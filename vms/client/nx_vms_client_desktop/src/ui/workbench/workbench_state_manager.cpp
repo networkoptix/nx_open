@@ -33,11 +33,14 @@ QnWorkbenchStateManager::QnWorkbenchStateManager(QObject *parent /* = nullptr*/)
 
 bool QnWorkbenchStateManager::tryClose(bool force)
 {
-    if (!force && canSaveState())
+    if (!force)
     {
         // State is saved by QnWorkbench::StateDelegate.
         if (auto statisticsManager = commonModule()->instance<QnStatisticsManager>())
+        {
             statisticsManager->saveCurrentStatistics();
+            statisticsManager->resetStatistics();
+        }
     }
 
     /* Order should be backward, so more recently opened dialogs will ask first. */
@@ -48,20 +51,6 @@ bool QnWorkbenchStateManager::tryClose(bool force)
     }
 
     return true;
-}
-
-bool QnWorkbenchStateManager::canSaveState() const
-{
-    /*
-     *  We may get here in the disconnect process when all layouts are already closed.
-     *  Marker of an invalid state - 'dummy' layout in the QnWorkbench class.
-     *  We can detect it by `workbench()->currentLayoutIndex() == -1` check.
-     */
-    return qnClientCoreModule->networkModule()->isConnected()
-        && qnRuntime->isDesktopMode()
-        && context()->user()
-        && !helpers::currentSystemIsNew(commonModule())
-        && workbench()->currentLayoutIndex() != -1;
 }
 
 void QnWorkbenchStateManager::registerDelegate(QnSessionAwareDelegate* d)

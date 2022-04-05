@@ -11,7 +11,7 @@
 #include <nx/network/ssl/certificate.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/common/html/html.h>
-#include <ui/statistics/modules/controls_statistics_module.h>
+#include <ui/statistics/modules/certificate_statistics_module.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "server_certificate_viewer.h"
@@ -73,15 +73,15 @@ ServerCertificateWarning::ServerCertificateWarning(
             switch (reason)
             {
                 case core::CertificateWarning::Reason::unknownServer:
-                    return "cert_unkn_dialog_" + name;
+                    return "unkn_dialog_" + name;
                 case core::CertificateWarning::Reason::invalidCertificate:
                 case core::CertificateWarning::Reason::serverCertificateChanged:
-                    return "cert_invl_dialog_" + name;
+                    return "invl_dialog_" + name;
             }
             return QString();
         };
-    auto statisticsModule = context()->statisticsModule();
-    statisticsModule->registerClick(statisticsName("open"));
+    auto statistics = context()->instance<QnCertificateStatisticsModule>();
+    statistics->registerClick(statisticsName("open"));
 
     // Init server certificate `link`
     auto link = new QLabel(common::html::localLink(tr("View certificate")));
@@ -97,7 +97,7 @@ ServerCertificateWarning::ServerCertificateWarning(
 
             // Show modal.
             viewer->open();
-            statisticsModule->registerClick(statisticsName("view_cert"));
+            statistics->registerClick(statisticsName("view_cert"));
         });
     addCustomWidget(link);
 
@@ -123,7 +123,8 @@ ServerCertificateWarning::ServerCertificateWarning(
         updateButtonState();
     }
 
-    statisticsModule->registerButton(statisticsName("connect"), connectButton);
+    connect(connectButton, &QPushButton::clicked,
+        statistics, [=] { statistics->registerClick(statisticsName("connect")); });
 
     // Create 'Cancel' button.
     setStandardButtons({QDialogButtonBox::Cancel});

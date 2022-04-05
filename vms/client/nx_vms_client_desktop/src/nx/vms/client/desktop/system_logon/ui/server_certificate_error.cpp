@@ -9,7 +9,7 @@
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/client/core/system_logon/certificate_warning.h>
 #include <nx/vms/common/html/html.h>
-#include <ui/statistics/modules/controls_statistics_module.h>
+#include <ui/statistics/modules/certificate_statistics_module.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "server_certificate_viewer.h"
@@ -30,6 +30,8 @@ ServerCertificateError::ServerCertificateError(
     setText(tr("Failed to connect to server"));
     setInformativeText(core::CertificateWarning::invalidCertificateError());
 
+    auto statistics = context()->instance<QnCertificateStatisticsModule>();
+
     // Init server certificate `link`
     auto link = new QLabel(common::html::localLink(tr("View certificate")));
     connect(link, &QLabel::linkActivated, this,
@@ -44,7 +46,7 @@ ServerCertificateError::ServerCertificateError(
 
             // Show modal.
             viewer->open();
-            context()->statisticsModule()->registerClick("cert_err_dialog_view_cert");
+            statistics->registerClick("err_dialog_view_cert");
         });
     addCustomWidget(link);
 
@@ -52,7 +54,7 @@ ServerCertificateError::ServerCertificateError(
     setStandardButtons({QDialogButtonBox::Ok});
     setDefaultButton(QDialogButtonBox::Ok);
 
-    context()->statisticsModule()->registerClick("cert_err_dialog_open");
+    statistics->registerClick("err_dialog_open");
 }
 
 } // namespace nx::vms::client::desktop

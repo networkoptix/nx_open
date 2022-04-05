@@ -15,17 +15,19 @@
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <network/system_helpers.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection_factory.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
+#include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <nx/utils/guarded_callback.h>
-#include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/style/skin.h>
+#include <ui/statistics/modules/certificate_statistics_module.h>
 #include <ui/workaround/widgets_signals_workaround.h>
+#include <ui/workbench/workbench_context.h>
 #include <utils/connection_diagnostics_helper.h>
 
 #include "../data/logon_data.h"
@@ -212,8 +214,12 @@ void LoginDialog::sendTestConnectionRequest(const nx::utils::Url& url)
         url.userName().toLower().toStdString(),
         nx::network::http::PasswordAuthToken(url.password().toStdString()));
 
+    std::shared_ptr<QnStatisticsScenarioGuard> connectScenario =
+        context()->instance<QnCertificateStatisticsModule>()->beginScenario(
+            QnCertificateStatisticsModule::Scenario::connectFromDialog);
+
     auto callback = nx::utils::guarded(this,
-        [url, this](RemoteConnectionFactory::ConnectionOrError result)
+        [url, connectScenario, this] (RemoteConnectionFactory::ConnectionOrError result)
         {
             if (!d->connectionProcess)
                 return;
@@ -347,6 +353,9 @@ void LoginDialog::at_testButton_clicked()
     NX_ASSERT(isValid());
     if (!isValid())
         return;
+
+    auto connectScenario = context()->instance<QnCertificateStatisticsModule>()->beginScenario(
+        ConnectScenario::connectFromDialog);
 
     nx::vms::client::core::RemoteConnectionPtr requestedConnection;
     bool setupNewServerRequested = false;

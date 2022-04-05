@@ -39,6 +39,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <ui/graphics/items/controls/time_slider.h>
+#include <ui/statistics/modules/certificate_statistics_module.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/workbench.h>
@@ -469,6 +470,7 @@ bool StartupActionsHandler::connectUsingCustomUri(const nx::vms::utils::SystemUr
     LogonData logonData({address, credentials});
     logonData.storeSession = false;
     logonData.secondaryInstance = true;
+    logonData.connectScenario = ConnectScenario::connectUsingCommand;
 
     if (uri.hasCloudSystemId())
         logonData.userType = nx::vms::api::UserType::cloud;
@@ -490,6 +492,7 @@ bool StartupActionsHandler::connectUsingCommandLineAuth(
 {
     // Set authentication parameters from the command line.
     LogonData logonData(startupParameters.parseAuthenticationString());
+    logonData.connectScenario = ConnectScenario::connectUsingCommand;
     if (logonData.address.isNull())
         return false;
 
@@ -561,14 +564,19 @@ bool StartupActionsHandler::connectToSystemIfNeeded(
             NX_DEBUG(this, "Auto-login to the server %1", address);
 
             LogonData logonData({address, *storedCredentials});
+            logonData.connectScenario = ConnectScenario::autoConnect;
             menu()->trigger(ConnectAction,
                 Parameters().withArgument(Qn::LogonDataRole, logonData));
             return true;
         }
         else if (qnCloudStatusWatcher->status() != QnCloudStatusWatcher::LoggedOut)
         {
+            CloudSystemConnectData connectData =
+                {systemId.toSimpleString(), ConnectScenario::autoConnect};
+
             menu()->trigger(ConnectToCloudSystemAction,
-                Parameters().withArgument(Qn::CloudSystemIdRole, systemId.toSimpleString()));
+                Parameters().withArgument(Qn::CloudSystemConnectDataRole, connectData));
+
             return true;
         }
     }

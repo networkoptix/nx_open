@@ -8,29 +8,29 @@
 #include <QtWidgets/QMenu>
 
 #include <client/client_runtime_settings.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/layout_item_index.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource/camera_resource.h>
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_matrix_index.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/build_info.h>
+#include <nx/utils/log/assert.h>
+#include <nx/vms/client/desktop/common/models/filter_proxy_model.h>
+#include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/desktop/system_logon/data/logon_data.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 #include <utils/common/delayed.h>
-
-#include <nx/build_info.h>
-#include <nx/utils/log/assert.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
-#include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
-#include <nx/vms/client/desktop/common/models/filter_proxy_model.h>
 
 namespace nx::vms::client::desktop {
 
@@ -514,8 +514,11 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
                     if (!d->context)
                         return;
 
+                    CloudSystemConnectData connectData =
+                        {cloudSystemId, ConnectScenario::connectFromTree};
+
                     d->context->menu()->trigger(ui::action::ConnectToCloudSystemAction,
-                        {Qn::CloudSystemIdRole, cloudSystemId});
+                        {Qn::CloudSystemConnectDataRole, connectData});
                 };
 
             // Looks like Qt has some bug when mouse events hangs and are targeted to
