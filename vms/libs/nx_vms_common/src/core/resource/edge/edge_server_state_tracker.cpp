@@ -5,6 +5,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <utils/camera/edge_device.h>
 
 namespace nx::core::resource {
 namespace edge {
@@ -30,78 +31,98 @@ EdgeServerStateTracker::EdgeServerStateTracker(QnMediaServerResource* edgeServer
         this, &EdgeServerStateTracker::onResourceRemoved);
 }
 
+bool EdgeServerStateTracker::hasUniqueCoupledChildCamera() const
+{
+    return (m_childCamerasIds & m_coupledCamerasIds).size() == 1;
+}
+
+QnVirtualCameraResourcePtr EdgeServerStateTracker::uniqueCoupledChildCamera() const
+{
+    if (!m_camerasTrackingInitialized)
+        return {};
+
+    const auto childCoupledCamerasIds = m_childCamerasIds & m_coupledCamerasIds;
+    if (childCoupledCamerasIds.size() == 1)
+    {
+        return m_edgeServer->resourcePool()->getResourceById(*childCoupledCamerasIds.begin())
+            .dynamicCast<QnVirtualCameraResource>();
+    }
+
+    return {};
+}
+
+bool EdgeServerStateTracker::hasCanonicalState() const
+{
+    return hasUniqueCoupledChildCamera() && m_childCamerasIds.size() == 1;
+}
+
 void EdgeServerStateTracker::initializeCamerasTracking()
 {
     const auto resourcePool = m_edgeServer->resourcePool();
-
     const auto allCameras =
         resourcePool->getAllCameras(QnResourcePtr(), /*ignoreDesktopCameras*/ true);
 
     for (const auto& camera: allCameras)
-    {
-        connect(camera.get(), &QnVirtualCameraResource::parentIdChanged,
-            this, &EdgeServerStateTracker::onCameraParentIdChanged);
+        trackCamera(camera);
 
-        if (camera->getParentId() == m_edgeServer->getId())
-            m_childCamerasIds.insert(camera->getId());
-
-        if (isCoupledCamera(camera))
-            m_coupledCamera = camera;
-    }
-
-    if (hasCoupledCamera())
-    {
-        connect(m_coupledCamera.get(), &QnVirtualCameraResource::nameChanged, this,
-            [this] { emit m_edgeServer->nameChanged(toSharedPointer(m_edgeServer)); });
-    }
-
-    m_hasCoupledCameraPreviousValue = hasCoupledCamera();
+    m_hasUniqueCoupledChildCameraPreviousValue = hasUniqueCoupledChildCamera();
     m_hasCanonicalStatePreviousValue = hasCanonicalState();
 
     m_camerasTrackingInitialized = true;
 }
 
-bool EdgeServerStateTracker::hasCoupledCamera() const
+void EdgeServerStateTracker::trackCamera(const QnVirtualCameraResourcePtr& camera)
 {
-    return !m_coupledCamera.isNull() && (m_coupledCamera->getParentId() == m_edgeServer->getId());
+    using namespace nx::vms::common::utils;
+
+    connect(camera.get(), &QnVirtualCameraResource::parentIdChanged,
+        this, &EdgeServerStateTracker::onCameraParentIdChanged);
+
+    const auto cameraId = camera->getId();
+
+    if (camera->getParentId() == m_edgeServer->getId())
+        m_childCamerasIds.insert(cameraId);
+
+    if (edge_device::isCoupledEdgeCamera(toSharedPointer(m_edgeServer), camera))
+    {
+        m_coupledCamerasIds.insert(cameraId);
+        connect(camera.get(), &QnVirtualCameraResource::nameChanged,
+            this, &EdgeServerStateTracker::onCoupledCameraNameChanged);
+    }
 }
 
-bool EdgeServerStateTracker::hasCanonicalState() const
+void EdgeServerStateTracker::updateState()
 {
-    return hasCoupledCamera() && m_childCamerasIds.size() == 1;
-}
+    if (m_hasUniqueCoupledChildCameraPreviousValue != hasUniqueCoupledChildCamera())
+    {
+        m_hasUniqueCoupledChildCameraPreviousValue = !m_hasUniqueCoupledChildCameraPreviousValue;
+        emit hasCoupledCameraChanged();
+    }
 
-QnVirtualCameraResourcePtr EdgeServerStateTracker::coupledCamera() const
-{
-    return m_coupledCamera;
+    if (m_hasCanonicalStatePreviousValue != hasCanonicalState())
+    {
+        m_hasCanonicalStatePreviousValue = !m_hasCanonicalStatePreviousValue;
+        emit hasCanonicalStateChanged();
+    }
 }
 
 void EdgeServerStateTracker::onResourceAdded(const QnResourcePtr& resource)
 {
     if (!m_camerasTrackingInitialized)
     {
-        if (resource != m_edgeServer)
-            return;
-
-        initializeCamerasTracking();
+        if (resource == m_edgeServer)
+            initializeCamerasTracking();
+        return;
     }
 
-    if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
+    if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
         if (camera->hasFlags(Qn::desktop_camera))
             return;
 
-        connect(camera.get(), &QnVirtualCameraResource::parentIdChanged,
-            this, &EdgeServerStateTracker::onCameraParentIdChanged);
+        trackCamera(camera);
 
-        if (camera->getParentId() == m_edgeServer->getId())
-            m_childCamerasIds.insert(camera->getId());
-
-        if (isCoupledCamera(camera))
-            m_coupledCamera = camera;
-
-        updateHasCoupledCamera();
-        updateHasCanonicalState();
+        updateState();
     }
 }
 
@@ -110,22 +131,19 @@ void EdgeServerStateTracker::onResourceRemoved(const QnResourcePtr& resource)
     if (!m_camerasTrackingInitialized)
         return;
 
-    if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
+    if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
         if (camera->hasFlags(Qn::desktop_camera))
             return;
 
-        if (isCoupledCamera(camera))
-        {
-            m_coupledCamera->disconnect(this);
-            m_coupledCamera = QnVirtualCameraResourcePtr();
-        }
+        camera->disconnect(this);
 
-        if (camera->getParentId() == m_edgeServer->getId())
-            m_childCamerasIds.remove(camera->getId());
+        const auto cameraId = camera->getId();
 
-        updateHasCoupledCamera();
-        updateHasCanonicalState();
+        m_coupledCamerasIds.remove(cameraId);
+        m_childCamerasIds.remove(cameraId);
+
+        updateState();
     }
 }
 
@@ -142,57 +160,13 @@ void EdgeServerStateTracker::onCameraParentIdChanged(const QnResourcePtr& resour
     if (camera->getParentId() == m_edgeServer->getId())
         m_childCamerasIds.insert(camera->getId());
 
-    updateHasCoupledCamera();
-    updateHasCanonicalState();
+    updateState();
 }
 
-bool EdgeServerStateTracker::isCoupledCamera(const QnVirtualCameraResourcePtr& camera) const
+void EdgeServerStateTracker::onCoupledCameraNameChanged(const QnResourcePtr& resource)
 {
-    using namespace nx::network;
-
-    if (camera->hasFlags(Qn::virtual_camera) || camera->hasFlags(Qn::desktop_camera))
-        return false;
-
-    const auto cameraHostAddressString = camera->getHostAddress();
-    if (cameraHostAddressString.isEmpty())
-        return false;
-
-    const auto cameraHostAddress = HostAddress(cameraHostAddressString);
-    const auto serverAddressList = m_edgeServer->getNetAddrList();
-
-    return std::any_of(std::cbegin(serverAddressList), std::cend(serverAddressList),
-        [&cameraHostAddress](const auto& serverAddress)
-        {
-            return serverAddress.address == cameraHostAddress;
-        });
-}
-
-void EdgeServerStateTracker::updateHasCoupledCamera()
-{
-    if (m_hasCoupledCameraPreviousValue == hasCoupledCamera())
-        return;
-
-    if (hasCoupledCamera())
-    {
-        connect(coupledCamera().get(), &QnVirtualCameraResource::nameChanged, this,
-            [this] { emit m_edgeServer->nameChanged(toSharedPointer(m_edgeServer)); });
-    }
-    else if (coupledCamera())
-    {
-        coupledCamera()->disconnect(this);
-    }
-
-    m_hasCoupledCameraPreviousValue = !m_hasCoupledCameraPreviousValue;
-    emit hasCoupledCameraChanged();
-}
-
-void EdgeServerStateTracker::updateHasCanonicalState()
-{
-    if (m_hasCanonicalStatePreviousValue == hasCanonicalState())
-        return;
-
-    m_hasCanonicalStatePreviousValue = !m_hasCanonicalStatePreviousValue;
-    emit hasCanonicalStateChanged();
+    if (hasUniqueCoupledChildCamera() && resource->getParentId() == m_edgeServer->getId())
+        emit m_edgeServer->nameChanged(toSharedPointer(m_edgeServer));
 }
 
 } // namespace edge

@@ -17,58 +17,59 @@ public:
     EdgeServerStateTracker(QnMediaServerResource* edgeServer);
 
     /**
-     * Checks existing camera resources in the resource pool for presence of EDGE device own
-     * camera, no matter is it child of considered EDGE server or not, also gathers list of server
-     * child devices. Starts further camera resources tracking.
-     * @note This method is not called from constructor, since querying resource pool within
-     *     setResourcePool() scope may cause deadlock. Initialization done on 'server added'
-     *     resource pool notification instead.
+     * @return True if unique camera resource that represents camera from an EDGE device is a child
+     *      of corresponding EDGE server. False if there are no such camera resource among the
+     *      child cameras of the server or, the other way around, there are more than one child
+     *      cameras representing the same EDGE camera with different IDs which may be result of
+     *      auto discovery or systems merge operations.
      */
-    void initializeCamerasTracking();
+    bool hasUniqueCoupledChildCamera() const;
 
     /**
-     * @returns True if camera resource binded with EDGE server (physically, as single device)
-     *     is an server's child.
+     * @return Pointer to the unique child camera resource that represents camera from an EDGE
+     *     device if <tt>hasUniqueCoupledChildCamera()</tt> returns true. Null pointer otherwise.
      */
-    bool hasCoupledCamera() const;
+    QnVirtualCameraResourcePtr uniqueCoupledChildCamera() const;
 
     /**
-     * @returns True if camera resource binded with EDGE server is server's one and only
-     *     child. That means than EDGE server may be displayed in the reduced state i.e as
-     *     single camera among other servers. Actual display state depends, for example,
-     *     also on QnMediaServerResource::isRedundancy(), so canonical state should be treated
-     *     only as possibility to be displayed in reduced state.
+     * @return True if unique camera resource that represents camera from an EDGE device is the one
+     *     and only child of corresponding EDGE server. In such case EDGE server may be represented
+     *     in the compact form in the Resource Tree, as camera within servers list. This method
+     *     informs whether it's possible or not to display EDGE server in the reduced form. Actual
+     *     display state depends on <tt>QnMediaServerResource::isRedundancy()</tt> method. Also see
+     *     <tt>QnMediaServerResource::isHiddenEdgeServer()</tt>
      */
     bool hasCanonicalState() const;
-
-    /**
-     * @returns Valid pointer to the camera resource binded with EDGE server if such exists
-     *     among all cameras in the system. It shouldn't be necessarily server's child. Null
-     *     pointer if no such found.
-     */
-    QnVirtualCameraResourcePtr coupledCamera() const;
 
 signals:
     void hasCoupledCameraChanged();
     void hasCanonicalStateChanged();
 
 private:
-    void updateHasCoupledCamera();
-    void updateHasCanonicalState();
+
+    /**
+     * @note This method isn't called from the constructor, since querying resource pool within
+     *     setResourcePool() scope may cause deadlock. Initialization done on 'server added'
+     *     resource pool notification instead.
+     */
+    void initializeCamerasTracking();
+    void trackCamera(const QnVirtualCameraResourcePtr& camera);
+
+    void updateState();
 
     void onResourceAdded(const QnResourcePtr& resource);
     void onResourceRemoved(const QnResourcePtr& resource);
     void onCameraParentIdChanged(const QnResourcePtr& resource, const QnUuid& previousParentId);
-    bool isCoupledCamera(const QnVirtualCameraResourcePtr& camera) const;
+    void onCoupledCameraNameChanged(const QnResourcePtr& resource);
 
 private:
     QnMediaServerResource* m_edgeServer;
-    QnVirtualCameraResourcePtr m_coupledCamera;
     QnUuidSet m_childCamerasIds;
+    QnUuidSet m_coupledCamerasIds;
 
     bool m_camerasTrackingInitialized = false;
 
-    bool m_hasCoupledCameraPreviousValue = false;
+    bool m_hasUniqueCoupledChildCameraPreviousValue = false;
     bool m_hasCanonicalStatePreviousValue = false;
 };
 

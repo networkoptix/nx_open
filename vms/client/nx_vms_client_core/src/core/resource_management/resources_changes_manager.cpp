@@ -250,7 +250,7 @@ void QnResourcesChangesManager::deleteResources(
         if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
         {
             const bool isHiddenEdgeServer =
-                QnMediaServerResource::isHiddenServer(camera->getParentResource());
+                QnMediaServerResource::isHiddenEdgeServer(camera->getParentResource());
             if (isHiddenEdgeServer && !camera->hasFlags(Qn::virtual_camera))
                 parentToDelete = camera->getParentId();
         }

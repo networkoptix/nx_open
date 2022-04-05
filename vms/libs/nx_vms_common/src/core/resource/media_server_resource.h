@@ -120,13 +120,7 @@ public:
 
     static bool isEdgeServer(const QnResourcePtr& resource);
     static bool isArmServer(const QnResourcePtr& resource);
-    static bool isHiddenServer(const QnResourcePtr& resource);
-
-    /**
-     * Camera resource which represents camera binded with EDGE server physically, as single
-     * device, if such found in the system. Not necessary child of given server resource.
-     */
-    static QnVirtualCameraResourcePtr getEdgeServerCoupledCamera(const QnResourcePtr& resource);
+    static bool isHiddenEdgeServer(const QnResourcePtr& resource);
 
     virtual void setStatus(
         nx::vms::api::ResourceStatus newStatus,

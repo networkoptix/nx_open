@@ -132,8 +132,8 @@ QString QnMediaServerResource::getName() const
 
     if (getServerFlags().testFlag(vms::api::SF_Edge) && !m_edgeServerStateTracker.isNull())
     {
-        if (m_edgeServerStateTracker->hasCoupledCamera())
-            return m_edgeServerStateTracker->coupledCamera()->getName();
+        if (m_edgeServerStateTracker->hasUniqueCoupledChildCamera())
+            return m_edgeServerStateTracker->uniqueCoupledChildCamera()->getName();
     }
 
     {
@@ -624,7 +624,7 @@ nx::vms::api::ModuleInformationWithAddresses
     return information;
 }
 
-bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource)
+bool QnMediaServerResource::isEdgeServer(const QnResourcePtr& resource)
 {
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
         return (server->getServerFlags().testFlag(vms::api::SF_Edge));
@@ -636,40 +636,14 @@ nx::core::resource::edge::EdgeServerStateTracker* QnMediaServerResource::edgeSer
     return m_edgeServerStateTracker.get();
 }
 
-QnVirtualCameraResourcePtr QnMediaServerResource::getEdgeServerCoupledCamera(
-    const QnResourcePtr& resource)
-{
-    if (!resource || !resource->hasFlags(Qn::server) || resource->hasFlags(Qn::fake))
-    {
-        NX_ASSERT("Passed resource is not a server");
-        return QnVirtualCameraResourcePtr();
-    }
-
-    const auto server = resource.staticCast<QnMediaServerResource>();
-    if (!server->getServerFlags().testFlag(vms::api::SF_Edge))
-    {
-        NX_ASSERT("Passed resource is not an EDGE server");
-        return QnVirtualCameraResourcePtr();
-    }
-
-    auto edgeServerStateTracker = server->edgeServerStateTracker();
-    if (!edgeServerStateTracker)
-    {
-        NX_ASSERT("m_edgeServerStateTracker isn't initialized yet");
-        return QnVirtualCameraResourcePtr();
-    }
-
-    return edgeServerStateTracker->coupledCamera();
-}
-
-bool QnMediaServerResource::isArmServer(const QnResourcePtr &resource)
+bool QnMediaServerResource::isArmServer(const QnResourcePtr& resource)
 {
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
         return (server->getServerFlags().testFlag(vms::api::SF_ArmServer));
     return false;
 }
 
-bool QnMediaServerResource::isHiddenServer(const QnResourcePtr &resource)
+bool QnMediaServerResource::isHiddenEdgeServer(const QnResourcePtr& resource)
 {
     // EDGE server may be represented as single camera item if:
     // 1. It have no child cameras except single non-virtual one with the same host address.

@@ -272,12 +272,15 @@ LayoutTourData ResourceTreeModelTest::addLayoutTour(
 
 QnVirtualCameraResourcePtr ResourceTreeModelTest::addCamera(
     const QString& name,
-    const QnUuid& parentId /*= QnUuid()*/) const
+    const QnUuid& parentId,
+    const QString& hostAddress) const
 {
     QnVirtualCameraResourcePtr camera(new CameraResourceStub());
     camera->setName(name);
     camera->setIdUnsafe(QnUuid::createUuid());
     camera->setParentId(parentId);
+    if (!hostAddress.isEmpty())
+        camera->setHostAddress(hostAddress);
     resourcePool()->addResource(camera);
     return camera;
 }

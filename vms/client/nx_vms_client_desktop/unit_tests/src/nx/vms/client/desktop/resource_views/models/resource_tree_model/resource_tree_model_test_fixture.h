@@ -76,8 +76,10 @@ protected:
 
     nx::vms::api::LayoutTourData addLayoutTour(const QString& name,
         const QnUuid& parentId = QnUuid()) const;
-    QnVirtualCameraResourcePtr addCamera(const QString& name,
-        const QnUuid& parentId = QnUuid()) const;
+    QnVirtualCameraResourcePtr addCamera(
+        const QString& name,
+        const QnUuid& parentId = QnUuid(),
+        const QString& hostAddress = QString()) const;
     QnVirtualCameraResourcePtr addEdgeCamera(
         const QString& name, const QnMediaServerResourcePtr& edgeServer) const;
     QnVirtualCameraResourcePtr addVirtualCamera(const QString& name,
