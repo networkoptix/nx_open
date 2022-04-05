@@ -321,6 +321,7 @@ void QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
         case RemoteConnectionErrorCode::cloudSessionExpired:
         case RemoteConnectionErrorCode::unauthorized:
         case RemoteConnectionErrorCode::userIsDisabled:
+        case RemoteConnectionErrorCode::twoFactorAuthOfCloudUserIsDisabled:
             icon = QnMessageBox::Icon::Warning;
             break;
         default:
@@ -334,6 +335,9 @@ void QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
         case RemoteConnectionErrorCode::sessionExpired:
         case RemoteConnectionErrorCode::cloudSessionExpired:
             title = tr("Your session has expired");
+            break;
+        case RemoteConnectionErrorCode::twoFactorAuthOfCloudUserIsDisabled:
+            title = tr("Failed to login to \"%1\" system").arg(moduleInformation.systemName);
             break;
         default:
             title = tr("Failed to connect to Server");
@@ -361,6 +365,8 @@ void QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
         {
             if (link == "#cloud")
                 context->menu()->trigger(ui::action::LoginToCloud);
+            else if (link == "#cloud_account_security")
+                context->menu()->trigger(ui::action::OpenCloudAccountSecurityUrl);
         });
 
     msgBox.exec();

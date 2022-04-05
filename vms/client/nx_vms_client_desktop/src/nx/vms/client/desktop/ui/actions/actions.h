@@ -1298,6 +1298,11 @@ enum IDType
     LogoutFromCloud,
 
     /**
+     * Opens cloud portal in the browser at account security page.
+     */
+    OpenCloudAccountSecurityUrl,
+
+    /**
     * Opens cloud portal in the browser at register page.
     */
     OpenCloudRegisterUrl,
