@@ -4,16 +4,14 @@
 
 #include <QtCore/QProcess>
 #include <QtCore/QScopedValueRollback>
-
 #include <QtGui/QDesktopServices>
 #include <QtGui/QImage>
 #include <QtGui/QImageWriter>
-
-#include <QtWidgets/QGroupBox>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
+#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPlainTextEdit>
 #include <QtWidgets/QPushButton>
@@ -67,6 +65,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/utils/metatypes.h>
 #include <nx/utils/platform/process.h>
 #include <nx/utils/qset.h>
 #include <nx/utils/std/algorithm.h>
@@ -92,6 +91,7 @@
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/resource_views/functional_delegate_utilities.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
+#include <nx/vms/client/desktop/rules/rules_dialog.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/state/screen_manager.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
@@ -111,7 +111,6 @@
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/client/desktop/utils/parameter_helper.h>
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
-#include <nx/vms/client/desktop/rules/rules_dialog.h>
 #include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/network/abstract_certificate_verifier.h>

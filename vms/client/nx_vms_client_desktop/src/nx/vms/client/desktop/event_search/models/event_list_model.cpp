@@ -1,15 +1,16 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "event_list_model.h"
-#include "private/event_list_model_p.h"
 
 #include <QtCore/QDateTime>
 
 #include <core/resource/camera_resource.h>
-#include <utils/common/synctime.h>
-#include <utils/common/delayed.h>
-
+#include <nx/utils/metatypes.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <utils/common/delayed.h>
+#include <utils/common/synctime.h>
+
+#include "private/event_list_model_p.h"
 
 namespace nx::vms::client::desktop {
 

@@ -2,9 +2,9 @@
 
 #include "debug_actions_handler.h"
 
+#include <QtWidgets/QAction>
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QPushButton>
-#include <QtWidgets/QAction>
 
 #include <api/common_message_processor.h>
 #include <client/client_runtime_settings.h>
@@ -16,21 +16,22 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/event/actions/common_action.h>
 #include <nx/vms/rules/action_fields/substitution.h>
+#include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_connector.h>
-#include <nx/vms/rules/events/debug_event.h>
-#include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx/vms/rules/event_fields/keywords_field.h>
+#include <nx/vms/rules/events/debug_event.h>
 #include <ui/dialogs/common/dialog.h>
 #include <ui/workbench/workbench_context.h>
+#include <utils/common/synctime.h>
 
 #include "../dialogs/animations_control_dialog.h"
 #include "../dialogs/applauncher_control_dialog.h"
 #include "../dialogs/credentials_store_dialog.h"
 #include "../dialogs/custom_settings_test_dialog.h"
 #include "../dialogs/interactive_settings_test_dialog.h"
-#include "../dialogs/qml_test_dialog.h"
 #include "../dialogs/palette_dialog.h"
+#include "../dialogs/qml_test_dialog.h"
 #include "../dialogs/resource_pool_dialog.h"
 #include "../dialogs/web_engine_dialog.h"
 #include "../utils/cameras_actions.h"
@@ -49,11 +50,21 @@ class DebugEventConnector:
 public:
     void atInc()
     {
-        emit event(EventPtr(new DebugEvent("Increment", qnRuntime->debugCounter())));
+        emit event(EventPtr(new DebugEvent(
+            "Debug Event",
+            QString("Increment action with value: %1").arg(qnRuntime->debugCounter()),
+            "Increment",
+            qnRuntime->debugCounter(),
+            std::chrono::microseconds(qnSyncTime->currentUSecsSinceEpoch()))));
     }
     void atDec()
     {
-        emit event(EventPtr(new DebugEvent("Decrement", qnRuntime->debugCounter())));
+        emit event(EventPtr(new DebugEvent(
+            "Debug Event",
+            QString("Decrement action with value: %1").arg(qnRuntime->debugCounter()),
+            "Decrement",
+            qnRuntime->debugCounter(),
+            std::chrono::microseconds(qnSyncTime->currentUSecsSinceEpoch()))));
     }
 };
 

@@ -20,7 +20,13 @@ class NX_VMS_RULES_API GenericEvent: public BasicEvent
 public:
     GenericEvent() = default;
 
-    GenericEvent(const QString &source, const QString &caption, const QString &description):
+    GenericEvent(
+        const QString &source,
+        const QString &caption,
+        const QString &description,
+        std::chrono::microseconds timestamp)
+        :
+        BasicEvent(timestamp),
         m_source(source),
         m_caption(caption),
         m_description(description)

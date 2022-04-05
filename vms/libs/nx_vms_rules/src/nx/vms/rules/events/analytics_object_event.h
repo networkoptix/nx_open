@@ -27,8 +27,10 @@ public:
         QnUuid cameraId,
         QnUuid engineId,
         QnUuid objectTypeId,
-        QnUuid objectTrackId)
+        QnUuid objectTrackId,
+        std::chrono::microseconds timestamp)
         :
+        BasicEvent(timestamp),
         m_cameraId(cameraId),
         m_engineId(engineId),
         m_objectTypeId(objectTypeId),

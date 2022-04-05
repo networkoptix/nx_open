@@ -15,6 +15,7 @@
 #include <nx/utils/datetime.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/metatypes.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/scope_guard.h>

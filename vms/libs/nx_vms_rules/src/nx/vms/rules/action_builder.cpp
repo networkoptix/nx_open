@@ -6,6 +6,8 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QVariant>
 
+#include <nx/utils/qobject.h>
+
 #include "action_field.h"
 #include "basic_action.h"
 
@@ -144,10 +146,20 @@ ActionPtr ActionBuilder::process(const EventData& eventData)
         if (!action)
             return {};
 
-        for (const auto& [name, field]: m_fields)
+        for (const auto& propertyName: utils::propertyNames(action.get()))
         {
-            const auto value = field->build(eventData);
-            action->setProperty(name.toUtf8().data(), value);
+            if (m_fields.contains(propertyName))
+            {
+                auto& field = m_fields.at(propertyName);
+                const auto value = field->build(eventData);
+                action->setProperty(propertyName.toUtf8().data(), value);
+            }
+            else
+            {
+                // Set property value only if it exists.
+                if (action->property(propertyName.toUtf8().data()).isValid())
+                    action->setProperty(propertyName.toUtf8().data(), eventData.value(propertyName));
+            }
         }
 
         return action;

@@ -91,7 +91,7 @@ private:
         if (auto contentType = text.trimmed(); contentType != kAutoValue)
             field->setValue(contentType);
         else
-            field->setValue("");
+            field->setValue({});
 
         emit edited();
     }

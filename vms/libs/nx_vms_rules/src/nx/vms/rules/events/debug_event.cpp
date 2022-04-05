@@ -7,6 +7,45 @@
 
 namespace nx::vms::rules {
 
+DebugEvent::DebugEvent(
+    const QString& caption,
+    const QString& description,
+    const QString& action,
+    qint64 value,
+    std::chrono::microseconds timestamp)
+    :
+    BasicEvent(timestamp),
+    m_action(action),
+    m_value(value),
+    m_caption(caption),
+    m_description(description)
+{
+}
+
+QString DebugEvent::caption() const
+{
+    return m_caption.isEmpty()
+        ? manifest().displayName
+        : m_caption;
+}
+
+void DebugEvent::setCaption(const QString& caption)
+{
+    m_caption = caption;
+}
+
+QString DebugEvent::description() const
+{
+    return m_description.isEmpty()
+        ? QString("%1 action with value: %2").arg(m_action).arg(m_value)
+        : m_description;
+}
+
+void DebugEvent::setDescription(const QString& description)
+{
+    m_description = description;
+}
+
 FilterManifest DebugEvent::filterManifest()
 {
     return {};

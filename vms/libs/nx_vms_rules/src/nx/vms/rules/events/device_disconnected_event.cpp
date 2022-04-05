@@ -6,7 +6,9 @@
 
 namespace nx::vms::rules {
 
-DeviceDisconnectedEvent::DeviceDisconnectedEvent(QnUuid deviceId, EventTimestamp timestamp)
+DeviceDisconnectedEvent::DeviceDisconnectedEvent(
+    QnUuid deviceId,
+    std::chrono::microseconds timestamp)
     :
     base_type(timestamp),
     m_deviceId(deviceId)

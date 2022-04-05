@@ -3,13 +3,14 @@
 #include "poe_over_budget_event.h"
 
 #include "../event_fields/source_server_field.h"
+#include "../utils/type.h"
 
 namespace nx::vms::rules {
 
 const ItemDescriptor& PoeOverBudgetEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
-        .id = eventType<PoeOverBudgetEvent>(),
+        .id = utils::type<PoeOverBudgetEvent>(),
         .displayName = tr("PoE over Budget"),
         .description = "",
         .fields = {

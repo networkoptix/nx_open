@@ -298,21 +298,4 @@ void QnCommonMetaTypes::initialize()
     QnJsonSerializer::registerSerializer<QList<QnResourceChannelMapping>>();
 
     qRegisterMetaType<nx::String>();
-
-    qRegisterMetaType<std::chrono::hours>();
-    qRegisterMetaType<std::chrono::minutes>();
-    qRegisterMetaType<std::chrono::seconds>();
-    qRegisterMetaType<std::chrono::milliseconds>();
-    qRegisterMetaType<std::chrono::microseconds>();
-
-    QMetaType::registerConverter<std::chrono::hours, std::chrono::minutes>();
-    QMetaType::registerConverter<std::chrono::hours, std::chrono::seconds>();
-    QMetaType::registerConverter<std::chrono::hours, std::chrono::milliseconds>();
-    QMetaType::registerConverter<std::chrono::hours, std::chrono::microseconds>();
-    QMetaType::registerConverter<std::chrono::minutes, std::chrono::seconds>();
-    QMetaType::registerConverter<std::chrono::minutes, std::chrono::milliseconds>();
-    QMetaType::registerConverter<std::chrono::minutes, std::chrono::microseconds>();
-    QMetaType::registerConverter<std::chrono::seconds, std::chrono::milliseconds>();
-    QMetaType::registerConverter<std::chrono::seconds, std::chrono::microseconds>();
-    QMetaType::registerConverter<std::chrono::milliseconds, std::chrono::microseconds>();
 }

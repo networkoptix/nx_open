@@ -16,27 +16,26 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <motion/motion_detection.h>
-#include <ui/help/business_help.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <ui/workbench/workbench_access_controller.h>
-
 #include <nx/api/mediaserver/image_request.h>
-#include <nx/vms/text/human_readable.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-#include <nx/vms/client/desktop/utils/managed_camera_set.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/algorithm/merge_sorted_lists.h>
 #include <nx/utils/datetime.h>
-#include <nx/utils/log/assert.h>
-#include <nx/utils/log/log.h>
-#include <nx/utils/log/format.h>
-#include <nx/utils/scope_guard.h>
 #include <nx/utils/guarded_callback.h>
-#include <nx/vms/event/event_fwd.h>
-
+#include <nx/utils/log/assert.h>
+#include <nx/utils/log/format.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/metatypes.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/utils/managed_camera_set.h>
+#include <nx/vms/event/event_fwd.h>
+#include <nx/vms/text/human_readable.h>
+#include <ui/help/business_help.h>
+#include <ui/workbench/workbench_access_controller.h>
 
 namespace nx::vms::client::desktop {
 

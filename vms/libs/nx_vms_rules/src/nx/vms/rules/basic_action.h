@@ -30,28 +30,28 @@ enum class ActionType
 class NX_VMS_RULES_API BasicAction: public QObject
 {
     Q_OBJECT
-
-public:
-    static constexpr auto kType = "type";
+    Q_PROPERTY(std::chrono::microseconds timestamp READ timestamp WRITE setTimestamp)
+    Q_PROPERTY(QString eventType READ eventType WRITE setEventType)
 
 public:
     QString type() const;
+
+    std::chrono::microseconds timestamp() const;
+    void setTimestamp(std::chrono::microseconds timestamp);
+    QString eventType() const;
+    void setEventType(const QString& eventType);
+
+    /** Returns a rule id the action belongs to. */
+    QnUuid ruleId() const;
+    void setRuleId(const QnUuid& ruleId);
 
 protected:
     BasicAction() = default;
 
 private:
-    //QString m_type;
+    std::chrono::microseconds m_timestamp;
+    QString m_eventType;
+    QnUuid m_ruleId;
 };
-
-// TODO: #sapa Unify with event and field. Choose name between type & metatype.
-template<class T>
-QString actionType()
-{
-    const auto& meta = T::staticMetaObject;
-    int idx = meta.indexOfClassInfo(BasicAction::kType);
-
-    return (idx < 0) ? QString() : meta.classInfo(idx).value();
-}
 
 } // namespace nx::vms::rules

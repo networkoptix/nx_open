@@ -10,6 +10,7 @@
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/metatypes.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
@@ -147,13 +148,18 @@ NotificationListModel::Private::Private(NotificationListModel* q):
         {
             // #mmalofeev does it need action id?
 
+            QnResourcePtr resource = resourcePool()->getResourceById(notificationAction->sourceId());
+
             EventData eventData;
             eventData.id = QnUuid::createUuid();
             eventData.title = notificationAction->caption();
             eventData.description = notificationAction->description();
             eventData.lifetime = kDisplayTimeout;
             eventData.removable = true;
-            eventData.extraData = QVariant::fromValue(ExtraData({}, {}));
+            eventData.extraData =
+                QVariant::fromValue(ExtraData(notificationAction->ruleId(), resource));
+            eventData.timestamp = notificationAction->timestamp();
+            eventData.source = resource;
 
             if (!this->q->addEvent(eventData))
                 return;

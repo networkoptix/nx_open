@@ -27,6 +27,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/format.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/metatypes.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/vms/api/analytics/descriptors.h>

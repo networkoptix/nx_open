@@ -29,7 +29,6 @@ struct ItemDescriptor;
 using EventPtr = QSharedPointer<BasicEvent>;
 using ActionPtr = QSharedPointer<BasicAction>;
 
-using EventTimestamp = std::chrono::microseconds;
 using EventData = QHash<QString, QVariant>; // TODO: #spanasenko Move to separate class?
 
 using FilterManifest = QMap<QString, QString>; //< Field name to field type mapping.

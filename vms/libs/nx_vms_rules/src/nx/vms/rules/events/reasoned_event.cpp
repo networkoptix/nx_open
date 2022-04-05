@@ -6,7 +6,7 @@ namespace nx::vms::rules {
 
 ReasonedEvent::ReasonedEvent(
     QnUuid serverId,
-    EventTimestamp timestamp,
+    std::chrono::microseconds timestamp,
     EventReason reasonCode,
     const QString& reasonText)
     :

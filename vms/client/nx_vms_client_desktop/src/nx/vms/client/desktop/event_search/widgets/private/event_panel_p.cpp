@@ -6,51 +6,50 @@
 
 #include <QtCore/QModelIndex>
 #include <QtCore/QScopedValueRollback>
+#include <QtGui/QWindow>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QScrollBar>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QVBoxLayout>
-#include <QtGui/QWindow>
 
-#include <core/resource/camera_resource.h>
 #include <client/client_module.h>
+#include <core/resource/camera_resource.h>
+#include <nx/api/mediaserver/image_request.h>
+#include <nx/utils/metatypes.h>
+#include <nx/utils/range_adapters.h>
+#include <nx/vms/client/desktop/common/widgets/animated_tab_widget.h>
+#include <nx/vms/client/desktop/common/widgets/compact_tab_bar.h>
+#include <nx/vms/client/desktop/common/widgets/text_edit_label.h>
+#include <nx/vms/client/desktop/event_search/synchronizers/analytics_search_synchronizer.h>
+#include <nx/vms/client/desktop/event_search/synchronizers/bookmark_search_synchronizer.h>
+#include <nx/vms/client/desktop/event_search/synchronizers/motion_search_synchronizer.h>
+#include <nx/vms/client/desktop/event_search/widgets/analytics_search_widget.h>
+#include <nx/vms/client/desktop/event_search/widgets/bookmark_search_widget.h>
+#include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
+#include <nx/vms/client/desktop/event_search/widgets/event_search_widget.h>
+#include <nx/vms/client/desktop/event_search/widgets/notification_counter_label.h>
+#include <nx/vms/client/desktop/event_search/widgets/notification_list_widget.h>
+#include <nx/vms/client/desktop/event_search/widgets/simple_motion_search_widget.h>
+#include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
+#include <nx/vms/client/desktop/image_providers/multi_image_provider.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/session_manager/session_manager.h>
+#include <nx/vms/client/desktop/state/client_state_handler.h>
+#include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/utils/widget_utils.h>
+#include <nx/vms/client/desktop/workbench/widgets/thumbnail_tooltip.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/animation/widget_opacity_animator.h>
 #include <ui/common/notification_levels.h>
 #include <ui/processors/hover_processor.h>
-#include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/event_processors.h>
-
-#include <nx/api/mediaserver/image_request.h>
-#include <nx/vms/client/desktop/common/widgets/animated_tab_widget.h>
-#include <nx/vms/client/desktop/common/widgets/compact_tab_bar.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/event_search/synchronizers/analytics_search_synchronizer.h>
-#include <nx/vms/client/desktop/event_search/synchronizers/bookmark_search_synchronizer.h>
-#include <nx/vms/client/desktop/event_search/synchronizers/motion_search_synchronizer.h>
-#include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
-#include <nx/vms/client/desktop/event_search/widgets/simple_motion_search_widget.h>
-#include <nx/vms/client/desktop/event_search/widgets/bookmark_search_widget.h>
-#include <nx/vms/client/desktop/event_search/widgets/event_search_widget.h>
-#include <nx/vms/client/desktop/event_search/widgets/analytics_search_widget.h>
-#include <nx/vms/client/desktop/event_search/widgets/notification_list_widget.h>
-#include <nx/vms/client/desktop/event_search/widgets/notification_counter_label.h>
-#include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
-#include <nx/vms/client/desktop/image_providers/multi_image_provider.h>
-#include <nx/vms/client/desktop/session_manager/session_manager.h>
-#include <nx/vms/client/desktop/state/client_state_handler.h>
-#include <nx/vms/client/desktop/workbench/widgets/thumbnail_tooltip.h>
-#include <nx/vms/client/desktop/ini.h>
-#include <nx/utils/range_adapters.h>
-
-#include <nx/vms/client/desktop/utils/widget_utils.h>
-#include <nx/vms/client/desktop/common/widgets/text_edit_label.h>
 
 using namespace std::chrono;
 

@@ -7,17 +7,17 @@
 #include <QtCore/QTimer>
 
 #include <core/resource/camera_resource.h>
+#include <nx/utils/elapsed_timer.h>
+#include <nx/utils/log/assert.h>
+#include <nx/utils/metatypes.h>
+#include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/desktop/event_search/models/bookmark_search_list_model.h>
+#include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/event_processors.h>
-
-#include <nx/vms/client/desktop/event_search/models/bookmark_search_list_model.h>
-#include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
-#include <nx/utils/elapsed_timer.h>
-#include <nx/utils/log/assert.h>
-#include <nx/utils/scoped_connections.h>
 
 namespace nx::vms::client::desktop {
 

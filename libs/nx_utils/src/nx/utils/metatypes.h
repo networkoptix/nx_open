@@ -2,6 +2,10 @@
 
 #pragma once
 
+#include <chrono>
+
+#include <QtCore/QMetaType>
+
 namespace nx::utils {
 
 struct NX_UTILS_API Metatypes
@@ -10,3 +14,9 @@ struct NX_UTILS_API Metatypes
 };
 
 } // namespace nx::utils
+
+Q_DECLARE_METATYPE(std::chrono::hours)
+Q_DECLARE_METATYPE(std::chrono::minutes)
+Q_DECLARE_METATYPE(std::chrono::seconds)
+Q_DECLARE_METATYPE(std::chrono::milliseconds)
+Q_DECLARE_METATYPE(std::chrono::microseconds)

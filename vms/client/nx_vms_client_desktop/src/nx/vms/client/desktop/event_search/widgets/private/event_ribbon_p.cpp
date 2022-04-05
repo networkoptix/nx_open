@@ -9,9 +9,9 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtGui/QTextDocument>
 #include <QtGui/QWheelEvent>
+#include <QtWidgets/QApplication>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QScrollBar>
-#include <QtWidgets/QApplication>
 
 #include <client/client_globals.h>
 #include <common/common_module.h>
@@ -22,6 +22,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/metatypes.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/utils/geometry.h>

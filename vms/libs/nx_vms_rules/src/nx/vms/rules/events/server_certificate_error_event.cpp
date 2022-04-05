@@ -2,12 +2,14 @@
 
 #include "server_certificate_error_event.h"
 
+#include "../utils/type.h"
+
 namespace nx::vms::rules {
 
 const ItemDescriptor& ServerCertificateErrorEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
-        .id = eventType<ServerCertificateErrorEvent>(),
+        .id = utils::type<ServerCertificateErrorEvent>(),
         .displayName = tr("Server Certificate Error"),
         .description = "",
     };
@@ -16,7 +18,7 @@ const ItemDescriptor& ServerCertificateErrorEvent::manifest()
 
 ServerCertificateErrorEvent::ServerCertificateErrorEvent(
     QnUuid serverId,
-    EventTimestamp timestamp)
+    std::chrono::microseconds timestamp)
     :
     base_type(timestamp),
     m_serverId(serverId)
