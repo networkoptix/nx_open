@@ -7,6 +7,7 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
+#include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
@@ -58,6 +59,10 @@ static const QList<EventType> kAllEvents{
  */
 static const QList<EventType> kDeprecatedEvents {
     EventType::backupFinishedEvent
+};
+
+static const QMap<EventType, GlobalPermission> kEventPermissions {
+    {EventType::cameraIpConflictEvent, GlobalPermission::editCameras},
 };
 
 }
@@ -344,6 +349,18 @@ bool hasAccessToSource(const EventParameters& params, const QnUserResourcePtr& u
         return false;
 
     const auto context = user->systemContext();
+
+    if (const auto permission = kEventPermissions.value(params.eventType);
+        (permission != GlobalPermission::none) &&
+            !context->globalPermissionsManager()->hasGlobalPermission(user, permission))
+    {
+        NX_VERBOSE(
+            NX_SCOPE_TAG,
+            "User %1 has no global permission %2 for the event %3",
+            user, permission, params.eventType);
+
+        return false;
+    }
 
     if (isSourceCameraRequired(params.eventType))
     {
