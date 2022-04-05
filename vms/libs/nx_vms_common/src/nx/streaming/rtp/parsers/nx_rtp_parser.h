@@ -6,8 +6,9 @@
 #include <QtCore/QMap>
 #include <QtCore/QFile>
 
-#include <nx/streaming/rtp/result.h>
 #include <nx/analytics/metadata_logger.h>
+#include <nx/streaming/rtp/result.h>
+#include <nx/utils/software_version.h>
 
 namespace nx::streaming::rtp {
 
@@ -27,11 +28,13 @@ public:
      * Don't parse incoming audio packets if value is false.
      */
     void setAudioEnabled(bool value);
+    void setServerVersion(const nx::utils::SoftwareVersion& serverVersion);
 
 private:
     void logMediaData(const QnAbstractMediaDataPtr& metadata);
 
 private:
+    nx::utils::SoftwareVersion m_serverVersion;
     const QnUuid m_deviceId;
     CodecParametersConstPtr m_context;
     QnAbstractMediaDataPtr m_mediaData;
