@@ -418,6 +418,11 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
                     if (!validated)
                         context->error = RemoteConnectionErrorCode::unauthorized;
                 }
+                else if (*response.error
+                    == nx::cloud::db::api::OauthManager::k2faDisabledForUserError)
+                {
+                    context->error = RemoteConnectionErrorCode::twoFactorAuthOfCloudUserIsDisabled;
+                }
                 else
                 {
                     context->error = RemoteConnectionErrorCode::unauthorized;

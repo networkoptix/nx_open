@@ -162,6 +162,18 @@ public:
                 };
             }
 
+            case RemoteConnectionErrorCode::twoFactorAuthOfCloudUserIsDisabled:
+            {
+                // %1 is link with name "account settings". It leads to /account/security section
+                // of Nx Cloud.
+                const QString message = tr("Two-factor authentication is required.")
+                    + html::kLineBreak
+                    + tr("You can configure it in your %1.")
+                          .arg(html::localLink("account settings", "#cloud_account_security"));
+
+                return {message, message};
+            }
+
             case RemoteConnectionErrorCode::unauthorized:
             {
                 return {

@@ -16,6 +16,7 @@ class OauthManager
 public:
     static constexpr std::string_view kTokenPrefix = "nxcdb-";
     static constexpr std::string_view k2faRequiredError = "second_factor_required";
+    static constexpr std::string_view k2faDisabledForUserError = "2fa_disabled_for_the_user";
 
     virtual ~OauthManager() = default;
 
