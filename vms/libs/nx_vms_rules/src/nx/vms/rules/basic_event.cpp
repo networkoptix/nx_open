@@ -2,28 +2,20 @@
 
 #include "basic_event.h"
 
-#include <QtCore/QDateTime>
 #include <QtCore/QMetaProperty>
+
+#include "utils/type.h"
 
 namespace nx::vms::rules {
 
-BasicEvent::BasicEvent(const nx::vms::api::rules::EventInfo& info)
-    :
+BasicEvent::BasicEvent(const nx::vms::api::rules::EventInfo& info):
     m_type(info.eventType),
-    m_state(info.state),
-    m_timestamp(QDateTime::currentMSecsSinceEpoch()) //< qnSyncTime?
+    m_state(info.state)
 {
 }
 
-BasicEvent::BasicEvent(EventTimestamp timestamp):
+BasicEvent::BasicEvent(std::chrono::microseconds timestamp):
     m_timestamp(timestamp)
-{
-}
-
-BasicEvent::BasicEvent()
-    :
-    m_state(State::none),
-    m_timestamp(QDateTime::currentMSecsSinceEpoch()) //< qnSyncTime?
 {
 }
 
@@ -32,29 +24,25 @@ QString BasicEvent::type() const
     if (!m_type.isEmpty())
         return m_type;
 
-    if (auto index = metaObject()->indexOfClassInfo("type"); index != -1)
-        return metaObject()->classInfo(index).value();
-
-    return {}; //< Assert?
+    return utils::type(metaObject()); //< Assert?
 }
 
-QStringList BasicEvent::fields() const
+QString BasicEvent::caption() const
 {
-    QStringList result;
+    return {};
+}
 
-    auto meta = metaObject();
-    for (int i = base_type::staticMetaObject.propertyOffset(); i < meta->propertyCount(); ++i)
-    {
-        const auto& propName = meta->property(i).name();
-        result << propName;
-    }
+void BasicEvent::setCaption(const QString&)
+{
+}
 
-    for (const auto& propName: this->dynamicPropertyNames())
-    {
-        result << propName;
-    }
+QString BasicEvent::description() const
+{
+    return {};
+}
 
-    return result;
+void BasicEvent::setDescription(const QString&)
+{
 }
 
 } // namespace nx::vms::rules

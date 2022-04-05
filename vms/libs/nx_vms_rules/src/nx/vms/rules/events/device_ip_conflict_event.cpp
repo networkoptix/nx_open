@@ -18,7 +18,7 @@ const ItemDescriptor& DeviceIpConflictEvent::manifest()
 
 DeviceIpConflictEvent::DeviceIpConflictEvent(
     QnUuid serverId,
-    EventTimestamp timestamp,
+    std::chrono::microseconds timestamp,
     const QHostAddress& address,
     const QStringList& macAddrList)
     :

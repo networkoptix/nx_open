@@ -8,13 +8,14 @@
 #include "../action_fields/password_field.h"
 #include "../action_fields/text_field.h"
 #include "../action_fields/text_with_fields.h"
+#include "../utils/type.h"
 
 namespace nx::vms::rules {
 
 const ItemDescriptor& HttpAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
-        .id = actionType<HttpAction>(),
+        .id = utils::type<HttpAction>(),
         .displayName = tr("Do HTTP request"),
         .description = "",
         .fields = {

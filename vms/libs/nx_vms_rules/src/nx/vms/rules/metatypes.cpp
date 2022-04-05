@@ -20,9 +20,6 @@ void Metatypes::initialize()
     QnJsonSerializer::registerSerializer<QnUuidList>();
 
     QnJsonSerializer::registerSerializer<QSet<QnUuid>>();
-
-    // qRegisterMetaType<UuidSelection>();
-    // QnJsonSerializer::registerSerializer<UuidSelection>();
 };
 
 } // namespace nx::vms::rules

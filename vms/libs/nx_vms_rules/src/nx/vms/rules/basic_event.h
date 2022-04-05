@@ -25,42 +25,33 @@ class NX_VMS_RULES_API BasicEvent: public QObject
     Q_OBJECT
     using base_type = QObject;
 
-    Q_PROPERTY(EventTimestamp timestamp MEMBER m_timestamp)
-    Q_PROPERTY(QString type READ type)
+    Q_PROPERTY(std::chrono::microseconds timestamp MEMBER m_timestamp)
+    Q_PROPERTY(QString caption READ caption WRITE setCaption)
+    Q_PROPERTY(QString description READ description WRITE setDescription)
 
 public:
-    static constexpr auto kType = "type";
-
     using State = nx::vms::api::rules::EventInfo::State;
 
 public:
     explicit BasicEvent(const nx::vms::api::rules::EventInfo& info);
-    explicit BasicEvent(EventTimestamp timestamp);
+    explicit BasicEvent(std::chrono::microseconds timestamp);
 
     QString type() const;
 
-    /** List of event field names. */
-    QStringList fields() const;
+    virtual QString caption() const;
+    virtual void setCaption(const QString& caption);
+    virtual QString description() const;
+    virtual void setDescription(const QString& description);
 
 protected:
-    BasicEvent();
+    BasicEvent() = default;
 
 private:
     QString m_type;
-    State m_state;
+    State m_state{State::none};
 
-    EventTimestamp m_timestamp;
+    std::chrono::microseconds m_timestamp;
 };
-
-// TODO: #sapa Unify with event and field. Choose name between type & metatype.
-template<class T>
-QString eventType()
-{
-    const auto& meta = T::staticMetaObject;
-    int idx = meta.indexOfClassInfo(BasicEvent::kType);
-
-    return (idx < 0) ? QString() : meta.classInfo(idx).value();
-}
 
 } // namespace nx::vms::rules
 

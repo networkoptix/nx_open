@@ -17,7 +17,8 @@ class NX_VMS_RULES_API CameraInputEvent: public BasicEvent
     // TODO: input port
 
 public:
-    CameraInputEvent(const QnUuid& cameraId):
+    CameraInputEvent(const QnUuid& cameraId, std::chrono::microseconds timestamp):
+        BasicEvent(timestamp),
         m_cameraId(cameraId)
     {
     }

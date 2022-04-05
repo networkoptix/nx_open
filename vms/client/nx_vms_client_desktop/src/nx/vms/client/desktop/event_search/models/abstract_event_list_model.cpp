@@ -6,6 +6,7 @@
 
 #include <client/client_globals.h>
 #include <nx/utils/datetime.h>
+#include <nx/utils/metatypes.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/time/formatter.h>

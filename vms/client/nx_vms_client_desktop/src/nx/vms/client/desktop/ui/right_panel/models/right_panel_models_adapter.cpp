@@ -24,6 +24,7 @@
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/metatypes.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/scope_guard.h>

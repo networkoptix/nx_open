@@ -13,11 +13,12 @@ class NX_VMS_RULES_API NotificationAction: public nx::vms::rules::BasicAction
     Q_OBJECT
     Q_CLASSINFO("type", "nx.actions.desktopNotification")
 
+    FIELD(QString, caption, setCaption)
+    FIELD(QString, description, setDescription)
     FIELD(nx::vms::rules::UuidSelection, users, setUsers)
     FIELD(int, interval, setInterval)
     FIELD(bool, acknowledge, setAcknowledge)
-    FIELD(QString, caption, setCaption)
-    FIELD(QString, description, setDescription)
+    FIELD(QnUuid, sourceId, setSourceId)
 
 public:
     static const ItemDescriptor& manifest();

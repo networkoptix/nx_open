@@ -15,11 +15,10 @@ class NX_VMS_RULES_API ServerStartedEvent: public BasicEvent
 
     FIELD(QnUuid, serverId, setServerId)
 
-
 public:
     static const ItemDescriptor& manifest();
 
-    ServerStartedEvent(QnUuid serverId, EventTimestamp timestamp);
+    ServerStartedEvent(QnUuid serverId, std::chrono::microseconds timestamp);
 };
 
 } // namespace nx::vms::rules

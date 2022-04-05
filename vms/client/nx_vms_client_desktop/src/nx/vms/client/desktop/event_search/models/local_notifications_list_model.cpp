@@ -5,6 +5,7 @@
 #include <QAction>
 
 #include <client/client_globals.h>
+#include <nx/utils/metatypes.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>

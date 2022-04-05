@@ -1,14 +1,15 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "system_health_list_model.h"
-#include "private/system_health_list_model_p.h"
 
 #include <client/client_globals.h>
 #include <core/resource/resource.h>
+#include <nx/utils/metatypes.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <ui/common/notification_levels.h>
 #include <utils/common/delayed.h>
 
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include "private/system_health_list_model_p.h"
 
 namespace nx::vms::client::desktop {
 

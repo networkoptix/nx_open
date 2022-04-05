@@ -24,7 +24,7 @@ public:
 
     DeviceIpConflictEvent(
         QnUuid deviceId,
-        EventTimestamp timestamp,
+        std::chrono::microseconds timestamp,
         const QHostAddress& address,
         const QStringList& macAddrList);
 };

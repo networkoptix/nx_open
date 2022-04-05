@@ -3,13 +3,14 @@
 #include "fan_error_event.h"
 
 #include "../event_fields/source_server_field.h"
+#include "../utils/type.h"
 
 namespace nx::vms::rules {
 
 const ItemDescriptor& FanErrorEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
-        .id = eventType<FanErrorEvent>(),
+        .id = utils::type<FanErrorEvent>(),
         .displayName = tr("Fan Error"),
         .description = "",
         .fields = {
@@ -19,7 +20,7 @@ const ItemDescriptor& FanErrorEvent::manifest()
     return kDescriptor;
 }
 
-FanErrorEvent::FanErrorEvent(QnUuid serverId, EventTimestamp timestamp):
+FanErrorEvent::FanErrorEvent(QnUuid serverId, std::chrono::microseconds timestamp):
     base_type(timestamp),
     m_serverId(serverId)
 {

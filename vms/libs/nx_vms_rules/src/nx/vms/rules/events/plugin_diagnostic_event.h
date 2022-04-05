@@ -28,14 +28,15 @@ public:
         QnUuid engineId,
         const QString &caption,
         const QString &description,
-        int level)
+        int level,
+        std::chrono::microseconds timestamp)
         :
+        BasicEvent(timestamp),
         m_cameraId(cameraId),
         m_engineId(engineId),
         m_caption(caption),
         m_description(description),
         m_level(level)
-
     {
     }
 

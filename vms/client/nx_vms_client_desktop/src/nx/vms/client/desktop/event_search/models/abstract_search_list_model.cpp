@@ -8,14 +8,14 @@
 #include <client/client_message_processor.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
+#include <nx/utils/datetime.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/metatypes.h>
+#include <nx/utils/model_row_iterator.h>
+#include <nx/vms/client/desktop/utils/managed_camera_set.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
-
-#include <nx/vms/client/desktop/utils/managed_camera_set.h>
-#include <nx/utils/datetime.h>
-#include <nx/utils/log/log.h>
-#include <nx/utils/model_row_iterator.h>
 
 namespace nx::vms::client::desktop {
 

@@ -18,7 +18,7 @@ class NX_VMS_RULES_API FanErrorEvent: public BasicEvent
 public:
     static const ItemDescriptor& manifest();
 
-    FanErrorEvent(QnUuid serverId, EventTimestamp timestamp);
+    FanErrorEvent(QnUuid serverId, std::chrono::microseconds timestamp);
 };
 
 } // namespace nx::vms::rules

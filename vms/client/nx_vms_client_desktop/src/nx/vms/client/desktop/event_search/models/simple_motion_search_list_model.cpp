@@ -8,26 +8,25 @@
 
 #include <camera/loaders/caching_camera_data_loader.h>
 #include <core/resource/camera_resource.h>
+#include <nx/api/mediaserver/image_request.h>
+#include <nx/utils/datetime.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/metatypes.h>
+#include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/event/event_fwd.h>
+#include <nx/vms/text/human_readable.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/help/business_help.h>
-#include <nx/vms/client/desktop/style/skin.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/synctime.h>
-
-#include <nx/api/mediaserver/image_request.h>
-#include <nx/vms/text/human_readable.h>
-#include <nx/vms/client/core/watchers/server_time_watcher.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-#include <nx/vms/event/event_fwd.h>
-#include <nx/utils/datetime.h>
-#include <nx/utils/log/log.h>
-
-#include <nx/vms/client/desktop/ini.h>
 
 using namespace std::chrono;
 

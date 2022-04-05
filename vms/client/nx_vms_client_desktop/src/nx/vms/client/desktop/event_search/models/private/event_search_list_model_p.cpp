@@ -15,6 +15,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/datetime.h>
+#include <nx/utils/metatypes.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/style/skin.h>

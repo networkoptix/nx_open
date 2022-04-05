@@ -29,6 +29,7 @@
 #include <nx/utils/datetime.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/metatypes.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/qset.h>
 #include <nx/utils/range_adapters.h>
@@ -569,7 +570,7 @@ void TileInteractionHandler::performDragAndDrop(
 }
 
 void TileInteractionHandler::showContextMenu(
-    const QModelIndex& index, 
+    const QModelIndex& index,
     const QPoint& globalPos,
     bool withStandardInteraction,
     QWidget* parent)

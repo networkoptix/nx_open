@@ -6,6 +6,7 @@
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/qobject.h>
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/rules/ini.h>
 
@@ -690,7 +691,7 @@ void Engine::processEvent(const EventPtr& event)
             //    resources += builder->affectedResources(eventData);
             //}
 
-            for (const auto& fieldName: event->fields())
+            for (const auto& fieldName: utils::propertyNames(event.get()))
             {
                 eventFields += fieldName;
             }
@@ -725,7 +726,10 @@ void Engine::processAcceptedEvent(const QnUuid& ruleId, const EventData& eventDa
     for (const auto builder: rule->actionBuilders())
     {
         if (auto action = builder->process(eventData))
+        {
+            action->setRuleId(ruleId);
             processAction(action);
+        }
     }
 }
 

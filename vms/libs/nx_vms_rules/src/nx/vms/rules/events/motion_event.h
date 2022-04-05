@@ -16,7 +16,8 @@ class NX_VMS_RULES_API MotionEvent: public BasicEvent
     FIELD(QnUuid, cameraId, setCameraId)
 
 public:
-    MotionEvent(const QnUuid& cameraId):
+    MotionEvent(const QnUuid& cameraId, std::chrono::microseconds timestamp):
+        BasicEvent(timestamp),
         m_cameraId(cameraId)
     {
     }

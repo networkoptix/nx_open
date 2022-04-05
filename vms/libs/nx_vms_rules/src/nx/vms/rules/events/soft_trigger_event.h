@@ -15,17 +15,28 @@ class NX_VMS_RULES_API SoftTriggerEvent: public BasicEvent
 
     FIELD(QnUuid, cameraId, setCameraId)
     FIELD(QnUuid, userId, setUserId)
+    FIELD(QString, triggerName, setTriggerName)
 
 public:
     SoftTriggerEvent() = default;
-    SoftTriggerEvent(const QnUuid &cameraId, const QnUuid &userId):
+    SoftTriggerEvent(
+        const QnUuid& cameraId,
+        const QnUuid& userId,
+        std::chrono::microseconds timestamp):
+        BasicEvent(timestamp),
         m_cameraId(cameraId),
         m_userId(userId)
     {
     }
 
+    virtual QString caption() const override;
+    virtual void setCaption(const QString& caption) override;
+
     static FilterManifest filterManifest();
     static const ItemDescriptor& manifest();
+
+private:
+    QString m_caption;
 };
 
 } // namespace nx::vms::rules

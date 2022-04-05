@@ -27,6 +27,7 @@
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/utils/counter.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/metatypes.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>

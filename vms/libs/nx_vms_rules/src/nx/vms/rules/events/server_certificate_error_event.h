@@ -18,7 +18,7 @@ class NX_VMS_RULES_API ServerCertificateErrorEvent: public BasicEvent
 public:
     static const ItemDescriptor& manifest();
 
-    ServerCertificateErrorEvent(QnUuid serverId, EventTimestamp timestamp);
+    ServerCertificateErrorEvent(QnUuid serverId, std::chrono::microseconds timestamp);
 };
 
 } // namespace nx::vms::rules
