@@ -139,10 +139,15 @@ void QnResourceAccessManager::setPermissionsInternal(const QnResourceAccessSubje
             if (!resource->resourcePool())
                 return false;
 
-            if (subject.user())
-                return subject.user()->resourcePool() != nullptr;
+            if (const auto user = subject.user())
+            {
+                // TODO: Find out if we want to check: user->isEnabled()
+                // TODO: fix the problem with dangling role ids and return check for:
+                //     userRolesManager()->hasRoles(user->userRoleIds())
+                return user->resourcePool() != nullptr;
+            }
 
-            return m_context->userRolesManager()->hasRole(subject.effectiveId());
+            return m_context->userRolesManager()->hasRole(subject.id());
         };
 
     if (isValid())
@@ -164,8 +169,7 @@ void QnResourceAccessManager::setPermissionsInternal(const QnResourceAccessSubje
         }
     }
 
-    NX_DEBUG(this, "%1 -> %2: %3",
-        subject.name(), resource->getName(), permissions);
+    NX_DEBUG(this, "%1 -> %2: %3", subject, resource->getName(), permissions);
     emit permissionsChanged(subject, resource, permissions);
 }
 
@@ -342,13 +346,15 @@ void QnResourceAccessManager::recalculateAllPermissions()
             return resource->resourcePool() == nullptr;
         });
 
-    nx::utils::remove_if(subjects,
+    std::erase_if(subjects,
         [this](const auto& subject)
         {
-            if (subject.user())
-                return !subject.user()->isEnabled() || subject.user()->resourcePool() == nullptr;
-            return !m_context->userRolesManager()->hasRole(subject.effectiveId());
-
+            if (const auto user = subject.user())
+            {
+                return !user->isEnabled() || !user->resourcePool()
+                    || !m_context->userRolesManager()->hasRoles(user->userRoleIds());
+            }
+            return !m_context->userRolesManager()->hasRole(subject.id());
         });
 
     auto permissionsCache = std::make_unique<PermissionsCache>();
@@ -1036,7 +1042,7 @@ bool QnResourceAccessManager::canModifyStorage(
 bool QnResourceAccessManager::canCreateUser(const QnResourceAccessSubject& subject,
     const nx::vms::api::UserData& data) const
 {
-    if (!data.userRoleId.isNull() && !m_context->userRolesManager()->hasRole(data.userRoleId))
+    if (!m_context->userRolesManager()->hasRoles(data.userRoleIds))
         return false;
 
     if (data.isCloud && !data.fullName.isEmpty())
@@ -1076,7 +1082,7 @@ bool QnResourceAccessManager::canModifyUser(
     const QnResourcePtr& target,
     const nx::vms::api::UserData& update) const
 {
-    if (!update.userRoleId.isNull() && !m_context->userRolesManager()->hasRole(update.userRoleId))
+    if (!m_context->userRolesManager()->hasRoles(update.userRoleIds))
         return false;
 
     auto userResource = target.dynamicCast<QnUserResource>();

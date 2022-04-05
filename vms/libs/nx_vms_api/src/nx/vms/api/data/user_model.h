@@ -15,6 +15,10 @@
 
 namespace nx::vms::api {
 
+// TODO: UserModel should be split in 2:
+// - v1::UserModel - current implementation for /rest/v1/users
+// - v2::UserModel - replace `QnUuid userRoleId` with `std::vector<QnUuid> groupIds` for /rest/v2/users
+
 /**%apidoc
  * User information object.
  */

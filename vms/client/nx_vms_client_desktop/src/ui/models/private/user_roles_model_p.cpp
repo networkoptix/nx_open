@@ -89,7 +89,7 @@ int QnUserRolesModelPrivate::rowForUser(const QnUserResourcePtr& user) const
         case Qn::UserRole::customUserRole:
         {
             auto roleIterator = std::find_if(m_userRoles.begin(), m_userRoles.end(),
-                [roleId = user->userRoleId()](const UserRoleData& role)
+                [roleId = user->firstRoleId()](const UserRoleData& role)
                 {
                     return role.id == roleId;
                 });

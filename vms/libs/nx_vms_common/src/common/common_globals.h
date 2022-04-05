@@ -561,6 +561,8 @@ namespace Qn {
      */
     enum class UserRole
     {
+        // TODO: This value should be removed. Role permissions shoud be added on top of own
+        //     user permissions.
         customUserRole = -2,
         customPermissions = -1,
         owner = 0,

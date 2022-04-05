@@ -3136,7 +3136,12 @@ bool QnMediaResourceWidget::isRelevantTriggerRule(const vms::event::RulePtr& rul
     if (::contains(subjects, currentUser->getId()))
         return true;
 
-    return ::contains(subjects, QnUserRolesManager::unifiedUserRoleId(currentUser));
+    for (const auto& roleId: currentUser->allUserRoleIds())
+    {
+        if (::contains(subjects, roleId))
+            return true;
+    }
+    return false;
 }
 
 void QnMediaResourceWidget::updateTriggerButtonTooltip(

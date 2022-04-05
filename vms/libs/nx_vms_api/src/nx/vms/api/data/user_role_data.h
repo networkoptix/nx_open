@@ -21,16 +21,26 @@ struct NX_VMS_API UserRoleData: IdData
 
     GlobalPermissions permissions;
 
+    /**%apidoc[opt] List of roles to inherit permissions. */
+    std::vector<QnUuid> parentRoleIds; //< TODO: Rename to parentGroupIds on gneral renaming.
+
     UserRoleData() = default;
-    UserRoleData(const QnUuid& id, const QString& name, GlobalPermissions permissions):
-        IdData(id), name(name), permissions(permissions) {}
+    UserRoleData(
+        const QnUuid& id, const QString& name,
+        GlobalPermissions permissions = {}, std::vector<QnUuid> parentRoleIds = {})
+        :
+        IdData(id), name(name), permissions(permissions), parentRoleIds(std::move(parentRoleIds))
+    {
+    }
 
     bool operator==(const UserRoleData& other) const = default;
+    QString toString() const;
 };
 #define UserRoleData_Fields \
     IdData_Fields \
     (name) \
-    (permissions)
+    (permissions) \
+    (parentRoleIds)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(UserRoleData)
 
 /**%apidoc Predefined non-editable role.

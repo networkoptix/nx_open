@@ -37,7 +37,8 @@ UserModel::DbUpdateTypes UserModel::toDbTypes() &&
     }
     user.fullName = std::move(fullName);
     user.permissions = std::move(permissions);
-    user.userRoleId = std::move(userRoleId);
+    if (!userRoleId.isNull())
+        user.userRoleIds.push_back(std::move(userRoleId));
     user.email = std::move(email);
     user.isEnabled = std::move(isEnabled);
     if (password)
@@ -78,7 +79,7 @@ std::vector<UserModel> UserModel::fromDbTypes(DbListTypes all)
         model.fullName = std::move(baseData.fullName);
         model.isOwner = baseData.isAdmin;
         model.permissions = std::move(baseData.permissions);
-        model.userRoleId = std::move(baseData.userRoleId);
+        model.userRoleId = baseData.userRoleIds.empty() ? QnUuid() : std::move(baseData.userRoleIds[0]);
         model.email = std::move(baseData.email);
         model.isHttpDigestEnabled = baseData.isCloud
             ? false

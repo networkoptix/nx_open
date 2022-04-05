@@ -70,20 +70,23 @@ bool SharedLayoutItemAccessProvider::calculateAccess(const QnResourceAccessSubje
     NX_ASSERT(mode() == Mode::cached);
 
     // Method is called under the mutex.
-    // Using effective id as aggregators are created for users and roles separately
-    QnLayoutItemAggregatorPtr aggregator = m_aggregatorsBySubject.value(subject.effectiveId());
-
-    if (!aggregator)
+    // Using effective ids as aggregators are created for users and roles separately.
+    for (const auto& s: m_context->resourceAccessSubjectsCache()->subjectWithParents(subject))
     {
-        // We may got here if role is deleted while user is not
-        NX_ASSERT(subject.isUser());
-        NX_ASSERT_HEAVY_CONDITION(subject.user()->userRole() == Qn::UserRole::customUserRole);
-        aggregator = m_aggregatorsBySubject.value(subject.id());
-    }
+        QnLayoutItemAggregatorPtr aggregator = m_aggregatorsBySubject.value(s.id());
 
-    NX_ASSERT(aggregator);
-    if (aggregator)
-        return aggregator->hasItem(resource->getId());
+        if (!aggregator)
+        {
+            // We may got here if role is deleted while user is not
+            NX_ASSERT(subject.isUser());
+            NX_ASSERT_HEAVY_CONDITION(subject.user()->userRole() == Qn::UserRole::customUserRole);
+            aggregator = m_aggregatorsBySubject.value(subject.id());
+        }
+
+        NX_ASSERT(aggregator);
+        if (aggregator && aggregator->hasItem(resource->getId()))
+            return true;
+    }
 
     return false;
 }

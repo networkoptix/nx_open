@@ -23,7 +23,7 @@ public:
     virtual QVector<QnResourcePtr> getResources() override;
 
 private:
-    void onUserRoleChanged(const QnUserResourcePtr& user, const QnUuid& previousRoleId);
+    void onUserRolesChanged(const QnUserResourcePtr& user, const std::vector<QnUuid>& previousRoleId);
     void onEnabledChanged(const QnUserResourcePtr& user);
 
     const QnResourcePool* m_resourcePool = nullptr;

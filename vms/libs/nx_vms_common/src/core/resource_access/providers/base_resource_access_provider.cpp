@@ -2,13 +2,14 @@
 
 #include "base_resource_access_provider.h"
 
-#include <core/resource/user_resource.h>
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subjects_cache.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
+#include <core/resource/user_resource.h>
+#include <nx/utils/log/log_main.h>
 #include <nx/vms/api/data/user_role_data.h>
 #include <nx/vms/common/system_context.h>
 
@@ -45,13 +46,23 @@ bool BaseResourceAccessProvider::hasAccess(const QnResourceAccessSubject& subjec
     const QnResourcePtr& resource) const
 {
     if (!acceptable(subject, resource))
+    {
+        NX_VERBOSE(this, "%1 -> %2 is not acceptable", subject, resource);
         return false;
+    }
 
     if (mode() == Mode::direct)
     {
-        return isSubjectEnabled(subject)
-            && calculateAccess(subject, resource,
-                m_context->globalPermissionsManager()->globalPermissions(subject));
+        if (!isSubjectEnabled(subject))
+        {
+            NX_VERBOSE(this, "%1 is disabled", subject);
+            return false;
+        }
+
+        const auto result = calculateAccess(subject, resource,
+            m_context->globalPermissionsManager()->globalPermissions(subject));
+        NX_VERBOSE(this, "%1 -> %2 is %3", subject, resource, result ? "accessible" : "inaccessible");
+        return result;
     }
 
     /**
@@ -64,9 +75,11 @@ bool BaseResourceAccessProvider::hasAccess(const QnResourceAccessSubject& subjec
     NX_MUTEX_LOCKER lk(&m_mutex);
 
     const auto iterator = m_accessibleResources.constFind(subject.id());
-    return iterator == m_accessibleResources.end()
+    const auto result = (iterator == m_accessibleResources.end())
         ? false
         : iterator->contains(resource->getId());
+    NX_VERBOSE(this, "%1 -> %2 is %3 from cache", subject, resource, result ? "accessible" : "inaccessible");
+    return result;
 }
 
 QSet<QnUuid> BaseResourceAccessProvider::accessibleResources(const QnResourceAccessSubject& subject) const
@@ -110,7 +123,10 @@ void BaseResourceAccessProvider::afterUpdate()
     for (const auto& subject: subjects)
     {
         if (!isSubjectEnabled(subject))
+        {
+            NX_VERBOSE(this, "%1 is disabled after update", subject);
             continue;
+        }
         const auto globalPermissions =
             m_context->globalPermissionsManager()->globalPermissions(subject);
         auto& accessible = m_accessibleResources[subject.id()];
@@ -119,6 +135,7 @@ void BaseResourceAccessProvider::afterUpdate()
             if (calculateAccess(subject, resource, globalPermissions))
                 accessible.insert(resource->getId());
         }
+        NX_VERBOSE(this, "%1 has acces to %2 after update", subject, nx::containerString(accessible));
     }
 }
 
@@ -149,6 +166,7 @@ void BaseResourceAccessProvider::updateAccessToResource(const QnResourcePtr& res
         return;
 
     const auto allSubjects = m_context->resourceAccessSubjectsCache()->allSubjects();
+    NX_VERBOSE(this, "Updating access to %1 by %2", resource, nx::containerString(allSubjects));
     for (const auto& subject: allSubjects)
         updateAccess(subject, resource);
 }
@@ -161,6 +179,7 @@ void BaseResourceAccessProvider::updateAccessBySubject(const QnResourceAccessSub
         return;
 
     const auto resources = m_context->resourcePool()->getResources();
+    NX_VERBOSE(this, "Updating access by %1 to %2", subject, nx::containerString(resources));
     for (const auto& resource: resources)
         updateAccess(subject, resource);
 }
@@ -195,13 +214,12 @@ void BaseResourceAccessProvider::updateAccess(const QnResourceAccessSubject& sub
             accessible.remove(targetId);
     }
 
+    NX_VERBOSE(this, "%1 access for %2 to %3", resource, subject, newValue);
     emit accessChanged(subject, resource, newValue ? baseSource() : Source::none);
 
     if (subject.isRole())
     {
-        const auto usersInRole =
-            m_context->resourceAccessSubjectsCache()->usersInRole(subject.effectiveId());
-        for (const auto& dependent: usersInRole)
+        for (const auto& dependent: m_context->resourceAccessSubjectsCache()->allSubjectsInRole(subject.id()))
             updateAccess(dependent, resource);
     }
 }
@@ -226,7 +244,7 @@ void BaseResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resour
             &BaseResourceAccessProvider::updateAccessBySubject);
 
         /* Changing of role means change of all user access rights. */
-        connect(user, &QnUserResource::userRoleChanged, this,
+        connect(user, &QnUserResource::userRolesChanged, this,
             &BaseResourceAccessProvider::updateAccessBySubject);
 
         handleSubjectAdded(user);
@@ -281,8 +299,7 @@ void BaseResourceAccessProvider::handleRoleRemoved(const nx::vms::api::UserRoleD
     if (isUpdating())
         return;
 
-    const auto usersInRole = m_context->resourceAccessSubjectsCache()->usersInRole(userRole.id);
-    for (const auto& subject: usersInRole)
+    for (const auto& subject: m_context->resourceAccessSubjectsCache()->allSubjectsInRole(userRole.id))
         updateAccessBySubject(subject);
 }
 
@@ -305,7 +322,6 @@ void BaseResourceAccessProvider::handleSubjectRemoved(const QnResourceAccessSubj
     QSet<QnUuid> resourceIds;
     {
         NX_MUTEX_LOCKER lk(&m_mutex);
-        NX_ASSERT(m_accessibleResources.contains(id));
         resourceIds = m_accessibleResources.take(id);
     }
 

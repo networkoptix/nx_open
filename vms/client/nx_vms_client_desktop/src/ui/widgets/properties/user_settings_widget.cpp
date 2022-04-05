@@ -246,7 +246,7 @@ bool QnUserSettingsWidget::hasChanges() const
     {
         const auto selectedRole = this->selectedRole();
         const bool changed = selectedRole == Qn::UserRole::customUserRole
-            ? m_model->user()->userRoleId() != selectedUserRoleId()
+            ? m_model->user()->firstRoleId() != selectedUserRoleId()
             : m_model->user()->userRole() != selectedRole;
         if (changed)
             return true;
@@ -404,7 +404,7 @@ void QnUserSettingsWidget::applyChanges()
     /* Here we must be sure settings widget goes before the permissions one. */
     if (permissions.testFlag(Qn::WriteAccessRightsPermission))
     {
-        m_model->user()->setUserRoleId(selectedUserRoleId());
+        m_model->user()->setSingleUserRole(selectedUserRoleId()); //< TODO: Handle more than 1 role.
 
         // We must set special 'Custom' flag for the users to avoid collisions with built-in roles.
         m_model->user()->setRawPermissions(selectedRole() == Qn::UserRole::customPermissions

@@ -48,36 +48,55 @@ struct NX_VMS_API UserData: ResourceData
      bool isAdmin = false;
 
     GlobalPermissions permissions = GlobalPermission::none;
-    /**%apidoc[opt] User role unique id.*/
+
+    /**%apidoc[opt]
+     * User role unique id.
+     * %deprecated Use `userRoleIds` instead.
+     */
     QnUuid userRoleId;
+
+    /**%apidoc[opt] List of roles to inherit permissions. */
+    std::vector<QnUuid> userRoleIds; //< TODO: Rename to userGroupIds on gneral renaming.
+
     /**%apidoc[opt] User's email.*/
     QString email;
+
     /**%apidoc[proprietary] HA1 digest hash from user password, as per RFC 2069. When modifying an
      * existing user, supply empty string. When creating a new user, calculate the value based on
      * UTF-8 password as follows:
      * <code>digest = md5_hex(user_name + ":" + realm + ":" + password);</code>
      */
     QnLatin1Array digest;
+
     /**%apidoc[proprietary] User's password hash. When modifying an existing user, supply empty
      * string. When creating a new user, see QnUserHash for detailed options.
      */
     QnLatin1Array hash;
+
     /**%apidoc[proprietary] Cryptography key hash. Supply empty string when creating, keep the
      * value when modifying.
      */
     QnLatin1Array cryptSha512Hash; /**< Hash suitable to be used in /etc/shadow file.*/
+
     /**%apidoc[proprietary] HTTP authorization realm as defined in RFC 2617, can be obtained via
      * /api/getTime.
      */
     QString realm;
+
     /**%apidoc[opt] Whether the user was imported from LDAP.*/
     bool isLdap = false;
+
     /**%apidoc[opt] Whether the user is enabled.*/
     bool isEnabled = true;
+
     /**%apidoc[opt] Whether the user is a cloud user, as opposed to a local one.*/
     bool isCloud = false;
+
     /**%apidoc[opt] Full name of the user.*/
     QString fullName;
+
+    bool adaptFromDeprecatedApi();
+    void adaptForDeprecatedApi();
 };
 #define UserData_Fields \
     ResourceData_Fields \
@@ -92,7 +111,8 @@ struct NX_VMS_API UserData: ResourceData
     (isEnabled) \
     (userRoleId)  \
     (isCloud)  \
-    (fullName)
+    (fullName) \
+    (userRoleIds)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(UserData)
 NX_REFLECTION_INSTRUMENT(UserData, UserData_Fields)
 

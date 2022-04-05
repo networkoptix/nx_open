@@ -952,7 +952,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createSubjectLayoutsEntity(
             FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy);
     }
 
-    if (!subject.user()->userRoleId().isNull())
+    if (!subject.user()->userRoleIds().empty())
     {
         layoutsList->installItemSource(m_itemKeySourcePool->userLayoutsSource(subject.user()));
         return layoutsList;

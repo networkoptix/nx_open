@@ -2,12 +2,13 @@
 
 #include "resource_pool_test_helper.h"
 
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
-#include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/user_role_data.h>
 
@@ -169,7 +170,11 @@ QnStorageResourcePtr QnResourcePoolTestHelper::addStorage(const QnMediaServerRes
     return storage;
 }
 
-nx::vms::api::UserRoleData QnResourcePoolTestHelper::createRole(GlobalPermissions permissions)
+nx::vms::api::UserRoleData QnResourcePoolTestHelper::createRole(
+    GlobalPermissions permissions, std::vector<QnUuid> parentRoleIds)
 {
-    return {QnUuid::createUuid(), "test_role", permissions};
+    const auto name = NX_FMT("Role for %1", nx::reflect::json::serialize(permissions));
+    nx::vms::api::UserRoleData role{QnUuid::createUuid(), name, permissions, parentRoleIds};
+    userRolesManager()->addOrUpdateUserRole(role);
+    return role;
 }

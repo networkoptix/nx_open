@@ -15,7 +15,7 @@
 
 namespace {
 
-int countEnabledUsers(const QList<QnResourceAccessSubject>& subjects)
+int countEnabledUsers(const std::unordered_set<QnResourceAccessSubject>& subjects)
 {
     return std::count_if(subjects.cbegin(), subjects.cend(),
         [](const QnResourceAccessSubject& subject) -> bool
@@ -100,12 +100,12 @@ QValidator::State RoleListModel::validateRole(const QnUuid& roleId) const
         return m_roleValidator(roleId);
 
     return m_userValidator
-        ? validateUsers(resourceAccessSubjectsCache()->usersInRole(roleId))
+        ? validateUsers(resourceAccessSubjectsCache()->allUsersInRole(roleId))
         : QValidator::Acceptable;
 }
 
 QValidator::State RoleListModel::validateUsers(
-    const QList<QnResourceAccessSubject>& subjects) const
+    const std::unordered_set<QnResourceAccessSubject>& subjects) const
 {
     if (!m_userValidator)
         return QValidator::Acceptable;
@@ -148,7 +148,7 @@ QSet<QnUuid> RoleListModel::checkedUsers() const
     QSet<QnUuid> checkedUsers;
     for (const auto& roleId: checkedRoles())
     {
-        for (const auto& subject: resourceAccessSubjectsCache()->usersInRole(roleId))
+        for (const auto& subject: resourceAccessSubjectsCache()->allUsersInRole(roleId))
         {
             NX_ASSERT(subject.isUser());
             if (const auto& user = subject.user())
@@ -252,7 +252,7 @@ void UserListModel::setCustomUsersOnly(bool value)
 bool UserListModel::systemHasCustomUsers() const
 {
     const auto id = userRolesManager()->predefinedRoleId(Qn::UserRole::customPermissions);
-    return countEnabledUsers(resourceAccessSubjectsCache()->usersInRole(id)) > 0;
+    return countEnabledUsers(resourceAccessSubjectsCache()->allUsersInRole(id)) > 0;
 }
 
 Qt::ItemFlags UserListModel::flags(const QModelIndex& index) const
@@ -322,7 +322,7 @@ bool UserListModel::isIndirectlyChecked(const QModelIndex& index) const
 
     const auto role = user->userRole();
     const auto roleId = role == Qn::UserRole::customUserRole
-        ? user->userRoleId()
+        ? user->firstRoleId()
         : QnUserRolesManager::predefinedRoleId(role);
 
     return m_rolesModel->checkedRoles().contains(roleId);
@@ -403,7 +403,7 @@ void RoleListDelegate::getDisplayInfo(const QModelIndex& index,
 {
     static const auto kExtraInfoTemplate = QString::fromWCharArray(L"\x2013 %1"); //< "- %1"
     const auto roleId = index.data(Qn::UuidRole).value<QnUuid>();
-    const int usersInRole = countEnabledUsers(resourceAccessSubjectsCache()->usersInRole(roleId));
+    const int usersInRole = countEnabledUsers(resourceAccessSubjectsCache()->allUsersInRole(roleId));
     baseName = userRolesManager()->userRoleName(roleId);
     extInfo = kExtraInfoTemplate.arg(tr("%n Users", "", usersInRole));
 }

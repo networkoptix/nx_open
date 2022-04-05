@@ -22,13 +22,13 @@ namespace test {
 class CachedSharedResourceAccessProviderTest: public CachedBaseAccessProviderTestFixture
 {
 protected:
-    void awaitAccess(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
+    void expectAccessGranted(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
         bool value = true)
     {
         if (value)
-            awaitAccessValue(subject, resource, kSource);
+            expectAccess(subject, resource, kSource);
         else
-            awaitAccessValue(subject, resource, Source::none);
+            expectAccess(subject, resource, Source::none);
     }
 
     virtual AbstractResourceAccessProvider* createAccessProvider() const override
@@ -124,8 +124,8 @@ TEST_F(CachedSharedResourceAccessProviderTest, checkAccessAdded)
     auto target = addCamera();
     auto user = addUser(GlobalPermission::none);
 
-    awaitAccess(user, target);
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << target->getId());
+    expectAccessGranted(user, target);
 }
 
 TEST_F(CachedSharedResourceAccessProviderTest, checkAccessRemoved)
@@ -133,9 +133,12 @@ TEST_F(CachedSharedResourceAccessProviderTest, checkAccessRemoved)
     auto target = addCamera();
     auto user = addUser(GlobalPermission::none);
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << target->getId());
-    awaitAccess(user, target, false);
+    expectAccessGranted(user, target, true);
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>());
+    expectAccessGranted(user, target, false);
 }
+
+// TODO: Add test for user role chains!!
 
 TEST_F(CachedSharedResourceAccessProviderTest, checkRoleAccessGranted)
 {
@@ -144,9 +147,10 @@ TEST_F(CachedSharedResourceAccessProviderTest, checkRoleAccessGranted)
     auto role = createRole(GlobalPermission::none);
     userRolesManager()->addOrUpdateUserRole(role);
     auto user = addUser(GlobalPermission::none);
-    user->setUserRoleId(role.id);
-    awaitAccess(user, target, true);
+    user->setUserRoleIds({role.id});
+    expectAccessGranted(user, target, false);
     sharedResourcesManager()->setSharedResources(role, QSet<QnUuid>() << target->getId());
+    expectAccessGranted(user, target, true);
 }
 
 TEST_F(CachedSharedResourceAccessProviderTest, checkUserRoleChanged)
@@ -157,8 +161,92 @@ TEST_F(CachedSharedResourceAccessProviderTest, checkUserRoleChanged)
     userRolesManager()->addOrUpdateUserRole(role);
     sharedResourcesManager()->setSharedResources(role, QSet<QnUuid>() << target->getId());
     auto user = addUser(GlobalPermission::none);
-    awaitAccess(user, target, true);
-    user->setUserRoleId(role.id);
+    expectAccessGranted(user, target, false);
+    user->setUserRoleIds({role.id});
+    expectAccessGranted(user, target, true);
+}
+
+TEST_F(CachedSharedResourceAccessProviderTest, checkUserAndRolesCombinedPermissions)
+{
+    auto cameraOfParentRole1 = addCamera();
+    auto cameraOfParentRole2 = addCamera();
+    auto cameraOfInheridedRole = addCamera();
+    auto cameraOfUser = addCamera();
+    auto cameraOfNoOne = addCamera();
+
+    auto parentRole1 = createRole(GlobalPermission::none);
+    sharedResourcesManager()->setSharedResources(parentRole1, {cameraOfParentRole1->getId()});
+    expectAccessGranted(parentRole1, cameraOfUser, false);
+    expectAccessGranted(parentRole1, cameraOfParentRole1, true);
+    expectAccessGranted(parentRole1, cameraOfParentRole2, false);
+    expectAccessGranted(parentRole1, cameraOfInheridedRole, false);
+    expectAccessGranted(parentRole1, cameraOfNoOne, false);
+
+    auto parentRole2 = createRole(GlobalPermission::none);
+    sharedResourcesManager()->setSharedResources(parentRole2, {cameraOfParentRole2->getId()});
+    expectAccessGranted(parentRole2, cameraOfUser, false);
+    expectAccessGranted(parentRole2, cameraOfParentRole1, false);
+    expectAccessGranted(parentRole2, cameraOfParentRole2, true);
+    expectAccessGranted(parentRole2, cameraOfInheridedRole, false);
+    expectAccessGranted(parentRole2, cameraOfNoOne, false);
+
+    auto inheritedRole = createRole(GlobalPermission::none, {parentRole1.id, parentRole2.id});
+    sharedResourcesManager()->setSharedResources(inheritedRole, {cameraOfInheridedRole->getId()});
+    expectAccessGranted(inheritedRole, cameraOfUser, false);
+    expectAccessGranted(inheritedRole, cameraOfParentRole1, true);
+    expectAccessGranted(inheritedRole, cameraOfParentRole2, true);
+    expectAccessGranted(inheritedRole, cameraOfInheridedRole, true);
+    expectAccessGranted(inheritedRole, cameraOfNoOne, false);
+
+    auto user = addUser(GlobalPermission::none, "vasily");
+    expectAccessGranted(user, cameraOfUser, false);
+    expectAccessGranted(user, cameraOfParentRole1, false);
+    expectAccessGranted(user, cameraOfParentRole2, false);
+    expectAccessGranted(user, cameraOfInheridedRole, false);
+    expectAccessGranted(user, cameraOfNoOne, false);
+
+    sharedResourcesManager()->setSharedResources(user, {cameraOfUser->getId()});
+    expectAccessGranted(user, cameraOfUser, true);
+    expectAccessGranted(user, cameraOfParentRole1, false);
+    expectAccessGranted(user, cameraOfParentRole2, false);
+    expectAccessGranted(user, cameraOfInheridedRole, false);
+    expectAccessGranted(user, cameraOfNoOne, false);
+
+    user->setUserRoleIds({parentRole1.id});
+    expectAccessGranted(user, cameraOfUser, true);
+    expectAccessGranted(user, cameraOfParentRole1, true);
+    expectAccessGranted(user, cameraOfParentRole2, false);
+    expectAccessGranted(user, cameraOfInheridedRole, false);
+    expectAccessGranted(user, cameraOfNoOne, false);
+
+    user->setUserRoleIds({parentRole1.id, parentRole2.id});
+    expectAccessGranted(user, cameraOfUser, true);
+    expectAccessGranted(user, cameraOfParentRole1, true);
+    expectAccessGranted(user, cameraOfParentRole2, true);
+    expectAccessGranted(user, cameraOfInheridedRole, false);
+    expectAccessGranted(user, cameraOfNoOne, false);
+
+    user->setUserRoleIds({inheritedRole.id});
+    expectAccessGranted(user, cameraOfUser, true);
+    expectAccessGranted(user, cameraOfParentRole1, true);
+    expectAccessGranted(user, cameraOfParentRole2, true);
+    expectAccessGranted(user, cameraOfInheridedRole, true);
+    expectAccessGranted(user, cameraOfNoOne, false);
+
+    inheritedRole.parentRoleIds = {};
+    userRolesManager()->addOrUpdateUserRole(inheritedRole);
+    expectAccessGranted(user, cameraOfUser, true);
+    expectAccessGranted(user, cameraOfParentRole1, false);
+    expectAccessGranted(user, cameraOfParentRole2, false);
+    expectAccessGranted(user, cameraOfInheridedRole, true);
+    expectAccessGranted(user, cameraOfNoOne, false);
+
+    user->setUserRoleIds({});
+    expectAccessGranted(user, cameraOfUser, true);
+    expectAccessGranted(user, cameraOfParentRole1, false);
+    expectAccessGranted(user, cameraOfParentRole2, false);
+    expectAccessGranted(user, cameraOfInheridedRole, false);
+    expectAccessGranted(user, cameraOfNoOne, false);
 }
 
 TEST_F(CachedSharedResourceAccessProviderTest, checkRoleRemoved)
@@ -168,12 +256,11 @@ TEST_F(CachedSharedResourceAccessProviderTest, checkRoleRemoved)
     auto role = createRole(GlobalPermission::none);
     userRolesManager()->addOrUpdateUserRole(role);
     auto user = addUser(GlobalPermission::none);
-    user->setUserRoleId(role.id);
+    user->setUserRoleIds({role.id});
     sharedResourcesManager()->setSharedResources(role, QSet<QnUuid>() << target->getId());
-    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
-    awaitAccess(user, target, false);
+    expectAccessGranted(user, target, true);
     userRolesManager()->removeUserRole(role.id);
-    ASSERT_FALSE(accessProvider()->hasAccess(user, target));
+    expectAccessGranted(user, target, false);
 }
 
 TEST_F(CachedSharedResourceAccessProviderTest, accessProviders)

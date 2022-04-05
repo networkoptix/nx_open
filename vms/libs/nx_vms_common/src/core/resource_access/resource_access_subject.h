@@ -18,32 +18,35 @@ public:
     QnResourceAccessSubject(const QnResourceAccessSubject& other);
 
     const QnUserResourcePtr& user() const { return m_user; }
-    nx::vms::api::GlobalPermissions rolePermissions() const { return m_rolePermissions; }
 
     bool isValid() const {return !m_id.isNull(); }
     bool isUser() const { return !m_user.isNull(); }
     bool isRole() const { return m_user.isNull(); }
-    const QnUuid& id() const { return m_id; }
 
-    /** Key value in the shared resources map. */
-    QnUuid effectiveId() const
-    {
-        return m_user && m_user->userRole() == Qn::UserRole::customUserRole
-            ? m_user->userRoleId() : m_id;
-    }
-    QString name() const;
+    const QnUuid& id() const { return m_id; }
     QString toString() const;
 
     void operator=(const QnResourceAccessSubject& other);
     bool operator==(const QnResourceAccessSubject& other) const;
     bool operator!=(const QnResourceAccessSubject& other) const;
+    bool operator<(const QnResourceAccessSubject& other) const;
+    bool operator>(const QnResourceAccessSubject& other) const;
 
 private:
     QnUserResourcePtr m_user;
-    nx::vms::api::GlobalPermissions m_rolePermissions;
     QnUuid m_id;
 };
 
 QDebug operator<<(QDebug dbg, const QnResourceAccessSubject& subject);
+
+namespace std {
+
+template<>
+struct hash<QnResourceAccessSubject>
+{
+    size_t operator()(const QnResourceAccessSubject& s) const { return hash<QnUuid>()(s.id()); }
+};
+
+} // namepsace std
 
 Q_DECLARE_METATYPE(QnResourceAccessSubject)

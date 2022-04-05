@@ -28,18 +28,14 @@ public:
     // Returns list of information structures for all custom user roles.
     UserRoleDataList userRoles() const;
 
-    // Returns list of information structures for custom user roles specified by their uuids.
-    template <class IDList>
-    UserRoleDataList userRoles(IDList idList) const
+    // Returns list of information structures for custom user roles specified by their uuids as well
+    // as thir inherited roles.
+    template <class Ids>
+    UserRoleDataList userRoles(const Ids& roleIds) const
     {
-        NX_MUTEX_LOCKER lk(&m_mutex);
+        NX_MUTEX_LOCKER lock(&m_mutex);
         UserRoleDataList result;
-        for (const auto& id : idList)
-        {
-            const auto itr = m_roles.find(id);
-            if (itr != m_roles.end())
-                result.push_back(itr.value());
-        }
+        appendUserRoles(&result, roleIds, lock);
         return result;
     }
 
@@ -49,12 +45,10 @@ public:
 
     // Checks if there is a custom user role with specified uuid.
     bool hasRole(const QnUuid& id) const;
+    bool hasRoles(const std::vector<QnUuid>& ids) const;
 
     // Returns information structure for custom user role with specified uuid.
     UserRoleData userRole(const QnUuid& id) const;
-
-    // Returns custom or predefined role id for specified user.
-    static QnUuid unifiedUserRoleId(const QnUserResourcePtr& user);
 
     // Returns list of predefined user roles.
     static const QList<Qn::UserRole>& predefinedRoles();
@@ -107,6 +101,21 @@ signals:
 
 private:
     bool isValidRoleId(const QnUuid& id) const; //< This function is not thread-safe.
+
+    template <class Ids>
+    void appendUserRoles(
+        UserRoleDataList* list, const Ids& roleIds, const nx::MutexLocker& lock) const
+    {
+        for (const auto& id: roleIds)
+        {
+            const auto itr = m_roles.find(id);
+            if (itr != m_roles.end())
+            {
+                list->push_back(itr.value());
+                appendUserRoles(list, itr.value().parentRoleIds, lock);
+            }
+        }
+    }
 
 private:
     mutable nx::Mutex m_mutex;

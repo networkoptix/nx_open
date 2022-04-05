@@ -274,7 +274,7 @@ QnUserResourceList QnUserRolesSettingsModel::users(
     return resourcePool()->getResources<QnUserResource>().filtered(
         [this, userRoleId, withCandidates](const QnUserResourcePtr& user)
         {
-            QnUuid id = user->userRoleId();
+            QnUuid id = user->firstRoleId();
             if (id == userRoleId)
                 return true;
 

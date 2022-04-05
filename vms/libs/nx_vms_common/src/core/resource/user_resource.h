@@ -133,8 +133,17 @@ public:
      */
     bool isBuiltInAdmin() const;
 
-    QnUuid userRoleId() const;
-    void setUserRoleId(const QnUuid& userRoleId);
+    std::vector<QnUuid> userRoleIds() const;
+    void setUserRoleIds(const std::vector<QnUuid>& userRoleIds);
+
+    /**
+     * Custom or Predefined Role IDs including inherited values.
+     */
+    std::vector<QnUuid> allUserRoleIds() const;
+
+    // TODO: Remove this helpers and adapt all usages to handle several roles.
+    QnUuid firstRoleId() const;
+    void setSingleUserRole(const QnUuid& id);
 
     bool isEnabled() const;
     void setEnabled(bool isEnabled);
@@ -157,7 +166,7 @@ public:
 
 signals:
     void permissionsChanged(const QnUserResourcePtr& user);
-    void userRoleChanged(const QnUserResourcePtr& user, const QnUuid& previousRoleId);
+    void userRolesChanged(const QnUserResourcePtr& user, const std::vector<QnUuid>& previousRoleIds);
 
     void enabledChanged(const QnUserResourcePtr& user);
     void passwordChanged(const QnUserResourcePtr& user);
@@ -180,7 +189,7 @@ private:
     QByteArray m_cryptSha512Hash;
     QString m_realm;
     std::atomic<GlobalPermissions> m_permissions;
-    QnUuid m_userRoleId;
+    std::vector<QnUuid> m_userRoleIds;
     std::atomic<bool> m_isOwner{false};
     std::atomic<bool> m_isEnabled{true};
     QString m_email;

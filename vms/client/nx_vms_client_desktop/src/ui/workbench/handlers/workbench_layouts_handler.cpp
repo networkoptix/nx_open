@@ -221,15 +221,28 @@ void LayoutsHandler::at_openLayoutAction_triggered(
     if (!currentUser)
         return;
 
-    const auto roleId = QnUserRolesManager::unifiedUserRoleId(currentUser);
+    if (!actionParams.allUsers)
+    {
+        const auto checkUserAcessibility =
+            [&]()
+            {
+                // Either user or his role should be mentioned in actionParams.additionalResources
+                // so that user can handle this action.
+                const auto& permitted = actionParams.additionalResources;
+                if (std::find(permitted.begin(), permitted.end(), currentUser->getId()) != permitted.end())
+                    return true;
 
-    // Either user or his role should be mentioned in actionParams.additionalResources
-    // so that user can handle this action.
-    auto permittedUsers = actionParams.additionalResources;
-    const auto itU = std::find(permittedUsers.begin(), permittedUsers.end(), currentUser->getId());
-    const auto itR = std::find(permittedUsers.begin(), permittedUsers.end(), roleId);
-    if (!actionParams.allUsers && itU == permittedUsers.end() && itR == permittedUsers.end())
-        return;
+                for (const auto& roleId: currentUser->allUserRoleIds())
+                {
+                    if (std::find(permitted.begin(), permitted.end(), roleId) != permitted.end())
+                        return true;
+                }
+                return false;
+            };
+
+        if (!checkUserAcessibility())
+            return;
+    }
 
     if (accessController()->hasPermissions(layout, Qn::ReadPermission))
     {
@@ -723,10 +736,16 @@ void LayoutsHandler::grantMissingAccessRights(const QnUserResourcePtr& user,
     if (resourceAccessManager()->hasGlobalPermission(user, GlobalPermission::accessAllMedia))
         return;
 
-    auto accessible = sharedResourcesManager()->sharedResources(user);
+    QnResourceAccessSubject subject(user);
+    // This is required to keep old behavior when it was not possible to grant access to the user
+    // directly if he has a role.
+    if (const auto roleIds = user->userRoleIds(); !roleIds.empty())
+        subject = nx::vms::api::UserRoleData(roleIds.front(), "");
+
+    auto accessible = sharedResourcesManager()->sharedResources(subject);
     for (const auto& toShare : calculateResourcesToShare(change.added, user))
         accessible << toShare->getId();
-    qnResourcesChangesManager->saveAccessibleResources(user, accessible);
+    qnResourcesChangesManager->saveAccessibleResources(subject, accessible);
 }
 
 bool LayoutsHandler::canRemoveLayouts(const QnLayoutResourceList &layouts)

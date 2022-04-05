@@ -58,7 +58,7 @@ public:
             {
                 for (auto user: users)
                 {
-                    if (user->userRoleId() != userRole.id)
+                    if (user->firstRoleId() != userRole.id)
                         continue;
                     handleUserChanged(user);
                 }

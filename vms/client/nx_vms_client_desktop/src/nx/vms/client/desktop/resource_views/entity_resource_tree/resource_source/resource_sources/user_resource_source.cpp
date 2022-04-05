@@ -31,13 +31,13 @@ UserResourceSource::UserResourceSource(
             if (user == m_currentUser)
                 return;
 
-            connect(user.get(), &QnUserResource::userRoleChanged,
-                this, &UserResourceSource::onUserRoleChanged);
+            connect(user.get(), &QnUserResource::userRolesChanged,
+                this, &UserResourceSource::onUserRolesChanged);
 
             connect(user.get(), &QnUserResource::enabledChanged,
                 this, &UserResourceSource::onEnabledChanged);
 
-            if (user->userRoleId() == m_roleId && user->isEnabled())
+            if (user->firstRoleId() == m_roleId && user->isEnabled())
                 emit resourceAdded(resource);
         });
 
@@ -47,25 +47,25 @@ UserResourceSource::UserResourceSource(
             if (resource->hasFlags(Qn::user))
             {
                 resource->disconnect(this);
-                if (resource.staticCast<QnUserResource>()->userRoleId() == m_roleId)
+                if (resource.staticCast<QnUserResource>()->firstRoleId() == m_roleId)
                     emit resourceRemoved(resource);
             }
         });
 }
 
-void UserResourceSource::onUserRoleChanged(const QnUserResourcePtr& user,
-    const QnUuid& previousRoleId)
+void UserResourceSource::onUserRolesChanged(const QnUserResourcePtr& user,
+    const std::vector<QnUuid>& previousRoleIds)
 {
-    if (previousRoleId == m_roleId)
+    if ((previousRoleIds.empty() ? QnUuid() : previousRoleIds.front()) == m_roleId)
         emit resourceRemoved(user);
 
-    if (user->userRoleId() == m_roleId)
+    if (user->firstRoleId() == m_roleId)
         emit resourceAdded(user);
 }
 
 void UserResourceSource::onEnabledChanged(const QnUserResourcePtr& user)
 {
-    if (user->userRoleId() != m_roleId)
+    if (user->firstRoleId() != m_roleId)
         return;
 
     if (user->isEnabled())
@@ -89,13 +89,13 @@ QVector<QnResourcePtr> UserResourceSource::getResources()
         if (user == m_currentUser)
             continue;
 
-        connect(user.get(), &QnUserResource::userRoleChanged,
-            this, &UserResourceSource::onUserRoleChanged);
+        connect(user.get(), &QnUserResource::userRolesChanged,
+            this, &UserResourceSource::onUserRolesChanged);
 
         connect(user.get(), &QnUserResource::enabledChanged,
             this, &UserResourceSource::onEnabledChanged);
 
-        if (user->userRoleId() == m_roleId && user->isEnabled())
+        if (user->firstRoleId() == m_roleId && user->isEnabled())
             result.push_back(userResource);
     }
 

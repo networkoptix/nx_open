@@ -63,7 +63,7 @@ bool SharedResourceAccessProvider::calculateAccess(const QnResourceAccessSubject
         m_context->sharedResourcesManager()->hasSharedResource(subject, resource->getId());
 
     NX_VERBOSE(this, "update access %1 to %2: %3",
-        subject.name(), resource->getName(), result);
+        subject, resource->getName(), result);
 
     return result;
 }
@@ -94,21 +94,16 @@ void SharedResourceAccessProvider::handleSharedResourcesChanged(
 
     auto changed = (newValues | oldValues) - (newValues & oldValues);
 
-    QString subjectName = subject.name();
-
     const auto changedResources = m_context->resourcePool()->getResourcesByIds(changed);
     for (const auto& resource: changedResources)
     {
         if (newValues.contains(resource->getId()))
         {
-            NX_VERBOSE(this, "%1 shared to %2",
-                resource->getName(), subjectName);
+            NX_VERBOSE(this, "%1 shared to %2", resource->getName(), subject);
         }
         else
         {
-            NX_VERBOSE(this, "%1 no more shared to %2",
-                resource->getName(),
-                subjectName);
+            NX_VERBOSE(this, "%1 no more shared to %2", resource->getName(), subject);
         }
         updateAccess(subject, resource);
     }

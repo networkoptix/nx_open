@@ -28,6 +28,25 @@ void UserData::fillId()
     }
 }
 
+bool UserData::adaptFromDeprecatedApi()
+{
+    if (userRoleId.isNull())
+        return true;
+
+    if (!userRoleIds.empty())
+        return false;
+
+    userRoleIds.push_back(userRoleId);
+    userRoleId = QnUuid();
+    return true;
+}
+
+void UserData::adaptForDeprecatedApi()
+{
+    if (!userRoleIds.empty())
+        userRoleId = userRoleIds.front();
+}
+
 QString toString(UserType type)
 {
     return QJson::serialized(type);

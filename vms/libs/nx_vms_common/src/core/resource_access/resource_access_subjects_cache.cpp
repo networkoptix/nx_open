@@ -2,10 +2,12 @@
 
 #include "resource_access_subjects_cache.h"
 
-#include <core/resource/user_resource.h>
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
+#include <core/resource/user_resource.h>
+#include <nx/utils/log/log_main.h>
+#include <nx/utils/std/algorithm.h>
 #include <nx/vms/common/system_context.h>
 
 QnResourceAccessSubjectsCache::QnResourceAccessSubjectsCache(
@@ -50,7 +52,7 @@ QnResourceAccessSubjectsCache::QnResourceAccessSubjectsCache(
         });
 
     connect(m_context->userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
-        &QnResourceAccessSubjectsCache::handleRoleAdded);
+        &QnResourceAccessSubjectsCache::handleRoleAddedOrUpdated);
     connect(m_context->userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
         &QnResourceAccessSubjectsCache::handleRoleRemoved);
 
@@ -58,41 +60,93 @@ QnResourceAccessSubjectsCache::QnResourceAccessSubjectsCache(
         [this](const QnResourceAccessSubject& subject)
         {
             if (const auto user = subject.user())
-                updateUserRole(user);
+                return updateSubjectRoles(subject, user->userRoleIds());
+
+            const auto role = m_context->userRolesManager()->userRole(subject.id());
+            updateSubjectRoles(subject, role.parentRoleIds);
         });
 
     for (const auto& user: m_context->resourcePool()->getResources<QnUserResource>())
         handleUserAdded(user);
 
     for (const auto& role: m_context->userRolesManager()->userRoles())
-        handleRoleAdded(role);
+        handleRoleAddedOrUpdated(role);
 }
 
-QList<QnResourceAccessSubject> QnResourceAccessSubjectsCache::allSubjects() const
+std::unordered_set<QnResourceAccessSubject> QnResourceAccessSubjectsCache::allSubjects() const
 {
-    NX_MUTEX_LOCKER lk(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mutex);
     return m_subjects;
 }
 
-QList<QnResourceAccessSubject> QnResourceAccessSubjectsCache::usersInRole(
+std::unordered_set<QnResourceAccessSubject> QnResourceAccessSubjectsCache::subjectsInRole(
     const QnUuid& roleId) const
 {
-    NX_MUTEX_LOCKER lk(&m_mutex);
-    return m_usersByRoleId.value(roleId);
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (const auto it = m_subjectsInRole.find(roleId); it != m_subjectsInRole.end())
+        return std::unordered_set<QnResourceAccessSubject>(it->second.begin(), it->second.end());
+    return {};
+}
+
+std::unordered_set<QnResourceAccessSubject> QnResourceAccessSubjectsCache::allUsersInRole(
+    const QnUuid& roleId) const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    std::unordered_set<QnResourceAccessSubject> result;
+    forEachSubjectInRole(roleId, [&](const auto& s) { if (s.isUser()) result.insert(s); }, lock);
+    NX_VERBOSE(this, "All users in role %1 - %2", roleId, nx::containerString(result));
+    return result;
+}
+
+std::unordered_set<QnResourceAccessSubject> QnResourceAccessSubjectsCache::allSubjectsInRole(
+    const QnUuid& roleId) const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    std::unordered_set<QnResourceAccessSubject> result;
+    forEachSubjectInRole(roleId, [&](const auto& s) { result.insert(s); }, lock);
+    NX_VERBOSE(this, "All subjects in role %1 - %2", roleId, nx::containerString(result));
+    return result;
+}
+
+std::unordered_set<QnResourceAccessSubject> QnResourceAccessSubjectsCache::subjectWithParents(
+    const QnResourceAccessSubject& subject) const
+{
+    std::unordered_set<QnResourceAccessSubject> result;
+    nx::vms::api::UserRoleDataList parentRoles;
+    if (const auto user = subject.user())
+    {
+        result.insert(subject);
+        parentRoles = m_context->userRolesManager()->userRoles(user->userRoleIds());
+    }
+    else
+    {
+        parentRoles = m_context->userRolesManager()->userRoles(std::array<QnUuid, 1>{subject.id()});
+    }
+
+    for (const auto& role: parentRoles)
+        result.insert(role);
+
+    NX_VERBOSE(this, "All subjects for %1 - %2", subject, nx::containerString(result));
+    return result;
 }
 
 void QnResourceAccessSubjectsCache::handleUserAdded(const QnUserResourcePtr& user)
 {
+    connect(user.get(), &QnUserResource::userRolesChanged, this,
+        [this](const QnUserResourcePtr& user)
+        {
+            const auto roleFlag = user->userRole();
+            const auto newRoleIds = roleFlag == Qn::UserRole::customUserRole
+                ? user->userRoleIds()
+                : std::vector<QnUuid>{QnUserRolesManager::predefinedRoleId(roleFlag)};
+
+            updateSubjectRoles(user, newRoleIds);
+        });
     QnResourceAccessSubject subject(user);
-    {
-        NX_MUTEX_LOCKER lk(&m_mutex);
-        m_subjects << subject;
-    }
 
-    connect(user.get(), &QnUserResource::userRoleChanged, this,
-        &QnResourceAccessSubjectsCache::updateUserRole);
-
-    updateUserRole(user);
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_subjects.insert(subject);
+    updateSubjectRoles(subject, user->userRoleIds(), lock);
 }
 
 void QnResourceAccessSubjectsCache::handleUserRemoved(const QnUserResourcePtr& user)
@@ -100,69 +154,92 @@ void QnResourceAccessSubjectsCache::handleUserRemoved(const QnUserResourcePtr& u
     user->disconnect(this);
     QnResourceAccessSubject subject(user);
 
-    NX_MUTEX_LOCKER lk(&m_mutex);
-    m_subjects.removeOne(subject);
-    const auto roleId = m_roleIdByUserId.take(user->getId());
-    removeUserFromRole(user, roleId);
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    updateSubjectRoles(subject, {}, lock);
+    m_subjects.erase(subject);
 }
 
-void QnResourceAccessSubjectsCache::updateUserRole(const QnUserResourcePtr& user)
+void QnResourceAccessSubjectsCache::handleRoleAddedOrUpdated(const nx::vms::api::UserRoleData& userRole)
 {
-    const auto id = user->getId();
+    const QnResourceAccessSubject subject(userRole);
 
-    NX_MUTEX_LOCKER lk(&m_mutex);
-    const auto oldRoleIter = m_roleIdByUserId.find(id);
-    const bool knownUser = oldRoleIter != m_roleIdByUserId.end();
-
-    const auto userRole = user->userRole();
-    const auto newRoleId = userRole == Qn::UserRole::customUserRole
-        ? user->userRoleId()
-        : QnUserRolesManager::predefinedRoleId(userRole);
-
-    if (knownUser && oldRoleIter.value() == newRoleId)
-        return;
-
-    if (knownUser)
-        removeUserFromRole(user, oldRoleIter.value());
-
-    m_roleIdByUserId[id] = newRoleId;
-    m_usersByRoleId[newRoleId].append(user);
-}
-
-void QnResourceAccessSubjectsCache::handleRoleAdded(const nx::vms::api::UserRoleData& userRole)
-{
-    NX_MUTEX_LOCKER lk(&m_mutex);
-    m_subjects << userRole;
-
-    QList<QnResourceAccessSubject> children;
-    for (const auto& subject: m_subjects)
-    {
-        if (subject.user() && subject.user()->userRoleId() == userRole.id)
-            children << subject;
-    }
-
-    if (children.isEmpty())
-        m_usersByRoleId.remove(userRole.id);
-    else
-        m_usersByRoleId[userRole.id] = children;
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_subjects.insert(subject);
+    updateSubjectRoles(subject, userRole.parentRoleIds, lock);
 }
 
 void QnResourceAccessSubjectsCache::handleRoleRemoved(const nx::vms::api::UserRoleData& userRole)
 {
-    NX_MUTEX_LOCKER lk(&m_mutex);
-    m_subjects.removeOne(userRole);
-    /* We are intentionally do not clear m_usersByRoleId field to make sure users with this role
-     * will be correctly processed later. */
+    const QnResourceAccessSubject subject(userRole);
+
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    updateSubjectRoles(subject, {}, lock);
+    // Keep m_subjectsInRole unchanged so other caches may use it to update inherited permissions.
+    // TODO: Think what we gonna do about this role ids in other objects (like users, other roles, etc).
+    m_subjects.erase(subject);
 }
 
-void QnResourceAccessSubjectsCache::removeUserFromRole(const QnUserResourcePtr& user,
-    const QnUuid& roleId)
+void QnResourceAccessSubjectsCache::updateSubjectRoles(
+    const QnResourceAccessSubject& subject, const std::vector<QnUuid>& newRoleIds)
 {
-    auto users = m_usersByRoleId.find(roleId);
-    if (users == m_usersByRoleId.end())
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    updateSubjectRoles(subject, newRoleIds, lock);
+}
+
+void QnResourceAccessSubjectsCache::updateSubjectRoles(
+    const QnResourceAccessSubject& subject, const std::vector<QnUuid>& newRoleIds,
+    const nx::MutexLocker&)
+{
+    std::unordered_set<QnResourceAccessSubject> newRoles;
+    for (const auto& id: newRoleIds)
+        newRoles.insert(nx::vms::api::UserRoleData{id, ""});
+
+    static const std::unordered_set<QnResourceAccessSubject> kEmpty;
+    const std::unordered_set<QnResourceAccessSubject>* knownRoles = &kEmpty;
+    if (const auto it = m_rolesOfSubject.find(subject.id()); it != m_rolesOfSubject.end())
+        knownRoles = &it->second;
+
+    if (newRoles == *knownRoles)
+    {
+        NX_DEBUG(this, "%1 roles are still %2", subject, nx::containerString(*knownRoles));
+        return;
+    }
+
+    NX_DEBUG(this, "%1 roles are changed from %2 to %3", subject,
+        nx::containerString(*knownRoles), nx::containerString(newRoles));
+
+    for (const auto& role: *knownRoles) //< Cleanup subjects from old roles.
+    {
+        const auto subjectsIt = m_subjectsInRole.find(role.id());
+        if (NX_ASSERT(subjectsIt != m_subjectsInRole.end(), "Role: %1", role.id()))
+        {
+            NX_ASSERT(subjectsIt->second.erase(subject), "%1 -> %2", role.id(), subject.id());
+            if (subjectsIt->second.empty())
+                m_subjectsInRole.erase(subjectsIt);
+        }
+    }
+
+    for (const auto& role: newRoles) //< Add subject to new roles.
+        m_subjectsInRole[role.id()].insert(subject);
+
+    if (newRoles.empty())
+        m_rolesOfSubject.erase(subject.id());
+    else
+        m_rolesOfSubject[subject.id()] = std::move(newRoles);
+}
+
+template<typename Action>
+void QnResourceAccessSubjectsCache::forEachSubjectInRole(
+    const QnUuid& roleId, const Action& action, const nx::MutexLocker& lock) const
+{
+    const auto& it = m_subjectsInRole.find(roleId);
+    if (it == m_subjectsInRole.end())
         return;
 
-    users->removeOne(user);
-    if (users->isEmpty())
-        m_usersByRoleId.erase(users);
+    for (const auto& subject: it->second)
+    {
+        action(subject);
+        if (subject.isRole())
+            forEachSubjectInRole(subject.id(), action, lock);
+    }
 }

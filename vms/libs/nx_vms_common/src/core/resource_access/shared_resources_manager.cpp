@@ -73,14 +73,22 @@ QSet<QnUuid> QnSharedResourcesManager::sharedResources(
         return QSet<QnUuid>();
 
     NX_MUTEX_LOCKER lk(&m_mutex);
-    return m_sharedResources[subject.effectiveId()];
+    QSet<QnUuid> result;
+    for (const auto& s: m_context->resourceAccessSubjectsCache()->subjectWithParents(subject))
+        result.unite(m_sharedResources[s.id()]);
+    return result;
 }
 
 bool QnSharedResourcesManager::hasSharedResource(
     const QnResourceAccessSubject& subject, const QnUuid& resourceId) const
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
-    return m_sharedResources[subject.effectiveId()].contains(resourceId);
+    for (const auto& s: m_context->resourceAccessSubjectsCache()->subjectWithParents(subject))
+    {
+        if (m_sharedResources[s.id()].contains(resourceId))
+            return true;
+    }
+    return false;
 }
 
 void QnSharedResourcesManager::setSharedResources(const QnResourceAccessSubject& subject,
@@ -90,9 +98,6 @@ void QnSharedResourcesManager::setSharedResources(const QnResourceAccessSubject&
     if (!subject.isValid())
         return;
 
-    NX_ASSERT(subject.effectiveId() == subject.id() || resources.empty(),
-        "Security check. We must not set custom accessible resources to user in custom role."
-    );
     setSharedResourcesInternal(subject, resources);
 }
 
@@ -144,7 +149,7 @@ void QnSharedResourcesManager::handleRoleAddedOrUpdated(const nx::vms::api::User
 void QnSharedResourcesManager::handleRoleRemoved(const nx::vms::api::UserRoleData& userRole)
 {
     handleSubjectRemoved(userRole);
-    for (auto subject: m_context->resourceAccessSubjectsCache()->usersInRole(userRole.id))
+    for (auto subject: m_context->resourceAccessSubjectsCache()->allSubjectsInRole(userRole.id))
         setSharedResourcesInternal(subject, kEmpty);
 }
 

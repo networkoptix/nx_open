@@ -29,15 +29,24 @@ void QnWorkbenchNotificationsExecutor::execute(const ActionPtr& action)
         if (!user)
             return;
 
-        auto usersSelection = notificationAction->users();
-        const auto roleId = QnUserRolesManager::unifiedUserRoleId(user);
-        if (!usersSelection.all
-            && !usersSelection.ids.contains(user->getId())
-            && !usersSelection.ids.contains(roleId))
-        {
-            return;
-        }
+        const auto isUserSelected =
+            [&]()
+            {
+                auto usersSelection = notificationAction->users();
+                if (usersSelection.all || usersSelection.ids.contains(user->getId()))
+                    return true;
 
-        emit notificationActionReceived(notificationAction);
+                for (const auto roleId: user->allUserRoleIds())
+                {
+                    if (usersSelection.ids.contains(roleId))
+                        return true;
+                }
+
+                return false;
+
+            };
+
+        if (isUserSelected())
+            emit notificationActionReceived(notificationAction);
     }
 }

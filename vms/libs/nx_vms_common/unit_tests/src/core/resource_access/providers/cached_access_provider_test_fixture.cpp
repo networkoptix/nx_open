@@ -22,32 +22,27 @@ void CachedAccessProviderTestFixture::SetUp()
 void CachedAccessProviderTestFixture::TearDown()
 {
     deinitializeContext();
-    ASSERT_TRUE(m_awaitedAccessQueue.empty());
     m_module.reset();
     m_staticCommon.reset();
 }
 
-void CachedAccessProviderTestFixture::awaitAccessValue(const QnResourceAccessSubject& subject,
-    const QnResourcePtr& resource, Source value)
-{
-    m_awaitedAccessQueue.emplace_back(subject, resource, value);
-}
-
-void CachedAccessProviderTestFixture::at_accessChanged(const QnResourceAccessSubject& subject,
+void CachedAccessProviderTestFixture::expectAccess(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource, Source value)
 {
     ASSERT_EQ(value, accessProvider()->accessibleVia(subject, resource));
-    ASSERT_EQ(value != Source::none,
-        accessProvider()->hasAccess(subject, resource));
+    ASSERT_EQ(value != Source::none, accessProvider()->hasAccess(subject, resource));
 
-    if (m_awaitedAccessQueue.empty())
-        return;
-
-    auto awaited = m_awaitedAccessQueue.front();
-    if (awaited.subject == subject && awaited.resource == resource)
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    const AccessKey key{subject.id(), resource->getId()};
+    while (m_notifiedAccess[key] != value)
     {
-        m_awaitedAccessQueue.pop_front();
-        ASSERT_EQ(value, awaited.value);
+        if (!m_condition.wait(&m_mutex, std::chrono::seconds(5)))
+        {
+            FAIL() << NX_FMT("Expected access %1 -> %2 is %3, actual %4",
+                subject, resource, value, m_notifiedAccess[key])
+                .toStdString();
+            return;
+        }
     }
 }
 
@@ -59,8 +54,22 @@ void CachedAccessProviderTestFixture::setupAwaitAccess()
             const QnResourcePtr& resource,
             Source value)
         {
-            at_accessChanged(subject, resource, value);
+            NX_MUTEX_LOCKER lock(&m_mutex);
+            m_notifiedAccess[AccessKey{subject.id(), resource->getId()}] = value;
+            m_condition.wakeAll();
         });
+}
+
+bool CachedAccessProviderTestFixture::AccessKey::operator<(const AccessKey& rhs) const
+{
+    if (subject != rhs.subject)
+        return subject < rhs.subject;
+    return resource < rhs.resource;
+}
+
+bool CachedAccessProviderTestFixture::AccessKey::operator==(const AccessKey& rhs) const
+{
+    return subject == rhs.subject && resource == rhs.resource;
 }
 
 } // namespace test

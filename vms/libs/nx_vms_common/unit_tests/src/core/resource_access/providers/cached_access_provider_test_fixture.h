@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <deque>
-
 #include <gtest/gtest.h>
 
 #include <common/common_module.h>
@@ -30,32 +28,26 @@ protected:
 
     using Source = nx::core::access::Source;
 
-    void awaitAccessValue(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
+    void expectAccess(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
         Source value);
 
-    void at_accessChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
-        Source value);
+private:
+    struct AccessKey
+    {
+        QnUuid subject;
+        QnUuid resource;
+
+        bool operator<(const AccessKey& rhs) const;
+        bool operator==(const AccessKey& rhs) const;
+    };
 
 private:
     std::unique_ptr<QnStaticCommonModule> m_staticCommon;
     std::unique_ptr<QnCommonModule> m_module;
 
-    struct AwaitedAccess
-    {
-        AwaitedAccess(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
-            Source value)
-            :
-            subject(subject),
-            resource(resource),
-            value(value)
-        {
-        }
-
-        QnResourceAccessSubject subject;
-        QnResourcePtr resource;
-        Source value;
-    };
-    std::deque<AwaitedAccess> m_awaitedAccessQueue;
+    nx::Mutex m_mutex;
+    nx::WaitCondition m_condition;
+    std::map<AccessKey, Source> m_notifiedAccess;
 };
 
 } // namespace test

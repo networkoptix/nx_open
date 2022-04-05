@@ -230,8 +230,8 @@ std::pair<QnUserResourceList, QList<QnUuid>> OpenLayoutActionWidget::getSelected
 
         for (const auto& roleId: roles)
         {
-            for (const auto& subject: resourceAccessSubjectsCache()->usersInRole(roleId))
-                users.append(subject.user()); //< TODO: skip duplicates?
+            for (const auto& subject: resourceAccessSubjectsCache()->allUsersInRole(roleId))
+                users.append(subject.user());
         }
 
         users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
