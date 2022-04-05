@@ -94,9 +94,9 @@ QByteArray CodecParameters::serialize() const
     return result;
 }
 
-bool CodecParameters::deserialize(const char* data, int size)
+bool CodecParameters::deserialize(const char* data, int size, int version)
 {
-    m_version = 0;
+    m_version = version;
     if (size > 0 && data[0] != '[') //< vms_4.2 format starts from ubjson without version
     {
         m_version = data[0];

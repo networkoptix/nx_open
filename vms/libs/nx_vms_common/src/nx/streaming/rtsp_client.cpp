@@ -1604,6 +1604,9 @@ CameraDiagnostics::Result QnRtspClient::sendRequestAndReceiveResponse(
             return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(m_url.host(), port);
         }
 
+        m_serverInfo = nx::network::http::getHeaderValue(
+            response.headers, nx::network::http::header::Server::NAME);
+
         switch (response.statusLine.statusCode)
         {
             case nx::network::http::StatusCode::ok:
@@ -1627,7 +1630,6 @@ CameraDiagnostics::Result QnRtspClient::sendRequestAndReceiveResponse(
                 break;
 
             default:
-                m_serverInfo = nx::network::http::getHeaderValue(response.headers, nx::network::http::header::Server::NAME);
                 NX_DEBUG(this, "Response failed: %1", response.statusLine.toString());
                 return CameraDiagnostics::RequestFailedResult(
                     m_url.toString(), nx::String(response.statusLine.reasonPhrase));

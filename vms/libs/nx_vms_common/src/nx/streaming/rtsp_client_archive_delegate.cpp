@@ -875,6 +875,7 @@ std::pair<QnAbstractDataPacketPtr, bool> QnRtspClientArchiveDelegate::processFFm
         // TODO: Use nx::network::http::header::Server here
         // to get RFC2616-conformant Server header parsing function.
         auto serverVersion = extractServerVersion(m_rtspSession->serverInfo());
+        parser->setServerVersion(serverVersion);
         if (!serverVersion.isNull() && serverVersion < nx::utils::SoftwareVersion(3, 0))
             parser->setAudioEnabled(false);
         itr = m_parsers.insert(channelNum, nx::streaming::rtp::QnNxRtpParserPtr(parser));
