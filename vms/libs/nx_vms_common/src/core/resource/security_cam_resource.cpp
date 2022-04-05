@@ -89,6 +89,9 @@ QnUuid QnSecurityCamResource::makeCameraIdFromUniqueId(const QString& uniqueId)
 
 void QnSecurityCamResource::setCommonModule(QnCommonModule* commonModule)
 {
+    if (this->commonModule())
+        return;
+
     base_type::setCommonModule(commonModule);
     connect(commonModule->resourceDataPool(), &QnResourceDataPool::changed, this,
         &QnSecurityCamResource::resetCachedValues, Qt::DirectConnection);
