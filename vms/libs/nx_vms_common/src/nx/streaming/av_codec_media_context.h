@@ -19,7 +19,9 @@ public:
     virtual ~CodecParameters();
 
     // Deserialize from ubjson format.
-    bool deserialize(const char* data, int size);
+    // Specify 'version' only for the version of VMS between 5.0 - 5.0.34644, all other versions
+    // should be analyzed automatically(zero value).
+    bool deserialize(const char* data, int size, int version = 0);
 
     // Serialize to ubjson format.
     QByteArray serialize() const;

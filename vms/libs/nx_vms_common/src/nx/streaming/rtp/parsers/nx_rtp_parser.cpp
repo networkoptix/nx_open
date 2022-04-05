@@ -17,6 +17,7 @@
 #include <nx/analytics/analytics_logging_ini.h>
 
 #include <utils/common/synctime.h>
+#include <utils/math/math.h>
 #include <motion/motion_detection.h>
 #include <nx/utils/log/log_main.h>
 
@@ -42,6 +43,11 @@ QnNxRtpParser::QnNxRtpParser(QnUuid deviceId, const QString& tag):
         /*engineId*/ QnUuid(),
         nx::vms::api::StreamIndex::secondary)
 {
+}
+
+void QnNxRtpParser::setServerVersion(const nx::utils::SoftwareVersion& serverVersion)
+{
+    m_serverVersion = serverVersion;
 }
 
 QnAbstractMediaDataPtr QnNxRtpParser::nextData()
@@ -84,8 +90,17 @@ Result QnNxRtpParser::processData(const uint8_t* data, int dataSize, bool& gotDa
     const bool isCodecContext = qFromBigEndian(rtpHeader->ssrc) & 1;
     if (isCodecContext)
     {
+        int contextVersion = 0;
         auto context = std::make_shared<CodecParameters>();
-        if (!context->deserialize((const char*) payload, dataSize))
+        if (qBetween(
+            nx::utils::SoftwareVersion(5, 0),
+            m_serverVersion,
+            nx::utils::SoftwareVersion(5, 0, 34644)))
+        {
+            contextVersion = 1;
+        }
+
+        if (!context->deserialize((const char*) payload, dataSize, contextVersion))
             return {false, "Failed to parse codec parameters from RTP packet."};
 
         m_context = context;
