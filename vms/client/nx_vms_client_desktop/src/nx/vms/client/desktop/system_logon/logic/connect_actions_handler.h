@@ -87,9 +87,7 @@ private:
     /**
      * Establish Server connection and stores connection data in case of success
      */
-    void connectToServer(
-        core::LogonData logonData,
-        ConnectionOptions options);
+    void connectToServer(LogonData logonData, ConnectionOptions options);
 
     /**
      * Show a dialog depending on the error code. Suggest user to download compatibility package

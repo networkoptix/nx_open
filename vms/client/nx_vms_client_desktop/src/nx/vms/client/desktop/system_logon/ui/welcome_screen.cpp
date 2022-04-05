@@ -36,6 +36,7 @@
 #include <nx/vms/client/core/settings/systems_visibility_manager.h>
 #include <nx/vms/client/desktop/common/utils/connection_url_parser.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/style/svg_icon_provider.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
@@ -47,7 +48,7 @@
 #include <ui/help/help_handler.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/models/systems_controller.h>
-#include <nx/vms/client/desktop/style/svg_icon_provider.h>
+#include <ui/statistics/modules/certificate_statistics_module.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/connective.h>
@@ -535,6 +536,7 @@ void WelcomeScreen::connectToSystemInternal(
 
     LogonData logonData({address, credentials, nx::vms::api::UserType::local, serverId});
     logonData.storePassword = storePassword;
+    logonData.connectScenario = ConnectScenario::connectFromTile;
 
     // TODO: #ynikitenkov add look after connection process
     // and don't allow to connect to two or more servers simultaneously
@@ -559,8 +561,9 @@ void WelcomeScreen::connectToCloudSystem(const QString& systemId)
         return;
 
     setConnectingToSystem(systemId);
+    CloudSystemConnectData connectData{systemId, ConnectScenario::connectFromTile};
     menu()->trigger(ui::action::ConnectToCloudSystemAction,
-        ui::action::Parameters().withArgument(Qn::CloudSystemIdRole, systemId));
+        ui::action::Parameters().withArgument(Qn::CloudSystemConnectDataRole, connectData));
 }
 
 void WelcomeScreen::connectToAnotherSystem()

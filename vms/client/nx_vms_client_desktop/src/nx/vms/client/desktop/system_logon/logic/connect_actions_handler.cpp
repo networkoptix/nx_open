@@ -59,11 +59,11 @@
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_logon/logic/connection_delegate_helper.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/dialogs/connecting_to_server_dialog.h>
 #include <nx/vms/client/desktop/ui/dialogs/session_refresh_dialog.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
-#include <nx/vms/client/desktop/system_logon/logic/connection_delegate_helper.h>
 #include <nx/vms/client/desktop/videowall/workbench_videowall_shortcut_helper.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/discovery/manager.h>
@@ -75,6 +75,7 @@
 #include <ui/dialogs/reconnect_info_dialog.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/opengl/gl_functions.h>
+#include <ui/statistics/modules/certificate_statistics_module.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -936,15 +937,20 @@ void ConnectActionsHandler::at_connectAction_triggered()
 void ConnectActionsHandler::at_connectToCloudSystemAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
-    QString systemId = parameters.argument(Qn::CloudSystemIdRole).toString();
-
-    const auto connectionInfo = core::cloudLogonData(systemId);
+    const auto connectData = parameters.argument<CloudSystemConnectData>(
+        Qn::CloudSystemConnectDataRole);
+    const auto connectionInfo = core::cloudLogonData(connectData.systemId);
 
     if (!connectionInfo)
         return;
 
+    std::shared_ptr<QnStatisticsScenarioGuard> connectScenario = connectData.connectScenario
+        ? context()->instance<QnCertificateStatisticsModule>()->beginScenario(
+            *connectData.connectScenario)
+        : nullptr;
+
     auto callback = d->makeSingleConnectionCallback(
-        [this, connectionInfo](RemoteConnectionFactory::ConnectionOrError result)
+        [this, connectionInfo, connectScenario](RemoteConnectionFactory::ConnectionOrError result)
         {
             if (auto error = std::get_if<RemoteConnectionError>(&result))
             {
@@ -1076,9 +1082,13 @@ void ConnectActionsHandler::at_selectCurrentServerAction_triggered()
     d->switchServerDialog = new ConnectingToServerDialog(mainWindowWidget());
     d->switchServerDialog->setDisplayedServer(server);
 
+    std::shared_ptr<QnStatisticsScenarioGuard> connectScenario =
+        context()->instance<QnCertificateStatisticsModule>()->beginScenario(
+            ConnectScenario::connectFromTree);
+
     auto callback = d->makeSingleConnectionCallback(
         nx::utils::guarded(d->switchServerDialog.data(),
-            [this, serverId, dialog = d->switchServerDialog]
+            [this, serverId, dialog = d->switchServerDialog, connectScenario]
                 (RemoteConnectionFactory::ConnectionOrError result)
         {
             if (NX_ASSERT(dialog))
@@ -1213,12 +1223,15 @@ void ConnectActionsHandler::clearConnection()
     resourceAccessManager()->endUpdate();
 }
 
-void ConnectActionsHandler::connectToServer(
-    core::LogonData logonData,
-    ConnectionOptions options)
+void ConnectActionsHandler::connectToServer(LogonData logonData, ConnectionOptions options)
 {
+    std::shared_ptr<QnStatisticsScenarioGuard> connectScenario = logonData.connectScenario
+        ? context()->instance<QnCertificateStatisticsModule>()->beginScenario(
+            *logonData.connectScenario)
+        : nullptr;
+
     auto callback = d->makeSingleConnectionCallback(
-        [this, options](RemoteConnectionFactory::ConnectionOrError result)
+        [this, options, connectScenario](RemoteConnectionFactory::ConnectionOrError result)
         {
             if (const auto error = std::get_if<RemoteConnectionError>(&result))
             {
