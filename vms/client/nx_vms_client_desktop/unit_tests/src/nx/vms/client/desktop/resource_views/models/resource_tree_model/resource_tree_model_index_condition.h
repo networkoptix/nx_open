@@ -17,7 +17,8 @@ using Condition = std::function<bool(const QModelIndex& index)>;
 // Ancestry and arrangement conditions.
 Condition topLevelNode();
 Condition hasChildren();
-Condition hasNotChildren();
+Condition hasNoChildren();
+Condition hasExactChildrenCount(int count);
 Condition directChildOf(Condition paramCondition);
 Condition directChildOf(const QModelIndex& index);
 Condition atRow(int row);

@@ -24,6 +24,8 @@ static constexpr auto kUniqueEdgeCameraName = "unique_edge_camera_name";
 static constexpr auto kUniqueVirtualCameraName = "unique_virtual_camera_name";
 static constexpr auto kUniqueGroupName = "unique_group_name";
 
+static constexpr auto kRenamedEdgeCameraName = "renamed_edge_camera_name";
+
 static constexpr auto kValidIpV4Address = "192.168.0.0";
 
 // Predefined conditions.
@@ -835,9 +837,6 @@ TEST_F(ResourceTreeModelTest, edgeServerWithBindedCameraDisplaysBindedCameraName
 
 TEST_F(ResourceTreeModelTest, edgeServerWithBindedCameraRenamedWhenBindedCameraRenamed)
 {
-    // String constants
-    static constexpr auto kRenamedEdgeCameraName = "renamed_edge_camera_name";
-
     // When user with administrator permissions is logged in.
     loginAsAdmin("admin");
 
@@ -863,9 +862,6 @@ TEST_F(ResourceTreeModelTest, edgeServerWithBindedCameraRenamedWhenBindedCameraR
 
 TEST_F(ResourceTreeModelTest, edgeServerDisplaysServerNameIfBindedCameraRenamedOnForeignServer)
 {
-    // String constants
-    static constexpr auto kRenamedEdgeCameraName = "renamed_edge_camera_name";
-
     // When user with administrator permissions is logged in.
     loginAsAdmin("admin");
 
@@ -889,7 +885,7 @@ TEST_F(ResourceTreeModelTest, edgeServerDisplaysServerNameIfBindedCameraRenamedO
 
     // Then exactly one server with no children founds in the resource tree.
     const auto serverIndex =
-        uniqueMatchingIndex(allOf(serverIconTypeCondition(), hasNotChildren()));
+        uniqueMatchingIndex(allOf(serverIconTypeCondition(), hasNoChildren()));
 
     // And that node have new binded EDGE camera name as display text.
     ASSERT_TRUE(displayFullMatch(kUniqueEdgeServerName)(serverIndex));
@@ -938,7 +934,7 @@ TEST_F(ResourceTreeModelTest, edgeServerDisplaysServerNameWhenBindedCameraMovedT
 
     // Then exactly one server with no children founds in the resource tree.
     const auto serverIndex =
-        uniqueMatchingIndex(allOf(serverIconTypeCondition(), hasNotChildren()));
+        uniqueMatchingIndex(allOf(serverIconTypeCondition(), hasNoChildren()));
 
     // And that node have initial EDGE server name as display text.
     ASSERT_TRUE(displayFullMatch(kUniqueEdgeServerName)(serverIndex));
@@ -953,9 +949,7 @@ TEST_F(ResourceTreeModelTest, edgeServerDisplaysBindedCameraNameIfCameraMovedFro
     const auto server = addServer(kUniqueServerName);
 
     // When EDGE camera with certain unique name is added to the foreign server.
-    // TODO: #vbreus Make single line unambiguous initialization.
-    const auto edgeCamera = addCamera(kUniqueEdgeCameraName, server->getId());
-    edgeCamera->setHostAddress(kValidIpV4Address);
+    const auto edgeCamera = addCamera(kUniqueEdgeCameraName, server->getId(), kValidIpV4Address);
 
     // When EDGE server with certain unique name is added to the resource pool.
     const auto edgeServer = addEdgeServer(kUniqueEdgeServerName, kValidIpV4Address);
@@ -1045,19 +1039,215 @@ TEST_F(ResourceTreeModelTest, edgeServerDisplaysServerNameIfBindedCameraIsOnFore
     const auto server = addServer(kUniqueServerName);
 
     // When EDGE camera with certain unique name is added to the foreign server.
-    // TODO: #vbreus Make single line unambiguous initialization.
-    const auto edgeCamera = addCamera(kUniqueEdgeCameraName, server->getId());
-    edgeCamera->setHostAddress(kValidIpV4Address);
+    const auto edgeCamera = addCamera(kUniqueEdgeCameraName, server->getId(), kValidIpV4Address);
 
     // When EDGE server with certain unique name is added to the resource pool.
     const auto edgeServer = addEdgeServer(kUniqueEdgeServerName, kValidIpV4Address);
 
     // Then exactly one server with no children founds in the resource tree.
     const auto serverIndex =
-        uniqueMatchingIndex(allOf(serverIconTypeCondition(), hasNotChildren()));
+        uniqueMatchingIndex(allOf(serverIconTypeCondition(), hasNoChildren()));
 
     // And that node have initial EDGE server name as display text.
     ASSERT_TRUE(displayFullMatch(kUniqueEdgeServerName)(serverIndex));
+}
+
+TEST_F(ResourceTreeModelTest, edgeServerWithDuplicatedBindedCamerasAppearsExpandedAndDisplaysServerName)
+{
+    // When user with administrator permissions is logged in.
+    loginAsAdmin("admin");
+
+    // When EDGE server with certain unique name is added to the resource pool.
+    const auto edgeServer = addEdgeServer(kUniqueEdgeServerName, kValidIpV4Address);
+
+    // When EDGE camera with certain unique name is added to EDGE server.
+    const auto edgeCamera = addEdgeCamera(kUniqueEdgeCameraName, edgeServer);
+
+    // When duplicated EDGE camera with the same name is added to EDGE server.
+    const auto edgeCamera2 = addEdgeCamera(kUniqueEdgeCameraName, edgeServer);
+
+    // Then exactly one server node with two child nodes founds in the resource tree.
+    const auto serverIndex =
+        uniqueMatchingIndex(allOf(serverIconTypeCondition(), hasExactChildrenCount(2)));
+
+    // And that node have initial EDGE server name as display text.
+    ASSERT_TRUE(displayFullMatch(kUniqueEdgeServerName)(serverIndex));
+
+    // When EDGE cameras renamed.
+    edgeCamera->setName(kRenamedEdgeCameraName);
+    edgeCamera2->setName(kRenamedEdgeCameraName);
+
+    // Then server name isn't affected.
+    ASSERT_TRUE(displayFullMatch(kUniqueEdgeServerName)(serverIndex));
+
+    // Then camera nodes are renamed as expected.
+    ASSERT_EQ(2, matchCount(allOf(
+        cameraIconTypeCondition(),
+        displayFullMatch(kRenamedEdgeCameraName),
+        directChildOf(serverIndex))));
+}
+
+TEST_F(ResourceTreeModelTest, edgeServerDisplaysBindedCameraNameIfDuplicateBindedCameraRemoved)
+{
+    // When user with administrator permissions is logged in.
+    loginAsAdmin("admin");
+
+    // When EDGE server with certain unique name is added to the resource pool.
+    const auto edgeServer = addEdgeServer(kUniqueEdgeServerName, kValidIpV4Address);
+
+    // When server redundancy flag set to true.
+    edgeServer->setRedundancy(true);
+
+    // When EDGE camera with certain unique name is added to EDGE server.
+    const auto edgeCamera = addEdgeCamera(kUniqueEdgeCameraName, edgeServer);
+
+    // When duplicated EDGE camera with the same name is added to EDGE server.
+    const auto edgeCamera2 = addEdgeCamera(kUniqueEdgeCameraName, edgeServer);
+
+    // When one of duplicated EDGE cameras is removed from the resource pool.
+    resourcePool()->removeResource(edgeCamera);
+
+    // Then exactly one server node with one child node founds in the resource tree.
+    const auto serverIndex =
+        uniqueMatchingIndex(allOf(serverIconTypeCondition(), hasExactChildrenCount(1)));
+
+    // And that node have binded EDGE camera name as display text.
+    ASSERT_TRUE(displayFullMatch(kUniqueEdgeCameraName)(serverIndex));
+
+    // When server redundancy flag set to false.
+    edgeServer->setRedundancy(false);
+
+    // Then EDGE server appears collapsed as it should be.
+    ASSERT_TRUE(noneMatches(serverIconTypeCondition()));
+    ASSERT_TRUE(onlyOneMatches(allOf(cameraIconTypeCondition(), hasNoChildren(), topLevelNode())));
+}
+
+TEST_F(ResourceTreeModelTest, edgeServerDisplaysBindedCameraNameIfDuplicateBindedCameraMovedToForeignServer)
+{
+    // When user with administrator permissions is logged in.
+    loginAsAdmin("admin");
+
+    // When EDGE server with certain unique name is added to the resource pool.
+    const auto edgeServer = addEdgeServer(kUniqueEdgeServerName, kValidIpV4Address);
+
+    // When server redundancy flag set to true.
+    edgeServer->setRedundancy(true);
+
+    // When EDGE camera with certain unique name is added to EDGE server.
+    const auto edgeCamera = addEdgeCamera(kUniqueEdgeCameraName, edgeServer);
+
+    // When duplicated EDGE camera with the same name is added to EDGE server.
+    const auto edgeCamera2 = addEdgeCamera(kUniqueEdgeCameraName, edgeServer);
+
+    // When another server with certain unique name is added to the resource pool.
+    const auto server = addServer(kUniqueServerName);
+
+    // When one of duplicated EDGE cameras is moved to the foreign server.
+    edgeCamera2->setParentId(server->getId());
+
+    // Then exactly one server node with single child that have EDGE camera name founds in the
+    // resource tree.
+    uniqueMatchingIndex(allOf(
+        serverIconTypeCondition(),
+        hasExactChildrenCount(1),
+        displayFullMatch(kUniqueEdgeCameraName)));
+
+    // When duplicated EDGE camera on the foreign server is renamed.
+    edgeCamera2->setName(kRenamedEdgeCameraName);
+
+    // Then EDGE server node name isn't affected.
+    uniqueMatchingIndex(allOf(
+        serverIconTypeCondition(),
+        hasExactChildrenCount(1),
+        displayFullMatch(kUniqueEdgeCameraName)));
+
+    // Then foreign server node name isn't affected, camera on the foreign server have
+    // expected name.
+    uniqueMatchingIndex(allOf(
+        cameraIconTypeCondition(),
+        hasNoChildren(),
+        displayFullMatch(kRenamedEdgeCameraName),
+        directChildOf(allOf(
+            serverIconTypeCondition(),
+            displayFullMatch(kUniqueServerName)))));
+}
+
+TEST_F(ResourceTreeModelTest,
+    edgeServerExpandsWhenBindedCameraMovesToForeignServerAndCollapsesWhenBindedCameraMovesBack)
+{
+    // When user with administrator permissions is logged in.
+    loginAsAdmin("admin");
+
+    // When EDGE server with certain unique name is added to the resource pool.
+    const auto edgeServer = addEdgeServer(kUniqueEdgeServerName, kValidIpV4Address);
+
+    // When binded EDGE camera with certain unique name is added to the EDGE server.
+    const auto edgeCamera = addEdgeCamera(kUniqueEdgeCameraName, edgeServer);
+
+    // When another server with certain unique name is added to the resource pool.
+    const auto server = addServer(kUniqueServerName);
+
+    // Then exactly one server node and exactly one camera node founds in the resource tree on the
+    // same level under the "Servers" group.
+    ASSERT_TRUE(onlyOneMatches(allOf(
+        serverIconTypeCondition(), hasNoChildren(), directChildOf(serversNodeCondition()))));
+
+    ASSERT_TRUE(onlyOneMatches(allOf(
+        cameraIconTypeCondition(), hasNoChildren(), directChildOf(serversNodeCondition()))));
+
+    ASSERT_EQ(2, matchCount(directChildOf(serversNodeCondition())));
+
+    // When binded EDGE camera is moved to the foreign server.
+    edgeCamera->setParentId(server->getId());
+
+    // Then exactly two server nodes and exactly one camera node with foreign server parent
+    // founds in the resource tree.
+    ASSERT_EQ(2, matchCount(serverIconTypeCondition()));
+    ASSERT_TRUE(onlyOneMatches(allOf(
+        cameraIconTypeCondition(),
+        directChildOf(displayFullMatch(kUniqueServerName)))));
+
+    // When binded EDGE camera is moved back to the EDGE server.
+    edgeCamera->setParentId(edgeServer->getId());
+
+    // Then again exactly one server node and exactly one camera node founds in the resource tree
+    // on the same level under the "Servers" group.
+    ASSERT_TRUE(onlyOneMatches(allOf(
+        serverIconTypeCondition(), hasNoChildren(), directChildOf(serversNodeCondition()))));
+
+    ASSERT_TRUE(onlyOneMatches(allOf(
+        cameraIconTypeCondition(), hasNoChildren(), directChildOf(serversNodeCondition()))));
+
+    ASSERT_EQ(2, matchCount(directChildOf(serversNodeCondition())));
+}
+
+TEST_F(ResourceTreeModelTest, thereIsNoCrashWhenDuplicatedEdgeCamerasAreRemoved)
+{
+    // When user with administrator permissions is logged in.
+    loginAsAdmin("admin");
+
+    // When EDGE server with certain unique name is added to the resource pool.
+    const auto edgeServer = addEdgeServer(kUniqueEdgeServerName, kValidIpV4Address);
+
+    // When binded EDGE camera with certain unique name is added to the EDGE server.
+    const auto edgeCamera1 = addEdgeCamera(kUniqueEdgeCameraName, edgeServer);
+
+    // When non-EDGE server with certain unique name is added to the resource pool.
+    const auto server = addServer(kUniqueServerName);
+
+    // When duplicated EDGE camera with certain unique name is added to that foreign server.
+    const auto edgeCamera2 = addCamera(kUniqueEdgeCameraName, server->getId(), kValidIpV4Address);
+
+    // Then exactly one server node and exactly two camera nodes founds in the resource tree.
+    ASSERT_EQ(1, matchCount(serverIconTypeCondition()));
+    ASSERT_EQ(2, matchCount(cameraIconTypeCondition()));
+
+    // When both EDGE cameras removed from the resource pool.
+    resourcePool()->removeResources({edgeCamera1, edgeCamera2});
+
+    // Then exactly two server nodes and no camera nodes founds in the resource tree.
+    ASSERT_EQ(2, matchCount(serverIconTypeCondition()));
+    ASSERT_EQ(0, matchCount(cameraIconTypeCondition()));
 }
 
 TEST_F(ResourceTreeModelTest, serverNodeProvidesResource)
