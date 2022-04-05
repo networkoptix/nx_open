@@ -54,7 +54,7 @@ public:
 
                 connectUserSignals(user);
 
-                if (user->userRoleId() == this->model->selectedUserRoleId())
+                if (user->firstRoleId() == this->model->selectedUserRoleId())
                     userAddedOrUpdated(user);
             });
 
@@ -67,7 +67,7 @@ public:
 
                 disconnect(user, nullptr, this, nullptr);
 
-                if (user->userRoleId() == this->model->selectedUserRoleId())
+                if (user->firstRoleId() == this->model->selectedUserRoleId())
                     userMaybeRemoved(user);
             });
     }
@@ -78,14 +78,14 @@ public:
             [this](const QnResourcePtr& resource)
             {
                 auto user = resource.staticCast<QnUserResource>();
-                if (user->userRoleId() == model->selectedUserRoleId())
+                if (user->firstRoleId() == model->selectedUserRoleId())
                     userAddedOrUpdated(user);
             });
 
-        connect(user, &QnUserResource::userRoleChanged, this,
+        connect(user, &QnUserResource::userRolesChanged, this,
             [this](const QnUserResourcePtr& user)
             {
-                if (user->userRoleId() == model->selectedUserRoleId())
+                if (user->firstRoleId() == model->selectedUserRoleId())
                     userAddedOrUpdated(user);
                 else
                     userMaybeRemoved(user);

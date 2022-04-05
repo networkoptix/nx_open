@@ -52,5 +52,6 @@ public:
 
     QnStorageResourcePtr addStorage(const QnMediaServerResourcePtr& server);
 
-    nx::vms::api::UserRoleData createRole(GlobalPermissions permissions);
+    nx::vms::api::UserRoleData createRole(
+        GlobalPermissions permissions, std::vector<QnUuid> parentRoleIds = {});
 };

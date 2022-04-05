@@ -13,6 +13,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/common/system_context.h>
 
+#include <nx/utils/log/log_main.h>
+
 namespace Qn {
 
 static uint qHash(UserRole role)
@@ -105,9 +107,15 @@ void QnUserRolesManager::resetUserRoles(const UserRoleDataList& userRoles)
     }
 
     for (auto role: removed)
+    {
+        NX_DEBUG(this, "%1 removed", role);
         emit userRoleRemoved(role);
+    }
     for (auto role: updated)
+    {
+        NX_DEBUG(this, "%1 added or updated", role);
         emit userRoleAddedOrUpdated(role);
+    }
 }
 
 bool QnUserRolesManager::hasRole(const QnUuid& id) const
@@ -116,21 +124,21 @@ bool QnUserRolesManager::hasRole(const QnUuid& id) const
     return m_roles.contains(id);
 }
 
+bool QnUserRolesManager::hasRoles(const std::vector<QnUuid>& ids) const
+{
+    NX_MUTEX_LOCKER lk(&m_mutex);
+    for (const auto& id: ids)
+    {
+        if (!m_roles.contains(id))
+            return false;
+    }
+    return true;
+}
+
 QnUserRolesManager::UserRoleData QnUserRolesManager::userRole(const QnUuid& id) const
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
     return m_roles.value(id);
-}
-
-QnUuid QnUserRolesManager::unifiedUserRoleId(const QnUserResourcePtr& user)
-{
-    if (!user)
-        return QnUuid();
-
-    const auto userRole = user->userRole();
-    return userRole == Qn::UserRole::customUserRole
-        ? user->userRoleId()
-        : predefinedRoleId(userRole);
 }
 
 void QnUserRolesManager::addOrUpdateUserRole(const UserRoleData& role)
@@ -145,6 +153,7 @@ void QnUserRolesManager::addOrUpdateUserRole(const UserRoleData& role)
         m_roles[role.id] = role;
     }
 
+    NX_DEBUG(this, "%1 added or updated", role);
     emit userRoleAddedOrUpdated(role);
 }
 
@@ -160,6 +169,7 @@ void QnUserRolesManager::removeUserRole(const QnUuid& id)
         role = m_roles.take(id);
     }
 
+    NX_DEBUG(this, "%1 removed", role);
     emit userRoleRemoved(role);
 }
 
@@ -314,7 +324,12 @@ QString QnUserRolesManager::userRoleName(const QnUserResourcePtr& user) const
         return QString();
     Qn::UserRole userRole = user->userRole();
     if (userRole == Qn::UserRole::customUserRole)
-        return this->userRole(user->userRoleId()).name;
+    {
+        QStringList names;
+        for (const auto& role: user->userRoleIds())
+            names << this->userRole(role).name;
+        return names.join(", ");
+    }
 
     return userRoleName(userRole);
 }

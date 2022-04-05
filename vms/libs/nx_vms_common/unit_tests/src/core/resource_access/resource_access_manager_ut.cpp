@@ -918,9 +918,8 @@ TEST_P(ResourceAccessManagerTest, checkUserRoleChange)
 
     auto user = addUser(GlobalPermission::none);
     auto role = createRole(GlobalPermission::accessAllMedia);
-    userRolesManager()->addOrUpdateUserRole(role);
 
-    user->setUserRoleId(role.id);
+    user->setUserRoleIds({role.id});
     ASSERT_TRUE(hasPermission(user, target, Qn::ReadPermission));
     ASSERT_TRUE(hasPermission(user, target, Qn::ViewContentPermission));
 }
@@ -944,9 +943,8 @@ TEST_P(ResourceAccessManagerTest, checkRoleAccessChange)
 
     auto user = addUser(GlobalPermission::none);
     auto role = createRole(GlobalPermission::none);
-    userRolesManager()->addOrUpdateUserRole(role);
 
-    user->setUserRoleId(role.id);
+    user->setUserRoleIds({role.id});
     ASSERT_FALSE(hasPermission(user, target, Qn::ReadPermission));
     ASSERT_FALSE(hasPermission(user, target, Qn::ViewContentPermission));
 
@@ -955,6 +953,120 @@ TEST_P(ResourceAccessManagerTest, checkRoleAccessChange)
 
     ASSERT_TRUE(hasPermission(user, target, Qn::ReadPermission));
     ASSERT_TRUE(hasPermission(user, target, Qn::ViewContentPermission));
+}
+
+TEST_P(ResourceAccessManagerTest, checkInheritedRoleAccessChange)
+{
+    auto target = addCamera();
+
+    auto user = addUser(GlobalPermission::none);
+    auto parentRole = createRole(GlobalPermission::none);
+    auto inheritedRole = createRole(GlobalPermission::none, {parentRole.id});
+
+    user->setUserRoleIds({inheritedRole.id});
+    ASSERT_FALSE(hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_FALSE(hasPermission(user, target, Qn::ViewContentPermission));
+
+    parentRole.permissions = GlobalPermission::accessAllMedia;
+    userRolesManager()->addOrUpdateUserRole(parentRole);
+    ASSERT_TRUE(hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_TRUE(hasPermission(user, target, Qn::ViewContentPermission));
+
+    inheritedRole.parentRoleIds = {};
+    userRolesManager()->addOrUpdateUserRole(inheritedRole);
+    ASSERT_FALSE(hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_FALSE(hasPermission(user, target, Qn::ViewContentPermission));
+
+    user->setUserRoleIds({inheritedRole.id, parentRole.id});
+    ASSERT_TRUE(hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_TRUE(hasPermission(user, target, Qn::ViewContentPermission));
+
+    userRolesManager()->removeUserRole(parentRole.id);
+    ASSERT_FALSE(hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_FALSE(hasPermission(user, target, Qn::ViewContentPermission));
+}
+
+TEST_P(ResourceAccessManagerTest, checkUserAndRolesCombinedPermissions)
+{
+    auto cameraOfParentRole1 = addCamera();
+    auto cameraOfParentRole2 = addCamera();
+    auto cameraOfInheridedRole = addCamera();
+    auto cameraOfUser = addCamera();
+    auto cameraOfNoOne = addCamera();
+
+    auto parentRole1 = createRole(GlobalPermission::none);
+    sharedResourcesManager()->setSharedResources(parentRole1, {cameraOfParentRole1->getId()});
+    EXPECT_FALSE(hasPermission(parentRole1, cameraOfUser, Qn::ReadPermission));
+    EXPECT_TRUE(hasPermission(parentRole1, cameraOfParentRole1, Qn::ReadPermission));
+    EXPECT_FALSE(hasPermission(parentRole1, cameraOfParentRole2, Qn::ReadPermission));
+    EXPECT_FALSE(hasPermission(parentRole1, cameraOfInheridedRole, Qn::ReadPermission));
+    EXPECT_FALSE(hasPermission(parentRole1, cameraOfNoOne, Qn::ReadPermission));
+
+    auto parentRole2 = createRole(GlobalPermission::none);
+    sharedResourcesManager()->setSharedResources(parentRole2, {cameraOfParentRole2->getId()});
+    EXPECT_FALSE(hasPermission(parentRole2, cameraOfUser, Qn::ReadPermission));
+    EXPECT_FALSE(hasPermission(parentRole2, cameraOfParentRole1, Qn::ReadPermission));
+    EXPECT_TRUE(hasPermission(parentRole2, cameraOfParentRole2, Qn::ReadPermission));
+    EXPECT_FALSE(hasPermission(parentRole2, cameraOfInheridedRole, Qn::ReadPermission));
+    EXPECT_FALSE(hasPermission(parentRole2, cameraOfNoOne, Qn::ReadPermission));
+
+    auto inheritedRole = createRole(GlobalPermission::none, {parentRole1.id, parentRole2.id});
+    sharedResourcesManager()->setSharedResources(inheritedRole, {cameraOfInheridedRole->getId()});
+    EXPECT_FALSE(hasPermission(inheritedRole, cameraOfUser, Qn::ReadPermission));
+    EXPECT_TRUE(hasPermission(inheritedRole, cameraOfParentRole1, Qn::ReadPermission));
+    EXPECT_TRUE(hasPermission(inheritedRole, cameraOfParentRole2, Qn::ReadPermission));
+    EXPECT_TRUE(hasPermission(inheritedRole, cameraOfInheridedRole, Qn::ReadPermission));
+    EXPECT_FALSE(hasPermission(inheritedRole, cameraOfNoOne, Qn::ReadPermission));
+
+    auto user = addUser(GlobalPermission::none, "vasily");
+    EXPECT_FALSE(hasPermission(user, cameraOfUser, Qn::ReadPermission));
+    EXPECT_FALSE(hasPermission(user, cameraOfParentRole1, Qn::ReadPermission));
+    EXPECT_FALSE(hasPermission(user, cameraOfParentRole2, Qn::ReadPermission));
+    EXPECT_FALSE(hasPermission(user, cameraOfInheridedRole, Qn::ReadPermission));
+    EXPECT_FALSE(hasPermission(user, cameraOfNoOne, Qn::ReadPermission));
+
+    sharedResourcesManager()->setSharedResources(user, {cameraOfUser->getId()});
+    EXPECT_TRUE(hasPermission(user, cameraOfUser, Qn::ReadPermission));
+    EXPECT_FALSE(hasPermission(user, cameraOfParentRole1, Qn::ReadPermission));
+    EXPECT_FALSE(hasPermission(user, cameraOfParentRole2, Qn::ReadPermission));
+    EXPECT_FALSE(hasPermission(user, cameraOfInheridedRole, Qn::ReadPermission));
+    EXPECT_FALSE(hasPermission(user, cameraOfNoOne, Qn::ReadPermission));
+
+    user->setUserRoleIds({parentRole1.id});
+    EXPECT_TRUE(hasPermission(user, cameraOfUser, Qn::ReadPermission));
+    EXPECT_TRUE(hasPermission(user, cameraOfParentRole1, Qn::ReadPermission));
+    EXPECT_FALSE(hasPermission(user, cameraOfParentRole2, Qn::ReadPermission));
+    EXPECT_FALSE(hasPermission(user, cameraOfInheridedRole, Qn::ReadPermission));
+    EXPECT_FALSE(hasPermission(user, cameraOfNoOne, Qn::ReadPermission));
+
+    user->setUserRoleIds({parentRole1.id, parentRole2.id});
+    EXPECT_TRUE(hasPermission(user, cameraOfUser, Qn::ReadPermission));
+    EXPECT_TRUE(hasPermission(user, cameraOfParentRole1, Qn::ReadPermission));
+    EXPECT_TRUE(hasPermission(user, cameraOfParentRole2, Qn::ReadPermission));
+    EXPECT_FALSE(hasPermission(user, cameraOfInheridedRole, Qn::ReadPermission));
+    EXPECT_FALSE(hasPermission(user, cameraOfNoOne, Qn::ReadPermission));
+
+    user->setUserRoleIds({inheritedRole.id});
+    EXPECT_TRUE(hasPermission(user, cameraOfUser, Qn::ReadPermission));
+    EXPECT_TRUE(hasPermission(user, cameraOfParentRole1, Qn::ReadPermission));
+    EXPECT_TRUE(hasPermission(user, cameraOfParentRole2, Qn::ReadPermission));
+    EXPECT_TRUE(hasPermission(user, cameraOfInheridedRole, Qn::ReadPermission));
+    EXPECT_FALSE(hasPermission(user, cameraOfNoOne, Qn::ReadPermission));
+
+    inheritedRole.parentRoleIds = {};
+    userRolesManager()->addOrUpdateUserRole(inheritedRole);
+    EXPECT_TRUE(hasPermission(user, cameraOfUser, Qn::ReadPermission));
+    EXPECT_FALSE(hasPermission(user, cameraOfParentRole1, Qn::ReadPermission));
+    EXPECT_FALSE(hasPermission(user, cameraOfParentRole2, Qn::ReadPermission));
+    EXPECT_TRUE(hasPermission(user, cameraOfInheridedRole, Qn::ReadPermission));
+    EXPECT_FALSE(hasPermission(user, cameraOfNoOne, Qn::ReadPermission));
+
+    user->setUserRoleIds({});
+    EXPECT_TRUE(hasPermission(user, cameraOfUser, Qn::ReadPermission));
+    EXPECT_FALSE(hasPermission(user, cameraOfParentRole1, Qn::ReadPermission));
+    EXPECT_FALSE(hasPermission(user, cameraOfParentRole2, Qn::ReadPermission));
+    EXPECT_FALSE(hasPermission(user, cameraOfInheridedRole, Qn::ReadPermission));
+    EXPECT_FALSE(hasPermission(user, cameraOfNoOne, Qn::ReadPermission));
 }
 
 TEST_P(ResourceAccessManagerTest, checkEditAccessChange)
@@ -974,9 +1086,8 @@ TEST_P(ResourceAccessManagerTest, checkRoleRemoved)
 
     auto user = addUser(GlobalPermission::none);
     auto role = createRole(GlobalPermission::accessAllMedia);
-    userRolesManager()->addOrUpdateUserRole(role);
 
-    user->setUserRoleId(role.id);
+    user->setUserRoleIds({role.id});
     ASSERT_TRUE(hasPermission(user, target, Qn::ReadPermission));
     ASSERT_TRUE(hasPermission(user, target, Qn::ViewContentPermission));
 
@@ -1012,11 +1123,10 @@ TEST_P(ResourceAccessManagerTest, checkShareLayoutToRole)
 
     // Create role without access
     auto role = createRole(GlobalPermission::none);
-    userRolesManager()->addOrUpdateUserRole(role);
 
     // Create user in role
     auto user = addUser(GlobalPermission::none, kTestUserName2);
-    user->setUserRoleId(role.id);
+    user->setUserRoleIds({role.id});
 
     // Create own layout
     auto layout = createLayout(Qn::remote);
@@ -1030,6 +1140,37 @@ TEST_P(ResourceAccessManagerTest, checkShareLayoutToRole)
     // Share layout to _role_
     layout->setParentId(QnUuid());
     sharedResourcesManager()->setSharedResources(role, {layout->getId()});
+
+    // Make sure user got permissions
+    ASSERT_TRUE(hasPermission(user, target, Qn::ReadPermission));
+}
+
+TEST_P(ResourceAccessManagerTest, checkShareLayoutToParentRole)
+{
+    loginAs(GlobalPermission::admin);
+
+    auto target = addCamera();
+
+    // Create roles without access
+    auto parentRole = createRole(GlobalPermission::none);
+    auto inheritedRole = createRole(GlobalPermission::none, {parentRole.id});
+
+    // Create user in role
+    auto user = addUser(GlobalPermission::none, kTestUserName2);
+    user->setUserRoleIds({inheritedRole.id});
+
+    // Create own layout
+    auto layout = createLayout(Qn::remote);
+    resourcePool()->addResource(layout);
+
+    // Place a camera on it
+    QnLayoutItemData item;
+    item.resource.id = target->getId();
+    layout->addItem(item);
+
+    // Share layout to _role_
+    layout->setParentId(QnUuid());
+    sharedResourcesManager()->setSharedResources(parentRole, {layout->getId()});
 
     // Make sure user got permissions
     ASSERT_TRUE(hasPermission(user, target, Qn::ReadPermission));

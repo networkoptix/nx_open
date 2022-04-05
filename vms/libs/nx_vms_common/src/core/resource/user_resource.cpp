@@ -4,24 +4,23 @@
 
 #include <QtCore/QCryptographicHash>
 
-#include <nx/utils/switch.h>
-#include <api/model/password_data.h>
 #include <api/global_settings.h>
+#include <api/model/password_data.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_properties.h>
-#include <utils/common/synctime.h>
-#include <utils/common/id.h>
-#include <utils/crypt/symmetrical.h>
-#include <utils/common/ldap.h>
-
+#include <core/resource_management/user_roles_manager.h>
+#include <nx/network/aio/timer.h>
 #include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
-#include <nx/utils/scope_guard.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
-#include <nx/network/aio/timer.h>
-
+#include <nx/utils/scope_guard.h>
+#include <nx/utils/switch.h>
 #include <nx/vms/api/data/user_data.h>
+#include <utils/common/id.h>
+#include <utils/common/ldap.h>
+#include <utils/common/synctime.h>
+#include <utils/crypt/symmetrical.h>
 
 const QnUuid QnUserResource::kAdminGuid("99cbc715-539b-4bfe-856f-799b45b69b1e");
 
@@ -215,8 +214,7 @@ Qn::UserRole QnUserResource::userRole() const
     if (isOwner())
         return Qn::UserRole::owner;
 
-    QnUuid id = userRoleId();
-    if (!id.isNull())
+    if (!userRoleIds().empty())
         return Qn::UserRole::customUserRole;
 
     auto permissions = getRawPermissions();
@@ -405,23 +403,51 @@ void QnUserResource::setOwner(bool isOwner)
         emit permissionsChanged(::toSharedPointer(this));
 }
 
-QnUuid QnUserResource::userRoleId() const
+std::vector<QnUuid> QnUserResource::userRoleIds() const
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
-    return m_userRoleId;
+    return m_userRoleIds;
 }
 
-void QnUserResource::setUserRoleId(const QnUuid& userRoleId)
+void QnUserResource::setUserRoleIds(const std::vector<QnUuid>& userRoleIds)
 {
-    QnUuid previousRoleId;
+    std::vector<QnUuid> previousRoleIds;
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
-        if (m_userRoleId == userRoleId)
+        if (m_userRoleIds == userRoleIds)
             return;
-        previousRoleId = m_userRoleId;
-        m_userRoleId = userRoleId;
+        previousRoleIds = m_userRoleIds;
+        m_userRoleIds = userRoleIds;
     }
-    emit userRoleChanged(::toSharedPointer(this), previousRoleId);
+    NX_VERBOSE(this, "Roles changed from %1 to %2",
+        nx::containerString(previousRoleIds), nx::containerString(userRoleIds));
+    emit userRolesChanged(::toSharedPointer(this), previousRoleIds);
+}
+
+std::vector<QnUuid> QnUserResource::allUserRoleIds() const
+{
+    if (const auto role = userRole(); role != Qn::UserRole::customUserRole)
+        return {QnUserRolesManager::predefinedRoleId(role)};
+
+    const auto system = systemContext();
+    if (!system)
+        return {};
+
+    std::vector<QnUuid> roleIds;
+    for (const auto& role: system->userRolesManager()->userRoles(userRoleIds()))
+        roleIds.push_back(role.id);
+    return roleIds;
+}
+
+QnUuid QnUserResource::firstRoleId() const
+{
+    NX_MUTEX_LOCKER locker(&m_mutex);
+    return m_userRoleIds.empty() ? QnUuid() : m_userRoleIds.front();
+}
+
+void QnUserResource::setSingleUserRole(const QnUuid& id)
+{
+    setUserRoleIds(id.isNull() ? std::vector<QnUuid>{} : std::vector<QnUuid>{id});
 }
 
 bool QnUserResource::isEnabled() const
@@ -535,12 +561,12 @@ void QnUserResource::updateInternal(const QnResourcePtr& source, NotifierList& n
         if (oldPermissions != newPermissions)
             notifiers << [r = toSharedPointer(this)]{ emit r->permissionsChanged(r); };
 
-        if (m_userRoleId != localOther->m_userRoleId)
+        if (m_userRoleIds != localOther->m_userRoleIds)
         {
-            const auto previousRoleId = m_userRoleId;
-            m_userRoleId = localOther->m_userRoleId;
-            notifiers << [r = toSharedPointer(this), previousRoleId]
-                { emit r->userRoleChanged(r, previousRoleId); };
+            const auto previousRoleIds = m_userRoleIds;
+            m_userRoleIds = localOther->m_userRoleIds;
+            notifiers << [r = toSharedPointer(this), previousRoleIds]
+                { emit r->userRolesChanged(r, previousRoleIds); };
         }
 
         if (m_email != localOther->m_email)

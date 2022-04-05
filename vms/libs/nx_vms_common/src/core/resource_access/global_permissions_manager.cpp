@@ -3,13 +3,14 @@
 #include "global_permissions_manager.h"
 
 #include <common/common_module.h>
-#include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_access/resource_access_subjects_cache.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
+#include <core/resource/user_resource.h>
 #include <nx/core/access/access_types.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/utils/log/log.h>
 
 using namespace nx::core::access;
 
@@ -39,7 +40,6 @@ QnGlobalPermissionsManager::QnGlobalPermissionsManager(
 
 QnGlobalPermissionsManager::~QnGlobalPermissionsManager()
 {
-
 }
 
 GlobalPermissions QnGlobalPermissionsManager::dependentPermissions(GlobalPermission value)
@@ -62,10 +62,22 @@ GlobalPermissions QnGlobalPermissionsManager::globalPermissions(
 {
     if (m_mode == Mode::cached)
     {
+        GlobalPermissions result;
+        bool haveUnknownValues = false;
         NX_MUTEX_LOCKER lk(&m_mutex);
-        auto iter = m_cache.find(subject.effectiveId());
-        if (iter != m_cache.cend())
-            return *iter;
+        for (const auto& s: m_context->resourceAccessSubjectsCache()->subjectWithParents(subject))
+        {
+            auto iter = m_cache.find(s.id());
+            if (iter == m_cache.cend())
+            {
+                haveUnknownValues = true;
+                break;
+            }
+            result |= *iter;
+        }
+        if (!haveUnknownValues)
+            return result;
+        // The cache is not calculated yet, fallback into direct calculation.
     }
     return calculateGlobalPermissions(subject);
 }
@@ -99,7 +111,10 @@ bool QnGlobalPermissionsManager::hasGlobalPermission(const Qn::UserAccessData& a
     const auto& resPool = m_context->resourcePool();
     auto user = resPool->getResourceById<QnUserResource>(accessRights.userId);
     if (!user)
+    {
+        NX_VERBOSE(this, "User %1 is not found", accessRights.userId);
         return false;
+    }
     return hasGlobalPermission(user, requiredPermission);
 }
 
@@ -119,58 +134,72 @@ GlobalPermissions QnGlobalPermissionsManager::filterDependentPermissions(GlobalP
 void QnGlobalPermissionsManager::updateGlobalPermissions(const QnResourceAccessSubject& subject)
 {
     NX_ASSERT(m_mode == Mode::cached);
-
+    NX_VERBOSE(this, "Update permissions for %1", subject);
     setGlobalPermissionsInternal(subject, calculateGlobalPermissions(subject));
 }
 
 GlobalPermissions QnGlobalPermissionsManager::calculateGlobalPermissions(
     const QnResourceAccessSubject& subject) const
 {
-    GlobalPermissions result = {};
-
     if (!subject.isValid())
-        return result;
-
-    if (subject.user())
     {
-        auto user = subject.user();
-        if (!user->isEnabled())
-            return result;
-
-        /* Handle just-created user situation. */
-        if (user->flags().testFlag(Qn::local))
-            return filterDependentPermissions(user->getRawPermissions());
-
-        /* User is already removed. Problems with 'on_resource_removed' connection order. */
-        if (!user->resourcePool())
-            return {};
-
-        switch (user->userRole())
-        {
-            case Qn::UserRole::customUserRole:
-                result =
-                    globalPermissions(m_context->userRolesManager()->userRole(user->userRoleId()));
-                break;
-            case Qn::UserRole::owner:
-            case Qn::UserRole::administrator:
-                result = GlobalPermission::adminPermissions;
-                break;
-            default:
-                result = filterDependentPermissions(user->getRawPermissions());
-                break;
-        }
+        NX_VERBOSE(this, "Invalid subject: %1", subject);
+        return {};
     }
-    else
-    {
-        /* If the group does not exist, permissions will be empty. */
-        result = subject.rolePermissions();
 
+    const auto rolesPermissions =
+        [this](const auto& roleIds)
+        {
+            GlobalPermissions result;
+            for (const auto& role: m_context->userRolesManager()->userRoles(roleIds))
+                result |= role.permissions;
+            return filterDependentPermissions(result);
+        };
+
+    if (auto user = subject.user())
+    {
+        if (!user->isEnabled())
+        {
+            NX_VERBOSE(this, "%1 is disabled", user);
+            return {};
+        }
+
+        if (user->flags().testFlag(Qn::local))
+        {
+            const auto result = filterDependentPermissions(user->getRawPermissions());
+            NX_VERBOSE(this, "%1 just created with %2", user, result);
+            return result;
+        }
+
+        if (!user->resourcePool())
+        {
+            // Problems with 'on_resource_removed' connection order.
+            NX_VERBOSE(this, "%1 is not in pool", user);
+            return {};
+        }
+
+        if (const auto r = user->userRole();
+            r == Qn::UserRole::owner || r == Qn::UserRole::administrator)
+        {
+            NX_VERBOSE(this, "%1 is %2", user, r);
+            return GlobalPermission::adminPermissions;
+        }
+
+        const auto raw = filterDependentPermissions(user->getRawPermissions());
+        const auto roleIds = user->userRoleIds();
+        const auto roles = rolesPermissions(roleIds);
+        NX_VERBOSE(this, "%1 has raw %2 and roles %3 from %4",
+            user, raw, roles, nx::containerString(roleIds));
+        return raw | roles;
+    }
+    else //< Subject is a role.
+    {
+        auto result = rolesPermissions(std::vector{subject.id()});
         /* If user belongs to group, he cannot be an admin - by design. */
         result &= ~GlobalPermissions(GlobalPermission::admin);
-        result = filterDependentPermissions(result);
+        NX_VERBOSE(this, "Role %1 has %3", subject.id(), result);
+        return result;
     }
-
-    return result;
 }
 
 void QnGlobalPermissionsManager::setGlobalPermissionsInternal(
@@ -194,7 +223,7 @@ void QnGlobalPermissionsManager::handleResourceAdded(const QnResourcePtr& resour
 
         connect(user.get(), &QnUserResource::permissionsChanged, this,
             &QnGlobalPermissionsManager::updateGlobalPermissions);
-        connect(user.get(), &QnUserResource::userRoleChanged, this,
+        connect(user.get(), &QnUserResource::userRolesChanged, this,
             &QnGlobalPermissionsManager::updateGlobalPermissions);
         connect(user.get(), &QnUserResource::enabledChanged, this,
             &QnGlobalPermissionsManager::updateGlobalPermissions);
@@ -211,14 +240,14 @@ void QnGlobalPermissionsManager::handleResourceRemoved(const QnResourcePtr& reso
 void QnGlobalPermissionsManager::handleRoleAddedOrUpdated(const nx::vms::api::UserRoleData& userRole)
 {
     updateGlobalPermissions(userRole);
-    for (auto subject: m_context->resourceAccessSubjectsCache()->usersInRole(userRole.id))
+    for (auto subject: m_context->resourceAccessSubjectsCache()->allSubjectsInRole(userRole.id))
         updateGlobalPermissions(subject);
 }
 
 void QnGlobalPermissionsManager::handleRoleRemoved(const nx::vms::api::UserRoleData& userRole)
 {
     handleSubjectRemoved(userRole);
-    for (auto subject: m_context->resourceAccessSubjectsCache()->usersInRole(userRole.id))
+    for (auto subject: m_context->resourceAccessSubjectsCache()->allSubjectsInRole(userRole.id))
         updateGlobalPermissions(subject);
 }
 

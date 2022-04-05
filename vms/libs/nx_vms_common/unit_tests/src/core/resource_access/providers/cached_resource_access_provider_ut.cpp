@@ -82,10 +82,10 @@ TEST_F(CachedResourceAccessProviderTest, checkAccessAdding)
 {
     auto camera = addCamera();
     auto user = addUser(GlobalPermission::none);
-    awaitAccessValue(user, camera, kShared);
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << camera->getId());
-    awaitAccessValue(user, camera, kPermissions);
+    expectAccess(user, camera, kShared);
     user->setRawPermissions(GlobalPermission::admin);
+    expectAccess(user, camera, kPermissions);
 }
 
 TEST_F(CachedResourceAccessProviderTest, checkAccessRemoving)
@@ -94,10 +94,10 @@ TEST_F(CachedResourceAccessProviderTest, checkAccessRemoving)
     auto user = addUser(GlobalPermission::admin);
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << camera->getId());
     ASSERT_EQ(accessProvider()->accessibleVia(user, camera), kPermissions);
-    awaitAccessValue(user, camera, kShared);
     user->setRawPermissions(GlobalPermission::none);
-    awaitAccessValue(user, camera, kNone);
+    expectAccess(user, camera, kShared);
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>());
+    expectAccess(user, camera, kNone);
 }
 
 TEST_F(CachedResourceAccessProviderTest, checkDuplicatedSignals)
@@ -105,13 +105,15 @@ TEST_F(CachedResourceAccessProviderTest, checkDuplicatedSignals)
     auto camera = addCamera();
     auto user = addUser(GlobalPermission::admin);
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << camera->getId());
-    awaitAccessValue(user, camera, kNone);
+    expectAccess(user, camera, kPermissions);
 
     /* Here we should not receive the signal. */
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>());
+    expectAccess(user, camera, kPermissions);
 
     /* And here - should. */
     user->setRawPermissions(GlobalPermission::none);
+    expectAccess(user, camera, kNone);
 }
 
 TEST_F(CachedResourceAccessProviderTest, checkSequentialAccessAdding)
@@ -129,19 +131,19 @@ TEST_F(CachedResourceAccessProviderTest, checkSequentialAccessAdding)
 
     auto user = addUser(GlobalPermission::none);
 
-    awaitAccessValue(user, camera, Source::videowall);
     user->setRawPermissions(GlobalPermission::controlVideowall);
+    expectAccess(user, camera, Source::videowall);
 
-    awaitAccessValue(user, camera, Source::layout);
     auto sharedIds = QSet<QnUuid>() << sharedLayout->getId();
     sharedResourcesManager()->setSharedResources(user, sharedIds);
+    expectAccess(user, camera, Source::layout);
 
     sharedIds << camera->getId();
-    awaitAccessValue(user, camera, Source::shared);
     sharedResourcesManager()->setSharedResources(user, sharedIds);
+    expectAccess(user, camera, Source::shared);
 
-    awaitAccessValue(user, camera, Source::permissions);
     user->setRawPermissions(GlobalPermission::accessAllMedia);
+    expectAccess(user, camera, Source::permissions);
 }
 
 TEST_F(CachedResourceAccessProviderTest, checkSequentialAccessRemoving)
@@ -158,22 +160,22 @@ TEST_F(CachedResourceAccessProviderTest, checkSequentialAccessRemoving)
     videoWallLayout->addItem(layoutItem);
 
     auto user = createUser(GlobalPermission::accessAllMedia);
-    awaitAccessValue(user, camera, Source::permissions);
     resourcePool()->addResource(user);   //permissions
+    expectAccess(user, camera, Source::permissions);
 
     auto sharedIds = QSet<QnUuid>() << sharedLayout->getId() << camera->getId();
     sharedResourcesManager()->setSharedResources(user, sharedIds);
-    awaitAccessValue(user, camera, Source::shared);
     user->setRawPermissions(GlobalPermission::controlVideowall); // shared
+    expectAccess(user, camera, Source::shared);
 
-    awaitAccessValue(user, camera, Source::layout);
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << sharedLayout->getId());
+    expectAccess(user, camera, Source::layout);
 
-    awaitAccessValue(user, camera, Source::videowall);
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>());
+    expectAccess(user, camera, Source::videowall);
 
-    awaitAccessValue(user, camera, Source::none);
     resourcePool()->removeResource(videoWall);
+    expectAccess(user, camera, Source::none);
 }
 
 TEST_F(CachedResourceAccessProviderTest, checkAccessProviders)

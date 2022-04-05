@@ -2,11 +2,17 @@
 
 #pragma once
 
+#include <unordered_set>
+#include <unordered_map>
+
 #include <core/resource_access/resource_access_subject.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/common/system_context_aware.h>
 
+/**
+ * The cache to access users and child roles by specific role id.
+ */
 class NX_VMS_COMMON_API QnResourceAccessSubjectsCache:
     public QObject,
     public nx::vms::common::SystemContextAware
@@ -19,25 +25,45 @@ public:
         QObject* parent = nullptr);
 
     /** List of all subjects of the resources access: users and roles (excl. predefined). */
-    QList<QnResourceAccessSubject> allSubjects() const;
+    std::unordered_set<QnResourceAccessSubject> allSubjects() const;
 
-    /** List of users, belonging to given role (predefined roles are also supported). */
-    QList<QnResourceAccessSubject> usersInRole(const QnUuid& roleId) const;
+    /** List of all subjects included in the role (without recursion). */
+    std::unordered_set<QnResourceAccessSubject> subjectsInRole(const QnUuid& roleId) const;
+
+    /** List of users, belonging to given role (including recursive roles, predefined roles are also supported). */
+    std::unordered_set<QnResourceAccessSubject> allUsersInRole(const QnUuid& roleId) const;
+
+    /** List of all subjects included in the role (with recursion). */
+    std::unordered_set<QnResourceAccessSubject> allSubjectsInRole(const QnUuid& roleId) const;
+
+    /** All parent roles including inheritance. */
+    std::unordered_set<QnResourceAccessSubject> subjectWithParents(
+        const QnResourceAccessSubject& subject) const;
 
 private:
     void handleUserAdded(const QnUserResourcePtr& user);
     void handleUserRemoved(const QnUserResourcePtr& user);
-    void updateUserRole(const QnUserResourcePtr& user);
 
-    void handleRoleAdded(const nx::vms::api::UserRoleData& userRole);
+    void handleRoleAddedOrUpdated(const nx::vms::api::UserRoleData& userRole);
     void handleRoleRemoved(const nx::vms::api::UserRoleData& userRole);
 
     void removeUserFromRole(const QnUserResourcePtr& user, const QnUuid& roleId);
 
+    void updateSubjectRoles(
+        const QnResourceAccessSubject& subject, const std::vector<QnUuid>& newRoleIds);
+    void updateSubjectRoles(
+        const QnResourceAccessSubject& subject, const std::vector<QnUuid>& newRoleIds,
+        const nx::MutexLocker& lock);
+
+    template<typename Action>
+    void forEachSubjectInRole(
+        const QnUuid& roleId, const Action& action,
+        const nx::MutexLocker& lock) const;
+
 private:
     mutable nx::Mutex m_mutex;
 
-    QList<QnResourceAccessSubject> m_subjects;
-    QHash<QnUuid, QnUuid> m_roleIdByUserId;
-    QHash<QnUuid, QList<QnResourceAccessSubject>> m_usersByRoleId;
+    std::unordered_set<QnResourceAccessSubject> m_subjects;
+    std::unordered_map<QnUuid, std::unordered_set<QnResourceAccessSubject>> m_subjectsInRole;
+    std::unordered_map<QnUuid, std::unordered_set<QnResourceAccessSubject>> m_rolesOfSubject;
 };

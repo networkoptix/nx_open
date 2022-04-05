@@ -6,6 +6,11 @@
 
 namespace nx::vms::api {
 
+QString UserRoleData::toString() const
+{
+    return QJson::serialized(*this);
+}
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     UserRoleData, (ubjson)(json)(xml)(sql_record)(csv_record), UserRoleData_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(

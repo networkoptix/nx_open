@@ -13,12 +13,11 @@
 #include <nx/core/access/access_types.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 #include <nx/vms/common/test_support/resource/resource_pool_test_helper.h>
+#include <nx/reflect/json/serializer.h>
 
 class QnCachedGlobalPermissionsManagerTest: public testing::Test, protected QnResourcePoolTestHelper
 {
 protected:
-
-    // virtual void SetUp() will be called before each test is run.
     virtual void SetUp()
     {
         m_staticCommon = std::make_unique<QnStaticCommonModule>();
@@ -31,96 +30,112 @@ protected:
             &QnGlobalPermissionsManager::globalPermissionsChanged,
             [this](const QnResourceAccessSubject& subject, GlobalPermissions value)
             {
-                at_globalPermissionsChanged(subject, value);
+                NX_MUTEX_LOCKER lock(&m_mutex);
+                m_notifiedAccess[subject.id()] = value;
+                m_condition.wakeAll();
             });
     }
 
-    // virtual void TearDown() will be called after each test is run.
     virtual void TearDown()
     {
         deinitializeContext();
-        ASSERT_TRUE(m_awaitedAccessQueue.empty());
-        m_currentUser.clear();
         m_module.reset();
         m_staticCommon.reset();
     }
 
-    bool hasGlobalPermission(const QnResourceAccessSubject& subject,
-        GlobalPermission requiredPermission)
+    bool expectPermissions(const QnResourceAccessSubject& subject, GlobalPermissions expected)
     {
-        return globalPermissionsManager()->hasGlobalPermission(subject, requiredPermission);
-    }
+        const auto actual = globalPermissionsManager()->globalPermissions(subject);
+        NX_DEBUG(this, "%1 global permissions %2", subject, nx::reflect::json::serialize(actual));
+        if (expected != actual)
+            return false;
 
-    void awaitPermissions(const QnResourceAccessSubject& subject, GlobalPermissions value)
-    {
-        m_awaitedAccessQueue.emplace_back(subject, value);
-    }
-
-    void at_globalPermissionsChanged(const QnResourceAccessSubject& subject,
-        GlobalPermissions value)
-    {
-        if (m_awaitedAccessQueue.empty())
-            return;
-
-        auto awaited = m_awaitedAccessQueue.front();
-        if (awaited.subject == subject)
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        while (m_notifiedAccess[subject.id()] != expected)
         {
-            m_awaitedAccessQueue.pop_front();
-            ASSERT_EQ(value, awaited.value);
+            if (!m_condition.wait(&m_mutex, std::chrono::seconds(5)))
+            {
+                NX_DEBUG(this, "%1 notified global permissions %2", subject,
+                    nx::reflect::json::serialize(m_notifiedAccess[subject.id()]));
+                return false;
+            }
         }
+
+        return true;
     }
 
+private:
     std::unique_ptr<QnStaticCommonModule> m_staticCommon;
     std::unique_ptr<QnCommonModule> m_module;
-    QnUserResourcePtr m_currentUser;
-
-    struct AwaitedAccess
-    {
-        AwaitedAccess(const QnResourceAccessSubject& subject, GlobalPermissions value)
-            :
-            subject(subject),
-            value(value)
-        {
-        }
-
-        QnResourceAccessSubject subject;
-        GlobalPermissions value;
-    };
-    std::deque<AwaitedAccess> m_awaitedAccessQueue;
+    nx::Mutex m_mutex;
+    nx::WaitCondition m_condition;
+    std::map<QnUuid, GlobalPermissions> m_notifiedAccess;
 };
 
-TEST_F(QnCachedGlobalPermissionsManagerTest, checkRoleRemoved)
+TEST_F(QnCachedGlobalPermissionsManagerTest, checkSingleRole)
 {
     auto role = createRole(GlobalPermission::accessAllMedia);
-    userRolesManager()->addOrUpdateUserRole(role);
-    ASSERT_TRUE(hasGlobalPermission(role, GlobalPermission::accessAllMedia));
+    ASSERT_TRUE(expectPermissions(role, GlobalPermission::accessAllMedia));
 
-    auto user = addUser(GlobalPermission::none);
-    ASSERT_FALSE(hasGlobalPermission(user, GlobalPermission::accessAllMedia));
+    auto user = addUser(GlobalPermission::userInput);
+    ASSERT_TRUE(expectPermissions(user, GlobalPermission::userInput));
 
-    user->setUserRoleId(role.id);
-    ASSERT_TRUE(hasGlobalPermission(user, GlobalPermission::accessAllMedia));
+    user->setUserRoleIds({role.id});
+    ASSERT_TRUE(expectPermissions(user, GlobalPermission::accessAllMedia | GlobalPermission::userInput));
 
     userRolesManager()->removeUserRole(role.id);
-    ASSERT_FALSE(hasGlobalPermission(user, GlobalPermission::accessAllMedia));
+    ASSERT_TRUE(expectPermissions(user, GlobalPermission::userInput));
 }
 
-TEST_F(QnCachedGlobalPermissionsManagerTest, checkRoleRemovedSignalRole)
+TEST_F(QnCachedGlobalPermissionsManagerTest, checkMultipleRoles)
 {
-    auto role = createRole(GlobalPermission::accessAllMedia);
-    userRolesManager()->addOrUpdateUserRole(role);
+    auto mediaRole = createRole(GlobalPermission::accessAllMedia);
+    ASSERT_TRUE(expectPermissions(mediaRole, GlobalPermission::accessAllMedia));
+
+    auto inputRole = createRole(GlobalPermission::userInput);
+    ASSERT_TRUE(expectPermissions(inputRole, GlobalPermission::userInput));
+
     auto user = addUser(GlobalPermission::none);
-    user->setUserRoleId(role.id);
-    awaitPermissions(role, GlobalPermission::none);
-    userRolesManager()->removeUserRole(role.id);
+    ASSERT_TRUE(expectPermissions(user, GlobalPermission::none));
+
+    user->setUserRoleIds({mediaRole.id});
+    ASSERT_TRUE(expectPermissions(user, GlobalPermission::accessAllMedia));
+
+    user->setUserRoleIds({inputRole.id});
+    ASSERT_TRUE(expectPermissions(user, GlobalPermission::userInput));
+
+    user->setUserRoleIds({mediaRole.id, inputRole.id});
+    ASSERT_TRUE(expectPermissions(user, GlobalPermission::accessAllMedia | GlobalPermission::userInput));
+
+    userRolesManager()->removeUserRole(mediaRole.id);
+    ASSERT_TRUE(expectPermissions(user, GlobalPermission::userInput));
+
+    userRolesManager()->removeUserRole(inputRole.id);
+    ASSERT_TRUE(expectPermissions(user, GlobalPermission::none));
 }
 
-TEST_F(QnCachedGlobalPermissionsManagerTest, checkRoleRemovedSignalUser)
+TEST_F(QnCachedGlobalPermissionsManagerTest, checkRoleInheritance)
 {
-    auto role = createRole(GlobalPermission::accessAllMedia);
-    userRolesManager()->addOrUpdateUserRole(role);
+    auto mediaRole = createRole(GlobalPermission::accessAllMedia);
+    ASSERT_TRUE(expectPermissions(mediaRole, GlobalPermission::accessAllMedia));
+
+    auto inputRole = createRole(GlobalPermission::userInput);
+    ASSERT_TRUE(expectPermissions(inputRole, GlobalPermission::userInput));
+
+    auto inheritedRole = createRole(GlobalPermission::none, {mediaRole.id, inputRole.id});
+    ASSERT_TRUE(expectPermissions(inheritedRole, GlobalPermission::accessAllMedia | GlobalPermission::userInput));
+
     auto user = addUser(GlobalPermission::none);
-    user->setUserRoleId(role.id);
-    awaitPermissions(user, GlobalPermission::none);
-    userRolesManager()->removeUserRole(role.id);
+    ASSERT_TRUE(expectPermissions(user, GlobalPermission::none));
+
+    user->setUserRoleIds({inheritedRole.id});
+    ASSERT_TRUE(expectPermissions(user, GlobalPermission::accessAllMedia | GlobalPermission::userInput));
+
+    userRolesManager()->removeUserRole(mediaRole.id);
+    ASSERT_TRUE(expectPermissions(inheritedRole, GlobalPermission::userInput));
+    ASSERT_TRUE(expectPermissions(user, GlobalPermission::userInput));
+
+    userRolesManager()->removeUserRole(inputRole.id);
+    ASSERT_TRUE(expectPermissions(inheritedRole, GlobalPermission::none));
+    ASSERT_TRUE(expectPermissions(user, GlobalPermission::none));
 }

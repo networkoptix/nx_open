@@ -13,6 +13,9 @@
 
 namespace nx::vms::api {
 
+// TODO: #muskov Move UserRoleModel into v1::UserRoleModel for /rest/v1/userRoles
+// Introduce v2::UserGroupModel for /rest/v2/userGroups
+
 /**%apidoc User role information object.
  */
 struct NX_VMS_API UserRoleModel: UserRoleData

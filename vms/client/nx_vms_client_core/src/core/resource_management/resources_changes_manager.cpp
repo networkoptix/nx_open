@@ -558,7 +558,7 @@ void QnResourcesChangesManager::saveAccessibleResources(const QnResourceAccessSu
         };
 
     vms::api::AccessRightsData accessRights;
-    accessRights.userId = subject.effectiveId();
+    accessRights.userId = subject.id();
     for (const auto& id: accessibleResources)
         accessRights.resourceIds.push_back(id);
     connection->getUserManager(Qn::kSystemAccess)->setAccessRights(

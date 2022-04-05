@@ -46,7 +46,7 @@ public:
     QSet<QnUuid> checkedUsers() const;
 
     QValidator::State validateRole(const QnUuid& roleId) const;
-    QValidator::State validateUsers(const QList<QnResourceAccessSubject>& subjects) const;
+    QValidator::State validateUsers(const std::unordered_set<QnResourceAccessSubject>& subjects) const;
 
     bool allUsers() const;
     void setAllUsers(bool value);

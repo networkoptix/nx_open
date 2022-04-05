@@ -4,19 +4,20 @@
 
 #include <QtCore/QHash>
 
+#include <nx/reflect/enum_instrument.h>
+
 namespace nx {
 namespace core {
 namespace access {
 
 /** Types of base providers, sorted by priority. */
-enum class Source
-{
+NX_REFLECTION_ENUM_CLASS(Source,
     none,
-    permissions,    //< Accessible by permissions.
-    shared,         //< Accessible by direct sharing.
-    layout,         //< Accessible by placing on shared layout.
-    videowall,      //< Accessible by placing on videowall.
-};
+    permissions, //< Accessible by permissions.
+    shared, //< Accessible by direct sharing.
+    layout, //< Accessible by placing on shared layout.
+    videowall //< Accessible by placing on videowall.
+)
 
 inline uint qHash(Source value, uint seed)
 {

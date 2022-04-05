@@ -10,13 +10,12 @@ QnResourceAccessSubject::QnResourceAccessSubject(const QnUserResourcePtr& user):
 }
 
 QnResourceAccessSubject::QnResourceAccessSubject(const nx::vms::api::UserRoleData& role):
-    m_rolePermissions(role.permissions),
     m_id(role.id)
 {
 }
 
 QnResourceAccessSubject::QnResourceAccessSubject(const QnResourceAccessSubject& other):
-    m_user(other.user()), m_rolePermissions(other.rolePermissions()), m_id(other.id())
+    m_user(other.user()), m_id(other.id())
 {
 }
 
@@ -24,20 +23,14 @@ QnResourceAccessSubject::QnResourceAccessSubject()
 {
 }
 
-QString QnResourceAccessSubject::name() const
-{
-    return m_user ? m_user->getName() :  QString::number(m_rolePermissions, 16);
-}
-
 QString QnResourceAccessSubject::toString() const
 {
-    return m_user ? nx::toString(m_user) : NX_FMT("Role->%1", m_rolePermissions).toQString();
+    return m_user ? nx::toString(m_user) : NX_FMT("Role(%1)", m_id).toQString();
 }
 
 void QnResourceAccessSubject::operator=(const QnResourceAccessSubject& other)
 {
     m_user = other.m_user;
-    m_rolePermissions = other.m_rolePermissions;
     m_id = other.m_id;
 }
 
@@ -51,8 +44,18 @@ bool QnResourceAccessSubject::operator==(const QnResourceAccessSubject& other) c
     return m_id == other.m_id;
 }
 
+bool QnResourceAccessSubject::operator<(const QnResourceAccessSubject& other) const
+{
+    return m_id < other.m_id;
+}
+
+bool QnResourceAccessSubject::operator>(const QnResourceAccessSubject& other) const
+{
+    return m_id > other.m_id;
+}
+
 QDebug operator<<(QDebug dbg, const QnResourceAccessSubject& subject)
 {
-    dbg.nospace() << "QnResourceAccessSubject(" << subject.name() << ")";
+    dbg.nospace() << "QnResourceAccessSubject(" << subject.toString() << ")";
     return dbg.space();
 }

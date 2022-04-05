@@ -73,7 +73,15 @@ public:
             NX_ASSERT(serializationFormat() == Qn::JsonFormat);
             serializedData = QJson::serialized(input);
         }
-        sendPostRequest(cmdCode, std::move(serializedData), handler);
+
+        NX_DEBUG(this, "Update %1 as %2: %3",
+            cmdCode, serializationFormat(), QJson::serialized(input));
+        sendPostRequest(cmdCode, std::move(serializedData),
+            [this, cmdCode, handler = std::move(handler)](auto result)
+            {
+                NX_DEBUG(this, "Update %1 result: %2", cmdCode, result);
+                handler(result);
+            });
     }
 
     /**

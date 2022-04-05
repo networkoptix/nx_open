@@ -333,7 +333,7 @@ bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QStri
                 return isValid(subject.user());
             };
 
-        if (!all_of(module->resourceAccessSubjectsCache()->usersInRole(roleId), isValidSubject))
+        if (!all_of(module->resourceAccessSubjectsCache()->allUsersInRole(roleId), isValidSubject))
             return false;
     }
 
@@ -388,7 +388,7 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
     for (const auto& roleId: roles)
     {
         receivers << module->userRolesManager()->userRoleName(roleId);
-        for (const auto& subject: module->resourceAccessSubjectsCache()->usersInRole(roleId))
+        for (const auto& subject: module->resourceAccessSubjectsCache()->allUsersInRole(roleId))
         {
             const auto& user = subject.user();
             if (!user || !user->isEnabled())
@@ -477,8 +477,12 @@ bool actionAllowedForUser(const nx::vms::event::AbstractActionPtr& action,
     if (std::find(subjects.cbegin(), subjects.cend(), userId) != subjects.cend())
         return true;
 
-    const auto roleId = QnUserRolesManager::unifiedUserRoleId(user);
-    return std::find(subjects.cbegin(), subjects.cend(), roleId) != subjects.cend();
+    for (const auto& roleId: user->allUserRoleIds())
+    {
+        if (std::find(subjects.cbegin(), subjects.cend(), roleId) != subjects.cend())
+            return true;
+    }
+    return false;
 }
 
 } // namespace QnBusiness
@@ -781,7 +785,7 @@ QValidator::State QnLayoutAccessValidationPolicy::roleValidity(const QnUuid& rol
                 return QValidator::Acceptable;
             }
 
-            auto usersInRole = commonModule()->resourceAccessSubjectsCache()->usersInRole(roleId);
+            auto usersInRole = commonModule()->resourceAccessSubjectsCache()->allUsersInRole(roleId);
             if (std::any_of(usersInRole.begin(), usersInRole.end(),
                 [this](const auto& subject)
                 {
@@ -822,7 +826,7 @@ void QnLayoutAccessValidationPolicy::setLayout(const QnLayoutResourcePtr& layout
 
 QValidator::State QnCloudUsersValidationPolicy::roleValidity(const QnUuid& roleId) const
 {
-    const auto& users = commonModule()->resourceAccessSubjectsCache()->usersInRole(roleId);
+    const auto& users = commonModule()->resourceAccessSubjectsCache()->allUsersInRole(roleId);
     bool hasCloud = false;
     bool hasNonCloud = false;
 
@@ -860,7 +864,7 @@ QString QnCloudUsersValidationPolicy::calculateAlert(
 
             for (const auto& roleId: roles)
             {
-                const auto& inRole = commonModule()->resourceAccessSubjectsCache()->usersInRole(roleId);
+                const auto& inRole = commonModule()->resourceAccessSubjectsCache()->allUsersInRole(roleId);
                 for (const auto& subject: inRole)
                 {
                     if (!subject.isUser())

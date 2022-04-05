@@ -101,9 +101,8 @@ TEST_F(CachedVideoWallItemAccessProviderTest, checkLayoutAddedBeforeVideowall)
     // What's going on on drop.
     auto layout = addLayoutForVideoWall(videoWall);
 
-    awaitAccessValue(user, layout, Source::videowall);
     resourcePool()->addResource(videoWall);
-    ASSERT_TRUE(accessProvider()->hasAccess(user, layout));
+    expectAccess(user, layout, Source::videowall);
 }
 
 TEST_F(CachedVideoWallItemAccessProviderTest, checkLayoutAddedBeforeVideowallItem)
@@ -116,13 +115,12 @@ TEST_F(CachedVideoWallItemAccessProviderTest, checkLayoutAddedBeforeVideowallIte
     layout->setParentId(videoWall->getId());
     resourcePool()->addResource(layout);
 
-    awaitAccessValue(user, layout, Source::videowall);
 
     QnVideoWallItem vwitem;
     vwitem.layout = layout->getId();
     videoWall->items()->addItem(vwitem);
 
-    ASSERT_TRUE(accessProvider()->hasAccess(user, layout));
+    expectAccess(user, layout, Source::videowall);
 }
 
 TEST_F(CachedVideoWallItemAccessProviderTest, checkLayoutAddedAfterVideowallItem)
@@ -138,9 +136,8 @@ TEST_F(CachedVideoWallItemAccessProviderTest, checkLayoutAddedAfterVideowallItem
     vwitem.layout = layout->getId();
     videoWall->items()->addItem(vwitem);
 
-    awaitAccessValue(user, layout, Source::videowall);
     resourcePool()->addResource(layout);
-    ASSERT_TRUE(accessProvider()->hasAccess(user, layout));
+    expectAccess(user, layout, Source::videowall);
 }
 
 TEST_F(CachedVideoWallItemAccessProviderTest, checkCameraOnVideoWall)
@@ -189,10 +186,8 @@ TEST_F(CachedVideoWallItemAccessProviderTest, checkCameraOnLayoutAddedOnVideoWal
     vwitem.layout = layout->getId();
     videoWall->items()->addItem(vwitem);
 
-    awaitAccessValue(user, target, Source::videowall);
     resourcePool()->addResource(layout);
-
-    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+    expectAccess(user, target, Source::videowall);
 }
 
 TEST_F(CachedVideoWallItemAccessProviderTest, checkCameraDroppedOnVideoWall_3_0)
@@ -213,10 +208,8 @@ TEST_F(CachedVideoWallItemAccessProviderTest, checkCameraDroppedOnVideoWall_3_0)
     vwitem.layout = layout->getId();
     videoWall->items()->addItem(vwitem);
 
-    awaitAccessValue(user, target, Source::videowall);
     layout->setParentId(videoWall->getId());
-
-    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+    expectAccess(user, target, Source::videowall);
 }
 
 TEST_F(CachedVideoWallItemAccessProviderTest, checkCameraDroppedOnVideoWall_3_1)
@@ -238,12 +231,9 @@ TEST_F(CachedVideoWallItemAccessProviderTest, checkCameraDroppedOnVideoWall_3_1)
     layout->setParentId(videoWall->getId());
     resourcePool()->addResource(layout);
 
-    awaitAccessValue(user, target, Source::videowall);
-
     vwitem.layout = layout->getId();
     videoWall->items()->updateItem(vwitem);
-
-    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+    expectAccess(user, target, Source::videowall);
 }
 
 TEST_F(CachedVideoWallItemAccessProviderTest, checkLayoutRemoved)

@@ -26,13 +26,13 @@ namespace test {
 class CachedPermissionsResourceAccessProviderTest: public CachedBaseAccessProviderTestFixture
 {
 protected:
-    void awaitAccess(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
+    void expectAccessGranted(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
         bool value = true)
     {
         if (value)
-            awaitAccessValue(subject, resource, kSource);
+            expectAccess(subject, resource, kSource);
         else
-            awaitAccessValue(subject, resource, Source::none);
+            expectAccess(subject, resource, Source::none);
     }
 
     virtual AbstractResourceAccessProvider* createAccessProvider() const override
@@ -210,11 +210,27 @@ TEST_F(CachedPermissionsResourceAccessProviderTest, checkUserRoleChangeAccess)
     auto target = addCamera();
 
     auto user = addUser(GlobalPermission::none);
-    auto role = createRole(GlobalPermission::accessAllMedia);
-    userRolesManager()->addOrUpdateUserRole(role);
+    auto parentRole = createRole(GlobalPermission::accessAllMedia);
+    userRolesManager()->addOrUpdateUserRole(parentRole);
 
-    user->setUserRoleId(role.id);
+    user->setUserRoleIds({parentRole.id});
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+
+    auto inheritedRole = createRole(GlobalPermission::none);
+    ASSERT_FALSE(accessProvider()->hasAccess(inheritedRole, target));
+
+    user->setUserRoleIds({inheritedRole.id});
+    ASSERT_FALSE(accessProvider()->hasAccess(user, target));
+
+    inheritedRole.parentRoleIds = {parentRole.id};
+    userRolesManager()->addOrUpdateUserRole(inheritedRole);
+    ASSERT_TRUE(accessProvider()->hasAccess(inheritedRole, target));
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+
+    inheritedRole.parentRoleIds = {};
+    userRolesManager()->addOrUpdateUserRole(inheritedRole);
+    ASSERT_FALSE(accessProvider()->hasAccess(inheritedRole, target));
+    ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
 
 TEST_F(CachedPermissionsResourceAccessProviderTest, checkUserEnabledChange)
@@ -239,131 +255,129 @@ TEST_F(CachedPermissionsResourceAccessProviderTest, awaitNewCameraAccess)
 {
     auto user = addUser(GlobalPermission::admin);
     auto camera = createCamera();
-    awaitAccess(user, camera);
     resourcePool()->addResource(camera);
+    expectAccessGranted(user, camera);
 }
 
 TEST_F(CachedPermissionsResourceAccessProviderTest, awaitRemovedCameraAccess)
 {
     auto user = addUser(GlobalPermission::admin);
     auto camera = addCamera();
-    awaitAccess(user, camera, false);
     resourcePool()->removeResource(camera);
+    expectAccessGranted(user, camera, false);
 }
 
 TEST_F(CachedPermissionsResourceAccessProviderTest, awaitNewUserAccess)
 {
     auto camera = addCamera();
     auto user = createUser(GlobalPermission::admin);
-    awaitAccess(user, camera);
     resourcePool()->addResource(user);
+    expectAccessGranted(user, camera);
 }
 
 TEST_F(CachedPermissionsResourceAccessProviderTest, awaitRemovedUserAccess)
 {
     auto camera = addCamera();
     auto user = addUser(GlobalPermission::admin);
-    awaitAccess(user, camera, false);
     resourcePool()->removeResource(user);
+    expectAccessGranted(user, camera, false);
 }
 
 TEST_F(CachedPermissionsResourceAccessProviderTest, awaitPermissionsChangedAccess)
 {
     auto camera = addCamera();
     auto user = addUser(GlobalPermission::none);
-    awaitAccess(user, camera);
     user->setRawPermissions(GlobalPermission::admin);
+    expectAccessGranted(user, camera);
 }
 
 TEST_F(CachedPermissionsResourceAccessProviderTest, suppressDuplicatedSignals)
 {
     auto camera = addCamera();
     auto user = addUser(GlobalPermission::admin);
-    awaitAccess(user, camera, false);
+    expectAccessGranted(user, camera, true);
 
     /* Here we should NOT receive the signal */
     user->setRawPermissions(GlobalPermission::accessAllMedia);
+    expectAccessGranted(user, camera, true);
 
     /* Here we should receive the 'false' value. */
     resourcePool()->removeResource(user);
+    expectAccessGranted(user, camera, false);
 }
 
-TEST_F(CachedPermissionsResourceAccessProviderTest, checkRoleCameraAccess)
+TEST_F(CachedPermissionsResourceAccessProviderTest, awaitRoleAccess)
 {
     auto target = addCamera();
 
     auto role = createRole(GlobalPermission::accessAllMedia);
-    userRolesManager()->addOrUpdateUserRole(role);
-    ASSERT_TRUE(accessProvider()->hasAccess(role, target));
-}
-
-TEST_F(CachedPermissionsResourceAccessProviderTest, checkRolePermissionsChange)
-{
-    auto target = addCamera();
-
-    auto role = createRole(GlobalPermission::none);
-    userRolesManager()->addOrUpdateUserRole(role);
-    ASSERT_FALSE(accessProvider()->hasAccess(role, target));
-
-    role.permissions = GlobalPermission::accessAllMedia;
-    userRolesManager()->addOrUpdateUserRole(role);
-    ASSERT_TRUE(accessProvider()->hasAccess(role, target));
-}
-
-TEST_F(CachedPermissionsResourceAccessProviderTest, awaitAddedRoleAccess)
-{
-    auto target = addCamera();
-
-    auto role = createRole(GlobalPermission::accessAllMedia);
-    awaitAccess(role, target, true);
-    userRolesManager()->addOrUpdateUserRole(role);
-}
-
-TEST_F(CachedPermissionsResourceAccessProviderTest, awaitRemovedRoleAccess)
-{
-    auto target = addCamera();
-
-    auto role = createRole(GlobalPermission::accessAllMedia);
-    userRolesManager()->addOrUpdateUserRole(role);
-    awaitAccess(role, target, false);
+    expectAccessGranted(role, target, true);
 
     userRolesManager()->removeUserRole(role.id);
+    expectAccessGranted(role, target, false);
+}
+
+TEST_F(CachedPermissionsResourceAccessProviderTest, awaitInheritedRoleAccess)
+{
+    auto target = addCamera();
+
+    auto parentRole = createRole(GlobalPermission::accessAllMedia);
+    expectAccessGranted(parentRole, target, true);
+
+    auto inheritedRole = createRole(GlobalPermission::none);
+    expectAccessGranted(inheritedRole, target, false);
+
+    inheritedRole.parentRoleIds = {parentRole.id};
+    userRolesManager()->addOrUpdateUserRole(inheritedRole);
+    expectAccessGranted(inheritedRole, target, true);
+
+    userRolesManager()->removeUserRole(parentRole.id);
+    expectAccessGranted(parentRole, target, false);
+    expectAccessGranted(inheritedRole, target, false);
 }
 
 TEST_F(CachedPermissionsResourceAccessProviderTest, suppressDuplicatedRoleSignals)
 {
     auto target = addCamera();
     auto role = createRole(GlobalPermission::accessAllMedia);
-    userRolesManager()->addOrUpdateUserRole(role);
-
-    awaitAccess(role, target, false);
+    expectAccessGranted(role, target, true);
 
     /* Here we should NOT receive the signal */
     role.permissions = GlobalPermission::accessAllMedia | GlobalPermission::exportArchive;
     userRolesManager()->addOrUpdateUserRole(role);
+    expectAccessGranted(role, target, true);
 
     /* Here we should receive the 'false' value. */
     userRolesManager()->removeUserRole(role.id);
+    expectAccessGranted(role, target, false);
 }
 
-TEST_F(CachedPermissionsResourceAccessProviderTest, awaitRoleAccessToAddedCamera)
+TEST_F(CachedPermissionsResourceAccessProviderTest, awaitRoleAccessToNewCameras)
 {
     auto role = createRole(GlobalPermission::accessAllMedia);
-    userRolesManager()->addOrUpdateUserRole(role);
 
     auto target = createCamera();
-    awaitAccess(role, target, true);
     resourcePool()->addResource(target);
+    expectAccessGranted(role, target, true);
+
+    resourcePool()->removeResource(target);
+    expectAccessGranted(role, target, false);
 }
 
-TEST_F(CachedPermissionsResourceAccessProviderTest, awaitRoleAccessToRemovedCamera)
+TEST_F(CachedPermissionsResourceAccessProviderTest, awaitInheritedRoleAccessToNewCameras)
 {
-    auto role = createRole(GlobalPermission::accessAllMedia);
-    userRolesManager()->addOrUpdateUserRole(role);
+    auto parentRole = createRole(GlobalPermission::accessAllMedia);
 
-    auto target = addCamera();
-    awaitAccess(role, target, false);
+    auto target = createCamera();
+    resourcePool()->addResource(target);
+    expectAccessGranted(parentRole, target, true);
+
+    auto inheritedRole = createRole(GlobalPermission::none, {parentRole.id});
+    expectAccessGranted(inheritedRole, target, true);
+
     resourcePool()->removeResource(target);
+    expectAccessGranted(parentRole, target, false);
+    expectAccessGranted(inheritedRole, target, false);
 }
 
 TEST_F(CachedPermissionsResourceAccessProviderTest, awaitUserAccessChangeOnRolePermissionsChange)
@@ -371,16 +385,30 @@ TEST_F(CachedPermissionsResourceAccessProviderTest, awaitUserAccessChangeOnRoleP
     auto target = addCamera();
 
     auto role = createRole(GlobalPermission::none);
-    userRolesManager()->addOrUpdateUserRole(role);
 
     auto user = addUser(GlobalPermission::admin);
-    user->setUserRoleId(role.id);
-    ASSERT_FALSE(accessProvider()->hasAccess(user, target));
+    user->setUserRoleIds({role.id});
+    expectAccessGranted(user, target, false);
 
-    awaitAccess(user, target, true);
     role.permissions = GlobalPermission::accessAllMedia;
     userRolesManager()->addOrUpdateUserRole(role);
-    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+    expectAccessGranted(user, target, true);
+}
+
+TEST_F(CachedPermissionsResourceAccessProviderTest, awaitUserAccessChangeOnInheritedRolePermissionsChange)
+{
+    auto target = addCamera();
+
+    auto parentRole = createRole(GlobalPermission::none);
+    auto inheritedRole = createRole(GlobalPermission::none, {parentRole.id});
+
+    auto user = addUser(GlobalPermission::admin);
+    user->setUserRoleIds({inheritedRole.id});
+    expectAccessGranted(user, target, false);
+
+    parentRole.permissions = GlobalPermission::accessAllMedia;
+    userRolesManager()->addOrUpdateUserRole(parentRole);
+    expectAccessGranted(user, target, true);
 }
 
 TEST_F(CachedPermissionsResourceAccessProviderTest, checkAccessToOwnLayout)

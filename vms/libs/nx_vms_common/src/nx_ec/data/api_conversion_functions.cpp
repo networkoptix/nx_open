@@ -595,7 +595,7 @@ void fromApiToResource(const UserData& src, QnUserResourcePtr& dst)
     dst->setOwner(src.isAdmin);
     dst->setEnabled(src.isEnabled);
     dst->setEmail(src.email);
-    dst->setUserRoleId(src.userRoleId);
+    dst->setUserRoleIds(src.userRoleIds);
     dst->setFullName(src.fullName);
 
     dst->setRawPermissions(src.permissions);
@@ -614,7 +614,7 @@ void fromResourceToApi(const QnUserResourcePtr& src, UserData& dst)
     dst.email = src->getEmail();
     dst.cryptSha512Hash = src->getCryptSha512Hash();
     dst.realm = src->getRealm();
-    dst.userRoleId = src->userRoleId();
+    dst.userRoleIds = src->userRoleIds();
     dst.fullName = src->fullName();
     nx::vms::api::setType(&dst, src->userType());
 }

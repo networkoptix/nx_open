@@ -8,11 +8,6 @@
 
 #include <api/global_settings.h>
 #include <common/common_module.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/resource_property_key.h>
-#include <core/resource/storage_resource.h>
-#include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_access/shared_resources_manager.h>
@@ -20,10 +15,16 @@
 #include <core/resource_management/layout_tour_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
-#include <nx/cloud/db/client/data/auth_data.h>
-#include <nx/vms/license/usage_helper.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/resource_property_key.h>
+#include <core/resource/storage_resource.h>
+#include <core/resource/user_resource.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/data/api_fwd.h>
+#include <nx/cloud/db/client/data/auth_data.h>
+#include <nx/utils/std/algorithm.h>
+#include <nx/vms/license/usage_helper.h>
 
 #include "amend_transaction_data.h"
 #include "ec_connection_notification_manager.h"
@@ -1238,14 +1239,24 @@ struct RemoveUserRoleAccess
             return r;
         }
 
-        const auto& resPool = commonModule->resourcePool();
-        for (const auto& user: resPool->getResources<QnUserResource>())
+        for (const auto& user: commonModule->resourcePool()->getResources<QnUserResource>())
         {
-            if (user->userRoleId() == param.id)
+            if (nx::utils::find_if(user->userRoleIds(), [&](const auto& id) { return id == param.id; }))
             {
                 QString errorMessage = NX_FMT(
                     "Removing user role is forbidden because the role is still used by the user %1",
                     user->getName());
+                return Result(ErrorCode::forbidden, std::move(errorMessage));
+            }
+        }
+
+        for (const auto& role: commonModule->userRolesManager()->userRoles())
+        {
+            if (nx::utils::find_if(role.parentRoleIds, [&](const auto& id) { return id == param.id; }))
+            {
+                QString errorMessage = NX_FMT(
+                    "Removing user role is forbidden because the role is still inherited by the role %1",
+                    role.name);
                 return Result(ErrorCode::forbidden, std::move(errorMessage));
             }
         }

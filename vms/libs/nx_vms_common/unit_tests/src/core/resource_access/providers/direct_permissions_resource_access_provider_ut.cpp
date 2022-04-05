@@ -201,11 +201,27 @@ TEST_F(DirectPermissionsResourceAccessProviderTest, checkUserRoleChangeAccess)
     auto target = addCamera();
 
     auto user = addUser(GlobalPermission::none);
-    auto role = createRole(GlobalPermission::accessAllMedia);
-    userRolesManager()->addOrUpdateUserRole(role);
+    auto parentRole = createRole(GlobalPermission::accessAllMedia);
+    userRolesManager()->addOrUpdateUserRole(parentRole);
 
-    user->setUserRoleId(role.id);
+    user->setUserRoleIds({parentRole.id});
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+
+    auto inheritedRole = createRole(GlobalPermission::none);
+    ASSERT_FALSE(accessProvider()->hasAccess(inheritedRole, target));
+
+    user->setUserRoleIds({inheritedRole.id});
+    ASSERT_FALSE(accessProvider()->hasAccess(user, target));
+
+    inheritedRole.parentRoleIds = {parentRole.id};
+    userRolesManager()->addOrUpdateUserRole(inheritedRole);
+    ASSERT_TRUE(accessProvider()->hasAccess(inheritedRole, target));
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+
+    inheritedRole.parentRoleIds = {};
+    userRolesManager()->addOrUpdateUserRole(inheritedRole);
+    ASSERT_FALSE(accessProvider()->hasAccess(inheritedRole, target));
+    ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
 
 TEST_F(DirectPermissionsResourceAccessProviderTest, checkUserEnabledChange)

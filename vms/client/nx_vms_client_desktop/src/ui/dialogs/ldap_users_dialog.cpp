@@ -207,7 +207,7 @@ void QnLdapUsersDialog::importUsers(const QnLdapUsers &users)
         user->fillIdUnsafe();
         user->setEnabled(enableUsers);
         if (selectedRole == Qn::UserRole::customUserRole)
-            user->setUserRoleId(selectedUserRoleId);
+            user->setSingleUserRole(selectedUserRoleId); //< TODO: Handle more than 1 role.
         else
             user->setRawPermissions(permissions);
         addedUsers.push_back(user);

@@ -282,7 +282,8 @@ void QnUserRolesDialog::applyChanges()
             const auto applyChanges = nx::utils::guarded(this,
                 [replacement](const QnUserResourcePtr& user)
                 {
-                    user->setUserRoleId(replacement.userRoleId);
+                    // TODO: Handle more than 1 role.
+                    user->setSingleUserRole(replacement.userRoleId);
                     user->setRawPermissions(replacement.permissions);
                 });
 
