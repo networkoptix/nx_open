@@ -89,7 +89,8 @@ private:
     void connectToServer(
         core::ConnectionInfo connectionInfo,
         std::optional<QnUuid> expectedServerId,
-        ConnectionOptions options);
+        ConnectionOptions options,
+        std::optional<ConnectScenario> scenario);
 
     /**
      * Show a dialog depending on the error code. Suggest user to download compatibility package

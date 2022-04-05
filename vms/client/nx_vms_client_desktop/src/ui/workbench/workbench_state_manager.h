@@ -57,11 +57,6 @@ public:
     bool tryClose(bool force);
 
 private:
-    /**
-     * @return True if client is currently in valid connected state.
-     */
-    bool canSaveState() const;
-
     friend class QnSessionAwareDelegate;
 
     void registerDelegate(QnSessionAwareDelegate* d);

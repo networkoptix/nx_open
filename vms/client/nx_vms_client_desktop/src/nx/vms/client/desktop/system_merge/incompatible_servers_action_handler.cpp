@@ -21,6 +21,8 @@
 #include <ui/dialogs/common/input_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/statistics/modules/certificate_statistics_module.h>
+#include <ui/workbench/workbench_context.h>
 #include <utils/merge_systems_common.h>
 
 #include "merge_systems_tool.h"
@@ -115,6 +117,13 @@ void IncompatibleServersActionHandler::connectToCurrentSystem(
     connect(progressDialog, &ProgressDialog::canceled,
         m_connectTool, &ConnectToCurrentSystemTool::cancel);
 
+    std::shared_ptr<QnStatisticsScenarioGuard> mergeScenario =
+        context()->instance<QnCertificateStatisticsModule>()->beginScenario(
+            QnCertificateStatisticsModule::Scenario::mergeFromTree);
+
+    // The captured scenario guard will be deleted after tool is destroyed.
+    connect(m_connectTool, &ConnectToCurrentSystemTool::destroyed, this, [mergeScenario] {});
+
     m_connectTool->start(target);
 }
 
@@ -125,12 +134,18 @@ void IncompatibleServersActionHandler::at_mergeSystemsAction_triggered()
         m_mergeDialog->raise();
         return;
     }
+
+    std::shared_ptr<QnStatisticsScenarioGuard> mergeScenario =
+        context()->instance<QnCertificateStatisticsModule>()->beginScenario(
+            QnCertificateStatisticsModule::Scenario::mergeFromDialog);
+
     auto delegate =
         std::make_unique<nx::vms::client::desktop::RemoteConnectionUserInteractionDelegate>(
             mainWindowWidget());
+            
     m_mergeDialog = new MergeSystemsDialog(mainWindowWidget(), std::move(delegate));
     connect(m_mergeDialog.data(), &QDialog::finished, this,
-        [this]()
+        [this, mergeScenario]()
         {
             m_mergeDialog->deleteLater();
             m_mergeDialog.clear();

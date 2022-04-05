@@ -178,6 +178,9 @@ namespace Qn
          */
         CloudSystemIdRole,
 
+        /** CloudSystemConnectData structure. Used in the ConnectToCloudSystemAction. */
+        CloudSystemConnectDataRole,
+
         /** Role for 'forced' flag. Used in DisconnectAction. */
         ForceRole,
 

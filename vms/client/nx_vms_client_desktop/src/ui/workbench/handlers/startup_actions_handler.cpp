@@ -38,6 +38,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <ui/graphics/items/controls/time_slider.h>
+#include <ui/statistics/modules/certificate_statistics_module.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/workbench.h>
@@ -465,6 +466,7 @@ bool StartupActionsHandler::connectUsingCustomUri(const nx::vms::utils::SystemUr
     LogonParameters parameters({address, credentials});
     parameters.storeSession = false;
     parameters.secondaryInstance = true;
+    parameters.connectScenario = ConnectScenario::connectUsingCommand;
 
     if (uri.hasCloudSystemId())
         parameters.connectionInfo.userType = nx::vms::api::UserType::cloud;
@@ -501,6 +503,7 @@ bool StartupActionsHandler::connectUsingCommandLineAuth(
     LogonParameters parameters(std::move(connectionInfo));
     parameters.storeSession = false;
     parameters.secondaryInstance = true;
+    parameters.connectScenario = ConnectScenario::connectUsingCommand;
 
     if (parameters.connectionInfo.userType == nx::vms::api::UserType::cloud)
     {
@@ -559,14 +562,19 @@ bool StartupActionsHandler::connectToSystemIfNeeded(
             NX_DEBUG(this, "Auto-login to the server %1", address);
 
             LogonParameters parameters({address, *storedCredentials});
+            parameters.connectScenario = ConnectScenario::autoConnect;
             menu()->trigger(ConnectAction,
                 Parameters().withArgument(Qn::LogonParametersRole, parameters));
             return true;
         }
         else if (qnCloudStatusWatcher->status() != QnCloudStatusWatcher::LoggedOut)
         {
+            CloudSystemConnectData connectData =
+                {localSystemId.toSimpleString(), ConnectScenario::autoConnect};
+
             menu()->trigger(ConnectToCloudSystemAction,
-                Parameters().withArgument(Qn::CloudSystemIdRole, localSystemId.toSimpleString()));
+                Parameters().withArgument(Qn::CloudSystemConnectDataRole, connectData));
+
             return true;
         }
     }

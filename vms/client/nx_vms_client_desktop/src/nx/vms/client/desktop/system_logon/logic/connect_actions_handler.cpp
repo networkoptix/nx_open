@@ -75,6 +75,7 @@
 #include <ui/dialogs/reconnect_info_dialog.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/opengl/gl_functions.h>
+#include <ui/statistics/modules/certificate_statistics_module.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -896,7 +897,8 @@ void ConnectActionsHandler::at_connectAction_triggered()
             connectToServer(
                 parameters.connectionInfo,
                 parameters.expectedServerId,
-                options);
+                options,
+                parameters.connectScenario);
         }
     }
     else if (NX_ASSERT(actionParameters.hasArgument(Qn::RemoteConnectionRole)))
@@ -940,14 +942,20 @@ void ConnectActionsHandler::at_connectAction_triggered()
 void ConnectActionsHandler::at_connectToCloudSystemAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
-    QString systemId = parameters.argument(Qn::CloudSystemIdRole).toString();
+    const auto connectData = parameters.argument<CloudSystemConnectData>(
+        Qn::CloudSystemConnectDataRole);
 
-    auto endpoint = cloudSystemEndpoint(systemId);
+    auto endpoint = cloudSystemEndpoint(connectData.systemId);
     if (!endpoint)
         return;
 
+    std::shared_ptr<QnStatisticsScenarioGuard> connectScenario = connectData.connectScenario
+        ? context()->instance<QnCertificateStatisticsModule>()->beginScenario(
+            *connectData.connectScenario)
+        : nullptr;
+
     auto callback = d->makeSingleConnectionCallback(
-        [this, endpoint](RemoteConnectionFactory::ConnectionOrError result)
+        [this, endpoint, connectScenario](RemoteConnectionFactory::ConnectionOrError result)
         {
             if (auto error = std::get_if<RemoteConnectionError>(&result))
             {
@@ -1083,9 +1091,13 @@ void ConnectActionsHandler::at_selectCurrentServerAction_triggered()
     d->switchServerDialog = new ConnectingToServerDialog(mainWindowWidget());
     d->switchServerDialog->setDisplayedServer(server);
 
+    std::shared_ptr<QnStatisticsScenarioGuard> connectScenario =
+        context()->instance<QnCertificateStatisticsModule>()->beginScenario(
+            ConnectScenario::connectFromTree);
+
     auto callback = d->makeSingleConnectionCallback(
         nx::utils::guarded(d->switchServerDialog.data(),
-            [this, serverId, dialog = d->switchServerDialog]
+            [this, serverId, dialog = d->switchServerDialog, connectScenario]
                 (RemoteConnectionFactory::ConnectionOrError result)
         {
             if (NX_ASSERT(dialog))
@@ -1228,10 +1240,16 @@ void ConnectActionsHandler::clearConnection()
 void ConnectActionsHandler::connectToServer(
     core::ConnectionInfo connectionInfo,
     std::optional<QnUuid> expectedServerId,
-    ConnectionOptions options)
+    ConnectionOptions options,
+    std::optional<ConnectScenario> scenario)
 {
+    std::shared_ptr<QnStatisticsScenarioGuard> connectScenario = scenario
+        ? context()->instance<QnCertificateStatisticsModule>()->beginScenario(
+            *scenario)
+        : nullptr;
+
     auto callback = d->makeSingleConnectionCallback(
-        [this, options](RemoteConnectionFactory::ConnectionOrError result)
+        [this, options, connectScenario](RemoteConnectionFactory::ConnectionOrError result)
         {
             if (const auto error = std::get_if<RemoteConnectionError>(&result))
             {

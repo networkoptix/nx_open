@@ -6,10 +6,34 @@
 
 #include <QtCore/QMetaType>
 
-#include <nx/vms/client/core/network/connection_info.h>
+#include <nx/reflect/enum_instrument.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/core/network/connection_info.h>
 
 namespace nx::vms::client::desktop {
+
+NX_REFLECTION_ENUM_CLASS(ConnectScenario,
+    /** Auto-connect on startup. */
+    autoConnect,
+
+    /** Connecting from the Login Dialog. */
+    connectFromDialog,
+
+    /** Connecting from the Welcome Screen tile. */
+    connectFromTile,
+
+    /** Connecting from the Resource Tree context menu. */
+    connectFromTree,
+
+    /** Connecting using the Command Line parameters. */
+    connectUsingCommand,
+
+    /** Merging from the Main Menu dialog. */
+    mergeFromDialog,
+
+    /** Merging from the Resource Tree context menu. */
+    mergeFromTree
+);
 
 struct LogonParameters
 {
@@ -28,6 +52,9 @@ struct LogonParameters
     /** The client was run as a secondary instance - using "Open in New Window" action. */
     bool secondaryInstance = false;
 
+    /** Connect scenario. */
+    std::optional<ConnectScenario> connectScenario;
+
     LogonParameters() = default;
 
     LogonParameters(core::ConnectionInfo connectionInfo):
@@ -36,6 +63,13 @@ struct LogonParameters
     }
 };
 
+struct CloudSystemConnectData
+{
+    QString systemId;
+    std::optional<ConnectScenario> connectScenario;
+};
+
 } // namespace nx::vms::client::desktop
 
 Q_DECLARE_METATYPE(nx::vms::client::desktop::LogonParameters)
+Q_DECLARE_METATYPE(nx::vms::client::desktop::CloudSystemConnectData)

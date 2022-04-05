@@ -29,6 +29,7 @@
 #include <ui/dialogs/common/message_box.h>
 #include <ui/graphics/instruments/gl_checker_instrument.h>
 #include <ui/statistics/modules/actions_statistics_module.h>
+#include <ui/statistics/modules/certificate_statistics_module.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/statistics/modules/durations_statistics_module.h>
 #include <ui/statistics/modules/generic_statistics_module.h>
@@ -114,6 +115,9 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
 
     const auto sessionRestoreStatModule = instance<QnSessionRestoreStatisticsModule>();
     statisticsManager->registerStatisticsModule(lit("restore"), sessionRestoreStatModule);
+
+    const auto certificateStatisticsModule = instance<QnCertificateStatisticsModule>();
+    statisticsManager->registerStatisticsModule(lit("certificate"), certificateStatisticsModule);
 
     m_statisticsModule.reset(new QnControlsStatisticsModule());
     statisticsManager->registerStatisticsModule(lit("controls"), m_statisticsModule.data());
