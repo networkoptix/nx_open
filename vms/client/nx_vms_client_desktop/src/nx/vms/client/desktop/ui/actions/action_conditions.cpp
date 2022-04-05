@@ -610,7 +610,7 @@ ActionVisibility ResourceRemovalCondition::check(const Parameters& parameters, Q
             // TODO: Use edge server tracker here (4.2).
             const QnMediaServerResourcePtr parentServer = camera->getParentServer();
             if (parentServer
-                && QnMediaServerResource::isHiddenServer(parentServer)
+                && QnMediaServerResource::isHiddenEdgeServer(parentServer)
                 && parentServer->getStatus() == nx::vms::api::ResourceStatus::online
                 && !camera->hasFlags(Qn::virtual_camera))
             {

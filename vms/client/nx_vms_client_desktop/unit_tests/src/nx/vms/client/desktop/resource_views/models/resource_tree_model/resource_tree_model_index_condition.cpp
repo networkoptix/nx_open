@@ -28,12 +28,21 @@ Condition hasChildren()
         };
 }
 
-Condition hasNotChildren()
+Condition hasNoChildren()
 {
     return
         [](const QModelIndex& index)
         {
             return index.isValid() && index.model()->rowCount(index) == 0;
+        };
+}
+
+Condition hasExactChildrenCount(int count)
+{
+    return
+        [count](const QModelIndex& index)
+        {
+            return index.isValid() && index.model()->rowCount(index) == count;
         };
 }
 

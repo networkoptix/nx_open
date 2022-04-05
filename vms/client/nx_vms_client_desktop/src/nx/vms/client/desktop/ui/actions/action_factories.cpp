@@ -222,11 +222,14 @@ EdgeNodeFactory::EdgeNodeFactory(QObject* parent):
 
 QMenu* EdgeNodeFactory::newMenu(const Parameters& parameters, QWidget* parentWidget)
 {
-    auto edgeCamera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
-    if (!edgeCamera || !QnMediaServerResource::isHiddenServer(edgeCamera->getParentResource()))
+    const auto edgeCamera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
+    if (!edgeCamera || !QnMediaServerResource::isHiddenEdgeServer(edgeCamera->getParentResource()))
         return nullptr;
 
-    return menu()->newMenu(action::NoAction, TreeScope, parentWidget,
+    return menu()->newMenu(
+        action::NoAction,
+        TreeScope,
+        parentWidget,
         Parameters(edgeCamera->getParentResource()));
 }
 
