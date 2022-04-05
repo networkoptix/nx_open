@@ -90,6 +90,27 @@ bool verifyDesktopCameraOnLayout(
     return true;
 }
 
+bool isPermissionsUpdateAttempted(const QnUserResourcePtr& existingUser,
+    GlobalPermissions permissions)
+{
+    if (permissions.testFlag(GlobalPermission::none))
+        return false;
+
+    return existingUser->getRawPermissions() != permissions;
+}
+
+bool canUpdatePermissions(
+    const QnUserResourcePtr& requestSender, const nx::vms::api::UserData& param)
+{
+    if (requestSender->isOwner())
+        return !param.isAdmin;
+
+    if (requestSender->getRawPermissions().testFlag(GlobalPermission::admin))
+        return !param.permissions.testFlag(GlobalPermission::admin);
+
+    return false;
+}
+
 } // namespace
 
 QnResourceAccessManager::QnResourceAccessManager(Mode mode, QObject* parent /*= nullptr*/):
@@ -1081,6 +1102,12 @@ bool QnResourceAccessManager::canModifyUser(
     /* Nobody can make user an owner (isAdmin ec2 field) unless target user is already an owner. */
     if (!userResource->isOwner() && update.isAdmin)
         return false;
+
+    if (isPermissionsUpdateAttempted(userResource, update.permissions))
+    {
+        auto subjectUser = subject.user();
+        return subjectUser && canUpdatePermissions(subjectUser, update);
+    }
 
     // Changing user type is always prohibited.
     if (userResource->userType() != nx::vms::api::type(update))

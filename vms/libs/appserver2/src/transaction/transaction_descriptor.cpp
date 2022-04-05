@@ -425,9 +425,11 @@ struct InvalidAccess
 struct InvalidAccessOut
 {
     template<typename Param>
-    RemotePeerAccess operator()(QnCommonModule* commonModule, const Qn::UserAccessData&, const Param&)
+    RemotePeerAccess operator()(QnCommonModule* commonModule,
+        const Qn::UserAccessData&, const Param&)
     {
-        NX_ASSERT(0, lit("Invalid outgoing transaction access check (%1). We shouldn't be here.").arg(typeid(Param).name()));
+        NX_ASSERT(false, "Invalid outgoing transaction access check (%1). We shouldn't be here.",
+            typeid(Param).name());
         return RemotePeerAccess::Forbidden;
     }
 };
@@ -655,6 +657,7 @@ struct SaveUserAccess
             // possible to recalculate hashes.
             const auto existingUser =
                 commonModule->resourcePool()->getResourceById<QnUserResource>(param.id);
+
             if (existingUser
                 && param.digest != nx::vms::api::UserData::kHttpIsDisabledStub
                 && (param.isCloud || existingUser->getDigest() == param.digest)

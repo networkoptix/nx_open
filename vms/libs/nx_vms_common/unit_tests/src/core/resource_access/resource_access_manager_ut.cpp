@@ -142,6 +142,22 @@ protected:
         checkCanModifyUserDigestAuthorizationEnabled(source, m_currentUser, allowed);
     }
 
+    void checkCanGrantUserAdminPermissions(
+        const QnUserResourcePtr& source, QnUserResourcePtr target, bool allowed)
+    {
+        nx::vms::api::UserData data;
+        ec2::fromResourceToApi(target, data);
+        data.permissions = GlobalPermission::admin;
+
+        auto info = nx::format("check: %1 -> %2", source->getName(), target->getName())
+            .toStdString();
+
+        if (allowed)
+            ASSERT_TRUE(resourceAccessManager()->canModifyUser(source, target, data)) << info;
+        else
+            ASSERT_FALSE(resourceAccessManager()->canModifyUser(source, target, data)) << info;
+    }
+
     // Declares the variables your tests want to use.
     std::unique_ptr<QnStaticCommonModule> m_staticCommon;
     std::unique_ptr<QnCommonModule> m_module;
@@ -806,6 +822,41 @@ TEST_P(ResourceAccessManagerTest, checkCanModifyUserDigestAuthorizationEnabled)
         {
             const bool allowed = allowedScenarios.contains({source, target});
             checkCanModifyUserDigestAuthorizationEnabled(source, target, allowed);
+        }
+    }
+}
+
+TEST_P(ResourceAccessManagerTest, checkCanGrantUserAdminPermissions)
+{
+    auto owner = addUser(GlobalPermission::none, "owner");
+    owner->setOwner(true);
+    auto cloud = addUser(GlobalPermission::none, "cloud", nx::vms::api::UserType::cloud);
+    auto cloudOwner =
+        addUser(GlobalPermission::none, "cloud owner", nx::vms::api::UserType::cloud);
+    cloudOwner->setOwner(true);
+    auto admin = addUser(GlobalPermission::admin, "admin");
+    auto ldap = addUser(GlobalPermission::none, "ldap", nx::vms::api::UserType::ldap);
+    auto other = addUser(GlobalPermission::none, "other");
+
+    QnUserResourceList users = { owner, cloudOwner, admin, cloud, ldap, other };
+    QVector<std::pair<QnUserResourcePtr, QnUserResourcePtr>> allowedScenarios = {
+        {owner, admin},
+        {owner, ldap},
+        {owner, other},
+        {owner, cloud},
+        {cloudOwner, admin},
+        {cloudOwner, cloud},
+        {cloudOwner, ldap},
+        {cloudOwner, other},
+        {admin, admin}
+    };
+
+    for (const auto source : users)
+    {
+        for (const auto target : users)
+        {
+            const bool allowed = allowedScenarios.contains({ source, target });
+            checkCanGrantUserAdminPermissions(source, target, allowed);
         }
     }
 }
