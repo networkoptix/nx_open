@@ -151,7 +151,12 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     setAutoFillBackground(true);
     setAcceptDrops(true);
     setPaletteColor(this, QPalette::Base, colorTheme()->color("dark7"));
-    setPaletteColor(this, QPalette::Window, colorTheme()->color("dark7"));
+
+    // Workaround for behavior change Qt5 -> Qt6.
+    // Force QPalette detach to prevent inheritance of parent brush, see QTBUG-98762.
+    const QColor windowColor = colorTheme()->color("dark7");
+    setPaletteColor(this, QPalette::Window, QColor::fromRgb(~windowColor.rgba()));
+    setPaletteColor(this, QPalette::Window, windowColor);
 
     d->mainMenuButton = newActionButton(
         action::MainMenuAction,
