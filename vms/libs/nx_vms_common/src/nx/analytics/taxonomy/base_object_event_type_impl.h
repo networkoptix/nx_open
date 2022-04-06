@@ -34,7 +34,7 @@ public:
 
     QString name() const
     {
-        if (m_descriptor.isHidden() && NX_ASSERT(m_base))
+        if (m_descriptor.isSupposedToMimicBaseType() && NX_ASSERT(m_base))
             return m_base->name();
 
         return m_descriptor.name;

@@ -219,6 +219,9 @@ struct EventTypeDescriptor: public ExtendedScopedDescriptor
     EventTypeFlags flags;
     bool hasEverBeenSupported = false;
 
+    /** See ObjectType::isSupposedToMimicBaseType(). */
+    bool isSupposedToMimicBaseType() const { return false; }
+
     bool isHidden() const { return flags.testFlag(EventTypeFlag::hidden); }
 };
 #define nx_vms_api_analyitcs_EventTypeDescriptor_Fields \
@@ -240,7 +243,17 @@ struct ObjectTypeDescriptor: public ExtendedScopedDescriptor
     ObjectTypeFlags flags;
     bool hasEverBeenSupported = false;
 
-    bool isHidden() const { return flags.testFlag(ObjectTypeFlag::hiddenDerivedType); }
+    /**
+     * Some Object Types aren't visible anywhere in the GUI (hidden), but behave like mixins for
+     * its base Types (mimicing them). E.g its attrributes become a part of the base Object Type
+     * attribute set.
+     */
+    bool isSupposedToMimicBaseType() const
+    {
+        return flags.testFlag(ObjectTypeFlag::hiddenDerivedType);
+    }
+
+    bool isHidden() const { return isSupposedToMimicBaseType(); }
 };
 #define nx_vms_api_analyitcs_ObjectTypeDescriptor_Fields \
     nx_vms_api_analytics_ExtendedScopedDescriptor_Fields \
