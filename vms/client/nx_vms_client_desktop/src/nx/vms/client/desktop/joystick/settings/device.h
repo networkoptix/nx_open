@@ -45,6 +45,12 @@ protected:
         double sensitivity = 0;
     };
 
+    // QString.toInt() could autodetect integer base by their format (0x... for hex numbers, etc.).
+    static constexpr int kAutoDetectBase = 0;
+
+    // Minimum significant zero point deviation in percent.
+    static constexpr int kMinBounceInPercentages = 2;
+
 public:
     /**
      * Constructor for supported joystick models.
@@ -93,7 +99,7 @@ signals:
 
 protected:
     virtual State getNewState() = 0;
-    virtual AxisLimits parseAxisLimits(const AxisDescriptor& descriptor);
+    virtual AxisLimits parseAxisLimits(const AxisDescriptor& descriptor) = 0;
     double mapAxisState(int rawValue, const AxisLimits& limits);
     void pollData();
 

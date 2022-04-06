@@ -7,9 +7,6 @@
 
 namespace {
 
-// QString.toInt() could autodetect integer base by their format (0x... for hex numbers, etc.).
-constexpr int kAutoDetectBase = 0;
-
 bool mapButtonState(const QBitArray& state)
 {
     // We assume that button has only two states: either pressed or not.
@@ -92,6 +89,25 @@ Device::State DeviceHid::getNewState()
     }
 
     return {newStickPositions, newButtonStates};
+}
+
+Device::AxisLimits DeviceHid::parseAxisLimits(const AxisDescriptor& descriptor)
+{
+    Device::AxisLimits result;
+    result.min = descriptor.min.toInt(/*ok*/ nullptr, kAutoDetectBase);
+    result.max = descriptor.max.toInt(/*ok*/ nullptr, kAutoDetectBase);
+    result.mid = descriptor.mid.toInt(/*ok*/ nullptr, kAutoDetectBase);
+
+    result.bounce = descriptor.bounce.toInt(/*ok*/ nullptr, kAutoDetectBase);
+
+    const int minBounce = (result.max - result.min) / 100.0 * kMinBounceInPercentages;
+    if (minBounce > result.bounce)
+        result.bounce = minBounce;
+
+    if (result.mid == 0)
+        result.mid = (result.min + result.max) / 2;
+    result.sensitivity = descriptor.sensitivity.toDouble(/*ok*/ nullptr);
+    return result;
 }
 
 DeviceHid::ParsedFieldLocation DeviceHid::parseLocation(const FieldLocation& location)
