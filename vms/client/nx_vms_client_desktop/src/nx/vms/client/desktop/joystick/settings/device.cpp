@@ -4,13 +4,6 @@
 
 #include "descriptors.h"
 
-namespace {
-
-// QString.toInt() could autodetect integer base by their format (0x... for hex numbers, etc.).
-constexpr int kAutoDetectBase = 0;
-
-} // namespace
-
 namespace nx::vms::client::desktop::joystick {
 
 Device::Device(
@@ -54,19 +47,6 @@ void Device::updateStickAxisLimits(const JoystickDescriptor& modelInfo)
     m_axisLimits[zIndex] = parseAxisLimits(modelInfo.zAxis);
     // Initialize stick position by zeroes (all three axes are in neutral position).
     m_stickPosition.fill(0);
-}
-
-Device::AxisLimits Device::parseAxisLimits(const AxisDescriptor& descriptor)
-{
-    Device::AxisLimits result;
-    result.min = descriptor.min.toInt(/*ok*/ nullptr, kAutoDetectBase);
-    result.max = descriptor.max.toInt(/*ok*/ nullptr, kAutoDetectBase);
-    result.mid = descriptor.mid.toInt(/*ok*/ nullptr, kAutoDetectBase);
-    result.bounce = descriptor.bounce.toInt(/*ok*/ nullptr, kAutoDetectBase);
-    if (result.mid == 0)
-        result.mid = (result.min + result.max) / 2;
-    result.sensitivity = descriptor.sensitivity.toDouble(/*ok*/ nullptr);
-    return result;
 }
 
 double Device::mapAxisState(int rawValue, const AxisLimits& limits)

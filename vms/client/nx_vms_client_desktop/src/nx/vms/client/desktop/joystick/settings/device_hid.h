@@ -41,6 +41,7 @@ public:
 
 protected:
     virtual State getNewState() override;
+    virtual AxisLimits parseAxisLimits(const AxisDescriptor& descriptor) override;
 
 private:
     ParsedFieldLocation parseLocation(const FieldLocation& location);

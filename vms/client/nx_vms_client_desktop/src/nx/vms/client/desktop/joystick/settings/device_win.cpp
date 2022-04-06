@@ -79,6 +79,22 @@ Device::State DeviceWindows::getNewState()
     return {newStickPositions, newButtonStates};
 }
 
+Device::AxisLimits DeviceWindows::parseAxisLimits(const AxisDescriptor& descriptor)
+{
+    Device::AxisLimits result;
+
+    // Ignore min and max due to dynamically receiving them.
+    const int min = descriptor.min.toInt(/*ok*/ nullptr, kAutoDetectBase);
+    const int max = descriptor.max.toInt(/*ok*/ nullptr, kAutoDetectBase);
+    const int bounce = descriptor.bounce.toInt(/*ok*/ nullptr, kAutoDetectBase);
+    const int minBounce = (max - min) / 100.0 * kMinBounceInPercentages;
+    if (minBounce < bounce) //< Rewrite dynamically received bounce only in this case.
+        result.bounce = bounce;
+
+    result.sensitivity = descriptor.sensitivity.toDouble(/*ok*/ nullptr);
+    return result;
+}
+
 bool DeviceWindows::enumObjectsCallback(LPCDIDEVICEOBJECTINSTANCE deviceObject, LPVOID devicePtr)
 {
     auto device = reinterpret_cast<DeviceWindows*>(devicePtr);
@@ -122,7 +138,7 @@ void DeviceWindows::formAxisLimits(int min, int max, Device::AxisLimits* limits)
     limits->max = max;
     limits->mid = (max - min) / 2;
 
-    const int minBounce = (max - min) / 100.0 * 2; //< Minimum 2% central point bounce.
+    const int minBounce = (max - min) / 100.0 * kMinBounceInPercentages;
     if (minBounce > limits->bounce)
         limits->bounce = minBounce;
 }
