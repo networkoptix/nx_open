@@ -38,6 +38,7 @@ public:
 
 protected:
     virtual State getNewState() override;
+    virtual AxisLimits parseAxisLimits(const AxisDescriptor& descriptor) override;
     static bool enumObjectsCallback(LPCDIDEVICEOBJECTINSTANCE deviceObject, LPVOID devicePtr);
     static void formAxisLimits(int min, int max, Device::AxisLimits* limits);
 
