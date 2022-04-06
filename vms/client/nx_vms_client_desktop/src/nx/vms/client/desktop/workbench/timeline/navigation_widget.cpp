@@ -304,6 +304,7 @@ void NavigationWidget::updateSpeedSliderSpeedFromNavigator()
         return;
 
     QScopedValueRollback<bool> guard(m_updatingSpeedSliderFromNavigator, true);
+    m_speedSlider->setSpeedRange(navigator()->minimalSpeed(), navigator()->maximalSpeed());
     m_speedSlider->setSpeed(navigator()->speed());
     updatePlayButtonChecked();
 }
