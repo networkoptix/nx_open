@@ -1505,7 +1505,7 @@ Handle ServerConnection::replaceDevice(
 
     auto request = prepareRequest(
         nx::network::http::Method::post,
-        prepareUrl(nx::format("/rest/v1/devices/%1/replace", deviceToBeReplacedId), /*params*/ {}),
+        prepareUrl(nx::format("/rest/v2/devices/%1/replace", deviceToBeReplacedId), /*params*/ {}),
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
         QJson::serialized(requestData));
 
