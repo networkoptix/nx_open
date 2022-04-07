@@ -34,7 +34,6 @@ struct CloudConnectControllerImpl
     MediatorAddressPublisher addressPublisher;
     OutgoingTunnelPool outgoingTunnelPool;
     CloudConnectSettings settings;
-    speed_test::UplinkSpeedReporter uplinkSpeedReporter;
 
     CloudConnectControllerImpl(
         const std::string& customCloudHost,
@@ -47,12 +46,8 @@ struct CloudConnectControllerImpl
         mediatorConnector(cloudHost),
         addressPublisher(
             mediatorConnector.systemConnection(),
-            &mediatorConnector),
-        uplinkSpeedReporter(
-            AppInfo::defaultCloudModulesXmlUrl(cloudHost),
             &mediatorConnector)
     {
-        uplinkSpeedReporter.start();
     }
 
     ~CloudConnectControllerImpl()

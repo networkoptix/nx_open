@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "cloud_modules_xml_server.h"
+
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/network/cloud/basic_cloud_module_url_fetcher.h>
 
@@ -50,26 +51,28 @@ void CloudModulesXmlServer::setSpeedTestUrl(const nx::utils::Url& url)
     setModule(kSpeedTestModuleName, url);
 }
 
-void CloudModulesXmlServer::setModule(const char* resName, const nx::utils::Url& resValue)
+void CloudModulesXmlServer::setModule(const std::string& resName, const nx::utils::Url& resValue)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_modules[resName] = resValue;
 }
 
-QByteArray CloudModulesXmlServer::serializeModules() const
+std::string CloudModulesXmlServer::xml() const
 {
-    static constexpr char kSequence[] = "<sequence>%1</sequence>";
-    static constexpr char kSet[] = "\r\n\t<set resName=\"%1\" resValue=\"%2\"/>";
-
     NX_MUTEX_LOCKER lock(&m_mutex);
 
-    QByteArray sets;
+    std::string xml = "<sequence>\r\n";
     for (const auto& [resName, resValue]: m_modules)
-        sets.append(nx::format(kSet).args(resName, resValue).toUtf8());
-    if (!sets.isEmpty())
-        sets.append("\r\n");
+        xml += "\t<set resName=\"" + resName + "\" resValue=\"" + resValue.toStdString() + "\"/>\r\n";
+    xml += "</sequence>\r\n";
 
-    return nx::format(kSequence).arg(sets).toUtf8();
+    return xml;
+}
+
+void CloudModulesXmlServer::clear()
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_modules.clear();
 }
 
 void CloudModulesXmlServer::serve(
@@ -78,9 +81,7 @@ void CloudModulesXmlServer::serve(
 {
     network::http::RequestResult result(network::http::StatusCode::ok);
     result.dataSource =
-        std::make_unique<network::http::BufferSource>(
-            "application/xml",
-            serializeModules());
+        std::make_unique<network::http::BufferSource>("application/xml", xml());
 
     handler(std::move(result));
 }

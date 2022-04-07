@@ -14,6 +14,7 @@
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/cloud/mediator_connector.h>
+#include <nx/network/test_support/uplink_speed_test_server.h>
 #include <nx/utils/thread/sync_queue.h>
 
 namespace nx::network::cloud::speed_test::test {
@@ -23,47 +24,6 @@ using namespace cloud::test;
 namespace {
 
 static constexpr char kDiscoveryPrefix[] = "/discovery";
-
-class UplinkSpeedTestServer
-{
-public:
-    void registerRequestHandlers(
-        const std::string& basePath,
-        network::http::server::rest::MessageDispatcher* messageDispatcher)
-    {
-		messageDispatcher->registerRequestProcessorFunc(
-            network::http::kAnyMethod,
-			url::joinPath(basePath, speed_test::http::kApiPath),
-			[this](auto&& ... args) { serve(std::forward<decltype(args)>(args)...); });
-    }
-
-    void setBandwidthTestInProgressHandler(
-        nx::utils::MoveOnlyFunc<void(int /*xTestSequence*/)> handler)
-    {
-        m_bandwidthTestInProgressHandler = std:: move(handler);
-    }
-
-private:
-    void serve(
-        nx::network::http::RequestContext request,
-        nx::network::http::RequestProcessedHandler completionHandler)
-    {
-		auto it = request.request.headers.find("X-Test-Sequence");
-		if (it == request.request.headers.end()) //< Performing a ping test in this case.
-            return completionHandler(nx::network::http::StatusCode::ok);
-
-        nx::network::http::insertOrReplaceHeader(&request.response->headers,
-            network::http::HttpHeader(it->first, it->second));
-
-        if (m_bandwidthTestInProgressHandler)
-            m_bandwidthTestInProgressHandler(nx::utils::stoi(it->second));
-
-        completionHandler(nx::network::http::StatusCode::ok);
-    }
-
-private:
-    nx::utils::MoveOnlyFunc<void(int /*xTestSequence*/)> m_bandwidthTestInProgressHandler;
-};
 
 class MockUplinkSpeedTester: public speed_test::UplinkSpeedTester
 {

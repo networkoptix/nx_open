@@ -79,6 +79,11 @@ void UplinkSpeedReporter::setFetchMediatorAddressHandler(
     m_fetchMediatorAddressHandler = std::move(handler);
 }
 
+void UplinkSpeedReporter::setCloudModulesXmlUrl(const nx::utils::Url& url)
+{
+    m_cloudModulesXmlUrl = url;
+}
+
 void UplinkSpeedReporter::start()
 {
     m_mediatorConnector->subsribeToSystemCredentialsSet(
