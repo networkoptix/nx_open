@@ -56,7 +56,6 @@ public:
     QnGlobalSettings* globalSettings() const;
     QnLayoutTourManager* layoutTourManager() const;
     nx::vms::event::RuleManager* eventRuleManager() const;
-    nx::vms::rules::Engine* vmsRulesEngine() const;
     QnAuditManager* auditManager() const;
     QnResourceDataPool* dataPool() const;
 private:

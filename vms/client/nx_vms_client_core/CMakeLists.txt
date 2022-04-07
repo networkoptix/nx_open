@@ -14,8 +14,16 @@ nx_add_target(nx_vms_client_core LIBRARY NO_API_MACROS
         ${qt_helpers_sources}
         ${speex_sources}
     PUBLIC_LIBS
-        Qt5::Quick Qt5::MultimediaQuick
-        appserver2 nx_vms_utils cloud_db_client nx_media nx_network nx_utils nx_vms_license
+        Qt5::MultimediaQuick
+        Qt5::Quick
+        appserver2
+        cloud_db_client
+        nx_media
+        nx_network
+        nx_utils
+        nx_vms_license
+        nx_vms_rules
+        nx_vms_utils
     PUBLIC_LIBS
         ffmpeg::ffmpeg
     ADDITIONAL_MOC_INCLUDE_DIRS

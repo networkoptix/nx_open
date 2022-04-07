@@ -15,6 +15,7 @@
 #include <nx/vms/api/data/peer_alive_data.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/rules/engine_holder.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_layout_tour_manager.h>
 #include <nx_ec/managers/abstract_misc_manager.h>
@@ -26,10 +27,7 @@ QnClientMessageProcessor::QnClientMessageProcessor(
     nx::vms::common::SystemContext* context,
     QObject* parent)
     :
-    base_type(context, parent),
-    m_status(),
-    m_connected(false),
-    m_holdConnection(false)
+    base_type(context, parent)
 {
 }
 
@@ -96,7 +94,17 @@ Qt::ConnectionType QnClientMessageProcessor::handlerConnectionType() const
     return Qt::QueuedConnection;
 }
 
-void QnClientMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection)
+void QnClientMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr& connection)
+{
+    base_type::connectToConnection(connection);
+
+    nx::vms::rules::EngineHolder::connectToConnection(
+        qnClientCoreModule->vmsRulesEngine(),
+        m_context,
+        handlerConnectionType());
+}
+
+void QnClientMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr& connection)
 {
     m_holdConnection = false;
     base_type::disconnectFromConnection(connection);
@@ -119,7 +127,7 @@ void QnClientMessageProcessor::onResourceStatusChanged(
     resource->setStatus(status);
 }
 
-void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource, ec2::NotificationSource source)
+void QnClientMessageProcessor::updateResource(const QnResourcePtr& resource, ec2::NotificationSource source)
 {
     NX_ASSERT(resource);
     /*

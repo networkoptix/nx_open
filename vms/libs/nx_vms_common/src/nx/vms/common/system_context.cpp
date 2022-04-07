@@ -31,9 +31,6 @@
 #include <nx/analytics/taxonomy/state_watcher.h>
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
 #include <nx/vms/event/rule_manager.h>
-#include <nx/vms/rules/ec2_router.h>
-#include <nx/vms/rules/engine.h>
-#include <nx/vms/rules/initializer.h>
 
 namespace nx::vms::common {
 
@@ -62,7 +59,6 @@ struct SystemContext::Private
     std::unique_ptr<QnResourceAccessManager> resourceAccessManager;
     std::unique_ptr<QnLayoutTourManager> layoutTourManager;
     std::unique_ptr<nx::vms::event::RuleManager> eventRuleManager;
-    std::unique_ptr<nx::vms::rules::Engine> vmsRulesEngine;
     std::unique_ptr<taxonomy::DescriptorContainer> analyticsDescriptorContainer;
     std::unique_ptr<taxonomy::AbstractStateWatcher> analyticsTaxonomyStateWatcher;
 
@@ -118,13 +114,6 @@ SystemContext::SystemContext(
 
     d->layoutTourManager = std::make_unique<QnLayoutTourManager>();
     d->eventRuleManager = std::make_unique<nx::vms::event::RuleManager>();
-    d->vmsRulesEngine = std::make_unique<nx::vms::rules::Engine>(
-        std::make_unique<nx::vms::rules::Ec2Router>(this));
-    nx::vms::rules::Initializer initializer(d->vmsRulesEngine.get());
-    initializer.registerFields();
-    initializer.registerEvents();
-    initializer.registerActions();
-
     d->analyticsDescriptorContainer = std::make_unique<taxonomy::DescriptorContainer>(this);
     d->analyticsTaxonomyStateWatcher = std::make_unique<taxonomy::StateWatcher>(
         d->analyticsDescriptorContainer.get());
@@ -277,11 +266,6 @@ QnLayoutTourManager* SystemContext::layoutTourManager() const
 nx::vms::event::RuleManager* SystemContext::eventRuleManager() const
 {
     return d->eventRuleManager.get();
-}
-
-nx::vms::rules::Engine* SystemContext::vmsRulesEngine() const
-{
-    return d->vmsRulesEngine.get();
 }
 
 taxonomy::DescriptorContainer* SystemContext::analyticsDescriptorContainer() const

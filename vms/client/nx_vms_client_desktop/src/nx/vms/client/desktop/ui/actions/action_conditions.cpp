@@ -2173,8 +2173,8 @@ ConditionWrapper hasNewEventRulesEngine()
     return new CustomBoolCondition(
         [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
         {
-            return context->commonModule()->vmsRulesEngine()->isEnabled()
-                || context->commonModule()->vmsRulesEngine()->hasRules();
+            auto engine = qnClientCoreModule->vmsRulesEngine();
+            return engine->isEnabled() && engine->hasRules();
         });
 }
 

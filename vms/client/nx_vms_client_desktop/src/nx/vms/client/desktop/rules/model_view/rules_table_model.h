@@ -8,16 +8,14 @@
 
 #include <QtCore/QAbstractTableModel>
 
-#include <nx/vms/rules/engine.h>
-#include <nx/vms/rules/field.h>
-#include <nx/vms/rules/rule.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/rules/rules_fwd.h>
 
 namespace nx::vms::client::desktop::rules {
 
 class RulesTableModel:
     public QAbstractTableModel,
-    public QnWorkbenchContextAware
+    public nx::vms::client::core::RemoteConnectionAware
 {
     Q_OBJECT
 
@@ -65,13 +63,13 @@ public:
 
         QString eventType() const;
         void setEventType(const QString& eventType);
-        QHash<QString, vms::rules::Field*> eventFields() const;
-        std::optional<vms::rules::ItemDescriptor> eventDescriptor() const;
+        QHash<QString, nx::vms::rules::Field*> eventFields() const;
+        std::optional<nx::vms::rules::ItemDescriptor> eventDescriptor() const;
 
         QString actionType() const;
         void setActionType(const QString& actionType);
-        QHash<QString, vms::rules::Field*> actionFields() const;
-        std::optional<vms::rules::ItemDescriptor> actionDescriptor() const;
+        QHash<QString, nx::vms::rules::Field*> actionFields() const;
+        std::optional<nx::vms::rules::ItemDescriptor> actionDescriptor() const;
 
         QString comment() const;
         void setComment(const QString& comment);
@@ -93,7 +91,7 @@ public:
 
     private:
         QPersistentModelIndex index;
-        vms::rules::Engine* engine{};
+        nx::vms::rules::Engine* engine = nullptr;
         std::unique_ptr<vms::rules::Rule> actualRule;
 
         /** Only RulesTableModel must has an ability to create SimplifiedRule instances. */
@@ -132,7 +130,7 @@ public:
 
 private:
     std::vector<std::shared_ptr<SimplifiedRule>> simplifiedRules;
-    vms::rules::Engine* engine{};
+    nx::vms::rules::Engine* engine = nullptr;
 
     std::set<QnUuid> addedRules;
     std::set<QnUuid> modifiedRules;

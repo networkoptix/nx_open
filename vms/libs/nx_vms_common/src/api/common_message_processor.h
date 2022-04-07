@@ -98,6 +98,7 @@ signals:
     void videowallControlMessageReceived(const nx::vms::api::VideowallControlMessageData& message);
 
     void vmsEventReceived(const nx::vms::api::rules::EventInfo& eventInfo);
+    void vmsRulesReset(QnUuid peerId, const nx::vms::api::rules::RuleList& vmsRules);
     void serverRuntimeEventOccurred(const nx::vms::api::ServerRuntimeEventData& eventData);
 
     void runtimeInfoChanged(const nx::vms::api::RuntimeData& runtimeInfo);
@@ -182,10 +183,6 @@ private slots:
     void on_broadcastBusinessAction(const nx::vms::event::AbstractActionPtr& action);
 
     void on_eventRuleAddedOrUpdated(const nx::vms::api::EventRuleData& data);
-
-    void on_vmsRuleUpdated(const nx::vms::api::rules::Rule& rule, ec2::NotificationSource source);
-    void on_vmsRuleRemoved(QnUuid id);
-    void on_vmsRulesReset();
 
 protected:
     ec2::AbstractECConnectionPtr m_connection;

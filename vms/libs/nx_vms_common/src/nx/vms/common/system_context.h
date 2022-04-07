@@ -200,11 +200,6 @@ public:
      */
     nx::vms::event::RuleManager* eventRuleManager() const;
 
-    /**
-     * Manages new VMS Rules.
-     */
-    nx::vms::rules::Engine* vmsRulesEngine() const;
-
     nx::analytics::taxonomy::DescriptorContainer* analyticsDescriptorContainer() const;
 
     nx::analytics::taxonomy::AbstractStateWatcher* analyticsTaxonomyStateWatcher() const;

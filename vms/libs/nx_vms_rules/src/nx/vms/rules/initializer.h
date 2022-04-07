@@ -6,7 +6,7 @@
 
 namespace nx::vms::rules {
 
-class NX_VMS_COMMON_API Initializer: public Plugin
+class NX_VMS_RULES_API Initializer: public Plugin
 {
 
 public:

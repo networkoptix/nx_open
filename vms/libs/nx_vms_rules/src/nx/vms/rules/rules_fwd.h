@@ -8,6 +8,7 @@
 
 namespace nx::vms::rules {
 
+class Field;
 class EventField;
 class ActionField;
 
@@ -20,6 +21,7 @@ class BasicAction;
 class ActionBuilder;
 class EventFilter;
 
+class Engine;
 class Rule;
 class Router;
 

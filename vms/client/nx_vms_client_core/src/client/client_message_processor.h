@@ -4,7 +4,6 @@
 
 #include <api/common_message_processor.h>
 #include <client/client_connection_status.h>
-#include <core/resource/camera_history.h>
 #include <core/resource/resource_fwd.h>
 
 class QnClientMessageProcessor: public QnCommonMessageProcessor
@@ -27,7 +26,8 @@ public:
 protected:
     virtual Qt::ConnectionType handlerConnectionType() const override;
 
-    virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) override;
+    virtual void connectToConnection(const ec2::AbstractECConnectionPtr& connection) override;
+    virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr& connection) override;
 
     virtual void handleTourAddedOrUpdated(const nx::vms::api::LayoutTourData& tour) override;
 
@@ -35,15 +35,15 @@ protected:
         const QnResourcePtr &resource,
         nx::vms::api::ResourceStatus status,
         ec2::NotificationSource source) override;
-    virtual void updateResource(const QnResourcePtr &resource, ec2::NotificationSource source) override;
+    virtual void updateResource(const QnResourcePtr& resource, ec2::NotificationSource source) override;
     virtual void onGotInitialNotification(const nx::vms::api::FullInfoData& fullData) override;
 
     virtual void handleRemotePeerFound(QnUuid peer, nx::vms::api::PeerType peerType) override;
     virtual void handleRemotePeerLost(QnUuid peer, nx::vms::api::PeerType peerType) override;
 private:
     QnClientConnectionStatus m_status;
-    bool m_connected;
-    bool m_holdConnection;
+    bool m_connected = false;
+    bool m_holdConnection = false;
 };
 
 #define qnClientMessageProcessor \
