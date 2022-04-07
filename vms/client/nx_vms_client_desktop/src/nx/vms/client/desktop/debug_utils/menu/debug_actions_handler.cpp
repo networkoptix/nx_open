@@ -51,20 +51,16 @@ public:
     void atInc()
     {
         emit event(EventPtr(new DebugEvent(
-            "Debug Event",
-            QString("Increment action with value: %1").arg(qnRuntime->debugCounter()),
             "Increment",
             qnRuntime->debugCounter(),
-            std::chrono::microseconds(qnSyncTime->currentUSecsSinceEpoch()))));
+            qnSyncTime->currentTimePoint())));
     }
     void atDec()
     {
         emit event(EventPtr(new DebugEvent(
-            "Debug Event",
-            QString("Decrement action with value: %1").arg(qnRuntime->debugCounter()),
             "Decrement",
             qnRuntime->debugCounter(),
-            std::chrono::microseconds(qnSyncTime->currentUSecsSinceEpoch()))));
+            qnSyncTime->currentTimePoint())));
     }
 };
 

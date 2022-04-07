@@ -18,6 +18,7 @@ class NX_VMS_RULES_API ServerStartedEvent: public BasicEvent
 public:
     static const ItemDescriptor& manifest();
 
+    ServerStartedEvent() = default;
     ServerStartedEvent(QnUuid serverId, std::chrono::microseconds timestamp);
 };
 

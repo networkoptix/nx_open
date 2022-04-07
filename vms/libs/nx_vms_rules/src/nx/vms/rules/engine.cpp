@@ -22,6 +22,7 @@
 #include "router.h"
 #include "rule.h"
 #include "utils/serialization.h"
+#include "utils/type.h"
 
 template<> nx::vms::rules::Engine* Singleton<nx::vms::rules::Engine>::s_instance = nullptr;
 
@@ -180,7 +181,7 @@ void Engine::setRules(RuleSet&& rules)
     emit rulesReset();
 }
 
-bool Engine::registerEvent(const ItemDescriptor& descriptor)
+bool Engine::registerEvent(const ItemDescriptor& descriptor, const EventConstructor& constructor)
 {
     if (!isDescriptorValid(descriptor))
     {
@@ -211,8 +212,32 @@ bool Engine::registerEvent(const ItemDescriptor& descriptor)
         return false;
     }
 
+    if (!registerEventConstructor(descriptor.id, constructor))
+        return false;
+
     m_eventDescriptors.insert(descriptor.id, descriptor);
 
+    return true;
+}
+
+bool Engine::registerEventConstructor(const QString& id, const EventConstructor& constructor)
+{
+    if (!constructor)
+    {
+        NX_ERROR(this, "Register %1 event constructor failed, invalid constructor passed", id);
+        return false;
+    }
+
+    if (m_eventTypes.contains(id))
+    {
+        NX_ERROR(
+            this,
+            "Register event constructor failed: %1 constructor is already registered",
+            id);
+        return false;
+    }
+
+    m_eventTypes.insert(id, constructor);
     return true;
 }
 
@@ -256,11 +281,8 @@ bool Engine::registerAction(const ItemDescriptor& descriptor, const ActionConstr
         return false;
     }
 
-    if (constructor)
-    {
-        if (!registerActionConstructor(descriptor.id, constructor))
-            return false;
-    }
+    if (!registerActionConstructor(descriptor.id, constructor))
+        return false;
 
     m_actionDescriptors.insert(descriptor.id, descriptor);
 
@@ -408,6 +430,23 @@ api::Rule Engine::serialize(const Rule* rule) const
     result.schedule = rule->schedule();
 
     return result;
+}
+
+EventPtr Engine::buildEvent(const EventData& eventData) const
+{
+    const QString eventType = eventData.value(utils::kType).toString();
+    if (!NX_ASSERT(m_eventTypes.contains(eventType)))
+        return EventPtr();
+
+    auto eventConstructor = m_eventTypes.value(eventType);
+    auto event = EventPtr(eventConstructor());
+    for (const auto& propertyName: nx::utils::propertyNames(event.get()))
+    {
+        if (eventData.contains(propertyName))
+            event->setProperty(propertyName.toUtf8(), eventData.value(propertyName));
+    }
+
+    return event;
 }
 
 std::unique_ptr<EventFilter> Engine::buildEventFilter(const api::EventFilter& serialized) const
@@ -691,7 +730,7 @@ void Engine::processEvent(const EventPtr& event)
             //    resources += builder->affectedResources(eventData);
             //}
 
-            for (const auto& fieldName: utils::propertyNames(event.get()))
+            for (const auto& fieldName: nx::utils::propertyNames(event.get()))
             {
                 eventFields += fieldName;
             }
@@ -722,6 +761,10 @@ void Engine::processAcceptedEvent(const QnUuid& ruleId, const EventData& eventDa
         return;
 
     const auto& rule = it->second;
+
+    auto event = buildEvent(eventData);
+    if (!NX_ASSERT(event))
+        return;
 
     for (const auto builder: rule->actionBuilders())
     {

@@ -22,6 +22,7 @@ class NX_VMS_RULES_API DeviceIpConflictEvent: public BasicEvent
 public:
     static const ItemDescriptor& manifest();
 
+    DeviceIpConflictEvent() = default;
     DeviceIpConflictEvent(
         QnUuid deviceId,
         std::chrono::microseconds timestamp,

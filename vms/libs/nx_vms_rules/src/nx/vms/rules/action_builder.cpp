@@ -2,10 +2,12 @@
 
 #include "action_builder.h"
 
-#include <QtCore/QSet>
+#include <QtCore/QJsonValue>
 #include <QtCore/QScopedValueRollback>
+#include <QtCore/QSet>
 #include <QtCore/QVariant>
 
+#include <nx/utils/log/assert.h>
 #include <nx/utils/qobject.h>
 
 #include "action_field.h"

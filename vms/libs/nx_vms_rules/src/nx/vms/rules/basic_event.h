@@ -9,6 +9,7 @@
 #include <QtCore/QSharedPointer>
 
 #include <nx/vms/api/rules/event_info.h>
+#include <nx/vms/api/types/event_rule_types.h>
 
 #include "manifest.h"
 #include "rules_fwd.h"
@@ -25,9 +26,8 @@ class NX_VMS_RULES_API BasicEvent: public QObject
     Q_OBJECT
     using base_type = QObject;
 
+    Q_PROPERTY(QString type READ type)
     Q_PROPERTY(std::chrono::microseconds timestamp MEMBER m_timestamp)
-    Q_PROPERTY(QString caption READ caption WRITE setCaption)
-    Q_PROPERTY(QString description READ description WRITE setDescription)
 
 public:
     using State = nx::vms::api::rules::EventInfo::State;
@@ -37,11 +37,6 @@ public:
     explicit BasicEvent(std::chrono::microseconds timestamp);
 
     QString type() const;
-
-    virtual QString caption() const;
-    virtual void setCaption(const QString& caption);
-    virtual QString description() const;
-    virtual void setDescription(const QString& description);
 
 protected:
     BasicEvent() = default;

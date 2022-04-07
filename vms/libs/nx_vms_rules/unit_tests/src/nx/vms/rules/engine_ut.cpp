@@ -1,7 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/rules/action_builder.h>
@@ -12,6 +12,7 @@
 
 #include "mock_engine_events.h"
 #include "test_action.h"
+#include "test_event.h"
 #include "test_field.h"
 #include "test_router.h"
 
@@ -47,6 +48,7 @@ protected:
     }
 
     std::unique_ptr<Engine> engine;
+    Engine::EventConstructor testEventConstructor = [] { return new TestEvent; };
     Engine::ActionConstructor testActionConstructor = [] { return new TestAction; };
     Engine::EventFieldConstructor testEventFieldConstructor = [] { return new TestEventField; };
     Engine::ActionFieldConstructor testActionFieldConstructor = [] { return new TestActionField; };
@@ -90,8 +92,8 @@ TEST_F(EngineTest, invalidDescriptorMustNotBeRegistered)
 {
     ItemDescriptor emptyDescriptor;
 
-    ASSERT_FALSE(engine->registerEvent(emptyDescriptor));
-    ASSERT_FALSE(engine->registerAction(emptyDescriptor));
+    ASSERT_FALSE(engine->registerEvent(emptyDescriptor, testEventConstructor));
+    ASSERT_FALSE(engine->registerAction(emptyDescriptor, testActionConstructor));
 
     ASSERT_TRUE(engine->events().empty());
     ASSERT_TRUE(engine->actions().empty());
@@ -106,8 +108,8 @@ TEST_F(EngineTest, descriptionWithoutIdMustNotBeRegistered)
 {
     ItemDescriptor descriptorWithoutId {.displayName = "Name"};
 
-    ASSERT_FALSE(engine->registerEvent(descriptorWithoutId));
-    ASSERT_FALSE(engine->registerAction(descriptorWithoutId));
+    ASSERT_FALSE(engine->registerEvent(descriptorWithoutId, testEventConstructor));
+    ASSERT_FALSE(engine->registerAction(descriptorWithoutId, testActionConstructor));
 
     ASSERT_TRUE(engine->events().empty());
     ASSERT_TRUE(engine->actions().empty());
@@ -117,8 +119,8 @@ TEST_F(EngineTest, descriptionWithoutNameMustNotBeRegistered)
 {
     ItemDescriptor descriptorWithoutName {.id = "nx.descriptor.id"};
 
-    ASSERT_FALSE(engine->registerEvent(descriptorWithoutName));
-    ASSERT_FALSE(engine->registerAction(descriptorWithoutName));
+    ASSERT_FALSE(engine->registerEvent(descriptorWithoutName, testEventConstructor));
+    ASSERT_FALSE(engine->registerAction(descriptorWithoutName, testActionConstructor));
 
     ASSERT_TRUE(engine->events().empty());
     ASSERT_TRUE(engine->actions().empty());
@@ -131,7 +133,7 @@ TEST_F(EngineTest, validDescriptorMustBeRegistered)
         .displayName = "Event Name",
         .description = "Event Description"};
 
-    ASSERT_TRUE(engine->registerEvent(eventDescriptor));
+    ASSERT_TRUE(engine->registerEvent(eventDescriptor, testEventConstructor));
 
     ASSERT_EQ(engine->events().size(), 1);
 
@@ -144,7 +146,7 @@ TEST_F(EngineTest, validDescriptorMustBeRegistered)
         .displayName = "Action Name",
         .description = "Action Description"};
 
-    ASSERT_TRUE(engine->registerAction(actionDescriptor));
+    ASSERT_TRUE(engine->registerAction(actionDescriptor, testActionConstructor));
 
     ASSERT_EQ(engine->actions().size(), 1);
 
@@ -171,8 +173,8 @@ TEST_F(EngineTest, descriptorMustNotBeRegisteredIfSomeOfTheFieldsNotRegistered)
 
     // As an nx.field.test is not registered, an event filter must not be created for the
     // event descriptor contained such a field.
-    ASSERT_FALSE(engine->registerEvent(descriptorWithNotRegisteredField));
-    ASSERT_FALSE(engine->registerAction(descriptorWithNotRegisteredField));
+    ASSERT_FALSE(engine->registerEvent(descriptorWithNotRegisteredField, testEventConstructor));
+    ASSERT_FALSE(engine->registerAction(descriptorWithNotRegisteredField, testActionConstructor));
 }
 
 TEST_F(EngineTest, eventFieldBuiltWithCorrectType)
@@ -209,7 +211,7 @@ TEST_F(EngineTest, eventFilterBuiltWithCorrectType)
             }
         }};
 
-    ASSERT_TRUE(engine->registerEvent(eventDescriptor));
+    ASSERT_TRUE(engine->registerEvent(eventDescriptor, testEventConstructor));
 
     auto eventFilter = engine->buildEventFilter(kTestEventId);
 
@@ -242,7 +244,7 @@ TEST_F(EngineTest, manifestFieldNamesShouldBeUnique)
     };
 
     // Manifest fields should have different names.
-    ASSERT_FALSE(engine->registerEvent(eventDescriptor));
+    ASSERT_FALSE(engine->registerEvent(eventDescriptor, testEventConstructor));
 }
 
 TEST_F(EngineTest, actionFieldBuiltWithCorrectType)
@@ -279,7 +281,7 @@ TEST_F(EngineTest, actionBuilderBuiltWithCorrectTypeAndCorrectFields)
             }
         }};
 
-    ASSERT_TRUE(engine->registerAction(actionDescriptor));
+    ASSERT_TRUE(engine->registerAction(actionDescriptor, testActionConstructor));
 
     auto actionBuilder = engine->buildActionBuilder(kTestActionId);
 

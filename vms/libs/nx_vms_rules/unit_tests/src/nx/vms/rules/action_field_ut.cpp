@@ -70,7 +70,7 @@ public:
     TextWithFieldsTest()
         :engine(new Engine(std::make_unique<TestRouter>()))
     {
-        engine->registerEvent(TestEvent::manifest());
+        engine->registerEvent(TestEvent::manifest(), []{ return new TestEvent(); });
     }
 };
 

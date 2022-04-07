@@ -16,6 +16,7 @@ class NX_VMS_RULES_API DeviceDisconnectedEvent: public BasicEvent
     FIELD(QnUuid, deviceId, setDeviceId)
 
 public:
+    DeviceDisconnectedEvent() = default;
     DeviceDisconnectedEvent(QnUuid deviceId, std::chrono::microseconds timestamp);
 
     static const ItemDescriptor& manifest();

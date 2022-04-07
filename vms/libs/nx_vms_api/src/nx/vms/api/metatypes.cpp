@@ -104,6 +104,7 @@ void Metatypes::initialize()
     qRegisterMetaType<DiscoveredServerData>();
     qRegisterMetaType<DiscoveredServerDataList>();
     qRegisterMetaType<EventReason>();
+    qRegisterMetaTypeStreamOperators<EventReason>();
     qRegisterMetaType<EventRuleData>();
     qRegisterMetaType<EventRuleDataList>();
     qRegisterMetaType<FullInfoData>();
@@ -169,6 +170,7 @@ void Metatypes::initialize()
     qRegisterMetaType<VideowallControlMessageData>();
     qRegisterMetaType<VideoWallLicenseOverflowData>();
     qRegisterMetaType<WebPageData>();
+    qRegisterMetaType<rules::EventInfo>();
 
     // Section for QnResourceDataJsonSerializer to work.
     QnJsonSerializer::registerSerializer<nx::vms::api::Credentials>();

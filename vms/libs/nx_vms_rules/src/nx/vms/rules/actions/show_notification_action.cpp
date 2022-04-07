@@ -20,8 +20,14 @@ const ItemDescriptor& NotificationAction::manifest()
             makeFieldDescriptor<TargetUserField>("users", tr("To")),
             makeFieldDescriptor<OptionalTimeField>("interval", tr("Interval of action")),
             makeFieldDescriptor<FlagField>("acknowledge", tr("Force Acknowledgement")),
-            makeFieldDescriptor<TextWithFields>("caption", tr("Custom caption"), QString()),
-            makeFieldDescriptor<TextWithFields>("description", tr("Custom description"), QString())
+            makeFieldDescriptor<TextWithFields>("caption", tr("Caption"), QString(),
+                {
+                    { "text", "{@EventCaption}" }
+                }),
+            makeFieldDescriptor<TextWithFields>("description", tr("Description"), QString(),
+                {
+                    { "text", "{@EventDescription}" }
+                })
         }
     };
     return kDescriptor;

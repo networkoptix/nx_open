@@ -14,7 +14,7 @@ bool ResourceFilterField::match(const QVariant& value) const
 {
     return m_acceptAll
         ? true
-        : m_ids.contains(value.toUuid());
+        : m_ids.contains(value.value<QnUuid>());
 }
 
 bool ResourceFilterField::acceptAll() const

@@ -18,10 +18,11 @@ public:
     using EventReason = nx::vms::api::EventReason;
 
     FIELD(QnUuid, serverId, setServerId)
-    FIELD(EventReason, reasonCode, setReasonCode)
+    FIELD(nx::vms::api::EventReason, reasonCode, setReasonCode)
     FIELD(QString, reasonText, setReasonText)
 
 public:
+    ReasonedEvent() = default;
     ReasonedEvent(
         QnUuid serverId,
         std::chrono::microseconds timestamp,

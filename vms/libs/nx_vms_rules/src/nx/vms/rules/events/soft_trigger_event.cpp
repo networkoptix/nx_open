@@ -8,18 +8,6 @@
 
 namespace nx::vms::rules {
 
-QString SoftTriggerEvent::caption() const
-{
-    return m_caption.isEmpty()
-        ? QString("%1 %2").arg(manifest().displayName).arg(m_triggerName)
-        : m_caption;
-}
-
-void SoftTriggerEvent::setCaption(const QString& caption)
-{
-    m_caption = caption;
-}
-
 FilterManifest SoftTriggerEvent::filterManifest()
 {
     return {};

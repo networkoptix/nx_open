@@ -19,16 +19,9 @@ class NX_VMS_RULES_API DebugEvent: public BasicEvent
 public:
     DebugEvent() = default;
     DebugEvent(
-        const QString& caption,
-        const QString& description,
         const QString& action,
         qint64 value,
         std::chrono::microseconds timestamp);
-
-    virtual QString caption() const override;
-    virtual void setCaption(const QString& caption) override;
-    virtual QString description() const override;
-    virtual void setDescription(const QString& description) override;
 
     static FilterManifest filterManifest();
     static const ItemDescriptor& manifest();

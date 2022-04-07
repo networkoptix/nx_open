@@ -22,21 +22,18 @@ public:
     SoftTriggerEvent(
         const QnUuid& cameraId,
         const QnUuid& userId,
-        std::chrono::microseconds timestamp):
+        const QString& triggerName,
+        std::chrono::microseconds timestamp)
+        :
         BasicEvent(timestamp),
         m_cameraId(cameraId),
-        m_userId(userId)
+        m_userId(userId),
+        m_triggerName(triggerName)
     {
     }
 
-    virtual QString caption() const override;
-    virtual void setCaption(const QString& caption) override;
-
     static FilterManifest filterManifest();
     static const ItemDescriptor& manifest();
-
-private:
-    QString m_caption;
 };
 
 } // namespace nx::vms::rules
