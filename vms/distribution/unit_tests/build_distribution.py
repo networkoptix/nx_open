@@ -205,7 +205,7 @@ def main():
             archiveByGlob(a, "mediaserver plugins", target_plugins_dir,
                 join(conf.BUILD_DIR, plugins_dir), lib_glob)
             archiveByGlob(a, "mediaserver optional plugins", target_plugins_optional_dir,
-                join(conf.BUILD_DIR, plugins_optional_dir), lib_glob)
+                join(conf.BUILD_DIR, plugins_optional_dir), lib_glob, recursive=True)
             for plugin_group in ["sqldrivers", "platforms", "webview"]:
                 archiveByGlob(a, f"Qt plugins from {plugin_group}", join(bin_dir, plugin_group),
                     join(conf.QT_DIR, "plugins", plugin_group), lib_glob)
