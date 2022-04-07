@@ -235,6 +235,7 @@ private:
     void processMetadata(const QnAbstractCompressedMetadataPtr& metadata);
     void notifyExternalTimeSrcAboutEof(bool isEof);
     bool isNvrFillerPacket(qint64 timestampUs) const;
+    void pushMetadataToConsumers(const QnAbstractCompressedMetadataPtr& metadata);
 protected:
 
     struct AudioFormat
