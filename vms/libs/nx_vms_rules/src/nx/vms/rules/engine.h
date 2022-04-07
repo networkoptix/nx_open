@@ -94,7 +94,13 @@ public:
      * Registers the event to the engine.
      * @return Whether the event was registered successfully.
      */
-    bool registerEvent(const ItemDescriptor& descriptor);
+    bool registerEvent(const ItemDescriptor& descriptor, const EventConstructor& constructor);
+
+    /**
+     * Registers the event constructor to the engine.
+     * @return Whether the event constructor is registered successfully.
+     */
+    bool registerEventConstructor(const QString& id, const EventConstructor& constructor);
 
     /** Map of all the registered events. */
     const QMap<QString, ItemDescriptor>& events() const;
@@ -108,7 +114,7 @@ public:
      * Registers the action to the engine.
      * @return Whether the action is registered successfully.
      */
-    bool registerAction(const ItemDescriptor& descriptor, const ActionConstructor& constructor = {});
+    bool registerAction(const ItemDescriptor& descriptor, const ActionConstructor& constructor);
 
     /**
      * Registers the action constructor to the engine.
@@ -159,6 +165,13 @@ public:
     // Declare following methods public for testing purposes.
     std::unique_ptr<Rule> buildRule(const api::Rule& serialized) const;
     api::Rule serialize(const Rule* rule) const;
+
+    /**
+     * Builds an event from the eventData and returns it.
+     * If the eventData doesn't contains 'type' value or there is no constructor is registered
+     * for such a type nullptr is returned.
+     */
+    EventPtr buildEvent(const EventData& eventData) const;
 
     std::unique_ptr<EventFilter> buildEventFilter(const api::EventFilter& serialized) const;
     api::EventFilter serialize(const EventFilter* filter) const;
@@ -221,6 +234,7 @@ private:
     QHash<QString, EventFieldConstructor> m_eventFields;
     QHash<QString, ActionFieldConstructor> m_actionFields;
 
+    QHash<QString, EventConstructor> m_eventTypes;
     QHash<QString, ActionConstructor> m_actionTypes;
 
     RuleSet m_rules;

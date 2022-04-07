@@ -27,22 +27,4 @@ QString BasicEvent::type() const
     return utils::type(metaObject()); //< Assert?
 }
 
-QString BasicEvent::caption() const
-{
-    return {};
-}
-
-void BasicEvent::setCaption(const QString&)
-{
-}
-
-QString BasicEvent::description() const
-{
-    return {};
-}
-
-void BasicEvent::setDescription(const QString&)
-{
-}
-
 } // namespace nx::vms::rules

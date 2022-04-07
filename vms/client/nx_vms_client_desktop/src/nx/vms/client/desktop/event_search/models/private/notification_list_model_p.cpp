@@ -146,20 +146,16 @@ NotificationListModel::Private::Private(NotificationListModel* q):
         this,
         [this](const QSharedPointer<nx::vms::rules::NotificationAction>& notificationAction)
         {
-            // #mmalofeev does it need action id?
-
-            QnResourcePtr resource = resourcePool()->getResourceById(notificationAction->sourceId());
-
             EventData eventData;
-            eventData.id = QnUuid::createUuid();
+            eventData.id = QnUuid::createUuid(); //< #mmalofeev Is it ok to use new id here?
             eventData.title = notificationAction->caption();
             eventData.description = notificationAction->description();
+            eventData.toolTip = notificationAction->tooltip();
             eventData.lifetime = kDisplayTimeout;
             eventData.removable = true;
             eventData.extraData =
-                QVariant::fromValue(ExtraData(notificationAction->ruleId(), resource));
+                QVariant::fromValue(ExtraData(notificationAction->ruleId(), {}));
             eventData.timestamp = notificationAction->timestamp();
-            eventData.source = resource;
 
             if (!this->q->addEvent(eventData))
                 return;

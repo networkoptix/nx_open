@@ -7,9 +7,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QSharedPointer>
 
-#include <nx/vms/api/rules/event_info.h>
-
-#include "field_types.h"
 #include "manifest.h"
 
 namespace nx::vms::rules {
@@ -31,15 +28,12 @@ class NX_VMS_RULES_API BasicAction: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(std::chrono::microseconds timestamp READ timestamp WRITE setTimestamp)
-    Q_PROPERTY(QString eventType READ eventType WRITE setEventType)
 
 public:
     QString type() const;
 
     std::chrono::microseconds timestamp() const;
     void setTimestamp(std::chrono::microseconds timestamp);
-    QString eventType() const;
-    void setEventType(const QString& eventType);
 
     /** Returns a rule id the action belongs to. */
     QnUuid ruleId() const;
@@ -50,7 +44,6 @@ protected:
 
 private:
     std::chrono::microseconds m_timestamp;
-    QString m_eventType;
     QnUuid m_ruleId;
 };
 

@@ -26,16 +26,6 @@ void BasicAction::setTimestamp(std::chrono::microseconds timestamp)
     m_timestamp = timestamp;
 }
 
-QString BasicAction::eventType() const
-{
-    return m_eventType;
-}
-
-void BasicAction::setEventType(const QString& eventType)
-{
-    m_eventType = eventType;
-}
-
 QnUuid BasicAction::ruleId() const
 {
     return m_ruleId;

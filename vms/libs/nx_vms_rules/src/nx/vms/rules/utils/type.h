@@ -4,6 +4,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QMetaObject>
+#include <QtCore/QMetaClassInfo>
 
 namespace nx::vms::rules::utils {
 
@@ -21,6 +22,5 @@ QString type()
 {
     return type(&T::staticMetaObject);
 }
-
 
 } // namespace nx::vms::rules::utils
