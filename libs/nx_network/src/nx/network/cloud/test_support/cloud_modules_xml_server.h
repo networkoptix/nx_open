@@ -36,11 +36,16 @@ public:
     void setHpmUdpUrl(const nx::utils::Url& url);
     void setNotificationModuleUrl(const nx::utils::Url& url);
     void setSpeedTestUrl(const nx::utils::Url& url);
+    void setModule(const std::string& resName, const nx::utils::Url& resValue);
+
+    /**
+     * @return a string containing the serialized cloud modules in xml format.
+     */
+    std::string xml() const;
+
+    void clear();
 
 private:
-    void setModule(const char* resName, const nx::utils::Url& resValue);
-    QByteArray serializeModules() const;
-
     void serve(
         network::http::RequestContext requestContext,
         network::http::RequestProcessedHandler handler);

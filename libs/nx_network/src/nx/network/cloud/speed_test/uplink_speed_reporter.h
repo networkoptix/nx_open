@@ -4,14 +4,13 @@
 
 #include <optional>
 
-#include <nx/utils/subscription.h>
-#include <nx/utils/url.h>
-
 #include <nx/network/aio/scheduler.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/cloud/mediator/api/connection_speed.h>
 #include <nx/network/cloud/speed_test/abstract_speed_tester.h>
+#include <nx/utils/subscription.h>
+#include <nx/utils/url.h>
 
 namespace nx::hpm::api { class Client; }
 
@@ -36,7 +35,7 @@ class NX_NETWORK_API UplinkSpeedReporter:
     using base_type = aio::BasicPollable;
 public:
     /**
-     * Note: url in speedTestSettings has no effect, it is fetched from cloud_modules.xml
+     * NOTE: url in speedTestSettings has no effect, it is fetched from cloud_modules.xml
      */
     UplinkSpeedReporter(
         const nx::utils::Url& cloudModulesXmlUrl,
@@ -63,6 +62,11 @@ public:
      * Invoked when fetching the mediator address completes.
      */
     void setFetchMediatorAddressHandler(FetchMediatorAddressHandler handler);
+
+    /**
+     * Replaces cloud_modules.xml url given in constructor. Must be called before start().
+     */
+    void setCloudModulesXmlUrl(const nx::utils::Url& url);
 
     /**
      * Checks for valid system credentials and listens for them to be set, invoking a speed test
