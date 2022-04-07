@@ -2,8 +2,10 @@
 
 #include "metatypes.h"
 
+#include <common/common_meta_types.h>
 #include <nx/fusion/serialization/json_functions.h>
 
+#include "basic_event.h"
 #include "field_types.h"
 
 namespace nx::vms::rules {
@@ -15,6 +17,10 @@ void Metatypes::initialize()
 
     if (initialized.exchange(true))
         return;
+
+    QnCommonMetaTypes::initialize();
+
+    qRegisterMetaType<nx::vms::rules::EventPtr>();
 
     qRegisterMetaType<QnUuidList>("QnUuidList");
     QnJsonSerializer::registerSerializer<QnUuidList>();

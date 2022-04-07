@@ -35,7 +35,6 @@ nx_add_target(nx_vms_common LIBRARY
         nx_fusion
         nx_sdk
         cloud_db_client
-        nx_vms_rules
         nx_vms_update
     FOLDER common/libs
 )

@@ -79,8 +79,6 @@
 #include <nx/vms/event/events/poe_over_budget_event.h>
 #include <nx/vms/event/events/server_certificate_error.h>
 #include <nx/vms/event/rule.h>
-#include <nx/vms/rules/basic_event.h>
-#include <nx/vms/rules/metatypes.h>
 #include <nx_ec/ec_api_common.h>
 #include <nx_ec/ec_api_fwd.h>
 #include <recording/stream_recorder.h>
@@ -102,7 +100,6 @@ void QnCommonMetaTypes::initialize()
 
     nx::utils::Metatypes::initialize();
     nx::vms::api::Metatypes::initialize();
-    nx::vms::rules::Metatypes::initialize();
 
     qRegisterMetaType<uintptr_t>("uintptr_t");
 
@@ -189,8 +186,6 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<nx::vms::event::AbstractEventPtr>();
     qRegisterMetaType<nx::vms::event::RulePtr>();
     qRegisterMetaType<nx::vms::event::RuleList>();
-
-    qRegisterMetaType<nx::vms::rules::EventPtr>();
 
     qRegisterMetaType<QnAbstractDataPacketPtr>();
     qRegisterMetaType<QnConstAbstractDataPacketPtr>();

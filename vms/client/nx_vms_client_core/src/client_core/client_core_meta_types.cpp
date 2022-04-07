@@ -9,55 +9,54 @@
 
 #include <qt_helpers/scene_position_listener.h>
 
-#include <core/resource/camera_resource.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/layout_resource.h>
-#include <core/resource/videowall_resource.h>
-#include <test/qml_test_helper.h>
-#include <ui/models/authentication_data_model.h>
-#include <ui/models/system_hosts_model.h>
-#include <ui/models/ordered_systems_model.h>
-#include <ui/models/model_data_accessor.h>
-#include <ui/positioners/grid_positioner.h>
 #include <client/forgotten_systems_manager.h>
-#include <helpers/nx_globals_object.h>
 #include <common/common_meta_types.h>
-
+#include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/videowall_resource.h>
+#include <helpers/nx_globals_object.h>
+#include <nx/fusion/model_functions.h>
+#include <nx/vms/api/data/software_version.h>
 #include <nx/vms/api/types/dewarping_types.h>
 #include <nx/vms/client/core/animation/kinetic_animation.h>
 #include <nx/vms/client/core/common/data/motion_selection.h>
+#include <nx/vms/client/core/common/helpers/texture_size_helper.h>
 #include <nx/vms/client/core/common/utils/collator.h>
 #include <nx/vms/client/core/common/utils/encoded_credentials.h>
+#include <nx/vms/client/core/common/utils/path_util.h>
 #include <nx/vms/client/core/common/utils/properties_sync.h>
 #include <nx/vms/client/core/common/utils/property_update_filter.h>
-#include <nx/vms/client/core/common/utils/path_util.h>
 #include <nx/vms/client/core/common/utils/validators.h>
 #include <nx/vms/client/core/common/utils/velocity_meter.h>
-#include <nx/vms/client/core/common/helpers/texture_size_helper.h>
 #include <nx/vms/client/core/graphics/shader_helper.h>
 #include <nx/vms/client/core/items/grid_viewport.h>
-#include <nx/vms/client/core/thumbnails/abstract_resource_thumbnail.h>
-#include <nx/vms/client/core/settings/welcome_screen_info.h>
 #include <nx/vms/client/core/media/media_player.h>
+#include <nx/vms/client/core/motion/helpers/camera_motion_helper.h>
+#include <nx/vms/client/core/motion/helpers/media_player_motion_provider.h>
+#include <nx/vms/client/core/motion/items/motion_mask_item.h>
 #include <nx/vms/client/core/network/oauth_client.h>
-#include <nx/vms/client/core/resource/resource_helper.h>
+#include <nx/vms/client/core/network/server_certificate_validation_level.h>
 #include <nx/vms/client/core/resource/media_dewarping_params.h>
 #include <nx/vms/client/core/resource/media_resource_helper.h>
-#include <nx/vms/client/core/motion/helpers/media_player_motion_provider.h>
-#include <nx/vms/client/core/motion/helpers/camera_motion_helper.h>
-#include <nx/vms/client/core/motion/items/motion_mask_item.h>
-#include <nx/vms/client/core/network/server_certificate_validation_level.h>
-#include <nx/vms/client/core/ui/frame_section.h>
-#include <nx/vms/client/core/utils/geometry.h>
-#include <nx/vms/client/core/utils/persistent_index_watcher.h>
+#include <nx/vms/client/core/resource/resource_helper.h>
+#include <nx/vms/client/core/settings/welcome_screen_info.h>
+#include <nx/vms/client/core/thumbnails/abstract_resource_thumbnail.h>
 #include <nx/vms/client/core/time/display_time_helper.h>
-#include <nx/vms/client/core/utils/file_io.h>
-#include <nx/vms/client/core/utils/quick_item_mouse_tracker.h>
-#include <nx/vms/client/core/utils/operation_manager.h>
 #include <nx/vms/client/core/two_way_audio/two_way_audio_controller.h>
-#include <nx/vms/api/data/software_version.h>
-
-#include <nx/fusion/model_functions.h>
+#include <nx/vms/client/core/ui/frame_section.h>
+#include <nx/vms/client/core/utils/file_io.h>
+#include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/core/utils/operation_manager.h>
+#include <nx/vms/client/core/utils/persistent_index_watcher.h>
+#include <nx/vms/client/core/utils/quick_item_mouse_tracker.h>
+#include <nx/vms/rules/metatypes.h>
+#include <test/qml_test_helper.h>
+#include <ui/models/authentication_data_model.h>
+#include <ui/models/model_data_accessor.h>
+#include <ui/models/ordered_systems_model.h>
+#include <ui/models/system_hosts_model.h>
+#include <ui/positioners/grid_positioner.h>
 
 namespace nx::vms::client::core {
 
@@ -78,6 +77,7 @@ void initializeMetaTypes()
         return;
 
     QnCommonMetaTypes::initialize();
+    nx::vms::rules::Metatypes::initialize();
 
     QnJsonSerializer::registerSerializer<EncodedCredentials>();
 

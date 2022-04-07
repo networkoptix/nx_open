@@ -42,8 +42,6 @@
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
-#include <nx/vms/rules/engine.h>
-#include <nx/vms/rules/rule.h>
 #include <nx/vms/time/abstract_time_sync_manager.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/data/api_conversion_functions.h>
@@ -79,8 +77,6 @@
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/event/rule_manager.h>
 #include <nx/vms/event/rule.h>
-#include <nx/vms/rules/engine.h>
-#include <nx/vms/rules/rule.h>
 #include <nx/vms/time/abstract_time_sync_manager.h>
 #include <utils/common/synctime.h>
 
@@ -405,27 +401,15 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     const auto vmsRulesManager = connection->vmsRulesNotificationManager();
     connect(
         vmsRulesManager,
-        &ec2::AbstractVmsRulesNotificationManager::ruleUpdated,
+        &ec2::AbstractVmsRulesNotificationManager::eventReceived,
         this,
-        &QnCommonMessageProcessor::on_vmsRuleUpdated,
-        connectionType);
-    connect(
-        vmsRulesManager,
-        &ec2::AbstractVmsRulesNotificationManager::ruleRemoved,
-        this,
-        &QnCommonMessageProcessor::on_vmsRuleRemoved,
+        &QnCommonMessageProcessor::vmsEventReceived,
         connectionType);
     connect(
         vmsRulesManager,
         &ec2::AbstractVmsRulesNotificationManager::reset,
         this,
-        &QnCommonMessageProcessor::on_vmsRulesReset,
-        connectionType);
-    connect(
-        vmsRulesManager,
-        &ec2::AbstractVmsRulesNotificationManager::eventReceived,
-        this,
-        &QnCommonMessageProcessor::vmsEventReceived,
+        [this]{ resetVmsRules({}); },
         connectionType);
 
     const auto storedFileManager = connection->storedFileNotificationManager();
@@ -842,25 +826,6 @@ void QnCommonMessageProcessor::on_broadcastBusinessAction(const vms::event::Abst
     emit businessActionReceived(action);
 }
 
-void QnCommonMessageProcessor::on_vmsRuleUpdated(
-    const nx::vms::api::rules::Rule& ruleData,
-    ec2::NotificationSource source)
-{
-    auto engine = m_context->vmsRulesEngine();
-    if (auto rule = engine->buildRule(ruleData))
-        engine->updateRule(std::move(rule));
-}
-
-void QnCommonMessageProcessor::on_vmsRuleRemoved(QnUuid id)
-{
-    m_context->vmsRulesEngine()->removeRule(id);
-}
-
-void QnCommonMessageProcessor::on_vmsRulesReset()
-{
-    resetVmsRules({});
-}
-
 void QnCommonMessageProcessor::handleTourAddedOrUpdated(const nx::vms::api::LayoutTourData& tour)
 {
     m_context->layoutTourManager()->addOrUpdateTour(tour);
@@ -932,7 +897,7 @@ void QnCommonMessageProcessor::resetEventRules(const nx::vms::api::EventRuleData
 
 void QnCommonMessageProcessor::resetVmsRules(const nx::vms::api::rules::RuleList& vmsRules)
 {
-    m_context->vmsRulesEngine()->init(m_context->peerId(), vmsRules);
+    emit vmsRulesReset(m_context->peerId(), vmsRules);
 }
 
 void QnCommonMessageProcessor::resetAccessRights(const AccessRightsDataList& accessRights)

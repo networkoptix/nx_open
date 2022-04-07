@@ -25,6 +25,8 @@ namespace nx::vms::api { enum class PeerType; }
 
 namespace nx::vms::client::core { class NetworkModule; }
 
+namespace nx::vms::rules { class Engine; }
+
 class QnClientCoreModule: public QObject, public Singleton<QnClientCoreModule>
 {
     Q_OBJECT
@@ -61,6 +63,8 @@ public:
     QQmlEngine* mainQmlEngine();
 
     QnCloudStatusWatcher* cloudStatusWatcher() const;
+
+    nx::vms::rules::Engine* vmsRulesEngine() const;
 
 private:
     struct Private;

@@ -3,8 +3,7 @@
 nx_add_target(nx_vms_rules
     LIBRARY
     PUBLIC_LIBS
-        nx_network
-        nx_vms_api
+        nx_vms_common
     FOLDER common/libs
 )
 

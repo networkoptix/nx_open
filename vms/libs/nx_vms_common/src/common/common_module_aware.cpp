@@ -145,12 +145,6 @@ nx::vms::event::RuleManager* QnCommonModuleAware::eventRuleManager() const
     return m_commonModule ? m_commonModule->eventRuleManager() : nullptr;
 }
 
-nx::vms::rules::Engine* QnCommonModuleAware::vmsRulesEngine() const
-{
-    NX_ASSERT(m_initialized);
-    return m_commonModule ? m_commonModule->vmsRulesEngine() : nullptr;
-}
-
 QnAuditManager* QnCommonModuleAware::auditManager() const
 {
     NX_ASSERT(m_initialized);

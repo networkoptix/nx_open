@@ -2,13 +2,16 @@
 
 #include "rules_table_model.h"
 
+#include <client_core/client_core_module.h>
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/action_field.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
+#include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_field.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/events/generic_event.h>
+#include <nx/vms/rules/rule.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_vms_rules_manager.h>
 
@@ -225,8 +228,7 @@ void RulesTableModel::SimplifiedRule::update(const QVector<int>& roles)
 
 RulesTableModel::RulesTableModel(QObject* parent):
     QAbstractTableModel(parent),
-    QnWorkbenchContextAware(parent),
-    engine(vmsRulesEngine())
+    engine(qnClientCoreModule->vmsRulesEngine())
 {
     initialise();
 

@@ -28,6 +28,7 @@
 #include <nx/vms/client/core/thumbnails/thumbnail_image_provider.h>
 #include <nx/vms/client/core/utils/operation_manager.h>
 #include <nx/vms/client/core/watchers/known_server_connections.h>
+#include <nx/vms/rules/engine_holder.h>
 #include <plugins/resource/desktop_audio_only/desktop_audio_only_resource.h>
 #include <watchers/cloud_status_watcher.h>
 
@@ -41,6 +42,7 @@ struct QnClientCoreModule::Private
     std::unique_ptr<NetworkModule> networkModule;
     std::unique_ptr<QnDataProviderFactory> resourceDataProviderFactory;
     std::unique_ptr<QnCloudStatusWatcher> cloudStatusWatcher;
+    std::unique_ptr<nx::vms::rules::EngineHolder> vmsRulesEngineHolder;
     QQmlEngine* qmlEngine = nullptr;
 };
 
@@ -107,6 +109,8 @@ QnClientCoreModule::QnClientCoreModule(
 
     d->resourceDataProviderFactory->registerResourceType<QnDesktopAudioOnlyResource>();
     d->cloudStatusWatcher = std::make_unique<QnCloudStatusWatcher>(d->commonModule.get());
+
+    d->vmsRulesEngineHolder = std::make_unique<nx::vms::rules::EngineHolder>(commonModule());
 }
 
 QnClientCoreModule::~QnClientCoreModule()
@@ -165,4 +169,9 @@ QQmlEngine* QnClientCoreModule::mainQmlEngine()
 QnCloudStatusWatcher* QnClientCoreModule::cloudStatusWatcher() const
 {
     return d->cloudStatusWatcher.get();
+}
+
+nx::vms::rules::Engine* QnClientCoreModule::vmsRulesEngine() const
+{
+    return d->vmsRulesEngineHolder->engine();
 }
