@@ -2,43 +2,18 @@
 
 #pragma once
 
-#include <tuple>
-#include <optional>
-#include <type_traits>
-
-#include <nx/fusion/model_functions_fwd.h>
-
-#include "access_rights_data.h"
-#include "user_role_data.h"
+#include "user_group_model.h"
 
 namespace nx::vms::api {
 
-// TODO: #muskov Move UserRoleModel into v1::UserRoleModel for /rest/v1/userRoles
-// Introduce v2::UserGroupModel for /rest/v2/userGroups
-
 /**%apidoc User role information object.
+ * %param[unused] parentRoleIds
+ * %// Deprecated, used in /rest/v1/userRoles only, use UserGroupModel with /rest/v{2-}/userGroups
+ * %// instead.
  */
-struct NX_VMS_API UserRoleModel: UserRoleData
+struct UserRoleModel: UserGroupModel
 {
     bool operator==(const UserRoleModel& other) const = default;
-
-    /**%apidoc[opt] List of accessible resource ids for the user role. */
-    std::optional<std::vector<QnUuid>> accessibleResources;
-
-    using DbReadTypes = std::tuple<UserRoleData, AccessRightsData>;
-    using DbUpdateTypes = std::tuple<UserRoleData, std::optional<AccessRightsData>>;
-    using DbListTypes = std::tuple<UserRoleDataList, AccessRightsDataList>;
-
-    QnUuid getId() const { return id; }
-    void setId(QnUuid id_) { id = std::move(id_); }
-    static_assert(isCreateModelV<UserRoleModel>);
-    static_assert(isUpdateModelV<UserRoleModel>);
-
-    DbUpdateTypes toDbTypes() &&;
-    static std::vector<UserRoleModel> fromDbTypes(DbListTypes data);
 };
-
-#define UserRoleModel_Fields UserRoleData_Fields (accessibleResources)
-QN_FUSION_DECLARE_FUNCTIONS(UserRoleModel, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
 
 } // namespace nx::vms::api

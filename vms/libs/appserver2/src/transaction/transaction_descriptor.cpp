@@ -1229,6 +1229,32 @@ struct AdminOnlyAccessOut
     }
 };
 
+struct SaveUserRoleAccess
+{
+    Result operator()(
+        QnCommonModule* commonModule,
+        const Qn::UserAccessData& accessData,
+        const nx::vms::api::UserRoleData& param)
+    {
+        if (auto r = AdminOnlyAccess()(commonModule, accessData, param); !r)
+        {
+            r.message = NX_FMT("Saving user role is forbidden because the user has no admin access");
+            return r;
+        }
+
+        const auto parentRoles = commonModule->userRolesManager()->userRoles(param.parentRoleIds);
+        if (const auto cycledRole =
+            nx::utils::find_if(parentRoles, [&](const auto& role) { return role.id == param.id; }))
+        {
+            return Result(ErrorCode::forbidden, NX_FMT(
+                "Parent role cycle is forbidden: This role is already inherided by: %1",
+                cycledRole->name));
+        }
+
+        return Result();
+    }
+};
+
 struct RemoveUserRoleAccess
 {
     Result operator()(
@@ -1238,7 +1264,7 @@ struct RemoveUserRoleAccess
     {
         if (auto r = AdminOnlyAccess()(commonModule, accessData, param); !r)
         {
-            r.message = NX_FMT("Removing user role is forbidden because the user has no admin access.");
+            r.message = NX_FMT("Removing user role is forbidden because the user has no admin access");
             return r;
         }
 
@@ -1247,7 +1273,7 @@ struct RemoveUserRoleAccess
             if (nx::utils::find_if(user->userRoleIds(), [&](const auto& id) { return id == param.id; }))
             {
                 QString errorMessage = NX_FMT(
-                    "Removing user role is forbidden because the role is still used by the user %1",
+                    "Removing user role is forbidden because the role is still used by the user: %1",
                     user->getName());
                 return Result(ErrorCode::forbidden, std::move(errorMessage));
             }
@@ -1258,7 +1284,7 @@ struct RemoveUserRoleAccess
             if (nx::utils::find_if(role.parentRoleIds, [&](const auto& id) { return id == param.id; }))
             {
                 QString errorMessage = NX_FMT(
-                    "Removing user role is forbidden because the role is still inherited by the role %1",
+                    "Removing user role is forbidden because the role is still inherited by the role: %1",
                     role.name);
                 return Result(ErrorCode::forbidden, std::move(errorMessage));
             }

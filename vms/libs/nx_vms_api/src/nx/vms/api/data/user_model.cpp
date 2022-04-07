@@ -5,14 +5,12 @@
 #include <nx/utils/std/algorithm.h>
 #include <nx/fusion/model_functions.h>
 
-namespace nx {
-namespace vms {
-namespace api {
+namespace nx::vms::api {
 
-QN_FUSION_ADAPT_STRUCT(UserModel, UserModel_Fields)
-QN_FUSION_DEFINE_FUNCTIONS(UserModel, (csv_record)(json)(ubjson)(xml))
+QN_FUSION_ADAPT_STRUCT(UserModelBase, UserModelBase_Fields)
+QN_FUSION_DEFINE_FUNCTIONS(UserModelBase, (csv_record)(json)(ubjson)(xml))
 
-UserModel::DbUpdateTypes UserModel::toDbTypes() &&
+UserModelBase::DbUpdateTypes UserModelBase::toDbTypesBase() &&
 {
     UserDataEx user;
     user.id = std::move(id);
@@ -37,8 +35,6 @@ UserModel::DbUpdateTypes UserModel::toDbTypes() &&
     }
     user.fullName = std::move(fullName);
     user.permissions = std::move(permissions);
-    if (!userRoleId.isNull())
-        user.userRoleIds.push_back(std::move(userRoleId));
     user.email = std::move(email);
     user.isEnabled = std::move(isEnabled);
     if (password)
@@ -63,43 +59,96 @@ UserModel::DbUpdateTypes UserModel::toDbTypes() &&
     return {std::move(user), std::move(accessRights)};
 }
 
-std::vector<UserModel> UserModel::fromDbTypes(DbListTypes all)
+UserModelBase UserModelBase::fromDbTypesBase(
+    UserData&& baseData, AccessRightsDataList&& allAccessRights)
 {
-    auto& baseList = std::get<std::vector<UserData>>(all);
-    const auto size = baseList.size();
-    std::vector<UserModel> result;
-    result.reserve(size);
-    auto& allAccessRights = std::get<AccessRightsDataList>(all);
+    UserModelBase model;
+    model.id = std::move(baseData.id);
+    model.name = std::move(baseData.name);
+    model.type = api::type(baseData);
+    model.fullName = std::move(baseData.fullName);
+    model.isOwner = baseData.isAdmin;
+    model.permissions = std::move(baseData.permissions);
+    model.email = std::move(baseData.email);
+    model.isHttpDigestEnabled = baseData.isCloud
+        ? false
+        : (baseData.digest != UserData::kHttpIsDisabledStub);
+    model.isEnabled = std::move(baseData.isEnabled);
+    model.digest = std::move(baseData.digest);
+    model.hash = std::move(baseData.hash);
+    model.cryptSha512Hash = std::move(baseData.cryptSha512Hash);
+    model.realm = std::move(baseData.realm);
+
+    auto accessRights = nx::utils::find_if(allAccessRights,
+        [id = model.getId()](const auto& accessRights) { return accessRights.userId == id; });
+    if (accessRights)
+        model.accessibleResources = std::move(accessRights->resourceIds);
+
+    return model;
+}
+
+QN_FUSION_ADAPT_STRUCT(UserModelV1, UserModelV1_Fields)
+QN_FUSION_DEFINE_FUNCTIONS(UserModelV1, (csv_record)(json)(ubjson)(xml))
+
+UserModelV1::DbUpdateTypes UserModelV1::toDbTypes() &&
+{
+    auto result = std::move(*this).toDbTypesBase();
+    auto& user = std::get<UserDataEx>(result);
+    if (!userRoleId.isNull())
+        user.userRoleIds.push_back(std::move(userRoleId));
+    return result;
+}
+
+std::vector<UserModelV1> UserModelV1::fromDbTypes(DbListTypes data)
+{
+    auto& baseList = std::get<std::vector<UserData>>(data);
+    auto& accessRights = std::get<AccessRightsDataList>(data);
+
+    std::vector<UserModelV1> result;
+    result.reserve(baseList.size());
     for (auto& baseData: baseList)
     {
-        UserModel model;
-        model.id = std::move(baseData.id);
-        model.name = std::move(baseData.name);
-        model.type = api::type(baseData);
-        model.fullName = std::move(baseData.fullName);
-        model.isOwner = baseData.isAdmin;
-        model.permissions = std::move(baseData.permissions);
-        model.userRoleId = baseData.userRoleIds.empty() ? QnUuid() : std::move(baseData.userRoleIds[0]);
-        model.email = std::move(baseData.email);
-        model.isHttpDigestEnabled = baseData.isCloud
-            ? false
-            : (baseData.digest != UserData::kHttpIsDisabledStub);
-        model.isEnabled = std::move(baseData.isEnabled);
-        model.digest = std::move(baseData.digest);
-        model.hash = std::move(baseData.hash);
-        model.cryptSha512Hash = std::move(baseData.cryptSha512Hash);
-        model.realm = std::move(baseData.realm);
+        UserModelV1 model;
+        static_cast<UserModelBase&>(model) =
+            fromDbTypesBase(std::move(baseData), std::move(accessRights));
 
-        auto accessRights = nx::utils::find_if(allAccessRights,
-            [id = model.getId()](const auto& accessRights) { return accessRights.userId == id; });
-        if (accessRights)
-            model.accessibleResources = std::move(accessRights->resourceIds);
+        model.userRoleId = baseData.userRoleIds.empty()
+            ? QUuid()
+            : baseData.userRoleIds.front();
 
         result.push_back(std::move(model));
     }
     return result;
 }
 
-} // namespace api
-} // namespace vms
-} // namespace nx
+QN_FUSION_ADAPT_STRUCT(UserModelV2, UserModelV2_Fields)
+QN_FUSION_DEFINE_FUNCTIONS(UserModelV2, (csv_record)(json)(ubjson)(xml))
+
+UserModelV1::DbUpdateTypes UserModelV2::toDbTypes() &&
+{
+    auto result = std::move(*this).toDbTypesBase();
+    auto& user = std::get<UserDataEx>(result);
+    user.userRoleIds = std::move(userGroupIds);
+    return result;
+}
+
+std::vector<UserModelV2> UserModelV2::fromDbTypes(DbListTypes data)
+{
+    auto& baseList = std::get<std::vector<UserData>>(data);
+    auto& accessRights = std::get<AccessRightsDataList>(data);
+
+    std::vector<UserModelV2> result;
+    result.reserve(baseList.size());
+    for (auto& baseData: baseList)
+    {
+        UserModelV2 model;
+        static_cast<UserModelBase&>(model) =
+            fromDbTypesBase(std::move(baseData), std::move(accessRights));
+
+        model.userGroupIds = std::move(baseData.userRoleIds);
+        result.push_back(std::move(model));
+    }
+    return result;
+}
+
+} // namespace nx::vms::api
