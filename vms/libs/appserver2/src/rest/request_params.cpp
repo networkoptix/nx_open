@@ -166,7 +166,6 @@ void toUrlParams(const nx::vms::api::StorageParentId& id, QUrlQuery* query)
 }
 
 bool parseHttpRequestParams(
-    QnCommonModule* /*commonModule*/,
     const QString& /*command*/,
     const nx::network::rest::Params& params,
     Qn::SerializationFormat* format)

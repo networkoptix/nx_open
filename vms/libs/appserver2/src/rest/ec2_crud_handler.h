@@ -27,7 +27,7 @@ public:
 
     std::vector<Model> read(Filter filter, const nx::network::rest::Request& request)
     {
-        auto processor = m_queryProcessor->getAccess(request.owner->accessRights());
+        auto processor = m_queryProcessor->getAccess(request.userSession);
         validateType(processor, filter);
 
         auto query =
@@ -58,7 +58,7 @@ public:
 
     void delete_(DeleteInput id, const nx::network::rest::Request& request)
     {
-        auto processor = getProcessorForUpdate(request);
+        auto processor = m_queryProcessor->getAccess(request.userSession);
         validateType(processor, id);
 
         std::promise<Result> promise;
@@ -78,7 +78,7 @@ public:
     void update(Model data, const nx::network::rest::Request& request)
     {
         std::promise<Result> promise;
-        auto processor = getProcessorForUpdate(request);
+        auto processor = m_queryProcessor->getAccess(request.userSession);
         if constexpr (toDbTypesExists<Model>::value)
         {
             auto id = data.getId();
@@ -208,14 +208,6 @@ private:
     {
         return callUpdateFuncImpl(
             t, std::forward<F>(f), std::make_index_sequence<sizeof...(Args)>{});
-    }
-
-    auto getProcessorForUpdate(const nx::network::rest::Request& request)
-    {
-        auto processor = m_queryProcessor->getAccess(Qn::UserSession(
-            std::move(request.owner->accessRights()),
-            std::move(request.owner->authSession())));
-        return processor;
     }
 
     static void throwError(Result r)

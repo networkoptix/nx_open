@@ -117,6 +117,15 @@ NX_NETWORK_API HttpHeaders::iterator insertHeader(
 NX_NETWORK_API void removeHeader(
     HttpHeaders* const headers, const std::string& name);
 
+/**
+ * Adds CORS to headers. supportedOrigins must be equal to '*' or a comma separated origins
+ * supported.
+ */
+NX_NETWORK_API void insertOrReplaceCorsHeaders(
+    HttpHeaders* headers,
+    const class Method& method,
+    std::string origin,
+    const std::string& supportedOrigins);
 
 /** Parses data and saves header name and data to *headerName and *headerValue. */
 NX_NETWORK_API bool parseHeader(
@@ -517,6 +526,15 @@ public:
     void setDeletedCookie(const std::string& name);
     std::map<std::string, std::string> getCookies() const;
 };
+
+NX_NETWORK_API HttpHeader deletedCookieHeader(
+    const std::string& name, const std::string& path = "/");
+
+NX_NETWORK_API HttpHeader cookieHeader(
+    const std::string& name,
+    const std::string& value,
+    const std::string& path = "/",
+    bool secure = true);
 
 inline bool operator==(const Response& left, const Response& right)
 {
