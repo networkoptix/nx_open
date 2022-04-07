@@ -730,7 +730,7 @@ APPLY(506, saveUserRole, nx::vms::api::UserRoleData, \
                        false, /*isRemoveOperation*/ \
                        CreateHashByIdHelper(), \
                        UserNotificationManagerHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
+                       SaveUserRoleAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \

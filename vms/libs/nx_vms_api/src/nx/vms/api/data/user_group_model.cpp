@@ -1,20 +1,24 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "user_role_model.h"
+#include "user_group_model.h"
 
 #include <nx/utils/std/algorithm.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/api/json/uuid_mover.h>
 
-namespace nx {
-namespace vms {
-namespace api {
+namespace nx::vms::api {
 
-QN_FUSION_ADAPT_STRUCT(UserRoleModel, UserRoleModel_Fields)
-QN_FUSION_DEFINE_FUNCTIONS(UserRoleModel, (csv_record)(json)(ubjson)(xml))
+QN_FUSION_ADAPT_STRUCT(UserGroupModel, UserGroupModel_Fields)
+QN_FUSION_DEFINE_FUNCTIONS(UserGroupModel, (csv_record)(json)(ubjson)(xml))
 
-UserRoleModel::DbUpdateTypes UserRoleModel::toDbTypes() &&
+UserGroupModel::DbUpdateTypes UserGroupModel::toDbTypes() &&
 {
+    UserRoleData userRole;
+    userRole.id = std::move(id);
+    userRole.name = std::move(name);
+    userRole.permissions = std::move(permissions);
+    userRole.parentRoleIds = std::move(parentGroupIds);
+
     std::optional<AccessRightsData> accessRights;
     if (accessibleResources)
     {
@@ -24,20 +28,22 @@ UserRoleModel::DbUpdateTypes UserRoleModel::toDbTypes() &&
         data.checkResourceExists = CheckResourceExists::no;
         accessRights = std::move(data);
     }
-    return {std::move(*this), std::move(accessRights)};
+
+    return {std::move(userRole), std::move(accessRights)};
 }
 
-std::vector<UserRoleModel> UserRoleModel::fromDbTypes(DbListTypes all)
+std::vector<UserGroupModel> UserGroupModel::fromDbTypes(DbListTypes all)
 {
     auto& baseList = std::get<UserRoleDataList>(all);
-    std::vector<UserRoleModel> result;
+    std::vector<UserGroupModel> result;
     result.reserve(baseList.size());
     for (auto& baseData: baseList)
     {
-        UserRoleModel model;
+        UserGroupModel model;
         model.id = std::move(baseData.id);
         model.name = std::move(baseData.name);
         model.permissions = std::move(baseData.permissions);
+        model.parentGroupIds = std::move(baseData.parentRoleIds);
 
         auto accessRights = nx::utils::find_if(
             std::get<AccessRightsDataList>(all),
@@ -50,6 +56,4 @@ std::vector<UserRoleModel> UserRoleModel::fromDbTypes(DbListTypes all)
     return result;
 }
 
-} // namespace api
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::api
