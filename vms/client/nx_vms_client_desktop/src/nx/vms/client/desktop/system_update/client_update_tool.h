@@ -18,6 +18,8 @@
 
 namespace nx::vms::applauncher::api { enum class ResultType; }
 
+namespace nx::vms::client::core { struct LogonData; }
+
 namespace nx::vms::common::p2p::downloader {
 
 class ResourcePoolPeerManager;
@@ -142,9 +144,7 @@ public:
     /**
      * Updates URL of the current mediaserver.
      */
-    void setServerUrl(
-        const QnUuid& serverId,
-        const nx::vms::client::core::ConnectionInfo& connectionInfo);
+    void setServerUrl(const nx::vms::client::core::LogonData& logonData);
 
     void checkServersInSystem();
 

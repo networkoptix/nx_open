@@ -10,11 +10,7 @@
 #include <ui/dialogs/common/dialog.h>
 #include <utils/common/connective.h>
 
-class QnMediaServerUpdateTool;
-
-namespace Ui {
-class QnCompatibilityVersionInstallationDialog;
-}
+namespace Ui { class QnCompatibilityVersionInstallationDialog; }
 
 namespace nx::vms::api { struct ModuleInformation; }
 namespace nx::vms::client::core { struct LogonData; }
@@ -55,7 +51,7 @@ public:
     QString errorString() const;
 
 protected:
-    int startUpdate();
+    void startUpdate();
     void processUpdateContents(const nx::vms::client::desktop::UpdateContents& contents);
     void setMessage(const QString& message);
 

@@ -155,14 +155,9 @@ std::pair<bool /*success*/, bool /*confirmRestart*/> downloadCompatibleVersion(
     else
         errorString = extras;
 
-    QnMessageBox dialog(QnMessageBoxIcon::Critical,
-        QnConnectionDiagnosticsHelper::tr("Failed to enter compatibility mode for version %1")
-            .arg(moduleInformation.version.toString()),
-        errorString,
-        QDialogButtonBox::Ok,
-        QDialogButtonBox::NoButton,
-        parentWidget);
-    dialog.exec();
+    QnConnectionDiagnosticsHelper::showCompatibilityModeFailureMessage(
+        moduleInformation.version, errorString, parentWidget);
+
     return {/*success*/ false, /*confirmRestart*/ false};
 }
 
@@ -370,6 +365,21 @@ void QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
         });
 
     msgBox.exec();
+}
+
+void QnConnectionDiagnosticsHelper::showCompatibilityModeFailureMessage(
+        const nx::vms::api::SoftwareVersion& version,
+        const QString& errorDescription,
+        QWidget* parentWidget)
+{
+    QnMessageBox dialog(QnMessageBoxIcon::Critical,
+        QnConnectionDiagnosticsHelper::tr("Failed to enter compatibility mode for version %1")
+            .arg(version.toString()),
+        errorDescription,
+        QDialogButtonBox::Ok,
+        QDialogButtonBox::NoButton,
+        parentWidget);
+    dialog.exec();
 }
 
 bool QnConnectionDiagnosticsHelper::getInstalledVersions(

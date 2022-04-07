@@ -247,17 +247,18 @@ std::future<UpdateContents> ClientUpdateTool::requestUpdateInfoFromServer(
         });
 }
 
-void ClientUpdateTool::setServerUrl(
-    const QnUuid& serverId,
-    const nx::vms::client::core::ConnectionInfo& connectionInfo)
+void ClientUpdateTool::setServerUrl(const core::LogonData& logonData)
 {
+    const auto serverId =
+        NX_ASSERT(logonData.expectedServerId) ? *logonData.expectedServerId : QnUuid();
+
     m_serverConnection.reset(
         new rest::ServerConnection(
             serverId,
             /*auditId*/ commonModule()->sessionId(),
             qnClientCoreModule->networkModule()->certificateVerifier(),
-            connectionInfo.address,
-            connectionInfo.credentials));
+            logonData.address,
+            logonData.credentials));
     m_peerManager->setServerDirectConnection(serverId, m_serverConnection);
     m_proxyPeerManager->setServerDirectConnection(serverId, m_serverConnection);
 }

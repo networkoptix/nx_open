@@ -467,7 +467,7 @@ bool StartupActionsHandler::connectUsingCustomUri(const nx::vms::utils::SystemUr
         auth.user.toStdString(),
         nx::network::http::PasswordAuthToken(auth.password.toStdString()));
 
-    LogonData logonData({address, credentials});
+    LogonData logonData(core::LogonData{.address = address, .credentials = credentials});
     logonData.storeSession = false;
     logonData.secondaryInstance = true;
     logonData.connectScenario = ConnectScenario::connectUsingCommand;

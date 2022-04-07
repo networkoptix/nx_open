@@ -428,12 +428,11 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     {
         const nx::vms::api::ModuleInformation& moduleInformation = connection->moduleInformation();
 
-        m_clientUpdateTool->setServerUrl(
-            moduleInformation.id,
-            {
-                connection->address(),
-                connection->credentials()
-            });
+        m_clientUpdateTool->setServerUrl(core::LogonData{
+            .address = connection->address(),
+            .credentials = connection->credentials(),
+            .expectedServerId = moduleInformation.id,
+        });
         //m_clientUpdateTool->requestRemoteUpdateInfo();
     }
     // Force update when we open dialog.

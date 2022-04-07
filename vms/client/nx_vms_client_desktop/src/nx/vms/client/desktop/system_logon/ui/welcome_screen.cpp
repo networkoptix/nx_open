@@ -537,7 +537,10 @@ void WelcomeScreen::connectToSystemInternal(
 
     NX_DEBUG(this, "Delayed connect to the system %1 after click on tile", address);
 
-    LogonData logonData({address, credentials, nx::vms::api::UserType::local, serverId});
+    LogonData logonData(core::LogonData{
+        .address = address,
+        .credentials = credentials,
+        .expectedServerId = serverId});
     logonData.storePassword = storePassword;
     logonData.connectScenario = ConnectScenario::connectFromTile;
 
