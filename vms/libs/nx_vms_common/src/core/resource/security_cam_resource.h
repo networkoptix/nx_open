@@ -40,9 +40,6 @@ protected:
 
 public:
     static constexpr int kDefaultMaxFps = 15;
-    static const int kDefaultSecondStreamFpsLow;
-    static const int kDefaultSecondStreamFpsMedium;
-    static const int kDefaultSecondStreamFpsHigh;
     static const Qn::LicenseType kDefaultLicenseType;
     static QnUuid makeCameraIdFromPhysicalId(const QString& physicalId);
 
@@ -391,8 +388,6 @@ public:
     void setCameraControlDisabled(bool value);
     bool isCameraControlDisabledInternal() const;
     virtual bool isCameraControlDisabled() const;
-
-    int defaultSecondaryFps(Qn::StreamQuality quality) const;
 
     // TODO: #2.4 #rvasilenko #High Move to runtime data
     Qn::CameraStatusFlags statusFlags() const;
