@@ -34,6 +34,7 @@ public:
     {
         connect,
         merge,
+        connectInCompatibilityMode,
     };
 
     enum class Reason

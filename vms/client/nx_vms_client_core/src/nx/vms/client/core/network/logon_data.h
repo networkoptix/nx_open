@@ -5,6 +5,7 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/socket_common.h>
 #include <nx/vms/api/data/user_data.h>
+#include <nx/vms/common/network/server_compatibility_validator.h>
 
 namespace nx::vms::client::core {
 
@@ -27,6 +28,12 @@ struct LogonData
      * Type of the user.
      */
     nx::vms::api::UserType userType = nx::vms::api::UserType::local;
+
+    using Purpose = nx::vms::common::ServerCompatibilityValidator::Purpose;
+    /**
+     * Connection purpose affects the way, how Server compatibility is checked.
+     */
+    Purpose purpose = Purpose::connect;
 
     /**
      * Id of the Server we expect to connect. Reqired to avoid passing stored credentials to another

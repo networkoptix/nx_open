@@ -392,8 +392,10 @@ void LoginDialog::at_testButton_clicked()
     }
     else if (setupNewServerRequested)
     {
-        LogonData logonData(
-            {address, credentials, nx::vms::api::UserType::local, expectedNewServerId});
+        LogonData logonData(core::LogonData{
+            .address = address,
+            .credentials = credentials,
+            .expectedServerId = expectedNewServerId});
 
         menu()->trigger(ui::action::SetupFactoryServerAction,
             ui::action::Parameters().withArgument(Qn::LogonDataRole, logonData));

@@ -121,7 +121,8 @@ RemoteConnectionErrorCode toConnectionErrorCode(nx::cloud::db::api::ResultCode r
 
 std::string publicKey(const nx::network::ssl::CertificateChain& chain)
 {
-    return NX_ASSERT(!chain.empty()) ? chain[0].publicKey() : "";
+    return (nx::network::ini().verifyVmsSslCertificates && NX_ASSERT(!chain.empty()))
+        ? chain[0].publicKey() : "";
 }
 
 } // namespace

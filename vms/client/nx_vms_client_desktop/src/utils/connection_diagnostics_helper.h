@@ -43,6 +43,11 @@ public:
         const nx::vms::api::SoftwareVersion& engineVersion,
         QWidget* parentWidget = nullptr);
 
+    static void showCompatibilityModeFailureMessage(
+        const nx::vms::api::SoftwareVersion& version,
+        const QString& errorDescription,
+        QWidget* parentWidget);
+
     static void failedRestartClientMessage(QWidget* parent);
 
     static QString developerModeText(

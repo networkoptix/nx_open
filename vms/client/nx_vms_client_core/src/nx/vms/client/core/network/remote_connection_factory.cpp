@@ -164,7 +164,7 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
                 context->error = RemoteConnectionErrorCode::factoryServer;
             }
             else if (const auto incompatibilityReason = ServerCompatibilityValidator::check(
-                context->moduleInformation))
+                context->moduleInformation, context->logonData.purpose))
             {
                 context->error = toErrorCode(*incompatibilityReason);
             }
@@ -539,7 +539,8 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
             return;
 
         context->certificateCache = std::make_shared<CertificateCache>();
-        if (NX_ASSERT(!context->certificateChain.empty()))
+        if (nx::network::ini().verifyVmsSslCertificates
+            && NX_ASSERT(!context->certificateChain.empty()))
         {
             context->certificateCache->addCertificate(
                 context->moduleInformation.id,
@@ -641,8 +642,7 @@ void RemoteConnectionFactory::shutdown()
 }
 
 RemoteConnectionFactory::ProcessPtr RemoteConnectionFactory::connect(
-    LogonData logonData,
-    Callback callback)
+    LogonData logonData, Callback callback)
 {
     ensureUserNameIsLowercaseIfDigest(logonData.credentials);
 
