@@ -67,7 +67,7 @@ static void updateActivity()
 
 // a lot of small audio packets in bluray HD audio codecs. So, previous size 7 is not enought
 static const int CL_MAX_DISPLAY_QUEUE_SIZE = 20;
-static const int CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE = 20;
+static const int CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE = 30;
 
 static const int DEFAULT_AUDIO_BUFF_SIZE = 1000 * 4;
 
@@ -1157,6 +1157,17 @@ bool QnCamDisplay::useSync(QnConstAbstractMediaDataPtr md)
 
 void QnCamDisplay::putData(const QnAbstractDataPacketPtr& data)
 {
+    // Put analytics/motion packets directly to their conumers to save space in the dataQueue.
+    if (const auto& metadata = std::dynamic_pointer_cast<QnAbstractCompressedMetadata>(data))
+    {
+        if (metadata->metadataType == MetadataType::ObjectDetection
+            || metadata->metadataType == MetadataType::Motion)
+        {
+            pushMetadataToConsumers(metadata);
+            return;
+        }
+    }
+
     QnCompressedVideoDataPtr video = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
     if (video)
     {
@@ -1293,7 +1304,7 @@ void QnCamDisplay::processMetadata(const QnAbstractCompressedMetadataPtr& metada
 {
     if (metadata->metadataType == MetadataType::MediaStreamEvent)
     {
-        const QByteArray data = QByteArray::fromRawData(metadata->data(), (int) metadata->dataSize());
+        const QByteArray data = QByteArray::fromRawData(metadata->data(), (int)metadata->dataSize());
 
         {
             NX_MUTEX_LOCKER locker(&m_lastMediaEventMutex);
@@ -1323,6 +1334,11 @@ void QnCamDisplay::processMetadata(const QnAbstractCompressedMetadataPtr& metada
         }
     }
 
+    pushMetadataToConsumers(metadata);
+}
+
+void QnCamDisplay::pushMetadataToConsumers(const QnAbstractCompressedMetadataPtr & metadata)
+{
     NX_MUTEX_LOCKER lock(&m_metadataConsumersHashMutex);
     const auto consumers = m_metadataConsumerByType;
     lock.unlock();
