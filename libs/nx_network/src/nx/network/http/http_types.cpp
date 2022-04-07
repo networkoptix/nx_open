@@ -126,6 +126,36 @@ void removeHeader(HttpHeaders* const headers, const std::string& name)
     headers->erase(name);
 }
 
+static bool hasOrigin(const std::string& origins, const std::string& origin)
+{
+    std::vector<std::string_view> tokens;
+    nx::utils::split(origins, ',', std::back_inserter(tokens));
+    return std::find(tokens.begin(), tokens.end(), origin) != tokens.end();
+}
+
+void insertOrReplaceCorsHeaders(
+    HttpHeaders* headers,
+    const Method& method,
+    std::string origin,
+    const std::string& supportedOrigins)
+{
+    if (!origin.empty() && (supportedOrigins == "*" || hasOrigin(supportedOrigins, origin)))
+    {
+        insertOrReplaceHeader(headers, HttpHeader("Access-Control-Allow-Credentials", "true"));
+        insertOrReplaceHeader(
+            headers, HttpHeader("Access-Control-Allow-Origin", std::move(origin)));
+    }
+    if (method == Method::get)
+        return;
+
+    insertOrReplaceHeader(headers,
+        HttpHeader("Access-Control-Allow-Methods", "POST, PUT, PATCH, DELETE, GET, OPTIONS"));
+    insertOrReplaceHeader(
+        headers, HttpHeader("Access-Control-Allow-Headers", "X-PINGOTHER, Content-Type"));
+    insertOrReplaceHeader(headers, HttpHeader("Access-Control-Max-Age", "600"));
+    insertOrReplaceHeader(headers, HttpHeader("Vary", "Accept-Encoding, Origin"));
+}
+
 //-------------------------------------------------------------------------------------------------
 // parse utils
 
@@ -788,20 +818,32 @@ std::string Response::toMultipartString(const ConstBufferRefType& boundary) cons
 
 static constexpr char kSetCookieHeaderName[] = "Set-Cookie";
 
+HttpHeader deletedCookieHeader(const std::string& name, const std::string& path)
+{
+    return {kSetCookieHeaderName,
+        name + "=" + kDeletedCookieValue + "; Path=" + path
+            + "; expires=Thu, 01 Jan 1970 00:00 : 00 GMT"};
+}
+
+HttpHeader cookieHeader(
+    const std::string& name, const std::string& value, const std::string& path, bool secure)
+{
+    // Using SameSite=None if cookie is secure to mimic old browser behavior, see:
+    //     https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite
+    return {kSetCookieHeaderName,
+        name + "=" + value + "; Path=" + path + (secure ? "; SameSite=None; Secure" : "")};
+}
+
 void Response::setCookie(
     const std::string& name, const std::string& value,
     const std::string& path, bool secure)
 {
-    // Using SameSite=None if cookie is secure to mimic old browser behavior, see:
-    //     https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite
-    auto header = name + "=" + value + "; Path=" + path + (secure ? "; SameSite=None; Secure" : "");
-    insertHeader(&headers, {kSetCookieHeaderName, std::move(header)});
+    insertHeader(&headers, cookieHeader(name, value, path, secure));
 }
 
 void Response::setDeletedCookie(const std::string& name)
 {
-    insertHeader(&headers, {kSetCookieHeaderName,
-        name + "=" + kDeletedCookieValue + "; Path=/; expires=Thu, 01 Jan 1970 00:00 : 00 GMT"});
+    insertHeader(&headers, deletedCookieHeader(name));
 }
 
 std::map<std::string, std::string> Response::getCookies() const
