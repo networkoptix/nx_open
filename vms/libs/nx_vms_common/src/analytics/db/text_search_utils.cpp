@@ -121,7 +121,7 @@ void TextMatcher::matchExactAttributes(
             [&condition](const auto& attr)
             {
                 return attr.name.compare(condition.name, Qt::CaseInsensitive) == 0
-                    && attr.value.startsWith(condition.value, Qt::CaseInsensitive);
+                    && attr.value.contains(condition.value, Qt::CaseInsensitive);
             };
         bool matched = condition.isNegative
             ? std::none_of(attributes.begin(), attributes.end(), comparator)
@@ -189,7 +189,7 @@ bool TextMatcher::wordMatchAnyOfAttributes(
             const auto words = QStringView(attribute.value).split(' ', Qt::SkipEmptyParts);
             return std::any_of(
                 words.cbegin(), words.cend(),
-                [&token](auto& word) { return word.startsWith(token, Qt::CaseInsensitive); });
+                [&token](auto& word) { return word.contains(token, Qt::CaseInsensitive); });
         });
 }
 
