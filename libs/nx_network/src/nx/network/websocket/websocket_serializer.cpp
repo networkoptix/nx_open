@@ -39,7 +39,7 @@ Serializer::Serializer(bool masked, unsigned mask)
 }
 
 nx::Buffer Serializer::prepareMessage(
-    nx::Buffer payload, FrameType type, CompressionType compressionType)
+    const nx::Buffer& payload, FrameType type, CompressionType compressionType)
 {
     m_doCompress = shouldMessageBeCompressed(type, compressionType, payload.size());
     return prepareFrame(payload, type, /*fin*/true);
@@ -48,7 +48,14 @@ nx::Buffer Serializer::prepareMessage(
 nx::Buffer Serializer::prepareFrame(nx::Buffer payload, FrameType type, bool fin)
 {
     if (m_doCompress)
-        payload = nx::utils::bstream::gzip::Compressor::compressData(std::move(payload), false);
+    {
+        payload = nx::utils::bstream::gzip::Compressor::deflateData(std::move(payload));
+        /* https://datatracker.ietf.org/doc/html/rfc7692#section-7.2.3.4
+         * deflateData() generates DEFLATE block with BFINAL bit set.
+         * Such payload should be flushed with empty uncompressed DEFLATE block with BFINAL set to 0.
+         * */
+        payload.append("\x0", 1);
+    }
 
     nx::Buffer header;
     int payloadLenType = payloadLenTypeByLen(payload.size());

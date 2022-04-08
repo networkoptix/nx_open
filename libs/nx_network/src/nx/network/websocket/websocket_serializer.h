@@ -13,7 +13,7 @@ class NX_NETWORK_API Serializer
 public:
     Serializer(bool masked, unsigned mask = 0);
 
-    nx::Buffer prepareMessage(nx::Buffer payload, FrameType type, CompressionType compressionType);
+    nx::Buffer prepareMessage(const nx::Buffer& payload, FrameType type, CompressionType compressionType);
     nx::Buffer prepareFrame(nx::Buffer payload, FrameType type, bool fin);
 
 private:
