@@ -40,6 +40,7 @@ struct OauthClient::Private: public QObject
         const QString& clientId);
 
     void issueAccessToken();
+    std::string email() const;
 };
 
 OauthClient::Private::Private(
@@ -98,6 +99,22 @@ void OauthClient::Private::issueAccessToken()
     m_connection->oauthManager()->issueToken(request, std::move(handler));
 }
 
+std::string OauthClient::Private::email() const
+{
+    auto email = authData.credentials.username;
+
+    if (email.empty())
+    {
+        RemoteConnectionAware connectionHelper;
+        auto remoteConnection = connectionHelper.connection();
+
+        if (remoteConnection && remoteConnection->connectionInfo().isCloud())
+            email = remoteConnection->credentials().username;
+    }
+
+    return email;
+}
+
 //-------------------------------------------------------------------------------------------------
 // OauthClient
 
@@ -147,22 +164,12 @@ QUrl OauthClient::url() const
         builder.addQueryItem("client_id", d->clientId);
 
     if (d->authData.empty()) //< Request auth code.
-    {
         builder.addQueryItem("response_type", "code");
-
-        RemoteConnectionAware connectionHelper;
-        auto remoteConnection = connectionHelper.connection();
-
-        if (remoteConnection && remoteConnection->connectionInfo().isCloud())
-            builder.addQueryItem("email", remoteConnection->credentials().username);
-    }
     else if (!d->authData.credentials.authToken.empty()) //< Request 2FA validation.
-    {
-        if (!d->authData.credentials.username.empty())
-            builder.addQueryItem("email", d->authData.credentials.username);
-
         builder.addQueryItem("access_token", d->authData.credentials.authToken.value);
-    }
+
+    if (const auto email = d->email(); !email.empty())
+        builder.addQueryItem("email", email);
 
     return builder.toUrl().toQUrl();
 }

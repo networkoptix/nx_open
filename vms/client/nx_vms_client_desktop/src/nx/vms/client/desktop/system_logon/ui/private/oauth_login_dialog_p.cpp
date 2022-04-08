@@ -8,13 +8,11 @@
 #include <QtWidgets/QProgressBar>
 #include <QtWidgets/QStackedWidget>
 
-#include <client_core/client_core_module.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/utils/async_handler_executor.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/network/oauth_client.h>
-#include <nx/vms/client/core/network/cloud_connection_factory.h>
-#include <nx/vms/client/core/utils/cloud_session_token_updater.h>
 #include <nx/vms/client/desktop/common/widgets/webview_widget.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
@@ -25,7 +23,6 @@
 
 namespace nx::vms::client::desktop {
 
-using namespace nx::cloud::db::api;
 using namespace nx::vms::client::core;
 
 static const QString kDesktopClientId = "desktopclient";
@@ -41,7 +38,6 @@ OauthLoginDialogPrivate::OauthLoginDialogPrivate(
     m_progressBar(new QProgressBar(parent)),
     m_webViewWidget(new WebViewWidget(parent)),
     m_placeholder(new OauthLoginPlaceholder(parent)),
-    m_cloudConnectionFactory(std::make_unique<core::CloudConnectionFactory>()),
     m_oauthClient(new OauthClient(
         clientType,
         OauthViewType::desktop,

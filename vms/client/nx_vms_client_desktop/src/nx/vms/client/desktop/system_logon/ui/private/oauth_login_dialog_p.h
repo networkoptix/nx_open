@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <QtCore/QObject>
-
 #include <memory>
+
+#include <QtCore/QObject>
 
 #include <nx/utils/url.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
@@ -69,16 +69,12 @@ public:
     QStackedWidget* m_stackedWidget = nullptr;
 
 private:
-    const QString m_cloudSystem;
     nx::utils::Url m_requestedUrl;
 
     QProgressBar* m_progressBar = nullptr;
     WebViewWidget* m_webViewWidget = nullptr;
     OauthLoginPlaceholder* m_placeholder = nullptr;
 
-    core::CloudAuthData m_authData;
-    std::unique_ptr<core::CloudConnectionFactory> m_cloudConnectionFactory;
-    std::unique_ptr<nx::cloud::db::api::Connection> m_connection;
     std::unique_ptr<nx::network::http::AsyncClient> m_checkClient;
     std::unique_ptr<core::OauthClient> m_oauthClient;
 };

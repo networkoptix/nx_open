@@ -140,6 +140,11 @@ void ConnectToCloudTool::requestCloudAuthData()
         this,
         &ConnectToCloudTool::cancel);
     m_oauthLoginDialog->setWindowModality(Qt::ApplicationModal);
+
+    // Prefill cloud username, if client is logged in.
+    m_oauthLoginDialog->setCredentials(
+        nx::network::http::Credentials(qnCloudStatusWatcher->credentials().username, {}));
+
     m_oauthLoginDialog->show();
 }
 
