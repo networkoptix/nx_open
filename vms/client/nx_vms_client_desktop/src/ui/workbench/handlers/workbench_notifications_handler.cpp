@@ -385,18 +385,25 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
 {
     NX_VERBOSE(this, "An action is received: %1", toString(action));
 
-    if (!QnBusiness::actionAllowedForUser(action, context()->user()))
+    const auto user = context()->user();
+    if (!user)
+    {
+        NX_DEBUG(this, "The user has logged out already");
+        return;
+    }
+
+    if (!QnBusiness::actionAllowedForUser(action, user))
     {
         NX_VERBOSE(
-            this, "The action is not allowed for the user %1", context()->user()->getName());
+            this, "The action is not allowed for the user %1", user->getName());
 
         return;
     }
 
-    if (!vms::event::hasAccessToSource(action->getRuntimeParams(), context()->user()))
+    if (!vms::event::hasAccessToSource(action->getRuntimeParams(), user))
     {
         NX_VERBOSE(
-            this, "User %1 has no access to the action's source", context()->user()->getName());
+            this, "User %1 has no access to the action's source", user->getName());
 
         return;
     }
