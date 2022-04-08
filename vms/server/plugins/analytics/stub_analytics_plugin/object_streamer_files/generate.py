@@ -37,6 +37,18 @@ class ObjectTypeSupportInfo:
         self.object_type_id = ''
         self.attributes: Sequence[str] = []
 
+class ObjectTypeSupportInfoEncoder(json.JSONEncoder):
+    '''JSON Encoder for ObjectTypeSupportInfo.'''
+
+    OBJECT_TYPE_ID_KEY = 'objectTypeId'
+    ATTRIBUTES_KEY = 'attributes'
+
+    def default(self, o: ObjectTypeSupportInfo) -> Dict:
+        result = {}
+        result[self.OBJECT_TYPE_ID_KEY] = o.object_type_id
+        result[self.ATTRIBUTES_KEY] = o.attributes
+        return result
+
 class ObjectTypeInfo:
     '''Information needed for Device Agent Manifest generation.'''
 
@@ -48,10 +60,10 @@ class Manifest:
     '''Device Agent Manifest for Object Streamer sub-plugin.'''
 
     class TypeLibrary:
-        '''
-        Type Library section of the Device Agent Manifest. Only "objectTypes" part is available
+        '''Type Library section of the Device Agent Manifest. Only "objectTypes" part is available
         now.
         '''
+
         OBJECT_TYPES_KEY = 'objectTypes'
         TYPE_ID_KEY = 'id'
         TYPE_NAME_KEY = 'name'
@@ -79,6 +91,31 @@ class Manifest:
         self.type_library = self.TypeLibrary()
         self.supported_types: Sequence[ObjectTypeSupportInfo] = []
 
+class TypeLibraryEncoder(json.JSONEncoder):
+    '''JSON Encoder for Manifest.'''
+
+    OBJECT_TYPES_KEY = 'objectTypes'
+
+    def default(self, o: Manifest.TypeLibrary) -> Dict:
+        result = {}
+        result[self.OBJECT_TYPES_KEY] = [object_type.__dict__ for object_type in o.object_types]
+        return result
+
+class ManifestEncoder(json.JSONEncoder):
+    '''JSON Encoder for Manifest.'''
+
+    TYPE_LIBRARY_KEY = 'typeLibrary'
+    SUPPORTED_TYPES_KEY = 'supportedTypes'
+
+    def default(self, o: Manifest) -> Dict:
+        result = {}
+        result[self.TYPE_LIBRARY_KEY] = TypeLibraryEncoder().default(o.type_library)
+        result[self.SUPPORTED_TYPES_KEY] = [
+            ObjectTypeSupportInfoEncoder().default(object_type_support_info)
+                for object_type_support_info in o.supported_types]
+
+        return result
+
 class BoundingBox:
     '''Bounding box of an Object on a video frame.'''
 
@@ -94,7 +131,7 @@ class BoundingBox:
 
     @property
     def left(self) -> float:
-        '''Left bound of the boudning box.'''
+        '''Left bound of the bounding box.'''
         return self.x
 
     @property
@@ -114,15 +151,16 @@ class BoundingBox:
 
 class ObjectPosition:
     '''Information about position of an Object on a certain video frame.'''
+
     def __init__(self):
-        self.type_id = ""
+        self.type_id = ''
         self.track_id = uuid.uuid4()
         self.bounding_box = BoundingBox()
         self.attributes = {}
 
     def is_valid(self):
-        '''
-        Position is valid if coordinates of all corners of its bounding box is in the range [0, 1].
+        '''Position is valid if coordinates of all corners of its bounding box is in the range
+        [0, 1].
         '''
         return (self.bounding_box.left >= 0.0 and
             self.bounding_box.right <= 1.0 and
@@ -131,6 +169,7 @@ class ObjectPosition:
 
 class ObjectMovementParameters:
     '''Movement parameters of an Object on a certain video frame.'''
+
     DEFAULT_SPEED = 0.01
 
     def __init__(self):
@@ -139,12 +178,14 @@ class ObjectMovementParameters:
 
 class ObjectContext:
     '''Full information about an Object on a certain video frame.'''
+
     def __init__(self):
         self.object_position = ObjectPosition()
         self.object_movement_parameters = ObjectMovementParameters()
 
 class StreamEntry:
     '''Single entry of the stream file.'''
+
     def __init__(self, frame_number: int, object_position: ObjectPosition):
         self.frame_number = frame_number
         self.object_position = object_position
@@ -156,7 +197,7 @@ class StreamEntryEncoder(json.JSONEncoder):
     TYPE_ID_KEY = 'typeId'
     TRACK_ID_KEY = 'trackId'
     ATTRIBUTES_KEY = 'attributes'
-    BOUNDING_BOX_KEY = 'boudningBox'
+    BOUNDING_BOX_KEY = 'boundingBox'
     TOP_LEFT_X_KEY = 'x'
     TOP_LEFT_Y_KEY = 'y'
     WIDTH_KEY = 'width'
@@ -264,7 +305,7 @@ class RandomMovementGenerator(Generator):
         return object_context
 
     def object_type_info(self) -> ObjectTypeInfo:
-        '''Overrides Generator.object_type_info.s'''
+        '''Overrides Generator.object_type_info.'''
         object_type_info = ObjectTypeInfo()
 
         object_type = object_type_info.object_type
@@ -280,13 +321,13 @@ class RandomMovementGenerator(Generator):
 
 class GenerationContext:
     '''Generation context of a single Object Track.'''
+
     def __init__(self):
         self.object_context = ObjectContext()
         self.track_generator: Generator = None
 
 class GenerationManager:
-    '''
-    Manager responsible for generation of the stream file and manifest with the given parameters.
+    '''Manager responsible for generation of the stream file and manifest with the given parameters.
     '''
 
     RANDOM_MOVEMENT_POLICY = 'random'
@@ -354,19 +395,17 @@ class GenerationManager:
         return manifest
 
     def generate_stream(self) -> Sequence[StreamEntry]:
-        ''' Generates stream file for the Object Streamer sub-plugin.'''
+        '''Generates stream file for the Object Streamer sub-plugin.'''
         stream = []
         for frame_number in range(self.stream_duration_in_frames):
             objects_in_frame = []
             for context in self.generation_contexts:
                 track_generator = context.track_generator
 
-                context.object_context = track_generator.move_object(
-                    frame_number, context.object_context)
+                context.object_context = track_generator.move_object(context.object_context)
 
                 if not context.object_context.object_position.is_valid():
-                    context.object_context = track_generator.generate_object(
-                        frame_number)
+                    context.object_context = track_generator.generate_object()
 
                 objects_in_frame.append(
                     StreamEntry(frame_number,
@@ -385,8 +424,7 @@ class GenerationManager:
         return None
 
     def _make_object_type_name_from_id(self, object_type_id: str):
-        '''
-        Generates Object Type name from its id if it isn't explicitly defined in the
+        '''Generates Object Type name from its id if it isn't explicitly defined in the
         corresponding object template in the configuration file of this script.
         '''
         capitalized = []
@@ -429,16 +467,13 @@ def main():
 
     manifest = generation_manager.generate_manifest()
     with open(args.manifest_file, 'w', encoding='UTF-8') as manifest_file:
-        json.dump(manifest.__dict__, manifest_file,
-            default=lambda o: o.__dict__, indent=4)
+        json.dump(manifest, manifest_file, cls=ManifestEncoder, indent=4)
 
     stream = generation_manager.generate_stream()
     with open(args.stream_file, 'w', encoding='UTF-8') as stream_file:
         indent = None if args.compressed_stream else 4
         separators = (",", ":") if args.compressed_stream else (", ", ": ")
-
-        json.dump(stream, stream_file,
-            cls=StreamEntryEncoder, indent=indent, separators=separators)
+        json.dump(stream, stream_file, cls=StreamEntryEncoder, indent=indent, separators=separators)
 
 if __name__ == '__main__':
     main()
