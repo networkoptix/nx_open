@@ -42,6 +42,8 @@ public:
 
     const nx::vms::client::core::CloudAuthData& authData() const;
 
+    void setCredentials(const nx::network::http::Credentials& credentials);
+
 signals:
     void authDataReady();
 

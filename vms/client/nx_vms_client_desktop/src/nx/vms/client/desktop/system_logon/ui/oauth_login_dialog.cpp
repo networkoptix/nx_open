@@ -93,7 +93,7 @@ bool OauthLoginDialog::validateToken(
         std::make_unique<OauthLoginDialog>(parent, core::OauthClientType::system2faAuth);
 
     dialog->setWindowTitle(title);
-    dialog->d->oauthClient()->setCredentials(credentials);
+    dialog->setCredentials(credentials);
     connect(
         dialog.get(),
         &OauthLoginDialog::authDataReady,
@@ -111,6 +111,11 @@ void OauthLoginDialog::loadPage()
 const nx::vms::client::core::CloudAuthData& OauthLoginDialog::authData() const
 {
     return d->oauthClient()->authData();
+}
+
+void OauthLoginDialog::setCredentials(const nx::network::http::Credentials& credentials)
+{
+    d->oauthClient()->setCredentials(credentials);
 }
 
 } // namespace nx::vms::client::desktop
