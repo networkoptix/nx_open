@@ -64,27 +64,51 @@ R"json(
 
 bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoPacket)
 {
-    for (auto& objectMetdataPacket: generateObjects(videoPacket->timestampUs()))
-        pushMetadataPacket(objectMetdataPacket.releasePtr());
+    if (m_lastFrameTimestampUs >= 0)
+    {
+        for (auto& objectMetdataPacket: generateObjects(
+            m_frameNumber == 0 ? m_maxFrameNumber : m_frameNumber - 1,
+            m_lastFrameTimestampUs,
+            std::max(videoPacket->timestampUs() - m_lastFrameTimestampUs, (int64_t) 0)))
+        {
+            pushMetadataPacket(objectMetdataPacket.releasePtr());
+        }
+    }
 
     ++m_frameNumber;
+    if (m_frameNumber > m_maxFrameNumber)
+        m_frameNumber = 0;
+
+    m_lastFrameTimestampUs = videoPacket->timestampUs();
 
     return true;
 }
 
 std::vector<Ptr<IObjectMetadataPacket>> DeviceAgent::generateObjects(
-    int64_t currentFrameTimestampUs)
+    int frameNumber, int64_t frameTimestampUs, int64_t durationUs)
 {
     std::vector<Ptr<IObjectMetadataPacket>> result;
 
-    if (m_frameNumber > m_maxFrameNumber)
-        m_frameNumber = 0;
-
-    if (m_objectsByFrameNumber.find(m_frameNumber) == m_objectsByFrameNumber.cend())
+    if (m_objectsByFrameNumber.find(frameNumber) == m_objectsByFrameNumber.cend())
         return result;
 
-    for (const Object& object: m_objectsByFrameNumber[m_frameNumber])
+    std::map<int64_t, Ptr<ObjectMetadataPacket>> objectMetadataPacketByTimestamp;
+    for (const Object& object: m_objectsByFrameNumber[frameNumber])
     {
+        const int64_t timestampUs = object.timestampUs >= 0
+            ? object.timestampUs
+            : frameTimestampUs;
+
+        Ptr<ObjectMetadataPacket>& objectMetadataPacket =
+            objectMetadataPacketByTimestamp[timestampUs];
+
+        if (!objectMetadataPacket)
+        {
+            objectMetadataPacket = makePtr<ObjectMetadataPacket>();
+            objectMetadataPacket->setTimestampUs(timestampUs);
+            objectMetadataPacket->setDurationUs(durationUs);
+        }
+
         auto objectMetadata = makePtr<ObjectMetadata>();
         objectMetadata->setTypeId(object.typeId);
         objectMetadata->setTrackId(object.trackId);
@@ -93,15 +117,11 @@ std::vector<Ptr<IObjectMetadataPacket>> DeviceAgent::generateObjects(
         for (const auto& item: object.attributes)
             objectMetadata->addAttribute(makePtr<Attribute>(item.first, item.second));
 
-        auto objectMetadataPacket = makePtr<ObjectMetadataPacket>();
-        objectMetadataPacket->setTimestampUs(object.timestampUs >= 0
-            ? object.timestampUs
-            : currentFrameTimestampUs);
-
         objectMetadataPacket->addItem(objectMetadata.releasePtr());
-
-        result.push_back(objectMetadataPacket);
     }
+
+    for (const auto& entry: objectMetadataPacketByTimestamp)
+        result.push_back(entry.second);
 
     return result;
 }
