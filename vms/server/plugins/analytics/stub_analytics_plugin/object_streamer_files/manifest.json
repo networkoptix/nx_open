@@ -1,6 +1,6 @@
 {
-    "type_library": {
-        "object_types": [
+    "typeLibrary": {
+        "objectTypes": [
             {
                 "id": "stub.objectStreamer.custom.type.1",
                 "name": "Stub OS: Custom Type 1"
@@ -27,9 +27,9 @@
             }
         ]
     },
-    "supported_types": [
+    "supportedTypes": [
         {
-            "object_type_id": "nx.base.Vehicle",
+            "objectTypeId": "nx.base.Vehicle",
             "attributes": [
                 "Color",
                 "Brand",
@@ -40,7 +40,7 @@
             ]
         },
         {
-            "object_type_id": "nx.base.Car",
+            "objectTypeId": "nx.base.Car",
             "attributes": [
                 "Color",
                 "Brand",
@@ -51,7 +51,7 @@
             ]
         },
         {
-            "object_type_id": "nx.base.Truck",
+            "objectTypeId": "nx.base.Truck",
             "attributes": [
                 "Color",
                 "Brand",
@@ -61,7 +61,7 @@
             ]
         },
         {
-            "object_type_id": "nx.base.Bus",
+            "objectTypeId": "nx.base.Bus",
             "attributes": [
                 "Color",
                 "Brand",
@@ -71,7 +71,7 @@
             ]
         },
         {
-            "object_type_id": "nx.base.Person",
+            "objectTypeId": "nx.base.Person",
             "attributes": [
                 "Age",
                 "Gender",
@@ -82,7 +82,7 @@
             ]
         },
         {
-            "object_type_id": "stub.objectStreamer.custom.type.1",
+            "objectTypeId": "stub.objectStreamer.custom.type.1",
             "attributes": [
                 "string attribute 1",
                 "string attribute 2",
