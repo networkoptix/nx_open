@@ -100,7 +100,9 @@ private:
     static std::string makePluginDiagnosticEventDescription(const std::set<Issue>& issues);
 
     std::vector<nx::sdk::Ptr<nx::sdk::analytics::IObjectMetadataPacket>> generateObjects(
-        int64_t currentFrameTimestampUs);
+        int frameNumber,
+        int64_t frameTimestampUs,
+        int64_t durationUs);
 
     void reportIssues(const Issues& issues);
 
@@ -108,6 +110,7 @@ private:
     std::map<int, std::vector<Object>> m_objectsByFrameNumber;
     int m_frameNumber = 0;
     int m_maxFrameNumber = 0;
+    int64_t m_lastFrameTimestampUs = -1;
 };
 
 } // namespace object_streamer
