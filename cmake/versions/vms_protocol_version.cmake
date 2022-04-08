@@ -10,6 +10,6 @@
 # ATTENTION: You must change the comment below to make sure it will generate a merge conflict if
 # somebody concurrently updates the Protocol version. Prefer to use the Jira Issue id and title as
 # a comment.
-set(_vmsInVersionProtocolNumber 04) #< VMS-30867: Multiple user roles support.
+set(_vmsInVersionProtocolNumber 05) #< VMS-31727: Websocket messages with “permessage-deflate” extension and size > 64 byte don't handled in browser.
 set(vmsProtocolVersion "${PROJECT_VERSION_MAJOR}${PROJECT_VERSION_MINOR}${_vmsInVersionProtocolNumber}")
 unset(_vmsInVersionProtocolNumber)

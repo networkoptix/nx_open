@@ -17,6 +17,9 @@ public:
     static QByteArray compressData(const QByteArray& data, bool addCrcAndSize = true);
     static nx::Buffer compressData(const nx::Buffer& data, bool addCrcAndSize = true);
 
+    static QByteArray deflateData(const QByteArray& data);
+    static nx::Buffer deflateData(const nx::Buffer& data);
+
     static nx::Buffer uncompressData(const nx::Buffer& data);
 };
 
