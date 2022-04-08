@@ -28,7 +28,7 @@
     </message>
     <message>
       <source>The password is expired. Please contact your system administrator.</source>
-      <translation type="unfinished">The password is expired. Please contact your system administrator.</translation>
+      <translation>Adgangskoden er udløbet. Kontakt venligst din systemadministrator.</translation>
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>

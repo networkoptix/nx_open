@@ -91,11 +91,11 @@
     </message>
     <message>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-      <translation>Blurオプションが有効になっていると、Intel HDグラフィックスディスプレイに問題が発生することがあります。オプションを使用しない事を強くお勧めします</translation>
+      <translation>ぼかしが有効になっている場合、Intel HD Graphics ディスプレイで問題が発生する可能性があります。オプションは変更しないことを強くお勧めします。</translation>
     </message>
     <message>
       <source>Disable blur</source>
-      <translation>Blurを無効にする</translation>
+      <translation>ぼかし効果を無効にする</translation>
     </message>
     <message>
       <source>Limit Frame Rate to save CPU</source>
