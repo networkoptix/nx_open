@@ -207,9 +207,9 @@ bool mightBeHtml(const QStringList& lines)
         lines.cbegin(), lines.cend(), [](const QString& line) { return mightBeHtml(line); });
 }
 
-QString toHtml(const QString& source)
+QString toHtml(const QString& source, Qt::WhiteSpaceMode whitespaceMode)
 {
-    return mightBeHtml(source) ? source : Qt::convertFromPlainText(source);
+    return mightBeHtml(source) ? source : Qt::convertFromPlainText(source, whitespaceMode);
 }
 
 QString toPlainText(const QString& source)

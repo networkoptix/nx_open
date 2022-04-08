@@ -76,7 +76,8 @@ NX_VMS_COMMON_API bool mightBeHtml(const QString& text);
 NX_VMS_COMMON_API bool mightBeHtml(const QStringList& lines);
 
 /** Converts plain text to HTML if needed. */
-NX_VMS_COMMON_API QString toHtml(const QString& source);
+NX_VMS_COMMON_API QString toHtml(
+    const QString& source, Qt::WhiteSpaceMode whitespaceMode = Qt::WhiteSpaceNormal);
 
 /** Converts HTML to plain text if needed. */
 NX_VMS_COMMON_API QString toPlainText(const QString& source);
