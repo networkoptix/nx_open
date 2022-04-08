@@ -35,6 +35,7 @@
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/client/desktop/workbench/workbench_animations.h>
+#include <nx/vms/common/html/html.h>
 #include <recording/time_period.h>
 #include <ui/common/notification_levels.h>
 #include <ui/common/read_only.h>
@@ -295,7 +296,7 @@ void EventRibbon::Private::updateTile(int index)
     if (!tileDescription.isEmpty())
     {
         QTextDocument doc;
-        doc.setHtml(tileDescription);
+        doc.setHtml(nx::vms::common::html::toHtml(tileDescription));
         WidgetUtils::elideDocumentLines(&doc, kTileDescriptionLineLimit);
         tileDescription = doc.toHtml("utf-8");
     }
