@@ -475,7 +475,7 @@ APPLY(313, getCamerasEx, nx::vms::api::CameraDataExList, \
 APPLY(314, removeCameraUserAttributes, nx::vms::api::IdData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
-                       false, /*isRemoveOperation*/ \
+                       true, /*isRemoveOperation*/ \
                        CreateHashByIdRfc4122Helper("camera_attributes"), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, \
                        RemoveResourceAccess(), /* save permission checker */ \
@@ -511,7 +511,7 @@ APPLY(401, saveMediaServer, nx::vms::api::MediaServerData, \
 APPLY(402, removeMediaServer, nx::vms::api::IdData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
-                       false, /*isRemoveOperation*/ \
+                       true, /*isRemoveOperation*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, \
                        RemoveResourceAccess(), /* save permission checker */ \
@@ -1565,7 +1565,7 @@ APPLY(10401, saveAnalyticsEngine, nx::vms::api::AnalyticsEngineData, \
 APPLY(10402, removeAnalyticsEngine, nx::vms::api::IdData, \
                         true, \
                         false, \
-                        false, /*isRemoveOperation*/ \
+                        true, /*isRemoveOperation*/ \
                         CreateHashByIdHelper(), \
                         &apiIdDataTriggerNotificationHelper, \
                         RemoveResourceAccess(), /* save permission checker */ \
