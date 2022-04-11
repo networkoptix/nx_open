@@ -128,6 +128,7 @@ void QnIncompatibleServerWatcher::stop()
         if (auto server = resourcePool()->getIncompatibleServerById(id))
             servers.push_back(server);
     }
+    NX_DEBUG(this, "Stop watching");
     resourcePool()->removeResources(servers);
 }
 

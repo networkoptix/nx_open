@@ -614,6 +614,7 @@ void QnServerStorageManager::at_storageSpaceReply(
         storagesToDelete.push_back(storage);
     }
 
+    NX_DEBUG(this, "Remove storages");
     resourcePool()->removeResources(storagesToDelete);
 
     auto replyProtocols = reply.storageProtocols.toSet();

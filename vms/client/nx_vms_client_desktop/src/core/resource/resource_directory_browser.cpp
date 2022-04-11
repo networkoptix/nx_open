@@ -211,6 +211,7 @@ void ResourceDirectoryBrowser::dropResourcesFromDirectory(const QString& path)
         if (shouldBeRemoved(fileLayoutResource))
             resourcesToRemove.append(fileLayoutResource);
     }
+    NX_DEBUG(this, "Drop resources from directory");
     resourcePool->removeResources(resourcesToRemove);
 }
 
