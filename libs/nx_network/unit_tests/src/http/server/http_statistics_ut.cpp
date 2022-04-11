@@ -11,6 +11,7 @@
 #include <nx/network/http/server/settings.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/reflect/json.h>
 #include <nx/utils/time.h>
 #include <nx/utils/random.h>
 #include <nx/utils/test_support/utils.h>
@@ -51,7 +52,7 @@ class AggregateHttpStatisticsProvider:
 protected:
     virtual void SetUp() override
     {
-        for(char i  = '0'; i < '7'; ++i)
+        for (char i  = '0'; i < '7'; ++i)
             m_requestPaths.emplace_back("/") += i;
     }
 
@@ -228,7 +229,7 @@ public:
             m_httpDispatcher.registerRequestProcessorFunc(
                 http::Method::get,
                 path,
-                [this](auto&&... args){ serveGet(std::forward<decltype(args)>(args)...); });
+                [](auto /* requestContext */, auto handler){ handler(http::StatusCode::ok); });
         }
     }
 
@@ -281,22 +282,43 @@ public:
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
+    void whenMakeAsyncGetRequest(
+        std::string path,
+        nx::utils::MoveOnlyFunc<void(http::AsyncClient*)> handler)
+    {
+        AsyncRequestContext context{
+            std::make_unique<http::AsyncClient>(ssl::kAcceptAnyCertificate),
+            std::move(handler)
+        };
+
+        auto clientPtr = context.client.get();
+        m_asyncRequests.emplace(clientPtr, std::move(context));
+
+        clientPtr->doGet(
+            url::Builder(m_httpServer->preferredUrl()).setPath(path),
+            [this, clientPtr]()
+            {
+                m_asyncRequests.at(clientPtr).handler(clientPtr);
+                m_asyncRequests.erase(clientPtr);
+            });
+    }
+
     http::server::HttpStatistics whenRequestHttpStatistics()
     {
         return m_httpServer->httpStatistics();
     }
 
 private:
-    void serveGet(
-        http::RequestContext /* context */,
-        http::RequestProcessedHandler handler)
-    {
-        handler(http::StatusCode::ok);
-    }
-
-private:
     http::server::rest::MessageDispatcher m_httpDispatcher;
     std::unique_ptr<http::server::MultiEndpointServer> m_httpServer;
+
+    struct AsyncRequestContext
+    {
+        std::unique_ptr<http::AsyncClient> client;
+        nx::utils::MoveOnlyFunc<void(http::AsyncClient*)> handler;
+    };
+
+    std::map<http::AsyncClient*, AsyncRequestContext> m_asyncRequests;
 };
 
 TEST_F(MultiEndpointServerHttpStatistics, RequestPathStatistics_present_if_requestsServedPerMinute_is_not_0)
@@ -353,6 +375,35 @@ RequestPathStatistics_requestsServedPerMinute_matches_aggregate_requestsServerPe
     // while sockets are still alive.
     socket->pleaseStopSync();
     socket2->pleaseStopSync();
+}
+
+TEST_F(MultiEndpointServerHttpStatistics, percentiles_present)
+{
+    givenGetRequestPaths({"/0"});
+
+    nx::utils::test::ScopedSyntheticMonotonicTime fixedTime{};
+
+    std::atomic_int requestsHandled = 0;
+    for (int i = 0; i < 100; ++i)
+    {
+        whenMakeAsyncGetRequest(
+            "/0",
+            [&requestsHandled](auto* /*httpClient*/) { ++requestsHandled; });
+    }
+
+    while (requestsHandled != 100)
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+    // Need to advance time past initial collection period to trigger value caching in the
+    // PercentilePerPeriod instances.
+    fixedTime.applyRelativeShift(std::chrono::minutes(1));
+
+    auto stats = whenRequestHttpStatistics();
+
+    const auto zero = std::chrono::microseconds::zero();
+    ASSERT_NE(zero, stats.requestProcessingTimePercentilesUsec.at("50"));
+    ASSERT_NE(zero, stats.requestProcessingTimePercentilesUsec.at("95"));
+    ASSERT_NE(zero, stats.requestProcessingTimePercentilesUsec.at("99"));
 }
 
 } // namespace nx::network::http::server::test

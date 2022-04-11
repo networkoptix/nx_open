@@ -2,6 +2,8 @@
 
 #include "http_statistics.h"
 
+#include <iomanip>
+
 #include <nx/fusion/model_functions.h>
 
 namespace nx::network::http::server {
@@ -11,24 +13,27 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     RequestPathStatistics, (json), RequestPathStatistics_server_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(HttpStatistics, (json), HttpStatistics_server_Fields)
 
-void HttpStatistics::assign(const RequestStatistics& other)
-{
-    averageRequestProcessingTimeUsec = other.averageRequestProcessingTimeUsec;
-    maxRequestProcessingTimeUsec = other.maxRequestProcessingTimeUsec;
-}
-
 //-------------------------------------------------------------------------------------------------
 // RequestStatisticsCalculator
 
 RequestStatisticsCalculator::RequestStatisticsCalculator():
     m_averageRequestProcessingTime(std::chrono::minutes(1))
 {
+    static constexpr std::array<double, 3> percentiles = {0.5, 0.95, 0.99};
+    for (const auto& p: percentiles)
+    {
+        m_requestProcessingTimePercentiles.emplace(
+            p,
+            PercentilePerPeriod{p, std::chrono::minutes(1), 2});
+    }
 }
 
 void RequestStatisticsCalculator::processedRequest(std::chrono::microseconds duration)
 {
     m_averageRequestProcessingTime.add(duration.count());
     m_maxRequestProcessingTime.add(duration);
+    for (auto& p: m_requestProcessingTimePercentiles)
+        p.second.add(duration);
 }
 
 RequestStatistics RequestStatisticsCalculator::requestStatistics() const
@@ -37,6 +42,21 @@ RequestStatistics RequestStatisticsCalculator::requestStatistics() const
     stats.averageRequestProcessingTimeUsec =
         std::chrono::microseconds(m_averageRequestProcessingTime.getAveragePerLastPeriod());
     stats.maxRequestProcessingTimeUsec = m_maxRequestProcessingTime.getMaxPerLastPeriod();
+
+    for (const auto& [key, calculator]: m_requestProcessingTimePercentiles)
+    {
+        std::ostringstream ss;
+        ss << std::setprecision(2) << std::fixed << key * 100;
+        auto k = ss.str();
+
+        while (k.back() == '0') //< Drop trailing zeros after the decimal.
+            k.pop_back();
+        while (k.back() == '.') //< If all decimals points were 0, then drop the decimal.
+            k.pop_back();
+
+        stats.requestProcessingTimePercentilesUsec[std::move(k)] = calculator.get();
+    }
+
     return stats;
 }
 
@@ -55,11 +75,10 @@ void RequestPathStatisticsCalculator::processedRequest(std::chrono::microseconds
 
 RequestPathStatistics RequestPathStatisticsCalculator::requestPathStatistics() const
 {
-    const auto stats = m_requestStatsCalculator.requestStatistics();
-    return RequestPathStatistics{
-        {stats.maxRequestProcessingTimeUsec, stats.averageRequestProcessingTimeUsec},
-        m_requestsPerMinute.getSumPerLastPeriod()
-    };
+    RequestPathStatistics stats;
+    stats.requestsServedPerMinute = m_requestsPerMinute.getSumPerLastPeriod();
+    stats.operator=(m_requestStatsCalculator.requestStatistics());
+    return stats;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -95,6 +114,12 @@ HttpStatistics AggregateHttpStatisticsProvider::httpStatistics() const
             accumulatedStats.maxRequestProcessingTimeUsec,
             httpStats.maxRequestProcessingTimeUsec);
         accumulatedStats.notFound404 += httpStats.notFound404;
+
+        for (const auto& [key, value]: httpStats.requestProcessingTimePercentilesUsec)
+        {
+            auto& percentile = accumulatedStats.requestProcessingTimePercentilesUsec[key];
+            percentile = std::max(percentile, value);
+        }
 
         for (const auto& [path, stats]: httpStats.requests)
         {
