@@ -68,7 +68,7 @@ QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(
 
 QnFfmpegVideoDecoder::~QnFfmpegVideoDecoder(void)
 {
-    closeDecoder();
+    avcodec_free_context(&m_context);
     if (m_metrics)
         m_metrics->decoders()--;
 }
@@ -81,12 +81,6 @@ AVCodec* QnFfmpegVideoDecoder::findCodec(AVCodecID codecId)
         codec = avcodec_find_decoder(codecId);
 
     return codec;
-}
-
-void QnFfmpegVideoDecoder::closeDecoder()
-{
-    QnFfmpegHelper::deleteAvCodecContext(m_context);
-    m_context = 0;
 }
 
 void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVideoDataPtr& data)
@@ -185,8 +179,7 @@ bool QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
         m_needRecreate = true;
         return true; // can't reset right now
     }
-    QnFfmpegHelper::deleteAvCodecContext(m_context);
-    m_context = 0;
+    avcodec_free_context(&m_context);
     m_spsFound = false;
     return openDecoder(data);
 }

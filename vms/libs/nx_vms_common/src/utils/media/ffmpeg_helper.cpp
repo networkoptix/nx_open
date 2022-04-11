@@ -102,19 +102,6 @@ AVCodec* QnFfmpegHelper::findAvCodec(AVCodecID codecId)
     return codec;
 }
 
-void QnFfmpegHelper::deleteAvCodecContext(AVCodecContext* context)
-{
-    if (!context)
-        return;
-
-    avcodec_close(context);
-    av_freep(&context->rc_override);
-    av_freep(&context->intra_matrix);
-    av_freep(&context->inter_matrix);
-    av_freep(&context->extradata);
-    av_freep(&context);
-}
-
 //-------------------------------------------------------------------------------------------------
 
 static qint32 ffmpegReadPacket(void *opaque, quint8* buf, int size)
@@ -301,17 +288,17 @@ int QnFfmpegHelper::getDefaultFrameSize(AVCodecParameters* avCodecParams)
     if (!avCodec)
         return 0;
 
-    auto encoderContext = nx::utils::wrapUnique(
-        avcodec_alloc_context3(avCodec),
-        &QnFfmpegHelper::deleteAvCodecContext);
+    auto encoderContext = avcodec_alloc_context3(avCodec);
 
     if (avCodec->sample_fmts)
         encoderContext->sample_fmt = avCodec->sample_fmts[0];
     encoderContext->channels = avCodecParams->channels;
     encoderContext->sample_rate = avCodecParams->sample_rate;
-    return (avcodec_open2(encoderContext.get(), avCodec, nullptr) >= 0)
+    auto res = avcodec_open2(encoderContext, avCodec, nullptr) >= 0
         ? encoderContext->frame_size
         : 0;
+    avcodec_free_context(&encoderContext);
+    return res;
 }
 
 int QnFfmpegHelper::planeCount(const AVPixFmtDescriptor* avPixFmtDescriptor)

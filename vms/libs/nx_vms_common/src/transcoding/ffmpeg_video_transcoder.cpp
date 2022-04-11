@@ -103,9 +103,7 @@ QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
 
 void QnFfmpegVideoTranscoder::close()
 {
-    QnFfmpegHelper::deleteAvCodecContext(m_encoderCtx);
-    m_encoderCtx = 0;
-
+    avcodec_free_context(&m_encoderCtx);
     m_lastFlushedDecoder = 0;
     m_videoDecoders.clear();
 }

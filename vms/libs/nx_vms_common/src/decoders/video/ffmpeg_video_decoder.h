@@ -56,7 +56,6 @@ private:
 
     bool openDecoder(const QnConstCompressedVideoDataPtr& data);
     bool initFFmpegDecoder();
-    void closeDecoder();
     void processNewResolutionIfChanged(const QnConstCompressedVideoDataPtr& data, int width, int height);
     int decodeVideo(
         AVCodecContext *avctx,

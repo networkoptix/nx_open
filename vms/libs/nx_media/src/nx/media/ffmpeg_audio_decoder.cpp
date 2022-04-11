@@ -31,12 +31,11 @@ public:
 
     ~FfmpegAudioDecoderPrivate()
     {
-        closeCodecContext();
+        avcodec_free_context(&codecContext);
         av_frame_free(&frame);
     }
 
     void initContext(const QnConstCompressedAudioDataPtr& frame, double speed);
-    void closeCodecContext();
 
     AVFrame* frame = nullptr;
     AVCodecContext* codecContext = nullptr;
@@ -64,7 +63,7 @@ void FfmpegAudioDecoderPrivate::initContext(
     if (avcodec_open2(codecContext, codec, nullptr) < 0)
     {
         qWarning() << "Can't open decoder for codec" << frame->compressionType;
-        closeCodecContext();
+        avcodec_free_context(&codecContext);
     }
 
     if (ini().allowSpeedupAudio && speed != 1.0)
@@ -74,12 +73,6 @@ void FfmpegAudioDecoderPrivate::initContext(
         if (!filter.init(codecContext, {1,1000000}, filterDescr))
             NX_WARNING(this, "Can't init audio filter");
     }
-}
-
-void FfmpegAudioDecoderPrivate::closeCodecContext()
-{
-    QnFfmpegHelper::deleteAvCodecContext(codecContext);
-    codecContext = 0;
 }
 
 //-------------------------------------------------------------------------------------------------

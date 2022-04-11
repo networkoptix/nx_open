@@ -90,8 +90,8 @@ QnFfmpegAudioTranscoder::QnFfmpegAudioTranscoder(AVCodecID codecId):
 
 QnFfmpegAudioTranscoder::~QnFfmpegAudioTranscoder()
 {
-    QnFfmpegHelper::deleteAvCodecContext(m_encoderCtx);
-    QnFfmpegHelper::deleteAvCodecContext(m_decoderCtx);
+    avcodec_free_context(&m_encoderCtx);
+    avcodec_free_context(&m_decoderCtx);
 
     av_frame_free(&m_frameDecodeTo);
 }
