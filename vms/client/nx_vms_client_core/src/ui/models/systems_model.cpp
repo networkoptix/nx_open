@@ -43,7 +43,9 @@ namespace
         {QnSystemsModel::WrongCustomizationRoleId, "wrongCustomization"},
         {QnSystemsModel::CompatibleVersionRoleId, "compatibleVersion"},
         {QnSystemsModel::VisibilityScopeRoleId, "visibilityScope"},
-        {QnSystemsModel::IsCloudOauthSupportedRoleId, "isOauthSupported"}};
+        {QnSystemsModel::IsCloudOauthSupportedRoleId, "isOauthSupported"},
+        {QnSystemsModel::Is2FaEnabledForSystem, "is2FaEnabledForSystem"}
+    };
 }
 
 class QnSystemsModelPrivate: public Connective<QObject>
@@ -264,6 +266,8 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
             return d->controller->visibilityScope(system->localId());
         case IsCloudOauthSupportedRoleId:
             return system->isOauthSupported();
+        case Is2FaEnabledForSystem:
+            return system->is2FaEnabled();
 
         default:
             return QVariant();
@@ -408,6 +412,13 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
             [this, systemDescription]()
             {
                 emitDataChanged(systemDescription, QnSystemsModel::IsOnlineRoleId);
+            });
+
+    data->connections
+        << connect(systemDescription, &QnBaseSystemDescription::system2faEnabledChanged, this,
+            [this, systemDescription]()
+            {
+                emitDataChanged(systemDescription, QnSystemsModel::Is2FaEnabledForSystem);
             });
 
     data->connections

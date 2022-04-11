@@ -216,6 +216,15 @@ bool QnSystemDescriptionAggregator::isCloudSystem() const
     return m_systems.first()->isOnline() || !isReachable();
 }
 
+bool QnSystemDescriptionAggregator::is2FaEnabled() const
+{
+    if (isEmptyAggregator())
+        return false;
+
+    // If the aggregator has cloud system, it would be the first in the m_systems map.
+    return m_systems.first()->is2FaEnabled();
+}
+
 bool QnSystemDescriptionAggregator::isNewSystem() const
 {
     if (isEmptyAggregator())

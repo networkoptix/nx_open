@@ -39,6 +39,8 @@ public: // overrides
 
     bool isCloudSystem() const override;
 
+    bool is2FaEnabled() const override;
+
     bool isNewSystem() const override;
 
     bool isOnline() const override;

@@ -32,7 +32,7 @@ private:
     void pingCloudSystem(const QString& cloudSystemId);
     void updateSystems();
     void tryRemoveAlienServer(const nx::vms::api::ModuleInformation& serverInfo);
-    void updateOnlineStateUnsafe(const QnCloudSystemList& targetSystems);
+    void updateStateUnsafe(const QnCloudSystemList& targetSystems);
 
 private:
     typedef QScopedPointer<QTimer> QTimerPtr;

@@ -20,6 +20,8 @@ public:
 public: // Overrides
     virtual bool isCloudSystem() const override;
 
+    virtual bool is2FaEnabled() const override;
+
     virtual bool isOnline() const override;
 
     virtual bool isNewSystem() const override;

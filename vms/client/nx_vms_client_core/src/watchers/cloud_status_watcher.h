@@ -72,6 +72,7 @@ public:
     bool setAuthData(const nx::vms::client::core::CloudAuthData& authData);
 
     QString cloudLogin() const;
+    bool is2FaEnabledForUser() const;
 
     void logSession(const QString& cloudSystemId);
 
@@ -108,6 +109,7 @@ signals:
     void statusChanged(Status status);
     void errorChanged(ErrorCode error);
     void isCloudEnabledChanged();
+    void is2FaEnabledForUserChanged();
 
     void cloudSystemsChanged(const QnCloudSystemList& currentCloudSystems);
     void recentCloudSystemsChanged();

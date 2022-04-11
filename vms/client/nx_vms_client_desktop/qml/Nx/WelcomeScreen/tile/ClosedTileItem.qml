@@ -196,7 +196,8 @@ Item
             source: "image://svg/skin/welcome_screen/tile/lock.svg"
             sourceSize: Qt.size(width, height)
 
-            visible: !tile.cloud && !tile.isFactorySystem && !tile.loggedIn
+            visible: tile.systemRequires2FaEnabledForUser
+                || (!tile.cloud && !tile.isFactorySystem && !tile.loggedIn)
         }
     }
 }

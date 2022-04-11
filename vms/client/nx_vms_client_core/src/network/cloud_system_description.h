@@ -20,16 +20,21 @@ public:
         const QString& systemName,
         const QString& ownerEmail,
         const QString& ownerFullName,
-        bool running);
+        bool running,
+        bool system2faEnabled);
 
     virtual ~QnCloudSystemDescription() = default;
 
     void setOnline(bool online);
 
+    void set2faEnabled(bool system2faEnabled);
+
     void updateLastKnownVersion(const nx::utils::SoftwareVersion& version);
 
 public: // Overrides
     virtual bool isCloudSystem() const override;
+
+    virtual bool is2FaEnabled() const override;
 
     virtual bool isOnline() const override;
 
@@ -48,7 +53,8 @@ private:
         const QString& systemName,
         const QString& ownerEmail,
         const QString& ownerFullName,
-        bool online);
+        bool online,
+        bool system2faEnabled);
 
 private:
     const QString m_ownerEmail;
@@ -56,4 +62,5 @@ private:
     nx::utils::SoftwareVersion m_lastKnownVersion;
 
     bool m_online;
+    bool m_system2faEnabled = false;
 };

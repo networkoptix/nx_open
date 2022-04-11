@@ -10,10 +10,11 @@ QnCloudSystemDescription::PointerType QnCloudSystemDescription::create(
     const QString& systemName,
     const QString& ownerEmail,
     const QString& ownerFullName,
-    bool online)
+    bool online,
+    bool system2faEnabled)
 {
     return PointerType(new QnCloudSystemDescription(
-        systemId, localSystemId, systemName, ownerEmail, ownerFullName, online));
+        systemId, localSystemId, systemName, ownerEmail, ownerFullName, online, system2faEnabled));
 }
 
 QnCloudSystemDescription::QnCloudSystemDescription(
@@ -22,12 +23,14 @@ QnCloudSystemDescription::QnCloudSystemDescription(
     const QString& systemName,
     const QString& ownerEmail,
     const QString& ownerFullName,
-    bool online)
+    bool online,
+    bool system2faEnabled)
     :
     base_type(systemId, localSystemId, systemName),
     m_ownerEmail(ownerEmail),
     m_ownerFullName(ownerFullName),
-    m_online(online)
+    m_online(online),
+    m_system2faEnabled(system2faEnabled)
 {
 }
 
@@ -38,6 +41,15 @@ void QnCloudSystemDescription::setOnline(bool online)
 
     m_online = online;
     emit onlineStateChanged();
+}
+
+void QnCloudSystemDescription::set2faEnabled(bool system2faEnabled)
+{
+    if (m_system2faEnabled == system2faEnabled)
+        return;
+
+    m_system2faEnabled = system2faEnabled;
+    emit system2faEnabledChanged();
 }
 
 void QnCloudSystemDescription::updateLastKnownVersion(const nx::utils::SoftwareVersion& version)
@@ -52,6 +64,11 @@ void QnCloudSystemDescription::updateLastKnownVersion(const nx::utils::SoftwareV
 bool QnCloudSystemDescription::isCloudSystem() const
 {
     return true;
+}
+
+bool QnCloudSystemDescription::is2FaEnabled() const
+{
+    return m_system2faEnabled;
 }
 
 bool QnCloudSystemDescription::isOnline() const

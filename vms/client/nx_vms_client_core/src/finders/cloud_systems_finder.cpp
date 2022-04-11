@@ -109,7 +109,7 @@ void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
         const auto targetId = helpers::getTargetSystemId(system);
         const auto systemDescription = QnCloudSystemDescription::create(
             targetId, system.localId, system.name, system.ownerAccountEmail,
-            system.ownerFullName, system.online);
+            system.ownerFullName, system.online, system.system2faEnabled);
         updatedSystems.insert(system.cloudId, systemDescription);
     }
 
@@ -142,7 +142,7 @@ void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
             m_systems.remove(removedCloudId);
         }
 
-        updateOnlineStateUnsafe(systems);
+        updateStateUnsafe(systems);
     }
 
     for (const auto id: removedTargetIds.keys())
@@ -153,7 +153,7 @@ void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
     }
 }
 
-void QnCloudSystemsFinder::updateOnlineStateUnsafe(const QnCloudSystemList& targetSystems)
+void QnCloudSystemsFinder::updateStateUnsafe(const QnCloudSystemList& targetSystems)
 {
     for (const auto system: targetSystems)
     {
@@ -170,6 +170,10 @@ void QnCloudSystemsFinder::updateOnlineStateUnsafe(const QnCloudSystemList& targ
             systemDescription->name(), systemDescription->id(), system.newestServerVersion);
         const auto version = nx::utils::SoftwareVersion(system.newestServerVersion);
         systemDescription->updateLastKnownVersion(version);
+
+        NX_DEBUG(this, "Set 2fa state for the system \"%1\" <%2> to [%3]",
+            systemDescription->name(), systemDescription->id(), system.system2faEnabled);
+        systemDescription->set2faEnabled(system.system2faEnabled);
     }
 }
 

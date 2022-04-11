@@ -114,6 +114,9 @@ WelcomeScreen::WelcomeScreen(QWidget* parent):
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::isCloudEnabledChanged,
         this, &WelcomeScreen::isCloudEnabledChanged);
 
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::is2FaEnabledForUserChanged,
+        this, &WelcomeScreen::is2FaEnabledForUserChanged);
+
     setHelpTopic(this, Qn::Login_Help);
 
     connect(qnSettings, &QnClientSettings::valueChanged, this,
@@ -795,6 +798,11 @@ void WelcomeScreen::deleteSystem(const QString& systemId, const QString& localSy
 bool WelcomeScreen::saveCredentialsAllowed() const
 {
     return qnSettings->saveCredentialsAllowed();
+}
+
+bool WelcomeScreen::is2FaEnabledForUser() const
+{
+    return qnCloudStatusWatcher->is2FaEnabledForUser();
 }
 
 } // namespace nx::vms::client::desktop
