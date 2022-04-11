@@ -23,9 +23,9 @@ void HttpStreamSocketServer::redirectAllRequestsTo(SocketAddress addressToRedire
 server::HttpStatistics HttpStreamSocketServer::httpStatistics() const
 {
     server::HttpStatistics httpStats;
-    httpStats.add(statistics());
+    httpStats.operator=(statistics());
     NX_MUTEX_LOCKER lock(&m_mutex);
-    httpStats.assign(m_statsCalculator.requestStatistics());
+    httpStats.operator=(m_statsCalculator.requestStatistics());
     httpStats.notFound404 = m_httpMessageDispatcher->dispatchFailures();
     httpStats.requests = m_httpMessageDispatcher->requestPathStatistics();
     return httpStats;

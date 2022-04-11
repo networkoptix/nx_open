@@ -7,19 +7,21 @@
 #include <nx/network/connection_server/server_statistics.h>
 #include <nx/utils/math/average_per_period.h>
 #include <nx/utils/math/max_per_period.h>
+#include <nx/utils/math/percentile_per_period.h>
 
 namespace nx::network::http::server {
 
 struct NX_NETWORK_API RequestStatistics
 {
-    std::chrono::microseconds maxRequestProcessingTimeUsec =
-        std::chrono::microseconds(0);
-    std::chrono::microseconds averageRequestProcessingTimeUsec =
-        std::chrono::microseconds(0);
+    std::chrono::microseconds maxRequestProcessingTimeUsec{0};
+    std::chrono::microseconds averageRequestProcessingTimeUsec{0};
+    std::map<std::string /* percent */, std::chrono::microseconds> requestProcessingTimePercentilesUsec;
 };
 
 #define RequestStatistics_server_Fields\
-    (maxRequestProcessingTimeUsec)(averageRequestProcessingTimeUsec)
+    (maxRequestProcessingTimeUsec)\
+    (averageRequestProcessingTimeUsec)\
+    (requestProcessingTimePercentilesUsec)
 
 QN_FUSION_DECLARE_FUNCTIONS(RequestStatistics, (json), NX_NETWORK_API)
 
@@ -30,6 +32,8 @@ NX_REFLECTION_INSTRUMENT(RequestStatistics, RequestStatistics_server_Fields)
 struct NX_NETWORK_API RequestPathStatistics: public RequestStatistics
 {
     int requestsServedPerMinute = 0;
+
+    using RequestStatistics::operator=;
 };
 
 #define RequestPathStatistics_server_Fields\
@@ -48,10 +52,11 @@ struct NX_NETWORK_API HttpStatistics:
 {
     // Inherited fields are aggregate statistics
 
-    void assign(const RequestStatistics& other);
-
     int notFound404 = 0;
     std::map<std::string/*requestPathTemplate*/, RequestPathStatistics> requests;
+
+    using network::server::Statistics::operator=;
+    using RequestStatistics::operator=;
 };
 
 #define HttpStatistics_server_Fields\
@@ -91,6 +96,11 @@ private:
     nx::utils::math::AveragePerPeriod<std::chrono::microseconds::rep>
         m_averageRequestProcessingTime;
     nx::utils::math::MaxPerMinute<std::chrono::microseconds> m_maxRequestProcessingTime;
+
+
+    using PercentilePerPeriod = nx::utils::math::PercentilePerPeriod<std::chrono::microseconds>;
+
+    std::map<double, PercentilePerPeriod> m_requestProcessingTimePercentiles;
 };
 
 //-------------------------------------------------------------------------------------------------
