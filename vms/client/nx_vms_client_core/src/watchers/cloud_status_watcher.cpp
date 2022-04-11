@@ -70,6 +70,7 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList& systemsList)
             : guidFromArbitraryData(system.cloudId); //< Safety check, local id should be present.
 
         system.online = (systemData.stateOfHealth == nx::cloud::db::api::SystemHealth::online);
+        system.system2faEnabled = systemData.system2faEnabled;
         system.name = QString::fromStdString(systemData.name);
         system.ownerAccountEmail = QString::fromStdString(systemData.ownerAccountEmail);
         system.ownerFullName = QString::fromStdString(systemData.ownerFullName);
@@ -108,6 +109,7 @@ public:
 
     void setCloudEnabled(bool enabled);
     bool cloudIsEnabled() const;
+    bool is2FaEnabledForUser() const;
 
     using TimePoint = QnCloudStatusWatcher::TimePoint;
     /**
@@ -138,7 +140,7 @@ private:
     void setCloudSystems(const QnCloudSystemList &newCloudSystems);
     void setRecentCloudSystems(const QnCloudSystemList &newRecentSystems);
     void updateCurrentSystem();
-
+    void updateCurrentCloudUserSecuritySettings();
     void updateStatusFromResultCode(api::ResultCode result);
     void setStatus(QnCloudStatusWatcher::Status newStatus, QnCloudStatusWatcher::ErrorCode error);
 
@@ -164,6 +166,7 @@ private:
     TimePoint m_suppressUntil;
 
     CloudAuthData m_authData;
+    api::AccountSecuritySettings m_accountSecuritySettings;
     std::unique_ptr<CloudSessionTokenUpdater> m_tokenUpdater;
     CloudTokenRemover m_tokenRemover;
 };
@@ -230,6 +233,13 @@ nx::network::http::Credentials QnCloudStatusWatcher::remoteConnectionCredentials
 QString QnCloudStatusWatcher::cloudLogin() const
 {
     return QString::fromStdString(credentials().username);
+}
+
+bool QnCloudStatusWatcher::is2FaEnabledForUser() const
+{
+    Q_D(const QnCloudStatusWatcher);
+
+    return d->is2FaEnabledForUser();
 }
 
 void QnCloudStatusWatcher::logSession(const QString& cloudSystemId)
@@ -351,6 +361,8 @@ QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *p
         {
              if (checkSuppressed())
                  q->updateSystems();
+
+             updateCurrentCloudUserSecuritySettings();
         });
     systemUpdateTimer->start();
 
@@ -369,6 +381,12 @@ QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *p
 bool QnCloudStatusWatcherPrivate::cloudIsEnabled() const
 {
     return m_cloudIsEnabled;
+}
+
+bool QnCloudStatusWatcherPrivate::is2FaEnabledForUser() const
+{
+    // totpExistsForAccount field shows whether 2fa is enabled for cloud account.
+    return m_accountSecuritySettings.totpExistsForAccount.value_or(false);
 }
 
 void QnCloudStatusWatcherPrivate::setCloudEnabled(bool enabled)
@@ -627,6 +645,7 @@ void QnCloudStatusWatcherPrivate::setStatus(
             || errorCode == QnCloudStatusWatcher::InvalidEmail))
     {
         NX_WARNING(this, "Forcing logout. Session expired or password was changed.");
+        m_accountSecuritySettings = {};
         q->resetAuthData();
         emit q->forcedLogout();
     }
@@ -679,6 +698,32 @@ void QnCloudStatusWatcherPrivate::updateCurrentSystem()
         currentSystem = *it;
         emit q->currentSystemChanged(currentSystem);
     }
+}
+
+void QnCloudStatusWatcherPrivate::updateCurrentCloudUserSecuritySettings()
+{
+    if (!cloudConnection)
+        return;
+
+    auto callback = nx::utils::AsyncHandlerExecutor(this).bind(
+        [this](api::ResultCode result, api::AccountSecuritySettings settings)
+        {
+            NX_VERBOSE(
+                this, "Updated current security settings of the cloud user, status: %1.", result);
+
+            bool has2FaChanged =
+                m_accountSecuritySettings.totpExistsForAccount != settings.totpExistsForAccount;
+
+            m_accountSecuritySettings = settings;
+
+            if (has2FaChanged)
+            {
+                Q_Q(QnCloudStatusWatcher);
+                emit q->is2FaEnabledForUserChanged();
+            }
+        });
+
+    cloudConnection->accountManager()->getSecuritySettings(std::move(callback));
 }
 
 void QnCloudStatusWatcherPrivate::suppressCloudInteraction(

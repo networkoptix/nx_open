@@ -37,6 +37,7 @@ class WelcomeScreen: public Connective<QQuickWidget>, public QnWorkbenchContextA
     Q_PROPERTY(QString cloudUserName READ cloudUserName NOTIFY cloudUserNameChanged)
     Q_PROPERTY(bool isCloudEnabled READ isCloudEnabled NOTIFY isCloudEnabledChanged)
     Q_PROPERTY(bool saveCredentialsAllowed READ saveCredentialsAllowed CONSTANT)
+    Q_PROPERTY(bool is2FaEnabledForUser READ is2FaEnabledForUser NOTIFY is2FaEnabledForUserChanged)
 
     Q_PROPERTY(bool visibleControls
         READ visibleControls
@@ -173,6 +174,8 @@ signals:
 
     void cloudUserNameChanged();
 
+    void is2FaEnabledForUserChanged();
+
     void isCloudEnabledChanged();
 
     void visibleControlsChanged();
@@ -211,6 +214,7 @@ private:
         const nx::network::http::Credentials& credentials);
 
     bool saveCredentialsAllowed() const;
+    bool is2FaEnabledForUser() const;
 
 protected:
     virtual void showEvent(QShowEvent* event) override;

@@ -70,8 +70,8 @@ public:
     bool setInitialAuthData(const nx::vms::client::core::CloudAuthData& authData);
     bool setAuthData(const nx::vms::client::core::CloudAuthData& authData);
 
-    // These getters are for qml
-    Q_INVOKABLE QString cloudLogin() const;
+    QString cloudLogin() const;
+    bool is2FaEnabledForUser() const;
 
     void logSession(const QString& cloudSystemId);
 
@@ -108,6 +108,7 @@ signals:
     void statusChanged(Status status);
     void errorChanged(ErrorCode error);
     void isCloudEnabledChanged();
+    void is2FaEnabledForUserChanged();
 
     void cloudSystemsChanged(const QnCloudSystemList& currentCloudSystems);
     void recentCloudSystemsChanged();

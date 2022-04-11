@@ -42,6 +42,8 @@ public:
 
         VisibilityScopeRoleId,
 
+        Is2FaEnabledForSystem,
+
         RolesCount
     };
 

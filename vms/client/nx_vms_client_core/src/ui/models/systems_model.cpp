@@ -43,7 +43,9 @@ namespace
         {QnSystemsModel::WrongVersionRoleId, "wrongVersion"},
         {QnSystemsModel::WrongCustomizationRoleId, "wrongCustomization"},
         {QnSystemsModel::CompatibleVersionRoleId, "compatibleVersion"},
-        {QnSystemsModel::VisibilityScopeRoleId, "visibilityScope"}};
+        {QnSystemsModel::VisibilityScopeRoleId, "visibilityScope"},
+        {QnSystemsModel::Is2FaEnabledForSystem, "is2FaEnabledForSystem"}
+    };
 }
 
 class QnSystemsModelPrivate: public Connective<QObject>
@@ -264,9 +266,9 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
             return !version.isNull() ? QVariant::fromValue(version) : QVariant();
         }
         case VisibilityScopeRoleId:
-        {
             return d->controller->visibilityScope(system->localId());
-        }
+        case Is2FaEnabledForSystem:
+            return system->is2FaEnabled();
 
         default:
             return QVariant();
@@ -411,6 +413,13 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
             [this, systemDescription]()
             {
                 emitDataChanged(systemDescription, QnSystemsModel::IsOnlineRoleId);
+            });
+
+    data->connections
+        << connect(systemDescription, &QnBaseSystemDescription::system2faEnabledChanged, this,
+            [this, systemDescription]()
+            {
+                emitDataChanged(systemDescription, QnSystemsModel::Is2FaEnabledForSystem);
             });
 
     data->connections
