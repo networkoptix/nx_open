@@ -64,9 +64,6 @@ bool cameraExists(QnResourcePool* resourcePool, const QnUuid& uuid)
 
 } // namespace
 
-const int QnSecurityCamResource::kDefaultSecondStreamFpsLow = 2;
-const int QnSecurityCamResource::kDefaultSecondStreamFpsMedium = 7;
-const int QnSecurityCamResource::kDefaultSecondStreamFpsHigh = 12;
 const Qn::LicenseType QnSecurityCamResource::kDefaultLicenseType = Qn::LC_Professional;
 
 bool QnSecurityCamResource::MotionStreamIndex::operator==(const MotionStreamIndex& other) const
@@ -1381,24 +1378,6 @@ bool QnSecurityCamResource::isCameraControlDisabledInternal() const
 {
     NX_ASSERT(!getIdForUserAttributes().isNull());
     return userAttributesPool()->cameraControlDisabled(getIdForUserAttributes());
-}
-
-int QnSecurityCamResource::defaultSecondaryFps(Qn::StreamQuality quality) const
-{
-    switch (quality)
-    {
-        case Qn::StreamQuality::lowest:
-        case Qn::StreamQuality::low:
-            return kDefaultSecondStreamFpsLow;
-        case Qn::StreamQuality::normal:
-            return kDefaultSecondStreamFpsMedium;
-        case Qn::StreamQuality::high:
-        case Qn::StreamQuality::highest:
-            return kDefaultSecondStreamFpsHigh;
-        default:
-            break;
-    }
-    return kDefaultSecondStreamFpsMedium;
 }
 
 Qn::CameraStatusFlags QnSecurityCamResource::statusFlags() const
