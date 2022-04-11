@@ -42,6 +42,7 @@ public:
         VisibilityScopeRoleId,
 
         IsCloudOauthSupportedRoleId,
+        Is2FaEnabledForSystem,
 
         RolesCount
     };

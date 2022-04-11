@@ -47,6 +47,11 @@ bool QnLocalSystemDescription::isCloudSystem() const
     return false;
 }
 
+bool QnLocalSystemDescription::is2FaEnabled() const
+{
+    return false;
+}
+
 bool QnLocalSystemDescription::isOnline() const
 {
     return isReachable();

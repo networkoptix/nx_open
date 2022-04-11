@@ -53,6 +53,8 @@ public:
 
     virtual bool isCloudSystem() const = 0;
 
+    virtual bool is2FaEnabled() const = 0;
+
     virtual bool isNewSystem() const = 0;
 
     typedef QList<nx::vms::api::ModuleInformationWithAddresses> ServersList;
@@ -91,6 +93,8 @@ public:
 
 signals:
     void isCloudSystemChanged();
+
+    void system2faEnabledChanged();
 
     void ownerChanged();
 
