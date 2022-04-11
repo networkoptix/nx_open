@@ -1212,6 +1212,7 @@ void ConnectActionsHandler::clearConnection()
     for (const auto& res: resourcesToRemove)
         idList.push_back(res->getId());
 
+    NX_DEBUG(this, "Clear connection");
     resourcePool()->removeResources(resourcesToRemove);
 
     resourcePropertyDictionary()->clear(idList);

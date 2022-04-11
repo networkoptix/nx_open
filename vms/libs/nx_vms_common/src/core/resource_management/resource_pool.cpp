@@ -283,13 +283,22 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
 
     // Emit notifications.
     for (const auto& layout: std::as_const(removedLayouts))
+    {
+        NX_DEBUG(this, "Remove layout resource %1", layout);
         emit resourceRemoved(layout);
+    }
 
     for (const auto& resource: std::as_const(removedOtherResources))
+    {
+        NX_DEBUG(this, "Remove other resource %1", resource);
         emit resourceRemoved(resource);
+    }
 
     for (const auto& user: std::as_const(removedUsers))
+    {
+        NX_DEBUG(this, "Remove user resource %1", user);
         emit resourceRemoved(user);
+    }
 
     emit resourcesRemoved(removedResources);
 }
