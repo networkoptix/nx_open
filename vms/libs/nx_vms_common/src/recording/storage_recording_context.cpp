@@ -143,7 +143,7 @@ void StorageRecordingContext::writeHeader(StorageContext& context)
         }
         throw ErrorEx(
             Error::Code::incompatibleCodec,
-            NX_FMT("Video or audio codec is incompatible with '%1' format. Try another format. Ffmpeg error: %1, codecs: %3",
+            NX_FMT("Video or audio codec is incompatible with '%1' format. Try another format. Ffmpeg error: %2, codecs: %3",
                 m_container, QnFfmpegHelper::avErrorToString(rez), codecs));
     }
 }
