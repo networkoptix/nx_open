@@ -60,6 +60,8 @@ private:
     void startCheck();
     void stopCheck();
 
+    std::string email() const;
+
 public:
     QLineEdit* m_urlLineEdit = nullptr;
     QStackedWidget* m_stackedWidget = nullptr;

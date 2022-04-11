@@ -97,6 +97,25 @@ OauthLoginDialogPrivate::~OauthLoginDialogPrivate()
     stopCheck();
 }
 
+std::string OauthLoginDialogPrivate::email() const
+{
+    auto email = m_authData.credentials.username;
+
+    if (email.empty())
+    {
+        nx::vms::client::core::RemoteConnectionAware connectionHelper;
+        auto connection = connectionHelper.connection();
+
+        if (connection && connection->connectionInfo().userType == nx::vms::api::UserType::cloud)
+            email = connection->credentials().username;
+    }
+
+    if (email.empty())
+        email = qnCloudStatusWatcher->cloudLogin().toStdString();
+
+    return email;
+}
+
 nx::utils::Url OauthLoginDialogPrivate::constructUrl(std::string_view cloudHost) const
 {
     auto builder = nx::network::url::Builder()
@@ -109,22 +128,12 @@ nx::utils::Url OauthLoginDialogPrivate::constructUrl(std::string_view cloudHost)
         .addQueryItem("redirect_url", "redirect-oauth");
 
     if (m_authData.empty()) //< Request auth code.
-    {
         builder.addQueryItem("response_type", "code");
-
-        nx::vms::client::core::RemoteConnectionAware connectionHelper;
-        auto remoteConnection = connectionHelper.connection();
-        if (remoteConnection
-            && remoteConnection->connectionInfo().userType == nx::vms::api::UserType::cloud)
-        {
-            builder.addQueryItem("email", remoteConnection->credentials().username);
-        }
-    }
     else if (!m_authData.credentials.authToken.empty()) //< Request 2FA validation.
-    {
         builder.addQueryItem("access_token", m_authData.credentials.authToken.value);
-        builder.addQueryItem("email", qnCloudStatusWatcher->cloudLogin());
-    }
+
+    if (const auto email = this->email(); !email.empty())
+        builder.addQueryItem("email", email);
 
     return builder.toUrl();
 }
