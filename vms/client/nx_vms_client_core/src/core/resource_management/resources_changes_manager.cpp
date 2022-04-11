@@ -233,7 +233,10 @@ void QnResourcesChangesManager::deleteResources(
 
             // We don't want to wait until transaction is received.
             if (success)
+            {
+                NX_DEBUG(this, "About to remove resources");
                 resourcePool()->removeResources(resources);
+            }
 
             safeCallback(success);
 
@@ -526,7 +529,12 @@ void QnResourcesChangesManager::saveUsers(
         {
             const bool success = errorCode == ec2::ErrorCode::ok;
             if (!success)
+            {
+                NX_DEBUG(this,
+                    "About to remove resources because of an error: %1",
+                    errorCode);
                 resourcePool()->removeResources(newUsers);
+            }
         });
 
     const auto currentUserName = QString::fromStdString(connectionCredentials().username);

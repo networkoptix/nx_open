@@ -22,6 +22,8 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/string.h>
 
+#include <nx/utils/log/log.h>
+
 class QThreadPool;
 namespace nx::vms::common { class SystemContext; }
 
@@ -92,6 +94,7 @@ public:
 
     void removeResource(const QnResourcePtr& resource)
     {
+        NX_DEBUG(this, "About to remove resource");
         removeResources(QnResourceList() << resource);
     }
 
