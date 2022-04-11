@@ -772,8 +772,7 @@ void QnDesktopDataProvider::closeStream()
     delete m_grabber;
     m_grabber = 0;
 
-    QnFfmpegHelper::deleteAvCodecContext(m_videoCodecCtx);
-    m_videoCodecCtx = 0;
+    avcodec_free_context(&m_videoCodecCtx);
 
     if (m_frame) {
         avpicture_free((AVPicture*) m_frame);

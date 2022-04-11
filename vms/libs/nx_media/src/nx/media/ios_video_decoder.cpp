@@ -282,8 +282,7 @@ void IOSVideoDecoderPrivate::closeCodecContext()
     if (codecContext)
         av_videotoolbox_default_free(codecContext);
 
-    QnFfmpegHelper::deleteAvCodecContext(codecContext);
-    codecContext = 0;
+    avcodec_free_context(&codecContext);
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -49,7 +49,7 @@ bool QnFfmpegAudioDecoder::isInitialized() const
 
 QnFfmpegAudioDecoder::~QnFfmpegAudioDecoder(void)
 {
-    QnFfmpegHelper::deleteAvCodecContext(m_audioDecoderCtx);
+    avcodec_free_context(&m_audioDecoderCtx);
     av_frame_free(&m_outFrame);
 }
 

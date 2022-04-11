@@ -141,13 +141,12 @@ public:
 
     ~FfmpegVideoDecoderPrivate()
     {
-        closeCodecContext();
+        avcodec_free_context(&codecContext);
         av_frame_free(&frame);
         sws_freeContext(scaleContext);
     }
 
     void initContext(const QnConstCompressedVideoDataPtr& frame);
-    void closeCodecContext();
 
     // convert color space if QT doesn't support it
     AVFrame* convertPixelFormat(const AVFrame* srcFrame);
@@ -171,18 +170,12 @@ void FfmpegVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr&
     if (avcodec_open2(codecContext, codec, nullptr) < 0)
     {
         NX_DEBUG(kLogTag, nx::format("Can't open decoder for codec %1").arg(frame->compressionType));
-        closeCodecContext();
+        avcodec_free_context(&codecContext);
         return;
     }
 
     // keep frame unless we call 'av_frame_unref'
     codecContext->refcounted_frames = 1;
-}
-
-void FfmpegVideoDecoderPrivate::closeCodecContext()
-{
-    QnFfmpegHelper::deleteAvCodecContext(codecContext);
-    codecContext = nullptr;
 }
 
 AVFrame* FfmpegVideoDecoderPrivate::convertPixelFormat(const AVFrame* srcFrame)

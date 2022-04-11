@@ -44,12 +44,6 @@ public:
      */
     static AVCodec* findAvCodec(AVCodecID codecId);
 
-    /**
-     * Close and deep-deallocate the context.
-     * @param context If null, do nothing.
-     */
-    static void deleteAvCodecContext(AVCodecContext* context);
-
     static AVIOContext* createFfmpegIOContext(QnStorageResourcePtr resource, const QString& url, QIODevice::OpenMode openMode, int ioBlockSize = 32768);
     static AVIOContext* createFfmpegIOContext(QIODevice* ioDevice, int ioBlockSize = 32768);
     static void closeFfmpegIOContext(AVIOContext* ioContext);
