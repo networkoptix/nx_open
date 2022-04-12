@@ -26,10 +26,10 @@ public:
 
 protected:
     // This field type should be used as base class only.
-    ResourceFilterField();
+    ResourceFilterField() = default;
 
 private:
-    bool m_acceptAll;
+    bool m_acceptAll = false;
     QSet<QnUuid> m_ids;
 };
 

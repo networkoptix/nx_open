@@ -6,10 +6,6 @@
 
 namespace nx::vms::rules {
 
-ResourceFilterField::ResourceFilterField()
-{
-}
-
 bool ResourceFilterField::match(const QVariant& value) const
 {
     return m_acceptAll

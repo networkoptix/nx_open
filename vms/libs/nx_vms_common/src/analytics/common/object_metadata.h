@@ -239,4 +239,5 @@ NX_VMS_COMMON_API ::std::ostream& operator<<(::std::ostream& os, const ObjectMet
 } // namespace common
 } // namespace nx
 
+Q_DECLARE_METATYPE(nx::common::metadata::Attributes)
 Q_DECLARE_METATYPE(nx::common::metadata::GroupedAttributes)

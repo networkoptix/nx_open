@@ -49,7 +49,7 @@ enum class ConditionType
 
 struct TextSearchCondition
 {
-    const ConditionType type;
+    ConditionType type;
 
     QString name;
     QString value;
@@ -164,7 +164,7 @@ private:
 /**
  * Matches given attributes against search expression defined by UserTextSearchExpressionParser.
  */
-class TextMatcher
+class NX_VMS_COMMON_API TextMatcher
 {
 public:
     /**

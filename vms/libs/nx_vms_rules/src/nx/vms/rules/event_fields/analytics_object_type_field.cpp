@@ -2,35 +2,26 @@
 
 #include "analytics_object_type_field.h"
 
-#include <QtCore/QVariant>
+#include <nx/analytics/taxonomy/helpers.h>
+#include <nx/vms/common/system_context.h>
 
 namespace nx::vms::rules {
 
+AnalyticsObjectTypeField::AnalyticsObjectTypeField(nx::vms::common::SystemContext* context):
+    SystemContextAware(context)
+{
+}
+
 bool AnalyticsObjectTypeField::match(const QVariant& value) const
 {
-    const auto typeId = value.value<QnUuid>();
-    // TODO: Implement base type matching.
-    return typeId == m_typeId;
-}
+    const auto typeId = value.toString();
+    if (typeId == m_value)
+        return true;
 
-QnUuid AnalyticsObjectTypeField::engineId() const
-{
-    return m_engineId;
-}
-
-void AnalyticsObjectTypeField::setEngineId(QnUuid id)
-{
-    m_engineId = id;
-}
-
-QnUuid AnalyticsObjectTypeField::typeId() const
-{
-    return m_typeId;
-}
-
-void AnalyticsObjectTypeField::setTypeId(QnUuid id)
-{
-    m_typeId = id;
+    return nx::analytics::taxonomy::isBaseType(
+        m_context->analyticsTaxonomyState().get(),
+        m_value,
+        typeId);
 }
 
 } // namespace nx::vms::rules

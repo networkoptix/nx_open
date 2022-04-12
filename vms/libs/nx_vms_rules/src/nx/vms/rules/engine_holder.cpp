@@ -16,10 +16,8 @@ namespace nx::vms::rules {
 EngineHolder::EngineHolder(nx::vms::common::SystemContext* context):
     m_engine(std::make_unique<Engine>(std::make_unique<Ec2Router>(context)))
 {
-    auto plugin = std::make_unique<Initializer>(m_engine.get());
-    plugin->registerFields();
-    plugin->registerEvents();
-    plugin->registerActions();
+    auto plugin = std::make_unique<Initializer>(context);
+    plugin->initialize(m_engine.get());
 
     m_builtinPlugin = std::move(plugin);
 }

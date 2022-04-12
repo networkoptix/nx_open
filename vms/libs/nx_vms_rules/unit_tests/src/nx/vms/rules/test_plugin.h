@@ -11,7 +11,10 @@ namespace nx::vms::rules::test {
 class TestPlugin: public nx::vms::rules::Plugin
 {
 public:
-    TestPlugin(Engine* engine): Plugin(engine) {};
+    TestPlugin(Engine* engine)
+    {
+        initialize(engine);
+    };
 
     virtual void registerFields() const override
     {

@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include <nx/vms/rules/basic_event.h>
+#include <analytics/common/object_metadata.h>
 
+#include "../basic_event.h"
 #include "../data_macros.h"
 
 namespace nx::vms::rules {
@@ -15,30 +16,22 @@ class NX_VMS_RULES_API AnalyticsObjectEvent: public BasicEvent
 
     FIELD(QnUuid, cameraId, setCameraId)
     FIELD(QnUuid, engineId, setEngineId)
-    FIELD(QnUuid, objectTypeId, setObjectTypeId)
+    FIELD(QString, objectTypeId, setObjectTypeId)
     FIELD(QnUuid, objectTrackId, setObjectTrackId)
-    // TODO: Use of Attributes type leads to dependence cycle with common.
-    // FIELD(nx::common::metadata::Attributes, attributes, setAttributes)
+    FIELD(nx::common::metadata::Attributes, attributes, setAttributes)
 
 public:
     AnalyticsObjectEvent() = default;
 
     AnalyticsObjectEvent(
+        std::chrono::microseconds timestamp,
         QnUuid cameraId,
         QnUuid engineId,
-        QnUuid objectTypeId,
+        const QString& objectTypeId,
         QnUuid objectTrackId,
-        std::chrono::microseconds timestamp)
-        :
-        BasicEvent(timestamp),
-        m_cameraId(cameraId),
-        m_engineId(engineId),
-        m_objectTypeId(objectTypeId),
-        m_objectTrackId(objectTrackId)
-    {
-    }
+        const nx::common::metadata::Attributes& attributes);
 
-    static FilterManifest filterManifest();
+    static const ItemDescriptor& manifest();
 };
 
 } // namespace nx::vms::rules

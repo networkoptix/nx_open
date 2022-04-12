@@ -2,15 +2,16 @@
 
 #pragma once
 
+#include <nx/vms/common/system_context_aware.h>
 #include <nx/vms/rules/plugin.h>
 
 namespace nx::vms::rules {
 
-class NX_VMS_RULES_API Initializer: public Plugin
+class NX_VMS_RULES_API Initializer: public nx::vms::common::SystemContextAware, public Plugin
 {
 
 public:
-    Initializer(Engine* engine);
+    Initializer(nx::vms::common::SystemContext* context);
     ~Initializer();
 
     virtual void registerEvents() const override;
