@@ -73,6 +73,7 @@ def get_go_unit_tests_list(tests_directory: str):
         "nx_go_libs_ut_nxhttp_ut",
         "nx_go_libs_ut_nxrange_ut",
         "nx_go_libs_ut_nxtime_ut",
+        "nx_go_libs_ut_nxoauth2_ut",
         "nx_service_authorizer_ut_authenticator_ut",
         "nx_service_authorizer_ut_functional_ut",
         "nx_service_authorizer_ut_jsondb_ut",
