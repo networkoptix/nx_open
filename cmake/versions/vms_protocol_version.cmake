@@ -10,6 +10,6 @@
 # ATTENTION: You must change the comment below to make sure it will generate a merge conflict if
 # somebody concurrently updates the Protocol version. Prefer to use the Jira Issue id and title as
 # a comment.
-set(_vmsInVersionProtocolNumber 05) #< VMS-31727: Websocket messages with “permessage-deflate” extension and size > 64 byte don't handled in browser.
+set(_vmsInVersionProtocolNumber 00) #< VMS-31543: Bump VMS version to 5.1
 set(vmsProtocolVersion "${PROJECT_VERSION_MAJOR}${PROJECT_VERSION_MINOR}${_vmsInVersionProtocolNumber}")
 unset(_vmsInVersionProtocolNumber)
