@@ -64,6 +64,7 @@ public:
 public:
     std::deque<QVideoFramePtr> queue; /**< Temporary  buffer for decoded data. */
     VideoDecoderPtr videoDecoder;
+    CodecParametersConstPtr currentCodecParameters;
     FrameBasicInfo prevFrameInfo;
     int frameNumber; /**< Absolute frame number. */
 
@@ -191,6 +192,9 @@ bool SeamlessVideoDecoder::decode(
         isSimilarParams = frameInfo.codec == d->prevFrameInfo.codec;
         if (!frameInfo.size.isEmpty())
             isSimilarParams &= frameInfo.size == d->prevFrameInfo.size;
+
+        if (d->currentCodecParameters && frame->context)
+            isSimilarParams &= frame->context->isEqual(*d->currentCodecParameters);
     }
     if (!isSimilarParams)
     {
@@ -220,6 +224,7 @@ bool SeamlessVideoDecoder::decode(
         {
             QMutexLocker lock(&mutex);
             d->prevFrameInfo = frameInfo;
+            d->currentCodecParameters = frame->context;
         }
         d->clearMetadata();
     }
