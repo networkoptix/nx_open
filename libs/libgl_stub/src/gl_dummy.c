@@ -4,3 +4,5 @@ void glOrtho() {}
 void glMatrixMode() {}
 void glLoadIdentity() {}
 void glLoadMatrixf() {}
+void glGetIntegerv() {}
+void glGetString() {}
