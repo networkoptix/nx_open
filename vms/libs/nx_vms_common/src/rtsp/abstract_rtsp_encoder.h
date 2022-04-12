@@ -14,7 +14,7 @@ class AbstractRtspEncoder
 public:
     virtual ~AbstractRtspEncoder() {}
 
-    virtual QString getSdpMedia(bool isVideo, int trackId) = 0;
+    virtual QString getSdpMedia(bool isVideo, int trackId, int port = 0) = 0;
 
     /*
      * Set media packet to encode

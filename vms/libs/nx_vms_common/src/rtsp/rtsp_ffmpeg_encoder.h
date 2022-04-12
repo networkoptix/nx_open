@@ -12,7 +12,7 @@ class NX_VMS_COMMON_API QnRtspFfmpegEncoder: public AbstractRtspEncoder
 public:
     QnRtspFfmpegEncoder(const DecoderConfig& config, nx::metrics::Storage* metrics);
 
-    virtual QString getSdpMedia(bool isVideo, int trackId) override;
+    virtual QString getSdpMedia(bool isVideo, int trackId, int port = 0) override;
 
     void setCodecContext(const CodecParametersConstPtr& codecParams);
 

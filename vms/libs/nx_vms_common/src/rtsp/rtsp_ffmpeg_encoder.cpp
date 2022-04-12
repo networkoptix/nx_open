@@ -196,11 +196,11 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
     return true;
 }
 
-QString QnRtspFfmpegEncoder::getSdpMedia(bool isVideo, int trackId)
+QString QnRtspFfmpegEncoder::getSdpMedia(bool isVideo, int trackId, int port)
 {
     QString sdpMedia;
     QTextStream stream(&sdpMedia);
-    stream << "m=" << (isVideo ? "video " : "audio ") << 0 << " RTP/AVP ";
+    stream << "m=" << (isVideo ? "video " : "audio ") << port << " RTP/AVP ";
     stream << kNxPayloadType << "\r\n";
     stream << "a=control:trackID=" << trackId << "\r\n";
     stream << "a=rtpmap:" << kNxPayloadType << " " << kNxPayloadTypeName << "/" << 1000000 <<"\r\n";
