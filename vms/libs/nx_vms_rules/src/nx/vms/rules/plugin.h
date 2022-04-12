@@ -17,15 +17,15 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API Plugin
 {
 public:
-    Plugin(Engine* engine);
+    Plugin();
     virtual ~Plugin();
 
-    virtual void initialize();
-    virtual void registerEventConnectors() const;
+    virtual void initialize(Engine* engine);
+    virtual void deinitialize();
+
     virtual void registerFields() const;
     virtual void registerEvents() const;
     virtual void registerActions() const;
-    virtual void deinitialize();
 
 protected:
     template<class C>

@@ -26,6 +26,7 @@ public:
 
     QnUuid engineId() const;
     const QString& objectTypeId() const;
+    QnUuid objectTrackId() const;
 
     virtual EventParameters getRuntimeParams() const override;
     virtual EventParameters getRuntimeParamsEx(

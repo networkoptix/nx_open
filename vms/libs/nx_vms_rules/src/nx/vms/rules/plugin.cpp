@@ -4,7 +4,7 @@
 
 namespace nx::vms::rules {
 
-Plugin::Plugin(Engine* engine): m_engine(engine)
+Plugin::Plugin()
 {
 }
 
@@ -12,12 +12,13 @@ Plugin::~Plugin()
 {
 }
 
-void Plugin::initialize()
+void Plugin::initialize(Engine* engine)
 {
-}
+    m_engine = engine;
 
-void Plugin::registerEventConnectors() const
-{
+    registerFields();
+    registerEvents();
+    registerActions();
 }
 
 void Plugin::registerFields() const

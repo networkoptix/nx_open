@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/rules/action_fields/builtin_fields.h>
 #include <nx/vms/rules/actions/builtin_actions.h>
 #include <nx/vms/rules/engine.h>
@@ -19,16 +20,16 @@ class BuiltinTypesTest:
     public Plugin
 {
 public:
-    BuiltinTypesTest():
-        Plugin(engine.get())
+    BuiltinTypesTest()
     {
+        initialize(engine.get());
     }
 
     template<class T>
     void testManifestValidity()
     {
-        const auto manifest = T::manifest();
-        const auto meta = T::staticMetaObject;
+        const auto& manifest = T::manifest();
+        const auto& meta = T::staticMetaObject;
 
         EXPECT_FALSE(manifest.id.isEmpty());
         EXPECT_FALSE(manifest.displayName.isEmpty());
@@ -54,12 +55,14 @@ public:
         EXPECT_TRUE(registerActionField<T>());
     }
 
-    template<class T>
-    void testEventFieldRegistration()
+    template<class T, class... Args>
+    void testEventFieldRegistration(Args... args)
     {
         SCOPED_TRACE(fieldMetatype<T>().toStdString());
 
-        EXPECT_TRUE(registerEventField<T>());
+        EXPECT_TRUE(m_engine->registerEventField(
+            fieldMetatype<T>(),
+            [args...]{ return new T(args...); }));
     }
 
     template<class T>
@@ -85,9 +88,15 @@ public:
 
 TEST_F(BuiltinTypesTest, BuiltinEvents)
 {
+    auto context = std::make_unique<nx::vms::common::SystemContext>(
+        QnUuid(),
+        QnUuid(),
+        nx::core::access::Mode::direct);
+
     // Event fields need to be registered first.
     testEventFieldRegistration<AnalyticsEventTypeField>();
-    testEventFieldRegistration<AnalyticsObjectTypeField>();
+    testEventFieldRegistration<AnalyticsObjectAttributesField>();
+    testEventFieldRegistration<AnalyticsObjectTypeField>(context.get());
     testEventFieldRegistration<CustomizableIconField>();
     testEventFieldRegistration<CustomizableTextField>();
     testEventFieldRegistration<EventTextField>();
@@ -100,7 +109,7 @@ TEST_F(BuiltinTypesTest, BuiltinEvents)
 
     // TODO: #amalov Uncomment all types after manifest definition.
     //testEventRegistration<AnalyticsEvent>();
-    //testEventRegistration<AnalyticsObjectEvent>();
+    testEventRegistration<AnalyticsObjectEvent>();
     //testEventRegistration<BackupFinishedEvent>();
     //testEventRegistration<CameraInputEvent>();
     testEventRegistration<DebugEvent>();

@@ -43,6 +43,11 @@ const QString& AnalyticsSdkObjectDetected::objectTypeId() const
     return m_objectTypeId;
 }
 
+QnUuid AnalyticsSdkObjectDetected::objectTrackId() const
+{
+    return m_objectTrackId;
+}
+
 EventParameters AnalyticsSdkObjectDetected::getRuntimeParams() const
 {
     EventParameters params = base_type::getRuntimeParams();
