@@ -47,7 +47,6 @@ const QString kNameAuditTrailEnabled("auditTrailEnabled");
 const QString kAuditTrailPeriodDaysName("auditTrailPeriodDays");
 const QString kNameTrafficEncryptionForced("trafficEncryptionForced");
 const QString kNameVideoTrafficEncryptionForced("videoTrafficEncryptionForced");
-const QString kNameInsecureDeprecatedApiEnabled("insecureDeprecatedApiEnabled");
 const QString kEventLogPeriodDaysName("eventLogPeriodDays");
 const QString kNameHost("smtpHost");
 const QString kNamePort("smtpPort");
@@ -129,6 +128,10 @@ const QString kMetadataStorageChangePolicyName("metadataStorageChangePolicy");
 
 const QString kShowServersInTreeForNonAdmins("showServersInTreeForNonAdmins");
 const QString kShowMouseTimelinePreview("showMouseTimelinePreview");
+
+const QString kNameInsecureDeprecatedApiEnabled("insecureDeprecatedApiEnabled");
+// TODO: Should be false, when all clients witch to new APIs.
+const bool kInsecureDeprecatedApiEnabledDefault = true;
 
 static const std::set<QString> kReadOnlyNames = {
     kNameLocalSystemId,
@@ -226,7 +229,7 @@ public:
     void setUseHttpsOnlyCameras(bool value);
 
     bool isInsecureDeprecatedApiEnabled() const;
-    void setInsecureDeprecatedApiEnabled(bool value);
+    void enableInsecureDeprecatedApi(bool value = true);
 
     bool isAutoDiscoveryEnabled() const;
     void setAutoDiscoveryEnabled(bool enabled);
