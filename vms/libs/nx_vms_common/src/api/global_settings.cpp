@@ -844,7 +844,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         "useHttpsOnlyForCameras", false, this);
 
     m_insecureDeprecatedApiEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        kNameInsecureDeprecatedApiEnabled, true, this);
+        kNameInsecureDeprecatedApiEnabled, kInsecureDeprecatedApiEnabledDefault, this);
 
     m_showMouseTimelinePreviewAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         kShowMouseTimelinePreview, true, this);
@@ -2281,7 +2281,7 @@ bool QnGlobalSettings::isInsecureDeprecatedApiEnabled() const
     return m_insecureDeprecatedApiEnabledAdaptor->value();
 }
 
-void QnGlobalSettings::setInsecureDeprecatedApiEnabled(bool value)
+void QnGlobalSettings::enableInsecureDeprecatedApi(bool value)
 {
     m_insecureDeprecatedApiEnabledAdaptor->setValue(value);
 }
