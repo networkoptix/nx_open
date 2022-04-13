@@ -27,6 +27,7 @@
 #include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/client/desktop/analytics/analytics_settings_manager.h>
 #include <utils/camera/camera_bitrate_calculator.h>
+#include <utils/camera/camera_replacement.h>
 
 #include "../camera_advanced_parameters_manifest_manager.h"
 #include "../utils/device_agent_settings_adapter.h"
@@ -826,6 +827,12 @@ State loadSingleCameraProperties(
         && state.singleCameraSettings.primaryStream().isEmpty()
         && state.singleCameraSettings.secondaryStream().isEmpty();
 
+    if (const auto replacementCamera =
+        nx::vms::common::utils::camera_replacement::findReplacementCamera(singleCamera))
+    {
+        singleProperties.foundReplacementCameraId = replacementCamera->getId();
+    }
+
     state.recording.defaultStreamResolution = singleCamera->streamInfo().getResolution();
     state.recording.mediaStreamCapability = singleCamera->cameraMediaCapability().
         streamCapabilities.value(StreamIndex::primary);
@@ -1153,6 +1160,12 @@ State CameraSettingsDialogStateReducer::loadCameras(
         [](const Camera& camera)
         {
             return camera->mediaPort() > 0;
+        });
+
+    state.devicesDescription.hasBeenReplaced = combinedValue(cameras,
+        [](const Camera& camera)
+        {
+            return nx::vms::common::utils::camera_replacement::findReplacementCamera(camera);
         });
 
     state.motion.dependingOnDualStreaming = combinedValue(cameras,

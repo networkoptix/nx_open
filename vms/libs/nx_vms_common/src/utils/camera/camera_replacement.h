@@ -17,9 +17,13 @@ bool NX_VMS_COMMON_API isReplacementCamera(const QnResourcePtr& resource);
 
 /**
  * @param resource Valid pointer to the camera resource expected.
- * @return True if given resource is valid camera resource that has been replaced previously.
+ * @return Pointer to the camera resource which has been configured as a replacement camera for the
+ *     given camera, null pointer if such camera isn't found in the system. The situation when such
+ *     camera is present in the system is possible if replaced camera was rediscovered again. Thus,
+ *     if this function returns non-null pointer, it follows that the camera resource passed as a
+ *     parameter represents device that was replaced earlier.
  */
-bool NX_VMS_COMMON_API isReplacedCamera(const QnResourcePtr& resource);
+QnVirtualCameraResourcePtr NX_VMS_COMMON_API findReplacementCamera(const QnResourcePtr& resource);
 
 /**
  * Predicate that determines if camera has capability of being replaced or vice versa if camera can

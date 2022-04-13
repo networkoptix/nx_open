@@ -34,15 +34,15 @@ bool isReplacementCamera(const QnResourcePtr& resource)
     return false;
 }
 
-bool isReplacedCamera(const QnResourcePtr& resource)
+QnVirtualCameraResourcePtr findReplacementCamera(const QnResourcePtr& resource)
 {
     const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
     if (!camera)
-        return false;
+        return {};
 
     const auto resourcePool = camera->resourcePool();
     if (!NX_ASSERT(resourcePool))
-        return false;
+        return {};
 
     return resourcePool->getResource<QnVirtualCameraResource>(
         [camera](const QnVirtualCameraResourcePtr& otherCamera)
