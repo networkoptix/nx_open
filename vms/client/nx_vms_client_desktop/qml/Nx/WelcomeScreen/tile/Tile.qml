@@ -549,7 +549,7 @@ Button
         // Inits user, password, savePassword values before openedTileComponent loaded.
         property var authDataAccessor: ModelDataAccessor
         {
-            property bool initialized: false
+            property string localSystemId: ""
 
             model: logicImpl.authenticationDataModel
 
@@ -557,16 +557,25 @@ Button
 
             onCountChanged:
             {
-                if (!initialized)
-                    tryToInitUser()
+                tryToInitUser()
             }
 
             function tryToInitUser()
             {
-                if (count)
+
+                if (count > 0 && localSystemId !== logicImpl.authenticationDataModel.localSystemId)
                 {
                     updateUserAndPassword(0)
-                    initialized = true
+                    localSystemId = logicImpl.authenticationDataModel.localSystemId
+                }
+                else
+                {
+                    // Fill properties without bindings with the default values to avoid using
+                    // data made for the previous system.
+                    logicImpl.savePassword = false
+                    logicImpl.user = ""
+                    logicImpl.isPasswordSaved = false
+                    logicImpl.newPassword = ""
                 }
             }
 
