@@ -966,6 +966,12 @@ void QnRtspClient::addRangeHeader( nx::network::http::Request* const request, qi
                 switch (m_dateTimeFormat)
                 {
                     case DateTimeFormat::Numeric:
+                        if (!m_additionAttrs.contains(Qn::EC2_INTERNAL_RTP_FORMAT)
+                            && startPos == DATETIME_NOW)
+                        {
+                            // Use rfc format for cameras if it not configured.
+                            return nx::network::rtsp::header::Range::Type::npt;
+                        }
                         return nx::network::rtsp::header::Range::Type::nxClock;
                     case DateTimeFormat::ISO:
                         return nx::network::rtsp::header::Range::Type::clock;
