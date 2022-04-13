@@ -132,8 +132,8 @@ QString QnMediaServerResource::getName() const
 
     if (getServerFlags().testFlag(vms::api::SF_Edge) && !m_edgeServerStateTracker.isNull())
     {
-        if (m_edgeServerStateTracker->hasUniqueCoupledChildCamera())
-            return m_edgeServerStateTracker->uniqueCoupledChildCamera()->getName();
+        if (const auto camera = m_edgeServerStateTracker->uniqueCoupledChildCamera())
+            return camera->getName();
     }
 
     {
@@ -141,6 +141,7 @@ QString QnMediaServerResource::getName() const
         if (!m_userAttributes.serverName.isEmpty())
             return m_userAttributes.serverName;
     }
+
     return QnResource::getName();
 }
 
