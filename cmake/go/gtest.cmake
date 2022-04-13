@@ -91,14 +91,6 @@ function(nx_go_build_test target working_dir package_path)
         )
     endif()
 	
-	if (EXISTS "${working_dir}/${package_path}/test_data/${target}")
-	    add_custom_command(
-            TARGET ${target}
-            WORKING_DIRECTORY ${working_dir}
-			COMMAND ${CMAKE_COMMAND} -E copy_directory ${package_path}/test_data/${target} ${CMAKE_BINARY_DIR}/bin/test_data/${target}
-	    )
-    endif()
-	
     add_test(NAME ${target} COMMAND ${CMAKE_BINARY_DIR}/bin/${target_exe})
 
     # NOTE: unit_tests is a custom target set in open/cmake/test_utils.cmake
