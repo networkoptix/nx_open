@@ -20,6 +20,14 @@ Some field names have the same meaning through all the controls and can have som
 - `"name"` - Unique id of the setting. Used when representing a Setting Value.
 - `"defaultValue"` - Default value of the control. Will be sent to the engine on applying changes.
 
+Certain fields are supported by some of the controls.
+- `"isActive"` - Boolean. Marks the control as an active one. It means that every change of the
+    control value in the GUI leads to sending a settings request to the Server immediately without
+    waiting for the confirmation with the "Apply" button. Results of such requests aren't saved in
+    the Server database, and reaction of the Plugin to such requests shouldn't lead to the actual
+    state change of the Plugin. The main purpose of active settings is to give Plugins a way to 
+    change the Settings Model and values on-the-fly, providing better user experience to the User.
+
 The Settings Model itself is a JSON object, which field `"items"` is a JSON array containing
 top-level Setting Models for individual Settings, and those Settings that support inner Settings
 (like `GroupBox`) may have them.
@@ -56,7 +64,8 @@ Text data field. Supports regex validation for the entered value.
         "defaultValue": "a text",
         "validationErrorMessage": "Text must contain only digits and characters a-f, e.g. 12ab34cd.",
         "validationRegex": "^[a-f0-9]+$",
-        "validationRegexFlags": "i"
+        "validationRegexFlags": "i",
+        "isActive": false
     }
 
 ### Setting Value
@@ -83,7 +92,8 @@ Integer number data field. Supports minimum and maximum value limitations.
         "description": "An integer number field",
         "defaultValue": 5,
         "minValue": 0,
-        "maxValue": 100
+        "maxValue": 100,
+        "isActive": false
     }
 
 ### Setting Value
@@ -110,7 +120,8 @@ Floating point number data field. Supports minimum and maximum value limitations
         "description": "A floating-point number field",
         "defaultValue": 3.141,
         "minValue": 0.0,
-        "maxValue": 100.0
+        "maxValue": 100.0,
+        "isActive": true
     }
 
 ### Setting Value
@@ -138,6 +149,7 @@ Text choice data field. Items in `itemCaptions` are optional, as well as `itemCa
         "description": "Choose one",
         "defaultValue": "v2",
         "range": ["v1", "v2", "v3"],
+        "isActive": true,
         "itemCaptions": {
             "v1": "value1",
             "v2": "value2",
@@ -170,6 +182,7 @@ itself.
         "description": "Choose one",
         "defaultValue": "opt2",
         "range": ["opt1", "opt2", "opt3", "opt4"],
+        "isActive": true,
         "itemCaptions": {
             "opt1": "option1",
             "opt2": "option2",
@@ -201,7 +214,8 @@ Boolean data field.
         "name": "checkbox1",
         "caption": "Check Box",
         "description": "True or False",
-        "defaultValue": true
+        "defaultValue": true,
+        "isActive": false
     }
 
 ### Setting Value
@@ -229,6 +243,7 @@ One or several boolean options choice data field. Items in `itemCaptions` are op
         "description": "Choose one or several options",
         "defaultValue": ["opt2", "opt3"],
         "range": ["opt1", "opt2", "opt3", "opt4"],
+        "isActive": false,
         "itemCaptions": {
             "opt1": "Option #1",
             "opt2": "Option #2",
@@ -259,7 +274,8 @@ Boolean data field, alternative visual representation.
         "name": "switch1",
         "caption": "Switch Button",
         "description": "Tooltip for the switch button",
-        "defaultValue": true
+        "defaultValue": true,
+        "isActive": true
     }
 
 ### Setting Value

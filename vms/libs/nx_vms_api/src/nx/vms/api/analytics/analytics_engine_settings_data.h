@@ -39,6 +39,7 @@ struct NX_VMS_API EngineSettingsResponse
     (settingsModel) \
     (settingsModelId) \
     (settingsErrors)
+QN_FUSION_DECLARE_FUNCTIONS(EngineSettingsResponse, (json), NX_VMS_API)
 
 struct NX_VMS_API EngineSettingsRequest
 {
@@ -63,8 +64,38 @@ struct NX_VMS_API EngineSettingsRequest
     (analyticsEngineId) \
     (settingsModelId) \
     (settingsValues)
-
-QN_FUSION_DECLARE_FUNCTIONS(EngineSettingsResponse, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(EngineSettingsRequest, (json), NX_VMS_API)
+
+struct NX_VMS_API EngineActiveSettingChangedRequest
+{
+    /**%apidoc
+     * Unique id of an Analytics Engine.
+     */
+    QnUuid analyticsEngineId;
+
+    /**%apidoc
+     * Id of a setting which triggered the notification.
+     */
+    QString activeSettingId;
+
+    /**%apidoc
+     * Settings model.
+     */
+    QJsonObject settingsModel;
+
+    /**%apidoc
+     * Name-value map with setting values, using JSON types corresponding to each setting type.
+     */
+    QJsonObject settingsValues;
+
+    bool operator==(const EngineActiveSettingChangedRequest& other) const = default;
+};
+#define nx_vms_api_analytics_EngineActiveSettingChangedRequest_Fields \
+    (analyticsEngineId) \
+    (activeSettingId) \
+    (settingsModel) \
+    (settingsValues)
+
+QN_FUSION_DECLARE_FUNCTIONS(EngineActiveSettingChangedRequest, (json), NX_VMS_API)
 
 } // namespace nx::vms::api::analytics

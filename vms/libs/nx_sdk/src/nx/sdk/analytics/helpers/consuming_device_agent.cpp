@@ -191,6 +191,14 @@ void ConsumingDeviceAgent::finalize()
     NX_OUTPUT << __func__ << "()";
 }
 
+void ConsumingDeviceAgent::doGetSettingsOnActiveSettingChange(
+    Result<const ISettingsResponse*>* outResult,
+    const IString* activeSettingId,
+    const IString* settingsModel,
+    const IStringMap* settingsValues)
+{
+}
+
 //-------------------------------------------------------------------------------------------------
 // Tools for the derived class.
 

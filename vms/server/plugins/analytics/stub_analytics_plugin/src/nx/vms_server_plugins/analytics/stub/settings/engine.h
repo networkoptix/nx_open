@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "active_settings_builder.h"
+
 #include <nx/sdk/analytics/helpers/plugin.h>
 #include <nx/sdk/analytics/helpers/engine.h>
 
@@ -35,8 +37,15 @@ protected:
     virtual void getPluginSideSettings(
         nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult) const override;
 
+    virtual void doGetSettingsOnActiveSettingChange(
+        nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult,
+        const nx::sdk::IString* activeSettingId,
+        const nx::sdk::IString* settingsModel,
+        const nx::sdk::IStringMap* settingsValues) override;
+
 private:
     nx::sdk::analytics::Plugin* const m_plugin;
+    ActiveSettingsBuilder m_activeSettingsBuilder;
 };
 
 } // namespace settings

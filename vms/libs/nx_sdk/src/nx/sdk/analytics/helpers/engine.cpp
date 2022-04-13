@@ -163,6 +163,14 @@ bool Engine::isCompatible(const IDeviceInfo* /*deviceInfo*/) const
     return true;
 }
 
+void Engine::doGetSettingsOnActiveSettingChange(
+    Result<const ISettingsResponse*>* outResult,
+    const IString* clientId,
+    const IString* activeSettingId,
+    const IStringMap* settings)
+{
+}
+
 } // namespace analytics
 } // namespace sdk
 } // namespace nx

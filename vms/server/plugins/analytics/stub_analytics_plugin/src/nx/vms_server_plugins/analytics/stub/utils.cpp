@@ -11,6 +11,8 @@ namespace vms_server_plugins {
 namespace analytics {
 namespace stub {
 
+using namespace nx::sdk;
+
 bool toBool(std::string str)
 {
     std::transform(str.begin(), str.begin(), str.end(), ::tolower);
@@ -81,6 +83,18 @@ std::string join(
         if (i != strings.size() - 1)
             result += delimiter;
     }
+
+    return result;
+}
+
+std::map<std::string, std::string> toStdMap(const Ptr<const IStringMap>& sdkMap)
+{
+    std::map<std::string, std::string> result;
+    if (!sdkMap)
+        return result;
+
+    for (int i = 0; i < sdkMap->count(); ++i)
+        result[sdkMap->key(i)] = sdkMap->value(i);
 
     return result;
 }

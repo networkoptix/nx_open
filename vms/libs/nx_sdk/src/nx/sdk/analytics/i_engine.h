@@ -21,20 +21,7 @@ namespace analytics {
 
 class IPlugin; //< Forward declaration for the parent object.
 
-/**
- * Main interface for an Analytics Engine instance. The instances are created by a Mediaserver via
- * calling analytics::IPlugin::createEngine() typically on Mediaserver start (or when a new Engine
- * is created by the system administrator), and destroyed (via releaseRef()) on Mediaserver
- * shutdown (or when an existing Engine is deleted by the system administrator).
- *
- * For the VMS end user, each Engine instance is perceived as an independent Analytics Engine
- * which has its own set of values of settings stored in the Mediaserver database.
- *
- * All methods are guaranteed to be called without overlapping even if from different threads (i.e.
- * with a guaranteed barrier between the calls), thus, no synchronization is required for the
- * implementation.
- */
-class IEngine: public Interface<IEngine>
+class IEngine0: public Interface<IEngine0>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IEngine"); }
@@ -170,7 +157,61 @@ public:
      */
     virtual void setHandler(IHandler* handler) = 0;
 };
-using IEngine0 = IEngine;
+
+/**
+ * Main interface for an Analytics Engine instance. The instances are created by a Mediaserver via
+ * calling analytics::IPlugin::createEngine() typically on Mediaserver start (or when a new Engine
+ * is created by the system administrator), and destroyed (via releaseRef()) on Mediaserver
+ * shutdown (or when an existing Engine is deleted by the system administrator).
+ *
+ * For the VMS end user, each Engine instance is perceived as an independent Analytics Engine
+ * which has its own set of values of settings stored in the Mediaserver database.
+ *
+ * All methods are guaranteed to be called without overlapping even if from different threads (i.e.
+ * with a guaranteed barrier between the calls), thus, no synchronization is required for the
+ * implementation.
+ */
+class IEngine: public Interface<IEngine, IEngine0>
+{
+public:
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IEngine1"); }
+
+    /** Called by getSettingsOnActiveSettingChange() */
+    protected: virtual void doGetSettingsOnActiveSettingChange(
+        Result<const ISettingsResponse*>* outResult,
+        const IString* activeSettingId,
+        const IString* settingsModel,
+        const IStringMap* settingsValues) = 0;
+    /**
+     * When a setting marked as Active changes its value in the GUI, the Server calls this method
+     * to notify the Plugin and allow it to adjust the values of the settings and the Settings
+     * Model. This mechanism allows certain settings to depend on the current values of others,
+     * for example, switching a checkbox or a drop-down can lead to some other setting being
+     * replaced with another, or some values being converted to a different measurement unit.
+     *
+     * @param activeSettingId Id of a setting which has triggered this notification.
+     *
+     * @param settingsModel Model of settings the Active setting has been triggered on. Never null.
+     *
+     * @param settingsValues Values currently set in the GUI. Never null.
+     *
+     * @return An error code with a message in case of some general failure that affected the
+     *     procedure of analyzing the settings, or a combination of optional individual setting
+     *     errors, optional new setting values in case they were adjusted, and an optional new
+     *     Settings Model. Can be null if none of the above items are present.
+     */
+    public: Result<const ISettingsResponse*> getSettingsOnActiveSettingChange(
+        const IString* activeSettingId,
+        const IString* settingsModel,
+        const IStringMap* settingsValues)
+    {
+        Result<const ISettingsResponse*> result;
+        doGetSettingsOnActiveSettingChange(
+            &result, activeSettingId, settingsModel, settingsValues);
+        return result;
+    }
+};
+using IEngine1 = IEngine;
 
 } // namespace analytics
 } // namespace sdk
