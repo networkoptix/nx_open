@@ -125,7 +125,8 @@ QN_FUSION_DECLARE_FUNCTIONS(TemporaryCredentials, (json))
 
 QN_FUSION_DECLARE_FUNCTIONS(AccountSecuritySettings, (json))
 
-#define AccountSecuritySettings_Fields (httpDigestAuthEnabled)(password)(account2faEnabled)(totp)
+#define AccountSecuritySettings_Fields \
+    (httpDigestAuthEnabled)(password)(account2faEnabled)(totp)(totpExistsForAccount)
 
 NX_REFLECTION_INSTRUMENT(AccountSecuritySettings, AccountSecuritySettings_Fields)
 

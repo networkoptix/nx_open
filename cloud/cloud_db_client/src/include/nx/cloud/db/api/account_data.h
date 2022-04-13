@@ -167,6 +167,9 @@ struct AccountSecuritySettings
 
     /**%apidoc Account password. Always required. */
     std::optional<std::string> password;
+
+    /**%apidoc Only used in get requests. True if a totp key was generated for the account */
+    std::optional<bool> totpExistsForAccount;
 };
 
 struct AccountForSharingRequest
