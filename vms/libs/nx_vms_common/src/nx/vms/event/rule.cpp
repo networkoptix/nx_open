@@ -300,6 +300,13 @@ RuleList Rule::getDefaultRules()
         << getPluginDiagnosticEventUpdateRules()
         << getServerCertificateErrorRules();
 
+    std::set<QnUuid> ruleIds;
+    for (const auto& rule: result)
+    {
+        NX_ASSERT(ruleIds.count(rule->id()) == 0, "Default rule id conflict: %1", rule->id());
+        ruleIds.insert(rule->id());
+    }
+
     auto disabledRules = getDisabledRulesUpd43();
 
     result.erase(std::remove_if(result.begin(), result.end(),
@@ -421,7 +428,7 @@ RuleList Rule::getServerCertificateErrorRules()
             EventType::serverCertificateError,
             kOwnerRoleIds)),
         RulePtr(new Rule(
-            /*internalId*/ 11008,
+            /*internalId*/ 10026,
             /*aggregationPeriod*/ 6 * 3600,
             /*isSystem*/ false,
             ActionType::pushNotificationAction,
