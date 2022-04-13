@@ -914,6 +914,39 @@ TEST_F(ResourceTreeModelTest, edgeServerDisplaysServerNameWhenBindedCameraRemove
     ASSERT_TRUE(displayFullMatch(kUniqueEdgeServerName)(serverIndex));
 }
 
+TEST_F(ResourceTreeModelTest, edgeServerDisplaysServerNameWhenMultipleResourcesRemoved)
+{
+    // When user with administrator permissions is logged in.
+    loginAsAdmin("admin");
+
+    // When EDGE server with certain unique name is added to the resource pool.
+    const auto edgeServer = addEdgeServer(kUniqueEdgeServerName, kValidIpV4Address);
+
+    // When binded EDGE camera with certain unique name is added to the EDGE server.
+    const auto edgeCamera = addEdgeCamera(kUniqueEdgeCameraName, edgeServer);
+
+    // When server redundancy flag set to true.
+    edgeServer->setRedundancy(true);
+
+    const auto camera = addCamera("test camera");
+
+    // Server gets EDGE camera name.
+    ASSERT_EQ(kUniqueEdgeCameraName, edgeServer->getName());
+
+    QObject::connect(resourcePool(), &QnResourcePool::resourceRemoved, resourcePool(),
+        [&](const QnResourcePtr& resource)
+        {
+            // Resources are removed from pool before this signal is emitted.
+            ASSERT_EQ(kUniqueEdgeServerName, edgeServer->getName());
+        });
+
+    // When binded EDGE camera removed from the resource pool.
+    resourcePool()->removeResources({ camera, edgeCamera });
+
+    // Server name returns back to original value.
+    ASSERT_EQ(kUniqueEdgeServerName, edgeServer->getName());
+}
+
 TEST_F(ResourceTreeModelTest, edgeServerDisplaysServerNameWhenBindedCameraMovedToForeignServer)
 {
     // When user with administrator permissions is logged in.
