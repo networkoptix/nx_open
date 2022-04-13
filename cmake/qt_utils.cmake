@@ -12,6 +12,8 @@ if(MACOSX)
     list(APPEND CMAKE_INSTALL_RPATH ${QT_DIR}/lib)
 endif()
 
+find_package(OpenSSL REQUIRED)
+
 find_package(Qt5
     COMPONENTS
         LinguistTools
