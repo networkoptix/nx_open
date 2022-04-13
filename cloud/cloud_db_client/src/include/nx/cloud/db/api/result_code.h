@@ -43,6 +43,7 @@ NX_REFLECTION_ENUM_CLASS(ResultCode,
     vmsRequestFailure,
     invalidTotp,
     invalidBackupCode,
+    userPasswordRequired,
 
     /** Credentials used for authentication are no longer valid. */
     credentialsRemovedPermanently,

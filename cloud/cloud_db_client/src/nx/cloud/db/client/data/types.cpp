@@ -22,6 +22,7 @@ nx::network::http::StatusCode::Value resultCodeToHttpStatusCode(ResultCode resul
         case ResultCode::badRequest:
         case ResultCode::mergedSystemIsOffline:
         case ResultCode::invalidFormat:
+        case ResultCode::userPasswordRequired:
             return nx::network::http::StatusCode::badRequest;
 
         case ResultCode::badUsername:
@@ -122,6 +123,7 @@ nx::network::http::ApiRequestResult apiResultToFusionRequestResult(Result result
             break;
 
         case ResultCode::badRequest:
+        case ResultCode::userPasswordRequired:
             requestResultCode = nx::network::http::ApiRequestErrorClass::badRequest;
             break;
 
