@@ -125,6 +125,12 @@ protected:
 
     virtual void finalize() override;
 
+    virtual void doGetSettingsOnActiveSettingChange(
+        Result<const ISettingsResponse*>* outResult,
+        const IString* activeSettingId,
+        const IString* settingsModel,
+        const IStringMap* settingsValues) override;
+
 public:
     virtual ~ConsumingDeviceAgent() override;
 

@@ -93,6 +93,12 @@ protected:
 
     IHandler* handler() const { return m_handler.get(); }
 
+    virtual void doGetSettingsOnActiveSettingChange(
+        Result<const ISettingsResponse*>* outResult,
+        const IString* clientId,
+        const IString* activeSettingId,
+        const IStringMap* settings) override;
+
 public:
     virtual ~Engine() override;
 

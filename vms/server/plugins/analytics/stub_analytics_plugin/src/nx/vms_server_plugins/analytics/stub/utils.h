@@ -2,8 +2,12 @@
 
 #pragma once
 
+#include <map>
 #include <string>
 #include <vector>
+
+#include <nx/sdk/ptr.h>
+#include <nx/sdk/i_string_map.h>
 
 namespace nx {
 namespace vms_server_plugins {
@@ -36,6 +40,8 @@ std::string join(const std::vector<std::string>& strings,
     const std::string& delimiter,
     const std::string& itemPrefix = std::string(),
     const std::string& itemPostfix = std::string());
+
+std::map<std::string, std::string> toStdMap(const nx::sdk::Ptr<const nx::sdk::IStringMap>& sdkMap);
 
 template<typename T>
 class SimpleOptional

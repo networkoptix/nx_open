@@ -91,6 +91,51 @@ std::string Plugin::manifestString() const
                         "url": "https://example.com/"
                     }
                 ]
+            },
+            {
+                "type": "GroupBox",
+                "caption": ")json" + kActiveSettingsGroupBoxCaption + R"json(",
+                "items":
+                [
+                    {
+                        "type": "ComboBox",
+                        "name": ")json" + kActiveComboBoxId + R"json(",
+                        "caption": "Active ComboBox",
+                        "defaultValue": "Some value",
+                        "isActive": true,
+                        "range":
+                        [
+                            "Some value",
+                            ")json" + kShowAdditionalComboBoxValue + R"json("
+                        ]
+                    },
+                    {
+                        "type": "CheckBox",
+                        "name": ")json" + kActiveCheckBoxId + R"json(",
+                        "caption": "Active CheckBox",
+                        "defaultValue": false,
+                        "isActive": true
+                    },
+                    {
+                        "type": "TextField",
+                        "name": ")json" + kActiveTextBoxId + R"json(",
+                        "caption": "Active TextBox",
+                        "defaultValue": "print \")json" + kShowAdditionalTextBoxValue + R"json(\"",
+                        "isActive": true
+                    },
+                    {
+                        "type": "RadioButtonGroup",
+                        "name": ")json" + kActiveRadioButtonGroupId + R"json(",
+                        "caption": "Active RadioButton Group",
+                        "defaultValue": "Some value",
+                        "isActive": true,
+                        "range":
+                        [
+                            "Some value",
+                            ")json" + kShowAdditionalRadioButtonValue + R"json("
+                        ]
+                    }
+                ]
             }
         ]
     }

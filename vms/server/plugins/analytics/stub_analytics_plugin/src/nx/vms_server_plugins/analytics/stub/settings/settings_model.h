@@ -19,6 +19,36 @@ static const std::string kCitySelector = "languageSelectorSettings";
 static const std::string kEnglishOption = "English";
 static const std::string kGermanOption = "German";
 
+// ------------------------------------------------------------------------------------------------
+
+static const std::string kCaption = "caption";
+static const std::string kSections = "sections";
+static const std::string kItems = "items";
+static const std::string kActiveSettingsSectionCaption = "Active settings section";
+static const std::string kActiveSettingsGroupBoxCaption = "Active settings";
+
+static const std::string kActiveComboBoxId = "activeComboBox";
+static const std::string kAdditionalComboBoxId = "additionalComboBox";
+static const std::string kShowAdditionalComboBoxValue = "Show additional ComboBox";
+static const std::string kAdditionalComboBoxValue = "Value 1";
+
+static const std::string kActiveCheckBoxId = "activeCheckBox";
+static const std::string kAdditionalCheckBoxId = "additionalCheckBox";
+static const std::string kShowAdditionalCheckBoxValue = "true";
+static const std::string kAdditionalCheckBoxValue = "false";
+
+static const std::string kActiveTextBoxId = "activeTextBox";
+static const std::string kAdditionalTextBoxId = "additionalTextBox";
+static const std::string kShowAdditionalTextBoxValue = "show something";
+static const std::string kAdditionalTextBoxValue = "";
+
+static const std::string kActiveRadioButtonGroupId = "activeRadioButtonGroup";
+static const std::string kShowAdditionalRadioButtonValue = "Show something";
+static const std::string kHideAdditionalRadioButtonValue = "Hide me";
+static const std::string kDefaultActiveRadioButtonGroupValue = "Some value";
+
+// ------------------------------------------------------------------------------------------------
+
 static const std::string kAlternativeSettingsModel =
     /*suppress newline*/ 1 + (const char*) R"json("
 {
@@ -347,6 +377,51 @@ static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R
                                 }
                             ]
                         }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "Section",
+            "caption": ")json" + kActiveSettingsSectionCaption + R"json(",
+            "items":
+            [
+                {
+                    "type": "ComboBox",
+                    "name": ")json" + kActiveComboBoxId + R"json(",
+                    "caption": "Active ComboBox",
+                    "defaultValue": "Some value",
+                    "isActive": true,
+                    "range":
+                    [
+                        "Some value",
+                        ")json" + kShowAdditionalComboBoxValue + R"json("
+                    ]
+                },
+                {
+                    "type": "CheckBox",
+                    "name": ")json" + kActiveCheckBoxId + R"json(",
+                    "caption": "Active CheckBox",
+                    "defaultValue": false,
+                    "isActive": true
+                },
+                {
+                    "type": "TextField",
+                    "name": ")json" + kActiveTextBoxId + R"json(",
+                    "caption": "Active TextBox",
+                    "defaultValue": "print \")json" + kShowAdditionalTextBoxValue + R"json(\"",
+                    "isActive": true
+                },
+                {
+                    "type": "RadioButtonGroup",
+                    "name": ")json" + kActiveRadioButtonGroupId + R"json(",
+                    "caption": "Active RadioButton Group",
+                    "defaultValue": "Some value",
+                    "isActive": true,
+                    "range":
+                    [
+                        "Some value",
+                        ")json" + kShowAdditionalRadioButtonValue + R"json("
                     ]
                 }
             ]
