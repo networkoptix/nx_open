@@ -41,7 +41,17 @@ public:
         static auto interfaceId() { return makeId("nx::sdk::analytics::IDeviceAgent::IHandler"); }
 
         virtual ~IHandler0() = default;
+
+        /**
+         * Passes a metadata packet to the Server. It's worth to mention that passing a single
+         * metadata packet containing multiple metadata items with the same timestamp is preferred
+         * to passiing multiple metadata packets with the same timestamp containing a single item.
+         * Although the latter will work correctly, it reduces the performace of the VMS Client.
+         * For example, if you have 10 objects detected on the same frame, it's better to send 1
+         * packet with all the object metadata than 10 separate packets.
+         */
         virtual void handleMetadata(IMetadataPacket* metadataPacket) = 0;
+
         virtual void handlePluginDiagnosticEvent(IPluginDiagnosticEvent* event) = 0;
     };
 
