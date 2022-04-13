@@ -78,7 +78,8 @@ std::string DeviceAgent::manifestString() const
             },
             {
                 "id": ")json" + kCounterObjectType + R"json(",
-                "name": "Counter"
+                "name": "Counter",
+                "flags": "nonIndexable"
             }
         ]
     }
