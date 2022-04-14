@@ -97,6 +97,14 @@ QN_FUSION_DECLARE_FUNCTIONS(AccountEmail, (json))
 NX_REFLECTION_INSTRUMENT(AccountEmail, AccountEmail_Fields)
 
 //-------------------------------------------------------------------------------------------------
+// PasswordResetRequest
+
+#define PasswordResetRequest_Fields (email)(customization)
+
+QN_FUSION_DECLARE_FUNCTIONS(PasswordResetRequest, (json))
+NX_REFLECTION_INSTRUMENT(PasswordResetRequest, PasswordResetRequest_Fields)
+
+//-------------------------------------------------------------------------------------------------
 // class TemporaryCredentials
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, TemporaryCredentialsTimeouts* const data);

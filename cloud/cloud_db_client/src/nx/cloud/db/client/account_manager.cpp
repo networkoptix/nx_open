@@ -74,13 +74,13 @@ void AccountManager::updateAccount(
 }
 
 void AccountManager::resetPassword(
-    api::AccountEmail accountEmail,
+    api::PasswordResetRequest request,
     std::function<void(api::ResultCode, api::AccountConfirmationCode)> completionHandler)
 {
     executeRequest<api::AccountConfirmationCode>(
         nx::network::http::Method::post,
         kAccountPasswordResetPath,
-        std::move(accountEmail),
+        std::move(request),
         std::move(completionHandler));
 }
 

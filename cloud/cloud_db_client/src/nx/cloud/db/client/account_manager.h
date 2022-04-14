@@ -42,7 +42,7 @@ public:
         std::function<void(api::ResultCode, api::AccountData)> completionHandler) override;
 
     virtual void resetPassword(
-        api::AccountEmail accountEmail,
+        api::PasswordResetRequest request,
         std::function<void(
             api::ResultCode,
             api::AccountConfirmationCode)> completionHandler) override;
