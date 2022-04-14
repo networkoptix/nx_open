@@ -174,7 +174,7 @@ struct NX_VMS_API CameraAttributesData
     BackupPolicy backupPolicy = BackupPolicy::byDefault;
 
     /**%apidoc[readonly] */
-    QString dataAccessId;
+    QString replaceWithId;
 
     /** Used by ...Model::toDbTypes() and transaction-description-modify checkers. */
     CheckResourceExists checkResourceExists = CheckResourceExists::yes; /**<%apidoc[unused] */
@@ -199,7 +199,7 @@ struct NX_VMS_API CameraAttributesData
     (recordAfterMotionSec) \
     (backupContentType) \
     (backupPolicy) \
-    (dataAccessId)
+    (replaceWithId)
 
 #define CameraAttributesData_Fields (cameraId)(cameraName) CameraAttributesData_Fields_Short
 

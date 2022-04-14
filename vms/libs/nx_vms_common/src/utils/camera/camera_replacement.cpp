@@ -29,7 +29,7 @@ using namespace nx::vms::api;
 bool isReplacementCamera(const QnResourcePtr& resource)
 {
     if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
-        return camera->dataAccessId() != camera->getPhysicalId();
+        return !camera->replaceWithId().isEmpty();
 
     return false;
 }
@@ -50,7 +50,7 @@ QnVirtualCameraResourcePtr findReplacementCamera(const QnResourcePtr& resource)
             if (camera == otherCamera)
                 return false;
 
-            return otherCamera->dataAccessId() == camera->getPhysicalId();
+            return otherCamera->replaceWithId() == camera->getPhysicalId();
         });
 }
 

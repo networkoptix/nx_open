@@ -1006,19 +1006,10 @@ struct ModifyCameraAttributesAccess
             // CRUD API PATCH merges with existing attributes represented as JSON object so they
             // can be not changed.
             nx::vms::api::CameraAttributesData origin = camera->getUserAttributes();
-            if (param.dataAccessId.isEmpty())
-            {
-                if (origin.dataAccessId == camera->getPhysicalId())
-                    origin.dataAccessId.clear();
-            }
-            else if (origin.dataAccessId.isEmpty())
-            {
-                origin.dataAccessId = camera->getPhysicalId();
-            }
-            if (param.dataAccessId != origin.dataAccessId)
+            if (!param.replaceWithId.isNull() && param.replaceWithId != origin.replaceWithId)
             {
                 return Result(ErrorCode::forbidden,
-                    NX_FMT("It is forbidden to alter dataAccessId via API. Device: %1",
+                    NX_FMT("It is forbidden to alter replaceWithId via API. Device: %1",
                         param.cameraId));
             }
 

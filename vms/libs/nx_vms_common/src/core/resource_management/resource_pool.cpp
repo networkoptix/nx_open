@@ -349,12 +349,12 @@ QnNetworkResourcePtr QnResourcePool::getNetworkResourceByPhysicalId(const QStrin
     return d->resourcesByPhysicalId.value(physicalId);
 }
 
-QnSecurityCamResourcePtr QnResourcePool::getCameraByDataAccessId(const QString& id) const
+QnSecurityCamResourcePtr QnResourcePool::getCameraByReplaceWithId(const QString& id) const
 {
     return getResource<QnSecurityCamResource>(
         [&id](const QnSecurityCamResourcePtr& resource)
         {
-            return resource->dataAccessId() == id;
+            return resource->replaceWithId() == id;
         });
 
     return QnSharedResourcePointer<QnSecurityCamResource>();

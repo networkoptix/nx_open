@@ -97,12 +97,12 @@ struct DeviceOptions
     /**%apidoc[readonly]
      * %// Appeared starting from /rest/v2/devices.
      */
-    QString dataAccessId;
+    QString replaceWithId;
 };
 #define DeviceOptions_Fields \
     (isControlEnabled)(isAudioEnabled)(isDualStreamingDisabled) \
     (dewarpingParams)(preferredServerId)(failoverPriority)(backupQuality)(backupContentType) \
-    (backupPolicy)(dataAccessId)
+    (backupPolicy)(replaceWithId)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceOptions, (json), NX_VMS_API)
 
 struct DeviceScheduleSettings
