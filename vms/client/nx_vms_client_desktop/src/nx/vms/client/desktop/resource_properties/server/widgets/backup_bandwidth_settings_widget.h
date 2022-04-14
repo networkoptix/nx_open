@@ -6,9 +6,8 @@
 
 #include <QtWidgets/QWidget>
 
-#include <ui/widgets/common/abstract_preferences_widget.h>
-
 #include <core/resource/resource_fwd.h>
+#include <ui/widgets/common/abstract_preferences_widget.h>
 
 namespace Ui { class BackupBandwidthSettingsWidget; }
 
@@ -24,13 +23,6 @@ class BackupBandwidthSettingsWidget:
     using base_type = QWidget;
 
 public:
-    enum BandwidthLimitType
-    {
-        NoLimit,
-        FixedLimit,
-        ScheduledLimit,
-    };
-
     BackupBandwidthSettingsWidget(QWidget* parent = nullptr);
     virtual ~BackupBandwidthSettingsWidget() override;
 
