@@ -1165,23 +1165,26 @@ void ServerUpdateTool::requestModuleInformation()
         m_serverConnection->getModuleInformationAll(callback);
 }
 
-void ServerUpdateTool::atUpdateStatusResponse(bool success, rest::Handle handle,
+void ServerUpdateTool::atUpdateStatusResponse(
+    bool success,
+    rest::Handle handle,
     const std::vector<nx::vms::common::update::Status>& response)
 {
+    NX_VERBOSE(this, "Got update status response. Success: %1, handle: %2", success, handle);
+
     if (m_expectedStatusHandle && m_expectedStatusHandle != handle)
     {
-        NX_VERBOSE(this) << "atUpdateStatusResponse handle" << handle << "was skipped";
+        NX_VERBOSE(this, "Update status response %1 was skipped.", handle);
         return;
     }
 
-    m_checkingRemoteUpdateStatus = false;
     m_expectedStatusHandle = 0;
 
     if (!success)
         return;
 
     RemoteStatus remoteStatus;
-    for (const auto& status : response)
+    for (const auto& status: response)
         remoteStatus[status.serverId] = status;
 
     m_remoteUpdateStatus = std::move(remoteStatus);
@@ -1189,9 +1192,14 @@ void ServerUpdateTool::atUpdateStatusResponse(bool success, rest::Handle handle,
 
 void ServerUpdateTool::requestRemoteUpdateStateAsync()
 {
+    NX_VERBOSE(this, "Requesting update status...");
+
     // Request another state only if there is no pending request.
-    if (m_checkingRemoteUpdateStatus)
+    if (m_expectedStatusHandle > 0)
+    {
+        NX_VERBOSE(this, "One of update status requests is in progress. Skipping...");
         return;
+    }
 
     const auto connection = connectedServerApi();
     if (!connection)
@@ -1202,7 +1210,6 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
     // participating in the update.
 
     // Requesting update status for mediaservers.
-    m_checkingRemoteUpdateStatus = true;
     m_expectedStatusHandle = system_update::requestUpdateStatus(
         connection,
         [this, tool = QPointer<ServerUpdateTool>(this)](
@@ -1219,7 +1226,6 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
                     "requestRemoteUpdateStateAsync: "
                         "Error in response to /ec2/updateStatus: code=%1, error=%2",
                     result.error, result.errorString);
-                return;
             }
 
             tool->atUpdateStatusResponse(

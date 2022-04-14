@@ -309,7 +309,6 @@ private:
     // Container for remote state.
     // We keep temporary state updates here. Widget will pull this data periodically.
     RemoteStatus m_remoteUpdateStatus;
-    bool m_checkingRemoteUpdateStatus = false;
     mutable std::recursive_mutex m_statusLock;
 
     // For pushing update package to the server swarm. Will be replaced by a p2p::Downloader.
