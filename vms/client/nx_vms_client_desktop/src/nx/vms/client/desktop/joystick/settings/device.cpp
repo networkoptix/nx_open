@@ -40,11 +40,16 @@ QString Device::path() const
     return m_path;
 }
 
+Device::StickPosition Device::currentStickPosition() const
+{
+    return m_stickPosition;
+}
+
 void Device::updateStickAxisLimits(const JoystickDescriptor& modelInfo)
 {
-    m_axisLimits[xIndex] = parseAxisLimits(modelInfo.xAxis);
-    m_axisLimits[yIndex] = parseAxisLimits(modelInfo.yAxis);
-    m_axisLimits[zIndex] = parseAxisLimits(modelInfo.zAxis);
+    m_axisLimits[xIndex] = parseAxisLimits(modelInfo.xAxis, m_axisLimits[xIndex]);
+    m_axisLimits[yIndex] = parseAxisLimits(modelInfo.yAxis, m_axisLimits[yIndex]);
+    m_axisLimits[zIndex] = parseAxisLimits(modelInfo.zAxis, m_axisLimits[zIndex]);
     // Initialize stick position by zeroes (all three axes are in neutral position).
     m_stickPosition.fill(0);
 }
@@ -79,14 +84,14 @@ void Device::pollData()
 
     bool deviceStateChanged = false;
 
-    if (newState.stickPositions != m_stickPosition)
+    if (newState.stickPosition != m_stickPosition)
     {
-        m_stickPosition = newState.stickPositions;
+        m_stickPosition = newState.stickPosition;
         deviceStateChanged = true;
         emit stickMoved(
-            newState.stickPositions[xIndex],
-            newState.stickPositions[yIndex],
-            newState.stickPositions[zIndex]);
+            newState.stickPosition[xIndex],
+            newState.stickPosition[yIndex],
+            newState.stickPosition[zIndex]);
     }
 
     NX_ASSERT(m_buttonStates.size() == newState.buttonStates.size());
@@ -109,7 +114,7 @@ void Device::pollData()
     }
 
     if (deviceStateChanged)
-        emit stateChanged(newState.stickPositions, newState.buttonStates);
+        emit stateChanged(newState.stickPosition, newState.buttonStates);
 }
 
 } // namespace nx::vms::client::desktop::joystick

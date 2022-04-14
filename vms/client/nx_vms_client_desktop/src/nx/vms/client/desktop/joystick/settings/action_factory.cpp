@@ -46,8 +46,8 @@ struct ActionFactory::Private
     std::vector<std::vector<std::unique_ptr<ParsedAction>>> assignedActions;
     int modifierIndex = -1;
 
-    Device::StickPositions savedStick;
-    std::vector<bool> savedButtons;
+    Device::StickPosition savedStick;
+    Device::ButtonStates savedButtons;
     bool actedWithModifier = false;
 
     // Layout focus related variables.
@@ -141,7 +141,7 @@ struct ActionFactory::Private
         return -1;
     }
 
-    void handleStateChanged(const Device::StickPositions& stick, const Device::ButtonStates& buttons)
+    void handleStateChanged(const Device::StickPosition& stick, const Device::ButtonStates& buttons)
     {
         if (!NX_ASSERT(buttons.size() == savedButtons.size()))
             return;
@@ -328,7 +328,7 @@ struct ActionFactory::Private
         return modifierIndex == id;
     }
 
-    bool modifierState(const std::vector<bool>& buttons)
+    bool modifierState(const Device::ButtonStates& buttons)
     {
         return modifierIndex >= 0
             ? buttons.at(modifierIndex)
@@ -379,7 +379,7 @@ void ActionFactory::updateConfig(const JoystickDescriptor& config)
     d->updateConfig(config);
 }
 
-void ActionFactory::handleStateChanged(const Device::StickPositions& stick, const Device::ButtonStates& buttons)
+void ActionFactory::handleStateChanged(const Device::StickPosition& stick, const Device::ButtonStates& buttons)
 {
     d->handleStateChanged(stick, buttons);
 }

@@ -31,7 +31,9 @@ public:
 
 protected:
     virtual State getNewState() override;
-    virtual AxisLimits parseAxisLimits(const AxisDescriptor& descriptor) override;
+    virtual AxisLimits parseAxisLimits(
+        const AxisDescriptor& descriptor,
+        const AxisLimits& oldLimits) const override;
 
 private:
     int m_dev = -1;

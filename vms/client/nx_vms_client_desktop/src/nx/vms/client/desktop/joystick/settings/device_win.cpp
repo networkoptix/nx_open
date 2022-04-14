@@ -66,30 +66,32 @@ Device::State DeviceWindows::getNewState()
         return {};
     }
 
-    StickPositions newStickPositions{
+    StickPosition newStickPosition{
         mapAxisState(state.lX, m_axisLimits[xIndex]),
         mapAxisState(state.lY, m_axisLimits[yIndex]),
         mapAxisState(state.lZ, m_axisLimits[zIndex])
     };
 
-    std::vector<bool> newButtonStates = m_buttonStates;
+    ButtonStates newButtonStates = m_buttonStates;
     for (int i = 0; i < newButtonStates.size() && i < sizeof(state.rgbButtons); ++i)
         newButtonStates[i] = state.rgbButtons[i];
 
-    return {newStickPositions, newButtonStates};
+    return {newStickPosition, newButtonStates};
 }
 
-Device::AxisLimits DeviceWindows::parseAxisLimits(const AxisDescriptor& descriptor)
+Device::AxisLimits DeviceWindows::parseAxisLimits(
+    const AxisDescriptor& descriptor,
+    const AxisLimits& oldLimits) const
 {
-    Device::AxisLimits result;
+    Device::AxisLimits result = oldLimits;
 
     // Ignore min and max due to dynamically receiving them.
-    const int min = descriptor.min.toInt(/*ok*/ nullptr, kAutoDetectBase);
-    const int max = descriptor.max.toInt(/*ok*/ nullptr, kAutoDetectBase);
-    const int bounce = descriptor.bounce.toInt(/*ok*/ nullptr, kAutoDetectBase);
-    const int minBounce = (max - min) / 100.0 * kMinBounceInPercentages;
-    if (minBounce < bounce) //< Rewrite dynamically received bounce only in this case.
-        result.bounce = bounce;
+
+    result.bounce = descriptor.bounce.toInt(/*ok*/ nullptr, kAutoDetectBase);
+
+    const int minBounce = (result.max - result.min) / 100.0 * kMinBounceInPercentages;
+    if (minBounce > result.bounce)
+        result.bounce = minBounce;
 
     result.sensitivity = descriptor.sensitivity.toDouble(/*ok*/ nullptr);
     return result;

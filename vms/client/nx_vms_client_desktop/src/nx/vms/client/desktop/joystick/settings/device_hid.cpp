@@ -66,9 +66,9 @@ Device::State DeviceHid::getNewState()
         return {};
     m_reportData = newReportData;
 
-    StickPositions newStickPositions;
-    newStickPositions.fill(0);
-    for (int i = 0; i < m_axisLocations.size() && i < newStickPositions.max_size(); ++i)
+    StickPosition newStickPosition;
+    newStickPosition.fill(0);
+    for (int i = 0; i < m_axisLocations.size() && i < newStickPosition.max_size(); ++i)
     {
         const auto state = parseData(m_reportData, m_axisLocations[i]);
 
@@ -79,19 +79,21 @@ Device::State DeviceHid::getNewState()
                 rawValue |= 1 << i;
         }
 
-        newStickPositions[i] = mapAxisState(rawValue, m_axisLimits[i]);
+        newStickPosition[i] = mapAxisState(rawValue, m_axisLimits[i]);
     }
 
-    std::vector<bool> newButtonStates;
+    ButtonStates newButtonStates;
     for (const auto& location: m_buttonLocations)
     {
         newButtonStates.push_back(mapButtonState(parseData(m_reportData, location)));
     }
 
-    return {newStickPositions, newButtonStates};
+    return {newStickPosition, newButtonStates};
 }
 
-Device::AxisLimits DeviceHid::parseAxisLimits(const AxisDescriptor& descriptor)
+Device::AxisLimits DeviceHid::parseAxisLimits(
+    const AxisDescriptor& descriptor,
+    const AxisLimits& /*oldLimits*/) const
 {
     Device::AxisLimits result;
     result.min = descriptor.min.toInt(/*ok*/ nullptr, kAutoDetectBase);

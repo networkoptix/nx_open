@@ -184,6 +184,12 @@ bool JoystickSettingsDialog::Private::initModel(bool initWithDefaults)
         : manager->getDeviceDescription(device->id());
     buttonSettingsModel->init(description, device);
 
+    const auto stickPosition = device->currentStickPosition();
+    QmlProperty<bool>(q->rootObjectHolder(), "panAndTiltHighlighted") =
+        stickPosition[Device::xIndex] != 0 || stickPosition[Device::yIndex] != 0;
+    QmlProperty<bool>(q->rootObjectHolder(), "zoomHighlighted") =
+        stickPosition[Device::zIndex] != 0;
+
     deviceConnection.reset(QObject::connect(device.get(), &Device::stickMoved, q,
         [this](double x, double y, double z)
         {

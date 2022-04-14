@@ -222,7 +222,7 @@ void Manager::initializeDevice(
 
     m_deviceConnections[devicePath] <<
         connect(device.get(), &Device::stateChanged, this,
-            [this, factory](const Device::StickPositions& stick, const Device::ButtonStates& buttons)
+            [this, factory](const Device::StickPosition& stick, const Device::ButtonStates& buttons)
             {
                 if (m_deviceActionsEnabled)
                     factory->handleStateChanged(stick, buttons);
