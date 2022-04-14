@@ -931,7 +931,7 @@ void QnMediaResourceWidget::createButtons()
     const auto motionSearchLocalAction = createActionAndButton(
         "item/motion.svg",
         isMotionSearchModeEnabled(),
-        QKeySequence{"Alt+M"},
+        {},
         tr("Motion Search"),
         Qn::MainWindow_MediaItem_SmartSearch_Help,
         Qn::MotionSearchButton,
@@ -956,7 +956,7 @@ void QnMediaResourceWidget::createButtons()
     const auto objectSearchLocalAction = createActionAndButton(
         "item/object.svg",
         action(action::ObjectSearchModeAction)->isChecked(),
-        QKeySequence{"Alt+O"},
+        {},
         tr("Object Search"),
         /*helpTopic*/ {},
         Qn::ObjectSearchButton,
