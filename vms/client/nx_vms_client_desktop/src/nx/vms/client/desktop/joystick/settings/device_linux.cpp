@@ -106,17 +106,17 @@ Device::State DeviceLinux::getNewState()
         return {};
 
     JoystickEvent event;
-    Device::StickPositions newStickPositions = m_stickPosition;
+    Device::StickPosition newStickPosition = m_stickPosition;
     Device::ButtonStates newButtonStates = m_buttonStates;
 
     while (readData(m_dev, &event.data))
     {
         if (event.isAxis())
         {
-            if (!NX_ASSERT(event.axisOrButtonIndex() < newStickPositions.size()))
+            if (!NX_ASSERT(event.axisOrButtonIndex() < newStickPosition.size()))
                 continue;
 
-            newStickPositions[event.axisOrButtonIndex()] =
+            newStickPosition[event.axisOrButtonIndex()] =
                 mapAxisState(event.axisOrButtonState(), m_axisLimits[event.axisOrButtonIndex()]);
         }
         else if (event.isButton())
@@ -128,10 +128,12 @@ Device::State DeviceLinux::getNewState()
         }
     }
 
-    return {newStickPositions, newButtonStates};
+    return {newStickPosition, newButtonStates};
 }
 
-Device::AxisLimits DeviceLinux::parseAxisLimits(const AxisDescriptor& descriptor)
+Device::AxisLimits DeviceLinux::parseAxisLimits(
+    const AxisDescriptor& descriptor,
+    const AxisLimits& /*oldLimits*/) const
 {
     AxisLimits result;
     result.min = JoystickEvent::MIN_AXES_VALUE;
