@@ -21,7 +21,11 @@ namespace nx::network::maintenance::log {
 class NX_NETWORK_API Server
 {
 public:
-    Server(nx::utils::log::LoggerCollection * loggerCollection = nullptr);
+    /**
+     * @param loggerCollection If null then no the global one is used.
+     */
+    Server(nx::utils::log::LoggerCollection* loggerCollection = nullptr);
+
     void registerRequestHandlers(
         const std::string& basePath,
         http::server::rest::MessageDispatcher* messageDispatcher);

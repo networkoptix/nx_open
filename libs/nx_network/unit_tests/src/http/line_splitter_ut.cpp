@@ -148,4 +148,33 @@ TEST_F(LineSplitter, common)
     ASSERT_EQ("line3", lineBuffer);
 }
 
+//-------------------------------------------------------------------------------------------------
+
+class StringLineIterator:
+    public ::testing::Test
+{
+protected:
+    std::vector<std::string> split(const std::string& text)
+    {
+        std::vector<std::string> lines;
+        http::StringLineIterator it(text);
+        for (auto line = it.next(); line; line = it.next())
+            lines.push_back(std::string(*line));
+        return lines;
+    }
+
+    void assertEq(const std::vector<std::string>& one, const std::vector<std::string>& two)
+    {
+        ASSERT_EQ(one, two);
+    }
+};
+
+TEST_F(StringLineIterator, main)
+{
+    assertEq(split("line1"), {{"line1"}});
+    assertEq(split("line1\r\n"), {{"line1"}});
+    assertEq(split("line1\nline2"), {{"line1"}, {"line2"}});
+    assertEq(split("line1\r\nline2\r\n"), {{"line1"}, {"line2"}});
+}
+
 } // namespace nx::network::http::test
