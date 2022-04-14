@@ -143,6 +143,15 @@ struct AccountEmail
     std::string email;
 };
 
+struct PasswordResetRequest
+{
+    /**%apidoc Account email. */
+    std::string email;
+
+    /**%apidoc Customization to use for password reset notification. */
+    std::optional<std::string> customization = std::nullopt;
+};
+
 struct TemporaryCredentialsTimeouts
 {
     /**%apidoc Expiration timeout.

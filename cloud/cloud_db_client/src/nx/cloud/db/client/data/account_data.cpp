@@ -200,7 +200,7 @@ bool deserialize(QnJsonContext*, const QJsonValue& value, AccountUpdateData* dat
     auto passwordIter = map.find(AccountUpdateData_password_field);
     if (passwordIter != map.constEnd())
         data->password = passwordIter.value().toString().toStdString();
-    
+
     auto currentPasswordIter = map.find(AccountUpdateData_currentPassword_field);
     if (currentPasswordIter != map.constEnd())
         data->currentPassword = currentPasswordIter.value().toString().toStdString();
@@ -245,6 +245,11 @@ void serializeToUrlQuery(const AccountEmail& data, QUrlQuery* const urlQuery)
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AccountEmail, (json), AccountEmail_Fields, (optional, false))
+
+//-------------------------------------------------------------------------------------------------
+// PasswordResetRequest
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PasswordResetRequest, (json), PasswordResetRequest_Fields)
 
 //-------------------------------------------------------------------------------------------------
 // class TemporaryCredentials

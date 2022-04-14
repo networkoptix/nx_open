@@ -45,7 +45,7 @@ public:
         std::function<void(api::ResultCode, api::AccountData)> completionHandler) = 0;
 
     virtual void resetPassword(
-        api::AccountEmail accountEmail,
+        api::PasswordResetRequest request,
         std::function<void(api::ResultCode, api::AccountConfirmationCode)> completionHandler) = 0;
 
     /** Requests to re-send account activation code to the email address provided. */
