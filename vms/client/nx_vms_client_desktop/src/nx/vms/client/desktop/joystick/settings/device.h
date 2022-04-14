@@ -26,12 +26,11 @@ public:
         axisIndexCount
     };
 
-    using StickPositions = std::array<double, axisIndexCount>;
-
+    using StickPosition = std::array<double, axisIndexCount>;
     using ButtonStates = std::vector<bool>;
     struct State
     {
-        StickPositions stickPositions;
+        StickPosition stickPosition;
         ButtonStates buttonStates;
     };
 
@@ -77,6 +76,8 @@ public:
 
     void updateStickAxisLimits(const JoystickDescriptor& modelInfo);
 
+    StickPosition currentStickPosition() const;
+
 signals:
     /** i-th button on the device has been pressed. */
     void buttonPressed(int id);
@@ -95,11 +96,13 @@ signals:
      * This signal is necessary for command processing since we need to check modifier state
      * changes before processing any other button state change.
      */
-    void stateChanged(const StickPositions& stick, const ButtonStates& buttons);
+    void stateChanged(const StickPosition& stick, const ButtonStates& buttons);
 
 protected:
     virtual State getNewState() = 0;
-    virtual AxisLimits parseAxisLimits(const AxisDescriptor& descriptor) = 0;
+    virtual AxisLimits parseAxisLimits(
+        const AxisDescriptor& descriptor,
+        const AxisLimits& oldLimits) const = 0;
     double mapAxisState(int rawValue, const AxisLimits& limits);
     void pollData();
 
@@ -112,7 +115,7 @@ protected:
 
     std::array<AxisLimits, axisIndexCount> m_axisLimits;
 
-    StickPositions m_stickPosition;
+    StickPosition m_stickPosition;
     ButtonStates m_buttonStates;
 };
 

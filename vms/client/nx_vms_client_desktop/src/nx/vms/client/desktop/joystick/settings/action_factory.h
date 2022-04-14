@@ -45,7 +45,7 @@ public:
 
     void updateConfig(const JoystickDescriptor& config);
 
-    void handleStateChanged(const Device::StickPositions& stick, const Device::ButtonStates& buttons);
+    void handleStateChanged(const Device::StickPosition& stick, const Device::ButtonStates& buttons);
 
 signals:
     void actionReady(
