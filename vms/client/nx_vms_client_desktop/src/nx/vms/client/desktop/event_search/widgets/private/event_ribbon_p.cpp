@@ -1151,7 +1151,8 @@ void EventRibbon::Private::setHighlightedTimestamp(microseconds value)
         return;
 
     m_highlightedTimestamp = value;
-    updateHighlightedTiles();
+    if (!m_updating)
+        updateHighlightedTiles();
 }
 
 QSet<QnResourcePtr> EventRibbon::Private::highlightedResources() const
@@ -1165,7 +1166,8 @@ void EventRibbon::Private::setHighlightedResources(const QSet<QnResourcePtr>& va
         return;
 
     m_highlightedResources = value;
-    updateHighlightedTiles();
+    if (!m_updating)
+        updateHighlightedTiles();
 }
 
 void EventRibbon::Private::setInsertionMode(UpdateMode updateMode, bool scrollDown)
