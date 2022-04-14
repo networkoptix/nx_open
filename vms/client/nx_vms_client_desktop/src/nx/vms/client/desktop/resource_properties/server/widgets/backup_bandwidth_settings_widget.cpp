@@ -20,10 +20,14 @@
 
 namespace {
 
-static constexpr int kDaysInWeek = 7;
-static constexpr int kHoursInDay = 24;
-
 static constexpr int64_t kBitsInMegabit = 1000 * 1000;
+
+enum BandwidthLimitType
+{
+    NoLimit,
+    FixedLimit,
+    ScheduledLimit,
+};
 
 using namespace nx::vms::client::desktop;
 
@@ -57,9 +61,16 @@ nx::vms::api::BackupBitrateBytesPerSecond getBackupBitrateLimitsFromGrid(
 }
 
 void setBackupBitrateLimitsToGrid(
-    ScheduleGridWidget* grid,
-    const nx::vms::api::BackupBitrateBytesPerSecond& bitrateLimits)
+    BandwidthLimitType limitType,
+    const nx::vms::api::BackupBitrateBytesPerSecond& bitrateLimits,
+    ScheduleGridWidget* grid)
 {
+    if (limitType == NoLimit)
+    {
+        grid->resetGridData();
+        return;
+    }
+
     for (const auto dayOfWeek: ScheduleGridWidget::daysOfWeek())
     {
         for (int hour = 0; hour < ScheduleGridWidget::kHoursInDay; ++hour)
@@ -72,20 +83,20 @@ void setBackupBitrateLimitsToGrid(
     }
 }
 
-BackupBandwidthSettingsWidget::BandwidthLimitType getBandwithLimitTypeFromBitrateLimits(
+BandwidthLimitType getBandwithLimitTypeFromBitrateLimits(
     const nx::vms::api::BackupBitrateBytesPerSecond& bitrateLimits)
 {
     if (bitrateLimits.isEmpty())
-        return BackupBandwidthSettingsWidget::NoLimit;
+        return NoLimit;
 
-    if (bitrateLimits.size() != kDaysInWeek * kHoursInDay)
-        return BackupBandwidthSettingsWidget::ScheduledLimit;
+    if (bitrateLimits.size() != ScheduleGridWidget::kDaysInWeek * ScheduleGridWidget::kHoursInDay)
+        return ScheduledLimit;
 
     const auto values = bitrateLimits.values();
     if (std::adjacent_find(values.cbegin(), values.cend(), std::not_equal_to<>()) == values.cend())
-        return BackupBandwidthSettingsWidget::FixedLimit;
+        return FixedLimit;
 
-    return BackupBandwidthSettingsWidget::ScheduledLimit;
+    return BandwidthLimitType::ScheduledLimit;
 }
 
 // Extension to the default buddy logic for brush selection buttons: clicking on the label not only
@@ -258,28 +269,17 @@ void BackupBandwidthSettingsWidget::loadDataToUi()
         ui->stackedWidget->setCurrentIndex(bandwidthLimitType);
     }
 
-    switch (bandwidthLimitType)
+    if (bandwidthLimitType == FixedLimit)
     {
-        case NoLimit:
-            ui->scheduleGridWidget->resetGridData();
-            break;
-
-        case FixedLimit:
-            ui->fixedLimitSpinbox->setValue(bytesPerSecondToMegabitsPerSecond(
-                bitrateLimits.cbegin().value()));
-            break;
-
-        case ScheduledLimit:
-            {
-                QSignalBlocker signalBlocker(ui->scheduleGridWidget);
-                setBackupBitrateLimitsToGrid(ui->scheduleGridWidget, bitrateLimits);
-            }
-            emit hasChangesChanged();
-            break;
-
-        default:
-            break;
+        ui->fixedLimitSpinbox->setValue(bytesPerSecondToMegabitsPerSecond(
+            bitrateLimits.cbegin().value()));
     }
+
+    {
+        QSignalBlocker signalBlocker(ui->scheduleGridWidget);
+        setBackupBitrateLimitsToGrid(bandwidthLimitType, bitrateLimits, ui->scheduleGridWidget);
+    }
+    emit hasChangesChanged();
 }
 
 void BackupBandwidthSettingsWidget::applyChanges()
