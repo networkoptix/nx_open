@@ -84,7 +84,7 @@ DeviceModel::DbUpdateTypes DeviceModel::toDbTypes() &&
     attributes.backupQuality = options.backupQuality;
     attributes.backupContentType = options.backupContentType;
     attributes.backupPolicy = options.backupPolicy;
-    attributes.dataAccessId = options.dataAccessId;
+    attributes.replaceWithId = options.replaceWithId;
 
     attributes.scheduleEnabled = schedule.isEnabled;
     attributes.scheduleTasks = schedule.tasks;
@@ -153,7 +153,7 @@ std::vector<DeviceModel> DeviceModel::fromDbTypes(DbListTypes all)
                 model.options.backupQuality = attributes->backupQuality;
                 model.options.backupContentType = attributes->backupContentType;
                 model.options.backupPolicy = attributes->backupPolicy;
-                model.options.dataAccessId = attributes->dataAccessId;
+                model.options.replaceWithId = attributes->replaceWithId;
 
                 model.schedule.isEnabled = attributes->scheduleEnabled;
                 model.schedule.tasks = attributes->scheduleTasks;
