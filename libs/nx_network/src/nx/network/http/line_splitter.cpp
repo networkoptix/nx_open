@@ -121,6 +121,9 @@ StringLineIterator::StringLineIterator(const std::string_view& str):
 
 std::optional<std::string_view> StringLineIterator::next()
 {
+    if (m_dataOffset >= m_sourceData.size())
+        return std::nullopt;
+
     ConstBufferRefType line;
     size_t bytesRead = 0;
     if (m_lineSplitter.parseByLines(m_sourceData.substr(m_dataOffset), &line, &bytesRead))
@@ -129,7 +132,10 @@ std::optional<std::string_view> StringLineIterator::next()
         return (std::string_view) line;
     }
 
-    return std::nullopt;
+    // Reporting text remainder as a line.
+    line = m_sourceData.substr(m_dataOffset);
+    m_dataOffset = m_sourceData.size();
+    return (std::string_view) line;
 }
 
 } // namespace nx::network::http
