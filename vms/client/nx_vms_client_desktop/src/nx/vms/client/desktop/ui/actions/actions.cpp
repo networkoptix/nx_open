@@ -231,7 +231,8 @@ void initialize(Manager* manager, Action* root)
 
     factory(MotionTabAction)
         .flags(GlobalHotkey | HotkeyOnly)
-        .shortcut(lit("M"))
+        .shortcut("M")
+        .shortcut("Alt+M")
         .condition(condition::isWorkbenchVisible())
         .text(ContextMenu::tr("Switch to Motion tab"));
 
@@ -249,7 +250,8 @@ void initialize(Manager* manager, Action* root)
 
     factory(ObjectsTabAction)
         .flags(GlobalHotkey | HotkeyOnly)
-        .shortcut(lit("O"))
+        .shortcut("O")
+        .shortcut("Alt+O")
         .condition(condition::isWorkbenchVisible())
         .text(ContextMenu::tr("Switch to Objects tab"));
 

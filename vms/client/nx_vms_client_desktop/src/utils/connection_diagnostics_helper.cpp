@@ -337,7 +337,7 @@ void QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
             title = tr("Your session has expired");
             break;
         case RemoteConnectionErrorCode::twoFactorAuthOfCloudUserIsDisabled:
-            title = tr("Failed to login to \"%1\" system").arg(moduleInformation.systemName);
+            title = tr("Failed to log in to \"%1\" system").arg(moduleInformation.systemName);
             break;
         default:
             title = tr("Failed to connect to Server");
