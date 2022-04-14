@@ -27,7 +27,7 @@ std::set<LoggerCollection::Context> removeDuplicates(
 {
     std::set<LoggerCollection::Context> uniqueLoggers;
 
-    for (const auto& element : loggersByFilters)
+    for (const auto& element: loggersByFilters)
         uniqueLoggers.emplace(element.second);
 
     return uniqueLoggers;
@@ -35,7 +35,7 @@ std::set<LoggerCollection::Context> removeDuplicates(
 
 } // namespace
 
-Server::Server(LoggerCollection * loggerCollection /*= nullptr*/):
+Server::Server(LoggerCollection* loggerCollection /*= nullptr*/):
     m_loggerCollection(loggerCollection)
 {
     if (!m_loggerCollection)
