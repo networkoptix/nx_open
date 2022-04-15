@@ -126,6 +126,9 @@ public:
         // The only intention for packets with such a flag is to be shown to the user in the Live
         // mode. They are not going to be recorded.
         MediaFlags_LiveOnly             = 0x40000,
+
+        // Packets that can be pipelined with some delay from live
+        MediaFlags_Delayed              = 0x80000,
     };
 
     Q_DECLARE_FLAGS(MediaFlags, MediaFlag)
