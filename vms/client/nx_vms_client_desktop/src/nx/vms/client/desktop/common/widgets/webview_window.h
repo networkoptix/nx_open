@@ -27,7 +27,7 @@ signals:
 
 public slots:
     void loadAndShow();
-    void setWindowGeometry(const QRect& geometry);
+    void setWindowFrameGeometry(const QRect& geometry);
     void setWindowSize(int width, int height);
 
 private:

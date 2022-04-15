@@ -59,9 +59,22 @@ void WebViewWindow::loadAndShow()
     show();
 }
 
-void WebViewWindow::setWindowGeometry(const QRect& geometry)
+void WebViewWindow::setWindowFrameGeometry(const QRect& geometry)
 {
-    setGeometry(geometry.marginsRemoved(windowHandle()->frameMargins()));
+    // Since we need to take system margins of the window into account, try to get them from our
+    // system window or from the parent window.
+
+    // This method might be called before the windows is shown. Force creation of system window if
+    // possible.
+    winId();
+
+    QWindow* handle = windowHandle();
+    if (!handle && parentWidget())
+        handle = parentWidget()->window()->windowHandle();
+
+    const QMargins margins = handle ? handle->frameMargins() : QMargins{};
+
+    setGeometry(geometry.marginsRemoved(margins));
 }
 
 void WebViewWindow::setWindowSize(int width, int height)
