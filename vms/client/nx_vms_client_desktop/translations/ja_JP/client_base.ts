@@ -9883,7 +9883,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Trust this server?</source>
-      <translation>このサーバーを信頼しますか？</translation>
+      <translation>このサーバーを信用しますか？</translation>
     </message>
     <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
