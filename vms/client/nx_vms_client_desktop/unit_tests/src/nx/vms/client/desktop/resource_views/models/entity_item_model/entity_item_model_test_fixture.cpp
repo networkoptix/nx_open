@@ -5,16 +5,14 @@
 #include <random>
 
 #include <api/global_settings.h>
+#include <client/client_runtime_settings.h>
+#include <client/client_startup_parameters.h>
+#include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <common/static_common_module.h>
-
-#include <client_core/client_core_module.h>
-#include <client/client_startup_parameters.h>
-#include <client/client_runtime_settings.h>
-
 #include <nx/utils/debug_helpers/model_transaction_checker.h>
-
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_item_model {
@@ -22,9 +20,6 @@ namespace test {
 
 void EntityItemModelTest::SetUp()
 {
-    m_clientRuntimeSettings.reset(new QnClientRuntimeSettings(QnStartupParameters()));
-    m_staticCommonModule.reset(new QnStaticCommonModule());
-    m_clientCoreModule.reset(new QnClientCoreModule(QnClientCoreModule::Mode::unitTests));
     m_entityItemModel.reset(new EntityItemModel());
     nx::utils::ModelTransactionChecker::install(m_entityItemModel.get());
 }
@@ -32,19 +27,11 @@ void EntityItemModelTest::SetUp()
 void EntityItemModelTest::TearDown()
 {
     m_entityItemModel.reset();
-    m_clientCoreModule.reset();
-    m_staticCommonModule.reset();
-    m_clientRuntimeSettings.reset();
-}
-
-QnCommonModule* EntityItemModelTest::commonModule() const
-{
-    return m_clientCoreModule->commonModule();
 }
 
 QnResourcePool* EntityItemModelTest::resourcePool() const
 {
-    return commonModule()->resourcePool();
+    return systemContext()->resourcePool();
 }
 
 EntityItemModelTest::SequentalIntegerGenerator EntityItemModelTest::sequentalIntegerGenerator(

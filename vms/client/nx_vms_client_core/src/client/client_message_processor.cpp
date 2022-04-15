@@ -145,7 +145,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr& resource, ec2
         return layout && layout->isFile();
     };
 
-    QnResourcePtr ownResource = m_context->resourcePool()->getResourceById(resource->getId());
+    QnResourcePtr ownResource = resourcePool()->getResourceById(resource->getId());
 
     /* Security check. Local layouts must not be overridden by server's.
     * Really that means GUID conflict, caused by saving of local layouts to server. */
@@ -158,7 +158,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr& resource, ec2
     QnCommonMessageProcessor::updateResource(resource, source);
     if (!ownResource)
     {
-        m_context->resourcePool()->addResource(resource);
+        resourcePool()->addResource(resource);
     }
     else
     {
@@ -224,7 +224,7 @@ void QnClientMessageProcessor::handleRemotePeerLost(QnUuid peer, nx::vms::api::P
     NX_DEBUG(this, lit("peer lost, state -> Reconnecting"));
     m_status.setState(QnConnectionState::Reconnecting);
 
-    auto currentServer = m_context->resourcePool()->getResourceById<QnMediaServerResource>(
+    auto currentServer = resourcePool()->getResourceById<QnMediaServerResource>(
         connection()->moduleInformation().id);
 
     /* Mark server as offline, so user will understand why is he reconnecting. */
@@ -260,7 +260,7 @@ void QnClientMessageProcessor::onGotInitialNotification(const nx::vms::api::Full
     NX_DEBUG(this, lit("Received initial notification while connected to %1")
             .arg(connection()->moduleInformation().id.toString()));
 
-    auto currentServer = m_context->resourcePool()->getResourceById<QnMediaServerResource>(
+    auto currentServer = resourcePool()->getResourceById<QnMediaServerResource>(
         connection()->moduleInformation().id);
 
     NX_ASSERT(currentServer);

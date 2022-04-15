@@ -37,7 +37,8 @@ class MediaResourceHelper: public ResourceHelper
     using base_type = ResourceHelper;
 
 public:
-    explicit MediaResourceHelper(QObject* parent = nullptr);
+    MediaResourceHelper(SystemContext* systemContext, QObject* parent = nullptr);
+    MediaResourceHelper(); //< QML constructor.
     virtual ~MediaResourceHelper();
 
     QString serverName() const;

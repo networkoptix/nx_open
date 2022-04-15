@@ -10,6 +10,7 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/utils/system_uri.h>
 
 using namespace nx::vms::utils;
@@ -62,7 +63,8 @@ QUrl QnCloudUrlHelper::faqUrl() const
 
 QUrl QnCloudUrlHelper::viewSystemUrl() const
 {
-    const auto systemId = qnClientCoreModule->commonModule()->globalSettings()->cloudSystemId();
+    const auto systemId = qnClientCoreModule->commonModule()
+        ->systemContext()->globalSettings()->cloudSystemId();
     if (systemId.isEmpty())
         return mainUrl();
 

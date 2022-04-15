@@ -20,7 +20,7 @@ class QnWorkbenchLayout;
 /**
  * Layout item. Video, image, server, or anything else.
  */
-class QnWorkbenchItem: public QObject, public nx::vms::client::core::CommonModuleAware
+class QnWorkbenchItem: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QnUuid uuid READ uuid)

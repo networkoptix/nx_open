@@ -54,10 +54,12 @@
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session_timeout_watcher.h>
 #include <nx/vms/client/core/utils/reconnect_helper.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_logon/logic/connection_delegate_helper.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -543,7 +545,7 @@ void ConnectActionsHandler::establishConnection(
                 integrations::connectionEstablished(context()->user(), messageBusConnection());
 
                 // Reload all dialogs and dependent data.
-                // It's done delayed because some things - for example qnGlobalSettings -
+                // It's done delayed because some things - for example globalSettings() -
                 // are updated in QueuedConnection to initial notification or resource addition.
                 const auto workbenchStateUpdate =
                     [this]()
@@ -592,6 +594,7 @@ void ConnectActionsHandler::establishConnection(
         Qt::QueuedConnection);
 
     qnClientCoreModule->networkModule()->setSession(session);
+    ApplicationContext::instance()->currentSystemContext()->setSession(session);
 
     const QString userName = QString::fromStdString(connection->credentials().username);
 
@@ -945,7 +948,7 @@ void ConnectActionsHandler::at_connectToCloudSystemAction_triggered()
         return;
 
     std::shared_ptr<QnStatisticsScenarioGuard> connectScenario = connectData.connectScenario
-        ? context()->instance<QnCertificateStatisticsModule>()->beginScenario(
+        ? ApplicationContext::instance()->certificateStatisticsModule()->beginScenario(
             *connectData.connectScenario)
         : nullptr;
 
@@ -1083,7 +1086,7 @@ void ConnectActionsHandler::at_selectCurrentServerAction_triggered()
     d->switchServerDialog->setDisplayedServer(server);
 
     std::shared_ptr<QnStatisticsScenarioGuard> connectScenario =
-        context()->instance<QnCertificateStatisticsModule>()->beginScenario(
+        ApplicationContext::instance()->certificateStatisticsModule()->beginScenario(
             ConnectScenario::connectFromTree);
 
     auto callback = d->makeSingleConnectionCallback(
@@ -1150,7 +1153,7 @@ bool ConnectActionsHandler::disconnectFromServer(DisconnectFlags flags)
     }
 
     if (!force)
-        qnGlobalSettings->synchronizeNow();
+        globalSettings()->synchronizeNow();
 
     if (flags.testFlag(DisconnectFlag::SwitchingServer))
         setState(LogicalState::connecting);
@@ -1175,6 +1178,7 @@ void ConnectActionsHandler::clearConnection()
     hideReconnectDialog();
     d->currentConnectionProcess.reset();
     qnClientCoreModule->networkModule()->setSession({});
+    ApplicationContext::instance()->currentSystemContext()->setSession({});
 
     context()->setUserName(QString());
     context()->instance<QnWorkbenchStateManager>()->tryClose(/*force*/ true);
@@ -1192,13 +1196,13 @@ void ConnectActionsHandler::clearConnection()
             resourcesToRemove.push_back(layout);
     }
 
-    for (const auto aviResource: resourcePool()->getResources<QnAviResource>())
+    for (const auto& aviResource: resourcePool()->getResources<QnAviResource>())
     {
         if (!aviResource->isOnline() && !aviResource->isEmbedded())
             resourcesToRemove.push_back(aviResource);
     }
 
-    for (const auto fileLayoutResource: resourcePool()->getResources<QnFileLayoutResource>())
+    for (const auto& fileLayoutResource: resourcePool()->getResources<QnFileLayoutResource>())
     {
         if (!fileLayoutResource->isOnline())
             resourcesToRemove.push_back(fileLayoutResource);
@@ -1227,7 +1231,7 @@ void ConnectActionsHandler::clearConnection()
 void ConnectActionsHandler::connectToServer(LogonData logonData, ConnectionOptions options)
 {
     std::shared_ptr<QnStatisticsScenarioGuard> connectScenario = logonData.connectScenario
-        ? context()->instance<QnCertificateStatisticsModule>()->beginScenario(
+        ? ApplicationContext::instance()->certificateStatisticsModule()->beginScenario(
             *logonData.connectScenario)
         : nullptr;
 

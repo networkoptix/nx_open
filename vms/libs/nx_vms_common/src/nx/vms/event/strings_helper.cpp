@@ -127,13 +127,13 @@ QString StringsHelper::actionName(ActionType value) const
 
         case ActionType::cameraOutputAction:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
-                m_context->resourcePool(),
+                resourcePool(),
                 tr("Device output"),
                 tr("Camera output"));
 
         case ActionType::cameraRecordingAction:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
-                m_context->resourcePool(),
+                resourcePool(),
                 tr("Device recording"),
                 tr("Camera recording"));
         default:
@@ -178,25 +178,25 @@ QString StringsHelper::eventName(EventType value, int count) const
 
         case EventType::cameraInputEvent:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
-                m_context->resourcePool(),
+                resourcePool(),
                     tr("Input Signal on Devices", "", count),
                     tr("Input Signal on Cameras", "", count));
 
         case EventType::cameraDisconnectEvent:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
-                m_context->resourcePool(),
+                resourcePool(),
                 tr("Devices Disconnected", "", count),
                 tr("Cameras Disconnected", "", count));
 
         case EventType::cameraIpConflictEvent:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
-                m_context->resourcePool(),
+                resourcePool(),
                 tr("Devices IP Conflict", "", count),
                 tr("Cameras IP Conflict", "", count));
 
         case EventType::anyCameraEvent:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
-                m_context->resourcePool(),
+                resourcePool(),
                 tr("Any Device Issue"),
                 tr("Any Camera Issue"));
 
@@ -218,7 +218,7 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
             return tr("Undefined event has occurred on %1").arg(resourceName);
 
         case EventType::cameraDisconnectEvent:
-            return QnDeviceDependentStrings::getNameFromSet(m_context->resourcePool(),
+            return QnDeviceDependentStrings::getNameFromSet(resourcePool(),
                 QnCameraDeviceStringSet(
                     tr("Device %1 was disconnected"),
                     tr("Camera %1 was disconnected"),
@@ -240,7 +240,7 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
             return tr("Server \"%1\" Failure").arg(resourceName);
 
         case EventType::cameraIpConflictEvent:
-            return QnDeviceDependentStrings::getDefaultNameFromSet(m_context->resourcePool(),
+            return QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(),
                 tr("Device IP Conflict at %1", "Device IP Conflict at <server_name>"),
                 tr("Camera IP Conflict at %1", "Camera IP Conflict at <server_name>"))
                 .arg(resourceName);
@@ -566,7 +566,7 @@ QnResourcePtr StringsHelper::eventSource(const EventParameters &params) const
 {
     QnUuid id = params.eventResourceId;
     return !id.isNull()
-        ? m_context->resourcePool()->getResourceById(id)
+        ? resourcePool()->getResourceById(id)
         : QnResourcePtr();
 }
 
@@ -716,7 +716,7 @@ QString StringsHelper::eventReason(const EventParameters& params) const
             for (const auto& id: reasonParamsEncoded.split(';'))
             {
                 if (const auto& camera =
-                        m_context->resourcePool()->getResourceById<QnVirtualCameraResource>(
+                        resourcePool()->getResourceById<QnVirtualCameraResource>(
                             QnUuid(id)))
                 {
                     disabledCameras << camera;
@@ -726,7 +726,7 @@ QString StringsHelper::eventReason(const EventParameters& params) const
             NX_ASSERT(!disabledCameras.isEmpty(), "At least one camera should be disabled on this event");
 
             result = QnDeviceDependentStrings::getNameFromSet(
-                m_context->resourcePool(),
+                resourcePool(),
                 QnCameraDeviceStringSet(
                     tr("Not enough licenses. Recording has been disabled on following devices:"),
                     tr("Not enough licenses. Recording has been disabled on following cameras:"),
@@ -781,7 +781,7 @@ QString StringsHelper::urlForCamera(
     else //< Server-side method to form links in emails.
     {
         const auto camera =
-            m_context->resourcePool()->getResourceById<QnVirtualCameraResource>(id);
+            resourcePool()->getResourceById<QnVirtualCameraResource>(id);
         if (!camera)
             return QString();
 
@@ -1073,7 +1073,7 @@ QString StringsHelper::notificationCaption(
                 : parameters.caption;
 
         case EventType::cameraDisconnectEvent:
-            return QnDeviceDependentStrings::getNameFromSet(m_context->resourcePool(),
+            return QnDeviceDependentStrings::getNameFromSet(resourcePool(),
                 QnCameraDeviceStringSet(
                     tr("Device was disconnected"),
                     tr("Camera was disconnected"),

@@ -27,6 +27,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/debug_helpers/model_transaction_checker.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
@@ -39,59 +41,44 @@ using namespace index_condition;
 
 void ResourceTreeModelTest::SetUp()
 {
-    m_clientRuntimeSettings.reset(new QnClientRuntimeSettings(QnStartupParameters()));
-    m_staticCommonModule.reset(new QnStaticCommonModule());
-    m_clientCoreModule.reset(new QnClientCoreModule(
-        QnClientCoreModule::Mode::unitTests,
-        /*peerId*/ QnUuid::createUuid()));
-
-    QnCommonModule* commonModule = m_clientCoreModule->commonModule();
-    commonModule->createMessageProcessor<QnDesktopClientMessageProcessor>();
+    systemContext()->createMessageProcessor<QnDesktopClientMessageProcessor>();
 
     // Should be not null for correct Videowall Item node display.
-    ASSERT_FALSE(commonModule->peerId().isNull());
+    ASSERT_FALSE(systemContext()->peerId().isNull());
 
-    m_accessController.reset(new QnWorkbenchAccessController(commonModule));
-    m_layoutSnapshotManager.reset(new QnWorkbenchLayoutSnapshotManager(commonModule));
+    m_layoutSnapshotManager.reset(new QnWorkbenchLayoutSnapshotManager(commonModule()));
 
     m_newResourceTreeModel.reset(new entity_item_model::EntityItemModel());
     nx::utils::ModelTransactionChecker::install(m_newResourceTreeModel.get());
 
     m_resourceTreeComposer.reset(new entity_resource_tree::ResourceTreeComposer(
-        commonModule, m_accessController.get(), nullptr));
+        commonModule(),
+        systemContext()->accessController(),
+        nullptr));
     m_resourceTreeComposer->attachModel(m_newResourceTreeModel.get());
 }
 
 void ResourceTreeModelTest::TearDown()
 {
-    m_clientCoreModule->commonModule()->deleteMessageProcessor();
+    systemContext()->deleteMessageProcessor();
     m_resourceTreeComposer.clear();
     m_newResourceTreeModel.clear();
     m_layoutSnapshotManager.clear();
-    m_accessController.clear();
-    m_clientCoreModule.clear();
-    m_staticCommonModule.clear();
-    m_clientRuntimeSettings.clear();
-}
-
-QnCommonModule* ResourceTreeModelTest::commonModule() const
-{
-    return m_clientCoreModule->commonModule();
 }
 
 QnResourcePool* ResourceTreeModelTest::resourcePool() const
 {
-    return commonModule()->resourcePool();
+    return systemContext()->resourcePool();
 }
 
 QnWorkbenchAccessController* ResourceTreeModelTest::workbenchAccessController() const
 {
-    return m_accessController.get();
+    return systemContext()->accessController();
 }
 
 QnResourceAccessManager* ResourceTreeModelTest::resourceAccessManager() const
 {
-    return commonModule()->resourceAccessManager();
+    return systemContext()->resourceAccessManager();
 }
 
 QnWorkbenchLayoutSnapshotManager* ResourceTreeModelTest::layoutSnapshotManager() const
@@ -101,12 +88,12 @@ QnWorkbenchLayoutSnapshotManager* ResourceTreeModelTest::layoutSnapshotManager()
 
 QnRuntimeInfoManager* ResourceTreeModelTest::runtimeInfoManager() const
 {
-    return commonModule()->runtimeInfoManager();
+    return systemContext()->runtimeInfoManager();
 }
 
 void ResourceTreeModelTest::setSystemName(const QString& name) const
 {
-    commonModule()->globalSettings()->setSystemName(name);
+    systemContext()->globalSettings()->setSystemName(name);
 }
 
 QnUserResourcePtr ResourceTreeModelTest::addUser(
@@ -422,7 +409,7 @@ QnUserResourcePtr ResourceTreeModelTest::loginAsUserWithPermissions(
         user->setOwner(true);
     }
 
-    m_accessController->setUser(user);
+    systemContext()->accessController()->setUser(user);
     return user;
 }
 
@@ -453,7 +440,7 @@ QnUserResourcePtr ResourceTreeModelTest::loginAsCustomUser(const QString& name) 
 
 void ResourceTreeModelTest::logout() const
 {
-    m_accessController->setUser(QnUserResourcePtr());
+    systemContext()->accessController()->setUser(QnUserResourcePtr());
 }
 
 void ResourceTreeModelTest::setFilterMode(

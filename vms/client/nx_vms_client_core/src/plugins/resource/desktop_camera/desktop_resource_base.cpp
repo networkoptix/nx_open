@@ -2,8 +2,8 @@
 
 #include "desktop_resource_base.h"
 
-#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
+#include <nx/vms/common/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <utils/common/long_runable_cleanup.h>
 

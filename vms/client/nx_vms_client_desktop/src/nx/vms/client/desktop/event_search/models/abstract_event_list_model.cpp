@@ -8,9 +8,11 @@
 #include <nx/utils/datetime.h>
 #include <nx/utils/metatypes.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/time/formatter.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/time/formatter.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/synctime.h>
 
@@ -88,7 +90,9 @@ QString AbstractEventListModel::timestampText(microseconds timestamp) const
 
     const auto timestampMs = duration_cast<milliseconds>(timestamp).count();
 
-    const auto timeWatcher = context()->instance<nx::vms::client::core::ServerTimeWatcher>();
+    // TODO: #sivanov Actualize used system context.
+    const auto timeWatcher = ApplicationContext::instance()->currentSystemContext()
+        ->serverTimeWatcher();
     const QDateTime dateTime = timeWatcher->displayTime(timestampMs);
 
     // For current day just display the time in system format.

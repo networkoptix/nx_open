@@ -280,7 +280,8 @@ NodePtr AnalyticsEntitiesTreeBuilder::eventTypesForRulesPurposes(
     const QnVirtualCameraResourceList& devices,
     const UnresolvedEntities& additionalUnresolvedEventTypes)
 {
-    std::shared_ptr<AbstractState> taxonomyState = commonModule->analyticsTaxonomyState();
+    std::shared_ptr<AbstractState> taxonomyState = commonModule->systemContext()
+        ->analyticsTaxonomyState();
     if (!taxonomyState)
         return NodePtr();
 
@@ -302,7 +303,7 @@ AnalyticsEventsSearchTreeBuilder::AnalyticsEventsSearchTreeBuilder(QObject* pare
     cachedEventTypesTree(makeNode(NodeType::root, {}))
 {
     using RuleManager = nx::vms::event::RuleManager;
-    const auto ruleManager = commonModule()->eventRuleManager();
+    const auto ruleManager = eventRuleManager();
     connect(ruleManager, &RuleManager::rulesReset,
         this, &AnalyticsEventsSearchTreeBuilder::updateEventTypesTree);
     connect(ruleManager, &RuleManager::ruleAddedOrUpdated,
@@ -373,7 +374,7 @@ NodePtr AnalyticsEventsSearchTreeBuilder::calculateEventTypesTree() const
     using namespace nx::vms::event;
 
     QSet<api::analytics::EventTypeId> actuallyUsedEventTypes;
-    for (const auto& rule: commonModule()->eventRuleManager()->rules())
+    for (const auto& rule: eventRuleManager()->rules())
     {
         if (rule->eventType() == EventType::analyticsSdkEvent)
             actuallyUsedEventTypes.insert(rule->eventParams().getAnalyticsEventTypeId());
@@ -386,7 +387,8 @@ NodePtr AnalyticsEventsSearchTreeBuilder::calculateEventTypesTree() const
     // TODO: #sivanov Shouldn't we filter out cameras here the same way?
     const auto devices = resourcePool()->getAllCameras(QnUuid(), /*ignoreDesktopCameras*/ true);
 
-    const std::shared_ptr<AbstractState> taxonomyState = commonModule()->analyticsTaxonomyState();
+    const std::shared_ptr<AbstractState> taxonomyState = commonModule()->systemContext()
+        ->analyticsTaxonomyState();
     if (!taxonomyState)
         return NodePtr();
 
@@ -436,7 +438,8 @@ AnalyticsObjectsSearchTreeBuilder::AnalyticsObjectsSearchTreeBuilder(QObject* pa
 AnalyticsEntitiesTreeBuilder::NodePtr AnalyticsObjectsSearchTreeBuilder::objectTypesTree() const
 {
     const auto devices = resourcePool()->getAllCameras(QnUuid(), /*ignoreDesktopCameras*/ true);
-    const std::shared_ptr<AbstractState> taxonomyState = commonModule()->analyticsTaxonomyState();
+    const std::shared_ptr<AbstractState> taxonomyState = commonModule()->systemContext()
+        ->analyticsTaxonomyState();
     if (!taxonomyState)
         return NodePtr();
 

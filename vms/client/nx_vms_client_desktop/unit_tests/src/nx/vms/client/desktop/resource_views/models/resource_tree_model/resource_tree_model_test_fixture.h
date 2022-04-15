@@ -4,19 +4,15 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/vms/api/data/layout_tour_data.h>
-#include <core/resource/resource_fwd.h>
 #include <core/resource/client_resource_fwd.h>
+#include <core/resource/resource_fwd.h>
 #include <core/resource/user_resource.h>
+#include <nx/vms/api/data/layout_tour_data.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_composer.h>
+#include <nx/vms/client/desktop/test_support/test_context.h>
 
 #include "resource_tree_model_index_condition.h"
 
-class QnCommonModule;
-class QnResourcePool;
-class QnStaticCommonModule;
-class QnClientRuntimeSettings;
-class QnClientCoreModule;
 class QnWorkbenchAccessController;
 class QnResourceAccessManager;
 class QnWorkbenchLayoutSnapshotManager;
@@ -24,12 +20,14 @@ class QnRuntimeInfoManager;
 
 namespace nx::vms::client::desktop {
 
+class SystemContext;
+
 namespace entity_item_model { class EntityItemModel; }
 namespace entity_resource_tree { class ResourceTreeComposer; };
 
 namespace test {
 
-class ResourceTreeModelTest: public testing::Test
+class ResourceTreeModelTest: public nx::vms::client::desktop::test::ContextBasedTest
 {
 protected:
     using NodeType = ResourceTree::NodeType;
@@ -37,7 +35,6 @@ protected:
     virtual void SetUp() override;
     virtual void TearDown() override;
 
-    QnCommonModule* commonModule() const;
     QnResourcePool* resourcePool() const;
     QnWorkbenchAccessController* workbenchAccessController() const;
     QnResourceAccessManager* resourceAccessManager() const;
@@ -130,10 +127,6 @@ protected:
     std::vector<QString> transformToDisplayStrings(const QModelIndexList& indexes) const;
 
 protected:
-    QSharedPointer<QnClientRuntimeSettings> m_clientRuntimeSettings;
-    QSharedPointer<QnStaticCommonModule> m_staticCommonModule;
-    QSharedPointer<QnClientCoreModule> m_clientCoreModule;
-    QSharedPointer<QnWorkbenchAccessController> m_accessController;
     QSharedPointer<QnWorkbenchLayoutSnapshotManager> m_layoutSnapshotManager;
     QSharedPointer<entity_item_model::EntityItemModel> m_newResourceTreeModel;
     QSharedPointer<entity_resource_tree::ResourceTreeComposer> m_resourceTreeComposer;

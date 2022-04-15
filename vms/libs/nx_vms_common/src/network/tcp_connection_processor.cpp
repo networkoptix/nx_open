@@ -770,7 +770,7 @@ void QnTCPConnectionProcessor::sendUnauthorizedResponse(
     }
 
     if (nx::network::http::getHeaderValue( d->response.headers, Qn::SERVER_GUID_HEADER_NAME ).empty())
-        d->response.headers.insert(nx::network::http::HttpHeader(Qn::SERVER_GUID_HEADER_NAME, commonModule()->peerId().toByteArray()));
+        d->response.headers.insert(nx::network::http::HttpHeader(Qn::SERVER_GUID_HEADER_NAME, peerId().toByteArray()));
 
     auto acceptEncodingHeaderIter = d->request.headers.find( "Accept-Encoding" );
     QByteArray contentEncoding;

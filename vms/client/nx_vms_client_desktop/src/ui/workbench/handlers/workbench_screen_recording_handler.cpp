@@ -358,7 +358,7 @@ void QnWorkbenchScreenRecordingHandler::onRecordingFinished()
                 continue;
             }
 
-            QnFileProcessor::createResourcesForFile(filePath);
+            QnFileProcessor::createResourcesForFile(filePath, resourcePool());
 
             qnSettings->setLastRecordingDir(QFileInfo(filePath).absolutePath());
 

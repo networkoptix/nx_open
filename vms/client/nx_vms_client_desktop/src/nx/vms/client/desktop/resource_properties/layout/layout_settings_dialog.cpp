@@ -68,7 +68,7 @@ LayoutSettingsDialog::LayoutSettingsDialog(QWidget* parent):
     d->logicalIdsWatcher = new LayoutLogicalIdsWatcher(
         d->store.data(),
         resourcePool(),
-        commonModule()->messageProcessor(),
+        messageProcessor(),
         this);
 
     auto generalTab = new LayoutGeneralSettingsWidget(d->store, ui->tabWidget);

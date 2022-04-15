@@ -95,7 +95,6 @@ private:
     QString progressMessage() const;
 
 private:
-    const QPointer<QnResourcePool> m_pool;
     CurrentSystemServers m_serversWatcher;
     ServerOnlineStatusWatcher m_serverStatusWatcher;
 

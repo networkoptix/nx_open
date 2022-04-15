@@ -178,7 +178,7 @@ void QnIncompatibleServerWatcherPrivate::at_resourcePool_statusChanged(const QnR
     auto moduleInformation = server->getModuleInformation();
 
     if (status != nx::vms::api::ResourceStatus::offline
-        && helpers::serverBelongsToCurrentSystem(moduleInformation, commonModule())
+        && helpers::serverBelongsToCurrentSystem(moduleInformation, systemContext())
         && nx::vms::common::ServerCompatibilityValidator::isCompatible(moduleInformation))
     {
         removeResource(getFakeId(id));

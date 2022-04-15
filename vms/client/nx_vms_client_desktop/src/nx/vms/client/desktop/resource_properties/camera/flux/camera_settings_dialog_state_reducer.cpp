@@ -26,6 +26,7 @@
 #include <nx/vms/api/types/motion_types.h>
 #include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/client/desktop/analytics/analytics_settings_manager.h>
+#include <nx/vms/common/system_context.h>
 #include <utils/camera/camera_bitrate_calculator.h>
 #include <utils/camera/camera_replacement.h>
 
@@ -416,7 +417,7 @@ State updateDuplicateLogicalIdInfo(State state)
 
     if (currentLogicalId > 0)
     {
-        const auto duplicateCameras = qnClientCoreModule->commonModule()->resourcePool()->
+        const auto duplicateCameras = qnClientCoreModule->resourcePool()->
             getAllCameras().filtered(isSameLogicalId);
 
         for (const auto& camera: duplicateCameras)
@@ -953,7 +954,7 @@ State CameraSettingsDialogStateReducer::setSingleVirtualCameraState(
 
     if (state.singleVirtualCameraState.status == VirtualCameraState::LockedByOtherClient)
     {
-        if (const auto user = qnClientCoreModule->commonModule()->resourcePool()->getResourceById(
+        if (const auto user = qnClientCoreModule->resourcePool()->getResourceById(
             state.singleVirtualCameraState.lockUserId))
         {
             state.virtualCameraUploaderName = user->getName();
@@ -2353,7 +2354,7 @@ State CameraSettingsDialogStateReducer::generateLogicalId(State state)
     if (!state.isSingleCamera())
         return state;
 
-    auto cameras = qnClientCoreModule->commonModule()->resourcePool()->getAllCameras();
+    auto cameras = qnClientCoreModule->resourcePool()->getAllCameras();
     std::set<int> usedValues;
 
     for (const auto& camera: cameras)

@@ -529,7 +529,7 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(
 
     nx::utils::Url url(data.url);
 
-    auto server = m_context->resourcePool()->getResourceById<QnMediaServerResource>(data.id);
+    auto server = resourcePool()->getResourceById<QnMediaServerResource>(data.id);
     if (!server)
     {
         if (!data.ignore)
@@ -592,7 +592,7 @@ void QnCommonMessageProcessor::on_resourceStatusChanged(
         return; //< ignore local setStatus call. Data already in the resourcePool
 
     const auto localStatus = static_cast<nx::vms::api::ResourceStatus>(status);
-    QnResourcePtr resource = m_context->resourcePool()->getResourceById(resourceId);
+    QnResourcePtr resource = resourcePool()->getResourceById(resourceId);
     if (resource)
         onResourceStatusChanged(resource, localStatus, source);
     else
@@ -606,7 +606,7 @@ void QnCommonMessageProcessor::on_resourceParamChanged(
     if (handleRemoteAnalyticsNotification(param, source))
         return;
 
-    QnResourcePtr resource = m_context->resourcePool()->getResourceById(param.resourceId);
+    QnResourcePtr resource = resourcePool()->getResourceById(param.resourceId);
     if (resource)
     {
         resource->setProperty(param.name, param.value, /*markDirty*/ false);
@@ -638,7 +638,7 @@ bool QnCommonMessageProcessor::handleRemoteAnalyticsNotification(
         return false;
     }
 
-    const auto resource = m_context->resourcePool()->getResourceById(param.resourceId);
+    const auto resource = resourcePool()->getResourceById(param.resourceId);
     if (!resource)
         return false;
 
@@ -679,8 +679,8 @@ void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )
 {
     if (canRemoveResource(resourceId))
     {
-        if (QnResourcePtr ownResource = m_context->resourcePool()->getResourceById(resourceId))
-            m_context->resourcePool()->removeResource(ownResource);
+        if (QnResourcePtr ownResource = resourcePool()->getResourceById(resourceId))
+            resourcePool()->removeResource(ownResource);
         m_context->resourceStatusDictionary()->remove(resourceId);
     }
     else
@@ -691,7 +691,7 @@ void QnCommonMessageProcessor::on_resourceStatusRemoved(const QnUuid& resourceId
 {
     if (!canRemoveResource(resourceId))
     {
-        if (auto res = m_context->resourcePool()->getResourceById(resourceId))
+        if (auto res = resourcePool()->getResourceById(resourceId))
         {
             if (auto connection = m_context->ec2Connection())
             {
@@ -708,8 +708,7 @@ void QnCommonMessageProcessor::on_accessRightsChanged(const AccessRightsData& ac
     for (const QnUuid& id : accessRights.resourceIds)
         accessibleResources << id;
 
-    if (auto user =
-            m_context->resourcePool()->getResourceById<QnUserResource>(accessRights.userId))
+    if (auto user = resourcePool()->getResourceById<QnUserResource>(accessRights.userId))
     {
         m_context->sharedResourcesManager()->setSharedResources(user, accessibleResources);
     }
@@ -733,7 +732,7 @@ void QnCommonMessageProcessor::on_userRoleChanged(const UserRoleData& userRole)
 void QnCommonMessageProcessor::on_userRoleRemoved(const QnUuid& userRoleId)
 {
     m_context->userRolesManager()->removeUserRole(userRoleId);
-    for (const auto& user: m_context->resourcePool()->getResources<QnUserResource>())
+    for (const auto& user: resourcePool()->getResources<QnUserResource>())
     {
         auto roles = user->userRoleIds();
         if (nx::utils::remove_if(roles, [&userRoleId](const auto& id) { return id == userRoleId; }))
@@ -744,7 +743,7 @@ void QnCommonMessageProcessor::on_userRoleRemoved(const QnUuid& userRoleId)
 void QnCommonMessageProcessor::on_cameraUserAttributesChanged(
     const CameraAttributesData& userAttributes)
 {
-    if (auto camera = m_context->resourcePool()->getResourceById<QnVirtualCameraResource>(
+    if (auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(
         userAttributes.cameraId))
     {
         if (camera->isScheduleEnabled() && !userAttributes.scheduleEnabled)
@@ -763,8 +762,7 @@ void QnCommonMessageProcessor::on_cameraUserAttributesChanged(
 void QnCommonMessageProcessor::on_cameraUserAttributesRemoved(const QnUuid& cameraId)
 {
     // It is OK if the Camera is missing.
-    if (auto camera =
-        m_context->resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId))
+    if (auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId))
     {
         nx::vms::api::CameraAttributesData emptyAttributes;
         emptyAttributes.cameraId = cameraId;
@@ -775,7 +773,7 @@ void QnCommonMessageProcessor::on_cameraUserAttributesRemoved(const QnUuid& came
 void QnCommonMessageProcessor::on_mediaServerUserAttributesChanged(
     const MediaServerUserAttributesData& attrs)
 {
-    auto server = m_context->resourcePool()->getResourceById<QnMediaServerResource>(attrs.serverId);
+    auto server = resourcePool()->getResourceById<QnMediaServerResource>(attrs.serverId);
     if (server)
         server->setUserAttributesAndNotify(attrs);
     else
@@ -785,7 +783,7 @@ void QnCommonMessageProcessor::on_mediaServerUserAttributesChanged(
 void QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved(const QnUuid& serverId)
 {
     // It is OK if the Server is missing.
-    if (auto server = m_context->resourcePool()->getResourceById<QnMediaServerResource>(serverId))
+    if (auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId))
     {
         nx::vms::api::MediaServerUserAttributesData emptyAttributes;
         emptyAttributes.serverId = serverId;
@@ -842,8 +840,7 @@ void QnCommonMessageProcessor::resetResources(const FullInfoData& fullData)
 {
     // Store all remote resources id to clean them if they are not in the list anymore.
     QHash<QnUuid, QnResourcePtr> remoteResources;
-    for (const QnResourcePtr& resource:
-        m_context->resourcePool()->getResourcesWithFlag(Qn::remote))
+    for (const QnResourcePtr& resource: resourcePool()->getResourcesWithFlag(Qn::remote))
     {
         remoteResources.insert(resource->getId(), resource);
     }
@@ -858,7 +855,7 @@ void QnCommonMessageProcessor::resetResources(const FullInfoData& fullData)
         };
 
     // Packet adding.
-    m_context->resourcePool()->beginTran();
+    resourcePool()->beginTran();
 
     updateResources(fullData.users);
     updateResources(fullData.cameras);
@@ -870,11 +867,11 @@ void QnCommonMessageProcessor::resetResources(const FullInfoData& fullData)
     updateResources(fullData.analyticsPlugins);
     updateResources(fullData.analyticsEngines);
 
-    m_context->resourcePool()->commit();
+    resourcePool()->commit();
 
     // Remove absent resources.
     for (const QnResourcePtr& resource: remoteResources)
-        m_context->resourcePool()->removeResource(resource);
+        resourcePool()->removeResource(resource);
 }
 
 void QnCommonMessageProcessor::resetLicenses(const LicenseDataList& licenses)
@@ -941,7 +938,7 @@ void QnCommonMessageProcessor::handleRemotePeerLost(QnUuid /*data*/, PeerType /*
 void QnCommonMessageProcessor::resetServerUserAttributesList(
     const MediaServerUserAttributesDataList& serverUserAttributesList)
 {
-    auto pool = m_context->resourcePool();
+    auto pool = resourcePool();
     for (const auto& serverAttrs: serverUserAttributesList)
     {
         auto server = pool->getResourceById<QnMediaServerResource>(serverAttrs.serverId);
@@ -955,7 +952,7 @@ void QnCommonMessageProcessor::resetServerUserAttributesList(
 void QnCommonMessageProcessor::resetCameraUserAttributesList(
     const CameraAttributesDataList& cameraUserAttributesList)
 {
-    auto pool = m_context->resourcePool();
+    auto pool = resourcePool();
     for (const auto& cameraAttrs: cameraUserAttributesList)
     {
         if (auto camera = pool->getResourceById<QnVirtualCameraResource>(cameraAttrs.cameraId))
@@ -995,8 +992,9 @@ void QnCommonMessageProcessor::resetStatusList(const ResourceStatusDataList& par
 {
     auto keys = m_context->resourceStatusDictionary()->values().keys();
     m_context->resourceStatusDictionary()->clear();
-    for(const QnUuid& id: keys) {
-        if (QnResourcePtr resource = m_context->resourcePool()->getResourceById(id))
+    for(const QnUuid& id: keys)
+    {
+        if (QnResourcePtr resource = resourcePool()->getResourceById(id))
         {
             NX_VERBOSE(this, lit("%1 Emit statusChanged signal for resource %2, %3, %4")
                     .arg(QString::fromLatin1(Q_FUNC_INFO))

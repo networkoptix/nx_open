@@ -14,7 +14,7 @@ ServerOnlineStatusWatcher::ServerOnlineStatusWatcher(QObject* parent):
     base_type(parent),
     QnCommonModuleAware(qnClientCoreModule->commonModule())
 {
-    connect(commonModule()->resourcePool(), &QnResourcePool::resourceRemoved, this,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
         {
             const auto server = resource.dynamicCast<QnMediaServerResource>();

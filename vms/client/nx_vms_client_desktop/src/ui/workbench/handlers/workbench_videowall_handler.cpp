@@ -54,6 +54,7 @@
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
 #include <nx/vms/client/desktop/videowall/utils.h>
 #include <nx/vms/client/desktop/videowall/workbench_videowall_shortcut_helper.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
 #include <nx/vms/license/usage_helper.h>
 #include <nx/vms/utils/platform/autorun.h>
@@ -181,11 +182,6 @@ struct ScreenWidgetKey
     {
     }
 
-    friend bool operator==(const ScreenWidgetKey &l, const ScreenWidgetKey &r)
-    {
-        return l.pcUuid == r.pcUuid && l.screens == r.screens;
-    }
-
     friend bool operator<(const ScreenWidgetKey &l, const ScreenWidgetKey &r)
     {
         if (l.pcUuid != r.pcUuid || (l.screens.isEmpty() && r.screens.isEmpty()))
@@ -295,7 +291,7 @@ bool QnWorkbenchVideoWallHandler::GeometrySetter::eventFilter(QObject* watched, 
 QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_licensesHelper(new nx::vms::license::VideoWallLicenseUsageHelper(commonModule(), this)),
+    m_licensesHelper(new nx::vms::license::VideoWallLicenseUsageHelper(systemContext(), this)),
     #ifdef _DEBUG
         /* Limit by reasonable size. */
         m_uuidPool(new QnUuidPool(uuidPoolBase, 256))
@@ -304,7 +300,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     #endif
 {
     m_licensesHelper->setCustomValidator(
-        std::make_unique<license::VideoWallLicenseValidator>(commonModule()));
+        std::make_unique<license::VideoWallLicenseValidator>(systemContext()));
 
     m_videoWallMode.active = qnRuntime->isVideoWallMode();
     m_videoWallMode.opening = false;
@@ -501,7 +497,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         connect(navigator(), &QnWorkbenchNavigator::speedChanged, this,
             &QnWorkbenchVideoWallHandler::at_navigator_speedChanged);
 
-        connect(context()->instance<QnWorkbenchStreamSynchronizer>(),
+        connect(workbench()->windowContext()->streamSynchronizer(),
             &QnWorkbenchStreamSynchronizer::runningChanged,
             this,
             &QnWorkbenchVideoWallHandler::at_workbenchStreamSynchronizer_runningChanged);
@@ -1047,7 +1043,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(
         {
             QByteArray value = message[valueKey].toUtf8();
             auto state = QJson::deserialized<QnStreamSynchronizationState>(value);
-            context()->instance<QnWorkbenchStreamSynchronizer>()->setState(state);
+            workbench()->windowContext()->streamSynchronizer()->setState(state);
             menu()->triggerIfPossible(action::ShowTimeLineOnVideowallAction);
             break;
         }
@@ -2971,7 +2967,7 @@ void QnWorkbenchVideoWallHandler::at_workbenchStreamSynchronizer_runningChanged(
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::SynchronizationChanged);
     message[valueKey] = QString::fromUtf8(QJson::serialized(
-        context()->instance<QnWorkbenchStreamSynchronizer>()->state()));
+        workbench()->windowContext()->streamSynchronizer()->state()));
     sendMessage(message);
 }
 
@@ -3072,19 +3068,8 @@ bool QnWorkbenchVideoWallHandler::saveReviewLayout(
     return !videowalls.isEmpty();
 }
 
-std::set<QnUuid> QnWorkbenchVideoWallHandler::onlineScreens() const
-{
-    return m_onlineScreens;
-}
-
 void QnWorkbenchVideoWallHandler::setItemOnline(const QnUuid &instanceGuid, bool online)
 {
-    if (online)
-        m_onlineScreens.insert(instanceGuid);
-    else
-        m_onlineScreens.erase(instanceGuid);
-    emit onlineScreensChanged();
-
     QnVideoWallItemIndex index = resourcePool()->getVideoWallItemByUuid(instanceGuid);
     if (index.isNull())
         return;

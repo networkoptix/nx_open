@@ -111,6 +111,7 @@
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/client/desktop/utils/parameter_helper.h>
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
@@ -237,10 +238,10 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::OpenFileAction), SIGNAL(triggered()), this, SLOT(at_openFileAction_triggered()));
     connect(action(action::OpenFolderAction), SIGNAL(triggered()), this, SLOT(at_openFolderAction_triggered()));
 
-    connect(qnGlobalSettings, &QnGlobalSettings::maxSceneItemsChanged, this,
+    connect(globalSettings(), &QnGlobalSettings::maxSceneItemsChanged, this,
         [this]
         {
-            qnRuntime->setMaxSceneItemsOverride(qnGlobalSettings->maxSceneItemsOverride());
+            qnRuntime->setMaxSceneItemsOverride(globalSettings()->maxSceneItemsOverride());
         });
 
     // local settings
@@ -553,12 +554,18 @@ void ActionHandler::addToLayout(
     addToLayout(layout, addToResourcePool(files), params);
 }
 
-QnResourceList ActionHandler::addToResourcePool(const QList<QString> &files) const {
-    return QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(files));
+QnResourceList ActionHandler::addToResourcePool(const QList<QString>& files) const
+{
+    return QnFileProcessor::createResourcesForFiles(
+        QnFileProcessor::findAcceptedFiles(files),
+        resourcePool());
 }
 
-QnResourceList ActionHandler::addToResourcePool(const QString &file) const {
-    return QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(file));
+QnResourceList ActionHandler::addToResourcePool(const QString& file) const
+{
+    return QnFileProcessor::createResourcesForFiles(
+        QnFileProcessor::findAcceptedFiles(file),
+        resourcePool());
 }
 
 void ActionHandler::openResourcesInNewWindow(const QnResourceList &resources)
@@ -742,7 +749,7 @@ void ActionHandler::changeDefaultPasswords(
                 [errorResultsStorage]()
                 {
                     QnVirtualCameraResourceList result;
-                    for (const auto errorResult: *errorResultsStorage)
+                    for (const auto& errorResult: *errorResultsStorage)
                         result.push_back(errorResult.first);
                     return result;
                 }();
@@ -777,7 +784,7 @@ void ActionHandler::changeDefaultPasswords(
             changeDefaultPasswords(password, camerasWithError, forceShowCamerasList);
         }));
 
-    for (const auto camera: cameras)
+    for (const auto& camera: cameras)
     {
         auto auth = camera->getDefaultAuth();
         auth.setPassword(password);
@@ -1020,7 +1027,7 @@ void ActionHandler::at_openInCurrentLayoutAction_triggered()
         && !parameters.hasArgument(Qn::ItemTimeRole))
     {
         parameters.setArgument(Qn::LayoutSyncStateRole,
-            context()->instance<QnWorkbenchStreamSynchronizer>()->state());
+            workbench()->windowContext()->streamSynchronizer()->state());
     }
 
     parameters.setArgument(Qn::LayoutResourceRole, currentLayout->resource());
@@ -1043,7 +1050,7 @@ void ActionHandler::at_openInNewTabAction_triggered()
     auto parameters = menu()->currentParameters(sender());
     const auto layouts = parameters.resources().filtered<QnLayoutResource>();
     const auto currentWidget = navigator()->currentWidget();
-    const auto streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+    const auto streamSynchronizer = workbench()->windowContext()->streamSynchronizer();
     auto currentState = streamSynchronizer->state();
     if (!currentState.isSyncOn
         || currentState.timeUs == DATETIME_NOW
@@ -2898,7 +2905,7 @@ void ActionHandler::checkIfStatisticsReportAllowed()
         return;
 
     // Check if user has already made a decision.
-    if (qnGlobalSettings->isStatisticsAllowedDefined())
+    if (globalSettings()->isStatisticsAllowedDefined())
         return;
 
     QnMessageBox::information(mainWindowWidget(),
@@ -2906,8 +2913,8 @@ void ActionHandler::checkIfStatisticsReportAllowed()
         tr("It will be used by software development team to improve your user experience.")
             + '\n' + tr("To disable it, go to System Administration dialog."));
 
-    qnGlobalSettings->setStatisticsAllowed(true);
-    qnGlobalSettings->synchronizeNow();
+    globalSettings()->setStatisticsAllowed(true);
+    globalSettings()->synchronizeNow();
 }
 
 void ActionHandler::confirmAnalyticsStorageLocation()

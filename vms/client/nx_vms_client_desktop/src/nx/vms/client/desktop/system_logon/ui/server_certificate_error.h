@@ -13,9 +13,7 @@ namespace nx::network { class SocketAddress; }
 
 namespace nx::vms::client::desktop {
 
-class ServerCertificateError:
-    public QnMessageBox,
-    public QnWorkbenchContextAware
+class ServerCertificateError: public QnMessageBox
 {
     Q_OBJECT
     using base_type = QnMessageBox;

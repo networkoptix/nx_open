@@ -16,10 +16,13 @@
 #include <core/resource/resource_property_key.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/videowall/videowall_online_screens_watcher.h>
 #include <nx/vms/license/usage_helper.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/workbench/handlers/workbench_videowall_handler.h>
@@ -177,18 +180,6 @@ void ResourceStatusHelper::Private::setContext(QnWorkbenchContext* value)
                 q,
                 &ResourceStatusHelper::defaultPasswordCamerasChanged);
         }
-
-        if (qnRuntime->isVideoWallMode())
-        {
-            const auto handler = m_context->instance<QnWorkbenchVideoWallHandler>();
-            if (NX_ASSERT(handler))
-            {
-                m_contextConnections << connect(handler,
-                    &QnWorkbenchVideoWallHandler::onlineScreensChanged,
-                    this,
-                    &Private::updateStatus);
-            }
-        }
     }
 
     emit q->contextChanged();
@@ -245,6 +236,12 @@ void ResourceStatusHelper::Private::setResource(QnResource* value)
             connect(m_licenseHelper.get(), &SingleCamLicenseStatusHelper::licenseStatusChanged,
                 this, &Private::updateLicenseUsage);
         }
+
+        auto systemContext = SystemContext::fromResource(m_resource);
+        m_resourceConnections << connect(systemContext->videoWallOnlineScreensWatcher(),
+            &VideoWallOnlineScreensWatcher::onlineScreensChanged,
+            this,
+            &Private::updateStatus);
     }
 
     emit q->resourceChanged();
@@ -364,7 +361,8 @@ void ResourceStatusHelper::Private::executeAction(ActionType type)
     {
         case ActionType::diagnostics:
         {
-            m_context->statisticsModule()->registerClick("resource_status_overlay_diagnostics");
+            ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
+                "resource_status_overlay_diagnostics");
             if (NX_ASSERT(m_camera))
                 m_context->menu()->trigger(ui::action::CameraDiagnosticsAction, m_camera);
 
@@ -373,7 +371,8 @@ void ResourceStatusHelper::Private::executeAction(ActionType type)
 
         case ActionType::enableLicense:
         {
-            m_context->statisticsModule()->registerClick("resource_status_overlay_enable_license");
+            ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
+                "resource_status_overlay_enable_license");
             if (!NX_ASSERT(m_camera && m_licenseUsage == LicenseUsage::notUsed))
                 return;
 
@@ -388,14 +387,16 @@ void ResourceStatusHelper::Private::executeAction(ActionType type)
 
         case ActionType::moreLicenses:
         {
-            m_context->statisticsModule()->registerClick("resource_status_overlay_more_licenses");
+            ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
+                "resource_status_overlay_more_licenses");
             m_context->menu()->trigger(ui::action::PreferencesLicensesTabAction);
             break;
         }
 
         case ActionType::settings:
         {
-            m_context->statisticsModule()->registerClick("resource_status_overlay_settings");
+            ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
+                "resource_status_overlay_settings");
             if (!NX_ASSERT(m_camera))
                 break;
 
@@ -426,22 +427,22 @@ void ResourceStatusHelper::Private::executeAction(ActionType type)
 
 bool ResourceStatusHelper::Private::isVideoWallLicenseValid() const
 {
-    if (!NX_ASSERT(m_context && qnRuntime->isVideoWallMode()))
+    if (!NX_ASSERT(m_resource && qnRuntime->isVideoWallMode()))
         return true;
 
-    const auto commonModule = m_context->commonModule();
+    auto systemContext = SystemContext::fromResource(m_resource);
 
     auto helper = qnClientModule->videoWallLicenseUsageHelper();
     if (helper->isValid())
         return true;
 
-    const QnPeerRuntimeInfo localInfo = commonModule->runtimeInfoManager()->localInfo();
+    const QnPeerRuntimeInfo localInfo = systemContext->runtimeInfoManager()->localInfo();
     NX_ASSERT(localInfo.data.peer.peerType == nx::vms::api::PeerType::videowallClient);
     QnUuid currentScreenId = localInfo.data.videoWallInstanceGuid;
 
     // Gather all online screen ids.
     // The order of screens should be the same across all client instances.
-    const auto onlineScreens = m_context->instance<QnWorkbenchVideoWallHandler>()->onlineScreens();
+    const auto onlineScreens = systemContext->videoWallOnlineScreensWatcher()->onlineScreens();
 
     const int allowedLiceses = helper->totalLicenses(Qn::LC_VideoWall);
 

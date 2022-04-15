@@ -278,7 +278,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
                 QDesktopServices::openUrl(m_updateInfo.info.releaseNotesUrl);
         });
 
-    connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged, this,
+    connect(globalSettings(), &QnGlobalSettings::cloudSettingsChanged, this,
         [this]()
         {
             if (m_widgetState != WidgetUpdateState::ready
@@ -331,10 +331,10 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
         this, &MultiServerUpdatesWidget::atStartInstallComplete,
         Qt::ConnectionType::QueuedConnection);
 
-    connect(qnGlobalSettings, &QnGlobalSettings::localSystemIdChanged, this,
+    connect(globalSettings(), &QnGlobalSettings::localSystemIdChanged, this,
         [this]()
         {
-            auto systemId = qnGlobalSettings->localSystemId();
+            auto systemId = globalSettings()->localSystemId();
             NX_DEBUG(this, "localSystemId is changed to %1. Need to refresh server list", systemId);
             if (systemId.isNull())
             {
@@ -741,7 +741,7 @@ void MultiServerUpdatesWidget::setUpdateTarget(
 
 QnUuid MultiServerUpdatesWidget::clientPeerId() const
 {
-    return m_stateTracker->getClientPeerId(commonModule());
+    return m_stateTracker->getClientPeerId(systemContext());
 }
 
 void MultiServerUpdatesWidget::setDayWarningVisible(bool visible)

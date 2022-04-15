@@ -78,7 +78,7 @@ SystemHealthListModel::Private::Private(SystemHealthListModel* q) :
     base_type(),
     QnWorkbenchContextAware(q),
     q(q),
-    m_helper(new vms::event::StringsHelper(commonModule())),
+    m_helper(new vms::event::StringsHelper(systemContext())),
     m_popupSystemHealthFilter(qnSettings->popupSystemHealth())
 {
     // Handle system health state.

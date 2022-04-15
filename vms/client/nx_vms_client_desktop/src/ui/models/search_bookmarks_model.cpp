@@ -7,21 +7,25 @@
 #include <camera/camera_bookmarks_manager.h>
 #include <camera/camera_bookmarks_query.h>
 #include <client/client_globals.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/utils/algorithm/index_of.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/text/human_readable.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <utils/camera/bookmark_helpers.h>
 #include <utils/camera/camera_names_watcher.h>
 
 using std::chrono::milliseconds;
+
+using namespace nx::vms::client::desktop;
 
 namespace
 {
@@ -175,7 +179,9 @@ int QnSearchBookmarksModelPrivate::getBookmarkIndex(const QnUuid& bookmarkId) co
 
 QDateTime QnSearchBookmarksModelPrivate::displayTime(qint64 millisecondsSinceEpoch) const
 {
-    const auto timeWatcher = context()->instance<nx::vms::client::core::ServerTimeWatcher>();
+    // TODO: #sivanov Actualize used system context.
+    const auto timeWatcher = ApplicationContext::instance()->currentSystemContext()
+        ->serverTimeWatcher();
     return timeWatcher->displayTime(millisecondsSinceEpoch);
 }
 

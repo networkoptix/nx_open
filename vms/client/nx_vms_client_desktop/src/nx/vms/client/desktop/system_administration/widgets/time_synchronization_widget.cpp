@@ -174,8 +174,8 @@ void TimeSynchronizationWidget::loadDataToUi()
     }
 
     m_store->initialize(
-        qnGlobalSettings->isTimeSynchronizationEnabled(),
-        qnGlobalSettings->primaryTimeServer(),
+        globalSettings()->isTimeSynchronizationEnabled(),
+        globalSettings()->primaryTimeServer(),
         servers);
 
     m_store->setBaseTime(milliseconds(qnSyncTime->currentMSecsSinceEpoch()));
@@ -203,9 +203,9 @@ void TimeSynchronizationWidget::applyChanges()
 
     const auto& state = m_store->state();
 
-    qnGlobalSettings->setTimeSynchronizationEnabled(state.enabled);
-    qnGlobalSettings->setPrimaryTimeServer(state.primaryServer);
-    qnGlobalSettings->synchronizeNow();
+    globalSettings()->setTimeSynchronizationEnabled(state.enabled);
+    globalSettings()->setPrimaryTimeServer(state.primaryServer);
+    globalSettings()->synchronizeNow();
 
     m_store->applyChanges();
 }

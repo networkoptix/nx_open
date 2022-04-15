@@ -7,11 +7,9 @@
 #include <QtCore/QObject>
 #include <QtQml/QQmlEngine>
 
-class QnClientCoreModule;
-class QnStaticCommonModule;
+namespace nx::vms::client::desktop::test {
 
-namespace nx::vms::client::desktop {
-namespace test {
+class Context;
 
 class QmlTestEnvironment: public QObject
 {
@@ -22,9 +20,7 @@ public:
     QQmlEngine* engine() const;
 
 private:
-    std::unique_ptr<QnStaticCommonModule> m_staticCommonModule;
-    std::unique_ptr<QnClientCoreModule> m_clientCoreModule;
+    std::unique_ptr<Context> m_testContext;
 };
 
-} // namespace test
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::desktop::test

@@ -13,6 +13,7 @@
 #include <core/resource/user_resource.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/director/director.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/joystick/settings/manager.h>
@@ -116,11 +117,11 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
     const auto sessionRestoreStatModule = instance<QnSessionRestoreStatisticsModule>();
     statisticsManager->registerStatisticsModule(lit("restore"), sessionRestoreStatModule);
 
-    const auto certificateStatisticsModule = instance<QnCertificateStatisticsModule>();
-    statisticsManager->registerStatisticsModule(lit("certificate"), certificateStatisticsModule);
+    statisticsManager->registerStatisticsModule("certificate",
+        ApplicationContext::instance()->certificateStatisticsModule());
 
-    m_statisticsModule.reset(new QnControlsStatisticsModule());
-    statisticsManager->registerStatisticsModule(lit("controls"), m_statisticsModule.data());
+    statisticsManager->registerStatisticsModule("controls",
+        ApplicationContext::instance()->controlsStatisticsModule());
 
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionClosed,
         statisticsManager, &QnStatisticsManager::resetStatistics);
@@ -155,7 +156,6 @@ QnWorkbenchContext::~QnWorkbenchContext() {
 
     /* Destruction order of these objects is important. */
     m_resourceTreeSettings.reset();
-    m_statisticsModule.reset();
     m_navigator.reset();
     m_display.reset();
     m_menu.reset();
@@ -197,11 +197,6 @@ QnWorkbenchDisplay* QnWorkbenchContext::display() const
 QnWorkbenchNavigator* QnWorkbenchContext::navigator() const
 {
     return m_navigator.data();
-}
-
-QnControlsStatisticsModule* QnWorkbenchContext::statisticsModule() const
-{
-    return m_statisticsModule.data();
 }
 
 nx::vms::client::desktop::joystick::Manager* QnWorkbenchContext::joystickManager() const

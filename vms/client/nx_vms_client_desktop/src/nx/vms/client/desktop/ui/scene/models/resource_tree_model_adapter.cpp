@@ -472,7 +472,7 @@ bool ResourceTreeModelAdapter::isFilterRelevant(ResourceTree::FilterType type) c
     {
         case ResourceTree::FilterType::servers:
             return d->context->accessController()->hasGlobalPermission(GlobalPermission::admin)
-                || d->context->commonModule()->globalSettings()->showServersInTreeForNonAdmins();
+                || d->context->globalSettings()->showServersInTreeForNonAdmins();
 
         default:
             return true;

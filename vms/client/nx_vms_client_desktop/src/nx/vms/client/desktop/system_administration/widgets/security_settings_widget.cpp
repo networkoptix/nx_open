@@ -193,19 +193,19 @@ SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
     /* Let suggest these options are changes so rare, so we can safely drop unsaved changes. */
-    connect(qnGlobalSettings, &QnGlobalSettings::auditTrailEnableChanged, this,
+    connect(globalSettings(), &QnGlobalSettings::auditTrailEnableChanged, this,
         &SecuritySettingsWidget::loadDataToUi);
-    connect(qnGlobalSettings, &QnGlobalSettings::trafficEncryptionForcedChanged, this,
+    connect(globalSettings(), &QnGlobalSettings::trafficEncryptionForcedChanged, this,
         &SecuritySettingsWidget::loadDataToUi);
-    connect(qnGlobalSettings, &QnGlobalSettings::videoTrafficEncryptionForcedChanged, this,
+    connect(globalSettings(), &QnGlobalSettings::videoTrafficEncryptionForcedChanged, this,
         &SecuritySettingsWidget::loadDataToUi);
-    connect(qnGlobalSettings, &QnGlobalSettings::watermarkChanged, this,
+    connect(globalSettings(), &QnGlobalSettings::watermarkChanged, this,
         &SecuritySettingsWidget::loadDataToUi);
-    connect(qnGlobalSettings, &QnGlobalSettings::sessionTimeoutChanged, this,
+    connect(globalSettings(), &QnGlobalSettings::sessionTimeoutChanged, this,
         &SecuritySettingsWidget::loadDataToUi);
-    connect(qnGlobalSettings, &QnGlobalSettings::useStorageEncryptionChanged, this,
+    connect(globalSettings(), &QnGlobalSettings::useStorageEncryptionChanged, this,
         &SecuritySettingsWidget::loadDataToUi);
-    connect(qnGlobalSettings, &QnGlobalSettings::showServersInTreeForNonAdminsChanged, this,
+    connect(globalSettings(), &QnGlobalSettings::showServersInTreeForNonAdminsChanged, this,
         &SecuritySettingsWidget::loadDataToUi);
 }
 
@@ -243,17 +243,17 @@ void SecuritySettingsWidget::showArchiveEncryptionPasswordDialog(bool viaButton)
 
 void SecuritySettingsWidget::loadDataToUi()
 {
-    ui->auditTrailCheckBox->setChecked(qnGlobalSettings->isAuditTrailEnabled());
+    ui->auditTrailCheckBox->setChecked(globalSettings()->isAuditTrailEnabled());
 
-    ui->forceTrafficEncryptionCheckBox->setChecked(qnGlobalSettings->isTrafficEncryptionForced());
-    ui->useHttpsOnlyCamerasCheckBox->setChecked(qnGlobalSettings->useHttpsOnlyCameras());
+    ui->forceTrafficEncryptionCheckBox->setChecked(globalSettings()->isTrafficEncryptionForced());
+    ui->useHttpsOnlyCamerasCheckBox->setChecked(globalSettings()->useHttpsOnlyCameras());
     ui->forceVideoTrafficEncryptionCheckBox->setChecked(
-        qnGlobalSettings->isVideoTrafficEncryptionForced());
+        globalSettings()->isVideoTrafficEncryptionForced());
 
-    m_watermarkSettings = qnGlobalSettings->watermarkSettings();
+    m_watermarkSettings = globalSettings()->watermarkSettings();
     ui->displayWatermarkCheckBox->setChecked(m_watermarkSettings.useWatermark);
 
-    const auto sessionTimeoutLimit = qnGlobalSettings->sessionTimeoutLimit();
+    const auto sessionTimeoutLimit = globalSettings()->sessionTimeoutLimit();
     ui->limitSessionLengthCheckBox->setChecked(sessionTimeoutLimit.has_value());
     if (sessionTimeoutLimit)
     {
@@ -270,21 +270,21 @@ void SecuritySettingsWidget::loadDataToUi()
         }
     }
 
-    if (!qnGlobalSettings->isVideoTrafficEncryptionForced())
+    if (!globalSettings()->isVideoTrafficEncryptionForced())
         ui->forceVideoEncryptionWarning->hide();
-    if (!qnGlobalSettings->useHttpsOnlyCameras())
+    if (!globalSettings()->useHttpsOnlyCameras())
         ui->useHttpsOnlyCamerasWarning->hide();
 
     loadEncryptionSettingsToUi();
     loadUserInfoToUi();
     updateLimitSessionControls();
 
-    ui->showServersInTreeCheckBox->setChecked(qnGlobalSettings->showServersInTreeForNonAdmins());
+    ui->showServersInTreeCheckBox->setChecked(globalSettings()->showServersInTreeForNonAdmins());
 }
 
 void SecuritySettingsWidget::loadEncryptionSettingsToUi()
 {
-    const bool storageEncryption = qnGlobalSettings->useStorageEncryption();
+    const bool storageEncryption = globalSettings()->useStorageEncryption();
     if (storageEncryption)
     {
         if (m_archivePasswordState != ArchivePasswordState::failedToSet)
@@ -328,18 +328,18 @@ void SecuritySettingsWidget::applyChanges()
     if (!hasChanges())
         return;
 
-    qnGlobalSettings->setAuditTrailEnabled(ui->auditTrailCheckBox->isChecked());
-    qnGlobalSettings->setTrafficEncryptionForced(ui->forceTrafficEncryptionCheckBox->isChecked());
-    qnGlobalSettings->setUseHttpsOnlyCameras(ui->useHttpsOnlyCamerasCheckBox->isChecked());
-    qnGlobalSettings->setVideoTrafficEncryptionForced(
+    globalSettings()->setAuditTrailEnabled(ui->auditTrailCheckBox->isChecked());
+    globalSettings()->setTrafficEncryptionForced(ui->forceTrafficEncryptionCheckBox->isChecked());
+    globalSettings()->setUseHttpsOnlyCameras(ui->useHttpsOnlyCamerasCheckBox->isChecked());
+    globalSettings()->setVideoTrafficEncryptionForced(
         ui->forceVideoTrafficEncryptionCheckBox->isChecked());
 
-    qnGlobalSettings->setWatermarkSettings(m_watermarkSettings);
-    qnGlobalSettings->setSessionTimeoutLimit(calculateSessionLimit());
-    qnGlobalSettings->setUseStorageEncryption(ui->archiveEncryptionGroupBox->isChecked());
-    qnGlobalSettings->setShowServersInTreeForNonAdmins(ui->showServersInTreeCheckBox->isChecked());
+    globalSettings()->setWatermarkSettings(m_watermarkSettings);
+    globalSettings()->setSessionTimeoutLimit(calculateSessionLimit());
+    globalSettings()->setUseStorageEncryption(ui->archiveEncryptionGroupBox->isChecked());
+    globalSettings()->setShowServersInTreeForNonAdmins(ui->showServersInTreeCheckBox->isChecked());
 
-    qnGlobalSettings->synchronizeNow();
+    globalSettings()->synchronizeNow();
     resetWarnings();
 
     const auto callback = nx::utils::guarded(this,
@@ -376,21 +376,21 @@ bool SecuritySettingsWidget::hasChanges() const
     if (isReadOnly())
         return false;
 
-    return (ui->auditTrailCheckBox->isChecked() != qnGlobalSettings->isAuditTrailEnabled())
+    return (ui->auditTrailCheckBox->isChecked() != globalSettings()->isAuditTrailEnabled())
         || (ui->forceTrafficEncryptionCheckBox->isChecked()
-            != qnGlobalSettings->isTrafficEncryptionForced())
+            != globalSettings()->isTrafficEncryptionForced())
         || (ui->useHttpsOnlyCamerasCheckBox->isChecked()
-            != qnGlobalSettings->useHttpsOnlyCameras())
+            != globalSettings()->useHttpsOnlyCameras())
         || (ui->forceVideoTrafficEncryptionCheckBox->isChecked()
-            != qnGlobalSettings->isVideoTrafficEncryptionForced())
-        || (m_watermarkSettings != qnGlobalSettings->watermarkSettings())
-        || (calculateSessionLimit() != qnGlobalSettings->sessionTimeoutLimit())
+            != globalSettings()->isVideoTrafficEncryptionForced())
+        || (m_watermarkSettings != globalSettings()->watermarkSettings())
+        || (calculateSessionLimit() != globalSettings()->sessionTimeoutLimit())
         || (ui->archiveEncryptionGroupBox->isChecked()
-            != qnGlobalSettings->useStorageEncryption())
+            != globalSettings()->useStorageEncryption())
         || m_archivePasswordState == ArchivePasswordState::changed
         || m_archivePasswordState == ArchivePasswordState::failedToSet
         || ui->showServersInTreeCheckBox->isChecked()
-            != qnGlobalSettings->showServersInTreeForNonAdmins();
+            != globalSettings()->showServersInTreeForNonAdmins();
 }
 
 void SecuritySettingsWidget::resetWarnings()

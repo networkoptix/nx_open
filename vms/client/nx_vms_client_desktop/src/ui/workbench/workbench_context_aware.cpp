@@ -12,7 +12,7 @@
 
 using namespace nx::vms::client::desktop::ui;
 
-QString QnWorkbenchContextAware::kQmlContextPropertyName(lit("workbenchContext"));
+QString QnWorkbenchContextAware::kQmlWorkbenchContextPropertyName("workbenchContext");
 
 QnWorkbenchContextAware::QnWorkbenchContextAware(QObject* parent, InitializationMode initMode):
     m_parent(parent),
@@ -125,7 +125,7 @@ void QnWorkbenchContextAware::initFromQmlContext()
         return;
 
     const auto workbenchContext =
-        qmlContext->contextProperty(kQmlContextPropertyName).value<QnWorkbenchContext*>();
+        qmlContext->contextProperty(kQmlWorkbenchContextPropertyName).value<QnWorkbenchContext*>();
 
     if (workbenchContext)
         init(workbenchContext);

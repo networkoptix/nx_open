@@ -20,7 +20,7 @@ class DirectSharedLayoutItemAccessProviderTest: public DirectBaseAccessProviderT
 protected:
     virtual AbstractResourceAccessProvider* createAccessProvider() const override
     {
-        return new SharedLayoutItemAccessProvider(Mode::direct, commonModule());
+        return new SharedLayoutItemAccessProvider(Mode::direct, systemContext());
     }
 };
 

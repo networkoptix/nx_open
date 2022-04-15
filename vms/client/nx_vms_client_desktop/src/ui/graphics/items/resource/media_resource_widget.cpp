@@ -5,8 +5,6 @@
 #include <chrono>
 #include <iterator>
 
-#include <boost/algorithm/cxx11/all_of.hpp>
-
 #include <QtCore/QTimer>
 #include <QtCore/QVarLengthArray>
 #include <QtGui/QPainter>
@@ -14,6 +12,8 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QOpenGLWidget>
+
+#include <qt_graphics_items/graphics_stacked_widget.h>
 
 #include <api/common_message_processor.h>
 #include <api/global_settings.h>
@@ -58,6 +58,7 @@
 #include <nx/vms/client/core/motion/motion_grid.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/integrations.h>
@@ -69,6 +70,7 @@
 #include <nx/vms/client/desktop/scene/resource_widget/private/object_tracking_button_controller.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/style.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
@@ -79,7 +81,9 @@
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/roi_figures_overlay_widget.h>
 #include <nx/vms/client/desktop/ui/graphics/items/resource/widget_analytics_controller.h>
 #include <nx/vms/client/desktop/watermark/watermark_painter.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/crypt/crypt.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/rule.h>
@@ -88,7 +92,6 @@
 #include <nx/vms/license/usage_helper.h>
 #include <nx/vms/time/formatter.h>
 #include <plugins/resource/desktop_camera/desktop_resource_base.h>
-#include <qt_graphics_items/graphics_stacked_widget.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/controls/html_text_item.h>
@@ -124,12 +127,13 @@
 
 using namespace std::chrono;
 
-using namespace nx;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::analytics;
 using namespace nx::vms::api;
 using namespace ui;
-using namespace nx::vms::common;
+
+namespace ptz = nx::vms::common::ptz;
+namespace html = nx::vms::common::html;
 
 using nx::vms::client::core::MotionSelection;
 using nx::vms::client::core::Geometry;
@@ -244,14 +248,19 @@ void drawCrosshair(QPainter* painter, const QRectF& rect)
 
 } // namespace
 
-QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWorkbenchItem* item, QGraphicsItem* parent):
-    base_type(context, item, parent),
-    d(new MediaResourceWidgetPrivate(base_type::resource(), accessController())),
-    m_recordingStatusHelper(new RecordingStatusHelper(this)),
+QnMediaResourceWidget::QnMediaResourceWidget(
+    SystemContext* systemContext,
+    WindowContext* windowContext,
+    QnWorkbenchItem* item,
+    QGraphicsItem* parent)
+    :
+    base_type(systemContext, windowContext, item, parent),
+    d(new MediaResourceWidgetPrivate(base_type::resource())),
+    m_recordingStatusHelper(new RecordingStatusHelper(systemContext, this)),
     m_posUtcMs(DATETIME_INVALID),
     m_watermarkPainter(new WatermarkPainter),
     m_encryptedArchivePasswordDialog(
-        new nx::vms::client::desktop::EncryptedArchivePasswordDialog(context->mainWindow())),
+        new nx::vms::client::desktop::EncryptedArchivePasswordDialog(mainWindow())),
     m_itemId(item->uuid()),
     m_buttonController(new CameraButtonController(this)),
     m_objectTrackingButtonController(new ObjectTrackingButtonController(this)),
@@ -336,10 +345,13 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     connect(navigator(), &QnWorkbenchNavigator::bookmarksModeEnabledChanged, this,
         &QnMediaResourceWidget::updateCompositeOverlayMode);
 
-    connect(commonModule()->messageProcessor(), &QnCommonMessageProcessor::businessActionReceived, this,
-        [this](const vms::event::AbstractActionPtr &businessAction)
+    connect(
+        systemContext->messageProcessor(),
+        &QnCommonMessageProcessor::businessActionReceived,
+        this,
+        [this](const nx::vms::event::AbstractActionPtr &businessAction)
         {
-            if (businessAction->actionType() != vms::api::ActionType::executePtzPresetAction)
+            if (businessAction->actionType() != ActionType::executePtzPresetAction)
                 return;
 
             const auto &actionParams = businessAction->getParams();
@@ -353,9 +365,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
                     QnAbstractPtzController::MaxPtzSpeed);
             }
         });
-
-    connect(context, &QnWorkbenchContext::userChanged,
-        this, &QnMediaResourceWidget::resetTriggers);
 
     updateDisplay();
     updateDewarpingParams();
@@ -386,8 +395,10 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     connect(this, &QnResourceWidget::zoomRectChanged,
         this, &QnMediaResourceWidget::at_zoomRectChanged);
 
-    connect(context->instance<QnWorkbenchRenderWatcher>(), &QnWorkbenchRenderWatcher::widgetChanged,
-        this, &QnMediaResourceWidget::at_renderWatcher_widgetChanged);
+    connect(windowContext->resourceWidgetRenderWatcher(),
+        &QnWorkbenchRenderWatcher::widgetChanged,
+        this,
+        &QnMediaResourceWidget::at_renderWatcher_widgetChanged);
 
     // Update buttons for single layout tour start/stop
     connect(action(action::ToggleLayoutTourModeAction), &QAction::toggled, this,
@@ -419,10 +430,14 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     initSoftwareTriggers();
 
     updateWatermark();
-    connect(globalSettings(), &QnGlobalSettings::watermarkChanged,
-        this, &QnMediaResourceWidget::updateWatermark);
-    connect(context, &QnWorkbenchContext::userChanged,
-        this, &QnMediaResourceWidget::updateWatermark);
+    connect(systemContext->globalSettings(),
+        &QnGlobalSettings::watermarkChanged,
+        this,
+        &QnMediaResourceWidget::updateWatermark);
+    connect(windowContext->workbenchContext(),
+        &QnWorkbenchContext::userChanged,
+        this,
+        &QnMediaResourceWidget::updateWatermark);
 
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this,
         &QnMediaResourceWidget::updateCurrentUtcPosMs);
@@ -440,7 +455,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
                 qnResourceRuntimeDataManager->layoutItemData(m_itemId, Qn::ItemPausedRole));
         }, this);
 
-    const bool canRotate = accessController()->hasPermissions(item->layout()->resource(),
+    const bool canRotate = systemContext->accessController()->hasPermissions(
+        item->layout()->resource(),
         Qn::WritePermission);
     setOption(WindowRotationForbidden, !hasVideo() || !canRotate);
     setAnalyticsObjectsVisible(item->displayAnalyticsObjects(), false);
@@ -464,10 +480,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
                 : SoftwareTriggerButton::State::Failure);
         };
 
-    const auto resourceId = base_type::resource()->getId();
     // Local files dropped onto layout are not virtual cameras.
-    if (!context->resourcePool()->getResourceById<QnVirtualCameraResource>(resourceId).isNull())
-        m_triggerController.setResourceId(resourceId);
+    if (d->camera)
+        m_triggerController.setResourceId(d->camera->getId());
 
     using Controller = nx::vms::client::core::SoftwareTriggersController;
     connect(&m_triggerController, &Controller::triggerActivated, this, triggerActionHandler);
@@ -536,7 +551,7 @@ void QnMediaResourceWidget::handleDewarpingParamsChanged()
 void QnMediaResourceWidget::initRenderer()
 {
     // TODO: We shouldn't be using OpenGL context in class constructor.
-    QGraphicsView *view = QnWorkbenchContextAware::display()->view();
+    QGraphicsView *view = WindowContextAware::display()->view();
     const auto viewport = dynamic_cast<QOpenGLWidget*>(view ? view->viewport() : nullptr);
     m_renderer = new QnResourceWidgetRenderer(nullptr, viewport);
     connect(m_renderer, &QnResourceWidgetRenderer::sourceSizeChanged, this,
@@ -569,15 +584,15 @@ void QnMediaResourceWidget::initSoftwareTriggers()
 
     resetTriggers();
 
-    auto eventRuleManager = commonModule()->eventRuleManager();
+    auto eventRuleManager = systemContext()->eventRuleManager();
 
-    connect(eventRuleManager, &vms::event::RuleManager::rulesReset,
+    connect(eventRuleManager, &nx::vms::event::RuleManager::rulesReset,
         this, &QnMediaResourceWidget::resetTriggers);
 
-    connect(eventRuleManager, &vms::event::RuleManager::ruleAddedOrUpdated,
+    connect(eventRuleManager, &nx::vms::event::RuleManager::ruleAddedOrUpdated,
         this, &QnMediaResourceWidget::at_eventRuleAddedOrUpdated);
 
-    connect(eventRuleManager, &vms::event::RuleManager::ruleRemoved,
+    connect(eventRuleManager, &nx::vms::event::RuleManager::ruleRemoved,
         this, &QnMediaResourceWidget::at_eventRuleRemoved);
 }
 
@@ -693,7 +708,8 @@ void QnMediaResourceWidget::initStatusOverlayController()
      connect(controller, &QnStatusOverlayController::customButtonClicked, this,
          [this, changeCameraPassword]()
          {
-             const auto passwordWatcher = context()->instance<DefaultPasswordCamerasWatcher>();
+             const auto passwordWatcher = windowContext()->workbenchContext()
+                 ->instance<DefaultPasswordCamerasWatcher>();
              changeCameraPassword(passwordWatcher->camerasWithDefaultPassword().values(), true);
          });
 }
@@ -830,7 +846,8 @@ QString QnMediaResourceWidget::overlayCustomButtonText(
     if (!accessController()->hasGlobalPermission(GlobalPermission::admin))
         return QString();
 
-    const auto watcher = context()->instance<DefaultPasswordCamerasWatcher>();
+    const auto watcher = windowContext()->workbenchContext()
+        ->instance<DefaultPasswordCamerasWatcher>();
     const auto camerasCount = watcher ? watcher->camerasWithDefaultPassword().size() : 0;
     return camerasCount > 1
         ? tr("Set for all %n Cameras", nullptr, camerasCount)
@@ -1317,9 +1334,8 @@ void QnMediaResourceWidget::updateHud(bool animate)
 
 void QnMediaResourceWidget::updateCameraButtons()
 {
-    const auto user = context()->user();
     const bool capabilityButtonsVisible = !d->isPreviewSearchLayout
-        && user //< Video wall has userInput permission but no actual user.
+        && !qnRuntime->isVideoWallMode() //< Video wall has userInput permission but no actual user.
         && d->camera
         && accessController()->hasGlobalPermission(GlobalPermission::userInput);
 
@@ -1347,7 +1363,7 @@ void QnMediaResourceWidget::updateCameraButtons()
 
 bool QnMediaResourceWidget::animationAllowed() const
 {
-    return QnWorkbenchContextAware::display()->animationAllowed();
+    return WindowContextAware::display()->animationAllowed();
 }
 
 void QnMediaResourceWidget::resumeHomePtzController()
@@ -1377,8 +1393,10 @@ const MotionSelection& QnMediaResourceWidget::motionSelection() const
 
 bool QnMediaResourceWidget::isMotionSelectionEmpty() const
 {
-    using boost::algorithm::all_of;
-    return all_of(m_motionSelection, [](const QRegion& r) { return r.isEmpty(); });
+    return std::all_of(
+        m_motionSelection.cbegin(),
+        m_motionSelection.cend(),
+         [](const QRegion& r) { return r.isEmpty(); });
 }
 
 void QnMediaResourceWidget::addToMotionSelection(const QRect &gridRect)
@@ -2076,7 +2094,12 @@ QString QnMediaResourceWidget::calculateDetailsText() const
         [&result](const QString& value)
         {
             if (!value.isEmpty())
-                result.append(html::styledParagraph(value, kDetailsTextPixelSize, /*bold*/ true));
+            {
+                result.append(html::styledParagraph(
+                    value,
+                    kDetailsTextPixelSize,
+                    /*bold*/ true));
+            }
         };
 
     if (hasVideo())
@@ -2185,7 +2208,10 @@ QString QnMediaResourceWidget::calculatePositionText() const
         : extractTime(getDisplayTimeUsec()));
 
     static const int kPositionTextPixelSize = 14;
-    return html::styledParagraph(timeString, kPositionTextPixelSize, /*bold*/ true);
+    return html::styledParagraph(
+        timeString,
+        kPositionTextPixelSize,
+        /*bold*/ true);
 }
 
 QString QnMediaResourceWidget::calculateTitleText() const
@@ -2265,7 +2291,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
             && item()->layout()
             && accessController()->hasPermissions(item()->layout()->resource(),
                 Qn::WritePermission | Qn::AddRemoveItemsPermission)
-            && !tourIsRunning(context())
+            && !tourIsRunning(windowContext()->workbenchContext())
             )
             result |= Qn::ZoomWindowButton;
     }
@@ -2401,8 +2427,7 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
     if (!d->camera || !d->camera->resourcePool())
         return Qn::ResourceOverlayButton::Empty;
 
-    const bool adminPermissions =
-        context()->accessController()->hasGlobalPermission(GlobalPermission::admin);
+    const bool adminPermissions = accessController()->hasGlobalPermission(GlobalPermission::admin);
 
     const bool canChangeSettings = qnRuntime->isDesktopMode()
         && accessController()->hasPermissions(d->camera, Qn::SavePermission | Qn::WritePermission);
@@ -2716,7 +2741,8 @@ void QnMediaResourceWidget::updateAnalyticsVisibility(bool animate)
 
 void QnMediaResourceWidget::processDiagnosticsRequest()
 {
-    context()->statisticsModule()->registerClick("resource_status_overlay_diagnostics");
+    ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
+        "resource_status_overlay_diagnostics");
 
     if (d->camera)
         menu()->trigger(action::CameraDiagnosticsAction, d->camera);
@@ -2724,7 +2750,8 @@ void QnMediaResourceWidget::processDiagnosticsRequest()
 
 void QnMediaResourceWidget::processEnableLicenseRequest()
 {
-    context()->statisticsModule()->registerClick("resource_status_overlay_enable_license");
+    ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
+        "resource_status_overlay_enable_license");
 
     const auto licenseStatus = d->licenseStatus();
     if (licenseStatus != nx::vms::license::UsageStatus::notUsed)
@@ -2736,13 +2763,14 @@ void QnMediaResourceWidget::processEnableLicenseRequest()
             camera->setScheduleEnabled(true);
         });
 
-    const bool animate = QnWorkbenchContextAware::display()->animationAllowed();
+    const bool animate = WindowContextAware::display()->animationAllowed();
     updateIoModuleVisibility(animate);
 }
 
 void QnMediaResourceWidget::processSettingsRequest()
 {
-    context()->statisticsModule()->registerClick("resource_status_overlay_settings");
+    ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
+        "resource_status_overlay_settings");
     if (!d->camera)
         return;
 
@@ -2753,14 +2781,15 @@ void QnMediaResourceWidget::processSettingsRequest()
 
 void QnMediaResourceWidget::processMoreLicensesRequest()
 {
-    context()->statisticsModule()->registerClick("resource_status_overlay_more_licenses");
+    ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
+        "resource_status_overlay_more_licenses");
 
     menu()->trigger(action::PreferencesLicensesTabAction);
 }
 
 void QnMediaResourceWidget::processEncryptedArchiveUnlockRequst()
 {
-    context()->statisticsModule()->registerClick(
+    ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
         "resource_status_overlay_unlock_encrypted_archive");
     m_encryptedArchivePasswordDialog->showForEncryptionData(m_encryptedArchiveData);
 }
@@ -2830,8 +2859,7 @@ qint64 QnMediaResourceWidget::getDisplayTimeUsec() const
     qint64 result = getUtcCurrentTimeUsec();
     if (!isSpecialDateTimeValueUsec(result))
     {
-        const auto timeWatcher = context()->instance<nx::vms::client::core::ServerTimeWatcher>();
-        result += timeWatcher->displayOffset(d->mediaResource) * 1000ll;
+        result += serverTimeWatcher()->displayOffset(d->mediaResource) * 1000ll;
     }
     return result;
 }
@@ -3001,10 +3029,10 @@ void QnMediaResourceWidget::setAnalyticsFilter(const nx::analytics::db::Filter& 
 void QnMediaResourceWidget::updateWatermark()
 {
     // Ini guard; remove on release. Default watermark is invisible.
-    auto settings = globalSettings()->watermarkSettings();
+    auto settings = systemContext()->globalSettings()->watermarkSettings();
 
     // First create normal watermark according to current client state.
-    auto watermark = context()->watermark();
+    auto watermark = windowContext()->workbenchContext()->watermark();
 
     // Do not show watermark for local AVI resources.
     if (resource().dynamicCast<QnAviResource>())
@@ -3078,7 +3106,7 @@ QnMediaResourceWidget::SoftwareTriggerInfo QnMediaResourceWidget::makeTriggerInf
 }
 
 void QnMediaResourceWidget::createTriggerIfRelevant(
-    const vms::event::RulePtr& rule)
+    const nx::vms::event::RulePtr& rule)
 {
     if (!isRelevantTriggerRule(rule))
         return;
@@ -3116,9 +3144,9 @@ void QnMediaResourceWidget::createTriggerIfRelevant(
     m_triggers.insert(index, SoftwareTrigger{rule->id(), info, overlayItemId});
 }
 
-bool QnMediaResourceWidget::isRelevantTriggerRule(const vms::event::RulePtr& rule) const
+bool QnMediaResourceWidget::isRelevantTriggerRule(const nx::vms::event::RulePtr& rule) const
 {
-    if (rule->isDisabled() || rule->eventType() != vms::api::EventType::softwareTriggerEvent)
+    if (rule->isDisabled() || rule->eventType() != EventType::softwareTriggerEvent)
         return false;
 
     const auto resourceId = d->resource->getId();
@@ -3157,7 +3185,7 @@ void QnMediaResourceWidget::updateTriggerButtonTooltip(
 
     if (enabledBySchedule)
     {
-        const auto name = vms::event::StringsHelper::getSoftwareTriggerName(info.name);
+        const auto name = nx::vms::event::StringsHelper::getSoftwareTriggerName(info.name);
         button->setToolTip(info.prolonged
             ? nx::format("%1 (%2)").args(name, tr("press and hold", "Soft Trigger")).toQString()
             : name);
@@ -3235,7 +3263,7 @@ void QnMediaResourceWidget::configureTriggerButton(SoftwareTriggerButton* button
 
     // Go-to-live handler.
     connect(button, &SoftwareTriggerButton::clicked, this,
-        [this, button, workbenchDisplay = QnWorkbenchContextAware::display()]()
+        [this, button, workbenchDisplay = WindowContextAware::display()]()
         {
             if (!button->isLive())
                 menu()->trigger(action::JumpToLiveAction, this);
@@ -3255,7 +3283,7 @@ void QnMediaResourceWidget::resetTriggers()
         return;
 
     // Create new relevant triggers.
-    for (const auto& rule: commonModule()->eventRuleManager()->rules())
+    for (const auto& rule: systemContext()->eventRuleManager()->rules())
         createTriggerIfRelevant(rule); //< Creates a trigger only if the rule is relevant.
 
     updateTriggersAvailability();
@@ -3285,7 +3313,7 @@ void QnMediaResourceWidget::at_eventRuleRemoved(const QnUuid& ruleId)
         removeTrigger(index);
 }
 
-void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const vms::event::RulePtr& rule)
+void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const nx::vms::event::RulePtr& rule)
 {
     const int index = triggerIndex(rule->id());
     if (index < 0)
@@ -3306,7 +3334,7 @@ void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const vms::event::RulePtr
     updateTriggerAvailability(rule);
 };
 
-void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr& rule)
+void QnMediaResourceWidget::updateTriggerAvailability(const nx::vms::event::RulePtr& rule)
 {
     if (!NX_ASSERT(rule))
         return;
@@ -3324,7 +3352,7 @@ void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr&
         return;
 
     const auto isScheduleMatchTime =
-        [this](const vms::event::RulePtr& rule)
+        [this](const nx::vms::event::RulePtr& rule)
         {
             const auto server = d->camera
                 ? d->camera->getParentServer()
@@ -3333,8 +3361,7 @@ void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr&
             if (server)
             {
                 return rule->isScheduleMatchTime(
-                    context()->instance<nx::vms::client::core::ServerTimeWatcher>()
-                        ->serverTime(server, qnSyncTime->currentMSecsSinceEpoch()));
+                    serverTimeWatcher()->serverTime(server, qnSyncTime->currentMSecsSinceEpoch()));
             }
 
             // If no server, fallback to client timezone.
@@ -3360,5 +3387,5 @@ void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr&
 void QnMediaResourceWidget::updateTriggersAvailability()
 {
     for (auto data: m_triggers)
-        updateTriggerAvailability(commonModule()->eventRuleManager()->rule(data.ruleId));
+        updateTriggerAvailability(systemContext()->eventRuleManager()->rule(data.ruleId));
 }

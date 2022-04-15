@@ -24,13 +24,13 @@ bool isRadassSupportedInternal(QnResourcePool* resourcePool, const QnLayoutItemD
         return false;
 
     // Some layouts do not belong to the same resource pool as cameras (e.g. showreels).
-    if (!resourcePool)
+    if (!NX_ASSERT(resourcePool))
     {
         // Unit tests do not have core module.
         if (!qnClientCoreModule)
             return false;
 
-        resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+        resourcePool = qnClientCoreModule->resourcePool();
     }
 
     return isRadassSupported(resourcePool->getResourceByDescriptor(item.resource)

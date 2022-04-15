@@ -367,7 +367,7 @@ QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *p
         });
     systemUpdateTimer->start();
 
-    connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,
+    connect(globalSettings(), &QnGlobalSettings::cloudSettingsChanged,
             this, &QnCloudStatusWatcherPrivate::updateCurrentSystem);
 
     m_tokenUpdater = std::make_unique<CloudSessionTokenUpdater>(this);
@@ -685,7 +685,7 @@ void QnCloudStatusWatcherPrivate::updateCurrentSystem()
 {
     Q_Q(QnCloudStatusWatcher);
 
-    const auto systemId = qnGlobalSettings->cloudSystemId();
+    const auto systemId = globalSettings()->cloudSystemId();
 
     const auto it = std::find_if(
         cloudSystems.begin(), cloudSystems.end(),

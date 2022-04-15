@@ -739,7 +739,7 @@ void QnStorageConfigWidget::at_storageView_clicked(const QModelIndex& index)
             if (storageId != m_model->metadataStorageId())
             {
                 // Check storage access rights.
-                if (record.isDbReady || qnGlobalSettings->forceAnalyticsDbStoragePermissions())
+                if (record.isDbReady || globalSettings()->forceAnalyticsDbStoragePermissions())
                     confirmNewMetadataStorage(storageId);
                 else
                     QnMessageBox::critical(this, tr("Insufficient permissions to store analytics data."));
@@ -938,8 +938,8 @@ void QnStorageConfigWidget::confirmNewMetadataStorage(const QnUuid& storageId)
     const auto updateServerSettings =
         [this](const vms::api::MetadataStorageChangePolicy policy, const QnUuid& storageId)
         {
-            qnGlobalSettings->setMetadataStorageChangePolicy(policy);
-            qnGlobalSettings->synchronizeNow();
+            globalSettings()->setMetadataStorageChangePolicy(policy);
+            globalSettings()->synchronizeNow();
 
             qnResourcesChangesManager->saveServer(m_server,
                 [storageId](const auto& server) { server->setMetadataStorageId(storageId); });

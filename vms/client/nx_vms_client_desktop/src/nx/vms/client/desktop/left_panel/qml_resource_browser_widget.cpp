@@ -1,29 +1,31 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "qml_resource_browser_widget.h"
-#include "private/resource_browser_wrapper_p.h"
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QItemSelectionModel>
 #include <QtCore/QScopedValueRollback>
-#include <QtQuick/QQuickItem>
 #include <QtQml/QQmlContext>
 #include <QtQml/QQmlEngine>
+#include <QtQuick/QQuickItem>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QToolTip>
 
 #include <client/client_globals.h>
 #include <client_core/client_core_module.h>
 #include <core/resource/resource.h>
+#include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/utils/qml_helpers.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
 
-#include <nx/utils/log/assert.h>
-#include <nx/vms/client/core/utils/qml_helpers.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
+#include "private/resource_browser_wrapper_p.h"
 
 namespace nx::vms::client::desktop {
 
@@ -50,7 +52,8 @@ QmlResourceBrowserWidget::QmlResourceBrowserWidget(QnWorkbenchContext* context, 
     setAttribute(Qt::WA_TranslucentBackground);
 
     rootContext()->setContextProperty(
-        QnWorkbenchContextAware::kQmlContextPropertyName, this->context());
+        QnWorkbenchContextAware::kQmlWorkbenchContextPropertyName, this->context());
+    ApplicationContext::instance()->currentSystemContext()->storeToQmlContext(rootContext());
 
     rootContext()->setContextProperty("maxTextureSize",
         QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE));

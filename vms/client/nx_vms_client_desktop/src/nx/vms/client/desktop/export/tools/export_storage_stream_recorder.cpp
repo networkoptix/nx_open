@@ -15,6 +15,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/common/system_context.h>
 #include <recording/helpers/recording_context_helpers.h>
 #include <transcoding/transcoding_utils.h>
 

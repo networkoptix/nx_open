@@ -17,9 +17,11 @@
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resources/search_helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/event/strings_helper.h>
@@ -40,7 +42,7 @@ namespace
 {
     QString firstResourceName(const QnAuditRecord *d1)
     {
-        auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+        auto resourcePool = qnClientCoreModule->resourcePool();
 
         if (d1->resources.empty())
             return QString();
@@ -52,7 +54,7 @@ namespace
 
     QString firstResourceIp(const QnAuditRecord *d1)
     {
-        auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+        auto resourcePool = qnClientCoreModule->resourcePool();
 
         if (d1->resources.empty())
             return QString();
@@ -266,7 +268,7 @@ void QnAuditLogModel::clear() {
 
 QString QnAuditLogModel::getResourceNameById(const QnUuid &id)
 {
-    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    auto resourcePool = qnClientCoreModule->resourcePool();
     return QnResourceDisplayInfo(resourcePool->getResourceById(id)).toString(
         qnSettings->resourceInfoLevel());
 }
@@ -276,7 +278,9 @@ QString QnAuditLogModel::formatDateTime(int timestampSecs, bool showDate, bool s
     if (timestampSecs == 0)
         return QString();
 
-    const auto timeWatcher = context()->instance<nx::vms::client::core::ServerTimeWatcher>();
+    // TODO: #sivanov Actualize used system context.
+    const auto timeWatcher = ApplicationContext::instance()->currentSystemContext()
+        ->serverTimeWatcher();
     QDateTime dateTime = timeWatcher->displayTime(timestampSecs * 1000ll);
     return formatDateTime(dateTime, showDate, showTime);
 }
@@ -310,7 +314,7 @@ QString QnAuditLogModel::formatDuration(int durationSecs)
 
 QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
 {
-    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    auto resourcePool = qnClientCoreModule->resourcePool();
     switch (eventType)
     {
         case Qn::AR_NotDefined:
@@ -388,7 +392,7 @@ QnVirtualCameraResourceList QnAuditLogModel::getCameras(const QnAuditRecord* rec
 
 QnVirtualCameraResourceList QnAuditLogModel::getCameras(const std::vector<QnUuid>& resources)
 {
-    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    auto resourcePool = qnClientCoreModule->resourcePool();
     QnVirtualCameraResourceList result;
     for (const auto& id : resources)
         if (QnVirtualCameraResourcePtr camera = resourcePool->getResourceById<QnVirtualCameraResource>(id))
@@ -823,7 +827,9 @@ bool QnAuditLogModel::skipDate(const QnAuditRecord *record, int row) const
     if (row < 1)
         return false;
 
-    const auto timeWatcher = context()->instance<nx::vms::client::core::ServerTimeWatcher>();
+    // TODO: #sivanov Actualize used system context.
+    const auto timeWatcher = ApplicationContext::instance()->currentSystemContext()
+        ->serverTimeWatcher();
     QDate d1 = timeWatcher->displayTime(record->createdTimeSec * 1000).date();
     QDate d2 = timeWatcher->displayTime(m_index->at(row - 1)->createdTimeSec * 1000).date();
     return d1 == d2;

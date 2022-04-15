@@ -33,7 +33,7 @@ protected:
 
     virtual AbstractResourceAccessProvider* createAccessProvider() const override
     {
-        return new SharedResourceAccessProvider(Mode::cached, commonModule());
+        return new SharedResourceAccessProvider(Mode::cached, systemContext());
     }
 };
 

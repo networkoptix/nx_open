@@ -49,8 +49,7 @@ ActionTypeDescriptorManager::ActionTypeDescriptorManager(QnCommonModule* commonM
 std::optional<ActionTypeDescriptor> ActionTypeDescriptorManager::descriptor(
     const ActionTypeId& actionTypeId) const
 {
-    const auto resourcePool = commonModule()->resourcePool();
-    const auto engines = resourcePool->getResources<nx::vms::common::AnalyticsEngineResource>();
+    const auto engines = resourcePool()->getResources<nx::vms::common::AnalyticsEngineResource>();
 
     for (const auto& engine: engines)
     {
@@ -73,11 +72,9 @@ ActionTypeDescriptorMap ActionTypeDescriptorManager::availableObjectActionTypeDe
     if (!deviceParentServer)
         return {};
 
-    const auto runtimeInfoManager = commonModule()->runtimeInfoManager();
-    const auto runtimeInfo = runtimeInfoManager->item(deviceParentServer->getId());
+    const auto runtimeInfo = runtimeInfoManager()->item(deviceParentServer->getId());
 
-    const auto resourcePool = commonModule()->resourcePool();
-    const auto engines = resourcePool->getResourcesByIds<nx::vms::common::AnalyticsEngineResource>(
+    const auto engines = resourcePool()->getResourcesByIds<nx::vms::common::AnalyticsEngineResource>(
         runtimeInfo.data.activeAnalyticsEngines);
 
     ActionTypeDescriptorMap result;

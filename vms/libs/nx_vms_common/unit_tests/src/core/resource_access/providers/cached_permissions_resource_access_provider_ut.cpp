@@ -39,7 +39,7 @@ protected:
     {
         return new PermissionsResourceAccessProvider(
             Mode::cached,
-            commonModule());
+            systemContext());
     }
 };
 

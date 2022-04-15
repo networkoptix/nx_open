@@ -2,98 +2,89 @@
 
 #include "application.h"
 
-#include <qglobal.h>
-
 #ifdef Q_OS_LINUX
-#   include <unistd.h>
+    #include <unistd.h>
 #endif
 
 #ifdef Q_WS_X11
-#include <X11/Xlib.h>
+    #include <X11/Xlib.h>
+#endif
+
+#if defined(Q_OS_MACOS)
+    #include <sys/sysctl.h>
 #endif
 
 #include <iostream>
 
-#include <QtCore/QString>
-#include <QtCore/QDir>
-#include <QtCore/QScopedPointer>
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonDocument>
-#include <QtCore/QSettings>
-#include <QtCore/QFile>
 #include <QtCore/QDateTime>
-
+#include <QtCore/QDir>
+#include <QtCore/QFile>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
+#include <QtCore/QScopedPointer>
+#include <QtCore/QSettings>
+#include <QtCore/QString>
 #include <QtGui/QDesktopServices>
-#include <QtGui/QWindow>
 #include <QtGui/QScreen>
-
+#include <QtGui/QWindow>
 #include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
-
+#include <QtNetwork/QNetworkRequest>
+#include <QtWebEngine/QtWebEngine>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QOpenGLWidget>
 
-#include <QtWebEngine/QtWebEngine>
+#if defined(Q_OS_WIN)
+    #include <QtPlatformHeaders/QWindowsWindowFunctions>
+#endif
 
-#include <nx/kit/output_redirector.h>
-
-#include <client/client_settings.h>
-#include <client/client_runtime_settings.h>
 #include <client/client_module.h>
+#include <client/client_runtime_settings.h>
+#include <client/client_settings.h>
 #include <client/client_startup_parameters.h>
 #include <client/self_updater.h>
-
 #include <client_core/client_core_module.h>
-
+#include <common/common_module.h>
+#include <nx/audio/audiodevice.h>
+#include <nx/branding.h>
+#include <nx/build_info.h>
+#include <nx/kit/output_redirector.h>
 #include <nx/media/decoder_registrar.h>
 #include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
-#include <nx/utils/log/log.h>
-#include <nx/utils/timer_manager.h>
-#include <nx/utils/rlimit.h>
-
-#include <nx/audio/audiodevice.h>
+#include <nx/speech_synthesizer/text_to_wave_server.h>
 #include <nx/utils/crash_dump/systemexcept.h>
-
-#include <common/common_module.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/rlimit.h>
+#include <nx/utils/timer_manager.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/director/director.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/joystick/joystick_settings_action_handler.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/state/window_controller.h>
 #include <nx/vms/client/desktop/state/window_geometry_manager.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/dialogs/eula_dialog.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <statistics/statistics_manager.h>
 #include <ui/graphics/instruments/gl_checker_instrument.h>
 #include <ui/help/help_handler.h>
 #include <ui/statistics/modules/session_restore_statistics_module.h>
 #include <ui/widgets/main_window.h>
+#include <ui/workaround/combobox_wheel_filter.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
-
-#if defined(Q_OS_MACOS)
-    #include <sys/sysctl.h>
-    #include <ui/workaround/mac_utils.h>
-#endif
-
-#include <ui/workaround/combobox_wheel_filter.h>
-
-#include <nx/speech_synthesizer/text_to_wave_server.h>
-
 #include <utils/common/command_line_parser.h>
 #include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
 
-#include <nx/vms/client/desktop/ini.h>
-#if defined(Q_OS_WIN)
-    #include <QtPlatformHeaders/QWindowsWindowFunctions>
+#if defined(Q_OS_MACOS)
+    #include <ui/workaround/mac_utils.h>
 #endif
-
-#include <nx/branding.h>
-#include <nx/build_info.h>
 
 namespace {
 
@@ -184,6 +175,9 @@ namespace nx::vms::client::desktop {
 
 int runApplicationInternal(QApplication* application, const QnStartupParameters& startupParams)
 {
+    auto applicationContext = std::make_unique<ApplicationContext>();
+
+    // TODO: #sivanov Move QnClientModule contents to Application Context.
     QnClientModule client(startupParams);
 
     NX_INFO(NX_SCOPE_TAG, "IniConfig iniFilesDir: %1",  nx::kit::IniConfig::iniFilesDir());
@@ -217,9 +211,12 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
     qApp->installEventFilter(&wheelFilter);
 
     /* Create workbench context. */
-    QScopedPointer<QnWorkbenchAccessController> accessController(
-        new QnWorkbenchAccessController(client.clientCoreModule()->commonModule()));
-    QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(accessController.data()));
+    auto workbenchContext = std::make_unique<QnWorkbenchContext>(
+        client.systemContext()->accessController());
+
+    // TODO: #sivanov Invert dependency. Workbench context should depend on Window context.
+    auto windowContext = std::make_unique<WindowContext>(workbenchContext.get());
+    applicationContext->addWindowContext(windowContext.get());
 
     #if defined(Q_OS_LINUX)
         qputenv("RESOURCE_NAME", nx::branding::brand().toUtf8());
@@ -232,7 +229,10 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
         int current = nx::branding::eulaVersion();
         const bool showEula = accepted < current && qgetenv("VMS_ACCEPT_EULA") != "YES";
         if (showEula
-            && !EulaDialog::acceptEulaFromFile(":/license.html", current, context->mainWindow()))
+            && !EulaDialog::acceptEulaFromFile(
+                ":/license.html",
+                current,
+                workbenchContext->mainWindow()))
         {
             // We should exit completely.
             return 0;
@@ -242,13 +242,12 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
     /* Create main window. */
 
     QScopedPointer<MainWindow> mainWindow(
-        new MainWindow(context.data(), nullptr, calculateWindowFlags()));
-    context->setMainWindow(mainWindow.data());
+        new MainWindow(workbenchContext.get(), /*parent*/ nullptr, calculateWindowFlags()));
+    workbenchContext->setMainWindow(mainWindow.data());
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
 
-    std::unique_ptr<nx::vms::client::desktop::joystick::JoystickSettingsActionHandler>
-        hidJoystickManager(
-            new nx::vms::client::desktop::joystick::JoystickSettingsActionHandler(context.get()));
+    auto hidJoystickManager = std::make_unique<joystick::JoystickSettingsActionHandler>(
+        workbenchContext.get());
 
     #if defined(Q_OS_LINUX)
         qunsetenv("RESOURCE_NAME");
@@ -266,8 +265,8 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
         std::make_unique<WindowController>(mainWindow.get()));
     client.clientStateHandler()->registerDelegate(kWindowGeometryData, std::move(geometryManager));
     client.clientStateHandler()->setStatisticsModules(
-        context->commonModule()->instance<QnStatisticsManager>(),
-        context->instance<QnSessionRestoreStatisticsModule>());
+        workbenchContext->commonModule()->instance<QnStatisticsManager>(),
+        workbenchContext->instance<QnSessionRestoreStatisticsModule>());
 
     // We must handle all 'WindowScreenChange' events _before_ we move window.
     qApp->processEvents();
@@ -315,7 +314,7 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
     {
         // We must handle 'move' event _before_ we activate fullscreen.
         qApp->processEvents();
-        context->menu()->trigger(ui::action::EffectiveMaximizeAction);
+        workbenchContext->menu()->trigger(ui::action::EffectiveMaximizeAction);
     }
     else
     {
@@ -325,7 +324,7 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
     client.initDesktopCamera(qobject_cast<QOpenGLWidget*>(mainWindow->viewport()));
     client.startLocalSearchers();
 
-    context->handleStartupParameters(startupParams);
+    workbenchContext->handleStartupParameters(startupParams);
 
     int result = application->exec();
 

@@ -4,10 +4,9 @@
 
 #include <QtCore/QObject>
 
-#include <core/resource/resource_fwd.h>
-
 #include <client/client_globals.h>
 #include <client/client_model_types.h>
+#include <core/resource/resource_fwd.h>
 
 #include "workbench_context_aware.h"
 
@@ -15,6 +14,8 @@ class QnWorkbenchLayout;
 class QnWorkbenchGridMapper;
 class QnWorkbenchItem;
 class QQuickItem;
+
+namespace nx::vms::client::desktop { class WindowContext; }
 
 /**
  * Workbench ties layout, items and current UI-related "state" together.
@@ -63,6 +64,13 @@ public:
      * number, the better.
      */
     static constexpr qreal kUnitSize = 10000.0;
+
+    /**
+     * Window context of the workbench.
+     * TODO: #sivanov Currently always returns application main window context. Dependencies should
+     * be inverted.
+     */
+    nx::vms::client::desktop::WindowContext* windowContext() const;
 
     /**
      * Clears this workbench by setting all of its properties to their initial

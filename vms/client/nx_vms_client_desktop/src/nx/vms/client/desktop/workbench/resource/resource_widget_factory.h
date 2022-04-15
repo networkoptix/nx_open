@@ -3,17 +3,17 @@
 #pragma once
 
 class QnResourceWidget;
-class QnWorkbenchContext;
 class QnWorkbenchItem;
 
 namespace nx::vms::client::desktop {
+
 namespace ui {
 namespace workbench {
 
 class ResourceWidgetFactory
 {
 public:
-    static QnResourceWidget* createWidget(QnWorkbenchContext* context, QnWorkbenchItem* item);
+    static QnResourceWidget* createWidget(QnWorkbenchItem* item);
 };
 
 } // namespace workbench

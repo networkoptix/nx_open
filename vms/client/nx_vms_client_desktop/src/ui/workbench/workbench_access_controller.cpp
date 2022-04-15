@@ -6,7 +6,6 @@
 
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
-#include <common/common_module.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/file_layout_resource.h>
@@ -19,6 +18,7 @@
 #include <core/resource_management/resource_runtime_data.h>
 #include <nx/streaming/abstract_archive_resource.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
+#include <nx/vms/common/system_context.h>
 #include <utils/common/checked_cast.h>
 
 QnWorkbenchPermissionsNotifier::QnWorkbenchPermissionsNotifier(QObject* parent) :
@@ -27,11 +27,11 @@ QnWorkbenchPermissionsNotifier::QnWorkbenchPermissionsNotifier(QObject* parent) 
 }
 
 QnWorkbenchAccessController::QnWorkbenchAccessController(
-    QnCommonModule* commonModule,
+    nx::vms::common::SystemContext* systemContext,
     QObject* parent)
     :
     base_type(parent),
-    QnCommonModuleAware(commonModule),
+    nx::vms::common::SystemContextAware(systemContext),
     m_user()
 {
     connect(resourcePool(), &QnResourcePool::resourceAdded, this,
@@ -51,7 +51,8 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(
     connect(resourceAccessManager(), &QnResourceAccessManager::allPermissionsRecalculated,
         this, &QnWorkbenchAccessController::recalculateAllPermissions);
 
-    connect(globalPermissionsManager(), &QnGlobalPermissionsManager::globalPermissionsChanged,
+    connect(systemContext->globalPermissionsManager(),
+        &QnGlobalPermissionsManager::globalPermissionsChanged,
         this,
         [this](const QnResourceAccessSubject& subject, GlobalPermissions /*value*/)
         {

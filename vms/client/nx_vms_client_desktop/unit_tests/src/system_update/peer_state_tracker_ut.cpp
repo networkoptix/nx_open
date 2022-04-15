@@ -8,7 +8,7 @@ namespace {
     auto kDefaultServerVersion = nx::utils::SoftwareVersion("4.0.0.29067");
 }
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::desktop::test {
 
 using Status = nx::vms::common::update::Status::Code;
 using Error = nx::vms::common::update::Status::ErrorCode;
@@ -71,4 +71,4 @@ TEST_F(UpdatePeerStateTrackerTest, testReadyInstallTracking)
     EXPECT_EQ(m_stateTracker->peersActive().size(), 1);
 }
 
-}
+} // namespace nx::vms::client::desktop::test

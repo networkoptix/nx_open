@@ -5,14 +5,14 @@
 #include <cassert>
 #include <cmath> //< For std::fmod.
 
-#include <QtCore/QtAlgorithms>
 #include <QtCore/QScopedValueRollback>
+#include <QtCore/QtAlgorithms>
 #include <QtGui/QScreen>
 #include <QtGui/QWindow>
+#include <QtGui/private/qopengltexturecache_p.h>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QGraphicsProxyWidget>
 #include <QtWidgets/QOpenGLWidget>
-#include <QtGui/private/qopengltexturecache_p.h>
 
 #include <camera/client_video_camera.h>
 #include <camera/resource_display.h>
@@ -31,6 +31,7 @@
 #include <nx/utils/log/log_main.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/camera/storage_location_camera_controller.h>
 #include <nx/vms/client/desktop/common/utils/audio_dispatcher.h>
 #include <nx/vms/client/desktop/common/widgets/webview_controller.h>
@@ -39,8 +40,10 @@
 #include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/resource/resource_widget_factory.h>
 #include <nx/vms/client/desktop/workbench/workbench_animations.h>
 #include <nx/vms/time/formatter.h>
@@ -762,7 +765,7 @@ void QnWorkbenchDisplay::setLayer(QGraphicsItem *item, QnWorkbenchDisplay::ItemL
     /* Moving items back and forth between layers should preserve their relative
      * z order. Hence the fmod. */
     item->setData(ITEM_LAYER_KEY, static_cast<int>(layer));
-    item->setZValue(layer * layerZSize + std::fmod(item->zValue(), layerZSize));
+    item->setZValue((int)layer * layerZSize + std::fmod(item->zValue(), layerZSize));
 }
 
 void QnWorkbenchDisplay::setLayer(const QList<QGraphicsItem *> &items, QnWorkbenchDisplay::ItemLayer layer)
@@ -1184,7 +1187,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         return false;
     }
 
-    auto widget = ResourceWidgetFactory::createWidget(context(), item);
+    auto widget = ResourceWidgetFactory::createWidget(item);
     if (!widget)
     {
         qnDeleteLater(item);
@@ -1526,7 +1529,7 @@ qreal QnWorkbenchDisplay::layerFrontZValue(ItemLayer layer) const
 
 qreal QnWorkbenchDisplay::layerZValue(ItemLayer layer) const
 {
-    return layer * layerZSize;
+    return (int)layer * layerZSize;
 }
 
 QnWorkbenchDisplay::ItemLayer QnWorkbenchDisplay::shadowLayer(ItemLayer itemLayer) const
@@ -2076,7 +2079,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged()
     if (layout->resource())
         layout->resource()->disconnect(this);
 
-    QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+    auto streamSynchronizer = workbench()->windowContext()->streamSynchronizer();
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(streamSynchronizer->state()));
 
     QVector<QnUuid> selectedUuids;
@@ -2131,7 +2134,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
         && layoutSearchStateData.value<QnThumbnailsSearchState>().step > 0
         && !workbenchLayout->items().empty();
 
-    const auto streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+    const auto streamSynchronizer = workbench()->windowContext()->streamSynchronizer();
     streamSynchronizer->setState(
         workbenchLayout->data(Qn::LayoutSyncStateRole).value<QnStreamSynchronizationState>());
 
@@ -2249,7 +2252,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
             mediaResourceWidget->setOverlayVisible(/*visible*/ true, /*animate*/ false);
             mediaResourceWidget->setInfoVisible(/*visible*/ true, /*animate*/ false);
 
-            const auto timeWatcher = context()->instance<nx::vms::client::core::ServerTimeWatcher>();
+            const auto timeWatcher = mediaResourceWidget->systemContext()->serverTimeWatcher();
             const qint64 displayTimeMs =
                 timeMs.value() + timeWatcher->displayOffset(mediaResourceWidget->resource());
 

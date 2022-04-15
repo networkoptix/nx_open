@@ -10,6 +10,7 @@
 #include <nx/branding.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/system_context.h>
 #include <utils/email/email.h>
 
 namespace nx::vms::client::desktop {
@@ -97,8 +98,8 @@ ContactAddress::ContactAddress(const QString& address):
 
 CustomerSupport::CustomerSupport(QnCommonModule* commonModule):
     CustomerSupport(
-        commonModule->globalSettings()->emailSettings().supportEmail,
-        commonModule->licensePool()->getLicenses())
+        commonModule->systemContext()->globalSettings()->emailSettings().supportEmail,
+        commonModule->systemContext()->licensePool()->getLicenses())
 {
 }
 

@@ -15,14 +15,15 @@
 
 class QQmlEngine;
 
-class QnCommonModule;
-class QnPtzControllerPool;
-class QnLayoutTourStateManager;
-class QnDataProviderFactory;
 class QnCloudStatusWatcher;
+class QnCommonModule;
+class QnDataProviderFactory;
+class QnLayoutTourStateManager;
+class QnPtzControllerPool;
+class QnResourcePool;
 
 namespace nx::vms::api { enum class PeerType; }
-
+namespace nx::vms::common { class SystemContext; }
 namespace nx::vms::client::core { class NetworkModule; }
 
 namespace nx::vms::rules { class Engine; }
@@ -42,8 +43,7 @@ public:
 
     QnClientCoreModule(
         Mode mode,
-        QnUuid peerId = QnUuid(),
-        nx::core::access::Mode resourceAccessMode = nx::core::access::Mode::cached);
+        nx::vms::common::SystemContext* systemContext);
     virtual ~QnClientCoreModule() override;
 
     using CertificateValidationLevel =
@@ -55,6 +55,10 @@ public:
 
     nx::vms::client::core::NetworkModule* networkModule() const;
 
+    /**
+     * Main Resource Pool of the client.
+     */
+    QnResourcePool* resourcePool() const;
     QnCommonModule* commonModule() const;
     QnPtzControllerPool* ptzControllerPool() const;
     QnLayoutTourStateManager* layoutTourStateManager() const;

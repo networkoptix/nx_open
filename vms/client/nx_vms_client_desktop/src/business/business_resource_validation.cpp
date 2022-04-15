@@ -2,10 +2,10 @@
 
 #include "business_resource_validation.h"
 
-#include <boost/algorithm/cxx11/all_of.hpp>
-
 #include <QtCore/QCryptographicHash>
 #include <QtWidgets/QLayout>
+
+#include <boost/algorithm/cxx11/all_of.hpp>
 
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
@@ -25,6 +25,7 @@
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
@@ -59,7 +60,7 @@ public:
     {
         const auto totalCount = total.size();
         return QnDeviceDependentStrings::getNameFromSet(
-            qnClientCoreModule->commonModule()->resourcePool(),
+            qnClientCoreModule->resourcePool(),
             QnCameraDeviceStringSet(
                 tr("%1 of %n devices", "", totalCount),
                 tr("%1 of %n cameras", "", totalCount),
@@ -71,7 +72,7 @@ public:
     static QString anyCamera()
     {
         return braced(QnDeviceDependentStrings::getDefaultNameFromSet(
-            qnClientCoreModule->commonModule()->resourcePool(),
+            qnClientCoreModule->resourcePool(),
             tr("Any Device"),
             tr("Any Camera")
         ));
@@ -80,7 +81,7 @@ public:
     static QString selectCamera()
     {
         return QnDeviceDependentStrings::getDefaultNameFromSet(
-            qnClientCoreModule->commonModule()->resourcePool(),
+            qnClientCoreModule->resourcePool(),
             tr("Select at least one device"),
             tr("Select at least one camera")
         );
@@ -117,7 +118,7 @@ QString genericCameraText(const QnVirtualCameraResourceList &cameras, const bool
     if (cameras.size() == 1)
         return getShortResourceName(cameras.first());
     return QnDeviceDependentStrings::getNumericName(
-        qnClientCoreModule->commonModule()->resourcePool(),
+        qnClientCoreModule->resourcePool(),
         cameras);
 }
 
@@ -211,7 +212,7 @@ QString QnCameraAudioTransmitPolicy::getText(const QnResourceList &resources, co
     int invalid = invalidResourcesCount<QnCameraAudioTransmitPolicy>(cameras);
     if (cameras.isEmpty())
         return QnDeviceDependentStrings::getDefaultNameFromSet(
-            qnClientCoreModule->commonModule()->resourcePool(),
+            qnClientCoreModule->resourcePool(),
             tr("Select device"),
             tr("Select camera"));
     else
@@ -312,7 +313,7 @@ bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QStri
 {
     using boost::algorithm::all_of;
 
-    auto module = qnClientCoreModule->commonModule();
+    auto module = qnClientCoreModule->commonModule()->systemContext();
 
     QnUserResourceList users;
     QList<QnUuid> roles;
@@ -343,7 +344,7 @@ bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QStri
 QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool detailed,
     const QString& additionalList)
 {
-    auto module = qnClientCoreModule->commonModule();
+    auto module = qnClientCoreModule->commonModule()->systemContext();
 
     QnUserResourceList users;
     QList<QnUuid> roles;
@@ -360,7 +361,7 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
         QStringList recipients;
         if (!users.empty() || !roles.empty())
         {
-            recipients << nx::vms::event::StringsHelper(qnClientCoreModule->commonModule())
+            recipients << nx::vms::event::StringsHelper(module)
                 .actionSubjects(users, roles, true);
         }
 
@@ -762,8 +763,8 @@ QString QnRequiredPermissionSubjectPolicy::calculateAlert(bool allUsers,
 // QnLayoutAccessValidationPolicy
 
 QnLayoutAccessValidationPolicy::QnLayoutAccessValidationPolicy(QnCommonModule* common):
-    m_accessManager(common->resourceAccessManager()),
-    m_rolesManager(common->userRolesManager())
+    m_accessManager(common->systemContext()->resourceAccessManager()),
+    m_rolesManager(common->systemContext()->userRolesManager())
 {
 }
 
@@ -785,7 +786,7 @@ QValidator::State QnLayoutAccessValidationPolicy::roleValidity(const QnUuid& rol
                 return QValidator::Acceptable;
             }
 
-            auto usersInRole = commonModule()->resourceAccessSubjectsCache()->allUsersInRole(roleId);
+            auto usersInRole = resourceAccessSubjectsCache()->allUsersInRole(roleId);
             if (std::any_of(usersInRole.begin(), usersInRole.end(),
                 [this](const auto& subject)
                 {
@@ -826,7 +827,7 @@ void QnLayoutAccessValidationPolicy::setLayout(const QnLayoutResourcePtr& layout
 
 QValidator::State QnCloudUsersValidationPolicy::roleValidity(const QnUuid& roleId) const
 {
-    const auto& users = commonModule()->resourceAccessSubjectsCache()->allUsersInRole(roleId);
+    const auto& users = resourceAccessSubjectsCache()->allUsersInRole(roleId);
     bool hasCloud = false;
     bool hasNonCloud = false;
 
@@ -860,11 +861,11 @@ QString QnCloudUsersValidationPolicy::calculateAlert(
         {
             QnUserResourceList users;
             QnUuidList roles;
-            commonModule()->userRolesManager()->usersAndRoles(subjects, users, roles);
+            userRolesManager()->usersAndRoles(subjects, users, roles);
 
             for (const auto& roleId: roles)
             {
-                const auto& inRole = commonModule()->resourceAccessSubjectsCache()->allUsersInRole(roleId);
+                const auto& inRole = resourceAccessSubjectsCache()->allUsersInRole(roleId);
                 for (const auto& subject: inRole)
                 {
                     if (!subject.isUser())

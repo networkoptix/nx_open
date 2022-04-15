@@ -6,7 +6,7 @@
 #include <nx/utils/singleton.h>
 #include <core/resource/resource_factory.h>
 
-namespace nx::vms::common::test_support {
+namespace nx::vms::common::test {
 
 class NX_VMS_COMMON_TEST_SUPPORT_API TestResourceFactory:
     public QObject,
@@ -20,4 +20,4 @@ public:
         const QnResourceParams& params) override;
 };
 
-} // namespace nx::vms::common::test_support
+} // namespace nx::vms::common::test

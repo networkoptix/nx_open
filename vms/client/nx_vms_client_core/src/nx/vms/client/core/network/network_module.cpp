@@ -9,6 +9,7 @@
 #include <common/common_module.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/vms/common/system_context.h>
 
 #include "certificate_storage.h"
 #include "certificate_verifier.h"
@@ -72,7 +73,7 @@ NetworkModule::NetworkModule(
         d->certificateVerifier.get());
 
     d->sessionTimeoutWatcher = std::make_unique<RemoteSessionTimeoutWatcher>(
-        commonModule->globalSettings());
+        commonModule->systemContext()->globalSettings());
 }
 
 NetworkModule::~NetworkModule()

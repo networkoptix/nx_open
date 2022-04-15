@@ -84,7 +84,7 @@ CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
             if (lastRequestUrl.host() != url.host())
                 return std::nullopt;
 
-            const auto camera = qnClientCoreModule->commonModule()->resourcePool()
+            const auto camera = qnClientCoreModule->resourcePool()
                 ->getResourceById<QnVirtualCameraResource>(lastCamera.id);
             if (!camera || camera->getStatus() == nx::vms::api::ResourceStatus::unauthorized)
                 return std::nullopt;
@@ -170,12 +170,12 @@ void CameraWebPageWidget::Private::resetPage()
 
 void CameraWebPageWidget::Private::loadPage()
 {
-    const auto commonModule = qnClientCoreModule->commonModule();
+    const auto resourcePool = qnClientCoreModule->resourcePool();
 
     // Cannot load resource url directly because camera settings url can contain a path from
     // resource_data.json and it is resolved in loadState().
     webWidget->controller()->load(
-        commonModule->resourcePool()->getResourceById<QnVirtualCameraResource>(lastCamera.id),
+        resourcePool->getResourceById<QnVirtualCameraResource>(lastCamera.id),
         lastRequestUrl);
 
     pendingLoadPage = false;
@@ -197,7 +197,7 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
 
     const auto cameraId = state.singleCameraProperties.id;
     const auto camera =
-        commonModule()->resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId);
+        resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId);
 
     if (!camera) //< Camera was just deleted.
     {

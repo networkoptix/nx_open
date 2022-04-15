@@ -24,6 +24,7 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/delayed.h>
+#include <nx/vms/client/desktop/window_context.h>
 
 #include "resources_structures.h"
 
@@ -507,9 +508,11 @@ bool TabApiBackend::Private::isFocusedWidget(const QnResourceWidget* widget) con
 
 bool TabApiBackend::Private::isSyncedLayout() const
 {
+    auto streamSynchronizer = context->workbench()->windowContext()->streamSynchronizer();
+
     const auto currentLayout = context->workbench()->currentLayout();
     const auto state = currentLayout == layout
-        ? context->instance<QnWorkbenchStreamSynchronizer>()->state()
+        ? streamSynchronizer->state()
         : layout->data(Qn::LayoutSyncStateRole).value<QnStreamSynchronizationState>();
     return state.isSyncOn;
 }
@@ -741,7 +744,7 @@ Error TabApiBackend::syncWith(const QUuid& itemId)
     if (!widget)
         return Error::failed(tr("Cannot find a widget corresponding to the specified item."));
 
-    const auto streamSynchronizer = d->context->instance<QnWorkbenchStreamSynchronizer>();
+    auto streamSynchronizer = d->context->workbench()->windowContext()->streamSynchronizer();
     streamSynchronizer->setState(widget, /*useWidgetPausedState*/true);
     return Error::success();
 }
@@ -753,7 +756,7 @@ Error TabApiBackend::stopSyncPlay()
 
     if (d->context->workbench()->currentLayout() == d->layout)
     {
-        const auto streamSynchronizer = d->context->instance<QnWorkbenchStreamSynchronizer>();
+        auto streamSynchronizer = d->context->workbench()->windowContext()->streamSynchronizer();
         streamSynchronizer->setState(kSyncDisabledState);
     }
 

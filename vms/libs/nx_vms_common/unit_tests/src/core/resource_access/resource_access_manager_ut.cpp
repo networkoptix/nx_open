@@ -2,8 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include <common/common_module.h>
-#include <common/static_common_module.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>
@@ -17,32 +15,25 @@
 #include <nx/core/access/access_types.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
-#include <nx/vms/common/test_support/resource/resource_pool_test_helper.h>
+#include <nx/vms/common/test_support/test_context.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
+namespace nx::vms::common::test {
+
 class ResourceAccessManagerTest:
-    protected QnResourcePoolTestHelper,
-    public ::testing::Test,
+    public ContextBasedTest,
     public ::testing::WithParamInterface<nx::core::access::Mode>
 {
-protected:
-
-    // virtual void SetUp() will be called before each test is run.
-    virtual void SetUp() override
+public:
+    ResourceAccessManagerTest():
+        ContextBasedTest(/*clientMode*/ false, GetParam())
     {
-        m_staticCommon = std::make_unique<QnStaticCommonModule>();
-        m_module = std::make_unique<QnCommonModule>(
-            /*clientMode*/ false, GetParam());
-        initializeContext(m_module.get());
     }
 
-    // virtual void TearDown() will be called after each test is run.
+protected:
     virtual void TearDown() override
     {
-        deinitializeContext();
         m_currentUser.clear();
-        m_module.reset();
-        m_staticCommon.reset();
     }
 
     QnLayoutResourcePtr createLayout(Qn::ResourceFlags flags, bool locked = false, const QnUuid &parentId = QnUuid())
@@ -158,9 +149,6 @@ protected:
             ASSERT_FALSE(resourceAccessManager()->canModifyUser(source, target, data)) << info;
     }
 
-    // Declares the variables your tests want to use.
-    std::unique_ptr<QnStaticCommonModule> m_staticCommon;
-    std::unique_ptr<QnCommonModule> m_module;
     QnUserResourcePtr m_currentUser;
 };
 
@@ -1463,3 +1451,5 @@ INSTANTIATE_TEST_SUITE_P(
     ResourceAccessManagerTests,
     ResourceAccessManagerTest,
     ::testing::Values(nx::core::access::Mode::direct, nx::core::access::Mode::cached));
+
+} // namespace nx::vms::common::test

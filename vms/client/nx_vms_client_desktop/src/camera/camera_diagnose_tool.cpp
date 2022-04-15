@@ -82,7 +82,7 @@ QString DiagnoseTool::errorMessage() const
 
 void DiagnoseTool::onGetServerSystemIdResponse(bool success, int /*handle*/, QString serverSystemId)
 {
-    const auto currentSystemId = commonModule()->globalSettings()->localSystemId();
+    const auto currentSystemId = globalSettings()->localSystemId();
     const bool isConnected = !currentSystemId.isNull();
 
     if (!success

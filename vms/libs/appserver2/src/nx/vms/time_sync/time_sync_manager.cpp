@@ -44,14 +44,14 @@ TimeSyncManager::TimeSyncManager(
                 connect(m_timer.get(), &QTimer::timeout, this, &TimeSyncManager::doPeriodicTasks);
             }
             updateTime();
-            auto globalSettings = this->commonModule()->globalSettings();
+            auto globalSettings = this->globalSettings();
             m_timer->start(
                 std::chrono::milliseconds(globalSettings->osTimeChangeCheckPeriod()).count());
         });
     connect(m_thread.get(), &QThread::finished, [this]() { m_timer->stop(); });
 
     connect(
-        commonModule->globalSettings(), &QnGlobalSettings::timeSynchronizationSettingsChanged,
+        globalSettings(), &QnGlobalSettings::timeSynchronizationSettingsChanged,
         this, [this]()
         {
             updateTime();
@@ -109,7 +109,7 @@ void TimeSyncManager::loadTimeFromLocalClock()
 
 TimeSyncManager::Result TimeSyncManager::loadTimeFromServer(const QnRoute& route)
 {
-    auto server = commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(route.id);
+    auto server = resourcePool()->getResourceById<QnMediaServerResource>(route.id);
     if (!server)
     {
         NX_DEBUG(this,
@@ -132,7 +132,7 @@ TimeSyncManager::Result TimeSyncManager::loadTimeFromServer(const QnRoute& route
             .arg(qnStaticCommon->moduleDisplayName(route.id)));
         return Result::error;
     }
-    auto maxRtt = commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndLocalTime();
+    auto maxRtt = globalSettings()->maxDifferenceBetweenSynchronizedAndLocalTime();
 
     auto httpClient = std::make_unique<nx::network::http::HttpClient>(
         std::move(socket),
@@ -179,13 +179,13 @@ TimeSyncManager::Result TimeSyncManager::loadTimeFromServer(const QnRoute& route
 
     const std::chrono::milliseconds rtt = rttTimer.elapsed();
     auto newTime = std::chrono::milliseconds(timeData.utcTimeMs - rtt.count() / 2);
-    bool syncWithInternel = commonModule()->globalSettings()->primaryTimeServer().isNull();
+    bool syncWithInternel = globalSettings()->primaryTimeServer().isNull();
     if (syncWithInternel && !timeData.isTakenFromInternet)
         return Result::error; //< Target server is not ready yet. Time is not taken from internet yet. Repeat later.
     m_isTimeTakenFromInternet = timeData.isTakenFromInternet;
     if (rtt > maxRtt)
         return Result::error; //< Too big rtt. Try again.
-    const auto ownGuid = commonModule()->peerId();
+    const auto ownGuid = peerId();
     NX_DEBUG(this, nx::format("Got time %1 (%2 <-- %3), rtt=%4")
         .args(
             QDateTime::fromMSecsSinceEpoch(newTime.count()).toString(Qt::ISODate),
@@ -195,7 +195,7 @@ TimeSyncManager::Result TimeSyncManager::loadTimeFromServer(const QnRoute& route
     if (!setSyncTime(newTime, rtt))
     {
         NX_DEBUG(this, nx::format("Server %1 ignore new time %2 because of small delta.")
-            .arg(qnStaticCommon->moduleDisplayName(commonModule()->peerId()))
+            .arg(qnStaticCommon->moduleDisplayName(peerId()))
             .arg(QDateTime::fromMSecsSinceEpoch(newTime.count()).toString(Qt::ISODate)));
     }
     return Result::ok;
@@ -242,7 +242,7 @@ void TimeSyncManager::doPeriodicTasks()
 
 QString TimeSyncManager::idForToStringFromPtr() const
 {
-    return qnStaticCommon->moduleDisplayName(this->commonModule()->peerId());
+    return qnStaticCommon->moduleDisplayName(peerId());
 }
 
 } // namespace nx::vms::time

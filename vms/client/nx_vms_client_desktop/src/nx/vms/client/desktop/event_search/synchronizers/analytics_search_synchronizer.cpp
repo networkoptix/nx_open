@@ -13,7 +13,14 @@
 #include <client/client_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_item_index.h>
-
+#include <nx/utils/log/log.h>
+#include <nx/vms/client/desktop/event_search/utils/analytics_search_setup.h>
+#include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
+#include <nx/vms/client/desktop/event_search/utils/text_filter_setup.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/utils/video_cache.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/rubber_band_instrument.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -24,14 +31,6 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
-
-#include <nx/utils/log/log.h>
-#include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/event_search/utils/analytics_search_setup.h>
-#include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
-#include <nx/vms/client/desktop/event_search/utils/text_filter_setup.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <nx/vms/client/desktop/utils/video_cache.h>
 
 namespace nx::vms::client::desktop {
 
@@ -79,7 +78,7 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
         });
 
     m_analyticsSetup->setLiveTimestampGetter(
-        [this](const QnVirtualCameraResourcePtr& camera) -> milliseconds
+        [this, context](const QnVirtualCameraResourcePtr& camera) -> milliseconds
         {
             static constexpr auto kMaxTimestamp = std::numeric_limits<milliseconds>::max();
 
@@ -87,8 +86,9 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
             if (widgets.empty())
                 return kMaxTimestamp;
 
+            auto streamSynchronizer = context->workbench()->windowContext()->streamSynchronizer();
             // In sync mode analyze only the first widget.
-            if (this->context()->instance<QnWorkbenchStreamSynchronizer>()->isRunning())
+            if (streamSynchronizer->isRunning())
                 widgets = decltype(widgets)({*widgets.cbegin()});
 
             for (const auto widget: widgets)

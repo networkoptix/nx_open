@@ -4,12 +4,14 @@
 
 #include "button_controller.h"
 
+#include <nx/vms/client/desktop/window_context_aware.h>
+
 class QnTwoWayAudioWidget;
 class QnMediaResourceWidget;
 
 namespace nx::vms::client::desktop {
 
-class CameraButtonController: public ButtonController
+class CameraButtonController: public ButtonController, public WindowContextAware
 {
     Q_OBJECT
     using base_type = ButtonController;

@@ -103,7 +103,7 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
         this,
         &QnCloudManagementWidget::connectToCloud);
 
-    connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,
+    connect(globalSettings(), &QnGlobalSettings::cloudSettingsChanged,
         this, &QnCloudManagementWidget::loadDataToUi);
 }
 
@@ -113,11 +113,11 @@ QnCloudManagementWidget::~QnCloudManagementWidget()
 
 void QnCloudManagementWidget::loadDataToUi()
 {
-    const bool linked = !qnGlobalSettings->cloudSystemId().isEmpty();
+    const bool linked = !globalSettings()->cloudSystemId().isEmpty();
 
     if (linked)
     {
-        ui->accountLabel->setText(qnGlobalSettings->cloudAccountName());
+        ui->accountLabel->setText(globalSettings()->cloudAccountName());
         ui->stackedWidget->setCurrentWidget(ui->linkedPage);
     }
     else

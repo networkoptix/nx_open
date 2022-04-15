@@ -171,7 +171,7 @@ struct LayoutSettingsDialogState: AbstractFluxState
 
     Background background;
 
-    bool operator==(const LayoutSettingsDialogState& other) const = default;
+//    bool operator==(const LayoutSettingsDialogState& other) const = default;
 
     bool isDuplicateLogicalId() const
     {

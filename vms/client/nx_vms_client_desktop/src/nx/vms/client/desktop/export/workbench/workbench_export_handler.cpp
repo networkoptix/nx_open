@@ -427,7 +427,7 @@ void WorkbenchExportHandler::handleExportVideoAction(const ui::action::Parameter
     {
         const QnLayoutItemData itemData = widget->item()->data();
         // Exporting from the scene and timeline
-        dialog.setMediaParams(centralResource, itemData, widget->context());
+        dialog.setMediaParams(centralResource, itemData, context());
 
         // Why symmetry with the next block is broken?
         const auto periods = parameters.argument<QnTimePeriodList>(Qn::MergedTimePeriodsRole);

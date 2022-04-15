@@ -6,26 +6,26 @@
 #include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QGraphicsSceneWheelEvent>
 
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
-#include <nx/vms/client/desktop/workbench/timeline/thumbnail_panel.h>
-
-#include <ui/common/palette.h>
-#include <ui/graphics/items/generic/image_button_widget.h>
-#include <ui/graphics/items/generic/framed_widget.h>
-#include <ui/graphics/items/generic/separator.h>
 #include <qt_graphics_items/graphics_widget.h>
-#include <ui/statistics/modules/controls_statistics_module.h>
+
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/style/icon.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/svg_icon_colorer.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/desktop/workbench/timeline/thumbnail_panel.h>
+#include <ui/common/palette.h>
+#include <ui/graphics/items/generic/framed_widget.h>
+#include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/generic/separator.h>
+#include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_display.h>
-
+#include <ui/workbench/workbench_navigator.h>
 #include <utils/common/scoped_painter_rollback.h>
 
-#include "time_slider.h"
 #include "time_scroll_bar.h"
+#include "time_slider.h"
 #include "timeline_placeholder.h"
 
 using namespace nx::vms::client::desktop;
@@ -237,7 +237,9 @@ void QnNavigationItem::createZoomButton(
 
     button->setIcon(qnSkin->icon(fileName, "", nullptr, substitutions));
     button->setPreferredSize(kZoomButtonSize);
-    context()->statisticsModule()->registerButton(statisticsName, button);
+    ApplicationContext::instance()->controlsStatisticsModule()->registerButton(
+        statisticsName,
+        button);
 
     connect(button, &QnImageButtonWidget::pressed, this,
         [this, zooming]() { m_zooming = zooming; });

@@ -36,19 +36,9 @@ void AnalyticsPluginResource::setManifest(const PluginManifest& manifest)
 
 AnalyticsEngineResourceList AnalyticsPluginResource::engines() const
 {
-    auto context = systemContext();
-    if (!context)
-    {
-        NX_ASSERT(false, "Resource has no common module.");
+    auto resourcePool = this->resourcePool();
+    if (!NX_ASSERT(resourcePool))
         return AnalyticsEngineResourceList();
-    }
-
-    auto resourcePool = context->resourcePool();
-    if (!resourcePool)
-    {
-        NX_ASSERT(false, "Can't access resource pool.");
-        return AnalyticsEngineResourceList();
-    }
 
     return resourcePool->getResources<AnalyticsEngineResource>(
         [id = getId()](const AnalyticsEngineResourcePtr& resource)

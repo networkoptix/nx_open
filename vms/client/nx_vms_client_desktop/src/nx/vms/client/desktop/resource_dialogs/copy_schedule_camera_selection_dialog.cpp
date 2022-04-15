@@ -45,7 +45,7 @@ CameraSelectionDialog::AlertTextProvider initAlertTextProvider(
                 CamLicenseUsageHelper helper(
                     cameras,
                     /*enableRecording*/ true,
-                    qnClientCoreModule->commonModule());
+                    qnClientCoreModule->commonModule()->systemContext());
 
                 if (!helper.isValid())
                 {

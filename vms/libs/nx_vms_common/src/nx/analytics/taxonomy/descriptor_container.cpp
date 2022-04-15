@@ -40,7 +40,7 @@ Descriptors DescriptorContainer::descriptors(const QnUuid& serverId)
             return *m_cachedDescriptors;
     }
 
-    QnResourcePool* resourcePool = m_context->resourcePool();
+    QnResourcePool* resourcePool = this->resourcePool();
     if (serverId.isNull())
     {
         const auto servers = resourcePool->servers();
@@ -74,9 +74,7 @@ Descriptors DescriptorContainer::descriptors(const QnUuid& serverId)
 
 void DescriptorContainer::updateDescriptors(Descriptors descriptors)
 {
-    QnResourcePool* resourcePool = m_context->resourcePool();
-
-    QnMediaServerResourcePtr ownServer = resourcePool->getResourceById<QnMediaServerResource>(
+    QnMediaServerResourcePtr ownServer = resourcePool()->getResourceById<QnMediaServerResource>(
         m_context->peerId());
 
     if (!NX_ASSERT(ownServer, "Unable to find own mediaserver"))

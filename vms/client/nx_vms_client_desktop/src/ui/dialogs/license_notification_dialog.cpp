@@ -44,7 +44,7 @@ class QnLicenseNotificationSortProxyModel:
 public:
     QnLicenseNotificationSortProxyModel(QObject* parent = nullptr) :
         base_type(parent),
-        validator(new nx::vms::license::Validator(commonModule(), this))
+        validator(new nx::vms::license::Validator(systemContext(), this))
     {
     }
 

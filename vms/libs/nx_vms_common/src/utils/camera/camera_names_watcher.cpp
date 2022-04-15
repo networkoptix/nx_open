@@ -24,7 +24,7 @@ QString utils::QnCameraNamesWatcher::getCameraName(const QnUuid& cameraId)
     if (it != m_names.end())
         return *it;
 
-    const auto& resPool = commonModule()->resourcePool();
+    const auto& resPool = resourcePool();
 
     const auto cameraResource = resPool->getResourceById<QnVirtualCameraResource>(cameraId);
     if (!cameraResource)

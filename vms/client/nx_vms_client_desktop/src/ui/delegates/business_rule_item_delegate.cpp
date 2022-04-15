@@ -60,7 +60,7 @@ QnBusinessRuleItemDelegate::QnBusinessRuleItemDelegate(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     m_lexComparator(new QnBusinessTypesComparator()),
-    m_businessStringsHelper(new vms::event::StringsHelper(qnClientCoreModule->commonModule()))
+    m_businessStringsHelper(new vms::event::StringsHelper(systemContext()))
 {
 }
 
@@ -68,7 +68,7 @@ QnBusinessRuleItemDelegate::~QnBusinessRuleItemDelegate()
 {
 }
 
-int QnBusinessRuleItemDelegate::optimalWidth(Column column, const QFontMetrics& metrics)
+int QnBusinessRuleItemDelegate::optimalWidth(Column column, const QFontMetrics& metrics) const
 {
     const int kExtraSpace =
         style::Metrics::kStandardPadding //< dropdown text indent
@@ -78,7 +78,7 @@ int QnBusinessRuleItemDelegate::optimalWidth(Column column, const QFontMetrics& 
     {
         case Column::event:
         {
-            vms::event::StringsHelper helper(qnClientCoreModule->commonModule());
+            vms::event::StringsHelper helper(systemContext());
             auto eventWidth = [&metrics, &helper](vms::api::EventType eventType)
                 {
                     return metrics.horizontalAdvance(helper.eventName(eventType));
@@ -90,7 +90,7 @@ int QnBusinessRuleItemDelegate::optimalWidth(Column column, const QFontMetrics& 
         }
         case Column::action:
         {
-            vms::event::StringsHelper helper(qnClientCoreModule->commonModule());
+            vms::event::StringsHelper helper(systemContext());
             auto actionWidth = [&metrics, &helper](vms::api::ActionType actionType)
                 {
                     return metrics.horizontalAdvance(helper.actionName(actionType));

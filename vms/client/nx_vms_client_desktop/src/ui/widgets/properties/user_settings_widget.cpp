@@ -276,7 +276,7 @@ void QnUserSettingsWidget::loadDataToUi()
 
     if (m_model->mode() == QnUserSettingsModel::NewUser)
     {
-        bool localSystem = qnGlobalSettings->cloudSystemId().isEmpty();
+        bool localSystem = globalSettings()->cloudSystemId().isEmpty();
         ui->userTypeWidget->setHidden(localSystem);
         ui->mainStackedWidget->setCurrentWidget(ui->localUserPage);
         ui->userTypeComboBox->setCurrentIndex(localSystem ? kLocalIndex : m_lastUserTypeIndex);

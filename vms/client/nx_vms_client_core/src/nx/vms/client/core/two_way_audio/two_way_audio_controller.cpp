@@ -140,7 +140,7 @@ void TwoWayAudioController::setResourceId(const QnUuid& id)
 
     stop();
 
-    const auto pool = commonModule()->resourcePool();
+    const auto pool = resourcePool();
     d->camera = pool->getResourceById<QnVirtualCameraResource>(id);
     d->availabilityWatcher->setResourceId(id);
     emit resourceIdChanged();

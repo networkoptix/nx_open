@@ -90,7 +90,7 @@ inline std::vector<QnUuid> toStdVector(const QList<QnUuid>& values)
 
 QSet<QnUuid> filterEventResources(const QSet<QnUuid>& ids, vms::api::EventType eventType)
 {
-    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    auto resourcePool = qnClientCoreModule->resourcePool();
 
     if (vms::event::requiresCameraResource(eventType))
         return toIds(resourcePool->getResourcesByIds<QnVirtualCameraResource>(ids));
@@ -115,7 +115,7 @@ QSet<QnUuid> filterActionResources(
     const QSet<QnUuid>& ids,
     vms::api::ActionType actionType)
 {
-    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    auto resourcePool = qnClientCoreModule->resourcePool();
 
     if (actionType == vms::api::ActionType::fullscreenCameraAction)
     {
@@ -181,7 +181,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
     m_eventTypesModel(new QStandardItemModel(this)),
     m_eventStatesModel(new QStandardItemModel(this)),
     m_actionTypesModel(new QStandardItemModel(this)),
-    m_helper(new vms::event::StringsHelper(commonModule()))
+    m_helper(new vms::event::StringsHelper(systemContext()))
 {
     const auto addEventItem =
         [this](vms::api::EventType eventType)
@@ -1228,7 +1228,7 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                 }
                 case ActionType::pushNotificationAction:
                 {
-                    if (qnGlobalSettings->cloudSystemId().isEmpty())
+                    if (globalSettings()->cloudSystemId().isEmpty())
                         return false;
 
                     static const QnCloudUsersValidationPolicy cloudUsersPolicy;

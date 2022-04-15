@@ -10,6 +10,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/common/system_context.h>
 
 namespace nx::vms::client::core {
 
@@ -68,8 +69,8 @@ public:
 
     SessionResourcesSignalListener(QObject* parent = nullptr):
         SessionResourcesSignalListener(
-            qnClientCoreModule->commonModule()->resourcePool(),
-            qnClientCoreModule->commonModule()->messageProcessor(),
+            qnClientCoreModule->resourcePool(),
+            qnClientCoreModule->commonModule()->systemContext()->messageProcessor(),
             parent)
     {
     }

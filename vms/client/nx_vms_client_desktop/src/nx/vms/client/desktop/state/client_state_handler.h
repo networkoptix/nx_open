@@ -48,7 +48,7 @@ public:
     virtual void createInheritedState(
         DelegateState* state,
         SubstateFlags flags,
-        const QStringList& resources)
+        const QStringList& /*resources*/)
     {
         saveState(state, flags);
     }

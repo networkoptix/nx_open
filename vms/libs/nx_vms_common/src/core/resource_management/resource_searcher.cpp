@@ -32,7 +32,7 @@ void QnAbstractResourceSearcher::setDiscoveryMode(DiscoveryMode mode) noexcept
 
 DiscoveryMode QnAbstractResourceSearcher::discoveryMode() const noexcept
 {
-    const auto& settings = commonModule()->globalSettings();
+    const auto& settings = globalSettings();
     if (settings->isInitialized() && settings->isNewSystem())
         return DiscoveryMode::disabled;
     return m_discoveryMode;
@@ -110,7 +110,7 @@ QList<QnResourcePtr> QnAbstractHttpResourceSearcher::checkAddress(AddressCheckPa
     if (const QString scheme = params.url.scheme(); scheme.isEmpty() || scheme == kUrlSchemeName)
     {
         const bool useHttps = params.url.port() == DEFAULT_HTTPS_PORT
-            || commonModule()->globalSettings()->useHttpsOnlyCameras();
+            || globalSettings()->useHttpsOnlyCameras();
         params.url.setScheme(useHttps ? kSecureUrlSchemeName : kUrlSchemeName);
     }
 

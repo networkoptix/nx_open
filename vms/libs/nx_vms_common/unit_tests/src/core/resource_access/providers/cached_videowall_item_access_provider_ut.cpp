@@ -21,7 +21,7 @@ class CachedVideoWallItemAccessProviderTest: public CachedBaseAccessProviderTest
 protected:
     virtual AbstractResourceAccessProvider* createAccessProvider() const override
     {
-        return new VideoWallItemAccessProvider(Mode::cached, commonModule());
+        return new VideoWallItemAccessProvider(Mode::cached, systemContext());
     }
 };
 

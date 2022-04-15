@@ -91,7 +91,7 @@ QString eventTypesToString(const std::vector<EventType>& types)
 EventSearchListModel::Private::Private(EventSearchListModel* q):
     base_type(q),
     q(q),
-    m_helper(new vms::event::StringsHelper(q->commonModule())),
+    m_helper(new vms::event::StringsHelper(q->systemContext())),
     m_liveUpdateTimer(new QTimer())
 {
     connect(m_liveUpdateTimer.data(), &QTimer::timeout, this, &Private::fetchLive);

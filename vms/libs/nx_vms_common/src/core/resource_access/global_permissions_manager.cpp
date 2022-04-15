@@ -26,9 +26,9 @@ QnGlobalPermissionsManager::QnGlobalPermissionsManager(
 {
     if (mode == Mode::cached)
     {
-        connect(m_context->resourcePool(), &QnResourcePool::resourceAdded, this,
+        connect(resourcePool(), &QnResourcePool::resourceAdded, this,
             &QnGlobalPermissionsManager::handleResourceAdded);
-        connect(m_context->resourcePool(), &QnResourcePool::resourceRemoved, this,
+        connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
             &QnGlobalPermissionsManager::handleResourceRemoved);
 
         connect(m_context->userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
@@ -108,8 +108,7 @@ bool QnGlobalPermissionsManager::hasGlobalPermission(const Qn::UserAccessData& a
     if (accessRights == Qn::kSystemAccess)
         return true;
 
-    const auto& resPool = m_context->resourcePool();
-    auto user = resPool->getResourceById<QnUserResource>(accessRights.userId);
+    auto user = resourcePool()->getResourceById<QnUserResource>(accessRights.userId);
     if (!user)
     {
         NX_VERBOSE(this, "User %1 is not found", accessRights.userId);

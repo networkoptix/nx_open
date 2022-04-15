@@ -4,26 +4,26 @@
 
 #include <chrono>
 
-#include <QtCore/QVector>
 #include <QtCore/QMetaType>
 #include <QtCore/QPointer>
+#include <QtCore/QVector>
 
-#include <utils/common/connective.h>
-#include <nx/utils/uuid.h>
+#include <qt_graphics_items/graphics_widget.h>
 
 #include <client/client_globals.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
-
+#include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
+#include <ui/animation/animated.h>
 #include <ui/common/constrained_resizable.h>
 #include <ui/common/fixed_rotation.h>
 #include <ui/common/frame_section_queryable.h>
 #include <ui/common/help_topic_queryable.h>
-#include <ui/animation/animated.h>
-#include <ui/graphics/items/overlays/overlayed.h>
-#include <ui/workbench/workbench_context_aware.h>
 #include <ui/graphics/instruments/instrumented.h>
-#include <qt_graphics_items/graphics_widget.h>
+#include <ui/graphics/items/overlays/overlayed.h>
+#include <utils/common/connective.h>
 
 class QGraphicsLinearLayout;
 
@@ -42,7 +42,8 @@ class QnHudOverlayWidget;
 
 class QnResourceWidget:
     public Overlayed<Animated<Instrumented<Connective<GraphicsWidget>>>>,
-    public QnWorkbenchContextAware,
+    public nx::vms::client::desktop::SystemContextAware,
+    public nx::vms::client::desktop::WindowContextAware,
     public ConstrainedResizable,
     public HelpTopicQueryable
 {
@@ -126,14 +127,16 @@ public:
      * \param item                      Workbench item that this widget represents.
      * \param parent                    Parent item.
      */
-    QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = nullptr);
+    QnResourceWidget(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        nx::vms::client::desktop::WindowContext* windowContext,
+        QnWorkbenchItem* item,
+        QGraphicsItem* parent = nullptr);
 
     /**
      * Virtual destructor.
      */
     virtual ~QnResourceWidget();
-
-    void setBookmarksLabelText(const QString &text);
 
     /**
      * \returns                         Resource associated with this widget.

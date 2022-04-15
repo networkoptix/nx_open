@@ -2,16 +2,17 @@
 
 #include "p2p_connection.h"
 
-#include <common/common_module.h>
 #include <api/global_settings.h>
 #include <api/runtime_info_manager.h>
-#include <nx/network/http/custom_headers.h>
-#include <nx/network/nx_network_ini.h>
-#include <core/resource_management/resource_pool.h>
+#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
-#include <nx/utils/log/log_main.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/metrics/metrics_storage.h>
+#include <nx/network/http/custom_headers.h>
+#include <nx/network/nx_network_ini.h>
+#include <nx/utils/log/log_main.h>
+#include <nx/vms/common/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
 
 namespace nx {
@@ -34,7 +35,7 @@ Connection::Connection(
         remotePeerType,
         localPeer,
         remotePeerUrl,
-        commonModule->globalSettings()->aliveUpdateInterval(),
+        commonModule->systemContext()->globalSettings()->aliveUpdateInterval(),
         std::move(opaqueObject),
         std::move(adapterFunc),
         std::make_unique<ConnectionLockGuard>(std::move(connectionLockGuard))),
@@ -50,7 +51,7 @@ Connection::Connection(
 
     addAdditionalRequestHeaders(std::move(headers));
 
-    const auto& localInfo = commonModule->runtimeInfoManager()->localInfo();
+    const auto& localInfo = runtimeInfoManager()->localInfo();
 
     std::vector<std::pair<QString, QString>> queryParams;
     if (!localInfo.data.videoWallInstanceGuid.isNull())

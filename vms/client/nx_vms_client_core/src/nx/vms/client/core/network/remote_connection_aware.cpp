@@ -12,6 +12,7 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/common/system_context.h>
 
 namespace nx::vms::client::core {
 
@@ -93,7 +94,7 @@ QnUuid RemoteConnectionAware::serverId() const
 
 QnMediaServerResourcePtr RemoteConnectionAware::currentServer() const
 {
-    return qnClientCoreModule->commonModule()
+    return qnClientCoreModule->commonModule()->systemContext()
         ->resourcePool()
         ->getResourceById<QnMediaServerResource>(serverId());
 }

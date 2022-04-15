@@ -65,7 +65,7 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent)
     connect(m_simpleSettingsWidget,     &QnSmtpSimpleSettingsWidget::settingsChanged,   this,   checkedChanged);
     connect(m_advancedSettingsWidget,   &QnSmtpAdvancedSettingsWidget::settingsChanged, this,   checkedChanged);
 
-    connect(qnGlobalSettings,           &QnGlobalSettings::emailSettingsChanged,        this,   &QnSmtpSettingsWidget::loadDataToUi);
+    connect(globalSettings(),           &QnGlobalSettings::emailSettingsChanged,        this,   &QnSmtpSettingsWidget::loadDataToUi);
 }
 
 QnSmtpSettingsWidget::~QnSmtpSettingsWidget()
@@ -77,7 +77,7 @@ void QnSmtpSettingsWidget::loadDataToUi() {
 
     finishTesting();
 
-    QnEmailSettings settings = qnGlobalSettings->emailSettings();
+    QnEmailSettings settings = globalSettings()->emailSettings();
 
     m_simpleSettingsWidget->setSettings(QnSimpleSmtpSettings::fromSettings(settings));
     m_advancedSettingsWidget->setSettings(settings);
@@ -93,8 +93,8 @@ void QnSmtpSettingsWidget::applyChanges() {
     if (isReadOnly())
         return;
 
-    qnGlobalSettings->setEmailSettings(settings());
-    qnGlobalSettings->synchronizeNow();
+    globalSettings()->setEmailSettings(settings());
+    globalSettings()->synchronizeNow();
 }
 
 void QnSmtpSettingsWidget::setReadOnlyInternal(bool readOnly) {
@@ -154,7 +154,7 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
 
 bool QnSmtpSettingsWidget::hasChanges() const  {
     QnEmailSettings local = settings();
-    QnEmailSettings remote = qnGlobalSettings->emailSettings();
+    QnEmailSettings remote = globalSettings()->emailSettings();
 
     /* Do not notify about changes if no valid settings are provided. */
     if (!local.isValid() && !remote.isValid())

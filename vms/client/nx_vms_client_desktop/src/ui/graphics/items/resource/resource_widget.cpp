@@ -23,13 +23,17 @@
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/style.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/selection_overlay_widget.h>
+#include <nx/vms/client/desktop/videowall/videowall_online_screens_watcher.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/license/usage_helper.h>
 #include <qt_graphics_items/graphics_label.h>
 #include <ui/animation/opacity_animator.h>
@@ -50,10 +54,8 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
-#include <ui/workbench/handlers/workbench_videowall_handler.h> //< TODO: #sivanov Remove this.
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -119,9 +121,15 @@ bool itemBelongsToValidLayout(QnWorkbenchItem *item)
 // -------------------------------------------------------------------------- //
 // Logic
 // -------------------------------------------------------------------------- //
-QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent) :
+QnResourceWidget::QnResourceWidget(
+    SystemContext* systemContext,
+    WindowContext* windowContext,
+    QnWorkbenchItem* item,
+    QGraphicsItem* parent)
+    :
     base_type(parent),
-    QnWorkbenchContextAware(context),
+    SystemContextAware(systemContext),
+    WindowContextAware(windowContext),
     m_hudOverlay(new QnHudOverlayWidget(this)),
     m_statusOverlay(new QnStatusOverlayWidget(this)),
     m_item(item),
@@ -168,9 +176,15 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     executeLater([this]() { updateHud(false); }, this);
 
-    /* Handle layout permissions if an item is placed on the common layout. Otherwise, it can be Motion Widget, for example. */
-    if (itemBelongsToValidLayout(item))
-        connect(accessController()->notifier(item->layout()->resource()), &QnWorkbenchPermissionsNotifier::permissionsChanged, this, &QnResourceWidget::updateButtonsVisibility);
+    // TODO: #sivanov Remove outdated check.
+    if (NX_ASSERT(itemBelongsToValidLayout(item)))
+    {
+        connect(
+            accessController()->notifier(item->layout()->resource()),
+            &QnWorkbenchPermissionsNotifier::permissionsChanged,
+            this,
+            &QnResourceWidget::updateButtonsVisibility);
+    }
 
     /* Status overlay. */
     m_statusController = new QnStatusOverlayController(m_resource, m_statusOverlay, this);
@@ -210,8 +224,12 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     if (qnRuntime->isVideoWallMode())
     {
-        auto handler = context->instance<QnWorkbenchVideoWallHandler>();
-        connect(handler, &QnWorkbenchVideoWallHandler::onlineScreensChanged, this, updateOverlay);
+        auto videoWallOnlineScreensWatcher = systemContext->videoWallOnlineScreensWatcher();
+        connect(
+            videoWallOnlineScreensWatcher,
+            &VideoWallOnlineScreensWatcher::onlineScreensChanged,
+            this,
+            updateOverlay);
     }
 
     /* Run handlers. */
@@ -443,7 +461,7 @@ void QnResourceWidget::setZoomRect(const QRectF &zoomRect)
 
 QnResourceWidget *QnResourceWidget::zoomTargetWidget() const
 {
-    return QnWorkbenchContextAware::display()->zoomTargetWidget(const_cast<QnResourceWidget *>(this));
+    return WindowContextAware::display()->zoomTargetWidget(const_cast<QnResourceWidget *>(this));
 }
 
 bool QnResourceWidget::isZoomWindow() const
@@ -744,13 +762,14 @@ bool QnResourceWidget::isVideoWallLicenseValid() const
     if (helper->isValid())
         return true;
 
-    const QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
+    const QnPeerRuntimeInfo localInfo = m_resource->systemContext()->runtimeInfoManager()->localInfo();
     NX_ASSERT(localInfo.data.peer.peerType == nx::vms::api::PeerType::videowallClient);
     QnUuid currentScreenId = localInfo.data.videoWallInstanceGuid;
 
     // Gather all online screen ids.
     // The order of screens should be the same across all client instances.
-    const auto onlineScreens = context()->instance<QnWorkbenchVideoWallHandler>()->onlineScreens();
+    auto videoWallOnlineScreensWatcher = systemContext()->videoWallOnlineScreensWatcher();
+    const auto onlineScreens = videoWallOnlineScreensWatcher->onlineScreens();
 
     const int allowedLiceses = helper->totalLicenses(Qn::LC_VideoWall);
 
@@ -914,7 +933,7 @@ QRectF QnResourceWidget::exposedRect(int channel, bool accountForViewport, bool 
 
 void QnResourceWidget::registerButtonStatisticsAlias(QnImageButtonWidget* button, const QString& alias)
 {
-    context()->statisticsModule()->registerButton(alias, button);
+    ApplicationContext::instance()->controlsStatisticsModule()->registerButton(alias, button);
 }
 
 QnImageButtonWidget* QnResourceWidget::createStatisticAwareButton(const QString& alias)

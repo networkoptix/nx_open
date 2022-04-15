@@ -72,6 +72,7 @@ protected:
     virtual Qn::Notifier storedItemAdded(const QnVideoWallMatrix& item) override;
     virtual Qn::Notifier storedItemRemoved(const QnVideoWallMatrix& item) override;
     virtual Qn::Notifier storedItemChanged(const QnVideoWallMatrix& item) override;
+
 private:
     bool m_autorun = false;
     bool m_timelineEnabled = false;

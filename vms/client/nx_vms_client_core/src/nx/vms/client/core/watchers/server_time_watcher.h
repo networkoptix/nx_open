@@ -8,7 +8,7 @@
 
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/client/core/system_context_aware.h>
 
 struct QnTimeReply;
 
@@ -16,13 +16,12 @@ namespace nx::vms::client::core {
 
 class ServerTimeWatcher:
     public QObject,
-    public RemoteConnectionAware
+    public SystemContextAware
 {
     Q_OBJECT
-    typedef QObject base_type;
 
 public:
-    ServerTimeWatcher(QObject *parent = nullptr);
+    ServerTimeWatcher(SystemContext* systemContext, QObject* parent = nullptr);
 
     enum TimeMode
     {

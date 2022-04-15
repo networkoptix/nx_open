@@ -4,12 +4,13 @@
 
 #include <QtCore/QPointer>
 
+#include <nx/utils/uuid.h>
+
 class QnCommonModule;
 class QnGlobalPermissionsManager;
 class QnLicensePool;
 class QnResourcePool;
 class QnResourceAccessManager;
-namespace nx::core::access { class ResourceAccessProvider; }
 class QnResourceAccessSubjectsCache;
 class QnRuntimeInfoManager;
 class QnSharedResourcesManager;
@@ -21,9 +22,13 @@ class QnGlobalSettings;
 class QnLayoutTourManager;
 class QnAuditManager;
 class QnResourceDataPool;
+class QnCommonMessageProcessor;
 
-namespace nx { namespace vms { namespace event { class RuleManager; }}}
+namespace nx::vms::common { class SystemContext; }
+namespace nx::vms::event { class RuleManager; }
 namespace nx::vms::rules { class Engine; }
+namespace nx::core::access { class ResourceAccessProvider; }
+namespace ec2 { class AbstractECConnection; }
 
 class NX_VMS_COMMON_API QnCommonModuleAware
 {
@@ -40,6 +45,11 @@ public:
     void deinitializeContext();
 
     QnCommonModule* commonModule() const;
+
+    nx::vms::common::SystemContext* systemContext() const;
+
+    QnUuid peerId() const;
+    QnUuid sessionId() const;
 
     QnLicensePool* licensePool() const;
     QnRuntimeInfoManager* runtimeInfoManager() const;
@@ -58,6 +68,9 @@ public:
     nx::vms::event::RuleManager* eventRuleManager() const;
     QnAuditManager* auditManager() const;
     QnResourceDataPool* dataPool() const;
+    std::shared_ptr<ec2::AbstractECConnection> ec2Connection() const;
+    QnCommonMessageProcessor* messageProcessor() const;
+
 private:
     void init(QObject *parent);
 

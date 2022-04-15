@@ -132,7 +132,7 @@ QnWorkbenchLayout* QnWorkbenchLayout::instance(const QnLayoutResourcePtr& layout
 
 QnWorkbenchLayout* QnWorkbenchLayout::instance(const QnVideoWallResourcePtr& videoWall)
 {
-    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    auto resourcePool = videoWall->resourcePool();
     for (const auto& layout: resourcePool->getResources<QnLayoutResource>())
     {
         if (layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>() == videoWall)

@@ -12,7 +12,7 @@ namespace helpers {
 template<typename ResourceType>
 QnSharedResourcePointer<ResourceType> extractResource(QnWorkbenchItem *item)
 {
-    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    auto resourcePool = qnClientCoreModule->resourcePool();
     const auto layoutItemData = item->data();
     return resourcePool->getResourceByDescriptor(layoutItemData.resource).template dynamicCast<ResourceType>();
 

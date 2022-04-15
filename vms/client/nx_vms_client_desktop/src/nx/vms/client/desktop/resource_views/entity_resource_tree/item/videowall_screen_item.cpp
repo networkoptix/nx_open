@@ -4,10 +4,10 @@
 
 #include <QtCore/QVariant>
 
-#include <common/common_module.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <core/resource/videowall_resource.h>
 #include <client/client_globals.h>
+#include <core/resource/videowall_resource.h>
+#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/common/system_context.h>
 #include <ui/help/help_topics.h>
 
 namespace {

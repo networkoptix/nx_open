@@ -7,7 +7,6 @@
 
 #include <api/global_settings.h>
 #include <client/client_globals.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -20,6 +19,7 @@
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
+#include <nx/vms/common/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
 
 using namespace nx::vms::client::desktop;

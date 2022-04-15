@@ -21,7 +21,7 @@ class DirectVideoWallItemAccessProviderTest: public DirectBaseAccessProviderTest
 protected:
     virtual AbstractResourceAccessProvider* createAccessProvider() const override
     {
-        return new VideoWallItemAccessProvider(Mode::direct, commonModule());
+        return new VideoWallItemAccessProvider(Mode::direct, systemContext());
     }
 };
 

@@ -5,41 +5,18 @@
 #include <thread>
 
 #include <api/helpers/camera_id_helper.h>
-#include <common/common_module.h>
-#include <common/static_common_module.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/core/access/access_types.h>
 #include <nx/utils/random.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
-#include <nx/vms/common/test_support/resource/resource_pool_test_helper.h>
+#include <nx/vms/common/test_support/test_context.h>
 
-class QnResourcePoolTest: public testing::Test, protected QnResourcePoolTestHelper
+namespace nx::vms::common::test {
+
+class QnResourcePoolTest: public ContextBasedTest
 {
-protected:
-
-    // virtual void SetUp() will be called before each test is run.
-    virtual void SetUp()
-    {
-        m_staticCommon = std::make_unique<QnStaticCommonModule>();
-        m_module = std::make_unique<QnCommonModule>(
-            /*clientMode*/ false,
-            nx::core::access::Mode::direct);
-        initializeContext(m_module.get());
-    }
-
-    // virtual void TearDown() will be called after each test is run.
-    virtual void TearDown()
-    {
-        deinitializeContext();
-        m_module.reset();
-        m_staticCommon.reset();
-    }
-
-    // Declares the variables your tests want to use.
-    std::unique_ptr<QnStaticCommonModule> m_staticCommon;
-    std::unique_ptr<QnCommonModule> m_module;
 };
 
 TEST_F(QnResourcePoolTest, removeCameraFromLayoutById)
@@ -156,3 +133,5 @@ TEST_F(QnResourcePoolTest, findCameraTest)
     runThreads("flexibleId wrong id", /*expectSuccess*/ false,
         [&](auto c) { return findCameraByFlexibleId(resourcePool(), "no_such_id"); });
 }
+
+} // namespace nx::vms::common::test

@@ -128,7 +128,7 @@ QnDesktopCameraConnectionProcessor::~QnDesktopCameraConnectionProcessor()
 
 QnResourcePtr QnDesktopCameraConnectionProcessor::getResource() const
 {
-    return commonModule()->resourcePool()->getResourceById(
+    return resourcePool()->getResourceById(
         QnDesktopResource::getDesktopResourceUuid());
 }
 void QnDesktopCameraConnectionProcessor::processRequest()

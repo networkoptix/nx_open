@@ -63,12 +63,12 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
     m_private->serverUpdateTool = context()->instance<ServerUpdateTool>();
     NX_ASSERT(m_private->serverUpdateTool);
 
-    m_autoChecksEnabled = qnGlobalSettings->isUpdateNotificationsEnabled();
+    m_autoChecksEnabled = globalSettings()->isUpdateNotificationsEnabled();
 
-    connect(qnGlobalSettings, &QnGlobalSettings::updateNotificationsChanged, this,
+    connect(globalSettings(), &QnGlobalSettings::updateNotificationsChanged, this,
         [this]()
         {
-            m_autoChecksEnabled = qnGlobalSettings->isUpdateNotificationsEnabled();
+            m_autoChecksEnabled = globalSettings()->isUpdateNotificationsEnabled();
             syncState();
         });
 
@@ -94,7 +94,7 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
             {
                 if (m_userLoggedIn)
                 {
-                    auto systemId = qnGlobalSettings->localSystemId();
+                    auto systemId = globalSettings()->localSystemId();
                     m_private->serverUpdateTool->onConnectToSystem(systemId);
                 }
                 else
@@ -176,7 +176,7 @@ void WorkbenchUpdateWatcher::atStartCheckUpdate()
 
 void WorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& contents)
 {
-    if (!qnGlobalSettings->isUpdateNotificationsEnabled())
+    if (!globalSettings()->isUpdateNotificationsEnabled())
         return;
 
     m_private->updateContents = contents;
@@ -208,7 +208,7 @@ void WorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& cont
         return;
 
     // Administrator disabled update notifications globally.
-    if (!qnGlobalSettings->isUpdateNotificationsEnabled())
+    if (!globalSettings()->isUpdateNotificationsEnabled())
         return;
 
     // Do not show notifications near the end of the week or on our holidays.

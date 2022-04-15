@@ -1,46 +1,46 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "ptz_instrument.h"
-#include "ptz_instrument_p.h"
-
 
 #include <chrono>
 
 #include <QtCore/QMetaEnum>
-#include <QtCore/QVariant>
 #include <QtCore/QTimer>
-#include <QtWidgets/QGraphicsSceneMouseEvent>
+#include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsSceneMouseEvent>
 
 #include <client/client_show_once_settings.h>
 #include <core/resource/client_camera.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <ui/animation/opacity_animator.h>
-#include <ui/animation/animation_event.h>
-#include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/graphics/items/generic/image_button_widget.h>
-#include <ui/statistics/modules/controls_statistics_module.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <ui/workbench/workbench.h>
-#include <ui/workbench/workbench_item.h>
-#include <ui/workbench/workbench_display.h>
-#include <ui/workbench/workbench_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <ui/workbench/workbench_layout.h>
-#include <utils/common/checked_cast.h>
-#include <utils/common/scoped_painter_rollback.h>
-#include <utils/math/math.h>
-#include <utils/math/color_transformations.h>
-
 #include <nx/utils/math/fuzzy.h>
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/common/custom_cursors.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/ptz_promo_overlay.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
 #include <nx/vms/client/desktop/workbench/watchers/keyboard_modifiers_watcher.h>
+#include <ui/animation/animation_event.h>
+#include <ui/animation/opacity_animator.h>
+#include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/statistics/modules/controls_statistics_module.h>
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_layout.h>
+#include <utils/common/checked_cast.h>
+#include <utils/common/scoped_painter_rollback.h>
+#include <utils/math/color_transformations.h>
+#include <utils/math/math.h>
+
+#include "ptz_instrument_p.h"
 
 using nx::vms::client::core::Geometry;
 
@@ -1423,7 +1423,7 @@ void PtzInstrument::at_splashItem_destroyed()
 
 void PtzInstrument::at_modeButton_clicked()
 {
-    context()->statisticsModule()->registerClick(lit("ptz_overlay_mode"));
+    ApplicationContext::instance()->controlsStatisticsModule()->registerClick("ptz_overlay_mode");
 
     PtzImageButtonWidget* button = checked_cast<PtzImageButtonWidget*>(sender());
 
@@ -1446,7 +1446,8 @@ void PtzInstrument::at_modeButton_clicked()
 
 void PtzInstrument::at_zoomInButton_pressed()
 {
-    context()->statisticsModule()->registerClick(lit("ptz_overlay_zoom_in"));
+    ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
+        "ptz_overlay_zoom_in");
     at_zoomButton_activated(1.0);
 }
 
@@ -1457,7 +1458,8 @@ void PtzInstrument::at_zoomInButton_released()
 
 void PtzInstrument::at_zoomOutButton_pressed()
 {
-    context()->statisticsModule()->registerClick(lit("ptz_overlay_zoom_out"));
+    ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
+        "ptz_overlay_zoom_out");
     at_zoomButton_activated(-1.0);
 }
 
@@ -1476,7 +1478,8 @@ void PtzInstrument::at_zoomButton_activated(qreal zoomSpeed)
 
 void PtzInstrument::at_focusInButton_pressed()
 {
-    context()->statisticsModule()->registerClick(lit("ptz_overlay_focus_in"));
+    ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
+        "ptz_overlay_focus_in");
     at_focusButton_activated(1.0);
 }
 
@@ -1487,7 +1490,8 @@ void PtzInstrument::at_focusInButton_released()
 
 void PtzInstrument::at_focusOutButton_pressed()
 {
-    context()->statisticsModule()->registerClick(lit("ptz_overlay_focus_out"));
+    ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
+        "ptz_overlay_focus_out");
     at_focusButton_activated(-1.0);
 }
 
@@ -1506,7 +1510,8 @@ void PtzInstrument::at_focusButton_activated(qreal speed)
 
 void PtzInstrument::at_focusAutoButton_clicked()
 {
-    context()->statisticsModule()->registerClick(lit("ptz_overlay_focus_auto"));
+    ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
+        "ptz_overlay_focus_auto");
 
     PtzImageButtonWidget* button = checked_cast<PtzImageButtonWidget*>(sender());
 

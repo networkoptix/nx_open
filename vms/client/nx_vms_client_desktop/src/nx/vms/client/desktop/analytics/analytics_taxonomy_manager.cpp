@@ -9,6 +9,7 @@
 #include <common/common_module.h>
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/utils/range_adapters.h>
+#include <nx/vms/common/system_context.h>
 
 namespace nx::vms::client::desktop {
 namespace analytics {
@@ -105,7 +106,7 @@ TaxonomyManager::TaxonomyManager(QnCommonModule* commonModule, QObject* parent):
     d(new Private())
 {
     const auto taxonomyStateWatcher = commonModule
-        ? commonModule->analyticsTaxonomyStateWatcher()
+        ? commonModule->systemContext()->analyticsTaxonomyStateWatcher()
         : nullptr;
     if (!NX_CRITICAL(taxonomyStateWatcher, "Common module singletons must be initialized"))
         return;
@@ -126,7 +127,7 @@ TaxonomyManager::~TaxonomyManager()
 
 Taxonomy* TaxonomyManager::currentTaxonomy() const
 {
-    d->ensureTaxonomy(commonModule()->analyticsTaxonomyStateWatcher());
+    d->ensureTaxonomy(commonModule()->systemContext()->analyticsTaxonomyStateWatcher());
     return d->currentTaxonomy.value().get();
 }
 
@@ -143,7 +144,7 @@ bool TaxonomyManager::isEngineRelevant(AbstractEngine* engine) const
     if (!NX_ASSERT(engine))
         return false;
 
-    d->ensureRelevancyInfo(commonModule()->analyticsTaxonomyStateWatcher());
+    d->ensureRelevancyInfo(commonModule()->systemContext()->analyticsTaxonomyStateWatcher());
     return d->relevantEngines.contains(engine);
 }
 
@@ -152,19 +153,19 @@ bool TaxonomyManager::isRelevantForEngine(AbstractObjectType* type, AbstractEngi
     if (!NX_ASSERT(type))
         return false;
 
-    d->ensureRelevancyInfo(commonModule()->analyticsTaxonomyStateWatcher());
+    d->ensureRelevancyInfo(commonModule()->systemContext()->analyticsTaxonomyStateWatcher());
     return d->relevantObjectTypes->value(engine).contains(type);
 }
 
 QSet<nx::analytics::taxonomy::AbstractEngine*> TaxonomyManager::relevantEngines() const
 {
-    d->ensureRelevancyInfo(commonModule()->analyticsTaxonomyStateWatcher());
+    d->ensureRelevancyInfo(commonModule()->systemContext()->analyticsTaxonomyStateWatcher());
     return d->relevantEngines;
 }
 
 QSet<AbstractObjectType*> TaxonomyManager::relevantObjectTypes(AbstractEngine* engine) const
 {
-    d->ensureRelevancyInfo(commonModule()->analyticsTaxonomyStateWatcher());
+    d->ensureRelevancyInfo(commonModule()->systemContext()->analyticsTaxonomyStateWatcher());
     return d->relevantObjectTypes->value(engine);
 }
 

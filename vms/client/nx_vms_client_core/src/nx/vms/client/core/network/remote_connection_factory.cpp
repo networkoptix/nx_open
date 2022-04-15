@@ -17,6 +17,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/thread/thread_util.h>
 #include <nx/vms/client/core/ini.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <nx_ec/ec_api_fwd.h>
 #include <utils/common/delayed.h>
@@ -135,7 +136,7 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
             certificateVerifier,
             context->certificateCache,
             serializationFormat,
-            /*auditId*/ commonModule()->sessionId());
+            /*auditId*/ sessionId());
     }
 
     bool executeInUiThreadSync(std::function<bool()> handler)
@@ -311,10 +312,24 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
             NX_DEBUG(this, "Fixed connection address: %1", fullHostname);
         }
 
-        // Use refresh token to issue new session token if server supports OAuth cloud
-        // authrization through the REST API.
-        if (context->userType() == nx::vms::api::UserType::cloud && isRestApiSupported(context))
-            context->logonData.credentials = qnCloudStatusWatcher->remoteConnectionCredentials();
+        if (context->userType() == nx::vms::api::UserType::cloud)
+        {
+            // Use refresh token to issue new session token if server supports OAuth cloud
+            // authrization through the REST API.
+            if (isRestApiSupported(context))
+            {
+                context->logonData.credentials =
+                    qnCloudStatusWatcher->remoteConnectionCredentials();
+            }
+            else
+            {
+                // Developer mode code.
+                context->logonData.credentials.username =
+                    qnCloudStatusWatcher->cloudLogin().toStdString();
+                context->logonData.credentials.authToken = nx::network::http::PasswordAuthToken(
+                    settings()->digestCloudPassword());
+            }
+        }
     }
 
     void checkServerCloudConnection(ContextPtr context)

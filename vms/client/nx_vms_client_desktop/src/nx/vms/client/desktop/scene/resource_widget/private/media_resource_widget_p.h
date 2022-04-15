@@ -8,7 +8,6 @@
 #include <nx/vms/client/core/media/abstract_analytics_metadata_provider.h>
 #include <nx/vms/client/core/media/abstract_metadata_consumer_owner.h>
 #include <nx/vms/client/core/media/abstract_motion_metadata_provider.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/desktop/camera/camera_fwd.h>
 #include <nx/vms/license/usage_helper.h>
@@ -16,18 +15,16 @@
 
 #include "motion_skip_mask.h"
 
-class QnWorkbenchAccessController;
-
 namespace nx::analytics { class MetadataLogParser; }
 namespace nx::analytics::db { struct Filter; }
+
+class QnWorkbenchAccessController;
 
 namespace nx::vms::client::desktop {
 
 class WidgetAnalyticsController;
 
-class MediaResourceWidgetPrivate:
-    public Connective<QObject>,
-    public core::RemoteConnectionAware
+class MediaResourceWidgetPrivate: public Connective<QObject>
 {
     Q_OBJECT
     Q_PROPERTY(bool hasVideo MEMBER hasVideo CONSTANT)
@@ -68,7 +65,6 @@ public:
 public:
     explicit MediaResourceWidgetPrivate(
         const QnResourcePtr& resource,
-        QnWorkbenchAccessController* accessController,
         QObject* parent = nullptr);
     virtual ~MediaResourceWidgetPrivate();
 

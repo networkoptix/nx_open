@@ -18,7 +18,8 @@ class LayoutTourItemWidget: public QnResourceWidget
 
 public:
     LayoutTourItemWidget(
-        QnWorkbenchContext* context,
+        nx::vms::client::desktop::SystemContext* systemContext,
+        nx::vms::client::desktop::WindowContext* windowContext,
         QnWorkbenchItem* item,
         QGraphicsItem* parent = nullptr);
     virtual ~LayoutTourItemWidget() override;

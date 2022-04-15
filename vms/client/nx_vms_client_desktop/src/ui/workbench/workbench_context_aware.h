@@ -28,7 +28,7 @@ class QnWorkbenchContextAware:
     public nx::vms::client::core::RemoteConnectionAware
 {
 public:
-    static QString kQmlContextPropertyName;
+    static QString kQmlWorkbenchContextPropertyName;
 
     enum class InitializationMode
     {

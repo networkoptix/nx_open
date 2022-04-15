@@ -189,7 +189,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     QnWorkbenchContextAware(parent),
     ui(new Ui::LicenseManagerWidget),
     m_model(new QnLicenseListModel(this)),
-    m_validator(new Validator(commonModule(), this))
+    m_validator(new Validator(systemContext(), this))
 {
     ui->setupUi(this);
 
@@ -279,8 +279,8 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
         updateLicenses();
     };
 
-    auto camerasUsageWatcher = new CamLicenseUsageWatcher(commonModule(), this);
-    auto videowallUsageWatcher = new VideoWallLicenseUsageWatcher(commonModule(), this);
+    auto camerasUsageWatcher = new CamLicenseUsageWatcher(systemContext(), this);
+    auto videowallUsageWatcher = new VideoWallLicenseUsageWatcher(systemContext(), this);
     connect(camerasUsageWatcher, &UsageWatcher::licenseUsageChanged, this,
         updateLicensesIfNeeded);
     connect(videowallUsageWatcher, &UsageWatcher::licenseUsageChanged, this,
@@ -353,8 +353,8 @@ void QnLicenseManagerWidget::updateLicenses()
 
         QStringList messages;
 
-        CamLicenseUsageHelper camUsageHelper(commonModule());
-        VideoWallLicenseUsageHelper vwUsageHelper(commonModule());
+        CamLicenseUsageHelper camUsageHelper(systemContext());
+        VideoWallLicenseUsageHelper vwUsageHelper(systemContext());
         QList<UsageHelper*> helpers{ &camUsageHelper, &vwUsageHelper };
 
         for (auto helper: helpers)
@@ -736,7 +736,7 @@ void QnLicenseManagerWidget::deactivateLicenses(const QnLicenseList& licenses)
         };
 
     Deactivator::deactivateAsync(
-        LicenseServer::deactivateUrl(commonModule()),
+        LicenseServer::deactivateUrl(systemContext()),
         m_deactivationReason, licenses, handler, parentWidget());
 }
 
@@ -918,7 +918,7 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged()
     {
         updateFromServer(
             ui->licenseWidget->serialKey().toLatin1(), /*infoMode*/ true,
-            LicenseServer::activateUrl(commonModule()).toQUrl());
+            LicenseServer::activateUrl(systemContext()).toQUrl());
     }
     else
     {

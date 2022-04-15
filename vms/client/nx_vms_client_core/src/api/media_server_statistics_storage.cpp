@@ -92,7 +92,7 @@ void QnMediaServerStatisticsStorage::update()
     NX_VERBOSE(this, "Update requested.");
 
     const auto server =
-        commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(m_serverId);
+        resourcePool()->getResourceById<QnMediaServerResource>(m_serverId);
     bool canRequest = connection()
         && server
         && server->getStatus() == nx::vms::api::ResourceStatus::online;

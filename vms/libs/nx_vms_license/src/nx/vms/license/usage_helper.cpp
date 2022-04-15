@@ -573,7 +573,6 @@ void CamLicenseUsageHelper::calculateUsedLicenses(
 {
     boost::fill(basicUsedLicenses, 0);
     boost::fill(proposedToUse, 0);
-    const auto& resPool = m_context->resourcePool();
 
     auto groupId = [](const QnSecurityCamResourcePtr& camera)
     {
@@ -583,7 +582,7 @@ void CamLicenseUsageHelper::calculateUsedLicenses(
     };
 
     QMap<QString, QSet<QnSecurityCamResourcePtr>> oldCameras;
-    for (const auto& camera: resPool->getAllCameras(QnResourcePtr(), true))
+    for (const auto& camera: resourcePool()->getAllCameras(QnResourcePtr(), true))
     {
         if (camera->isScheduleEnabled())
             oldCameras[groupId(camera)].insert(camera);
@@ -723,7 +722,7 @@ void VideoWallLicenseUsageHelper::calculateUsedLicenses(licensesArray& basicUsed
     int usedScreens = 0;
 
     // Calculating total screens.
-    for (const auto& videowall: m_context->resourcePool()->getResources<QnVideoWallResource>())
+    for (const auto& videowall: resourcePool()->getResources<QnVideoWallResource>())
         usedScreens += videowall->items()->getItems().size();
 
     basicUsedLicenses[Qn::LC_VideoWall] =

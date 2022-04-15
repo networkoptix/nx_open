@@ -5,11 +5,10 @@
 #include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>
 #include <client_core/client_core_module.h>
-
+#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
-#include <core/resource/media_server_resource.h>
-
+#include <nx/vms/client/desktop/system_context.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace os
@@ -21,27 +20,18 @@ const nx::utils::OsInfo ubuntu18("linux_x64", "ubuntu", "18.04");
 const nx::utils::OsInfo windows("windows_x64");
 } // namespace os;
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::desktop::test {
 
 // virtual void SetUp() will be called before each test is run.
 void ClientUpdateTestEnvironment::SetUp()
 {
-    m_runtime.reset(new QnClientRuntimeSettings(QnStartupParameters()));
-    m_staticCommon.reset(new QnStaticCommonModule());
-    m_module.reset(new QnClientCoreModule(QnClientCoreModule::Mode::unitTests));
-    m_resourceRuntime.reset(new QnResourceRuntimeDataManager(m_module->commonModule()));
-    //m_accessController.reset(new QnWorkbenchAccessController(m_module->commonModule()));
+    m_resourceRuntime.reset(new QnResourceRuntimeDataManager(commonModule()));
 }
 
 // virtual void TearDown() will be called after each test is run.
 void ClientUpdateTestEnvironment::TearDown()
 {
-    //m_currentUser.clear();
-    //m_accessController.clear();
     m_resourceRuntime.clear();
-    m_module.clear();
-    m_staticCommon.reset();
-    m_runtime.clear();
 }
 
 ClientVerificationData ClientUpdateTestEnvironment::makeClientData(nx::utils::SoftwareVersion version)
@@ -88,14 +78,9 @@ void ClientUpdateTestEnvironment::removeAllServers()
     resourcePool()->removeResources(servers);
 }
 
-QnCommonModule* ClientUpdateTestEnvironment::commonModule() const
-{
-    return m_module->commonModule();
-}
-
 QnResourcePool* ClientUpdateTestEnvironment::resourcePool() const
 {
-    return commonModule()->resourcePool();
+    return systemContext()->resourcePool();
 }
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::desktop::test

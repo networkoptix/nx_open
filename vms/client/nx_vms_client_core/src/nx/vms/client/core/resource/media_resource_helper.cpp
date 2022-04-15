@@ -7,6 +7,7 @@
 #include <core/resource/resource_property_key.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/vms/client/core/system_context.h>
 #include <utils/common/connective.h>
 
 namespace nx::vms::client::core {
@@ -32,11 +33,16 @@ public:
     void handleResourceChanged();
 };
 
-MediaResourceHelper::MediaResourceHelper(QObject* parent):
-    base_type(parent),
+MediaResourceHelper::MediaResourceHelper(SystemContext* systemContext, QObject* parent):
+    base_type(systemContext, parent),
     d(new Private(this))
 {
-    connect(this, &ResourceHelper::resourceIdChanged, d, &Private::handleResourceChanged);
+}
+
+MediaResourceHelper::MediaResourceHelper():
+    base_type(),
+    d(new Private(this))
+{
 }
 
 MediaResourceHelper::~MediaResourceHelper()
@@ -143,6 +149,7 @@ MediaDewarpingParams MediaResourceHelper::fisheyeParams() const
 MediaResourceHelper::Private::Private(MediaResourceHelper* q):
     q(q)
 {
+    connect(q, &ResourceHelper::resourceIdChanged, this, &Private::handleResourceChanged);
 }
 
 void MediaResourceHelper::Private::handlePropertyChanged(

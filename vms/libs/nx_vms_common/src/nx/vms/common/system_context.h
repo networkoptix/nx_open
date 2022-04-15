@@ -8,16 +8,16 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
 
+#include "system_context_aware.h"  //< Forward declarations.
+
 class QnCameraHistoryPool;
 class QnCommonMessageProcessor;
 class QnGlobalPermissionsManager;
 class QnGlobalSettings;
 class QnLayoutTourManager;
 class QnLicensePool;
-class QnResourceAccessManager;
 class QnResourceAccessSubjectsCache;
 class QnResourceDataPool;
-class QnResourcePool;
 class QnResourcePropertyDictionary;
 class QnResourceStatusDictionary;
 class QnRouter;
@@ -46,8 +46,10 @@ class AbstractCertificateVerifier;
  * client-server connection. Also there can be separate Resource Context for the local files in the
  * Desktop Client. VMS Server has the only one Resource Context for it's own database connection.
  */
-class NX_VMS_COMMON_API SystemContext
+class NX_VMS_COMMON_API SystemContext: public QObject
 {
+    Q_OBJECT
+
 public:
     /**
      * @param peerId Id of the current peer in the Message Bus. It is persistent and is not changed
@@ -61,7 +63,8 @@ public:
     SystemContext(
         QnUuid peerId,
         QnUuid sessionId,
-        nx::core::access::Mode resourceAccessMode);
+        nx::core::access::Mode resourceAccessMode,
+        QObject* parent = nullptr);
     virtual ~SystemContext();
 
     /**

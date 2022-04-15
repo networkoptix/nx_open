@@ -7,14 +7,17 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/types/event_rule_types.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <plugins/resource/desktop_camera/desktop_resource_base.h>
 #include <ui/graphics/items/overlays/scrollable_text_items_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/graphics/items/resource/two_way_audio_widget.h>
 #include <ui/graphics/items/resource/software_trigger_button.h>
+#include <ui/graphics/items/resource/two_way_audio_widget.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
+#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 
 using ExtendedCameraOutput = nx::vms::api::ExtendedCameraOutput;
@@ -28,7 +31,8 @@ static constexpr int kTriggerButtonHeight = 40;
 } // namespace
 
 CameraButtonController::CameraButtonController(QnMediaResourceWidget* mediaResourceWidget):
-    base_type(mediaResourceWidget)
+    base_type(mediaResourceWidget),
+    WindowContextAware(mediaResourceWidget->windowContext())
 {
 }
 
@@ -97,7 +101,7 @@ void CameraButtonController::removeButtons()
 
 QnVirtualCameraResourcePtr CameraButtonController::getAudioOutputDevice() const
 {
-    const auto redirectedOutputCamera = resourcePool()
+    const auto redirectedOutputCamera = m_camera->resourcePool()
         ->getResourceById<QnVirtualCameraResource>(m_camera->audioOutputDeviceId());
     return redirectedOutputCamera.isNull() ? m_camera : redirectedOutputCamera;
 }
@@ -109,13 +113,17 @@ void CameraButtonController::createTwoAudioButton()
 
     if (!m_twoWayAudioWidget)
     {
+        auto systemContext = SystemContext::fromResource(m_camera);
         const QString desktopResourceUniqueId = QnDesktopResource::calculateUniqueId(
-            commonModule()->peerId(), context()->user()->getId());
+            systemContext->peerId(),
+            workbench()->context()->user()->getId());
         m_twoWayAudioWidget =
             new QnTwoWayAudioWidget(desktopResourceUniqueId, m_parentWidget);
         m_twoWayAudioWidget->setCamera(getAudioOutputDevice());
         m_twoWayAudioWidget->setFixedHeight(kTriggerButtonHeight);
-        context()->statisticsModule()->registerButton("two_way_audio", m_twoWayAudioWidget);
+        ApplicationContext::instance()->controlsStatisticsModule()->registerButton(
+            "two_way_audio",
+            m_twoWayAudioWidget);
 
         connect(m_twoWayAudioWidget, &QnTwoWayAudioWidget::pressed, this,
             [this]

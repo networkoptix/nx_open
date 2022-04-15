@@ -77,6 +77,7 @@
 #include <nx/vms/client/desktop/utils/webengine_profile_manager.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail.h>
 #include <nx/vms/client/desktop/workbench/timeline/timeline_globals.h>
+#include <nx/vms/common/system_context.h>
 #include <recording/time_period.h>
 #include <ui/common/notification_levels.h>
 #include <ui/common/weak_graphics_item_pointer.h>
@@ -101,12 +102,12 @@ QnResourcePtr stringToResource(const QString& s)
 {
     const QStringList files{s};
     const auto acceptedFiles = QnFileProcessor::findAcceptedFiles(files);
+    const auto resourcePool = qnClientCoreModule->resourcePool();
     if (acceptedFiles.empty())
     {
-        const auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
         return resourcePool->getResourceById(QnUuid::fromStringSafe(s));
     }
-    const auto resources = QnFileProcessor::createResourcesForFiles(acceptedFiles);
+    const auto resources = QnFileProcessor::createResourcesForFiles(acceptedFiles, resourcePool);
     if (resources.empty())
         return QnResourcePtr();
     return resources.front();
@@ -116,15 +117,15 @@ QnResourceList stringToResourceList(const QString& s)
 {
     const QStringList files{s};
     const auto acceptedFiles = QnFileProcessor::findAcceptedFiles(files);
+    const auto resourcePool = qnClientCoreModule->resourcePool();
     if (acceptedFiles.empty())
     {
-        const auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
         const auto resource = resourcePool->getResourceById(QnUuid::fromStringSafe(s));
         if (!resource)
             return {};
         return {resource};
     }
-    return QnFileProcessor::createResourcesForFiles(acceptedFiles);
+    return QnFileProcessor::createResourcesForFiles(acceptedFiles, resourcePool);
 }
 
 QString resourceListToString(const QnResourceList& list)

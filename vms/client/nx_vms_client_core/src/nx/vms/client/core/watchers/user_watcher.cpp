@@ -4,23 +4,23 @@
 
 #include <client/client_message_processor.h>
 #include <common/common_module.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <utils/common/checked_cast.h>
-
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/common/system_context.h>
+#include <utils/common/checked_cast.h>
 
 namespace {
 
-QnUserResourcePtr findUser(const QString& userName, QnCommonModule* commonModule)
+QnUserResourcePtr findUser(const QString& userName, nx::vms::common::SystemContext* systemContext)
 {
-    NX_ASSERT(commonModule);
-    if (!commonModule)
+    NX_ASSERT(systemContext);
+    if (!systemContext)
         return QnUserResourcePtr();
 
-    const auto users = commonModule->resourcePool()->getResources<QnUserResource>();
+    const auto users = systemContext->resourcePool()->getResources<QnUserResource>();
 
     for (const auto& user: users)
     {
@@ -39,7 +39,7 @@ UserWatcher::UserWatcher(QObject* parent) :
     base_type(parent)
 {
     const auto updateUserResource =
-        [this] { setUser(findUser(m_userName, commonModule())); };
+        [this] { setUser(findUser(m_userName, systemContext())); };
 
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived,
         this, updateUserResource);

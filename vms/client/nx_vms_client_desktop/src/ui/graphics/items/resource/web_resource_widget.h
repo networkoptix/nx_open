@@ -14,7 +14,10 @@ class QnWebResourceWidget: public QnResourceWidget
 
 public:
     QnWebResourceWidget(
-        QnWorkbenchContext* context, QnWorkbenchItem* item, QGraphicsItem *parent = nullptr);
+        nx::vms::client::desktop::SystemContext* systemContext,
+        nx::vms::client::desktop::WindowContext* windowContext,
+        QnWorkbenchItem* item,
+        QGraphicsItem *parent = nullptr);
     virtual ~QnWebResourceWidget();
 
     virtual bool eventFilter(QObject* object, QEvent* event) override;

@@ -33,11 +33,12 @@
 using namespace nx::vms::client::desktop;
 
 QnWebResourceWidget::QnWebResourceWidget(
-    QnWorkbenchContext* context,
+    SystemContext* systemContext,
+    WindowContext* windowContext,
     QnWorkbenchItem* item,
     QGraphicsItem* parent)
     :
-    base_type(context, item, parent),
+    base_type(systemContext, windowContext, item, parent),
     m_webEngineView(item->data(Qn::ItemWebPageSavedStateDataRole).isNull()
         ? new GraphicsWebEngineView(resource(), this)
         : new GraphicsWebEngineView({}, this)) //< Page will be loaded from saved state later.

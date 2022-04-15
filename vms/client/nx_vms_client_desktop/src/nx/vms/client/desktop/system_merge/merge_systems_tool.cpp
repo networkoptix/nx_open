@@ -2,7 +2,6 @@
 
 #include "merge_systems_tool.h"
 
-#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <network/system_helpers.h>
 #include <nx/branding.h>
@@ -13,6 +12,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/remote_connection_user_interaction_delegate.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/license/remote_licenses.h>
 #include <nx_ec/data/api_conversion_functions.h>
 

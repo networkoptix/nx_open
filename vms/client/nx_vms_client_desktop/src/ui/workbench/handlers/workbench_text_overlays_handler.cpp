@@ -95,7 +95,7 @@ QnWorkbenchTextOverlaysHandler::QnWorkbenchTextOverlaysHandler(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     d_ptr(new QnWorkbenchTextOverlaysHandlerPrivate(this)),
-    m_helper(new nx::vms::event::StringsHelper(commonModule()))
+    m_helper(new nx::vms::event::StringsHelper(systemContext()))
 {
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::businessActionReceived,
         this, &QnWorkbenchTextOverlaysHandler::at_eventActionReceived);

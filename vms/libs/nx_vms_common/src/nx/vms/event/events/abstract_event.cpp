@@ -2,23 +2,24 @@
 
 #include "abstract_event.h"
 
-#include "utils/common/synctime.h"
-#include "core/resource/resource.h"
 #include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/resource_access_manager.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/user_resource.h>
-#include <core/resource/camera_resource.h>
 #include <core/resource_access/resource_access_subject.h>
-#include <nx/vms/api/analytics/engine_manifest.h>
-#include <nx/vms/api/analytics/descriptors.h>
-#include <nx/analytics/taxonomy/abstract_state_watcher.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
 #include <nx/analytics/taxonomy/abstract_state.h>
-#include <nx/utils/std/algorithm.h>
+#include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/utils/qset.h>
+#include <nx/utils/std/algorithm.h>
+#include <nx/vms/api/analytics/descriptors.h>
+#include <nx/vms/api/analytics/engine_manifest.h>
+#include <nx/vms/common/system_context.h>
+#include <utils/common/synctime.h>
 
 using nx::analytics::taxonomy::AbstractState;
 using nx::analytics::taxonomy::AbstractEventType;
@@ -213,7 +214,7 @@ bool hasToggleState(
             return true;
 
         const std::shared_ptr<AbstractState> taxonomyState =
-            commonModule->analyticsTaxonomyState();
+            commonModule->systemContext()->analyticsTaxonomyState();
 
         if (!NX_ASSERT(taxonomyState))
             return false;

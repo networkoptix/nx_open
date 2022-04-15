@@ -4,18 +4,16 @@
 
 #include <QtCore/QSize>
 
-#include <utils/media/av_codec_helper.h>
-#include <common/common_module.h>
-
+#include <core/resource/camera_history.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/common/system_context.h>
+#include <utils/media/av_codec_helper.h>
 
-#include <core/resource/camera_resource.h>
-#include <core/resource/camera_history.h>
-#include <core/resource/media_server_resource.h>
-
-#include "video_decoder_registry.h"
 #include "media_player.h" //< For enum VideoQuality.
+#include "video_decoder_registry.h"
 
 namespace nx {
 namespace media {

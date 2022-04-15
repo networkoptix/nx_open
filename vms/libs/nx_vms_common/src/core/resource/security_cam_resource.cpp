@@ -4,7 +4,6 @@
 
 #include <api/global_settings.h>
 #include <api/model/api_ioport_data.h>
-#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_data.h>
 #include <core/resource/user_resource.h>
@@ -18,6 +17,7 @@
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/data/backup_settings.h>
+#include <nx/vms/common/system_context.h>
 #include <recording/time_period_list.h>
 #include <utils/camera/camera_bitrate_calculator.h>
 #include <utils/common/synctime.h>

@@ -308,7 +308,8 @@ void WebDownloader::startDownload()
             const QStringList files{m_fileInfo.absoluteFilePath()};
 
             const auto resources = QnFileProcessor::createResourcesForFiles(
-                QnFileProcessor::findAcceptedFiles(files));
+                QnFileProcessor::findAcceptedFiles(files),
+                resourcePool());
 
             if (resources.isEmpty())
                 return;

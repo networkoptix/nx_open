@@ -92,7 +92,7 @@ NotificationListModel::Private::Private(NotificationListModel* q):
     base_type(),
     QnWorkbenchContextAware(q),
     q(q),
-    m_helper(new vms::event::StringsHelper(commonModule()))
+    m_helper(new vms::event::StringsHelper(systemContext()))
 {
     const auto handler = context()->instance<QnWorkbenchNotificationsHandler>();
     connect(handler, &QnWorkbenchNotificationsHandler::cleared, q, &EventListModel::clear);

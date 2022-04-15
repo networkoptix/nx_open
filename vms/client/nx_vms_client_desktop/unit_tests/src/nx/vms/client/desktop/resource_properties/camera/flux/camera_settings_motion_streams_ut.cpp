@@ -4,9 +4,6 @@
 
 #include <gtest/gtest.h>
 
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
-#include <common/static_common_module.h>
 #include <core/resource/resource_property_key.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/impl_ptr.h>
@@ -16,6 +13,8 @@
 #include <nx/vms/client/desktop/resource_properties/camera/flux/camera_settings_dialog_store.h>
 #include <nx/vms/client/desktop/resource_properties/camera/utils/camera_settings_dialog_state_conversion_functions.h>
 #include <nx/vms/client/desktop/resource_properties/camera/watchers/camera_settings_remote_changes_watcher.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/test_support/test_context.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 
 namespace nx::vms::client::desktop {
@@ -64,7 +63,7 @@ MotionStreamIndex makeStreamIndex(StreamIndex index, bool isForced)
 
 using MotionType = nx::vms::api::MotionType;
 
-class CameraSettingsMotionStreamsTest: public testing::Test
+class CameraSettingsMotionStreamsTest: public ContextBasedTest
 {
 public:
     using State = CameraSettingsDialogState;
@@ -103,32 +102,17 @@ public:
         <= QnVirtualCameraResource::kMaximumMotionDetectionPixels);
 
 protected:
-    virtual void SetUp() override
-    {
-        m_staticCommonModule.reset(new QnStaticCommonModule());
-        m_clientCoreModule.reset(new QnClientCoreModule(QnClientCoreModule::Mode::unitTests));
-    }
-
-    virtual void TearDown() override
-    {
-        m_clientCoreModule.reset();
-        m_staticCommonModule.reset();
-    }
-
     CameraResourceStubPtr makeCamera(
         const QSize& primaryResolution = highResolution1,
         const QSize& secondaryResolution = lowResolution1)
     {
         CameraResourceStubPtr camera(
             new CameraResourceStub(primaryResolution, secondaryResolution));
-        m_clientCoreModule->commonModule()->resourcePool()->addResource(camera);
+        systemContext()->resourcePool()->addResource(camera);
         return camera;
     }
 
 private:
-    std::unique_ptr<QnStaticCommonModule> m_staticCommonModule;
-    std::unique_ptr<QnClientCoreModule> m_clientCoreModule;
-
     nx::utils::ImplPtr<Store> m_store;
     nx::utils::ImplPtr<CameraSettingsRemoteChangesWatcher> m_changesWatcher;
 };

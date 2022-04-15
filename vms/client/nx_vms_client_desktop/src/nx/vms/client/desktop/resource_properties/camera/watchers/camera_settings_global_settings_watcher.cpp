@@ -8,6 +8,7 @@
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/common/system_context.h>
 
 #include "../flux/camera_settings_dialog_store.h"
 
@@ -17,7 +18,7 @@ namespace {
 
 QnGlobalSettings* globalSettings()
 {
-    auto settings = qnClientCoreModule->commonModule()->globalSettings();
+    auto settings = qnClientCoreModule->commonModule()->systemContext()->globalSettings();
     NX_ASSERT(settings);
     return settings;
 }

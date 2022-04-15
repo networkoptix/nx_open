@@ -3,10 +3,9 @@
 #include "client_resource_processor.h"
 
 #include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 
 void QnClientResourceProcessor::processResources(const QnResourceList& resources)
 {
-    qnClientCoreModule->commonModule()->resourcePool()->addResources(resources);
+    qnClientCoreModule->resourcePool()->addResources(resources);
 }

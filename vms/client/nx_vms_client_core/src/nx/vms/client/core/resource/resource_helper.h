@@ -5,12 +5,11 @@
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/api/types/resource_types.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <utils/common/connective.h>
+#include <nx/vms/client/core/system_context_aware.h>
 
 namespace nx::vms::client::core {
 
-class ResourceHelper: public Connective<QObject>, public CommonModuleAware
+class ResourceHelper: public QObject, public SystemContextAware
 {
     Q_OBJECT
 
@@ -32,10 +31,9 @@ class ResourceHelper: public Connective<QObject>, public CommonModuleAware
 
     Q_PROPERTY(qint64 displayOffset READ displayOffset NOTIFY displayOffsetChanged)
 
-    using base_type = Connective<QObject>;
-
 public:
-    ResourceHelper(QObject* parent = nullptr);
+    ResourceHelper(SystemContext* systemContext, QObject* parent = nullptr);
+    ResourceHelper(); //< QML constructor.
 
     QnUuid resourceId() const;
     void setResourceId(const QnUuid& id);
@@ -72,10 +70,12 @@ signals:
     void resourceRemoved();
 
 private:
+    void initialize();
     QnResource* rawResource() const;
     void setRawResource(QnResource* value);
 
 private:
+    bool m_initialized = false;
     QnResourcePtr m_resource;
 };
 

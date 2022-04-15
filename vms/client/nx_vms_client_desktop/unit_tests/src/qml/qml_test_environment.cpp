@@ -2,10 +2,10 @@
 
 #include "qml_test_environment.h"
 
-#include <client_core/client_core_module.h>
 #include <client/client_meta_types.h>
-#include <common/static_common_module.h>
-
+#include <client_core/client_core_module.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/test_support/test_context.h>
 #include <nx/vms/utils/external_resources.h>
 
 using namespace nx::vms::utils;
@@ -21,8 +21,7 @@ static const QString kQmlRoot = ":/qml/";
 
 QmlTestEnvironment::QmlTestEnvironment(QObject* parent):
     QObject(parent),
-    m_staticCommonModule(new QnStaticCommonModule()),
-    m_clientCoreModule(new QnClientCoreModule(QnClientCoreModule::Mode::unitTests))
+    m_testContext(new Context())
 {
     engine()->setBaseUrl(QUrl(kQmlRoot));
     engine()->addImportPath(kQmlRoot);
@@ -37,7 +36,7 @@ QmlTestEnvironment::~QmlTestEnvironment()
 
 QQmlEngine* QmlTestEnvironment::engine() const
 {
-    return m_clientCoreModule->mainQmlEngine();
+    return m_testContext->clientCoreModule()->mainQmlEngine();
 }
 
 } // namespace test

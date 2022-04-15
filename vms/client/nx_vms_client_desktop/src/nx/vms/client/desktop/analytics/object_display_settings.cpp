@@ -46,18 +46,28 @@ public:
 
     void loadSettings()
     {
-        nx::reflect::json::deserialize(
-            qnSettings->detectedObjectDisplaySettings().toUtf8().data(), &settingsByObjectTypeId);
+        // Client settings are absent in unit tests.
+        if (auto settings = QnClientSettings::instance())
+        {
+            nx::reflect::json::deserialize(
+                settings->detectedObjectDisplaySettings().toUtf8().data(),
+                &settingsByObjectTypeId);
+        }
     }
 
     void saveSettings()
     {
-        qnSettings->setDetectedObjectDisplaySettings(
-            QString::fromStdString(nx::reflect::json::serialize(settingsByObjectTypeId)));
+        // Client settings are absent in unit tests.
+        if (auto settings = QnClientSettings::instance())
+        {
+            settings->setDetectedObjectDisplaySettings(
+                QString::fromStdString(nx::reflect::json::serialize(settingsByObjectTypeId)));
+        }
     }
 };
 
-ObjectDisplaySettings::ObjectDisplaySettings():
+ObjectDisplaySettings::ObjectDisplaySettings(QObject* parent):
+    QObject(parent),
     d(new Private())
 {
     d->loadSettings();

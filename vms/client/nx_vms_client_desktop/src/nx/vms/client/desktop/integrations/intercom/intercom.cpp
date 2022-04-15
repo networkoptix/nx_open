@@ -177,7 +177,7 @@ struct IntercomIntegration::Private: public QObject
             return;
 
         const nx::vms::event::RuleManager* localRuleManager =
-            qnClientCoreModule->commonModule()->eventRuleManager();
+            qnClientCoreModule->commonModule()->systemContext()->eventRuleManager();
         const nx::vms::event::RulePtr rule = localRuleManager->rule(kOpenLayoutRuleId);
 
         for (const auto& camera: newCameras)
@@ -267,7 +267,7 @@ struct IntercomIntegration::Private: public QObject
         const nx::vms::api::EventRuleDataList& rules) const
     {
         const nx::vms::event::RuleManager* localRuleManager =
-            qnClientCoreModule->commonModule()->eventRuleManager();
+            qnClientCoreModule->commonModule()->systemContext()->eventRuleManager();
 
         for (const auto& camera: cameras)
         {
@@ -344,7 +344,7 @@ void IntercomIntegration::connectionEstablished(
 {
     d->currentUser = currentUser;
 
-    const auto cameras = qnClientCoreModule->commonModule()->resourcePool()->getAllCameras();
+    const auto cameras = currentUser->resourcePool()->getAllCameras();
     d->tryCreateRules(cameras);
 }
 

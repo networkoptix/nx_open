@@ -15,7 +15,7 @@ namespace nx::vms::client::desktop::test {
 
 class TestTimer;
 
-class NX_VMS_CLIENT_DESKTOP_API TestTimerFactory: public AbstractTimerFactory
+class TestTimerFactory: public AbstractTimerFactory
 {
 public:
     using milliseconds = std::chrono::milliseconds;

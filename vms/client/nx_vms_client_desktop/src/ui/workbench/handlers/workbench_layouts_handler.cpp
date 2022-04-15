@@ -37,6 +37,7 @@
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
 #include <ui/dialogs/layout_name_dialog.h>

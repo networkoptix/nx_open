@@ -10,7 +10,7 @@
 #include <nx/vms/client/core/system_logon/certificate_warning.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/statistics/modules/certificate_statistics_module.h>
-#include <ui/workbench/workbench_context.h>
+#include <nx/vms/client/desktop/application_context.h>
 
 #include "server_certificate_viewer.h"
 
@@ -22,15 +22,14 @@ ServerCertificateError::ServerCertificateError(
     const nx::network::ssl::CertificateChain& certificates,
     QWidget* parent)
     :
-    base_type(parent),
-    QnWorkbenchContextAware(parent)
+    base_type(parent)
 {
     // Fill data.
     setIcon(QnMessageBox::Icon::Critical);
     setText(tr("Failed to connect to server"));
     setInformativeText(core::CertificateWarning::invalidCertificateError());
 
-    auto statistics = context()->instance<QnCertificateStatisticsModule>();
+    auto statistics = ApplicationContext::instance()->certificateStatisticsModule();
 
     // Init server certificate `link`
     auto link = new QLabel(common::html::localLink(tr("View certificate")));

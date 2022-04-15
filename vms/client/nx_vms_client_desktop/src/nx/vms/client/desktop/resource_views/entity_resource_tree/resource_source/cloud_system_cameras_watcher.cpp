@@ -4,6 +4,7 @@
 
 #include <api/server_rest_connection.h>
 #include <client_core/client_core_module.h>
+#include <finders/systems_finder.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/network/cloud_system_endpoint.h>
 #include <nx/vms/client/core/network/network_module.h>
@@ -57,23 +58,66 @@ bool CloudSystemCamerasWatcher::ensureConnection()
 
 void CloudSystemCamerasWatcher::updateCameras()
 {
-    m_connection->serverApi()->getCameras(
-        nx::utils::guarded(this,
-            [this](
-                bool success,
+    const bool isRestApiSupported =
+        (m_connection->moduleInformation().version >= nx::vms::api::SoftwareVersion("5.0.0.0"));
+
+    auto systemDescription = qnSystemsFinder->getSystem(m_systemId);
+    if (NX_ASSERT(systemDescription) && !systemDescription->isReachable())
+        return;
+
+    if (isRestApiSupported)
+    {
+        m_connection->serverApi()->getCameras(
+            nx::utils::guarded(this,
+                [this](
+                    bool success,
+                    ::rest::Handle requestId,
+                    ::rest::ServerConnection::Cameras result)
+                {
+                    if (!success)
+                        return;
+
+                    QSet<QString> cameras;
+                    for (const nx::vms::api::DeviceModel& data: result)
+                        cameras.insert(data.name);
+
+                    setCameras(cameras);
+                }),
+            this->thread());
+    }
+    else
+    {
+        auto callback =
+            [this](bool success,
                 ::rest::Handle requestId,
-                ::rest::ServerConnection::Cameras result)
+                QByteArray data,
+                nx::network::http::HttpHeaders /*headers*/)
             {
                 if (!success)
                     return;
 
-                QSet<QString> cameras;
-                for (const nx::vms::api::DeviceModel& data: result)
-                    cameras.insert(data.name);
+                const auto [cameras, result] =
+                    nx::reflect::json::deserialize<nx::vms::api::CameraDataExList>(data.toStdString());
 
-                setCameras(cameras);
-            }),
-        this->thread());
+                if (!NX_ASSERT(result,
+                    nx::format("Cannot deserialize resut: %1", data)))
+                {
+                    return;
+                }
+
+                QSet<QString> cameraNames;
+                for (const auto& data: cameras)
+                    cameraNames.insert(data.name);
+
+                setCameras(cameraNames);
+            };
+
+        m_connection->serverApi()->getRawResult(
+            "/ec2/getCamerasEx",
+            /*params*/ {},
+            nx::utils::guarded(this, callback),
+            this->thread());
+    }
 }
 
 void CloudSystemCamerasWatcher::timerEvent(QTimerEvent*)

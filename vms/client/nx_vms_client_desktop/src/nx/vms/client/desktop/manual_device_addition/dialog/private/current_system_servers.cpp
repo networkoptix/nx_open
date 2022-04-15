@@ -39,7 +39,7 @@ CurrentSystemServers::CurrentSystemServers(QObject* parent):
     base_type(parent),
     QnCommonModuleAware(parent)
 {
-    const auto pool = commonModule()->resourcePool();
+    const auto pool = resourcePool();
     connect(pool, &QnResourcePool::resourceAdded, this, &CurrentSystemServers::tryAddServer);
     connect(pool, &QnResourcePool::resourceRemoved, this, &CurrentSystemServers::tryRemoveServer);
 

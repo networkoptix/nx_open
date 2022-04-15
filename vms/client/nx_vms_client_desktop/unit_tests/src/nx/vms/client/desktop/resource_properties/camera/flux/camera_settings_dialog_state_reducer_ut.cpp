@@ -4,10 +4,6 @@
 
 #include <gtest/gtest.h>
 
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
-#include <common/common_module_aware.h>
-#include <common/static_common_module.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/resource_property_key.h>
 #include <core/resource_management/resource_pool.h>
@@ -15,6 +11,8 @@
 #include <nx/vms/client/desktop/resource_properties/camera/flux/camera_settings_dialog_state.h>
 #include <nx/vms/client/desktop/resource_properties/camera/flux/camera_settings_dialog_state_reducer.h>
 #include <nx/vms/client/desktop/resource_properties/camera/utils/camera_settings_dialog_state_conversion_functions.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/test_support/test_context.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 
 using namespace std::chrono;
@@ -78,28 +76,16 @@ void ensureScheduleFps(const CameraSettingsDialogState& state, int fps)
 
 } // namespace
 
-class CameraSettingsDialogStateReducerTest: public testing::Test
+class CameraSettingsDialogStateReducerTest: public ContextBasedTest
 {
 public:
     using State = CameraSettingsDialogState;
     using Reducer = CameraSettingsDialogStateReducer;
 
 protected:
-    virtual void SetUp() override
-    {
-        m_staticCommonModule.reset(new QnStaticCommonModule());
-        m_clientCoreModule.reset(new QnClientCoreModule(QnClientCoreModule::Mode::unitTests));
-    }
-
-    virtual void TearDown() override
-    {
-        m_clientCoreModule.reset();
-        m_staticCommonModule.reset();
-    }
-
     CameraResourceStubPtr createCamera() const
     {
-        const auto resourcePool = m_clientCoreModule->commonModule()->resourcePool();
+        const auto resourcePool = systemContext()->resourcePool();
         const auto camera = CameraResourceStubPtr(new CameraResourceStub());
         resourcePool->addResource(camera);
         return camera;
@@ -107,7 +93,7 @@ protected:
 
     CameraResourceStubPtr createNvrCamera() const
     {
-        const auto resourcePool = m_clientCoreModule->commonModule()->resourcePool();
+        const auto resourcePool = systemContext()->resourcePool();
         const auto camera = CameraResourceStubPtr(new CameraResourceStub());
         camera->markCameraAsNvr();
         resourcePool->addResource(camera);
@@ -123,10 +109,6 @@ protected:
         s.readOnly = false;
         return s;
     }
-
-private:
-    std::unique_ptr<QnStaticCommonModule> m_staticCommonModule;
-    std::unique_ptr<QnClientCoreModule> m_clientCoreModule;
 };
 
 TEST_F(CameraSettingsDialogStateReducerTest, recordingDaysBasicChecks)

@@ -2,14 +2,15 @@
 
 #pragma once
 
-#include <QtCore/QObject>
 #include <QtCore/QList>
+#include <QtCore/QObject>
 
 #include <common/common_globals.h>
 #include <common/common_module_aware.h>
 #include <core/resource/client_resource_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/common/system_context_aware.h>
 #include <utils/common/connective.h>
 
 class QnWorkbenchContext;
@@ -37,14 +38,16 @@ private:
  */
 class NX_VMS_CLIENT_DESKTOP_API QnWorkbenchAccessController:
     public Connective<QObject>,
-    public QnCommonModuleAware
+    public nx::vms::common::SystemContextAware
 {
     Q_OBJECT
 
     typedef Connective<QObject> base_type;
 
 public:
-    QnWorkbenchAccessController(QnCommonModule* commonModule, QObject* parent = nullptr);
+    QnWorkbenchAccessController(
+        nx::vms::common::SystemContext* systemContext,
+        QObject* parent = nullptr);
     virtual ~QnWorkbenchAccessController();
 
     QnUserResourcePtr user() const;

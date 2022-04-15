@@ -15,7 +15,7 @@ class ObjectDisplaySettings: public QObject
     Q_OBJECT
 
 public:
-    ObjectDisplaySettings();
+    ObjectDisplaySettings(QObject* parent = nullptr);
     virtual ~ObjectDisplaySettings() override;
 
     QColor objectColor(const QString& objectTypeId);

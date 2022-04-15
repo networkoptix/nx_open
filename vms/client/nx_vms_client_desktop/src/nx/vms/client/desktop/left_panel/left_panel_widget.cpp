@@ -78,7 +78,7 @@ LeftPanelWidget::LeftPanelWidget(QnWorkbenchContext* context, QWidget* parent):
     setAttribute(Qt::WA_TranslucentBackground);
 
     rootContext()->setContextProperty(
-        QnWorkbenchContextAware::kQmlContextPropertyName, this->context());
+        QnWorkbenchContextAware::kQmlWorkbenchContextPropertyName, this->context());
 
     rootContext()->setContextProperty("maxTextureSize",
         QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE));

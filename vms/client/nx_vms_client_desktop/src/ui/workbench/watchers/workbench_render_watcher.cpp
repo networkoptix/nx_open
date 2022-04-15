@@ -11,9 +11,14 @@
 #include <utils/common/checked_cast.h>
 #include <utils/common/event_processors.h>
 
-QnWorkbenchRenderWatcher::QnWorkbenchRenderWatcher(QObject *parent):
+using namespace nx::vms::client::desktop;
+
+QnWorkbenchRenderWatcher::QnWorkbenchRenderWatcher(
+    WindowContext* windowContext,
+    QObject* parent)
+    :
     QObject(parent),
-    QnWorkbenchContextAware(parent)
+    WindowContextAware(windowContext)
 {
     /* Connect to display. */
     connect(display(), &QnWorkbenchDisplay::widgetAdded, this,

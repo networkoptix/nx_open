@@ -2,12 +2,10 @@
 
 #include <gtest/gtest.h>
 
-#include <common/common_module.h>
-#include <common/static_common_module.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/core/access/access_types.h>
-#include <nx/vms/common/test_support/resource/resource_pool_test_helper.h>
+#include <nx/vms/common/test_support/test_context.h>
 #include <nx/vms/license/usage_helper.h>
 
 #include "license_pool_scaffold.h"
@@ -15,32 +13,24 @@
 
 namespace nx::vms::license::test {
 
-class QnVideowallLicenseUsageHelperTest: public testing::Test, protected QnResourcePoolTestHelper
+class QnVideowallLicenseUsageHelperTest: public nx::vms::common::test::ContextBasedTest
 {
 protected:
 
     // virtual void SetUp() will be called before each test is run.
     virtual void SetUp()
     {
-        m_staticCommon = std::make_unique<QnStaticCommonModule>();
-        m_module = std::make_unique<QnCommonModule>(
-            /*clientMode*/ false,
-            nx::core::access::Mode::direct);
-        initializeContext(m_module.get());
-
         m_licenses.reset(new QnLicensePoolScaffold(licensePool()));
-        m_helper.reset(new VideoWallLicenseUsageHelper(commonModule()));
-        m_helper->setCustomValidator(std::make_unique<QLicenseStubValidator>(commonModule()));
+        m_helper.reset(new VideoWallLicenseUsageHelper(systemContext()));
+        m_helper->setCustomValidator(
+            std::make_unique<QLicenseStubValidator>(systemContext()));
     }
 
     // virtual void TearDown() will be called after each test is run.
     virtual void TearDown()
     {
-        deinitializeContext();
         m_helper.reset();
         m_licenses.reset();
-        m_module.reset();
-        m_staticCommon.reset();
     }
 
     void addLicense()
@@ -77,8 +67,6 @@ protected:
     }
 
     // Declares the variables your tests want to use.
-    std::unique_ptr<QnStaticCommonModule> m_staticCommon;
-    std::unique_ptr<QnCommonModule> m_module;
     QScopedPointer<QnLicensePoolScaffold> m_licenses;
     QScopedPointer<VideoWallLicenseUsageHelper> m_helper;
 };

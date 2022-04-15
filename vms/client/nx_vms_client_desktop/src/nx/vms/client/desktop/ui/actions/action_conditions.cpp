@@ -2184,7 +2184,7 @@ ConditionWrapper allowedToShowServersInResourceTree()
         [](const Parameters&, QnWorkbenchContext* context)
         {
             return context->accessController()->hasGlobalPermission(GlobalPermission::admin)
-                || context->commonModule()->globalSettings()->showServersInTreeForNonAdmins();
+                || context->globalSettings()->showServersInTreeForNonAdmins();
         });
 }
 

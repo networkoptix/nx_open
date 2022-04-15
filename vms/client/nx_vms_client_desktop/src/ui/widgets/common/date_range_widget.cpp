@@ -12,9 +12,13 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/current_date_monitor.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/workbench/workbench_context.h>
+
+using namespace nx::vms::client::desktop;
 
 namespace {
 
@@ -147,6 +151,8 @@ QDateTime QnDateRangeWidget::actualDateTime(const QDate& userDate) const
 
 QDate QnDateRangeWidget::displayDate(qint64 timestampMs) const
 {
-    const auto timeWatcher = context()->instance<nx::vms::client::core::ServerTimeWatcher>();
+    // TODO: #sivanov Actualize used system context.
+    const auto timeWatcher = ApplicationContext::instance()->currentSystemContext()
+        ->serverTimeWatcher();
     return timeWatcher->displayTime(timestampMs).date();
 }

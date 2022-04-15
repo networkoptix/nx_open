@@ -26,9 +26,9 @@ QnSharedResourcesManager::QnSharedResourcesManager(
     m_mutex(nx::Mutex::NonRecursive),
     m_sharedResources()
 {
-    connect(m_context->resourcePool(), &QnResourcePool::resourceAdded, this,
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         &QnSharedResourcesManager::handleResourceAdded);
-    connect(m_context->resourcePool(), &QnResourcePool::resourceRemoved, this,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         &QnSharedResourcesManager::handleResourceRemoved);
 
     connect(m_context->userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,

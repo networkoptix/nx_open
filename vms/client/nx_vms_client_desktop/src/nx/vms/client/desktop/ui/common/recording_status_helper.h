@@ -5,14 +5,14 @@
 #include <QtCore/QObject>
 #include <QtGui/QIcon>
 
-#include <nx/utils/uuid.h>
 #include <core/resource/resource_fwd.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/api/types/resource_types.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
-class RecordingStatusHelper: public QObject, public QnWorkbenchContextAware
+class RecordingStatusHelper: public QObject, public SystemContextAware
 {
     Q_OBJECT
     Q_PROPERTY(QnUuid cameraId READ cameraId WRITE setCameraId NOTIFY cameraIdChanged)
@@ -21,7 +21,8 @@ class RecordingStatusHelper: public QObject, public QnWorkbenchContextAware
     Q_PROPERTY(QString qmlIconName READ qmlIconName NOTIFY recordingModeChanged)
 
 public:
-    RecordingStatusHelper(QObject* parent = nullptr);
+    RecordingStatusHelper(SystemContext* systemContext, QObject* parent = nullptr);
+    RecordingStatusHelper(); //< QML constructor.
 
     QnUuid cameraId() const;
     void setCameraId(const QnUuid& id);
@@ -59,12 +60,14 @@ signals:
     void recordingModeChanged();
 
 private:
+    void initialize();
     void updateRecordingMode();
 
 protected:
     virtual void timerEvent(QTimerEvent* event) override;
 
 private:
+    bool m_initialized = false;
     nx::vms::api::RecordingType m_recordingType = nx::vms::api::RecordingType::never;
     nx::vms::api::RecordingMetadataTypes m_metadataTypes = nx::vms::api::RecordingMetadataType::none;
 

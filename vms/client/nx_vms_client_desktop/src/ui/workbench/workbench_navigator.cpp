@@ -14,8 +14,7 @@
 #include <QtWidgets/QGraphicsSceneContextMenuEvent>
 #include <QtWidgets/QMenu>
 
-extern "C"
-{
+extern "C" {
 #include <libavutil/avutil.h> // TODO: remove
 }
 
@@ -47,9 +46,12 @@ extern "C"
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail_loading_manager.h>
 #include <server/server_storage_manager.h>
 #include <ui/animation/variant_animator.h>
@@ -128,7 +130,6 @@ QnArchiveStreamReader* getReader(QnResourceWidget* widget)
 QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_streamSynchronizer(context()->instance<QnWorkbenchStreamSynchronizer>()),
     m_lastSpeedRange(0.0, 0.0),
     m_startSelectionAction(new QAction(this)),
     m_endSelectionAction(new QAction(this)),
@@ -494,7 +495,9 @@ void QnWorkbenchNavigator::initialize()
 
     connect(m_dayTimeWidget, SIGNAL(timeClicked(const QTime &)), this, SLOT(at_dayTimeWidget_timeClicked(const QTime &)));
 
-    const auto timeWatcher = context()->instance<nx::vms::client::core::ServerTimeWatcher>();
+    // TODO: #sivanov Actualize used system context.
+    const auto timeWatcher = ApplicationContext::instance()->currentSystemContext()
+        ->serverTimeWatcher();
     connect(timeWatcher, &nx::vms::client::core::ServerTimeWatcher::displayOffsetsChanged,
         this, &QnWorkbenchNavigator::updateLocalOffset);
 
@@ -532,7 +535,9 @@ void QnWorkbenchNavigator::deinitialize()
 
     m_calendar->disconnect(this);
 
-    const auto timeWatcher = context()->instance<nx::vms::client::core::ServerTimeWatcher>();
+    // TODO: #sivanov Actualize used system context.
+    const auto timeWatcher = ApplicationContext::instance()->currentSystemContext()
+        ->serverTimeWatcher();
     timeWatcher->disconnect(this);
     qnSettings->notifier(QnClientSettings::TIME_MODE)->disconnect(this);
 
@@ -1192,7 +1197,8 @@ void QnWorkbenchNavigator::updateCurrentWidget()
         if (m_timeSlider)
             m_timeSlider->setThumbnailLoadingManager(nullptr);
 
-        if (m_streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods))
+        const auto streamSynchronizer = workbench()->windowContext()->streamSynchronizer();
+        if (streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods))
         {
             // TODO: #sivanov Should it be done at every selection change?
             for (auto widget: m_syncedWidgets)
@@ -1303,9 +1309,9 @@ void QnWorkbenchNavigator::updateCurrentWidget()
 
 void QnWorkbenchNavigator::updateLocalOffset()
 {
-    const auto timeWatcher = context()->instance<nx::vms::client::core::ServerTimeWatcher>();
     qint64 localOffset = m_currentMediaWidget
-        ? timeWatcher->displayOffset(m_currentMediaWidget->resource())
+        ? m_currentMediaWidget->systemContext()->serverTimeWatcher()->displayOffset(
+            m_currentMediaWidget->resource())
         : 0;
 
     if (m_timeSlider)
@@ -1473,7 +1479,8 @@ bool QnWorkbenchNavigator::isTimelineCatchingUp() const
 
 bool QnWorkbenchNavigator::isCurrentWidgetSynced() const
 {
-    return m_streamSynchronizer->isRunning() && m_currentWidgetFlags.testFlag(WidgetSupportsSync);
+    const auto streamSynchronizer = workbench()->windowContext()->streamSynchronizer();
+    return streamSynchronizer->isRunning() && m_currentWidgetFlags.testFlag(WidgetSupportsSync);
 }
 
 void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
@@ -1614,9 +1621,10 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
             if (mediaWidget->display()->camDisplay()->isRealTimeSource())
                 return DATETIME_NOW;
 
+            const auto streamSynchronizer = workbench()->windowContext()->streamSynchronizer();
             qint64 timeUSec;
             if (isCurrentWidgetSynced())
-                timeUSec = m_streamSynchronizer->state().timeUs; // Fetch "current" time instead of "displayed"
+                timeUSec = streamSynchronizer->state().timeUs; // Fetch "current" time instead of "displayed"
             else
                 timeUSec = mediaWidget->display()->camDisplay()->getExternalTime();
 
@@ -1719,7 +1727,8 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
         if (timeUSec >= 0)
             updateLive();
 
-        const bool syncSupportedButDisabled = !m_streamSynchronizer->isRunning()
+        const auto streamSynchronizer = workbench()->windowContext()->streamSynchronizer();
+        const bool syncSupportedButDisabled = !streamSynchronizer->isRunning()
             && m_currentWidgetFlags.testFlag(WidgetSupportsSync);
 
         if (isSearch || syncSupportedButDisabled)
@@ -2120,7 +2129,7 @@ void QnWorkbenchNavigator::updateSyncIsForced()
 
     m_syncIsForced = syncIsForced;
 
-    const auto streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+    const auto streamSynchronizer = workbench()->windowContext()->streamSynchronizer();
     if (syncIsForced && !streamSynchronizer->isRunning())
     {
         if (m_currentWidgetFlags.testFlag(WidgetSupportsSync))
@@ -2450,7 +2459,7 @@ void QnWorkbenchNavigator::reopenPlaybackConnection(const QnVirtualCameraResourc
                 [=]
                 {
                     QObject::disconnect(*pauseSignalConnection);
-                    
+
                     reader->reopen();
                     reader->resume();
                 },
@@ -2569,7 +2578,8 @@ void QnWorkbenchNavigator::at_timeSlider_thumbnailClicked()
 
 void QnWorkbenchNavigator::syncIfOutOfSyncWithLive(QnResourceWidget *widget)
 {
-    if (!m_streamSynchronizer->isRunning())
+    const auto streamSynchronizer = workbench()->windowContext()->streamSynchronizer();
+    if (!streamSynchronizer->isRunning())
         return;
 
     if (!widget->resource()->flags().testFlag(Qn::sync))
@@ -2584,7 +2594,7 @@ void QnWorkbenchNavigator::syncIfOutOfSyncWithLive(QnResourceWidget *widget)
         return;
 
     const bool outOfSync = reader->isRealTimeSource() &&
-        m_streamSynchronizer->state().timeUs != DATETIME_NOW;
+        streamSynchronizer->state().timeUs != DATETIME_NOW;
 
     if (!outOfSync)
         return;

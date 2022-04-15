@@ -17,6 +17,7 @@
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
+#include <nx/vms/common/test_support/test_context.h>
 
 namespace {
 
@@ -41,7 +42,7 @@ void PrintTo(const RadassMode& val, ::std::ostream* os)
 }
 
 class RadassResourceManagerTest:
-    public ::testing::Test,
+    public nx::vms::common::test::ContextBasedTest,
     public nx::utils::test::TestWithTemporaryDirectory
 {
 protected:
@@ -50,8 +51,6 @@ protected:
     {
         QDir(testDataDir()).removeRecursively();
 
-        m_staticCommon.reset(new QnStaticCommonModule());
-        m_module.reset(new QnCommonModule(false, nx::core::access::Mode::direct));
         m_manager.reset(new RadassResourceManager());
         m_manager->setCacheDirectory(testDataDir());
         m_layout.reset(new QnLayoutResource());
@@ -64,8 +63,6 @@ protected:
     {
         m_layout.reset();
         m_manager.reset();
-        m_module.reset();
-        m_staticCommon.reset();
 
         QDir(testDataDir()).removeRecursively();
     }
@@ -104,14 +101,9 @@ protected:
         return QnLayoutItemIndex(m_layout, item.uuid);
     }
 
-    QnCommonModule* commonModule() const { return m_module.data(); }
-    QnResourcePool* resourcePool() const { return commonModule()->resourcePool(); }
     RadassResourceManager* manager() const { return m_manager.data(); }
     QnLayoutResourcePtr layout() const { return m_layout; }
 
-    // Declares the variables your tests want to use.
-    QScopedPointer<QnStaticCommonModule> m_staticCommon;
-    QScopedPointer<QnCommonModule> m_module;
     QScopedPointer<RadassResourceManager> m_manager;
     QnLayoutResourcePtr m_layout;
 };

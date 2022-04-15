@@ -20,7 +20,7 @@ class CachedSharedLayoutItemAccessProviderTest: public CachedBaseAccessProviderT
 protected:
     virtual AbstractResourceAccessProvider* createAccessProvider() const override
     {
-        return new SharedLayoutItemAccessProvider(Mode::cached, commonModule());
+        return new SharedLayoutItemAccessProvider(Mode::cached, systemContext());
     }
 };
 

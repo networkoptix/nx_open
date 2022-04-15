@@ -48,7 +48,6 @@ typedef QSharedPointer<QnCachingCameraDataLoader> QnCachingCameraDataLoaderPtr;
 class QnCameraDataManager;
 class QnCalendarWidget;
 class QnDayTimeWidget;
-class QnWorkbenchStreamSynchronizer;
 class QnSearchQueryStrategy;
 class VariantAnimator;
 
@@ -315,7 +314,6 @@ private:
     void setTimeSliderWindowFromCalendar(milliseconds startMSec, milliseconds endMSec, bool extend);
 
 private:
-    QPointer<QnWorkbenchStreamSynchronizer> m_streamSynchronizer;
     QElapsedTimer m_updateSliderTimer;
     QPointer<QnTimeSlider> m_timeSlider;
     QPointer<QnTimeScrollBar> m_timeScrollBar;

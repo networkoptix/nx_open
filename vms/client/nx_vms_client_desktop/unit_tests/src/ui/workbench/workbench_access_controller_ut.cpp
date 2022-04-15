@@ -2,58 +2,49 @@
 
 #include <gtest/gtest.h>
 
-#include <common/common_module.h>
-#include <common/static_common_module.h>
-
 #include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>
 #include <client_core/client_core_module.h>
-
+#include <common/common_module.h>
+#include <common/static_common_module.h>
+#include <core/resource/file_layout_resource.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource/user_resource.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
-#include <core/resource/layout_resource.h>
-#include <core/resource/file_layout_resource.h>
-#include <core/resource/user_resource.h>
-#include <core/resource_access/resource_access_subject.h>
-#include <core/resource_access/resource_access_manager.h>
-
+#include <nx/fusion/model_functions.h>
+#include <nx/vms/client/desktop/test_support/test_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
-
-#include <nx/fusion/model_functions.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 namespace {
 const QString userName1 = QStringLiteral("unit_test_user_1");
 const QString userName2 = QStringLiteral("unit_test_user_2");
 }
 
-class QnWorkbenchAccessControllerTest: public testing::Test
+namespace nx::vms::client::desktop::test {
+
+class WorkbenchAccessControllerTest: public ContextBasedTest
 {
 protected:
 
     // virtual void SetUp() will be called before each test is run.
     virtual void SetUp()
     {
-        m_runtime.reset(new QnClientRuntimeSettings(QnStartupParameters()));
-        m_staticCommon.reset(new QnStaticCommonModule());
-        m_module.reset(new QnClientCoreModule(QnClientCoreModule::Mode::unitTests));
-        m_resourceRuntime.reset(new QnResourceRuntimeDataManager(m_module->commonModule()));
-        m_accessController.reset(new QnWorkbenchAccessController(m_module->commonModule()));
+        m_resourceRuntime.reset(new QnResourceRuntimeDataManager(commonModule()));
     }
 
     // virtual void TearDown() will be called after each test is run.
     virtual void TearDown()
     {
         m_currentUser.clear();
-        m_accessController.clear();
         m_resourceRuntime.clear();
-        m_module.clear();
-        m_staticCommon.reset();
-        m_runtime.clear();
     }
 
-    QnCommonModule* commonModule() const { return m_module->commonModule(); }
-    QnResourcePool* resourcePool() const { return commonModule()->resourcePool(); }
+    QnResourcePool* resourcePool() const { return systemContext()->resourcePool(); }
 
     QnUserResourcePtr addUser(
         const QString &name, GlobalPermissions globalPermissions,
@@ -92,7 +83,7 @@ protected:
     {
         resourcePool()->removeResources(resourcePool()->getResourcesWithFlag(Qn::remote));
         m_currentUser.clear();
-        m_accessController->setUser(m_currentUser);
+        systemContext()->accessController()->setUser(m_currentUser);
     }
 
     void loginAsOwner()
@@ -101,7 +92,7 @@ protected:
         auto user = addUser(userName1, {});
         user->setOwner(true);
         m_currentUser = user;
-        m_accessController->setUser(m_currentUser);
+        systemContext()->accessController()->setUser(m_currentUser);
     }
 
     void loginAs(
@@ -112,27 +103,22 @@ protected:
         auto user = addUser(userName1, globalPermissions, userType);
         ASSERT_FALSE(user->isOwner());
         m_currentUser = user;
-        m_accessController->setUser(m_currentUser);
+        systemContext()->accessController()->setUser(m_currentUser);
     }
 
     void checkPermissions(const QnResourcePtr &resource, Qn::Permissions desired, Qn::Permissions forbidden) const
     {
-        Qn::Permissions actual = m_accessController->permissions(resource);
+        Qn::Permissions actual = systemContext()->accessController()->permissions(resource);
         ASSERT_EQ(desired, actual);
         ASSERT_EQ(forbidden & actual, 0);
     }
 
     void checkForbiddenPermissions(const QnResourcePtr &resource, Qn::Permissions forbidden) const
     {
-        Qn::Permissions actual = m_accessController->permissions(resource);
+        Qn::Permissions actual = systemContext()->accessController()->permissions(resource);
         ASSERT_EQ(forbidden & actual, 0);
     }
 
-    // Declares the variables your tests want to use.
-    QScopedPointer<QnStaticCommonModule> m_staticCommon;
-    QSharedPointer<QnClientCoreModule> m_module;
-    QSharedPointer<QnWorkbenchAccessController> m_accessController;
-    QSharedPointer<QnClientRuntimeSettings> m_runtime;
     QSharedPointer<QnResourceRuntimeDataManager> m_resourceRuntime;
     QnUserResourcePtr m_currentUser;
 };
@@ -142,7 +128,7 @@ protected:
 /************************************************************************/
 
 /** Fix permissions for exported layouts (files). */
-TEST_F(QnWorkbenchAccessControllerTest, checkExportedLayouts)
+TEST_F(WorkbenchAccessControllerTest, checkExportedLayouts)
 {
     auto layout = createLayout(Qn::exported_layout);
     layout->setUrl("path/to/file");
@@ -166,7 +152,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkExportedLayouts)
 }
 
 /** Fix permissions for exported layouts (files). */
-TEST_F(QnWorkbenchAccessControllerTest, checkEncryptedExportedLayouts)
+TEST_F(WorkbenchAccessControllerTest, checkEncryptedExportedLayouts)
 {
     auto layout = createLayout(Qn::exported_layout);
     layout->setUrl("path/to/file");
@@ -187,7 +173,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkEncryptedExportedLayouts)
 }
 
 /** Fix permissions for locked exported layouts (files). */
-TEST_F(QnWorkbenchAccessControllerTest, checkExportedLayoutsLocked)
+TEST_F(WorkbenchAccessControllerTest, checkExportedLayoutsLocked)
 {
     auto layout = createLayout(Qn::exported_layout, true);
     layout->setUrl("path/to/file");
@@ -213,7 +199,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkExportedLayoutsLocked)
 /************************************************************************/
 
 /** Check permissions for layouts when the user is not logged in. */
-TEST_F(QnWorkbenchAccessControllerTest, checkLocalLayoutsUnlogged)
+TEST_F(WorkbenchAccessControllerTest, checkLocalLayoutsUnlogged)
 {
     auto layout = createLayout(Qn::local);
     resourcePool()->addResource(layout);
@@ -232,7 +218,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkLocalLayoutsUnlogged)
 /************************************************************************/
 
 /** Check permissions for unsaved layouts when the user is logged in. */
-TEST_F(QnWorkbenchAccessControllerTest, checkLocalLayoutsLoggedIn)
+TEST_F(WorkbenchAccessControllerTest, checkLocalLayoutsLoggedIn)
 {
     loginAs(GlobalPermission::liveViewerPermissions);
 
@@ -251,7 +237,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkLocalLayoutsLoggedIn)
 }
 
 /** Check permissions for locked unsaved layouts when the user is logged in. */
-TEST_F(QnWorkbenchAccessControllerTest, checkLockedLocalLayoutsLoggedIn)
+TEST_F(WorkbenchAccessControllerTest, checkLockedLocalLayoutsLoggedIn)
 {
     loginAs(GlobalPermission::liveViewerPermissions);
 
@@ -271,7 +257,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkLockedLocalLayoutsLoggedIn)
 }
 
 /** Check Qn::WriteDigestPermission permission for a new cloud user (should be missing). */
-TEST_F(QnWorkbenchAccessControllerTest, checkPermissionForNewCloudUser)
+TEST_F(WorkbenchAccessControllerTest, checkPermissionForNewCloudUser)
 {
     loginAs(GlobalPermission::adminPermissions);
 
@@ -280,3 +266,5 @@ TEST_F(QnWorkbenchAccessControllerTest, checkPermissionForNewCloudUser)
 
     checkForbiddenPermissions(newCloudUser, Qn::WriteDigestPermission);
 }
+
+} // namespace nx::vms::client::desktop::test

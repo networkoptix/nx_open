@@ -4,20 +4,20 @@
 
 #include <QtCore/QVariant>
 
-#include <common/common_module.h>
-#include <core/resource/resource.h>
-#include <core/resource/user_resource.h>
-#include <core/resource/layout_resource.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/camera_history.h>
-#include <core/resource/resource_display_info.h>
-#include <core/resource_access/resource_access_subject.h>
-#include <core/resource_access/global_permissions_manager.h>
-#include <ui/help/help_topics.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <client/client_globals.h>
+#include <core/resource/camera_history.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource/resource.h>
+#include <core/resource/resource_display_info.h>
+#include <core/resource/user_resource.h>
+#include <core/resource_access/global_permissions_manager.h>
+#include <core/resource_access/resource_access_subject.h>
 #include <nx/vms/client/desktop/resource_views/data/camera_extra_status.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
+#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/common/system_context.h>
+#include <ui/help/help_topics.h>
 
 namespace {
 

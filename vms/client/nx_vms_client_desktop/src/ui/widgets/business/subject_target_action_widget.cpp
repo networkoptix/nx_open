@@ -20,7 +20,7 @@ using namespace nx::vms::client::desktop::ui;
 
 QnSubjectTargetActionWidget::QnSubjectTargetActionWidget(QWidget* parent):
     base_type(parent),
-    m_helper(new vms::event::StringsHelper(commonModule()))
+    m_helper(new vms::event::StringsHelper(systemContext()))
 {
 }
 

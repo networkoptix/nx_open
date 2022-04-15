@@ -25,6 +25,7 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/vms/api/protocol_version.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/discovery/manager.h>
 #include <nx/vms/utils/installation_info.h>
 #include <nx_ec/abstract_ec_connection.h>
@@ -38,6 +39,7 @@ using namespace nx::vms::common;
 
 struct QnCommonModule::Private
 {
+    QPointer<nx::vms::common::SystemContext> systemContext;
     AbstractCertificateVerifier* certificateVerifier = nullptr;
     std::unique_ptr<nx::vms::discovery::Manager> moduleDiscoveryManager;
     std::unique_ptr<QnRouter> router;
@@ -48,20 +50,16 @@ struct QnCommonModule::Private
 
 QnCommonModule::QnCommonModule(
     bool clientMode,
-    core::access::Mode resourceAccessMode,
-    QnUuid peerId,
+    nx::vms::common::SystemContext* systemContext,
     QObject* parent)
     :
     QObject(parent),
-    nx::vms::common::SystemContext(
-        /*peerId*/ std::move(peerId),
-        /*sessionId*/ QnUuid::createUuid(),
-        resourceAccessMode),
     d(new Private),
     m_type(clientMode
         ? nx::vms::api::ModuleInformation::clientId()
         : nx::vms::api::ModuleInformation::mediaServerId())
 {
+    d->systemContext = systemContext;
     QnCommonMetaTypes::initialize();
 
     QnFfmpegHelper::registerLogCallback();
@@ -80,23 +78,28 @@ QnCommonModule::QnCommonModule(
     else
     {
         nx::vms::discovery::Manager::ServerModeInfo serverModeInfo{
-            .peerId = this->peerId(),
-            .sessionId = this->sessionId(),
+            .peerId = systemContext->peerId(),
+            .sessionId = systemContext->sessionId(),
             .multicastDiscoveryAllowed = true
         };
         d->moduleDiscoveryManager = std::make_unique<nx::vms::discovery::Manager>(serverModeInfo);
     }
 
-    d->moduleDiscoveryManager->monitorServerUrls(resourcePool());
+    d->moduleDiscoveryManager->monitorServerUrls(systemContext->resourcePool());
 
     d->router = std::make_unique<QnRouter>(d->moduleDiscoveryManager.get());
 
-    initNetworking(d->router.get(), d->certificateVerifier);
+    systemContext->initNetworking(d->router.get(), d->certificateVerifier);
 
     /* Init members. */
     m_startupTime = QDateTime::currentDateTime();
 
     m_engineVersion = nx::vms::api::SoftwareVersion(nx::build_info::vmsVersion());
+}
+
+nx::vms::common::SystemContext* QnCommonModule::systemContext() const
+{
+    return d->systemContext.data();
 }
 
 QnRouter* QnCommonModule::router() const
@@ -139,18 +142,19 @@ nx::vms::api::ModuleInformation QnCommonModule::moduleInformation() const
     moduleInformation.cloudHost = nx::network::SocketGlobals::cloud().cloudHost().c_str();
     moduleInformation.realm = nx::network::AppInfo::realm().c_str();
 
-    moduleInformation.systemName = globalSettings()->systemName();
-    moduleInformation.localSystemId = globalSettings()->localSystemId();
-    moduleInformation.cloudSystemId = globalSettings()->cloudSystemId();
+    moduleInformation.systemName = d->systemContext->globalSettings()->systemName();
+    moduleInformation.localSystemId = d->systemContext->globalSettings()->localSystemId();
+    moduleInformation.cloudSystemId = d->systemContext->globalSettings()->cloudSystemId();
 
     moduleInformation.type = m_type;
-    moduleInformation.id = peerId();
-    moduleInformation.runtimeId = sessionId();
+    moduleInformation.id = d->systemContext->peerId();
+    moduleInformation.runtimeId = d->systemContext->sessionId();
     moduleInformation.version = m_engineVersion;
 
     // This code is executed only on the server side.
-    NX_ASSERT(!peerId().isNull());
-    if (auto server = resourcePool()->getResourceById<QnMediaServerResource>(peerId()))
+    NX_ASSERT(!d->systemContext->peerId().isNull());
+    if (auto server = d->systemContext->resourcePool()->getResourceById<QnMediaServerResource>(
+        d->systemContext->peerId()))
     {
         moduleInformation.port = server->getPort();
         moduleInformation.name = server->getName();
@@ -159,12 +163,12 @@ nx::vms::api::ModuleInformation QnCommonModule::moduleInformation() const
             moduleInformation.serverFlags |= nx::vms::api::SF_NewSystem; //< Legacy API compatibility.
     }
 
-    if (auto ec2 = ec2Connection())
+    if (auto ec2 = d->systemContext->ec2Connection())
         moduleInformation.synchronizedTimeMs = ec2->timeSyncManager()->getSyncTime();
 
     if (!moduleInformation.cloudSystemId.isEmpty())
     {
-        const auto cloudAccountName = globalSettings()->cloudAccountName();
+        const auto cloudAccountName = d->systemContext->globalSettings()->cloudAccountName();
         if (!cloudAccountName.isEmpty())
             moduleInformation.cloudOwnerId = QnUuid::fromArbitraryData(cloudAccountName);
     }
@@ -257,7 +261,7 @@ QnAuditManager* QnCommonModule::auditManager() const
 void QnCommonModule::setCertificateVerifier(nx::vms::common::AbstractCertificateVerifier* value)
 {
     d->certificateVerifier = value;
-    initNetworking(d->router.get(), d->certificateVerifier);
+    d->systemContext->initNetworking(d->router.get(), d->certificateVerifier);
 }
 
 nx::vms::common::AbstractCertificateVerifier* QnCommonModule::certificateVerifier() const
@@ -269,3 +273,148 @@ CameraDriverRestrictionList* QnCommonModule::cameraDriverRestrictionList() const
 {
     return m_cameraDriverRestrictionList;
 }
+
+//-------------------------------------------------------------------------------------------------
+// Temporary methods for the migration simplification.
+
+QnUuid QnCommonModule::peerId() const
+{
+    return NX_ASSERT(d->systemContext)
+        ? d->systemContext->peerId()
+        : QnUuid();
+}
+
+QnUuid QnCommonModule::sessionId() const
+{
+    return NX_ASSERT(d->systemContext)
+        ? d->systemContext->sessionId()
+        : QnUuid();
+}
+
+QnLicensePool* QnCommonModule::licensePool() const
+{
+    return NX_ASSERT(d->systemContext)
+        ? d->systemContext->licensePool()
+        : nullptr;
+}
+
+QnRuntimeInfoManager* QnCommonModule::runtimeInfoManager() const
+{
+    return NX_ASSERT(d->systemContext)
+        ? d->systemContext->runtimeInfoManager()
+        : nullptr;
+}
+
+QnResourcePool* QnCommonModule::resourcePool() const
+{
+    return NX_ASSERT(d->systemContext)
+        ? d->systemContext->resourcePool()
+        : nullptr;
+}
+
+QnResourceAccessManager* QnCommonModule::resourceAccessManager() const
+{
+    return NX_ASSERT(d->systemContext)
+        ? d->systemContext->resourceAccessManager()
+        : nullptr;
+}
+
+nx::core::access::ResourceAccessProvider* QnCommonModule::resourceAccessProvider() const
+{
+    return NX_ASSERT(d->systemContext)
+        ? d->systemContext->resourceAccessProvider()
+        : nullptr;
+}
+
+QnResourceAccessSubjectsCache* QnCommonModule::resourceAccessSubjectsCache() const
+{
+    return NX_ASSERT(d->systemContext)
+        ? d->systemContext->resourceAccessSubjectsCache()
+        : nullptr;
+}
+
+QnGlobalPermissionsManager* QnCommonModule::globalPermissionsManager() const
+{
+    return NX_ASSERT(d->systemContext)
+        ? d->systemContext->globalPermissionsManager()
+        : nullptr;
+}
+
+QnSharedResourcesManager* QnCommonModule::sharedResourcesManager() const
+{
+    return NX_ASSERT(d->systemContext)
+        ? d->systemContext->sharedResourcesManager()
+        : nullptr;
+}
+
+QnUserRolesManager* QnCommonModule::userRolesManager() const
+{
+    return NX_ASSERT(d->systemContext)
+        ? d->systemContext->userRolesManager()
+        : nullptr;
+}
+
+QnCameraHistoryPool* QnCommonModule::cameraHistoryPool() const
+{
+    return NX_ASSERT(d->systemContext)
+        ? d->systemContext->cameraHistoryPool()
+        : nullptr;
+}
+
+QnResourcePropertyDictionary* QnCommonModule::resourcePropertyDictionary() const
+{
+    return NX_ASSERT(d->systemContext)
+        ? d->systemContext->resourcePropertyDictionary()
+        : nullptr;
+}
+
+QnResourceStatusDictionary* QnCommonModule::resourceStatusDictionary() const
+{
+    return NX_ASSERT(d->systemContext)
+        ? d->systemContext->resourceStatusDictionary()
+        : nullptr;
+}
+
+QnGlobalSettings* QnCommonModule::globalSettings() const
+{
+    return NX_ASSERT(d->systemContext)
+        ? d->systemContext->globalSettings()
+        : nullptr;
+}
+
+QnLayoutTourManager* QnCommonModule::layoutTourManager() const
+{
+    return NX_ASSERT(d->systemContext)
+        ? d->systemContext->layoutTourManager()
+        : nullptr;
+}
+
+nx::vms::event::RuleManager* QnCommonModule::eventRuleManager() const
+{
+    return NX_ASSERT(d->systemContext)
+        ? d->systemContext->eventRuleManager()
+        : nullptr;
+}
+
+QnResourceDataPool* QnCommonModule::resourceDataPool() const
+{
+    return NX_ASSERT(d->systemContext)
+        ? d->systemContext->resourceDataPool()
+        : nullptr;
+}
+
+std::shared_ptr<ec2::AbstractECConnection> QnCommonModule::ec2Connection() const
+{
+    return NX_ASSERT(d->systemContext)
+        ? d->systemContext->ec2Connection()
+        : nullptr;
+}
+
+QnCommonMessageProcessor* QnCommonModule::messageProcessor() const
+{
+    return NX_ASSERT(d->systemContext)
+        ? d->systemContext->messageProcessor()
+        : nullptr;
+}
+
+//-------------------------------------------------------------------------------------------------

@@ -11,6 +11,7 @@
 #include <nx/core/resource/server_mock.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
+#include <nx/vms/common/test_support/test_context.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/event_parameters.h>
 #include <nx/vms/rules/action_parameters_processing.h>
@@ -137,32 +138,21 @@ const QString kDummyEventName = "Dummy Event Created For The Testing Purposes";
 
 } // namespace
 
-class ActionParametersProcessingTest: public ::testing::Test
+class ActionParametersProcessingTest: public nx::vms::common::test::ContextBasedTest
 {
 protected:
     virtual void SetUp() override
     {
-        m_commonModule = std::make_unique<QnCommonModule>(
-            /*clientMode*/ false,
-            nx::core::access::Mode::direct,
-            /*peerId*/ QnUuid::createUuid());
-
-        m_camera.reset(new nx::CameraResourceStub());
+        m_camera = addCamera();
         m_camera->setName("BigBro");
-        m_commonModule->resourcePool()->addResource(m_camera);
 
         // We need a whole Server just to make analytics descriptors work.
         QnMediaServerResourcePtr server(new nx::core::resource::ServerMock());
-        server->setIdUnsafe(m_commonModule->peerId());
-        m_commonModule->resourcePool()->addResource(server);
+        server->setIdUnsafe(commonModule()->peerId());
+        resourcePool()->addResource(server);
 
         server->setProperty(nx::analytics::kDescriptorsProperty, QString(kSerializedDescriptors));
         server->saveProperties();
-    }
-
-    QnCommonModule* commonModule() const
-    {
-        return m_commonModule.get();
     }
 
     const QnVirtualCameraResourcePtr& camera() const
@@ -171,7 +161,6 @@ protected:
     }
 
 private:
-    std::unique_ptr<QnCommonModule> m_commonModule;
     QnVirtualCameraResourcePtr m_camera;
 };
 
