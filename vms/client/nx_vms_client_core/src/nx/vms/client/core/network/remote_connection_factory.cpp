@@ -334,6 +334,20 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
         return context && context->moduleInformation.version >= kRestApiSupportVersion;
     }
 
+    bool isSystemCompatibleWithUser(ContextPtr context)
+    {
+        // The system version below 5.0 is not compatible with a cloud user with 2fa enabled
+        if (context && !isRestApiSupported(context)
+            && context->userType() == nx::vms::api::UserType::cloud
+            && qnCloudStatusWatcher->is2FaEnabledForUser())
+        {
+            context->error = RemoteConnectionErrorCode::systemIsNotCompatibleWith2Fa;
+            return false;
+        }
+
+        return true;
+    }
+
     void loginWithDigest(ContextPtr context)
     {
         if (context)
@@ -569,6 +583,9 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
             checkServerCertificateEquality(context());
         verifyCertificate(context());
         checkCompatibility(context());
+
+        if (!isSystemCompatibleWithUser(context()))
+            return;
 
         if (!isRestApiSupported(context()))
         {
