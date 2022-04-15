@@ -331,7 +331,7 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
     {
         // The system version below 5.0 is not compatible with a cloud user with 2fa enabled
         if (context && !isRestApiSupported(context)
-            && context->userType() == nx::vms::api::UserType::cloud
+            && context->info.userType == nx::vms::api::UserType::cloud
             && qnCloudStatusWatcher->is2FaEnabledForUser())
         {
             context->error = RemoteConnectionErrorCode::systemIsNotCompatibleWith2Fa;
