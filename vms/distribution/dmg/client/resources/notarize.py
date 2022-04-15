@@ -28,7 +28,7 @@ def get_upload_error_message(request_result):
 
 def execute(command):
     try:
-        print("-- Running:", command)
+        logging.info("-- Running:", command)
         output = subprocess.check_output(command)
         return True, output
     except subprocess.CalledProcessError as error:
@@ -56,7 +56,7 @@ def upload_for_notarization(options):
             pass
 
     if not request_result:
-        print("xcrun failed uploading the file to notarization. Output:\n", output)
+        logging.error("xcrun failed uploading the file to notarization. Output:\n", output)
         return None, None
 
     request_id = get_request_uuid(request_result)
@@ -192,8 +192,7 @@ def main():
     options = parser.parse_args()
 
     if not os.path.exists(options.dmg_file_name):
-        print(f"File {options.dmg_file_name} does not exist.")
-        exit(1)
+        show_critical_error_and_exit(f"File {options.dmg_file_name} does not exist.")
 
     need_upload = 'request_id' not in options or options.request_id is None
     if need_upload:
@@ -204,7 +203,7 @@ def main():
         show_critical_error_and_exit(message.format(upload_error))
 
     if need_upload:
-        logging.info("Upload successeful, upload id: %s", options.request_id)
+        logging.info("Upload successful, upload id: %s", options.request_id)
 
     check_period_seconds = 30
     success, notarizationError = wait_for_notarization_completion(
@@ -224,7 +223,7 @@ def main():
         show_critical_error_and_exit(
             message.format(notarizationError, elapsedTimeMessage))
 
-    logging.info("Notarization successeful!\n\n%s", elapsedTimeMessage)
+    logging.info("Notarization successful!\n\n%s", elapsedTimeMessage)
 
 
 if __name__ == '__main__':
