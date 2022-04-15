@@ -138,12 +138,16 @@ figure::FigurePtr figureFromObjectData(
     return figure;
 }
 
+/**
+ * Path element inside Track. When constructing this structure make sure that the provided
+ * ObjectMetadata always exists for the whole lifetime of the Track.
+ */
 struct TrackElement
 {
-    TrackElement(const ObjectMetadata& metadata, microseconds timestamp):
+    TrackElement(const ObjectMetadata* metadata, microseconds timestamp):
         metadata(metadata), timestamp(timestamp) {}
 
-    ObjectMetadata metadata;
+    const ObjectMetadata* metadata;
     microseconds timestamp = 0us;
 
     bool operator<(const TrackElement& other) const
@@ -270,7 +274,9 @@ public:
 
     void updateObjectAreas(microseconds timestamp);
 
-    std::vector<Track> fetchTracks(microseconds timestamp, int channel) const;
+    std::vector<Track> fetchTracks(
+        const QList<ObjectMetadataPacketPtr>& objectMetadataPackets,
+        microseconds timestamp) const;
 
 public:
     QnMediaResourceWidget* mediaResourceWidget = nullptr;
@@ -425,18 +431,9 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
 }
 
 std::vector<Track> WidgetAnalyticsController::Private::fetchTracks(
-    microseconds timestamp, int channel) const
+    const QList<ObjectMetadataPacketPtr>& objectMetadataPackets,
+    microseconds timestamp) const
 {
-    if (logger)
-        logger->pushFrameInfo({timestamp});
-
-    // Peek some future metatada packets to prolong existing areas' lifetime at least until the
-    // latest track id appearance.
-    QList<ObjectMetadataPacketPtr> objectMetadataPackets = metadataProvider->metadataRange(
-        timestamp - kMetadataWindowSize,
-        timestamp + kMetadataWindowSize,
-        channel);
-
     // Left only objects which are to be displayed right now, store tracks for others.
     QHash<QnUuid, Track> objectTrackByTrackId;
     for (const auto& objectPacket: objectMetadataPackets)
@@ -457,8 +454,8 @@ std::vector<Track> WidgetAnalyticsController::Private::fetchTracks(
             if (packetHasDuration)
                 track.minimalDuration = microseconds(objectPacket->durationUs);
 
-            track.path.emplace_back(objectMetadata, timestamp);
-            NX_ASSERT(std::is_sorted(track.path.cbegin(), track.path.cend()));
+            track.path.emplace_back(&objectMetadata, timestamp);
+            NX_ASSERT_HEAVY_CONDITION(std::is_sorted(track.path.cbegin(), track.path.cend()));
         }
     }
 
@@ -508,7 +505,19 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
     if (!d->metadataProvider || !d->analyticsWidget)
         return;
 
-    const std::vector<Track> tracks = d->fetchTracks(timestamp, channel);
+    if (d->logger)
+        d->logger->pushFrameInfo({timestamp});
+
+    // Peek some future metatada packets to prolong existing areas' lifetime at least until the
+    // latest track id appearance.
+    const QList<ObjectMetadataPacketPtr> objectMetadataPackets = d->metadataProvider->metadataRange(
+        timestamp - kMetadataWindowSize,
+        timestamp + kMetadataWindowSize,
+        channel);
+
+    // Each Track contains a raw pointer inside an ObjectMetadataPacketPtr, so the lifetime of
+    // objectMetadataPackets should always be greater than the lifetime of tracks.
+    const std::vector<Track> tracks = d->fetchTracks(objectMetadataPackets, timestamp);
 
     NX_VERBOSE(this,
         "Updating analytics objects; current timestamp %1\n"
@@ -520,7 +529,7 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
     // Process each object from the actual metadata packets.
     for (const auto& track: tracks)
     {
-        auto& objectInfo = d->addOrUpdateObject(track.path[0].metadata);
+        auto& objectInfo = d->addOrUpdateObject(*track.path[0].metadata);
         objectInfo.startTimestamp = track.startTimestamp();
         objectInfo.endTimestamp = track.endTimestamp();
 
@@ -529,7 +538,7 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
         {
             const auto& nextElement = track.path[1];
             objectInfo.futureRectangleTimestamp = nextElement.timestamp;
-            objectInfo.futureRectangle = nextElement.metadata.boundingBox;
+            objectInfo.futureRectangle = nextElement.metadata->boundingBox;
         }
         else
         {
