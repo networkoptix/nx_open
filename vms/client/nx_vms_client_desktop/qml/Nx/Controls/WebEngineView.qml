@@ -148,9 +148,12 @@ Item
 
             let newWindow = controller.newWindow()
 
-            const windowOrTab = [WebEngineView.NewViewInTab, WebEngineView.NewViewInBackgroundTab]
-            if (windowOrTab.includes(request.destination))
-                newWindow.setWindowSize(width, height)
+            const newGeometry = request.requestedGeometry
+            const newWidth = newGeometry.width <= 0 ? width : newGeometry.width
+            const newHeight = newGeometry.height <= 0 ? height : newGeometry.height
+
+            newWindow.setWindowFrameGeometry(
+                Qt.rect(newGeometry.x, newGeometry.y, newWidth, newHeight))
 
             newWindow.rootReady.connect(root =>
             {
@@ -186,7 +189,7 @@ Item
         {
             // Allow web page to position web dialog windows.
             if (containingWindow)
-                containingWindow.setWindowGeometry(geometry)
+                containingWindow.setWindowFrameGeometry(geometry)
         }
 
         function getContextMenuActions(request)
