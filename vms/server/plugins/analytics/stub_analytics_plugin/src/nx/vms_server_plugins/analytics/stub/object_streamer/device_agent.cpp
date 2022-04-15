@@ -2,14 +2,13 @@
 
 #include "device_agent.h"
 
-#include "common.h"
-
 #include <fstream>
 #include <streambuf>
 
 #include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 #include <nx/sdk/helpers/uuid_helper.h>
+#include <nx/sdk/helpers/settings_response.h>
 
 #include <nx/kit/json.h>
 #include <nx/kit/debug.h>
@@ -38,14 +37,38 @@ static const std::string kWidthField = "width";
 static const std::string kHeightField = "height";
 static const std::string kTimestampUsField = "timestampUs";
 
+static const std::string kDefaultManifestFile = "manifest.json";
+static const std::string kDefaultStreamFile = "stream.json";
+
+static const std::string kManifestFileSetting = "manifestFile";
+static const std::string kStreamFileSetting = "streamFile";
+
+static const std::string kObjectTypeFilterPrefix = "object_type_filter_";
+
+static std::string defaultManifestFilePath(const std::string& pluginHomeDir)
+{
+    return pluginHomeDir + "/" + kDefaultManifestFile;
+}
+
+static std::string defaultStreamFilePath(const std::string& pluginHomeDir)
+{
+    return pluginHomeDir + "/" + kDefaultStreamFile;
+}
+
+static std::string makeObjectTypeFilterSettingName(const std::string& objectTypeId)
+{
+    return kObjectTypeFilterPrefix + objectTypeId;
+}
+
 static std::string readFileToString(const std::string& filePath)
 {
     std::ifstream t(filePath);
     return std::string(std::istreambuf_iterator<char>(t), std::istreambuf_iterator<char>());
 }
 
-DeviceAgent::DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo):
-    ConsumingDeviceAgent(deviceInfo, /*enableOutput*/ true)
+DeviceAgent::DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo, std::string pluginHomeDir):
+    ConsumingDeviceAgent(deviceInfo, /*enableOutput*/ true),
+    m_pluginHomeDir(std::move(pluginHomeDir))
 {
 }
 
@@ -55,11 +78,8 @@ DeviceAgent::~DeviceAgent()
 
 std::string DeviceAgent::manifestString() const
 {
-    return /*suppress newline*/ 1 + (const char*)
-R"json(
-{
-}
-)json";
+    // Manifest is provided via "pushManifest" call.
+    return "{}";
 }
 
 bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoPacket)
@@ -89,12 +109,15 @@ std::vector<Ptr<IObjectMetadataPacket>> DeviceAgent::generateObjects(
 {
     std::vector<Ptr<IObjectMetadataPacket>> result;
 
-    if (m_objectsByFrameNumber.find(frameNumber) == m_objectsByFrameNumber.cend())
+    if (m_streamInfo.objectsByFrameNumber.find(frameNumber) == m_streamInfo.objectsByFrameNumber.cend())
         return result;
 
     std::map<int64_t, Ptr<ObjectMetadataPacket>> objectMetadataPacketByTimestamp;
-    for (const Object& object: m_objectsByFrameNumber[frameNumber])
+    for (const Object& object: m_streamInfo.objectsByFrameNumber[frameNumber])
     {
+        if (m_disabledObjectTypeIds.find(object.typeId) != m_disabledObjectTypeIds.cend())
+            continue;
+
         const int64_t timestampUs = object.timestampUs >= 0
             ? object.timestampUs
             : frameTimestampUs;
@@ -134,21 +157,48 @@ void DeviceAgent::doSetNeededMetadataTypes(
 
 Result<const ISettingsResponse*> DeviceAgent::settingsReceived()
 {
+    std::string manifestFilePath;
+    std::string streamFilePath;
+
+    if (m_isInitialSettings)
+    {
+        manifestFilePath = defaultManifestFilePath(m_pluginHomeDir);
+        streamFilePath = defaultStreamFilePath(m_pluginHomeDir);
+        m_isInitialSettings = false;
+    }
+
     std::map<std::string, std::string> settings = currentSettings();
 
-    pushManifest(readFileToString(settings[kManifestFileSetting]));
+    const auto manifestSettingIt = settings.find(kManifestFileSetting);
+    if (manifestSettingIt != settings.cend())
+        manifestFilePath = manifestSettingIt->second;
+
+    const auto streamSettingIt = settings.find(kStreamFileSetting);
+    if (streamSettingIt != settings.cend())
+        streamFilePath = streamSettingIt->second;
+
+    pushManifest(readFileToString(manifestFilePath));
 
     Issues issues;
-    m_objectsByFrameNumber = parseObjectStreamFile(settings[kObjectStreamFileSetting], &issues);
-
-    reportIssues(issues);
-
-    if (!m_objectsByFrameNumber.empty())
-        m_maxFrameNumber = m_objectsByFrameNumber.rbegin()->first;
+    m_streamInfo = parseObjectStreamFile(streamFilePath, &issues);
+    if (!m_streamInfo.objectsByFrameNumber.empty())
+        m_maxFrameNumber = m_streamInfo.objectsByFrameNumber.rbegin()->first;
 
     m_frameNumber = 0;
 
-    return nullptr;
+    reportIssues(issues);
+
+    m_disabledObjectTypeIds.clear();
+    for (const auto& entry: settings)
+    {
+        const std::string& settingName = entry.first;
+        const std::string& settingValue = entry.second;
+
+        if (startsWith(settingName, kObjectTypeFilterPrefix) && !toBool(settingValue))
+            m_disabledObjectTypeIds.insert(settingName.substr(kObjectTypeFilterPrefix.length()));
+    }
+
+    return makeSettingsResponse(manifestFilePath, streamFilePath).releasePtr();
 }
 
 void DeviceAgent::reportIssues(const Issues& issues)
@@ -170,7 +220,7 @@ void DeviceAgent::reportIssues(const Issues& issues)
     }
 }
 
-/*static*/ std::map<int, std::vector<DeviceAgent::Object>> DeviceAgent::parseObjectStreamFile(
+/*static*/ DeviceAgent::StreamInfo DeviceAgent::parseObjectStreamFile(
     const std::string& filePath, Issues* outIssues)
 {
     const std::string jsonString = readFileToString(filePath);
@@ -190,7 +240,7 @@ void DeviceAgent::reportIssues(const Issues& issues)
         return {};
     }
 
-    std::map<int, std::vector<Object>> result;
+    StreamInfo result;
     for (const Json& objectDescription: json.array_items())
     {
         if (!objectDescription.is_object())
@@ -209,7 +259,9 @@ void DeviceAgent::reportIssues(const Issues& issues)
         if (!parseTimestamp(objectDescription, &object.timestampUs, outIssues))
             continue;
 
-        result[object.frameNumberToGenerateObject].push_back(std::move(object));
+        result.objectTypeIds.insert(object.typeId);
+        result.objectsByFrameNumber[object.frameNumberToGenerateObject].push_back(
+            std::move(object));
     }
 
     return result;
@@ -393,6 +445,65 @@ void DeviceAgent::reportIssues(const Issues& issues)
         issueStrings.push_back(issueToString(issue));
 
     return "The following issues have been found: " + join(issueStrings, ",\n");
+}
+
+Ptr<ISettingsResponse> DeviceAgent::makeSettingsResponse(
+    const std::string& manifestFilePath,
+    const std::string& streamFilePath) const
+{
+    Json::object manifestPathSetting;
+    manifestPathSetting["type"] = "TextArea";
+    manifestPathSetting["name"] = kManifestFileSetting;
+    manifestPathSetting["caption"] = "Path to Device Agent Manifest file";
+    manifestPathSetting["defaultValue"] = defaultManifestFilePath(m_pluginHomeDir);
+
+    Json::object streamFilePathSetting;
+    streamFilePathSetting["type"] = "TextArea";
+    streamFilePathSetting["name"] = kStreamFileSetting;
+    streamFilePathSetting["caption"] = "Path to Object stream file";
+    streamFilePathSetting["defaultValue"] = defaultStreamFilePath(m_pluginHomeDir);
+
+    Json::array pathSettingGroupItems = {manifestPathSetting, streamFilePathSetting};
+    Json::object pathSettingGroup;
+    pathSettingGroup["type"] = "GroupBox";
+    pathSettingGroup["caption"] = "Paths";
+    pathSettingGroup["items"] = std::move(pathSettingGroupItems);
+
+    std::map<std::string, std::string> values;
+    Json::array filterSettingGroupItems;
+    for (const std::string& objectTypeId: m_streamInfo.objectTypeIds)
+    {
+        Json::object objectTypeFilter;
+        objectTypeFilter["type"] = "CheckBox";
+        objectTypeFilter["name"] = makeObjectTypeFilterSettingName(objectTypeId);
+        objectTypeFilter["caption"] = objectTypeId;
+        objectTypeFilter["defaultValue"] = true;
+
+        filterSettingGroupItems.push_back(std::move(objectTypeFilter));
+
+        values[makeObjectTypeFilterSettingName(objectTypeId)] =
+            m_disabledObjectTypeIds.find(objectTypeId) == m_disabledObjectTypeIds.cend()
+                ? "true"
+                : "false";
+    }
+
+    Json::object filterSettingGroup;
+    filterSettingGroup["type"] = "GroupBox";
+    filterSettingGroup["caption"] = "Filters";
+    filterSettingGroup["items"] = std::move(filterSettingGroupItems);
+
+    Json::object settingsModel;
+    settingsModel["type"] = "Settings";
+    settingsModel["items"] = std::vector<Json>{pathSettingGroup, filterSettingGroup};
+
+    values[kManifestFileSetting] = manifestFilePath;
+    values[kStreamFileSetting] = streamFilePath;
+
+    auto settingsResponse = makePtr<SettingsResponse>();
+    settingsResponse->setModel(Json(settingsModel).dump());
+    settingsResponse->setValues(makePtr<StringMap>(std::move(values)));
+
+    return settingsResponse;
 }
 
 } // namespace object_streamer
