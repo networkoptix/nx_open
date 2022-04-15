@@ -7,16 +7,13 @@
 #include <nx/network/ssl/helpers.h>
 #include <nx/vms/client/core/system_logon/certificate_warning.h>
 #include <ui/dialogs/common/message_box.h>
-#include <ui/workbench/workbench_context_aware.h>
 
 namespace nx::vms::api { struct ModuleInformation; }
 namespace nx::network { class SocketAddress; }
 
 namespace nx::vms::client::desktop {
 
-class ServerCertificateWarning:
-    public QnMessageBox,
-    public QnWorkbenchContextAware
+class ServerCertificateWarning: public QnMessageBox
 {
     Q_OBJECT
     using base_type = QnMessageBox;

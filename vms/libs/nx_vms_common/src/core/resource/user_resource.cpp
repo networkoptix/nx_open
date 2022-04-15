@@ -6,7 +6,6 @@
 
 #include <api/global_settings.h>
 #include <api/model/password_data.h>
-#include <common/common_module.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/network/aio/timer.h>
@@ -17,6 +16,7 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/switch.h>
 #include <nx/vms/api/data/user_data.h>
+#include <nx/vms/common/system_context.h>
 #include <utils/common/id.h>
 #include <utils/common/ldap.h>
 #include <utils/common/synctime.h>

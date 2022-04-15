@@ -14,9 +14,9 @@
 #include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
+#include <nx/analytics/analytics_logging_ini.h>
 #include <nx/analytics/frame_info.h>
 #include <nx/analytics/metadata_logger.h>
-#include <nx/analytics/analytics_logging_ini.h>
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/analytics/taxonomy/object_type_dictionary.h>
 #include <nx/fusion/model_functions.h>
@@ -24,17 +24,18 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/media/abstract_analytics_metadata_provider.h>
 #include <nx/vms/client/core/utils/geometry.h>
-#include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/ui/graphics/items/overlays/analytics_overlay_widget.h>
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/analytics/object_display_settings.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/ui/graphics/items/overlays/analytics_overlay_widget.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/box.h>
-#include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/point.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/dummy.h>
+#include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/point.h>
+#include <nx/vms/common/system_context.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
-#include <ui/graphics/items/resource/media_resource_widget.h>
-#include <utils/common/connective.h>
 #include <utils/math/linear_combination.h>
 
 namespace nx::vms::client::desktop {
@@ -252,7 +253,7 @@ QString approximateDebugTime(microseconds value)
 
 } // namespace
 
-class WidgetAnalyticsController::Private: public Connective<QObject>, public QnCommonModuleAware
+class WidgetAnalyticsController::Private: public SystemContextAware
 {
 public:
     static AnalyticsOverlayWidget::AreaInfo areaInfoFromObject(
@@ -298,10 +299,9 @@ AnalyticsOverlayWidget::AreaInfo WidgetAnalyticsController::Private::areaInfoFro
     return areaInfo;
 }
 
-WidgetAnalyticsController::Private::Private(WidgetAnalyticsController* parent)
-    :
-    QnCommonModuleAware(parent),
-    objectTypeDictionary(commonModule()->analyticsTaxonomyStateWatcher())
+WidgetAnalyticsController::Private::Private(WidgetAnalyticsController* parent):
+    SystemContextAware(parent->systemContext()),
+    objectTypeDictionary(systemContext()->analyticsTaxonomyStateWatcher())
 {
 }
 
@@ -313,7 +313,7 @@ QnLayoutResourcePtr WidgetAnalyticsController::Private::layoutResource() const
 ObjectInfo& WidgetAnalyticsController::Private::addOrUpdateObject(
     const ObjectMetadata& objectMetadata)
 {
-    const auto settings = commonModule()->findInstance<ObjectDisplaySettings>();
+    const auto settings = systemContext()->objectDisplaySettings();
 
     auto& objectInfo = objectInfoByTrackId[objectMetadata.trackId];
     objectInfo.trackId = objectMetadata.trackId;
@@ -321,7 +321,7 @@ ObjectInfo& WidgetAnalyticsController::Private::addOrUpdateObject(
 
     objectInfo.rectangle = objectMetadata.boundingBox;
 
-    const auto watcher = commonModule()->analyticsTaxonomyStateWatcher();
+    const auto watcher = systemContext()->analyticsTaxonomyStateWatcher();
     const auto state = NX_ASSERT(watcher) ? watcher->state() : nullptr;
     const auto objectType = state ? state->objectTypeById(objectMetadata.typeId) : nullptr;
     const QString title = objectType ? objectType->name() : QString();
@@ -482,9 +482,8 @@ std::vector<Track> WidgetAnalyticsController::Private::fetchTracks(
 
 //-------------------------------------------------------------------------------------------------
 
-WidgetAnalyticsController::WidgetAnalyticsController(QnMediaResourceWidget* mediaResourceWidget)
-    :
-    base_type(mediaResourceWidget),
+WidgetAnalyticsController::WidgetAnalyticsController(QnMediaResourceWidget* mediaResourceWidget):
+    SystemContextAware(mediaResourceWidget->systemContext()),
     d(new Private(this))
 {
     NX_ASSERT(mediaResourceWidget);

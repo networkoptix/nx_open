@@ -112,7 +112,7 @@ PushNotificationBusinessActionWidget::PushNotificationBusinessActionWidget(QWidg
         &QAction::triggered);
 
     connect(
-        base_type::qnGlobalSettings,
+        base_type::globalSettings(),
         &QnGlobalSettings::cloudSettingsChanged,
         this,
         &PushNotificationBusinessActionWidget::updateCurrentTab);
@@ -213,7 +213,7 @@ void PushNotificationBusinessActionWidget::parametersChanged()
 void PushNotificationBusinessActionWidget::updateCurrentTab()
 {
     ui->stackedWidget->setCurrentIndex(
-        base_type::qnGlobalSettings->cloudSystemId().isEmpty() ? 0 : 1);
+        base_type::globalSettings()->cloudSystemId().isEmpty() ? 0 : 1);
 }
 
 void PushNotificationBusinessActionWidget::updateLimitInfo(QWidget *textField)

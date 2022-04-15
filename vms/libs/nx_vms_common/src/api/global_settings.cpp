@@ -157,14 +157,14 @@ QnGlobalSettings::QnGlobalSettings(nx::vms::common::SystemContext* context, QObj
             adapter->markWriteOnly();
     }
 
-    connect(m_context->resourcePool(), &QnResourcePool::resourceAdded, this,
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         [this](const QnResourcePtr& resource)
         {
             if (resource->getId() == QnUserResource::kAdminGuid)
                 at_adminUserAdded(resource);
         }, Qt::DirectConnection);
 
-    connect(m_context->resourcePool(), &QnResourcePool::resourceRemoved, this,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         &QnGlobalSettings::at_resourcePool_resourceRemoved, Qt::DirectConnection);
 
     initialize();
@@ -179,8 +179,7 @@ void QnGlobalSettings::initialize()
     if (isInitialized())
         return;
 
-    const auto& resource = m_context->resourcePool()->getResourceById(
-        QnUserResource::kAdminGuid);
+    const auto& resource = resourcePool()->getResourceById(QnUserResource::kAdminGuid);
 
     if (resource)
         at_adminUserAdded(resource);

@@ -138,7 +138,7 @@ void MessageBus::printTran(
     const ec2::QnAbstractTransaction& tran,
     Connection::Direction direction) const
 {
-    auto localPeerName = peerName(commonModule()->peerId());
+    auto localPeerName = peerName(peerId());
     QString msgName;
     QString directionName;
     if (direction == Connection::Direction::outgoing)
@@ -169,7 +169,7 @@ void MessageBus::start()
     m_localShortPeerInfo.encode(localPeer(), 0);
     m_peers.reset(new BidirectionRoutingInfo(localPeer()));
     addOfflinePeersFromDb();
-    m_lastRuntimeInfo[localPeer()] = commonModule()->runtimeInfoManager()->localInfo().data;
+    m_lastRuntimeInfo[localPeer()] = runtimeInfoManager()->localInfo().data;
     base_type::start();
     m_started = true;
 }
@@ -198,7 +198,7 @@ void MessageBus::addOutgoingConnectionToPeer(
     deleteRemoveUrlById(peer);
 
     nx::utils::Url url(_url);
-    const auto patch = commonModule()->globalSettings()->isWebSocketEnabled()
+    const auto patch = globalSettings()->isWebSocketEnabled()
         ? ConnectionBase::kWebsocketUrlPath : ConnectionBase::kHttpHandshakeUrlPath;
     if (peerType == nx::vms::api::PeerType::cloudServer)
     {
@@ -336,7 +336,7 @@ void MessageBus::createOutgoingConnections(
             }
 
             ConnectionLockGuard connectionLockGuard(
-                commonModule()->peerId(),
+                peerId(),
                 connectionGuardSharedState(),
                 remoteConnection.peerId,
                 ConnectionLockGuard::Direction::Outgoing);
@@ -352,7 +352,7 @@ void MessageBus::createOutgoingConnections(
                 std::make_unique<ConnectionContext>(),
                 std::move(connectionLockGuard),
                 [this](const auto& remotePeer) { return validateRemotePeerData(remotePeer); }));
-            connection->setMaxSendBufferSize(commonModule()->globalSettings()->maxP2pQueueSizeBytes());
+            connection->setMaxSendBufferSize(globalSettings()->maxP2pQueueSizeBytes());
             m_outgoingConnections.insert(remoteConnection.peerId, connection);
             ++m_connectionTries;
             connectSignals(connection);
@@ -447,7 +447,7 @@ void MessageBus::doPeriodicTasks()
 
 vms::api::PeerData MessageBus::localPeer() const
 {
-    return commonModule()->runtimeInfoManager()->localInfo().data.peer;
+    return runtimeInfoManager()->localInfo().data.peer;
 }
 
 vms::api::PeerDataEx MessageBus::localPeerEx() const
@@ -455,11 +455,11 @@ vms::api::PeerDataEx MessageBus::localPeerEx() const
     nx::vms::api::PeerDataEx result;
     result.assign(localPeer());
 
-    result.systemId = commonModule()->globalSettings()->localSystemId();
+    result.systemId = globalSettings()->localSystemId();
     result.cloudHost = nx::network::SocketGlobals::cloud().cloudHost().c_str();
     result.identityTime = commonModule()->systemIdentityTime();
     result.aliveUpdateIntervalMs = std::chrono::duration_cast<std::chrono::milliseconds>
-        (commonModule()->globalSettings()->aliveUpdateInterval()).count();
+        (globalSettings()->aliveUpdateInterval()).count();
     result.protoVersion = nx::vms::api::protocolVersion();
     return result;
 }
@@ -628,7 +628,7 @@ void MessageBus::at_gotMessage(
         messageType != MessageType::pushTransactionData &&
         messageType != MessageType::pushTransactionList)
     {
-        auto localPeerName = peerName(commonModule()->peerId());
+        auto localPeerName = peerName(peerId());
 
         NX_VERBOSE(
             this,
@@ -880,7 +880,7 @@ void MessageBus::sendTransactionImpl(
         modifiedTran = srcTran;
         if (ec2::amendOutputDataIfNeeded(
             connection.staticCast<Connection>()->userAccessData(),
-            commonModule()->resourceAccessManager(),
+            resourceAccessManager(),
             &modifiedTran.params))
         {
             // Make persistent info null in case if data has been amended. We don't want such

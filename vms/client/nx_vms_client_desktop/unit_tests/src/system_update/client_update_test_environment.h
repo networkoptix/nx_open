@@ -4,14 +4,10 @@
 
 #include <gtest/gtest.h>
 
-#include <common/common_module.h>
-#include <common/static_common_module.h>
 #include <core/resource/media_server_resource.h>
+#include <nx/vms/client/desktop/system_update/update_verification.h>
+#include <nx/vms/client/desktop/test_support/test_context.h>
 
-#include "nx/vms/client/desktop/system_update/update_verification.h"
-
-class QnClientCoreModule;
-class QnClientRuntimeSettings;
 class QnResourceRuntimeDataManager;
 
 namespace os
@@ -23,9 +19,9 @@ extern const nx::utils::OsInfo ubuntu18;
 extern const nx::utils::OsInfo windows;
 } // namespace os
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::desktop::test {
 
-class ClientUpdateTestEnvironment: public testing::Test
+class ClientUpdateTestEnvironment: public ContextBasedTest
 {
 public:
     // virtual void SetUp() will be called before each test is run.
@@ -45,15 +41,11 @@ public:
 
     void removeAllServers();
 
-    QnCommonModule* commonModule() const;
     QnResourcePool* resourcePool() const;
 
-    QScopedPointer<QnStaticCommonModule> m_staticCommon;
-    QSharedPointer<QnClientCoreModule> m_module;
-    QSharedPointer<QnClientRuntimeSettings> m_runtime;
     QSharedPointer<QnResourceRuntimeDataManager> m_resourceRuntime;
 };
 
 using Version = nx::utils::SoftwareVersion;
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::desktop::test

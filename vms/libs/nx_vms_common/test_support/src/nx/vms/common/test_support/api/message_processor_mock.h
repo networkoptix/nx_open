@@ -4,7 +4,7 @@
 
 #include <api/common_message_processor.h>
 
-namespace nx::vms::common::test_support {
+namespace nx::vms::common::test {
 
 class TestResourceFactory;
 
@@ -32,4 +32,4 @@ private:
     std::unique_ptr<TestResourceFactory> m_resourceFactory;
 };
 
-} // namespace nx::vms::common::test_support
+} // namespace nx::vms::common::test

@@ -8,6 +8,7 @@
 
 #include <nx/vms/client/desktop/analytics/analytics_settings_manager.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
+#include <nx/vms/common/test_support/test_context.h>
 
 namespace nx::vms::client::desktop {
 namespace test {
@@ -69,12 +70,8 @@ public:
     int counter = 0;
 };
 
-class AnalyticsSettingsTestFixture: public ::testing::Test
+class AnalyticsSettingsTestFixture: public nx::vms::common::test::ContextBasedTest
 {
-public:
-    AnalyticsSettingsTestFixture();
-    virtual ~AnalyticsSettingsTestFixture() override;
-
 protected:
     // virtual void SetUp() will be called before each test is run.
     virtual void SetUp() override;
@@ -82,17 +79,12 @@ protected:
     // virtual void TearDown() will be called after each test is run.
     virtual void TearDown() override;
 
-    nx::CameraResourceStubPtr addCamera();
-
     nx::vms::common::AnalyticsEngineResourcePtr addEngine();
 
     AnalyticsSettingsManager* manager() const;
 
     QnResourcePool* resourcePool() const;
 
-    // Declares the variables your tests want to use.
-    struct Environment;
-    QScopedPointer<Environment> m_environment;
     QScopedPointer<AnalyticsSettingsManager> m_manager;
     AnalyticsSettingsMockApiInterfacePtr m_serverInterfaceMock;
 };

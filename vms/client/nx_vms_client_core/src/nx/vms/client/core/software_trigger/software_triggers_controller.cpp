@@ -5,21 +5,21 @@
 #include <QtQml/QtQml>
 
 #include <api/server_rest_connection.h>
-#include <common/common_module.h>
 #include <client_core/client_core_module.h>
-#include <core/resource/user_resource.h>
+#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource_management/resource_pool.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
-
+#include <core/resource_access/resource_access_subject.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/guarded_callback.h>
-#include <nx/vms/event/rule.h>
-#include <nx/vms/event/rule_manager.h>
 #include <nx/vms/client/core/common/utils/ordered_requests_helper.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
-#include <core/resource_access/resource_access_subject.h>
+#include <nx/vms/common/system_context.h>
+#include <nx/vms/event/rule.h>
+#include <nx/vms/event/rule_manager.h>
 #include <utils/common/synctime.h>
 
 namespace nx::vms::client::core {
@@ -45,8 +45,8 @@ SoftwareTriggersController::Private::Private(SoftwareTriggersController* q):
     q(q),
     commonModule(qnClientCoreModule->commonModule()),
     userWatcher(commonModule->instance<UserWatcher>()),
-    accessManager(commonModule->resourceAccessManager()),
-    ruleManager(commonModule->eventRuleManager())
+    accessManager(commonModule->systemContext()->resourceAccessManager()),
+    ruleManager(commonModule->systemContext()->eventRuleManager())
 {
 }
 
@@ -129,7 +129,7 @@ void SoftwareTriggersController::setResourceId(const QnUuid& id)
     if (d->resourceId == id)
         return;
 
-    const auto pool = d->commonModule->resourcePool();
+    const auto pool = d->commonModule->systemContext()->resourcePool();
     d->resourceId = pool->getResourceById<QnVirtualCameraResource>(id)
         ? id
         : QnUuid();

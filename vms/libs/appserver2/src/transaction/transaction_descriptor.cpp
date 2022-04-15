@@ -24,6 +24,7 @@
 #include <nx_ec/data/api_fwd.h>
 #include <nx/cloud/db/client/data/auth_data.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/license/usage_helper.h>
 
 #include "amend_transaction_data.h"
@@ -481,10 +482,10 @@ static Result checkExistingResourceAccess(
     const QnUuid& resourceId,
     Qn::Permissions permissions)
 {
-    const auto& resPool = commonModule->resourcePool();
+    const auto& resPool = commonModule->systemContext()->resourcePool();
     QnResourcePtr target = resPool->getResourceById(resourceId);
     auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-    if (commonModule->resourceAccessManager()->hasPermission(userResource, target, permissions))
+    if (commonModule->systemContext()->resourceAccessManager()->hasPermission(userResource, target, permissions))
         return Result();
 
     const QString errorMessage = NX_FMT(
@@ -538,16 +539,16 @@ struct ModifyResourceAccess
         if (hasSystemAccess(accessData))
             return Result();
 
-        const auto& resPool = commonModule->resourcePool();
+        const auto& resPool = commonModule->systemContext()->resourcePool();
         auto userResource = resPool->getResourceById(accessData.userId)
             .dynamicCast<QnUserResource>();
         QnResourcePtr target = resPool->getResourceById(param.id);
 
         bool result = false;
         if (!target)
-            result = commonModule->resourceAccessManager()->canCreateResourceFromData(userResource, param);
+            result = commonModule->systemContext()->resourceAccessManager()->canCreateResourceFromData(userResource, param);
         else
-            result = commonModule->resourceAccessManager()->canModifyResource(userResource, target, param);
+            result = commonModule->systemContext()->resourceAccessManager()->canModifyResource(userResource, target, param);
 
         if (!result)
         {
@@ -583,7 +584,7 @@ struct ModifyStorageAccess
         }
 
         transaction_descriptor::CanModifyStorageData data;
-        const auto existingResource = commonModule->resourcePool()->getResourceById(param.id);
+        const auto existingResource = commonModule->systemContext()->resourcePool()->getResourceById(param.id);
         data.hasExistingStorage = (bool) existingResource;
         data.getExistingStorageDataFunc =
             [&]()
@@ -596,7 +597,7 @@ struct ModifyStorageAccess
         data.logErrorFunc = [this](const QString& message) { NX_DEBUG(this, message); };
         data.modifyResourceResult = ModifyResourceAccess()(commonModule, accessData, param);
         data.request = param;
-        amendOutputDataIfNeeded(accessData, commonModule->resourceAccessManager(), &data.request);
+        amendOutputDataIfNeeded(accessData, commonModule->systemContext()->resourceAccessManager(), &data.request);
 
         return transaction_descriptor::canModifyStorage(data);
     }
@@ -617,11 +618,11 @@ struct RemoveResourceAccess
         if (hasSystemAccess(accessData))
             return Result();
 
-        const auto& resPool = commonModule->resourcePool();
+        const auto& resPool = commonModule->systemContext()->resourcePool();
         auto userResource = resPool->getResourceById(accessData.userId)
             .dynamicCast<QnUserResource>();
         QnResourcePtr target = resPool->getResourceById(param.id);
-        if (!commonModule->resourceAccessManager()->hasPermission(
+        if (!commonModule->systemContext()->resourceAccessManager()->hasPermission(
             userResource, target, Qn::RemovePermission))
         {
             QString errorMessage = NX_FMT(
@@ -642,7 +643,7 @@ struct SaveUserAccess
     {
         if (!hasSystemAccess(accessData))
         {
-            auto allUsers = commonModule->resourcePool()->getResources<QnUserResource>();
+            auto allUsers = commonModule->systemContext()->resourcePool()->getResources<QnUserResource>();
             auto hasUserWithSameName = std::any_of(allUsers.cbegin(), allUsers.cend(),
                 [&param](const auto& resPtr)
                 { return resPtr->getName() == param.name && resPtr->getId() != param.id; });
@@ -657,7 +658,7 @@ struct SaveUserAccess
             // Won't allow to change the user name without providing the password because it's not
             // possible to recalculate hashes.
             const auto existingUser =
-                commonModule->resourcePool()->getResourceById<QnUserResource>(param.id);
+                commonModule->systemContext()->resourcePool()->getResourceById<QnUserResource>(param.id);
 
             if (existingUser
                 && param.digest != nx::vms::api::UserData::kHttpIsDisabledStub
@@ -730,8 +731,9 @@ void applyColumnFilter(
 void applyColumnFilter(
     QnCommonModule* commonModule, const Qn::UserAccessData& accessData, api::StorageData& data)
 {
-    if (!hasSystemAccess(accessData) && !commonModule->resourceAccessManager()->hasGlobalPermission(
-        accessData, GlobalPermission::admin))
+    if (!hasSystemAccess(accessData)
+        && !commonModule->systemContext()->resourceAccessManager()->hasGlobalPermission(
+            accessData, GlobalPermission::admin))
     {
         data.url = QnStorageResource::urlWithoutCredentials(data.url);
     }
@@ -787,7 +789,7 @@ struct ReadResourceParamAccess
         const Qn::UserAccessData& accessData,
         nx::vms::api::ResourceParamData& param)
     {
-        const auto accessManager = commonModule->resourceAccessManager();
+        const auto accessManager = commonModule->systemContext()->resourceAccessManager();
         if (accessData == Qn::kSystemAccess
             || accessData.access == Qn::UserAccessData::Access::ReadAllResources
             || accessManager->hasGlobalPermission(accessData, GlobalPermission::admin))
@@ -828,7 +830,7 @@ struct ModifyResourceParamAccess
 
     static QString userNameOrId(const Qn::UserAccessData& accessData, QnCommonModule* commonModule)
     {
-        auto user = commonModule->resourcePool()->getResourceById<QnUserResource>(accessData.userId);
+        auto user = commonModule->systemContext()->resourcePool()->getResourceById<QnUserResource>(accessData.userId);
         return userNameOrId(user, accessData);
     }
 
@@ -842,7 +844,7 @@ struct ModifyResourceParamAccess
     static bool hasSameProperty(
         QnCommonModule* commonModule, const nx::vms::api::ResourceParamWithRefData& param)
     {
-        auto target = commonModule->resourcePool()->getResourceById(param.resourceId);
+        auto target = commonModule->systemContext()->resourcePool()->getResourceById(param.resourceId);
         return target && hasSameProperty(target, param);
     }
 
@@ -872,7 +874,7 @@ struct ModifyResourceParamAccess
                 userNameOrId(accessData, commonModule), accessData.access, param.name));
         }
 
-        const auto& resPool = commonModule->resourcePool();
+        const auto& resPool = commonModule->systemContext()->resourcePool();
         auto userResource =
             resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
 
@@ -893,7 +895,7 @@ struct ModifyResourceParamAccess
                 return Result();
         }
 
-        auto accessManager = commonModule->resourceAccessManager();
+        auto accessManager = commonModule->systemContext()->resourceAccessManager();
         auto target = resPool->getResourceById(param.resourceId);
         if (param.checkResourceExists != nx::vms::api::CheckResourceExists::yes)
         {
@@ -998,8 +1000,8 @@ struct ModifyCameraAttributesAccess
         if (hasSystemAccess(accessData))
             return Result();
 
-        const auto& resPool = commonModule->resourcePool();
-        auto accessManager = commonModule->resourceAccessManager();
+        const auto& resPool = commonModule->systemContext()->resourcePool();
+        auto accessManager = commonModule->systemContext()->resourceAccessManager();
         auto camera = resPool->getResourceById<QnVirtualCameraResource>(param.cameraId);
         if (camera)
         {
@@ -1039,13 +1041,13 @@ struct ModifyCameraAttributesAccess
         }
 
         using namespace nx::vms::license;
-        CamLicenseUsageHelper licenseUsageHelper(commonModule);
+        CamLicenseUsageHelper licenseUsageHelper(commonModule->systemContext());
 
         // Check the license if and only if recording goes from 'off' to 'on' state
         if (param.scheduleEnabled && !camera->isScheduleEnabled())
         {
             using namespace nx::vms::license;
-            CamLicenseUsageHelper licenseUsageHelper(commonModule);
+            CamLicenseUsageHelper licenseUsageHelper(commonModule->systemContext());
             QnVirtualCameraResourceList cameras;
 
             licenseUsageHelper.propose(camera, param.scheduleEnabled);
@@ -1082,10 +1084,10 @@ struct ModifyCameraAttributesListAccess
         }
 
         using namespace nx::vms::license;
-        CamLicenseUsageHelper licenseUsageHelper(commonModule);
+        CamLicenseUsageHelper licenseUsageHelper(commonModule->systemContext());
         QnVirtualCameraResourceList cameras;
 
-        const auto& resPool = commonModule->resourcePool();
+        const auto& resPool = commonModule->systemContext()->resourcePool();
         for (const auto& p: param)
         {
             auto camera = resPool->getResourceById(p.cameraId).dynamicCast<QnVirtualCameraResource
@@ -1142,8 +1144,8 @@ struct ModifyServerAttributesAccess
         if (hasSystemAccess(accessData))
             return Result();
 
-        const auto& resPool = commonModule->resourcePool();
-        auto accessManager = commonModule->resourceAccessManager();
+        const auto& resPool = commonModule->systemContext()->resourcePool();
+        auto accessManager = commonModule->systemContext()->resourceAccessManager();
         auto server = resPool->getResourceById<QnMediaServerResource>(param.serverId);
         if (server)
         {
@@ -1173,9 +1175,9 @@ static Result userAccessHelper(
 {
     if (hasSystemAccess(accessData))
         return Result();
-    const auto& resPool = commonModule->resourcePool();
+    const auto& resPool = commonModule->systemContext()->resourcePool();
     auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-    if (!commonModule->resourceAccessManager()->hasGlobalPermission(userResource, permissions))
+    if (!commonModule->systemContext()->resourceAccessManager()->hasGlobalPermission(userResource, permissions))
     {
         QString errorMessage = NX_FMT(
             "User %1 with %2 permissions is asking for %3 permissions and fails",
@@ -1295,7 +1297,7 @@ struct ModifyAccessRightsChecker
         if (hasSystemAccess(accessData))
             return Result();
 
-        auto user = commonModule->resourcePool()->getResourceById<QnUserResource>(param.userId);
+        auto user = commonModule->systemContext()->resourcePool()->getResourceById<QnUserResource>(param.userId);
         if (!param.resourceIds.empty())
         {
             if ((param.checkResourceExists == nx::vms::api::CheckResourceExists::customRole)
@@ -1307,17 +1309,17 @@ struct ModifyAccessRightsChecker
             }
         }
 
-        auto accessManager = commonModule->resourceAccessManager();
+        auto accessManager = commonModule->systemContext()->resourceAccessManager();
 
         // CRUD API PATCH merges with existing shared resources so they can be not changed.
         QSet<QnUuid> sharedResources;
         if (user)
         {
-            sharedResources = commonModule->sharedResourcesManager()->sharedResources(user);
+            sharedResources = commonModule->systemContext()->sharedResourcesManager()->sharedResources(user);
         }
         else
         {
-            auto role = commonModule->userRolesManager()->userRole(param.userId);
+            auto role = commonModule->systemContext()->userRolesManager()->userRole(param.userId);
             if (role.id.isNull())
             {
                 // We can clear shared Resources even after the User or Role is deleted.
@@ -1330,7 +1332,7 @@ struct ModifyAccessRightsChecker
             }
             else
             {
-                sharedResources = commonModule->sharedResourcesManager()->sharedResources(role);
+                sharedResources = commonModule->systemContext()->sharedResourcesManager()->sharedResources(role);
             }
         }
         if (sharedResources == QSet<QnUuid>(param.resourceIds.begin(), param.resourceIds.end()))
@@ -1390,7 +1392,7 @@ struct LayoutTourAccessById
         const Qn::UserAccessData& accessData,
         const nx::vms::api::IdData& tourId)
     {
-        const auto tour = commonModule->layoutTourManager()->tour(tourId.id);
+        const auto tour = commonModule->systemContext()->layoutTourManager()->tour(tourId.id);
         if (!tour.isValid())
             return Result(); //< Allow everyone to work with tours which are already deleted.
         return LayoutTourAccess()(commonModule, accessData, tour);
@@ -1559,7 +1561,7 @@ struct SetStatusTransactionType
         AbstractPersistentStorage* db)
     {
         const auto isServer =
-            [resourcePool = commonModule->resourcePool(), db, &id = params.id]() -> bool
+            [resourcePool = commonModule->systemContext()->resourcePool(), db, &id = params.id]() -> bool
             {
                 if (QnResourcePtr resource = resourcePool->getResourceById<QnResource>(id))
                     return (bool) resource.dynamicCast<QnMediaServerResource>();

@@ -10,20 +10,9 @@
 namespace nx::core::access {
 namespace test {
 
-void CachedAccessProviderTestFixture::SetUp()
+CachedAccessProviderTestFixture::CachedAccessProviderTestFixture():
+    nx::vms::common::test::ContextBasedTest(/*clientMode*/ false, nx::core::access::Mode::cached)
 {
-    m_staticCommon = std::make_unique<QnStaticCommonModule>();
-    m_module = std::make_unique<QnCommonModule>(
-        /*clientMode*/ false,
-        nx::core::access::Mode::cached);
-    initializeContext(m_module.get());
-}
-
-void CachedAccessProviderTestFixture::TearDown()
-{
-    deinitializeContext();
-    m_module.reset();
-    m_staticCommon.reset();
 }
 
 void CachedAccessProviderTestFixture::expectAccess(const QnResourceAccessSubject& subject,

@@ -6,11 +6,9 @@
 #include <QtCore/QScopedPointer>
 
 #include <client/client_startup_parameters.h>
-
-#include <nx/vms/client/desktop/radass/radass_fwd.h>
-
-#include <nx/utils/singleton.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/utils/singleton.h>
+#include <nx/vms/client/desktop/radass/radass_fwd.h>
 
 class QOpenGLWidget;
 class QnClientCoreModule;
@@ -29,19 +27,20 @@ namespace nx::vms::utils { class TranslationManager; }
 
 namespace nx::vms::client::desktop {
 
-class AnalyticsMetadataProviderFactory;
-class UploadManager;
-class VirtualCameraManager;
-class VideoCache;
-class ResourceDirectoryBrowser;
-class ClientStateHandler;
-class SharedMemoryManager;
-class RunningInstancesManager;
-class AnalyticsSettingsManager;
-class ServerRuntimeEventConnector;
-class PerformanceMonitor;
-class LicenseHealthWatcher;
 class AnalyticsAttributeHelper;
+class AnalyticsMetadataProviderFactory;
+class AnalyticsSettingsManager;
+class ClientStateHandler;
+class LicenseHealthWatcher;
+class PerformanceMonitor;
+class ResourceDirectoryBrowser;
+class RunningInstancesManager;
+class ServerRuntimeEventConnector;
+class SharedMemoryManager;
+class SystemContext;
+class UploadManager;
+class VideoCache;
+class VirtualCameraManager;
 
 namespace session {
 class SessionManager;
@@ -60,7 +59,9 @@ class NX_VMS_CLIENT_DESKTOP_API QnClientModule: public QObject, public Singleton
     Q_OBJECT
 
 public:
-    explicit QnClientModule(const QnStartupParameters& startupParams, QObject* parent = nullptr);
+    explicit QnClientModule(
+        const QnStartupParameters& startupParams,
+        QObject* parent = nullptr);
     virtual ~QnClientModule();
 
     void initDesktopCamera(QOpenGLWidget* window);
@@ -68,6 +69,9 @@ public:
 
     QnCameraDataManager* cameraDataManager() const;
     QnClientCoreModule* clientCoreModule() const;
+
+    nx::vms::client::desktop::SystemContext* systemContext() const;
+
     nx::vms::client::desktop::session::SessionManager* sessionManager() const;
     nx::vms::client::desktop::ClientStateHandler* clientStateHandler() const;
     nx::vms::client::desktop::SharedMemoryManager* sharedMemoryManager() const;

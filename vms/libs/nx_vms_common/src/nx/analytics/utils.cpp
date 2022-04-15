@@ -1,7 +1,9 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "utils.h"
+
 #include <core/resource/camera_resource.h>
+#include <nx/vms/common/system_context.h>
 
 namespace nx::analytics {
 
@@ -33,11 +35,11 @@ std::set<QString> supportedObjectTypeIdsFromManifest(const DeviceAgentManifest& 
 
 bool serverHasActiveObjectEngines(QnCommonModule* commonModule, const QnUuid& serverId)
 {
-    auto server = commonModule->resourcePool()->getResourceById<QnMediaServerResource>(serverId);
+    auto server = commonModule->systemContext()->resourcePool()->getResourceById<QnMediaServerResource>(serverId);
     if (!server)
         return false;
 
-    auto cameras = commonModule->resourcePool()->getAllCameras(server);
+    auto cameras = commonModule->systemContext()->resourcePool()->getAllCameras(server);
     return std::any_of(cameras.cbegin(), cameras.cend(),
         [](const auto& camera) { return !camera->supportedObjectTypes().empty(); });
 }

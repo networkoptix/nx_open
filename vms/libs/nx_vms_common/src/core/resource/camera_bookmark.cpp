@@ -2,13 +2,14 @@
 
 #include "camera_bookmark.h"
 
-#include <QtCore/QMap>
 #include <QtCore/QLinkedList>
+#include <QtCore/QMap>
 
-#include <nx/fusion/model_functions.h>
-#include <utils/camera/camera_names_watcher.h>
-#include <utils/camera/bookmark_helpers.h>
 #include <common/common_module.h>
+#include <nx/fusion/model_functions.h>
+#include <nx/vms/common/system_context.h>
+#include <utils/camera/bookmark_helpers.h>
+#include <utils/camera/camera_names_watcher.h>
 
 using std::chrono::milliseconds;
 using namespace std::literals::chrono_literals;
@@ -210,7 +211,7 @@ BinaryPredicate createPredicate(QnCommonModule* commonModule, const QnBookmarkSo
             const auto creatorGetter =
                 [commonModule](const QnCameraBookmark& bookmark)
                 {
-                    auto resourcePool = commonModule->resourcePool();
+                    auto resourcePool = commonModule->systemContext()->resourcePool();
                     return helpers::getBookmarkCreatorName(bookmark, resourcePool);
                 };
             return makePredByGetter(creatorGetter, isAscending);

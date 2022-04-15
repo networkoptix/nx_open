@@ -6,47 +6,39 @@
 
 #include <QtWidgets/QAction>
 
-#include <nx/vms/client/desktop/ini.h>
 #include <api/common_message_processor.h>
-
-#include <camera/camera_data_manager.h>
 #include <camera/camera_bookmarks_manager.h>
+#include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
-
 #include <common/common_module.h>
-
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/resource.h>
-#include <core/resource/user_resource.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/media_server_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_history.h>
-
-#include <recording/time_period.h>
-
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/resource.h>
+#include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/build_info.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/utils/parameter_helper.h>
+#include <recording/time_period.h>
 #include <ui/dialogs/camera_bookmark_dialog.h>
-#include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/controls/bookmarks_viewer.h>
 #include <ui/graphics/items/controls/time_slider.h>
-
+#include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
-
+#include <ui/workbench/watchers/workbench_bookmark_tags_watcher.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
-#include <ui/workbench/watchers/workbench_bookmark_tags_watcher.h>
-
 #include <utils/common/synctime.h>
-#include <nx/vms/client/desktop/utils/parameter_helper.h>
-
-#include <nx/build_info.h>
 
 using std::chrono::microseconds;
 using std::chrono::milliseconds;
@@ -105,7 +97,8 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = nu
     connect(bookmarksViewer, &QnBookmarksViewer::editBookmarkClicked, this,
         [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
         {
-            context()->statisticsModule()->registerClick(lit("bookmark_tooltip_edit"));
+            ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
+                "bookmark_tooltip_edit");
             menu()->triggerIfPossible(action::EditCameraBookmarkAction,
                 getActionParamsFunc(bookmark));
         });
@@ -113,7 +106,8 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = nu
     connect(bookmarksViewer, &QnBookmarksViewer::removeBookmarkClicked, this,
         [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
         {
-            context()->statisticsModule()->registerClick(lit("bookmark_tooltip_delete"));
+            ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
+                "bookmark_tooltip_delete");
             menu()->triggerIfPossible(action::RemoveBookmarkAction,
                 getActionParamsFunc(bookmark));
         });
@@ -121,14 +115,16 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = nu
     connect(bookmarksViewer, &QnBookmarksViewer::exportBookmarkClicked, this,
         [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
         {
-            context()->statisticsModule()->registerClick(lit("bookmark_tooltip_export"));
+            ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
+                "bookmark_tooltip_export");
             menu()->triggerIfPossible(action::ExportBookmarkAction, getActionParamsFunc(bookmark));
         });
 
     connect(bookmarksViewer, &QnBookmarksViewer::playBookmark, this,
         [this](const QnCameraBookmark &bookmark)
         {
-            context()->statisticsModule()->registerClick(lit("bookmark_tooltip_play"));
+            ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
+                "bookmark_tooltip_play");
 
             auto slider = navigator()->timeSlider();
 
@@ -147,7 +143,8 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = nu
     connect(bookmarksViewer, &QnBookmarksViewer::tagClicked, this,
         [this, bookmarksViewer](const QString &tag)
         {
-            context()->statisticsModule()->registerClick(lit("bookmark_tooltip_tag"));
+            ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
+                "bookmark_tooltip_tag");
             menu()->triggerIfPossible(action::OpenBookmarksSearchAction,
                 {Qn::BookmarkTagRole, tag});
         });
@@ -301,7 +298,7 @@ void QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered()
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 
-    for (const auto bookmark : bookmarks)
+    for (const auto& bookmark : bookmarks)
         qnCameraBookmarksManager->deleteCameraBookmark(bookmark.guid);
 }
 

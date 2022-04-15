@@ -2,13 +2,13 @@
 
 #include "analytics_sdk_event.h"
 
+#include <analytics/db/text_search_utils.h>
+#include <core/resource/resource.h>
+#include <nx/analytics/taxonomy/abstract_state.h>
+#include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/kit/utils.h>
 #include <nx/utils/uuid.h>
-#include <core/resource/resource.h>
-
-#include <nx/analytics/taxonomy/abstract_state_watcher.h>
-#include <nx/analytics/taxonomy/abstract_state.h>
-#include <analytics/db/text_search_utils.h>
+#include <nx/vms/common/system_context.h>
 
 namespace nx {
 namespace vms {

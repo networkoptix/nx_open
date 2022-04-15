@@ -13,7 +13,7 @@ TimeSyncManager::TimeSyncManager(QnCommonModule* commonModule, const QnUuid& ser
     base_type(commonModule),
     m_serverId(serverId)
 {
-    connect(commonModule->globalSettings(),
+    connect(globalSettings(),
         &QnGlobalSettings::timeSynchronizationSettingsChanged,
         this,
         &TimeSyncManager::resync);
@@ -31,8 +31,8 @@ void TimeSyncManager::resync()
 
 void TimeSyncManager::updateTime()
 {
-    auto route = commonModule()->router()->routeTo(m_serverId, commonModule());
-    auto networkTimeSyncInterval = commonModule()->globalSettings()->syncTimeExchangePeriod();
+    auto route = commonModule()->router()->routeTo(m_serverId, commonModule()->systemContext());
+    auto networkTimeSyncInterval = globalSettings()->syncTimeExchangePeriod();
     if (route.isValid())
     {
         if (!m_lastSyncTimeInterval.hasExpired(networkTimeSyncInterval))

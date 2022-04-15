@@ -53,7 +53,7 @@ QnUuid RoiCameraThumbnail::cameraId() const
 
 void RoiCameraThumbnail::setCameraId(const QnUuid& value)
 {
-    setResource(qnClientCoreModule->commonModule()->resourcePool()
+    setResource(qnClientCoreModule->resourcePool()
         ->getResourceById<QnVirtualCameraResource>(value));
 }
 

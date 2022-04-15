@@ -81,7 +81,7 @@ MainWindow::MainWindow(QQmlEngine* engine, QnWorkbenchContext* context, QWidget*
 
     d->sceneWidget->rootContext()->setContextProperty(lit("workbench"), workbench());
     d->sceneWidget->rootContext()->setContextProperty(
-        QnWorkbenchContextAware::kQmlContextPropertyName, context);
+        QnWorkbenchContextAware::kQmlWorkbenchContextPropertyName, context);
 
     // TODO: #vkutin Replace with a better calculation?
     d->sceneWidget->rootContext()->setContextProperty("maxTextureSize",

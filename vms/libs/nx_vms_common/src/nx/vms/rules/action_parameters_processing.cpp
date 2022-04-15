@@ -3,12 +3,13 @@
 #include "action_parameters_processing.h"
 
 #include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
-#include <nx/analytics/taxonomy/state_watcher.h>
-#include <nx/analytics/taxonomy/state.h>
 #include <core/resource/camera_resource.h>
-#include <nx/vms/event/event_parameters.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/analytics/taxonomy/state.h>
+#include <nx/analytics/taxonomy/state_watcher.h>
 #include <nx/utils/string.h>
+#include <nx/vms/common/system_context.h>
+#include <nx/vms/event/event_parameters.h>
 
 namespace nx::vms::rules {
 
@@ -20,7 +21,7 @@ namespace {
 void processTextFieldSubstitutions(
     QString& value,
     const EventParameters& data,
-    const QnCommonModule* commonModule)
+    const nx::vms::common::SystemContext* systemContext)
 {
     using EventType = nx::vms::api::EventType;
     using Keyword = SubstitutionKeywords::Event;
@@ -41,14 +42,14 @@ void processTextFieldSubstitutions(
         substitutions.push_back({Keyword::description, data.description});
         substitutions.push_back({Keyword::eventType, data.getAnalyticsEventTypeId()});
 
-        if (auto camera = commonModule->resourcePool()->getResourceById<QnVirtualCameraResource>(
+        if (auto camera = systemContext->resourcePool()->getResourceById<QnVirtualCameraResource>(
             data.eventResourceId))
         {
             substitutions.push_back({Keyword::cameraName, camera->getUserDefinedName()});
         }
 
         if (const std::shared_ptr<AbstractState> taxonomyState =
-            commonModule->analyticsTaxonomyState())
+            systemContext->analyticsTaxonomyState())
         {
             if (const auto eventType =
                 taxonomyState->eventTypeById(data.getAnalyticsEventTypeId()))
@@ -81,7 +82,10 @@ ActionParameters actualActionParameters(
 
     if (actionType == ActionType::execHttpRequestAction)
     {
-        processTextFieldSubstitutions(result.text, eventRuntimeParameters, commonModule);
+        processTextFieldSubstitutions(
+            result.text,
+            eventRuntimeParameters,
+            commonModule->systemContext());
     }
     return result;
 }

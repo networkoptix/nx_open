@@ -4,18 +4,17 @@
 
 #include <QtNetwork/QHostAddress>
 
-#include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/user_resource.h>
-#include <core/resource/storage_resource.h>
 #include <core/resource/device_dependent_strings.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/resource.h>
+#include <core/resource/storage_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_management/user_roles_manager.h>
-#include <common/common_module.h>
-
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/socket_global.h>
+#include <nx/vms/common/system_context.h>
 
 namespace {
 

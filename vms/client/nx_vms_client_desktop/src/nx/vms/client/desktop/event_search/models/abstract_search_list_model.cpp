@@ -29,7 +29,7 @@ AbstractSearchListModel::AbstractSearchListModel(QnWorkbenchContext* context, QO
             return isCameraApplicable(camera);
         }))
 {
-    NX_CRITICAL(commonModule() && commonModule()->messageProcessor() && resourcePool());
+    NX_CRITICAL(messageProcessor() && resourcePool());
 
     connect(context, &QnWorkbenchContext::userChanged, this,
         [this](const QnUserResourcePtr& user)

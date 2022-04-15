@@ -2,16 +2,14 @@
 
 #include "videowall_item_access_provider.h"
 
-#include <core/resource_access/global_permissions_manager.h>
-#include <core/resource_access/resource_access_filter.h>
-#include <core/resource_access/helpers/layout_item_aggregator.h>
-
-#include <core/resource_management/resource_pool.h>
-
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
-#include <common/common_module.h>
+#include <core/resource_access/global_permissions_manager.h>
+#include <core/resource_access/helpers/layout_item_aggregator.h>
+#include <core/resource_access/resource_access_filter.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/common/system_context.h>
 
 namespace {
 

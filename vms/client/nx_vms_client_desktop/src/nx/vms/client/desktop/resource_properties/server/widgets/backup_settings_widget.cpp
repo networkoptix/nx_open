@@ -250,7 +250,7 @@ void BackupSettingsWidget::updateBackupSettingsAvailability()
 
 void BackupSettingsWidget::updateMessageBarText()
 {
-    const auto savedBackupSettings = commonModule()->globalSettings()->backupSettings();
+    const auto savedBackupSettings = globalSettings()->backupSettings();
     const auto modelBackupSettings = m_backupSettingsViewWidget->globalBackupSettings();
 
     if (savedBackupSettings == modelBackupSettings)

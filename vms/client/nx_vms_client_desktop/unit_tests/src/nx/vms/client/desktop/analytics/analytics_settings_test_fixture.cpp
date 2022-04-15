@@ -2,13 +2,12 @@
 
 #include "analytics_settings_test_fixture.h"
 
-#include <common/common_module.h>
-#include <common/static_common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/core/access/access_types.h>
 #include <nx/vms/api/analytics/device_agent_settings_response.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/test_support/api/message_processor_mock.h>
 
 namespace nx::vms::client::desktop {
@@ -86,35 +85,11 @@ ListenerNotifier::ListenerNotifier(const AnalyticsSettingsListenerPtr& listener)
         });
 }
 
-struct AnalyticsSettingsTestFixture::Environment
-{
-    Environment():
-        commonModule(
-            /*clientMode*/ false,
-            /*resourceAccessMode*/ nx::core::access::Mode::direct),
-        messageProcessor(&commonModule)
-    {
-    }
-
-    QnStaticCommonModule staticCommonModule;
-    QnCommonModule commonModule;
-    nx::vms::common::test_support::MessageProcessorMock messageProcessor;
-};
-
-AnalyticsSettingsTestFixture::AnalyticsSettingsTestFixture()
-{
-}
-
-AnalyticsSettingsTestFixture::~AnalyticsSettingsTestFixture()
-{
-}
-
 void AnalyticsSettingsTestFixture::SetUp()
 {
-    m_environment.reset(new Environment());
     m_serverInterfaceMock = std::make_shared<AnalyticsSettingsMockApiInterface>();
     m_manager.reset(new AnalyticsSettingsManager());
-    m_manager->setContext(resourcePool(), &m_environment->messageProcessor);
+    m_manager->setContext(resourcePool(), createMessageProcessor());
     m_manager->setServerInterface(m_serverInterfaceMock);
 }
 
@@ -122,14 +97,6 @@ void AnalyticsSettingsTestFixture::TearDown()
 {
     m_manager.reset();
     m_serverInterfaceMock.reset();
-    m_environment.reset();
-}
-
-nx::CameraResourceStubPtr AnalyticsSettingsTestFixture::addCamera()
-{
-    nx::CameraResourceStubPtr camera(new nx::CameraResourceStub());
-    resourcePool()->addResource(camera);
-    return camera;
 }
 
 AnalyticsEngineResourcePtr AnalyticsSettingsTestFixture::addEngine()
@@ -147,7 +114,7 @@ AnalyticsSettingsManager* AnalyticsSettingsTestFixture::manager() const
 
 QnResourcePool* AnalyticsSettingsTestFixture::resourcePool() const
 {
-    return m_environment->commonModule.resourcePool();
+    return systemContext()->resourcePool();
 }
 
 } // namespace test

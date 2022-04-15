@@ -326,14 +326,14 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
         return false;
 
     if (camera->hasCameraCapabilities(nx::vms::api::DeviceCapability::boundToServer)
-        && camera->getParentId() != commonModule()->peerId())
+        && camera->getParentId() != peerId())
     {
         return false;
     }
 
-    QnUuid ownGuid = commonModule()->peerId();
+    QnUuid ownGuid = peerId();
     QnMediaServerResourcePtr mServer = camera->getParentServer();
-    const auto& resPool = commonModule()->resourcePool();
+    const auto& resPool = resourcePool();
     auto rpCamera = resPool->getResourceByPhysicalId<QnSecurityCamResource>(camera->getPhysicalId());
     if (rpCamera)
     {
@@ -347,7 +347,7 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
     if (!ownServer)
         return false;
 
-    QnPeerRuntimeInfo localInfo = commonModule()->runtimeInfoManager()->localInfo();
+    QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
     using namespace nx::vms::api;
     const bool noStorages = localInfo.data.flags.testFlag(RuntimeFlag::noStorages);
     if (noStorages)
@@ -374,7 +374,7 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
     if (rpCamera && rpCamera->preferredServerId() == ownGuid)
         return true; //< Return back preferred camera.
 
-    QnPeerRuntimeInfo remoteInfo = commonModule()->runtimeInfoManager()->item(mServer->getId());
+    QnPeerRuntimeInfo remoteInfo = runtimeInfoManager()->item(mServer->getId());
     if (mServer->getStatus() == nx::vms::api::ResourceStatus::online
         && !remoteInfo.data.flags.testFlag(nx::vms::api::RuntimeFlag::noStorages))
     {
@@ -466,7 +466,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             searchType = SearchType::Partial;
         }
     }
-    const auto& resPool = commonModule()->resourcePool();
+    const auto& resPool = resourcePool();
     //filtering discovered resources by discovery mode
     QnResourceList resources;
     for( auto it = resourcesAndSearches.cbegin(); it != resourcesAndSearches.cend(); ++it )
@@ -569,7 +569,7 @@ QThreadPool* QnResourceDiscoveryManager::threadPool()
 
 bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources, SearchType /*searchType*/)
 {
-    const auto& resPool = commonModule()->resourcePool();
+    const auto& resPool = resourcePool();
     //excluding already existing resources
     QnResourceList::iterator it = resources.begin();
     while (it != resources.end())
@@ -688,7 +688,7 @@ QnResourceDiscoveryManager::State QnResourceDiscoveryManager::state() const
 
 DiscoveryMode QnResourceDiscoveryManager::discoveryMode() const
 {
-    if (commonModule()->globalSettings()->isAutoDiscoveryEnabled())
+    if (globalSettings()->isAutoDiscoveryEnabled())
         return DiscoveryMode::fullyEnabled;
     if (isRedundancyUsing())
         return DiscoveryMode::partiallyEnabled;
@@ -697,10 +697,10 @@ DiscoveryMode QnResourceDiscoveryManager::discoveryMode() const
 
 bool QnResourceDiscoveryManager::isRedundancyUsing() const
 {
-    const auto& resPool = commonModule()->resourcePool();
-    auto servers = resPool->servers();
+    auto servers = resourcePool()->servers();
     if (servers.size() < 2)
         return false;
+
     for (const auto& server: servers)
     {
         if (server->isRedundancy())
@@ -711,9 +711,9 @@ bool QnResourceDiscoveryManager::isRedundancyUsing() const
 
 void QnResourceDiscoveryManager::updateSearcherUsageUnsafe(QnAbstractResourceSearcher *searcher, bool usePartialEnable)
 {
-    DiscoveryMode discoveryMode = commonModule()->globalSettings()->isAutoDiscoveryEnabled() ?
-        DiscoveryMode::fullyEnabled :
-        DiscoveryMode::partiallyEnabled;
+    DiscoveryMode discoveryMode = globalSettings()->isAutoDiscoveryEnabled()
+        ? DiscoveryMode::fullyEnabled
+        : DiscoveryMode::partiallyEnabled;
     if( searcher->isLocal() ||                  // local resources should always be found
         searcher->isVirtualResource() )         // virtual resources should always be found
     {
@@ -726,7 +726,7 @@ void QnResourceDiscoveryManager::updateSearcherUsageUnsafe(QnAbstractResourceSea
         //     setting, but MUST check disabledVendors for all other vendors (if they enabled on
         //     edge server).
         if (!nx::build_info::isEdgeServer())
-            disabledVendorsForAutoSearch = commonModule()->globalSettings()->disabledVendorsSet();
+            disabledVendorsForAutoSearch = globalSettings()->disabledVendorsSet();
 
         //no lower_bound, since QSet is built on top of hash
         if( disabledVendorsForAutoSearch.contains(searcher->manufacturer()+lit("=partial")) )

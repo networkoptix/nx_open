@@ -233,7 +233,7 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
     SnappedScrollBar *scrollBar = new SnappedScrollBar(this);
     ui->usersTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
-    connect(qnGlobalSettings, &QnGlobalSettings::ldapSettingsChanged, this, &QnUserManagementWidget::updateLdapState);
+    connect(globalSettings(), &QnGlobalSettings::ldapSettingsChanged, this, &QnUserManagementWidget::updateLdapState);
     connect(ui->usersTable,   &QAbstractItemView::clicked,            this, &QnUserManagementWidget::at_usersTable_clicked);
 
     connect(ui->createUserButton,        &QPushButton::clicked,  this,  &QnUserManagementWidget::createUser);
@@ -332,7 +332,7 @@ void QnUserManagementWidget::loadDataToUi()
 void QnUserManagementWidget::updateLdapState()
 {
     ui->ldapSettingsButton->setEnabled(true);
-    ui->fetchButton->setEnabled(qnGlobalSettings->ldapSettings().isValid(/*checkPassword*/ false));
+    ui->fetchButton->setEnabled(globalSettings()->ldapSettings().isValid(/*checkPassword*/ false));
 }
 
 void QnUserManagementWidget::applyChanges()
@@ -525,7 +525,7 @@ void QnUserManagementWidget::fetchUsers()
     if (!context()->user())
         return;
 
-    if (!qnGlobalSettings->ldapSettings().isValid(/*checkPassword*/ false))
+    if (!globalSettings()->ldapSettings().isValid(/*checkPassword*/ false))
         return;
 
     QScopedPointer<QnLdapUsersDialog> dialog(new QnLdapUsersDialog(this));

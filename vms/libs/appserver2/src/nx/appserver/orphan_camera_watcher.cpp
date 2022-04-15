@@ -55,11 +55,11 @@ void OrphanCameraWatcher::start()
 
 void OrphanCameraWatcher::update()
 {
-    auto connectionPtr = commonModule()->ec2Connection();
+    auto connectionPtr = ec2Connection();
     if (!connectionPtr)
         return;
 
-    auto pool = commonModule()->resourcePool();
+    auto pool = resourcePool();
     if (!pool)
         return;
 

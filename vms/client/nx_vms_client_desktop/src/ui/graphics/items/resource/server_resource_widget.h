@@ -25,7 +25,11 @@ class QnServerResourceWidget: public QnResourceWidget, public AnimationTimerList
 public:
     typedef QHash<QString, bool> HealthMonitoringButtons;
 
-    QnServerResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = nullptr);
+    QnServerResourceWidget(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        nx::vms::client::desktop::WindowContext* windowContext,
+        QnWorkbenchItem* item,
+        QGraphicsItem* parent = nullptr);
     virtual ~QnServerResourceWidget();
 
     /**

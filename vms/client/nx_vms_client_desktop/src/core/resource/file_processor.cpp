@@ -68,28 +68,30 @@ QStringList QnFileProcessor::findAcceptedFiles(const QList<QUrl>& urls)
     return QnFileProcessor::findAcceptedFiles(files);
 }
 
-QnResourcePtr QnFileProcessor::createResourcesForFile(const QString& fileName)
+QnResourcePtr QnFileProcessor::createResourcesForFile(
+    const QString& fileName,
+    QnResourcePool* resourcePool)
 {
     const auto path = fixSeparators(fileName);
-    auto pool = qnClientCoreModule->commonModule()->resourcePool();
-    const auto result = ResourceDirectoryBrowser::resourceFromFile(path, pool);
+    const auto result = ResourceDirectoryBrowser::resourceFromFile(path, resourcePool);
     if (result)
-        pool->addResource(result);
+        resourcePool->addResource(result);
     return result;
 }
 
-QnResourceList QnFileProcessor::createResourcesForFiles(const QStringList &files)
+QnResourceList QnFileProcessor::createResourcesForFiles(
+    const QStringList& files,
+    QnResourcePool* resourcePool)
 {
-    auto pool = qnClientCoreModule->commonModule()->resourcePool();
     QnResourceList result;
     for (const auto& fileName: files)
     {
         const auto path = fixSeparators(fileName);
-        QnResourcePtr resource = ResourceDirectoryBrowser::resourceFromFile(path, pool);
+        QnResourcePtr resource = ResourceDirectoryBrowser::resourceFromFile(path, resourcePool);
         if (resource)
             result << resource;
     }
-    pool->addResources(result);
+    resourcePool->addResources(result);
 
     return result;
 }
@@ -124,16 +126,15 @@ QnResourceList QnFileProcessor::findOrCreateResourcesForFiles(const QList<QUrl>&
     return result;
 }
 
-void QnFileProcessor::deleteLocalResources(const QnResourceList &resources_)
+void QnFileProcessor::deleteLocalResources(const QnResourceList& resources)
 {
-    QnResourceList resources;
-    foreach (const QnResourcePtr &resource, resources_)
-        if (resource->hasFlags(Qn::url | Qn::local))
-            resources.append(resource);
-    if (resources.isEmpty())
-        return;
-
-    qnClientCoreModule->commonModule()->resourcePool()->removeResources(resources);
     for (const QnResourcePtr& resource: resources)
-        QFile::remove(resource->getUrl());
+    {
+        if (resource->hasFlags(Qn::url | Qn::local))
+        {
+            if (auto resourcePool = resource->resourcePool())
+                resourcePool->removeResource(resource);
+            QFile::remove(resource->getUrl());
+        }
+    }
 }

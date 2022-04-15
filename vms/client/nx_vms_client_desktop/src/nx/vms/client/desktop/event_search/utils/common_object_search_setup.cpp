@@ -9,22 +9,23 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/pending_operation.h>
+#include <nx/utils/qset.h>
+#include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/event_search/models/abstract_search_list_model.h>
+#include <nx/vms/client/desktop/event_search/utils/text_filter_setup.h>
+#include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/utils/managed_camera_set.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/synctime.h>
-
-#include <nx/utils/log/log.h>
-#include <nx/utils/pending_operation.h>
-#include <nx/utils/scoped_connections.h>
-#include <nx/utils/qset.h>
-#include <nx/vms/client/core/watchers/server_time_watcher.h>
-#include <nx/vms/client/desktop/event_search/models/abstract_search_list_model.h>
-#include <nx/vms/client/desktop/event_search/utils/text_filter_setup.h>
-#include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
-#include <nx/vms/client/desktop/utils/managed_camera_set.h>
 
 namespace nx::vms::client::desktop {
 
@@ -196,8 +197,9 @@ CommonObjectSearchSetup::Private::Private(CommonObjectSearchSetup* q):
             if (!context())
                 return;
 
-            const auto timeWatcher =
-                context()->instance<nx::vms::client::core::ServerTimeWatcher>();
+            // TODO: #sivanov Actualize used system context.
+            const auto timeWatcher = ApplicationContext::instance()->currentSystemContext()
+                ->serverTimeWatcher();
             setCurrentDate(timeWatcher->displayTime(qnSyncTime->currentMSecsSinceEpoch()));
         });
 

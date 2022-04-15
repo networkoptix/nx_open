@@ -26,9 +26,9 @@ BaseResourceAccessProvider::BaseResourceAccessProvider(
 {
     if (mode == Mode::cached)
     {
-        connect(m_context->resourcePool(), &QnResourcePool::resourceAdded, this,
+        connect(resourcePool(), &QnResourcePool::resourceAdded, this,
             &BaseResourceAccessProvider::handleResourceAdded);
-        connect(m_context->resourcePool(), &QnResourcePool::resourceRemoved, this,
+        connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
             &BaseResourceAccessProvider::handleResourceRemoved);
 
         connect(m_context->userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
@@ -116,7 +116,7 @@ void BaseResourceAccessProvider::afterUpdate()
     if (mode() == Mode::direct)
         return;
 
-    const auto resources = m_context->resourcePool()->getResources();
+    const auto resources = resourcePool()->getResources();
     const auto subjects = m_context->resourceAccessSubjectsCache()->allSubjects();
 
     NX_MUTEX_LOCKER lk(&m_mutex);
@@ -178,7 +178,7 @@ void BaseResourceAccessProvider::updateAccessBySubject(const QnResourceAccessSub
     if (isUpdating())
         return;
 
-    const auto resources = m_context->resourcePool()->getResources();
+    const auto resources = resourcePool()->getResources();
     NX_VERBOSE(this, "Updating access by %1 to %2", subject, nx::containerString(resources));
     for (const auto& resource: resources)
         updateAccess(subject, resource);
@@ -325,7 +325,7 @@ void BaseResourceAccessProvider::handleSubjectRemoved(const QnResourceAccessSubj
         resourceIds = m_accessibleResources.take(id);
     }
 
-    const auto resources = m_context->resourcePool()->getResourcesByIds(resourceIds);
+    const auto resources = resourcePool()->getResourcesByIds(resourceIds);
     for (const auto& targetResource: resources)
         emit accessChanged(subject, targetResource, Source::none);
 }

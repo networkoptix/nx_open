@@ -9,6 +9,7 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/common/system_context.h>
 #include <utils/common/synctime.h>
 
 using namespace nx::vms::client::desktop::license;
@@ -23,7 +24,7 @@ bool VideoWallLicenseValidator::overrideMissingRuntimeInfo(
     if (!currentSession)
         return false;
 
-    const auto& manager = qnClientCoreModule->commonModule()->runtimeInfoManager();
+    const auto& manager = qnClientCoreModule->commonModule()->systemContext()->runtimeInfoManager();
     auto commonInfo =
         manager->items()->getItem(currentSession->connection()->moduleInformation().id);
 

@@ -4,14 +4,13 @@
 
 #include <api/server_rest_connection.h>
 #include <camera/iomodule/iomodule_monitor.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/event/action_parameters.h>
 #include <ui/graphics/items/overlays/scrollable_text_items_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/workbench/workbench_context.h>
 
 using ExtendedCameraOutput = nx::vms::api::ExtendedCameraOutput;
 
@@ -19,7 +18,6 @@ namespace nx::vms::client::desktop {
 
 ButtonController::ButtonController(QnMediaResourceWidget* mediaResourceWidget):
     base_type(mediaResourceWidget),
-    QnWorkbenchContextAware(mediaResourceWidget),
     m_parentWidget(mediaResourceWidget),
     m_camera(mediaResourceWidget->resource().dynamicCast<QnVirtualCameraResource>())
 {
@@ -116,7 +114,8 @@ void ButtonController::buttonClickHandler(
             handleApiReply(button, success, requestId, result);
         });
 
-    if (auto connection = connectedServerApi())
+    auto systemContext = SystemContext::fromResource(m_camera);
+    if (auto connection = systemContext->connectedServerApi())
         connection->executeEventAction(actionData, callback, thread());
 }
 

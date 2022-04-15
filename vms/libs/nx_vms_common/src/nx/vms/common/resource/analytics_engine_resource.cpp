@@ -63,7 +63,7 @@ AnalyticsPluginResourcePtr AnalyticsEngineResource::plugin() const
     if (!NX_ASSERT(context, "Can't access resource context"))
         return AnalyticsPluginResourcePtr();
 
-    return context->resourcePool()->getResourceById(getParentId())
+    return resourcePool()->getResourceById(getParentId())
         .dynamicCast<AnalyticsPluginResource>();
 }
 

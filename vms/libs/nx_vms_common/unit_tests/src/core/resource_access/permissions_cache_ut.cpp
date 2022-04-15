@@ -4,20 +4,25 @@
 
 #include <gtest/gtest.h>
 
-#include <common/common_module.h>
-#include <common/static_common_module.h>
 #include <core/resource_access/permissions_cache.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/core/access/access_types.h>
-#include <nx/vms/common/test_support/resource/resource_pool_test_helper.h>
+#include <nx/vms/common/test_support/test_context.h>
 
 namespace nx::core::access {
 namespace test {
 
 using namespace Qn;
+using namespace nx::vms::common::test;
 
-class PermissionsCacheTest: public testing::Test, protected QnResourcePoolTestHelper
+class PermissionsCacheTest: public ContextBasedTest
 {
+public:
+    PermissionsCacheTest():
+        ContextBasedTest(/*clientMode*/ false, nx::core::access::Mode::cached)
+    {
+    }
+
 protected:
     static constexpr int kRoleSubjectsCount = 200;
     static constexpr int kUserSubjectsCount = 1000;
@@ -51,27 +56,8 @@ protected:
         resourceIdPool.resize(0);
     }
 
-    virtual void SetUp() override
-    {
-        m_staticCommon = std::make_unique<QnStaticCommonModule>();
-        m_module = std::make_unique<QnCommonModule>(
-            /*clientMode*/ false,
-            nx::core::access::Mode::cached);
-        initializeContext(m_module.get());
-    }
-
-    virtual void TearDown() override
-    {
-        deinitializeContext();
-        m_module.reset();
-        m_staticCommon.reset();
-    }
-
     static std::vector<QnUuid> subjectIdPool;
     static std::vector<QnUuid> resourceIdPool;
-
-    std::unique_ptr<QnStaticCommonModule> m_staticCommon;
-    std::unique_ptr<QnCommonModule> m_module;
 };
 
 std::vector<QnUuid> PermissionsCacheTest::subjectIdPool = {};

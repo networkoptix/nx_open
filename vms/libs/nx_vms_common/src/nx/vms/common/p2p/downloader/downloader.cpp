@@ -71,7 +71,7 @@ void Downloader::Private::startDownload(const QString& fileName)
         fileName,
         storage.data(),
         peerManagers,
-        q->commonModule()->peerId());
+        q->peerId());
     workers[fileName] = worker;
 
     connect(worker.get(), &Worker::finished, this,

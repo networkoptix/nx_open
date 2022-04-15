@@ -3,27 +3,25 @@
 #include "audit_item_delegate.h"
 
 #include <QtGui/QMouseEvent>
-
-#include <QtWidgets/QApplication>
 #include <QtWidgets/QAbstractScrollArea>
-
-#include <nx/vms/time/formatter.h>
-
-#include <core/resource/camera_resource.h>
-#include <core/resource/device_dependent_strings.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/resource_display_info.h>
+#include <QtWidgets/QApplication>
 
 #include <client/client_settings.h>
-
-#include <ui/models/audit/audit_log_model.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/device_dependent_strings.h>
+#include <core/resource/resource_display_info.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/time/formatter.h>
+#include <ui/models/audit/audit_log_model.h>
 #include <ui/workbench/workbench_context.h>
-
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
 
-#include <nx/vms/client/core/watchers/server_time_watcher.h>
+using namespace nx::vms::client::desktop;
 
 namespace
 {
@@ -436,7 +434,10 @@ void QnAuditItemDelegate::paintDateTime(const QStyle* style, QPainter* painter, 
         return;
 
     /* Get date and time strings: */
-    const auto serverTimeWatcher = context()->instance<nx::vms::client::core::ServerTimeWatcher>();
+
+    // TODO: #sivanov Actualize used system context.
+    const auto serverTimeWatcher = ApplicationContext::instance()->currentSystemContext()
+        ->serverTimeWatcher();
     QDateTime dateTime = serverTimeWatcher->displayTime(dateTimeSecs * 1000ll);
     QString dateStr = nx::vms::time::toString(dateTime.date()) + lit(" ");
     QString timeStr = nx::vms::time::toString(dateTime.time());
@@ -476,8 +477,9 @@ void QnAuditItemDelegate::paintDescription(const QStyle* style, QPainter* painte
         case Qn::AR_ViewArchive:
         case Qn::AR_ExportVideo:
         {
+            // TODO: #sivanov Actualize used system context.
             const auto serverTimeWatcher =
-                context()->instance<nx::vms::client::core::ServerTimeWatcher>();
+                ApplicationContext::instance()->currentSystemContext()->serverTimeWatcher();
             const auto rangeStartTime = nx::vms::time::toString(serverTimeWatcher->displayTime(
                 record->rangeStartSec * 1000ll));
             const auto rangeEndTime = nx::vms::time::toString(serverTimeWatcher->displayTime(

@@ -9,6 +9,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
@@ -143,7 +144,7 @@ void External::Private::resetC2pLayout(
 
     // Forcefully enable sync.
     std::chrono::microseconds timestampUs = timestamp;
-    const auto streamSynchronizer = context->instance<QnWorkbenchStreamSynchronizer>();
+    auto streamSynchronizer = context->workbench()->windowContext()->streamSynchronizer();
     streamSynchronizer->start(/*timeUSec*/ timestampUs.count(), /*speed*/ 0.0);
 
     context->navigator()->setPlaying(false);

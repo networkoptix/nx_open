@@ -4,7 +4,9 @@
 
 #include <chrono>
 
+#include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/core/media/analytics_fwd.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/types.h>
 
 class QnMediaResourceWidget;
@@ -14,14 +16,13 @@ namespace nx::vms::client::desktop {
 
 class AnalyticsOverlayWidget;
 
-class WidgetAnalyticsController: public QObject
+class WidgetAnalyticsController: public SystemContextAware
 {
-    using base_type = QObject;
     using Filter = nx::analytics::db::Filter;
 
 public:
     WidgetAnalyticsController(QnMediaResourceWidget* mediaResourceWidget);
-    virtual ~WidgetAnalyticsController() override;
+    ~WidgetAnalyticsController();
 
     void updateAreas(std::chrono::microseconds timestamp, int channel);
     void clearAreas();
@@ -33,7 +34,7 @@ public:
 
 private:
     class Private;
-    const QScopedPointer<Private> d;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop

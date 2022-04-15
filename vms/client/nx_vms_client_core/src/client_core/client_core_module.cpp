@@ -28,6 +28,7 @@
 #include <nx/vms/client/core/thumbnails/thumbnail_image_provider.h>
 #include <nx/vms/client/core/utils/operation_manager.h>
 #include <nx/vms/client/core/watchers/known_server_connections.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/rules/engine_holder.h>
 #include <plugins/resource/desktop_audio_only/desktop_audio_only_resource.h>
 #include <watchers/cloud_status_watcher.h>
@@ -51,17 +52,17 @@ struct QnClientCoreModule::Private
 
 QnClientCoreModule::QnClientCoreModule(
     Mode mode,
-    QnUuid peerId,
-    nx::core::access::Mode resourceAccessMode)
+    nx::vms::common::SystemContext* systemContext)
     :
     base_type(),
     d(new Private())
 {
-    NX_ASSERT(!peerId.isNull() || mode == Mode::unitTests, "Production usage must have peer id.");
+    NX_ASSERT(!systemContext->peerId().isNull()
+        || mode == Mode::unitTests, "Production usage must have peer id.");
+
     d->commonModule = std::make_unique<QnCommonModule>(
         /*clientMode*/ true,
-        resourceAccessMode,
-        std::move(peerId));
+        systemContext);
 
     ini().reload();
 
@@ -110,7 +111,7 @@ QnClientCoreModule::QnClientCoreModule(
     d->resourceDataProviderFactory->registerResourceType<QnDesktopAudioOnlyResource>();
     d->cloudStatusWatcher = std::make_unique<QnCloudStatusWatcher>(d->commonModule.get());
 
-    d->vmsRulesEngineHolder = std::make_unique<nx::vms::rules::EngineHolder>(commonModule());
+    d->vmsRulesEngineHolder = std::make_unique<nx::vms::rules::EngineHolder>(systemContext);
 }
 
 QnClientCoreModule::~QnClientCoreModule()
@@ -139,6 +140,11 @@ void QnClientCoreModule::initializeNetworking(
 NetworkModule* QnClientCoreModule::networkModule() const
 {
     return d->networkModule.get();
+}
+
+QnResourcePool* QnClientCoreModule::resourcePool() const
+{
+    return d->commonModule->systemContext()->resourcePool();
 }
 
 QnCommonModule* QnClientCoreModule::commonModule() const

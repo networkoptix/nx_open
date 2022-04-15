@@ -4,15 +4,14 @@
 
 #include <QtCore/QFileInfo>
 
-#include <common/common_module.h>
-
+#include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/file_layout_resource.h>
+#include <core/resource/storage_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/user_roles_manager.h>
-#include <core/resource/avi/avi_resource.h>
-#include <core/resource/storage_resource.h>
-#include <core/resource/file_layout_resource.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
+#include <nx/vms/common/system_context.h>
 
 namespace nx::vms::client::desktop::resources::search_helper {
 

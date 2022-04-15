@@ -3,30 +3,32 @@
 #include "control_widget.h"
 
 #include <QtWidgets/QAction>
-#include <QtWidgets/QVBoxLayout>
-#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QGridLayout>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QVBoxLayout>
 
 #include <camera/resource_display.h>
 #include <client/client_runtime_settings.h>
 #include <core/resource/resource.h>
-#include <ui/graphics/items/resource/media_resource_widget.h>
+#include <nx/streaming/abstract_archive_stream_reader.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/style/icon.h>
+#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <ui/graphics/instruments/instrument_manager.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/style/icon.h>
+#include <ui/workbench/extensions/workbench_stream_synchronizer.h>
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_navigator.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <utils/common/event_processors.h>
-
-#include <nx/streaming/abstract_archive_stream_reader.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 
 #include "volume_slider.h"
 
@@ -90,7 +92,9 @@ ControlWidget::ControlWidget(QnWorkbenchContext* context, QWidget* parent):
     initButton(m_calendarButton, ui::action::ToggleCalendarAction,
         "slider/buttons/calendar.png");
 
-    this->context()->statisticsModule()->registerSlider(lit("volume_slider"), m_volumeSlider);
+    ApplicationContext::instance()->controlsStatisticsModule()->registerSlider(
+        "volume_slider",
+        m_volumeSlider);
 
     auto mainLayout = new QVBoxLayout();
     mainLayout->setSpacing(2);
@@ -112,7 +116,7 @@ ControlWidget::ControlWidget(QnWorkbenchContext* context, QWidget* parent):
     setLayout(mainLayout);
 
     /* Set up handlers. */
-    QnWorkbenchStreamSynchronizer *streamSynchronizer = this->context()->instance<QnWorkbenchStreamSynchronizer>();
+    auto streamSynchronizer = workbench()->windowContext()->streamSynchronizer();
     connect(streamSynchronizer, &QnWorkbenchStreamSynchronizer::runningChanged,
         this, &ControlWidget::updateSyncButtonState);
     connect(streamSynchronizer, &QnWorkbenchStreamSynchronizer::effectiveChanged,
@@ -273,7 +277,7 @@ void ControlWidget::updateLiveButtonState()
 
 void ControlWidget::updateSyncButtonState()
 {
-    const auto streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+    auto streamSynchronizer = context()->workbench()->windowContext()->streamSynchronizer();
     const auto syncForced = navigator()->syncIsForced();
 
     const auto syncAllowed = streamSynchronizer->isEffective()
@@ -323,7 +327,7 @@ void ControlWidget::at_jumpToliveAction_triggered()
 
 void ControlWidget::at_toggleSyncAction_triggered()
 {
-    const auto streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+    auto streamSynchronizer = workbench()->windowContext()->streamSynchronizer();
 
     if (m_syncButton->isChecked())
         streamSynchronizer->setState(navigator()->currentWidget());

@@ -59,7 +59,7 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
         this, &QnGeneralSystemAdministrationWidget::hasChangesChanged);
     connect(ui->systemNameLabel, &EditableLabel::editingFinished,
         this, &QnGeneralSystemAdministrationWidget::hasChangesChanged);
-    connect(qnGlobalSettings, &QnGlobalSettings::systemNameChanged,
+    connect(globalSettings(), &QnGlobalSettings::systemNameChanged,
         this, &QnGeneralSystemAdministrationWidget::loadSystemName);
 
     auto buttonLayout = new QHBoxLayout(ui->buttonWidget);
@@ -163,13 +163,13 @@ void QnGeneralSystemAdministrationWidget::applyChanges()
     ui->systemSettingsWidget->applyChanges();
     ui->systemNameLabel->setEditing(false);
 
-    qnGlobalSettings->setSystemName(ui->systemNameLabel->text().trimmed());
-    qnGlobalSettings->synchronizeNow();
+    globalSettings()->setSystemName(ui->systemNameLabel->text().trimmed());
+    globalSettings()->synchronizeNow();
 }
 
 bool QnGeneralSystemAdministrationWidget::hasChanges() const
 {
-    return (ui->systemNameLabel->text().trimmed() != qnGlobalSettings->systemName())
+    return (ui->systemNameLabel->text().trimmed() != globalSettings()->systemName())
         || ui->systemSettingsWidget->hasChanges();
 }
 
@@ -215,7 +215,7 @@ void QnGeneralSystemAdministrationWidget::retranslateUi()
 
 void QnGeneralSystemAdministrationWidget::loadSystemName()
 {
-    ui->systemNameLabel->setText(qnGlobalSettings->systemName());
+    ui->systemNameLabel->setText(globalSettings()->systemName());
 }
 
 bool QnGeneralSystemAdministrationWidget::isDatabaseBackupAvailable() const

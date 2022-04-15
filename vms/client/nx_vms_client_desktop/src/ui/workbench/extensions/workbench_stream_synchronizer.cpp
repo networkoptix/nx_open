@@ -2,33 +2,30 @@
 
 #include "workbench_stream_synchronizer.h"
 
+#include <camera/cam_display.h>
+#include <camera/client_video_camera.h>
+#include <camera/resource_display.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource/resource.h>
+#include <core/resource/security_cam_resource.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/utils/counter.h>
+#include <nx/utils/datetime.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/window_context.h>
+#include <plugins/resource/archive/syncplay_wrapper.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/workbench/watchers/workbench_render_watcher.h>
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_layout.h>
 #include <utils/common/checked_cast.h>
 
-#include <core/resource/resource.h>
-#include <core/resource/layout_resource.h>
-#include <core/resource/security_cam_resource.h>
-
-#include <plugins/resource/archive/syncplay_wrapper.h>
-
-#include <camera/resource_display.h>
-#include <camera/client_video_camera.h>
-#include <camera/cam_display.h>
-
-#include <ui/workbench/workbench_display.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench.h>
-#include <ui/workbench/workbench_layout.h>
-#include <ui/graphics/items/resource/resource_widget.h>
-#include <ui/graphics/items/resource/media_resource_widget.h>
-
-#include <ui/workbench/watchers/workbench_render_watcher.h>
-
-#include <nx/fusion/model_functions.h>
-
-#include <nx/utils/datetime.h>
-
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnStreamSynchronizationState, (json), (isSyncOn)(timeUs)(speed))
+
+using namespace nx::vms::client::desktop;
 
 QnStreamSynchronizationState::QnStreamSynchronizationState():
     QnStreamSynchronizationState(false, AV_NOPTS_VALUE, 0.0)
@@ -47,31 +44,51 @@ QnStreamSynchronizationState QnStreamSynchronizationState::live()
     return QnStreamSynchronizationState(true, DATETIME_NOW, 1.0);
 }
 
-
-QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QObject *parent):
+QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(
+    WindowContext* windowContext,
+    QObject* parent)
+    :
     QObject(parent),
-    QnWorkbenchContextAware(parent),
-    m_widgetCount(0),
-    m_counter(nullptr),
+    WindowContextAware(windowContext),
     m_syncPlay(new QnArchiveSyncPlayWrapper(this)),
-    m_watcher(context()->instance<QnWorkbenchRenderWatcher>())
+    m_watcher(windowContext->resourceWidgetRenderWatcher())
 {
+    NX_CRITICAL(m_watcher, "Initialization order failure");
+
     /* Connect to display. */
-    connect(display(),                  &QnWorkbenchDisplay::widgetAdded,               this,       &QnWorkbenchStreamSynchronizer::at_display_widgetAdded);
-    connect(display(),                  &QnWorkbenchDisplay::widgetAboutToBeRemoved,    this,       &QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved);
-    connect(workbench(),                &QnWorkbench::currentLayoutChanged,             this,       &QnWorkbenchStreamSynchronizer::at_workbench_currentLayoutChanged);
+    connect(display(),
+        &QnWorkbenchDisplay::widgetAdded,
+        this,
+        &QnWorkbenchStreamSynchronizer::at_display_widgetAdded);
+    connect(display(),
+        &QnWorkbenchDisplay::widgetAboutToBeRemoved,
+        this,
+        &QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved);
+    connect(workbench(),
+        &QnWorkbench::currentLayoutChanged,
+        this,
+        &QnWorkbenchStreamSynchronizer::at_workbench_currentLayoutChanged);
 
     /* Prepare counter. */
     m_counter = new nx::utils::CounterWithSignal(1, this);
-    connect(this,                       &QObject::destroyed,                            m_counter,  &nx::utils::CounterWithSignal::decrement);
-    connect(m_counter,                  &nx::utils::CounterWithSignal::reachedZero,                        m_syncPlay, &QnArchiveSyncPlayWrapper::deleteLater);
-    connect(m_counter,                  &nx::utils::CounterWithSignal::reachedZero,                        m_counter,  &nx::utils::CounterWithSignal::deleteLater);
+    connect(this, &QObject::destroyed, m_counter, &nx::utils::CounterWithSignal::decrement);
+    connect(m_counter,
+        &nx::utils::CounterWithSignal::reachedZero,
+        m_syncPlay,
+        &QnArchiveSyncPlayWrapper::deleteLater);
+    connect(m_counter,
+        &nx::utils::CounterWithSignal::reachedZero,
+        m_counter,
+        &nx::utils::CounterWithSignal::deleteLater);
 
     /* Prepare render watcher instance. */
-    connect(m_watcher,                  &QnWorkbenchRenderWatcher::displayChanged,      this,       &QnWorkbenchStreamSynchronizer::at_renderWatcher_displayChanged);
+    connect(m_watcher,
+        &QnWorkbenchRenderWatcher::displayChanged,
+        this,
+        &QnWorkbenchStreamSynchronizer::at_renderWatcher_displayChanged);
 
     /* Run handlers for all widgets already on display. */
-    foreach(QnResourceWidget *widget, display()->widgets())
+    foreach (QnResourceWidget* widget, display()->widgets())
         at_display_widgetAdded(widget);
 }
 
@@ -213,4 +230,3 @@ void QnWorkbenchStreamSynchronizer::at_resource_flagsChanged(const QnResourcePtr
         }
     }
 }
-

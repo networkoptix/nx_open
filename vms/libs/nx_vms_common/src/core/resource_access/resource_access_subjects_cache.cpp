@@ -18,14 +18,14 @@ QnResourceAccessSubjectsCache::QnResourceAccessSubjectsCache(
     nx::vms::common::SystemContextAware(context),
     m_mutex(nx::Mutex::NonRecursive)
 {
-    NX_CRITICAL(m_context->resourcePool()
+    NX_CRITICAL(resourcePool()
         && m_context->userRolesManager()
         && m_context->globalPermissionsManager());
 
     // TODO: #vkutin #sivanov Don't connect to users directly.
     // Add required signals to globalPermissionsManager add use it.
 
-    connect(m_context->resourcePool(), &QnResourcePool::resourceAdded, this,
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         [this](const QnResourcePtr& resource)
         {
             /* Quick check */
@@ -38,7 +38,7 @@ QnResourceAccessSubjectsCache::QnResourceAccessSubjectsCache(
                 handleUserAdded(user);
         });
 
-    connect(m_context->resourcePool(), &QnResourcePool::resourceRemoved, this,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
         {
             /* Quick check */

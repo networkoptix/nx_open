@@ -44,7 +44,7 @@ void UpdateFileLayoutHelper::finishUpdateLayout(const QnFileLayoutResourcePtr& l
     NX_ASSERT(QCoreApplication::instance()->thread() == thread(),
         "Must be called from the main thread");
 
-    QnResourcePool* resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    QnResourcePool* resourcePool = qnClientCoreModule->resourcePool();
     auto sourceLayout =
         resourcePool->getResourceByUrl(loadedLayout->getUrl()).dynamicCast<QnFileLayoutResource>();
 
@@ -193,7 +193,7 @@ QnResourcePtr ResourceDirectoryBrowser::createArchiveResource(
 
 void ResourceDirectoryBrowser::dropResourcesFromDirectory(const QString& path)
 {
-    QnResourcePool* resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    QnResourcePool* resourcePool = qnClientCoreModule->resourcePool();
     const QString canonicalDirPath = QDir(path).canonicalPath();
 
     QnResourceList resourcesToRemove;
@@ -245,7 +245,7 @@ void LocalResourceProducer::createLocalResources(const QStringList& pathList)
     if (!clientCoreModule)
         return;
 
-    QPointer<QnResourcePool> resourcePool(clientCoreModule->commonModule()->resourcePool());
+    QPointer<QnResourcePool> resourcePool(clientCoreModule->resourcePool());
 
     QnResourceList newResources;
     for (const auto& filePath: pathList)
@@ -280,7 +280,7 @@ void LocalResourceProducer::updateFileLayoutResource(const QString& path)
     if (QThread::currentThread()->isInterruptionRequested())
         return;
 
-    QnResourcePool* resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    QnResourcePool* resourcePool = qnClientCoreModule->resourcePool();
     if (auto fileLayout =
         resourcePool->getResourceByUrl(path).dynamicCast<QnFileLayoutResource>())
     {
@@ -316,7 +316,7 @@ void LocalResourceProducer::updateVideoFileResource(const QString& path)
     if (!clientCoreModule)
         return;
 
-    const auto resourcePool = clientCoreModule->commonModule()->resourcePool();
+    const auto resourcePool = clientCoreModule->resourcePool();
 
     if (auto aviResource = resourcePool->getResourceByUrl(path).dynamicCast<QnAviResource>())
     {

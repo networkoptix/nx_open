@@ -16,7 +16,7 @@ namespace nx::vms::client::core {
 
 ReconnectHelper::ReconnectHelper(std::optional<QnUuid> stickyReconnectTo)
 {
-    auto currentServer = commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(
+    auto currentServer = resourcePool()->getResourceById<QnMediaServerResource>(
         stickyReconnectTo.value_or(QnUuid()));
 
     if (currentServer && stickyReconnectTo.has_value())

@@ -8,7 +8,6 @@
 #include <api/server_rest_connection_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
-#include <ui/workbench/workbench_context_aware.h>
 
 class GraphicsWidget;
 class QnIOModuleMonitor;
@@ -17,9 +16,7 @@ class QnScrollableItemsWidget;
 
 namespace nx::vms::client::desktop {
 
-class ButtonController:
-    public QObject,
-    public QnWorkbenchContextAware
+class ButtonController: public QObject
 {
     Q_OBJECT
     using base_type = QObject;

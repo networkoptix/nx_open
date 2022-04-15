@@ -50,7 +50,7 @@ QnLocalResourceStatusWatcher::QnLocalResourceStatusWatcher(QObject* parent /*= n
 {
     using namespace std::literals::chrono_literals;
 
-    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    auto resourcePool = qnClientCoreModule->resourcePool();
     connect(resourcePool, &QnResourcePool::resourceAdded,
         this, &QnLocalResourceStatusWatcher::onResourceAdded);
 
@@ -92,7 +92,7 @@ void QnLocalResourceStatusWatcher::onResourceAdded(const QnResourcePtr& resource
 
 void QnLocalResourceStatusWatcher::timerEvent(QTimerEvent* event)
 {
-    const auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    const auto resourcePool = qnClientCoreModule->resourcePool();
     for (auto it = m_watchedResources.begin(); it != m_watchedResources.end();)
     {
         NX_ASSERT(it->statusFuture.valid());

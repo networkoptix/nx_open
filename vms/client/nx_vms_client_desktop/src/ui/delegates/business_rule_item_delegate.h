@@ -21,7 +21,7 @@ public:
     virtual ~QnBusinessRuleItemDelegate() override;
 
     using Column = QnBusinessRuleViewModel::Column;
-    static int optimalWidth(Column column, const QFontMetrics& metrics);
+    int optimalWidth(Column column, const QFontMetrics& metrics) const;
 
     virtual void updateEditorGeometry(
         QWidget* editor,

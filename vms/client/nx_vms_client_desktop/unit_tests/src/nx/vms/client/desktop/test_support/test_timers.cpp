@@ -10,7 +10,7 @@ namespace nx::vms::client::desktop::test {
 
 using std::chrono::milliseconds;
 
-class NX_VMS_CLIENT_DESKTOP_API TestTimer: public AbstractTimer
+class TestTimer: public AbstractTimer
 {
 public:
     TestTimer(TestTimerFactory* factory, QObject* parent):
@@ -106,7 +106,7 @@ private:
     bool m_singleShot = false;
 };
 
-class NX_VMS_CLIENT_DESKTOP_API TestElapsedTimer: public AbstractElapsedTimer
+class TestElapsedTimer: public AbstractElapsedTimer
 {
 public:
     TestElapsedTimer(TestTimerFactory* factory):

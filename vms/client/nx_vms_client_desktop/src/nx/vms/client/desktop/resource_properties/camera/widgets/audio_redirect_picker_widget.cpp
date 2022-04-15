@@ -97,7 +97,7 @@ void AudioRedirectPickerWidget::loadState(const CameraSettingsDialogState& state
     m_deviceId = state.singleCameraId();
     m_audioRedirectDeviceId = getRedirectDeviceId(state);
 
-    const auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    const auto resourcePool = qnClientCoreModule->resourcePool();
 
     const auto device = resourcePool->getResourceById<QnVirtualCameraResource>(m_deviceId);
     const auto redirectDevice =
@@ -147,7 +147,7 @@ void AudioRedirectPickerWidget::showEvent(QShowEvent* event)
 
 QnResourcePool* AudioRedirectPickerWidget::resourcePool() const
 {
-    return qnClientCoreModule->commonModule()->resourcePool();
+    return qnClientCoreModule->resourcePool();
 }
 
 void AudioRedirectPickerWidget::selectAudioRedirectDevice()

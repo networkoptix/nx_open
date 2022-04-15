@@ -340,10 +340,11 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
         Column::action,
         Column::aggregation };
 
+    auto columnDelegate = new QnBusinessRuleItemDelegate(this);
     for (auto column: forcedColumns)
     {
         m_rulesViewModel->forceColumnMinWidth(column,
-            QnBusinessRuleItemDelegate::optimalWidth(column, this->fontMetrics()));
+            columnDelegate->optimalWidth(column, this->fontMetrics()));
     }
 
     const auto kSortColumn = Column::event;
@@ -375,7 +376,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     ui->tableView->setMinimumHeight(style::Metrics::kHeaderSize
         + style::Metrics::kButtonHeight * style::Hints::kMinimumTableRows);
 
-    ui->tableView->setItemDelegate(new QnBusinessRuleItemDelegate(this));
+    ui->tableView->setItemDelegate(columnDelegate);
 
     connect(m_rulesViewModel, &QAbstractItemModel::dataChanged, this, &QnBusinessRulesDialog::at_model_dataChanged);
     connect(ui->tableView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &QnBusinessRulesDialog::at_tableView_currentRowChanged);

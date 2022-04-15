@@ -24,6 +24,7 @@
 #include <nx/vms/client/desktop/resource_views/models/resource_tree_icon_decorator_model.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/common/system_context.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace {
@@ -66,12 +67,12 @@ std::function<AbstractItemPtr(const QnResourcePtr&)> serverItemCreator()
 
 QnMediaServerResourceList getAccessibleServers(
     const QnUserResourcePtr& currentUser,
-    QnCommonModule* commonModule)
+    nx::vms::common::SystemContext* systemContext)
 {
     using namespace nx::core::access;
 
-    const auto resourcePool = commonModule->resourcePool();
-    const auto accessProvider = commonModule->resourceAccessProvider();
+    const auto resourcePool = systemContext->resourcePool();
+    const auto accessProvider = systemContext->resourceAccessProvider();
 
     return getAccessibleResources(currentUser,
         resourcePool->getResources<QnMediaServerResource>(), accessProvider);
@@ -128,7 +129,7 @@ ServerSelectionDialog::Private::Private(
 
 {
     const auto serversList =
-        q->commonModule()->resourcePool()->getResourcesByIds(selectedServersIds);
+        q->resourcePool()->getResourcesByIds(selectedServersIds);
 
     selectionDecoratorModel.reset(new ResourceSelectionDecoratorModel());
     selectionDecoratorModel->setSelectedResources(
@@ -137,7 +138,7 @@ ServerSelectionDialog::Private::Private(
     iconDecoratorModel->setSourceModel(entityModel.get());
     selectionDecoratorModel->setSourceModel(iconDecoratorModel.get());
 
-    serversEntity = createServersEntity(getAccessibleServers(currentUser, q->commonModule())
+    serversEntity = createServersEntity(getAccessibleServers(currentUser, q->systemContext())
         .filtered(filterFunctor), q->resourcePool());
     entityModel->setRootEntity(serversEntity.get());
 

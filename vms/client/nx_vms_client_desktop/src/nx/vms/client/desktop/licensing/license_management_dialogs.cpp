@@ -105,7 +105,7 @@ public:
 
         QnLicenseList licenses = limitToLicenses
             ? *limitToLicenses
-            : context->commonModule()->licensePool()->getLicenses();
+            : context->licensePool()->getLicenses();
 
         CustomerSupport customerSupport(context->commonModule());
         const auto regionalContacts = customerSupport.regionalContactsForLicenses(licenses);

@@ -3,60 +3,37 @@
 #include "desktop_data_provider.h"
 
 #include <intrin.h>
-#include <windows.h>
 #include <mmsystem.h>
-
-#include <common/common_module.h>
-#include <api/global_settings.h>
-
-static const int DEFAULT_VIDEO_STREAM_ID = 0;
-static const int DEFAULT_AUDIO_STREAM_ID = 1;
-static const int AUDIO_QUEUE_MAX_SIZE = 256;
-static const int AUDIO_CAUPTURE_FREQUENCY = 44100;
-static const int AUDIO_CAUPTURE_ALT_FREQUENCY = 48000;
-static const int BASE_BITRATE = 1000 * 1000 * 10; // bitrate for best quality for fullHD mode;
-static const int MAX_VIDEO_JITTER = 2;
+#include <windows.h>
 
 extern "C" {
-#include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
-#include <libavutil/opt.h>
+#include <libavformat/avformat.h>
 #include <libavutil/imgutils.h>
+#include <libavutil/opt.h>
 } // extern "C"
 
+#include <api/global_settings.h>
 #include <decoders/audio/ffmpeg_audio_decoder.h>
-#include <nx/streaming/av_codec_media_context.h>
 #include <nx/streaming/abstract_data_consumer.h>
+#include <nx/streaming/av_codec_media_context.h>
 #include <nx/streaming/config.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/video_data_packet.h>
 #include <nx/utils/log/log.h>
-#include <plugins/resource/desktop_win/win_audio_device_info.h>
+#include <nx/vms/common/system_context.h>
 #include <plugins/resource/desktop_win/audio_device_change_notifier.h>
+#include <plugins/resource/desktop_win/win_audio_device_info.h>
 #include <utils/common/synctime.h>
 #include <utils/media/av_options.h>
 #include <utils/media/ffmpeg_helper.h>
 
 namespace {
 
-    struct FffmpegLog
-    {
-        static void av_log_default_callback_impl(void* ptr, int level, const char* fmt, va_list vl)
-        {
-            Q_UNUSED(level)
-                Q_UNUSED(ptr)
-                NX_ASSERT(fmt && "nullptr Pointer");
-
-            if (!fmt) {
-                return;
-            }
-            static char strText[1024 + 1];
-            vsnprintf(&strText[0], sizeof(strText) - 1, fmt, vl);
-            va_end(vl);
-
-            qDebug() << "ffmpeg library: " << strText;
-        }
-    };
+static const int AUDIO_QUEUE_MAX_SIZE = 256;
+static const int AUDIO_CAPTURE_FREQUENCY = 44100;
+static const int BASE_BITRATE = 1000 * 1000 * 10; // bitrate for best quality for fullHD mode;
+static const int MAX_VIDEO_JITTER = 2;
 
 } // namespace
 
@@ -220,7 +197,7 @@ int QnDesktopDataProvider::EncodedAudioInfo::audioPacketSize()
 bool QnDesktopDataProvider::EncodedAudioInfo::setupFormat(QString& errMessage)
 {
     m_audioFormat = m_audioDevice.preferredFormat();
-    m_audioFormat.setSampleRate(AUDIO_CAUPTURE_FREQUENCY);
+    m_audioFormat.setSampleRate(AUDIO_CAPTURE_FREQUENCY);
     m_audioFormat.setSampleSize(16);
     m_audioFormat.setChannelCount(2);
     m_audioFormat.setSampleType(QAudioFormat::SignedInt);

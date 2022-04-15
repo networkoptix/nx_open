@@ -43,18 +43,17 @@ static const qreal kTopMargin = 20.0;
 } // namespace
 
 QnVideowallScreenWidget::QnVideowallScreenWidget(
-    QnWorkbenchContext* context,
+    SystemContext* systemContext,
+    WindowContext* windowContext,
     QnWorkbenchItem* item,
     QGraphicsItem* parent)
     :
-    base_type(context, item, parent),
+    base_type(systemContext, windowContext, item, parent),
     m_videowall(base_type::resource().dynamicCast<QnVideoWallResource>()),
     m_mainOverlayWidget(new QnViewportBoundWidget(this)),
-    m_layout(new QGraphicsAnchorLayout()),
-    m_thumbnailManager(context->instance<CameraThumbnailManager>())
+    m_layout(new QGraphicsAnchorLayout())
 {
     NX_ASSERT(m_videowall, "QnVideowallScreenWidget was created with a non-videowall resource.");
-    m_thumbnailManager->setAutoRotate(false); //< TODO: VMS-6759
 
     setAcceptDrops(true);
     setOption(QnResourceWidget::WindowRotationForbidden, true);
@@ -76,10 +75,6 @@ QnVideowallScreenWidget::QnVideowallScreenWidget(
 
     connect(m_videowall, &QnVideoWallResource::itemChanged, this,
         &QnVideowallScreenWidget::at_videoWall_itemChanged);
-
-    connect(m_thumbnailManager, &CameraThumbnailManager::thumbnailReady, this,
-        &QnVideowallScreenWidget::at_thumbnailReady);
-
 }
 
 QnVideowallScreenWidget::~QnVideowallScreenWidget()
@@ -223,13 +218,6 @@ void QnVideowallScreenWidget::updateLayout(bool force)
     }
 
     m_layoutUpdateRequired = false;
-}
-
-
-void QnVideowallScreenWidget::at_thumbnailReady(const QnUuid& resourceId, const QPixmap& thumbnail)
-{
-    m_thumbs[resourceId] = thumbnail;
-    update();
 }
 
 void QnVideowallScreenWidget::at_videoWall_itemChanged(const QnVideoWallResourcePtr& videoWall,

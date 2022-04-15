@@ -124,7 +124,7 @@ const int kQueryTimeoutMs = 15000;
 
 QnVirtualCameraResourceList cameras(const QSet<QnUuid>& ids)
 {
-    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    auto resourcePool = qnClientCoreModule->resourcePool();
     return resourcePool->getResourcesByIds<QnVirtualCameraResource>(ids);
 }
 
@@ -138,7 +138,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     m_updateDisabled(false),
     m_dirty(false),
     m_lastMouseButton(Qt::NoButton),
-    m_helper(new StringsHelper(commonModule()))
+    m_helper(new StringsHelper(systemContext()))
 {
     ui->setupUi(this);
 

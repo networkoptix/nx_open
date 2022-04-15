@@ -18,7 +18,6 @@
 #include <nx/utils/value_cache.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/software_version.h>
-#include <nx/vms/common/system_context.h>
 #include <utils/common/instance_storage.h>
 
 class QnStoragePluginFactory;
@@ -28,12 +27,17 @@ class QnResourceDiscoveryManager;
 class QnAuditManager;
 class CameraDriverRestrictionList;
 
+namespace nx::vms::common {
+
+class AbstractCertificateVerifier;
+class SystemContext;
+
+} // namespace nx::vms::common
+
 namespace nx::core::access { class ResourceAccessProvider; }
 namespace nx::metrics { struct Storage; }
-namespace nx::vms::common { class AbstractCertificateVerifier; }
 namespace nx::vms::discovery { class Manager; }
 namespace nx::vms::event { class RuleManager; }
-namespace nx::vms::rules { class Engine; }
 
 namespace nx::utils { class TimerManager; }
 
@@ -45,36 +49,31 @@ namespace nx::utils { class TimerManager; }
  * or VMS Server). Functional tests can create several Common Module instances to emulate complex
  * System of several VMS Servers.
  *
- * As a temporary solution, QnCommonModule inherits SystemContext for now. This is required to
+ * As a temporary solution, QnCommonModule stores SystemContext for now. This is required to
  * simplify transition process.
  */
 class NX_VMS_COMMON_API QnCommonModule:
     public QObject,
-    public nx::vms::common::SystemContext,
     public /*mixin*/ QnInstanceStorage
 {
     Q_OBJECT
 
 public:
     /**
-     * Create singleton storage and a corresponding Resource Context.
+     * Common-purpose singleton storage.
+     * @param systemContext General System Context. Ownership is managed by the caller.
      * @param clientMode Mode of the Module Discovery work.
-     * @param resourceAccessMode Mode of the resource access permissions calculation.
-     * @param peerId Id of the current peer in the Message Bus. It is persistent and is not changed
-     *     between the application runs. It is stored in the application settings. VMS Server uses
-     *     it as a Server Resource id. Desktop Client calculates actual peer id depending on the
-     *     stored persistent id and on the number of the running client instance, so different
-     *     Client windows have different peer ids.
      */
     explicit QnCommonModule(
         bool clientMode,
-        nx::core::access::Mode resourceAccessMode,
-        QnUuid peerId = QnUuid(),
+        nx::vms::common::SystemContext* systemContext, //< TODO: #sivanov Remove from here.
         QObject* parent = nullptr);
     virtual ~QnCommonModule();
 
     using QnInstanceStorage::instance;
     using QnInstanceStorage::store;
+
+    nx::vms::common::SystemContext* systemContext() const;
 
     QnStoragePluginFactory* storagePluginFactory() const
     {
@@ -146,6 +145,30 @@ public:
     /** instanceCounter used for unit test purpose only */
 
     CameraDriverRestrictionList* cameraDriverRestrictionList() const;
+
+    //---------------------------------------------------------------------------------------------
+    // Temporary methods for the migration simplification.
+    QnUuid peerId() const;
+    QnUuid sessionId() const;
+    QnLicensePool* licensePool() const;
+    QnRuntimeInfoManager* runtimeInfoManager() const;
+    QnResourcePool* resourcePool() const;
+    QnResourceAccessManager* resourceAccessManager() const;
+    nx::core::access::ResourceAccessProvider* resourceAccessProvider() const;
+    QnResourceAccessSubjectsCache* resourceAccessSubjectsCache() const;
+    QnGlobalPermissionsManager* globalPermissionsManager() const;
+    QnSharedResourcesManager* sharedResourcesManager() const;
+    QnUserRolesManager* userRolesManager() const;
+    QnCameraHistoryPool* cameraHistoryPool() const;
+    QnResourcePropertyDictionary* resourcePropertyDictionary() const;
+    QnResourceStatusDictionary* resourceStatusDictionary() const;
+    QnGlobalSettings* globalSettings() const;
+    QnLayoutTourManager* layoutTourManager() const;
+    nx::vms::event::RuleManager* eventRuleManager() const;
+    QnResourceDataPool* resourceDataPool() const;
+    std::shared_ptr<ec2::AbstractECConnection> ec2Connection() const;
+    QnCommonMessageProcessor* messageProcessor() const;
+    //---------------------------------------------------------------------------------------------
 
 signals:
     void systemIdentityTimeChanged(qint64 value, const QnUuid& sender);

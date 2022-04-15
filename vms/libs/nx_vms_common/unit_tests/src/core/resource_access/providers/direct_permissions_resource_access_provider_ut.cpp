@@ -30,7 +30,7 @@ class DirectPermissionsResourceAccessProviderTest: public DirectBaseAccessProvid
 protected:
     virtual AbstractResourceAccessProvider* createAccessProvider() const override
     {
-        return new PermissionsResourceAccessProvider(Mode::direct, commonModule());
+        return new PermissionsResourceAccessProvider(Mode::direct, systemContext());
     }
 };
 

@@ -619,7 +619,7 @@ void QnServerSettingsWidget::showServerCertificate(const QString& id)
         return;
 
     const auto target = m_server->getModuleInformation();
-    NX_ASSERT(target.systemName == qnGlobalSettings->systemName());
+    NX_ASSERT(target.systemName == globalSettings()->systemName());
 
     auto viewer = new ServerCertificateViewer(m_server, certificate, mode, this);
 

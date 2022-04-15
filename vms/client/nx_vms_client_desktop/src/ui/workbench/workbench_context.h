@@ -25,7 +25,6 @@ class QnWorkbenchAccessController;
 class QnWorkbenchDisplay;
 class QnWorkbenchNavigator;
 class QnWorkbenchLayoutWatcher;
-class QnControlsStatisticsModule;
 
 namespace nx::vms::client::desktop {
 
@@ -65,7 +64,6 @@ public:
 
     QnWorkbenchDisplay* display() const;
     QnWorkbenchNavigator* navigator() const;
-    QnControlsStatisticsModule* statisticsModule() const;
     nx::vms::client::desktop::joystick::Manager* joystickManager() const;
 
     nx::vms::client::desktop::MainWindow* mainWindow() const;
@@ -125,7 +123,6 @@ private:
     QScopedPointer<QnWorkbenchDisplay> m_display;
     QScopedPointer<QnWorkbenchSynchronizer> m_synchronizer;
     QScopedPointer<QnWorkbenchNavigator> m_navigator;
-    QScopedPointer<QnControlsStatisticsModule> m_statisticsModule;
     QScopedPointer<nx::vms::client::desktop::ResourceTreeSettings> m_resourceTreeSettings;
     std::unique_ptr<nx::vms::client::desktop::joystick::Manager> m_joystickManager;
 

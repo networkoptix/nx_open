@@ -2,10 +2,9 @@
 
 #include "client_core_camera.h"
 
-#include <common/common_module.h>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/status_dictionary.h>
+#include <nx/vms/common/system_context.h>
 
 namespace nx::vms::client::core {
 

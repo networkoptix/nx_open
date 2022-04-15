@@ -72,12 +72,12 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     retranslateUi();
 
     /* Let suggest these options are changes so rare, so we can safely drop unsaved changes. */
-    connect(qnGlobalSettings, &QnGlobalSettings::autoDiscoveryChanged,                this,   &QnSystemSettingsWidget::loadDataToUi);
-    connect(qnGlobalSettings, &QnGlobalSettings::cameraSettingsOptimizationChanged,   this,   &QnSystemSettingsWidget::loadDataToUi);
-    connect(qnGlobalSettings, &QnGlobalSettings::statisticsAllowedChanged,            this,   &QnSystemSettingsWidget::loadDataToUi);
+    connect(globalSettings(), &QnGlobalSettings::autoDiscoveryChanged,                this,   &QnSystemSettingsWidget::loadDataToUi);
+    connect(globalSettings(), &QnGlobalSettings::cameraSettingsOptimizationChanged,   this,   &QnSystemSettingsWidget::loadDataToUi);
+    connect(globalSettings(), &QnGlobalSettings::statisticsAllowedChanged,            this,   &QnSystemSettingsWidget::loadDataToUi);
 
     connect(
-        qnGlobalSettings,
+        globalSettings(),
         &QnGlobalSettings::cloudSettingsChanged,
         this,
         &QnSystemSettingsWidget::loadDataToUi);
@@ -100,13 +100,13 @@ void QnSystemSettingsWidget::retranslateUi()
 
 void QnSystemSettingsWidget::loadDataToUi()
 {
-    ui->autoDiscoveryCheckBox->setChecked(qnGlobalSettings->isAutoDiscoveryEnabled());
-    ui->autoSettingsCheckBox->setChecked(qnGlobalSettings->isCameraSettingsOptimizationEnabled());
+    ui->autoDiscoveryCheckBox->setChecked(globalSettings()->isAutoDiscoveryEnabled());
+    ui->autoSettingsCheckBox->setChecked(globalSettings()->isCameraSettingsOptimizationEnabled());
     ui->settingsWarningLabel->setVisible(false);
-    ui->statisticsReportCheckBox->setChecked(qnGlobalSettings->isStatisticsAllowed());
+    ui->statisticsReportCheckBox->setChecked(globalSettings()->isStatisticsAllowed());
 
-    const bool connectedToCloud = !qnGlobalSettings->cloudSystemId().isNull();
-    const bool hasCustomLanguage = !qnGlobalSettings->pushNotificationsLanguage().isEmpty();
+    const bool connectedToCloud = !globalSettings()->cloudSystemId().isNull();
+    const bool hasCustomLanguage = !globalSettings()->pushNotificationsLanguage().isEmpty();
 
     ui->customNotificationLanguageCheckBox->setVisible(connectedToCloud);
     ui->customNotificationLanguageCheckBox->setChecked(hasCustomLanguage);
@@ -114,7 +114,7 @@ void QnSystemSettingsWidget::loadDataToUi()
 
     int defaultLanguageIndex = -1;
     int currentLanguage = -1;
-    QString locale = qnGlobalSettings->pushNotificationsLanguage();
+    QString locale = globalSettings()->pushNotificationsLanguage();
     for (int i = 0; i < ui->languageComboBox->count(); i++)
     {
         const auto& translation = ui->languageComboBox->itemData(
@@ -141,22 +141,22 @@ void QnSystemSettingsWidget::applyChanges()
     if (!hasChanges())
         return;
 
-    qnGlobalSettings->setAutoDiscoveryEnabled(ui->autoDiscoveryCheckBox->isChecked());
-    qnGlobalSettings->setCameraSettingsOptimizationEnabled(ui->autoSettingsCheckBox->isChecked());
-    qnGlobalSettings->setStatisticsAllowed(ui->statisticsReportCheckBox->isChecked());
+    globalSettings()->setAutoDiscoveryEnabled(ui->autoDiscoveryCheckBox->isChecked());
+    globalSettings()->setCameraSettingsOptimizationEnabled(ui->autoSettingsCheckBox->isChecked());
+    globalSettings()->setStatisticsAllowed(ui->statisticsReportCheckBox->isChecked());
     ui->settingsWarningLabel->setVisible(false);
 
-    if (!qnGlobalSettings->cloudSystemId().isNull())
+    if (!globalSettings()->cloudSystemId().isNull())
     {
         const auto& locale = ui->languageComboBox->currentData(
             QnTranslationListModel::TranslationRole)
             .value<TranslationInfo>().localeCode;
 
-        qnGlobalSettings->setPushNotificationsLanguage(
+        globalSettings()->setPushNotificationsLanguage(
             ui->customNotificationLanguageCheckBox->isChecked() ? locale : QString());
     }
 
-    qnGlobalSettings->synchronizeNow();
+    globalSettings()->synchronizeNow();
 }
 
 bool QnSystemSettingsWidget::hasChanges() const
@@ -164,22 +164,22 @@ bool QnSystemSettingsWidget::hasChanges() const
     if (isReadOnly())
         return false;
 
-    if (ui->autoDiscoveryCheckBox->isChecked() != qnGlobalSettings->isAutoDiscoveryEnabled())
+    if (ui->autoDiscoveryCheckBox->isChecked() != globalSettings()->isAutoDiscoveryEnabled())
         return true;
 
-    if (ui->autoSettingsCheckBox->isChecked() != qnGlobalSettings->isCameraSettingsOptimizationEnabled())
+    if (ui->autoSettingsCheckBox->isChecked() != globalSettings()->isCameraSettingsOptimizationEnabled())
         return true;
 
     /* Always mark as 'has changes' if we have not still decided to allow the statistics. */
-    if (!qnGlobalSettings->isStatisticsAllowedDefined())
+    if (!globalSettings()->isStatisticsAllowedDefined())
         return true;
 
-    if (ui->statisticsReportCheckBox->isChecked() != qnGlobalSettings->isStatisticsAllowed())
+    if (ui->statisticsReportCheckBox->isChecked() != globalSettings()->isStatisticsAllowed())
         return true;
 
-    if (!qnGlobalSettings->cloudSystemId().isNull())
+    if (!globalSettings()->cloudSystemId().isNull())
     {
-        const auto& currentLocale = qnGlobalSettings->pushNotificationsLanguage();
+        const auto& currentLocale = globalSettings()->pushNotificationsLanguage();
 
         if (ui->customNotificationLanguageCheckBox->isChecked() != !currentLocale.isEmpty())
             return true;

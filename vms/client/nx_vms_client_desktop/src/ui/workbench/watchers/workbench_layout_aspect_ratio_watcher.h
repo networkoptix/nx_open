@@ -4,17 +4,24 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QSet>
-#include <ui/workbench/workbench_context_aware.h>
+
+#include <nx/vms/client/desktop/window_context_aware.h>
 
 class QnWorkbenchRenderWatcher;
 class QnResourceWidget;
 class QnWorkbenchLayout;
 
-class QnWorkbenchLayoutAspectRatioWatcher : public QObject, public QnWorkbenchContextAware {
+class QnWorkbenchLayoutAspectRatioWatcher:
+    public QObject,
+    public nx::vms::client::desktop::WindowContextAware
+{
     Q_OBJECT
+
 public:
-    explicit QnWorkbenchLayoutAspectRatioWatcher(QObject* parent = 0);
-    ~QnWorkbenchLayoutAspectRatioWatcher();
+    explicit QnWorkbenchLayoutAspectRatioWatcher(
+        nx::vms::client::desktop::WindowContext* windowContext,
+        QObject* parent = nullptr);
+    virtual ~QnWorkbenchLayoutAspectRatioWatcher() override;
 
 private slots:
     void at_renderWatcher_widgetChanged(QnResourceWidget* widget);
@@ -30,8 +37,8 @@ private:
     void setAppropriateAspectRatio(QnResourceWidget* widget);
 
 private:
-    QnWorkbenchRenderWatcher* m_renderWatcher;
-    QnWorkbenchLayout* m_watchedLayout;
+    QnWorkbenchRenderWatcher* const m_renderWatcher;
+    QnWorkbenchLayout* m_watchedLayout = nullptr;
     QSet<QnResourceWidget*> m_watchedWidgets;
     bool m_monitoring = true;
 };

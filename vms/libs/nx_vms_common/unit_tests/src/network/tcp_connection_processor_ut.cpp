@@ -1,5 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <thread>
+
 #include <gtest/gtest.h>
 
 #include <QtCore/QDateTime>
@@ -7,18 +9,13 @@
 #include <QtCore/QElapsedTimer>
 #include <QtNetwork/QHostAddress>
 
-#include <common/static_common_module.h>
-#include <common/common_module.h>
-
-#include <nx/core/access/access_types.h>
-
-#include <recording/time_period_list.h>
-#include <nx/utils/test_support/test_options.h>
-#include <network/tcp_connection_processor.h>
-#include <nx/network/socket_common.h>
-#include <network/tcp_listener.h>
 #include <network/tcp_connection_priv.h>
-#include <thread>
+#include <network/tcp_connection_processor.h>
+#include <network/tcp_listener.h>
+#include <nx/network/socket_common.h>
+#include <nx/utils/test_support/test_options.h>
+#include <nx/vms/common/test_support/test_context.h>
+#include <recording/time_period_list.h>
 
 namespace {
     static const int kDataTransferTimeout = 1000;
@@ -80,12 +77,10 @@ protected:
 
 TEST( TcpConnectionProcessor, sendAsyncData )
 {
-    QnStaticCommonModule staticCommon;
+    nx::vms::common::test::Context context;
 
     // TcpListener uses commonModule()->moduleGuid().
-    QnCommonModule commonModule(false, nx::core::access::Mode::direct);
-
-    TestTcpListener tcpListener(&commonModule, QHostAddress::Any, 0);
+    TestTcpListener tcpListener(context.commonModule(), QHostAddress::Any, 0);
     tcpListener.start();
 
     QElapsedTimer timer;

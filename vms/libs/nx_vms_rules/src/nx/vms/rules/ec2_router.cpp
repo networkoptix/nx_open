@@ -54,7 +54,7 @@ void Ec2Router::routeEvent(
     QSet<QnUuid> peers;
     for (const auto& id: affectedResources)
     {
-        const auto& ptr = m_context->resourcePool()->getResourceById(id);
+        const auto& ptr = resourcePool()->getResourceById(id);
         if (!ptr)
             continue;
 

@@ -54,7 +54,7 @@ ECConnectionAuditManager::~ECConnectionAuditManager()
 
 void ECConnectionAuditManager::at_resourceAboutToRemoved(const QnUuid& id)
 {
-    if (QnResourcePtr res = commonModule()->resourcePool()->getResourceById(id))
+    if (QnResourcePtr res = resourcePool()->getResourceById(id))
         m_removedResourceNames[id] = res->getName();
 }
 
@@ -63,7 +63,7 @@ void ECConnectionAuditManager::addAuditRecord(
     const CameraData& params,
     const QnAuthSession& authInfo)
 {
-    if (commonModule()->resourcePool()->getResourceById(params.id))
+    if (resourcePool()->getResourceById(params.id))
         return; //< Don't log if resource already exists.
     QnAuditRecord auditRecord = commonModule()->auditManager()->prepareRecord(authInfo, Qn::AR_CameraInsert);
     auditRecord.resources.push_back(params.id);
@@ -117,7 +117,7 @@ void ECConnectionAuditManager::addAuditRecord(
     const StorageData& params,
     const QnAuthSession& authInfo)
 {
-    auto command = commonModule()->resourcePool()->getResourceById(params.id)
+    auto command = resourcePool()->getResourceById(params.id)
         ? Qn::AR_StorageUpdate : Qn::AR_StorageInsert;
     QnAuditRecord auditRecord = commonModule()->auditManager()->prepareRecord(authInfo, command);
     auditRecord.resources.push_back(params.id);
@@ -165,7 +165,7 @@ void ECConnectionAuditManager::addAuditRecord(
     auditRecord.resources.push_back(params.id);
     nx::vms::event::RulePtr rule(new nx::vms::event::Rule());
     fromApiToResource(params, rule);
-    nx::vms::event::StringsHelper helper(commonModule());
+    nx::vms::event::StringsHelper helper(commonModule()->systemContext());
     auditRecord.addParam("description", helper.ruleDescriptionText(rule).toUtf8());
 
     commonModule()->auditManager()->addAuditRecord(auditRecord);
@@ -202,7 +202,7 @@ void ECConnectionAuditManager::addAuditRecord(
     const IdData& params,
     const QnAuthSession& authInfo)
 {
-    const auto& resPool = commonModule()->resourcePool();
+    const auto& resPool = resourcePool();
     Qn::AuditRecordType eventType = Qn::AR_NotDefined;
     QString description;
     QnUuid resourceId;
@@ -243,13 +243,13 @@ void ECConnectionAuditManager::addAuditRecord(
         case ApiCommand::removeEventRule:
         {
             eventType = Qn::AR_BEventRemove;
-            auto ruleManager = commonModule()->eventRuleManager();
+            auto ruleManager = eventRuleManager();
             if (ruleManager)
             {
                 nx::vms::event::RulePtr rule = ruleManager->rule(params.id);
                 if (rule)
                 {
-                    nx::vms::event::StringsHelper helper(commonModule());
+                    nx::vms::event::StringsHelper helper(commonModule()->systemContext());
                     description = helper.ruleDescriptionText(rule);
                 }
             }

@@ -137,7 +137,7 @@ void MergeSystemsDialog::updateKnownSystems()
     ui->urlComboBox->setCurrentText(QString());
 
     const QString displayName = nx::utils::elideString(
-        qnGlobalSettings->systemName(), kMaxSystemNameLength);
+        globalSettings()->systemName(), kMaxSystemNameLength);
 
     ui->currentSystemLabel->setText(
         tr("You are about to merge the current System %1 with System")
@@ -223,7 +223,7 @@ void MergeSystemsDialog::at_mergeButton_clicked()
         return;
 
     const bool ownSettings = ui->currentSystemRadioButton->isChecked();
-    const QString currentSystemName = qnGlobalSettings->systemName();
+    const QString currentSystemName = globalSettings()->systemName();
     const QString targetSystemName = ui->remoteSystemRadioButton->text();
 
     const auto ownerSessionToken = FreshSessionTokenHelper(this).getToken(
@@ -277,7 +277,7 @@ void MergeSystemsDialog::at_mergeTool_systemFound(
         moduleInformation.id);
     if (server
         && server->getStatus() == nx::vms::api::ResourceStatus::online
-        && helpers::serverBelongsToCurrentSystem(moduleInformation, commonModule()))
+        && helpers::serverBelongsToCurrentSystem(moduleInformation, systemContext()))
     {
         if (m_url.host() == lit("localhost") || QHostAddress(m_url.host()).isLoopback())
         {

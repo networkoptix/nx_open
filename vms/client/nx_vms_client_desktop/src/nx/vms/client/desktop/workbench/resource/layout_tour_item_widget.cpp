@@ -82,15 +82,14 @@ static constexpr int kMaxTitleLength = 30; //< symbols
 } // namespace
 
 LayoutTourItemWidget::LayoutTourItemWidget(
-    QnWorkbenchContext* context,
+    SystemContext* systemContext,
+    WindowContext* windowContext,
     QnWorkbenchItem* item,
     QGraphicsItem* parent)
     :
-    base_type(context, item, parent),
-    m_previewPainter(new LayoutPreviewPainter(context->resourcePool()))
+    base_type(systemContext, windowContext, item, parent),
+    m_previewPainter(new LayoutPreviewPainter(resource()->resourcePool()))
 {
-    context->instance<CameraThumbnailManager>()->setAutoRotate(false); //< TODO: VMS-6759
-
     setPaletteColor(this, QPalette::Highlight, colorTheme()->color("brand_core"));
     setPaletteColor(this, QPalette::Dark, colorTheme()->color("dark17"));
     setOption(QnResourceWidget::InfoOverlaysForbidden);
@@ -334,5 +333,3 @@ void LayoutTourItemWidget::initOverlay()
 } // namespace workbench
 } // namespace ui
 } // namespace nx::vms::client::desktop
-
-

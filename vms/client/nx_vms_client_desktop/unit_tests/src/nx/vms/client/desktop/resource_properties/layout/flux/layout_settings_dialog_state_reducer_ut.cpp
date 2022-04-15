@@ -2,8 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include <common/common_module.h>
-#include <common/static_common_module.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/core/access/access_types.h>
@@ -12,7 +10,9 @@
 #include <nx/vms/client/desktop/resource_properties/layout/flux/layout_settings_dialog_state_reducer.h>
 #include <nx/vms/client/desktop/resource_properties/layout/flux/layout_settings_dialog_store.h>
 #include <nx/vms/client/desktop/resource_properties/layout/watchers/layout_logical_ids_watcher.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/test_support/api/message_processor_mock.h>
+#include <nx/vms/common/test_support/test_context.h>
 
 namespace nx::vms::client::desktop {
 namespace test {
@@ -201,10 +201,8 @@ class LayoutSettingsDialogStateReducerBackgroundTest:
 {
 };
 
-class LayoutSettingsDialogStateInteractionTest: public LayoutSettingsDialogStateReducerTest
+class LayoutSettingsDialogStateInteractionTest: public nx::vms::common::test::ContextBasedTest
 {
-    using base_type = LayoutSettingsDialogStateReducerTest;
-
 protected:
     Store& store() { return *m_store; }
     const State& state() const { return m_store->state(); }
@@ -221,7 +219,7 @@ protected:
         layout->setIdUnsafe(QnUuid::createUuid());
         layout->setName(name);
         layout->setLogicalId(logicalId);
-        m_environment->commonModule->resourcePool()->addResource(layout);
+        systemContext()->resourcePool()->addResource(layout);
         return layout;
     }
 
@@ -230,14 +228,18 @@ protected:
      */
     virtual void SetUp() override
     {
-        base_type::SetUp();
-        m_environment.reset(new Environment());
+        Reducer::setTracingEnabled(true);
+        Reducer::setScreenAspectRatio({16, 9});
+
+        auto messageProcessor = createMessageProcessor();
+
         m_store.reset(new Store());
         m_logicalIdsWatcher.reset(new LayoutLogicalIdsWatcher(
             m_store.get(),
-            m_environment->commonModule->resourcePool(),
-            m_environment->messageProcessor.get()));
-        m_environment->messageProcessor->emulateConnectionEstablished();
+            systemContext()->resourcePool(),
+            systemContext()->messageProcessor()));
+
+        messageProcessor->emulateConnectionEstablished();
     }
 
     /**
@@ -247,25 +249,9 @@ protected:
     {
         m_logicalIdsWatcher.reset();
         m_store.reset();
-        m_environment.reset();
-        base_type::TearDown();
     }
 
 private:
-    struct Environment
-    {
-        std::unique_ptr<QnStaticCommonModule> staticCommon =
-            std::make_unique<QnStaticCommonModule>();
-        std::unique_ptr<QnCommonModule> commonModule = std::make_unique<QnCommonModule>(
-            /*clientMode*/ true,
-            nx::core::access::Mode::cached);
-        // TODO: #sivanov Message Processor should be created and destroyed using Context methods.
-        std::unique_ptr<common::test_support::MessageProcessorMock> messageProcessor =
-            std::make_unique<common::test_support::MessageProcessorMock>(commonModule.get());
-    };
-
-private:
-    std::unique_ptr<Environment> m_environment;
     std::unique_ptr<Store> m_store;
     std::unique_ptr<LayoutLogicalIdsWatcher> m_logicalIdsWatcher;
 };

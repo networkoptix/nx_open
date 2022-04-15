@@ -4,26 +4,21 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/utils/std/cpp14.h>
-#include <nx/utils/log/log.h>
 #include <nx/core/access/access_types.h>
-#include <common/common_module.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
 #include <common/common_globals.h>
-#include <common/static_common_module.h>
-
+#include <common/common_module.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/media/abstract_video_decoder.h>
-#include <nx/media/video_decoder_registry.h>
 #include <nx/media/media_player.h>
 #include <nx/media/media_player_quality_chooser.h>
-
+#include <nx/media/video_decoder_registry.h>
 #include <nx/streaming/archive_stream_reader.h>
-#include <core/resource/camera_resource.h>
-
-#include <core/resource/media_server_resource.h>
-
-#include <common/common_module.h>
+#include <nx/vms/common/test_support/test_context.h>
 #include <utils/media/ffmpeg_initializer.h>
-#include <core/resource_management/resource_pool.h>
 
 // TODO: #dklychkov Move mock classes to a separate file.
 // TODO: #dklychkov Rename this test to something like quality_chooser_ut.
@@ -307,9 +302,7 @@ public:
     void test(const TestCase& testCase);
 
 private:
-    QnStaticCommonModule m_staticCommon;
-    std::unique_ptr<QnCommonModule> m_module{
-        new QnCommonModule(false, nx::core::access::Mode::direct)};
+    nx::vms::common::test::Context m_context{false, nx::core::access::Mode::direct};
     QnSharedResourcePointer<MockServer> m_server{new MockServer()};
     QnSharedResourcePointer<MockCamera> m_camera{new MockCamera(m_server->getId())};
 };
@@ -460,15 +453,15 @@ public:
 
 PlayerSetQualityTest::PlayerSetQualityTest()
 {
-    m_module->resourcePool()->clear(); //< Just in case.
+    m_context.commonModule()->resourcePool()->clear(); //< Just in case.
     m_server->setUrl("http://localhost:7001");
-    m_module->resourcePool()->addResource(m_server);
-    m_module->resourcePool()->addResource(m_camera);
+    m_context.commonModule()->resourcePool()->addResource(m_server);
+    m_context.commonModule()->resourcePool()->addResource(m_camera);
 }
 
 PlayerSetQualityTest::~PlayerSetQualityTest()
 {
-    m_module->resourcePool()->clear();
+    m_context.commonModule()->resourcePool()->clear();
 }
 
 void PlayerSetQualityTest::test(const TestCase& testCase)
@@ -505,15 +498,12 @@ void PlayerSetQualityTest::test(const TestCase& testCase)
     }
 }
 
-class NxMediaPlayerTest: public ::testing::Test
+class NxMediaPlayerTest: public nx::vms::common::test::ContextBasedTest
 {
 protected:
     virtual void SetUp()
     {
-        m_staticCommon.reset(new QnStaticCommonModule());
-        // Init singletons.
-        m_common.reset(new QnCommonModule(false, nx::core::access::Mode::direct));
-        m_common->store(new QnFfmpegInitializer());
+        context()->commonModule()->store(new QnFfmpegInitializer());
 
         VideoDecoderRegistry::instance()->reinitialize(); //< Just in case.
         VideoDecoderRegistry::instance()->addPlugin<MockVideoDecoder>("MockVideoDecoder");
@@ -521,14 +511,8 @@ protected:
 
     virtual void TearDown()
     {
-        m_common.reset();
-        m_staticCommon.reset();
         VideoDecoderRegistry::instance()->reinitialize();
     }
-
-private:
-    QScopedPointer<QnStaticCommonModule> m_staticCommon;
-    QScopedPointer<QnCommonModule> m_common;
 };
 
 } // namespace

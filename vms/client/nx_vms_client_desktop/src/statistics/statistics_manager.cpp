@@ -191,9 +191,9 @@ bool QnStatisticsManager::isStatisticsSendingAllowed() const
     if (nx::build_info::publicationType() == nx::build_info::PublicationType::local)
         return false;
 
-    return qnGlobalSettings->isInitialized()
-        && qnGlobalSettings->isStatisticsAllowed()
-        && !qnGlobalSettings->isNewSystem();
+    return globalSettings()->isInitialized()
+        && globalSettings()->isStatisticsAllowed()
+        && !globalSettings()->isNewSystem();
 }
 
 void QnStatisticsManager::unregisterModule(const QString &alias)
@@ -352,8 +352,8 @@ void QnStatisticsManager::saveCurrentStatistics()
 
     // Appends mandatory metrics
 
-    const auto systemName = qnGlobalSettings->systemName();
-    const auto cloudSystemId = qnGlobalSettings->cloudSystemId();
+    const auto systemName = globalSettings()->systemName();
+    const auto cloudSystemId = globalSettings()->cloudSystemId();
     metrics.insert(kSessionIdMetricTag, m_sessionId.toString());
     metrics.insert(kClientMachineIdMetricTag, m_clientId.toString());
 

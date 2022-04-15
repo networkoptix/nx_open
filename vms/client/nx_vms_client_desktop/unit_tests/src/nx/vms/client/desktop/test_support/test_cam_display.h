@@ -6,7 +6,7 @@
 
 namespace nx::vms::client::desktop::test {
 
-class NX_VMS_CLIENT_DESKTOP_API TestCamDisplay: public AbstractVideoDisplay
+class TestCamDisplay: public AbstractVideoDisplay
 {
 public:
     TestCamDisplay(const QString& name = {}, CameraID cameraID = {});

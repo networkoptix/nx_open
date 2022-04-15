@@ -4,7 +4,6 @@
 
 #include <QtCore/QUrlQuery>
 
-#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource/security_cam_resource.h>
@@ -14,6 +13,7 @@
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/common/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <utils/common/synctime.h>
 

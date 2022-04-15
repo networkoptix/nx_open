@@ -4,20 +4,37 @@
 
 #include <QtQml/QQmlEngine>
 
-#include <common/common_module.h>
-#include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource_management/resource_pool.h>
-#include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/time/formatter.h>
 
 namespace nx::vms::client::core {
 
-ResourceHelper::ResourceHelper(QObject* parent):
-    base_type(parent)
+ResourceHelper::ResourceHelper(SystemContext* systemContext, QObject* parent):
+    QObject(parent),
+    SystemContextAware(systemContext)
 {
-    const auto timeWatcher = commonModule()->instance<ServerTimeWatcher>();
+    initialize();
+}
+
+ResourceHelper::ResourceHelper():
+    QObject(),
+    SystemContextAware(SystemContext::fromQmlContext(this))
+{
+}
+
+void ResourceHelper::initialize()
+{
+    if (m_initialized)
+        return;
+
+    m_initialized = true;
+
+    const auto timeWatcher = systemContext()->serverTimeWatcher();
     connect(timeWatcher, &ServerTimeWatcher::displayOffsetsChanged,
         this, &ResourceHelper::displayOffsetChanged);
 
@@ -36,6 +53,7 @@ QnUuid ResourceHelper::resourceId() const
 
 void ResourceHelper::setResourceId(const QnUuid& id)
 {
+    initialize();
     if (resourceId() != id)
         setResource(resourcePool()->getResourceById<QnResource>(id));
 }
@@ -49,24 +67,25 @@ void ResourceHelper::setResource(const QnResourcePtr& value)
 
     if (m_resource)
     {
+        initialize();
         QQmlEngine::setObjectOwnership(m_resource.get(), QQmlEngine::CppOwnership);
 
-        connect(m_resource, &QnResource::nameChanged,
+        connect(m_resource.get(), &QnResource::nameChanged,
             this, &ResourceHelper::resourceNameChanged);
-        connect(m_resource, &QnResource::statusChanged,
+        connect(m_resource.get(), &QnResource::statusChanged,
             this, &ResourceHelper::resourceStatusChanged);
     }
 
     if (const auto camera = m_resource.dynamicCast<QnSecurityCamResource>())
     {
-        connect(camera, &QnSecurityCamResource::capabilitiesChanged, this,
+        connect(camera.get(), &QnSecurityCamResource::capabilitiesChanged, this,
             [this]()
             {
                 emit defaultCameraPasswordChanged();
                 emit oldCameraFirmwareChanged();
             });
 
-        connect(camera, &QnSecurityCamResource::propertyChanged, this,
+        connect(camera.get(), &QnSecurityCamResource::propertyChanged, this,
             [this](
                 const QnResourcePtr& resource,
                 const QString& key,
@@ -161,11 +180,10 @@ bool ResourceHelper::hasVideo() const
 
 qint64 ResourceHelper::displayOffset() const
 {
-    using Watcher = nx::vms::client::core::ServerTimeWatcher;
-    const auto timeWatcher = commonModule()->instance<Watcher>();
+    const auto timeWatcher = serverTimeWatcher();
     const auto mediaResource = m_resource.dynamicCast<QnMediaResource>();
 
-    return !mediaResource || timeWatcher->timeMode() == Watcher::clientTimeMode
+    return !mediaResource || timeWatcher->timeMode() == ServerTimeWatcher::clientTimeMode
         ? nx::vms::time::systemDisplayOffset()
         : timeWatcher->utcOffset(mediaResource);
 }

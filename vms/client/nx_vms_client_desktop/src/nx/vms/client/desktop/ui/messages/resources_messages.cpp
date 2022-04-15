@@ -294,7 +294,7 @@ bool Resources::deleteResources(QWidget* parent, const QnResourceList& resources
 
         text = (cameras.size() == resources.size()
             ? QnDeviceDependentStrings::getNameFromSet(
-                qnClientCoreModule->commonModule()->resourcePool(),
+                qnClientCoreModule->resourcePool(),
                 QnCameraDeviceStringSet(
                     tr("Delete %n devices?", "", cameras.size()),
                     tr("Delete %n cameras?", "", cameras.size()),
@@ -305,7 +305,7 @@ bool Resources::deleteResources(QWidget* parent, const QnResourceList& resources
         extras = (onlineAutoDiscoveredCameras.isEmpty()
             ? QString()
             : QnDeviceDependentStrings::getNameFromSet(
-                qnClientCoreModule->commonModule()->resourcePool(),
+                qnClientCoreModule->resourcePool(),
                 QnCameraDeviceStringSet(
                     tr("%n of them are auto-discovered.",
                         "", onlineAutoDiscoveredCameras.size()),

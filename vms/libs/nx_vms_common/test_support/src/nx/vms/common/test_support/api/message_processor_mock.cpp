@@ -4,7 +4,7 @@
 
 #include "../resource/test_resource_factory.h"
 
-namespace nx::vms::common::test_support {
+namespace nx::vms::common::test {
 
 MessageProcessorMock::MessageProcessorMock(
     nx::vms::common::SystemContext* context,
@@ -29,4 +29,4 @@ QnResourceFactory* MessageProcessorMock::getResourceFactory() const
     return m_resourceFactory.get();
 }
 
-} // namespace nx::vms::common::test_support
+} // namespace nx::vms::common::test

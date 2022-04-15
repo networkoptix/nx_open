@@ -13,7 +13,6 @@ class CachedBaseAccessProviderTestFixture: public CachedAccessProviderTestFixtur
 
 protected:
     virtual void SetUp() override;
-    virtual void TearDown() override;
 
     virtual AbstractResourceAccessProvider* accessProvider() const override;
     virtual AbstractResourceAccessProvider* createAccessProvider() const = 0;

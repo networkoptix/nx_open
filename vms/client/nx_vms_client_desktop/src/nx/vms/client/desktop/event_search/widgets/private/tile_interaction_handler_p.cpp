@@ -34,12 +34,14 @@
 #include <nx/utils/qset.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
@@ -345,7 +347,9 @@ void TileInteractionHandler::copyBookmarkToClipboard(const QModelIndex &index)
     auto displayTime =
         [this](qint64 msecsSinceEpoch)
         {
-            const auto timeWatcher = context()->instance<nx::vms::client::core::ServerTimeWatcher>();
+            // TODO: #sivanov Actualize used system context.
+            const auto timeWatcher = ApplicationContext::instance()->currentSystemContext()
+                ->serverTimeWatcher();
             return nx::vms::time::toString(timeWatcher->displayTime(msecsSinceEpoch));
         };
 

@@ -37,7 +37,7 @@ struct StatisticsSettingsWatcher::Private: public QObject
     nx::utils::Url actualUrl() const
     {
         const auto localSettingsUrl =
-            q->commonModule()->globalSettings()->clientStatisticsSettingsUrl();
+            q->globalSettings()->clientStatisticsSettingsUrl();
 
         if (localSettingsUrl.isValid())
             return localSettingsUrl;

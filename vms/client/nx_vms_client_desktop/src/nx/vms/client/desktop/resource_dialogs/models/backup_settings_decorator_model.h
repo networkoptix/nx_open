@@ -6,16 +6,17 @@
 
 #include <QtCore/QIdentityProxyModel>
 
+#include <common/common_module_aware.h>
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/api/types/resource_types.h>
-#include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/data/backup_settings.h>
-
-class QnCommonModule;
+#include <nx/vms/api/data/camera_attributes_data.h>
+#include <nx/vms/api/types/resource_types.h>
 
 namespace nx::vms::client::desktop {
 
-class BackupSettingsDecoratorModel: public QIdentityProxyModel
+class BackupSettingsDecoratorModel:
+    public QIdentityProxyModel,
+    public QnCommonModuleAware
 {
     Q_OBJECT
     using base_type = QIdentityProxyModel;
@@ -25,7 +26,7 @@ public:
     using CameraBackupQuality = nx::vms::api::CameraBackupQuality;
 
 public:
-    BackupSettingsDecoratorModel(const QnCommonModule* commonModule);
+    BackupSettingsDecoratorModel(QnCommonModule* commonModule);
     virtual ~BackupSettingsDecoratorModel() override;
 
     virtual QVariant data(const QModelIndex& index, int role) const override;
@@ -63,7 +64,6 @@ private:
     QVariant nothingToBackupWarningData(const QModelIndex& index) const;
 
 private:
-    const QnCommonModule* m_commonModule;
     QHash<QnVirtualCameraResourcePtr, BackupContentTypes> m_changedContentTypes;
     QHash<QnVirtualCameraResourcePtr, CameraBackupQuality> m_changedQuality;
     QHash<QnVirtualCameraResourcePtr, bool> m_changedEnabledState;

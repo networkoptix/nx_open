@@ -3,6 +3,7 @@
 #include "buttons.h"
 
 #include <nx/fusion/model_functions.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -38,7 +39,9 @@ QnImageButtonWidget* newActionButton(
     const auto action = context->menu()->action(actionId);
 
     QnImageButtonWidget* button = new QnImageButtonWidget(parent);
-    context->statisticsModule()->registerButton(alias(action), button);
+    ApplicationContext::instance()->controlsStatisticsModule()->registerButton(
+        alias(action),
+        button);
 
     button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::ToolButton);
     button->setDefaultAction(action);
@@ -60,7 +63,9 @@ T* newCustomShowHideButton(
     const auto action = context->menu()->action(actionId);
 
     auto button = new T(parent);
-    context->statisticsModule()->registerButton(alias(action), button);
+    ApplicationContext::instance()->controlsStatisticsModule()->registerButton(
+        alias(action),
+        button);
 
     if (action)
         button->setDefaultAction(action);
@@ -102,7 +107,9 @@ QnImageButtonWidget* newPinTimelineButton(
     const auto action = context->menu()->action(actionId);
 
     auto button = new QnImageButtonWidget(parent);
-    context->statisticsModule()->registerButton(alias(action), button);
+    ApplicationContext::instance()->controlsStatisticsModule()->registerButton(
+        alias(action),
+        button);
 
     if (action)
         button->setDefaultAction(action);
@@ -127,7 +134,9 @@ QnImageButtonWidget* newPinButton(
     const auto action = context->menu()->action(actionId);
 
     QnImageButtonWidget* button = new QnImageButtonWidget(parent);
-    context->statisticsModule()->registerButton(alias(action), button);
+    ApplicationContext::instance()->controlsStatisticsModule()->registerButton(
+        alias(action),
+        button);
 
     if (action)
         button->setDefaultAction(action);

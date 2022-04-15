@@ -69,8 +69,10 @@ struct SystemContext::Private
 SystemContext::SystemContext(
     QnUuid peerId,
     QnUuid sessionId,
-    nx::core::access::Mode resourceAccessMode)
+    nx::core::access::Mode resourceAccessMode,
+    QObject* parent)
     :
+    QObject(parent),
     d(new Private{.peerId = std::move(peerId), .sessionId=std::move(sessionId)})
 {
     d->licensePool = std::make_unique<QnLicensePool>(this);

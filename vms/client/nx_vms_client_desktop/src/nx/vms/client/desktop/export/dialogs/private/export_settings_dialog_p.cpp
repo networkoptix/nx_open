@@ -190,7 +190,7 @@ void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout,
             state().exportLayoutSettings.period.startTimeMs));
 
     // FIXME: #sivanov Use resource pool from the dialog itself.
-    provider->setResourcePool(qnClientCoreModule->commonModule()->resourcePool());
+    provider->setResourcePool(qnClientCoreModule->resourcePool());
     provider->setItemBackgroundColor(palette.color(QPalette::Window));
     provider->setFontColor(palette.color(QPalette::WindowText));
     provider->setRequestRoundMethod(nx::api::ResourceImageRequest::RoundMethod::iFrameAfter);

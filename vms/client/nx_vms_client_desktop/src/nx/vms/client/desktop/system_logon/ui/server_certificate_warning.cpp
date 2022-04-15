@@ -10,9 +10,9 @@
 
 #include <nx/network/ssl/certificate.h>
 #include <nx/vms/api/data/module_information.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/statistics/modules/certificate_statistics_module.h>
-#include <ui/workbench/workbench_context.h>
 
 #include "server_certificate_viewer.h"
 
@@ -25,8 +25,7 @@ ServerCertificateWarning::ServerCertificateWarning(
     core::CertificateWarning::Reason reason,
     QWidget* parent)
     :
-    base_type(parent),
-    QnWorkbenchContextAware(parent)
+    base_type(parent)
 {
     // Prepare target description text.
 
@@ -80,7 +79,7 @@ ServerCertificateWarning::ServerCertificateWarning(
             }
             return QString();
         };
-    auto statistics = context()->instance<QnCertificateStatisticsModule>();
+    auto statistics = ApplicationContext::instance()->certificateStatisticsModule();
     statistics->registerClick(statisticsName("open"));
 
     // Init server certificate `link`

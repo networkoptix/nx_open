@@ -9,17 +9,18 @@
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
 #include <client_core/client_core_module.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/client_camera.h>
-#include <core/resource/motion_window.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/motion_window.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/analytics/metadata_log_parser.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/media/consuming_motion_metadata_provider.h>
 #include <nx/vms/client/desktop/analytics/analytics_metadata_provider_factory.h>
-#include <nx/vms/client/desktop/ui/graphics/items/resource/widget_analytics_controller.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/ui/graphics/items/resource/widget_analytics_controller.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/license/usage_helper.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -128,7 +129,6 @@ bool AnalyticsAvailabilityWatcher::isEnabledForWidget(
 
 MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(
     const QnResourcePtr& resource,
-    QnWorkbenchAccessController* accessController,
     QObject* parent)
     :
     base_type(parent),
@@ -142,7 +142,7 @@ MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(
         AnalyticsMetadataProviderFactory::instance()->createMetadataProvider(resource)),
     taxonomyManager(qnClientCoreModule->mainQmlEngine()->singletonInstance<TaxonomyManager*>(
         qmlTypeId("nx.vms.client.desktop.analytics", 1, 0, "TaxonomyManager"))),
-    m_accessController(accessController)
+    m_accessController(SystemContext::fromResource(resource)->accessController())
 {
     QSignalBlocker blocker(this);
 
@@ -433,7 +433,12 @@ void MediaResourceWidgetPrivate::updateIsAnalyticsSupported()
 
 void MediaResourceWidgetPrivate::requestAnalyticsObjectsExistence()
 {
-    if (!NX_ASSERT(camera) || !connection())
+    if (!NX_ASSERT(camera))
+        return;
+
+    auto systemContext = SystemContext::fromResource(camera);
+    auto connection = systemContext->connection();
+    if (!connection)
         return;
 
     nx::analytics::db::Filter filter;
@@ -461,7 +466,7 @@ void MediaResourceWidgetPrivate::requestAnalyticsObjectsExistence()
             }
         });
     NX_VERBOSE(this, "Request analytics objects existance for camera %1", camera);
-    connectedServerApi()->lookupObjectTracks(
+    systemContext->connectedServerApi()->lookupObjectTracks(
         filter,
         /*isLocal*/ false,
         callback,

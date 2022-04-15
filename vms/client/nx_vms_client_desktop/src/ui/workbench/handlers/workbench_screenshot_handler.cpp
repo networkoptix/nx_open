@@ -4,49 +4,43 @@
 
 #include <chrono>
 
-#include <QtCore/QTimer>
 #include <QtCore/QStack>
+#include <QtCore/QTimer>
 #include <QtGui/QImageWriter>
 #include <QtGui/QPainter>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QComboBox>
 
-#include <nx/vms/time/formatter.h>
-
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
-#include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
-
-#include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
-
-#include <core/resource/file_processor.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/media_resource.h>
+#include <client/client_settings.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/file_processor.h>
+#include <core/resource/media_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-
-#include <platform/environment.h>
-
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ini.h>
-#include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/dialogs/common/custom_file_dialog.h>
+#include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
+#include <nx/utils/string.h>
+#include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/progress_dialog.h>
-#include <ui/dialogs/common/session_aware_dialog.h>
+#include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/time/formatter.h>
+#include <platform/environment.h>
+#include <transcoding/filters/filter_helper.h>
+#include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_messages.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
-#include <nx/vms/client/desktop/style/custom_style.h>
-
-#include <ui/help/help_topics.h>
-#include <ui/help/help_topic_accessor.h>
-
-#include <nx/utils/string.h>
-
-#include <transcoding/filters/filter_helper.h>
-#include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
-#include <nx/vms/client/core/watchers/server_time_watcher.h>
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
@@ -264,7 +258,7 @@ qint64 QnWorkbenchScreenshotHandler::screenshotTimeMSec(QnMediaResourceWidget *w
     if (!adjust)
         return timeMSec;
 
-    const auto timeWatcher = context()->instance<nx::vms::client::core::ServerTimeWatcher>();
+    const auto timeWatcher = widget->systemContext()->serverTimeWatcher();
     qint64 localOffset = timeWatcher->displayOffset(widget->resource());
 
     timeMSec += localOffset;
@@ -610,7 +604,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         return;
     }
 
-    QnFileProcessor::createResourcesForFile(filename);
+    QnFileProcessor::createResourcesForFile(filename, resourcePool());
 }
 
 void QnWorkbenchScreenshotHandler::showProgressDelayed(const QString &message) {

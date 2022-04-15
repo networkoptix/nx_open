@@ -49,7 +49,7 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
     ui->userRoleComboBox->setModel(m_rolesModel);
     ui->userRoleComboBox->setCurrentIndex(m_rolesModel->rowForRole(Qn::UserRole::liveViewer)); // sensible default
 
-    const QnLdapSettings &settings = qnGlobalSettings->ldapSettings();
+    const QnLdapSettings &settings = globalSettings()->ldapSettings();
 
     if (!settings.isValid(/*checkPassword*/ false))
     {

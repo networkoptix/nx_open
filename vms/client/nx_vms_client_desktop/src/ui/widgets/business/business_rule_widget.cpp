@@ -241,7 +241,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
         ui->actionAtLabel->setText(actionAtLabelText);
 
         const bool aggregationIsVisible = (m_model->actionType() == ActionType::pushNotificationAction)
-            ? !qnGlobalSettings->cloudSystemId().isNull()
+            ? !globalSettings()->cloudSystemId().isNull()
             : vms::event::allowsAggregation(m_model->actionType());
         ui->aggregationWidget->setVisible(aggregationIsVisible);
 
@@ -255,13 +255,13 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
             m_intervalOfActionUpdater.reset();
         }
         if (m_model->actionType() == ActionType::pushNotificationAction
-            && qnGlobalSettings->cloudSystemId().isNull())
+            && globalSettings()->cloudSystemId().isNull())
         {
             m_intervalOfActionUpdater.emplace(
-                connect(qnGlobalSettings, &QnGlobalSettings::cloudCredentialsChanged, this,
+                connect(globalSettings(), &QnGlobalSettings::cloudCredentialsChanged, this,
                     [this]()
                     {
-                        ui->aggregationWidget->setVisible(!qnGlobalSettings->cloudSystemId().isNull());
+                        ui->aggregationWidget->setVisible(!globalSettings()->cloudSystemId().isNull());
                     }));
         }
 
@@ -370,7 +370,7 @@ void QnBusinessRuleWidget::initActionParameters()
     const auto getTabBeforeTarget = [this]() -> QWidget *
     {
         const bool aggregationIsVisible = (m_model->actionType() == ActionType::pushNotificationAction)
-            ? !qnGlobalSettings->cloudSystemId().isNull()
+            ? !globalSettings()->cloudSystemId().isNull()
             : vms::event::allowsAggregation(m_model->actionType());
         if (aggregationIsVisible)
             return ui->aggregationWidget->lastTabItem();

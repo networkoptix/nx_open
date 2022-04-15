@@ -22,6 +22,7 @@
 #include <nx/vms/client/core/network/credentials_manager.h>
 #include <nx/vms/client/core/utils/cloud_session_token_updater.h>
 #include <nx/vms/client/core/utils/reconnect_helper.h>
+#include <nx/vms/common/system_context.h>
 #include <transaction/message_bus_adapter.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
@@ -149,13 +150,13 @@ RemoteSession::RemoteSession(RemoteConnectionPtr connection, QObject* parent):
 {
     // Audit id should be updated when establishing new session.
     // TODO: #sivanov Remove global singleton storage, use session id as audit id everywhere.
-    QnCommonModule* commonModule = qnClientCoreModule->commonModule();
-    commonModule->updateRunningInstanceGuid();
+    auto systemContext = qnClientCoreModule->commonModule()->systemContext();
+    systemContext->updateRunningInstanceGuid();
 
     d->remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
 
     d->messageProcessor = static_cast<QnClientMessageProcessor*>(
-        commonModule->messageProcessor());
+        systemContext->messageProcessor());
 
     connect(d->messageProcessor.data(), &QnCommonMessageProcessor::connectionOpened, this,
         &RemoteSession::onMessageBusConnectionOpened);
@@ -327,11 +328,11 @@ void RemoteSession::establishConnection(RemoteConnectionPtr connection)
 
     // TODO: #sivanov Remove global singleton storage, use session id as audit id everywhere.
     // Setup audit id.
-    QnCommonModule* commonModule = qnClientCoreModule->commonModule();
-    connection->updateSessionId(commonModule->sessionId());
+    auto systemContext = qnClientCoreModule->commonModule()->systemContext();
+    connection->updateSessionId(systemContext->sessionId());
 
     // Setup message bus connection.
-    connection->initializeMessageBusConnection(commonModule);
+    connection->initializeMessageBusConnection(qnClientCoreModule->commonModule());
     qnSyncTime->setTimeSyncManager(connection->timeSynchronizationManager());
     if (NX_ASSERT(d->messageProcessor))
         d->messageProcessor->init(connection->messageBusConnection());

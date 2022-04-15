@@ -774,7 +774,7 @@ bool ServerUpdateTool::verifyUpdateManifest(
     ClientVerificationData clientData;
     clientData.fillDefault();
     clientData.clientId = checkClient
-        ? m_stateTracker->getClientPeerId(commonModule())
+        ? m_stateTracker->getClientPeerId(systemContext())
         : QnUuid();
     clientData.installedVersions = clientVersions;
     VerificationOptions options;

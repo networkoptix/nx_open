@@ -64,7 +64,6 @@ bool SortModel::lessThan(const QModelIndex& source_left, const QModelIndex& sour
 
 DeviceAdditionDialog::DeviceAdditionDialog(QWidget* parent):
     base_type(parent),
-    m_pool(commonModule()->resourcePool()),
     m_serversWatcher(parent),
     m_serverStatusWatcher(this),
     ui(new Ui::DeviceAdditionDialog()),
@@ -760,7 +759,7 @@ void DeviceAdditionDialog::updateResultsWidgetState()
     ui->searchButton->setVisible(!showSearchProgressControls);
     ui->stopSearchButton->setVisible(showSearchProgressControls);
     ui->searchProgressBar->setVisible(showSearchProgressControls);
-    ui->httpsOnlyBar->setVisible(m_currentSearch && qnGlobalSettings->useHttpsOnlyCameras());
+    ui->httpsOnlyBar->setVisible(m_currentSearch && globalSettings()->useHttpsOnlyCameras());
 
     if (!m_currentSearch)
         return;

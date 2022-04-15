@@ -123,7 +123,7 @@ QVariant QnLicenseListModel::textData(const QModelIndex& index, bool fullText) c
         case LicenseStatusColumn:
         {
             bool fullStatus = fullText || m_extendedStatus;
-            Validator validator(commonModule());
+            Validator validator(systemContext());
             QnLicenseErrorCode code = validator.validate(license);
             if (code == QnLicenseErrorCode::NoError)
                 return expirationInfo(license, fullStatus).second;
@@ -168,7 +168,7 @@ QVariant QnLicenseListModel::foregroundData(const QModelIndex& index) const
         case QnLicenseListModel::ExpirationDateColumn:
         case QnLicenseListModel::LicenseStatusColumn:
         {
-            Validator validator(commonModule());
+            Validator validator(systemContext());
             QnLicenseErrorCode code = validator.validate(license);
             if (code != QnLicenseErrorCode::NoError)
             {
@@ -335,7 +335,7 @@ QPair<QnLicenseListModel::ExpirationState, QString> QnLicenseListModel::expirati
 
 QnMediaServerResourcePtr QnLicenseListModel::serverByLicense(const QnLicensePtr& license) const
 {
-    Validator validator(commonModule());
+    Validator validator(systemContext());
     auto serverId = validator.serverId(license);
     return resourcePool()->getResourceById<QnMediaServerResource>(serverId);
 }

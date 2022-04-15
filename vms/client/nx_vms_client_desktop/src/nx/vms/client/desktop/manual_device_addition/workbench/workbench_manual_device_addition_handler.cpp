@@ -51,7 +51,7 @@ WorkbenchManualDeviceAdditionHandler::WorkbenchManualDeviceAdditionHandler(QObje
         [this]()
         {
             const auto servers =
-                commonModule()->resourcePool()->getAllServers(nx::vms::api::ResourceStatus::online);
+                resourcePool()->getAllServers(nx::vms::api::ResourceStatus::online);
             if (servers.isEmpty())
             {
                 NX_ASSERT(false, "No online servers for device searching");

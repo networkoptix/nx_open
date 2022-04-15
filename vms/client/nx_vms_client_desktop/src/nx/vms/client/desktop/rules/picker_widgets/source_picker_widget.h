@@ -138,7 +138,7 @@ private:
 
     void updateUi()
     {
-        auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+        auto resourcePool = qnClientCoreModule->resourcePool();
 
         auto resourceList = resourcePool->getResourcesByIds<QnUserResource>(field->ids());
 
@@ -194,7 +194,7 @@ QnSelectResourcesButton* ServerPicker::createSelectButton()
 template<>
 void CameraPicker::updateUi()
 {
-    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    auto resourcePool = qnClientCoreModule->resourcePool();
 
     auto resourceList = resourcePool->getResourcesByIds<QnVirtualCameraResource>(field->ids());
 
@@ -225,7 +225,7 @@ void CameraPicker::updateUi()
 template<>
 void ServerPicker::updateUi()
 {
-    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    auto resourcePool = qnClientCoreModule->resourcePool();
 
     auto resourceList = resourcePool->getResourcesByIds<QnMediaServerResource>(field->ids());
 

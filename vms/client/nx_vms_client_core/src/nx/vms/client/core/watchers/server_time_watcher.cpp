@@ -5,7 +5,6 @@
 #include <api/model/time_reply.h>
 #include <api/server_rest_connection.h>
 #include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/fake_media_server.h>
@@ -13,6 +12,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/system_context.h>
 #include <utils/common/synctime.h>
 
 namespace {
@@ -24,10 +24,11 @@ constexpr int kServerTimeUpdatePeriodMs = 1000 * 60 * 2;
 
 namespace nx::vms::client::core {
 
-ServerTimeWatcher::ServerTimeWatcher(QObject* parent):
-    base_type(parent)
+ServerTimeWatcher::ServerTimeWatcher(SystemContext* systemContext, QObject* parent):
+    QObject(parent),
+    SystemContextAware(systemContext)
 {
-    const auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    const auto resourcePool = this->resourcePool();
 
     connect(resourcePool, &QnResourcePool::resourceAdded, this,
         &ServerTimeWatcher::handleResourceAdded);
@@ -171,7 +172,8 @@ void ServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr& server)
         return;
     }
 
-    if (!connection())
+    auto connection = this->connection();
+    if (!connection)
         return;
 
     auto callback = nx::utils::guarded(this,
@@ -191,7 +193,10 @@ void ServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr& server)
             emit displayOffsetsChanged();
         });
 
-    connectedServerApi()->getServerLocalTime(server->getId(), callback, this->thread());
+    connectedServerApi()->getServerLocalTime(
+        server->getId(),
+        callback,
+        this->thread());
 }
 
 void ServerTimeWatcher::handleResourceAdded(const QnResourcePtr& resource)

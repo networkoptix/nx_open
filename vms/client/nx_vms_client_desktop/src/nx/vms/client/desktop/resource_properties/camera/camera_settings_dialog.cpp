@@ -279,7 +279,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     d->cameraPropertyWatcher = new CameraSettingsRemoteChangesWatcher(d->store, this);
     d->cameraPtzCapabilitiesWatcher = new CameraSettingsPtzCapabilitiesWatcher(d->store, this);
 
-    d->licenseUsageHelper = new nx::vms::license::CamLicenseUsageHelper(commonModule(), this);
+    d->licenseUsageHelper = new nx::vms::license::CamLicenseUsageHelper(systemContext(), this);
 
     d->deviceAgentSettingsAdapter = new DeviceAgentSettingsAdapter(d->store, this);
 

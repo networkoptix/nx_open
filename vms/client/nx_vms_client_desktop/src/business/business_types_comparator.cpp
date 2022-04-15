@@ -25,7 +25,7 @@ bool QnBusinessTypesComparator::lexicographicalLessThan(ActionType left, ActionT
 
 void QnBusinessTypesComparator::initLexOrdering()
 {
-    StringsHelper helper(commonModule());
+    StringsHelper helper(systemContext());
 
     // event types to lex order
     int maxType = 0;

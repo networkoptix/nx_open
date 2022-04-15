@@ -163,7 +163,7 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
     qint64 totalDurationMs = 0;
     qint64 estimatedTotalSizeMb = 0;
 
-    const auto resPool = qnClientCoreModule->commonModule()->resourcePool();
+    const auto resPool = qnClientCoreModule->resourcePool();
     for (const auto& item: layout->getItems())
     {
         const auto resource = resPool->getResourceByDescriptor(item.resource);

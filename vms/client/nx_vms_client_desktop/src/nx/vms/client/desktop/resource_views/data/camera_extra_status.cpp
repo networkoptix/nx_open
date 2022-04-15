@@ -2,9 +2,9 @@
 
 #include "camera_extra_status.h"
 
-#include <common/common_module.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
+#include <nx/vms/common/system_context.h>
 
 namespace nx::vms::client::desktop {
 

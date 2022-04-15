@@ -54,10 +54,10 @@ public:
 
         QList<PeerInformation> result;
 
-        const auto& selfId = q->commonModule()->peerId();
+        const auto& selfId = q->peerId();
 
         for (const auto& server:
-            q->commonModule()->resourcePool()->getAllServers(nx::vms::api::ResourceStatus::online))
+            q->resourcePool()->getAllServers(nx::vms::api::ResourceStatus::online))
         {
             if (const auto& id = server->getId(); id != selfId)
                 result.append(PeerInformation{id, server->getOsInfo()});
@@ -145,7 +145,7 @@ QList<QnUuid> ResourcePoolPeerManager::peers() const
 
 int ResourcePoolPeerManager::distanceTo(const QnUuid& peerId) const
 {
-    const auto& connection = commonModule()->ec2Connection();
+    const auto& connection = ec2Connection();
     if (!connection)
         return -1;
 

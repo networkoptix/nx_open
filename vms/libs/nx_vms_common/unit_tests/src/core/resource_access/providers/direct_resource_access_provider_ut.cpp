@@ -31,12 +31,8 @@ namespace test {
 class DirectResourceAccessProviderTest: public DirectAccessProviderTestFixture
 {
     using base_type = DirectAccessProviderTestFixture;
-protected:
-    virtual void SetUp()
-    {
-        base_type::SetUp();
-    }
 
+protected:
     ResourceAccessProvider* accessProvider() const
     {
         return resourceAccessProvider();

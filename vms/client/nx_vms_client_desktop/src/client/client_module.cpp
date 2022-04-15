@@ -71,7 +71,7 @@
 #include <nx/vms/client/desktop/analytics/analytics_settings_manager.h>
 #include <nx/vms/client/desktop/analytics/analytics_settings_manager_factory.h>
 #include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
-#include <nx/vms/client/desktop/analytics/object_display_settings.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/components/debug_info_storage.h>
 #include <nx/vms/client/desktop/debug_utils/utils/performance_monitor.h>
 #include <nx/vms/client/desktop/director/director.h>
@@ -89,6 +89,7 @@
 #include <nx/vms/client/desktop/state/qt_based_shared_memory.h>
 #include <nx/vms/client/desktop/state/running_instances_manager.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_health/license_health_watcher.h>
 #include <nx/vms/client/desktop/system_health/system_internet_access_watcher.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
@@ -311,16 +312,18 @@ struct QnClientModule::Private
             sharedMemoryManager.get());
     }
 
-    void initLicensesModule(QnCommonModule* commonModule)
+    void initLicensesModule()
     {
         using namespace nx::vms::license;
 
-        videoWallLicenseUsageHelper = std::make_unique<VideoWallLicenseUsageHelper>(commonModule);
+        videoWallLicenseUsageHelper =
+            std::make_unique<VideoWallLicenseUsageHelper>(systemContext.get());
         videoWallLicenseUsageHelper->setCustomValidator(
-            std::make_unique<license::VideoWallLicenseValidator>(commonModule));
+            std::make_unique<license::VideoWallLicenseValidator>(systemContext.get()));
     }
 
     const QnStartupParameters startupParameters;
+    std::unique_ptr<SystemContext> systemContext;
     std::unique_ptr<ClientStateHandler> clientStateHandler;
     std::unique_ptr<RunningInstancesManager> runningInstancesManager;
     std::unique_ptr<SharedMemoryManager> sharedMemoryManager;
@@ -330,7 +333,7 @@ struct QnClientModule::Private
     std::unique_ptr<nx::vms::client::desktop::analytics::AttributeHelper> analyticsAttributeHelper;
     std::unique_ptr<nx::vms::utils::TranslationManager> translationManager;
     std::unique_ptr<nx::vms::license::VideoWallLicenseUsageHelper> videoWallLicenseUsageHelper;
-    std::unique_ptr<nx::vms::client::desktop::DebugInfoStorage> debugInfoStorage;
+    std::unique_ptr<DebugInfoStorage> debugInfoStorage;
 };
 
 QnClientModule::QnClientModule(const QnStartupParameters& startupParameters, QObject* parent):
@@ -363,7 +366,7 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParameters, QOb
     if (d->startupParameters.selfUpdateMode)
         return;
 
-    d->initLicensesModule(m_clientCoreModule->commonModule());
+    d->initLicensesModule();
     initNetwork();
 
     // Initialize application UI.
@@ -386,12 +389,10 @@ QnClientModule::~QnClientModule()
     if (m_resourceDirectoryBrowser)
         m_resourceDirectoryBrowser->stop();
 
-    m_clientCoreModule->commonModule()->resourcePool()->threadPool()->waitForDone();
+    d->systemContext->resourcePool()->threadPool()->waitForDone();
 
-    QApplication::setOrganizationName(QString());
-    QApplication::setApplicationName(QString());
-    QApplication::setApplicationDisplayName(QString());
-    QApplication::setApplicationVersion(QString());
+    if (d->systemContext->messageProcessor())
+        d->systemContext->deleteMessageProcessor();
 
     // Restoring default message handler.
     nx::utils::disableQtMessageAsserts();
@@ -493,8 +494,8 @@ void QnClientModule::initSingletons()
 
     // Initializing SessionManager.
 
-    m_processInterface.reset(new nx::vms::client::desktop::session::DefaultProcessInterface());
-    using SessionManager = nx::vms::client::desktop::session::SessionManager;
+    m_processInterface.reset(new session::DefaultProcessInterface());
+    using SessionManager = session::SessionManager;
     session::Config sessionConfig;
     //sessionConfig.rootGuid = pcUuid;
     sessionConfig.sharedPrefix = nx::branding::customization() + "/SessionManager";
@@ -526,20 +527,23 @@ void QnClientModule::initSingletons()
     QnUuid peerId = d->runningInstancesManager
         ? d->runningInstancesManager->currentInstanceGuid()
         : QnUuid();
+
+    d->systemContext = std::make_unique<SystemContext>(peerId);
+    ApplicationContext::instance()->addSystemContext(d->systemContext.get());
+
     m_clientCoreModule.reset(new QnClientCoreModule(
         QnClientCoreModule::Mode::desktopClient,
-        std::move(peerId)));
-    QnCommonModule* commonModule = m_clientCoreModule->commonModule();
+        d->systemContext.get()));
 
     // In self-update mode we do not have runningInstancesManager.
     if (!d->startupParameters.selfUpdateMode)
     {
         // Message processor should exist before networking is initialized.
-        commonModule->createMessageProcessor<QnDesktopClientMessageProcessor>(this);
+        d->systemContext->createMessageProcessor<QnDesktopClientMessageProcessor>(this);
 
         // Must be called when peerId is set.
         nx::network::SocketGlobals::cloud().outgoingTunnelPool().assignOwnPeerId(
-            "dc", commonModule->peerId());
+            "dc", d->systemContext->peerId());
 
         m_clientCoreModule->initializeNetworking(
             clientPeerType,
@@ -558,6 +562,7 @@ void QnClientModule::initSingletons()
     d->initializeTranslations();
 
     // Pass ownership to the common module.
+    auto commonModule = m_clientCoreModule->commonModule();
     commonModule->store(clientRuntimeSettings.release());
 
     initRuntimeParams(d->startupParameters);
@@ -586,7 +591,7 @@ void QnClientModule::initSingletons()
     commonModule->store(new QnIncompatibleServerWatcher());
     commonModule->store(new QnClientResourceFactory());
 
-    commonModule->store(new ServerRuntimeEventConnector(commonModule->messageProcessor()));
+    commonModule->store(new ServerRuntimeEventConnector(d->systemContext->messageProcessor()));
 
     commonModule->store(new QnCameraBookmarksManager());
 
@@ -619,21 +624,20 @@ void QnClientModule::initSingletons()
     commonModule->store(new QnQtbugWorkaround());
 
     commonModule->store(new nx::cloud::gateway::VmsGatewayEmbeddable(true));
-    commonModule->store(new nx::vms::client::desktop::LocalProxyServer());
+    commonModule->store(new LocalProxyServer());
 
     m_cameraDataManager = commonModule->store(new QnCameraDataManager(commonModule));
 
-    commonModule->store(new ObjectDisplaySettings());
     commonModule->store(new SystemInternetAccessWatcher(commonModule));
     commonModule->findInstance<nx::vms::client::core::watchers::KnownServerConnections>()->start();
 
     d->analyticsSettingsManager = AnalyticsSettingsManagerFactory::createAnalyticsSettingsManager(
-        commonModule->resourcePool(),
-        commonModule->messageProcessor());
+        d->systemContext->resourcePool(),
+        d->systemContext->messageProcessor());
 
     d->analyticsAttributeHelper = std::make_unique<
         nx::vms::client::desktop::analytics::AttributeHelper>(
-            commonModule->analyticsTaxonomyStateWatcher());
+            d->systemContext->analyticsTaxonomyStateWatcher());
 
     m_analyticsMetadataProviderFactory.reset(new AnalyticsMetadataProviderFactory());
     m_analyticsMetadataProviderFactory->registerMetadataProviders();
@@ -644,10 +648,10 @@ void QnClientModule::initSingletons()
     rest::ServerConnection::setDebugFlag(rest::ServerConnection::DebugFlag::disableThumbnailRequests,
         ini().debugDisableCameraThumbnails);
 
-    m_performanceMonitor.reset(new nx::vms::client::desktop::PerformanceMonitor());
-    m_licenseHealthWatcher.reset(new nx::vms::client::desktop::LicenseHealthWatcher(commonModule->licensePool()));
+    m_performanceMonitor.reset(new PerformanceMonitor());
+    m_licenseHealthWatcher.reset(new LicenseHealthWatcher(d->systemContext->licensePool()));
 
-    d->debugInfoStorage = std::make_unique<nx::vms::client::desktop::DebugInfoStorage>();
+    d->debugInfoStorage = std::make_unique<DebugInfoStorage>();
 }
 
 void QnClientModule::initRuntimeParams([[maybe_unused]] const QnStartupParameters& startupParams)
@@ -897,6 +901,11 @@ QnClientCoreModule* QnClientModule::clientCoreModule() const
     return m_clientCoreModule.data();
 }
 
+SystemContext* QnClientModule::systemContext() const
+{
+    return d->systemContext.get();
+}
+
 QnClientModule::SessionManager* QnClientModule::sessionManager() const
 {
     return m_sessionManager.get();
@@ -988,17 +997,15 @@ nx::vms::utils::TranslationManager* QnClientModule::translationManager() const
 
 void QnClientModule::initLocalInfo(nx::vms::api::PeerType peerType)
 {
-    auto commonModule = m_clientCoreModule->commonModule();
-
     nx::vms::api::RuntimeData runtimeData;
-    runtimeData.peer.id = commonModule->peerId();
-    runtimeData.peer.instanceId = commonModule->sessionId();
+    runtimeData.peer.id = d->systemContext->peerId();
+    runtimeData.peer.instanceId = d->systemContext->sessionId();
     runtimeData.peer.peerType = peerType;
     runtimeData.peer.dataFormat = serializationFormat();
     runtimeData.brand = ini().developerMode ? QString() : nx::branding::brand();
     runtimeData.customization = ini().developerMode ? QString() : nx::branding::customization();
     runtimeData.videoWallInstanceGuid = d->startupParameters.videoWallItemGuid;
-    commonModule->runtimeInfoManager()->updateLocalItem(runtimeData); // initializing localInfo
+    d->systemContext->runtimeInfoManager()->updateLocalItem(runtimeData); // initializing localInfo
 }
 
 void QnClientModule::registerResourceDataProviders()

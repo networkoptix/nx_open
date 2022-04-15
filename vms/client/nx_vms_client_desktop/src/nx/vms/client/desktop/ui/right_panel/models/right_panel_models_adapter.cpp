@@ -56,6 +56,7 @@
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/system_context.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -941,7 +942,7 @@ bool RightPanelModelsAdapter::Private::isAllowed() const
                 return false;
 
             std::vector<AbstractObjectType*> objectTypes;
-            if (const auto state = m_context->commonModule()->analyticsTaxonomyState())
+            if (const auto state = m_context->systemContext()->analyticsTaxonomyState())
                 objectTypes = state->rootObjectTypes();
 
             return std::any_of(objectTypes.cbegin(), objectTypes.cend(),
@@ -1060,7 +1061,7 @@ void RightPanelModelsAdapter::Private::recreateSourceModel()
             q->setSourceModel(analyticsModel);
 
             m_modelConnections << connect(
-                m_context->commonModule()->analyticsTaxonomyStateWatcher(),
+                m_context->systemContext()->analyticsTaxonomyStateWatcher(),
                 qOverload<>(&nx::analytics::taxonomy::AbstractStateWatcher::stateChanged),
                 q,
                 &RightPanelModelsAdapter::allowanceChanged);

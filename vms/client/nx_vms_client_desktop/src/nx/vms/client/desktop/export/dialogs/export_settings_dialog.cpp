@@ -1,7 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "export_settings_dialog.h"
-#include "private/export_settings_dialog_p.h"
 #include "ui_export_settings_dialog.h"
 
 #include <limits>
@@ -10,33 +9,35 @@
 
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
+#include <core/resource/camera_bookmark.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/layout_item_data.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/camera_bookmark.h>
-#include <nx/vms/time/formatter.h>
-#include <ui/common/palette.h>
-#include <ui/help/help_topics.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/graphics/items/resource/media_resource_widget.h>
-#include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <ui/workbench/workbench_item.h>
-#include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/workbench_context.h>
-#include <utils/common/event_processors.h>
-#include <utils/math/math.h>
-
-#include <nx/vms/client/core/watchers/server_time_watcher.h>
-#include <nx/core/transcoding/filters/timestamp_filter.h>
 #include <nx/core/layout/layout_file_info.h>
+#include <nx/core/transcoding/filters/timestamp_filter.h>
+#include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
 #include <nx/vms/client/desktop/common/widgets/message_bar.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button_group.h>
 #include <nx/vms/client/desktop/export/widgets/export_password_widget.h>
 #include <nx/vms/client/desktop/image_providers/layout_thumbnail_loader.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/time/formatter.h>
+#include <ui/common/palette.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_layout.h>
+#include <utils/common/event_processors.h>
+#include <utils/math/math.h>
+
+#include "private/export_settings_dialog_p.h"
 
 namespace nx::vms::client::desktop {
 
@@ -648,13 +649,17 @@ void ExportSettingsDialog::setMediaParams(
     QnWorkbenchContext* context)
 {
     d->dispatch(Reducer::enableTab, Mode::Media);
-    const auto timeWatcher = context->instance<core::ServerTimeWatcher>();
+
+    const auto resource = mediaResource->toResourcePtr();
+    auto systemContext = SystemContext::fromResource(resource);
+
+    const auto timeWatcher = systemContext->serverTimeWatcher();
     d->dispatch(Reducer::setServerTimeZoneOffsetMs, timeWatcher->utcOffset(mediaResource, Qn::InvalidUtcOffset));
 
     const auto timestampOffsetMs = timeWatcher->displayOffset(mediaResource);
     d->dispatch(Reducer::setTimestampOffsetMs, timestampOffsetMs);
 
-    const auto resource = mediaResource->toResourcePtr();
+
     const auto currentSettings = d->state().getExportMediaSettings();
     const auto startTimeMs = currentSettings.period.startTimeMs;
 

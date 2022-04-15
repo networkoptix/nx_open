@@ -703,5 +703,3 @@ private:
     mutable nx::Mutex m_mutex;
     QnUserResourcePtr m_admin;
 };
-
-#define qnGlobalSettings commonModule()->globalSettings()

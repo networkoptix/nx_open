@@ -10,7 +10,7 @@
 #include "storage_resource_stub.h"
 #include "camera_resource_stub.h"
 
-namespace nx::vms::common::test_support {
+namespace nx::vms::common::test {
 
 using namespace nx::vms::api;
 
@@ -30,4 +30,4 @@ QnResourcePtr TestResourceFactory::createResource(
     return QnResourcePtr(new CameraResourceStub());
 }
 
-} // namespace nx::vms::common::test_support
+} // namespace nx::vms::common::test

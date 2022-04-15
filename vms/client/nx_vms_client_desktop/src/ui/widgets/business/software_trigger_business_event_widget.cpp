@@ -31,7 +31,7 @@ static constexpr int kDropdownIconSize = 40;
 QnSoftwareTriggerBusinessEventWidget::QnSoftwareTriggerBusinessEventWidget(QWidget* parent) :
     base_type(parent),
     ui(new Ui::SoftwareTriggerBusinessEventWidget),
-    m_helper(new vms::event::StringsHelper(commonModule())),
+    m_helper(new vms::event::StringsHelper(systemContext())),
     m_validationPolicy(new QnRequiredPermissionSubjectPolicy(
         GlobalPermission::userInput,
         tr("User Input")))

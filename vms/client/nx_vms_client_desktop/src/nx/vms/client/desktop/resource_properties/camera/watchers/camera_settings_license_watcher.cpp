@@ -64,7 +64,7 @@ public:
         connect(m_store, &CameraSettingsDialogStore::stateChanged, this, &Private::updateText);
 
         using namespace nx::vms::license;
-        const auto watcher = new CamLicenseUsageWatcher(q->commonModule(), this);
+        const auto watcher = new CamLicenseUsageWatcher(q->systemContext(), this);
         connect(watcher, &UsageWatcher::licenseUsageChanged, this, &Private::updateText);
     }
 
@@ -105,7 +105,7 @@ private:
         if (!m_store)
             return {};
 
-        nx::vms::license::CamLicenseUsageHelper helper(q->commonModule());
+        nx::vms::license::CamLicenseUsageHelper helper(q->systemContext());
 
         if (m_store->state().recording.enabled.hasValue())
             helper.propose(m_cameras, m_store->state().recording.enabled());

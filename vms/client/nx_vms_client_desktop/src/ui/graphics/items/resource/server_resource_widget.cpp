@@ -16,6 +16,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/license/usage_helper.h>
 #include <nx/vms/text/human_readable.h>
 #include <qt_graphics_items/graphics_label.h>
@@ -417,9 +418,14 @@ using HealthMonitoringButtons = QnServerResourceWidget::HealthMonitoringButtons;
 // -------------------------------------------------------------------------- //
 // QnServerResourceWidget
 // -------------------------------------------------------------------------- //
-QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /* = nullptr */):
-    base_type(context, item, parent),
-    m_manager(context->instance<QnMediaServerStatisticsManager>()),
+QnServerResourceWidget::QnServerResourceWidget(
+    SystemContext* systemContext,
+    WindowContext* windowContext,
+    QnWorkbenchItem* item,
+    QGraphicsItem* parent)
+    :
+    base_type(systemContext, windowContext, item, parent),
+    m_manager(windowContext->workbenchContext()->instance<QnMediaServerStatisticsManager>()),
     m_lastHistoryId(-1),
     m_counter(0),
     m_renderStatus(Qn::NothingRendered),

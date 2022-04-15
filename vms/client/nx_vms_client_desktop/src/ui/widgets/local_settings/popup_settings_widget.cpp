@@ -35,7 +35,7 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
     m_systemHealthCheckBoxes(),
     m_adaptor(new QnBusinessEventsFilterResourcePropertyAdaptor(this)),
     m_updating(false),
-    m_helper(new nx::vms::event::StringsHelper(commonModule()))
+    m_helper(new nx::vms::event::StringsHelper(systemContext()))
 {
     ui->setupUi(this);
 

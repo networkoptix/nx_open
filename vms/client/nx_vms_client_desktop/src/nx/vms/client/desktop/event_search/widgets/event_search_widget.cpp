@@ -173,7 +173,7 @@ void EventSearchWidget::Private::setupTypeSelection()
 
     analyticsEventsMenu->setTitle(tr("Analytics events"));
 
-    StringsHelper helper(q->commonModule());
+    StringsHelper helper(q->systemContext());
 
     auto defaultAction = addMenuAction(
         eventFilterMenu, tr("Any event"), EventType::undefinedEvent);
@@ -259,7 +259,7 @@ QMenu* EventSearchWidget::Private::createDeviceIssuesMenu(QWidget* parent) const
 
     menu->addSeparator();
 
-    nx::vms::event::StringsHelper stringsHelper(q->commonModule());
+    nx::vms::event::StringsHelper stringsHelper(q->systemContext());
     for (const auto type: nx::vms::event::childEvents(EventType::anyCameraEvent))
         addMenuAction(menu, stringsHelper.eventName(type), type);
 
@@ -280,7 +280,7 @@ QMenu* EventSearchWidget::Private::createServerEventsMenu(QWidget* parent) const
     const auto accessibleServerEvents = NvrEventsActionsAccess::removeInacessibleNvrEvents(
         nx::vms::event::childEvents(EventType::anyServerEvent), q->resourcePool());
 
-    nx::vms::event::StringsHelper stringsHelper(q->commonModule());
+    nx::vms::event::StringsHelper stringsHelper(q->systemContext());
     for (const auto type: accessibleServerEvents)
         addMenuAction(menu, stringsHelper.eventName(type), type);
 

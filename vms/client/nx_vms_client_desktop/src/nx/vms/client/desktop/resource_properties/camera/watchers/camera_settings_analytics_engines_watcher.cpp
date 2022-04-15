@@ -76,8 +76,7 @@ CameraSettingsAnalyticsEnginesWatcher::Private::Private(
     QnCommonModuleAware(commonModule),
     store(store)
 {
-    const auto messageProcessor =
-        qobject_cast<QnClientMessageProcessor*>(commonModule->messageProcessor());
+    const auto messageProcessor = qnClientMessageProcessor;
 
     if (!NX_ASSERT(messageProcessor))
         return;
@@ -87,9 +86,9 @@ CameraSettingsAnalyticsEnginesWatcher::Private::Private(
     connect(messageProcessor, &QnCommonMessageProcessor::connectionClosed,
         this, &Private::at_connectionClosed);
 
-    connect(commonModule->resourcePool(), &QnResourcePool::resourceAdded,
+    connect(resourcePool(), &QnResourcePool::resourceAdded,
         this, &Private::at_resourceAdded);
-    connect(commonModule->resourcePool(), &QnResourcePool::resourceRemoved,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved,
         this, &Private::at_resourceRemoved);
 
     if (messageProcessor->connectionStatus()->state() == QnConnectionState::Ready)
@@ -133,7 +132,7 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::at_initialResourcesReceived
 
     engines.clear();
 
-    for (const auto& engine: commonModule()->resourcePool()->getResources<AnalyticsEngineResource>())
+    for (const auto& engine: resourcePool()->getResources<AnalyticsEngineResource>())
         at_resourceAdded(engine);
 }
 

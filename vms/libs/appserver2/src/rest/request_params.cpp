@@ -4,13 +4,14 @@
 
 #include <QtCore/QUrlQuery>
 
-#include <nx/vms/api/data/stored_file_data.h>
-#include <nx/fusion/model_functions.h>
-#include <transaction/transaction.h>
 #include <api/helpers/camera_id_helper.h>
 #include <api/helpers/layout_id_helper.h>
 #include <common/common_module.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/network/rest/params.h>
+#include <nx/vms/api/data/stored_file_data.h>
+#include <nx/vms/common/system_context.h>
+#include <transaction/transaction.h>
 
 namespace ec2 {
 
@@ -119,7 +120,8 @@ bool parseHttpRequestParams(
     if (result)
     {
         static const QnUuid kNonExistingUuid("{11111111-1111-1111-1111-111111111111}");
-        *id = nx::camera_id_helper::flexibleIdToId(commonModule->resourcePool(), stringValue);
+        *id = nx::camera_id_helper::flexibleIdToId(
+            commonModule->systemContext()->resourcePool(), stringValue);
         if (id->isNull())
             *id = kNonExistingUuid; //< Turn on data filtering anyway.
     }
@@ -137,7 +139,8 @@ bool parseHttpRequestParams(
     if (result)
     {
         static const QnUuid kNonExistingUuid("{11111111-1111-1111-1111-111111111111}");
-        *id = nx::layout_id_helper::flexibleIdToId(commonModule->resourcePool(), stringValue);
+        *id = nx::layout_id_helper::flexibleIdToId(
+            commonModule->systemContext()->resourcePool(), stringValue);
         if (id->isNull())
             *id = kNonExistingUuid; //< Turn on data filtering anyway.
     }

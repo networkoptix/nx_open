@@ -36,9 +36,11 @@
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/analytics/analytics_icon_manager.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
 #include <nx/vms/text/human_readable.h>
 #include <server/server_storage_manager.h>
@@ -236,7 +238,7 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
             }
         });
 
-    const auto watcher = q->commonModule()->analyticsTaxonomyStateWatcher();
+    const auto watcher = q->commonModule()->systemContext()->analyticsTaxonomyStateWatcher();
     if (NX_ASSERT(watcher))
     {
         connect(watcher, &nx::analytics::taxonomy::AbstractStateWatcher::stateChanged, this,
@@ -424,7 +426,7 @@ void AnalyticsSearchListModel::Private::updateRelevantObjectTypes()
     std::set<QString> relevantObjectTypes;
     if (!m_selectedObjectType.isEmpty())
     {
-        const auto watcher = q->commonModule()->analyticsTaxonomyStateWatcher();
+        const auto watcher = q->commonModule()->systemContext()->analyticsTaxonomyStateWatcher();
         if (NX_ASSERT(watcher))
         {
             relevantObjectTypes = std::move(nx::analytics::taxonomy::getAllDerivedTypeIds(
@@ -940,7 +942,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
         filter.boundingBox = m_filterRect;
 
     const nx::analytics::taxonomy::ObjectTypeDictionary objectTypeDictionary(
-        q->commonModule()->analyticsTaxonomyStateWatcher());
+        q->commonModule()->systemContext()->analyticsTaxonomyStateWatcher());
 
     const int oldNewTrackCount = m_newTracks.size();
 
@@ -1174,7 +1176,7 @@ void AnalyticsSearchListModel::Private::advanceTrack(ObjectTrack& track,
 const nx::analytics::taxonomy::AbstractObjectType*
     AnalyticsSearchListModel::Private::objectTypeById(const QString& objectTypeId) const
 {
-    const auto watcher = q->commonModule()->analyticsTaxonomyStateWatcher();
+    const auto watcher = q->commonModule()->systemContext()->analyticsTaxonomyStateWatcher();
     if (!NX_ASSERT(watcher))
         return nullptr;
 
@@ -1198,7 +1200,10 @@ QString AnalyticsSearchListModel::Private::description(
     if (!ini().showDebugTimeInformationInRibbon)
         return QString();
 
-    const auto timeWatcher = q->context()->instance<nx::vms::client::core::ServerTimeWatcher>();
+
+    // TODO: #sivanov Actualize used system context.
+    const auto timeWatcher = ApplicationContext::instance()->currentSystemContext()
+        ->serverTimeWatcher();
     const auto start = timeWatcher->displayTime(startTime(track).count());
     const auto duration = objectDuration(track);
 
@@ -1227,7 +1232,7 @@ QString AnalyticsSearchListModel::Private::engineName(
         return {};
 
     const std::shared_ptr<AbstractState> taxonomyState =
-        q->commonModule()->analyticsTaxonomyState();
+        q->commonModule()->systemContext()->analyticsTaxonomyState();
 
     if (!taxonomyState)
         return QString();

@@ -1,27 +1,23 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "layout_reader.h"
-#include "layout_proto.h"
 
 #include <QtCore/QThread>
 
+#include <client/client_globals.h>
+#include <client_core/client_core_module.h>
+#include <common/common_module.h>
+#include <core/resource/avi/avi_resource.h>
+#include <core/resource/file_layout_resource.h>
+#include <core/storage/file_storage/layout_storage_resource.h>
+#include <managers/resource_manager.h>
 #include <nx/core/watermark/watermark.h>
 #include <nx/fusion/serialization/json.h>
-
-#include <core/resource/file_layout_resource.h>
-#include <core/resource/avi/avi_resource.h>
-#include <core/storage/file_storage/layout_storage_resource.h>
-
-#include <common/common_module.h>
-
-#include <managers/resource_manager.h>
-
-#include <client_core/client_core_module.h>
-
-#include <client/client_globals.h>
-
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
+#include <nx/vms/common/system_context.h>
+
+#include "layout_proto.h"
 
 QnFileLayoutResourcePtr nx::vms::client::desktop::layout::layoutFromFile(
     const QString& layoutUrl, const QString& password)
@@ -177,7 +173,7 @@ QnFileLayoutResourcePtr nx::vms::client::desktop::layout::layoutFromFile(
         if (timeZoneOffset != Qn::InvalidUtcOffset)
             aviResource->setTimeZoneOffset(timeZoneOffset);
 
-        auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+        auto resourcePool = qnClientCoreModule->resourcePool();
         resourcePool->addResource(aviResource, QnResourcePool::SkipAddingTransaction);
 
         // Check if we have updated an existing resource.

@@ -9,7 +9,6 @@ namespace test {
 
 void CachedBaseAccessProviderTestFixture::SetUp()
 {
-    base_type::SetUp();
     m_accessProvider = createAccessProvider();
     for (auto provider: resourceAccessProvider()->providers())
     {
@@ -18,11 +17,6 @@ void CachedBaseAccessProviderTestFixture::SetUp()
     }
     resourceAccessProvider()->addBaseProvider(m_accessProvider);
     setupAwaitAccess();
-}
-
-void CachedBaseAccessProviderTestFixture::TearDown()
-{
-    base_type::TearDown();
 }
 
 AbstractResourceAccessProvider* CachedBaseAccessProviderTestFixture::accessProvider() const

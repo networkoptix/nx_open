@@ -4,45 +4,40 @@
 
 #include <optional>
 
+#include <QtCore/QElapsedTimer>
+#include <QtCore/QHash>
+#include <QtCore/QList>
+#include <QtCore/QMutex>
+#include <QtCore/QTimer>
 #include <QtMultimedia/QAbstractVideoSurface>
 #include <QtMultimedia/QVideoSurfaceFormat>
-#include <QtCore/QElapsedTimer>
-#include <QtCore/QTimer>
-#include <QtCore/QMutex>
-#include <QtCore/QList>
-#include <QtCore/QHash>
-
-#include <nx/kit/debug.h>
 
 #include <common/common_module.h>
-#include <nx/utils/log/log.h>
-#include <utils/common/long_runable_cleanup.h>
-
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/camera_history.h>
-#include <core/resource/media_server_resource.h>
-
-#include <core/resource/avi/avi_resource.h>
 #include <core/resource/avi/avi_archive_delegate.h>
-
-#include <nx_ec/abstract_ec_connection.h>
+#include <core/resource/avi/avi_resource.h>
+#include <core/resource/camera_history.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/kit/debug.h>
+#include <nx/media/ini.h>
+#include <nx/media/quick_sync/qsv_supported.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/streaming/rtsp_client_archive_delegate.h>
+#include <nx/utils/log/log.h>
+#include <nx/vms/common/system_context.h>
+#include <nx_ec/abstract_ec_connection.h>
+#include <utils/common/long_runable_cleanup.h>
 
-#include <nx/media/ini.h>
-
-#include "player_data_consumer.h"
-#include "frame_metadata.h"
-#include "video_decoder_registry.h"
 #include "audio_output.h"
+#include "frame_metadata.h"
+#include "media_player_quality_chooser.h"
+#include "player_data_consumer.h"
+#include "video_decoder_registry.h"
 
-#include <nx/media/quick_sync/qsv_supported.h>
 #ifdef __QSV_SUPPORTED__
 #include <nx/media/quick_sync/quick_sync_surface.h>
 #endif // __QSV_SUPPORTED__
-
-#include "media_player_quality_chooser.h"
 
 static uint qHash(const MetadataType& value)
 {
@@ -792,7 +787,7 @@ bool PlayerPrivate::createArchiveReader()
     else
     {
         const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-        auto connection = q_ptr->commonModule()->ec2Connection();
+        auto connection = q_ptr->commonModule()->systemContext()->ec2Connection();
         NX_ASSERT(camera);
         auto rtspArchiveDelegate = new QnRtspClientArchiveDelegate(
             archiveReader.get(),
@@ -1197,7 +1192,8 @@ void Player::setSource(const QUrl& url)
     }
     else
     {
-        d->resource = commonModule()->resourcePool()->getResourceById(QnUuid(d->url.path().mid(1)));
+        d->resource = commonModule()->systemContext()
+            ->resourcePool()->getResourceById(QnUuid(d->url.path().mid(1)));
     }
 
     if (d->resource)

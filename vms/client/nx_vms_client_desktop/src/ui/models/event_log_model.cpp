@@ -4,8 +4,8 @@
 
 #include <cassert>
 
-#include <QtGui/QTextDocument>
 #include <QtGui/QPalette>
+#include <QtGui/QTextDocument>
 
 #include <api/helpers/camera_id_helper.h>
 #include <business/business_types_comparator.h> //< TODO: #vkutin Think of a proper location.
@@ -21,11 +21,14 @@
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
-#include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/analytics/taxonomy/abstract_state.h>
+#include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/event/events/reasoned_event.h>
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/time/formatter.h>
@@ -36,6 +39,7 @@
 #include <utils/math/math.h>
 
 using namespace nx;
+using namespace nx::vms::client::desktop;
 
 using eventIterator = vms::event::ActionDataList::iterator;
 using nx::vms::api::EventType;
@@ -180,7 +184,7 @@ QnEventLogModel::QnEventLogModel(QObject* parent):
     QnWorkbenchContextAware(parent),
     m_linkBrush(QPalette().link()),
     m_index(new DataIndex(this)),
-    m_stringsHelper(new vms::event::StringsHelper(commonModule()))
+    m_stringsHelper(new vms::event::StringsHelper(systemContext()))
 {
 }
 
@@ -368,7 +372,7 @@ QVariant QnEventLogModel::iconData(Column column, const vms::event::ActionData& 
             break;
     }
 
-    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    auto resourcePool = qnClientCoreModule->resourcePool();
     return qnResIconCache->icon(resourcePool->getResourceById(resId));
 }
 
@@ -400,7 +404,9 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
         {
             qint64 timestampMs = action.eventParams.eventTimestampUsec / 1000;
 
-            const auto timeWatcher = context()->instance<nx::vms::client::core::ServerTimeWatcher>();
+            // TODO: #sivanov Actualize used system context.
+            const auto timeWatcher =
+                ApplicationContext::instance()->currentSystemContext()->serverTimeWatcher();
             QDateTime dt = timeWatcher->displayTime(timestampMs);
             return nx::vms::time::toString(dt);
         }
@@ -409,7 +415,7 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
             if (action.eventParams.eventType == nx::vms::api::EventType::analyticsSdkEvent)
             {
                 const std::shared_ptr<AbstractState> taxonomyState =
-                    commonModule()->analyticsTaxonomyState();
+                    commonModule()->systemContext()->analyticsTaxonomyState();
 
                 if (!taxonomyState)
                     m_stringsHelper->eventName(action.eventParams.eventType);

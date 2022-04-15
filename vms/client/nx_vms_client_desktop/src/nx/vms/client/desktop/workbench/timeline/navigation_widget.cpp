@@ -4,24 +4,23 @@
 
 #include <QtCore/QScopedValueRollback>
 #include <QtWidgets/QAction>
-#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QVBoxLayout>
 
-#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/style/icon.h>
-
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-
-#include <ui/workbench/workbench_display.h>
-#include <ui/workbench/workbench_navigator.h>
-#include <ui/workbench/workbench_context.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_navigator.h>
 #include <utils/common/event_processors.h>
 
-#include "speed_slider.h"
 #include "clock_label.h"
+#include "speed_slider.h"
 
 namespace nx::vms::client::desktop::workbench::timeline {
 
@@ -76,7 +75,9 @@ NavigationWidget::NavigationWidget(QnWorkbenchContext* context, QWidget* parent)
     mainLayout->setSpacing(3);
     setLayout(mainLayout);
 
-    this->context()->statisticsModule()->registerSlider(lit("speed_slider"), m_speedSlider);
+    ApplicationContext::instance()->controlsStatisticsModule()->registerSlider(
+        "speed_slider",
+        m_speedSlider);
     mainLayout->addWidget(m_speedSlider);
 
     auto buttonsLayout = new QHBoxLayout();

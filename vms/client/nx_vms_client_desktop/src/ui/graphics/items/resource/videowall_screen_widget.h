@@ -12,15 +12,17 @@ class QnVideoWallItem;
 class QGraphicsAnchorLayout;
 class QGraphicsWidget;
 
-namespace nx::vms::client::desktop{ class CameraThumbnailManager; }
-
 /** Class for displaying single screen of the videowall resource on the scene. */
 class QnVideowallScreenWidget: public QnResourceWidget
 {
     Q_OBJECT
     using base_type = QnResourceWidget;
+
 public:
-    QnVideowallScreenWidget(QnWorkbenchContext* context, QnWorkbenchItem* item,
+    QnVideowallScreenWidget(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        nx::vms::client::desktop::WindowContext* windowContext,
+        QnWorkbenchItem* item,
         QGraphicsItem* parent = nullptr);
 
     virtual ~QnVideowallScreenWidget();
@@ -46,7 +48,6 @@ private:
     void updateItems();
     void updateLayout(bool force = false);
 
-    void at_thumbnailReady(const QnUuid& resourceId, const QPixmap& thumbnail);
     void at_videoWall_itemChanged(const QnVideoWallResourcePtr& videoWall,
         const QnVideoWallItem& item,
         const QnVideoWallItem& oldItem);
@@ -60,7 +61,4 @@ private:
     QGraphicsAnchorLayout* m_layout = nullptr;
 
     bool m_layoutUpdateRequired = true;
-
-    nx::vms::client::desktop::CameraThumbnailManager* m_thumbnailManager = nullptr;
-    QHash<QnUuid, QPixmap> m_thumbs;
 };

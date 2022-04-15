@@ -71,7 +71,7 @@ void QnWorkbenchLicenseNotifier::checkLicenses() const
         }
     }
 
-    nx::vms::license::Validator validator(commonModule());
+    nx::vms::license::Validator validator(systemContext());
     for (const auto& license: licensePool()->getLicenses())
     {
         const auto errorCode = validator.validate(license);

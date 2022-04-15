@@ -2,8 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include <common/common_module.h>
-#include <common/static_common_module.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/global_permissions_manager.h>
@@ -11,21 +9,23 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/core/access/access_types.h>
-#include <nx/vms/common/test_support/resource/camera_resource_stub.h>
-#include <nx/vms/common/test_support/resource/resource_pool_test_helper.h>
 #include <nx/reflect/json/serializer.h>
+#include <nx/vms/common/test_support/resource/camera_resource_stub.h>
+#include <nx/vms/common/test_support/test_context.h>
 
-class QnCachedGlobalPermissionsManagerTest: public testing::Test, protected QnResourcePoolTestHelper
+namespace nx::vms::common::test {
+
+class QnCachedGlobalPermissionsManagerTest: public ContextBasedTest
 {
+public:
+    QnCachedGlobalPermissionsManagerTest():
+        ContextBasedTest(/*clientMode*/ false, nx::core::access::Mode::cached)
+    {
+    }
+
 protected:
     virtual void SetUp()
     {
-        m_staticCommon = std::make_unique<QnStaticCommonModule>();
-        m_module = std::make_unique<QnCommonModule>(
-            /*clientMode*/ false,
-            nx::core::access::Mode::cached);
-        initializeContext(m_module.get());
-
         QObject::connect(globalPermissionsManager(),
             &QnGlobalPermissionsManager::globalPermissionsChanged,
             [this](const QnResourceAccessSubject& subject, GlobalPermissions value)
@@ -34,13 +34,6 @@ protected:
                 m_notifiedAccess[subject.id()] = value;
                 m_condition.wakeAll();
             });
-    }
-
-    virtual void TearDown()
-    {
-        deinitializeContext();
-        m_module.reset();
-        m_staticCommon.reset();
     }
 
     bool expectPermissions(const QnResourceAccessSubject& subject, GlobalPermissions expected)
@@ -65,8 +58,6 @@ protected:
     }
 
 private:
-    std::unique_ptr<QnStaticCommonModule> m_staticCommon;
-    std::unique_ptr<QnCommonModule> m_module;
     nx::Mutex m_mutex;
     nx::WaitCondition m_condition;
     std::map<QnUuid, GlobalPermissions> m_notifiedAccess;
@@ -139,3 +130,5 @@ TEST_F(QnCachedGlobalPermissionsManagerTest, checkRoleInheritance)
     ASSERT_TRUE(expectPermissions(inheritedRole, GlobalPermission::none));
     ASSERT_TRUE(expectPermissions(user, GlobalPermission::none));
 }
+
+} // namespace nx::vms::common::test

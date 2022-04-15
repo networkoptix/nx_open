@@ -3,6 +3,7 @@
 #include <api/global_settings.h>
 #include <common/common_module.h>
 #include <common/static_common_module.h>
+#include <nx/vms/common/system_context.h>
 
 #include "nx/vms/client/desktop/system_update/multi_server_updates_widget.h"
 
@@ -71,7 +72,7 @@ const QString packagesForSystemSupportTest = R"(
 } // namespace
 
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::desktop::test {
 
 class UpdateVerificationTest: public ClientUpdateTestEnvironment
 {
@@ -371,7 +372,7 @@ TEST_F(UpdateVerificationTest, cloudCompatibilityCheck)
 
     static const QString kCloudSystemId = "cloud_system_id";
 
-    commonModule()->globalSettings()->setCloudSystemId({});
+    commonModule()->systemContext()->globalSettings()->setCloudSystemId({});
 
     VerificationOptions options;
     options.commonModule = commonModule();
@@ -380,17 +381,17 @@ TEST_F(UpdateVerificationTest, cloudCompatibilityCheck)
     makeServer(kCurrentVersion);
     const auto clientData = makeClientData(kCurrentVersion);
 
-    commonModule()->globalSettings()->setCloudSystemId({});
+    commonModule()->systemContext()->globalSettings()->setCloudSystemId({});
     verifyUpdateContents(contents, getAllServers(), clientData, options);
     EXPECT_EQ(contents.error, common::update::InformationError::noError);
     EXPECT_TRUE(contents.cloudIsCompatible);
 
-    commonModule()->globalSettings()->setCloudSystemId(kCloudSystemId);
+    commonModule()->systemContext()->globalSettings()->setCloudSystemId(kCloudSystemId);
     verifyUpdateContents(contents, getAllServers(), clientData, options);
     EXPECT_EQ(contents.error, common::update::InformationError::incompatibleCloudHost);
     EXPECT_FALSE(contents.cloudIsCompatible);
 
-    commonModule()->globalSettings()->setCloudSystemId({});
+    commonModule()->systemContext()->globalSettings()->setCloudSystemId({});
     const auto incompatibleServer = makeServer(kCurrentVersion, false, false);
     incompatibleServer->QObject::setProperty(
         update_verification::kServerIsLinkedToCloudTestProperty, true);
@@ -556,4 +557,4 @@ TEST_F(UpdateVerificationTest, aSyntheticTest)
     ASSERT_EQ(std::get<update::Package>(result).file, "ubuntu.zip");
 }
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::desktop::test

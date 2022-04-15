@@ -9,7 +9,6 @@ namespace test {
 
 void DirectBaseAccessProviderTestFixture::SetUp()
 {
-    base_type::SetUp();
     m_accessProvider = createAccessProvider();
     for (auto provider: resourceAccessProvider()->providers())
     {
@@ -17,11 +16,6 @@ void DirectBaseAccessProviderTestFixture::SetUp()
         delete provider;
     }
     resourceAccessProvider()->addBaseProvider(m_accessProvider);
-}
-
-void DirectBaseAccessProviderTestFixture::TearDown()
-{
-    base_type::TearDown();
 }
 
 AbstractResourceAccessProvider* DirectBaseAccessProviderTestFixture::accessProvider() const

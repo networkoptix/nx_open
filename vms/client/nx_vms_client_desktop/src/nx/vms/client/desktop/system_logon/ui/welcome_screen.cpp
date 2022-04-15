@@ -69,9 +69,11 @@ namespace {
 const int kDefaultSimpleModeTilesNumber = 6;
 const std::chrono::milliseconds kSystemConnectTimeout = std::chrono::seconds(12);
 
-QnResourceList extractResources(const QList<QUrl>& urls)
+QnResourceList extractResources(const QList<QUrl>& urls, QnResourcePool* resourcePool)
 {
-    return QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(urls));
+    return QnFileProcessor::createResourcesForFiles(
+        QnFileProcessor::findAcceptedFiles(urls),
+        resourcePool);
 }
 
 } // namespace
@@ -368,12 +370,12 @@ void WelcomeScreen::abortConnectionProcess() const
 
 bool WelcomeScreen::isAcceptableDrag(const QList<QUrl>& urls)
 {
-    return !extractResources(urls).isEmpty();
+    return !extractResources(urls, resourcePool()).isEmpty();
 }
 
 void WelcomeScreen::makeDrop(const QList<QUrl>& urls)
 {
-    const auto resources = extractResources(urls);
+    const auto resources = extractResources(urls, resourcePool());
     if (resources.isEmpty())
         return;
 

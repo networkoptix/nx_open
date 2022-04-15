@@ -2,42 +2,37 @@
 
 #include "workbench.h"
 
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/layout_tour_manager.h>
-
+#include <client/client_module.h>
+#include <common/common_module.h>
+#include <core/resource/file_layout_resource.h>
 #include <core/resource/layout_reader.h>
 #include <core/resource/layout_resource.h>
-#include <core/resource/file_layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
-
-#include <nx/vms/client/desktop/style/skin.h>
-#include <ui/graphics/items/resource/resource_widget.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_display.h>
-#include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/workbench_grid_mapper.h>
-#include <ui/workbench/workbench_item.h>
-#include <ui/workbench/workbench_layout_snapshot_manager.h>
-
-#include <utils/common/checked_cast.h>
-#include <utils/common/util.h>
-#include <utils/web_downloader.h>
-
-#include <client/client_module.h>
+#include <core/resource_management/layout_tour_manager.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/fusion/serialization/json_functions.h>
+#include <nx/utils/math/fuzzy.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/resources/layout_password_management.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
+#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/utils/webengine_profile_manager.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/handlers/layout_tours_handler.h>
 #include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
 #include <nx/vms/client/desktop/workbench/layouts/special_layout.h>
-
-#include <common/common_module.h>
-#include <nx/vms/client/desktop/resources/layout_password_management.h>
-
-#include <nx/vms/client/desktop/utils/webengine_profile_manager.h>
-
-#include <nx/utils/math/fuzzy.h>
-#include <nx/fusion/serialization/json_functions.h>
+#include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_grid_mapper.h>
+#include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_layout_snapshot_manager.h>
+#include <utils/common/checked_cast.h>
+#include <utils/common/util.h>
+#include <utils/web_downloader.h>
 
 #include "workbench_layout_synchronizer.h"
 
@@ -188,6 +183,11 @@ QnWorkbench::~QnWorkbench() {
     qnClientModule->clientStateHandler()->unregisterDelegate(kWorkbenchDataKey);
     m_dummyLayout = nullptr;
     clear();
+}
+
+nx::vms::client::desktop::WindowContext* QnWorkbench::windowContext() const
+{
+    return ApplicationContext::instance()->mainWindowContext();
 }
 
 void QnWorkbench::clear()

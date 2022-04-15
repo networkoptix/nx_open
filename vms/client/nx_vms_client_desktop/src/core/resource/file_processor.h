@@ -18,8 +18,12 @@ public:
     static QStringList findAcceptedFiles(const QUrl &url)
     { return QnFileProcessor::findAcceptedFiles(QStringList() << url.toLocalFile()); }
 
-    static QnResourcePtr createResourcesForFile(const QString& fileName);
-    static QnResourceList createResourcesForFiles(const QStringList &files);
+    static QnResourcePtr createResourcesForFile(
+        const QString& fileName,
+        QnResourcePool* resourcePool);
+    static QnResourceList createResourcesForFiles(
+        const QStringList& files,
+        QnResourcePool* resourcePool);
 
     /**
      * Function creates a set of resources for the given filepaths. If resource pool is provided,
@@ -29,5 +33,5 @@ public:
         const QList<QUrl>& urls,
         QnResourcePool* resourcePool);
 
-    static void deleteLocalResources(const QnResourceList &resources);
+    static void deleteLocalResources(const QnResourceList& resources);
 };

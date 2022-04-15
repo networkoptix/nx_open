@@ -24,7 +24,7 @@ class DirectSharedResourceAccessProviderTest: public DirectBaseAccessProviderTes
 protected:
     virtual AbstractResourceAccessProvider* createAccessProvider() const override
     {
-        return new SharedResourceAccessProvider(Mode::direct, commonModule());
+        return new SharedResourceAccessProvider(Mode::direct, systemContext());
     }
 };
 

@@ -2,12 +2,10 @@
 
 #include "camera_settings_test_fixture.h"
 
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
-#include <common/static_common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/resource_properties/camera/utils/camera_settings_dialog_state_conversion_functions.h>
 #include <nx/vms/client/desktop/resource_properties/camera/watchers/camera_settings_analytics_engines_watcher.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 using namespace nx::vms::api;
 
@@ -34,16 +32,12 @@ public:
 
 struct CameraSettingsTestFixture::Private
 {
-    std::unique_ptr<QnStaticCommonModule> staticCommonModule;
-    std::unique_ptr<QnClientCoreModule> clientCoreModule;
+
     std::unique_ptr<CameraSettingsAnalyticsEnginesWatcherStub> analyticsEnginesWatcher;
     StubCameraResourceList cameras;
 
     Private()
     {
-        staticCommonModule = std::make_unique<QnStaticCommonModule>();
-        clientCoreModule = std::make_unique<QnClientCoreModule>(
-            QnClientCoreModule::Mode::unitTests);
         analyticsEnginesWatcher = std::make_unique<CameraSettingsAnalyticsEnginesWatcherStub>();
     }
 
@@ -81,7 +75,7 @@ CameraResourceStubPtr CameraSettingsTestFixture::givenCamera(CameraFeatures feat
         camera->setUserEnabledAnalyticsEngines({id});
     }
 
-    d->clientCoreModule->commonModule()->resourcePool()->addResource(camera);
+    systemContext()->resourcePool()->addResource(camera);
     d->cameras.push_back(camera);
 
     dispatch(Reducer::loadCameras,
@@ -106,7 +100,7 @@ void CameraSettingsTestFixture::whenChangesAreSaved()
 void CameraSettingsTestFixture::whenCameraRemoved(CameraResourceStubPtr camera)
 {
     d->cameras.removeOne(camera);
-    d->clientCoreModule->commonModule()->resourcePool()->removeResource(camera);
+    systemContext()->resourcePool()->removeResource(camera);
     dispatch(Reducer::loadCameras,
         d->cameras,
         /*deviceAgentSettingsAdapter*/ nullptr,

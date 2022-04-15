@@ -8,17 +8,17 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QThread>
 
-#include <utils/math/math.h>
-#include <utils/common/invocation_event.h>
-#include <utils/common/connective.h>
-#include <nx/vms/common/ptz/vector.h>
+#include <core/resource/resource_data.h>
+#include <core/resource/security_cam_resource.h>
+#include <core/resource_management/resource_data_pool.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/common/ptz/vector.h>
+#include <nx/vms/common/system_context.h>
+#include <utils/common/connective.h>
+#include <utils/common/invocation_event.h>
+#include <utils/math/math.h>
 
 #include "threaded_ptz_controller.h"
-#include "core/resource/resource_data.h"
-#include "core/resource_management/resource_data_pool.h"
-#include "common/common_module.h"
-#include "core/resource/security_cam_resource.h"
 
 using namespace nx::core;
 using namespace nx::vms::common::ptz;

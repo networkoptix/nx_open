@@ -2,15 +2,15 @@
 
 #include "analytics_sdk_object_detected.h"
 
+#include <analytics/db/analytics_db_types.h>
+#include <analytics/db/text_search_utils.h>
+#include <core/resource/resource.h>
+#include <nx/analytics/taxonomy/abstract_state_watcher.h>
+#include <nx/analytics/taxonomy/helpers.h>
 #include <nx/kit/utils.h>
 #include <nx/utils/uuid.h>
-#include <core/resource/resource.h>
-
 #include <nx/vms/api/analytics/descriptors.h>
-#include <analytics/db/text_search_utils.h>
-#include <analytics/db/analytics_db_types.h>
-#include <nx/analytics/taxonomy/helpers.h>
-#include <nx/analytics/taxonomy/abstract_state_watcher.h>
+#include <nx/vms/common/system_context.h>
 
 namespace nx::vms:: event
 {

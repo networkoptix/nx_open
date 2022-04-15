@@ -6,11 +6,9 @@
 
 #include <gtest/gtest.h>
 
-class QnCommonModule;
+#include <nx/vms/client/desktop/test_support/test_context.h>
+
 class QnResourcePool;
-class QnClientRuntimeSettings;
-class QnStaticCommonModule;
-class QnClientCoreModule;
 
 namespace nx::vms::client::desktop::entity_item_model { class EntityItemModel; }
 
@@ -18,13 +16,12 @@ namespace nx::vms::client::desktop {
 namespace entity_item_model {
 namespace test {
 
-class EntityItemModelTest: public testing::Test
+class EntityItemModelTest: public nx::vms::client::desktop::test::ContextBasedTest
 {
 protected:
     virtual void SetUp() override;
     virtual void TearDown() override;
 
-    QnCommonModule* commonModule() const;
     QnResourcePool* resourcePool() const;
 
     using SequentalIntegerGenerator = std::function<int()>;
@@ -47,9 +44,6 @@ protected:
     std::vector<int> inversePermutation(const std::vector<int>& permutation) const;
 
 protected:
-    QSharedPointer<QnClientRuntimeSettings> m_clientRuntimeSettings;
-    QSharedPointer<QnStaticCommonModule> m_staticCommonModule;
-    QSharedPointer<QnClientCoreModule> m_clientCoreModule;
     QSharedPointer<EntityItemModel> m_entityItemModel;
 };
 

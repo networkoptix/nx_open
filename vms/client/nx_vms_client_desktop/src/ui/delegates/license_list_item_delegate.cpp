@@ -11,7 +11,7 @@
 
 QnLicenseListItemDelegate::QnLicenseListItemDelegate(QObject* parent, bool invalidLicensesDimmed):
     base_type(parent),
-    m_validator(new nx::vms::license::Validator(commonModule(), this)),
+    m_validator(new nx::vms::license::Validator(systemContext(), this)),
     m_invalidLicensesDimmed(invalidLicensesDimmed)
 {
 }

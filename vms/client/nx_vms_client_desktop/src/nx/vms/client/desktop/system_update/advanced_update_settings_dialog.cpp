@@ -26,22 +26,22 @@ AdvancedUpdateSettingsDialog::AdvancedUpdateSettingsDialog(QWidget* parent):
 
     QmlProperty<bool> notifyAboutUpdates(rootObjectHolder(), "notifyAboutUpdates");
 
-    notifyAboutUpdates = qnGlobalSettings->isUpdateNotificationsEnabled();
+    notifyAboutUpdates = globalSettings()->isUpdateNotificationsEnabled();
 
     notifyAboutUpdates.connectNotifySignal(
         this,
         [this, notifyAboutUpdates]()
         {
-            qnGlobalSettings->setUpdateNotificationsEnabled(notifyAboutUpdates);
-            qnGlobalSettings->synchronizeNow();
+            globalSettings()->setUpdateNotificationsEnabled(notifyAboutUpdates);
+            globalSettings()->synchronizeNow();
         });
 
-    connect(qnGlobalSettings,
+    connect(globalSettings(),
         &QnGlobalSettings::updateNotificationsChanged,
         this,
         [this, notifyAboutUpdates]()
         {
-            notifyAboutUpdates = qnGlobalSettings->isUpdateNotificationsEnabled();
+            notifyAboutUpdates = globalSettings()->isUpdateNotificationsEnabled();
         });
 }
 

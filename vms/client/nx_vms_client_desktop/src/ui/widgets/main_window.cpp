@@ -29,6 +29,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/audio_dispatcher.h>
 #include <nx/vms/client/desktop/debug_utils/menu/debug_actions_handler.h>
 #include <nx/vms/client/desktop/export/workbench/workbench_export_handler.h>
@@ -38,6 +39,7 @@
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
 #include <nx/vms/client/desktop/state/screen_manager.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/cloud_actions_handler.h>
 #include <nx/vms/client/desktop/system_logon/logic/connect_actions_handler.h>
 #include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
@@ -83,7 +85,6 @@
 #include <ui/workbench/watchers/workbench_bookmark_tags_watcher.h>
 #include <ui/workbench/watchers/workbench_bookmarks_watcher.h>
 #include <ui/workbench/watchers/workbench_item_bookmarks_watcher.h>
-#include <ui/workbench/watchers/workbench_layout_aspect_ratio_watcher.h>
 #include <ui/workbench/watchers/workbench_ptz_dialog_watcher.h>
 #include <ui/workbench/watchers/workbench_resources_changes_watcher.h>
 #include <ui/workbench/watchers/workbench_server_port_watcher.h>
@@ -283,7 +284,6 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<ui::workbench::ResourceGroupingActionHandler>();
     context->instance<ui::workbench::ResourceTreeSettingsActionHandler>();
 
-    context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
     context->instance<QnWorkbenchPtzDialogWatcher>();
 
     context->instance<QnWorkbenchResourcesChangesWatcher>();
@@ -298,17 +298,17 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
     context->instance<KeyboardModifiersWatcher>();
 
-    const auto timeWatcher = context->instance<nx::vms::client::core::ServerTimeWatcher>();
     const auto timeModeNotifier = qnSettings->notifier(QnClientSettings::TIME_MODE);
     const auto updateTimeMode =
-        [timeWatcher]()
+        []()
         {
             const auto newMode = qnSettings->timeMode() == Qn::ClientTimeMode
                 ? nx::vms::client::core::ServerTimeWatcher::clientTimeMode
                 : nx::vms::client::core::ServerTimeWatcher::serverTimeMode;
-            timeWatcher->setTimeMode(newMode);
+            for (auto systemContext: ApplicationContext::instance()->systemContexts())
+                systemContext->serverTimeWatcher()->setTimeMode(newMode);
         };
-    connect(timeModeNotifier, &QnPropertyNotifier::valueChanged, timeWatcher, updateTimeMode);
+    connect(timeModeNotifier, &QnPropertyNotifier::valueChanged, this, updateTimeMode);
 
     // Apply already loaded time mode settings
     updateTimeMode();
@@ -710,7 +710,7 @@ bool MainWindow::handleOpenFile(const QString &message)
 {
     const auto files = message.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
     const auto resources = QnFileProcessor::createResourcesForFiles(
-        QnFileProcessor::findAcceptedFiles(files));
+        QnFileProcessor::findAcceptedFiles(files), resourcePool());
 
     if (resources.isEmpty())
         return false;

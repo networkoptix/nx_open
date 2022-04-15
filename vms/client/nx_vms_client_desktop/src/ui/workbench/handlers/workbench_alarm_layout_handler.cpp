@@ -23,6 +23,7 @@
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -132,7 +133,7 @@ void QnWorkbenchAlarmLayoutHandler::disableSyncForLayout(QnWorkbenchLayout* layo
     const auto syncDisabled = QnStreamSynchronizationState();
     if (workbench()->currentLayout() == layout)
     {
-        auto streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+        auto streamSynchronizer = workbench()->windowContext()->streamSynchronizer();
         streamSynchronizer->setState(syncDisabled);
     }
     layout->setData(Qn::LayoutSyncStateRole,

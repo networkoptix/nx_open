@@ -137,9 +137,9 @@ namespace nx::vms::client::desktop {
 using namespace nx::vms::api;
 using namespace backup_settings_view;
 
-BackupSettingsDecoratorModel::BackupSettingsDecoratorModel(const QnCommonModule* commonModule):
+BackupSettingsDecoratorModel::BackupSettingsDecoratorModel(QnCommonModule* commonModule):
     base_type(nullptr),
-    m_commonModule(commonModule)
+    QnCommonModuleAware(commonModule)
 {
     NX_ASSERT(commonModule);
 
@@ -309,7 +309,7 @@ BackupSettings BackupSettingsDecoratorModel::globalBackupSettings() const
 {
     return m_changedGlobalBackupSettings
         ? *m_changedGlobalBackupSettings
-        : m_commonModule->globalSettings()->backupSettings();
+        : globalSettings()->backupSettings();
 }
 
 void BackupSettingsDecoratorModel::setGlobalBackupSettings(const BackupSettings& backupSettings)
@@ -317,7 +317,7 @@ void BackupSettingsDecoratorModel::setGlobalBackupSettings(const BackupSettings&
     auto globalBackupSettingsChangesNotifier = makeGlobalBackupSettingsChangesNotifier(this);
     auto hasChangesNotifier = makeHasChangesNotifier(this);
 
-    const auto savedGlobalBackupSettings = m_commonModule->globalSettings()->backupSettings();
+    const auto savedGlobalBackupSettings = globalSettings()->backupSettings();
     if (savedGlobalBackupSettings == backupSettings)
         m_changedGlobalBackupSettings.reset();
     else
@@ -495,8 +495,8 @@ void BackupSettingsDecoratorModel::applyChanges()
 
     if (m_changedGlobalBackupSettings)
     {
-        m_commonModule->globalSettings()->setBackupSettings(*m_changedGlobalBackupSettings);
-        m_commonModule->globalSettings()->synchronizeNow();
+        globalSettings()->setBackupSettings(*m_changedGlobalBackupSettings);
+        globalSettings()->synchronizeNow();
     }
 
     m_changedContentTypes.clear();
@@ -507,14 +507,12 @@ void BackupSettingsDecoratorModel::applyChanges()
 
 QnVirtualCameraResourceList BackupSettingsDecoratorModel::camerasToApplySettings() const
 {
-    const auto resourcePool = m_commonModule->resourcePool();
-
     QnVirtualCameraResourceList cameras =
         m_changedContentTypes.keys() + m_changedQuality.keys() + m_changedEnabledState.keys();
 
     if (m_changedGlobalBackupSettings)
     {
-        cameras.append(resourcePool->getAllCameras(QnResourcePtr(), /*ignoreDesktopCameras*/ true)
+        cameras.append(resourcePool()->getAllCameras(QnResourcePtr(), /*ignoreDesktopCameras*/ true)
             .filtered(cameraHasDefaultBackupSettings));
     }
 

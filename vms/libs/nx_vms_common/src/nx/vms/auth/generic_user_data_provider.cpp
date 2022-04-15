@@ -19,13 +19,13 @@ GenericUserDataProvider::GenericUserDataProvider(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)
 {
     Qn::directConnect(
-        commonModule->resourcePool(), &QnResourcePool::resourceAdded,
+        resourcePool(), &QnResourcePool::resourceAdded,
         this, &GenericUserDataProvider::at_resourcePool_resourceAdded);
     Qn::directConnect(
-        commonModule->resourcePool(), &QnResourcePool::resourceChanged,
+        resourcePool(), &QnResourcePool::resourceChanged,
         this, &GenericUserDataProvider::at_resourcePool_resourceAdded);
     Qn::directConnect(
-        commonModule->resourcePool(), &QnResourcePool::resourceRemoved,
+        resourcePool(), &QnResourcePool::resourceRemoved,
         this, &GenericUserDataProvider::at_resourcePool_resourceRemoved);
 }
 
