@@ -60,6 +60,9 @@ NX_REFLECTION_ENUM_CLASS(RemoteConnectionErrorCode,
     /** Saved or actual local session token expired. */
     sessionExpired,
 
+    /** System is not compatible with two-factor authentication. */
+    systemIsNotCompatibleWith2Fa,
+
     /** Two-factor authentication must be enabled for both the system and the user. */
     twoFactorAuthOfCloudUserIsDisabled,
 

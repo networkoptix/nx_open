@@ -336,6 +336,9 @@ void QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
         case RemoteConnectionErrorCode::cloudSessionExpired:
             title = tr("Your session has expired");
             break;
+        case RemoteConnectionErrorCode::systemIsNotCompatibleWith2Fa:
+            title = tr("System is not compatible with two-factor authentication");
+            break;
         case RemoteConnectionErrorCode::twoFactorAuthOfCloudUserIsDisabled:
             title = tr("Failed to log in to \"%1\" system").arg(moduleInformation.systemName);
             break;
