@@ -494,9 +494,12 @@ void MediaResourceWidgetPrivate::setStreamDataFilters(StreamDataFilters filters)
     if (!reader->setStreamDataFilter(filters))
         return;
 
-     const auto positionUsec = display()->camDisplay()->getExternalTime();
-     if (positionUsec == AV_NOPTS_VALUE || positionUsec == DATETIME_NOW)
-         return;
+    if (display()->camDisplay()->isRealTimeSource())
+        return;
+
+    const auto positionUsec = display()->camDisplay()->getExternalTime();
+    if (positionUsec == AV_NOPTS_VALUE || positionUsec == DATETIME_NOW)
+        return;
 
     reader->jumpTo(/*mksek*/ positionUsec, /*skipTime*/ positionUsec);
 }
