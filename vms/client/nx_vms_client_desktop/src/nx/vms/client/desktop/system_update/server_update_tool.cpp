@@ -1467,6 +1467,14 @@ std::future<UpdateContents> ServerUpdateTool::checkForUpdate(
     const common::update::UpdateInfoParams& infoParams)
 {
     auto connection = connectedServerApi();
+    if (!connection)
+    {
+        NX_WARNING(this, "checkForUpdate() - There's no server connection.");
+        std::promise<UpdateContents> promise;
+        auto future = promise.get_future();
+        promise.set_value({});
+        return future;
+    }
 
     return std::async(
         [updateUrl, connection, infoParams]() -> UpdateContents
