@@ -95,9 +95,9 @@ protected:
 
     virtual void doGetSettingsOnActiveSettingChange(
         Result<const ISettingsResponse*>* outResult,
-        const IString* clientId,
         const IString* activeSettingId,
-        const IStringMap* settings) override;
+        const IString* settingsModel,
+        const IStringMap* settingsValues) override;
 
 public:
     virtual ~Engine() override;

@@ -70,7 +70,7 @@ const std::map<
 };
 
 const std::map<
-    /* activeSettingId */ std::string,
+    /*activeSettingId*/ std::string,
     ActiveSettingsBuilder::ActiveSettingHandler> kDefaultActiveSettingsRules =
 {
     {kActiveComboBoxId, hideAdditionalComboBox},
