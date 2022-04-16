@@ -192,10 +192,10 @@ void ConsumingDeviceAgent::finalize()
 }
 
 void ConsumingDeviceAgent::doGetSettingsOnActiveSettingChange(
-    Result<const ISettingsResponse*>* outResult,
-    const IString* activeSettingId,
-    const IString* settingsModel,
-    const IStringMap* settingsValues)
+    Result<const ISettingsResponse*>* /*outResult*/,
+    const IString* /*activeSettingId*/,
+    const IString* /*settingsModel*/,
+    const IStringMap* /*settingsValues*/)
 {
 }
 

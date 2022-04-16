@@ -164,10 +164,10 @@ bool Engine::isCompatible(const IDeviceInfo* /*deviceInfo*/) const
 }
 
 void Engine::doGetSettingsOnActiveSettingChange(
-    Result<const ISettingsResponse*>* outResult,
-    const IString* clientId,
-    const IString* activeSettingId,
-    const IStringMap* settings)
+    Result<const ISettingsResponse*>* /*outResult*/,
+    const IString* /*activeSettingId*/,
+    const IString* /*settingsModel*/,
+    const IStringMap* /*settingsValues*/)
 {
 }
 
