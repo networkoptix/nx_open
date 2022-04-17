@@ -220,9 +220,7 @@ public:
      */
     bool canApplySchedule(const QnScheduleTaskList& schedule) const;
 
-    static constexpr QSize kDefaultSecondaryStreamResolution{512, 384};
     static constexpr QSize kMaximumSecondaryStreamResolution{1024, 768};
-
     static constexpr int kMaximumMotionDetectionPixels
         = kMaximumSecondaryStreamResolution.width() * kMaximumSecondaryStreamResolution.height();
 
@@ -275,8 +273,6 @@ private:
 };
 
 constexpr QSize EMPTY_RESOLUTION_PAIR(0, 0);
-constexpr QSize SECONDARY_STREAM_DEFAULT_RESOLUTION =
-    QnVirtualCameraResource::kDefaultSecondaryStreamResolution;
 constexpr QSize SECONDARY_STREAM_MAX_RESOLUTION =
     QnVirtualCameraResource::kMaximumSecondaryStreamResolution;
 constexpr QSize UNLIMITED_RESOLUTION(INT_MAX, INT_MAX);
