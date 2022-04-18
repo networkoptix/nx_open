@@ -93,7 +93,10 @@ public:
     /** Wraps QObject for accessing properties not exposed to scripting engine. */
     Q_INVOKABLE QJSValue wrap(QJSValue object);
 
-    /** Sends mouse event to the object. If the object is null the whole screen is used. */
+    /**
+     * Sends mouse event to the object. If the object is null the whole screen is used. Returns
+     * new mouse buttons after sending mouse event(s).
+     */
     Q_INVOKABLE void mouse(QJSValue object, QJSValue parameters);
 
     /**

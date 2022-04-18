@@ -4,6 +4,7 @@
 
 #include <QtCore/QModelIndex>
 #include <QtQml/QJSValue>
+#include <QtCore/QPoint>
 
 class QAbstractItemModel;
 class QAction;
@@ -97,13 +98,17 @@ void sendKeys(QJSValue object, QString keys);
 /**
  * Sends mouse event(s) to the specified window.
  */
-void sendMouse(
+Qt::MouseButtons sendMouse(
     QWindow* windowHandle,
     QPoint screenPos,
     QString eventType,
     Qt::MouseButton button,
     Qt::KeyboardModifiers modifiers,
-    bool nativeSetPos);
+    Qt::MouseButtons buttons,
+    bool nativeSetPos,
+    QPoint pixelDelta = {},
+    QPoint angleDelta = {},
+    bool inverted = false);
 
 /** Property type or method return type info. */
 QVariantMap getMetaInfo(const QMetaObject* meta, QString methodOrProperty);

@@ -75,6 +75,7 @@ void ObjectWrapper::activate()
                         "click",
                         Qt::LeftButton,
                         Qt::NoModifier,
+                        Qt::NoButton,
                         true);
                 }
                 else

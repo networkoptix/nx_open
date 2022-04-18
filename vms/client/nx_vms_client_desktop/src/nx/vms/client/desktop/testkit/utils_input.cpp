@@ -161,13 +161,17 @@ Q_INVOKABLE void sendKeys(QJSValue object, QString keys)
     }
 }
 
-void sendMouse(
+Qt::MouseButtons sendMouse(
     QWindow* windowHandle,
     QPoint screenPos,
     QString eventType,
     Qt::MouseButton button,
     Qt::KeyboardModifiers modifiers,
-    bool nativeSetPos)
+    Qt::MouseButtons buttons,
+    bool nativeSetPos,
+    QPoint pixelDelta,
+    QPoint angleDelta,
+    bool inverted)
 {
     QPoint windowPos = windowHandle->mapFromGlobal(screenPos);
     QPoint localPos = windowPos;
@@ -175,12 +179,22 @@ void sendMouse(
     auto postEvent =
         [&](QEvent::Type type)
         {
-            static Qt::MouseButtons qtestMouseButtons = Qt::NoButton;
             if (type == QEvent::MouseButtonPress || type == QEvent::MouseButtonRelease)
-                qtestMouseButtons.setFlag(button, type == QEvent::MouseButtonPress);
+                buttons.setFlag(button, type == QEvent::MouseButtonPress);
 
-            auto mappedEvent = new QMouseEvent(
-                type, localPos, windowPos, screenPos, button, qtestMouseButtons, modifiers);
+            QInputEvent* mappedEvent = nullptr;
+
+            if (type == QEvent::Wheel)
+            {
+                mappedEvent = new QWheelEvent(
+                    localPos, screenPos, pixelDelta, angleDelta, buttons, modifiers,
+                    Qt::NoScrollPhase, inverted, Qt::MouseEventNotSynthesized);
+            }
+            else
+            {
+                mappedEvent = new QMouseEvent(
+                    type, localPos, windowPos, screenPos, button, buttons, modifiers);
+            }
 
             QSpontaneKeyEvent::setSpontaneous(mappedEvent);
             QCoreApplication::postEvent(windowHandle, mappedEvent);
@@ -215,6 +229,12 @@ void sendMouse(
 
         postEvent(QEvent::MouseButtonDblClick);
     }
+    else if (eventType == "wheel")
+    {
+        postEvent(QEvent::Wheel);
+    }
+
+    return buttons;
 }
 
 } // namespace nx::vms::client::desktop::testkit::utils
