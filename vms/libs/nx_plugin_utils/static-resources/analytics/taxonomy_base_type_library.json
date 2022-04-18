@@ -1200,6 +1200,10 @@
         {
           "name": "Brown",
           "rgb": "#A52A2A"
+        },
+        {
+          "name": "Cyan",
+          "rgb": "#00FFFF"
         }
       ]
     }
