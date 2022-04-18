@@ -98,8 +98,14 @@ void ButtonController::buttonClickHandler(
 
     actionParameters.durationMs = 0;
     actionParameters.relayOutputId = getOutputId(outputType);
+
     if (actionParameters.relayOutputId.isEmpty())
+    {
+        NX_WARNING(this,
+            "Unexpected output type %1.",
+            QString::fromStdString(nx::reflect::toString(outputType)));
         return;
+    }
 
     nx::vms::api::EventActionData actionData;
     actionData.actionType = nx::vms::api::ActionType::cameraOutputAction;
@@ -129,7 +135,6 @@ QString ButtonController::getOutputId(nx::vms::api::ExtendedCameraOutput outputT
         return iter.value();
     }
 
-    NX_WARNING(this, "Unexpected output type %1.", outputName);
     return "";
 }
 
