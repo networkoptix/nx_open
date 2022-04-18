@@ -96,7 +96,11 @@ Qt::KeyboardModifiers sendKey(
 
 } // namespace
 
-Q_INVOKABLE void sendKeys(QJSValue object, QString keys)
+Q_INVOKABLE Qt::KeyboardModifiers sendKeys(
+    QJSValue object,
+    QString keys,
+    KeyOption option,
+    Qt::KeyboardModifiers modifiers)
 {
     QObject* receiver = object.toQObject();
 
@@ -104,7 +108,7 @@ Q_INVOKABLE void sendKeys(QJSValue object, QString keys)
         receiver = qGuiApp->focusWindow();
 
     if (!receiver)
-        return;
+        return modifiers;
 
     // QGraphicsObject should receive key events via its view.
     if (auto w = qobject_cast<QGraphicsObject*>(receiver))
@@ -124,7 +128,7 @@ Q_INVOKABLE void sendKeys(QJSValue object, QString keys)
         }
     }
 
-    Qt::KeyboardModifiers modifiers = Qt::NoModifier;
+    const auto eventType = option == KeyRelease ? QEvent::KeyRelease : QEvent::KeyPress;
 
     for (int i = 0; i < keys.length(); ++i)
     {
@@ -149,7 +153,10 @@ Q_INVOKABLE void sendKeys(QJSValue object, QString keys)
         // Simulate typing: first send key press event for each key in the sequence,
         // than send key release event, but in reverse.
         for (QString k: sequence)
-            modifiers = sendKey(receiver, k, modifiers, QEvent::KeyPress);
+            modifiers = sendKey(receiver, k, modifiers, eventType);
+
+        if (option != KeyType)
+            continue; //< Press or release has been sent.
 
         // Go through sequence in reverse
         auto iter = sequence.constEnd();
@@ -159,6 +166,8 @@ Q_INVOKABLE void sendKeys(QJSValue object, QString keys)
             modifiers = sendKey(receiver, *iter, modifiers, QEvent::KeyRelease);
         }
     }
+
+    return modifiers;
 }
 
 Qt::MouseButtons sendMouse(

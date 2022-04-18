@@ -377,9 +377,17 @@ void TestKit::mouse(QJSValue object, QJSValue parameters)
         parameters.property("inverted").toBool());
 }
 
-void TestKit::keys(QJSValue object, QString keys)
+void TestKit::keys(QJSValue object, QString keys, QString input)
 {
-    utils::sendKeys(object, keys);
+    input = input.toUpper();
+    auto option = utils::KeyType;
+
+    if (input == "PRESS")
+        option = utils::KeyPress;
+    else if (input == "RELEASE")
+        option = utils::KeyRelease;
+
+    utils::sendKeys(object, keys, option, QGuiApplication::keyboardModifiers());
 }
 
 QJSValue TestKit::dump(QJSValue object, QJSValue withChildren)

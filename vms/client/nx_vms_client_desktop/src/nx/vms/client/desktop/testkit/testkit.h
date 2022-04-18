@@ -101,9 +101,12 @@ public:
 
     /**
      * Sends sequence of keyboard events to the object. If object is null the events are sent to
-     * the active window.
+     * the active window. Input option may be "type", "press" or "release".
      */
-    Q_INVOKABLE void keys(QJSValue object, QString keys);
+    Q_INVOKABLE void keys(
+        QJSValue object,
+        QString keys,
+        QString input = "type");
 
     /** Dumps QObject into JSON object */
     Q_INVOKABLE QJSValue dump(QJSValue object, QJSValue withChildren=false);
