@@ -25,6 +25,8 @@
 #include <QAndroidJniObject>
 #include <QAndroidJniEnvironment>
 
+#include <media/filters/h264_mp4_to_annexb.h>
+
 namespace nx {
 namespace media {
 
@@ -516,8 +518,23 @@ QSize AndroidVideoDecoder::maxResolution(const AVCodecID codec)
     return AndroidVideoDecoderPrivate::maxResolutions[codec]; //< Return empty QSize if not found.
 }
 
-int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result)
+int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frameSrc, QVideoFramePtr* result)
 {
+    QnConstCompressedVideoDataPtr frame;
+    if (frameSrc)
+    {
+        // The filter keeps same frame in case of filtering is not required or
+        // it is not the H264/H265 codec.
+        H2645Mp4ToAnnexB filter;
+        frame = std::dynamic_pointer_cast<const QnCompressedVideoData>(
+            filter.processData(frameSrc));
+        if (!frame)
+        {
+            NX_WARNING(this, "Failed to convert h264/h265 video to Annex B format");
+            return 0;
+        }
+    }
+
     QElapsedTimer tm;
     tm.restart();
     if (!d->initialized)
