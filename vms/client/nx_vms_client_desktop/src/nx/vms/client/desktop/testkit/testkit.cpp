@@ -80,6 +80,16 @@ QString eventName(const QEvent* event)
     return eventNames.value(event->type());
 }
 
+QPoint valueToPoint(const QJSValue& value)
+{
+    QPoint result;
+    if (value.hasOwnProperty("x"))
+        result.setX(value.property("x").toInt());
+    if (value.hasOwnProperty("y"))
+        result.setY(value.property("y").toInt());
+    return result;
+}
+
 } // namespace
 
 bool TestKit::eventFilter(QObject* obj, QEvent* event)
@@ -359,8 +369,12 @@ void TestKit::mouse(QJSValue object, QJSValue parameters)
         screenPos,
         parameters.property("type").toString(),
         button,
-        modifiers,
-        parameters.property("native").toBool());
+        modifiers | QGuiApplication::keyboardModifiers(),
+        QGuiApplication::mouseButtons(),
+        parameters.property("native").toBool(),
+        valueToPoint(parameters.property("pixelDelta")),
+        valueToPoint(parameters.property("angleDelta")),
+        parameters.property("inverted").toBool());
 }
 
 void TestKit::keys(QJSValue object, QString keys)
