@@ -89,11 +89,21 @@ QRect globalRect(QVariant object, QWindow** window = nullptr);
  */
 qreal sideIntersect(QRect widgetRect, QRect sideRect, Qt::Alignment align);
 
+enum KeyOption {
+    KeyType = 0,
+    KeyPress = 1,
+    KeyRelease = 2,
+};
+
 /**
  * Types specified text into the object.
  * Also supports sequences like `<Enter>`, `<Ctrl+S>` etc.
  */
-void sendKeys(QJSValue object, QString keys);
+Qt::KeyboardModifiers sendKeys(
+    QJSValue object,
+    QString keys,
+    KeyOption option = KeyType,
+    Qt::KeyboardModifiers modifiers = Qt::NoModifier);
 
 /**
  * Sends mouse event(s) to the specified window.
