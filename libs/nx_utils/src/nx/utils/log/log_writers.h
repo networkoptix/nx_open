@@ -8,6 +8,7 @@
 #include <nx/utils/log/log_level.h>
 #include <nx/utils/thread/mutex.h>
 
+#include <QtCore/QDateTime>
 #include <QtCore/QFileInfo>
 #include <QtCore/QLockFile>
 
@@ -81,6 +82,7 @@ private:
     nx::Mutex m_mutex;
     std::fstream m_file;
     QFileInfo m_fileInfo;
+    QDateTime m_fileOpenTime;
     QLockFile m_volumeLock;
     std::future<void> m_archive;
     int m_archiveQueue = 0;
