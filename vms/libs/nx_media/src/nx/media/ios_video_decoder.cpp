@@ -11,6 +11,7 @@ extern "C" {
 #include <libavutil/frame.h>
 } // extern "C"
 
+#include <utils/media/annexb_to_mp4.h>
 #include <utils/media/ffmpeg_helper.h>
 #include <utils/media/ffmpeg_initializer.h>
 #include <utils/media/nalUnits.h>
@@ -229,6 +230,7 @@ public:
     void initContext(const QnConstCompressedVideoDataPtr& frame);
     void closeCodecContext();
 
+    AnnexbToMp4 m_annexbToMp4;
     AVCodecContext* codecContext;
     AVFrame* frame;
     qint64 lastPts;
@@ -261,11 +263,6 @@ void IOSVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& fr
     codecContext->thread_count = 1;
     codecContext->opaque = this;
     codecContext->get_format = get_format;
-    if (!fillExtraData(frame.get(), &codecContext->extradata, &codecContext->extradata_size))
-    {
-        NX_DEBUG(this, "Failed to build extra data");
-        return;
-    }
 
     if (avcodec_open2(codecContext, codec, nullptr) < 0)
     {
@@ -312,9 +309,8 @@ bool IOSVideoDecoder::isCompatible(
     // VideoToolBox supports H263 only.
     // If cheat it and provide H263P instead (by changing compression type H263P -> H263)
     // it would show green box.
-    if (codec != AV_CODEC_ID_H265 &&
+    if (/*codec != AV_CODEC_ID_H265 &&*/ // TODO support mp4 format for hevc
         codec != AV_CODEC_ID_H264 &&
-        codec != AV_CODEC_ID_H263P &&
         codec != AV_CODEC_ID_MPEG4 &&
         codec != AV_CODEC_ID_MPEG1VIDEO &&
         codec != AV_CODEC_ID_MPEG2VIDEO)
@@ -366,10 +362,23 @@ QSize IOSVideoDecoder::maxResolution(const AVCodecID codec)
 }
 
 int IOSVideoDecoder::decode(
-    const QnConstCompressedVideoDataPtr& compressedVideoData,
+    const QnConstCompressedVideoDataPtr& videoData,
     QVideoFramePtr* outDecodedFrame)
 {
     Q_D(IOSVideoDecoder);
+
+    auto compressedVideoData = videoData;
+    if (videoData
+        && videoData->compressionType == AV_CODEC_ID_H264
+        && !nx::media::isMp4Format(videoData.get()))
+    {
+        compressedVideoData = d->m_annexbToMp4.process(videoData.get());
+        if (!compressedVideoData)
+        {
+            NX_WARNING(this, "Decoding failed, cannot convert to MP4 format");
+            return -1;
+        }
+    }
 
     if (!d->codecContext)
     {

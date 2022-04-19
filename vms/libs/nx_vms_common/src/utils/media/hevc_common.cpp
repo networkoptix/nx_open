@@ -141,5 +141,31 @@ std::vector<uint8_t> buildExtraDataAnnexB(const uint8_t* data, int32_t size)
     return extraData;
 }
 
-} // namespace nx::media::hevc
+std::vector<uint8_t> buildExtraData(const uint8_t* data, int32_t size)
+{
+    std::vector<std::vector<uint8_t>> spsVector;
+    std::vector<std::vector<uint8_t>> ppsVector;
+    std::vector<std::vector<uint8_t>> vpsVector;
+    auto nalUnits = nx::media::nal::findNalUnitsAnnexB(data, size);
+    for (const auto& nalu: nalUnits)
+    {
+        NalUnitType unitType = (NalUnitType)((*nalu.data & kPayloadHeaderNalUnitTypeMask) >> 1);
+        if (unitType == NalUnitType::vpsNut)
+            vpsVector.push_back(std::vector<uint8_t>(nalu.data, nalu.data + nalu.size));
+        if (unitType == NalUnitType::ppsNut)
+            ppsVector.push_back(std::vector<uint8_t>(nalu.data, nalu.data + nalu.size));
+        if (unitType == NalUnitType::spsNut)
+            spsVector.push_back(std::vector<uint8_t>(nalu.data, nalu.data + nalu.size));
+    }
 
+    if (spsVector.empty() || ppsVector.empty() || vpsVector.empty())
+    {
+        NX_WARNING(NX_SCOPE_TAG, "Failed to write h264 extra data, no sps/pps/vps found");
+        return std::vector<uint8_t>();
+    }
+    std::vector<uint8_t> extradata;
+    // TODO;
+    return extradata;
+}
+
+} // namespace nx::media::hevc

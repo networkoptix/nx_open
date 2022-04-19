@@ -16,28 +16,14 @@
 
 namespace {
 
-static const std::array<uint8_t, 4> kStartCode = { 0, 0, 0, 1 };
-static const std::array<uint8_t, 3> kStartCode3B = { 0, 0, 1 };
-
 int getNalSize(const uint8_t* ptr)
 {
     return (ptr[0] << 8) | ptr[1];
 }
 
-template <size_t arraySize>
-bool startsWith(const void* data, size_t size, const std::array<uint8_t, arraySize> value)
-{
-    return size >= value.size() && memcmp(data, value.data(), value.size()) == 0;
-}
-
-bool isStartCode(const void* data, size_t size)
-{
-    return startsWith(data, size, kStartCode) || startsWith(data, size, kStartCode3B);
-}
-
 void appendNalUnit(std::vector<uint8_t>& result, const uint8_t* data, int size)
 {
-    result.insert(result.end(), kStartCode.begin(), kStartCode.end());
+    result.insert(result.end(), nx::media::nal::kStartCode.begin(), nx::media::nal::kStartCode.end());
     result.insert(result.end(), data, data + size);
 }
 
@@ -89,17 +75,6 @@ std::vector<uint8_t> readH264SeqHeaderFromExtraData(const uint8_t* extraData, in
     return result;
 }
 
-void convertToStartCodes(uint8_t* const data, const int size)
-{
-    uint8_t* offset = data;
-    while (offset + 4 < data + size)
-    {
-        size_t naluSize = ntohl(*(uint32_t*)offset);
-        memcpy(offset, kStartCode.data(), kStartCode.size());
-        offset += kStartCode.size() + naluSize;
-    }
-}
-
 } // namespace
 
 std::vector<uint8_t> readH265SeqHeaderFromExtraData(const uint8_t* extraData, int extraDataSize)
@@ -149,15 +124,14 @@ QnConstAbstractDataPacketPtr H2645Mp4ToAnnexB::processData(const QnConstAbstract
     const uint8_t* extraData = videoData->context->getExtradata();
     int extraDataSize = videoData->context->getExtradataSize();
 
-
     if (extraData && extraDataSize)
     {
-        if (isStartCode(extraData, extraDataSize))
+        if (nx::media::nal::isStartCode(extraData, extraDataSize))
             return data;
     }
     else
     {
-        if (isStartCode(videoData->data(), videoData->dataSize()))
+        if (nx::media::nal::isStartCode(videoData->data(), videoData->dataSize()))
             return data;
     }
 
@@ -192,7 +166,7 @@ QnConstAbstractDataPacketPtr H2645Mp4ToAnnexB::processData(const QnConstAbstract
     memcpy(resultData + header.size(), videoData->data(), videoData->dataSize());
 
     // Replacing NALU size with {0 0 0 1}.
-    convertToStartCodes(resultData + header.size(), videoData->dataSize());
+    nx::media::nal::convertToStartCodes(resultData + header.size(), videoData->dataSize());
     result->context = m_newContext;
     return result;
 }
