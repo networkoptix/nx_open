@@ -129,6 +129,7 @@ bool File::openFile()
     {
         // File exists, prepare to append.
         m_file.seekp(std::streamoff(0), std::ios_base::end);
+        m_fileOpenTime = QDateTime::currentDateTime();
         return !m_file.fail();
     }
 
@@ -140,6 +141,7 @@ bool File::openFile()
     if (m_file.fail())
         return false;
     m_fileInfo.refresh();
+    m_fileOpenTime = QDateTime::currentDateTime();
 
     // Ensure 1st char is UTF8 BOM.
     m_file.write("\xEF\xBB\xBF", 3);
@@ -313,13 +315,7 @@ bool File::isCurrentLimitReached(nx::Locker<nx::Mutex>* /*lock*/)
     if (m_settings.maxFileTimePeriodS != std::chrono::seconds::zero())
     {
         const auto now = QDateTime::currentDateTime();
-        const auto timeLimit = m_fileInfo.birthTime().addSecs(m_settings.maxFileTimePeriodS.count());
-
-        if (now < m_fileInfo.birthTime())
-        {
-            std::cerr << nx::toString(this).toStdString() << ": file " << getFileName().toStdString()
-                << " was created in future " << m_fileInfo.birthTime().toString().toStdString() << '\n';
-        }
+        const auto timeLimit = m_fileOpenTime.addSecs(m_settings.maxFileTimePeriodS.count());
 
         if (timeLimit.isValid() && now >= timeLimit)
             return true;
