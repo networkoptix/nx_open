@@ -76,7 +76,8 @@ bool isParameterSet(NalUnitType unitType);
 NX_VMS_COMMON_API bool isSlice(NalUnitType unitType);
 NX_VMS_COMMON_API bool isNewAccessUnit(NalUnitType unitType); //< check is new AU, exlcuding slices
 
-std::vector<uint8_t> buildExtraDataAnnexB(const uint8_t* data, int32_t size);
+NX_VMS_COMMON_API std::vector<uint8_t> buildExtraDataAnnexB(const uint8_t* data, int32_t size);
+NX_VMS_COMMON_API std::vector<uint8_t> buildExtraData(const uint8_t* data, int32_t size);
 
 } // namespace nx::media::hevc
 
