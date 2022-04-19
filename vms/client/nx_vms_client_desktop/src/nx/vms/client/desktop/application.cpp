@@ -359,7 +359,7 @@ int runApplication(int argc, char** argv)
     nx::utils::rlimit::setMaxFileDescriptors(8000);
 
     // This attribute is needed to embed QQuickWidget into other QWidgets.
-    //QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
+    QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 
     const QnStartupParameters startupParams = QnStartupParameters::fromCommandLineArg(argc, argv);
     if (startupParams.hiDpiDisabled)
