@@ -18,7 +18,7 @@ namespace object_streamer {
 class DeviceAgent: public nx::sdk::analytics::ConsumingDeviceAgent
 {
 public:
-    DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo);
+    DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo, std::string pluginHomeDir);
     virtual ~DeviceAgent() override;
 
 protected:
@@ -70,10 +70,14 @@ private:
         std::set<Issue> warnings;
     };
 
+    struct StreamInfo
+    {
+        std::map<int, std::vector<Object>> objectsByFrameNumber;
+        std::set<std::string> objectTypeIds;
+    };
+
 private:
-    static std::map<int, std::vector<Object>> parseObjectStreamFile(
-        const std::string& filePath,
-        Issues* outIssues);
+    static StreamInfo parseObjectStreamFile(const std::string& filePath, Issues* outIssues);
 
     static bool parseCommonFields(
         const nx::kit::Json& objectDescription,
@@ -99,18 +103,26 @@ private:
 
     static std::string makePluginDiagnosticEventDescription(const std::set<Issue>& issues);
 
+private:
     std::vector<nx::sdk::Ptr<nx::sdk::analytics::IObjectMetadataPacket>> generateObjects(
         int frameNumber,
         int64_t frameTimestampUs,
         int64_t durationUs);
 
+    sdk::Ptr<sdk::ISettingsResponse> makeSettingsResponse(
+        const std::string& manifestFilePath,
+        const std::string& streamFilePath) const;
+
     void reportIssues(const Issues& issues);
 
 private:
-    std::map<int, std::vector<Object>> m_objectsByFrameNumber;
+    StreamInfo m_streamInfo;
+    std::set<std::string> m_disabledObjectTypeIds;
     int m_frameNumber = 0;
     int m_maxFrameNumber = 0;
     int64_t m_lastFrameTimestampUs = -1;
+    std::string m_pluginHomeDir;
+    bool m_isInitialSettings = true;
 };
 
 } // namespace object_streamer
