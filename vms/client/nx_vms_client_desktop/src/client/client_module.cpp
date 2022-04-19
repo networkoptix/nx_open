@@ -426,9 +426,6 @@ void QnClientModule::initApplication()
     /* We don't want changes in desktop color settings to clash with our custom style. */
     QApplication::setDesktopSettingsAware(false);
     QApplication::setQuitOnLastWindowClosed(true);
-
-    if (nx::build_info::isMacOsX())
-        QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 }
 
 void QnClientModule::initDesktopCamera([[maybe_unused]] QOpenGLWidget* window)
