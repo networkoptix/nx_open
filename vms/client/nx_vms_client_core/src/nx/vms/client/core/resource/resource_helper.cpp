@@ -122,9 +122,11 @@ void ResourceHelper::setRawResource(QnResource* value)
     setResource(value ? value->toSharedPointer() : QnResourcePtr());
 }
 
-nx::vms::api::ResourceStatus ResourceHelper::resourceStatus() const
+int ResourceHelper::resourceStatus() const
 {
-    return m_resource ? m_resource->getStatus() : nx::vms::api::ResourceStatus::undefined;
+    return static_cast<int>(m_resource
+        ? m_resource->getStatus()
+        : nx::vms::api::ResourceStatus::undefined);
 }
 
 QString ResourceHelper::resourceName() const

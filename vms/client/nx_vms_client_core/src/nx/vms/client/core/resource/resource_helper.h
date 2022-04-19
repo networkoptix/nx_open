@@ -13,9 +13,11 @@ class ResourceHelper: public QObject, public SystemContextAware
 {
     Q_OBJECT
 
+    // Resource status should be int for correct interaction within QML code/enums.
+    Q_PROPERTY(int resourceStatus READ resourceStatus NOTIFY resourceStatusChanged)
+
     Q_PROPERTY(QnUuid resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
-    Q_PROPERTY(QnResource* resource READ rawResource WRITE setRawResource NOTIFY resourceChanged)
-    Q_PROPERTY(nx::vms::api::ResourceStatus resourceStatus READ resourceStatus NOTIFY resourceStatusChanged)
+    Q_PROPERTY(QnResource* resource READ rawResource WRITE setRawResource NOTIFY resourceChanged)    
     Q_PROPERTY(QString resourceName READ resourceName NOTIFY resourceNameChanged)
     Q_PROPERTY(bool hasDefaultCameraPassword READ hasDefaultCameraPassword
         NOTIFY defaultCameraPasswordChanged)
@@ -41,7 +43,7 @@ public:
     QnResourcePtr resource() const;
     void setResource(const QnResourcePtr& value);
 
-    nx::vms::api::ResourceStatus resourceStatus() const;
+    int resourceStatus() const;
     QString resourceName() const;
     bool hasDefaultCameraPassword() const;
     bool hasOldCameraFirmware() const;
