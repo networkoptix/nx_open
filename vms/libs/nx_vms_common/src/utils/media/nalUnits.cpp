@@ -2078,4 +2078,26 @@ std::vector<uint8_t> convertStartCodesToSizes(const uint8_t* data, int32_t size,
     return result;
 }
 
+template <size_t arraySize>
+bool startsWith(const void* data, size_t size, const std::array<uint8_t, arraySize> value)
+{
+    return size >= value.size() && memcmp(data, value.data(), value.size()) == 0;
+}
+
+bool isStartCode(const void* data, size_t size)
+{
+    return startsWith(data, size, kStartCode) || startsWith(data, size, kStartCode3B);
+}
+
+void convertToStartCodes(uint8_t* const data, const int size)
+{
+    uint8_t* offset = data;
+    while (offset + 4 < data + size)
+    {
+        size_t naluSize = ntohl(*(uint32_t*)offset);
+        memcpy(offset, kStartCode.data(), kStartCode.size());
+        offset += kStartCode.size() + naluSize;
+    }
+}
+
 } // namespace nx::media::nal
