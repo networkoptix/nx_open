@@ -314,20 +314,21 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
 
         if (context->userType() == nx::vms::api::UserType::cloud)
         {
+            auto& credentials = context->logonData.credentials;
+
             // Use refresh token to issue new session token if server supports OAuth cloud
-            // authrization through the REST API.
+            // authorization through the REST API.
             if (isRestApiSupported(context))
             {
-                context->logonData.credentials =
-                    qnCloudStatusWatcher->remoteConnectionCredentials();
+                credentials = qnCloudStatusWatcher->remoteConnectionCredentials();
             }
-            else
+            // Current or stored credentials will be passed to compatibility mode client.
+            else if (credentials.authToken.empty())
             {
                 // Developer mode code.
-                context->logonData.credentials.username =
-                    qnCloudStatusWatcher->cloudLogin().toStdString();
-                context->logonData.credentials.authToken = nx::network::http::PasswordAuthToken(
-                    settings()->digestCloudPassword());
+                credentials = nx::network::http::Credentials(
+                    qnCloudStatusWatcher->cloudLogin().toStdString(),
+                    nx::network::http::PasswordAuthToken(settings()->digestCloudPassword()));
             }
         }
     }
