@@ -335,6 +335,11 @@ bool UploaderManager::isRunning() const
     return !m_sessionId.empty();
 }
 
+std::string UploaderManager::currentSessionId() const
+{
+    return m_sessionId;
+}
+
 void UploaderManager::startLogUpload(
     const std::string& sessionId,
     std::chrono::milliseconds timeLimit)
