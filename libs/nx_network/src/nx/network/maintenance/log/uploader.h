@@ -139,6 +139,8 @@ public:
 
     bool isRunning() const;
 
+    std::string currentSessionId() const;
+
 private:
     void startLogUpload(
         const std::string& sessionId,
