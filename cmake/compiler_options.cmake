@@ -343,14 +343,20 @@ if(MACOSX)
             -mmacosx-version-min=11.0
             -target arm64-apple-macos
         )
-        add_link_options(-target arm64-apple-macos)
+        add_link_options(
+            -mmacosx-version-min=11.0
+            -target arm64-apple-macos
+        )
     else()
         add_compile_options(
             -msse4.1
             -mmacosx-version-min=10.14
             -target x86_64-apple-macos
         )
-        add_link_options(-target x86_64-apple-macos)
+        add_link_options(
+            -mmacosx-version-min=10.14
+            -target x86_64-apple-macos
+        )
     endif()
     add_compile_options(-Wno-unused-local-typedef)
     list(APPEND CMAKE_INSTALL_RPATH @executable_path/../lib)
