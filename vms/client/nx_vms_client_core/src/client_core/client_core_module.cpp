@@ -25,10 +25,10 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_image_provider.h>
 #include <nx/vms/client/core/utils/operation_manager.h>
 #include <nx/vms/client/core/watchers/known_server_connections.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/rules/engine_holder.h>
 #include <plugins/resource/desktop_audio_only/desktop_audio_only_resource.h>
 #include <watchers/cloud_status_watcher.h>
@@ -52,7 +52,7 @@ struct QnClientCoreModule::Private
 
 QnClientCoreModule::QnClientCoreModule(
     Mode mode,
-    nx::vms::common::SystemContext* systemContext)
+    SystemContext* systemContext)
     :
     base_type(),
     d(new Private())
@@ -103,6 +103,7 @@ QnClientCoreModule::QnClientCoreModule(
 
     d->qmlEngine = new QQmlEngine(this);
     d->qmlEngine->setOutputWarningsToStandardError(true);
+    systemContext->storeToQmlContext(d->qmlEngine->rootContext());
 
     const auto thumbnailProvider = new ThumbnailImageProvider();
     // QQmlEngine takes ownership of thumbnailProvider.
