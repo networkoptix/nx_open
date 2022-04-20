@@ -252,6 +252,13 @@ struct ActionFactory::Private
                 params.setArgument(Qn::ItemDataRole::ForceRole, true);
                 break;
             }
+            case PtzFocusInAction:
+            case PtzFocusOutAction:
+            case PtzFocusAutoAction:
+            {
+                params.setArgument(Qn::ItemDataRole::ForceRole, true);
+                break;
+            }
             default:
                 break; //< No additional parameters.
         }
