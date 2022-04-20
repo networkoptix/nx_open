@@ -13,12 +13,13 @@ import re
 
 
 class QmlDeployUtil:
-    def __init__(self, qt_root):
+    def __init__(self, qt_root, qt_host_root):
         self.qt_root = os.path.abspath(qt_root)
+        self.qt_host_root = os.path.abspath(qt_host_root)
 
-        self.scanner_path = self.find_qmlimportscanner(qt_root)
+        self.scanner_path = self.find_qmlimportscanner(qt_host_root)
         if not self.scanner_path:
-            exit("qmlimportscanner is not found in {}".format(qt_root))
+            exit("qmlimportscanner is not found in {}".format(qt_host_root))
             raise
 
         self.import_path = self.find_qml_import_path(qt_root)
@@ -34,10 +35,11 @@ class QmlDeployUtil:
     @staticmethod
     def find_qmlimportscanner(qt_root):
         for name in ["qmlimportscanner", "qmlimportscanner.exe"]:
-            path = os.path.join(qt_root, "bin", name)
+            for subdir in ["bin", "libexec"]:
+                path = os.path.join(qt_root, subdir, name)
 
-            if os.path.exists(path):
-                return path
+                if os.path.exists(path):
+                    return path
 
         return None
 
@@ -249,6 +251,7 @@ def main():
     parser.add_argument("--qmlimportscanner", type=str, help="Custom qmlimportscanner binary.")
     parser.add_argument("--qml-root", type=str, required=True, help="Root QML directory.")
     parser.add_argument("--qt-root", type=str, required=True, help="Qt root directory.")
+    parser.add_argument("--qt-host-root", type=str, required=True, help="Host Qt root directory.")
     parser.add_argument("-o", "--output", type=str, help="Output.")
     parser.add_argument("--print-static-plugins", action="store_true", help="Print static plugins list.")
     parser.add_argument("--generate-import-cpp", action="store_true", help="Generate a file for importing plugins.")
@@ -259,7 +262,7 @@ def main():
 
     args = parser.parse_args()
 
-    deploy_util = QmlDeployUtil(args.qt_root)
+    deploy_util = QmlDeployUtil(args.qt_root, args.qt_host_root)
     if args.qmlimportscanner:
         if not os.path.exists(args.qmlimportscanner):
             exit("{}: not found".format(args.qmlimportscanner))

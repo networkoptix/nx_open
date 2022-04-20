@@ -11,6 +11,7 @@ execute_process(
     COMMAND ${PYTHON_EXECUTABLE} qmldeploy.py
         "--qml-root" ${desktop_client_qml_root}
         "--qt-root" ${qt.dir}
+        "--qt-host-root" ${QT_HOST_PATH}
         "--output" ${client_qml_directory}
         "--prefer-compiled"
         "--skip-styles"
