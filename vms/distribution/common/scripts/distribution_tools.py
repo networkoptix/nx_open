@@ -154,7 +154,7 @@ def icu_files(icu_lib_directory):
         )
     else:
         templates = (
-            f'{dynamic_library_filename(template, version="55")}' for template in (
+            f'{dynamic_library_filename(template, version="60")}' for template in (
             'icudata',
             'icui18n',
             'icuuc'
