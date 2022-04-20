@@ -2897,14 +2897,24 @@ bool QnMediaResourceWidget::isMotionSearchModeEnabled() const
 void QnMediaResourceWidget::setPtzMode(bool value)
 {
     const bool ptzEnabled = value && d->canControlPtz();
+
+    titleBar()->rightButtonsBar()->setButtonsChecked(Qn::PtzButton, ptzEnabled);
+
     if (ptzEnabled)
-    {
-        titleBar()->rightButtonsBar()->setButtonsChecked(Qn::PtzButton, true);
         menu()->trigger(action::JumpToLiveAction, this);
-    }
 
     setOption(ControlPtz, ptzEnabled);
     item()->setControlPtz(ptzEnabled);
+}
+
+QnMediaResourceWidget::PtzEnabledBy QnMediaResourceWidget::ptzActivationReason()
+{
+    return m_ptzActivationReason;
+}
+
+void QnMediaResourceWidget::setPtzActivationReason(QnMediaResourceWidget::PtzEnabledBy reason)
+{
+    m_ptzActivationReason = reason;
 }
 
 QnSpeedRange QnMediaResourceWidget::speedRange() const
