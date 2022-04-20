@@ -305,9 +305,18 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
             NX_DEBUG(this, "Fixed connection address: %1", fullHostname);
         }
 
-        // Use refresh token to issue new session token.
         if (context->info.userType == nx::vms::api::UserType::cloud)
-            context->info.credentials = qnCloudStatusWatcher->remoteConnectionCredentials();
+        {
+            auto& credentials = context->info.credentials;
+
+            // Use refresh token to issue new session token if server supports OAuth cloud
+            // authentication through the REST API.
+            if (isRestApiSupported(context))
+            {
+                credentials = qnCloudStatusWatcher->remoteConnectionCredentials();
+            }
+            // Current or stored credentials will be passed to compatibility mode client.
+        }
     }
 
     void checkServerCloudConnection(ContextPtr context)
