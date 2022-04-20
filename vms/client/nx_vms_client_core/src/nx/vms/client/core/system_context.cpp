@@ -29,11 +29,18 @@ public:
 
     virtual SystemContext* systemContext() const override
     {
-        const auto qmlContext = QQmlEngine::contextForObject(m_owner);
-        if (!NX_ASSERT(qmlContext))
-            return nullptr;
+        auto qmlContext = QQmlEngine::contextForObject(m_owner);
 
-        return qmlContext->contextProperty(kSystemContextPropertyName).value<SystemContext*>();
+        while (NX_ASSERT(qmlContext))
+        {
+            auto systemContext = qmlContext->contextProperty(kSystemContextPropertyName);
+            if (systemContext.isValid())
+                return systemContext.value<SystemContext*>();
+
+            qmlContext = qmlContext->parentContext();
+        }
+
+        return nullptr;
     }
 
 private:

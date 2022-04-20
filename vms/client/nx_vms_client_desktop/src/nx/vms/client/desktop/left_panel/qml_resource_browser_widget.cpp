@@ -53,7 +53,6 @@ QmlResourceBrowserWidget::QmlResourceBrowserWidget(QnWorkbenchContext* context, 
 
     rootContext()->setContextProperty(
         QnWorkbenchContextAware::kQmlWorkbenchContextPropertyName, this->context());
-    ApplicationContext::instance()->currentSystemContext()->storeToQmlContext(rootContext());
 
     rootContext()->setContextProperty("maxTextureSize",
         QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE));

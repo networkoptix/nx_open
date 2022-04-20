@@ -23,8 +23,12 @@ class QnPtzControllerPool;
 class QnResourcePool;
 
 namespace nx::vms::api { enum class PeerType; }
-namespace nx::vms::common { class SystemContext; }
-namespace nx::vms::client::core { class NetworkModule; }
+namespace nx::vms::client::core {
+
+class NetworkModule;
+class SystemContext;
+
+} // namespace nx::vms::client::core
 
 namespace nx::vms::rules { class Engine; }
 
@@ -43,7 +47,7 @@ public:
 
     QnClientCoreModule(
         Mode mode,
-        nx::vms::common::SystemContext* systemContext);
+        nx::vms::client::core::SystemContext* systemContext);
     virtual ~QnClientCoreModule() override;
 
     using CertificateValidationLevel =
