@@ -213,6 +213,43 @@ public:
         return true;
     }
 
+    void updatePtzState(bool ptzMoveIsActive, QnMediaResourceWidget* widget)
+    {
+        switch (widget->ptzActivationReason())
+        {
+            case QnMediaResourceWidget::PtzEnabledBy::joystick:
+            {
+                widget->setPtzMode(ptzMoveIsActive);
+                if (!ptzMoveIsActive)
+                    widget->setPtzActivationReason(QnMediaResourceWidget::PtzEnabledBy::nothing);
+                break;
+            }
+            case QnMediaResourceWidget::PtzEnabledBy::nothing:
+            {
+                if (widget->options().testFlag(QnResourceWidget::ControlPtz))
+                {
+                    widget->setPtzActivationReason(QnMediaResourceWidget::PtzEnabledBy::user);
+                }
+                else
+                {
+                    widget->setPtzActivationReason(QnMediaResourceWidget::PtzEnabledBy::joystick);
+                    widget->setPtzMode(ptzMoveIsActive);
+                }
+                break;
+            }
+            case QnMediaResourceWidget::PtzEnabledBy::user:
+            {
+                if (!widget->options().testFlag(QnResourceWidget::ControlPtz))
+                    widget->setPtzActivationReason(QnMediaResourceWidget::PtzEnabledBy::nothing);
+                break;
+            }
+            default:
+            {
+                NX_ASSERT(this, "Unexpected ptz activation reason.");
+            }
+        }
+    }
+
     void showPtzBanner(const QString& resourceName)
     {
         static const QString kPtzNotSupportedMessageTemplate =
@@ -501,6 +538,10 @@ void QnWorkbenchPtzHandler::at_ptzContinuousMoveAction_triggered()
 
     auto speed = parameters.argument<QVector3D>(Qn::ItemDataRole::PtzSpeedRole);
 
+    const bool ptzForced = parameters.argument(Qn::ItemDataRole::ForceRole).toBool();
+    if (ptzForced)
+        d->updatePtzState(!speed.isNull(), widget);
+
     if (!speed.isNull() && !d->checkPtzIsActiveOrForced())
         return;
 
@@ -595,6 +636,11 @@ void QnWorkbenchPtzHandler::ptzFocusMove(double speed)
     const auto widget = dynamic_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
     if (!widget)
         return;
+
+    const auto parameters = menu()->currentParameters(sender());
+    const bool ptzForced = parameters.argument(Qn::ItemDataRole::ForceRole).toBool();
+    if (ptzForced)
+        d->updatePtzState(speed != 0, widget);
 
     const auto controller = widget->ptzController();
     if (!NX_ASSERT(controller))

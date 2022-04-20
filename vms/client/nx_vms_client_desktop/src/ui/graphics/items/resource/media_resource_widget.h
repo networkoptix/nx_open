@@ -73,6 +73,14 @@ class QnMediaResourceWidget: public QnResourceWidget
     using MotionSelection = nx::vms::client::core::MotionSelection;
 
 public:
+    enum class PtzEnabledBy
+    {
+        nothing,
+        joystick,
+        user
+    };
+
+public:
     QnMediaResourceWidget(
         nx::vms::client::desktop::SystemContext* systemContext,
         nx::vms::client::desktop::WindowContext* windowContext,
@@ -166,6 +174,9 @@ public:
     bool isMotionSearchModeEnabled() const;
 
     void setPtzMode(bool value);
+
+    PtzEnabledBy ptzActivationReason();
+    void setPtzActivationReason(PtzEnabledBy reason);
 
     QnSpeedRange speedRange() const;
     static const QnSpeedRange& availableSpeedRange();
@@ -482,6 +493,8 @@ private:
 
     QnPtzControllerPtr m_ptzController;
     QnFisheyeHomePtzController* m_homePtzController = nullptr;
+
+    PtzEnabledBy m_ptzActivationReason = PtzEnabledBy::nothing;
 
     nx::vms::api::dewarping::MediaData m_dewarpingParams;
     nx::vms::api::dewarping::ViewData m_itemDewarpingStoredParams;
