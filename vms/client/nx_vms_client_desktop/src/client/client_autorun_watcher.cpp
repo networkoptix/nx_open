@@ -56,7 +56,7 @@ void QnClientAutoRunWatcher::setAutoRun(bool enabled)
 
 QString QnClientAutoRunWatcher::autoRunKey() const
 {
-    return nx::branding::desktopClientDisplayName();
+    return nx::branding::desktopClientInternalName();
 }
 
 QString QnClientAutoRunWatcher::autoRunPath() const
