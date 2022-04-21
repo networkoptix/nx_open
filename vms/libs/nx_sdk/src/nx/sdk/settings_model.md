@@ -42,6 +42,14 @@ top-level Setting Models for individual Settings, and those Settings that suppor
 Here are the descriptions of all available Setting types, with examples of their definition in the
 Settings Model, and examples of their value strings.
 
+### Regular expressions
+Some types of controls supports Regular Expressions (Regex).
+General pattern syntax is described here:\
+<https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions>\
+Note that only these flags are supported: `g`, `i`, `m`, `u`, `y`.\
+Full information available in the
+["ECMA-262 7th Edition" specification](https://262.ecma-international.org/7.0/).
+
 ---------------------------------------------------------------------------------------------------
 ## TextField
 
@@ -71,6 +79,35 @@ Text data field. Supports regex validation for the entered value.
 ### Setting Value
 
     "textField1": "some text"
+
+---------------------------------------------------------------------------------------------------
+## PasswordField
+
+Password data field. Supports regex validation for the entered value.
+
+[proprietary]
+
+![](doc/images/password-field1.png)
+![](doc/images/password-field2.png)
+
+[/proprietary]
+
+### Setting Model
+
+    {
+        "type": "PasswordField",
+        "name": "passwordField1",
+        "caption": "Password Field",
+        "description": "A password field",
+        "defaultValue": "1234",
+        "validationErrorMessage": "Password must contain only digits",
+        "validationRegex": "^[0-9]+$",
+        "validationRegexFlags": "i"
+    }
+
+### Setting Value
+
+    "passwordField1": "password"
 
 ---------------------------------------------------------------------------------------------------
 ## SpinBox

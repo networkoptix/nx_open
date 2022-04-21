@@ -49,6 +49,16 @@ std::string Plugin::manifestString() const
                         "defaultValue": "a text"
                     },
                     {
+                        "type": "PasswordField",
+                        "name": "passwordField1",
+                        "caption": "Password Field",
+                        "description": "A password field",
+                        "defaultValue": "1234",
+                        "validationErrorMessage": "Password must contain only digits",
+                        "validationRegex": "^[0-9]+$",
+                        "validationRegexFlags": "i"
+                    },
+                    {
                         "type": "SpinBox",
                         "name": "testSpinBox",
                         "caption": "Spin Box",
