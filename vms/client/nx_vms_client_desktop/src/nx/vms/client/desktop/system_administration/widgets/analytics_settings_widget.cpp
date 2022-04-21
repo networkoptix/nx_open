@@ -78,7 +78,7 @@ public:
 
     Q_INVOKABLE QJsonObject settingsModel(const QnUuid& engineId)
     {
-        return enginesWatcher->engineInfo(engineId).settingsModel;
+        return settingsModelByEngineId.value(engineId);
     }
 
     QVariant analyticsEngines() const { return engines; }
@@ -127,6 +127,7 @@ public:
         bool changed = false;
     };
     QHash<QnUuid, SettingsValues> settingsValuesByEngineId;
+    QHash<QnUuid, QJsonObject> settingsModelByEngineId;
 };
 
 AnalyticsSettingsWidget::Private::Private(AnalyticsSettingsWidget* q):
@@ -274,6 +275,7 @@ void AnalyticsSettingsWidget::Private::refreshSettingsValues(const QnUuid& engin
                     return;
 
                 settingsValuesByEngineId[engineId] = SettingsValues{result.settingsValues, false};
+                settingsModelByEngineId[engineId] = result.settingsModel;
                 emit settingsValuesChanged(engineId);
             }),
         thread());
