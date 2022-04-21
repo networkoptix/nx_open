@@ -30,7 +30,6 @@ extern "C" {
 #include <nx/utils/ios_device_info.h>
 #endif
 
-#include <QtMultimedia/QAbstractVideoBuffer>
 #include <QtMultimedia/private/qabstractvideobuffer_p.h>
 
 namespace nx {
@@ -60,149 +59,124 @@ namespace {
         return pix_fmts[0];
     }
 
-    QVideoFrame::PixelFormat toQtPixelFormat(AVPixelFormat pixFormat)
+    QVideoFrameFormat::PixelFormat toQtPixelFormat(AVPixelFormat pixFormat)
     {
         switch (pixFormat)
         {
             case AV_PIX_FMT_YUV420P:
             case AV_PIX_FMT_YUVJ420P:
-                return QVideoFrame::Format_YUV420P;
+                return QVideoFrameFormat::Format_YUV420P;
             case AV_PIX_FMT_BGRA:
-                return QVideoFrame::Format_BGRA32;
+                return QVideoFrameFormat::Format_BGRA8888;
             case AV_PIX_FMT_NV12:
-                return QVideoFrame::Format_NV12;
+                return QVideoFrameFormat::Format_NV12;
             default:
-                return QVideoFrame::Format_Invalid;
+                return QVideoFrameFormat::Format_Invalid;
         }
     }
 
-    QVideoFrame::PixelFormat toQtPixelFormat(OSType pixFormat)
+    QVideoFrameFormat::PixelFormat toQtPixelFormat(OSType pixFormat)
     {
         switch (pixFormat)
         {
             case kCVPixelFormatType_420YpCbCr8Planar:
-                return QVideoFrame::Format_YUV420P;
+                return QVideoFrameFormat::Format_YUV420P;
             case kCVPixelFormatType_422YpCbCr8:
-                return QVideoFrame::Format_YV12;
+                return QVideoFrameFormat::Format_YV12;
             case kCVPixelFormatType_32BGRA:
-                return QVideoFrame::Format_BGRA32;
+                return QVideoFrameFormat::Format_BGRA8888;
             case kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange:
             case kCVPixelFormatType_420YpCbCr8BiPlanarFullRange:
-                return QVideoFrame::Format_NV12;
+                return QVideoFrameFormat::Format_NV12;
             default:
-                return QVideoFrame::Format_Invalid;
+                return QVideoFrameFormat::Format_Invalid;
         }
     }
 }
 
-class IOSMemoryBufferPrivate: public QAbstractVideoBufferPrivate
+class IOSMemoryBuffer: public QAbstractVideoBuffer
 {
 public:
-    AVFrame* frame;
-    QAbstractVideoBuffer::MapMode mapMode;
-public:
-    IOSMemoryBufferPrivate(AVFrame* _frame):
-        QAbstractVideoBufferPrivate(),
-        frame(_frame),
-        mapMode(QAbstractVideoBuffer::NotMapped)
+    IOSMemoryBuffer(AVFrame* frame):
+        QAbstractVideoBuffer(QVideoFrame::NoHandle),
+        m_frame(frame)
     {
     }
 
-    virtual ~IOSMemoryBufferPrivate()
+    ~IOSMemoryBuffer()
     {
-        av_frame_free(&frame);
+        av_frame_free(&m_frame);
     }
 
-    virtual int map(
-                    QAbstractVideoBuffer::MapMode mode,
-                    int* numBytes,
-                    int linesize[4],
-                    uchar* data[4]) override
+    virtual QVideoFrame::MapMode mapMode() const override
     {
-        int planes = 1;
-        *numBytes = 0;
+        return m_mapMode;
+    }
 
-        if (frame->data[3])
+    virtual MapData map(QVideoFrame::MapMode mode) override
+    {
+        MapData data;
+
+        m_mapMode = mode;
+
+        data.nPlanes = 1;
+
+        if (m_frame->data[3])
         {
             // map frame to the internal buffer
-            CVPixelBufferRef pixbuf = (CVPixelBufferRef)frame->data[3];
+            CVPixelBufferRef pixbuf = (CVPixelBufferRef) m_frame->data[3];
             CVPixelBufferLockBaseAddress(pixbuf, kCVPixelBufferLock_ReadOnly);
 
             if (CVPixelBufferIsPlanar(pixbuf))
             {
-                planes = CVPixelBufferGetPlaneCount(pixbuf);
-                for (int i = 0; i < planes; i++)
+                data.nPlanes = CVPixelBufferGetPlaneCount(pixbuf);
+                for (int i = 0; i < data.nPlanes; i++)
                 {
-                    data[i]     = (uint8_t*)CVPixelBufferGetBaseAddressOfPlane(pixbuf, i);
-                    linesize[i] = CVPixelBufferGetBytesPerRowOfPlane(pixbuf, i);
-                    *numBytes += linesize[i] * CVPixelBufferGetHeightOfPlane(pixbuf, i);
+                    data.data[i] = (uint8_t*) CVPixelBufferGetBaseAddressOfPlane(pixbuf, i);
+                    data.bytesPerLine[i] = CVPixelBufferGetBytesPerRowOfPlane(pixbuf, i);
+                    data.size[i] = data.bytesPerLine[i] * CVPixelBufferGetHeightOfPlane(pixbuf, i);
                 }
             }
             else
             {
-                data[0] = (uchar*) CVPixelBufferGetBaseAddress(pixbuf);
-                linesize[0] = CVPixelBufferGetBytesPerRow(pixbuf);
-                *numBytes = linesize[0] * CVPixelBufferGetHeight(pixbuf);
+                data.data[0] = (uchar*) CVPixelBufferGetBaseAddress(pixbuf);
+                data.bytesPerLine[0] = CVPixelBufferGetBytesPerRow(pixbuf);
+                data.size[0] = data.bytesPerLine[0] * CVPixelBufferGetHeight(pixbuf);
             }
         }
         else
         {
             // map frame to the ffmpeg buffer
-            planes = 0;
-            const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) frame->format);
-            for (int i = 0; i < descr->nb_components && frame->data[i]; ++i)
+            data.nPlanes = 0;
+            const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) m_frame->format);
+            for (int i = 0; i < descr->nb_components && m_frame->data[i]; ++i)
             {
-                ++planes;
-                data[i] = frame->data[i];
-                linesize[i] = frame->linesize[i];
+                ++data.nPlanes;
+                data.data[i] = m_frame->data[i];
+                data.bytesPerLine[i] = m_frame->linesize[i];
 
-                int bytesPerPlane = linesize[i] * frame->height;
+                int bytesPerPlane = data.bytesPerLine[i] * m_frame->height;
                 if (i > 0)
                 {
                     bytesPerPlane >>= descr->log2_chroma_h + descr->log2_chroma_w;
                     bytesPerPlane *= descr->comp->step;
                 }
-                *numBytes += bytesPerPlane;
+                data.size[i] = bytesPerPlane;
             }
-
         }
 
-        return planes;
-    }
-};
-
-
-class IOSMemoryBuffer: public QAbstractVideoBuffer
-{
-    Q_DECLARE_PRIVATE(IOSMemoryBuffer)
-public:
-    IOSMemoryBuffer(AVFrame* frame):
-        QAbstractVideoBuffer(
-                             *(new IOSMemoryBufferPrivate(frame)),
-                             NoHandle)
-    {
-    }
-
-    virtual MapMode mapMode() const override
-    {
-        return d_func()->mapMode;
-    }
-
-    virtual uchar* map(MapMode mode, int *numBytes, int *bytesPerLine) override
-    {
-        Q_D(IOSMemoryBuffer);
-        CVPixelBufferRef pixbuf = (CVPixelBufferRef) d->frame->data[3];
-        *bytesPerLine = CVPixelBufferGetBytesPerRow(pixbuf);
-        *numBytes = *bytesPerLine * CVPixelBufferGetHeight(pixbuf);
-        return (uchar*) CVPixelBufferGetBaseAddress(pixbuf);
+        return data;
     }
 
     virtual void unmap() override
     {
-        Q_D(IOSMemoryBuffer);
-        CVPixelBufferRef pixbuf = (CVPixelBufferRef) d->frame->data[3];
+        CVPixelBufferRef pixbuf = (CVPixelBufferRef) m_frame->data[3];
         CVPixelBufferUnlockBaseAddress(pixbuf, kCVPixelBufferLock_ReadOnly);
     }
+
+private:
+    AVFrame* m_frame = nullptr;
+    QVideoFrame::MapMode m_mapMode = QVideoFrame::NotMapped;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -435,7 +409,7 @@ int IOSVideoDecoder::decode(
     qint64 startTimeMs = d->frame->pkt_dts / 1000;
     int frameNum = qMax(0, d->codecContext->frame_number - 1);
 
-    QVideoFrame::PixelFormat qtPixelFormat = QVideoFrame::Format_Invalid;
+    QVideoFrameFormat::PixelFormat qtPixelFormat = QVideoFrameFormat::Format_Invalid;
     d->isHardwareAccelerated = d->frame->data[3];
     if (d->isHardwareAccelerated)
     {
@@ -446,7 +420,7 @@ int IOSVideoDecoder::decode(
     {
         qtPixelFormat = toQtPixelFormat((AVPixelFormat)d->frame->format);
     }
-    if (qtPixelFormat == QVideoFrame::Format_Invalid)
+    if (qtPixelFormat == QVideoFrameFormat::Format_Invalid)
     {
         NX_WARNING(this, "Unknown pixel format");
         // Recreate frame just in case.
@@ -458,7 +432,7 @@ int IOSVideoDecoder::decode(
 
     QAbstractVideoBuffer* buffer = new IOSMemoryBuffer(d->frame);
     d->frame = av_frame_alloc();
-    QVideoFrame* videoFrame = new QVideoFrame(buffer, frameSize, qtPixelFormat);
+    QVideoFrame* videoFrame = new QVideoFrame(buffer, {frameSize, qtPixelFormat});
     videoFrame->setStartTime(startTimeMs);
 
     outDecodedFrame->reset(videoFrame);
