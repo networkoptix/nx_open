@@ -296,6 +296,16 @@ static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R
                                 "Text must contain only digits and characters a-f, e.g. 12ab34cd."
                         },
                         {
+                            "type": "PasswordField",
+                            "name": "passwordField1",
+                            "caption": "Password Field",
+                            "description": "A password field",
+                            "defaultValue": "1234",
+                            "validationErrorMessage": "Password must contain only digits",
+                            "validationRegex": "^[0-9]+$",
+                            "validationRegexFlags": "i"
+                        },
+                        {
                             "type": "SpinBox",
                             "caption": "Device Agent SpinBox (plugin side)",
                             "name": "pluginSideTestSpinBox2",
