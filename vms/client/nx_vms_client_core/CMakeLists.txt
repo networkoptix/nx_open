@@ -49,6 +49,25 @@ qt6_add_shaders(nx_vms_client_core "nx_vms_client_core_shaders"
         ${shader_sources}
 )
 
+# Workaround for Qt bug with Xcode new build system:
+#
+# The custom command generating
+#
+#   open/vms/client/nx_vms_client_core/.qsb/qml/Nx/Core/Items/MaskedUniformGrid.frag.qsb
+#
+# is attached to multiple targets:
+#
+#   nx_vms_client_core_other_files
+#   nx_vms_client_core_resources_1
+#
+# but none of these is a common dependency of the other(s).  This is not
+# allowed by the Xcode "new build system".
+#
+# Qt tries to expose source files to IDE using fake target ${target}_other_files.
+if(CMAKE_GENERATOR STREQUAL "Xcode")
+    set_property(TARGET nx_vms_client_core_other_files PROPERTY SOURCES "")
+endif()
+
 if(TARGET qtkeychain)
     target_link_libraries(nx_vms_client_core PRIVATE qtkeychain)
 else()
