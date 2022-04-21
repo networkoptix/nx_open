@@ -2415,6 +2415,9 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setAnalyticsEngines(
             state.analytics.currentEngineId);
     }
 
+    if (!state.isPageVisible(state.selectedTab)) //< Analytics tab can become hidden.
+        state.selectedTab = CameraSettingsTab::general;
+
     return {true, std::move(state)};
 }
 
