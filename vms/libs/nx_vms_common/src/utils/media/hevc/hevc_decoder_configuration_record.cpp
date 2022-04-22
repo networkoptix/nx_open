@@ -2,9 +2,8 @@
 
 #include "hevc_decoder_configuration_record.h"
 
-#include "bitStream.h"
-#include "hevc_common.h"
-
+#include <utils/media/bitStream.h>
+#include <utils/media/hevc_common.h>
 
 namespace {
 

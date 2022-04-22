@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <utils/media/h264_utils.h>
-#include <utils/media/hevc_decoder_configuration_record.h>
+#include <utils/media/hevc/hevc_decoder_configuration_record.h>
 
 
 TEST(media, build_extradata_h264)
@@ -16,7 +16,7 @@ TEST(media, build_extradata_h264)
     const int kSpsSize = 18;
     const int kPpsSize = 4;
 
-    std::vector<uint8_t> extradata = nx::media::h264::buildExtraData(
+    std::vector<uint8_t> extradata = nx::media::h264::buildExtraDataMp4(
         frameData, sizeof(frameData));
 
     ASSERT_EQ(extradata.size(), 33);

@@ -7,10 +7,32 @@
 #include <utils/media/h263_utils.h>
 #include <utils/media/h264_utils.h>
 #include <utils/media/hevc_common.h>
-#include <utils/media/hevc_sps.h>
+#include <utils/media/hevc/extradata.h>
+#include <utils/media/hevc/sequence_parameter_set.h>
 #include <utils/media/mime_types.h>
 
 namespace nx::media {
+
+bool extractSps(const QnCompressedVideoData* videoData, hevc::SequenceParameterSet& sps)
+{
+    // H.265 nal units have same format (unit delimiter) as H.264 nal units
+    auto nalUnits = nx::media::h264::decodeNalUnits(videoData); // TODO make another one for h265(in case of extradata format is differ).
+    for (const auto& nalu: nalUnits)
+    {
+        hevc::NalUnitHeader packetHeader;
+        if (!packetHeader.decode(nalu.data, nalu.size))
+            return false;
+
+        switch (packetHeader.unitType)
+        {
+            case hevc::NalUnitType::spsNut:
+                return parseNalUnit(nalu.data, nalu.size, sps);
+            default:
+                break;
+        }
+    }
+    return false;
+}
 
 QSize getFrameSize(const QnCompressedVideoData* frame)
 {
@@ -24,8 +46,8 @@ QSize getFrameSize(const QnCompressedVideoData* frame)
     {
         case AV_CODEC_ID_H265:
         {
-            hevc::Sps sps;
-            if (sps.decodeFromVideoFrame(frame))
+            hevc::SequenceParameterSet sps;
+            if (extractSps(frame, sps))
                 return QSize(sps.width, sps.height);
             return QSize();
         }
@@ -119,7 +141,7 @@ bool fillExtraData(const QnCompressedVideoData* video, uint8_t** outExtradata, i
     return true;
 }
 
-std::vector<uint8_t> buildExtraData(const QnConstCompressedVideoDataPtr& frame)
+std::vector<uint8_t> buildExtraDataAnnexB(const QnConstCompressedVideoDataPtr& frame)
 {
     if (frame->context && frame->context->getExtradata())
     {

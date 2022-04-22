@@ -2,8 +2,9 @@
 
 #include <gtest/gtest.h>
 
+#include <utils/media/hevc_common.h>
+#include <utils/media/hevc/sequence_parameter_set.h>
 #include <utils/media/nalUnits.h>
-#include <utils/media/hevc_sps.h>
 
 using SourcePayload = QByteArray;
 using DestinationPayload = QByteArray;
@@ -62,9 +63,9 @@ TEST(NalUnits, hevcDecodeSpsNoCrash)
     for (const auto& entry : kEncodedSps)
     {
         const auto buffer = QByteArray::fromHex(entry.first);
-        nx::media::hevc::Sps sps;
-        const auto result = sps.decode((const uint8_t*) buffer.constData(), buffer.size());
-
+        nx::media::hevc::SequenceParameterSet sps;
+        const auto result = nx::media::hevc::parseNalUnit(
+            (const uint8_t*) buffer.constData(), buffer.size(), sps);
         ASSERT_EQ(result, entry.second);
     }
 }

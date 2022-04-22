@@ -3,8 +3,11 @@
 #include "annexb_to_mp4.h"
 
 #include <nx/utils/log/log.h>
-#include <utils/media/nalUnits.h>
 #include <utils/media/h264_utils.h>
+#include <utils/media/hevc/extradata.h>
+#include <utils/media/nalUnits.h>
+#include <utils/media/utils.h>
+
 
 namespace nx::media {
 
@@ -55,7 +58,7 @@ bool isMp4Format(const QnCompressedVideoData* data)
 
 QnCompressedVideoDataPtr AnnexbToMp4::process(const QnCompressedVideoData* frame)
 {
-    if (frame->compressionType != AV_CODEC_ID_H264) // TODO support H265
+    if (frame->compressionType != AV_CODEC_ID_H264 && frame->compressionType != AV_CODEC_ID_H265)
         return nullptr;
 
     if (isMp4Format(frame))
@@ -66,8 +69,19 @@ QnCompressedVideoDataPtr AnnexbToMp4::process(const QnCompressedVideoData* frame
 
     if (frame->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
     {
-        std::vector<uint8_t> extradata = nx::media::h264::buildExtraData(
-            (const uint8_t*)frame->data(), frame->dataSize());
+        std::vector<uint8_t> extradata;
+        if (frame->compressionType == AV_CODEC_ID_H264)
+        {
+            extradata = nx::media::h264::buildExtraDataMp4(
+                (const uint8_t*)frame->data(), frame->dataSize());
+        }
+        else if (frame->compressionType == AV_CODEC_ID_H265)
+        {
+            extradata = nx::media::hevc::buildExtraDataMp4(
+                (const uint8_t*)frame->data(), frame->dataSize());
+        }
+        else
+            return nullptr;
 
         if (!m_context && extradata.empty())
         {
@@ -77,6 +91,14 @@ QnCompressedVideoDataPtr AnnexbToMp4::process(const QnCompressedVideoData* frame
 
         auto context = std::make_shared<CodecParameters>(frame->context->getAvCodecParameters());
         context->setExtradata(extradata.data(), extradata.size());
+
+        QSize streamResolution = nx::media::getFrameSize(frame);
+        if (streamResolution.isEmpty())
+            return nullptr;
+
+        context->getAvCodecParameters()->width = streamResolution.width();
+        context->getAvCodecParameters()->height = streamResolution.height();
+
         m_context = context;
     }
 

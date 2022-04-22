@@ -87,6 +87,7 @@ namespace {
             case kCVPixelFormatType_32BGRA:
                 return QVideoFrame::Format_BGRA32;
             case kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange:
+            case kCVPixelFormatType_420YpCbCr8BiPlanarFullRange:
                 return QVideoFrame::Format_NV12;
             default:
                 return QVideoFrame::Format_Invalid;
@@ -309,7 +310,7 @@ bool IOSVideoDecoder::isCompatible(
     // VideoToolBox supports H263 only.
     // If cheat it and provide H263P instead (by changing compression type H263P -> H263)
     // it would show green box.
-    if (/*codec != AV_CODEC_ID_H265 &&*/ // TODO support mp4 format for hevc
+    if (codec != AV_CODEC_ID_H265 &&
         codec != AV_CODEC_ID_H264 &&
         codec != AV_CODEC_ID_MPEG4 &&
         codec != AV_CODEC_ID_MPEG1VIDEO &&
@@ -369,7 +370,7 @@ int IOSVideoDecoder::decode(
 
     auto compressedVideoData = videoData;
     if (videoData
-        && videoData->compressionType == AV_CODEC_ID_H264
+        && (videoData->compressionType == AV_CODEC_ID_H264 || videoData->compressionType == AV_CODEC_ID_H265)
         && !nx::media::isMp4Format(videoData.get()))
     {
         compressedVideoData = d->m_annexbToMp4.process(videoData.get());

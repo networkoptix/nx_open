@@ -114,7 +114,7 @@ void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
                     BitStreamReader bitReader;
                     try {
                         bitReader.setBuffer(curNal + 1, end);
-                        int first_mb_in_slice = NALUnit::extractUEGolombCode(bitReader);
+                        int first_mb_in_slice = bitReader.getGolomb();
                         if (first_mb_in_slice > 0) {
                             nextSliceCnt++;
                             //break;

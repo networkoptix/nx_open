@@ -9,7 +9,7 @@
 #include <array>
 
 #include <utils/media/nalUnits.h>
-#include <utils/media/hevc_decoder_configuration_record.h>
+#include <utils/media/hevc/hevc_decoder_configuration_record.h>
 #include <nx/utils/log/log.h>
 #include <nx/network/socket_common.h>
 #include <nx/streaming/video_data_packet.h>
