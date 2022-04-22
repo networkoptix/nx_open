@@ -161,16 +161,16 @@
     <message>
       <source>Connection to %1 is not ready yet. Check your internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check your internet connection or try again later.</translation>
+      <translation>Forbindelsen til %1 er ikke klar endnu. Tjek din internetforbindelse, eller prøv igen senere.</translation>
     </message>
     <message>
       <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</translation>
+      <translation>Forbindelsen til %1 er ikke klar endnu. Tjek serverens internetforbindelse, eller prøv igen senere.</translation>
     </message>
     <message>
       <source>Connection to the server could not be established. Try again later.</source>
-      <translation type="unfinished">Connection to the server could not be established. Try again later.</translation>
+      <translation>Forbindelse til serveren kunne ikke etableres. Prøv igen senere.</translation>
     </message>
     <message>
       <source>Your session has expired</source>
@@ -179,16 +179,16 @@
     <message>
       <source>Please log in to %1 again.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Please log in to %1 again.</translation>
+      <translation>Log venligst ind på %1 igen.</translation>
     </message>
     <message>
       <source>Log in to %1 to log in to this system with %2 user</source>
       <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in to %1 to log in to this system with %2 user</translation>
+      <translation>Log ind på %1 for at logge på dette system med %2 bruger</translation>
     </message>
     <message>
       <source>Session duration limit can be changed by a system administrator.</source>
-      <translation type="unfinished">Session duration limit can be changed by a system administrator.</translation>
+      <translation>Sessionsvarighedsgrænsen kan ændres af systemadministrator.</translation>
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
@@ -196,7 +196,7 @@
     </message>
     <message>
       <source>Too many login attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many login attempts. Try again in a minute.</translation>
+      <translation>For mange loginforsøg. Prøv igen om et minut.</translation>
     </message>
   </context>
 </TS>

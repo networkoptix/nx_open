@@ -291,7 +291,7 @@
     <name>BackupSettingsWidget</name>
     <message>
       <source>Server is offline. Backup settings are not available.</source>
-      <translation type="unfinished">Server is offline. Backup settings are not available.</translation>
+      <translation>Server is offline. Back-up instellingen zijn niet beschikbaar.</translation>
     </message>
   </context>
   <context>
@@ -322,7 +322,7 @@
     </message>
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
-      <translation type="unfinished">Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</translation>
+      <translation>De back-up is gestopt vanwege een opslagprobleem. Back-up wordt automatisch hervat nadat het opslagprobleem is opgelost</translation>
     </message>
   </context>
   <context>
@@ -616,19 +616,19 @@
     </message>
     <message>
       <source>RTP Transport</source>
-      <translation type="unfinished">RTP Transport</translation>
+      <translation>RTP Transport</translation>
     </message>
     <message>
       <source>Use camera native presets</source>
-      <translation type="unfinished">Use camera native presets</translation>
+      <translation>Gebruik de camera presets</translation>
     </message>
     <message>
       <source>Time Settings</source>
-      <translation type="unfinished">Time Settings</translation>
+      <translation>Tijdinstellingen</translation>
     </message>
     <message>
       <source>Keep camera time settings</source>
-      <translation type="unfinished">Keep camera time settings</translation>
+      <translation>Cameratijdinstellingen behouden</translation>
     </message>
   </context>
   <context>
@@ -1496,7 +1496,7 @@
     </message>
     <message>
       <source>Allow digest authentication for imported user</source>
-      <translation type="unfinished">Allow digest authentication for imported user</translation>
+      <translation>Sta digest authenticatie toe voor geïmporteerde gebruiker</translation>
     </message>
   </context>
   <context>
@@ -2442,7 +2442,7 @@
     </message>
     <message>
       <source>Manage Users</source>
-      <translation type="unfinished">Manage Users</translation>
+      <translation>Gebruikers beheren</translation>
     </message>
   </context>
   <context>
@@ -2534,7 +2534,7 @@
     </message>
     <message>
       <source>Autodetect built-in and USB webcams</source>
-      <translation type="unfinished">Autodetect built-in and USB webcams</translation>
+      <translation>Ingebouwde en USB-webcams automatisch detecteren</translation>
     </message>
   </context>
   <context>
@@ -3012,7 +3012,7 @@
     </message>
     <message>
       <source>Allow opening web page without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening web page without SSL certificate checking</translation>
+      <translation>Webpagina openen zonder SSL-certificaat toestaan</translation>
     </message>
   </context>
   <context>
