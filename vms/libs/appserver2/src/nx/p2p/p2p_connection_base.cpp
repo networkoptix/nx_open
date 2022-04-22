@@ -401,7 +401,18 @@ void ConnectionBase::setState(State state)
     if (state == m_state)
         return;
 
-    NX_ASSERT(m_state != State::Error, "State 'Error' is final and should not be changed");
+    if (m_state >= State::Error)
+    {
+        if (NX_ASSERT(state >= State::Error,
+            "State %1 is final and should not be changed to %2",
+            toString(m_state), toString(state)))
+        {
+            NX_VERBOSE(
+                this, "Ignore state change: [%1] -> [%2]", toString(m_state), toString(state));
+        }
+        return;
+    }
+
     NX_VERBOSE(this,
         "Connection State change: [%1] -> [%2]",
         toString(m_state), toString(state));
