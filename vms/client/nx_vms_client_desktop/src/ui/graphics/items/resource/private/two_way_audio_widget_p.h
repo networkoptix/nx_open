@@ -38,7 +38,7 @@ public:
     Private(const QString& sourceId, QnTwoWayAudioWidget* owner);
     virtual ~Private();
 
-    void updateCamera(const QnVirtualCameraResourcePtr& camera);
+    void updateCamera(const QnSecurityCamResourcePtr& camera);
 
     void startStreaming();
     void stopStreaming();
@@ -79,5 +79,5 @@ private:
     VisualizerData m_visualizerData;
     qint64 m_paintTimeStamp = 0;
 
-    QnVirtualCameraResourcePtr m_camera;
+    QnSecurityCamResourcePtr m_camera;
 };

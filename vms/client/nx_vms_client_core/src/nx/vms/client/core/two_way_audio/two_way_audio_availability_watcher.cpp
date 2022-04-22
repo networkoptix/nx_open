@@ -57,6 +57,10 @@ void TwoWayAudioAvailabilityWatcher::setResourceId(const QnUuid& uuid)
     {
         connect(m_camera, &QnVirtualCameraResource::statusChanged,
             this, &TwoWayAudioAvailabilityWatcher::updateAvailability);
+        connect(m_camera, &QnSecurityCamResource::twoWayAudioEnabledChanged,
+            this, &TwoWayAudioAvailabilityWatcher::updateAvailability);
+        connect(m_camera, &QnSecurityCamResource::audioOutputDeviceIdChanged,
+            this, &TwoWayAudioAvailabilityWatcher::updateAvailability);
 
         if (m_licenseHelper)
         {
@@ -81,6 +85,13 @@ void TwoWayAudioAvailabilityWatcher::updateAvailability()
             if (!m_camera )
                 return false;
 
+            if (!m_camera->isTwoWayAudioEnabled())
+                return false;
+
+            const auto audioOutput = m_camera->audioOutputDevice();
+            if (!audioOutput->hasTwoWayAudio())
+                return false;
+
             const auto user = commonModule()->instance<UserWatcher>()->user();
             if (!user)
                 return false;
@@ -94,7 +105,6 @@ void TwoWayAudioAvailabilityWatcher::updateAvailability()
 
             if (m_licenseHelper)
                 return m_licenseHelper->status() == nx::vms::license::UsageStatus::used;
-
 
             return true;
         }();

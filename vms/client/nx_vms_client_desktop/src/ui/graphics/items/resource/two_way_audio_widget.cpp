@@ -39,7 +39,7 @@ QnTwoWayAudioWidget::~QnTwoWayAudioWidget()
 {
 }
 
-void QnTwoWayAudioWidget::setCamera(const QnVirtualCameraResourcePtr &camera)
+void QnTwoWayAudioWidget::setCamera(const QnSecurityCamResourcePtr &camera)
 {
     d->updateCamera(camera);
 }
