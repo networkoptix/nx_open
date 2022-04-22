@@ -22,7 +22,6 @@ public:
     virtual void createButtons() override;
     virtual void removeButtons() override;
 
-    QnVirtualCameraResourcePtr getAudioOutputDevice() const;
     void createTwoAudioButton();
     void removeTwoAudioButton();
 

@@ -16,7 +16,7 @@ public:
     QnTwoWayAudioWidget(const QString& sourceId, QGraphicsWidget* parent = nullptr);
     virtual ~QnTwoWayAudioWidget() override;
 
-    void setCamera(const QnVirtualCameraResourcePtr& camera);
+    void setCamera(const QnSecurityCamResourcePtr& camera);
 
     void setFixedHeight(qreal height);
 

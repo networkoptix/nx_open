@@ -303,6 +303,11 @@ public:
     QnUuid audioOutputDeviceId() const;
 
     /**
+     * @return Redirected audio output (if any) or self.
+     */
+    QnSecurityCamResourcePtr audioOutputDevice() const;
+
+    /**
      * Sets ID of device which will be used as audio output override for the camera.
      * @param deviceId Valid another device ID expected. Null ID should be set if this device's
      *     own audio output is intended to be used.
