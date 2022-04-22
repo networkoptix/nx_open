@@ -43,7 +43,10 @@ NX_VMS_COMMON_API bool operator==(const Attribute& left, const Attribute& right)
 
 NX_VMS_COMMON_API QString toString(const Attribute&);
 
-using Attributes = std::set<Attribute>;
+using Attributes = std::vector<Attribute>;
+
+NX_VMS_COMMON_API void addAttributeIfNotExists(Attributes* result, const Attribute& a);
+NX_VMS_COMMON_API Attributes::iterator findFirstAttributeByName(Attributes* a, const QString& name);
 
 struct RangePoint
 {

@@ -1150,14 +1150,12 @@ void AnalyticsSearchListModel::Private::advanceTrack(ObjectTrack& track,
                 if (range.from.has_value() && range.to.has_value())
                 {
                     numericAttribute.addRange(range);
-                    track.attributes.erase(foundIt);
-                    track.attributes.emplace(numericAttribute.name, numericAttribute.stringValue());
+                    *foundIt = {numericAttribute.name, numericAttribute.stringValue()};
                     continue;
                 }
             }
         }
-
-        track.attributes.insert(attribute);
+        addAttributeIfNotExists(&track.attributes, attribute);
     }
 
     track.lastAppearanceTimeUs = position.timestampUs;
