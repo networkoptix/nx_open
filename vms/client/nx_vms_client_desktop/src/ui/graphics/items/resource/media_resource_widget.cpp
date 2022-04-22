@@ -1352,7 +1352,7 @@ void QnMediaResourceWidget::updateCameraButtons()
 
     const bool twoWayAudioButtonVisible =
         capabilityButtonsVisible
-        && m_buttonController->getAudioOutputDevice()->hasTwoWayAudio()
+        && d->camera->audioOutputDevice()->hasTwoWayAudio()
         && d->camera->isTwoWayAudioEnabled();
 
     if (twoWayAudioButtonVisible)

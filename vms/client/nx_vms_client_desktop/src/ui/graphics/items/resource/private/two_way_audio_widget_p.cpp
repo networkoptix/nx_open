@@ -278,8 +278,7 @@ void QnTwoWayAudioWidget::Private::updateState()
     q->setOpacity(enabled ? kEnabledOpacityCoeff : kDisabledOpacityCoeff);
 }
 
-
-void QnTwoWayAudioWidget::Private::updateCamera(const QnVirtualCameraResourcePtr& camera)
+void QnTwoWayAudioWidget::Private::updateCamera(const QnSecurityCamResourcePtr& camera)
 {
     if (m_camera == camera)
         return;

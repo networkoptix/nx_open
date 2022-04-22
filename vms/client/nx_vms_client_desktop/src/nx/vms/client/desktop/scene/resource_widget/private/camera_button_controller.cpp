@@ -99,13 +99,6 @@ void CameraButtonController::removeButtons()
     ButtonController::removeButtons();
 }
 
-QnVirtualCameraResourcePtr CameraButtonController::getAudioOutputDevice() const
-{
-    const auto redirectedOutputCamera = m_camera->resourcePool()
-        ->getResourceById<QnVirtualCameraResource>(m_camera->audioOutputDeviceId());
-    return redirectedOutputCamera.isNull() ? m_camera : redirectedOutputCamera;
-}
-
 void CameraButtonController::createTwoAudioButton()
 {
     if (!m_camera)
@@ -119,7 +112,7 @@ void CameraButtonController::createTwoAudioButton()
             workbench()->context()->user()->getId());
         m_twoWayAudioWidget =
             new QnTwoWayAudioWidget(desktopResourceUniqueId, m_parentWidget);
-        m_twoWayAudioWidget->setCamera(getAudioOutputDevice());
+        m_twoWayAudioWidget->setCamera(m_camera->audioOutputDevice());
         m_twoWayAudioWidget->setFixedHeight(kTriggerButtonHeight);
         ApplicationContext::instance()->controlsStatisticsModule()->registerButton(
             "two_way_audio",
@@ -140,7 +133,7 @@ void CameraButtonController::createTwoAudioButton()
     }
     else
     {
-        m_twoWayAudioWidget->setCamera(getAudioOutputDevice());
+        m_twoWayAudioWidget->setCamera(m_camera->audioOutputDevice());
     }
 }
 
