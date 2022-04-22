@@ -51,7 +51,7 @@ public:
         NotDefined,
         Connecting,
         Connected,
-        Error,
+        Error = 256, //< All greater states are errors too.
         Unauthorized,
         forbidden,
         handshakeError,
