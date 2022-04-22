@@ -21,18 +21,18 @@
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>Ethvert plugin</translation>
     </message>
     <message numerus="yes">
       <source>%1 with %n attributes</source>
       <translation type="unfinished">
-        <numerusform>%1 with %n attributes</numerusform>
+        <numerusform>%1 med %n attributter</numerusform>
         <numerusform>%1 with %n attributes</numerusform>
       </translation>
     </message>
     <message>
       <source>Any subtype</source>
-      <translation type="unfinished">Any subtype</translation>
+      <translation>Enhver undertype</translation>
     </message>
   </context>
   <context>
@@ -46,11 +46,11 @@
     <name>CertificatesModel</name>
     <message>
       <source>Subject</source>
-      <translation type="unfinished">Subject</translation>
+      <translation>Emne</translation>
     </message>
     <message>
       <source>Issuer</source>
-      <translation type="unfinished">Issuer</translation>
+      <translation>Udsteder</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -894,11 +894,11 @@
     </message>
     <message>
       <source>Switch to Cameras &amp; Resources tab</source>
-      <translation type="unfinished">Switch to Cameras &amp; Resources tab</translation>
+      <translation>Skift til fanen Kameraer og ressourcer</translation>
     </message>
     <message>
       <source>Search Cameras &amp; Resources</source>
-      <translation type="unfinished">Search Cameras &amp; Resources</translation>
+      <translation>Søg I Kameraer Og Ressourcer</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
@@ -906,55 +906,55 @@
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>Ny</translation>
     </message>
     <message>
       <source>Welcome Screen</source>
-      <translation type="unfinished">Welcome Screen</translation>
+      <translation>Velkomstskærm</translation>
     </message>
     <message>
       <source>Add Web Page...</source>
-      <translation type="unfinished">Add Web Page...</translation>
+      <translation>Tilføj webside...</translation>
     </message>
     <message>
       <source>Show Servers</source>
-      <translation type="unfinished">Show Servers</translation>
+      <translation>Vis servere</translation>
     </message>
     <message>
       <source>Save Window Configuration</source>
-      <translation type="unfinished">Save Window Configuration</translation>
+      <translation>Gem Windows-konfiguration</translation>
     </message>
     <message>
       <source>Save Windows Configuration</source>
-      <translation type="unfinished">Save Windows Configuration</translation>
+      <translation>Gem Windows-konfiguration</translation>
     </message>
     <message>
       <source>Windows Configuration</source>
-      <translation type="unfinished">Windows Configuration</translation>
+      <translation>Windows-konfiguration</translation>
     </message>
     <message>
       <source>Save Current State</source>
-      <translation type="unfinished">Save Current State</translation>
+      <translation>Gem nuværende tilstand</translation>
     </message>
     <message>
       <source>Restore Saved State</source>
-      <translation type="unfinished">Restore Saved State</translation>
+      <translation>Gendan gemt tilstand</translation>
     </message>
     <message>
       <source>Delete Saved State</source>
-      <translation type="unfinished">Delete Saved State</translation>
+      <translation>Slet gemt tilstand</translation>
     </message>
     <message>
       <source>Close all Windows</source>
-      <translation type="unfinished">Close all Windows</translation>
+      <translation>Luk alle vinduer</translation>
     </message>
     <message>
       <source>Delete Bookmark...</source>
-      <translation type="unfinished">Delete Bookmark...</translation>
+      <translation>Slet bogmærke...</translation>
     </message>
     <message>
       <source>Delete Bookmarks...</source>
-      <translation type="unfinished">Delete Bookmarks...</translation>
+      <translation>Slet bogmærker...</translation>
     </message>
     <message numerus="yes">
       <source>Show on Items</source>
@@ -969,23 +969,23 @@
     </message>
     <message>
       <source>Rotate to</source>
-      <translation type="unfinished">Rotate to</translation>
+      <translation>Rotér til</translation>
     </message>
     <message>
       <source>Create Group</source>
-      <translation type="unfinished">Create Group</translation>
+      <translation>Opret Gruppe</translation>
     </message>
     <message>
       <source>Remove Group</source>
-      <translation type="unfinished">Remove Group</translation>
+      <translation>Fjern Gruppe</translation>
     </message>
     <message>
       <source>Add Proxied Web Page...</source>
-      <translation type="unfinished">Add Proxied Web Page...</translation>
+      <translation>Tilføj proxy-webside...</translation>
     </message>
     <message>
       <source>Cell Spacing</source>
-      <translation type="unfinished">Cell Spacing</translation>
+      <translation>Celleafstand</translation>
     </message>
     <message>
       <source>Show Panel</source>
@@ -1166,7 +1166,7 @@
     </message>
     <message>
       <source>Executable %1 Media File</source>
-      <translation type="unfinished">Executable %1 Media File</translation>
+      <translation>Eksekverbar %1 mediefil</translation>
     </message>
   </context>
   <context>
@@ -1672,11 +1672,11 @@
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Anbefalet</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation type="unfinished">Strict</translation>
+      <translation>Streng</translation>
     </message>
     <message>
       <source>May lead to privacy issues</source>
@@ -1684,11 +1684,11 @@
     </message>
     <message>
       <source>Connect only servers with public certificate</source>
-      <translation type="unfinished">Connect only servers with public certificate</translation>
+      <translation>Tilslut kun servere med offentligt certifikat</translation>
     </message>
     <message>
       <source>Certificate storage will be cleared.</source>
-      <translation type="unfinished">Certificate storage will be cleared.</translation>
+      <translation>Certifikatlagring vil blive ryddet.</translation>
     </message>
     <message>
       <source>Current client instance will be disconnected.</source>
@@ -1696,11 +1696,11 @@
     </message>
     <message>
       <source>All other client windows will be closed.</source>
-      <translation type="unfinished">All other client windows will be closed.</translation>
+      <translation>Alle andre klientvinduer vil blive lukket.</translation>
     </message>
     <message>
       <source>Security settings changed</source>
-      <translation type="unfinished">Security settings changed</translation>
+      <translation>Sikkerhedsindstillinger ændret</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -2015,11 +2015,11 @@
     </message>
     <message>
       <source>MitM Attack</source>
-      <translation type="unfinished">MitM Attack</translation>
+      <translation>MitM angreb</translation>
     </message>
     <message>
       <source>MitM attack from server %1</source>
-      <translation type="unfinished">MitM attack from server %1</translation>
+      <translation>MitM angreb fra server %1</translation>
     </message>
   </context>
   <context>
@@ -2296,7 +2296,7 @@
     </message>
     <message>
       <source>Some rules are not valid and may not work</source>
-      <translation type="unfinished">Some rules are not valid and may not work</translation>
+      <translation>Nogle regler er ikke gyldige og virker muligvis ikke</translation>
     </message>
   </context>
   <context>
@@ -2683,7 +2683,7 @@ to %1</translation>
     <message>
       <source>Enter your account password to disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to disconnect System from %1</translation>
+      <translation>Indtast adgangskoden til din konto for at frakoble systemet fra %1</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -2692,12 +2692,12 @@ to %1</translation>
     <message>
       <source>System disconnected from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">System disconnected from %1</translation>
+      <translation>Systemet blev afbrudt fra %1</translation>
     </message>
     <message>
       <source>You are about to disconnect System from %1</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation type="unfinished">You are about to disconnect System from %1</translation>
+      <translation>Du er ved at afbryde forbindelsen til System fra %1</translation>
     </message>
     <message>
       <source>All %1 users will be deleted.</source>
@@ -2734,11 +2734,11 @@ to %1</translation>
     </message>
     <message>
       <source>Requested operation is not allowed with provided credentials.</source>
-      <translation type="unfinished">Requested operation is not allowed with provided credentials.</translation>
+      <translation>Den anmodede handling er ikke tilladt med de angivne legitimationsoplysninger.</translation>
     </message>
     <message>
       <source>This account is not activated. Please check your email.</source>
-      <translation type="unfinished">This account is not activated. Please check your email.</translation>
+      <translation>Denne konto er ikke aktiveret. Tjek venligst din e-mail.</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
@@ -2746,7 +2746,7 @@ to %1</translation>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
-      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
+      <translation>Netværksfejl. Tjek venligst din internetforbindelse og prøv igen.</translation>
     </message>
     <message>
       <source>Invalid login.</source>
@@ -5061,7 +5061,7 @@ to %1</translation>
     </message>
     <message>
       <source>ARCHIVE ENCRYPTED</source>
-      <translation type="unfinished">ARCHIVE ENCRYPTED</translation>
+      <translation>ARKIV KRYPTERET</translation>
     </message>
     <message>
       <source>Ask your system administrator to enter the encryption password to decrypt this archive</source>
@@ -5382,7 +5382,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Security</source>
-      <translation type="unfinished">Security</translation>
+      <translation>Sikkerhed</translation>
     </message>
   </context>
   <context>
@@ -5852,7 +5852,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Learn More</source>
-      <translation type="unfinished">Learn More</translation>
+      <translation>Læs mere</translation>
     </message>
   </context>
   <context>
@@ -5927,7 +5927,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Password reset is required</source>
-      <translation type="unfinished">Password reset is required</translation>
+      <translation>Nulstilling af adgangskode er påkrævet</translation>
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed.</source>
@@ -6646,7 +6646,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Merge</source>
-      <translation type="unfinished">Merge</translation>
+      <translation>Flet</translation>
     </message>
     <message>
       <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
@@ -6662,7 +6662,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Move anyway?</source>
-      <translation type="unfinished">Move anyway?</translation>
+      <translation>Flet alligevel?</translation>
     </message>
     <message>
       <source>Move</source>
@@ -6690,11 +6690,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Move Group without Them</source>
-      <translation type="unfinished">Move Group without Them</translation>
+      <translation>Flyt gruppe uden dem</translation>
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers</translation>
+      <translation>Virtuelle kameraer, USB- eller webkameraer kan ikke flyttes mellem servere</translation>
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains virtual cameras, USB or web cameras</source>
@@ -6923,33 +6923,33 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Choose devices...</source>
-      <translation type="unfinished">Choose devices...</translation>
+      <translation>Vælg enheder...</translation>
     </message>
     <message>
       <source>Choose cameras...</source>
-      <translation type="unfinished">Choose cameras...</translation>
+      <translation>Vælg kameraer...</translation>
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
       <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
+        <numerusform>%n valgte enheder</numerusform>
         <numerusform>%n chosen devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
       <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
+        <numerusform>%n valgte kameraer</numerusform>
         <numerusform>%n chosen cameras</numerusform>
       </translation>
     </message>
     <message>
       <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
+      <translation>Valgt kamera</translation>
     </message>
     <message>
       <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
+      <translation>Valgt enhed</translation>
     </message>
   </context>
   <context>
@@ -7003,15 +7003,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::AudioRedirectPickerWidget</name>
     <message>
       <source>Select Device...</source>
-      <translation type="unfinished">Select Device...</translation>
+      <translation>Vælg enhed...</translation>
     </message>
     <message>
       <source>Use audio stream from</source>
-      <translation type="unfinished">Use audio stream from</translation>
+      <translation>Brug lydstream fra</translation>
     </message>
     <message>
       <source>Transmit audio stream to</source>
-      <translation type="unfinished">Transmit audio stream to</translation>
+      <translation>Send lydstream til</translation>
     </message>
     <message>
       <source>This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</source>
@@ -7079,11 +7079,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Use audio stream from this device</source>
-      <translation type="unfinished">Use audio stream from this device</translation>
+      <translation>Brug lydstream fra denne enhed</translation>
     </message>
     <message>
       <source>Use audio stream from this camera</source>
-      <translation type="unfinished">Use audio stream from this camera</translation>
+      <translation>Brug lydstream fra dette kamera</translation>
     </message>
     <message>
       <source>%1 is connected to another server. Audio stream is not available</source>
@@ -7171,15 +7171,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot be modified for new added cameras</source>
-      <translation type="unfinished">Cannot be modified for new added cameras</translation>
+      <translation>Kan ikke ændres for nye tilføjede kameraer</translation>
     </message>
     <message>
       <source>This device provides only one data stream</source>
-      <translation type="unfinished">This device provides only one data stream</translation>
+      <translation>Denne enhed leverer kun én datastrøm</translation>
     </message>
     <message>
       <source>Stream setting is not applicable to this device type</source>
-      <translation type="unfinished">Stream setting is not applicable to this device type</translation>
+      <translation>Streamindstillingen gælder ikke for denne enhedstype</translation>
     </message>
     <message>
       <source>Not supported</source>
@@ -7198,7 +7198,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>What to backup</source>
-      <translation type="unfinished">What to backup</translation>
+      <translation>Hvad skal sikkerhedskopieres</translation>
     </message>
     <message>
       <source>Quality</source>
@@ -7206,9 +7206,9 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>Set for %n selected devices</source>
-      <translation type="unfinished">
-        <numerusform>Set for %n selected devices</numerusform>
-        <numerusform>Set for %n selected devices</numerusform>
+      <translation>
+        <numerusform>Indstil til %n valgte enheder</numerusform>
+        <numerusform>Indstil til %n valgte enheder</numerusform>
       </translation>
     </message>
   </context>
@@ -7216,7 +7216,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupSettingsViewWidget</name>
     <message>
       <source>Nothing to backup</source>
-      <translation type="unfinished">Nothing to backup</translation>
+      <translation>Intet at sikkerhedskopiere</translation>
     </message>
   </context>
   <context>
@@ -7227,11 +7227,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Bandwidth Limit</source>
-      <translation type="unfinished">Bandwidth Limit</translation>
+      <translation>Båndbreddegrænse</translation>
     </message>
     <message>
       <source>New added cameras</source>
-      <translation type="unfinished">New added cameras</translation>
+      <translation>Nye tilføjede kameraer</translation>
     </message>
     <message>
       <source>New added cameras settings will apply to all servers in the system.</source>
@@ -7276,19 +7276,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Applies only to the cameras connected to current server.</source>
-      <translation type="unfinished">Applies only to the cameras connected to current server.</translation>
+      <translation>Gælder kun for de kameraer, der er tilsluttet den aktuelle server.</translation>
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Backup is enabled for %n devices</numerusform>
-        <numerusform>Backup is enabled for %n devices</numerusform>
+      <translation>
+        <numerusform>Sikkerhedskopiering er aktiveret for %n enheder</numerusform>
+        <numerusform>Sikkerhedskopiering er aktiveret for %n enheder</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n cameras</source>
       <translation type="unfinished">
-        <numerusform>Backup is enabled for %n cameras</numerusform>
+        <numerusform>Sikkerhedskopiering er aktiveret for %n kameraer</numerusform>
         <numerusform>Backup is enabled for %n cameras</numerusform>
       </translation>
     </message>
@@ -7333,11 +7333,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraButtonController</name>
     <message>
       <source>Heater</source>
-      <translation type="unfinished">Heater</translation>
+      <translation>Varme</translation>
     </message>
     <message>
       <source>Wiper</source>
-      <translation type="unfinished">Wiper</translation>
+      <translation>Visker</translation>
     </message>
   </context>
   <context>
@@ -7395,15 +7395,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Force Motion Detection</source>
-      <translation type="unfinished">Force Motion Detection</translation>
+      <translation>Gennemtving Bevægelsesdetektion</translation>
     </message>
     <message>
       <source>Pan</source>
-      <translation type="unfinished">Pan</translation>
+      <translation>Panorér</translation>
     </message>
     <message>
       <source>Pan &amp; Tilt</source>
-      <translation type="unfinished">Pan &amp; Tilt</translation>
+      <translation>Panorere &amp; Vippe</translation>
     </message>
     <message>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
@@ -7483,7 +7483,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Force Motion Detection</source>
-      <translation type="unfinished">Force Motion Detection</translation>
+      <translation>Gennemtving Bevægelsesdetektion</translation>
     </message>
     <message>
       <source>Select areas on the preview to set chosen sensitivity for.</source>
@@ -7653,7 +7653,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Objects Only</source>
-      <translation type="unfinished">Objects Only</translation>
+      <translation>Kun objekter</translation>
     </message>
     <message>
       <source>Motion &amp; Objects Only</source>
@@ -7704,7 +7704,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Audio will be disabled</source>
-      <translation type="unfinished">Audio will be disabled</translation>
+      <translation>Lyd vil blive deaktiveret</translation>
     </message>
     <message>
       <source>You need to select a device that will provide audio.</source>
@@ -7770,7 +7770,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Vælg</translation>
     </message>
   </context>
   <context>
@@ -7813,11 +7813,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot download update file</source>
-      <translation type="unfinished">Cannot download update file</translation>
+      <translation>Kan ikke downloade opdateringsfil</translation>
     </message>
     <message>
       <source>There is no enough space to download update file</source>
-      <translation type="unfinished">There is no enough space to download update file</translation>
+      <translation>Der er ikke plads nok til at downloade opdateringsfilen</translation>
     </message>
   </context>
   <context>
@@ -8397,7 +8397,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::FailoverPriorityDialogItemDelegate</name>
     <message>
       <source>No failover</source>
-      <translation type="unfinished">No failover</translation>
+      <translation>Ingen failover</translation>
     </message>
     <message>
       <source>Low</source>
@@ -8435,7 +8435,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ForceSecureAuthDialog</name>
     <message>
       <source>Force secure authentication?</source>
-      <translation type="unfinished">Force secure authentication?</translation>
+      <translation>Gennemtving sikker godkendelse?</translation>
     </message>
     <message>
       <source>To revert this change user password reset will be required.</source>
@@ -8634,7 +8634,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::LocalSessionTokenExpirationWatcher</name>
     <message>
       <source>Your session expires soon</source>
-      <translation type="unfinished">Your session expires soon</translation>
+      <translation>Din session udløber snart</translation>
     </message>
     <message>
       <source>Re-Authenticate Now</source>
@@ -8694,7 +8694,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::MediaFileSettingsDialog</name>
     <message>
       <source>File Settings</source>
-      <translation type="unfinished">File Settings</translation>
+      <translation>Filindstillinger</translation>
     </message>
   </context>
   <context>
@@ -9674,7 +9674,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Input Signal</source>
-      <translation type="unfinished">Input Signal</translation>
+      <translation>Input- Signal</translation>
     </message>
     <message>
       <source>Soft Trigger</source>
@@ -9751,33 +9751,32 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
-      <translation type="unfinished">Motion, Objects</translation>
+      <translation>Bevægelse, Objekter</translation>
     </message>
     <message>
       <source>Motion, Objects
  + Low-Res</source>
-      <translation type="unfinished">Motion, Objects
- + Low-Res</translation>
+      <translation>Bevægelse, Objekter
+ + Lav-opløsning</translation>
     </message>
     <message>
       <source>Objects Only</source>
-      <translation type="unfinished">Objects Only</translation>
+      <translation>Kun objekter</translation>
     </message>
     <message>
       <source>Objects
  + Low-Res</source>
-      <translation type="unfinished">Objects
- + Low-Res</translation>
+      <translation>Objekter + Lav opløsning</translation>
     </message>
     <message>
       <source>Motion Only</source>
-      <translation type="unfinished">Motion Only</translation>
+      <translation>Kun bevægelse</translation>
     </message>
     <message>
       <source>Motion
  + Low-Res</source>
-      <translation type="unfinished">Motion
- + Low-Res</translation>
+      <translation>Bevægelse
+ + Lav-opløsning</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected devices</source>
@@ -9930,7 +9929,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Learn more.</source>
-      <translation type="unfinished">Learn more.</translation>
+      <translation>Læs mere.</translation>
     </message>
     <message numerus="yes">
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
@@ -9945,26 +9944,26 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <name>nx::vms::client::desktop::ServerCertificateError</name>
     <message>
       <source>Failed to connect to server</source>
-      <translation type="unfinished">Failed to connect to server</translation>
+      <translation>Kunne ikke oprette forbindelse til server</translation>
     </message>
     <message>
       <source>View certificate</source>
-      <translation type="unfinished">View certificate</translation>
+      <translation>Vis certifikat</translation>
     </message>
     <message>
       <source>Server certificate is invalid.</source>
-      <translation type="unfinished">Server certificate is invalid.</translation>
+      <translation>Servercertifikat er ugyldigt.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
     <message>
       <source>The certificate is pinned to %1</source>
-      <translation type="unfinished">The certificate is pinned to %1</translation>
+      <translation>Certifikatet er fastgjort til %1</translation>
     </message>
     <message>
       <source>The certificate was presented by %1</source>
-      <translation type="unfinished">The certificate was presented by %1</translation>
+      <translation>Certifikatet blev præsenteret af %1</translation>
     </message>
     <message>
       <source>Server Id: %1</source>
@@ -9976,29 +9975,29 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Custom certificate</source>
-      <translation type="unfinished">Custom certificate</translation>
+      <translation>Brugerdefineret certifikat</translation>
     </message>
     <message>
       <source>Pinned certificate</source>
-      <translation type="unfinished">Pinned certificate</translation>
+      <translation>Fastgjort certifikat</translation>
     </message>
     <message>
       <source>Unknown certificate</source>
-      <translation type="unfinished">Unknown certificate</translation>
+      <translation>Ukendt certifikat</translation>
     </message>
     <message>
       <source>This is a custom certificate installed on %1</source>
-      <translation type="unfinished">This is a custom certificate installed on %1</translation>
+      <translation>Dette er et brugerdefineret certifikat installeret på %1</translation>
     </message>
     <message>
       <source>Pin this certificate to %1?</source>
-      <translation type="unfinished">Pin this certificate to %1?</translation>
+      <translation>Fastgør dette certifikat til %1?</translation>
     </message>
     <message>
       <source>Someone may be impersonating %1 to steel your personal information.
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steel your personal information.
-Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
+      <translation>Nogen udgiver sig muligvis som %1 for at stjæle dine personlige oplysninger.
+Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-certifikat.</translation>
     </message>
     <message>
       <source>Pin</source>
@@ -10009,15 +10008,15 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
     <message>
       <source>View certificate</source>
-      <translation type="unfinished">View certificate</translation>
+      <translation>Vis certifikat</translation>
     </message>
     <message>
       <source>Connect Anyway</source>
-      <translation type="unfinished">Connect Anyway</translation>
+      <translation>Tilslut alligevel</translation>
     </message>
     <message>
       <source>I trust this server</source>
-      <translation type="unfinished">I trust this server</translation>
+      <translation>Jeg tillid til denne server</translation>
     </message>
     <message>
       <source>System:</source>
@@ -10033,7 +10032,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Trust this server?</source>
-      <translation type="unfinished">Trust this server?</translation>
+      <translation>Hav tillid til denne server?</translation>
     </message>
     <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
@@ -10545,7 +10544,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Hide</source>
-      <translation type="unfinished">Hide</translation>
+      <translation>Skjul</translation>
     </message>
     <message>
       <source>Unable to connect to the system because it has become offline</source>
@@ -10678,15 +10677,15 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>High-Res</source>
-      <translation type="unfinished">High-Res</translation>
+      <translation>Høj Opløsning</translation>
     </message>
     <message>
       <source>Low-Res</source>
-      <translation type="unfinished">Low-Res</translation>
+      <translation>Lav Opløsning</translation>
     </message>
     <message>
       <source>All streams</source>
-      <translation type="unfinished">All streams</translation>
+      <translation>Alle streams</translation>
     </message>
   </context>
   <context>
@@ -10758,11 +10757,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
     <message>
       <source>New Group</source>
-      <translation type="unfinished">New Group</translation>
+      <translation>Ny gruppe</translation>
     </message>
     <message>
       <source>New Group %1</source>
-      <translation type="unfinished">New Group %1</translation>
+      <translation>Ny gruppe %1</translation>
     </message>
   </context>
   <context>
@@ -11324,7 +11323,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <message>
       <source>%1 Beta</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 Beta</translation>
+      <translation>%1 Beta</translation>
     </message>
   </context>
   <context>
@@ -11335,7 +11334,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Press Esc to stop the tour.</source>
-      <translation type="unfinished">Press Esc to stop the tour.</translation>
+      <translation>Tryk på Esc for at stoppe turen.</translation>
     </message>
   </context>
   <context>
@@ -11398,7 +11397,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <name>nx::vms::client::desktop::ui::workbench::ResourceGroupingActionHandler</name>
     <message>
       <source>Maximum level of nesting is reached</source>
-      <translation type="unfinished">Maximum level of nesting is reached</translation>
+      <translation>Maksimalt niveau for nesting er nået</translation>
     </message>
   </context>
   <context>
@@ -11530,24 +11529,24 @@ to view more bookmarks</translation>
     <name>nx::vms::update::desktop::ClientUpdateManager</name>
     <message>
       <source>Restart Client</source>
-      <translation type="unfinished">Restart Client</translation>
+      <translation>Genstart klient</translation>
     </message>
     <message>
       <source>Updates Settings</source>
-      <translation type="unfinished">Updates Settings</translation>
+      <translation>Opdatér indstillinger</translation>
     </message>
     <message>
       <source>Client update is installed</source>
-      <translation type="unfinished">Client update is installed</translation>
+      <translation>Klientopdatering er installeret</translation>
     </message>
     <message>
       <source>Client is updated to version %1. Restart %2 to finish update.</source>
       <comment>%1 is a version like &apos;4.3.0&apos;, %2 is a VMS name like &apos;Nx Witness&apos;</comment>
-      <translation type="unfinished">Client is updated to version %1. Restart %2 to finish update.</translation>
+      <translation>Klienten er opdateret til version %1. Genstart %2 for at afslutte opdateringen.</translation>
     </message>
     <message>
       <source>Automatic client updates</source>
-      <translation type="unfinished">Automatic client updates</translation>
+      <translation>Automatiske klientopdateringer</translation>
     </message>
     <message>
       <source>New client-only updates will be installed automatically. You can change this in the settings.</source>

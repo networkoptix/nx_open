@@ -90,18 +90,18 @@
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
+      <translation>
+        <numerusform>%n nieuwe resultaten</numerusform>
+        <numerusform>%n nieuwe resultaten</numerusform>
       </translation>
     </message>
     <message>
       <source>new results</source>
-      <translation type="unfinished">new results</translation>
+      <translation>nieuwe resultaten</translation>
     </message>
     <message>
       <source>Detected by</source>
-      <translation type="unfinished">Detected by</translation>
+      <translation>Gedetecteerd door</translation>
     </message>
   </context>
   <context>
@@ -136,14 +136,14 @@
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
+      <translation>
+        <numerusform>%n nieuwe resultaten</numerusform>
+        <numerusform>%n nieuwe resultaten</numerusform>
       </translation>
     </message>
     <message>
       <source>new results</source>
-      <translation type="unfinished">new results</translation>
+      <translation>nieuwe resultaten</translation>
     </message>
   </context>
   <context>
@@ -483,7 +483,7 @@
     <name>InformationBubble</name>
     <message>
       <source>Detected by</source>
-      <translation type="unfinished">Detected by</translation>
+      <translation>Gedetecteerd door</translation>
     </message>
   </context>
   <context>
@@ -521,7 +521,7 @@
     </message>
     <message>
       <source>Previous Object</source>
-      <translation type="unfinished">Previous Object</translation>
+      <translation>Vorig object</translation>
     </message>
     <message>
       <source>Pause</source>
@@ -533,11 +533,11 @@
     </message>
     <message>
       <source>Next Object</source>
-      <translation type="unfinished">Next Object</translation>
+      <translation>Volgend object</translation>
     </message>
     <message>
       <source>Toggle Repeat</source>
-      <translation type="unfinished">Toggle Repeat</translation>
+      <translation>Schakel Herhalen in</translation>
     </message>
   </context>
   <context>
@@ -803,7 +803,7 @@
     </message>
     <message>
       <source>preview is not available for the selected object</source>
-      <translation type="unfinished">preview is not available for the selected object</translation>
+      <translation>voorbeeld is niet beschikbaar voor het geselecteerde object</translation>
     </message>
   </context>
   <context>
@@ -873,7 +873,7 @@ om PTZ te activeren</translation>
     </message>
     <message>
       <source>Subtype</source>
-      <translation type="unfinished">Subtype</translation>
+      <translation>Subtype</translation>
     </message>
   </context>
   <context>
@@ -1025,7 +1025,7 @@ om PTZ te activeren</translation>
     <name>SelectOverlappedIdDialog</name>
     <message>
       <source>Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</source>
-      <translation type="unfinished">Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</translation>
+      <translation>Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</translation>
     </message>
     <message>
       <source>Select</source>
