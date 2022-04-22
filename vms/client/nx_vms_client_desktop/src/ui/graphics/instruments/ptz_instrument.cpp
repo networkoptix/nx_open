@@ -497,7 +497,8 @@ void PtzInstrument::updatePromo(QnMediaResourceWidget* widget)
     }
 
     const bool showPromo = widget->options().testFlag(QnResourceWidget::ControlPtz)
-        && !qnSettings->isPtzAimOverlayEnabled();
+        && !qnSettings->isPtzAimOverlayEnabled()
+        && widget->ptzActivationReason() != QnMediaResourceWidget::PtzEnabledBy::joystick;
 
     const bool animate = display()->animationAllowed();
 
