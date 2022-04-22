@@ -20,7 +20,7 @@ class LogUploader:
 public:
     ~LogUploader()
     {
-        if(m_uploader)
+        if (m_uploader)
             m_uploader->pleaseStopSync();
     }
 
@@ -28,15 +28,7 @@ protected:
     virtual void SetUp() override
     {
         startCollector();
-    }
 
-    void givenStartedUploader()
-    {
-        givenStartedUploaderWithTimeout(std::nullopt);
-    }
-
-    void givenStartedUploaderWithTimeout(std::optional<std::chrono::milliseconds> timeout)
-    {
         m_sessionId = QnUuid::createUuid().toSimpleStdString();
 
         nx::utils::log::LevelSettings filter;
@@ -46,6 +38,16 @@ protected:
             nx::utils::log::Level::verbose);
 
         m_uploader = std::make_unique<Uploader>(collectorUrl(), m_sessionId, filter);
+        m_uploader->setMinBufSizeToUpload(/*do not accumulate data before uploading*/ 0);
+    }
+
+    void givenStartedUploader()
+    {
+        givenStartedUploaderWithTimeout(std::nullopt);
+    }
+
+    void givenStartedUploaderWithTimeout(std::optional<std::chrono::milliseconds> timeout)
+    {
         m_uploader->start(timeout, [this](auto&&... args) {
             saveUploadResult(std::forward<decltype(args)>(args)...);
         });
@@ -54,9 +56,15 @@ protected:
     void whenGenerateSomeLogs()
     {
         for (int i = 0; i < 7; ++i)
+            generateLogMessage();
+    }
+
+    void whenGenerateLogsOfSize(std::size_t size)
+    {
+        for (std::size_t totalSize = 0; totalSize < size; )
         {
-            m_generatedLogs.push_back(nx::utils::generateRandomName(15));
-            NX_VERBOSE(this, "Log uploader test message %1", m_generatedLogs.back());
+            generateLogMessage();
+            totalSize += m_generatedLogs.back().size();
         }
     }
 
@@ -86,9 +94,47 @@ protected:
         }
     }
 
+    void thenSomeLogsAreUploadedEventually()
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+
+        for (;;)
+        {
+            auto& uploadedLogs = m_uploadedLogs[m_sessionId];
+            if (!uploadedLogs.empty())
+                break;
+
+            lock.unlock();
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            lock.relock();
+        }
+
+        auto& uploadedLogs = m_uploadedLogs[m_sessionId];
+
+        const auto found = std::all_of(
+            uploadedLogs.begin(), uploadedLogs.end(),
+            [this](const std::string& uploaded)
+            {
+                return std::any_of(
+                    m_generatedLogs.begin(), m_generatedLogs.end(),
+                    [&uploaded](const std::string& generated) {
+                        return uploaded.find(generated) != std::string::npos;
+                    });
+            });
+
+        ASSERT_TRUE(found);
+    }
+
     void thenUploaderCompleted()
     {
         m_lastUploadResult = m_uploadResults.pop();
+    }
+
+    template<typename F>
+    void andEachUploadedFragment(F f)
+    {
+        for (const auto& fragment: m_uploadedFragments)
+            f(fragment);
     }
 
     UploadResult uploaderResult()
@@ -99,6 +145,11 @@ protected:
     void setCollectorMalfunctioning(http::StatusCode::Value val)
     {
         m_collectorForcedResponse = val;
+    }
+
+    Uploader& uploader()
+    {
+        return *m_uploader;
     }
 
 private:
@@ -125,6 +176,7 @@ private:
         {
             NX_MUTEX_LOCKER lock(&m_mutex);
             const auto str = requestContext.request.messageBody.toStdString();
+            m_uploadedFragments.push_back(str);
             http::StringLineIterator splitter(str);
             for (auto line = splitter.next(); line; line = splitter.next())
                 m_uploadedLogs[sessionId].push_back(std::string(*line));
@@ -144,16 +196,25 @@ private:
         m_uploadResults.push(std::move(result));
     }
 
+    void generateLogMessage()
+    {
+        m_generatedLogs.push_back(nx::format("Log uploader test message %1",
+            nx::utils::generateRandomName(15)).toStdString());
+
+        NX_VERBOSE(this, m_generatedLogs.back());
+    }
+
 private:
-    http::TestHttpServer m_collector;
     std::vector<std::string> m_generatedLogs;
     std::unique_ptr<Uploader> m_uploader;
     std::string m_sessionId;
     nx::Mutex m_mutex;
     std::unordered_map<std::string /*sessionId*/, std::vector<std::string>> m_uploadedLogs;
+    std::vector<std::string> m_uploadedFragments;
     std::optional<http::StatusCode::Value> m_collectorForcedResponse;
     nx::utils::SyncQueue<UploadResult> m_uploadResults;
     std::optional<UploadResult> m_lastUploadResult;
+    http::TestHttpServer m_collector;
 };
 
 TEST_F(LogUploader, log_is_uploaded_to_collector)
@@ -174,6 +235,23 @@ TEST_F(LogUploader, unsuccessful_upload_is_finished_on_timeout)
     ASSERT_EQ(0, uploaderResult().bytesUploaded);
     ASSERT_GE(uploaderResult().bytesDropped, 0);
     ASSERT_EQ(http::StatusCode::forbidden, uploaderResult().lastHttpError);
+}
+
+TEST_F(LogUploader, data_is_accumulated_before_upload)
+{
+    static const std::size_t uploadChunkSize = 1024;
+
+    uploader().setAccumulateDataTimeout(std::chrono::hours(100));
+    uploader().setMinBufSizeToUpload(uploadChunkSize);
+
+    givenStartedUploader();
+
+    whenGenerateLogsOfSize(10 * uploadChunkSize);
+    std::this_thread::sleep_for(std::chrono::milliseconds(350));
+
+    thenSomeLogsAreUploadedEventually();
+    andEachUploadedFragment(
+        [](const auto& fragment) { ASSERT_GE(fragment.size(), uploadChunkSize); });
 }
 
 } // namespace nx::network::maintenance::log::test
