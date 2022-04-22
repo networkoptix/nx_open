@@ -92,7 +92,6 @@ public:
     static quint8* addStartCode(quint8* buffer, quint8* boundStart);
     static QByteArray dropBorderedStartCodes(const QByteArray& sourceNal);
 
-    static int extractUEGolombCode(BitStreamReader& bitReader);
     static void writeUEGolombCode(BitStreamWriter& bitWriter, quint32 value);
     void writeSEGolombCode(BitStreamWriter& bitWriter, qint32 value);
     const BitStreamReader& getBitReader() const {return bitReader;}

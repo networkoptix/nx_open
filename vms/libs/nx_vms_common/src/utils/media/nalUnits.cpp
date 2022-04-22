@@ -195,9 +195,9 @@ bool NALUnit::isIFrame(const quint8* data, int dataLen)
     try
     {
         //extract first_mb_in_slice
-        NALUnit::extractUEGolombCode(bitReader);
+        bitReader.getGolomb();
 
-        int slice_type = NALUnit::extractUEGolombCode(bitReader);
+        int slice_type = bitReader.getGolomb();
         if (slice_type >= 5)
             slice_type -= 5; // +5 flag is: all other slice at this picture must be same type
 
@@ -276,13 +276,6 @@ void NALUnit::writeUEGolombCode(BitStreamWriter& bitWriter, quint32 value)
 
     bitWriter.putBits(nBit+1, 1);
     bitWriter.putBits(nBit, value - (x-1));
-}
-
-int NALUnit::extractUEGolombCode(BitStreamReader& bitReader)
-{
-    int cnt = 0;
-    for ( ; bitReader.getBits(1) == 0; cnt++) {}
-    return (1 << cnt)-1 + bitReader.getBits(cnt);
 }
 
 int NALUnit::extractSEGolombCode()

@@ -143,9 +143,9 @@ std::vector<PeerDistanceRecord> deserializePeersMessage(const QByteArray& data, 
             PeerNumberType firstVia = kUnknownPeerNumnber;
             if (isOnline)
             {
-                distance = NALUnit::extractUEGolombCode(reader); // todo: move function to another place
+                distance = reader.getGolomb(); // todo: move function to another place
                 if (distance > 0)
-                    firstVia = NALUnit::extractUEGolombCode(reader);
+                    firstVia = reader.getGolomb();
             }
             else
             {

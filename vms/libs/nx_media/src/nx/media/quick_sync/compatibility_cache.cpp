@@ -35,7 +35,7 @@ bool CompatibilityCache::isDecodableCached(const QnConstCompressedVideoDataPtr& 
     if (!frame) //< TODO temporary ignore empty frame for new player interface
         return true;
 
-    auto extraData = nx::media::buildExtraData(frame);
+    auto extraData = nx::media::buildExtraDataAnnexB(frame);
     if (extraData.empty())
         return true;
 

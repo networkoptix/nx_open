@@ -59,6 +59,7 @@ public:
     BitStreamReader(const uint8_t* buffer, const uint8_t* end);
 
     void setBuffer(const uint8_t* buffer, const uint8_t* end);
+    void setBuffer(const uint8_t* buffer, int size);
     uint32_t getBits(uint32_t num);
     uint32_t showBits(uint32_t num);
     uint32_t getBit();
@@ -67,6 +68,8 @@ public:
     void skipBit();
     void readData(uint8_t* data, int size);
     int bitsLeft() const { return m_totalBits; }
+    int getGolomb();
+    int getSignedGolomb();
 
     uint32_t getBitsCount() const
     {

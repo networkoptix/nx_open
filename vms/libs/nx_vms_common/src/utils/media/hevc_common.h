@@ -6,7 +6,11 @@
 #include <vector>
 #include <QtCore/QString>
 
+#include <utils/media/nalUnits.h>
+
 namespace nx::media::hevc {
+
+static const uint8_t kPayloadHeaderNalUnitTypeMask = 0x7e;
 
 enum class NalUnitType
 {
@@ -67,6 +71,23 @@ struct NX_VMS_COMMON_API NalUnitHeader
     bool decode(const uint8_t* const payload, int payloadLength, QString* outErrorString = nullptr);
 };
 
+template<typename NalUnitType>
+bool parseNalUnit(const uint8_t* data, int size, NalUnitType& result)
+{
+    if (size <= NalUnitHeader::kTotalLength)
+        return false;
+
+    data += NalUnitHeader::kTotalLength;
+    size -= NalUnitHeader::kTotalLength;
+
+    // Remove emulation_prevention_three_byte.
+    std::vector<uint8_t> decodedBuffer(size);
+    auto decodedData = decodedBuffer.data();
+
+    int decodedSize = NALUnit::decodeNAL(data, data + size, decodedData, size);
+    return result.read(decodedData, decodedSize);
+}
+
 NX_VMS_COMMON_API PacketType fromNalUnitTypeToPacketType(NalUnitType unitType);
 bool isValidUnitType(int unitType);
 NX_VMS_COMMON_API bool isRandomAccessPoint(NalUnitType unitType);
@@ -75,9 +96,6 @@ bool isTrailingPicture(NalUnitType unitType);
 bool isParameterSet(NalUnitType unitType);
 NX_VMS_COMMON_API bool isSlice(NalUnitType unitType);
 NX_VMS_COMMON_API bool isNewAccessUnit(NalUnitType unitType); //< check is new AU, exlcuding slices
-
-NX_VMS_COMMON_API std::vector<uint8_t> buildExtraDataAnnexB(const uint8_t* data, int32_t size);
-NX_VMS_COMMON_API std::vector<uint8_t> buildExtraData(const uint8_t* data, int32_t size);
 
 } // namespace nx::media::hevc
 

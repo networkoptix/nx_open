@@ -95,9 +95,9 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getH264FrameType(
             BitStreamReader bitReader;
             bitReader.setBuffer(data + 1, end);
             try {
-                /*int first_mb_in_slice =*/ NALUnit::extractUEGolombCode(bitReader);
+                /*int first_mb_in_slice =*/ bitReader.getGolomb();
 
-                int slice_type = NALUnit::extractUEGolombCode(bitReader);
+                int slice_type = bitReader.getGolomb();
                 if (slice_type >= 5)
                     slice_type -= 5; //< +5 flag is: all other slices at this picture must be of the same type.
 
