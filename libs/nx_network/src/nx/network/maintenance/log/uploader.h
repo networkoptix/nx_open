@@ -12,6 +12,7 @@
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/maintenance/log/utils.h>
+#include <nx/reflect/instrument.h>
 #include <nx/utils/log/log_level.h>
 #include <nx/utils/log/logger_collection.h>
 #include <nx/utils/thread/mutex.h>
@@ -27,6 +28,10 @@ struct UploadResult
     std::optional<std::string> lastErrorText;
     std::optional<http::StatusCode::Value> lastHttpError;
 };
+
+NX_REFLECTION_INSTRUMENT(
+    UploadResult,
+    (duration)(bytesUploaded)(bytesDropped)(lastErrorText)(lastHttpError))
 
 class BufferedLogWriter;
 
@@ -55,12 +60,29 @@ public:
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
     static constexpr std::size_t kDefaultBufferSize = 128 * 1024;
+    static constexpr std::size_t kMinBufSizeToUpload = 4 * 1024;
+    static constexpr std::chrono::milliseconds kAccumulateDataTimeout = std::chrono::seconds(3);
 
     /**
      * Set buffer size for not-yet-sent log messages. By default, kDefaultBufferSize.
      * Must be set before Uploader::start.
      */
     void setLogBufferSize(std::size_t size);
+
+    /**
+     * If non-zero, then uploader accumulates at least size data before uploading.
+     * If data was not accumulated during AccumulateDataTimeout, then existing data
+     * is uploaded.
+     * If zero, then the data is uploaded right away, without any delay.
+     * By default, kMinBufSizeToUpload.
+     */
+    void setMinBufSizeToUpload(std::size_t);
+
+    /**
+     * See Uploader::setMinBufSizeToUpload.
+     * Default value is kAccumulateDataTimeout.
+     */
+    void setAccumulateDataTimeout(std::chrono::milliseconds);
 
     /**
      * @param handler invoked when timeLimit has been exceeded.
@@ -93,6 +115,15 @@ private:
     void reportResult();
 
 private:
+    enum class State
+    {
+        init,
+        working,
+        stopRequested,
+        flushing,
+        done,
+    };
+
     const nx::utils::Url m_uploadLogFragmentUrl;
     const nx::utils::log::LevelSettings m_logFilter;
     UploadResult m_progress;
@@ -104,7 +135,11 @@ private:
     std::shared_ptr<BufferedLogWriter> m_logWriter;
     std::chrono::steady_clock::time_point m_startTime;
     std::size_t m_logBufferSize = kDefaultBufferSize;
+    std::optional<std::chrono::steady_clock::time_point> m_minBufWaitStartClock;
+    std::size_t m_minBufSizeToUpload = kMinBufSizeToUpload;
+    std::chrono::milliseconds m_accumulateDataTimeout = kAccumulateDataTimeout;
 
+    State m_state = State::init;
     bool m_uploading = false;
     std::unique_ptr<http::AsyncClient> m_uploadClient;
     std::size_t m_lastSentBufSize = 0;

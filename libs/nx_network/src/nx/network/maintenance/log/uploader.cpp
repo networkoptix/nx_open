@@ -5,6 +5,7 @@
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/rest/http_rest_client.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/reflect/json.h>
 #include <nx/utils/log/logger_builder.h>
 #include <nx/utils/log/log_writers.h>
 #include <nx/utils/log/log_settings.h>
@@ -72,6 +73,7 @@ public:
             return; //< Skip message.
 
         m_buffer += message.toStdString();
+        m_buffer += "\r\n";
     }
 
     nx::Buffer takeBuffer()
@@ -83,8 +85,14 @@ public:
         return result;
     }
 
+    std::size_t bufSize() const
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        return (std::size_t) m_buffer.size();
+    }
+
 private:
-    nx::Mutex m_mutex;
+    mutable nx::Mutex m_mutex;
     nx::Buffer m_buffer;
     std::size_t m_maxBufferSize = 0;
 };
@@ -123,11 +131,21 @@ void Uploader::setLogBufferSize(std::size_t size)
     m_logBufferSize = size;
 }
 
+void Uploader::setMinBufSizeToUpload(std::size_t val)
+{
+    m_minBufSizeToUpload = val;
+}
+
+void Uploader::setAccumulateDataTimeout(std::chrono::milliseconds val)
+{
+    m_accumulateDataTimeout = val;
+}
+
 void Uploader::start(
     std::optional<std::chrono::milliseconds> timeLimit,
     Handler handler)
 {
-    NX_VERBOSE(this, "Starting log uploader. Filter %1, url %2",
+    NX_DEBUG(this, "Starting log uploader. Filter %1, url %2",
         m_logFilter, m_uploadLogFragmentUrl);
 
     if (auto err = installLogger(); err)
@@ -135,6 +153,7 @@ void Uploader::start(
 
     post([this, timeLimit, handler = std::move(handler)]() mutable {
         m_handler = std::move(handler);
+        m_state = State::working;
 
         if (timeLimit)
             m_timer.start(*timeLimit, [this]() { onTimeout(); });
@@ -160,6 +179,8 @@ void Uploader::stopSync()
             m_logWriter = nullptr;
         }
         m_handler = nullptr;
+
+        NX_DEBUG(this, "Stopped log uploader. %1", nx::reflect::json::serialize(m_progress));
     });
 }
 
@@ -224,7 +245,9 @@ void Uploader::removeLogger()
 
 void Uploader::onTimeout()
 {
-    reportResult();
+    // Waiting for the ongoing upload to complete.
+    // If there is not-uploaded data, it should be uploaded.
+    m_state = State::stopRequested;
 }
 
 void Uploader::checkUploadQueue()
@@ -232,9 +255,40 @@ void Uploader::checkUploadQueue()
     if (m_uploading)
         return;
 
+    if (m_state >= State::flushing)
+        return reportResult();
+
+    const auto bufSize = m_logWriter->bufSize();
+
+    if (m_state == State::working)
+    {
+        // Waiting for the buffer size to reach some minimum size.
+        // But, waiting no longer than kAccumulateDataTimeout.
+        if (bufSize < m_minBufSizeToUpload &&
+            (!m_minBufWaitStartClock ||
+                nx::utils::monotonicTime() - *m_minBufWaitStartClock < m_accumulateDataTimeout))
+        {
+            if (!m_minBufWaitStartClock)
+                m_minBufWaitStartClock = nx::utils::monotonicTime();
+            return;
+        }
+    }
+    else if (m_state == State::stopRequested)
+    {
+        m_state = State::flushing;
+        if (bufSize == 0)
+            return reportResult();
+        //else
+        //    uploading the buffer regardless of its size.
+    }
+    else
+    {
+        NX_ASSERT(false, nx::format("m_state = %1", (int) m_state));
+    }
+
+    m_minBufWaitStartClock = std::nullopt;
+
     auto buf = m_logWriter->takeBuffer();
-    if (buf.empty())
-        return;
 
     if (!m_uploadClient)
         m_uploadClient = std::make_unique<http::AsyncClient>(ssl::kDefaultCertificateCheck);

@@ -691,7 +691,7 @@ void AsyncClient::onMessageReceived(Message message)
 
     NX_VERBOSE(this, "Response headers from %1 has been successfully read: %2",
         m_contentLocationUrl,
-        logTraffic() ? response()->toString() : response()->statusLine.toString());
+        nx::utils::trim(logTraffic() ? response()->toString() : response()->statusLine.toString(), "\r\n"));
 
     if (repeatRequestIfNeeded(*m_response.response))
         return;
