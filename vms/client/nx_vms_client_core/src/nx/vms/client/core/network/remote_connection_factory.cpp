@@ -326,9 +326,14 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
             else if (credentials.authToken.empty())
             {
                 // Developer mode code.
-                credentials = nx::network::http::Credentials(
-                    qnCloudStatusWatcher->cloudLogin().toStdString(),
-                    nx::network::http::PasswordAuthToken(settings()->digestCloudPassword()));
+                context->logonData.credentials.username =
+                    qnCloudStatusWatcher->cloudLogin().toStdString();
+                if (!context->logonData.credentials.authToken.isPassword()
+                    || context->logonData.credentials.authToken.value.empty())
+                {
+                    context->logonData.credentials.authToken =
+                        nx::network::http::PasswordAuthToken(settings()->digestCloudPassword());
+                }
             }
         }
     }
