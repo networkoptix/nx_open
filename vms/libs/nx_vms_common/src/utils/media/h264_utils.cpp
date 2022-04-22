@@ -127,7 +127,7 @@ std::vector<uint8_t> buildExtraDataAnnexB(const uint8_t* data, int32_t size)
     return extraData;
 }
 
-std::vector<uint8_t> buildExtraData(const uint8_t* data, int32_t size)
+std::vector<uint8_t> buildExtraDataMp4(const uint8_t* data, int32_t size)
 {
     std::vector<std::vector<uint8_t>> spsVector;
     std::vector<std::vector<uint8_t>> ppsVector;

@@ -49,7 +49,7 @@ void logCallback(void* ptr, int level, const char* fmt, va_list vl)
             if (size > 0 && message[size - 1] == '\n')
                 message[size - 1] = 0;
 
-            NX_DEBUG(NX_SCOPE_TAG, "%1", message);
+            NX_ERROR(NX_SCOPE_TAG, "%1", message);
             break;
     }
 }

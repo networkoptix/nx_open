@@ -44,7 +44,7 @@ void moveBits(uint8_t* buffer, int oldBitOffset, int newBitOffset, int len)
     BitStreamWriter writer;
     writer.setBuffer(dst, dst + len/8 + 1 + increaseInBytes);
     writer.skipBits(newBitOffset % 8);
-    if (oldBitOffset % 8) 
+    if (oldBitOffset % 8)
     {
         reader.skipBits(oldBitOffset % 8);
         int c = 8 - (oldBitOffset % 8);
@@ -104,6 +104,11 @@ void BitStreamReader::setBuffer(const uint8_t* buffer, const uint8_t* end)
     BitStream::setBuffer(buffer, end);
     m_curVal = getCurVal(m_buffer);
     m_bitLeft = INT_BIT;
+}
+
+void BitStreamReader::setBuffer(const uint8_t* buffer, int size)
+{
+    setBuffer(buffer, buffer + size);
 }
 
 void BitStreamReader::readData(uint8_t* data, int size)
@@ -218,6 +223,24 @@ void BitStreamReader::skipBit()
         m_bitLeft = INT_BIT - 1;
     }
     m_totalBits--;
+}
+
+int BitStreamReader::getGolomb()
+{
+    int cnt = 0;
+    for ( ; getBits(1) == 0; cnt++) {}
+    return (1 << cnt)-1 + getBits(cnt);
+}
+
+int BitStreamReader::getSignedGolomb()
+{
+    int value = getGolomb();
+
+    if (value % 2) {
+        return value / 2 + 1;
+    } else {
+        return -value / 2;
+    }
 }
 
 void BitStreamWriter::putBits(uint32_t num, uint32_t value)

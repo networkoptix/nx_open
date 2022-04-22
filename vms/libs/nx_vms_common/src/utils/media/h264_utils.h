@@ -13,7 +13,7 @@
 namespace nx::media::h264 {
 
 NX_VMS_COMMON_API std::vector<uint8_t> buildExtraDataAnnexB(const uint8_t* data, int32_t size);
-NX_VMS_COMMON_API std::vector<uint8_t> buildExtraData(const uint8_t* data, int32_t size);
+NX_VMS_COMMON_API std::vector<uint8_t> buildExtraDataMp4(const uint8_t* data, int32_t size);
 
 NX_VMS_COMMON_API std::vector<nal::NalUnitInfo> decodeNalUnits(const QnCompressedVideoData* videoData);
 
