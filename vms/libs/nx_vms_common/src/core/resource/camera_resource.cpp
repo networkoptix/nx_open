@@ -420,11 +420,11 @@ bool QnVirtualCameraResource::saveBitrateIfNeeded( const CameraBitrateInfo& bitr
 
         // Generally update should not happen more often than once per
         // UPDATE_BITRATE_TIMEOUT_DAYS
-        if (lastTime.isValid() && lastTime < time &&
-            lastTime.addDays(UPDATE_BITRATE_TIMEOUT_DAYS) > time)
+        if (lastTime.isValid()
+            && lastTime.addDays(UPDATE_BITRATE_TIMEOUT_DAYS) < time)
         {
             // If camera got configured we shell update anyway
-            bool isGotConfigured = bitrateInfo.isConfigured &&
+            bool isGotConfigured = bitrateInfo.isConfigured ||
                 it->isConfigured != bitrateInfo.isConfigured;
 
             if (!isGotConfigured)
