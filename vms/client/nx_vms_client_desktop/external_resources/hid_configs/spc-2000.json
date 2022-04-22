@@ -170,7 +170,11 @@
 		{
 			"bits": "58",
 			"name": "11",
-			"actions": [{ "id": "PtzFocusAutoAction" }]
+			"actions":
+			[
+				{ "id": "FullscreenResourceAction" },
+				{ "id": "FullscreenResourceAction" }
+			]
 		},
 		{
 			"bits": "59",
