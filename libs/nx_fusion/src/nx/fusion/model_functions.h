@@ -56,10 +56,10 @@ __VA_ARGS__ uint qHash(const TYPE &value, uint seed) {                          
 namespace Qn {
 
 template<typename OutputData>
-QByteArray serialized(
-    const OutputData& outputData, Qn::SerializationFormat format, bool extraFormatting)
+std::optional<QByteArray> trySerialize(const OutputData& outputData,
+    Qn::SerializationFormat format, bool extraFormatting)
 {
-    switch(format)
+    switch (format)
     {
         case Qn::UbjsonFormat:
             return QnUbjson::serialized(outputData);
@@ -81,11 +81,18 @@ QByteArray serialized(
             QByteArray result = QnXml::serialized(outputData, QStringLiteral("reply"));
             return result;
         }
-
         default:
-            NX_ASSERT(false);
-            return QJson::serialized(outputData);
+            return {};
     }
+}
+
+template<typename OutputData>
+QByteArray serialized(
+    const OutputData& outputData, Qn::SerializationFormat format, bool extraFormatting)
+{
+    auto serializedData = trySerialize(outputData, format, extraFormatting);
+    NX_ASSERT(serializedData.has_value());
+    return serializedData.has_value() ? *serializedData : QByteArray();
 }
 
 } // namespace Qn
