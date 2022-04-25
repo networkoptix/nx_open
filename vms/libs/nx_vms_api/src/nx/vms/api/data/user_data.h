@@ -95,7 +95,9 @@ struct NX_VMS_API UserData: ResourceData
     /**%apidoc[opt] Full name of the user.*/
     QString fullName;
 
+    // TODO: Remove when /ec2/getUsers and /ec2/saveUser compatibility below 5.1 can be dropped.
     bool adaptFromDeprecatedApi();
+    void cleanOnDeprecatedApiMerge(const QJsonValue& overrideValue);
     void adaptForDeprecatedApi();
 };
 #define UserData_Fields \

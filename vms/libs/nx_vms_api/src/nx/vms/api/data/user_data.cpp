@@ -41,6 +41,14 @@ bool UserData::adaptFromDeprecatedApi()
     return true;
 }
 
+void UserData::cleanOnDeprecatedApiMerge(const QJsonValue& overrideValue)
+{
+    const auto overrides =
+        [obj = overrideValue.toObject()](const auto& n) { return obj.find(n) != obj.end(); };
+    if (overrides("userRoleId") || overrides("userRoleIds"))
+        userRoleIds.clear();
+}
+
 void UserData::adaptForDeprecatedApi()
 {
     if (!userRoleIds.empty())
