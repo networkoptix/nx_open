@@ -197,6 +197,16 @@ CameraMediaStreams QnVirtualCameraResource::mediaStreams() const
 {
     const QString& mediaStreamsStr = getProperty(ResourcePropertyKey::kMediaStreams);
     CameraMediaStreams supportedMediaStreams = QJson::deserialized<CameraMediaStreams>(mediaStreamsStr.toLatin1());
+
+    // TODO #lbusygin: just for vms_4.2 version, get rid of this code when the mobile client
+    // stops supporting servers < 5.0.
+    for(auto& str: supportedMediaStreams.streams)
+    {
+        if (str.codec == AV_CODEC_ID_INDEO3)
+            str.codec = AV_CODEC_ID_H264;
+        if (str.codec == AV_CODEC_ID_FIC)
+            str.codec = AV_CODEC_ID_H265;
+    }
     return supportedMediaStreams;
 }
 
