@@ -26,7 +26,6 @@ struct SystemsVisibilitySortFilterModel::Private
 {
     nx::utils::ScopedConnections sourceModelConnections;
     QCollator collator;
-    int totalSystemsCount = 0;
 
     VisibilityScopeGetter visibilityScopeFilterGetter =
         []()
@@ -72,9 +71,6 @@ void SystemsVisibilitySortFilterModel::setSourceModel(QAbstractItemModel* source
     setFilterCaseSensitivity(Qt::CaseInsensitive);
     setFilterRole(QnSystemsModel::SearchRoleId);
 
-    d->totalSystemsCount = sourceModel->rowCount()
-        - forgottenSystemsCount(0, sourceModel->rowCount() - 1);
-
     d->sourceModelConnections <<
         QObject::connect(sourceModel, &QAbstractItemModel::dataChanged,
             [this](
@@ -97,26 +93,11 @@ void SystemsVisibilitySortFilterModel::setSourceModel(QAbstractItemModel* source
             });
     sort(0);
 
-    // Systems have to exist still.
-    d->sourceModelConnections << connect(sourceModel, &QnSystemsModel::rowsAboutToBeRemoved,
-        [this](const QModelIndex& /*parent*/, int first, int last)
-        {
-            const int totalSystemsDelta = last - first + 1 - forgottenSystemsCount(first, last);
-            d->totalSystemsCount -= totalSystemsDelta;
-
-            if (totalSystemsDelta > 0)
-                emit totalSystemsCountChanged();
-        });
+    d->sourceModelConnections << connect(sourceModel, &QnSystemsModel::rowsRemoved,
+        this, &SystemsVisibilitySortFilterModel::totalSystemsCountChanged);
 
     d->sourceModelConnections << connect(sourceModel, &QnSystemsModel::rowsInserted,
-        [this](const QModelIndex& /*parent*/, int first, int last)
-        {
-            const int totalSystemsDelta = last - first + 1 - forgottenSystemsCount(first, last);
-            d->totalSystemsCount += totalSystemsDelta;
-
-            if (totalSystemsDelta > 0)
-                emit totalSystemsCountChanged();
-        });
+        this, &SystemsVisibilitySortFilterModel::totalSystemsCountChanged);
 }
 
 void SystemsVisibilitySortFilterModel::setVisibilityScopeFilterCallbacks(
@@ -143,7 +124,6 @@ void SystemsVisibilitySortFilterModel::forgottenSystemAdded(const QString& syste
         const auto index = sourceModel()->index(row, 0);
         if (systemId == sourceModel()->data(index, QnSystemsModel::SystemIdRoleId))
         {
-            --d->totalSystemsCount;
             invalidateFilter();
             emit totalSystemsCountChanged();
             return;
@@ -161,7 +141,6 @@ void SystemsVisibilitySortFilterModel::forgottenSystemRemoved(const QString& sys
         const auto index = sourceModel()->index(row, 0);
         if (systemId == sourceModel()->data(index, QnSystemsModel::SystemIdRoleId))
         {
-            ++d->totalSystemsCount;
             invalidateFilter();
             emit totalSystemsCountChanged();
             return;
@@ -188,7 +167,7 @@ void SystemsVisibilitySortFilterModel::setVisibilityFilter(
 
 int SystemsVisibilitySortFilterModel::totalSystemsCount() const
 {
-    return d->totalSystemsCount;
+    return sourceModel()->rowCount() - forgottenSystemsCount(0, sourceModel()->rowCount() - 1);
 }
 
 bool SystemsVisibilitySortFilterModel::filterAcceptsRow(
