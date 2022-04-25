@@ -96,6 +96,8 @@ void ConnectTilesProxyModel::setSourceModel(QAbstractItemModel* sourceModel)
             [this]()
             {
                 endInsertRows();
+                emit systemsCountChanged();
+                emit totalSystemsCountChanged();
             });
 
     d->sourceModelConnections <<
@@ -112,6 +114,8 @@ void ConnectTilesProxyModel::setSourceModel(QAbstractItemModel* sourceModel)
             [this]()
             {
                 endRemoveRows();
+                emit systemsCountChanged();
+                emit totalSystemsCountChanged();
             });
 
     d->sourceModelConnections <<
@@ -178,16 +182,13 @@ void ConnectTilesProxyModel::setSourceModel(QAbstractItemModel* sourceModel)
             [this]()
             {
                 endResetModel();
+                emit systemsCountChanged();
+                emit totalSystemsCountChanged();
             });
 
     d->sourceModelConnections <<
         connect(d->visibilityModel, &SystemsVisibilitySortFilterModel::visibilityFilterChanged,
             this, &ConnectTilesProxyModel::visibilityFilterChanged);
-
-    connect(this, &ConnectTilesProxyModel::rowsRemoved,
-        this, &ConnectTilesProxyModel::systemsCountChanged);
-    connect(this, &ConnectTilesProxyModel::rowsInserted,
-        this, &ConnectTilesProxyModel::systemsCountChanged);
 
     connect(d->visibilityModel, &SystemsVisibilitySortFilterModel::totalSystemsCountChanged,
         this, &ConnectTilesProxyModel::totalSystemsCountChanged);
