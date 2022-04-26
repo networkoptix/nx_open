@@ -4,6 +4,14 @@
 
 namespace nx::vms::rules {
 
+QString NetworkIssueEvent::uniqueName() const
+{
+    return makeName(
+        ReasonedEvent::uniqueName(),
+        serverId().toString(),
+        QString::number(static_cast<int>(reasonCode())));
+}
+
 const ItemDescriptor& NetworkIssueEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{

@@ -12,6 +12,7 @@
 
 #include "action_field.h"
 #include "basic_action.h"
+#include "utils/field.h"
 
 namespace nx::vms::rules {
 
@@ -39,6 +40,16 @@ QnUuid ActionBuilder::id() const
 QString ActionBuilder::actionType() const
 {
     return m_actionType;
+}
+
+QnUuid ActionBuilder::ruleId() const
+{
+    return m_ruleId;
+}
+
+void ActionBuilder::setRuleId(const QnUuid& ruleId)
+{
+    m_ruleId = ruleId;
 }
 
 std::map<QString, QVariant> ActionBuilder::flatData() const
@@ -93,8 +104,18 @@ bool ActionBuilder::updateFlatData(const std::map<QString, QVariant>& data)
 
 void ActionBuilder::addField(const QString& name, std::unique_ptr<ActionField> field)
 {
-    // TODO: assert?
+    if (!NX_ASSERT(field))
+        return;
+
+    if (name == utils::kAggregationIntervalFieldName)
+    {
+        auto optionalTimeField = dynamic_cast<OptionalTimeField*>(field.get());
+        if (NX_ASSERT(optionalTimeField))
+            setAggregationInterval(seconds(optionalTimeField->value()));
+    }
+
     m_fields[name] = std::move(field);
+
     updateState();
 }
 
@@ -118,65 +139,33 @@ QSet<QString> ActionBuilder::requiredEventFields() const
     return result;
 }
 
-QSet<QnUuid> ActionBuilder::affectedResources(const EventData& eventData) const
+QSet<QnUuid> ActionBuilder::affectedResources(const EventPtr& event) const
 {
-    QSet<QnUuid> result;
-    for (auto field: m_targetFields)
-    {
-        auto value = field->build(eventData);
-        result += value.toUuid(); //TODO: #spanasenko Check result.
-    }
-    return result;
+    NX_ASSERT(false, "Not implemented");
+    return {};
 }
 
-ActionPtr ActionBuilder::process(const EventData& eventData)
+void ActionBuilder::process(EventPtr event)
 {
+    m_aggregatedEvent.aggregate(event);
+
     if (m_interval.count())
     {
         if (!m_timer.isActive())
+        {
             m_timer.start();
-
-        // TODO: #amalov Aggregate the event.
-        return {};
+            emit action(buildAction());
+        }
     }
     else
     {
-        if (!NX_ASSERT(m_constructor))
-            return {};
-
-        ActionPtr action(m_constructor());
-        if (!action)
-            return {};
-
-        for (const auto& propertyName: utils::propertyNames(action.get()))
-        {
-            if (m_fields.contains(propertyName))
-            {
-                auto& field = m_fields.at(propertyName);
-                const auto value = field->build(eventData);
-                action->setProperty(propertyName.toUtf8().data(), value);
-            }
-            else
-            {
-                // Set property value only if it exists.
-                if (action->property(propertyName.toUtf8().data()).isValid())
-                    action->setProperty(propertyName.toUtf8().data(), eventData.value(propertyName));
-            }
-        }
-
-        return action;
+        emit action(buildAction());
     }
 }
 
 void ActionBuilder::setAggregationInterval(seconds interval)
 {
     m_interval = interval;
-
-    m_timer.stop();
-    m_timer.setInterval(m_interval);
-    if (m_interval.count())
-        m_timer.start();
-    updateState();
 }
 
 seconds ActionBuilder::aggregationInterval() const
@@ -195,7 +184,11 @@ void ActionBuilder::connectSignals()
 
 void ActionBuilder::onTimeout()
 {
-    // emit aggregated action
+    if (!m_aggregatedEvent.empty())
+    {
+        m_timer.start();
+        emit action(buildAction());
+    }
 }
 
 void ActionBuilder::updateState()
@@ -207,6 +200,43 @@ void ActionBuilder::updateState()
 
     QScopedValueRollback<bool> guard(m_updateInProgress, true);
     emit stateChanged();
+}
+
+ActionPtr ActionBuilder::buildAction()
+{
+    AggregatedEvent aggregatedEvent = std::move(m_aggregatedEvent);
+
+    if (!NX_ASSERT(m_constructor) || !NX_ASSERT(!aggregatedEvent.empty()))
+        return {};
+
+    ActionPtr action(m_constructor());
+    if (!action)
+        return {};
+
+    action->setRuleId(m_ruleId);
+
+    const auto propertyNames =
+        nx::utils::propertyNames(action.get(), nx::utils::PropertyAccess::writable);
+    for (const auto& propertyName: propertyNames)
+    {
+        if (m_fields.contains(propertyName))
+        {
+            auto& field = m_fields.at(propertyName);
+            const auto value = field->build(aggregatedEvent);
+            action->setProperty(propertyName.toUtf8().data(), value);
+        }
+        else
+        {
+            // Set property value only if it exists.
+            if (action->property(propertyName.toUtf8().data()).isValid())
+            {
+                action->setProperty(
+                    propertyName.toUtf8().data(), aggregatedEvent.property(propertyName));
+            }
+        }
+    }
+
+    return action;
 }
 
 } // namespace nx::vms::rules

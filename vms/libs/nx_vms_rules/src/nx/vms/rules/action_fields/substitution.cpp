@@ -4,15 +4,20 @@
 
 #include <QtCore/QVariant>
 
+#include "../aggregated_event.h"
+
 namespace nx::vms::rules {
 
 Substitution::Substitution()
 {
 }
 
-QVariant Substitution::build(const EventData& eventData) const
+QVariant Substitution::build(const AggregatedEvent& aggregatedEvent) const
 {
-    const auto& value = eventData.value(m_eventFieldName.toUtf8().data());
+    // TODO: #mmalofeev what does substitution mean it case of the aggregated event?
+    QVariant value;
+    if (!aggregatedEvent.empty())
+        value = aggregatedEvent.initialEvent()->property(m_eventFieldName.toUtf8().data());
 
     return value.canConvert(QVariant::String)
         ? value.toString() //< TODO: #spanasenko Refactor.

@@ -32,6 +32,8 @@ public:
     {
     }
 
+    virtual QString uniqueName() const override;
+
     static FilterManifest filterManifest();
     static const ItemDescriptor& manifest();
 };

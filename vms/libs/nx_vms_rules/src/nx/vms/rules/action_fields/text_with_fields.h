@@ -18,7 +18,7 @@ class NX_VMS_RULES_API TextWithFields: public ActionField
 public:
     TextWithFields();
 
-    virtual QVariant build(const EventData& eventData) const override;
+    virtual QVariant build(const AggregatedEvent& aggregatedEvent) const override;
 
     QString text() const;
 

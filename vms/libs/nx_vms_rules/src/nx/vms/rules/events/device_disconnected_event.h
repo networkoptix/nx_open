@@ -19,6 +19,8 @@ public:
     DeviceDisconnectedEvent() = default;
     DeviceDisconnectedEvent(QnUuid deviceId, std::chrono::microseconds timestamp);
 
+    virtual QString uniqueName() const override;
+
     static const ItemDescriptor& manifest();
 };
 

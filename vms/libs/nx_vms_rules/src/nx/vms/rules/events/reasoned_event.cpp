@@ -17,4 +17,28 @@ ReasonedEvent::ReasonedEvent(
 {
 }
 
+QString ReasonedEvent::uniqueName() const
+{
+    switch (m_reasonCode)
+    {
+        case EventReason::storageIoError:
+        case EventReason::storageTooSlow:
+        case EventReason::storageFull:
+        case EventReason::systemStorageFull:
+        case EventReason::metadataStorageOffline:
+        case EventReason::metadataStorageFull:
+        case EventReason::metadataStoragePermissionDenied:
+        case EventReason::raidStorageError:
+        case EventReason::encryptionFailed:
+            return makeName(
+                BasicEvent::uniqueName(),
+                QString::number(static_cast<int>(m_reasonCode)),
+                m_reasonText);
+        default:
+            return makeName(
+                BasicEvent::uniqueName(),
+                QString::number(static_cast<int>(m_reasonCode)));
+    }
+}
+
 } // namespace nx::vms::rules

@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <nx/utils/metatypes.h>
+
 #include "../simple_type_field.h"
 
 namespace nx::vms::rules {
@@ -10,13 +12,12 @@ namespace nx::vms::rules {
  * Action field for storing optional time value. Typically displayed with a special editor widget.
  * Stores positive value in seconds if the editor checkbox is checked, zero otherwise.
  */
-class NX_VMS_RULES_API OptionalTimeField: public SimpleTypeActionField<int>
+class NX_VMS_RULES_API OptionalTimeField: public SimpleTypeActionField<std::chrono::seconds>
 {
     Q_OBJECT
     Q_CLASSINFO("metatype", "nx.actions.fields.optionalTime")
 
-    // TODO: #amalov Invert common dependency to use std::chrono instead of int.
-    Q_PROPERTY(int value READ value WRITE setValue)
+    Q_PROPERTY(std::chrono::seconds value READ value WRITE setValue)
 
 public:
     OptionalTimeField() = default;

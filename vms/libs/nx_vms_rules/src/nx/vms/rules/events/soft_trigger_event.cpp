@@ -8,6 +8,12 @@
 
 namespace nx::vms::rules {
 
+QString SoftTriggerEvent::uniqueName() const
+{
+    // All the soft trigger events must be considered as unique events.
+    return QnUuid::createUuid().toString();
+}
+
 FilterManifest SoftTriggerEvent::filterManifest()
 {
     return {};
