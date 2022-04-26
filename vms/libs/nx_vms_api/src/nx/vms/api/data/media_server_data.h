@@ -165,6 +165,7 @@ struct NX_VMS_API MediaServerUserAttributesData
      * "don't perform backup".
      */
     BackupBitrateBytesPerSecond backupBitrateBytesPerSecond;
+    int locationId = 0;
 
     /** Used by ...Model::toDbTypes() and transaction-description-modify checkers. */
     CheckResourceExists checkResourceExists = CheckResourceExists::yes; /**<%apidoc[unused] */
@@ -180,7 +181,9 @@ struct NX_VMS_API MediaServerUserAttributesData
     (maxCameras) \
     (allowAutoRedundancy) \
     (metadataStorageId) \
-    (backupBitrateBytesPerSecond)
+    (backupBitrateBytesPerSecond)\
+    (locationId)
+
 #define MediaServerUserAttributesData_Fields \
     (serverId) \
     (serverName) \

@@ -548,6 +548,18 @@ bool QnMediaServerResource::isRedundancy() const
     return m_userAttributes.allowAutoRedundancy;
 }
 
+void QnMediaServerResource::setLocationId(int value)
+{
+    NX_MUTEX_LOCKER lock(&m_attributesMutex);
+    m_userAttributes.locationId = value;
+}
+
+int QnMediaServerResource::locationId() const
+{
+    NX_MUTEX_LOCKER lock(&m_attributesMutex);
+    return m_userAttributes.locationId;
+}
+
 void QnMediaServerResource::setCompatible(bool value)
 {
     if (m_isCompatible == value)
