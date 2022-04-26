@@ -199,4 +199,51 @@
       <translation type="unfinished">Too many login attempts. Try again in a minute.</translation>
     </message>
   </context>
+  <context>
+    <name>nx::vms::client::core::CertificateWarning</name>
+    <message>
+      <source>Trust this server?</source>
+      <translation type="unfinished">Trust this server?</translation>
+    </message>
+    <message>
+      <source>Cannot verify the identity of %1</source>
+      <translation type="unfinished">Cannot verify the identity of %1</translation>
+    </message>
+    <message>
+      <source>Someone may be impersonating %1 to steal your personal information.</source>
+      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.</translation>
+    </message>
+    <message>
+      <source>System:</source>
+      <translation type="unfinished">System:</translation>
+    </message>
+    <message>
+      <source>Server:</source>
+      <translation type="unfinished">Server:</translation>
+    </message>
+    <message>
+      <source>Server ID:</source>
+      <translation type="unfinished">Server ID:</translation>
+    </message>
+    <message>
+      <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
+      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct server.</translation>
+    </message>
+    <message>
+      <source>Do not connect to this server unless instructed by your VMS administrator.</source>
+      <translation type="unfinished">Do not connect to this server unless instructed by your VMS administrator.</translation>
+    </message>
+    <message>
+      <source>Server certificate is invalid.</source>
+      <translation type="unfinished">Server certificate is invalid.</translation>
+    </message>
+    <message>
+      <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
+      <translation type="unfinished">You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</translation>
+    </message>
+    <message>
+      <source>You attempted to connect to: %1 but the Server&apos;s certificate has changed.</source>
+      <translation type="unfinished">You attempted to connect to: %1 but the Server&apos;s certificate has changed.</translation>
+    </message>
+  </context>
 </TS>

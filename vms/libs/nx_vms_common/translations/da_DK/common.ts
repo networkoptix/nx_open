@@ -28,7 +28,7 @@
     </message>
     <message>
       <source>The password is expired. Please contact your system administrator.</source>
-      <translation type="unfinished">The password is expired. Please contact your system administrator.</translation>
+      <translation>Adgangskoden er udløbet. Kontakt venligst din systemadministrator.</translation>
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
@@ -732,11 +732,11 @@
     </message>
     <message>
       <source>NVR</source>
-      <translation type="unfinished">NVR</translation>
+      <translation>NVR</translation>
     </message>
     <message>
       <source>NVR Licenses</source>
-      <translation type="unfinished">NVR Licenses</translation>
+      <translation>NVR Licenser</translation>
     </message>
     <message numerus="yes">
       <source>%n NVR Licenses</source>
@@ -1126,7 +1126,7 @@
     </message>
     <message>
       <source>Could not allocate output metadata stream.</source>
-      <translation type="unfinished">Could not allocate output metadata stream.</translation>
+      <translation>Kunne ikke tildele output metadata stream.</translation>
     </message>
     <message>
       <source>Invalid audio codec information.</source>
@@ -1727,7 +1727,7 @@
     </message>
     <message>
       <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</translation>
+      <translation>&apos;ikke initialisere AES-kryptering under optagelse af mediearkiv. Data skrives ukrypteret.</translation>
     </message>
     <message>
       <source>Archive backup failed.</source>
@@ -1755,7 +1755,7 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
-      <translation type="unfinished">Server &quot;%1&quot; certificate error</translation>
+      <translation>Server &quot;%1&quot; certifikatfejl</translation>
     </message>
   </context>
   <context>

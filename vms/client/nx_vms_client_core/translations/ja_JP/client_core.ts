@@ -199,4 +199,51 @@
       <translation>ログイン試行回数が多すぎます。しばらくしてからもう一度お試しください。</translation>
     </message>
   </context>
+  <context>
+    <name>nx::vms::client::core::CertificateWarning</name>
+    <message>
+      <source>Trust this server?</source>
+      <translation>このサーバーを信用しますか？</translation>
+    </message>
+    <message>
+      <source>Cannot verify the identity of %1</source>
+      <translation>%1 の識別情報を確認できません</translation>
+    </message>
+    <message>
+      <source>Someone may be impersonating %1 to steal your personal information.</source>
+      <translation>誰かがあなたの個人情報を盗むために %1 になりすましている可能性があります。</translation>
+    </message>
+    <message>
+      <source>System:</source>
+      <translation>システム:</translation>
+    </message>
+    <message>
+      <source>Server:</source>
+      <translation>サーバー:</translation>
+    </message>
+    <message>
+      <source>Server ID:</source>
+      <translation>サーバーID:</translation>
+    </message>
+    <message>
+      <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
+      <translation>証明書の詳細を確認して、正しいサーバーに接続していることを確認してください。</translation>
+    </message>
+    <message>
+      <source>Do not connect to this server unless instructed by your VMS administrator.</source>
+      <translation>VMS管理者の指示がない限り、このサーバーに接続しないでください。</translation>
+    </message>
+    <message>
+      <source>Server certificate is invalid.</source>
+      <translation>サーバー証明書が無効です。</translation>
+    </message>
+    <message>
+      <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
+      <translation>%1 に接続しようとしましたが、自動的に検証できない証明書がサーバーによって提示されました。</translation>
+    </message>
+    <message>
+      <source>You attempted to connect to: %1 but the Server&apos;s certificate has changed.</source>
+      <translation>%1 への接続を試みましたが、サーバーの証明書が変更されていました。</translation>
+    </message>
+  </context>
 </TS>

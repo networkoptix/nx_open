@@ -1002,7 +1002,7 @@
     </message>
     <message>
       <source>Advanced Viewer</source>
-      <translation>拡張ビューアー</translation>
+      <translation>上位ビューアー</translation>
     </message>
     <message>
       <source>Viewer</source>

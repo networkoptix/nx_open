@@ -20,11 +20,11 @@
     <name>AuthResultTranslations</name>
     <message>
       <source>This user does not exist.</source>
-      <translation>此用戶不存在</translation>
+      <translation>此使用者帳號不存在</translation>
     </message>
     <message>
       <source>Wrong password.</source>
-      <translation>密碼不正確.</translation>
+      <translation>使用者密碼不正確</translation>
     </message>
     <message>
       <source>The password is expired. Please contact your system administrator.</source>
@@ -32,23 +32,23 @@
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
-      <translation>無法登入LDAP伺服器。請稍後再試。</translation>
+      <translation>無法登入指定的LDAP伺服器。請稍後再試。</translation>
     </message>
     <message>
       <source>%1 is not accessible yet. Please try again later.</source>
-      <translation>%1 無回應，請稍後再試</translation>
+      <translation>無法連線至 %1 或無回應，請稍後再試</translation>
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
-      <translation>由於嘗試次數過多，該用戶已被鎖定。請稍後再試。</translation>
+      <translation>由於嘗試登入錯誤次數過多，此使用者帳號目前已被鎖定。請稍後再試。</translation>
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your system administrator.</source>
-      <translation>該授權方式不被允許。請聯繫系統管理員。</translation>
+      <translation>此授權方式不被允許。請聯繫系統管理員。</translation>
     </message>
     <message>
       <source>The session key is invalid or expired.</source>
-      <translation>會議金鑰無效或過期</translation>
+      <translation>通訊金鑰無效或已過期</translation>
     </message>
     <message>
       <source>Internal server error (%1). Please contact your system administrator.</source>
@@ -56,7 +56,7 @@
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
-      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
+      <translation>此用戶已被系統管理員停用.</translation>
     </message>
   </context>
   <context>
