@@ -732,11 +732,11 @@
     </message>
     <message>
       <source>NVR</source>
-      <translation type="unfinished">NVR</translation>
+      <translation>NVR</translation>
     </message>
     <message>
       <source>NVR Licenses</source>
-      <translation type="unfinished">NVR Licenses</translation>
+      <translation>NVR Licenser</translation>
     </message>
     <message numerus="yes">
       <source>%n NVR Licenses</source>
