@@ -649,8 +649,14 @@ void QnUserSettingsDialog::retranslateUi()
 void QnUserSettingsDialog::applyChanges()
 {
     auto mode = m_model->mode();
-    if (mode == QnUserSettingsModel::Invalid || mode == QnUserSettingsModel::OtherProfile)
+    const bool isDigestModeChanged =
+        m_model->digestSupport() != QnUserResource::DigestSupport::keep;
+
+    if ((mode == QnUserSettingsModel::Invalid || mode == QnUserSettingsModel::OtherProfile)
+        && !isDigestModeChanged)
+    {
         return;
+    }
 
     // TODO: #sivanov What to rollback if current password changes cannot be saved?
 
@@ -769,12 +775,15 @@ void QnUserSettingsDialog::updateControlsVisibility()
     const bool canChangeDigestMode =
         m_user && accessController()->hasPermissions(m_user, Qn::WriteDigestPermission);
 
+    const bool canEnableDigest = canChangeDigestMode
+        && accessController()->hasPermissions(m_user, Qn::WritePasswordPermission);
+
     // We can't use token authentication for a new user if the client supports digest only.
     const bool tokenAuthEnabled = nx::vms::client::core::ini().bearerAuthentication;
     ui->warningBanner->setVisible(tokenAuthEnabled && digestEnabled);
 
     ui->forceSecureAuthButton->setVisible(canChangeDigestMode);
-    m_digestMenuButton->setVisible(canChangeDigestMode && !digestEnabled);
+    m_digestMenuButton->setVisible(canEnableDigest && !digestEnabled);
 
     // Buttons state takes into account pages visibility, so we must recalculate it.
     updateButtonBox();
