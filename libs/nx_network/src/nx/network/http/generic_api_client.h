@@ -280,7 +280,8 @@ inline void GenericApiClient<ApiResultCodeDescriptor>::makeAsyncCallWithRetries(
     {
         if (m_isRequestSucceeded && !(*m_isRequestSucceeded)(result) && attemptNum < m_numRetries)
         {
-            return makeAsyncCallWithRetries<Output>(method,
+            return makeAsyncCallWithRetries<Output>(
+                method,
                 requestPath,
                 urlQuery,
                 std::move(credentials),
@@ -370,6 +371,8 @@ void GenericApiClient<ApiResultCodeDescriptor>::processResponse(
     const network::http::Response* response,
     Output... output)
 {
+    auto ctx = takeContextOfRequest(requestPtr);
+
     const auto resultCode =
         getResultCode(error, response, requestPtr->lastFusionRequestResult(), output...);
 
