@@ -558,25 +558,16 @@ nx::vms::api::SoftwareVersion QnSystemsModelPrivate::getIncompatibleVersion(
     if (servers.isEmpty())
         return {};
 
-    const auto predicate =
-        [this, systemDescription](const nx::vms::api::ModuleInformation& serverInfo)
+    const auto incompatibleIt = std::find_if(servers.begin(), servers.end(),
+        [systemDescription](const nx::vms::api::ModuleInformation& serverInfo)
         {
-            if (!systemDescription->isReachableServer(serverInfo.id))
-                return false;
+            return systemDescription->isReachableServer(serverInfo.id)
+                && !ServerCompatibilityValidator::isCompatible(serverInfo);
+        });
 
-            const auto incompatibilityReason = ServerCompatibilityValidator::check(
-                serverInfo);
-
-            return incompatibilityReason
-                && *incompatibilityReason == ServerCompatibilityValidator::Reason::versionIsTooLow;
-        };
-
-    const auto incompatibleIt = std::find_if(servers.begin(), servers.end(), predicate);
-
-    if (incompatibleIt == servers.end())
-        return {};
-
-    return incompatibleIt->version;
+    return incompatibleIt == servers.end()
+        ? nx::vms::api::SoftwareVersion()
+        : incompatibleIt->version;
 }
 
 bool QnSystemsModelPrivate::isCompatibleSystem(
@@ -584,7 +575,7 @@ bool QnSystemsModelPrivate::isCompatibleSystem(
 {
     const auto servers = systemDescription->servers();
     return std::all_of(servers.cbegin(), servers.cend(),
-        [this, systemDescription](const nx::vms::api::ModuleInformation& serverInfo)
+        [systemDescription](const nx::vms::api::ModuleInformation& serverInfo)
         {
             if (!systemDescription->isReachableServer(serverInfo.id))
                 return true;
