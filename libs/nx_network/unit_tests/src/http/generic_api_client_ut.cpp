@@ -6,24 +6,28 @@
 
 #include "simple_service/service_launcher.h"
 
-namespace nx::network::http::server::test {
+namespace nx::network::http::test {
 
 namespace {
 constexpr char kDefaultPath[] = "/simpleService/handler";
 } // namespace
 
-class GenericApiClientTests;
-
 //added this class to open protected GenericApiClient functions for testing
-class GenericApiClientChild: public GenericApiClient<>
+class GenericApiClientChild:
+    public http::GenericApiClient<>
 {
-    friend class GenericApiClientTests;
-
 public:
-    GenericApiClientChild(const utils::Url& baseApiUrl): GenericApiClient<>(baseApiUrl, nx::network::ssl::kAcceptAnyCertificate) {}
+    using base_type = http::GenericApiClient<>;
+
+    GenericApiClientChild(const utils::Url& baseApiUrl):
+        http::GenericApiClient<>(baseApiUrl, nx::network::ssl::kAcceptAnyCertificate)
+    {}
+
+    using base_type::makeAsyncCall;
 };
 
-class SimpleServiceLauncher: public Launcher
+class SimpleServiceLauncher:
+    public http::server::test::Launcher
 {
 public:
     virtual ~SimpleServiceLauncher() = default;
@@ -50,26 +54,30 @@ nx::utils::Url SimpleServiceLauncher::basicHttpUrl() const
         .toUrl();
 }
 
-class GenericApiClientTests: public ::testing::Test
+class GenericApiClient:
+    public ::testing::Test
 {
     using Client = GenericApiClientChild;
     using ResultType = nx::network::http::StatusCode::Value;
 
 public:
-    ~GenericApiClientTests()
+    ~GenericApiClient()
     {
         if (m_client)
             m_client->pleaseStopSync();
     }
 
+public:
+    std::unique_ptr<Client> m_client;
+    SimpleServiceLauncher m_instance;
+    std::promise<ResultType> m_resultCode;
+
 protected:
-    void whenStartInstanceAndClient()
+    virtual void SetUp() override
     {
-        m_instance.startInstance();
-        m_instance.moduleInstance()->httpEndpoints();
-        m_instance.moduleInstance()->resetAttemptsNum();
-        m_client =
-            std::make_unique<Client>(nx::network::url::Builder(m_instance.basicHttpUrl()).toUrl());
+        startInstanceAndClient();
+
+        m_initialHttpClientCount = SocketGlobals::instance().debugCounters().httpClientConnectionCount;
     }
 
     void saveRequestResult(std::tuple<ResultType> response)
@@ -81,13 +89,20 @@ protected:
     {
         m_client->makeAsyncCall<void>(
             nx::network::http::Method::get, kDefaultPath, [this](auto&&... args) {
-                saveRequestResult(std::forward<decltype(args)>(args)...);
+                // Using post to make sure that the completion handler has returned before saving the result.
+                m_client->post([this, args = std::make_tuple(std::forward<decltype(args)>(args)...)]() {
+                    std::apply(
+                        [this](auto&&... args) { saveRequestResult(std::forward<decltype(args)>(args)...); },
+                        std::move(args));
+                });
             });
     }
+
     void thenApiCallSucceeded()
     {
         ASSERT_EQ(nx::network::http::StatusCode::ok, m_resultCode.get_future().get());
     }
+
     void thenApiCallFail500()
     {
         ASSERT_EQ(
@@ -97,31 +112,45 @@ protected:
     void andThenRetriesDone(int numRetries)
     {
         ASSERT_EQ(numRetries, m_instance.moduleInstance()->getCurAttempNum());
-    };
+    }
 
-public:
-    std::unique_ptr<Client> m_client;
-    SimpleServiceLauncher m_instance;
-    std::promise<ResultType> m_resultCode;
+    void andHttpClientCountIs(int count)
+    {
+        ASSERT_EQ(
+            count,
+            SocketGlobals::instance().debugCounters().httpClientConnectionCount - m_initialHttpClientCount);
+    }
+
+private:
+    void startInstanceAndClient()
+    {
+        m_instance.startInstance();
+        m_instance.moduleInstance()->httpEndpoints();
+        m_instance.moduleInstance()->resetAttemptsNum();
+        m_client = std::make_unique<Client>(
+            nx::network::url::Builder(m_instance.basicHttpUrl()).toUrl());
+    }
+
+private:
+    int m_initialHttpClientCount = 0;
 };
 
-TEST_F(GenericApiClientTests, testNumRetries)
+TEST_F(GenericApiClient, testNumRetries)
 {
     const int kNumRetries = 3;
 
-    whenStartInstanceAndClient();
     m_client->setRetryPolicy(kNumRetries, nx::network::http::StatusCode::ok);
     m_instance.moduleInstance()->setSuccessfullAttemptNum(kNumRetries);
     whenPerformApiCall();
 
     thenApiCallSucceeded();
     andThenRetriesDone(kNumRetries);
+    andHttpClientCountIs(0);
 }
 
-TEST_F(GenericApiClientTests, testWithfailingRequest)
+TEST_F(GenericApiClient, testWithfailingRequest)
 {
     const int kNumRetries = 2;
-    whenStartInstanceAndClient();
     m_client->setRetryPolicy(kNumRetries, nx::network::http::StatusCode::ok);
     m_instance.moduleInstance()->setSuccessfullAttemptNum(kNumRetries + 1);
     whenPerformApiCall();
@@ -130,4 +159,12 @@ TEST_F(GenericApiClientTests, testWithfailingRequest)
     andThenRetriesDone(kNumRetries);
 }
 
-} // namespace nx::network::http::server::test
+TEST_F(GenericApiClient, internal_http_client_is_freed_after_request_completion)
+{
+    whenPerformApiCall();
+
+    thenApiCallSucceeded();
+    andHttpClientCountIs(0);
+}
+
+} // namespace nx::network::http::test
