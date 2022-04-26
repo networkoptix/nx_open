@@ -206,6 +206,7 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/) :
     /* Set up context help. */
     setHelpTopic(ui->nameLabel, ui->nameLineEdit, Qn::ServerSettings_General_Help);
     setHelpTopic(ui->nameLabel, ui->maxCamerasSpinBox, Qn::ServerSettings_General_Help);
+    setHelpTopic(ui->nameLabel, ui->locationIdSpinBox, Qn::ServerSettings_General_Help);
     setHelpTopic(ui->ipAddressLabel, ui->ipAddressLineEdit, Qn::ServerSettings_General_Help);
     setHelpTopic(ui->portLabel, ui->portLineEdit, Qn::ServerSettings_General_Help);
     setHelpTopic(ui->webCamerasDiscoveryCheckBox, Qn::ServerSettings_General_Help);
@@ -214,7 +215,7 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/) :
     const auto failoverHint = HintButton::createGroupBoxHint(ui->failoverGroupBox);
     // Notice: this hint button uses help topic from the parent class.
     failoverHint->setHintText(
-        tr("Servers with failover enabled will automatically take cameras from offline servers."));
+        tr("Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID."));
 
     connect(ui->pingButton, &QPushButton::clicked, this, &QnServerSettingsWidget::at_pingButton_clicked);
 
@@ -233,6 +234,13 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/) :
         updateFailoverLabel();
         emit hasChangesChanged();
     });
+
+    connect(ui->locationIdSpinBox, QnSpinboxIntValueChanged, this, 
+        [this]
+        {
+            updateFailoverLabel();
+            emit hasChangesChanged();
+        });
 
     connect(ui->failoverPriorityButton, &QPushButton::clicked, action(action::OpenFailoverPriorityAction), &QAction::trigger);
 
@@ -297,7 +305,7 @@ void QnServerSettingsWidget::setReadOnlyInternal(bool readOnly)
     using ::setReadOnly;
     setReadOnly(ui->failoverGroupBox, readOnly);
     setReadOnly(ui->maxCamerasSpinBox, readOnly);
-
+    setReadOnly(ui->locationIdSpinBox, readOnly);
 }
 
 void QnServerSettingsWidget::updateReadOnly()
@@ -329,9 +337,13 @@ bool QnServerSettingsWidget::hasChanges() const
     if (m_server->isRedundancy() != ui->failoverGroupBox->isChecked())
         return true;
 
-    if (m_server->isRedundancy() &&
-        (m_server->getMaxCameras() != ui->maxCamerasSpinBox->value()))
-        return true;
+    if (m_server->isRedundancy())
+    {
+        if (m_server->getMaxCameras() != ui->maxCamerasSpinBox->value())
+            return true;
+        if (m_server->locationId() != ui->locationIdSpinBox->value())
+            return true;
+    }
 
     if (isWebCamerasDiscoveryEnabledChanged())
         return true;
@@ -378,6 +390,7 @@ void QnServerSettingsWidget::loadDataToUi()
         currentMaxCamerasValue = maxCameras;
 
     ui->maxCamerasSpinBox->setValue(currentMaxCamerasValue);
+    ui->locationIdSpinBox->setValue(m_server->locationId());
     ui->failoverGroupBox->setChecked(m_server->isRedundancy());
     ui->maxCamerasWidget->setEnabled(m_server->isRedundancy());
 
@@ -401,6 +414,7 @@ void QnServerSettingsWidget::applyChanges()
     {
         server->setName(ui->nameLineEdit->text());
         server->setMaxCameras(ui->maxCamerasSpinBox->value());
+        server->setLocationId(ui->locationIdSpinBox->value());
         server->setRedundancy(ui->failoverGroupBox->isChecked());
         server->setWebCamerasDiscoveryEnabled(isWebCamerasDiscoveryEnabled());
     });

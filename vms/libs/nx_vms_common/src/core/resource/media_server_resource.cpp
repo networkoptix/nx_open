@@ -499,6 +499,18 @@ int QnMediaServerResource::getMaxCameras() const
     return lk->maxCameras();
 }
 
+void QnMediaServerResource::setLocationId(int value)
+{
+    QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId());
+    lk->setLocationId(value);
+}
+
+int QnMediaServerResource::locationId() const
+{
+    QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId());
+    return lk->locationId();
+}
+
 QnMediaServerUserAttributesPtr QnMediaServerResource::userAttributes() const
 {
     QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId());

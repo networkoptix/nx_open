@@ -66,6 +66,16 @@ void QnMediaServerUserAttributes::setMaxCameras(int value)
     m_data.maxCameras = value;
 }
 
+int QnMediaServerUserAttributes::locationId() const
+{
+    return m_data.locationId;
+}
+
+void QnMediaServerUserAttributes::setLocationId(int value)
+{
+    m_data.locationId = value;
+}
+
 nx::vms::api::MediaServerUserAttributesData QnMediaServerUserAttributes::data() const
 {
     return m_data;

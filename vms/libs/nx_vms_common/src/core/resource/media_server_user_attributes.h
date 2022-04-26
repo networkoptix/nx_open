@@ -20,6 +20,8 @@ public:
     void setName(const QString& name);
     int maxCameras() const;
     void setMaxCameras(int value);
+    int locationId() const;
+    void setLocationId(int value);
     QnUuid serverId() const;
     void setServerId(const QnUuid& serverId);
     bool isRedundancyEnabled() const;

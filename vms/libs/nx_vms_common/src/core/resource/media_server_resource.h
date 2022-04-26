@@ -92,6 +92,12 @@ public:
     int getMaxCameras() const;
     void setMaxCameras(int value);
 
+    /** 
+     * Automatic failover moves Cameras across Servers with the same Location ID only. 
+     */
+    void setLocationId(int value);
+    int locationId() const;
+
     void setRedundancy(bool value);
     bool isRedundancy() const;
 
