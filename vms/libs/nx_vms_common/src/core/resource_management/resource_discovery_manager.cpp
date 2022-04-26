@@ -346,6 +346,8 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
         return true; // can take foreign camera is camera's server is absent
     if (!ownServer)
         return false;
+    if (mServer->locationId() != ownServer->locationId())
+        return false;
 
     QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
     using namespace nx::vms::api;
