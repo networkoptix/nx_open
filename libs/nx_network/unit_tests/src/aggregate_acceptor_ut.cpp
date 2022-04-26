@@ -18,6 +18,8 @@ class DirectAcceptorStub:
     public AcceptorStub
 {
 public:
+    DirectAcceptorStub(): AcceptorStub(nullptr) {}
+
     virtual void acceptAsync(AcceptCompletionHandler handler) override
     {
         handler(SystemError::timedOut, nullptr);
@@ -34,7 +36,7 @@ protected:
     {
         constexpr int testAcceptorCount = 7;
         for (int i = 0; i < testAcceptorCount; ++i)
-            addAcceptor(std::make_unique<AcceptorStub>());
+            addAcceptor(std::make_unique<AcceptorStub>(&m_readyConnections));
     }
 
     void givenDirectAcceptor()
@@ -96,6 +98,7 @@ private:
     std::vector<AcceptorStub*> m_acceptorStubs;
     AcceptorStub* m_acceptorToRemove = nullptr;
     nx::utils::SyncQueue<AcceptResult> m_acceptResults;
+    nx::utils::SyncQueue<std::unique_ptr<AbstractStreamSocket>> m_readyConnections;
 
     void addAcceptor(std::unique_ptr<AcceptorStub> acceptor)
     {
