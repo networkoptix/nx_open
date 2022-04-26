@@ -5527,7 +5527,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Backup storage is not configured</source>
-      <translation type="unfinished">Backup storage is not configured</translation>
+      <translation>Sikkerhedskopieringslager er ikke konfigureret</translation>
     </message>
     <message>
       <source>Camera recording schedule is invalid</source>
@@ -6638,11 +6638,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Merge this group with %1?</source>
-      <translation type="unfinished">Merge this group with %1?</translation>
+      <translation>Flet denne gruppe med %1?</translation>
     </message>
     <message>
       <source>Two groups with the same name cannot exist.</source>
-      <translation type="unfinished">Two groups with the same name cannot exist.</translation>
+      <translation>Der findes allerede en gruppe med samme navn.</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -6702,19 +6702,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual cameras cannot be moved between servers</translation>
+      <translation>Virtuelle kameraer kan ikke flyttes mellem servere</translation>
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains virtual cameras</source>
-      <translation type="unfinished">%1 cannot be moved between servers as it contains virtual cameras</translation>
+      <translation>%1 kan ikke flyttes mellem servere, da den indeholder virtuelle kameraer</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers</source>
-      <translation type="unfinished">USB or web cameras cannot be moved between servers</translation>
+      <translation>USB- eller webkameraer kan ikke flyttes mellem servere</translation>
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains USB or web cameras</source>
-      <translation type="unfinished">%1 cannot be moved between servers as it contains USB or web cameras</translation>
+      <translation>%1 kan ikke flyttes mellem servere, da den indeholder USB- eller webkameraer</translation>
     </message>
   </context>
   <context>
@@ -7031,27 +7031,27 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Use this device for audio output</source>
-      <translation type="unfinished">Use this device for audio output</translation>
+      <translation>Brug denne enhed til lydoutput</translation>
     </message>
     <message>
       <source>Use this camera for audio output</source>
-      <translation type="unfinished">Use this camera for audio output</translation>
+      <translation>Brug dette kamera til lydoutput</translation>
     </message>
     <message>
       <source>Use audio stream from another device</source>
-      <translation type="unfinished">Use audio stream from another device</translation>
+      <translation>Brug lydstream fra en anden enhed</translation>
     </message>
     <message>
       <source>Use audio stream from another camera</source>
-      <translation type="unfinished">Use audio stream from another camera</translation>
+      <translation>Brug lydstream fra et andet kamera</translation>
     </message>
     <message>
       <source>Transmit audio stream to another device</source>
-      <translation type="unfinished">Transmit audio stream to another device</translation>
+      <translation>Send lydstream til en anden enhed</translation>
     </message>
     <message>
       <source>Transmit audio stream to another camera</source>
-      <translation type="unfinished">Transmit audio stream to another camera</translation>
+      <translation>Send lydstream til et andet kamera</translation>
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</source>
@@ -7657,7 +7657,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Motion &amp; Objects Only</source>
-      <translation type="unfinished">Motion &amp; Objects Only</translation>
+      <translation>Kun bevægelse og objekter</translation>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
@@ -7754,7 +7754,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Invalid stream address</source>
-      <translation type="unfinished">Invalid stream address</translation>
+      <translation>Ugyldig stream adresse</translation>
     </message>
     <message>
       <source>Streaming protocol mismatch</source>
@@ -7856,7 +7856,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Login to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Login to %1</translation>
+      <translation>Log ind på %1</translation>
     </message>
   </context>
   <context>
@@ -7879,11 +7879,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Re-authentication required</source>
-      <translation type="unfinished">Re-authentication required</translation>
+      <translation>Genautentificering påkrævet</translation>
     </message>
     <message>
       <source>Enter password to continue your session</source>
-      <translation type="unfinished">Enter password to continue your session</translation>
+      <translation>Indtast adgangskode for at fortsætte din session</translation>
     </message>
     <message>
       <source>Your session has expired. Please sign in again to continue.</source>
@@ -7961,7 +7961,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Merge Server to the System</source>
       <comment>Dialog title</comment>
-      <translation type="unfinished">Merge Server to the System</translation>
+      <translation>Flet server til systemet</translation>
     </message>
     <message>
       <source>Enter your account password to merge Server to the System</source>
@@ -8390,7 +8390,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Exported: %1</source>
       <comment>Duration will be substituted</comment>
-      <translation type="unfinished">Exported: %1</translation>
+      <translation>Eksporteret: %1</translation>
     </message>
   </context>
   <context>
@@ -8443,7 +8443,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Do not show this message again</source>
-      <translation type="unfinished">Do not show this message again</translation>
+      <translation>Vis ikke denne besked igen</translation>
     </message>
     <message>
       <source>Enable</source>
@@ -8638,16 +8638,16 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Re-Authenticate Now</source>
-      <translation type="unfinished">Re-Authenticate Now</translation>
+      <translation>Genautentificer nu</translation>
     </message>
     <message>
       <source>Less than a minute left</source>
-      <translation type="unfinished">Less than a minute left</translation>
+      <translation>Mindre end et minut tilbage</translation>
     </message>
     <message numerus="yes">
       <source>%n minutes left</source>
       <translation type="unfinished">
-        <numerusform>%n minutes left</numerusform>
+        <numerusform>%n minutter tilbage</numerusform>
         <numerusform>%n minutes left</numerusform>
       </translation>
     </message>
@@ -8837,7 +8837,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>System name is not configured yet.</source>
-      <translation type="unfinished">System name is not configured yet.</translation>
+      <translation>Systemnavnet er ikke konfigureret endnu.</translation>
     </message>
     <message>
       <source>Connection to Server could not be established. The Server&apos;s certificate is invalid.</source>
@@ -8883,8 +8883,8 @@ We recommend you not to open this web page. If you understand the risks, you can
 You can force it, but it may significantly increase CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection for this camera is not currently working because of changed stream resolution.
-You can force it, but it may significantly increase CPU load.</translation>
+      <translation>Bevægelsesdetektion for dette kamera fungerer ikke i øjeblikket på grund af ændret stream-opløsning.
+Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     </message>
     <message>
       <source>Motion detection for some cameras will not be working because the remaining stream has too high resolution.
@@ -9216,7 +9216,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Notifications Settings</source>
-      <translation type="unfinished">Notifications Settings</translation>
+      <translation>Notifikationsindstillinger</translation>
     </message>
   </context>
   <context>
@@ -9967,7 +9967,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Server Id: %1</source>
-      <translation type="unfinished">Server Id: %1</translation>
+      <translation>Server Id: %1</translation>
     </message>
     <message>
       <source>This certificate does not match the certificate %1 is pinned to.</source>
@@ -10040,7 +10040,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     </message>
     <message>
       <source>Cannot verify the identity of %1</source>
-      <translation type="unfinished">Cannot verify the identity of %1</translation>
+      <translation>Kan ikke bekræfte identiteten af %1</translation>
     </message>
     <message>
       <source>Someone may be impersonating %1 to steal your personal information.</source>
@@ -10272,7 +10272,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     <message numerus="yes">
       <source>Recording schedule is invalid for %n cameras</source>
       <translation type="unfinished">
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
+        <numerusform>Optagelsestidsplan er ugyldig til %n kameraer</numerusform>
         <numerusform>Recording schedule is invalid for %n cameras</numerusform>
       </translation>
     </message>
@@ -10852,7 +10852,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     </message>
     <message>
       <source>Selected Layout</source>
-      <translation type="unfinished">Selected Layout</translation>
+      <translation>Valgt layout</translation>
     </message>
   </context>
   <context>
@@ -11554,7 +11554,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Cannot check for update.</source>
-      <translation type="unfinished">Cannot check for update.</translation>
+      <translation>Kan ikke søge efter opdatering.</translation>
     </message>
     <message>
       <source>Client update package is broken.</source>
