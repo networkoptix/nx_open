@@ -90,11 +90,30 @@ public:
 
     std::vector<AbstractAttribute*> attributes() const
     {
-        std::vector<AbstractAttribute*> result = this->baseAttributes();
-        result.insert(
-            result.end(),
-            m_internalOwnAttributes.begin(),
-            m_internalOwnAttributes.cend());
+        std::map<QString, AbstractAttribute*> ownAttributes;
+        for (AbstractAttribute* ownAttribute: m_internalOwnAttributes)
+            ownAttributes[ownAttribute->name()] = ownAttribute;
+
+        std::vector<AbstractAttribute*> result;
+        for (AbstractAttribute* baseAttribute: this->baseAttributes())
+        {
+            const auto ownAttributeIt = ownAttributes.find(baseAttribute->name());
+            if (ownAttributeIt == ownAttributes.cend())
+            {
+                result.push_back(baseAttribute);
+            }
+            else
+            {
+                result.push_back(ownAttributeIt->second);
+                ownAttributes.erase(ownAttributeIt);
+            }
+        }
+
+        for (AbstractAttribute* ownAttribute: m_internalOwnAttributes)
+        {
+            if (ownAttributes.find(ownAttribute->name()) != ownAttributes.cend())
+                result.push_back(ownAttribute);
+        }
 
         return result;
     }
