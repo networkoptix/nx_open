@@ -27,7 +27,7 @@ class NX_VMS_RULES_API BasicEvent: public QObject
     using base_type = QObject;
 
     Q_PROPERTY(QString type READ type)
-    Q_PROPERTY(std::chrono::microseconds timestamp MEMBER m_timestamp)
+    Q_PROPERTY(std::chrono::microseconds timestamp READ timestamp WRITE setTimestamp)
 
 public:
     using State = nx::vms::api::rules::EventInfo::State;
@@ -37,9 +37,24 @@ public:
     explicit BasicEvent(std::chrono::microseconds timestamp);
 
     QString type() const;
+    std::chrono::microseconds timestamp() const;
+    void setTimestamp(const std::chrono::microseconds& timestamp);
+
+    /**
+     * Returns the event unique name. Used for the event aggregation. At the basic level event
+     * uniqueness is determinded by the event name.
+     */
+    virtual QString uniqueName() const;
 
 protected:
     BasicEvent() = default;
+
+    template<class... Strings>
+    QString makeName(const Strings&... strings) const
+    {
+        static constexpr auto kEventNameSeparator = '_';
+        return QStringList{strings...}.join(kEventNameSeparator);
+    }
 
 private:
     QString m_type;

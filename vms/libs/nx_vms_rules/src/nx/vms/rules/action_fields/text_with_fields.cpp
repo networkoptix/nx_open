@@ -4,6 +4,7 @@
 
 #include <nx/utils/log/assert.h>
 
+#include "../aggregated_event.h"
 #include "../engine.h"
 #include "../manifest.h"
 
@@ -11,42 +12,40 @@ namespace nx::vms::rules {
 
 namespace {
 
-using FormatFunction = std::function<QString(const EventData&)>;
+using FormatFunction = std::function<QString(const AggregatedEvent&)>;
 
 static const QChar kFunctionPrefix = '@';
 
-QString createGuid(const EventData&)
+QString createGuid(const AggregatedEvent&)
 {
     return QUuid::createUuid().toString(QUuid::StringFormat::WithoutBraces);
 }
 
-QString eventType(const EventData& data)
+QString eventType(const AggregatedEvent& event)
 {
-    auto value = data.value("type").toString();
-    NX_ASSERT(!value.isEmpty());
-    return value;
+    return event.empty() ? QString() : event.type();
 }
 
-QString eventName(const EventData& data)
+QString eventName(const AggregatedEvent& event)
 {
-    auto descriptor = Engine::instance()->eventDescriptor(eventType(data));
+    auto descriptor = Engine::instance()->eventDescriptor(event.type());
     return descriptor ? descriptor->displayName : TextWithFields::tr("Unknown event");
 }
 
-QString eventCaption(const EventData& data)
+QString eventCaption(const AggregatedEvent& event)
 {
-    if (const auto value = data.value("caption"); value.canConvert<QString>())
+    if (const auto value = event.property("caption"); value.canConvert<QString>())
         return value.toString();
 
-    return eventName(data);
+    return eventName(event);
 }
 
-QString eventDescription(const EventData& data)
+QString eventDescription(const AggregatedEvent& event)
 {
-    if (const auto value = data.value("description"); value.canConvert<QString>())
+    if (const auto value = event.property("description"); value.canConvert<QString>())
         return value.toString();
 
-    auto descriptor = Engine::instance()->eventDescriptor(eventType(data));
+    auto descriptor = Engine::instance()->eventDescriptor(eventType(event));
     return descriptor ? descriptor->description : QString();
 }
 
@@ -69,7 +68,7 @@ TextWithFields::TextWithFields()
 {
 }
 
-QVariant TextWithFields::build(const EventData& eventData) const
+QVariant TextWithFields::build(const AggregatedEvent& aggregatedEvent) const
 {
     QString result;
 
@@ -82,15 +81,15 @@ QVariant TextWithFields::build(const EventData& eventData) const
             {
                 if (const auto function = formatFunction(name))
                 {
-                    result += function(eventData);
+                    result += function(aggregatedEvent);
                     continue;
                 }
             }
-            const auto& it = eventData.find(name);
-            if (it != eventData.end() && it.value().canConvert(QVariant::String))
+            const auto propertyValue = aggregatedEvent.property(name);
+            if (propertyValue.isValid() && propertyValue.canConvert(QVariant::String))
             {
                 // Found a valid event field, use it instead of the placeholder.
-                result += it.value().toString(); //< TODO: #spanasenko Refactor.
+                result += propertyValue.toString(); //< TODO: #spanasenko Refactor.
             }
             else
             {

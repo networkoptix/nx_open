@@ -10,6 +10,7 @@
 
 #include <nx/utils/uuid.h>
 
+#include "aggregated_event.h"
 #include "rules_fwd.h"
 
 namespace nx::vms::rules {
@@ -33,6 +34,10 @@ public:
 
     QnUuid id() const;
     QString actionType() const;
+
+    /** Returns a rule id the action builder belongs to. */
+    QnUuid ruleId() const;
+    void setRuleId(const QnUuid& ruleId);
 
     /**
      * Get all configurable Builder properties in a form of flattened dictionary,
@@ -62,9 +67,14 @@ public:
     const QHash<QString, ActionField*> fields() const;
 
     QSet<QString> requiredEventFields() const;
-    QSet<QnUuid> affectedResources(const EventData& eventData) const;
+    QSet<QnUuid> affectedResources(const EventPtr& event) const;
 
-    ActionPtr process(const EventData& eventData);
+    /**
+     * Process the event and emits action() signal whenever appropriate action is
+     * built. Depends on the aggregation interval the event could be processed immediately
+     * or aggregated and processed after the aggregation interval is triggered.
+     */
+    void process(EventPtr event);
 
     void setAggregationInterval(std::chrono::seconds interval);
     std::chrono::seconds aggregationInterval() const;
@@ -73,19 +83,23 @@ public:
 
 signals:
     void stateChanged();
+    void action(const ActionPtr& action);
 
 private:
     void onTimeout();
     void updateState();
+    ActionPtr buildAction();
 
 private:
     QnUuid m_id;
+    QnUuid m_ruleId;
     QString m_actionType;
     ActionConstructor m_constructor;
     std::map<QString, std::unique_ptr<ActionField>> m_fields;
     QList<ActionField*> m_targetFields;
     std::chrono::seconds m_interval = std::chrono::seconds(0);
     QTimer m_timer;
+    AggregatedEvent m_aggregatedEvent;
     bool m_updateInProgress = false;
 };
 

@@ -27,4 +27,19 @@ QString BasicEvent::type() const
     return utils::type(metaObject()); //< Assert?
 }
 
+std::chrono::microseconds BasicEvent::timestamp() const
+{
+    return m_timestamp;
+}
+
+void BasicEvent::setTimestamp(const std::chrono::microseconds& timestamp)
+{
+    m_timestamp = timestamp;
+}
+
+QString BasicEvent::uniqueName() const
+{
+    return type();
+}
+
 } // namespace nx::vms::rules

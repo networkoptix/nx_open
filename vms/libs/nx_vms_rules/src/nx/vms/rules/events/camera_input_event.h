@@ -14,7 +14,7 @@ class NX_VMS_RULES_API CameraInputEvent: public BasicEvent
     Q_CLASSINFO("type", "nx.events.cameraInput")
 
     FIELD(QnUuid, cameraId, setCameraId)
-    // TODO: input port
+    FIELD(QString, inputPortId, setInputPortId)
 
 public:
     CameraInputEvent(const QnUuid& cameraId, std::chrono::microseconds timestamp):
@@ -22,6 +22,8 @@ public:
         m_cameraId(cameraId)
     {
     }
+
+    virtual QString uniqueName() const override;
 
     static FilterManifest filterManifest();
 };

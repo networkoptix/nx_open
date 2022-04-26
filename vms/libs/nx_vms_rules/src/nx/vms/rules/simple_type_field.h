@@ -33,7 +33,7 @@ class SimpleTypeActionField: public SimpleTypeField<T, ActionField>
     using SimpleTypeField<T, ActionField>::m_value;
 
 public:
-    virtual QVariant build(const EventData&) const override
+    virtual QVariant build(const AggregatedEvent&) const override
     {
         return QVariant::fromValue(m_value);
     };

@@ -440,7 +440,8 @@ EventPtr Engine::buildEvent(const EventData& eventData) const
 
     auto eventConstructor = m_eventTypes.value(eventType);
     auto event = EventPtr(eventConstructor());
-    for (const auto& propertyName: nx::utils::propertyNames(event.get()))
+    auto propertyNames = nx::utils::propertyNames(event.get(), nx::utils::PropertyAccess::fullAccess);
+    for (const auto& propertyName: propertyNames)
     {
         if (eventData.contains(propertyName))
             event->setProperty(propertyName.toUtf8(), eventData.value(propertyName));
@@ -541,7 +542,9 @@ std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const api::ActionBuild
     //if (!ctor)
     //    return nullptr;
 
-    std::unique_ptr<ActionBuilder> builder(new ActionBuilder(serialized.id, serialized.actionType, ctor));
+    std::unique_ptr<ActionBuilder> builder(
+        new ActionBuilder(serialized.id, serialized.actionType, ctor));
+    connect(builder.get(), &ActionBuilder::action, this, &Engine::processAction);
 
     for (const auto& fieldInfo: serialized.fields)
     {
@@ -603,6 +606,8 @@ std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const ItemDescriptor& 
 
     auto builder =
         std::make_unique<ActionBuilder>(QnUuid::createUuid(), descriptor.id, constructor);
+
+    connect(builder.get(), &ActionBuilder::action, this, &Engine::processAction);
 
     for (const auto& fieldDescriptor: descriptor.fields)
     {
@@ -767,13 +772,7 @@ void Engine::processAcceptedEvent(const QnUuid& ruleId, const EventData& eventDa
         return;
 
     for (const auto builder: rule->actionBuilders())
-    {
-        if (auto action = builder->process(eventData))
-        {
-            action->setRuleId(ruleId);
-            processAction(action);
-        }
-    }
+        builder->process(event);
 }
 
 void Engine::processAction(const ActionPtr& action)

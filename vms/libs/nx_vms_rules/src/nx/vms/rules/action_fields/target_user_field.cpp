@@ -4,7 +4,7 @@
 
 namespace nx::vms::rules {
 
-QVariant TargetUserField::build(const EventData& eventData) const
+QVariant TargetUserField::build(const AggregatedEvent&) const
 {
     return QVariant::fromValue(UuidSelection{
         .ids = m_ids,

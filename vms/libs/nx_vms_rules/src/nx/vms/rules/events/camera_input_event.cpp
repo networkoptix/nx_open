@@ -4,6 +4,11 @@
 
 namespace nx::vms::rules {
 
+QString CameraInputEvent::uniqueName() const
+{
+    return makeName(BasicEvent::uniqueName(), m_inputPortId);
+}
+
 FilterManifest CameraInputEvent::filterManifest()
 {
     return {};

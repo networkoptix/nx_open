@@ -15,6 +15,11 @@ DeviceDisconnectedEvent::DeviceDisconnectedEvent(
 {
 }
 
+QString DeviceDisconnectedEvent::uniqueName() const
+{
+    return makeName(BasicEvent::uniqueName(), m_deviceId.toString());
+}
+
 const ItemDescriptor& DeviceDisconnectedEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{

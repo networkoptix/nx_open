@@ -12,6 +12,8 @@ class NX_VMS_RULES_API LicenseIssueEvent: public ReasonedEvent
     Q_CLASSINFO("type", "nx.events.licenseIssue")
 
 public:
+    virtual QString uniqueName() const override;
+
     static const ItemDescriptor& manifest();
 
     using ReasonedEvent::ReasonedEvent;

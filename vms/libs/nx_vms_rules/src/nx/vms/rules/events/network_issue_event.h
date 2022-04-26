@@ -12,6 +12,7 @@ class NX_VMS_RULES_API NetworkIssueEvent: public ReasonedEvent
     Q_CLASSINFO("type", "nx.events.networkIssue")
 
 public:
+    virtual QString uniqueName() const override;
     static const ItemDescriptor& manifest();
 
     // TODO: #amalov Ensure correct event source processing.

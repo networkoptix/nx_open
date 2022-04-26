@@ -4,6 +4,12 @@
 
 namespace nx::vms::rules {
 
+QString LicenseIssueEvent::uniqueName() const
+{
+    // Licence issue event does not require uniqness offered by the ReasonedEvent::uniqueName().
+    return BasicEvent::uniqueName();
+}
+
 const ItemDescriptor& LicenseIssueEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{

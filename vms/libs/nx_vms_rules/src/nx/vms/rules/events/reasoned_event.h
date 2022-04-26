@@ -29,6 +29,8 @@ public:
         EventReason reasonCode,
         const QString& reasonText);
 
+    virtual QString uniqueName() const override;
+
 protected:
     ~ReasonedEvent() = default; //< Intended for use as base class only.
 };

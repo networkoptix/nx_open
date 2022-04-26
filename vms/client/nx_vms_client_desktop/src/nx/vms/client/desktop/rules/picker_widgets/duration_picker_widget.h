@@ -17,7 +17,8 @@ template<typename F>
 class DurationPickerWidget: public FieldPickerWidget<F>
 {
 public:
-    explicit DurationPickerWidget(QWidget* parent = nullptr)
+    explicit DurationPickerWidget(QWidget* parent = nullptr):
+        FieldPickerWidget<F>(parent)
     {
         auto mainLayout = new QHBoxLayout;
         mainLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
@@ -66,7 +67,7 @@ private:
     {
         {
             QSignalBlocker blocker{timeDurationWidget};
-            timeDurationWidget->setValue(field->value());
+            timeDurationWidget->setValue(field->value().count());
         }
 
         connect(timeDurationWidget,
@@ -78,7 +79,7 @@ private:
 
     void onValueChanged()
     {
-        field->setValue(timeDurationWidget->value());
+        field->setValue(std::chrono::seconds(timeDurationWidget->value()));
         emit edited();
     }
 };

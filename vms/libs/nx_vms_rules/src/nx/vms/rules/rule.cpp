@@ -29,6 +29,10 @@ void Rule::addEventFilter(std::unique_ptr<EventFilter> filter)
 
 void Rule::addActionBuilder(std::unique_ptr<ActionBuilder> builder)
 {
+    if (!builder)
+        return;
+
+    builder->setRuleId(m_id);
     insertActionBuilder(m_builders.size(), std::move(builder));
 }
 

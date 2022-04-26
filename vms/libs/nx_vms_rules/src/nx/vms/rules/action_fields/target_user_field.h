@@ -18,7 +18,7 @@ class NX_VMS_RULES_API TargetUserField: public ActionField
 public:
     TargetUserField() = default;
 
-    virtual QVariant build(const EventData& eventData) const override;
+    virtual QVariant build(const AggregatedEvent& aggregatedEvent) const override;
 };
 
 } // namespace nx::vms::rules
