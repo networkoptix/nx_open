@@ -26,10 +26,14 @@ public:
 
     static QnTextPixmapCache* instance();
 
-    const QPixmap& pixmap(const QString& text, const QFont& font, const QColor& color);
+    const QPixmap& pixmap(
+        const QString& text,
+        const QFont& font,
+        const QColor& color,
+        qreal shadowRadius = 0.0);
 
     const QnTextPixmap& pixmap(const QString& text, const QFont& font, const QColor& color,
-        int width, Qt::TextElideMode elideMode);
+        int width, Qt::TextElideMode elideMode, qreal shadowRadius = 0.0);
 
 private:
     QScopedPointer<QnTextPixmapCachePrivate> d;

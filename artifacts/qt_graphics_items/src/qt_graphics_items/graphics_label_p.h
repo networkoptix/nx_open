@@ -53,6 +53,7 @@ public:
     QRectF rect;
     bool staticTextDirty;
     bool pixmapDirty;
+    qreal shadowRadius = 0.0;
 };
 
 #endif // GRAPHICSLABEL_P_H

@@ -75,7 +75,8 @@ void GraphicsLabelPrivate::ensurePixmaps() {
     if(!pixmapDirty)
         return;
 
-    pixmap = QnTextPixmapCache::instance()->pixmap(text, q->font(), q->palette().color(QPalette::WindowText));
+    pixmap = QnTextPixmapCache::instance()->pixmap(
+        text, q->font(), q->palette().color(QPalette::WindowText), shadowRadius);
     pixmapDirty = false;
 }
 
@@ -171,6 +172,15 @@ void GraphicsLabel::setPerformanceHint(PerformanceHint performanceHint) {
     default:
         break;
     }
+}
+
+void GraphicsLabel::setShadowRadius(qreal radius)
+{
+    Q_D(GraphicsLabel);
+
+    d->shadowRadius = radius;
+    d->pixmapDirty = true;
+    update();
 }
 
 QSizeF GraphicsLabel::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const {
