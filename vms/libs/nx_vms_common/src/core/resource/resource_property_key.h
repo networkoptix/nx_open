@@ -114,6 +114,12 @@ static const QString kDontRecordPrimaryStreamKey("dontRecordPrimaryStream");
  */
 static const QString kDontRecordSecondaryStreamKey("dontRecordSecondaryStream");
 
+/**
+ * Remote archive before this time will not be synchronized.
+ */
+static const QString kLastSyncronizedRemoteArchiveTimestampMs(
+    "lastSyncronizedRemoteArchiveTimestampMs");
+
 namespace Onvif {
 
 static const QString kMediaUrl = "MediaUrl";
@@ -262,6 +268,12 @@ static const QString kOnvifTimeoutSeconds("onvifTimeoutSeconds");
 static const QString kOnvifSetDateTimeOffset("onvifSetDateTimeOffset");
 
 static const QString kAnalogEncoder("analogEncoder");
+
+// Holes in remote archive smaller than this many seconds will be patched up.
+static const QString kOnvifRemoteArchiveMinChunkDuration("onvifRemoteArchiveMinChunkDuration");
+
+// Skip this many seconds at the start of remote archive when when downloading it.
+static const QString kOnvifRemoteArchiveStartSkipDuration("onvifRemoteArchiveStartSkipDuration");
 
 static const QString kDisableRtspMetadataStream("disableRtspMetadataStream");
 
