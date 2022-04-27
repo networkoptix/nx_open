@@ -5,11 +5,13 @@
 #include <QtWidgets/QGraphicsDropShadowEffect>
 #include <QtWidgets/QGraphicsLinearLayout>
 
-#include <ui/animation/opacity_animator.h>
-#include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
-#include <ui/common/palette.h>
 #include <qt_graphics_items/graphics_label.h>
+
+#include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <ui/animation/opacity_animator.h>
+#include <ui/common/palette.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
 
 using namespace nx::vms::client::desktop;
@@ -54,18 +56,21 @@ QnResourceTitleItem::QnResourceTitleItem(QGraphicsItem* parent):
     mainLayout->addStretch();
     mainLayout->addItem(rightButtonsBar());
 
-    const auto createDropShadowEffect =
-        []()
-        {
-            const auto effect = new QGraphicsDropShadowEffect();
-            effect->setBlurRadius(2.5);
-            effect->setOffset(QPointF(0, 0));
-            effect->setColor(qRgba(0, 0, 0, 255));
-            return effect;
-        };
+    if (ini().enableCameraTitleShadowEffect)
+    {
+        const auto createDropShadowEffect =
+            []()
+            {
+                const auto effect = new QGraphicsDropShadowEffect();
+                effect->setBlurRadius(2.5);
+                effect->setOffset(QPointF(0, 0));
+                effect->setColor(qRgba(0, 0, 0, 255));
+                return effect;
+            };
 
-    m_nameLabel->setGraphicsEffect(createDropShadowEffect());
-    m_extraInfoLabel->setGraphicsEffect(createDropShadowEffect());
+        m_nameLabel->setGraphicsEffect(createDropShadowEffect());
+        m_extraInfoLabel->setGraphicsEffect(createDropShadowEffect());
+    }
 
     setLayout(mainLayout);
 }

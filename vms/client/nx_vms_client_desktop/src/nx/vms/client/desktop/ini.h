@@ -175,6 +175,10 @@ struct Ini: nx::kit::IniConfig
     NX_INI_INT(4, attributeTableSpacing,
         "[Design] Spacing between attributes in analytics attribute tables.");
 
+    // VMS-31995
+    NX_INI_FLAG(true, enableCameraTitleShadowEffect,
+        "[Design] Enable graphics shadow effect on camera title texts.");
+
     // ---------------------------------------------------------------------------------------------
     // Features section
     // Flags here can be removed when QA approves the feature to be definitely present in the
