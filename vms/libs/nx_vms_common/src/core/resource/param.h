@@ -113,6 +113,12 @@ namespace ResourcePropertyKey
     static const QString kDontRecordSecondaryStreamKey("dontRecordSecondaryStream");
 
     /**
+     * Remote archive before this time will not be synchronized.
+     */
+    static const QString kLastSyncronizedRemoteArchiveTimestampMs(
+        "lastSyncronizedRemoteArchiveTimestampMs");
+
+    /**
      * Whether to download remote (i.e. on-camera) archives.
      */
     static const QString kRemoteArchiveSynchronizationDisabled("remoteArchiveSynchronizationDisabled");
@@ -257,6 +263,12 @@ namespace ResourceDataKey
 
     // Add this many seconds to VMS system time before uploading it to ONVIF camera
     static const QString kOnvifSetDateTimeOffset("onvifSetDateTimeOffset");
+
+    // Holes in remote archive smaller than this many seconds will be patched up.
+    static const QString kOnvifRemoteArchiveMinChunkDuration("onvifRemoteArchiveMinChunkDuration");
+
+    // Skip this many seconds at the start of remote archive when when downloading it.
+    static const QString kOnvifRemoteArchiveStartSkipDuration("onvifRemoteArchiveStartSkipDuration");
 } // namespace ResourceDataKey
 
 //-------------------------------------------------------------------------------------------------
