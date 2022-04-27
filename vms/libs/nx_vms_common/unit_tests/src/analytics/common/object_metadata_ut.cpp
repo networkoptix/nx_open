@@ -9,10 +9,10 @@ namespace nx::common::metadata::test {
 TEST(metadataAttributes, twoGroups)
 {
     Attributes attributes;
-    attributes.insert({"name1","value1"});
-    attributes.insert({"name1","value2"});
-    attributes.insert({"name2","value1"});
-    attributes.insert({"name1","value3"});
+    addAttributeIfNotExists(&attributes, {"name1","value1"});
+    addAttributeIfNotExists(&attributes, {"name1","value2"});
+    addAttributeIfNotExists(&attributes, {"name2","value1"});
+    addAttributeIfNotExists(&attributes, {"name1","value3"});
 
     const auto result = groupAttributes(attributes);
     ASSERT_EQ(2, result.size());
@@ -25,8 +25,8 @@ TEST(metadataAttributes, twoGroups)
 TEST(metadataAttributes, oneGroup)
 {
     Attributes attributes;
-    attributes.insert({"name1", "value1"});
-    attributes.insert({"name1", "value2"});
+    addAttributeIfNotExists(&attributes, {"name1", "value1"});
+    addAttributeIfNotExists(&attributes, {"name1", "value2"});
 
     const auto result = groupAttributes(attributes);
     ASSERT_EQ(1, result.size());
@@ -37,8 +37,8 @@ TEST(metadataAttributes, oneGroup)
 TEST(metadataAttributes, simpleGroups)
 {
     Attributes attributes;
-    attributes.insert({"name1", "value1"});
-    attributes.insert({"name2", "value2"});
+    addAttributeIfNotExists(&attributes, {"name1", "value1"});
+    addAttributeIfNotExists(&attributes, {"name2", "value2"});
 
     const auto result = groupAttributes(attributes);
     ASSERT_EQ(2, result.size());
@@ -51,8 +51,8 @@ TEST(metadataAttributes, simpleGroups)
 TEST(metadataAttributes, filterOutHidden)
 {
     Attributes attributes;
-    attributes.insert({"nx.sys.testAttribute", "value1"});
-    attributes.insert({"nx.sys.testAttribute", "value2"});
+    addAttributeIfNotExists(&attributes, {"nx.sys.testAttribute", "value1"});
+    addAttributeIfNotExists(&attributes, {"nx.sys.testAttribute", "value2"});
 
     const auto filtered = groupAttributes(attributes); //< Filters hidden attributes out by default.
     ASSERT_EQ(0, filtered.size());
@@ -67,9 +67,9 @@ TEST(metadataAttributes, filterOutHidden)
 TEST(metadataAttributes, humanReadableNames)
 {
     Attributes attributes;
-    attributes.insert({"Parent Name.Nested Name", "TRUE"});
-    attributes.insert({"Parent Name.Nested Name", "fAlSe"});
-    attributes.insert({"Parent Name.Nested Name", "true story"});
+    addAttributeIfNotExists(&attributes, {"Parent Name.Nested Name", "TRUE"});
+    addAttributeIfNotExists(&attributes, {"Parent Name.Nested Name", "fAlSe"});
+    addAttributeIfNotExists(&attributes, {"Parent Name.Nested Name", "true story"});
 
     const auto humanReadable = groupAttributes(attributes);
     ASSERT_EQ(1, humanReadable.size());

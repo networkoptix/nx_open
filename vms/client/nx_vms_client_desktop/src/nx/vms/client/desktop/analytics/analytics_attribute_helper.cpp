@@ -109,7 +109,7 @@ GroupedAttributes AttributeHelper::preprocessAttributes(
         const auto path = attributePath(objectTypeId, nameValuePair.name);
         if (path.isEmpty()) //< An attribute unknown to the current taxonomy.
         {
-            unknown.insert(nameValuePair);
+            addAttributeIfNotExists(&unknown, nameValuePair);
             continue;
         }
 
@@ -131,8 +131,7 @@ GroupedAttributes AttributeHelper::preprocessAttributes(
             default:
                 break;
         }
-
-        preprocessed.insert({name.join(' '), value});
+        addAttributeIfNotExists(&preprocessed, { name.join(' '), value });
     }
 
     return groupAttributes(preprocessed, /*humanReadableNames*/ false)

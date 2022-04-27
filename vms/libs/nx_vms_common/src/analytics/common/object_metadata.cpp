@@ -373,6 +373,34 @@ void QnCompressedObjectMetadataPacket::assign(const QnCompressedObjectMetadataPa
     packet = other->packet;
 }
 
+void addAttributeIfNotExists(Attributes* result, const Attribute& a)
+{
+    Attributes::iterator insPos = result->end();
+    for (auto it = result->begin(); it != result->end(); ++it)
+    {
+        const auto& attribute = *it;
+        if (attribute.name == a.name)
+        {
+            if (attribute.value == a.value)
+                return;
+            insPos = it;
+        }
+    }
+    if (insPos == result->end())
+        result->push_back(a);
+    else
+        result->insert(std::next(insPos), a);
+}
+
+Attributes::iterator findFirstAttributeByName(Attributes* a, const QString& name)
+{
+    for (auto it = a->begin(); it != a->end(); ++it)
+    {
+        if (it->name == name)
+            return it;
+    }
+    return a->end();
+}
 
 } // namespace metadata
 } // namespace common
