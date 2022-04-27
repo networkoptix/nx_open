@@ -104,25 +104,27 @@ int calculateAutoFpsLimit(QnWorkbenchLayout* layout)
     if (!layout)
         return kIdleFps;
 
-    const auto itemsCount = layout->items().count();
+    const auto& items = layout->items();
 
-    if (itemsCount == 0) // Empty layout.
+    if (items.count() == 0) // Empty layout.
         return kIdleFps;
 
+    QnVirtualCameraResourceList cameras;
+
     // Gather cameras placed on current layout.
-    const QnVirtualCameraResourceList cameras =
-        layout->itemResources().filtered<QnVirtualCameraResource>();
-
-    if (itemsCount == cameras.count()) // Layout contains only cameras.
+    for (const auto item: items)
     {
-        QPair<int, int> result = Qn::calculateMaxFps(cameras);
-
-        if (result.second != std::numeric_limits<int>::max())
-            return result.second;
+        if (auto camera = item->resource().dynamicCast<QnVirtualCameraResource>())
+            cameras.push_back(camera);
+        else
+            return kUnlimitedFps; //< Item is not camera - do not limit fps.
     }
 
-    // We do not have any info about items fps - do not limit fps.
-    return kUnlimitedFps;
+    const QPair<int, int> result = Qn::calculateMaxFps(cameras);
+
+    return result.second == std::numeric_limits<int>::max()
+        ? kUnlimitedFps
+        : result.second;
 }
 
 DelegateState serializeState(const QnPaneSettingsMap& settings)
