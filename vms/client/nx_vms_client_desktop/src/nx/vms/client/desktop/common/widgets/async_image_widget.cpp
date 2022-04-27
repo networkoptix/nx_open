@@ -13,6 +13,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <ui/common/palette.h>
+#include <ui/utils/blur_image.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <nx/vms/client/core/utils/geometry.h>
@@ -26,15 +27,6 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 
-#if QT_VERSION == QT_VERSION_CHECK(5, 15, 2)
-QT_BEGIN_NAMESPACE
-extern Q_WIDGETS_EXPORT void qt_blurImage(
-    QImage& image,
-    qreal radius,
-    bool improvedQuality,
-    int transposed = 0);
-QT_END_NAMESPACE
-#endif
 
 namespace nx::vms::client::desktop {
 
