@@ -152,12 +152,12 @@ InvalidatorPtr cloudSystemIconInvalidator(const QnSystemDescriptionPtr& systemDe
 GenericItem::FlagsProvider cloudSystemFlagsProvider(const QnSystemDescriptionPtr& systemDescription)
 {
     return
-        [weakSystemDescription = systemDescription.toWeakRef()]
+        [weakSystemDescription = systemDescription.toWeakRef()]() -> Qt::ItemFlags
         {
             if (auto systemDescription = weakSystemDescription.lock())
             {
                 if (systemDescription->isReachable() && systemDescription->isOnline())
-                    return Qt::ItemIsSelectable, Qt::ItemIsEnabled;
+                    return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
             }
             return Qt::ItemIsSelectable;
         };
