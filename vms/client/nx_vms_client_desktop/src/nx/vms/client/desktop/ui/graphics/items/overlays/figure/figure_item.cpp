@@ -31,7 +31,6 @@ FigureItem::FigureItem(
 
 void FigureItem::setFigure(const figure::FigurePtr& value)
 {
-    prepareGeometryChange();
     m_figure = value;
 
     if (!m_figure)

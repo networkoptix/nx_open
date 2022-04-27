@@ -219,6 +219,7 @@ public:
     void updateArea(const QnUuid& areaId);
     void updateAreas();
     void ensureRotation();
+    void handleContentUpdated();
 
     QHash<QnUuid, Area> areaById;
     QnUuid highlightedAreaId;
@@ -226,20 +227,22 @@ public:
     QPointer<QGraphicsRotation> rotation;
     int angle = 0;
     QRectF zoomRect;
-    std::unique_ptr<nx::utils::PendingOperation> updateOperation;
 
     const figure::RendererPtr renderer;
 };
 
 AnalyticsOverlayWidget::Private::Private(AnalyticsOverlayWidget* q):
     q(q),
-    updateOperation(new nx::utils::PendingOperation()),
     renderer(new figure::Renderer(kAreaLineWidth, kNoFillForObjects))
 {
-    // Limits the number of update requests to 60 per second.
-    updateOperation->setInterval(kTimeBetweenUpdateRequests);
-    updateOperation->setFlags(nx::utils::PendingOperation::NoFlags);
-    updateOperation->setCallback([q]() { q->update(); });
+}
+
+void AnalyticsOverlayWidget::Private::handleContentUpdated()
+{
+    // For implementing a correct widget licecycle the following code should be called here:
+    //   q->update();
+    // However this widget is only used on main scene which is redrawn at fixed rate.
+    // Calls to update() are useless here and lead to increased CPU/GPU consumption.
 }
 
 void AnalyticsOverlayWidget::Private::setHighlightedArea(const QnUuid& areaId)
@@ -254,7 +257,7 @@ void AnalyticsOverlayWidget::Private::setHighlightedArea(const QnUuid& areaId)
     updateArea(oldHighlightedAreaId);
     updateArea(areaId);
 
-    updateOperation->requestOperation();
+    handleContentUpdated();
 }
 
 void AnalyticsOverlayWidget::Private::updateArea(Area& area)
@@ -417,7 +420,7 @@ void AnalyticsOverlayWidget::addOrUpdateArea(
     tooltipItem->setFigure(figure);
 
     d->updateArea(area);
-    d->updateOperation->requestOperation();
+    d->handleContentUpdated();
 }
 
 void AnalyticsOverlayWidget::removeArea(const QnUuid& areaId)
@@ -427,7 +430,7 @@ void AnalyticsOverlayWidget::removeArea(const QnUuid& areaId)
         if (d->highlightedAreaId == areaId)
             d->setHighlightedArea(QnUuid());
         NX_VERBOSE(this, "Area was removed, total %1 left", d->areaById.size());
-        d->updateOperation->requestOperation();
+        d->handleContentUpdated();
     }
 }
 
