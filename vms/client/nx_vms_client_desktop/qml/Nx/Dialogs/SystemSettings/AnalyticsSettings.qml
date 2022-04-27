@@ -32,6 +32,35 @@ Item
             settingsView.selectSection(currentSectionPath)
     }
 
+    Item
+    {
+        id: scrollBarParent
+
+        width: 8
+
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+    }
+
+    SettingsView
+    {
+        id: settingsView
+
+        scrollBarParent: scrollBarParent
+
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.left: menu.right
+        anchors.right: scrollBarParent.left
+        anchors.margins: 16
+
+        onValuesEdited: function(activeElement)
+        {
+            store.setSettingsValues(currentEngineId, activeElement, getValues())
+        }
+    }
+
     Connections
     {
         target: analyticsSettings.store || null
@@ -96,19 +125,5 @@ Item
         // For some reason the notify signal of currentEngineId is not caught by C++ for the very
         // first time. However any handler on QML side fixes it. This is why this empty handler is
         // here.
-    }
-
-    SettingsView
-    {
-        id: settingsView
-
-        anchors.fill: parent
-        anchors.margins: 16
-        anchors.leftMargin: menu.width + 16
-
-        onValuesEdited: function(activeElement)
-        {
-            store.setSettingsValues(currentEngineId, activeElement, getValues())
-        }
     }
 }
