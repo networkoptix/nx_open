@@ -13,6 +13,7 @@
 #include <QtGui/QFontMetrics>
 #include <QtGui/QGuiApplication>
 
+#include <ui/utils/blur_image.h>
 #include <nx/utils/log/assert.h>
 
 #include "hashed_font.h"
@@ -20,8 +21,35 @@
 
 namespace {
 
+QImage getShadowImage(
+    const QString& text,
+    const QSize& size,
+    qreal pixelRatio,
+    const QPointF& origin,
+    const QFont& font,
+    qreal radius)
+{
+    static const QColor kShadowColor = qRgba(0, 0, 0, 255);
+
+    // Use Format_ARGB32_Premultiplied so qt_blurImage() won't convert the image before blurring.
+    QImage image(size, QImage::Format_ARGB32_Premultiplied);
+    image.setDevicePixelRatio(pixelRatio);
+    image.fill(Qt::transparent);
+
+    QPainter painter(&image);
+    painter.setCompositionMode(QPainter::CompositionMode_Source);
+    painter.setPen(kShadowColor);
+    painter.setFont(font);
+    const QPointF offset{0, 0.75};
+    painter.drawText(-origin + offset, text);
+    painter.end();
+
+    qt_blurImage(image, radius, false);
+    return image;
+}
+
 QnTextPixmap renderText(const QString& text, const QPen& pen, const QFont& font,
-    int width, Qt::TextElideMode elideMode)
+    int width, Qt::TextElideMode elideMode, qreal shadowRadius = 0.0)
 {
     const QFontMetrics metrics(font);
 
@@ -49,6 +77,14 @@ QnTextPixmap renderText(const QString& text, const QPen& pen, const QFont& font,
     pixmap.fill(Qt::transparent);
 
     QPainter painter(&pixmap);
+
+    if (shadowRadius > 0)
+    {
+        const auto shadowImage =
+            getShadowImage(renderText, pixmapSize, pixelRatio, origin, font, shadowRadius);
+        painter.drawImage(QPoint{0, 0}, shadowImage);
+    }
+
     painter.setCompositionMode(QPainter::CompositionMode_Source);
     painter.setPen(pen);
     painter.setFont(font);
@@ -131,9 +167,10 @@ QnTextPixmapCache::~QnTextPixmapCache()
 const QPixmap& QnTextPixmapCache::pixmap(
     const QString& text,
     const QFont& font,
-    const QColor& color)
+    const QColor& color,
+    qreal shadowRadius)
 {
-    return pixmap(text, font, color, 0, Qt::ElideNone).pixmap;
+    return pixmap(text, font, color, 0, Qt::ElideNone, shadowRadius).pixmap;
 }
 
 const QnTextPixmap& QnTextPixmapCache::pixmap(
@@ -141,7 +178,8 @@ const QnTextPixmap& QnTextPixmapCache::pixmap(
     const QFont& font,
     const QColor& color,
     int width,
-    Qt::TextElideMode elideMode)
+    Qt::TextElideMode elideMode,
+    qreal shadowRadius)
 {
     QColor localColor = color.toRgb();
     if (!localColor.isValid())
@@ -173,7 +211,8 @@ const QnTextPixmap& QnTextPixmapCache::pixmap(
         d->pixmapByKey.remove(key);
     }
 
-    const auto textPixmapStruct = renderText(text, QPen(localColor, 0), font, width, elideMode);
+    const auto textPixmapStruct = renderText(
+        text, QPen(localColor, 0), font, width, elideMode, shadowRadius);
 
     static const QnTextPixmap kEmptyTextPixmap;
 

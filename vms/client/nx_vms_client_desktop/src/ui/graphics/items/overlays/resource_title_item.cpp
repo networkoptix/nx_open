@@ -2,7 +2,6 @@
 
 #include "resource_title_item.h"
 
-#include <QtWidgets/QGraphicsDropShadowEffect>
 #include <QtWidgets/QGraphicsLinearLayout>
 
 #include <ui/animation/opacity_animator.h>
@@ -54,18 +53,10 @@ QnResourceTitleItem::QnResourceTitleItem(QGraphicsItem* parent):
     mainLayout->addStretch();
     mainLayout->addItem(rightButtonsBar());
 
-    const auto createDropShadowEffect =
-        []()
-        {
-            const auto effect = new QGraphicsDropShadowEffect();
-            effect->setBlurRadius(2.5);
-            effect->setOffset(QPointF(0, 0));
-            effect->setColor(qRgba(0, 0, 0, 255));
-            return effect;
-        };
+    static constexpr qreal kShadowRadius = 2.5;
 
-    m_nameLabel->setGraphicsEffect(createDropShadowEffect());
-    m_extraInfoLabel->setGraphicsEffect(createDropShadowEffect());
+    m_nameLabel->setShadowRadius(kShadowRadius);
+    m_extraInfoLabel->setShadowRadius(kShadowRadius);
 
     setLayout(mainLayout);
 }

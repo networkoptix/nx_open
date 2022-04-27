@@ -61,6 +61,8 @@ public:
     PerformanceHint performanceHint() const;
     void setPerformanceHint(PerformanceHint performanceHint);
 
+    void setShadowRadius(qreal radius);
+
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 public slots:
