@@ -390,8 +390,8 @@ WorkbenchUi::WorkbenchUi(QObject *parent):
 void WorkbenchUi::updateAutoFpsLimit()
 {
     NX_TRACE_COUNTER("Items").args({{
-        "cameras",
-        workbench()->currentLayout()->itemResources().filtered<QnVirtualCameraResource>().count()
+        "items",
+        workbench()->currentLayout()->items().count()
     }});
 
     m_instrumentManager->setFpsLimit(calculateAutoFpsLimit(workbench()->currentLayout()));
