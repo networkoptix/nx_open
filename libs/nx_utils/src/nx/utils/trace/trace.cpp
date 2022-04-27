@@ -16,6 +16,7 @@
 #include <QtCore/QFileInfo>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/thread/thread_util.h>
 
 using namespace std::chrono;
 
@@ -23,7 +24,7 @@ namespace nx::utils::trace {
 
 namespace {
 
-constexpr auto kCapacity = 1000;
+constexpr auto kCapacity = 10000;
 constexpr auto kDumpPeriod = 1s;
 
 class Queue
@@ -94,7 +95,7 @@ public:
     {
         m_queue.try_enqueue({
             Log::EventPhase::Complete,
-            reinterpret_cast<int64_t>(QThread::currentThreadId()),
+            static_cast<int64_t>(currentThreadSystemId()),
             start,
             end,
             name,
@@ -247,7 +248,7 @@ void Log::disable()
 
 Log Log::event(EventPhase phase, const char* name)
 {
-    const auto id = reinterpret_cast<int64_t>(QThread::currentThreadId());
+    const auto id = static_cast<int64_t>(currentThreadSystemId());
     return Log(phase, name, id, steady_clock::now());
 }
 

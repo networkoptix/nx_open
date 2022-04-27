@@ -362,9 +362,13 @@ void StartupActionsHandler::handleStartupParameters()
     if (!startupParameters.scriptFile.isEmpty())
         handleScriptFile(startupParameters.scriptFile);
 
-    if (!startupParameters.traceFile.isEmpty())
+    const auto traceFile = startupParameters.traceFile.isEmpty()
+        ? qgetenv("NX_TRACE_FILE").toStdString()
+        : startupParameters.traceFile.toStdString();
+
+    if (!traceFile.empty())
     {
-        nx::utils::trace::Log::enable(startupParameters.traceFile.toStdString());
+        nx::utils::trace::Log::enable(traceFile);
         qnClientModule->performanceMonitor()->setEnabled(true);
     }
 }
