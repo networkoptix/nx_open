@@ -294,14 +294,7 @@ QMarginsF AreaTooltipItem::textMargins() const
 
 void AreaTooltipItem::setFigure(const figure::FigurePtr& figure)
 {
-    if (figure.isNull() == d->figure.isNull()
-        && (figure.isNull() || figure->equalsTo(*d->figure)))
-    {
-        return;
-    }
-
     d->figure = figure;
-    update();
 }
 
 } // namespace nx::vms::client::desktop
