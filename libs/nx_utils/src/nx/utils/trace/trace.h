@@ -111,7 +111,7 @@ public:
         m_startTime = std::chrono::steady_clock::now();
 
         // It is not possible to inline destructor code with incomplete QJsonObject.
-        // However, including full QJsonObject header significantly decreases
+        // However, including full QJsonObject header significantly increases
         // compilation time.
         // Avoid this by moving the destructor call to the actual trace report call
         // which is not inlined.
