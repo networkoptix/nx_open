@@ -1496,7 +1496,7 @@
     </message>
     <message>
       <source>Allow digest authentication for imported user</source>
-      <translation>インポートされたユーザーのダイジェスト認証を許可する</translation>
+      <translation>インポートされたユーザーのDigest認証を許可する</translation>
     </message>
   </context>
   <context>
@@ -2906,7 +2906,7 @@
     <name>UserSettingsDialog</name>
     <message>
       <source>This user can use digest authentication.</source>
-      <translation>このユーザーはダイジェスト認証を使用できます。</translation>
+      <translation>このユーザーはDigest認証を使用できます。</translation>
     </message>
     <message>
       <source>Force Secure Authentication</source>

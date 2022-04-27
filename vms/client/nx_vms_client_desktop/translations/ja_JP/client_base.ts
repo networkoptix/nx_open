@@ -1664,11 +1664,11 @@
     </message>
     <message>
       <source>May lead to privacy issues</source>
-      <translation>プライバシーの問題につながる可能性があります</translation>
+      <translation>機密性の問題につながる可能性があります</translation>
     </message>
     <message>
       <source>Connect only servers with public certificate</source>
-      <translation>公開証明書を持つサーバーにのみ接続</translation>
+      <translation>正式な証明書を持つサーバーにのみ接続します</translation>
     </message>
     <message>
       <source>Certificate storage will be cleared.</source>
@@ -3774,7 +3774,7 @@ to %1</source>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>カメラとサーバーのIPアドレスとユーザーの役割を表示する。</translation>
+      <translation>カメラやサーバーのIPアドレスおよびユーザーの役割を表示します。</translation>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
@@ -5656,7 +5656,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To enable digest authentication password reset is required</source>
-      <translation>ダイジェスト認証を有効にするには、パスワードのリセットが必要です</translation>
+      <translation>Digest認証を有効にするには、パスワードの再設定が必要です</translation>
     </message>
   </context>
   <context>
@@ -5775,7 +5775,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Allow digest authentication for this user</source>
-      <translation>このユーザーのダイジェスト認証を許可する</translation>
+      <translation>このユーザーのDigest認証を許可する</translation>
     </message>
     <message>
       <source>Learn More</source>
@@ -5854,7 +5854,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Password reset is required</source>
-      <translation>パスワードのリセットが必要です</translation>
+      <translation>パスワードの再設定が必要です</translation>
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed.</source>
@@ -8303,7 +8303,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>To revert this change user password reset will be required.</source>
-      <translation>この変更を元に戻すには、ユーザーパスワードのリセットが必要です。</translation>
+      <translation>この変更を元に戻すには、ユーザーパスワードの再設定が必要です。</translation>
     </message>
     <message>
       <source>Do not show this message again</source>
@@ -9787,7 +9787,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
       <comment>%n is digest user count, %1 is total user count</comment>
       <translation>
-        <numerusform>%1 ユーザー中 %n 名が Digest認証 (安全ではない) を利用できる設定です。</numerusform>
+        <numerusform>%1 ユーザー中 %n 名が Digest認証を利用できる (安全ではない) 設定です。</numerusform>
       </translation>
     </message>
   </context>
