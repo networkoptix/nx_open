@@ -60,6 +60,8 @@ NxObject
 
         viewport: workbenchContext.mainWindow
 
+        visible: bubble.visible
+
         width: bubble.boundingRect.width
         height: bubble.boundingRect.height
 
