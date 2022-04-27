@@ -329,12 +329,20 @@ void QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
             break;
     }
 
+    const auto getShortErrorDescriptionText =
+        [&error, &moduleInformation, &engineVersion]
+        {
+            return nx::vms::client::core::errorDescription(
+                error.code, moduleInformation, engineVersion).shortText;
+        };
+
     QString title;
     switch (error.code)
     {
         case RemoteConnectionErrorCode::sessionExpired:
         case RemoteConnectionErrorCode::cloudSessionExpired:
-            title = tr("Your session has expired");
+        case RemoteConnectionErrorCode::ldapInitializationInProgress:
+            title = getShortErrorDescriptionText();
             break;
         case RemoteConnectionErrorCode::systemIsNotCompatibleWith2Fa:
             title = tr("System is not compatible with two-factor authentication");
@@ -342,6 +350,7 @@ void QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
         case RemoteConnectionErrorCode::twoFactorAuthOfCloudUserIsDisabled:
             title = tr("Failed to log in to \"%1\" system").arg(moduleInformation.systemName);
             break;
+
         default:
             title = tr("Failed to connect to Server");
             break;
