@@ -200,7 +200,7 @@
     </message>
     <message>
       <source>Please contact support.</source>
-      <translation type="unfinished">Please contact support.</translation>
+      <translation>Kontakt venligst support.</translation>
     </message>
     <message>
       <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
