@@ -10,6 +10,6 @@ TextFieldWithWarning
 
     function updateWarning()
     {
-        warningState = validationRegex && !validationRegex.test(text)
+        warningState = errorMessage || validationRegex && !validationRegex.test(text)
     }
 }

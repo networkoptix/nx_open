@@ -17,10 +17,12 @@ LabeledItem
     property var figureSettings
     property var figure
     property bool useLabelField: true
+    property bool isActive: false
 
     isGroup: true
 
     signal valueChanged()
+    signal activeValueChanged() //< This signal is emitted even if isActive is set to false.
 
     readonly property bool filled: !!figure
 
@@ -85,7 +87,7 @@ LabeledItem
             id: showOnCameraCheckBox
             text: qsTr("Display on video")
             enabled: figureView.hasFigure
-            onCheckedChanged: valueChanged()
+            onCheckedChanged: activeValueChanged()
             topPadding: 0
         }
     }
@@ -104,12 +106,21 @@ LabeledItem
                 figureSettings: control.figureSettings
                 resourceId: figureView.resourceId
 
-                onAccepted: figure = serializeFigure()
+                onAccepted:
+                {
+                    let newFigure = serializeFigure()
+                    let newFigureString = JSON.stringify(newFigure, Object.keys(newFigure).sort())
+                    let figureString =
+                        figure ? JSON.stringify(figure, Object.keys(figure).sort()) : ""
+
+                    if (figureString !== newFigureString)
+                        figure = newFigure
+                }
             }
         }
     }
 
-    onFigureChanged: valueChanged()
+    onFigureChanged: activeValueChanged()
 
     function openEditDialog()
     {

@@ -63,6 +63,27 @@ public:
             m_owner->thread());
     }
 
+    virtual rest::Handle activeSettingsChanged(
+        const QnVirtualCameraResourcePtr& device,
+        const nx::vms::common::AnalyticsEngineResourcePtr& engine,
+        const QString& activeElement,
+        const QJsonObject& settingsModel,
+        const QJsonObject& settingsValues,
+        AnalyticsSettingsCallback callback) override
+    {
+        if (!NX_ASSERT(device) || !NX_ASSERT(engine) || !NX_ASSERT(m_owner))
+            return {};
+
+        return connectedServerApi()->deviceAnalyticsActiveSettingsChanged(
+            device,
+            engine,
+            activeElement,
+            settingsModel,
+            settingsValues,
+            nx::utils::guarded(m_owner, callback),
+            m_owner->thread());
+    }
+
 private:
     QPointer<QObject> m_owner;
 };

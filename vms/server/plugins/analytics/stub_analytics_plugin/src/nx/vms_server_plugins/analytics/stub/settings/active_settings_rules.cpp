@@ -45,15 +45,6 @@ const std::string kAdditionalCheckBoxSetting = R"json(
     }
 )json";
 
-const std::string kAdditionalTextBoxSetting = R"json(
-    {
-        "type": "TextField",
-        "name": ")json" + kActiveTextBoxId + R"json(",
-        "caption": "Active TextBox",
-        "defaultValue": "print \")json" + kShowAdditionalTextBoxValue + R"json(\""
-    }
-)json";
-
 const std::string kAdditionalRadioButton = "Hide me";
 
 // ------------------------------------------------------------------------------------------------
@@ -64,7 +55,6 @@ const std::map<
 {
     {{kActiveComboBoxId, kShowAdditionalComboBoxValue}, showAdditionalComboBox},
     {{kActiveCheckBoxId, kShowAdditionalCheckBoxValue}, showAdditionalCheckBox},
-    {{kActiveTextBoxId, kShowAdditionalTextBoxValue}, showAdditionalTextBox},
     {{kActiveRadioButtonGroupId, kShowAdditionalRadioButtonValue}, showAdditionalRadioButton},
     {{kActiveRadioButtonGroupId, kHideAdditionalRadioButtonValue}, hideAdditionalRadioButton}
 };
@@ -75,7 +65,6 @@ const std::map<
 {
     {kActiveComboBoxId, hideAdditionalComboBox},
     {kActiveCheckBoxId, hideAdditionalCheckBox},
-    {kActiveTextBoxId, hideAdditionalTextBox}
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -213,24 +202,6 @@ void hideAdditionalCheckBox(Json* inOutModel, std::map<std::string, std::string>
         inOutModel,
         inOutValues,
         kAdditionalCheckBoxId);
-}
-
-void showAdditionalTextBox(Json* inOutModel, std::map<std::string, std::string>* inOutValues)
-{
-    showAdditionalSetting(
-        inOutModel,
-        inOutValues,
-        kActiveTextBoxId,
-        kAdditionalTextBoxSetting,
-        kAdditionalTextBoxValue);
-}
-
-void hideAdditionalTextBox(Json* inOutModel, std::map<std::string, std::string>* inOutValues)
-{
-    hideAdditionalSetting(
-        inOutModel,
-        inOutValues,
-        kAdditionalTextBoxId);
 }
 
 void showAdditionalRadioButton(Json* inOutModel, std::map<std::string, std::string>* inOutValues)

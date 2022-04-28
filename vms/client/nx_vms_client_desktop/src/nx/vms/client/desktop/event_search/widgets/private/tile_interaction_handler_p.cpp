@@ -487,7 +487,8 @@ bool TileInteractionHandler::requestPluginActionSettings(const QJsonObject& sett
         "loadModel",
         Qt::DirectConnection,
         Q_ARG(QVariant, settingsModel.toVariantMap()),
-        Q_ARG(QVariant, {}));
+        /*initialValues*/ Q_ARG(QVariant, {}),
+        /*restoreScrollPosition*/ Q_ARG(QVariant, false));
 
     const auto panel = new QScrollArea(&parametersDialog);
     panel->setFixedHeight(400);

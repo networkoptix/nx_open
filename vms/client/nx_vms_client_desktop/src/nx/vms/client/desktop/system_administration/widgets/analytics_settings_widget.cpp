@@ -19,6 +19,7 @@
 #include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <nx/vms/client/desktop/analytics/analytics_engines_watcher.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <utils/common/connective.h>
@@ -69,16 +70,29 @@ public:
         return settingsValuesByEngineId.value(engineId).values;
     }
 
-    Q_INVOKABLE void setSettingsValues(const QnUuid& engineId, const QJsonObject& values)
+    Q_INVOKABLE void setSettingsValues(
+        const QnUuid& engineId, const QString& activeElement, const QJsonObject& values)
     {
         settingsValuesByEngineId.insert(engineId, SettingsValues{values, true});
         hasChanges = true;
+
+        if (ini().activePluginSettings && !activeElement.isEmpty())
+            activeElementChanged(currentEngineId, activeElement);
+
         emit q->hasChangesChanged();
     }
 
     Q_INVOKABLE QJsonObject settingsModel(const QnUuid& engineId)
     {
+        if (m_previewSettingsModel[engineId])
+            return *m_previewSettingsModel[engineId];
+
         return settingsModelByEngineId.value(engineId);
+    }
+
+    Q_INVOKABLE QJsonObject errors(const QnUuid& engineId)
+    {
+        return m_errors[engineId];
     }
 
     QVariant analyticsEngines() const { return engines; }
@@ -97,11 +111,14 @@ public:
     }
 
     void refreshSettingsValues(const QnUuid& engineId);
+    void activeElementChanged(const QnUuid& engineId, const QString& activeElement);
     void applySettingsValues();
 
 signals:
     void analyticsEnginesChanged();
     void settingsValuesChanged(const QnUuid& engineId);
+    void settingsModelChanged(const QnUuid& engineId);
+    void errorsChanged(const QnUuid& engineId);
     void loadingChanged();
 
 private:
@@ -109,6 +126,7 @@ private:
         const QnUuid& engineId, const AnalyticsEnginesWatcher::AnalyticsEngineInfo& engineInfo);
     void removeEngine(const QnUuid& engineId);
     void updateEngine(const QnUuid& engineId);
+    void setErrors(const QnUuid& engineId, const QJsonObject& errors);
 
 public:
     const QScopedPointer<QQuickWidget> view;
@@ -118,6 +136,8 @@ public:
     bool settingsLoading = false;
     QList<rest::Handle> pendingRefreshRequests;
     QList<rest::Handle> pendingApplyRequests;
+    QHash<QnUuid, std::optional<QJsonObject>> m_previewSettingsModel;
+    QHash<QnUuid, QJsonObject> m_errors;
 
     QmlProperty<QnUuid> currentEngineId{view.data(), "currentEngineId"};
 
@@ -231,6 +251,15 @@ void AnalyticsSettingsWidget::Private::updateEngine(const QnUuid& engineId)
     emit analyticsEnginesChanged();
 }
 
+void AnalyticsSettingsWidget::Private::setErrors(const QnUuid& engineId, const QJsonObject& errors)
+{
+    if (m_errors.value(engineId) == errors)
+        return;
+
+    m_errors[engineId] = errors;
+    emit errorsChanged(engineId);
+}
+
 void AnalyticsSettingsWidget::Private::activateEngine(const QnUuid& engineId)
 {
     if (enginesWatcher->engineInfo(engineId).id.isNull())
@@ -254,6 +283,8 @@ void AnalyticsSettingsWidget::Private::refreshSettingsValues(const QnUuid& engin
     if (!connection()) //< It may be null if the client just disconnected from the server.
         return;
 
+    m_previewSettingsModel[engineId].reset();
+
     const auto engine = resourcePool()->getResourceById<AnalyticsEngineResource>(engineId);
     if (!NX_ASSERT(engine))
         return;
@@ -276,6 +307,7 @@ void AnalyticsSettingsWidget::Private::refreshSettingsValues(const QnUuid& engin
 
                 settingsValuesByEngineId[engineId] = SettingsValues{result.settingsValues, false};
                 settingsModelByEngineId[engineId] = result.settingsModel;
+                emit settingsModelChanged(engineId);
                 emit settingsValuesChanged(engineId);
             }),
         thread());
@@ -332,6 +364,55 @@ void AnalyticsSettingsWidget::Private::applySettingsValues()
 
         pendingApplyRequests.append(handle);
     }
+
+    setLoading(!pendingApplyRequests.isEmpty());
+}
+
+void AnalyticsSettingsWidget::Private::activeElementChanged(
+    const QnUuid& engineId, const QString& activeElement)
+{
+    if (!pendingApplyRequests.isEmpty() || !pendingRefreshRequests.isEmpty())
+        return;
+
+    if (!NX_ASSERT(connection()))
+        return;
+
+    const auto engine = resourcePool()->getResourceById<AnalyticsEngineResource>(engineId);
+    if (!NX_ASSERT(engine))
+        return;
+
+    const auto handle = connectedServerApi()->engineAnalyticsActiveSettingsChanged(
+        engine,
+        activeElement,
+        settingsModel(engineId),
+        settingsValuesByEngineId[engineId].values,
+        nx::utils::guarded(this,
+            [this, engineId](
+                bool success,
+                rest::Handle requestId,
+                const nx::vms::api::analytics::EngineSettingsResponse& result)
+            {
+                if (!pendingApplyRequests.removeOne(requestId))
+                    return;
+
+                setLoading(!pendingApplyRequests.isEmpty());
+
+                if (!success)
+                    return;
+
+                settingsValuesByEngineId[engineId] =
+                    SettingsValues{ result.settingsValues, true };
+
+                m_previewSettingsModel[engineId] = result.settingsModel;
+                emit settingsModelChanged(engineId);
+                setErrors(engineId, result.settingsErrors);
+            }),
+            thread());
+
+    if (handle <= 0)
+        return;
+
+    pendingApplyRequests.append(handle);
 
     setLoading(!pendingApplyRequests.isEmpty());
 }

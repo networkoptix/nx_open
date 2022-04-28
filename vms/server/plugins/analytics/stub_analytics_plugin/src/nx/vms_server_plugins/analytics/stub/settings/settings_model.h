@@ -37,11 +37,6 @@ static const std::string kAdditionalCheckBoxId = "additionalCheckBox";
 static const std::string kShowAdditionalCheckBoxValue = "true";
 static const std::string kAdditionalCheckBoxValue = "false";
 
-static const std::string kActiveTextBoxId = "activeTextBox";
-static const std::string kAdditionalTextBoxId = "additionalTextBox";
-static const std::string kShowAdditionalTextBoxValue = "show something";
-static const std::string kAdditionalTextBoxValue = "";
-
 static const std::string kActiveRadioButtonGroupId = "activeRadioButtonGroup";
 static const std::string kShowAdditionalRadioButtonValue = "Show something";
 static const std::string kHideAdditionalRadioButtonValue = "Hide me";
@@ -413,13 +408,6 @@ static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R
                     "name": ")json" + kActiveCheckBoxId + R"json(",
                     "caption": "Active CheckBox",
                     "defaultValue": false,
-                    "isActive": true
-                },
-                {
-                    "type": "TextField",
-                    "name": ")json" + kActiveTextBoxId + R"json(",
-                    "caption": "Active TextBox",
-                    "defaultValue": "print \")json" + kShowAdditionalTextBoxValue + R"json(\"",
                     "isActive": true
                 },
                 {

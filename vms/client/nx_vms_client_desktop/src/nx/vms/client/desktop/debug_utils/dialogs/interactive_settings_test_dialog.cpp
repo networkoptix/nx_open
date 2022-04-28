@@ -66,7 +66,8 @@ void InteractiveSettingsTestDialog::loadManifest()
             "loadModel",
             Qt::DirectConnection,
             Q_ARG(QVariant, model),
-            Q_ARG(QVariant, {}));
+            /*initialValues*/ Q_ARG(QVariant, {}),
+            /*restoreScrollPosition*/ Q_ARG(QVariant, false));
 
         refreshValues();
     }

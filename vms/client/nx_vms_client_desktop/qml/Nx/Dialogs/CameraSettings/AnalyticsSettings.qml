@@ -69,7 +69,8 @@ Item
                 else
                 {
                     currentSettingsModel = actualModel
-                    settingsView.loadModel(currentSettingsModel, actualValues)
+                    settingsView.loadModel(
+                        currentSettingsModel, actualValues, /*restoreScrollPosition*/ true)
 
                     if (navigationMenu.lastClickedSectionId || !canUseSectionPath)
                     {
@@ -127,6 +128,8 @@ Item
                 settingsView.loadModel({}, {})
             }
 
+            settingsView.setErrors(store.deviceAgentSettingsErrors(engineId))
+
             if (currentEngineId)
                 header.currentStreamIndex = store.analyticsStreamIndex(currentEngineId)
 
@@ -170,8 +173,10 @@ Item
         contentVisible: contentEnabled
         scrollBarParent: scrollBarsParent
 
-        onValuesEdited:
-            store.setDeviceAgentSettingsValues(currentEngineId, getValues())
+        onValuesEdited: function(activeElement)
+        {
+            store.setDeviceAgentSettingsValues(currentEngineId, activeElement, getValues())
+        }
 
         headerItem: InformationPanel
         {

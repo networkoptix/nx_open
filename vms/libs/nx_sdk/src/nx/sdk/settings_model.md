@@ -25,7 +25,7 @@ Certain fields are supported by some of the controls.
     control value in the GUI leads to sending a settings request to the Server immediately without
     waiting for the confirmation with the "Apply" button. Results of such requests aren't saved in
     the Server database, and reaction of the Plugin to such requests shouldn't lead to the actual
-    state change of the Plugin. The main purpose of active settings is to give Plugins a way to 
+    state change of the Plugin. The main purpose of active settings is to give Plugins a way to
     change the Settings Model and values on-the-fly, providing better user experience to the User.
 
 The Settings Model itself is a JSON object, which field `"items"` is a JSON array containing
@@ -72,8 +72,7 @@ Text data field. Supports regex validation for the entered value.
         "defaultValue": "a text",
         "validationErrorMessage": "Text must contain only digits and characters a-f, e.g. 12ab34cd.",
         "validationRegex": "^[a-f0-9]+$",
-        "validationRegexFlags": "i",
-        "isActive": false
+        "validationRegexFlags": "i"
     }
 
 ### Setting Value
@@ -129,8 +128,7 @@ Integer number data field. Supports minimum and maximum value limitations.
         "description": "An integer number field",
         "defaultValue": 5,
         "minValue": 0,
-        "maxValue": 100,
-        "isActive": false
+        "maxValue": 100
     }
 
 ### Setting Value
@@ -157,8 +155,7 @@ Floating point number data field. Supports minimum and maximum value limitations
         "description": "A floating-point number field",
         "defaultValue": 3.141,
         "minValue": 0.0,
-        "maxValue": 100.0,
-        "isActive": true
+        "maxValue": 100.0
     }
 
 ### Setting Value

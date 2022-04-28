@@ -6,10 +6,11 @@
 
 #include <QtCore/QScopedValueRollback>
 
+#include <nx/reflect/json/serializer.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/qset.h>
 #include <nx/vms/client/desktop/common/flux/private_flux_store.h>
-#include <nx/reflect/json/serializer.h>
 
 #include "camera_settings_dialog_state_reducer.h"
 
@@ -716,12 +717,19 @@ QJsonObject CameraSettingsDialogStore::deviceAgentSettingsValues(const QnUuid& e
 }
 
 void CameraSettingsDialogStore::setDeviceAgentSettingsValues(
-    const QnUuid& engineId, const QJsonObject& values)
+    const QnUuid& engineId, const QString& activeElement, const QJsonObject& values)
 {
+    auto previewSettings = utils::guarded(this,
+        [this, engineId](bool success, const DeviceAgentData& data)
+        {
+            resetDeviceAgentData(engineId, data, /*resetUser*/ false);
+        });
+
     d->executeAction(
         [&](State state)
         {
-            return Reducer::setDeviceAgentSettingsValues(std::move(state), engineId, values);
+            return Reducer::setDeviceAgentSettingsValues(
+                std::move(state), engineId, activeElement, values, previewSettings);
         });
 }
 
@@ -735,13 +743,18 @@ void CameraSettingsDialogStore::refreshDeviceAgentSettings(const QnUuid& engineI
 }
 
 void CameraSettingsDialogStore::resetDeviceAgentData(
-    const QnUuid& engineId, const DeviceAgentData& data)
+    const QnUuid& engineId, const DeviceAgentData& data, bool resetUser)
 {
     d->executeAction(
         [&](State state)
         {
-            return Reducer::resetDeviceAgentData(std::move(state), engineId, data);
+            return Reducer::resetDeviceAgentData(std::move(state), engineId, data, resetUser);
         });
+}
+
+QJsonObject CameraSettingsDialogStore::deviceAgentSettingsErrors(const QnUuid& engineId) const
+{
+    return d->state.analytics.settingsByEngineId[engineId].errors;
 }
 
 bool CameraSettingsDialogStore::dualStreamingEnabled() const

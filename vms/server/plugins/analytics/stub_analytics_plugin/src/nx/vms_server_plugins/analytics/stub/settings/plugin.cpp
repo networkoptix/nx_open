@@ -127,13 +127,6 @@ std::string Plugin::manifestString() const
                         "isActive": true
                     },
                     {
-                        "type": "TextField",
-                        "name": ")json" + kActiveTextBoxId + R"json(",
-                        "caption": "Active TextBox",
-                        "defaultValue": "print \")json" + kShowAdditionalTextBoxValue + R"json(\"",
-                        "isActive": true
-                    },
-                    {
                         "type": "RadioButtonGroup",
                         "name": ")json" + kActiveRadioButtonGroupId + R"json(",
                         "caption": "Active RadioButton Group",

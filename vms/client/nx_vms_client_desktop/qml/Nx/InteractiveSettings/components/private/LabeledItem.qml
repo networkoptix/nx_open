@@ -22,6 +22,8 @@ BottomPaddedItem
     // Descendant components should define GlobalToolTip bindings where required.
     property bool defaultValueTooltipEnabled: false
 
+    property string errorMessage: ""
+
     width: parent.width
 
     readonly property bool isBaselineAligned: label.lineCount === 1

@@ -18,6 +18,7 @@ LabeledItem
     property var defaultValue
     property var itemCaptions
     property alias range: buttons.model
+    property bool isActive: false
 
     readonly property bool filled: value
 
@@ -35,7 +36,10 @@ LabeledItem
             checked: control.value === identifier
 
             onClicked:
-                control.value = identifier
+            {
+                if (control.value !== identifier)
+                    control.value = identifier
+            }
 
             GlobalToolTip.text: control.defaultValueTooltipText(
                 (itemCaptions && itemCaptions[defaultValue]) || defaultValue)

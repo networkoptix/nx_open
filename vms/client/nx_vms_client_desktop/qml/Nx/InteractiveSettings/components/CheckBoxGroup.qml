@@ -18,6 +18,7 @@ LabeledItem
     property var defaultValue
     property var itemCaptions
     property alias range: buttons.model
+    property bool isActive: false
 
     readonly property bool filled: value && value !== []
 

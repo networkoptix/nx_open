@@ -18,8 +18,10 @@ LabeledItem
     property size maximum
     property point minBoxPosition
     property point maxBoxPosition
+    property bool isActive: false
 
     signal valueChanged()
+    signal activeValueChanged()
 
     isGroup: true
 
@@ -41,7 +43,7 @@ LabeledItem
                 openEditDialog()
 
             onFigureChanged:
-                control.valueChanged()
+                control.activeValueChanged()
         }
     }
 

@@ -39,6 +39,14 @@ public:
         const QnUuid& settingsModelId,
         AnalyticsSettingsCallback callback) override;
 
+    virtual rest::Handle activeSettingsChanged(
+        const QnVirtualCameraResourcePtr& device,
+        const nx::vms::common::AnalyticsEngineResourcePtr& engine,
+        const QString& activeElement,
+        const QJsonObject& settingsModel,
+        const QJsonObject& settingsValues,
+        AnalyticsSettingsCallback callback) override;
+
     bool requestWasSent(const DeviceAgentId& agentId) const;
 
     void sendReply(

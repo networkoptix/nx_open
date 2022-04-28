@@ -15,6 +15,7 @@ StackLayout
     property Item childrenItem: column
     property StackLayout sectionStack: control
     property Item scrollBarParent: null
+    property alias verticalScrollBar: view.verticalScrollBar
     property Item extraHeaderItem: null
 
     property bool contentEnabled: parent && parent.hasOwnProperty("contentEnabled")
