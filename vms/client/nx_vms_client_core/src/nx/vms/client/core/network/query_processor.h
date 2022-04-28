@@ -14,9 +14,9 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/network/ssl/helpers.h>
 
-namespace nx::vms::client::core {
+namespace nx::vms::common { class AbstractCertificateVerifier; }
 
-class CertificateVerifier;
+namespace nx::vms::client::core {
 
 /**
  * Interface for transaction manager classes to send transactions in form of http requests.
@@ -25,11 +25,13 @@ class QueryProcessor: public QObject
 {
     Q_OBJECT
 
+    using AbstractCertificateVerifier = nx::vms::common::AbstractCertificateVerifier;
+
 public:
     QueryProcessor(
         const QnUuid& serverId,
         const QnUuid& runningInstanceId,
-        CertificateVerifier* certificateVerifier,
+        AbstractCertificateVerifier* certificateVerifier,
         nx::network::SocketAddress address,
         nx::network::http::Credentials credentials,
         Qn::SerializationFormat serializationFormat);

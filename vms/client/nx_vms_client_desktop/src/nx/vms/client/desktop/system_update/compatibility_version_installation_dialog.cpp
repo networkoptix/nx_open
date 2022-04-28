@@ -13,6 +13,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/module_information.h>
+#include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/logon_data.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection_factory.h>
@@ -304,7 +305,9 @@ void CompatibilityVersionInstallationDialog::atUpdateCurrentState()
 
 void CompatibilityVersionInstallationDialog::startUpdate()
 {
-    m_private->clientUpdateTool->setServerUrl(m_private->connectionProcess->context->logonData);
+    m_private->clientUpdateTool->setServerUrl(
+        m_private->connectionProcess->context->logonData,
+        m_private->connectionProcess->context->certificateCache.get());
 
     connect(m_private->clientUpdateTool, &ClientUpdateTool::updateStateChanged,
         this, &CompatibilityVersionInstallationDialog::atUpdateStateChanged);
