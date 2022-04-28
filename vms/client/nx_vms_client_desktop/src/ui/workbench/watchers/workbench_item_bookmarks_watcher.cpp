@@ -276,6 +276,7 @@ void QnWorkbenchItemBookmarksWatcher::WidgetData::sendBookmarksToOverlay()
     QnCameraBookmarkList bookmarksToDisplay;
     QnCameraBookmarkSearchFilter filter;
     filter.text = m_parent->m_textFilter;
+    filter.endTimeMs = milliseconds(DATETIME_NOW);
 
     for (const auto& bookmark: m_bookmarksAtPos.bookmarkList())
     {
