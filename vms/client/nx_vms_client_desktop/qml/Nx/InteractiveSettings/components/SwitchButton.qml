@@ -17,6 +17,7 @@ Control
     property alias caption: button.text
     property alias value: button.checked
     property bool defaultValue: false
+    property bool isActive: false
 
     readonly property bool filled: value
 

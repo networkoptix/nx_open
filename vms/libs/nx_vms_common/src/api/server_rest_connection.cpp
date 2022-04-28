@@ -31,6 +31,7 @@
 #include <nx/utils/buffer.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
+#include <nx/vms/api/analytics/device_agent_active_setting_changed_request.h>
 #include <nx/vms/api/analytics/device_agent_settings_request.h>
 #include <nx/vms/api/data/device_actions.h>
 #include <nx/vms/api/data/email_settings_data.h>
@@ -1152,6 +1153,28 @@ Handle ServerConnection::setEngineAnalyticsSettings(
         targetThread);
 }
 
+Handle ServerConnection::engineAnalyticsActiveSettingsChanged(
+    const nx::vms::common::AnalyticsEngineResourcePtr& engine,
+    const QString& activeElement,
+    const QJsonObject& settingsModel,
+    const QJsonObject& settingsValues,
+    Result<nx::vms::api::analytics::EngineSettingsResponse>::type&& callback,
+    QThread* targetThread)
+{
+    nx::vms::api::analytics::EngineActiveSettingChangedRequest request;
+    request.analyticsEngineId = engine->getId();
+    request.activeSettingId = activeElement;
+    request.settingsModel = settingsModel;
+    request.settingsValues = settingsValues;
+
+    using namespace nx::vms::api::analytics;
+    return executePost<nx::network::rest::JsonResult>(
+        "/ec2/notifyAnalyticsEngineActiveSettingChanged",
+        QJson::serialized(request),
+        extractJsonResult<EngineSettingsResponse>(std::move(callback)),
+        targetThread);
+}
+
 Handle ServerConnection::getDeviceAnalyticsSettings(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
@@ -1185,6 +1208,29 @@ Handle ServerConnection::setDeviceAnalyticsSettings(
 
     return executePost<nx::network::rest::JsonResult>(
         "/ec2/deviceAnalyticsSettings",
+        QJson::serialized(request),
+        extractJsonResult<nx::vms::api::analytics::DeviceAgentSettingsResponse>(std::move(callback)),
+        targetThread);
+}
+
+Handle ServerConnection::deviceAnalyticsActiveSettingsChanged(
+    const QnVirtualCameraResourcePtr& device,
+    const nx::vms::common::AnalyticsEngineResourcePtr& engine,
+    const QString& activeElement,
+    const QJsonObject& settingsModel,
+    const QJsonObject& settingsValues,
+    Result<nx::vms::api::analytics::DeviceAgentSettingsResponse>::type&& callback,
+    QThread* targetThread)
+{
+    nx::vms::api::analytics::DeviceAgentActiveSettingChangedRequest request;
+    request.analyticsEngineId = engine->getId();
+    request.deviceId = device->getId().toString();
+    request.activeSettingId = activeElement;
+    request.settingsModel = settingsModel;
+    request.settingsValues = settingsValues;
+
+    return executePost<nx::network::rest::JsonResult>(
+        "/ec2/notifyDeviceAnalyticsActiveSettingChanged",
         QJson::serialized(request),
         extractJsonResult<nx::vms::api::analytics::DeviceAgentSettingsResponse>(std::move(callback)),
         targetThread);

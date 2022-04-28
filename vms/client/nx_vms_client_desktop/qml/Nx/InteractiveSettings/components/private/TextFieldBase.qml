@@ -17,7 +17,12 @@ LabeledItem
     readonly property bool filled: textFieldItem.text !== ""
 
     Binding { target: textFieldItem; property: "text"; value: defaultValue }
-    Binding { target: textFieldItem; property: "warningText"; value: validationErrorMessage }
+    Binding
+    {
+        target: textFieldItem
+        property: "warningText"
+        value: errorMessage || validationErrorMessage
+    }
     Binding
     {
         target: textFieldItem
@@ -39,6 +44,12 @@ LabeledItem
     function setValue(value)
     {
         textFieldItem.text = value
+        textFieldItem.updateWarning()
+    }
+
+    function setErrorMessage(value)
+    {
+        errorMessage = value
         textFieldItem.updateWarning()
     }
 }

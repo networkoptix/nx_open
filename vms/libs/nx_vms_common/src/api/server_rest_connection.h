@@ -552,6 +552,14 @@ public:
         Result<nx::vms::api::analytics::EngineSettingsResponse>::type&& callback,
         QThread* targetThread = nullptr);
 
+    Handle engineAnalyticsActiveSettingsChanged(
+        const nx::vms::common::AnalyticsEngineResourcePtr& engine,
+        const QString& activeElement,
+        const QJsonObject& settingsModel,
+        const QJsonObject& settingsValues,
+        Result<nx::vms::api::analytics::EngineSettingsResponse>::type&& callback,
+        QThread* targetThread = nullptr);
+
     Handle getDeviceAnalyticsSettings(
         const QnVirtualCameraResourcePtr& device,
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
@@ -563,6 +571,15 @@ public:
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
         const QJsonObject& settings,
         const QnUuid& settingsModelId,
+        Result<nx::vms::api::analytics::DeviceAgentSettingsResponse>::type&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle deviceAnalyticsActiveSettingsChanged(
+        const QnVirtualCameraResourcePtr& device,
+        const nx::vms::common::AnalyticsEngineResourcePtr& engine,
+        const QString& activeElement,
+        const QJsonObject& settingsModel,
+        const QJsonObject& settingsValues,
         Result<nx::vms::api::analytics::DeviceAgentSettingsResponse>::type&& callback,
         QThread* targetThread = nullptr);
 

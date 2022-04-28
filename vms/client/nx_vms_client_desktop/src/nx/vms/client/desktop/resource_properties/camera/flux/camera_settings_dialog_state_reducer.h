@@ -153,13 +153,20 @@ public:
     static State setAnalyticsStreamIndex(
         State state, const QnUuid& engineId, State::StreamIndex value, ModificationSource source);
 
+    using PreviewSettings =
+        std::function<void(bool success, const DeviceAgentData&)>;
+
     static std::pair<bool, State> setDeviceAgentSettingsValues(
-        State state, const QnUuid& engineId, const QJsonObject& values);
+        State state,
+        const QnUuid& engineId,
+        const QString& activeElement,
+        const QJsonObject& values,
+        PreviewSettings previewSettings = {});
 
     static State refreshDeviceAgentSettings(State state, const QnUuid& engineId);
 
     static std::pair<bool, State> resetDeviceAgentData(
-        State state, const QnUuid& engineId, const DeviceAgentData& values);
+        State state, const QnUuid& engineId, const DeviceAgentData& values, bool resetUser = true);
 
     static State setVirtualCameraIgnoreTimeZone(State state, bool value);
     static State setVirtualCameraMotionDetectionEnabled(State state, bool value);

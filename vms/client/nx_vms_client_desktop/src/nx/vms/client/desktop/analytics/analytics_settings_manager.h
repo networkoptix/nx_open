@@ -41,6 +41,13 @@ public:
         const QJsonObject& settings,
         const QnUuid& settingsModelId,
         AnalyticsSettingsCallback callback) = 0;
+    virtual rest::Handle activeSettingsChanged(
+        const QnVirtualCameraResourcePtr& device,
+        const nx::vms::common::AnalyticsEngineResourcePtr& engine,
+        const QString& activeElement,
+        const QJsonObject& settingsModel,
+        const QJsonObject& settingsValues,
+        AnalyticsSettingsCallback callback) = 0;
 };
 using AnalyticsSettingsServerInterfacePtr = std::shared_ptr<AnalyticsSettingsServerInterface>;
 
@@ -103,6 +110,14 @@ public:
     void storeSettings(
         const DeviceAgentId& agentId,
         const nx::vms::api::analytics::DeviceAgentSettingsResponse& data);
+
+    using PreviewSettings = std::function<void(bool success, const DeviceAgentData&)>;
+    bool activeSettingsChanged(
+        const DeviceAgentId& agentId,
+        const QString& activeElement,
+        const QJsonObject& settingsModel,
+        const QJsonObject& settingsValues,
+        PreviewSettings previewSettings);
 
     AnalyticsSettingsListenerPtr getListener(const DeviceAgentId& agentId);
 

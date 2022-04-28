@@ -39,6 +39,17 @@ rest::Handle AnalyticsSettingsMockApiInterface::applySettings(
     return makeRequest(RequestInfo::Type::apply, device, engine, callback).handle;
 }
 
+rest::Handle AnalyticsSettingsMockApiInterface::activeSettingsChanged(
+    const QnVirtualCameraResourcePtr& device,
+    const nx::vms::common::AnalyticsEngineResourcePtr& engine,
+    const QString& activeElement,
+    const QJsonObject& settingsModel,
+    const QJsonObject& settingsValues,
+    AnalyticsSettingsCallback callback)
+{
+    return makeRequest(RequestInfo::Type::get, device, engine, callback).handle;
+}
+
 bool AnalyticsSettingsMockApiInterface::requestWasSent(const DeviceAgentId& agentId) const
 {
     return std::find_if(m_requests.cbegin(), m_requests.cend(),

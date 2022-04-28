@@ -36,6 +36,7 @@ struct NX_VMS_CLIENT_DESKTOP_API DeviceAgentData
     };
     nx::vms::api::analytics::SettingsModel model;
     nx::vms::api::analytics::SettingsValues values;
+    QJsonObject errors;
     QnUuid modelId;
     Status status = Status::initial;
 };

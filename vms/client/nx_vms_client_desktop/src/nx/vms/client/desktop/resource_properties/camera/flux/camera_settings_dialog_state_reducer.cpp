@@ -2501,7 +2501,11 @@ State CameraSettingsDialogStateReducer::setAnalyticsStreamIndex(
 }
 
 std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsValues(
-    State state, const QnUuid& engineId, const QJsonObject& values)
+    State state,
+    const QnUuid& engineId,
+    const QString& activeElement,
+    const QJsonObject& values,
+    PreviewSettings previewSettings)
 {
     if (!std::any_of(
         state.analytics.engines.begin(),
@@ -2517,6 +2521,18 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsV
 
     storedValues.setUser(values);
     state.hasChanges = true;
+
+    if (ini().activePluginSettings && !activeElement.isEmpty())
+    {
+        bool loading = qnClientModule->analyticsSettingsManager()->activeSettingsChanged(
+            DeviceAgentId{state.singleCameraProperties.id, engineId},
+            activeElement,
+            state.analytics.settingsByEngineId[engineId].model,
+            values,
+            previewSettings);
+
+        state.analytics.settingsByEngineId[engineId].loading = loading;
+    }
 
     return {true, std::move(state)};
 }
@@ -2538,12 +2554,14 @@ State CameraSettingsDialogStateReducer::refreshDeviceAgentSettings(
 }
 
 std::pair<bool, State> CameraSettingsDialogStateReducer::resetDeviceAgentData(
-    State state, const QnUuid& engineId, const DeviceAgentData& data)
+    State state, const QnUuid& engineId, const DeviceAgentData& data, bool resetUser)
 {
     auto& settings = state.analytics.settingsByEngineId[engineId];
     settings.model = data.model;
     settings.values.setBase(data.values);
-    settings.values.resetUser();
+    if (resetUser)
+        settings.values.resetUser();
+    settings.errors = data.errors;
     settings.loading = data.status != DeviceAgentData::Status::ok;
 
     NX_TRACE(NX_SCOPE_TAG, "Device agent settings reset for %1, status is %2, loading: %3",

@@ -396,6 +396,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
         {
             QJsonObject model;
             UserEditable<QJsonObject> values;
+            QJsonObject errors;
             bool loading = false;
         };
         QHash<QnUuid /*engineId*/, EngineSettings> settingsByEngineId;

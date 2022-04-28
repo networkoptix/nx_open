@@ -42,6 +42,17 @@ Item
                 settingsView.setValues(store.settingsValues(engineId))
         }
 
+        function onSettingsModelChanged(engineId)
+        {
+            if (engineId === currentEngineId)
+                updateModel(engineId)
+        }
+
+        function onErrorsChanged(engineId)
+        {
+            settingsView.setErrors(store.errors(engineId))
+        }
+
         function onAnalyticsEnginesChanged()
         {
             for (var i = 0; i < store.analyticsEngines.length; ++i)
@@ -66,9 +77,15 @@ Item
             menu.currentItemId = engineId ? (engineId + "|") : ""
         }
 
+        updateModel(engineId)
+    }
+
+    function updateModel(engineId)
+    {
         const model = engineId ? store.settingsModel(engineId) : {}
         const values = engineId ? store.settingsValues(engineId) : {}
-        settingsView.loadModel(model, values)
+        settingsView.loadModel(model, values, /*restoreScrollPosition*/ true)
+        settingsView.selectSection(menu.currentSectionPath)
         menu.currentEngineSettingsModel = model
     }
 
@@ -89,6 +106,9 @@ Item
         anchors.margins: 16
         anchors.leftMargin: menu.width + 16
 
-        onValuesEdited: store.setSettingsValues(currentEngineId, getValues())
+        onValuesEdited: function(activeElement)
+        {
+            store.setSettingsValues(currentEngineId, activeElement, getValues())
+        }
     }
 }

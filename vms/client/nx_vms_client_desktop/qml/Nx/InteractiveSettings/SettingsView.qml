@@ -13,7 +13,7 @@ Item
     id: settingsView
 
     signal valuesChanged()
-    signal valuesEdited()
+    signal valuesEdited(string activeElement)
 
     property Item contentItem: null
     property bool contentEnabled: true
@@ -31,8 +31,10 @@ Item
         property bool valuesChangedEnabled: true
     }
 
-    function loadModel(model, initialValues)
+    function loadModel(model, initialValues, restoreScrollPosition)
     {
+        let scrollPosition = contentItem ? contentItem.verticalScrollBar.position : 0.0
+
         if (contentItem)
             contentItem.destroy()
 
@@ -45,6 +47,19 @@ Item
         contentItem.scrollBarParent = Qt.binding(function() { return scrollBarParent })
         contentItem.extraHeaderItem = Qt.binding(function() { return headerItem })
         impl.sectionPaths = Settings.buildSectionPaths(model)
+
+        if (restoreScrollPosition)
+        {
+            let scroll =
+                () =>
+                {
+                    contentItem.verticalScrollBar.sizeChanged.disconnect(scroll)
+                    contentItem.verticalScrollBar.position = scrollPosition
+                }
+
+            // Scroll after resize.
+            contentItem.verticalScrollBar.sizeChanged.connect(scroll)
+        }
 
         if (initialValues)
             setValues(initialValues)
@@ -72,12 +87,12 @@ Item
             valuesChanged()
     }
 
-    function triggerValuesEdited()
+    function triggerValuesEdited(activeElement)
     {
         if (!impl.valuesChangedEnabled)
             return
 
-        valuesEdited()
+        valuesEdited(activeElement)
         valuesChanged()
     }
 
@@ -116,5 +131,10 @@ Item
         let modelCopy = JSON.parse(JSON.stringify(model))
         Settings.preprocessModel(modelCopy)
         return modelCopy
+    }
+
+    function setErrors(errors)
+    {
+        Settings.setErrors(contentItem, errors)
     }
 }

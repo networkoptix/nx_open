@@ -16,6 +16,7 @@ LabeledItem
     property var value: defaultValue
     property var defaultValue
     property var itemCaptions
+    property bool isActive: false
 
     defaultValueTooltipEnabled: true
 
@@ -24,7 +25,11 @@ LabeledItem
     contentItem: ComboBox
     {
         id: comboBox
-        onActivated: control.value = range[currentIndex]
+        onActivated:
+        {
+            if (control.value !== range[currentIndex])
+                control.value = range[currentIndex]
+        }
 
         model:
         {

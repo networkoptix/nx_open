@@ -341,6 +341,44 @@ void AnalyticsSettingsManager::storeSettings(
         d->loadResponseData(agentId, /*success*/ true, data);
 }
 
+bool AnalyticsSettingsManager::activeSettingsChanged(
+    const DeviceAgentId& agentId,
+    const QString& activeElement,
+    const QJsonObject& settingsModel,
+    const QJsonObject& settingsValues,
+    PreviewSettings previewSettings)
+{
+    if (!NX_ASSERT(d->serverInterface))
+        return false;
+
+    auto [device, engine] = d->toResources(agentId);
+    if (!device || !engine)
+        return false;
+
+    const auto handle = d->serverInterface->activeSettingsChanged(
+        device,
+        engine,
+        activeElement,
+        settingsModel,
+        settingsValues,
+        [this, agentId, previewSettings](
+            bool success,
+            rest::Handle requestId,
+            const DeviceAgentSettingsResponse& result)
+        {
+            previewSettings(
+                success,
+                DeviceAgentData{
+                    .model = result.settingsModel,
+                    .values = result.settingsValues,
+                    .errors = result.settingsErrors,
+                    .modelId = result.settingsModelId,
+                    .status = DeviceAgentData::Status::ok});
+        });
+
+    return handle > 0;
+}
+
 AnalyticsSettingsListenerPtr AnalyticsSettingsManager::getListener(const DeviceAgentId& agentId)
 {
     NX_VERBOSE(this, "Listener requested for %1", d->toString(agentId));

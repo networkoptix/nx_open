@@ -15,6 +15,7 @@ LabeledItem
     property alias caption: checkBox.text
     property alias value: checkBox.checked
     property bool defaultValue: false
+    property bool isActive: false
 
     readonly property bool filled: checkBox.checked
 

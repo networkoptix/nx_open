@@ -51,8 +51,21 @@ function _createItemsRecursively(parent, visualParent, model, depth)
 
     if (item)
     {
+        if (item.activeValueChanged)
+        {
+            item.activeValueChanged.connect(
+                () => settingsView.triggerValuesEdited(item.isActive ? item.name : ""))
+        }
+
         if (item.valueChanged)
-            item.valueChanged.connect(settingsView.triggerValuesEdited)
+        {
+            // An item can be active and only have a `valueChanged` signal.
+            let isDedicatedActiveSignalUsed = item.activeValueChanged
+            let activeElementName =
+                (item.isActive && !isDedicatedActiveSignalUsed) ? item.name : ""
+
+            item.valueChanged.connect(() => settingsView.triggerValuesEdited(activeElementName))
+        }
 
         if (item.filledChanged && parent.processFilledChanged)
         {
@@ -208,3 +221,14 @@ function resetValues(rootItem)
 {
     _processItemsRecursively(rootItem, resetValue)
 }
+
+function setErrors(rootItem, errors)
+{
+    _processItemsRecursively(rootItem,
+        (item) =>
+        {
+            if (item.name && errors[item.name] && item.setErrorMessage !== undefined)
+                item.setErrorMessage(errors[item.name])
+        })
+}
+
