@@ -20,6 +20,8 @@ namespace nx::vms::applauncher::api { enum class ResultType; }
 
 namespace nx::vms::client::core { struct LogonData; }
 
+namespace nx::vms::common { class AbstractCertificateVerifier; }
+
 namespace nx::vms::common::p2p::downloader {
 
 class ResourcePoolPeerManager;
@@ -144,7 +146,9 @@ public:
     /**
      * Updates URL of the current mediaserver.
      */
-    void setServerUrl(const nx::vms::client::core::LogonData& logonData);
+    void setServerUrl(
+        const nx::vms::client::core::LogonData& logonData,
+        nx::vms::common::AbstractCertificateVerifier* certificateVerifier);
 
     /**
      * Requests update information from the internet. It can proxy request through mediaserver if
