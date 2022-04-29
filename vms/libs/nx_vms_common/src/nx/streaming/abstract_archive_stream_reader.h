@@ -129,7 +129,7 @@ signals:
     void waitForDataCanBeAccepted();
 protected:
     AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher = nullptr;
-    bool m_cycleMode = true;
+    bool m_cycleMode = false;
     qint64 m_needToSleep = 0;
     QnAbstractArchiveDelegate* m_delegate = nullptr;
     QnAbstractNavigator* m_navDelegate = nullptr;

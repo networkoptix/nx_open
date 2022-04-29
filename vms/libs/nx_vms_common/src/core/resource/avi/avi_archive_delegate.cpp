@@ -431,6 +431,15 @@ bool QnAviArchiveDelegate::open(
                 return false;
         }
 
+        if (m_archiveIntegrityWatcher //< On client storages are almost always offline at this point.
+            && m_storage->getStatus() != nx::vms::api::ResourceStatus::online)
+        {
+            NX_DEBUG(this, "%1: Source storage '%2' is offline", __func__,
+                nx::utils::url::hidePassword(m_storage->getUrl()));
+
+            return false;
+        }
+
         // This condition is basically wrong. It's kept as is for now because
         // QnLayoutStorageResource has invalid 'isFileExists()' implementation. Both problems
         // should be fixed here VMS-29988.
