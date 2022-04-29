@@ -4,6 +4,8 @@
 
 #include <queue>
 
+#include <boost/container/flat_map.hpp>
+
 #include <QtCore/QVector>
 #include <QtCore/QMultiMap>
 #include <QtCore/QSharedPointer>
@@ -40,7 +42,7 @@ public:
             removeOldestMetadataItem();
 
         m_metadataCache.push(metadata);
-        m_metadataByTimestamp.insert(timestampUs(metadata), metadata);
+        m_metadataByTimestamp.insert({timestampUs(metadata), metadata});
     }
 
     QList<T> findMetadataInRange(
@@ -48,23 +50,20 @@ public:
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
 
-        if (m_metadataByTimestamp.isEmpty())
+        if (m_metadataByTimestamp.empty())
             return {};
 
         QList<T> result;
 
         if (isForward)
         {
-            auto it = std::lower_bound(
-                m_metadataByTimestamp.keyBegin(),
-                m_metadataByTimestamp.keyEnd(),
-                startTimestamp).base();
+            auto it = m_metadataByTimestamp.lower_bound(startTimestamp);
 
             while (maxCount > 0 && it != m_metadataByTimestamp.end()
-                && timestampUs(*it) < endTimestamp)
+                && timestampUs(it->second) < endTimestamp)
             {
-                if (NX_ASSERT(*it, "Metadata cache should not hold null metadata pointers."))
-                    result.append(*it);
+                if (NX_ASSERT(it->second, "Metadata cache should not hold null metadata pointers."))
+                    result.append(it->second);
 
                 ++it;
                 --maxCount;
@@ -72,20 +71,17 @@ public:
         }
         else
         {
-            auto it = std::lower_bound(
-                m_metadataByTimestamp.keyBegin(),
-                m_metadataByTimestamp.keyEnd(),
-                endTimestamp).base();
+            auto it = m_metadataByTimestamp.lower_bound(startTimestamp);
 
             while (maxCount > 0 && it != m_metadataByTimestamp.begin())
             {
                 --it;
-                if (NX_ASSERT(*it, "Metadata cache should not hold null metadata pointers."))
+                if (NX_ASSERT(it->second, "Metadata cache should not hold null metadata pointers."))
                 {
-                    if (timestampUs(*it) < startTimestamp)
+                    if (timestampUs(it->second) < startTimestamp)
                         break;
 
-                    result.prepend(*it);
+                    result.prepend(it->second);
                     --maxCount;
                 }
             }
@@ -118,7 +114,7 @@ private:
 
         for (auto it = range.first; it != range.second; ++it)
         {
-            if (*it != metadata)
+            if (it->second != metadata)
                 continue;
 
             m_metadataByTimestamp.erase(it);
@@ -135,7 +131,10 @@ private:
 private:
     mutable nx::Mutex m_mutex;
     std::queue<T> m_metadataCache;
-    QMultiMap<qint64, T> m_metadataByTimestamp;
+
+    // The most frequent operation we do is computing lower_bound and T is small (shared_ptr)
+    // so a flat_* container is used here for better performance.
+    boost::container::flat_multimap<qint64, T> m_metadataByTimestamp;
     size_t m_cacheSize;
 };
 
