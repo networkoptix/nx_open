@@ -103,20 +103,16 @@ enum class GlobalPermission
     /**%apidoc[unused]
      * Owner permissions. This flag is for API handler registration only. Users in the DB have to
      * be checked by isOwner().
-     * %caption GlobalOwnerPermission
      */
     owner = 0x20000000,
 
-    /**%apidoc[unused]
-     * %caption GlobalRequireFreshSessionPermissions
-     */
+    /**%apidoc[unused] */
     requireFreshSession = 0x40000000,
 
-    /**%apidoc[unused]
-     * %caption GlobalAdminWithFreshSessionPermissions
-     */
+    /**%apidoc[unused] */
     adminWithFreshSession = admin | requireFreshSession,
 
+    /**%apidoc[unused] */
     ownerWithFreshSession = owner | requireFreshSession,
 
     /* Combinations. */
