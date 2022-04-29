@@ -310,9 +310,10 @@ void QnDesktopCameraConnection::run()
         setupNetwork(std::move(newClient), nullptr);
 
         d->httpClient->addAdditionalHeader("user-name", d->credentials.username);
-        d->httpClient->addAdditionalHeader("physical-id",
-            QnDesktopResource::calculateUniqueId(d->moduleGuid, d->userId)
-            .toStdString());
+        const auto uniqueId = QnDesktopResource::calculateUniqueId(
+            d->moduleGuid, d->userId).toStdString();
+        d->httpClient->addAdditionalHeader("unique-id", uniqueId); //< Support for 4.2 and below.
+        d->httpClient->addAdditionalHeader("physical-id", uniqueId);
         d->httpClient->setSendTimeout(std::chrono::milliseconds(CONNECT_TIMEOUT));
         d->httpClient->setResponseReadTimeout(std::chrono::milliseconds(CONNECT_TIMEOUT));
 
