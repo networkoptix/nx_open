@@ -2,6 +2,8 @@
 
 #include "object_metadata.h"
 
+#include <unordered_map>
+
 #include <QtCore/QRegularExpression>
 
 #include <nx/kit/debug.h>
@@ -161,14 +163,16 @@ bool operator<(const ObjectMetadataPacket& first, std::chrono::microseconds seco
 GroupedAttributes groupAttributes(
     const Attributes& attributes, bool humanReadableNames, bool filterOutHidden)
 {
-    std::map<QString, GroupedAttributes::size_type> nameToIndex;
+    std::unordered_map<QString, GroupedAttributes::size_type> nameToIndex;
     GroupedAttributes result;
+
+    nameToIndex.reserve(attributes.size());
 
     const auto preprocessValue =
         [](const QString& source)
         {
             static const QStringList kStandardValues = {"True", "False"};
-            for (const auto standardValue: kStandardValues)
+            for (const auto& standardValue: kStandardValues)
             {
                 if (source.compare(standardValue, Qt::CaseInsensitive) == 0)
                     return standardValue;
@@ -182,7 +186,7 @@ GroupedAttributes groupAttributes(
         if (filterOutHidden && nx::analytics::isAnalyticsAttributeHidden(attribute.name))
             continue;
 
-        const auto [it, inserted] = nameToIndex.emplace(attribute.name, result.size());
+        const auto [it, inserted] = nameToIndex.try_emplace(attribute.name, result.size());
         if (inserted)
             result.push_back(AttributeGroup{attribute.name});
 
