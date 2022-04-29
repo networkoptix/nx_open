@@ -1,5 +1,7 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+option(runConanAutomatically "Run Conan automatically when configuring the project." ON)
+
 find_program(CONAN_EXECUTABLE NAMES conan NO_CMAKE_SYSTEM_PATH NO_CMAKE_PATH)
 if(NOT CONAN_EXECUTABLE)
     message(FATAL_ERROR "Conan executable is not found.")
@@ -68,18 +70,43 @@ else()
     set(build_type "Release")
 endif()
 
-nx_execute_process_or_fail(
-    COMMAND
-        ${CONAN_EXECUTABLE} install ${CMAKE_SOURCE_DIR}
-        --install-folder ${CMAKE_BINARY_DIR}
-        --profile:build default
-        --profile:host ${CMAKE_SOURCE_DIR}/conan_profiles/${conan_profile}.profile
-        --update
-        -s build_type=${build_type}
-        -o targetDevice=${targetDevice}
-        -o useClang=${use_clang}
-    ERROR_MESSAGE "Conan execution failed."
+set(_run_conan_script ${CMAKE_BINARY_DIR}/run_conan.cmake)
+set(conan_home $ENV{CONAN_USER_HOME})
+
+set(_run_conan_script_contents
+    "#!/usr/bin/env -S cmake -P"
+    ""
+    "set(ENV{CONAN_USER_HOME} ${conan_home})"
+    "execute_process(COMMAND"
+    "    ${CONAN_EXECUTABLE} install ${CMAKE_SOURCE_DIR}"
+    "    --install-folder ${CMAKE_BINARY_DIR}"
+    "    --profile:build default"
+    "    --profile:host ${CMAKE_SOURCE_DIR}/conan_profiles/${conan_profile}.profile"
+    "    --update"
+    "    -s build_type=${build_type}"
+    "    -o targetDevice=${targetDevice}"
+    "    -o useClang=${use_clang}"
+    ")"
+    ""
 )
+string(JOIN "\n" _run_conan_script_contents ${_run_conan_script_contents})
+file(CONFIGURE OUTPUT ${_run_conan_script} CONTENT ${_run_conan_script_contents})
+file(CHMOD ${_run_conan_script} PERMISSIONS
+    OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+nx_store_known_file(${_run_conan_script})
+
+if(runConanAutomatically OR NOT EXISTS ${CMAKE_BINARY_DIR}/conan_paths.cmake)
+    nx_execute_process_or_fail(
+        COMMAND ${CMAKE_COMMAND} -P ${_run_conan_script}
+        ERROR_MESSAGE "Conan execution failed."
+    )
+else()
+    message(WARNING
+        "Automatic Conan execution is disabled! "
+        "If you need to update Conan packages, either enable automatic updates with "
+        "`-DrunConanAutomatically=ON` or run update manually using "
+        "`cmake -P ${_run_conan_script}`")
+endif()
 
 set(CONAN_DISABLE_CHECK_COMPILER ON)
 
