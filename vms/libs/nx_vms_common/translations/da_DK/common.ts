@@ -1106,7 +1106,7 @@
     <name>nx::recording::Error</name>
     <message>
       <source>Internal error</source>
-      <translation type="unfinished">Internal error</translation>
+      <translation>Intern fejl</translation>
     </message>
     <message>
       <source>Corresponding container in FFMPEG library was not found.</source>
@@ -1739,7 +1739,7 @@
     </message>
     <message>
       <source>Archive backup failed</source>
-      <translation type="unfinished">Archive backup failed</translation>
+      <translation>Sikkerhedskopiering af arkiv mislykkedes</translation>
     </message>
     <message>
       <source>Data is backed up to %1</source>
