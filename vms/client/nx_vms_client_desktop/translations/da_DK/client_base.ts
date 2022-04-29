@@ -1680,7 +1680,7 @@
     </message>
     <message>
       <source>May lead to privacy issues</source>
-      <translation type="unfinished">May lead to privacy issues</translation>
+      <translation>Kan føre til privatlivsproblemer</translation>
     </message>
     <message>
       <source>Connect only servers with public certificate</source>
@@ -1692,7 +1692,7 @@
     </message>
     <message>
       <source>Current client instance will be disconnected.</source>
-      <translation type="unfinished">Current client instance will be disconnected.</translation>
+      <translation>Den aktuelle klient forbindelse vil blive afbrudt.</translation>
     </message>
     <message>
       <source>All other client windows will be closed.</source>
@@ -2985,7 +2985,7 @@ to %1</translation>
     </message>
     <message>
       <source>Save Database Backup</source>
-      <translation type="unfinished">Save Database Backup</translation>
+      <translation>Gem Databasesikkerhedskopi</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
@@ -7712,11 +7712,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>2-way audio will be disabled</source>
-      <translation type="unfinished">2-way audio will be disabled</translation>
+      <translation>2-vejs lyd vil blive deaktiveret</translation>
     </message>
     <message>
       <source>You need to select a device to transmit the audio stream to and use for audio playback.</source>
-      <translation type="unfinished">You need to select a device to transmit the audio stream to and use for audio playback.</translation>
+      <translation>Du skal vælge en enhed, som du vil overføre lydstrømmen til og bruge til lydafspilning.</translation>
     </message>
   </context>
   <context>
@@ -7732,9 +7732,9 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>%1 are required</source>
       <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are required</numerusform>
-        <numerusform>%1 are required</numerusform>
+      <translation>
+        <numerusform>%1 er obligatorisk</numerusform>
+        <numerusform>%1 er påkrævet</numerusform>
       </translation>
     </message>
   </context>
@@ -7758,7 +7758,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Streaming protocol mismatch</source>
-      <translation type="unfinished">Streaming protocol mismatch</translation>
+      <translation>Streaming af protokol-uoverensstemmelse</translation>
     </message>
   </context>
   <context>
@@ -7928,7 +7928,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Enter your account password to connect System to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to connect System to %1</translation>
+      <translation>Indtast din kontoadgangskode for at forbinde System til %1</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -7965,7 +7965,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Enter your account password to merge Server to the System</source>
-      <translation type="unfinished">Enter your account password to merge Server to the System</translation>
+      <translation>Indtast din adgangskode for at flette Server til Systemet</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -9486,7 +9486,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Add Proxied Web Page</source>
-      <translation type="unfinished">Add Proxied Web Page</translation>
+      <translation>Tilføj proxy-webside</translation>
     </message>
     <message>
       <source>Add Web Page</source>
@@ -9682,15 +9682,15 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Stream Issue</source>
-      <translation type="unfinished">Stream Issue</translation>
+      <translation>Stream problem</translation>
     </message>
     <message>
       <source>Device Disconnect</source>
-      <translation type="unfinished">Device Disconnect</translation>
+      <translation>Afbrydelse af enhed</translation>
     </message>
     <message>
       <source>Device IP Conflict</source>
-      <translation type="unfinished">Device IP Conflict</translation>
+      <translation>Enheds IP-konflikt</translation>
     </message>
     <message numerus="yes">
       <source>+%n values</source>
