@@ -6,7 +6,9 @@ namespace nx::analytics {
 
 inline bool isAnalyticsAttributeHidden(const QString& name)
 {
-    return name.startsWith("nx.sys.") || name.endsWith(".sys.hidden");
+    static const QString kSystem = "nx.sys.";
+    static const QString kHidden = ".sys.hidden";
+    return name.startsWith(kSystem) || name.endsWith(kHidden);
 }
 
 } // namespace nx::analytics
