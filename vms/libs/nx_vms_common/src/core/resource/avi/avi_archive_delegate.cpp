@@ -435,6 +435,15 @@ bool QnAviArchiveDelegate::open(
                 return false;
         }
 
+        if (m_archiveIntegrityWatcher //< On client storages are almost always offline at this point.
+            && m_storage->getStatus() != nx::vms::api::ResourceStatus::online)
+        {
+            NX_DEBUG(this, "%1: Source storage '%2' is offline", __func__,
+                nx::utils::url::hidePassword(m_storage->getUrl()));
+
+            return false;
+        }
+
         if (!m_storage->isFileExists(url))
         {
             if (m_archiveIntegrityWatcher)
