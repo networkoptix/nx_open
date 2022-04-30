@@ -106,10 +106,10 @@ DetectableObjectTypeModel::~DetectableObjectTypeModel()
 
 QModelIndex DetectableObjectTypeModel::index(int row, int column, const QModelIndex& parent) const
 {
-    if (column != 0 || row < 0 || row >= rowCount(parent))
+    if (!hasIndex(row, column, parent))
         return {};
 
-    const auto& parentData = d->data((quintptr) parent.internalId());
+    const auto& parentData = d->data(parent.internalId());
     return createIndex(row, column, parentData.derivedTypeIds[row]);
 }
 
@@ -119,9 +119,12 @@ QModelIndex DetectableObjectTypeModel::parent(const QModelIndex& index) const
         return {};
 
     const auto& data = d->data(index.internalId());
-    return data.type
-        ? createIndex(data.indexInParent, 0, (quintptr) data.type->base())
-        : QModelIndex();
+    const auto baseTypeId = NX_ASSERT(data.type) ? (quintptr) data.type->base() : 0;
+    if (!baseTypeId)
+        return {};
+
+    const auto baseData = d->data(baseTypeId);
+    return createIndex(baseData.indexInParent, 0, baseTypeId);
 }
 
 int DetectableObjectTypeModel::rowCount(const QModelIndex& parent) const
