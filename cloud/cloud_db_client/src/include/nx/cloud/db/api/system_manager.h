@@ -66,7 +66,7 @@ public:
      */
     virtual void shareSystem(
         SystemSharing sharingData,
-        std::function<void(ResultCode)> completionHandler) = 0;
+        std::function<void(ResultCode, SystemSharing)> completionHandler) = 0;
 
     /**
      * Returns sharings (account email, access role) for the specified system.
