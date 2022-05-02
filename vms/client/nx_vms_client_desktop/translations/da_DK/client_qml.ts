@@ -90,9 +90,9 @@
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
+      <translation>
+        <numerusform>%n Nye resultater</numerusform>
+        <numerusform>%n nye resultater</numerusform>
       </translation>
     </message>
     <message>
@@ -136,9 +136,9 @@
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
+      <translation>
+        <numerusform>%n nye resultater</numerusform>
+        <numerusform>%n nye resultater</numerusform>
       </translation>
     </message>
     <message>
@@ -1105,9 +1105,9 @@ to activate PTZ</translation>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Set for all %n Cameras</numerusform>
-        <numerusform>Set for all %n Cameras</numerusform>
+      <translation>
+        <numerusform>Indstil for alle %n kameraer</numerusform>
+        <numerusform>Indstil for alle %n kameraer</numerusform>
       </translation>
     </message>
     <message>
@@ -1247,9 +1247,9 @@ to activate PTZ</translation>
     <name>TreeView</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... og %n mere</numerusform>
+        <numerusform>... og %n mere</numerusform>
       </translation>
     </message>
   </context>
