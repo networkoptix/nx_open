@@ -86,11 +86,12 @@ void SystemManager::getSystems(
 
 void SystemManager::shareSystem(
     api::SystemSharing sharingData,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::function<void(api::ResultCode, api::SystemSharing)> completionHandler)
 {
-    executeRequest</*Output*/ void>(
+    auto systemId = sharingData.systemId;
+    executeRequest<api::SystemSharing>(
         nx::network::http::Method::post,
-        kSystemSharePath,
+        nx::network::http::rest::substituteParameters(kSystemUsersPath, {systemId}),
         std::move(sharingData),
         std::move(completionHandler));
 }
@@ -99,10 +100,14 @@ void SystemManager::getCloudUsersOfSystem(
     const std::string& systemId,
     std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler)
 {
-    executeRequest<api::SystemSharingExList>(
+    executeRequest<std::vector<api::SystemSharingEx>>(
         nx::network::http::Method::get,
         nx::network::http::rest::substituteParameters(kSystemUsersPath, {systemId}),
-        std::move(completionHandler));
+        [completionHandler = std::move(completionHandler)](
+            api::ResultCode resultCode, std::vector<api::SystemSharingEx> systems)
+        {
+            completionHandler(resultCode, api::SystemSharingExList{std::move(systems)});
+        });
 }
 
 void SystemManager::getAccessRoleList(
