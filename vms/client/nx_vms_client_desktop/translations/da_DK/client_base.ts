@@ -25,9 +25,9 @@
     </message>
     <message numerus="yes">
       <source>%1 with %n attributes</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>test</numerusform>
         <numerusform>%1 med %n attributter</numerusform>
-        <numerusform>%1 with %n attributes</numerusform>
       </translation>
     </message>
     <message>
@@ -1708,7 +1708,7 @@
     </message>
     <message>
       <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
-      <translation type="unfinished">On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</translation>
+      <translation>Ved den første forbindelse til serveren vil du blive bedt om at acceptere certifikatet, hvis det indeholder fejl</translation>
     </message>
   </context>
   <context>
@@ -2755,16 +2755,16 @@ to %1</translation>
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
+      <translation>%1 er midlertidigt utilgængelig. Prøv igen senere.</translation>
     </message>
     <message>
       <source>Credentials are no longer valid.</source>
-      <translation type="unfinished">Credentials are no longer valid.</translation>
+      <translation>Legitimationsoplysninger er ikke længere gyldige.</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Internal %1 error. Please contact support team.</translation>
+      <translation>Intern %1 fejl. Kontakt venligst supportteamet.</translation>
     </message>
   </context>
   <context>
@@ -2989,7 +2989,7 @@ to %1</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
-      <translation type="unfinished">Enter your account password to create backup</translation>
+      <translation>Indtast adgangskoden til din konto for at oprette backup</translation>
     </message>
     <message>
       <source>Create</source>
@@ -2997,11 +2997,11 @@ to %1</translation>
     </message>
     <message>
       <source>Restore from Database Backup</source>
-      <translation type="unfinished">Restore from Database Backup</translation>
+      <translation>Gendan fra en sikkerhedskopi</translation>
     </message>
     <message>
       <source>Enter your account password to restore System from backup</source>
-      <translation type="unfinished">Enter your account password to restore System from backup</translation>
+      <translation>Indtast din kontoadgangskode for at gendanne systemet fra backup</translation>
     </message>
     <message>
       <source>Restore</source>
@@ -3703,7 +3703,7 @@ to %1</translation>
     </message>
     <message>
       <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
-      <translation type="unfinished">You do not have a valid license installed. Please activate your commercial or trial license.</translation>
+      <translation>Du har ikke en gyldig licens installeret. Aktiver venligst din kommercielle eller prøvelicens.</translation>
     </message>
   </context>
   <context>
@@ -4787,21 +4787,21 @@ to %1</translation>
     </message>
     <message numerus="yes">
       <source>Certificates</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Certifikater</numerusform>
-        <numerusform>Certificates</numerusform>
+        <numerusform>Certifikater</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server utilizes these %n SSL certificates to authenticate its identity</source>
-      <translation type="unfinished">
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
+      <translation>
+        <numerusform>Serveren bruger disse %n SSL-certifikater til at autentificere sin identitet</numerusform>
+        <numerusform>Serveren bruger disse %n SSL-certifikater til at autentificere sin identitet</numerusform>
       </translation>
     </message>
     <message>
       <source>Certificate received from the server doesn&apos;t match the certificate this server is pinned to.</source>
-      <translation type="unfinished">Certificate received from the server doesn&apos;t match the certificate this server is pinned to.</translation>
+      <translation>Certifikatet modtaget fra serveren&apos; stemmer ikke overens med det certifikat, som denne server er fastgjort til.</translation>
     </message>
     <message>
       <source>Details</source>
@@ -5065,7 +5065,7 @@ to %1</translation>
     </message>
     <message>
       <source>Ask your system administrator to enter the encryption password to decrypt this archive</source>
-      <translation type="unfinished">Ask your system administrator to enter the encryption password to decrypt this archive</translation>
+      <translation>Bed din systemadministrator om at indtaste krypteringsadgangskoden for at dekryptere dette arkiv</translation>
     </message>
     <message>
       <source>Unlock</source>
@@ -5343,7 +5343,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Storage is available but will not be writable because it is too small in comparison to the already present storages</source>
-      <translation type="unfinished">Storage is available but will not be writable because it is too small in comparison to the already present storages</translation>
+      <translation>Lagerplads er tilgængelig, men vil ikke være skrivbar, fordi den er for lille i forhold til de allerede lagerede data</translation>
     </message>
   </context>
   <context>
@@ -5705,7 +5705,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>With enabled digest authentication</source>
-      <translation type="unfinished">With enabled digest authentication</translation>
+      <translation>Med aktiveret digest-godkendelse</translation>
     </message>
   </context>
   <context>
@@ -5728,7 +5728,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To enable digest authentication password reset is required</source>
-      <translation type="unfinished">To enable digest authentication password reset is required</translation>
+      <translation>For at aktivere digest-godkendelse kræves nulstilling af adgangskode</translation>
     </message>
   </context>
   <context>
@@ -5848,7 +5848,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Allow digest authentication for this user</source>
-      <translation type="unfinished">Allow digest authentication for this user</translation>
+      <translation>Tillad digest-godkendelse for denne bruger</translation>
     </message>
     <message>
       <source>Learn More</source>
@@ -5931,7 +5931,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed.</source>
-      <translation type="unfinished">Only letters, numbers and symbols %1 are allowed.</translation>
+      <translation>Kun bogstaver, tal og symboler %1 er tilladt.</translation>
     </message>
   </context>
   <context>
@@ -6022,10 +6022,9 @@ If you intended to move analytics data to another storage location, please conta
 but this web page presented an untrusted certificate auth.
 We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
       <comment>%1 is the web page address</comment>
-      <translation type="unfinished">You try to open the
-%1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</translation>
+      <translation>Du forsøger at åbne
+%1, men denne webside præsenterede en upålidelig certifikatgodkendelse.
+Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan du åbne websiden.</translation>
     </message>
   </context>
   <context>
@@ -6095,7 +6094,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Camera %1 does not support PTZ</source>
-      <translation type="unfinished">Camera %1 does not support PTZ</translation>
+      <translation>Kamera %1 understøtter ikke PTZ</translation>
     </message>
   </context>
   <context>
@@ -6147,7 +6146,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Could not open file &apos;%1&apos;. Please check if the folder is accessible</source>
-      <translation type="unfinished">Could not open file &apos;%1&apos;. Please check if the folder is accessible</translation>
+      <translation>Kunne ikke åbne filen &apos;%1&apos;. Tjek venligst om mappen er tilgængelig</translation>
     </message>
   </context>
   <context>
@@ -6931,16 +6930,16 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n valgte enheder</numerusform>
-        <numerusform>%n chosen devices</numerusform>
+        <numerusform>%n valgte enheder</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n valgte kameraer</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
+        <numerusform>%n valgte kameraer</numerusform>
       </translation>
     </message>
     <message>
@@ -7109,37 +7108,37 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupQueueSize</name>
     <message numerus="yes">
       <source>%n weeks</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n uger</numerusform>
-        <numerusform>%n weeks</numerusform>
+        <numerusform>%n uger</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n days</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n dage</numerusform>
-        <numerusform>%n days</numerusform>
+        <numerusform>%n dage</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n hours</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n timer</numerusform>
-        <numerusform>%n hours</numerusform>
+        <numerusform>%n timer</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n minutes</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n minutter</numerusform>
-        <numerusform>%n minutes</numerusform>
+        <numerusform>%n minutter</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n seconds</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n sekunder</numerusform>
-        <numerusform>%n seconds</numerusform>
+        <numerusform>%n sekunder</numerusform>
       </translation>
     </message>
   </context>
@@ -7268,7 +7267,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Skip backup for existing footage?</source>
-      <translation type="unfinished">Skip backup for existing footage?</translation>
+      <translation>Spring backup over for eksisterende optagelser?</translation>
     </message>
     <message>
       <source>This action cannot be undone.</source>
@@ -7287,9 +7286,9 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Sikkerhedskopiering er aktiveret for %n kameraer</numerusform>
-        <numerusform>Backup is enabled for %n cameras</numerusform>
+        <numerusform>Sikkerhedskopiering er aktiveret for %n kameraer</numerusform>
       </translation>
     </message>
   </context>
@@ -7669,37 +7668,37 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Motion &amp; Objects + Lo-Res</source>
-      <translation type="unfinished">Motion &amp; Objects + Lo-Res</translation>
+      <translation>Bevægelse, Objekter + Lav opløsning</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSettingsDialogStateConversionFunctions</name>
     <message numerus="yes">
       <source>Failed to enable audio on %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to enable audio on %n devices</numerusform>
-        <numerusform>Failed to enable audio on %n devices</numerusform>
+      <translation>
+        <numerusform>Kunne ikke aktivere lyd på %n enheder</numerusform>
+        <numerusform>Kunne ikke aktivere lyd på %n enheder</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These devices do not have audio inputs or are not configured correctly.</source>
-      <translation type="unfinished">
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
+      <translation>
+        <numerusform>Disse enheder har ikke lydudgange eller er ikke konfigureret korrekt.</numerusform>
+        <numerusform>Disse enheder har ikke lydudgange eller er ikke konfigureret korrekt.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to enable 2-way audio on %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
+      <translation>
+        <numerusform>Kunne ikke aktivere 2-vejs lyd på %n enheder</numerusform>
+        <numerusform>Kunne ikke aktivere 2-vejs lyd på %n enheder</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These devices do not have audio outputs or are not configured correctly.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Disse enheder har ikke lydudgange eller er ikke konfigureret korrekt.</numerusform>
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
+        <numerusform>Disse enheder har ikke lydudgange eller er ikke konfigureret korrekt.</numerusform>
       </translation>
     </message>
     <message>
@@ -7708,7 +7707,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>You need to select a device that will provide audio.</source>
-      <translation type="unfinished">You need to select a device that will provide audio.</translation>
+      <translation>Du skal vælge en enhed, der vil levere lyd.</translation>
     </message>
     <message>
       <source>2-way audio will be disabled</source>
@@ -7766,7 +7765,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Select a certificate to authenticate yourself to %1:</source>
       <extracomment>%1 here is a host name for which you provide a certificate.</extracomment>
-      <translation type="unfinished">Select a certificate to authenticate yourself to %1:</translation>
+      <translation>Vælg et certifikat for at godkende dig selv til %1:</translation>
     </message>
     <message>
       <source>Select</source>
@@ -7871,7 +7870,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Could not connect to server. Application will be closed.</source>
-      <translation type="unfinished">Could not connect to server. Application will be closed.</translation>
+      <translation>Kunne ikke forbinde til serveren. Programmet vil blive lukket.</translation>
     </message>
     <message>
       <source>Failed to connect to the selected server</source>
@@ -7887,7 +7886,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Your session has expired. Please sign in again to continue.</source>
-      <translation type="unfinished">Your session has expired. Please sign in again to continue.</translation>
+      <translation>Din session er udløbet. Log venligst ind igen for at fortsætte.</translation>
     </message>
     <message>
       <source>OK</source>
@@ -7899,11 +7898,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ConnectToCloudTool</name>
     <message>
       <source>Local System owner is absent or disabled.</source>
-      <translation type="unfinished">Local System owner is absent or disabled.</translation>
+      <translation>Lokal systemejer er fraværende eller deaktiveret.</translation>
     </message>
     <message>
       <source>None of your Servers is connected to the Internet.</source>
-      <translation type="unfinished">None of your Servers is connected to the Internet.</translation>
+      <translation>Ingen af dine servere er forbundet til internettet.</translation>
     </message>
     <message>
       <source>System connected to %1</source>
@@ -7918,12 +7917,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Connect System to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect System to %1</translation>
+      <translation>Forbind System til %1</translation>
     </message>
     <message>
       <source>Connect System to %1?</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect System to %1?</translation>
+      <translation>Forbind System til %1?</translation>
     </message>
     <message>
       <source>Enter your account password to connect System to %1</source>
@@ -8646,9 +8645,9 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>%n minutes left</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n minutter tilbage</numerusform>
-        <numerusform>%n minutes left</numerusform>
+        <numerusform>%n minutter tilbage</numerusform>
       </translation>
     </message>
   </context>
@@ -9490,11 +9489,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Add Web Page</source>
-      <translation type="unfinished">Add Web Page</translation>
+      <translation>Tilføj webside</translation>
     </message>
     <message>
       <source>Edit Proxied Web Page</source>
-      <translation type="unfinished">Edit Proxied Web Page</translation>
+      <translation>Rediger proxy-webside</translation>
     </message>
     <message>
       <source>Edit Web Page</source>
@@ -9502,7 +9501,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
-      <translation type="unfinished">Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</translation>
+      <translation>Slå websideproxy til på fanen &lt;b&gt;Generelt&lt;/b&gt;.</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
@@ -9593,7 +9592,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
-      <translation type="unfinished">Motion, Objects</translation>
+      <translation>Bevægelse, Objekter</translation>
     </message>
     <message>
       <source>Objects only</source>
@@ -9666,7 +9665,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Analytic</source>
-      <translation type="unfinished">Analytic</translation>
+      <translation>Analyse</translation>
     </message>
     <message>
       <source>Generic</source>
@@ -10052,7 +10051,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     </message>
     <message>
       <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
-      <translation type="unfinished">You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</translation>
+      <translation>Du forsøgte at oprette forbindelse til: %1, men serveren præsenterede et certifikat, der ikke kan bekræftes automatisk.</translation>
     </message>
   </context>
   <context>
@@ -10066,7 +10065,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     </message>
     <message>
       <source>There are no suitable servers</source>
-      <translation type="unfinished">There are no suitable servers</translation>
+      <translation>Der er ingen egnede servere</translation>
     </message>
   </context>
   <context>
@@ -10271,14 +10270,14 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     </message>
     <message numerus="yes">
       <source>Recording schedule is invalid for %n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Optagelsestidsplan er ugyldig til %n kameraer</numerusform>
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
+        <numerusform>Optagelsestidsplan er ugyldig til %n kameraer</numerusform>
       </translation>
     </message>
     <message>
       <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
-      <translation type="unfinished">Recording schedule on some cameras contains recording modes that are not supported.</translation>
+      <translation>Optagelsesplan på nogle kameraer indeholder optagetilstande, der ikke understøttes.</translation>
     </message>
   </context>
   <context>
@@ -10661,7 +10660,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     <name>nx::vms::client::desktop::backup_settings_view::BackupSettingsViewStrings</name>
     <message>
       <source>All archive</source>
-      <translation type="unfinished">All archive</translation>
+      <translation>Alle arkiver</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -10768,11 +10767,11 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
     <message>
       <source>Intercom Alarm Layout</source>
-      <translation type="unfinished">Intercom Alarm Layout</translation>
+      <translation>Alarmlayout For Intercom</translation>
     </message>
     <message>
       <source>Intercom Open Door</source>
-      <translation type="unfinished">Intercom Open Door</translation>
+      <translation>Intercom åben dør</translation>
     </message>
     <message>
       <source>Open door</source>
@@ -10859,30 +10858,30 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     <name>nx::vms::client::desktop::jsapi::detail::ResourcesApiBackend</name>
     <message>
       <source>Resource is not available for the usage with JS API</source>
-      <translation type="unfinished">Resource is not available for the usage with JS API</translation>
+      <translation>Ressource er ikke tilgængelig til brug med JS API</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
     <message>
       <source>Cannot find an item with the specified id</source>
-      <translation type="unfinished">Cannot find an item with the specified id</translation>
+      <translation>Kan ikke finde et element med det angivne id</translation>
     </message>
     <message>
       <source>Cannot find a resource with the specified id.</source>
-      <translation type="unfinished">Cannot find a resource with the specified id.</translation>
+      <translation>Kan ikke finde en ressource med det angivne id.</translation>
     </message>
     <message>
       <source>Cannot specify a media parameters for the resource without media stream.</source>
-      <translation type="unfinished">Cannot specify a media parameters for the resource without media stream.</translation>
+      <translation>Kan ikke angive medie parametre for ressourcen uden medie stream.</translation>
     </message>
     <message>
       <source>Cannot add the resource to the layout</source>
-      <translation type="unfinished">Cannot add the resource to the layout</translation>
+      <translation>Kan ikke tilføje ressourcen til layoutet</translation>
     </message>
     <message>
       <source>Cannot find a widget corresponding to the specified item.</source>
-      <translation type="unfinished">Cannot find a widget corresponding to the specified item.</translation>
+      <translation>Kan ikke finde en widget, der svarer til det angivne element.</translation>
     </message>
   </context>
   <context>
@@ -11309,7 +11308,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>This build is for demo purposes only.</source>
-      <translation type="unfinished">This build is for demo purposes only.</translation>
+      <translation>Denne version er kun til demo formål.</translation>
     </message>
     <message>
       <source>It cannot be upgraded to subsequent builds as they become available.</source>
@@ -11318,7 +11317,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <message>
       <source>To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</source>
       <comment>%1 is the product name</comment>
-      <translation type="unfinished">To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</translation>
+      <translation>For at opgradere, skal du afinstallere %1 før du installerer en opdateret build (alle data vil gå tabt).</translation>
     </message>
     <message>
       <source>%1 Beta</source>
@@ -11550,7 +11549,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>New client-only updates will be installed automatically. You can change this in the settings.</source>
-      <translation type="unfinished">New client-only updates will be installed automatically. You can change this in the settings.</translation>
+      <translation>Nye klientopdateringer installeres automatisk. Du kan ændre dette i indstillingerne.</translation>
     </message>
     <message>
       <source>Cannot check for update.</source>
@@ -11558,15 +11557,15 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Client update package is broken.</source>
-      <translation type="unfinished">Client update package is broken.</translation>
+      <translation>Opdateringspakken til klienten er i stykker.</translation>
     </message>
     <message>
       <source>Client update package is missing for current platform.</source>
-      <translation type="unfinished">Client update package is missing for current platform.</translation>
+      <translation>Klientopdateringspakke mangler for den nuværende platform.</translation>
     </message>
     <message>
       <source>Can&apos;t check client update availability. Check your internet connection and try again.</source>
-      <translation type="unfinished">Can&apos;t check client update availability. Check your internet connection and try again.</translation>
+      <translation>Kan ikke kontrollere tilgængeligheden af klientopdateringer&apos;Tjek din internetforbindelse, og prøv igen.</translation>
     </message>
   </context>
 </TS>
