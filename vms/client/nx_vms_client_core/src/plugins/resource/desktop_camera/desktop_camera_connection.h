@@ -58,6 +58,8 @@ public:
     void sendLock();
     bool isConnected() const;
     QnResourcePtr getResource() const;
+    void setServerVersion(const nx::utils::SoftwareVersion& version);
+    nx::utils::SoftwareVersion serverVersion() const;
 private:
     void disconnectInternal();
 private:

@@ -94,6 +94,14 @@ QByteArray CodecParameters::serialize() const
     return result;
 }
 
+QByteArray CodecParameters::serializeInDeprecatedFormat42() const
+{
+    QnMediaContextSerializableData_4_2 data;
+    data.initializeFrom(m_codecParams);
+    auto result = data.serialize();
+    return result;
+}
+
 bool CodecParameters::deserialize(const char* data, int size, int version)
 {
     m_version = version;

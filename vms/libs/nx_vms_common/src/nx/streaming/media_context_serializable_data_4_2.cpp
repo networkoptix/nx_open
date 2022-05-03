@@ -40,15 +40,15 @@ void QnMediaContextSerializableData_4_2::initializeFrom(const AVCodecParameters*
     codecType = codecParams->codec_type;
     if (codecParams->extradata)
     {
-        extradata = QByteArray((const char*) codecParams->extradata,
+        extradata = QByteArray((const char*)codecParams->extradata,
             codecParams->extradata_size);
     }
     channels = codecParams->channels;
     sampleRate = codecParams->sample_rate;
     sampleFmt = (AVSampleFormat)codecParams->format;
     bitsPerCodedSample = codecParams->bits_per_coded_sample;
-    width = codecParams->width;
-    height = codecParams->height;
+    codedWidth_deprecated = width = codecParams->width;
+    codedHeight_deprecated = height = codecParams->height;
     bitRate = codecParams->bit_rate;
     channelLayout = codecParams->channel_layout;
     blockAlign = codecParams->block_align;

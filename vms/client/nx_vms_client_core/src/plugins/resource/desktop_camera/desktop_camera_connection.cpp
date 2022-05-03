@@ -38,6 +38,7 @@ public:
             m_serializers[i].reset(new QnRtspFfmpegEncoder(DecoderConfig(), owner->commonModule()->metrics()));
             m_serializers[i]->setAdditionFlags(0);
             m_serializers[i]->setLiveMarker(true);
+            m_serializers[i]->setServerVersion(owner->serverVersion());
         }
     }
 
@@ -99,9 +100,10 @@ class QnDesktopCameraConnectionProcessor::Private: public QnTCPConnectionProcess
 {
 public:
     QnDesktopResourcePtr desktop;
-    QnAbstractStreamDataProvider* dataProvider;
-    QnDesktopCameraDataConsumer* dataConsumer;
+    QnAbstractStreamDataProvider* dataProvider = nullptr;
+    QnDesktopCameraDataConsumer* dataConsumer = nullptr;
     nx::Mutex sendMutex;
+    nx::utils::SoftwareVersion serverVersion;
 };
 
 QnDesktopCameraConnectionProcessor::QnDesktopCameraConnectionProcessor(
@@ -131,6 +133,17 @@ QnResourcePtr QnDesktopCameraConnectionProcessor::getResource() const
     return commonModule()->resourcePool()->getResourceById(
         QnDesktopResource::getDesktopResourceUuid());
 }
+
+void QnDesktopCameraConnectionProcessor::setServerVersion(const nx::utils::SoftwareVersion& version)
+{
+    d->serverVersion = version;
+}
+
+nx::utils::SoftwareVersion QnDesktopCameraConnectionProcessor::serverVersion() const
+{
+    return d->serverVersion;
+}
+
 void QnDesktopCameraConnectionProcessor::processRequest()
 {
     const auto method = d->request.requestLine.method;
@@ -289,6 +302,8 @@ void QnDesktopCameraConnection::run()
                     /*sslContext*/ nullptr,
                     d->owner)
                 : std::shared_ptr<QnDesktopCameraConnectionProcessor>();
+            if (newProcessor)
+                newProcessor->setServerVersion(d->server->getVersion());
 
             NX_MUTEX_LOCKER lock(&d->mutex);
             std::swap(d->httpClient, newClient);

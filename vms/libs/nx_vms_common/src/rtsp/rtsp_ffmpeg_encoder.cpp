@@ -100,7 +100,10 @@ void QnRtspFfmpegEncoder::setDataPacket(QnConstAbstractMediaDataPtr media)
         if (!m_contextSent || !m_contextSent->isEqual(*currentContext.get()))
         {
             m_contextSent = currentContext;
-            m_codecParamsData = currentContext->serialize();
+            if (!m_serverVersion.isNull() && m_serverVersion.major() < 5)
+                m_codecParamsData = currentContext->serializeInDeprecatedFormat42();
+            else
+                m_codecParamsData = currentContext->serialize();
         }
     }
     m_eofReached = false;
@@ -225,4 +228,9 @@ void QnRtspFfmpegEncoder::setLiveMarker(int value)
 void QnRtspFfmpegEncoder::setAdditionFlags(quint16 value)
 {
     m_additionFlags = value;
+}
+
+void QnRtspFfmpegEncoder::setServerVersion(const nx::utils::SoftwareVersion& serverVersion)
+{
+    m_serverVersion = serverVersion;
 }

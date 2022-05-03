@@ -26,6 +26,9 @@ public:
     // Serialize to ubjson format.
     QByteArray serialize() const;
 
+    // Serialize to ubjson format that compatible with version 4.2 and below
+    QByteArray serializeInDeprecatedFormat42() const;
+
     CodecParameters();
 
     /**
