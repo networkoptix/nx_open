@@ -13,9 +13,7 @@ AbstractMessageDispatcher::AbstractMessageDispatcher():
 
 AbstractMessageDispatcher::~AbstractMessageDispatcher()
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    auto activeRequests = std::exchange(m_activeRequests, {});
-    lock.unlock();
+    auto activeRequests = m_activeRequests.takeAll();
 
     if (!activeRequests.empty())
     {
@@ -65,14 +63,15 @@ int AbstractMessageDispatcher::dispatchFailures() const
 std::map<std::string, server::RequestPathStatistics>
     AbstractMessageDispatcher::requestPathStatistics() const
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    std::map<std::string, server::RequestPathStatistics> stats;
-    for(const auto& [path, calculator]: m_requestPathStatsCalculators)
-    {
-        auto requestPathStats = calculator.requestPathStatistics();
-        if (requestPathStats.requestsServedPerMinute > 0)
-            stats.emplace(path, std::move(requestPathStats));
-    }
+    std::map</*path*/ std::string, server::RequestPathStatistics> stats;
+    m_requestPathStatsCalculators.forEach(
+        [&stats](const auto& value)
+        {
+            auto requestPathStats = value.second.requestPathStatistics();
+            if (requestPathStats.requestsServedPerMinute > 0)
+                stats.emplace(value.first, std::move(requestPathStats));
+        });
+
     return stats;
 }
 
@@ -91,18 +90,19 @@ void AbstractMessageDispatcher::incrementDispatchFailures() const
 void AbstractMessageDispatcher::startUpdatingRequestPathStatistics(
     const std::string& requestPathTemplate) const
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    const_cast<AbstractMessageDispatcher*>(this)->
-        m_requestPathStatsCalculators[requestPathTemplate].processingRequest();
+    m_requestPathStatsCalculators.emplace();
+    m_requestPathStatsCalculators.modify(
+        requestPathTemplate,
+        [](auto& val) { val.processingRequest(); });
 }
 
 void AbstractMessageDispatcher::finishUpdatingRequestPathStatistics(
     const std::string& requestPathTemplate,
     std::chrono::microseconds processingTime) const
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    const_cast<AbstractMessageDispatcher*>(this)->
-        m_requestPathStatsCalculators[requestPathTemplate].processedRequest(processingTime);
+    m_requestPathStatsCalculators.modify(
+        requestPathTemplate,
+        [processingTime](auto& val) { val.processedRequest(processingTime); });
 }
 
 } // namespace nx::network::http
