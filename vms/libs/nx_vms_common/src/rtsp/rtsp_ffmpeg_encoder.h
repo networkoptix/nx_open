@@ -6,6 +6,7 @@
 
 #include "abstract_rtsp_encoder.h"
 #include <transcoding/ffmpeg_video_transcoder.h>
+#include <nx/utils/software_version.h>
 
 class NX_VMS_COMMON_API QnRtspFfmpegEncoder: public AbstractRtspEncoder
 {
@@ -26,6 +27,8 @@ public:
     void setLiveMarker(int value);
     void setAdditionFlags(quint16 value);
 
+    void setServerVersion(const nx::utils::SoftwareVersion& serverVersion);
+
 private:
     DecoderConfig m_config;
     bool m_gotLivePacket;
@@ -43,6 +46,7 @@ private:
 
     std::unique_ptr<QnFfmpegVideoTranscoder> m_videoTranscoder;
     nx::metrics::Storage* m_metrics = nullptr;
+    nx::utils::SoftwareVersion m_serverVersion;
 
     CodecParametersConstPtr getGeneratedContext(AVCodecID compressionType);
     QnConstAbstractMediaDataPtr transcodeVideoPacket(QnConstAbstractMediaDataPtr media);

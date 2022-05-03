@@ -28,6 +28,10 @@ struct NX_VMS_COMMON_API QnMediaContextSerializableData_4_2
      */
     bool deserialize(const QByteArray& data);
 
+    QByteArray serialize() const;
+    
+    void initializeFrom(const AVCodecParameters* codecParams);
+
     //--------------------------------------------------------------------------
     /// Fields defined in ffmpeg's AVCodecParameters.
     //@{
