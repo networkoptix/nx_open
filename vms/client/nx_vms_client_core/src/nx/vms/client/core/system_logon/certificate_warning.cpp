@@ -29,7 +29,8 @@ QString CertificateWarning::header(Reason reason, const QString& serverName)
 QString CertificateWarning::details(
     Reason reason,
     const nx::vms::api::ModuleInformation& target,
-    const nx::network::SocketAddress& primaryAddress)
+    const nx::network::SocketAddress& primaryAddress,
+    ClientType clientType)
 {
     auto result =
         [reason]()
@@ -72,8 +73,14 @@ QString CertificateWarning::details(
     knownData << kTemplate.arg(tr("Server ID:"), target.id.toSimpleString());
 
     const auto targetInfo =
-        QString("<p style='margin-top: 8px; margin-bottom: 8px;'>%1</p>")
-            .arg(knownData.join(common::html::kLineBreak));
+        [clientType, knownData]()
+        {
+            const auto result = QString("<p style='margin-top: 8px; margin-bottom: 8px;'>%1</p>")
+                .arg(knownData.join(common::html::kLineBreak));
+            return clientType == ClientType::desktop
+                ? result
+                : QString("%1%1%2%1").arg(common::html::kLineBreak, result);
+        }();
 
     // Patch up details string: we don't want to have spaces around target info block.
     const static QString kPlaceholder("%1");

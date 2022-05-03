@@ -23,11 +23,18 @@ public:
         serverCertificateChanged,
     };
 
+    enum class ClientType
+    {
+        desktop,
+        mobile
+    };
+
     static QString header(Reason reason, const QString& serverName);
     static QString details(
         Reason reason,
         const nx::vms::api::ModuleInformation& target,
-        const nx::network::SocketAddress& primaryAddress);
+        const nx::network::SocketAddress& primaryAddress,
+        ClientType clientType = ClientType::desktop);
     static QString advice(Reason reason);
     static QString invalidCertificateError();
 
