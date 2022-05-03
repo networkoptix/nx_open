@@ -9,6 +9,7 @@
 
 #include <nx/network/connection_server/message_dispatcher.h>
 #include <nx/utils/counter.h>
+#include <nx/utils/data_structures/partitioned_concurrent_hash_map.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
 
@@ -123,10 +124,7 @@ public:
         auto requestProcessStartTime = std::chrono::steady_clock::now();
 
         const int seq = ++m_requestSeq;
-        {
-            NX_MUTEX_LOCKER lock(&m_mutex);
-            m_activeRequests.emplace(seq, requestContext.request.requestLine.toString());
-        }
+        m_activeRequests.emplace(seq, requestContext.request.requestLine.toString());
 
         handlerPtr->handleRequest(
             std::move(requestContext),
@@ -142,10 +140,7 @@ public:
                     statisticsKey,
                     duration_cast<microseconds>(steady_clock::now() - requestProcessStartTime));
 
-                {
-                    NX_MUTEX_LOCKER lock(&m_mutex);
-                    m_activeRequests.erase(seq);
-                }
+                m_activeRequests.erase(seq);
 
                 completionFunc(
                     std::move(message),
@@ -213,8 +208,12 @@ private:
 
     mutable nx::Mutex m_mutex;
     nx::utils::math::SumPerMinute<int> m_dispatchFailures;
-    std::map<std::string, server::RequestPathStatisticsCalculator> m_requestPathStatsCalculators;
-    mutable std::map<int /*sequence*/, std::string> m_activeRequests;
+
+    mutable nx::utils::PartitionedConcurrentHashMap<
+        std::string, server::RequestPathStatisticsCalculator
+    > m_requestPathStatsCalculators;
+
+    mutable nx::utils::PartitionedConcurrentHashMap<int /*sequence*/, std::string> m_activeRequests;
     mutable std::atomic<int> m_requestSeq{0};
     std::optional<std::chrono::milliseconds> m_linger = kDefaultLinger;
 };
