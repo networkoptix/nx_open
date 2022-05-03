@@ -47,8 +47,10 @@ bool QnSettings::contains(const QString& key) const
     return false;
 }
 
-bool QnSettings::containsGroup(QString group) const
+bool QnSettings::containsGroup(const QString& groupSrc) const
 {
+    QString group = groupSrc;
+
     if (!group.endsWith('/'))
         group += '/';
 
@@ -120,26 +122,30 @@ void QnSettings::initializeSystemSettings()
 //-------------------------------------------------------------------------------------------------
 
 QnSettingsGroupReader::QnSettingsGroupReader(
-    const QnSettings& settings,
-    const std::string& name)
+    const SettingsReader& settings,
+    const QString& name)
     :
     m_settings(settings),
     m_groupName(name)
 {
 }
 
-bool QnSettingsGroupReader::contains(const std::string& keyName) const
+bool QnSettingsGroupReader::contains(const QString& keyName) const
 {
-    std::string key = m_groupName.empty() ? keyName : m_groupName + "/" + keyName;
-    return m_settings.contains(key.c_str());
+    QString key = m_groupName.isEmpty() ? keyName : m_groupName + "/" + keyName;
+    return m_settings.contains(key);
+}
+
+bool QnSettingsGroupReader::containsGroup(const QString& groupName) const
+{
+    QString key = m_groupName.isEmpty() ? groupName : m_groupName + "/" + groupName;
+    return m_settings.containsGroup(key);
 }
 
 QVariant QnSettingsGroupReader::value(
-    const std::string_view& keyName,
+    const QString& keyName,
     const QVariant& defaultValue) const
 {
-    std::string key = m_groupName.empty()
-        ? std::string(keyName)
-        : m_groupName + "/" + std::string(keyName);
+    QString key = m_groupName.isEmpty() ? keyName : m_groupName + "/" + keyName;
     return m_settings.value(key, defaultValue);
 }
