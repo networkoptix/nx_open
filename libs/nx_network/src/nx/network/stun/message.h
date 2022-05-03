@@ -11,12 +11,6 @@
 #include <optional>
 #include <vector>
 
-#ifdef _DEBUG
-    #include <map>
-#else
-    #include <unordered_map>
-#endif
-
 #include <nx/utils/buffer.h>
 #include <nx/network/connection_server/base_protocol_message_types.h>
 #include <nx/network/socket_common.h>
@@ -25,12 +19,13 @@
 
 #include <nx/utils/system_error.h>
 
+#include "message_integrity.h"
 #include "stun_attributes.h"
 
-//!Implementation of STUN protocol (rfc5389)
-namespace nx {
-namespace network {
-namespace stun {
+/**
+ * Implementation of STUN protocol (rfc5389).
+ */
+namespace nx::network::stun {
 
 class MessageParserBuffer;
 class MessageSerializerBuffer;
@@ -117,20 +112,17 @@ struct TransportHeader
 class NX_NETWORK_API Message
 {
 public:
-    //TODO #akolesnikov is std::shared_ptr really needed here?
-    typedef std::shared_ptr< attrs::Attribute > AttributePtr;
-
-    typedef std::map< int, AttributePtr > AttributesMap;
+    // TODO: #akolesnikov is std::shared_ptr really needed here?
+    using AttributePtr = std::shared_ptr< attrs::Attribute >;
 
     TransportHeader transportHeader;
     Header header;
-    AttributesMap attributes;
 
-    explicit Message(
-        Header header_ = Header(),
-        AttributesMap attributes_ = AttributesMap());
+    explicit Message(Header header_ = Header());
 
     void clear();
+
+    // Adds attribute replacing existing with the same type, if any.
     void addAttribute(AttributePtr&& attribute);
 
     /** Adds integer attribute */
@@ -145,8 +137,8 @@ public:
     }
 
     /** Add std::chrono::duration attribute.
-        \warning value.count() MUST NOT be greater than std::numeric_limits<int>::max()
-    */
+     * \warning value.count() MUST NOT be greater than std::numeric_limits<int>::max().
+     */
     template<typename Rep, typename Period>
     void addAttribute(int type, std::chrono::duration<Rep, Period> value)
     {
@@ -154,9 +146,10 @@ public:
         addAttribute(std::make_shared<attrs::IntAttribute>(type, value.count()));
     }
 
-    /** Add attribute of composite type.
-        Attribute MUST be represented as a structure. E.g, MessageIntegrity
-    */
+    /**
+     * Add attribute of composite type.
+     * Attribute MUST be represented as a structure. E.g, MessageIntegrity.
+     */
     template<typename T, typename... Args>
     void newAttribute(Args... args)
     {
@@ -166,11 +159,11 @@ public:
     template< typename T >
     const T* getAttribute(int type) const
     {
-        auto it = attributes.find(type);
-        if (it == attributes.end())
+        auto it = findAttr(type);
+        if (it == m_attributes.end())
             return nullptr;
 
-        return static_cast<const T*>(it->second.get());
+        return static_cast<const T*>(it->get());
     }
 
     template< typename T >
@@ -179,24 +172,37 @@ public:
         return getAttribute<T>(T::TYPE);
     }
 
-    /**
-     * The STUN implementation has the following bug from the very beginning:
-     * it adds zeroed MESSAGE-INTEGRITY when calculating the hmac.
-     * This is wrong (see https://datatracker.ietf.org/doc/html/rfc8489#section-14.5).
-     * It says: "up to and including the attribute PRECEDING the MESSAGE-INTEGRITY".
-     * But the backward compatibility between VMS and Cloud has to be preserved.
-     * So, not fixing this bug.
-     */
+    std::size_t attributeCount() const;
+
+    void eraseAttribute(int type);
+    void eraseAllAttributes();
+
+    template<typename Func>
+    // requires std::is_invocable_v<Func, const attrs::Attribute*>
+    void forEachAttribute(Func func) const
+    {
+        std::for_each(
+            m_attributes.begin(), m_attributes.end(),
+            [&func](const auto& attr) { func(attr.get()); });
+    }
+
     void insertIntegrity(const std::string& userName, const std::string& key);
 
-    bool verifyIntegrity(const std::string& userName, const std::string& key);
+    bool verifyIntegrity(
+        const std::string& userName,
+        const std::string& key,
+        MessageIntegrityOptions options = {}) const;
 
     std::optional<std::string> hasError(SystemError::ErrorCode code) const;
 
 private:
-    Buffer hmacSha1(const std::string& key);
+    using Attributes = std::vector<AttributePtr>;
+
+    Attributes::iterator findAttr(int type);
+    Attributes::const_iterator findAttr(int type) const;
+
+private:
+    Attributes m_attributes;
 };
 
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun

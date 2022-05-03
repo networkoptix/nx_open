@@ -9,12 +9,13 @@
 #include <nx/utils/qnbytearrayref.h>
 #include <nx/utils/string.h>
 
+#include "parse_utils.h"
+
 namespace nx::network::stun {
 
 using namespace attrs;
 
 static constexpr std::uint32_t kMagicCookie = 0x2112A442;
-static constexpr int kAttrHeaderSize = 4;
 
 MessageParser::MessageParser()
 {
@@ -88,7 +89,7 @@ void MessageParser::reset()
     m_legacyState = LegacyState::HEADER_INITIAL_AND_TYPE;
 
     m_state = State::header;
-    m_bytesToCache = kHeaderSize;
+    m_bytesToCache = kMessageHeaderSize;
     m_messageBytesParsed = 0;
     m_cache.clear();
 
@@ -410,7 +411,7 @@ int MessageParser::parseAttributeLength(MessageParserBuffer& buffer)
 
 int MessageParser::parseAttributeValueNotAdd(MessageParserBuffer& buffer)
 {
-    std::size_t valueWithPaddingLength = calculatePaddingSize(m_attribute.length);
+    std::size_t valueWithPaddingLength = addPadding(m_attribute.length);
     m_attribute.value.resize(static_cast<int>(m_attribute.length));
     bool ok = false;
     buffer.readNextBytesToBuffer(m_attribute.value.data(), m_attribute.length, &ok);
@@ -440,7 +441,7 @@ int MessageParser::parseAttributeValue(MessageParserBuffer& buffer)
         return FAILED;
 
     const auto attrType = attr->getType();
-    m_message->attributes[attrType] = std::unique_ptr<Attribute>(attr);
+    m_message->addAttribute(std::unique_ptr<Attribute>(attr));
 
     switch (attrType)
     {
@@ -493,14 +494,6 @@ int MessageParser::parseAttributeFingerprintValue(MessageParserBuffer& buffer)
         }
         return SECTION_FINISH;
     }
-}
-
-std::size_t MessageParser::calculatePaddingSize(std::size_t value_bytes)
-{
-    // STUN RFC indicates that the length for the attribute is the length
-    // prior to padding. So we still need to calculate the padding by ourself.
-    static const std::size_t kAlignMask = 3;
-    return (value_bytes + kAlignMask) & ~kAlignMask;
 }
 
 std::tuple<nx::ConstBufferRefType, std::optional<server::ParserState>>
@@ -623,7 +616,7 @@ void MessageParser::parseInternal(
             }
 
             m_bytesToCache = kAttrHeaderSize;
-            m_state = m_messageBytesParsed < (m_header.length + kHeaderSize)
+            m_state = m_messageBytesParsed < (m_header.length + kMessageHeaderSize)
                 ? State::attrHeader : State::done;
             break;
         }
@@ -634,7 +627,7 @@ void MessageParser::parseInternal(
     }
 
     if (m_state != State::done && m_state != State::failed &&
-        m_messageBytesParsed + m_bytesToCache > kHeaderSize + m_header.length)
+        m_messageBytesParsed + m_bytesToCache > kMessageHeaderSize + m_header.length)
     {
         // Packet length in the header is inconsistent with some attribute length.
         m_state = State::failed;

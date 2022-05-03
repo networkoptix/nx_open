@@ -106,12 +106,6 @@ private:
      */
     bool travelAllAttributes(const std::function<bool(const attrs::Attribute*)>&);
 
-    std::size_t calculatePaddingSize(std::size_t size) const
-    {
-        static const std::size_t kAlignMask = 3;
-        return (size + kAlignMask) & ~kAlignMask;
-    }
-
     bool addFingerprint(MessageSerializerBuffer* buffer);
 
     // Returns stun fingerprint(xor'ed crc32).

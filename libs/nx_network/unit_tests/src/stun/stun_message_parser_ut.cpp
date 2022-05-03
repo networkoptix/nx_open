@@ -4,16 +4,15 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/stun/message_integrity.h>
 #include <nx/network/stun/message_parser.h>
 #include <nx/network/stun/message_serializer.h>
 #include <nx/network/stun/stun_attributes.h>
+#include <nx/utils/auth/utils.h>
 #include <nx/utils/random.h>
 #include <nx/utils/string.h>
 
-namespace nx {
-namespace network {
-namespace stun {
-namespace test {
+namespace nx::network::stun::test {
 
 static constexpr int kIntAttributeType = attrs::userDefined + 1;
 static constexpr int kStringAttributeType = attrs::userDefined + 100;
@@ -21,13 +20,6 @@ static constexpr int kStringAttributeType = attrs::userDefined + 100;
 class StunMessageParser:
     public ::testing::Test
 {
-public:
-    StunMessageParser():
-        m_userName("aaa"),
-        m_userPassword("bbb")
-    {
-    }
-
 protected:
     void prepareMessageWithFingerprint()
     {
@@ -72,7 +64,7 @@ protected:
     void prepareRandomMessageWithoutAttributes()
     {
         prepareRandomMessage();
-        m_testMessage.attributes.clear();
+        m_testMessage.eraseAllAttributes();
     }
 
     void prepareSerializedMessageWithDuplicateAttributes()
@@ -81,16 +73,11 @@ protected:
         serializeMessage();
 
         // Copying attributes.
-        m_bufferToParse.append(m_bufferToParse.substr(MessageParser::kHeaderSize));
+        m_bufferToParse.append(m_bufferToParse.substr(MessageParser::kMessageHeaderSize));
 
         // Adjusting message length.
-        std::uint16_t newMessageLength = htons(m_bufferToParse.size() - MessageParser::kHeaderSize);
+        std::uint16_t newMessageLength = htons(m_bufferToParse.size() - MessageParser::kMessageHeaderSize);
         memcpy(m_bufferToParse.data() + 0x02, &newMessageLength, sizeof(newMessageLength));
-    }
-
-    void addIntegrity()
-    {
-        m_testMessage.insertIntegrity(m_userName, m_userPassword);
     }
 
     void givenCorruptedMessageWithValidFingerprint()
@@ -228,16 +215,11 @@ protected:
         thenParseSucceeded();
     }
 
-    void assertIntegrityCheckPasses()
-    {
-        ASSERT_TRUE(m_parsedMessage.verifyIntegrity(m_userName, m_userPassword));
-    }
-
     void andParsedMessageIsExpected()
     {
         // The fingerprint is validated by the parser.
-        m_testMessage.attributes.erase(attrs::fingerPrint);
-        m_parsedMessage.attributes.erase(attrs::fingerPrint);
+        m_testMessage.eraseAttribute(attrs::fingerPrint);
+        m_parsedMessage.eraseAttribute(attrs::fingerPrint);
 
         assertEqual(m_testMessage, m_parsedMessage);
     }
@@ -252,20 +234,20 @@ protected:
         m_alwaysAddFingerprint = val;
     }
 
-private:
+protected:
     Message m_testMessage;
-    Message m_parsedMessage;
-    MessageParser m_parser;
     nx::Buffer m_bufferToParse;
+    Message m_parsedMessage;
+
+private:
+    MessageParser m_parser;
     nx::network::server::ParserState m_prevParseResult = nx::network::server::ParserState::init;
-    std::string m_userName;
-    std::string m_userPassword;
     bool m_alwaysAddFingerprint = false;
 
     void assertEqual(const Message& one, const Message& two)
     {
         assertEqual(one.header, two.header);
-        assertEqual(one.attributes, two.attributes);
+        assertAttrsEqual(one, two);
     }
 
     void assertEqual(const Header& one, const Header& two)
@@ -275,33 +257,28 @@ private:
         ASSERT_EQ(one.transactionId, two.transactionId);
     }
 
-    void assertEqual(const Message::AttributesMap& one, const Message::AttributesMap& two)
+    void assertAttrsEqual(const Message& one, const Message& two)
     {
-        ASSERT_EQ(one.size(), two.size());
+        ASSERT_EQ(one.attributeCount(), two.attributeCount());
 
-        for (auto it1 = one.begin(), it2 = two.begin();
-            it1 != one.end() && it2 != two.end();
-            ++it1, ++it2)
-        {
-            ASSERT_EQ(it1->first, it2->first);
-            ASSERT_EQ(it1->second->getType(), it2->second->getType());
-            if (it1->second->getType() >= kStringAttributeType)
+        one.forEachAttribute(
+            [&two](const attrs::Attribute* oneAttr)
             {
-                ASSERT_EQ(
-                    static_cast<attrs::Unknown*>(it1->second.get())->getBuffer(),
-                    static_cast<attrs::Unknown*>(it2->second.get())->getBuffer());
-            }
-            else if (it1->second->getType() >= kIntAttributeType)
-            {
-                ASSERT_EQ(
-                    static_cast<attrs::IntAttribute*>(it1->second.get())->value(),
-                    static_cast<attrs::IntAttribute*>(it2->second.get())->value());
-            }
-            else
-            {
-                FAIL();
-            }
-        }
+                const attrs::Attribute* twoAttr = two.getAttribute<attrs::Attribute>(oneAttr->getType());
+                ASSERT_NE(nullptr, twoAttr);
+                if (oneAttr->getType() >= kIntAttributeType)
+                {
+                    ASSERT_EQ(
+                        static_cast<const attrs::IntAttribute*>(oneAttr)->value(),
+                        static_cast<const attrs::IntAttribute*>(twoAttr)->value());
+                }
+                else
+                {
+                    ASSERT_EQ(
+                        static_cast<const attrs::Unknown*>(oneAttr)->getBuffer(),
+                        static_cast<const attrs::Unknown*>(twoAttr)->getBuffer());
+                }
+            });
     }
 };
 
@@ -369,17 +346,6 @@ TEST_F(StunMessageParser, message_without_fingerprint_causes_parse_error_when_in
     whenParsePacket();
 
     thenParseFailed();
-}
-
-TEST_F(StunMessageParser, fingerprint_and_integrity)
-{
-    prepareMessageWithFingerprint();
-    addIntegrity();
-
-    serializeMessage();
-
-    assertMessageCanBeParsed();
-    assertIntegrityCheckPasses();
 }
 
 TEST_F(StunMessageParser, message_with_wrong_fingerprint_causes_parse_error)
@@ -450,7 +416,211 @@ TEST_F(StunMessageParser, parses_message_with_duplicate_attributes)
     assertMessageCanBeParsed();
 }
 
-} // namespace test
-} // namespace stun
-} // namespace network
-} // namespace nx
+//-------------------------------------------------------------------------------------------------
+
+class StunMessageIntegrity:
+    public StunMessageParser
+{
+public:
+    StunMessageIntegrity():
+        m_userName("aaabbbcc"),
+        m_userPassword("bbb")
+    {
+    }
+
+protected:
+    static constexpr int kMessageIntegrityLength = 20;
+
+    void givenMessage()
+    {
+        nx::Buffer serialized;
+        std::tie(m_testMessage, serialized) = prepareMessageWithIntegrity();
+    }
+
+    void givenSerializedMessageWithIntegrity()
+    {
+        std::tie(m_testMessage, m_bufferToParse) = prepareMessageWithIntegrity();
+        addIntegrity();
+    }
+
+    void givenSerializedMessageWithLegacyIntegrity()
+    {
+        givenSerializedMessageWithIntegrity();
+
+        // Replacing integrity (the last attribute) with zeros.
+        m_bufferToParse.replace(
+            m_bufferToParse.size() - kMessageIntegrityLength,
+            kMessageIntegrityLength,
+            nx::Buffer(kMessageIntegrityLength, '\0'));
+
+        // Recalculating integrity taking into account zeroed MESSAGE-INTEGRITY attribute.
+        auto integrity = nx::utils::auth::hmacSha1(m_userPassword, m_bufferToParse);
+        m_testMessage.newAttribute<attrs::MessageIntegrity>(integrity);
+
+        m_bufferToParse.replace(
+            m_bufferToParse.size() - kMessageIntegrityLength,
+            kMessageIntegrityLength,
+            integrity);
+    }
+
+    void givenMessageWithIntegrity()
+    {
+        std::tie(m_testMessage, m_expectedSerializedMessage) = prepareMessageWithIntegrity();
+        addIntegrity();
+    }
+
+    void addIntegrity()
+    {
+        m_testMessage.insertIntegrity(m_userName, m_userPassword);
+    }
+
+    void corruptMessageIntegrityAttribute()
+    {
+        std::size_t pos = findMessageIntegrity(m_bufferToParse);
+        ASSERT_NE(0U, pos);
+
+        ++m_bufferToParse[pos + 6];
+    }
+
+    void assertParsedMessageIntegrityCheckPasses(MessageIntegrityOptions options = {})
+    {
+        ASSERT_TRUE(m_parsedMessage.verifyIntegrity(m_userName, m_userPassword, options));
+    }
+
+    void useVerificationKey(const std::string& key)
+    {
+        m_userPassword = key;
+    }
+
+    void assertParsedMessageIntegrityCheckFails(MessageIntegrityOptions options = {})
+    {
+        ASSERT_FALSE(m_parsedMessage.verifyIntegrity(m_userName, m_userPassword, options));
+    }
+
+    void assertMessageContainsValidIntegrity()
+    {
+        auto msgIntegrityAttr = m_testMessage.getAttribute<attrs::MessageIntegrity>();
+        ASSERT_NE(nullptr, msgIntegrityAttr);
+        ASSERT_EQ(m_lastCalculatedIntegrity, msgIntegrityAttr->getBuffer());
+    }
+
+    void assertMessageSerializedCorrectly()
+    {
+        ASSERT_EQ(m_expectedSerializedMessage, m_bufferToParse);
+    }
+
+private:
+    // Returns tuple<message, serialized message>.
+    std::tuple<Message, nx::Buffer> prepareMessageWithIntegrity()
+    {
+        static constexpr char kDefaultTid[] = "012345670123456789ABCDEF";
+
+        Message msg(Header(MessageClass::indication, MethodType::userMethod + 1));
+        msg.header.transactionId = nx::utils::fromHex(kDefaultTid);
+        const std::string nonce = "nonce888";
+        msg.newAttribute<attrs::Nonce>(nonce);
+        msg.newAttribute<attrs::UserName>(m_userName);
+        msg.newAttribute<attrs::Unknown>(kStringAttributeType + 1, "ua1val");
+        msg.newAttribute<attrs::Unknown>(kStringAttributeType + 2, "ua2val");
+
+        EXPECT_EQ(8, m_userName.size()) << "The following code assumes that m_userName.size() is 8";
+
+        nx::Buffer serializedMsg = nx::utils::fromHex(
+            Buffer("00B1" "0048" "2112A442")        // indication 3, length=72 (attrs), magic cookie
+            + kDefaultTid
+            + Buffer("0015" "0008") + nx::utils::toUpper(nx::utils::toHex(nonce))
+            + Buffer("0006" "0008") + nx::utils::toUpper(nx::utils::toHex(m_userName))
+            + Buffer("E065" "0006") + nx::utils::toUpper(nx::utils::toHex(Buffer("ua1val"))) + Buffer("0000")
+            + Buffer("E066" "0006") + nx::utils::toUpper(nx::utils::toHex(Buffer("ua2val"))) + Buffer("0000")
+        );
+
+        // Calculating integrity without MESSAGE-INTEGRITY attribute but with its length reflected in the message header.
+        m_lastCalculatedIntegrity = nx::utils::auth::hmacSha1(m_userPassword, serializedMsg);
+        serializedMsg += nx::utils::fromHex(Buffer("0008" "0014")) + m_lastCalculatedIntegrity;
+
+        return std::make_tuple(msg, serializedMsg);
+    }
+
+private:
+    std::string m_userName;
+    std::string m_userPassword;
+    nx::Buffer m_expectedSerializedMessage;
+    nx::Buffer m_lastCalculatedIntegrity;
+};
+
+TEST_F(StunMessageIntegrity, calculated_integrity_is_valid)
+{
+    givenMessage();
+    addIntegrity();
+
+    assertMessageContainsValidIntegrity();
+}
+
+TEST_F(StunMessageIntegrity, message_fingerprint_is_ignored_when_adding_integrity)
+{
+    givenMessage();
+    addFingerprint();
+    addIntegrity();
+
+    assertMessageContainsValidIntegrity();
+}
+
+TEST_F(StunMessageIntegrity, integrity_is_serialized)
+{
+    givenMessageWithIntegrity();
+    serializeMessage();
+    assertMessageSerializedCorrectly();
+}
+
+TEST_F(StunMessageIntegrity, correct_integrity_is_verified)
+{
+    givenSerializedMessageWithIntegrity();
+    assertMessageCanBeParsed();
+
+    assertParsedMessageIntegrityCheckPasses();
+}
+
+TEST_F(StunMessageIntegrity, integrity_verification_fails_with_wrong_key)
+{
+    givenSerializedMessageWithIntegrity();
+    assertMessageCanBeParsed();
+
+    useVerificationKey("wrong_key");
+    assertParsedMessageIntegrityCheckFails();
+}
+
+TEST_F(StunMessageIntegrity, corrupted_integrity_is_not_verified)
+{
+    givenSerializedMessageWithIntegrity();
+    corruptMessageIntegrityAttribute();
+    assertMessageCanBeParsed();
+
+    assertParsedMessageIntegrityCheckFails();
+}
+
+// The STUN implementation had the following bug from the very beginning:
+// it added zeroed MESSAGE-INTEGRITY when calculating the hmac.
+// This is wrong (see https://datatracker.ietf.org/doc/html/rfc8489#section-14.5),
+// but the backward compatibility between VMS and Cloud has to be preserved.
+// So, ths functionality has been kept as legacy.
+TEST_F(StunMessageIntegrity, legacy_integrity_verification)
+{
+    givenSerializedMessageWithLegacyIntegrity();
+
+    assertMessageCanBeParsed();
+    assertParsedMessageIntegrityCheckPasses({.legacyMode = true});
+}
+
+TEST_F(StunMessageIntegrity, fingerprint_and_integrity)
+{
+    givenMessage();
+    addFingerprint();
+    addIntegrity();
+
+    serializeMessage();
+
+    assertMessageCanBeParsed();
+    assertParsedMessageIntegrityCheckPasses();
+}
+
+} // namespace nx::network::stun::test

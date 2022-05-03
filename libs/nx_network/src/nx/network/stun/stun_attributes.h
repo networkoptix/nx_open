@@ -67,7 +67,7 @@ public:
     virtual nx::network::server::SerializerState serialize(
         MessageSerializerBuffer* buffer,
         std::size_t* bytesWritten) const = 0;
-    
+
     virtual bool deserialize(MessageParserBuffer* buffer) = 0;
 };
 
@@ -81,7 +81,7 @@ class NX_NETWORK_API MappedAddress:
     public SerializableAttribute
 {
 public:
-    static const int TYPE = mappedAddress;
+    static constexpr int TYPE = mappedAddress;
 
     MappedAddress();
     MappedAddress(SocketAddress endpoint);
@@ -91,7 +91,7 @@ public:
     virtual nx::network::server::SerializerState serialize(
         MessageSerializerBuffer* buffer,
         std::size_t* bytesWritten) const override;
-    
+
     virtual bool deserialize(MessageParserBuffer* buffer) override;
 
     const SocketAddress& endpoint() const;
@@ -100,8 +100,8 @@ public:
     bool operator==(const MappedAddress& rhs) const;
 
 private:
-    static const int kAddressTypeIpV4 = 1;
-    static const int kAddressTypeIpV6 = 2;
+    static constexpr int kAddressTypeIpV4 = 1;
+    static constexpr int kAddressTypeIpV6 = 2;
 
     SocketAddress m_endpoint;
 };
@@ -110,7 +110,7 @@ class NX_NETWORK_API AlternateServer:
     public MappedAddress
 {
 public:
-    static const int TYPE = alternateServer;
+    static constexpr int TYPE = alternateServer;
 
     AlternateServer();
     AlternateServer(SocketAddress endpoint);
@@ -120,7 +120,7 @@ public:
 
 struct NX_NETWORK_API XorMappedAddress: Attribute
 {
-    static const int TYPE = xorMappedAddress;
+    static constexpr int TYPE = xorMappedAddress;
 
     enum
     {
@@ -166,7 +166,7 @@ private:
 
 struct NX_NETWORK_API UserName: Attribute, BufferedValue
 {
-    static const int TYPE = userName;
+    static constexpr int TYPE = userName;
 
     UserName(std::string value = std::string());
     virtual int getType() const override { return TYPE; }
@@ -174,7 +174,7 @@ struct NX_NETWORK_API UserName: Attribute, BufferedValue
 
 struct NX_NETWORK_API ErrorCode: Attribute, BufferedValue
 {
-    static const int TYPE = errorCode;
+    static constexpr int TYPE = errorCode;
 
     ErrorCode(int code_, std::string phrase = std::string());
     virtual int getType() const override { return TYPE; }
@@ -191,7 +191,7 @@ private:
 
 struct NX_NETWORK_API FingerPrint: Attribute
 {
-    static const int TYPE = fingerPrint;
+    static constexpr int TYPE = fingerPrint;
 
     FingerPrint(uint32_t crc32_ = 0);
     virtual int getType() const override { return TYPE; }
@@ -204,8 +204,8 @@ private:
 
 struct NX_NETWORK_API MessageIntegrity: Attribute, BufferedValue
 {
-    static const int TYPE = messageIntegrity;
-    static const int SIZE = 20;
+    static constexpr int TYPE = messageIntegrity;
+    static constexpr int SIZE = 20;
 
     MessageIntegrity(Buffer hmac = Buffer(SIZE, 0));
     virtual int getType() const override { return TYPE; }
@@ -213,7 +213,7 @@ struct NX_NETWORK_API MessageIntegrity: Attribute, BufferedValue
 
 struct NX_NETWORK_API Nonce: Attribute, BufferedValue
 {
-    static const int TYPE = nonce;
+    static constexpr int TYPE = nonce;
 
     Nonce(Buffer nonce = Buffer());
     virtual int getType() const override { return TYPE; }
@@ -221,7 +221,7 @@ struct NX_NETWORK_API Nonce: Attribute, BufferedValue
 
 struct NX_NETWORK_API Unknown: Attribute, BufferedValue
 {
-    static const int TYPE = unknown;
+    static constexpr int TYPE = unknown;
 
     Unknown(int userType_, nx::Buffer value_ = nx::Buffer());
     virtual int getType() const override { return userType; }

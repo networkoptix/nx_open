@@ -8,6 +8,8 @@
 
 #include <nx/utils/string.h>
 
+#include "parse_utils.h"
+
 namespace nx {
 namespace network {
 namespace stun {
@@ -205,7 +207,7 @@ server::SerializerState MessageSerializer::serializeAttributeValue_Buffer(
     // The size of the STUN attributes should be the size before padding bytes
     *value = buffer->position() - cur_pos;
     // Padding the UnknownAttributes to the boundary of 4
-    std::size_t padding_size = calculatePaddingSize(attribute.getBuffer().size());
+    std::size_t padding_size = addPadding(attribute.getBuffer().size());
     for (std::size_t i = attribute.getBuffer().size(); i < padding_size; ++i)
     {
         if (buffer->WriteByte(0) == NULL)
@@ -235,7 +237,7 @@ server::SerializerState MessageSerializer::serializeAttributeValue_ErrorCode(
         return server::SerializerState::needMoreBufferSpace;
     *value = buffer->position() - cur_pos;
     // Padding
-    std::size_t padding_size = calculatePaddingSize(utf8_bytes.size());
+    std::size_t padding_size = addPadding(utf8_bytes.size());
     for (std::size_t i = utf8_bytes.size(); i < padding_size; ++i)
     {
         if (buffer->WriteByte(0) == NULL)
@@ -244,29 +246,46 @@ server::SerializerState MessageSerializer::serializeAttributeValue_ErrorCode(
     return server::SerializerState::done;
 }
 
-bool MessageSerializer::travelAllAttributes(const std::function<bool(const attrs::Attribute*)>& callback)
+bool MessageSerializer::travelAllAttributes(
+    const std::function<bool(const attrs::Attribute*)>& callback)
 {
-    auto message_integrity = m_message->attributes.find(attrs::messageIntegrity);
-    auto fingerprint = m_message->attributes.find(attrs::fingerPrint);
+    const attrs::Attribute* messageIntegrity = nullptr;
+    const attrs::Attribute* fingerprint = nullptr;
 
-    for (auto ib = m_message->attributes.cbegin(); ib != m_message->attributes.cend(); ++ib)
-    {
-        if (ib != message_integrity && ib != fingerprint)
+    bool failed = false;
+    m_message->forEachAttribute(
+        [&messageIntegrity, &fingerprint, &callback, &failed](const attrs::Attribute* attr)
         {
-            if (!callback(ib->second.get()))
-                return false;
-        }
-    }
-    if (message_integrity != m_message->attributes.cend())
+            if (attr->getType() == attrs::messageIntegrity)
+            {
+                messageIntegrity = attr;
+            }
+            else if (attr->getType() == attrs::fingerPrint)
+            {
+                fingerprint = attr;
+            }
+            else
+            {
+                if (!callback(attr))
+                    failed = true;
+            }
+        });
+
+    if (failed)
+        return false;
+
+    if (messageIntegrity != nullptr)
     {
-        if (!callback(message_integrity->second.get()))
+        if (!callback(messageIntegrity))
             return false;
     }
-    if (fingerprint != m_message->attributes.cend())
+
+    if (fingerprint != nullptr)
     {
-        if (!callback(fingerprint->second.get()))
+        if (!callback(fingerprint))
             return false;
     }
+
     return true;
 }
 
@@ -291,7 +310,7 @@ server::SerializerState MessageSerializer::serializeAttributes(
             }
 
             // Checking for really large message may round our body size
-            std::size_t padding_attribute_value_size = calculatePaddingSize(valueSize);
+            std::size_t padding_attribute_value_size = addPadding(valueSize);
             NX_ASSERT(padding_attribute_value_size + 4 + length <= std::numeric_limits<std::uint16_t>::max());
             qToBigEndian(static_cast<std::uint16_t>(valueSize), reinterpret_cast<uchar*>(len));
             length += static_cast<std::uint16_t>(4 + padding_attribute_value_size);
@@ -324,20 +343,19 @@ bool MessageSerializer::checkMessageIntegrity()
     //}
     // 3. Checking the validation for specific attributes
     // ErrorCode message
-    const auto ib = m_message->attributes.find(attrs::errorCode);
-    if (ib != m_message->attributes.end())
+    const ErrorCode* errorCode = m_message->getAttribute<ErrorCode>(attrs::errorCode);
+    if (errorCode != nullptr)
     {
         // Checking the error code message
-        ErrorCode* error_code = static_cast<ErrorCode*>(
-            ib->second.get());
-        if (error_code->getClass() < 3 || error_code->getClass() > 6)
+        if (errorCode->getClass() < 3 || errorCode->getClass() > 6)
             return false;
-        if (error_code->getNumber() < 0 || error_code->getNumber() >= 99)
+        if (errorCode->getNumber() < 0 || errorCode->getNumber() >= 99)
             return false;
-        // RFC: The reason phrase string will at most be 127 characters
-        if (error_code->getBuffer().size() > 127)
+        // RFC: The reason phrase string will at most be 127 characters.
+        if (errorCode->getBuffer().size() > 127)
             return false;
     }
+
     return true;
 }
 
@@ -369,7 +387,8 @@ server::SerializerState MessageSerializer::serialize(
         if (serializeAttributes(&buffer) == server::SerializerState::needMoreBufferSpace)
             continue;
 
-        if (m_alwaysAddFingerprint || m_message->attributes.count(attrs::fingerPrint) > 0)
+        if (m_alwaysAddFingerprint ||
+            m_message->getAttribute<attrs::Attribute>(attrs::fingerPrint) != nullptr)
         {
             if (!addFingerprint(&buffer))
                 continue;

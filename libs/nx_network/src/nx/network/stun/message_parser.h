@@ -57,7 +57,8 @@ private:
     };
 
 public:
-    static constexpr std::size_t kHeaderSize = 20;
+    static constexpr std::size_t kMessageHeaderSize = 20;
+    static constexpr std::size_t kAttrHeaderSize = 4;
 
     MessageParser();
 
@@ -161,7 +162,6 @@ private:
     int parseAttributeFingerprintLength(MessageParserBuffer& buffer);
     int parseAttributeFingerprintValue(MessageParserBuffer& buffer);
     // Ending states
-    std::size_t calculatePaddingSize(std::size_t value_bytes);
 
     bool parseHeader(MessageParserBuffer* buffer);
 
@@ -177,7 +177,7 @@ private:
     bool m_fingerprintFound = false;
 
     State m_state = State::header;
-    std::size_t m_bytesToCache = kHeaderSize;
+    std::size_t m_bytesToCache = kMessageHeaderSize;
     std::size_t m_messageBytesParsed = 0;
     nx::Buffer m_cache;
     bool m_fingerprintRequired = false;
