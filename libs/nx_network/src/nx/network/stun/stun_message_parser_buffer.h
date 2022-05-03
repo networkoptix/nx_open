@@ -23,6 +23,7 @@ public:
     void readNextBytesToBuffer(char* buffer, std::size_t count, bool* ok);
     std::size_t position() const;
     bool eof() const;
+    void skip(std::size_t count);
 
 private:
     bool read(std::size_t byteSize, void* buffer);

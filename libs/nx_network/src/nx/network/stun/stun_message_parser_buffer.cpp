@@ -70,6 +70,11 @@ bool MessageParserBuffer::eof() const
     return m_position == m_buffer.size();
 }
 
+void MessageParserBuffer::skip(std::size_t count)
+{
+    m_position = std::min(m_position + count, m_buffer.size());
+}
+
 bool MessageParserBuffer::read(std::size_t count, void* buffer)
 {
     if (m_buffer.size() - m_position < count)

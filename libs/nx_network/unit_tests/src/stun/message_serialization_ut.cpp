@@ -63,7 +63,7 @@ TEST(StunMessageSerialization, BindingRequest)
     ASSERT_EQ(parsed.header.messageClass, MessageClass::request);
     ASSERT_EQ(parsed.header.method, MethodType::bindingMethod);
     ASSERT_EQ(0, nx::utils::stricmp(nx::utils::toHex(parsed.header.transactionId), DEFAULT_TID));
-    ASSERT_EQ(parsed.attributes.size(), (size_t)0);
+    ASSERT_EQ((size_t)0, parsed.attributeCount());
 }
 
 TEST(StunMessageSerialization, BindingResponse)
@@ -100,7 +100,7 @@ TEST(StunMessageSerialization, BindingResponse)
     ASSERT_EQ(parsed.header.messageClass, MessageClass::successResponse);
     ASSERT_EQ(parsed.header.method, MethodType::bindingMethod);
     ASSERT_EQ(0, nx::utils::stricmp(nx::utils::toHex(parsed.header.transactionId), DEFAULT_TID));
-    ASSERT_EQ(parsed.attributes.size(), (size_t)1);
+    ASSERT_EQ((size_t)1, parsed.attributeCount());
 
     const auto address = parsed.getAttribute< attrs::XorMappedAddress >();
     ASSERT_NE(address, nullptr);
@@ -141,7 +141,7 @@ TEST(StunMessageSerialization, BindingError)
     ASSERT_EQ(parsed.header.messageClass, MessageClass::errorResponse);
     ASSERT_EQ(parsed.header.method, MethodType::bindingMethod);
     ASSERT_EQ(0, nx::utils::stricmp(nx::utils::toHex(parsed.header.transactionId), DEFAULT_TID));
-    ASSERT_EQ(parsed.attributes.size(), (size_t)1);
+    ASSERT_EQ((size_t) 1, parsed.attributeCount());
 
     const auto error = parsed.getAttribute< attrs::ErrorCode >();
     ASSERT_NE(error, nullptr);
@@ -185,7 +185,7 @@ TEST(StunMessageSerialization, CustomIndication)
     ASSERT_EQ(parsed.header.messageClass, MessageClass::indication);
     ASSERT_EQ(parsed.header.method, MethodType::userMethod + 1);
     ASSERT_EQ(0, nx::utils::stricmp(nx::utils::toHex(parsed.header.transactionId), DEFAULT_TID));
-    ASSERT_EQ(parsed.attributes.size(), 2U);
+    ASSERT_EQ(2U, parsed.attributeCount());
 
     const auto attr1 = parsed.getAttribute< attrs::Unknown >(0x9001);
     ASSERT_NE(attr1, nullptr);
@@ -301,7 +301,7 @@ TEST(StunMessageSerialization, Authentification)
     ASSERT_EQ(parsed.header.messageClass, MessageClass::request);
     ASSERT_EQ(parsed.header.method, MethodType::bindingMethod);
     ASSERT_EQ(0, nx::utils::stricmp(nx::utils::toHex(parsed.header.transactionId), DEFAULT_TID));
-    ASSERT_EQ(parsed.attributes.size(), 3U);
+    ASSERT_EQ(3U, parsed.attributeCount());
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -346,39 +346,9 @@ protected:
         return crc32.checksum() ^ 0x5354554e;
     }
 
-    nx::Buffer givenMessageWithIntegrity()
-    {
-        m_message = Message(Header(MessageClass::indication, MethodType::userMethod + 1));
-        m_message.header.transactionId = nx::utils::fromHex(DEFAULT_TID);
-        m_message.newAttribute<attrs::Unknown>(0x9001, "ua1val");
-        m_message.newAttribute<attrs::Unknown>(0x9002, "ua2val");
-        m_message.newAttribute<attrs::UserName>(m_username);
-        const std::string nonce = "nonce888";
-        m_message.newAttribute<attrs::Nonce>(nonce);
-        m_message.insertIntegrity(m_username, m_key);
-
-        // The STUN implementation has the following bug from the very beginning:
-        // it adds zeroed MESSAGE-INTEGRITY when calculating the hmac.
-        // This is wrong (see https://datatracker.ietf.org/doc/html/rfc8489#section-14.5),
-        // but the backward compatibility between VMS and Cloud has to be preserved.
-        // So, not fixing this bug.
-
-        const Buffer messageWithIntegrity = nx::utils::fromHex(
-            Buffer("00B1" "0048" "2112A442")        // indication 3, length=72 (attrs), magic cookie
-            + DEFAULT_TID
-            + Buffer("0006" "0008") + nx::utils::toUpper(nx::utils::toHex(m_username))
-            + Buffer("0015" "0008") + nx::utils::toUpper(nx::utils::toHex(nonce))
-            + Buffer("9001" "0006") + nx::utils::toUpper(nx::utils::toHex(Buffer("ua1val"))) + Buffer("0000")
-            + Buffer("9002" "0006") + nx::utils::toUpper(nx::utils::toHex(Buffer("ua2val"))) + Buffer("0000")
-            + Buffer("0008" "0014") + nx::utils::toUpper(nx::utils::toHex(nx::Buffer(20, '\0')))
-        );
-
-        return nx::utils::auth::hmacSha1(m_key, messageWithIntegrity);
-    }
-
     std::uint32_t addFingerprint()
     {
-        m_message.attributes.erase(attrs::fingerPrint);
+        m_message.eraseAttribute(attrs::fingerPrint);
 
         MessageSerializer serializer;
         serializer.setAlwaysAddFingerprint(false);
@@ -414,9 +384,10 @@ protected:
             m_prevSerializationResult);
     }
 
-    void andSerializedMessageEndsWith(const nx::Buffer& suffix)
+    void andSerializedMessageEndsWith(const nx::Buffer& expected)
     {
-        ASSERT_TRUE(m_outputBuffer.ends_with(suffix));
+        const auto actual = m_outputBuffer.substr(m_outputBuffer.size() - expected.size());
+        ASSERT_EQ(expected, actual);
     }
 
     void andSerializedMessageContains(const nx::Buffer& expectedSubstr)
@@ -467,28 +438,6 @@ TEST_F(StunMessageSerializer, fingerprint_is_added_to_every_message_if_enabled)
     thenMessageSerializedSuccessfully();
 
     andSerializedMessageContainsFingerprint(expectedFingerprint);
-}
-
-TEST_F(StunMessageSerializer, valid_message_integrity_is_added)
-{
-    const auto expectedIntegrity = givenMessageWithIntegrity();
-
-    whenSerializeMessage();
-
-    thenMessageSerializedSuccessfully();
-    andSerializedMessageEndsWith(expectedIntegrity);
-}
-
-TEST_F(StunMessageSerializer, message_with_integrity_and_fingerprint)
-{
-    const auto expectedIntegrity = givenMessageWithIntegrity();
-    const auto expectedFingerprint = addFingerprint();
-
-    whenSerializeMessage();
-
-    thenMessageSerializedSuccessfully();
-    andSerializedMessageContainsFingerprint(expectedFingerprint);
-    andSerializedMessageContains(expectedIntegrity);
 }
 
 } // namespace test

@@ -132,12 +132,20 @@ std::tuple<bool, std::string> decodeBase32(const std::string& str)
 
 Buffer hmacSha1(const std::string_view& key, const std::string_view& baseString)
 {
-    unsigned int len;
+    return hmacSha1(key, std::vector<std::string_view>{baseString});
+}
+
+Buffer hmacSha1(
+    const std::string_view& key,
+    const std::vector<std::string_view>& messageParts)
+{
+    unsigned int len = 0;
     Buffer result(20, 0);
 
     auto ctx = utils::wrapUnique(HMAC_CTX_new(), &HMAC_CTX_free);
     HMAC_Init_ex(ctx.get(), key.data(), key.size(), EVP_sha1(), nullptr);
-    HMAC_Update(ctx.get(), (const unsigned char*) baseString.data(), baseString.size());
+    for (const auto& part: messageParts)
+        HMAC_Update(ctx.get(), (const unsigned char*) part.data(), part.size());
     HMAC_Final(ctx.get(), (unsigned char*) result.data(), &len);
 
     result.resize(len);

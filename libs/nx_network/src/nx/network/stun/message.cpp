@@ -8,7 +8,6 @@
 
 #include <openssl/hmac.h>
 
-#include <nx/utils/auth/utils.h>
 #include <nx/utils/random.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/string.h>
@@ -19,11 +18,7 @@
 #include "stun_message_parser_buffer.h"
 #include "stun_message_serializer_buffer.h"
 
-static constexpr size_t DEFAULT_BUFFER_SIZE = 4 * 1024;
-
-namespace nx {
-namespace network {
-namespace stun {
+namespace nx::network::stun {
 
 const char* toString(MessageClass value)
 {
@@ -103,21 +98,41 @@ Buffer Header::makeTransactionId()
 
 Buffer Header::nullTransactionId(TRANSACTION_ID_SIZE, 0);
 
+std::size_t Message::attributeCount() const
+{
+    return m_attributes.size();
+}
+
+void Message::eraseAttribute(int type)
+{
+    auto it = findAttr(type);
+    if (it != m_attributes.end())
+        m_attributes.erase(it);
+}
+
+void Message::eraseAllAttributes()
+{
+    m_attributes.clear();
+}
+
 void Message::insertIntegrity(const std::string& userName, const std::string& key)
 {
     newAttribute< attrs::UserName >(userName);
-    if (attributes.count(attrs::nonce) == 0)
+    if (findAttr(attrs::nonce) == m_attributes.end())
         newAttribute< attrs::Nonce >(nx::Buffer(QnUuid::createUuid().toSimpleByteArray()));
 
     newAttribute< attrs::MessageIntegrity >(nx::Buffer(
         attrs::MessageIntegrity::SIZE, 0));
 
-    const auto hmac = hmacSha1(key);
+    const auto hmac = calcMessageIntegrity(*this, key, {});
     NX_ASSERT(hmac.size() == attrs::MessageIntegrity::SIZE);
     newAttribute< attrs::MessageIntegrity >(hmac);
 }
 
-bool Message::verifyIntegrity(const std::string& userName, const std::string& key)
+bool Message::verifyIntegrity(
+    const std::string& userName,
+    const std::string& key,
+    MessageIntegrityOptions options) const
 {
     const auto userNameAttr = getAttribute< attrs::UserName >();
     if (!userNameAttr || userNameAttr->getString() != userName)
@@ -127,11 +142,9 @@ bool Message::verifyIntegrity(const std::string& userName, const std::string& ke
     if (!miAttr)
         return false;
 
-    Buffer messageHmac = miAttr->getBuffer();
-    newAttribute< attrs::MessageIntegrity >();
-
-    Buffer realHmac = hmacSha1(key);
-    return messageHmac == realHmac;
+    const Buffer receivedHmac = miAttr->getBuffer();
+    const Buffer calculatedHmac = calcMessageIntegrity(*this, key, options);
+    return receivedHmac == calculatedHmac;
 }
 
 std::optional<std::string> Message::hasError(SystemError::ErrorCode code) const
@@ -158,50 +171,38 @@ std::optional<std::string> Message::hasError(SystemError::ErrorCode code) const
     return std::nullopt;
 }
 
-Message::Message(Header header_, AttributesMap attributes_)
-    : header(std::move(header_))
-    , attributes(std::move(attributes_))
+Message::Message(Header header_):
+    header(std::move(header_))
 {
 }
 
 void Message::addAttribute(AttributePtr&& attribute)
 {
-    attributes[attribute->getType()] = std::move(attribute);
+    const auto type = attribute->getType();
+    auto it = findAttr(type);
+    if (it == m_attributes.end())
+        m_attributes.push_back(std::move(attribute));
+    else
+        *it = std::move(attribute);
 }
 
 void Message::clear()
 {
-    attributes.clear();
+    m_attributes.clear();
 }
 
-Buffer Message::hmacSha1(const std::string& key)
+Message::Attributes::iterator Message::findAttr(int type)
 {
-    Buffer buffer;
-    buffer.reserve(DEFAULT_BUFFER_SIZE);
-
-    // INTEGRITY is calculated without fingerprint.
-    AttributePtr fingerprintAttr;
-    if (attributes.count(attrs::fingerPrint) > 0)
-    {
-        fingerprintAttr = std::move(attributes[attrs::fingerPrint]);
-        attributes.erase(attrs::fingerPrint);
-    }
-
-    size_t bytes;
-    MessageSerializer serializer;
-    serializer.setAlwaysAddFingerprint(false);
-    serializer.setMessage(this);
-    if (serializer.serialize(&buffer, &bytes) != nx::network::server::SerializerState::done)
-    {
-        NX_ASSERT(false);
-    }
-
-    if (fingerprintAttr)
-        attributes.emplace(attrs::fingerPrint, std::move(fingerprintAttr));
-
-    return nx::utils::auth::hmacSha1(key, buffer);
+    return std::find_if(
+        m_attributes.begin(), m_attributes.end(),
+        [type](const auto& attr) { return attr->getType() == type; });
 }
 
-} // namespace stun
-} // namespace network
-} // namespace nx
+Message::Attributes::const_iterator Message::findAttr(int type) const
+{
+    return std::find_if(
+        m_attributes.begin(), m_attributes.end(),
+        [type](const auto& attr) { return attr->getType() == type; });
+}
+
+} // namespace nx::network::stun
