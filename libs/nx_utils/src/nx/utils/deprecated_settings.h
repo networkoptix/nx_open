@@ -9,6 +9,19 @@
 
 #include "argument_parser.h"
 
+class SettingsReader
+{
+public:
+    virtual ~SettingsReader() = default;
+
+    virtual bool contains(const QString& key) const = 0;
+    virtual bool containsGroup(const QString& groupName) const = 0;
+
+    virtual QVariant value(
+        const QString& key,
+        const QVariant& defaultValue = QVariant()) const = 0;
+};
+
 /**
  * Able to take settings from QSettings class (win32 registry or linux ini file) or from
  *  command line arguments.
@@ -25,7 +38,8 @@
  *
  * arguments: --section/item=value
  */
-class NX_UTILS_API QnSettings
+class NX_UTILS_API QnSettings:
+    public SettingsReader
 {
 public:
     QnSettings(
@@ -43,12 +57,12 @@ public:
 
     void parseArgs(int argc, const char* argv[]);
 
-    bool contains(const QString& key) const;
-    bool containsGroup(QString groupName) const;
+    virtual bool contains(const QString& key) const override;
+    virtual bool containsGroup(const QString& groupName) const override;
 
-    QVariant value(
+    virtual QVariant value(
         const QString& key,
-        const QVariant& defaultValue = QVariant()) const;
+        const QVariant& defaultValue = QVariant()) const override;
 
     QVariant value(
         const std::string_view& key,
@@ -81,21 +95,22 @@ private:
 /**
  * Useful for reading from a specific group.
  */
-class NX_UTILS_API QnSettingsGroupReader
+class NX_UTILS_API QnSettingsGroupReader:
+    public SettingsReader
 {
 public:
     QnSettingsGroupReader(
-        const QnSettings& settings,
-        const std::string& name);
+        const SettingsReader& settings,
+        const QString& name);
 
-    bool contains(const std::string& key) const;
+    virtual bool contains(const QString& key) const override;
+    virtual bool containsGroup(const QString& groupName) const override;
 
-    QVariant value(
-        const std::string_view& key,
-        const QVariant& defaultValue = QVariant()) const;
+    virtual QVariant value(
+        const QString& key,
+        const QVariant& defaultValue = QVariant()) const override;
 
 private:
-    const QnSettings& m_settings;
-    std::string m_groupName;
+    const SettingsReader& m_settings;
+    QString m_groupName;
 };
-
