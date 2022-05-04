@@ -307,6 +307,13 @@ public:
     std::chrono::milliseconds keepAliveTimeOut() const { return m_keepAliveTimeOut; }
     QString sessionId() const { return m_SessionId; }
 
+
+    /*
+    * Some cameras declare qop support in digest authentication, but actually don't support it.
+    */
+    void setIgnoreQopInDigest(bool value);
+    bool ignoreQopInDigest(bool value) const;
+
 private:
     void addRangeHeader( nx::network::http::Request* const request, qint64 startPos, qint64 endPos );
     nx::network::http::Request createDescribeRequest();
@@ -398,6 +405,7 @@ private:
     std::set<QString> m_additionalSupportedCodecs;
     int m_tcpRecvBufferSize = 512 * 1024;
     int m_nonceCount = 0;
+    bool m_ignoreQopInDigest = false;
 
     /*!
         \param readSome if \a true, returns as soon as some data has been read. Otherwise, blocks till all \a bufSize bytes has been read
