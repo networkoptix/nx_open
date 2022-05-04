@@ -44,15 +44,21 @@ ResultType isVersionInstalled(
 
 ResultType restartClient(
     nx::utils::SoftwareVersion version,
-    const QString& auth)
+    const QString& auth,
+    const QString& systemUri)
 {
     QStringList arguments;
-    arguments << QLatin1String("--no-single-application");
-    if (!auth.isEmpty())
+
+    if(!systemUri.isEmpty())
     {
-        arguments << QLatin1String("--auth");
-        arguments << auth;
+        arguments << "--" << systemUri;
     }
+    else if (!auth.isEmpty())
+    {
+        arguments << "--auth" << auth;
+    }
+
+    arguments << "--no-single-application";
 
     Response response;
 
