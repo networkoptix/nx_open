@@ -25,6 +25,10 @@ struct QnStartupParameters
     static nx::vms::client::core::ConnectionInfo parseAuthenticationString(QString string);
     nx::vms::client::core::ConnectionInfo parseAuthenticationString() const;
 
+    static nx::vms::utils::SystemUri createSystemUri(
+        const nx::vms::client::core::ConnectionInfo& connectionInfo,
+        const QString& cloudHost);
+
     bool isVideoWallMode() const;
 
     bool allowMultipleClientInstances = false;

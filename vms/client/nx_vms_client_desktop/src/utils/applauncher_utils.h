@@ -24,7 +24,9 @@ ResultType getInstalledVersions(QList<nx::utils::SoftwareVersion>* versions);
  *
  * @return ResultType::ok if request has been performed successfully, otherwise - error code.
  */
-ResultType restartClient(nx::utils::SoftwareVersion version = {}, const QString& auth = {});
+ResultType restartClient(nx::utils::SoftwareVersion version = {},
+    const QString& auth = {},
+    const QString& systemUri = {});
 
 bool checkOnline(bool runWhenOffline = true);
 

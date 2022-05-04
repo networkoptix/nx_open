@@ -246,6 +246,14 @@ bool QnConnectionDiagnosticsHelper::downloadAndRunCompatibleVersion(
     const QString authString = QnStartupParameters::createAuthenticationString(
         connectionInfo, moduleInformation.version);
 
+    // Recreate System URI for older client, may be dropped with 4.2 compatibility.
+    const auto systemUri = (connectionInfo.userType == nx::vms::api::UserType::cloud
+        && moduleInformation.version < kCloudTokenVersion
+        && connectionInfo.credentials.authToken.isPassword())
+        ? QnStartupParameters::createSystemUri(connectionInfo, moduleInformation.cloudHost)
+            .toString()
+        : QString();
+
     // Version is installed, trying to run.
     while (true)
     {
@@ -262,7 +270,7 @@ bool QnConnectionDiagnosticsHelper::downloadAndRunCompatibleVersion(
         if (needToConfirmRestart && !confirmRestart(moduleInformation, engineVersion, parentWidget))
             return false;
 
-        switch (restartClient(moduleInformation.version, authString))
+        switch (restartClient(moduleInformation.version, authString, systemUri))
         {
             case ResultType::ok:
             {

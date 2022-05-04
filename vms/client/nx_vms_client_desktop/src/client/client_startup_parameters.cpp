@@ -258,3 +258,22 @@ bool QnStartupParameters::isVideoWallMode() const
 {
     return !videoWallGuid.isNull();
 }
+
+nx::vms::utils::SystemUri QnStartupParameters::createSystemUri(
+    const nx::vms::client::core::ConnectionInfo& connectionInfo,
+    const QString& cloudHost)
+{
+    using namespace nx::vms::utils;
+
+    SystemUri uri;
+    uri.setScope(SystemUri::Scope::Generic);
+    uri.setProtocol(SystemUri::Protocol::Native);
+    uri.setDomain(cloudHost);
+    uri.setClientCommand(SystemUri::ClientCommand::Client);
+    uri.setSystemId(
+        QString::fromStdString(connectionInfo.address.address.toString()).split(".").back());
+    uri.setAuthenticator(
+        QString::fromStdString(connectionInfo.credentials.username),
+        QString::fromStdString(connectionInfo.credentials.authToken.value));
+    return uri;
+}
