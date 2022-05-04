@@ -1677,6 +1677,8 @@ CameraDiagnostics::Result QnRtspClient::sendRequestAndReceiveResponse(
                     m_url, authenticateHeaderName, authenticateHeaderValue);
                 return CameraDiagnostics::NotAuthorisedResult(m_url);
             }
+            if (m_ignoreQopInDigest)
+                authenticate.params.erase("qop");
             m_responseAuthenticate = std::move(authenticate);
         }
     }
@@ -1714,4 +1716,14 @@ void QnRtspClient::addRequestHeader(const QString& requestName, const nx::networ
 QElapsedTimer QnRtspClient::lastReceivedDataTimer() const
 {
     return m_lastReceivedDataTimer;
+}
+
+void QnRtspClient::setIgnoreQopInDigest(bool value)
+{
+    m_ignoreQopInDigest = value;
+}
+
+bool QnRtspClient::ignoreQopInDigest(bool value) const
+{
+    return m_ignoreQopInDigest;
 }
