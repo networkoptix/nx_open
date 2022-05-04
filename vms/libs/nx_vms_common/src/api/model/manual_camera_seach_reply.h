@@ -17,6 +17,7 @@ typedef nx::vms::api::DeviceSearchStatus QnManualResourceSearchStatus;
 struct QnManualResourceSearchEntry
 {
     QString name;
+    QString model;
     QString url;
     QString manufacturer;
     QString vendor;
@@ -25,11 +26,17 @@ struct QnManualResourceSearchEntry
 
     QnManualResourceSearchEntry(): existsInPool(false) {}
 
-    QnManualResourceSearchEntry(const QString &name, const QString &url,
-        const QString &manufacturer, const QString &vendor,
-        const QString& physicalId, bool existsInPool)
+    QnManualResourceSearchEntry(
+        const QString& name,
+        const QString& model,
+        const QString& url,
+        const QString& manufacturer,
+        const QString& vendor,
+        const QString& physicalId,
+        bool existsInPool)
         :
         name(name),
+        model(model),
         url(url),
         manufacturer(manufacturer),
         vendor(vendor),
