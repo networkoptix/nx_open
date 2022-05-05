@@ -46,7 +46,11 @@ struct NX_VMS_CLIENT_DESKTOP_API SharedMemoryData
             saveWindowState,
 
             /** Restore window state from file. */
-            restoreWindowState);
+            restoreWindowState,
+
+            /** Logout from cloud. */
+            logoutFromCloud
+        );
 
         /** PID of the process. */
         PidType pid = 0;
@@ -191,14 +195,17 @@ public:
     /** Sets actual session id for the current client instance and creates session if needed. */
     void enterSession(const SessionId& sessionId);
 
-    /** 
-     * Clears session id for the current client instance and removes session if needed. 
-     * Returns true if the session is still active. 
+    /**
+     * Clears session id for the current client instance and removes session if needed.
+     * Returns true if the session is still active.
      */
     bool leaveSession();
 
     /** Updates token of the current instance session. */
     void updateSessionToken(std::string token);
+
+    /** Notify all instances that they must logout from cloud. */
+    void requestLogoutFromCloud();
 
 signals:
     void clientCommandRequested(SharedMemoryData::Command command, const QByteArray& data);

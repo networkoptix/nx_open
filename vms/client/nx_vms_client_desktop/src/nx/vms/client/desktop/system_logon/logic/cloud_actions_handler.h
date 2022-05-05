@@ -16,6 +16,8 @@ public:
     virtual ~CloudActionsHandler() override;
 
 private:
+    void logoutFromCloud();
+
     void at_loginToCloudAction_triggered();
     void at_logoutFromCloudAction_triggered();
 
