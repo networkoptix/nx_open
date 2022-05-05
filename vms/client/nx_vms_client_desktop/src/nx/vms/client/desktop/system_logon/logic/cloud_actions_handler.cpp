@@ -5,11 +5,14 @@
 #include <QtGui/QDesktopServices>
 #include <QtWidgets/QAction>
 
+#include <client/client_globals.h>
+#include <client/client_module.h>
 #include <common/common_module.h>
 #include <helpers/cloud_url_helper.h>
 #include <helpers/system_helpers.h>
 #include <nx/branding.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
+#include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/connection_diagnostics_helper.h>
@@ -58,10 +61,29 @@ CloudActionsHandler::CloudActionsHandler(QObject* parent):
     auto watcher = qnCloudStatusWatcher;
     connect(watcher, &QnCloudStatusWatcher::forcedLogout,
         this, &CloudActionsHandler::at_forcedLogout);
+
+    connect(
+        qnClientModule->sharedMemoryManager(),
+        &nx::vms::client::desktop::SharedMemoryManager::clientCommandRequested,
+        this,
+        [this](SharedMemoryData::Command command, const QByteArray& /*data*/)
+        {
+            if (command == SharedMemoryData::Command::logoutFromCloud)
+            {
+                logoutFromCloud();
+                menu()->trigger(ui::action::DisconnectAction, {Qn::ForceRole, true});
+            }
+        });
 }
 
 CloudActionsHandler::~CloudActionsHandler()
 {
+}
+
+void CloudActionsHandler::logoutFromCloud()
+{
+    qnCloudStatusWatcher->resetAuthData();
+    nx::vms::client::core::helpers::forgetSavedCloudPassword();
 }
 
 void CloudActionsHandler::at_loginToCloudAction_triggered()
@@ -79,8 +101,8 @@ void CloudActionsHandler::at_loginToCloudAction_triggered()
 
 void CloudActionsHandler::at_logoutFromCloudAction_triggered()
 {
-    qnCloudStatusWatcher->resetAuthData();
-    nx::vms::client::core::helpers::forgetSavedCloudPassword();
+    logoutFromCloud();
+    qnClientModule->sharedMemoryManager()->requestLogoutFromCloud();
 }
 
 void CloudActionsHandler::at_forcedLogout()

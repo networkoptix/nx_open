@@ -512,4 +512,9 @@ void SharedMemoryManager::updateSessionToken(std::string token)
     d->updateSessionToken(token);
 }
 
+void SharedMemoryManager::requestLogoutFromCloud()
+{
+    d->sendCommand(Command::logoutFromCloud);
+}
+
 } // namespace nx::vms::client::desktop
