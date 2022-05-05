@@ -148,6 +148,9 @@ const QnUuid& SystemContext::sessionId() const
 void SystemContext::updateRunningInstanceGuid()
 {
     d->sessionId = QnUuid::createUuid();
+    auto data = runtimeInfoManager()->localInfo();
+    data.data.peer.instanceId = d->sessionId;
+    runtimeInfoManager()->updateLocalItem(data);
 }
 
 QnRouter* SystemContext::router() const
