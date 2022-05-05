@@ -2516,7 +2516,8 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
     if (hasSpaceIssues)
     {
         setWarningStyle(ui->spaceErrorLabel);
-        ui->spaceErrorLabel->setText("Client does not have enough space to download update packages.");
+        ui->spaceErrorLabel->setText(tr("There is not enough space on your computer to download "
+            "the Client update. Please free up some space on your hard drive and try again."));
         ui->spaceErrorLabel->show();
     }
     else
