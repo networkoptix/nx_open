@@ -198,5 +198,19 @@
         <source>Too many login attempts. Try again in a minute.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>To log in to this system, disable “Ask for a verification code on every login with your %1 account” in your account %2.</source>
+        <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Two-factor authentication is required.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You can configure it in your %1.</source>
+        <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

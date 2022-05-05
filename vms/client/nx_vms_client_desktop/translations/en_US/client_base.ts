@@ -1015,6 +1015,10 @@
         <source>Web Page Settings...</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Account security...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Deactivator</name>
@@ -1582,6 +1586,33 @@
     </message>
 </context>
 <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+        <source>Zoom In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Focus Far</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Focus Near</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Focus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Dewarping Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QWebEnginePage</name>
     <message>
         <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
@@ -1635,6 +1666,20 @@
     <message>
         <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>QnAccessibleMediaWidget</name>
+    <message>
+        <source>Access granted by:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>and %n more</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2894,8 +2939,12 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Your session has expired</source>
-        <translation></translation>
+        <source>System is not compatible with two-factor authentication</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to log in to &quot;%1&quot; system</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4777,10 +4826,6 @@ to %1</source>
         <source>Failover</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-        <translation></translation>
-    </message>
     <message numerus="yes">
         <source>Certificates</source>
         <translation>
@@ -4802,6 +4847,10 @@ to %1</source>
     <message>
         <source>Details</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7542,6 +7591,10 @@ We recommend you not to open this web page. If you understand the risks, you can
         <source>Select Camera</source>
         <translation></translation>
     </message>
+    <message>
+        <source>You do not have any cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::CameraSettingsDialog</name>
@@ -9176,6 +9229,10 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
         <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

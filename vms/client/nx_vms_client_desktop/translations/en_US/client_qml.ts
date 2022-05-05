@@ -802,8 +802,8 @@
         <translation></translation>
     </message>
     <message>
-        <source>preview is not available for the selected object</source>
-        <translation></translation>
+        <source>Preview is not available for the selected object</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
