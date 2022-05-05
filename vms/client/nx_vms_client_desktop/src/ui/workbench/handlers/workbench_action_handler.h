@@ -111,7 +111,7 @@ protected:
         QnTimePeriod timelineSelection;
         nx::vms::client::core::MotionSelection motionSelection;
         QRectF analyticsSelection;
-        bool displayRoi = false;
+        bool displayRoi = true;
         bool displayAnalyticsObjects = false;
     };
 
