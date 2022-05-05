@@ -33,7 +33,7 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
     if (m_dataProvider)
     {
         m_archiveReader = dynamic_cast<QnAbstractArchiveStreamReader *>(m_dataProvider.data());
-        if (resource->flags().testFlag(Qn::local_media))
+        if (m_archiveReader && resource->flags().testFlag(Qn::local_media))
             m_archiveReader->setCycleMode(true);
 
         m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider *>(m_dataProvider.data());
