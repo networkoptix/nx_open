@@ -52,26 +52,11 @@ IosDeviceInformation IosDeviceInformation::currentInformation()
 
 bool IosDeviceInformation::isBionicProcessor() const
 {
-    enum BionicIPhonesMajorVersion
-    {
-        iPhoneXsLike = 11,
-        iPhone11 = 12
-    };
+    static const int kIPhoneXsLikeMajorVersion = 11;
+    static const int kIPadPro3rdGenMajorVersion = 8;
 
-    enum BionicIPadsMajorVersion
-    {
-        iPadPro3rdGen = 8,
-        iPadMini5rdAndAir3rdGen = 11,
-    };
-
-    static const QList<IosDeviceInformation> kBionicDevices = {
-        {Type::iPhone, iPhoneXsLike},
-        {Type::iPhone, iPhone11},
-        {Type::iPad, iPadPro3rdGen},
-        {Type::iPad, iPadMini5rdAndAir3rdGen}};
-
-    return kBionicDevices.contains(*this);
+    return (type == Type::iPhone && majorVersion >= kIPhoneXsLikeMajorVersion)
+        || (type == Type::iPad && majorVersion >= kIPadPro3rdGenMajorVersion);
 }
 
 } // namespace nx::media
-
