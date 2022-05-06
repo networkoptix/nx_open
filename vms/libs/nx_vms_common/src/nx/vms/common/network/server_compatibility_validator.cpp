@@ -35,10 +35,10 @@ static const QMap<Peer, Protocol> kDefaultProtocolByPeer{
 };
 
 /** The lowest version of the Server to which Client can try to connect. */
-static const nx::utils::SoftwareVersion kMinimalConnectVersion(3, 0);
+static const nx::utils::SoftwareVersion kMinimalConnectVersion(4, 0);
 
 /** The lowest version of the Server which can be merged to existing System */
-static const nx::utils::SoftwareVersion kMinimalMergeVersion(4, 3);
+static const nx::utils::SoftwareVersion kMinimalMergeVersion(5, 0);
 
 static const QMap<Purpose, nx::utils::SoftwareVersion> kMinimalVersionByPurpose{
     {Purpose::connect, kMinimalConnectVersion},
