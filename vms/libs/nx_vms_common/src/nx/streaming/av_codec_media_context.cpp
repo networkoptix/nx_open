@@ -122,6 +122,16 @@ bool CodecParameters::deserialize(const char* data, int size, int version)
             return false;
         }
     }
+    else if (m_version >= 2)
+    {
+        if (m_version > 2)
+            NX_DEBUG(this, "Try to deserialize data from the future version");
+        if (!::deserialize<QnMediaContextSerializableData>(*this, data, size))
+        {
+            NX_WARNING(this, "Failed to deserialize codec parameters data");
+            return false;
+        }
+    }
     else
     {
         NX_WARNING(this, "Failed to deserialize codec parameters data, version not supported: %1",
