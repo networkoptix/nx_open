@@ -123,6 +123,13 @@ public:
     void enableAuthentication(const std::string& pathRegex);
     void registerUserCredentials(const Credentials& credentials);
 
+    /**
+     * Enables external authentication manager to authenticate request under path.
+     */
+    void enableAuthentication(
+        const std::string& pathRegex,
+        server::AbstractAuthenticationManager& mgr);
+
     nx::network::http::HttpStreamSocketServer& server() { return *m_httpServer; }
     const nx::network::http::HttpStreamSocketServer& server() const { return *m_httpServer; }
     nx::network::http::server::rest::MessageDispatcher& httpMessageDispatcher()

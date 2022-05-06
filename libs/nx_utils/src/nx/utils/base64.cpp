@@ -9,9 +9,11 @@ namespace nx::utils {
 // without allocations at all.
 // TODO: #akolesnikov Provide single implementation.
 
-int toBase64(
+namespace {
+
+int toBase64Internal(
     const void* data, int size,
-    char* outBuf, int outBufCapacity)
+    char* outBuf, int outBufCapacity, bool isUrl)
 {
     const auto encodedLength = ((size / 3) + 1) * 4;
 
@@ -21,12 +23,33 @@ int toBase64(
     if (outBufCapacity < encodedLength)
         return -1;
 
-    const auto encoded = QByteArray::fromRawData((const char*) data, size).toBase64();
+    const auto encoded =
+        QByteArray::fromRawData((const char*) data, size)
+            .toBase64(isUrl ? (QByteArray::Base64UrlEncoding | QByteArray::OmitTrailingEquals)
+                            : QByteArray::Base64Encoding);
     memcpy(outBuf, encoded.data(), encoded.size());
     return encoded.size();
 }
 
-static int estimateDecodedLen(const char* encoded, int size)
+} // anonymous namespace
+
+int toBase64(
+    const void* data, int size,
+    char* outBuf, int outBufCapacity)
+{
+    return toBase64Internal(data, size, outBuf, outBufCapacity, false);
+}
+
+int toBase64Url(
+    const void* data, int size,
+    char* outBuf, int outBufCapacity)
+{
+    return toBase64Internal(data, size, outBuf, outBufCapacity, true);
+}
+
+namespace {
+
+int estimateDecodedLen(const char* encoded, int size)
 {
     // Removing padding if present.
     while (size > 0 && encoded[size-1] == '=')
@@ -39,9 +62,9 @@ static int estimateDecodedLen(const char* encoded, int size)
         + kRemainderLenToDataLen[size % 4];
 }
 
-int fromBase64(
+int fromBase64UrlInternal(
     const char* data, int size,
-    void* outBuf, int outBufCapacity)
+    void* outBuf, int outBufCapacity, bool isUrl)
 {
     const auto decodedLength = estimateDecodedLen(data, size);
 
@@ -51,9 +74,27 @@ int fromBase64(
     if (outBufCapacity < decodedLength)
         return -1;
 
-    const auto decoded = QByteArray::fromBase64(QByteArray::fromRawData(data, size));
+    const auto decoded = QByteArray::fromBase64(
+        QByteArray::fromRawData((const char*) data, size),
+        isUrl ? QByteArray::Base64UrlEncoding : QByteArray::Base64Encoding);
     memcpy(outBuf, decoded.data(), decoded.size());
     return decoded.size();
+}
+
+} // anonymous namespace
+
+int fromBase64(
+    const char* data, int size,
+    void* outBuf, int outBufCapacity)
+{
+    return fromBase64UrlInternal(data, size, outBuf, outBufCapacity, false);
+}
+
+int fromBase64Url(
+    const char* data, int size,
+    void* outBuf, int outBufCapacity)
+{
+    return fromBase64UrlInternal(data, size, outBuf, outBufCapacity, true);
 }
 
 } // namespace nx::utils
