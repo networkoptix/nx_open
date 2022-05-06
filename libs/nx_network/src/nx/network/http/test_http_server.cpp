@@ -59,6 +59,13 @@ void TestHttpServer::registerUserCredentials(const Credentials& credentials)
     m_credentialsProvider.addCredentials(credentials);
 }
 
+void TestHttpServer::enableAuthentication(
+    const std::string& pathRegex,
+    server::AbstractAuthenticationManager& mgr)
+{
+    m_authDispatcher.add(std::regex(pathRegex), &mgr);
+}
+
 bool TestHttpServer::registerStaticProcessor(
     const std::string& path,
     nx::Buffer msgBody,
