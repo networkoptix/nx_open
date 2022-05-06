@@ -363,18 +363,18 @@
     </message>
     <message>
       <source>Click to add</source>
-      <translation type="unfinished">Click to add</translation>
+      <translation>Klik for at tilføje</translation>
     </message>
     <message>
       <source>Display on video</source>
-      <translation type="unfinished">Display on video</translation>
+      <translation>Vis på video</translation>
     </message>
   </context>
   <context>
     <name>FigureEditorDialog</name>
     <message>
       <source>Clear</source>
-      <translation type="unfinished">Clear</translation>
+      <translation>Ryd</translation>
     </message>
     <message>
       <source>OK</source>
@@ -389,7 +389,7 @@
     <name>FigureView</name>
     <message>
       <source>NO PREVIEW</source>
-      <translation type="unfinished">NO PREVIEW</translation>
+      <translation>INGEN PREVIEW</translation>
     </message>
   </context>
   <context>
@@ -490,15 +490,15 @@
     <name>InformationPanel</name>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Version</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>Leverandør</translation>
     </message>
     <message>
       <source>Camera stream</source>
-      <translation type="unfinished">Camera stream</translation>
+      <translation>Kamera stream</translation>
     </message>
     <message>
       <source>Select video stream from the camera for analysis</source>
@@ -880,7 +880,7 @@ to activate PTZ</translation>
     <name>Repeater</name>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Tilføj</translation>
     </message>
   </context>
   <context>
@@ -891,7 +891,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Intet fundet</translation>
     </message>
     <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
@@ -1011,7 +1011,7 @@ to activate PTZ</translation>
     <name>SearchField</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Søg</translation>
     </message>
   </context>
   <context>
@@ -1197,11 +1197,11 @@ to activate PTZ</translation>
     <name>TileMenu</name>
     <message>
       <source>Edit</source>
-      <translation type="unfinished">Edit</translation>
+      <translation>Rediger</translation>
     </message>
     <message>
       <source>Hide</source>
-      <translation type="unfinished">Hide</translation>
+      <translation>Skjul</translation>
     </message>
     <message>
       <source>Show</source>
@@ -1288,7 +1288,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Indlæser...</translation>
     </message>
   </context>
 </TS>
