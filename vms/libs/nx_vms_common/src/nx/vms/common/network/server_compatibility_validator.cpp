@@ -35,9 +35,9 @@ static const QMap<Peer, Protocol> kDefaultProtocolByPeer{
 };
 
 static const QMap<Purpose, nx::utils::SoftwareVersion> kMinimalVersionByPurpose{
-    {Purpose::connect, {3, 0}},
+    {Purpose::connect, {4, 0}},
     {Purpose::merge, {5, 0}},
-    {Purpose::connectInCompatibilityMode, {3, 0}},
+    {Purpose::connectInCompatibilityMode, {4, 0}},
 };
 
 void ensureInitialized()
