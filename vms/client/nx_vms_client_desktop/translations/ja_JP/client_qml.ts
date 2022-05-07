@@ -897,7 +897,7 @@ PTZを行います</translation>
     <message numerus="yes">
       <source>...and %n more</source>
       <translation>
-        <numerusform>...さらに %n 件</numerusform>
+        <numerusform>...ほか %n 件</numerusform>
       </translation>
     </message>
   </context>
@@ -1236,7 +1236,7 @@ PTZを行います</translation>
     <message numerus="yes">
       <source>... and %n more</source>
       <translation>
-        <numerusform>... さらに %n 件</numerusform>
+        <numerusform>... ほか %n 件</numerusform>
       </translation>
     </message>
   </context>
