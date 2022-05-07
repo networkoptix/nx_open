@@ -10133,7 +10133,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <message numerus="yes">
       <source>... and %n more</source>
       <translation>
-        <numerusform>... さらに %n 件</numerusform>
+        <numerusform>... ほか %n 件</numerusform>
       </translation>
     </message>
     <message numerus="yes">
