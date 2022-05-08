@@ -5,6 +5,7 @@
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
+#include <nx/utils/impl_ptr.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/connective.h>
@@ -15,14 +16,16 @@ namespace nx::vms::client::desktop { class CheckableHeaderView; }
 class QnUserListModel;
 class QnSortedUserListModel;
 
-class QnUserManagementWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
+class QnUserManagementWidget:
+    public Connective<QnAbstractPreferencesWidget>,
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
-    typedef Connective<QnAbstractPreferencesWidget> base_type;
+    using base_type = Connective<QnAbstractPreferencesWidget>;
 
 public:
     explicit QnUserManagementWidget(QWidget* parent = nullptr);
-    virtual ~QnUserManagementWidget();
+    virtual ~QnUserManagementWidget() override;
 
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
@@ -31,36 +34,7 @@ public:
     void filterDigestUsers();
 
 private:
-    void at_usersTable_clicked(const QModelIndex& index);
-    void at_headerCheckStateChanged(Qt::CheckState state);
-
-    Q_SLOT void at_mergeLdapUsersAsync_finished(int status, int handle, const QString& errorString);
-
-    void editRoles();
-    void createUser();
-    void fetchUsers();
-    void openLdapSettings();
-    void forceSecureAuth();
-
-    void modelUpdated();
-    void updateSelection();
-    void updateLdapState();
-
-    bool enableUser(const QnUserResourcePtr& user, bool enabled);
-    void setSelectedEnabled(bool enabled);
-    void enableSelected();
-    void disableSelected();
-    void deleteSelected();
-
-    QnUserResourceList visibleUsers() const;
-    QnUserResourceList visibleSelectedUsers() const;
-
-    bool canDisableDigest(const QnUserResourcePtr& user) const;
-
-private:
-    QScopedPointer<Ui::QnUserManagementWidget> ui;
-    QnUserListModel* m_usersModel;
-    QnSortedUserListModel* m_sortModel;
-    nx::vms::client::desktop::CheckableHeaderView* m_header = nullptr;
-    QAction* m_filterDigestAction = nullptr;
+    class Private;
+    nx::utils::ImplPtr<Ui::QnUserManagementWidget> ui;
+    nx::utils::ImplPtr<Private> d;
 };
