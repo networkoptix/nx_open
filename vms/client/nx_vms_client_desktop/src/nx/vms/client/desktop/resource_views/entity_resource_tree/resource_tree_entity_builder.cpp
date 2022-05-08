@@ -128,7 +128,7 @@ LayoutItemCreator layoutItemCreator(
             const auto resourcePool = layout->resourcePool();
             const auto itemData = layout->getItem(itemId);
 
-            const auto itemResource = resourcePool->getResourceById(itemData.resource.id);
+            const auto itemResource = resourcePool->getResourceByDescriptor(itemData.resource);
             if (!itemResource)
                 return AbstractItemPtr();
 
