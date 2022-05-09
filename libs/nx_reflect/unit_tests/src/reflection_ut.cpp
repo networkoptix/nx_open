@@ -107,6 +107,90 @@ TEST(Reflection, struct_properties_represented_with_get_set_methods_json)
 
 //-------------------------------------------------------------------------------------------------
 
+class FooWithReadOnlyProperty
+{
+public:
+    std::string str() const { return m_str; }
+    void setStr(const std::string& s) { m_str = s; }
+
+    std::string readOnlyProperty() const { return "readOnly"; }
+
+    bool operator==(const FooWithReadOnlyProperty& right) const = default;
+
+private:
+    std::string m_str;
+};
+
+NX_REFLECTION_INSTRUMENT_GSN(
+    FooWithReadOnlyProperty,
+    ((&FooWithReadOnlyProperty::str, &FooWithReadOnlyProperty::setStr, "strVal"))
+    ((&FooWithReadOnlyProperty::readOnlyProperty, nx::reflect::none, "ro")))
+
+TEST(Reflection, struct_properties_read_only)
+{
+    FieldEnumerator fieldEnumerator;
+    const auto fieldNames = nx::reflect::visitAllFields<FooWithReadOnlyProperty>(fieldEnumerator);
+
+    ASSERT_EQ(
+        std::vector<std::string>({{"strVal"}, {"ro"}}),
+        fieldNames);
+}
+
+TEST(Reflection, struct_properties_read_only_json)
+{
+    FooWithReadOnlyProperty foo;
+    foo.setStr("abc");
+
+    const auto serialized = nx::reflect::json::serialize(foo);
+    ASSERT_EQ(R"({"strVal":"abc","ro":"readOnly"})", serialized);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class FooWithWriteOnlyProperty
+{
+public:
+    std::string str() const { return m_str; }
+    void setStr(const std::string& s) { m_str = s; }
+
+    void setWriteOnlyProperty(const std::string& val) { m_wo = val; }
+
+    bool operator==(const FooWithWriteOnlyProperty& right) const = default;
+
+private:
+    std::string m_str;
+    std::string m_wo;
+};
+
+NX_REFLECTION_INSTRUMENT_GSN(
+    FooWithWriteOnlyProperty,
+    ((&FooWithWriteOnlyProperty::str, &FooWithWriteOnlyProperty::setStr, "strVal"))
+    ((nx::reflect::none, &FooWithWriteOnlyProperty::setWriteOnlyProperty, "wo")))
+
+TEST(Reflection, struct_properties_write_only)
+{
+    FieldEnumerator fieldEnumerator;
+    const auto fieldNames = nx::reflect::visitAllFields<FooWithWriteOnlyProperty>(fieldEnumerator);
+
+    ASSERT_EQ(
+        std::vector<std::string>({{"strVal"}, {"wo"}}),
+        fieldNames);
+}
+
+TEST(Reflection, struct_properties_write_only_json)
+{
+    FooWithWriteOnlyProperty foo;
+    foo.setStr("abc");
+    foo.setWriteOnlyProperty("write only");
+
+    FooWithWriteOnlyProperty deserialized;
+    ASSERT_TRUE(nx::reflect::json::deserialize(R"({"strVal":"abc","wo":"write only"})", &deserialized));
+
+    ASSERT_EQ(foo, deserialized);
+}
+
+//-------------------------------------------------------------------------------------------------
+
 template<typename T>
 struct GenericFoo
 {

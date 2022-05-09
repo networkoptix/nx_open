@@ -138,6 +138,33 @@ public:
     constexpr bool operator!=(const string_view& other) const { return !(*this == other); }
 };
 
+//-------------------------------------------------------------------------------------------------
+
+template<typename T> struct Decay { using Type = T; };
+template<typename T> struct Decay<const T&> { using Type = T; };
+template<typename T> struct Decay<T&> { using Type = T; };
+template<typename T> struct Decay<const T> { using Type = T; };
+
+// Getter is a `T(Class::*) const`.
+template<typename Getter>
+struct GetterReturnType {};
+
+template<typename C, typename T>
+struct GetterReturnType<T (C::*)() const> { using Type = typename Decay<T>::Type; };
+
+template<typename C, typename T>
+struct GetterReturnType<T (C::*)() const noexcept> { using Type = typename Decay<T>::Type; };
+
+// Setter is a `void(Class::*)(T)`.
+template<typename Setter>
+struct SetterReturnType {};
+
+template<typename C, typename T>
+struct SetterReturnType<void(C::*)(T)> { using Type = typename Decay<T>::Type; };
+
+template<typename C, typename T>
+struct SetterReturnType<void(C::*)(T) noexcept> { using Type = typename Decay<T>::Type; };
+
 } // namespace detail
 
 } // namespace nx::reflect

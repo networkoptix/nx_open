@@ -47,45 +47,82 @@ private:
     Field Class::* m_fieldPtr = nullptr;
 };
 
+//-------------------------------------------------------------------------------------------------
+
 /**
  * Wraps a class property represented by set and get member functions.
  */
-template<typename Class, typename R, typename T>
+template<typename Getter, typename Setter>
 class WrappedProperty
 {
 public:
-    using Type = R;
+    using Type = typename detail::GetterReturnType<Getter>::Type;
 
-    using Setter = void(Class::*)(T);
-    using Getter = R(Class::*)() const;
-
-    WrappedProperty(
-        Getter getter,
-        Setter setter,
-        const char* name)
-        :
-        m_name(name),
-        m_getter(getter),
-        m_setter(setter)
-    {
-    }
+    WrappedProperty(Getter getter, Setter setter, const char* name):
+        m_name(name), m_getter(getter), m_setter(setter) {}
 
     const char* name() const { return m_name; }
 
-    template<typename Arg>
-    void set(Class* obj, Arg&& arg) const
-    {
-        (obj->*m_setter)(detail::forward<Arg>(arg));
-    }
+    template<typename Class, typename Arg>
+    void set(Class* obj, Arg&& arg) const { (obj->*m_setter)(detail::forward<Arg>(arg)); }
 
-    auto get(const Class& obj) const
-    {
-        return (obj.*m_getter)();
-    }
+    template<typename Class>
+    auto get(const Class& obj) const { return (obj.*m_getter)(); }
 
 private:
     const char* m_name = nullptr;
     Getter m_getter = nullptr;
+    Setter m_setter = nullptr;
+};
+
+/**
+ * Can be used to specify and absent setter or getter.
+ * It allows instrumenting structures with read-only or write-only properties.
+ */
+struct None {};
+static constexpr None none{};
+
+/**
+ * Wraps a read-only property represented by get member function.
+ */
+template<typename Getter>
+class WrappedProperty<Getter, None>
+{
+public:
+    using Type = typename detail::GetterReturnType<Getter>::Type;
+
+    WrappedProperty(Getter getter, const None& /*dummy*/, const char* name):
+        m_name(name), m_getter(getter) {}
+
+    const char* name() const { return m_name; }
+
+    template<typename Class>
+    auto get(const Class& obj) const { return (obj.*m_getter)(); }
+
+private:
+    const char* m_name = nullptr;
+    Getter m_getter = nullptr;
+};
+
+/**
+ * Wraps a write-only property represented by set member function.
+ */
+template<typename Setter>
+class WrappedProperty<None, Setter>
+{
+public:
+    using Type = typename detail::SetterReturnType<Setter>::Type;
+
+    WrappedProperty(const None& /*dummy*/, Setter setter, const char* name):
+        m_name(name), m_setter(setter) {}
+
+    const char* name() const { return m_name; }
+
+    template<typename Class, typename Arg>
+    void set(Class* obj, Arg&& arg) const { (obj->*m_setter)(detail::forward<Arg>(arg)); }
+
+private:
+    const char* m_name = nullptr;
     Setter m_setter = nullptr;
 };
 
