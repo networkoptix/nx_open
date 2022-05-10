@@ -69,6 +69,14 @@ public:
         std::function<void(ResultCode, SystemSharing)> completionHandler) = 0;
 
     /**
+     * Revokes user with given email from accessing system with the specified systemId.
+     */
+    virtual void revokeUserAccess(
+        const std::string& systemId,
+        const std::string& email,
+        std::function<void(ResultCode)> completionHandler) = 0;
+
+    /**
      * Returns sharings (account email, access role) for the specified system.
      * @note owner or cloudAdmin account credentials MUST be provided.
      */

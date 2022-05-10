@@ -43,6 +43,11 @@ public:
         api::SystemSharing sharingData,
         std::function<void(api::ResultCode, api::SystemSharing)> completionHandler) override;
 
+    virtual void revokeUserAccess(
+        const std::string& systemId,
+        const std::string& email,
+        std::function<void(api::ResultCode)> completionHandler) override;
+
     virtual void getCloudUsersOfSystem(
         const std::string& systemId,
         std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler) override;
