@@ -12,8 +12,8 @@
 #include <nx/vms/client/desktop/system_administration/widgets/analytics_settings_widget.h>
 #include <nx/vms/client/desktop/system_administration/widgets/security_settings_widget.h>
 #include <nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.h>
+#include <nx/vms/client/desktop/system_administration/widgets/user_list_widget.h>
 #include <nx/vms/client/desktop/system_update/multi_server_updates_widget.h>
-#include <nx/vms/common/system_settings.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/widgets/system_settings/cloud_management_widget.h>
@@ -22,7 +22,6 @@
 #include <ui/widgets/system_settings/license_manager_widget.h>
 #include <ui/widgets/system_settings/routing_management_widget.h>
 #include <ui/widgets/system_settings/smtp/smtp_settings_widget.h>
-#include <ui/widgets/system_settings/user_management_widget.h>
 
 using namespace nx::vms::client::desktop;
 
@@ -39,7 +38,7 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
     auto generalWidget = new QnGeneralSystemAdministrationWidget(this);
     addPage(GeneralPage, generalWidget, tr("General"));
 
-    auto usersWidget = new QnUserManagementWidget(this);
+    auto usersWidget = new UserListWidget(this);
     addPage(UserManagement, usersWidget, tr("Users"));
 
     // This is a page for updating many servers in one run.
@@ -89,4 +88,7 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
         this, [securityWidget]() { securityWidget->resetWarnings(); });
 }
 
-QnSystemAdministrationDialog::~QnSystemAdministrationDialog() = default;
+QnSystemAdministrationDialog::~QnSystemAdministrationDialog()
+{
+    // Required here for forward-declared scoped pointer destruction.
+}

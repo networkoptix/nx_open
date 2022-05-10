@@ -10,13 +10,13 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/connective.h>
 
-namespace Ui { class QnUserManagementWidget; }
-namespace nx::vms::client::desktop { class CheckableHeaderView; }
+namespace Ui { class UserListWidget; }
 
-class QnUserListModel;
-class QnSortedUserListModel;
+namespace nx::vms::client::desktop {
 
-class QnUserManagementWidget:
+class CheckableHeaderView;
+
+class UserListWidget:
     public Connective<QnAbstractPreferencesWidget>,
     public QnWorkbenchContextAware
 {
@@ -24,8 +24,8 @@ class QnUserManagementWidget:
     using base_type = Connective<QnAbstractPreferencesWidget>;
 
 public:
-    explicit QnUserManagementWidget(QWidget* parent = nullptr);
-    virtual ~QnUserManagementWidget() override;
+    explicit UserListWidget(QWidget* parent = nullptr);
+    virtual ~UserListWidget() override;
 
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
@@ -35,6 +35,9 @@ public:
 
 private:
     class Private;
-    nx::utils::ImplPtr<Ui::QnUserManagementWidget> ui;
+    class Delegate;
+    nx::utils::ImplPtr<Ui::UserListWidget> ui;
     nx::utils::ImplPtr<Private> d;
 };
+
+} // namespace nx::vms::client::desktop
