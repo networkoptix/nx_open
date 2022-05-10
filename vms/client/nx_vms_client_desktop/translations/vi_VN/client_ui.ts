@@ -2713,11 +2713,11 @@
     </message>
     <message>
       <source>Reindex Archive</source>
-      <translation>Lưu trữ Reindex</translation>
+      <translation>Lập lại chỉ mục Lưu trữ</translation>
     </message>
     <message>
       <source>Reindex Backup</source>
-      <translation>Reindexing sao lưu</translation>
+      <translation>Lập lại chỉ mục Sao lưu</translation>
     </message>
     <message>
       <source>Analytics data will continue to be stored on the disabled storage.</source>

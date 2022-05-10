@@ -5067,11 +5067,11 @@ to %1</source>
     </message>
     <message>
       <source>Depending on the total size of the archive, reindexing can take up to several hours.</source>
-      <translation>Tùy thuộc vào tổng dung lượng lưu trữ, việc lập lại bản ghi có thể mất vài giờ.</translation>
+      <translation>Tùy thuộc vào tổng dung lượng lưu trữ, việc lập lại chỉ mục có thể mất vài giờ.</translation>
     </message>
     <message>
       <source>Reindexing is only necessary if your archive folders have been moved, renamed or deleted.</source>
-      <translation>Phục hồi lại chỉ là cần thiết nếu thư mục lưu trữ của bạn đã được di chuyển, đổi tên hoặc xóa.</translation>
+      <translation>Lập lại chỉ mục chỉ cần thiết nếu thư mục lưu trữ của bạn đã bị di chuyển, đổi tên hoặc xóa.</translation>
     </message>
     <message>
       <source>You can cancel this operation at any moment without data loss.</source>
@@ -5087,15 +5087,15 @@ to %1</source>
     </message>
     <message>
       <source>Archive reindexing completed</source>
-      <translation>Lưu trữ đã hoàn tất</translation>
+      <translation>Lập lại chỉ mục lưu trữ đã hoàn tất</translation>
     </message>
     <message>
       <source>Backup reindexing completed</source>
-      <translation>Lưu trữ đã hoàn tất</translation>
+      <translation>Lập lại chỉ mục Sao lưu đã hoàn tất</translation>
     </message>
     <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
-      <translation>Lập chỉ mục lại có thể khắc phục sự cố với lưu trữ hoặc sao lưu nếu chúng bị mất hoặc bị hỏng hoặc nếu một số phần cứng đã được thay thế.</translation>
+      <translation>Lập lại chỉ mục có thể khắc phục sự cố với bộ lưu trữ hoặc sao lưu nếu bị mất hoặc bị hỏng hoặc nếu một vài phần cứng bị thay thế.</translation>
     </message>
     <message>
       <source>What to do with current analytics data?</source>
@@ -5227,11 +5227,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Reindexing Backup...</source>
-      <translation>Reindexing sao lưu...</translation>
+      <translation>Đang lập lại chỉ mục Sao lưu...</translation>
     </message>
     <message>
       <source>Reindexing Archive...</source>
-      <translation>Reindexing lưu trữ...</translation>
+      <translation>Đang lập lại chỉ mục lưu trữ...</translation>
     </message>
   </context>
   <context>
