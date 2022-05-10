@@ -96,6 +96,17 @@ void SystemManager::shareSystem(
         std::move(completionHandler));
 }
 
+void SystemManager::revokeUserAccess(
+    const std::string& systemId,
+    const std::string& email,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    executeRequest</*Output*/ void>(
+        nx::network::http::Method::delete_,
+        nx::network::http::rest::substituteParameters(kSystemUserPath, {systemId, email}),
+        std::move(completionHandler));
+}
+
 void SystemManager::getCloudUsersOfSystem(
     const std::string& systemId,
     std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler)
