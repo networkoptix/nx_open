@@ -2,14 +2,19 @@
 
 #pragma once
 
+#include <QtCore/QAbstractListModel>
 #include <QtCore/QSortFilterProxyModel>
 
 #include <core/resource/resource_fwd.h>
-
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnUserListModelPrivate;
-class QnUserListModel : public QAbstractListModel, public QnWorkbenchContextAware
+namespace nx::vms::client::desktop {
+
+class UserListModelPrivate;
+
+class UserListModel:
+    public QAbstractListModel,
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
     typedef QAbstractListModel base_type;
@@ -26,8 +31,8 @@ public:
         ColumnCount
     };
 
-    QnUserListModel(QObject* parent = nullptr);
-    virtual ~QnUserListModel();
+    UserListModel(QObject* parent = nullptr);
+    virtual ~UserListModel();
 
     virtual int rowCount(const QModelIndex& parent) const override;
     virtual int columnCount(const QModelIndex& parent) const override;
@@ -51,16 +56,16 @@ public:
     static bool isInteractiveColumn(int column);
 
 private:
-    QnUserListModelPrivate* d;
-    friend class QnUserListModelPrivate;
+    UserListModelPrivate* d;
+    friend class UserListModelPrivate;
 };
 
-class QnSortedUserListModel : public QSortFilterProxyModel
+class SortedUserListModel: public QSortFilterProxyModel
 {
     typedef QSortFilterProxyModel base_type;
 
 public:
-    QnSortedUserListModel(QObject* parent);
+    SortedUserListModel(QObject* parent);
     void setDigestFilter(std::optional<bool> value);
 
 protected:
@@ -70,3 +75,5 @@ protected:
 private:
     std::optional<bool> m_digestFilter;
 };
+
+} // namespace nx::vms::client::desktop

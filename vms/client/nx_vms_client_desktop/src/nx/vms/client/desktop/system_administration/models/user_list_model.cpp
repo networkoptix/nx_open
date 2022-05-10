@@ -18,24 +18,24 @@
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <ui/workbench/workbench_access_controller.h>
 
-using namespace nx::vms::client::desktop;
+namespace nx::vms::client::desktop {
 
-class QnUserListModelPrivate:
+class UserListModelPrivate:
     public Connective<QObject>,
     public nx::vms::client::core::CommonModuleAware
 {
-    Q_DECLARE_TR_FUNCTIONS(QnUserListModelPrivate)
+    Q_DECLARE_TR_FUNCTIONS(UserListModelPrivate)
     using base_type = Connective<QObject>;
 
 public:
-    QnUserListModel* model;
+    UserListModel* model;
 
     QnUserResourceList users;
     QSet<QnUserResourcePtr> checkedUsers;
     QHash<QnUserResourcePtr, bool> enableChangedUsers;
     QHash<QnUserResourcePtr, bool> digestChangedUsers;
 
-    QnUserListModelPrivate(QnUserListModel* parent) :
+    UserListModelPrivate(UserListModel* parent) :
         base_type(parent),
         model(parent)
     {
@@ -93,7 +93,7 @@ private:
     void removeUserInternal(const QnUserResourcePtr& user);
 };
 
-void QnUserListModelPrivate::at_resourcePool_resourceChanged(const QnResourcePtr& resource)
+void UserListModelPrivate::at_resourcePool_resourceChanged(const QnResourcePtr& resource)
 {
     QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
     if (!user)
@@ -101,17 +101,17 @@ void QnUserListModelPrivate::at_resourcePool_resourceChanged(const QnResourcePtr
     handleUserChanged(user);
 }
 
-void QnUserListModelPrivate::handleUserChanged(const QnUserResourcePtr& user)
+void UserListModelPrivate::handleUserChanged(const QnUserResourcePtr& user)
 {
     int row = users.indexOf(user);
     if (row == -1)
         return;
 
     QModelIndex index = model->index(row);
-    emit model->dataChanged(index, index.sibling(row, QnUserListModel::ColumnCount - 1));
+    emit model->dataChanged(index, index.sibling(row, UserListModel::ColumnCount - 1));
 }
 
-QnUserResourcePtr QnUserListModelPrivate::user(const QModelIndex& index) const
+QnUserResourcePtr UserListModelPrivate::user(const QModelIndex& index) const
 {
     if (!index.isValid() || index.row() >= users.size())
         return QnUserResourcePtr();
@@ -120,7 +120,7 @@ QnUserResourcePtr QnUserListModelPrivate::user(const QModelIndex& index) const
 }
 
 // TODO: #vkutin Move this function to more suitable place. Rewrite it if needed.
-QString QnUserListModelPrivate::permissionsString(const QnUserResourcePtr& user) const
+QString UserListModelPrivate::permissionsString(const QnUserResourcePtr& user) const
 {
     QStringList permissionStrings;
 
@@ -156,7 +156,7 @@ QString QnUserListModelPrivate::permissionsString(const QnUserResourcePtr& user)
     return permissionStrings.join(lit(", "));
 }
 
-bool QnUserListModelPrivate::isUnique(const QnUserResourcePtr& user) const
+bool UserListModelPrivate::isUnique(const QnUserResourcePtr& user) const
 {
     QString userName = user->getName();
     for (const QnUserResourcePtr& other : users)
@@ -170,7 +170,7 @@ bool QnUserListModelPrivate::isUnique(const QnUserResourcePtr& user) const
     return true;
 }
 
-Qt::CheckState QnUserListModelPrivate::checkState() const
+Qt::CheckState UserListModelPrivate::checkState() const
 {
     if (checkedUsers.isEmpty())
         return Qt::Unchecked;
@@ -181,7 +181,7 @@ Qt::CheckState QnUserListModelPrivate::checkState() const
     return Qt::PartiallyChecked;
 }
 
-void QnUserListModelPrivate::setCheckState(Qt::CheckState state, const QnUserResourcePtr& user)
+void UserListModelPrivate::setCheckState(Qt::CheckState state, const QnUserResourcePtr& user)
 {
     if (!user)
     {
@@ -199,7 +199,7 @@ void QnUserListModelPrivate::setCheckState(Qt::CheckState state, const QnUserRes
     }
 }
 
-void QnUserListModelPrivate::resetUsers(const QnUserResourceList& value)
+void UserListModelPrivate::resetUsers(const QnUserResourceList& value)
 {
     model->beginResetModel();
     for (const auto& user: users)
@@ -210,7 +210,7 @@ void QnUserListModelPrivate::resetUsers(const QnUserResourceList& value)
     model->endResetModel();
 }
 
-void QnUserListModelPrivate::addUser(const QnUserResourcePtr& user)
+void UserListModelPrivate::addUser(const QnUserResourcePtr& user)
 {
     if (users.contains(user))
         return;
@@ -223,7 +223,7 @@ void QnUserListModelPrivate::addUser(const QnUserResourcePtr& user)
     addUserInternal(user);
 }
 
-void QnUserListModelPrivate::removeUser(const QnUserResourcePtr& user)
+void UserListModelPrivate::removeUser(const QnUserResourcePtr& user)
 {
     int row = users.indexOf(user);
     if (row >= 0)
@@ -236,12 +236,12 @@ void QnUserListModelPrivate::removeUser(const QnUserResourcePtr& user)
     removeUserInternal(user);
 }
 
-void QnUserListModelPrivate::addUserInternal(const QnUserResourcePtr& user)
+void UserListModelPrivate::addUserInternal(const QnUserResourcePtr& user)
 {
     connect(user, &QnUserResource::nameChanged, this,
-        &QnUserListModelPrivate::at_resourcePool_resourceChanged);
+        &UserListModelPrivate::at_resourcePool_resourceChanged);
     connect(user, &QnUserResource::fullNameChanged, this,
-        &QnUserListModelPrivate::at_resourcePool_resourceChanged);
+        &UserListModelPrivate::at_resourcePool_resourceChanged);
     connect(user, &QnUserResource::enabledChanged, this,
         [this](const QnUserResourcePtr &user)
         {
@@ -257,7 +257,7 @@ void QnUserListModelPrivate::addUserInternal(const QnUserResourcePtr& user)
         });
 }
 
-void QnUserListModelPrivate::removeUserInternal(const QnUserResourcePtr& user)
+void UserListModelPrivate::removeUserInternal(const QnUserResourcePtr& user)
 {
     disconnect(user, nullptr, this, nullptr);
     checkedUsers.remove(user);
@@ -265,18 +265,18 @@ void QnUserListModelPrivate::removeUserInternal(const QnUserResourcePtr& user)
     digestChangedUsers.remove(user);
 }
 
-QnUserListModel::QnUserListModel(QObject* parent):
+UserListModel::UserListModel(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    d(new QnUserListModelPrivate(this))
+    d(new UserListModelPrivate(this))
 {
 }
 
-QnUserListModel::~QnUserListModel()
+UserListModel::~UserListModel()
 {
 }
 
-int QnUserListModel::rowCount(const QModelIndex& parent) const
+int UserListModel::rowCount(const QModelIndex& parent) const
 {
     if (!parent.isValid())
         return d->users.size();
@@ -284,7 +284,7 @@ int QnUserListModel::rowCount(const QModelIndex& parent) const
     return 0;
 }
 
-int QnUserListModel::columnCount(const QModelIndex &parent) const
+int UserListModel::columnCount(const QModelIndex &parent) const
 {
     if (!parent.isValid())
         return ColumnCount;
@@ -292,7 +292,7 @@ int QnUserListModel::columnCount(const QModelIndex &parent) const
     return 0;
 }
 
-QVariant QnUserListModel::data(const QModelIndex& index, int role) const
+QVariant UserListModel::data(const QModelIndex& index, int role) const
 {
     if (!hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
@@ -427,7 +427,7 @@ QVariant QnUserListModel::data(const QModelIndex& index, int role) const
     return QVariant();
 }
 
-QVariant QnUserListModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant UserListModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (orientation == Qt::Vertical)
         return QVariant();
@@ -451,7 +451,7 @@ QVariant QnUserListModel::headerData(int section, Qt::Orientation orientation, i
     }
 }
 
-Qt::ItemFlags QnUserListModel::flags(const QModelIndex& index) const
+Qt::ItemFlags UserListModel::flags(const QModelIndex& index) const
 {
     Qt::ItemFlags flags = Qt::NoItemFlags;
 
@@ -467,12 +467,12 @@ Qt::ItemFlags QnUserListModel::flags(const QModelIndex& index) const
     return flags;
 }
 
-Qt::CheckState QnUserListModel::checkState() const
+Qt::CheckState UserListModel::checkState() const
 {
     return d->checkState();
 }
 
-void QnUserListModel::setCheckState(Qt::CheckState state, const QnUserResourcePtr& user)
+void UserListModel::setCheckState(Qt::CheckState state, const QnUserResourcePtr& user)
 {
     if (state == Qt::PartiallyChecked)
         return;
@@ -492,7 +492,7 @@ void QnUserListModel::setCheckState(Qt::CheckState state, const QnUserResourcePt
     }
 }
 
-bool QnUserListModel::isUserEnabled(const QnUserResourcePtr& user) const
+bool UserListModel::isUserEnabled(const QnUserResourcePtr& user) const
 {
     if (!d->enableChangedUsers.contains(user))
         return user->isEnabled();
@@ -500,7 +500,7 @@ bool QnUserListModel::isUserEnabled(const QnUserResourcePtr& user) const
     return d->enableChangedUsers[user];
 }
 
-void QnUserListModel::setUserEnabled(const QnUserResourcePtr& user, bool enabled)
+void UserListModel::setUserEnabled(const QnUserResourcePtr& user, bool enabled)
 {
     NX_ASSERT(user->resourcePool());
     if (!user->resourcePool())
@@ -510,55 +510,55 @@ void QnUserListModel::setUserEnabled(const QnUserResourcePtr& user, bool enabled
     d->handleUserChanged(user);
 }
 
-bool QnUserListModel::isDigestEnabled(const QnUserResourcePtr& user) const
+bool UserListModel::isDigestEnabled(const QnUserResourcePtr& user) const
 {
     return d->digestChangedUsers.contains(user)
         ? d->digestChangedUsers[user]
         : user->shouldDigestAuthBeUsed();
 }
 
-void QnUserListModel::setDigestEnabled(const QnUserResourcePtr& user, bool enabled)
+void UserListModel::setDigestEnabled(const QnUserResourcePtr& user, bool enabled)
 {
     NX_ASSERT(!user->isCloud());
     d->digestChangedUsers[user] = enabled;
 }
 
-QnUserResourceList QnUserListModel::users() const
+QnUserResourceList UserListModel::users() const
 {
     return d->users;
 }
 
-void QnUserListModel::resetUsers(const QnUserResourceList& value)
+void UserListModel::resetUsers(const QnUserResourceList& value)
 {
     d->resetUsers(value);
 }
 
-void QnUserListModel::addUser(const QnUserResourcePtr& user)
+void UserListModel::addUser(const QnUserResourcePtr& user)
 {
     d->addUser(user);
 }
 
-void QnUserListModel::removeUser(const QnUserResourcePtr& user)
+void UserListModel::removeUser(const QnUserResourcePtr& user)
 {
     d->removeUser(user);
 }
 
-bool QnUserListModel::isInteractiveColumn(int column)
+bool UserListModel::isInteractiveColumn(int column)
 {
     return column == CheckBoxColumn || column == EnabledColumn;
 }
 
-QnSortedUserListModel::QnSortedUserListModel(QObject *parent) : base_type(parent)
+SortedUserListModel::SortedUserListModel(QObject *parent) : base_type(parent)
 {
 }
 
-void QnSortedUserListModel::setDigestFilter(std::optional<bool> value)
+void SortedUserListModel::setDigestFilter(std::optional<bool> value)
 {
     m_digestFilter = value;
     invalidateFilter();
 }
 
-bool QnSortedUserListModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
+bool SortedUserListModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
 {
     QnUserResourcePtr leftUser = left.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
     QnUserResourcePtr rightUser = right.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
@@ -573,7 +573,7 @@ bool QnSortedUserListModel::lessThan(const QModelIndex& left, const QModelIndex&
 
     switch (sortColumn())
     {
-        case QnUserListModel::EnabledColumn:
+        case UserListModel::EnabledColumn:
         {
             bool leftEnabled = leftUser->isEnabled();
             bool rightEnabled = rightUser->isEnabled();
@@ -583,7 +583,7 @@ bool QnSortedUserListModel::lessThan(const QModelIndex& left, const QModelIndex&
             break;
         }
 
-        case QnUserListModel::UserTypeColumn:
+        case UserListModel::UserTypeColumn:
         {
             const auto leftType = leftUser->userType();
             const auto rightType = rightUser->userType();
@@ -593,8 +593,8 @@ bool QnSortedUserListModel::lessThan(const QModelIndex& left, const QModelIndex&
             break;
         }
 
-        case QnUserListModel::FullNameColumn:
-        case QnUserListModel::UserRoleColumn:
+        case UserListModel::FullNameColumn:
+        case UserListModel::UserRoleColumn:
         {
             QString leftText = left.data(Qt::DisplayRole).toString();
             QString rightText = right.data(Qt::DisplayRole).toString();
@@ -613,7 +613,7 @@ bool QnSortedUserListModel::lessThan(const QModelIndex& left, const QModelIndex&
     return nx::utils::naturalStringLess(leftUser->getName(), rightUser->getName());
 }
 
-bool QnSortedUserListModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
+bool SortedUserListModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
 {
     QModelIndex sourceIndex = sourceModel()->index(sourceRow, 0, sourceParent);
     const auto user = sourceIndex.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
@@ -621,3 +621,5 @@ bool QnSortedUserListModel::filterAcceptsRow(int sourceRow, const QModelIndex& s
     return (!m_digestFilter || m_digestFilter == user->shouldDigestAuthBeUsed())
         && base_type::filterAcceptsRow(sourceRow, sourceParent);
 }
+
+} // namespace nx::vms::client::desktop

@@ -1,21 +1,22 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef UPDATE_DIALOG_H
-#define UPDATE_DIALOG_H
+#pragma once
 
+#include <nx/utils/impl_ptr.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 
 class QnSessionAwareDelegate;
 
-namespace Ui {
-    class QnSystemAdministrationDialog;
-}
+namespace Ui { class QnSystemAdministrationDialog; }
 
-class QnSystemAdministrationDialog : public QnSessionAwareTabbedDialog {
+class QnSystemAdministrationDialog: public QnSessionAwareTabbedDialog
+{
     Q_OBJECT
-    typedef QnSessionAwareTabbedDialog base_type;
+    using base_type = QnSessionAwareTabbedDialog;
+
 public:
-    enum DialogPage {
+    enum DialogPage
+    {
         GeneralPage,
         UserManagement,
         UpdatesPage,
@@ -29,16 +30,12 @@ public:
 
         PageCount
     };
+    Q_ENUM(DialogPage)
 
-    QnSystemAdministrationDialog(QWidget *parent = 0);
-    ~QnSystemAdministrationDialog();
+    explicit QnSystemAdministrationDialog(QWidget* parent = nullptr);
+    virtual ~QnSystemAdministrationDialog() override;
 
 private:
     Q_DISABLE_COPY(QnSystemAdministrationDialog)
-
-    QScopedPointer<Ui::QnSystemAdministrationDialog> ui;
+    nx::utils::ImplPtr<Ui::QnSystemAdministrationDialog> ui;
 };
-
-Q_DECLARE_METATYPE(QnSystemAdministrationDialog::DialogPage)
-
-#endif // UPDATE_DIALOG_H

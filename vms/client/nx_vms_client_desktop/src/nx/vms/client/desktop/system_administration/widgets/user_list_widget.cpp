@@ -1,9 +1,9 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "user_management_widget.h"
-#include "ui_user_management_widget.h"
+#include "user_list_widget.h"
+#include "ui_user_list_widget.h"
 
-#include <boost/algorithm/cxx11/any_of.hpp>
+#include <algorithm>
 
 #include <QtCore/QMap>
 #include <QtCore/QSortFilterProxyModel>
@@ -24,6 +24,7 @@
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_administration/models/user_list_model.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/dialogs/force_secure_auth_dialog.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
@@ -35,7 +36,6 @@
 #include <ui/dialogs/resource_properties/user_settings_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/models/user_list_model.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -44,21 +44,24 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
 
-using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 using namespace nx::vms::common;
+
+namespace nx::vms::client::desktop {
 
 namespace {
 
 static constexpr int kMaximumColumnWidth = 200;
 
-// -----------------------------------------------------------------------------------------------
-// QnUserListDelegate
+} // namespace
 
-class QnUserListDelegate: public QStyledItemDelegate
+// -----------------------------------------------------------------------------------------------
+// UserListWidget::Delegate
+
+class UserListWidget::Delegate: public QStyledItemDelegate
 {
     using base_type = QStyledItemDelegate;
-    Q_DECLARE_TR_FUNCTIONS(QnUserManagementWidget)
+    Q_DECLARE_TR_FUNCTIONS(UserListWidget)
 
     struct LinkMetrics
     {
@@ -82,7 +85,7 @@ class QnUserListDelegate: public QStyledItemDelegate
     static constexpr int kLinkPadding = 0;
 
 public:
-    explicit QnUserListDelegate(ItemViewHoverTracker* hoverTracker, QObject* parent = nullptr):
+    explicit Delegate(ItemViewHoverTracker* hoverTracker, QObject* parent = nullptr):
         base_type(parent),
         m_hoverTracker(hoverTracker),
         m_linkText(tr("Edit")),
@@ -96,10 +99,10 @@ public:
     {
         switch (index.column())
         {
-            case QnUserListModel::UserTypeColumn:
+            case UserListModel::UserTypeColumn:
                 return Skin::maximumSize(index.data(Qt::DecorationRole).value<QIcon>());
 
-            case QnUserListModel::UserRoleColumn:
+            case UserListModel::UserRoleColumn:
                 return base_type::sizeHint(option, index) + QSize(
                     linkMetrics(option).totalWidth() + kLinkPadding, 0);
 
@@ -113,15 +116,15 @@ public:
     {
         // Determine item opacity based on user enabled state:
         QnScopedPainterOpacityRollback opacityRollback(painter);
-        if (!QnUserListModel::isInteractiveColumn(index.column())
-            && index.sibling(index.row(), QnUserListModel::EnabledColumn).data(Qt::CheckStateRole)
+        if (!UserListModel::isInteractiveColumn(index.column())
+            && index.sibling(index.row(), UserListModel::EnabledColumn).data(Qt::CheckStateRole)
                 .toInt() != Qt::Checked)
         {
             painter->setOpacity(painter->opacity() * nx::style::Hints::kDisabledItemOpacity);
         }
 
         // Paint right-aligned user type icon:
-        if (index.column() == QnUserListModel::UserTypeColumn)
+        if (index.column() == UserListModel::UserTypeColumn)
         {
             const auto icon = index.data(Qt::DecorationRole).value<QIcon>();
             if (icon.isNull())
@@ -137,10 +140,10 @@ public:
         }
 
         // Determine if link should be drawn:
-        const bool drawLink = index.column() == QnUserListModel::UserRoleColumn
+        const bool drawLink = index.column() == UserListModel::UserRoleColumn
             && option.state.testFlag(QStyle::State_MouseOver)
             && m_hoverTracker
-            && !QnUserListModel::isInteractiveColumn(m_hoverTracker->hoveredIndex().column());
+            && !UserListModel::isInteractiveColumn(m_hoverTracker->hoveredIndex().column());
 
         // If not, call standard paint:
         if (!drawLink)
@@ -191,24 +194,22 @@ private:
     const QIcon m_editIcon;
 };
 
-} // unnamed namespace
-
 // -----------------------------------------------------------------------------------------------
-// QnUserManagementWidget
+// UserListWidget
 
-class QnUserManagementWidget::Private: public QObject
+class UserListWidget::Private: public QObject
 {
-    QnUserManagementWidget* const q;
-    Ui::QnUserManagementWidget* const ui{q->ui.get()};
+    UserListWidget* const q;
+    Ui::UserListWidget* const ui{q->ui.get()};
 
 public:
-    QnUserListModel* const usersModel{new QnUserListModel(q)};
-    QnSortedUserListModel* const sortModel{new QnSortedUserListModel(q)};
-    CheckableHeaderView* const header{new CheckableHeaderView(QnUserListModel::CheckBoxColumn, q)};
+    UserListModel* const usersModel{new UserListModel(q)};
+    SortedUserListModel* const sortModel{new SortedUserListModel(q)};
+    CheckableHeaderView* const header{new CheckableHeaderView(UserListModel::CheckBoxColumn, q)};
     QAction* filterDigestAction = nullptr;
 
 public:
-    Private(QnUserManagementWidget* q);
+    Private(UserListWidget* q);
     void setupUi();
     void loadData();
 
@@ -238,26 +239,26 @@ private:
     QnUserResourceList visibleSelectedUsers() const;
 };
 
-QnUserManagementWidget::QnUserManagementWidget(QWidget* parent):
+UserListWidget::UserListWidget(QWidget* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::QnUserManagementWidget()),
+    ui(new Ui::UserListWidget()),
     d(new Private(this))
 {
     d->setupUi();
 }
 
-QnUserManagementWidget::~QnUserManagementWidget()
+UserListWidget::~UserListWidget()
 {
     // Required here for forward-declared scoped pointer destruction.
 }
 
-void QnUserManagementWidget::loadDataToUi()
+void UserListWidget::loadDataToUi()
 {
     d->loadData();
 }
 
-void QnUserManagementWidget::applyChanges()
+void UserListWidget::applyChanges()
 {
     const auto modelUsers = d->usersModel->users();
     QMap<QnUserResource::DigestSupport, QSet<QnUserResourcePtr>> usersToSave;
@@ -324,13 +325,13 @@ void QnUserManagementWidget::applyChanges()
     }
 }
 
-bool QnUserManagementWidget::hasChanges() const
+bool UserListWidget::hasChanges() const
 {
     if (!isEnabled())
         return false;
 
-    using boost::algorithm::any_of;
-    return any_of(resourcePool()->getResources<QnUserResource>(),
+    const auto users = resourcePool()->getResources<QnUserResource>();
+    return std::any_of(users.cbegin(), users.cend(),
         [this, users = d->usersModel->users()](const QnUserResourcePtr& user)
         {
             return !users.contains(user)
@@ -339,15 +340,15 @@ bool QnUserManagementWidget::hasChanges() const
         });
 }
 
-void QnUserManagementWidget::filterDigestUsers()
+void UserListWidget::filterDigestUsers()
 {
     ui->filterButton->setCurrentAction(d->filterDigestAction);
 }
 
 // -----------------------------------------------------------------------------------------------
-// QnUserManagementWidget::Private
+// UserListWidget::Private
 
-QnUserManagementWidget::Private::Private(QnUserManagementWidget* q): q(q)
+UserListWidget::Private::Private(UserListWidget* q): q(q)
 {
     sortModel->setDynamicSortFilter(true);
     sortModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
@@ -362,7 +363,7 @@ QnUserManagementWidget::Private::Private(QnUserManagementWidget* q): q(q)
         this, &Private::updateLdapState);
 }
 
-void QnUserManagementWidget::Private::setupUi()
+void UserListWidget::Private::setupUi()
 {
     ui->setupUi(q);
 
@@ -388,19 +389,19 @@ void QnUserManagementWidget::Private::setupUi()
     ui->usersTable->setModel(sortModel);
     ui->usersTable->setHeader(header);
     ui->usersTable->setIconSize(QSize(36, 24));
-    ui->usersTable->setItemDelegate(new QnUserListDelegate(hoverTracker, q));
-    ui->usersTable->setItemDelegateForColumn(QnUserListModel::EnabledColumn, switchItemDelegate);
+    ui->usersTable->setItemDelegate(new UserListWidget::Delegate(hoverTracker, q));
+    ui->usersTable->setItemDelegateForColumn(UserListModel::EnabledColumn, switchItemDelegate);
 
     header->setVisible(true);
     header->setMaximumSectionSize(kMaximumColumnWidth);
     header->setSectionResizeMode(QHeaderView::ResizeToContents);
-    header->setSectionResizeMode(QnUserListModel::FullNameColumn, QHeaderView::Stretch);
+    header->setSectionResizeMode(UserListModel::FullNameColumn, QHeaderView::Stretch);
     header->setSectionsClickable(true);
 
     connect(header, &CheckableHeaderView::checkStateChanged,
         this, &Private::handleHeaderCheckStateChanged);
 
-    ui->usersTable->sortByColumn(QnUserListModel::LoginColumn, Qt::AscendingOrder);
+    ui->usersTable->sortByColumn(UserListModel::LoginColumn, Qt::AscendingOrder);
 
     const auto scrollBar = new SnappedScrollBar(q);
     ui->usersTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
@@ -422,7 +423,7 @@ void QnUserManagementWidget::Private::setupUi()
     connect(ui->usersTable, &TreeView::spacePressed, this,
         [this](const QModelIndex& index)
         {
-            handleUsersTableClicked(index.sibling(index.row(), QnUserListModel::CheckBoxColumn));
+            handleUsersTableClicked(index.sibling(index.row(), UserListModel::CheckBoxColumn));
         });
 
     // By [Left] disable user, by [Right] enable user:
@@ -464,7 +465,7 @@ void QnUserManagementWidget::Private::setupUi()
     connect(hoverTracker, &ItemViewHoverTracker::itemEnter, this,
         [this](const QModelIndex& index)
         {
-            if (!QnUserListModel::isInteractiveColumn(index.column()))
+            if (!UserListModel::isInteractiveColumn(index.column()))
                 ui->usersTable->setCursor(Qt::PointingHandCursor);
             else
                 ui->usersTable->unsetCursor();
@@ -476,16 +477,16 @@ void QnUserManagementWidget::Private::setupUi()
     updateSelection();
 }
 
-void QnUserManagementWidget::Private::updateLdapState()
+void UserListWidget::Private::updateLdapState()
 {
     ui->ldapSettingsButton->setEnabled(true);
     ui->fetchButton->setEnabled(
         q->globalSettings()->ldapSettings().isValid(/*checkPassword*/ false));
 }
 
-void QnUserManagementWidget::Private::modelUpdated()
+void UserListWidget::Private::modelUpdated()
 {
-    ui->usersTable->setColumnHidden(QnUserListModel::UserTypeColumn,
+    ui->usersTable->setColumnHidden(UserListModel::UserTypeColumn,
         !boost::algorithm::any_of(visibleUsers(),
             [](const QnUserResourcePtr& user) { return !user->isLocal(); }));
 
@@ -497,7 +498,7 @@ void QnUserManagementWidget::Private::modelUpdated()
     updateSelection();
 }
 
-void QnUserManagementWidget::Private::updateSelection()
+void UserListWidget::Private::updateSelection()
 {
     const auto users = visibleSelectedUsers();
     Qt::CheckState selectionState = Qt::Unchecked;
@@ -548,7 +549,7 @@ void QnUserManagementWidget::Private::updateSelection()
     q->update();
 }
 
-void QnUserManagementWidget::Private::openLdapSettings()
+void UserListWidget::Private::openLdapSettings()
 {
     if (!q->context()->user())
         return;
@@ -558,7 +559,7 @@ void QnUserManagementWidget::Private::openLdapSettings()
     dialog->exec();
 }
 
-void QnUserManagementWidget::Private::forceSecureAuth()
+void UserListWidget::Private::forceSecureAuth()
 {
     if (!ForceSecureAuthDialog::isConfirmed(q))
         return;
@@ -576,19 +577,19 @@ void QnUserManagementWidget::Private::forceSecureAuth()
     updateSelection();
 }
 
-void QnUserManagementWidget::Private::editRoles()
+void UserListWidget::Private::editRoles()
 {
     q->menu()->triggerIfPossible(action::UserRolesAction,
         action::Parameters().withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(q)));
 }
 
-void QnUserManagementWidget::Private::createUser()
+void UserListWidget::Private::createUser()
 {
     q->menu()->triggerIfPossible(action::NewUserAction,
         action::Parameters().withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(q)));
 }
 
-void QnUserManagementWidget::Private::fetchUsers()
+void UserListWidget::Private::fetchUsers()
 {
     if (!q->context()->user())
         return;
@@ -601,7 +602,7 @@ void QnUserManagementWidget::Private::fetchUsers()
     dialog->exec();
 }
 
-bool QnUserManagementWidget::Private::enableUser(const QnUserResourcePtr& user, bool enabled)
+bool UserListWidget::Private::enableUser(const QnUserResourcePtr& user, bool enabled)
 {
     if (!q->accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission))
         return false;
@@ -612,14 +613,14 @@ bool QnUserManagementWidget::Private::enableUser(const QnUserResourcePtr& user, 
     return true;
 }
 
-void QnUserManagementWidget::Private::setSelectedEnabled(bool enabled)
+void UserListWidget::Private::setSelectedEnabled(bool enabled)
 {
     const auto users = visibleSelectedUsers();
     for (const auto& user: users)
         enableUser(user, enabled);
 }
 
-void QnUserManagementWidget::Private::deleteSelected()
+void UserListWidget::Private::deleteSelected()
 {
     QnUserResourceList usersToDelete;
     const auto users = visibleSelectedUsers();
@@ -634,12 +635,12 @@ void QnUserManagementWidget::Private::deleteSelected()
     emit q->hasChangesChanged();
 }
 
-QnUserResourceList QnUserManagementWidget::Private::visibleUsers() const
+QnUserResourceList UserListWidget::Private::visibleUsers() const
 {
     QnUserResourceList result;
     for (int row = 0; row < sortModel->rowCount(); ++row)
     {
-        const QModelIndex index = sortModel->index(row, QnUserListModel::CheckBoxColumn);
+        const QModelIndex index = sortModel->index(row, UserListModel::CheckBoxColumn);
         const auto user = index.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
         if (user)
             result.push_back(user);
@@ -648,12 +649,12 @@ QnUserResourceList QnUserManagementWidget::Private::visibleUsers() const
     return result;
 }
 
-QnUserResourceList QnUserManagementWidget::Private::visibleSelectedUsers() const
+QnUserResourceList UserListWidget::Private::visibleSelectedUsers() const
 {
     QnUserResourceList result;
     for (int row = 0; row < sortModel->rowCount(); ++row)
     {
-        const QModelIndex index = sortModel->index(row, QnUserListModel::CheckBoxColumn);
+        const QModelIndex index = sortModel->index(row, UserListModel::CheckBoxColumn);
         const bool checked = index.data(Qt::CheckStateRole).toInt() == Qt::Checked;
         if (!checked)
             continue;
@@ -666,12 +667,12 @@ QnUserResourceList QnUserManagementWidget::Private::visibleSelectedUsers() const
     return result;
 }
 
-bool QnUserManagementWidget::Private::canDisableDigest(const QnUserResourcePtr& user) const
+bool UserListWidget::Private::canDisableDigest(const QnUserResourcePtr& user) const
 {
     return q->accessController()->hasPermissions(user, Qn::WriteDigestPermission);
 }
 
-void QnUserManagementWidget::Private::handleHeaderCheckStateChanged(Qt::CheckState state)
+void UserListWidget::Private::handleHeaderCheckStateChanged(Qt::CheckState state)
 {
     const auto users = visibleUsers();
     for (const auto& user: users)
@@ -680,7 +681,7 @@ void QnUserManagementWidget::Private::handleHeaderCheckStateChanged(Qt::CheckSta
     updateSelection();
 }
 
-void QnUserManagementWidget::Private::handleUsersTableClicked(const QModelIndex& index)
+void UserListWidget::Private::handleUsersTableClicked(const QModelIndex& index)
 {
     const auto user = index.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
     if (!user)
@@ -688,7 +689,7 @@ void QnUserManagementWidget::Private::handleUsersTableClicked(const QModelIndex&
 
     switch (index.column())
     {
-        case QnUserListModel::CheckBoxColumn:
+        case UserListModel::CheckBoxColumn:
         {
             const auto nextCheckState = index.data(Qt::CheckStateRole).toInt() == Qt::Checked
                 ? Qt::Unchecked
@@ -698,7 +699,7 @@ void QnUserManagementWidget::Private::handleUsersTableClicked(const QModelIndex&
             break;
         }
 
-        case QnUserListModel::EnabledColumn:
+        case UserListModel::EnabledColumn:
             enableUser(user, !usersModel->isUserEnabled(user));
             break;
 
@@ -713,10 +714,12 @@ void QnUserManagementWidget::Private::handleUsersTableClicked(const QModelIndex&
     }
 }
 
-void QnUserManagementWidget::Private::loadData()
+void UserListWidget::Private::loadData()
 {
     ui->createUserButton->setEnabled(true);
     updateLdapState();
     usersModel->resetUsers(q->resourcePool()->getResources<QnUserResource>());
     updateSelection();
 }
+
+} // namespace nx::vms::client::desktop
