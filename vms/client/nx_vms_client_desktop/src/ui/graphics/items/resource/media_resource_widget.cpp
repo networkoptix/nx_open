@@ -1878,9 +1878,27 @@ QnPtzControllerPtr QnMediaResourceWidget::ptzController() const
     return m_ptzController;
 }
 
-bool QnMediaResourceWidget::canControlPtz() const
+bool QnMediaResourceWidget::supportsBasicPtz() const
 {
-    return d->canControlPtz();
+    return d->supportsBasicPtz();
+}
+
+bool QnMediaResourceWidget::canControlPtzMove() const
+{
+    return d->supportsPtzCapabilities(
+        Ptz::ContinuousPanCapability
+        | Ptz::ContinuousTiltCapability
+        | Ptz::ContinuousRotationCapability);
+}
+
+bool QnMediaResourceWidget::canControlPtzFocus() const
+{
+    return d->supportsPtzCapabilities(Ptz::ContinuousFocusCapability);
+}
+
+bool QnMediaResourceWidget::canControlPtzZoom() const
+{
+    return d->supportsPtzCapabilities(Ptz::ContinuousZoomCapability);
 }
 
 nx::vms::api::dewarping::MediaData QnMediaResourceWidget::dewarpingParams() const
@@ -2273,7 +2291,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
         }
     }
 
-    if (d->canControlPtz())
+    if (d->supportsBasicPtz())
         result |= Qn::PtzButton;
 
     if (m_dewarpingParams.enabled)
@@ -2896,7 +2914,7 @@ bool QnMediaResourceWidget::isMotionSearchModeEnabled() const
 
 void QnMediaResourceWidget::setPtzMode(bool value)
 {
-    const bool ptzEnabled = value && d->canControlPtz();
+    const bool ptzEnabled = value && d->supportsBasicPtz();
 
     titleBar()->rightButtonsBar()->setButtonsChecked(Qn::PtzButton, ptzEnabled);
 

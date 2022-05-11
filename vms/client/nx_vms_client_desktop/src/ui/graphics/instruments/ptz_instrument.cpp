@@ -1544,7 +1544,7 @@ bool PtzInstrument::PtzData::hasAdvancedPtz() const
 bool PtzInstrument::supportsContinuousPtz(
     QnMediaResourceWidget* widget, DirectionFlag direction) const
 {
-    if (!widget || (!widget->canControlPtz() && !widget->options().testFlag(
+    if (!widget || (!widget->supportsBasicPtz() && !widget->options().testFlag(
         QnResourceWidget::DisplayDewarped)))
     {
         return false;
