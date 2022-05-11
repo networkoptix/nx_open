@@ -396,6 +396,32 @@ bool QnAviArchiveDelegate::reopen()
     return true;
 }
 
+bool QnAviArchiveDelegate::checkStorage()
+{
+    if (m_storage)
+        return true;
+
+    auto storageFactoryInterface = dynamic_cast<nx::vms::common::StorageFactoryInterface*>(
+        m_resource.data());
+
+    if (!NX_ASSERT(storageFactoryInterface))
+        return false;
+
+    m_storage = QnStorageResourcePtr(
+        storageFactoryInterface->storageFactory()->createStorage(m_resource->getUrl()));
+
+    auto aviResource = m_resource.dynamicCast<QnAviResource>();
+    if (aviResource)
+    {
+        auto aviStorage = aviResource->getStorage().dynamicCast<QnLayoutFileStorageResource>();
+        auto fileStorage = m_storage.dynamicCast<QnLayoutFileStorageResource>();
+        if (fileStorage && aviStorage)
+            fileStorage->usePasswordToRead(aviStorage->password());
+    }
+
+    return (bool) m_storage;
+}
+
 bool QnAviArchiveDelegate::open(
     const QnResourcePtr& resource,
     AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher)
@@ -404,46 +430,13 @@ bool QnAviArchiveDelegate::open(
 
     m_archiveIntegrityWatcher = archiveIntegrityWatcher;
     m_resource = resource;
-    auto aviResource = m_resource.dynamicCast<QnAviResource>();
-    auto storageFactoryInterface = dynamic_cast<nx::vms::common::StorageFactoryInterface*>(
-        m_resource.data());
-    NX_ASSERT(storageFactoryInterface,
-        "Only storage-based resources must be open with this delegate");
-
     if (m_formatContext == nullptr)
     {
         m_eofReached = false;
-        QString url = m_resource->getUrl();
-        if (m_storage == nullptr)
-        {
-            if (!storageFactoryInterface)
-                return false;
-
-            m_storage = QnStorageResourcePtr(
-                storageFactoryInterface->storageFactory()->createStorage(url));
-
-            auto fileStorage = m_storage.dynamicCast<QnLayoutFileStorageResource>();
-
-            if (aviResource)
-            {
-                auto aviStorage = aviResource->getStorage().dynamicCast<QnLayoutFileStorageResource>();
-                if (fileStorage && aviStorage)
-                    fileStorage->usePasswordToRead(aviStorage->password());
-            }
-
-            if(!m_storage)
-                return false;
-        }
-
-        if (m_archiveIntegrityWatcher //< On client storages are almost always offline at this point.
-            && m_storage->getStatus() != nx::vms::api::ResourceStatus::online)
-        {
-            NX_DEBUG(this, "%1: Source storage '%2' is offline", __func__,
-                nx::utils::url::hidePassword(m_storage->getUrl()));
-
+        if (!checkStorage())
             return false;
-        }
 
+        QString url = m_resource->getUrl();
         if (!m_storage->isFileExists(url))
         {
             if (m_archiveIntegrityWatcher)

@@ -111,6 +111,8 @@ private:
     CodecParametersConstPtr getCodecContext(AVStream* stream);
     bool reopen();
 
+    virtual bool checkStorage();
+
 protected:
     QnResourcePtr m_resource;
     unsigned m_selectedAudioChannel = 0;
