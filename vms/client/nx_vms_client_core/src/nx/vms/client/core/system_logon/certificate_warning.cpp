@@ -32,26 +32,24 @@ QString CertificateWarning::details(
     const nx::network::SocketAddress& primaryAddress,
     ClientType clientType)
 {
-    auto result =
-        [reason]()
-        {
-            switch (reason)
-            {
-                case Reason::unknownServer:
-                    return tr(
-                        "You attempted to connect to: %1 "
-                        "but the Server presented a certificate that is unable to be automatically verified.");
-                case Reason::invalidCertificate:
-                    return tr("Someone may be impersonating %1 to steal your personal information.");
-                case Reason::serverCertificateChanged:
-                    return tr(
-                        "You attempted to connect to: %1 "
-                        "but the Server's certificate has changed.");
-                default:
-                    NX_ASSERT(false, "Unreachable");
-                    return QString();
-            }
-        }();
+    QString details;
+    switch (reason)
+    {
+        case Reason::unknownServer:
+            details = tr("You attempted to connect to this Server, but it presented a certificate "
+                "that cannot be verified automatically.");
+            break;
+        case Reason::invalidCertificate:
+            details = tr("Someone may be impersonating this Server to steal your personal "
+                "information.");
+            break;
+        case Reason::serverCertificateChanged:
+            details = tr("You attempted to connect to this Server but the Server's certificate has "
+                "changed.");
+        default:
+            NX_ASSERT(false, "Unreachable");
+            break;
+    }
 
     QStringList knownData;
     const static QString kTemplate("<b>%1</b> %2");
@@ -82,20 +80,7 @@ QString CertificateWarning::details(
                 : QString("%1%1%2%1").arg(common::html::kLineBreak, result);
         }();
 
-    // Patch up details string: we don't want to have spaces around target info block.
-    const static QString kPlaceholder("%1");
-    const auto pattern = result.arg(kPlaceholder);
-    const auto substrings = result.split(kPlaceholder);
-    if (substrings.size() == 2)
-    {
-        result = substrings[0].trimmed() + targetInfo + substrings[1].trimmed();
-    }
-    else
-    {
-        // Something failed. Perhaps the translation does not meet our expectations.
-        result = result.arg(targetInfo);
-    }
-    return result;
+    return targetInfo + details;
 }
 
 QString CertificateWarning::advice(Reason reason)
@@ -103,15 +88,13 @@ QString CertificateWarning::advice(Reason reason)
     switch (reason)
     {
         case Reason::unknownServer:
-            return tr(
-                "Review the certificate's details to make sure "
-                "you are connecting to the correct server.");
+            return tr("Review the certificate's details to make sure you are connecting to the "
+                "correct server.");
         case Reason::invalidCertificate:
-            return tr("Do not connect to this server unless instructed by your VMS administrator.");
+            return tr("Do not connect to this Server unless instructed by your VMS administrator.");
         case Reason::serverCertificateChanged:
-            return tr(
-                "Review the certificate's details to make sure "
-                "you are connecting to the correct server.");
+            return tr("Review the certificate's details to make sure you are connecting to the "
+                "correct Server.");
         default:
             NX_ASSERT(false, "Unreachable");
             return {};

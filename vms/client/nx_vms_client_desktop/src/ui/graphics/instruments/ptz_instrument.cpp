@@ -41,6 +41,7 @@
 #include <utils/math/math.h>
 
 #include "ptz_instrument_p.h"
+#include "ptz_overlay_widget.h"
 
 using nx::vms::client::core::Geometry;
 

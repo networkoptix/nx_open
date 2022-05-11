@@ -62,7 +62,7 @@
        <item>
         <widget class="QPushButton" name="neverButton">
          <property name="text">
-          <string>No failover</string>
+          <string>No Failover</string>
          </property>
         </widget>
        </item>
