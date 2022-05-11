@@ -19,7 +19,7 @@ AdvancedUpdateSettingsDialog::AdvancedUpdateSettingsDialog(QWidget* parent):
         QUrl("Nx/Dialogs/SystemSettings/AdvancedUpdateSettings.qml"),
         {},
         parent),
-    QnWorkbenchContextAware(parent)
+    QnSessionAwareDelegate(parent)
 {
     QmlProperty<ClientUpdateManager*>(rootObjectHolder(), "clientUpdateManager") =
         context()->findInstance<ClientUpdateManager>();
@@ -43,6 +43,16 @@ AdvancedUpdateSettingsDialog::AdvancedUpdateSettingsDialog(QWidget* parent):
         {
             notifyAboutUpdates = qnGlobalSettings->isUpdateNotificationsEnabled();
         });
+}
+
+bool AdvancedUpdateSettingsDialog::tryClose(bool /*force*/)
+{
+    reject();
+    return true;
+}
+
+void AdvancedUpdateSettingsDialog::forcedUpdate()
+{
 }
 
 } // namespace nx::vms::client::desktop
