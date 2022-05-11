@@ -128,7 +128,7 @@ bool CameraSelectionDialog::selectCameras(
 
     if (dialog.resourceSelectionWidget()->isEmpty())
     {
-        QnMessageBox::warning(parent, tr("You do not have any cameras"));
+        QnMessageBox::warning(parent, tr("No cameras available"));
         return false;
     }
 

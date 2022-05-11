@@ -704,7 +704,7 @@ void initialize(Manager* manager, Action* root)
 
     factory(OpenCloudAccountSecurityUrl)
         .flags(NoTarget)
-        .text(ContextMenu::tr("Account security..."));
+        .text(ContextMenu::tr("Account Security..."));
 
     factory(OpenCloudMainUrl)
         .flags(NoTarget)

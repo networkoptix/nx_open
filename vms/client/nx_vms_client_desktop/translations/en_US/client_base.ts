@@ -1016,7 +1016,7 @@
         <translation></translation>
     </message>
     <message>
-        <source>Account security...</source>
+        <source>Account Security...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7591,10 +7591,6 @@ We recommend you not to open this web page. If you understand the risks, you can
         <source>Select Camera</source>
         <translation></translation>
     </message>
-    <message>
-        <source>You do not have any cameras</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::CameraSettingsDialog</name>
@@ -8440,10 +8436,6 @@ We recommend you not to open this web page. If you understand the risks, you can
 <context>
     <name>nx::vms::client::desktop::FailoverPriorityDialogItemDelegate</name>
     <message>
-        <source>No failover</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Low</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8453,6 +8445,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
         <source>High</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Failover</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -10082,15 +10078,15 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
         <translation></translation>
     </message>
     <message>
-        <source>Someone may be impersonating %1 to steal your personal information.</source>
-        <translation></translation>
+        <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Do not connect to this server unless instructed by your VMS administrator.</source>
-        <translation></translation>
+        <source>Someone may be impersonating this Server to steal your personal information.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
+        <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

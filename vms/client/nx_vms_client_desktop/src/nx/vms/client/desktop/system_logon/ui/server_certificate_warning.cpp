@@ -63,13 +63,11 @@ ServerCertificateWarning::ServerCertificateWarning(
         {
             icon = QnMessageBox::Icon::Question;
             header = tr("Trust this server?");
-            details = tr(
-                "You attempted to connect to: %1 "
-                "but the Server presented a certificate that is unable to be automatically verified.");
+            details = tr("You attempted to connect to this Server, but it presented a certificate "
+                "that cannot be verified automatically.");
 
-            advice = tr(
-                "Review the certificate's details to make sure "
-                "you are connecting to the correct server.");
+            advice = tr("Review the certificate's details to make sure you are connecting to the "
+                "correct server.");
             break;
         }
 
@@ -78,9 +76,10 @@ ServerCertificateWarning::ServerCertificateWarning(
         {
             icon = QnMessageBox::Icon::Warning;
             header = tr("Cannot verify the identity of %1").arg(target.name);
-            details = tr("Someone may be impersonating %1 to steal your personal information.");
-            advice =
-                tr("Do not connect to this server unless instructed by your VMS administrator.");
+            details = tr("Someone may be impersonating this Server to steal your personal "
+                "information.");
+            advice = tr("Do not connect to this Server unless instructed by your VMS "
+                "administrator.");
 
             break;
         }
@@ -89,24 +88,11 @@ ServerCertificateWarning::ServerCertificateWarning(
             NX_ASSERT("Unreachable");
     }
 
-    // Patch up details string: we don't want to have spaces around target info block.
-    const static QString placeholder("%1");
-    const auto pattern = details.arg(placeholder);
-    const auto substrings = details.split(placeholder);
-    if (substrings.size() == 2)
-    {
-        details = substrings[0].trimmed() + targetInfo + substrings[1].trimmed();
-    }
-    else
-    {
-        // Something failed. Perhaps the translation does not meet our expectations.
-        details = details.arg(targetInfo);
-    }
 
     // Load data into UI.
     setIcon(icon);
     setText(header);
-    setInformativeText(details);
+    setInformativeText(targetInfo + details);
 
     // Add this text as a separate label to make a proper spacing.
     auto additionalText = new QLabel(advice);

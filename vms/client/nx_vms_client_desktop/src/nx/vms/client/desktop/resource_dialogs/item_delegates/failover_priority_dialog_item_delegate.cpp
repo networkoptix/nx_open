@@ -47,7 +47,7 @@ QString FailoverPriorityDialogItemDelegate::failoverPriorityToString(
     switch (failoverPriority)
     {
         case FailoverPriority::never:
-            return tr("No failover");
+            return tr("No Failover");
         case FailoverPriority::low:
             return tr("Low");
         case FailoverPriority::medium:

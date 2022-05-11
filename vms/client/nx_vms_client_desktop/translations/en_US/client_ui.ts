@@ -1130,10 +1130,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>No failover</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Low</source>
         <translation></translation>
     </message>
@@ -1148,6 +1144,10 @@
     <message>
         <source>Select some devices to setup failover priority</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>No Failover</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -164,8 +164,8 @@ public:
 
             case RemoteConnectionErrorCode::systemIsNotCompatibleWith2Fa:
             {
-                const QString message = tr("To log in to this system, disable “Ask for a "
-                    "verification code on every login with your %1 account” in your account %2.",
+                const QString message = tr("To log in to this System, disable “Ask for a "
+                    "verification code on every login with your %1 account” in your %2.",
                     "%1 is the cloud name (like Nx Cloud),"
                     "%2 is link that leads to /account/security section of Nx Cloud")
                     .arg(nx::branding::cloudName(),
@@ -178,7 +178,7 @@ public:
             {
                 const QString message = tr("Two-factor authentication is required.")
                     + html::kLineBreak
-                    + tr("You can configure it in your %1.",
+                    + tr("You can enable two-factor authentication in your %1.",
                         "%1 is link that leads to /account/security section of Nx Cloud")
                           .arg(html::localLink("account settings", "#cloud_account_security"));
 

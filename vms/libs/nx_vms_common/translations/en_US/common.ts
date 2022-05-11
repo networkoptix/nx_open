@@ -347,14 +347,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
         <translation></translation>
     </message>
@@ -371,7 +363,15 @@
         <translation></translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it is off) in I/O module settings (error &quot;%1&quot;).</source>
+        <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
