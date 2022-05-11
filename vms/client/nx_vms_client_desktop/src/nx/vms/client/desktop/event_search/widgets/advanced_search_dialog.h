@@ -4,8 +4,7 @@
 
 #include <nx/vms/client/desktop/common/dialogs/qml_dialog_wrapper.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
-
-#include <ui/workbench/workbench_context_aware.h>
+#include <ui/workbench/workbench_state_manager.h>
 
 class QScreen;
 
@@ -13,7 +12,7 @@ namespace nx::vms::client::desktop {
 
 class AdvancedSearchDialog:
     public QmlDialogWrapper,
-    public QnWorkbenchContextAware
+    public QnSessionAwareDelegate
 {
 public:
     AdvancedSearchDialog(QWidget* parent = nullptr);
@@ -22,6 +21,9 @@ public:
     static void unregisterStateDelegate();
 
     class StateDelegate;
+
+    virtual bool tryClose(bool force) override;
+    virtual void forcedUpdate() override;
 
 private:
     QScreen* defaultScreen() const;
