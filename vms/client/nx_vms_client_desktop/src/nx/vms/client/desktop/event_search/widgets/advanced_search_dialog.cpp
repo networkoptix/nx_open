@@ -43,7 +43,7 @@ AdvancedSearchDialog::AdvancedSearchDialog(QWidget* parent) :
         QUrl("Nx/LeftPanel/private/analytics/AnalyticsSearchDialog.qml"),
         {},
         parent),
-    QnWorkbenchContextAware(parent)
+    QnSessionAwareDelegate(parent)
 {
     rootObjectHolder()->object()->setProperty("workbenchContext", QVariant::fromValue(context()));
 
@@ -137,6 +137,16 @@ void AdvancedSearchDialog::unregisterStateDelegate()
 QScreen* AdvancedSearchDialog::defaultScreen() const
 {
     return qApp->primaryScreen();
+}
+
+bool AdvancedSearchDialog::tryClose(bool /*force*/)
+{
+    reject();
+    return true;
+}
+
+void AdvancedSearchDialog::forcedUpdate()
+{
 }
 
 // ------------------------------------------------------------------------------------------------
