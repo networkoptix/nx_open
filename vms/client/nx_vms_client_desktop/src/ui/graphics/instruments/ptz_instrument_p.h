@@ -21,7 +21,6 @@
 #include "selection_item.h"
 
 using nx::vms::client::core::Geometry;
-using namespace nx::vms::client::desktop;
 
 // -------------------------------------------------------------------------- //
 // PtzArrowItem
@@ -36,8 +35,8 @@ public:
     {
         setAcceptedMouseButtons(Qt::NoButton);
 
-        setPen(QPen(colorTheme()->color("ptz.main", 192), 0.0));
-        setBrush(colorTheme()->color("ptz.fill", 192));
+        setPen(QPen(nx::vms::client::desktop::colorTheme()->color("ptz.main", 192), 0.0));
+        setBrush(nx::vms::client::desktop::colorTheme()->color("ptz.fill", 192));
     }
 
     const QSizeF &size() const {
@@ -116,8 +115,8 @@ public:
         font.setPixelSize(50);
         setFont(font);
 
-        setFrameColor(colorTheme()->color("ptz.main", 192));
-        setWindowColor(colorTheme()->color("ptz.fill", 64));
+        setFrameColor(nx::vms::client::desktop::colorTheme()->color("ptz.main", 192));
+        setWindowColor(nx::vms::client::desktop::colorTheme()->color("ptz.fill", 64));
     }
 
     QnMediaResourceWidget *target() const {
@@ -132,7 +131,6 @@ private:
     QPointer<QnMediaResourceWidget> m_target;
 };
 
-
 // -------------------------------------------------------------------------- //
 // PtzManipulatorWidget
 // -------------------------------------------------------------------------- //
@@ -143,8 +141,8 @@ class PtzManipulatorWidget: public GraphicsWidget {
 public:
     PtzManipulatorWidget(QGraphicsItem* parent = nullptr, Qt::WindowFlags windowFlags = {}):
         base_type(parent, windowFlags),
-        m_pen(QPen(colorTheme()->color("ptz.main", 192), 0.0)),
-        m_brush(colorTheme()->color("ptz.fill", 64))
+        m_pen(QPen(nx::vms::client::desktop::colorTheme()->color("ptz.main", 192), 0.0)),
+        m_brush(nx::vms::client::desktop::colorTheme()->color("ptz.fill", 64))
     {
     }
 
@@ -166,270 +164,6 @@ public:
 private:
     const QPen m_pen;
     const QBrush m_brush;
-};
-
-
-// -------------------------------------------------------------------------- //
-// PtzOverlayWidget
-// -------------------------------------------------------------------------- //
-class PtzOverlayWidget: public GraphicsWidget
-{
-    Q_OBJECT
-    typedef GraphicsWidget base_type;
-
-public:
-    PtzOverlayWidget(QGraphicsItem* parent = nullptr, Qt::WindowFlags windowFlags = {}):
-        base_type(parent, windowFlags),
-        m_markersMode(Qt::Horizontal | Qt::Vertical),
-        m_pen(QPen(colorTheme()->color("ptz.main", 192), 0.0))
-    {
-        setAcceptedMouseButtons(Qt::NoButton);
-
-        QPainterPath upRoundPath;
-        upRoundPath.moveTo(0, 1);
-        upRoundPath.lineTo(0, 0.5);
-        upRoundPath.arcTo(0, 0, 1, 1, 180, -180);
-        upRoundPath.lineTo(1, 1);
-        upRoundPath.closeSubpath();
-
-        QPainterPath downRoundPath;
-        downRoundPath.moveTo(0, 0);
-        downRoundPath.lineTo(0, 0.5);
-        downRoundPath.arcTo(0, 0, 1, 1, 180, 180);
-        downRoundPath.lineTo(1, 0);
-        downRoundPath.closeSubpath();
-
-        /* Note that construction order is important as it defines which items are on top. */
-        m_manipulatorWidget = new PtzManipulatorWidget(this);
-
-        m_zoomInButton = new PtzImageButtonWidget(this);
-        m_zoomInButton->setIcon(qnSkin->icon("ptz/zoom_in.png"));
-        m_zoomInButton->setToolTip(tr("Zoom In"));
-
-        m_zoomOutButton = new PtzImageButtonWidget(this);
-        m_zoomOutButton->setIcon(qnSkin->icon("ptz/zoom_out.png"));
-        m_zoomOutButton->setToolTip(tr("Zoom Out"));
-
-        m_focusInButton = new PtzImageButtonWidget(this);
-        m_focusInButton->setIcon(qnSkin->icon("ptz/focus_in.png"));
-        m_focusInButton->setToolTip(tr("Focus Far"));
-        m_focusInButton->setFrameShape(Qn::CustomFrame);
-        m_focusInButton->setCustomFramePath(upRoundPath);
-
-        m_focusOutButton = new PtzImageButtonWidget(this);
-        m_focusOutButton->setIcon(qnSkin->icon("ptz/focus_out.png"));
-        m_focusOutButton->setToolTip(tr("Focus Near"));
-        m_focusOutButton->setFrameShape(Qn::CustomFrame);
-        m_focusOutButton->setCustomFramePath(downRoundPath);
-
-        m_focusAutoButton = new PtzImageButtonWidget(this);
-        m_focusAutoButton->setIcon(qnSkin->icon("ptz/focus_auto.png"));
-        m_focusAutoButton->setToolTip(tr("Auto Focus"));
-        m_focusAutoButton->setFrameShape(Qn::RectangularFrame);
-
-        m_modeButton = new PtzImageButtonWidget(this);
-        m_modeButton->setToolTip(tr("Change Dewarping Mode"));
-
-        updateLayout();
-        showCursor();
-    }
-
-    void forceUpdateLayout()
-    {
-        updateLayout();
-    }
-
-    void hideCursor()
-    {
-        manipulatorWidget()->setCursor(Qt::BlankCursor);
-        zoomInButton()->setCursor(Qt::BlankCursor);
-        zoomOutButton()->setCursor(Qt::BlankCursor);
-        focusInButton()->setCursor(Qt::BlankCursor);
-        focusOutButton()->setCursor(Qt::BlankCursor);
-        focusAutoButton()->setCursor(Qt::BlankCursor);
-    }
-
-    void showCursor()
-    {
-        manipulatorWidget()->setCursor(nx::vms::client::desktop::CustomCursors::sizeAll);
-        zoomInButton()->setCursor(Qt::ArrowCursor);
-        zoomOutButton()->setCursor(Qt::ArrowCursor);
-        focusInButton()->setCursor(Qt::ArrowCursor);
-        focusOutButton()->setCursor(Qt::ArrowCursor);
-        focusAutoButton()->setCursor(Qt::ArrowCursor);
-    }
-
-    PtzManipulatorWidget* manipulatorWidget() const
-    {
-        return m_manipulatorWidget;
-    }
-
-    PtzImageButtonWidget* zoomInButton() const
-    {
-        return m_zoomInButton;
-    }
-
-    PtzImageButtonWidget* zoomOutButton() const
-    {
-        return m_zoomOutButton;
-    }
-
-    PtzImageButtonWidget* focusInButton() const
-    {
-        return m_focusInButton;
-    }
-
-    PtzImageButtonWidget* focusOutButton() const
-    {
-        return m_focusOutButton;
-    }
-
-    PtzImageButtonWidget* focusAutoButton() const
-    {
-        return m_focusAutoButton;
-    }
-
-    PtzImageButtonWidget* modeButton() const
-    {
-        return m_modeButton;
-    }
-
-    Qt::Orientations markersMode() const
-    {
-        return m_markersMode;
-    }
-
-    void setMarkersMode(Qt::Orientations mode)
-    {
-        m_markersMode = mode;
-    }
-
-    virtual void setGeometry(const QRectF& rect) override
-    {
-        QSizeF oldSize = size();
-
-        base_type::setGeometry(rect);
-
-        if(!qFuzzyEquals(oldSize, size()))
-            updateLayout();
-    }
-
-    virtual void paint(
-        QPainter* painter,
-        const QStyleOptionGraphicsItem* option,
-        QWidget* widget) override
-    {
-        if (m_markersMode == 0)
-        {
-            base_type::paint(painter, option, widget);
-            return;
-        }
-
-        QRectF rect = this->rect();
-
-        QVector<QPointF> crosshairLines;
-
-        QPointF center = rect.center();
-        qreal unit = this->unit();
-
-        if (m_markersMode & Qt::Horizontal) {
-            qreal x = unit * 3.0;
-            while(x < rect.width() / 2.0) {
-                crosshairLines
-                    << center + QPointF(-x, unit / 2.0) << center + QPointF(-x, -unit / 2.0);
-
-                if(x < rect.width() / 2.0 - 3.0 * unit || !m_focusInButton->isVisible())
-                    crosshairLines
-                    << center + QPointF( x, unit / 2.0) << center + QPointF( x, -unit / 2.0);
-
-                x += unit;
-            }
-        }
-
-        if (m_markersMode & Qt::Vertical) {
-            qreal y = unit * 3.0;
-            while(y < rect.height() / 2.0) {
-                crosshairLines
-                    << center + QPointF(unit / 2.0,  y) << center + QPointF(-unit / 2.0,  y)
-                    << center + QPointF(unit / 2.0, -y) << center + QPointF(-unit / 2.0, -y);
-                y += unit;
-            }
-        }
-
-        QnScopedPainterPenRollback penRollback(painter, m_pen);
-        painter->drawLines(crosshairLines);
-    }
-
-private:
-    qreal unit() const
-    {
-        QRectF rect = this->rect();
-        return qMin(rect.width(), rect.height()) / 32;
-    }
-
-    void updateLayout()
-    {
-        /* We're doing manual layout of child items as this is an overlay widget and
-         * we don't want layouts to clash with widget's size constraints. */
-
-        qreal unit = this->unit();
-        QRectF rect = this->rect();
-        QPointF center = rect.center();
-        QPointF left = (rect.topLeft() + rect.bottomLeft()) / 2.0;
-        QPointF right = (rect.topRight() + rect.bottomRight()) / 2.0;
-        QPointF xStep(unit, 0), yStep(0, unit);
-        QSizeF size = Geometry::toSize(xStep + yStep);
-
-        m_manipulatorWidget->setGeometry(QRectF(center - xStep - yStep, center + xStep + yStep));
-
-        if (qnSettings->isPtzAimOverlayEnabled())
-        {
-            m_zoomInButton->setGeometry(QRectF(center - xStep * 3 - yStep * 2.5, 1.5 * size));
-            m_zoomOutButton->setGeometry(QRectF(center + xStep * 1.5 - yStep * 2.5, 1.5 * size));
-            m_modeButton->setGeometry(QRectF(left + xStep - yStep * 1.5, 3.0 * size));
-
-            if (m_focusAutoButton->isVisible())
-            {
-                m_focusInButton->setGeometry(QRectF(right - xStep * 2.5 - yStep * 2.25, 1.5 * size));
-                m_focusAutoButton->setGeometry(QRectF(right - xStep * 2.5 - yStep * 0.75, 1.5 * size));
-                m_focusOutButton->setGeometry(QRectF(right - xStep * 2.5 + yStep * 0.75, 1.5 * size));
-            }
-            else
-            {
-                m_focusInButton->setGeometry(QRectF(right - xStep * 2.5 - yStep * 1.5, 1.5 * size));
-                m_focusOutButton->setGeometry(QRectF(right - xStep * 2.5 + yStep * 0.0, 1.5 * size));
-            }
-        }
-        else
-        {
-            m_zoomInButton->setGeometry(QRectF(left + xStep * 0.5 - yStep * 2.0, 1.5 * size));
-            m_zoomOutButton->setGeometry(QRectF(left + xStep * 0.5 + yStep * 0.5, 1.5 * size));
-            m_modeButton->setGeometry(QRectF(left + xStep * 2.5 - yStep * 1.5, 3.0 * size));
-
-            if (m_focusAutoButton->isVisible())
-            {
-                m_focusInButton->setGeometry(QRectF(right - xStep * 2.0 - yStep * 2.25, 1.5 * size));
-                m_focusAutoButton->setGeometry(QRectF(right - xStep * 2.0 - yStep * 0.75, 1.5 * size));
-                m_focusOutButton->setGeometry(QRectF(right - xStep * 2.0 + yStep * 0.75, 1.5 * size));
-            }
-            else
-            {
-                m_focusInButton->setGeometry(QRectF(right - xStep * 2.0 - yStep * 1.5, 1.5 * size));
-                m_focusOutButton->setGeometry(QRectF(right - xStep * 2.0 + yStep * 0.0, 1.5 * size));
-            }
-        }
-    }
-
-private:
-    Qt::Orientations m_markersMode;
-    PtzManipulatorWidget* m_manipulatorWidget = nullptr;
-    PtzImageButtonWidget* m_zoomInButton = nullptr;
-    PtzImageButtonWidget* m_zoomOutButton = nullptr;
-    PtzImageButtonWidget* m_focusInButton = nullptr;
-    PtzImageButtonWidget* m_focusOutButton = nullptr;
-    PtzImageButtonWidget* m_focusAutoButton = nullptr;
-    PtzImageButtonWidget* m_modeButton = nullptr;
-    const QPen m_pen;
 };
 
 // -----------------------------------------------------------------------------------------------
@@ -479,10 +213,10 @@ public:
         if (m_direction.isNull())
             return;
 
-        static const QColor kShadowColor(colorTheme()->color("dark5", 51));
-        static const QBrush kDarkBrush(colorTheme()->color("dark5", 102));
-        static const QBrush kMidlightBrush(colorTheme()->color("light1", 153));
-        static const QBrush kLightBrush(colorTheme()->color("light1"));
+        static const QColor kShadowColor(nx::vms::client::desktop::colorTheme()->color("dark5", 51));
+        static const QBrush kDarkBrush(nx::vms::client::desktop::colorTheme()->color("dark5", 102));
+        static const QBrush kMidlightBrush(nx::vms::client::desktop::colorTheme()->color("light1", 153));
+        static const QBrush kLightBrush(nx::vms::client::desktop::colorTheme()->color("light1"));
 
         static constexpr qreal kBigRadius = 9.5;
         static constexpr qreal kSmallRadius = 2.5;
@@ -554,7 +288,7 @@ public:
     PtzSplashItem(QGraphicsItem *parent = nullptr):
         base_type(parent)
     {
-        setColor(colorTheme()->color("ptz.main", 128));
+        setColor(nx::vms::client::desktop::colorTheme()->color("ptz.main", 128));
     }
 };
 
@@ -571,7 +305,7 @@ public:
     PtzSelectionItem(QGraphicsItem *parent = nullptr):
         base_type(parent)
     {
-        setPen(QPen(colorTheme()->color("ptz.main", 192), 0.0));
-        setBrush(colorTheme()->color("ptz.fill", 64));
+        setPen(QPen(nx::vms::client::desktop::colorTheme()->color("ptz.main", 192), 0.0));
+        setBrush(nx::vms::client::desktop::colorTheme()->color("ptz.fill", 64));
     }
 };
