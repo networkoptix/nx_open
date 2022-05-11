@@ -152,7 +152,10 @@ public:
      */
     QnPtzControllerPtr ptzController() const;
 
-    bool canControlPtz() const;
+    bool supportsBasicPtz() const;
+    bool canControlPtzFocus() const;
+    bool canControlPtzMove() const;
+    bool canControlPtzZoom() const;
 
     nx::vms::api::dewarping::MediaData dewarpingParams() const;
     void setDewarpingParams(const nx::vms::api::dewarping::MediaData& params);

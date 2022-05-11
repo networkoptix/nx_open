@@ -184,18 +184,13 @@ public:
     }
 
     // Joystick-controlled action must occur only if ptz is active.
-    bool checkPtzIsActiveOrForced()
+    bool checkPtzIsActiveOrForced(QnMediaResourceWidget* widget, bool isSupported)
     {
-        const auto widget = dynamic_cast<QnMediaResourceWidget*>(q->display()->widget(Qn::CentralRole));
-        if (!widget)
-            return false;
-
         const auto parameters = q->menu()->currentParameters(q->sender());
 
-        const bool ptzSupported = widget->canControlPtz();
         const bool ptzActive = widget->options().testFlag(QnResourceWidget::ControlPtz);
         const bool ptzForced = parameters.argument(Qn::ItemDataRole::ForceRole).toBool();
-        if (!ptzSupported || (!ptzActive && !ptzForced))
+        if (!isSupported || (!ptzActive && !ptzForced))
         {
             QnMediaResourcePtr mediaResource = widget->resource();
             if (!mediaResource)
@@ -211,6 +206,42 @@ public:
         }
 
         return true;
+    }
+
+    bool checkPtzEnabled()
+    {
+        const auto widget = dynamic_cast<QnMediaResourceWidget*>(q->display()->widget(Qn::CentralRole));
+        if (!widget)
+            return false;
+
+        return checkPtzIsActiveOrForced(widget, widget->supportsBasicPtz());
+    }
+
+    bool checkPtzMoveEnabled()
+    {
+        const auto widget = dynamic_cast<QnMediaResourceWidget*>(q->display()->widget(Qn::CentralRole));
+        if (!widget)
+            return false;
+
+        return checkPtzIsActiveOrForced(widget, widget->canControlPtzMove());
+    }
+
+    bool checkPtzZoomEnabled()
+    {
+        const auto widget = dynamic_cast<QnMediaResourceWidget*>(q->display()->widget(Qn::CentralRole));
+        if (!widget)
+            return false;
+
+        return checkPtzIsActiveOrForced(widget, widget->canControlPtzZoom());
+    }
+
+    bool checkPtzFocusEnabled()
+    {
+        const auto widget = dynamic_cast<QnMediaResourceWidget*>(q->display()->widget(Qn::CentralRole));
+        if (!widget)
+            return false;
+
+        return checkPtzIsActiveOrForced(widget, widget->canControlPtzFocus());
     }
 
     void updatePtzState(bool ptzMoveIsActive, QnMediaResourceWidget* widget)
@@ -542,7 +573,10 @@ void QnWorkbenchPtzHandler::at_ptzContinuousMoveAction_triggered()
     if (ptzForced)
         d->updatePtzState(!speed.isNull(), widget);
 
-    if (!speed.isNull() && !d->checkPtzIsActiveOrForced())
+    if (((!qFuzzyIsNull(speed.x()) || !qFuzzyIsNull(speed.y())) && !d->checkPtzMoveEnabled()))
+        return;
+
+    if (!qFuzzyIsNull(speed.z()) && !d->checkPtzZoomEnabled())
         return;
 
     const auto rotation = item->rotation()
@@ -562,7 +596,7 @@ void QnWorkbenchPtzHandler::at_ptzContinuousMoveAction_triggered()
 
 void QnWorkbenchPtzHandler::at_ptzActivatePresetByIndexAction_triggered()
 {
-    if (!d->checkPtzIsActiveOrForced())
+    if (!d->checkPtzEnabled())
         return;
 
     auto widget = qobject_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
@@ -596,7 +630,7 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetByIndexAction_triggered()
 
 void QnWorkbenchPtzHandler::at_ptzActivateObjectByHotkeyAction_triggered()
 {
-    if (!d->checkPtzIsActiveOrForced())
+    if (!d->checkPtzEnabled())
         return;
 
     const auto widget = dynamic_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
@@ -630,7 +664,7 @@ void QnWorkbenchPtzHandler::at_ptzFocusOutAction_triggered()
 
 void QnWorkbenchPtzHandler::ptzFocusMove(double speed)
 {
-    if (!d->checkPtzIsActiveOrForced())
+    if (!d->checkPtzFocusEnabled())
         return;
 
     const auto widget = dynamic_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
@@ -661,7 +695,7 @@ void QnWorkbenchPtzHandler::ptzFocusMove(double speed)
 
 void QnWorkbenchPtzHandler::at_ptzFocusAutoAction_triggered()
 {
-    if (!d->checkPtzIsActiveOrForced())
+    if (!d->checkPtzFocusEnabled())
         return;
 
     const auto widget = dynamic_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));

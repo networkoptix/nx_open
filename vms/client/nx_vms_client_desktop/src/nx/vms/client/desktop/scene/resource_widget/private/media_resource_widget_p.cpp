@@ -248,18 +248,26 @@ bool MediaResourceWidgetPrivate::isUnauthorized() const
     return m_isUnauthorized;
 }
 
-bool MediaResourceWidgetPrivate::canControlPtz() const
+bool MediaResourceWidgetPrivate::supportsBasicPtz() const
+{
+    return supportsPtzCapabilities(Ptz::ContinuousPtzCapabilities | Ptz::ViewportPtzCapability);
+}
+
+bool MediaResourceWidgetPrivate::supportsPtzCapabilities(Ptz::Capabilities capabilities) const
 {
     // Ptz is not available for the local files.
     if (!camera)
+        return false;
+
+    if (camera->hasAnyOfPtzCapabilities(Ptz::VirtualPtzCapability))
         return false;
 
     // Ptz is forbidden in exported files or on search layouts.
     if (isExportedLayout || isPreviewSearchLayout)
         return false;
 
-    // Check if we can control at least something on the current camera and fisheye is disabled.
-    if (!camera->isPtzSupported())
+    // Check if camera supports the capabilities.
+    if (!camera->hasAnyOfPtzCapabilities(capabilities))
         return false;
 
     // Check permissions on the current camera.
@@ -277,7 +285,7 @@ bool MediaResourceWidgetPrivate::canControlPtz() const
         return false;
 
     // Ptz is redirected to non-ptz camera.
-    if (!actualPtzTarget->isPtzSupported())
+    if (!actualPtzTarget->hasAnyOfPtzCapabilities(capabilities))
         return false;
 
     return m_accessController->hasPermissions(actualPtzTarget, Qn::WritePtzPermission);
