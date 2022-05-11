@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <core/ptz/ptz_constants.h>
 #include <core/resource/client_resource_fwd.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/vms/api/types/resource_types.h>
@@ -74,7 +75,8 @@ public:
     bool isPlayingLive() const;
     bool isOffline() const;
     bool isUnauthorized() const;
-    bool canControlPtz() const;
+    bool supportsBasicPtz() const; //< Camera supports Pan, Tilt and Zoom.
+    bool supportsPtzCapabilities(Ptz::Capabilities capabilities) const;
 
     nx::vms::license::UsageStatus licenseStatus() const;
 
