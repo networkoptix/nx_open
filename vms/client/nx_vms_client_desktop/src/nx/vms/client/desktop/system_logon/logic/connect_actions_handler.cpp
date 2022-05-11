@@ -263,7 +263,13 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
     connect(action(ui::action::ReconnectAction), &QAction::triggered, this,
         &ConnectActionsHandler::at_reconnectAction_triggered);
     connect(action(ui::action::DisconnectAction), &QAction::triggered, this,
-        &ConnectActionsHandler::at_disconnectAction_triggered);
+        [this]()
+        {
+            if (auto session = qnClientCoreModule->networkModule()->session())
+                session->syncWhenTerminate();
+
+            at_disconnectAction_triggered();
+        });
     connect(action(ui::action::SelectCurrentServerAction), &QAction::triggered, this,
         &ConnectActionsHandler::at_selectCurrentServerAction_triggered);
 
