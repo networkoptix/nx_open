@@ -71,7 +71,7 @@ public:
         }
         else
         {
-            auto it = m_metadataByTimestamp.lower_bound(startTimestamp);
+            auto it = m_metadataByTimestamp.lower_bound(endTimestamp);
 
             while (maxCount > 0 && it != m_metadataByTimestamp.begin())
             {
