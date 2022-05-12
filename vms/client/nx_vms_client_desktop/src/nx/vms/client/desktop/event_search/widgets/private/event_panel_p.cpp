@@ -251,6 +251,15 @@ EventPanel::Private::Private(EventPanel* q):
         connect(action(ui::action::MotionTabAction), &QAction::triggered, this,
             [this] { setCurrentTab(Tab::motion); });
 
+        connect(action(ui::action::SwitchMotionTabAction), &QAction::triggered, this,
+            [this]
+            {
+                if (currentTab() == Tab::motion)
+                    setCurrentTab(Tab::notifications);
+                else
+                    setCurrentTab(Tab::motion);
+            });
+
         connect(action(ui::action::BookmarksTabAction), &QAction::triggered, this,
             [this] { setCurrentTab(Tab::bookmarks); });
 

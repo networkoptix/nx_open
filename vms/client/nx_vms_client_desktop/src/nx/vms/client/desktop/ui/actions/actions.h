@@ -271,6 +271,11 @@ enum IDType
     MotionTabAction,
 
     /**
+     * Switches the tabs on the right panel between the motion and notification tabs.
+     */
+    SwitchMotionTabAction,
+
+    /**
      * Opens Bookmarks tab in the right panel.
      */
     BookmarksTabAction,
