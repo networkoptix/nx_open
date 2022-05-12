@@ -8,7 +8,6 @@
 #include <QtWidgets/QTabBar>
 #include <QtCore/QTimer>
 
-#include <api/global_settings.h>
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>
@@ -23,6 +22,7 @@
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/common/system_settings.h>
 #include <server/server_storage_manager.h>
 #include <ui/common/palette.h>
 

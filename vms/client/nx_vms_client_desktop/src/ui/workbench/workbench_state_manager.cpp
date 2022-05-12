@@ -2,10 +2,9 @@
 
 #include "workbench_state_manager.h"
 
-#include <api/global_settings.h>
+#include <client_core/client_core_module.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
-#include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/resource/user_resource.h>
 #include <network/system_helpers.h>
@@ -14,9 +13,10 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/common/system_settings.h>
 #include <statistics/statistics_manager.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench.h>
 
 namespace {
 

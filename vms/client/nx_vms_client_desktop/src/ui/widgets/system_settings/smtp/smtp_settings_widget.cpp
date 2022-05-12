@@ -5,20 +5,17 @@
 
 #include <QtCore/QScopedValueRollback>
 
-#include <api/global_settings.h>
-
 #include <common/common_module.h>
-
+#include <nx/vms/common/system_settings.h>
+#include <ui/common/read_only.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-
-#include <ui/common/read_only.h>
-#include <ui/widgets/system_settings/smtp/smtp_simple_settings_widget.h>
 #include <ui/widgets/system_settings/smtp/smtp_advanced_settings_widget.h>
+#include <ui/widgets/system_settings/smtp/smtp_simple_settings_widget.h>
 #include <ui/widgets/system_settings/smtp/smtp_test_connection_widget.h>
-
 #include <utils/email/email.h>
 
+using namespace nx::vms::common;
 
 namespace {
 enum WidgetPages
@@ -29,8 +26,6 @@ enum WidgetPages
 };
 
 }
-
-
 
 QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent)
     : base_type(parent)
@@ -59,13 +54,19 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent)
             emit hasChangesChanged();
     };
 
-    connect(ui->advancedCheckBox,       &QCheckBox::toggled,                            this,   &QnSmtpSettingsWidget::at_advancedCheckBox_toggled);
-    connect(ui->testButton,             &QPushButton::clicked,                          this,   &QnSmtpSettingsWidget::at_testButton_clicked);
-    connect(m_testSettingsWidget,       &QnSmtpTestConnectionWidget::finished,          this,   &QnSmtpSettingsWidget::finishTesting);
-    connect(m_simpleSettingsWidget,     &QnSmtpSimpleSettingsWidget::settingsChanged,   this,   checkedChanged);
-    connect(m_advancedSettingsWidget,   &QnSmtpAdvancedSettingsWidget::settingsChanged, this,   checkedChanged);
+    connect(ui->advancedCheckBox, &QCheckBox::toggled,
+        this, &QnSmtpSettingsWidget::at_advancedCheckBox_toggled);
+    connect(ui->testButton, &QPushButton::clicked,
+        this, &QnSmtpSettingsWidget::at_testButton_clicked);
+    connect(m_testSettingsWidget, &QnSmtpTestConnectionWidget::finished,
+        this, &QnSmtpSettingsWidget::finishTesting);
+    connect(m_simpleSettingsWidget, &QnSmtpSimpleSettingsWidget::settingsChanged,
+        this, checkedChanged);
+    connect(m_advancedSettingsWidget, &QnSmtpAdvancedSettingsWidget::settingsChanged,
+        this, checkedChanged);
 
-    connect(globalSettings(),           &QnGlobalSettings::emailSettingsChanged,        this,   &QnSmtpSettingsWidget::loadDataToUi);
+    connect(globalSettings(), &SystemSettings::emailSettingsChanged,
+        this, &QnSmtpSettingsWidget::loadDataToUi);
 }
 
 QnSmtpSettingsWidget::~QnSmtpSettingsWidget()

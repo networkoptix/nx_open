@@ -11,11 +11,11 @@
 #include <QtQuick/QQuickWindow>
 #include <QtWidgets/QWidget>
 
-#include <api/global_settings.h>
 #include <client/client_module.h>
 #include <common/common_module.h>
 #include <nx/utils/log/format.h>
 #include <nx/utils/singleton.h>
+#include <nx/vms/common/system_settings.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
 

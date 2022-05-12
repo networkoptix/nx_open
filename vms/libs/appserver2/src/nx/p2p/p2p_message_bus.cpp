@@ -2,31 +2,29 @@
 
 #include "p2p_message_bus.h"
 
+#include "ec_connection_notification_manager.h"
+#include <api/runtime_info_manager.h>
 #include <common/common_module.h>
 #include <common/static_common_module.h>
-
-#include <utils/media/bitStream.h>
-#include <utils/common/synctime.h>
-#include "ec_connection_notification_manager.h"
+#include <nx/cloud/db/api/ec2_request_paths.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/url/url_parse_helper.h>
+#include <nx/utils/qmetaobject_helper.h>
+#include <nx/utils/qset.h>
+#include <nx/utils/random.h>
+#include <nx/utils/std/algorithm.h>
+#include <nx/utils/std/cmath.h>
+#include <nx/vms/api/data/update_sequence_data.h>
+#include <nx/vms/api/protocol_version.h>
+#include <nx/vms/common/system_settings.h>
+#include <transaction/json_transaction_serializer.h>
 #include <transaction/transaction_message_bus_priv.h>
 #include <transaction/ubjson_transaction_serializer.h>
-#include <transaction/json_transaction_serializer.h>
-#include <api/global_settings.h>
-#include <utils/math/math.h>
-#include <api/runtime_info_manager.h>
-
-#include <nx/cloud/db/api/ec2_request_paths.h>
-#include <nx/network/socket_global.h>
-#include <nx/network/cloud/cloud_connect_controller.h>
-#include <nx/network/url/url_parse_helper.h>
-#include <nx/utils/std/cmath.h>
-#include <nx/utils/random.h>
-#include <nx/vms/api/protocol_version.h>
-#include <nx/vms/api/data/update_sequence_data.h>
 #include <utils/common/delayed.h>
-#include <nx/utils/qmetaobject_helper.h>
-#include <nx/utils/std/algorithm.h>
-#include <nx/utils/qset.h>
+#include <utils/common/synctime.h>
+#include <utils/math/math.h>
+#include <utils/media/bitStream.h>
 
 namespace nx {
 namespace p2p {

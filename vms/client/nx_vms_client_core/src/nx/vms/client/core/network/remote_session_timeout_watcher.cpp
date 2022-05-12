@@ -4,14 +4,15 @@
 
 #include <QtCore/QTimer>
 
-#include <api/global_settings.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/common/system_settings.h>
 #include <utils/common/synctime.h>
 
 #include "remote_connection.h"
 #include "remote_session.h"
 
 using namespace std::chrono;
+using namespace nx::vms::common;
 
 namespace nx::vms::client::core {
 
@@ -87,14 +88,14 @@ struct RemoteSessionTimeoutWatcher::Private
 //--------------------------------------------------------------------------------------------------
 
 RemoteSessionTimeoutWatcher::RemoteSessionTimeoutWatcher(
-    QnGlobalSettings* settings,
+    SystemSettings* settings,
     QObject* parent)
     :
     base_type(parent),
     d(new Private())
 {
     d->passwordSessionTimeoutLimit = settings->sessionTimeoutLimit();
-    connect(settings, &QnGlobalSettings::sessionTimeoutChanged, this,
+    connect(settings, &SystemSettings::sessionTimeoutChanged, this,
         [this, settings]()
         {
             d->passwordSessionTimeoutLimit = settings->sessionTimeoutLimit();

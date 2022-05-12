@@ -8,14 +8,14 @@
 #include <QtCore/QStandardPaths>
 #include <QtCore/QTimer>
 
-#include <api/global_settings.h>
 #include <client/client_message_processor.h>
 #include <common/common_module.h>
 #include <network/system_helpers.h>
-#include <nx/utils/string.h>
-#include <nx/utils/uuid.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_stored_file_manager.h>
+#include <nx/utils/string.h>
+#include <nx/utils/uuid.h>
+#include <nx/vms/common/system_settings.h>
 #include <utils/common/util.h> /* For removeDir. */
 
 namespace {

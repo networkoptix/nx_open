@@ -8,7 +8,6 @@
 // 1. Is dynamic resource switching via setResource really needed?
 // 2. Since we moved DB sync out of this class, queueing changes seems no longer needed.
 
-
 // -------------------------------------------------------------------------- //
 // QnAbstractResourcePropertyAdaptor
 // -------------------------------------------------------------------------- //
@@ -16,32 +15,54 @@ QnAbstractResourcePropertyAdaptor::QnAbstractResourcePropertyAdaptor(
     const QString& key,
     const QVariant& defaultValue,
     QnAbstractResourcePropertyHandler *handler,
-    QObject* parent)
+    QObject* parent,
+    std::function<QString()> label)
 :
     base_type(parent),
     m_key(key),
+    m_label(std::move(label)),
     m_defaultValue(defaultValue),
     m_handler(handler),
     m_pendingSave(0),
     m_value(defaultValue)
 {
-    connect(this, &QnAbstractResourcePropertyAdaptor::saveRequestQueued, this, &QnAbstractResourcePropertyAdaptor::processSaveRequests, Qt::DirectConnection);
+    connect(this, &QnAbstractResourcePropertyAdaptor::saveRequestQueued,
+        this, &QnAbstractResourcePropertyAdaptor::processSaveRequests, Qt::DirectConnection);
 }
 
-QnAbstractResourcePropertyAdaptor::~QnAbstractResourcePropertyAdaptor() {
+QnAbstractResourcePropertyAdaptor::~QnAbstractResourcePropertyAdaptor()
+{
     setResourceInternal(QnResourcePtr(), false); /* This will disconnect us from resource. */
 }
 
-const QString &QnAbstractResourcePropertyAdaptor::key() const {
+const QString& QnAbstractResourcePropertyAdaptor::key() const
+{
     return m_key;
 }
 
-QnResourcePtr QnAbstractResourcePropertyAdaptor::resource() const {
+QString QnAbstractResourcePropertyAdaptor::label() const
+{
+    if (m_label)
+        return m_label();
+
+    QString result = m_key.left(1).toUpper();
+    for (int i = 1; i < m_key.length(); ++i)
+    {
+        if (m_key[i] == m_key[i].toUpper())
+            result += " ";
+        result += m_key[i];
+    }
+    return result;
+}
+
+QnResourcePtr QnAbstractResourcePropertyAdaptor::resource() const
+{
     NX_MUTEX_LOCKER locker( &m_mutex );
     return m_resource;
 }
 
-void QnAbstractResourcePropertyAdaptor::setResource(const QnResourcePtr &resource) {
+void QnAbstractResourcePropertyAdaptor::setResource(const QnResourcePtr &resource)
+{
     setResourceInternal(resource, true);
 }
 

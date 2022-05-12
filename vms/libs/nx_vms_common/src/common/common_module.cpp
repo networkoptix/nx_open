@@ -8,16 +8,16 @@
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QFile>
 
-#include <api/global_settings.h>
 #include <audit/audit_manager.h>
 #include <common/common_meta_types.h>
-#include <core/resource/camera_history.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/storage_plugin_factory.h>
 #include <core/resource_management/camera_driver_restriction_list.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/camera_history.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/storage_plugin_factory.h>
 #include <network/router.h>
+#include <nx_ec/abstract_ec_connection.h>
 #include <nx/branding.h>
 #include <nx/build_info.h>
 #include <nx/metrics/metrics_storage.h>
@@ -26,9 +26,9 @@
 #include <nx/utils/timer_manager.h>
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/discovery/manager.h>
 #include <nx/vms/utils/installation_info.h>
-#include <nx_ec/abstract_ec_connection.h>
 #include <utils/media/ffmpeg_helper.h>
 
 using namespace nx;
@@ -375,7 +375,7 @@ QnResourceStatusDictionary* QnCommonModule::resourceStatusDictionary() const
         : nullptr;
 }
 
-QnGlobalSettings* QnCommonModule::globalSettings() const
+SystemSettings* QnCommonModule::globalSettings() const
 {
     return NX_ASSERT(d->systemContext)
         ? d->systemContext->globalSettings()

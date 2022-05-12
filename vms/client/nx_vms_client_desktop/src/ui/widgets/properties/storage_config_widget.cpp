@@ -7,18 +7,17 @@
 #include <QtWidgets/QMenu>
 
 #include <analytics/db/analytics_db_types.h>
-#include <api/global_settings.h>
 #include <api/model/rebuild_archive_reply.h>
 #include <api/model/storage_space_reply.h>
 #include <api/server_rest_connection.h>
 #include <client/client_module.h>
 #include <common/common_globals.h>
 #include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/client_storage_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resources_changes_manager.h>
 #include <nx/analytics/utils.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/pending_operation.h>
@@ -31,6 +30,7 @@
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/time/formatter.h>
 #include <server/server_storage_manager.h>
 #include <ui/dialogs/storage_url_dialog.h>

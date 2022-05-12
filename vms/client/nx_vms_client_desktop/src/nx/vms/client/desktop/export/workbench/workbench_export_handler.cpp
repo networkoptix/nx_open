@@ -6,13 +6,13 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QPushButton>
 
-#include <api/global_settings.h>
 #include <camera/loaders/caching_camera_data_loader.h>
+#include <client_core/client_core_module.h>
 #include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
-#include <client_core/client_core_module.h>
 #include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
@@ -20,7 +20,6 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
 #include <nx/branding.h>
 #include <nx/build_info.h>
@@ -40,6 +39,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
+#include <nx/vms/common/system_settings.h>
 #include <platform/environment.h>
 #include <recording/time_period.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -53,8 +53,8 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
-#include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
+#include <ui/workbench/workbench_layout.h>
 
 #ifdef Q_OS_WIN
 #   include <launcher/nov_launcher_win.h>

@@ -9,7 +9,6 @@
 #include <QtCore/QSettings>
 #include <QtCore/QTimer>
 
-#include <api/global_settings.h>
 #include <client_core/client_core_settings.h>
 #include <common/common_module.h>
 #include <helpers/system_helpers.h>
@@ -30,6 +29,7 @@
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/utils/cloud_session_token_updater.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
+#include <nx/vms/common/system_settings.h>
 #include <utils/common/delayed.h>
 #include <utils/common/id.h>
 #include <utils/common/synctime.h>
@@ -367,7 +367,7 @@ QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *p
         });
     systemUpdateTimer->start();
 
-    connect(globalSettings(), &QnGlobalSettings::cloudSettingsChanged,
+    connect(globalSettings(), &nx::vms::common::SystemSettings::cloudSettingsChanged,
             this, &QnCloudStatusWatcherPrivate::updateCurrentSystem);
 
     m_tokenUpdater = std::make_unique<CloudSessionTokenUpdater>(this);

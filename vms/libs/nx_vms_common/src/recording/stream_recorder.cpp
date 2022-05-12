@@ -2,27 +2,22 @@
 
 #include "stream_recorder.h"
 
+#include "export/sign_helper.h"
 #include <common/common_module.h>
-#include <api/global_settings.h>
-
+#include <core/resource/avi/avi_archive_delegate.h>
+#include <core/resource/media_resource.h>
 #include <core/resource/resource_consumer.h>
 #include <core/resource/resource.h>
-#include <core/resource/media_resource.h>
 #include <core/resource/security_cam_resource.h>
-
-#include <nx/streaming/abstract_data_packet.h>
-#include <nx/streaming/media_data_packet.h>
-#include <nx/streaming/abstract_media_stream_data_provider.h>
-#include <nx/streaming/config.h>
-
-#include <core/resource/avi/avi_archive_delegate.h>
-#include <nx/streaming/archive_stream_reader.h>
-
-#include "export/sign_helper.h"
-
-#include <utils/common/util.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/streaming/abstract_data_packet.h>
+#include <nx/streaming/abstract_media_stream_data_provider.h>
+#include <nx/streaming/archive_stream_reader.h>
+#include <nx/streaming/config.h>
+#include <nx/streaming/media_data_packet.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/common/system_settings.h>
+#include <utils/common/util.h>
 
 namespace {
 

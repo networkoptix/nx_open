@@ -5,12 +5,13 @@
 #include <QtQuick/QQuickItem>
 #include <QtWidgets/QWidget>
 
+#include <common/common_module.h>
 #include <nx/vms/client/core/utils/qml_property.h>
 #include <nx/vms/client/desktop/system_update/client_update_manager.h>
-
-#include <api/global_settings.h>
-#include <common/common_module.h>
+#include <nx/vms/common/system_settings.h>
 #include <ui/workbench/workbench_context.h>
+
+using namespace nx::vms::common;
 
 namespace nx::vms::client::desktop {
 
@@ -37,7 +38,7 @@ AdvancedUpdateSettingsDialog::AdvancedUpdateSettingsDialog(QWidget* parent):
         });
 
     connect(globalSettings(),
-        &QnGlobalSettings::updateNotificationsChanged,
+        &SystemSettings::updateNotificationsChanged,
         this,
         [this, notifyAboutUpdates]()
         {

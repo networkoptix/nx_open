@@ -2,7 +2,6 @@
 
 #include "export_storage_stream_recorder.h"
 
-#include <api/global_settings.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/resource/media_resource.h>
@@ -16,6 +15,7 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/system_settings.h>
 #include <recording/helpers/recording_context_helpers.h>
 #include <transcoding/transcoding_utils.h>
 

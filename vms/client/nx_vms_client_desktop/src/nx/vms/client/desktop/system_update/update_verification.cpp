@@ -1,19 +1,18 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <api/global_settings.h>
+#include <client_core/client_core_module.h>
+#include <client/client_settings.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <client_core/client_core_module.h>
-#include <client/client_settings.h>
 #include <network/system_helpers.h>
+#include <nx/build_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
-#include <nx/vms/update/update_check.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/discovery/manager.h>
+#include <nx/vms/update/update_check.h>
 #include <utils/common/synctime.h>
-
-#include <nx/build_info.h>
 
 #include "update_verification.h"
 

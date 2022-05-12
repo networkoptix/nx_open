@@ -2,7 +2,6 @@
 
 #include "amend_transaction_data.h"
 
-#include <api/global_settings.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/network/app_info.h>
@@ -23,6 +22,7 @@
 #include <nx/vms/api/data/videowall_data.h>
 #include <nx/vms/api/data/webpage_data.h>
 #include <nx/vms/api/rules/rule.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/crypt/crypt.h>
 #include <nx/vms/event/action_parameters.h>
 #include <transaction/transaction_descriptor.h>
@@ -36,7 +36,7 @@ extern const std::set<QString> kResourceParamToAmend =
     []()
     {
         std::set<QString> s;
-        s.insert(nx::settings_names::kWriteOnlyNames.begin(), nx::settings_names::kWriteOnlyNames.end());
+        s.insert(nx::vms::common::SystemSettings::Names::kWriteOnlyNames.begin(), nx::vms::common::SystemSettings::Names::kWriteOnlyNames.end());
         s.insert(ResourcePropertyKey::kWriteOnlyNames.begin(), ResourcePropertyKey::kWriteOnlyNames.end());
         return s;
     }();

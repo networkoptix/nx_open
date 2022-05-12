@@ -6,9 +6,7 @@
 #include <QtCore/QThreadPool>
 
 #include <api/common_message_processor.h>
-#include <api/global_settings.h>
 #include <api/runtime_info_manager.h>
-#include <core/resource/camera_history.h>
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/providers/permissions_resource_access_provider.h>
 #include <core/resource_access/providers/resource_access_provider.h>
@@ -25,11 +23,13 @@
 #include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource_management/status_dictionary.h>
 #include <core/resource_management/user_roles_manager.h>
+#include <core/resource/camera_history.h>
 #include <licensing/license.h>
 #include <network/router.h>
 #include <nx/analytics/taxonomy/descriptor_container.h>
 #include <nx/analytics/taxonomy/state_watcher.h>
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/event/rule_manager.h>
 
 namespace nx::vms::common {
@@ -50,7 +50,7 @@ struct SystemContext::Private
     std::unique_ptr<QnCameraHistoryPool> cameraHistoryPool;
     std::unique_ptr<QnServerAdditionalAddressesDictionary> serverAdditionalAddressesDictionary;
     std::unique_ptr<QnRuntimeInfoManager> runtimeInfoManager;
-    std::unique_ptr<QnGlobalSettings> globalSettings;
+    std::unique_ptr<SystemSettings> globalSettings;
     std::unique_ptr<QnUserRolesManager> userRolesManager;
     std::unique_ptr<QnSharedResourcesManager> sharedResourceManager;
     std::unique_ptr<QnGlobalPermissionsManager> globalPermissionsManager;
@@ -84,7 +84,7 @@ SystemContext::SystemContext(
     d->serverAdditionalAddressesDictionary =
         std::make_unique<QnServerAdditionalAddressesDictionary>();
     d->runtimeInfoManager = std::make_unique<QnRuntimeInfoManager>(this);
-    d->globalSettings = std::make_unique<QnGlobalSettings>(this);
+    d->globalSettings = std::make_unique<SystemSettings>(this);
     d->userRolesManager = std::make_unique<QnUserRolesManager>(this);
 
     // Depends on resource pool and roles.
@@ -228,7 +228,7 @@ QnRuntimeInfoManager* SystemContext::runtimeInfoManager() const
     return d->runtimeInfoManager.get();
 }
 
-QnGlobalSettings* SystemContext::globalSettings() const
+SystemSettings* SystemContext::globalSettings() const
 {
     return d->globalSettings.get();
 }

@@ -7,10 +7,10 @@
 
 struct CloudCredentialsData
 {
-    // TODO: rename it to cloudSystemId
-    QString cloudSystemID; //< keep same name as the constant QnGlobalSettings::kNameCloudSystemID
-    QString cloudAuthKey; //< keep same name as the constant QnGlobalSettings::kNameCloudAuthKey
-    QString cloudAccountName; //< keep same name as the constant QnGlobalSetttings::kNameCloudAccountName
+    // Keep same names as the constants in nx::vms::common::SystemSettings::Names.
+    QString cloudSystemID;
+    QString cloudAuthKey;
+    QString cloudAccountName;
 };
 
 #define CloudCredentialsData_Fields (cloudSystemID)(cloudAuthKey)(cloudAccountName)

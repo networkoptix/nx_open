@@ -4,7 +4,6 @@
 
 #include <QtCore/QCryptographicHash>
 
-#include <api/global_settings.h>
 #include <api/model/password_data.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/user_roles_manager.h>
@@ -17,6 +16,7 @@
 #include <nx/utils/switch.h>
 #include <nx/vms/api/data/user_data.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/system_settings.h>
 #include <utils/common/id.h>
 #include <utils/common/ldap.h>
 #include <utils/common/synctime.h>

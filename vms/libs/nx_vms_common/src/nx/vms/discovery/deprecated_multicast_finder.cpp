@@ -10,12 +10,11 @@
 #include <QtCore/QMap>
 #include <QtNetwork/QNetworkInterface>
 
-#include <api/global_settings.h>
 #include <common/common_module.h>
 #include <common/static_common_module.h>
 #include <nx/network/nettools.h>
-#include <nx/network/socket.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/socket.h>
 #include <nx/network/system_socket.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/cryptographic_hash.h>
@@ -25,6 +24,7 @@
 #include <nx/vms/api/data/peer_data.h>
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
+#include <nx/vms/common/system_settings.h>
 
 namespace nx {
 namespace vms {

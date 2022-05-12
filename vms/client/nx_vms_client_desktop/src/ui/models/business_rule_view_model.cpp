@@ -2,54 +2,46 @@
 
 #include "business_rule_view_model.h"
 
-#include <core/resource/resource.h>
-#include <core/resource/device_dependent_strings.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/layout_resource.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/user_resource.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
-#include <core/resource_access/resource_access_manager.h>
-#include <core/resource_access/resource_access_subjects_cache.h>
-#include <core/resource/resource_display_info.h>
-
-// TODO: #vkutin Move these to proper locations and namespaces
-#include <business/business_resource_validation.h>
+#include <business/business_resource_validation.h> //< TODO: #vkutin Move these to proper locations and namespaces
 #include <business/business_types_comparator.h>
-
-#include <api/global_settings.h>
-#include <common/common_module.h>
 #include <client_core/client_core_module.h>
 #include <client/client_settings.h>
-
+#include <common/common_module.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/resource_access_subject.h>
+#include <core/resource_access/resource_access_subjects_cache.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/device_dependent_strings.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/resource_display_info.h>
+#include <core/resource/resource.h>
+#include <core/resource/user_resource.h>
+#include <nx/network/http/http_types.h>
+#include <nx/reflect/string_conversion.h>
+#include <nx/utils/qset.h>
 #include <nx/vms/api/types/event_rule_types.h>
-#include <nx/vms/event/action_parameters.h>
-#include <nx/vms/event/strings_helper.h>
-#include <nx/vms/event/events/events.h>
-#include <nx/vms/event/actions/actions.h>
-#include <nx/vms/client/desktop/rules/helpers/fullscreen_action_helper.h>
-#include <nx/vms/client/desktop/rules/helpers/exit_fullscreen_action_helper.h>
 #include <nx/vms/client/desktop/rules/event_action_subtype.h>
+#include <nx/vms/client/desktop/rules/helpers/exit_fullscreen_action_helper.h>
+#include <nx/vms/client/desktop/rules/helpers/fullscreen_action_helper.h>
 #include <nx/vms/client/desktop/rules/nvr_events_actions_access.h>
-
-#include <nx/vms/common/resource/analytics_engine_resource.h>
-
-#include <ui/help/help_topics.h>
-#include <ui/help/business_help.h>
-#include <ui/models/notification_sound_model.h>
+#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <ui/workbench/workbench_context.h>
-
-#include <nx/utils/qset.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
+#include <nx/vms/common/system_settings.h>
+#include <nx/vms/event/action_parameters.h>
+#include <nx/vms/event/actions/actions.h>
+#include <nx/vms/event/events/events.h>
+#include <nx/vms/event/strings_helper.h>
 #include <nx/vms/text/human_readable.h>
+#include <ui/help/business_help.h>
+#include <ui/help/help_topics.h>
+#include <ui/models/notification_sound_model.h>
+#include <ui/workbench/workbench_context.h>
 #include <utils/media/audio_player.h>
-#include <nx/network/http/http_types.h>
-
-#include <nx/reflect/string_conversion.h>
-#include <core/resource_access/resource_access_subject.h>
 
 using namespace nx;
 

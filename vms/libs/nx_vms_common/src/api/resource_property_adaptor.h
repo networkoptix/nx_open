@@ -123,13 +123,15 @@ class NX_VMS_COMMON_API QnAbstractResourcePropertyAdaptor:
 
 public:
     QnAbstractResourcePropertyAdaptor(
-        const QString &key,
+        const QString& key,
         const QVariant& defaultValue,
-        QnAbstractResourcePropertyHandler *handler,
-        QObject *parent = NULL);
+        QnAbstractResourcePropertyHandler* handler,
+        QObject* parent = NULL,
+        std::function<QString()> label = nullptr);
     virtual ~QnAbstractResourcePropertyAdaptor();
 
-    const QString &key() const;
+    const QString& key() const;
+    QString label() const;
 
     QnResourcePtr resource() const;
     void setResource(const QnResourcePtr &resource);
@@ -153,9 +155,11 @@ public:
 
     bool isReadOnly() const { return m_isReadOnly; }
     bool isWriteOnly() const { return m_isWriteOnly; }
+    bool isOwnerOnly() const { return m_isOwnerOnly; }
 
     void markReadOnly() { m_isReadOnly = true; }
     void markWriteOnly() { m_isWriteOnly = true; }
+    void markOwnerOnly() { m_isOwnerOnly = true; }
 
 signals:
     void valueChanged();
@@ -181,6 +185,7 @@ private:
 
 private:
     const QString m_key;
+    const std::function<QString()> m_label;
     const QVariant m_defaultValue;
     const QScopedPointer<QnAbstractResourcePropertyHandler> m_handler;
     QAtomicInt m_pendingSave;
@@ -192,6 +197,7 @@ private:
 
     bool m_isReadOnly = false;
     bool m_isWriteOnly = false;
+    bool m_isOwnerOnly = false;
 };
 
 template<class T>
@@ -201,11 +207,13 @@ public:
     QnResourcePropertyAdaptor(
         const QString& key,
         QnResourcePropertyHandler<T>* handler,
-        const T& defaultValue = T(),
+        const T& defaultValue,
         std::function<bool(const T&)> isValueValid = nullptr,
-        QObject* parent = NULL)
+        QObject* parent = NULL,
+        std::function<QString()> label = nullptr)
         :
-        QnAbstractResourcePropertyAdaptor(key, QVariant::fromValue(defaultValue), handler, parent),
+        QnAbstractResourcePropertyAdaptor(
+            key, QVariant::fromValue(defaultValue), handler, parent, std::move(label)),
         m_type(qMetaTypeId<T>()),
         m_defaultValue(defaultValue),
         m_isValueValid(std::move(isValueValid))
@@ -219,9 +227,10 @@ public:
         const QString& key,
         QnResourcePropertyHandler<T>* handler,
         const T& defaultValue,
-        QObject* parent)
+        QObject* parent,
+        std::function<QString()> label = nullptr)
         :
-        QnResourcePropertyAdaptor(key, handler, defaultValue, nullptr, parent)
+        QnResourcePropertyAdaptor(key, handler, defaultValue, nullptr, parent, std::move(label))
     {
     }
 

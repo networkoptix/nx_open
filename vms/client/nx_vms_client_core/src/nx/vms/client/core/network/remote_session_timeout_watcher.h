@@ -9,7 +9,7 @@
 
 #include <nx/utils/impl_ptr.h>
 
-class QnGlobalSettings;
+namespace nx::vms::common { class SystemSettings; }
 
 namespace nx::vms::client::core {
 
@@ -21,7 +21,7 @@ class NX_VMS_CLIENT_CORE_API RemoteSessionTimeoutWatcher: public QObject
     using base_type = QObject;
 
 public:
-    RemoteSessionTimeoutWatcher(QnGlobalSettings* globalSettings, QObject* parent = nullptr);
+    RemoteSessionTimeoutWatcher(nx::vms::common::SystemSettings* globalSettings, QObject* parent = nullptr);
     virtual ~RemoteSessionTimeoutWatcher() override;
 
     void tick();

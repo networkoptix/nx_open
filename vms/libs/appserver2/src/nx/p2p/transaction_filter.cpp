@@ -2,13 +2,11 @@
 
 #include "transaction_filter.h"
 
+#include <core/resource/user_resource.h>
+#include <nx/cloud/db/client/data/auth_data.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/string.h>
-
-#include <nx/cloud/db/client/data/auth_data.h>
-
-#include <api/global_settings.h>
-#include <core/resource/user_resource.h>
+#include <nx/vms/common/system_settings.h>
 
 namespace nx::p2p {
 

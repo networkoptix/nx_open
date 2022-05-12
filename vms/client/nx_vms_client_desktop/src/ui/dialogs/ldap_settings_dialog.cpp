@@ -6,22 +6,23 @@
 #include <QtCore/QTimer>
 #include <QtWidgets/QPushButton>
 
-#include <api/global_settings.h>
 #include <api/server_rest_connection.h>
 #include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/common/system_settings.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/ldap.h>
 
 using namespace nx;
+using namespace nx::vms::common;
 
 namespace {
     /** Special value, used when the user has pressed "Test" button. */
@@ -63,8 +64,10 @@ QnLdapSettingsDialogPrivate::QnLdapSettingsDialogPrivate(QnLdapSettingsDialog *p
     , testHandle(kTestInvalidHandle)
     , timeoutTimer(new QTimer(parent))
 {
-    connect(globalSettings(), &QnGlobalSettings::ldapSettingsChanged, this, &QnLdapSettingsDialogPrivate::updateFromSettings);
-    connect(timeoutTimer, &QTimer::timeout, this, &QnLdapSettingsDialogPrivate::at_timeoutTimer_timeout);
+    connect(globalSettings(), &SystemSettings::ldapSettingsChanged,
+        this, &QnLdapSettingsDialogPrivate::updateFromSettings);
+    connect(timeoutTimer, &QTimer::timeout,
+        this, &QnLdapSettingsDialogPrivate::at_timeoutTimer_timeout);
 }
 
 void QnLdapSettingsDialogPrivate::testSettings()

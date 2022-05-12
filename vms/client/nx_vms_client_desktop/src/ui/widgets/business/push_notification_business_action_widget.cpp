@@ -6,31 +6,25 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtWidgets/QAction>
 
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
-
-#include <api/global_settings.h>
-
 #include <business/business_resource_validation.h>
 #include <core/resource/user_resource.h>
-
+#include <nx/branding.h>
+#include <nx/network/app_info.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
-
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-
+#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
-
-#include <nx/network/app_info.h>
-#include <nx/branding.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <nx/vms/client/desktop/style/custom_style.h>
-
 using namespace nx::vms::client::desktop::ui;
+using namespace nx::vms::common;
 
 namespace {
 
@@ -113,7 +107,7 @@ PushNotificationBusinessActionWidget::PushNotificationBusinessActionWidget(QWidg
 
     connect(
         base_type::globalSettings(),
-        &QnGlobalSettings::cloudSettingsChanged,
+        &SystemSettings::cloudSettingsChanged,
         this,
         &PushNotificationBusinessActionWidget::updateCurrentTab);
     updateCurrentTab();

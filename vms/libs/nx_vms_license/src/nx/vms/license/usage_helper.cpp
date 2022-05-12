@@ -14,15 +14,15 @@
 #include <boost/algorithm/cxx11/all_of.hpp>
 #include <boost/algorithm/cxx11/any_of.hpp>
 
-#include <api/global_settings.h>
 #include <api/runtime_info_manager.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource/videowall_resource.h>
-#include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/types/connection_types.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/system_settings.h>
 
 #include "validator.h"
 

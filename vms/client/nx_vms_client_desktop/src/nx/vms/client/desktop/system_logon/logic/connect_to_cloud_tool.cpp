@@ -2,13 +2,12 @@
 
 #include "connect_to_cloud_tool.h"
 
-#include <api/global_settings.h>
 #include <api/server_rest_connection.h>
 #include <client_core/client_core_module.h>
 #include <cloud/cloud_result_info.h>
 #include <common/common_module.h>
-#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
 #include <nx/branding.h>
 #include <nx/utils/async_handler_executor.h>
 #include <nx/utils/guarded_callback.h>
@@ -19,6 +18,7 @@
 #include <nx/vms/client/desktop/system_logon/ui/oauth_login_dialog.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/dialogs/session_refresh_dialog.h>
+#include <nx/vms/common/system_settings.h>
 #include <ui/dialogs/cloud/cloud_result_messages.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <watchers/cloud_status_watcher.h>

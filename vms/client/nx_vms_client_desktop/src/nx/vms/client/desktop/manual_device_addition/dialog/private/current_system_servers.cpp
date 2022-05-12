@@ -3,11 +3,10 @@
 #include "current_system_servers.h"
 
 #include <common/common_module.h>
-#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-
+#include <core/resource/media_server_resource.h>
 #include <nx/utils/log/log.h>
-#include <api/global_settings.h>
+#include <nx/vms/common/system_settings.h>
 
 namespace {
 

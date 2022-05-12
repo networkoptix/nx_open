@@ -6,13 +6,12 @@
 #include <QtConcurrent/QtConcurrent>
 #include <QtCore/QTimer>
 
-#include <api/global_settings.h>
 #include <api/helpers/send_statistics_request_data.h>
 #include <api/server_rest_connection.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
-#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
 #include <nx/build_info.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/guarded_callback.h>
@@ -20,6 +19,7 @@
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/desktop/statistics/statistics_settings_watcher.h>
+#include <nx/vms/common/system_settings.h>
 #include <statistics/abstract_statistics_module.h>
 #include <statistics/abstract_statistics_storage.h>
 

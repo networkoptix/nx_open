@@ -2,7 +2,6 @@
 
 #include "cloud_url_helper.h"
 
-#include <api/global_settings.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <nx/branding.h>
@@ -11,6 +10,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/utils/system_uri.h>
 
 using namespace nx::vms::utils;

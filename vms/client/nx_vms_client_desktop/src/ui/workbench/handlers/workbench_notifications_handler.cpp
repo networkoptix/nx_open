@@ -8,7 +8,7 @@
 #include <QtGui/QGuiApplication>
 #include <QtWidgets/QAction>
 
-#include <api/global_settings.h>
+#include <nx/vms/common/system_settings.h>
 #include <business/business_resource_validation.h>
 #include <camera/camera_bookmarks_manager.h>
 #include <client/client_globals.h>

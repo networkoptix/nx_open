@@ -2,9 +2,9 @@
 
 #include "cloud_system_information_watcher.h"
 
-#include <api/global_settings.h>
 #include <client_core/client_core_settings.h>
 #include <common/common_module.h>
+#include <nx/vms/common/system_settings.h>
 #include <watchers/cloud_status_watcher.h>
 
 class QnCloudSystemInformationWatcherPrivate : public QObject

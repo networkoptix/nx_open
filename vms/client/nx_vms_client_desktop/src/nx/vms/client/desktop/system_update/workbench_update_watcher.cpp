@@ -6,11 +6,10 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QPushButton>
 
-#include <api/global_settings.h>
 #include <client/client_settings.h>
 #include <common/common_module.h>
-#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
 #include <network/system_helpers.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/random.h>
@@ -20,6 +19,7 @@
 #include <nx/vms/client/desktop/system_update/update_contents.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/update/tools.h>
 #include <nx/vms/update/update_check.h>
 #include <ui/dialogs/common/message_box.h>
@@ -34,6 +34,7 @@
 using namespace std::chrono;
 
 using namespace nx::vms::client::desktop::ui;
+using namespace nx::vms::common;
 
 namespace {
     constexpr int kUpdatePeriodMSec = 1000; //< 1 second.
@@ -65,7 +66,7 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
 
     m_autoChecksEnabled = globalSettings()->isUpdateNotificationsEnabled();
 
-    connect(globalSettings(), &QnGlobalSettings::updateNotificationsChanged, this,
+    connect(globalSettings(), &SystemSettings::updateNotificationsChanged, this,
         [this]()
         {
             m_autoChecksEnabled = globalSettings()->isUpdateNotificationsEnabled();

@@ -14,14 +14,14 @@
 #include <QtGui/QDesktopServices>
 #include <QtWidgets/QMenu>
 
-#include <api/global_settings.h>
 #include <client/client_message_processor.h>
 #include <client/client_settings.h>
 #include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
-#include <core/resource_management/resource_pool.h>
 #include <network/system_helpers.h>
+#include <nx_ec/abstract_ec_connection.h>
 #include <nx/branding.h>
 #include <nx/utils/app_info.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -35,8 +35,8 @@
 #include <nx/vms/client/desktop/ui/dialogs/eula_dialog.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/update/tools.h>
-#include <nx_ec/abstract_ec_connection.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/message_box.h>
@@ -56,6 +56,7 @@
 #include "workbench_update_watcher.h"
 
 using namespace nx::vms::client::desktop::ui;
+using namespace nx::vms::common;
 
 namespace {
 
@@ -278,7 +279,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
                 QDesktopServices::openUrl(m_updateInfo.info.releaseNotesUrl);
         });
 
-    connect(globalSettings(), &QnGlobalSettings::cloudSettingsChanged, this,
+    connect(globalSettings(), &SystemSettings::cloudSettingsChanged, this,
         [this]()
         {
             if (m_widgetState != WidgetUpdateState::ready
@@ -331,7 +332,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
         this, &MultiServerUpdatesWidget::atStartInstallComplete,
         Qt::ConnectionType::QueuedConnection);
 
-    connect(globalSettings(), &QnGlobalSettings::localSystemIdChanged, this,
+    connect(globalSettings(), &SystemSettings::localSystemIdChanged, this,
         [this]()
         {
             auto systemId = globalSettings()->localSystemId();

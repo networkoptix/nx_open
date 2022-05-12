@@ -10,13 +10,12 @@
 #include <QtGui/QKeyEvent>
 #include <QtWidgets/QMenu>
 
-#include <api/global_settings.h>
 #include <client/client_settings.h>
 #include <common/common_module.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
@@ -28,6 +27,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/dialogs/force_secure_auth_dialog.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
+#include <nx/vms/common/system_settings.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/ldap_settings_dialog.h>
@@ -46,6 +46,7 @@
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
+using namespace nx::vms::common;
 
 namespace {
 
@@ -233,7 +234,7 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
     SnappedScrollBar *scrollBar = new SnappedScrollBar(this);
     ui->usersTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
-    connect(globalSettings(), &QnGlobalSettings::ldapSettingsChanged, this, &QnUserManagementWidget::updateLdapState);
+    connect(globalSettings(), &SystemSettings::ldapSettingsChanged, this, &QnUserManagementWidget::updateLdapState);
     connect(ui->usersTable,   &QAbstractItemView::clicked,            this, &QnUserManagementWidget::at_usersTable_clicked);
 
     connect(ui->createUserButton,        &QPushButton::clicked,  this,  &QnUserManagementWidget::createUser);

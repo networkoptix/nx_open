@@ -2,10 +2,12 @@
 
 #include "time_sync_manager.h"
 
-#include <api/global_settings.h>
 #include <common/common_module.h>
 #include <network/router.h>
 #include <nx_ec/managers/abstract_time_manager.h>
+#include <nx/vms/common/system_settings.h>
+
+using namespace nx::vms::common;
 
 namespace nx::vms::client::core {
 
@@ -14,7 +16,7 @@ TimeSyncManager::TimeSyncManager(QnCommonModule* commonModule, const QnUuid& ser
     m_serverId(serverId)
 {
     connect(globalSettings(),
-        &QnGlobalSettings::timeSynchronizationSettingsChanged,
+        &SystemSettings::timeSynchronizationSettingsChanged,
         this,
         &TimeSyncManager::resync);
 }

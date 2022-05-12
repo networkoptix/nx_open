@@ -6,17 +6,18 @@
 #include <QtCore/QTimer>
 #include <QtCore/QUrl>
 
-#include <api/global_settings.h>
 #include <api/model/ping_reply.h>
 #include <api/network_proxy_factory.h>
 #include <api/runtime_info_manager.h>
 #include <api/server_rest_connection.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/edge/edge_server_state_tracker.h>
-#include <core/resource/storage_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/server_additional_addresses_dictionary.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/edge/edge_server_state_tracker.h>
+#include <core/resource/storage_resource.h>
+#include <nx_ec/abstract_ec_connection.h>
+#include <nx_ec/data/api_conversion_functions.h>
 #include <nx/analytics/properties.h>
 #include <nx/branding.h>
 #include <nx/network/app_info.h>
@@ -31,13 +32,13 @@
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
 #include <nx/vms/common/system_context.h>
-#include <nx_ec/abstract_ec_connection.h>
-#include <nx_ec/data/api_conversion_functions.h>
+#include <nx/vms/common/system_settings.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/sleep.h>
 #include <utils/common/util.h>
 
 using namespace nx;
+using namespace nx::vms::common;
 
 namespace {
 
@@ -776,7 +777,7 @@ void QnMediaServerResource::setSystemContext(nx::vms::common::SystemContext* sys
 
         const auto& settings = context->globalSettings();
         connect(settings,
-            &QnGlobalSettings::cloudSettingsChanged,
+            &SystemSettings::cloudSettingsChanged,
             this,
             &QnMediaServerResource::at_cloudSettingsChanged,
             Qt::DirectConnection);

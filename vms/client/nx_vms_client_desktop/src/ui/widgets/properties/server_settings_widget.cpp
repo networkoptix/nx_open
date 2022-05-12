@@ -12,17 +12,16 @@
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QStyledItemDelegate>
 
-#include <api/global_settings.h>
 #include <api/model/audit/audit_record.h>
 #include <api/server_rest_connection.h>
 #include <camera/camera_data_manager.h>
 #include <client/client_model_types.h>
 #include <client/client_settings.h>
 #include <common/common_module.h>
-#include <core/resource/device_dependent_strings.h>
-#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
+#include <core/resource/device_dependent_strings.h>
+#include <core/resource/media_server_resource.h>
 #include <nx/network/rest/result.h>
 #include <nx/network/ssl/certificate.h>
 #include <nx/utils/guarded_callback.h>
@@ -35,6 +34,7 @@
 #include <nx/vms/client/desktop/system_logon/ui/server_certificate_viewer.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/system_settings.h>
 #include <ui/common/read_only.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -235,7 +235,7 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/) :
         emit hasChangesChanged();
     });
 
-    connect(ui->locationIdSpinBox, QnSpinboxIntValueChanged, this, 
+    connect(ui->locationIdSpinBox, QnSpinboxIntValueChanged, this,
         [this]
         {
             updateFailoverLabel();

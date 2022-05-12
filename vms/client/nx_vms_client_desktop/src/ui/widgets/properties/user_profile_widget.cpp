@@ -3,17 +3,17 @@
 #include "user_profile_widget.h"
 #include "ui_user_profile_widget.h"
 
-#include <api/global_settings.h>
-#include <client/client_settings.h>
 #include <client_core/client_core_settings.h>
+#include <client/client_settings.h>
 #include <common/common_module.h>
-#include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
+#include <core/resource/user_resource.h>
 #include <helpers/system_helpers.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_logon/logic/context_current_user_watcher.h>
+#include <nx/vms/common/system_settings.h>
 #include <ui/common/read_only.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/resource_properties/change_user_password_dialog.h>

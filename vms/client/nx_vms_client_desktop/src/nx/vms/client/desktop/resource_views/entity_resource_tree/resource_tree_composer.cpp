@@ -4,21 +4,20 @@
 
 #include <functional>
 
+#include <client/client_globals.h>
 #include <common/common_module.h>
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/resource_access_subject.h>
-#include <api/global_settings.h>
-
-#include <client/client_globals.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
-#include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/unique_key_composition_entity.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/flattening_group_entity.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
+#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/flattening_group_entity.h>
+#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/unique_key_composition_entity.h>
+#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
+#include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>
+#include <nx/vms/common/system_settings.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 
 namespace nx::vms::client::desktop {

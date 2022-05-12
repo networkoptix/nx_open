@@ -3,23 +3,19 @@
 #include "system_settings_widget.h"
 #include "ui_system_settings_widget.h"
 
-#include <api/global_settings.h>
-
-#include <common/common_module.h>
-
-#include <core/resource/device_dependent_strings.h>
-
 #include <client/client_globals.h>
-
+#include <common/common_module.h>
+#include <core/resource/device_dependent_strings.h>
+#include <nx/branding.h>
+#include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/common/system_settings.h>
 #include <ui/common/read_only.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <nx/vms/client/desktop/style/custom_style.h>
 #include <ui/models/translation_list_model.h>
 
-#include <nx/branding.h>
-
 using namespace nx::vms::client::desktop;
+using namespace nx::vms::common;
 
 QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     base_type(parent),
@@ -72,13 +68,13 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     retranslateUi();
 
     /* Let suggest these options are changes so rare, so we can safely drop unsaved changes. */
-    connect(globalSettings(), &QnGlobalSettings::autoDiscoveryChanged,                this,   &QnSystemSettingsWidget::loadDataToUi);
-    connect(globalSettings(), &QnGlobalSettings::cameraSettingsOptimizationChanged,   this,   &QnSystemSettingsWidget::loadDataToUi);
-    connect(globalSettings(), &QnGlobalSettings::statisticsAllowedChanged,            this,   &QnSystemSettingsWidget::loadDataToUi);
+    connect(globalSettings(), &SystemSettings::autoDiscoveryChanged,                this,   &QnSystemSettingsWidget::loadDataToUi);
+    connect(globalSettings(), &SystemSettings::cameraSettingsOptimizationChanged,   this,   &QnSystemSettingsWidget::loadDataToUi);
+    connect(globalSettings(), &SystemSettings::statisticsAllowedChanged,            this,   &QnSystemSettingsWidget::loadDataToUi);
 
     connect(
         globalSettings(),
-        &QnGlobalSettings::cloudSettingsChanged,
+        &SystemSettings::cloudSettingsChanged,
         this,
         &QnSystemSettingsWidget::loadDataToUi);
 }

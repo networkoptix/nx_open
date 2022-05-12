@@ -2,18 +2,18 @@
 
 #include "p2p_connection.h"
 
-#include <api/global_settings.h>
 #include <api/runtime_info_manager.h>
 #include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_management/resource_pool.h>
+#include <nx_ec/abstract_ec_connection.h>
 #include <nx/metrics/metrics_storage.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/nx_network_ini.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/vms/common/system_context.h>
-#include <nx_ec/abstract_ec_connection.h>
+#include <nx/vms/common/system_settings.h>
 
 namespace nx {
 namespace p2p {

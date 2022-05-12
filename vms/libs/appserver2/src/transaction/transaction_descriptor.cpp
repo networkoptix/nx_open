@@ -6,7 +6,6 @@
 
 #include <QtCore/QCryptographicHash>
 
-#include <api/global_settings.h>
 #include <common/common_module.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
@@ -25,6 +24,7 @@
 #include <nx/cloud/db/client/data/auth_data.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/license/usage_helper.h>
 
 #include "amend_transaction_data.h"

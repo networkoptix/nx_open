@@ -2,16 +2,16 @@
 
 #include "manager.h"
 
-#include <api/global_settings.h>
 #include <common/common_module.h>
-#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <nx_ec/data/api_conversion_functions.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
-#include <nx_ec/data/api_conversion_functions.h>
+#include <nx/vms/common/system_settings.h>
 
 #include "deprecated_multicast_finder.h"
 #include "module_connector.h"

@@ -25,7 +25,6 @@
 #include <QtWidgets/QGraphicsSceneWheelEvent>
 #include <QtWidgets/QGraphicsView>
 
-#include <api/global_settings.h>
 #include <client/client_runtime_settings.h>
 #include <core/resource/camera_bookmark.h>
 #include <nx/utils/math/arithmetic.h>
@@ -38,16 +37,17 @@
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail_loading_manager.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail_panel.h>
 #include <nx/vms/client/desktop/workbench/timeline/timeline_globals.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/text/time_strings.h>
 #include <nx/vms/time/formatter.h>
-#include <recording/time_period.h>
+#include <qt_graphics_items/graphics_label.h>
+#include <qt_graphics_items/graphics_slider_p.h>
 #include <recording/time_period_list.h>
+#include <recording/time_period.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/items/controls/bookmarks_viewer.h>
 #include <ui/graphics/items/controls/time_slider_pixmap_cache.h>
-#include <qt_graphics_items/graphics_label.h>
-#include <qt_graphics_items/graphics_slider_p.h>
 #include <ui/help/help_topics.h>
 #include <ui/processors/drag_processor.h>
 #include <ui/processors/kinetic_cutting_processor.h>
@@ -67,6 +67,7 @@ using std::chrono::milliseconds;
 using namespace std::literals::chrono_literals;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::workbench::timeline;
+using namespace nx::vms::common;
 using nx::vms::client::core::Geometry;
 
 namespace {
@@ -729,7 +730,7 @@ QnTimeSlider::QnTimeSlider(
     connect(qApp, &QApplication::focusChanged, this,
         [this](QWidget* old, QWidget* /*now*/) { m_lastFocusedWidget = old; });
 
-    connect(globalSettings(), &QnGlobalSettings::showMouseTimelinePreviewChanged,
+    connect(globalSettings(), &SystemSettings::showMouseTimelinePreviewChanged,
         [this]
         {
             m_useLivePreview = ini().enableTimelinePreview

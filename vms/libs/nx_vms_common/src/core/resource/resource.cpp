@@ -6,19 +6,21 @@
 
 #include <QtCore/QMetaObject>
 
-#include <api/global_settings.h>
-#include <core/resource/camera_advanced_param.h>
 #include <core/resource_management/resource_management_ini.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/status_dictionary.h>
-#include <nx/vms/common/system_context.h>
+#include <core/resource/camera_advanced_param.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/resource_data.h>
+#include <nx/vms/common/system_context.h>
+#include <nx/vms/common/system_settings.h>
 #include <utils/common/util.h>
 
 #include "resource_consumer.h"
+
+using namespace nx::vms::common;
 
 namespace {
 
@@ -32,7 +34,7 @@ QString hidePasswordIfCredentialsPropety(const QString& key, const QString& valu
     {
         return value.left(value.indexOf(':')) + ":******";
     }
-    else if (key == nx::settings_names::kNameSmtpPassword)
+    else if (key == SystemSettings::Names::smtpPassword)
     {
         return "******";
     }

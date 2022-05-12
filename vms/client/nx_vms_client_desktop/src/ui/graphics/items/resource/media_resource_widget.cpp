@@ -16,17 +16,16 @@
 #include <qt_graphics_items/graphics_stacked_widget.h>
 
 #include <api/common_message_processor.h>
-#include <api/global_settings.h>
 #include <api/server_rest_connection.h>
 #include <camera/cam_display.h>
 #include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h> //< TODO: #sivanov Remove this dependency.
 #include <camera/resource_display.h>
+#include <client_core/client_core_module.h>
 #include <client/client_globals.h>
 #include <client/client_module.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
-#include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/ptz/activity_ptz_controller.h>
 #include <core/ptz/fallback_ptz_controller.h>
@@ -35,6 +34,10 @@
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/tour_ptz_controller.h>
 #include <core/ptz/viewport_ptz_controller.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_runtime_data.h>
+#include <core/resource_management/resources_changes_manager.h>
+#include <core/resource_management/user_roles_manager.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/client_camera.h>
@@ -44,10 +47,6 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_runtime_data.h>
-#include <core/resource_management/resources_changes_manager.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <nx/analytics/metadata_log_parser.h>
 #include <nx/network/cloud/protocol_type.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
@@ -84,10 +83,11 @@
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/crypt/crypt.h>
 #include <nx/vms/event/actions/abstract_action.h>
-#include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
+#include <nx/vms/event/rule.h>
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/license/usage_helper.h>
 #include <nx/vms/time/formatter.h>
@@ -129,6 +129,7 @@ using namespace std::chrono;
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::analytics;
+using namespace nx::vms::common;
 using namespace nx::vms::api;
 using namespace ui;
 
@@ -249,7 +250,7 @@ void drawCrosshair(QPainter* painter, const QRectF& rect)
 } // namespace
 
 QnMediaResourceWidget::QnMediaResourceWidget(
-    SystemContext* systemContext,
+    nx::vms::client::desktop::SystemContext* systemContext,
     WindowContext* windowContext,
     QnWorkbenchItem* item,
     QGraphicsItem* parent)
@@ -431,7 +432,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(
 
     updateWatermark();
     connect(systemContext->globalSettings(),
-        &QnGlobalSettings::watermarkChanged,
+        &SystemSettings::watermarkChanged,
         this,
         &QnMediaResourceWidget::updateWatermark);
     connect(windowContext->workbenchContext(),

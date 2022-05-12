@@ -8,7 +8,6 @@
 #include <QtWidgets/QTableView>
 
 #include <api/server_rest_connection.h>
-#include <api/global_settings.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
@@ -17,9 +16,10 @@
 #include <core/resource/user_resource.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
-#include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/common/widgets/checkable_header_view.h>
+#include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/common/system_settings.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/models/ldap_user_list_model.h>

@@ -6,17 +6,17 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QPushButton>
 
-#include <api/global_settings.h>
 #include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>
 #include <nx/vms/client/desktop/resource_dialogs/models/resource_selection_decorator_model.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>
+#include <nx/vms/common/system_settings.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 

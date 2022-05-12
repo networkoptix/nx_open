@@ -5,13 +5,12 @@
 #include <QtQuick/QQuickItem>
 #include <QtWidgets/QWidget>
 
-#include <api/global_settings.h>
-#include <client/client_module.h>
 #include <client_core/client_core_module.h>
+#include <client/client_module.h>
 #include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource_management/resource_pool.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/utils/qml_property.h>
@@ -22,6 +21,7 @@
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
 #include <nx/vms/client/desktop/resource_views/models/resource_tree_icon_decorator_model.h>
 #include <nx/vms/client/desktop/system_update/client_update_manager.h>
+#include <nx/vms/common/system_settings.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
