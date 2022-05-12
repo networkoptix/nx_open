@@ -2,14 +2,13 @@
 
 #include "security_cam_resource.h"
 
-#include <api/global_settings.h>
 #include <api/model/api_ioport_data.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/resource_data.h>
-#include <core/resource/user_resource.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/resource_data.h>
+#include <core/resource/user_resource.h>
 #include <licensing/license.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/reflect/string_conversion.h>
@@ -18,6 +17,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/data/backup_settings.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/system_settings.h>
 #include <recording/time_period_list.h>
 #include <utils/camera/camera_bitrate_calculator.h>
 #include <utils/common/synctime.h>

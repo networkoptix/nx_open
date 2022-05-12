@@ -5,13 +5,12 @@
 
 #include <QtCore/QScopedValueRollback>
 
-#include <api/global_settings.h>
 #include <api/server_rest_connection.h>
 #include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/client_camera.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>
@@ -22,6 +21,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/system_settings.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/system_administration_dialog.h>

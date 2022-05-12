@@ -13,7 +13,6 @@
 class QnCameraHistoryPool;
 class QnCommonMessageProcessor;
 class QnGlobalPermissionsManager;
-class QnGlobalSettings;
 class QnLayoutTourManager;
 class QnLicensePool;
 class QnResourceAccessSubjectsCache;
@@ -40,6 +39,7 @@ namespace nx::vms::rules { class Engine; }
 namespace nx::vms::common {
 
 class AbstractCertificateVerifier;
+class SystemSettings;
 
 /**
  * Storage for the application Resource Context classes. One Resource Context corresponds to one
@@ -161,7 +161,7 @@ public:
      * System settings, which do not depend on any Device or Server and are applied globally.
      * Currently stored as Resource Properties for the `admin` User.
      */
-    QnGlobalSettings* globalSettings() const;
+    SystemSettings* globalSettings() const;
 
     /**
      * List of all User Roles.

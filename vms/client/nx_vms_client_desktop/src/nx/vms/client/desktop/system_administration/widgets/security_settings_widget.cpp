@@ -3,11 +3,10 @@
 #include "security_settings_widget.h"
 #include "ui_security_settings_widget.h"
 
-#include <api/global_settings.h>
 #include <api/server_rest_connection.h>
 #include <common/common_module.h>
-#include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/user_resource.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/desktop/common/dialogs/repeated_password_dialog.h>
 #include <nx/vms/client/desktop/common/widgets/hint_button.h>
@@ -15,6 +14,7 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/watermark/watermark_edit_settings.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/text/human_readable.h>
 #include <ui/common/read_only.h>
 #include <ui/dialogs/common/message_box.h>
@@ -22,6 +22,8 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/workaround/widgets_signals_workaround.h>
+
+using namespace nx::vms::common;
 
 namespace {
 
@@ -193,19 +195,19 @@ SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
     /* Let suggest these options are changes so rare, so we can safely drop unsaved changes. */
-    connect(globalSettings(), &QnGlobalSettings::auditTrailEnableChanged, this,
+    connect(globalSettings(), &SystemSettings::auditTrailEnableChanged, this,
         &SecuritySettingsWidget::loadDataToUi);
-    connect(globalSettings(), &QnGlobalSettings::trafficEncryptionForcedChanged, this,
+    connect(globalSettings(), &SystemSettings::trafficEncryptionForcedChanged, this,
         &SecuritySettingsWidget::loadDataToUi);
-    connect(globalSettings(), &QnGlobalSettings::videoTrafficEncryptionForcedChanged, this,
+    connect(globalSettings(), &SystemSettings::videoTrafficEncryptionForcedChanged, this,
         &SecuritySettingsWidget::loadDataToUi);
-    connect(globalSettings(), &QnGlobalSettings::watermarkChanged, this,
+    connect(globalSettings(), &SystemSettings::watermarkChanged, this,
         &SecuritySettingsWidget::loadDataToUi);
-    connect(globalSettings(), &QnGlobalSettings::sessionTimeoutChanged, this,
+    connect(globalSettings(), &SystemSettings::sessionTimeoutChanged, this,
         &SecuritySettingsWidget::loadDataToUi);
-    connect(globalSettings(), &QnGlobalSettings::useStorageEncryptionChanged, this,
+    connect(globalSettings(), &SystemSettings::useStorageEncryptionChanged, this,
         &SecuritySettingsWidget::loadDataToUi);
-    connect(globalSettings(), &QnGlobalSettings::showServersInTreeForNonAdminsChanged, this,
+    connect(globalSettings(), &SystemSettings::showServersInTreeForNonAdminsChanged, this,
         &SecuritySettingsWidget::loadDataToUi);
 }
 

@@ -4,14 +4,14 @@
 
 #include <QtNetwork/QNetworkReply>
 
-#include <api/global_settings.h>
 #include <api/server_rest_connection.h>
 #include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource_management/resource_pool.h>
 #include <nx/network/http/http_types.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/common/system_settings.h>
 
 namespace CameraDiagnostics {
 

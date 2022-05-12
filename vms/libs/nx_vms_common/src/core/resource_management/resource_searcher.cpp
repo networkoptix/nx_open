@@ -2,12 +2,12 @@
 
 #include "resource_searcher.h"
 
-#include <core/resource/resource_type.h>
-#include <api/global_settings.h>
 #include <common/common_module.h>
+#include <core/resource/resource_type.h>
 #include <core/resource/resource.h>
-#include <nx/network/http/http_types.h>
 #include <nx/network/http/http_client.h>
+#include <nx/network/http/http_types.h>
+#include <nx/vms/common/system_settings.h>
 
 QnAbstractResourceSearcher::QnAbstractResourceSearcher(QnCommonModule* commonModule) noexcept:
     QnCommonModuleAware(commonModule),

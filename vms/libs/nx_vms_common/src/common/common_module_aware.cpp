@@ -6,6 +6,8 @@
 
 #include "common_module.h"
 
+using namespace nx::vms::common;
+
 QnCommonModuleAware::QnCommonModuleAware(QnCommonModule* commonModule)
 {
     init(commonModule);
@@ -152,7 +154,7 @@ QnResourceStatusDictionary* QnCommonModuleAware::statusDictionary() const
     return m_commonModule ? m_commonModule->systemContext()->resourceStatusDictionary() : nullptr;
 }
 
-QnGlobalSettings* QnCommonModuleAware::globalSettings() const
+SystemSettings* QnCommonModuleAware::globalSettings() const
 {
     NX_ASSERT(m_initialized);
     return m_commonModule ? m_commonModule->systemContext()->globalSettings() : nullptr;

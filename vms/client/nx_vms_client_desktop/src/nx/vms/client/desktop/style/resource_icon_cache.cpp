@@ -5,22 +5,22 @@
 #include <QtGui/QPainter>
 #include <QtGui/QPixmap>
 
-#include <api/global_settings.h>
 #include <client/client_globals.h>
+#include <core/resource_management/resource_runtime_data.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
-#include <core/resource_management/resource_runtime_data.h>
 #include <network/system_helpers.h>
+#include <nx_ec/abstract_ec_connection.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/system_context.h>
-#include <nx_ec/abstract_ec_connection.h>
+#include <nx/vms/common/system_settings.h>
 
 using namespace nx::vms::client::desktop;
 

@@ -4,12 +4,12 @@
 
 #include <QtCore/QCoreApplication>
 
-#include <api/global_settings.h>
 #include <core/resource/media_server_resource.h>
 #include <network/cloud_system_data.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/system_settings.h>
 #include <utils/common/id.h>
 
 namespace {

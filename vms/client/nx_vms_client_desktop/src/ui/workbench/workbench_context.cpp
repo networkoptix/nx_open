@@ -4,7 +4,6 @@
 
 #include <QtWidgets/QApplication>
 
-#include <api/global_settings.h>
 #include <client/client_message_processor.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
@@ -23,9 +22,10 @@
 #include <nx/vms/client/desktop/system_update/client_update_manager.h>
 #include <nx/vms/client/desktop/system_update/server_update_tool.h>
 #include <nx/vms/client/desktop/system_update/workbench_update_watcher.h>
-#include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
+#include <nx/vms/common/system_settings.h>
 #include <statistics/statistics_manager.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/graphics/instruments/gl_checker_instrument.h>
@@ -40,12 +40,12 @@
 #include <ui/widgets/main_window.h>
 #include <ui/workbench/watchers/workbench_desktop_camera_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_watcher.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_synchronizer.h>
+#include <ui/workbench/workbench.h>
 
 #if defined(Q_OS_LINUX)
     #include <ui/workaround/x11_launcher_workaround.h>

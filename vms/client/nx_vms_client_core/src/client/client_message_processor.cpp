@@ -2,23 +2,23 @@
 
 #include "client_message_processor.h"
 
-#include <api/global_settings.h>
 #include <client_core/client_core_module.h>
-#include <core/resource/layout_resource.h>
-#include <core/resource/media_server_resource.h>
 #include <core/resource_management/layout_tour_state_manager.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <nx_ec/abstract_ec_connection.h>
+#include <nx_ec/managers/abstract_layout_tour_manager.h>
+#include <nx_ec/managers/abstract_misc_manager.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/peer_alive_data.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/rules/engine_holder.h>
-#include <nx_ec/abstract_ec_connection.h>
-#include <nx_ec/managers/abstract_layout_tour_manager.h>
-#include <nx_ec/managers/abstract_misc_manager.h>
 #include <utils/common/synctime.h>
 
 using namespace nx::vms::client::core;

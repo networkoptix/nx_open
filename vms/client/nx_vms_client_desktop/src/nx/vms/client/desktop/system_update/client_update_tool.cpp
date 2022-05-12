@@ -4,10 +4,9 @@
 
 #include <QtCore/QCoreApplication>
 
-#include <api/global_settings.h>
 #include <api/server_rest_connection.h>
-#include <client/client_startup_parameters.h>
 #include <client_core/client_core_module.h>
+#include <client/client_startup_parameters.h>
 #include <common/common_module.h>
 #include <nx/build_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
@@ -24,6 +23,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/common/p2p/downloader/private/internet_only_peer_manager.h>
 #include <nx/vms/common/p2p/downloader/private/resource_pool_peer_manager.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/update/persistent_update_storage.h>
 #include <nx/vms/update/update_check.h>
 #include <utils/applauncher_utils.h>

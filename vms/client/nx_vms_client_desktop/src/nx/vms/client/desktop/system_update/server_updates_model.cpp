@@ -2,20 +2,18 @@
 
 #include <QtWidgets/QApplication>
 
-#include <nx/utils/string.h>
-
-#include <api/global_settings.h>
+#include <client/client_settings.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
-
-#include <client/client_settings.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <network/system_helpers.h>
+#include <nx/utils/string.h>
+#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/common/system_settings.h>
+#include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
+#include <ui/workbench/workbench_context.h>
 
 #include "server_updates_model.h"
 #include "peer_state_tracker.h"

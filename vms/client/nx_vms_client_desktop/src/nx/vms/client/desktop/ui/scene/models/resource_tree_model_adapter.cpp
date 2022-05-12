@@ -8,18 +8,17 @@
 #include <QtCore/QStack>
 #include <QtQml/QtQml>
 
-#include <api/global_settings.h>
 #include <client/client_globals.h>
 #include <client/client_module.h>
 #include <client/client_settings.h>
 #include <common/common_globals.h>
 #include <common/common_module.h>
+#include <core/resource_access/resource_access_filter.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
-#include <core/resource_access/resource_access_filter.h>
-#include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
@@ -32,6 +31,7 @@
 #include <nx/vms/client/desktop/ui/scene/models/resource_tree_squish_facade.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_manager.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_state.h>
+#include <nx/vms/common/system_settings.h>
 #include <ui/models/resource_search_proxy_model.h>
 #include <ui/workbench/handlers/workbench_action_handler.h>
 #include <ui/workbench/workbench_access_controller.h>

@@ -2,23 +2,23 @@
 
 #include "ec_connection_audit_manager.h"
 
-#include <audit/audit_manager.h>
-#include <utils/common/synctime.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/user_resource.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/camera_resource.h>
 #include <api/common_message_processor.h>
-#include <nx/vms/event/strings_helper.h>
-#include <nx/vms/event/rule.h>
-#include <nx/vms/event/rule_manager.h>
-#include <nx_ec/data/api_conversion_functions.h>
-#include <api/global_settings.h>
+#include <audit/audit_manager.h>
 #include <common/common_module.h>
-#include <nx_ec/managers/abstract_media_server_manager.h>
-#include <nx_ec/managers/abstract_camera_manager.h>
-#include <nx/vms/api/data/event_rule_data.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>
+#include <core/resource/user_resource.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <nx_ec/managers/abstract_camera_manager.h>
+#include <nx_ec/managers/abstract_media_server_manager.h>
+#include <nx/vms/api/data/event_rule_data.h>
+#include <nx/vms/common/system_settings.h>
+#include <nx/vms/event/rule_manager.h>
+#include <nx/vms/event/rule.h>
+#include <nx/vms/event/strings_helper.h>
+#include <utils/common/synctime.h>
 
 namespace ec2 {
 
@@ -187,14 +187,13 @@ void ECConnectionAuditManager::addAuditRecord(
     const ResourceParamWithRefDataList& params,
     const QnAuthSession& authInfo)
 {
-    QStringList settingNames;
+    std::map<QString, QString> settings;
     for (const auto& param: params)
     {
-        if (QnGlobalSettings::isGlobalSetting(param))
-            settingNames << param.name;
+        if (nx::vms::common::SystemSettings::isGlobalSetting(param))
+            settings[param.name] = param.value;
     }
-    if (!settingNames.isEmpty())
-        commonModule()->auditManager()->notifySettingsChanged(authInfo, settingNames);
+    commonModule()->auditManager()->notifySettingsChanged(authInfo, std::move(settings));
 }
 
 void ECConnectionAuditManager::addAuditRecord(

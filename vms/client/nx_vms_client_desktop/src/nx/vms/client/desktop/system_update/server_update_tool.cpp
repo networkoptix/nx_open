@@ -8,15 +8,15 @@
 #include <QtCore/QStorageInfo>
 #include <QtCore/QThread>
 
-#include <api/global_settings.h>
+#include <client_core/client_core_module.h>
 #include <client/client_module.h>
 #include <client/client_settings.h>
-#include <client_core/client_core_module.h>
 #include <common/common_module.h>
-#include <core/resource/fake_media_server.h>
-#include <core/resource/media_server_resource.h>
 #include <core/resource_management/incompatible_server_watcher.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/fake_media_server.h>
+#include <core/resource/media_server_resource.h>
+#include <nx_ec/abstract_ec_connection.h>
 #include <nx/branding.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
@@ -31,9 +31,9 @@
 #include <nx/vms/client/desktop/system_update/requests.h>
 #include <nx/vms/client/desktop/utils/upload_manager.h>
 #include <nx/vms/common/p2p/downloader/private/internet_only_peer_manager.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/update/tools.h>
 #include <nx/vms/update/update_check.h>
-#include <nx_ec/abstract_ec_connection.h>
 #include <utils/common/synctime.h>
 #include <watchers/cloud_status_watcher.h>
 

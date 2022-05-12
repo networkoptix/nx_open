@@ -4,27 +4,20 @@
 
 #include <QDateTime>
 
-#include <api/global_settings.h>
-
+#include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
-#include <common/common_module.h>
-
+#include <ec2_thread_pool.h>
+#include <nx/build_info.h>
+#include <nx/utils/app_info.h>
 #include <nx/utils/crash_dump/systemexcept.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/app_info.h>
 #include <nx/utils/timer_manager.h>
-
-#include <nx/vms/statistics/settings.h>
-
 #include <nx/vms/api/data/os_information.h>
-
+#include <nx/vms/common/system_settings.h>
+#include <nx/vms/statistics/settings.h>
 #include <utils/common/scoped_thread_rollback.h>
 #include <utils/common/synctime.h>
-
-#include <nx/build_info.h>
-
-#include "ec2_thread_pool.h"
 
 static const QString DATE_FORMAT = lit("yyyy-MM-dd_hh-mm-ss");
 static const QString SERVER_API_COMMAND = lit("crashserver/api/report");

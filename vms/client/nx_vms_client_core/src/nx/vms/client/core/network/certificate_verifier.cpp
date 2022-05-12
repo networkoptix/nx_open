@@ -8,7 +8,6 @@
 #include <QtCore/QFile>
 #include <QtCore/QPointer>
 
-#include <api/global_settings.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/network/nx_network_ini.h>
@@ -17,6 +16,7 @@
 #include <nx/network/ssl/helpers.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/ini.h>
+#include <nx/vms/common/system_settings.h>
 
 #include "certificate_storage.h"
 #include "remote_connection.h"

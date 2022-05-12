@@ -12,8 +12,8 @@
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/shared_item/shared_item.h>
 
 class QnCommonModule;
-class QnGlobalSettings;
 class QnLayoutTourManager;
+namespace nx::vms::common { class SystemSettings; }
 
 namespace nx::vms::api { struct UserRoleData; }
 
@@ -94,7 +94,7 @@ public:
 
 private:
     QnResourcePool* resourcePool() const;
-    QnGlobalSettings* globalSettings() const;
+    nx::vms::common::SystemSettings* globalSettings() const;
     QnLayoutTourManager* layoutTourManager() const;
 
 private:

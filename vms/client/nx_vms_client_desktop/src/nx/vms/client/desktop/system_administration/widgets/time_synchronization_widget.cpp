@@ -6,20 +6,20 @@
 #include <QtCore/QSortFilterProxyModel>
 #include <QtCore/QTimer>
 
-#include <api/global_settings.h>
 #include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
-#include <core/resource_management/resource_pool.h>
+#include <nx_ec/abstract_ec_connection.h>
 #include <nx/utils/algorithm/index_of.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
-#include <nx/vms/time/formatter.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/time_sync/time_sync_manager.h>
-#include <nx_ec/abstract_ec_connection.h>
+#include <nx/vms/time/formatter.h>
 #include <ui/common/read_only.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>

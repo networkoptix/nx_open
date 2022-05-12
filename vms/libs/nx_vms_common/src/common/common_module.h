@@ -162,7 +162,7 @@ public:
     QnCameraHistoryPool* cameraHistoryPool() const;
     QnResourcePropertyDictionary* resourcePropertyDictionary() const;
     QnResourceStatusDictionary* resourceStatusDictionary() const;
-    QnGlobalSettings* globalSettings() const;
+    nx::vms::common::SystemSettings* globalSettings() const;
     QnLayoutTourManager* layoutTourManager() const;
     nx::vms::event::RuleManager* eventRuleManager() const;
     QnResourceDataPool* resourceDataPool() const;

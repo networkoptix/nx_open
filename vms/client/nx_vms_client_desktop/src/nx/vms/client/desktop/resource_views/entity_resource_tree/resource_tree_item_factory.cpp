@@ -2,16 +2,16 @@
 
 #include "resource_tree_item_factory.h"
 
-#include <api/global_settings.h>
 #include <client/client_globals.h>
 #include <common/common_module.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/layout_resource.h>
-#include <core/resource/resource.h>
-#include <core/resource/resource_display_info.h>
-#include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource/resource_display_info.h>
+#include <core/resource/resource.h>
+#include <core/resource/user_resource.h>
+#include <finders/systems_finder.h>
 #include <nx/vms/api/data/user_role_data.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/generic_item/generic_item_builder.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/resource_item.h>
@@ -21,28 +21,29 @@
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/recorder_item_data_helper.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/common/system_settings.h>
 #include <ui/help/help_topics.h>
-#include <finders/systems_finder.h>
 
 namespace {
 
 using namespace nx::vms::client::desktop::entity_item_model;
 using namespace nx::vms::client::desktop::entity_resource_tree;
+using namespace nx::vms::common;
 
 //-------------------------------------------------------------------------------------------------
 // Provider and invalidator pair factory functions for the header system name name generic item.
 //-------------------------------------------------------------------------------------------------
-GenericItem::DataProvider systemNameProvider(const QnGlobalSettings* globalSettings)
+GenericItem::DataProvider systemNameProvider(const SystemSettings* globalSettings)
 {
     return [globalSettings] { return globalSettings->systemName(); };
 }
 
-InvalidatorPtr systemNameInvalidator(const QnGlobalSettings* globalSettings)
+InvalidatorPtr systemNameInvalidator(const SystemSettings* globalSettings)
 {
     auto result = std::make_shared<Invalidator>();
 
     result->connections()->add(globalSettings->connect(
-        globalSettings, &QnGlobalSettings::systemNameChanged, globalSettings,
+        globalSettings, &SystemSettings::systemNameChanged, globalSettings,
         [invalidator = result.get()] { invalidator->invalidate(); }));
 
     return result;
@@ -466,7 +467,7 @@ QnResourcePool* ResourceTreeItemFactory::resourcePool() const
     return m_commonModule->resourcePool();
 }
 
-QnGlobalSettings* ResourceTreeItemFactory::globalSettings() const
+SystemSettings* ResourceTreeItemFactory::globalSettings() const
 {
     return m_commonModule->globalSettings();
 }

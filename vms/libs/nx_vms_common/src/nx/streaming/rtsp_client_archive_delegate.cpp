@@ -13,13 +13,12 @@ extern "C"
 #include <libavcodec/avcodec.h>
 }
 
-#include <api/global_settings.h>
 #include <api/network_proxy_factory.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_media_layout.h>
-#include <core/resource_management/resource_pool.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/streaming/archive_stream_reader.h>
@@ -30,6 +29,7 @@ extern "C"
 #include <nx/streaming/rtsp_client.h>
 #include <nx/utils/suppress_exceptions.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/system_settings.h>
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>

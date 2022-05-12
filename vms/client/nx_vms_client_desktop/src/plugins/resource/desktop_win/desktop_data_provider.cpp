@@ -13,7 +13,6 @@ extern "C" {
 #include <libavutil/opt.h>
 } // extern "C"
 
-#include <api/global_settings.h>
 #include <decoders/audio/ffmpeg_audio_decoder.h>
 #include <nx/streaming/abstract_data_consumer.h>
 #include <nx/streaming/av_codec_media_context.h>
@@ -22,6 +21,7 @@ extern "C" {
 #include <nx/streaming/video_data_packet.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/system_settings.h>
 #include <plugins/resource/desktop_win/audio_device_change_notifier.h>
 #include <plugins/resource/desktop_win/win_audio_device_info.h>
 #include <utils/common/synctime.h>

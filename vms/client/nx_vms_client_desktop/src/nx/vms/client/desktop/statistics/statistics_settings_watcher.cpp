@@ -2,15 +2,15 @@
 
 #include "statistics_settings_watcher.h"
 
-#include <api/global_settings.h>
 #include <common/common_module.h>
-#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/client/core/network/network_manager.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/statistics/settings.h>
 #include <utils/common/delayed.h>
 

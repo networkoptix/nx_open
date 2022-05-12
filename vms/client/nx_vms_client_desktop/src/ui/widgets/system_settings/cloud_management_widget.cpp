@@ -5,7 +5,6 @@
 
 #include <QtGui/QDesktopServices>
 
-#include <api/global_settings.h>
 #include <api/server_rest_connection.h>
 #include <common/common_module.h>
 #include <core/resource/user_resource.h>
@@ -19,6 +18,7 @@
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/system_settings.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/help/help_topic_accessor.h>
@@ -26,6 +26,7 @@
 #include <ui/workbench/workbench_context.h>
 
 using namespace nx::vms::client::desktop;
+using namespace nx::vms::common;
 
 namespace {
 
@@ -103,7 +104,7 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
         this,
         &QnCloudManagementWidget::connectToCloud);
 
-    connect(globalSettings(), &QnGlobalSettings::cloudSettingsChanged,
+    connect(globalSettings(), &SystemSettings::cloudSettingsChanged,
         this, &QnCloudManagementWidget::loadDataToUi);
 }
 

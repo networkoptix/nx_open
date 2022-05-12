@@ -15,25 +15,25 @@
 #include <QtGui/QDragEnterEvent>
 #include <QtWidgets/QCheckBox>
 
-#include <api/global_settings.h>
 #include <business/business_resource_validation.h>
 #include <client/client_settings.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <nx/vms/client/desktop/resource_dialogs/server_selection_dialog.h>
+#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
+#include <nx/vms/common/system_settings.h>
 #include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/dialogs/week_time_schedule_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <ui/widgets/business/aggregation_widget.h>
 #include <ui/widgets/business/business_action_widget_factory.h>
 #include <ui/widgets/business/business_event_widget_factory.h>
@@ -42,6 +42,7 @@
 using namespace nx;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
+using namespace nx::vms::common;
 
 using nx::vms::api::EventType;
 using nx::vms::api::ActionType;
@@ -258,7 +259,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
             && globalSettings()->cloudSystemId().isNull())
         {
             m_intervalOfActionUpdater.emplace(
-                connect(globalSettings(), &QnGlobalSettings::cloudCredentialsChanged, this,
+                connect(globalSettings(), &SystemSettings::cloudCredentialsChanged, this,
                     [this]()
                     {
                         ui->aggregationWidget->setVisible(!globalSettings()->cloudSystemId().isNull());

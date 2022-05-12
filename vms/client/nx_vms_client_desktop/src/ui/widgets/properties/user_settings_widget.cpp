@@ -3,13 +3,12 @@
 #include "user_settings_widget.h"
 #include "ui_user_settings_widget.h"
 
-#include <api/global_settings.h>
 #include <client/client_globals.h>
 #include <common/common_module.h>
-#include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
+#include <core/resource/user_resource.h>
 #include <nx/branding.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
@@ -17,6 +16,7 @@
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/system_settings.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/models/resource_properties/user_settings_model.h>

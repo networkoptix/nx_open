@@ -10,24 +10,23 @@
 #include <QtWidgets/QAction>
 #include <QtQml/QtQml>
 
-#include <nx/branding.h>
-#include <nx/build_info.h>
-#include <nx/utils/random.h>
-#include <nx/utils/log/log.h>
-#include <nx/vms/api/protocol_version.h>
-#include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
-#include <nx/vms/common/update/tools.h>
-
-#include <api/global_settings.h>
 #include <client/client_message_processor.h>
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
+#include <nx/branding.h>
+#include <nx/build_info.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/random.h>
+#include <nx/vms/api/protocol_version.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
+#include <nx/vms/common/system_settings.h>
+#include <nx/vms/common/update/tools.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include <ui/workbench/workbench_context.h>
 #include <utils/common/synctime.h>
 
 #include "client_update_tool.h"
@@ -35,6 +34,7 @@
 #include "requests.h"
 
 using namespace std::chrono;
+using namespace nx::vms::common;
 
 namespace nx::vms::client::desktop {
 
@@ -142,7 +142,7 @@ ClientUpdateManager::Private::Private(ClientUpdateManager* q):
         &Private::handleConnectionStateChanged);
 
     connect(globalSettings(),
-        &QnGlobalSettings::clientUpdateSettingsChanged,
+        &SystemSettings::clientUpdateSettingsChanged,
         this,
         &Private::handleClientUpdateSettingsChanged);
 

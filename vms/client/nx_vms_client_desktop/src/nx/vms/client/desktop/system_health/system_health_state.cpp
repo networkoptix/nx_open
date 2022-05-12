@@ -8,15 +8,14 @@
 #include <QtWidgets/QAction>
 
 #include <api/common_message_processor.h>
-#include <api/global_settings.h>
 #include <api/runtime_info_manager.h>
-#include <client/client_show_once_settings.h>
 #include <client_core/client_core_module.h>
+#include <client/client_show_once_settings.h>
 #include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_management/resource_pool.h>
 #include <licensing/license.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
@@ -26,9 +25,12 @@
 #include <nx/vms/client/desktop/system_health/system_internet_access_watcher.h>
 #include <nx/vms/client/desktop/system_health/user_emails_watcher.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/common/system_settings.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/email/email.h>
+
+using namespace nx::vms::common;
 
 namespace nx::vms::client::desktop {
 
@@ -93,7 +95,7 @@ SystemHealthState::Private::Private(SystemHealthState* q) :
 
     // SmtpIsNotSet.
 
-    connect(q->globalSettings(), &QnGlobalSettings::emailSettingsChanged, q, update(SmtpIsNotSet));
+    connect(q->globalSettings(), &SystemSettings::emailSettingsChanged, q, update(SmtpIsNotSet));
     connect(q->context(), &QnWorkbenchContext::userChanged, q, update(SmtpIsNotSet));
 
     update(SmtpIsNotSet)();
@@ -105,7 +107,7 @@ SystemHealthState::Private::Private(SystemHealthState* q) :
     connect(internetAccessWatcher(), &SystemInternetAccessWatcher::internetAccessChanged,
         q, update(NoInternetForTimeSync));
 
-    connect(q->globalSettings(), &QnGlobalSettings::timeSynchronizationSettingsChanged,
+    connect(q->globalSettings(), &SystemSettings::timeSynchronizationSettingsChanged,
         q, update(NoInternetForTimeSync));
 
     const auto messageProcessor = q->commonModule()->messageProcessor();

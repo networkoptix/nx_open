@@ -18,20 +18,26 @@
 #include <QtWidgets/QTableView>
 #include <QtWidgets/QWhatsThis>
 
-#include <api/global_settings.h>
 #include <api/network_proxy_factory.h>
 #include <api/server_rest_connection.h>
 #include <camera/cam_display.h>
 #include <camera/camera_data_manager.h>
 #include <camera/resource_display.h>
+#include <client_core/client_core_module.h>
 #include <client/client_message_processor.h>
 #include <client/client_module.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_show_once_settings.h>
 #include <client/client_startup_parameters.h>
 #include <client/desktop_client_message_processor.h>
-#include <client_core/client_core_module.h>
 #include <common/common_module.h>
+#include <core/resource_access/resource_access_filter.h>
+#include <core/resource_management/layout_tour_manager.h>
+#include <core/resource_management/resource_discovery_manager.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_properties.h>
+#include <core/resource_management/resource_runtime_data.h>
+#include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
@@ -41,20 +47,13 @@
 #include <core/resource/layout_item_data.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/resource.h>
 #include <core/resource/resource_directory_browser.h>
+#include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>
+#include <core/resource/videowall_item.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
-#include <core/resource_access/resource_access_filter.h>
-#include <core/resource_management/layout_tour_manager.h>
-#include <core/resource_management/resource_discovery_manager.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_properties.h>
-#include <core/resource_management/resource_runtime_data.h>
-#include <core/resource_management/resources_changes_manager.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
 #include <network/authutil.h>
 #include <nx/analytics/utils.h>
@@ -115,6 +114,7 @@
 #include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/event/action_parameters.h>
 #include <platform/environment.h>
 #include <recording/time_period_list.h>
@@ -136,8 +136,8 @@
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
+#include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/models/resource/resource_list_model.h>
@@ -146,16 +146,16 @@
 #include <ui/workbench/handlers/workbench_layouts_handler.h> //< TODO: #sivanov Fix dependencies.
 #include <ui/workbench/watchers/workbench_bookmarks_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
-#include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
+#include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/workbench_synchronizer.h>
+#include <ui/workbench/workbench.h>
 #include <utils/applauncher_utils.h>
 #include <utils/common/delayed.h>
 #include <utils/common/delete_later.h>
@@ -176,6 +176,7 @@
 
 using nx::vms::client::core::Geometry;
 using nx::vms::client::core::MotionSelection;
+using namespace nx::vms::common;
 
 namespace {
 
@@ -238,7 +239,7 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::OpenFileAction), SIGNAL(triggered()), this, SLOT(at_openFileAction_triggered()));
     connect(action(action::OpenFolderAction), SIGNAL(triggered()), this, SLOT(at_openFolderAction_triggered()));
 
-    connect(globalSettings(), &QnGlobalSettings::maxSceneItemsChanged, this,
+    connect(globalSettings(), &SystemSettings::maxSceneItemsChanged, this,
         [this]
         {
             qnRuntime->setMaxSceneItemsOverride(globalSettings()->maxSceneItemsOverride());

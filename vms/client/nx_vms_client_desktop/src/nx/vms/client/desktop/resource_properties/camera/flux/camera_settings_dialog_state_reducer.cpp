@@ -7,15 +7,14 @@
 
 #include <QtCore/QUrlQuery>
 
-#include <api/global_settings.h>
 #include <camera/fps_calculator.h>
-#include <client/client_module.h>
 #include <client_core/client_core_module.h>
+#include <client/client_module.h>
 #include <common/common_module.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/resource_display_info.h>
 #include <nx/analytics/utils.h>
 #include <nx/network/http/http_types.h>
 #include <nx/reflect/json/serializer.h>
@@ -27,6 +26,7 @@
 #include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/client/desktop/analytics/analytics_settings_manager.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/system_settings.h>
 #include <utils/camera/camera_bitrate_calculator.h>
 #include <utils/camera/camera_replacement.h>
 

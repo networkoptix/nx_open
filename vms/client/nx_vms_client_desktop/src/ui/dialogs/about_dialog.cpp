@@ -13,9 +13,8 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
 
-#include "core/resource_management/resource_pool.h"
-#include <api/global_settings.h>
 #include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource/resource_type.h>
@@ -30,6 +29,7 @@
 #include <nx/vms/client/desktop/resource_views/functional_delegate_utilities.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/system_settings.h>
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/help/help_topic_accessor.h>
@@ -40,6 +40,7 @@
 #include <ui/workbench/workbench_context.h>
 
 using namespace nx::vms::client::desktop;
+using namespace nx::vms::common;
 
 QnAboutDialog::QnAboutDialog(QWidget *parent):
     base_type(parent, Qt::MSWindowsFixedSizeDialogHint),
@@ -77,7 +78,7 @@ QnAboutDialog::QnAboutDialog(QWidget *parent):
 
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QnAboutDialog::reject);
     connect(m_copyButton, &QPushButton::clicked, this, &QnAboutDialog::at_copyButton_clicked);
-    connect(globalSettings(), &QnGlobalSettings::emailSettingsChanged, this,
+    connect(globalSettings(), &SystemSettings::emailSettingsChanged, this,
         &QnAboutDialog::retranslateUi);
     connect(context()->instance<QnWorkbenchVersionMismatchWatcher>(),
         &QnWorkbenchVersionMismatchWatcher::mismatchDataChanged,

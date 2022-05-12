@@ -6,36 +6,30 @@
 #include <QtCore/QStandardPaths>
 #include <QtWidgets/QAction>
 
-#include <api/global_settings.h>
-
-#include <client/client_module.h>
-
-#include <core/resource/layout_resource.h>
-#include <core/resource/camera_resource.h>
-
-#include <camera/resource_display.h>
 #include <camera/cam_display.h>
-
-#include <nx/vms/client/desktop/radass/radass_types.h>
+#include <camera/resource_display.h>
+#include <client/client_module.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/radass/radass_support.h>
-
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/radass/radass_types.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
-
+#include <nx/vms/common/system_settings.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench.h>
 
 namespace {
 
 using namespace std::chrono;
+using namespace nx::vms::common;
 
 static const QString kCacheDirectoryName = "radass";
 static constexpr auto kHintTimeout = 5s;
@@ -85,7 +79,7 @@ RadassActionHandler::RadassActionHandler(QObject* parent):
         &RadassActionHandler::handleCurrentLayoutChanged);
 
     // We must load settings as early as possible to handle auto-run showreels and layouts.
-    connect(globalSettings(), &QnGlobalSettings::localSystemIdChanged, this,
+    connect(globalSettings(), &SystemSettings::localSystemIdChanged, this,
         &RadassActionHandler::handleLocalSystemIdChanged);
 }
 

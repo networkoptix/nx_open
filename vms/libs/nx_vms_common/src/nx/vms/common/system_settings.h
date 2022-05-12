@@ -23,148 +23,114 @@
 #include <utils/email/email_fwd.h>
 
 class QnAbstractResourcePropertyAdaptor;
-
-template<class T>
-class QnResourcePropertyAdaptor;
+template<class T> class QnResourcePropertyAdaptor;
 class QSettings;
-
 struct QnWatermarkSettings;
+namespace nx::vms::api { struct ResourceParamWithRefData; }
+namespace nx::vms::api { struct BackupSettings; }
 
-namespace nx::vms::api {
-struct ResourceParamWithRefData;
-struct BackupSettings;
-} // namespace nx::vms::api
+namespace nx::vms::common {
 
-namespace nx::settings_names {
+struct SystemSettingNames
+{
+    #define DECLARE_SETTING_NAME(NAME) static const inline QString NAME = NX_FMT( #NAME )
 
-const QString kNameDisabledVendors("disabledVendors");
-const QString kNameCameraSettingsOptimization("cameraSettingsOptimization");
-const QString kNameAutoUpdateThumbnails("autoUpdateThumbnails");
-const QString kMaxSceneItemsOverrideKey("maxSceneItems");
-const QString kUseTextEmailFormat("useTextEmailFormat");
-const QString kUseWindowsEmailLineFeed("useWindowsEmailLineFeed");
-const QString kNameAuditTrailEnabled("auditTrailEnabled");
-const QString kAuditTrailPeriodDaysName("auditTrailPeriodDays");
-const QString kNameTrafficEncryptionForced("trafficEncryptionForced");
-const QString kNameVideoTrafficEncryptionForced("videoTrafficEncryptionForced");
-const QString kEventLogPeriodDaysName("eventLogPeriodDays");
-const QString kNameHost("smtpHost");
-const QString kNamePort("smtpPort");
-const QString kNameUser("smtpUser");
-const QString kNameSmtpPassword("smtpPassword");
-const QString kNameConnectionType("smtpConnectionType");
-const QString kNameSimple("smtpSimple");
-const QString kNameTimeout("smtpTimeout");
-const QString kNameFrom("emailFrom");
-const QString kNameSignature("emailSignature");
-const QString kNameSupportEmail("emailSupportEmail");
-const QString kNameUpdateNotificationsEnabled("updateNotificationsEnabled");
+    DECLARE_SETTING_NAME(backupSettings);
+    DECLARE_SETTING_NAME(cloudAccountName);
+    DECLARE_SETTING_NAME(cloudAuthKey);
+    DECLARE_SETTING_NAME(cloudHost);
+    DECLARE_SETTING_NAME(cloudSystemID); //< TODO: rename it to cloudSystemId
+    DECLARE_SETTING_NAME(disabledVendors);
+    DECLARE_SETTING_NAME(insecureDeprecatedApiEnabled);
+    DECLARE_SETTING_NAME(lastMergeMasterId);
+    DECLARE_SETTING_NAME(lastMergeSlaveId);
+    DECLARE_SETTING_NAME(ldapAdminDn);
+    DECLARE_SETTING_NAME(ldapAdminPassword);
+    DECLARE_SETTING_NAME(ldapPasswordExpirationPeriodMs);
+    DECLARE_SETTING_NAME(ldapSearchBase);
+    DECLARE_SETTING_NAME(ldapSearchFilter);
+    DECLARE_SETTING_NAME(ldapSearchTimeoutS);
+    DECLARE_SETTING_NAME(ldapUri);
+    DECLARE_SETTING_NAME(licenseServer);
+    DECLARE_SETTING_NAME(localSystemId);
+    DECLARE_SETTING_NAME(maxHttpTranscodingSessions);
+    DECLARE_SETTING_NAME(primaryTimeServer);
+    DECLARE_SETTING_NAME(remoteSessionTimeoutS);
+    DECLARE_SETTING_NAME(remoteSessionUpdateS);
+    DECLARE_SETTING_NAME(resourceFileUri);
+    DECLARE_SETTING_NAME(sessionLimitMinutes);
+    DECLARE_SETTING_NAME(sessionsLimit);
+    DECLARE_SETTING_NAME(sessionsLimitPerUser);
+    DECLARE_SETTING_NAME(smtpPassword);
+    DECLARE_SETTING_NAME(specificFeatures);
+    DECLARE_SETTING_NAME(statisticsReportLastNumber);
+    DECLARE_SETTING_NAME(statisticsReportLastTime);
+    DECLARE_SETTING_NAME(statisticsReportLastVersion);
+    DECLARE_SETTING_NAME(systemName);
+    DECLARE_SETTING_NAME(trafficEncryptionForced);
+    DECLARE_SETTING_NAME(webSocketEnabled);
 
-const QString kNameTimeSynchronizationEnabled("timeSynchronizationEnabled");
-const QString kNamePrimaryTimeServer("primaryTimeServer");
+    // TODO: Should be false, when all clients witch to new APIs.
+    static const inline bool insecureDeprecatedApiEnabledDefault = true;
 
-/* Max rtt for internet time synchronization request */
-const QString kMaxDifferenceBetweenSynchronizedAndInternetTime(
-    "maxDifferenceBetweenSynchronizedAndInternetTime");
+    static const inline std::set<QString> kReadOnlyNames = {
+        cloudAccountName,
+        cloudAuthKey,
+        cloudHost,
+        cloudSystemID,
+        lastMergeMasterId,
+        lastMergeSlaveId,
+        localSystemId,
+        primaryTimeServer,
+        specificFeatures,
+        statisticsReportLastNumber,
+        statisticsReportLastTime,
+        statisticsReportLastVersion,
+    };
 
-/* Max rtt for server to server or client to server time synchronization request */
-const QString kMaxDifferenceBetweenSynchronizedAndLocalTime(
-    "maxDifferenceBetweenSynchronizedAndLocalTimeMs");
+    static const inline std::set<QString> kWriteOnlyNames = {
+        cloudAuthKey,
+        ldapAdminPassword,
+        smtpPassword,
+    };
 
-/* Period to check local time for changes */
-const QString kOsTimeChangeCheckPeriod("osTimeChangeCheckPeriodMs");
-
-/* Period to synchronize time via network */
-const QString kSyncTimeExchangePeriod("syncTimeExchangePeriod");
-const QString kSyncTimeEpsilon("syncTimeEpsilon");
-
-const QString kNameAutoDiscoveryEnabled("autoDiscoveryEnabled");
-const QString kNameAutoDiscoveryResponseEnabled("autoDiscoveryResponseEnabled");
-const QString kNameBackupSettings("backupSettings");
-const QString kNameCrossdomainEnabled("crossdomainEnabled");
-const QString kCloudHostName("cloudHost");
-
-const QString kNameStatisticsAllowed("statisticsAllowed");
-const QString kNameStatisticsReportLastTime("statisticsReportLastTime");
-const QString kNameStatisticsReportLastVersion("statisticsReportLastVersion");
-const QString kNameStatisticsReportLastNumber("statisticsReportLastNumber");
-const QString kNameStatisticsReportTimeCycle("statisticsReportTimeCycle");
-const QString kNameStatisticsReportUpdateDelay("statisticsReportUpdateDelay");
-const QString kNameLocalSystemId("localSystemId");
-const QString kNameLastMergeMasterId("lastMergeMasterId");
-const QString kNameLastMergeSlaveId("lastMergeSlaveId");
-const QString kNameSystemName("systemName");
-const QString kNameStatisticsReportServerApi("statisticsReportServerApi");
-const QString kNameSettingsUrlParam("clientStatisticsSettingsUrl");
-const QString kNameSpecificFeatures("specificFeatures");
-
-const QString ldapUri("ldapUri");
-const QString ldapAdminDn("ldapAdminDn");
-const QString ldapAdminPassword("ldapAdminPassword");
-const QString ldapSearchBase("ldapSearchBase");
-const QString ldapSearchFilter("ldapSearchFilter");
-const QString ldapPasswordExpirationPeriodMs("ldapPasswordExpirationPeriodMs");
-const QString ldapSearchTimeoutS("ldapSearchTimeoutS");
-const int ldapSearchTimeoutSDefault(30);
-
-const QString kNameCloudAccountName("cloudAccountName");
-const QString kNameCloudSystemId("cloudSystemID"); //< todo: rename it to cloudSystemId
-const QString kNameCloudAuthKey("cloudAuthKey");
-const QString kNameUpnpPortMappingEnabled("upnpPortMappingEnabled");
-
-static const QString kTargetUpdateInformationName = "targetUpdateInformation";
-static const QString kInstalledUpdateInformationName = "installedUpdateInformation";
-static const QString kTargetPersistentUpdateStorageName = "targetPersistentUpdateStorage";
-static const QString kInstalledPersistentUpdateStorageName = "installedPersistentUpdateStorage";
-static const QString kDownloaderPeersName = "downloaderPeers";
-static const QString kClientUpdateSettings = "clientUpdateSettings";
-
-const QString kWatermarkSettingsName("watermarkSettings");
-const QString kDefaultVideoCodec("defaultVideoCodec");
-const QString kDefaultExportVideoCodec("defaultExportVideoCodec");
-const QString kLowQualityScreenVideoCodec("lowQualityScreenVideoCodec");
-const QString kForceLiveCacheForPrimaryStream("forceLiveCacheForPrimaryStream");
-const QString kMetadataStorageChangePolicyName("metadataStorageChangePolicy");
-
-const QString kShowServersInTreeForNonAdmins("showServersInTreeForNonAdmins");
-const QString kShowMouseTimelinePreview("showMouseTimelinePreview");
-
-const QString kNameInsecureDeprecatedApiEnabled("insecureDeprecatedApiEnabled");
-// TODO: Should be false, when all clients witch to new APIs.
-const bool kInsecureDeprecatedApiEnabledDefault = true;
-
-static const std::set<QString> kReadOnlyNames = {
-    kNameLocalSystemId,
-    kCloudHostName,
-    kNameCloudAccountName,
-    kNameCloudSystemId,
-    kNameCloudAuthKey,
-    kNameStatisticsReportLastTime,
-    kNameStatisticsReportLastVersion,
-    kNameStatisticsReportLastNumber,
-    kNamePrimaryTimeServer,
+    static const inline std::set<QString> kOwnerOnlyNames = {
+        disabledVendors,
+        insecureDeprecatedApiEnabled,
+        ldapAdminDn,
+        ldapAdminPassword,
+        ldapPasswordExpirationPeriodMs,
+        ldapSearchBase,
+        ldapSearchFilter,
+        ldapSearchTimeoutS,
+        ldapUri,
+        licenseServer,
+        maxHttpTranscodingSessions,
+        remoteSessionTimeoutS,
+        remoteSessionUpdateS,
+        resourceFileUri,
+        sessionLimitMinutes,
+        sessionsLimit,
+        sessionsLimitPerUser,
+        trafficEncryptionForced,
+        webSocketEnabled,
+    };
 };
-
-static const std::set<QString> kWriteOnlyNames = {
-    kNameSmtpPassword,
-    ldapAdminPassword,
-    kNameCloudAuthKey,
-};
-
-} // namespace nx::settings_names
 
 using FileToPeerList = QMap<QString, QList<QnUuid>>;
 
-class NX_VMS_COMMON_API QnGlobalSettings:
+class NX_VMS_COMMON_API SystemSettings:
     public Connective<QObject>,
-    public nx::vms::common::SystemContextAware
+    public SystemContextAware
 {
     Q_OBJECT
     typedef Connective<QObject> base_type;
 
 public:
-    QnGlobalSettings(nx::vms::common::SystemContext* context, QObject* parent = nullptr);
-    virtual ~QnGlobalSettings();
+    using Names = SystemSettingNames;
+
+    SystemSettings(SystemContext* context, QObject* parent = nullptr);
+    virtual ~SystemSettings();
 
     void initialize();
 
@@ -371,7 +337,7 @@ public:
 
     /*!
         \a QnAbstractResourcePropertyAdaptor class methods are thread-safe
-        \note returned list is not changed during \a QnGlobalSettings instance life-time
+        \note returned list is not changed during \a SystemSettings instance life-time
     */
     const QList<QnAbstractResourcePropertyAdaptor*>& allSettings() const;
 
@@ -706,3 +672,5 @@ private:
     mutable nx::Mutex m_mutex;
     QnUserResourcePtr m_admin;
 };
+
+} // namespace nx::vms::common

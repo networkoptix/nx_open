@@ -6,7 +6,6 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QVBoxLayout>
 
-#include <api/global_settings.h>
 #include <common/common_module.h>
 #include <core/resource/user_resource.h>
 #include <licensing/license.h>
@@ -15,6 +14,7 @@
 #include <nx/vms/client/desktop/common/widgets/text_edit_field.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/system_settings.h>
 #include <ui/workbench/workbench_context.h>
 
 using namespace nx::vms::common;

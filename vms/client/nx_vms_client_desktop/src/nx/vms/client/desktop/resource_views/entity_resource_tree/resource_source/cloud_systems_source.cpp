@@ -4,13 +4,15 @@
 
 #include <QtCore/QVector>
 
-#include <api/global_settings.h>
 #include <common/common_module.h>
 #include <finders/systems_finder.h>
+#include <nx/vms/common/system_settings.h>
+
+using namespace nx::vms::common;
 
 namespace {
 
-QVector<QString> getOtherCloudSystemsIds(QnGlobalSettings* globalSettings)
+QVector<QString> getOtherCloudSystemsIds(SystemSettings* globalSettings)
 {
     QVector<QString> result;
 

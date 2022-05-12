@@ -4,19 +4,19 @@
 
 #include <chrono>
 
-#include <api/global_settings.h>
-#include <client/client_settings.h>
 #include <client_core/client_core_module.h>
+#include <client/client_settings.h>
 #include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/fake_media_server.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource_management/resource_pool.h>
 #include <network/system_helpers.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection_user_interaction_delegate.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
+#include <nx/vms/common/system_settings.h>
 #include <ui/dialogs/common/input_dialog.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
