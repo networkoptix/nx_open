@@ -8,15 +8,15 @@ static auto& statistics = nx::network::UdtStatistics::global;
 
 bool UdtInternetTrafficMetric::isSignificant() const
 {
-    return nx::network::UdtStatistics::global.internetBytesTransfered != 0;
+    return nx::network::UdtStatistics::global.internetBytesTransferred != 0;
 }
 
 QString UdtInternetTrafficMetric::value() const
 {
-    return nx::toString(nx::network::UdtStatistics::global.internetBytesTransfered);
+    return nx::toString(nx::network::UdtStatistics::global.internetBytesTransferred);
 }
 
 void UdtInternetTrafficMetric::reset()
 {
-    nx::network::UdtStatistics::global.internetBytesTransfered = 0;
+    nx::network::UdtStatistics::global.internetBytesTransferred = 0;
 }

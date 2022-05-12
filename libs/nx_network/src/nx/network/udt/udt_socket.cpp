@@ -667,7 +667,7 @@ int UdtStreamSocket::send(const void* buffer, std::size_t bufferLen)
     else if (sendResult > 0)
     {
         if (m_isInternetConnection)
-            UdtStatistics::global.internetBytesTransfered += (size_t)sendResult;
+            UdtStatistics::global.internetBytesTransferred += (size_t) sendResult;
     }
 
     return sendResult;
@@ -894,7 +894,7 @@ int UdtStreamSocket::handleRecvResult(int recvResult)
     else if (recvResult > 0)
     {
         if (m_isInternetConnection)
-            UdtStatistics::global.internetBytesTransfered += (size_t)recvResult;
+            UdtStatistics::global.internetBytesTransferred += (size_t) recvResult;
     }
 
     return recvResult;

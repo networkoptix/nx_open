@@ -36,10 +36,10 @@ public:
     std::atomic<int> terminated{0};
 
     /**
-     * This socket sequence is unique even after socket destruction
-     * (socket pointer is not unique after delete call).
+     * This socket sequence number is unique even after the socket destruction, while the socket
+     * pointer is not unique after the delete() call.
      */
-    SocketSequenceType socketSequence;
+    SocketSequence socketSequence;
 
     bool isUdtSocket = false;
 

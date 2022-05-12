@@ -412,7 +412,7 @@ void AioTaskQueue::removeSocketFromPollSet(
 }
 
 std::vector<SocketAddRemoveTask> AioTaskQueue::cancelPostedCalls(
-    SocketSequenceType socketSequence)
+    SocketSequence socketSequence)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
 
@@ -662,7 +662,7 @@ void AioTaskQueue::cancelPeriodicTask(
 
 std::vector<SocketAddRemoveTask> AioTaskQueue::cancelPostedCalls(
     const nx::Locker<nx::Mutex>& /*lock*/,
-    SocketSequenceType socketSequence)
+    SocketSequence socketSequence)
 {
     std::vector<SocketAddRemoveTask> elementsToRemove;
 
