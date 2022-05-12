@@ -2,7 +2,7 @@
 
 #include "certificate_statistics_module.h"
 
-#include <nx/utils/log/format.h>
+#include <nx/utils/log/log.h>
 
 QnStatisticValuesHash QnCertificateStatisticsModule::values() const
 {
@@ -49,10 +49,16 @@ QnCertificateStatisticsModule::ScenarioGuard::ScenarioGuard(
 {
     NX_CRITICAL(m_owner);
 
-    if (NX_ASSERT(!m_owner->m_scenario.has_value(), "Another scenario is already running"))
+    if (NX_ASSERT(!m_owner->m_scenario.has_value(),
+        "Failed to start '%1' scenario, '%2' is already running", scenario, *m_owner->m_scenario))
+    {
+        NX_VERBOSE(this, "Starting '%1' scenario", scenario);
         m_owner->setScenario(scenario);
+    }
     else
+    {
         m_owner.clear(); //< Clear pointer to disable destructor logic.
+    }
 }
 
 QnCertificateStatisticsModule::ScenarioGuard::~ScenarioGuard()
