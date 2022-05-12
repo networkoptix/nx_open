@@ -232,9 +232,12 @@ void initialize(Manager* manager, Action* root)
     factory(MotionTabAction)
         .flags(GlobalHotkey | HotkeyOnly)
         .shortcut("M")
-        .shortcut("Alt+M")
         .condition(condition::isWorkbenchVisible())
         .text(ContextMenu::tr("Switch to Motion tab"));
+
+    factory(SwitchMotionTabAction)
+        .flags(GlobalHotkey | HotkeyOnly)
+        .shortcut("Alt+M");
 
     factory(BookmarksTabAction)
         .flags(GlobalHotkey | HotkeyOnly)
@@ -251,12 +254,12 @@ void initialize(Manager* manager, Action* root)
     factory(ObjectsTabAction)
         .flags(GlobalHotkey | HotkeyOnly)
         .shortcut("O")
-        .shortcut("Alt+O")
         .condition(condition::isWorkbenchVisible())
         .text(ContextMenu::tr("Switch to Objects tab"));
 
     factory(ObjectSearchModeAction)
-        .flags(NoTarget)
+        .flags(GlobalHotkey | HotkeyOnly)
+        .shortcut("Alt+O")
         .checkable()
         .condition(condition::isWorkbenchVisible());
 
