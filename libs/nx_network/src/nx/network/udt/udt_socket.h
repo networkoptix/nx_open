@@ -216,11 +216,11 @@ private:
 class NX_NETWORK_API UdtStatistics
 {
 public:
-#ifdef __arm__
-    std::atomic<uint32_t> internetBytesTransfered{ 0 };
-#else
-    std::atomic<uint64_t> internetBytesTransfered{ 0 };
-#endif
+    #if defined(__arm__) //< Some 32-bit ARM devices lack the kernel support for the atomic int64.
+        std::atomic<uint32_t> internetBytesTransferred{0};
+    #else
+        std::atomic<uint64_t> internetBytesTransferred{0};
+    #endif
 
     static UdtStatistics global;
 };
