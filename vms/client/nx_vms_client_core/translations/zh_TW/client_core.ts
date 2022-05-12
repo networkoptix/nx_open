@@ -192,7 +192,7 @@
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
-      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
+      <translation>此用戶已被系統管理員停用.</translation>
     </message>
     <message>
       <source>Too many login attempts. Try again in a minute.</source>
