@@ -67,7 +67,7 @@ ServerCertificateWarning::ServerCertificateWarning(
                 "that cannot be verified automatically.");
 
             advice = tr("Review the certificate's details to make sure you are connecting to the "
-                "correct server.");
+                "correct Server.");
             break;
         }
 
