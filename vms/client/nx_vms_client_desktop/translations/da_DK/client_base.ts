@@ -6984,7 +6984,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Prøv at ændre filtrene eller konfigurer objektgenkendelse i kameraets plugin-indstillinger</translation>
     </message>
   </context>
   <context>
@@ -7314,7 +7314,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+      <translation>Vælg et tidsinterval på tidslinjen og højreklik på den markerede sektion for at oprette et bogmærke</translation>
     </message>
   </context>
   <context>
@@ -8777,7 +8777,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <message>
       <source>The discovered System %1 has an incompatible version %2.</source>
       <comment>%1 is name of System, %2 is version information</comment>
-      <translation type="unfinished">The discovered System %1 has an incompatible version %2.</translation>
+      <translation>Det opdagede System %1 har en inkompatibel version %2.</translation>
     </message>
     <message>
       <source>Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</source>
@@ -8797,11 +8797,11 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
-      <translation type="unfinished">You are about to merge Systems with Starter licenses.</translation>
+      <translation>Du er ved at flette systemer med Starter-licenser.</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one Starter license is allowed per System, so the second license will be deactivated.</translation>
+      <translation>Kun én starterlicens er tilladt pr. system, så den anden licens vil blive deaktiveret.</translation>
     </message>
     <message>
       <source>Merge anyway?</source>
@@ -8813,7 +8813,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Only one NVR license is allowed per System, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one NVR license is allowed per System, so the second license will be deactivated.</translation>
+      <translation>Kun én NVR-licens er tilladt pr. System, så den anden licens vil blive deaktiveret.</translation>
     </message>
     <message>
       <source>Could not configure the remote System %1.</source>
@@ -9186,7 +9186,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
-      <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
+      <translation>Du bruger en tilpasset klient. Kontakt venligst %1 for at få opdateringsinstruktionerne.</translation>
     </message>
   </context>
   <context>
@@ -9907,7 +9907,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Enables RTSP traffic encryption.</source>
-      <translation type="unfinished">Enables RTSP traffic encryption.</translation>
+      <translation>Aktiverer RTSP-trafikkryptering.</translation>
     </message>
     <message>
       <source>days</source>
@@ -10035,7 +10035,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     </message>
     <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
-      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct server.</translation>
+      <translation>Gennemgå certifikatets&apos;s detaljer for at sikre, at du opretter forbindelse til den korrekte server.</translation>
     </message>
     <message>
       <source>Cannot verify the identity of %1</source>

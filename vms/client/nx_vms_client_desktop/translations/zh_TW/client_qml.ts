@@ -1138,7 +1138,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Cannot decrypt media</source>
-      <translation type="unfinished">Cannot decrypt media</translation>
+      <translation>影像解密時發生錯誤</translation>
     </message>
     <message>
       <source>Password required</source>

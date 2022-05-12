@@ -4913,20 +4913,20 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Certificates</source>
-      <translation type="unfinished">
-        <numerusform>Certificates</numerusform>
-        <numerusform>Certificates</numerusform>
-        <numerusform>Certificates</numerusform>
-        <numerusform>Certificates</numerusform>
+      <translation>
+        <numerusform>Certyfikaty</numerusform>
+        <numerusform>Certyfikaty</numerusform>
+        <numerusform>Certyfikaty</numerusform>
+        <numerusform>Certyfikaty</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server utilizes these %n SSL certificates to authenticate its identity</source>
-      <translation type="unfinished">
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
+      <translation>
+        <numerusform>Serwer wykorzystuje %n certyfikatów SSL do uwierzytelniania tożsamości</numerusform>
+        <numerusform>Serwer wykorzystuje %n certyfikatów SSL do uwierzytelniania tożsamości</numerusform>
+        <numerusform>Serwer wykorzystuje %n certyfikatów SSL do uwierzytelniania tożsamości</numerusform>
+        <numerusform>Serwer wykorzystuje %n certyfikatów SSL do uwierzytelniania tożsamości</numerusform>
       </translation>
     </message>
     <message>
@@ -7316,47 +7316,47 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupQueueSize</name>
     <message numerus="yes">
       <source>%n weeks</source>
-      <translation type="unfinished">
-        <numerusform>%n weeks</numerusform>
-        <numerusform>%n weeks</numerusform>
-        <numerusform>%n weeks</numerusform>
-        <numerusform>%n weeks</numerusform>
+      <translation>
+        <numerusform>%n tygodni</numerusform>
+        <numerusform>%n tygodni</numerusform>
+        <numerusform>%n tygodni</numerusform>
+        <numerusform>%n tygodni</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n days</source>
-      <translation type="unfinished">
-        <numerusform>%n days</numerusform>
-        <numerusform>%n days</numerusform>
-        <numerusform>%n days</numerusform>
-        <numerusform>%n days</numerusform>
+      <translation>
+        <numerusform>%n dni</numerusform>
+        <numerusform>%n dni</numerusform>
+        <numerusform>%n dni</numerusform>
+        <numerusform>%n dni</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n hours</source>
-      <translation type="unfinished">
-        <numerusform>%n hours</numerusform>
-        <numerusform>%n hours</numerusform>
-        <numerusform>%n hours</numerusform>
-        <numerusform>%n hours</numerusform>
+      <translation>
+        <numerusform>%n godzin</numerusform>
+        <numerusform>%n godzin</numerusform>
+        <numerusform>%n godzin</numerusform>
+        <numerusform>%n godzin</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n minutes</source>
-      <translation type="unfinished">
-        <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
+      <translation>
+        <numerusform>%n minut</numerusform>
+        <numerusform>%n minut</numerusform>
+        <numerusform>%n minut</numerusform>
+        <numerusform>%n minut</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n seconds</source>
-      <translation type="unfinished">
-        <numerusform>%n seconds</numerusform>
-        <numerusform>%n seconds</numerusform>
-        <numerusform>%n seconds</numerusform>
-        <numerusform>%n seconds</numerusform>
+      <translation>
+        <numerusform>%n sekund</numerusform>
+        <numerusform>%n sekund</numerusform>
+        <numerusform>%n sekund</numerusform>
+        <numerusform>%n sekund</numerusform>
       </translation>
     </message>
   </context>
@@ -7423,11 +7423,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>Set for %n selected devices</source>
-      <translation type="unfinished">
-        <numerusform>Set for %n selected devices</numerusform>
-        <numerusform>Set for %n selected devices</numerusform>
-        <numerusform>Set for %n selected devices</numerusform>
-        <numerusform>Set for %n selected devices</numerusform>
+      <translation>
+        <numerusform>Ustaw dla %n wybranych urządzeń</numerusform>
+        <numerusform>Ustaw dla %n wybranych urządzeń</numerusform>
+        <numerusform>Ustaw dla %n wybranych urządzeń</numerusform>
+        <numerusform>Ustaw dla %n wybranych urządzeń</numerusform>
       </translation>
     </message>
   </context>
@@ -7499,20 +7499,20 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Backup is enabled for %n devices</numerusform>
-        <numerusform>Backup is enabled for %n devices</numerusform>
-        <numerusform>Backup is enabled for %n devices</numerusform>
-        <numerusform>Backup is enabled for %n devices</numerusform>
+      <translation>
+        <numerusform>Kopia zapasowa jest włączona dla %n urządzeń</numerusform>
+        <numerusform>Kopia zapasowa jest włączona dla %n urządzeń</numerusform>
+        <numerusform>Kopia zapasowa jest włączona dla %n urządzeń</numerusform>
+        <numerusform>Kopia zapasowa jest włączona dla %n urządzeń</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Backup is enabled for %n cameras</numerusform>
-        <numerusform>Backup is enabled for %n cameras</numerusform>
-        <numerusform>Backup is enabled for %n cameras</numerusform>
-        <numerusform>Backup is enabled for %n cameras</numerusform>
+      <translation>
+        <numerusform>Kopia zapasowa jest włączona dla %n kamer</numerusform>
+        <numerusform>Kopia zapasowa jest włączona dla %n kamer</numerusform>
+        <numerusform>Kopia zapasowa jest włączona dla %n kamer</numerusform>
+        <numerusform>Kopia zapasowa jest włączona dla %n kamer</numerusform>
       </translation>
     </message>
   </context>
@@ -7911,11 +7911,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraSettingsDialogStateConversionFunctions</name>
     <message numerus="yes">
       <source>Failed to enable audio on %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to enable audio on %n devices</numerusform>
-        <numerusform>Failed to enable audio on %n devices</numerusform>
-        <numerusform>Failed to enable audio on %n devices</numerusform>
-        <numerusform>Failed to enable audio on %n devices</numerusform>
+      <translation>
+        <numerusform>Nie udało się włączyć dźwięku na %n urządzeniach</numerusform>
+        <numerusform>Nie udało się włączyć dźwięku na %n urządzeniach</numerusform>
+        <numerusform>Nie udało się włączyć dźwięku na %n urządzeniach</numerusform>
+        <numerusform>Nie udało się włączyć dźwięku na %n urządzeniach</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7929,11 +7929,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>Failed to enable 2-way audio on %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
+      <translation>
+        <numerusform>Nie udało się włączyć dwukierunkowego dźwięku na %n urządzeniach</numerusform>
+        <numerusform>Nie udało się włączyć 2-kierunkowego dźwięku na %n urządzeniach</numerusform>
+        <numerusform>Nie udało się włączyć 2-kierunkowego dźwięku na %n urządzeniach</numerusform>
+        <numerusform>Nie udało się włączyć 2-kierunkowego dźwięku na %n urządzeniach</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7977,11 +7977,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>%1 are required</source>
       <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are required</numerusform>
-        <numerusform>%1 are required</numerusform>
-        <numerusform>%1 are required</numerusform>
-        <numerusform>%1 are required</numerusform>
+      <translation>
+        <numerusform>%1 jest wymagane</numerusform>
+        <numerusform>%1 jest wymagane</numerusform>
+        <numerusform>%1 jest wymagane</numerusform>
+        <numerusform>%1 jest wymagane</numerusform>
       </translation>
     </message>
   </context>
@@ -8907,11 +8907,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>%n minutes left</source>
-      <translation type="unfinished">
-        <numerusform>%n minutes left</numerusform>
-        <numerusform>%n minutes left</numerusform>
-        <numerusform>%n minutes left</numerusform>
-        <numerusform>%n minutes left</numerusform>
+      <translation>
+        <numerusform>Pozostało %n minut</numerusform>
+        <numerusform>Pozostało %n minut</numerusform>
+        <numerusform>Pozostało %n minut</numerusform>
+        <numerusform>Pozostało %n minut</numerusform>
       </translation>
     </message>
   </context>
