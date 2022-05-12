@@ -2,9 +2,9 @@
 
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-COMPANY_NAME=@customization.companyId@
+COMPANY_ID=@customization.companyId@
 FULLVERSION=@release.version@.@buildNumber@
-TARGET=/opt/$COMPANY_NAME/client/$FULLVERSION
+TARGET=/opt/$COMPANY_ID/client/$FULLVERSION
 
 . /usr/share/debconf/confmodule
 
