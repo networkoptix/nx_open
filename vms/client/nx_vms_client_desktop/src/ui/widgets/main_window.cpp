@@ -318,9 +318,11 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     addAction(action(action::ResourcesTabAction));
     addAction(action(action::SearchResourcesAction));
     addAction(action(action::MotionTabAction));
+    addAction(action(action::SwitchMotionTabAction));
     addAction(action(action::BookmarksTabAction));
     addAction(action(action::EventsTabAction));
     addAction(action(action::ObjectsTabAction));
+    addAction(action(action::ObjectSearchModeAction));
     addAction(action(action::NextLayoutAction));
     addAction(action(action::PreviousLayoutAction));
     addAction(action(action::SaveCurrentLayoutAction));
