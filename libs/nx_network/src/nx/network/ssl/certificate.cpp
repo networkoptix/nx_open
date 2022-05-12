@@ -409,6 +409,23 @@ X509Certificate::X509Certificate(X509* x509):
 {
 }
 
+X509Certificate::X509Certificate(const X509Certificate& certificate):
+    m_x509(X509_dup(certificate.m_x509.get()), &X509_free)
+{
+    for (const auto& i: certificate.m_extraChainCerts)
+        m_extraChainCerts.emplace_back(X509Ptr(X509_dup(i.get()), &X509_free));
+}
+
+X509Certificate& X509Certificate::operator=(const X509Certificate& certificate)
+{
+    m_x509.reset(X509_dup(certificate.m_x509.get()));
+
+    m_extraChainCerts.clear();
+    for (const auto& i: certificate.m_extraChainCerts)
+        m_extraChainCerts.emplace_back(X509Ptr(X509_dup(i.get()), &X509_free));
+    return *this;
+}
+
 bool X509Certificate::parsePem(
     const std::string& pem,
     std::optional<int> maxChainLength)
@@ -522,6 +539,11 @@ bool X509Certificate::bindToContext(SSL_CTX* sslContext) const
     return true;
 }
 
+X509* X509Certificate::x509() const
+{
+    return m_x509.get();
+}
+
 std::string X509Certificate::toString() const
 {
     return toString(m_x509.get());
@@ -606,6 +628,24 @@ Pem::Pem():
     m_pkey(nullptr, &EVP_PKEY_free)
 {
 }
+
+/* Note that EVP_PKEY_dup() is introduced in OpenSSL 3.0
+ * Now this deep copy uses EVP_PKEY_up_ref(), which is probably unsafe
+ * */
+
+Pem::Pem(const Pem& pem):
+    m_certificate(pem.m_certificate),
+    m_pkey(EVP_PKEY_up_ref(pem.m_pkey.get()) != 0 ? pem.m_pkey.get() : nullptr, &EVP_PKEY_free)
+{
+}
+
+Pem& Pem::operator=(const Pem& pem)
+{
+    m_certificate = pem.m_certificate;
+    m_pkey.reset(EVP_PKEY_up_ref(pem.m_pkey.get()) != 0 ? pem.m_pkey.get() : nullptr);
+    return *this;
+}
+
 
 bool Pem::parse(const std::string& str)
 {

@@ -192,6 +192,8 @@ class NX_NETWORK_API X509Certificate
 {
 public:
     X509Certificate(X509* x509 = nullptr);
+    X509Certificate(const X509Certificate& certificate);
+    X509Certificate& operator=(const X509Certificate& certificate);
 
     /**
      * @return true if certificate was parsed successfully.
@@ -221,6 +223,7 @@ public:
     std::string pemString() const;
     std::vector<Certificate> certificates() const;
     std::set<std::string> hosts() const;
+    X509* x509() const;
 
     /**
      * Generates user-readable text representation of the "Subject Alternative Names" extension of
@@ -250,6 +253,8 @@ class NX_NETWORK_API Pem
 {
 public:
     Pem();
+    Pem(const Pem& pem);
+    Pem& operator=(const Pem& pem);
 
     bool parse(const std::string& str);
 
