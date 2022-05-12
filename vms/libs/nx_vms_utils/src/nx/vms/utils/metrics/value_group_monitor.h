@@ -5,6 +5,7 @@
 #include <memory>
 
 #include <nx/vms/api/metrics.h>
+#include <nx/utils/dot_notation_string.h>
 #include <nx/utils/value_history.h>
 
 #include "value_monitors.h"
@@ -22,6 +23,12 @@ public:
 
     api::metrics::ValueGroup values(Scope requiredScope, bool formatted) const;
     api::metrics::ValueGroupAlarms alarms(Scope requiredScope) const;
+
+    std::pair<api::metrics::ValueGroup, Scope> valuesWithScope(Scope requiredScope,
+        bool formatted,
+        const nx::utils::DotNotationString& filter = {}) const;
+    std::pair<api::metrics::ValueGroupAlarms, Scope> alarmsWithScope(Scope requiredScope,
+        const nx::utils::DotNotationString& filter = {}) const;
 
     void setRules(
         const std::map<QString, api::metrics::ValueRule>& rules,
