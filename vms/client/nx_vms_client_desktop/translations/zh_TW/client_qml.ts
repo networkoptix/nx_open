@@ -794,8 +794,8 @@
       <translation>在佈局上顯示</translation>
     </message>
     <message>
-      <source>preview is not available for the selected object</source>
-      <translation type="unfinished">preview is not available for the selected object</translation>
+      <source>Preview is not available for the selected object</source>
+      <translation type="unfinished">Preview is not available for the selected object</translation>
     </message>
   </context>
   <context>
@@ -1138,7 +1138,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Cannot decrypt media</source>
-      <translation type="unfinished">Cannot decrypt media</translation>
+      <translation>影像解密時發生錯誤</translation>
     </message>
     <message>
       <source>Password required</source>

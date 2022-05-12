@@ -802,7 +802,7 @@
       <translation>Im Layout anzeigen</translation>
     </message>
     <message>
-      <source>preview is not available for the selected object</source>
+      <source>Preview is not available for the selected object</source>
       <translation>Vorschau ist für das ausgewählte Objekt nicht verfügbar</translation>
     </message>
   </context>

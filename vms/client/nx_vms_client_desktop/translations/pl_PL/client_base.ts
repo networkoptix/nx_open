@@ -1019,6 +1019,10 @@
       <source>Web Page Settings...</source>
       <translation type="unfinished">Web Page Settings...</translation>
     </message>
+    <message>
+      <source>Account Security...</source>
+      <translation type="unfinished">Account Security...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1614,6 +1618,33 @@
     </message>
   </context>
   <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+      <source>Zoom In</source>
+      <translation>Przybliż</translation>
+    </message>
+    <message>
+      <source>Zoom Out</source>
+      <translation>Oddalenie</translation>
+    </message>
+    <message>
+      <source>Focus Far</source>
+      <translation>Ostrość dalej</translation>
+    </message>
+    <message>
+      <source>Focus Near</source>
+      <translation>Ostrość bliżej</translation>
+    </message>
+    <message>
+      <source>Auto Focus</source>
+      <translation>Auto ostrość</translation>
+    </message>
+    <message>
+      <source>Change Dewarping Mode</source>
+      <translation>Zmień tryb przekształcania</translation>
+    </message>
+  </context>
+  <context>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
@@ -1667,6 +1698,22 @@
     <message>
       <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
       <translation>Udzielając dostępu do układów, udostępniasz ich wszystkie kamery. Użytkownik otrzyma również dostęp do wszystkich nowych kamer na tych układach.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnAccessibleMediaWidget</name>
+    <message>
+      <source>Access granted by:</source>
+      <translation>Dostęp udzielony przez:</translation>
+    </message>
+    <message numerus="yes">
+      <source>and %n more</source>
+      <translation>
+        <numerusform>i jeszcze %n</numerusform>
+        <numerusform>i jeszcze %n</numerusform>
+        <numerusform>i jeszcze %n</numerusform>
+        <numerusform>i jeszcze %n</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -2968,8 +3015,12 @@ to %1</source>
       <translation>Nie można przejść do trybu zgodności dla wersji %1</translation>
     </message>
     <message>
-      <source>Your session has expired</source>
-      <translation>Sesja wygasła</translation>
+      <source>System is not compatible with two-factor authentication</source>
+      <translation type="unfinished">System is not compatible with two-factor authentication</translation>
+    </message>
+    <message>
+      <source>Failed to log in to &quot;%1&quot; system</source>
+      <translation type="unfinished">Failed to log in to &quot;%1&quot; system</translation>
     </message>
   </context>
   <context>
@@ -4907,26 +4958,22 @@ to %1</source>
       <source>Failover</source>
       <translation>Failover</translation>
     </message>
-    <message>
-      <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation>Serwery z włączonym przełączaniem awaryjnym failover automatycznie przejmą kamery z uszkodzonych serwerów.</translation>
-    </message>
     <message numerus="yes">
       <source>Certificates</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Certyfikaty</numerusform>
-        <numerusform>Certificates</numerusform>
-        <numerusform>Certificates</numerusform>
-        <numerusform>Certificates</numerusform>
+        <numerusform>Certyfikaty</numerusform>
+        <numerusform>Certyfikaty</numerusform>
+        <numerusform>Certyfikaty</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server utilizes these %n SSL certificates to authenticate its identity</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Serwer wykorzystuje %n certyfikatów SSL do uwierzytelniania tożsamości</numerusform>
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
+        <numerusform>Serwer wykorzystuje %n certyfikatów SSL do uwierzytelniania tożsamości</numerusform>
+        <numerusform>Serwer wykorzystuje %n certyfikatów SSL do uwierzytelniania tożsamości</numerusform>
+        <numerusform>Serwer wykorzystuje %n certyfikatów SSL do uwierzytelniania tożsamości</numerusform>
       </translation>
     </message>
     <message>
@@ -4936,6 +4983,10 @@ to %1</source>
     <message>
       <source>Details</source>
       <translation>Szczegóły</translation>
+    </message>
+    <message>
+      <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
+      <translation type="unfinished">Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</translation>
     </message>
   </context>
   <context>
@@ -7316,47 +7367,47 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupQueueSize</name>
     <message numerus="yes">
       <source>%n weeks</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n tygodni</numerusform>
-        <numerusform>%n weeks</numerusform>
-        <numerusform>%n weeks</numerusform>
-        <numerusform>%n weeks</numerusform>
+        <numerusform>%n tygodni</numerusform>
+        <numerusform>%n tygodni</numerusform>
+        <numerusform>%n tygodni</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n days</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n dni</numerusform>
-        <numerusform>%n days</numerusform>
-        <numerusform>%n days</numerusform>
-        <numerusform>%n days</numerusform>
+        <numerusform>%n dni</numerusform>
+        <numerusform>%n dni</numerusform>
+        <numerusform>%n dni</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n hours</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n godzin</numerusform>
-        <numerusform>%n hours</numerusform>
-        <numerusform>%n hours</numerusform>
-        <numerusform>%n hours</numerusform>
+        <numerusform>%n godzin</numerusform>
+        <numerusform>%n godzin</numerusform>
+        <numerusform>%n godzin</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n minutes</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n minut</numerusform>
-        <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
+        <numerusform>%n minut</numerusform>
+        <numerusform>%n minut</numerusform>
+        <numerusform>%n minut</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n seconds</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n sekund</numerusform>
-        <numerusform>%n seconds</numerusform>
-        <numerusform>%n seconds</numerusform>
-        <numerusform>%n seconds</numerusform>
+        <numerusform>%n sekund</numerusform>
+        <numerusform>%n sekund</numerusform>
+        <numerusform>%n sekund</numerusform>
       </translation>
     </message>
   </context>
@@ -7423,11 +7474,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>Set for %n selected devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Ustaw dla %n wybranych urządzeń</numerusform>
-        <numerusform>Set for %n selected devices</numerusform>
-        <numerusform>Set for %n selected devices</numerusform>
-        <numerusform>Set for %n selected devices</numerusform>
+        <numerusform>Ustaw dla %n wybranych urządzeń</numerusform>
+        <numerusform>Ustaw dla %n wybranych urządzeń</numerusform>
+        <numerusform>Ustaw dla %n wybranych urządzeń</numerusform>
       </translation>
     </message>
   </context>
@@ -7499,20 +7550,20 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kopia zapasowa jest włączona dla %n urządzeń</numerusform>
-        <numerusform>Backup is enabled for %n devices</numerusform>
-        <numerusform>Backup is enabled for %n devices</numerusform>
-        <numerusform>Backup is enabled for %n devices</numerusform>
+        <numerusform>Kopia zapasowa jest włączona dla %n urządzeń</numerusform>
+        <numerusform>Kopia zapasowa jest włączona dla %n urządzeń</numerusform>
+        <numerusform>Kopia zapasowa jest włączona dla %n urządzeń</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kopia zapasowa jest włączona dla %n kamer</numerusform>
-        <numerusform>Backup is enabled for %n cameras</numerusform>
-        <numerusform>Backup is enabled for %n cameras</numerusform>
-        <numerusform>Backup is enabled for %n cameras</numerusform>
+        <numerusform>Kopia zapasowa jest włączona dla %n kamer</numerusform>
+        <numerusform>Kopia zapasowa jest włączona dla %n kamer</numerusform>
+        <numerusform>Kopia zapasowa jest włączona dla %n kamer</numerusform>
       </translation>
     </message>
   </context>
@@ -7911,11 +7962,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraSettingsDialogStateConversionFunctions</name>
     <message numerus="yes">
       <source>Failed to enable audio on %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Nie udało się włączyć dźwięku na %n urządzeniach</numerusform>
         <numerusform>Nie udało się włączyć dźwięku na %n urządzeniach</numerusform>
-        <numerusform>Failed to enable audio on %n devices</numerusform>
-        <numerusform>Failed to enable audio on %n devices</numerusform>
+        <numerusform>Nie udało się włączyć dźwięku na %n urządzeniach</numerusform>
+        <numerusform>Nie udało się włączyć dźwięku na %n urządzeniach</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7929,11 +7980,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>Failed to enable 2-way audio on %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Nie udało się włączyć dwukierunkowego dźwięku na %n urządzeniach</numerusform>
         <numerusform>Nie udało się włączyć 2-kierunkowego dźwięku na %n urządzeniach</numerusform>
         <numerusform>Nie udało się włączyć 2-kierunkowego dźwięku na %n urządzeniach</numerusform>
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
+        <numerusform>Nie udało się włączyć 2-kierunkowego dźwięku na %n urządzeniach</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7977,11 +8028,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>%1 are required</source>
       <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 jest wymagane</numerusform>
-        <numerusform>%1 are required</numerusform>
-        <numerusform>%1 are required</numerusform>
-        <numerusform>%1 are required</numerusform>
+        <numerusform>%1 jest wymagane</numerusform>
+        <numerusform>%1 jest wymagane</numerusform>
+        <numerusform>%1 jest wymagane</numerusform>
       </translation>
     </message>
   </context>
@@ -8653,10 +8704,6 @@ We recommend you not to open this web page. If you understand the risks, you can
   <context>
     <name>nx::vms::client::desktop::FailoverPriorityDialogItemDelegate</name>
     <message>
-      <source>No failover</source>
-      <translation>Brak przełączania awaryjnego</translation>
-    </message>
-    <message>
       <source>Low</source>
       <translation>Niski</translation>
     </message>
@@ -8667,6 +8714,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>High</source>
       <translation>Wysoki</translation>
+    </message>
+    <message>
+      <source>No Failover</source>
+      <translation type="unfinished">No Failover</translation>
     </message>
   </context>
   <context>
@@ -8907,11 +8958,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>%n minutes left</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Pozostało %n minut</numerusform>
-        <numerusform>%n minutes left</numerusform>
-        <numerusform>%n minutes left</numerusform>
-        <numerusform>%n minutes left</numerusform>
+        <numerusform>Pozostało %n minut</numerusform>
+        <numerusform>Pozostało %n minut</numerusform>
+        <numerusform>Pozostało %n minut</numerusform>
       </translation>
     </message>
   </context>
@@ -9453,6 +9504,10 @@ Możesz to wymusić, ale może to znacznie zwiększyć obciążenie procesora.</
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
       <translation>Używasz klienta niestandardowego. Skontaktuj się z %1, aby uzyskać instrukcje aktualizacji.</translation>
+    </message>
+    <message>
+      <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
+      <translation type="unfinished">There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</translation>
     </message>
   </context>
   <context>
@@ -10326,16 +10381,16 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation>Nie można zweryfikować tożsamości %1</translation>
     </message>
     <message>
-      <source>Someone may be impersonating %1 to steal your personal information.</source>
-      <translation>Ktoś może podszywać się pod %1 aby ukraść Twoje dane osobowe.</translation>
+      <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
+      <translation type="unfinished">You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</translation>
     </message>
     <message>
-      <source>Do not connect to this server unless instructed by your VMS administrator.</source>
-      <translation>Nie łącz się z tym serwerem bez instrukcji administratora VMS.</translation>
+      <source>Someone may be impersonating this Server to steal your personal information.</source>
+      <translation type="unfinished">Someone may be impersonating this Server to steal your personal information.</translation>
     </message>
     <message>
-      <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
-      <translation type="unfinished">You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</translation>
+      <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
+      <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
     </message>
   </context>
   <context>

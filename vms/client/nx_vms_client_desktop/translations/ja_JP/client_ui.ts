@@ -1130,10 +1130,6 @@
       <translation>優先順位設定:</translation>
     </message>
     <message>
-      <source>No failover</source>
-      <translation>フェイルオーバーなし</translation>
-    </message>
-    <message>
       <source>Low</source>
       <translation>低</translation>
     </message>
@@ -1148,6 +1144,10 @@
     <message>
       <source>Select some devices to setup failover priority</source>
       <translation>デバイスを選択してフェイルオーバーの優先順位を設定してください</translation>
+    </message>
+    <message>
+      <source>No Failover</source>
+      <translation type="unfinished">No Failover</translation>
     </message>
   </context>
   <context>

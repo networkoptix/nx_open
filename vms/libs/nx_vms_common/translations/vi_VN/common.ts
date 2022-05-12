@@ -341,18 +341,6 @@
       <translation>Camera đã được khôi phục lưu trữ. Xóa camera và thêm lại để xem Video trực tiếp.</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation>Trước tiên, bật chức năng "ghi" (nếu chức năng này đang tắt) và giảm số khung hình hiển thị/giây trong mục Cài đặt của thiết bị (lỗi &quot;%1&quot;).</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation>Trước tiên, bật chức năng "ghi" (nếu chức năng này đang tắt) và giảm số khung hình hiển thị/giây trong mục Cài đặt của camera (lỗi &quot;%1&quot;).</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation>Trước tiên, hãy thử bật chức năng ghi (nếu nó bị tắt) và giảm fps trong cài đặt mô-đun I/O (lỗi &quot;%1&quot;).</translation>
-    </message>
-    <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
       <translation>Vui lòng cập nhật firmware. Phiên bản được hỗ trợ tối thiểu là %1. Phiên bản hiện tại là %2</translation>
     </message>
@@ -367,6 +355,18 @@
     <message>
       <source>Internal server error. %1</source>
       <translation>Lỗi nội bộ máy chủ. %1</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
+      <translation type="unfinished">If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
+      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
+      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>

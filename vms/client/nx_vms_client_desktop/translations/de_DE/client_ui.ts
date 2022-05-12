@@ -1130,10 +1130,6 @@
       <translation>Priorität festlegen:</translation>
     </message>
     <message>
-      <source>No failover</source>
-      <translation>Kein Failover</translation>
-    </message>
-    <message>
       <source>Low</source>
       <translation>Niedrig</translation>
     </message>
@@ -1148,6 +1144,10 @@
     <message>
       <source>Select some devices to setup failover priority</source>
       <translation>Wählen Sie einige Geräte aus, um die Failover-Priorität einzurichten</translation>
+    </message>
+    <message>
+      <source>No Failover</source>
+      <translation>Kein Failover</translation>
     </message>
   </context>
   <context>

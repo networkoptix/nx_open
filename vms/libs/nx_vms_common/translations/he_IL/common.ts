@@ -359,18 +359,6 @@
       <translation>המצלמה שוחזרה מארכיון. מחק את המצלמה והוסף אותה שוב לתצוגת וידאו חי.</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation>ראשית, נסה להפעיל את ההקלטה (אם היא כבויה) ולהקטין את ה fps בהגדרות המכשיר (שגיאה &quot;%1&quot;).</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation>ראשית, נסה להפעיל את ההקלטה (אם היא כבויה) ולהקטין את ה fps בהגדרות המצלמה (שגיאה &quot;%1&quot;).</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation>ראשית, נסה להפעיל את ההקלטה (אם היא כבויה) ולהקטין את ה fps בהגדרות התקן הקלט/פלט (שגיאה &quot;%1&quot;).</translation>
-    </message>
-    <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
       <translation>אנא עדכן קושחה. הגירסה הנתמכת המינימלית היא %1. גרסת הקושחה הגרסה הנוכחית היא %2</translation>
     </message>
@@ -385,6 +373,18 @@
     <message>
       <source>Internal server error. %1</source>
       <translation>שגיאת שרת פנימית. %1</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
+      <translation type="unfinished">If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
+      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
+      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>

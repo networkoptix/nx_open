@@ -802,8 +802,8 @@
       <translation>Mostra sul layout</translation>
     </message>
     <message>
-      <source>preview is not available for the selected object</source>
-      <translation type="unfinished">preview is not available for the selected object</translation>
+      <source>Preview is not available for the selected object</source>
+      <translation type="unfinished">Preview is not available for the selected object</translation>
     </message>
   </context>
   <context>

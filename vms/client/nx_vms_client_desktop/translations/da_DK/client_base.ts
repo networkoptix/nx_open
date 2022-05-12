@@ -1015,6 +1015,10 @@
       <source>Web Page Settings...</source>
       <translation>Websideindstillinger...</translation>
     </message>
+    <message>
+      <source>Account Security...</source>
+      <translation type="unfinished">Account Security...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1582,6 +1586,33 @@
     </message>
   </context>
   <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+      <source>Zoom In</source>
+      <translation type="unfinished">Zoom In</translation>
+    </message>
+    <message>
+      <source>Zoom Out</source>
+      <translation type="unfinished">Zoom Out</translation>
+    </message>
+    <message>
+      <source>Focus Far</source>
+      <translation type="unfinished">Focus Far</translation>
+    </message>
+    <message>
+      <source>Focus Near</source>
+      <translation type="unfinished">Focus Near</translation>
+    </message>
+    <message>
+      <source>Auto Focus</source>
+      <translation type="unfinished">Auto Focus</translation>
+    </message>
+    <message>
+      <source>Change Dewarping Mode</source>
+      <translation type="unfinished">Change Dewarping Mode</translation>
+    </message>
+  </context>
+  <context>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
@@ -1635,6 +1666,20 @@
     <message>
       <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
       <translation type="unfinished">Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnAccessibleMediaWidget</name>
+    <message>
+      <source>Access granted by:</source>
+      <translation type="unfinished">Access granted by:</translation>
+    </message>
+    <message numerus="yes">
+      <source>and %n more</source>
+      <translation>
+        <numerusform>og %n mere</numerusform>
+        <numerusform>og %n mere</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -2898,8 +2943,12 @@ to %1</translation>
       <translation type="unfinished">Failed to enter compatibility mode for version %1</translation>
     </message>
     <message>
-      <source>Your session has expired</source>
-      <translation>Din session er udløbet</translation>
+      <source>System is not compatible with two-factor authentication</source>
+      <translation type="unfinished">System is not compatible with two-factor authentication</translation>
+    </message>
+    <message>
+      <source>Failed to log in to &quot;%1&quot; system</source>
+      <translation type="unfinished">Failed to log in to &quot;%1&quot; system</translation>
     </message>
   </context>
   <context>
@@ -4781,10 +4830,6 @@ to %1</translation>
       <source>Failover</source>
       <translation type="unfinished">Failover</translation>
     </message>
-    <message>
-      <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation type="unfinished">Servers with failover enabled will automatically take cameras from offline servers.</translation>
-    </message>
     <message numerus="yes">
       <source>Certificates</source>
       <translation>
@@ -4806,6 +4851,10 @@ to %1</translation>
     <message>
       <source>Details</source>
       <translation type="unfinished">Details</translation>
+    </message>
+    <message>
+      <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
+      <translation type="unfinished">Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</translation>
     </message>
   </context>
   <context>
@@ -6984,7 +7033,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Prøv at ændre filtrene eller konfigurer objektgenkendelse i kameraets plugin-indstillinger</translation>
     </message>
   </context>
   <context>
@@ -7314,7 +7363,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+      <translation>Vælg et tidsinterval på tidslinjen og højreklik på den markerede sektion for at oprette et bogmærke</translation>
     </message>
   </context>
   <context>
@@ -8395,10 +8444,6 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
   <context>
     <name>nx::vms::client::desktop::FailoverPriorityDialogItemDelegate</name>
     <message>
-      <source>No failover</source>
-      <translation>Ingen failover</translation>
-    </message>
-    <message>
       <source>Low</source>
       <translation type="unfinished">Low</translation>
     </message>
@@ -8409,6 +8454,10 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <message>
       <source>High</source>
       <translation type="unfinished">High</translation>
+    </message>
+    <message>
+      <source>No Failover</source>
+      <translation type="unfinished">No Failover</translation>
     </message>
   </context>
   <context>
@@ -8777,7 +8826,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <message>
       <source>The discovered System %1 has an incompatible version %2.</source>
       <comment>%1 is name of System, %2 is version information</comment>
-      <translation type="unfinished">The discovered System %1 has an incompatible version %2.</translation>
+      <translation>Det opdagede System %1 har en inkompatibel version %2.</translation>
     </message>
     <message>
       <source>Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</source>
@@ -8797,11 +8846,11 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
-      <translation type="unfinished">You are about to merge Systems with Starter licenses.</translation>
+      <translation>Du er ved at flette systemer med Starter-licenser.</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one Starter license is allowed per System, so the second license will be deactivated.</translation>
+      <translation>Kun én starterlicens er tilladt pr. system, så den anden licens vil blive deaktiveret.</translation>
     </message>
     <message>
       <source>Merge anyway?</source>
@@ -8813,7 +8862,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Only one NVR license is allowed per System, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one NVR license is allowed per System, so the second license will be deactivated.</translation>
+      <translation>Kun én NVR-licens er tilladt pr. System, så den anden licens vil blive deaktiveret.</translation>
     </message>
     <message>
       <source>Could not configure the remote System %1.</source>
@@ -9186,7 +9235,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
-      <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
+      <translation>Du bruger en tilpasset klient. Kontakt venligst %1 for at få opdateringsinstruktionerne.</translation>
+    </message>
+    <message>
+      <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
+      <translation type="unfinished">There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</translation>
     </message>
   </context>
   <context>
@@ -9907,7 +9960,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Enables RTSP traffic encryption.</source>
-      <translation type="unfinished">Enables RTSP traffic encryption.</translation>
+      <translation>Aktiverer RTSP-trafikkryptering.</translation>
     </message>
     <message>
       <source>days</source>
@@ -10035,23 +10088,23 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     </message>
     <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
-      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct server.</translation>
+      <translation>Gennemgå certifikatets&apos;s detaljer for at sikre, at du opretter forbindelse til den korrekte server.</translation>
     </message>
     <message>
       <source>Cannot verify the identity of %1</source>
       <translation>Kan ikke bekræfte identiteten af %1</translation>
     </message>
     <message>
-      <source>Someone may be impersonating %1 to steal your personal information.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.</translation>
+      <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
+      <translation type="unfinished">You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</translation>
     </message>
     <message>
-      <source>Do not connect to this server unless instructed by your VMS administrator.</source>
-      <translation type="unfinished">Do not connect to this server unless instructed by your VMS administrator.</translation>
+      <source>Someone may be impersonating this Server to steal your personal information.</source>
+      <translation type="unfinished">Someone may be impersonating this Server to steal your personal information.</translation>
     </message>
     <message>
-      <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
-      <translation>Du forsøgte at oprette forbindelse til: %1, men serveren præsenterede et certifikat, der ikke kan bekræftes automatisk.</translation>
+      <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
+      <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
     </message>
   </context>
   <context>

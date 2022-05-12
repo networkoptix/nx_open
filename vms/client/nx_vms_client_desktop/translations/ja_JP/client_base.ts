@@ -1013,6 +1013,10 @@
       <source>Web Page Settings...</source>
       <translation>Webページ設定...</translation>
     </message>
+    <message>
+      <source>Account Security...</source>
+      <translation type="unfinished">Account Security...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1566,6 +1570,33 @@
     </message>
   </context>
   <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+      <source>Zoom In</source>
+      <translation>ズームイン</translation>
+    </message>
+    <message>
+      <source>Zoom Out</source>
+      <translation>ズームアウト</translation>
+    </message>
+    <message>
+      <source>Focus Far</source>
+      <translation>フォーカス遠</translation>
+    </message>
+    <message>
+      <source>Focus Near</source>
+      <translation>フォーカス近</translation>
+    </message>
+    <message>
+      <source>Auto Focus</source>
+      <translation>オートフォーカス</translation>
+    </message>
+    <message>
+      <source>Change Dewarping Mode</source>
+      <translation>歪み補正モード</translation>
+    </message>
+  </context>
+  <context>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
@@ -1619,6 +1650,19 @@
     <message>
       <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
       <translation>割り当てたレイアウトに含まれる全てのカメラへのアクセス権も付与されます。そのレイアウトに新しく追加されたカメラへのアクセス権も自動的に付与されます。</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnAccessibleMediaWidget</name>
+    <message>
+      <source>Access granted by:</source>
+      <translation>アクセスが許可されました:</translation>
+    </message>
+    <message numerus="yes">
+      <source>and %n more</source>
+      <translation>
+        <numerusform>ほか %n 件</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -2857,8 +2901,12 @@ to %1</source>
       <translation>バージョン %1 互換モードへの切り替えに失敗しました</translation>
     </message>
     <message>
-      <source>Your session has expired</source>
-      <translation>セッションの期限が切れました</translation>
+      <source>System is not compatible with two-factor authentication</source>
+      <translation type="unfinished">System is not compatible with two-factor authentication</translation>
+    </message>
+    <message>
+      <source>Failed to log in to &quot;%1&quot; system</source>
+      <translation type="unfinished">Failed to log in to &quot;%1&quot; system</translation>
     </message>
   </context>
   <context>
@@ -4712,10 +4760,6 @@ to %1</source>
       <source>Failover</source>
       <translation>フェイルオーバー</translation>
     </message>
-    <message>
-      <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation>フェイルオーバーが有効になっているサーバーは、自動的にオフラインサーバーからカメラを引き継ぎます。</translation>
-    </message>
     <message numerus="yes">
       <source>Certificates</source>
       <translation>
@@ -4735,6 +4779,10 @@ to %1</source>
     <message>
       <source>Details</source>
       <translation>詳細</translation>
+    </message>
+    <message>
+      <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
+      <translation type="unfinished">Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</translation>
     </message>
   </context>
   <context>
@@ -8260,10 +8308,6 @@ We recommend you not to open this web page. If you understand the risks, you can
   <context>
     <name>nx::vms::client::desktop::FailoverPriorityDialogItemDelegate</name>
     <message>
-      <source>No failover</source>
-      <translation>フェイルオーバーなし</translation>
-    </message>
-    <message>
       <source>Low</source>
       <translation>低</translation>
     </message>
@@ -8274,6 +8318,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>High</source>
       <translation>高</translation>
+    </message>
+    <message>
+      <source>No Failover</source>
+      <translation type="unfinished">No Failover</translation>
     </message>
   </context>
   <context>
@@ -9048,6 +9096,10 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
       <translation>現在、カスタムクライアントを使用しています。更新手順については、 %1 にお問い合わせください。</translation>
+    </message>
+    <message>
+      <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
+      <translation type="unfinished">There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</translation>
     </message>
   </context>
   <context>
@@ -9894,16 +9946,16 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation>%1 の識別情報を確認できません</translation>
     </message>
     <message>
-      <source>Someone may be impersonating %1 to steal your personal information.</source>
-      <translation>誰かがあなたの個人情報を盗むために %1 になりすましている可能性があります。</translation>
+      <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
+      <translation type="unfinished">You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</translation>
     </message>
     <message>
-      <source>Do not connect to this server unless instructed by your VMS administrator.</source>
-      <translation>VMS管理者の指示がない限り、このサーバーに接続しないでください。</translation>
+      <source>Someone may be impersonating this Server to steal your personal information.</source>
+      <translation type="unfinished">Someone may be impersonating this Server to steal your personal information.</translation>
     </message>
     <message>
-      <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
-      <translation>%1 に接続しようとしましたが、自動的に検証できない証明書がサーバーによって提示されました。</translation>
+      <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
+      <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
     </message>
   </context>
   <context>

@@ -802,8 +802,8 @@
       <translation>Vis på layout</translation>
     </message>
     <message>
-      <source>preview is not available for the selected object</source>
-      <translation>forhåndsvisning er ikke tilgængelig for det valgte objekt</translation>
+      <source>Preview is not available for the selected object</source>
+      <translation type="unfinished">Preview is not available for the selected object</translation>
     </message>
   </context>
   <context>

@@ -1130,10 +1130,6 @@
       <translation>Ustaw priorytet:</translation>
     </message>
     <message>
-      <source>No failover</source>
-      <translation>Brak przełączania awaryjnego</translation>
-    </message>
-    <message>
       <source>Low</source>
       <translation>Niski</translation>
     </message>
@@ -1148,6 +1144,10 @@
     <message>
       <source>Select some devices to setup failover priority</source>
       <translation>Wybierz jakieś urządzenia, aby skonfigurować priorytet przełączania awaryjnego</translation>
+    </message>
+    <message>
+      <source>No Failover</source>
+      <translation type="unfinished">No Failover</translation>
     </message>
   </context>
   <context>

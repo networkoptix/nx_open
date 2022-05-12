@@ -341,18 +341,6 @@
       <translation>此攝影機來自離線錄影資料回復，若要瀏覽即時影像，請刪除相機並重新添加。</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation>若裝置錄影尚未開啟，請先嘗試啟動錄影並降低幀率 (錯誤訊息：&quot;%1&quot;)</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation>若攝影機錄影尚未開啟，請先嘗試啟動錄影並降低幀率 (錯誤訊息：&quot;%1&quot;)</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation>若I/O模組錄影尚未開啟，請先嘗試啟動錄影並降低幀率 (錯誤訊息：&quot;%1&quot;)</translation>
-    </message>
-    <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
       <translation>請更新韌體. 至少更新到 %1. 目前版本是 %2</translation>
     </message>
@@ -367,6 +355,18 @@
     <message>
       <source>Internal server error. %1</source>
       <translation>內部伺服器錯誤。 %1</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
+      <translation type="unfinished">If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
+      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
+      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>

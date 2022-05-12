@@ -341,18 +341,6 @@
       <translation>카메라 아카이브에서 복원 되었습니다. 라이브 비디오를 보려면 카메라를 삭제 한후 다시 추가하십시요.</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation>우선, 장치 설정에서 녹화모드를 켜고 FPS를 줄이세요 (오류 &quot;%1&quot;).</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation>장치 설정에서 우선 녹화모드 On하고 Fps를 줄이세요 (오류 &quot;%1&quot;).</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation>장치 설정에서 우선 녹화모드 On하고 Fps를 줄이세요 (오류 &quot;%1&quot;).</translation>
-    </message>
-    <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
       <translation>펌웨어를 업데이트하십시오. 최소 지원 버전은 %1입니다. 현재 버전은 %2입니다</translation>
     </message>
@@ -367,6 +355,18 @@
     <message>
       <source>Internal server error. %1</source>
       <translation>인터넷 서버 오류. %1</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
+      <translation type="unfinished">If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
+      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
+      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>

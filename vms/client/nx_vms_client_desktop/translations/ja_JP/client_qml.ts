@@ -794,8 +794,8 @@
       <translation>レイアウトに表示</translation>
     </message>
     <message>
-      <source>preview is not available for the selected object</source>
-      <translation>選択したオブジェクトのプレビューは使用できません</translation>
+      <source>Preview is not available for the selected object</source>
+      <translation type="unfinished">Preview is not available for the selected object</translation>
     </message>
   </context>
   <context>

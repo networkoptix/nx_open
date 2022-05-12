@@ -1130,10 +1130,6 @@
       <translation>Définir la priorité:</translation>
     </message>
     <message>
-      <source>No failover</source>
-      <translation>Aucun basculement</translation>
-    </message>
-    <message>
       <source>Low</source>
       <translation>Basse</translation>
     </message>
@@ -1148,6 +1144,10 @@
     <message>
       <source>Select some devices to setup failover priority</source>
       <translation>Sélectionnez certains appareils pour configurer la priorité de basculement</translation>
+    </message>
+    <message>
+      <source>No Failover</source>
+      <translation>Pas de basculement</translation>
     </message>
   </context>
   <context>

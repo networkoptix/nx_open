@@ -341,18 +341,6 @@
       <translation>カメラはアーカイブから復元されました。カメラを削除して再度登録すると、ライブ映像が表示されます。</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation>まず、(録画オフの場合は)録画をOnにして、デバイス設定で fps を下げてください (エラー&quot;%1&quot;)。</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation>まず、(録画オフの場合は)録画をOnにして、カメラ設定で fps を下げてください (エラー&quot;%1&quot;)。</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation>まず、(録画オフの場合は)録画をOnにして、I/Oモジュール設定で fps を下げてください (エラー&quot;%1&quot;)。</translation>
-    </message>
-    <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
       <translation>ファームウェアを更新してください。サポートバージョンは %1 以上です。現在のバージョンは %2 です。</translation>
     </message>
@@ -367,6 +355,18 @@
     <message>
       <source>Internal server error. %1</source>
       <translation>内部サーバーエラー %1</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
+      <translation type="unfinished">If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
+      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
+      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>

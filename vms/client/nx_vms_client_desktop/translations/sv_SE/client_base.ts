@@ -1015,6 +1015,10 @@
       <source>Web Page Settings...</source>
       <translation>Inställningar för webbsidan...</translation>
     </message>
+    <message>
+      <source>Account Security...</source>
+      <translation type="unfinished">Account Security...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1582,6 +1586,33 @@
     </message>
   </context>
   <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+      <source>Zoom In</source>
+      <translation>Zooma In</translation>
+    </message>
+    <message>
+      <source>Zoom Out</source>
+      <translation>Zooma Ut</translation>
+    </message>
+    <message>
+      <source>Focus Far</source>
+      <translation>Fokus långt</translation>
+    </message>
+    <message>
+      <source>Focus Near</source>
+      <translation>Fokusera nära</translation>
+    </message>
+    <message>
+      <source>Auto Focus</source>
+      <translation>Autofokus</translation>
+    </message>
+    <message>
+      <source>Change Dewarping Mode</source>
+      <translation>Ändra Dewarping läge</translation>
+    </message>
+  </context>
+  <context>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
@@ -1635,6 +1666,20 @@
     <message>
       <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
       <translation>Att ge tillgång till vissa layouter ger dig tillgång till alla kameror på dem. Dessutom kommer användaren att få tillgång till alla nya kameror på dessa layouter.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnAccessibleMediaWidget</name>
+    <message>
+      <source>Access granted by:</source>
+      <translation>Åtkomst beviljad av:</translation>
+    </message>
+    <message numerus="yes">
+      <source>and %n more</source>
+      <translation>
+        <numerusform>och %n mer</numerusform>
+        <numerusform>och %n mer</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -2898,8 +2943,12 @@ till %1</translation>
       <translation>Det gick inte att ange kompatibilitetsläge för version %1</translation>
     </message>
     <message>
-      <source>Your session has expired</source>
-      <translation>Din session har upphört att gälla</translation>
+      <source>System is not compatible with two-factor authentication</source>
+      <translation type="unfinished">System is not compatible with two-factor authentication</translation>
+    </message>
+    <message>
+      <source>Failed to log in to &quot;%1&quot; system</source>
+      <translation type="unfinished">Failed to log in to &quot;%1&quot; system</translation>
     </message>
   </context>
   <context>
@@ -4781,10 +4830,6 @@ till %1</translation>
       <source>Failover</source>
       <translation>Failover</translation>
     </message>
-    <message>
-      <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation>Servrar med failover aktiverade tar automatiskt kameror från offline-servrar.</translation>
-    </message>
     <message numerus="yes">
       <source>Certificates</source>
       <translation>
@@ -4806,6 +4851,10 @@ till %1</translation>
     <message>
       <source>Details</source>
       <translation>Detaljer</translation>
+    </message>
+    <message>
+      <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
+      <translation type="unfinished">Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</translation>
     </message>
   </context>
   <context>
@@ -8396,10 +8445,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
   <context>
     <name>nx::vms::client::desktop::FailoverPriorityDialogItemDelegate</name>
     <message>
-      <source>No failover</source>
-      <translation>Ingen failover</translation>
-    </message>
-    <message>
       <source>Low</source>
       <translation>Låg</translation>
     </message>
@@ -8410,6 +8455,10 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>High</source>
       <translation>Hög</translation>
+    </message>
+    <message>
+      <source>No Failover</source>
+      <translation type="unfinished">No Failover</translation>
     </message>
   </context>
   <context>
@@ -9188,6 +9237,10 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
       <translation>Du använder en anpassad klient. Kontakta %1 att få uppdateringsinstruktionerna.</translation>
+    </message>
+    <message>
+      <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
+      <translation type="unfinished">There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</translation>
     </message>
   </context>
   <context>
@@ -10043,16 +10096,16 @@ Fäst inte detta certifikat om du gjorde&apos;t ändra %2 server SSL-certifikat.
       <translation>Kan inte verifiera identiteten på %1</translation>
     </message>
     <message>
-      <source>Someone may be impersonating %1 to steal your personal information.</source>
-      <translation>Någon kan efterlikna %1 för att stjäla dina personuppgifter.</translation>
+      <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
+      <translation type="unfinished">You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</translation>
     </message>
     <message>
-      <source>Do not connect to this server unless instructed by your VMS administrator.</source>
-      <translation>Anslut inte till den här servern om du inte har instruerats av din VMS administratör.</translation>
+      <source>Someone may be impersonating this Server to steal your personal information.</source>
+      <translation type="unfinished">Someone may be impersonating this Server to steal your personal information.</translation>
     </message>
     <message>
-      <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
-      <translation>Du försökte ansluta till: %1 men servern presenterade ett certifikat som inte kan verifieras automatiskt.</translation>
+      <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
+      <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
     </message>
   </context>
   <context>

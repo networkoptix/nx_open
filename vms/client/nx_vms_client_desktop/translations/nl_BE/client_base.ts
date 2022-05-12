@@ -1015,6 +1015,10 @@
       <source>Web Page Settings...</source>
       <translation>Webpagina instellingen...</translation>
     </message>
+    <message>
+      <source>Account Security...</source>
+      <translation type="unfinished">Account Security...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1582,6 +1586,33 @@
     </message>
   </context>
   <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+      <source>Zoom In</source>
+      <translation>Inzoomen</translation>
+    </message>
+    <message>
+      <source>Zoom Out</source>
+      <translation>Uitzoomen</translation>
+    </message>
+    <message>
+      <source>Focus Far</source>
+      <translation>Focus veraf</translation>
+    </message>
+    <message>
+      <source>Focus Near</source>
+      <translation>Focus dichtbij</translation>
+    </message>
+    <message>
+      <source>Auto Focus</source>
+      <translation>Autofocus</translation>
+    </message>
+    <message>
+      <source>Change Dewarping Mode</source>
+      <translation>Dewarping modus wijzigen</translation>
+    </message>
+  </context>
+  <context>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
@@ -1635,6 +1666,20 @@
     <message>
       <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
       <translation>Door het geven van toegang tot sommige lay-outs, geeft u ook toegang tot alle camera's in deze lay-out. Daarmee krijgt de gebruiker toegang tot extra camera's op deze lay-outs.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnAccessibleMediaWidget</name>
+    <message>
+      <source>Access granted by:</source>
+      <translation>Toegang verleend door:</translation>
+    </message>
+    <message numerus="yes">
+      <source>and %n more</source>
+      <translation>
+        <numerusform>en %n meer</numerusform>
+        <numerusform>en %n meer</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -2894,8 +2939,12 @@ to %1</source>
       <translation>Kan compatibiliteitsmodus voor versie %1 niet invoeren</translation>
     </message>
     <message>
-      <source>Your session has expired</source>
-      <translation>Uw sessie is verlopen</translation>
+      <source>System is not compatible with two-factor authentication</source>
+      <translation type="unfinished">System is not compatible with two-factor authentication</translation>
+    </message>
+    <message>
+      <source>Failed to log in to &quot;%1&quot; system</source>
+      <translation type="unfinished">Failed to log in to &quot;%1&quot; system</translation>
     </message>
   </context>
   <context>
@@ -4777,10 +4826,6 @@ to %1</source>
       <source>Failover</source>
       <translation>Failover</translation>
     </message>
-    <message>
-      <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation>Servers met geactiveerde failover nemen automatisch camera's over van offline servers.</translation>
-    </message>
     <message numerus="yes">
       <source>Certificates</source>
       <translation>
@@ -4802,6 +4847,10 @@ to %1</source>
     <message>
       <source>Details</source>
       <translation>Details</translation>
+    </message>
+    <message>
+      <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
+      <translation type="unfinished">Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</translation>
     </message>
   </context>
   <context>
@@ -8392,10 +8441,6 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
   <context>
     <name>nx::vms::client::desktop::FailoverPriorityDialogItemDelegate</name>
     <message>
-      <source>No failover</source>
-      <translation>Geen failover</translation>
-    </message>
-    <message>
       <source>Low</source>
       <translation>Lage</translation>
     </message>
@@ -8406,6 +8451,10 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     <message>
       <source>High</source>
       <translation>Hoog</translation>
+    </message>
+    <message>
+      <source>No Failover</source>
+      <translation type="unfinished">No Failover</translation>
     </message>
   </context>
   <context>
@@ -9184,6 +9233,10 @@ Je kunt het forceren, maar het kan de CPU-belasting aanzienlijk verhogen.</trans
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
       <translation>U gebruikt een aangepaste client. Neem contact op met %1 om de update-instructies te krijgen.</translation>
+    </message>
+    <message>
+      <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
+      <translation type="unfinished">There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</translation>
     </message>
   </context>
   <context>
@@ -10039,16 +10092,16 @@ Pin dit certificaat niet vast als u het %2 server SSL-certificaat niet hebt gewi
       <translation>Kan de identiteit van %1 niet verifiëren</translation>
     </message>
     <message>
-      <source>Someone may be impersonating %1 to steal your personal information.</source>
-      <translation>Iemand doet zich mogelijk voor %1 om uw persoonlijke gegevens te stelen.</translation>
+      <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
+      <translation type="unfinished">You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</translation>
     </message>
     <message>
-      <source>Do not connect to this server unless instructed by your VMS administrator.</source>
-      <translation>Maak geen verbinding met deze server tenzij uw VMS-beheerder u dat heeft gevraagd.</translation>
+      <source>Someone may be impersonating this Server to steal your personal information.</source>
+      <translation type="unfinished">Someone may be impersonating this Server to steal your personal information.</translation>
     </message>
     <message>
-      <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
-      <translation>U hebt geprobeerd te verbinden met: %1, maar de server heeft een certificaat gepresenteerd dat niet automatisch kan worden geverifieerd.</translation>
+      <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
+      <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
     </message>
   </context>
   <context>

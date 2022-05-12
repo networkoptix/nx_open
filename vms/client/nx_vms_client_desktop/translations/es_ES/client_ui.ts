@@ -1130,10 +1130,6 @@
       <translation>Establecer prioridad:</translation>
     </message>
     <message>
-      <source>No failover</source>
-      <translation>Sin conmutación por error</translation>
-    </message>
-    <message>
       <source>Low</source>
       <translation>Bajo</translation>
     </message>
@@ -1148,6 +1144,10 @@
     <message>
       <source>Select some devices to setup failover priority</source>
       <translation>Seleccionar las cámaras para configurar la prioridad de conmutación por error</translation>
+    </message>
+    <message>
+      <source>No Failover</source>
+      <translation type="unfinished">No Failover</translation>
     </message>
   </context>
   <context>
