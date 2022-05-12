@@ -47,12 +47,32 @@ api::metrics::SystemManifest SystemController::manifest() const
 
 api::metrics::SystemValues SystemController::values(Scope requestScope, bool formatted) const
 {
+    return valuesWithScope(requestScope, formatted).first;
+}
+
+std::pair<api::metrics::SystemValues, Scope> SystemController::valuesWithScope(Scope requestScope,
+    bool formatted,
+    const nx::utils::DotNotationString& filter) const
+{
     const auto start = std::chrono::steady_clock::now();
+    auto actualScope = requestScope;
     api::metrics::SystemValues systemValues;
     for (const auto& controller: m_resourceControllers)
     {
-        if (auto values = controller->values(requestScope, formatted); !values.empty())
-            systemValues[controller->name()] = std::move(values);
+        if (!filter.accepts(controller->name()))
+            continue;
+
+        nx::utils::DotNotationString nested;
+        if (auto it = filter.findWithWildcard(controller->name()); it != filter.end())
+            nested = it.value();
+
+        if (auto values = controller->valuesWithScope(requestScope, formatted, std::move(nested)); !values.first.empty())
+        {
+            systemValues[controller->name()] = std::move(values.first);
+
+            if (values.second == Scope::local)
+                actualScope = Scope::local;
+        }
     }
 
     const auto counts =
@@ -66,20 +86,40 @@ api::metrics::SystemValues SystemController::values(Scope requestScope, bool for
 
     NX_DEBUG(this, "Return %1 from %2 values in %3",
         counts().join(", "), requestScope, std::chrono::steady_clock::now() - start);
-    return systemValues;
+
+    return {systemValues, actualScope};
 }
 
 api::metrics::SystemAlarms SystemController::alarms(Scope requestScope) const
 {
+    return alarmsWithScope(requestScope).first;
+}
+
+std::pair<api::metrics::SystemAlarms, Scope> SystemController::alarmsWithScope(Scope requestScope,
+    const nx::utils::DotNotationString& filter) const
+{
+    auto actualScope = requestScope;
     api::metrics::SystemAlarms systemAlarms;
     for (const auto& controller: m_resourceControllers)
     {
-        if (auto alarms = controller->alarms(requestScope); !alarms.empty())
-            systemAlarms[controller->name()] = std::move(alarms);
+        if (!filter.accepts(controller->name()))
+            continue;
+
+        nx::utils::DotNotationString nested;
+        if (auto it = filter.findWithWildcard(controller->name()); it != filter.end())
+            nested = it.value();
+
+        if (auto alarms = controller->alarmsWithScope(requestScope, std::move(nested)); !alarms.first.empty())
+        {
+            systemAlarms[controller->name()] = std::move(alarms.first);
+
+            if (alarms.second == Scope::local)
+                actualScope = Scope::local;
+        }
     }
 
     NX_DEBUG(this, "Return %1 %2 alarmed resources", systemAlarms.size(), requestScope);
-    return systemAlarms;
+    return {systemAlarms, actualScope};
 }
 
 api::metrics::SystemRules SystemController::rules() const

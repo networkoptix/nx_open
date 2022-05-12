@@ -15,31 +15,55 @@ ValueGroupMonitor::ValueGroupMonitor(ValueMonitors monitors):
 
 api::metrics::ValueGroup ValueGroupMonitor::values(Scope requiredScope, bool formatted) const
 {
+    return valuesWithScope(requiredScope, formatted).first;
+}
+
+std::pair<api::metrics::ValueGroup, Scope> ValueGroupMonitor::valuesWithScope(Scope requiredScope,
+    bool formatted,
+    const nx::utils::DotNotationString& filter) const
+{
     // TODO: Use RW lock.
     NX_MUTEX_LOCKER locker(&m_mutex);
 
+    auto actualScope = requiredScope;
     api::metrics::ValueGroup values;
     for (const auto& [id, monitor]: m_valueMonitors)
     {
         if (requiredScope == Scope::local && monitor->scope() == Scope::system)
             continue;
 
+        if (!filter.accepts(id))
+            continue;
+
+        if (monitor->scope() == Scope::local)
+            actualScope = Scope::local;
+
         auto value = formatted ? monitor->formattedValue() : monitor->value();
         if (!value.isNull())
             values[id] = std::move(value);
     }
 
-    return values;
+    return {values, actualScope};
 }
 
 api::metrics::ValueGroupAlarms ValueGroupMonitor::alarms(Scope requiredScope) const
 {
+    return alarmsWithScope(requiredScope).first;
+}
+
+std::pair<api::metrics::ValueGroupAlarms, Scope> ValueGroupMonitor::alarmsWithScope(Scope requiredScope,
+    const nx::utils::DotNotationString& filter) const
+{
     // TODO: Use RW lock.
     NX_MUTEX_LOCKER locker(&m_mutex);
 
+    auto actualScope = requiredScope;
     api::metrics::ValueGroupAlarms alarms;
     for (const auto& [id, monitors]: m_alarmMonitors)
     {
+        if (!filter.accepts(id))
+            continue;
+
         for (const auto& monitor: monitors)
         {
             if (requiredScope == Scope::local && monitor->scope() == Scope::system)
@@ -56,11 +80,14 @@ api::metrics::ValueGroupAlarms ValueGroupMonitor::alarms(Scope requiredScope) co
                 }
 
                 alarms[id].push_back(std::move(*alarm));
+
+                if (monitor->scope() == Scope::local)
+                    actualScope = Scope::local;
             }
         }
     }
 
-    return alarms;
+    return {alarms, actualScope};
 }
 
 void ValueGroupMonitor::setRules(

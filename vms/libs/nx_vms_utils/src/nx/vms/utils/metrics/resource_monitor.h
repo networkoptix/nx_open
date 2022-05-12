@@ -19,6 +19,12 @@ public:
     api::metrics::ResourceValues values(Scope requestScope, bool formatted) const;
     api::metrics::ResourceAlarms alarms(Scope requestScope) const;
 
+    std::pair<api::metrics::ResourceValues, Scope> valuesWithScope(Scope requestScope,
+        bool formatted,
+        const nx::utils::DotNotationString& filter = {}) const;
+    std::pair<api::metrics::ResourceAlarms, Scope> alarmsWithScope(Scope requestScope,
+        const nx::utils::DotNotationString& filter = {}) const;
+
     void setRules(const api::metrics::ResourceRules& rules);
     QString idForToStringFromPtr() const;
 

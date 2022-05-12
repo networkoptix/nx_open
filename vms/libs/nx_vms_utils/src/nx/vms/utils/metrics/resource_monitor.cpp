@@ -17,39 +17,74 @@ ResourceMonitor::ResourceMonitor(
 
 api::metrics::ResourceValues ResourceMonitor::values(Scope requestScope, bool formatted) const
 {
+    return valuesWithScope(requestScope, formatted).first;
+}
+
+std::pair<api::metrics::ResourceValues, Scope> ResourceMonitor::valuesWithScope(Scope requestScope,
+    bool formatted,
+    const nx::utils::DotNotationString& filter) const
+{
     nx::utils::ElapsedTimer timer(nx::utils::ElapsedTimerState::started);
+    auto actualScope = requestScope;
     api::metrics::ResourceValues values;
     size_t count = 0;
     for (const auto& [id, monitor]: m_monitors)
     {
-        if (auto v = monitor->values(requestScope, formatted); !v.empty())
+        if (!filter.accepts(id))
+            continue;
+
+        nx::utils::DotNotationString nested;
+        if (auto it = filter.findWithWildcard(id); it != filter.end())
+            nested = it.value();
+
+        if (auto v = monitor->valuesWithScope(requestScope, formatted, std::move(nested)); !v.first.empty())
         {
-            count += v.size();
-            values[id] = std::move(v);
+            count += v.first.size();
+            values[id] = std::move(v.first);
+
+            if (v.second == Scope::local)
+                actualScope = Scope::local;
         }
     }
 
     NX_VERBOSE(this, "Return %1 %2 values in %3 groups in %4",
         count, requestScope, values.size(), timer.elapsed());
-    return values;
+    return {values, actualScope};
 }
 
 api::metrics::ResourceAlarms ResourceMonitor::alarms(Scope requestScope) const
 {
+    return alarmsWithScope(requestScope).first;
+}
+
+std::pair<api::metrics::ResourceAlarms, Scope> ResourceMonitor::alarmsWithScope(Scope requestScope,
+    const nx::utils::DotNotationString& filter) const
+{
     nx::utils::ElapsedTimer timer(nx::utils::ElapsedTimerState::started);
+    auto actualScope = requestScope;
     api::metrics::ResourceAlarms resourceAlarms;
     size_t count = 0;
     for (const auto& [groupId, monitor]: m_monitors)
     {
-        if (auto alarms = monitor->alarms(requestScope); !alarms.empty())
+        if (!filter.accepts(groupId))
+            continue;
+
+        nx::utils::DotNotationString nested;
+        if (auto it = filter.findWithWildcard(groupId); it != filter.end())
+            nested = it.value();
+
+        if (auto alarms = monitor->alarmsWithScope(requestScope, std::move(nested)); !alarms.first.empty())
         {
-            count += alarms.size();
-            resourceAlarms[groupId] = std::move(alarms);
+            count += alarms.first.size();
+            resourceAlarms[groupId] = std::move(alarms.first);
+
+            if (alarms.second == Scope::local)
+                actualScope = Scope::local;
         }
     }
 
     NX_VERBOSE(this, "Return %1 %2 alarmed values in %3", count, requestScope, timer.elapsed());
-    return resourceAlarms;
+    return {resourceAlarms, actualScope};
 }
 
 void ResourceMonitor::setRules(const api::metrics::ResourceRules& rules)

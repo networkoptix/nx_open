@@ -20,6 +20,12 @@ public:
     api::metrics::SystemValues values(Scope requestScope, bool formatted) const;
     api::metrics::SystemAlarms alarms(Scope requestScope) const;
 
+    std::pair<api::metrics::SystemValues, Scope> valuesWithScope(Scope requestScope,
+        bool formatted,
+        const nx::utils::DotNotationString& filter = {}) const;
+    std::pair<api::metrics::SystemAlarms, Scope> alarmsWithScope(Scope requestScope,
+        const nx::utils::DotNotationString& filter = {}) const;
+
     api::metrics::SystemRules rules() const;
     void setRules(api::metrics::SystemRules rules, bool makePermament = false);
 

@@ -23,6 +23,12 @@ public:
     api::metrics::ResourceGroupValues values(Scope requestScope, bool formatted);
     api::metrics::ResourceGroupAlarms alarms(Scope requestScope);
 
+    std::pair<api::metrics::ResourceGroupValues, Scope> valuesWithScope(Scope requestScope,
+        bool formatted,
+        const nx::utils::DotNotationString& filter = {});
+    std::pair<api::metrics::ResourceGroupAlarms, Scope> alarmsWithScope(Scope requestScope,
+        const nx::utils::DotNotationString& filter = {});
+
     api::metrics::ResourceRules rules() const;
     void setRules(api::metrics::ResourceRules rules);
 

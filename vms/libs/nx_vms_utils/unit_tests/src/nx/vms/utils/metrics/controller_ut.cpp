@@ -309,6 +309,99 @@ public:
         }
     }
 
+    void testValuesWithScope(Scope scope, bool includeRules, bool formatted, const nx::utils::DotNotationString& filter)
+    {
+        #define EXPECT_VALUE(RESOURCE, GROUP, PARAMETER, VALUE) \
+        do { \
+            if (filter.accepts("tests")) \
+            { \
+                auto testsIt = filter.findWithWildcard("tests"); \
+                auto& testsFilter = (testsIt != filter.end() ? testsIt.value() : filter); \
+                auto& tests = systemValues["tests"]; \
+                if (testsFilter.accepts(RESOURCE)) \
+                { \
+                    auto resIt = testsFilter.findWithWildcard(RESOURCE); \
+                    auto& resFilter = (resIt != testsFilter.end() ? resIt.value() : testsFilter); \
+                    auto& res = tests[RESOURCE]; \
+                    if (resFilter.accepts(GROUP)) \
+                    { \
+                        auto groupIt = resFilter.findWithWildcard(GROUP); \
+                        auto& groupFilter = (groupIt != resFilter.end() ? groupIt.value() : resFilter); \
+                        auto& group = res[GROUP]; \
+                        if (groupFilter.accepts(PARAMETER)) \
+                        { \
+                            EXPECT_EQ(group[PARAMETER], VALUE); \
+                        } \
+                        else \
+                        { \
+                            ASSERT_EQ(group.find(PARAMETER), group.end()); \
+                        } \
+                    } \
+                    else \
+                    { \
+                        ASSERT_EQ(res.find(GROUP), res.end()); \
+                    } \
+                } \
+                else \
+                { \
+                    ASSERT_EQ(tests.find(RESOURCE), tests.end()); \
+                } \
+            } \
+            else \
+            { \
+                ASSERT_EQ(systemValues.size(), 0); \
+            } \
+        } while(false)
+
+
+        for (const auto& resource: m_resources)
+            resource->setDefaults();
+
+        auto [systemValues, actualScope] = m_systemController.valuesWithScope(scope, formatted, filter);
+
+        EXPECT_VALUE("R0", "_", "name", "TR0");
+        EXPECT_VALUE("R0", "g1", "i", formatted ? Value("0 KB") : Value(1));
+        EXPECT_VALUE("R0", "g1", "t", "first of 0");
+        if (includeRules)
+        {
+            EXPECT_VALUE("R0", "g1", "ip", formatted ? Value("2") : Value(2));
+            if (scope == Scope::system)
+                EXPECT_VALUE("R0", "g1", "c", "hello");
+        }
+        if (scope == Scope::system)
+        {
+            EXPECT_VALUE("R0", "g2", "i", formatted ? Value("2") : Value(2));
+            EXPECT_VALUE("R0", "g2", "t", "second of 0");
+            if (includeRules)
+                EXPECT_VALUE("R0", "g2", "im", formatted ? Value("1") : Value(1));
+        }
+
+        EXPECT_VALUE("R2", "_", "name", "TR2");
+        EXPECT_VALUE("R2", "g1", "i", formatted ? Value("0.02 KB") : Value(21));
+        EXPECT_VALUE("R2", "g1", "t", "first of 2");
+        if (includeRules)
+        {
+            EXPECT_VALUE("R2", "g1", "ip", formatted ? Value("22") : Value(22));
+            if (scope == Scope::system)
+                EXPECT_VALUE("R2", "g1", "c", "hello");
+        }
+        if (scope == Scope::system)
+        {
+            EXPECT_VALUE("R2", "g2", "i", formatted ? Value("22") : Value(22));
+            EXPECT_VALUE("R2", "g2", "t", "second of 2");
+            if (includeRules)
+                EXPECT_VALUE("R2", "g2", "im", formatted ? Value("21") : Value(21));
+        }
+
+        if (scope == Scope::system)
+        {
+            EXPECT_VALUE("R1", "g2", "i", formatted ? Value("12") : Value(12));
+            EXPECT_VALUE("R1", "g2", "t", "second of 1");
+        }
+
+        #undef EXPECT_VALUE
+    }
+
     void testAlarms(Scope scope)
     {
         #define EXPECT_ALARM(RESOURCE, GROUP, PARAMETER, LEVEL, TEXT) \
@@ -356,6 +449,78 @@ public:
             ASSERT_EQ(alarms.size(), (scope == Scope::system) ? 1 : 0);
             if (scope == Scope::system)
                 EXPECT_ALARM("R2", "g2", "i", warning, "i is 50 (>30)");
+        }
+
+        #undef EXPECT_ALARM
+    }
+
+    void testAlarmsWithScope(Scope scope, const nx::utils::DotNotationString& filter)
+    {
+        #define EXPECT_ALARM(RESOURCE, GROUP, PARAMETER, LEVEL, TEXT) \
+        do { \
+            if (filter.accepts("tests")) \
+            { \
+                auto testsIt = filter.findWithWildcard("tests"); \
+                auto& testsFilter = (testsIt != filter.end() ? testsIt.value() : filter); \
+                auto& tests = alarms["tests"]; \
+                if (testsFilter.accepts(RESOURCE)) \
+                { \
+                    auto resIt = testsFilter.findWithWildcard(RESOURCE); \
+                    auto& resFilter = (resIt != testsFilter.end() ? resIt.value() : testsFilter); \
+                    auto& res = tests[RESOURCE]; \
+                    if (resFilter.accepts(GROUP)) \
+                    { \
+                        auto groupIt = resFilter.findWithWildcard(GROUP); \
+                        auto& groupFilter = (groupIt != resFilter.end() ? groupIt.value() : resFilter); \
+                        auto& group = res[GROUP]; \
+                        if (groupFilter.accepts(PARAMETER)) \
+                        { \
+                            auto& para = group[PARAMETER]; \
+                            EXPECT_EQ(para.size(), 1); \
+                            EXPECT_EQ(para[0].level, api::metrics::AlarmLevel::LEVEL); \
+                            EXPECT_EQ(para[0].text, TEXT); \
+                        } \
+                        else \
+                        { \
+                            ASSERT_EQ(group.find(PARAMETER), group.end()); \
+                        } \
+                    } \
+                    else \
+                    { \
+                        ASSERT_EQ(res.find(GROUP), res.end()); \
+                    } \
+                } \
+                else \
+                { \
+                    ASSERT_EQ(tests.find(RESOURCE), tests.end()); \
+                } \
+            } \
+            else \
+            { \
+                ASSERT_EQ(alarms.size(), 0); \
+            } \
+        } while(false)
+
+        for (const auto& resource: m_resources)
+            resource->setDefaults();
+        m_resources[0]->update("i1", 150);
+        m_resources[0]->update("i2", 50);
+        m_resources[1]->update("i2", 70);
+        m_resources[2]->update("i1", -2);
+        {
+            auto [alarms, actualScope] = m_systemController.alarmsWithScope(scope, filter);
+
+            EXPECT_ALARM("R0", "g1", "ip", warning, "i = 0.15 KB (>100), ip = 151");
+            if (scope == Scope::system)
+            {
+                EXPECT_ALARM("R0", "g2", "i", warning, "i is 50 (>30)");
+                EXPECT_ALARM("R1", "g2", "i", warning, "i is 70 (>30)");
+                EXPECT_ALARM("R2", "g1", "ip", error, "i = -0 KB (<0), ip = -1");
+            }
+            else
+            {
+                EXPECT_ALARM("R2", "g1", "ip", error, "i = -0 KB (<0), ip = -1");
+            }
         }
 
         #undef EXPECT_ALARM
@@ -431,6 +596,39 @@ TEST_F(MetricsControllerTest, ValuesScenario)
     testValues(Scope::system, /*includeRules*/ true, /*formatted*/ true);
 }
 
+TEST_F(MetricsControllerTest, ValuesWithScope)
+{
+    nx::utils::DotNotationString filter;
+    testValuesWithScope(Scope::local, /*includeRules*/ false, /*formatted*/ false, filter);
+    testValuesWithScope(Scope::system, /*includeRules*/ false, /*formatted*/ false, filter);
+
+    filter.add("tests.R0._.name");
+    testValuesWithScope(Scope::local, /*includeRules*/ false, /*formatted*/ false, filter);
+    testValuesWithScope(Scope::system, /*includeRules*/ false, /*formatted*/ false, filter);
+
+    filter.clear();
+    filter.add("tests.R0.*.*");
+    testValuesWithScope(Scope::local, /*includeRules*/ false, /*formatted*/ false, filter);
+    testValuesWithScope(Scope::system, /*includeRules*/ false, /*formatted*/ false, filter);
+
+    filter.clear();
+    filter.add("tests.R0.*.i");
+    filter.add("tests.R1.*.t");
+    filter.add("tests.R2.*.name");
+    testValuesWithScope(Scope::local, /*includeRules*/ false, /*formatted*/ false, filter);
+    testValuesWithScope(Scope::system, /*includeRules*/ false, /*formatted*/ false, filter);
+
+    filter.clear();
+    filter.add("tests.*");
+    testValuesWithScope(Scope::local, /*includeRules*/ false, /*formatted*/ false, filter);
+    testValuesWithScope(Scope::system, /*includeRules*/ false, /*formatted*/ false, filter);
+
+    filter.clear();
+    filter.add("none");
+    testValuesWithScope(Scope::local, /*includeRules*/ false, /*formatted*/ false, filter);
+    testValuesWithScope(Scope::system, /*includeRules*/ false, /*formatted*/ false, filter);
+}
+
 TEST_F(MetricsControllerTest, LocalAlarms)
 {
     ASSERT_EQ(m_systemController.alarms(Scope::local).size(), 0);
@@ -452,6 +650,31 @@ TEST_F(MetricsControllerTest, AlarmsScenario)
     setRules();
     testAlarms(Scope::local);
     testAlarms(Scope::system);
+}
+
+TEST_F(MetricsControllerTest, AlarmsWithScope)
+{
+    nx::utils::DotNotationString filter;
+    ASSERT_EQ(m_systemController.alarms(Scope::local).size(), 0);
+    ASSERT_EQ(m_systemController.alarms(Scope::system).size(), 0);
+    setRules();
+    testAlarmsWithScope(Scope::local, filter);
+    testAlarmsWithScope(Scope::system, filter);
+
+    filter.clear();
+    filter.add("none");
+    testAlarmsWithScope(Scope::local, filter);
+    testAlarmsWithScope(Scope::system, filter);
+
+    filter.clear();
+    filter.add("tests.*.g1.ip");
+    testAlarmsWithScope(Scope::local, filter);
+    testAlarmsWithScope(Scope::system, filter);
+
+    filter.clear();
+    filter.add("tests.R0.g2.i");
+    testAlarmsWithScope(Scope::local, filter);
+    testAlarmsWithScope(Scope::system, filter);
 }
 
 } // namespace nx::vms::utils::metrics::test

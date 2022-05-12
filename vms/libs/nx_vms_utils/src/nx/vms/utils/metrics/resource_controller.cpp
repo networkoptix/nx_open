@@ -8,32 +8,71 @@ namespace nx::vms::utils::metrics {
 
 api::metrics::ResourceGroupValues ResourceController::values(Scope requestScope, bool formatted)
 {
+    return valuesWithScope(requestScope, formatted).first;
+}
+
+std::pair<api::metrics::ResourceGroupValues, Scope> ResourceController::valuesWithScope(Scope requestScope,
+    bool formatted,
+    const nx::utils::DotNotationString& filter)
+{
     beforeValues(requestScope, formatted);
 
     NX_MUTEX_LOCKER lock(&m_mutex);
+    auto actualScope = requestScope;
     api::metrics::ResourceGroupValues groupValues;
     for (const auto& [id, monitor]: m_monitors)
     {
-        if (auto values = monitor->values(requestScope, formatted); !values.empty())
-            groupValues[id] = std::move(values);
+        if (!filter.accepts(id))
+            continue;
+
+        nx::utils::DotNotationString nested;
+        if (auto it = filter.findWithWildcard(id); it != filter.end())
+            nested = it.value();
+
+        if (auto values = monitor->valuesWithScope(requestScope, formatted, std::move(nested)); !values.first.empty())
+        {
+            groupValues[id] = std::move(values.first);
+
+            if (values.second == Scope::local)
+                actualScope = Scope::local;
+        }
     }
 
-    return groupValues;
+    return {groupValues, actualScope};
 }
 
 api::metrics::ResourceGroupAlarms ResourceController::alarms(Scope requestScope)
 {
+    return alarmsWithScope(requestScope).first;
+}
+
+std::pair<api::metrics::ResourceGroupAlarms, Scope> ResourceController::alarmsWithScope(Scope requestScope,
+    const nx::utils::DotNotationString& filter)
+{
     beforeAlarms(requestScope);
 
     NX_MUTEX_LOCKER lock(&m_mutex);
+    auto actualScope = requestScope;
     api::metrics::ResourceGroupAlarms groupAlarms;
     for (const auto& [id, monitor]: m_monitors)
     {
-        if (auto alarms = monitor->alarms(requestScope); !alarms.empty())
-            groupAlarms[id] = std::move(alarms);
+        if (!filter.accepts(id))
+            continue;
+
+        nx::utils::DotNotationString nested;
+        if (auto it = filter.findWithWildcard(id); it != filter.end())
+            nested = it.value();
+
+        if (auto alarms = monitor->alarmsWithScope(requestScope, std::move(nested)); !alarms.first.empty())
+        {
+            groupAlarms[id] = std::move(alarms.first);
+
+            if (alarms.second == Scope::local)
+                actualScope = Scope::local;
+        }
     }
 
-    return groupAlarms;
+    return {groupAlarms, actualScope};
 }
 
 api::metrics::ResourceRules ResourceController::rules() const
