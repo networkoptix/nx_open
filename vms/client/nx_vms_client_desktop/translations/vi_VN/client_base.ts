@@ -9757,7 +9757,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Does not affect the connections established by server.</source>
-      <translation type="unfinished">Does not affect the connections established by server.</translation>
+      <translation>Không ảnh hưởng đến các kết nối được thiết lập bởi máy chủ.</translation>
     </message>
     <message>
       <source>Enables RTSP traffic encryption.</source>

@@ -4786,16 +4786,16 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>Certificates</source>
-      <translation type="unfinished">
-        <numerusform>Certificates</numerusform>
-        <numerusform>Certificates</numerusform>
+      <translation>
+        <numerusform>Certificados</numerusform>
+        <numerusform>Certificados</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server utilizes these %n SSL certificates to authenticate its identity</source>
-      <translation type="unfinished">
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
+      <translation>
+        <numerusform>El servidor utiliza estos certificados %n SSL para autenticar su identidad</numerusform>
+        <numerusform>El servidor utiliza estos certificados %n SSL para autenticar su identidad</numerusform>
       </translation>
     </message>
     <message>
@@ -7107,37 +7107,37 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupQueueSize</name>
     <message numerus="yes">
       <source>%n weeks</source>
-      <translation type="unfinished">
-        <numerusform>%n weeks</numerusform>
-        <numerusform>%n weeks</numerusform>
+      <translation>
+        <numerusform>%n semanas</numerusform>
+        <numerusform>%n semanas</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n days</source>
-      <translation type="unfinished">
-        <numerusform>%n days</numerusform>
-        <numerusform>%n days</numerusform>
+      <translation>
+        <numerusform>%n días</numerusform>
+        <numerusform>%n días</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n hours</source>
-      <translation type="unfinished">
-        <numerusform>%n hours</numerusform>
-        <numerusform>%n hours</numerusform>
+      <translation>
+        <numerusform>%n horas</numerusform>
+        <numerusform>%n horas</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n minutes</source>
-      <translation type="unfinished">
-        <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
+      <translation>
+        <numerusform>%n minutos</numerusform>
+        <numerusform>%n minutos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n seconds</source>
-      <translation type="unfinished">
-        <numerusform>%n seconds</numerusform>
-        <numerusform>%n seconds</numerusform>
+      <translation>
+        <numerusform>%n segundos</numerusform>
+        <numerusform>%n segundos</numerusform>
       </translation>
     </message>
   </context>
@@ -7278,16 +7278,16 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Backup is enabled for %n devices</numerusform>
-        <numerusform>Backup is enabled for %n devices</numerusform>
+      <translation>
+        <numerusform>La copia de seguridad está habilitada para %n dispositivos</numerusform>
+        <numerusform>La copia de seguridad está habilitada para %n dispositivos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Backup is enabled for %n cameras</numerusform>
-        <numerusform>Backup is enabled for %n cameras</numerusform>
+      <translation>
+        <numerusform>La copia de seguridad está habilitada para %n cámaras</numerusform>
+        <numerusform>La copia de seguridad está habilitada para %n cámaras</numerusform>
       </translation>
     </message>
   </context>
@@ -7674,9 +7674,9 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraSettingsDialogStateConversionFunctions</name>
     <message numerus="yes">
       <source>Failed to enable audio on %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to enable audio on %n devices</numerusform>
-        <numerusform>Failed to enable audio on %n devices</numerusform>
+      <translation>
+        <numerusform>No se pudo habilitar el audio en %n dispositivos</numerusform>
+        <numerusform>No se pudo habilitar el audio en %n dispositivos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7688,9 +7688,9 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>Failed to enable 2-way audio on %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
+      <translation>
+        <numerusform>No se pudo habilitar el audio bidireccional en %n dispositivos</numerusform>
+        <numerusform>No se pudo habilitar el audio bidireccional en %n dispositivos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7730,9 +7730,9 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>%1 are required</source>
       <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are required</numerusform>
-        <numerusform>%1 are required</numerusform>
+      <translation>
+        <numerusform>Se requiere %1</numerusform>
+        <numerusform>Se requiere %1</numerusform>
       </translation>
     </message>
   </context>
