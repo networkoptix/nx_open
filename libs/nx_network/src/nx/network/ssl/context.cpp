@@ -84,7 +84,7 @@ bool Context::setDefaultCertificate(const std::string& pemStr)
     return setDefaultCertificate(pem);
 }
 
-bool Context::setDefaultCertificate(const Pem& pem)
+bool Context::setDefaultCertificate(Pem pem)
 {
     auto newDefaultContext = createServerContext();
 
@@ -96,12 +96,19 @@ bool Context::setDefaultCertificate(const Pem& pem)
 
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
+        m_defaultServerPem = std::move(pem);
         m_defaultServerContext = std::move(newDefaultContext);
     }
 
     NX_INFO(this, "Default certificate set to %1", pem);
 
     return true;
+}
+
+Pem Context::getDefaultCertificate() const
+{
+    NX_MUTEX_LOCKER locker(&m_mutex);
+    return m_defaultServerPem;
 }
 
 bool Context::configureVirtualHost(

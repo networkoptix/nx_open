@@ -57,7 +57,9 @@ public:
      */
     bool setDefaultCertificate(const std::string& pem);
 
-    bool setDefaultCertificate(const Pem& pem);
+    bool setDefaultCertificate(Pem pem);
+
+    Pem getDefaultCertificate() const;
 
     /**
      * Set certificate to be used for connections with a SNI server name satisfying hostnameRegex.
@@ -144,6 +146,7 @@ private:
 
     std::shared_ptr<SSL_CTX> m_defaultServerContext;
     std::shared_ptr<SSL_CTX> m_clientContext;
+    Pem m_defaultServerPem;
     mutable nx::Mutex m_mutex;
     std::map<
         std::string /*hostname regexp*/, VirtualHostContext,
