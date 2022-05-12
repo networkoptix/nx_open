@@ -99,6 +99,11 @@ std::string Plugin::manifestString() const
                         "type": "Link",
                         "caption": "Customer Support",
                         "url": "https://example.com/"
+                    },
+                    {
+                        "type": "Banner",
+                        "icon": "info",
+                        "text": "Some text"
                     }
                 ]
             },

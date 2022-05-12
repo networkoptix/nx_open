@@ -336,6 +336,30 @@ A clickable hyperlink.
     }
 
 ---------------------------------------------------------------------------------------------------
+## Banner
+
+A static text with an icon.
+
+The `"icon"` field is optional and accepts the following values: `"info"` (default), `"warning"`.
+
+NOTE: This setting is non-editable and has no value, it is just a visual item in the dialog.
+
+[proprietary]
+
+![](doc/images/banner_info.png)
+![](doc/images/banner_warning.png)
+
+[/proprietary]
+
+### Setting Model
+
+    {
+        "type": "Banner",
+        "icon": "info",
+        "text": "Some text"
+    }
+
+---------------------------------------------------------------------------------------------------
 ## PolygonFigure
 
 Polygon figure field. Supports maximum points limitation.
