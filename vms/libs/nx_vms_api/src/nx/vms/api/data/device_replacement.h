@@ -61,7 +61,7 @@ struct NX_VMS_API DeviceReplacementResponse
      * A list of info/warning messages during camera replacement.
      * Messages are grouped to sections with some severity level.
      * It is allowed that some sections could contain empty message list.
-     * That means some block of data is transfered without any warnings.
+     * That means some block of data is transferred without any warnings.
      */
     std::vector<DeviceReplacementInfo> report;
 

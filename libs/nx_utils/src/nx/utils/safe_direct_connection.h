@@ -26,12 +26,11 @@ class SafeDirectConnectionGlobalHelper;
 class NX_UTILS_API EnableSafeDirectConnection
 {
 public:
-#ifdef __arm__
-    // Some devices lack kernel support for atomic int64.
-    typedef unsigned int ID;
-#else
-    typedef quint64 ID;
-#endif
+    #if defined(__arm__) //< Some 32-bit ARM devices lack the kernel support for the atomic int64.
+        typedef unsigned int ID;
+    #else
+        typedef quint64 ID;
+    #endif
 
     EnableSafeDirectConnection();
     virtual ~EnableSafeDirectConnection();

@@ -126,10 +126,10 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(InterfaceListPolicy policy, bool ign
         if (ignoreLoopback && iface.flags().testFlag(QNetworkInterface::IsLoopBack))
             continue;
 
-#if defined(Q_OS_LINUX) && defined(__arm__)
-        if (iface.name() == "usb0" && interfaces.size() > 1)
-            continue;
-#endif
+        #if defined(Q_OS_LINUX) && defined(__arm__)
+            if (iface.name() == "usb0" && interfaces.size() > 1)
+                continue;
+        #endif
 
         bool addInterfaceAnyway = policy == InterfaceListPolicy::allowInterfacesWithoutAddress;
         QList<QNetworkAddressEntry> addresses = iface.addressEntries();

@@ -61,7 +61,7 @@ public:
     TaskType type;
     Pollable* socket;
     /** Socket number that is still unique after socket has been destroyed. */
-    SocketSequenceType socketSequence;
+    SocketSequence socketSequence;
     aio::EventType eventType;
     AIOEventHandler* eventHandler;
     /** 0 means no timeout. */
@@ -124,7 +124,7 @@ class CancelPostedCallsTask:
 {
 public:
     CancelPostedCallsTask(
-        SocketSequenceType socketSequence,
+        SocketSequence socketSequence,
         std::atomic<int>* const _taskCompletionEvent = nullptr)
         :
         SocketAddRemoveTask(
@@ -234,7 +234,7 @@ public:
      * when removing functor. This may lead to a deadlock if we not release lock.
      */
     std::vector<SocketAddRemoveTask> cancelPostedCalls(
-        SocketSequenceType socketSequence);
+        SocketSequence socketSequence);
 
     std::size_t postedCallCount() const;
 
@@ -323,7 +323,7 @@ private:
 
     std::vector<SocketAddRemoveTask> cancelPostedCalls(
         const nx::Locker<nx::Mutex>& /*lock*/,
-        SocketSequenceType socketSequence);
+        SocketSequence socketSequence);
 
     template<typename Func>
     void callAndReportAbnormalProcessingTime(Func func, const char* description);
