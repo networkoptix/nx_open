@@ -21,11 +21,11 @@ bool operator==(const in6_addr& left, const in6_addr& right)
 }
 
 #if !defined(_WIN32)
-#   if defined(__arm__) && !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
-#       undef htonl
-#   endif
+    #if defined(__arm__) && !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
+        #undef htonl
+    #endif
 
-    // NOTE: calcLoopbackAddr() fixes a compile error on clang in release mode.
+    // NOTE: calcLoopbackAddr() fixes a compile error on clang in the Release mode.
     auto calcLoopbackAddr() { return htonl(INADDR_LOOPBACK); }
     const in_addr in4addr_loopback{ calcLoopbackAddr() };
 #endif

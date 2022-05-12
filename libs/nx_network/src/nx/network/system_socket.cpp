@@ -60,11 +60,11 @@
 namespace nx {
 namespace network {
 
-#if defined(__arm__)
+#if defined(__arm__) //< Some 32-bit ARM devices lack the kernel support for the atomic int64.
     qint64 totalSocketBytesSent() { return 0; }
 #else
-    static std::atomic<qint64> m_totalSocketBytesSent;
-    qint64 totalSocketBytesSent() { return m_totalSocketBytesSent; }
+    static std::atomic<qint64> g_totalSocketBytesSent;
+    qint64 totalSocketBytesSent() { return g_totalSocketBytesSent; }
 #endif
 
 #ifdef SO_REUSEPORT
@@ -792,7 +792,7 @@ int CommunicatingSocket<SocketInterfaceToImplement>::send(
     else
     {
         #if !defined(__arm__)
-            m_totalSocketBytesSent += sent;
+            g_totalSocketBytesSent += sent;
         #endif
     }
     return sent;

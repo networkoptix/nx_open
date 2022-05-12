@@ -5,7 +5,7 @@
 namespace nx {
 namespace network {
 
-static std::atomic<SocketSequenceType> socketSequenceCounter(1);
+static std::atomic<SocketSequence> socketSequenceCounter(1);
 
 CommonSocketImpl::CommonSocketImpl():
     aioThread(std::in_place, nullptr),
