@@ -58,6 +58,8 @@ public:
     Property<ValidationLevel> certificateValidationLevel{
         this, "CertificateValidationLevel", ValidationLevel::recommended};
 
+    Property<bool> enableHardwareDecoding{this, "EnableHadrwareDecoding", true};
+
 private:
     // Migration from 4.2 to 4.3.
     void migrateSystemAuthenticationData();

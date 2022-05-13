@@ -50,13 +50,4 @@ IosDeviceInformation IosDeviceInformation::currentInformation()
 #endif
 }
 
-bool IosDeviceInformation::isBionicProcessor() const
-{
-    static const int kIPhoneXsLikeMajorVersion = 11;
-    static const int kIPadPro3rdGenMajorVersion = 8;
-
-    return (type == Type::iPhone && majorVersion >= kIPhoneXsLikeMajorVersion)
-        || (type == Type::iPad && majorVersion >= kIPadPro3rdGenMajorVersion);
-}
-
 } // namespace nx::media
