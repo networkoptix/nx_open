@@ -28,7 +28,7 @@ def get_upload_error_message(request_result):
 
 def execute(command):
     try:
-        logging.info("-- Running:", command)
+        logging.info(f"-- Running: {command}")
         output = subprocess.check_output(command)
         return True, output
     except subprocess.CalledProcessError as error:
