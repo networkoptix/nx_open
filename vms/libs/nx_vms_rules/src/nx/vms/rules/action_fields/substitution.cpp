@@ -4,7 +4,7 @@
 
 #include <QtCore/QVariant>
 
-#include "../aggregated_event.h"
+#include "../basic_event.h"
 
 namespace nx::vms::rules {
 
@@ -12,12 +12,12 @@ Substitution::Substitution()
 {
 }
 
-QVariant Substitution::build(const AggregatedEvent& aggregatedEvent) const
+QVariant Substitution::build(const EventPtr& event) const
 {
     // TODO: #mmalofeev what does substitution mean it case of the aggregated event?
     QVariant value;
-    if (!aggregatedEvent.empty())
-        value = aggregatedEvent.initialEvent()->property(m_eventFieldName.toUtf8().data());
+    if (event)
+        value = event->property(m_eventFieldName.toUtf8().data());
 
     return value.canConvert(QVariant::String)
         ? value.toString() //< TODO: #spanasenko Refactor.

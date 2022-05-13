@@ -4,6 +4,10 @@
 
 #include <QtNetwork/QHostAddress>
 
+#include <nx/vms/common/html/html.h>
+
+#include "../utils/event_details.h"
+
 namespace nx::vms::rules {
 
 const ItemDescriptor& DeviceIpConflictEvent::manifest()
@@ -17,8 +21,8 @@ const ItemDescriptor& DeviceIpConflictEvent::manifest()
 }
 
 DeviceIpConflictEvent::DeviceIpConflictEvent(
-    QnUuid serverId,
     std::chrono::microseconds timestamp,
+    QnUuid serverId,
     const QHostAddress& address,
     const QStringList& macAddrList)
     :
@@ -27,6 +31,27 @@ DeviceIpConflictEvent::DeviceIpConflictEvent(
     m_ipAddress(address.toString()),
     m_macAddresses(macAddrList)
 {
+}
+
+QMap<QString, QString> DeviceIpConflictEvent::details(common::SystemContext* context) const
+{
+    auto result = BasicEvent::details(context);
+
+    utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing());
+
+    return result;
+}
+
+QString DeviceIpConflictEvent::detailing() const
+{
+    QStringList result;
+
+    result << tr("Conflicting Address: %1").arg(m_ipAddress);
+    int n = 0;
+    for (const auto& macAddress: m_macAddresses)
+        result << tr("MAC #%1: %2").arg(++n).arg(macAddress);
+
+    return result.join(common::html::kLineBreak);
 }
 
 } // namespace nx::vms::rules

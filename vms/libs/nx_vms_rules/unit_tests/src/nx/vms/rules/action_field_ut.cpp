@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/vms/common/test_support/test_context.h>
 #include <nx/vms/rules/action_fields/builtin_fields.h>
-#include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/engine.h>
 
 #include "test_event.h"
@@ -54,7 +54,7 @@ struct FormatResult
 };
 
 class TextWithFieldsTest:
-    public ::testing::Test,
+    public common::test::ContextBasedTest,
     public ::testing::WithParamInterface<FormatResult>
 {
 public:
@@ -74,72 +74,79 @@ public:
         engine->registerEvent(TestEvent::manifest(), []{ return new TestEvent(); });
     }
 
-    AggregatedEvent makeAggregatedEvent()
+    EventPtr makeEvent()
     {
-        AggregatedEvent aggregatedEvent;
-        aggregatedEvent.aggregate(engine->buildEvent(kEventData));
-        return aggregatedEvent;
+        return engine->buildEvent(kEventData);
     }
 };
 
 TEST_F(TextWithFieldsTest, CreateGuid)
 {
-    TextWithFields field;
+    TextWithFields field(systemContext());
     field.setText("{@CreateGuid}");
-    EXPECT_TRUE(QnUuid::isUuidString(field.build(makeAggregatedEvent()).toString()));
+    EXPECT_TRUE(QnUuid::isUuidString(field.build(makeEvent()).toString()));
 }
 
 TEST_F(TextWithFieldsTest, EventType)
 {
-    TextWithFields field;
+    TextWithFields field(systemContext());
     field.setText("{@EventType}");
-    EXPECT_EQ(TestEvent::manifest().id, field.build(makeAggregatedEvent()).toString());
+    EXPECT_EQ(TestEvent::manifest().id, field.build(makeEvent()).toString());
 }
 
 TEST_F(TextWithFieldsTest, EventName)
 {
-    TextWithFields field;
+    TextWithFields field(systemContext());
     field.setText("{@EventName}");
-    EXPECT_EQ(TestEvent::manifest().displayName, field.build(makeAggregatedEvent()).toString());
+    EXPECT_EQ(TestEvent::manifest().displayName, field.build(makeEvent()).toString());
 }
 
 TEST_F(TextWithFieldsTest, EventCaption)
 {
-    TextWithFields field;
-    AggregatedEvent aggregatedEvent(makeAggregatedEvent());
+    TextWithFields field(systemContext());
+    EventPtr event(makeEvent());
 
     field.setText("{@EventCaption}");
-    EXPECT_EQ(TestEvent::manifest().displayName, field.build(aggregatedEvent).toString());
+    EXPECT_EQ(TestEvent::manifest().displayName, field.build(event).toString());
 
     constexpr auto kEventCaption = "Test caption";
-    aggregatedEvent.initialEvent()->setProperty("caption", kEventCaption);
+    event->setProperty("caption", kEventCaption);
 
-    EXPECT_EQ(kEventCaption, field.build(aggregatedEvent).toString());
+    EXPECT_EQ(kEventCaption, field.build(event).toString());
 }
 
 TEST_F(TextWithFieldsTest, EventDescription)
 {
-    TextWithFields field;
-    AggregatedEvent aggregatedEvent(makeAggregatedEvent());
+    TextWithFields field(systemContext());
+    EventPtr event(makeEvent());
 
     field.setText("{@EventDescription}");
-    EXPECT_EQ(TestEvent::manifest().description, field.build(aggregatedEvent).toString());
+    EXPECT_EQ(TestEvent::manifest().description, field.build(event).toString());
 
     constexpr auto kEventDescription = "Test description override";
-    aggregatedEvent.initialEvent()->setProperty("description", kEventDescription);
+    event->setProperty("description", kEventDescription);
 
-    EXPECT_EQ(kEventDescription, field.build(aggregatedEvent).toString());
+    EXPECT_EQ(kEventDescription, field.build(event).toString());
+}
+
+TEST_F(TextWithFieldsTest, EventTooltip)
+{
+    TextWithFields field(systemContext());
+
+    field.setText("{@EventTooltip}");
+    // Tooltip must not be empty, at least event name and timestamp must exists.
+    EXPECT_FALSE(field.build(makeEvent()).toString().isEmpty());
 }
 
 TEST_P(TextWithFieldsTest, FormatLine)
 {
     const auto [expected, format] = GetParam();
 
-    TextWithFields field;
+    TextWithFields field(systemContext());
     field.setText(format);
     SCOPED_TRACE(nx::format("Format line: %1", field.text()).toStdString());
 
-    auto result = field.build(makeAggregatedEvent());
+    auto result = field.build(makeEvent());
     ASSERT_TRUE(result.isValid());
 
     EXPECT_EQ(expected.toStdString(), result.toString().toStdString());

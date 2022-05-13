@@ -17,11 +17,15 @@ class NX_VMS_RULES_API DeviceDisconnectedEvent: public BasicEvent
 
 public:
     DeviceDisconnectedEvent() = default;
-    DeviceDisconnectedEvent(QnUuid deviceId, std::chrono::microseconds timestamp);
+    DeviceDisconnectedEvent(std::chrono::microseconds timestamp, QnUuid deviceId);
 
     virtual QString uniqueName() const override;
+    virtual QMap<QString, QString> details(common::SystemContext* context) const override;
 
     static const ItemDescriptor& manifest();
+
+private:
+    QString caption(common::SystemContext* context) const;
 };
 
 } // namespace nx::vms::rules

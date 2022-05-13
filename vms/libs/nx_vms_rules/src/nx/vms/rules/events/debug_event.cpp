@@ -4,6 +4,7 @@
 
 #include "../event_fields/int_field.h"
 #include "../event_fields/text_field.h"
+#include "../utils/event_details.h"
 
 namespace nx::vms::rules {
 
@@ -12,6 +13,20 @@ DebugEvent::DebugEvent(const QString& action, qint64 value, std::chrono::microse
     m_action(action),
     m_value(value)
 {
+}
+
+QMap<QString, QString> DebugEvent::details(common::SystemContext* context) const
+{
+    auto result = BasicEvent::details(context);
+
+    utils::insertIfNotEmpty(result, utils::kDescriptionDetailName, description());
+
+    return result;
+}
+
+QString DebugEvent::description() const
+{
+    return QString("%1 action with %2 value").arg(m_action).arg(m_value);
 }
 
 FilterManifest DebugEvent::filterManifest()

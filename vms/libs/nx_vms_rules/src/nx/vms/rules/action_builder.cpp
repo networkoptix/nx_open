@@ -12,6 +12,7 @@
 
 #include "action_field.h"
 #include "basic_action.h"
+#include "basic_event.h"
 #include "utils/field.h"
 
 namespace nx::vms::rules {
@@ -147,7 +148,10 @@ QSet<QnUuid> ActionBuilder::affectedResources(const EventPtr& event) const
 
 void ActionBuilder::process(EventPtr event)
 {
-    m_aggregatedEvent.aggregate(event);
+    if (!m_event)
+        m_event = event;
+    else
+        m_event->aggregate(event);
 
     if (m_interval.count())
     {
@@ -184,7 +188,7 @@ void ActionBuilder::connectSignals()
 
 void ActionBuilder::onTimeout()
 {
-    if (!m_aggregatedEvent.empty())
+    if (!m_event)
     {
         m_timer.start();
         emit action(buildAction());
@@ -204,9 +208,9 @@ void ActionBuilder::updateState()
 
 ActionPtr ActionBuilder::buildAction()
 {
-    AggregatedEvent aggregatedEvent = std::move(m_aggregatedEvent);
+    EventPtr event = std::move(m_event);
 
-    if (!NX_ASSERT(m_constructor) || !NX_ASSERT(!aggregatedEvent.empty()))
+    if (!NX_ASSERT(m_constructor) || !NX_ASSERT(event))
         return {};
 
     ActionPtr action(m_constructor());
@@ -219,19 +223,21 @@ ActionPtr ActionBuilder::buildAction()
         nx::utils::propertyNames(action.get(), nx::utils::PropertyAccess::writable);
     for (const auto& propertyName: propertyNames)
     {
+        const auto propertyNameUtf8 = propertyName.toUtf8();
+
         if (m_fields.contains(propertyName))
         {
             auto& field = m_fields.at(propertyName);
-            const auto value = field->build(aggregatedEvent);
-            action->setProperty(propertyName.toUtf8().data(), value);
+            const auto value = field->build(event);
+            action->setProperty(propertyNameUtf8, value);
         }
         else
         {
             // Set property value only if it exists.
-            if (action->property(propertyName.toUtf8().data()).isValid())
+            if (action->property(propertyNameUtf8).isValid()
+                && event->property(propertyNameUtf8).isValid())
             {
-                action->setProperty(
-                    propertyName.toUtf8().data(), aggregatedEvent.property(propertyName));
+                action->setProperty(propertyNameUtf8, event->property(propertyNameUtf8));
             }
         }
     }

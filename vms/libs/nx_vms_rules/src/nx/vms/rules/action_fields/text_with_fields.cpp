@@ -3,50 +3,92 @@
 #include "text_with_fields.h"
 
 #include <nx/utils/log/assert.h>
+#include <nx/vms/common/html/html.h>
 
-#include "../aggregated_event.h"
+#include "../basic_event.h"
 #include "../engine.h"
 #include "../manifest.h"
+#include "../utils/event_details.h"
 
 namespace nx::vms::rules {
 
 namespace {
 
-using FormatFunction = std::function<QString(const AggregatedEvent&)>;
+using FormatFunction = std::function<QString(const EventPtr&, common::SystemContext*)>;
 
 static const QChar kFunctionPrefix = '@';
 
-QString createGuid(const AggregatedEvent&)
+QString createGuid(const EventPtr&, common::SystemContext* context = nullptr)
 {
     return QUuid::createUuid().toString(QUuid::StringFormat::WithoutBraces);
 }
 
-QString eventType(const AggregatedEvent& event)
+QString eventType(const EventPtr& event, common::SystemContext* constext = nullptr)
 {
-    return event.empty() ? QString() : event.type();
+    return event ? event->type() : QString();
 }
 
-QString eventName(const AggregatedEvent& event)
+QString eventName(const EventPtr& event, common::SystemContext* context)
 {
-    auto descriptor = Engine::instance()->eventDescriptor(event.type());
-    return descriptor ? descriptor->displayName : TextWithFields::tr("Unknown event");
+    if (const auto name = event->details(context).value(utils::kNameDetailName); !name.isEmpty())
+        return name;
+
+    return {};
 }
 
-QString eventCaption(const AggregatedEvent& event)
+QString eventCaption(const EventPtr& event, common::SystemContext* context)
 {
-    if (const auto value = event.property("caption"); value.canConvert<QString>())
+    const auto caption = event->details(context).value(utils::kCaptionDetailName);
+    if (!caption.isEmpty())
+        return caption;
+
+    if (const auto value = event->property("caption"); value.canConvert<QString>())
         return value.toString();
 
-    return eventName(event);
+    return eventName(event, context);
 }
 
-QString eventDescription(const AggregatedEvent& event)
+QString eventDescription(const EventPtr& event, common::SystemContext* context)
 {
-    if (const auto value = event.property("description"); value.canConvert<QString>())
+    const auto description = event->details(context).value(utils::kDescriptionDetailName);
+    if (!description.isEmpty())
+        return description;
+
+    if (const auto value = event->property("description"); value.canConvert<QString>())
         return value.toString();
 
     auto descriptor = Engine::instance()->eventDescriptor(eventType(event));
     return descriptor ? descriptor->description : QString();
+}
+
+QString eventTooltip(const EventPtr& event, common::SystemContext* context)
+{
+    QStringList result;
+
+    const auto details = event->details(context);
+
+    result << TextWithFields::tr("Event: %1").arg(details.value(utils::kNameDetailName));
+
+    if (const auto source = details.value(utils::kSourceDetailName); !source.isEmpty())
+        result << TextWithFields::tr("Source: %1").arg(source);
+
+    if (const auto plugin = details.value(utils::kPluginDetailName); !plugin.isEmpty())
+        result << TextWithFields::tr("Plugin: %1").arg(plugin);
+
+    result << details.value(utils::kPluginDetailName);
+
+    if (const auto detailing = details.value(utils::kDetailingDetailName); !detailing.isEmpty())
+        result << detailing;
+
+    return result.join(common::html::kLineBreak);
+}
+
+QString eventSource(const EventPtr& event, common::SystemContext* context)
+{
+    if (const auto value = event->property("source"); value.canConvert<QString>())
+        return value.toString();
+
+    return {};
 }
 
 FormatFunction formatFunction(const QString& name)
@@ -57,6 +99,8 @@ FormatFunction formatFunction(const QString& name)
         { "@EventName", &eventName },
         { "@EventCaption", &eventCaption },
         { "@EventDescription", &eventDescription },
+        { "@EventTooltip", &eventTooltip },
+        { "@EventSource", &eventSource },
     };
 
     return kFormatFunctions.value(name);
@@ -64,11 +108,12 @@ FormatFunction formatFunction(const QString& name)
 
 } // namespace
 
-TextWithFields::TextWithFields()
+TextWithFields::TextWithFields(common::SystemContext* context):
+    common::SystemContextAware(context)
 {
 }
 
-QVariant TextWithFields::build(const AggregatedEvent& aggregatedEvent) const
+QVariant TextWithFields::build(const EventPtr& event) const
 {
     QString result;
 
@@ -81,11 +126,12 @@ QVariant TextWithFields::build(const AggregatedEvent& aggregatedEvent) const
             {
                 if (const auto function = formatFunction(name))
                 {
-                    result += function(aggregatedEvent);
+                    result += function(event, systemContext());
                     continue;
                 }
             }
-            const auto propertyValue = aggregatedEvent.property(name);
+
+            const auto propertyValue = event->property(name.toUtf8().data());
             if (propertyValue.isValid() && propertyValue.canConvert(QVariant::String))
             {
                 // Found a valid event field, use it instead of the placeholder.

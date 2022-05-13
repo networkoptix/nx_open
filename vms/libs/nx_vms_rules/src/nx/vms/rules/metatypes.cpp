@@ -4,6 +4,7 @@
 
 #include <common/common_meta_types.h>
 #include <nx/fusion/serialization/json_functions.h>
+#include <nx/utils/metatypes.h>
 
 #include "basic_event.h"
 #include "field_types.h"
@@ -26,6 +27,7 @@ void Metatypes::initialize()
     QnJsonSerializer::registerSerializer<QnUuidList>();
 
     QnJsonSerializer::registerSerializer<QSet<QnUuid>>();
+    QnJsonSerializer::registerSerializer<std::chrono::seconds>();
 };
 
 } // namespace nx::vms::rules

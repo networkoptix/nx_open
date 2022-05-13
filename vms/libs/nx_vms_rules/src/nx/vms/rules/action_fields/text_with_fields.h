@@ -2,12 +2,16 @@
 
 #pragma once
 
+#include <nx/vms/common/system_context_aware.h>
+
 #include "../action_field.h"
 
 namespace nx::vms::rules {
 
  /** Perform string formatting using event data values. */
-class NX_VMS_RULES_API TextWithFields: public ActionField
+class NX_VMS_RULES_API TextWithFields:
+    public ActionField,
+    public common::SystemContextAware
 {
     Q_OBJECT
 
@@ -16,9 +20,9 @@ class NX_VMS_RULES_API TextWithFields: public ActionField
     Q_PROPERTY(QString text READ text WRITE setText)
 
 public:
-    TextWithFields();
+    TextWithFields(common::SystemContext* context);
 
-    virtual QVariant build(const AggregatedEvent& aggregatedEvent) const override;
+    virtual QVariant build(const EventPtr& event) const override;
 
     QString text() const;
 

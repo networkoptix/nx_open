@@ -2,9 +2,15 @@
 
 #include "analytics_object_event.h"
 
+#include <core/resource/camera_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/analytics/taxonomy/abstract_state.h>
+#include <nx/vms/common/system_context.h>
+
 #include "../event_fields/analytics_object_attributes_field.h"
 #include "../event_fields/analytics_object_type_field.h"
 #include "../event_fields/source_camera_field.h"
+#include "../utils/event_details.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -17,13 +23,32 @@ AnalyticsObjectEvent::AnalyticsObjectEvent(
     QnUuid objectTrackId,
     const nx::common::metadata::Attributes& attributes)
     :
-    BasicEvent(timestamp),
-    m_cameraId(cameraId),
-    m_engineId(engineId),
+    AnalyticsEngineEvent(timestamp, QString(), QString(), cameraId, engineId), // TODO: #mmalofeev Should AnalyticsObjectEvent has a caption like an AnalyticsEvent?
     m_objectTypeId(objectTypeId),
     m_objectTrackId(objectTrackId),
     m_attributes(attributes)
 {
+}
+
+QMap<QString, QString> AnalyticsObjectEvent::details(common::SystemContext* context) const
+{
+    auto result = AnalyticsEngineEvent::details(context);
+
+    utils::insertIfNotEmpty(result, utils::kCaptionDetailName, analyticsObjectCaption(context));
+
+    return result;
+}
+
+QString AnalyticsObjectEvent::analyticsObjectCaption(common::SystemContext* context) const
+{
+    const auto camera =
+        context->resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId());
+
+    const auto objectType = camera && camera->systemContext()
+        ? camera->systemContext()->analyticsTaxonomyState()->objectTypeById(m_objectTypeId)
+        : nullptr;
+
+    return objectType ? objectType->name() : tr("Object detected");
 }
 
 const ItemDescriptor& AnalyticsObjectEvent::manifest()

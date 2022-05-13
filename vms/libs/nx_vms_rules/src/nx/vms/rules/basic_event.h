@@ -3,16 +3,19 @@
 #pragma once
 
 #include <chrono>
+#include <unordered_map>
 
 #include <QtCore/QObject>
-#include <QtCore/QString>
 #include <QtCore/QSharedPointer>
+#include <QtCore/QString>
 
 #include <nx/vms/api/rules/event_info.h>
 #include <nx/vms/api/types/event_rule_types.h>
 
 #include "manifest.h"
 #include "rules_fwd.h"
+
+namespace nx::vms::common { class SystemContext; }
 
 namespace nx::vms::rules {
 
@@ -46,6 +49,21 @@ public:
      */
     virtual QString uniqueName() const;
 
+    /**
+     * Aggregates the event. If the event is unique, then uniqueEventCount increases,
+     * totalEventCount otherwise.
+     */
+    virtual void aggregate(const EventPtr& event);
+
+    /** Returns amount of the unique aggregated events. Uniqueness is determined by the uniqueName(). */
+    size_t uniqueEventCount() const;
+
+    /** Returns total amount of the aggregated events. */
+    size_t totalEventCount() const;
+
+    /** Returns the event string formatted details(such as caption, description, timestamp etc.). */
+    virtual QMap<QString, QString> details(common::SystemContext* context) const;
+
 protected:
     BasicEvent() = default;
 
@@ -61,6 +79,12 @@ private:
     State m_state{State::none};
 
     std::chrono::microseconds m_timestamp;
+
+    /** Holds events occurencies count. */
+    std::unordered_map</*unique name*/ QString, /*count*/ size_t> m_eventsHash;
+
+    QString name() const;
+    QString aggregatedTimestamp() const;
 };
 
 } // namespace nx::vms::rules
