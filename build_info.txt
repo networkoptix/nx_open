@@ -8,6 +8,7 @@ cloudGroup=@cloudGroup@
 arch=@arch@
 platform=@platform@
 platformModification=@modification@
+withRootTool=@withRootTool@
 changeSet=@changeSet@
 branch=@branch@
 currentRefs=@currentRefs@
