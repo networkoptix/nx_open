@@ -2709,7 +2709,7 @@
     </message>
     <message>
       <source>Storage Locations</source>
-      <translation>ストレージの場所</translation>
+      <translation>保存先</translation>
     </message>
     <message>
       <source>Reindex Archive</source>

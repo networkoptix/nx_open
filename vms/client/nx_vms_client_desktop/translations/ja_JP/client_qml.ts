@@ -795,7 +795,7 @@
     </message>
     <message>
       <source>preview is not available for the selected object</source>
-      <translation>選択したオブジェクトのプレビューは使用できません</translation>
+      <translation>選択したオブジェクトのプレビューは利用できません</translation>
     </message>
   </context>
   <context>
