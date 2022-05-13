@@ -5,31 +5,28 @@
 #include <nx/vms/rules/basic_event.h>
 
 #include "../data_macros.h"
+#include "described_event.h"
 
 namespace nx::vms::rules {
 
-class NX_VMS_RULES_API GenericEvent: public BasicEvent
+class NX_VMS_RULES_API GenericEvent: public DescribedEvent
 {
     Q_OBJECT
     Q_CLASSINFO("type", "nx.events.generic")
 
     FIELD(QString, source, setSource)
-    FIELD(QString, caption, setCaption)
-    FIELD(QString, description, setDescription)
 
 public:
     GenericEvent() = default;
 
     GenericEvent(
-        const QString &source,
-        const QString &caption,
-        const QString &description,
-        std::chrono::microseconds timestamp)
+        std::chrono::microseconds timestamp,
+        const QString& caption,
+        const QString& description,
+        const QString& source)
         :
-        BasicEvent(timestamp),
-        m_source(source),
-        m_caption(caption),
-        m_description(description)
+        DescribedEvent(timestamp, caption, description),
+        m_source(source)
     {
     }
 

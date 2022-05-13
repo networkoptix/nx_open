@@ -8,8 +8,6 @@
 
 namespace nx::vms::rules {
 
-class AggregatedEvent;
-
 /**
  * Abstract base class for storing configuration values for action builders.
  * Derived classes should provide Q_PROPERTY's for for all values used for
@@ -24,10 +22,7 @@ public:
     ActionField();
 
     virtual QSet<QString> requiredEventFields() const;
-    virtual QVariant build(const AggregatedEvent& event) const = 0;
-
-private:
-
+    virtual QVariant build(const EventPtr& event) const = 0;
 };
 
 } // namespace nx::vms::rules

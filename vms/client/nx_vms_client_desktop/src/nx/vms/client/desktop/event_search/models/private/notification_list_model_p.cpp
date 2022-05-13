@@ -153,9 +153,23 @@ NotificationListModel::Private::Private(NotificationListModel* q):
             eventData.toolTip = notificationAction->tooltip();
             eventData.lifetime = kDisplayTimeout;
             eventData.removable = true;
-            eventData.extraData =
-                QVariant::fromValue(ExtraData(notificationAction->ruleId(), {}));
             eventData.timestamp = notificationAction->timestamp();
+
+            if (const auto sourceId = QnUuid(notificationAction->source()); !sourceId.isNull())
+            {
+                eventData.source = resourcePool()->getResourceById(sourceId);
+                if (eventData.source)
+                {
+                    if (auto camera = eventData.source.dynamicCast<QnVirtualCameraResource>())
+                    {
+                        eventData.previewCamera = camera;
+                        eventData.cameras = {camera};
+                    }
+                }
+            }
+
+            eventData.extraData =
+                QVariant::fromValue(ExtraData(notificationAction->ruleId(), eventData.source));
 
             if (!this->q->addEvent(eventData))
                 return;

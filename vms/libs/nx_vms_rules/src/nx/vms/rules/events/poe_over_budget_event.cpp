@@ -2,10 +2,31 @@
 
 #include "poe_over_budget_event.h"
 
+#include <nx/vms/common/html/html.h>
+
 #include "../event_fields/source_server_field.h"
+#include "../utils/event_details.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
+
+QMap<QString, QString> PoeOverBudgetEvent::details(common::SystemContext* context) const
+{
+    auto result = BasicEvent::details(context);
+
+    utils::insertIfNotEmpty(result, utils::kDescriptionDetailName, description());
+
+    return result;
+}
+
+QString PoeOverBudgetEvent::description() const
+{
+    const QString consumptionString; // TODO: #mmalofeev Add consumption params to the PoeOverBudgetEvent.
+    if (consumptionString.isEmpty())
+        return {};
+
+    return QString("%1 %2").arg(common::html::bold(tr("Consumption"))).arg(consumptionString);
+}
 
 const ItemDescriptor& PoeOverBudgetEvent::manifest()
 {

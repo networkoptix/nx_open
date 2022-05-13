@@ -73,7 +73,9 @@ void Initializer::registerFields() const
     registerActionField<OptionalTimeField>();
     registerActionField<PasswordField>();
     registerActionField<TargetUserField>();
-    registerActionField<TextWithFields>();
+    m_engine->registerActionField(
+        fieldMetatype<TextWithFields>(),
+        [this] { return new TextWithFields(this->m_context); });
     registerActionField<Substitution>();
 }
 

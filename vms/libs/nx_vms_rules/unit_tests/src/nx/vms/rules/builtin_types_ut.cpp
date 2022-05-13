@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/vms/common/system_context.h>
+#include <nx/vms/common/test_support/test_context.h>
 #include <nx/vms/rules/action_fields/builtin_fields.h>
 #include <nx/vms/rules/actions/builtin_actions.h>
 #include <nx/vms/rules/engine.h>
@@ -15,7 +15,7 @@
 namespace nx::vms::rules::test {
 
 class BuiltinTypesTest:
-    public ::testing::Test,
+    public common::test::ContextBasedTest,
     public TestEngineHolder,
     public Plugin
 {
@@ -47,12 +47,14 @@ public:
         }
     }
 
-    template<class T>
-    void testActionFieldRegistration()
+    template<class T, class... Args>
+    void testActionFieldRegistration(Args... args)
     {
         SCOPED_TRACE(fieldMetatype<T>().toStdString());
 
-        EXPECT_TRUE(registerActionField<T>());
+        EXPECT_TRUE(m_engine->registerActionField(
+            fieldMetatype<T>(),
+            [args...]{ return new T(args...); }));
     }
 
     template<class T, class... Args>
@@ -88,15 +90,10 @@ public:
 
 TEST_F(BuiltinTypesTest, BuiltinEvents)
 {
-    auto context = std::make_unique<nx::vms::common::SystemContext>(
-        QnUuid(),
-        QnUuid(),
-        nx::core::access::Mode::direct);
-
     // Event fields need to be registered first.
     testEventFieldRegistration<AnalyticsEventTypeField>();
     testEventFieldRegistration<AnalyticsObjectAttributesField>();
-    testEventFieldRegistration<AnalyticsObjectTypeField>(context.get());
+    testEventFieldRegistration<AnalyticsObjectTypeField>(systemContext());
     testEventFieldRegistration<CustomizableIconField>();
     testEventFieldRegistration<CustomizableTextField>();
     testEventFieldRegistration<EventTextField>();
@@ -141,7 +138,7 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionFieldRegistration<PasswordField>();
     testActionFieldRegistration<Substitution>();
     testActionFieldRegistration<TargetUserField>();
-    testActionFieldRegistration<TextWithFields>();
+    testActionFieldRegistration<TextWithFields>(systemContext());
 
     // TODO: #amalov Uncomment all types after manifest definition.
     //testActionRegistration<BookmarkAction>();

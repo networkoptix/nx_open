@@ -10,7 +10,6 @@
 
 #include <nx/utils/uuid.h>
 
-#include "aggregated_event.h"
 #include "rules_fwd.h"
 
 namespace nx::vms::rules {
@@ -99,7 +98,7 @@ private:
     QList<ActionField*> m_targetFields;
     std::chrono::seconds m_interval = std::chrono::seconds(0);
     QTimer m_timer;
-    AggregatedEvent m_aggregatedEvent;
+    EventPtr m_event;
     bool m_updateInProgress = false;
 };
 

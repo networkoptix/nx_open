@@ -20,14 +20,21 @@ class NX_VMS_RULES_API DeviceIpConflictEvent: public BasicEvent
     FIELD(QStringList, macAddresses, setMacAddresses)
 
 public:
-    static const ItemDescriptor& manifest();
-
     DeviceIpConflictEvent() = default;
     DeviceIpConflictEvent(
-        QnUuid deviceId,
         std::chrono::microseconds timestamp,
+        QnUuid deviceId,
         const QHostAddress& address,
         const QStringList& macAddrList);
+
+    virtual QMap<QString, QString> details(common::SystemContext* context) const override;
+
+    static const ItemDescriptor& manifest();
+
+private:
+    QMap<QString, QString> m_detailing;
+
+    QString detailing() const;
 };
 
 } // namespace nx::vms::rules

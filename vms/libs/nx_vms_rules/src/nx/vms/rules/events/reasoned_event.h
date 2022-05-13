@@ -24,8 +24,8 @@ public:
 public:
     ReasonedEvent() = default;
     ReasonedEvent(
-        QnUuid serverId,
         std::chrono::microseconds timestamp,
+        QnUuid serverId,
         EventReason reasonCode,
         const QString& reasonText);
 

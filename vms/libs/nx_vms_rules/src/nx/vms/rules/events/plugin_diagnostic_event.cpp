@@ -2,7 +2,18 @@
 
 #include "plugin_diagnostic_event.h"
 
+#include "../utils/event_details.h"
+
 namespace nx::vms::rules {
+
+QMap<QString, QString> PluginDiagnosticEvent::details(common::SystemContext* context) const
+{
+    auto result = AnalyticsEngineEvent::details(context);
+
+    utils::insertIfNotEmpty(result, utils::kCaptionDetailName, tr("Unknown Plugin Diagnostic Event"));
+
+    return result;
+}
 
 FilterManifest PluginDiagnosticEvent::filterManifest()
 {

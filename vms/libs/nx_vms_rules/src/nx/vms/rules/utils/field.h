@@ -8,6 +8,10 @@
 namespace nx::vms::rules::utils {
 
 static constexpr auto kAggregationIntervalFieldName = "aggregationInterval";
+static constexpr auto kCameraIdFieldName = "cameraId";
+static constexpr auto kDeviceIdFieldName = "deviceId";
+static constexpr auto kServerIdFieldName = "serverId";
+static constexpr auto kEngineIdFieldName = "engineId";
 
 inline FieldDescriptor makeAggregationIntervalFieldDescriptor(
     const QString& displayName,

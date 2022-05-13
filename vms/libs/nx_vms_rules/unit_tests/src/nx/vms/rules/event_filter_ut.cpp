@@ -47,7 +47,7 @@ protected:
 TEST_F(EventFilterTest, allEventFieldsMatchToAllFilterFieldsTest)
 {
     EventPtr genericEvent(
-        new GenericEvent{"Source string", "Caption string", "Description string", {}});
+        new GenericEvent{{}, "Source string", "Caption string", "Description string"});
 
     sourceField->setString("Source string");
     captionField->setString("Caption string");
@@ -59,7 +59,7 @@ TEST_F(EventFilterTest, allEventFieldsMatchToAllFilterFieldsTest)
 TEST_F(EventFilterTest, allEventFieldsMismatchToFilterFieldsTest)
 {
     EventPtr genericEvent(
-        new GenericEvent{"Source string", "Caption string", "Description string", {}});
+        new GenericEvent{{}, "Source string", "Caption string", "Description string"});
 
     sourceField->setString("Foo");
     captionField->setString("Bar");
@@ -71,7 +71,7 @@ TEST_F(EventFilterTest, allEventFieldsMismatchToFilterFieldsTest)
 TEST_F(EventFilterTest, oneEventFieldMismatchToFilterFieldTest)
 {
     EventPtr genericEvent(
-        new GenericEvent{"Source string", "Caption string", "Description string", {}});
+        new GenericEvent{{}, "Source string", "Caption string", "Description string"});
 
     sourceField->setString("Foo");
     captionField->setString("Caption");
