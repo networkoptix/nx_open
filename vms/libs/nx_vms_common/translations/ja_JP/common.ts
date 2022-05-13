@@ -358,15 +358,15 @@
     </message>
     <message>
       <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</translation>
+      <translation>無効になっている場合は、I/O モジュール設定で録画を有効にしてください (エラー &quot;%1&quot;)。</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</translation>
+      <translation>無効になっている場合は、デバイス設定で録画を有効にしてFPSを下げてください (エラー &quot;%1&quot;)。</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</translation>
+      <translation>無効になっている場合は、カメラ設定で録画を有効にしてFPSを下げてください (エラー &quot;%1&quot;)。</translation>
     </message>
   </context>
   <context>
@@ -1644,11 +1644,11 @@
     </message>
     <message>
       <source>RTP error in primary stream (%1)</source>
-      <translation>プライマリストリーム (%1) でのRTPエラー</translation>
+      <translation>プライマリストリームのRTPエラー (%1)</translation>
     </message>
     <message>
       <source>RTP error in secondary stream (%1)</source>
-      <translation>セカンダリストリーム (%1) でのRTPエラー</translation>
+      <translation>セカンダリストリームのRTPエラー (%1)</translation>
     </message>
     <message>
       <source>Analytics Object Detected</source>

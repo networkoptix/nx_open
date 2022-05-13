@@ -7598,6 +7598,10 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>Select Camera</source>
       <translation>Seleccionar cámara</translation>
     </message>
+    <message>
+      <source>No cameras available</source>
+      <translation>No hay ninguna cámara disponible</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSettingsDialog</name>
@@ -9282,7 +9286,7 @@ Puede forzarlo, pero puede aumentar significativamente la carga de la CPU.</tran
     <name>nx::vms::client::desktop::ObjectTrackingButton</name>
     <message>
       <source>Object tracking is ON</source>
-      <translation type="unfinished">Object tracking is ON</translation>
+      <translation>El seguimiento de objetos está activado</translation>
     </message>
   </context>
   <context>
@@ -10086,10 +10090,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation>¿Confiar en este servidor?</translation>
     </message>
     <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
-      <translation>Revise los detalles del certificado para asegurarse de que está conectando al servidor correcto.</translation>
-    </message>
-    <message>
       <source>Cannot verify the identity of %1</source>
       <translation>No se puede verificar la identidad de %1</translation>
     </message>
@@ -10104,6 +10104,10 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <message>
       <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
       <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
+    </message>
+    <message>
+      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
+      <translation>Revise los detalles del certificado para asegurarse de que está conectando al servidor correcto.</translation>
     </message>
   </context>
   <context>
@@ -10827,28 +10831,28 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Open door</source>
-      <translation type="unfinished">Open door</translation>
+      <translation>Abrir puerta</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::integrations::OverlappedIdDialogModel</name>
     <message>
       <source>Latest</source>
-      <translation type="unfinished">Latest</translation>
+      <translation>Más reciente</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::integrations::OverlappedIdIntegration</name>
     <message>
       <source>Overlapped ID...</source>
-      <translation type="unfinished">Overlapped ID...</translation>
+      <translation>Identificación superpuesta...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::joystick::JoystickButtonActionChoiceModel</name>
     <message>
       <source>No Action</source>
-      <translation type="unfinished">No Action</translation>
+      <translation>Sin Acción</translation>
     </message>
     <message>
       <source>Focus Near</source>
@@ -10860,46 +10864,46 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Autofocus</source>
-      <translation type="unfinished">Autofocus</translation>
+      <translation>AutoEnfoque</translation>
     </message>
     <message>
       <source>Go to PTZ Position</source>
-      <translation type="unfinished">Go to PTZ Position</translation>
+      <translation>Ir a la posición PTZ</translation>
     </message>
     <message>
       <source>Set to Fullscreen</source>
-      <translation type="unfinished">Set to Fullscreen</translation>
+      <translation>Ir a pantalla completa</translation>
     </message>
     <message>
       <source>Next Camera on Layout</source>
-      <translation type="unfinished">Next Camera on Layout</translation>
+      <translation>Siguiente cámara en diseño</translation>
     </message>
     <message>
       <source>Previous Camera on Layout</source>
-      <translation type="unfinished">Previous Camera on Layout</translation>
+      <translation>Cámara anterior en diseño</translation>
     </message>
     <message>
       <source>Open Layout</source>
-      <translation type="unfinished">Open Layout</translation>
+      <translation>Abrir Diseño</translation>
     </message>
     <message>
       <source>Modifier</source>
-      <translation type="unfinished">Modifier</translation>
+      <translation>Modificador</translation>
     </message>
     <message>
       <source>Multiple</source>
-      <translation type="unfinished">Multiple</translation>
+      <translation>Múltiple</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::joystick::JoystickButtonSettingsModel</name>
     <message>
       <source>Select Layout...</source>
-      <translation type="unfinished">Select Layout...</translation>
+      <translation>Seleccionar diseño...</translation>
     </message>
     <message>
       <source>Button</source>
-      <translation type="unfinished">Button</translation>
+      <translation>Botón</translation>
     </message>
     <message>
       <source>Selected Layout</source>

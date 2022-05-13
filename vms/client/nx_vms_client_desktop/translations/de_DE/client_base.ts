@@ -7596,6 +7596,10 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
       <source>Select Camera</source>
       <translation>Kamera auswählen</translation>
     </message>
+    <message>
+      <source>No cameras available</source>
+      <translation>Keine Kameras verfügbar</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSettingsDialog</name>
@@ -10085,10 +10089,6 @@ Pinnen Sie dieses Zertifikat nicht an, wenn Sie das SSL-Zertifikat des %2-Server
       <translation>Diesem Server vertrauen?</translation>
     </message>
     <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
-      <translation>Überprüfen Sie die Details des Zertifikats, um sicherzustellen, dass Sie sich mit dem richtigen Server verbinden.</translation>
-    </message>
-    <message>
       <source>Cannot verify the identity of %1</source>
       <translation>Kann die Identität von %1 nicht verifizieren</translation>
     </message>
@@ -10103,6 +10103,10 @@ Pinnen Sie dieses Zertifikat nicht an, wenn Sie das SSL-Zertifikat des %2-Server
     <message>
       <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
       <translation>Stellen Sie nur dann eine Verbindung zu diesem Server her, wenn Sie von Ihrem VMS-Administrator dazu aufgefordert werden.</translation>
+    </message>
+    <message>
+      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
+      <translation>Überprüfen Sie die Zertifikatsdetails, um sicherzustellen, dass Sie sich mit dem richtigen Server verbinden.</translation>
     </message>
   </context>
   <context>

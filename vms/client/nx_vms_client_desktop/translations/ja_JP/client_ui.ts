@@ -1147,7 +1147,7 @@
     </message>
     <message>
       <source>No Failover</source>
-      <translation type="unfinished">No Failover</translation>
+      <translation>フェイルオーバーなし</translation>
     </message>
   </context>
   <context>
@@ -2709,7 +2709,7 @@
     </message>
     <message>
       <source>Storage Locations</source>
-      <translation>ストレージの場所</translation>
+      <translation>保存先</translation>
     </message>
     <message>
       <source>Reindex Archive</source>

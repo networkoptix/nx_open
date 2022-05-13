@@ -7596,6 +7596,10 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
       <source>Select Camera</source>
       <translation>Selecteer Camera</translation>
     </message>
+    <message>
+      <source>No cameras available</source>
+      <translation type="unfinished">No cameras available</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSettingsDialog</name>
@@ -10085,10 +10089,6 @@ Pin dit certificaat niet vast als u het %2 server SSL-certificaat niet hebt gewi
       <translation>Deze server vertrouwen?</translation>
     </message>
     <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
-      <translation>Bekijk de details van het certificaat om er zeker van te zijn dat u verbinding maakt met de juiste server.</translation>
-    </message>
-    <message>
       <source>Cannot verify the identity of %1</source>
       <translation>Kan de identiteit van %1 niet verifiëren</translation>
     </message>
@@ -10103,6 +10103,10 @@ Pin dit certificaat niet vast als u het %2 server SSL-certificaat niet hebt gewi
     <message>
       <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
       <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
+    </message>
+    <message>
+      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
+      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct Server.</translation>
     </message>
   </context>
   <context>

@@ -1017,7 +1017,7 @@
     </message>
     <message>
       <source>Account Security...</source>
-      <translation type="unfinished">Account Security...</translation>
+      <translation>Kontosäkerhet...</translation>
     </message>
   </context>
   <context>
@@ -7600,6 +7600,10 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <source>Select Camera</source>
       <translation>Välj kamera</translation>
     </message>
+    <message>
+      <source>No cameras available</source>
+      <translation>Inga kameror tillgängliga</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSettingsDialog</name>
@@ -10088,10 +10092,6 @@ Fäst inte detta certifikat om du gjorde&apos;t ändra %2 server SSL-certifikat.
       <translation>Lita på den här servern?</translation>
     </message>
     <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
-      <translation>Granska certifikatets detaljer för att se till att du ansluter till rätt server.</translation>
-    </message>
-    <message>
       <source>Cannot verify the identity of %1</source>
       <translation>Kan inte verifiera identiteten på %1</translation>
     </message>
@@ -10106,6 +10106,10 @@ Fäst inte detta certifikat om du gjorde&apos;t ändra %2 server SSL-certifikat.
     <message>
       <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
       <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
+    </message>
+    <message>
+      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
+      <translation>Granska certifikatets&apos;s detaljer för att se till att du ansluter till rätt server.</translation>
     </message>
   </context>
   <context>

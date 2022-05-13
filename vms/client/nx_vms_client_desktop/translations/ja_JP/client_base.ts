@@ -1015,7 +1015,7 @@
     </message>
     <message>
       <source>Account Security...</source>
-      <translation type="unfinished">Account Security...</translation>
+      <translation>アカウントのセキュリティ...</translation>
     </message>
   </context>
   <context>
@@ -1593,7 +1593,7 @@
     </message>
     <message>
       <source>Change Dewarping Mode</source>
-      <translation>歪み補正モード</translation>
+      <translation>歪み補正モードを変更</translation>
     </message>
   </context>
   <context>
@@ -2902,11 +2902,11 @@ to %1</source>
     </message>
     <message>
       <source>System is not compatible with two-factor authentication</source>
-      <translation type="unfinished">System is not compatible with two-factor authentication</translation>
+      <translation>システムは二要素認証と互換性がありません</translation>
     </message>
     <message>
       <source>Failed to log in to &quot;%1&quot; system</source>
-      <translation type="unfinished">Failed to log in to &quot;%1&quot; system</translation>
+      <translation>&quot;%1&quot; システムへのログインに失敗しました</translation>
     </message>
   </context>
   <context>
@@ -4782,7 +4782,7 @@ to %1</source>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
-      <translation type="unfinished">Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</translation>
+      <translation>フェイルオーバーが有効なサーバーは、同じロケーションIDをもつオフラインサーバーからカメラを自動的に引き継ぎます。</translation>
     </message>
   </context>
   <context>
@@ -7477,6 +7477,10 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>Select Camera</source>
       <translation>カメラ選択</translation>
     </message>
+    <message>
+      <source>No cameras available</source>
+      <translation>利用可能なカメラはありません</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSettingsDialog</name>
@@ -8321,7 +8325,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>No Failover</source>
-      <translation type="unfinished">No Failover</translation>
+      <translation>フェイルオーバーなし</translation>
     </message>
   </context>
   <context>
@@ -9099,7 +9103,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
-      <translation type="unfinished">There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</translation>
+      <translation>クライアントアップデートをダウンロードするのに十分な空き容量がありません。ハードドライブの空き容量を確保して、もう一度お試しください。</translation>
     </message>
   </context>
   <context>
@@ -9938,24 +9942,24 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation>このサーバーを信用しますか？</translation>
     </message>
     <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
-      <translation>証明書の詳細を確認して、正しいサーバーに接続していることを確認してください。</translation>
-    </message>
-    <message>
       <source>Cannot verify the identity of %1</source>
       <translation>%1 の識別情報を確認できません</translation>
     </message>
     <message>
       <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
-      <translation type="unfinished">You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</translation>
+      <translation>このサーバーに接続しようとしましたが、自動的に検証できない証明書が表示されました。</translation>
     </message>
     <message>
       <source>Someone may be impersonating this Server to steal your personal information.</source>
-      <translation type="unfinished">Someone may be impersonating this Server to steal your personal information.</translation>
+      <translation>誰かがあなたの個人情報を盗むためにこのサーバーになりすましている可能性があります。</translation>
     </message>
     <message>
       <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
-      <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
+      <translation>VMS管理者の指示がない限り、このサーバーに接続しないでください。</translation>
+    </message>
+    <message>
+      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
+      <translation>証明書の詳細を確認して、正しいサーバーに接続していることを確認してください。</translation>
     </message>
   </context>
   <context>

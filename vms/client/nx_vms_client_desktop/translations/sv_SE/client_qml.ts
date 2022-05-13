@@ -803,7 +803,7 @@
     </message>
     <message>
       <source>Preview is not available for the selected object</source>
-      <translation type="unfinished">Preview is not available for the selected object</translation>
+      <translation>Förhandsgranskning är inte tillgänglig för det valda objektet</translation>
     </message>
   </context>
   <context>

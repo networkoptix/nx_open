@@ -7831,6 +7831,10 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>Select Camera</source>
       <translation>Wybierz kamerę</translation>
     </message>
+    <message>
+      <source>No cameras available</source>
+      <translation type="unfinished">No cameras available</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSettingsDialog</name>
@@ -10373,10 +10377,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation>Oznaczyć serwer jako zaufany?</translation>
     </message>
     <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
-      <translation>Przejrzyj szczegóły certyfikatu &apos; aby upewnić się, że łączyłeś się z właściwym serwerem.</translation>
-    </message>
-    <message>
       <source>Cannot verify the identity of %1</source>
       <translation>Nie można zweryfikować tożsamości %1</translation>
     </message>
@@ -10391,6 +10391,10 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <message>
       <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
       <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
+    </message>
+    <message>
+      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
+      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct Server.</translation>
     </message>
   </context>
   <context>

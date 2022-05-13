@@ -7599,6 +7599,10 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
       <source>Select Camera</source>
       <translation>Selecione a câmera</translation>
     </message>
+    <message>
+      <source>No cameras available</source>
+      <translation type="unfinished">No cameras available</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSettingsDialog</name>
@@ -10088,10 +10092,6 @@ Não fixe este certificado se você&apos;t modificou o certificado SSL %2 servid
       <translation>Deseja confiar neste servidor?</translation>
     </message>
     <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
-      <translation>Revise os&apos;s para certificar-se de que está se conectando ao servidor correto.</translation>
-    </message>
-    <message>
       <source>Cannot verify the identity of %1</source>
       <translation>Não é possível verificar a identidade de %1</translation>
     </message>
@@ -10106,6 +10106,10 @@ Não fixe este certificado se você&apos;t modificou o certificado SSL %2 servid
     <message>
       <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
       <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
+    </message>
+    <message>
+      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
+      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct Server.</translation>
     </message>
   </context>
   <context>
