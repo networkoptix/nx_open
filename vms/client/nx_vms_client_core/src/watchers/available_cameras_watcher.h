@@ -9,7 +9,10 @@
 #include <utils/common/connective.h>
 
 class QnAvailableCamerasWatcherPrivate;
-class QnAvailableCamerasWatcher: public Connective<QObject>, public QnCommonModuleAware
+
+class NX_VMS_CLIENT_CORE_API QnAvailableCamerasWatcher:
+    public Connective<QObject>,
+    public QnCommonModuleAware
 {
     Q_OBJECT
 

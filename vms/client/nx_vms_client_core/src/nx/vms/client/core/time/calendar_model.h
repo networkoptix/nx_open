@@ -12,7 +12,7 @@ namespace nx::vms::client::core {
 
 class TimePeriodsStore;
 
-class CalendarModel: public QAbstractListModel
+class NX_VMS_CLIENT_CORE_API CalendarModel: public QAbstractListModel
 {
     Q_OBJECT
     using base_type = QAbstractListModel;

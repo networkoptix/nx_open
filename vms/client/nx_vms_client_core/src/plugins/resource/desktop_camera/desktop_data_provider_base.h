@@ -16,7 +16,7 @@
 
 class QnAbstractDataConsumer;
 
-class QnDesktopDataProviderBase : public QnAbstractMediaStreamDataProvider
+class NX_VMS_CLIENT_CORE_API QnDesktopDataProviderBase : public QnAbstractMediaStreamDataProvider
 {
 public:
     QnDesktopDataProviderBase(QnResourcePtr ptr);

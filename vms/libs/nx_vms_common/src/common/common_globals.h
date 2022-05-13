@@ -15,7 +15,7 @@
 #include <nx/string.h>
 
 namespace Qn {
-    NX_VMS_COMMON_API Q_NAMESPACE
+    Q_NAMESPACE_EXPORT(NX_VMS_COMMON_API)
 
     NX_REFLECTION_ENUM(ExtrapolationMode,
         ConstantExtrapolation,

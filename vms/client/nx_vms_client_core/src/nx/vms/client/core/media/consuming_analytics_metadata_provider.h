@@ -9,7 +9,7 @@
 
 namespace nx::vms::client::core {
 
-class ConsumingAnalyticsMetadataProvider:
+class NX_VMS_CLIENT_CORE_API ConsumingAnalyticsMetadataProvider:
     public AbstractAnalyticsMetadataProvider,
     public AbstractMetadataConsumerOwner
 {
@@ -36,7 +36,7 @@ private:
     const QScopedPointer<Private> d;
 };
 
-class ConsumingAnalyticsMetadataProviderFactory:
+class NX_VMS_CLIENT_CORE_API ConsumingAnalyticsMetadataProviderFactory:
     public AbstractAnalyticsMetadataProviderFactory
 {
 public:

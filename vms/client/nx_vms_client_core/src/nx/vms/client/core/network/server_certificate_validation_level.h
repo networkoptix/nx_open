@@ -8,7 +8,7 @@
 
 namespace nx::vms::client::core::network::server_certificate {
 
-Q_NAMESPACE
+Q_NAMESPACE_EXPORT(NX_VMS_CLIENT_CORE_API)
 
 NX_REFLECTION_ENUM_CLASS(ValidationLevel,
     disabled,

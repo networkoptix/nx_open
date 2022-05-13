@@ -15,7 +15,7 @@ namespace nx::vms::client::core {
  * It's intended to be used in the GUI thread and is NOT thread-safe.
  * Descendants should call setImage when an image is obtained.
  */
-class AsyncImageResult: public QObject
+class NX_VMS_CLIENT_CORE_API AsyncImageResult: public QObject
 {
     Q_OBJECT
 

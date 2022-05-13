@@ -13,7 +13,7 @@
 /**
  * Used for DesktopClient purpose to put incompatible media servers to the resource tree.
  */
-class QnFakeMediaServerResource: public QnMediaServerResource
+class NX_VMS_CLIENT_CORE_API QnFakeMediaServerResource: public QnMediaServerResource
 {
     Q_OBJECT
     using base_type = QnMediaServerResource;

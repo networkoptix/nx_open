@@ -13,7 +13,7 @@ class QRect;
 
 namespace nx::vms::client::core {
 
-class MotionGrid
+class NX_VMS_CLIENT_CORE_API MotionGrid
 {
 public:
     static constexpr int kWidth = Qn::kMotionGridWidth;

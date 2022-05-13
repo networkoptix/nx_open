@@ -5,7 +5,8 @@
 
 #include <QtCore/QtGlobal>
 
-class QnPerformance {
+class NX_VMS_CLIENT_CORE_API QnPerformance
+{
 public:
     /**
      * \returns                         CPU time (both user and kernel) consumed
@@ -14,7 +15,7 @@ public:
     static qint64 currentThreadTimeMSecs();
 
     /**
-     * \returns                         CPU time (both user and kernel) consumed 
+     * \returns                         CPU time (both user and kernel) consumed
      *                                  by the current thread since its start, in nanoseconds.
      */
     static qint64 currentThreadTimeNSecs();
@@ -26,7 +27,7 @@ public:
     static qint64 currentThreadCycles();
 
     /**
-     * \returns                         Current CPU frequency. 
+     * \returns                         Current CPU frequency.
      * \see currentThreadCycles()
      */
     static qint64 currentCpuFrequency();

@@ -4,7 +4,7 @@
 
 #include <network/system_description.h>
 
-class QnLocalSystemDescription: public QnSystemDescription
+class NX_VMS_CLIENT_CORE_API QnLocalSystemDescription: public QnSystemDescription
 {
     Q_OBJECT
     using base_type = QnSystemDescription;

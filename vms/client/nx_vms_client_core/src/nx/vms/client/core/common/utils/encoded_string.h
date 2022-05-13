@@ -25,7 +25,7 @@ namespace nx::vms::client::core {
  * Executing cryptography algorithms is lazy, called only when actually needed to avoid (de)cypher
  * before actual key is set.
  */
-class EncodedString
+class NX_VMS_CLIENT_CORE_API EncodedString
 {
 public:
     /** Construct an empty value. Mode will be deducted on first setter call. */

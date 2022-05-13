@@ -15,7 +15,7 @@ class AbstractImageSource;
 /**
  * Generic QML image provider with two-level underlying hierarchy: image sources and images.
  */
-class ThumbnailImageProvider:
+class NX_VMS_CLIENT_CORE_API ThumbnailImageProvider:
     public QObject,
     public QQuickImageProvider,
     public Singleton<ThumbnailImageProvider>

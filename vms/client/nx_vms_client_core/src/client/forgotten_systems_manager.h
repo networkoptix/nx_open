@@ -12,7 +12,9 @@
 #include <nx/utils/singleton.h>
 #include <utils/common/connective.h>
 
-class QnForgottenSystemsManager: public QObject, public Singleton<QnForgottenSystemsManager>
+class NX_VMS_CLIENT_CORE_API QnForgottenSystemsManager:
+    public QObject,
+    public Singleton<QnForgottenSystemsManager>
 {
     Q_OBJECT
     typedef QObject base_type;

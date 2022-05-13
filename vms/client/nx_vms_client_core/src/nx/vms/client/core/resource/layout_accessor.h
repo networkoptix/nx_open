@@ -11,7 +11,9 @@
 namespace nx::vms::client::core {
 namespace resource {
 
-class LayoutAccessor: public Connective<QObject>, public nx::vms::client::core::CommonModuleAware
+class NX_VMS_CLIENT_CORE_API LayoutAccessor:
+    public Connective<QObject>,
+    public CommonModuleAware
 {
     Q_OBJECT
     Q_PROPERTY(QString layoutId READ layoutId WRITE setLayoutId NOTIFY layoutChanged)

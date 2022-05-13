@@ -25,7 +25,7 @@ namespace nx::vms::client::core {
  * Part of the logic is tightly bound to the our server API (e.g. passing error codes in headers),
  * so for now class shouldn't be treated as a generic purpose one.
  */
-class NetworkManager: public QObject
+class NX_VMS_CLIENT_CORE_API NetworkManager: public QObject
 {
     Q_OBJECT
     using base_type = QObject;

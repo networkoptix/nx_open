@@ -11,12 +11,13 @@
 
 namespace nx::vms::client::core {
 
-struct CloudSystemEndpoint
+struct NX_VMS_CLIENT_CORE_API CloudSystemEndpoint
 {
     QnUuid serverId;
     nx::network::SocketAddress address;
 };
 
-std::optional<CloudSystemEndpoint> cloudSystemEndpoint(const QString& systemId);
+NX_VMS_CLIENT_CORE_API std::optional<CloudSystemEndpoint> cloudSystemEndpoint(
+    const QString& systemId);
 
 } // namespace nx::vms::client::desktop

@@ -12,7 +12,9 @@ namespace nx::api { struct CameraImageRequest; }
 
 namespace nx::vms::client::core {
 
-class CameraAsyncImageRequest: public AsyncImageResult, public RemoteConnectionAware
+class NX_VMS_CLIENT_CORE_API CameraAsyncImageRequest:
+    public AsyncImageResult,
+    public RemoteConnectionAware
 {
     Q_OBJECT
     using base_type = AsyncImageResult;
@@ -44,6 +46,6 @@ private:
     nx::utils::ImplPtr<Private> d;
 };
 
-QString toString(CameraAsyncImageRequest::CameraStream value);
+NX_VMS_CLIENT_CORE_API QString toString(CameraAsyncImageRequest::CameraStream value);
 
 } // namespace nx::vms::client::core

@@ -14,7 +14,7 @@ struct QnTimeReply;
 
 namespace nx::vms::client::core {
 
-class ServerTimeWatcher:
+class NX_VMS_CLIENT_CORE_API ServerTimeWatcher:
     public QObject,
     public SystemContextAware
 {

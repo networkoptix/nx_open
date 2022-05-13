@@ -10,7 +10,7 @@
 
 namespace nx::vms::client::core {
 
-class DisplayTimeHelper: public QObject
+class NX_VMS_CLIENT_CORE_API DisplayTimeHelper: public QObject
 {
     Q_OBJECT
     using base_type = QObject;

@@ -17,7 +17,7 @@ namespace nx::vms::client::core {
  * Centralized interface for working with stored credentials.
  * Username is stored as-is but search is case-insensitive.
  */
-struct CredentialsManager: public QObject
+struct NX_VMS_CLIENT_CORE_API CredentialsManager: public QObject
 {
     using Credentials = nx::network::http::Credentials;
 

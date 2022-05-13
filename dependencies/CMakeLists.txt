@@ -13,6 +13,10 @@ if(withDesktopClient)
     add_subdirectory(qthttpserver)
 endif()
 
+if(withDesktopClient OR withMobileClient)
+    add_subdirectory(speex)
+endif()
+
 if((withDesktopClient OR withMobileClient) AND NOT (ANDROID OR IOS))
     add_subdirectory(qtkeychain)
 endif()

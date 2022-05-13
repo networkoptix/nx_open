@@ -7,7 +7,7 @@
 
 namespace nx::vms::client::core {
 
-class CalendarUtils
+class NX_VMS_CLIENT_CORE_API CalendarUtils
 {
 public:
     static const int kMinYear;

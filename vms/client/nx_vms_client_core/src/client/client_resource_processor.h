@@ -7,7 +7,7 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_processor.h>
 
-class QnClientResourceProcessor:
+class NX_VMS_CLIENT_CORE_API QnClientResourceProcessor:
     public QObject,
     public QnResourceProcessor
 {

@@ -88,7 +88,7 @@ NX_REFLECTION_ENUM_CLASS(RemoteConnectionErrorCode,
     digestCloudCredentialsRequired
 );
 
-struct RemoteConnectionError
+struct NX_VMS_CLIENT_CORE_API RemoteConnectionError
 {
     RemoteConnectionErrorCode code;
     /** Description from the server side. */

@@ -52,6 +52,7 @@ qt_plugins = [
 
 nx_libraries = [
     'nx_vms_common',
+    'nx_vms_client_core',
     'nx_vms_client_desktop',
     'nx_vms_utils',
     'nx_vms_applauncher_api',

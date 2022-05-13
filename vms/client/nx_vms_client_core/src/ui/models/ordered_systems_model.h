@@ -9,7 +9,7 @@
 #include <client/system_weights_manager.h>
 #include <nx/vms/client/core/enums.h>
 
-class QnSystemSortFilterListModel: public QnSortFilterListModel
+class NX_VMS_CLIENT_CORE_API QnSystemSortFilterListModel: public QnSortFilterListModel
 {
     Q_OBJECT
     using base_type = QnSortFilterListModel;

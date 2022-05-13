@@ -16,7 +16,7 @@ using nx::vms::client::core::WeightData;
 
 typedef QHash<QString, WeightData> QnWeightsDataHash;
 
-class QnSystemsWeightsManager:
+class NX_VMS_CLIENT_CORE_API QnSystemsWeightsManager:
     public QObject,
     public Singleton<QnSystemsWeightsManager>
 {

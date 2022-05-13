@@ -10,7 +10,9 @@
 
 namespace nx::vms::client::core {
 
-class SoftwareTriggersController: public QObject, public RemoteConnectionAware
+class NX_VMS_CLIENT_CORE_API SoftwareTriggersController:
+    public QObject,
+    public RemoteConnectionAware
 {
     Q_OBJECT
     using base_type = QObject;

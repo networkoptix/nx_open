@@ -23,7 +23,7 @@ namespace nx::vms::client::core {
 
 class CertificateCache;
 
-struct RemoteConnectionFactoryContext: public QObject
+struct NX_VMS_CLIENT_CORE_API RemoteConnectionFactoryContext: public QObject
 {
     LogonData logonData;
     std::optional<std::chrono::microseconds> sessionTokenExpirationTime;

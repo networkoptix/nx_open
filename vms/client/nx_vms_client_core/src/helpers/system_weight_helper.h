@@ -9,8 +9,8 @@
 namespace nx::vms::client::core {
 namespace helpers {
 
-qreal calculateSystemWeight(qreal baseWeight, qint64 lastConnectedUtcMs);
-void updateWeightData(const QnUuid& localId);
+NX_VMS_CLIENT_CORE_API qreal calculateSystemWeight(qreal baseWeight, qint64 lastConnectedUtcMs);
+NX_VMS_CLIENT_CORE_API void updateWeightData(const QnUuid& localId);
 
 } // helpers namespace
 } // namespace nx::vms::client::core

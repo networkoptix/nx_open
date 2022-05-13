@@ -8,7 +8,7 @@ namespace nx::media { class AbstractMetadataConsumer;}
 
 namespace nx::vms::client::core {
 
-class NX_FORCE_EXPORT AbstractMetadataConsumerOwner
+class NX_VMS_CLIENT_CORE_API AbstractMetadataConsumerOwner
 {
 public:
     virtual ~AbstractMetadataConsumerOwner() {}

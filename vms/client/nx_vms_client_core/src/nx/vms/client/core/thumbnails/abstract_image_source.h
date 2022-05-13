@@ -14,7 +14,7 @@ class ThumbnailImageProvider;
 /**
  * A base class for image sources for generic QML image provider ThumbnailImageProvider.
  */
-class AbstractImageSource
+class NX_VMS_CLIENT_CORE_API AbstractImageSource
 {
 public:
     const QString id;

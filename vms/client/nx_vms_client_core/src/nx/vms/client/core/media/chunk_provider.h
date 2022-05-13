@@ -11,7 +11,9 @@
 
 namespace nx::vms::client::core {
 
-class ChunkProvider: public TimePeriodsStore, public nx::vms::client::core::CommonModuleAware
+class NX_VMS_CLIENT_CORE_API ChunkProvider:
+    public TimePeriodsStore,
+    public nx::vms::client::core::CommonModuleAware
 {
     Q_OBJECT
     using base_type = TimePeriodsStore;

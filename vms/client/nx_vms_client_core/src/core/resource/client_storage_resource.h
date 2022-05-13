@@ -11,7 +11,7 @@
 *   Additional info like total space is loaded with a separate API request
 *   and is set from outside.
 */
-class QnClientStorageResource: public QnStorageResource
+class NX_VMS_CLIENT_CORE_API QnClientStorageResource: public QnStorageResource
 {
     Q_OBJECT
 

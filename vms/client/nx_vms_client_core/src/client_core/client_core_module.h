@@ -32,7 +32,9 @@ class SystemContext;
 
 namespace nx::vms::rules { class Engine; }
 
-class QnClientCoreModule: public QObject, public Singleton<QnClientCoreModule>
+class NX_VMS_CLIENT_CORE_API QnClientCoreModule:
+    public QObject,
+    public Singleton<QnClientCoreModule>
 {
     Q_OBJECT
     using base_type = QObject;

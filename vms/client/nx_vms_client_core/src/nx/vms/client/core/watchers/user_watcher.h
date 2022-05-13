@@ -10,7 +10,7 @@
 
 namespace nx::vms::client::core {
 
-class UserWatcher: public Connective<QObject>, public CommonModuleAware
+class NX_VMS_CLIENT_CORE_API UserWatcher: public Connective<QObject>, public CommonModuleAware
 {
     Q_OBJECT
     /* This property should remain read-only for QML! */

@@ -13,26 +13,35 @@ struct CloudAuthData;
 
 namespace helpers {
 
-extern const nx::utils::log::Tag kCredentialsLogTag;
-extern const char* const kCloudUrlSchemeName;
+NX_VMS_CLIENT_CORE_API extern const nx::utils::log::Tag kCredentialsLogTag;
+NX_VMS_CLIENT_CORE_API extern const char* const kCloudUrlSchemeName;
 
-void storeConnection(const QnUuid& localSystemId, const QString& systemName, const nx::utils::Url &url);
-void removeConnection(const QnUuid& localSystemId, const nx::utils::Url& url = nx::utils::Url());
+NX_VMS_CLIENT_CORE_API void storeConnection(
+    const QnUuid& localSystemId,
+    const QString& systemName,
+    const nx::utils::Url& url);
 
-void removePasswords(const QnUuid& localSystemId, const QString& userName = QString());
+NX_VMS_CLIENT_CORE_API void removeConnection(
+    const QnUuid& localSystemId,
+    const nx::utils::Url& url = nx::utils::Url());
+
+NX_VMS_CLIENT_CORE_API void removePasswords(
+    const QnUuid& localSystemId,
+    const QString& userName = QString());
 
 /** Try to load password cloud credentials from older versions, 4.2 and below.*/
-nx::network::http::Credentials loadCloudPasswordCredentials();
-void forgetSavedCloudPassword();
+NX_VMS_CLIENT_CORE_API nx::network::http::Credentials loadCloudPasswordCredentials();
+NX_VMS_CLIENT_CORE_API void forgetSavedCloudPassword();
 
-CloudAuthData loadCloudCredentials();
-void saveCloudCredentials(const CloudAuthData& credentials);
+NX_VMS_CLIENT_CORE_API CloudAuthData loadCloudCredentials();
+NX_VMS_CLIENT_CORE_API void saveCloudCredentials(const CloudAuthData& credentials);
 
-std::optional<QnUuid> preferredCloudServer(const QString& systemId);
-void savePreferredCloudServer(const QString& systemId, const QnUuid& serverId);
+NX_VMS_CLIENT_CORE_API std::optional<QnUuid> preferredCloudServer(const QString& systemId);
+NX_VMS_CLIENT_CORE_API void savePreferredCloudServer(
+    const QString& systemId, const QnUuid& serverId);
 
-QString serverCloudHost(const QString& systemId, const QnUuid& serverId);
-bool isCloudUrl(const nx::utils::Url& url);
+NX_VMS_CLIENT_CORE_API QString serverCloudHost(const QString& systemId, const QnUuid& serverId);
+NX_VMS_CLIENT_CORE_API bool isCloudUrl(const nx::utils::Url& url);
 
 } // namespace helpers
 } // namespace nx::vms::client::core

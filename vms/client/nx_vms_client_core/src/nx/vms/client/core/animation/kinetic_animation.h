@@ -10,7 +10,7 @@
 namespace nx::vms::client::core {
 namespace animation {
 
-class KineticAnimation: public QObject
+class NX_VMS_CLIENT_CORE_API KineticAnimation: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QPointF position READ position NOTIFY positionChanged)

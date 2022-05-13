@@ -9,7 +9,7 @@
 class AbstractSystemsController;
 class QnSystemsModelPrivate;
 
-class QnSystemsModel: public Connective<QAbstractListModel>
+class NX_VMS_CLIENT_CORE_API QnSystemsModel: public Connective<QAbstractListModel>
 {
     Q_OBJECT
 

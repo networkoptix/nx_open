@@ -10,7 +10,7 @@
 
 namespace nx::vms::client::core {
 
-class NX_FORCE_EXPORT AbstractAnalyticsMetadataProvider
+class NX_VMS_CLIENT_CORE_API AbstractAnalyticsMetadataProvider
 {
 public:
     AbstractAnalyticsMetadataProvider();

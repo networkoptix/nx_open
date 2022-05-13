@@ -11,7 +11,9 @@
 
 namespace nx::vms::client::core {
 
-class SystemsVisibilityManager: public QObject, public Singleton<SystemsVisibilityManager>
+class NX_VMS_CLIENT_CORE_API SystemsVisibilityManager:
+    public QObject,
+    public Singleton<SystemsVisibilityManager>
 {
     Q_OBJECT
     typedef QObject base_type;

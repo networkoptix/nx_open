@@ -6,7 +6,7 @@
 
 namespace nx::vms::client::core {
 
-class KeychainBackend: public nx::utils::property_storage::AbstractBackend
+class NX_VMS_CLIENT_CORE_API KeychainBackend: public nx::utils::property_storage::AbstractBackend
 {
 public:
     explicit KeychainBackend(const QString& serviceName);

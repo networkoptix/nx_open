@@ -8,7 +8,7 @@
 
 namespace nx::vms::client::core {
 
-class GenericImageStore: public AbstractImageSource
+class NX_VMS_CLIENT_CORE_API GenericImageStore: public AbstractImageSource
 {
 public:
     using AbstractImageSource::AbstractImageSource; //< Forward constructors.

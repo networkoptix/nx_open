@@ -13,7 +13,9 @@ namespace nx::vms::license { class SingleCamLicenseStatusHelper; }
 
 namespace nx::vms::client::core {
 
-class TwoWayAudioAvailabilityWatcher: public Connective<QObject>, public CommonModuleAware
+class NX_VMS_CLIENT_CORE_API TwoWayAudioAvailabilityWatcher:
+    public Connective<QObject>,
+    public CommonModuleAware
 {
     Q_OBJECT
     using base_type = Connective<QObject>;

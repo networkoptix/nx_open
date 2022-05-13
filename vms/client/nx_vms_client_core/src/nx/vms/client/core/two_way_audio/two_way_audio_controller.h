@@ -17,7 +17,7 @@ namespace nx::vms::client::core {
 class TwoWayAudioAvailabilityWatcher;
 class OrderedRequestsManager;
 
-class TwoWayAudioController: public Connective<QObject>,
+class NX_VMS_CLIENT_CORE_API TwoWayAudioController: public Connective<QObject>,
     public CommonModuleAware
 {
     Q_OBJECT

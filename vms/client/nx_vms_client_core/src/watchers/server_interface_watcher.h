@@ -11,7 +11,7 @@
 #include <nx/vms/discovery/manager.h>
 
 // TODO: #dklychkov move the watcher to the network folder, as the router and module finder
-class QnServerInterfaceWatcher:
+class NX_VMS_CLIENT_CORE_API QnServerInterfaceWatcher:
     public QObject,
     public nx::vms::client::core::CommonModuleAware,
     public nx::vms::client::core::RemoteConnectionAware

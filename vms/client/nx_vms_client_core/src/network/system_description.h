@@ -11,7 +11,7 @@
 #include <nx/utils/url.h>
 #include <nx/vms/api/data/module_information.h>
 
-class QnSystemDescription: public QnBaseSystemDescription
+class NX_VMS_CLIENT_CORE_API QnSystemDescription: public QnBaseSystemDescription
 {
     Q_OBJECT
 

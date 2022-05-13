@@ -10,7 +10,7 @@ namespace nx::vms::client::core {
  * Walk around the given grid, starting from the top left corner. Default state is invalid until
  * next() is called.
  */
-struct GridWalker
+struct NX_VMS_CLIENT_CORE_API GridWalker
 {
     enum class Policy
     {

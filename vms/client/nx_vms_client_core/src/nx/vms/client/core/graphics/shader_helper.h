@@ -13,7 +13,7 @@
 
 namespace nx::vms::client::core::graphics {
 
-class ShaderHelper: public QObject
+class NX_VMS_CLIENT_CORE_API ShaderHelper: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
@@ -33,7 +33,7 @@ public:
     static void registerQmlType();
 };
 
-QByteArray preprocessShaderSource(const char* parenthesized);
+NX_VMS_CLIENT_CORE_API QByteArray preprocessShaderSource(const char* parenthesized);
 
 } // namespace nx::vms::client::core
 

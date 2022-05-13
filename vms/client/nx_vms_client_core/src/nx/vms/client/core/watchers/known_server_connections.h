@@ -17,7 +17,7 @@ class QnCommonModule;
 namespace nx::vms::client::core {
 namespace watchers {
 
-class KnownServerConnections: public QObject
+class NX_VMS_CLIENT_CORE_API KnownServerConnections: public QObject
 {
     Q_OBJECT
 

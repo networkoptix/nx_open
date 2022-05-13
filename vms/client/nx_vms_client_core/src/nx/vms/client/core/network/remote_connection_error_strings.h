@@ -11,7 +11,7 @@ namespace nx::vms::client::core {
 
 enum class RemoteConnectionErrorCode;
 
-struct RemoteConnectionErrorDescription
+struct NX_VMS_CLIENT_CORE_API RemoteConnectionErrorDescription
 {
     /** Short one-line description, used on WS tiles or in mobile client. */
     QString shortText;
@@ -20,12 +20,12 @@ struct RemoteConnectionErrorDescription
     QString longText;
 };
 
-RemoteConnectionErrorDescription errorDescription(
+NX_VMS_CLIENT_CORE_API RemoteConnectionErrorDescription errorDescription(
     RemoteConnectionErrorCode code,
     const nx::vms::api::ModuleInformation& moduleInformation,
     const nx::utils::SoftwareVersion& engineVersion);
 
 /** Short error description does not require client and server versions.  */
-QString shortErrorDescription(RemoteConnectionErrorCode code);
+NX_VMS_CLIENT_CORE_API QString shortErrorDescription(RemoteConnectionErrorCode code);
 
 } // namespace nx::vms::client::core

@@ -15,7 +15,7 @@
 
 class QSettings;
 
-class QnClientCoreSettings :
+class NX_VMS_CLIENT_CORE_API QnClientCoreSettings :
     public QnPropertyStorage,
     public Singleton<QnClientCoreSettings>
 {
