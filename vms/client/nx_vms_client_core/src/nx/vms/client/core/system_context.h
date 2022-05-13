@@ -13,7 +13,7 @@ class QQmlContext;
 
 namespace nx::vms::client::core {
 
-class SystemContext: public nx::vms::common::SystemContext
+class NX_VMS_CLIENT_CORE_API SystemContext: public nx::vms::common::SystemContext
 {
     Q_OBJECT
 

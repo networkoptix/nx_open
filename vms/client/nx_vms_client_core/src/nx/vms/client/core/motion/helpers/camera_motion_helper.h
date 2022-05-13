@@ -9,7 +9,7 @@
 
 namespace nx::vms::client::core {
 
-class CameraMotionHelper: public QObject
+class NX_VMS_CLIENT_CORE_API CameraMotionHelper: public QObject
 {
     Q_OBJECT
 

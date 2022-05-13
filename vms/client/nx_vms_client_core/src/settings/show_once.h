@@ -11,7 +11,7 @@ namespace nx {
 namespace settings {
 
 /** Generic class for persistent storage of 'once'-type flags. */
-class ShowOnce: public QObject
+class NX_VMS_CLIENT_CORE_API ShowOnce: public QObject
 {
     Q_OBJECT
     using base_type = QObject;

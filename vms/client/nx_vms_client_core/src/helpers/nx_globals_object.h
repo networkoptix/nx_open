@@ -16,7 +16,7 @@
 
 namespace nx::vms::client::core {
 
-class NxGlobalsObject: public QObject
+class NX_VMS_CLIENT_CORE_API NxGlobalsObject: public QObject
 {
     Q_OBJECT
     Q_ENUMS(nx::vms::client::core::Enums::ResourceFlags)

@@ -12,7 +12,7 @@
 
 namespace nx::vms::client::core {
 
-class AbstractAnalyticsMetadataProviderFactory
+class NX_VMS_CLIENT_CORE_API AbstractAnalyticsMetadataProviderFactory
 {
 public:
     virtual ~AbstractAnalyticsMetadataProviderFactory();
@@ -22,7 +22,8 @@ public:
         const QnResourcePtr& resource) const = 0;
 };
 
-class AnalyticsMetadataProviderFactory: public AbstractAnalyticsMetadataProviderFactory
+class NX_VMS_CLIENT_CORE_API AnalyticsMetadataProviderFactory:
+    public AbstractAnalyticsMetadataProviderFactory
 {
 public:
     /**

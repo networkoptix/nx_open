@@ -20,7 +20,7 @@ public:
     static QString toString(QnConnectionState state);
 };
 
-class QnClientConnectionStatus: public QObject
+class NX_VMS_CLIENT_CORE_API QnClientConnectionStatus: public QObject
 {
     Q_OBJECT
 public:

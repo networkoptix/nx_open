@@ -15,7 +15,7 @@ class ThumbnailCache;
  * Thus multiple instances of AbstractCachingResourceThumbnail represent several access points
  * to a single shared thumbnail image.
  */
-class AbstractCachingResourceThumbnail: public AbstractResourceThumbnail
+class NX_VMS_CLIENT_CORE_API AbstractCachingResourceThumbnail: public AbstractResourceThumbnail
 {
     Q_OBJECT
     using base_type = AbstractResourceThumbnail;

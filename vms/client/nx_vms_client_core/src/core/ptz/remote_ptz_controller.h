@@ -13,7 +13,7 @@
 namespace nx::network::rest { struct JsonResult; }
 namespace nx::network::rest { class Params; }
 
-class QnRemotePtzController:
+class NX_VMS_CLIENT_CORE_API QnRemotePtzController:
     public QnAbstractPtzController,
     public nx::vms::client::core::RemoteConnectionAware
 {

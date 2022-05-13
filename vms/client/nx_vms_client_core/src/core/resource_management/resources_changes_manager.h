@@ -13,7 +13,7 @@
  * Utility class for saving resources user attributes.
  * Supports changes rollback in case they cannot be saved on server.
  */
-class QnResourcesChangesManager: public Connective<QObject>,
+class NX_VMS_CLIENT_CORE_API QnResourcesChangesManager: public Connective<QObject>,
     public Singleton<QnResourcesChangesManager>,
     public nx::vms::client::core::CommonModuleAware,
     public nx::vms::client::core::RemoteConnectionAware

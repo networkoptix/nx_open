@@ -7,7 +7,7 @@
 #include <nx/vms/client/core/settings/welcome_screen_info.h>
 #include <watchers/cloud_status_watcher.h>
 
-class AbstractSystemsController: public QObject
+class NX_VMS_CLIENT_CORE_API AbstractSystemsController: public QObject
 {
     Q_OBJECT
 

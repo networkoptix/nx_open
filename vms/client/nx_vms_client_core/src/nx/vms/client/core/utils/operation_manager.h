@@ -9,7 +9,7 @@
 
 namespace nx::vms::client::core {
 
-class OperationManager: public QObject
+class NX_VMS_CLIENT_CORE_API OperationManager: public QObject
 {
     Q_OBJECT
     using base_type = QObject;

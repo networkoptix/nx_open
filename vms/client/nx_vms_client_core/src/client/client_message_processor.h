@@ -6,7 +6,7 @@
 #include <client/client_connection_status.h>
 #include <core/resource/resource_fwd.h>
 
-class QnClientMessageProcessor: public QnCommonMessageProcessor
+class NX_VMS_CLIENT_CORE_API QnClientMessageProcessor: public QnCommonMessageProcessor
 {
     Q_OBJECT
 

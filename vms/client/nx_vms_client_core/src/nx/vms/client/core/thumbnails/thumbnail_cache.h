@@ -13,7 +13,7 @@ namespace nx::vms::client::core {
  * Thumbnail image cache with a capability to emit a signal upon each write into.
  * Intended to be used mostly with AbstractCachingResourceThumbnail descendants.
  */
-class ThumbnailCache: public QObject
+class NX_VMS_CLIENT_CORE_API ThumbnailCache: public QObject
 {
     Q_OBJECT
     using base_type = QObject;

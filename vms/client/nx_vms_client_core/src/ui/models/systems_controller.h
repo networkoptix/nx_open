@@ -4,7 +4,7 @@
 
 #include "abstract_systems_controller.h"
 
-class SystemsController: public AbstractSystemsController
+class NX_VMS_CLIENT_CORE_API SystemsController: public AbstractSystemsController
 {
     Q_OBJECT
 

@@ -4,7 +4,8 @@
 
 #include <plugins/resource/desktop_camera/abstract_desktop_resource_searcher_impl.h>
 
-struct QnDesktopAudioOnlyResourceSearcherImpl: public QnAbstractDesktopResourceSearcherImpl
+struct NX_VMS_CLIENT_CORE_API QnDesktopAudioOnlyResourceSearcherImpl:
+    public QnAbstractDesktopResourceSearcherImpl
 {
     virtual QnResourceList findResources() override;
 };

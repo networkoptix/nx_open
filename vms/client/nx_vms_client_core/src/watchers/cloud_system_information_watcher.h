@@ -5,7 +5,8 @@
 #include <QtCore/QObject>
 
 class QnCloudSystemInformationWatcherPrivate;
-class QnCloudSystemInformationWatcher : public QObject
+
+class NX_VMS_CLIENT_CORE_API QnCloudSystemInformationWatcher: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString systemId READ systemId NOTIFY systemIdChanged)

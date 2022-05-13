@@ -8,7 +8,7 @@
 
 namespace nx::vms::client::core {
 
-class Camera: public QnVirtualCameraResource
+class NX_VMS_CLIENT_CORE_API Camera: public QnVirtualCameraResource
 {
     Q_OBJECT
     using base_type = QnVirtualCameraResource;

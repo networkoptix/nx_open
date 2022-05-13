@@ -18,6 +18,7 @@
 
 namespace nx::analytics { class MetadataLogParser; }
 namespace nx::analytics::db { struct Filter; }
+namespace nx::vms::client::core { class ConsumingMotionMetadataProvider; }
 
 class QnWorkbenchAccessController;
 
@@ -50,7 +51,7 @@ public:
     bool isAnalyticsSupported = false;
     QnUuid twoWayAudioWidgetId;
 
-    QScopedPointer<nx::vms::client::core::AbstractMotionMetadataProvider> motionMetadataProvider;
+    QScopedPointer<nx::vms::client::core::ConsumingMotionMetadataProvider> motionMetadataProvider;
     nx::vms::client::core::AbstractAnalyticsMetadataProviderPtr analyticsMetadataProvider;
 
     QScopedPointer<WidgetAnalyticsController> analyticsController;

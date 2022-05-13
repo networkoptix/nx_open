@@ -22,7 +22,7 @@ class RemoteSession;
 class ServerTimeWatcher;
 class SystemContext;
 
-class SystemContextAware: public nx::vms::common::SystemContextAware
+class NX_VMS_CLIENT_CORE_API SystemContextAware: public nx::vms::common::SystemContextAware
 {
 public:
     using nx::vms::common::SystemContextAware::SystemContextAware;

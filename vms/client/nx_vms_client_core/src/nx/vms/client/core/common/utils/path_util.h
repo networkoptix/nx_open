@@ -9,7 +9,7 @@
 
 namespace nx::vms::client::core {
 
-class PathUtil: public QObject
+class NX_VMS_CLIENT_CORE_API PathUtil: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QVariantList points READ pointsVariantList WRITE setPointsVariantList

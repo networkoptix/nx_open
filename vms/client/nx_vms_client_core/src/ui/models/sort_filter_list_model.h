@@ -11,7 +11,7 @@
 class QAbstractListModel;
 
 class QnSortFilterListModelPrivate;
-class QnSortFilterListModel: public QAbstractProxyModel
+class NX_VMS_CLIENT_CORE_API QnSortFilterListModel: public QAbstractProxyModel
 {
     Q_OBJECT
     using base_type = QAbstractProxyModel;

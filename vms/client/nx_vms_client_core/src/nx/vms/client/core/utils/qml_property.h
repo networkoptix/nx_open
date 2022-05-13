@@ -13,7 +13,7 @@ namespace nx::vms::client::core {
 
 namespace detail {
 
-class QmlPropertyConnection: public QObject
+class NX_VMS_CLIENT_CORE_API QmlPropertyConnection: public QObject
 {
     Q_OBJECT
 
@@ -26,7 +26,7 @@ signals:
 
 } // namespace detail
 
-class QmlPropertyBase
+class NX_VMS_CLIENT_CORE_API QmlPropertyBase
 {
     class SharedState;
 
@@ -38,7 +38,7 @@ public:
      * A class which wants to use a QmlProperty with a dynamic object should use this holder in the
      * corresponding constructor of QmlProperty.
      */
-    class ObjectHolder
+    class NX_VMS_CLIENT_CORE_API ObjectHolder
     {
     public:
         QObject* object() const;
@@ -203,9 +203,9 @@ bool QmlProperty<T>::setValue(const T& value) const
 }
 
 template<>
-QVariant QmlProperty<QVariant>::value() const;
+NX_VMS_CLIENT_CORE_API QVariant QmlProperty<QVariant>::value() const;
 
 template<>
-bool QmlProperty<QVariant>::setValue(const QVariant& value) const;
+NX_VMS_CLIENT_CORE_API bool QmlProperty<QVariant>::setValue(const QVariant& value) const;
 
 } // namespace nx::vms::client::core

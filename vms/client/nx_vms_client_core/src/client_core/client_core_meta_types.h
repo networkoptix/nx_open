@@ -7,6 +7,6 @@
 typedef QSet<QString> QnStringSet;
 namespace nx::vms::client::core {
 
-void initializeMetaTypes();
+NX_VMS_CLIENT_CORE_API void initializeMetaTypes();
 
 } // namespace nx::vms::client::core

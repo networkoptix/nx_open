@@ -9,10 +9,17 @@ namespace nx::vms::client::core {
 namespace ptz {
 namespace helpers {
 
-bool getSortedPresets(const QnAbstractPtzController* controller, QnPtzPresetList& presets);
-bool getSortedPresets(const QnPtzControllerPtr& controller, QnPtzPresetList& presets);
+NX_VMS_CLIENT_CORE_API bool getSortedPresets(
+    const QnAbstractPtzController* controller,
+    QnPtzPresetList& presets);
 
-QnPtzPresetList sortedPresets(const QnResourcePtr& resource, QnPtzPresetList presets);
+NX_VMS_CLIENT_CORE_API bool getSortedPresets(
+    const QnPtzControllerPtr& controller,
+    QnPtzPresetList& presets);
+
+NX_VMS_CLIENT_CORE_API QnPtzPresetList sortedPresets(
+    const QnResourcePtr& resource,
+    QnPtzPresetList presets);
 
 } // namespace helpers
 } // namespace ptz

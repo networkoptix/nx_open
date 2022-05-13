@@ -8,7 +8,7 @@
 
 namespace nx::vms::client::core {
 
-class ProxyImageResult: public AsyncImageResult
+class NX_VMS_CLIENT_CORE_API ProxyImageResult: public AsyncImageResult
 {
     Q_OBJECT
     using base_type = AsyncImageResult;

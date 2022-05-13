@@ -26,7 +26,7 @@ class AsyncImageResult;
  * When used in QML code a connection to the `imageChanged` signal must be made,
  * as an image can change with `url` property value not changing.
  */
-class AbstractResourceThumbnail: public QObject
+class NX_VMS_CLIENT_CORE_API AbstractResourceThumbnail: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QnResource* resource READ rawResource WRITE setRawResource NOTIFY resourceChanged)
@@ -168,6 +168,6 @@ private:
     nx::utils::ImplPtr<Private> d;
 };
 
-QString toString(AbstractResourceThumbnail::Status value);
+NX_VMS_CLIENT_CORE_API QString toString(AbstractResourceThumbnail::Status value);
 
 } // namespace nx::vms::client::core

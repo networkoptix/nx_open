@@ -28,7 +28,7 @@ namespace nx::vms::client::core {
 
 using RemoteConnectionAwareMock = ConnectionInfo;
 
-class RemoteConnectionAware
+class NX_VMS_CLIENT_CORE_API RemoteConnectionAware
 {
 public:
     RemoteConnectionPtr connection() const;

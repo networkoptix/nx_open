@@ -6,7 +6,7 @@
 
 namespace nx::vms::client::core {
 
-struct Ini: nx::kit::IniConfig
+struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
 {
     Ini(): IniConfig("nx_vms_client_core.ini") { reload(); }
 
@@ -34,6 +34,6 @@ struct Ini: nx::kit::IniConfig
         "from this folder are used as trusted root certificates together with the system ones.");
 };
 
-Ini& ini();
+NX_VMS_CLIENT_CORE_API Ini& ini();
 
 } // namespace nx::vms::client::core

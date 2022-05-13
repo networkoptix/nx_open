@@ -11,7 +11,7 @@
 
 namespace nx::vms::client::core {
 
-struct ReconnectHelper: public CommonModuleAware
+struct NX_VMS_CLIENT_CORE_API ReconnectHelper: public CommonModuleAware
 {
     ReconnectHelper(std::optional<QnUuid> stickyReconnectTo = std::nullopt);
 

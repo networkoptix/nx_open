@@ -9,7 +9,7 @@
 
 namespace nx::vms::client::core {
 
-class RemoteConnectionUserInteractionDelegate:
+class NX_VMS_CLIENT_CORE_API RemoteConnectionUserInteractionDelegate:
     public nx::vms::client::core::AbstractRemoteConnectionUserInteractionDelegate
 {
     Q_OBJECT

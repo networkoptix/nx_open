@@ -21,7 +21,7 @@ class QnCloudStatusWatcherPrivate;
 
 namespace nx::vms::client::core { struct CloudAuthData; }
 
-class QnCloudStatusWatcher:
+class NX_VMS_CLIENT_CORE_API QnCloudStatusWatcher:
     public QObject,
     public Singleton<QnCloudStatusWatcher>,
     public QnCommonModuleAware

@@ -22,7 +22,7 @@ class RemoteSession;
  * Ensures certificate can be used to establish connection. User interaction requested if needed,
  * confirmed certificates are pinned.
  */
-class CertificateVerifier: public nx::vms::common::AbstractCertificateVerifier
+class NX_VMS_CLIENT_CORE_API CertificateVerifier: public common::AbstractCertificateVerifier
 {
     Q_OBJECT
     using base_type = nx::vms::common::AbstractCertificateVerifier;

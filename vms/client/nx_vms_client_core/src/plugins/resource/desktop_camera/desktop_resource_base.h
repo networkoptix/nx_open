@@ -10,7 +10,7 @@
 
 class QnDesktopCameraConnection;
 
-class QnDesktopResource: public QnAbstractArchiveResource
+class NX_VMS_CLIENT_CORE_API QnDesktopResource: public QnAbstractArchiveResource
 {
     Q_OBJECT
 

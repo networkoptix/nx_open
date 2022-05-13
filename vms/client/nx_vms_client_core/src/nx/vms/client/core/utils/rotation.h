@@ -15,7 +15,7 @@ NX_REFLECTION_ENUM_CLASS(StandardRotation,
     rotate270 = 270
 );
 
-class Rotation
+class NX_VMS_CLIENT_CORE_API Rotation
 {
 public:
     Rotation() = default;

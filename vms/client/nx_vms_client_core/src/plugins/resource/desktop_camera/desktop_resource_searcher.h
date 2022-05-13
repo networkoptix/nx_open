@@ -7,7 +7,7 @@
 
 #include <nx/utils/singleton.h>
 
-class QnDesktopResourceSearcher:
+class NX_VMS_CLIENT_CORE_API QnDesktopResourceSearcher:
     public QObject,
     public QnAbstractResourceSearcher
 {

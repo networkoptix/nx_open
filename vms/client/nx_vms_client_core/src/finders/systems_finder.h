@@ -12,7 +12,9 @@
 class ConnectionsHolder;
 class QnSystemDescriptionAggregator;
 
-class QnSystemsFinder: public QnAbstractSystemsFinder, public Singleton<QnSystemsFinder>
+class NX_VMS_CLIENT_CORE_API QnSystemsFinder:
+    public QnAbstractSystemsFinder,
+    public Singleton<QnSystemsFinder>
 {
     Q_OBJECT
     typedef QnAbstractSystemsFinder base_type;

@@ -8,7 +8,7 @@
 #include <nx/vms/utils/system_uri.h>
 #include <nx/utils/url.h>
 
-class QnCloudUrlHelper: public QObject
+class NX_VMS_CLIENT_CORE_API QnCloudUrlHelper: public QObject
 {
     Q_OBJECT
 

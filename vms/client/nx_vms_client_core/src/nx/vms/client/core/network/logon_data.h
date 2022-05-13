@@ -12,7 +12,7 @@ namespace nx::vms::client::core {
 /**
  * Parameters to establish client-server connection.
  */
-struct LogonData
+struct NX_VMS_CLIENT_CORE_API LogonData
 {
     /**
      * Address of the Server.

@@ -9,7 +9,8 @@
 namespace nx::vms::client::core {
 namespace ptz {
 
-class HotkeysResourcePropertyAdaptor: public QnJsonResourcePropertyAdaptor<PresetIdByHotkey>
+class NX_VMS_CLIENT_CORE_API HotkeysResourcePropertyAdaptor:
+    public QnJsonResourcePropertyAdaptor<PresetIdByHotkey>
 {
     Q_OBJECT
     using base_type = QnJsonResourcePropertyAdaptor<PresetIdByHotkey>;

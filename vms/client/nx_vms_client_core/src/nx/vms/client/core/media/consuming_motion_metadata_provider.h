@@ -9,7 +9,7 @@
 
 namespace nx::vms::client::core {
 
-class ConsumingMotionMetadataProvider:
+class NX_VMS_CLIENT_CORE_API ConsumingMotionMetadataProvider:
     public AbstractMotionMetadataProvider,
     public AbstractMetadataConsumerOwner
 {

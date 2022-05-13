@@ -17,7 +17,7 @@
 
 namespace nx::vms::client::core {
 
-class Settings:
+class NX_VMS_CLIENT_CORE_API Settings:
     public nx::utils::property_storage::Storage,
     public Singleton<Settings>
 {

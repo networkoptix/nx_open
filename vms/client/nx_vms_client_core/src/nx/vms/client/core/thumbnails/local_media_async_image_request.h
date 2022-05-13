@@ -14,7 +14,7 @@ namespace nx::api { struct CameraImageRequest; }
 
 namespace nx::vms::client::core {
 
-class LocalMediaAsyncImageRequest: public AsyncImageResult
+class NX_VMS_CLIENT_CORE_API LocalMediaAsyncImageRequest: public AsyncImageResult
 {
     Q_OBJECT
     using base_type = AsyncImageResult;

@@ -15,7 +15,7 @@ namespace nx::vms::client::core {
 
 class RemoteSession;
 
-class RemoteSessionTimeoutWatcher: public QObject
+class NX_VMS_CLIENT_CORE_API RemoteSessionTimeoutWatcher: public QObject
 {
     Q_OBJECT
     using base_type = QObject;

@@ -11,7 +11,7 @@ namespace nx::network { class SocketAddress; }
 namespace nx::vms::client::core {
 
 /** Helper class. Contains text functions and enums. */
-class CertificateWarning: public QObject
+class NX_VMS_CLIENT_CORE_API CertificateWarning: public QObject
 {
     Q_OBJECT
 

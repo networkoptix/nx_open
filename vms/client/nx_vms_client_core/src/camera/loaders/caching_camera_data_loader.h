@@ -19,7 +19,7 @@
 #include <recording/time_period_list.h>
 #include <utils/common/connective.h>
 
-class QnCachingCameraDataLoader: public Connective<QObject> {
+class NX_VMS_CLIENT_CORE_API QnCachingCameraDataLoader: public Connective<QObject> {
     Q_OBJECT;
     typedef Connective<QObject> base_type;
 

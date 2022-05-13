@@ -6,7 +6,7 @@
 
 namespace nx::vms::client::core {
 
-class FontLoader
+class NX_VMS_CLIENT_CORE_API FontLoader
 {
 public:
     static void loadFonts(const QString& path = QStringLiteral("fonts"));

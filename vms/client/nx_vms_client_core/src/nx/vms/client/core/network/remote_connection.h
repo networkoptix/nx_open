@@ -37,7 +37,7 @@ class CertificateVerifier;
  * Stores actual connection info and allows to modify it e.g. when we are changing current user
  * password or find a quicker network interface.
  */
-class RemoteConnection: public QObject
+class NX_VMS_CLIENT_CORE_API RemoteConnection: public QObject
 {
     Q_OBJECT
 public:

@@ -33,7 +33,7 @@ class CertificateVerifier;
  * (de)serializers, etc. Creates instanses of RemoteConnection and provides an access to the
  * mentioned classes.
  */
-class RemoteConnectionFactory: public ec2::AbstractECConnectionFactory
+class NX_VMS_CLIENT_CORE_API RemoteConnectionFactory: public ec2::AbstractECConnectionFactory
 {
 public:
     using Context = RemoteConnectionFactoryContext;

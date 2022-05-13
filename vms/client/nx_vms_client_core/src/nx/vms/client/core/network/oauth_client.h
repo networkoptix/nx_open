@@ -18,7 +18,7 @@ struct CloudAuthData;
  * Implements logic for OAuth authentication process. Constructs URL to be used for the
  * requests for the cloud login/2fa/etc pages and processes responses from them.
  */
-class OauthClient: public QObject
+class NX_VMS_CLIENT_CORE_API OauthClient: public QObject
 {
     Q_OBJECT
     using base_type = QObject;

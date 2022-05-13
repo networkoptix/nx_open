@@ -10,7 +10,7 @@
 
 namespace nx::vms::client::core {
 
-class Geometry: public QObject
+class NX_VMS_CLIENT_CORE_API Geometry: public QObject
 {
     Q_OBJECT
 

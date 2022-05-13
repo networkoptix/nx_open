@@ -9,7 +9,7 @@
 
 #include "audio_device_info.h"
 
-class QnAudioRecorderSettings: public QObject
+class NX_VMS_CLIENT_CORE_API QnAudioRecorderSettings: public QObject
 {
 public:
     using DeviceList = QList<QnAudioDeviceInfo>;

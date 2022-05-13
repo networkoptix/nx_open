@@ -20,7 +20,9 @@ struct QnSpectrumData
     QVector<double> data; //< data in range [0..1]
 };
 
-class QnVoiceSpectrumAnalyzer: public QObject, public Singleton<QnVoiceSpectrumAnalyzer>
+class NX_VMS_CLIENT_CORE_API QnVoiceSpectrumAnalyzer:
+    public QObject,
+    public Singleton<QnVoiceSpectrumAnalyzer>
 {
     Q_OBJECT
 

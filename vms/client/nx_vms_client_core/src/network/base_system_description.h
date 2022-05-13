@@ -29,7 +29,7 @@ enum class QnSystemCompatibility
     incompatible
 };
 
-class QnBaseSystemDescription : public QObject
+class NX_VMS_CLIENT_CORE_API QnBaseSystemDescription: public QObject
 {
     Q_OBJECT
     typedef QObject base_type;

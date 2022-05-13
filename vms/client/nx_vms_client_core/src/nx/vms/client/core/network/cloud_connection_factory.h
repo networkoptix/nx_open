@@ -8,7 +8,7 @@
 
 namespace nx::vms::client::core {
 
-class CloudConnectionFactory
+class NX_VMS_CLIENT_CORE_API CloudConnectionFactory
 {
 public:
     CloudConnectionFactory();

@@ -7,7 +7,7 @@
 
 namespace nx::vms::client::core {
 
-class MediaPlayer: public nx::media::Player
+class NX_VMS_CLIENT_CORE_API MediaPlayer: public nx::media::Player
 {
     Q_OBJECT
 
