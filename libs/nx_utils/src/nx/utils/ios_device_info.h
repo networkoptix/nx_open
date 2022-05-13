@@ -27,8 +27,6 @@ struct NX_UTILS_API IosDeviceInformation
 
     bool operator==(const IosDeviceInformation& other) const;
 
-    bool isBionicProcessor() const;
-
     static IosDeviceInformation currentInformation();
 };
 

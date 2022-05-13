@@ -27,9 +27,7 @@
 namespace nx {
 namespace media {
 
-void DecoderRegistrar::registerDecoders(
-    const QMap<int, QSize>& maxFfmpegResolutions,
-    [[maybe_unused]] bool enableHardwareDecoderOnIPhone)
+void DecoderRegistrar::registerDecoders(const QMap<int, QSize>& maxFfmpegResolutions)
 {
     VideoDecoderRegistry::instance()->setTranscodingEnabled(true);
 
@@ -46,7 +44,6 @@ void DecoderRegistrar::registerDecoders(
     #endif
 
     #if defined(Q_OS_IOS)
-    if (enableHardwareDecoderOnIPhone)
     {
         static const int kHardwareDecodersCount = 1;
         VideoDecoderRegistry::instance()->addPlugin<IOSVideoDecoder>(

@@ -279,7 +279,7 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
         qunsetenv("RESOURCE_NAME");
     #endif
 
-    nx::media::DecoderRegistrar::registerDecoders({}, true);
+    nx::media::DecoderRegistrar::registerDecoders({});
 
     bool customScreen = startupParams.screen != QnStartupParameters::kInvalidScreen
         && startupParams.screen < QGuiApplication::screens().size();
