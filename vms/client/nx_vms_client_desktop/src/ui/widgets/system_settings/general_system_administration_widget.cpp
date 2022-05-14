@@ -126,13 +126,6 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     setHelpTopic(m_buttons[kAuditLogButton     ], Qn::AuditTrail_Help);
     setHelpTopic(m_buttons[kBookmarksButton], Qn::Bookmarks_Search_Help);
 
-    const auto backupHint = HintButton::createGroupBoxHint(ui->backupGroupBox);
-    backupHint->addHintLine(
-        tr("Creates a backup of System configuration that can be restored in case of failure."));
-    backupHint->addHintLine(tr("Backup includes servers and cameras settings, users, webpages, "
-        "event rules, etc. Video is not saved."));
-    setHelpTopic(backupHint, Qn::SystemSettings_Server_Backup_Help);
-
     connect(m_buttons[kBusinessRulesButton], &QPushButton::clicked, this,
         [this] { menu()->trigger(ui::action::OpenBusinessRulesAction); });
 
@@ -156,7 +149,6 @@ void QnGeneralSystemAdministrationWidget::loadDataToUi()
 {
     loadSystemName();
     ui->systemSettingsWidget->loadDataToUi();
-    ui->backupGroupBox->setVisible(isDatabaseBackupAvailable() && isUserAnOwner());
 }
 
 void QnGeneralSystemAdministrationWidget::applyChanges()
@@ -219,18 +211,7 @@ void QnGeneralSystemAdministrationWidget::loadSystemName()
     ui->systemNameLabel->setText(globalSettings()->systemName());
 }
 
-bool QnGeneralSystemAdministrationWidget::isDatabaseBackupAvailable() const
-{
-    return true;
-}
-
-bool QnGeneralSystemAdministrationWidget::isUserAnOwner() const
-{
-    return context()->user() && context()->user()->isOwner();
-}
-
 void QnGeneralSystemAdministrationWidget::setReadOnlyInternal(bool readOnly)
 {
     ::setReadOnly(ui->systemSettingsWidget, readOnly);
-    ::setReadOnly(ui->backupWidget, readOnly);
 }
