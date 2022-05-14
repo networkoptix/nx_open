@@ -1644,11 +1644,11 @@
     </message>
     <message>
       <source>RTP error in primary stream (%1)</source>
-      <translation>プライマリストリーム (%1) でのRTPエラー</translation>
+      <translation>プライマリストリームのRTPエラー (%1)</translation>
     </message>
     <message>
       <source>RTP error in secondary stream (%1)</source>
-      <translation>セカンダリストリーム (%1) でのRTPエラー</translation>
+      <translation>セカンダリストリームのRTPエラー (%1)</translation>
     </message>
     <message>
       <source>Analytics Object Detected</source>
