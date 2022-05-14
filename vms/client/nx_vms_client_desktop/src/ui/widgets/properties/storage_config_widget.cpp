@@ -321,7 +321,7 @@ public:
         connect(m_server.get(), &QnResource::propertyChanged, this,
             [this](const QnResourcePtr&, const QString& key)
             {
-                if (key == QnMediaServerResource::kMetadataStorageIdKey)
+                if (key == ResourcePropertyKey::Server::kMetadataStorageIdKey)
                 {
                     // Assume that we have metadata while the database is being loaded.
                     m_metadataExists = true;
@@ -772,7 +772,7 @@ void QnStorageConfigWidget::setServer(const QnMediaServerResourcePtr& server)
             [this](const QnResourcePtr&, const QString& key)
             {
                 // Now metadata storage is changed instantly, so we don't fire hasChangedChanged().
-                if (key == QnMediaServerResource::kMetadataStorageIdKey)
+                if (key == ResourcePropertyKey::Server::kMetadataStorageIdKey)
                     m_model->setMetadataStorageId(m_server->metadataStorageId());
             });
 

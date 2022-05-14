@@ -222,7 +222,7 @@ void QnServerStorageManager::handleResourceAdded(const QnResourcePtr& resource)
     connect(server, &QnMediaServerResource::propertyChanged, this,
         [this](const QnResourcePtr& resource, const QString& key)
         {
-            if (key != QnMediaServerResource::kMetadataStorageIdKey)
+            if (key != ResourcePropertyKey::Server::kMetadataStorageIdKey)
                 return;
 
             updateActiveMetadataStorage(resource.objectCast<QnMediaServerResource>(),

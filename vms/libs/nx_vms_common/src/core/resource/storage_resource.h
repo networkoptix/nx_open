@@ -75,6 +75,9 @@ public:
     virtual QIODevice* open(
         const QString &fileName,
         QIODevice::OpenMode openMode) override;
+
+    virtual bool canStoreAnalytics() const { return false; }
+
 signals:
     /*
      * Storage may emit archiveRangeChanged signal to inform server what some data in archive already deleted

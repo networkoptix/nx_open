@@ -858,17 +858,20 @@ struct ModifyResourceParamAccess
         if (hasSystemAccess(accessData))
             return Result();
 
+        const bool isNewApiCompoundTransaction =
+            param.checkResourceExists != nx::vms::api::CheckResourceExists::yes;
+
+        if (!isRemove
+            && isNewApiCompoundTransaction
+            && hasSameProperty(commonModule, param))
+        {
+            // CRUD API PATCH merges with existing values represented as JSON object so some of
+            // them are not changed.
+            return Result();
+        }
+
         if (kSystemAccessOnlyProperties.find(param.name) != kSystemAccessOnlyProperties.cend())
         {
-            if (!isRemove
-                && param.checkResourceExists != nx::vms::api::CheckResourceExists::yes
-                && hasSameProperty(commonModule, param))
-            {
-                // CRUD API PATCH merges with existing values represented as JSON object so some of
-                // them are not changed.
-                return Result();
-            }
-
             return Result(ErrorCode::forbidden, NX_FMT(
                 "User '%1' with %2 permissions can not modify resource parameter '%3'",
                 userNameOrId(accessData, commonModule), accessData.access, param.name));
@@ -897,20 +900,43 @@ struct ModifyResourceParamAccess
 
         auto accessManager = commonModule->systemContext()->resourceAccessManager();
         auto target = resPool->getResourceById(param.resourceId);
-        if (param.checkResourceExists != nx::vms::api::CheckResourceExists::yes)
+        if (!isRemove && param.name == ResourcePropertyKey::Server::kMetadataStorageIdKey)
         {
-            if (target)
+            if (param.resourceId != commonModule->peerId())
             {
-                // CRUD API PATCH merges with existing values represented as JSON object so some of
-                // them are not changed.
-                if (hasSameProperty(target, param))
-                    return Result();
+                return Result(ErrorCode::forbidden,
+                    NX_FMT("Setting analytics storage for different server is forbidden"));
             }
-            else
+
+            const auto metadataStorageId = QnUuid::fromStringSafe(param.value);
+            const auto ownServer = resPool->getResourceById<QnMediaServerResource>(param.resourceId);
+            if (!NX_ASSERT(ownServer))
             {
-                if (accessManager->hasGlobalPermission(userResource, GlobalPermission::admin))
-                    return Result();
+                return Result(ErrorCode::serverError,
+                    NX_FMT("Own server %1 does not exist", param.resourceId));
             }
+
+            const auto ownStorages = ownServer->getStorages();
+            const auto storage = nx::utils::find_if(ownStorages,
+                [&metadataStorageId](const auto& s) { return s->getId() == metadataStorageId; });
+
+            if (!storage)
+            {
+                return Result(ErrorCode::badRequest,
+                    NX_FMT("Storage %1 does not belong to the server", param.value));
+            }
+
+            if (!(*storage)->canStoreAnalytics())
+            {
+                return Result(ErrorCode::forbidden,
+                    NX_FMT("Storage %1 can not store analytics", param.value));
+            }
+        }
+
+        if (isNewApiCompoundTransaction)
+        {
+            if (accessManager->hasGlobalPermission(userResource, GlobalPermission::admin))
+                return Result();
         }
 
         Qn::Permissions permissions = Qn::SavePermission;
