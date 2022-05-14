@@ -10,14 +10,23 @@ Item
 {
     // Helper properties for providing additional JS APIs using Qt MetaObject system.
     property bool enableInjections: false
-    property list<WebEngineScript> injectScripts: [
+
+    Component
+    {
+        id: webChannelScript
+
         WebEngineScript
         {
             injectionPoint: WebEngineScript.DocumentCreation
             worldId: WebEngineScript.MainWorld
             name: "QWebChannel"
             sourceUrl: "qrc:///qtwebchannel/qwebchannel.js"
-        },
+        }
+    }
+
+    Component
+    {
+        id: injectScript
 
         WebEngineScript
         {
@@ -26,7 +35,7 @@ Item
             name: "NxObjectInjectorScript"
             sourceUrl: "qrc:///qml/Nx/Controls/web_engine_inject.js"
         }
-    ]
+    }
 
     // If set, then all connections are proxied via resourceId parent VMS Server.
     property string resourceId: ""
@@ -85,7 +94,9 @@ Item
                 error.rejectCertificate()
         }
         webChannel: enableInjections ? nxWebChannel : null
-        userScripts: enableInjections ? injectScripts : []
+        userScripts: enableInjections
+            ? [webChannelScript.createObject(webView), injectScript.createObject(webView)]
+            : []
 
         profile: getProfile(offTheRecord, resourceId)
 
