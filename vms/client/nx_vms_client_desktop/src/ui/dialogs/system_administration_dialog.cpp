@@ -7,8 +7,10 @@
 
 #include <common/common_module.h>
 #include <nx/branding.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/system_administration/widgets/advanced_system_settings_widget.h>
 #include <nx/vms/client/desktop/system_administration/widgets/analytics_settings_widget.h>
 #include <nx/vms/client/desktop/system_administration/widgets/outgoing_mail_settings_widget.h>
 #include <nx/vms/client/desktop/system_administration/widgets/security_settings_widget.h>
@@ -87,10 +89,10 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
     addPage(
         TimeServerSelection,
         new TimeSynchronizationWidget(this),
-        tr("Time Synchronization"));
+        tr("Time Sync"));
 
     auto routingWidget = new QnRoutingManagementWidget(this);
-    addPage(RoutingManagement, routingWidget, tr("Routing Management"));
+    addPage(RoutingManagement, routingWidget, tr("Routing"));
 
     const auto analyticsSettingsWidget = new AnalyticsSettingsWidget(this);
     auto updateAnalyticsSettingsWidgetVisibility =
@@ -102,6 +104,10 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
     addPage(Analytics, analyticsSettingsWidget, tr("Integrations"));
     connect(analyticsSettingsWidget, &AnalyticsSettingsWidget::visibilityUpdateRequested, this,
         updateAnalyticsSettingsWidgetVisibility);
+
+    auto advancedSettingsWidget = new AdvancedSystemSettingsWidget(
+        appContext()->currentSystemContext(), this);
+    addPage(Advanced, advancedSettingsWidget, tr("Advanced"));
 
     loadDataToUi();
     updateAnalyticsSettingsWidgetVisibility();

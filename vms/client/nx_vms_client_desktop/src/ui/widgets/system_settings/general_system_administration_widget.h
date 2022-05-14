@@ -39,10 +39,6 @@ private slots:
     void loadSystemName();
 
 private:
-    bool isDatabaseBackupAvailable() const;
-    bool isUserAnOwner() const;
-
-private:
     QScopedPointer<Ui::GeneralSystemAdministrationWidget> ui;
 
     enum Buttons

@@ -27,6 +27,7 @@ public:
         TimeServerSelection,
         RoutingManagement,
         Analytics,
+        Advanced,
 
         PageCount
     };
