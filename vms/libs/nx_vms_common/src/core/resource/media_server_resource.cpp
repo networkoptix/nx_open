@@ -46,8 +46,6 @@ const bool kWebCamerasDiscoveryEnabledDefaultValue = false;
 
 } // namespace
 
-const QString QnMediaServerResource::kMetadataStorageIdKey = "metadataStorageId";
-
 QnMediaServerResource::QnMediaServerResource():
     base_type(),
     m_serverFlags(vms::api::SF_None),
@@ -522,12 +520,13 @@ bool QnMediaServerResource::setUserAttributesAndNotify(
 
 QnUuid QnMediaServerResource::metadataStorageId() const
 {
-    return QnUuid::fromStringSafe(getProperty(kMetadataStorageIdKey));
+    return QnUuid::fromStringSafe(getProperty(ResourcePropertyKey::Server::kMetadataStorageIdKey));
 }
 
 void QnMediaServerResource::setMetadataStorageId(const QnUuid& value)
 {
-    setProperty(kMetadataStorageIdKey, value.toString());
+    NX_ASSERT(!value.isNull());
+    setProperty(ResourcePropertyKey::Server::kMetadataStorageIdKey, value.toString());
 }
 
 void QnMediaServerResource::setRedundancy(bool value)

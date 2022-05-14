@@ -93,6 +93,8 @@ struct NX_VMS_API ServerModel: ResourceWithParameters
 
     DbUpdateTypes toDbTypes() &&;
     static std::vector<ServerModel> fromDbTypes(DbListTypes data);
+
+    void extractFromList(const QnUuid& id, ResourceParamWithRefDataList* list);
 };
 #define ServerModel_Fields \
     (id)(name)(url)(version)(endpoints)(authKey)(osInfo)(metadataStorageId)(flags) \

@@ -30,9 +30,8 @@ class NX_VMS_COMMON_API QnMediaServerResource:
     Q_OBJECT
 
     typedef QnResource base_type;
-public:
-    static const QString kMetadataStorageIdKey;
 
+public:
     QnMediaServerResource();
     virtual ~QnMediaServerResource();
 

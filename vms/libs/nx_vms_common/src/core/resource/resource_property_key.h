@@ -149,6 +149,7 @@ static const QString kNvrPoePortPoweringModes("nvrPoePortPoweringModes");
 static const QString kCertificate("certificate");
 static const QString kUserProvidedCertificate("userProvidedCertificate");
 static const QString kWebCamerasDiscoveryEnabled("webCamerasDiscoveryEnabled");
+static const QString kMetadataStorageIdKey = "metadataStorageId";
 
 } // namespace Server
 

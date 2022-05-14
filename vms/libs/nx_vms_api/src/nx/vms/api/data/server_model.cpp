@@ -4,11 +4,10 @@
 
 #include <nx/utils/std/algorithm.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/vms/api/json/uuid_mover.h>
 
-namespace nx {
-namespace vms {
-namespace api {
+namespace nx::vms::api {
+
+static QString kMetadataStorageId = "metadataStorageId";
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ServerModel, (json), ServerModel_Fields)
 
@@ -35,7 +34,6 @@ ServerModel::DbUpdateTypes ServerModel::toDbTypes() &&
     attributesData.serverName = mainData.name;
     attributesData.maxCameras = maxCameras.value_or(0);
     attributesData.allowAutoRedundancy = isFailoverEnabled;
-    attributesData.metadataStorageId = metadataStorageId.value_or(QnUuid{});
     attributesData.backupBitrateBytesPerSecond = backupBitrateBytesPerSecond;
 
     attributesData.checkResourceExists = CheckResourceExists::no;
@@ -45,6 +43,14 @@ ServerModel::DbUpdateTypes ServerModel::toDbTypes() &&
         statusData = ResourceStatusData(mainData.id, *status);
 
     auto parameters = asList(mainData.id);
+    if (metadataStorageId)
+    {
+        parameters.push_back(ResourceParamWithRefData(
+            mainData.id,
+            kMetadataStorageId,
+            metadataStorageId->toString(),
+            CheckResourceExists::no));
+    }
     return {
         std::move(mainData),
         std::move(attributesData),
@@ -85,9 +91,6 @@ std::vector<ServerModel> ServerModel::fromDbTypes(DbListTypes all)
                     model.maxCameras = attrs->maxCameras;
                 model.isFailoverEnabled = attrs->allowAutoRedundancy;
                 model.backupBitrateBytesPerSecond = attrs->backupBitrateBytesPerSecond;
-
-                if (!attrs->metadataStorageId.isNull())
-                    model.metadataStorageId = attrs->metadataStorageId;
             }
 
             if (const auto status = nx::utils::find_if(
@@ -112,6 +115,19 @@ std::vector<ServerModel> ServerModel::fromDbTypes(DbListTypes all)
         });
 }
 
-} // namespace api
-} // namespace vms
-} // namespace nx
+void ServerModel::extractFromList(const QnUuid& id, ResourceParamWithRefDataList* list)
+{
+    ResourceWithParameters::extractFromList(id, list);
+
+    if (const auto it = parameters.find(kMetadataStorageId); it != parameters.end())
+    {
+        if (const auto value = it->second.toString(); !value.isEmpty())
+        {
+            if (const QnUuid storageId(value); !storageId.isNull())
+                metadataStorageId = storageId;
+        }
+        parameters.erase(it);
+    }
+}
+
+} // namespace nx::vms::api
