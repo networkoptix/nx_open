@@ -34,6 +34,9 @@ public:
     /** Should be called before first decode(). */
     void setAllowOverlay(bool value);
 
+    /** Should be called before first decode(). */
+    void setAllowHardwareAcceleration(bool value);
+
     /** Should be called before first decode(); needed by some decoders, e.g. hw-based. */
     void setVideoGeometryAccessor(VideoGeometryAccessor videoGeometryAccessor);
 

@@ -77,6 +77,8 @@ public:
     std::deque<FrameMetadata> metadataQueue;
 
     bool allowOverlay;
+    bool allowHardwareAcceleration = false;
+    bool resetDecoder = false;
     SeamlessVideoDecoder::VideoGeometryAccessor videoGeometryAccessor;
 
     RenderContextSynchronizerPtr renderContextSynchronizer;
@@ -166,6 +168,15 @@ void SeamlessVideoDecoder::setAllowOverlay(bool value)
     d->allowOverlay = value;
 }
 
+void SeamlessVideoDecoder::setAllowHardwareAcceleration(bool value)
+{
+    Q_D(SeamlessVideoDecoder);
+    if (d->allowHardwareAcceleration == value)
+        return;
+
+    d->allowHardwareAcceleration = value;
+    d->resetDecoder = true;
+}
 
 void SeamlessVideoDecoder::setVideoGeometryAccessor(VideoGeometryAccessor videoGeometryAccessor)
 {
@@ -196,8 +207,9 @@ bool SeamlessVideoDecoder::decode(
         if (d->currentCodecParameters && frame->context)
             isSimilarParams &= frame->context->isEqual(*d->currentCodecParameters);
     }
-    if (!isSimilarParams)
+    if (!isSimilarParams || (d->resetDecoder && frame->flags & QnAbstractMediaData::MediaFlags_AVKey))
     {
+        d->resetDecoder = false;
         if (d->videoDecoder)
         {
             for (;;)
@@ -215,7 +227,11 @@ bool SeamlessVideoDecoder::decode(
         // Release previous decoder in case the hardware decoder can handle only single instance.
         d->videoDecoder.reset();
         d->videoDecoder = VideoDecoderRegistry::instance()->createCompatibleDecoder(
-            frame->compressionType, frameInfo.size, d->allowOverlay, d->renderContextSynchronizer);
+            frame->compressionType,
+            frameInfo.size,
+            d->allowOverlay,
+            d->allowHardwareAcceleration,
+            d->renderContextSynchronizer);
         if (d->videoDecoder)
             d->videoDecoder->setVideoGeometryAccessor(d->videoGeometryAccessor);
         d->decoderFrameOffset = d->frameNumber;

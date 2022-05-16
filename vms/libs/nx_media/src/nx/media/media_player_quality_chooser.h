@@ -52,6 +52,8 @@ struct Params
 
     bool allowOverlay = false;
 
+    bool allowHardwareAcceleration = false;
+
     /** List of decoders currently used by the player. */
     const std::vector<AbstractVideoDecoder*>* currentDecoders = nullptr;
 };

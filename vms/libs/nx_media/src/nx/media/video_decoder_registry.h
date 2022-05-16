@@ -27,8 +27,12 @@ public:
      * @return Optimal video decoder (in case of any) compatible with such frame. Return null
      * pointer if no compatible decoder is found.
      */
-    VideoDecoderPtr createCompatibleDecoder(const AVCodecID codec, const QSize& resolution,
-        bool allowOverlay, RenderContextSynchronizerPtr renderContextSynchronizer);
+    VideoDecoderPtr createCompatibleDecoder(
+        const AVCodecID codec,
+        const QSize& resolution,
+        bool allowOverlay,
+        bool allowHardwareAcceleration,
+        RenderContextSynchronizerPtr renderContextSynchronizer);
 
     /**
      * @return Whether a compatible video decoder is found.
@@ -37,6 +41,7 @@ public:
         const AVCodecID codec,
         const QSize& resolution,
         bool allowOverlay,
+        bool allowHardwareAcceleration,
         const std::vector<AbstractVideoDecoder*>& currentDecoders);
 
     /**
@@ -77,7 +82,7 @@ private:
         std::function<AbstractVideoDecoder*(const RenderContextSynchronizerPtr& synchronizer,
             const QSize& resolution)> createVideoDecoder;
         std::function<bool(
-            const AVCodecID codec, const QSize& resolution, bool allowOverlay)> isCompatible;
+            const AVCodecID codec, const QSize& resolution, bool allowOverlay, bool allowHardwareAcceleration)> isCompatible;
         std::function<QSize(const AVCodecID codec)> maxResolution;
         int useCount = 0;
         int maxUseCount = std::numeric_limits<int>::max();

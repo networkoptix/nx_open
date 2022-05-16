@@ -195,7 +195,11 @@ static Result applyTranscodingIfPossible(const QSize& desiredResolution, const P
     QSize resolution = limitResolution(desiredResolution, kMaxTranscodingResolution);
 
     if (!VideoDecoderRegistry::instance()->hasCompatibleDecoder(
-        input.transcodingCodec, resolution, input.allowOverlay, *input.currentDecoders))
+        input.transcodingCodec,
+        resolution,
+        input.allowOverlay,
+        input.allowHardwareAcceleration,
+        *input.currentDecoders))
     {
         NX_DEBUG(kLogTag, nx::format("Transcoding to %1 x %2 not supported.").args(
             resolution.width(), resolution.height()));
@@ -239,7 +243,7 @@ static Result chooseHighStreamIfPossible(
     }
 
     if (VideoDecoderRegistry::instance()->hasCompatibleDecoder(
-        highCodec, highResolution, input.allowOverlay, *input.currentDecoders))
+        highCodec, highResolution, input.allowOverlay, input.allowHardwareAcceleration, *input.currentDecoders))
     {
         return {Player::HighVideoQuality, highResolution};
     }

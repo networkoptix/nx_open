@@ -230,6 +230,8 @@ public:
 
     bool allowOverlay = true;
 
+    bool allowHardwareAcceleration = true;
+
     // Video geometry inside the application window.
     QRect videoGeometry;
 
@@ -738,6 +740,7 @@ void PlayerPrivate::applyVideoQuality()
     input.positionMs = positionMs;
     input.camera = camera;
     input.allowOverlay = allowOverlay;
+    input.allowHardwareAcceleration = allowHardwareAcceleration;
     input.currentDecoders = &currentVideoDecoders;
 
     const auto& result = media_player_quality_chooser::chooseVideoQuality(videoQuality, input);
@@ -822,6 +825,7 @@ bool PlayerPrivate::initDataProvider()
     dataConsumer.reset(new PlayerDataConsumer(archiveReader, renderContextSynchronizer));
     dataConsumer->setPlaySpeed(speed);
     dataConsumer->setAllowOverlay(allowOverlay);
+    dataConsumer->setAllowHardwareAcceleration(allowHardwareAcceleration);
     updateAudio();
 
     dataConsumer->setVideoGeometryAccessor(
@@ -1385,6 +1389,7 @@ QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) con
             d->positionMs,
             camera,
             /*allowOverlay*/ true,
+            d->allowHardwareAcceleration,
             &currentDecoders
         }](int quality)
         {
@@ -1609,6 +1614,25 @@ QString videoQualityToString(int videoQuality)
         return nx::format("%1 [h: %2]").args(Player::CustomVideoQuality, videoQuality);
     }
     return nx::toString(videoQuality);
+}
+
+bool Player::allowHardwareAcceleration() const
+{
+    Q_D(const Player);
+    return d->allowHardwareAcceleration;
+}
+
+void Player::setAllowHardwareAcceleration(bool value)
+{
+    Q_D(Player);
+    if (d->allowHardwareAcceleration == value)
+        return;
+
+    if (d->dataConsumer)
+        d->dataConsumer->setAllowHardwareAcceleration(value);
+
+    d->allowHardwareAcceleration = value;
+    emit allowHardwareAccelerationChanged();
 }
 
 } // namespace media

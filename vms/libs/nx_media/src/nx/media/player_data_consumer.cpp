@@ -293,6 +293,7 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
         {
             auto videoDecoder = new SeamlessVideoDecoder(m_renderContextSynchronizer);
             videoDecoder->setAllowOverlay(m_allowOverlay);
+            videoDecoder->setAllowHardwareAcceleration(m_allowHardwareAcceleration);
             videoDecoder->setVideoGeometryAccessor(m_videoGeometryAccessor);
             m_videoDecoders.push_back(SeamlessVideoDecoderPtr(videoDecoder));
         }
@@ -582,6 +583,17 @@ bool PlayerDataConsumer::isAudioEnabled() const
 void PlayerDataConsumer::setAllowOverlay(bool value)
 {
     m_allowOverlay = value;
+}
+
+void PlayerDataConsumer::setAllowHardwareAcceleration(bool value)
+{
+    if (m_allowHardwareAcceleration == value)
+        return;
+
+    NX_MUTEX_LOCKER lock(&m_decoderMutex);
+    for (auto& videoDecoder: m_videoDecoders)
+        videoDecoder->setAllowHardwareAcceleration(value);
+    m_allowHardwareAcceleration = value;
 }
 
 } // namespace media
