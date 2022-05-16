@@ -141,9 +141,6 @@ struct NX_VMS_API MediaServerUserAttributesData
      */
     bool allowAutoRedundancy = false;
 
-    /**%apidoc Id of a Storage used to keep Analytics metadata database. */
-    QnUuid metadataStorageId;
-
     /**%apidoc[opt]:array
      * Backup bitrate per day of week and hour, as a JSON array of name-value objects, structured
      * according to the following example:
@@ -180,7 +177,6 @@ struct NX_VMS_API MediaServerUserAttributesData
 #define MediaServerUserAttributesData_Fields_Short \
     (maxCameras) \
     (allowAutoRedundancy) \
-    (metadataStorageId) \
     (backupBitrateBytesPerSecond)\
     (locationId)
 
