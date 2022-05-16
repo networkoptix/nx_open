@@ -248,7 +248,10 @@ FfmpegVideoDecoder::~FfmpegVideoDecoder()
 }
 
 bool FfmpegVideoDecoder::isCompatible(
-    const AVCodecID codec, const QSize& resolution, bool /*allowOverlay*/)
+    const AVCodecID codec,
+    const QSize& resolution,
+    bool /*allowOverlay*/,
+    bool /*allowHardwareAcceleration*/)
 {
     const QSize maxRes = maxResolution(codec);
     if (maxRes.isEmpty())

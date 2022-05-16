@@ -28,7 +28,10 @@ public:
     virtual ~AndroidVideoDecoder();
 
     static bool isCompatible(
-        const AVCodecID codec, const QSize& resolution, bool allowOverlay);
+        const AVCodecID codec,
+        const QSize& resolution,
+        bool allowOverlay,
+        bool allowHardwareAcceleration);
 
     static QSize maxResolution(const AVCodecID codec);
 

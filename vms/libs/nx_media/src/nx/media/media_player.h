@@ -105,6 +105,8 @@ class Player: public QObject
 
     Q_PROPERTY(bool allowOverlay READ allowOverlay WRITE setAllowOverlay NOTIFY allowOverlayChanged)
 
+    Q_PROPERTY(bool allowHardwareAcceleration READ allowHardwareAcceleration WRITE setAllowHardwareAcceleration NOTIFY allowHardwareAccelerationChanged)
+
     /**
      * Is (0, 0) if no video is playing or the resolution is not available.
      */
@@ -221,6 +223,9 @@ public:
     double speed() const;
     void setSpeed(double value);
 
+    bool allowHardwareAcceleration() const;
+    void setAllowHardwareAcceleration(bool value);
+
     int maxTextureSize() const;
     void setMaxTextureSize(int value);
 
@@ -313,6 +318,7 @@ signals:
     void aspectRatioChanged();
     void videoQualityChanged();
     void allowOverlayChanged();
+    void allowHardwareAccelerationChanged();
     void videoGeometryChanged();
     void currentResolutionChanged();
     void audioEnabledChanged();

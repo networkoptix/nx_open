@@ -89,6 +89,7 @@ public:
     bool isAudioEnabled() const;
 
     void setAllowOverlay(bool value);
+    void setAllowHardwareAcceleration(bool value);
 
     void setPlaySpeed(double value);
 
@@ -200,6 +201,7 @@ private:
     std::atomic<bool> m_audioEnabled;
     std::atomic<bool> m_needToResetAudio;
     std::atomic<bool> m_allowOverlay;
+    std::atomic<bool> m_allowHardwareAcceleration {false};
     std::atomic<double> m_speed;
     nx::vms::common::MediaStreamEventPacket m_mediaEvent;
     RenderContextSynchronizerPtr m_renderContextSynchronizer;

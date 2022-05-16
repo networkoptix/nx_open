@@ -49,7 +49,10 @@ public:
      * @return True if the decoder is compatible with the provided parameters.
      */
     static bool isCompatible(
-        const AVCodecID /*codec*/, const QSize& /*resolution*/, bool /*allowOverlay*/)
+        const AVCodecID /*codec*/,
+        const QSize& /*resolution*/,
+        bool /*allowOverlay*/,
+        bool /*allowHardwareAcceleration*/)
     {
         return false;
     }

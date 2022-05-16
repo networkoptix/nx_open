@@ -78,7 +78,10 @@ ProxyVideoDecoder::~ProxyVideoDecoder()
 }
 
 bool ProxyVideoDecoder::isCompatible(
-    const AVCodecID codec, const QSize& resolution, bool allowOverlay)
+    const AVCodecID codec,
+    const QSize& resolution,
+    bool allowOverlay,
+    bool /*allowHardwareAcceleration*/)
 {
     const auto loggedCall =
         [&](bool returnValue)
