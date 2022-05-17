@@ -20,24 +20,36 @@
 
 namespace nx::vms::client::desktop {
 
-class UserListModelPrivate:
+namespace {
+
+bool isCustomUser(const QnUserResourcePtr& user)
+{
+    if (!NX_ASSERT(user))
+        return false;
+
+    const auto role = user->userRole();
+    return role == Qn::UserRole::customPermissions || role == Qn::UserRole::customUserRole;
+};
+
+} // namespace
+
+class UserListModel::Private:
     public Connective<QObject>,
     public nx::vms::client::core::CommonModuleAware
 {
-    Q_DECLARE_TR_FUNCTIONS(UserListModelPrivate)
+    Q_DECLARE_TR_FUNCTIONS(UserListModel)
     using base_type = Connective<QObject>;
 
-public:
-    UserListModel* model;
+    UserListModel* const model;
 
+public:
     QnUserResourceList users;
     QSet<QnUserResourcePtr> checkedUsers;
     QHash<QnUserResourcePtr, bool> enableChangedUsers;
     QHash<QnUserResourcePtr, bool> digestChangedUsers;
 
-    UserListModelPrivate(UserListModel* parent) :
-        base_type(parent),
-        model(parent)
+    Private(UserListModel* q):
+        model(q)
     {
         connect(resourcePool(), &QnResourcePool::resourceAdded, this,
             [this](const QnResourcePtr& resource)
@@ -93,7 +105,7 @@ private:
     void removeUserInternal(const QnUserResourcePtr& user);
 };
 
-void UserListModelPrivate::at_resourcePool_resourceChanged(const QnResourcePtr& resource)
+void UserListModel::Private::at_resourcePool_resourceChanged(const QnResourcePtr& resource)
 {
     QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
     if (!user)
@@ -101,7 +113,7 @@ void UserListModelPrivate::at_resourcePool_resourceChanged(const QnResourcePtr& 
     handleUserChanged(user);
 }
 
-void UserListModelPrivate::handleUserChanged(const QnUserResourcePtr& user)
+void UserListModel::Private::handleUserChanged(const QnUserResourcePtr& user)
 {
     int row = users.indexOf(user);
     if (row == -1)
@@ -111,7 +123,7 @@ void UserListModelPrivate::handleUserChanged(const QnUserResourcePtr& user)
     emit model->dataChanged(index, index.sibling(row, UserListModel::ColumnCount - 1));
 }
 
-QnUserResourcePtr UserListModelPrivate::user(const QModelIndex& index) const
+QnUserResourcePtr UserListModel::Private::user(const QModelIndex& index) const
 {
     if (!index.isValid() || index.row() >= users.size())
         return QnUserResourcePtr();
@@ -120,7 +132,7 @@ QnUserResourcePtr UserListModelPrivate::user(const QModelIndex& index) const
 }
 
 // TODO: #vkutin Move this function to more suitable place. Rewrite it if needed.
-QString UserListModelPrivate::permissionsString(const QnUserResourcePtr& user) const
+QString UserListModel::Private::permissionsString(const QnUserResourcePtr& user) const
 {
     QStringList permissionStrings;
 
@@ -156,7 +168,7 @@ QString UserListModelPrivate::permissionsString(const QnUserResourcePtr& user) c
     return permissionStrings.join(lit(", "));
 }
 
-bool UserListModelPrivate::isUnique(const QnUserResourcePtr& user) const
+bool UserListModel::Private::isUnique(const QnUserResourcePtr& user) const
 {
     QString userName = user->getName();
     for (const QnUserResourcePtr& other : users)
@@ -170,7 +182,7 @@ bool UserListModelPrivate::isUnique(const QnUserResourcePtr& user) const
     return true;
 }
 
-Qt::CheckState UserListModelPrivate::checkState() const
+Qt::CheckState UserListModel::Private::checkState() const
 {
     if (checkedUsers.isEmpty())
         return Qt::Unchecked;
@@ -181,7 +193,7 @@ Qt::CheckState UserListModelPrivate::checkState() const
     return Qt::PartiallyChecked;
 }
 
-void UserListModelPrivate::setCheckState(Qt::CheckState state, const QnUserResourcePtr& user)
+void UserListModel::Private::setCheckState(Qt::CheckState state, const QnUserResourcePtr& user)
 {
     if (!user)
     {
@@ -199,7 +211,7 @@ void UserListModelPrivate::setCheckState(Qt::CheckState state, const QnUserResou
     }
 }
 
-void UserListModelPrivate::resetUsers(const QnUserResourceList& value)
+void UserListModel::Private::resetUsers(const QnUserResourceList& value)
 {
     model->beginResetModel();
     for (const auto& user: users)
@@ -210,7 +222,7 @@ void UserListModelPrivate::resetUsers(const QnUserResourceList& value)
     model->endResetModel();
 }
 
-void UserListModelPrivate::addUser(const QnUserResourcePtr& user)
+void UserListModel::Private::addUser(const QnUserResourcePtr& user)
 {
     if (users.contains(user))
         return;
@@ -223,7 +235,7 @@ void UserListModelPrivate::addUser(const QnUserResourcePtr& user)
     addUserInternal(user);
 }
 
-void UserListModelPrivate::removeUser(const QnUserResourcePtr& user)
+void UserListModel::Private::removeUser(const QnUserResourcePtr& user)
 {
     int row = users.indexOf(user);
     if (row >= 0)
@@ -236,12 +248,12 @@ void UserListModelPrivate::removeUser(const QnUserResourcePtr& user)
     removeUserInternal(user);
 }
 
-void UserListModelPrivate::addUserInternal(const QnUserResourcePtr& user)
+void UserListModel::Private::addUserInternal(const QnUserResourcePtr& user)
 {
     connect(user, &QnUserResource::nameChanged, this,
-        &UserListModelPrivate::at_resourcePool_resourceChanged);
+        &UserListModel::Private::at_resourcePool_resourceChanged);
     connect(user, &QnUserResource::fullNameChanged, this,
-        &UserListModelPrivate::at_resourcePool_resourceChanged);
+        &UserListModel::Private::at_resourcePool_resourceChanged);
     connect(user, &QnUserResource::enabledChanged, this,
         [this](const QnUserResourcePtr &user)
         {
@@ -257,7 +269,7 @@ void UserListModelPrivate::addUserInternal(const QnUserResourcePtr& user)
         });
 }
 
-void UserListModelPrivate::removeUserInternal(const QnUserResourcePtr& user)
+void UserListModel::Private::removeUserInternal(const QnUserResourcePtr& user)
 {
     disconnect(user, nullptr, this, nullptr);
     checkedUsers.remove(user);
@@ -267,13 +279,17 @@ void UserListModelPrivate::removeUserInternal(const QnUserResourcePtr& user)
 
 UserListModel::UserListModel(QObject* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
-    d(new UserListModelPrivate(this))
+    QnWorkbenchContextAware(parent, QnWorkbenchContextAware::InitializationMode::lazy),
+    d(new UserListModel::Private(this))
 {
+    const auto users = resourcePool()->getResources<QnUserResource>();
+    for (const auto& user: users)
+        d->addUser(user);
 }
 
 UserListModel::~UserListModel()
 {
+    // Required here for forward-declared scoped pointer destruction.
 }
 
 int UserListModel::rowCount(const QModelIndex& parent) const
@@ -305,12 +321,17 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
         {
             switch (index.column())
             {
-                case LoginColumn        : return user->getName();
-                case FullNameColumn     : return user->fullName();
-                case UserRoleColumn     : return userRolesManager()->userRoleName(user);
-                default                 : break;
-
-            } // switch (column)
+                case LoginColumn:
+                    return user->getName();
+                case FullNameColumn:
+                    return user->fullName();
+                case EmailColumn:
+                    return user->getEmail();
+                case UserGroupsColumn:
+                    return userRolesManager()->userRoleName(user);
+                default:
+                    break;
+            }
             break;
         }
 
@@ -342,48 +363,70 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
                 case FullNameColumn:
                     return user->fullName();
 
-                case UserRoleColumn:
+                case EmailColumn:
+                    return user->getEmail();
+
+                case UserGroupsColumn:
                     return d->permissionsString(user);
 
-                case EnabledColumn:
-                    return user->isEnabled() ? tr("Enabled") : tr("Disabled");
-
                 default:
-                    return QString(); // not QVariant() because we want to hide a tooltip if one is shown
+                    return QString(); // not QVariant() because we want to hide a tooltip if shown.
 
             } // switch (column)
             break;
         }
 
-        case Qt::DecorationRole:
+        case Qn::DecorationPathRole:
         {
-            if (index.column() == UserTypeColumn)
+            switch (index.column())
             {
-                switch (user->userType())
+                case UserTypeColumn:
                 {
-                    case nx::vms::api::UserType::cloud:
+                    switch (user->userType())
                     {
-                        return user->isEnabled()
-                            ? qnSkin->icon("cloud/cloud_20.png")
-                            : qnSkin->icon("cloud/cloud_20_disabled.png");
+                        case nx::vms::api::UserType::cloud:
+                            return user->isEnabled()
+                                ? QString("cloud/cloud_20.png")
+                                : QString("cloud/cloud_20_disabled.png");
+
+                        case nx::vms::api::UserType::ldap:
+                            return QString("user_settings/user_type_ldap.png");
+
+                        default:
+                            break;
                     }
-                    case nx::vms::api::UserType::ldap:
-                        return qnSkin->icon("user_settings/user_type_ldap.png");
-                    default:
-                        break;
+
+                    break;
                 }
+
+                case IsCustomColumn:
+                {
+                    if (isCustomUser(user))
+                        return QString("text_buttons/ok.png");
+
+                    break;
+                }
+
+                default:
+                    break;
             }
 
             break;
         }
 
+        case Qt::DecorationRole:
+        {
+            const auto path = data(index, Qn::DecorationPathRole).toString();
+            return path.isEmpty() ? QVariant() : QVariant::fromValue(qnSkin->icon(path));
+        }
+
         case Qt::ForegroundRole:
         {
-            /* Always use default color for checkboxes. */
+            // Always use default color for checkboxes.
             if (index.column() == CheckBoxColumn)
                 return QVariant();
 
-            /* Highlight conflicting users. */
+            // Highlight conflicting users.
             if (user->isLdap() && !d->isUnique(user))
                 return colorTheme()->color("red_l2");
 
@@ -400,29 +443,19 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
             break;
         }
 
-        // TODO: #vkutin Refactor this role.
         case Qn::DisabledRole:
-        {
-            if (index.column() == EnabledColumn)
-                return !accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission);
-            break;
-        }
+            return index.column() != CheckBoxColumn && !isUserEnabled(user);
 
         case Qt::CheckStateRole:
         {
             if (index.column() == CheckBoxColumn)
                 return d->checkedUsers.contains(user) ? Qt::Checked : Qt::Unchecked;
-
-            if (index.column() == EnabledColumn)
-                return isUserEnabled(user) ? Qt::Checked : Qt::Unchecked;
-
             break;
         }
 
         default:
             break;
-
-    } // switch (role)
+    }
 
     return QVariant();
 }
@@ -440,12 +473,16 @@ QVariant UserListModel::headerData(int section, Qt::Orientation orientation, int
 
     switch (section)
     {
-        case LoginColumn        : return tr("Login");
-        case FullNameColumn     : return tr("Name");
-        case UserRoleColumn     : return tr("Role");
-
-        case UserTypeColumn:
-        case EnabledColumn:
+        case LoginColumn:
+            return tr("Login");
+        case FullNameColumn:
+            return tr("Name");
+        case EmailColumn:
+            return tr("Email");
+        case UserGroupsColumn:
+            return tr("Groups");
+        case IsCustomColumn:
+            return tr("Custom");
         default:
             return QString();
     }
@@ -465,6 +502,14 @@ Qt::ItemFlags UserListModel::flags(const QModelIndex& index) const
         flags |= Qt::ItemIsUserCheckable;
 
     return flags;
+}
+
+QHash<int, QByteArray> UserListModel::roleNames() const
+{
+    auto roleNames = base_type::roleNames();
+    roleNames[Qt::CheckStateRole] = "checkState";
+    roleNames[Qn::DecorationPathRole] = "decorationPath";
+    return roleNames;
 }
 
 Qt::CheckState UserListModel::checkState() const
@@ -545,7 +590,7 @@ void UserListModel::removeUser(const QnUserResourcePtr& user)
 
 bool UserListModel::isInteractiveColumn(int column)
 {
-    return column == CheckBoxColumn || column == EnabledColumn;
+    return column == CheckBoxColumn;
 }
 
 SortedUserListModel::SortedUserListModel(QObject *parent) : base_type(parent)
@@ -560,29 +605,17 @@ void SortedUserListModel::setDigestFilter(std::optional<bool> value)
 
 bool SortedUserListModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
 {
-    QnUserResourcePtr leftUser = left.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
-    QnUserResourcePtr rightUser = right.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
+    const auto leftUser = left.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
+    const auto rightUser = right.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
 
-    NX_ASSERT(leftUser);
-    NX_ASSERT(rightUser);
-
-    if (!rightUser)
+    if (!NX_ASSERT(rightUser))
         return true;
-    if (!leftUser)
+
+    if (!NX_ASSERT(leftUser))
         return false;
 
     switch (sortColumn())
     {
-        case UserListModel::EnabledColumn:
-        {
-            bool leftEnabled = leftUser->isEnabled();
-            bool rightEnabled = rightUser->isEnabled();
-            if (leftEnabled != rightEnabled)
-                return leftEnabled;
-
-            break;
-        }
-
         case UserListModel::UserTypeColumn:
         {
             const auto leftType = leftUser->userType();
@@ -594,13 +627,24 @@ bool SortedUserListModel::lessThan(const QModelIndex& left, const QModelIndex& r
         }
 
         case UserListModel::FullNameColumn:
-        case UserListModel::UserRoleColumn:
+        case UserListModel::EmailColumn:
+        case UserListModel::UserGroupsColumn:
         {
-            QString leftText = left.data(Qt::DisplayRole).toString();
-            QString rightText = right.data(Qt::DisplayRole).toString();
+            const QString leftText = left.data(Qt::DisplayRole).toString();
+            const QString rightText = right.data(Qt::DisplayRole).toString();
 
             if (leftText != rightText)
                 return leftText < rightText;
+
+            break;
+        }
+
+        case UserListModel::IsCustomColumn:
+        {
+            const bool leftCustom = isCustomUser(leftUser);
+            const bool rightCustom = isCustomUser(rightUser);
+            if (leftCustom != rightCustom)
+                return leftCustom;
 
             break;
         }
@@ -609,7 +653,7 @@ bool SortedUserListModel::lessThan(const QModelIndex& left, const QModelIndex& r
             break;
     }
 
-    /* Otherwise sort by login (which is unique): */
+    // Otherwise sort by login (which is unique):
     return nx::utils::naturalStringLess(leftUser->getName(), rightUser->getName());
 }
 

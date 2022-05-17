@@ -439,7 +439,7 @@
   <customwidget>
    <class>nx::vms::client::desktop::MessageBar</class>
    <extends>QWidget</extends>
-   <header location="global">nx/vms/client/desktop/common/widgets/message_bar.h</header>
+   <header location="global">nx/vms/client/desktop/common/widgets/control_bars.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

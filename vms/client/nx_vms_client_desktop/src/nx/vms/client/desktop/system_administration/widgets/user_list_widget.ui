@@ -10,21 +10,37 @@
     <height>400</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="mainVerticalLayout" stretch="0,0">
+  <layout class="QVBoxLayout" name="mainVerticalLayout">
    <item>
     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
+     <property name="leftMargin">
+      <number>16</number>
+     </property>
+     <property name="rightMargin">
+      <number>16</number>
+     </property>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_5">
        <property name="spacing">
         <number>16</number>
        </property>
        <item>
-        <widget class="QLineEdit" name="filterLineEdit">
-         <property name="placeholderText">
+        <widget class="nx::vms::client::desktop::SearchLineEdit" name="filterLineEdit" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="placeholderText" stdset="0">
           <string>Search users</string>
          </property>
-         <property name="clearButtonEnabled">
-          <bool>true</bool>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="createUserButton">
+         <property name="text">
+          <string>+ Add User</string>
          </property>
         </widget>
        </item>
@@ -106,60 +122,6 @@
           </widget>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_1">
-           <property name="spacing">
-            <number>8</number>
-           </property>
-           <property name="topMargin">
-            <number>8</number>
-           </property>
-           <property name="bottomMargin">
-            <number>8</number>
-           </property>
-           <item>
-            <widget class="QPushButton" name="enableSelectedButton">
-             <property name="text">
-              <string>Enable</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="disableSelectedButton">
-             <property name="text">
-              <string>Disable</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="deleteSelectedButton">
-             <property name="text">
-              <string>Delete...</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="forceSecureAuthButton">
-             <property name="text">
-              <string>Force Secure Authentication</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_1">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
-         <item>
           <spacer name="verticalSpacer">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
@@ -193,6 +155,12 @@
            <property name="orientation">
             <enum>Qt::Vertical</enum>
            </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
           </spacer>
          </item>
          <item row="1" column="0">
@@ -217,64 +185,16 @@
            <property name="orientation">
             <enum>Qt::Vertical</enum>
            </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
           </spacer>
          </item>
         </layout>
        </widget>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <property name="spacing">
-      <number>4</number>
-     </property>
-     <property name="topMargin">
-      <number>0</number>
-     </property>
-     <item>
-      <widget class="QPushButton" name="createUserButton">
-       <property name="text">
-        <string>New User...</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="rolesButton">
-       <property name="text">
-        <string>Edit Roles...</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>0</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="nx::vms::client::desktop::HintButton" name="ldapTooltip"/>
-     </item>
-     <item>
-      <widget class="QPushButton" name="ldapSettingsButton">
-       <property name="text">
-        <string>LDAP Settings...</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="fetchButton">
-       <property name="text">
-        <string>Fetch Users from LDAP...</string>
-       </property>
       </widget>
      </item>
     </layout>
@@ -288,28 +208,21 @@
    <header location="global">nx/vms/client/desktop/common/widgets/tree_view.h</header>
   </customwidget>
   <customwidget>
-   <class>nx::vms::client::desktop::HintButton</class>
-   <extends>QPushButton</extends>
-   <header location="global">nx/vms/client/desktop/common/widgets/hint_button.h</header>
-  </customwidget>
-  <customwidget>
    <class>DropdownButton</class>
    <extends>QPushButton</extends>
    <header>nx/vms/client/desktop/common/widgets/dropdown_button.h</header>
+  </customwidget>
+  <customwidget>
+   <class>nx::vms::client::desktop::SearchLineEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/search_line_edit.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>filterLineEdit</tabstop>
   <tabstop>filterButton</tabstop>
   <tabstop>usersTable</tabstop>
-  <tabstop>enableSelectedButton</tabstop>
-  <tabstop>disableSelectedButton</tabstop>
-  <tabstop>deleteSelectedButton</tabstop>
-  <tabstop>forceSecureAuthButton</tabstop>
-  <tabstop>createUserButton</tabstop>
-  <tabstop>rolesButton</tabstop>
-  <tabstop>ldapSettingsButton</tabstop>
-  <tabstop>fetchButton</tabstop>
  </tabstops>
  <resources/>
  <connections/>

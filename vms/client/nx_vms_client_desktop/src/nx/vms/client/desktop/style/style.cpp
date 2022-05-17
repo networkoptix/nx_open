@@ -1234,11 +1234,13 @@ void Style::drawPrimitive(PrimitiveElement element,
         {
             QRect rect;
             TabShape shape = TabShape::Default;
+            int indent = 0;
 
             if (auto tabWidget = qobject_cast<const QTabWidget*>(widget))
             {
                 shape = tabShape(tabWidget->tabBar());
                 rect = tabWidget->tabBar()->geometry();
+                indent = tabWidget->property(Properties::kTabBarIndent).toInt();
             }
             else if (auto tabBar = qobject_cast<const QTabBar*>(widget))
             {
@@ -1246,8 +1248,8 @@ void Style::drawPrimitive(PrimitiveElement element,
                 rect = tabBar->rect();
             }
 
-            rect.setLeft(option->rect.left());
-            rect.setRight(option->rect.right());
+            rect.setLeft(option->rect.left() + indent);
+            rect.setRight(option->rect.right() - indent);
 
             QnScopedPainterPenRollback penRollback(painter);
             QnScopedPainterAntialiasingRollback aaRollback(painter, false);
@@ -3248,8 +3250,7 @@ QRect Style::subElementRect(
         {
             if (auto tabWidget = qobject_cast<const QTabWidget*>(widget))
             {
-                int hspace = pixelMetric(PM_TabBarTabHSpace, option, widget) / 2;
-
+                const int hspace = pixelMetric(PM_TabBarTabHSpace, option, widget) / 2;
                 QRect rect = base_type::subElementRect(subElement, option, widget);
 
                 if (tabShape(tabWidget->tabBar()) == TabShape::Compact)
@@ -3257,11 +3258,13 @@ QRect Style::subElementRect(
                 else
                     rect.moveLeft(rect.left() + hspace);
 
-                int indent = tabWidget->property(Properties::kTabBarIndent).toInt();
-                rect.moveLeft(rect.left() + indent);
+                const int shift = tabWidget->property(Properties::kTabBarShift).toInt();
+                const int indent = tabWidget->property(Properties::kTabBarIndent).toInt();
 
-                if (rect.right() > option->rect.right())
-                    rect.setRight(option->rect.right());
+                rect.moveLeft(rect.left() + shift + indent);
+
+                if (rect.right() > option->rect.right() - indent)
+                    rect.setRight(option->rect.right() - indent);
 
                 return rect;
             }

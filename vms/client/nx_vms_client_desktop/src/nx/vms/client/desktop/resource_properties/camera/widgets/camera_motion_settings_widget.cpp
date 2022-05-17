@@ -54,7 +54,7 @@ CameraMotionSettingsWidget::CameraMotionSettingsWidget(
     ui->setupUi(this);
     ui->motionDetectionCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
     ui->motionDetectionCheckBox->setForegroundRole(QPalette::ButtonText);
-    ui->highResolutionAlertBar->setReservedSpace(true);
+    ui->highResolutionAlertBar->setRetainSizeWhenHidden(true);
 
     const QList<QColor> sensitivityColors = colorTheme()->colors("camera.sensitivityColors");
 
@@ -122,7 +122,7 @@ CameraMotionSettingsWidget::CameraMotionSettingsWidget(
     const auto forceDetectionButton = new QPushButton(ui->motionImplicitlyDisabledAlertBar);
     forceDetectionButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     forceDetectionButton->setText(tr("Force Motion Detection"));
-    ui->motionImplicitlyDisabledAlertBar->mainLayout()->addWidget(forceDetectionButton);
+    ui->motionImplicitlyDisabledAlertBar->verticalLayout()->addWidget(forceDetectionButton);
 
     check_box_utils::autoClearTristate(ui->motionDetectionCheckBox);
 
@@ -303,7 +303,7 @@ void CameraMotionSettingsWidget::loadAlerts(const CameraSettingsDialogState& sta
             return {};
         }());
 
-    ui->highResolutionAlertBar->setReservedSpace(
+    ui->highResolutionAlertBar->setRetainSizeWhenHidden(
         ui->motionHintBar->text().isEmpty() &&
         ui->recordingAlertBar->text().isEmpty() &&
         ui->motionImplicitlyDisabledAlertBar->text().isEmpty() &&

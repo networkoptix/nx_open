@@ -6,39 +6,41 @@
 #include <QtCore/QSortFilterProxyModel>
 
 #include <core/resource/resource_fwd.h>
+#include <nx/utils/impl_ptr.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace nx::vms::client::desktop {
-
-class UserListModelPrivate;
 
 class UserListModel:
     public QAbstractListModel,
     public QnWorkbenchContextAware
 {
     Q_OBJECT
-    typedef QAbstractListModel base_type;
+    using base_type = QAbstractListModel;
 
 public:
-    enum Columns {
+    enum Columns
+    {
         CheckBoxColumn,
         UserTypeColumn,
         LoginColumn,
         FullNameColumn,
-        UserRoleColumn,
-        EnabledColumn,
+        EmailColumn,
+        UserGroupsColumn,
+        IsCustomColumn,
 
         ColumnCount
     };
 
-    UserListModel(QObject* parent = nullptr);
-    virtual ~UserListModel();
+    explicit UserListModel(QObject* parent = nullptr);
+    virtual ~UserListModel() override;
 
     virtual int rowCount(const QModelIndex& parent) const override;
     virtual int columnCount(const QModelIndex& parent) const override;
     virtual QVariant data(const QModelIndex& index, int role) const override;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
+    virtual QHash<int, QByteArray> roleNames() const override;
 
     Qt::CheckState checkState() const;
     void setCheckState(Qt::CheckState state, const QnUserResourcePtr& user = QnUserResourcePtr());
@@ -56,16 +58,17 @@ public:
     static bool isInteractiveColumn(int column);
 
 private:
-    UserListModelPrivate* d;
-    friend class UserListModelPrivate;
+    class Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 class SortedUserListModel: public QSortFilterProxyModel
 {
-    typedef QSortFilterProxyModel base_type;
+    using base_type = QSortFilterProxyModel;
 
 public:
-    SortedUserListModel(QObject* parent);
+    explicit SortedUserListModel(QObject* parent = nullptr);
+
     void setDigestFilter(std::optional<bool> value);
 
 protected:

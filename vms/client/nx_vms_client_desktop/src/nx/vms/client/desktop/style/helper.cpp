@@ -22,6 +22,7 @@ const char* Properties::kSideIndentation = "_qn_sideIndentation";
 const char* Properties::kCheckBoxAsButton = "_qn_checkBoxAsButton";
 const char* Properties::kMenuAsDropdown = "_qn_menuAsDropdown";
 const char* Properties::kTabBarIndent = "_qn_tabBarIndent";
+const char* Properties::kTabBarShift = "_qn_tabBarShift";
 const char* Properties::kItemViewRadioButtons = "_qn_itemViewRadioButtons";
 const char* Properties::kPushButtonMargin = "_qn_pushButtonMargin";
 const char* Properties::kMenuNoMouseReplayArea = "_qn_menuNoMouseReplayArea";
