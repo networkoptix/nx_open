@@ -130,7 +130,7 @@ public:
 
 private:
     struct Private;
-    nx::utils::ImplPtr<Private> d;
+    std::shared_ptr<Private> d;
 };
 
 } // namespace nx::vms::client::core
