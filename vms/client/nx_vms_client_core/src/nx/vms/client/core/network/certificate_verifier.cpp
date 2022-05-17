@@ -417,8 +417,15 @@ nx::network::ssl::AdapterFunc CertificateCache::makeAdapterFunc(const QnUuid& se
         return nx::network::ssl::kAcceptAnyCertificate;
 
     return nx::network::ssl::makeAdapterFunc(
-        [this, serverId](const nx::network::ssl::CertificateChainView& chain)
+        [ptr=std::weak_ptr<Private>(d), serverId](
+            const nx::network::ssl::CertificateChainView& chain)
         {
+            // In some weird scenarios someone can try to establish connection when the certificate
+            // cache is deleted already.
+            auto d = ptr.lock();
+            if (!d)
+                return false;
+
             NX_MUTEX_LOCKER lock(&d->mutex);
             return d->verifyCertificateByCache(serverId, chain) == CertificateVerifier::Status::ok;
         }
