@@ -112,6 +112,11 @@ namespace ResourcePropertyKey
      */
     static const QString kDontRecordSecondaryStreamKey("dontRecordSecondaryStream");
 
+    /**
+     * Whether to download remote (i.e. on-camera) archives.
+     */
+    static const QString kRemoteArchiveSynchronizationDisabled("remoteArchiveSynchronizationDisabled");
+
     namespace Onvif
     {
         static const QString kMediaUrl("MediaUrl");
