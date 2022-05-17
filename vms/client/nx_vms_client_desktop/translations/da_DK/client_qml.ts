@@ -1047,15 +1047,15 @@ to activate PTZ</translation>
     <name>SizeConstraints</name>
     <message>
       <source>MAX</source>
-      <translation type="unfinished">MAX</translation>
+      <translation>MAKS</translation>
     </message>
     <message>
       <source>MIN</source>
-      <translation type="unfinished">MIN</translation>
+      <translation>MIN</translation>
     </message>
     <message>
       <source>Set minimum and maximum object size.</source>
-      <translation type="unfinished">Set minimum and maximum object size.</translation>
+      <translation>Indstil minimum og maksimum objektstørrelse.</translation>
     </message>
     <message>
       <source>Minimum object size cannot be greater than maximum.</source>
