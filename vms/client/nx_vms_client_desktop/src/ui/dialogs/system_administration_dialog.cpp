@@ -18,6 +18,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/widgets/system_settings/cloud_management_widget.h>
 #include <ui/widgets/system_settings/database_management_widget.h>
+#include <ui/widgets/system_settings/deprecated_user_management_widget.h>
 #include <ui/widgets/system_settings/general_system_administration_widget.h>
 #include <ui/widgets/system_settings/license_manager_widget.h>
 #include <ui/widgets/system_settings/routing_management_widget.h>
@@ -38,8 +39,18 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
     auto generalWidget = new QnGeneralSystemAdministrationWidget(this);
     addPage(GeneralPage, generalWidget, tr("General"));
 
-    auto usersWidget = new UserListWidget(this);
-    addPage(UserManagement, usersWidget, tr("Users"));
+    auto userListWidget = ini().enableNewUserSettings
+        ? new UserListWidget(this)
+        : nullptr;
+
+    auto deprecatedUserManagementWidget = !ini().enableNewUserSettings
+        ? new QnDeprecatedUserManagementWidget(this)
+        : nullptr;
+
+    if (ini().enableNewUserSettings)
+        addPage(UserManagement, userListWidget, tr("User Management"));
+    else
+        addPage(UserManagement, deprecatedUserManagementWidget, tr("Users"));
 
     // This is a page for updating many servers in one run.
     auto multiUpdatesWidget = new MultiServerUpdatesWidget(this);
@@ -52,12 +63,24 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
 
     auto securityWidget = new SecuritySettingsWidget(this);
     addPage(SecurityPage, securityWidget, tr("Security"));
-    connect(securityWidget, &SecuritySettingsWidget::manageUsers, this,
-        [this, usersWidget]
-        {
-            setCurrentPage(UserManagement);
-            usersWidget->filterDigestUsers();
-        });
+    if (ini().enableNewUserSettings)
+    {
+        connect(securityWidget, &SecuritySettingsWidget::manageUsers, this,
+        [this, userListWidget]
+            {
+                setCurrentPage(UserManagement);
+                userListWidget->filterDigestUsers();
+            });
+    }
+    else
+    {
+        connect(securityWidget, &SecuritySettingsWidget::manageUsers, this,
+            [this, deprecatedUserManagementWidget]
+            {
+                setCurrentPage(UserManagement);
+                deprecatedUserManagementWidget->filterDigestUsers();
+            });
+    }
 
     addPage(CloudManagement, new QnCloudManagementWidget(this), nx::branding::cloudName());
     addPage(
