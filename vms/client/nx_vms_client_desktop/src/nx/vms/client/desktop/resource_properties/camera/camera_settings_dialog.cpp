@@ -358,7 +358,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     d->fixupScheduleButton = new QPushButton(ui->scheduleAlertBar);
     d->fixupScheduleButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     d->fixupScheduleButton->setText(tr("Change invalid schedule to \"Record Always\""));
-    ui->scheduleAlertBar->mainLayout()->addWidget(d->fixupScheduleButton.data());
+    ui->scheduleAlertBar->verticalLayout()->addWidget(d->fixupScheduleButton.data());
     connect(d->fixupScheduleButton.data(), &QPushButton::clicked, this,
         [this]()
         {

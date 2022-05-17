@@ -207,7 +207,7 @@ EventPanel::Private::Private(EventPanel* q):
         m_analyticsTab->hide();
 
         static constexpr int kTabBarShift = 10;
-        m_tabs->setProperty(style::Properties::kTabBarIndent, kTabBarShift);
+        m_tabs->setProperty(style::Properties::kTabBarShift, kTabBarShift);
         setTabShape(m_tabs->tabBar(), style::TabShape::Compact);
 
         for (auto [tab, synchronizer]: nx::utils::constKeyValueRange(m_synchronizers))

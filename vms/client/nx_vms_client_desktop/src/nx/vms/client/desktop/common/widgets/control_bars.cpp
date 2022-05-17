@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "message_bar.h"
+#include "control_bars.h"
 
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QVBoxLayout>
@@ -14,14 +14,32 @@
 namespace nx::vms::client::desktop {
 
 // ------------------------------------------------------------------------------------------------
-// MessageBar
+// ControlBar
 
-MessageBar::MessageBar(QWidget* parent):
+struct ControlBar::Private
+{
+    ControlBar* const q;
+    QWidget* const background{new QWidget(q)};
+    QVBoxLayout* const verticalLayout{new QVBoxLayout(background)};
+    QHBoxLayout* const horizontalLayout{new QHBoxLayout()};
+    bool retainSizeWhenHidden = false;
+
+    void updateVisibility()
+    {
+        const bool hidden = !retainSizeWhenHidden && background->isHidden();
+        if (hidden == q->isHidden())
+            return;
+
+        q->setHidden(hidden);
+
+        if (q->parentWidget() && q->parentWidget()->layout() && q->parentWidget()->isVisible())
+            q->parentWidget()->layout()->activate();
+    }
+};
+
+ControlBar::ControlBar(QWidget* parent):
     base_type(parent),
-    m_background(new QWidget(this)),
-    m_label(new QnWordWrappedLabel(m_background)),
-    m_layout(new QVBoxLayout(m_background)),
-    m_overlayLayout(new QHBoxLayout(m_label))
+    d(new Private{.q = this})
 {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
 
@@ -29,34 +47,100 @@ MessageBar::MessageBar(QWidget* parent):
     setPaletteColor(this, QPalette::Link, colorTheme()->color("light4"));
     setPaletteColor(this, QPalette::LinkVisited, colorTheme()->color("light1"));
 
-    m_background->setAutoFillBackground(true);
-    m_background->setHidden(true);
+    d->background->setAutoFillBackground(true);
+    d->background->setHidden(true);
 
-    m_layout->addWidget(m_label);
+    d->verticalLayout->addLayout(d->horizontalLayout);
+    d->horizontalLayout->setContentsMargins(0, 0, 0, 0);
 
-    m_label->setForegroundRole(QPalette::Text);
-    m_label->label()->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-    m_label->setText(QString());
-    setOpenExternalLinks(true);
-    WidgetUtils::setRetainSizeWhenHidden(m_background, true);
-
-    m_background->setContentsMargins(
+    d->verticalLayout->setContentsMargins(
         style::Metrics::kDefaultTopLevelMargin, style::Metrics::kStandardPadding,
         style::Metrics::kDefaultTopLevelMargin, style::Metrics::kStandardPadding);
 
+    WidgetUtils::setRetainSizeWhenHidden(d->background, true);
+
     auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(m_background);
+    layout->addWidget(d->background);
 
-    setHidden(!m_reservedSpace);
+    setHidden(!d->retainSizeWhenHidden);
+}
 
-    connect(m_label, &QnWordWrappedLabel::linkActivated,
+ControlBar::~ControlBar()
+{
+    // Required here for forward-declared scoped pointer destruction.
+}
+
+bool ControlBar::isDisplayed() const
+{
+    return !d->background->isHidden();
+}
+
+void ControlBar::setDisplayed(bool value)
+{
+    if (isDisplayed() == value)
+        return;
+
+    d->background->setVisible(value);
+    d->updateVisibility();
+}
+
+bool ControlBar::retainSizeWhenHidden() const
+{
+    return d->retainSizeWhenHidden;
+}
+
+void ControlBar::setRetainSizeWhenHidden(bool value)
+{
+    if (d->retainSizeWhenHidden == value)
+        return;
+
+    d->retainSizeWhenHidden = value;
+    d->updateVisibility();
+}
+
+QVBoxLayout* ControlBar::verticalLayout() const
+{
+    return d->verticalLayout;
+}
+
+QHBoxLayout* ControlBar::horizontalLayout() const
+{
+    return d->horizontalLayout;
+}
+
+// -----------------------------------------------------------------------------------------------
+// MessageBar
+
+struct MessageBar::Private
+{
+    MessageBar* const q;
+    QnWordWrappedLabel* const label{new QnWordWrappedLabel(q)};
+    QHBoxLayout* const overlayLayout{new QHBoxLayout(label)};
+};
+
+MessageBar::MessageBar(QWidget* parent):
+    base_type(parent),
+    d(new Private{.q = this})
+{
+    horizontalLayout()->addWidget(d->label);
+    d->label->setForegroundRole(QPalette::Text);
+    d->label->label()->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    d->label->setText(QString());
+    setOpenExternalLinks(true);
+
+    connect(d->label, &QnWordWrappedLabel::linkActivated,
         this, &MessageBar::linkActivated);
+}
+
+MessageBar::~MessageBar()
+{
+    // Required here for forward-declared scoped pointer destruction.
 }
 
 QString MessageBar::text() const
 {
-    return m_label->text();
+    return d->label->text();
 }
 
 void MessageBar::setText(const QString& text)
@@ -64,56 +148,23 @@ void MessageBar::setText(const QString& text)
     if (text == this->text())
         return;
 
-    m_label->setText(text);
-    m_background->setHidden(text.isEmpty());
-
-    updateVisibility();
+    d->label->setText(text);
+    setDisplayed(!text.isEmpty());
 }
 
 void MessageBar::setOpenExternalLinks(bool open)
 {
-    m_label->setOpenExternalLinks(open);
-}
-
-bool MessageBar::reservedSpace() const
-{
-    return m_reservedSpace;
-}
-
-void MessageBar::setReservedSpace(bool reservedSpace)
-{
-    if (m_reservedSpace == reservedSpace)
-        return;
-
-    m_reservedSpace = reservedSpace;
-    updateVisibility();
-}
-
-QVBoxLayout* MessageBar::mainLayout() const
-{
-    return m_layout;
+    d->label->setOpenExternalLinks(open);
 }
 
 QHBoxLayout* MessageBar::overlayLayout() const
 {
-    return m_overlayLayout;
+    return d->overlayLayout;
 }
 
 QnWordWrappedLabel* MessageBar::label() const
 {
-    return m_label;
-}
-
-void MessageBar::updateVisibility()
-{
-    bool hidden = !m_reservedSpace && m_background->isHidden();
-    if (hidden == isHidden())
-        return;
-
-    setHidden(hidden);
-
-    if (parentWidget() && parentWidget()->layout() && parentWidget()->isVisible())
-        parentWidget()->layout()->activate();
+    return d->label;
 }
 
 // ------------------------------------------------------------------------------------------------

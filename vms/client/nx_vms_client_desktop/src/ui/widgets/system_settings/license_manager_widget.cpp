@@ -196,7 +196,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     const QString alertText = tr("You do not have a valid license installed. "
         "Please activate your commercial or trial license.");
     ui->alertBar->setText(alertText);
-    ui->alertBar->setReservedSpace(false);
+    ui->alertBar->setRetainSizeWhenHidden(false);
     ui->alertBar->setVisible(false);
 
     m_exportLicensesButton = new QPushButton(ui->licensesGroupBox);

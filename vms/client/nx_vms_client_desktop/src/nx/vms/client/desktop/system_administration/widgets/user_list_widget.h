@@ -10,8 +10,6 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/connective.h>
 
-namespace Ui { class UserListWidget; }
-
 namespace nx::vms::client::desktop {
 
 class CheckableHeaderView;
@@ -36,7 +34,6 @@ public:
 private:
     class Private;
     class Delegate;
-    nx::utils::ImplPtr<Ui::UserListWidget> ui;
     nx::utils::ImplPtr<Private> d;
 };
 

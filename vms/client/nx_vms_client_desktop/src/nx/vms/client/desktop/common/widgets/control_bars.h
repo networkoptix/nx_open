@@ -5,6 +5,7 @@
 #include <QtCore/QList>
 #include <QtWidgets/QWidget>
 
+#include <nx/utils/impl_ptr.h>
 #include <ui/widgets/word_wrapped_label.h>
 
 class QHBoxLayout;
@@ -12,15 +13,39 @@ class QVBoxLayout;
 
 namespace nx::vms::client::desktop {
 
-class MessageBar: public QWidget
+class ControlBar: public QWidget
+{
+    Q_OBJECT
+    using base_type = QWidget;
+
+public:
+    explicit ControlBar(QWidget* parent = nullptr);
+    virtual ~ControlBar() override;
+
+    bool retainSizeWhenHidden() const;
+    void setRetainSizeWhenHidden(bool value);
+
+    QVBoxLayout* verticalLayout() const;
+    QHBoxLayout* horizontalLayout() const;
+
+    bool isDisplayed() const;
+    void setDisplayed(bool value);
+
+private:
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
+};
+
+class MessageBar: public ControlBar
 {
     Q_OBJECT
     Q_PROPERTY(QString text READ text WRITE setText)
 
-    using base_type = QWidget;
+    using base_type = ControlBar;
 
 public:
     explicit MessageBar(QWidget* parent = nullptr);
+    virtual ~MessageBar() override;
 
     QString text() const;
     void setText(const QString& text);
@@ -28,31 +53,19 @@ public:
     /** Enabled by default. */
     void setOpenExternalLinks(bool open);
 
-    /**
-     * This property controls how the bar should behave when no text is set.
-     * If reservedSpace is set, bar will be displayed without text and color - just take space.
-     * It is used when we don't want to change the dialog size.
-     */
-    bool reservedSpace() const;
-    void setReservedSpace(bool reservedSpace);
-
-    QVBoxLayout* mainLayout() const;
     QHBoxLayout* overlayLayout() const;
     QnWordWrappedLabel* label() const;
+
+private:
+    using base_type::setDisplayed;
 
 signals:
     /** Emitted only when `setOpenExternalLinks` is disabled. */
     void linkActivated(const QString& link);
 
 private:
-    void updateVisibility();
-
-private:
-    QWidget* const m_background = nullptr;
-    QnWordWrappedLabel* const m_label = nullptr;
-    QVBoxLayout* const m_layout = nullptr;
-    QHBoxLayout* const m_overlayLayout = nullptr;
-    bool m_reservedSpace = false;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 // The following classes are helpers for easy customization.

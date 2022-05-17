@@ -215,7 +215,7 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     const auto forceDetectionButton = new QPushButton(ui->motionImplicitlyDisabledAlertBar);
     forceDetectionButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     forceDetectionButton->setText(tr("Force Motion Detection"));
-    ui->motionImplicitlyDisabledAlertBar->mainLayout()->addWidget(forceDetectionButton);
+    ui->motionImplicitlyDisabledAlertBar->verticalLayout()->addWidget(forceDetectionButton);
 
     connect(forceDetectionButton, &QPushButton::clicked, store,
         [store]() { store->forceMotionDetection(); });

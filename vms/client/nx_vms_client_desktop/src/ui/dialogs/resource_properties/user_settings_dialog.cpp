@@ -443,7 +443,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget* parent):
         this,
         [this] { setUser(QnUserResourcePtr()); });
 
-    ui->alertBar->setReservedSpace(false);
+    ui->alertBar->setRetainSizeWhenHidden(false);
 
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);

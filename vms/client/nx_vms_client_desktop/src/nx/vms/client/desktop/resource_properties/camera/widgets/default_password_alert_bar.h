@@ -5,7 +5,7 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-#include <nx/vms/client/desktop/common/widgets/message_bar.h>
+#include <nx/vms/client/desktop/common/widgets/control_bars.h>
 
 class QPushButton;
 

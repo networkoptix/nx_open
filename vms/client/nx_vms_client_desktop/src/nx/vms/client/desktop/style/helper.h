@@ -195,7 +195,10 @@ struct Properties
     /** Name of a property to change menu appearance to dropdown (bool). */
     static const char* kMenuAsDropdown;
 
-    /** Name of a property to hold an extra indent of a tab bar. */
+    /** Name of a property to hold an extra horizontal shift of a tab bar. */
+    static const char* kTabBarShift;
+
+    /** Name of a property to hold extra left and right indents of a tab bar. */
     static const char* kTabBarIndent;
 
     /** Name of a property to change item view checkboxes to radio buttons (bool). */

@@ -68,7 +68,7 @@
   <customwidget>
    <class>nx::vms::client::desktop::AlertBar</class>
    <extends>QWidget</extends>
-   <header>nx/vms/client/desktop/common/widgets/message_bar.h</header>
+   <header>nx/vms/client/desktop/common/widgets/control_bars.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

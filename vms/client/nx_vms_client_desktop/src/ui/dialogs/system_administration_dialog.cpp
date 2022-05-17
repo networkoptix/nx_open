@@ -13,6 +13,7 @@
 #include <nx/vms/client/desktop/system_administration/widgets/security_settings_widget.h>
 #include <nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.h>
 #include <nx/vms/client/desktop/system_administration/widgets/user_list_widget.h>
+#include <nx/vms/client/desktop/system_administration/widgets/user_management_tab_widget.h>
 #include <nx/vms/client/desktop/system_update/multi_server_updates_widget.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -39,8 +40,8 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
     auto generalWidget = new QnGeneralSystemAdministrationWidget(this);
     addPage(GeneralPage, generalWidget, tr("General"));
 
-    auto userListWidget = ini().enableNewUserSettings
-        ? new UserListWidget(this)
+    auto userManagementWidget = ini().enableNewUserSettings
+        ? new UserManagementTabWidget(this)
         : nullptr;
 
     auto deprecatedUserManagementWidget = !ini().enableNewUserSettings
@@ -48,7 +49,7 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
         : nullptr;
 
     if (ini().enableNewUserSettings)
-        addPage(UserManagement, userListWidget, tr("User Management"));
+        addPage(UserManagement, userManagementWidget, tr("User Management"));
     else
         addPage(UserManagement, deprecatedUserManagementWidget, tr("Users"));
 
@@ -66,10 +67,10 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
     if (ini().enableNewUserSettings)
     {
         connect(securityWidget, &SecuritySettingsWidget::manageUsers, this,
-        [this, userListWidget]
+        [this, userManagementWidget]
             {
                 setCurrentPage(UserManagement);
-                userListWidget->filterDigestUsers();
+                userManagementWidget->manageDigestUsers();
             });
     }
     else
