@@ -249,13 +249,14 @@ std::future<UpdateContents> ClientUpdateTool::requestUpdateInfoFromServer(
 
 void ClientUpdateTool::setServerUrl(
     const QnUuid& serverId,
-    const nx::vms::client::core::ConnectionInfo& connectionInfo)
+    const nx::vms::client::core::ConnectionInfo& connectionInfo,
+    nx::vms::common::AbstractCertificateVerifier* certificateVerifier)
 {
     m_serverConnection.reset(
         new rest::ServerConnection(
             serverId,
             /*auditId*/ commonModule()->runningInstanceGUID(),
-            qnClientCoreModule->networkModule()->certificateVerifier(),
+            certificateVerifier,
             connectionInfo.address,
             connectionInfo.credentials));
     m_peerManager->setServerDirectConnection(serverId, m_serverConnection);

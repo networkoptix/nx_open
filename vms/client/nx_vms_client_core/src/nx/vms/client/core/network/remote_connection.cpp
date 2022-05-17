@@ -180,14 +180,14 @@ struct RemoteConnection::Private
         serverApi = std::make_shared<rest::ServerConnection>(
             moduleInformation.id,
             sessionId,
-            certificateVerifier,
+            certificateCache.get(),
             this->connectionInfo.address,
             this->connectionInfo.credentials);
 
         queryProcessor = std::make_shared<QueryProcessor>(
             moduleInformation.id,
             sessionId,
-            certificateVerifier,
+            certificateCache.get(),
             this->connectionInfo.address,
             this->connectionInfo.credentials,
             serializationFormat);

@@ -54,8 +54,6 @@ public:
 
     virtual ~CertificateVerifier() override;
 
-    nx::network::ssl::VerifyCertificateFunc makeVerifyCertificateFunc(const QnUuid& serverId);
-
     /**
      * Create AdapterFunc that accepts only certificates with matching public key. This function
      * is intended to be used when establishing a connection.
@@ -63,8 +61,7 @@ public:
     nx::network::ssl::AdapterFunc makeRestrictedAdapterFunc(const std::string& expectedKey);
 
     /**
-     * Create AdapterFunc that uses in-memory certificate cache. Used as default certificate
-     * check option for all connections during normal client operation.
+     * Create AdapterFunc that uses the active connection certificate cache.
      */
     virtual nx::network::ssl::AdapterFunc makeAdapterFunc(const QnUuid& serverId) override;
 
@@ -109,11 +106,14 @@ private:
 /**
  * Per-session certificate cache.
  */
-class CertificateCache
+class CertificateCache: public nx::vms::common::AbstractCertificateVerifier
 {
+    Q_OBJECT
+    using base_type = nx::vms::common::AbstractCertificateVerifier;
+
 public:
-    CertificateCache();
-    ~CertificateCache();
+    CertificateCache(QObject* parent = nullptr);
+    virtual ~CertificateCache() override;
 
     void addCertificate(
         const QnUuid& serverId,
@@ -126,9 +126,11 @@ public:
 
     void removeCertificates(const QnUuid& serverId);
 
+    virtual nx::network::ssl::AdapterFunc makeAdapterFunc(const QnUuid& serverId) override;
+
 private:
     struct Private;
-    nx::utils::ImplPtr<Private> d;
+    std::shared_ptr<Private> d;
 };
 
 } // namespace nx::vms::client::core

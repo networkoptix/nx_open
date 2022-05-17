@@ -18,7 +18,7 @@ struct QueryProcessor::Private
     Private(
         const QnUuid& serverId,
         const QnUuid& runningInstanceId,
-        CertificateVerifier* certificateVerifier,
+        AbstractCertificateVerifier* certificateVerifier,
         nx::network::SocketAddress address,
         nx::network::http::Credentials credentials,
         Qn::SerializationFormat format)
@@ -65,7 +65,7 @@ struct QueryProcessor::Private
 
     const QnUuid serverId;
     QnUuid runningInstanceId;
-    CertificateVerifier* const certificateVerifier;
+    AbstractCertificateVerifier* certificateVerifier;
     nx::network::SocketAddress address;
     nx::network::http::Credentials credentials;
     const Qn::SerializationFormat serializationFormat;
@@ -75,7 +75,7 @@ struct QueryProcessor::Private
 QueryProcessor::QueryProcessor(
     const QnUuid& serverId,
     const QnUuid& runningInstanceId,
-    CertificateVerifier* certificateVerifier,
+    AbstractCertificateVerifier* certificateVerifier,
     nx::network::SocketAddress address,
     nx::network::http::Credentials credentials,
     Qn::SerializationFormat serializationFormat)
