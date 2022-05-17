@@ -6,6 +6,7 @@
 
 namespace nx::vms::rules::test {
 
+/** Reroutes events back to local engine. */
 class TestRouter: public nx::vms::rules::Router
 {
 public:
@@ -14,6 +15,10 @@ public:
         const QSet<QnUuid>& triggeredRules,
         const QSet<QnUuid>& affectedResources) override
     {
+        for (const auto ruleId: triggeredRules)
+        {
+            emit eventReceived(ruleId, eventData);
+        }
     }
 };
 

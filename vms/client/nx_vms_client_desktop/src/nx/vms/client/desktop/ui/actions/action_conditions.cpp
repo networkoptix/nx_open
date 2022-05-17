@@ -2174,7 +2174,7 @@ ConditionWrapper hasNewEventRulesEngine()
         [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
         {
             auto engine = qnClientCoreModule->vmsRulesEngine();
-            return engine->isEnabled() && engine->hasRules();
+            return engine && engine->isEnabled();
         });
 }
 

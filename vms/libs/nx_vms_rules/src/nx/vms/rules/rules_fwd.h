@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <chrono>
-
 #include <QtCore/QSharedPointer>
+
+#include <nx/vms/api/rules/common.h>
 
 namespace nx::vms::rules {
 
@@ -34,5 +34,7 @@ using ActionPtr = QSharedPointer<BasicAction>;
 using EventData = QHash<QString, QVariant>; // TODO: #spanasenko Move to separate class?
 
 using FilterManifest = QMap<QString, QString>; //< Field name to field type mapping.
+
+using State = nx::vms::api::rules::State;
 
 } // namespace nx::vms::rules

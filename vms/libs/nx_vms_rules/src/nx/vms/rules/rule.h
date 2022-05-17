@@ -22,7 +22,7 @@ class NX_VMS_RULES_API Rule: public QObject
     Q_OBJECT
 
 public:
-    Rule(const QnUuid& id);
+    explicit Rule(const QnUuid& id);
     ~Rule();
 
     QnUuid id() const;

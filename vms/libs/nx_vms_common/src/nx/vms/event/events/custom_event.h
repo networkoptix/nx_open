@@ -2,28 +2,25 @@
 
 #pragma once
 
-#include <nx/vms/event/events/abstract_event.h>
-#include <core/resource/resource_fwd.h>
-#include <nx/fusion/model_functions_fwd.h>
+#include "prolonged_event.h"
 
 namespace nx {
 namespace vms {
 namespace event {
 
-class NX_VMS_COMMON_API CustomEvent: public AbstractEvent
+class NX_VMS_COMMON_API CustomEvent: public ProlongedEvent
 {
-    using base_type = AbstractEvent;
+    using base_type = ProlongedEvent;
 
 public:
     explicit CustomEvent(
         EventState toggleState,
-        qint64 timeStamp, const
-        QString& resourceName,
+        qint64 timeStamp,
+        const QString& resourceName,
         const QString& caption,
         const QString& description,
         EventMetaData metadata);
 
-    virtual bool isEventStateMatched(EventState state, ActionType actionType) const override;
     virtual bool checkEventParams(const EventParameters& params) const override;
     virtual EventParameters getRuntimeParams() const override;
 

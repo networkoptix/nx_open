@@ -5,7 +5,7 @@
 #include <nx/vms/common/system_context_aware.h>
 
 #include "../data_macros.h"
-#include "../simple_type_field.h"
+#include "../base_fields/simple_type_field.h"
 
 namespace nx::vms::rules {
 

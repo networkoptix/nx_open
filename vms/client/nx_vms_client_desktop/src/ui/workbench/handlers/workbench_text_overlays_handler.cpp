@@ -3,12 +3,14 @@
 #include "workbench_text_overlays_handler.h"
 
 #include <algorithm>
+#include <chrono>
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QTimer>
 #include <QtGui/QTextDocument>
 
 #include <client/client_message_processor.h>
+#include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -16,6 +18,8 @@
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/strings_helper.h>
+#include <nx/vms/rules/actions/text_overlay_action.h>
+#include <nx/vms/rules/engine.h>
 #include <ui/graphics/items/controls/html_text_item.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -27,7 +31,9 @@ using namespace nx;
 
 namespace {
 
-static constexpr int kMinimumTextOverlayDurationMs = 5000;
+using namespace std::chrono;
+
+static constexpr auto kMinimumTextOverlayDuration = 5s;
 
 QnHtmlTextItemOptions textOverlayOptions()
 {
@@ -40,6 +46,58 @@ QnHtmlTextItemOptions textOverlayOptions()
      * falls back to QnResourceHudOverlay::palette().color(QPalette::Window). */
     return QnHtmlTextItemOptions(QColor(), true,
         kBorderRadius, kHorPaddings, kVertPaddings, kMaxItemWidth);
+}
+
+QString formatOverlayText(
+    const QString& text,
+    const QString& rawCaption,
+    const QStringList& rawDescription)
+{
+    using namespace nx::vms::common;
+
+    const QString kHtmlPageTemplate =
+        "<html><head><style>* {text-indent: 0; margin-top: 0; "
+        "margin-bottom: 0; margin-left: 0; margin-right: 0; "
+        "color: white;}</style></head><body>%1</body></html>";
+
+    constexpr int kCaptionMaxLength = 64;
+    constexpr int kDescriptionMaxLength = 160;
+    constexpr int kCaptionPixelFontSize = 16;
+    constexpr int kDescriptionPixelFontSize = 13;
+
+    QString textHtml;
+
+    if (text.isEmpty())
+    {
+        const auto caption = html::mightBeHtml(rawCaption)
+            ? rawCaption
+            : rawCaption.toHtmlEscaped();
+
+        // NewLine symbols will be replaced with html tag later.
+        const auto description = html::mightBeHtml(rawDescription)
+            ? rawDescription.join(html::kLineBreak)
+            : rawDescription.join('\n').toHtmlEscaped();
+
+        const auto captionHtml = html::styledParagraph(
+            caption,
+            kCaptionPixelFontSize,
+            /*bold*/ true);
+        const auto descriptionHtml = html::styledParagraph(
+            description,
+            kDescriptionPixelFontSize);
+
+        textHtml = kHtmlPageTemplate.arg(
+            html::elide(captionHtml, kCaptionMaxLength) +
+            html::elide(descriptionHtml, kDescriptionMaxLength));
+    }
+    else
+    {
+        textHtml = html::elide(
+            html::styledParagraph(html::toHtml(text), kDescriptionPixelFontSize),
+            kDescriptionMaxLength);
+    }
+
+    return textHtml;
 }
 
 } // namespace
@@ -56,8 +114,11 @@ class QnWorkbenchTextOverlaysHandlerPrivate
 public:
     QnWorkbenchTextOverlaysHandlerPrivate(QnWorkbenchTextOverlaysHandler* main): q_ptr(main) {}
 
-    void showTextOverlays(const QnResourcePtr& resource, const QnUuid& id,
-        const QString& text, int timeoutMs);
+    void showTextOverlays(
+        const QnResourcePtr& resource,
+        QnUuid id,
+        const QString& text,
+        std::chrono::milliseconds timeout);
 
     void hideTextOverlays(const QnResourcePtr& resource, const QnUuid& id);
 
@@ -67,15 +128,18 @@ private:
     struct OverlayData
     {
         QString text;
-        int timeoutMs = -1;
+        std::chrono::milliseconds timeout = -1ms;
         QElapsedTimer elapsedTimer;
         QTimer* autohideTimer = nullptr;
     };
 
     void hideImmediately(const QnResourcePtr& resource, const QnUuid& id);
 
-    void setupAutohideTimer(OverlayData& data,
-        const QnResourcePtr& resource, const QnUuid& id, int timeoutMs);
+    void setupAutohideTimer(
+        OverlayData& data,
+        const QnResourcePtr& resource,
+        QnUuid id,
+        std::chrono::milliseconds timeout);
 
     OverlayData* findData(const QnResourcePtr& resource, const QnUuid& id);
     void removeData(const QnResourcePtr& resource, const QnUuid& id);
@@ -102,6 +166,10 @@ QnWorkbenchTextOverlaysHandler::QnWorkbenchTextOverlaysHandler(QObject* parent):
 
     connect(display(), &QnWorkbenchDisplay::widgetAdded,
         this, &QnWorkbenchTextOverlaysHandler::at_resourceWidgetAdded);
+
+    qnClientCoreModule->vmsRulesEngine()->addActionExecutor(
+        nx::vms::rules::TextOverlayAction::manifest().id,
+        this);
 }
 
 QnWorkbenchTextOverlaysHandler::~QnWorkbenchTextOverlaysHandler()
@@ -140,7 +208,8 @@ void QnWorkbenchTextOverlaysHandler::at_eventActionReceived(
     std::sort(cameras.begin(), cameras.end());
     cameras.erase(std::unique(cameras.begin(), cameras.end()), cameras.end());
 
-    const int timeoutMs = isProlongedAction ? -1 : actionParams.durationMs;
+    const auto timeout = std::chrono::milliseconds(
+        isProlongedAction ? -1 : actionParams.durationMs);
 
     const auto id = businessAction->getRuleId();
     const bool finished = isProlongedAction && (state == vms::api::EventState::inactive);
@@ -154,57 +223,17 @@ void QnWorkbenchTextOverlaysHandler::at_eventActionReceived(
     }
     else
     {
-        using namespace nx::vms::common;
-
-        const QString kHtmlPageTemplate =
-            "<html><head><style>* {text-indent: 0; margin-top: 0; "
-            "margin-bottom: 0; margin-left: 0; margin-right: 0; "
-            "color: white;}</style></head><body>%1</body></html>";
-
-        constexpr int kCaptionMaxLength = 64;
-        constexpr int kDescriptionMaxLength = 160;
-        constexpr int kCaptionPixelFontSize = 16;
-        constexpr int kDescriptionPixelFontSize = 13;
-
-        QString textHtml;
         const QString text = actionParams.text.trimmed();
+        const auto runtimeParams = businessAction->getRuntimeParams();
+        const auto rawCaption = m_helper->eventAtResource(runtimeParams, Qn::RI_WithUrl);
+        const auto rawDescription = m_helper->eventDetails(
+            runtimeParams,
+            nx::vms::event::AttrSerializePolicy::singleLine);
 
-        if (text.isEmpty())
-        {
-            const auto runtimeParams = businessAction->getRuntimeParams();
-            const auto rawCaption = m_helper->eventAtResource(runtimeParams, Qn::RI_WithUrl);
-            const auto caption = html::mightBeHtml(rawCaption)
-                ? rawCaption
-                : rawCaption.toHtmlEscaped();
-
-            // NewLine symbols will be replaced with html tag later.
-            const auto rawDescription = m_helper->eventDetails(runtimeParams,
-                nx::vms::event::AttrSerializePolicy::singleLine);
-            const auto description = html::mightBeHtml(rawDescription)
-                ? rawDescription.join(html::kLineBreak)
-                : rawDescription.join('\n').toHtmlEscaped();
-
-            const auto captionHtml = html::styledParagraph(
-                caption,
-                kCaptionPixelFontSize,
-                /*bold*/ true);
-            const auto descriptionHtml = html::styledParagraph(
-                description,
-                kDescriptionPixelFontSize);
-
-            textHtml = kHtmlPageTemplate.arg(
-                html::elide(captionHtml, kCaptionMaxLength) +
-                html::elide(descriptionHtml, kDescriptionMaxLength));
-        }
-        else
-        {
-            textHtml = html::elide(
-                html::styledParagraph(html::toHtml(text), kDescriptionPixelFontSize),
-                kDescriptionMaxLength);
-        }
+        const QString textHtml = formatOverlayText(text, rawCaption, rawDescription);
 
         for (const auto& camera: cameras)
-            d->showTextOverlays(camera, id, textHtml, timeoutMs);
+            d->showTextOverlays(camera, id, textHtml, timeout);
     }
 }
 
@@ -214,13 +243,55 @@ void QnWorkbenchTextOverlaysHandler::at_resourceWidgetAdded(QnResourceWidget* wi
     d->handleNewWidget(widget);
 }
 
+void QnWorkbenchTextOverlaysHandler::execute(const nx::vms::rules::ActionPtr& action)
+{
+    if (!context()->user())
+        return;
+
+    const auto overlayAction = action.dynamicCast<nx::vms::rules::TextOverlayAction>();
+    if (!overlayAction)
+        return;
+
+    const auto ruleId = overlayAction->ruleId();
+    QnUuidSet deviceIds = overlayAction->devices();
+
+    // TODO: #amalov Implement "use source" logic via field mechanics.
+    if (overlayAction->useSource())
+    {
+        // deviceIds << overlayAction->source();
+    }
+
+    auto cameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(deviceIds);
+
+    Q_D(QnWorkbenchTextOverlaysHandler);
+
+    if (overlayAction->state() == nx::vms::rules::State::stopped)
+    {
+        for (const auto& camera: cameras)
+            d->hideTextOverlays(camera, ruleId);
+    }
+    else
+    {
+        const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+            overlayAction->duration());
+        const QString text = overlayAction->text().trimmed();
+        // TODO: #amalov Check formatting.
+        const QString textHtml = formatOverlayText(text, {}, {});
+
+        for (const auto& camera: cameras)
+            d->showTextOverlays(camera, ruleId, textHtml, duration);
+    }
+}
+
 /*
 * QnWorkbenchTextOverlaysHandlerPrivate implementation
 */
 
 void QnWorkbenchTextOverlaysHandlerPrivate::showTextOverlays(
-    const QnResourcePtr& resource, const QnUuid& id,
-    const QString& text, int timeoutMs)
+    const QnResourcePtr& resource,
+    QnUuid id,
+    const QString& text,
+    std::chrono::milliseconds timeout)
 {
     Q_Q(QnWorkbenchTextOverlaysHandler);
 
@@ -232,10 +303,10 @@ void QnWorkbenchTextOverlaysHandlerPrivate::showTextOverlays(
 
     auto& data = m_overlays[resource][id];
     data.text = text;
-    data.timeoutMs = timeoutMs;
+    data.timeout = timeout;
     data.elapsedTimer.start();
 
-    setupAutohideTimer(data, resource, id, timeoutMs); //< will clear timer if timeoutMs < 0
+    setupAutohideTimer(data, resource, id, timeout); //< Will clear timer if timeout <= 0.
 }
 
 void QnWorkbenchTextOverlaysHandlerPrivate::hideTextOverlays(
@@ -245,12 +316,12 @@ void QnWorkbenchTextOverlaysHandlerPrivate::hideTextOverlays(
     if (!data)
         return;
 
-    const qint64 remainingMs = data->elapsedTimer.isValid()
-        ? kMinimumTextOverlayDurationMs - data->elapsedTimer.elapsed()
-        : qint64(0);
+    const auto remaining = data->elapsedTimer.isValid()
+        ? kMinimumTextOverlayDuration - std::chrono::milliseconds(data->elapsedTimer.elapsed())
+        : 0ms;
 
-    if (remainingMs > 0)
-        setupAutohideTimer(*data, resource, id, static_cast<int>(remainingMs));
+    if (remaining.count() > 0)
+        setupAutohideTimer(*data, resource, id, remaining);
     else
         hideImmediately(resource, id);
 }
@@ -289,8 +360,11 @@ void QnWorkbenchTextOverlaysHandlerPrivate::hideImmediately(
     removeData(resource, id);
 }
 
-void QnWorkbenchTextOverlaysHandlerPrivate::setupAutohideTimer(OverlayData& data,
-    const QnResourcePtr& resource, const QnUuid& id, int timeoutMs)
+void QnWorkbenchTextOverlaysHandlerPrivate::setupAutohideTimer(
+    OverlayData& data,
+    const QnResourcePtr& resource,
+    QnUuid id,
+    std::chrono::milliseconds timeout)
 {
     Q_Q(QnWorkbenchTextOverlaysHandler);
 
@@ -301,11 +375,11 @@ void QnWorkbenchTextOverlaysHandlerPrivate::setupAutohideTimer(OverlayData& data
         data.autohideTimer = nullptr;
     }
 
-    if (timeoutMs > 0)
+    if (timeout.count() > 0)
     {
         data.autohideTimer = executeDelayedParented(
             [this, resource, id] { hideImmediately(resource, id); },
-            timeoutMs, q);
+            timeout, q);
     }
 }
 
@@ -341,7 +415,7 @@ void QnWorkbenchTextOverlaysHandlerPrivate::removeData(
         return;
 
     /* Clear auto-hide timer: */
-    setupAutohideTimer(dataIter.value(), resource, id, -1);
+    setupAutohideTimer(dataIter.value(), resource, id, -1ms);
 
     resourceOverlays.erase(dataIter);
 

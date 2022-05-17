@@ -8,17 +8,12 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/data_macros.h>
 
+#include "common.h"
+
 namespace nx::vms::api::rules {
 
 struct NX_VMS_API EventInfo
 {
-    NX_REFLECTION_ENUM_CLASS_IN_CLASS(State,
-        none,
-        started,
-        ended,
-        instant
-    )
-
     QnUuid id;
     QString eventType;
     State state = State::none;
@@ -33,5 +28,4 @@ QN_FUSION_DECLARE_FUNCTIONS(EventInfo, (json)(ubjson), NX_VMS_API)
 
 } // namespace nx::vms::api::rules
 
-Q_DECLARE_METATYPE(nx::vms::api::rules::EventInfo::State)
 Q_DECLARE_METATYPE(nx::vms::api::rules::EventInfo)

@@ -4,9 +4,7 @@
 
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/rules/action_fields/builtin_fields.h>
-#include <nx/vms/rules/actions/http_action.h>
-#include <nx/vms/rules/actions/send_email_action.h>
-#include <nx/vms/rules/actions/show_notification_action.h>
+#include <nx/vms/rules/actions/builtin_actions.h>
 #include <nx/vms/rules/event_fields/builtin_fields.h>
 #include <nx/vms/rules/events/builtin_events.h>
 
@@ -31,6 +29,7 @@ void Initializer::registerEvents() const
     registerEvent<FanErrorEvent>();
     registerEvent<GenericEvent>();
     registerEvent<LicenseIssueEvent>();
+    registerEvent<MotionEvent>();
     registerEvent<NetworkIssueEvent>();
     registerEvent<PoeOverBudgetEvent>();
     registerEvent<ServerCertificateErrorEvent>();
@@ -47,6 +46,7 @@ void Initializer::registerActions() const
     registerAction<HttpAction>();
     registerAction<NotificationAction>();
     registerAction<SendEmailAction>();
+    registerAction<TextOverlayAction>();
 }
 
 void Initializer::registerFields() const
@@ -65,6 +65,7 @@ void Initializer::registerFields() const
     registerEventField<SourceCameraField>();
     registerEventField<SourceServerField>();
     registerEventField<SourceUserField>();
+    registerEventField<StateField>();
 
     registerActionField<ActionTextField>();
     registerActionField<ContentTypeField>();
@@ -72,6 +73,7 @@ void Initializer::registerFields() const
     registerActionField<HttpMethodField>();
     registerActionField<OptionalTimeField>();
     registerActionField<PasswordField>();
+    registerActionField<TargetDeviceField>();
     registerActionField<TargetUserField>();
     m_engine->registerActionField(
         fieldMetatype<TextWithFields>(),

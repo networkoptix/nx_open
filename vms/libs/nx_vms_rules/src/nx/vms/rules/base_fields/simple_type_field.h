@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "action_field.h"
-#include "event_field.h"
+#include "../action_field.h"
+#include "../event_field.h"
 
 namespace nx::vms::rules {
 

@@ -1,13 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "ini.h"
+#include "target_device_field.h"
 
 namespace nx::vms::rules {
 
-Ini& ini()
+QVariant TargetDeviceField::build(const EventPtr& eventData) const
 {
-    static Ini ini;
-    return ini;
+    return QVariant::fromValue(ids());
 }
 
 } // namespace nx::vms::rules

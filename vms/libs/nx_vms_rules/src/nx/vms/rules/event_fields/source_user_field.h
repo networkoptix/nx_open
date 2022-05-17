@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "resource_filter_field.h"
+#include "../base_fields/resource_filter_field.h"
 
 namespace nx::vms::rules {
 
-class NX_VMS_RULES_API SourceUserField: public ResourceFilterField
+class NX_VMS_RULES_API SourceUserField: public ResourceFilterEventField
 {
     Q_OBJECT
     Q_CLASSINFO("metatype", "nx.events.fields.sourceUser")

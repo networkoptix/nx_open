@@ -9,6 +9,14 @@
 
 namespace nx::vms::rules {
 
+enum class ItemFlag
+{
+    instant = 1 << 0,
+    prolonged = 1 << 1,
+};
+
+Q_DECLARE_FLAGS(ItemFlags, ItemFlag)
+
 /** Description of event or action field. */
 struct FieldDescriptor
 {
@@ -44,6 +52,8 @@ struct ItemDescriptor
 
     /** Item description, to show hint to the user. */
     QString description;
+
+    ItemFlags flags = ItemFlag::instant;
 
     /** Item fields. */
     QList<FieldDescriptor> fields;

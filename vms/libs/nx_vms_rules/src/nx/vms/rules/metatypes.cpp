@@ -21,6 +21,8 @@ void Metatypes::initialize()
 
     QnCommonMetaTypes::initialize();
 
+    qRegisterMetaType<nx::vms::api::rules::State>();
+
     qRegisterMetaType<nx::vms::rules::EventPtr>();
 
     qRegisterMetaType<QnUuidList>("QnUuidList");

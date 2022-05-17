@@ -12,6 +12,9 @@ static constexpr auto kCameraIdFieldName = "cameraId";
 static constexpr auto kDeviceIdFieldName = "deviceId";
 static constexpr auto kServerIdFieldName = "serverId";
 static constexpr auto kEngineIdFieldName = "engineId";
+static constexpr auto kDurationFieldName = "duration";
+static constexpr auto kIntervalFieldName = "interval";
+static constexpr auto kStateFieldName = "state";
 
 inline FieldDescriptor makeAggregationIntervalFieldDescriptor(
     const QString& displayName,

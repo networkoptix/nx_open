@@ -4,11 +4,15 @@
 
 #include <nx/kit/ini_config.h>
 
-struct Ini: public nx::kit::IniConfig
+namespace nx::vms::rules {
+
+struct NX_VMS_RULES_API Ini: public nx::kit::IniConfig
 {
     Ini(): IniConfig("nx_vms_rules.ini") { reload(); }
 
     NX_INI_STRING("old", rulesEngine, "Version of VMS Rules Engine (old / new / both)");
 };
 
-Ini& ini();
+NX_VMS_RULES_API Ini& ini();
+
+} // namespace nx::vms::rules

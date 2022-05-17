@@ -100,9 +100,12 @@ bool Engine::addEventConnector(EventConnector *eventConnector)
 bool Engine::addActionExecutor(const QString& actionType, ActionExecutor* actionExecutor)
 {
     if (m_executors.contains(actionType))
-        return false; // TODO: #spanasenko Verbose output?
+    {
+        NX_DEBUG(this, "Executor for action type %1 already registered", actionType);
+        return false;
+    }
 
-    m_executors[actionType] = actionExecutor;
+    m_executors.insert(actionType, actionExecutor);
     return true;
 }
 
@@ -701,7 +704,7 @@ void Engine::processEvent(const EventPtr& event)
     if (!m_enabled)
         return;
 
-    NX_DEBUG(this, "Processing Event: %1", event->type());
+    NX_DEBUG(this, "Processing Event: %1, state: %2", event->type(), event->state());
 
     EventData eventData;
     QSet<QString> eventFields; // TODO: #spanasenko Cache data.
@@ -759,7 +762,7 @@ void Engine::processEvent(const EventPtr& event)
 // TODO: #spanasenko Use a wrapper with additional checks instead of QHash.
 void Engine::processAcceptedEvent(const QnUuid& ruleId, const EventData& eventData)
 {
-    NX_DEBUG(this, "Processing accepted event");
+    NX_DEBUG(this, "Processing accepted event, rule id: %1", ruleId);
 
     const auto it = m_rules.find(ruleId);
     if (it == m_rules.end()) // Assert?

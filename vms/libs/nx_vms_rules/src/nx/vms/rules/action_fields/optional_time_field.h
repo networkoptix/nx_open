@@ -4,7 +4,7 @@
 
 #include <nx/utils/metatypes.h>
 
-#include "../simple_type_field.h"
+#include "../base_fields/simple_type_field.h"
 
 namespace nx::vms::rules {
 

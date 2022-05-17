@@ -17,6 +17,10 @@ class NX_VMS_RULES_API ActionExecutor: public QObject
     Q_OBJECT
 
 public:
+    ActionExecutor(QObject* parent = nullptr):
+        QObject(parent)
+    {}
+
     virtual void initialize(Engine* engine) {};
     virtual void execute(const ActionPtr& action) = 0;
 };

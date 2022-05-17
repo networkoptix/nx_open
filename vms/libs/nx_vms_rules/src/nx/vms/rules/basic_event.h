@@ -10,7 +10,6 @@
 #include <QtCore/QString>
 
 #include <nx/vms/api/rules/event_info.h>
-#include <nx/vms/api/types/event_rule_types.h>
 
 #include "manifest.h"
 #include "rules_fwd.h"
@@ -31,17 +30,21 @@ class NX_VMS_RULES_API BasicEvent: public QObject
 
     Q_PROPERTY(QString type READ type)
     Q_PROPERTY(std::chrono::microseconds timestamp READ timestamp WRITE setTimestamp)
-
-public:
-    using State = nx::vms::api::rules::EventInfo::State;
+    Q_PROPERTY(nx::vms::api::rules::State state READ state WRITE setState)
 
 public:
     explicit BasicEvent(const nx::vms::api::rules::EventInfo& info);
-    explicit BasicEvent(std::chrono::microseconds timestamp);
+    explicit BasicEvent(
+        std::chrono::microseconds timestamp,
+        State state = State::instant);
 
     QString type() const;
+
     std::chrono::microseconds timestamp() const;
     void setTimestamp(const std::chrono::microseconds& timestamp);
+
+    State state() const;
+    void setState(State state);
 
     /**
      * Returns the event unique name. Used for the event aggregation. At the basic level event
@@ -76,9 +79,8 @@ protected:
 
 private:
     QString m_type;
-    State m_state{State::none};
-
     std::chrono::microseconds m_timestamp;
+    State m_state = State::none;
 
     /** Holds events occurencies count. */
     std::unordered_map</*unique name*/ QString, /*count*/ size_t> m_eventsHash;

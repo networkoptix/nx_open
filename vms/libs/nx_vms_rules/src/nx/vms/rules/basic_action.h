@@ -28,12 +28,16 @@ class NX_VMS_RULES_API BasicAction: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(std::chrono::microseconds timestamp READ timestamp WRITE setTimestamp)
+    Q_PROPERTY(nx::vms::api::rules::State state READ state WRITE setState)
 
 public:
     QString type() const;
 
     std::chrono::microseconds timestamp() const;
     void setTimestamp(std::chrono::microseconds timestamp);
+
+    State state() const;
+    void setState(State state);
 
     /** Returns a rule id the action belongs to. */
     QnUuid ruleId() const;
@@ -44,6 +48,7 @@ protected:
 
 private:
     std::chrono::microseconds m_timestamp;
+    State m_state = State::instant;
     QnUuid m_ruleId;
 };
 
