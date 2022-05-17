@@ -238,7 +238,7 @@ Button
 
                 Label
                 {
-                    anchors.fill: parent
+                    height: titleRect.height
 
                     elide: Text.ElideRight
                     font.pixelSize: 20
@@ -246,6 +246,8 @@ Button
 
                     textFormat: context.richTextEnabled ? Text.RichText : Text.PlainText
                     text: tile.title
+
+                    GlobalToolTip.text: tile.title
                 }
             }
 
