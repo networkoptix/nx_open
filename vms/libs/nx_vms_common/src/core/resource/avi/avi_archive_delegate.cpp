@@ -431,11 +431,12 @@ bool QnAviArchiveDelegate::open(
                 return false;
         }
 
+        using namespace nx::utils::url;
         if (m_archiveIntegrityWatcher //< On client storages are almost always offline at this point.
             && m_storage->getStatus() != nx::vms::api::ResourceStatus::online)
         {
             NX_DEBUG(this, "%1: Source storage '%2' is offline", __func__,
-                nx::utils::url::hidePassword(m_storage->getUrl()));
+               hidePassword(m_storage->getUrl()));
 
             return false;
         }
@@ -445,6 +446,25 @@ bool QnAviArchiveDelegate::open(
         // should be fixed here VMS-29988.
         if (!m_storage->isFileExists(url) && m_archiveIntegrityWatcher)
         {
+            if (m_storage->getStatus() == nx::vms::api::ResourceStatus::online)
+            {
+                NX_DEBUG(this,
+                    "%1: File %2 is missing but the storage %3 is online. Forcing storage test",
+                    __func__, hidePassword(url), hidePassword(m_storage->getUrl()));
+                m_archiveIntegrityWatcher->forceStorageTest(m_storage->isBackup());
+
+                NX_VERBOSE(this, "%1: Forced storage test finished. Storage %2 status is %3",
+                    __func__, hidePassword(m_storage->getUrl()), m_storage->getStatus());
+            }
+
+            if (m_storage->getStatus() != nx::vms::api::ResourceStatus::online)
+            {
+                NX_DEBUG(this, "%1: Source storage '%2' is offline", __func__,
+                    hidePassword(m_storage->getUrl()));
+
+                return false;
+            }
+
             m_archiveIntegrityWatcher->fileMissing(url);
             return false;
         }
