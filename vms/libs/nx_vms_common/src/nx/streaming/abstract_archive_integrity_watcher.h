@@ -29,4 +29,5 @@ public:
      * @brief reset - resets watcher to the initial state so the problems detected are reported
      */
     virtual void reset() = 0;
+    virtual void forceStorageTest(bool isBackup) = 0;
 };

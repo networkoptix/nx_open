@@ -439,6 +439,28 @@ bool QnAviArchiveDelegate::open(
         QString url = m_resource->getUrl();
         if (!m_storage->isFileExists(url))
         {
+            using namespace nx::utils::url;
+            if (m_storage->getStatus() == nx::vms::api::ResourceStatus::online
+                && m_archiveIntegrityWatcher)
+            {
+                NX_DEBUG(this,
+                    "%1: File %2 is missing but the storage %3 is online. Forcing storage test",
+                    __func__, hidePassword(url), hidePassword(m_storage->getUrl()));
+
+                m_archiveIntegrityWatcher->forceStorageTest(m_storage->isBackup());
+
+                NX_VERBOSE(this, "%1: Forced storage test finished. Storage %2 status is %3",
+                    __func__, hidePassword(m_storage->getUrl()), m_storage->getStatus());
+            }
+
+            if (m_storage->getStatus() != nx::vms::api::ResourceStatus::online)
+            {
+                NX_DEBUG(this, "%1: Source storage '%2' is offline", __func__,
+                    hidePassword(m_storage->getUrl()));
+
+                return false;
+            }
+
             if (m_archiveIntegrityWatcher)
                 m_archiveIntegrityWatcher->fileMissing(url);
 
