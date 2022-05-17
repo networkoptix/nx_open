@@ -228,7 +228,7 @@ void GlobalToolTipAttached::Private::adjustPosition()
 {
     auto toolTip = instance();
 
-    if (!item || !toolTip)
+    if (!item || !toolTip || !item->window())
         return;
 
     QQuickItem* parent = toolTip.parentItem();
@@ -409,8 +409,11 @@ void GlobalToolTipAttached::setText(const QString& value)
     d->text = value;
     emit textChanged();
 
-    if (auto toolTip = d->instance(); toolTip && toolTip.isVisible())
+    if (auto toolTip = d->instance();
+        toolTip && toolTip.isVisible() && toolTip.invokerItem() == d->item)
+    {
         d->update();
+    }
 }
 
 bool GlobalToolTipAttached::isVisible() const
@@ -455,8 +458,11 @@ void GlobalToolTipAttached::setStickToItem(bool value)
     d->stickToItem = value;
     emit stickToItemChanged();
 
-    if (auto toolTip = d->instance(); toolTip && toolTip.isVisible())
+    if (auto toolTip = d->instance();
+        toolTip && toolTip.isVisible() && toolTip.invokerItem() == d->item)
+    {
         d->update();
+    }
 }
 
 int GlobalToolTipAttached::delay() const
