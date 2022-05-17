@@ -230,6 +230,10 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, enableCameraReplacementFeature,
         "[Feature] Makes Camera Replacement feature available in the client.");
 
+    // VMS-16938
+    NX_INI_FLAG(false, enableNewUserSettings,
+        "[Feature] Makes new User Settings with LDAP groups support available in the client.");
+
     // ---------------------------------------------------------------------------------------------
     // Support section.
     // Flags here can be removed when support engineers decide whether to discard the flag or move
