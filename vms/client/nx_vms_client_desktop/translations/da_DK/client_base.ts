@@ -39,7 +39,7 @@
     <name>CameraDiagnostics::DiagnoseTool</name>
     <message>
       <source>No connection to Server %1.</source>
-      <translation type="unfinished">No connection to Server %1.</translation>
+      <translation>Ingen forbindelse til Server %1.</translation>
     </message>
   </context>
   <context>
@@ -61,49 +61,49 @@
     <name>ComboBoxUtils</name>
     <message>
       <source>multiple values</source>
-      <translation type="unfinished">multiple values</translation>
+      <translation>flere værdier</translation>
     </message>
   </context>
   <context>
     <name>CompatibilityVersionInstallationDialog</name>
     <message>
       <source>Installing version %1</source>
-      <translation type="unfinished">Installing version %1</translation>
+      <translation>Installerer version %1</translation>
     </message>
     <message>
       <source>Installation failed</source>
-      <translation type="unfinished">Installation failed</translation>
+      <translation>Installation mislykkes</translation>
     </message>
     <message>
       <source>Installation completed</source>
-      <translation type="unfinished">Installation completed</translation>
+      <translation>Installation fuldført</translation>
     </message>
     <message>
       <source>Getting update information from the server</source>
-      <translation type="unfinished">Getting update information from the server</translation>
+      <translation>Henter opdateringsoplysninger fra serveren</translation>
     </message>
     <message>
       <source>Downloading update package</source>
-      <translation type="unfinished">Downloading update package</translation>
+      <translation>Downloader opdateringspakke</translation>
     </message>
     <message>
       <source>Installing</source>
-      <translation type="unfinished">Installing</translation>
+      <translation>Installerer</translation>
     </message>
     <message>
       <source>Verifying update package</source>
-      <translation type="unfinished">Verifying update package</translation>
+      <translation>Bekræfter opdateringspakken</translation>
     </message>
   </context>
   <context>
     <name>ContextMenu</name>
     <message>
       <source>Filter...</source>
-      <translation type="unfinished">Filter...</translation>
+      <translation>Filter...</translation>
     </message>
     <message>
       <source>Connect to System</source>
-      <translation type="unfinished">Connect to System</translation>
+      <translation>Opret forbindelse til systemet</translation>
     </message>
     <message>
       <source>Help</source>
@@ -199,23 +199,23 @@
     </message>
     <message>
       <source>Web Client...</source>
-      <translation type="unfinished">Web Client...</translation>
+      <translation>Webklient...</translation>
     </message>
     <message>
       <source>Open Web Client...</source>
-      <translation type="unfinished">Open Web Client...</translation>
+      <translation>Åbn webklient...</translation>
     </message>
     <message>
       <source>Save Current Layout</source>
-      <translation type="unfinished">Save Current Layout</translation>
+      <translation>Gem nuværende layout</translation>
     </message>
     <message>
       <source>Save Current Layout As...</source>
-      <translation type="unfinished">Save Current Layout As...</translation>
+      <translation>Gem nuværende layout som...</translation>
     </message>
     <message>
       <source>Save Video Wall View</source>
-      <translation type="unfinished">Save Video Wall View</translation>
+      <translation>Gem videovægvisning</translation>
     </message>
     <message>
       <source>Start Screen Recording</source>
@@ -314,7 +314,7 @@
     </message>
     <message>
       <source>About...</source>
-      <translation type="unfinished">About...</translation>
+      <translation>Om...</translation>
     </message>
     <message>
       <source>Exit</source>
@@ -322,67 +322,67 @@
     </message>
     <message>
       <source>Mark Selection Start</source>
-      <translation type="unfinished">Mark Selection Start</translation>
+      <translation>Markér Markering Start</translation>
     </message>
     <message>
       <source>Mark Selection End</source>
-      <translation type="unfinished">Mark Selection End</translation>
+      <translation>Markér Markering Slut</translation>
     </message>
     <message>
       <source>Clear Selection</source>
-      <translation type="unfinished">Clear Selection</translation>
+      <translation>Ryd valgte</translation>
     </message>
     <message>
       <source>Zoom to Selection</source>
-      <translation type="unfinished">Zoom to Selection</translation>
+      <translation>Zoom til markering</translation>
     </message>
     <message>
       <source>Add Bookmark...</source>
-      <translation type="unfinished">Add Bookmark...</translation>
+      <translation>Tilføj bogmærke...</translation>
     </message>
     <message>
       <source>Edit Bookmark...</source>
-      <translation type="unfinished">Edit Bookmark...</translation>
+      <translation>Redigér bogmærke...</translation>
     </message>
     <message>
       <source>Preview Search...</source>
-      <translation type="unfinished">Preview Search...</translation>
+      <translation>Forhåndsvisning af søgning...</translation>
     </message>
     <message>
       <source>Server...</source>
-      <translation type="unfinished">Server...</translation>
+      <translation>Server...</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation type="unfinished">Open</translation>
+      <translation>Åbn</translation>
     </message>
     <message>
       <source>Monitor</source>
-      <translation type="unfinished">Monitor</translation>
+      <translation>Overvåg</translation>
     </message>
     <message>
       <source>Open in New Tab</source>
-      <translation type="unfinished">Open in New Tab</translation>
+      <translation>Åbn i nyt faneblad</translation>
     </message>
     <message>
       <source>Monitor in New Tab</source>
-      <translation type="unfinished">Monitor in New Tab</translation>
+      <translation>Overvåg i nyt faneblad</translation>
     </message>
     <message>
       <source>Open in Alarm Layout</source>
-      <translation type="unfinished">Open in Alarm Layout</translation>
+      <translation>Åbn i alarmlayout</translation>
     </message>
     <message>
       <source>Open in New Window</source>
-      <translation type="unfinished">Open in New Window</translation>
+      <translation>Åbn i nyt vindue</translation>
     </message>
     <message>
       <source>Monitor in New Window</source>
-      <translation type="unfinished">Monitor in New Window</translation>
+      <translation>Overvåg i nyt vindue</translation>
     </message>
     <message>
       <source>Open Video Wall</source>
-      <translation type="unfinished">Open Video Wall</translation>
+      <translation>Åbn Videovæg</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
@@ -390,19 +390,19 @@
     </message>
     <message>
       <source>Identify</source>
-      <translation type="unfinished">Identify</translation>
+      <translation>Identificer</translation>
     </message>
     <message>
       <source>Attach to Video Wall...</source>
-      <translation type="unfinished">Attach to Video Wall...</translation>
+      <translation>Vedhæft til videovæg...</translation>
     </message>
     <message>
       <source>Switch to Video Wall mode...</source>
-      <translation type="unfinished">Switch to Video Wall mode...</translation>
+      <translation>Skift til videovægtilstand...</translation>
     </message>
     <message>
       <source>Save Video Wall</source>
-      <translation type="unfinished">Save Video Wall</translation>
+      <translation>Gem videovæg</translation>
     </message>
     <message>
       <source>Save Current Matrix</source>
@@ -426,23 +426,23 @@
     </message>
     <message>
       <source>Save Layout</source>
-      <translation type="unfinished">Save Layout</translation>
+      <translation>Gem layout</translation>
     </message>
     <message>
       <source>Save Layout As...</source>
-      <translation type="unfinished">Save Layout As...</translation>
+      <translation>Gem layout som...</translation>
     </message>
     <message>
       <source>Maximize Item</source>
-      <translation type="unfinished">Maximize Item</translation>
+      <translation>Maksimér Element</translation>
     </message>
     <message>
       <source>Restore Item</source>
-      <translation type="unfinished">Restore Item</translation>
+      <translation>Gendan element</translation>
     </message>
     <message>
       <source>Save Current Position...</source>
-      <translation type="unfinished">Save Current Position...</translation>
+      <translation>Gem nuværende position...</translation>
     </message>
     <message>
       <source>Manage...</source>
@@ -770,11 +770,11 @@
     </message>
     <message>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Upload Fil...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Upload Mappe...</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
@@ -842,55 +842,55 @@
     </message>
     <message>
       <source>Show Notifications</source>
-      <translation type="unfinished">Show Notifications</translation>
+      <translation>Vis notifikationer</translation>
     </message>
     <message>
       <source>Hide Notifications</source>
-      <translation type="unfinished">Hide Notifications</translation>
+      <translation>Skjul notifikationer</translation>
     </message>
     <message>
       <source>Files...</source>
-      <translation type="unfinished">Files...</translation>
+      <translation>Filer...</translation>
     </message>
     <message>
       <source>Switch to Notifications tab</source>
-      <translation type="unfinished">Switch to Notifications tab</translation>
+      <translation>Skift til fanen Notifikationer</translation>
     </message>
     <message>
       <source>Switch to Motion tab</source>
-      <translation type="unfinished">Switch to Motion tab</translation>
+      <translation>Skift til fanen Bevægelse</translation>
     </message>
     <message>
       <source>Switch to Bookmarks tab</source>
-      <translation type="unfinished">Switch to Bookmarks tab</translation>
+      <translation>Skift til fanen Bogmærker</translation>
     </message>
     <message>
       <source>Switch to Events tab</source>
-      <translation type="unfinished">Switch to Events tab</translation>
+      <translation>Skift til fanen Begivenheder</translation>
     </message>
     <message>
       <source>Switch to Objects tab</source>
-      <translation type="unfinished">Switch to Objects tab</translation>
+      <translation>Skift til fanen Objekter</translation>
     </message>
     <message>
       <source>Pin Calendar</source>
-      <translation type="unfinished">Pin Calendar</translation>
+      <translation>Fastgør Kalender</translation>
     </message>
     <message>
       <source>Unpin Calendar</source>
-      <translation type="unfinished">Unpin Calendar</translation>
+      <translation>Frigør kalender</translation>
     </message>
     <message>
       <source>Page...</source>
-      <translation type="unfinished">Page...</translation>
+      <translation>Side...</translation>
     </message>
     <message>
       <source>Connect to this Server</source>
-      <translation type="unfinished">Connect to this Server</translation>
+      <translation>Opret forbindelse til denne server</translation>
     </message>
     <message>
       <source>Pin</source>
-      <translation type="unfinished">Pin</translation>
+      <translation>Fastgør</translation>
     </message>
     <message>
       <source>Switch to Cameras &amp; Resources tab</source>
@@ -958,9 +958,9 @@
     </message>
     <message numerus="yes">
       <source>Show on Items</source>
-      <translation type="unfinished">
-        <numerusform>Show on Items</numerusform>
-        <numerusform>Show on Items</numerusform>
+      <translation>
+        <numerusform>Vis på elementer</numerusform>
+        <numerusform>Vis på elementer</numerusform>
       </translation>
     </message>
     <message>
@@ -997,7 +997,7 @@
     </message>
     <message>
       <source>Joystick Settings...</source>
-      <translation type="unfinished">Joystick Settings...</translation>
+      <translation>Joystick Indstillinger...</translation>
     </message>
     <message>
       <source>Advanced...</source>
@@ -1017,34 +1017,34 @@
     </message>
     <message>
       <source>Account Security...</source>
-      <translation type="unfinished">Account Security...</translation>
+      <translation>Kontosikkerhed...</translation>
     </message>
   </context>
   <context>
     <name>Deactivator</name>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Ukendt fejl.</translation>
     </message>
     <message>
       <source>License does not exist.</source>
-      <translation type="unfinished">License does not exist.</translation>
+      <translation>Licens eksistere ikke.</translation>
     </message>
     <message>
       <source>License is disabled.</source>
-      <translation type="unfinished">License is disabled.</translation>
+      <translation>Licensen er deaktiveret.</translation>
     </message>
     <message>
       <source>License is inactive.</source>
-      <translation type="unfinished">License is inactive.</translation>
+      <translation>Licensen er inaktiv.</translation>
     </message>
     <message>
       <source>Invalid license.</source>
-      <translation type="unfinished">Invalid license.</translation>
+      <translation>Ugyldig licens.</translation>
     </message>
     <message>
       <source>License is trial.</source>
-      <translation type="unfinished">License is trial.</translation>
+      <translation>Licens er en prøvelicens.</translation>
     </message>
     <message>
       <source>License is in pending deactivation state, but has not been deactivated yet.</source>
@@ -1086,7 +1086,7 @@
     <name>EventSearchWidget::Private</name>
     <message>
       <source>Server events</source>
-      <translation type="unfinished">Server events</translation>
+      <translation>Serverhændelser</translation>
     </message>
     <message>
       <source>Analytics events</source>
@@ -1094,27 +1094,27 @@
     </message>
     <message>
       <source>Any event</source>
-      <translation type="unfinished">Any event</translation>
+      <translation>Enhver begivenhed</translation>
     </message>
     <message>
       <source>Any device issue</source>
-      <translation type="unfinished">Any device issue</translation>
+      <translation>Ethvert enhedsproblem</translation>
     </message>
     <message>
       <source>Any camera issue</source>
-      <translation type="unfinished">Any camera issue</translation>
+      <translation>Ethvert kameraproblem</translation>
     </message>
     <message>
       <source>Any server event</source>
-      <translation type="unfinished">Any server event</translation>
+      <translation>Enhver serverhændelse</translation>
     </message>
     <message>
       <source>Device issues</source>
-      <translation type="unfinished">Device issues</translation>
+      <translation>Problemer med enheden</translation>
     </message>
     <message>
       <source>Camera issues</source>
-      <translation type="unfinished">Camera issues</translation>
+      <translation>Problemer med kamera</translation>
     </message>
     <message>
       <source>Any analytics event</source>
@@ -1125,11 +1125,11 @@
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Vælg layout...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n layouts</numerusform>
         <numerusform>%n layouts</numerusform>
       </translation>
@@ -1139,15 +1139,15 @@
     <name>FileExtensions</name>
     <message>
       <source>Pictures</source>
-      <translation type="unfinished">Pictures</translation>
+      <translation>Billeder</translation>
     </message>
     <message>
       <source>Video</source>
-      <translation type="unfinished">Video</translation>
+      <translation>Video</translation>
     </message>
     <message>
       <source>All Files</source>
-      <translation type="unfinished">All Files</translation>
+      <translation>Alle Filer</translation>
     </message>
   </context>
   <context>
@@ -1323,18 +1323,18 @@
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
-      <translation type="unfinished">
-        <numerusform>Cannot deactivate licenses</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
+      <translation>
+        <numerusform>Kan ikke deaktivere licenser</numerusform>
+        <numerusform>Kan ikke deaktivere licenser</numerusform>
       </translation>
     </message>
     <message>
       <source>Please try again later.</source>
-      <translation type="unfinished">Please try again later.</translation>
+      <translation>Prøv venligst igen senere.</translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
-      <translation type="unfinished">Cannot connect to the License Server</translation>
+      <translation>Kan ikke oprette forbindelse til licensserveren</translation>
     </message>
     <message>
       <source>Please make sure your server has active Internet connection or check firewall settings.</source>
@@ -1375,7 +1375,7 @@
     </message>
     <message>
       <source>Please contact %1.</source>
-      <translation type="unfinished">Please contact %1.</translation>
+      <translation>Kontakt venligst %1.</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact your Regional / License support:</source>
@@ -1425,15 +1425,15 @@
     <name>PasswordInformation</name>
     <message>
       <source>Good</source>
-      <translation type="unfinished">Good</translation>
+      <translation>God</translation>
     </message>
     <message>
       <source>Fair</source>
-      <translation type="unfinished">Fair</translation>
+      <translation>Middelmådig</translation>
     </message>
     <message>
       <source>Weak</source>
-      <translation type="unfinished">Weak</translation>
+      <translation>Svag</translation>
     </message>
     <message>
       <source>Password should contain different types of symbols.</source>
@@ -1484,11 +1484,11 @@
     </message>
     <message>
       <source>Common</source>
-      <translation type="unfinished">Common</translation>
+      <translation>Almindelig</translation>
     </message>
     <message>
       <source>This password is in list of the most popular passwords.</source>
-      <translation type="unfinished">This password is in list of the most popular passwords.</translation>
+      <translation>Denne adgangskode er på listen over de mest populære adgangskoder.</translation>
     </message>
     <message>
       <source>Incorrect</source>
@@ -1589,11 +1589,11 @@
     <name>PtzOverlayWidget</name>
     <message>
       <source>Zoom In</source>
-      <translation type="unfinished">Zoom In</translation>
+      <translation>Zoom ind</translation>
     </message>
     <message>
       <source>Zoom Out</source>
-      <translation type="unfinished">Zoom Out</translation>
+      <translation>Zoom ud</translation>
     </message>
     <message>
       <source>Focus Far</source>
@@ -1605,11 +1605,11 @@
     </message>
     <message>
       <source>Auto Focus</source>
-      <translation type="unfinished">Auto Focus</translation>
+      <translation>Autofokus</translation>
     </message>
     <message>
       <source>Change Dewarping Mode</source>
-      <translation type="unfinished">Change Dewarping Mode</translation>
+      <translation>Skift dewarping-tilstand</translation>
     </message>
   </context>
   <context>
@@ -1654,11 +1654,11 @@
     <name>QnAbstractPtzDialog</name>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Indlæser...</translation>
     </message>
     <message>
       <source>Saving...</source>
-      <translation type="unfinished">Saving...</translation>
+      <translation>Gemmer...</translation>
     </message>
   </context>
   <context>
@@ -1672,7 +1672,7 @@
     <name>QnAccessibleMediaWidget</name>
     <message>
       <source>Access granted by:</source>
-      <translation type="unfinished">Access granted by:</translation>
+      <translation>Adgang givet af:</translation>
     </message>
     <message numerus="yes">
       <source>and %n more</source>
@@ -1760,15 +1760,15 @@
     <name>QnAuditItemDelegate</name>
     <message>
       <source>Play</source>
-      <translation type="unfinished">Play</translation>
+      <translation>Afspil</translation>
     </message>
     <message>
       <source>User settings...</source>
-      <translation type="unfinished">User settings...</translation>
+      <translation>Brugerindstillinger...</translation>
     </message>
     <message>
       <source>Server settings...</source>
-      <translation type="unfinished">Server settings...</translation>
+      <translation>Serverindstillinger...</translation>
     </message>
     <message>
       <source>Camera settings...</source>
@@ -1815,15 +1815,15 @@
     </message>
     <message>
       <source>No cameras</source>
-      <translation type="unfinished">No cameras</translation>
+      <translation>Ingen kameraer</translation>
     </message>
     <message>
       <source>Select sessions to see their details</source>
-      <translation type="unfinished">Select sessions to see their details</translation>
+      <translation>Vælg sessioner for at se deres detaljer</translation>
     </message>
     <message>
       <source>Select cameras to see their details</source>
-      <translation type="unfinished">Select cameras to see their details</translation>
+      <translation>Vælg kameraer for at se deres detaljer</translation>
     </message>
     <message>
       <source>No archive for this position</source>
@@ -1897,31 +1897,31 @@
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Log på</translation>
     </message>
     <message>
       <source>User updated</source>
-      <translation type="unfinished">User updated</translation>
+      <translation>Bruger opdateret</translation>
     </message>
     <message>
       <source>Watching live</source>
-      <translation type="unfinished">Watching live</translation>
+      <translation>Ser live</translation>
     </message>
     <message>
       <source>Watching archive</source>
-      <translation type="unfinished">Watching archive</translation>
+      <translation>Ser arkiv</translation>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation type="unfinished">Exporting video</translation>
+      <translation>Eksporterer video</translation>
     </message>
     <message>
       <source>System name changed</source>
-      <translation type="unfinished">System name changed</translation>
+      <translation>System navn ændret</translation>
     </message>
     <message>
       <source>System merge</source>
-      <translation type="unfinished">System merge</translation>
+      <translation>Systemfletning</translation>
     </message>
     <message>
       <source>General settings updated</source>
@@ -1941,35 +1941,35 @@
     </message>
     <message>
       <source>Database restored</source>
-      <translation type="unfinished">Database restored</translation>
+      <translation>Database gendannet</translation>
     </message>
     <message>
       <source>Session begins</source>
-      <translation type="unfinished">Session begins</translation>
+      <translation>Session begynder</translation>
     </message>
     <message>
       <source>Session ends</source>
-      <translation type="unfinished">Session ends</translation>
+      <translation>Sessionen afslutter</translation>
     </message>
     <message>
       <source>Duration</source>
-      <translation type="unfinished">Duration</translation>
+      <translation>Varighed</translation>
     </message>
     <message>
       <source>User</source>
-      <translation type="unfinished">User</translation>
+      <translation>Bruger</translation>
     </message>
     <message>
       <source>IP</source>
-      <translation type="unfinished">IP</translation>
+      <translation>IP</translation>
     </message>
     <message>
       <source>Activity</source>
-      <translation type="unfinished">Activity</translation>
+      <translation>Aktivitet</translation>
     </message>
     <message>
       <source>Date</source>
-      <translation type="unfinished">Date</translation>
+      <translation>Dato</translation>
     </message>
     <message>
       <source>Time</source>
@@ -1977,47 +1977,47 @@
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Beskrivelse</translation>
     </message>
     <message>
       <source>Click to expand</source>
-      <translation type="unfinished">Click to expand</translation>
+      <translation>Klik for at udvide</translation>
     </message>
     <message>
       <source>Device updated</source>
-      <translation type="unfinished">Device updated</translation>
+      <translation>Enhed opdateret</translation>
     </message>
     <message>
       <source>Camera updated</source>
-      <translation type="unfinished">Camera updated</translation>
+      <translation>Kamera opdateret</translation>
     </message>
     <message>
       <source>Device added</source>
-      <translation type="unfinished">Device added</translation>
+      <translation>Enhed tilføjet</translation>
     </message>
     <message>
       <source>Camera added</source>
-      <translation type="unfinished">Camera added</translation>
+      <translation>Kamera tilføjet</translation>
     </message>
     <message>
       <source>Device removed</source>
-      <translation type="unfinished">Device removed</translation>
+      <translation>Enhed fjernet</translation>
     </message>
     <message>
       <source>Camera removed</source>
-      <translation type="unfinished">Camera removed</translation>
+      <translation>Kamera fjernet</translation>
     </message>
     <message>
       <source>Device name</source>
-      <translation type="unfinished">Device name</translation>
+      <translation>Enhedsnavn</translation>
     </message>
     <message>
       <source>Camera name</source>
-      <translation type="unfinished">Camera name</translation>
+      <translation>Kameranavn</translation>
     </message>
     <message>
       <source>Email settings changed</source>
-      <translation type="unfinished">Email settings changed</translation>
+      <translation>E-mail-indstillinger ændret</translation>
     </message>
     <message>
       <source>Filled circle mark means the archive is still available</source>
@@ -2036,11 +2036,11 @@
     </message>
     <message>
       <source>Event rule changed</source>
-      <translation type="unfinished">Event rule changed</translation>
+      <translation>Hændelsesreglen er ændret</translation>
     </message>
     <message>
       <source>Event rule removed</source>
-      <translation type="unfinished">Event rule removed</translation>
+      <translation>Hændelsesregel fjernet</translation>
     </message>
     <message>
       <source>Event rules reset to default</source>
@@ -2085,19 +2085,19 @@
     </message>
     <message>
       <source>1 month</source>
-      <translation type="unfinished">1 month</translation>
+      <translation>1 måned</translation>
     </message>
     <message>
       <source>3 month</source>
-      <translation type="unfinished">3 month</translation>
+      <translation>3 måneder</translation>
     </message>
     <message>
       <source>6 month</source>
-      <translation type="unfinished">6 month</translation>
+      <translation>6 måneder</translation>
     </message>
     <message>
       <source>year</source>
-      <translation type="unfinished">year</translation>
+      <translation>år</translation>
     </message>
     <message>
       <source>Name cannot be empty.</source>
@@ -2141,11 +2141,11 @@
     </message>
     <message>
       <source>Any Device</source>
-      <translation type="unfinished">Any Device</translation>
+      <translation>Enhver enhed</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation type="unfinished">Any Camera</translation>
+      <translation>Ethvert kamera</translation>
     </message>
   </context>
   <context>
@@ -2266,19 +2266,19 @@
     </message>
     <message>
       <source>Devices</source>
-      <translation type="unfinished">Devices</translation>
+      <translation>Enheder</translation>
     </message>
     <message>
       <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
+      <translation>Kameraer</translation>
     </message>
     <message>
       <source>Any Device</source>
-      <translation type="unfinished">Any Device</translation>
+      <translation>Enhver enhed</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation type="unfinished">Any Camera</translation>
+      <translation>Ethvert kamera</translation>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
@@ -2293,7 +2293,7 @@
     <name>QnBusinessRulesDialog</name>
     <message>
       <source>&amp;New...</source>
-      <translation type="unfinished">&amp;New...</translation>
+      <translation>&amp;Ny...</translation>
     </message>
     <message>
       <source>&amp;Delete</source>
@@ -2732,7 +2732,7 @@ to %1</translation>
     </message>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>Afbryd</translation>
     </message>
     <message>
       <source>System disconnected from %1</source>
@@ -2944,11 +2944,11 @@ to %1</translation>
     </message>
     <message>
       <source>System is not compatible with two-factor authentication</source>
-      <translation type="unfinished">System is not compatible with two-factor authentication</translation>
+      <translation>Systemet er ikke kompatibelt med to-faktor-godkendelse</translation>
     </message>
     <message>
       <source>Failed to log in to &quot;%1&quot; system</source>
-      <translation type="unfinished">Failed to log in to &quot;%1&quot; system</translation>
+      <translation>Kunne ikke logge på &quot;%1&quot; -systemet</translation>
     </message>
   </context>
   <context>
@@ -3115,11 +3115,11 @@ to %1</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation type="unfinished">Copy Selection to Clipboard</translation>
+      <translation>Kopier markering til udklipsholder</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation type="unfinished">Export Selection to File...</translation>
+      <translation>Eksporter markering til fil...</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -3127,11 +3127,11 @@ to %1</translation>
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation type="unfinished">Clear Filter</translation>
+      <translation>Nulstil Filter</translation>
     </message>
     <message>
       <source>Export selected events to file</source>
-      <translation type="unfinished">Export selected events to file</translation>
+      <translation>Eksporter valgte begivenheder til fil</translation>
     </message>
     <message>
       <source>Any Action</source>
@@ -4617,7 +4617,7 @@ to %1</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Beskrivelse</translation>
     </message>
   </context>
   <context>
@@ -4854,7 +4854,7 @@ to %1</translation>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
-      <translation type="unfinished">Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</translation>
+      <translation>Servere med failover aktiveret vil automatisk tage kameraer fra offline Servere med det samme lokations-ID.</translation>
     </message>
   </context>
   <context>
@@ -6722,19 +6722,19 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Some devices from %1 will not be moved to %2. Move anyways?</source>
-      <translation type="unfinished">Some devices from %1 will not be moved to %2. Move anyways?</translation>
+      <translation>Visse enheder fra %1 vil ikke blive flyttet til %2. Flyt alligevel?</translation>
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>Virtuelle kameraer, USB-kameraer eller webkameraer kan ikke flyttes mellem servere. Disse enheder vil forblive på %1:</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>USB eller web-kameraer kan ikke flyttes mellem servere. Disse enheder vil forblive på %1:</translation>
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">Virtual cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>Virtuelle kameraer kan ikke flyttes mellem servere. Disse enheder vil forblive på %1:</translation>
     </message>
     <message>
       <source>Move Group without Them</source>
@@ -6746,7 +6746,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains virtual cameras, USB or web cameras</source>
-      <translation type="unfinished">%1 cannot be moved between servers as it contains virtual cameras, USB or web cameras</translation>
+      <translation>%1 kan ikke flyttes mellem servere, da den indeholder USB- eller webkameraer</translation>
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers</source>
@@ -7063,19 +7063,19 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</source>
-      <translation type="unfinished">This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</translation>
+      <translation>Denne enhed har ikke en lydindgang, eller den er ikke konfigureret korrekt. Vælg en anden enhed som lydkilde.</translation>
     </message>
     <message>
       <source>This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</source>
-      <translation type="unfinished">This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</translation>
+      <translation>Denne enhed har ikke en lydindgang, eller den er ikke konfigureret korrekt. Vælg en anden enhed som lydkilde.</translation>
     </message>
     <message>
       <source>This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</source>
-      <translation type="unfinished">This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</translation>
+      <translation>Denne enhed har ikke en lydudgang, eller den er ikke konfigureret korrekt. Vælg en anden enhed til afspilning af lyd.</translation>
     </message>
     <message>
       <source>This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</source>
-      <translation type="unfinished">This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</translation>
+      <translation>Dette kamera har ikke en lydudgang, eller det er ikke konfigureret korrekt. Vælg et andet kamera til lydafspilning.</translation>
     </message>
     <message>
       <source>Use this device for audio output</source>
@@ -7103,27 +7103,27 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</translation>
+      <translation>Den valgte enhed har ikke&apos;, eller den er ikke konfigureret&apos;Lydafspilning er ikke tilgængelig.</translation>
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</translation>
+      <translation>Den valgte enhed har ikke&apos;, eller den er ikke konfigureret&apos;Lydafspilning er ikke tilgængelig.</translation>
     </message>
     <message>
       <source>The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
-      <translation type="unfinished">The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</translation>
+      <translation>Den valgte enhed har ikke&apos;t en lydindgang, eller den er ikke konfigureret korrekt. Lydafspilning er ikke tilgængelig.</translation>
     </message>
     <message>
       <source>The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
-      <translation type="unfinished">The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</translation>
+      <translation>Det valgte kamera har ikke&apos;t en lydindgang, eller det er ikke konfigureret korrekt. Lydafspilning er ikke tilgængelig.</translation>
     </message>
     <message>
       <source>The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
-      <translation type="unfinished">The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</translation>
+      <translation>Den valgte enhed har ikke en lydudgang, eller den er ikke konfigureret korrekt. 2-vejs lyd er ikke tilgængelig.</translation>
     </message>
     <message>
       <source>The selected camera does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
-      <translation type="unfinished">The selected camera does not have an audio output, or it is not configured correctly. 2-way audio is not available.</translation>
+      <translation>Det valgte kamera har ikke et lydoutput, eller det er ikke konfigureret korrekt. 2-vejs lyd er ikke tilgængelig.</translation>
     </message>
     <message>
       <source>Use audio stream from this device</source>
@@ -7135,7 +7135,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>%1 is connected to another server. Audio stream is not available</source>
-      <translation type="unfinished">%1 is connected to another server. Audio stream is not available</translation>
+      <translation>%1 er forbundet til en anden server. Audio stream er ikke tilgængelig</translation>
     </message>
     <message>
       <source>Selected device is connected to another server. Audio stream is not available.</source>
@@ -7601,7 +7601,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>No cameras available</source>
-      <translation type="unfinished">No cameras available</translation>
+      <translation>Ingen tilgængelige kameraer</translation>
     </message>
   </context>
   <context>
@@ -7693,7 +7693,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Change invalid schedule to &quot;Record Always&quot;</source>
-      <translation type="unfinished">Change invalid schedule to &quot;Record Always&quot;</translation>
+      <translation>Skift ugyldig tidsplan til &quot;Optag altid&quot;</translation>
     </message>
     <message>
       <source>Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</source>
@@ -8842,7 +8842,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>This user does not have permissions for the requested operation.</source>
-      <translation type="unfinished">This user does not have permissions for the requested operation.</translation>
+      <translation>Denne bruger har ikke tilladelser til den anmodede handling.</translation>
     </message>
     <message>
       <source>Cannot create database backup.</source>
@@ -8901,7 +8901,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Ukendt fejl.</translation>
     </message>
     <message>
       <source>%1 systems have different owners. Merge is not allowed.</source>
@@ -9668,7 +9668,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     <name>nx::vms::client::desktop::RemoteConnectionUserInteractionDelegate</name>
     <message>
       <source>Connect to System</source>
-      <translation type="unfinished">Connect to System</translation>
+      <translation>Opret forbindelse til systemet</translation>
     </message>
   </context>
   <context>
@@ -9872,27 +9872,27 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected devices</translation>
+      <translation>Registrering af bevægelse og objekter er deaktiveret for nogle af de valgte enheder</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for this camera</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for this camera</translation>
+      <translation>Registrering af bevægelse og objekter er deaktiveret for dette kamera</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected cameras</translation>
+      <translation>Registrering af bevægelse og objekter er deaktiveret for nogle af de valgte kameraer</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this I/O module</source>
-      <translation type="unfinished">Motion detection is disabled for this I/O module</translation>
+      <translation>Bevægelsesdetektion er deaktiveret for dette I/O-modul</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected I/O modules</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected I/O modules</translation>
+      <translation>Bevægelsesdetektion er deaktiveret for dette I/O-modul</translation>
     </message>
     <message>
       <source>This I/O module has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">This I/O module has only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Dette I/O-modul har kun én stream. Optagelser med og uden bevægelse vil dele den samme opløsning eller kvalitet.</translation>
     </message>
     <message>
       <source>Some of the selected I/O modules have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
@@ -9942,7 +9942,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Archive encryption password</source>
-      <translation type="unfinished">Archive encryption password</translation>
+      <translation>Arkivér krypteringsadgangskode</translation>
     </message>
     <message>
       <source>The encryption password will be required to restore the archive on another system.
@@ -10057,7 +10057,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     </message>
     <message>
       <source>Pin</source>
-      <translation type="unfinished">Pin</translation>
+      <translation>Fastgør</translation>
     </message>
   </context>
   <context>
@@ -10265,7 +10265,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     <name>nx::vms::client::desktop::SessionRefreshDialog</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Log på</translation>
     </message>
     <message>
       <source>Password</source>
@@ -10391,7 +10391,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Beskrivelse</translation>
     </message>
     <message>
       <source>Enter parameters</source>
@@ -10403,11 +10403,11 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     </message>
     <message>
       <source>Open</source>
-      <translation type="unfinished">Open</translation>
+      <translation>Åbn</translation>
     </message>
     <message>
       <source>Open in New Tab</source>
-      <translation type="unfinished">Open in New Tab</translation>
+      <translation>Åbn i nyt faneblad</translation>
     </message>
   </context>
   <context>
@@ -11510,15 +11510,15 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Edit bookmark</source>
-      <translation type="unfinished">Edit bookmark</translation>
+      <translation>Redigér bogmærke</translation>
     </message>
     <message>
       <source>Export bookmark</source>
-      <translation type="unfinished">Export bookmark</translation>
+      <translation>Exportér bogmærker</translation>
     </message>
     <message>
       <source>Delete bookmark</source>
-      <translation type="unfinished">Delete bookmark</translation>
+      <translation>Slet bogmærke</translation>
     </message>
   </context>
   <context>

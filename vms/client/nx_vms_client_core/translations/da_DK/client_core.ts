@@ -200,17 +200,17 @@
     </message>
     <message>
       <source>Two-factor authentication is required.</source>
-      <translation type="unfinished">Two-factor authentication is required.</translation>
+      <translation>Tofaktorgodkendelseskode krævet.</translation>
     </message>
     <message>
       <source>You can enable two-factor authentication in your %1.</source>
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">You can enable two-factor authentication in your %1.</translation>
+      <translation>Du kan aktivere to-faktor-godkendelse i din %1.</translation>
     </message>
     <message>
       <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</translation>
+      <translation>For at logge ind på dette system skal du deaktivere "Spørg om en bekræftelseskode ved hvert login med din %1 -konto" i din %2.</translation>
     </message>
   </context>
 </TS>
