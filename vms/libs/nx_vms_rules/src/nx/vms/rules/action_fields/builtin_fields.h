@@ -8,6 +8,7 @@
 #include "optional_time_field.h"
 #include "password_field.h"
 #include "substitution.h"
+#include "target_device_field.h"
 #include "target_user_field.h"
 #include "text_field.h"
 #include "text_with_fields.h"

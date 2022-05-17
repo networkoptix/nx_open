@@ -70,10 +70,10 @@ RulesDialog::RulesDialog(QWidget* parent):
         });
 
     connect(ui->eventTypePicker, &EventTypePickerWidget::eventContinuancePicked, this,
-        [this](api::rules::EventInfo::State eventContinuance)
+        [this](api::rules::State eventContinuance)
         {
             if (actionEditorWidget)
-                actionEditorWidget->setInstant(eventContinuance == api::rules::EventInfo::State::instant);
+                actionEditorWidget->setInstant(eventContinuance == api::rules::State::instant);
         });
 
     connect(ui->actionTypePicker, &ActionTypePickerWidget::actionTypePicked, this,
@@ -294,7 +294,7 @@ void RulesDialog::createActionEditor(const vms::rules::ItemDescriptor& descripto
 
     actionEditorWidget->setReadOnly(readOnly);
     actionEditorWidget->setInstant(
-        ui->eventTypePicker->eventContinuance() == api::rules::EventInfo::State::instant);
+        ui->eventTypePicker->eventContinuance() == api::rules::State::instant);
 
     ui->actionEditorContainerWidget->layout()->addWidget(actionEditorWidget);
 }

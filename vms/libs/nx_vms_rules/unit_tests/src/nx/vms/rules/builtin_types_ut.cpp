@@ -96,6 +96,7 @@ TEST_F(BuiltinTypesTest, BuiltinEvents)
     testEventFieldRegistration<AnalyticsObjectTypeField>(systemContext());
     testEventFieldRegistration<CustomizableIconField>();
     testEventFieldRegistration<CustomizableTextField>();
+    testEventFieldRegistration<StateField>();
     testEventFieldRegistration<EventTextField>();
     testEventFieldRegistration<ExpectedUuidField>();
     testEventFieldRegistration<IntField>();
@@ -115,7 +116,7 @@ TEST_F(BuiltinTypesTest, BuiltinEvents)
     testEventRegistration<FanErrorEvent>();
     testEventRegistration<GenericEvent>();
     testEventRegistration<LicenseIssueEvent>();
-    //testEventRegistration<MotionEvent>();
+    testEventRegistration<MotionEvent>();
     testEventRegistration<NetworkIssueEvent>();
     //testEventRegistration<PluginDiagnosticEvent>();
     testEventRegistration<PoeOverBudgetEvent>();
@@ -137,6 +138,7 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionFieldRegistration<OptionalTimeField>();
     testActionFieldRegistration<PasswordField>();
     testActionFieldRegistration<Substitution>();
+    testActionFieldRegistration<TargetDeviceField>();
     testActionFieldRegistration<TargetUserField>();
     testActionFieldRegistration<TextWithFields>(systemContext());
 
@@ -157,7 +159,7 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionRegistration<SendEmailAction>();
     //testActionRegistration<ShowOnAlarmLayoutAction>();
     //testActionRegistration<SpeakAction>();
-    //testActionRegistration<TextOverlayAction>();
+    testActionRegistration<TextOverlayAction>();
     //testActionRegistration<WriteToLogAction>();
 }
 

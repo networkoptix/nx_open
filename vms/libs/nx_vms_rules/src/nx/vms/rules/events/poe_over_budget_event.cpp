@@ -33,7 +33,7 @@ const ItemDescriptor& PoeOverBudgetEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<PoeOverBudgetEvent>(),
         .displayName = tr("PoE over Budget"),
-        .description = "",
+        .flags = ItemFlag::prolonged,
         .fields = {
             makeFieldDescriptor<SourceServerField>("serverId", tr("Server")),
         }

@@ -2,18 +2,14 @@
 
 #include "custom_event.h"
 
-#include <nx/fusion/model_functions.h>
-#include <nx/utils/string.h>
-#include <nx/vms/event/actions/abstract_action.h>
-
 namespace nx {
 namespace vms {
 namespace event {
 
 CustomEvent::CustomEvent(
     EventState toggleState,
-    qint64 timeStamp, const
-    QString& resourceName,
+    qint64 timeStamp,
+    const QString& resourceName,
     const QString& caption,
     const QString& description,
     EventMetaData metadata)
@@ -24,13 +20,6 @@ CustomEvent::CustomEvent(
     m_description(description),
     m_metadata(std::move(metadata))
 {
-}
-
-bool CustomEvent::isEventStateMatched(EventState state, ActionType actionType) const
-{
-    return state == EventState::undefined
-        || state == getToggleState()
-        || hasToggleState(actionType);
 }
 
 bool CustomEvent::checkEventParams(const EventParameters& params) const

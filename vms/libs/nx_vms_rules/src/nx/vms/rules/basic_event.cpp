@@ -18,8 +18,9 @@ BasicEvent::BasicEvent(const nx::vms::api::rules::EventInfo& info):
 {
 }
 
-BasicEvent::BasicEvent(std::chrono::microseconds timestamp):
-    m_timestamp(timestamp)
+BasicEvent::BasicEvent(std::chrono::microseconds timestamp, State state):
+    m_timestamp(timestamp),
+    m_state(state)
 {
 }
 
@@ -39,6 +40,17 @@ std::chrono::microseconds BasicEvent::timestamp() const
 void BasicEvent::setTimestamp(const std::chrono::microseconds& timestamp)
 {
     m_timestamp = timestamp;
+}
+
+State BasicEvent::state() const
+{
+    return m_state;
+}
+
+void BasicEvent::setState(State state)
+{
+    NX_ASSERT(state != State::none);
+    m_state = state;
 }
 
 QString BasicEvent::uniqueName() const

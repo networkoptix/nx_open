@@ -13,4 +13,5 @@
 #include "source_camera_field.h"
 #include "source_server_field.h"
 #include "source_user_field.h"
+#include "state_field.h"
 #include "text_field.h"

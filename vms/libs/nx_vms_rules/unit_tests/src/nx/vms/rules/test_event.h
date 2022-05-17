@@ -3,6 +3,7 @@
 #pragma once
 
 #include <nx/vms/rules/basic_event.h>
+#include <nx/vms/rules/utils/type.h>
 
 namespace nx::vms::rules::test {
 
@@ -20,9 +21,9 @@ public:
     static ItemDescriptor manifest()
     {
         return ItemDescriptor{
-            .id = "nx.events.test",
+            .id = utils::type<TestEvent>(),
             .displayName = "Test event",
-            .description = "Test description",
+            .flags = {ItemFlag::instant, ItemFlag::prolonged},
         };
     }
 

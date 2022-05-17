@@ -3,8 +3,11 @@
 #pragma once
 
 #include <nx/vms/rules/plugin.h>
+#include <nx/vms/rules/event_fields/state_field.h>
 
 #include "test_field.h"
+#include "test_event.h"
+#include "test_action.h"
 
 namespace nx::vms::rules::test {
 
@@ -18,7 +21,18 @@ public:
 
     virtual void registerFields() const override
     {
+        registerEventField<StateField>();
         registerEventField<TestEventField>();
+    }
+
+    void registerEvents() const
+    {
+        registerEvent<TestEvent>();
+    }
+
+    void registerActions() const
+    {
+        registerAction<TestProlongedAction>();
     }
 };
 

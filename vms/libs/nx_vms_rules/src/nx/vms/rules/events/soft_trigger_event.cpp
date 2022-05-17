@@ -73,7 +73,7 @@ const ItemDescriptor& SoftTriggerEvent::manifest()
     static const auto kDescriptor = ItemDescriptor{
         .id = "nx.events.softTrigger",
         .displayName = tr("Software Trigger"),
-        .description = "",
+        .flags = {ItemFlag::instant, ItemFlag::prolonged},
         .fields = {
             makeFieldDescriptor<SourceCameraField>("cameraId", tr("Camera ID")),
             makeFieldDescriptor<SourceUserField>("userId", tr("User ID")),

@@ -2,26 +2,21 @@
 
 #pragma once
 
-#include <QtCore/QObject>
-#include <QtCore/QScopedPointer>
-
 #include <nx/vms/event/event_fwd.h>
-
+#include <nx/vms/rules/action_executor.h>
 #include <ui/workbench/workbench_context_aware.h>
-
-#include <utils/common/connective.h>
 
 class QnResourceWidget;
 class QnWorkbenchTextOverlaysHandlerPrivate;
 
-namespace nx { namespace vms { namespace event { class StringsHelper; }}}
+namespace nx::vms::event { class StringsHelper; }
 
 class QnWorkbenchTextOverlaysHandler:
-    public Connective<QObject>,
+    public nx::vms::rules::ActionExecutor,
     public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = nx::vms::rules::ActionExecutor;
 
 public:
     QnWorkbenchTextOverlaysHandler(QObject* parent = nullptr);
@@ -30,6 +25,8 @@ public:
 private:
     void at_eventActionReceived(const nx::vms::event::AbstractActionPtr& businessAction);
     void at_resourceWidgetAdded(QnResourceWidget* widget);
+
+    virtual void execute(const nx::vms::rules::ActionPtr& action);
 
 private:
     Q_DECLARE_PRIVATE(QnWorkbenchTextOverlaysHandler);

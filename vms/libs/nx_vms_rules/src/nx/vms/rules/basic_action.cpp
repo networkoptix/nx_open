@@ -4,6 +4,8 @@
 
 #include <QtCore/QMetaProperty>
 
+#include <nx/utils/log/assert.h>
+
 #include "utils/type.h"
 
 namespace nx::vms::rules {
@@ -24,6 +26,17 @@ std::chrono::microseconds BasicAction::timestamp() const
 void BasicAction::setTimestamp(std::chrono::microseconds timestamp)
 {
     m_timestamp = timestamp;
+}
+
+State BasicAction::state() const
+{
+    return m_state;
+}
+
+void BasicAction::setState(State state)
+{
+    NX_ASSERT(state != State::none);
+    m_state = state;
 }
 
 QnUuid BasicAction::ruleId() const

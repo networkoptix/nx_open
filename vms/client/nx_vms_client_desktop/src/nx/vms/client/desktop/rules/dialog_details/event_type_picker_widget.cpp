@@ -34,10 +34,10 @@ EventTypePickerWidget::EventTypePickerWidget(QWidget* parent):
         });
 
     std::list<std::pair<QString, QVariant>> continuanceList {
-        {tr("None"), QVariant::fromValue(api::rules::EventInfo::State::none)},
-        {tr("Starts"), QVariant::fromValue(api::rules::EventInfo::State::started)},
-        {tr("Ends"), QVariant::fromValue(api::rules::EventInfo::State::ended)},
-        {tr("Instant"), QVariant::fromValue(api::rules::EventInfo::State::instant)}
+        {tr("None"), QVariant::fromValue(api::rules::State::none)},
+        {tr("Starts"), QVariant::fromValue(api::rules::State::started)},
+        {tr("Stops"), QVariant::fromValue(api::rules::State::stopped)},
+        {tr("Instant"), QVariant::fromValue(api::rules::State::instant)}
     };
 
     ui->continuanceComboBox->clear();
@@ -62,9 +62,9 @@ void EventTypePickerWidget::setEventType(const QString& eventType)
     ui->eventTypeComboBox->setCurrentIndex(ui->eventTypeComboBox->findData(eventType));
 }
 
-api::rules::EventInfo::State EventTypePickerWidget::eventContinuance() const
+api::rules::State EventTypePickerWidget::eventContinuance() const
 {
-    return ui->continuanceComboBox->currentData().value<api::rules::EventInfo::State>();
+    return ui->continuanceComboBox->currentData().value<api::rules::State>();
 }
 
 } // namespace nx::vms::client::desktop::rules
