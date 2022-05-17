@@ -18,6 +18,8 @@
 
 namespace nx::vms::applauncher::api { enum class ResultType; }
 
+namespace nx::vms::common { class AbstractCertificateVerifier; }
+
 namespace nx::vms::common::p2p::downloader {
 
 class ResourcePoolPeerManager;
@@ -144,7 +146,8 @@ public:
      */
     void setServerUrl(
         const QnUuid& serverId,
-        const nx::vms::client::core::ConnectionInfo& connectionInfo);
+        const nx::vms::client::core::ConnectionInfo& connectionInfo,
+        nx::vms::common::AbstractCertificateVerifier* certificateVerifier);
 
     void checkServersInSystem();
 

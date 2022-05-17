@@ -433,7 +433,8 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
             {
                 connection->address(),
                 connection->credentials()
-            });
+            },
+            commonModule()->certificateVerifier());
         //m_clientUpdateTool->requestRemoteUpdateInfo();
     }
     // Force update when we open dialog.

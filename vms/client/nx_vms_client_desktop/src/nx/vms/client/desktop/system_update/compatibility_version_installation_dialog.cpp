@@ -9,6 +9,8 @@
 #include <QtWidgets/QPushButton>
 
 #include <client/client_settings.h>
+#include <client_core/client_core_module.h>
+#include <common/common_module.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/module_information.h>
@@ -62,7 +64,10 @@ CompatibilityVersionInstallationDialog::CompatibilityVersionInstallationDialog(
         this, &CompatibilityVersionInstallationDialog::atAutoRestartChanged);
 
     m_private->clientUpdateTool.reset(new nx::vms::client::desktop::ClientUpdateTool(this));
-    m_private->clientUpdateTool->setServerUrl(moduleInformation.id, connectionInfo);
+    m_private->clientUpdateTool->setServerUrl(
+        moduleInformation.id,
+        connectionInfo,
+        qnClientCoreModule->commonModule()->certificateVerifier());
 }
 
 CompatibilityVersionInstallationDialog::~CompatibilityVersionInstallationDialog()
