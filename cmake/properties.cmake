@@ -134,11 +134,6 @@ string(TIMESTAMP current_year %Y UTC)
 set(nx_copyright_owner "Network Optix")
 set(nx_copyright "Copyright (c) 2011-${current_year} ${nx_copyright_owner}")
 
-if(customization.advanced.disableCodeSigning)
-    set(codeSigning OFF)
-    message(STATUS "Code signing forcefully disabled for the current customization")
-endif()
-
 if(eulaVersionOverride)
     set(customization.eulaVersion ${eulaVersionOverride})
 endif()
