@@ -3,6 +3,7 @@
 #pragma once
 
 #include <chrono>
+#include <optional>
 #include <stdexcept>
 
 #include <nx/reflect/instrument.h>
@@ -48,32 +49,37 @@ NX_SQL_API RdbmsDriverType rdbmsDriverTypeFromString(const char* str);
 class NX_SQL_API ConnectionOptions
 {
 public:
-    RdbmsDriverType driverType;
+    RdbmsDriverType driverType = RdbmsDriverType::sqlite;
     QString hostName;
-    int port;
+    int port = 3306;
     QString dbName;
     QString userName;
     QString password;
     QString connectOptions;
     QString encoding;
-    int maxConnectionCount;
+    int maxConnectionCount = 1;
     /** Connection is closed if not used for this interval. */
-    std::chrono::seconds inactivityTimeout;
+    std::chrono::seconds inactivityTimeout = std::chrono::minutes(10);
     /**
      * If scheduled request has not received DB connection during this timeout
      * it will be cancelled with DBResult::cancelled error code.
      * By default it is one minute.
      * NOTE: Set to zero to disable this timeout.
      */
-    std::chrono::milliseconds maxPeriodQueryWaitsForAvailableConnection;
-    int maxErrorsInARowBeforeClosingConnection;
+    std::chrono::milliseconds maxPeriodQueryWaitsForAvailableConnection = std::chrono::minutes(1);
+    int maxErrorsInARowBeforeClosingConnection = 7;
     bool failOnDbTuneError = false;
+    /**
+     * If specified, then no more than this amount of data modification queries will be run concurrently.
+     * Otherwise, there is no limit (if DB type supports it).
+     */
+    std::optional<int> concurrentModificationQueryLimit;
 
     ConnectionOptions();
 
     void loadFromSettings(const QnSettings& settings, const QString& groupName = "db");
 
-    bool operator==(const ConnectionOptions&) const;
+    bool operator==(const ConnectionOptions&) const = default;
 };
 
 NX_REFLECTION_INSTRUMENT(ConnectionOptions, (driverType)(hostName)(port)(dbName)(userName) \
