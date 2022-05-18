@@ -1,0 +1,14 @@
+## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
+file: certificate.p12
+password: '123456'
+timestamp_servers:
+    - http://timestamp.digicert.com
+    - http://timestamp.globalsign.com/tsa/r6advanced1
+    - http://rfc3161timestamp.globalsign.com/advanced
+    - http://timestamp.sectigo.com
+    - http://timestamp.apple.com/ts01
+    - http://tsa.mesign.com
+    - http://time.certum.pl
+    - http://zeitstempel.dfn.de
+    - http://timestamp.entrust.net/TSS/RFC3161sha2TS

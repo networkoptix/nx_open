@@ -20,3 +20,8 @@ set(isEdgeServer "false")
 set(statisticsServerUrl "" CACHE STRING "Default statistics server URL")
 set(statisticsServerUser "" CACHE STRING "Default statistics server user")
 set(statisticsServerPassword "" CACHE STRING "Default statistics server password")
+
+if(WINDOWS)
+    set(codeSigning false CACHE STRING "Sign created executables")
+    set(trustedTimestamping false CACHE STRING "Use trusted timestamping for code signing")
+endif()
