@@ -432,7 +432,7 @@ QStringList StringsHelper::eventDetails(
         {
             if (!params.description.isEmpty())
             {
-                QnCameraConflictList conflicts;
+                nx::vms::rules::CameraConflictList conflicts;
                 conflicts.sourceServer = params.caption;
                 conflicts.decode(params.description);
                 int n = 0;
