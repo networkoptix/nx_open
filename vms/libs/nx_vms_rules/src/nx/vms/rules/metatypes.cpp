@@ -5,6 +5,7 @@
 #include <common/common_meta_types.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/utils/metatypes.h>
+#include <nx/vms/rules/camera_conflict_list.h>
 
 #include "basic_event.h"
 #include "field_types.h"
@@ -24,6 +25,8 @@ void Metatypes::initialize()
     qRegisterMetaType<nx::vms::api::rules::State>();
 
     qRegisterMetaType<nx::vms::rules::EventPtr>();
+
+    qRegisterMetaType<nx::vms::rules::CameraConflictList>();
 
     qRegisterMetaType<QnUuidList>("QnUuidList");
     QnJsonSerializer::registerSerializer<QnUuidList>();

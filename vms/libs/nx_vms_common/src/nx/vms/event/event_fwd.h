@@ -11,9 +11,6 @@
 #include <common/common_globals.h>
 #include <nx/vms/api/types/event_rule_types.h>
 
-// TODO: #vkutin Think of a location to put this to
-struct QnCameraConflictList;
-
 namespace nx::vms::event {
 
 class AbstractEvent;
