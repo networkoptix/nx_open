@@ -74,42 +74,28 @@ RdbmsDriverType rdbmsDriverTypeFromString(const char* str)
 
 namespace {
 
-const QLatin1String kDbDriverName("driverName");
+static constexpr char kDbDriverName[] = "driverName";
+static constexpr char kDbHostName[] = "hostName";
+static constexpr char kDbPort[] = "port";
+static constexpr char kDbName[] = "name";
+static constexpr char kDbUserName[] = "userName";
+static constexpr char kDbPassword[] = "password";
+static constexpr char kDbConnectOptions[] = "connectOptions";
+static constexpr char kDbEncoding[] = "encoding";
+static constexpr char kDbMaxConnections[] = "maxConnections";
+static constexpr char kDbInactivityTimeout[] = "inactivityTimeout";
 
-const QLatin1String kDbHostName("hostName");
+static constexpr char kDbMaxPeriodQueryWaitsForAvailableConnection[] =
+    "maxPeriodQueryWaitsForAvailableConnection";
 
-const QLatin1String kDbPort("port");
-
-const QLatin1String kDbName("name");
-
-const QLatin1String kDbUserName("userName");
-
-const QLatin1String kDbPassword("password");
-
-const QLatin1String kDbConnectOptions("connectOptions");
-
-const QLatin1String kDbEncoding("encoding");
-
-const QLatin1String kDbMaxConnections("maxConnections");
-
-const QLatin1String kDbInactivityTimeout("inactivityTimeout");
-
-const QLatin1String kDbMaxPeriodQueryWaitsForAvailableConnection(
-    "maxPeriodQueryWaitsForAvailableConnection");
-
-const QLatin1String kDbFailOnDbTuneError("failOnDbTuneError");
+static constexpr char kDbFailOnDbTuneError[] = "failOnDbTuneError";
+static constexpr char kDbConcurrentModificationQueryLimit[] = "concurrentModificationQueryLimit";
 
 } // namespace
 
 ConnectionOptions::ConnectionOptions():
-    driverType(RdbmsDriverType::sqlite),
     hostName("127.0.0.1"),
-    port(3306),
-    encoding("utf8"),
-    maxConnectionCount(1),
-    inactivityTimeout(std::chrono::minutes(10)),
-    maxPeriodQueryWaitsForAvailableConnection(std::chrono::minutes(1)),
-    maxErrorsInARowBeforeClosingConnection(7)
+    encoding("utf8")
 {
 }
 
@@ -117,73 +103,60 @@ void ConnectionOptions::loadFromSettings(const QnSettings& settings, const QStri
 {
     using namespace std::chrono;
 
-    if (auto str = nx::format("%1/%2").arg(groupName).arg(kDbDriverName); settings.contains(str))
+    QnSettingsGroupReader settingsReader(settings, groupName);
+
+    if (settingsReader.contains(kDbDriverName))
     {
         driverType = rdbmsDriverTypeFromString(
-            settings.value(str).toString().toStdString().c_str());
+            settingsReader.value(kDbDriverName).toString().toStdString().c_str());
     }
 
-    if (auto str = nx::format("%1/%2").arg(groupName).arg(kDbHostName); settings.contains(str))
-        hostName = settings.value(str).toString();
+    if (settingsReader.contains(kDbHostName))
+        hostName = settingsReader.value(kDbHostName).toString();
 
-    if (auto str = nx::format("%1/%2").arg(groupName).arg(kDbPort); settings.contains(str))
-        port = settings.value(str).toInt();
+    if (settingsReader.contains(kDbPort))
+        port = settingsReader.value(kDbPort).toInt();
 
-    if (auto str = nx::format("%1/%2").arg(groupName).arg(kDbName); settings.contains(str))
-        dbName = settings.value(str).toString();
+    if (settingsReader.contains(kDbName))
+        dbName = settingsReader.value(kDbName).toString();
 
-    if (auto str = nx::format("%1/%2").arg(groupName).arg(kDbUserName); settings.contains(str))
-        userName = settings.value(str).toString();
+    if (settingsReader.contains(kDbUserName))
+        userName = settingsReader.value(kDbUserName).toString();
 
-    if (auto str = nx::format("%1/%2").arg(groupName).arg(kDbPassword); settings.contains(str))
-        password = settings.value(str).toString();
+    if (settingsReader.contains(kDbPassword))
+        password = settingsReader.value(kDbPassword).toString();
 
-    if (auto str = nx::format("%1/%2").arg(groupName).arg(kDbConnectOptions); settings.contains(str))
-        connectOptions = settings.value(str).toString();
+    if (settingsReader.contains(kDbConnectOptions))
+        connectOptions = settingsReader.value(kDbConnectOptions).toString();
 
-    if (auto str = nx::format("%1/%2").arg(groupName).arg(kDbEncoding); settings.contains(str))
-        encoding = settings.value(str).toString();
+    if (settingsReader.contains(kDbEncoding))
+        encoding = settingsReader.value(kDbEncoding).toString();
 
-    if (auto str = nx::format("%1/%2").arg(groupName).arg(kDbMaxConnections); settings.contains(str))
+    if (settingsReader.contains(kDbMaxConnections))
     {
-        maxConnectionCount = settings.value(str).toInt();
+        maxConnectionCount = settingsReader.value(kDbMaxConnections).toInt();
         if (maxConnectionCount <= 0)
             maxConnectionCount = std::thread::hardware_concurrency();
     }
 
-    if (auto str = nx::format("%1/%2").arg(groupName).arg(kDbInactivityTimeout); settings.contains(str))
+    if (settingsReader.contains(kDbInactivityTimeout))
     {
         inactivityTimeout = duration_cast<seconds>(
             nx::utils::parseTimerDuration(
-                settings.value(str).toString()));
+                settingsReader.value(kDbInactivityTimeout).toString()));
     }
 
-    if (auto str = nx::format("%1/%2").arg(groupName).arg(kDbMaxPeriodQueryWaitsForAvailableConnection);
-        settings.contains(str))
+    if (settingsReader.contains(kDbMaxPeriodQueryWaitsForAvailableConnection))
     {
         maxPeriodQueryWaitsForAvailableConnection = duration_cast<seconds>(
-            nx::utils::parseTimerDuration(settings.value(str).toString()));
+            nx::utils::parseTimerDuration(settingsReader.value(kDbMaxPeriodQueryWaitsForAvailableConnection).toString()));
     }
 
-    if (auto str = nx::format("%1/%2").arg(groupName).arg(kDbFailOnDbTuneError); settings.contains(str))
-        failOnDbTuneError = settings.value(str).toBool();
-}
+    if (settingsReader.contains(kDbFailOnDbTuneError))
+        failOnDbTuneError = settingsReader.value(kDbFailOnDbTuneError).toBool();
 
-bool ConnectionOptions::operator==(const ConnectionOptions& rhs) const
-{
-    return
-        driverType == rhs.driverType &&
-        hostName == rhs.hostName &&
-        port == rhs.port &&
-        dbName == rhs.dbName &&
-        userName == rhs.userName &&
-        password == rhs.password &&
-        connectOptions == rhs.connectOptions &&
-        encoding == rhs.encoding &&
-        maxConnectionCount == rhs.maxConnectionCount &&
-        inactivityTimeout == rhs.inactivityTimeout &&
-        maxPeriodQueryWaitsForAvailableConnection == rhs.maxPeriodQueryWaitsForAvailableConnection &&
-        maxErrorsInARowBeforeClosingConnection == rhs.maxErrorsInARowBeforeClosingConnection;
+    if (settingsReader.contains(kDbConcurrentModificationQueryLimit))
+        concurrentModificationQueryLimit = settingsReader.value(kDbConcurrentModificationQueryLimit).toInt();
 }
 
 //-------------------------------------------------------------------------------------------------
