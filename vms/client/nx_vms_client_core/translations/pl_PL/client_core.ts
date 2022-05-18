@@ -161,16 +161,16 @@
     <message>
       <source>Connection to %1 is not ready yet. Check your internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check your internet connection or try again later.</translation>
+      <translation>Połączenie z %1 nie jest jeszcze gotowe. Sprawdź połączenie internetowe serwera lub spróbuj ponownie później.</translation>
     </message>
     <message>
       <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</translation>
+      <translation>Połączenie z %1 nie jest jeszcze gotowe. Sprawdź połączenie internetowe serwera lub spróbuj ponownie później.</translation>
     </message>
     <message>
       <source>Connection to the server could not be established. Try again later.</source>
-      <translation type="unfinished">Connection to the server could not be established. Try again later.</translation>
+      <translation>Nie można nawiązać połączenia z serwerem. Spróbuj ponownie później.</translation>
     </message>
     <message>
       <source>Your session has expired</source>
@@ -179,16 +179,16 @@
     <message>
       <source>Please log in to %1 again.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Please log in to %1 again.</translation>
+      <translation>Zaloguj się ponownie.</translation>
     </message>
     <message>
       <source>Log in to %1 to log in to this system with %2 user</source>
       <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in to %1 to log in to this system with %2 user</translation>
+      <translation>Zaloguj się do %1 aby uzyskać dostęp do tego systemu jako użytkownik chmury</translation>
     </message>
     <message>
       <source>Session duration limit can be changed by a system administrator.</source>
-      <translation type="unfinished">Session duration limit can be changed by a system administrator.</translation>
+      <translation>Limit czasu trwania sesji może zostać zmieniony przez administratorów systemu.</translation>
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
@@ -196,21 +196,21 @@
     </message>
     <message>
       <source>Too many login attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many login attempts. Try again in a minute.</translation>
+      <translation>Zbyt wiele prób. Spróbuj ponownie za minutę.</translation>
     </message>
     <message>
       <source>Two-factor authentication is required.</source>
-      <translation type="unfinished">Two-factor authentication is required.</translation>
+      <translation>Wymagane jest uwierzytelnianie dwuskładnikowe.</translation>
     </message>
     <message>
       <source>You can enable two-factor authentication in your %1.</source>
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">You can enable two-factor authentication in your %1.</translation>
+      <translation>Możesz włączyć uwierzytelnianie dwuskładnikowe w swoim %1.</translation>
     </message>
     <message>
       <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</translation>
+      <translation>Aby zalogować się do tego Systemu, wyłącz opcję „Pytaj o kod weryfikacyjny przy każdym logowaniu przy użyciu konta %1 ” w swoim %2.</translation>
     </message>
   </context>
 </TS>

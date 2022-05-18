@@ -291,7 +291,7 @@
     <name>BackupSettingsWidget</name>
     <message>
       <source>Server is offline. Backup settings are not available.</source>
-      <translation type="unfinished">Server is offline. Backup settings are not available.</translation>
+      <translation>Serwer jest odłączony. Ustawienia kopii zapasowej są niedostępne.</translation>
     </message>
   </context>
   <context>
@@ -322,7 +322,7 @@
     </message>
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
-      <translation type="unfinished">Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</translation>
+      <translation>Kopia zapasowa została zatrzymana z powodu problemu z pamięcią. Kopia zapasowa zostanie wznowiona automatycznie po rozwiązaniu problemu z pamięcią</translation>
     </message>
   </context>
   <context>
@@ -616,19 +616,19 @@
     </message>
     <message>
       <source>RTP Transport</source>
-      <translation type="unfinished">RTP Transport</translation>
+      <translation>Protokół RTP</translation>
     </message>
     <message>
       <source>Use camera native presets</source>
-      <translation type="unfinished">Use camera native presets</translation>
+      <translation>Użyj natywnych ustawień kamery</translation>
     </message>
     <message>
       <source>Time Settings</source>
-      <translation type="unfinished">Time Settings</translation>
+      <translation>Ustawienia czasu</translation>
     </message>
     <message>
       <source>Keep camera time settings</source>
-      <translation type="unfinished">Keep camera time settings</translation>
+      <translation>Zachowaj ustawienia czasu kamery</translation>
     </message>
   </context>
   <context>
@@ -1147,7 +1147,7 @@
     </message>
     <message>
       <source>No Failover</source>
-      <translation type="unfinished">No Failover</translation>
+      <translation>Brak opcji Failover</translation>
     </message>
   </context>
   <context>
@@ -1496,7 +1496,7 @@
     </message>
     <message>
       <source>Allow digest authentication for imported user</source>
-      <translation type="unfinished">Allow digest authentication for imported user</translation>
+      <translation>Zezwalaj na uwierzytelnianie digest dla importowanego użytkownika</translation>
     </message>
   </context>
   <context>
@@ -2442,7 +2442,7 @@
     </message>
     <message>
       <source>Manage Users</source>
-      <translation type="unfinished">Manage Users</translation>
+      <translation>Zarządzanie użytkownikami</translation>
     </message>
   </context>
   <context>
@@ -2534,7 +2534,7 @@
     </message>
     <message>
       <source>Autodetect built-in and USB webcams</source>
-      <translation type="unfinished">Autodetect built-in and USB webcams</translation>
+      <translation>Automatyczne wykrywanie kamer wbudowanych i USB</translation>
     </message>
   </context>
   <context>
@@ -3012,7 +3012,7 @@
     </message>
     <message>
       <source>Allow opening web page without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening web page without SSL certificate checking</translation>
+      <translation>Zezwalaj na otwieranie strony internetowej bez sprawdzania certyfikatu SSL</translation>
     </message>
   </context>
   <context>
