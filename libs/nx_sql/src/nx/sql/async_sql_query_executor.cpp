@@ -38,7 +38,7 @@ AsyncSqlQueryExecutor::AsyncSqlQueryExecutor(
     m_terminated(false)
 {
     m_dropConnectionThread = nx::utils::thread(
-            std::bind(&AsyncSqlQueryExecutor::dropExpiredConnectionsThreadFunc, this));
+        std::bind(&AsyncSqlQueryExecutor::dropExpiredConnectionsThreadFunc, this));
 
     using namespace std::placeholders;
     if (m_connectionOptions.maxPeriodQueryWaitsForAvailableConnection
@@ -50,7 +50,15 @@ AsyncSqlQueryExecutor::AsyncSqlQueryExecutor(
     }
 
     if (m_connectionOptions.driverType == RdbmsDriverType::sqlite)
+    {
+        // SQLite does not support concurrent DB updates.
         m_queryQueue.setConcurrentModificationQueryLimit(1);
+    }
+    else if (m_connectionOptions.concurrentModificationQueryLimit)
+    {
+        m_queryQueue.setConcurrentModificationQueryLimit(
+            *m_connectionOptions.concurrentModificationQueryLimit);
+    }
 }
 
 AsyncSqlQueryExecutor::~AsyncSqlQueryExecutor()
