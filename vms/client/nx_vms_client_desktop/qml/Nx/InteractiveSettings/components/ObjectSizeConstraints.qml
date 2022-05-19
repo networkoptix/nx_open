@@ -102,11 +102,17 @@ LabeledItem
             value && Array.isArray(value.positions) && value.positions[1], maximum)
 
         valueChanged()
+        updatePreview()
     }
 
     function resetValue()
     {
         setValue(null)
+    }
+
+    function updatePreview()
+    {
+        figureView.figure = getValue()
     }
 
     function deserializeSize(sizeJson, defaultSize, minimumSize)
