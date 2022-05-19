@@ -24,6 +24,8 @@ struct NX_VMS_API UserRoleData: IdData
     /**%apidoc[opt] List of roles to inherit permissions. */
     std::vector<QnUuid> parentRoleIds; //< TODO: Rename to parentGroupIds on gneral renaming.
 
+    bool isLdap = false;
+
     UserRoleData() = default;
     UserRoleData(
         const QnUuid& id, const QString& name,
@@ -40,7 +42,8 @@ struct NX_VMS_API UserRoleData: IdData
     IdData_Fields \
     (name) \
     (permissions) \
-    (parentRoleIds)
+    (parentRoleIds) \
+    (isLdap)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(UserRoleData)
 
 /**%apidoc Predefined non-editable role.
