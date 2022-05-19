@@ -99,9 +99,7 @@ private:
      */
     void handleConnectionError(RemoteConnectionError error);
 
-    void establishConnection(
-        RemoteConnectionPtr connection,
-        bool autoTerminateServerSession = false);
+    void establishConnection(RemoteConnectionPtr connection);
 
     void storeConnectionRecord(
         core::ConnectionInfo connectionInfo,

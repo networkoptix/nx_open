@@ -60,7 +60,6 @@ struct RemoteSession::Private
 
     mutable nx::Mutex mutex;
     bool autoTerminate = false;
-    bool terminateSync = false;
 
     void terminateServerSessionIfNeeded();
     void updateTokenExpirationTime();
@@ -68,46 +67,38 @@ struct RemoteSession::Private
 
 void RemoteSession::Private::terminateServerSessionIfNeeded()
 {
+    if (!autoTerminate)
+        return;
+
     if (!connection)
         return;
 
+    if (connection->userType() == nx::vms::api::UserType::cloud)
+        return;
+
     const auto credentials = connection->credentials();
-    if (autoTerminate && !credentials.authToken.empty() && credentials.authToken.isBearerToken())
-    {
-        auto terminate =
-            [this, sessionToken = credentials.authToken.value](
-                rest::ServerConnection::PostCallback callback = {})
-            {
-                connection->serverApi()->deleteEmptyResult(
-                    QString("/rest/v1/login/sessions/") + sessionToken,
-                    nx::network::rest::Params(),
-                    std::move(callback));
-            };
+    const bool canDeleteToken = !credentials.authToken.empty()
+        && credentials.authToken.isBearerToken();
+    if (!canDeleteToken)
+        return;
 
-        if (terminateSync)
+    NX_INFO(this, "Terminate server session");
+    std::promise<bool> promise;
+    connection->serverApi()->deleteEmptyResult(
+        QString("/rest/v1/login/sessions/") + credentials.authToken.value,
+        nx::network::rest::Params(),
+        [&promise](
+            bool success,
+            rest::Handle /*requestId*/,
+            rest::ServerConnection::EmptyResponseType /*requestResult*/)
         {
-            std::promise<bool> promise;
-            terminate(
-                [&promise](
-                    bool success,
-                    rest::Handle requestId,
-                    rest::ServerConnection::EmptyResponseType requestResult)
-                {
-                    promise.set_value(success);
-                });
+            promise.set_value(success);
+        });
 
-            auto result = promise.get_future();
-            auto status = result.wait_for(kTerminateServerSessionTimeout);
-            if (status != std::future_status::ready || result.get() == false)
-                NX_WARNING(this, "Can not terminate server session");
-        }
-        else
-        {
-            terminate();
-        }
-    }
-
-    autoTerminate = false;
+    auto result = promise.get_future();
+    auto status = result.wait_for(kTerminateServerSessionTimeout);
+    if (status != std::future_status::ready || result.get() == false)
+        NX_WARNING(this, "Can not terminate server session");
 }
 
 void RemoteSession::Private::updateTokenExpirationTime()
@@ -271,12 +262,8 @@ RemoteConnectionPtr RemoteSession::connection() const
 
 void RemoteSession::setAutoTerminate(bool value)
 {
+    NX_VERBOSE(this, "Set session auto-terminate to %1", value);
     d->autoTerminate = value;
-}
-
-void RemoteSession::syncWhenTerminate()
-{
-    d->terminateSync = true;
 }
 
 bool RemoteSession::keepCurrentServerOnError(RemoteConnectionErrorCode error)

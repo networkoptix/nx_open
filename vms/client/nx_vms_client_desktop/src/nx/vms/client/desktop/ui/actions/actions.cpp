@@ -308,11 +308,15 @@ void initialize(Manager* manager, Action* root)
         .autoRepeat(false);
 
     factory(DisconnectAction)
+        .flags(NoTarget)
+        .condition(condition::isLoggedIn());
+
+    factory(DisconnectMainMenuAction)
         .flags(Main | GlobalHotkey)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Disconnect from Server"))
         .autoRepeat(false)
-        .shortcut(lit("Ctrl+Shift+D"))
+        .shortcut("Ctrl+Shift+D")
         .condition(condition::isLoggedIn());
 
     factory(ResourcesModeAction)
