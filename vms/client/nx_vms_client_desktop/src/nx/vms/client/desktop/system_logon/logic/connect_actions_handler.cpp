@@ -261,14 +261,19 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
         &ConnectActionsHandler::at_connectToCloudSystemAction_triggered);
     connect(action(ui::action::ReconnectAction), &QAction::triggered, this,
         &ConnectActionsHandler::at_reconnectAction_triggered);
-    connect(action(ui::action::DisconnectAction), &QAction::triggered, this,
+
+    connect(action(ui::action::DisconnectMainMenuAction), &QAction::triggered, this,
         [this]()
         {
-            if (auto session = qnClientCoreModule->networkModule()->session())
-                session->syncWhenTerminate();
+            if (auto session = RemoteSession::instance())
+                session->autoTerminateIfNeeded();
 
             at_disconnectAction_triggered();
         });
+
+    connect(action(ui::action::DisconnectAction), &QAction::triggered, this,
+        &ConnectActionsHandler::at_disconnectAction_triggered);
+
     connect(action(ui::action::SelectCurrentServerAction), &QAction::triggered, this,
         &ConnectActionsHandler::at_selectCurrentServerAction_triggered);
 
@@ -277,9 +282,6 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
     connect(action(ui::action::BeforeExitAction), &QAction::triggered, this,
         [this]()
         {
-            if (auto session = qnClientCoreModule->networkModule()->session())
-                session->syncWhenTerminate();
-
             disconnectFromServer(DisconnectFlag::Force);
             action(ui::action::ResourcesModeAction)->setChecked(true);
         });
@@ -504,9 +506,7 @@ void ConnectActionsHandler::handleConnectionError(RemoteConnectionError error)
     }
 }
 
-void ConnectActionsHandler::establishConnection(
-    RemoteConnectionPtr connection,
-    bool autoTerminateServerSession)
+void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
 {
     if (!NX_ASSERT(connection))
         return;
@@ -515,7 +515,6 @@ void ConnectActionsHandler::establishConnection(
     const auto session = std::make_shared<desktop::RemoteSession>(connection);
 
     session->setStickyReconnect(qnSettings->stickReconnectToServer());
-    session->setAutoTerminate(autoTerminateServerSession);
     connect(session.get(), &RemoteSession::stateChanged, this,
         [this](RemoteSession::State state)
         {
@@ -862,6 +861,12 @@ void ConnectActionsHandler::at_connectAction_triggered()
         if (!disconnectFromServer(DisconnectFlag::NoFlags))
         {
             NX_VERBOSE(this, "User cancelled the disconnect");
+
+            // Login dialog sets auto-terminate if needed. If user cancelled the disconnect,
+            // we should restore status-quo to make sure session won't be terminated
+            // unconditionally.
+            if (auto session = RemoteSession::instance())
+                session->setAutoTerminate(false);
             return;
         }
     }
@@ -1269,8 +1274,7 @@ void ConnectActionsHandler::connectToServer(
                 switchCloudHostIfNeeded(
                     d->currentConnectionProcess->context->moduleInformation.cloudHost);
 
-                const bool autoTerminateServerSession = !options.testFlag(StorePassword);
-                establishConnection(connection, autoTerminateServerSession);
+                establishConnection(connection);
 
                 storeConnectionRecord(
                     connection->connectionInfo(),

@@ -97,6 +97,7 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_logon/logic/context_current_user_watcher.h>
+#include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
 #include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
 #include <nx/vms/client/desktop/system_update/advanced_update_settings_dialog.h>
 #include <nx/vms/client/desktop/system_update/workbench_update_watcher.h>
@@ -339,8 +340,22 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::RestoreSessionState), &QAction::triggered, this, &ActionHandler::at_restoreSessionState_triggered);
     connect(action(action::DeleteSessionState), &QAction::triggered, this, &ActionHandler::at_deleteSessionState_triggered);
 
-    connect(action(action::CloseAllWindowsAction), &QAction::triggered, this, &ActionHandler::closeAllWindows);
-    connect(action(action::ExitAction), &QAction::triggered, this, &ActionHandler::closeApplication);
+    connect(action(action::CloseAllWindowsAction), &QAction::triggered, this,
+        [this]()
+        {
+            if (auto session = RemoteSession::instance())
+                session->autoTerminateIfNeeded();
+            closeAllWindows();
+        });
+
+    connect(action(action::ExitAction), &QAction::triggered, this,
+        [this]()
+        {
+            if (auto session = RemoteSession::instance())
+                session->autoTerminateIfNeeded();
+            closeApplication();
+        });
+
     connect(
         qnClientModule->sharedMemoryManager(),
         &nx::vms::client::desktop::SharedMemoryManager::clientCommandRequested,
@@ -2450,7 +2465,7 @@ void ActionHandler::showSessionSavedBanner()
 
 void ActionHandler::closeAllWindows()
 {
-    doCloseApplication(false, AppClosingMode::CloseAll);
+    doCloseApplication(/*force*/ false, AppClosingMode::CloseAll);
 }
 
 void ActionHandler::closeApplication(bool force)
@@ -2478,7 +2493,9 @@ void ActionHandler::at_clientCommandRequested(
         }
         case SharedMemoryData::Command::exit:
         {
-            doCloseApplication(true, AppClosingMode::External);
+            if (auto session = RemoteSession::instance())
+                session->autoTerminateIfNeeded();
+            doCloseApplication(/*force*/ true, AppClosingMode::External);
             break;
         }
         default:
