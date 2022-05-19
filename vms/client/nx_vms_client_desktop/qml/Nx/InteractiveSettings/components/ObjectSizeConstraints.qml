@@ -21,7 +21,6 @@ LabeledItem
     property bool isActive: false
 
     signal valueChanged()
-    signal activeValueChanged()
 
     isGroup: true
 
@@ -43,7 +42,7 @@ LabeledItem
                 openEditDialog()
 
             onFigureChanged:
-                control.activeValueChanged()
+                control.valueChanged()
         }
     }
 
@@ -104,11 +103,17 @@ LabeledItem
             value && Array.isArray(value.positions) && value.positions[1], maximum)
 
         valueChanged()
+        updatePreview()
     }
 
     function resetValue()
     {
         setValue(null)
+    }
+
+    function updatePreview()
+    {
+        figureView.figure = getValue()
     }
 
     function deserializeSize(sizeJson, defaultSize, minimumSize)
