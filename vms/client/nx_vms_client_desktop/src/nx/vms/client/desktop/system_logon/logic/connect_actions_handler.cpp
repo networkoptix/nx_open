@@ -1128,9 +1128,14 @@ void ConnectActionsHandler::at_selectCurrentServerAction_triggered()
 
                 ConnectionOptions options(StoreSession | StorePreferredCloudServer);
                 const auto localId = ::helpers::getLocalSystemId(connection->moduleInformation());
+                const auto storedCredentials = CredentialsManager::credentials(
+                    localId,
+                    connection->credentials().username);
+                const bool hasStoredCredentials = storedCredentials
+                    && !storedCredentials->authToken.value.empty();
 
                 // If current connection is stored, also save credentials to the target server.
-                if (CredentialsManager::credentials(localId, connection->credentials().username))
+                if (hasStoredCredentials)
                     options.setFlag(StorePassword);
 
                 storeConnectionRecord(
