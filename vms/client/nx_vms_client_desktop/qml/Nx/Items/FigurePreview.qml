@@ -4,6 +4,8 @@ import QtQuick 2.0
 
 import Nx 1.0
 
+import "private/figure_utils.js" as F
+
 Item
 {
     id: preview
@@ -26,7 +28,7 @@ Item
 
     function updateFigure()
     {
-        if (!figure || !figure.points)
+        if (!figure || F.isEmptyObject(figure))
         {
             loader.source = ""
             return
