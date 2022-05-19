@@ -7,7 +7,6 @@
 #include "events/plugin.h"
 #include "diagnostic_events/plugin.h"
 #include "video_frames/plugin.h"
-#include "deprecated_object_detection/plugin.h"
 #include "special_objects/plugin.h"
 #include "motion_metadata/plugin.h"
 #include "custom_metadata/plugin.h"
@@ -29,16 +28,15 @@ extern "C" NX_PLUGIN_API nx::sdk::IPlugin* createNxPluginByIndex(int instanceInd
         case 2: return new events::Plugin();
         case 3: return new diagnostic_events::Plugin();
         case 4: return new video_frames::Plugin();
-        case 5: return new deprecated_object_detection::Plugin();
-        case 6: return new special_objects::Plugin();
-        case 7: return new motion_metadata::Plugin();
-        case 8: return new custom_metadata::Plugin();
-        case 9: return new sdk_features::Plugin();
-        case 10: return new taxonomy_features::Plugin();
-        case 11: return new object_streamer::Plugin();
-        case 12: return new best_shots::Plugin();
-		case 13: return new object_detection::Plugin();
-        case 14: return new object_actions::Plugin();
+        case 5: return new special_objects::Plugin();
+        case 6: return new motion_metadata::Plugin();
+        case 7: return new custom_metadata::Plugin();
+        case 8: return new sdk_features::Plugin();
+        case 9: return new taxonomy_features::Plugin();
+        case 10: return new object_streamer::Plugin();
+        case 11: return new best_shots::Plugin();
+		case 12: return new object_detection::Plugin();
+        case 13: return new object_actions::Plugin();
         default: return nullptr;
     }
 }
