@@ -100,7 +100,7 @@ public:
         const Options& options = {Type::operational}) const override;
 
 private:
-    mutable nx::Mutex m_mutex;
+    mutable nx::Mutex m_mutex { nx::Mutex::RecursionMode::Recursive };
 };
 
 } // namespace nx::vms::common::ptz
