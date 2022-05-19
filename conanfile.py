@@ -58,26 +58,26 @@ class NxConan(ConanFile):
 
     ffmpeg_version = "4.4"
     requires = (
-        f"ffmpeg/{ffmpeg_version}" "#dca3e2655f3c26d8078d6f5657026b3f",
-        "openssl/1.1.1k" "#671787bc7a7b737a22baa973d4b25df7",
-        "qt/5.15.2" "#09feed020369533d53a6dde1ba05c119",
-        "roboto-fonts/1.0" "#d9dbbcbc40cbdeb6dfaa382399bccfd6",
+        f"ffmpeg/{ffmpeg_version}" "#633390099f4ad9835d426c8e98b15d11",
+        "openssl/1.1.1k" "#5adf0506cae13abf5170409c9d92819b",
+        "qt/5.15.2" "#ddcad85211a62685803a6317803ebe1a",
+        "roboto-fonts/1.0" "#a1d64ec2d6a2e16f8f476b2b47162123",
     )
 
     def build_requirements(self):
         if self.isLinux:
             if self.options.useClang:
-                self.build_requires("clang/11.0.1" "#f9fc45fe77910654c04a3b7517784fc7")
-            self.build_requires("sdk-gcc/5.5" "#53c2ddb9615885ac85d38be2ec272d8e")
+                self.build_requires("clang/11.0.1" "#91163fed8b1b7ceffc1263afc4fc0770")
+            self.build_requires("sdk-gcc/5.5" "#01b5d38415be7bdd73ae29717c8f7741")
 
         if self.isWindows:
-            self.build_requires("wix/3.11" "#fdab0a403cf050e75921ecdb6fa90690")
+            self.build_requires("wix/3.11" "#a662d89b677af4a98ac8cd2371be63b8")
 
         if self.haveDesktopClient or self.haveMediaserver:
-            self.build_requires("doxygen/1.8.14" "#100a69d210981b259d85d575da0e5e7d")
+            self.build_requires("doxygen/1.8.14" "#5491e71ff28d608c302b6a74e82c4c61")
 
     def requirements(self):
-        self.requires("boost/1.76.0" "#bf922d85865a39cc5d2bc9dc3cf3ff6e")
+        self.requires("boost/1.78.0" "#298dce0adb40278309cc5f76fc92b47a")
 
         # Until we have arm64 macs in CI to build native tools, run x86_64 tools using Rosetta 2.
         if self.isMacos and self.settings.arch in ("armv8", "x86_64"):
@@ -85,36 +85,36 @@ class NxConan(ConanFile):
 
         if self.isLinux:
             if self.settings.arch == "x86_64":
-                self.requires("libva/2.6" "#868f4ccc7d32875978f3fae99b79eb07")
-                self.requires("intel-media-sdk/19.4" "#c30f624d2a10677b50cb70d02897812b")
+                self.requires("libva/2.6" "#740a8e07c1ac1f7210fba99e2ec2283a")
+                self.requires("intel-media-sdk/19.4" "#b5fe1df9594326590fe81f28301e09d6")
 
             if not self.isArm32:
                 self.requires("os_deps_for_desktop_linux/ubuntu_xenial"
                     "#b4e7ff961f0fb8957c5d5a755d5eb55a")
 
         if self.haveDesktopClient:
-            self.requires("hidapi/0.10.1" "#badb3592592c0b6009d844e78060bd41")
+            self.requires("hidapi/0.10.1" "#a876ff0453c3a0743228811370d0874a")
 
             if not self.isEdge1:
-                self.requires("flite/2.2" "#89ef970a23fed33fb5f8785e073ab5e1")
+                self.requires("flite/2.2" "#97d02c44abce7573ef767ddb6260835a")
 
         if self.isWindows or self.isAndroid:
-            self.requires("openal/1.19.1" "#eead8dabd1aaed0d105ab3ae8be6473f")
+            self.requires("openal/1.19.1" "#5e48f04d6f5a6f7c7b25e5ec6437c9c4")
 
         if self.isWindows:
-            self.requires("directx/JUN2010" "#3272f55697228596a7708784a0473927")
-            self.requires("intel-media-sdk-bin/2019R1" "#d82fd5a48e99fdea7334167360e463f5")
-            self.requires("msvc-redist/14.29.30133" "#a15cae953d6fb0f22835b9c3eb8cdc7d")
-            self.requires("winsdk-redist/10.0.19041.0" "#422b9a7a082bbb4a2c1326cecbf75aea")
+            self.requires("directx/JUN2010" "#ca268f1b54e3874ad43524cd81447b01")
+            self.requires("intel-media-sdk-bin/2019R1" "#0a123266dd20b84b16a4cc60b752fc4b")
+            self.requires("msvc-redist/14.29.30133" "#9f10aa59e4671ce0669d6181e6b0a269")
+            self.requires("winsdk-redist/10.0.19041.0" "#acf550438d5c5d7c1be638c7ac9662e3")
 
         if self.isArm32 or self.isArm64:
-            self.requires("sse2neon/efcbd5" "#3afbbf213755a8fbd8a00e71c2dbc228")
+            self.requires("sse2neon/efcbd5" "#57aba3f11ce3af714a328146c08e5171")
 
         self._add_documentation_requirements()
 
     def _add_documentation_requirements(self):
-        self.requires(f"vms_help/5.0" "#0fcd55611025d356916d512bf7b8a67f")
-        self.requires(f"vms_quick_start_guide/5.0" "#568c88a5b8ef893dd3735a44e2c01215")
+        self.requires(f"vms_help/5.0" "#27fcc774b8e172ad18bf04060934bf56")
+        self.requires(f"vms_quick_start_guide/5.0" "#cf0e958c5edf4045eb6bbc41ee2cba5e")
 
     def imports(self):
         if self.isLinux:
