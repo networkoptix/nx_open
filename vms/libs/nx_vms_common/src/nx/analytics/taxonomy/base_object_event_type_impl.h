@@ -172,6 +172,8 @@ public:
             m_isPrivate = false;
 
         hasPublicDescendants |= !m_isPrivate;
+        if (m_descriptor.isHidden() && m_descriptor.hasEverBeenSupported)
+            hasPublicDescendants = true;
 
         if (m_base)
             m_base->resolvePrivateness(hasPublicDescendants);
