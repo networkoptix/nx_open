@@ -50,6 +50,7 @@ GraphicsWebEngineView::GraphicsWebEngineView(const QnResourcePtr &resource, QGra
     m_controller(new WebViewController(this))
 {
     setProperty(Qn::NoHandScrollOver, true);
+    setAcceptDrops(true);
 
     m_controller->setMenuSave(true);
 

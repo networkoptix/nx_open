@@ -4,40 +4,35 @@
 
 #include <memory>
 
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QGraphicsScene>
-#include <QtWidgets/QGraphicsView>
-#include <QtWidgets/QGraphicsSceneHoverEvent>
-#include <QtWidgets/QOpenGLWidget>
-
-#include <QtQml/QQmlComponent>
-#include <QtQml/QQmlEngine>
-
-#include <QtQuick/QQuickRenderControl>
-#include <QtQuick/QQuickWindow>
-#include <QtQuick/QQuickItem>
-
+#include <QtCore/QElapsedTimer>
+#include <QtCore/QtMath>
 #include <QtGui/QOffscreenSurface>
-#include <QtGui/QOpenGLFramebufferObject>
+#include <QtGui/QOpenGLBuffer>
 #include <QtGui/QOpenGLContext>
+#include <QtGui/QOpenGLFramebufferObject>
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOpenGLVertexArrayObject>
-#include <QtGui/QOpenGLBuffer>
 #include <QtGui/QPaintDevice>
 #include <QtGui/QPaintEngine>
-
-#include <QtCore/QtMath>
-#include <QtCore/QElapsedTimer>
+#include <QtQml/QQmlComponent>
+#include <QtQml/QQmlEngine>
+#include <QtQuick/QQuickItem>
+#include <QtQuick/QQuickRenderControl>
+#include <QtQuick/QQuickWindow>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsSceneHoverEvent>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QOpenGLWidget>
 
 #include <qt_graphics_items/graphics_utils.h>
 
-#include <nx/utils/log/log.h>
-
 #include <client_core/client_core_module.h>
-#include <ui/workaround/gl_native_painting.h>
-#include <ui/workaround/sharp_pixmap_painting.h>
+#include <nx/utils/log/log.h>
 #include <opengl_renderer.h>
 #include <ui/graphics/shaders/texture_color_shader_program.h>
+#include <ui/workaround/gl_native_painting.h>
+#include <ui/workaround/sharp_pixmap_painting.h>
 
 using namespace std::chrono;
 
@@ -575,6 +570,32 @@ void GraphicsQmlView::wheelEvent(QGraphicsSceneWheelEvent* event)
     const QPointF mousePoint = event->pos();
     const QPoint globalPos = event->screenPos();
     QWheelEvent mappedEvent(mousePoint, globalPos, event->delta(), event->buttons(), event->modifiers(), event->orientation());
+    QCoreApplication::sendEvent(d->quickWindow.data(), &mappedEvent);
+    event->setAccepted(mappedEvent.isAccepted());
+}
+
+void GraphicsQmlView::dragMoveEvent(QGraphicsSceneDragDropEvent* event)
+{
+    QDragMoveEvent mappedEvent(
+        event->pos().toPoint(),
+        event->possibleActions(),
+        event->mimeData(),
+        event->buttons(),
+        event->modifiers());
+
+    QCoreApplication::sendEvent(d->quickWindow.data(), &mappedEvent);
+    event->setAccepted(mappedEvent.isAccepted());
+}
+
+void GraphicsQmlView::dropEvent(QGraphicsSceneDragDropEvent* event)
+{
+    QDropEvent mappedEvent(
+        event->pos(),
+        event->possibleActions(),
+        event->mimeData(),
+        event->buttons(),
+        event->modifiers());
+
     QCoreApplication::sendEvent(d->quickWindow.data(), &mappedEvent);
     event->setAccepted(mappedEvent.isAccepted());
 }
