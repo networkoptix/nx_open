@@ -59,10 +59,7 @@ public:
     RemoteConnectionPtr connection() const;
 
     /** Auto-terminate server session when destroying. */
-    void setAutoTerminate(bool value = false);
-
-    /** Synchronization when terminating server session. */
-    void syncWhenTerminate();
+    void setAutoTerminate(bool value);
 
 signals:
     void stateChanged(State state);

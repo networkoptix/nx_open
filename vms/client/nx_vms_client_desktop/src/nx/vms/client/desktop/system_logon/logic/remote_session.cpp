@@ -11,7 +11,10 @@
 #include <client/client_module.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
+#include <network/system_helpers.h>
 #include <nx/reflect/json.h>
+#include <nx/vms/client/core/network/credentials_manager.h>
+#include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_connection_error.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
@@ -72,12 +75,47 @@ RemoteSession::~RemoteSession()
 {
     const bool sessionIsStillActive = qnClientModule->sharedMemoryManager()->leaveSession();
     if (sessionIsStillActive)
+    {
+        NX_VERBOSE(this, "Current session is not the latest one, keep token alive");
         setAutoTerminate(false);
+    }
+}
+
+std::shared_ptr<RemoteSession> RemoteSession::instance()
+{
+    return std::dynamic_pointer_cast<RemoteSession>(
+        qnClientCoreModule->networkModule()->session());
 }
 
 SessionId RemoteSession::sessionId() const
 {
     return m_sessionId;
+}
+
+void RemoteSession::autoTerminateIfNeeded()
+{
+    NX_VERBOSE(this, "User ended session manually");
+
+    auto connection = this->connection();
+    if (!NX_ASSERT(connection))
+        return;
+
+    const auto systemId = ::helpers::getLocalSystemId(connection->moduleInformation());
+    const auto storedCredentials = CredentialsManager::credentials(
+        systemId,
+        connection->credentials().username);
+    const bool hasStoredCredentials = storedCredentials
+        && storedCredentials->authToken.isBearerToken()
+        && !storedCredentials->authToken.value.empty();
+
+    if (hasStoredCredentials)
+    {
+        NX_VERBOSE(this, "Keep token alive as it is stored locally");
+    }
+    else
+    {
+        setAutoTerminate(true);
+    }
 }
 
 bool RemoteSession::keepCurrentServerOnError(RemoteConnectionErrorCode error)

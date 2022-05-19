@@ -42,9 +42,14 @@ enum IDType
     ConnectToCloudSystemAction,
 
     /**
-     * Disconnects from server.
+     * Disconnects from the current Server (universal internal action).
      */
     DisconnectAction,
+
+    /**
+     * Disconnects from the current Server (main menu user-only action).
+     */
+    DisconnectMainMenuAction,
 
     /**
     * Switches mode to browse resources/show welcome screen

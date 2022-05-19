@@ -20,7 +20,18 @@ public:
     RemoteSession(core::RemoteConnectionPtr connection, QObject* parent = nullptr);
     virtual ~RemoteSession() override;
 
+    /**
+     * In the current version there only one Remote Session instance. When multiple sessions are
+     * supported, accessor will be changed.
+     */
+    static std::shared_ptr<RemoteSession> instance();
+
     SessionId sessionId() const;
+
+    /**
+     * Auto-terminate current session on closing if user did not save the token locally.
+     */
+    void autoTerminateIfNeeded();
 
 protected:
     virtual bool keepCurrentServerOnError(core::RemoteConnectionErrorCode error) override;

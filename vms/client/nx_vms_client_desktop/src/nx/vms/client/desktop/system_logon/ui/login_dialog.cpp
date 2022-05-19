@@ -22,6 +22,7 @@
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/help/help_topic_accessor.h>
@@ -265,6 +266,8 @@ void LoginDialog::sendTestConnectionRequest(const nx::utils::Url& url)
             }
             else
             {
+                if (auto session = RemoteSession::instance())
+                    session->autoTerminateIfNeeded();
                 auto connection = std::get<RemoteConnectionPtr>(result);
                 menu()->trigger(ui::action::ConnectAction,
                     ui::action::Parameters().withArgument(Qn::RemoteConnectionRole, connection));
@@ -388,6 +391,8 @@ void LoginDialog::at_testButton_clicked()
     updateFocus();
     if (requestedConnection)
     {
+        if (auto session = RemoteSession::instance())
+            session->autoTerminateIfNeeded();
         menu()->trigger(ui::action::ConnectAction,
             ui::action::Parameters().withArgument(Qn::RemoteConnectionRole, requestedConnection));
         base_type::accept();
