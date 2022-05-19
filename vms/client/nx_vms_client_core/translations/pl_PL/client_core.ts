@@ -239,11 +239,11 @@
     </message>
     <message>
       <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
-      <translation type="unfinished">You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</translation>
+      <translation>Próbowałeś połączyć się z: %1, ale serwer przedstawił certyfikat, którego nie można automatycznie zweryfikować.</translation>
     </message>
     <message>
       <source>You attempted to connect to: %1 but the Server&apos;s certificate has changed.</source>
-      <translation type="unfinished">You attempted to connect to: %1 but the Server&apos;s certificate has changed.</translation>
+      <translation>Próbowałeś połączyć się z: %1, ale certyfikat serwera &apos; uległ zmianie.</translation>
     </message>
   </context>
 </TS>
