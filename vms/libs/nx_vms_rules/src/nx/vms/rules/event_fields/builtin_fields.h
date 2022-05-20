@@ -8,6 +8,7 @@
 #include "customizable_icon_field.h"
 #include "customizable_text_field.h"
 #include "expected_uuid_field.h"
+#include "input_port_field.h"
 #include "int_field.h"
 #include "keywords_field.h"
 #include "source_camera_field.h"
