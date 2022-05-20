@@ -96,6 +96,7 @@ TEST_F(BuiltinTypesTest, BuiltinEvents)
     testEventFieldRegistration<AnalyticsObjectTypeField>(systemContext());
     testEventFieldRegistration<CustomizableIconField>();
     testEventFieldRegistration<CustomizableTextField>();
+    testEventFieldRegistration<InputPortField>();
     testEventFieldRegistration<StateField>();
     testEventFieldRegistration<EventTextField>();
     testEventFieldRegistration<ExpectedUuidField>();
@@ -109,7 +110,7 @@ TEST_F(BuiltinTypesTest, BuiltinEvents)
     //testEventRegistration<AnalyticsEvent>();
     testEventRegistration<AnalyticsObjectEvent>();
     //testEventRegistration<BackupFinishedEvent>();
-    //testEventRegistration<CameraInputEvent>();
+    testEventRegistration<CameraInputEvent>();
     testEventRegistration<DebugEvent>();
     testEventRegistration<DeviceDisconnectedEvent>();
     testEventRegistration<DeviceIpConflictEvent>();
