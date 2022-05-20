@@ -3,12 +3,9 @@
 #include "camera_schedule_widget.h"
 #include "ui_camera_schedule_widget.h"
 
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/misc/schedule_task.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <nx/utils/log/assert.h>
@@ -21,7 +18,6 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
-#include <nx/vms/common/html/html.h>
 #include <nx/vms/license/usage_helper.h>
 #include <ui/common/palette.h>
 #include <ui/common/read_only.h>
@@ -280,8 +276,8 @@ void CameraScheduleWidget::loadAlerts(const CameraSettingsDialogState& state)
             return QString();
         }());
 
-    const auto getRecordingAlertText =
-        [&state]
+    ui->recordingAlertBar->setText(
+        [&state]()
         {
             if (!state.recordingAlert)
                 return QString();
@@ -307,52 +303,7 @@ void CameraScheduleWidget::loadAlerts(const CameraSettingsDialogState& state)
 
             NX_ASSERT(false);
             return QString();
-        };
-
-    const auto getReplacedCameraRecordingAlertText =
-        [&state]
-        {
-            if (state.devicesDescription.hasBeenReplaced == CombinedValue::None
-                || !state.recording.enabled.hasValue()
-                || !state.recording.enabled())
-            {
-                return QString();
-            }
-
-            if (state.isSingleCamera())
-            {
-                const auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
-                const auto replacementCamera =
-                    resourcePool->getResourceById<QnVirtualCameraResource>(
-                        state.singleCameraProperties.foundReplacementCameraId);
-
-                const auto replacementCameraName = QStringList({
-                    nx::vms::common::html::bold(replacementCamera->getName()),
-                    QnResourceDisplayInfo(replacementCamera).host()})
-                        .join(QChar::Nbsp);
-
-                return tr("This camera has been replaced by the %1. Enabling recording will "
-                        "discard archive transfer, whole archive from the %1 will be moved "
-                        "to this camera")
-                    .arg(replacementCameraName);
-            }
-            else
-            {
-                return tr("Selected devices contain cameras that have been replaced, enabling "
-                    "recording for that cameras will discard archive transfer: archives from "
-                    "corresponding replacement cameras will be moved back");
-            }
-        };
-
-    QString recordingAlertBarText;
-
-    if (const auto alert = getRecordingAlertText(); !alert.isEmpty())
-        recordingAlertBarText.append(nx::vms::common::html::paragraph(alert));
-
-    if (const auto alert = getReplacedCameraRecordingAlertText(); !alert.isEmpty())
-        recordingAlertBarText.append(nx::vms::common::html::paragraph(alert));
-
-    ui->recordingAlertBar->setText(recordingAlertBarText);
+        }());
 }
 
 QnScheduleTaskList CameraScheduleWidget::calculateScheduleTasks() const

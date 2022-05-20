@@ -326,6 +326,8 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::MediaFileSettingsAction), &QAction::triggered, this, &ActionHandler::at_mediaFileSettingsAction_triggered);
     connect(action(action::ReplaceCameraAction), &QAction::triggered,
         this, &ActionHandler::replaceCameraActionTriggered);
+    connect(action(action::UndoReplaceCameraAction), &QAction::triggered,
+        this, &ActionHandler::undoReplaceCameraActionTriggered);
     connect(action(action::CameraIssuesAction), SIGNAL(triggered()), this, SLOT(at_cameraIssuesAction_triggered()));
     connect(action(action::CameraBusinessRulesAction), SIGNAL(triggered()), this, SLOT(at_cameraBusinessRulesAction_triggered()));
     connect(action(action::CameraDiagnosticsAction), SIGNAL(triggered()), this, SLOT(at_cameraDiagnosticsAction_triggered()));
@@ -2234,6 +2236,28 @@ void ActionHandler::replaceCameraActionTriggered()
     }
 
     replaceCameraDialog.exec();
+}
+
+void ActionHandler::undoReplaceCameraActionTriggered()
+{
+    const auto camera =
+        menu()->currentParameters(sender()).resource().dynamicCast<QnVirtualCameraResource>();
+
+    if (!NX_ASSERT(camera, "Expected parameter is missing"))
+        return;
+
+    const auto callback = nx::utils::guarded(this,
+        [this]
+        (bool success,
+            rest::Handle requestId, rest::ServerConnection::EmptyResponseType requestResult)
+        {
+            // TODO: #vbreus Notify about result.
+        });
+
+    connectedServerApi()->undoReplaceDevice(
+            camera->getId(),
+            callback,
+            thread());
 }
 
 void ActionHandler::at_cameraIssuesAction_triggered()

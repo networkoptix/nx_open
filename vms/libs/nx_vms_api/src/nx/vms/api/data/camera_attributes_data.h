@@ -173,9 +173,6 @@ struct NX_VMS_API CameraAttributesData
     BackupContentTypes backupContentType = BackupContentType::archive; //< What to backup content wise.
     BackupPolicy backupPolicy = BackupPolicy::byDefault;
 
-    /**%apidoc[readonly] */
-    QString replaceWithId;
-
     /** Used by ...Model::toDbTypes() and transaction-description-modify checkers. */
     CheckResourceExists checkResourceExists = CheckResourceExists::yes; /**<%apidoc[unused] */
 };
@@ -198,8 +195,7 @@ struct NX_VMS_API CameraAttributesData
     (recordBeforeMotionSec) \
     (recordAfterMotionSec) \
     (backupContentType) \
-    (backupPolicy) \
-    (replaceWithId)
+    (backupPolicy)
 
 #define CameraAttributesData_Fields (cameraId)(cameraName) CameraAttributesData_Fields_Short
 

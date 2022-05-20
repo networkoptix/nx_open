@@ -4,7 +4,6 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_type.h>
-#include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
 
 namespace {
@@ -25,34 +24,6 @@ namespace utils {
 namespace camera_replacement {
 
 using namespace nx::vms::api;
-
-bool isReplacementCamera(const QnResourcePtr& resource)
-{
-    if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
-        return !camera->replaceWithId().isEmpty();
-
-    return false;
-}
-
-QnVirtualCameraResourcePtr findReplacementCamera(const QnResourcePtr& resource)
-{
-    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-    if (!camera)
-        return {};
-
-    const auto resourcePool = camera->resourcePool();
-    if (!NX_ASSERT(resourcePool))
-        return {};
-
-    return resourcePool->getResource<QnVirtualCameraResource>(
-        [camera](const QnVirtualCameraResourcePtr& otherCamera)
-        {
-            if (camera == otherCamera)
-                return false;
-
-            return otherCamera->replaceWithId() == camera->getPhysicalId();
-        });
-}
 
 bool cameraSupportsReplacement(const QnResourcePtr& resource)
 {

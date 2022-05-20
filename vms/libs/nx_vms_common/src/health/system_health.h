@@ -46,6 +46,7 @@ enum MessageType
     backupStoragesNotConfigured = 21, //< Generated on the client side since 4.3.
 
     cameraRecordingScheduleIsInvalid = 22, //< Generated on the client side.
+    deviceIsReplacedWith = 23, //< Camera have been replaced but now it is back online.
 
     // IMPORTANT!!!
     // Enum order change is forbidden as leads to stored settings failure and protocol change.

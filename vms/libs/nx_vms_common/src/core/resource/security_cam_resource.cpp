@@ -1876,23 +1876,6 @@ nx::vms::api::ExtendedCameraOutputs QnSecurityCamResource::extendedOutputs() con
     return result;
 }
 
-void QnSecurityCamResource::setReplaceWithId(const QString& replaceWithId)
-{
-    {
-        NX_MUTEX_LOCKER lock(&m_attributesMutex);
-        if (m_userAttributes.replaceWithId == replaceWithId)
-            return;
-        m_userAttributes.replaceWithId = replaceWithId;
-    }
-    emit replaceWithIdChanged(::toSharedPointer(this));
-}
-
-QString QnSecurityCamResource::replaceWithId() const
-{
-    NX_MUTEX_LOCKER lock(&m_attributesMutex);
-    return m_userAttributes.replaceWithId;
-}
-
 nx::vms::api::CameraAttributesData QnSecurityCamResource::getUserAttributes() const
 {
     NX_MUTEX_LOCKER lock(&m_attributesMutex);
@@ -1954,9 +1937,6 @@ void QnSecurityCamResource::setUserAttributesAndNotify(
 
     if (originalAttributes.backupPolicy != attributes.backupPolicy)
         emit backupPolicyChanged(::toSharedPointer(this));
-
-    if (originalAttributes.replaceWithId != attributes.replaceWithId)
-        emit replaceWithIdChanged(::toSharedPointer(this));
 }
 
 bool QnSecurityCamResource::isRtspMetatadaRequired() const

@@ -236,8 +236,6 @@ public:
         return getNetworkResourceByPhysicalId(id).dynamicCast<Resource>();
     }
 
-    QnSecurityCamResourcePtr getCameraByReplaceWithId(const QString& id) const;
-    
     template<class Resource>
     QnSharedResourcePointer<Resource> getResourceById(const QnUuid& id) const
     {

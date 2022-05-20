@@ -93,16 +93,11 @@ struct DeviceOptions
 
     /**%apidoc[opt] */
     BackupPolicy backupPolicy = BackupPolicy::byDefault;
-
-    /**%apidoc[readonly]
-     * %// Appeared starting from /rest/v2/devices.
-     */
-    QString replaceWithId;
 };
 #define DeviceOptions_Fields \
     (isControlEnabled)(isAudioEnabled)(isDualStreamingDisabled) \
     (dewarpingParams)(preferredServerId)(failoverPriority)(backupQuality)(backupContentType) \
-    (backupPolicy)(replaceWithId)
+    (backupPolicy)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceOptions, (json), NX_VMS_API)
 
 struct DeviceScheduleSettings

@@ -49,7 +49,7 @@ public:
 
     static constexpr nx::vms::api::StreamIndex kDefaultAnalyzedStreamIndex =
         nx::vms::api::StreamIndex::primary;
-    virtual QString recordingCatalog() const { return QString(); }
+
 public:
     QnVirtualCameraResource();
 

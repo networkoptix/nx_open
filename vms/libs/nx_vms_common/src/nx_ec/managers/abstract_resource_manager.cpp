@@ -107,4 +107,13 @@ ErrorCode AbstractResourceManager::removeSync(const nx::vms::api::ResourceParamW
         });
 }
 
+ErrorCode AbstractResourceManager::removeHardwareIdMappingSync(const QnUuid& resourceId)
+{
+    return detail::callSync(
+        [&](auto handler)
+        {
+            removeHardwareIdMapping(resourceId, std::move(handler));
+        });
+}
+
 } // namespace ec2

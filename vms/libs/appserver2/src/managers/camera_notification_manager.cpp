@@ -47,8 +47,6 @@ void QnCameraNotificationManager::triggerNotification(
     const QnTransaction<nx::vms::api::IdData>& tran,
     NotificationSource /*source*/)
 {
-    NX_ASSERT(tran.command == ApiCommand::removeCamera ||
-        tran.command == ApiCommand::removeCameraUserAttributes);
     switch (tran.command)
     {
     case ApiCommand::removeCamera:
@@ -56,6 +54,9 @@ void QnCameraNotificationManager::triggerNotification(
         break;
     case ApiCommand::removeCameraUserAttributes:
         emit userAttributesRemoved(tran.params.id);
+        break;
+    case ApiCommand::removeHardwareIdMapping:
+        emit hardwareIdMappingRemoved(tran.params.id);
         break;
     default:
         NX_ASSERT(0);
@@ -68,6 +69,20 @@ void QnCameraNotificationManager::triggerNotification(
 {
     if (tran.command == ApiCommand::addCameraHistoryItem)
         emit cameraHistoryChanged(tran.params);
+}
+
+void QnCameraNotificationManager::triggerNotification(
+    const QnTransaction<nx::vms::api::HardwareIdMapping>& tran,
+    NotificationSource /*source*/)
+{
+    switch (tran.command)
+    {
+        case ApiCommand::addHardwareIdMapping:
+            emit hardwareIdMappingAdded(tran.params);
+            break;
+        default:
+            NX_ASSERT(false);
+    }
 }
 
 } // namespace ec2

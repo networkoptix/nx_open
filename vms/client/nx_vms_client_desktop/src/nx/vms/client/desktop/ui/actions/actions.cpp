@@ -1545,6 +1545,11 @@ void initialize(Manager* manager, Action* root)
                 !condition::isLayoutTourReviewMode()
                 && !condition::isPreviewSearchMode()));
 
+    factory(UndoReplaceCameraAction)
+        .flags(SingleTarget | ResourceTarget)
+        .requiredGlobalPermission(GlobalPermission::admin)
+        .mode(DesktopMode);
+
     factory(CameraIssuesAction)
         .mode(DesktopMode)
         .flags(Scene | Tree | Table | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget)

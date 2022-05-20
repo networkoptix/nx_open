@@ -95,4 +95,35 @@ ErrorCode AbstractCameraManager::saveUserAttributesSync(
         });
 }
 
+ErrorCode AbstractCameraManager::addHardwareIdMappingSync(
+    const nx::vms::api::HardwareIdMapping& hardwareIdMapping)
+{
+    return detail::callSync(
+        [&](auto handler)
+        {
+            addHardwareIdMapping(hardwareIdMapping, std::move(handler));
+        });
+}
+
+ErrorCode AbstractCameraManager::removeHardwareIdMappingSync(
+    const QnUuid& id)
+{
+    return detail::callSync(
+        [&](auto handler)
+        {
+            removeHardwareIdMapping(id, std::move(handler));
+        });
+}
+
+ErrorCode AbstractCameraManager::getHardwareIdMappingsSync(
+    nx::vms::api::HardwareIdMappingList* outHardwareIdMappings)
+{
+    return detail::callSync(
+        [&](auto handler)
+        {
+            getHardwareIdMappings(std::move(handler));
+        },
+        outHardwareIdMappings);
+}
+
 } // namespace ec2

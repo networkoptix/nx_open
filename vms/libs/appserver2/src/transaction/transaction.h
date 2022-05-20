@@ -11,17 +11,18 @@
 #include <nx/fusion/serialization/xml.h>
 #include <nx/reflect/instrument.h>
 
-#include <nx/vms/api/data/timestamp.h>
-#include <utils/crypt/symmetrical.h>
+#include <nx/vms/api/data/database_dump_to_file_data.h>
 #include <nx/vms/api/data/full_info_data.h>
+#include <nx/vms/api/data/hardware_id_mapping.h>
 #include <nx/vms/api/data/license_data.h>
+#include <nx/vms/api/data/peer_alive_data.h>
 #include <nx/vms/api/data/resource_type_data.h>
 #include <nx/vms/api/data/server_runtime_event_data.h>
-#include <nx/vms/api/data/update_sequence_data.h>
-#include <nx/vms/api/data/peer_alive_data.h>
-#include <nx/vms/api/data/database_dump_to_file_data.h>
 #include <nx/vms/api/data/system_merge_history_record.h>
+#include <nx/vms/api/data/timestamp.h>
+#include <nx/vms/api/data/update_sequence_data.h>
 #include <nx_ec/abstract_ec_connection.h>
+#include <utils/crypt/symmetrical.h>
 
 namespace ec2 {
 
@@ -483,6 +484,42 @@ APPLY(314, removeCameraUserAttributes, nx::vms::api::IdData, \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
+APPLY(315, addHardwareIdMapping, nx::vms::api::HardwareIdMapping, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       false, /*isRemoveOperation*/ \
+                       HardwareIdMappingHashHelper(), /* getHash*/ \
+                       CameraNotificationManagerHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AdminOnlyAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
+APPLY(316, removeHardwareIdMapping, nx::vms::api::IdData, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       true, /*isRemoveOperation*/ \
+                       CreateHashByIdRfc4122Helper("hardwareid_mapping"), /* getHash*/ \
+                       CameraNotificationManagerHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AdminOnlyAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
+APPLY(317, getHardwareIdMappings, nx::vms::api::HardwareIdMappingList, \
+                       false, /* persistent*/ \
+                       false, /* system*/ \
+                       false, /*isRemoveOperation*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       InvalidTriggerNotificationHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
+                       FilterListByAccess<AdminOnlyAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
 APPLY(400, getMediaServers, nx::vms::api::MediaServerDataList, \
                        false, /* persistent*/ \

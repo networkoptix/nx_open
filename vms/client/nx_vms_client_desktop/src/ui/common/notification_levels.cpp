@@ -48,6 +48,7 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageT
         case QnSystemHealth::NoInternetForTimeSync:
         case QnSystemHealth::UsersEmailIsEmpty:
         case QnSystemHealth::cameraRecordingScheduleIsInvalid:
+        case QnSystemHealth::deviceIsReplacedWith:
             return QnNotificationLevel::Value::ImportantNotification;
 
         // Red notifications.
