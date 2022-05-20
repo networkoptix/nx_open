@@ -121,8 +121,7 @@ private:
     SwsContext *m_scaleContext;
     int m_outputWidth;
     int m_outputHeight;
-    bool m_enableFrameQueue;
-    bool m_queueUsed;
+    bool m_mtDecoding = false;
     bool m_needReinitDecoders;
     bool m_reverseMode;
     bool m_prevReverseMode;
@@ -164,9 +163,7 @@ private:
         QnFrameScaler::DownscaleFactor forceFactor);
     bool processDecodedFrame(
         QnAbstractVideoDecoder* dec,
-        const CLConstVideoDecoderOutputPtr& outFrame,
-        bool enableFrameQueue,
-        bool reverseMode);
+        const CLConstVideoDecoderOutputPtr& outFrame);
     void checkQueueOverflow();
     void clearReverseQueue();
 
