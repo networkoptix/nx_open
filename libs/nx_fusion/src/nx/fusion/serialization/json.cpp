@@ -247,6 +247,7 @@ public:
         registerSerializer<QStringList>();
         registerSerializer<QList<QString>>();
         registerSerializer<QList<QByteArray>>();
+        registerSerializer<QVector<bool>>();
 
         registerSerializer<QColor>();
         registerSerializer<QBrush>();
