@@ -76,7 +76,7 @@ set(conan_home $ENV{CONAN_USER_HOME})
 set(_additional_conan_parameters)
 if(targetDevice MATCHES "^linux|^edge")
     set(_additional_conan_parameters
-        "    --profile:host ${open_source_root}/cmake/conan_profiles/gcc.profile"
+        "        --profile:host ${open_source_root}/cmake/conan_profiles/gcc.profile"
     )
 endif()
 
@@ -84,17 +84,22 @@ set(_run_conan_script_contents
     "#!/usr/bin/env -S cmake -P"
     ""
     "set(ENV{CONAN_USER_HOME} ${conan_home})"
-    "execute_process(COMMAND"
-    "    ${CONAN_EXECUTABLE} install ${CMAKE_SOURCE_DIR}"
-    "    --install-folder ${CMAKE_BINARY_DIR}"
-    "    --profile:build default"
-    "    --profile:host ${CMAKE_SOURCE_DIR}/conan_profiles/${conan_profile}.profile"
-    "    --update"
-    "    -s build_type=${build_type}"
-    "    -o targetDevice=${targetDevice}"
-    "    -o useClang=${use_clang}"
+    "execute_process("
+    "    COMMAND"
+    "        ${CONAN_EXECUTABLE} install ${CMAKE_SOURCE_DIR}"
+    "        --install-folder ${CMAKE_BINARY_DIR}"
+    "        --profile:build default"
+    "        --profile:host ${CMAKE_SOURCE_DIR}/conan_profiles/${conan_profile}.profile"
+    "        --update"
+    "        -s build_type=${build_type}"
+    "        -o targetDevice=${targetDevice}"
+    "        -o useClang=${use_clang}"
     ${_additional_conan_parameters}
+    "    RESULT_VARIABLE result"
     ")"
+    "if(NOT result EQUAL 0)"
+    "    message(FATAL_ERROR \"Conan failed to install the dependencies.\")"
+    "endif()"
     ""
 )
 string(JOIN "\n" _run_conan_script_contents ${_run_conan_script_contents})
