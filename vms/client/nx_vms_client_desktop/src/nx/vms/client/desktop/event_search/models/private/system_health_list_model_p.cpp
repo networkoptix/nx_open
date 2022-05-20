@@ -33,6 +33,13 @@
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/workbench_context.h>
 
+namespace {
+
+static const auto kDeviceNameAttribute = "deviceName";
+static const auto kOldDeviceUrlAttribute = "oldDeviceUrl";
+
+} // namespace
+
 namespace nx::vms::client::desktop {
 
 using namespace ui;
@@ -191,6 +198,24 @@ QString SystemHealthListModel::Private::text(int index) const
                 m_camerasWithInvalidSchedule.size());
         }
 
+        case QnSystemHealth::deviceIsReplacedWith:
+        {
+            using namespace nx::vms::common;
+            using namespace nx::common::metadata;
+            using namespace nx::vms::client::desktop;
+
+            static const auto kDeviceNameColor = ColorTheme::instance()->color("light10");
+
+            const auto caption = tr("Replaced camera discovered");
+
+            auto attributes = item.serverData->getRuntimeParams().attributes;
+            const auto deviceName =
+                findFirstAttributeByName(&attributes, kDeviceNameAttribute)->value;
+
+            return html::paragraph(caption)
+                + html::paragraph(html::colored(deviceName, kDeviceNameColor));
+        }
+
         case QnSystemHealth::RemoteArchiveSyncStarted:
         case QnSystemHealth::RemoteArchiveSyncFinished:
         case QnSystemHealth::RemoteArchiveSyncProgress:
@@ -252,6 +277,36 @@ QString SystemHealthListModel::Private::toolTip(int index) const
         return result.join(kLineBreak);
     }
 
+    if (item.message == QnSystemHealth::deviceIsReplacedWith)
+    {
+        using namespace nx::vms::common;
+        using namespace nx::common::metadata;
+
+        auto attributes = item.serverData->getRuntimeParams().attributes;
+
+        const auto discoveredCameraName =
+            findFirstAttributeByName(&attributes, kDeviceNameAttribute)->value;
+        const auto discoveredCameraUrl =
+            nx::utils::Url(findFirstAttributeByName(&attributes, kOldDeviceUrlAttribute)->value);
+        const auto discoveredCameraHost = discoveredCameraUrl.host();
+        const auto discoveredCameraText = QStringList({
+            html::bold(discoveredCameraName), discoveredCameraHost}).join(QChar::Space);
+
+        const auto replacementCameraText = QStringList({
+            html::bold(item.resource->getName()), QnResourceDisplayInfo(item.resource).host()})
+                .join(QChar::Space);
+
+        QStringList tooltipLines;
+
+        tooltipLines.append(tr("Camera %1 has been replaced by %2.")
+            .arg(discoveredCameraText)
+            .arg(replacementCameraText));
+
+        tooltipLines.append(tr("Click on the \"Undo Replace\" to continue using two devices."));
+
+        return tooltipLines.join("<br>");
+    }
+
     return QnSystemHealthStringsHelper::messageTooltip(item.message,
         QnResourceDisplayInfo(item.resource).toString(qnSettings->resourceInfoLevel()));
 }
@@ -289,21 +344,43 @@ bool SystemHealthListModel::Private::isCloseable(int index) const
 
 CommandActionPtr SystemHealthListModel::Private::commandAction(int index) const
 {
-    if (m_items[index].message != QnSystemHealth::DefaultCameraPasswords)
-        return {};
+    const auto& item = m_items[index];
 
-    auto action = CommandActionPtr(new CommandAction(tr("Set Passwords")));
-    connect(action.data(), &QAction::triggered, this,
-        [this]()
+    switch (item.message)
+    {
+        case QnSystemHealth::DefaultCameraPasswords:
         {
-            const auto state = context()->instance<SystemHealthState>();
-            const auto parameters = action::Parameters(m_camerasWithDefaultPassword)
-                .withArgument(Qn::ForceShowCamerasList, true);
+            const auto action = CommandActionPtr(new CommandAction(tr("Set Passwords")));
+            connect(action.data(), &QAction::triggered, this,
+                [this]
+                {
+                    const auto state = context()->instance<SystemHealthState>();
+                    const auto parameters = action::Parameters(m_camerasWithDefaultPassword)
+                        .withArgument(Qn::ForceShowCamerasList, true);
 
-            menu()->triggerIfPossible(action::ChangeDefaultCameraPasswordAction, parameters);
-        });
+                    menu()->triggerIfPossible(
+                        action::ChangeDefaultCameraPasswordAction, parameters);
+                });
 
-    return action;
+            return action;
+        }
+
+        case QnSystemHealth::deviceIsReplacedWith:
+        {
+            const auto action = CommandActionPtr(new CommandAction(tr("Undo Replace")));
+            connect(action.data(), &QAction::triggered, this,
+                [this, resource = item.resource]
+                {
+                    const auto parameters = action::Parameters(resource);
+                    menu()->triggerIfPossible(action::UndoReplaceCameraAction, parameters);
+                });
+
+            return action;
+        }
+
+        default:
+            return {};
+    }
 }
 
 action::IDType SystemHealthListModel::Private::action(int index) const

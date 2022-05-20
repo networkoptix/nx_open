@@ -1558,6 +1558,19 @@ Handle ServerConnection::replaceDevice(
     return executeRequest(request, std::move(internal_callback), targetThread);
 }
 
+Handle ServerConnection::undoReplaceDevice(
+    const QnUuid& deviceId,
+    PostCallback&& callback,
+    QThread* targetThread)
+{
+    return executeDelete(
+        nx::format("/rest/v2/devices/%1/replace", deviceId),
+        nx::network::rest::Params(),
+        callback,
+        targetThread,
+        {});
+}
+
 Handle ServerConnection::recordedTimePeriods(
     const QnChunksRequestData& request,
     Result<MultiServerPeriodDataList>::type&& callback,

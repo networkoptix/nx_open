@@ -3,7 +3,6 @@
 #include "camera_settings_dialog_state_conversion_functions.h"
 
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QLabel>
 
 #include <core/ptz/ptz_preset.h>
 #include <core/resource/camera_resource.h>
@@ -17,7 +16,6 @@
 #include <nx/vms/client/core/motion/motion_grid.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/widgets/views/resource_list_view.h>
-#include <utils/camera/camera_replacement.h>
 
 #include "../flux/camera_settings_dialog_state.h"
 #include "../flux/camera_settings_dialog_state_reducer.h"
@@ -150,76 +148,7 @@ void setRecordingAfterThreshold(
 
 void setRecordingEnabled(bool value, const Cameras& cameras)
 {
-    using namespace nx::vms::common::utils;
-
-    const auto filterReplacedCameras =
-        [value](const Cameras& cameras)
-        {
-            if (!value)
-                return cameras;
-
-            QnResourceList replacedCameras;
-            QnResourceList replacementCameras;
-            for (const auto camera: cameras)
-            {
-                if (const auto replacementCamera = camera_replacement::findReplacementCamera(camera))
-                {
-                    replacedCameras.push_back(camera);
-                    replacementCameras.push_back(replacementCamera);
-                }
-            }
-
-            if (replacedCameras.empty())
-                return cameras;
-
-            QnMessageBox messageBox(QnMessageBoxIcon::Warning, 
-                /*text*/ {}, 
-                /*extras*/ {},
-                QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-                QDialogButtonBox::Ok,
-                QApplication::activeWindow());
-
-            const auto caption = CameraSettingsDialogStateConversionFunctions::tr(
-                "Confirm archive transfer discarding");
-
-            const auto replacedCamerasHint = replacedCameras.size() == 1
-                ? CameraSettingsDialogStateConversionFunctions::tr(
-                    "Enabling recording on the camera that has been replaced earlier will undo "
-                    "archive transfer, existing archive from the replacement camera will be "
-                    "moved back to that camera:")
-                : CameraSettingsDialogStateConversionFunctions::tr(
-                    "Enabling recording on the cameras that have been replaced earlier will undo "
-                    "archives transfer, existing archives from the corresponding replacement "
-                    "cameras will be moved back to that cameras:");
-
-            const auto replacementCamerasHint = replacedCameras.size() == 1
-                ? CameraSettingsDialogStateConversionFunctions::tr(
-                    "A new archive will be created for the camera used as a replacement:")
-                : CameraSettingsDialogStateConversionFunctions::tr(
-                    "New archives will be created for the corresponding replacement cameras:");
-
-            const auto confirmationQuestion = CameraSettingsDialogStateConversionFunctions::tr(
-                "Do you want to proceed with this action?");
-
-            messageBox.setText(caption);
-            messageBox.setInformativeText(replacedCamerasHint);
-            messageBox.addCustomWidget(new QnResourceListView(replacedCameras, &messageBox));
-            messageBox.addCustomWidget(new QLabel(replacementCamerasHint, &messageBox));
-            messageBox.addCustomWidget(new QnResourceListView(replacementCameras, &messageBox));
-            messageBox.addCustomWidget(new QLabel(confirmationQuestion, &messageBox));
-
-            const auto button = messageBox.exec();
-
-            return button == QDialogButtonBox::Ok
-                ? cameras
-                : cameras.filtered(
-                    [&replacedCameras](const auto& camera)
-                    {
-                        return !replacedCameras.contains(camera);
-                    });
-        };
-
-    for (const auto& camera: filterReplacedCameras(cameras))
+    for (const auto& camera: cameras)
         camera->setScheduleEnabled(value);
 }
 

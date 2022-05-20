@@ -9,23 +9,6 @@ namespace utils {
 namespace camera_replacement {
 
 /**
- * @param resource Valid pointer to the camera resource expected.
- * @return True if given resource is valid camera resource and has been configured as a replacement
- *     for another camera previously.
- */
-bool NX_VMS_COMMON_API isReplacementCamera(const QnResourcePtr& resource);
-
-/**
- * @param resource Valid pointer to the camera resource expected.
- * @return Pointer to the camera resource which has been configured as a replacement camera for the
- *     given camera, null pointer if such camera isn't found in the system. The situation when such
- *     camera is present in the system is possible if replaced camera was rediscovered again. Thus,
- *     if this function returns non-null pointer, it follows that the camera resource passed as a
- *     parameter represents device that was replaced earlier.
- */
-QnVirtualCameraResourcePtr NX_VMS_COMMON_API findReplacementCamera(const QnResourcePtr& resource);
-
-/**
  * Predicate that determines if camera has capability of being replaced or vice versa if camera can
  * act as replacement device. Having this capability for both of devices involved is a necessary
  * but not sufficient condition to have ability to perform replacement operation.

@@ -58,6 +58,12 @@ public:
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
+    // TODO: #vbreus Temporary implementation, remove as REST API request will be implemented.
+    virtual int removeHardwareIdMapping(
+        const QnUuid& resourceId,
+        Handler<> handler,
+        nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
+
 private:
     decltype(auto) processor() { return m_queryProcessor->getAccess(m_userSession); }
 
@@ -208,6 +214,21 @@ int QnResourceManager<T>::remove(
     processor().processUpdateAsync(
         ApiCommand::removeResources,
         params,
+        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+    return requestId;
+}
+
+template<class T>
+int QnResourceManager<T>::removeHardwareIdMapping(
+    const QnUuid& resourceId,
+    Handler<> handler,
+    nx::utils::AsyncHandlerExecutor handlerExecutor)
+{
+    handler = handlerExecutor.bind(std::move(handler));
+    const int requestId = generateRequestID();
+    processor().processUpdateAsync(
+        ApiCommand::removeHardwareIdMapping,
+        nx::vms::api::IdData(resourceId),
         [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
     return requestId;
 }

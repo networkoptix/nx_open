@@ -656,6 +656,11 @@ public:
         Result<nx::vms::api::DeviceReplacementResponse>::type&& callback,
         QThread* targetThread = nullptr);
 
+    Handle undoReplaceDevice(
+        const QnUuid& deviceId,
+        PostCallback&& callback,
+        QThread* targetThread = nullptr);
+
     Handle debug(
         const QString& action,
         const QString& value,

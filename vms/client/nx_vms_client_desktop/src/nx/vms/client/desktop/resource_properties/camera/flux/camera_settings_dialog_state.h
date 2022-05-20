@@ -62,8 +62,6 @@ struct SingleCameraProperties
     QSize primaryStreamResolution;
     QSize secondaryStreamResolution;
 
-    QnUuid foundReplacementCameraId;
-
     std::optional<QnCameraAdvancedParams> advancedSettingsManifest;
 
     /** Camera's supported object types, not filtered by engines. */
@@ -74,7 +72,7 @@ NX_REFLECTION_INSTRUMENT(SingleCameraProperties,
     (id)(name)(firmware)(model)(vendor)(macAddress)(ipAddress)(webPageLabelText)(settingsUrl)
     (overrideXmlHttpRequestTimeout)(overrideHttpUserAgent)(isOnline)(fixupRequestUrls)(hasVideo)
     (editableStreamUrls)(networkLink)(usbDevice)(maxFpsWithoutMotion)
-    (primaryStreamResolution)(secondaryStreamResolution)(foundReplacementCameraId))
+    (primaryStreamResolution)(secondaryStreamResolution))
 
 struct CombinedProperties
 {
@@ -98,7 +96,6 @@ struct CombinedProperties
     CombinedValue hasCustomMediaPort = CombinedValue::None;
     CombinedValue supportsSchedule = CombinedValue::None;
     CombinedValue isUdpMulticastTransportAllowed = CombinedValue::None;
-    CombinedValue hasBeenReplaced = CombinedValue::None;
 
     int maxFps = 0;
     int maxDualStreamingFps = 0;
@@ -108,7 +105,7 @@ NX_REFLECTION_INSTRUMENT(CombinedProperties,
     (isAudioForced)(supportsAudioOutput)(hasMotion)(hasObjectDetection)(hasDualStreamingCapability)
     (hasRemoteArchiveCapability)(canSwitchPtzPresetTypes)(canForcePanTiltCapabilities)
     (canForceZoomCapability)(canAdjustPtzSensitivity)(hasCustomMediaPortCapability)
-    (hasCustomMediaPort)(supportsSchedule)(isUdpMulticastTransportAllowed)(hasBeenReplaced)(maxFps)
+    (hasCustomMediaPort)(supportsSchedule)(isUdpMulticastTransportAllowed)(maxFps)
     (maxDualStreamingFps))
 
 struct MotionConstraints

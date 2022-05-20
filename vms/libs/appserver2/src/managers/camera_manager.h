@@ -59,6 +59,20 @@ public:
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
+    virtual int addHardwareIdMapping(
+        const nx::vms::api::HardwareIdMapping& hardwareIdMapping,
+        Handler<> handler,
+        nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
+
+    virtual int removeHardwareIdMapping(
+        const QnUuid& id,
+        Handler<> handler,
+        nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
+
+    virtual int getHardwareIdMappings(
+        Handler<nx::vms::api::HardwareIdMappingList> handler,
+        nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
+
 private:
     decltype(auto) processor() { return m_queryProcessor->getAccess(m_userSession); }
 
@@ -212,6 +226,50 @@ int QnCameraManager<QueryProcessorType>::saveUserAttributes(
         ApiCommand::saveCameraUserAttributesList,
         dataList,
         [handler, requestId](ec2::Result result) { handler(requestId, result); });
+    return requestId;
+}
+
+template<class QueryProcessorType>
+int QnCameraManager<QueryProcessorType>::addHardwareIdMapping(
+    const nx::vms::api::HardwareIdMapping& hardwareIdMapping,
+    Handler<> handler,
+    nx::utils::AsyncHandlerExecutor handlerExecutor)
+{
+    handler = handlerExecutor.bind(std::move(handler));
+    const int requestId = generateRequestID();
+    processor().processUpdateAsync(
+        ApiCommand::addHardwareIdMapping,
+        hardwareIdMapping,
+        [handler, requestId](ec2::Result result) { handler(requestId, result); });
+    return requestId;
+}
+
+template<class QueryProcessorType>
+int QnCameraManager<QueryProcessorType>::removeHardwareIdMapping(
+    const QnUuid& id,
+    Handler<> handler,
+    nx::utils::AsyncHandlerExecutor handlerExecutor)
+{
+    handler = handlerExecutor.bind(std::move(handler));
+    const int requestId = generateRequestID();
+    processor().processUpdateAsync(
+        ApiCommand::removeHardwareIdMapping,
+        nx::vms::api::IdData(id),
+        [handler, requestId](ec2::Result result) { handler(requestId, result); });
+    return requestId;
+}
+
+template<class QueryProcessorType>
+int QnCameraManager<QueryProcessorType>::getHardwareIdMappings(
+    Handler<nx::vms::api::HardwareIdMappingList> handler,
+    nx::utils::AsyncHandlerExecutor handlerExecutor)
+{
+    handler = handlerExecutor.bind(std::move(handler));
+    const int requestId = generateRequestID();
+    processor().template processQueryAsync<std::nullptr_t, nx::vms::api::HardwareIdMappingList>(
+        ApiCommand::getHardwareIdMappings,
+        nullptr,
+        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
     return requestId;
 }
 

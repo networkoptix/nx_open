@@ -1469,6 +1469,11 @@ enum IDType
      */
     ReplaceCameraAction,
 
+    /**
+     * Discards camera replacement.
+     */
+    UndoReplaceCameraAction,
+
     ActionCount,
 
     NoAction = -1

@@ -179,6 +179,7 @@ protected slots:
 
     void at_mediaFileSettingsAction_triggered();
     void replaceCameraActionTriggered();
+    void undoReplaceCameraActionTriggered();
     void at_cameraIssuesAction_triggered();
     void at_cameraBusinessRulesAction_triggered();
     void at_cameraDiagnosticsAction_triggered();

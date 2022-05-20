@@ -14,7 +14,8 @@ namespace event {
 
 SystemHealthAction::SystemHealthAction(
     QnSystemHealth::MessageType message,
-    const QnUuid& eventResourceId)
+    const QnUuid& eventResourceId,
+    const nx::common::metadata::Attributes& attributes)
     :
     base_type(ActionType::showPopupAction, EventParameters())
 {
@@ -22,6 +23,7 @@ SystemHealthAction::SystemHealthAction(
     runtimeParams.eventType = EventType(EventType::systemHealthEvent + message);
     runtimeParams.eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();
     runtimeParams.eventResourceId = eventResourceId;
+    runtimeParams.attributes = attributes;
     setRuntimeParams(runtimeParams);
 
     ActionParameters actionParams;

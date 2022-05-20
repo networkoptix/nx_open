@@ -557,9 +557,6 @@ public:
 
     virtual QString getUrl() const override;
 
-    void setReplaceWithId(const QString& replaceWithId);
-    virtual QString replaceWithId() const;
-
     nx::vms::api::CameraAttributesData getUserAttributes() const;
     void setUserAttributes(const nx::vms::api::CameraAttributesData& attributes);
     void setUserAttributesAndNotify(const nx::vms::api::CameraAttributesData& attributes);
@@ -593,7 +590,6 @@ signals:
     void backupContentTypeChanged(const QnResourcePtr& resource);
     void backupPolicyChanged(const QnResourcePtr& resource);
     void mediaCapabilitiesChanged(const QnSecurityCamResourcePtr& camera);
-    void replaceWithIdChanged(const QnSecurityCamResourcePtr& resource);
 
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, nx::vms::api::EventReason reasonCode, const QString& reasonParamsEncoded);
 

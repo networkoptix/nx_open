@@ -85,6 +85,15 @@ struct CreateHashByIdHelper
     QnUuid operator ()(const Param &param) { return param.id; }
 };
 
+struct HardwareIdMappingHashHelper
+{
+    QnUuid operator()(const nx::vms::api::HardwareIdMapping& params)
+    {
+        return QnAbstractTransaction::makeHash(
+            params.physicalIdGuid.toRfc4122(), "hardwareid_mapping");
+    }
+};
+
 template<typename ClassType, typename FieldType>
 struct CreateHashFromCustomField
 {
@@ -1034,13 +1043,6 @@ struct ModifyCameraAttributesAccess
             // CRUD API PATCH merges with existing attributes represented as JSON object so they
             // can be not changed.
             nx::vms::api::CameraAttributesData origin = camera->getUserAttributes();
-            if (!param.replaceWithId.isNull() && param.replaceWithId != origin.replaceWithId)
-            {
-                return Result(ErrorCode::forbidden,
-                    NX_FMT("It is forbidden to alter replaceWithId via API. Device: %1",
-                        param.cameraId));
-            }
-
             if (origin == param)
                 return Result();
         }
