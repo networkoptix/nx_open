@@ -86,6 +86,7 @@ static constexpr char kVmsDbPrefix[] = "/cdb/vms-db";
 static constexpr char kMaintenanceGetVmsConnections[] = "/cdb/maintenance/vmsConnections";
 static constexpr char kMaintenanceGetTransactionLog[] = "/cdb/maintenance/transactionLog";
 static constexpr char kMaintenanceGetStatistics[] = "/cdb/maintenance/statistics";
+static constexpr char kMaintenanceGetSettings[] = "/cdb/maintenance/settings";
 
 static constexpr char kStatisticsPath[] = "/cdb/statistics";
 static constexpr char kStatisticsMetricsPath[] = "/cdb/statistics/metrics/";

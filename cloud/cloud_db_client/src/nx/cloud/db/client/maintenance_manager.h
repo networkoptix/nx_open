@@ -21,6 +21,9 @@ public:
 
     virtual void getStatistics(
         std::function<void(api::ResultCode, api::Statistics)> completionHandler) override;
+
+    virtual void getSettings(
+        std::function<void(api::ResultCode, std::string)> completionHandler) override;
 };
 
 } // namespace nx::cloud::db::client
