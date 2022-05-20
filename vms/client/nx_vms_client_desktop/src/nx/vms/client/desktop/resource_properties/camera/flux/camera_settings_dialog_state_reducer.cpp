@@ -2509,7 +2509,7 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsV
     storedValues.setUser(values);
     state.hasChanges = true;
 
-    if (ini().activePluginSettings && !activeElement.isEmpty())
+    if (!activeElement.isEmpty())
     {
         bool loading = qnClientModule->analyticsSettingsManager()->activeSettingsChanged(
             DeviceAgentId{state.singleCameraProperties.id, engineId},

@@ -76,7 +76,7 @@ public:
         settingsValuesByEngineId.insert(engineId, SettingsValues{values, true});
         hasChanges = true;
 
-        if (ini().activePluginSettings && !activeElement.isEmpty())
+        if (!activeElement.isEmpty())
             activeElementChanged(currentEngineId, activeElement);
 
         emit q->hasChangesChanged();
