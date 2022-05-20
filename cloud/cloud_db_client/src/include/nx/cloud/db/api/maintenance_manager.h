@@ -47,6 +47,9 @@ public:
 
     virtual void getStatistics(
         std::function<void(api::ResultCode, api::Statistics)> completionHandler) = 0;
+
+    virtual void getSettings(
+        std::function<void(api::ResultCode, std::string)> completionHandler) = 0;
 };
 
 } // namespace nx::cloud::db::api

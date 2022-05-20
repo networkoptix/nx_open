@@ -30,4 +30,9 @@ void MaintenanceManager::getStatistics(
         std::move(completionHandler));
 }
 
+void MaintenanceManager::getSettings(std::function<void(api::ResultCode, std::string)> completionHandler)
+{
+    executeRequest<std::string>(kMaintenanceGetSettings, std::move(completionHandler));
+}
+
 } // namespace nx::cloud::db::client
