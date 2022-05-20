@@ -7,8 +7,13 @@
     #define dup2 _dup2
     #define fileno _fileno
 #else
-    #undef __STRICT_ANSI__ //< Enable fileno() in <stdio.h> on Cygwin/MinGW.
-    #include <stdio.h>
+    #if defined(__STRICT_ANSI__)
+        #undef __STRICT_ANSI__ //< Enable fileno() in <stdio.h> on Cygwin/MinGW.
+        #include <stdio.h>
+        #define __STRICT_ANSI__
+    #else
+        #include <stdio.h>
+    #endif
 
     #include <unistd.h>
 #endif
