@@ -196,7 +196,7 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/) :
 
     ui->alertBar->label()->setContextMenuPolicy(Qt::ContextMenuPolicy::NoContextMenu);
     ui->alertBar->setOpenExternalLinks(false);
-    ui->alertBar->setRetainSizeWhenHidden(false);
+    ui->alertBar->setRetainSpaceWhenNotDisplayed(false);
     ui->alertBar->setVisible(false);
     connect(ui->alertBar, &MessageBar::linkActivated,
         this, &QnServerSettingsWidget::showServerCertificate);

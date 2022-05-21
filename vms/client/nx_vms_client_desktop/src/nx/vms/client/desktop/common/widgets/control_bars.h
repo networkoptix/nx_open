@@ -13,6 +13,11 @@ class QVBoxLayout;
 
 namespace nx::vms::client::desktop {
 
+/**
+ * A block of controls on a colored background.
+ * It's intended to be positioned in an external layout at a top or a bottom of a dialog.
+ * Controls should be added to either verticalLayout() or horizontalLayout().
+ */
 class ControlBar: public QWidget
 {
     Q_OBJECT
@@ -22,12 +27,25 @@ public:
     explicit ControlBar(QWidget* parent = nullptr);
     virtual ~ControlBar() override;
 
-    bool retainSizeWhenHidden() const;
-    void setRetainSizeWhenHidden(bool value);
-
+    /** A vertical layout to insert controls to. */
     QVBoxLayout* verticalLayout() const;
+
+    /**
+     * A horizontal layout to insert controls to.
+     * Occupies the first position in the vertical layout.
+     */
     QHBoxLayout* horizontalLayout() const;
 
+    /**
+     * Whether the bar should keep occupying its space in an exterior layout when not displayed.
+     */
+    bool retainSpaceWhenNotDisplayed() const;
+    void setRetainSpaceWhenNotDisplayed(bool value);
+
+    /**
+     * When retainSpaceWhenNotDisplayed is true, visibility must be controlled via these methods.
+     * It's OK to do it in any case, even when retainSpaceWhenNotDisplayed is false.
+     */
     bool isDisplayed() const;
     void setDisplayed(bool value);
 
@@ -36,6 +54,10 @@ private:
     nx::utils::ImplPtr<Private> d;
 };
 
+/**
+ * A text message on a colored background.
+ * It's intended to be positioned in an external layout at a top or a bottom of a dialog.
+ */
 class MessageBar: public ControlBar
 {
     Q_OBJECT
@@ -53,8 +75,14 @@ public:
     /** Enabled by default. */
     void setOpenExternalLinks(bool open);
 
-    QHBoxLayout* overlayLayout() const;
+    /** A label displaying the text message. */
     QnWordWrappedLabel* label() const;
+
+    /**
+     * An additional layout on top of the label.
+     * Overlay controls may be inserted in it.
+     */
+    QHBoxLayout* overlayLayout() const;
 
 private:
     using base_type::setDisplayed;
@@ -68,8 +96,9 @@ private:
     nx::utils::ImplPtr<Private> d;
 };
 
-// The following classes are helpers for easy customization.
-
+/**
+ * A message bar customized with a red background to display error or warning messages.
+ */
 class AlertBar: public MessageBar
 {
     Q_OBJECT
@@ -79,6 +108,9 @@ public:
     explicit AlertBar(QWidget* parent = nullptr);
 };
 
+/**
+ * A message bar customized to display promotional messages.
+ */
 class PromoBar: public MessageBar
 {
     Q_OBJECT
@@ -86,6 +118,23 @@ class PromoBar: public MessageBar
 
 public:
     using base_type::base_type; //< Forward constructors.
+};
+
+/**
+ * Automatically generated vertical set of AlertBars.
+ */
+class AlertBlock: public QWidget
+{
+    Q_OBJECT
+    using base_type = QWidget;
+
+public:
+    explicit AlertBlock(QWidget* parent = nullptr);
+    void setAlerts(const QStringList& value);
+
+private:
+    QList<AlertBar*> m_bars;
+    QVBoxLayout* const m_layout = nullptr;
 };
 
 // TODO: #v4.2 Unify multiline message bars with the ones that reserve space.
@@ -96,21 +145,6 @@ class MultilineAlertBar: public QnWordWrappedLabel
 
 public:
     explicit MultilineAlertBar(QWidget* parent = nullptr);
-};
-
-class AlertBlock: public QWidget
-{
-    Q_OBJECT
-    using base_type = QWidget;
-
-public:
-    AlertBlock(QWidget* parent = nullptr);
-
-    void setAlerts(const QStringList& value);
-
-private:
-    QList<AlertBar*> m_bars;
-    QVBoxLayout* const m_layout = nullptr;
 };
 
 } // namespace nx::vms::client::desktop
