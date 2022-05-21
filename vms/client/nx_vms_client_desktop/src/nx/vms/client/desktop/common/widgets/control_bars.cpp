@@ -22,11 +22,11 @@ struct ControlBar::Private
     QWidget* const background{new QWidget(q)};
     QVBoxLayout* const verticalLayout{new QVBoxLayout(background)};
     QHBoxLayout* const horizontalLayout{new QHBoxLayout()};
-    bool retainSizeWhenHidden = false;
+    bool retainSpaceWhenNotDisplayed = false;
 
     void updateVisibility()
     {
-        const bool hidden = !retainSizeWhenHidden && background->isHidden();
+        const bool hidden = !retainSpaceWhenNotDisplayed && background->isHidden();
         if (hidden == q->isHidden())
             return;
 
@@ -63,7 +63,7 @@ ControlBar::ControlBar(QWidget* parent):
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(d->background);
 
-    setHidden(!d->retainSizeWhenHidden);
+    setHidden(!d->retainSpaceWhenNotDisplayed);
 }
 
 ControlBar::~ControlBar()
@@ -85,17 +85,17 @@ void ControlBar::setDisplayed(bool value)
     d->updateVisibility();
 }
 
-bool ControlBar::retainSizeWhenHidden() const
+bool ControlBar::retainSpaceWhenNotDisplayed() const
 {
-    return d->retainSizeWhenHidden;
+    return d->retainSpaceWhenNotDisplayed;
 }
 
-void ControlBar::setRetainSizeWhenHidden(bool value)
+void ControlBar::setRetainSpaceWhenNotDisplayed(bool value)
 {
-    if (d->retainSizeWhenHidden == value)
+    if (d->retainSpaceWhenNotDisplayed == value)
         return;
 
-    d->retainSizeWhenHidden = value;
+    d->retainSpaceWhenNotDisplayed = value;
     d->updateVisibility();
 }
 

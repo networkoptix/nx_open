@@ -54,7 +54,7 @@ CameraMotionSettingsWidget::CameraMotionSettingsWidget(
     ui->setupUi(this);
     ui->motionDetectionCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
     ui->motionDetectionCheckBox->setForegroundRole(QPalette::ButtonText);
-    ui->highResolutionAlertBar->setRetainSizeWhenHidden(true);
+    ui->highResolutionAlertBar->setRetainSpaceWhenNotDisplayed(true);
 
     const QList<QColor> sensitivityColors = colorTheme()->colors("camera.sensitivityColors");
 
@@ -303,7 +303,7 @@ void CameraMotionSettingsWidget::loadAlerts(const CameraSettingsDialogState& sta
             return {};
         }());
 
-    ui->highResolutionAlertBar->setRetainSizeWhenHidden(
+    ui->highResolutionAlertBar->setRetainSpaceWhenNotDisplayed(
         ui->motionHintBar->text().isEmpty() &&
         ui->recordingAlertBar->text().isEmpty() &&
         ui->motionImplicitlyDisabledAlertBar->text().isEmpty() &&
