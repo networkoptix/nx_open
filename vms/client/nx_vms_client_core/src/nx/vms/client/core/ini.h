@@ -18,6 +18,10 @@ struct Ini: nx::kit::IniConfig
     NX_INI_INT(8, maxLastConnectedTilesStored,
         "[Support] Maximum last connected systems tiles stored on the Welcome Screen");
 
+    // VMS-32318
+    NX_INI_FLAG(true, asyncAuthTokenTermination,
+        "[Bugfix] Support asynchronous auth token termination to avoid visual lag on disconnect");
+
     NX_INI_INT(0, systemsHideOptions,
         "[Dev] Hide systems, bitwise combination of flags:\n"
         " * 1 - Incompatible systems.\n"

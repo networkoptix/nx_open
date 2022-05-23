@@ -23,6 +23,7 @@
 #include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/network/session_token_terminator.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_image_provider.h>
 #include <nx/vms/client/core/utils/operation_manager.h>
@@ -38,6 +39,7 @@ struct QnClientCoreModule::Private
     std::unique_ptr<QnCommonModule> commonModule;
     std::unique_ptr<NetworkModule> networkModule;
     std::unique_ptr<QnDataProviderFactory> resourceDataProviderFactory;
+    std::unique_ptr<SessionTokenTerminator> sessionTokenTerminator;
     QQmlEngine* qmlEngine = nullptr;
 };
 
@@ -96,6 +98,8 @@ QnClientCoreModule::QnClientCoreModule(
     d->qmlEngine->addImageProvider(ThumbnailImageProvider::id, thumbnailProvider);
 
     registerResourceDataProviders();
+
+    d->sessionTokenTerminator = std::make_unique<SessionTokenTerminator>();
 }
 
 QnClientCoreModule::~QnClientCoreModule()
@@ -147,4 +151,9 @@ QQmlEngine* QnClientCoreModule::mainQmlEngine()
 void QnClientCoreModule::registerResourceDataProviders()
 {
     d->resourceDataProviderFactory->registerResourceType<QnDesktopAudioOnlyResource>();
+}
+
+SessionTokenTerminator* QnClientCoreModule::sessionTokenTerminator() const
+{
+    return d->sessionTokenTerminator.get();
 }
