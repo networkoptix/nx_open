@@ -16,6 +16,7 @@
 #include "camera_bookmark_fwd.h"
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/json.h>
 #include <nx/vms/api/data/bookmark_models.h>
 #include <nx/vms/api/json/value_or_array.h>
 
@@ -125,6 +126,14 @@ struct NX_VMS_COMMON_API QnCameraBookmark
 #define QnCameraBookmark_Fields \
     (guid)(creatorId)(creationTimeStampMs)(name)(description)(timeout)\
     (startTimeMs)(durationMs)(tags)(cameraId)
+
+NX_REFLECTION_INSTRUMENT(QnCameraBookmark, QnCameraBookmark_Fields)
+
+void NX_VMS_COMMON_API serialize(
+    nx::reflect::json::SerializationContext* ctx, const QnCameraBookmarkTags& value);
+
+nx::reflect::DeserializationResult NX_VMS_COMMON_API deserialize(
+    const nx::reflect::json::DeserializationContext& ctx, QnCameraBookmarkTags* data);
 
 /**
  * @brief The QnCameraBookmarkSearchFilter struct   Bookmarks search request parameters. Used for loading bookmarks for the fixed time period
