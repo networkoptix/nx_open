@@ -24,6 +24,7 @@
 #include <nx/vms/client/core/network/local_network_interfaces_manager.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/network/session_token_terminator.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_image_provider.h>
@@ -44,6 +45,7 @@ struct QnClientCoreModule::Private
     std::unique_ptr<QnDataProviderFactory> resourceDataProviderFactory;
     std::unique_ptr<QnCloudStatusWatcher> cloudStatusWatcher;
     std::unique_ptr<nx::vms::rules::EngineHolder> vmsRulesEngineHolder;
+    std::unique_ptr<SessionTokenTerminator> sessionTokenTerminator;
     QQmlEngine* qmlEngine = nullptr;
 };
 
@@ -113,6 +115,7 @@ QnClientCoreModule::QnClientCoreModule(
     d->cloudStatusWatcher = std::make_unique<QnCloudStatusWatcher>(d->commonModule.get());
 
     d->vmsRulesEngineHolder = std::make_unique<nx::vms::rules::EngineHolder>(systemContext);
+    d->sessionTokenTerminator = std::make_unique<SessionTokenTerminator>();
 }
 
 QnClientCoreModule::~QnClientCoreModule()
@@ -181,4 +184,8 @@ QnCloudStatusWatcher* QnClientCoreModule::cloudStatusWatcher() const
 nx::vms::rules::Engine* QnClientCoreModule::vmsRulesEngine() const
 {
     return d->vmsRulesEngineHolder->engine();
+}
+SessionTokenTerminator* QnClientCoreModule::sessionTokenTerminator() const
+{
+    return d->sessionTokenTerminator.get();
 }
