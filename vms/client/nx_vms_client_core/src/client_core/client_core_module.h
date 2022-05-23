@@ -26,6 +26,7 @@ namespace nx::vms::api { enum class PeerType; }
 namespace nx::vms::client::core {
 
 class NetworkModule;
+class SessionTokenTerminator;
 class SystemContext;
 
 } // namespace nx::vms::client::core
@@ -69,6 +70,7 @@ public:
     QnPtzControllerPool* ptzControllerPool() const;
     QnLayoutTourStateManager* layoutTourStateManager() const;
     QnDataProviderFactory* dataProviderFactory() const;
+    nx::vms::client::core::SessionTokenTerminator* sessionTokenTerminator() const;
 
     QQmlEngine* mainQmlEngine();
 
