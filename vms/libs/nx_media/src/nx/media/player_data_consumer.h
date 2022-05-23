@@ -111,7 +111,6 @@ signals:
     void gotMetadata(QnAbstractCompressedMetadataPtr data);
 private slots:
     void onBeforeJump(qint64 timeUsec);
-    void onJumpCanceled(qint64 timeUsec);
     void onJumpOccurred(qint64 timeUsec, int sequence);
 
 protected:
@@ -175,8 +174,6 @@ private:
     mutable nx::Mutex m_jumpMutex; //< sync jump related logic
     mutable nx::Mutex m_decoderMutex; //< sync with create/destroy decoder
 
-    int m_awaitingJumpCounter; //< how many jump requests are queued
-
     struct BofFrameInfo
     {
         BofFrameInfo(): videoChannel(0), frameNumber(0) {}
@@ -205,6 +202,7 @@ private:
     std::atomic<double> m_speed;
     nx::vms::common::MediaStreamEventPacket m_mediaEvent;
     RenderContextSynchronizerPtr m_renderContextSynchronizer;
+    const QnArchiveStreamReader* m_archiveReader = nullptr;
 };
 
 } // namespace media

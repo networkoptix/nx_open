@@ -115,8 +115,6 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_extTimeSrc(0),
     m_useMtDecoding(false),
     m_buffering(0),
-    m_executingJump(0),
-    m_skipPrevJumpSignal(0),
     m_processedPackets(0),
     m_emptyPacketCounter(0),
     m_isStillImage(false),
@@ -717,7 +715,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 m_nextReverseTime[channel] = m_display[channel]->nextReverseTime();
 
             m_timeMutex.lock();
-            if (m_buffering && m_executingJump == 0 && !m_afterJump &&
+            if (m_buffering && !m_archiveReader->isJumpProcessing() && !m_afterJump &&
                 m_skippingFramesTime == qint64(AV_NOPTS_VALUE))
             {
                 m_buffering &= ~(1 << vd->channelNumber);
@@ -916,19 +914,8 @@ void QnCamDisplay::onBeforeJump(qint64 time)
         m_audioDisplay->clearAudioBuffer();
     }
 
-    if (m_skipPrevJumpSignal > 0)
-    {
-        m_skipPrevJumpSignal--;
-        return;
-    }
-    //setSingleShotMode(false);
-
-    m_executingJump++;
-
     m_buffering = getBufferingMask();
 
-    if (m_executingJump > 1)
-        clearUnprocessedData();
     m_processedPackets = 0;
     m_gotKeyDataInfo.clear();
 }
@@ -948,15 +935,8 @@ void QnCamDisplay::onJumpOccured(qint64 time)
     m_singleShotQuantProcessed = false;
     m_jumpTime = time;
 
-    if (m_executingJump > 0)
-        m_executingJump--;
     m_processedPackets = 0;
     m_delayedFrameCount = 0;
-}
-
-void QnCamDisplay::onJumpCanceled(qint64 /*time*/)
-{
-    m_skipPrevJumpSignal++;
 }
 
 void QnCamDisplay::afterJump(QnAbstractMediaDataPtr media)
@@ -1236,7 +1216,7 @@ void QnCamDisplay::moveTimestampTo(qint64 timestampUs)
         m_nextReverseTime[i] = AV_NOPTS_VALUE;
     }
 
-    if (m_buffering && m_executingJump == 0)
+    if (m_buffering && !m_archiveReader->isJumpProcessing())
     {
         m_buffering = 0;
         m_timeMutex.unlock();
@@ -1477,7 +1457,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
         m_bofReceived = false;
         {
             NX_MUTEX_LOCKER lock( &m_timeMutex );
-            if (m_executingJump == 0)
+            if (!m_archiveReader->isJumpProcessing())
                 m_afterJump = false;
         }
         afterJump(media);
@@ -2090,7 +2070,7 @@ bool QnCamDisplay::isLongWaiting() const
     if (isRealTimeSource())
         return false;
 
-    if (m_executingJump > 0 || m_executingChangeSpeed || m_buffering)
+    if (m_archiveReader->isJumpProcessing() || m_executingChangeSpeed || m_buffering)
         return false;
 
     return m_isLongWaiting || m_emptyPacketCounter >= 3;

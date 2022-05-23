@@ -64,7 +64,6 @@ public slots:
 private slots:
     void onBeforeJump(qint64 mksec);
     void onJumpOccured(qint64 mksec);
-    void onJumpCanceled(qint64 time);
 
 private:
     void onConsumerBlocksReaderInternal(QnAbstractArchiveStreamReader* reader, bool value);

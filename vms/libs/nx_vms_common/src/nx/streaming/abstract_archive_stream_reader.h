@@ -119,7 +119,6 @@ protected:
 signals:
     void beforeJump(qint64 mksec);
     void jumpOccured(qint64 mksec, int sequence);
-    void jumpCanceled(qint64 mksec);
     void streamAboutToBePaused();
     void streamPaused();
     void streamAboutToBeResumed();

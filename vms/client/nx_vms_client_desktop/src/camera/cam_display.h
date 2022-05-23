@@ -158,7 +158,6 @@ public slots:
     void onBeforeJump(qint64 time);
     void onSkippingFrames(qint64 time);
     void onJumpOccured(qint64 time);
-    void onJumpCanceled(qint64 time);
     void onRealTimeStreamHint(bool value);
     void onSlowSourceHint();
     void onReaderPaused();
@@ -290,8 +289,6 @@ protected:
 
     bool m_useMtDecoding;
     int m_buffering;
-    int m_executingJump;
-    int m_skipPrevJumpSignal;
     int m_processedPackets;
     qint64 m_nextReverseTime[CL_MAX_CHANNELS];
     int m_emptyPacketCounter;
