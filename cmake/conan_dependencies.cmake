@@ -73,6 +73,13 @@ endif()
 set(_run_conan_script ${CMAKE_BINARY_DIR}/run_conan.cmake)
 set(conan_home $ENV{CONAN_USER_HOME})
 
+set(_additional_conan_parameters)
+if(targetDevice MATCHES "^linux|^edge")
+    set(_additional_conan_parameters
+        "    --profile:host ${open_source_root}/cmake/conan_profiles/gcc.profile"
+    )
+endif()
+
 set(_run_conan_script_contents
     "#!/usr/bin/env -S cmake -P"
     ""
@@ -86,6 +93,7 @@ set(_run_conan_script_contents
     "    -s build_type=${build_type}"
     "    -o targetDevice=${targetDevice}"
     "    -o useClang=${use_clang}"
+    ${_additional_conan_parameters}
     ")"
     ""
 )
