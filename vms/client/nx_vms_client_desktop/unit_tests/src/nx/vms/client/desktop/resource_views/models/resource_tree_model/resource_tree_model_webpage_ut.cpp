@@ -18,10 +18,14 @@ using namespace index_condition;
 static constexpr auto kUniqueWebPageName = "unique_web_page_name";
 static constexpr auto kUniqueServerName = "unique_server_name";
 static constexpr auto kUniqueUserName = "unique_user_name";
+static constexpr auto kServer1Name = "server_1";
+static constexpr auto kServer2Name = "server_2";
 
 // Predefined conditions.
 static const auto kUniqueWebPageNameCondition = displayFullMatch(kUniqueWebPageName);
 static const auto kUniqueServerNameCondition = displayFullMatch(kUniqueServerName);
+static const auto kServer1NameCondition = displayFullMatch(kServer1Name);
+static const auto kServer2NameCondition = displayFullMatch(kServer2Name);
 
 TEST_F(ResourceTreeModelTest, webPageAdds)
 {
@@ -315,6 +319,37 @@ TEST_F(ResourceTreeModelTest, webPageDisableProxy)
 
     // And that node is child of "Web Pages" node.
     ASSERT_TRUE(directChildOf(webPagesNodeCondition())(webPageIndex));
+}
+
+TEST_F(ResourceTreeModelTest, webPageMovesBetweenServers)
+{
+    // Given a system with two servers.
+    const auto server1 = addServer(kServer1Name);
+    const auto server2 = addServer(kServer2Name);
+
+    // Given a proxied web page, which is the child of server 1.
+    auto proxiedWebPage = addProxiedWebResource(kUniqueWebPageName, server1->getId());
+
+    // When user is logged in.
+    loginAsAdmin("admin");
+
+    // Then there is exactly one web page in the Resource Tree and that node is a child of server 1.
+    auto webPageIndex = uniqueMatchingIndex(kUniqueWebPageNameCondition);
+    ASSERT_TRUE(kServer1NameCondition(webPageIndex.parent()));
+
+    // When server 2 is set as parent of proxied web page.
+    proxiedWebPage->setParentId(server2->getId());
+
+    // Then there is exactly one web page in the Resource Tree and that node is a child of server 2.
+    webPageIndex = uniqueMatchingIndex(kUniqueWebPageNameCondition);
+    ASSERT_TRUE(kServer2NameCondition(webPageIndex.parent()));
+
+    // When server 1 is set as parent of proxied web page back.
+    proxiedWebPage->setParentId(server1->getId());
+
+    // Then there is exactly one web page in the Resource Tree and that node is a child of server 1.
+    webPageIndex = uniqueMatchingIndex(kUniqueWebPageNameCondition);
+    ASSERT_TRUE(kServer1NameCondition(webPageIndex.parent()));
 }
 
 } // namespace test
