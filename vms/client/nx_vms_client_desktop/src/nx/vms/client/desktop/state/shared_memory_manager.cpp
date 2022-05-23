@@ -7,58 +7,20 @@
 
 #include <QtCore/QTimer>
 
-#include <nx/reflect/json.h>
-#include <nx/reflect/to_string.h>
 #include <nx/utils/log/assert.h>
-
-void serialize(
-    nx::reflect::json::SerializationContext* ctx,
-    const nx::vms::client::desktop::SharedMemoryData::ScreenUsageData& data)
-{
-    ctx->composer.startArray();
-    for (const auto& item: data)
-        ctx->composer.writeInt(item);
-    ctx->composer.endArray();
-}
 
 namespace nx::vms::client::desktop {
 
 using Command = SharedMemoryData::Command;
 using ScreenUsageData = SharedMemoryData::ScreenUsageData;
+using namespace shared_memory;
 
 namespace {
 
 using namespace std::chrono;
 static constexpr auto kWatcherInterval = 250ms;
 
-using DataFilter = std::function<bool(const SharedMemoryData::Process&)>;
-
-DataFilter pidEqualTo(SharedMemoryData::PidType value)
-{
-    return [value](const SharedMemoryData::Process& data) { return data.pid == value; };
-}
-
-DataFilter sessionIdEqualTo(SessionId value)
-{
-    return [value](const SharedMemoryData::Process& data) { return data.sessionId == value; };
-}
-
 } // namespace
-
-void PrintTo(SharedMemoryData::Command command, ::std::ostream* os)
-{
-    *os << nx::reflect::toString(command);
-}
-
-void PrintTo(SharedMemoryData::Process process, ::std::ostream* os)
-{
-    *os << nx::reflect::json::serialize(process);
-}
-
-void PrintTo(SharedMemoryData::Session session, ::std::ostream* os)
-{
-    *os << nx::reflect::json::serialize(session);
-}
 
 struct SharedMemoryLocker
 {
@@ -89,15 +51,23 @@ struct SharedMemoryManager::Private
     {
     }
 
-    static auto findProcess(auto& data, const auto& predicate)
+    auto* findCurrentProcess(auto& data) const
     {
-        auto process = std::find_if(data.processes.begin(), data.processes.end(), predicate);
-        return process != data.processes.end() ? &(*process) : nullptr;
+        return data.findProcess(currentProcessPid);
     }
 
-    auto findCurrentProcess(auto& data) const
+    auto isRunning(bool isRunning) const
     {
-        return findProcess(data, pidEqualTo(currentProcessPid));
+        return exceptPids({0}) | ranges::views::filter(
+            [this, isRunning](const SharedMemoryData::Process& process)
+            {
+                return processInterface->isProcessRunning(process.pid) == isRunning;
+            });
+    }
+
+    auto otherWithinSession(SessionId sessionId) const
+    {
+        return withinSession(sessionId) | exceptPids({currentProcessPid});
     }
 
     /** Cleanup data, which processes are closed already. */
@@ -105,18 +75,13 @@ struct SharedMemoryManager::Private
     {
         SharedMemoryLocker guard(memoryInterface);
         SharedMemoryData data = memoryInterface->data();
-        for (auto& process: data.processes)
-        {
-            if (process.pid != 0
-                && process.pid != currentProcessPid
-                && !processInterface->isProcessRunning(process.pid))
-            {
-                process = {};
-            }
-        }
+
+        for (auto& process: data.processes | isRunning(false) | exceptPids({currentProcessPid}))
+            process = {};
+
         for (auto& session: data.sessions)
         {
-            const bool sessionIsActive = findProcess(data, sessionIdEqualTo(session.id));
+            const bool sessionIsActive = !(data.processes | withinSession(session.id)).empty();
             if (!sessionIsActive)
                 session = {};
         }
@@ -127,17 +92,8 @@ struct SharedMemoryManager::Private
     {
         SharedMemoryLocker guard(memoryInterface);
         SharedMemoryData data = memoryInterface->data();
-        auto existing = findCurrentProcess(data);
-
-        if (!NX_ASSERT(!existing, "Current instance is already registered"))
-            return;
-
-        auto empty = findProcess(data, pidEqualTo(0));
-        if (!NX_ASSERT(empty, "No space for the current instance"))
-            return;
-
-        *empty = {.pid = currentProcessPid};
-        memoryInterface->setData(data);
+        if (data.addProcess(currentProcessPid))
+            memoryInterface->setData(data);
     }
 
     void updateCurrentInstance(std::function<void(SharedMemoryData::Process*)> transform)
@@ -167,84 +123,54 @@ struct SharedMemoryManager::Private
     void requestToSaveState()
     {
         SharedMemoryLocker guard(memoryInterface);
-
         const SharedMemoryData data = memoryInterface->data();
-
-        SessionId sessionId;
-        auto instance = findCurrentProcess(data);
-        if (NX_ASSERT(instance, "Current instance is unregistered"))
-            sessionId = instance->sessionId;
-
-        // Send this command only if we are not logged in.
-        if (sessionId != SessionId())
-        {
-            sendCommandUnderLock(
-                Command::saveWindowState,
-                [&](const SharedMemoryData::Process& block)
-                {
-                    return block.sessionId == sessionId;
-                });
-        }
+        auto session = data.findProcessSession(currentProcessPid);
+        if (NX_ASSERT(session, "Session not found"))
+            sendCommandUnderLock(Command::saveWindowState, withinSession(session->id));
     }
 
     void assignStatesToOtherInstances(QStringList* windowStates)
     {
         SharedMemoryLocker guard(memoryInterface);
-
         SharedMemoryData data = memoryInterface->data();
         bool modified = false;
 
-        SessionId sessionId;
-        auto instance = findCurrentProcess(data);
-        if (NX_ASSERT(instance, "Current instance is unregistered"))
-            sessionId = instance->sessionId;
-
-        if (!NX_ASSERT(sessionId != SessionId(), "Current instance is not logged in"))
+        auto session = data.findProcessSession(currentProcessPid);
+        if (!NX_ASSERT(session, "Session not found"))
             return;
 
-        for (auto& memoryBlock: data.processes)
+        for (auto& process: data.processes | isRunning(true) | otherWithinSession(session->id))
         {
             if (windowStates->empty())
                 break;
 
-            if (memoryBlock.pid != 0
-                && memoryBlock.pid != currentProcessPid
-                && processInterface->isProcessRunning(memoryBlock.pid)
-                && memoryBlock.sessionId == sessionId)
-            {
-                memoryBlock.command = Command::restoreWindowState;
-                memoryBlock.commandData = windowStates->takeFirst().toLatin1() + '\0';
-                modified = true;
-            }
+            process.command = Command::restoreWindowState;
+            process.commandData = windowStates->takeFirst().toLatin1() + '\0';
+            modified = true;
         }
 
         if (modified)
             memoryInterface->setData(data);
     }
 
-    void sendCommand(Command command, DataFilter filter = {})
+    void sendCommand(Command command, PipeFilterType filter = all())
     {
         SharedMemoryLocker guard(memoryInterface);
         sendCommandUnderLock(command, filter);
     }
 
-    void sendCommandUnderLock(Command command, DataFilter filter = {})
+    void sendCommandUnderLock(Command command, PipeFilterType filter = all())
     {
         SharedMemoryData data = memoryInterface->data();
         bool modified = false;
 
-        for (auto& memoryBlock: data.processes)
+        for (auto& process: data.processes | exceptPids({currentProcessPid, 0}) | filter)
         {
-            if (memoryBlock.pid != 0 //< Do not write commands to uninitialized memory.
-                && memoryBlock.pid != currentProcessPid //< Do not send commands to self.
-                && (!filter || filter(memoryBlock)))
+            // Do not override existing commands with higher priority.
+            if (process.command < command)
             {
-                // Do not override existing commands with higher priority.
-                if (memoryBlock.command < command)
-                {
-                    memoryBlock.command = command;
-                    modified = true;
-                }
+                process.command = command;
+                modified = true;
             }
         }
 
@@ -273,56 +199,23 @@ struct SharedMemoryManager::Private
         return {Command::none, {}};
     }
 
-    bool sessionHasOtherProcesses(auto data, const SessionId& sessionId) const
-    {
-        return findProcess(
-            data,
-            [&](const SharedMemoryData::Process& process)
-            {
-                return process.pid != currentProcessPid && process.sessionId == sessionId;
-            });
-    }
-
     bool isLastInstanceInCurrentSession() const
     {
         SharedMemoryLocker guard(memoryInterface);
         const SharedMemoryData data = memoryInterface->data();
 
-        auto process = findCurrentProcess(data);
-        if (!process || process->sessionId == SessionId())
+        auto session = data.findProcessSession(currentProcessPid);
+        if (!session)
             return false;
 
-        return !std::any_of(data.processes.cbegin(), data.processes.cend(),
-            [this, sessionId = process->sessionId](
-                const SharedMemoryData::Process& process)
-            {
-                return process.pid != currentProcessPid
-                    && process.sessionId == sessionId
-                    && processInterface->isProcessRunning(process.pid);
-            });
+        auto instances = data.processes | isRunning(true) | otherWithinSession(session->id);
+        return !instances.empty();
     }
 
-    auto findSession(auto& data, const SessionId& sessionId)
+    bool sessionHasOtherProcesses(const SharedMemoryData& data, SessionId sessionId) const
     {
-        auto session = std::find_if(data.sessions.begin(), data.sessions.end(),
-            [&](const SharedMemoryData::Session& session) { return session.id == sessionId; });
-
-        return session != data.sessions.end() ? &(*session) : nullptr;
-    }
-
-    auto findCurrentSession(auto& data)
-    {
-        auto process = findCurrentProcess(data);
-        return process ? findSession(data, process->sessionId) : nullptr;
-    }
-
-    void addSession(SharedMemoryData& data, const SessionId& sessionId)
-    {
-        auto empty = findSession(data, {});
-        if (!NX_ASSERT(empty, "No space for new session"))
-            return;
-
-        *empty = {.id = sessionId};
+        auto instances = data.processes | otherWithinSession(sessionId);
+        return !instances.empty();
     }
 
     void enterSession(const SessionId& sessionId)
@@ -330,10 +223,10 @@ struct SharedMemoryManager::Private
         SharedMemoryLocker guard(memoryInterface);
         auto data = memoryInterface->data();
 
-        if (!findSession(data, sessionId))
-            addSession(data, sessionId);
+        if (!data.findSession(sessionId))
+            data.addSession(sessionId);
 
-        auto process = findCurrentProcess(data);
+        auto process = data.findProcess(currentProcessPid);
         if (!NX_ASSERT(process, "Current process is not registered"))
             return;
 
@@ -351,7 +244,7 @@ struct SharedMemoryManager::Private
             return false;
 
         const auto sessionId = std::exchange(process->sessionId, {});
-        auto session = findSession(data, sessionId);
+        auto session = data.findSession(sessionId);
         if (!NX_ASSERT(session, "Session is not registered"))
             return false;
 
@@ -367,8 +260,7 @@ struct SharedMemoryManager::Private
     {
         SharedMemoryLocker guard(memoryInterface);
         auto data = memoryInterface->data();
-        auto session = findCurrentSession(data);
-
+        auto session = data.findProcessSession(currentProcessPid);
         if (!NX_ASSERT(session, "Session is not registered"))
             return;
 
@@ -486,7 +378,7 @@ void SharedMemoryManager::processEvents()
         emit clientCommandRequested(command, commandData);
 
     const auto data = d->readData();
-    if (auto session = d->findCurrentSession(data))
+    if (auto session = data.findProcessSession(d->currentProcessPid))
     {
         if (d->lastSessionToken != session->token)
         {

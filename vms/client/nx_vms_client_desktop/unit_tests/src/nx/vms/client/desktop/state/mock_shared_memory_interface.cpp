@@ -4,28 +4,18 @@
 
 namespace nx::vms::client::desktop {
 namespace test {
-
 namespace {
-
-using DataFilter = std::function<bool(const SharedMemoryData::Process&)>;
-DataFilter pidEqualTo(SharedMemoryData::PidType value)
-{
-    return [value](const SharedMemoryData::Process& data) { return data.pid == value; };
-}
 
 void addSessionIfNeeded(SharedMemoryDataPtr memory, SessionId sessionId)
 {
-    auto& sessions = memory->sessions;
-    auto session = std::find_if(sessions.begin(), sessions.end(),
-        [&](const SharedMemoryData::Session& session) { return session.id == sessionId; });
+    if (sessionId != SessionId() && !memory->findSession(sessionId))
+        memory->addSession(sessionId);
+}
 
-    if (session != sessions.end())
-        return;
-
-    session = std::find_if(sessions.begin(), sessions.end(),
-        [&](const SharedMemoryData::Session& session) { return session.id == SessionId(); });
-
-    *session = {.id = sessionId};
+SharedMemoryData::Process* addProcessIfNeeded(SharedMemoryDataPtr memory, PidType pid)
+{
+    auto process = memory->findProcess(pid);
+    return process ? process : memory->addProcess(pid);
 }
 
 } // namespace
@@ -36,17 +26,11 @@ PidType MockSharedMemoryInterface::givenAnotherRunningInstance(
     const SessionId& sessionId,
     const SharedMemoryData::ScreenUsageData& screens)
 {
-    // Find first free block.
-    auto freeBlock = 
-        std::find_if(memory->processes.begin(), memory->processes.end(), pidEqualTo(0));
-
     MockClientProcessExecutionInterface processInterface(processesMap);
-    freeBlock->pid = processInterface.givenRunningProcess();
-    freeBlock->sessionId = sessionId;
+    auto freeBlock = memory->addProcess(processInterface.givenRunningProcess());
     freeBlock->usedScreens = screens;
-
     addSessionIfNeeded(memory, sessionId);
-
+    freeBlock->sessionId = sessionId;
     return freeBlock->pid;
 }
 
@@ -54,13 +38,8 @@ SharedMemoryData::Process MockSharedMemoryInterface::sharedMemoryBlock(
     SharedMemoryDataPtr memory,
     PidType processPid)
 {
-    auto currentBlock =
-        std::find_if(memory->processes.begin(), memory->processes.end(), pidEqualTo(processPid));
-
-    if (currentBlock != memory->processes.end())
-        return *currentBlock;
-
-    return {};
+    auto currentBlock = memory->findProcess(processPid);
+    return currentBlock ? *currentBlock : SharedMemoryData::Process{};
 }
 
 void MockSharedMemoryInterface::setSharedMemoryBlock(
@@ -69,17 +48,8 @@ void MockSharedMemoryInterface::setSharedMemoryBlock(
     PidType processPid)
 {
     data.pid = processPid;
-
-    auto currentBlock =
-        std::find_if(memory->processes.begin(), memory->processes.end(), pidEqualTo(processPid));
-
-    if (currentBlock == memory->processes.end())
-    {
-        currentBlock =
-            std::find_if(memory->processes.begin(), memory->processes.end(), pidEqualTo(0));
-    }
-
-    NX_ASSERT(currentBlock != memory->processes.end());
+    auto currentBlock = addProcessIfNeeded(memory, processPid);
+    NX_ASSERT(currentBlock != nullptr);
     *currentBlock = data;
 }
 

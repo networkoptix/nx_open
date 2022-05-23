@@ -14,99 +14,10 @@
 
 #include "client_process_execution_interface.h"
 #include "session_id.h"
+#include "shared_memory_data.h"
 
 namespace nx::vms::client::desktop {
 
-/**
- * This structure is shared between all the clients using the shared memory mechanism.
- */
-struct NX_VMS_CLIENT_DESKTOP_API SharedMemoryData
-{
-    static constexpr int kClientCount = 64;
-    static constexpr int kCommandDataSize = 64;
-    static constexpr int kTokenSize = 64;
-
-    using PidType = ClientProcessExecutionInterface::PidType;
-    using ScreenUsageData = QSet<int>;
-    using Token = std::string;
-
-    struct Process
-    {
-        /** List of all possible commands, which one client can send to others. */
-        NX_REFLECTION_ENUM_CLASS_IN_CLASS(Command,
-            none,
-
-            /** If the current client modifies local settings, others must reload them. */
-            reloadSettings,
-
-            /** Close window without saving its state. */
-            exit,
-
-            /** Save full window state for later use during Session Restore. */
-            saveWindowState,
-
-            /** Restore window state from file. */
-            restoreWindowState,
-
-            /** Logout from cloud. */
-            logoutFromCloud
-        );
-
-        /** PID of the process. */
-        PidType pid = 0;
-
-        /** List of screens, which are used by the client. 8 bytes. */
-        ScreenUsageData usedScreens;
-
-        /** Actual session id if the client is connected to the system. */
-        SessionId sessionId = {};
-
-        /** Actual command, which should be executed by the client. */
-        Command command = Command::none;
-
-        /**
-         * Additional data associated with command. Must not exceed kCommandDataSize bytes.
-         *
-         * Contains file name for restoreWindowState command.
-         * Ignored for other commands.
-         */
-        QByteArray commandData;
-
-        bool operator==(const Process& other) const = default;
-    };
-
-    using Command = Process::Command;
-
-    struct Session
-    {
-        SessionId id = {};
-        Token token;
-
-        bool operator==(const Session& other) const = default;
-    };
-
-    using Processes = std::array<Process, kClientCount>;
-    using Sessions = std::array<Session, kClientCount>;
-
-    Processes processes;
-    Sessions sessions;
-
-    bool operator==(const SharedMemoryData& other) const = default;
-};
-
-#define SharedMemoryDataProcess_Fields (pid)(usedScreens)(sessionId)(command)(commandData)
-NX_REFLECTION_INSTRUMENT(SharedMemoryData::Process, SharedMemoryDataProcess_Fields);
-
-#define SharedMemoryDataSession_Fields (id)(token)
-NX_REFLECTION_INSTRUMENT(SharedMemoryData::Session, SharedMemoryDataSession_Fields);
-
-#define SharedMemoryData_Fields (processes)(sessions)
-NX_REFLECTION_INSTRUMENT(SharedMemoryData, SharedMemoryData_Fields);
-
-/** GTest output support. */
-NX_VMS_CLIENT_DESKTOP_API void PrintTo(SharedMemoryData::Command command, ::std::ostream* os);
-NX_VMS_CLIENT_DESKTOP_API void PrintTo(SharedMemoryData::Process process, ::std::ostream* os);
-NX_VMS_CLIENT_DESKTOP_API void PrintTo(SharedMemoryData::Session session, ::std::ostream* os);
 
 class SharedMemoryInterface
 {
