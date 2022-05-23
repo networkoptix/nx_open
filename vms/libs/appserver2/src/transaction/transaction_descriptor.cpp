@@ -481,8 +481,18 @@ static Result checkExistingResourceAccess(
     Qn::Permissions permissions)
 {
     const auto& resPool = commonModule->resourcePool();
-    QnResourcePtr target = resPool->getResourceById(resourceId);
     auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
+    // Null resource Id can not be handled by permissions engine, since there is no such resource.
+    // System settings are stored as admin user properties
+    if ((resourceId.isNull() || resourceId == QnUserResource::kAdminGuid)
+        && userResource
+        && (userResource->userRole() == Qn::UserRole::owner
+            || userResource->userRole() == Qn::UserRole::administrator))
+    {
+        return Result();
+    }
+
+    QnResourcePtr target = resPool->getResourceById(resourceId);
     if (commonModule->resourceAccessManager()->hasPermission(userResource, target, permissions))
         return Result();
 
