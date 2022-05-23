@@ -12,6 +12,8 @@ find_package(Qt5
 
 find_package(hidapi REQUIRED)
 
+find_package(range-v3 REQUIRED)
+
 if(LINUX)
     find_package(Qt5 COMPONENTS X11Extras)
 endif()
@@ -134,6 +136,7 @@ nx_add_target(nx_vms_client_desktop LIBRARY
         nx_kit
         nx_monitoring
         hidapi::hidapi
+        range-v3::range-v3
     FOLDER client/libs
     MACOS_ARG_MAX_WORKAROUND
 )
