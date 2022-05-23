@@ -22,6 +22,12 @@ struct DefaultApiResultCodeDescriptor
     using ResultCode = nx::network::http::StatusCode::Value;
 };
 
+template <class T>
+concept HasResultCodeT = requires
+{
+    typename T::ResultCode;
+};
+
 /**
  * Base class for client of some API. E.g., REST API based on HTTP/json.
  * ApiResultCodeDescriptor MUST define:
@@ -38,9 +44,9 @@ struct DefaultApiResultCodeDescriptor
  *         const Output&... output);
  * </code></pre>
  */
-template<typename ApiResultCodeDescriptor = DefaultApiResultCodeDescriptor>
-// requires { typename ApiResultCodeDescriptor::ResultCode; }
-class GenericApiClient: public network::aio::BasicPollable
+template<HasResultCodeT ApiResultCodeDescriptor = DefaultApiResultCodeDescriptor,
+    typename Base = network::aio::BasicPollable>
+class GenericApiClient: public Base
 {
     using base_type = network::aio::BasicPollable;
     using ResultType = typename ApiResultCodeDescriptor::ResultCode;
@@ -151,21 +157,21 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-template<typename ApiResultCodeDescriptor>
-GenericApiClient<ApiResultCodeDescriptor>::GenericApiClient(
+template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
+GenericApiClient<ApiResultCodeDescriptor, Base>::GenericApiClient(
     const utils::Url& baseApiUrl, ssl::AdapterFunc adapterFunc):
     m_baseApiUrl(baseApiUrl), m_adapterFunc(std::move(adapterFunc)), m_numRetries(1)
 {
 }
 
-template<typename ApiResultCodeDescriptor>
-GenericApiClient<ApiResultCodeDescriptor>::~GenericApiClient()
+template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
+GenericApiClient<ApiResultCodeDescriptor, Base>::~GenericApiClient()
 {
-    pleaseStopSync();
+    Base::pleaseStopSync();
 }
 
-template<typename ApiResultCodeDescriptor>
-void GenericApiClient<ApiResultCodeDescriptor>::bindToAioThread(
+template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
+void GenericApiClient<ApiResultCodeDescriptor, Base>::bindToAioThread(
     network::aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);
@@ -175,39 +181,39 @@ void GenericApiClient<ApiResultCodeDescriptor>::bindToAioThread(
         context.second.client->bindToAioThread(aioThread);
 }
 
-template<typename ApiResultCodeDescriptor>
-void GenericApiClient<ApiResultCodeDescriptor>::setRequestTimeout(
+template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
+void GenericApiClient<ApiResultCodeDescriptor, Base>::setRequestTimeout(
     std::optional<std::chrono::milliseconds> timeout)
 {
     m_requestTimeout = timeout;
 }
 
-template<typename ResultCode>
-void GenericApiClient<ResultCode>::setRetryPolicy(unsigned numOfRetries, ResultType successCode)
+template<HasResultCodeT ResultCode, typename Base>
+void GenericApiClient<ResultCode, Base>::setRetryPolicy(unsigned numOfRetries, ResultType successCode)
 {
     m_numRetries = numOfRetries;
     m_isRequestSucceeded = [successCode](ResultType result) { return result == successCode; };
 }
 
-template<typename ResultCode>
-void GenericApiClient<ResultCode>::setRetryPolicy(
+template<HasResultCodeT ResultCode, typename Base>
+void GenericApiClient<ResultCode, Base>::setRetryPolicy(
     unsigned numOfRetries, nx::utils::MoveOnlyFunc<bool(ResultType)> m_isRequstSucceded)
 {
     m_numRetries = numOfRetries;
     m_isRequstSucceded = std::move(m_isRequstSucceded);
 }
 
-template<typename ApiResultCodeDescriptor>
-void GenericApiClient<ApiResultCodeDescriptor>::stopWhileInAioThread()
+template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
+void GenericApiClient<ApiResultCodeDescriptor, Base>::stopWhileInAioThread()
 {
     base_type::stopWhileInAioThread();
 
     m_activeRequests.clear();
 }
 
-template<typename ApiResultCodeDescriptor>
+template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
 template<typename Output, typename... InputArgsAndCompletionHandler>
-inline void GenericApiClient<ApiResultCodeDescriptor>::makeAsyncCall(
+inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCall(
     const network::http::Method& method,
     const std::string& requestPath,
     const nx::utils::UrlQuery& urlQuery,
@@ -221,9 +227,9 @@ inline void GenericApiClient<ApiResultCodeDescriptor>::makeAsyncCall(
         std::forward<InputArgsAndCompletionHandler>(args)...);
 }
 
-template<typename ApiResultCodeDescriptor>
+template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
 template<typename Output, typename... InputArgsAndCompletionHandler>
-inline void GenericApiClient<ApiResultCodeDescriptor>::makeAsyncCall(
+inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCall(
     const network::http::Method& method,
     const std::string& requestPath,
     const nx::utils::UrlQuery& urlQuery,
@@ -248,9 +254,9 @@ inline void GenericApiClient<ApiResultCodeDescriptor>::makeAsyncCall(
         std::move(handler));
 }
 
-template<typename ApiResultCodeDescriptor>
+template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
 template<typename Output, typename InputTuple, typename Handler>
-inline void GenericApiClient<ApiResultCodeDescriptor>::makeAsyncCallWithRetries(
+inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCallWithRetries(
     const network::http::Method& method,
     const std::string& requestPath,
     const nx::utils::UrlQuery& urlQuery,
@@ -301,9 +307,9 @@ inline void GenericApiClient<ApiResultCodeDescriptor>::makeAsyncCallWithRetries(
         });
 }
 
-template<typename ApiResultCodeDescriptor>
+template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
 template<typename Output, typename... InputArgsAndCompletionHandler, typename>
-inline void GenericApiClient<ApiResultCodeDescriptor>::makeAsyncCall(
+inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCall(
     const network::http::Method& method,
     const std::string& requestPath,
     InputArgsAndCompletionHandler&&... args)
@@ -316,9 +322,9 @@ inline void GenericApiClient<ApiResultCodeDescriptor>::makeAsyncCall(
         std::forward<InputArgsAndCompletionHandler>(args)...);
 }
 
-template<typename ApiResultCodeDescriptor>
+template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
 template<typename Output, typename... InputArgs>
-auto GenericApiClient<ApiResultCodeDescriptor>::makeSyncCall(InputArgs&&... inputArgs)
+auto GenericApiClient<ApiResultCodeDescriptor, Base>::makeSyncCall(InputArgs&&... inputArgs)
 {
     if constexpr (std::is_same<Output, void>::value)
     {
@@ -332,15 +338,15 @@ auto GenericApiClient<ApiResultCodeDescriptor>::makeSyncCall(InputArgs&&... inpu
     }
 }
 
-template<typename ApiResultCodeDescriptor>
-const utils::Url& GenericApiClient<ApiResultCodeDescriptor>::baseApiUrl() const
+template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
+const utils::Url& GenericApiClient<ApiResultCodeDescriptor, Base>::baseApiUrl() const
 {
     return m_baseApiUrl;
 }
 
-template<typename ApiResultCodeDescriptor>
+template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
 template<typename Output, typename... Args>
-auto GenericApiClient<ApiResultCodeDescriptor>::createHttpClient(
+auto GenericApiClient<ApiResultCodeDescriptor, Base>::createHttpClient(
     const nx::utils::Url& url, network::http::Credentials credentials, Args&&... args)
 {
     using InputParamType = nx::utils::tuple_first_element_t<std::tuple<std::decay_t<Args>...>>;
@@ -348,7 +354,7 @@ auto GenericApiClient<ApiResultCodeDescriptor>::createHttpClient(
     auto httpClient =
         std::make_unique<network::http::FusionDataHttpClient<InputParamType, Output>>(
             url, std::move(credentials), m_adapterFunc, std::forward<Args>(args)...);
-    httpClient->bindToAioThread(getAioThread());
+    httpClient->bindToAioThread(Base::getAioThread());
 
     if (m_requestTimeout)
         httpClient->setRequestTimeout(*m_requestTimeout);
@@ -362,9 +368,9 @@ auto GenericApiClient<ApiResultCodeDescriptor>::createHttpClient(
     return httpClientPtr;
 }
 
-template<typename ApiResultCodeDescriptor>
+template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
 template<typename Request, typename CompletionHandler, typename... Output>
-void GenericApiClient<ApiResultCodeDescriptor>::processResponse(
+void GenericApiClient<ApiResultCodeDescriptor, Base>::processResponse(
     Request* requestPtr,
     CompletionHandler handler,
     SystemError::ErrorCode error,
@@ -379,9 +385,10 @@ void GenericApiClient<ApiResultCodeDescriptor>::processResponse(
     handler(resultCode, std::move(output)...);
 }
 
-template<typename ApiResultCodeDescriptor>
-typename GenericApiClient<ApiResultCodeDescriptor>::Context GenericApiClient<
-    ApiResultCodeDescriptor>::takeContextOfRequest(nx::network::aio::BasicPollable* httpClientPtr)
+template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
+typename GenericApiClient<ApiResultCodeDescriptor, Base>::Context
+    GenericApiClient<ApiResultCodeDescriptor, Base>::takeContextOfRequest(
+        nx::network::aio::BasicPollable* httpClientPtr)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     auto clientIter = m_activeRequests.find(httpClientPtr);
@@ -392,9 +399,9 @@ typename GenericApiClient<ApiResultCodeDescriptor>::Context GenericApiClient<
     return context;
 }
 
-template<typename ApiResultCodeDescriptor>
+template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
 template<typename... Output>
-auto GenericApiClient<ApiResultCodeDescriptor>::getResultCode(
+auto GenericApiClient<ApiResultCodeDescriptor, Base>::getResultCode(
     [[maybe_unused]] SystemError::ErrorCode systemErrorCode,
     const network::http::Response* response,
     const network::http::ApiRequestResult& fusionRequestResult,
@@ -413,16 +420,16 @@ auto GenericApiClient<ApiResultCodeDescriptor>::getResultCode(
     }
 }
 
-template<typename ApiResultCodeDescriptor>
+template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
 template<typename Output, typename ResultTuple, typename... InputArgs>
-auto GenericApiClient<ApiResultCodeDescriptor>::makeSyncCallInternal(InputArgs&&... inputArgs)
+auto GenericApiClient<ApiResultCodeDescriptor, Base>::makeSyncCallInternal(InputArgs&&... inputArgs)
 {
     std::promise<ResultTuple> done;
 
     makeAsyncCall<Output>(std::forward<InputArgs>(inputArgs)..., [this, &done](auto&&... args) {
         auto result = std::make_tuple(std::move(args)...);
         // Doing post to make sure all network operations are completed before returning.
-        post([&done, result = std::move(result)]() { done.set_value(std::move(result)); });
+        Base::post([&done, result = std::move(result)]() { done.set_value(std::move(result)); });
     });
 
     auto result = done.get_future().get();
