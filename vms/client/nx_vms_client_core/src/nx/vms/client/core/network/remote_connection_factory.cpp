@@ -615,13 +615,6 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
             return;
         }
 
-        if (!nx::vms::client::core::ini().bearerAuthentication)
-        {
-            loginWithDigest(context());
-            pullRestCertificates(context());
-            return;
-        }
-
         if (peerType == nx::vms::api::PeerType::videowallClient)
         {
             loginWithToken(context());

@@ -10,10 +10,6 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
 {
     Ini(): IniConfig("nx_vms_client_core.ini") { reload(); }
 
-    // VMS-20420
-    NX_INI_FLAG(true, bearerAuthentication,
-        "[Feature] Enable bearer token authentication.");
-
     // VMS-30347.
     NX_INI_INT(8, maxLastConnectedTilesStored,
         "[Support] Maximum last connected systems tiles stored on the Welcome Screen");
