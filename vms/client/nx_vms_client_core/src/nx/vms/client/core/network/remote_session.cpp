@@ -18,6 +18,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/credentials_manager.h>
 #include <nx/vms/client/core/utils/cloud_session_token_updater.h>
@@ -30,6 +31,7 @@
 #include "network_module.h"
 #include "remote_connection.h"
 #include "remote_connection_factory.h"
+#include "session_token_terminator.h"
 
 using namespace std::chrono;
 
@@ -70,7 +72,13 @@ void RemoteSession::Private::terminateServerSessionIfNeeded()
     if (!autoTerminate)
         return;
 
-    if (!connection)
+    if (ini().asyncAuthTokenTermination)
+    {
+        qnClientCoreModule->sessionTokenTerminator()->terminateTokenAsync(connection);
+        return;
+    }
+
+    if (!NX_ASSERT(connection))
         return;
 
     if (connection->userType() == nx::vms::api::UserType::cloud)
