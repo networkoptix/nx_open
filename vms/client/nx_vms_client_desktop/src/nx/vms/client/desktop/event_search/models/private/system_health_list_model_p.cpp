@@ -35,7 +35,7 @@
 
 namespace {
 
-static const auto kDeviceNameAttribute = "deviceName";
+static const auto kDeviceModelAttribute = "deviceModel";
 static const auto kOldDeviceUrlAttribute = "oldDeviceUrl";
 
 } // namespace
@@ -209,11 +209,11 @@ QString SystemHealthListModel::Private::text(int index) const
             const auto caption = tr("Replaced camera discovered");
 
             auto attributes = item.serverData->getRuntimeParams().attributes;
-            const auto deviceName =
-                findFirstAttributeByName(&attributes, kDeviceNameAttribute)->value;
+            const auto deviceModel =
+                findFirstAttributeByName(&attributes, kDeviceModelAttribute)->value;
 
             return html::paragraph(caption)
-                + html::paragraph(html::colored(deviceName, kDeviceNameColor));
+                + html::paragraph(html::colored(deviceModel, kDeviceNameColor));
         }
 
         case QnSystemHealth::RemoteArchiveSyncStarted:
@@ -284,13 +284,13 @@ QString SystemHealthListModel::Private::toolTip(int index) const
 
         auto attributes = item.serverData->getRuntimeParams().attributes;
 
-        const auto discoveredCameraName =
-            findFirstAttributeByName(&attributes, kDeviceNameAttribute)->value;
+        const auto discoveredCameraModel =
+            findFirstAttributeByName(&attributes, kDeviceModelAttribute)->value;
         const auto discoveredCameraUrl =
             nx::utils::Url(findFirstAttributeByName(&attributes, kOldDeviceUrlAttribute)->value);
         const auto discoveredCameraHost = discoveredCameraUrl.host();
         const auto discoveredCameraText = QStringList({
-            html::bold(discoveredCameraName), discoveredCameraHost}).join(QChar::Space);
+            html::bold(discoveredCameraModel), discoveredCameraHost}).join(QChar::Space);
 
         const auto replacementCameraText = QStringList({
             html::bold(item.resource->getName()), QnResourceDisplayInfo(item.resource).host()})
