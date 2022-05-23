@@ -66,6 +66,7 @@ class NxConan(ConanFile):
 
     def build_requirements(self):
         if self.isLinux:
+            # Note: For gcc-toolchain requirement see open/cmake/conan_profiles/gcc.profile.
             if self.options.useClang:
                 self.build_requires("clang/11.0.1" "#91163fed8b1b7ceffc1263afc4fc0770")
             self.build_requires("sdk-gcc/5.5" "#01b5d38415be7bdd73ae29717c8f7741")
