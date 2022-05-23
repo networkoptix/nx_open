@@ -56,7 +56,7 @@ CompositeResourceSource::CompositeResourceSource(
 
 QVector<QnResourcePtr> CompositeResourceSource::getResources()
 {
-    const auto unitedResources = m_firstSourceResources.unite(m_secondSourceResources);
+    const auto unitedResources = m_firstSourceResources | m_secondSourceResources;
     return QVector<QnResourcePtr>(unitedResources.cbegin(), unitedResources.cend());
 }
 
