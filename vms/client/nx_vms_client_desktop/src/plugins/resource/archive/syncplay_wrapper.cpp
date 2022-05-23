@@ -287,8 +287,6 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveStreamReader* r
         &QnArchiveSyncPlayWrapper::onBeforeJump, Qt::DirectConnection);
     connect(reader, &QnAbstractArchiveStreamReader::jumpOccured, this,
         &QnArchiveSyncPlayWrapper::onJumpOccured, Qt::DirectConnection);
-    connect(reader, &QnAbstractArchiveStreamReader::jumpCanceled, this,
-        &QnArchiveSyncPlayWrapper::onJumpCanceled, Qt::DirectConnection);
 
     if (d->enabled)
     {
@@ -433,12 +431,6 @@ void QnArchiveSyncPlayWrapper::reinitTime(qint64 newTime)
 }
 
 void QnArchiveSyncPlayWrapper::onBeforeJump(qint64 /*mksec*/)
-{
-    Q_D(QnArchiveSyncPlayWrapper);
-    NX_MUTEX_LOCKER lock( &d->timeMutex );
-}
-
-void QnArchiveSyncPlayWrapper::onJumpCanceled(qint64 /*time*/)
 {
     Q_D(QnArchiveSyncPlayWrapper);
     NX_MUTEX_LOCKER lock( &d->timeMutex );

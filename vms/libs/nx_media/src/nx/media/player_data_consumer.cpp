@@ -46,7 +46,6 @@ PlayerDataConsumer::PlayerDataConsumer(
     RenderContextSynchronizerPtr renderContextSynchronizer)
     :
     QnAbstractDataConsumer(kMaxMediaQueueLen),
-    m_awaitingJumpCounter(0),
     m_sequence(0),
     m_lastFrameTimeUs(AV_NOPTS_VALUE),
     m_lastDisplayedTimeUs(AV_NOPTS_VALUE),
@@ -54,14 +53,13 @@ PlayerDataConsumer::PlayerDataConsumer(
     m_audioEnabled(true),
     m_needToResetAudio(true),
     m_speed(1),
-    m_renderContextSynchronizer(renderContextSynchronizer)
+    m_renderContextSynchronizer(renderContextSynchronizer),
+    m_archiveReader(archiveReader.get())
 {
     Qn::directConnect(archiveReader.get(), &QnArchiveStreamReader::beforeJump,
         this, &PlayerDataConsumer::onBeforeJump);
     Qn::directConnect(archiveReader.get(), &QnArchiveStreamReader::jumpOccured,
         this, &PlayerDataConsumer::onJumpOccurred);
-    Qn::directConnect(archiveReader.get(), &QnArchiveStreamReader::jumpCanceled,
-        this, &PlayerDataConsumer::onJumpCanceled);
 }
 
 PlayerDataConsumer::~PlayerDataConsumer()
@@ -202,7 +200,7 @@ bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
 
 bool PlayerDataConsumer::processEmptyFrame(const QnEmptyMediaDataPtr& constData)
 {
-    if (m_awaitingJumpCounter > 0)
+    if (m_archiveReader->isJumpProcessing())
         return true; //< ignore EOF due to we are going set new position
 
 
@@ -372,7 +370,7 @@ QVideoFramePtr PlayerDataConsumer::dequeueVideoFrame()
 
     {
         NX_MUTEX_LOCKER lock(&m_jumpMutex);
-        if (!checkSequence(metadata.sequence) || m_awaitingJumpCounter > 0)
+        if (!checkSequence(metadata.sequence) || m_archiveReader->isJumpProcessing())
         {
             // Frame became deprecated because a new jump was queued. Mark it as noDelay
             metadata.displayHint = DisplayHint::obsolete;
@@ -450,7 +448,6 @@ void PlayerDataConsumer::onBeforeJump(qint64 timeUsec)
 {
     // This function is called directly from an archiveReader thread. Should be thread safe.
     NX_MUTEX_LOCKER lock(&m_jumpMutex);
-    ++m_awaitingJumpCounter;
     m_eofPacketCounter = 0; //< ignore EOF due to we are going to set new position
 
     // The purpose of this variable is prevent doing delay between frames while they are displayed.
@@ -459,33 +456,22 @@ void PlayerDataConsumer::onBeforeJump(qint64 timeUsec)
     m_lastDisplayedTimeUs = m_lastFrameTimeUs = timeUsec; //< force position to the new place
 }
 
-void PlayerDataConsumer::onJumpCanceled(qint64 /*timeUsec*/)
-{
-    // This function is called directly from an archiveReader thread. Should be thread safe.
-    // Previous jump command has not been executed due to the new jump command received.
-    NX_MUTEX_LOCKER lock(&m_jumpMutex);
-    --m_awaitingJumpCounter;
-    NX_ASSERT(m_awaitingJumpCounter >= 0);
-}
-
 void PlayerDataConsumer::onJumpOccurred(qint64 /*timeUsec*/, int sequence)
 {
     // This function is called directly from an archiveReader thread. Should be thread safe.
+    bool allJumpsProcessed = !m_archiveReader->isJumpProcessing();
+    if (allJumpsProcessed)
     {
         NX_MUTEX_LOCKER lock(&m_jumpMutex);
-        --m_awaitingJumpCounter;
-        if (m_awaitingJumpCounter == 0)
-        {
-            // This function is called from dataProvider thread. PlayerConsumer may still process the
-            // previous frame. So, leave noDelay state a bit later, when the next BOF frame will be
-            // received.
-            m_sequence = sequence;
-            m_awaitingFramesMask.setMask();
-        }
+        // This function is called from dataProvider thread. PlayerConsumer may still process the
+        // previous frame. So, leave noDelay state a bit later, when the next BOF frame will be
+        // received.
+        m_sequence = sequence;
+        m_awaitingFramesMask.setMask();
     }
 
     clearUnprocessedData(); //< Clear input (undecoded) data queue.
-    if (m_awaitingJumpCounter == 0)
+    if (allJumpsProcessed)
         emit jumpOccurred(m_sequence);
     else
         emit hurryUp();

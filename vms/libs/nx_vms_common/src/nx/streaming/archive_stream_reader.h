@@ -176,7 +176,8 @@ public:
     virtual std::chrono::microseconds currentTime() const override;
 
     void reopen();
-
+    bool isJumpProcessing() const;
+	
 protected:
     virtual bool init();
 
@@ -210,6 +211,7 @@ private:
     void setSpeedInternal(double speed, qint64 currentTimeHint = AV_NOPTS_VALUE);
     bool isCompatiblePacketForMask(const QnAbstractMediaDataPtr& mediaData) const;
     virtual bool needKeyData(int channel) const override;
+    void emitJumpOccured(qint64 mksec, int sequence);
 
 private slots:
 private:
@@ -219,7 +221,7 @@ private:
     qint64 m_lastGopSeekTime;
     QVector<int> m_audioCodecs;
     bool m_IFrameAfterJumpFound;
-    qint64 m_requiredJumpTime;
+    std::atomic<qint64> m_requiredJumpTime;
     QString m_onDestroyFileName;
     bool m_BOF;
     int m_afterBOFCounter;
