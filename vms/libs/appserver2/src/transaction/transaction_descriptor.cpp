@@ -492,10 +492,23 @@ static Result checkExistingResourceAccess(
     Qn::Permissions permissions)
 {
     const auto& resPool = commonModule->systemContext()->resourcePool();
-    QnResourcePtr target = resPool->getResourceById(resourceId);
     auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-    if (commonModule->systemContext()->resourceAccessManager()->hasPermission(userResource, target, permissions))
+    // Null resource Id can not be handled by permissions engine, since there is no such resource.
+    // System settings are stored as admin user properties
+    if ((resourceId.isNull() || resourceId == QnUserResource::kAdminGuid)
+        && userResource
+        && (userResource->userRole() == Qn::UserRole::owner
+            || userResource->userRole() == Qn::UserRole::administrator))
+    {
         return Result();
+    }
+
+    QnResourcePtr target = resPool->getResourceById(resourceId);
+    if (commonModule->systemContext()->resourceAccessManager()->hasPermission(
+        userResource, target, permissions))
+    {
+        return Result();
+    }
 
     const QString errorMessage = NX_FMT(
         "User %1 with %2 permissions is asking for %3 resource with %4 permissions and fails",
