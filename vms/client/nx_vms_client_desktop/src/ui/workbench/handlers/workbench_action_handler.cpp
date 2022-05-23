@@ -2253,7 +2253,11 @@ void ActionHandler::undoReplaceCameraActionTriggered()
         (bool success,
             rest::Handle requestId, rest::ServerConnection::EmptyResponseType requestResult)
         {
-            // TODO: #vbreus Notify about result.
+            if (success)
+            {
+                QnMessageBox::success(mainWindowWidget(),
+                    tr("Undo replacement completed successfully!"));
+            }
         });
 
     connectedServerApi()->undoReplaceDevice(
