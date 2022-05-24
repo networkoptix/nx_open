@@ -42,6 +42,7 @@ public:
         registerKey<std::vector<QnCameraAdvancedParameterOverload>>(
             ResourceDataKey::kAdvancedParameterOverloads);
         registerKey<ptz::Override>(ptz::Override::kPtzOverrideKey);
+        registerKey<QVector<bool>>("hasDualStreaming");
     }
 
 protected:
