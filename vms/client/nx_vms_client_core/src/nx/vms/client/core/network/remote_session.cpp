@@ -70,44 +70,8 @@ struct RemoteSession::Private
 
 void RemoteSession::Private::terminateServerSessionIfNeeded()
 {
-    if (!autoTerminate)
-        return;
-
-    if (ini().asyncAuthTokenTermination)
-    {
+    if (autoTerminate)
         qnClientCoreModule->sessionTokenTerminator()->terminateTokenAsync(connection);
-        return;
-    }
-
-    if (!NX_ASSERT(connection))
-        return;
-
-    if (connection->userType() == nx::vms::api::UserType::cloud)
-        return;
-
-    const auto credentials = connection->credentials();
-    const bool canDeleteToken = !credentials.authToken.empty()
-        && credentials.authToken.isBearerToken();
-    if (!canDeleteToken)
-        return;
-
-    NX_INFO(this, "Terminate server session");
-    std::promise<bool> promise;
-    connection->serverApi()->deleteEmptyResult(
-        QString("/rest/v1/login/sessions/") + credentials.authToken.value,
-        nx::network::rest::Params(),
-        [&promise](
-            bool success,
-            rest::Handle /*requestId*/,
-            rest::ServerConnection::EmptyResponseType /*requestResult*/)
-        {
-            promise.set_value(success);
-        });
-
-    auto result = promise.get_future();
-    auto status = result.wait_for(kTerminateServerSessionTimeout);
-    if (status != std::future_status::ready || result.get() == false)
-        NX_WARNING(this, "Can not terminate server session");
 }
 
 void RemoteSession::Private::updateTokenExpirationTime()
