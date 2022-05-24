@@ -1580,15 +1580,15 @@
     </message>
     <message>
       <source>License Key</source>
-      <translation>Mã bản quyền</translation>
+      <translation>Khóa giấy phép</translation>
     </message>
     <message>
       <source>Invalid License Key</source>
-      <translation>Mã bản quyền không hợp lệ</translation>
+      <translation>Khóa giấy phép không hợp lệ</translation>
     </message>
     <message>
       <source>Activation Key File</source>
-      <translation>Bắt đầu tập tin quan trọng</translation>
+      <translation>Tệp khóa kích hoạt</translation>
     </message>
     <message>
       <source>Hardware ID</source>
