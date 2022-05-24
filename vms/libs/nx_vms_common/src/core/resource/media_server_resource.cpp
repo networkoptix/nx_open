@@ -331,9 +331,11 @@ QString QnMediaServerResource::rtspUrl() const
 
     if (auto context = systemContext())
     {
-        auto connection = context->ec2Connection();
-        isSecure = context->globalSettings()->isVideoTrafficEncryptionForced()
-            || (connection && connection->credentials().authToken.isBearerToken());
+        if (auto connection = context->ec2Connection())
+        {
+            isSecure = context->globalSettings()->isVideoTrafficEncryptionForced()
+                || connection->credentials().authToken.isBearerToken();
+        }
     }
 
     nx::network::url::Builder urlBuilder(getUrl());
