@@ -52,12 +52,20 @@ bool cameraCanBeReplaced(const QnResourcePtr& resource)
     return parentResource && parentResource->getStatus() == ResourceStatus::online;
 }
 
-bool cameraCanBeUsedAsReplacement(const QnResourcePtr& resource)
+bool cameraCanBeUsedAsReplacement(
+    const QnResourcePtr& cameraToBeReplaced,
+    const QnResourcePtr& replacementCamera)
 {
-    if (!cameraSupportsReplacement(resource))
+    if (!NX_ASSERT(cameraToBeReplaced && replacementCamera))
         return false;
 
-    return resource->isOnline();
+    if (cameraToBeReplaced->getParentId() != replacementCamera->getParentId())
+        return false;
+
+    if (!cameraSupportsReplacement(replacementCamera))
+        return false;
+
+    return replacementCamera->isOnline();
 }
 
 } // namespace camera_replacement

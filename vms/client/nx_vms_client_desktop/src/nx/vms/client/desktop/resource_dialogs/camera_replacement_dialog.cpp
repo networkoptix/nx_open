@@ -10,6 +10,7 @@
 
 #include <api/server_rest_connection.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>
@@ -149,16 +150,25 @@ QLayout* createDataTransferReportItem(
 }
 
 ResourceSelectionWidget::EntityFactoryFunction treeEntityCreationFunction(
+    const QnVirtualCameraResourcePtr& cameraToBeReplaced,
     bool showServersInTree)
 {
     using namespace nx::vms::common::utils;
 
     return
-        [showServersInTree](const entity_resource_tree::ResourceTreeEntityBuilder* builder)
+        [cameraToBeReplaced, showServersInTree](
+            const entity_resource_tree::ResourceTreeEntityBuilder* builder)
         {
+            const auto resourceFilter =
+                [cameraToBeReplaced](const QnResourcePtr& resource)
+                {
+                    return camera_replacement::cameraCanBeUsedAsReplacement(
+                        cameraToBeReplaced, resource);
+                };
+
             return builder->createDialogAllCamerasEntity(
                 showServersInTree,
-                camera_replacement::cameraCanBeUsedAsReplacement);
+                resourceFilter);
         };
 }
 
@@ -198,7 +208,7 @@ CameraReplacementDialog::CameraReplacementDialog(
     d->resourceSelectionWidget->setDetailsPanelHidden(true);
     d->resourceSelectionWidget->setSelectionMode(ResourceSelectionMode::ExclusiveSelection);
     d->resourceSelectionWidget->setTreeEntityFactoryFunction(
-        treeEntityCreationFunction(showServersInTree(context())));
+        treeEntityCreationFunction(cameraToBeReplaced, showServersInTree(context())));
 
     setupUiContols();
     resize(minimumSizeHint());

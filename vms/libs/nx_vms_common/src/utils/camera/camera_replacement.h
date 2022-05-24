@@ -34,11 +34,14 @@ bool NX_VMS_COMMON_API cameraCanBeReplaced(const QnResourcePtr& resource);
 /**
  * Predicate which determines if camera can actually be used as a replacement for another one
  * right now.
- * @param resource Valid pointer to the camera resource expected.
- * @return True if given camera supports replacement (see <tt>cameraSupportsReplacement()</tt>)
- *     and also has online status.
+ * @param cameraToBeReplaced Valid pointer to the camera resource expected.
+ * @param replacementCamera Valid pointer to the camera resource expected.
+ * @return True if given camera supports replacement (see <tt>cameraSupportsReplacement()</tt>),
+ *     has online status and has same parent server as camera to be replaced.
  */
-bool NX_VMS_COMMON_API cameraCanBeUsedAsReplacement(const QnResourcePtr& resource);
+bool NX_VMS_COMMON_API cameraCanBeUsedAsReplacement(
+    const QnResourcePtr& cameraToBeReplaced,
+    const QnResourcePtr& replacementCamera);
 
 } // namespace camera_replacement
 } // namespace utils
