@@ -1239,7 +1239,7 @@
     </message>
     <message>
       <source>Invalid License Key</source>
-      <translation>Mã bản quyền Không hợp lệ</translation>
+      <translation>Khóa giấy phép không hợp lệ</translation>
     </message>
     <message>
       <source>Please make sure it is entered correctly.</source>
@@ -1247,11 +1247,11 @@
     </message>
     <message>
       <source>Invalid activation key file</source>
-      <translation>Key kích hoạt không hợp lệ</translation>
+      <translation>Khóa giấy phép không hợp lệ</translation>
     </message>
     <message>
       <source>Select a valid activation key file to continue.</source>
-      <translation>Chọn key kích hoạt khác để tiếp tục.</translation>
+      <translation>Chọn tệp khóa kích hoạt hợp lệ để tiếp tục.</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1</source>
@@ -1271,7 +1271,7 @@
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
-      <translation>Để kích hoạt mã bản quyền theo cách thủ công, vui lòng liên hệ với %1.</translation>
+      <translation>Để kích hoạt Khóa giấy phép theo cách thủ công, vui lòng liên hệ với %1.</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -1287,7 +1287,7 @@
     </message>
     <message>
       <source>To activate License Key manually please contact your Regional / License support:</source>
-      <translation>Để kích hoạt mã bản quyền theo cách thủ công, vui lòng liên hệ với bộ phận hỗ trợ khu vực / Hỗ trợ mã bản quyền:</translation>
+      <translation>Để kích hoạt Khóa giấy phép theo cách thủ công, vui lòng liên hệ với bộ phận hỗ trợ khu vực/Hỗ trợ giấy phép:</translation>
     </message>
   </context>
   <context>
@@ -1353,7 +1353,7 @@
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
-      <translation>Để có được Mã bản quyền hợp lệ, vui lòng liên hệ %1.</translation>
+      <translation>Để nhận Khóa giấy phép hợp lệ, vui lòng liên hệ %1.</translation>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
@@ -1365,7 +1365,7 @@
     </message>
     <message>
       <source>To get a valid License Key please contact your Regional / License support:</source>
-      <translation>Để có được Mã bản quyền hợp lệ, vui lòng liên hệ với bộ phận hỗ trợ khu vực / Hỗ trợ giấy phép:</translation>
+      <translation>Để nhận Khóa giấy phép hợp lệ, vui lòng liên hệ với bộ phận hỗ trợ khu vực/Hỗ trợ giấy phép:</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your Regional / License support:</source>
@@ -3492,7 +3492,7 @@ to %1</source>
     </message>
     <message>
       <source>License Key</source>
-      <translation>Mã bản quyền</translation>
+      <translation>Khóa giấy phép</translation>
     </message>
     <message>
       <source>Locked to Hardware ID</source>
@@ -3531,7 +3531,7 @@ to %1</source>
     </message>
     <message>
       <source>License Key</source>
-      <translation>Mã bản quyền</translation>
+      <translation>Khóa giấy phép</translation>
     </message>
     <message>
       <source>Status</source>
@@ -3667,16 +3667,16 @@ to %1</source>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
-      <translation>Để có được tệp Khóa kích hoạt, vui lòng gửi Mã bản quyền và ID phần cứng được cung cấp về %1.</translation>
+      <translation>Để nhận được tệp kích hoạt, vui lòng gửi Khóa giấy phép và ID phần cứng tới %1.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
-      <translation>Vui lòng gửi Mã bản quyền và ID Phần cứng tới bộ phận hỗ trợ Khu vực / Hỗ trợ giấy phép để nhận một tệp Khóa kích hoạt.</translation>
+      <translation>Vui lòng gửi Khóa giấy phép và ID Phần cứng tới bộ phận hỗ trợ Khu vực/Hỗ trợ giấy phép để nhận tệp kích hoạt.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation>Vui lòng gửi Mã bản quyền và ID Phần cứng tới bộ phận hỗ trợ Khu vực / Hỗ trợ giấy phép (%1) để nhận một tệp Khóa kích hoạt.</translation>
+      <translation>Vui lòng gửi Khóa giấy phép và ID Phần cứng tới bộ phận hỗ trợ Khu vực/Hỗ trợ giấy phép (%1) để nhận tệp khóa kích hoạt.</translation>
     </message>
   </context>
   <context>
@@ -10932,7 +10932,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
       <translation>
-        <numerusform>Lưu ý rằng mỗi khóa mã bản quyền có thể bị vô hiệu hóa tối đa %n lần.</numerusform>
+        <numerusform>Lưu ý rằng mỗi Khóa giấy phép có thể bị vô hiệu hóa tối đa %n lần.</numerusform>
       </translation>
     </message>
   </context>
