@@ -334,9 +334,14 @@ void QnMediaServerResource::setGuidConflictDetected(bool value)
 
 QString QnMediaServerResource::rtspUrl() const
 {
+    bool isSecure = true;
+
     auto connection = commonModule()->ec2Connection();
-    const auto isSecure = commonModule()->globalSettings()->isVideoTrafficEncryptionForced()
-        || (connection && connection->credentials().authToken.isBearerToken());
+    if (connection)
+    {
+        isSecure = commonModule()->globalSettings()->isVideoTrafficEncryptionForced()
+            || connection->credentials().authToken.isBearerToken();
+    }
 
     nx::network::url::Builder urlBuilder(getUrl());
     urlBuilder.setScheme(nx::network::rtsp::urlScheme(isSecure));
