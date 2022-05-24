@@ -1251,8 +1251,12 @@ void ConnectActionsHandler::connectToServer(LogonData logonData, ConnectionOptio
             *logonData.connectScenario)
         : nullptr;
 
+    // Store username case-sensitive as it was entered (actual only for the digest auth method).
+    std::string originalUsername = logonData.credentials.username;
+
     auto callback = d->makeSingleConnectionCallback(
-        [this, options, connectScenario](RemoteConnectionFactory::ConnectionOrError result)
+        [this, options, connectScenario, originalUsername]
+            (RemoteConnectionFactory::ConnectionOrError result)
         {
             if (const auto error = std::get_if<RemoteConnectionError>(&result))
             {
@@ -1267,8 +1271,11 @@ void ConnectActionsHandler::connectToServer(LogonData logonData, ConnectionOptio
 
                 establishConnection(connection);
 
+                ConnectionInfo storedConnectionInfo = connection->connectionInfo();
+                storedConnectionInfo.credentials.username = originalUsername;
+
                 storeConnectionRecord(
-                    connection->connectionInfo(),
+                    storedConnectionInfo,
                     connection->moduleInformation(),
                     options);
             }
