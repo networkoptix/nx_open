@@ -372,7 +372,10 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
     void loginWithDigest(ContextPtr context)
     {
         if (context)
+        {
+            ensureUserNameIsLowercaseIfDigest(context->logonData.credentials);
             requestsManager->checkDigestAuthentication(context);
+        }
     }
 
     bool loginWithToken(ContextPtr context)
@@ -675,8 +678,6 @@ void RemoteConnectionFactory::shutdown()
 RemoteConnectionFactory::ProcessPtr RemoteConnectionFactory::connect(
     LogonData logonData, Callback callback)
 {
-    ensureUserNameIsLowercaseIfDigest(logonData.credentials);
-
     auto process = std::make_shared<RemoteConnectionProcess>();
 
     process->context->logonData = logonData;
