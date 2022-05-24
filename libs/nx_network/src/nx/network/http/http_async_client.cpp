@@ -51,6 +51,7 @@ void AsyncClient::Timeouts::setDefaults(Timeouts value)
 
 AsyncClient::AsyncClient(ssl::AdapterFunc adapterFunc): m_adapterFunc(std::move(adapterFunc))
 {
+    NX_VERBOSE(this, "Creating an instance...");
     SocketGlobals::instance().allocationAnalyzer().recordObjectCreation(this);
     ++SocketGlobals::instance().debugCounters().httpClientConnectionCount;
     if (!NX_ASSERT(m_adapterFunc))
@@ -61,6 +62,7 @@ AsyncClient::AsyncClient(
     std::unique_ptr<AbstractStreamSocket> socket, ssl::AdapterFunc adapterFunc):
     AsyncClient(std::move(adapterFunc))
 {
+    NX_VERBOSE(this, "Creating an instance...");
     m_socket = std::move(socket);
     if (m_socket)
     {
@@ -71,6 +73,7 @@ AsyncClient::AsyncClient(
 
 AsyncClient::~AsyncClient()
 {
+    NX_VERBOSE(this, "Deleting the instance...");
     --SocketGlobals::instance().debugCounters().httpClientConnectionCount;
     SocketGlobals::instance().allocationAnalyzer().recordObjectDestruction(this);
 }
