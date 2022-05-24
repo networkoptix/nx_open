@@ -168,7 +168,8 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
 
         m_lastRequestUrl = nx::utils::Url(requestStr);
 
-        QByteArray encodedRequest = nx::utils::Url(QLatin1String(requestStr)).toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters).toLatin1();
+        QByteArray encodedRequest = nx::utils::Url(QString::fromLatin1(requestStr))
+            .toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters).toLatin1();
         request.append(encodedRequest);
         request.append(" HTTP/1.1\r\n");
         request.append("Host: ");
@@ -359,7 +360,8 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& _requestStr, bool recur
 
         request.append("GET ");
 
-        QByteArray encodedRequest = nx::utils::Url(QLatin1String(requestStr)).toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters).toLatin1();
+        QByteArray encodedRequest = nx::utils::Url(QString::fromLatin1(requestStr))
+            .toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters).toLatin1();
         request.append(encodedRequest);
 
         request.append(" HTTP/1.1\r\n");

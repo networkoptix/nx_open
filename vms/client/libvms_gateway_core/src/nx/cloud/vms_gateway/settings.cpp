@@ -4,7 +4,6 @@
 
 #include <thread>
 
-#include <QtCore/QLatin1String>
 #include <QtCore/QStandardPaths>
 #include <QtCore/QString>
 
@@ -17,83 +16,83 @@
 
 namespace {
 
-const QString kModuleName = lit("vms_gateway");
+constexpr auto kModuleName = "vms_gateway";
 
 //general
-const QLatin1String kGeneralEndpointsToListen("general/listenOn");
-const QLatin1String kDefaultGeneralEndpointsToListen("0.0.0.0:3347");
+constexpr auto kGeneralEndpointsToListen = "general/listenOn";
+constexpr auto kDefaultGeneralEndpointsToListen = "0.0.0.0:3347";
 
-const QLatin1String kGeneralDataDir("general/dataDir");
+constexpr auto kGeneralDataDir = "general/dataDir";
 
-const QLatin1String kGeneralChangeUser("general/changeUser");
+constexpr auto kGeneralChangeUser = "general/changeUser";
 
-const QLatin1String kGeneralMediatorEndpoint("general/mediatorEndpoint");
+constexpr auto kGeneralMediatorEndpoint = "general/mediatorEndpoint";
 
 //auth
-const QLatin1String kAuthXmlPath("auth/rulesXmlPath");
-const QLatin1String kDefaultAuthXmlPath(":/authorization_rules.xml");
+constexpr auto kAuthXmlPath = "auth/rulesXmlPath";
+constexpr auto kDefaultAuthXmlPath = ":/authorization_rules.xml";
 
 //tcp
-const QLatin1String kTcpRecvTimeout("tcp/recvTimeout");
+constexpr auto kTcpRecvTimeout = "tcp/recvTimeout";
 const std::chrono::milliseconds kDefaultTcpRecvTimeout = std::chrono::seconds(17);
 
-const QLatin1String kTcpSendTimeout("tcp/sendTimeout");
+constexpr auto kTcpSendTimeout = "tcp/sendTimeout";
 const std::chrono::milliseconds kDefaultTcpSendTimeout = std::chrono::seconds(17);
 
 //http
-const QLatin1String kHttpProxyTargetPort("http/proxyTargetPort");
+constexpr auto kHttpProxyTargetPort = "http/proxyTargetPort";
 const int kDefaultHttpProxyTargetPort = nx::network::http::DEFAULT_HTTP_PORT;
 
-const QLatin1String kHttpConnectSupport("http/connectSupport");
+constexpr auto kHttpConnectSupport = "http/connectSupport";
 const int kDefaultHttpConnectSupport = 0;
 
-const QLatin1String kHttpAllowTargetEndpointInUrl("http/allowTargetEndpointInUrl");
-const QLatin1String kDefaultHttpAllowTargetEndpointInUrl("false");
+constexpr auto kHttpAllowTargetEndpointInUrl = "http/allowTargetEndpointInUrl";
+constexpr auto kDefaultHttpAllowTargetEndpointInUrl = "false";
 
-const QLatin1String kHttpSslSupport("http/sslSupport");
-const QLatin1String kDefaultHttpSslSupport("true");
+constexpr auto kHttpSslSupport = "http/sslSupport";
+constexpr auto kDefaultHttpSslSupport = "true";
 
-const QLatin1String kHttpSslCertPath("http/sslCertPath");
-const QLatin1String kDefaultHttpSslCertPath("");
+constexpr auto kHttpSslCertPath = "http/sslCertPath";
+constexpr auto kDefaultHttpSslCertPath = "";
 
-const QLatin1String kHttpConnectionInactivityTimeout("http/connectionInactivityTimeout");
+constexpr auto kHttpConnectionInactivityTimeout = "http/connectionInactivityTimeout";
 const std::chrono::milliseconds kDefaultHttpConnectionInactivityTimeout = std::chrono::minutes(1);
 
 //proxy
-const QLatin1String kProxyTargetConnectionInactivityTimeout("proxy/targetConnectionInactivityTimeout");
+constexpr auto kProxyTargetConnectionInactivityTimeout = "proxy/targetConnectionInactivityTimeout";
 const std::chrono::milliseconds kDefaultProxyTargetConnectionInactivityTimeout = std::chrono::minutes(2);
 
 //cloudConnect
-const QLatin1String kReplaceHostAddressWithPublicAddress("cloudConnect/replaceHostAddressWithPublicAddress");
-const QLatin1String kDefaultReplaceHostAddressWithPublicAddress("true");
+constexpr auto kReplaceHostAddressWithPublicAddress = "cloudConnect/replaceHostAddressWithPublicAddress";
+constexpr auto kDefaultReplaceHostAddressWithPublicAddress = "true";
 
-const QLatin1String kAllowIpTarget("cloudConnect/allowIpTarget");
-const QLatin1String kDefaultAllowIpTarget("false");
+constexpr auto kAllowIpTarget = "cloudConnect/allowIpTarget";
+constexpr auto kDefaultAllowIpTarget = "false";
 
-const QLatin1String kFetchPublicIpUrl("cloudConnect/fetchPublicIpUrl");
-const QLatin1String kDefaultFetchPublicIpUrl("http://tools.vmsproxy.com/myip");
+constexpr auto kFetchPublicIpUrl = "cloudConnect/fetchPublicIpUrl";
+constexpr auto kDefaultFetchPublicIpUrl = "http://tools.vmsproxy.com/myip";
 
-const QLatin1String kPublicIpAddress("cloudConnect/publicIpAddress");
-const QLatin1String kDefaultPublicIpAddress("");
+constexpr auto kPublicIpAddress = "cloudConnect/publicIpAddress";
+constexpr auto kDefaultPublicIpAddress = "";
 
 namespace tcp_reverse {
 
-const QLatin1String kPort("cloudConnect/tcpReversePort");
+constexpr auto kPort = "cloudConnect/tcpReversePort";
 const uint32_t kDefaultPort(0);
 
-const QLatin1String kPoolSize("cloudConnect/tcpReversePoolSize");
+constexpr auto kPoolSize = "cloudConnect/tcpReversePoolSize";
 const size_t kDefaultPoolSize(1);
 
-const QLatin1String kKeepAlive("cloudConnect/tcpReverseKeepAlive");
-const QLatin1String kDefaultKeepAlive("{ 60, 10, 3 }");
+constexpr auto kKeepAlive = "cloudConnect/tcpReverseKeepAlive";
+constexpr auto kDefaultKeepAlive = "{ 60, 10, 3 }";
 
-const QLatin1String kStartTimeout("cloudConnect/tcpReverseStartTimeout");
+constexpr auto kStartTimeout = "cloudConnect/tcpReverseStartTimeout";
 const std::chrono::minutes kDefaultStartTimeout(5);
 
 } // namespace tcp_reverse
 
-const QLatin1String kPreferedSslMode("cloudConnect/preferedSslMode");
-const QLatin1String kDefaultPreferedSslMode("enabled");
+constexpr auto kPreferedSslMode = "cloudConnect/preferedSslMode";
+constexpr auto kDefaultPreferedSslMode = "enabled";
 
 static const QString kApplicationInternalName = nx::branding::company() + " vms_gateway_core";
 
