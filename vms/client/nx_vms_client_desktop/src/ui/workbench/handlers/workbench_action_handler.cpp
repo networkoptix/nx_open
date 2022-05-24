@@ -2227,11 +2227,13 @@ void ActionHandler::replaceCameraActionTriggered()
         cameraToBeReplaced,
         mainWindowWidget());
 
+    const auto parentServerName = cameraToBeReplaced->getParentServer()->getName();
+
     if (replaceCameraDialog.isEmpty())
     {
         QnMessageBox::warning(
             mainWindowWidget(),
-            tr("There are no suitable cameras for replacement"));
+            tr("There are no suitable cameras for replacement on the %1").arg(parentServerName));
         return;
     }
 
