@@ -302,6 +302,7 @@ void ServerConnection::updateSessionId(const QnUuid& sessionId)
 
 ServerConnection::~ServerConnection()
 {
+    d->httpClientPool.stop(/*invokeCallbacks*/ true);
 }
 
 void ServerConnection::updateAddress(nx::network::SocketAddress address)
