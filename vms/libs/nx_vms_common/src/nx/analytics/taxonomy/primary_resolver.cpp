@@ -30,13 +30,13 @@ std::optional<ProcessingError> validateId(const Descriptor& descriptor, const QS
 {
     if (descriptor.id.isEmpty())
     {
-        return ProcessingError{NX_FMT("%1: id can't be an empty string", typeName)};
+        return ProcessingError{nx::format("%1: id can't be an empty string", typeName)};
     }
 
     QRegularExpression idRegExp("^[A-Za-z_][\\}\\{\\-A-Za-z0-9_\\.]+$");
     if (const auto match = idRegExp.match(descriptor.id); !match.hasMatch())
     {
-        return ProcessingError{NX_FMT(
+        return ProcessingError{nx::format(
             "%1: id string can contain only latin letters, numbers, periods and underscores "
             "and start with a latin letter or an underscore. Given: %2",
             typeName, descriptor.id)};
@@ -53,7 +53,7 @@ std::optional<ProcessingError> validateFlags(const Descriptor& descriptor)
         if (descriptor.flags.testFlag(ObjectTypeFlag::hiddenDerivedType) &&
             (!descriptor.base || descriptor.base->isEmpty()))
         {
-            return ProcessingError{NX_FMT(
+            return ProcessingError{nx::format(
                 "%1: \"hiddenDerivedType\" flag is availbale only for derived types. The \"base\" "
                 "field must be filled.", descriptor.id)};
         }
@@ -115,7 +115,7 @@ void resolveInheritance(
             {
                 errorHandler->handleError(
                     ProcessingError{
-                        NX_FMT("%1 %2: missing base type (%3)",
+                        nx::format("%1 %2: missing base type (%3)",
                             descriptorTypeName,
                             currentDescriptor->id,
                             *currentDescriptor->base) });
@@ -135,7 +135,7 @@ void resolveInheritance(
             {
                 errorHandler->handleError(
                     ProcessingError{
-                        NX_FMT("%1 %2: inheritance cycle (%3)",
+                        nx::format("%1 %2: inheritance cycle (%3)",
                             descriptorTypeName,
                             descriptor.id,
                             containerString(bases)) });
