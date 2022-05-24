@@ -9,6 +9,7 @@
 #include <nx/network/aggregate_acceptor.h>
 #include <nx/network/retry_timer.h>
 #include <nx/network/socket_attributes_cache.h>
+#include <nx/reflect/enum_instrument.h>
 #include <nx/utils/basic_factory.h>
 
 #include "mediator_connector.h"
@@ -83,13 +84,12 @@ public:
     void moveToListeningState();
 
 protected:
-    enum class State
-    {
+    NX_REFLECTION_ENUM_CLASS_IN_CLASS(State,
         init,
         readyToListen,
         registeringOnMediator,
         listening
-    };
+    );
 
     virtual void cancelIoInAioThread() override;
 
@@ -118,7 +118,7 @@ protected:
     nx::network::RetryTimer m_mediatorRegistrationRetryTimer;
     int m_acceptQueueLen;
 
-    std::atomic<State> m_state;
+    State m_state = State::init;
     std::vector<std::unique_ptr<AbstractTunnelAcceptor>> m_acceptors;
     IncomingTunnelPool* m_tunnelPool = nullptr;
     std::vector<AbstractConnectionAcceptor*> m_customConnectionAcceptors;
