@@ -14,13 +14,17 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/module_information.h>
+#include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/connection_info.h>
+#include <nx/vms/client/core/network/network_module.h>
+#include <nx/vms/client/core/network/remote_connection_factory.h>
 #include <nx/vms/common/update/tools.h>
 #include <nx/vms/update/update_check.h>
 
 #include "update_verification.h"
 
 using namespace std::chrono;
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 
 using Clock = std::chrono::steady_clock;
@@ -32,12 +36,17 @@ const auto kWaitForUpdateInfo = std::chrono::milliseconds(5);
 
 struct CompatibilityVersionInstallationDialog::Private
 {
+    core::ConnectionInfo connectionInfo;
+    QnUuid expectedServerId;
+
     // Update info from mediaservers.
     std::future<UpdateContents> updateInfoMediaserver;
     // Update info from the internet.
     std::future<UpdateContents> updateInfoInternet;
     int requestsLeft = 0;
     bool checkingUpdates = false;
+
+    core::RemoteConnectionFactory::ProcessPtr connectionProcess;
 
     std::shared_ptr<ClientUpdateTool> clientUpdateTool;
 
@@ -56,7 +65,9 @@ CompatibilityVersionInstallationDialog::CompatibilityVersionInstallationDialog(
     ui(new Ui::QnCompatibilityVersionInstallationDialog),
     m_versionToInstall(moduleInformation.version),
     m_engineVersion(engineVersion),
-    m_private(new Private())
+    m_private(new Private{
+        .connectionInfo = connectionInfo,
+        .expectedServerId = moduleInformation.id})
 {
     ui->setupUi(this);
     ui->autoRestart->setChecked(m_autoInstall);
@@ -64,10 +75,6 @@ CompatibilityVersionInstallationDialog::CompatibilityVersionInstallationDialog(
         this, &CompatibilityVersionInstallationDialog::atAutoRestartChanged);
 
     m_private->clientUpdateTool.reset(new nx::vms::client::desktop::ClientUpdateTool(this));
-    m_private->clientUpdateTool->setServerUrl(
-        moduleInformation.id,
-        connectionInfo,
-        qnClientCoreModule->commonModule()->certificateVerifier());
 }
 
 CompatibilityVersionInstallationDialog::~CompatibilityVersionInstallationDialog()
@@ -97,8 +104,28 @@ void CompatibilityVersionInstallationDialog::reject()
 
 int CompatibilityVersionInstallationDialog::exec()
 {
-    // Will do exec there
-    return startUpdate();
+    NX_VERBOSE(this, "Connecting to the System %1...", m_private->connectionInfo.address);
+    const auto remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
+    m_private->connectionProcess = remoteConnectionFactory->connect(
+        m_private->connectionInfo,
+        m_private->expectedServerId,
+        nx::utils::guarded(this,
+            [this](core::RemoteConnectionFactory::ConnectionOrError result)
+            {
+                if (auto error = std::get_if<core::RemoteConnectionError>(&result))
+                {
+                    m_installationResult = InstallResult::failedDownload;
+                    setMessage(tr("Cannot connect to the System"));
+                    done(QDialogButtonBox::StandardButton::Ok);
+                    return;
+                }
+
+                NX_VERBOSE(this, "Connected to the System %1", m_private->connectionInfo.address);
+                QMetaObject::invokeMethod(this,
+                    &CompatibilityVersionInstallationDialog::startUpdate,
+                    Qt::QueuedConnection);
+            }));
+    return base_type::exec();
 }
 
 void CompatibilityVersionInstallationDialog::processUpdateContents(const UpdateContents& contents)
@@ -264,8 +291,12 @@ void CompatibilityVersionInstallationDialog::atUpdateCurrentState()
     m_private->clientUpdateTool->checkServersInSystem();
 }
 
-int CompatibilityVersionInstallationDialog::startUpdate()
+void CompatibilityVersionInstallationDialog::startUpdate()
 {
+    m_private->clientUpdateTool->setServerUrl(
+        m_private->expectedServerId,
+        m_private->connectionProcess->context->info,
+        m_private->connectionProcess->context->certificateCache.get());
     connect(m_private->clientUpdateTool, &ClientUpdateTool::updateStateChanged,
         this, &CompatibilityVersionInstallationDialog::atUpdateStateChanged);
 
@@ -293,8 +324,6 @@ int CompatibilityVersionInstallationDialog::startUpdate()
 
     setMessage(tr("Installing version %1").arg(m_versionToInstall.toString()));
     ui->buttonBox->setStandardButtons(QDialogButtonBox::Cancel);
-    int result = base_type::exec();
-    return result;
 }
 
 void CompatibilityVersionInstallationDialog::setMessage(const QString& message)

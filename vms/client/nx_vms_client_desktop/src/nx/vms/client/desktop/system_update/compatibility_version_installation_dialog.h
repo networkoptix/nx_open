@@ -55,7 +55,7 @@ public:
     QString errorString() const;
 
 protected:
-    int startUpdate();
+    void startUpdate();
     void processUpdateContents(const nx::vms::client::desktop::UpdateContents& contents);
     void setMessage(const QString& message);
 
