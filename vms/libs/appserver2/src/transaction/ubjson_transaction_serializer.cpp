@@ -21,11 +21,13 @@ namespace ec2
         return true;
     }
 
-    uint qHash(const QnUbjsonTransactionSerializer::CacheKey &id) 
+    uint qHash(const QnUbjsonTransactionSerializer::CacheKey &id)
     {
-        return ::qHash(QByteArray(id.persistentInfo.dbID.toRfc4122()).
-            append((const char*)&id.persistentInfo.timestamp, sizeof(id.persistentInfo.timestamp)).
-            append((const char*)&id.persistentInfo.sequence, sizeof(id.persistentInfo.sequence)),
-            id.command);
+        QByteArray idData(id.persistentInfo.dbID.toRfc4122());
+        idData
+            .append((const char*)&id.persistentInfo.timestamp, sizeof(id.persistentInfo.timestamp))
+            .append((const char*)&id.persistentInfo.sequence, sizeof(id.persistentInfo.sequence));
+
+        return ::qHash(idData, id.command);
     }
 }

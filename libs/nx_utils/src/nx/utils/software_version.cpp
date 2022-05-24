@@ -38,7 +38,7 @@ SoftwareVersion::SoftwareVersion(const QString& versionString):
 }
 
 SoftwareVersion::SoftwareVersion(const char* versionString):
-    SoftwareVersion(QLatin1String(versionString))
+    SoftwareVersion(QString::fromLatin1(versionString))
 {
 }
 
