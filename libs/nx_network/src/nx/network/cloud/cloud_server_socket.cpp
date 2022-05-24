@@ -27,8 +27,7 @@ CloudServerSocket::CloudServerSocket(
     m_mediatorConnector(mediatorConnector),
     m_mediatorConnection(mediatorConnector->systemConnection()),
     m_mediatorRegistrationRetryTimer(std::move(mediatorRegistrationRetryPolicy)),
-    m_acceptQueueLen(kDefaultAcceptQueueSize),
-    m_state(State::init)
+    m_acceptQueueLen(kDefaultAcceptQueueSize)
 {
     bindToAioThreadUnchecked(getAioThread());
 
@@ -288,8 +287,8 @@ void CloudServerSocket::startAcceptor(
             std::unique_ptr<AbstractIncomingTunnelConnection> connection)
         {
             NX_ASSERT(m_mediatorConnection->isInSelfAioThread());
-            NX_VERBOSE(this, nx::format("Acceptor %1 returned %2: %3")
-                .args((void*)acceptorPtr, (void*)connection.get(), SystemError::toString(code)));
+            NX_VERBOSE(this, "Acceptor %1 returned %2: %3",
+                (void*)acceptorPtr, (void*)connection.get(), SystemError::toString(code));
 
             const auto it = std::find_if(
                 m_acceptors.begin(), m_acceptors.end(),
@@ -298,15 +297,14 @@ void CloudServerSocket::startAcceptor(
 
             if (code == SystemError::noError)
             {
-                NX_INFO(this, nx::format("Cloud connection (session %1) from %2 has been accepted. Info %3")
-                    .args(acceptorPtr->connectionId(), acceptorPtr->remotePeerId(),
-                        acceptorPtr->toString()));
+                NX_INFO(this, "Cloud connection (session %1) from %2 has been accepted. Info %3",
+                    acceptorPtr->connectionId(), acceptorPtr->remotePeerId(), acceptorPtr->toString());
             }
             else
             {
-                NX_INFO(this, nx::format("Cloud connection (session %1) from %2 has not been accepted with error %3. Info %4")
-                    .args(acceptorPtr->connectionId(), acceptorPtr->remotePeerId(),
-                        SystemError::toString(code), acceptorPtr->toString()));
+                NX_INFO(this, "Cloud connection (session %1) from %2 has not been accepted with error %3. Info %4",
+                    acceptorPtr->connectionId(), acceptorPtr->remotePeerId(), SystemError::toString(code),
+                    acceptorPtr->toString());
             }
 
             NX_CRITICAL(it != m_acceptors.end());
@@ -329,23 +327,22 @@ void CloudServerSocket::onListenRequestCompleted(
         });
 
     m_registrationHandler = nullptr;
-    NX_ASSERT(m_state == State::registeringOnMediator);
+    NX_ASSERT(m_state == State::registeringOnMediator, nx::format("m_state = %1", m_state));
     if (resultCode == nx::hpm::api::ResultCode::ok)
     {
-        NX_DEBUG(this, nx::format("Listen request completed successfully"));
+        NX_DEBUG(this, "Listen request completed successfully");
         m_state = State::listening;
         startAcceptingConnections(response);
         return;
     }
 
-    NX_DEBUG(this, nx::format("Listen request has failed: %1").arg(toString(resultCode)));
+    NX_DEBUG(this, "Listen request has failed: %1", resultCode);
 
     if (!m_mediatorRegistrationRetryTimer.scheduleNextTry(
             std::bind(&CloudServerSocket::retryRegistration, this)))
     {
         // It is not supposed to happen in production, is it?
-        NX_WARNING(this, nx::format("Stopped mediator registration retries. Last result code %1")
-            .arg(toString(resultCode)));
+        NX_WARNING(this, "Stopped mediator registration retries. Last result code %1", resultCode);
         m_state = State::readyToListen;
         reportResult(SystemError::invalidData); //< TODO: #akolesnikov Use better error code.
     }
@@ -399,7 +396,7 @@ void CloudServerSocket::initializeCustomAcceptors(
 
 void CloudServerSocket::retryRegistration()
 {
-    NX_DEBUG(this, nx::format("Retrying to register on mediator"));
+    NX_DEBUG(this, "Retrying to register on mediator");
     issueRegistrationRequest();
 }
 
@@ -480,8 +477,8 @@ void CloudServerSocket::onNewConnectionHasBeenAccepted(
     if (socket)
         socket->bindToAioThread(SocketGlobals::aioService().getRandomAioThread());
 
-    NX_VERBOSE(this, nx::format("Returning socket from tunnel pool. Result code %1")
-        .arg(SystemError::toString(sysErrorCode)));
+    NX_VERBOSE(this, "Returning socket from tunnel pool. Result code %1",
+        SystemError::toString(sysErrorCode));
     handler(sysErrorCode, std::move(socket));
 }
 
@@ -513,9 +510,9 @@ void CloudServerSocket::onConnectionRequested(
     hpm::api::ConnectionRequestedEvent event)
 {
     event.connectionMethods &= m_supportedConnectionMethods;
-    NX_VERBOSE(this, nx::format("Connection request '%1' from %2 with methods: %3")
-        .args(event.connectSessionId, event.originatingPeerID,
-            hpm::api::ConnectionMethod::toString(event.connectionMethods)));
+    NX_VERBOSE(this, "Connection request '%1' from %2 with methods: %3",
+        event.connectSessionId, event.originatingPeerID,
+            hpm::api::ConnectionMethod::toString(event.connectionMethods));
 
     auto acceptors = TunnelAcceptorFactory::instance().create(
         m_mediatorConnector->address()
@@ -524,8 +521,8 @@ void CloudServerSocket::onConnectionRequested(
         event);
     for (auto& acceptor: acceptors)
     {
-        NX_VERBOSE(this, nx::format("Create acceptor '%1' by connection request %2 from %3")
-            .args(acceptor, event.connectSessionId, event.originatingPeerID));
+        NX_VERBOSE(this, "Create acceptor '%1' by connection request %2 from %3",
+            acceptor, event.connectSessionId, event.originatingPeerID);
 
         acceptor->setConnectionInfo(
             event.connectSessionId, event.originatingPeerID);
@@ -550,7 +547,7 @@ void CloudServerSocket::onMediatorConnectionRestored()
             m_aggregateAcceptor.remove(customAcceptor);
         m_customConnectionAcceptors.clear();
 
-        NX_DEBUG(this, nx::format("Register on mediator after reconnect"));
+        NX_DEBUG(this, "Register on mediator after reconnect");
         issueRegistrationRequest();
     }
 }
