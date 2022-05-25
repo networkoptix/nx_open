@@ -258,6 +258,8 @@ QString relativeUrlForTopic(Qn::HelpTopic topic)
             return "notifications_panel.html";
         case Qn::HelpTopic::OtherSystems_Help:
             return "configuring_multi-server_envir.html";
+        case Qn::HelpTopic::PluginsAndAnalytics_Help:
+            return "plugins-and-analytics.html";
         case Qn::HelpTopic::PtzManagement_Tour_Help:
             return "setting_up_ptz_tours.html";
         case Qn::HelpTopic::PtzPresets_Help:
