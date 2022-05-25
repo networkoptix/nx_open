@@ -14,26 +14,22 @@
 
 namespace nx::vms::api {
 
-/**%apidoc User group information object.
- */
+/**%apidoc User Group information object. */
 struct NX_VMS_API UserGroupModel
 {
     QnUuid id;
     QString name;
 
-    /**%apidoc:string[opt] Only local users are supposed to be created by API.
-     * %value local
-     * %value ldap
-    */
+    /**%apidoc[opt] Only local User Groups are supposed to be created by the API. */
     UserType type = UserType::local;
 
     /**%apidoc[opt] */
     GlobalPermissions permissions;
 
-    /**%apidoc[opt] List of groups to inherit permissions. */
+    /**%apidoc[opt] List of User Groups to inherit permissions. */
     std::vector<QnUuid> parentGroupIds;
 
-    /**%apidoc[opt] List of accessible resource ids for the user group. */
+    /**%apidoc[opt] List of accessible resource ids for this User Group. */
     std::optional<std::vector<QnUuid>> accessibleResources;
 
     bool operator==(const UserGroupModel& other) const = default;
