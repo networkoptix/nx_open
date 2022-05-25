@@ -33,6 +33,10 @@ NX_NETWORK_API bool verifyBySystemCertificates(
     const std::string& hostName,
     std::string* outErrorMessage = nullptr);
 
+NX_NETWORK_API CertificateChain completeCertificateChain(
+    const CertificateChain& chain,
+    bool* ok = nullptr);
+
 NX_NETWORK_API AdapterFunc makeAdapterFunc(
     VerifyCertificateFunc verifyCertificateFunc,
     std::optional<std::string> serverName = std::nullopt);
