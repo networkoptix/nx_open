@@ -603,9 +603,18 @@ ActionVisibility ResourceRemovalCondition::check(const Parameters& parameters, Q
         if (resource->hasFlags(Qn::fake))
             return false;
 
-        // TODO: can Server with mismatchedCertificate status be removed?
         if (resource->hasFlags(Qn::remote_server))
-            return resource->getStatus() == nx::vms::api::ResourceStatus::offline;
+        {
+            switch (resource->getStatus())
+            {
+                case nx::vms::api::ResourceStatus::offline:
+                case nx::vms::api::ResourceStatus::unauthorized:
+                case nx::vms::api::ResourceStatus::mismatchedCertificate:
+                    return true;
+                default:
+                    return false;
+            }
+        }
 
         if (resource.dynamicCast<QnFileLayoutResource>()) //< Cannot remove local layout from server.
             return false;
