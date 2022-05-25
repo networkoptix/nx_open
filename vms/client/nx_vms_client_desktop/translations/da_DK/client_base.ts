@@ -7150,7 +7150,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::BackupBandwidthSettingsWidget</name>
     <message>
       <source>Select an area on the schedule to apply chosen settings.</source>
-      <translation type="unfinished">Select an area on the schedule to apply chosen settings.</translation>
+      <translation>Vælg et område i tidsplanen for at anvende valgte indstillinger.</translation>
     </message>
   </context>
   <context>
@@ -9734,7 +9734,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Soft Trigger</source>
-      <translation type="unfinished">Soft Trigger</translation>
+      <translation>Udløser</translation>
     </message>
     <message>
       <source>Stream Issue</source>

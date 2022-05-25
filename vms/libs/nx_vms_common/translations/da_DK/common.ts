@@ -807,42 +807,42 @@
     <message numerus="yes">
       <source>%n Cameras</source>
       <translation type="unfinished">
-        <numerusform>%n Cameras</numerusform>
+        <numerusform>%n Kameraer</numerusform>
         <numerusform>%n Cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
       <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
+        <numerusform>%n kameraer</numerusform>
         <numerusform>%n cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Modules</source>
       <translation type="unfinished">
-        <numerusform>%n I/O Modules</numerusform>
+        <numerusform>%n I/O-Moduler</numerusform>
         <numerusform>%n I/O Modules</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules</source>
       <translation type="unfinished">
-        <numerusform>%n I/O modules</numerusform>
+        <numerusform>%n I/O moduler</numerusform>
         <numerusform>%n I/O modules</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Devices</source>
       <translation type="unfinished">
-        <numerusform>%n Devices</numerusform>
+        <numerusform>%n Enheder</numerusform>
         <numerusform>%n Devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices</source>
       <translation type="unfinished">
-        <numerusform>%n devices</numerusform>
+        <numerusform>%n enheder</numerusform>
         <numerusform>%n devices</numerusform>
       </translation>
     </message>

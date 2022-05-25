@@ -2110,7 +2110,7 @@
     </message>
     <message>
       <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
+      <translation>強制安全驗證</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -2406,7 +2406,7 @@
     </message>
     <message>
       <source>User Activity</source>
-      <translation type="unfinished">User Activity</translation>
+      <translation>用戶活動</translation>
     </message>
     <message>
       <source>Display servers in tree for non-administrator users</source>
