@@ -4,6 +4,9 @@
 
 #include <QtQuick/QQuickItem>
 
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+
 #include "../flux/camera_settings_dialog_store.h"
 
 namespace nx::vms::client::desktop {
@@ -30,6 +33,7 @@ CameraAnalyticsSettingsWidget::CameraAnalyticsSettingsWidget(
         return;
 
     rootObject()->setProperty("store", QVariant::fromValue(store));
+    setHelpTopic(this, Qn::PluginsAndAnalytics_Help);
 }
 
 } // namespace nx::vms::client::desktop

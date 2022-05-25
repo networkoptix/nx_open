@@ -133,6 +133,7 @@ enum HelpTopic
     NewUser_Help,
     NotificationsPanel_Help,
     OtherSystems_Help,
+    PluginsAndAnalytics_Help,
     PtzManagement_Tour_Help,
     PtzPresets_Help,
     Rapid_Review_Help,
