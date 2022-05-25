@@ -15,6 +15,7 @@
 #include <nx/network/ssl/helpers.h>
 #include <nx/vms/api/data/login.h>
 #include <nx/vms/api/data/module_information.h>
+#include <nx/vms/common/network/server_compatibility_validator.h>
 
 #include "connection_info.h"
 #include "remote_connection_error.h"
@@ -25,7 +26,10 @@ class CertificateCache;
 
 struct RemoteConnectionFactoryContext: public QObject
 {
+    using Purpose = common::ServerCompatibilityValidator::Purpose;
+
     ConnectionInfo info;
+    Purpose purpose = Purpose::connect;
     std::optional<std::chrono::microseconds> sessionTokenExpirationTime;
     nx::vms::api::ModuleInformation moduleInformation;
     nx::network::ssl::CertificateChain certificateChain;

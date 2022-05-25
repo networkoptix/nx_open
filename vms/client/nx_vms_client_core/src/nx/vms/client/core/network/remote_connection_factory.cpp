@@ -161,7 +161,7 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
                 context->error = RemoteConnectionErrorCode::factoryServer;
             }
             else if (const auto incompatibilityReason = ServerCompatibilityValidator::check(
-                context->moduleInformation))
+                context->moduleInformation, context->purpose))
             {
                 context->error = toErrorCode(*incompatibilityReason);
             }
@@ -655,11 +655,13 @@ void RemoteConnectionFactory::shutdown()
 RemoteConnectionFactory::ProcessPtr RemoteConnectionFactory::connect(
     ConnectionInfo connectionInfo,
     std::optional<QnUuid> expectedServerId,
-    Callback callback)
+    Callback callback,
+    Context::Purpose purpose)
 {
     auto process = std::make_shared<RemoteConnectionProcess>();
 
     process->context->info = connectionInfo;
+    process->context->purpose = purpose;
 
     process->future = std::async(std::launch::async,
         [this, contextPtr = WeakContextPtr(process->context), expectedServerId, callback]
