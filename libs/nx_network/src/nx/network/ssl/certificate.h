@@ -369,6 +369,9 @@ NX_NETWORK_API std::optional<Pem> readPemFile(const std::string& filePath);
 NX_NETWORK_API bool verifyBySystemCertificates(
     STACK_OF(X509)* chain, const std::string& hostName, std::string* outErrorMessage = nullptr);
 
+NX_NETWORK_API std::vector<Certificate> completeCertificateChain(
+    STACK_OF(X509)* chain, bool* ok = nullptr);
+
 NX_NETWORK_API void addTrustedRootCertificate(const CertificateView& cert);
 
 } // namespace nx::network::ssl
