@@ -124,7 +124,8 @@ int CompatibilityVersionInstallationDialog::exec()
                 QMetaObject::invokeMethod(this,
                     &CompatibilityVersionInstallationDialog::startUpdate,
                     Qt::QueuedConnection);
-            }));
+            }),
+        nx::vms::common::ServerCompatibilityValidator::Purpose::connectInCompatibilityMode);
     return base_type::exec();
 }
 

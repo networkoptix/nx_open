@@ -77,7 +77,8 @@ public:
     ProcessPtr connect(
         ConnectionInfo connectionInfo,
         std::optional<QnUuid> expectedServerId,
-        Callback callback);
+        Callback callback,
+        Context::Purpose purpose = Context::Purpose::connect);
 
     virtual void shutdown() override;
 

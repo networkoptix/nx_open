@@ -34,15 +34,10 @@ static const QMap<Peer, Protocol> kDefaultProtocolByPeer{
     {Peer::desktopClient, Protocol::ubjson},
 };
 
-/** The lowest version of the Server to which Client can try to connect. */
-static const nx::utils::SoftwareVersion kMinimalConnectVersion(3, 0);
-
-/** The lowest version of the Server which can be merged to existing System */
-static const nx::utils::SoftwareVersion kMinimalMergeVersion(4, 3);
-
 static const QMap<Purpose, nx::utils::SoftwareVersion> kMinimalVersionByPurpose{
-    {Purpose::connect, kMinimalConnectVersion},
-    {Purpose::merge, kMinimalMergeVersion},
+    {Purpose::connect, {4, 0}},
+    {Purpose::merge, {5, 0}},
+    {Purpose::connectInCompatibilityMode, {4, 0}},
 };
 
 bool isClient(Peer peerType)
@@ -96,13 +91,15 @@ std::optional<ServerCompatibilityValidator::Reason> checkInternal(
     if (!ServerCompatibilityValidator::isCompatibleCustomization(customization))
         return ServerCompatibilityValidator::Reason::customizationDiffers;
 
-    if (!compatibleCloudHost(cloudHost))
+    const bool compatibilityMode = (purpose == Purpose::connectInCompatibilityMode);
+
+    if (!compatibilityMode && !compatibleCloudHost(cloudHost))
         return ServerCompatibilityValidator::Reason::cloudHostDiffers;
 
     // Binary protocol requires the same protocol version.
     const bool ensureProtocolVersion = (s_localProtocolType == Protocol::ubjson);
 
-    if (ensureProtocolVersion && protoVersion != protocolVersion())
+    if (!compatibilityMode && ensureProtocolVersion && protoVersion != protocolVersion())
         return ServerCompatibilityValidator::Reason::binaryProtocolVersionDiffers;
 
     return std::nullopt;
