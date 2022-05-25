@@ -10,6 +10,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <nx/network/socket_common.h>
+#include <nx/network/ssl/helpers.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/client/core/network/helpers.h>
 #include <nx/vms/client/desktop/common/delegates/customizable_item_delegate.h>
@@ -173,7 +174,7 @@ void ServerCertificateViewer::setCertificateData(
     Mode mode)
 {
     NX_ASSERT(!certificates.empty());
-    m_certificates = certificates;
+    m_certificates = nx::network::ssl::completeCertificateChain(certificates);
 
     setWindowTitle(calculateDialogTitle(mode));
 

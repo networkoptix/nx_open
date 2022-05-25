@@ -10,6 +10,7 @@
 #include <QtNetwork/QSslCertificate>
 #include <QtNetwork/QSslConfiguration>
 #include <QtNetwork/QSslError>
+#include <QtNetwork/QSslKey>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
@@ -18,6 +19,42 @@
 #include <nx/utils/type_utils.h>
 
 #include "context.h"
+
+namespace {
+
+nx::Mutex s_storeMutex;
+std::unique_ptr<X509_STORE, decltype(&X509_STORE_free)> s_caStore{nullptr, {}};
+
+X509_STORE* caStore()
+{
+    NX_MUTEX_LOCKER lock(&s_storeMutex);
+
+    if (!s_caStore)
+    {
+        s_caStore = nx::utils::wrapUnique(X509_STORE_new(), &X509_STORE_free);
+
+        if (!NX_ASSERT(s_caStore, "Unable to create certificate store"))
+            return nullptr;
+
+        // Fill the store by system certificates. We use QSslConfiguration here to avoid the need
+        // to maintain our own list of system-specific certificate paths for different OS.
+        const auto caCerts = QSslConfiguration::defaultConfiguration().caCertificates();
+        for (const auto& cert: caCerts)
+        {
+            auto converted = nx::network::ssl::Certificate::parse(cert.toPem().data());
+
+            if (!NX_ASSERT(converted.size() == 1))
+                continue;
+
+            X509_STORE_add_cert(s_caStore.get(), converted.at(0).x509());
+        }
+    }
+
+    return s_caStore.get();
+}
+
+
+} // namespace
 
 namespace nx::network::ssl {
 
@@ -906,11 +943,71 @@ bool verifyBySystemCertificates(
     return false;
 }
 
+std::vector<Certificate> completeCertificateChain(STACK_OF(X509)* chain, bool* ok)
+{
+    auto converted =
+        [](STACK_OF(X509)* chain)
+        {
+            std::vector<Certificate> result;
+
+            for (int i = 0; i < sk_X509_num(chain); ++i)
+                result.push_back(Certificate(sk_X509_value(chain, i)));
+
+            return result;
+        };
+
+    // Report a failure if we don't reach the end of this function.
+    if (ok)
+        *ok = false;
+
+    auto store = caStore();
+    if (!store)
+    {
+        NX_WARNING(NX_SCOPE_TAG,
+            "Can't complete certificate chain: OpenSSL store is not created");
+        return converted(chain);
+    }
+
+    auto context = nx::utils::wrapUnique(X509_STORE_CTX_new(), &X509_STORE_CTX_free);
+    if (!NX_ASSERT(context))
+    {
+        NX_WARNING(NX_SCOPE_TAG,
+            "Can't complete certificate chain: OpenSSL context is not created");
+        return converted(chain);
+    }
+
+    if (!X509_STORE_CTX_init(context.get(), store, sk_X509_value(chain, 0), chain))
+    {
+        NX_WARNING(NX_SCOPE_TAG,
+            "Can't complete certificate chain: failed to initialize OpenSSL context");
+        return converted(chain);
+    }
+
+    // Try to build certificate chain.
+    X509_verify_cert(context.get());
+
+    const auto new_chain = X509_STORE_CTX_get0_chain(context.get());
+    if (!new_chain)
+    {
+        NX_WARNING(NX_SCOPE_TAG, "Can't complete certificate chain");
+        return converted(chain);
+    }
+
+    // New chain has been built successfully.
+    if (ok)
+        *ok = true;
+
+    return converted(new_chain);
+}
+
 void addTrustedRootCertificate(const Certificate& cert)
 {
     QSslConfiguration conf = QSslConfiguration::defaultConfiguration();
     conf.addCaCertificate(QSslCertificate(pemByteArray(cert.x509())));
     QSslConfiguration::setDefaultConfiguration(std::move(conf));
+
+    NX_MUTEX_LOCKER lock(&s_storeMutex);
+    NX_ASSERT(!s_caStore, "All trusted root certificates should be loaded on startup");
 }
 
 } // namespace nx::network::ssl

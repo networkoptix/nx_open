@@ -85,6 +85,14 @@ bool verifyBySystemCertificates(
     return verifyBySystemCertificates(converted.get(), hostName, outErrorMessage);
 }
 
+CertificateChain completeCertificateChain(
+    const CertificateChain& chain,
+    bool* ok)
+{
+    auto converted = toOpenSSL(chain);
+    return completeCertificateChain(converted.get(), ok);
+}
+
 AdapterFunc makeAdapterFunc(
     VerifyCertificateFunc verifyCertificateFunc,
     std::optional<std::string> serverName)
