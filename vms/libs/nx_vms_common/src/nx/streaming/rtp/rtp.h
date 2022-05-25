@@ -52,6 +52,11 @@ struct RtpHeader
     uint32_t payloadOffset() const { return kSize + CSRCCount * kCsrcSize; }
     uint32_t getTimestamp() const { return ntohl(timestamp); }
     uint16_t getSequence() const { return ntohs(sequence); }
+    bool isRtcp() const
+    {
+        // TODO #lbusygin: Incorrect check.
+        return payloadType >= 72 && payloadType <= 76;
+    }
 };
 
 struct RtpHeaderExtensionHeader
