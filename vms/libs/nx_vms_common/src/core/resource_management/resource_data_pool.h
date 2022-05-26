@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QJsonObject>
 
 #include <nx/utils/thread/mutex.h>
 #include <core/resource/resource_data.h>
@@ -34,6 +35,7 @@ public:
     bool loadFile(const QString& fileName);
     bool loadData(const QByteArray& data);
     void clear();
+    QJsonObject allData() const;
 
 signals:
     void changed();
@@ -68,9 +70,10 @@ private:
     QnResourceData data(const Key& key) const;
 
 private:
+    mutable nx::Mutex m_mutex;
+    QJsonObject m_allData;
     std::vector<std::pair<Key, QnResourceData>> m_dataByKey;
 
     /** Cache of the search results to avoid using too much regexps. */
     mutable QHash<Key, QnResourceData> m_cachedResultByKey;
-    mutable nx::Mutex m_mutex;
 };

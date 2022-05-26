@@ -184,6 +184,8 @@ bool QnResourceDataPool::loadData(const QByteArray& data)
         m_dataByKey = std::move(dataByKey);
         m_cachedResultByKey.clear();
     }
+
+    m_allData = std::move(map);
     emit changed();
     return true;
 }
@@ -194,8 +196,14 @@ void QnResourceDataPool::clear()
         NX_MUTEX_LOCKER lock(&m_mutex);
         m_cachedResultByKey.clear();
         m_dataByKey.clear();
+        m_allData = QJsonObject();
     }
     emit changed();
+}
+
+QJsonObject QnResourceDataPool::allData() const
+{
+    return m_allData;
 }
 
 QnResourceDataPool::Key::Key(
