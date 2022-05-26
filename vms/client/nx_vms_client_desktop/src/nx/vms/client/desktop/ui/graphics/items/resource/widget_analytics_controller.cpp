@@ -105,6 +105,9 @@ figure::FigurePtr figureFromObjectData(
     const QRectF& boundingRect,
     const QRectF& zoomRect)
 {
+    if (!boundingRect.isValid())
+        return {};
+
     auto figure =
         [info, boundingRect]()
         {
