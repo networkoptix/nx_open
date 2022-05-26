@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QMetaType>
+
 #include <nx/reflect/enum_instrument.h>
 
 namespace nx::vms::api::rules {

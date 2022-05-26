@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <nx/vms/rules/basic_event.h>
+#include <nx/vms/api/types/event_rule_types.h>
 
 #include "../data_macros.h"
 #include "analytics_engine_event.h"
@@ -14,10 +14,11 @@ class NX_VMS_RULES_API PluginDiagnosticEvent: public AnalyticsEngineEvent
     Q_OBJECT
     Q_CLASSINFO("type", "nx.events.pluginDiagnostic")
 
-    // TODO: Introduce level type.
-    FIELD(int, level, setLevel)
+    FIELD(nx::vms::api::EventLevel, level, setLevel)
 
 public:
+    static const ItemDescriptor& manifest();
+
     PluginDiagnosticEvent() = default;
 
     PluginDiagnosticEvent(
@@ -26,16 +27,10 @@ public:
         const QString &description,
         QnUuid cameraId,
         QnUuid engineId,
-        int level)
-        :
-        AnalyticsEngineEvent(timestamp, caption, description, cameraId, engineId),
-        m_level(level)
-    {
-    }
+        nx::vms::api::EventLevel level);
 
     virtual QMap<QString, QString> details(common::SystemContext* context) const override;
 
-    static FilterManifest filterManifest();
 };
 
 } // namespace nx::vms::rules

@@ -45,6 +45,9 @@ public:
     const nx::common::metadata::Attributes& attributes() const;
     const std::optional<QString> attribute(const QString& attributeName) const;
 
+    const QnUuid objectTrackId() const;
+    const QString& key() const;
+
 private:
     const QnUuid m_engineId;
     const QString m_eventTypeId;

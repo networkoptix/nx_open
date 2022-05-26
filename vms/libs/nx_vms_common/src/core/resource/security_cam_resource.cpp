@@ -1643,24 +1643,6 @@ nx::core::resource::AbstractRemoteArchiveManager* QnSecurityCamResource::remoteA
     return nullptr;
 }
 
-void QnSecurityCamResource::analyticsEventStarted(const QString& caption, const QString& description)
-{
-    emit analyticsEventStart(
-        toSharedPointer(),
-        caption,
-        description,
-        qnSyncTime->currentMSecsSinceEpoch());
-}
-
-void QnSecurityCamResource::analyticsEventEnded(const QString& caption, const QString& description)
-{
-    emit analyticsEventEnd(
-        toSharedPointer(),
-        caption,
-        description,
-        qnSyncTime->currentMSecsSinceEpoch());
-}
-
 float QnSecurityCamResource::rawSuggestBitrateKbps(
     Qn::StreamQuality quality, QSize resolution, int fps, const QString& codec)
 {

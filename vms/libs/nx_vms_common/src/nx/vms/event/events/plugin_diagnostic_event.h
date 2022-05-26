@@ -27,6 +27,19 @@ public:
     virtual bool checkEventParams(const EventParameters& params) const override;
     virtual EventParameters getRuntimeParams() const override;
 
+    const QString& caption() const { return m_caption; }
+    const QString& description() const { return m_description; }
+    QnUuid engineId() const { return m_resourceId; }
+    QnUuid deviceId() const
+    {
+        if (!m_metadata.cameraRefs.empty())
+            return QnUuid(m_metadata.cameraRefs.front());
+
+        return {};
+    }
+
+    nx::vms::api::EventLevel level() const { return m_metadata.level; }
+
 private:
     const QnUuid m_resourceId;
     const QString m_caption;

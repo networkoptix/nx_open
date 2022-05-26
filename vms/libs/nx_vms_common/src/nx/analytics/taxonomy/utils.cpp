@@ -2,7 +2,10 @@
 
 #include "utils.h"
 
-#include <nx/analytics/taxonomy/proxy_object_type_attribute.h>
+#include "abstract_event_type.h"
+#include "abstract_group.h"
+#include "abstract_scope.h"
+#include "proxy_object_type_attribute.h"
 
 namespace nx::analytics::taxonomy {
 
@@ -81,5 +84,20 @@ std::vector<AbstractAttribute*> makeSupportedAttributes(
 
     return result;
 }
+
+bool eventBelongsToGroup(const AbstractEventType* eventType, const QString& groupId)
+{
+    for (const AbstractScope* scope: eventType->scopes())
+    {
+        const AbstractGroup* group = scope->group();
+        if (!group)
+            continue;
+
+        if (group->id() == groupId)
+            return true;
+    }
+
+    return false;
+};
 
 } // namespace nx::analytics::taxonomy

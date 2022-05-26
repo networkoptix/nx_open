@@ -32,7 +32,7 @@ class NX_VMS_RULES_API ResourceFilterEventField: public EventField, public Resou
     Q_OBJECT
 
     Q_PROPERTY(bool acceptAll READ acceptAll WRITE setAcceptAll)
-    Q_PROPERTY(QSet<QnUuid> ids READ ids WRITE setIds)
+    Q_PROPERTY(QnUuidSet ids READ ids WRITE setIds)
 
 public:
     virtual bool match(const QVariant& value) const override;
@@ -45,7 +45,7 @@ class NX_VMS_RULES_API ResourceFilterActionField:
     Q_OBJECT
 
     Q_PROPERTY(bool acceptAll READ acceptAll WRITE setAcceptAll)
-    Q_PROPERTY(QSet<QnUuid> ids READ ids WRITE setIds)
+    Q_PROPERTY(QnUuidSet ids READ ids WRITE setIds)
 
 public:
     virtual QVariant build(const EventPtr& eventData) const override;
