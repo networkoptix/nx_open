@@ -471,9 +471,6 @@ public:
 
     virtual nx::core::resource::AbstractRemoteArchiveManager* remoteArchiveManager();
 
-    virtual void analyticsEventStarted(const QString& caption, const QString& description);
-    virtual void analyticsEventEnded(const QString& caption, const QString& description);
-
     virtual float suggestBitrateKbps(
         const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const;
     static float rawSuggestBitrateKbps(
@@ -592,18 +589,6 @@ signals:
     void mediaCapabilitiesChanged(const QnSecurityCamResourcePtr& camera);
 
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, nx::vms::api::EventReason reasonCode, const QString& reasonParamsEncoded);
-
-    void analyticsEventStart(
-        const QnResourcePtr& resource,
-        const QString& caption,
-        const QString& description,
-        qint64 timestamp);
-
-    void analyticsEventEnd(
-        const QnResourcePtr& resource,
-        const QString& caption,
-        const QString& description,
-        qint64 timestamp );
 
     void recordingActionChanged(const QnResourcePtr& resource);
 

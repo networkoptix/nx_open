@@ -23,6 +23,7 @@ void Metatypes::initialize()
     QnCommonMetaTypes::initialize();
 
     qRegisterMetaType<nx::vms::api::rules::State>();
+    QnJsonSerializer::registerSerializer<State>();
 
     qRegisterMetaType<nx::vms::rules::EventPtr>();
 
@@ -31,7 +32,9 @@ void Metatypes::initialize()
     qRegisterMetaType<QnUuidList>("QnUuidList");
     QnJsonSerializer::registerSerializer<QnUuidList>();
 
-    QnJsonSerializer::registerSerializer<QSet<QnUuid>>();
+    qRegisterMetaType<QnUuidSet>("QnUuidSet");
+    QnJsonSerializer::registerSerializer<QnUuidSet>();
+
     QnJsonSerializer::registerSerializer<std::chrono::seconds>();
 };
 

@@ -22,7 +22,9 @@ Initializer::~Initializer()
 void Initializer::registerEvents() const
 {
     // Register built-in events.
+    registerEvent<AnalyticsEvent>();
     registerEvent<AnalyticsObjectEvent>();
+    registerEvent<CameraInputEvent>();
     registerEvent<DeviceDisconnectedEvent>();
     registerEvent<DeviceIpConflictEvent>();
     registerEvent<DebugEvent>();
@@ -31,6 +33,7 @@ void Initializer::registerEvents() const
     registerEvent<LicenseIssueEvent>();
     registerEvent<MotionEvent>();
     registerEvent<NetworkIssueEvent>();
+    registerEvent<PluginDiagnosticEvent>();
     registerEvent<PoeOverBudgetEvent>();
     registerEvent<ServerCertificateErrorEvent>();
     registerEvent<ServerConflictEvent>();
@@ -51,7 +54,11 @@ void Initializer::registerActions() const
 
 void Initializer::registerFields() const
 {
-    registerEventField<AnalyticsEventTypeField>();
+    registerEventField<AnalyticsEngineField>();
+    registerEventField<AnalyticsEventLevelField>();
+    m_engine->registerEventField(
+        fieldMetatype<AnalyticsEventTypeField>(),
+        [this] { return new AnalyticsEventTypeField(this->m_context); });
     registerEventField<AnalyticsObjectAttributesField>();
     m_engine->registerEventField(
         fieldMetatype<AnalyticsObjectTypeField>(),
@@ -60,6 +67,7 @@ void Initializer::registerFields() const
     registerEventField<CustomizableTextField>();
     registerEventField<EventTextField>();
     registerEventField<ExpectedUuidField>();
+    registerEventField<InputPortField>();
     registerEventField<IntField>();
     registerEventField<KeywordsField>();
     registerEventField<SourceCameraField>();

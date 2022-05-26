@@ -7,9 +7,53 @@
 #include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/vms/common/system_context.h>
 
+#include "../event_fields/source_camera_field.h"
+#include "../event_fields/analytics_event_type_field.h"
+#include "../event_fields/analytics_object_attributes_field.h"
+#include "../event_fields/keywords_field.h"
 #include "../utils/event_details.h"
+#include "../utils/type.h"
 
 namespace nx::vms::rules {
+
+const ItemDescriptor& AnalyticsEvent::manifest()
+{
+    static const auto kDescriptor = ItemDescriptor{
+        .id = utils::type<AnalyticsEvent>(),
+        .displayName = tr("Analytics Event"),
+        .flags = {ItemFlag::instant, ItemFlag::prolonged},
+        .fields = {
+            makeFieldDescriptor<SourceCameraField>("cameraId", tr("Camera")),
+            makeFieldDescriptor<AnalyticsEventTypeField>("eventTypeId", tr("Event Type")),
+            makeFieldDescriptor<KeywordsField>("caption", tr("Caption")),
+            makeFieldDescriptor<KeywordsField>("description", tr("Description")),
+            makeFieldDescriptor<AnalyticsObjectAttributesField>("attributes", tr("Attributes")),
+        }
+    };
+
+    return kDescriptor;
+}
+
+AnalyticsEvent::AnalyticsEvent(
+    std::chrono::microseconds timestamp,
+    State state,
+    const QString& caption,
+    const QString& description,
+    QnUuid cameraId,
+    QnUuid engineId,
+    const QString& eventTypeId,
+    const nx::common::metadata::Attributes& attributes,
+    QnUuid objectTrackId,
+    const QString& key)
+    :
+    AnalyticsEngineEvent(timestamp, caption, description, cameraId, engineId),
+    m_eventTypeId(eventTypeId),
+    m_attributes(attributes),
+    m_objectTrackId(objectTrackId),
+    m_key(key)
+{
+    setState(state);
+}
 
 QMap<QString, QString> AnalyticsEvent::details(common::SystemContext* context) const
 {
@@ -23,19 +67,14 @@ QMap<QString, QString> AnalyticsEvent::details(common::SystemContext* context) c
 
 QString AnalyticsEvent::analyticsEventCaption(common::SystemContext* context) const
 {
-    auto eventSource = context->resourcePool()->getResourceById(cameraId());
-    const auto camera = eventSource.dynamicCast<QnVirtualCameraResource>();
+    auto camera =
+        context->resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId());
 
     const auto eventType = camera && camera->systemContext()
-        ? camera->systemContext()->analyticsTaxonomyState()->eventTypeById(m_eventTypeId.toString())
+        ? camera->systemContext()->analyticsTaxonomyState()->eventTypeById(m_eventTypeId)
         : nullptr;
 
     return eventType ? eventType->name() : tr("Analytics Event");
-}
-
-FilterManifest AnalyticsEvent::filterManifest()
-{
-    return {};
 }
 
 } // namespace nx::vms::rules

@@ -6,6 +6,7 @@
 #include <core/resource/resource.h>
 #include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
+#include <nx/analytics/taxonomy/utils.h>
 #include <nx/kit/utils.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/common/system_context.h>
@@ -19,25 +20,6 @@ using nx::analytics::taxonomy::AbstractState;
 using nx::analytics::taxonomy::AbstractEventType;
 using nx::analytics::taxonomy::AbstractGroup;
 using nx::analytics::taxonomy::AbstractScope;
-
-namespace {
-
-bool belongsToGroup(const AbstractEventType* eventType, const QString& groupId)
-{
-    for (const AbstractScope* scope: eventType->scopes())
-    {
-        const AbstractGroup* group = scope->group();
-        if (!group)
-            continue;
-
-        if (group->id() == groupId)
-            return true;
-    }
-
-    return false;
-};
-
-} // namespace
 
 AnalyticsSdkEvent::AnalyticsSdkEvent(
     QnResourcePtr resource,
@@ -119,7 +101,10 @@ bool AnalyticsSdkEvent::checkEventParams(const EventParameters& params) const
 
     const bool isEventTypeMatched =
         m_eventTypeId == params.getAnalyticsEventTypeId()
-        || belongsToGroup(eventType, params.getAnalyticsEventTypeId());
+        || nx::analytics::taxonomy::eventBelongsToGroup(
+            eventType,
+            params.getAnalyticsEventTypeId());
+
     if (!isEventTypeMatched || !checkForKeywords(m_caption, params.caption))
         return false;
 
@@ -146,6 +131,16 @@ const std::optional<QString> AnalyticsSdkEvent::attribute(const QString& attribu
     }
 
     return std::nullopt;
+}
+
+const QnUuid AnalyticsSdkEvent::objectTrackId() const
+{
+    return m_objectTrackId;
+}
+
+const QString& AnalyticsSdkEvent::key() const
+{
+    return m_key;
 }
 
 } // namespace event

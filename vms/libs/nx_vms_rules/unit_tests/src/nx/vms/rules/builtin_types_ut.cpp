@@ -91,7 +91,9 @@ public:
 TEST_F(BuiltinTypesTest, BuiltinEvents)
 {
     // Event fields need to be registered first.
-    testEventFieldRegistration<AnalyticsEventTypeField>();
+    testEventFieldRegistration<AnalyticsEngineField>();
+    testEventFieldRegistration<AnalyticsEventLevelField>();
+    testEventFieldRegistration<AnalyticsEventTypeField>(systemContext());
     testEventFieldRegistration<AnalyticsObjectAttributesField>();
     testEventFieldRegistration<AnalyticsObjectTypeField>(systemContext());
     testEventFieldRegistration<CustomizableIconField>();
@@ -107,9 +109,9 @@ TEST_F(BuiltinTypesTest, BuiltinEvents)
     testEventFieldRegistration<SourceUserField>();
 
     // TODO: #amalov Uncomment all types after manifest definition.
-    //testEventRegistration<AnalyticsEvent>();
+    testEventRegistration<AnalyticsEvent>();
     testEventRegistration<AnalyticsObjectEvent>();
-    //testEventRegistration<BackupFinishedEvent>();
+    //testEventRegistration<BackupFinishedEvent>(); // Deprecated
     testEventRegistration<CameraInputEvent>();
     testEventRegistration<DebugEvent>();
     testEventRegistration<DeviceDisconnectedEvent>();
@@ -119,7 +121,7 @@ TEST_F(BuiltinTypesTest, BuiltinEvents)
     testEventRegistration<LicenseIssueEvent>();
     testEventRegistration<MotionEvent>();
     testEventRegistration<NetworkIssueEvent>();
-    //testEventRegistration<PluginDiagnosticEvent>();
+    testEventRegistration<PluginDiagnosticEvent>();
     testEventRegistration<PoeOverBudgetEvent>();
     testEventRegistration<ServerCertificateErrorEvent>();
     testEventRegistration<ServerConflictEvent>();

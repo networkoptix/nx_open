@@ -15,11 +15,12 @@ class TestEventField: public nx::vms::rules::EventField
 
     Q_PROPERTY(QnUuid id MEMBER id)
     Q_PROPERTY(QnUuidList idsList MEMBER idsList)
-    Q_PROPERTY(QSet<QnUuid> idsSet MEMBER idsSet)
+    Q_PROPERTY(QnUuidSet idsSet MEMBER idsSet)
     Q_PROPERTY(QString string MEMBER string)
     Q_PROPERTY(QStringList strings MEMBER strings)
     Q_PROPERTY(bool flag MEMBER flag)
     Q_PROPERTY(int number MEMBER number)
+    Q_PROPERTY(nx::vms::api::rules::State state MEMBER state)
 
 public:
     virtual bool match(const QVariant&) const override { return false; };
@@ -27,13 +28,15 @@ public:
 public:
     QnUuid id;
     QnUuidList idsList;
-    QSet<QnUuid> idsSet;
+    QnUuidSet idsSet;
 
     QString string;
     QStringList strings;
 
     bool flag = false;
     int number = 0;
+
+    State state = State::none;
 };
 
 class TestActionField: public nx::vms::rules::ActionField

@@ -5,10 +5,11 @@
 #include <map>
 #include <set>
 
-#include <nx/vms/api/analytics/descriptors.h>
 #include <nx/analytics/taxonomy/abstract_attribute.h>
 
 namespace nx::analytics::taxonomy {
+
+class AbstractEventType;
 
 template<typename Container, typename Item>
 bool contains(const Container& container, const Item& item)
@@ -35,5 +36,9 @@ void pathsFromTree(
 std::vector<AbstractAttribute*> makeSupportedAttributes(
     const std::vector<AbstractAttribute*>& allAttributes,
     const AttributeTree& supportedAttributeTree);
+
+NX_VMS_COMMON_API bool eventBelongsToGroup(
+    const AbstractEventType* eventType,
+    const QString& groupId);
 
 } // namespace nx::analytics::taxonomy
