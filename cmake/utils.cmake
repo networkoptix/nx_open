@@ -394,7 +394,7 @@ function(nx_print_var some_var)
 endfunction()
 
 macro(nx_execute_process_or_fail)
-    cmake_parse_arguments(_NX_EXEC "" "RESULT_VARIABLE;ERROR_MESSAGE" "" ${ARGN})
+    cmake_parse_arguments(_NX_EXEC "" "RESULT_VARIABLE" "ERROR_MESSAGE" ${ARGN})
 
     execute_process(${_NX_EXEC_UNPARSED_ARGUMENTS} RESULT_VARIABLE _nx_exec_result)
 
@@ -410,6 +410,8 @@ macro(nx_execute_process_or_fail)
 
         if(NOT _NX_EXEC_ERROR_MESSAGE)
             set(_NX_EXEC_ERROR_MESSAGE "Process execution failed.")
+        else()
+            list(JOIN _NX_EXEC_ERROR_MESSAGE " " _NX_EXEC_ERROR_MESSAGE)
         endif()
 
         message(

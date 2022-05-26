@@ -58,7 +58,7 @@ class NxConan(ConanFile):
 
     ffmpeg_version = "4.4"
     requires = (
-        f"ffmpeg/{ffmpeg_version}" "#633390099f4ad9835d426c8e98b15d11",
+        f"ffmpeg/{ffmpeg_version}" "#ff2f8bdbcc6ad4607c41da4fc4dd41a8",
         "openssl/1.1.1k" "#5adf0506cae13abf5170409c9d92819b",
         "qt/5.15.2" "#ddcad85211a62685803a6317803ebe1a",
         "roboto-fonts/1.0" "#a1d64ec2d6a2e16f8f476b2b47162123",
