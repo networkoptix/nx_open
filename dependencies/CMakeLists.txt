@@ -4,6 +4,7 @@ add_subdirectory(concurrentqueue)
 add_subdirectory(nx_kit)
 add_subdirectory(udt)
 add_subdirectory(quazip)
+add_subdirectory(qt-mustache)
 
 if(withTests)
     add_subdirectory(googletest)
