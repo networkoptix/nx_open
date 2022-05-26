@@ -318,7 +318,7 @@ static bool isQopTypeSupported(const std::string_view& qopAttributeValue)
     return found;
 }
 
-static bool calcDigestResponse(
+bool calcDigestResponse(
     const Method& method,
     const std::string_view& userName,
     const std::optional<std::string_view>& userPassword,

@@ -94,6 +94,17 @@ public:
      */
     SharedGuard* operator->() const;
 
+    template <typename Handler>
+    auto wrap(Handler&& handler)
+    {
+        return [sharedGuard = m_sharedGuard, handler = std::forward<Handler>(handler)](
+                   auto&&... args) mutable
+        {
+            if (const auto lock = sharedGuard->lock())
+                std::move(handler)(std::forward<decltype(args)>(args)...);
+        };
+    }
+
 private:
     std::shared_ptr<SharedGuard> m_sharedGuard;
 };

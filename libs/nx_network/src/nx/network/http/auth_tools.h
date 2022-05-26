@@ -180,6 +180,15 @@ NX_NETWORK_API bool calcDigestResponse(
     const Method& method,
     const std::string_view& userName,
     const std::optional<std::string_view>& userPassword,
+    const std::optional<std::string_view>& predefinedHa1,
+    const std::string_view& uri,
+    const std::map<std::string, std::string>& inputParams,
+    std::map<std::string, std::string>* outputParams);
+
+NX_NETWORK_API bool calcDigestResponse(
+    const Method& method,
+    const std::string_view& userName,
+    const std::optional<std::string_view>& userPassword,
     const std::optional<std::string_view>& predefinedHA1,
     const std::string_view& uri,
     const header::WWWAuthenticate& wwwAuthenticateHeader,
