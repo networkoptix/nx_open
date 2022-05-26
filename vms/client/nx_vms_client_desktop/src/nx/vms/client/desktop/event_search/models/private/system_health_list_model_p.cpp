@@ -209,11 +209,17 @@ QString SystemHealthListModel::Private::text(int index) const
             const auto caption = tr("Replaced camera discovered");
 
             auto attributes = item.serverData->getRuntimeParams().attributes;
-            const auto deviceModel =
-                findFirstAttributeByName(&attributes, kDeviceModelAttribute)->value;
+            const auto deviceModelAttrItr =
+                findFirstAttributeByName(&attributes, kDeviceModelAttribute);
 
-            return html::paragraph(caption)
-                + html::paragraph(html::colored(deviceModel, kDeviceNameColor));
+           auto result = html::paragraph(caption);
+           if (deviceModelAttrItr != attributes.cend())
+           {
+               result += html::paragraph(
+                   html::colored(deviceModelAttrItr->value, kDeviceNameColor));
+           }
+
+           return result;
         }
 
         case QnSystemHealth::RemoteArchiveSyncStarted:
@@ -284,13 +290,22 @@ QString SystemHealthListModel::Private::toolTip(int index) const
 
         auto attributes = item.serverData->getRuntimeParams().attributes;
 
-        const auto discoveredCameraModel =
-            findFirstAttributeByName(&attributes, kDeviceModelAttribute)->value;
-        const auto discoveredCameraUrl =
-            nx::utils::Url(findFirstAttributeByName(&attributes, kOldDeviceUrlAttribute)->value);
-        const auto discoveredCameraHost = discoveredCameraUrl.host();
-        const auto discoveredCameraText = QStringList({
-            html::bold(discoveredCameraModel), discoveredCameraHost}).join(QChar::Space);
+        const auto discoveredCameraModelAttrItr =
+            findFirstAttributeByName(&attributes, kDeviceModelAttribute);
+        const auto discoveredCameraUrlAttrItr =
+            findFirstAttributeByName(&attributes, kOldDeviceUrlAttribute);
+
+        QString discoveredCameraText;
+        if (discoveredCameraModelAttrItr != attributes.cend()
+            && discoveredCameraUrlAttrItr != attributes.cend())
+        {
+            const auto discoveredCameraHost =
+                nx::utils::Url(discoveredCameraUrlAttrItr->value).host();
+
+            discoveredCameraText = QStringList(
+                {html::bold(discoveredCameraModelAttrItr->value), discoveredCameraHost})
+                    .join(QChar::Space);
+        }
 
         const auto replacementCameraText = QStringList({
             html::bold(item.resource->getName()), QnResourceDisplayInfo(item.resource).host()})
