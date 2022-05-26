@@ -57,14 +57,15 @@ protected:
         using namespace std::chrono;
 
         std::promise<bool> streamingServerResult;
+        std::promise<SocketAddress> serverAddressAvailable;
         nx::utils::thread serverThread(
-            [this, &conf, &streamingServerResult]()
+            [this, &conf, &serverAddressAvailable, &streamingServerResult]()
             {
-                streamingServerResult.set_value(streamingServerMain(conf));
+                streamingServerResult.set_value(streamingServerMain(conf, &serverAddressAvailable));
             });
 
         typename SocketTypeSet::ClientSocket clientSocket;
-        const auto addr = m_serverAddress.get_future().get();
+        const auto addr = serverAddressAvailable.get_future().get();
         EXPECT_TRUE(clientSocket.connect(addr, nx::network::kNoTimeout))
             << SystemError::getLastOSErrorText();
         if (conf.doServerDelay)
@@ -110,15 +111,15 @@ protected:
     }
 
 private:
-    nx::utils::promise<SocketAddress> m_serverAddress;
-
-    bool streamingServerMain(const StreamingTestConfig& conf)
+    bool streamingServerMain(
+        const StreamingTestConfig& conf,
+        std::promise<SocketAddress>* serverAddressAvailable)
     {
         const auto server = std::make_unique<typename SocketTypeSet::ServerSocket>();
 
         EXPECT_TRUE(server->bind(SocketAddress::anyPrivateAddress));
         EXPECT_TRUE(server->listen());
-        m_serverAddress.set_value(server->getLocalAddress());
+        serverAddressAvailable->set_value(server->getLocalAddress());
 
         auto client = server->accept();
         EXPECT_TRUE((bool)client);
