@@ -364,15 +364,15 @@
     </message>
     <message>
       <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</translation>
+      <translation>Hvis deaktiveret, prøv at aktivere optagelse i I/O-modulindstillinger (fejl &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</translation>
+      <translation>Hvis den er deaktiveret, prøv at aktivere optagelse og sænk FPS i enhedsindstillinger (fejl &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</translation>
+      <translation>Hvis den er deaktiveret, prøv at aktivere optagelse og reducere FPS i kameraindstillinger (fejl &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
