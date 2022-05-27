@@ -37,12 +37,12 @@ class BaseConanPackagePathsGenerator(Generator):
         return content
 
 
-# Workaround to use the same generator name in the NxConan subclass.
+# Workaround to use the same generator name in the NxOpenConan subclass.
 class ConanPackagePathsGenerator(BaseConanPackagePathsGenerator):
     pass
 
 
-class NxConan(ConanFile):
+class NxOpenConan(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
 
     generators = "cmake_find_package", "virtualrunenv", "ConanPackagePathsGenerator"
