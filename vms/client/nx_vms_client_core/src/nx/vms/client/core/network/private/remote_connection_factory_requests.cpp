@@ -400,8 +400,14 @@ void RemoteConnectionFactoryRequestsManager::checkDigestAuthentication(ContextPt
 
     if (context->credentials().authToken.type != AuthTokenType::password)
     {
-        NX_DEBUG(this, "Unexpected auth token type %1", context->credentials().authToken.type);
-        context->error = RemoteConnectionErrorCode::sessionExpired;
+        // It's allowed to download compatible version even if we cannot authenticate.
+        if (context->logonData.purpose != LogonData::Purpose::connectInCompatibilityMode)
+        {
+            NX_DEBUG(this,
+                "Unexpected auth token type %1",
+                context->credentials().authToken.type);
+            context->error = RemoteConnectionErrorCode::sessionExpired;
+        }
         return;
     }
 
