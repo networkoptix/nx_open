@@ -10,6 +10,7 @@
 #include <QtWidgets/QStackedWidget>
 
 #include <client_core/client_core_module.h>
+#include <nx/vms/client/desktop/system_administration/widgets/logs_management_widget.h>
 #include <ui/widgets/system_settings/database_management_widget.h>
 
 namespace nx::vms::client::desktop {
@@ -63,7 +64,7 @@ AdvancedSystemSettingsWidget::AdvancedSystemSettingsWidget(
     d(new Private(this))
 {
     d->addTab(tr("Backup and Restore"), new QnDatabaseManagementWidget(this));
-    d->addTab(tr("Logs Management"), new QLabel("TODO"));
+    d->addTab(tr("Logs Management"), new LogsManagementWidget(this));
 }
 
 AdvancedSystemSettingsWidget::~AdvancedSystemSettingsWidget()
