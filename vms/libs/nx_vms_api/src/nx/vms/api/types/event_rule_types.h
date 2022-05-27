@@ -290,5 +290,6 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(EventLevels)
 
 Q_DECLARE_METATYPE(nx::vms::api::ActionType)
 Q_DECLARE_METATYPE(nx::vms::api::EventLevel)
+Q_DECLARE_METATYPE(nx::vms::api::EventLevels)
 Q_DECLARE_METATYPE(nx::vms::api::EventReason)
 Q_DECLARE_METATYPE(nx::vms::api::EventType)

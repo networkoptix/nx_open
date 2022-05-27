@@ -6,8 +6,12 @@
 
 namespace nx::vms::rules {
 
-QMap<QString, QJsonValue> serializeProperties(const QObject* object);
+NX_VMS_RULES_API QMap<QString, QJsonValue> serializeProperties(
+    const QObject* object,
+    const QSet<QString>& names);
 
-void deserializeProperties(const QMap<QString, QJsonValue>& propMap, QObject* object);
+NX_VMS_RULES_API void deserializeProperties(
+    const QMap<QString, QJsonValue>& propMap,
+    QObject* object);
 
 } // namespace nx::vms::rules

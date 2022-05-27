@@ -8,6 +8,8 @@
 #include <QtCore/QMetaObject>
 #include <QtCore/QMetaProperty>
 
+#include <nx/utils/log/assert.h>
+
 namespace nx::utils {
 
 /** Describes access to the properties of the QObject based classes. */
@@ -32,9 +34,9 @@ Q_DECLARE_FLAGS(PropertyAccessFlags, PropertyAccess)
  * nullptr. By default QObject properties are excluded, set includeBaseProperties to true to include.
  */
 template<class Base = QObject>
-inline QStringList propertyNames(
-    QObject* object,
-    const PropertyAccessFlags& propertyAccessFlags = PropertyAccess::anyAccess,
+inline QSet<QString> propertyNames(
+    const QObject* object,
+    PropertyAccessFlags propertyAccessFlags = PropertyAccess::anyAccess,
     bool includeBaseProperties = false)
 {
     static_assert(std::is_base_of<QObject, Base>());
@@ -42,13 +44,17 @@ inline QStringList propertyNames(
     if (!object )
         return {};
 
-    QStringList result;
+    const auto baseMetaObject = &Base::staticMetaObject;
+    const auto metaObject = object->metaObject();
+    if (!NX_ASSERT(metaObject->inherits(baseMetaObject)))
+        return {};
 
+    QSet<QString> result;
     const int offset = includeBaseProperties
-        ? Base::staticMetaObject.propertyOffset()
-        : Base::staticMetaObject.propertyOffset() + Base::staticMetaObject.propertyCount();
+        ? baseMetaObject->propertyOffset()
+        : baseMetaObject->propertyOffset() + baseMetaObject->propertyCount();
 
-    auto metaObject = object->metaObject();
+
     for (int i = offset; i < metaObject->propertyCount(); ++i)
     {
         auto property = metaObject->property(i);

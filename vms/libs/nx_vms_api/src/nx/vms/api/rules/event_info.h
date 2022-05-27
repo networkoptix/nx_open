@@ -17,7 +17,7 @@ struct NX_VMS_API EventInfo
     QnUuid id;
     QString eventType;
     State state = State::none;
-    QMap<QString, QString> props;
+    QMap<QString, QJsonValue> props;
 };
 
 #define nx_vms_api_rules_EventInfo_Fields \

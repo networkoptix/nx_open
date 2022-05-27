@@ -441,14 +441,8 @@ EventPtr Engine::buildEvent(const EventData& eventData) const
     if (!NX_ASSERT(m_eventTypes.contains(eventType)))
         return EventPtr();
 
-    auto eventConstructor = m_eventTypes.value(eventType);
-    auto event = EventPtr(eventConstructor());
-    auto propertyNames = nx::utils::propertyNames(event.get(), nx::utils::PropertyAccess::fullAccess);
-    for (const auto& propertyName: propertyNames)
-    {
-        if (eventData.contains(propertyName))
-            event->setProperty(propertyName.toUtf8(), eventData.value(propertyName));
-    }
+    auto event = EventPtr(m_eventTypes[eventType]());
+    deserializeProperties(eventData, event.get());
 
     return event;
 }
@@ -749,12 +743,7 @@ void Engine::processEvent(const EventPtr& event)
 
     if (!ruleIds.empty())
     {
-        for (const auto& name: eventFields)
-        {
-            // TODO: #spanasenko Replace by custom convertors (!)
-            eventData[name] = event->property(name.toUtf8().data());
-        }
-
+        eventData = serializeProperties(event.get(), eventFields);
         m_router->routeEvent(eventData, ruleIds, resources);
     }
 }

@@ -2,6 +2,8 @@
 
 #include "camera_conflict_list.h"
 
+#include <nx/fusion/model_functions.h>
+
 namespace nx::vms::rules {
 
 namespace {
@@ -69,5 +71,7 @@ void CameraConflictList::decode(const QString& encoded)
         }
     }
 }
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(CameraConflictList, (json), CameraConflictList_Fields)
 
 } // namespace nx::vms::rules

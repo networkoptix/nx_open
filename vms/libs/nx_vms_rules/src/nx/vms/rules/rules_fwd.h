@@ -6,6 +6,8 @@
 
 #include <nx/vms/api/rules/common.h>
 
+class QJsonValue;
+
 namespace nx::vms::rules {
 
 class Field;
@@ -31,7 +33,7 @@ struct ItemDescriptor;
 using EventPtr = QSharedPointer<BasicEvent>;
 using ActionPtr = QSharedPointer<BasicAction>;
 
-using EventData = QHash<QString, QVariant>; // TODO: #spanasenko Move to separate class?
+using EventData = QMap<QString, QJsonValue>; // TODO: #spanasenko Move to separate class?
 
 using FilterManifest = QMap<QString, QString>; //< Field name to field type mapping.
 

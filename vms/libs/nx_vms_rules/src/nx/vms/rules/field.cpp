@@ -6,7 +6,8 @@
 #include <QtCore/QMetaProperty>
 #include <QtCore/QScopedValueRollback>
 
-#include <nx/fusion/serialization/json.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/qobject.h>
 
 #include "utils/serialization.h"
 
@@ -51,7 +52,7 @@ void Field::connectSignals()
 
 QMap<QString, QJsonValue> Field::serializedProperties() const
 {
-    return serializeProperties(this);
+    return serializeProperties(this, nx::utils::propertyNames(this));
 }
 
 bool Field::setProperties(const QVariantMap& properties)

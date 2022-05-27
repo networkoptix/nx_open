@@ -66,17 +66,12 @@ void Ec2Router::routeEvent(
     }
     //TODO: #spanasenko Add client peers.
 
+    nx::vms::api::rules::EventInfo info;
+    info.props = eventData;
+
     for (const auto& ruleId: triggeredRules)
     {
-        nx::vms::api::rules::EventInfo info;
         info.id = ruleId;
-        for (auto it = eventData.begin(); it != eventData.end(); ++it)
-        {
-            QByteArray data;
-            QDataStream ds(&data, QIODevice::WriteOnly);
-            ds << it.value();
-            info.props[it.key()] = data.toBase64(); //< TODO: #spanasenko Refactor.
-        }
 
         m_context->ec2Connection()->getVmsRulesManager(Qn::kSystemAccess)->broadcastEvent(
             info, kFakeHandler);
@@ -86,14 +81,7 @@ void Ec2Router::routeEvent(
 void Ec2Router::onEventReceived(const nx::vms::api::rules::EventInfo& eventInfo)
 {
     const auto& ruleId = eventInfo.id;
-    EventData eventData;
-    for (auto it = eventInfo.props.begin(); it != eventInfo.props.end(); ++it)
-    {
-        auto data = QByteArray::fromBase64(it.value().toLatin1());
-        QDataStream ds(&data, QIODevice::ReadOnly);
-        ds >> eventData[it.key()];
-    }
-    emit eventReceived(ruleId, eventData);
+    emit eventReceived(ruleId, eventInfo.props);
 }
 
 } // namespace nx::vms::rules

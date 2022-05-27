@@ -3,10 +3,12 @@
 #include <gtest/gtest.h>
 
 #include <nx/fusion/serialization/json_functions.h>
+#include <nx/utils/qobject.h>
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/event_fields/source_user_field.h>
+#include <nx/vms/rules/utils/serialization.h>
 
 #include "test_field.h"
 #include "test_plugin.h"
@@ -18,17 +20,16 @@ TEST(VmsRulesSerialization, EventField)
 {
     auto engine = std::make_unique<nx::vms::rules::Engine>(std::make_unique<TestRouter>());
     auto plugin = std::make_unique<nx::vms::rules::test::TestPlugin>(engine.get());
-    plugin->registerFields();
 
     auto field = std::make_unique<TestEventField>();
     field->id = QnUuid::createUuid();
-    field->idsList << QnUuid::createUuid() << QnUuid::createUuid();
-    field->idsSet << QnUuid::createUuid() << QnUuid::createUuid();
+    field->idSet << QnUuid::createUuid() << QnUuid::createUuid();
     field->string = "test string";
     field->strings << "string 1" << "string 2";
     field->flag = true;
     field->number = 42;
     field->state = State::started;
+    field->levels = nx::vms::api::EventLevel::InfoEventLevel;
 
     static const auto kFieldName = "test";
     nx::vms::rules::EventFilter filter(QnUuid::createUuid(), "nx.events.test");
@@ -52,13 +53,40 @@ TEST(VmsRulesSerialization, EventField)
     ASSERT_TRUE(resultField);
 
     EXPECT_EQ(sourceField->id, resultField->id);
-    EXPECT_EQ(sourceField->idsList, resultField->idsList);
-    EXPECT_EQ(sourceField->idsSet, resultField->idsSet);
+    EXPECT_EQ(sourceField->idSet, resultField->idSet);
     EXPECT_EQ(sourceField->string, resultField->string);
     EXPECT_EQ(sourceField->strings, resultField->strings);
     EXPECT_EQ(sourceField->flag, resultField->flag);
     EXPECT_EQ(sourceField->number, resultField->number);
     EXPECT_EQ(sourceField->state, resultField->state);
+    EXPECT_EQ(sourceField->levels, resultField->levels);
+}
+
+TEST(VmsRulesSerialization, Event)
+{
+    const auto sourceEvent = QSharedPointer<TestEvent>::create(
+        std::chrono::seconds(5),
+        State::started);
+    sourceEvent->attributes = nx::common::metadata::Attributes{{"key", "value"}};
+    sourceEvent->level = nx::vms::api::EventLevel::ErrorEventLevel;
+    sourceEvent->reason = nx::vms::api::EventReason::networkBadCameraTime;
+    sourceEvent->conflicts.camerasByServer["test"] = QStringList{"cam1", "cam2"};
+
+    const auto propData =
+        serializeProperties(sourceEvent.get(), nx::utils::propertyNames(sourceEvent.get()));
+
+    auto propJson = QJson::serialized(propData);
+    SCOPED_TRACE(propJson.toStdString());
+
+    const auto resultEvent = QSharedPointer<TestEvent>::create();
+    deserializeProperties(propData, resultEvent.get());
+
+    EXPECT_EQ(sourceEvent->timestamp(), resultEvent->timestamp());
+    EXPECT_EQ(sourceEvent->state(), resultEvent->state());
+    EXPECT_EQ(sourceEvent->attributes, resultEvent->attributes);
+    EXPECT_EQ(sourceEvent->level, resultEvent->level);
+    EXPECT_EQ(sourceEvent->reason, resultEvent->reason);
+    EXPECT_EQ(sourceEvent->conflicts, resultEvent->conflicts);
 }
 
 } // namespace nx::vms::rules::test
