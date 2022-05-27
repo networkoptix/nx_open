@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/utils/qobject.h>
 #include <nx/vms/common/test_support/test_context.h>
 #include <nx/vms/rules/action_fields/builtin_fields.h>
 #include <nx/vms/rules/actions/builtin_actions.h>
@@ -9,6 +10,7 @@
 #include <nx/vms/rules/event_fields/builtin_fields.h>
 #include <nx/vms/rules/events/builtin_events.h>
 #include <nx/vms/rules/plugin.h>
+#include <nx/vms/rules/utils/serialization.h>
 
 #include "test_router.h"
 
@@ -65,6 +67,11 @@ public:
         EXPECT_TRUE(m_engine->registerEventField(
             fieldMetatype<T>(),
             [args...]{ return new T(args...); }));
+
+        // Check for serialization assertions.
+        const auto field = m_engine->buildEventField(fieldMetatype<T>());
+        const auto data = serializeProperties(field.get(), nx::utils::propertyNames(field.get()));
+        deserializeProperties(data, field.get());
     }
 
     template<class T>
@@ -75,6 +82,13 @@ public:
         testManifestValidity<T>();
 
         EXPECT_TRUE(registerEvent<T>());
+
+        // Check for serialization assertions.
+        const auto event = QSharedPointer<T>::create();
+        event->setState(State::instant);
+
+        const auto data = serializeProperties(event.get(), nx::utils::propertyNames(event.get()));
+        deserializeProperties(data, event.get());
     }
 
     template<class T>
