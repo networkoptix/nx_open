@@ -1231,7 +1231,7 @@
     </message>
     <message>
       <source>Connect to the previous system on startup</source>
-      <translation type="unfinished">Connect to the previous system on startup</translation>
+      <translation>啟動後自動連線至先前的系統</translation>
     </message>
     <message>
       <source>Automatically restore saved windows configuration</source>
@@ -1243,7 +1243,7 @@
     </message>
     <message>
       <source>Mute audio when the mic is active</source>
-      <translation type="unfinished">Mute audio when the mic is active</translation>
+      <translation>當麥克風啟用時則將音訊切換成靜音</translation>
     </message>
   </context>
   <context>
@@ -1496,7 +1496,7 @@
     </message>
     <message>
       <source>Allow digest authentication for imported user</source>
-      <translation type="unfinished">Allow digest authentication for imported user</translation>
+      <translation>允許匯入的使用者使用Digest認證</translation>
     </message>
   </context>
   <context>
@@ -2410,7 +2410,7 @@
     </message>
     <message>
       <source>Display servers in tree for non-administrator users</source>
-      <translation type="unfinished">Display servers in tree for non-administrator users</translation>
+      <translation>非管理者亦能於資源樹列表中看到伺服器的顯示</translation>
     </message>
     <message>
       <source>Archive encryption</source>
