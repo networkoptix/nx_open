@@ -4,6 +4,7 @@
 #include "ui_logs_management_widget.h"
 
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_administration/models/logs_management_model.h>
 
 namespace nx::vms::client::desktop {
 
@@ -38,6 +39,15 @@ void LogsManagementWidget::setReadOnlyInternal(bool readOnly)
 void LogsManagementWidget::setupUi()
 {
     ui->setupUi(this);
+
+    ui->unitsTable->setModel(new LogsManagementModel(this));
+    ui->unitsTable->setColumnHidden(LogsManagementModel::Columns::StatusColumn, true);
+    ui->unitsTable->horizontalHeader()->setSectionResizeMode(
+        LogsManagementModel::Columns::NameColumn, QHeaderView::Stretch);
+    ui->unitsTable->horizontalHeader()->setSectionResizeMode(
+        LogsManagementModel::Columns::LogLevelColumn, QHeaderView::Stretch);
+    ui->unitsTable->horizontalHeader()->setSectionResizeMode(
+        LogsManagementModel::Columns::CheckBoxColumn, QHeaderView::ResizeToContents);
 
     ui->downloadButton->setIcon(qnSkin->icon("text_buttons/download.png"));
     ui->settingsButton->setIcon(qnSkin->icon("text_buttons/settings.png"));
