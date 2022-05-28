@@ -596,7 +596,7 @@
     </message>
     <message>
       <source>Use different values for pan and tilt</source>
-      <translation type="unfinished">Use different values for pan and tilt</translation>
+      <translation>水平/垂直套用不同的設定</translation>
     </message>
     <message>
       <source>Tilt</source>
@@ -2293,11 +2293,11 @@
     <name>RewindForWidget</name>
     <message>
       <source>Playback time :</source>
-      <translation type="unfinished">Playback time :</translation>
+      <translation>播放時間：</translation>
     </message>
     <message>
       <source>rewind for</source>
-      <translation type="unfinished">rewind for</translation>
+      <translation>倒帶</translation>
     </message>
     <message>
       <source>Live</source>
@@ -2410,7 +2410,7 @@
     </message>
     <message>
       <source>Display servers in tree for non-administrator users</source>
-      <translation type="unfinished">Display servers in tree for non-administrator users</translation>
+      <translation>非管理者亦能於資源樹列表中看到伺服器的顯示</translation>
     </message>
     <message>
       <source>Archive encryption</source>
@@ -2438,7 +2438,7 @@
     </message>
     <message>
       <source>Encrypt video traffic to desktop and mobile clients</source>
-      <translation type="unfinished">Encrypt video traffic to desktop and mobile clients</translation>
+      <translation>加密客戶端與伺服器間的影像串流</translation>
     </message>
     <message>
       <source>Manage Users</source>

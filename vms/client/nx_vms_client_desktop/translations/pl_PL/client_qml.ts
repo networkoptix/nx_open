@@ -91,8 +91,8 @@
     <message numerus="yes">
       <source>%n new results</source>
       <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
+        <numerusform>%n nowych wyników</numerusform>
+        <numerusform>%n nowych wyników</numerusform>
         <numerusform>%n new results</numerusform>
         <numerusform>%n new results</numerusform>
       </translation>
@@ -139,8 +139,8 @@
     <message numerus="yes">
       <source>%n new results</source>
       <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
+        <numerusform>%n nowych wyników</numerusform>
+        <numerusform>%n nowych wyników</numerusform>
         <numerusform>%n new results</numerusform>
         <numerusform>%n new results</numerusform>
       </translation>

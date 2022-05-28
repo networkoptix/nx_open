@@ -26,7 +26,7 @@
     <message numerus="yes">
       <source>%1 with %n attributes</source>
       <translation type="unfinished">
-        <numerusform>%1 with %n attributes</numerusform>
+        <numerusform>%1 z %n atrybutami</numerusform>
         <numerusform>%1 with %n attributes</numerusform>
         <numerusform>%1 with %n attributes</numerusform>
         <numerusform>%1 with %n attributes</numerusform>
@@ -7920,7 +7920,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <message numerus="yes">
       <source>These devices do not have audio inputs or are not configured correctly.</source>
       <translation type="unfinished">
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
+        <numerusform>Te urządzenia nie mają wejścia audio lub nie są one poprawnie skonfigurowane.</numerusform>
         <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
         <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
         <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
@@ -7938,7 +7938,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <message numerus="yes">
       <source>These devices do not have audio outputs or are not configured correctly.</source>
       <translation type="unfinished">
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
+        <numerusform>Te urządzenia nie mają wyjścia audio lub nie są one poprawnie skonfigurowane.</numerusform>
         <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
         <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
         <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
@@ -10560,8 +10560,8 @@ Nie przypinaj tego certyfikatu, jeśli &apos; nie zmodyfikowałeś %2 certyfikat
     <message numerus="yes">
       <source>Recording schedule is invalid for %n cameras</source>
       <translation type="unfinished">
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
+        <numerusform>Harmonogram nagrywania jest nieprawidłowy dla %n kamer</numerusform>
+        <numerusform>Harmonogram nagrywania jest nieprawidłowy dla %n kamer</numerusform>
         <numerusform>Recording schedule is invalid for %n cameras</numerusform>
         <numerusform>Recording schedule is invalid for %n cameras</numerusform>
       </translation>
