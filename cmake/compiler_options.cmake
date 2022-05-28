@@ -287,7 +287,6 @@ if(UNIX)
         add_compile_options(
             -Wno-error=maybe-uninitialized
             -Wno-psabi
-            -Wno-error=attributes #< TODO: Try to remove this after FFmpeg upgrade.
         )
     elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         add_compile_options(
