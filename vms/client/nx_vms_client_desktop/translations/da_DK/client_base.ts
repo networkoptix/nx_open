@@ -8461,7 +8461,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>No Failover</source>
-      <translation type="unfinished">No Failover</translation>
+      <translation>Ingen failover</translation>
     </message>
   </context>
   <context>
@@ -9243,7 +9243,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
-      <translation type="unfinished">There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</translation>
+      <translation>Der er ikke plads nok på din computer til at downloade klientopdateringen. Frigør venligst plads på harddisken og prøv igen.</translation>
     </message>
   </context>
   <context>
@@ -9840,11 +9840,11 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this camera</source>
-      <translation type="unfinished">Motion detection is disabled for this camera</translation>
+      <translation>Bevægelsesdetektion er deaktiveret for dette kamera</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected cameras</translation>
+      <translation>Bevægelsesdetektion er deaktiveret for nogle af de valgte kameraer</translation>
     </message>
     <message>
       <source>Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
