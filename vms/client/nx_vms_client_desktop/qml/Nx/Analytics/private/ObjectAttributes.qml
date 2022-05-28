@@ -65,19 +65,31 @@ Column
             if (!objectAttributes.objectType)
                 return null
 
-            let attributes = objectAttributes.objectType.supportedAttributes
-            const derivedTypes = objectAttributes.objectType.derivedTypes
-
-            // Add attributes of private derived types.
-            for (let i = 0; i < derivedTypes.length; ++i)
+            const attributeByName = {}
+            const orderedAttributeNames = []
+            for (const attribute of objectAttributes.objectType.supportedAttributes)
             {
-                if (!derivedTypes[i].isPrivate)
-                    continue
-
-                attributes = attributes.concat(derivedTypes[i].supportedOwnAttributes)
+                attributeByName[attribute.name] = attribute
+                orderedAttributeNames.push(attribute.name)
             }
 
-            return attributes
+            // Add attributes of private derived types.
+            for (const derivedType of objectAttributes.objectType.derivedTypes)
+            {
+                if (!derivedType.isPrivate)
+                    continue
+
+                for (const attribute of derivedType.supportedAttributes)
+                {
+                    if (attributeByName.hasOwnProperty(attribute.name))
+                        continue;
+
+                    attributeByName[attribute.name] = attribute
+                    orderedAttributeNames.push(attribute.name)
+                }
+            }
+
+            return orderedAttributeNames.map(attributeName => attributeByName[attributeName])
         }
 
         AttributeEditor
