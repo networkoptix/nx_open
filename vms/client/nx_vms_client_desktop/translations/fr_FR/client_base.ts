@@ -7602,7 +7602,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>No cameras available</source>
-      <translation type="unfinished">No cameras available</translation>
+      <translation>Aucune caméra disponible</translation>
     </message>
   </context>
   <context>
@@ -10110,7 +10110,7 @@ N'utilisez pas ce certificat si vous n'avez pas modifié le certificat SSL du se
     </message>
     <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
-      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct Server.</translation>
+      <translation>Examinez les détails du certificat pour vous assurer que vous vous connectez au bon serveur.</translation>
     </message>
   </context>
   <context>
