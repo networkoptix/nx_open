@@ -58,6 +58,7 @@ bool isMessageLocked(MessageType message)
         case StoragesNotConfigured:
         case NoInternetForTimeSync:
         case cameraRecordingScheduleIsInvalid:
+        case deviceIsReplacedWith:
             return true;
         default:
             return false;

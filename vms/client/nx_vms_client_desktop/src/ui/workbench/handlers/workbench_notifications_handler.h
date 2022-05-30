@@ -32,6 +32,10 @@ public:
     virtual bool tryClose(bool force) override;
     virtual void forcedUpdate() override;
 
+    void setSystemHealthEventVisible(QnSystemHealth::MessageType message, bool visible);
+    void setSystemHealthEventVisible(QnSystemHealth::MessageType message,
+        const QnResourcePtr& resource, bool visible);
+
 signals:
     void systemHealthEventAdded(QnSystemHealth::MessageType message, const QVariant& params);
     void systemHealthEventRemoved(QnSystemHealth::MessageType message, const QVariant& params);
@@ -50,10 +54,6 @@ private slots:
 
 private:
     void addNotification(const nx::vms::event::AbstractActionPtr& businessAction);
-
-    void setSystemHealthEventVisible(QnSystemHealth::MessageType message, bool visible);
-    void setSystemHealthEventVisible(QnSystemHealth::MessageType message,
-        const QnResourcePtr& resource, bool visible);
 
     void setSystemHealthEventVisibleInternal(QnSystemHealth::MessageType message,
         const QVariant& params, bool visible);
