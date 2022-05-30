@@ -187,7 +187,7 @@ QVariant LogsManagementModel::data(const QModelIndex& index, int role) const
             switch (role)
             {
                 case Qt::DisplayRole:
-                    return logLevelName(unit);
+                    return logLevelName(logLevel(unit));
 
                 case Qt::ForegroundRole:
                     return logLevelColor(unit);
@@ -244,12 +244,15 @@ Qt::ItemFlags LogsManagementModel::flags(const QModelIndex& index) const
     return base_type::flags(index);
 }
 
-QString LogsManagementModel::logLevelName(LogsManagementUnitPtr unit)
+QList<nx::utils::log::Level> LogsManagementModel::logLevels()
 {
-    if (!NX_ASSERT(unit))
-        return {};
+    using Level = nx::utils::log::Level;
+    return {Level::none, Level::error, Level::warning, Level::info, Level::debug, Level::verbose};
+}
 
-    switch (logLevel(unit))
+QString LogsManagementModel::logLevelName(nx::utils::log::Level level)
+{
+    switch (level)
     {
         case nx::utils::log::Level::none: return tr("none");
         case nx::utils::log::Level::error: return tr("error");
