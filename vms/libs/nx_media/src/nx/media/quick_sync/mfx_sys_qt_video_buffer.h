@@ -7,7 +7,6 @@
 
 #include <nx/utils/log/log.h>
 
-
 namespace nx::media::quick_sync {
 
 class MfxQtVideoBufferPrivate: public QAbstractVideoBufferPrivate
@@ -60,7 +59,6 @@ public:
     virtual ~MfxQtVideoBuffer()
     {
     }
-
 
     virtual MapMode mapMode() const override
     {
