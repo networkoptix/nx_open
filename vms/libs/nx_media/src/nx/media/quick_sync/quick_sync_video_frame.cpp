@@ -85,8 +85,6 @@ AVFrame QuickSyncVideoFrame::lockFrame()
 
 void QuickSyncVideoFrame::unlockFrame()
 {
-    AVFrame result;
-    memset(&result, 0, sizeof(AVFrame));
     auto surfaceInfo = m_frame->handle().value<QuickSyncSurface>();
     auto decoderLock = surfaceInfo.decoder.lock();
     if (!decoderLock)
