@@ -313,12 +313,23 @@ containing the following fields:
 Other fields depend on the particular attribute type.
 
 Attributes that are inherited from the base type can be "re-defined" as follows:
-    - "subtype" and "unit" can be specified if not specified in the base type (or had exactly the
-        same value);
-    - "items" of an Enum can be specified, which defines additional items (base items are
-        implicitly inherited);
-    - "minValue" and "maxValue" can be specified iff they narrow the inherited range rather than
-        extend it.
+
+- "subtype" and "unit" can be specified if not specified in the base type (or had exactly the
+    same value);
+
+- "minValue" and "maxValue" can be specified if and only if the inherited range rather than
+    extend it.
+
+- For Enums and Colors, the Attribute can be re-defined to use another Enum/Color
+    respectively, provided that this overriding Enum/Color is in turn inherited from the
+    Enum/Color of the base Attribute.
+
+- ATTENTION: In the current VMS version, there is the following limitation when overriding
+    inherited attributes. It is considered an undefined behavior (the Search GUI may behave
+    unexpectedly) to use the following scheme: an Object type `B` has an Attribute `a`, and
+    the hidden derived Object type `D` inherited from `B` overrides the Attribute `a`, and
+    both `B.a` and `D.a` are declared as supported Attributes, no matter whether in one or in
+    different Device Agent manifests, and in one or different Plugins.
 
 ### Attribute types
 
