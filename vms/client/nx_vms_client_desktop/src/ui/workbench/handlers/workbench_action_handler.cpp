@@ -145,6 +145,7 @@
 #include <ui/widgets/main_window.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/handlers/workbench_layouts_handler.h> //< TODO: #sivanov Fix dependencies.
+#include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/watchers/workbench_bookmarks_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -2257,6 +2258,10 @@ void ActionHandler::undoReplaceCameraActionTriggered()
             {
                 QnMessageBox::success(mainWindowWidget(),
                     tr("Undo replacement completed successfully!"));
+                const auto notificationsHandler =
+                    context()->instance<QnWorkbenchNotificationsHandler>();
+                notificationsHandler->setSystemHealthEventVisible(
+                    QnSystemHealth::deviceIsReplacedWith, false);
             }
         });
 
