@@ -6,6 +6,7 @@
 
 #include <utils/common/util.h>
 #include <utils/media/ffmpeg_helper.h>
+#include <utils/media/utils.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/url.h>
 #include <core/resource/media_resource.h>
@@ -104,7 +105,15 @@ void StorageRecordingContext::allocateFfmpegObjects(
         {
             for (int i = 0; i < videoLayout->channelCount(); ++i)
             {
-                if (!helpers::addStream(getVideoCodecParameters(videoData), context.formatCtx))
+                auto codecParams = getVideoCodecParameters(videoData);
+                auto avCodecParams = codecParams->getAvCodecParameters();
+                if (!nx::media::fillExtraData(
+                    videoData.get(), &avCodecParams->extradata, &avCodecParams->extradata_size))
+                {
+                    throw ErrorEx(Error::Code::videoStreamAllocation, "Failed to build extra data");
+                }
+
+                if (!helpers::addStream(codecParams, context.formatCtx))
                 {
                     throw ErrorEx(
                         Error::Code::videoStreamAllocation, "Can't allocate output video stream");
