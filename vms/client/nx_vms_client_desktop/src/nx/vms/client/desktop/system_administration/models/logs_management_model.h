@@ -73,7 +73,8 @@ public:
     virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;
     Qt::ItemFlags flags(const QModelIndex& index) const override;
 
-    static QString logLevelName(std::shared_ptr<LogsManagementUnit> unit);
+    static QList<nx::utils::log::Level> logLevels();
+    static QString logLevelName(nx::utils::log::Level level);
 
 private:
     LogsManagementUnitPtr itemForRow(int row) const;
