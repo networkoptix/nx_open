@@ -89,7 +89,6 @@ bool QuickSyncVideoDecoderOldPlayer::decode(
     if (!result)
         return false;
 
-    std::weak_ptr<nx::media::quick_sync::QuickSyncVideoDecoderImpl> decoderWeakPtr = m_impl;
     outFrame->format = AV_PIX_FMT_NV12;
     outFrame->flags = m_lastFlags | QnAbstractMediaData::MediaFlags_HWDecodingUsed;
     outFrame->pkt_dts = result->startTime();
