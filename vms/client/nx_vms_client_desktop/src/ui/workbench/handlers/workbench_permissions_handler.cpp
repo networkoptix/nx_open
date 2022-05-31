@@ -4,26 +4,40 @@
 
 #include <QtWidgets/QAction>
 
-#include <core/resource/layout_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/webpage_resource.h>
-
-#include <core/resource_access/resource_access_manager.h>
-#include <core/resource_access/resource_access_filter.h>
-#include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_access/providers/resource_access_provider.h>
-
-#include <core/resource_management/user_roles_manager.h>
+#include <core/resource_access/resource_access_filter.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/shared_resources_manager.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
-
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <core/resource_management/user_roles_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
-
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 
 namespace nx::vms::client::desktop {
+
+namespace {
+
+QSet<QnResourcePtr> localLayoutResources(const QnLayoutResourcePtr& layout)
+{
+    QnResourcePool* resourcePool = layout->resourcePool();
+
+    QSet<QnResourcePtr> result;
+    for (const auto& item: layout->getItems())
+    {
+        if (auto resource = resourcePool->getResourceByDescriptor(item.resource))
+            result.insert(resource);
+    }
+    return result;
+}
+
+} // namespace
 
 PermissionsHandler::PermissionsHandler(QObject* parent):
     QObject(parent),
@@ -100,13 +114,15 @@ bool PermissionsHandler::confirmStopSharingLayouts(const QnResourceAccessSubject
     if (resourceAccessManager()->hasGlobalPermission(subject, GlobalPermission::accessAllMedia))
         return true;
 
-    /* Calculate all resources that were available through these layouts. */
+    // Calculate all resources that were available through these layouts.
+    // Check only Resources from the same System Context as the Layout. Cross-system Resources
+    // cannot be available through Shared Layouts.
     QSet<QnUuid> layoutsIds;
     QSet<QnResourcePtr> resourcesOnLayouts;
     for (const auto& layout: layouts)
     {
         layoutsIds.insert(layout->getId());
-        resourcesOnLayouts.unite(layout->layoutResources());
+        resourcesOnLayouts.unite(localLayoutResources(layout));
     }
 
     QnResourceList resourcesBecomeUnaccessible;

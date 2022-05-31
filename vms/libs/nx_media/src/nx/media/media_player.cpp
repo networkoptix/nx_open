@@ -1189,8 +1189,7 @@ void Player::setSource(const QUrl& url)
 
     if (d->isLocalFile)
     {
-        d->resource.reset(
-            new QnAviResource(d->url.toString(), commonModule()->storagePluginFactory()));
+        d->resource.reset(new QnAviResource(d->url.toString()));
         d->resource->setStatus(nx::vms::api::ResourceStatus::online);
         d->setLiveMode(false);
     }

@@ -11,7 +11,7 @@ namespace nx::core::access {
 namespace test {
 
 CachedAccessProviderTestFixture::CachedAccessProviderTestFixture():
-    nx::vms::common::test::ContextBasedTest(/*clientMode*/ false, nx::core::access::Mode::cached)
+    nx::vms::common::test::ContextBasedTest(nx::core::access::Mode::cached)
 {
 }
 

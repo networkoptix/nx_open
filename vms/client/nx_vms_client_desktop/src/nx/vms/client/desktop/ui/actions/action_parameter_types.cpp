@@ -2,19 +2,16 @@
 
 #include "action_parameter_types.h"
 
-#include <nx/utils/flat_map.h>
-
-#include <common/common_module.h>
-#include <client_core/client_core_module.h>
-
-#include <core/resource/resource_fwd.h>
-#include <core/resource/layout_resource.h>
-#include <core/resource/user_resource.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_item_index.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/resource_fwd.h>
+#include <core/resource/user_resource.h>
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_matrix_index.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/utils/flat_map.h>
+#include <nx/vms/client/desktop/resources/resource_descriptor.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -215,10 +212,7 @@ QnResourceList ParameterTypes::resources(const QnLayoutItemIndexList& layoutItem
             continue;
 
         QnLayoutItemData data = index.layout()->getItem(index.uuid());
-
-        QnResourcePtr resource = qnClientCoreModule->commonModule()->
-            resourcePool()->getResourceByDescriptor(data.resource);
-        if (resource)
+        if (auto resource = getResourceByDescriptor(data.resource))
             result.push_back(resource);
     }
 

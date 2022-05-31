@@ -4,7 +4,7 @@
 
 #include <QtCore/QPointer>
 
-#include <client/client_module.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 
@@ -96,14 +96,14 @@ ResourceTreeSettings::ResourceTreeSettings(QObject* parent):
     if (ini().newPanelsLayout)
         return;
 
-    qnClientModule->clientStateHandler()->registerDelegate(
+    appContext()->clientStateHandler()->registerDelegate(
         kResourceTreeSettingsDelegateId, std::make_unique<StateDelegate>(this));
 }
 
 ResourceTreeSettings::~ResourceTreeSettings()
 {
     if (!ini().newPanelsLayout)
-        qnClientModule->clientStateHandler()->unregisterDelegate(kResourceTreeSettingsDelegateId);
+        appContext()->clientStateHandler()->unregisterDelegate(kResourceTreeSettingsDelegateId);
 }
 
 bool ResourceTreeSettings::showServersInTree() const

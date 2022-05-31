@@ -10,9 +10,13 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
 #include <nx/utils/math/fuzzy.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 #include "workbench_layout.h"
+
+using namespace nx::vms::client::desktop;
 
 QnWorkbenchItem::QnWorkbenchItem(const QnResourcePtr& resource, const QnUuid& uuid, QObject* parent):
     QObject(parent),
@@ -64,7 +68,7 @@ QnLayoutItemData QnWorkbenchItem::data() const
 {
     NX_ASSERT(m_resource);
 
-    QnLayoutItemData data = nx::vms::client::desktop::layout::itemFromResource(m_resource);
+    QnLayoutItemData data = layoutItemFromResource(m_resource);
     data.uuid = m_uuid;
     data.flags = flags();
     data.rotation = rotation();
@@ -388,13 +392,26 @@ QVariant QnWorkbenchItem::data(Qn::ItemDataRole role) const
         case Qn::ItemRotationRole:
             return rotation();
         default:
-            return qnResourceRuntimeDataManager->layoutItemData(m_uuid, role);
+            break;
     }
+
+    // FIXME: #sivanov Workaround destruction issue order.
+    auto layoutContext = layout()
+        ? SystemContext::fromResource(layout()->resource())
+        : appContext()->currentSystemContext();
+    return layoutContext->resourceRuntimeDataManager()->layoutItemData(m_uuid, role);
 }
 
 void QnWorkbenchItem::setData(Qn::ItemDataRole role, const QVariant &value)
 {
-    QVariant localValue = qnResourceRuntimeDataManager->layoutItemData(m_uuid, role);
+    // FIXME: #sivanov Workaround destruction issue order.
+    auto layoutContext = layout()
+        ? SystemContext::fromResource(layout()->resource())
+        : appContext()->currentSystemContext();
+
+    auto resourceRuntimeDataManager = layoutContext->resourceRuntimeDataManager();
+
+    QVariant localValue = resourceRuntimeDataManager->layoutItemData(m_uuid, role);
     switch (role)
     {
         case Qn::ItemUuidRole:
@@ -446,7 +463,7 @@ void QnWorkbenchItem::setData(Qn::ItemDataRole role, const QVariant &value)
             bool flip = value.toBool();
             if (localValue.toBool() != flip)
             {
-                qnResourceRuntimeDataManager->setLayoutItemData(m_uuid, role, flip);
+                resourceRuntimeDataManager->setLayoutItemData(m_uuid, role, flip);
                 emit dataChanged(Qn::ItemFlipRole);
             }
             break;
@@ -456,7 +473,7 @@ void QnWorkbenchItem::setData(Qn::ItemDataRole role, const QVariant &value)
             if (localValue == value)
                 return;
 
-            qnResourceRuntimeDataManager->setLayoutItemData(m_uuid, role, value);
+            resourceRuntimeDataManager->setLayoutItemData(m_uuid, role, value);
             emit dataChanged(role);
             break;
         }

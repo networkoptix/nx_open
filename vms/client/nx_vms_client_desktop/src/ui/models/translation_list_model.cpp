@@ -5,8 +5,7 @@
 #include <QtCore/QCoreApplication>
 
 #include <client/client_globals.h>
-#include <client/client_module.h>
-
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/utils/translation/scoped_locale.h>
 #include <nx/vms/utils/translation/translation_manager.h>
 
@@ -16,7 +15,7 @@ QnTranslationListModel::QnTranslationListModel(QObject* parent):
     base_type(parent)
 {
     using namespace nx::vms::utils;
-    TranslationManager* translationManager = qnClientModule->translationManager();
+    TranslationManager* translationManager = appContext()->translationManager();
     for (const Translation& translation: translationManager->translations())
     {
         TranslationInfo info;

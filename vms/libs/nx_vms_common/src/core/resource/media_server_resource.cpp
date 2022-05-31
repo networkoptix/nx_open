@@ -273,7 +273,7 @@ bool QnMediaServerResource::hasInternetAccess() const
         && getStatus() == nx::vms::api::ResourceStatus::online;
 }
 
-rest::ServerConnectionPtr QnMediaServerResource::restConnection()
+rest::ServerConnectionPtr QnMediaServerResource::restConnection() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
 

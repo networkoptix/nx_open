@@ -26,7 +26,7 @@ class LayoutPreviewPainter: public QObject
     using base_type = QObject;
 
 public:
-    LayoutPreviewPainter(QnResourcePool* resourcePool, QObject* parent = nullptr);
+    LayoutPreviewPainter(QObject* parent = nullptr);
     virtual ~LayoutPreviewPainter() override;
 
     QnLayoutResourcePtr layout() const;
@@ -45,8 +45,6 @@ private:
 
     QPixmap m_layoutThumbnail;
 
-    // We need resource pool to pass it to m_layoutThumbnailProvider.
-    QPointer<QnResourcePool> m_resourcePool;
     // Status of resource loading.
     Qn::ResourceStatusOverlay m_overlayStatus = Qn::NoDataOverlay;
 

@@ -896,7 +896,7 @@ bool ServerUpdateTool::haveActiveUpdate() const
 
 ServerUpdateTool::TimePoint::duration ServerUpdateTool::getInstallDuration() const
 {
-    return milliseconds(qnSyncTime->currentMSecsSinceEpoch()) - m_timeStartedInstall;
+    return qnSyncTime->value() - m_timeStartedInstall;
 }
 
 void ServerUpdateTool::dropAllRequests(const QString& reason)
@@ -1140,7 +1140,7 @@ bool ServerUpdateTool::requestInstallAction(
 
     m_remoteUpdateStatus = {};
 
-    m_timeStartedInstall = milliseconds(qnSyncTime->currentMSecsSinceEpoch());
+    m_timeStartedInstall = qnSyncTime->value();
     m_serversAreInstalling = servers;
 
     const auto connection = connectedServerApi();

@@ -2,23 +2,22 @@
 
 #include "layout_preview_painter.h"
 
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
-
-#include <ui/common/palette.h>
-#include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/style.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <ui/workaround/sharp_pixmap_painting.h>
-#include <utils/common/scoped_painter_rollback.h>
-
+#include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/common/widgets/autoscaled_plain_text.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
 #include <nx/vms/client/desktop/image_providers/layout_thumbnail_loader.h>
+#include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <ui/common/palette.h>
+#include <ui/workaround/sharp_pixmap_painting.h>
+#include <utils/common/scoped_painter_rollback.h>
 
 using nx::vms::client::core::Geometry;
 
@@ -30,14 +29,10 @@ static const QSize kPreviewSize(640, 480);
 namespace nx::vms::client::desktop {
 namespace ui {
 
-LayoutPreviewPainter::LayoutPreviewPainter(QnResourcePool* resourcePool,
-    QObject* parent)
-    :
+LayoutPreviewPainter::LayoutPreviewPainter(QObject* parent):
     base_type(parent),
-    m_busyIndicator(new BusyIndicator()),
-    m_resourcePool(resourcePool)
+    m_busyIndicator(new BusyIndicator())
 {
-    NX_ASSERT(m_resourcePool);
 }
 
 LayoutPreviewPainter::~LayoutPreviewPainter()
@@ -74,14 +69,12 @@ void LayoutPreviewPainter::setLayout(const QnLayoutResourcePtr& layout)
 
         // If layout is modified while preview painter is already created, newly added cameras'
         // status changes will be ignored.
-        for (const auto& resource:
-            QnLayoutResource::layoutResources(m_resourcePool, layout->getItems()))
+        for (const auto& resource: layoutResources(layout))
         {
             connect(resource.get(), &QnResource::statusChanged,
                 m_layoutThumbnailProvider.get(), &ImageProvider::loadAsync);
         }
 
-        m_layoutThumbnailProvider->setResourcePool(m_resourcePool);
         m_layoutThumbnailProvider->loadAsync();
     }
 }

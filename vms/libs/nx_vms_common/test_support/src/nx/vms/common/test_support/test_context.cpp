@@ -12,31 +12,24 @@ namespace nx::vms::common::test {
 
 struct Context::Private
 {
-    std::unique_ptr<QnStaticCommonModule> staticCommonModule;
     std::unique_ptr<SystemContext> systemContext;
     std::unique_ptr<QnCommonModule> commonModule;
 };
 
-Context::Context(bool clientMode, nx::core::access::Mode resourceAccessMode):
+Context::Context(nx::core::access::Mode resourceAccessMode):
     d(new Private())
 {
-    d->staticCommonModule = std::make_unique<QnStaticCommonModule>();
     d->systemContext = std::make_unique<SystemContext>(
         /*peerId*/ QnUuid::createUuid(),
         /*sessionId*/ QnUuid::createUuid(),
         resourceAccessMode);
     d->commonModule = std::make_unique<QnCommonModule>(
-        clientMode,
-        d->systemContext.get());
+        d->systemContext.get(),
+        /*moduleDiscoveryManager*/ nullptr);
 }
 
 Context::~Context()
 {
-}
-
-QnStaticCommonModule* Context::staticCommonModule() const
-{
-    return d->staticCommonModule.get();
 }
 
 QnCommonModule* Context::commonModule() const
@@ -50,10 +43,9 @@ SystemContext* Context::systemContext() const
 }
 
 ContextBasedTest::ContextBasedTest(
-    bool clientMode,
     nx::core::access::Mode resourceAccessMode)
 {
-    m_context = std::make_unique<Context>(clientMode, resourceAccessMode);
+    m_context = std::make_unique<Context>(resourceAccessMode);
     initializeContext(m_context->commonModule());
 }
 

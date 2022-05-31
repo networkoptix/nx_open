@@ -2,20 +2,20 @@
 
 #include "workbench_layout_synchronizer.h"
 
-#include <cassert>
-
-#include <utils/common/scoped_value_rollback.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource/resource.h>
+#include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/resources/resource_descriptor.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/delete_later.h>
-
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/resource.h>
-#include <core/resource/layout_resource.h>
-#include <core/resource/user_resource.h>
+#include <utils/common/scoped_value_rollback.h>
 
 #include "workbench.h"
-#include "workbench_layout.h"
 #include "workbench_item.h"
+#include "workbench_layout.h"
+
+using namespace nx::vms::client::desktop;
 
 namespace {
 
@@ -225,7 +225,7 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemAdded(const QnLayoutResource
     if (m_layout->item(itemData.uuid))
         return;
 
-    const auto resource = resourcePool()->getResourceByDescriptor(itemData.resource);
+    const auto resource = getResourceByDescriptor(itemData.resource);
     if (!resource)
         return;
 

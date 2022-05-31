@@ -23,15 +23,19 @@ using DeveloperFlags = ServerCompatibilityValidator::DeveloperFlags;
 
 namespace {
 
-static Peer s_localPeerType = Peer::undefined;
+static Peer s_localPeerType = Peer::notDefined;
 static Protocol s_localProtocolType = Protocol::undefined;
 static DeveloperFlags s_developerFlags = {};
 
 static const QMap<Peer, Protocol> kDefaultProtocolByPeer{
-    {Peer::undefined, Protocol::undefined},
+    {Peer::notDefined, Protocol::undefined},
     {Peer::server, Protocol::ubjson},
-    {Peer::mobileClient, Protocol::json},
     {Peer::desktopClient, Protocol::ubjson},
+    {Peer::videowallClient, Protocol::ubjson},
+    {Peer::oldMobileClient, Protocol::json},
+    {Peer::mobileClient, Protocol::json},
+    {Peer::cloudServer, Protocol::json},
+    {Peer::oldServer, Protocol::json},
 };
 
 static const QMap<Purpose, nx::utils::SoftwareVersion> kMinimalVersionByPurpose{
@@ -42,7 +46,7 @@ static const QMap<Purpose, nx::utils::SoftwareVersion> kMinimalVersionByPurpose{
 
 void ensureInitialized()
 {
-    NX_ASSERT(s_localPeerType != Peer::undefined && s_localProtocolType != Protocol::undefined);
+    NX_ASSERT(ServerCompatibilityValidator::isInitialized());
 }
 
 bool compatibleCloudHost(const QString& remoteCloudHost)
@@ -112,6 +116,11 @@ void ServerCompatibilityValidator::initialize(
         ? kDefaultProtocolByPeer[localPeerType]
         : connectionProtocol;
     s_developerFlags = developerFlags;
+}
+
+bool ServerCompatibilityValidator::isInitialized()
+{
+    return s_localPeerType != Peer::notDefined && s_localProtocolType != Protocol::undefined;
 }
 
 std::optional<ServerCompatibilityValidator::Reason> ServerCompatibilityValidator::check(

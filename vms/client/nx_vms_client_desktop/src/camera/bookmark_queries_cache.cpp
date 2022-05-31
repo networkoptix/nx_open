@@ -1,15 +1,16 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-
 #include "bookmark_queries_cache.h"
 
 #include <chrono>
 
-#include <camera/camera_bookmarks_query.h>
 #include <camera/camera_bookmarks_manager.h>
-
-#include <utils/common/scoped_timer.h>
+#include <camera/camera_bookmarks_query.h>
 #include <core/resource/camera_resource.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <utils/common/scoped_timer.h>
+
+using namespace nx::vms::client::desktop;
 
 using std::chrono::milliseconds;
 
@@ -32,13 +33,14 @@ QnCameraBookmarksQueryPtr QnBookmarkQueriesCache::getOrCreateQuery(const QnVirtu
 {
     QN_LOG_TIME(Q_FUNC_INFO);
 
-    if (!camera)
+    if (!camera || !camera->systemContext())
         return QnCameraBookmarksQueryPtr();
 
     auto it = m_queries.find(camera);
     if (it == m_queries.end())
     {
-        const auto query = qnCameraBookmarksManager->createQuery();
+        auto systemContext = SystemContext::fromResource(camera);
+        const auto query = systemContext->cameraBookmarksManager()->createQuery();
         query->setCamera(camera->getId());
         it = m_queries.insert(std::make_pair(camera, query)).first;
     }

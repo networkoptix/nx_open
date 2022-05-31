@@ -135,7 +135,7 @@ bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent
         return false;
     }
 
-    m_mimeData.reset(new MimeData{mimeData, resourcePool()});
+    m_mimeData.reset(new MimeData{mimeData});
 
     if (!isDragValid())
     {
@@ -195,7 +195,8 @@ bool DropInstrument::dropEvent(QGraphicsItem* /*item*/, QGraphicsSceneDragDropEv
 
     // Try to drop videowall items first.
     const auto videoWallItems = resourcePool()->getVideoWallItemsByUuid(localMimeData->entities());
-    if (delayedTriggerIfPossible(action::StartVideoWallControlAction, videoWallItems))
+    if (!videoWallItems.empty()
+        && delayedTriggerIfPossible(action::StartVideoWallControlAction, videoWallItems))
     {
         // Ignore resources.
         return true;

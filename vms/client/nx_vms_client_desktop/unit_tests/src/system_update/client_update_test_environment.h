@@ -24,12 +24,6 @@ namespace nx::vms::client::desktop::test {
 class ClientUpdateTestEnvironment: public ContextBasedTest
 {
 public:
-    // virtual void SetUp() will be called before each test is run.
-    virtual void SetUp();
-
-    // virtual void TearDown() will be called after each test is run.
-    virtual void TearDown();
-
     ClientVerificationData makeClientData(nx::utils::SoftwareVersion version);
 
     QnMediaServerResourcePtr makeServer(
@@ -42,8 +36,6 @@ public:
     void removeAllServers();
 
     QnResourcePool* resourcePool() const;
-
-    QSharedPointer<QnResourceRuntimeDataManager> m_resourceRuntime;
 };
 
 using Version = nx::utils::SoftwareVersion;

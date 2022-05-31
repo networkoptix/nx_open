@@ -18,7 +18,6 @@ namespace nx::vms::client::desktop {
 
 class VirtualCameraPreparer:
     public QObject,
-    public QnCommonModuleAware,
     public core::RemoteConnectionAware
 {
     Q_OBJECT

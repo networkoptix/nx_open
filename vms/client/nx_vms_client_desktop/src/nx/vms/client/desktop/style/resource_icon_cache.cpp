@@ -6,21 +6,21 @@
 #include <QtGui/QPixmap>
 
 #include <client/client_globals.h>
-#include <core/resource_management/resource_runtime_data.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
+#include <core/resource_management/resource_runtime_data.h>
 #include <network/system_helpers.h>
-#include <nx_ec/abstract_ec_connection.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx_ec/abstract_ec_connection.h>
 
 using namespace nx::vms::client::desktop;
 
@@ -227,12 +227,14 @@ QIcon QnResourceIconCache::icon(const QnResourcePtr& resource)
 
 void QnResourceIconCache::setKey(const QnResourcePtr& resource, Key key)
 {
-    qnResourceRuntimeDataManager->setResourceData(resource, Qn::ResourceIconKeyRole, (int)key);
+    SystemContext::fromResource(resource)->resourceRuntimeDataManager()
+        ->setResourceData(resource, Qn::ResourceIconKeyRole, (int)key);
 }
 
 void QnResourceIconCache::clearKey(const QnResourcePtr& resource)
 {
-    qnResourceRuntimeDataManager->cleanupResourceData(resource, Qn::ResourceIconKeyRole);
+    SystemContext::fromResource(resource)->resourceRuntimeDataManager()
+        ->cleanupResourceData(resource, Qn::ResourceIconKeyRole);
 }
 
 QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
@@ -241,9 +243,10 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
 
     // #vbreus There is no client module in the testing environment.
     // But it seems that there nothing interesting regarding Resource Tree model.
-    if (auto runtimeManager = QnResourceRuntimeDataManager::instance())
+    if (auto context = SystemContext::fromResource(resource))
     {
-        auto customIconKey = runtimeManager->resourceData(resource, Qn::ResourceIconKeyRole);
+        auto customIconKey = context->resourceRuntimeDataManager()
+            ->resourceData(resource, Qn::ResourceIconKeyRole);
         if (customIconKey.isValid())
             return static_cast<Key>(customIconKey.toInt());
     }

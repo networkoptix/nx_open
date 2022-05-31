@@ -5,6 +5,7 @@
 #include <optional>
 
 #include <nx/utils/software_version.h>
+#include <nx/vms/api/types/connection_types.h>
 #include <nx_ec/ec_api_fwd.h>
 
 class QnCommonModule;
@@ -45,13 +46,7 @@ public:
         versionIsTooLow,
     };
 
-    enum class Peer
-    {
-        undefined,
-        server,
-        mobileClient,
-        desktopClient,
-    };
+    using Peer = nx::vms::api::PeerType;
 
     enum class Protocol
     {
@@ -73,6 +68,8 @@ public:
         Peer localPeerType,
         Protocol connectionProtocol = Protocol::autoDetect,
         DeveloperFlags developerFlags = {DeveloperFlag::empty});
+
+    static bool isInitialized();
 
     static std::optional<Reason> check(
         const nx::vms::api::SystemInformation& systemInformation,

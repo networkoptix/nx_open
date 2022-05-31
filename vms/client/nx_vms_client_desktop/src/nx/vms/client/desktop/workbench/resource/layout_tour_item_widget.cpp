@@ -8,6 +8,9 @@
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
+#include <qt_graphics_items/graphics_label.h>
+#include <qt_graphics_items/graphics_pixmap.h>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
@@ -17,12 +20,11 @@
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/graphics/painters/layout_preview_painter.h>
 #include <nx/vms/text/time_strings.h>
-#include <qt_graphics_items/graphics_label.h>
-#include <qt_graphics_items/graphics_pixmap.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
@@ -88,7 +90,7 @@ LayoutTourItemWidget::LayoutTourItemWidget(
     QGraphicsItem* parent)
     :
     base_type(systemContext, windowContext, item, parent),
-    m_previewPainter(new LayoutPreviewPainter(resource()->resourcePool()))
+    m_previewPainter(new LayoutPreviewPainter())
 {
     setPaletteColor(this, QPalette::Highlight, colorTheme()->color("brand_core"));
     setPaletteColor(this, QPalette::Dark, colorTheme()->color("dark17"));
@@ -99,15 +101,14 @@ LayoutTourItemWidget::LayoutTourItemWidget(
 
     if (!layout)
     {
-        layout = layout::layoutFromResource(resource());
+        layout = layoutFromResource(resource());
         QString name = lit("Tour@%1").arg(resource()->getName());
         layout->setName(name);
 
         connect(resource(), &QnResource::rotationChanged, this,
             [this]()
             {
-                m_previewPainter->setLayout(
-                    layout::layoutFromResource(resource()));
+                m_previewPainter->setLayout(layoutFromResource(resource()));
             });
     }
 
@@ -268,7 +269,10 @@ void LayoutTourItemWidget::initOverlay()
             menu()->trigger(action::SaveCurrentLayoutTourAction);
         });
 
-    connect(qnResourceRuntimeDataManager, &QnResourceRuntimeDataManager::layoutItemDataChanged,
+    auto layoutContext = SystemContext::fromResource(item()->layout()->resource());
+
+    connect(layoutContext->resourceRuntimeDataManager(),
+        &QnResourceRuntimeDataManager::layoutItemDataChanged,
         this,
         [this, delayEdit](const QnUuid& id, Qn::ItemDataRole role, const QVariant& data)
         {

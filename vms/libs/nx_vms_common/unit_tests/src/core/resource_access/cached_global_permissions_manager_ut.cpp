@@ -19,7 +19,7 @@ class QnCachedGlobalPermissionsManagerTest: public ContextBasedTest
 {
 public:
     QnCachedGlobalPermissionsManagerTest():
-        ContextBasedTest(/*clientMode*/ false, nx::core::access::Mode::cached)
+        ContextBasedTest(nx::core::access::Mode::cached)
     {
     }
 

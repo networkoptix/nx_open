@@ -6,7 +6,9 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/streaming/rtsp_client_archive_delegate.h>
+#include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 #include <nx_ec/abstract_ec_connection.h>
 
@@ -103,11 +105,18 @@ AudioLayoutConstPtr QnClientCameraResource::getAudioLayout(
 QnAbstractStreamDataProvider* QnClientCameraResource::createLiveDataProvider()
 {
     const auto camera = toSharedPointer(this);
+    auto context = dynamic_cast<nx::vms::client::core::SystemContext*>(systemContext());
+    if (!NX_ASSERT(context))
+        return nullptr;
+
+    auto credentials = context->connection()
+        ? context->connection()->credentials()
+        : nx::network::http::Credentials();
 
     QnArchiveStreamReader *result = new QnArchiveStreamReader(camera);
     auto delegate = new QnRtspClientArchiveDelegate(
         result,
-        connectionCredentials(),
+        credentials,
         "ClientCamera");
 
     delegate->setCamera(camera);
@@ -116,13 +125,21 @@ QnAbstractStreamDataProvider* QnClientCameraResource::createLiveDataProvider()
     connect(delegate, &QnRtspClientArchiveDelegate::dataDropped, this,
         &QnClientCameraResource::dataDropped);
 
-    connect(session().get(),
-        &nx::vms::client::core::RemoteSession::credentialsChanged,
-        delegate,
-        [this, delegate]
-        {
-            delegate->updateCredentials(connectionCredentials());
-        });
+    if (auto session = context->session())
+    {
+        connect(session.get(),
+            &nx::vms::client::core::RemoteSession::credentialsChanged,
+            delegate,
+            [this, delegate,
+                sessionPtr = std::weak_ptr<nx::vms::client::core::RemoteSession>(session)]
+            {
+                if (auto session = sessionPtr.lock())
+                {
+                    if (auto connection = session->connection())
+                        delegate->updateCredentials(connection->credentials());
+                }
+            });
+    }
 
     return result;
 }

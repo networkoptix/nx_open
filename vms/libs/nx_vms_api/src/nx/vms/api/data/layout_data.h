@@ -21,52 +21,71 @@ struct NX_VMS_API LayoutItemData: IdData
 {
     /**%apidoc [opt] Should have fixed value.*/
     qint32 flags = 0;
+
     /**%apidoc Left coordinate of the layout item (floating-point).*/
     float left = 0;
+
     /**%apidoc Top coordinate of the layout item (floating-point).*/
     float top = 0;
+
     /**%apidoc Right coordinate of the layout item (floating-point).*/
     float right = 0;
+
     /**%apidoc Bottom coordinate of the layout item (floating-point).*/
     float bottom = 0;
+
     /**%apidoc [opt] Degree of image tilt; a positive value rotates counter-clockwise
      * (floating-point, 0..360).
      */
     float rotation = 0;
+
     /**%apidoc Device unique id.*/
     QnUuid resourceId;
-    /**%apidoc [opt] If the item represents a local file - URL of the file, otherwise is empty. Can
-     * be filled with the device logical id when saving layout.
+
+    /**%apidoc [opt] If the item represents a local file - the URL of the file. For cross-System
+     * layouts, contains the special URL of the Device. Otherwise is empty. Can be filled with the
+     * Device logical id when saving the Layout.
      */
     QString resourcePath;
+
     /**%apidoc [opt] Left coordinate of the displayed window inside the camera image, as a fraction
      * of the image width (floating-point, 0..1).
      */
     float zoomLeft = 0;
+
     /**%apidoc [opt] Top coordinate of the displayed window inside the camera image, as a fraction
      * of the image height (floating-point, 0..1).
      */
     float zoomTop = 0;
+
     /**%apidoc [opt] Right coordinate of the displayed window inside the camera image, as a
      * fraction of the image width (floating-point, 0..1).
      */
     float zoomRight = 0;
+
     /**%apidoc [opt] Bottom coordinate of the displayed window inside the camera image, as a
      * fraction of the image height (floating-point, 0..1).
      */
     float zoomBottom = 0;
+
     /**%apidoc Unique id of the original layout item for which the zoom window was created.*/
     QnUuid zoomTargetId;
+
     /**%apidoc [opt] Image enhancement parameters.*/
     ImageCorrectionData contrastParams;
+
     /**%apidoc [opt] Image dewarping parameters.*/
     nx::vms::api::dewarping::ViewData dewarpingParams;
+
     /**%apidoc [opt] Whether to display info for the layout item.*/
     bool displayInfo = false;
+
     /**%apidoc [opt] Whether PTZ control is enabled for the layout item.*/
     bool controlPtz = false;
+
     /**%apidoc [opt] Should the detected analytics objects be displayed on the item.*/
     bool displayAnalyticsObjects = false;
+
     /**%apidoc [opt] Should the regions of interest be displayed on the item.*/
     bool displayRoi = true;
 

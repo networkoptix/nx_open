@@ -32,11 +32,8 @@ QnAspectRatio getAspectRatioFromImage(const QString& fileName)
 
 } // namespace
 
-QnAviResource::QnAviResource(const QString& file, QnStoragePluginFactory* storageFactory):
-    nx::vms::common::StorageFactoryInterface(storageFactory)
+QnAviResource::QnAviResource(const QString& file)
 {
-    NX_ASSERT(storageFactory, "Factory must exist");
-
     //setUrl(QDir::cleanPath(file));
     setUrl(file);
     QString shortName = QFileInfo(file).fileName();
@@ -96,7 +93,7 @@ QnAbstractStreamDataProvider* QnAviResource::createDataProvider(
         return nullptr;
 
     if (FileTypeSupport::isImageFileExt(resource->getUrl()))
-        return new QnSingleShotFileStreamreader(resource, aviResource->storageFactory());
+        return new QnSingleShotFileStreamreader(resource);
 
     QnArchiveStreamReader* result = new QnArchiveStreamReader(aviResource);
     result->setArchiveDelegate(aviResource->createArchiveDelegate());

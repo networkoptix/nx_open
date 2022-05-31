@@ -10,7 +10,7 @@
 #include <core/resource/client_resource_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/common/system_context_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <utils/common/connective.h>
 
 class QnWorkbenchContext;
@@ -38,7 +38,7 @@ private:
  */
 class NX_VMS_CLIENT_DESKTOP_API QnWorkbenchAccessController:
     public Connective<QObject>,
-    public nx::vms::common::SystemContextAware
+    public nx::vms::client::desktop::SystemContextAware
 {
     Q_OBJECT
 
@@ -46,7 +46,7 @@ class NX_VMS_CLIENT_DESKTOP_API QnWorkbenchAccessController:
 
 public:
     QnWorkbenchAccessController(
-        nx::vms::common::SystemContext* systemContext,
+        nx::vms::client::desktop::SystemContext* systemContext,
         QObject* parent = nullptr);
     virtual ~QnWorkbenchAccessController();
 

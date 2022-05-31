@@ -19,6 +19,7 @@ extern "C" {
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/video_cache.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/opengl/gl_functions.h>
@@ -27,7 +28,7 @@ extern "C" {
 #include <utils/media/utils.h>
 
 #ifdef __QSV_SUPPORTED__
-    #include <nx/media/quick_sync/quick_sync_video_decoder_old_player.h>
+#include <nx/media/quick_sync/quick_sync_video_decoder_old_player.h>
 #endif // __QSV_SUPPORTED__
 
 #include "buffered_frame_displayer.h"
@@ -734,7 +735,11 @@ bool QnVideoStreamDisplay::processDecodedFrame(
         return false;
 
     if (m_isLive && outFrame->memoryType() != MemoryType::VideoMemory)
-        qnClientModule->videoCache()->add(m_resource->toResource()->getId(), outFrame);
+    {
+        auto camera = m_resource->toResourcePtr();
+        auto systemContext = SystemContext::fromResource(camera);
+        systemContext->videoCache()->add(camera->getId(), outFrame);
+    }
 
     NX_ASSERT(!outFrame->isExternalData());
 

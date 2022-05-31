@@ -84,8 +84,8 @@ void ManagedCameraSet::setMultipleCameras(const QnVirtualCameraResourceSet& came
     QnVirtualCameraResourceSet invalid;
     for (const auto& camera: m_notFilteredCameras)
     {
-        if (!NX_ASSERT(camera && m_resourcePool && camera->resourcePool() == m_resourcePool))
-            invalid.insert(camera);
+        if (!(camera && m_resourcePool && camera->resourcePool() == m_resourcePool))
+            invalid.insert(camera); // Cameras from other cloud systems can be here.
     }
 
     m_notFilteredCameras -= invalid;

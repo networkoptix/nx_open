@@ -198,8 +198,7 @@ CommonObjectSearchSetup::Private::Private(CommonObjectSearchSetup* q):
                 return;
 
             // TODO: #sivanov Actualize used system context.
-            const auto timeWatcher = ApplicationContext::instance()->currentSystemContext()
-                ->serverTimeWatcher();
+            const auto timeWatcher = appContext()->currentSystemContext()->serverTimeWatcher();
             setCurrentDate(timeWatcher->displayTime(qnSyncTime->currentMSecsSinceEpoch()));
         });
 

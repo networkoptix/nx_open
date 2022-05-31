@@ -167,8 +167,9 @@ void QnArchiveSyncPlayWrapper::setJumpTime(qint64 mksec)
 {
     Q_D(QnArchiveSyncPlayWrapper);
     d->lastJumpTime = mksec;
+    // keep camera sync after jump to live position (really in reverse mode cameras stay in archive)
     if (d->speed < 0 && d->lastJumpTime == DATETIME_NOW)
-        d->lastJumpTime = qnSyncTime->currentMSecsSinceEpoch()*1000ll; // keep camera sync after jump to live position (really in reverse mode cameras stay in archive)
+        d->lastJumpTime = qnSyncTime->currentUSecsSinceEpoch();
     d->timer.restart();
 }
 

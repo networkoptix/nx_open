@@ -145,7 +145,10 @@ InvalidatorPtr cloudSystemIconInvalidator(const QnSystemDescriptionPtr& systemDe
     result->connections()->add(systemDescription->connect(
         systemDescription.get(),
         &QnBaseSystemDescription::onlineStateChanged,
-        [invalidator = result.get()] { invalidator->invalidate(); }));
+        [invalidator = result.get()]
+        {
+            invalidator->invalidate();
+        }));
 
     return result;
 }
@@ -419,14 +422,6 @@ AbstractItemPtr ResourceTreeItemFactory::createCloudSystemItem(const QString& sy
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::cloudSystem))
         .withRole(Qn::HelpTopicIdRole, static_cast<int>(Qn::OtherSystems_Help))
         .withFlags(cloudSystemFlagsProvider(systemDescription));
-}
-
-AbstractItemPtr ResourceTreeItemFactory::createCloudCameraItem(const QString& id)
-{
-    return GenericItemBuilder()
-        .withRole(Qt::DisplayRole, id)
-        .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::sharedLayout))
-        .withRole(Qn::ResourceIconKeyRole, static_cast<int>(IconCache::Camera));
 }
 
 AbstractItemPtr ResourceTreeItemFactory::createUserRoleItem(const QnUuid& roleUuid)

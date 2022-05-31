@@ -8,18 +8,15 @@
 
 #include <QtCore/QObject>
 
+#include <core/resource/resource_fwd.h>
 #include <nx/network/retry_timer.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/url.h>
 #include <nx/vms/api/data/module_information.h>
+#include <nx/utils/impl_ptr.h>
 
-class QnMediaServerResource;
-class QnResourcePool;
-
-namespace nx {
-namespace vms {
-namespace discovery {
+namespace nx::vms::discovery {
 
 class DeprecatedMulticastFinder;
 class ModuleConnector;
@@ -82,11 +79,10 @@ public:
     void setMulticastInterval(std::chrono::milliseconds value);
 
     /**
-     * Listen for the urls changes for all servers in the provided Resource Pool.
+     * Start Servers search and listen for the urls changes for all servers in the provided Resource
+     * Pool.
      */
-    void monitorServerUrls(QnResourcePool* resourcePool);
-
-    void start();
+    void start(QnResourcePool* resourcePool);
     void stop();
 
     std::list<ModuleEndpoint> getAll() const; //< All accessible modules.
@@ -117,8 +113,6 @@ public:
             (ptr->*foundSlot)(module);
     }
 
-    void beforeDestroy();
-
 signals:
     /** New reachable module is found. */
     void found(nx::vms::discovery::ModuleEndpoint module);
@@ -133,26 +127,13 @@ signals:
     void conflict(nx::vms::discovery::ModuleEndpoint module);
 
 private:
-    void initialize();
-    void initializeConnector();
-    void initializeMulticastFinders();
-    void updateEndpoints(const QnMediaServerResource* server);
+    void updateEndpoints(const QnMediaServerResourcePtr& server);
 
 private:
-    std::optional<ServerModeInfo> m_serverModeInfo;
-
-    std::atomic<bool> isRunning;
-
-    mutable nx::Mutex m_mutex;
-    std::map<QnUuid, ModuleEndpoint> m_modules;
-
-    std::unique_ptr<ModuleConnector> m_moduleConnector;
-    std::unique_ptr<UdpMulticastFinder> m_multicastFinder;
-    std::unique_ptr<DeprecatedMulticastFinder> m_legacyMulticastFinder;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
-} // namespace discovery
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::discovery
 
 Q_DECLARE_METATYPE(nx::vms::discovery::ModuleEndpoint);

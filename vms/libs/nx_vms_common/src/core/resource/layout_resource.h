@@ -135,20 +135,6 @@ public:
      */
     bool isServiceLayout() const;
 
-    /** Get all resources ids placed on the layout. */
-    QSet<QnUuid> layoutResourceIds() const;
-
-    /** Get all resources placed on the layout. WARNING: method is SLOW! */
-    QSet<QnResourcePtr> layoutResources() const;
-
-    /** Get all resources placed on the layout. WARNING: method is SLOW! */
-    static QSet<QnResourcePtr> layoutResources(QnResourcePool* resourcePool, const QnLayoutItemDataMap& items);
-
-    /**
-     * Used to dump some layout content to qDebug().
-     */
-    void dumpStructure() const;
-
 signals:
     void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
     void itemRemoved(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);

@@ -4,20 +4,25 @@
 
 #include <functional>
 
-#include <core/resource/camera_bookmark.h>
-
 #include <camera/camera_bookmarks_manager_fwd.h>
-
+#include <core/resource/camera_bookmark.h>
+#include <nx/utils/impl_ptr.h>
 #include <nx/utils/singleton.h>
-
 #include <nx/vms/event/event_fwd.h>
 
-/** Singleton, used to create, update, delete, fetch and cache bookmarks. */
-class QnCameraBookmarksManager : public QObject, public Singleton<QnCameraBookmarksManager>
+namespace nx::vms::client::desktop { class SystemContext; }
+
+class QnCameraBookmarksManagerPrivate;
+
+/** Creates, updates, deletes, fetches and caches bookmarks. */
+class QnCameraBookmarksManager: public QObject
 {
     Q_OBJECT
+
 public:
-    QnCameraBookmarksManager(QObject *parent = nullptr);
+    QnCameraBookmarksManager(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        QObject* parent = nullptr);
 
     virtual ~QnCameraBookmarksManager();
 
@@ -86,11 +91,6 @@ signals:
     /// @param                  The removed bookmark GUID.
     void bookmarkRemoved(const QnUuid &bookmarkId);
 
-protected:
-    Q_DECLARE_PRIVATE(QnCameraBookmarksManager);
-
 private:
-    QScopedPointer<QnCameraBookmarksManagerPrivate> d_ptr;
+    nx::utils::ImplPtr<QnCameraBookmarksManagerPrivate> d;
 };
-
-#define qnCameraBookmarksManager QnCameraBookmarksManager::instance()

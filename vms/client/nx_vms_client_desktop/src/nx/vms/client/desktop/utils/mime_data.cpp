@@ -4,46 +4,43 @@
 
 #include <QtCore/QDataStream>
 #include <QtCore/QFile>
-
 #include <QtWidgets/QApplication>
 
+#include <core/resource/file_processor.h>
+#include <core/resource/resource.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/resource.h>
-#include <core/resource/file_processor.h>
-
-#include <nx/utils/range_adapters.h>
+#include <nx/build_info.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/qset.h>
-#include <nx/build_info.h>
+#include <nx/utils/range_adapters.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/resources/resource_descriptor.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 namespace {
 
 enum class Protocol
 {
     unknown = -1,
-    v10,
-    v31,
-    v40
+    v40,
+    v51,
 };
 
 enum
 {
-    RESOURCES_BINARY_V1_TAG = 0xE1E00001,
-    RESOURCES_BINARY_V2_TAG = 0xE1E00002,
-    RESOURCES_BINARY_V3_TAG = 0xE1E00003,
+    RESOURCES_BINARY_V40_TAG = 0xE1E00003,
+    RESOURCES_BINARY_V51_TAG = 0xE1E00004,
 };
 
 Protocol protocolFromTag(quint32 tag)
 {
     switch (tag)
     {
-        case RESOURCES_BINARY_V1_TAG:
-            return Protocol::v10;
-        case RESOURCES_BINARY_V2_TAG:
-            return Protocol::v31;
-        case RESOURCES_BINARY_V3_TAG:
+        case RESOURCES_BINARY_V40_TAG:
             return Protocol::v40;
+        case RESOURCES_BINARY_V51_TAG:
+            return Protocol::v51;
         default:
             return Protocol::unknown;
     }
@@ -51,108 +48,233 @@ Protocol protocolFromTag(quint32 tag)
 
 Q_GLOBAL_STATIC_WITH_ARGS(quint64, qn_localMagic, (QDateTime::currentMSecsSinceEpoch()));
 
-static const QString kInternalMimeType = lit("application/x-noptix-resources");
-static const QString kUriListMimeType = lit("text/uri-list"); //< Must be equal to Qt internal type
-
-QByteArray serializeToInternal(const QList<QnUuid>& ids, const QHash<int, QVariant>& arguments)
-{
-    QByteArray result;
-    QDataStream stream(&result, QIODevice::WriteOnly);
-
-    // Magic signature.
-    stream << static_cast<quint32>(RESOURCES_BINARY_V3_TAG);
-
-    // For local D&D.
-    stream << static_cast<quint64>(QApplication::applicationPid());
-    stream << static_cast<quint64>(*qn_localMagic());
-
-    // Data.
-    stream << static_cast<quint32>(ids.size());
-    for (const auto& id: ids)
-        stream << id.toString();
-
-    stream << static_cast<quint32>(arguments.size());
-    for (const auto& [key, value]: nx::utils::constKeyValueRange(arguments))
-        stream << key << value;
-
-    return result;
-}
-
-std::pair<QList<QnUuid>, QHash<int, QVariant>> deserializeFromInternal(const QByteArray& data)
-{
-    QByteArray tmp = data;
-    QDataStream stream(&tmp, QIODevice::ReadOnly);
-    std::pair<QList<QnUuid>, QHash<int, QVariant>> result;
-
-    quint32 tag;
-    stream >> tag;
-
-    const auto protocol = protocolFromTag(tag);
-    if (protocol == Protocol::unknown)
-        return result;
-
-    bool fromOtherApp = false;
-
-    quint64 pid;
-    stream >> pid;
-    if (pid != (quint64)QApplication::applicationPid())
-        fromOtherApp = true;
-
-    quint64 magic;
-    stream >> magic;
-    if (magic != *qn_localMagic())
-        fromOtherApp = true;
-
-    quint32 count{0};
-    stream >> count;
-
-    for (quint32 i = 0; i < count; i++)
-    {
-        QString id;
-        stream >> id;
-        if (stream.status() != QDataStream::Ok)
-            break;
-
-        result.first.push_back(QnUuid(id));
-
-        if (protocol == Protocol::v10)
-        {
-            QString physicalId; //< Is not used in the later format.
-            stream >> physicalId;
-        }
-    }
-
-    if (stream.status() != QDataStream::Ok || protocol < Protocol::v40)
-        return result;
-
-    count = 0;
-    stream >> count;
-
-    for (quint32 i = 0; i < count; i++)
-    {
-        int key{};
-        QVariant value;
-        stream >> key >> value;
-        if (stream.status() != QDataStream::Ok)
-            break;
-
-        result.second[key] = value;
-    }
-
-    return result;
-}
+static const QString kInternalMimeType = "application/x-noptix-resources";
+static const QString kUriListMimeType = "text/uri-list"; //< Must be equal to Qt internal type.
 
 } // namespace
 
 namespace nx::vms::client::desktop {
 
-MimeData::MimeData()
+struct MimeData::Private
+{
+    QHash<QString, QByteArray> data;
+    QList<QnUuid> entities;
+    QnResourceList resources;
+    QHash<int, QVariant> arguments;
+
+    /** Deserialize from the raw data.*/
+    bool deserialize(QByteArray data, const QList<QUrl>& urls)
+    {
+        entities.clear();
+        resources.clear();
+        arguments.clear();
+
+        QDataStream stream(&data, QIODevice::ReadOnly);
+
+        quint32 tag;
+        stream >> tag;
+
+        const auto protocol = protocolFromTag(tag);
+        if (protocol == Protocol::unknown)
+            return deserializeUrls(urls);
+
+        switch (protocol)
+        {
+            case Protocol::v40:
+                return deserializeContentV4(stream, urls);
+            case Protocol::v51:
+                return deserializeContentV5(stream, urls);
+            default:
+                break;
+        }
+        return false;
+    }
+
+    bool deserializeUrls(const QList<QUrl>& urls)
+    {
+        SystemContext* systemContext = appContext()->currentSystemContext();
+        if (!NX_ASSERT(systemContext))
+            return false;
+
+        auto resourcePool = systemContext->resourcePool();
+
+        auto urlResources = nx::utils::toQSet(
+            QnFileProcessor::findOrCreateResourcesForFiles(urls, resourcePool)
+                .filtered(QnResourceAccessFilter::isDroppable));
+
+        // Remove duplicates because resources can have both id and url.
+        for (const auto& resource: resources)
+            urlResources.remove(resource);
+
+        resources.append(urlResources.values());
+
+        for (const auto resource: urlResources)
+            entities.removeAll(resource->getId());
+
+        return !urls.empty();
+    }
+
+    /** Deserialize content using format from 4.0 version.*/
+    bool deserializeContentV4(QDataStream& stream, const QList<QUrl>& urls)
+    {
+        quint64 pid;
+        stream >> pid; //< Can be compared with QApplication::applicationPid() if needed.
+        quint64 magic;
+        stream >> magic; //< Can be compared with *qn_localMagic() if needed.
+
+        // Resources and entities.
+        SystemContext* systemContext = appContext()->currentSystemContext();
+        if (!NX_ASSERT(systemContext))
+            return false;
+
+        auto resourcePool = systemContext->resourcePool();
+
+        int idsCount = 0;
+        stream >> idsCount;
+
+        // Intentionally leave duplicates here to keep Ctrl+Drag behavior consistent.
+        for (int i = 0; i < idsCount; i++)
+        {
+            QString sid;
+            stream >> sid;
+            const QnUuid id(sid);
+
+            if (auto resource = resourcePool->getResourceById(id))
+            {
+                if (QnResourceAccessFilter::isDroppable(resource))
+                    resources.push_back(resource);
+            }
+            else
+            {
+                entities.push_back(id);
+            }
+        }
+
+        // Arguments.
+        int argumentsCount = 0;
+        stream >> argumentsCount;
+
+        for (int i = 0; i < argumentsCount; i++)
+        {
+            int key = 0;
+            QVariant value;
+            stream >> key >> value;
+            arguments[key] = value;
+        }
+
+        deserializeUrls(urls);
+        return stream.status() == QDataStream::Ok;
+    }
+
+    /** Deserialize content using format from 5.1 version.*/
+    bool deserializeContentV5(QDataStream& stream, const QList<QUrl>& urls)
+    {
+        // Resources.
+        {
+            int resourcesCount = 0;
+            stream >> resourcesCount;
+
+            // Intentionally leave duplicates here to keep Ctrl+Drag behavior consistent.
+            for (int i = 0; i < resourcesCount; i++)
+            {
+                nx::vms::common::ResourceDescriptor descriptor;
+                stream >> descriptor.id >> descriptor.path;
+
+                if (auto resource = getResourceByDescriptor(descriptor);
+                    resource && QnResourceAccessFilter::isDroppable(resource))
+                {
+                    resources.push_back(resource);
+                }
+            }
+        }
+
+        // Entities.
+        {
+            int entitiesCount = 0;
+            for (int i = 0; i < entitiesCount; i++)
+            {
+                QnUuid id;
+                stream >> id;
+                entities.push_back(id);
+            }
+        }
+
+        // Arguments.
+        {
+            int argumentsCount = 0;
+            stream >> argumentsCount;
+
+            for (int i = 0; i < argumentsCount; i++)
+            {
+                int key = 0;
+                QVariant value;
+                stream >> key >> value;
+                arguments[key] = value;
+            }
+        }
+
+        deserializeUrls(urls);
+        return stream.status() == QDataStream::Ok;
+    }
+
+    /** Store serialized content into data storage. */
+    void updateInternalStorage()
+    {
+        QByteArray serialized;
+        QDataStream stream(&serialized, QIODevice::WriteOnly);
+
+        // Magic signature.
+        stream << static_cast<quint32>(RESOURCES_BINARY_V51_TAG);
+
+        // Resources.
+        stream << static_cast<quint32>(resources.size());
+        for (const auto& resource: resources)
+        {
+            auto d = descriptor(resource);
+            stream << d.id << d.path;
+        }
+
+        // Entities.
+        stream << static_cast<quint32>(entities.size());
+        for (const auto& entity: entities)
+            stream << entity;
+
+        // Arguments.
+        stream << static_cast<quint32>(arguments.size());
+        for (const auto& [key, value]: nx::utils::constKeyValueRange(arguments))
+            stream << key << value;
+
+        data[kInternalMimeType] = serialized;
+    }
+};
+
+MimeData::MimeData():
+    d(new Private())
 {
 }
 
-MimeData::MimeData(const QMimeData* data, QnResourcePool* resourcePool)
+MimeData::MimeData(const QMimeData* data):
+    MimeData()
 {
-    load(data, resourcePool);
+    load(data);
+}
+
+MimeData::~MimeData()
+{
+}
+
+MimeData::MimeData(QByteArray data):
+    MimeData()
+{
+    QDataStream stream(&data, QIODevice::ReadOnly);
+    stream >> d->data;
+    if (stream.status() != QDataStream::Ok || formats().empty())
+        return;
+
+    // Code reuse.
+    QMimeData mimeData;
+    toMimeData(&mimeData);
+    load(&mimeData);
 }
 
 QStringList MimeData::mimeTypes()
@@ -178,153 +300,86 @@ QMimeData* MimeData::createMimeData() const
 
 QByteArray MimeData::data(const QString& mimeType) const
 {
-    return m_data.value(mimeType);
+    return d->data.value(mimeType);
 }
 
 void MimeData::setData(const QString& mimeType, const QByteArray& data)
 {
-    m_data[mimeType] = data;
+    d->data[mimeType] = data;
 }
 
 QStringList MimeData::formats() const
 {
-    return m_data.keys();
+    return d->data.keys();
 }
 
 bool MimeData::hasFormat(const QString& mimeType) const
 {
-    return m_data.contains(mimeType);
+    return d->data.contains(mimeType);
 }
 
 void MimeData::removeFormat(const QString& mimeType)
 {
-    m_data.remove(mimeType);
+    d->data.remove(mimeType);
 }
 
 QnResourceList MimeData::resources() const
 {
-    return m_resources;
+    return d->resources;
 }
 
 void MimeData::setResources(const QnResourceList& resources)
 {
-    m_resources = resources.filtered(QnResourceAccessFilter::isDroppable);
-    updateInternalStorage();
+    d->resources = resources.filtered(QnResourceAccessFilter::isDroppable);
+    d->updateInternalStorage();
 }
 
 QList<QnUuid> MimeData::entities() const
 {
-    return m_entities;
+    return d->entities;
 }
 
 void MimeData::setEntities(const QList<QnUuid>& ids)
 {
-    m_entities = ids;
-    updateInternalStorage();
+    d->entities = ids;
+    d->updateInternalStorage();
 }
 
 QString MimeData::serialized() const
 {
     QByteArray serializedData;
     QDataStream stream(&serializedData, QIODevice::WriteOnly);
-    stream << m_data;
+    stream << d->data;
     return QLatin1String(serializedData.toBase64());
-}
-
-MimeData MimeData::deserialized(QByteArray data, QnResourcePool* resourcePool)
-{
-    QDataStream stream(&data, QIODevice::ReadOnly);
-    MimeData result;
-    stream >> result.m_data;
-    if (stream.status() != QDataStream::Ok || result.formats().empty())
-        return result;
-
-    // Code reuse...
-    QMimeData mimeData;
-    result.toMimeData(&mimeData);
-    result.load(&mimeData, resourcePool);
-    return result;
 }
 
 bool MimeData::isEmpty() const
 {
-    return m_entities.empty() && m_resources.empty();
+    return d->entities.empty() && d->resources.empty();
 }
 
-void MimeData::load(const QMimeData* data, QnResourcePool* resourcePool)
+void MimeData::load(const QMimeData* data)
 {
-    for (const QString &format: data->formats())
+    for (const QString& format: data->formats())
         setData(format, data->data(format));
 
-    QnUuidList ids;
-    std::tie(ids, m_arguments) = deserializeFromInternal(this->data(kInternalMimeType));
-
-    m_resources.clear();
-
-    // Intentionally leave duplicates here to keep Ctrl+Drag behavior consistent.
-    if (resourcePool)
-        m_resources = resourcePool->getResourcesByIds(ids);
-
-    if (data->hasUrls())
-    {
-        auto urlResources = nx::utils::toQSet(
-            QnFileProcessor::findOrCreateResourcesForFiles(data->urls(), resourcePool));
-
-        // Remove duplicates because resources can have both id and url.
-        for (const auto& resource: m_resources)
-            urlResources.remove(resource);
-
-        m_resources.append(urlResources.values());
-    }
-
-    for (const auto resource: m_resources)
-        ids.removeAll(resource->getId());
-
-    m_entities = ids;
-    m_resources = m_resources.filtered(QnResourceAccessFilter::isDroppable);
-
-    updateInternalStorage();
-}
-
-void MimeData::updateInternalStorage()
-{
-    QList<QnUuid> ids = m_entities;
     QList<QUrl> urls;
-    for (const auto& resource: m_resources)
-    {
-        ids.append(resource->getId());
-        if (resource->hasFlags(Qn::url | Qn::local))
-            urls.append(QUrl::fromLocalFile(resource->getUrl()));
-    }
+    if (data->hasUrls())
+        urls = data->urls();
 
-    setData(kInternalMimeType, serializeToInternal(ids, m_arguments));
-
-    if (!urls.empty())
-    {
-        QMimeData d;
-
-        // See QTBUG-71939, VMS-18536. Presence more than one URL in MIME data for drag'n'drop may
-        // lead to irreversible malfunction of drag'n'drop in the entire application. Relevant
-        // only for macOS.
-        // TODO: Remove this workaround as soon as issue will be fixed in the Qt framework for
-        // latest macOS versions either.
-        if (nx::build_info::isMacOsX())
-            urls = {urls.first()};
-
-        d.setUrls(urls);
-        setData(kUriListMimeType, d.data(kUriListMimeType));
-    }
+    d->deserialize(this->data(kInternalMimeType), urls);
+    d->updateInternalStorage();
 }
 
 QHash<int, QVariant> MimeData::arguments() const
 {
-    return m_arguments;
+    return d->arguments;
 }
 
 void MimeData::setArguments(const QHash<int, QVariant>& value)
 {
-    m_arguments = value;
-    updateInternalStorage();
+    d->arguments = value;
+    d->updateInternalStorage();
 }
 
 } // namespace nx::vms::client::desktop

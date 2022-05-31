@@ -75,9 +75,6 @@ public:
     // Resource Tree cloud system item within 'Other Systems' group.
     AbstractItemPtr createCloudSystemItem(const QString& systemId);
 
-    // Resource Tree cloud system's camera.
-    AbstractItemPtr createCloudCameraItem(const QString& id);
-
     // Resource Tree user role group item.
     AbstractItemPtr createUserRoleItem(const QnUuid& roleUuid);
 

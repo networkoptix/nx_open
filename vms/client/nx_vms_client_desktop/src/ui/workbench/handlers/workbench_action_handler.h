@@ -49,7 +49,6 @@ class QnSystemAdministrationDialog;
 
 namespace nx::vms::client::desktop {
 
-class MimeData;
 class AdvancedUpdateSettingsDialog;
 class SceneBanner;
 class AdvancedSearchDialog;

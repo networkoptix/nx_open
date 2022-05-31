@@ -9,7 +9,6 @@
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
 #include <client/client_message_processor.h>
-#include <client/client_module.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
@@ -18,6 +17,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/utils/qset.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/state/running_instances_manager.h>
 #include <nx/vms/client/desktop/style/skin.h>
@@ -38,6 +38,7 @@
 #include <utils/common/delayed.h>
 
 using namespace nx;
+using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
 namespace {
@@ -182,7 +183,7 @@ void QnWorkbenchAlarmLayoutHandler::addCameraOnLayout(QnWorkbenchLayout* layout,
     if (!layout->resource())
         return;
 
-    auto data = nx::vms::client::desktop::layout::itemFromResource(camera);
+    auto data = layoutItemFromResource(camera);
     data.flags = Qn::PendingGeometryAdjustment;
 
     layout->resource()->addItem(data);
@@ -306,7 +307,7 @@ void QnWorkbenchAlarmLayoutHandler::setCameraItemPosition(QnWorkbenchLayout *lay
 
 bool QnWorkbenchAlarmLayoutHandler::currentInstanceIsMain() const
 {
-    auto runningInstancesManager = qnClientModule->runningInstancesManager();
+    auto runningInstancesManager = appContext()->runningInstancesManager();
     if (!NX_ASSERT(runningInstancesManager, "Instance Manager must exist here"))
         return true;
 

@@ -7,7 +7,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/types/event_rule_types.h>
-#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -114,7 +114,7 @@ void CameraButtonController::createTwoAudioButton()
             new QnTwoWayAudioWidget(desktopResourceUniqueId, m_parentWidget);
         m_twoWayAudioWidget->setCamera(m_camera->audioOutputDevice());
         m_twoWayAudioWidget->setFixedHeight(kTriggerButtonHeight);
-        ApplicationContext::instance()->controlsStatisticsModule()->registerButton(
+        statisticsModule()->controls()->registerButton(
             "two_way_audio",
             m_twoWayAudioWidget);
 

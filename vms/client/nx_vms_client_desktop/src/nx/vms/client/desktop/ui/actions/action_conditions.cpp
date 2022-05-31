@@ -39,6 +39,7 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/condition/generic_condition.h>
 #include <nx/vms/client/desktop/joystick/settings/manager.h>
 #include <nx/vms/client/desktop/network/cloud_url_validator.h>
@@ -46,8 +47,10 @@
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
+#include <nx/vms/client/desktop/resources/resource_descriptor.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_manager.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_state.h>
@@ -241,7 +244,8 @@ public:
         if (!camera || !camera->hasFlags(Qn::virtual_camera))
             return InvisibleAction;
 
-        const auto state = qnClientModule->virtualCameraManager()->state(camera);
+        auto systemContext = SystemContext::fromResource(camera);
+        const auto state = systemContext->virtualCameraManager()->state(camera);
         return m_delegate(state);
     }
 
@@ -1119,30 +1123,43 @@ ActionVisibility NewUserLayoutCondition::check(const Parameters& parameters, QnW
         : InvisibleAction;
 }
 
-ActionVisibility OpenInLayoutCondition::check(const Parameters& parameters, QnWorkbenchContext* context)
+ActionVisibility OpenInLayoutCondition::check(
+    const Parameters& parameters,
+    QnWorkbenchContext* /*context*/)
 {
     auto layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole);
     if (!layout)
         return InvisibleAction;
 
-    return canOpen(parameters.resources(), layout, context)
+    return canOpen(parameters.resources(), layout)
         ? EnabledAction
         : InvisibleAction;
 }
 
-bool OpenInLayoutCondition::canOpen(const QnResourceList& resources,
-    const QnLayoutResourcePtr& layout,
-    QnWorkbenchContext* context) const
+bool OpenInLayoutCondition::canOpen(
+    const QnResourceList& resources,
+    const QnLayoutResourcePtr& layout) const
 {
+    auto getAccessController =
+        [](const QnResourcePtr& resource) -> QnWorkbenchAccessController*
+        {
+            auto systemContext = SystemContext::fromResource(resource);
+            if (NX_ASSERT(systemContext))
+                return systemContext->accessController();
+            return nullptr;
+        };
+
     if (!layout)
     {
         return any_of(resources,
-            [context](const QnResourcePtr& resource)
+            [getAccessController](const QnResourcePtr& resource)
             {
+                auto accessController = getAccessController(resource);
+
                 return QnResourceAccessFilter::isOpenableInEntity(resource)
                     && (resource->hasFlags(Qn::layout)
-                        || context->accessController()->hasPermissions(
-                            resource, Qn::ViewContentPermission));
+                        || (accessController && accessController->hasPermissions(
+                            resource, Qn::ViewContentPermission)));
             });
     }
 
@@ -1150,11 +1167,12 @@ bool OpenInLayoutCondition::canOpen(const QnResourceList& resources,
 
     for (const auto& resource: resources)
     {
-        if (!QnResourceAccessFilter::isOpenableInLayout(resource)
-            || !context->accessController()->hasPermissions(resource, Qn::ViewContentPermission))
-        {
+        auto accessController = getAccessController(resource);
+        const bool hasViewContentPermission = accessController
+            && accessController->hasPermissions(resource, Qn::ViewContentPermission);
+
+        if (!hasViewContentPermission || !QnResourceAccessFilter::isOpenableInLayout(resource))
             continue;
-        }
 
         /* Allow to duplicate items on the exported layout. */
         if (isExportedLayout && resource->getParentId() == layout->getId())
@@ -1171,27 +1189,33 @@ bool OpenInLayoutCondition::canOpen(const QnResourceList& resources,
     return false;
 }
 
-ActionVisibility OpenInCurrentLayoutCondition::check(const QnResourceList& resources, QnWorkbenchContext* context)
+ActionVisibility OpenInCurrentLayoutCondition::check(
+    const QnResourceList& resources,
+    QnWorkbenchContext* context)
 {
     QnLayoutResourcePtr layout = context->workbench()->currentLayout()->resource();
 
     if (!layout)
         return InvisibleAction;
 
-    return canOpen(resources, layout, context)
+    return canOpen(resources, layout)
         ? EnabledAction
         : InvisibleAction;
 }
 
-ActionVisibility OpenInCurrentLayoutCondition::check(const Parameters& parameters, QnWorkbenchContext* context)
+ActionVisibility OpenInCurrentLayoutCondition::check(
+    const Parameters& parameters,
+    QnWorkbenchContext* context)
 {
     /* Make sure we will get to specialized implementation */
     return Condition::check(parameters, context);
 }
 
-ActionVisibility OpenInNewEntityCondition::check(const QnResourceList& resources, QnWorkbenchContext* context)
+ActionVisibility OpenInNewEntityCondition::check(
+    const QnResourceList& resources,
+    QnWorkbenchContext* /*context*/)
 {
-    return canOpen(resources, QnLayoutResourcePtr(), context)
+    return canOpen(resources, QnLayoutResourcePtr())
         ? EnabledAction
         : InvisibleAction;
 }
@@ -1255,30 +1279,36 @@ ActionVisibility ChangeResolutionCondition::check(const Parameters& parameters,
     if (!layout)
         return InvisibleAction;
 
-    const auto layoutItems = parameters.layoutItems();
+    std::vector<QnLayoutItemData> items;
+    if (!parameters.layoutItems().empty())
+    {
+        for (const auto idx: parameters.layoutItems())
+            items.push_back(idx.layout()->getItem(idx.uuid()));
+    }
+    else // Use all items from the current layout.
+    {
+        for (const auto& item: layout->getItems())
+            items.push_back(item);
+    }
 
-    const auto itemIds =
-        [layout, layoutItems]
+    QnVirtualCameraResourceList cameras;
+    for (const auto& item: items)
+    {
+        if (item.uuid.isNull())
+            continue;
+
+        // Skip zoom windows.
+        if (!item.zoomTargetUuid.isNull())
+            continue;
+
+        auto resource = getResourceByDescriptor(item.resource);
+        // Filter our non-camera items and I/O modules.
+        if (auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+            camera && camera->hasVideo())
         {
-            if (layoutItems.empty())
-                return layout->layoutResourceIds();
-
-            QSet<QnUuid> result;
-            for (const auto idx: layoutItems)
-            {
-                const auto item = idx.layout()->getItem(idx.uuid());
-                // Skip zoom windows.
-                if (!item.zoomTargetUuid.isNull())
-                    continue;
-
-                result.insert(item.resource.id);
-            }
-            return result;
-        }();
-
-    // Filter our non-camera items and I/O modules.
-    const auto cameras = context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(itemIds)
-        .filtered([](const QnVirtualCameraResourcePtr& camera) { return camera->hasVideo(nullptr);});
+            cameras.push_back(camera);
+        }
+    }
 
     if (cameras.empty())
         return InvisibleAction;
@@ -1724,7 +1754,7 @@ ActionVisibility ReachableServerCondition::check(
     if (!currentSession || server->getId() == currentSession->connection()->moduleInformation().id)
         return InvisibleAction;
 
-    if (!context->commonModule()->moduleDiscoveryManager()->getEndpoint(server->getId()))
+    if (!appContext()->moduleDiscoveryManager()->getEndpoint(server->getId()))
         return DisabledAction;
 
     return EnabledAction;
@@ -2155,7 +2185,7 @@ ConditionWrapper hasSavedWindowsState()
     return new CustomBoolCondition(
         [](const Parameters& parameters, QnWorkbenchContext* context)
         {
-            return qnClientModule->clientStateHandler()->hasSavedConfiguration();
+            return appContext()->clientStateHandler()->hasSavedConfiguration();
         });
 }
 
@@ -2164,7 +2194,7 @@ ConditionWrapper hasOtherWindowsInSession()
     return new CustomBoolCondition(
         [](const Parameters& parameters, QnWorkbenchContext* context)
         {
-            return !qnClientModule->sharedMemoryManager()->isLastInstanceInCurrentSession();
+            return !appContext()->sharedMemoryManager()->isLastInstanceInCurrentSession();
         });
 }
 
@@ -2173,7 +2203,7 @@ ConditionWrapper hasOtherWindows()
     return new CustomBoolCondition(
         [](const Parameters& parameters, QnWorkbenchContext* context)
         {
-            return qnClientModule->sharedMemoryManager()->runningInstancesIndices().size() > 1;
+            return appContext()->sharedMemoryManager()->runningInstancesIndices().size() > 1;
         });
 }
 

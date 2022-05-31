@@ -4,13 +4,16 @@
 
 #include <camera/camera_bookmarks_manager_fwd.h>
 #include <core/resource/camera_bookmark.h>
-
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <utils/common/from_this_to_shared.h>
 
 /**
  * Main interface class to load bookmarks in all common cases.
  */
-class QnCameraBookmarksQuery: public QObject, public QnFromThisToShared<QnCameraBookmarksQuery>
+class QnCameraBookmarksQuery:
+    public QObject,
+    public QnFromThisToShared<QnCameraBookmarksQuery>,
+    public nx::vms::client::desktop::SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;
@@ -102,7 +105,9 @@ private:
     friend class QnCameraBookmarksManagerPrivate;
 
     QnCameraBookmarksQuery(
-        const QnCameraBookmarkSearchFilter& filter, QObject* parent = nullptr);
+        nx::vms::client::desktop::SystemContext* systemContext,
+        const QnCameraBookmarkSearchFilter& filter,
+        QObject* parent = nullptr);
 
     QnCameraBookmarksQueryPtr toSharedPointer() const;
 

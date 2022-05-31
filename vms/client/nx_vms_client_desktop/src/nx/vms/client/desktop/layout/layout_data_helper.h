@@ -6,15 +6,18 @@
 
 struct QnLayoutItemData;
 
-namespace nx::vms::client::desktop::layout {
-
-/** Extract resource path for storing in layout item. */
-QString resourcePath(const QnResourcePtr& resource);
+namespace nx::vms::client::desktop {
 
 /** Implements common client logic for creating layout item from resource. */
-QnLayoutItemData itemFromResource(const QnResourcePtr& resource);
+QnLayoutItemData layoutItemFromResource(const QnResourcePtr& resource);
 
 /** Create a new layout resource with a given resource on it. */
 QnLayoutResourcePtr layoutFromResource(const QnResourcePtr& resource);
 
-} // namespace nx::vms::client::desktop::layout
+/** Get all resources placed on the layout. WARNING: method is SLOW! */
+QSet<QnResourcePtr> layoutResources(const QnLayoutResourcePtr& layout);
+
+/** Check whether resource belongs to the given layout. */
+bool resourceBelongsToLayout(const QnResourcePtr& resource, const QnLayoutResourcePtr& layout);
+
+} // namespace nx::vms::client::desktop

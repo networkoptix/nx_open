@@ -2,39 +2,25 @@
 
 #include "radass_support.h"
 
-#include <common/common_module.h>
-#include <client_core/client_core_module.h>
-
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/layout_item_data.h>
 #include <core/resource/layout_item_index.h>
-
+#include <core/resource/layout_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/condition/generic_condition.h>
-
+#include <nx/vms/client/desktop/resources/resource_descriptor.h>
 
 namespace nx::vms::client::desktop {
 
 namespace {
 
-bool isRadassSupportedInternal(QnResourcePool* resourcePool, const QnLayoutItemData& item)
+bool isRadassSupportedInternal(const QnLayoutItemData& item)
 {
     if (!item.zoomRect.isNull())
         return false;
 
-    // Some layouts do not belong to the same resource pool as cameras (e.g. showreels).
-    if (!NX_ASSERT(resourcePool))
-    {
-        // Unit tests do not have core module.
-        if (!qnClientCoreModule)
-            return false;
-
-        resourcePool = qnClientCoreModule->resourcePool();
-    }
-
-    return isRadassSupported(resourcePool->getResourceByDescriptor(item.resource)
-        .dynamicCast<QnVirtualCameraResource>());
+    return isRadassSupported(
+        getResourceByDescriptor(item.resource).dynamicCast<QnVirtualCameraResource>());
 }
 
 } // namespace
@@ -45,9 +31,9 @@ bool isRadassSupported(const QnLayoutResourcePtr& layout, MatchMode match)
         return false;
 
     return GenericCondition::check<QnLayoutItemData>(layout->getItems().values(), match,
-        [resourcePool = layout->resourcePool()](const QnLayoutItemData& item)
+        [](const QnLayoutItemData& item)
         {
-            return isRadassSupportedInternal(resourcePool, item);
+            return isRadassSupportedInternal(item);
         });
 }
 
@@ -57,9 +43,9 @@ ConditionResult isRadassSupported(const QnLayoutResourcePtr& layout)
         return ConditionResult::None;
 
     return GenericCondition::check<QnLayoutItemData>(layout->getItems().values(),
-        [resourcePool = layout->resourcePool()](const QnLayoutItemData& item)
+        [](const QnLayoutItemData& item)
         {
-            return isRadassSupportedInternal(resourcePool, item);
+            return isRadassSupportedInternal(item);
         });
 }
 
@@ -69,7 +55,7 @@ bool isRadassSupported(const QnLayoutItemIndex& item)
         return false;
 
     const auto layoutItem = item.layout()->getItem(item.uuid());
-    return isRadassSupportedInternal(item.layout()->resourcePool(), layoutItem);
+    return isRadassSupportedInternal(layoutItem);
 }
 
 bool isRadassSupported(const QnVirtualCameraResourcePtr& camera)

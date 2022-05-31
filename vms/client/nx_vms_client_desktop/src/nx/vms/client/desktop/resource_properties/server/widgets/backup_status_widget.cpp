@@ -26,7 +26,7 @@ namespace {
 nx::vms::api::BackupPosition backupPositionFromCurrentTime()
 {
     const auto currentTimePointMs = std::chrono::system_clock::time_point(
-        std::chrono::milliseconds(qnSyncTime->currentMSecsSinceEpoch()));
+        qnSyncTime->value());
 
     nx::vms::api::BackupPosition result;
     result.positionHighMs = currentTimePointMs;

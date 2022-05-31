@@ -31,7 +31,6 @@ class QnVideoWallMatrix;
 class QnVideoWallControlMessage;
 
 struct QnLayoutItemData;
-struct QnLayoutItemResourceDescriptor;
 
 // -->
 
@@ -107,6 +106,8 @@ typedef QnSharedResourcePointer<QnWebPageResource> QnWebPageResourcePtr;
 typedef QnSharedResourcePointerList<QnWebPageResource> QnWebPageResourceList;
 
 namespace nx::vms::common {
+
+struct ResourceDescriptor;
 
 class AnalyticsPluginResource;
 using AnalyticsPluginResourcePtr = QnSharedResourcePointer<AnalyticsPluginResource>;

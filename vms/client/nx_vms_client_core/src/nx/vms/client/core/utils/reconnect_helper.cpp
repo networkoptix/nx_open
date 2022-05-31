@@ -3,10 +3,10 @@
 #include "reconnect_helper.h"
 
 #include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
@@ -57,7 +57,7 @@ std::optional<nx::network::SocketAddress> ReconnectHelper::currentAddress() cons
     if (server->getId() == qnClientCoreModule->networkModule()->currentServerId())
         return std::nullopt;
 
-    const auto discoverManager = commonModule()->moduleDiscoveryManager();
+    const auto discoverManager = appContext()->moduleDiscoveryManager();
     return discoverManager->getEndpoint(server->getId());
 }
 

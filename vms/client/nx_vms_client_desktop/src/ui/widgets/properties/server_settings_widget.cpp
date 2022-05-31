@@ -111,7 +111,7 @@ public:
             });
 
         static const auto kLookupInterval = std::chrono::seconds{60};
-        const auto now = std::chrono::milliseconds{qnSyncTime->currentMSecsSinceEpoch()};
+        const auto now = qnSyncTime->value();
 
         const auto onlineServers = q->resourcePool()->getAllServers(nx::vms::api::ResourceStatus::online);
         for (const QnMediaServerResourcePtr& server: onlineServers)

@@ -7,7 +7,6 @@
 
 #include <nx/utils/singleton.h>
 #include <nx/vms/api/data/runtime_data.h>
-#include <nx/vms/common/system_context_aware.h>
 #include <utils/common/threadsafe_item_storage.h>
 
 class QnCommonMessageProcessor;
@@ -47,13 +46,12 @@ Q_DECLARE_METATYPE(QnPeerRuntimeInfoMap)
 
 class NX_VMS_COMMON_API QnRuntimeInfoManager:
     public QObject,
-    private QnThreadsafeItemStorageNotifier<QnPeerRuntimeInfo>,
-    public nx::vms::common::SystemContextAware
+    private QnThreadsafeItemStorageNotifier<QnPeerRuntimeInfo>
 {
     Q_OBJECT
 
 public:
-    QnRuntimeInfoManager(nx::vms::common::SystemContext* context, QObject* parent = nullptr);
+    QnRuntimeInfoManager(QObject* parent = nullptr);
 
     const QnThreadsafeItemStorage<QnPeerRuntimeInfo>* items() const;
 

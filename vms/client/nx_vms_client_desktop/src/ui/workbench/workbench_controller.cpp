@@ -31,8 +31,8 @@
 #include <nx/vms/client/core/ptz/hotkey_resource_property_adaptor.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
+#include <nx/vms/client/desktop/resources/resource_descriptor.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
@@ -43,7 +43,7 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/viewport_animator.h>
 #include <ui/common/weak_graphics_item_pointer.h>
-#include <ui/dialogs/common/custom_file_dialog.h>  //for QnCustomFileDialog::fileDialogOptions() constant
+#include <ui/dialogs/common/custom_file_dialog.h> //for QnCustomFileDialog::fileDialogOptions() constant
 #include <ui/dialogs/sign_dialog.h> // TODO: move out.
 #include <ui/graphics/instruments/animation_instrument.h>
 #include <ui/graphics/instruments/bounding_instrument.h>
@@ -1197,8 +1197,7 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget* widget, 
         return;
 
     data.uuid = QnUuid::createUuid();
-    data.resource.id = resource->getId();
-    data.resource.path = layout::resourcePath(resource);
+    data.resource = descriptor(resource);
     data.zoomTargetUuid = zoomTargetWidget->item()->uuid();
     data.rotation = zoomTargetWidget->item()->rotation();
     data.zoomRect = zoomRect;

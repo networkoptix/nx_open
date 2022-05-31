@@ -1,18 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-
 #include "workbench_export_handler.h"
 
 #include <QtWidgets/QAction>
 #include <QtWidgets/QPushButton>
 
 #include <camera/loaders/caching_camera_data_loader.h>
-#include <client_core/client_core_module.h>
 #include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
-#include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
@@ -20,6 +16,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
 #include <nx/branding.h>
 #include <nx/build_info.h>
@@ -35,6 +32,7 @@
 #include <nx/vms/client/desktop/export/tools/export_media_validator.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
+#include <nx/vms/client/desktop/resources/resource_descriptor.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
@@ -53,11 +51,11 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
-#include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_layout_snapshot_manager.h>
 
 #ifdef Q_OS_WIN
-#   include <launcher/nov_launcher_win.h>
+#include <launcher/nov_launcher_win.h>
 #endif
 
 namespace nx::vms::client::desktop {
@@ -109,7 +107,7 @@ QnLayoutResourcePtr layoutFromBookmarks(const QnCameraBookmarkList& bookmarks, Q
     {
         gridWalker.next();
 
-        QnLayoutItemData item = layout::itemFromResource(camera);
+        QnLayoutItemData item = layoutItemFromResource(camera);
         item.flags = Qn::ItemFlag::Pinned;
         item.combinedGeometry = QRect(gridWalker.pos(), kCellSize);
 
@@ -252,9 +250,7 @@ struct WorkbenchExportHandler::Private
             case FileExtension::mkv:
             case FileExtension::mp4:
             {
-                QnAviResourcePtr file(new QnAviResource(
-                    completeFilename,
-                    qnClientCoreModule->commonModule()->storagePluginFactory()));
+                QnAviResourcePtr file(new QnAviResource(completeFilename));
                 file->setStatus(nx::vms::api::ResourceStatus::online);
                 resourcePool->addResource(file);
                 return file;
@@ -618,7 +614,7 @@ WorkbenchExportHandler::ExportToolInstance WorkbenchExportHandler::prepareExport
                 //  - export from the scene, uses rotation from the layout.
                 //  - export from bookmark. Matches rotation from camera settings.
                 const auto& resourcePtr = dialog.mediaResource()->toResourcePtr();
-                QnLayoutResourcePtr layout = layout::layoutFromResource(resourcePtr);
+                QnLayoutResourcePtr layout = layoutFromResource(resourcePtr);
                 auto layoutItems = layout->getItems();
                 if (!layoutItems.empty())
                 {
@@ -708,7 +704,7 @@ bool WorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr& layout
 
     for (const QnLayoutItemData &item : layout->getItems())
     {
-        QnResourcePtr resource = resourcePool()->getResourceByDescriptor(item.resource);
+        QnResourcePtr resource = getResourceByDescriptor(item.resource);
         if (!resource)
             continue;
         if (resource->getParentResource() == layout)

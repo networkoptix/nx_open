@@ -2,14 +2,15 @@
 
 #include "two_way_audio_availability_watcher.h"
 
+#include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource_access/global_permissions_manager.h>
-#include <client_core/client_core_module.h>
-#include <nx/vms/license/usage_helper.h>
-#include <nx/vms/client/core/watchers/user_watcher.h>
 #include <core/resource_access/resource_access_subject.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/core/watchers/user_watcher.h>
+#include <nx/vms/license/usage_helper.h>
 
 namespace nx::vms::client::core {
 
@@ -17,7 +18,7 @@ TwoWayAudioAvailabilityWatcher::TwoWayAudioAvailabilityWatcher(QObject* parent):
     base_type(parent)
 {
     const auto manager = globalPermissionsManager();
-    const auto userWatcher = commonModule()->instance<UserWatcher>();
+    const UserWatcher* userWatcher = dynamic_cast<SystemContext*>(systemContext())->userWatcher();
 
     connect(userWatcher, &UserWatcher::userChanged,
         this, &TwoWayAudioAvailabilityWatcher::updateAvailability);
@@ -92,7 +93,8 @@ void TwoWayAudioAvailabilityWatcher::updateAvailability()
             if (!audioOutput->hasTwoWayAudio())
                 return false;
 
-            const auto user = commonModule()->instance<UserWatcher>()->user();
+            const auto userWatcher = dynamic_cast<SystemContext*>(systemContext())->userWatcher();
+            const auto user = userWatcher->user();
             if (!user)
                 return false;
 

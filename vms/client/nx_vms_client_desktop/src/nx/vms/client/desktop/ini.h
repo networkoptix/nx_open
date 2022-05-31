@@ -14,6 +14,8 @@ struct Ini: nx::kit::IniConfig
 
     QVariant get(const QString& name) const;
 
+    bool isAutoCloudHostDeductionMode() const;
+
     // ---------------------------------------------------------------------------------------------
     // Developers' section
     // Flags here can be removed by developers' decision.

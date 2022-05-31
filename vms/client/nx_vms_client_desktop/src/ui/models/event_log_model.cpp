@@ -405,8 +405,7 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
             qint64 timestampMs = action.eventParams.eventTimestampUsec / 1000;
 
             // TODO: #sivanov Actualize used system context.
-            const auto timeWatcher =
-                ApplicationContext::instance()->currentSystemContext()->serverTimeWatcher();
+            const auto timeWatcher = appContext()->currentSystemContext()->serverTimeWatcher();
             QDateTime dt = timeWatcher->displayTime(timestampMs);
             return nx::vms::time::toString(dt);
         }

@@ -5,20 +5,18 @@
 #include <vector>
 
 #include <nx/utils/uuid.h>
-
-#include <utils/common/connective.h>
-
 #include <nx/vms/api/data/server_runtime_event_data.h>
 
 class QnCommonMessageProcessor;
 
 namespace nx::vms::client::desktop {
 
-class ServerRuntimeEventConnector: public Connective<QObject>
+class ServerRuntimeEventConnector: public QObject
 {
     Q_OBJECT
+
 public:
-    ServerRuntimeEventConnector(QnCommonMessageProcessor* messageProcessor);
+    void setMessageProcessor(QnCommonMessageProcessor* messageProcessor);
 
 signals:
     void deviceAgentSettingsMaybeChanged(QnUuid deviceId, QnUuid engineId);

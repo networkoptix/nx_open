@@ -3,7 +3,7 @@
 #include "notification_list_model.h"
 
 #include <nx/fusion/model_functions.h>
-#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -40,7 +40,7 @@ bool NotificationListModel::defaultAction(const QModelIndex& index)
     const auto& event = getEvent(index.row());
     if (event.actionId != ui::action::NoAction)
     {
-        ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
+        statisticsModule()->controls()->registerClick(
             getStatisticsAlias(QnLexical::serialized(event.actionId)));
     }
 

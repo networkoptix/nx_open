@@ -74,7 +74,7 @@ QNetworkProxy QnNetworkProxyFactory::proxyToResource(
         return QNetworkProxy(QNetworkProxy::NoProxy);
 
     auto router = context->router();
-    if (!NX_ASSERT(router))
+    if (!router) //< Cloud cross-system contexts have no routing.
         return QNetworkProxy(QNetworkProxy::NoProxy);
 
     QnMediaServerResourcePtr server;

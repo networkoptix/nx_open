@@ -2,9 +2,12 @@
 
 #include "desktop_client_message_processor.h"
 
-#include <core/resource/client_camera_factory.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/resources/resource_factory.h>
+
+using namespace nx::vms::client::desktop;
 
 QnResourceFactory* QnDesktopClientMessageProcessor::getResourceFactory() const
 {
-    return QnClientResourceFactory::instance();
+    return appContext()->resourceFactory();
 }

@@ -78,7 +78,7 @@ QnCameraBookmark helpers::bookmarkFromAction(
         : endTimeMs - startTimeMs);
     bookmark.durationMs += milliseconds(recordBeforeMs + recordAfterMs);
     bookmark.cameraId = camera->getId();
-    bookmark.creationTimeStampMs = milliseconds(qnSyncTime->currentMSecsSinceEpoch());
+    bookmark.creationTimeStampMs = qnSyncTime->value();
 
     vms::event::StringsHelper helper(camera->systemContext());
     bookmark.name = helper.eventAtResource(action->getRuntimeParams(), Qn::RI_WithUrl);

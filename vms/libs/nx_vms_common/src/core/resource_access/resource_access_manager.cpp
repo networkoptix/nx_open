@@ -52,7 +52,7 @@ bool verifyDesktopCameraOnLayout(
     QnVirtualCameraResourcePtr desktopCamera;
     for (const auto& item: data.items)
     {
-        QnLayoutItemResourceDescriptor descriptor{item.resourceId, item.resourcePath};
+        nx::vms::common::ResourceDescriptor descriptor{item.resourceId, item.resourcePath};
         auto camera = resourcePool->getResourceByDescriptor(descriptor)
             .dynamicCast<QnVirtualCameraResource>();
 

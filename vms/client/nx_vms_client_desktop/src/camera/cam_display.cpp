@@ -5,35 +5,31 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QFileInfo>
 
-#include <utils/common/util.h>
-#include <utils/common/synctime.h>
-
 #include <client/client_settings.h>
-#include <client/client_module.h>
-
 #include <core/resource/camera_resource.h>
 #include <core/resource/client_camera.h>
-
 #include <nx/fusion/model_functions.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/streaming/config.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/utils/log/log.h>
-
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
+#include <utils/common/synctime.h>
+#include <utils/common/util.h>
 
-#include "video_stream_display.h"
 #include "audio_stream_display.h"
+#include "video_stream_display.h"
 
 #if defined(Q_OS_MAC)
-#include <CoreServices/CoreServices.h>
+    #include <CoreServices/CoreServices.h>
 #elif defined(Q_OS_WIN)
-#include <qt_windows.h>
-#include <plugins/resource/desktop_win/desktop_resource.h>
+    #include <qt_windows.h>
+    #include <plugins/resource/desktop_win/desktop_resource.h>
 #endif
 
-using nx::vms::client::desktop::AbstractVideoDisplay;
+using namespace nx::vms::client::desktop;
 
 Q_GLOBAL_STATIC(nx::Mutex, activityMutex)
 static qint64 activityTime = 0;
@@ -164,7 +160,7 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     if (auto clientCam = resource.dynamicCast<QnClientCameraResource>())
     {
         connect(clientCam.data(), &QnClientCameraResource::dataDropped, this,
-            [this] { qnClientModule->radassController()->onSlowStream(this); });
+            [this] { appContext()->radassController()->onSlowStream(this); });
     }
 
 #ifdef Q_OS_WIN
@@ -209,7 +205,7 @@ QnCamDisplay::~QnCamDisplay()
     if (auto clientCam = m_resource.dynamicCast<QnClientCameraResource>())
         clientCam->disconnect(this); // disconnecting radassController()->onSlowStream.
 
-    qnClientModule->radassController()->unregisterConsumer(this);
+    appContext()->radassController()->unregisterConsumer(this);
 
     NX_ASSERT(!isRunning());
     stop();
@@ -348,7 +344,7 @@ void QnCamDisplay::hurryUpCkeckForCamera2(QnAbstractMediaDataPtr media)
         if (m_afterJumpTimer.elapsed()*1000 > REDASS_DELAY_INTERVAL)
         {
             if (m_receivedInterval/1000 < m_afterJumpTimer.elapsed()/2)
-                qnClientModule->radassController()->onSlowStream(this);
+                appContext()->radassController()->onSlowStream(this);
         }
     }
 }
@@ -374,7 +370,7 @@ void QnCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
             m_delayedFrameCount = qMax(0, m_delayedFrameCount);
             m_delayedFrameCount++;
             if (m_delayedFrameCount > 10 && m_archiveReader->getQuality() != MEDIA_Quality_Low /*&& canSwitchQuality()*/)
-                qnClientModule->radassController()->onSlowStream(this);
+                appContext()->radassController()->onSlowStream(this);
         }
         else if (realSleepTime >= 0)
         {
@@ -382,7 +378,7 @@ void QnCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
             m_delayedFrameCount--;
             if (m_delayedFrameCount < -10 && m_dataQueue.size() >= m_dataQueue.size()*0.75)
             {
-                qnClientModule->radassController()->streamBackToNormal(this);
+                appContext()->radassController()->streamBackToNormal(this);
             }
         }
     }
@@ -497,7 +493,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     if (!m_forceMtDecoding)
     {
         bool canSwitchToMT = isFullScreen()
-            || qnClientModule->radassController()->consumerCount() == 1;
+            || appContext()->radassController()->consumerCount() == 1;
 
         bool shouldSwitchToMT = (m_isRealTimeSource && m_totalFrames > 100 && m_dataQueue.size() >= m_dataQueue.size()-1) || !m_isRealTimeSource;
         if (canSwitchToMT && shouldSwitchToMT)
@@ -1497,7 +1493,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
     bool audioParamsChanged = false;
     if (ad)
     {
-        currentAudioFormat = { nx::audio::formatFromMediaContext(ad->context), 
+        currentAudioFormat = { nx::audio::formatFromMediaContext(ad->context),
             ad->context->getBitsPerCodedSample() };
         audioParamsChanged = m_playingFormat != currentAudioFormat
             || m_audioDisplay->getAudioBufferSize() != expectedBufferSize;

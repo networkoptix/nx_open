@@ -6,9 +6,10 @@
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/qset.h>
+#include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
-#include <nx/utils/qset.h>
 #include <ui/models/business_rule_view_model.h>
 
 namespace nx::vms::client::desktop {
@@ -212,9 +213,9 @@ bool FullscreenActionHelper::cameraExistOnLayouts(const QnBusinessRuleViewModel*
 
     const auto layouts = getLayoutsInternal(model);
     return std::all_of(layouts.cbegin(), layouts.cend(),
-        [id = camera->getId()](const auto& layout)
+        [camera](const auto& layout)
         {
-            return layout->layoutResourceIds().contains(id);
+            return resourceBelongsToLayout(camera, layout);
         });
 }
 

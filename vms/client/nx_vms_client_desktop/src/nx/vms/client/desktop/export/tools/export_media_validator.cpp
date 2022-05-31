@@ -2,23 +2,22 @@
 
 #include "export_media_validator.h"
 
+#include <camera/camera_data_manager.h>
+#include <camera/loaders/caching_camera_data_loader.h>
 #include <client/client_module.h>
 #include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <camera/camera_data_manager.h>
-#include <camera/loaders/caching_camera_data_loader.h>
+#include <nx/core/transcoding/filters/filter_chain.h>
+#include <nx/fusion/model_functions.h>
+#include <nx/vms/client/desktop/common/utils/filesystem.h>
+#include <nx/vms/client/desktop/export/data/export_layout_settings.h>
+#include <nx/vms/client/desktop/export/data/export_media_settings.h>
+#include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/resources/resource_descriptor.h>
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
-
-#include <nx/core/transcoding/filters/filter_chain.h>
-#include <nx/vms/client/desktop/common/utils/filesystem.h>
-#include <nx/vms/client/desktop/export/data/export_media_settings.h>
-#include <nx/vms/client/desktop/export/data/export_layout_settings.h>
-
-#include <nx/fusion/model_functions.h>
 
 namespace nx::vms::client::desktop {
 
@@ -163,10 +162,9 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
     qint64 totalDurationMs = 0;
     qint64 estimatedTotalSizeMb = 0;
 
-    const auto resPool = qnClientCoreModule->resourcePool();
     for (const auto& item: layout->getItems())
     {
-        const auto resource = resPool->getResourceByDescriptor(item.resource);
+        const auto resource = getResourceByDescriptor(item.resource);
         if (!resource)
             continue;
 
@@ -213,8 +211,8 @@ bool ExportMediaValidator::exeFileIsTooBig(
     qint64 durationMs)
 {
     qint64 videoSizeMb = 0;
-    const auto layoutResources = layout->layoutResources();
-    for (const auto& resource: layoutResources)
+    const auto resources = layoutResources(layout);
+    for (const auto& resource: resources)
     {
         if (const QnMediaResourcePtr& media = resource.dynamicCast<QnMediaResource>())
             videoSizeMb += estimatedExportVideoSizeMb(media, durationMs);

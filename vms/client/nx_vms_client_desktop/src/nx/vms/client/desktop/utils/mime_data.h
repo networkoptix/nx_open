@@ -2,15 +2,15 @@
 
 #pragma once
 
-#include <QtCore/QHash>
 #include <QtCore/QByteArray>
+#include <QtCore/QHash>
+#include <QtCore/QMimeData>
 #include <QtCore/QString>
 #include <QtCore/QStringList>
-#include <QtCore/QMimeData>
 #include <QtCore/QVariant>
 
 #include <core/resource/resource_fwd.h>
-
+#include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
 
 namespace nx::vms::client::desktop {
@@ -26,7 +26,9 @@ class NX_VMS_CLIENT_DESKTOP_API MimeData
 {
 public:
     MimeData();
-    MimeData(const QMimeData* data, QnResourcePool* resourcePool);
+    MimeData(const QMimeData* data);
+    MimeData(QByteArray serializedData);
+    ~MimeData();
 
     static QStringList mimeTypes();
     void toMimeData(QMimeData* data) const;
@@ -56,20 +58,15 @@ public:
     void setArguments(const QHash<int, QVariant>& value);
 
     QString serialized() const;
-    static MimeData deserialized(QByteArray data, QnResourcePool* resourcePool);
 
     bool isEmpty() const;
 
 private:
-    void load(const QMimeData* data, QnResourcePool* resourcePool);
-    void updateInternalStorage();
+    void load(const QMimeData* data);
 
 private:
-    QHash<QString, QByteArray> m_data;
-
-    QList<QnUuid> m_entities;
-    QnResourceList m_resources;
-    QHash<int, QVariant> m_arguments;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop

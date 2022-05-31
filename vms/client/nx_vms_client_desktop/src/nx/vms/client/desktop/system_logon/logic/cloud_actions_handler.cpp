@@ -6,12 +6,13 @@
 #include <QtWidgets/QAction>
 
 #include <client/client_globals.h>
-#include <client/client_module.h>
 #include <common/common_module.h>
 #include <helpers/cloud_url_helper.h>
 #include <helpers/system_helpers.h>
 #include <nx/branding.h>
+#include <nx/vms/api/data/module_information.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/workbench_context.h>
@@ -63,8 +64,8 @@ CloudActionsHandler::CloudActionsHandler(QObject* parent):
         this, &CloudActionsHandler::at_forcedLogout);
 
     connect(
-        qnClientModule->sharedMemoryManager(),
-        &nx::vms::client::desktop::SharedMemoryManager::clientCommandRequested,
+        appContext()->sharedMemoryManager(),
+        &SharedMemoryManager::clientCommandRequested,
         this,
         [this](SharedMemoryData::Command command, const QByteArray& /*data*/)
         {
@@ -102,7 +103,7 @@ void CloudActionsHandler::at_loginToCloudAction_triggered()
 void CloudActionsHandler::at_logoutFromCloudAction_triggered()
 {
     logoutFromCloud();
-    qnClientModule->sharedMemoryManager()->requestLogoutFromCloud();
+    appContext()->sharedMemoryManager()->requestLogoutFromCloud();
 }
 
 void CloudActionsHandler::at_forcedLogout()

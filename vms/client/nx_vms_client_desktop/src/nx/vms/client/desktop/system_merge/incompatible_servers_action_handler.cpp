@@ -13,8 +13,8 @@
 #include <nx/branding.h>
 #include <nx/build_info.h>
 #include <nx/vms/client/core/system_logon/remote_connection_user_interaction_delegate.h>
-#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/progress_dialog.h>
+#include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/system_logon/logic/connection_delegate_helper.h>
 #include <nx/vms/client/desktop/system_merge/connect_to_current_system_tool.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -118,7 +118,7 @@ void IncompatibleServersActionHandler::connectToCurrentSystem(
         m_connectTool, &ConnectToCurrentSystemTool::cancel);
 
     std::shared_ptr<QnStatisticsScenarioGuard> mergeScenario =
-        ApplicationContext::instance()->certificateStatisticsModule()->beginScenario(
+        statisticsModule()->certificates()->beginScenario(
             QnCertificateStatisticsModule::Scenario::mergeFromTree);
 
     // The captured scenario guard will be deleted after tool is destroyed.
@@ -136,7 +136,7 @@ void IncompatibleServersActionHandler::at_mergeSystemsAction_triggered()
     }
 
     std::shared_ptr<QnStatisticsScenarioGuard> mergeScenario =
-        ApplicationContext::instance()->certificateStatisticsModule()->beginScenario(
+        statisticsModule()->certificates()->beginScenario(
             QnCertificateStatisticsModule::Scenario::mergeFromDialog);
 
     auto delegate = createConnectionUserInteractionDelegate(mainWindowWidget());

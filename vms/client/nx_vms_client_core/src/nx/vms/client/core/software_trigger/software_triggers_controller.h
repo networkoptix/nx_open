@@ -6,13 +6,11 @@
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/client/core/system_context_aware.h>
 
 namespace nx::vms::client::core {
 
-class NX_VMS_CLIENT_CORE_API SoftwareTriggersController:
-    public QObject,
-    public RemoteConnectionAware
+class NX_VMS_CLIENT_CORE_API SoftwareTriggersController: public QObject, public SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;
@@ -21,7 +19,8 @@ class NX_VMS_CLIENT_CORE_API SoftwareTriggersController:
         NOTIFY resourceIdChanged)
 
 public:
-    SoftwareTriggersController(QObject* parent = nullptr);
+    SoftwareTriggersController(SystemContext* systemContext, QObject* parent = nullptr);
+    SoftwareTriggersController(); //< QML constructor.
     virtual ~SoftwareTriggersController() override;
 
     static void registerQmlType();

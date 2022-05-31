@@ -22,6 +22,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/common/widgets/checkable_header_view.h>
 #include <nx/vms/client/desktop/common/widgets/item_view_auto_hider.h>
@@ -33,6 +34,7 @@
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
@@ -711,13 +713,18 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
 
     const int matrixWidth = qMax(1, qRound(std::sqrt(displayAspectRatio * resList.size() / desiredCellAspectRatio)));
 
+    auto resourceRuntimeDataManager = appContext()->currentSystemContext()
+        ->resourceRuntimeDataManager();
     for(int i = 0; i < resList.size(); i++)
     {
         auto resource = resList[i];
 
-        QnLayoutItemData item = layout::itemFromResource(resource);
+        QnLayoutItemData item = layoutItemFromResource(resource);
         item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
-        qnResourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemTimeRole, period.startTimeMs);
+        resourceRuntimeDataManager->setLayoutItemData(
+            item.uuid,
+            Qn::ItemTimeRole,
+            period.startTimeMs);
 
         layout->addItem(item);
     }

@@ -5,10 +5,11 @@
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <recording/time_period_list.h>
 
-#include "virtual_camera_worker.h"
 #include "virtual_camera_preparer.h"
+#include "virtual_camera_worker.h"
 
 namespace nx::vms::client::desktop {
 
@@ -18,9 +19,9 @@ struct VirtualCameraManager::Private
     QHash<QnUuid, VirtualCameraWorker*> workers;
 };
 
-VirtualCameraManager::VirtualCameraManager(QObject* parent):
+VirtualCameraManager::VirtualCameraManager(SystemContext* systemContext, QObject* parent):
     QObject(parent),
-    QnCommonModuleAware(parent),
+    SystemContextAware(systemContext),
     d(new Private)
 {
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this, &VirtualCameraManager::dropWorker);

@@ -271,7 +271,7 @@ void QnVideowallItemWidget::paintFrame(QPainter *painter, const QRectF &paintRec
 
 void QnVideowallItemWidget::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
 {
-    m_mimeData.reset(new MimeData{event->mimeData(), resourcePool()});
+    m_mimeData.reset(new MimeData{event->mimeData()});
     if (!isDragValid())
         return;
 
@@ -419,7 +419,6 @@ void QnVideowallItemWidget::updateLayout()
         connect(m_layoutThumbnailProvider.get(), &ImageProvider::statusChanged,
             this, &QnVideowallItemWidget::at_updateThumbnailStatus);
 
-        m_layoutThumbnailProvider->setResourcePool(resourcePool());
         m_layoutThumbnailProvider->loadAsync();
 
         connect(m_layout, &QnLayoutResource::itemAdded, this,

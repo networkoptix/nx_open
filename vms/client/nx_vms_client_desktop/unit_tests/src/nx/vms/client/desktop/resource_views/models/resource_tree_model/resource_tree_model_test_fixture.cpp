@@ -4,16 +4,12 @@
 
 #include <QtCore/QFileInfo>
 
-#include <client_core/client_core_module.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>
 #include <client/desktop_client_message_processor.h>
+#include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <common/static_common_module.h>
-#include <core/resource_access/resource_access_manager.h>
-#include <core/resource_access/shared_resources_manager.h>
-#include <core/resource_management/layout_tour_manager.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/avi/filetypesupport.h>
 #include <core/resource/camera_resource.h>
@@ -24,6 +20,10 @@
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/shared_resources_manager.h>
+#include <core/resource_management/layout_tour_manager.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/utils/debug_helpers/model_transaction_checker.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -132,7 +132,7 @@ QnMediaServerResourcePtr ResourceTreeModelTest::addEdgeServer(const QString& nam
 
 QnAviResourcePtr ResourceTreeModelTest::addLocalMedia(const QString& path) const
 {
-    QnAviResourcePtr localMedia(new QnAviResource(path, commonModule()->storagePluginFactory()));
+    QnAviResourcePtr localMedia(new QnAviResource(path));
     if (FileTypeSupport::isImageFileExt(path))
     {
         localMedia->addFlags(Qn::still_image);

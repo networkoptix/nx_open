@@ -494,7 +494,7 @@ qint64 QnRtspClientArchiveDelegate::startTime() const
     if (result == qint64(AV_NOPTS_VALUE))
         result = m_rtspSession->startTime();
 
-    if (result == DATETIME_NOW || result <= qnSyncTime->currentMSecsSinceEpoch()*1000)
+    if (result == DATETIME_NOW || result <= qnSyncTime->currentUSecsSinceEpoch())
         return result;
     else
         return DATETIME_NOW; // archive in a future
@@ -561,7 +561,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
         if (result == 0 || outOfRange || result->dataType == QnAbstractMediaData::EMPTY_DATA)
         {
             if (m_lastSeekTime == AV_NOPTS_VALUE)
-                m_lastSeekTime = qnSyncTime->currentMSecsSinceEpoch() * 1000;
+                m_lastSeekTime = qnSyncTime->currentUSecsSinceEpoch();
             QnMediaServerResourcePtr newServer = getNextMediaServerFromTime(m_camera, m_lastSeekTime / 1000);
             if (newServer)
             {

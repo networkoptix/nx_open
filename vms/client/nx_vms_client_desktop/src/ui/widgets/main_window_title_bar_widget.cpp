@@ -182,7 +182,7 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
         Qt::QueuedConnection); //< QueuedConnection is needed here because 2 title bars
                                // (windowed/welcomescreen and fullscreen) are subscribed to
                                // MainMenuAction, and main menu must not change
-                               // windowed/welcomescreen/fullscreen state BETWEEN their slots 
+                               // windowed/welcomescreen/fullscreen state BETWEEN their slots
                                // processing MainMenuAction.
                                //
                                // TODO: #vkutin #gdm #ynikitenkov Lift this limitation in the
@@ -329,7 +329,7 @@ void QnMainWindowTitleBarWidget::mouseDoubleClickEvent(QMouseEvent* event)
 void QnMainWindowTitleBarWidget::dragEnterEvent(QDragEnterEvent* event)
 {
     Q_D(QnMainWindowTitleBarWidget);
-    d->mimeData.reset(new MimeData{event->mimeData(), resourcePool()});
+    d->mimeData.reset(new MimeData{event->mimeData()});
     if (d->mimeData->isEmpty())
         return;
 

@@ -10,7 +10,6 @@
 #include <QtCore/QTimer>
 
 #include <client_core/client_core_settings.h>
-#include <common/common_module.h>
 #include <helpers/system_helpers.h>
 #include <network/cloud_system_data.h>
 #include <nx/branding.h>
@@ -22,14 +21,12 @@
 #include <nx/utils/string.h>
 #include <nx/vms/api/data/cloud_system_data.h>
 #include <nx/vms/api/data/peer_data.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <nx/vms/client/core/network/cloud_connection_factory.h>
 #include <nx/vms/client/core/network/cloud_token_remover.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/utils/cloud_session_token_updater.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
-#include <nx/vms/common/system_settings.h>
 #include <utils/common/delayed.h>
 #include <utils/common/id.h>
 #include <utils/common/synctime.h>
@@ -87,14 +84,13 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList& systemsList)
 
 }
 
-class QnCloudStatusWatcherPrivate : public QObject, public nx::vms::client::core::CommonModuleAware
+class QnCloudStatusWatcherPrivate : public QObject
 {
     QnCloudStatusWatcher* q_ptr;
     Q_DECLARE_PUBLIC(QnCloudStatusWatcher)
 
 public:
-    std::unique_ptr<CloudConnectionFactory> cloudConnectionFactory
-        = std::make_unique<CloudConnectionFactory>();
+    std::unique_ptr<CloudConnectionFactory> cloudConnectionFactory;
     std::shared_ptr<api::Connection> cloudConnection;
     std::unique_ptr<api::Connection> resendActivationConnection;
 
@@ -103,7 +99,6 @@ public:
 
     QnCloudSystemList cloudSystems;
     QnCloudSystemList recentCloudSystems;
-    QnCloudSystem currentSystem;
 
 public:
     QnCloudStatusWatcherPrivate(QnCloudStatusWatcher* parent);
@@ -140,7 +135,6 @@ private:
     void updateSystems();
     void setCloudSystems(const QnCloudSystemList &newCloudSystems);
     void setRecentCloudSystems(const QnCloudSystemList &newRecentSystems);
-    void updateCurrentSystem();
     void updateCurrentCloudUserSecuritySettings();
     void updateStatusFromResultCode(api::ResultCode result);
     void setStatus(QnCloudStatusWatcher::Status newStatus, QnCloudStatusWatcher::ErrorCode error);
@@ -176,7 +170,6 @@ template<> QnCloudStatusWatcher* Singleton<QnCloudStatusWatcher>::s_instance = n
 
 QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent):
     base_type(parent),
-    QnCommonModuleAware(parent),
     d_ptr(new QnCloudStatusWatcherPrivate(this))
 {
     const auto correctOfflineState = [this]()
@@ -199,8 +192,7 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent):
     connect(this, &QnCloudStatusWatcher::statusChanged, this, correctOfflineState);
 
     Q_D(QnCloudStatusWatcher);
-    connect(this, &QnCloudStatusWatcher::cloudSystemsChanged,
-        d, &QnCloudStatusWatcherPrivate::updateCurrentSystem);
+
     connect(this, &QnCloudStatusWatcher::cloudSystemsChanged,
         d, &QnCloudStatusWatcherPrivate::setRecentCloudSystems);
     connect(this, &QnCloudStatusWatcher::recentCloudSystemsChanged, this,
@@ -319,6 +311,9 @@ void QnCloudStatusWatcher::updateSystems()
 void QnCloudStatusWatcher::resendActivationEmail(const QString& email)
 {
     Q_D(QnCloudStatusWatcher);
+    if (!d->cloudConnectionFactory)
+        d->cloudConnectionFactory = std::make_unique<CloudConnectionFactory>();
+
     if (!d->resendActivationConnection)
         d->resendActivationConnection = d->cloudConnectionFactory->createConnection();
 
@@ -366,9 +361,6 @@ QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *p
              updateCurrentCloudUserSecuritySettings();
         });
     systemUpdateTimer->start();
-
-    connect(globalSettings(), &nx::vms::common::SystemSettings::cloudSettingsChanged,
-            this, &QnCloudStatusWatcherPrivate::updateCurrentSystem);
 
     m_tokenUpdater = std::make_unique<CloudSessionTokenUpdater>(this);
 
@@ -480,6 +472,9 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
         setCloudSystems(QnCloudSystemList());
         return;
     }
+
+    if (!cloudConnectionFactory)
+        cloudConnectionFactory = std::make_unique<CloudConnectionFactory>();
 
     cloudConnection = cloudConnectionFactory->createConnection();
 
@@ -679,26 +674,6 @@ void QnCloudStatusWatcherPrivate::setRecentCloudSystems(const QnCloudSystemList 
 
     Q_Q(QnCloudStatusWatcher);
     emit q->recentCloudSystemsChanged();
-}
-
-void QnCloudStatusWatcherPrivate::updateCurrentSystem()
-{
-    Q_Q(QnCloudStatusWatcher);
-
-    const auto systemId = globalSettings()->cloudSystemId();
-
-    const auto it = std::find_if(
-        cloudSystems.begin(), cloudSystems.end(),
-        [systemId](const QnCloudSystem& system) { return systemId == system.cloudId; });
-
-    if (it == cloudSystems.end())
-        return;
-
-    if (!it->visuallyEqual(currentSystem))
-    {
-        currentSystem = *it;
-        emit q->currentSystemChanged(currentSystem);
-    }
 }
 
 void QnCloudStatusWatcherPrivate::updateCurrentCloudUserSecuritySettings()

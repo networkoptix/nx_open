@@ -13,11 +13,11 @@
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QVBoxLayout>
 
-#include <client/client_module.h>
 #include <core/resource/camera_resource.h>
 #include <nx/api/mediaserver/image_request.h>
 #include <nx/utils/metatypes.h>
 #include <nx/utils/range_adapters.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/animated_tab_widget.h>
 #include <nx/vms/client/desktop/common/widgets/compact_tab_bar.h>
 #include <nx/vms/client/desktop/common/widgets/text_edit_label.h>
@@ -307,13 +307,13 @@ EventPanel::Private::Private(EventPanel* q):
     connect(q, &EventPanel::customContextMenuRequested,
         this, &EventPanel::Private::showContextMenu);
 
-    qnClientModule->clientStateHandler()->registerDelegate(
+    appContext()->clientStateHandler()->registerDelegate(
         kEventPanelStorageKey, std::make_unique<StateDelegate>(this));
 }
 
 EventPanel::Private::~Private()
 {
-    qnClientModule->clientStateHandler()->unregisterDelegate(kEventPanelStorageKey);
+    appContext()->clientStateHandler()->unregisterDelegate(kEventPanelStorageKey);
 }
 
 EventPanel::Tab EventPanel::Private::currentTab() const

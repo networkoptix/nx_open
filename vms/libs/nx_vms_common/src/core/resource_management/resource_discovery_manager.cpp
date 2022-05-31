@@ -9,24 +9,25 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QThreadPool>
 
-#include "core/resource/media_server_resource.h"
 #include <api/runtime_info_manager.h>
 #include <common/common_module.h>
-#include <core/resource_management/camera_driver_restriction_list.h>
-#include <core/resource_management/resource_management_ini.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_searcher.h>
 #include <core/resource/abstract_storage_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource/storage_resource.h>
+#include <core/resource_management/camera_driver_restriction_list.h>
+#include <core/resource_management/resource_management_ini.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_searcher.h>
 #include <nx/build_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/analytics_data.h>
 #include <nx/vms/api/data/media_server_data.h>
+#include <nx/vms/common/application_context.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/system_settings.h>
@@ -39,6 +40,8 @@
 #else
     static const int kThreadCount = 32;
 #endif
+
+using namespace nx::vms::common;
 
 // ------------------------------------ QnManualCameraInfo -----------------------------
 
@@ -135,7 +138,7 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(const QnUuid &resourceT
 
     if (resourceTypeId == nx::vms::api::StorageData::kResourceTypeId)
     {
-        result = QnResourcePtr(commonModule()->storagePluginFactory()->createStorage(
+        result = QnResourcePtr(appContext()->storagePluginFactory()->createStorage(
             params.url, resourceManagementIni().allowDefaultStorageFactory));
     }
     else if (resourceTypeId == nx::vms::api::AnalyticsPluginData::kResourceTypeId)

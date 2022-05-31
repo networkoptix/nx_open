@@ -3,8 +3,7 @@
 #include "qml_test_environment.h"
 
 #include <client/client_meta_types.h>
-#include <client_core/client_core_module.h>
-#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
 #include <nx/vms/utils/external_resources.h>
 
@@ -36,7 +35,7 @@ QmlTestEnvironment::~QmlTestEnvironment()
 
 QQmlEngine* QmlTestEnvironment::engine() const
 {
-    return m_testContext->clientCoreModule()->mainQmlEngine();
+    return appContext()->qmlEngine();
 }
 
 } // namespace test

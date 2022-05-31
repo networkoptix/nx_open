@@ -4,12 +4,17 @@
 
 #include <camera/camera_bookmarks_manager.h>
 #include <core/resource/camera_resource.h>
+#include <nx/vms/client/desktop/system_context.h>
+
+using namespace nx::vms::client::desktop;
 
 QnCameraBookmarksQuery::QnCameraBookmarksQuery(
+    SystemContext* systemContext,
     const QnCameraBookmarkSearchFilter& filter,
-    QObject* parent /*= nullptr*/)
+    QObject* parent)
     :
     base_type(parent),
+    SystemContextAware(systemContext),
     m_id(QUuid::createUuid()),
     m_filter(filter)
 {
@@ -84,12 +89,12 @@ void QnCameraBookmarksQuery::setFilter(const QnCameraBookmarkSearchFilter& value
 
 QnCameraBookmarkList QnCameraBookmarksQuery::cachedBookmarks() const
 {
-    return qnCameraBookmarksManager->cachedBookmarks(toSharedPointer());
+    return systemContext()->cameraBookmarksManager()->cachedBookmarks(toSharedPointer());
 }
 
 void QnCameraBookmarksQuery::executeRemoteAsync(BookmarksCallbackType callback)
 {
-    qnCameraBookmarksManager->executeQueryRemoteAsync(toSharedPointer(), callback);
+    systemContext()->cameraBookmarksManager()->executeQueryRemoteAsync(toSharedPointer(), callback);
 }
 
 void QnCameraBookmarksQuery::refresh()

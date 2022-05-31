@@ -47,6 +47,7 @@
 #include <client/self_updater.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
+#include <common/static_common_module.h>
 #include <nx/audio/audiodevice.h>
 #include <nx/branding.h>
 #include <nx/build_info.h>
@@ -91,8 +92,29 @@ namespace {
 const int kSuccessCode = 0;
 const int kInvalidParametersCode = -1;
 static const nx::utils::log::Tag kMainWindow(lit("MainWindow"));
-
 const QString kWindowGeometryData = "windowGeometry";
+static constexpr int kStarDragDistance = 20;
+
+void initApplication()
+{
+    QThread::currentThread()->setPriority(QThread::HighestPriority);
+
+    // Set up application parameters so that QSettings know where to look for settings.
+    QApplication::setOrganizationName(nx::branding::company());
+    QApplication::setApplicationName(nx::branding::desktopClientInternalName());
+    QApplication::setApplicationDisplayName(nx::branding::desktopClientDisplayName());
+
+    QString applicationVersion = nx::build_info::vmsVersion();
+    if (!nx::build_info::usedMetaVersion().isEmpty())
+        applicationVersion += " " + nx::build_info::usedMetaVersion();
+
+    QApplication::setApplicationVersion(applicationVersion);
+    QApplication::setStartDragDistance(kStarDragDistance);
+
+    // We don't want changes in desktop color settings to clash with our custom style.
+    QApplication::setDesktopSettingsAware(false);
+    QApplication::setQuitOnLastWindowClosed(true);
+}
 
 void sendCloudPortalConfirmation(const nx::vms::utils::SystemUri& uri, QObject* owner)
 {
@@ -175,7 +197,11 @@ namespace nx::vms::client::desktop {
 
 int runApplicationInternal(QApplication* application, const QnStartupParameters& startupParams)
 {
-    auto applicationContext = std::make_unique<ApplicationContext>();
+    ApplicationContext::Mode applicationMode = startupParams.selfUpdateMode
+        ? ApplicationContext::Mode::selfUpdate
+        : ApplicationContext::Mode::desktopClient;
+
+    auto applicationContext = std::make_unique<ApplicationContext>(applicationMode, startupParams);
 
     // TODO: #sivanov Move QnClientModule contents to Application Context.
     QnClientModule client(startupParams);
@@ -263,10 +289,9 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
 
     auto geometryManager = std::make_unique<WindowGeometryManager>(
         std::make_unique<WindowController>(mainWindow.get()));
-    client.clientStateHandler()->registerDelegate(kWindowGeometryData, std::move(geometryManager));
-    client.clientStateHandler()->setStatisticsModules(
-        workbenchContext->commonModule()->instance<QnStatisticsManager>(),
-        workbenchContext->instance<QnSessionRestoreStatisticsModule>());
+    applicationContext->clientStateHandler()->registerDelegate(
+        kWindowGeometryData,
+        std::move(geometryManager));
 
     // We must handle all 'WindowScreenChange' events _before_ we move window.
     qApp->processEvents();
@@ -294,7 +319,7 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
     }
     else
     {
-        client.clientStateHandler()->clientStarted(
+        applicationContext->clientStateHandler()->clientStarted(
             StartupParameters::fromCommandLineParams(startupParams));
     }
 
@@ -328,7 +353,7 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
 
     int result = application->exec();
 
-    client.clientStateHandler()->unregisterDelegate(kWindowGeometryData);
+    applicationContext->clientStateHandler()->unregisterDelegate(kWindowGeometryData);
 
     /* Write out settings. */
     qnSettings->setAudioVolume(nx::audio::AudioDevice::instance()->volume());
@@ -391,6 +416,7 @@ int runApplication(int argc, char** argv)
     QtWebEngine::initialize();
 
     auto application = std::make_unique<QApplication>(argc, argv);
+    initApplication();
 
     // Initialize speech synthesis.
     const QString applicationDirPath = QCoreApplication::applicationDirPath();

@@ -2,43 +2,42 @@
 
 #include "avi_archive_delegate.h"
 
-#include <QtCore/QSharedPointer>
-#include <QtCore/QDataStream>
-
 #include <chrono>
 #include <stdint.h>
 
-#include <utils/media/ffmpeg_helper.h>
-#include <utils/media/av_codec_helper.h>
-#include <utils/media/h263_utils.h>
-#include <utils/common/util.h>
-#include <nx/utils/log/log.h>
-#include <nx/fusion/model_functions.h>
-
-#include <core/resource/storage_plugin_factory.h>
-#include <core/resource/resource_media_layout.h>
-#include <core/resource/storage_resource.h>
-#include <core/resource/media_resource.h>
-#include <nx/streaming/video_data_packet.h>
-#include <nx/streaming/av_codec_media_context.h>
-#include <nx/streaming/config.h>
-
-#include <core/resource/avi/avi_resource.h>
-#include <core/storage/file_storage/layout_storage_resource.h>
-
-#include <motion/light_motion_archive_connection.h>
-#include <export/sign_helper.h>
-#include <utils/media/nalUnits.h>
-#include <recording/helpers/recording_context_helpers.h>
+#include <QtCore/QDataStream>
+#include <QtCore/QSharedPointer>
 
 #include <analytics/common/object_metadata.h>
 #include <analytics/common/object_metadata_v0.h>
+#include <core/resource/avi/avi_resource.h>
+#include <core/resource/media_resource.h>
+#include <core/resource/resource_media_layout.h>
+#include <core/resource/storage_plugin_factory.h>
+#include <core/resource/storage_resource.h>
+#include <core/storage/file_storage/layout_storage_resource.h>
+#include <export/sign_helper.h>
+#include <motion/light_motion_archive_connection.h>
+#include <nx/fusion/model_functions.h>
+#include <nx/streaming/av_codec_media_context.h>
+#include <nx/streaming/config.h>
+#include <nx/streaming/video_data_packet.h>
+#include <nx/utils/log/log.h>
+#include <nx/vms/common/application_context.h>
+#include <recording/helpers/recording_context_helpers.h>
+#include <utils/common/util.h>
+#include <utils/media/av_codec_helper.h>
+#include <utils/media/ffmpeg_helper.h>
+#include <utils/media/h263_utils.h>
+#include <utils/media/nalUnits.h>
 
 extern "C" {
 
 #include <libavformat/avformat.h>
 
 } // extern "C"
+
+using namespace nx::vms::common;
 
 namespace {
 
@@ -401,14 +400,8 @@ bool QnAviArchiveDelegate::checkStorage()
     if (m_storage)
         return true;
 
-    auto storageFactoryInterface = dynamic_cast<nx::vms::common::StorageFactoryInterface*>(
-        m_resource.data());
-
-    if (!NX_ASSERT(storageFactoryInterface))
-        return false;
-
     m_storage = QnStorageResourcePtr(
-        storageFactoryInterface->storageFactory()->createStorage(m_resource->getUrl()));
+        appContext()->storagePluginFactory()->createStorage(m_resource->getUrl()));
 
     auto aviResource = m_resource.dynamicCast<QnAviResource>();
     if (aviResource)

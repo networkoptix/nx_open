@@ -11,16 +11,17 @@ namespace nx::vms::client::desktop {
 
 using namespace nx::vms::api;
 
-ServerRuntimeEventConnector::ServerRuntimeEventConnector(
-    QnCommonMessageProcessor* messageProcessor)
+void ServerRuntimeEventConnector::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)
 {
-    connect(
-        messageProcessor,
-        &QnCommonMessageProcessor::serverRuntimeEventOccurred,
-        this,
-        &ServerRuntimeEventConnector::at_serverRuntimeEventOccurred);
+    if (messageProcessor)
+    {
+        connect(
+            messageProcessor,
+            &QnCommonMessageProcessor::serverRuntimeEventOccurred,
+            this,
+            &ServerRuntimeEventConnector::at_serverRuntimeEventOccurred);
+    }
 }
-
 
 void ServerRuntimeEventConnector::at_serverRuntimeEventOccurred(
     const ServerRuntimeEventData& eventData)

@@ -11,10 +11,10 @@
 #include <QtQuick/QQuickWindow>
 #include <QtWidgets/QWidget>
 
-#include <client/client_module.h>
 #include <common/common_module.h>
 #include <nx/utils/log/format.h>
 #include <nx/utils/singleton.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
@@ -125,13 +125,13 @@ AdvancedSearchDialog::AdvancedSearchDialog(QWidget* parent) :
 
 void AdvancedSearchDialog::registerStateDelegate()
 {
-    qnClientModule->clientStateHandler()->registerDelegate(
+    appContext()->clientStateHandler()->registerDelegate(
         kAdvancedSearchDialogKey, std::make_unique<StateDelegate>());
 }
 
 void AdvancedSearchDialog::unregisterStateDelegate()
 {
-    qnClientModule->clientStateHandler()->unregisterDelegate(kAdvancedSearchDialogKey);
+    appContext()->clientStateHandler()->unregisterDelegate(kAdvancedSearchDialogKey);
 }
 
 QScreen* AdvancedSearchDialog::defaultScreen() const

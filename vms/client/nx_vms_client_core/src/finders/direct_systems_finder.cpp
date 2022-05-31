@@ -2,7 +2,6 @@
 
 #include "direct_systems_finder.h"
 
-#include <common/common_module.h>
 #include <network/local_system_description.h>
 #include <network/system_helpers.h>
 #include <nx/network/address_resolver.h>
@@ -11,9 +10,12 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
+#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/discovery/manager.h>
 
 #include "search_address_manager.h"
+
+using namespace nx::vms::client::core;
 
 namespace {
 
@@ -38,7 +40,7 @@ QnDirectSystemsFinder::QnDirectSystemsFinder(
     base_type(parent),
     m_searchAddressManager(searchAddressManager)
 {
-    const auto moduleManager = commonModule()->moduleDiscoveryManager();
+    const auto moduleManager = appContext()->moduleDiscoveryManager();
     NX_ASSERT(moduleManager, "Module finder does not exist");
     if (!moduleManager)
         return;

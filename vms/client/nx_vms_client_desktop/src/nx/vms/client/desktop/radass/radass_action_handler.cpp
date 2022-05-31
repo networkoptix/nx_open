@@ -8,9 +8,9 @@
 
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
-#include <client/client_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/radass/radass_support.h>
@@ -58,7 +58,7 @@ RadassActionHandler::RadassActionHandler(QObject* parent):
     QnWorkbenchContextAware(parent),
     d(new Private)
 {
-    d->controller = qnClientModule->radassController();
+    d->controller = appContext()->radassController();
     // Manager must be available from actions factory.
     d->manager = context()->instance<RadassResourceManager>();
     d->manager->setCacheDirectory(getCacheDirectory());

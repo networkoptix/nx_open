@@ -3,22 +3,22 @@
 #pragma once
 
 #include <client/client_globals.h>
-#include <common/common_module_aware.h>
 #include <core/resource/resource_fwd.h>
-#include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <utils/common/functional.h>
 
 class NX_VMS_CLIENT_DESKTOP_API QnResourceRuntimeDataManager:
     public QObject,
-    public Singleton<QnResourceRuntimeDataManager>,
-    public QnCommonModuleAware
+    public nx::vms::client::desktop::SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;
 public:
-    QnResourceRuntimeDataManager(QnCommonModule* commonModule, QObject* parent = nullptr);
+    QnResourceRuntimeDataManager(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        QObject* parent = nullptr);
 
     QVariant resourceData(const QnResourcePtr& resource, Qn::ItemDataRole role) const;
     void setResourceData(const QnResourcePtr& resource, Qn::ItemDataRole role, const QVariant& data);
@@ -49,5 +49,3 @@ private:
     using DataHash = QHash<Qn::ItemDataRole, QVariant>;
     QHash<QnUuid, DataHash> m_data;
 };
-
-#define qnResourceRuntimeDataManager QnResourceRuntimeDataManager::instance()

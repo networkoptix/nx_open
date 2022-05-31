@@ -8,7 +8,9 @@
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/resources/resource_descriptor.h>
+
+using namespace nx::vms::client::desktop;
 
 QnWorkbenchLayoutWatcher::QnWorkbenchLayoutWatcher(QObject *parent):
     QObject(parent),
@@ -37,24 +39,25 @@ void QnWorkbenchLayoutWatcher::at_resourcePool_resourceAdded(const QnResourcePtr
     if (!layout)
         return;
 
-    for (QnLayoutItemData data : layout->getItems())
+    for (QnLayoutItemData data: layout->getItems())
     {
-        QnResourcePtr resource = resourcePool()->getResourceByDescriptor(data.resource);
+        if (isCrossSystemResource(data.resource))
+            continue;
+
+        QnResourcePtr resource = getResourceByDescriptor(data.resource);
 
         if (!resource
             && !data.resource.path.isEmpty()
             && QFileInfo::exists(data.resource.path))
         {
             /* Try to load local resource. */
-            resource = QnResourcePtr(
-                new QnAviResource(data.resource.path, commonModule()->storagePluginFactory()));
+            resource = QnResourcePtr(new QnAviResource(data.resource.path));
             resourcePool()->addResource(resource);
         }
 
         if (resource)
         {
-            data.resource.id = resource->getId();
-            data.resource.path = nx::vms::client::desktop::layout::resourcePath(resource);
+            data.resource = descriptor(resource);
             layout->updateItem(data);
         }
         else

@@ -10,7 +10,6 @@
 #include <QtGui/QDesktopServices>
 
 #include <client/client_globals.h>
-#include <client/client_module.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
 #include <client/client_show_once_settings.h>
@@ -22,6 +21,7 @@
 #include <nx/utils/log/log_main.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator_button.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
@@ -162,7 +162,7 @@ void QnAdvancedSettingsWidget::applyChanges()
         const auto checkInstances =
             [this]
             {
-                return qnClientModule->sharedMemoryManager()->runningInstancesIndices().size() > 1;
+                return appContext()->sharedMemoryManager()->runningInstancesIndices().size() > 1;
             };
 
         const bool connected = checkConnection();
@@ -209,7 +209,7 @@ void QnAdvancedSettingsWidget::applyChanges()
                     okButton->showIndicator();
 
                     // Stop other clients.
-                    qnClientModule->sharedMemoryManager()->requestToExit();
+                    appContext()->sharedMemoryManager()->requestToExit();
 
                     // Disconnect.
                     menu()->trigger(ui::action::DisconnectAction);

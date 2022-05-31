@@ -16,6 +16,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/core/layout/layout_file_info.h>
 #include <nx/utils/qset.h>
+#include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
 
 namespace nx::vms::client::desktop {
@@ -30,7 +31,7 @@ void UpdateFileLayoutHelper::startUpdateLayout(const QnFileLayoutResourcePtr& so
     NX_ASSERT(QCoreApplication::instance()->thread() == thread(),
         "Must be called from the main thread");
 
-    const auto resources = sourceLayout->layoutResources();
+    const auto resources = layoutResources(sourceLayout);
     sourceLayout->setItems(QnLayoutItemDataList());
     for (const auto& resource: resources)
     {
@@ -169,14 +170,12 @@ QnResourcePtr ResourceDirectoryBrowser::createArchiveResource(
 
     if (FileTypeSupport::isMovieFileExt(path))
     {
-        return QnResourcePtr(
-            new QnAviResource(path, qnClientCoreModule->commonModule()->storagePluginFactory()));
+        return QnResourcePtr(new QnAviResource(path));
     }
 
     if (FileTypeSupport::isImageFileExt(path))
     {
-        QnResourcePtr res = QnResourcePtr(
-            new QnAviResource(path, qnClientCoreModule->commonModule()->storagePluginFactory()));
+        QnResourcePtr res(new QnAviResource(path));
         res->addFlags(Qn::still_image);
         res->removeFlags(Qn::video | Qn::audio);
         return res;
@@ -328,8 +327,7 @@ void LocalResourceProducer::updateVideoFileResource(const QString& path)
         if (QThread::currentThread()->isInterruptionRequested())
             return;
 
-        auto updatedAviResource = QnResourcePtr(
-            new QnAviResource(path, qnClientCoreModule->commonModule()->storagePluginFactory()));
+        QnResourcePtr updatedAviResource(new QnAviResource(path));
         resourcePool->addResource(updatedAviResource);
     }
 }

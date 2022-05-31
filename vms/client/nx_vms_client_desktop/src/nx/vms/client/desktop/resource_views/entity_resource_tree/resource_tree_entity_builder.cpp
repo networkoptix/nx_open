@@ -31,6 +31,7 @@
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/entity/showreels_list_entity.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/entity/videowall_matrices_entity.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/entity/videowall_screens_entity.h>
+#include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/cloud_cross_system_camera_decorator.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/health_monitor_resource_item_decorator.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/main_tree_resource_item_decorator.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item_order/resource_tree_item_order.h>
@@ -39,14 +40,17 @@
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/resource_tree_item_key_source_pool.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_item_factory.h>
+#include <nx/vms/client/desktop/resources/resource_descriptor.h>
+
+using namespace nx::vms::client::desktop;
 
 namespace {
 
-using namespace nx::vms::client::desktop::entity_item_model;
-using namespace nx::vms::client::desktop::entity_resource_tree;
+using namespace entity_item_model;
+using namespace entity_resource_tree;
 using namespace nx::vms::api;
 
-using NodeType = nx::vms::client::desktop::ResourceTree::NodeType;
+using NodeType = ResourceTree::NodeType;
 using ResourceItemCreator = std::function<AbstractItemPtr(const QnResourcePtr&)>;
 
 using UserdDefinedGroupIdGetter = std::function<QString(const QnResourcePtr&, int)>;
@@ -126,10 +130,9 @@ LayoutItemCreator layoutItemCreator(
     return
         [factory, permissions, layout](const QnUuid& itemId) -> AbstractItemPtr
         {
-            const auto resourcePool = layout->resourcePool();
             const auto itemData = layout->getItem(itemId);
 
-            const auto itemResource = resourcePool->getResourceById(itemData.resource.id);
+            const auto itemResource = getResourceByDescriptor(itemData.resource);
             if (!itemResource)
                 return AbstractItemPtr();
 
@@ -867,12 +870,13 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createCloudSystemCamerasEntity(
     const QString& systemId) const
 {
     auto itemCreator =
-        [this](const QString& camera)
+        [this](const QnResourcePtr& camera)
         {
-            return m_itemFactory->createCloudCameraItem(camera);
+            return std::make_unique<CloudCrossSystemCameraDecorator>(
+                m_itemFactory->createResourceItem(camera));
         };
 
-    auto list = makeKeyList<QString>(itemCreator, serverResourcesOrder());
+    auto list = makeKeyList<QnResourcePtr>(itemCreator, numericOrder());
     list->installItemSource(m_itemKeySourcePool->cloudSystemCamerasSource(systemId));
 
     return list;

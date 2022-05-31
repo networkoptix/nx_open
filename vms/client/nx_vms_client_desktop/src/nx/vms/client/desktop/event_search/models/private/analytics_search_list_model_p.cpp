@@ -1200,8 +1200,7 @@ QString AnalyticsSearchListModel::Private::description(
 
 
     // TODO: #sivanov Actualize used system context.
-    const auto timeWatcher = ApplicationContext::instance()->currentSystemContext()
-        ->serverTimeWatcher();
+    const auto timeWatcher = appContext()->currentSystemContext()->serverTimeWatcher();
     const auto start = timeWatcher->displayTime(startTime(track).count());
     const auto duration = objectDuration(track);
 

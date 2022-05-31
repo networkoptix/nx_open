@@ -2,19 +2,18 @@
 
 #include "motion_search_synchronizer.h"
 
-#include <client/client_module.h>
 #include <core/resource/camera_resource.h>
-#include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/workbench/workbench.h>
-#include <ui/workbench/workbench_display.h>
-
 #include <nx/utils/log/assert.h>
-#include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/desktop/event_search/models/simple_motion_search_list_model.h>
+#include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/utils/video_cache.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_display.h>
 
 using nx::vms::client::core::MotionSelection;
 
@@ -114,17 +113,17 @@ void MotionSearchSynchronizer::updateAreaSelection()
 
 void MotionSearchSynchronizer::updateCachedDevices()
 {
-    if (auto cache = qnClientModule->videoCache())
+    std::map<SystemContext*, QnUuidSet> cachedDevicesByContext;
+    if (active() && m_commonSetup)
     {
-        QnUuidSet cachedDevices;
-        if (active() && m_commonSetup)
+        for (const auto& camera: m_commonSetup->selectedCameras())
         {
-            for (const auto& camera: m_commonSetup->selectedCameras())
-                cachedDevices.insert(camera->getId());
+            auto systemContext = SystemContext::fromResource(camera);
+            cachedDevicesByContext[systemContext].insert(camera->getId());
         }
-
-        cache->setCachedDevices(intptr_t(this), cachedDevices);
     }
+    for (const auto& [systemContext, cachedDevices]: cachedDevicesByContext)
+        systemContext->videoCache()->setCachedDevices(intptr_t(this), cachedDevices);
 }
 
 bool MotionSearchSynchronizer::isMediaAccepted(QnMediaResourceWidget* widget) const

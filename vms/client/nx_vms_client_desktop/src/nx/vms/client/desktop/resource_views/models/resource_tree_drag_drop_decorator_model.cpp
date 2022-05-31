@@ -194,7 +194,7 @@ QMimeData* ResourceTreeDragDropDecoratorModel::mimeData(const QModelIndexList& i
         }
     }
 
-    MimeData data(baseMimeData.get(), resourcePool());
+    MimeData data(baseMimeData.get());
     data.setEntities(entities.values());
     data.setResources(resources.values());
     data.setArguments(arguments);
@@ -223,7 +223,7 @@ bool ResourceTreeDragDropDecoratorModel::canDropMimeData(const QMimeData* mimeDa
         return sourceModel()->canDropMimeData(mimeData, action, row, column, parent);
 
     // Check if the drop is targeted for the scene.
-    MimeData data(mimeData, resourcePool());
+    MimeData data(mimeData);
     if (data.arguments().contains(Qn::ItemTimeRole))
         return false;
 
@@ -256,7 +256,7 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
         return false;
 
     // Resource tree drop is working only for resources that are already in the pool.
-    MimeData data(mimeData, resourcePool());
+    MimeData data(mimeData);
     resourcePool()->addNewResources(data.resources());
 
     const auto index = targetDropIndex(parent);

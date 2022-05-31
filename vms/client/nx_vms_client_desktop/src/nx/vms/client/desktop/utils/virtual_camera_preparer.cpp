@@ -1,14 +1,11 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "virtual_camera_preparer.h"
-#include "server_request_storage.h"
-#include "virtual_camera_payload.h"
 
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 
 #include <api/server_rest_connection.h>
-#include <common/common_module.h>
 #include <core/resource/avi/avi_archive_delegate.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_resource.h>
@@ -17,6 +14,9 @@
 #include <nx/utils/guarded_callback.h>
 #include <recording/time_period_list.h>
 #include <utils/common/synctime.h>
+
+#include "server_request_storage.h"
+#include "virtual_camera_payload.h"
 
 namespace nx::vms::client::desktop {
 
@@ -68,7 +68,6 @@ struct VirtualCameraPreparer::Private
 
 VirtualCameraPreparer::VirtualCameraPreparer(const QnSecurityCamResourcePtr& camera, QObject* parent):
     base_type(parent),
-    QnCommonModuleAware(parent),
     d(new Private(camera))
 {
     connect(this, &VirtualCameraPreparer::finishedLater, this,
@@ -140,8 +139,7 @@ void VirtualCameraPreparer::checkLocally(VirtualCameraPayload& payload)
         return;
     }
 
-    QnAviResourcePtr resource(
-        new QnAviResource(payload.path, commonModule()->storagePluginFactory()));
+    QnAviResourcePtr resource(new QnAviResource(payload.path));
     QnAviArchiveDelegatePtr delegate(resource->createArchiveDelegate());
     bool opened = delegate->open(resource);
     if (!opened || !delegate->hasVideo() || resource->hasFlags(Qn::still_image))

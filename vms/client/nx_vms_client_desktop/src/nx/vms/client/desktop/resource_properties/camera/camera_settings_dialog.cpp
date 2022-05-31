@@ -18,13 +18,15 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
+#include <nx/utils/qset.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
 #include <nx/vms/client/desktop/thumbnails/live_camera_thumbnail.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/license/usage_helper.h>
-#include <nx/utils/qset.h>
 #include <ui/common/read_only.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/help/help_topic_accessor.h>
@@ -107,7 +109,7 @@ struct CameraSettingsDialog::Private: public QObject
         advancedParametersManifestManager.reset(new CameraAdvancedParametersManifestManager());
         advancedParametersManifestWatcher.reset(new CameraSettingsAdvancedManifestWatcher(
             advancedParametersManifestManager.get(),
-            qnClientModule->serverRuntimeEventConnector(),
+            appContext()->currentSystemContext()->serverRuntimeEventConnector(),
             store));
 
         advancedSettingsWidget = new CameraAdvancedParamsWidget(store, q->ui->tabWidget);

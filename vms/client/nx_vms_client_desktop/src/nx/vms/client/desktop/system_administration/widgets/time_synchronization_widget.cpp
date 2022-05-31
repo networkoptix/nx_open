@@ -178,7 +178,7 @@ void TimeSynchronizationWidget::loadDataToUi()
         globalSettings()->primaryTimeServer(),
         servers);
 
-    m_store->setBaseTime(milliseconds(qnSyncTime->currentMSecsSinceEpoch()));
+    m_store->setBaseTime(qnSyncTime->value());
 
     const auto& state = m_store->state();
     if (state.status ==  State::Status::synchronizedWithSelectedServer)

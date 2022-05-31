@@ -2,8 +2,9 @@
 
 #include "workbench_bookmark_tags_watcher.h"
 
-#include <api/helpers/bookmark_request_data.h>
+#include <QtCore/QTimer>
 
+#include <api/helpers/bookmark_request_data.h>
 #include <camera/camera_bookmarks_manager.h>
 #include <client/client_message_processor.h>
 #include <client/client_module.h>
@@ -12,8 +13,9 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/network/network_module.h>
+#include <nx/vms/client/desktop/system_context.h>
 
-#include <QtCore/QTimer>
+using namespace nx::vms::client::desktop;
 
 QnWorkbenchBookmarkTagsWatcher::QnWorkbenchBookmarkTagsWatcher(QObject *parent)
     : QObject(parent)
@@ -43,7 +45,9 @@ void QnWorkbenchBookmarkTagsWatcher::refresh() {
     QnGetBookmarkTagsRequestData requestData(TagsLimit);
     requestData.format = Qn::SerializationFormat::UbjsonFormat;
 
-    auto bookmarkManager = commonModule()->instance<QnCameraBookmarksManager>();
+    // FIXME: #sivanov Move watcher itself to the System Context.
+    auto systemContext = SystemContext::fromResource(currentServer());
+    auto bookmarkManager = systemContext->cameraBookmarksManager();
     bookmarkManager->getBookmarkTagsAsync(TagsLimit,
         [this](bool success, int /*handle*/, const QnCameraBookmarkTagList &tags)
         {

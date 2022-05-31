@@ -13,6 +13,7 @@
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/network/network_module.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
@@ -315,7 +316,7 @@ void ExportStorageStreamRecorder::addRecordingContext(
 bool ExportStorageStreamRecorder::addRecordingContext(const QString& fileName)
 {
     const auto storage = QnStorageResourcePtr(
-        qnClientCoreModule->commonModule()->storagePluginFactory()->createStorage(fileName));
+        appContext()->storagePluginFactory()->createStorage(fileName));
 
     if (!storage)
         return false;

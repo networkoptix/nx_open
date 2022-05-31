@@ -16,9 +16,9 @@
 #include <core/resource/resource_property_key.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <nx/utils/scoped_connections.h>
-#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
+#include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -361,7 +361,7 @@ void ResourceStatusHelper::Private::executeAction(ActionType type)
     {
         case ActionType::diagnostics:
         {
-            ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
+            statisticsModule()->controls()->registerClick(
                 "resource_status_overlay_diagnostics");
             if (NX_ASSERT(m_camera))
                 m_context->menu()->trigger(ui::action::CameraDiagnosticsAction, m_camera);
@@ -371,7 +371,7 @@ void ResourceStatusHelper::Private::executeAction(ActionType type)
 
         case ActionType::enableLicense:
         {
-            ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
+            statisticsModule()->controls()->registerClick(
                 "resource_status_overlay_enable_license");
             if (!NX_ASSERT(m_camera && m_licenseUsage == LicenseUsage::notUsed))
                 return;
@@ -387,7 +387,7 @@ void ResourceStatusHelper::Private::executeAction(ActionType type)
 
         case ActionType::moreLicenses:
         {
-            ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
+            statisticsModule()->controls()->registerClick(
                 "resource_status_overlay_more_licenses");
             m_context->menu()->trigger(ui::action::PreferencesLicensesTabAction);
             break;
@@ -395,7 +395,7 @@ void ResourceStatusHelper::Private::executeAction(ActionType type)
 
         case ActionType::settings:
         {
-            ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
+            statisticsModule()->controls()->registerClick(
                 "resource_status_overlay_settings");
             if (!NX_ASSERT(m_camera))
                 break;

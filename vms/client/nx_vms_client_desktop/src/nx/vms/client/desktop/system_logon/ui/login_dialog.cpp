@@ -18,8 +18,8 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection_factory.h>
-#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
+#include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
@@ -217,7 +217,7 @@ void LoginDialog::sendTestConnectionRequest(const nx::utils::Url& url)
         nx::network::http::PasswordAuthToken(url.password().toStdString()));
 
     std::shared_ptr<QnStatisticsScenarioGuard> connectScenario =
-        ApplicationContext::instance()->certificateStatisticsModule()->beginScenario(
+        statisticsModule()->certificates()->beginScenario(
             QnCertificateStatisticsModule::Scenario::connectFromDialog);
 
     auto callback = nx::utils::guarded(this,
@@ -359,7 +359,7 @@ void LoginDialog::at_testButton_clicked()
         return;
 
     auto connectScenario =
-        ApplicationContext::instance()->certificateStatisticsModule()->beginScenario(
+        statisticsModule()->certificates()->beginScenario(
             ConnectScenario::connectFromDialog);
 
     nx::vms::client::core::RemoteConnectionPtr requestedConnection;

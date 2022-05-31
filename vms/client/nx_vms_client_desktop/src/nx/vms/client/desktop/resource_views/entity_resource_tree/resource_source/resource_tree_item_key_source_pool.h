@@ -143,9 +143,9 @@ public:
     UniqueStringSourcePtr cloudSystemsSource();
 
     /**
-     * Provides ids of cameras of the cloud system.
+     * Provides cameras of the cloud system.
      */
-    UniqueStringSourcePtr cloudSystemCamerasSource(const QString& systemId);
+    UniqueResourceSourcePtr cloudSystemCamerasSource(const QString& systemId);
 
     /**
      * Provides user roles IDs stored in user roles manager.

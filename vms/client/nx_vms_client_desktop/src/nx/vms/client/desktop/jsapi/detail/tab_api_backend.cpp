@@ -5,13 +5,15 @@
 #include <QtCore/QCoreApplication>
 
 #include <core/resource/layout_resource.h>
+#include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
-#include <core/resource/resource.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -24,7 +26,6 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/delayed.h>
-#include <nx/vms/client/desktop/window_context.h>
 
 #include "resources_structures.h"
 
@@ -195,7 +196,14 @@ void TabApiBackend::Private::updateLayoutItemData(
     const QUuid& itemId,
     const ItemParams& params)
 {
-    const auto manager = qnResourceRuntimeDataManager;
+    if (!layout)
+        return;
+
+    auto currentLayout = layout->resource();
+    if (!currentLayout)
+        return;
+
+    const auto manager = SystemContext::fromResource(currentLayout)->resourceRuntimeDataManager();
 
     // We always skip focuse state for newly added items to preserve selection on layout.
     manager->setLayoutItemData(itemId, Qn::ItemSkipFocusOnAdditionRole, true);
@@ -384,11 +392,13 @@ std::optional<MediaParams> TabApiBackend::Private::itemMediaParams(QnWorkbenchIt
         };
 
     const auto tryFillFromItemData =
-        [&result](const QnUuid& itemId)
+        [this, &result](const QnUuid& itemId)
         {
-            const auto selectionValue = qnResourceRuntimeDataManager->layoutItemData(
+            auto manager = SystemContext::fromResource(layout->resource())
+                ->resourceRuntimeDataManager();
+            const auto selectionValue = manager->layoutItemData(
                 itemId, Qn::ItemSliderSelectionRole);
-            const auto windowValue = qnResourceRuntimeDataManager->layoutItemData(
+            const auto windowValue = manager->layoutItemData(
                 itemId, Qn::ItemSliderWindowRole);
             if (!selectionValue.isValid() || !windowValue.isValid())
                 return false; //< We suppose these values should be set simultaniously.
@@ -691,7 +701,7 @@ ItemResult TabApiBackend::addItem(
             Error::failed(tr("Cannot add the resource to the layout")));
     }
 
-    QnLayoutItemData itemData = layout::itemFromResource(resource);
+    QnLayoutItemData itemData = layoutItemFromResource(resource);
     itemData.flags = Qn::PendingGeometryAdjustment;
 
     const auto itemId = itemData.uuid.toQUuid();

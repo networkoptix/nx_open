@@ -2,8 +2,6 @@
 
 #include "workbench_access_controller.h"
 
-#include <cassert>
-
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
 #include <core/resource/avi/avi_resource.h>
@@ -18,8 +16,10 @@
 #include <core/resource_management/resource_runtime_data.h>
 #include <nx/streaming/abstract_archive_resource.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
-#include <nx/vms/common/system_context.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <utils/common/checked_cast.h>
+
+using namespace nx::vms::client::desktop;
 
 QnWorkbenchPermissionsNotifier::QnWorkbenchPermissionsNotifier(QObject* parent) :
     QObject(parent)
@@ -27,11 +27,11 @@ QnWorkbenchPermissionsNotifier::QnWorkbenchPermissionsNotifier(QObject* parent) 
 }
 
 QnWorkbenchAccessController::QnWorkbenchAccessController(
-    nx::vms::common::SystemContext* systemContext,
+    SystemContext* systemContext,
     QObject* parent)
     :
     base_type(parent),
-    nx::vms::common::SystemContextAware(systemContext),
+    SystemContextAware(systemContext),
     m_user()
 {
     connect(resourcePool(), &QnResourcePool::resourceAdded, this,

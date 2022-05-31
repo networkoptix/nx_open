@@ -412,7 +412,7 @@ bool QnBusinessRuleWidget::eventFilter(QObject *object, QEvent *event)
     {
         QDragEnterEvent* de = static_cast<QDragEnterEvent*>(event);
 
-        m_mimeData.reset(new MimeData{de->mimeData(), resourcePool()});
+        m_mimeData.reset(new MimeData{de->mimeData()});
         if (!m_mimeData->resources().empty())
             de->acceptProposedAction();
         return true;

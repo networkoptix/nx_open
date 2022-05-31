@@ -11,7 +11,6 @@
 #include <client_core/client_core_module.h>
 #include <client_core/client_core_settings.h>
 #include <client/client_message_processor.h>
-#include <client/client_module.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
 #include <client/desktop_client_message_processor.h>
@@ -60,6 +59,7 @@
 #include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
+#include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/connection_delegate_helper.h>
@@ -532,7 +532,7 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
                     [this]()
                     {
                         if (context()->user())
-                            qnClientModule->clientStateHandler()->clientDisconnected();
+                            appContext()->clientStateHandler()->clientDisconnected();
 
                         disconnectFromServer(DisconnectFlag::Force);
                         if (!qnRuntime->isDesktopMode())
@@ -599,14 +599,14 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
         Qt::QueuedConnection);
 
     qnClientCoreModule->networkModule()->setSession(session);
-    ApplicationContext::instance()->currentSystemContext()->setSession(session);
+    appContext()->currentSystemContext()->setSession(session);
 
     const QString userName = QString::fromStdString(connection->credentials().username);
 
     context()->setUserName(userName);
 
     // TODO: #sivanov Implement separate address and credentials handling.
-    qnClientModule->clientStateHandler()->clientConnected(
+    appContext()->clientStateHandler()->clientConnected(
         qnSettings->restoreUserSessionData(),
         session->sessionId(),
         connection->createLogonData());
@@ -959,8 +959,7 @@ void ConnectActionsHandler::at_connectToCloudSystemAction_triggered()
         return;
 
     std::shared_ptr<QnStatisticsScenarioGuard> connectScenario = connectData.connectScenario
-        ? ApplicationContext::instance()->certificateStatisticsModule()->beginScenario(
-            *connectData.connectScenario)
+        ? statisticsModule()->certificates()->beginScenario(*connectData.connectScenario)
         : nullptr;
 
     auto callback = d->makeSingleConnectionCallback(
@@ -1044,7 +1043,7 @@ void ConnectActionsHandler::at_disconnectAction_triggered()
     NX_DEBUG(this, "Disconnecting from the server");
     const bool wasLoggedIn = (bool) context()->user();
     if (disconnectFromServer(flags) && wasLoggedIn)
-        qnClientModule->clientStateHandler()->clientDisconnected();
+        appContext()->clientStateHandler()->clientDisconnected();
 
     mainWindow()->welcomeScreen()->dropConnectingState();
 }
@@ -1066,7 +1065,7 @@ void ConnectActionsHandler::at_selectCurrentServerAction_triggered()
     if (!NX_ASSERT(serverId != currentConnection->moduleInformation().id, "Checked in the action conditions"))
         return;
 
-    const auto discoveryManager = commonModule()->moduleDiscoveryManager();
+    const auto discoveryManager = appContext()->moduleDiscoveryManager();
     const auto endpoint = discoveryManager->getEndpoint(serverId);
     if (!NX_ASSERT(endpoint, "Checked in the action conditions"))
     {
@@ -1097,7 +1096,7 @@ void ConnectActionsHandler::at_selectCurrentServerAction_triggered()
     d->switchServerDialog->setDisplayedServer(server);
 
     std::shared_ptr<QnStatisticsScenarioGuard> connectScenario =
-        ApplicationContext::instance()->certificateStatisticsModule()->beginScenario(
+        statisticsModule()->certificates()->beginScenario(
             ConnectScenario::connectFromTree);
 
     auto callback = d->makeSingleConnectionCallback(
@@ -1194,7 +1193,7 @@ void ConnectActionsHandler::clearConnection()
     hideReconnectDialog();
     d->currentConnectionProcess.reset();
     qnClientCoreModule->networkModule()->setSession({});
-    ApplicationContext::instance()->currentSystemContext()->setSession({});
+    appContext()->currentSystemContext()->setSession({});
 
     context()->setUserName(QString());
     context()->instance<QnWorkbenchStateManager>()->tryClose(/*force*/ true);
@@ -1247,8 +1246,7 @@ void ConnectActionsHandler::clearConnection()
 void ConnectActionsHandler::connectToServer(LogonData logonData, ConnectionOptions options)
 {
     std::shared_ptr<QnStatisticsScenarioGuard> connectScenario = logonData.connectScenario
-        ? ApplicationContext::instance()->certificateStatisticsModule()->beginScenario(
-            *logonData.connectScenario)
+        ? statisticsModule()->certificates()->beginScenario(*logonData.connectScenario)
         : nullptr;
 
     // Store username case-sensitive as it was entered (actual only for the digest auth method).

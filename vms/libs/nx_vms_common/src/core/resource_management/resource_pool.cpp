@@ -434,7 +434,7 @@ QnNetworkResourceList QnResourcePool::getAllNetResourceByHostAddress(
 }
 
 QnResourcePtr QnResourcePool::getResourceByDescriptor(
-    const QnLayoutItemResourceDescriptor& descriptor) const
+    const nx::vms::common::ResourceDescriptor& descriptor) const
 {
     if (!descriptor.id.isNull())
     {

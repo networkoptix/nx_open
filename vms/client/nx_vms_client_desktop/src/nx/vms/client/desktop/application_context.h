@@ -2,28 +2,60 @@
 
 #pragma once
 
-#include <QtCore/QObject>
-
 #include <nx/utils/impl_ptr.h>
+#include <nx/utils/uuid.h>
+#include <nx/vms/client/core/application_context.h>
 
-class QnCertificateStatisticsModule;
-class QnControlsStatisticsModule;
+class QnClientCoreModule;
+
+struct QnStartupParameters;
+
+namespace nx::vms::utils { class TranslationManager; }
 
 namespace nx::vms::client::desktop {
 
+class ClientStateHandler;
+class CloudCrossSystemManager;
+class ContextStatisticsModule;
+class ObjectDisplaySettings;
+class RadassController;
+class ResourceFactory;
+class RunningInstancesManager;
+class SharedMemoryManager;
 class SystemContext;
+class UploadManager;
 class WindowContext;
+
+namespace session {
+class SessionManager;
+class DefaultProcessInterface;
+} // namespace session
 
 /**
  * Main context of the desktop client application. Exists through all application lifetime and is
  * accessible from anywhere using `instance()` method.
  */
-class ApplicationContext: public QObject
+class NX_VMS_CLIENT_DESKTOP_API ApplicationContext: public core::ApplicationContext
 {
     Q_OBJECT
 
 public:
-    ApplicationContext(QObject* parent = nullptr);
+    enum class Mode
+    {
+        /** Generic Desktop Client mode. */
+        desktopClient,
+
+        /** Dekstop Client self-update mode (with admin permissions). */
+        selfUpdate,
+
+        /** Unit tests mode. */
+        unitTests,
+    };
+
+    ApplicationContext(
+        Mode mode,
+        const QnStartupParameters& startupParameters,
+        QObject* parent = nullptr);
     virtual ~ApplicationContext() override;
 
     /**
@@ -55,6 +87,11 @@ public:
     void removeSystemContext(SystemContext* systemContext);
 
     /**
+     * Find existing System Context by it's cloud system id.
+     */
+    SystemContext* systemContextByCloudSystemId(const QString& cloudSystemId) const;
+
+    /**
      * Main Window context.
      */
     WindowContext* mainWindowContext() const;
@@ -72,13 +109,55 @@ public:
      */
     void removeWindowContext(WindowContext* windowContext);
 
-    QnCertificateStatisticsModule* certificateStatisticsModule() const;
+    /**
+     * @return Id of the current peer in the Message Bus. It is persistent and is not changed
+     *     between the application runs. Desktop Client calculates actual peer id depending on the
+     *     stored persistent id and on the number of the running client instance, so different
+     *     Client windows have different peer ids.
+     */
+    QnUuid peerId() const;
 
-    QnControlsStatisticsModule* controlsStatisticsModule() const;
+    /**
+     * @return Id of the current Video Wall instance if the client was run in the Video Wall mode.
+     */
+    QnUuid videoWallInstanceId() const;
+
+    /**
+     * Temporary accessor until QnClientCoreModule contents is moved to the corresponding
+     * contexts.
+     */
+    QnClientCoreModule* clientCoreModule() const;
+
+    /**
+     * Central place for the initialization, storage and access to various statistics modules.
+     */
+    ContextStatisticsModule* statisticsModule() const;
+
+    /**
+     * Map of analytics objects colors by object type. Persistently stored on a PC.
+     */
+    ObjectDisplaySettings* objectDisplaySettings() const;
+
+    ClientStateHandler* clientStateHandler() const;
+    SharedMemoryManager* sharedMemoryManager() const;
+    RunningInstancesManager* runningInstancesManager() const;
+    session::SessionManager* sessionManager() const;
+
+    nx::vms::utils::TranslationManager* translationManager() const;
+
+    CloudCrossSystemManager* cloudCrossSystemManager() const;
+
+    RadassController* radassController() const;
+
+    ResourceFactory* resourceFactory() const;
+
+    UploadManager* uploadManager() const;
 
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
 };
+
+inline ApplicationContext* appContext() { return ApplicationContext::instance(); }
 
 } // namespace nx::vms::client::desktop

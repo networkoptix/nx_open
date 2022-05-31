@@ -192,9 +192,14 @@ public:
     QnVirtualCameraResourceList getAllCameras(
         const QnResourcePtr& server,  bool ignoreDesktopCameras = false) const;
 
+    /**
+     * All Servers in the System. Never returns fake servers.
+     */
     QnMediaServerResourceList servers() const;
 
-    // Never returns fake servers.
+    /**
+     * All Servers with given status in the System. Never returns fake servers.
+     */
     QnMediaServerResourceList getAllServers(nx::vms::api::ResourceStatus status) const;
 
     /** Find an online server with actual internet access. */
@@ -257,7 +262,8 @@ public:
      */
     QnResourceList getResourcesByLogicalId(int value) const;
 
-    QnResourcePtr getResourceByDescriptor(const QnLayoutItemResourceDescriptor& descriptor) const;
+    QnResourcePtr getResourceByDescriptor(
+        const nx::vms::common::ResourceDescriptor& descriptor) const;
 
     QnResourcePtr getResourceByUrl(
         const QString& url, const QnUuid& parentServerId = QnUuid()) const;

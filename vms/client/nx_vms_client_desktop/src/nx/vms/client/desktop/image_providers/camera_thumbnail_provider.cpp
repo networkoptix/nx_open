@@ -3,14 +3,13 @@
 #include "camera_thumbnail_provider.h"
 
 #include <api/server_rest_connection.h>
-#include <client/client_module.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/video_cache.h>
 
 namespace nx::vms::client::desktop {
@@ -117,7 +116,8 @@ bool CameraThumbnailProvider::tryLoad()
         return true;
     }
 
-    auto cache = qnClientModule->videoCache();
+    auto systemContext = SystemContext::fromResource(m_request.camera);
+    auto cache = systemContext->videoCache();
     if (!cache || nx::api::CameraImageRequest::isSpecialTimeValue(m_request.usecSinceEpoch))
         return false;
 

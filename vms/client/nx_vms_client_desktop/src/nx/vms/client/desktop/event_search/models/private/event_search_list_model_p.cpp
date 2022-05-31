@@ -268,8 +268,7 @@ rest::Handle EventSearchListModel::Private::requestPrefetch(const QnTimePeriod& 
             if (success)
             {
                 // Ignore events later than current system time.
-                truncate(data, currentRequest().direction,
-                    duration_cast<milliseconds>(qnSyncTime->currentTimePoint()));
+                truncate(data, currentRequest().direction, qnSyncTime->value());
 
                 m_prefetch = std::move(data);
                 if (!m_prefetch.empty())
@@ -375,8 +374,7 @@ void EventSearchListModel::Private::fetchLive()
                 return;
 
             // Ignore events later than current system time.
-            truncate(data, m_liveFetch.direction,
-                duration_cast<milliseconds>(qnSyncTime->currentTimePoint()));
+            truncate(data, m_liveFetch.direction, qnSyncTime->value());
 
             if (data.empty())
                 return;

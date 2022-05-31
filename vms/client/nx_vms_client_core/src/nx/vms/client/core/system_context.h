@@ -5,6 +5,7 @@
 #include <QtCore/QObject>
 
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/api/data/module_information.h>
 #include <nx/vms/common/system_context.h>
 
 #include "system_context_aware.h" //< Forward declarations.
@@ -13,9 +14,13 @@ class QQmlContext;
 
 namespace nx::vms::client::core {
 
-class NX_VMS_CLIENT_CORE_API SystemContext: public nx::vms::common::SystemContext
+class UserWatcher;
+class WatermarkWatcher;
+
+class NX_VMS_CLIENT_CORE_API SystemContext: public common::SystemContext
 {
     Q_OBJECT
+    using base_type = common::SystemContext;
 
 public:
     /**
@@ -34,9 +39,9 @@ public:
     void storeToQmlContext(QQmlContext* qmlContext);
 
     /**
-     * Actual remote session this Context belongs to. See ::setSession for the details.
+     * Information about the Server we are connected to.
      */
-    std::shared_ptr<RemoteSession> session() const;
+    nx::vms::api::ModuleInformation moduleInformation() const;
 
     /**
      * Update remote session this Context belongs to. Current client architecture supposes one main
@@ -45,6 +50,13 @@ public:
      * // TODO: #sivanov Invert architecture, so Remote Session will own the System Context.
      */
     void setSession(std::shared_ptr<RemoteSession> session);
+
+    /**
+     * Set connection which this Context should use to communicate with the corresponding System.
+     * Connection is mutually exclusive with ::setSession() and should be used for session-less
+     * Contexts only.
+     */
+    void setConnection(RemoteConnectionPtr connection);
 
     /**
      * Id of the server which was used to establish the Remote Session (if it is present).
@@ -56,23 +68,30 @@ public:
      */
     QnMediaServerResourcePtr currentServer() const;
 
+    /**
+     * Remote session this context belongs to (if any).
+     */
+    std::shared_ptr<RemoteSession> session() const;
+
+    /**
+     * Connection which this Context should use to communicate with the corresponding System.
+     */
     RemoteConnectionPtr connection() const;
-
-    //ec2::AbstractECConnectionPtr messageBusConnection() const;
-
-    ///** Address of the server we are currently connected to. */
-    //nx::network::SocketAddress connectionAddress() const;
-
-    ///** Credentials we are using to authorize the connection. */
-    //nx::network::http::Credentials connectionCredentials() const;
 
     /** API interface of the currently connected server. */
     rest::ServerConnectionPtr connectedServerApi() const;
+
+    UserWatcher* userWatcher() const;
+
+    WatermarkWatcher* watermarkWatcher() const;
 
     ServerTimeWatcher* serverTimeWatcher() const;
 
 signals:
     void remoteIdChanged(const QnUuid& id);
+
+protected:
+    virtual void setMessageProcessor(QnCommonMessageProcessor* messageProcessor) override;
 
 private:
     struct Private;

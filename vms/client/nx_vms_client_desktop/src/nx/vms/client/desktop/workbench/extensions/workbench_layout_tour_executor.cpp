@@ -4,12 +4,12 @@
 
 #include <QtCore/QTimerEvent>
 
-#include <client/client_module.h>
 #include <client/client_settings.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/layout_tour_item.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/data/layout_tour_data.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
@@ -70,7 +70,7 @@ void LayoutTourExecutor::startTour(const nx::vms::api::LayoutTourData& tour)
     if (!tour.settings.manual)
         startTimer();
 
-    qnClientModule->clientStateHandler()->storeSystemSpecificState();
+    appContext()->clientStateHandler()->storeSystemSpecificState();
 }
 
 void LayoutTourExecutor::updateTour(const nx::vms::api::LayoutTourData& tour)
@@ -105,7 +105,7 @@ void LayoutTourExecutor::stopTour(const QnUuid& id)
     if (m_mode == Mode::MultipleLayouts && m_tour.id == id)
     {
         stopCurrentTour();
-        qnClientModule->clientStateHandler()->storeSystemSpecificState();
+        appContext()->clientStateHandler()->storeSystemSpecificState();
     }
 }
 
@@ -208,7 +208,7 @@ void LayoutTourExecutor::resetTourItems(const nx::vms::api::LayoutTourItemDataLi
 
         QnLayoutResourcePtr layout = existingLayout
             ? existingLayout->clone(&remapHash)
-            : layout::layoutFromResource(existing);
+            : layoutFromResource(existing);
 
         NX_ASSERT(layout);
         if (!layout)

@@ -21,6 +21,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/utils/trace/trace.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
 #include <nx/vms/client/desktop/workbench/panels/special_layout_panel.h>
 #include <nx/vms/client/desktop/debug_utils/components/performance_info.h>
@@ -361,7 +362,7 @@ WorkbenchUi::WorkbenchUi(QObject *parent):
     connect(action(action::ShowTimeLineOnVideowallAction), &QAction::triggered,
         this, [this] { updateControlsVisibility(false); });
 
-    qnClientModule->clientStateHandler()->registerDelegate(
+    appContext()->clientStateHandler()->registerDelegate(
         kWorkbenchUiDataKey, std::make_unique<StateDelegate>(this));
     //TODO: #spanasenko Save state occasionally?
 
@@ -399,7 +400,7 @@ WorkbenchUi::~WorkbenchUi()
 {
     debugLabel = nullptr;
 
-    qnClientModule->clientStateHandler()->unregisterDelegate(kWorkbenchUiDataKey);
+    appContext()->clientStateHandler()->unregisterDelegate(kWorkbenchUiDataKey);
 
     /* The disconnect call is needed so that our methods don't get triggered while
      * the ui machinery is shutting down. */

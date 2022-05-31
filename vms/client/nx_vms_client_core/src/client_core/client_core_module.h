@@ -41,16 +41,7 @@ class NX_VMS_CLIENT_CORE_API QnClientCoreModule:
     using base_type = QObject;
 
 public:
-    enum class Mode
-    {
-        desktopClient,
-        mobileClient,
-        unitTests
-    };
-
-    QnClientCoreModule(
-        Mode mode,
-        nx::vms::client::core::SystemContext* systemContext);
+    QnClientCoreModule(nx::vms::client::core::SystemContext* systemContext);
     virtual ~QnClientCoreModule() override;
 
     using CertificateValidationLevel =
@@ -72,9 +63,7 @@ public:
     QnDataProviderFactory* dataProviderFactory() const;
     nx::vms::client::core::SessionTokenTerminator* sessionTokenTerminator() const;
 
-    QQmlEngine* mainQmlEngine();
-
-    QnCloudStatusWatcher* cloudStatusWatcher() const;
+    QQmlEngine* mainQmlEngine() const;
 
     nx::vms::rules::Engine* vmsRulesEngine() const;
 

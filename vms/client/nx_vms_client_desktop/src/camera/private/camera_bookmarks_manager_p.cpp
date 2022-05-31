@@ -14,9 +14,12 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/network/rest/params.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <utils/common/delayed.h>
 #include <utils/common/scoped_timer.h>
 #include <utils/common/synctime.h>
+
+using namespace nx::vms::client::desktop;
 
 namespace {
     /** Each query can be updated no more often than once in that period. */
@@ -147,10 +150,13 @@ QnCameraBookmarksManagerPrivate::PendingInfo::PendingInfo(const QnUuid &bookmark
 /************************************************************************/
 /* QnCameraBookmarksManagerPrivate                                      */
 /************************************************************************/
-QnCameraBookmarksManagerPrivate::QnCameraBookmarksManagerPrivate(QnCameraBookmarksManager *parent)
-    : base_type(parent)
-    , q_ptr(parent)
-    , m_operationsTimer(new QTimer(this))
+QnCameraBookmarksManagerPrivate::QnCameraBookmarksManagerPrivate(
+    SystemContext* systemContext,
+    QObject* parent)
+    :
+    base_type(parent),
+    SystemContextAware(systemContext),
+    m_operationsTimer(new QTimer(this))
 {
     /*
      Bookmarks updating strategy:
@@ -540,7 +546,7 @@ void QnCameraBookmarksManagerPrivate::updateQueryCache(
 
 QnCameraBookmarksQueryPtr QnCameraBookmarksManagerPrivate::createQuery(const QnCameraBookmarkSearchFilter& filter)
 {
-    QnCameraBookmarksQueryPtr query(new QnCameraBookmarksQuery(filter));
+    QnCameraBookmarksQueryPtr query(new QnCameraBookmarksQuery(systemContext(), filter));
     QUuid queryId = query->id();
     registerQuery(query);
 

@@ -3,7 +3,7 @@
 #include "buttons.h"
 
 #include <nx/fusion/model_functions.h>
-#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -39,7 +39,7 @@ QnImageButtonWidget* newActionButton(
     const auto action = context->menu()->action(actionId);
 
     QnImageButtonWidget* button = new QnImageButtonWidget(parent);
-    ApplicationContext::instance()->controlsStatisticsModule()->registerButton(
+    statisticsModule()->controls()->registerButton(
         alias(action),
         button);
 
@@ -63,7 +63,7 @@ T* newCustomShowHideButton(
     const auto action = context->menu()->action(actionId);
 
     auto button = new T(parent);
-    ApplicationContext::instance()->controlsStatisticsModule()->registerButton(
+    statisticsModule()->controls()->registerButton(
         alias(action),
         button);
 
@@ -107,7 +107,7 @@ QnImageButtonWidget* newPinTimelineButton(
     const auto action = context->menu()->action(actionId);
 
     auto button = new QnImageButtonWidget(parent);
-    ApplicationContext::instance()->controlsStatisticsModule()->registerButton(
+    statisticsModule()->controls()->registerButton(
         alias(action),
         button);
 
@@ -134,7 +134,7 @@ QnImageButtonWidget* newPinButton(
     const auto action = context->menu()->action(actionId);
 
     QnImageButtonWidget* button = new QnImageButtonWidget(parent);
-    ApplicationContext::instance()->controlsStatisticsModule()->registerButton(
+    statisticsModule()->controls()->registerButton(
         alias(action),
         button);
 

@@ -5,8 +5,6 @@
 #include <QtQml/QtQml>
 
 #include <api/server_rest_connection.h>
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
@@ -16,8 +14,8 @@
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/common/utils/ordered_requests_helper.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
 #include <utils/common/synctime.h>
@@ -32,21 +30,13 @@ struct SoftwareTriggersController::Private
 
     SoftwareTriggersController* const q;
     OrderedRequestsHelper orderedRequestsHelper;
-    QnCommonModule* const commonModule;
-    nx::vms::client::core::UserWatcher* const userWatcher;
-    QnResourceAccessManager* const accessManager;
-    vms::event::RuleManager* const ruleManager;
 
     QnUuid resourceId;
     QnUuid activeTriggerRuleId;
 };
 
 SoftwareTriggersController::Private::Private(SoftwareTriggersController* q):
-    q(q),
-    commonModule(qnClientCoreModule->commonModule()),
-    userWatcher(commonModule->instance<UserWatcher>()),
-    accessManager(commonModule->systemContext()->resourceAccessManager()),
-    ruleManager(commonModule->systemContext()->eventRuleManager())
+    q(q)
 {
 }
 
@@ -61,11 +51,11 @@ bool SoftwareTriggersController::Private::setTriggerState(
         return false;
     }
 
-    const auto currentUser = userWatcher->user();
-    if (!accessManager->hasGlobalPermission(currentUser, GlobalPermission::userInput))
+    const auto currentUser = q->systemContext()->userWatcher()->user();
+    if (!q->resourceAccessManager()->hasGlobalPermission(currentUser, GlobalPermission::userInput))
         return false;
 
-    const auto rule = ruleManager->rule(ruleId);
+    const auto rule = q->systemContext()->eventRuleManager()->rule(ruleId);
     if (!rule)
     {
         NX_ASSERT(rule, "Trigger does not exist");
@@ -103,8 +93,16 @@ bool SoftwareTriggersController::Private::setTriggerState(
 
 //--------------------------------------------------------------------------------------------------
 
-SoftwareTriggersController::SoftwareTriggersController(QObject* parent):
-    base_type(parent),
+SoftwareTriggersController::SoftwareTriggersController(SystemContext* systemContext, QObject* parent):
+    QObject(parent),
+    SystemContextAware(systemContext),
+    d(new Private(this))
+{
+}
+
+SoftwareTriggersController::SoftwareTriggersController():
+    QObject(),
+    SystemContextAware(SystemContext::fromQmlContext(this)),
     d(new Private(this))
 {
 }
@@ -129,7 +127,7 @@ void SoftwareTriggersController::setResourceId(const QnUuid& id)
     if (d->resourceId == id)
         return;
 
-    const auto pool = d->commonModule->systemContext()->resourcePool();
+    const auto pool = systemContext()->resourcePool();
     d->resourceId = pool->getResourceById<QnVirtualCameraResource>(id)
         ? id
         : QnUuid();
@@ -159,7 +157,7 @@ bool SoftwareTriggersController::activateTrigger(const QnUuid& ruleId)
         return false;
     }
 
-    const auto rule = d->ruleManager->rule(ruleId);
+    const auto rule = systemContext()->eventRuleManager()->rule(ruleId);
     if (!rule)
     {
         NX_ASSERT(false, "Not rule for specified trigger");
@@ -177,7 +175,7 @@ bool SoftwareTriggersController::deactivateTrigger()
     if (d->activeTriggerRuleId.isNull())
         return false; //< May be when activation failed.
 
-    const auto rule = d->ruleManager->rule(d->activeTriggerRuleId);
+    const auto rule = systemContext()->eventRuleManager()->rule(d->activeTriggerRuleId);
     if (!rule || !rule->isActionProlonged())
     {
         NX_ASSERT(rule, "No rule for specified trigger");
@@ -193,7 +191,7 @@ void SoftwareTriggersController::cancelTriggerAction()
     if (d->activeTriggerRuleId.isNull())
         return;
 
-    const auto rule = d->ruleManager->rule(d->activeTriggerRuleId);
+    const auto rule = systemContext()->eventRuleManager()->rule(d->activeTriggerRuleId);
     if (rule && rule->isActionProlonged())
         deactivateTrigger();
 

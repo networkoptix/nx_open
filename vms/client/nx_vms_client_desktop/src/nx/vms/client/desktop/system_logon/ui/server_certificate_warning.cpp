@@ -10,7 +10,7 @@
 
 #include <nx/network/ssl/certificate.h>
 #include <nx/vms/api/data/module_information.h>
-#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/statistics/modules/certificate_statistics_module.h>
 
@@ -79,7 +79,7 @@ ServerCertificateWarning::ServerCertificateWarning(
             }
             return QString();
         };
-    auto statistics = ApplicationContext::instance()->certificateStatisticsModule();
+    auto statistics = statisticsModule()->certificates();
     statistics->registerClick(statisticsName("open"));
 
     // Init server certificate `link`

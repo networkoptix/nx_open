@@ -13,7 +13,6 @@
 #include <QtWidgets/QToolButton>
 
 #include <client/client_message_processor.h>
-#include <client/client_module.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
 #include <client/self_updater.h>
@@ -83,7 +82,6 @@
 #include <ui/workbench/handlers/workbench_webpage_handler.h>
 #include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
 #include <ui/workbench/watchers/workbench_bookmark_tags_watcher.h>
-#include <ui/workbench/watchers/workbench_bookmarks_watcher.h>
 #include <ui/workbench/watchers/workbench_item_bookmarks_watcher.h>
 #include <ui/workbench/watchers/workbench_ptz_dialog_watcher.h>
 #include <ui/workbench/watchers/workbench_resources_changes_watcher.h>
@@ -155,7 +153,7 @@ struct MainWindow::Private
     Private(MainWindow* owner):
         q(owner)
     {
-        screenManager = std::make_unique<ScreenManager>(qnClientModule->sharedMemoryManager());
+        screenManager = std::make_unique<ScreenManager>(appContext()->sharedMemoryManager());
     }
 
 
@@ -289,7 +287,6 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<QnWorkbenchResourcesChangesWatcher>();
     context->instance<QnWorkbenchBookmarkTagsWatcher>();
     context->instance<QnWorkbenchItemBookmarksWatcher>();
-    context->instance<QnWorkbenchBookmarksWatcher>();
     context->instance<QnTimelineBookmarksWatcher>();
     context->instance<QnWorkbenchServerPortWatcher>();
     context->instance<QnWorkbenchScreenRecordingHandler>();
@@ -305,7 +302,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
             const auto newMode = qnSettings->timeMode() == Qn::ClientTimeMode
                 ? nx::vms::client::core::ServerTimeWatcher::clientTimeMode
                 : nx::vms::client::core::ServerTimeWatcher::serverTimeMode;
-            for (auto systemContext: ApplicationContext::instance()->systemContexts())
+            for (auto systemContext: appContext()->systemContexts())
                 systemContext->serverTimeWatcher()->setTimeMode(newMode);
         };
     connect(timeModeNotifier, &QnPropertyNotifier::valueChanged, this, updateTimeMode);

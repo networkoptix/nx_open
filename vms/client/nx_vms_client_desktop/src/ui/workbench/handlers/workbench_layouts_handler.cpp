@@ -66,6 +66,7 @@ namespace ui {
 namespace workbench {
 
 namespace {
+
 QString generateUniqueLayoutName(
     QnResourcePool* resourcePool,
     const QnUserResourcePtr &user,
@@ -122,6 +123,22 @@ QnResourceList calculateResourcesToShare(const QnResourceList& resources,
             return !accessProvider->hasAccess(user, resource);
         };
     return resources.filtered(sharingRequired);
+}
+
+QSet<QnResourcePtr> localLayoutResources(QnResourcePool* resourcePool, const QnLayoutItemDataMap& items)
+{
+    QSet<QnResourcePtr> result;
+    for (const auto& item: items)
+    {
+        if (auto resource = resourcePool->getResourceByDescriptor(item.resource))
+            result.insert(resource);
+    }
+    return result;
+}
+
+QSet<QnResourcePtr> localLayoutResources(const QnLayoutResourcePtr& layout)
+{
+    return localLayoutResources(layout->resourcePool(), layout->getItems());
 }
 
 } // namespace
@@ -586,8 +603,11 @@ LayoutsHandler::LayoutChange LayoutsHandler::calculateLayoutChange(
 
     /* Share added resources. */
     auto snapshot = snapshotManager()->snapshot(layout);
-    auto oldResources = QnLayoutResource::layoutResources(resourcePool(), snapshot.items);
-    auto newResources = layout->layoutResources();
+
+    // Check only Resources from the same System Context as the Layout. Cross-system Resources
+    // cannot be available through Shared Layouts.
+    auto oldResources = localLayoutResources(resourcePool(), snapshot.items);
+    auto newResources = localLayoutResources(layout);
 
     result.added = (newResources - oldResources).values();
     result.removed = (oldResources - newResources).values();
@@ -701,12 +721,14 @@ bool LayoutsHandler::confirmDeleteLocalLayouts(const QnUserResourcePtr& user,
     if (user == context()->user())
         return true;
 
-    /* Calculate removed cameras that are still directly accessible. */
+    // Calculate removed cameras that are still directly accessible.
+    // Check only Resources from the same System Context as the Layout. Cross-system Resources
+    // cannot be available through Shared Layouts.
     QSet<QnResourcePtr> removedResources;
     for (const auto& layout: layouts)
     {
         const auto snapshot = snapshotManager()->snapshot(layout);
-        removedResources.unite(QnLayoutResource::layoutResources(resourcePool(), snapshot.items));
+        removedResources.unite(localLayoutResources(resourcePool(), snapshot.items));
     }
 
     const auto accessible = sharedResourcesManager()->sharedResources(user);

@@ -17,7 +17,6 @@
 #include <camera/client_video_camera.h>
 #include <camera/resource_display.h>
 #include <client/client_meta_types.h>
-#include <client/client_module.h>
 #include <client/client_runtime_settings.h>
 #include <common/common_meta_types.h>
 #include <core/resource/camera_resource.h>
@@ -1307,7 +1306,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
             // Zoom windows must not be controlled by radass or storage location controller.
             if (!mediaWidget->isZoomWindow())
             {
-                qnClientModule->radassController()->registerConsumer(
+                appContext()->radassController()->registerConsumer(
                     mediaWidget->display()->camDisplay());
                 context()->instance<StorageLocationCameraController>()->registerConsumer(
                     mediaWidget->display());
@@ -1365,7 +1364,7 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
     const auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
     if (mediaWidget && !mediaWidget->isZoomWindow())
     {
-        qnClientModule->radassController()->unregisterConsumer(
+        appContext()->radassController()->unregisterConsumer(
             mediaWidget->display()->camDisplay());
         context()->instance<StorageLocationCameraController>()->unregisterConsumer(
             mediaWidget->display());

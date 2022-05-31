@@ -2,6 +2,7 @@
 
 #include "system_context_aware.h"
 
+#include <client/client_message_processor.h>
 #include <nx/utils/log/assert.h>
 
 #include "system_context.h"
@@ -13,9 +14,9 @@ SystemContext* SystemContextAware::systemContext() const
     return dynamic_cast<SystemContext*>(nx::vms::common::SystemContextAware::systemContext());
 }
 
-std::shared_ptr<RemoteSession> SystemContextAware::session() const
+QnClientMessageProcessor* SystemContextAware::clientMessageProcessor() const
 {
-    return systemContext()->session();
+    return static_cast<QnClientMessageProcessor*>(this->messageProcessor());
 }
 
 QnUuid SystemContextAware::currentServerId() const

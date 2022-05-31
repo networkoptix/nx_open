@@ -13,13 +13,16 @@
 #include <managers/resource_manager.h>
 #include <nx/core/watermark/watermark.h>
 #include <nx/fusion/serialization/json.h>
+#include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <nx/vms/common/system_context.h>
 
 #include "layout_proto.h"
 
-QnFileLayoutResourcePtr nx::vms::client::desktop::layout::layoutFromFile(
+using namespace nx::vms::client::desktop;
+
+QnFileLayoutResourcePtr layout::layoutFromFile(
     const QString& layoutUrl, const QString& password)
 {
     // Create storage handler and read layout info.
@@ -115,7 +118,7 @@ QnFileLayoutResourcePtr nx::vms::client::desktop::layout::layoutFromFile(
         if (backgroundFile)
         {
             QByteArray data = backgroundFile->readAll();
-            nx::vms::client::desktop::LocalFileCache cache;
+            LocalFileCache cache;
             cache.storeImageData(layout->backgroundImageFilename(), data);
 
             backgroundFile.reset();
@@ -158,9 +161,7 @@ QnFileLayoutResourcePtr nx::vms::client::desktop::layout::layoutFromFile(
         fileStorage->usePasswordToRead(password); //< Set the password or do nothing.
         auto storage = fileStorage.dynamicCast<QnStorageResource>();
 
-        QnAviResourcePtr aviResource(new QnAviResource(
-            item.resource.path,
-            qnClientCoreModule->commonModule()->storagePluginFactory()));
+        QnAviResourcePtr aviResource(new QnAviResource(item.resource.path));
         aviResource->addFlags(Qn::exported_media);
         if (layoutWithCameras)
             aviResource->addFlags(Qn::utc | Qn::sync | Qn::periods | Qn::motion);
@@ -224,14 +225,14 @@ QnFileLayoutResourcePtr nx::vms::client::desktop::layout::layoutFromFile(
     return layout;
 }
 
-bool nx::vms::client::desktop::layout::reloadFromFile(
+bool layout::reloadFromFile(
     QnFileLayoutResourcePtr layout, const QString& password)
 {
     if (!NX_ASSERT(layout))
         return false;
 
     // Remove all layout AVI streams from resource pool.
-    const auto resources = layout->layoutResources();
+    const auto resources = layoutResources(layout);
     layout->setItems(QnLayoutItemDataList());
     for (const auto& resource: resources)
     {

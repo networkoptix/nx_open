@@ -2,7 +2,6 @@
 
 #include "workbench.h"
 
-#include <client/client_module.h>
 #include <common/common_module.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/layout_reader.h>
@@ -161,7 +160,7 @@ QnWorkbench::QnWorkbench(QObject *parent):
 
     auto delegate = new StateDelegate(this);
     m_stateDelegate = delegate;
-    qnClientModule->clientStateHandler()->registerDelegate(
+    appContext()->clientStateHandler()->registerDelegate(
         kWorkbenchDataKey, std::unique_ptr<StateDelegate>(delegate));
 
     using WebEngineProfileManager = nx::vms::client::desktop::utils::WebEngineProfileManager;
@@ -180,14 +179,14 @@ QnWorkbench::~QnWorkbench() {
     emit aboutToBeDestroyed();
     blockSignals(signalsBlocked);
 
-    qnClientModule->clientStateHandler()->unregisterDelegate(kWorkbenchDataKey);
+    appContext()->clientStateHandler()->unregisterDelegate(kWorkbenchDataKey);
     m_dummyLayout = nullptr;
     clear();
 }
 
 nx::vms::client::desktop::WindowContext* QnWorkbench::windowContext() const
 {
-    return ApplicationContext::instance()->mainWindowContext();
+    return appContext()->mainWindowContext();
 }
 
 void QnWorkbench::clear()

@@ -2,16 +2,18 @@
 
 #include "server_interface_watcher.h"
 
-#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+
+using namespace nx::vms::client::core;
 
 QnServerInterfaceWatcher::QnServerInterfaceWatcher(QObject* parent): QObject(parent)
 {
-    commonModule()->moduleDiscoveryManager()->onSignals(this,
+    appContext()->moduleDiscoveryManager()->onSignals(this,
         &QnServerInterfaceWatcher::at_connectionChanged,
         &QnServerInterfaceWatcher::at_connectionChanged,
         &QnServerInterfaceWatcher::at_connectionChangedById);
@@ -75,7 +77,7 @@ void QnServerInterfaceWatcher::at_resourcePool_statusChanged(const QnResourcePtr
 void QnServerInterfaceWatcher::updatePrimaryInterface(const QnMediaServerResourcePtr& server)
 {
     const auto serverId = server->getId();
-    const auto module = commonModule()->moduleDiscoveryManager()->getModule(serverId);
+    const auto module = appContext()->moduleDiscoveryManager()->getModule(serverId);
     if (!module)
         return;
 

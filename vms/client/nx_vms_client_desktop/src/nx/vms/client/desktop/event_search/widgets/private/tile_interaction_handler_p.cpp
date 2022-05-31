@@ -348,8 +348,7 @@ void TileInteractionHandler::copyBookmarkToClipboard(const QModelIndex &index)
         [this](qint64 msecsSinceEpoch)
         {
             // TODO: #sivanov Actualize used system context.
-            const auto timeWatcher = ApplicationContext::instance()->currentSystemContext()
-                ->serverTimeWatcher();
+            const auto timeWatcher = appContext()->currentSystemContext()->serverTimeWatcher();
             return nx::vms::time::toString(timeWatcher->displayTime(msecsSinceEpoch));
         };
 
@@ -562,7 +561,7 @@ void TileInteractionHandler::performDragAndDrop(
     if (!baseMimeData)
         return;
 
-    MimeData data(baseMimeData.get(), nullptr);
+    MimeData data(baseMimeData.get());
     data.setResources(resourceList);
     data.setArguments(setupDropActionParameters(resourceList, index.data(Qn::TimestampRole)));
 

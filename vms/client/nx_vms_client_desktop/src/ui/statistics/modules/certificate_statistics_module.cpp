@@ -25,7 +25,7 @@ void QnCertificateStatisticsModule::reset()
 
 void QnCertificateStatisticsModule::registerClick(const QString& alias)
 {
-    if (!NX_ASSERT(m_scenario, "Certificate statistics scenario is undefined"))
+    if (!m_scenario)
         return;
 
     ++(m_values[*m_scenario][alias]);

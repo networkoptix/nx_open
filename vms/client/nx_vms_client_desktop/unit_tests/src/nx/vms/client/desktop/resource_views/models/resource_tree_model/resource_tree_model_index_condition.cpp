@@ -240,8 +240,7 @@ Condition mimeDataContainsResource(const QnResourcePtr& resource)
             if (!index.isValid() || resource.isNull() || !resource->resourcePool())
                 return false;
 
-            const auto resourcePool = resource->resourcePool();
-            const auto mimeData = MimeData(index.model()->mimeData({index}), resourcePool);
+            const auto mimeData = MimeData(index.model()->mimeData({index}));
             return mimeData.resources().contains(resource);
         };
 }
@@ -254,7 +253,7 @@ Condition mimeDataContainsEntity(const QnUuid& entityId)
             if (!index.isValid())
                 return false;
 
-            const auto mimeData = MimeData(index.model()->mimeData({index}), nullptr);
+            const auto mimeData = MimeData(index.model()->mimeData({index}));
             return mimeData.entities().contains(entityId);
     };
 }

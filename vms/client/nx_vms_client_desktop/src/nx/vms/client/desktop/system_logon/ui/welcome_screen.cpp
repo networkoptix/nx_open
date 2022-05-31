@@ -34,6 +34,7 @@
 #include <nx/vms/client/core/network/remote_connection_error_strings.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/settings/systems_visibility_manager.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/connection_url_parser.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/svg_icon_provider.h>
@@ -581,7 +582,7 @@ void WelcomeScreen::connectToAnotherSystem()
 
 void WelcomeScreen::testSystemOnline(const QString& serverUrl)
 {
-    if (const auto manager = commonModule()->moduleDiscoveryManager())
+    if (const auto manager = appContext()->moduleDiscoveryManager())
     {
         const auto url = parseConnectionUrlFromUserInput(serverUrl);
         if (url.isValid())
@@ -780,7 +781,7 @@ void WelcomeScreen::deleteSystem(const QString& systemId, const QString& localSy
     if (const auto system = qnSystemsFinder->getSystem(systemId))
     {
         auto knownConnections = qnClientCoreSettings->knownServerConnections();
-        const auto moduleManager = commonModule()->moduleDiscoveryManager();
+        const auto moduleManager = appContext()->moduleDiscoveryManager();
         const auto servers = system->servers();
         for (const auto& info: servers)
         {

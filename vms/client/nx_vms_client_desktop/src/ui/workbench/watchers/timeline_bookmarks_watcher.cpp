@@ -6,28 +6,27 @@
 
 #include <QtCore/QTimer>
 
-#include <utils/common/delayed.h>
-#include <utils/camera/bookmark_helpers.h>
-#include <core/resource/camera_resource.h>
-#include <camera/camera_bookmarks_manager.h>
-#include <camera/camera_bookmark_aggregation.h>
-#include <ui/utils/bookmark_merge_helper.h>
-#include <ui/workbench/workbench_navigator.h>
-#include <ui/graphics/items/resource/resource_widget.h>
-#include <ui/graphics/items/controls/time_slider.h>
-
-#include <ui/workbench/workbench_display.h>
-
 #include <camera/bookmark_queries_cache.h>
+#include <camera/camera_bookmark_aggregation.h>
+#include <camera/camera_bookmarks_manager.h>
 #include <camera/camera_bookmarks_query.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-
-#include <utils/common/scoped_timer.h>
-
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/pending_operation.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <ui/graphics/items/controls/time_slider.h>
+#include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/utils/bookmark_merge_helper.h>
+#include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_navigator.h>
+#include <utils/camera/bookmark_helpers.h>
+#include <utils/common/delayed.h>
+#include <utils/common/scoped_timer.h>
 
+using namespace nx::vms::client::desktop;
 using namespace std::chrono;
 
 namespace {
@@ -77,7 +76,11 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject* parent):
                 ensureStaticQueryForCamera(camera);
         });
 
-    connect(qnCameraBookmarksManager, &QnCameraBookmarksManager::bookmarkRemoved, this,
+    // FIXME: #sivanov Actually we must listen for all system contexts here.
+    auto systemContext = appContext()->currentSystemContext();
+    connect(systemContext->cameraBookmarksManager(),
+        &QnCameraBookmarksManager::bookmarkRemoved,
+        this,
         &QnTimelineBookmarksWatcher::onBookmarkRemoved);
 
     navigator()->timeSlider()->setBookmarksHelper(m_mergeHelper);
@@ -269,13 +272,14 @@ void QnTimelineBookmarksWatcher::setCurrentCamera(const QnVirtualCameraResourceP
     if (m_timelineWindowQuery)
         m_timelineWindowQuery->disconnect(this);
 
-    if (m_currentCamera)
+    if (m_currentCamera && m_currentCamera->systemContext())
     {
         // Ensure query exists
         ensureStaticQueryForCamera(m_currentCamera);
         auto filter = m_timelineWindowQueryFilter;
         filter.cameras.insert(m_currentCamera->getId());
-        m_timelineWindowQuery = qnCameraBookmarksManager->createQuery(filter);
+        m_timelineWindowQuery = SystemContext::fromResource(m_currentCamera)
+            ->cameraBookmarksManager()->createQuery(filter);
 
         connect(m_timelineWindowQuery, &QnCameraBookmarksQuery::bookmarksChanged, this,
             [this](const QnCameraBookmarkList& bookmarks)

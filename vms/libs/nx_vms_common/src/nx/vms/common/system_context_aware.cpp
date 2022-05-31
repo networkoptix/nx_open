@@ -59,4 +59,19 @@ QnResourcePool* SystemContextAware::resourcePool() const
     return systemContext()->resourcePool();
 }
 
+QnCommonMessageProcessor* SystemContextAware::messageProcessor() const
+{
+    return systemContext()->messageProcessor();
+}
+
+QnCameraHistoryPool* SystemContextAware::cameraHistoryPool() const
+{
+    return systemContext()->cameraHistoryPool();
+}
+
+SystemSettings* SystemContextAware::systemSettings() const
+{
+    return systemContext()->globalSettings();
+}
+
 } // namespace nx::vms::common

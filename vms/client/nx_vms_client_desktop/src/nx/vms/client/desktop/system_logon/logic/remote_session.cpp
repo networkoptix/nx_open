@@ -6,17 +6,15 @@
 
 #include <QtCore/QTimer>
 
-#include <api/server_rest_connection.h>
-#include <client/client_message_processor.h>
-#include <client/client_module.h>
 #include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <network/system_helpers.h>
 #include <nx/reflect/json.h>
+#include <nx/utils/log/log.h>
 #include <nx/vms/client/core/network/credentials_manager.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_connection_error.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <utils/common/synctime.h>
 
@@ -38,7 +36,7 @@ RemoteSession::RemoteSession(RemoteConnectionPtr connection, QObject* parent)
     const auto localSystemId = connection->moduleInformation().localSystemId.toString();
     m_sessionId = SessionId(username, localSystemId);
 
-    auto sharedMemoryManager = qnClientModule->sharedMemoryManager();
+    auto sharedMemoryManager = appContext()->sharedMemoryManager();
 
     auto tokenUpdated =
         [this, sharedMemoryManager]
@@ -73,7 +71,7 @@ RemoteSession::RemoteSession(RemoteConnectionPtr connection, QObject* parent)
 
 RemoteSession::~RemoteSession()
 {
-    const bool sessionIsStillActive = qnClientModule->sharedMemoryManager()->leaveSession();
+    const bool sessionIsStillActive = appContext()->sharedMemoryManager()->leaveSession();
     if (sessionIsStillActive)
     {
         NX_VERBOSE(this, "Current session is not the latest one, keep token alive");

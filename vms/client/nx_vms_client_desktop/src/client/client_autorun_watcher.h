@@ -6,14 +6,14 @@
 
 class QnClientAutoRunWatcher: public QObject
 {
-    Q_OBJECT;
+    Q_OBJECT
+
 public:
     QnClientAutoRunWatcher(QObject* parent = nullptr);
 
+private:
     bool isAutoRun() const;
     void setAutoRun(bool enabled);
-
-private:
     QString autoRunKey() const;
     QString autoRunPath() const;
 };

@@ -20,6 +20,7 @@ extern "C" {
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/video_data_packet.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <plugins/resource/desktop_win/audio_device_change_notifier.h>
@@ -27,6 +28,8 @@ extern "C" {
 #include <utils/common/synctime.h>
 #include <utils/media/av_options.h>
 #include <utils/media/ffmpeg_helper.h>
+
+using namespace nx::vms::client::desktop;
 
 namespace {
 
@@ -478,7 +481,7 @@ bool QnDesktopDataProvider::initAudioCapturing()
         m_frameSize = m_audioEncoder.codecParams()->getFrameSize();
         m_audioFrameDuration = m_frameSize / (double) sampleRate * 1000; // keep in ms
 
-        m_soundAnalyzer = QnVoiceSpectrumAnalyzer::instance();
+        m_soundAnalyzer = appContext()->voiceSpectrumAnalyzer();
         m_soundAnalyzer->initialize(sampleRate, channels);
 
         foreach(EncodedAudioInfo* audioChannel, m_audioInfo)

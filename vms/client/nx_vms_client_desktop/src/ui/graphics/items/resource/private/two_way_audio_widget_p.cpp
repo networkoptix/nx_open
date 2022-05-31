@@ -4,6 +4,8 @@
 
 #include <chrono>
 
+#include <qt_graphics_items/graphics_label.h>
+
 #include <api/server_rest_connection.h>
 #include <client/client_settings.h>
 #include <client_core/client_core_module.h>
@@ -15,11 +17,11 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/accessor.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/license/usage_helper.h>
-#include <qt_graphics_items/graphics_label.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/common/palette.h>
@@ -236,7 +238,7 @@ QnTwoWayAudioWidget::Private::Private(
             case HintState::pressed:
                 if (m_stateTimer.hasExpired(kDataTimeoutMs))
                 {
-                    auto data = QnVoiceSpectrumAnalyzer::instance()->getSpectrumData().data;
+                    auto data = appContext()->voiceSpectrumAnalyzer()->getSpectrumData().data;
                     if (data.isEmpty())
                     {
                         setHint(tr("Input device is not selected"));
@@ -362,7 +364,7 @@ void QnTwoWayAudioWidget::Private::stopStreaming()
         setState(HintState::released);
 
     m_controller.stop();
-    QnVoiceSpectrumAnalyzer::instance()->reset();
+    appContext()->voiceSpectrumAnalyzer()->reset();
     m_visualizerData = VisualizerData();
 }
 
@@ -418,7 +420,7 @@ void QnTwoWayAudioWidget::Private::paint(QPainter* painter, const QRectF& source
         m_paintTimeStamp = m_stateTimer.elapsed();
         const auto timeStepMs = m_paintTimeStamp - oldTimeStamp;
 
-        auto data = QnVoiceSpectrumAnalyzer::instance()->getSpectrumData().data;
+        auto data = appContext()->voiceSpectrumAnalyzer()->getSpectrumData().data;
         if (data.isEmpty())
         {
             paintVisualizer(painter, visualizerRect, generateEmptyData(m_paintTimeStamp));

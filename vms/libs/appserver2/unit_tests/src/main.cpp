@@ -15,7 +15,6 @@ int main(int argc, char** argv)
     QnStaticCommonModule staticCommonModule(nx::vms::api::PeerType::server);
 
     std::unique_ptr<QCoreApplication> application;
-    QnCommonMetaTypes::initialize();
     return nx::network::test::runTest(argc, argv,
         [&](const nx::utils::ArgumentParser& /*args*/)
         {
