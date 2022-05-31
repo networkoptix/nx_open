@@ -345,7 +345,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     addAction(action(action::CloseLayoutAction));
     addAction(action(action::MainMenuAction));
     addAction(action(action::OpenLoginDialogAction));
-    addAction(action(action::DisconnectAction));
+    addAction(action(action::DisconnectMainMenuAction));
     addAction(action(action::OpenInFolderAction));
     addAction(action(action::RemoveLayoutItemAction));
     addAction(action(action::RemoveLayoutItemFromSceneAction));
