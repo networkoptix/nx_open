@@ -98,7 +98,10 @@ bool Uncompressor::processData(const ConstBufferRefType& data)
                     case Z_STREAM_END:
                     {
                         if (zResult == Z_STREAM_END)
+                        {
                             d->state = Private::State::done;
+                            inflateReset(&d->zStream);
+                        }
 
                         if (d->zStream.avail_out == 0 && d->zStream.avail_in > 0)
                         {

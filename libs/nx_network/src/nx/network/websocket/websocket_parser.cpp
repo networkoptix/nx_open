@@ -2,7 +2,6 @@
 
 #include "websocket_parser.h"
 #include <nx/network/socket_common.h>
-#include <nx/utils/gzip/gzip_compressor.h>
 
 #include <algorithm>
 #include <stdint.h>
@@ -11,7 +10,12 @@ namespace nx::network::websocket {
 
 Parser::Parser(Role role, GotFrameHandler handler):
     m_role(role),
-    m_frameHandler(std::move(handler))
+    m_frameHandler(std::move(handler)),
+    m_uncompressor(nx::utils::bstream::makeCustomOutputStream(
+        [this] (const nx::Buffer& data)
+        {
+            this->m_uncompressed += data;
+        }))
 {
 }
 
@@ -135,7 +139,21 @@ Parser::ParseState Parser::readHeaderFixed(char* data)
 void Parser::handleFrame()
 {
     if (m_doUncompress)
-        m_frameBuffer = nx::utils::bstream::gzip::Compressor::uncompressData(m_frameBuffer);
+    {
+        m_uncompressor.processData(m_frameBuffer);
+        m_frameBuffer = m_uncompressed;
+
+        if (m_fin)
+        {
+            // https://datatracker.ietf.org/doc/html/rfc7692#section-7.2.2
+            // Block with "\x00\x00\xff\xff" should be inflated in separate call of 'inflate()',
+            // this logic is copied from Chromium sources.
+            static const nx::Buffer buf("\x00\x00\xff\xff", 4);
+            m_uncompressor.processData(buf);
+        }
+
+        m_uncompressed.clear();
+    }
 
     m_frameHandler(m_firstFrame ? m_opCode : FrameType::continuation, m_frameBuffer, m_fin);
     m_frameBuffer.clear();
