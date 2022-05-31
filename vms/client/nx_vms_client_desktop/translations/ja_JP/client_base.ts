@@ -7140,7 +7140,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>To enable backup add more drives to use them as backup storage in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation>バックアップを有効にするには、%1 にドライブを追加してバックアップ用に設定してください</translation>
+      <translation>バックアップを有効にするには、%1 でドライブを追加してバックアップ用に設定してください</translation>
     </message>
   </context>
   <context>
@@ -10775,7 +10775,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
       <source>Drag layout or camera here to add it to the showreel</source>
-      <translation>レイアウトやカメラをドラッグしてシーケンス表示に追加する</translation>
+      <translation>レイアウトまたはカメラをここにドラッグしてシーケンスに追加</translation>
     </message>
   </context>
   <context>
@@ -11164,7 +11164,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <name>nx::vms::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
       <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
-      <translation>キーボードの矢印キーでレイアウトの切替え　シーケンス表示を終了するには、Escキーを押します</translation>
+      <translation>キーボードの矢印キーでレイアウト切替、Escキーでシーケンス表示を終了</translation>
     </message>
     <message>
       <source>Press Esc to stop the tour.</source>
