@@ -22,7 +22,7 @@ Most of the source code and other files are licensed under the terms of Mozilla 
 ## Build environment
 
 Currently the following platforms and architectures are supported by this repository:
-- Windows x64 (Microsoft Visual Studio 2019).
+- Windows x64 (Microsoft Visual Studio).
 - Linux x64 (GCC or Clang).
 - Linux 64-bit ARM (cross-compiling on Linux x64, GCC or Clang).
 - Linux 32-bit ARM (cross-compiling on Linux x64, GCC or Clang).
@@ -39,15 +39,21 @@ NOTE: Certain Components in this repository can be built using more platforms an
 the Nx Kit library (`artifacts/nx_kit/`).
 
 Pre-requisites per platform (the details are given in the further subsections):
-- CMake 3.19.0+ (on Windows, comes with Microsoft Visual Studio 2019).
-- Ninja (on Windows, comes with Miscosoft Visual Studio 2019).
+- CMake 3.19.0+ (on Windows, comes with Microsoft Visual Studio).
+- Ninja (on Windows, comes with Miscosoft Visual Studio).
 - Python 3.8+.
-- Conan 1.42.x.
+- Conan 1.43.x.
 - For Linux:
     - `chrpath`.
     - Certain packages for the build dependencies.
 - For Windows:
-    - Microsoft Visual Studio 2019 Community Edition.
+    - Microsoft Visual Studio, Community Edition
+        - Version 2019 is required in the repository branch `vms_5.0`.
+        - Version 2022 is supported in the repository branches `vms_5.0_patch` and `master`.
+            - NOTE: At some point in the future, the support for Microsoft Visual Studio 2019 may
+                be dropped in these and further branches.
+- For MacOS:
+    - XCode 12.5.
 
 ### CMake
 
@@ -58,7 +64,7 @@ version is recommended) and be available on `PATH` as `cmake`.
     for Debian and Ubuntu (https://apt.kitware.com/). It is recommended to completely remove
     (`apt purge -y --auto-remove cmake`) the CMake package from the Main repository before
     installing the one from the Kitware repository.
-- **Windows**: CMake which comes with Microsoft Visual Studio 2019 is suitable. If desired, a
+- **Windows**: CMake which comes with Microsoft Visual Studio is suitable. If desired, a
     standalone installation of CMake can be performed from https://cmake.org/download/; after
     installing, choose "Add CMake to the system PATH for all users" and add the path to `cmake.exe`
     to `CMakeSettings.json` (see the "Generation" section of this guide).
@@ -85,14 +91,14 @@ Python 3.8+ should be installed and available on `PATH` either as `python` or `p
 
 ### Conan
 
-Conan 1.42.x should be installed. It is recommended to install Conan by Python's `pip`:
+Conan 1.43.x should be installed. It is recommended to install Conan by Python's `pip`:
 ```
-python -m pip install conan==1.42.2
+python -m pip install conan==1.43.2
 ```
 
 ### Build tools
 
-- **Windows**: Install [Visual Studio 2019 Community Edition](https://visualstudio.microsoft.com/downloads/)
+- **Windows**: Install [Visual Studio, Community Edition](https://visualstudio.microsoft.com/downloads/)
     **The Workload** "Desktop development with C++" should be installed. Also make sure that in
     **Individual components**, "C++ CMake tools for Windows" is selected.
 
@@ -192,8 +198,7 @@ Below are the usage examples, where `<build>` is `./build.sh` on Linux and `buil
     ```
     <build> -DcustomizationPackage=<customization.zip>
     ```
-    The built executables will be placed in `nx_open-build/bin/`, their names may depend on the
-    customization package.
+    The built executables will be placed in `nx_open-build/bin/`.
 
 - To make a clean Release build with the distribution package and unit test archive, delete the
     build directory (if any), and run the command:
@@ -209,20 +214,43 @@ Below are the usage examples, where `<build>` is `./build.sh` on Linux and `buil
         source files or altering the build system files, because `ninja_tool.py` properly
         handles such cases - the generation stage will be called automatically when needed.
 
-ATTENTION: On Windows, you can use a regular `cmd` console, because `build.bat` calls the
-`vcvars64.bat` which comes with the Visual Studio and appropriately sets PATH and other environment
+ATTENTION: On **Windows**, you can use a regular `cmd` console, because `build.bat` calls the
+`vcvars64.bat` which comes with the Visual Studio and properly sets PATH and other environment
 variables to enable using the 64-bit compiler and linker. If you don't use `build.bat`, you may
-call `vcvars64.bat` from your console, or use the console available from the Start menu as `VS2019
-x64 Native Tools Command Prompt`. Do not use the Visual Studio Command Prompt available from the
-Visual Studio main menu, because it sets up the environment for the 32-bit compiler and linker.
+call `vcvars64.bat` from your console, or use the console available from the Start menu as `VS####
+x64 Native Tools Command Prompt`, where `####` is `2019` or `2022`. Do not use the Visual Studio
+Command Prompt available from the Visual Studio main menu, because it sets up the environment for
+the 32-bit compiler and linker.
 
-For cross-compiling on Linux or MacOS, set the CMake variable `<targetDevice>`: add the argument
-`-DtargetDevice=<value>`, where <value> is one of the following:
+For **cross-compiling** on Linux or MacOS, set the CMake variable `<targetDevice>`: add the
+argument `-DtargetDevice=<value>`, where <value> is one of the following:
 - `linux_x64`
 - `linux_arm64`
 - `linux_arm32`
 - `macos_x64`
 - `macos_arm64`
+
+---------------------------------------------------------------------------------------------------
+## Running VMS Desktop Client
+
+The VMS Desktop Client can be run direclty from the build directory, without installing a
+distribution package.
+
+After the successful build, the Desktop Client executable is located in `nx_open-build/bin/`; its
+names may depend on the customization package.
+
+For **Linux** and **MacOS**, just run the Desktop Client executable.
+
+For **Windows**, before running the Desktop Client executable, add the directory of the Qt library
+to the `PATH`:
+```
+set PATH=%PATH%;<qt_library_directory>/bin
+```
+Note the `/bin` ending appended to the Qt library directory. The Qt library directory can be found
+in the generated file `nx_open-build/conan_paths.cmake, in the line looking like:
+```
+set(CONAN_QT_ROOT ...)
+```
 
 ---------------------------------------------------------------------------------------------------
 ## Free and Open-Source Software Notices
