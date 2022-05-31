@@ -56,6 +56,12 @@ milliseconds toMs(microseconds value)
     return duration_cast<milliseconds>(value);
 }
 
+bool isValidFigureRectangle(const QRectF& rect)
+{
+    // Rectangle can be used as a point, so zero width and height are OK.
+    return rect.width() >= 0 && rect.height() >= 0;
+};
+
 struct ObjectInfo
 {
     QnUuid trackId;
@@ -105,7 +111,7 @@ figure::FigurePtr figureFromObjectData(
     const QRectF& boundingRect,
     const QRectF& zoomRect)
 {
-    if (!boundingRect.isValid())
+    if (!isValidFigureRectangle(boundingRect))
         return {};
 
     auto figure =
@@ -228,17 +234,10 @@ QRectF interpolatedRectangle(
     microseconds futureRectangleTimestamp,
     microseconds timestamp)
 {
-    const auto isValidRectangle =
-        [](const QRectF& rect)
-        {
-            // Rectangle can be used as a point, and that's OK.
-            return rect.width() >= 0 || rect.height() >= 0;
-        };
-
-    if (!isValidRectangle(rectangle))
+    if (!isValidFigureRectangle(rectangle))
         return futureRectangle;
 
-    if (!isValidRectangle(futureRectangle))
+    if (!isValidFigureRectangle(futureRectangle))
         return rectangle;
 
     if (futureRectangleTimestamp <= rectangleTimestamp)
