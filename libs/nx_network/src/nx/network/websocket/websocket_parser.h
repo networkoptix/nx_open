@@ -6,6 +6,9 @@
 #include "websocket_common_types.h"
 #include <nx/utils/move_only_func.h>
 
+#include <nx/utils/byte_stream/custom_output_stream.h>
+#include <nx/utils/gzip/gzip_uncompressor.h>
+
 namespace nx::network::websocket {
 
 class NX_NETWORK_API Parser
@@ -41,6 +44,7 @@ private:
     GotFrameHandler m_frameHandler;
     nx::Buffer m_buf;
     nx::Buffer m_frameBuffer;
+    nx::Buffer m_uncompressed;
     ParseState m_state = ParseState::readingHeaderFixedPart;
     int m_pos = 0;
     int m_payloadLen = 0;
@@ -52,6 +56,7 @@ private:
     int m_maskPos;
     bool m_firstFrame = true;
     bool m_doUncompress = false;
+    nx::utils::bstream::gzip::Uncompressor m_uncompressor;
 
     void parse(char* data, int len);
     void processPart(
