@@ -3,9 +3,38 @@
 #include "fan_error_event.h"
 
 #include "../event_fields/source_server_field.h"
+#include "../utils/event_details.h"
+#include "../utils/string_helper.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
+
+FanErrorEvent::FanErrorEvent(QnUuid serverId, std::chrono::microseconds timestamp):
+    base_type(timestamp),
+    m_serverId(serverId)
+{
+}
+
+QVariantMap FanErrorEvent::details(common::SystemContext* context) const
+{
+    auto result = BasicEvent::details(context);
+
+    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
+    result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
+
+    return result;
+}
+
+QString FanErrorEvent::extendedCaption(common::SystemContext* context) const
+{
+    if (totalEventCount() == 1)
+    {
+        const auto resourceName = utils::StringHelper(context).resource(m_serverId, Qn::RI_WithUrl);
+        return tr("Fan error at %1").arg(resourceName);
+    }
+
+    return BasicEvent::extendedCaption();
+}
 
 const ItemDescriptor& FanErrorEvent::manifest()
 {
@@ -15,15 +44,10 @@ const ItemDescriptor& FanErrorEvent::manifest()
         .description = "",
         .fields = {
             makeFieldDescriptor<SourceServerField>("serverId", tr("Server")),
-        }
+        },
+        .emailTemplatePath = ":/email_templates/fan_error.mustache"
     };
     return kDescriptor;
-}
-
-FanErrorEvent::FanErrorEvent(QnUuid serverId, std::chrono::microseconds timestamp):
-    base_type(timestamp),
-    m_serverId(serverId)
-{
 }
 
 } // namespace nx::vms::rules

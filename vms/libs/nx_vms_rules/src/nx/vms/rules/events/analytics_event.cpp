@@ -12,27 +12,10 @@
 #include "../event_fields/analytics_object_attributes_field.h"
 #include "../event_fields/keywords_field.h"
 #include "../utils/event_details.h"
+#include "../utils/string_helper.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
-
-const ItemDescriptor& AnalyticsEvent::manifest()
-{
-    static const auto kDescriptor = ItemDescriptor{
-        .id = utils::type<AnalyticsEvent>(),
-        .displayName = tr("Analytics Event"),
-        .flags = {ItemFlag::instant, ItemFlag::prolonged},
-        .fields = {
-            makeFieldDescriptor<SourceCameraField>("cameraId", tr("Camera")),
-            makeFieldDescriptor<AnalyticsEventTypeField>("eventTypeId", tr("Event Type")),
-            makeFieldDescriptor<KeywordsField>("caption", tr("Caption")),
-            makeFieldDescriptor<KeywordsField>("description", tr("Description")),
-            makeFieldDescriptor<AnalyticsObjectAttributesField>("attributes", tr("Attributes")),
-        }
-    };
-
-    return kDescriptor;
-}
 
 AnalyticsEvent::AnalyticsEvent(
     std::chrono::microseconds timestamp,
@@ -55,12 +38,17 @@ AnalyticsEvent::AnalyticsEvent(
     setState(state);
 }
 
-QMap<QString, QString> AnalyticsEvent::details(common::SystemContext* context) const
+QVariantMap AnalyticsEvent::details(common::SystemContext* context) const
 {
     auto result = AnalyticsEngineEvent::details(context);
 
     if (!result.contains(utils::kCaptionDetailName))
         utils::insertIfNotEmpty(result, utils::kCaptionDetailName, analyticsEventCaption(context));
+
+    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
+    result.insert(utils::kHasScreenshotDetailName, true);
+    utils::insertIfNotEmpty(result, utils::kAnalyticsEventTypeDetailName, analyticsEventCaption(context));
+    result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
 
     return result;
 }
@@ -75,6 +63,40 @@ QString AnalyticsEvent::analyticsEventCaption(common::SystemContext* context) co
         : nullptr;
 
     return eventType ? eventType->name() : tr("Analytics Event");
+}
+
+QString AnalyticsEvent::extendedCaption(common::SystemContext* context) const
+{
+    if (totalEventCount() == 1)
+    {
+        const auto resourceName = utils::StringHelper(context).resource(cameraId(), Qn::RI_WithUrl);
+        const auto eventCaption = analyticsEventCaption(context);
+
+        return tr("%1 at %2", "Analytics Event at some camera")
+            .arg(eventCaption)
+            .arg(resourceName);
+    }
+
+    return BasicEvent::extendedCaption();
+}
+
+const ItemDescriptor& AnalyticsEvent::manifest()
+{
+    static const auto kDescriptor = ItemDescriptor{
+        .id = "nx.events.analytics",
+        .displayName = tr("Analytics Event"),
+        .description = "",
+        .flags = {ItemFlag::instant, ItemFlag::prolonged},
+        .fields = {
+            makeFieldDescriptor<SourceCameraField>("cameraId", tr("Camera")),
+            makeFieldDescriptor<AnalyticsEventTypeField>("eventTypeId", tr("Event Type")),
+            makeFieldDescriptor<KeywordsField>("caption", tr("Caption")),
+            makeFieldDescriptor<KeywordsField>("description", tr("Description")),
+            makeFieldDescriptor<AnalyticsObjectAttributesField>("attributes", tr("Attributes")),
+        },
+        .emailTemplatePath = ":/email_templates/analytics_event.mustache"
+    };
+    return kDescriptor;
 }
 
 } // namespace nx::vms::rules

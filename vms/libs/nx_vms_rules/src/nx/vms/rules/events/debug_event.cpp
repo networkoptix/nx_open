@@ -15,11 +15,12 @@ DebugEvent::DebugEvent(const QString& action, qint64 value, std::chrono::microse
 {
 }
 
-QMap<QString, QString> DebugEvent::details(common::SystemContext* context) const
+QVariantMap DebugEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);
 
     utils::insertIfNotEmpty(result, utils::kDescriptionDetailName, description());
+    result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
 
     return result;
 }
@@ -27,11 +28,6 @@ QMap<QString, QString> DebugEvent::details(common::SystemContext* context) const
 QString DebugEvent::description() const
 {
     return QString("%1 action with %2 value").arg(m_action).arg(m_value);
-}
-
-FilterManifest DebugEvent::filterManifest()
-{
-    return {};
 }
 
 const ItemDescriptor& DebugEvent::manifest()
@@ -43,7 +39,8 @@ const ItemDescriptor& DebugEvent::manifest()
         .fields = {
             makeFieldDescriptor<EventTextField>("action", tr("Action")),
             makeFieldDescriptor<IntField>("value", tr("Value"))
-        }
+        },
+        .emailTemplatePath = ":/email_templates/debug.mustache"
     };
     return kDescriptor;
 }

@@ -2,14 +2,11 @@
 
 #include "soft_trigger_event.h"
 
-#include <core/resource/resource_display_info.h>
-#include <core/resource_management/resource_pool.h>
-#include <nx/vms/common/system_context.h>
-
 #include "../event_fields/source_camera_field.h"
 #include "../event_fields/source_user_field.h"
 #include "../event_fields/text_field.h"
 #include "../utils/event_details.h"
+#include "../utils/string_helper.h"
 
 namespace nx::vms::rules {
 
@@ -32,40 +29,44 @@ QString SoftTriggerEvent::uniqueName() const
     return QnUuid::createUuid().toString();
 }
 
-QMap<QString, QString> SoftTriggerEvent::details(common::SystemContext* context) const
+QVariantMap SoftTriggerEvent::details(common::SystemContext* context) const
 {
-    QMap<QString, QString> result = BasicEvent::details(context);
+    auto result = BasicEvent::details(context);
 
     utils::insertIfNotEmpty(result, utils::kCaptionDetailName, caption());
-    utils::insertIfNotEmpty(result, utils::kSourceDetailName, source(context));
+    utils::insertIfValid(result, utils::kSourceIdDetailName, QVariant::fromValue(cameraId()));
     utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing());
+    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
+    utils::insertIfNotEmpty(result, utils::kTriggerNameDetailName, trigger());
+    utils::insertIfValid(result, utils::kUserIdDetailName, QVariant::fromValue(m_userId));
+    result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
 
     return result;
 }
 
-QString SoftTriggerEvent::caption() const
+QString SoftTriggerEvent::trigger() const
 {
-    return QString("%1 %2").arg(type()).arg(triggerName());
+    return m_triggerName.isEmpty() ? tr("Trigger Name") : m_triggerName;
 }
 
-QString SoftTriggerEvent::source(common::SystemContext* context) const
+QString SoftTriggerEvent::caption() const
 {
-    auto cameraResource = context->resourcePool()->getResourceById(cameraId());
-    if (!cameraResource)
-        return {};
-
-    constexpr auto detailLevel = Qn::ResourceInfoLevel::RI_NameOnly; // TODO: #mmalofeev Should it be some hardcoded value or some value from the settings?
-    return QnResourceDisplayInfo(cameraResource).toString(detailLevel);
+    return QString("%1 %2").arg(type()).arg(trigger());
 }
 
 QString SoftTriggerEvent::detailing() const
 {
-    return tr("Trigger: %1").arg(m_triggerName);
+    return tr("Trigger: %1").arg(trigger());
 }
 
-FilterManifest SoftTriggerEvent::filterManifest()
+QString SoftTriggerEvent::extendedCaption(common::SystemContext* context) const
 {
-    return {};
+    return totalEventCount() == 1
+        ? tr("Soft Trigger %1 at %2")
+            .arg(trigger())
+            .arg(utils::StringHelper(context).resource(cameraId(), Qn::RI_WithUrl))
+        : tr("Soft Trigger %1 has been activated multiple times")
+            .arg(trigger());
 }
 
 const ItemDescriptor& SoftTriggerEvent::manifest()
@@ -78,7 +79,8 @@ const ItemDescriptor& SoftTriggerEvent::manifest()
             makeFieldDescriptor<SourceCameraField>("cameraId", tr("Camera ID")),
             makeFieldDescriptor<SourceUserField>("userId", tr("User ID")),
             makeFieldDescriptor<EventTextField>("triggerName", tr("Name"))
-        }
+        },
+        .emailTemplatePath = ":/email_templates/software_trigger.mustache"
     };
     return kDescriptor;
 }

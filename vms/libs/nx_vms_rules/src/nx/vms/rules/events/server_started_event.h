@@ -19,7 +19,12 @@ public:
     static const ItemDescriptor& manifest();
 
     ServerStartedEvent() = default;
-    ServerStartedEvent(QnUuid serverId, std::chrono::microseconds timestamp);
+    ServerStartedEvent(std::chrono::microseconds timestamp, QnUuid serverId);
+
+    virtual QVariantMap details(common::SystemContext* context) const override;
+
+private:
+    QString extendedCaption(common::SystemContext* context) const;
 };
 
 } // namespace nx::vms::rules

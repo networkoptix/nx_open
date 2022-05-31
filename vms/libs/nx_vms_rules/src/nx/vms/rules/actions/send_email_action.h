@@ -3,6 +3,7 @@
 #pragma once
 
 #include <nx/vms/rules/basic_action.h>
+#include <utils/email/message.h>
 
 #include "../data_macros.h"
 
@@ -16,8 +17,8 @@ class NX_VMS_RULES_API SendEmailAction: public nx::vms::rules::BasicAction
     FIELD(UuidSelection, users, setUsers)
     FIELD(int, interval, setInterval)
     FIELD(QString, emails, setEmails)
-    FIELD(QString, caption, setCaption)
-    FIELD(QString, description, setDescription)
+    FIELD(nx::email::Message, message, setMessage)
+    FIELD(QVariantMap, details, setDetails)
 
 public:
     static const ItemDescriptor& manifest();

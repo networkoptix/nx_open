@@ -5,6 +5,7 @@
 #include <QtCore/QMetaProperty>
 
 #include <nx/vms/time/formatter.h>
+#include <nx/utils/metatypes.h>
 
 #include "engine.h"
 #include "utils/event_details.h"
@@ -85,12 +86,14 @@ void BasicEvent::aggregate(const EventPtr& event)
         aggregateEvent(aggregatedEvent.first);
 }
 
-QMap<QString, QString> BasicEvent::details(common::SystemContext*) const
+QVariantMap BasicEvent::details(common::SystemContext*) const
 {
-    QMap<QString, QString> result;
+    QVariantMap result;
 
-    result.insert(utils::kNameDetailName, name());
-    result.insert(utils::kTimestampDetailName, aggregatedTimestamp());
+    utils::insertIfNotEmpty(result, utils::kTypeDetailName, type());
+    utils::insertIfNotEmpty(result, utils::kNameDetailName, name());
+    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption());
+    utils::insertIfValid(result, utils::kCountDetailName, QVariant::fromValue(totalEventCount()));
 
     return result;
 }
@@ -119,18 +122,11 @@ QString BasicEvent::name() const
     return descriptor ? descriptor->displayName : tr("Unknown event");
 }
 
-QString BasicEvent::aggregatedTimestamp() const
+QString BasicEvent::extendedCaption() const
 {
-    const auto time = QDateTime::fromMSecsSinceEpoch(timestamp().count() / 1000);
-    const auto count = totalEventCount();
-
-    return count == 1
-        ? tr("Time: %1 on %2", "%1 means time, %2 means date")
-              .arg(time::toString(time.time()))
-              .arg(time::toString(time.date()))
-        : tr("First occurrence: %1 on %2 (%n times total)", "%1 means time, %2 means date", count)
-              .arg(time::toString(time.time()))
-              .arg(time::toString(time.date()));
+    return totalEventCount() == 1
+        ? tr("%1 event has occurred").arg(name())
+        : tr("Multiple %1 events have occurred").arg(name());
 }
 
 } // namespace nx::vms::rules

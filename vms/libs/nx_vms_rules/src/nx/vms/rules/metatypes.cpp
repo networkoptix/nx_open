@@ -8,6 +8,7 @@
 #include <nx/utils/metatypes.h>
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/rules/camera_conflict_list.h>
+#include <utils/email/message.h>
 
 #include "basic_event.h"
 #include "field_types.h"
@@ -49,6 +50,8 @@ void Metatypes::initialize()
 
     QnJsonSerializer::registerSerializer<std::chrono::microseconds>();
     QnJsonSerializer::registerSerializer<std::chrono::seconds>();
+
+    qRegisterMetaType<email::Message>();
 };
 
 } // namespace nx::vms::rules

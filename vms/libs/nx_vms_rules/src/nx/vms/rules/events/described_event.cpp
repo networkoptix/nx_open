@@ -37,7 +37,7 @@ void DescribedEvent::setDescription(const QString& description)
     m_description = description;
 }
 
-QMap<QString, QString> DescribedEvent::details(common::SystemContext* context) const
+QVariantMap DescribedEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);
 

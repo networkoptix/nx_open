@@ -29,12 +29,13 @@ public:
         QnUuid objectTrackId,
         const nx::common::metadata::Attributes& attributes);
 
-    virtual QMap<QString, QString> details(common::SystemContext* context) const override;
+    virtual QVariantMap details(common::SystemContext* context) const override;
 
     static const ItemDescriptor& manifest();
 
 private:
     QString analyticsObjectCaption(common::SystemContext* context) const;
+    QString extendedCaption(common::SystemContext* context) const;
 };
 
 } // namespace nx::vms::rules

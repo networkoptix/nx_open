@@ -27,13 +27,11 @@ public:
     QnUuid engineId() const;
     void setEngineId(QnUuid engineId);
 
-    virtual QMap<QString, QString> details(common::SystemContext* context) const override;
+    virtual QVariantMap details(common::SystemContext* context) const override;
 
 private:
     QnUuid m_cameraId;
     QnUuid m_engineId;
-
-    QString engine(common::SystemContext* context) const;
 };
 
 } // namespace nx::vms::rules

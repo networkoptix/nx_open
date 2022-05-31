@@ -764,7 +764,10 @@ void Engine::processAcceptedEvent(const QnUuid& ruleId, const EventData& eventDa
         return;
 
     for (const auto builder: rule->actionBuilders())
-        builder->process(event);
+    {
+        if (m_executors.contains(builder->actionType()))
+            builder->process(event);
+    }
 }
 
 void Engine::processAction(const ActionPtr& action)

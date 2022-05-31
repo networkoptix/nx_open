@@ -12,9 +12,14 @@ class NX_VMS_RULES_API ServerFailureEvent: public ReasonedEvent
     Q_CLASSINFO("type", "nx.events.serverFailure")
 
 public:
+    virtual QVariantMap details(common::SystemContext* context) const override;
+
     static const ItemDescriptor& manifest();
 
     using ReasonedEvent::ReasonedEvent;
+
+private:
+    QString extendedCaption(common::SystemContext* context) const;
 };
 
 } // namespace nx::vms::rules

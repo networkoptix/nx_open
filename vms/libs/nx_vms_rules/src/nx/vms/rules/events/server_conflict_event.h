@@ -18,8 +18,6 @@ class NX_VMS_RULES_API ServerConflictEvent: public BasicEvent
     FIELD(nx::vms::rules::CameraConflictList, conflicts, setConflicts)
 
 public:
-    static const ItemDescriptor& manifest();
-
     ServerConflictEvent(
         std::chrono::microseconds timestamp,
         QnUuid serverId,
@@ -27,10 +25,13 @@ public:
 
     ServerConflictEvent() = default;
 
-    virtual QMap<QString, QString> details(common::SystemContext* context) const override;
+    virtual QVariantMap details(common::SystemContext* context) const override;
+
+    static const ItemDescriptor& manifest();
 
 private:
     QString detailing() const;
+    QString extendedCaption(common::SystemContext* context) const;
 };
 
 } // namespace nx::vms::rules

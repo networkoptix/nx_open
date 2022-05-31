@@ -2,11 +2,46 @@
 
 #include "backup_finished_event.h"
 
+#include "../utils/event_details.h"
+#include "../utils/string_helper.h"
+
 namespace nx::vms::rules {
+
+QVariantMap BackupFinishedEvent::details(common::SystemContext* context) const
+{
+    auto result = BasicEvent::details(context);
+
+    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
+    result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
+
+    return result;
+}
+
+QString BackupFinishedEvent::extendedCaption(common::SystemContext* context) const
+{
+    if (totalEventCount() == 1)
+    {
+        const auto resourceName = utils::StringHelper(context).resource({}, Qn::RI_WithUrl); //< TODO: add server id to the event
+        return tr("Server \"%1\" has finished an archive backup").arg(resourceName);
+    }
+
+    return BasicEvent::extendedCaption();
+}
 
 FilterManifest BackupFinishedEvent::filterManifest()
 {
     return {};
+}
+
+const ItemDescriptor& BackupFinishedEvent::manifest()
+{
+    static const auto kDescriptor = ItemDescriptor{
+        .id = "nx.events.archiveBackupFinished",
+        .displayName = tr("Backup Finished"),
+        .description = "",
+        .emailTemplatePath = ":/email_templates/backup_finished.mustache"
+    };
+    return kDescriptor;
 }
 
 } // namespace nx::vms::rules

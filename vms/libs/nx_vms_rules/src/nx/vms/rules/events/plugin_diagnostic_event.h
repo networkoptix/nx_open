@@ -29,8 +29,11 @@ public:
         QnUuid engineId,
         nx::vms::api::EventLevel level);
 
-    virtual QMap<QString, QString> details(common::SystemContext* context) const override;
+    virtual QVariantMap details(common::SystemContext* context) const override;
 
+private:
+    QString eventCaption() const;
+    QString extendedCaption(common::SystemContext* context) const;
 };
 
 } // namespace nx::vms::rules

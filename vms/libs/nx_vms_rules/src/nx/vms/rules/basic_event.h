@@ -64,8 +64,8 @@ public:
     /** Returns total amount of the aggregated events. */
     size_t totalEventCount() const;
 
-    /** Returns the event string formatted details(such as caption, description, timestamp etc.). */
-    virtual QMap<QString, QString> details(common::SystemContext* context) const;
+    /** Returns the event details(such as caption, description, timestamp, source etc.). */
+    virtual QVariantMap details(common::SystemContext* context) const;
 
 protected:
     BasicEvent() = default;
@@ -77,6 +77,8 @@ protected:
         return QStringList{strings...}.join(kEventNameSeparator);
     }
 
+    QString extendedCaption() const;
+
 private:
     QString m_type;
     std::chrono::microseconds m_timestamp;
@@ -86,7 +88,6 @@ private:
     std::unordered_map</*unique name*/ QString, /*count*/ size_t> m_eventsHash;
 
     QString name() const;
-    QString aggregatedTimestamp() const;
 };
 
 } // namespace nx::vms::rules

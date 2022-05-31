@@ -2,24 +2,27 @@
 
 #pragma once
 
-#include "../basic_event.h"
 #include "../data_macros.h"
+#include "camera_event.h"
 
 namespace nx::vms::rules {
 
-class NX_VMS_RULES_API MotionEvent: public BasicEvent
+class NX_VMS_RULES_API MotionEvent: public CameraEvent
 {
     Q_OBJECT
-    using base_type = BasicEvent;
+    using base_type = CameraEvent;
     Q_CLASSINFO("type", "nx.events.motion")
 
-    FIELD(QnUuid, source, setSource)
-
 public:
-    static const ItemDescriptor& manifest();
-
     MotionEvent() = default;
     MotionEvent(std::chrono::microseconds timestamp, State state, QnUuid deviceId);
+
+    virtual QVariantMap details(common::SystemContext* context) const override;
+
+    static const ItemDescriptor& manifest();
+
+private:
+    QString extendedCaption(common::SystemContext* context) const;
 };
 
 } // namespace nx::vms::rules

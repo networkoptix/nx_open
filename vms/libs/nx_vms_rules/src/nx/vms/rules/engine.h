@@ -134,7 +134,9 @@ public:
     using EventFieldConstructor = std::function<EventField*()>;
     using ActionFieldConstructor = std::function<ActionField*()>;
 
+    bool isEventFieldRegistered(const QString& fieldId) const;
     bool registerEventField(const QString& type, const EventFieldConstructor& ctor);
+    bool isActionFieldRegistered(const QString& fieldId) const;
     bool registerActionField(const QString& type, const ActionFieldConstructor& ctor);
 
     /**
@@ -219,9 +221,6 @@ private:
 
     std::unique_ptr<EventFilter> buildEventFilter(const ItemDescriptor& descriptor) const;
     std::unique_ptr<ActionBuilder> buildActionBuilder(const ItemDescriptor& descriptor) const;
-
-    bool isEventFieldRegistered(const QString& fieldId) const;
-    bool isActionFieldRegistered(const QString& fieldId) const;
 
 private:
     bool m_enabled = false;

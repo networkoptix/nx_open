@@ -57,6 +57,9 @@ struct ItemDescriptor
 
     /** Item fields. */
     QList<FieldDescriptor> fields;
+
+    /** Path to the mustache template file used to generate email. */
+    QString emailTemplatePath; // TODO: #mmalofeev split ItemDescriptor to EventDescriptior and ActionDescriptor.
 };
 
 template<class T>

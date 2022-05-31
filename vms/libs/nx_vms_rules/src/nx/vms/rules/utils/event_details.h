@@ -2,19 +2,41 @@
 
 #pragma once
 
+#include <chrono>
+
+#include <QtCore/QVariantMap>
+
 namespace nx::vms::rules::utils {
 
+static constexpr auto kAnalyticsEventTypeDetailName = "analyticsEventType";
+static constexpr auto kAnalyticsObjectTypeDetailName = "analyticsObjectType";
 static constexpr auto kCaptionDetailName = "caption";
+static constexpr auto kCountDetailName = "count";
 static constexpr auto kDescriptionDetailName = "description";
-static constexpr auto kNameDetailName = "name";
-static constexpr auto kTimestampDetailName = "timestamp";
-static constexpr auto kSourceDetailName = "source";
-static constexpr auto kPluginDetailName = "plugin";
 static constexpr auto kDetailingDetailName = "detailing";
+static constexpr auto kExtendedCaptionDetailName = "extendedCaption";
+static constexpr auto kEmailTemplatePathDetailName = "extendedCaption";
+static constexpr auto kHasScreenshotDetailName = "hasTimestamp";
+static constexpr auto kNameDetailName = "name";
+static constexpr auto kPluginIdDetailName = "pluginId";
+static constexpr auto kScreenshotLifetimeDetailName = "screenshotLifetime";
+static constexpr auto kSourceIdDetailName = "sourceId";
+static constexpr auto kSourceStatusDetailName = "sourceStatus";
+static constexpr auto kTypeDetailName = "type";
+static constexpr auto kTriggerNameDetailName = "triggerName";
+static constexpr auto kUserIdDetailName = "userId";
 
-inline void insertIfNotEmpty(QMap<QString, QString>& map, const QString& key, const QString& value)
+static constexpr std::chrono::microseconds kScreenshotLifetime(5'000'000);
+
+inline void insertIfNotEmpty(QVariantMap& map, const QString& key, const QString& value)
 {
     if (!value.isEmpty())
+        map.insert(key, value);
+}
+
+inline void insertIfValid(QVariantMap& map, const QString& key, const QVariant& value)
+{
+    if (value.isValid())
         map.insert(key, value);
 }
 

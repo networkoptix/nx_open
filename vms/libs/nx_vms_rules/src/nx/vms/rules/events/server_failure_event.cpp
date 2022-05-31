@@ -2,7 +2,31 @@
 
 #include "server_failure_event.h"
 
+#include "../utils/event_details.h"
+#include "../utils/string_helper.h"
+
 namespace nx::vms::rules {
+
+QVariantMap ServerFailureEvent::details(common::SystemContext* context) const
+{
+    auto result = ReasonedEvent::details(context);
+
+    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
+    result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
+
+    return result;
+}
+
+QString ServerFailureEvent::extendedCaption(common::SystemContext* context) const
+{
+    if (totalEventCount() == 1)
+    {
+        const auto resourceName = utils::StringHelper(context).resource(serverId(), Qn::RI_WithUrl);
+        return tr("Server \"%1\" Failure").arg(resourceName);
+    }
+
+    return BasicEvent::extendedCaption();
+}
 
 const ItemDescriptor& ServerFailureEvent::manifest()
 {
@@ -10,6 +34,7 @@ const ItemDescriptor& ServerFailureEvent::manifest()
         .id = "nx.events.serverFailure",
         .displayName = tr("Server Failure"),
         .description = "",
+        .emailTemplatePath = ":/email_templates/mediaserver_failure.mustache"
     };
     return kDescriptor;
 }

@@ -9,6 +9,7 @@
 
 #include "../event_fields/source_camera_field.h"
 #include "../utils/event_details.h"
+#include "../utils/string_helper.h"
 
 namespace nx::vms::rules {
 
@@ -26,19 +27,21 @@ QString DeviceDisconnectedEvent::uniqueName() const
     return makeName(BasicEvent::uniqueName(), m_deviceId.toString());
 }
 
-QMap<QString, QString> DeviceDisconnectedEvent::details(common::SystemContext* context) const
+QVariantMap DeviceDisconnectedEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);
 
     utils::insertIfNotEmpty(result, utils::kCaptionDetailName, caption(context));
+    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
+    utils::insertIfValid(result, utils::kSourceIdDetailName, QVariant::fromValue(m_deviceId));
+    result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
 
     return result;
 }
 
 QString DeviceDisconnectedEvent::caption(common::SystemContext* context) const
 {
-    const auto eventSource = context->resourcePool()->getResourceById(deviceId());
-    const auto camera = eventSource.dynamicCast<QnVirtualCameraResource>();
+    const auto camera = context->resourcePool()->getResourceById<QnVirtualCameraResource>(m_deviceId);
 
     return QnDeviceDependentStrings::getNameFromSet(
         context->resourcePool(),
@@ -49,6 +52,26 @@ QString DeviceDisconnectedEvent::caption(common::SystemContext* context) const
         camera);
 }
 
+QString DeviceDisconnectedEvent::extendedCaption(common::SystemContext* context) const
+{
+    const auto camera = context->resourcePool()->getResourceById<QnVirtualCameraResource>(m_deviceId);
+
+    if (totalEventCount() == 1)
+    {
+        const auto resourceName = utils::StringHelper(context).resource(m_deviceId, Qn::RI_WithUrl);
+
+        return QnDeviceDependentStrings::getNameFromSet(
+            context->resourcePool(),
+            QnCameraDeviceStringSet(
+                tr("Device %1 was disconnected"),
+                tr("Camera %1 was disconnected"),
+                tr("I/O Module %1 was disconnected")),
+            camera).arg(resourceName);
+    }
+
+    return BasicEvent::extendedCaption();
+}
+
 const ItemDescriptor& DeviceDisconnectedEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
@@ -57,7 +80,8 @@ const ItemDescriptor& DeviceDisconnectedEvent::manifest()
         .description = "",
         .fields = {
             makeFieldDescriptor<SourceCameraField>("deviceId", tr("Device ID")),
-        }
+        },
+        .emailTemplatePath = ":/email_templates/camera_disconnect.mustache"
     };
     return kDescriptor;
 }

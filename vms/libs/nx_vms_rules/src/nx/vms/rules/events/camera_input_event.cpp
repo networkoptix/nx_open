@@ -5,23 +5,10 @@
 #include "../event_fields/input_port_field.h"
 #include "../event_fields/source_camera_field.h"
 #include "../utils/event_details.h"
+#include "../utils/string_helper.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
-
-const ItemDescriptor& CameraInputEvent::manifest()
-{
-    static const auto kDescriptor = ItemDescriptor{
-        .id = utils::type<CameraInputEvent>(),
-        .displayName = tr("Input Signal on Camera"),
-        .flags = ItemFlag::prolonged,
-        .fields = {
-            makeFieldDescriptor<SourceCameraField>("cameraId", tr("Camera")),
-            makeFieldDescriptor<InputPortField>("inputPortId", tr("Input ID")),
-        }
-    };
-    return kDescriptor;
-}
 
 CameraInputEvent::CameraInputEvent(
     std::chrono::microseconds timestamp,
@@ -29,8 +16,7 @@ CameraInputEvent::CameraInputEvent(
     QnUuid cameraId,
     const QString& inputPortId)
     :
-    BasicEvent(timestamp, state),
-    m_cameraId(cameraId),
+    CameraEvent(timestamp, state, cameraId),
     m_inputPortId(inputPortId)
 {
 }
@@ -40,11 +26,13 @@ QString CameraInputEvent::uniqueName() const
     return makeName(BasicEvent::uniqueName(), m_inputPortId);
 }
 
-QMap<QString, QString> CameraInputEvent::details(common::SystemContext* context) const
+QVariantMap CameraInputEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);
 
     utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing());
+    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
+    result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
 
     return result;
 }
@@ -52,6 +40,32 @@ QMap<QString, QString> CameraInputEvent::details(common::SystemContext* context)
 QString CameraInputEvent::detailing() const
 {
     return tr("Input Port: %1").arg(m_inputPortId);
+}
+
+QString CameraInputEvent::extendedCaption(common::SystemContext* context) const
+{
+    if (totalEventCount() == 1)
+    {
+        const auto resourceName = utils::StringHelper(context).resource(source(), Qn::RI_WithUrl);
+        return tr("Input on %1").arg(resourceName);
+    }
+
+    return BasicEvent::extendedCaption();
+}
+
+const ItemDescriptor& CameraInputEvent::manifest()
+{
+    static const auto kDescriptor = ItemDescriptor{
+        .id = utils::type<CameraInputEvent>(),
+        .displayName = tr("Input Signal on Camera"),
+        .flags = ItemFlag::prolonged,
+        .fields = {
+            makeFieldDescriptor<SourceCameraField>("source", tr("Camera")),
+            makeFieldDescriptor<InputPortField>("inputPortId", tr("Input ID")),
+        },
+        .emailTemplatePath = ":/email_templates/camera_input.mustache"
+    };
+    return kDescriptor;
 }
 
 } // namespace nx::vms::rules

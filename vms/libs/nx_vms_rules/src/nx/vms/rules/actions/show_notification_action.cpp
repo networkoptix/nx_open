@@ -31,10 +31,6 @@ const ItemDescriptor& NotificationAction::manifest()
             makeFieldDescriptor<TextWithFields>("tooltip", tr("Tooltip"), QString(),
                 {
                     { "text", "{@EventTooltip}" }
-                }),
-            makeFieldDescriptor<TextWithFields>("source", tr("Source"), QString(),
-                {
-                    { "text", "{@EventSource}" }
                 })
         }
     };
