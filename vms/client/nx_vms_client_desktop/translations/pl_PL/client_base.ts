@@ -9554,7 +9554,7 @@ Możesz to wymusić, ale może to znacznie zwiększyć obciążenie procesora.</
     <name>nx::vms::client::desktop::ObjectTrackingButton</name>
     <message>
       <source>Object tracking is ON</source>
-      <translation type="unfinished">Object tracking is ON</translation>
+      <translation>Śledzenie obiektów włączone</translation>
     </message>
   </context>
   <context>
@@ -11131,21 +11131,21 @@ Nie przypinaj tego certyfikatu, jeśli &apos; nie zmodyfikowałeś %2 certyfikat
     </message>
     <message>
       <source>Open door</source>
-      <translation type="unfinished">Open door</translation>
+      <translation>Otwórz drzwi</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::integrations::OverlappedIdDialogModel</name>
     <message>
       <source>Latest</source>
-      <translation type="unfinished">Latest</translation>
+      <translation>Najnowszy</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::integrations::OverlappedIdIntegration</name>
     <message>
       <source>Overlapped ID...</source>
-      <translation type="unfinished">Overlapped ID...</translation>
+      <translation>Nakładane ID...</translation>
     </message>
   </context>
   <context>

@@ -310,11 +310,11 @@
     </message>
     <message>
       <source>Skip Current Queue</source>
-      <translation type="unfinished">Skip Current Queue</translation>
+      <translation>跳過目前佇列</translation>
     </message>
     <message>
       <source>Maximum backup queue size</source>
-      <translation type="unfinished">Maximum backup queue size</translation>
+      <translation>最大備份佇列容量</translation>
     </message>
     <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>

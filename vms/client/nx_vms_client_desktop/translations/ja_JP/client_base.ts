@@ -7188,7 +7188,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>To enable backup add more drives to use them as backup storage in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation>バックアップを有効にするには、%1 にドライブを追加してバックアップ用に設定してください</translation>
+      <translation>バックアップを有効にするには、%1 でドライブを追加してバックアップ用に設定してください</translation>
     </message>
   </context>
   <context>

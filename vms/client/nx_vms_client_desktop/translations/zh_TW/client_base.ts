@@ -905,55 +905,55 @@
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>新增</translation>
     </message>
     <message>
       <source>Welcome Screen</source>
-      <translation type="unfinished">Welcome Screen</translation>
+      <translation>歡迎畫面</translation>
     </message>
     <message>
       <source>Add Web Page...</source>
-      <translation type="unfinished">Add Web Page...</translation>
+      <translation>新增一個網頁</translation>
     </message>
     <message>
       <source>Show Servers</source>
-      <translation type="unfinished">Show Servers</translation>
+      <translation>顯示伺服器</translation>
     </message>
     <message>
       <source>Save Window Configuration</source>
-      <translation type="unfinished">Save Window Configuration</translation>
+      <translation>儲存視窗設定</translation>
     </message>
     <message>
       <source>Save Windows Configuration</source>
-      <translation type="unfinished">Save Windows Configuration</translation>
+      <translation>儲存視窗設定</translation>
     </message>
     <message>
       <source>Windows Configuration</source>
-      <translation type="unfinished">Windows Configuration</translation>
+      <translation>視窗設定</translation>
     </message>
     <message>
       <source>Save Current State</source>
-      <translation type="unfinished">Save Current State</translation>
+      <translation>保存目前的狀態</translation>
     </message>
     <message>
       <source>Restore Saved State</source>
-      <translation type="unfinished">Restore Saved State</translation>
+      <translation>還原已儲存的狀態</translation>
     </message>
     <message>
       <source>Delete Saved State</source>
-      <translation type="unfinished">Delete Saved State</translation>
+      <translation>刪除已儲存的狀態</translation>
     </message>
     <message>
       <source>Close all Windows</source>
-      <translation type="unfinished">Close all Windows</translation>
+      <translation>關閉所有視窗</translation>
     </message>
     <message>
       <source>Delete Bookmark...</source>
-      <translation type="unfinished">Delete Bookmark...</translation>
+      <translation>刪除此書籤</translation>
     </message>
     <message>
       <source>Delete Bookmarks...</source>
-      <translation type="unfinished">Delete Bookmarks...</translation>
+      <translation>刪除所選擇的書籤</translation>
     </message>
     <message numerus="yes">
       <source>Show on Items</source>
@@ -967,15 +967,15 @@
     </message>
     <message>
       <source>Rotate to</source>
-      <translation type="unfinished">Rotate to</translation>
+      <translation>旋轉</translation>
     </message>
     <message>
       <source>Create Group</source>
-      <translation type="unfinished">Create Group</translation>
+      <translation>建立群組</translation>
     </message>
     <message>
       <source>Remove Group</source>
-      <translation type="unfinished">Remove Group</translation>
+      <translation>刪除群組</translation>
     </message>
     <message>
       <source>Add Proxied Web Page...</source>
@@ -3008,7 +3008,7 @@ to %1</source>
     </message>
     <message>
       <source>Restore from Database Backup</source>
-      <translation type="unfinished">Restore from Database Backup</translation>
+      <translation>從資料庫備份還原</translation>
     </message>
     <message>
       <source>Enter your account password to restore System from backup</source>
@@ -3436,7 +3436,7 @@ to %1</source>
     </message>
     <message>
       <source>Please enter a password.</source>
-      <translation type="unfinished">Please enter a password.</translation>
+      <translation>請輸入密碼。</translation>
     </message>
   </context>
   <context>
@@ -3896,11 +3896,11 @@ to %1</source>
     </message>
     <message>
       <source>Motion Search</source>
-      <translation type="unfinished">Motion Search</translation>
+      <translation>智慧位移搜尋</translation>
     </message>
     <message>
       <source>Object Search</source>
-      <translation type="unfinished">Object Search</translation>
+      <translation>物件搜尋</translation>
     </message>
   </context>
   <context>
@@ -4468,7 +4468,7 @@ to %1</source>
     </message>
     <message>
       <source>Enter Fullscreen</source>
-      <translation type="unfinished">Enter Fullscreen</translation>
+      <translation>全螢幕顯示</translation>
     </message>
   </context>
   <context>
@@ -4766,8 +4766,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Certificates</source>
-      <translation type="unfinished">
-        <numerusform>Certificates</numerusform>
+      <translation>
+        <numerusform>憑證</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5910,7 +5910,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed.</source>
-      <translation type="unfinished">Only letters, numbers and symbols %1 are allowed.</translation>
+      <translation>僅允許輸入字母、數字與 %1 符號。</translation>
     </message>
   </context>
   <context>
