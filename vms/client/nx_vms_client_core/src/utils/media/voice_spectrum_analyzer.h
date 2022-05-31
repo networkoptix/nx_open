@@ -10,7 +10,6 @@ extern "C" {
 #include <libavcodec/avfft.h> //< private
 } // extern "C"
 
-#include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 
 struct QnSpectrumData
@@ -21,8 +20,7 @@ struct QnSpectrumData
 };
 
 class NX_VMS_CLIENT_CORE_API QnVoiceSpectrumAnalyzer:
-    public QObject,
-    public Singleton<QnVoiceSpectrumAnalyzer>
+    public QObject
 {
     Q_OBJECT
 

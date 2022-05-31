@@ -8,14 +8,10 @@
 // it quits after first getData
 // such reader can be used for photo
 
-class QnStoragePluginFactory;
-
 class QnSingleShotFileStreamreader: public QnAbstractMediaStreamDataProvider
 {
 public:
-    QnSingleShotFileStreamreader(
-        const QnResourcePtr& resource,
-        QnStoragePluginFactory* storageFactory);
+    QnSingleShotFileStreamreader(const QnResourcePtr& resource);
 
     ~QnSingleShotFileStreamreader(){stop();}
     void setStorage(const QnStorageResourcePtr& storage);
@@ -29,5 +25,4 @@ protected:
 
 private:
     QnStorageResourcePtr m_storage;
-    QnStoragePluginFactory* const m_storageFactory;
 };

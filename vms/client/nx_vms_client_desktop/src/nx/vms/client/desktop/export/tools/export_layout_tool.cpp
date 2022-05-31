@@ -10,7 +10,6 @@
 #include <camera/loaders/caching_camera_data_loader.h>
 #include <client/client_module.h>
 #include <client/client_settings.h>
-#include <common/common_module.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/file_layout_resource.h>
@@ -26,6 +25,7 @@
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
+#include <nx/vms/client/desktop/resources/resource_descriptor.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
 #include <nx_ec/data/api_conversion_functions.h>
@@ -207,14 +207,9 @@ ExportLayoutTool::ItemInfoList ExportLayoutTool::prepareLayout()
     QSet<QnUuid> idList;
     QnLayoutItemDataMap items;
 
-    // Take resource pool from the original layout.
-    auto resourcePool = d->originalLayout->resourcePool();
-    if (!NX_ASSERT(resourcePool))
-        return result;
-
     for (const auto& item: d->layout->getItems())
     {
-        const auto resource = resourcePool->getResourceByDescriptor(item.resource);
+        const auto resource = getResourceByDescriptor(item.resource);
         const auto mediaResource = resource.dynamicCast<QnMediaResource>();
         // We only export video files or cameras; no still images, web pages etc.
         const bool skip = !mediaResource || resource->hasFlags(Qn::still_image);
@@ -560,10 +555,6 @@ void ExportLayoutTool::at_camera_exportFinished(const std::optional<nx::recordin
 
     if (error)
     {
-        auto camRes = camera->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
-        NX_ASSERT(camRes, "Make sure camera exists");
-        const auto resourcePool = camRes->resourcePool();
-        NX_ASSERT(resourcePool);
         d->lastError = ExportProcessError::unsupportedMedia;
         finishExport(false);
     }

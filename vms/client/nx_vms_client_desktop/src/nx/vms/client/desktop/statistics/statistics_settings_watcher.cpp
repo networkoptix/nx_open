@@ -2,31 +2,37 @@
 
 #include "statistics_settings_watcher.h"
 
-#include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/media_server_resource.h>
+#include <chrono>
+
+#include <QtCore/QTimer>
+
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/client/core/network/network_manager.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/statistics/settings.h>
 #include <utils/common/delayed.h>
 
+using namespace std::chrono;
+
 namespace nx::vms::client::desktop {
 
-struct StatisticsSettingsWatcher::Private: public QObject
+namespace {
+
+constexpr auto kUpdateSettingsInterval = 4h;
+
+} // namespace
+
+struct StatisticsSettingsWatcher::Private
 {
     StatisticsSettingsWatcher* const q;
     std::optional<QnStatisticsSettings> settings;
     std::unique_ptr<nx::network::http::AsyncClient> request;
     mutable nx::Mutex mutex;
-
-    Private(StatisticsSettingsWatcher* owner):
-        q(owner)
-    {
-    }
 
     ~Private()
     {
@@ -37,7 +43,7 @@ struct StatisticsSettingsWatcher::Private: public QObject
     nx::utils::Url actualUrl() const
     {
         const auto localSettingsUrl =
-            q->globalSettings()->clientStatisticsSettingsUrl();
+            q->systemSettings()->clientStatisticsSettingsUrl();
 
         if (localSettingsUrl.isValid())
             return localSettingsUrl;
@@ -111,24 +117,36 @@ struct StatisticsSettingsWatcher::Private: public QObject
     }
 };
 
-StatisticsSettingsWatcher::StatisticsSettingsWatcher(QObject* parent):
-    base_type(parent),
-    d(new Private(this))
+StatisticsSettingsWatcher::StatisticsSettingsWatcher(
+    SystemContext* systemContext,
+    QObject* parent)
+    :
+    QObject(parent),
+    SystemContextAware(systemContext),
+    d(new Private{.q = this})
 {
+    auto updateSettings = [this] { d->updateSettings(); };
+
+    connect(systemSettings(),
+        &common::SystemSettings::initialized,
+        this,
+        updateSettings);
+
+    auto updateSettingsTimer = new QTimer(this);
+    updateSettingsTimer->setSingleShot(false);
+    updateSettingsTimer->setInterval(kUpdateSettingsInterval);
+    updateSettingsTimer->callOnTimeout(updateSettings);
+    updateSettingsTimer->start();
 }
 
 StatisticsSettingsWatcher::~StatisticsSettingsWatcher()
-{}
+{
+}
 
 std::optional<QnStatisticsSettings> StatisticsSettingsWatcher::settings() const
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
     return d->settings;
-}
-
-void StatisticsSettingsWatcher::updateSettings()
-{
-    d->updateSettings();
 }
 
 } // namespace nx::vms::client::desktop

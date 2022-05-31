@@ -10,8 +10,6 @@
 
 #include "system_context_aware.h"  //< Forward declarations.
 
-class QnCameraHistoryPool;
-class QnCommonMessageProcessor;
 class QnGlobalPermissionsManager;
 class QnLayoutTourManager;
 class QnLicensePool;
@@ -209,8 +207,8 @@ public:
 
     std::shared_ptr<nx::analytics::taxonomy::AbstractState> analyticsTaxonomyState() const;
 
-private:
-    void setMessageProcessor(QnCommonMessageProcessor* messageProcessor);
+protected:
+    virtual void setMessageProcessor(QnCommonMessageProcessor* messageProcessor);
 
 private:
     struct Private;

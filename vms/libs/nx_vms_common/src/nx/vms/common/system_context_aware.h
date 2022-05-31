@@ -6,12 +6,15 @@
 
 #include <nx/utils/impl_ptr.h>
 
+class QnCameraHistoryPool;
+class QnCommonMessageProcessor;
 class QnResourceAccessManager;
 class QnResourcePool;
 
 namespace nx::vms::common {
 
 class SystemContext;
+class SystemSettings;
 
 class NX_VMS_COMMON_API SystemContextInitializer
 {
@@ -45,6 +48,19 @@ protected:
      * List of all Resources in the System. Some data is stored in the external dictionaries.
      */
     QnResourcePool* resourcePool() const;
+
+    QnCommonMessageProcessor* messageProcessor() const;
+
+    /**
+     * Information about Servers, storing Device footage.
+     */
+    QnCameraHistoryPool* cameraHistoryPool() const;
+
+    /**
+     * System settings, which do not depend on any Device or Server and are applied globally.
+     * Currently stored as Resource Properties for the `admin` User.
+     */
+    SystemSettings* systemSettings() const;
 
     // TODO: #GDM Remove field.
     SystemContext* m_context = nullptr;

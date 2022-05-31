@@ -3,45 +3,37 @@
 #include "resource_item_delegate.h"
 
 #include <QtCore/QtMath>
-
 #include <QtWidgets/QAbstractItemView>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QLineEdit>
 
-#include <common/common_globals.h>
-#include <common/common_module.h>
-
-#include <core/resource/camera_history.h>
-#include <core/resource/network_resource.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/layout_resource.h>
-#include <core/resource/user_resource.h>
-#include <core/resource/resource_display_info.h>
-#include <core/resource/videowall_resource.h>
-#include <core/resource/videowall_item_index.h>
-
-#include <core/resource_management/resource_runtime_data.h>
-
 #include <client/client_meta_types.h>
 #include <client/client_settings.h>
-#include <client/client_module.h>
-
+#include <common/common_globals.h>
+#include <common/common_module.h>
+#include <core/resource/camera_history.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource/network_resource.h>
+#include <core/resource/resource_display_info.h>
+#include <core/resource/user_resource.h>
+#include <core/resource/videowall_item_index.h>
+#include <core/resource/videowall_resource.h>
+#include <core/resource_management/resource_runtime_data.h>
+#include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resource_views/data/camera_extra_status.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
-
-#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-
-#include <ui/workbench/workbench.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/workbench_item.h>
-
+#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_manager.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_state.h>
-
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_layout.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 using namespace nx::vms::client::desktop;
@@ -507,7 +499,7 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForMediaResou
     if (centralItem && centralItem->resource() == resource)
         return ItemState::accented;
 
-    if (currentLayout->layoutResourceIds().contains(resource->getId()))
+    if (resourceBelongsToLayout(resource, currentLayout))
         return ItemState::selected;
 
     return ItemState::normal;
@@ -635,7 +627,9 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForVideoWallI
     if (!centralItem || uuid.isNull())
         return ItemState::selected;
 
-    auto indices = qnResourceRuntimeDataManager->layoutItemData(centralItem->uuid(),
+    auto layoutContext = SystemContext::fromResource(layout->resource());
+    auto indices = layoutContext->resourceRuntimeDataManager()->layoutItemData(
+        centralItem->uuid(),
         Qn::VideoWallItemIndicesRole).value<QnVideoWallItemIndexList>();
 
     for (const auto& itemIndex: indices)
@@ -715,9 +709,9 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
         if (resource->hasFlags(Qn::virtual_camera))
         {
             QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
+            auto systemContext = SystemContext::fromResource(camera);
 
-            using namespace nx::vms::client::desktop;
-            VirtualCameraState state = qnClientModule->virtualCameraManager()->state(camera);
+            VirtualCameraState state = systemContext->virtualCameraManager()->state(camera);
             if (state.isRunning())
                 extInfo = kCustomExtInfoTemplate.arg(QString::number(state.progress()) + lit("%"));
         }

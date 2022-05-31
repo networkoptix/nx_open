@@ -56,7 +56,7 @@ public:
     std::optional<nx::network::SocketAddress> getCloudAddress() const;
 
     virtual QString getUrl() const override;
-    QString rtspUrl() const;
+    virtual QString rtspUrl() const;
     virtual void setUrl(const QString& url) override;
     // TODO: #dklychkov Remove this, use getPrimaryAddress() instead.
     quint16 getPort() const;
@@ -72,7 +72,7 @@ public:
     bool hasInternetAccess() const;
 
     /** New Server Rest connection. */
-    ::rest::ServerConnectionPtr restConnection();
+    rest::ServerConnectionPtr restConnection() const;
 
     QnStorageResourceList getStorages() const;
     QnStorageResourcePtr getStorageByUrl(const QString& url) const;
@@ -88,8 +88,8 @@ public:
     int getMaxCameras() const;
     void setMaxCameras(int value);
 
-    /** 
-     * Automatic failover moves Cameras across Servers with the same Location ID only. 
+    /**
+     * Automatic failover moves Cameras across Servers with the same Location ID only.
      */
     void setLocationId(int value);
     int locationId() const;
@@ -192,9 +192,11 @@ protected:
 private:
     Qn::PanicMode calculatePanicMode() const;
 
+protected:
+    mutable rest::ServerConnectionPtr m_restConnection;
+
 private:
     nx::network::SocketAddress m_primaryAddress;
-    ::rest::ServerConnectionPtr m_restConnection; //< new one
     QList<nx::network::SocketAddress> m_netAddrList;
     QList<nx::utils::Url> m_additionalUrls;
     QList<nx::utils::Url> m_ignoredUrls;

@@ -41,9 +41,17 @@ public:
     void setTimeSyncManager(nx::vms::common::AbstractTimeSyncManagerPtr timeSyncManager);
     void setTimeNotificationManager(ec2::AbstractTimeNotificationManagerPtr timeNotificationManager);
 
+    /**
+     * Synchronized time of the System in milliseconds since epoch. Can be taken from the Internet
+     * if there is a network access, otherwise one of the Servers is chosen as main, and it's time
+     * is used.
+     * If System connection is not established yet, local OS time is used.
+     */
+    std::chrono::milliseconds value() const;
+
     qint64 currentMSecsSinceEpoch() const;
     qint64 currentUSecsSinceEpoch() const;
-    std::chrono::microseconds currentTimePoint();
+    std::chrono::microseconds currentTimePoint() const;
     QDateTime currentDateTime() const;
 
 signals:

@@ -13,18 +13,11 @@
 #include <core/resource/resource.h>
 #include <nx/speech_synthesizer/text_to_wave_server.h>
 #include <nx/utils/random.h>
-#include <nx/vms/common/resource/storage_factory_interface.h>
 #include <utils/common/util.h>
 
-class LocalAudioFileResource: public QnResource, public nx::vms::common::StorageFactoryInterface
+class LocalAudioFileResource: public QnResource
 {
 public:
-    LocalAudioFileResource():
-        nx::vms::common::StorageFactoryInterface(
-            qnClientCoreModule->commonModule()->storagePluginFactory())
-    {
-    }
-
     virtual void setStatus(nx::vms::api::ResourceStatus, Qn::StatusChangeReason /*reason*/) override {}
     virtual nx::vms::api::ResourceStatus getStatus() const override { return nx::vms::api::ResourceStatus::online; }
 };

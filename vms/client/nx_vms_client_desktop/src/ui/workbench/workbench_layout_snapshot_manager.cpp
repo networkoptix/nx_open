@@ -5,25 +5,22 @@
 #include <cassert>
 
 #include <common/common_module.h>
-
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
-
-#include <nx_ec/abstract_ec_connection.h>
-#include <nx_ec/managers/abstract_layout_manager.h>
-
 #include <nx/vms/api/data/layout_data.h>
+#include <nx/vms/client/desktop/resources/resource_descriptor.h>
+#include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
-
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_storage.h>
 #include <ui/workbench/workbench_layout_synchronizer.h>
-#include <ui/workbench/workbench_layout.h>
-
 #include <utils/common/checked_cast.h>
+
+using namespace nx::vms::client::desktop;
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchLayoutSnapshotManager
@@ -182,7 +179,7 @@ void QnWorkbenchLayoutSnapshotManager::restore(const QnLayoutResourcePtr &resour
         QnLayoutItemDataMap existingItems;
         for (const auto item: snapshot.items)
         {
-            if (!resourcePool()->getResourceByDescriptor(item.resource))
+            if (!getResourceByDescriptor(item.resource))
                 continue;
             existingItems.insert(item.uuid, item);
         }

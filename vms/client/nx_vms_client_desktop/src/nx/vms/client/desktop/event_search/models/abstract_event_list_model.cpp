@@ -91,8 +91,7 @@ QString AbstractEventListModel::timestampText(microseconds timestamp) const
     const auto timestampMs = duration_cast<milliseconds>(timestamp).count();
 
     // TODO: #sivanov Actualize used system context.
-    const auto timeWatcher = ApplicationContext::instance()->currentSystemContext()
-        ->serverTimeWatcher();
+    const auto timeWatcher = appContext()->currentSystemContext()->serverTimeWatcher();
     const QDateTime dateTime = timeWatcher->displayTime(timestampMs);
 
     // For current day just display the time in system format.

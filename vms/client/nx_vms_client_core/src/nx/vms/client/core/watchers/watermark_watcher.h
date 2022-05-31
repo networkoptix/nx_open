@@ -5,17 +5,17 @@
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 
-#include <common/common_module_aware.h>
 #include <nx/core/watermark/watermark.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/core/system_context_aware.h>
 
 namespace nx::vms::client::core {
 
 /** Watches over the watermark parameters/states and provides urls for the images if needed. */
 class NX_VMS_CLIENT_CORE_API WatermarkWatcher:
     public QObject,
-    public QnCommonModuleAware
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;
@@ -23,7 +23,7 @@ class NX_VMS_CLIENT_CORE_API WatermarkWatcher:
 public:
     static void registerQmlType();
 
-    WatermarkWatcher(QObject* parent = nullptr);
+    WatermarkWatcher(SystemContext* systemContext, QObject* parent = nullptr);
     virtual ~WatermarkWatcher() override;
 
     /**

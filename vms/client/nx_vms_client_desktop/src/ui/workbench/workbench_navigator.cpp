@@ -166,7 +166,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
         });
 
     connect(
-        qnClientModule->serverRuntimeEventConnector(),
+        appContext()->currentSystemContext()->serverRuntimeEventConnector(),
         &ServerRuntimeEventConnector::deviceFootageChanged,
         this,
         [this](const std::vector<QnUuid>& deviceIds)
@@ -418,8 +418,14 @@ void QnWorkbenchNavigator::setBookmarksModeEnabled(bool enabled)
         return;
 
     m_timeSlider->setBookmarksVisible(enabled);
+
+    // Do not disable it anymore.
     if (enabled)
-        qnCameraBookmarksManager->setEnabled(true); //not disabling it anymore
+    {
+        // FIXME: #sivanov Probably all managers should be permanently enabled.
+        auto systemContext = appContext()->currentSystemContext();
+        systemContext->cameraBookmarksManager()->setEnabled(true);
+    }
     emit bookmarksModeEnabledChanged();
 }
 
@@ -496,8 +502,7 @@ void QnWorkbenchNavigator::initialize()
     connect(m_dayTimeWidget, SIGNAL(timeClicked(const QTime &)), this, SLOT(at_dayTimeWidget_timeClicked(const QTime &)));
 
     // TODO: #sivanov Actualize used system context.
-    const auto timeWatcher = ApplicationContext::instance()->currentSystemContext()
-        ->serverTimeWatcher();
+    const auto timeWatcher = appContext()->currentSystemContext()->serverTimeWatcher();
     connect(timeWatcher, &nx::vms::client::core::ServerTimeWatcher::displayOffsetsChanged,
         this, &QnWorkbenchNavigator::updateLocalOffset);
 
@@ -536,8 +541,7 @@ void QnWorkbenchNavigator::deinitialize()
     m_calendar->disconnect(this);
 
     // TODO: #sivanov Actualize used system context.
-    const auto timeWatcher = ApplicationContext::instance()->currentSystemContext()
-        ->serverTimeWatcher();
+    const auto timeWatcher = appContext()->currentSystemContext()->serverTimeWatcher();
     timeWatcher->disconnect(this);
     qnSettings->notifier(QnClientSettings::TIME_MODE)->disconnect(this);
 

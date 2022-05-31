@@ -7,6 +7,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include <nx/vms/client/desktop/utils/virtual_camera_fwd.h>
+#include <nx/utils/scoped_connections.h>
 
 namespace nx::vms::client::desktop {
 
@@ -31,6 +32,7 @@ private:
 
 private:
     QnVirtualCameraResourcePtr m_camera;
+    nx::utils::ScopedConnection m_managerConnection;
 };
 
 } // namespace nx::vms::client::desktop

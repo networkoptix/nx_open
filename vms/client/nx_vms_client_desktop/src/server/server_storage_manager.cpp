@@ -4,30 +4,32 @@
 
 #include <chrono>
 
-#include <api/server_rest_connection.h>
 #include <api/model/rebuild_archive_reply.h>
 #include <api/model/storage_space_reply.h>
+#include <api/server_rest_connection.h>
 #include <client/client_module.h>
 #include <common/common_module.h>
+#include <core/resource/client_storage_resource.h>
 #include <core/resource/fake_media_server.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/client_storage_resource.h>
-#include <nx_ec/managers/abstract_media_server_manager.h>
-#include <nx_ec/data/api_conversion_functions.h>
+#include <nx/network/rest/params.h>
+#include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
+#include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_media_server_manager.h>
 #include <utils/common/delayed.h>
 
-#include <nx/utils/guarded_callback.h>
-#include <nx/network/rest/params.h>
-#include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
+using namespace nx::vms::client::desktop;
 
 namespace {
 
 using namespace std::chrono;
-using namespace nx::vms::client::desktop;
 
 // Delay between requests when the rebuild is running.
 static constexpr auto kUpdateRebuildStatusDelay = 1s;
@@ -129,8 +131,12 @@ QnServerStorageManager::RequestKey::RequestKey(
 
 template<> QnServerStorageManager* Singleton<QnServerStorageManager>::s_instance = nullptr;
 
-QnServerStorageManager::QnServerStorageManager(QObject* parent):
-    base_type(parent)
+QnServerStorageManager::QnServerStorageManager(
+    SystemContext* systemContext,
+    QObject* parent)
+    :
+    base_type(parent),
+    SystemContextAware(systemContext)
 {
     connect(resourcePool(), &QnResourcePool::resourceAdded,
         this, &QnServerStorageManager::handleResourceAdded);
@@ -143,7 +149,7 @@ QnServerStorageManager::QnServerStorageManager(QObject* parent):
     for (const auto& server: allServers)
         handleResourceAdded(server);
 
-    connect(qnClientModule->serverRuntimeEventConnector(),
+    connect(systemContext->serverRuntimeEventConnector(),
         &ServerRuntimeEventConnector::analyticsStorageParametersChanged,
         this,
         [this](const QnUuid& serverId)
@@ -156,6 +162,11 @@ QnServerStorageManager::QnServerStorageManager(QObject* parent):
 
 QnServerStorageManager::~QnServerStorageManager()
 {
+}
+
+QnServerStorageManager* QnServerStorageManager::instance()
+{
+    return appContext()->currentSystemContext()->serverStorageManager();
 }
 
 void QnServerStorageManager::handleResourceAdded(const QnResourcePtr& resource)
@@ -184,23 +195,23 @@ void QnServerStorageManager::handleResourceAdded(const QnResourcePtr& resource)
 
     if (const auto storage = resource.objectCast<QnClientStorageResource>())
     {
-        connect(storage, &QnResource::statusChanged,
+        connect(storage.data(), &QnResource::statusChanged,
             this, &QnServerStorageManager::checkStoragesStatusInternal);
 
-        connect(storage, &QnResource::statusChanged, this, handleStorageChanged);
+        connect(storage.data(), &QnResource::statusChanged, this, handleStorageChanged);
 
         // Free space is not used in the client but called quite often.
-        //connect(storage, &QnClientStorageResource::freeSpaceChanged,
+        //connect(storage.data(), &QnClientStorageResource::freeSpaceChanged,
         //    this, emitStorageChanged);
 
-        connect(storage, &QnClientStorageResource::totalSpaceChanged, this, emitStorageChanged);
-        connect(storage, &QnClientStorageResource::isWritableChanged, this, handleStorageChanged);
+        connect(storage.data(), &QnClientStorageResource::totalSpaceChanged, this, emitStorageChanged);
+        connect(storage.data(), &QnClientStorageResource::isWritableChanged, this, handleStorageChanged);
 
-        connect(storage, &QnClientStorageResource::isUsedForWritingChanged,
+        connect(storage.data(), &QnClientStorageResource::isUsedForWritingChanged,
             this, handleStorageChanged);
 
-        connect(storage, &QnClientStorageResource::isBackupChanged, this, emitStorageChanged);
-        connect(storage, &QnClientStorageResource::isActiveChanged, this, emitStorageChanged);
+        connect(storage.data(), &QnClientStorageResource::isBackupChanged, this, emitStorageChanged);
+        connect(storage.data(), &QnClientStorageResource::isActiveChanged, this, emitStorageChanged);
 
         emit storageAdded(storage);
         checkStoragesStatusInternal(storage);
@@ -213,13 +224,13 @@ void QnServerStorageManager::handleResourceAdded(const QnResourcePtr& resource)
 
     m_serverInfo.insert(server, ServerInfo());
 
-    connect(server, &QnMediaServerResource::statusChanged,
+    connect(server.data(), &QnMediaServerResource::statusChanged,
         this, &QnServerStorageManager::checkStoragesStatusInternal);
 
-    connect(server, &QnMediaServerResource::apiUrlChanged,
+    connect(server.data(), &QnMediaServerResource::apiUrlChanged,
         this, &QnServerStorageManager::checkStoragesStatusInternal);
 
-    connect(server, &QnMediaServerResource::propertyChanged, this,
+    connect(server.data(), &QnMediaServerResource::propertyChanged, this,
         [this](const QnResourcePtr& resource, const QString& key)
         {
             if (key != ResourcePropertyKey::Server::kMetadataStorageIdKey)
@@ -334,14 +345,19 @@ void QnServerStorageManager::checkStoragesStatusInternal(const QnResourcePtr& re
 
 void QnServerStorageManager::saveStorages(const QnStorageResourceList& storages)
 {
-    ec2::AbstractECConnectionPtr conn = messageBusConnection();
-    if (!conn)
+    auto connection = this->connection();
+    if (!connection)
+        return;
+
+    auto messageBusConnection = connection->messageBusConnection();
+
+    if (!messageBusConnection)
         return;
 
     nx::vms::api::StorageDataList apiStorages;
     ec2::fromResourceListToApi(storages, apiStorages);
 
-    conn->getMediaServerManager(Qn::kSystemAccess)->saveStorages(
+    messageBusConnection->getMediaServerManager(Qn::kSystemAccess)->saveStorages(
         apiStorages,
         [storages](int /*reqID*/, ec2::ErrorCode error)
         {
@@ -361,11 +377,16 @@ void QnServerStorageManager::saveStorages(const QnStorageResourceList& storages)
 
 void QnServerStorageManager::deleteStorages(const nx::vms::api::IdDataList& ids)
 {
-    const auto connection = messageBusConnection();
+    auto connection = this->connection();
     if (!connection)
         return;
 
-    connection->getMediaServerManager(Qn::kSystemAccess)->removeStorages(
+    auto messageBusConnection = connection->messageBusConnection();
+
+    if (!messageBusConnection)
+        return;
+
+    messageBusConnection->getMediaServerManager(Qn::kSystemAccess)->removeStorages(
         ids, [](int /*requestId*/, ec2::ErrorCode) {});
     invalidateRequests();
 }

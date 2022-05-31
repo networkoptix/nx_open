@@ -30,6 +30,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/trace/trace.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/utils/performance_monitor.h>
 #include <nx/vms/client/desktop/director/director.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -241,7 +242,7 @@ void StartupActionsHandler::submitDelayedDrops()
             resources.append(layout);
     }
 
-    const auto mimeData = MimeData::deserialized(d->delayedDrops.raw, resourcePool());
+    const MimeData mimeData(d->delayedDrops.raw);
 
     for (const auto& tour: layoutTourManager()->tours(mimeData.entities()))
         tours.push_back(tour);
@@ -313,7 +314,7 @@ void StartupActionsHandler::handleStartupParameters()
     if (!startupParameters.instantDrop.isEmpty())
     {
         const auto raw = QByteArray::fromBase64(startupParameters.instantDrop.toLatin1());
-        const auto mimeData = MimeData::deserialized(raw, resourcePool());
+        const MimeData mimeData(raw);
         const auto resources = mimeData.resources();
         resourcePool()->addNewResources(resources);
         handleInstantDrops(resources);
@@ -392,7 +393,7 @@ void StartupActionsHandler::handleAcsModeResources(
     const QnResourceList& resources,
     const qint64 timeStampMs)
 {
-    const auto maxTime = milliseconds(qnSyncTime->currentMSecsSinceEpoch());
+    const auto maxTime = qnSyncTime->value();
 
     milliseconds windowStart(timeStampMs);
     windowStart -= kAcsModeTimelineWindowSize / 2;
@@ -614,7 +615,7 @@ bool StartupActionsHandler::connectToCloudIfNeeded(const QnStartupParameters& st
         return false;
 
     NX_DEBUG(this, "Connecting to cloud as %1", authData.credentials.username);
-    qnClientCoreModule->cloudStatusWatcher()->setInitialAuthData(authData);
+    appContext()->cloudStatusWatcher()->setInitialAuthData(authData);
     return true;
 }
 

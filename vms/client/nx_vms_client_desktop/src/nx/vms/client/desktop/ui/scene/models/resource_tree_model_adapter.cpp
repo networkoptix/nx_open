@@ -9,7 +9,6 @@
 #include <QtQml/QtQml>
 
 #include <client/client_globals.h>
-#include <client/client_module.h>
 #include <client/client_settings.h>
 #include <common/common_globals.h>
 #include <common/common_module.h>
@@ -28,6 +27,7 @@
 #include <nx/vms/client/desktop/resource_views/models/resource_tree_drag_drop_decorator_model.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_edit_delegate.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_interaction_handler.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/scene/models/resource_tree_squish_facade.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_manager.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_state.h>
@@ -388,7 +388,8 @@ QVariant ResourceTreeModelAdapter::data(const QModelIndex& index, int role) cons
             if (resource->hasFlags(Qn::virtual_camera))
             {
                 const auto camera = resource.dynamicCast<QnSecurityCamResource>();
-                const auto state = qnClientModule->virtualCameraManager()->state(camera);
+                auto systemContext = SystemContext::fromResource(camera);
+                const auto state = systemContext->virtualCameraManager()->state(camera);
                 if (state.isRunning())
                     return kCustomExtInfoTemplate.arg(QString::number(state.progress()) + lit("%"));
             }

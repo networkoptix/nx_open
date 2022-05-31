@@ -11,8 +11,7 @@
 #include <api/server_rest_connection_fwd.h>
 #include <camera/camera_bookmarks_manager_fwd.h>
 #include <core/resource/camera_bookmark.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/event_fwd.h>
 #include <utils/common/connective.h>
@@ -22,14 +21,15 @@ struct QnMultiserverRequestData;
 
 class QnCameraBookmarksManagerPrivate:
     public Connective<QObject>,
-    public nx::vms::client::core::CommonModuleAware,
-    public nx::vms::client::core::RemoteConnectionAware
+    public nx::vms::client::desktop::SystemContextAware
 {
     Q_OBJECT
 
     typedef Connective<QObject> base_type;
 public:
-    QnCameraBookmarksManagerPrivate(QnCameraBookmarksManager *parent);
+    QnCameraBookmarksManagerPrivate(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        QObject* parent = nullptr);
 
     virtual ~QnCameraBookmarksManagerPrivate();
 
@@ -149,9 +149,6 @@ private:
     std::optional<QnUuid> getServerForBookmark(const QnCameraBookmark& bookmark);
 
 private:
-    Q_DECLARE_PUBLIC(QnCameraBookmarksManager)
-    QnCameraBookmarksManager *q_ptr;
-
     QTimer* m_operationsTimer;
 
     struct OperationInfo {

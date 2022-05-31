@@ -8,12 +8,14 @@
 #include <finders/recent_local_systems_finder.h>
 #include <finders/scope_local_systems_finder.h>
 #include <network/system_description_aggregator.h>
+#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/ini.h>
+#include <nx/vms/common/network/server_compatibility_validator.h>
 #include <utils/common/instance_storage.h>
 
 #include "search_address_manager.h"
 
-template<> QnSystemsFinder* Singleton<QnSystemsFinder>::s_instance = nullptr;
+using namespace nx::vms::client::core;
 
 enum class SystemHideFlag
 {
@@ -25,11 +27,12 @@ enum class SystemHideFlag
 };
 Q_DECLARE_FLAGS(SystemHideFlags, SystemHideFlag)
 
-QnSystemsFinder::QnSystemsFinder(QObject* parent)
-    : base_type(parent)
-    , m_finders()
-    , m_systems()
+QnSystemsFinder::QnSystemsFinder(QObject* parent):
+    base_type(parent)
 {
+    NX_ASSERT(nx::vms::common::ServerCompatibilityValidator::isInitialized(),
+        "Internal finders use it on start when processing existing system descriptions");
+
     enum
     {
         kCloudPriority,
@@ -86,6 +89,11 @@ QnSystemsFinder::QnSystemsFinder(QObject* parent)
 
 QnSystemsFinder::~QnSystemsFinder()
 {}
+
+QnSystemsFinder* QnSystemsFinder::instance()
+{
+    return appContext()->systemsFinder();
+}
 
 void QnSystemsFinder::addSystemsFinder(QnAbstractSystemsFinder* finder, int priority)
 {

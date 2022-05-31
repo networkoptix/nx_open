@@ -9,6 +9,8 @@
 #include <nx/vms/client/core/network/remote_connection_fwd.h>
 #include <nx/vms/common/system_context_aware.h>
 
+class QnClientMessageProcessor;
+
 namespace rest {
 
 class ServerConnection;
@@ -30,10 +32,8 @@ public:
     SystemContext* systemContext() const;
 
 protected:
-    /**
-     * Actual remote session this Context belongs to.
-     */
-    std::shared_ptr<RemoteSession> session() const;
+
+    QnClientMessageProcessor* clientMessageProcessor() const;
 
     /**
      * Id of the server which was used to establish the Remote Session (if it is present).

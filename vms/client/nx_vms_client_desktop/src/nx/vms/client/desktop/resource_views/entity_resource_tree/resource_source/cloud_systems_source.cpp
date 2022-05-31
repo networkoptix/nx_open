@@ -6,6 +6,7 @@
 
 #include <common/common_module.h>
 #include <finders/systems_finder.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/common/system_settings.h>
 
 using namespace nx::vms::common;
@@ -39,8 +40,9 @@ CloudSystemsSource::CloudSystemsSource(const QnCommonModule* commonModule):
     initializeRequest =
         [this]
         {
-            const auto systemsFinder = qnSystemsFinder;
-            if (!systemsFinder) //< Systems finder won't be available in the test environment.
+            const auto systemsFinder = appContext()->systemsFinder();
+            const bool isUnitTestsEnvironment = !systemsFinder;
+            if (isUnitTestsEnvironment)
                 return;
 
             m_connectionsGuard.add(systemsFinder->QObject::connect(

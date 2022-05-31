@@ -30,18 +30,9 @@ namespace nx::vms::client::desktop::test {
 class WorkbenchAccessControllerTest: public ContextBasedTest
 {
 protected:
-
-    // virtual void SetUp() will be called before each test is run.
-    virtual void SetUp()
-    {
-        m_resourceRuntime.reset(new QnResourceRuntimeDataManager(commonModule()));
-    }
-
-    // virtual void TearDown() will be called after each test is run.
     virtual void TearDown()
     {
         m_currentUser.clear();
-        m_resourceRuntime.clear();
     }
 
     QnResourcePool* resourcePool() const { return systemContext()->resourcePool(); }
@@ -119,7 +110,6 @@ protected:
         ASSERT_EQ(forbidden & actual, 0);
     }
 
-    QSharedPointer<QnResourceRuntimeDataManager> m_resourceRuntime;
     QnUserResourcePtr m_currentUser;
 };
 

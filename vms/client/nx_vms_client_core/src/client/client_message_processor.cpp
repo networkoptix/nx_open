@@ -182,6 +182,9 @@ void QnClientMessageProcessor::handleRemotePeerFound(QnUuid peer, nx::vms::api::
     if (m_connected)
         return;
 
+    if (!NX_ASSERT(connection()))
+        return;
+
     if (connection()->moduleInformation().id.isNull())
     {
         NX_WARNING(this, "Remote peer found while disconnected");

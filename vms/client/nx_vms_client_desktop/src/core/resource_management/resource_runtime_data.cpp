@@ -5,13 +5,15 @@
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/system_context.h>
 
-template<>
-QnResourceRuntimeDataManager* Singleton<QnResourceRuntimeDataManager>::s_instance = nullptr;
+using namespace nx::vms::client::desktop;
 
-QnResourceRuntimeDataManager::QnResourceRuntimeDataManager(QnCommonModule* commonModule, QObject* parent):
+QnResourceRuntimeDataManager::QnResourceRuntimeDataManager(
+    SystemContext* systemContext, QObject* parent)
+    :
     base_type(parent),
-    QnCommonModuleAware(commonModule)
+    SystemContextAware(systemContext)
 {
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
@@ -28,7 +30,7 @@ QnResourceRuntimeDataManager::QnResourceRuntimeDataManager(QnCommonModule* commo
 
 QVariant QnResourceRuntimeDataManager::resourceData(const QnResourcePtr& resource, Qn::ItemDataRole role) const
 {
-    NX_ASSERT(resource);
+    NX_ASSERT(resource && resource->systemContext() == systemContext());
     if (!resource)
         return QVariant();
 
@@ -41,7 +43,7 @@ void QnResourceRuntimeDataManager::setResourceData(
     Qn::ItemDataRole role,
     const QVariant& data)
 {
-    NX_ASSERT(resource && !resource->getId().isNull());
+    NX_ASSERT(resource && resource->systemContext() == systemContext());
     if (!resource)
         return;
 
@@ -56,7 +58,7 @@ void QnResourceRuntimeDataManager::setResourceData(
 
 void QnResourceRuntimeDataManager::cleanupResourceData(const QnResourcePtr& resource, Qn::ItemDataRole role)
 {
-    NX_ASSERT(resource && !resource->getId().isNull());
+    NX_ASSERT(resource && resource->systemContext() == systemContext());
     if (!resource)
         return;
 
@@ -65,7 +67,7 @@ void QnResourceRuntimeDataManager::cleanupResourceData(const QnResourcePtr& reso
 
 void QnResourceRuntimeDataManager::cleanupResourceData(const QnResourcePtr& resource)
 {
-    NX_ASSERT(resource && !resource->getId().isNull());
+    NX_ASSERT(resource && resource->systemContext() == systemContext());
     if (!resource)
         return;
 

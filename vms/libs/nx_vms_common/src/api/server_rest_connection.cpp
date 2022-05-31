@@ -1502,24 +1502,6 @@ Handle ServerConnection::loginAsync(
         targetThread);
 }
 
-Handle ServerConnection::getCameras(Result<Cameras>::type&& callback, QThread* targetThread)
-{
-    return executeGet(
-        "/rest/v1/devices",
-        /*params*/ {},
-        [callback = move(callback)](
-            bool success,
-            Handle requestId,
-            const QByteArray& result,
-            const nx::network::http::HttpHeaders&)
-        {
-            Cameras cameras;
-            QJson::deserialize(result, &cameras);
-            callback(success, requestId, cameras);
-        },
-        targetThread);
-}
-
 Handle ServerConnection::replaceDevice(
     const QnUuid& deviceToBeReplacedId,
     const QString& replacementDevicePhysicalId,

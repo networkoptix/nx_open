@@ -31,7 +31,6 @@
 #include <nx/vms/api/data/backup_position.h>
 #include <nx/vms/api/data/camera_history_data.h>
 #include <nx/vms/api/data/database_dump_data.h>
-#include <nx/vms/api/data/device_model.h>
 #include <nx/vms/api/data/device_replacement.h>
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/api/data/login.h>
@@ -645,9 +644,6 @@ public:
         const nx::vms::api::LoginSessionRequest& data,
         Result<RestResultOrData<nx::vms::api::LoginSession>>::type callback,
         QThread* targetThread);
-
-    using Cameras = QVector<nx::vms::api::DeviceModel>;
-    Handle getCameras(Result<Cameras>::type&& callback, QThread* targetThread);
 
     Handle replaceDevice(
         const QnUuid& deviceToBeReplacedId,

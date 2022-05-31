@@ -4,8 +4,7 @@
 
 #include <QtQml/QtQml>
 
-#include <client/client_module.h>
-
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 
 namespace nx::vms::client::desktop {
@@ -81,7 +80,7 @@ QmlClientStateDelegate::QmlClientStateDelegate(QObject* parent):
 QmlClientStateDelegate::~QmlClientStateDelegate()
 {
     if (!m_name.isEmpty())
-        qnClientModule->clientStateHandler()->unregisterDelegate(m_name);
+        appContext()->clientStateHandler()->unregisterDelegate(m_name);
 }
 
 bool QmlClientStateDelegate::systemDependent() const
@@ -106,11 +105,11 @@ void QmlClientStateDelegate::setName(const QString& value)
         return;
 
     if (!m_name.isEmpty())
-        qnClientModule->clientStateHandler()->unregisterDelegate(m_name);
+        appContext()->clientStateHandler()->unregisterDelegate(m_name);
 
     m_name = trimmedValue;
     if (!m_name.isEmpty())
-        qnClientModule->clientStateHandler()->registerDelegate(m_name, m_delegate);
+        appContext()->clientStateHandler()->registerDelegate(m_name, m_delegate);
 }
 
 void QmlClientStateDelegate::reportStatistics(const QString& name, const QString& value)

@@ -399,9 +399,7 @@ public:
     virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 
 protected:
-    bool canOpen(const QnResourceList& resources,
-        const QnLayoutResourcePtr& layout,
-        QnWorkbenchContext* context) const;
+    bool canOpen(const QnResourceList& resources, const QnLayoutResourcePtr& layout) const;
 };
 
 class OpenInCurrentLayoutCondition: public OpenInLayoutCondition

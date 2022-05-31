@@ -4,14 +4,10 @@
 
 #include <QtCore/QObject>
 
-#include <common/common_module_aware.h>
-
 #include <utils/common/connective.h>
 #include <network/base_system_description.h>
 
-class NX_VMS_CLIENT_CORE_API QnAbstractSystemsFinder:
-    public Connective<QObject>,
-    public QnCommonModuleAware
+class NX_VMS_CLIENT_CORE_API QnAbstractSystemsFinder: public Connective<QObject>
 {
     Q_OBJECT
     typedef Connective<QObject> base_type;

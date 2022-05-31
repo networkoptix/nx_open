@@ -48,6 +48,7 @@ public:
 };
 #define Credentials_Fields (user)(password)
 NX_VMS_API_DECLARE_STRUCT_EX(Credentials, (csv_record)(json)(ubjson)(xml))
+NX_REFLECTION_INSTRUMENT(Credentials, Credentials_Fields);
 
 } // namespace nx::vms::api
 

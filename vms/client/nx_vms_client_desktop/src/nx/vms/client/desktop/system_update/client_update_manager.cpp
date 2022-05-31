@@ -394,7 +394,7 @@ void ClientUpdateManager::Private::setEnabled(bool enabled)
         settings.enabled = enabled;
         settings.showFeatureInformer = false;
         settings.updateEnabledTimestamp =
-            enabled ? duration_cast<milliseconds>(qnSyncTime->currentTimePoint()) : 0ms;
+            enabled ? qnSyncTime->value() : 0ms;
         setGlobalClientUpdateSettings(settings);
     }
 
@@ -446,7 +446,7 @@ void ClientUpdateManager::Private::planUpdate()
 {
     if (ini().startClientOnlyUpdateImmediately)
     {
-        generatedUpdateDateTime = duration_cast<milliseconds>(qnSyncTime->currentTimePoint());
+        generatedUpdateDateTime = qnSyncTime->value();
         updateDateTimeShift = 0ms;
         emit q->plannedUpdateDateChanged();
         return;
@@ -454,7 +454,7 @@ void ClientUpdateManager::Private::planUpdate()
 
     const auto isSuitableDay = [](int day) { return day <= Qt::Wednesday || day == Qt::Sunday; };
 
-    const auto now = duration_cast<milliseconds>(qnSyncTime->currentTimePoint());
+    const auto now = qnSyncTime->value();
     updateDateTimeShift = milliseconds(
         nx::utils::random::number<long>(0, kClientUpdateRolloutPeriod.count()));
 
@@ -799,7 +799,7 @@ void ClientUpdateManager::speedUpCurrentUpdate()
 
     common::api::ClientUpdateSettings settings = d->globalClientUpdateSettings();
     settings.pendingVersion = d->updateContents.info.version;
-    settings.plannedInstallationDate = duration_cast<milliseconds>(qnSyncTime->currentTimePoint());
+    settings.plannedInstallationDate = qnSyncTime->value();
     d->setGlobalClientUpdateSettings(settings);
 }
 

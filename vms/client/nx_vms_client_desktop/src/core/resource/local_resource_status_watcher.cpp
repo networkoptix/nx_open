@@ -10,6 +10,9 @@
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/avi/avi_archive_delegate.h>
 #include <core/resource/file_layout_resource.h>
+#include <nx/vms/client/desktop/layout/layout_data_helper.h>
+
+using namespace nx::vms::client::desktop;
 
 namespace {
 
@@ -34,7 +37,7 @@ void setResourceStatus(const QnResourcePtr resource, nx::vms::api::ResourceStatu
     resource->setStatus(status);
     if (const auto layout = resource.dynamicCast<QnFileLayoutResource>())
     {
-        const auto resources = layout->layoutResources();
+        const auto resources = layoutResources(layout);
         for (const auto& item: resources)
         {
             if (item.dynamicCast<QnAviResource>())

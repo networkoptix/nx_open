@@ -48,8 +48,6 @@ public:
      */
     void setTolerant(bool value);
 
-    void setResourcePool(QnResourcePool* pool);
-
     QColor fontColor() const;
     void setFontColor(const QColor& value);
 
@@ -59,8 +57,6 @@ protected:
 private:
     struct Private;
     QScopedPointer<Private> d;
-
-    QPointer<QnResourcePool> m_resourcePool;
 };
 
 } // namespace nx::vms::client::desktop

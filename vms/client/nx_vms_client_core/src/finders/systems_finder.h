@@ -12,9 +12,7 @@
 class ConnectionsHolder;
 class QnSystemDescriptionAggregator;
 
-class NX_VMS_CLIENT_CORE_API QnSystemsFinder:
-    public QnAbstractSystemsFinder,
-    public Singleton<QnSystemsFinder>
+class NX_VMS_CLIENT_CORE_API QnSystemsFinder: public QnAbstractSystemsFinder
 {
     Q_OBJECT
     typedef QnAbstractSystemsFinder base_type;
@@ -28,6 +26,8 @@ public:
 public: //overrides
     SystemDescriptionList systems() const override;
     QnSystemDescriptionPtr getSystem(const QString& id) const override;
+
+    static QnSystemsFinder* instance();
 
 private:
     void onBaseSystemDiscovered(const QnSystemDescriptionPtr& system, int priority);

@@ -25,7 +25,6 @@
 #include <camera/resource_display.h>
 #include <client_core/client_core_module.h>
 #include <client/client_message_processor.h>
-#include <client/client_module.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_show_once_settings.h>
 #include <client/client_startup_parameters.h>
@@ -74,6 +73,7 @@
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/delegates/customizable_item_delegate.h>
 #include <nx/vms/client/desktop/common/dialogs/progress_dialog.h>
 #include <nx/vms/client/desktop/event_search/widgets/advanced_search_dialog.h>
@@ -96,6 +96,7 @@
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/context_current_user_watcher.h>
 #include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
 #include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
@@ -146,7 +147,6 @@
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/handlers/workbench_layouts_handler.h> //< TODO: #sivanov Fix dependencies.
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
-#include <ui/workbench/watchers/workbench_bookmarks_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -366,7 +366,7 @@ ActionHandler::ActionHandler(QObject *parent) :
         });
 
     connect(
-        qnClientModule->sharedMemoryManager(),
+        appContext()->sharedMemoryManager(),
         &nx::vms::client::desktop::SharedMemoryManager::clientCommandRequested,
         this,
         &ActionHandler::at_clientCommandRequested);
@@ -473,7 +473,7 @@ void ActionHandler::addToLayout(
         return;
     }
 
-    QnLayoutItemData data = layout::itemFromResource(resource);
+    QnLayoutItemData data = layoutItemFromResource(resource);
     data.flags = Qn::PendingGeometryAdjustment;
     data.zoomRect = params.zoomWindow;
     data.zoomTargetUuid = params.zoomUuid;
@@ -487,39 +487,42 @@ void ActionHandler::addToLayout(
     data.contrastParams = params.contrastParams;
     data.dewarpingParams = params.dewarpingParams;
 
+    auto layoutContext = SystemContext::fromResource(layout);
+    auto resourceRuntimeDataManager = layoutContext->resourceRuntimeDataManager();
+
     if (params.timelineWindow.isValid())
     {
-        qnResourceRuntimeDataManager->setLayoutItemData(
+        resourceRuntimeDataManager->setLayoutItemData(
             data.uuid, Qn::ItemSliderWindowRole, params.timelineWindow);
     }
 
     if (params.timelineSelection.isValid())
     {
-        qnResourceRuntimeDataManager->setLayoutItemData(
+        resourceRuntimeDataManager->setLayoutItemData(
             data.uuid, Qn::ItemSliderSelectionRole, params.timelineSelection);
     }
 
     if (!params.motionSelection.empty())
     {
-        qnResourceRuntimeDataManager->setLayoutItemData(
+        resourceRuntimeDataManager->setLayoutItemData(
             data.uuid, Qn::ItemMotionSelectionRole, params.motionSelection);
     }
 
     if (params.analyticsSelection.isValid())
     {
-        qnResourceRuntimeDataManager->setLayoutItemData(
+        resourceRuntimeDataManager->setLayoutItemData(
             data.uuid, Qn::ItemAnalyticsSelectionRole, params.analyticsSelection);
     }
 
     if (params.frameDistinctionColor.isValid())
     {
-        qnResourceRuntimeDataManager->setLayoutItemData(
+        resourceRuntimeDataManager->setLayoutItemData(
             data.uuid, Qn::ItemFrameDistinctionColorRole, params.frameDistinctionColor);
     }
 
     if (!params.zoomWindowRectangleVisible)
     {
-        qnResourceRuntimeDataManager->setLayoutItemData(
+        resourceRuntimeDataManager->setLayoutItemData(
             data.uuid, Qn::ItemZoomWindowRectangleVisibleRole, false);
     }
 
@@ -532,17 +535,17 @@ void ActionHandler::addToLayout(
     if (resource.dynamicCast<QnAviResource>() && layoutSize == 0)
     {
         // Rewind local files to the beginning on an empty layout.
-        qnResourceRuntimeDataManager->setLayoutItemData(data.uuid, Qn::ItemTimeRole, 0);
-        qnResourceRuntimeDataManager->setLayoutItemData(data.uuid, Qn::ItemPausedRole, false);
-        qnResourceRuntimeDataManager->setLayoutItemData(data.uuid, Qn::ItemSpeedRole, 1);
+        resourceRuntimeDataManager->setLayoutItemData(data.uuid, Qn::ItemTimeRole, 0);
+        resourceRuntimeDataManager->setLayoutItemData(data.uuid, Qn::ItemPausedRole, false);
+        resourceRuntimeDataManager->setLayoutItemData(data.uuid, Qn::ItemSpeedRole, 1);
     }
     else if (params.time > 0ms)
     {
-        qnResourceRuntimeDataManager->setLayoutItemData(
+        resourceRuntimeDataManager->setLayoutItemData(
             data.uuid, Qn::ItemTimeRole, params.time.count());
-        qnResourceRuntimeDataManager->setLayoutItemData(
+        resourceRuntimeDataManager->setLayoutItemData(
             data.uuid, Qn::ItemPausedRole, params.paused);
-        qnResourceRuntimeDataManager->setLayoutItemData(
+        resourceRuntimeDataManager->setLayoutItemData(
             data.uuid, Qn::ItemSpeedRole, params.speed);
     }
 }
@@ -598,7 +601,7 @@ void ActionHandler::openResourcesInNewWindow(const QnResourceList &resources)
         if (auto connection = this->connection())
             logonData = connection->createLogonData();
 
-        qnClientModule->clientStateHandler()->createNewWindow(
+        appContext()->clientStateHandler()->createNewWindow(
             logonData,
             {data.serialized()});
     }
@@ -855,6 +858,9 @@ void ActionHandler::at_openInLayoutAction_triggered()
     if (!layout)
         return;
 
+    auto layoutContext = SystemContext::fromResource(layout);
+    auto resourceRuntimeDataManager = layoutContext->resourceRuntimeDataManager();
+
     QPointF position = parameters.argument<QPointF>(Qn::ItemPositionRole);
 
     const int maxItems = qnRuntime->maxSceneItems();
@@ -890,7 +896,7 @@ void ActionHandler::at_openInLayoutAction_triggered()
             for (const auto extraItemRole: kExtraItemRoles)
             {
                 const auto value =
-                    qnResourceRuntimeDataManager->layoutItemData(oldUuid, extraItemRole);
+                    resourceRuntimeDataManager->layoutItemData(oldUuid, extraItemRole);
                 if (value.isValid())
                     extraItemRoleValues[data.uuid].insert(extraItemRole, value);
             }
@@ -913,7 +919,7 @@ void ActionHandler::at_openInLayoutAction_triggered()
 
             const auto values = extraItemRoleValues[data.uuid];
             for (auto it = values.begin(); it != values.end(); ++it)
-                qnResourceRuntimeDataManager->setLayoutItemData(data.uuid, it.key(), it.value());
+                resourceRuntimeDataManager->setLayoutItemData(data.uuid, it.key(), it.value());
         }
     }
     else
@@ -1174,12 +1180,12 @@ void ActionHandler::at_openNewWindowAction_triggered()
     if (auto connection = this->connection())
         logonData = connection->createLogonData();
 
-    qnClientModule->clientStateHandler()->createNewWindow(logonData);
+    appContext()->clientStateHandler()->createNewWindow(logonData);
 }
 
 void ActionHandler::at_openWelcomeScreenAction_triggered()
 {
-    qnClientModule->clientStateHandler()->createNewWindow();
+    appContext()->clientStateHandler()->createNewWindow();
 }
 
 void ActionHandler::at_reviewLayoutTourInNewWindowAction_triggered()
@@ -1194,7 +1200,7 @@ void ActionHandler::at_reviewLayoutTourInNewWindowAction_triggered()
 
     MimeData data;
     data.setEntities({id});
-    qnClientModule->clientStateHandler()->createNewWindow(
+    appContext()->clientStateHandler()->createNewWindow(
         connection->createLogonData(),
         {data.serialized()});
 }
@@ -2146,6 +2152,9 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
     if (context()->user())
         layout->setParentId(context()->user()->getId());
 
+    auto resourceRuntimeDataManager = appContext()->currentSystemContext()
+        ->resourceRuntimeDataManager();
+
     qint64 time = period.startTimeMs;
     for (int i = 0; i < itemCount; i++) {
         QnTimePeriod localPeriod(time, step);
@@ -2154,19 +2163,19 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
         if (!localPeriods.empty())
             localTime = qMax(localTime, localPeriods.begin()->startTimeMs);
 
-        QnLayoutItemData item = layout::itemFromResource(resource);
+        QnLayoutItemData item = layoutItemFromResource(resource);
         item.flags = Qn::Pinned;
         item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
         item.contrastParams = widget->item()->imageEnhancement();
         item.dewarpingParams = widget->item()->dewarpingParams();
         item.rotation = widget->item()->rotation();
-        qnResourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemPausedRole, true);
-        qnResourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemSliderSelectionRole, localPeriod);
-        qnResourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemSliderWindowRole, period);
-        qnResourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemTimeRole, localTime);
+        resourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemPausedRole, true);
+        resourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemSliderSelectionRole, localPeriod);
+        resourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemSliderWindowRole, period);
+        resourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemTimeRole, localTime);
         // set aspect ratio to make thumbnails load in all cases, see #2619
-        qnResourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemAspectRatioRole, desiredItemAspectRatio);
-        qnResourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::TimePeriodsRole, localPeriods);
+        resourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemAspectRatioRole, desiredItemAspectRatio);
+        resourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::TimePeriodsRole, localPeriods);
 
         layout->addItem(item);
 
@@ -2535,7 +2544,7 @@ void ActionHandler::at_removeFromServerAction_triggered()
 
 void ActionHandler::at_saveSessionState_triggered()
 {
-    qnClientModule->clientStateHandler()->saveWindowsConfiguration();
+    appContext()->clientStateHandler()->saveWindowsConfiguration();
     showSessionSavedBanner();
 }
 
@@ -2545,12 +2554,12 @@ void ActionHandler::at_restoreSessionState_triggered()
     if (auto connection = this->connection())
         logonData = connection->createLogonData();
 
-    qnClientModule->clientStateHandler()->restoreWindowsConfiguration(logonData);
+    appContext()->clientStateHandler()->restoreWindowsConfiguration(logonData);
 }
 
 void ActionHandler::at_deleteSessionState_triggered()
 {
-    qnClientModule->clientStateHandler()->deleteWindowsConfiguration();
+    appContext()->clientStateHandler()->deleteWindowsConfiguration();
 }
 
 void ActionHandler::showSessionSavedBanner()
@@ -2576,13 +2585,13 @@ void ActionHandler::at_clientCommandRequested(
     {
         case SharedMemoryData::Command::saveWindowState:
         {
-            qnClientModule->clientStateHandler()->clientRequestedToSaveState();
+            appContext()->clientStateHandler()->clientRequestedToSaveState();
             showSessionSavedBanner();
             break;
         }
         case SharedMemoryData::Command::restoreWindowState:
         {
-            qnClientModule->clientStateHandler()->clientRequestedToRestoreState(
+            appContext()->clientStateHandler()->clientRequestedToRestoreState(
                 QString::fromLatin1(data));
             break;
         }
@@ -2601,7 +2610,7 @@ void ActionHandler::at_clientCommandRequested(
 void ActionHandler::doCloseApplication(bool force, AppClosingMode mode)
 {
     if (mode == AppClosingMode::CloseAll)
-        qnClientModule->clientStateHandler()->sharedMemoryManager()->requestToExit();
+        appContext()->clientStateHandler()->sharedMemoryManager()->requestToExit();
 
     // tryClose() may clear the context user.
     const bool storeSystemSpecificParameters =
@@ -2616,11 +2625,11 @@ void ActionHandler::doCloseApplication(bool force, AppClosingMode mode)
 
     // Store system-specific parameters.
     if (storeSystemSpecificParameters)
-        qnClientModule->clientStateHandler()->clientDisconnected();
+        appContext()->clientStateHandler()->clientDisconnected();
 
     // Store system-independent parameters
     if (mode != AppClosingMode::External)
-        qnClientModule->clientStateHandler()->clientClosed();
+        appContext()->clientStateHandler()->clientClosed();
 
     menu()->trigger(action::BeforeExitAction);
     context()->setClosingDown(true);

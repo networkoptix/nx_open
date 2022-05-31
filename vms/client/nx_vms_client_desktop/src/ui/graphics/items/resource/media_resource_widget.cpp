@@ -55,9 +55,9 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/media/consuming_motion_metadata_provider.h>
 #include <nx/vms/client/core/motion/motion_grid.h>
+#include <nx/vms/client/core/software_trigger/software_triggers_controller.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
-#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/integrations.h>
@@ -67,6 +67,7 @@
 #include <nx/vms/client/desktop/scene/resource_widget/private/camera_button_controller.h>
 #include <nx/vms/client/desktop/scene/resource_widget/private/media_resource_widget_p.h>
 #include <nx/vms/client/desktop/scene/resource_widget/private/object_tracking_button_controller.h>
+#include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -129,7 +130,6 @@ using namespace std::chrono;
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::analytics;
-using namespace nx::vms::common;
 using namespace nx::vms::api;
 using namespace ui;
 
@@ -260,9 +260,10 @@ QnMediaResourceWidget::QnMediaResourceWidget(
     m_recordingStatusHelper(new RecordingStatusHelper(systemContext, this)),
     m_posUtcMs(DATETIME_INVALID),
     m_watermarkPainter(new WatermarkPainter),
-    m_encryptedArchivePasswordDialog(
-        new nx::vms::client::desktop::EncryptedArchivePasswordDialog(mainWindow())),
+    m_encryptedArchivePasswordDialog(new EncryptedArchivePasswordDialog(mainWindow())),
     m_itemId(item->uuid()),
+    m_triggersController(
+        new nx::vms::client::core::SoftwareTriggersController(systemContext, this)),
     m_buttonController(new CameraButtonController(this)),
     m_objectTrackingButtonController(new ObjectTrackingButtonController(this)),
     m_toggleImageEnhancementAction(new QAction(this))
@@ -346,26 +347,30 @@ QnMediaResourceWidget::QnMediaResourceWidget(
     connect(navigator(), &QnWorkbenchNavigator::bookmarksModeEnabledChanged, this,
         &QnMediaResourceWidget::updateCompositeOverlayMode);
 
-    connect(
-        systemContext->messageProcessor(),
-        &QnCommonMessageProcessor::businessActionReceived,
-        this,
-        [this](const nx::vms::event::AbstractActionPtr &businessAction)
-        {
-            if (businessAction->actionType() != ActionType::executePtzPresetAction)
-                return;
-
-            const auto &actionParams = businessAction->getParams();
-            if (actionParams.actionResourceId != d->resource->getId())
-                return;
-
-            if (m_ptzController)
+    // Cross-system contexts have no message processor.
+    if (auto messageProcessor = systemContext->messageProcessor())
+    {
+        connect(
+            messageProcessor,
+            &QnCommonMessageProcessor::businessActionReceived,
+            this,
+            [this](const nx::vms::event::AbstractActionPtr &businessAction)
             {
-                m_ptzController->activatePreset(
-                    actionParams.presetId,
-                    QnAbstractPtzController::MaxPtzSpeed);
-            }
-        });
+                if (businessAction->actionType() != ActionType::executePtzPresetAction)
+                    return;
+
+                const auto &actionParams = businessAction->getParams();
+                if (actionParams.actionResourceId != d->resource->getId())
+                    return;
+
+                if (m_ptzController)
+                {
+                    m_ptzController->activatePreset(
+                        actionParams.presetId,
+                        QnAbstractPtzController::MaxPtzSpeed);
+                }
+            });
+    }
 
     updateDisplay();
     updateDewarpingParams();
@@ -432,7 +437,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(
 
     updateWatermark();
     connect(systemContext->globalSettings(),
-        &SystemSettings::watermarkChanged,
+        &nx::vms::common::SystemSettings::watermarkChanged,
         this,
         &QnMediaResourceWidget::updateWatermark);
     connect(windowContext->workbenchContext(),
@@ -443,17 +448,23 @@ QnMediaResourceWidget::QnMediaResourceWidget(
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this,
         &QnMediaResourceWidget::updateCurrentUtcPosMs);
 
-    connect(qnResourceRuntimeDataManager, &QnResourceRuntimeDataManager::layoutItemDataChanged,
-        this, &QnMediaResourceWidget::handleItemDataChanged);
+    auto layoutContext = SystemContext::fromResource(item->layout()->resource());
+
+    connect(layoutContext->resourceRuntimeDataManager(),
+        &QnResourceRuntimeDataManager::layoutItemDataChanged,
+        this,
+        &QnMediaResourceWidget::handleItemDataChanged);
 
     // Update paused state after all initialization for widget is done.
     executeLater(
-        [this]()
+        [this, layoutContext]()
         {
             handleItemDataChanged(
                 m_itemId,
                 Qn::ItemPausedRole,
-                qnResourceRuntimeDataManager->layoutItemData(m_itemId, Qn::ItemPausedRole));
+                layoutContext->resourceRuntimeDataManager()->layoutItemData(
+                    m_itemId,
+                    Qn::ItemPausedRole));
         }, this);
 
     const bool canRotate = systemContext->accessController()->hasPermissions(
@@ -483,11 +494,11 @@ QnMediaResourceWidget::QnMediaResourceWidget(
 
     // Local files dropped onto layout are not virtual cameras.
     if (d->camera)
-        m_triggerController.setResourceId(d->camera->getId());
+        m_triggersController->setResourceId(d->camera->getId());
 
     using Controller = nx::vms::client::core::SoftwareTriggersController;
-    connect(&m_triggerController, &Controller::triggerActivated, this, triggerActionHandler);
-    connect(&m_triggerController, &Controller::triggerDeactivated, this, triggerActionHandler);
+    connect(m_triggersController, &Controller::triggerActivated, this, triggerActionHandler);
+    connect(m_triggersController, &Controller::triggerDeactivated, this, triggerActionHandler);
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget()
@@ -503,7 +514,8 @@ QnMediaResourceWidget::~QnMediaResourceWidget()
 
 void QnMediaResourceWidget::beforeDestroy()
 {
-    qnResourceRuntimeDataManager->disconnect(this);
+    auto layoutContext = SystemContext::fromResource(item()->layout()->resource());
+    layoutContext->resourceRuntimeDataManager()->disconnect(this);
 }
 
 void QnMediaResourceWidget::handleItemDataChanged(
@@ -2760,7 +2772,7 @@ void QnMediaResourceWidget::updateAnalyticsVisibility(bool animate)
 
 void QnMediaResourceWidget::processDiagnosticsRequest()
 {
-    ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
+    statisticsModule()->controls()->registerClick(
         "resource_status_overlay_diagnostics");
 
     if (d->camera)
@@ -2769,7 +2781,7 @@ void QnMediaResourceWidget::processDiagnosticsRequest()
 
 void QnMediaResourceWidget::processEnableLicenseRequest()
 {
-    ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
+    statisticsModule()->controls()->registerClick(
         "resource_status_overlay_enable_license");
 
     const auto licenseStatus = d->licenseStatus();
@@ -2788,7 +2800,7 @@ void QnMediaResourceWidget::processEnableLicenseRequest()
 
 void QnMediaResourceWidget::processSettingsRequest()
 {
-    ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
+    statisticsModule()->controls()->registerClick(
         "resource_status_overlay_settings");
     if (!d->camera)
         return;
@@ -2800,7 +2812,7 @@ void QnMediaResourceWidget::processSettingsRequest()
 
 void QnMediaResourceWidget::processMoreLicensesRequest()
 {
-    ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
+    statisticsModule()->controls()->registerClick(
         "resource_status_overlay_more_licenses");
 
     menu()->trigger(action::PreferencesLicensesTabAction);
@@ -2808,7 +2820,7 @@ void QnMediaResourceWidget::processMoreLicensesRequest()
 
 void QnMediaResourceWidget::processEncryptedArchiveUnlockRequst()
 {
-    ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
+    statisticsModule()->controls()->registerClick(
         "resource_status_overlay_unlock_encrypted_archive");
     m_encryptedArchivePasswordDialog->showForEncryptionData(m_encryptedArchiveData);
 }
@@ -3240,7 +3252,7 @@ void QnMediaResourceWidget::configureTriggerButton(SoftwareTriggerButton* button
                 if (!button->isLive())
                     return;
 
-                const bool success = m_triggerController.activateTrigger(info.ruleId);
+                const bool success = m_triggersController->activateTrigger(info.ruleId);
                 button->setState(success
                     ? SoftwareTriggerButton::State::Waiting
                     : SoftwareTriggerButton::State::Failure);
@@ -3261,7 +3273,7 @@ void QnMediaResourceWidget::configureTriggerButton(SoftwareTriggerButton* button
                 if (button->state() == SoftwareTriggerButton::State::Failure)
                     return;
 
-                button->setState(m_triggerController.deactivateTrigger()
+                button->setState(m_triggersController->deactivateTrigger()
                     ? SoftwareTriggerButton::State::Default
                     : SoftwareTriggerButton::State::Failure);
 
@@ -3276,7 +3288,7 @@ void QnMediaResourceWidget::configureTriggerButton(SoftwareTriggerButton* button
                 if (!button->isLive())
                     return;
 
-                const bool success = m_triggerController.activateTrigger(info.ruleId);
+                const bool success = m_triggersController->activateTrigger(info.ruleId);
                 button->setEnabled(!success);
                 button->setState(success
                     ? SoftwareTriggerButton::State::Waiting

@@ -3,14 +3,17 @@
 #include "desktop_audio_only_data_provider.h"
 
 #include <decoders/audio/ffmpeg_audio_decoder.h>
-#include <speex/speex_preprocess.h>
 #include <nx/build_info.h>
-#include <nx/utils/log/log.h>
-#include <utils/common/synctime.h>
 #include <nx/streaming/av_codec_media_context.h>
 #include <nx/streaming/config.h>
-#include <utils/media/ffmpeg_helper.h>
+#include <nx/utils/log/log.h>
+#include <nx/vms/client/core/application_context.h>
+#include <speex/speex_preprocess.h>
 #include <ui/screen_recording/audio_recorder_settings.h>
+#include <utils/common/synctime.h>
+#include <utils/media/ffmpeg_helper.h>
+
+using namespace nx::vms::client::core;
 
 namespace
 {
@@ -125,7 +128,7 @@ void QnDesktopAudioOnlyDataProvider::run()
     initSpeex(m_frameSize, sampleRate);
     resizeBuffers(m_frameSize);
 
-    m_soundAnalyzer = QnVoiceSpectrumAnalyzer::instance();
+    m_soundAnalyzer = appContext()->voiceSpectrumAnalyzer();
     m_soundAnalyzer->initialize(sampleRate, channels);
 
     startInputs();

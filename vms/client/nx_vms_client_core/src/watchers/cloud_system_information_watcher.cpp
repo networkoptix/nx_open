@@ -4,21 +4,45 @@
 
 #include <client_core/client_core_settings.h>
 #include <common/common_module.h>
+#include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/common/system_settings.h>
 #include <watchers/cloud_status_watcher.h>
 
-class QnCloudSystemInformationWatcherPrivate : public QObject
+class QnCloudSystemInformationWatcherPrivate:
+    public QObject,
+    public nx::vms::client::core::CommonModuleAware
 {
     QnCloudSystemInformationWatcher* q_ptr;
     Q_DECLARE_PUBLIC(QnCloudSystemInformationWatcher)
+
 public:
     QString systemId;
     QString ownerEmail;
     QString ownerFullName;
+    QnCloudSystem currentSystem;
 
 public:
     QnCloudSystemInformationWatcherPrivate(QnCloudSystemInformationWatcher* parent);
     void updateInformation(const QnCloudSystem& system);
+
+    void updateCurrentSystem()
+    {
+        const auto systemId = globalSettings()->cloudSystemId();
+        const auto cloudSystems = qnCloudStatusWatcher->cloudSystems();
+
+        const auto it = std::find_if(
+            cloudSystems.begin(), cloudSystems.end(),
+            [systemId](const QnCloudSystem& system) { return systemId == system.cloudId; });
+
+        if (it == cloudSystems.end())
+            return;
+
+        if (!it->visuallyEqual(currentSystem))
+        {
+            currentSystem = *it;
+            updateInformation(currentSystem);
+        }
+    }
 };
 
 QnCloudSystemInformationWatcher::QnCloudSystemInformationWatcher(QObject* parent) :
@@ -68,11 +92,14 @@ QString QnCloudSystemInformationWatcher::ownerDescription() const
 }
 
 QnCloudSystemInformationWatcherPrivate::QnCloudSystemInformationWatcherPrivate(
-        QnCloudSystemInformationWatcher* parent) :
+    QnCloudSystemInformationWatcher* parent)
+    :
     q_ptr(parent)
 {
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::currentSystemChanged,
-            this, &QnCloudSystemInformationWatcherPrivate::updateInformation);
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::cloudSystemsChanged,
+        this, &QnCloudSystemInformationWatcherPrivate::updateCurrentSystem);
+    connect(globalSettings(), &nx::vms::common::SystemSettings::cloudSettingsChanged,
+        this, &QnCloudSystemInformationWatcherPrivate::updateCurrentSystem);
 }
 
 void QnCloudSystemInformationWatcherPrivate::updateInformation(const QnCloudSystem& system)

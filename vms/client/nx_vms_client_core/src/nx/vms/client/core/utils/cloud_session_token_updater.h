@@ -51,8 +51,8 @@ private:
 private:
     std::unique_ptr<CloudConnectionFactory> m_cloudConnectionFactory;
     std::unique_ptr<nx::cloud::db::api::Connection> m_cloudConnection;
-    QTimer* m_timer;
-    std::chrono::microseconds m_expirationTime;
+    QTimer* m_timer = nullptr;
+    std::chrono::microseconds m_expirationTime = std::chrono::microseconds::zero();
 };
 
 } // namespace nx::vms::client::core

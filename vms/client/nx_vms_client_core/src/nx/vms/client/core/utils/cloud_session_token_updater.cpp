@@ -31,13 +31,8 @@ bool isTokenExpiring(microseconds expirationTime)
 
 CloudSessionTokenUpdater::CloudSessionTokenUpdater(QObject* parent):
     QObject(parent),
-    m_cloudConnectionFactory(std::make_unique<CloudConnectionFactory>()),
-    m_cloudConnection(m_cloudConnectionFactory->createConnection())
+    m_timer(new QTimer(this))
 {
-    if (!NX_ASSERT(m_cloudConnection))
-        return;
-
-    m_timer = new QTimer(this);
     m_timer->setInterval(kTokenUpdateInterval);
     m_timer->callOnTimeout([this]() { onTimer(); });
 }
@@ -77,6 +72,12 @@ void CloudSessionTokenUpdater::issueToken(
     IssueTokenHandler handler,
     nx::utils::AsyncHandlerExecutor executor)
 {
+    if (!m_cloudConnection)
+    {
+        m_cloudConnectionFactory = std::make_unique<CloudConnectionFactory>();
+        m_cloudConnection = m_cloudConnectionFactory->createConnection();
+    }
+
     m_cloudConnection->oauthManager()->issueToken(request, executor.bind(handler));
 }
 

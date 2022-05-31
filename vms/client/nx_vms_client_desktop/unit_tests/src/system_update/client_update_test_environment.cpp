@@ -22,18 +22,6 @@ const nx::utils::OsInfo windows("windows_x64");
 
 namespace nx::vms::client::desktop::test {
 
-// virtual void SetUp() will be called before each test is run.
-void ClientUpdateTestEnvironment::SetUp()
-{
-    m_resourceRuntime.reset(new QnResourceRuntimeDataManager(commonModule()));
-}
-
-// virtual void TearDown() will be called after each test is run.
-void ClientUpdateTestEnvironment::TearDown()
-{
-    m_resourceRuntime.clear();
-}
-
 ClientVerificationData ClientUpdateTestEnvironment::makeClientData(nx::utils::SoftwareVersion version)
 {
     ClientVerificationData data;

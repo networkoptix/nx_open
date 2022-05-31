@@ -21,7 +21,6 @@
 #include <nx/vms/api/data/image_correction_data.h>
 #include <nx/vms/client/core/common/data/motion_selection.h>
 #include <nx/vms/client/core/media/abstract_analytics_metadata_provider.h>
-#include <nx/vms/client/core/software_trigger/software_triggers_controller.h>
 #include <nx/vms/client/desktop/camera/camera_fwd.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/types.h>
 #include <nx/vms/common/ptz/datafield.h>
@@ -62,6 +61,8 @@ class QnGraphicsStackedWidget;
 struct QnHtmlTextItemOptions;
 
 namespace nx::analytics::db { struct Filter; }
+
+namespace nx::vms::client::core { class SoftwareTriggersController; }
 
 /**
  * Widget to show media from a camera or disk file (from QnMediaResource).
@@ -527,7 +528,7 @@ private:
 
     QList<SoftwareTrigger> m_triggers;
     QnUuid m_itemId;
-    nx::vms::client::core::SoftwareTriggersController m_triggerController;
+    nx::vms::client::core::SoftwareTriggersController* m_triggersController = nullptr;
     nx::vms::client::desktop::CameraButtonController* m_buttonController = nullptr;
     nx::vms::client::desktop::ObjectTrackingButtonController* m_objectTrackingButtonController = nullptr;
 

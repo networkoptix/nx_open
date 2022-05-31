@@ -9,7 +9,6 @@
 
 class QnClientCoreModule;
 class QnCommonModule;
-class QnStaticCommonModule;
 
 namespace nx::vms::client::desktop { class SystemContext; }
 
@@ -21,7 +20,6 @@ public:
     Context();
     virtual ~Context();
 
-    QnStaticCommonModule* staticCommonModule() const;
     QnCommonModule* commonModule() const;
     QnClientCoreModule* clientCoreModule() const;
     SystemContext* systemContext() const;

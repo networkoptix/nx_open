@@ -21,6 +21,8 @@
 #include <nx/build_info.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/statistics/context_statistics_module.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
@@ -97,8 +99,7 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = nu
     connect(bookmarksViewer, &QnBookmarksViewer::editBookmarkClicked, this,
         [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
         {
-            ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
-                "bookmark_tooltip_edit");
+            statisticsModule()->controls()->registerClick("bookmark_tooltip_edit");
             menu()->triggerIfPossible(action::EditCameraBookmarkAction,
                 getActionParamsFunc(bookmark));
         });
@@ -106,8 +107,7 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = nu
     connect(bookmarksViewer, &QnBookmarksViewer::removeBookmarkClicked, this,
         [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
         {
-            ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
-                "bookmark_tooltip_delete");
+            statisticsModule()->controls()->registerClick("bookmark_tooltip_delete");
             menu()->triggerIfPossible(action::RemoveBookmarkAction,
                 getActionParamsFunc(bookmark));
         });
@@ -115,16 +115,14 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = nu
     connect(bookmarksViewer, &QnBookmarksViewer::exportBookmarkClicked, this,
         [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
         {
-            ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
-                "bookmark_tooltip_export");
+            statisticsModule()->controls()->registerClick("bookmark_tooltip_export");
             menu()->triggerIfPossible(action::ExportBookmarkAction, getActionParamsFunc(bookmark));
         });
 
     connect(bookmarksViewer, &QnBookmarksViewer::playBookmark, this,
         [this](const QnCameraBookmark &bookmark)
         {
-            ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
-                "bookmark_tooltip_play");
+            statisticsModule()->controls()->registerClick("bookmark_tooltip_play");
 
             auto slider = navigator()->timeSlider();
 
@@ -143,8 +141,7 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = nu
     connect(bookmarksViewer, &QnBookmarksViewer::tagClicked, this,
         [this, bookmarksViewer](const QString &tag)
         {
-            ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
-                "bookmark_tooltip_tag");
+            statisticsModule()->controls()->registerClick("bookmark_tooltip_tag");
             menu()->triggerIfPossible(action::OpenBookmarksSearchAction,
                 {Qn::BookmarkTagRole, tag});
         });
@@ -195,7 +192,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
     const auto parameters = menu()->currentParameters(sender());
     auto camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
     // TODO: #sivanov Will we support these actions for exported layouts?
-    if (!camera)
+    if (!camera || !camera->systemContext())
         return;
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
@@ -215,13 +212,13 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
         return;
 
     bookmark.creatorId = context()->user()->getId();
-    bookmark.creationTimeStampMs = milliseconds(qnSyncTime->currentMSecsSinceEpoch());
+    bookmark.creationTimeStampMs = qnSyncTime->value();
     dialog->submitData(bookmark);
     NX_ASSERT(bookmark.isValid(), "Dialog must not allow to create invalid bookmarks");
     if (!bookmark.isValid())
         return;
 
-    qnCameraBookmarksManager->addCameraBookmark(bookmark);
+    SystemContext::fromResource(camera)->cameraBookmarksManager()->addCameraBookmark(bookmark);
 
     action(action::BookmarksModeAction)->setChecked(true);
 }
@@ -231,7 +228,7 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered()
     const auto parameters = menu()->currentParameters(sender());
     QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
     // TODO: #sivanov Will we support these actions for exported layouts?
-    if (!camera)
+    if (!camera || !camera->systemContext())
         return;
 
     QnCameraBookmark bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
@@ -253,7 +250,7 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered()
         return;
     dialog->submitData(bookmark);
 
-    qnCameraBookmarksManager->updateCameraBookmark(bookmark);
+    SystemContext::fromResource(camera)->cameraBookmarksManager()->updateCameraBookmark(bookmark);
 }
 
 void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered()
@@ -261,7 +258,7 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered()
     const auto parameters = menu()->currentParameters(sender());
     QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
     // TODO: #sivanov Will we support these actions for exported layouts?
-    if (!camera)
+    if (!camera || !camera->systemContext())
         return;
 
     QnCameraBookmark bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
@@ -276,7 +273,8 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered()
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 
-    qnCameraBookmarksManager->deleteCameraBookmark(bookmark.guid);
+    SystemContext::fromResource(camera)->cameraBookmarksManager()->deleteCameraBookmark(
+        bookmark.guid);
 }
 
 void QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered()
@@ -298,8 +296,10 @@ void QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered()
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 
-    for (const auto& bookmark : bookmarks)
-        qnCameraBookmarksManager->deleteCameraBookmark(bookmark.guid);
+    // FIXME: #sivanov Actual system context probably should be linked to the bookmarks.
+    auto bookmarksManager = appContext()->currentSystemContext()->cameraBookmarksManager();
+    for (const auto& bookmark: bookmarks)
+        bookmarksManager->deleteCameraBookmark(bookmark.guid);
 }
 
 void QnWorkbenchBookmarksHandler::at_bookmarksModeAction_triggered()

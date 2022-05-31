@@ -28,7 +28,7 @@ void QnStoragePluginFactory::registerStoragePlugin(
         m_defaultFactory = factory;
 }
 
-bool QnStoragePluginFactory::existsFactoryForProtocol(const QString &protocol)
+bool QnStoragePluginFactory::existsFactoryForProtocol(const QString& protocol)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_factoryByProtocol.find(protocol) == m_factoryByProtocol.end() ? false : true;
@@ -39,10 +39,12 @@ void QnStoragePluginFactory::setDefault(StorageFactory factory)
     s_factory = factory;
 }
 
-QnStorageResource *QnStoragePluginFactory::createStorage(
-    const QString &url,
+QnStorageResource* QnStoragePluginFactory::createStorage(
+    const QString& url,
     bool useDefaultForUnknownPrefix)
 {
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
     if (url.isEmpty())
         return nullptr;
 
@@ -56,7 +58,7 @@ QnStorageResource *QnStoragePluginFactory::createStorage(
     QString protocol = url.left(index);
     if (m_factoryByProtocol.contains(protocol))
     {
-        QnStorageResource *ret = m_factoryByProtocol.value(protocol)(url);
+        QnStorageResource* ret = m_factoryByProtocol.value(protocol)(url);
         if (ret == nullptr)
         {
             NX_ERROR(this, "Failed to create storage for url %1", url);
@@ -64,9 +66,10 @@ QnStorageResource *QnStoragePluginFactory::createStorage(
         }
         ret->setStorageType(protocol);
         return ret;
-    } else {
-        if (useDefaultForUnknownPrefix)
-            return m_defaultFactory ? m_defaultFactory(url) : nullptr;
-        return nullptr;
     }
+
+    if (useDefaultForUnknownPrefix)
+        return m_defaultFactory ? m_defaultFactory(url) : nullptr;
+
+    return nullptr;
 }

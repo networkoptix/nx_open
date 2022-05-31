@@ -6,10 +6,12 @@
 #include <cmath>
 
 #include <QtGui/QPainter>
+#include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
-#include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/private/qpixmapfilter_p.h>
+
+#include <qt_graphics_items/graphics_label.h>
 
 #include <api/runtime_info_manager.h>
 #include <client/client_module.h>
@@ -23,9 +25,9 @@
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/utils/geometry.h>
-#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -35,7 +37,6 @@
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/license/usage_helper.h>
-#include <qt_graphics_items/graphics_label.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/cursor_cache.h>
 #include <ui/common/palette.h>
@@ -112,8 +113,7 @@ bool itemBelongsToValidLayout(QnWorkbenchItem *item)
     return (item
             && item->layout()
             && item->layout()->resource()
-            && item->layout()->resource()->resourcePool()
-            && !item->layout()->resource()->getParentId().isNull());
+            && item->layout()->resource()->systemContext());
 }
 
 } // anonymous namespace
@@ -179,11 +179,15 @@ QnResourceWidget::QnResourceWidget(
     // TODO: #sivanov Remove outdated check.
     if (NX_ASSERT(itemBelongsToValidLayout(item)))
     {
-        connect(
-            accessController()->notifier(item->layout()->resource()),
-            &QnWorkbenchPermissionsNotifier::permissionsChanged,
-            this,
-            &QnResourceWidget::updateButtonsVisibility);
+        auto layoutSystemContext = SystemContext::fromResource(item->layout()->resource());
+        if (NX_ASSERT(layoutSystemContext))
+        {
+            connect(
+                layoutSystemContext->accessController()->notifier(item->layout()->resource()),
+                &QnWorkbenchPermissionsNotifier::permissionsChanged,
+                this,
+                &QnResourceWidget::updateButtonsVisibility);
+        }
     }
 
     /* Status overlay. */
@@ -197,8 +201,11 @@ QnResourceWidget::QnResourceWidget(
 
     m_aspectRatio = defaultAspectRatio();
 
-    connect(qnResourceRuntimeDataManager, &QnResourceRuntimeDataManager::layoutItemDataChanged,
-        this, [this, itemId = item->uuid()](
+    auto layoutContext = SystemContext::fromResource(item->layout()->resource());
+    connect(layoutContext->resourceRuntimeDataManager(),
+        &QnResourceRuntimeDataManager::layoutItemDataChanged,
+        this,
+        [this, itemId = item->uuid()](
             const QnUuid& id, Qn::ItemDataRole role, const QVariant& /*data*/)
         {
             if (id != itemId)
@@ -933,7 +940,7 @@ QRectF QnResourceWidget::exposedRect(int channel, bool accountForViewport, bool 
 
 void QnResourceWidget::registerButtonStatisticsAlias(QnImageButtonWidget* button, const QString& alias)
 {
-    ApplicationContext::instance()->controlsStatisticsModule()->registerButton(alias, button);
+    statisticsModule()->controls()->registerButton(alias, button);
 }
 
 QnImageButtonWidget* QnResourceWidget::createStatisticAwareButton(const QString& alias)
@@ -989,8 +996,11 @@ int QnResourceWidget::calculateButtonsVisibility() const
 {
     int result = Qn::InfoButton;
 
-    const auto layout = item()->layout()->resource();
-    const auto permissions = accessController()->permissions(layout);
+    const auto layout = layoutResource();
+    auto layoutSystemContext = SystemContext::fromResource(layout);
+    const Qn::Permissions permissions = NX_ASSERT(layoutSystemContext)
+        ? layoutSystemContext->accessController()->permissions(layout)
+        : Qn::AllPermissions;
     const bool fullscreenMode = options().testFlag(FullScreenMode);
 
     if (!m_options.testFlag(WindowRotationForbidden) && permissions.testFlag(Qn::WritePermission))

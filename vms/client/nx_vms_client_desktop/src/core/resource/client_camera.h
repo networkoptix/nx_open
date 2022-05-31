@@ -10,8 +10,7 @@
 class QnArchiveStreamReader;
 
 class QnClientCameraResource:
-    public nx::vms::client::core::Camera,
-    public nx::vms::client::core::RemoteConnectionAware
+    public nx::vms::client::core::Camera
 {
     Q_OBJECT
     using base_type = nx::vms::client::core::Camera;

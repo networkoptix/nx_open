@@ -41,17 +41,22 @@ qint64 QnSyncTime::currentUSecsSinceEpoch() const
     return currentMSecsSinceEpoch() * 1000;
 }
 
-std::chrono::microseconds QnSyncTime::currentTimePoint()
+std::chrono::milliseconds QnSyncTime::value() const
 {
-    return std::chrono::microseconds(currentUSecsSinceEpoch());
+    NX_MUTEX_LOCKER lock(&d->mutex);
+    return d->timeSyncManager
+        ? d->timeSyncManager->getSyncTime()
+        : std::chrono::milliseconds(QDateTime::currentMSecsSinceEpoch());
+}
+
+std::chrono::microseconds QnSyncTime::currentTimePoint() const
+{
+    return value();
 }
 
 qint64 QnSyncTime::currentMSecsSinceEpoch() const
 {
-    NX_MUTEX_LOCKER lock(&d->mutex);
-    return d->timeSyncManager
-        ? d->timeSyncManager->getSyncTime().count()
-        : QDateTime::currentMSecsSinceEpoch();
+    return value().count();
 }
 
 void QnSyncTime::setTimeSyncManager(nx::vms::common::AbstractTimeSyncManagerPtr timeSyncManager)

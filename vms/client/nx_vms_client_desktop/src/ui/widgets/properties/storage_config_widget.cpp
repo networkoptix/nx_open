@@ -13,21 +13,23 @@
 #include <client/client_module.h>
 #include <common/common_globals.h>
 #include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/client_storage_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resources_changes_manager.h>
 #include <nx/analytics/utils.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/style.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/system_settings.h>
@@ -286,7 +288,7 @@ public:
             handleResourceAdded(camera);
 
         connect(
-            qnClientModule->serverRuntimeEventConnector(),
+            appContext()->currentSystemContext()->serverRuntimeEventConnector(),
             &ServerRuntimeEventConnector::analyticsStorageParametersChanged,
             this,
             [this](const QnUuid& serverId)
@@ -644,7 +646,7 @@ void QnStorageConfigWidget::at_addExtStorage(bool addToMain)
     if (!m_server || isReadOnly())
         return;
 
-    auto storageManager = commonModule()->instance<QnServerStorageManager>();
+    auto storageManager = qnServerStorageManager;
     QScopedPointer<QnStorageUrlDialog> dialog(new QnStorageUrlDialog(m_server, storageManager, this));
     dialog->setProtocols(storageManager->protocols(m_server));
     dialog->setCurrentServerStorages(m_model->storages());

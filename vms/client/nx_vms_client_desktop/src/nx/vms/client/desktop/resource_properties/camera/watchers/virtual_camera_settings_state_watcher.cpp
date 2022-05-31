@@ -9,6 +9,7 @@
 #include <client/client_module.h>
 #include <core/resource/camera_resource.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_manager.h>
 
 #include "../flux/camera_settings_dialog_store.h"
@@ -38,13 +39,6 @@ VirtualCameraSettingsStateWatcher::VirtualCameraSettingsStateWatcher(
     connect(remoteStatePollTimer, &QTimer::timeout,
         this, &VirtualCameraSettingsStateWatcher::updateState);
 
-    connect(qnClientModule->virtualCameraManager(), &VirtualCameraManager::stateChanged, this,
-        [this](const VirtualCameraState& virtualCameraState)
-        {
-            if (m_camera && m_camera->getId() == virtualCameraState.cameraId)
-                emit virtualCameraStateChanged(virtualCameraState, {});
-        });
-
     connect(this, &VirtualCameraSettingsStateWatcher::virtualCameraStateChanged,
         store, &CameraSettingsDialogStore::setSingleVirtualCameraState);
 }
@@ -61,7 +55,24 @@ void VirtualCameraSettingsStateWatcher::setCameras(const QnVirtualCameraResource
     m_camera = camera;
     updateState();
 
-    const auto virtualCameraState = qnClientModule->virtualCameraManager()->state(m_camera);
+    VirtualCameraState virtualCameraState;
+    if (m_camera)
+    {
+        auto systemContext = SystemContext::fromResource(m_camera);
+        m_managerConnection.reset(
+            connect(systemContext->virtualCameraManager(), &VirtualCameraManager::stateChanged, this,
+                [this](const VirtualCameraState& virtualCameraState)
+                {
+                    if (m_camera && m_camera->getId() == virtualCameraState.cameraId)
+                        emit virtualCameraStateChanged(virtualCameraState, {});
+                }));
+        virtualCameraState = systemContext->virtualCameraManager()->state(m_camera);
+    }
+    else
+    {
+        m_managerConnection.reset();
+    }
+
     emit virtualCameraStateChanged(virtualCameraState, {});
 }
 
@@ -71,10 +82,10 @@ void VirtualCameraSettingsStateWatcher::updateState()
         return;
 
     // Remote state is not updated automatically, so it must be polled if not locked locally.
-
-    const auto status = qnClientModule->virtualCameraManager()->state(m_camera).status;
+    auto systemContext = SystemContext::fromResource(m_camera);
+    const auto status = systemContext->virtualCameraManager()->state(m_camera).status;
     if (status == VirtualCameraState::Unlocked || status == VirtualCameraState::LockedByOtherClient)
-        qnClientModule->virtualCameraManager()->updateState(m_camera);
+        systemContext->virtualCameraManager()->updateState(m_camera);
 }
 
 } // namespace nx::vms::client::desktop

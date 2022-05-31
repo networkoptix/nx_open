@@ -16,11 +16,9 @@
 #include <nx/utils/url.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/value_cache.h>
-#include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/software_version.h>
 #include <utils/common/instance_storage.h>
 
-class QnStoragePluginFactory;
 class QSettings;
 class QnRouter;
 class QnResourceDiscoveryManager;
@@ -62,11 +60,10 @@ public:
     /**
      * Common-purpose singleton storage.
      * @param systemContext General System Context. Ownership is managed by the caller.
-     * @param clientMode Mode of the Module Discovery work.
      */
     explicit QnCommonModule(
-        bool clientMode,
         nx::vms::common::SystemContext* systemContext, //< TODO: #sivanov Remove from here.
+        nx::vms::discovery::Manager* moduleDiscoveryManager, //< TODO: #sivanov Remove from here.
         QObject* parent = nullptr);
     virtual ~QnCommonModule();
 
@@ -74,11 +71,6 @@ public:
     using QnInstanceStorage::store;
 
     nx::vms::common::SystemContext* systemContext() const;
-
-    QnStoragePluginFactory* storagePluginFactory() const
-    {
-        return m_storagePluginFactory;
-    }
 
     QnRouter* router() const;
 
@@ -103,8 +95,6 @@ public:
     */
     void setSystemIdentityTime(qint64 value, const QnUuid& sender);
     qint64 systemIdentityTime() const;
-
-    nx::vms::api::ModuleInformation moduleInformation() const;
 
     bool isTranscodeDisabled() const { return m_transcodingDisabled; }
     void setTranscodeDisabled(bool value) { m_transcodingDisabled = value; }
@@ -180,7 +170,6 @@ private:
     std::unique_ptr<nx::utils::TimerManager> m_timerManager;
     std::shared_ptr<nx::metrics::Storage> m_metrics;
 
-    const QString m_type;
     QnUuid m_dbId;
     mutable nx::Mutex m_mutex;
     bool m_transcodingDisabled = false;
@@ -188,8 +177,6 @@ private:
     qint64 m_systemIdentityTime = 0;
 
     QDateTime m_startupTime;
-
-    QnStoragePluginFactory* m_storagePluginFactory = nullptr;
 
     QnResourceDiscoveryManager* m_resourceDiscoveryManager = nullptr;
 

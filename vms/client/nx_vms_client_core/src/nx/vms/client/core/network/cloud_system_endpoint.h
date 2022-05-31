@@ -9,6 +9,9 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/uuid.h>
 
+class QnBaseSystemDescription;
+using QnSystemDescriptionPtr = QSharedPointer<QnBaseSystemDescription>;
+
 namespace nx::vms::client::core {
 
 struct NX_VMS_CLIENT_CORE_API CloudSystemEndpoint
@@ -19,5 +22,8 @@ struct NX_VMS_CLIENT_CORE_API CloudSystemEndpoint
 
 NX_VMS_CLIENT_CORE_API std::optional<CloudSystemEndpoint> cloudSystemEndpoint(
     const QString& systemId);
+
+NX_VMS_CLIENT_CORE_API std::optional<CloudSystemEndpoint> cloudSystemEndpoint(
+    const QnSystemDescriptionPtr& system);
 
 } // namespace nx::vms::client::desktop

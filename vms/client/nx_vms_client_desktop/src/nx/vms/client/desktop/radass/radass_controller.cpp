@@ -2,19 +2,16 @@
 
 #include "radass_controller.h"
 
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/desktop/camera/abstract_video_display.h>
 #include <utils/common/counter_hash.h>
 
-#include <core/resource/media_resource.h>
-
-#include <nx/vms/client/desktop/camera/abstract_video_display.h>
-
-#include "radass_types.h"
-#include "radass_support.h"
 #include "radass_controller_params.h"
+#include "radass_support.h"
+#include "radass_types.h"
 #include "utils/qt_timers.h"
 
 using namespace std::chrono;

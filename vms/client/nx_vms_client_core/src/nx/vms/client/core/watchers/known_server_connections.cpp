@@ -15,6 +15,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
@@ -66,10 +67,8 @@ private:
 
 KnownServerConnections::Private::Private(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule),
-    m_discoveryManager(commonModule->moduleDiscoveryManager())
+    m_discoveryManager(appContext()->moduleDiscoveryManager()) //< Can be absent in unit tests.
 {
-    if (!m_discoveryManager)
-        NX_ASSERT(m_discoveryManager);
 }
 
 void KnownServerConnections::Private::start()
@@ -81,8 +80,11 @@ void KnownServerConnections::Private::start()
     if (m_connections.size() != oldSize)
         qnClientCoreSettings->setKnownServerConnections(m_connections);
 
-    for (const auto& connection: m_connections)
-        m_discoveryManager->checkEndpoint(connection.url, connection.serverId);
+    if (m_discoveryManager)
+    {
+        for (const auto& connection: m_connections)
+            m_discoveryManager->checkEndpoint(connection.url, connection.serverId);
+    }
 
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionOpened, this,
         [this]()
@@ -113,7 +115,8 @@ void KnownServerConnections::Private::saveConnection(
     m_connections.prepend(connection);
     trimConnectionsList(m_connections);
 
-    m_discoveryManager->checkEndpoint(connection.url, connection.serverId);
+    if (m_discoveryManager)
+        m_discoveryManager->checkEndpoint(connection.url, connection.serverId);
     qnClientCoreSettings->setKnownServerConnections(m_connections);
 }
 

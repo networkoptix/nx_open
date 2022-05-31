@@ -16,12 +16,23 @@ std::optional<CloudSystemEndpoint> cloudSystemEndpoint(const QString& systemId)
     if (!NX_ASSERT(qnCloudStatusWatcher->status() != QnCloudStatusWatcher::LoggedOut))
         return std::nullopt;
 
-    NX_DEBUG(typeid(cloudSystemEndpoint), "Connecting to the cloud system %1", systemId);
+    NX_DEBUG(NX_SCOPE_TAG, "Connecting to the cloud system %1", systemId);
 
     auto system = qnSystemsFinder->getSystem(systemId);
     if (!system || !system->isReachable())
     {
-        NX_WARNING(typeid(cloudSystemEndpoint), "System %1 is no longer accessible", systemId);
+        NX_WARNING(NX_SCOPE_TAG, "System %1 is no longer accessible", systemId);
+        return std::nullopt;
+    }
+
+    return cloudSystemEndpoint(system);
+}
+
+std::optional<CloudSystemEndpoint> cloudSystemEndpoint(const QnSystemDescriptionPtr& system)
+{
+    if (!NX_ASSERT(system) || !system->isReachable())
+    {
+        NX_WARNING(NX_SCOPE_TAG, "System %1 is no longer accessible", system->id());
         return std::nullopt;
     }
 
@@ -31,7 +42,7 @@ std::optional<CloudSystemEndpoint> cloudSystemEndpoint(const QString& systemId)
     if (!ini().ignoreSavedPreferredCloudServers)
     {
         result.serverId =
-            nx::vms::client::core::helpers::preferredCloudServer(systemId).value_or(QnUuid());
+            nx::vms::client::core::helpers::preferredCloudServer(system->id()).value_or(QnUuid());
         if (!result.serverId.isNull())
         {
             if (system->isReachableServer(result.serverId))
@@ -39,17 +50,17 @@ std::optional<CloudSystemEndpoint> cloudSystemEndpoint(const QString& systemId)
                 url = system->getServerHost(result.serverId);
                 if (NX_ASSERT(!url.isEmpty()))
                 {
-                    NX_DEBUG(typeid(cloudSystemEndpoint),
+                    NX_DEBUG(NX_SCOPE_TAG,
                         "Choosing stored preferred cloud server %1 (%2)",
-                        result.serverId.toString(),
+                        result.serverId,
                         url);
                 }
             }
             else
             {
-                NX_DEBUG(typeid(cloudSystemEndpoint),
+                NX_DEBUG(NX_SCOPE_TAG,
                     "Stored preferred cloud server %1 is not reachable",
-                    result.serverId.toString());
+                    result.serverId);
             }
         }
     }
@@ -71,7 +82,7 @@ std::optional<CloudSystemEndpoint> cloudSystemEndpoint(const QString& systemId)
                 return result.join("\n");
             };
 
-        NX_DEBUG(typeid(cloudSystemEndpoint), "Connection options:\n%1", debugServersInfo());
+        NX_DEBUG(NX_SCOPE_TAG, "Connection options:\n%1", debugServersInfo());
 
         const auto iter = std::find_if(servers.cbegin(), servers.cend(),
             [system](const nx::vms::api::ModuleInformation& server)
@@ -85,12 +96,12 @@ std::optional<CloudSystemEndpoint> cloudSystemEndpoint(const QString& systemId)
             {
                 result.serverId = iter->id;
                 url = system->getServerHost(iter->id);
-                if (NX_ASSERT(!url.isEmpty()))
+                if (!url.isEmpty())
                 {
                     const bool isCloudUrl =
                         nx::network::SocketGlobals::addressResolver().isCloudHostname(url.host());
 
-                    NX_DEBUG(typeid(cloudSystemEndpoint),
+                    NX_DEBUG(NX_SCOPE_TAG,
                         "Choosing %1 connection to the server %2 (%3)",
                         isCloudUrl ? "cloud" : "local",
                         result.serverId,
@@ -102,8 +113,7 @@ std::optional<CloudSystemEndpoint> cloudSystemEndpoint(const QString& systemId)
 
     if (url.isEmpty())
     {
-        NX_WARNING(typeid(cloudSystemEndpoint),
-            "No connection to the system %1 is found", systemId);
+        NX_WARNING(NX_SCOPE_TAG, "No connection to the system %1 is found", system->id());
         return std::nullopt;
     }
 

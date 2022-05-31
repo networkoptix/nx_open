@@ -1,17 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef QN_AVI_RESOURCE_H
-#define QN_AVI_RESOURCE_H
+#pragma once
 
 #include <optional>
-
-#include <utils/common/aspect_ratio.h>
 
 #include <nx/streaming/abstract_archive_resource.h>
 #include <nx/streaming/config.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/vms/api/data/dewarping_data.h>
-#include <nx/vms/common/resource/storage_factory_interface.h>
+#include <utils/common/aspect_ratio.h>
 
 #include "avi_archive_metadata.h"
 
@@ -19,14 +16,13 @@ class QnArchiveStreamReader;
 class QnAviArchiveDelegate;
 
 class NX_VMS_COMMON_API QnAviResource:
-    public QnAbstractArchiveResource,
-    public nx::vms::common::StorageFactoryInterface
+    public QnAbstractArchiveResource
 {
     Q_OBJECT
     using base_type = QnAbstractArchiveResource;
 
 public:
-    QnAviResource(const QString& file, QnStoragePluginFactory* storageFactory);
+    QnAviResource(const QString& file);
     ~QnAviResource();
 
     static QnAbstractStreamDataProvider* createDataProvider(
@@ -82,5 +78,3 @@ private:
     mutable QnConstResourceVideoLayoutPtr m_videoLayout;
     std::optional<int> m_previousRotation;
 };
-
-#endif // QN_AVI_RESOURCE_H

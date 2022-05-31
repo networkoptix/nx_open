@@ -9,6 +9,7 @@
 #include <QtCore/QJsonValue>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/instrument.h>
 #include <nx/vms/api/types/device_type.h>
 
 #include "camera_attributes_data.h"
@@ -26,6 +27,7 @@ struct DeviceGroupSettings
 };
 #define DeviceGroupSettings_Fields (id)(name)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceGroupSettings, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(DeviceGroupSettings, DeviceGroupSettings_Fields);
 
 struct NX_VMS_API DeviceModelGeneral
 {
@@ -64,6 +66,7 @@ struct NX_VMS_API DeviceModelGeneral
 #define DeviceModelGeneral_Fields \
     (id)(name)(url)(typeId)(mac)(serverId)(physicalId)(isManuallyAdded)(vendor)(model)(group)(credentials)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceModelGeneral, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(DeviceModelGeneral, DeviceModelGeneral_Fields);
 
 struct DeviceOptions
 {
@@ -99,6 +102,7 @@ struct DeviceOptions
     (dewarpingParams)(preferredServerId)(failoverPriority)(backupQuality)(backupContentType) \
     (backupPolicy)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceOptions, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(DeviceOptions, DeviceOptions_Fields);
 
 struct DeviceScheduleSettings
 {
@@ -109,6 +113,7 @@ struct DeviceScheduleSettings
 };
 #define DeviceScheduleSettings_Fields (isEnabled)(tasks)(minArchiveDays)(maxArchiveDays)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceScheduleSettings, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(DeviceScheduleSettings, DeviceScheduleSettings_Fields);
 
 struct DeviceMotionSettings
 {
@@ -124,6 +129,7 @@ struct DeviceMotionSettings
 };
 #define DeviceMotionSettings_Fields (type)(mask)(recordBeforeS)(recordAfterS)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceMotionSettings, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(DeviceMotionSettings, DeviceMotionSettings_Fields);
 
 /** ATTENTION: When changing/adding values, adjust apidoc for /ec2/getResourceParams. */
 NX_REFLECTION_ENUM_CLASS(DeviceCapability,
@@ -274,5 +280,6 @@ struct NX_VMS_API DeviceModel: DeviceModelGeneral, ResourceWithParameters
     (parameters)(logicalId)(status)(options)(schedule)(motion)(isLicenseUsed)(backupQuality) \
     (deviceType)(capabilities)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceModel, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(DeviceModel, DeviceModel_Fields);
 
 } // namespace nx::vms::api

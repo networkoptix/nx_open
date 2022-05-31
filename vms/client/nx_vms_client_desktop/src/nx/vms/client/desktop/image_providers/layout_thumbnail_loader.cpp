@@ -9,23 +9,23 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 
+#include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
-#include <core/resource/avi/avi_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <ui/common/palette.h>
-#include <nx/vms/client/desktop/style/helper.h>
-#include <ui/workaround/sharp_pixmap_painting.h>
-
-#include <nx/vms/client/core/utils/geometry.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/common/widgets/autoscaled_plain_text.h>
 #include <nx/vms/client/desktop/image_providers/layout_background_image_provider.h>
 #include <nx/vms/client/desktop/image_providers/resource_thumbnail_provider.h>
 #include <nx/vms/client/desktop/image_providers/watermark_proxy_provider.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resources/resource_descriptor.h>
+#include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <ui/common/palette.h>
+#include <ui/workaround/sharp_pixmap_painting.h>
 
 using nx::vms::client::core::Geometry;
 
@@ -497,20 +497,9 @@ void LayoutThumbnailLoader::setFontColor(const QColor& value)
     setPaletteColor(d->noDataWidget.data(), QPalette::WindowText, value);
 }
 
-void LayoutThumbnailLoader::setResourcePool(QnResourcePool* pool)
-{
-    m_resourcePool = pool;
-}
-
 void LayoutThumbnailLoader::doLoadAsync()
 {
     if (!d->layout)
-        return;
-
-    QnResourcePool* resourcePool = d->layout->resourcePool();
-    if (!resourcePool)
-        resourcePool = m_resourcePool;
-    if (!resourcePool)
         return;
 
     d->reset();
@@ -533,7 +522,7 @@ void LayoutThumbnailLoader::doLoadAsync()
         if (!itemRect.isValid()) // TODO: #sivanov Some items can be not placed yet.
             continue;
 
-        const auto resource = resourcePool->getResourceByDescriptor(iter->resource);
+        const auto resource = getResourceByDescriptor(iter->resource);
         if (!resource)
             continue;
 

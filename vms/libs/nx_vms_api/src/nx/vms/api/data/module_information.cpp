@@ -9,9 +9,6 @@
 
 namespace {
 
-// This string represents the Client during search with DeprecatedMulticastFinder class.
-static const QString kClientId = "Client";
-
 static const QString kMediaServerId = "Media Server";
 
 } // namespace
@@ -59,11 +56,6 @@ bool ModuleInformation::isNewSystem() const
 QString ModuleInformation::mediaServerId()
 {
     return kMediaServerId;
-}
-
-QString ModuleInformation::clientId()
-{
-    return kClientId;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(

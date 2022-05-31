@@ -9,6 +9,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/workbench.h>
@@ -88,7 +89,7 @@ void External::Private::resetC2pLayout(
     int y = 0;
     for (const auto& camera: cameras)
     {
-        QnLayoutItemData item = layout::itemFromResource(camera);
+        QnLayoutItemData item = layoutItemFromResource(camera);
 
         for (const auto& existingItem: existingItems)
         {
@@ -112,7 +113,8 @@ void External::Private::resetC2pLayout(
 
     const QnTimePeriod sliderWindow(timestamp - kSliderWindow/2, kSliderWindow);
 
-    const auto dataManager = qnResourceRuntimeDataManager;
+    const auto dataManager =
+        SystemContext::fromResource(currentLayout)->resourceRuntimeDataManager();
 
     // Select camera as an active item to display timeline.
     QnUuid activeItemId;

@@ -26,6 +26,7 @@
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/analytics/object_display_settings.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/analytics_overlay_widget.h>
@@ -321,7 +322,7 @@ QnLayoutResourcePtr WidgetAnalyticsController::Private::layoutResource() const
 ObjectInfo& WidgetAnalyticsController::Private::addOrUpdateObject(
     const ObjectMetadata& objectMetadata)
 {
-    const auto settings = systemContext()->objectDisplaySettings();
+    const auto settings = appContext()->objectDisplaySettings();
 
     auto& objectInfo = objectInfoByTrackId[objectMetadata.trackId];
     objectInfo.trackId = objectMetadata.trackId;

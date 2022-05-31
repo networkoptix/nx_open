@@ -2,56 +2,53 @@
 
 #include "test_context.h"
 
+#include <QtCore/QCoreApplication>
+
 #include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <common/static_common_module.h>
+#include <nx/branding.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop::test {
 
 struct Context::Private
 {
-    std::unique_ptr<QnStaticCommonModule> staticCommonModule;
-    std::unique_ptr<QnClientRuntimeSettings> clientRuntimeSettings;
-    std::unique_ptr<SystemContext> systemContext;
-    std::unique_ptr<QnClientCoreModule> clientCoreModule;
+    std::unique_ptr<ApplicationContext> appContext;
 };
 
 Context::Context():
     d(new Private())
 {
-    d->staticCommonModule = std::make_unique<QnStaticCommonModule>();
-    d->clientRuntimeSettings = std::make_unique<QnClientRuntimeSettings>(QnStartupParameters());
-    d->systemContext = std::make_unique<SystemContext>(/*peerId*/ QnUuid::createUuid());
-    d->clientCoreModule = std::make_unique<QnClientCoreModule>(
-        QnClientCoreModule::Mode::unitTests,
-        d->systemContext.get());
+    QCoreApplication::setOrganizationName(nx::branding::company());
+    QCoreApplication::setApplicationName("Unit tests");
+    d->appContext = std::make_unique<ApplicationContext>(
+        ApplicationContext::Mode::unitTests,
+        QnStartupParameters());
 }
 
 Context::~Context()
 {
-}
-
-QnStaticCommonModule* Context::staticCommonModule() const
-{
-    return d->staticCommonModule.get();
+    QCoreApplication::setOrganizationName(QString());
+    QCoreApplication::setApplicationName(QString());
 }
 
 QnCommonModule* Context::commonModule() const
 {
-    return d->clientCoreModule->commonModule();
+    return d->appContext->clientCoreModule()->commonModule();
 }
 
 QnClientCoreModule* Context::clientCoreModule() const
 {
-    return d->clientCoreModule.get();
+    return d->appContext->clientCoreModule();
 }
 
 SystemContext* Context::systemContext() const
 {
-    return d->systemContext.get();
+    return d->appContext->currentSystemContext();
 }
 
 } // namespace nx::vms::client::desktop::test

@@ -5,41 +5,36 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtWidgets/QAction>
 
-#include <client_core/client_core_module.h>
-
 #include <client/client_meta_types.h>
 #include <client/client_runtime_settings.h>
-
+#include <client_core/client_core_module.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/layout_tour_manager.h>
 #include <core/resource_management/layout_tour_state_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
-#include <core/resource/layout_resource.h>
-
+#include <nx/utils/log/log.h>
+#include <nx/utils/pending_operation.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/vms/client/core/utils/grid_walker.h>
-
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/graphics/items/resource/layout_tour_drop_placeholder.h>
-
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/items/resource/resource_widget.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
-#include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_grid_mapper.h>
+#include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_utility.h>
-
 #include <utils/common/delayed.h>
-
-#include <nx/utils/log/log.h>
-#include <nx/utils/std/cpp14.h>
-#include <nx/utils/pending_operation.h>
 
 namespace {
 
@@ -89,14 +84,14 @@ LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
             m_saveToursQueue.clear();
         };
     m_saveToursOperation =
-        new utils::PendingOperation(saveQueuedTours, kSaveTourIntervalMs, this);
+        new nx::utils::PendingOperation(saveQueuedTours, kSaveTourIntervalMs, this);
 
     auto updateItemsLayout = [this]
         {
             this->updateItemsLayout();
         };
     m_updateItemsLayoutOperation =
-        new utils::PendingOperation(updateItemsLayout, kUpdateItemsLayoutIntervalMs, this);
+        new nx::utils::PendingOperation(updateItemsLayout, kUpdateItemsLayoutIntervalMs, this);
 
     connect(layoutTourManager(), &QnLayoutTourManager::tourChanged, this,
         &LayoutTourReviewController::handleTourChanged);
@@ -125,8 +120,11 @@ LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
     connect(workbench(), &QnWorkbench::currentLayoutChanged, this,
         &LayoutTourReviewController::startListeningLayout);
 
-    connect(qnResourceRuntimeDataManager, &QnResourceRuntimeDataManager::layoutItemDataChanged,
-        this, &LayoutTourReviewController::handleItemDataChanged);
+    // FIXME: #sivanov Actually we should listen only current layout context.
+    connect(appContext()->currentSystemContext()->resourceRuntimeDataManager(),
+        &QnResourceRuntimeDataManager::layoutItemDataChanged,
+        this,
+        &LayoutTourReviewController::handleItemDataChanged);
 }
 
 LayoutTourReviewController::~LayoutTourReviewController()
@@ -375,6 +373,8 @@ void LayoutTourReviewController::updateItemsLayout()
     const auto tour = layoutTourManager()->tour(currentTourId());
     const auto reviewLayout = wbLayout->resource();
     NX_ASSERT(reviewLayout == m_reviewLayouts.value(tourId));
+    auto resourceRuntimeDataManager =
+        SystemContext::fromResource(reviewLayout)->resourceRuntimeDataManager();
 
     nx::vms::api::LayoutTourDataList currentItems;
 
@@ -410,8 +410,10 @@ void LayoutTourReviewController::updateItemsLayout()
             auto layoutItem = *existing;
             const bool pinned = wbLayout->pinItem(layoutItem, {walker.pos(), kCellSize});
             NX_ASSERT(pinned);
-            qnResourceRuntimeDataManager->setLayoutItemData(layoutItem->uuid(),
-                Qn::LayoutTourItemDelayMsRole, item.delayMs);
+            resourceRuntimeDataManager->setLayoutItemData(
+                layoutItem->uuid(),
+                Qn::LayoutTourItemDelayMsRole,
+                item.delayMs);
             layoutItems.erase(existing);
         }
         else
@@ -423,7 +425,7 @@ void LayoutTourReviewController::updateItemsLayout()
     // These are items that were not repositioned.
     for (auto layoutItem: layoutItems)
     {
-        qnResourceRuntimeDataManager->cleanupData(layoutItem->uuid());
+        resourceRuntimeDataManager->cleanupData(layoutItem->uuid());
         reviewLayout->removeItem(layoutItem->uuid());
     }
 
@@ -434,8 +436,11 @@ void LayoutTourReviewController::updateItemsLayout()
 void LayoutTourReviewController::resetReviewLayout(const QnLayoutResourcePtr& layout,
     const nx::vms::api::LayoutTourItemDataList& items)
 {
+    auto resourceRuntimeDataManager =
+        SystemContext::fromResource(layout)->resourceRuntimeDataManager();
+
     for (const auto& itemId: layout->getItems().keys())
-        qnResourceRuntimeDataManager->cleanupData(itemId);
+        resourceRuntimeDataManager->cleanupData(itemId);
     layout->setItems(QnLayoutItemDataList());
 
     const int gridSize = std::min((int)items.size(), qnRuntime->maxSceneItems());
@@ -462,14 +467,19 @@ void LayoutTourReviewController::addItemToReviewLayout(
     if (layout->getItems().size() >= qnRuntime->maxSceneItems())
         return;
 
+    auto resourceRuntimeDataManager =
+        SystemContext::fromResource(layout)->resourceRuntimeDataManager();
+
     QnLayoutItemData itemData;
     itemData.uuid = QnUuid::createUuid();
     itemData.combinedGeometry = QRectF(position, kCellSize);
     if (pinItem)
         itemData.flags = Qn::Pinned;
     itemData.resource.id = item.resourceId;
-    qnResourceRuntimeDataManager->setLayoutItemData(itemData.uuid,
-        Qn::LayoutTourItemDelayMsRole, item.delayMs);
+    resourceRuntimeDataManager->setLayoutItemData(
+        itemData.uuid,
+        Qn::LayoutTourItemDelayMsRole,
+        item.delayMs);
     layout->addItem(itemData);
 }
 
@@ -542,9 +552,13 @@ void LayoutTourReviewController::handleItemDataChanged(const QnUuid& id, Qn::Ite
     if (!selectedItems.contains(id))
         return;
 
+    auto resourceRuntimeDataManager =
+        SystemContext::fromResource(workbench()->currentLayout()->resource())
+        ->resourceRuntimeDataManager();
+
     selectedItems.remove(id);
     for (const auto& itemId: selectedItems)
-        qnResourceRuntimeDataManager->setLayoutItemData(itemId, role, data);
+        resourceRuntimeDataManager->setLayoutItemData(itemId, role, data);
 }
 
 void LayoutTourReviewController::at_reviewLayoutTourAction_triggered()

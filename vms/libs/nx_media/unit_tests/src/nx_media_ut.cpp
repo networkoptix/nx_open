@@ -302,7 +302,7 @@ public:
     void test(const TestCase& testCase);
 
 private:
-    nx::vms::common::test::Context m_context{false, nx::core::access::Mode::direct};
+    nx::vms::common::test::Context m_context{nx::core::access::Mode::direct};
     QnSharedResourcePointer<MockServer> m_server{new MockServer()};
     QnSharedResourcePointer<MockCamera> m_camera{new MockCamera(m_server->getId())};
 };

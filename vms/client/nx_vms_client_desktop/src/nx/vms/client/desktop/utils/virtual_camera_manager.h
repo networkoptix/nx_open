@@ -6,7 +6,7 @@
 #include <QtCore/QScopedPointer>
 
 #include <core/resource/resource_fwd.h>
-#include <common/common_module_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 #include "virtual_camera_fwd.h"
 
@@ -16,11 +16,12 @@ class VirtualCameraWorker;
 
 class VirtualCameraManager:
     public QObject,
-    public QnCommonModuleAware
+    public SystemContextAware
 {
     Q_OBJECT
+
 public:
-    VirtualCameraManager(QObject* parent = nullptr);
+    VirtualCameraManager(SystemContext* systemContext, QObject* parent = nullptr);
     virtual ~VirtualCameraManager() override;
 
     void setCurrentUser(const QnUserResourcePtr& user);

@@ -5,21 +5,20 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <utils/common/connective.h>
+#include <nx/vms/client/core/system_context_aware.h>
 
 namespace nx::vms::client::core {
 
-class NX_VMS_CLIENT_CORE_API UserWatcher: public Connective<QObject>, public CommonModuleAware
+class NX_VMS_CLIENT_CORE_API UserWatcher: public QObject, public SystemContextAware
 {
     Q_OBJECT
     /* This property should remain read-only for QML! */
     Q_PROPERTY(QString userName READ userName NOTIFY userNameChanged)
 
-    using base_type = Connective<QObject>;
-
 public:
-    UserWatcher(QObject* parent = nullptr);
+    UserWatcher(SystemContext* systemContext, QObject* parent = nullptr);
+
+    void setMessageProcessor(QnClientMessageProcessor* messageProcessor);
 
     void setUser(const QnUserResourcePtr& currentUser);
     const QnUserResourcePtr& user() const;
@@ -30,8 +29,6 @@ public:
 signals:
     void userChanged(const QnUserResourcePtr& user);
     void userNameChanged();
-
-private:
 
 private:
     QString m_userName;

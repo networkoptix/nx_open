@@ -7,7 +7,6 @@
 
 #include <QtCore/QObject>
 
-#include <common/common_module_aware.h>
 #include <network/cloud_system_data.h>
 #include <nx/cloud/db/api/account_data.h>
 #include <nx/network/http/auth_tools.h>
@@ -23,8 +22,7 @@ namespace nx::vms::client::core { struct CloudAuthData; }
 
 class NX_VMS_CLIENT_CORE_API QnCloudStatusWatcher:
     public QObject,
-    public Singleton<QnCloudStatusWatcher>,
-    public QnCommonModuleAware
+    public Singleton<QnCloudStatusWatcher>
 {
     using Credentials = nx::network::http::Credentials;
     using base_type = QObject;
@@ -113,7 +111,6 @@ signals:
 
     void cloudSystemsChanged(const QnCloudSystemList& currentCloudSystems);
     void recentCloudSystemsChanged();
-    void currentSystemChanged(const QnCloudSystem& system);
 
 private:
     nx::utils::ImplPtr<QnCloudStatusWatcherPrivate> d_ptr;

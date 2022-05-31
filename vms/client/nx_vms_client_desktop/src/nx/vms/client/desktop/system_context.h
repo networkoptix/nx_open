@@ -10,14 +10,21 @@
 
 #include "system_context_aware.h"  //< Forward declarations.
 
+class QnCameraBookmarksManager;
+class QnResourceRuntimeDataManager;
+class QnServerStorageManager;
+
 namespace nx::vms::client::desktop {
 
-class ObjectDisplaySettings;
+class ServerRuntimeEventConnector;
+class VideoCache;
 class VideoWallOnlineScreensWatcher;
+class VirtualCameraManager;
 
-class NX_VMS_CLIENT_DESKTOP_API SystemContext: public nx::vms::client::core::SystemContext
+class NX_VMS_CLIENT_DESKTOP_API SystemContext: public core::SystemContext
 {
     Q_OBJECT
+    using base_type = core::SystemContext;
 
 public:
     /**
@@ -34,13 +41,16 @@ public:
     static SystemContext* fromResource(const QnResourcePtr& resource);
 
     QnWorkbenchAccessController* accessController() const;
-
-    /**
-     * Map of analytics objects colors by object type. Persistently stored on a PC.
-     */
-    ObjectDisplaySettings* objectDisplaySettings() const;
-
     VideoWallOnlineScreensWatcher* videoWallOnlineScreensWatcher() const;
+    ServerRuntimeEventConnector* serverRuntimeEventConnector() const;
+    QnServerStorageManager* serverStorageManager() const;
+    QnCameraBookmarksManager* cameraBookmarksManager() const;
+    QnResourceRuntimeDataManager* resourceRuntimeDataManager() const;
+    VirtualCameraManager* virtualCameraManager() const;
+    VideoCache* videoCache() const;
+
+protected:
+    virtual void setMessageProcessor(QnCommonMessageProcessor* messageProcessor) override;
 
 private:
     struct Private;

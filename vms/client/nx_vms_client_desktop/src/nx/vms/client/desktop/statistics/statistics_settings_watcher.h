@@ -7,7 +7,7 @@
 #include <QtCore/QObject>
 
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <statistics/statistics_settings.h>
 
 namespace nx::vms::client::desktop {
@@ -18,20 +18,15 @@ namespace nx::vms::client::desktop {
  * `clientStatisticsSettingsUrl` global settings parameter.
  * Opensource clients have no hardcoded option.
  */
-class StatisticsSettingsWatcher:
-    public QObject,
-    public core::CommonModuleAware
+class StatisticsSettingsWatcher: public QObject, public SystemContextAware
 {
     Q_OBJECT
-    using base_type = QObject;
 
 public:
-    StatisticsSettingsWatcher(QObject* parent = nullptr);
+    StatisticsSettingsWatcher(SystemContext* systemContext, QObject* parent = nullptr);
     virtual ~StatisticsSettingsWatcher() override;
 
     std::optional<QnStatisticsSettings> settings() const;
-
-    void updateSettings();
 
 signals:
     void settingsAvailableChanged();

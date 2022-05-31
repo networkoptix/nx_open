@@ -33,4 +33,9 @@ QVariant Ini::get(const QString& name) const
     return {};
 }
 
+bool Ini::isAutoCloudHostDeductionMode() const
+{
+    return std::string(cloudHost) == "auto";
+}
+
 } // namespace nx::vms::client::desktop

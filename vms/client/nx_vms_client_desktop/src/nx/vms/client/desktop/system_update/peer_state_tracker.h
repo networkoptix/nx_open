@@ -2,15 +2,15 @@
 
 #pragma once
 
+#include <chrono>
 #include <map>
 #include <memory>
-#include <chrono>
 
-#include <utils/common/connective.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/software_version.h>
 #include <nx/vms/common/update/update_information.h>
-#include <common/common_module.h>
+#include <utils/common/connective.h>
 
 #include "client_update_tool.h"
 

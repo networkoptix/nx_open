@@ -26,7 +26,7 @@ class ResourceAccessManagerTest:
 {
 public:
     ResourceAccessManagerTest():
-        ContextBasedTest(/*clientMode*/ false, GetParam())
+        ContextBasedTest(GetParam())
     {
     }
 

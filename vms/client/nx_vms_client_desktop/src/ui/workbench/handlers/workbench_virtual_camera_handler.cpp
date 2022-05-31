@@ -5,31 +5,32 @@
 #include <QtCore/QDirIterator>
 #include <QtWidgets/QAction>
 
-#include <api/server_rest_connection.h>
 #include <api/model/virtual_camera_reply.h>
+#include <api/server_rest_connection.h>
 #include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
+#include <client/client_module.h>
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <ui/dialogs/new_virtual_camera_dialog.h>
-#include <ui/dialogs/common/message_box.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_state_manager.h>
-
-#include <client/client_module.h>
-#include <nx/vms/text/human_readable.h>
-#include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/messages/resources_messages.h>
-#include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
-#include <nx/vms/client/desktop/utils/virtual_camera_manager.h>
-#include <nx/vms/client/desktop/utils/virtual_camera_state.h>
-#include <nx/vms/client/desktop/utils/virtual_camera_payload.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/ui/messages/resources_messages.h>
+#include <nx/vms/client/desktop/utils/virtual_camera_manager.h>
+#include <nx/vms/client/desktop/utils/virtual_camera_payload.h>
+#include <nx/vms/client/desktop/utils/virtual_camera_state.h>
+#include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
+#include <nx/vms/text/human_readable.h>
+#include <ui/dialogs/common/message_box.h>
+#include <ui/dialogs/new_virtual_camera_dialog.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_state_manager.h>
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
@@ -54,10 +55,13 @@ public:
 
     virtual bool tryClose(bool force) override
     {
+        // FIXME: #sivanov Use system context from session delegate.
+        auto systemContext = appContext()->currentSystemContext();
         if (!force)
         {
             QnResourceList resources;
-            for (const VirtualCameraState& state : qnClientModule->virtualCameraManager()->runningUploads())
+            for (const VirtualCameraState& state:
+                systemContext->virtualCameraManager()->runningUploads())
             {
                 QnResourcePtr resource = resourcePool()->getResourceById(state.cameraId);
                 if (resource)
@@ -68,13 +72,14 @@ public:
                 return false;
         }
 
-        qnClientModule->virtualCameraManager()->cancelAllUploads();
+        systemContext->virtualCameraManager()->cancelAllUploads();
         return true;
     }
 
     virtual void forcedUpdate() override
     {
-        qnClientModule->virtualCameraManager()->setCurrentUser(context()->user());
+        auto systemContext = appContext()->currentSystemContext();
+        systemContext->virtualCameraManager()->setCurrentUser(context()->user());
     }
 };
 
@@ -98,7 +103,10 @@ QnWorkbenchVirtualCameraHandler::QnWorkbenchVirtualCameraHandler(QObject* parent
         &QnWorkbenchVirtualCameraHandler::at_resourcePool_resourceAdded);
     connect(context(), &QnWorkbenchContext::userChanged, this,
         &QnWorkbenchVirtualCameraHandler::at_context_userChanged);
-    connect(qnClientModule->virtualCameraManager(), &VirtualCameraManager::stateChanged, this,
+
+    // FIXME: #sivanov Connect to all contexts.
+    auto systemContext = appContext()->currentSystemContext();
+    connect(systemContext->virtualCameraManager(), &VirtualCameraManager::stateChanged, this,
         &QnWorkbenchVirtualCameraHandler::at_virtualCameraManager_stateChanged);
 
     const auto& manager = context()->instance<nx::vms::client::desktop::workbench::LocalNotificationsManager>();
@@ -194,7 +202,8 @@ void QnWorkbenchVirtualCameraHandler::at_uploadVirtualCameraFileAction_triggered
     for(QString& path: paths)
         path = path.trimmed();
 
-    qnClientModule->virtualCameraManager()->prepareUploads(camera, paths, this,
+    auto systemContext = SystemContext::fromResource(camera);
+    systemContext->virtualCameraManager()->prepareUploads(camera, paths, this,
         [this, camera](VirtualCameraUpload upload)
         {
             if(fixFileUpload(camera, &upload))
@@ -236,7 +245,8 @@ void QnWorkbenchVirtualCameraHandler::at_uploadVirtualCameraFolderAction_trigger
         return;
     }
 
-    qnClientModule->virtualCameraManager()->prepareUploads(camera, files, this,
+    auto systemContext = SystemContext::fromResource(camera);
+    systemContext->virtualCameraManager()->prepareUploads(camera, files, this,
         [this, path, camera](VirtualCameraUpload upload)
         {
             if (fixFolderUpload(path, camera, &upload))
@@ -251,7 +261,8 @@ void QnWorkbenchVirtualCameraHandler::at_cancelVirtualCameraUploadsAction_trigge
     if (!camera || !camera->getParentServer())
         return;
 
-    VirtualCameraState state = qnClientModule->virtualCameraManager()->state(camera);
+    auto systemContext = SystemContext::fromResource(camera);
+    VirtualCameraState state = systemContext->virtualCameraManager()->state(camera);
     if (!state.isCancellable())
         return;
 
@@ -263,7 +274,7 @@ void QnWorkbenchVirtualCameraHandler::at_cancelVirtualCameraUploadsAction_trigge
         QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
 
     if (dialog.exec() != QDialogButtonBox::Cancel)
-        qnClientModule->virtualCameraManager()->cancelUploads(camera);
+        systemContext->virtualCameraManager()->cancelUploads(camera);
 }
 
 bool QnWorkbenchVirtualCameraHandler::fixFileUpload(
@@ -470,9 +481,10 @@ void QnWorkbenchVirtualCameraHandler::uploadValidFiles(
         if (payload.status == VirtualCameraPayload::Valid)
             validPayloads.push_back(payload);
 
-    if (!qnClientModule->virtualCameraManager()->addUpload(camera, validPayloads))
+    auto systemContext = SystemContext::fromResource(camera);
+    if (!systemContext->virtualCameraManager()->addUpload(camera, validPayloads))
     {
-        VirtualCameraState state = qnClientModule->virtualCameraManager()->state(camera);
+        VirtualCameraState state = systemContext->virtualCameraManager()->state(camera);
         NX_ASSERT(state.status == VirtualCameraState::LockedByOtherClient);
 
         QString message;
@@ -494,7 +506,8 @@ void QnWorkbenchVirtualCameraHandler::at_resourcePool_resourceAdded(const QnReso
 
 void QnWorkbenchVirtualCameraHandler::at_context_userChanged()
 {
-    qnClientModule->virtualCameraManager()->setCurrentUser(context()->user());
+    auto systemContext = appContext()->currentSystemContext();
+    systemContext->virtualCameraManager()->setCurrentUser(context()->user());
 }
 
 void QnWorkbenchVirtualCameraHandler::at_virtualCameraManager_stateChanged(const VirtualCameraState& state)

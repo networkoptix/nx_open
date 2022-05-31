@@ -9,13 +9,12 @@
 #include <api/model/recording_stats_reply.h>
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
-#include <nx/utils/singleton.h>
 #include <nx/vms/api/data/id_data.h>
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <server/server_storage_manager_fwd.h>
-#include <utils/common/connective.h>
 
 struct QnStorageStatusReply;
 
@@ -24,17 +23,22 @@ struct QnStorageStatusReply;
  *     rebuild process.
  */
 class QnServerStorageManager:
-    public Connective<QObject>,
-    public Singleton<QnServerStorageManager>,
-    public nx::vms::client::core::CommonModuleAware,
-    public nx::vms::client::core::RemoteConnectionAware
+    public QObject,
+    public nx::vms::client::desktop::SystemContextAware
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
-    explicit QnServerStorageManager(QObject* parent = nullptr);
+    explicit QnServerStorageManager(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        QObject* parent = nullptr);
     virtual ~QnServerStorageManager() override;
+
+    /**
+     * Temporary method to access storage manager from the current system context.
+     */
+    static QnServerStorageManager* instance();
 
     QSet<QString> protocols(const QnMediaServerResourcePtr& server) const;
     QnStorageScanData rebuildStatus(

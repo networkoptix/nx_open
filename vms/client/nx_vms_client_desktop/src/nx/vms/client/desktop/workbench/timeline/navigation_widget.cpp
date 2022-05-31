@@ -7,7 +7,7 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QVBoxLayout>
 
-#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/icon.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -75,7 +75,7 @@ NavigationWidget::NavigationWidget(QnWorkbenchContext* context, QWidget* parent)
     mainLayout->setSpacing(3);
     setLayout(mainLayout);
 
-    ApplicationContext::instance()->controlsStatisticsModule()->registerSlider(
+    statisticsModule()->controls()->registerSlider(
         "speed_slider",
         m_speedSlider);
     mainLayout->addWidget(m_speedSlider);

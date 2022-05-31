@@ -138,7 +138,9 @@ QnSearchBookmarksModelPrivate::QnSearchBookmarksModelPrivate(QnSearchBookmarksMo
             emit q->dataChanged(topIndex, bottomIndex);
         });
 
-    connect(qnCameraBookmarksManager, &QnCameraBookmarksManager::bookmarkRemoved, this,
+    // FIXME: #sivanov Actually we must listen for all system contexts here.
+    auto bookmarksManager = appContext()->currentSystemContext()->cameraBookmarksManager();
+    connect(bookmarksManager, &QnCameraBookmarksManager::bookmarkRemoved, this,
         [this](const QnUuid& bookmarkId)
         {
             if (m_updatingWeakGuard.lock())
@@ -154,7 +156,7 @@ QnSearchBookmarksModelPrivate::QnSearchBookmarksModelPrivate(QnSearchBookmarksMo
             q->endRemoveRows();
         });
 
-    connect(qnCameraBookmarksManager, &QnCameraBookmarksManager::bookmarkUpdated, this,
+    connect(bookmarksManager, &QnCameraBookmarksManager::bookmarkUpdated, this,
         [this](const QnCameraBookmark& bookmark)
         {
             if (m_updatingWeakGuard.lock())
@@ -180,8 +182,7 @@ int QnSearchBookmarksModelPrivate::getBookmarkIndex(const QnUuid& bookmarkId) co
 QDateTime QnSearchBookmarksModelPrivate::displayTime(qint64 millisecondsSinceEpoch) const
 {
     // TODO: #sivanov Actualize used system context.
-    const auto timeWatcher = ApplicationContext::instance()->currentSystemContext()
-        ->serverTimeWatcher();
+    const auto timeWatcher = appContext()->currentSystemContext()->serverTimeWatcher();
     return timeWatcher->displayTime(millisecondsSinceEpoch);
 }
 
@@ -241,7 +242,9 @@ void QnSearchBookmarksModelPrivate::applyFilter()
 {
     const auto endUpdateOperationGuard = startUpdateOperation();
 
-    m_query = qnCameraBookmarksManager->createQuery();
+    // FIXME: #sivanov Ensure request is sent to the correct system context (or to all required).
+    auto bookmarksManager = appContext()->currentSystemContext()->cameraBookmarksManager();
+    m_query = bookmarksManager->createQuery();
     m_query->setFilter(m_filter);
     m_query->executeRemoteAsync(
         [this, endUpdateOperationGuard](bool success, int /*requestId*/, const QnCameraBookmarkList& bookmarks)

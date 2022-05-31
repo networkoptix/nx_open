@@ -64,7 +64,7 @@ public:
                 if (!success)
                     return;
 
-                const auto syncTime = milliseconds(qnSyncTime->currentMSecsSinceEpoch());
+                const auto syncTime = qnSyncTime->value();
                 const auto rtt = m_elapsedTimer.elapsed();
                 TimeSynchronizationWidgetStore::TimeOffsetInfoList offsetList;
 

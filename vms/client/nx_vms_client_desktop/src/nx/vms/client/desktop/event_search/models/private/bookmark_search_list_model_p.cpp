@@ -19,7 +19,9 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/help/help_topics.h>
@@ -207,7 +209,9 @@ rest::Handle BookmarkSearchListModel::Private::getBookmarks(
         QVariant::fromValue(filter.orderBy.order).toString(),
         filter.limit);
 
-    return qnCameraBookmarksManager->getBookmarksAsync(filter,
+    // FIXME: #sivanov Send request to all contexts for the required cameras.
+    auto systemContext = appContext()->currentSystemContext();
+    return systemContext->cameraBookmarksManager()->getBookmarksAsync(filter,
         BookmarksCallbackType(nx::utils::guarded(this, callback)));
 }
 
@@ -289,16 +293,19 @@ bool BookmarkSearchListModel::Private::commitPrefetch(const QnTimePeriod& period
 
 void BookmarkSearchListModel::Private::watchBookmarkChanges()
 {
-    // TODO: #vkutin Check whether qnCameraBookmarksManager won't emit these signals
+    // TODO: #vkutin Check whether Camera Bookmarks Manager won't emit these signals
     // if current user has no GlobalPermission::viewBookmarks
 
-    connect(qnCameraBookmarksManager, &QnCameraBookmarksManager::bookmarkAdded,
+    // FIXME: #sivanov Listen for all system contexts.
+    auto bookmarkManager = appContext()->currentSystemContext()->cameraBookmarksManager();
+
+    connect(bookmarkManager, &QnCameraBookmarksManager::bookmarkAdded,
         this, &Private::addBookmark);
 
-    connect(qnCameraBookmarksManager, &QnCameraBookmarksManager::bookmarkUpdated,
+    connect(bookmarkManager, &QnCameraBookmarksManager::bookmarkUpdated,
         this, &Private::updateBookmark);
 
-    connect(qnCameraBookmarksManager, &QnCameraBookmarksManager::bookmarkRemoved,
+    connect(bookmarkManager, &QnCameraBookmarksManager::bookmarkRemoved,
         this, &Private::removeBookmark);
 }
 

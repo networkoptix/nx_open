@@ -4,35 +4,34 @@
 
 #include <limits>
 
-#include <boost/algorithm/cxx11/all_of.hpp>
-
 #include <QtWidgets/QGraphicsWidget>
 
-#include <common/common_module.h>
-#include <client_core/client_core_module.h>
+#include <boost/algorithm/cxx11/all_of.hpp>
 
-#include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
-
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_runtime_data.h>
+#include <client/client_settings.h>
+#include <client_core/client_core_module.h>
+#include <common/common_module.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_runtime_data.h>
+#include <nx/utils/datetime.h>
+#include <nx/utils/log/log.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/resources/resource_descriptor.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <ui/graphics/items/resource/resource_widget.h>
+#include <utils/common/util.h>
 
-#include "workbench_item.h"
+#include "extensions/workbench_stream_synchronizer.h"
 #include "workbench_grid_walker.h"
+#include "workbench_item.h"
 #include "workbench_layout_synchronizer.h"
 #include "workbench_utility.h"
 
-#include "extensions/workbench_stream_synchronizer.h"
-
-#include "utils/common/util.h"
-
-#include <nx/utils/datetime.h>
-#include <nx/utils/log/log.h>
-
+using namespace nx::vms::client::desktop;
 using nx::vms::client::core::Geometry;
 
 namespace {
@@ -186,7 +185,7 @@ bool QnWorkbenchLayout::update(const QnLayoutResourcePtr& resource)
         auto item = this->item(data.uuid);
         if (!item)
         {
-            if (const auto resource = resourcePool()->getResourceByDescriptor(data.resource))
+            if (const auto resource = getResourceByDescriptor(data.resource))
             {
                 auto workbenchItem = new QnWorkbenchItem(resource, data, this);
                 // Each item must either be pinned or queued to be pinned.
@@ -325,7 +324,14 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem* item)
 
     item->m_layout = nullptr;
     m_items.remove(item);
-    qnResourceRuntimeDataManager->cleanupData(item->uuid(), Qn::ItemWebPageSavedStateDataRole);
+
+    // FIXME: #sivanov Workaround destruction issue order.
+    auto layoutContext = resource()
+        ? SystemContext::fromResource(resource())
+        : appContext()->currentSystemContext();
+    layoutContext->resourceRuntimeDataManager()->cleanupData(
+        item->uuid(),
+        Qn::ItemWebPageSavedStateDataRole);
 
     emit itemRemoved(item);
 
@@ -391,9 +397,12 @@ void QnWorkbenchLayout::removeZoomLinkInternal(QnWorkbenchItem* item,
 
 void QnWorkbenchLayout::clear()
 {
+    // FIXME: #sivanov We need to get a context for this layout but resource is unavailable.
+    auto layoutContext = appContext()->currentSystemContext();
+    auto resourceRuntimeDataManager = layoutContext->resourceRuntimeDataManager();
     foreach(QnWorkbenchItem *item, m_items)
     {
-        qnResourceRuntimeDataManager->cleanupData(item->uuid(), Qn::ItemWebPageSavedStateDataRole);
+        resourceRuntimeDataManager->cleanupData(item->uuid(), Qn::ItemWebPageSavedStateDataRole);
         delete item;
     }
     m_items.clear();

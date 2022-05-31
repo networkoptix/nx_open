@@ -8,7 +8,7 @@
 
 #include <qt_graphics_items/graphics_widget.h>
 
-#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/icon.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/svg_icon_colorer.h>
@@ -237,7 +237,7 @@ void QnNavigationItem::createZoomButton(
 
     button->setIcon(qnSkin->icon(fileName, "", nullptr, substitutions));
     button->setPreferredSize(kZoomButtonSize);
-    ApplicationContext::instance()->controlsStatisticsModule()->registerButton(
+    statisticsModule()->controls()->registerButton(
         statisticsName,
         button);
 

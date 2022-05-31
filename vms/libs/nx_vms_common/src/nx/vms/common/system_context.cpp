@@ -83,7 +83,7 @@ SystemContext::SystemContext(
     d->cameraHistoryPool = std::make_unique<QnCameraHistoryPool>(this);
     d->serverAdditionalAddressesDictionary =
         std::make_unique<QnServerAdditionalAddressesDictionary>();
-    d->runtimeInfoManager = std::make_unique<QnRuntimeInfoManager>(this);
+    d->runtimeInfoManager = std::make_unique<QnRuntimeInfoManager>();
     d->globalSettings = std::make_unique<SystemSettings>(this);
     d->userRolesManager = std::make_unique<QnUserRolesManager>(this);
 

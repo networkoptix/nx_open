@@ -15,7 +15,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/storage_plugin_factory.h>
 #include <network/router.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx/branding.h>
@@ -24,11 +23,9 @@
 #include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/utils/timer_manager.h>
-#include <nx/vms/api/protocol_version.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/discovery/manager.h>
-#include <nx/vms/utils/installation_info.h>
 #include <utils/media/ffmpeg_helper.h>
 
 using namespace nx;
@@ -41,7 +38,7 @@ struct QnCommonModule::Private
 {
     QPointer<nx::vms::common::SystemContext> systemContext;
     AbstractCertificateVerifier* certificateVerifier = nullptr;
-    std::unique_ptr<nx::vms::discovery::Manager> moduleDiscoveryManager;
+    QPointer<nx::vms::discovery::Manager> moduleDiscoveryManager = nullptr;
     std::unique_ptr<QnRouter> router;
 };
 
@@ -49,47 +46,29 @@ struct QnCommonModule::Private
 // QnCommonModule
 
 QnCommonModule::QnCommonModule(
-    bool clientMode,
     nx::vms::common::SystemContext* systemContext,
+    nx::vms::discovery::Manager* moduleDiscoveryManager,
     QObject* parent)
     :
     QObject(parent),
-    d(new Private),
-    m_type(clientMode
-        ? nx::vms::api::ModuleInformation::clientId()
-        : nx::vms::api::ModuleInformation::mediaServerId())
+    d(new Private)
 {
     d->systemContext = systemContext;
+    d->moduleDiscoveryManager = moduleDiscoveryManager;
     QnCommonMetaTypes::initialize();
 
     QnFfmpegHelper::registerLogCallback();
     m_timerManager = std::make_unique<nx::utils::TimerManager>("CommonTimerManager");
 
-    m_storagePluginFactory = new QnStoragePluginFactory(this);
-
     m_cameraDriverRestrictionList = new CameraDriverRestrictionList(this);
 
     m_metrics = std::make_shared<nx::metrics::Storage>(); //< Depends on nothing.
 
-    if (clientMode)
+    if (moduleDiscoveryManager) //< Can be absent in unit tests.
     {
-        d->moduleDiscoveryManager = std::make_unique<nx::vms::discovery::Manager>();
+        d->router = std::make_unique<QnRouter>(d->moduleDiscoveryManager);
+        systemContext->initNetworking(d->router.get(), d->certificateVerifier);
     }
-    else
-    {
-        nx::vms::discovery::Manager::ServerModeInfo serverModeInfo{
-            .peerId = systemContext->peerId(),
-            .sessionId = systemContext->sessionId(),
-            .multicastDiscoveryAllowed = true
-        };
-        d->moduleDiscoveryManager = std::make_unique<nx::vms::discovery::Manager>(serverModeInfo);
-    }
-
-    d->moduleDiscoveryManager->monitorServerUrls(systemContext->resourcePool());
-
-    d->router = std::make_unique<QnRouter>(d->moduleDiscoveryManager.get());
-
-    systemContext->initNetworking(d->router.get(), d->certificateVerifier);
 
     /* Init members. */
     m_startupTime = QDateTime::currentDateTime();
@@ -109,7 +88,7 @@ QnRouter* QnCommonModule::router() const
 
 nx::vms::discovery::Manager* QnCommonModule::moduleDiscoveryManager() const
 {
-    return d->moduleDiscoveryManager.get();
+    return d->moduleDiscoveryManager;
 }
 
 nx::utils::SoftwareVersion QnCommonModule::engineVersion() const
@@ -124,56 +103,9 @@ void QnCommonModule::setEngineVersion(const nx::utils::SoftwareVersion& version)
 
 QnCommonModule::~QnCommonModule()
 {
-    d->moduleDiscoveryManager->beforeDestroy();
     /* Here all singletons will be destroyed, so we guarantee all socket work will stop. */
     clear();
     setResourceDiscoveryManager(nullptr);
-}
-
-nx::vms::api::ModuleInformation QnCommonModule::moduleInformation() const
-{
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    nx::vms::api::ModuleInformation moduleInformation;
-    moduleInformation.protoVersion = nx::vms::api::protocolVersion();
-    moduleInformation.osInfo = nx::utils::OsInfo::current();
-    moduleInformation.hwPlatform = nx::vms::utils::installationInfo().hwPlatform;
-    moduleInformation.brand = nx::branding::brand();
-    moduleInformation.customization = nx::branding::customization();
-    moduleInformation.cloudHost = nx::network::SocketGlobals::cloud().cloudHost().c_str();
-    moduleInformation.realm = nx::network::AppInfo::realm().c_str();
-
-    moduleInformation.systemName = d->systemContext->globalSettings()->systemName();
-    moduleInformation.localSystemId = d->systemContext->globalSettings()->localSystemId();
-    moduleInformation.cloudSystemId = d->systemContext->globalSettings()->cloudSystemId();
-
-    moduleInformation.type = m_type;
-    moduleInformation.id = d->systemContext->peerId();
-    moduleInformation.runtimeId = d->systemContext->sessionId();
-    moduleInformation.version = m_engineVersion;
-
-    // This code is executed only on the server side.
-    NX_ASSERT(!d->systemContext->peerId().isNull());
-    if (auto server = d->systemContext->resourcePool()->getResourceById<QnMediaServerResource>(
-        d->systemContext->peerId()))
-    {
-        moduleInformation.port = server->getPort();
-        moduleInformation.name = server->getName();
-        moduleInformation.serverFlags = server->getServerFlags();
-        if (moduleInformation.isNewSystem())
-            moduleInformation.serverFlags |= nx::vms::api::SF_NewSystem; //< Legacy API compatibility.
-    }
-
-    if (auto ec2 = d->systemContext->ec2Connection())
-        moduleInformation.synchronizedTimeMs = ec2->timeSyncManager()->getSyncTime();
-
-    if (!moduleInformation.cloudSystemId.isEmpty())
-    {
-        const auto cloudAccountName = d->systemContext->globalSettings()->cloudAccountName();
-        if (!cloudAccountName.isEmpty())
-            moduleInformation.cloudOwnerId = QnUuid::fromArbitraryData(cloudAccountName);
-    }
-
-    return moduleInformation;
 }
 
 void QnCommonModule::setSystemIdentityTime(qint64 value, const QnUuid& sender)

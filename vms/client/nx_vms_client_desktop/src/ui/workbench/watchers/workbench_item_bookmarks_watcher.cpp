@@ -10,6 +10,7 @@
 #include <core/resource/camera_resource.h>
 #include <nx/utils/datetime.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/graphics/items/overlays/scrollable_text_items_widget.h>
@@ -170,19 +171,21 @@ QnWorkbenchItemBookmarksWatcher::WidgetDataPtr QnWorkbenchItemBookmarksWatcher::
     return WidgetDataPtr(new WidgetData(camera, widget, timelineWatcher, parent));
 }
 
-QnWorkbenchItemBookmarksWatcher::WidgetData::WidgetData(const QnVirtualCameraResourcePtr &camera
-    , QnMediaResourceWidget *resourceWidget
-    , QnTimelineBookmarksWatcher *timelineWatcher
-    , QnWorkbenchItemBookmarksWatcher *parent)
-    : base_type(parent)
-    , m_timelineWatcher(timelineWatcher)
-    , m_camera(camera)
-    , m_parent(parent)
-    , m_mediaWidget(resourceWidget)
-    , m_posMs(DATETIME_INVALID)
-    , m_bookmarks()
-    , m_bookmarksAtPos()
-    , m_query(qnCameraBookmarksManager->createQuery())
+QnWorkbenchItemBookmarksWatcher::WidgetData::WidgetData(
+    const QnVirtualCameraResourcePtr& camera,
+    QnMediaResourceWidget* resourceWidget,
+    QnTimelineBookmarksWatcher* timelineWatcher,
+    QnWorkbenchItemBookmarksWatcher* parent)
+    :
+    base_type(parent),
+    m_timelineWatcher(timelineWatcher),
+    m_camera(camera),
+    m_parent(parent),
+    m_mediaWidget(resourceWidget),
+    m_posMs(DATETIME_INVALID),
+    m_bookmarks(),
+    m_bookmarksAtPos(),
+    m_query(SystemContext::fromResource(camera)->cameraBookmarksManager()->createQuery())
 {
     m_query->setFilter(kInitialFilter);
     m_query->setCamera(camera->getId());

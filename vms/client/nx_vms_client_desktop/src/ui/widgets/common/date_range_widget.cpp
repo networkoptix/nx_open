@@ -152,7 +152,6 @@ QDateTime QnDateRangeWidget::actualDateTime(const QDate& userDate) const
 QDate QnDateRangeWidget::displayDate(qint64 timestampMs) const
 {
     // TODO: #sivanov Actualize used system context.
-    const auto timeWatcher = ApplicationContext::instance()->currentSystemContext()
-        ->serverTimeWatcher();
+    const auto timeWatcher = appContext()->currentSystemContext()->serverTimeWatcher();
     return timeWatcher->displayTime(timestampMs).date();
 }

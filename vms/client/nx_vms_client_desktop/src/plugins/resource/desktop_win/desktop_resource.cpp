@@ -4,12 +4,13 @@
 
 #include <QtWidgets/QOpenGLWidget>
 
-#include "plugins/resource/desktop_win/desktop_data_provider.h"
-#include "ui/screen_recording/video_recorder_settings.h"
-#include "core/resource/media_server_resource.h"
-#include "plugins/resource/desktop_camera/desktop_camera_connection.h"
+#include <core/resource/media_server_resource.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <plugins/resource/desktop_camera/desktop_camera_connection.h>
+#include <plugins/resource/desktop_win/desktop_data_provider.h>
+#include <ui/screen_recording/video_recorder_settings.h>
 
-//static QnWinDesktopResource* instance = 0;
+using namespace nx::vms::client::desktop;
 
 QnWinDesktopResource::QnWinDesktopResource(QOpenGLWidget* mainWindow):
     m_mainWidget(mainWindow)
@@ -55,7 +56,7 @@ void QnWinDesktopResource::createSharedDataProvider()
             return; // already exists
     }
 
-    QnVoiceSpectrumAnalyzer::instance()->reset();
+    appContext()->voiceSpectrumAnalyzer()->reset();
 
     QnVideoRecorderSettings recorderSettings;
 

@@ -17,38 +17,36 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/joystick/settings/manager.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>
+#include <nx/vms/client/desktop/statistics/context_statistics_module.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_health/system_health_state.h>
 #include <nx/vms/client/desktop/system_logon/logic/context_current_user_watcher.h>
 #include <nx/vms/client/desktop/system_update/client_update_manager.h>
 #include <nx/vms/client/desktop/system_update/server_update_tool.h>
 #include <nx/vms/client/desktop/system_update/workbench_update_watcher.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <statistics/statistics_manager.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/graphics/instruments/gl_checker_instrument.h>
 #include <ui/statistics/modules/actions_statistics_module.h>
-#include <ui/statistics/modules/certificate_statistics_module.h>
-#include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/statistics/modules/durations_statistics_module.h>
-#include <ui/statistics/modules/generic_statistics_module.h>
 #include <ui/statistics/modules/graphics_statistics_module.h>
-#include <ui/statistics/modules/session_restore_statistics_module.h>
 #include <ui/statistics/modules/users_statistics_module.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workbench/watchers/workbench_desktop_camera_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_watcher.h>
+#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_synchronizer.h>
-#include <ui/workbench/workbench.h>
 
 #if defined(Q_OS_LINUX)
-    #include <ui/workaround/x11_launcher_workaround.h>
+#include <ui/workaround/x11_launcher_workaround.h>
 #endif
 
 using namespace nx::vms::client::desktop::ui;
@@ -70,7 +68,7 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
     m_userWatcher = instance<ContextCurrentUserWatcher>();
 
     // We need to instantiate core user watcher for two way audio availability watcher.
-    const auto coreUserWatcher = commonModule()->instance<nx::vms::client::core::UserWatcher>();
+    const auto coreUserWatcher = accessController->systemContext()->userWatcher();
 
     // Desktop camera must work in the normal mode only.
     if (qnRuntime->isDesktopMode())
@@ -96,10 +94,7 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
 
     // Adds statistics modules
 
-    auto statisticsManager = commonModule()->instance<QnStatisticsManager>();
-
-    const auto genericStatModule = instance<QnGenericStatisticsModule>();
-    statisticsManager->registerStatisticsModule("generic", genericStatModule);
+    auto statisticsManager = statisticsModule()->manager();
 
     const auto actionsStatModule = instance<QnActionsStatisticsModule>();
     actionsStatModule->setActionManager(m_menu.data());
@@ -114,19 +109,8 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
     const auto durationStatModule = instance<QnDurationStatisticsModule>();
     statisticsManager->registerStatisticsModule(lit("durations"), durationStatModule);
 
-    const auto sessionRestoreStatModule = instance<QnSessionRestoreStatisticsModule>();
-    statisticsManager->registerStatisticsModule(lit("restore"), sessionRestoreStatModule);
-
-    statisticsManager->registerStatisticsModule("certificate",
-        ApplicationContext::instance()->certificateStatisticsModule());
-
-    statisticsManager->registerStatisticsModule("controls",
-        ApplicationContext::instance()->controlsStatisticsModule());
-
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionClosed,
         statisticsManager, &QnStatisticsManager::resetStatistics);
-    connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived,
-        statisticsManager, &QnStatisticsManager::sendStatistics);
 
     instance<nx::vms::client::desktop::SystemHealthState>();
     instance<QnGLCheckerInstrument>();

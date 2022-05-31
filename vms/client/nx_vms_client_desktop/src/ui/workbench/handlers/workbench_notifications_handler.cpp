@@ -8,7 +8,6 @@
 #include <QtGui/QGuiApplication>
 #include <QtWidgets/QAction>
 
-#include <nx/vms/common/system_settings.h>
 #include <business/business_resource_validation.h>
 #include <camera/camera_bookmarks_manager.h>
 #include <client/client_globals.h>
@@ -28,9 +27,11 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/event/actions/common_action.h>
 #include <nx/vms/event/strings_helper.h>
 #include <nx_ec/abstract_ec_connection.h>
@@ -147,7 +148,7 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
             }
         };
 
-    if (!camera)
+    if (!camera || !camera->systemContext())
     {
         QnMessageBox::warning(mainWindowWidget(),
             tr("Unable to acknowledge event on removed camera."));
@@ -178,7 +179,10 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
     bookmark.creatorId = currentUserId;
     bookmark.creationTimeStampMs = milliseconds(currentTimeMs);
 
-    qnCameraBookmarksManager->addAcknowledge(bookmark, businessAction->getRuleId(),
+    auto systemContext = SystemContext::fromResource(camera);
+    systemContext->cameraBookmarksManager()->addAcknowledge(
+        bookmark,
+        businessAction->getRuleId(),
         creationCallback);
 
     // Hiding notification instantly to keep UX smooth.

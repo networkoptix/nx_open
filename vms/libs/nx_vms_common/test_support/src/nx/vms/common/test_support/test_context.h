@@ -9,7 +9,6 @@
 
 #include "resource/resource_pool_test_helper.h"
 
-class QnStaticCommonModule;
 class QnCommonModule;
 
 namespace nx::vms::common { class SystemContext; }
@@ -21,12 +20,9 @@ class MessageProcessorMock;
 class NX_VMS_COMMON_TEST_SUPPORT_API Context
 {
 public:
-    Context(
-        bool clientMode = false,
-        nx::core::access::Mode resourceAccessMode = nx::core::access::Mode::direct);
+    Context(nx::core::access::Mode resourceAccessMode = nx::core::access::Mode::direct);
     virtual ~Context();
 
-    QnStaticCommonModule* staticCommonModule() const;
     QnCommonModule* commonModule() const;
     SystemContext* systemContext() const;
 
@@ -40,9 +36,7 @@ class NX_VMS_COMMON_TEST_SUPPORT_API ContextBasedTest:
     protected QnResourcePoolTestHelper
 {
 public:
-    ContextBasedTest(
-        bool clientMode = false,
-        nx::core::access::Mode resourceAccessMode = nx::core::access::Mode::direct);
+    ContextBasedTest(nx::core::access::Mode resourceAccessMode = nx::core::access::Mode::direct);
 
     ~ContextBasedTest();
 

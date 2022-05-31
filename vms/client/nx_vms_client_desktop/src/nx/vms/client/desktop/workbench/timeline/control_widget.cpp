@@ -11,7 +11,7 @@
 #include <client/client_runtime_settings.h>
 #include <core/resource/resource.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
-#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/icon.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -92,7 +92,7 @@ ControlWidget::ControlWidget(QnWorkbenchContext* context, QWidget* parent):
     initButton(m_calendarButton, ui::action::ToggleCalendarAction,
         "slider/buttons/calendar.png");
 
-    ApplicationContext::instance()->controlsStatisticsModule()->registerSlider(
+    statisticsModule()->controls()->registerSlider(
         "volume_slider",
         m_volumeSlider);
 

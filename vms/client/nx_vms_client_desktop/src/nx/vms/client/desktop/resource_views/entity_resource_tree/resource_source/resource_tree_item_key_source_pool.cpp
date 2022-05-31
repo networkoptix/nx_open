@@ -245,7 +245,7 @@ UniqueStringSourcePtr ResourceTreeItemKeySourcePool::cloudSystemsSource()
     return std::make_shared<CloudSystemsSource>(m_commonModule);
 }
 
-UniqueStringSourcePtr ResourceTreeItemKeySourcePool::cloudSystemCamerasSource(
+UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::cloudSystemCamerasSource(
     const QString& systemId)
 {
     return std::make_shared<CloudSystemCamerasSource>(systemId);

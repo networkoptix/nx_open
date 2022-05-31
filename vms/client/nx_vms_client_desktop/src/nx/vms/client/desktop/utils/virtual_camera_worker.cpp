@@ -1,21 +1,22 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "virtual_camera_worker.h"
-#include "server_request_storage.h"
-#include "upload_manager.h"
-#include "virtual_camera_payload.h"
 
 #include <QtCore/QTimer>
 
 #include <api/model/virtual_camera_status_reply.h>
 #include <api/server_rest_connection.h>
 #include <client/client_module.h>
-#include <core/resource/security_cam_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/security_cam_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/desktop/application_context.h>
+
+#include "server_request_storage.h"
+#include "upload_manager.h"
+#include "virtual_camera_payload.h"
 
 namespace nx::vms::client::desktop {
 
@@ -203,7 +204,7 @@ void VirtualCameraWorker::processCurrentFile()
     config.uploadAllChunks = true;
     config.recreateFile = true;
 
-    QString uploadId = qnClientModule->uploadManager()->addUpload(
+    QString uploadId = appContext()->uploadManager()->addUpload(
         d->camera->getParentServer(), config, this,
         [this](const UploadState& upload)
         {
@@ -218,7 +219,7 @@ void VirtualCameraWorker::processCurrentFile()
     }
 
     d->state.status = VirtualCameraState::Uploading;
-    d->state.currentUpload = qnClientModule->uploadManager()->state(uploadId);
+    d->state.currentUpload = appContext()->uploadManager()->state(uploadId);
 
     emit stateChanged(d->state);
 }
@@ -268,7 +269,7 @@ void VirtualCameraWorker::handleStop()
         return;
 
     if (d->state.status == VirtualCameraState::Uploading)
-        qnClientModule->uploadManager()->cancelUpload(d->state.currentUpload.id);
+        appContext()->uploadManager()->cancelUpload(d->state.currentUpload.id);
 
     connectedServerApi()->releaseVirtualCameraLock(
         d->camera,

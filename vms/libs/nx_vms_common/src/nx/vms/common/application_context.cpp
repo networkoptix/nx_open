@@ -1,30 +1,35 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "static_common_module.h"
+#include "application_context.h"
 
 #include <QtCore/QCoreApplication>
 
+#include <common/common_meta_types.h>
+#include <core/resource/storage_plugin_factory.h>
+#include <network/cloud/cloud_media_server_endpoint_verificator.h>
 #include <nx/network/cloud/tunnel/tcp/tunnel_tcp_endpoint_verificator_factory.h>
 #include <nx/network/socket_global.h>
-#include <network/cloud/cloud_media_server_endpoint_verificator.h>
-
+#include <nx/utils/thread/long_runnable.h>
+#include <nx/utils/thread/mutex.h>
 #include <utils/common/long_runable_cleanup.h>
 #include <utils/common/synctime.h>
 #include <utils/media/ffmpeg_initializer.h>
 
-#include <nx/utils/thread/long_runnable.h>
-#include <nx/utils/thread/mutex.h>
+// Resources initialization must be located outside of the namespace.
+static void initializeResources()
+{
+    Q_INIT_RESOURCE(nx_vms_common);
+}
 
-#include "common_meta_types.h"
+namespace nx::vms::common {
 
 using namespace nx::network;
 
-struct QnStaticCommonModule::Private
+static ApplicationContext* s_instance = nullptr;
+
+struct ApplicationContext::Private
 {
-    Private(nx::vms::api::PeerType localPeerType):
-        localPeerType(localPeerType)
-    {
-    }
+    ApplicationContext* const q;
 
     cloud::tcp::EndpointVerificatorFactory::Function endpointVerificatorFactoryBak;
     mutable nx::Mutex mutex;
@@ -35,17 +40,24 @@ struct QnStaticCommonModule::Private
     std::unique_ptr<QnLongRunableCleanup> longRunableCleanup;
     std::unique_ptr<QnFfmpegInitializer> ffmpegInitializer;
     std::unique_ptr<QnSyncTime> syncTime;
+    std::unique_ptr<QnStoragePluginFactory> storagePluginFactory;
 };
 
-template<> QnStaticCommonModule* Singleton<QnStaticCommonModule>::s_instance = nullptr;
-
-QnStaticCommonModule::QnStaticCommonModule(
+ApplicationContext::ApplicationContext(
     PeerType localPeerType,
-    const QString& customCloudHost)
+    const QString& customCloudHost,
+    QObject* parent)
     :
-    d(new Private(localPeerType))
+    QObject(parent),
+    d(new Private{
+        .q = this,
+        .localPeerType = localPeerType
+    })
 {
-    Q_INIT_RESOURCE(nx_vms_common);
+    if (NX_ASSERT(!s_instance))
+        s_instance = this;
+
+    initializeResources();
     QnCommonMetaTypes::initialize();
 
     d->longRunnablePool = std::make_unique<QnLongRunnablePool>();
@@ -55,15 +67,25 @@ QnStaticCommonModule::QnStaticCommonModule(
     initNetworking(customCloudHost);
 
     d->syncTime = std::make_unique<QnSyncTime>();
+    d->storagePluginFactory = std::make_unique<QnStoragePluginFactory>();
 }
 
-QnStaticCommonModule::~QnStaticCommonModule()
+ApplicationContext::~ApplicationContext()
 {
     d->longRunnablePool->stopAll();
     deinitNetworking();
+
+    if (NX_ASSERT(s_instance == this))
+        s_instance = nullptr;
 }
 
-void QnStaticCommonModule::initNetworking(const QString& customCloudHost)
+ApplicationContext* ApplicationContext::instance()
+{
+    NX_ASSERT(s_instance);
+    return s_instance;
+}
+
+void ApplicationContext::initNetworking(const QString& customCloudHost)
 {
     SocketGlobals::init(/*initializationFlags*/ 0, customCloudHost.toStdString());
     SocketGlobals::addressResolver().addFixedAddress("localhost", SocketAddress::anyPrivateAddress);
@@ -79,7 +101,7 @@ void QnStaticCommonModule::initNetworking(const QString& customCloudHost)
             });
 }
 
-void QnStaticCommonModule::deinitNetworking()
+void ApplicationContext::deinitNetworking()
 {
     cloud::tcp::EndpointVerificatorFactory::instance().setCustomFunc(
         std::move(d->endpointVerificatorFactoryBak));
@@ -87,25 +109,25 @@ void QnStaticCommonModule::deinitNetworking()
     SocketGlobals::deinit();
 }
 
-nx::vms::api::PeerType QnStaticCommonModule::localPeerType() const
+nx::vms::api::PeerType ApplicationContext::localPeerType() const
 {
     return d->localPeerType;
 }
 
-void QnStaticCommonModule::setModuleShortId(const QnUuid& id, int number)
+void ApplicationContext::setModuleShortId(const QnUuid& id, int number)
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
     d->longToShortInstanceId.insert(id, number);
 }
 
-int QnStaticCommonModule::moduleShortId(const QnUuid& id) const
+int ApplicationContext::moduleShortId(const QnUuid& id) const
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
     auto itr = d->longToShortInstanceId.find(id);
     return itr != d->longToShortInstanceId.end() ? itr.value() : -1;
 }
 
-QString QnStaticCommonModule::moduleDisplayName(const QnUuid& id) const
+QString ApplicationContext::moduleDisplayName(const QnUuid& id) const
 {
     static const QnUuid kCloudPeerId("674BAFD7-4EEC-4BBA-84AA-A1BAEA7FC6DB");
     if (id == kCloudPeerId)
@@ -116,3 +138,11 @@ QString QnStaticCommonModule::moduleDisplayName(const QnUuid& id) const
     return itr != d->longToShortInstanceId.end() ?
         QString::number(itr.value()) : id.toString();
 }
+
+
+QnStoragePluginFactory* ApplicationContext::storagePluginFactory() const
+{
+    return d->storagePluginFactory.get();
+}
+
+} // namespace nx::vms::common

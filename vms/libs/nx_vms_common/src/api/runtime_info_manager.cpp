@@ -3,18 +3,10 @@
 #include "runtime_info_manager.h"
 
 #include <api/common_message_processor.h>
-#include <common/common_module.h>
 #include <nx/utils/log/log.h>
-#include <nx/vms/common/system_context.h>
 
-//#define RUNTIME_INFO_DEBUG
-
-QnRuntimeInfoManager::QnRuntimeInfoManager(
-    nx::vms::common::SystemContext* context,
-    QObject* parent)
-    :
+QnRuntimeInfoManager::QnRuntimeInfoManager(QObject* parent):
     QObject(parent),
-    nx::vms::common::SystemContextAware(context),
     m_items(new QnThreadsafeItemStorage<QnPeerRuntimeInfo>(&m_mutex, this))
 {
 }
@@ -22,7 +14,7 @@ QnRuntimeInfoManager::QnRuntimeInfoManager(
 void QnRuntimeInfoManager::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)
 {
     if (m_messageProcessor)
-        disconnect(m_messageProcessor, nullptr, this, nullptr);
+        m_messageProcessor->disconnect(this);
 
     if (messageProcessor)
     {
@@ -65,25 +57,19 @@ const QnThreadsafeItemStorage<QnPeerRuntimeInfo> * QnRuntimeInfoManager::items()
 
 Qn::Notifier QnRuntimeInfoManager::storedItemAdded(const QnPeerRuntimeInfo& item)
 {
-#ifdef RUNTIME_INFO_DEBUG
-    qDebug() <<"runtime info added" << item.uuid << item.data.peer.peerType;
-#endif
+    NX_VERBOSE(this, "Runtime info added: %1 [%2]",  item.data.peer.peerType, item.uuid);
     return [this, item](){ emit runtimeInfoAdded(item); };
 }
 
 Qn::Notifier QnRuntimeInfoManager::storedItemRemoved(const QnPeerRuntimeInfo& item)
 {
-#ifdef RUNTIME_INFO_DEBUG
-    qDebug() <<"runtime info removed" << item.uuid << item.data.peer.peerType;
-#endif
+    NX_VERBOSE(this, "Runtime info removed: %1 [%2]",  item.data.peer.peerType, item.uuid);
     return [this, item](){ emit runtimeInfoRemoved(item); };
 }
 
 Qn::Notifier QnRuntimeInfoManager::storedItemChanged(const QnPeerRuntimeInfo& item)
 {
-#ifdef RUNTIME_INFO_DEBUG
-    qDebug() <<"runtime info changed" << item.uuid << item.data.peer.peerType;
-#endif
+    NX_VERBOSE(this, "Runtime info changed: %1 [%2]",  item.data.peer.peerType, item.uuid);
     return [this, item]{ emit runtimeInfoChanged(item); };
 }
 

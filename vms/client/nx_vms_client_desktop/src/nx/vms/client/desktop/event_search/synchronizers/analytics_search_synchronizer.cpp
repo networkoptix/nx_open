@@ -10,7 +10,6 @@
 
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
-#include <client/client_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_item_index.h>
 #include <nx/utils/log/log.h>
@@ -18,6 +17,7 @@
 #include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/desktop/event_search/utils/text_filter_setup.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/utils/video_cache.h>
 #include <nx/vms/client/desktop/window_context.h>
@@ -272,17 +272,17 @@ void AnalyticsSearchSynchronizer::updateAreaSelection()
 
 void AnalyticsSearchSynchronizer::updateCachedDevices()
 {
-    if (auto cache = qnClientModule->videoCache())
+    std::map<SystemContext*, QnUuidSet> cachedDevicesByContext;
+    if (active() && m_commonSetup)
     {
-        QnUuidSet cachedDevices;
-        if (active() && m_commonSetup)
+        for (const auto& camera: m_commonSetup->selectedCameras())
         {
-            for (const auto& camera: m_commonSetup->selectedCameras())
-                cachedDevices.insert(camera->getId());
+            auto systemContext = SystemContext::fromResource(camera);
+            cachedDevicesByContext[systemContext].insert(camera->getId());
         }
-
-        cache->setCachedDevices(intptr_t(this), cachedDevices);
     }
+    for (const auto& [systemContext, cachedDevices]: cachedDevicesByContext)
+        systemContext->videoCache()->setCachedDevices(intptr_t(this), cachedDevices);
 }
 
 void AnalyticsSearchSynchronizer::updateWorkbench()

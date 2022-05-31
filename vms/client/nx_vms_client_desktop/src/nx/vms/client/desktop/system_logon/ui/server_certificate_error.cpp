@@ -8,9 +8,9 @@
 #include <nx/network/ssl/certificate.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/client/core/system_logon/certificate_warning.h>
+#include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/statistics/modules/certificate_statistics_module.h>
-#include <nx/vms/client/desktop/application_context.h>
 
 #include "server_certificate_viewer.h"
 
@@ -29,7 +29,7 @@ ServerCertificateError::ServerCertificateError(
     setText(tr("Failed to connect to server"));
     setInformativeText(core::CertificateWarning::invalidCertificateError());
 
-    auto statistics = ApplicationContext::instance()->certificateStatisticsModule();
+    auto statistics = statisticsModule()->certificates();
 
     // Init server certificate `link`
     auto link = new QLabel(common::html::localLink(tr("View certificate")));

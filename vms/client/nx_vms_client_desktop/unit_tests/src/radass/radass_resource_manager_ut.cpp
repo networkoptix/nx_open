@@ -16,8 +16,9 @@
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
+#include <nx/vms/client/desktop/test_support/test_context.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
-#include <nx/vms/common/test_support/test_context.h>
 
 namespace {
 
@@ -42,7 +43,7 @@ void PrintTo(const RadassMode& val, ::std::ostream* os)
 }
 
 class RadassResourceManagerTest:
-    public nx::vms::common::test::ContextBasedTest,
+    public nx::vms::client::desktop::test::ContextBasedTest,
     public nx::utils::test::TestWithTemporaryDirectory
 {
 protected:
@@ -55,7 +56,7 @@ protected:
         m_manager->setCacheDirectory(testDataDir());
         m_layout.reset(new QnLayoutResource());
         m_layout->setIdUnsafe(QnUuid::createUuid());
-        resourcePool()->addResource(m_layout);
+        systemContext()->resourcePool()->addResource(m_layout);
     }
 
     // virtual void TearDown() will be called after each test is run.
@@ -70,7 +71,7 @@ protected:
     QnLayoutItemIndex addCamera(bool hasDualStreaming = true)
     {
         auto camera = new CameraResourceStub();
-        resourcePool()->addResource(QnResourcePtr(camera));
+        systemContext()->resourcePool()->addResource(QnResourcePtr(camera));
         camera->setHasDualStreaming(hasDualStreaming);
 
         QnLayoutItemData item;
@@ -89,7 +90,7 @@ protected:
     QnLayoutItemIndex addZoomWindow()
     {
         auto camera = new CameraResourceStub();
-        resourcePool()->addResource(QnResourcePtr(camera));
+        systemContext()->resourcePool()->addResource(QnResourcePtr(camera));
         camera->setHasDualStreaming(true);
 
         QnLayoutItemData item;
@@ -295,7 +296,7 @@ TEST_F(RadassResourceManagerTest, saveAndLoadPersistentData)
     manager()->switchLocalSystemId(kSystemId1);
     addCamera();
     manager()->setMode(layout(), RadassMode::High);
-    manager()->saveData(kSystemId1, resourcePool());
+    manager()->saveData(kSystemId1, systemContext()->resourcePool());
     manager()->switchLocalSystemId(kSystemId2);
     ASSERT_EQ(RadassMode::Auto, manager()->mode(layout()));
     manager()->switchLocalSystemId(kSystemId1);

@@ -736,7 +736,7 @@ begin_label:
                 {
                     // no any packet yet readed from archive and eof reached. So, current time still unknown
                     QnSleep::msleep(10);
-                    internalJumpTo(qnSyncTime->currentMSecsSinceEpoch() * 1000 - BACKWARD_SEEK_STEP);
+                    internalJumpTo(qnSyncTime->currentUSecsSinceEpoch() - BACKWARD_SEEK_STEP);
                     m_afterBOFCounter = 0;
                     goto begin_label;
                 }
@@ -783,7 +783,7 @@ begin_label:
                                 m_bottomIFrameTime = seekTime = m_topIFrameTime - BACKWARD_SEEK_STEP;
                             }
                             else {
-                                m_topIFrameTime = qnSyncTime->currentMSecsSinceEpoch() * 1000;
+                                m_topIFrameTime = qnSyncTime->currentUSecsSinceEpoch();
                                 seekTime = m_topIFrameTime - LIVE_SEEK_OFFSET;
                             }
                         }
@@ -802,7 +802,7 @@ begin_label:
                         if (seekTime != DATETIME_NOW)
                             seekTime = qMax(m_delegate->startTime(), seekTime - BACKWARD_SEEK_STEP);
                         else
-                            seekTime = qnSyncTime->currentMSecsSinceEpoch() * 1000 - BACKWARD_SEEK_STEP;
+                            seekTime = qnSyncTime->currentUSecsSinceEpoch() - BACKWARD_SEEK_STEP;
                     }
 
                     if (m_currentTime != seekTime) {
@@ -1280,7 +1280,7 @@ bool QnArchiveStreamReader::jumpToEx(
     }
 
     if (m_resource)
-        
+
         NX_VERBOSE(this, "Set position %1 for device %2", mksecToDateTime(mksec), m_resource->getId());
 
     qint64 newTime = mksec;

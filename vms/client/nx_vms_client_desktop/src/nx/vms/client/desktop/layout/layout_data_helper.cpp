@@ -5,30 +5,17 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_access/resource_access_filter.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/resources/resource_descriptor.h>
 
-namespace nx::vms::client::desktop::layout {
+namespace nx::vms::client::desktop {
 
-QString resourcePath(const QnResourcePtr& resource)
-{
-    if (!NX_ASSERT(resource))
-        return {};
-
-    if (resource->hasFlags(Qn::exported_layout))
-        return resource->getUrl();
-
-    if (resource->hasFlags(Qn::local_video))
-        return resource->getUrl();
-
-    return {};
-}
-
-QnLayoutItemData itemFromResource(const QnResourcePtr& resource)
+QnLayoutItemData layoutItemFromResource(const QnResourcePtr& resource)
 {
     QnLayoutItemData data;
 
     data.uuid = QnUuid::createUuid();
-    data.resource.id = resource->getId();
-    data.resource.path = resourcePath(resource);
+    data.resource = descriptor(resource);
 
     if (auto mediaResource = resource.dynamicCast<QnMediaResource>())
         data.rotation = mediaResource->forcedRotation().value_or(0);
@@ -66,7 +53,7 @@ QnLayoutResourcePtr layoutFromResource(const QnResourcePtr& resource)
             cellGeometry = cellGeometry.transposed();
     }
 
-    QnLayoutItemData item = itemFromResource(resource);
+    QnLayoutItemData item = layoutItemFromResource(resource);
     // TODO: #sivanov Move to api.
     item.flags = /*pinned*/ 0x1; // Layout data item flags are declared in the client module.
     item.combinedGeometry = cellGeometry;
@@ -77,4 +64,28 @@ QnLayoutResourcePtr layoutFromResource(const QnResourcePtr& resource)
     return layout;
 }
 
-} // namespace nx::vms::client::desktop::layout
+QSet<QnResourcePtr> layoutResources(const QnLayoutResourcePtr& layout)
+{
+    QSet<QnResourcePtr> result;
+    for (const auto& item: layout->getItems())
+    {
+        if (item.uuid.isNull())
+            continue;
+
+        if (auto resource = getResourceByDescriptor(item.resource))
+            result.insert(resource);
+    }
+    return result;
+}
+
+bool resourceBelongsToLayout(const QnResourcePtr& resource, const QnLayoutResourcePtr& layout)
+{
+    for (const auto& item: layout->getItems())
+    {
+        if (item.resource.id == resource->getId())
+            return true;
+    }
+    return false;
+}
+
+} // namespace nx::vms::client::desktop

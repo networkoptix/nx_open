@@ -5,25 +5,19 @@
 #include <QtCore/QHash>
 #include <QtCore/QList>
 #include <QtCore/QMetaType>
-#include <QtCore/QVariant>
 #include <QtCore/QRect>
-
-#include <nx/vms/api/data/dewarping_data.h>
-#include <nx/vms/api/data/image_correction_data.h>
+#include <QtCore/QVariant>
 
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/data/dewarping_data.h>
+#include <nx/vms/api/data/image_correction_data.h>
+#include <nx/vms/common/resource/resource_descriptor.h>
 
 #include "resource_fwd.h"
 
-struct QnLayoutItemResourceDescriptor
-{
-    QnUuid id;
-    QString path;
-};
-
 struct NX_VMS_COMMON_API QnLayoutItemData
 {
-    QnLayoutItemResourceDescriptor resource;
+    nx::vms::common::ResourceDescriptor resource;
 
     QnUuid uuid;
     int flags = 0;

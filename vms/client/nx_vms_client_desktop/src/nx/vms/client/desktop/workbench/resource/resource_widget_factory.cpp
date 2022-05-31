@@ -52,7 +52,7 @@ QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchItem* item)
     }
 
     // TODO: #sivanov Take Window Context from the workbench item.
-    auto windowContext = ApplicationContext::instance()->mainWindowContext();
+    auto windowContext = appContext()->mainWindowContext();
 
     auto layout = item->layout();
     const bool isLayoutTourReview = layout && layout->isLayoutTourReview();

@@ -172,7 +172,7 @@ struct RemoteConnection::Private
         QnUuid sessionId)
         :
         peerType(peerType),
-        moduleInformation(std::move(moduleInformation)),
+        moduleInformation(moduleInformation),
         connectionInfo(std::move(connectionInfo)),
         sessionTokenExpirationTime(sessionTokenExpirationTime),
         certificateCache(certificateCache)

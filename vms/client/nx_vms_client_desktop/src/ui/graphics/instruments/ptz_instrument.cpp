@@ -17,8 +17,8 @@
 #include <nx/utils/math/fuzzy.h>
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/client/core/utils/geometry.h>
-#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/common/custom_cursors.h>
@@ -1425,7 +1425,7 @@ void PtzInstrument::at_splashItem_destroyed()
 
 void PtzInstrument::at_modeButton_clicked()
 {
-    ApplicationContext::instance()->controlsStatisticsModule()->registerClick("ptz_overlay_mode");
+    statisticsModule()->controls()->registerClick("ptz_overlay_mode");
 
     PtzImageButtonWidget* button = checked_cast<PtzImageButtonWidget*>(sender());
 
@@ -1448,8 +1448,7 @@ void PtzInstrument::at_modeButton_clicked()
 
 void PtzInstrument::at_zoomInButton_pressed()
 {
-    ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
-        "ptz_overlay_zoom_in");
+    statisticsModule()->controls()->registerClick("ptz_overlay_zoom_in");
     at_zoomButton_activated(1.0);
 }
 
@@ -1460,8 +1459,7 @@ void PtzInstrument::at_zoomInButton_released()
 
 void PtzInstrument::at_zoomOutButton_pressed()
 {
-    ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
-        "ptz_overlay_zoom_out");
+    statisticsModule()->controls()->registerClick("ptz_overlay_zoom_out");
     at_zoomButton_activated(-1.0);
 }
 
@@ -1480,8 +1478,7 @@ void PtzInstrument::at_zoomButton_activated(qreal zoomSpeed)
 
 void PtzInstrument::at_focusInButton_pressed()
 {
-    ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
-        "ptz_overlay_focus_in");
+    statisticsModule()->controls()->registerClick("ptz_overlay_focus_in");
     at_focusButton_activated(1.0);
 }
 
@@ -1492,8 +1489,7 @@ void PtzInstrument::at_focusInButton_released()
 
 void PtzInstrument::at_focusOutButton_pressed()
 {
-    ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
-        "ptz_overlay_focus_out");
+    statisticsModule()->controls()->registerClick("ptz_overlay_focus_out");
     at_focusButton_activated(-1.0);
 }
 
@@ -1512,8 +1508,7 @@ void PtzInstrument::at_focusButton_activated(qreal speed)
 
 void PtzInstrument::at_focusAutoButton_clicked()
 {
-    ApplicationContext::instance()->controlsStatisticsModule()->registerClick(
-        "ptz_overlay_focus_auto");
+    statisticsModule()->controls()->registerClick("ptz_overlay_focus_auto");
 
     PtzImageButtonWidget* button = checked_cast<PtzImageButtonWidget*>(sender());
 

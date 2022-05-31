@@ -2,20 +2,22 @@
 
 #include "single_shot_file_reader.h"
 
-#include "filetypesupport.h"
-#include "utils/common/synctime.h"
-#include "nx/streaming/video_data_packet.h"
-#include <nx/streaming/config.h>
-#include "core/resource/storage_resource.h"
-#include <core/resource/storage_plugin_factory.h>
 #include <common/common_module.h>
+#include <core/resource/storage_plugin_factory.h>
+#include <core/resource/storage_resource.h>
+#include <nx/streaming/config.h>
+#include <nx/streaming/video_data_packet.h>
+#include <nx/vms/common/application_context.h>
+#include <utils/common/synctime.h>
+
+#include "filetypesupport.h"
+
+using namespace nx::vms::common;
 
 QnSingleShotFileStreamreader::QnSingleShotFileStreamreader(
-    const QnResourcePtr& resource,
-    QnStoragePluginFactory* storageFactory)
+    const QnResourcePtr& resource)
     :
-    QnAbstractMediaStreamDataProvider(resource),
-    m_storageFactory(storageFactory)
+    QnAbstractMediaStreamDataProvider(resource)
 {
 }
 
@@ -38,9 +40,10 @@ QnAbstractMediaDataPtr QnSingleShotFileStreamreader::getNextData()
     else
         return QnAbstractMediaDataPtr();
 
-    if (m_storage == 0)
+    if (!m_storage)
     {
-        m_storage = QnStorageResourcePtr(m_storageFactory->createStorage(getResource()->getUrl()));
+        m_storage = QnStorageResourcePtr(
+            appContext()->storagePluginFactory()->createStorage(getResource()->getUrl()));
     }
     QIODevice* file = m_storage->open(getResource()->getUrl(), QIODevice::ReadOnly);
     if (file == 0)
@@ -52,7 +55,7 @@ QnAbstractMediaDataPtr QnSingleShotFileStreamreader::getNextData()
 
     outData->compressionType = compressionType;
     outData->flags |= QnAbstractMediaData::MediaFlags_AVKey | QnAbstractMediaData::MediaFlags_StillImage;
-    outData->timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
+    outData->timestamp = qnSyncTime->currentUSecsSinceEpoch();
     outData->dataProvider = this;
     outData->channelNumber = 0;
 

@@ -17,7 +17,7 @@ class ResourceHelper: public QObject, public SystemContextAware
     Q_PROPERTY(int resourceStatus READ resourceStatus NOTIFY resourceStatusChanged)
 
     Q_PROPERTY(QnUuid resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
-    Q_PROPERTY(QnResource* resource READ rawResource WRITE setRawResource NOTIFY resourceChanged)    
+    Q_PROPERTY(QnResource* resource READ rawResource WRITE setRawResource NOTIFY resourceChanged)
     Q_PROPERTY(QString resourceName READ resourceName NOTIFY resourceNameChanged)
     Q_PROPERTY(bool hasDefaultCameraPassword READ hasDefaultCameraPassword
         NOTIFY defaultCameraPasswordChanged)

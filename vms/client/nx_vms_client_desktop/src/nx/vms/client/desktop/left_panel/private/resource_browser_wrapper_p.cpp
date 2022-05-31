@@ -1,7 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "resource_browser_wrapper_p.h"
-#include "../left_panel_widget.h"
 
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
@@ -9,19 +8,20 @@
 #include <QtWidgets/QAction>
 
 #include <client/client_globals.h>
-#include <client/client_module.h>
 #include <core/resource/resource.h>
-#include <ui/workbench/workbench_context.h>
-
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
+#include <ui/workbench/workbench_context.h>
+
+#include "../left_panel_widget.h"
 
 namespace nx::vms::client::desktop {
 
@@ -101,7 +101,7 @@ public:
         }
 
         q->tree.model()->setAutoExpandedNodes(nodeIds);
-        
+
         reportStatistics("left_panel_servers_visible",
             q->context()->resourceTreeSettings()->showServersInTree());
 
@@ -146,7 +146,7 @@ ResourceBrowserWrapper::ResourceBrowserWrapper(
     m_layoutInfo(new WorkbenchLayoutInfo(context, this)),
     m_focusScope(focusScope)
 {
-    qnClientModule->clientStateHandler()->registerDelegate(
+    appContext()->clientStateHandler()->registerDelegate(
         kResourceBrowserStateDelegateId, std::make_unique<StateDelegate>(this));
 
     connect(action(ui::action::SearchResourcesAction), &QAction::triggered, this,
@@ -216,7 +216,7 @@ ResourceBrowserWrapper::ResourceBrowserWrapper(
 
 ResourceBrowserWrapper::~ResourceBrowserWrapper()
 {
-    qnClientModule->clientStateHandler()->unregisterDelegate(kResourceBrowserStateDelegateId);
+    appContext()->clientStateHandler()->unregisterDelegate(kResourceBrowserStateDelegateId);
 }
 
 ui::action::Parameters ResourceBrowserWrapper::currentParameters() const

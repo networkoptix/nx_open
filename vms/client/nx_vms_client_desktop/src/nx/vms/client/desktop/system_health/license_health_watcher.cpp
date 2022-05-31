@@ -26,8 +26,8 @@ void LicenseHealthWatcher::at_timer()
     {
         if (validator.validate(license) == nx::vms::license::QnLicenseErrorCode::Expired)
         {
-            qint64 experationDelta = qnSyncTime->currentMSecsSinceEpoch() - license->expirationTime();
-            if (experationDelta < m_timer.interval())
+            qint64 expirationDelta = qnSyncTime->currentMSecsSinceEpoch() - license->expirationTime();
+            if (expirationDelta < m_timer.interval())
             {
                 emit m_licensePool->licensesChanged();
                 break;

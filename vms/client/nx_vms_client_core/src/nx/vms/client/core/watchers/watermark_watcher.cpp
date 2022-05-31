@@ -7,13 +7,13 @@
 #include <QtCore/QSize>
 #include <QtQml/QtQml>
 
-#include <common/common_module.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/media/watermark_image_provider.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/common/system_settings.h>
 
@@ -49,17 +49,19 @@ struct WatermarkWatcher::Private: public QObject
 WatermarkWatcher::Private::Private(WatermarkWatcher* q):
     q(q)
 {
-    const auto userWatcher = q->commonModule()->instance<UserWatcher>();
+    const auto userWatcher = q->systemContext()->userWatcher();
     connect(userWatcher, &UserWatcher::userChanged, this, &Private::updateUser);
     updateUser();
 
-    connect(q->globalSettings(), &common::SystemSettings::watermarkChanged,
-        this, &Private::updateWatermark);
+    connect(q->systemContext()->globalSettings(),
+        &common::SystemSettings::watermarkChanged,
+        this,
+        &Private::updateWatermark);
 }
 
 void WatermarkWatcher::Private::updateUser()
 {
-    const auto value = q->commonModule()->instance<UserWatcher>()->userName();
+    const auto value = q->systemContext()->userWatcher()->userName();
     if (value == user)
         return;
 
@@ -69,7 +71,7 @@ void WatermarkWatcher::Private::updateUser()
 
 void WatermarkWatcher::Private::updateWatermark()
 {
-    const auto settings = q->globalSettings()->watermarkSettings();
+    const auto settings = q->systemContext()->globalSettings()->watermarkSettings();
     const auto value = nx::core::Watermark{settings, user};
     if (watermark == value)
         return;
@@ -84,12 +86,13 @@ void WatermarkWatcher::Private::updateWatermark()
 
 void WatermarkWatcher::registerQmlType()
 {
-    qmlRegisterType<WatermarkWatcher>("nx.client.mobile", 1, 0, "WatermarkWatcher");
+    qmlRegisterUncreatableType<WatermarkWatcher>("nx.client.mobile", 1, 0, "WatermarkWatcher",
+        "System Context instance of Watermark Watcher should be used");
 }
 
-WatermarkWatcher::WatermarkWatcher(QObject* parent):
+WatermarkWatcher::WatermarkWatcher(SystemContext* systemContext, QObject* parent):
     base_type(parent),
-    QnCommonModuleAware(parent),
+    SystemContextAware(systemContext),
     d(new Private(this))
 {
 }
@@ -136,9 +139,9 @@ QUrl WatermarkWatcher::watermarkImageUrl(const QnUuid& id) const
     if (it == d->data.cend() || it->second.size.isEmpty())
         return {};
 
-    const auto user = commonModule()->instance<nx::vms::client::core::UserWatcher>()->user();
-    const auto hasAdminPermission = globalPermissionsManager()->hasGlobalPermission(
-        user, GlobalPermission::admin);
+    const auto user = systemContext()->userWatcher()->user();
+    const auto hasAdminPermission = systemContext()->globalPermissionsManager()
+        ->hasGlobalPermission(user, GlobalPermission::admin);
     if (hasAdminPermission)
         return {};
 

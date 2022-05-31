@@ -142,7 +142,7 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     connect(m_selectAllAction, &QAction::triggered,
         this, [this]() { currentTable()->selectAll(); });
 
-    auto storageManager = commonModule()->instance<QnServerStorageManager>();
+    auto storageManager = qnServerStorageManager;
     connect(storageManager, &QnServerStorageManager::storageSpaceRecieved,
         this, &QnStorageAnalyticsWidget::atReceivedSpaceInfo);
 
@@ -311,7 +311,7 @@ void QnStorageAnalyticsWidget::querySpaceFromServer()
     if (!m_server || m_server->getStatus() != nx::vms::api::ResourceStatus::online)
         return;
 
-    auto storageManager = commonModule()->instance<QnServerStorageManager>();
+    auto storageManager = qnServerStorageManager;
     // If next call fails, it will return 0 meaning "no request".
     m_spaceRequestHandle = storageManager->requestStorageSpace(m_server);
 }
@@ -342,7 +342,7 @@ void QnStorageAnalyticsWidget::queryStatsFromServer(qint64 bitrateAveragingPerio
     const auto index = bitrateAveragingPeriodMs == kDefaultBitrateAveragingPeriod ? 0 : 1;
     // If next call fails, it will return -1 meaning "no request".
     m_statsRequest[index].averagingPeriod = bitrateAveragingPeriodMs;
-    auto storageManager = commonModule()->instance<QnServerStorageManager>();
+    auto storageManager = qnServerStorageManager;
     m_statsRequest[index].handle = storageManager->requestRecordingStatistics(
         m_server, bitrateAveragingPeriodMs,
         [tool=QPointer(this)](bool success, int handle, const QnRecordingStatsReply& data)

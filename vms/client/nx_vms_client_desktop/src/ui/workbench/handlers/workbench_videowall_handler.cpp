@@ -48,6 +48,7 @@
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/state/client_process_runner.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <nx/vms/client/desktop/ui/messages/videowall_messages.h>
@@ -117,15 +118,24 @@ static const QString kPositionUsecKey("position");
 static const QString kSilentKey("silent");
 
 
-QnVideoWallItemIndexList getIndices(const QnLayoutItemData& data)
+QnVideoWallItemIndexList getIndices(
+    const QnLayoutResourcePtr& layout,
+    const QnLayoutItemData& data)
 {
-    return qnResourceRuntimeDataManager->layoutItemData(data.uuid, Qn::VideoWallItemIndicesRole)
+    auto layoutContext = SystemContext::fromResource(layout);
+    auto resourceRuntimeDataManager = layoutContext->resourceRuntimeDataManager();
+    return resourceRuntimeDataManager->layoutItemData(data.uuid, Qn::VideoWallItemIndicesRole)
         .value<QnVideoWallItemIndexList>();
 }
 
-void setIndices(const QnLayoutItemData& data, const QnVideoWallItemIndexList& value)
+void setIndices(
+    const QnLayoutResourcePtr& layout,
+    const QnLayoutItemData& data,
+    const QnVideoWallItemIndexList& value)
 {
-    qnResourceRuntimeDataManager->setLayoutItemData(data.uuid, Qn::VideoWallItemIndicesRole, value);
+    auto layoutContext = SystemContext::fromResource(layout);
+    auto resourceRuntimeDataManager = layoutContext->resourceRuntimeDataManager();
+    resourceRuntimeDataManager->setLayoutItemData(data.uuid, Qn::VideoWallItemIndicesRole, value);
 }
 
 void addItemToLayout(const QnLayoutResourcePtr &layout, const QnVideoWallItemIndexList& indices)
@@ -168,7 +178,7 @@ void addItemToLayout(const QnLayoutResourcePtr &layout, const QnVideoWallItemInd
     else
         itemData.flags = Qn::PendingGeometryAdjustment;
     itemData.resource.id = firstIdx.videowall()->getId();
-    setIndices(itemData, indices);
+    setIndices(layout, itemData, indices);
     layout->addItem(itemData);
 }
 
@@ -228,7 +238,15 @@ auto offlineItemOnThisPc = []
             };
     };
 
-} /* anonymous namespace */
+QSet<QnUuid> layoutResourceIds(const QnLayoutResourcePtr& layout)
+{
+    QSet<QnUuid> result;
+    for (const auto& item: layout->getItems())
+        result << item.resource.id;
+    return result;
+}
+
+} // namespace
 
 //--------------------------------------------------------------------------------------------------
 
@@ -1375,7 +1393,7 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(
     {
         if (auto layout = resource.dynamicCast<QnLayoutResource>())
         {
-            for (auto resource: layout->layoutResources())
+            for (auto resource: layoutResources(layout))
                 addToFiltered(resource);
         }
         else
@@ -1414,7 +1432,7 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(
         int i = 0;
         for (const QnResourcePtr &resource: filtered)
         {
-            QnLayoutItemData item = layout::itemFromResource(resource);
+            QnLayoutItemData item = layoutItemFromResource(resource);
             item.flags = Qn::Pinned;
             item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
             layout->addItem(item);
@@ -1607,9 +1625,13 @@ void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered()
             continue;
 
         QnVideoWallItem existingItem = index.item();
-        if (const auto layout = resourcePool()->getResourceById<QnLayoutResource>(existingItem.layout))
+        if (const auto layout = resourcePool()->getResourceById<QnLayoutResource>(
+            existingItem.layout))
         {
-            auto removedResources = resourcePool()->getResourcesByIds(layout->layoutResourceIds());
+            // Check only Resources from the same System Context as the Layout. Cross-system
+            // Resources cannot be available through Video Wall.
+            QSet<QnUuid> resourceIds = layoutResourceIds(layout);
+            auto removedResources = layout->resourcePool()->getResourcesByIds(resourceIds);
             if (!confirmRemoveResourcesFromLayout(layout, removedResources))
                 break;
         }
@@ -2050,8 +2072,10 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
     // User can occasionally remove own access to cameras by dropping something on videowall.
     if (dropAction == Action::SetAction && currentLayout)
     {
-        const auto oldResources = currentLayout->layoutResourceIds();
-        const auto newResources = targetLayout->layoutResourceIds();
+        // Check only Resources from the same System Context as the Layout. Cross-system Resources
+        // cannot be available through Video Wall.
+        const auto oldResources = layoutResourceIds(currentLayout);
+        const auto newResources = layoutResourceIds(targetLayout);
 
         const auto removedResources = resourcePool()->getResourcesByIds(oldResources - newResources);
         if (!confirmRemoveResourcesFromLayout(currentLayout, removedResources))
@@ -2437,7 +2461,7 @@ void QnWorkbenchVideoWallHandler::at_videoWall_pcRemoved(
     for (auto workbenchItem: layout->items())
     {
         QnLayoutItemData data = workbenchItem->data();
-        auto indices = getIndices(data);
+        auto indices = getIndices(layout->resource(), data);
         if (indices.isEmpty())
             continue;
         if (indices.first().item().pcUuid != pc.uuid)
@@ -3039,7 +3063,7 @@ bool QnWorkbenchVideoWallHandler::saveReviewLayout(
     for (QnWorkbenchItem* workbenchItem : layout->items())
     {
         QnLayoutItemData data = workbenchItem->data();
-        auto indices = getIndices(data);
+        auto indices = getIndices(layout->resource(), data);
         if (indices.isEmpty())
             continue;
         QnVideoWallItemIndex firstIdx = indices.first();
@@ -3211,7 +3235,7 @@ void QnWorkbenchVideoWallHandler::updateReviewLayout(
         {
             for (auto workbenchItem: layout->items())
             {
-                auto indices = getIndices(workbenchItem->data());
+                auto indices = getIndices(layout->resource(), workbenchItem->data());
                 if (indices.isEmpty())
                     continue;
 
@@ -3233,7 +3257,7 @@ void QnWorkbenchVideoWallHandler::updateReviewLayout(
             for (auto workbenchItem: layout->items())
             {
                 QnLayoutItemData data = workbenchItem->data();
-                auto indices = getIndices(data);
+                auto indices = getIndices(layout->resource(), data);
                 if (indices.isEmpty())
                     continue;
 
@@ -3267,12 +3291,12 @@ void QnWorkbenchVideoWallHandler::updateReviewLayout(
                 return;
 
             auto data = workbenchItem->data();
-            auto indices = getIndices(data);
+            auto indices = getIndices(layout->resource(), data);
             indices.removeAll(QnVideoWallItemIndex(videowall, item.uuid));
             if (indices.isEmpty())
                 layout->removeItem(workbenchItem);
             else
-                setIndices(data, indices);
+                setIndices(layout->resource(), data, indices);
         };
 
     auto addToWorkbenchItem =
@@ -3281,9 +3305,9 @@ void QnWorkbenchVideoWallHandler::updateReviewLayout(
             if (workbenchItem)
             {
                 auto data = workbenchItem->data();
-                auto indices = getIndices(data);
+                auto indices = getIndices(layout->resource(), data);
                 indices << QnVideoWallItemIndex(videowall, item.uuid);
-                setIndices(data, indices);
+                setIndices(layout->resource(), data, indices);
             }
             else
             {
@@ -3326,7 +3350,7 @@ bool QnWorkbenchVideoWallHandler::checkLocalFiles(
         return true;
 
     return messages::Videowall::checkLocalFiles(mainWindowWidget(), index,
-        layout->layoutResources().values());
+        layoutResources(layout).values());
 }
 
 void QnWorkbenchVideoWallHandler::showLicensesErrorDialog(const QString& detail) const
