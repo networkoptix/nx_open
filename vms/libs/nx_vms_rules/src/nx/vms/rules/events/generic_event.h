@@ -18,19 +18,18 @@ class NX_VMS_RULES_API GenericEvent: public DescribedEvent
 
 public:
     GenericEvent() = default;
-
     GenericEvent(
         std::chrono::microseconds timestamp,
         const QString& caption,
         const QString& description,
-        const QString& source)
-        :
-        DescribedEvent(timestamp, caption, description),
-        m_source(source)
-    {
-    }
+        const QString& source);
+
+    virtual QVariantMap details(common::SystemContext* context) const override;
 
     static const ItemDescriptor& manifest();
+
+private:
+    QString extendedCaption() const;
 };
 
 } // namespace nx::vms::rules

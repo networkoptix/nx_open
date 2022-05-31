@@ -15,12 +15,13 @@ class NX_VMS_RULES_API PoeOverBudgetEvent: public BasicEvent
     FIELD(QnUuid, serverId, setServerId)
 
 public:
-    virtual QMap<QString, QString> details(common::SystemContext* context) const override;
+    virtual QVariantMap details(common::SystemContext* context) const override;
 
     static const ItemDescriptor& manifest();
 
 private:
     QString description() const;
+    QString extendedCaption(common::SystemContext* context) const;
 };
 
 } // namespace nx::vms::rules

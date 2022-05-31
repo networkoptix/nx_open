@@ -20,12 +20,13 @@ public:
     DeviceDisconnectedEvent(std::chrono::microseconds timestamp, QnUuid deviceId);
 
     virtual QString uniqueName() const override;
-    virtual QMap<QString, QString> details(common::SystemContext* context) const override;
+    virtual QVariantMap details(common::SystemContext* context) const override;
 
     static const ItemDescriptor& manifest();
 
 private:
     QString caption(common::SystemContext* context) const;
+    QString extendedCaption(common::SystemContext* context) const;
 };
 
 } // namespace nx::vms::rules

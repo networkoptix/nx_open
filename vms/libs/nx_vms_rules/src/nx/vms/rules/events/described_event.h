@@ -20,7 +20,7 @@ public:
     QString description() const;
     void setDescription(const QString& description);
 
-    virtual QMap<QString, QString> details(common::SystemContext* context) const override;
+    virtual QVariantMap details(common::SystemContext* context) const override;
 
 protected:
     DescribedEvent() = default;

@@ -155,9 +155,9 @@ NotificationListModel::Private::Private(NotificationListModel* q):
             eventData.removable = true;
             eventData.timestamp = notificationAction->timestamp();
 
-            if (const auto sourceId = QnUuid(notificationAction->source()); !sourceId.isNull())
+            if (!notificationAction->source().isNull())
             {
-                eventData.source = resourcePool()->getResourceById(sourceId);
+                eventData.source = resourcePool()->getResourceById(notificationAction->source());
                 if (eventData.source)
                 {
                     if (auto camera = eventData.source.dynamicCast<QnVirtualCameraResource>())

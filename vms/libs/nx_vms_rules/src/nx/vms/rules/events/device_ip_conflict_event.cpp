@@ -4,21 +4,15 @@
 
 #include <QtNetwork/QHostAddress>
 
+#include <core/resource/device_dependent_strings.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/system_context.h>
 
 #include "../utils/event_details.h"
+#include "../utils/string_helper.h"
 
 namespace nx::vms::rules {
-
-const ItemDescriptor& DeviceIpConflictEvent::manifest()
-{
-    static const auto kDescriptor = ItemDescriptor{
-        .id = "nx.events.deviceIpConflict",
-        .displayName = tr("Device IP Conflict"),
-        .description = "",
-    };
-    return kDescriptor;
-}
 
 DeviceIpConflictEvent::DeviceIpConflictEvent(
     std::chrono::microseconds timestamp,
@@ -33,11 +27,13 @@ DeviceIpConflictEvent::DeviceIpConflictEvent(
 {
 }
 
-QMap<QString, QString> DeviceIpConflictEvent::details(common::SystemContext* context) const
+QVariantMap DeviceIpConflictEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);
 
     utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing());
+    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
+    result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
 
     return result;
 }
@@ -52,6 +48,31 @@ QString DeviceIpConflictEvent::detailing() const
         result << tr("MAC #%1: %2").arg(++n).arg(macAddress);
 
     return result.join(common::html::kLineBreak);
+}
+
+QString DeviceIpConflictEvent::extendedCaption(common::SystemContext* context) const
+{
+    if (totalEventCount() == 1)
+    {
+        const auto resourceName = utils::StringHelper(context).resource(serverId(), Qn::RI_WithUrl);
+        return QnDeviceDependentStrings::getDefaultNameFromSet(
+            context->resourcePool(),
+            tr("Device IP Conflict at %1", "Device IP Conflict at <server_name>"),
+            tr("Camera IP Conflict at %1", "Camera IP Conflict at <server_name>")).arg(resourceName);
+    }
+
+    return BasicEvent::extendedCaption();
+}
+
+const ItemDescriptor& DeviceIpConflictEvent::manifest()
+{
+    static const auto kDescriptor = ItemDescriptor{
+        .id = "nx.events.deviceIpConflict",
+        .displayName = tr("Device IP Conflict"),
+        .description = "",
+        .emailTemplatePath = ":/email_templates/camera_ip_conflict.mustache"
+    };
+    return kDescriptor;
 }
 
 } // namespace nx::vms::rules

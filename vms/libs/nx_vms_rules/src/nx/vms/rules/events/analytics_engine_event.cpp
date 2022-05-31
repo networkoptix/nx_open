@@ -2,10 +2,6 @@
 
 #include "analytics_engine_event.h"
 
-#include <nx/analytics/taxonomy/abstract_engine.h>
-#include <nx/analytics/taxonomy/abstract_state.h>
-#include <nx/vms/common/system_context.h>
-
 #include "../utils/event_details.h"
 
 namespace nx::vms::rules {
@@ -43,32 +39,13 @@ void AnalyticsEngineEvent::setEngineId(QnUuid engineId)
     m_engineId = engineId;
 }
 
-QMap<QString, QString> AnalyticsEngineEvent::details(common::SystemContext* context) const
+QVariantMap AnalyticsEngineEvent::details(common::SystemContext* context) const
 {
     auto result = DescribedEvent::details(context);
 
-    utils::insertIfNotEmpty(result, utils::kPluginDetailName, engine(context));
+    utils::insertIfValid(result, utils::kPluginIdDetailName, QVariant::fromValue(m_engineId));
 
     return result;
-}
-
-QString AnalyticsEngineEvent::engine(common::SystemContext* context) const
-{
-    using nx::analytics::taxonomy::AbstractState;
-    using nx::analytics::taxonomy::AbstractEngine;
-
-    if (m_engineId.isNull())
-        return {};
-
-    const std::shared_ptr<AbstractState> taxonomyState = context->analyticsTaxonomyState();
-    if (!taxonomyState)
-        return {};
-
-    const AbstractEngine* engineInfo = taxonomyState->engineById(m_engineId.toString());
-    if (engineInfo)
-        return engineInfo->name();
-
-    return {};
 }
 
 } // namespace nx::vms::rules

@@ -26,15 +26,15 @@ public:
         const QString& triggerName);
 
     virtual QString uniqueName() const override;
-    virtual QMap<QString, QString> details(common::SystemContext* context) const override;
+    virtual QVariantMap details(common::SystemContext* context) const override;
 
-    static FilterManifest filterManifest();
     static const ItemDescriptor& manifest();
 
 private:
+    QString trigger() const;
     QString caption() const;
-    QString source(common::SystemContext* context) const;
     QString detailing() const;
+    QString extendedCaption(common::SystemContext* context) const;
 };
 
 } // namespace nx::vms::rules

@@ -31,6 +31,7 @@
 #include <nx/vms/client/core/utils/operation_manager.h>
 #include <nx/vms/client/core/watchers/known_server_connections.h>
 #include <nx/vms/rules/engine_holder.h>
+#include <nx/vms/rules/initializer.h>
 #include <plugins/resource/desktop_audio_only/desktop_audio_only_resource.h>
 #include <watchers/cloud_status_watcher.h>
 
@@ -114,7 +115,9 @@ QnClientCoreModule::QnClientCoreModule(
     d->resourceDataProviderFactory->registerResourceType<QnDesktopAudioOnlyResource>();
     d->cloudStatusWatcher = std::make_unique<QnCloudStatusWatcher>(d->commonModule.get());
 
-    d->vmsRulesEngineHolder = std::make_unique<nx::vms::rules::EngineHolder>(systemContext);
+    d->vmsRulesEngineHolder = std::make_unique<nx::vms::rules::EngineHolder>(
+        systemContext,
+        std::make_unique<nx::vms::rules::Initializer>(systemContext));
     d->sessionTokenTerminator = std::make_unique<SessionTokenTerminator>();
 }
 

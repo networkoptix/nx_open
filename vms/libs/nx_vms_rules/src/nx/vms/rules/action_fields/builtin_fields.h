@@ -3,6 +3,7 @@
 #pragma once
 
 #include "content_type_field.h"
+#include "email_message_field.h"
 #include "flag_field.h"
 #include "http_method_field.h"
 #include "optional_time_field.h"

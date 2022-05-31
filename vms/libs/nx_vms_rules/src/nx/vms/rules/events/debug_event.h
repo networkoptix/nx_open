@@ -23,9 +23,8 @@ public:
         qint64 value,
         std::chrono::microseconds timestamp);
 
-    virtual QMap<QString, QString> details(common::SystemContext* context) const override;
+    virtual QVariantMap details(common::SystemContext* context) const override;
 
-    static FilterManifest filterManifest();
     static const ItemDescriptor& manifest();
 
 private:

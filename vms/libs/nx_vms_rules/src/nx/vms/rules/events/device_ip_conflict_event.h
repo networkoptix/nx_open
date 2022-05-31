@@ -27,14 +27,13 @@ public:
         const QHostAddress& address,
         const QStringList& macAddrList);
 
-    virtual QMap<QString, QString> details(common::SystemContext* context) const override;
+    virtual QVariantMap details(common::SystemContext* context) const override;
 
     static const ItemDescriptor& manifest();
 
 private:
-    QMap<QString, QString> m_detailing;
-
     QString detailing() const;
+    QString extendedCaption(common::SystemContext* context) const;
 };
 
 } // namespace nx::vms::rules

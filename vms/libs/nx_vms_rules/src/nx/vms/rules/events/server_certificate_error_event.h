@@ -16,10 +16,15 @@ class NX_VMS_RULES_API ServerCertificateErrorEvent: public BasicEvent
     FIELD(QnUuid, serverId, setServerId)
 
 public:
+    ServerCertificateErrorEvent() = default;
+    ServerCertificateErrorEvent(std::chrono::microseconds timestamp, QnUuid serverId);
+
+    virtual QVariantMap details(common::SystemContext* context) const override;
+
     static const ItemDescriptor& manifest();
 
-    ServerCertificateErrorEvent() = default;
-    ServerCertificateErrorEvent(QnUuid serverId, std::chrono::microseconds timestamp);
+private:
+    QString extendedCaption(common::SystemContext* context) const;
 };
 
 } // namespace nx::vms::rules

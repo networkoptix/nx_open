@@ -16,10 +16,15 @@ class NX_VMS_RULES_API FanErrorEvent: public BasicEvent
     FIELD(QnUuid, serverId, setServerId)
 
 public:
-    static const ItemDescriptor& manifest();
-
     FanErrorEvent() = default;
     FanErrorEvent(QnUuid serverId, std::chrono::microseconds timestamp);
+
+    virtual QVariantMap details(common::SystemContext* context) const override;
+
+    static const ItemDescriptor& manifest();
+
+private:
+    QString extendedCaption(common::SystemContext* context) const;
 };
 
 } // namespace nx::vms::rules

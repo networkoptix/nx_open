@@ -8,9 +8,51 @@
 #include <nx/vms/rules/event_fields/source_camera_field.h>
 
 #include "../utils/event_details.h"
+#include "../utils/string_helper.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
+
+PluginDiagnosticEvent::PluginDiagnosticEvent(
+    std::chrono::microseconds timestamp,
+    const QString& caption,
+    const QString& description,
+    QnUuid cameraId,
+    QnUuid engineId,
+    nx::vms::api::EventLevel level)
+    :
+    AnalyticsEngineEvent(timestamp, caption, description, cameraId, engineId),
+    m_level(level)
+{
+}
+
+QVariantMap PluginDiagnosticEvent::details(common::SystemContext* context) const
+{
+    auto result = AnalyticsEngineEvent::details(context);
+
+    if (!result.contains(utils::kCaptionDetailName))
+        result.insert(utils::kCaptionDetailName, eventCaption());
+
+    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
+
+    return result;
+}
+
+QString PluginDiagnosticEvent::eventCaption() const
+{
+    return caption().isEmpty() ? tr("Plugin Diagnostic Event") : caption();
+}
+
+QString PluginDiagnosticEvent::extendedCaption(common::SystemContext* context) const
+{
+    if (totalEventCount() == 1)
+    {
+        const auto resourceName = utils::StringHelper(context).resource(cameraId(), Qn::RI_WithUrl);
+        return tr("%1 - %2").arg(resourceName).arg(eventCaption());
+    }
+
+    return BasicEvent::extendedCaption();
+}
 
 const ItemDescriptor& PluginDiagnosticEvent::manifest()
 {
@@ -28,28 +70,6 @@ const ItemDescriptor& PluginDiagnosticEvent::manifest()
     };
 
     return kDescriptor;
-}
-
-PluginDiagnosticEvent::PluginDiagnosticEvent(
-    std::chrono::microseconds timestamp,
-    const QString& caption,
-    const QString& description,
-    QnUuid cameraId,
-    QnUuid engineId,
-    nx::vms::api::EventLevel level)
-    :
-    AnalyticsEngineEvent(timestamp, caption, description, cameraId, engineId),
-    m_level(level)
-{
-}
-
-QMap<QString, QString> PluginDiagnosticEvent::details(common::SystemContext* context) const
-{
-    auto result = AnalyticsEngineEvent::details(context);
-
-    utils::insertIfNotEmpty(result, utils::kCaptionDetailName, tr("Unknown Plugin Diagnostic Event"));
-
-    return result;
 }
 
 } // namespace nx::vms::rules

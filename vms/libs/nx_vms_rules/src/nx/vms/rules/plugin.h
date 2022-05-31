@@ -34,7 +34,8 @@ protected:
         const QString id = fieldMetatype<C>();
         if (NX_ASSERT(!id.isEmpty(), "Class does not have required 'metatype' property"))
         {
-            return m_engine->registerEventField(id, [] { return new C(); });
+            if (!m_engine->isEventFieldRegistered(id))
+                return m_engine->registerEventField(id, [] { return new C(); });
         }
         return false;
     }
@@ -45,7 +46,8 @@ protected:
         const QString id = fieldMetatype<C>();
         if (NX_ASSERT(!id.isEmpty(), "Class does not have required 'metatype' property"))
         {
-            return m_engine->registerActionField(id, [] { return new C(); });
+            if (!m_engine->isActionFieldRegistered(id))
+                return m_engine->registerActionField(id, [] { return new C(); });
         }
         return false;
     }

@@ -11,6 +11,7 @@
 #include "../event_fields/analytics_object_type_field.h"
 #include "../event_fields/source_camera_field.h"
 #include "../utils/event_details.h"
+#include "../utils/string_helper.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -30,11 +31,15 @@ AnalyticsObjectEvent::AnalyticsObjectEvent(
 {
 }
 
-QMap<QString, QString> AnalyticsObjectEvent::details(common::SystemContext* context) const
+QVariantMap AnalyticsObjectEvent::details(common::SystemContext* context) const
 {
     auto result = AnalyticsEngineEvent::details(context);
 
     utils::insertIfNotEmpty(result, utils::kCaptionDetailName, analyticsObjectCaption(context));
+    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
+    result.insert(utils::kHasScreenshotDetailName, true);
+    utils::insertIfNotEmpty(result, utils::kAnalyticsObjectTypeDetailName, analyticsObjectCaption(context));
+    result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
 
     return result;
 }
@@ -51,6 +56,21 @@ QString AnalyticsObjectEvent::analyticsObjectCaption(common::SystemContext* cont
     return objectType ? objectType->name() : tr("Object detected");
 }
 
+QString AnalyticsObjectEvent::extendedCaption(common::SystemContext* context) const
+{
+    if (totalEventCount() == 1)
+    {
+        const auto resourceName = utils::StringHelper(context).resource(cameraId(), Qn::RI_WithUrl);
+        const auto objectCaption = analyticsObjectCaption(context);
+
+        return tr("%1 at camera '%2'", " is detected")
+            .arg(objectCaption)
+            .arg(resourceName);
+    }
+
+    return BasicEvent::extendedCaption();
+}
+
 const ItemDescriptor& AnalyticsObjectEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
@@ -61,7 +81,8 @@ const ItemDescriptor& AnalyticsObjectEvent::manifest()
             {fieldMetatype<SourceCameraField>(), "cameraId", tr("Camera")},
             {fieldMetatype<AnalyticsObjectTypeField>(), "objectTypeId", tr("Object Type")},
             {fieldMetatype<AnalyticsObjectAttributesField>(), "attributes", tr("Attributes")},
-        }
+        },
+        .emailTemplatePath = ":/email_templates/analytics_object.mustache"
     };
 
     return kDescriptor;

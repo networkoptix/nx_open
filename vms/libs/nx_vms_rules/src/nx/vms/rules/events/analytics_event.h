@@ -20,8 +20,6 @@ class NX_VMS_RULES_API AnalyticsEvent: public AnalyticsEngineEvent
     FIELD(QString, key, setKey)
 
 public:
-    static const ItemDescriptor& manifest();
-
     AnalyticsEvent() = default;
 
     AnalyticsEvent(
@@ -36,10 +34,13 @@ public:
         QnUuid objectTrackId,
         const QString& key);
 
-    virtual QMap<QString, QString> details(common::SystemContext* context) const override;
+    virtual QVariantMap details(common::SystemContext* context) const override;
+
+    static const ItemDescriptor& manifest();
 
 private:
     QString analyticsEventCaption(common::SystemContext* context) const;
+    QString extendedCaption(common::SystemContext* context) const;
 };
 
 } // namespace nx::vms::rules

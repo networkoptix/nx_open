@@ -5,19 +5,9 @@
 #include <nx/utils/range_adapters.h>
 
 #include "../utils/event_details.h"
+#include "../utils/string_helper.h"
 
 namespace nx::vms::rules {
-
-const ItemDescriptor& ServerConflictEvent::manifest()
-{
-    static const auto kDescriptor = ItemDescriptor{
-        .id = "nx.events.serverConflict",
-        .displayName = tr("Server Conflict"),
-        .description = "",
-    };
-
-    return kDescriptor;
-}
 
 ServerConflictEvent::ServerConflictEvent(
     std::chrono::microseconds timestamp,
@@ -30,7 +20,7 @@ ServerConflictEvent::ServerConflictEvent(
 {
 }
 
-QMap<QString, QString> ServerConflictEvent::details(common::SystemContext* context) const
+QVariantMap ServerConflictEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);
 
@@ -41,6 +31,8 @@ QMap<QString, QString> ServerConflictEvent::details(common::SystemContext* conte
     }
 
     utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing());
+    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
+    result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
 
     return result;
 }
@@ -66,6 +58,29 @@ QString ServerConflictEvent::detailing() const
 
     //TODO: #mmalofeev Choose type for tooltip/detailing field.
     return result.join("\n");
+}
+
+QString ServerConflictEvent::extendedCaption(common::SystemContext* context) const
+{
+    if (totalEventCount() == 1)
+    {
+        const auto resourceName = utils::StringHelper(context).resource({}, Qn::RI_WithUrl); //< TODO: add resource id to the event.
+        return tr("Server \"%1\" Conflict").arg(resourceName);
+    }
+
+    return BasicEvent::extendedCaption();
+}
+
+const ItemDescriptor& ServerConflictEvent::manifest()
+{
+    static const auto kDescriptor = ItemDescriptor{
+        .id = "nx.events.serverConflict",
+        .displayName = tr("Server Conflict"),
+        .description = "",
+        .emailTemplatePath = ":/email_templates/mediaserver_conflict.mustache"
+    };
+
+    return kDescriptor;
 }
 
 } // namespace nx::vms::rules

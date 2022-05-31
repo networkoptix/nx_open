@@ -8,18 +8,16 @@
 #include <nx/vms/common/system_context.h>
 
 #include "ec2_router.h"
-#include "initializer.h"
+#include "plugin.h"
 #include "rule.h"
 
 namespace nx::vms::rules {
 
-EngineHolder::EngineHolder(nx::vms::common::SystemContext* context):
-    m_engine(std::make_unique<Engine>(std::make_unique<Ec2Router>(context)))
+EngineHolder::EngineHolder(nx::vms::common::SystemContext* context, std::unique_ptr<Plugin> plugin):
+    m_engine(std::make_unique<Engine>(std::make_unique<Ec2Router>(context))),
+    m_builtinPlugin(std::move(plugin))
 {
-    auto plugin = std::make_unique<Initializer>(context);
-    plugin->initialize(m_engine.get());
-
-    m_builtinPlugin = std::move(plugin);
+    m_builtinPlugin->initialize(m_engine.get());
 }
 
 EngineHolder::~EngineHolder()

@@ -13,10 +13,15 @@ class NX_VMS_RULES_API NetworkIssueEvent: public ReasonedEvent
 
 public:
     virtual QString uniqueName() const override;
+    virtual QVariantMap details(common::SystemContext* context) const override;
+
     static const ItemDescriptor& manifest();
 
     // TODO: #amalov Ensure correct event source processing.
     using ReasonedEvent::ReasonedEvent;
+
+private:
+    QString extendedCaption(common::SystemContext* context) const;
 };
 
 } // namespace nx::vms::rules

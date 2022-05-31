@@ -158,6 +158,7 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionFieldRegistration<TargetDeviceField>();
     testActionFieldRegistration<TargetUserField>();
     testActionFieldRegistration<TextWithFields>(systemContext());
+    testActionFieldRegistration<EmailMessageField>(systemContext());
 
     // TODO: #amalov Uncomment all types after manifest definition.
     //testActionRegistration<BookmarkAction>();
