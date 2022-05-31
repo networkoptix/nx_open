@@ -34,4 +34,7 @@ private:
     QString m_moduleName;
 };
 
+NX_REFLECTION_INSTRUMENT_GSN(BasicServiceSettings,
+    ((&BasicServiceSettings::dataDir, nx::reflect::none, "dataDir")))
+
 } // namespace nx::utils
