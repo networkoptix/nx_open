@@ -12,6 +12,7 @@ Bubble 1.0 Bubble.qml
 BubbleToolTip 1.0 BubbleToolTip.qml
 Button 1.0 Button.qml
 CheckBox 1.0 CheckBox.qml
+CheckBoxImage 1.0 CheckBoxImage.qml
 ComboBox 1.0 ComboBox.qml
 CompactTabButton 1.0 CompactTabButton.qml
 CompactMenuItem 1.0 CompactMenuItem.qml

@@ -23,22 +23,16 @@ CheckBox
     font.pixelSize: 13
     font.weight: Font.Normal
 
-    baselineOffset: text.baselineOffset
+    baselineOffset: text.baselineOffset + topPadding
 
-    indicator: Image
+    indicator: CheckBoxImage
     {
-        y: topPadding
-        opacity: enabled ? 1.0 : 0.3
+        id: checkIndicator
 
-        source:
-        {
-            var source = "qrc:///skin/theme/checkbox"
-            if (control.checked)
-                source += "_checked"
-            if (control.hovered)
-                source += "_hover"
-            return source + ".png"
-        }
+        anchors.baseline: control.baseline
+        checkState: control.checkState
+        enabled: control.enabled
+        hovered: control.hovered
     }
 
     contentItem: Row
@@ -62,21 +56,8 @@ CheckBox
             elide: Qt.ElideRight
             font: control.font
             text: control.text
-            opacity: enabled ? 1.0 : 0.3
-
-            color:
-            {
-                if (control.checked)
-                {
-                    return (control.hovered && !control.pressed)
-                        ? ColorTheme.brightText
-                        : ColorTheme.text
-                }
-
-                return (control.hovered && !control.pressed)
-                    ? ColorTheme.lighter(ColorTheme.light, 2)
-                    : ColorTheme.light
-            }
+            opacity: checkIndicator.opacity
+            color: checkIndicator.color
         }
     }
 
