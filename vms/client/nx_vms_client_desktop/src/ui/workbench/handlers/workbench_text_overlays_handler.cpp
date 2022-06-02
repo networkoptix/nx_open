@@ -61,7 +61,7 @@ QString formatOverlayText(
         "color: white;}</style></head><body>%1</body></html>";
 
     constexpr int kCaptionMaxLength = 64;
-    constexpr int kDescriptionMaxLength = 160;
+    constexpr int kDescriptionMaxLength = 512;
     constexpr int kCaptionPixelFontSize = 16;
     constexpr int kDescriptionPixelFontSize = 13;
 
