@@ -20,6 +20,9 @@ struct NX_VMS_API UserGroupModel
     QnUuid id;
     QString name;
 
+    /**%apidoc[opt] */
+    QString description;
+
     /**%apidoc[opt] Only local User Groups are supposed to be created by the API. */
     UserType type = UserType::local;
 
@@ -48,7 +51,8 @@ struct NX_VMS_API UserGroupModel
     static std::vector<UserGroupModel> fromDbTypes(DbListTypes data);
 };
 
-#define UserGroupModel_Fields (id)(name)(type)(permissions)(parentGroupIds)(accessibleResources)
+#define UserGroupModel_Fields \
+    (id)(name)(description)(type)(permissions)(parentGroupIds)(accessibleResources)
 
 QN_FUSION_DECLARE_FUNCTIONS(UserGroupModel, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
 
