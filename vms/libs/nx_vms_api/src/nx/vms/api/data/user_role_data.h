@@ -26,6 +26,9 @@ struct NX_VMS_API UserRoleData: IdData
 
     bool isLdap = false;
 
+    /**%apidoc[opt] */
+    QString description;
+
     UserRoleData() = default;
     UserRoleData(
         const QnUuid& id, const QString& name,
@@ -43,7 +46,8 @@ struct NX_VMS_API UserRoleData: IdData
     (name) \
     (permissions) \
     (parentRoleIds) \
-    (isLdap)
+    (isLdap) \
+    (description)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(UserRoleData)
 
 /**%apidoc Predefined non-editable role.
