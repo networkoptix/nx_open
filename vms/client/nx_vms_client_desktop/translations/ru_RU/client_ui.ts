@@ -592,7 +592,7 @@
     </message>
     <message>
       <source>Use Media2 to fetch profiles</source>
-      <translation type="unfinished">Use Media2 to fetch profiles</translation>
+      <translation>Использовать Media2 для получения профилей</translation>
     </message>
     <message>
       <source>Use different values for pan and tilt</source>
@@ -2402,7 +2402,7 @@
     </message>
     <message>
       <source>Use only HTTPS to connect to cameras</source>
-      <translation type="unfinished">Use only HTTPS to connect to cameras</translation>
+      <translation>Использовать только HTTPS для подключения к камерам</translation>
     </message>
     <message>
       <source>User Activity</source>
@@ -2430,7 +2430,7 @@
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation type="unfinished">Connection with cameras that do not support HTTPS will be lost.</translation>
+      <translation>Соединение с камерами, не поддерживающими HTTPS, будет потеряно.</translation>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>

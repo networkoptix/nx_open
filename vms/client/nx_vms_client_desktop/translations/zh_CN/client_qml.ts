@@ -243,22 +243,22 @@
     </message>
     <message>
       <source>Unreachable</source>
-      <translation type="unfinished">Unreachable</translation>
+      <translation>无法访问</translation>
     </message>
     <message>
       <source>Incompatible</source>
-      <translation type="unfinished">Incompatible</translation>
+      <translation>不兼容</translation>
     </message>
     <message>
       <source>Pending</source>
-      <translation type="unfinished">Pending</translation>
+      <translation>等待处理</translation>
     </message>
   </context>
   <context>
     <name>CloudTile</name>
     <message>
       <source>Log in to </source>
-      <translation type="unfinished">Log in to </translation>
+      <translation>登录到 </translation>
     </message>
   </context>
   <context>
@@ -279,18 +279,18 @@
     <name>ContextHintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>点击图标阅读更多</translation>
     </message>
   </context>
   <context>
     <name>CounterBlock</name>
     <message>
       <source>Remove column</source>
-      <translation type="unfinished">Remove column</translation>
+      <translation>删除栏</translation>
     </message>
     <message>
       <source>Add column</source>
-      <translation type="unfinished">Add column</translation>
+      <translation>添加栏</translation>
     </message>
     <message>
       <source>Hide information</source>
@@ -712,7 +712,7 @@
     </message>
     <message>
       <source>URL or Host:Port</source>
-      <translation type="unfinished">URL or Host:Port</translation>
+      <translation>URL 或主机：端口</translation>
     </message>
     <message>
       <source>Login</source>
@@ -783,7 +783,7 @@
     <name>PreviewPanel</name>
     <message>
       <source>No Preview</source>
-      <translation type="unfinished">No Preview</translation>
+      <translation>无预览</translation>
     </message>
     <message>
       <source>Select the object to display the preview</source>
@@ -850,7 +850,7 @@ to activate PTZ</source>
     <name>RangeEditor</name>
     <message>
       <source>from</source>
-      <translation type="unfinished">from</translation>
+      <translation>来自</translation>
     </message>
     <message>
       <source>to</source>
@@ -922,7 +922,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>All Types</source>
-      <translation type="unfinished">All Types</translation>
+      <translation>所有类型</translation>
     </message>
     <message>
       <source>Servers</source>
@@ -961,7 +961,7 @@ to activate PTZ</source>
     <name>ResourceToolTip</name>
     <message>
       <source>Cannot load preview</source>
-      <translation type="unfinished">Cannot load preview</translation>
+      <translation>无法加载预览</translation>
     </message>
     <message>
       <source>Preview is outdated</source>
@@ -1265,11 +1265,11 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Official Website</source>
-      <translation type="unfinished">Official Website</translation>
+      <translation>官方网站</translation>
     </message>
     <message>
       <source>Help &amp; User Manual</source>
-      <translation type="unfinished">Help &amp; User Manual</translation>
+      <translation>帮助和用户手册</translation>
     </message>
     <message>
       <source>Support</source>
