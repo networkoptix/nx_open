@@ -53,7 +53,7 @@
     </message>
     <message>
       <source>Expires</source>
-      <translation>期限切れ</translation>
+      <translation>有効期限</translation>
     </message>
   </context>
   <context>
@@ -1219,7 +1219,7 @@
     </message>
     <message>
       <source>License you are trying to activate is incompatible with your software.</source>
-      <translation>アクティブ化しようとしているライセンスはソフトウェアと互換性がありません</translation>
+      <translation>有効化しようとしているライセンスは、このソフトウェアとの互換性がありません。</translation>
     </message>
     <message>
       <source>To report the issue please contact %1.</source>
@@ -1275,7 +1275,7 @@
     </message>
     <message>
       <source>Network error</source>
-      <translation>ネットワークエラー.</translation>
+      <translation>ネットワークエラー</translation>
     </message>
     <message>
       <source>License activated</source>
@@ -3563,7 +3563,7 @@ to %1</source>
     </message>
     <message>
       <source>Expires</source>
-      <translation>期限切れ</translation>
+      <translation>有効期限</translation>
     </message>
     <message>
       <source>License is active</source>
@@ -3571,7 +3571,7 @@ to %1</source>
     </message>
     <message>
       <source>License is expired</source>
-      <translation>ライセンスの期限が切れ</translation>
+      <translation>ライセンスの期限切れ</translation>
     </message>
     <message>
       <source>Expires soon</source>
@@ -3667,16 +3667,16 @@ to %1</source>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
-      <translation>アクティベーションキーファイルを取得するには、提供されたライセンスキーとハードウェアIDを %1に送信してください。</translation>
+      <translation>ライセンスファイルを取得するには、ライセンスキーとハードウェアIDを %1 までご連絡ください。</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
-      <translation>アクティベーションキーファイルを取得するには、提供されたライセンスキーとハードウェアIDを地域/ライセンスサポートに送信してください。</translation>
+      <translation>ライセンスファイルを取得するには、ライセンスキーとハードウェアIDを地域/ライセンスサポートまでご連絡ください。</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation>アクティベーションキーファイルを取得するには、提供されたライセンスキーとハードウェアIDを地域/ライセンスサポート(%1) に送信してください。</translation>
+      <translation>ライセンスファイルを取得するには、ライセンスキーとハードウェアIDを地域/ライセンスサポート (%1) までご連絡ください。</translation>
     </message>
   </context>
   <context>
@@ -4725,7 +4725,7 @@ to %1</source>
     <message numerus="yes">
       <source>Server utilizes these %n SSL certificates to authenticate its identity</source>
       <translation>
-        <numerusform>サーバーはこれら %n つのSSL 証明書を使用して身元を認証します。</numerusform>
+        <numerusform>サーバーはこちらのSSL 証明書 %n つ を使用して身元を証明します。</numerusform>
       </translation>
     </message>
     <message>
@@ -9738,17 +9738,17 @@ You can still change quality and FPS directly on the camera.</source>
     </message>
     <message>
       <source>Archive encryption password</source>
-      <translation>暗号化パスワードをアーカイブする</translation>
+      <translation>アーカイブ暗号化パスワード</translation>
     </message>
     <message>
       <source>The encryption password will be required to restore the archive on another system.
 Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</source>
-      <translation>アーカイブを別のシステムに復元するには暗号化パスワードが必要です。
-注意：このパスワードはリセットできません。紛失した場合、アーカイブは復元できなくなります。</translation>
+      <translation>アーカイブを別のシステムで復元するには暗号化パスワードが必要です。
+注意: このパスワードはリセットできません。紛失した場合、アーカイブは復元できなくなります。</translation>
     </message>
     <message>
       <source>Encrypts archive data to prevent it from being viewed outside of the system. You will not be required to enter the encryption password to view the video archive within this system.</source>
-      <translation>アーカイブデータを暗号化して、システムの外部で表示されないようにします。このシステム内でビデオアーカイブを表示するために暗号化パスワードを入力する必要はありません。</translation>
+      <translation>アーカイブデータを暗号化して、システムの外部で閲覧されないようにします。このシステム内でビデオアーカイブを表示する場合、暗号化パスワードを入力する必要はありません。</translation>
     </message>
     <message>
       <source>Failed to set archive encryption password</source>
@@ -9756,7 +9756,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Does not affect the connections established by server.</source>
-      <translation>サーバーによって確立された接続には影響しません。</translation>
+      <translation>サーバーからの接続には影響しません。</translation>
     </message>
     <message>
       <source>Enables RTSP traffic encryption.</source>
