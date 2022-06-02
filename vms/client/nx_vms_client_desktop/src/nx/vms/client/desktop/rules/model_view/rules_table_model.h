@@ -37,7 +37,7 @@ public:
         FieldRole
     };
 
-    explicit RulesTableModel(QObject* parent = nullptr);
+    RulesTableModel(nx::vms::rules::Engine* engine, QObject* parent);
     ~RulesTableModel();
 
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;

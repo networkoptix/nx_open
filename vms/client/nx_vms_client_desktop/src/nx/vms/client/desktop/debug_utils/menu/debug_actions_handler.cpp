@@ -8,11 +8,11 @@
 
 #include <api/common_message_processor.h>
 #include <client/client_runtime_settings.h>
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/rules/rule.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/testkit/testkit.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/event/actions/common_action.h>
@@ -148,9 +148,8 @@ void DebugActionsHandler::registerDebugCounterActions()
     connect(action(ui::action::DebugDecrementCounterAction), &QAction::triggered, this,
         &DebugActionsHandler::at_debugDecrementCounterAction_triggered);
 
-    auto engine = qnClientCoreModule->vmsRulesEngine();
     auto connector = new DebugEventConnector(); // initialize instance
-    engine->addEventConnector(connector);
+    appContext()->currentSystemContext()->vmsRulesEngine()->addEventConnector(connector);
 
     registerDebugAction(
         "Debug counter ++",

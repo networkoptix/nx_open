@@ -226,9 +226,9 @@ void RulesTableModel::SimplifiedRule::update(const QVector<int>& roles)
     }
 }
 
-RulesTableModel::RulesTableModel(QObject* parent):
+RulesTableModel::RulesTableModel(nx::vms::rules::Engine* engine, QObject* parent):
     QAbstractTableModel(parent),
-    engine(qnClientCoreModule->vmsRulesEngine())
+    engine(engine)
 {
     initialise();
 
@@ -247,13 +247,14 @@ RulesTableModel::RulesTableModel(QObject* parent):
 
             if (auto simplifiedRule = rule(ruleId).lock())
             {
-                simplifiedRule->setRule(engine->cloneRule(ruleId));
+                simplifiedRule->setRule(this->engine->cloneRule(ruleId));
                 return;
             }
 
             beginInsertRows({}, simplifiedRules.size(), simplifiedRules.size());
 
-            simplifiedRules.emplace_back(new SimplifiedRule(engine, engine->cloneRule(ruleId)));
+            simplifiedRules.emplace_back(
+                new SimplifiedRule(this->engine, this->engine->cloneRule(ruleId)));
             simplifiedRules.back()->setModelIndex(index(simplifiedRules.size() - 1, IdColumn));
 
             endInsertRows();

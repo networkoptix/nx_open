@@ -29,14 +29,22 @@ Engine* EngineHolder::engine() const
     return m_engine.get();
 }
 
-void EngineHolder::connectToConnection(
+void EngineHolder::connectEngine(
     Engine* engine,
-    nx::vms::common::SystemContext* context,
+    const QnCommonMessageProcessor* processor,
     Qt::ConnectionType connectionType)
 {
-    const auto vmsRulesManager = context->ec2Connection()->vmsRulesNotificationManager();
+    if (!NX_ASSERT(processor))
+        return;
 
-    connect(vmsRulesManager.get(), &ec2::AbstractVmsRulesNotificationManager::ruleUpdated, engine,
+    connect(processor, &QnCommonMessageProcessor::vmsRulesReset, engine,
+        [engine](QnUuid peerId, const nx::vms::api::rules::RuleList& rules)
+        {
+            engine->init(peerId, rules);
+        },
+        connectionType);
+
+    connect(processor, &QnCommonMessageProcessor::vmsRuleUpdated, engine,
         [engine](const nx::vms::api::rules::Rule& ruleData, ec2::NotificationSource source)
         {
             if (auto rule = engine->buildRule(ruleData))
@@ -44,17 +52,10 @@ void EngineHolder::connectToConnection(
         },
         connectionType);
 
-    connect(vmsRulesManager.get(), &ec2::AbstractVmsRulesNotificationManager::ruleRemoved, engine,
+    connect(processor, &QnCommonMessageProcessor::vmsRuleRemoved, engine,
         [engine](QnUuid id)
         {
             engine->removeRule(id);
-        },
-        connectionType);
-
-    connect(context->messageProcessor(), &QnCommonMessageProcessor::vmsRulesReset, engine,
-        [engine](QnUuid peerId, const nx::vms::api::rules::RuleList& rules)
-        {
-            engine->init(peerId, rules);
         },
         connectionType);
 }

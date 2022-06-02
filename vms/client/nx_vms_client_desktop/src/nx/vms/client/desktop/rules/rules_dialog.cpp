@@ -5,6 +5,8 @@
 
 #include <QtCore/QSortFilterProxyModel>
 
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/rules/model_view/modification_mark_item_delegate.h>
@@ -22,7 +24,8 @@ namespace nx::vms::client::desktop::rules {
 RulesDialog::RulesDialog(QWidget* parent):
     QnSessionAwareButtonBoxDialog(parent),
     ui(new Ui::RulesDialog()),
-    rulesTableModel(new RulesTableModel(this)),
+    rulesTableModel(
+        new RulesTableModel(appContext()->currentSystemContext()->vmsRulesEngine(), this)),
     rulesFilterModel(new QSortFilterProxyModel(this))
 {
     ui->setupUi(this);

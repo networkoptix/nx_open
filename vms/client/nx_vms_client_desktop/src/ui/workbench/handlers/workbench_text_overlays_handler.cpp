@@ -10,11 +10,11 @@
 #include <QtGui/QTextDocument>
 
 #include <client/client_message_processor.h>
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/strings_helper.h>
@@ -167,7 +167,7 @@ QnWorkbenchTextOverlaysHandler::QnWorkbenchTextOverlaysHandler(QObject* parent):
     connect(display(), &QnWorkbenchDisplay::widgetAdded,
         this, &QnWorkbenchTextOverlaysHandler::at_resourceWidgetAdded);
 
-    qnClientCoreModule->vmsRulesEngine()->addActionExecutor(
+    nx::vms::client::desktop::appContext()->currentSystemContext()->vmsRulesEngine()->addActionExecutor(
         nx::vms::rules::TextOverlayAction::manifest().id,
         this);
 }

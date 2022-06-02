@@ -26,7 +26,6 @@ public:
 protected:
     virtual Qt::ConnectionType handlerConnectionType() const override;
 
-    virtual void connectToConnection(const ec2::AbstractECConnectionPtr& connection) override;
     virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr& connection) override;
 
     virtual void handleTourAddedOrUpdated(const nx::vms::api::LayoutTourData& tour) override;

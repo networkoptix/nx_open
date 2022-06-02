@@ -26,8 +26,6 @@
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/utils/operation_manager.h>
 #include <nx/vms/client/core/watchers/known_server_connections.h>
-#include <nx/vms/rules/engine_holder.h>
-#include <nx/vms/rules/initializer.h>
 #include <plugins/resource/desktop_audio_only/desktop_audio_only_resource.h>
 
 using namespace nx::vms::client::core;
@@ -39,7 +37,6 @@ struct QnClientCoreModule::Private
     std::unique_ptr<QnCommonModule> commonModule;
     std::unique_ptr<NetworkModule> networkModule;
     std::unique_ptr<QnDataProviderFactory> resourceDataProviderFactory;
-    std::unique_ptr<nx::vms::rules::EngineHolder> vmsRulesEngineHolder;
     std::unique_ptr<SessionTokenTerminator> sessionTokenTerminator;
 };
 
@@ -72,9 +69,6 @@ QnClientCoreModule::QnClientCoreModule(
 
     d->resourceDataProviderFactory->registerResourceType<QnDesktopAudioOnlyResource>();
 
-    d->vmsRulesEngineHolder = std::make_unique<nx::vms::rules::EngineHolder>(
-        systemContext,
-        std::make_unique<nx::vms::rules::Initializer>(systemContext));
     d->sessionTokenTerminator = std::make_unique<SessionTokenTerminator>();
 }
 
@@ -136,10 +130,6 @@ QQmlEngine* QnClientCoreModule::mainQmlEngine() const
     return appContext()->qmlEngine();
 }
 
-nx::vms::rules::Engine* QnClientCoreModule::vmsRulesEngine() const
-{
-    return d->vmsRulesEngineHolder->engine();
-}
 SessionTokenTerminator* QnClientCoreModule::sessionTokenTerminator() const
 {
     return d->sessionTokenTerminator.get();

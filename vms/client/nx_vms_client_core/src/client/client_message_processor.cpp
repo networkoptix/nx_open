@@ -16,7 +16,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/peer_alive_data.h>
 #include <nx/vms/client/core/network/remote_connection.h>
-#include <nx/vms/common/system_context.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/rules/engine_holder.h>
 #include <utils/common/synctime.h>
@@ -92,16 +92,6 @@ bool QnClientMessageProcessor::isConnectionHeld() const
 Qt::ConnectionType QnClientMessageProcessor::handlerConnectionType() const
 {
     return Qt::QueuedConnection;
-}
-
-void QnClientMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr& connection)
-{
-    base_type::connectToConnection(connection);
-
-    nx::vms::rules::EngineHolder::connectToConnection(
-        qnClientCoreModule->vmsRulesEngine(),
-        m_context,
-        handlerConnectionType());
 }
 
 void QnClientMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr& connection)
