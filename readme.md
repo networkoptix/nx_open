@@ -1,14 +1,13 @@
-# Nx Meta VMP Open Source Components
+# Nx Meta Platform Open Source Components
 
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 ---------------------------------------------------------------------------------------------------
 ## Introduction
 
-This repository `nx_open` contains **Network Optix Meta Video Management Platform open source
-components** - the source code and specifications which are part of the Nx Meta Video Management
-Platform (VMP) which in turn is used to build all Powered-by-Nx products, including Nx Witness
-Video Management System (VMS).
+This repository `nx_open` contains **Network Optix Meta Platform open source components** - the
+source code and specifications which are used to build all Powered-by-Nx products including Nx
+Witness Video Management System (VMS).
 
 Currently, the main VMS component which can be built from this repository is the Desktop Client.
 Other notable Components which are parts of the Desktop Client, but can be useful independently,
@@ -46,12 +45,9 @@ Pre-requisites per platform (the details are given in the further subsections):
 - For Linux:
     - `chrpath`.
     - Certain packages for the build dependencies.
-- For Windows:
-    - Microsoft Visual Studio, Community Edition
-        - Version 2019 is required in the repository branch `vms_5.0`.
-        - Version 2022 is supported in the repository branches `vms_5.0_patch` and `master`.
-            - NOTE: At some point in the future, the support for Microsoft Visual Studio 2019 may
-                be dropped in these and further branches.
+- For Windows: Microsoft Visual Studio 2022, Community Edition.
+    - NOTE: Microsoft Visual Studio 2019 can also be used to build the repository branch `vms_5.0`,
+        but its support may be dropped in further branches like `vms_5.0_patch`.
 - For MacOS:
     - XCode 12.5.
 
@@ -217,10 +213,9 @@ Below are the usage examples, where `<build>` is `./build.sh` on Linux and `buil
 ATTENTION: On **Windows**, you can use a regular `cmd` console, because `build.bat` calls the
 `vcvars64.bat` which comes with the Visual Studio and properly sets PATH and other environment
 variables to enable using the 64-bit compiler and linker. If you don't use `build.bat`, you may
-call `vcvars64.bat` from your console, or use the console available from the Start menu as `VS####
-x64 Native Tools Command Prompt`, where `####` is `2019` or `2022`. Do not use the Visual Studio
-Command Prompt available from the Visual Studio main menu, because it sets up the environment for
-the 32-bit compiler and linker.
+call `vcvars64.bat` from your console, or use the console available from the Start menu as `VS2022
+x64 Native Tools Command Prompt`. Do not use the Visual Studio Command Prompt available from the
+Visual Studio main menu, because it sets up the environment for the 32-bit compiler and linker.
 
 For **cross-compiling** on Linux or MacOS, set the CMake variable `<targetDevice>`: add the
 argument `-DtargetDevice=<value>`, where <value> is one of the following:
@@ -251,6 +246,30 @@ in the generated file `nx_open-build/conan_paths.cmake, in the line looking like
 ```
 set(CONAN_QT_ROOT ...)
 ```
+
+### Compatible VMS Server versions
+
+The Desktop Client built from the open-source repository can only connect to a compatible VMS
+Server. Because the VMS Server sources are not publicly available, such Server can only be obtained
+from any public VMS release, including the official VMS releases, and the regular preview
+releases called MetaVMS.
+
+For any given public VMS release, the compatibility is guaranteed only for the Client built from
+the same commit as the Server. The particular commit can be identified in the repository by its git
+tag. The public release tags look like `vms/4.2/12345_release_all` or `vms/5.0/34567_beta_meta_R2`.
+
+Clients built from further commits in the same branch may retain compatibility with the publicly
+released Server for a while, but at some point may lose the compatibility because of some changes
+introduced synchronously into the Client and the Server parts of the source code. Thus, it is
+recommended to base the Client modification branches from tagged commits corresponding to the
+public releases, including MetaVMS releases, and rebase them as soon as next public release from
+this branch is available.
+
+Besides having the compatible code, to be able to work together, the Client and Server have to use
+the same customization package. If, however, for experimental purposes (not for the production use)
+you need to connect to a Server with a different customization, the following option can be added
+to `desktop_client.ini`: `developerMode=true`. For the details, see the documentation for the
+IniConfig mechanism of the Nx Kit library located at `artifacts/nx_kit/`.
 
 ---------------------------------------------------------------------------------------------------
 ## Free and Open-Source Software Notices
