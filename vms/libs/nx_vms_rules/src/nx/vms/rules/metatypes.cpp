@@ -6,6 +6,7 @@
 #include <common/common_meta_types.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/utils/metatypes.h>
+#include <nx/vms/api/rules/rule.h>
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/rules/camera_conflict_list.h>
 #include <utils/email/message.h>
@@ -36,6 +37,8 @@ void Metatypes::initialize()
     QnJsonSerializer::registerSerializer<nx::vms::api::EventLevels>();
 
     QnJsonSerializer::registerSerializer<nx::vms::api::EventReason>();
+
+    qRegisterMetaType<nx::vms::api::rules::RuleList>("nx::vms::api::rules::RuleList");
 
     qRegisterMetaType<nx::vms::api::rules::State>();
     QnJsonSerializer::registerSerializer<State>();

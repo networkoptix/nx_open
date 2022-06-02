@@ -12,6 +12,8 @@
 
 class QQmlContext;
 
+namespace nx::vms::rules { class Engine; }
+
 namespace nx::vms::client::core {
 
 class UserWatcher;
@@ -86,6 +88,8 @@ public:
     WatermarkWatcher* watermarkWatcher() const;
 
     ServerTimeWatcher* serverTimeWatcher() const;
+
+    nx::vms::rules::Engine* vmsRulesEngine() const;
 
 signals:
     void remoteIdChanged(const QnUuid& id);

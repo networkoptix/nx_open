@@ -13,6 +13,8 @@
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/core/watchers/watermark_watcher.h>
+#include <nx/vms/rules/engine_holder.h>
+#include <nx/vms/rules/initializer.h>
 
 namespace nx::vms::client::core {
 
@@ -55,6 +57,7 @@ struct SystemContext::Private
     std::unique_ptr<UserWatcher> userWatcher;
     std::unique_ptr<WatermarkWatcher> watermarkWatcher;
     std::unique_ptr<ServerTimeWatcher> serverTimeWatcher;
+    std::unique_ptr<nx::vms::rules::EngineHolder> vmsRulesEngineHolder;
 
     mutable nx::Mutex sessionMutex;
 
@@ -76,6 +79,10 @@ SystemContext::SystemContext(QnUuid peerId, QObject* parent):
     d->userWatcher = std::make_unique<UserWatcher>(this);
     d->watermarkWatcher = std::make_unique<WatermarkWatcher>(this);
     d->serverTimeWatcher = std::make_unique<ServerTimeWatcher>(this);
+
+    d->vmsRulesEngineHolder = std::make_unique<nx::vms::rules::EngineHolder>(
+        this,
+        std::make_unique<nx::vms::rules::Initializer>(this));
 }
 
 SystemContext::~SystemContext()
@@ -166,12 +173,21 @@ ServerTimeWatcher* SystemContext::serverTimeWatcher() const
     return d->serverTimeWatcher.get();
 }
 
+nx::vms::rules::Engine* SystemContext::vmsRulesEngine() const
+{
+    return d->vmsRulesEngineHolder->engine();
+}
+
 void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)
 {
     base_type::setMessageProcessor(messageProcessor);
 
     auto clientMessageProcessor = static_cast<QnClientMessageProcessor*>(messageProcessor);
     d->userWatcher->setMessageProcessor(clientMessageProcessor);
+    nx::vms::rules::EngineHolder::connectEngine(
+        vmsRulesEngine(),
+        clientMessageProcessor,
+        Qt::QueuedConnection);
 }
 
 } // namespace nx::vms::client::desktop

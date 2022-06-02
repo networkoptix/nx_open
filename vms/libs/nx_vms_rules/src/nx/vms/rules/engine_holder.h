@@ -6,6 +6,8 @@
 
 namespace nx::vms::common { class SystemContext; }
 
+class QnCommonMessageProcessor;
+
 namespace nx::vms::rules {
 
 class Plugin;
@@ -21,9 +23,9 @@ public:
 
     Engine* engine() const;
 
-    static void connectToConnection(
+    static void connectEngine(
         Engine* engine,
-        nx::vms::common::SystemContext* context,
+        const QnCommonMessageProcessor* processor,
         Qt::ConnectionType connectionType);
 
 private:

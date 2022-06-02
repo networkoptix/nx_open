@@ -2212,7 +2212,7 @@ ConditionWrapper hasNewEventRulesEngine()
     return new CustomBoolCondition(
         [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
         {
-            auto engine = qnClientCoreModule->vmsRulesEngine();
+            auto engine = appContext()->currentSystemContext()->vmsRulesEngine();
             return engine && engine->isEnabled();
         });
 }

@@ -429,6 +429,18 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         this,
         [this]{ resetVmsRules({}); },
         connectionType);
+    connect(
+        vmsRulesManager,
+        &ec2::AbstractVmsRulesNotificationManager::ruleUpdated,
+        this,
+        &QnCommonMessageProcessor::vmsRuleUpdated,
+        connectionType);
+    connect(
+        vmsRulesManager,
+        &ec2::AbstractVmsRulesNotificationManager::ruleRemoved,
+        this,
+        &QnCommonMessageProcessor::vmsRuleRemoved,
+        connectionType);
 
     const auto storedFileManager = connection->storedFileNotificationManager();
     connect(

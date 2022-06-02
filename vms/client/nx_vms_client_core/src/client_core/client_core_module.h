@@ -31,8 +31,6 @@ class SystemContext;
 
 } // namespace nx::vms::client::core
 
-namespace nx::vms::rules { class Engine; }
-
 class NX_VMS_CLIENT_CORE_API QnClientCoreModule:
     public QObject,
     public Singleton<QnClientCoreModule>
@@ -64,8 +62,6 @@ public:
     nx::vms::client::core::SessionTokenTerminator* sessionTokenTerminator() const;
 
     QQmlEngine* mainQmlEngine() const;
-
-    nx::vms::rules::Engine* vmsRulesEngine() const;
 
 private:
     struct Private;

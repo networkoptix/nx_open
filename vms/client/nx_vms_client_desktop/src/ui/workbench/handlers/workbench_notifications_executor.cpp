@@ -2,9 +2,10 @@
 
 #include "workbench_notifications_executor.h"
 
-#include <client_core/client_core_module.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/user_roles_manager.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/utils/type.h>
@@ -15,7 +16,7 @@ using namespace nx::vms::rules;
 QnWorkbenchNotificationsExecutor::QnWorkbenchNotificationsExecutor(QObject* parent):
     QnWorkbenchContextAware(parent)
 {
-    qnClientCoreModule->vmsRulesEngine()
+    nx::vms::client::desktop::appContext()->currentSystemContext()->vmsRulesEngine()
         ->addActionExecutor(utils::type<NotificationAction>(), this);
 }
 

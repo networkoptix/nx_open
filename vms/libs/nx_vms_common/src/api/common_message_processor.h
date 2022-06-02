@@ -102,10 +102,13 @@ signals:
 
     void vmsEventReceived(const nx::vms::api::rules::EventInfo& eventInfo);
     void vmsRulesReset(QnUuid peerId, const nx::vms::api::rules::RuleList& vmsRules);
-    void serverRuntimeEventOccurred(const nx::vms::api::ServerRuntimeEventData& eventData);
+    void vmsRuleUpdated(const nx::vms::api::rules::Rule& rule, ec2::NotificationSource source);
+    void vmsRuleRemoved(QnUuid id);
 
+    void serverRuntimeEventOccurred(const nx::vms::api::ServerRuntimeEventData& eventData);
     void runtimeInfoChanged(const nx::vms::api::RuntimeData& runtimeInfo);
     void runtimeInfoRemoved(const nx::vms::api::IdData& data);
+
     void remotePeerFound(QnUuid data, nx::vms::api::PeerType peerType);
     void remotePeerLost(QnUuid data, nx::vms::api::PeerType peerType);
 
