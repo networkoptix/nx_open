@@ -2944,11 +2944,11 @@ till %1</translation>
     </message>
     <message>
       <source>System is not compatible with two-factor authentication</source>
-      <translation type="unfinished">System is not compatible with two-factor authentication</translation>
+      <translation>Systemet är inte kompatibelt med tvåfaktorsautentisering</translation>
     </message>
     <message>
       <source>Failed to log in to &quot;%1&quot; system</source>
-      <translation type="unfinished">Failed to log in to &quot;%1&quot; system</translation>
+      <translation>Det gick inte att logga in på &quot;%1&quot; system</translation>
     </message>
   </context>
   <context>
@@ -4854,7 +4854,7 @@ till %1</translation>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
-      <translation type="unfinished">Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</translation>
+      <translation>Servrar med failover aktiverat tar automatiskt kameror från offlineservrar med samma plats-ID.</translation>
     </message>
   </context>
   <context>
@@ -8462,7 +8462,7 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>No Failover</source>
-      <translation type="unfinished">No Failover</translation>
+      <translation>Ingen failover</translation>
     </message>
   </context>
   <context>
@@ -9244,7 +9244,7 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
     </message>
     <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
-      <translation type="unfinished">There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</translation>
+      <translation>Det finns inte tillräckligt med utrymme på din dator för att ladda ner Client update. Frigör lite utrymme på din hårddisk och försök igen.</translation>
     </message>
   </context>
   <context>
@@ -10097,15 +10097,15 @@ Fäst inte detta certifikat om du gjorde&apos;t ändra %2 server SSL-certifikat.
     </message>
     <message>
       <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
-      <translation type="unfinished">You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</translation>
+      <translation>Du försökte ansluta till den här servern, men den visade ett certifikat som inte kan verifieras automatiskt.</translation>
     </message>
     <message>
       <source>Someone may be impersonating this Server to steal your personal information.</source>
-      <translation type="unfinished">Someone may be impersonating this Server to steal your personal information.</translation>
+      <translation>Någon kanske utger sig för att vara den här servern för att stjäla din personliga information.</translation>
     </message>
     <message>
       <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
-      <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
+      <translation>Anslut inte till den här servern om inte din VMS administratör har fått instruktioner.</translation>
     </message>
     <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>

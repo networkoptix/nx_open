@@ -2402,7 +2402,7 @@
     </message>
     <message>
       <source>Use only HTTPS to connect to cameras</source>
-      <translation type="unfinished">Use only HTTPS to connect to cameras</translation>
+      <translation>仅使用 HTTPS 连接到摄像机</translation>
     </message>
     <message>
       <source>User Activity</source>

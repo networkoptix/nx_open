@@ -1564,7 +1564,7 @@
     </message>
     <message>
       <source>License will be bound to the current server</source>
-      <translation>ライセンスは既存のサーバーに統合されます</translation>
+      <translation>ライセンスは現在のサーバーに紐づけされます</translation>
     </message>
     <message>
       <source>Activate Free License</source>
@@ -1580,7 +1580,7 @@
     </message>
     <message>
       <source>License Key</source>
-      <translation>ライセンスキー:</translation>
+      <translation>ライセンスキー</translation>
     </message>
     <message>
       <source>Invalid License Key</source>
@@ -1588,7 +1588,7 @@
     </message>
     <message>
       <source>Activation Key File</source>
-      <translation>ライセンスファイル:</translation>
+      <translation>ライセンスファイル</translation>
     </message>
     <message>
       <source>Hardware ID</source>
@@ -2410,7 +2410,7 @@
     </message>
     <message>
       <source>Display servers in tree for non-administrator users</source>
-      <translation>管理者以外のユーザーのツリーにサーバーを表示する</translation>
+      <translation>サーバーを非管理者ユーザーのツリーにも表示する</translation>
     </message>
     <message>
       <source>Archive encryption</source>
@@ -2476,7 +2476,7 @@
     </message>
     <message>
       <source>Expires</source>
-      <translation>期限切れ</translation>
+      <translation>有効期限</translation>
     </message>
     <message>
       <source>Certificate is expired</source>
