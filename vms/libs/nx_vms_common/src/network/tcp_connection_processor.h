@@ -18,6 +18,8 @@
 class QnTcpListener;
 class QnTCPConnectionProcessorPrivate;
 
+static constexpr char kRfc4571Stun[] = "RFC4571+STUN";
+
 namespace Qn { struct UserAccessData; }
 
 class NX_VMS_COMMON_API QnTCPConnectionProcessor:
@@ -53,6 +55,13 @@ public:
     static int isFullMessage(
         const nx::Buffer& message,
         std::optional<qint64>* const fullMessageSize = nullptr );
+
+    /**
+     * Check for some known binary protocol(s)
+     * If yes, fill 'protocol' and 'size' field
+     */
+    int checkForBinaryProtocol(const QByteArray& message);
+    bool isBinaryProtocol() const;
 
     bool sendChunk(const QnByteArray& chunk);
     bool sendChunk(const QByteArray& chunk);

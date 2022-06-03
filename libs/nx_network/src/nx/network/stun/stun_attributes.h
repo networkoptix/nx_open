@@ -43,10 +43,14 @@ enum Type
     realm = 0x0014,
     nonce = 0x0015,
     xorMappedAddress = 0x0020,
+    priority = 0x0024,
+    useCandidate = 0x0025,
 
     software = 0x8022,
     alternateServer = 0x8023,
     fingerPrint = 0x8028,
+    iceControlled = 0x8029,
+    iceControlling = 0x802A,
 
     // Starting value for custom NX attributes in the middle of unasigned range 0xC003-0xFFFF:
     // https://www.iana.org/assignments/stun-parameters/stun-parameters.txt
@@ -237,6 +241,47 @@ struct NX_NETWORK_API IntAttribute: Unknown
 
     int value() const;
 };
+
+struct NX_NETWORK_API Priority: IntAttribute
+{
+    static const int TYPE = priority;
+
+    Priority(int value = 0);
+    virtual int getType() const override { return TYPE; }
+};
+
+struct NX_NETWORK_API UseCandidate: Unknown
+{
+    static const int TYPE = useCandidate;
+
+    UseCandidate(nx::Buffer value_ = nx::Buffer()): Unknown(TYPE, value_) {}
+    virtual int getType() const override { return TYPE; }
+};
+
+struct NX_NETWORK_API IceControlled: Unknown
+{
+    static const int TYPE = iceControlled;
+
+    IceControlled(nx::Buffer value_ = nx::Buffer()): Unknown(TYPE, value_) {}
+    virtual int getType() const override { return TYPE; }
+};
+
+struct NX_NETWORK_API IceControlling: Unknown
+{
+    static const int TYPE = iceControlling;
+
+    IceControlling(nx::Buffer value_ = nx::Buffer()): Unknown(TYPE, value_) {}
+    virtual int getType() const override { return TYPE; }
+};
+
+struct NX_NETWORK_API Realm: Unknown
+{
+    static const int TYPE = realm;
+
+    Realm(nx::Buffer value_ = nx::Buffer()): Unknown(TYPE, value_) {}
+    virtual int getType() const override { return TYPE; }
+};
+
 
 } // namespace attrs
 

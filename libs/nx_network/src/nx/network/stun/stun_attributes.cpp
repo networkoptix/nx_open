@@ -246,9 +246,8 @@ Unknown::Unknown(int userType_, nx::Buffer value):
 }
 
 
-////////////////////////////////////////////////////////////
-//// IntAttribute
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// IntAttribute
 
 IntAttribute::IntAttribute(int userType, int value):
     Unknown(userType)
@@ -272,6 +271,14 @@ int IntAttribute::value() const
         buf.data(),
         sizeof(valueInNetworkByteOrder));
     return ntohl(valueInNetworkByteOrder);
+}
+
+//-------------------------------------------------------------------------------------------------
+// Priority
+
+Priority::Priority(int value):
+    IntAttribute(TYPE, value)
+{
 }
 
 } // namespace attrs
