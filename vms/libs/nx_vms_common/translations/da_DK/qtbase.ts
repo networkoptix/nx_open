@@ -583,7 +583,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Recent Places</source>
-      <translation type="unfinished">Recent Places</translation>
+      <translation>Seneste Steder</translation>
     </message>
     <message>
       <source>Remove</source>

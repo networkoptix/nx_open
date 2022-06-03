@@ -2492,11 +2492,11 @@
     </message>
     <message>
       <source>Pin to this certificate</source>
-      <translation type="unfinished">Pin to this certificate</translation>
+      <translation>綁定此憑證</translation>
     </message>
     <message>
       <source>View pinned certificate</source>
-      <translation type="unfinished">View pinned certificate</translation>
+      <translation>檢視綁定的憑證</translation>
     </message>
   </context>
   <context>

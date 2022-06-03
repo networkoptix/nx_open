@@ -70,11 +70,11 @@
     <name>RemoteConnectionErrorStrings</name>
     <message>
       <source>Client version: %1</source>
-      <translation>用戶端版本: %1</translation>
+      <translation>客戶端版本: %1</translation>
     </message>
     <message>
       <source>Server version: %1.</source>
-      <translation>伺服器版本: %1.</translation>
+      <translation>伺服器版本: %1</translation>
     </message>
     <message>
       <source>Incompatible server</source>
@@ -86,11 +86,11 @@
     </message>
     <message>
       <source>You will be asked to restart the client in compatibility mode.</source>
-      <translation>您正切換客戶端至相容模式.</translation>
+      <translation>系統將自動使用相容模式重啟客戶端。</translation>
     </message>
     <message>
       <source>Invalid certificate</source>
-      <translation type="unfinished">Invalid certificate</translation>
+      <translation>憑證無效</translation>
     </message>
     <message>
       <source>The server&amp;apos;s certificate was rejected.</source>
@@ -104,7 +104,7 @@
     <message>
       <source>%1 user login is temporarily unavailable</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user login is temporarily unavailable</translation>
+      <translation>%1 帳戶登入暫時無法使用</translation>
     </message>
     <message>
       <source>Connection timed out</source>
@@ -112,11 +112,11 @@
     </message>
     <message>
       <source>The server is incompatible.</source>
-      <translation type="unfinished">The server is incompatible.</translation>
+      <translation>此伺服器的版本與目前使用的客戶端不相容。</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
-      <translation>從Web瀏覽器或桌面客戶端連接到此伺服器進行設定</translation>
+      <translation>透過網頁瀏覽器或桌面客戶端連接到此伺服器，以進行設定</translation>
     </message>
     <message>
       <source>LDAP Server connection timed out</source>
@@ -124,23 +124,23 @@
     </message>
     <message>
       <source>LDAP Server connection timed out.</source>
-      <translation>LDAP伺服器連線逾時.</translation>
+      <translation>LDAP伺服器連線逾時。</translation>
     </message>
     <message>
       <source>Session expired. Re-enter your password.</source>
-      <translation type="unfinished">Session expired. Re-enter your password.</translation>
+      <translation>連線逾時，請重新登入。</translation>
     </message>
     <message>
       <source>Invalid login or password</source>
-      <translation>無效的帳號或密碼</translation>
+      <translation>無效的使用者名稱或密碼</translation>
     </message>
     <message>
       <source>Incorrect username or password.</source>
-      <translation>帳號或密碼錯誤.</translation>
+      <translation>使用者名稱或密碼錯誤。</translation>
     </message>
     <message>
       <source>User is disabled</source>
-      <translation>使用者已被停用</translation>
+      <translation>此使用者帳戶已被停用</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
@@ -148,29 +148,29 @@
     </message>
     <message>
       <source>Compatibility mode for versions lower than %1 is not supported.</source>
-      <translation>相容模式不支援比 %1 更低的版本.</translation>
+      <translation>低於 %1 的版本無法支援相容模式。</translation>
     </message>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation type="unfinished">Internal error. Please try again later.</translation>
+      <translation>發生內部錯誤，請稍後再嘗試連線。</translation>
     </message>
     <message>
       <source>If this error persists, please contact your system administrator.</source>
-      <translation type="unfinished">If this error persists, please contact your system administrator.</translation>
+      <translation>如果此錯誤持續發生，請與您的系統管理員連繫。</translation>
     </message>
     <message>
       <source>Connection to %1 is not ready yet. Check your internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check your internet connection or try again later.</translation>
+      <translation>與 %1 的連線失敗，請檢查您的網路連線或稍後重試。</translation>
     </message>
     <message>
       <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</translation>
+      <translation>與 %1 的連線失敗，請檢查伺服器的網路連線或稍後重試。</translation>
     </message>
     <message>
       <source>Connection to the server could not be established. Try again later.</source>
-      <translation type="unfinished">Connection to the server could not be established. Try again later.</translation>
+      <translation>無法建立與伺服器的連線，請稍後再試。</translation>
     </message>
     <message>
       <source>Your session has expired</source>
@@ -179,33 +179,33 @@
     <message>
       <source>Please log in to %1 again.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Please log in to %1 again.</translation>
+      <translation>請重新登錄 %1。</translation>
     </message>
     <message>
       <source>Log in to %1 to log in to this system with %2 user</source>
       <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in to %1 to log in to this system with %2 user</translation>
+      <translation>請使用 %2 使用者帳戶登入 %1，來連接此系統</translation>
     </message>
     <message>
       <source>Session duration limit can be changed by a system administrator.</source>
-      <translation type="unfinished">Session duration limit can be changed by a system administrator.</translation>
+      <translation>系統管理員可啟用並更改連線時間限制。</translation>
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
-      <translation>此用戶已被系統管理員停用.</translation>
+      <translation>此使用者帳戶已被系統管理員停用。</translation>
     </message>
     <message>
       <source>Too many login attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many login attempts. Try again in a minute.</translation>
+      <translation>登錄嘗試次數過多，請稍後再試。</translation>
     </message>
     <message>
       <source>Two-factor authentication is required.</source>
-      <translation type="unfinished">Two-factor authentication is required.</translation>
+      <translation>請先啟用雙重驗證。</translation>
     </message>
     <message>
       <source>You can enable two-factor authentication in your %1.</source>
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">You can enable two-factor authentication in your %1.</translation>
+      <translation>您可以在 %1中啟用雙重驗證功能。</translation>
     </message>
     <message>
       <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
