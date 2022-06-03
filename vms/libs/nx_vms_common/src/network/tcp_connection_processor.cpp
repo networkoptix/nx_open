@@ -171,12 +171,34 @@ int QnTCPConnectionProcessor::isFullMessage(
     return isFullMessage(message.toRawByteArray(), fullMessageSize);
 }
 
+int QnTCPConnectionProcessor::checkForBinaryProtocol(const QByteArray& message)
+{
+    Q_D(QnTCPConnectionProcessor);
+    if (message.size() > 4 && message[0] == 0x0 && message[2] == 0x0 && message[3] == 0x1)
+    {
+        /* By rfc4571, first TWO bytes should be a length.
+         * But, for STUN content, first message is Binding Request,
+         * which very likely be less then 256 bytes length
+         */
+        d->protocol = kRfc4571Stun;
+        d->binaryProtocol = true;
+        int size = message[1];
+        return size;
+    }
+    return -1;
+}
+
 void QnTCPConnectionProcessor::parseRequest()
 {
     Q_D(QnTCPConnectionProcessor);
 
     d->request = nx::network::http::Request();
-    if (!d->request.parse(d->clientRequest))
+
+    if (isBinaryProtocol())
+    {
+        return;
+    }
+    else if (!d->request.parse(d->clientRequest))
     {
         NX_DEBUG(this, "Unable to parse request: [%1]", d->clientRequest);
         return;
@@ -514,7 +536,11 @@ QnTCPConnectionProcessor::ReadResult QnTCPConnectionProcessor::readRequest()
         {
             //globalTimeout.restart();
             d->clientRequest.append((const char*) d->tcpReadBuffer, bytes);
-            const auto messageSize = isFullMessage(d->clientRequest, &fullHttpMessageSize);
+
+            int messageSize = checkForBinaryProtocol(d->clientRequest);
+            if (messageSize < 0)
+               messageSize = isFullMessage(d->clientRequest, &fullHttpMessageSize);
+
             if (messageSize < 0)
                 return ReadResult::incomplete;
 
@@ -524,8 +550,8 @@ QnTCPConnectionProcessor::ReadResult QnTCPConnectionProcessor::readRequest()
             }
             else if (d->clientRequest.size() > kMaxRequestSize)
             {
-                qWarning() << "Too large HTTP client request ("<<d->clientRequest.size()<<" bytes"
-                    ", "<<kMaxRequestSize<<" allowed). Ignoring...";
+                NX_WARNING(this, "Too large HTTP client request (%1 bytes, %2 allowed). Ignoring...",
+                    d->clientRequest.size(), kMaxRequestSize);
                 return ReadResult::error;
             }
             if (fullHttpMessageSize)
@@ -691,6 +717,12 @@ int QnTCPConnectionProcessor::notFound(QByteArray& contentType)
     Q_D(QnTCPConnectionProcessor);
     std::tie(contentType, d->response.messageBody) = generateErrorResponse(code);
     return code;
+}
+
+bool QnTCPConnectionProcessor::isBinaryProtocol() const
+{
+    Q_D(const QnTCPConnectionProcessor);
+    return d->binaryProtocol;
 }
 
 bool QnTCPConnectionProcessor::isConnectionCanBePersistent() const

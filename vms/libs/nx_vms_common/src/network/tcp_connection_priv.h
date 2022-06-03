@@ -113,6 +113,7 @@ public:
     QByteArray receiveBuffer;
     quint8* tcpReadBuffer;
     bool chunkedMode;
+    bool binaryProtocol = false;
     int clientRequestOffset;
     QDateTime lastModified;
     Qn::UserAccessData accessRights;
