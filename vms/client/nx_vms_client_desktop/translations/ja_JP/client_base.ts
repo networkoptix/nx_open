@@ -517,11 +517,11 @@
     </message>
     <message>
       <source>User Roles...</source>
-      <translation>ユーザーの役割...</translation>
+      <translation>ユーザーロール...</translation>
     </message>
     <message>
       <source>Role Settings...</source>
-      <translation>役割設定...</translation>
+      <translation>ロール設定...</translation>
     </message>
     <message>
       <source>Check Device Issues...</source>
@@ -1531,7 +1531,7 @@
     </message>
     <message>
       <source>Preset used by some tours. Delete it anyway?</source>
-      <translation>プリセットはツアーで使用されてます 削除しますか？</translation>
+      <translation>ツアーに使用されているプリセットです。削除しますか?</translation>
     </message>
     <message>
       <source>These tours will become invalid.</source>
@@ -2310,7 +2310,7 @@
     </message>
     <message>
       <source>Some rules are not valid and may not work</source>
-      <translation>一部のルールは有効ではないため、動作しない可能性があります</translation>
+      <translation>一部のルールは不完全であり、動作しない可能性があります</translation>
     </message>
   </context>
   <context>
@@ -2746,7 +2746,7 @@ to %1</source>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation>試行回数が多すぎます。しばらくしてからもう一度お試しください</translation>
+      <translation>試行回数が多すぎます。しばらくしてからもう一度お試しください。</translation>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
@@ -2792,7 +2792,7 @@ to %1</source>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation>試行回数が多すぎます。しばらくしてからもう一度お試しください</translation>
+      <translation>試行回数が多すぎます。しばらくしてからもう一度お試しください。</translation>
     </message>
   </context>
   <context>
@@ -3822,11 +3822,11 @@ to %1</source>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>カメラやサーバーのIPアドレスおよびユーザーの役割を表示します。</translation>
+      <translation>カメラやサーバーのIPアドレスおよびユーザーのロールを表示します。</translation>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
-      <translation>ツアー表示中のカメラ1台あたりの表示時間。</translation>
+      <translation>ツアー表示中のレイアウト切り替え間隔。</translation>
     </message>
   </context>
   <context>
@@ -4037,11 +4037,11 @@ to %1</source>
     </message>
     <message>
       <source>This is also required to create/edit PTZ presets and tours.</source>
-      <translation>PTZ プリセットやツアーを作成/編集するために必要です</translation>
+      <translation>PTZ プリセットやツアーを作成/編集する場合にも必要</translation>
     </message>
     <message>
       <source>Control video walls</source>
-      <translation>ビデオウォールコントロール</translation>
+      <translation>ビデオウォールの制御</translation>
     </message>
     <message>
       <source>View event log</source>
@@ -4057,11 +4057,11 @@ to %1</source>
     </message>
     <message>
       <source>View bookmarks</source>
-      <translation>ブックマーク表示</translation>
+      <translation>ブックマークの表示</translation>
     </message>
     <message>
       <source>Modify bookmarks</source>
-      <translation>ブックマークを変更</translation>
+      <translation>ブックマークの変更</translation>
     </message>
     <message>
       <source>User Input</source>
@@ -4350,18 +4350,18 @@ to %1</source>
     <message>
       <source>Role %1 has no %2 permission</source>
       <comment>%1 is the name of selected role, %2 is permission name</comment>
-      <translation>役割%1には%2権限がありません</translation>
+      <translation>ロール %1 には %2 の権限がありません</translation>
     </message>
     <message>
       <source>Selected roles have no %1 permission</source>
       <comment>%1 is permission name</comment>
-      <translation>選択した役割には%1権限がありません</translation>
+      <translation>選択されたロールには %1 権限がありません</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 selected roles have no %2 permission</source>
       <comment>%1 is number of selected roles, %2 is permission name</comment>
       <translation>
-        <numerusform>選択した%1個のうち%n個の役割に%2権限がありません</numerusform>
+        <numerusform>選択した %1 ロールのうち %n つは、 %2 の権限がありません</numerusform>
       </translation>
     </message>
     <message>
@@ -4634,7 +4634,7 @@ to %1</source>
     </message>
     <message>
       <source>User %1 has invalid email address</source>
-      <translation>ユーザー %1 の無効なメール アドレス</translation>
+      <translation>ユーザー %1 のメールアドレスが無効</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 users have invalid email address</source>
@@ -4838,7 +4838,7 @@ to %1</source>
     </message>
     <message>
       <source>SMTP Server</source>
-      <translation>SMTP サーバ</translation>
+      <translation>SMTPサーバー</translation>
     </message>
     <message>
       <source>Server cannot be empty.</source>
@@ -4893,7 +4893,7 @@ to %1</source>
     </message>
     <message>
       <source>No preset found. Use &quot;Advanced&quot; option.</source>
-      <translation>プリセットが見つかりません &quot;アドバンス&quot;オプションを使用してください</translation>
+      <translation>プリセットが見つかりません。 &quot;アドバンス&quot;オプションを使用してください。</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
@@ -4904,7 +4904,7 @@ to %1</source>
     <name>QnSmtpTestConnectionWidget</name>
     <message>
       <source>Timed Out</source>
-      <translation>タイムアウト</translation>
+      <translation>タイムアウトしました</translation>
     </message>
     <message>
       <source>TLS</source>
@@ -5369,7 +5369,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No licenses</source>
-      <translation>ライセンスなし</translation>
+      <translation>ライセンスがありません</translation>
     </message>
     <message>
       <source>Email server is not set</source>
@@ -5381,11 +5381,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Rebuilding archive index is completed</source>
-      <translation>アーカイブインデックスのリビルド終了</translation>
+      <translation>アーカイブインデックスの再構築が完了しました</translation>
     </message>
     <message>
       <source>Rebuilding archive index is canceled by user</source>
-      <translation>アーカイブインデックスのリビルドがユーザーによってキャンセルされました</translation>
+      <translation>アーカイブインデックスの再構築はユーザーによってキャンセルされました</translation>
     </message>
     <message>
       <source>Email address is not set for user %1</source>
@@ -5393,27 +5393,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Email address is not set.</source>
-      <translation>Emailアドレスが設定されていません</translation>
+      <translation>Emailアドレスが設定されていません。</translation>
     </message>
     <message>
       <source>Email server is not set.</source>
-      <translation>Emailサーバーが設定されていません</translation>
+      <translation>Emailサーバーが設定されていません。</translation>
     </message>
     <message>
       <source>You have no licenses.</source>
-      <translation>ライセンスがありません</translation>
+      <translation>ライセンスがありません。</translation>
     </message>
     <message>
       <source>You cannot record video from cameras.</source>
-      <translation>カメラ映像を記録できません</translation>
+      <translation>カメラ映像を録画できません。</translation>
     </message>
     <message>
       <source>Rebuilding archive index is completed on the following Server:</source>
-      <translation>アーカイブインデックスのリビルド終了　サーバー:</translation>
+      <translation>アーカイブインデックスの再構築が次のサーバーで完了しました:</translation>
     </message>
     <message>
       <source>Rebuilding archive index is canceled by user on the following Server:</source>
-      <translation>アーカイブインデックスのリビルドキャンセル　サーバー:</translation>
+      <translation>アーカイブインデックスの再構築は次のサーバーでキャンセルされました:</translation>
     </message>
     <message>
       <source>Learn more</source>
@@ -5429,15 +5429,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You cannot receive System notifications by email.</source>
-      <translation>システム通知メールを受信できません</translation>
+      <translation>システム通知をメールで受信できません。</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses.</source>
-      <translation>一部のユーザーにメール アドレスが設定されていません</translation>
+      <translation>一部のユーザーにメールアドレスが設定されていません。</translation>
     </message>
     <message>
       <source>They cannot receive System notifications by email.</source>
-      <translation>システム通知メールを受信できません</translation>
+      <translation>システム通知をメールで受信できません。</translation>
     </message>
     <message>
       <source>Error while sending email</source>
@@ -5483,7 +5483,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation>一部のカメラにパスワードの設定が必要です</translation>
+      <translation>一部カメラにパスワード設定が必要です</translation>
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
@@ -5499,7 +5499,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Error occurred during remote archive synchronization</source>
-      <translation>リモートアーカイブの同期中にエラーが発生しました</translation>
+      <translation>カメラストレージとの同期中にエラーが発生しました</translation>
     </message>
     <message>
       <source>Backup storage is not configured</source>
@@ -5618,7 +5618,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Role</source>
-      <translation>役割</translation>
+      <translation>ロール</translation>
     </message>
     <message>
       <source>%1 user</source>
@@ -5696,7 +5696,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Role</source>
-      <translation>役割</translation>
+      <translation>ロール</translation>
     </message>
     <message>
       <source>Email</source>
@@ -5711,18 +5711,18 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnUserRoleSettingsWidget</name>
     <message>
       <source>Role name cannot be empty.</source>
-      <translation>役割名称は空白にできません</translation>
+      <translation>ロール名は空欄にできません。</translation>
     </message>
     <message>
       <source>Role with same name already exists.</source>
-      <translation>同じ名前の役割が既に存在します</translation>
+      <translation>同じ名前のロールが既に存在します。</translation>
     </message>
   </context>
   <context>
     <name>QnUserRoleSettingsWidgetPrivate</name>
     <message>
       <source>No users have this role</source>
-      <translation>この役割が割り当てられたユーザーはいません</translation>
+      <translation>このロールに割り当てられたユーザーはいません</translation>
     </message>
     <message>
       <source>Custom with no permissions</source>
@@ -5734,11 +5734,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Assign a new role</source>
-      <translation>新しい役割を割り当てる</translation>
+      <translation>新しいロールを割り当てる</translation>
     </message>
     <message>
       <source>Delete such users</source>
-      <translation>このようなユーザーを削除します</translation>
+      <translation>該当ユーザーを削除する</translation>
     </message>
     <message numerus="yes">
       <source>Please select an action to perform on %n users with this role</source>
@@ -5751,7 +5751,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnUserRolesDialog</name>
     <message>
       <source>Role Info</source>
-      <translation>役割情報</translation>
+      <translation>ロール情報</translation>
     </message>
     <message>
       <source>Permissions</source>
@@ -5767,11 +5767,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>New Role</source>
-      <translation>新しい役割</translation>
+      <translation>新しいロール</translation>
     </message>
     <message>
       <source>New Role %1</source>
-      <translation>新しい役割 %1</translation>
+      <translation>新しいロール %1</translation>
     </message>
   </context>
   <context>
@@ -6433,17 +6433,17 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>All users with this role will get access to %n resources:</source>
       <translation>
-        <numerusform>この役割を持つすべてのユーザーは、%n リソースへアクセスできます:</numerusform>
+        <numerusform>このロールを持つすべてのユーザーは、%n リソースへアクセスできます:</numerusform>
       </translation>
     </message>
     <message>
       <source>To remove access, please go to Role Settings.</source>
-      <translation>アクセスを削除するには、ユーザーの役割をご覧ください</translation>
+      <translation>アクセス権を削除するには、ロール設定に移動してください。</translation>
     </message>
     <message numerus="yes">
       <source>All users with this role will still have access to %n removed resources:</source>
       <translation>
-        <numerusform>この役割を持つすべてのユーザーは削除された %n リソースへアクセスできます</numerusform>
+        <numerusform>このロールを持つすべてのユーザーは、削除された %n リソースへアクセスできます:</numerusform>
       </translation>
     </message>
     <message>
@@ -6463,7 +6463,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>All users with this role will lose access to %n resources:</source>
       <translation>
-        <numerusform>この役割を持つすべてのユーザーは、%n リソースへアクセスできなくなります:</numerusform>
+        <numerusform>このロールを持つすべてのユーザーは、%n リソースへアクセスできなくなります:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8695,7 +8695,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</source>
-      <translation>選択されたシステムには、現在のシステムと互換性のない古いソフトウェアバージョンが含まれています。 選択したシステムを最新のビルドに更新してから、現在のシステムと統合してください。</translation>
+      <translation>ご指定のシステムは、現在のシステムと互換性のない古いソフトウェアバージョンです。対象システムを最新のビルドに更新してから、現在のシステムと統合してください。</translation>
     </message>
     <message>
       <source>The password or user name is invalid.</source>
@@ -9170,7 +9170,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
-      <translation>選択されたユーザー役割にユーザーが含まれていません。アクションは動作しません。</translation>
+      <translation>選択されたユーザーロールにユーザーが含まれていません。アクションは動作しません。</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>

@@ -1014,7 +1014,7 @@
     </message>
     <message>
       <source>Custom Role</source>
-      <translation>カスタムの役割</translation>
+      <translation>カスタムロール</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1034,7 +1034,7 @@
     </message>
     <message>
       <source>Custom user role.</source>
-      <translation>カスタムのユーザーの役割</translation>
+      <translation>カスタムのユーザーロール。</translation>
     </message>
     <message>
       <source>Custom permissions.</source>
@@ -1474,7 +1474,7 @@
     </message>
     <message>
       <source>Role</source>
-      <translation>役割</translation>
+      <translation>ロール</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
@@ -1485,7 +1485,7 @@
     <message numerus="yes">
       <source>%n Roles</source>
       <translation>
-        <numerusform>%n 役割</numerusform>
+        <numerusform>%n ロール</numerusform>
       </translation>
     </message>
     <message>
