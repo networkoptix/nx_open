@@ -1488,7 +1488,7 @@
     </message>
     <message>
       <source>Role to assign to imported users</source>
-      <translation>インポートされたユーザーに割り当てる役割</translation>
+      <translation>インポートしたユーザーに割り当てるロール</translation>
     </message>
     <message>
       <source>Disable imported users</source>
@@ -1704,7 +1704,7 @@
     </message>
     <message>
       <source>Take system name and settings from:</source>
-      <translation>システム名と設定を取得:</translation>
+      <translation>次のシステム名および設定を使用:</translation>
     </message>
   </context>
   <context>
@@ -2106,7 +2106,7 @@
     </message>
     <message>
       <source>Edit Roles...</source>
-      <translation>役割を編集...</translation>
+      <translation>ロールを編集...</translation>
     </message>
     <message>
       <source>Force Secure Authentication</source>
@@ -2667,7 +2667,7 @@
     <name>SoftwareTriggerBusinessEventWidget</name>
     <message>
       <source>Available to</source>
-      <translation>役割</translation>
+      <translation>ユーザー</translation>
     </message>
     <message>
       <source>Name</source>
@@ -2770,7 +2770,7 @@
     <name>SubjectSelectionDialog</name>
     <message>
       <source>Roles</source>
-      <translation>役割</translation>
+      <translation>ロール</translation>
     </message>
     <message>
       <source>Show all users</source>
@@ -2880,26 +2880,26 @@
     </message>
     <message>
       <source>Delete Role</source>
-      <translation>役割を削除</translation>
+      <translation>ロールを削除</translation>
     </message>
   </context>
   <context>
     <name>UserRolesDialog</name>
     <message>
       <source>User Roles</source>
-      <translation>ユーザーの役割</translation>
+      <translation>ユーザーロール</translation>
     </message>
     <message>
       <source>New role</source>
-      <translation>新しい役割</translation>
+      <translation>新しいロール</translation>
     </message>
     <message>
       <source>There are no custom user roles yet.</source>
-      <translation>カスタムユーザーの役割はまだありません</translation>
+      <translation>カスタムのユーザーロールはまだありません。</translation>
     </message>
     <message>
       <source>Click &quot;New role&quot; button to create one.</source>
-      <translation>作成するには、 &quot;役割&quot; ボタンをクリックしてください。</translation>
+      <translation>作成するには、 &quot;新しいロール&quot; ボタンをクリックしてください。</translation>
     </message>
   </context>
   <context>
@@ -2921,11 +2921,11 @@
     </message>
     <message>
       <source>Role</source>
-      <translation>役割</translation>
+      <translation>ロール</translation>
     </message>
     <message>
       <source>Edit Roles...</source>
-      <translation>役割を編集...</translation>
+      <translation>ロールを編集...</translation>
     </message>
   </context>
   <context>

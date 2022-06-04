@@ -987,11 +987,11 @@
     </message>
     <message>
       <source>Show Panel</source>
-      <translation type="unfinished">Show Panel</translation>
+      <translation>顯示面板</translation>
     </message>
     <message>
       <source>Hide Panel</source>
-      <translation type="unfinished">Hide Panel</translation>
+      <translation>隱藏面板</translation>
     </message>
     <message>
       <source>Joystick Settings...</source>
@@ -999,19 +999,19 @@
     </message>
     <message>
       <source>Advanced...</source>
-      <translation type="unfinished">Advanced...</translation>
+      <translation>進階選項</translation>
     </message>
     <message>
       <source>Copy Bookmark Text</source>
-      <translation type="unfinished">Copy Bookmark Text</translation>
+      <translation>複製書籤內容</translation>
     </message>
     <message>
       <source>Copy Bookmarks Text</source>
-      <translation type="unfinished">Copy Bookmarks Text</translation>
+      <translation>複製書籤內容</translation>
     </message>
     <message>
       <source>Web Page Settings...</source>
-      <translation type="unfinished">Web Page Settings...</translation>
+      <translation>網頁設定</translation>
     </message>
   </context>
   <context>
@@ -1672,11 +1672,11 @@
     </message>
     <message>
       <source>Certificate storage will be cleared.</source>
-      <translation type="unfinished">Certificate storage will be cleared.</translation>
+      <translation>已儲存的憑證將會被清除。</translation>
     </message>
     <message>
       <source>Current client instance will be disconnected.</source>
-      <translation type="unfinished">Current client instance will be disconnected.</translation>
+      <translation>目前的客戶端連線將會被中斷。</translation>
     </message>
     <message>
       <source>All other client windows will be closed.</source>
@@ -1991,7 +1991,7 @@
     </message>
     <message>
       <source>MitM Attack</source>
-      <translation type="unfinished">MitM Attack</translation>
+      <translation>MitM 攻擊</translation>
     </message>
     <message>
       <source>MitM attack from server %1</source>
@@ -2647,7 +2647,7 @@ to %1</source>
     <message>
       <source>Enter your account password to disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to disconnect System from %1</translation>
+      <translation>請輸入您的帳戶密碼來終止系統與 %1 的連線</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -2656,12 +2656,12 @@ to %1</source>
     <message>
       <source>System disconnected from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">System disconnected from %1</translation>
+      <translation>系統已中斷與 %1 的連線</translation>
     </message>
     <message>
       <source>You are about to disconnect System from %1</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation type="unfinished">You are about to disconnect System from %1</translation>
+      <translation>此系統即將中斷與 %1的連線</translation>
     </message>
     <message>
       <source>All %1 users will be deleted.</source>
@@ -2670,7 +2670,7 @@ to %1</source>
     </message>
     <message>
       <source>You will be logged out.</source>
-      <translation type="unfinished">You will be logged out.</translation>
+      <translation>您即將被登出。</translation>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
@@ -2683,7 +2683,7 @@ to %1</source>
     <message>
       <source>Cannot disconnect the System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot disconnect the System from %1</translation>
+      <translation>系統無法中斷與 %1的連線</translation>
     </message>
   </context>
   <context>
@@ -2948,15 +2948,15 @@ to %1</source>
     </message>
     <message>
       <source>Save Database Backup</source>
-      <translation type="unfinished">Save Database Backup</translation>
+      <translation>資料庫備份</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
-      <translation type="unfinished">Enter your account password to create backup</translation>
+      <translation>請輸入您的帳戶密碼以執行資料庫備份</translation>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>建立</translation>
     </message>
     <message>
       <source>Restore from Database Backup</source>
@@ -2964,7 +2964,7 @@ to %1</source>
     </message>
     <message>
       <source>Enter your account password to restore System from backup</source>
-      <translation type="unfinished">Enter your account password to restore System from backup</translation>
+      <translation>請輸入您的帳戶密碼來將資料庫還原於此系統</translation>
     </message>
     <message>
       <source>Restore</source>
@@ -4994,7 +4994,7 @@ to %1</source>
     </message>
     <message>
       <source>ARCHIVE ENCRYPTED</source>
-      <translation type="unfinished">ARCHIVE ENCRYPTED</translation>
+      <translation>錄影資料已加密</translation>
     </message>
     <message>
       <source>Ask your system administrator to enter the encryption password to decrypt this archive</source>
@@ -5002,7 +5002,7 @@ to %1</source>
     </message>
     <message>
       <source>Unlock</source>
-      <translation type="unfinished">Unlock</translation>
+      <translation>解除鎖定</translation>
     </message>
   </context>
   <context>
@@ -5459,11 +5459,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Backup storage is not configured</source>
-      <translation type="unfinished">Backup storage is not configured</translation>
+      <translation>尚未設定備份儲存裝置</translation>
     </message>
     <message>
       <source>Camera recording schedule is invalid</source>
-      <translation type="unfinished">Camera recording schedule is invalid</translation>
+      <translation>無效的錄影排程</translation>
     </message>
   </context>
   <context>
@@ -5637,7 +5637,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>With enabled digest authentication</source>
-      <translation type="unfinished">With enabled digest authentication</translation>
+      <translation>啟用Digest認證的使用者</translation>
     </message>
   </context>
   <context>
@@ -5783,7 +5783,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Learn More</source>
-      <translation type="unfinished">Learn More</translation>
+      <translation>進一步瞭解</translation>
     </message>
   </context>
   <context>
@@ -5858,7 +5858,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Password reset is required</source>
-      <translation type="unfinished">Password reset is required</translation>
+      <translation>需要重設密碼</translation>
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed.</source>
@@ -5932,19 +5932,19 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWebResourceWidget</name>
     <message>
       <source>Open this web page?</source>
-      <translation type="unfinished">Open this web page?</translation>
+      <translation>開啟此網頁?</translation>
     </message>
     <message>
       <source>Web page</source>
-      <translation type="unfinished">Web page</translation>
+      <translation>網頁</translation>
     </message>
     <message>
       <source>Connect anyway</source>
-      <translation type="unfinished">Connect anyway</translation>
+      <translation>仍繼續連線</translation>
     </message>
     <message>
       <source>Web page settings...</source>
-      <translation type="unfinished">Web page settings...</translation>
+      <translation>網頁設定</translation>
     </message>
     <message>
       <source>You try to open the
@@ -6535,7 +6535,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Merge this group with %1?</source>
-      <translation type="unfinished">Merge this group with %1?</translation>
+      <translation>是否將此群組與 %1合併?</translation>
     </message>
     <message>
       <source>Two groups with the same name cannot exist.</source>
@@ -6579,11 +6579,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>USB或者內建攝影機無法移動至其他伺服器，下列設備將會保留在伺服器%1:</translation>
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">Virtual cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>虛擬攝影機無法移動至其他伺服器，下列設備將會保留在伺服器%1:</translation>
     </message>
     <message>
       <source>Move Group without Them</source>
@@ -6897,15 +6897,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::AudioRedirectPickerWidget</name>
     <message>
       <source>Select Device...</source>
-      <translation type="unfinished">Select Device...</translation>
+      <translation>選擇設備...</translation>
     </message>
     <message>
       <source>Use audio stream from</source>
-      <translation type="unfinished">Use audio stream from</translation>
+      <translation>使用以下設備音訊來源</translation>
     </message>
     <message>
       <source>Transmit audio stream to</source>
-      <translation type="unfinished">Transmit audio stream to</translation>
+      <translation>在以下設備播放音訊</translation>
     </message>
     <message>
       <source>This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</source>
@@ -6941,11 +6941,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Transmit audio stream to another device</source>
-      <translation type="unfinished">Transmit audio stream to another device</translation>
+      <translation>在另一台設備播放音訊</translation>
     </message>
     <message>
       <source>Transmit audio stream to another camera</source>
-      <translation type="unfinished">Transmit audio stream to another camera</translation>
+      <translation>在另一台攝影機播放音訊</translation>
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</source>
@@ -7592,7 +7592,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>You need to select a device to transmit the audio stream to and use for audio playback.</source>
-      <translation type="unfinished">You need to select a device to transmit the audio stream to and use for audio playback.</translation>
+      <translation>請選擇設備來傳輸與播放音訊。</translation>
     </message>
   </context>
   <context>
@@ -9544,7 +9544,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Device Disconnect</source>
-      <translation type="unfinished">Device Disconnect</translation>
+      <translation>設備連線中斷</translation>
     </message>
     <message>
       <source>Device IP Conflict</source>
@@ -9801,15 +9801,15 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <name>nx::vms::client::desktop::ServerCertificateError</name>
     <message>
       <source>Failed to connect to server</source>
-      <translation type="unfinished">Failed to connect to server</translation>
+      <translation>無法連線至伺服器</translation>
     </message>
     <message>
       <source>View certificate</source>
-      <translation type="unfinished">View certificate</translation>
+      <translation>檢視憑證</translation>
     </message>
     <message>
       <source>Server certificate is invalid.</source>
-      <translation type="unfinished">Server certificate is invalid.</translation>
+      <translation>無效的伺服器憑證。</translation>
     </message>
   </context>
   <context>
@@ -9824,7 +9824,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Server Id: %1</source>
-      <translation type="unfinished">Server Id: %1</translation>
+      <translation>伺服器ID: %1</translation>
     </message>
     <message>
       <source>This certificate does not match the certificate %1 is pinned to.</source>
@@ -9832,15 +9832,15 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Custom certificate</source>
-      <translation type="unfinished">Custom certificate</translation>
+      <translation>自定義憑證</translation>
     </message>
     <message>
       <source>Pinned certificate</source>
-      <translation type="unfinished">Pinned certificate</translation>
+      <translation>綁定的憑證</translation>
     </message>
     <message>
       <source>Unknown certificate</source>
-      <translation type="unfinished">Unknown certificate</translation>
+      <translation>未知的憑證</translation>
     </message>
     <message>
       <source>This is a custom certificate installed on %1</source>
@@ -9848,7 +9848,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Pin this certificate to %1?</source>
-      <translation type="unfinished">Pin this certificate to %1?</translation>
+      <translation>是否將此憑證綁定至 %1?</translation>
     </message>
     <message>
       <source>Someone may be impersonating %1 to steel your personal information.
@@ -9865,11 +9865,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
     <message>
       <source>View certificate</source>
-      <translation type="unfinished">View certificate</translation>
+      <translation>檢視憑證</translation>
     </message>
     <message>
       <source>Connect Anyway</source>
-      <translation type="unfinished">Connect Anyway</translation>
+      <translation>仍進行連線</translation>
     </message>
     <message>
       <source>I trust this server</source>
@@ -9885,11 +9885,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Server ID:</source>
-      <translation type="unfinished">Server ID:</translation>
+      <translation>伺服器ID:</translation>
     </message>
     <message>
       <source>Trust this server?</source>
-      <translation type="unfinished">Trust this server?</translation>
+      <translation>是否信任此伺服器？</translation>
     </message>
     <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>

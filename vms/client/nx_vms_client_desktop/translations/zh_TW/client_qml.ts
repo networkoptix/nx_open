@@ -90,13 +90,13 @@
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
+      <translation>
+        <numerusform>%n 筆新結果</numerusform>
       </translation>
     </message>
     <message>
       <source>new results</source>
-      <translation type="unfinished">new results</translation>
+      <translation>新結果</translation>
     </message>
     <message>
       <source>Detected by</source>
@@ -107,7 +107,7 @@
     <name>AnalyticsSearchDialog</name>
     <message>
       <source>Advanced Object Search</source>
-      <translation type="unfinished">Advanced Object Search</translation>
+      <translation>進階物件搜尋</translation>
     </message>
     <message>
       <source>Select area</source>
@@ -135,13 +135,13 @@
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
+      <translation>
+        <numerusform>%n 筆新結果</numerusform>
       </translation>
     </message>
     <message>
       <source>new results</source>
-      <translation type="unfinished">new results</translation>
+      <translation>新結果</translation>
     </message>
   </context>
   <context>
@@ -286,11 +286,11 @@
     <name>CounterBlock</name>
     <message>
       <source>Remove column</source>
-      <translation type="unfinished">Remove column</translation>
+      <translation>移除欄位</translation>
     </message>
     <message>
       <source>Add column</source>
-      <translation type="unfinished">Add column</translation>
+      <translation>新增欄位</translation>
     </message>
     <message>
       <source>Hide information</source>
@@ -344,7 +344,7 @@
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+      <translation>請嘗試更改過濾條件或者新增事件規則</translation>
     </message>
     <message>
       <source>Event Log</source>
@@ -424,7 +424,7 @@
     </message>
     <message>
       <source>Floor/table</source>
-      <translation type="unfinished">Floor/table</translation>
+      <translation>地板或桌面</translation>
     </message>
     <message>
       <source>Angle</source>
@@ -472,7 +472,7 @@
     <message>
       <source>Hold %1 to activate actions</source>
       <comment>Leave %1 as is. It will be replaced to button name.</comment>
-      <translation type="unfinished">Hold %1 to activate actions</translation>
+      <translation>按住 %1 以觸發動作</translation>
     </message>
   </context>
   <context>
@@ -548,7 +548,7 @@
     </message>
     <message>
       <source>Basic Actions</source>
-      <translation type="unfinished">Basic Actions</translation>
+      <translation>基本動作</translation>
     </message>
     <message>
       <source>With Modifier</source>
@@ -567,7 +567,7 @@
     <name>JoystickSettingsTab</name>
     <message>
       <source>Pan and Tilt</source>
-      <translation type="unfinished">Pan and Tilt</translation>
+      <translation>水平與垂直位移</translation>
     </message>
     <message>
       <source>Zoom In / Zoom Out</source>
@@ -575,7 +575,7 @@
     </message>
     <message>
       <source>Select Camera on Layout</source>
-      <translation type="unfinished">Select Camera on Layout</translation>
+      <translation>在佈局上選取攝影機</translation>
     </message>
     <message>
       <source>Log in to the system to configure how to open layouts</source>
@@ -625,7 +625,7 @@
     </message>
     <message>
       <source>Select a camera to see its motion events</source>
-      <translation type="unfinished">Select a camera to see its motion events</translation>
+      <translation>選擇一個攝影機以查看位移事件</translation>
     </message>
     <message>
       <source>No motion detected</source>
@@ -633,7 +633,7 @@
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>可嘗試更改篩選條件或啟用位移偵測錄影模式</translation>
     </message>
     <message>
       <source>Select Camera...</source>
@@ -683,7 +683,7 @@
     </message>
     <message>
       <source>Select an area on the video to filter results</source>
-      <translation type="unfinished">Select an area on the video to filter results</translation>
+      <translation>在影像上框選區域來篩選結果</translation>
     </message>
   </context>
   <context>
@@ -787,7 +787,7 @@
     </message>
     <message>
       <source>Select the object to display the preview</source>
-      <translation type="unfinished">Select the object to display the preview</translation>
+      <translation>選擇欲顯示預覽畫面的物件</translation>
     </message>
     <message>
       <source>Show on Layout</source>
@@ -887,7 +887,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
-      <translation type="unfinished">Drag video files or images to the client window, or add local media folder through the Local Settings dialog</translation>
+      <translation>將串流檔案、圖像拖曳至客戶端視窗，或透過“本機設定”選項來加入本機媒體資料夾</translation>
     </message>
     <message>
       <source>Try searching for something else</source>
