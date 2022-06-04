@@ -592,7 +592,7 @@
     </message>
     <message>
       <source>Use Media2 to fetch profiles</source>
-      <translation type="unfinished">Use Media2 to fetch profiles</translation>
+      <translation>使用 Media2 获取配置文件</translation>
     </message>
     <message>
       <source>Use different values for pan and tilt</source>
