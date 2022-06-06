@@ -140,8 +140,11 @@ void Logger::setSettings(const LoggerSettings& loggerSettings)
                 m_settings.maxFileTimePeriodS,
                 file->getFileName()));
     }
-    setDefaultLevel(m_settings.level.primary);
-    setLevelFilters(m_settings.level.filters);
+    if (m_settings.level.primary == Level::trace)
+        m_settings.level.primary = Level::verbose;
+    m_defaultLevel = m_settings.level.primary;
+    m_levelFilters = m_settings.level.filters;
+    handleLevelChange(&lock);
 }
 
 void Logger::setApplicationName(const QString& applicationName)
