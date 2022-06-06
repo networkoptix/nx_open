@@ -408,11 +408,11 @@ bool Resources::moveProxiedWebPages(QWidget* parent, const QnResourceList& resou
 
     const bool multipleWebpagesAreMoved = webPages.count() > 1;
 
-    const auto text = multipleWebpagesAreMoved
-        ? tr("You are about to move these webpages to server \"%1\". These webpages proxy all"
-             " requested contents, and their proxy server will change to server \"%1\".")
-        : tr("You are about to move this webpage to server \"%1\". This webpage proxies all"
-             " requested contents, and its proxy server will change to server \"%1\".");
+    const auto text = tr(
+        "You are about to move these webpages to server \"%1\". These webpages proxy all"
+             " requested contents, and their proxy server will change to server \"%1\".",
+        "",
+        webPages.count());
 
     messageBox.setWindowTitle(nx::branding::vmsName());
     messageBox.setIcon(QnMessageBoxIcon::Warning);
@@ -426,7 +426,7 @@ bool Resources::moveProxiedWebPages(QWidget* parent, const QnResourceList& resou
 
     // Always show a list of webpages when multiple webpages are moved, even if only one of them
     // proxies all contents.
-    if (multipleWebpagesAreMoved)
+    if (webPages.count() > 1)
     {
         messageBox.addCustomWidget(
             new QnResourceListView(allContentsWebpages, kSimpleOptions, &messageBox),
@@ -486,7 +486,7 @@ bool Resources::moveCamerasToServer(
         QnMessageBox::Layout::Content);
 
     messageBox.addButton(
-        tr("Move Group without Them"),
+        tr("Move Group without them"),
         QDialogButtonBox::AcceptRole,
         Qn::ButtonAccent::Standard);
     messageBox.addButton(tr("Cancel"), QDialogButtonBox::RejectRole);
