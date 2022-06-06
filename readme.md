@@ -42,13 +42,13 @@ Pre-requisites per platform (the details are given in the further subsections):
 - Ninja (on Windows, comes with Miscosoft Visual Studio).
 - Python 3.8+.
 - Conan 1.43.x.
-- For Linux:
+- **Linux:**
     - `chrpath`.
     - Certain packages for the build dependencies.
-- For Windows: Microsoft Visual Studio 2022, Community Edition.
+- **Windows:** Microsoft Visual Studio 2022, Community Edition.
     - NOTE: Microsoft Visual Studio 2019 can also be used to build the repository branch `vms_5.0`,
         but its support may be dropped in further branches like `vms_5.0_patch`.
-- For MacOS:
+- **MacOS**:
     - XCode 12.5.
 
 ### CMake
@@ -73,24 +73,48 @@ Python 3.8+ should be installed and available on `PATH` either as `python` or `p
 - **Windows**: a Windows-native (non-Cygwin) version of Python should be installed. A Cygwin
     version of Python may be installed as well, but must appear on `PATH` as a symlink (this makes
     it not visible to Windows-native programs including `cmake`).
+- **Linux**:
+    - `distutils` must be installed explicitly:
+        ```
+        sudo apt install python3-distutils
+        ```
+    - **Ubuntu 18**: Make sure that the right version of Python is installed. First, check the
+        currently installed version of `python3`:
+        ```
+        python3 --version
+        ```
+        If the version is lower than 3.8, update it:
+        ```
+        sudo apt install python3.8
+        sudo rm /usr/bin/python3
+        sudo ln -s /usr/bin/python3.8 /usr/bin/python3
+        ```
 - Python module `pyaml` should be installed into Python:
-    ```
-    python -m pip install pyaml # via pip
-    sudo apt install python3-yaml # via apt
-    ```
-- **Linux**: When using `apt`, `distutils` must be installed explicitly:
-    ```
-    sudo apt install python3-distutils
-    ```
-    Also, `python` should refer to version 3.8+ (e.g. by installing the `python-is-python3`
-    package).
+    - **Windows:**
+        ```
+        python -m pip install pyaml
+        ```
+    - **Linux:**
+        ```
+        python3 -m pip install pyaml
+        ```
 
 ### Conan
 
 Conan 1.43.x should be installed. It is recommended to install Conan by Python's `pip`:
-```
-python -m pip install conan==1.43.2
-```
+- **Windows:**
+    ```
+    python -m pip install markupsafe==2.0.1 conan==1.43.2
+    ```
+- **Linux:**
+    ```
+    python3 -m pip install markupsafe==2.0.1 conan==1.43.2
+    ```
+
+NOTE: Conan requires the `markupsafe` package of version no later than 2.0.1.
+
+ATTENTION: `pip` installs package binaries to `~/.local/bin/`, so make sure that this directory is
+on `PATH`.
 
 ### Build tools
 
@@ -100,9 +124,12 @@ python -m pip install conan==1.43.2
 
 - **Linux**:
     - Install the `chrpath` tool.
+        ```
+        sudo apt install chrpath
+        ```
     - Install Ninja build tool using either way:
         - From https://ninja-build.org/; make sure `ninja` is on `PATH`.
-        - On Debian/Ubuntu - install via apt:
+        - **Debian/Ubuntu**: Install via apt:
             ```
             sudo apt install ninja-build
             ```
@@ -119,12 +146,18 @@ python -m pip install conan==1.43.2
         - GStreamer plugins: `libgstreamer-plugins-base1.0-0` (a runtime dependency)
         - XSLT library: `libxslt1.1` (a runtime dependency, required by Qt)
         - Zip archiver: `zip` (command, required for ARM distribution building)
+        - Pkg-config: `pkg-config`
+        - Autoconf: `autoconf`
 
         A typical command to install all of the above:
         ```
         sudo apt install zlib1g-dev libopenal-dev mesa-common-dev libgl1-mesa-dev \
             libglu1-mesa-dev libldap2-dev libxfixes-dev libxss-dev libgstreamer1.0-0 \
-            libgstreamer-plugins-base1.0-0 libxslt1.1 pkg-config
+            libgstreamer-plugins-base1.0-0 libxslt1.1 pkg-config autoconf
+        ```
+    - **Ubuntu 20+**: Install `libtinfo5` library:
+        ```
+        sudo apt install -y libtinfo5
         ```
 
 ---------------------------------------------------------------------------------------------------
@@ -188,18 +221,21 @@ absent. When running the scripts with `CMakeCache.txt` in the build directory pr
 perform the Build stage, and the script arguments are ignored (they are intended to be passed only
 to the Generation stage).
 
+ATTENTION: If the generation fails for any reason, remove `CMakeCache.txt` manually before the next
+attempt of running the build script.
+
 Below are the usage examples, where `<build>` is `./build.sh` on Linux and `build.bat` on Windows.
 
 - To make a clean Debug build, delete the build directory (if any), and run the command:
     ```
-    <build> -DcustomizationPackage=<customization.zip>
+    <build> -DcustomizationPackageFile=<customization.zip>
     ```
     The built executables will be placed in `nx_open-build/bin/`.
 
 - To make a clean Release build with the distribution package and unit test archive, delete the
     build directory (if any), and run the command:
     ```
-    <build> -DcustomizationPackage=<customization.zip> -DdeveloperBuild=OFF -DwithDistributions=ON -DwithUnitTestsArchive=ON
+    <build> -DcustomizationPackageFile=<customization.zip> -DdeveloperBuild=OFF -DwithDistributions=ON -DwithUnitTestsArchive=ON
     ```
     The built distribution packages and unit test archive will be placed in
     `nx_open-build/distrib/`. To run the unit tests, unpack the unit test archive and run all the
