@@ -77,6 +77,10 @@ QnWebpageDialog::QnWebpageDialog(QWidget* parent, EditMode editMode):
         "Proxying all contents exposes any service or device on the server's network to the users"
         " of this webpage"));
 
+    ui->clientApiAlertLabel->setText(tr(
+        "The webpage is able to interact with the Desktop Client and request access to the user"
+        " session"));
+
     auto aligner = new Aligner(this);
     aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     aligner->addWidgets({
@@ -124,6 +128,9 @@ QnWebpageDialog::QnWebpageDialog(QWidget* parent, EditMode editMode):
 
     connect(ui->proxyAllContentsCheckBox, &QCheckBox::stateChanged,
         this, &QnWebpageDialog::updateWarningLabel);
+
+    connect(ui->clientApiCheckBox, &QCheckBox::toggled,
+        ui->clientApiAlertLabel, &AlertLabel::setVisible);
 
     updateTitle();
     updateSelectServerMenuButtonVisibility();

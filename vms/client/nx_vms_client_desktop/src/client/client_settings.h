@@ -3,8 +3,8 @@
 #pragma once
 
 #include <QtCore/QObject>
-#include <QtCore/QUrl>
 #include <QtCore/QStringList>
+#include <QtCore/QUrl>
 #include <QtGui/QColor>
 
 #include <client/client_globals.h>
@@ -22,6 +22,7 @@
 #include <nx/vms/client/core/system_logon/connection_data.h>
 #include <nx/vms/client/desktop/export/settings/export_layout_persistent_settings.h>
 #include <nx/vms/client/desktop/export/settings/export_media_persistent_settings.h>
+#include <nx/vms/client/desktop/jsapi/auth_allowed_urls.h>
 #include <nx/vms/client/desktop/system_update/update_contents.h>
 #include <ui/workbench/workbench_pane_settings.h>
 #include <utils/common/property_storage.h>
@@ -181,6 +182,9 @@ public:
         /** Mute audio output while two way audio is engaged. */
         MUTE_ON_AUDIO_TRANSMIT,
 
+        /** Approved urls that have access to a session token using jsapi. */
+        AUTH_ALLOWED_URLS,
+
         VARIABLE_COUNT
     };
     Q_ENUM(Variable)
@@ -222,6 +226,7 @@ protected:
 private:
     using ExportMediaSettings = nx::vms::client::desktop::ExportMediaPersistentSettings;
     using ExportLayoutSettings = nx::vms::client::desktop::ExportLayoutPersistentSettings;
+    using AuthAllowedUrls = nx::vms::client::desktop::AuthAllowedUrls;
 
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT)
         QN_DECLARE_RW_PROPERTY(int,                         maxSceneVideoItems,     setMaxSceneVideoItems,      MAX_SCENE_VIDEO_ITEMS,      24)
@@ -321,6 +326,12 @@ private:
 
         QN_DECLARE_RW_PROPERTY(bool, muteOnAudioTransmit, setMuteOnAudioTransmit,
             MUTE_ON_AUDIO_TRANSMIT, true)
+
+        QN_DECLARE_RW_PROPERTY(AuthAllowedUrls,
+            authAllowedUrls,
+            setAuthAllowedUrls,
+            AUTH_ALLOWED_URLS,
+            AuthAllowedUrls{})
 
     QN_END_PROPERTY_STORAGE()
 

@@ -10,7 +10,9 @@
 #include <nx/utils/string.h>
 #include <nx/utils/url.h>
 #include <nx/vms/client/desktop/common/widgets/webview_controller.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/c2p/jsapi/external.h>
+#include <nx/vms/client/desktop/jsapi/auth.h>
 #include <nx/vms/client/desktop/jsapi/globals.h>
 #include <nx/vms/client/desktop/jsapi/logger.h>
 #include <nx/vms/client/desktop/jsapi/resources.h>
@@ -127,6 +129,13 @@ void QnWebResourceWidget::initClientApiSupport()
         [](QObject* parent) -> QObject*
         {
             return new jsapi::Logger(parent);
+        });
+
+    m_webEngineView->controller()->registerApiObjectWithFactory("vms.auth",
+        [this](QObject* parent) -> QObject*
+        {
+            auto urlProvider = [this] { return m_webEngineView->controller()->url(); };
+            return new jsapi::Auth(urlProvider, resource(), parent);
         });
 
     m_webEngineView->controller()->registerApiObjectWithFactory("vms",
