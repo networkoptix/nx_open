@@ -242,6 +242,16 @@ QVariant QnClientSettings::readValueFromSettings(QSettings* settings, int id,
                 defaultValue.value<UpdateDeliveryInfo>()));
         }
 
+        case AUTH_ALLOWED_URLS:
+        {
+            auto asJson = base_type::readValueFromSettings(settings, id, QVariant())
+                .value<QString>().toStdString();
+
+            auto [urls, result] = nx::reflect::json::deserialize<AuthAllowedUrls>(asJson);
+
+            return result ? QVariant::fromValue(urls) : defaultValue;
+        }
+
         default:
             return base_type::readValueFromSettings(settings, id, defaultValue);
             break;
@@ -327,6 +337,14 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
         {
             const auto& updateInfo = value.value<UpdateDeliveryInfo>();
             QString asJson = QString::fromUtf8(QJson::serialized(updateInfo));
+            base_type::writeValueToSettings(settings, id, asJson);
+            break;
+        }
+
+        case AUTH_ALLOWED_URLS:
+        {
+            const auto urls = value.value<AuthAllowedUrls>();
+            QString asJson = QString::fromStdString(nx::reflect::json::serialize(urls));
             base_type::writeValueToSettings(settings, id, asJson);
             break;
         }

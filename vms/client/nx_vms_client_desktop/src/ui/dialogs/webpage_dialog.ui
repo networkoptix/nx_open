@@ -190,6 +190,13 @@
         </widget>
        </item>
        <item>
+        <widget class="nx::vms::client::desktop::AlertLabel" name="clientApiAlertLabel" native="true">
+         <property name="visible">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QCheckBox" name="proxyAllContentsCheckBox">
          <property name="enabled">
           <bool>false</bool>
