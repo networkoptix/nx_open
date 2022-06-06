@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Open source libraries</source>
-      <translation type="unfinished">Open source libraries</translation>
+      <translation>开放原始码函式库</translation>
     </message>
   </context>
   <context>
@@ -107,7 +107,7 @@
     </message>
     <message>
       <source>Server certificate validation</source>
-      <translation type="unfinished">Server certificate validation</translation>
+      <translation>服务器证书验证</translation>
     </message>
   </context>
   <context>
@@ -152,11 +152,11 @@
     <name>AnalyticsSdkObjectDetectedWidget</name>
     <message>
       <source>Attributes:</source>
-      <translation type="unfinished">Attributes:</translation>
+      <translation>属性：</translation>
     </message>
     <message>
       <source>Object Type:</source>
-      <translation type="unfinished">Object Type:</translation>
+      <translation>物件类型:</translation>
     </message>
   </context>
   <context>
@@ -167,15 +167,15 @@
     </message>
     <message>
       <source>Keep Archive For...</source>
-      <translation type="unfinished">Keep Archive For...</translation>
+      <translation>视频存档天数</translation>
     </message>
     <message>
       <source>Max</source>
-      <translation type="unfinished">Max</translation>
+      <translation>最大值</translation>
     </message>
     <message>
       <source>Min</source>
-      <translation type="unfinished">Min</translation>
+      <translation>最小值</translation>
     </message>
   </context>
   <context>
@@ -256,19 +256,19 @@
     <name>BackupBandwidthSettingsWidget</name>
     <message>
       <source>No Limit</source>
-      <translation type="unfinished">No Limit</translation>
+      <translation>无限制</translation>
     </message>
     <message>
       <source>Fixed</source>
-      <translation type="unfinished">Fixed</translation>
+      <translation>频宽限制</translation>
     </message>
     <message>
       <source>Scheduled</source>
-      <translation type="unfinished">Scheduled</translation>
+      <translation>启用频宽录影天数计画设置</translation>
     </message>
     <message>
       <source>Fix bandwidth to</source>
-      <translation type="unfinished">Fix bandwidth to</translation>
+      <translation>限制频宽上限为</translation>
     </message>
     <message>
       <source>Mbit/s</source>
@@ -276,11 +276,11 @@
     </message>
     <message>
       <source>Unlimited</source>
-      <translation type="unfinished">Unlimited</translation>
+      <translation>无限制</translation>
     </message>
     <message>
       <source>Limited to</source>
-      <translation type="unfinished">Limited to</translation>
+      <translation>限于</translation>
     </message>
     <message>
       <source>No backup</source>
@@ -2438,11 +2438,11 @@
     </message>
     <message>
       <source>Encrypt video traffic to desktop and mobile clients</source>
-      <translation type="unfinished">Encrypt video traffic to desktop and mobile clients</translation>
+      <translation>加密客戶端與伺服器間的影像串流</translation>
     </message>
     <message>
       <source>Manage Users</source>
-      <translation type="unfinished">Manage Users</translation>
+      <translation>管理用户</translation>
     </message>
   </context>
   <context>
@@ -2460,7 +2460,7 @@
     <name>ServerCertificateViewer</name>
     <message>
       <source>Server certificate</source>
-      <translation type="unfinished">Server certificate</translation>
+      <translation>服务器证书</translation>
     </message>
     <message>
       <source>General</source>
@@ -2468,11 +2468,11 @@
     </message>
     <message>
       <source>Issued by</source>
-      <translation type="unfinished">Issued by</translation>
+      <translation>发布者</translation>
     </message>
     <message>
       <source>Self-signed root certificate</source>
-      <translation type="unfinished">Self-signed root certificate</translation>
+      <translation>自签署根凭证</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -2480,11 +2480,11 @@
     </message>
     <message>
       <source>Certificate is expired</source>
-      <translation type="unfinished">Certificate is expired</translation>
+      <translation>凭证已过期</translation>
     </message>
     <message>
       <source>Fingerprints</source>
-      <translation type="unfinished">Fingerprints</translation>
+      <translation>凭证指纹</translation>
     </message>
     <message>
       <source>Details</source>
@@ -2492,11 +2492,11 @@
     </message>
     <message>
       <source>Pin to this certificate</source>
-      <translation type="unfinished">Pin to this certificate</translation>
+      <translation>绑定此凭证</translation>
     </message>
     <message>
       <source>View pinned certificate</source>
-      <translation type="unfinished">View pinned certificate</translation>
+      <translation>检视绑定凭证</translation>
     </message>
   </context>
   <context>
@@ -2534,7 +2534,7 @@
     </message>
     <message>
       <source>Autodetect built-in and USB webcams</source>
-      <translation type="unfinished">Autodetect built-in and USB webcams</translation>
+      <translation>自动侦测内置或USB摄像机</translation>
     </message>
   </context>
   <context>
@@ -2906,11 +2906,11 @@
     <name>UserSettingsDialog</name>
     <message>
       <source>This user can use digest authentication.</source>
-      <translation type="unfinished">This user can use digest authentication.</translation>
+      <translation>此用户可使用摘要身份验证。</translation>
     </message>
     <message>
       <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
+      <translation>强制安全认证</translation>
     </message>
   </context>
   <context>
@@ -2992,7 +2992,7 @@
     </message>
     <message>
       <source>Proxy this webpage via server</source>
-      <translation type="unfinished">Proxy this webpage via server</translation>
+      <translation>透过服务器代理转送此网页连线</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -3004,15 +3004,15 @@
     </message>
     <message>
       <source>Allow using Client API</source>
-      <translation type="unfinished">Allow using Client API</translation>
+      <translation>允许使用客户端 API</translation>
     </message>
     <message>
       <source>Proxy all requested contents</source>
-      <translation type="unfinished">Proxy all requested contents</translation>
+      <translation>代理转送所有请求内容</translation>
     </message>
     <message>
       <source>Allow opening web page without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening web page without SSL certificate checking</translation>
+      <translation>允许在不验证SSL凭证的情况下开启网页</translation>
     </message>
   </context>
   <context>

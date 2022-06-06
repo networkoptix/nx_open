@@ -1692,7 +1692,7 @@
     </message>
     <message>
       <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
-      <translation type="unfinished">On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</translation>
+      <translation>在第一次連線時，若伺服器綁定非公開憑證，則需先由您確認以進行連線</translation>
     </message>
   </context>
   <context>
@@ -2674,7 +2674,7 @@ to %1</source>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
-      <translation type="unfinished">System will be accessible through local network with a local administrator account.</translation>
+      <translation>允許在區域網路使用本機管理者帳戶存取系統。</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -2710,7 +2710,7 @@ to %1</source>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
-      <translation>網路錯誤. 請檢查您的網際網路連接, 然後重試.</translation>
+      <translation>網路錯誤。請檢查您的網路連線並重試。</translation>
     </message>
     <message>
       <source>Invalid login.</source>
@@ -4734,7 +4734,7 @@ to %1</source>
     </message>
     <message>
       <source>Certificate received from the server doesn&apos;t match the certificate this server is pinned to.</source>
-      <translation type="unfinished">Certificate received from the server doesn&apos;t match the certificate this server is pinned to.</translation>
+      <translation>伺服器傳送的憑證與其綁定的憑證不一致。</translation>
     </message>
     <message>
       <source>Details</source>
@@ -6955,19 +6955,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
-      <translation type="unfinished">The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</translation>
+      <translation>選擇的設備沒有偵測到音訊輸入或者設定錯誤，目前無法取得音訊</translation>
     </message>
     <message>
       <source>The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
-      <translation type="unfinished">The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</translation>
+      <translation>選擇的攝影機沒有偵測到音訊輸入或者設定錯誤，目前音訊無法使用</translation>
     </message>
     <message>
       <source>The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
-      <translation type="unfinished">The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</translation>
+      <translation>選擇的設備沒有偵測到音訊輸出或者設定錯誤，目前無法使用雙向語音通話功能</translation>
     </message>
     <message>
       <source>The selected camera does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
-      <translation type="unfinished">The selected camera does not have an audio output, or it is not configured correctly. 2-way audio is not available.</translation>
+      <translation>選擇的攝影機沒有偵測到音訊輸出或者設定錯誤，目前無法使用雙向語音通話功能</translation>
     </message>
     <message>
       <source>Use audio stream from this device</source>
@@ -7034,7 +7034,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupSettingsDecoratorModel</name>
     <message>
       <source>The camera has neither recorded footage nor recording scheduled</source>
-      <translation type="unfinished">The camera has neither recorded footage nor recording scheduled</translation>
+      <translation>找不到此攝影機的錄影資料亦沒有啟用錄影排程</translation>
     </message>
     <message>
       <source>Motion detection is disabled</source>
@@ -7081,7 +7081,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>
     <message>
       <source>Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</source>
-      <translation type="unfinished">Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</translation>
+      <translation>可透過%1或%2來選去多台設備已進行批次編輯，也可使用%3來選擇所有設備。</translation>
     </message>
     <message>
       <source>What to backup</source>
@@ -7125,11 +7125,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Backup will be turned on for new added cameras on all servers in the system.</source>
-      <translation type="unfinished">Backup will be turned on for new added cameras on all servers in the system.</translation>
+      <translation>系統中所有伺服器新加入的攝影機將自動啟用備份設定</translation>
     </message>
     <message>
       <source>Backup will be turned off for new added cameras on all servers in the system.</source>
-      <translation type="unfinished">Backup will be turned off for new added cameras on all servers in the system.</translation>
+      <translation>系統中所有伺服器新加入的攝影機將不做任何備份</translation>
     </message>
     <message>
       <source>Storage Management</source>
@@ -7138,7 +7138,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation type="unfinished">To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</translation>
+      <translation>若需啟用備份設定，請先於%1新增備份儲存裝置(或者可將部分主要儲存位置改為備份)</translation>
     </message>
     <message>
       <source>To enable backup add more drives to use them as backup storage in %1</source>
@@ -7775,7 +7775,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>None of your Servers is connected to the Internet.</source>
-      <translation type="unfinished">None of your Servers is connected to the Internet.</translation>
+      <translation>沒有任何伺服器連線到網際網路。</translation>
     </message>
     <message>
       <source>System connected to %1</source>
@@ -9445,11 +9445,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Recording motion, objects and low quality</source>
-      <translation type="unfinished">Recording motion, objects and low quality</translation>
+      <translation>位移與物件偵測 + 低畫質連續錄影</translation>
     </message>
     <message>
       <source>Recording objects and low quality</source>
-      <translation type="unfinished">Recording objects and low quality</translation>
+      <translation>物件偵測 + 低畫質連續錄影</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
@@ -9839,7 +9839,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>This is a custom certificate installed on %1</source>
-      <translation type="unfinished">This is a custom certificate installed on %1</translation>
+      <translation>此為安裝於%1上的自訂憑證</translation>
     </message>
     <message>
       <source>Pin this certificate to %1?</source>
@@ -9848,8 +9848,8 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message>
       <source>Someone may be impersonating %1 to steel your personal information.
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steel your personal information.
-Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
+      <translation>將可能有冒充 %1 來竊取您隱私資料的風險。
+若您沒有修改%2伺服器的憑證，請不要固定此證書。</translation>
     </message>
     <message>
       <source>Pin</source>
@@ -10126,7 +10126,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
-      <translation type="unfinished">Recording schedule on some cameras contains recording modes that are not supported.</translation>
+      <translation>部分攝影機的錄影排程包含不支援的錄影模式</translation>
     </message>
   </context>
   <context>
@@ -10386,7 +10386,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>You will be able to access the %1 login menu at any time by clicking the cloud icon on the navigation panel.</source>
-      <translation type="unfinished">You will be able to access the %1 login menu at any time by clicking the cloud icon on the navigation panel.</translation>
+      <translation>您隨時可透過點擊導覽列上的Nx cloud圖示來連線至%1</translation>
     </message>
     <message>
       <source>Hide</source>
@@ -10394,7 +10394,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Unable to connect to the system because it has become offline</source>
-      <translation type="unfinished">Unable to connect to the system because it has become offline</translation>
+      <translation>系統已離線，故連線失敗</translation>
     </message>
   </context>
   <context>
@@ -10613,11 +10613,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
     <message>
       <source>Intercom Alarm Layout</source>
-      <translation>對講機報警佈局</translation>
+      <translation>透過對講機觸發佈局</translation>
     </message>
     <message>
       <source>Intercom Open Door</source>
-      <translation type="unfinished">Intercom Open Door</translation>
+      <translation>透過對講機開門</translation>
     </message>
     <message>
       <source>Open door</source>

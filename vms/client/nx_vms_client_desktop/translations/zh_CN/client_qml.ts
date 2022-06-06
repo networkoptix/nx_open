@@ -13,27 +13,27 @@
     </message>
     <message>
       <source>Notify about available updates</source>
-      <translation type="unfinished">Notify about available updates</translation>
+      <translation>有可用更新时请通知我</translation>
     </message>
     <message>
       <source>Automatic client updates</source>
-      <translation type="unfinished">Automatic client updates</translation>
+      <translation>客户端自动更新</translation>
     </message>
     <message>
       <source>Turn this option on to make connected clients update automatically to the latest compatible version.</source>
-      <translation type="unfinished">Turn this option on to make connected clients update automatically to the latest compatible version.</translation>
+      <translation>启用此选项，将允许连接的客户端自动更新至最新的相容版本。</translation>
     </message>
     <message>
       <source>Connecting clients will be automatically updated to the new version when it’s available.</source>
-      <translation type="unfinished">Connecting clients will be automatically updated to the new version when it’s available.</translation>
+      <translation>有新版本时，连接的客户端将自动更新。</translation>
     </message>
     <message>
       <source>All connecting clients are updating to version %1.</source>
-      <translation type="unfinished">All connecting clients are updating to version %1.</translation>
+      <translation>所有连接的客户端都将更新到版本 %1。</translation>
     </message>
     <message>
       <source>Connecting clients will be updated to version %1 on %2.</source>
-      <translation type="unfinished">Connecting clients will be updated to version %1 on %2.</translation>
+      <translation>已连接的客户端将会于 %2 时更新至版本 %1。</translation>
     </message>
     <message>
       <source>Check for updates</source>
@@ -41,18 +41,18 @@
     </message>
     <message>
       <source>Speed up this update</source>
-      <translation type="unfinished">Speed up this update</translation>
+      <translation>提前更新时间</translation>
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
-      <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
+      <translation>您正在使用非正式发布版本的客户端，请联系 %1 以取得更新说明与协助。</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsEventSelector</name>
     <message>
       <source>Event Type</source>
-      <translation type="unfinished">Event Type</translation>
+      <translation>事件类型</translation>
     </message>
     <message>
       <source>All</source>
@@ -63,7 +63,7 @@
     <name>AnalyticsFilters</name>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>物件类型</translation>
     </message>
   </context>
   <context>
@@ -86,17 +86,17 @@
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>可尝试更改筛选条件，或在摄像机扩充套件中设定物件侦测功能</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
+      <translation>
+        <numerusform>%n 个新结果</numerusform>
       </translation>
     </message>
     <message>
       <source>new results</source>
-      <translation type="unfinished">new results</translation>
+      <translation>新结果</translation>
     </message>
     <message>
       <source>Detected by</source>
@@ -107,7 +107,7 @@
     <name>AnalyticsSearchDialog</name>
     <message>
       <source>Advanced Object Search</source>
-      <translation type="unfinished">Advanced Object Search</translation>
+      <translation>高级物件搜寻</translation>
     </message>
     <message>
       <source>Select area</source>
@@ -127,21 +127,21 @@
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>尝试在摄像机套件设定中更改筛选器或物件侦测参数</translation>
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>任何插件</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
+      <translation>
+        <numerusform>%n 个新结果</numerusform>
       </translation>
     </message>
     <message>
       <source>new results</source>
-      <translation type="unfinished">new results</translation>
+      <translation>新结果</translation>
     </message>
   </context>
   <context>
@@ -173,7 +173,7 @@
     <name>ButtonSettingsDelegate</name>
     <message>
       <source>Hotkey %1</source>
-      <translation type="unfinished">Hotkey %1</translation>
+      <translation>热键 %1</translation>
     </message>
   </context>
   <context>
@@ -204,11 +204,11 @@
     </message>
     <message>
       <source>Choose devices...</source>
-      <translation type="unfinished">Choose devices...</translation>
+      <translation>选择设备...</translation>
     </message>
     <message>
       <source>Choose cameras...</source>
-      <translation type="unfinished">Choose cameras...</translation>
+      <translation>选择摄像机...</translation>
     </message>
     <message>
       <source>none</source>
@@ -216,23 +216,23 @@
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
+      <translation>
+        <numerusform>%n 个已选择的设备</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
+      <translation>
+        <numerusform>%n 已选取的摄像机</numerusform>
       </translation>
     </message>
     <message>
       <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
+      <translation>已选择的设备</translation>
     </message>
     <message>
       <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
+      <translation>已选取的摄像机</translation>
     </message>
   </context>
   <context>
@@ -344,7 +344,7 @@
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+      <translation>请尝试更改筛选条件或创建事件规则</translation>
     </message>
     <message>
       <source>Event Log</source>
@@ -424,7 +424,7 @@
     </message>
     <message>
       <source>Floor/table</source>
-      <translation type="unfinished">Floor/table</translation>
+      <translation>地板/桌面</translation>
     </message>
     <message>
       <source>Angle</source>
@@ -472,7 +472,7 @@
     <message>
       <source>Hold %1 to activate actions</source>
       <comment>Leave %1 as is. It will be replaced to button name.</comment>
-      <translation type="unfinished">Hold %1 to activate actions</translation>
+      <translation>按住 %1 以激活操作</translation>
     </message>
   </context>
   <context>
@@ -517,7 +517,7 @@
     </message>
     <message>
       <source>Previous Object</source>
-      <translation type="unfinished">Previous Object</translation>
+      <translation>前一个物件</translation>
     </message>
     <message>
       <source>Pause</source>
@@ -529,7 +529,7 @@
     </message>
     <message>
       <source>Next Object</source>
-      <translation type="unfinished">Next Object</translation>
+      <translation>下一个物件</translation>
     </message>
     <message>
       <source>Toggle Repeat</source>
@@ -540,15 +540,15 @@
     <name>JoystickSettingsDialog</name>
     <message>
       <source>Joystick Settings</source>
-      <translation type="unfinished">Joystick Settings</translation>
+      <translation>操纵杆设置</translation>
     </message>
     <message>
       <source>joystick</source>
-      <translation type="unfinished">joystick</translation>
+      <translation>操纵杆</translation>
     </message>
     <message>
       <source>Basic Actions</source>
-      <translation type="unfinished">Basic Actions</translation>
+      <translation>基本操作</translation>
     </message>
     <message>
       <source>With Modifier</source>
@@ -556,26 +556,26 @@
     </message>
     <message>
       <source>This model is not supported</source>
-      <translation type="unfinished">This model is not supported</translation>
+      <translation>不支持此型号</translation>
     </message>
     <message>
       <source>Reset to Default</source>
-      <translation type="unfinished">Reset to Default</translation>
+      <translation>重置为默认值</translation>
     </message>
   </context>
   <context>
     <name>JoystickSettingsTab</name>
     <message>
       <source>Pan and Tilt</source>
-      <translation type="unfinished">Pan and Tilt</translation>
+      <translation>云台</translation>
     </message>
     <message>
       <source>Zoom In / Zoom Out</source>
-      <translation type="unfinished">Zoom In / Zoom Out</translation>
+      <translation>放大/缩小</translation>
     </message>
     <message>
       <source>Select Camera on Layout</source>
-      <translation type="unfinished">Select Camera on Layout</translation>
+      <translation>在布局上选择摄像机</translation>
     </message>
     <message>
       <source>Log in to the system to configure how to open layouts</source>
@@ -625,7 +625,7 @@
     </message>
     <message>
       <source>Select a camera to see its motion events</source>
-      <translation type="unfinished">Select a camera to see its motion events</translation>
+      <translation>选择一个摄像机查看移动事件</translation>
     </message>
     <message>
       <source>No motion detected</source>
@@ -633,11 +633,11 @@
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>可尝试更改筛选条件或启用移动侦测录像模式</translation>
     </message>
     <message>
       <source>Select Camera...</source>
-      <translation type="unfinished">Select Camera...</translation>
+      <translation>选择摄像机...</translation>
     </message>
     <message>
       <source>No bookmarks</source>
@@ -645,7 +645,7 @@
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+      <translation>在时间线上选择一个时间跨度，右键单击高亮部分以创建书签</translation>
     </message>
   </context>
   <context>
@@ -683,7 +683,7 @@
     </message>
     <message>
       <source>Select an area on the video to filter results</source>
-      <translation type="unfinished">Select an area on the video to filter results</translation>
+      <translation>在视频上框选区域来筛选结果</translation>
     </message>
   </context>
   <context>
@@ -787,7 +787,7 @@
     </message>
     <message>
       <source>Select the object to display the preview</source>
-      <translation type="unfinished">Select the object to display the preview</translation>
+      <translation>选择要显示预览的对象</translation>
     </message>
     <message>
       <source>Show on Layout</source>
@@ -861,11 +861,11 @@ to activate PTZ</source>
     <name>RecursiveObjectTypeSelector</name>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>物件类型</translation>
     </message>
     <message>
       <source>Subtype</source>
-      <translation type="unfinished">Subtype</translation>
+      <translation>子类型</translation>
     </message>
   </context>
   <context>
@@ -887,11 +887,11 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
-      <translation type="unfinished">Drag video files or images to the client window, or add local media folder through the Local Settings dialog</translation>
+      <translation>将视频文件或图像拖动至客户端窗口，或通过“本地设置”对话框添加本地媒体文件夹</translation>
     </message>
     <message>
       <source>Try searching for something else</source>
-      <translation type="unfinished">Try searching for something else</translation>
+      <translation>请尝试搜寻其他内容</translation>
     </message>
   </context>
   <context>
@@ -911,7 +911,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>OUTDATED</source>
-      <translation type="unfinished">OUTDATED</translation>
+      <translation>已逾时</translation>
     </message>
   </context>
   <context>
@@ -965,7 +965,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Preview is outdated</source>
-      <translation type="unfinished">Preview is outdated</translation>
+      <translation>预览已逾时</translation>
     </message>
   </context>
   <context>
@@ -1020,7 +1020,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>选择</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1057,7 +1057,7 @@ to activate PTZ</source>
     <name>SphereDewarpingSettings</name>
     <message>
       <source>Horizon correction</source>
-      <translation type="unfinished">Horizon correction</translation>
+      <translation>水平校正</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -1114,7 +1114,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>No signal</source>
-      <translation type="unfinished">No signal</translation>
+      <translation>无信号</translation>
     </message>
     <message>
       <source>Not enough licenses</source>
@@ -1122,15 +1122,15 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Server unavailable</source>
-      <translation type="unfinished">Server unavailable</translation>
+      <translation>服务器无法使用</translation>
     </message>
     <message>
       <source>No access</source>
-      <translation type="unfinished">No access</translation>
+      <translation>无法存取</translation>
     </message>
     <message>
       <source>Device disabled</source>
-      <translation type="unfinished">Device disabled</translation>
+      <translation>设备已禁用</translation>
     </message>
     <message>
       <source>Too many connections</source>
@@ -1138,7 +1138,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Cannot decrypt media</source>
-      <translation type="unfinished">Cannot decrypt media</translation>
+      <translation>无法解密视频档案</translation>
     </message>
     <message>
       <source>Password required</source>
@@ -1168,19 +1168,19 @@ to activate PTZ</source>
     </message>
     <message>
       <source>No Favorite Systems</source>
-      <translation type="unfinished">No Favorite Systems</translation>
+      <translation>没有收藏的系统</translation>
     </message>
     <message>
       <source>No Hidden Systems</source>
-      <translation type="unfinished">No Hidden Systems</translation>
+      <translation>没有隐藏系统</translation>
     </message>
     <message>
       <source>You can add system to the favorites from the context menu</source>
-      <translation type="unfinished">You can add system to the favorites from the context menu</translation>
+      <translation>您可以透过右上角的对话选单，将系统加入收藏夹中。</translation>
     </message>
     <message>
       <source>You can hide systems from the main list from the context menu</source>
-      <translation type="unfinished">You can hide systems from the main list from the context menu</translation>
+      <translation>您可以透过右上角的对话选单来将系统隐藏。</translation>
     </message>
   </context>
   <context>
@@ -1203,11 +1203,11 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Add to Favorites</source>
-      <translation type="unfinished">Add to Favorites</translation>
+      <translation>加入收藏</translation>
     </message>
     <message>
       <source>Remove from Favorites</source>
-      <translation type="unfinished">Remove from Favorites</translation>
+      <translation>从收藏夹中删除</translation>
     </message>
   </context>
   <context>
@@ -1246,7 +1246,7 @@ to activate PTZ</source>
     <name>VisibilityMenu</name>
     <message>
       <source>Hidden</source>
-      <translation type="unfinished">Hidden</translation>
+      <translation>已隱藏</translation>
     </message>
     <message>
       <source>All Systems</source>
@@ -1254,14 +1254,14 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Favorites</source>
-      <translation type="unfinished">Favorites</translation>
+      <translation>收藏夹</translation>
     </message>
   </context>
   <context>
     <name>WelcomeScreen</name>
     <message>
       <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
-      <translation type="unfinished">You don&apos;t have access to the %1. Please check your internet connection.</translation>
+      <translation>目前无法连线至 %1，请检查您的网络连线。</translation>
     </message>
     <message>
       <source>Official Website</source>
