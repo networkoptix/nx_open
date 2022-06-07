@@ -39,10 +39,10 @@ struct NX_VMS_API BookmarkFilter
 
     std::optional<QnUuid> id;
 
-    /**%apidoc[opt] Minimum start time for the bookmark. */
+    /**%apidoc[opt]:integer Minimum start time for the bookmark. */
     std::chrono::milliseconds startTimeMs{};
 
-    /**%apidoc[opt] Maximum end time for the bookmark. */
+    /**%apidoc[opt]:integer Maximum end time for the bookmark. */
     std::chrono::milliseconds endTimeMs{};
 
     /**%apidoc[opt] Text-search filter string. */
@@ -61,16 +61,16 @@ struct NX_VMS_API BookmarkFilter
     /**%apidoc[opt] Bookmark field used for ordering. */
     BookmarkSortField column = BookmarkSortField::startTime;
 
-    /**%apidoc[opt] Do not return bookmarks with duration less than this value. */
+    /**%apidoc[opt]:integer Do not return bookmarks with duration less than this value. */
     std::optional<std::chrono::milliseconds> minVisibleLengthMs;
 
     /**%apidoc:stringArray Device ids to get Bookmarks on. */
     nx::vms::api::json::ValueOrArray<QString> deviceId;
 
-    /**%apidoc[opt] Minimum creation time of the bookmark (in milliseconds since epoch, or as a string). */
+    /**%apidoc[opt]:integer Minimum creation time of the bookmark (in milliseconds since epoch, or as a string). */
     std::chrono::milliseconds creationStartTimeMs{};
 
-    /**%apidoc[opt] Maximum creation time of the bookmark (in milliseconds since epoch, or as a string) */
+    /**%apidoc[opt]:integer Maximum creation time of the bookmark (in milliseconds since epoch, or as a string) */
     std::chrono::milliseconds creationEndTimeMs{};
 };
 #define BookmarkFilter_Fields \
@@ -91,10 +91,10 @@ struct NX_VMS_API Bookmark
     /**%apidoc[opt] Details of the Bookmark. */
     QString description;
 
-    /**%apidoc Start time of the Bookmark (in milliseconds since epoch). */
+    /**%apidoc:integer Start time of the Bookmark (in milliseconds since epoch). */
     std::chrono::milliseconds startTimeMs{0};
 
-    /**%apidoc Length of the Bookmark (in milliseconds). */
+    /**%apidoc:integer Length of the Bookmark (in milliseconds). */
     std::chrono::milliseconds durationMs{0};
 
     /**%apidoc[opt]:stringArray List of tags attached to the Bookmark. */
@@ -103,7 +103,7 @@ struct NX_VMS_API Bookmark
     /**%apidoc[readonly] Id of the User created this bookmark. */
     QnUuid creatorUserId;
 
-    /**%apidoc[opt]
+    /**%apidoc[opt]:integer
      * Time of the Bookmark creation in milliseconds since epoch. Equals to startTimeMs field if
      * the Bookmark is created by the System.
      */
