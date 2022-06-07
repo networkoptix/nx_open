@@ -71,9 +71,9 @@ Ptr<IObjectMetadataPacket> DeviceAgent::generateObject(int64_t timestampUs)
     {
         m_trackContext.trackId = UuidHelper::randomUuid();
         m_trackContext.boundingBox.x = 0;
-        m_trackContext.boundingBox.y = 0.33;
-        m_trackContext.boundingBox.height = 0.33;
-        m_trackContext.boundingBox.width = 0.2;
+        m_trackContext.boundingBox.y = 0.33F;
+        m_trackContext.boundingBox.height = 0.33F;
+        m_trackContext.boundingBox.width = 0.2F;
     }
     else
     {

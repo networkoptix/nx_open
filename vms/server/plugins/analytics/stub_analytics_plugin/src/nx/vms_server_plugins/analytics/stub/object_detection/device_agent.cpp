@@ -75,7 +75,7 @@ Ptr<IMetadataPacket> DeviceAgent::generateObjectMetadataPacket(int64_t frameTime
         objects = generateObjects(kObjectAttributes, m_objectTypeIdsToGenerate);
     }
 
-    for (int i = 0; i < objects.size(); ++i)
+    for (int i = 0; i < (int) objects.size(); ++i)
     {
         objects[i]->setBoundingBox(generateBoundingBox(m_frameIndex, i, objects.size()));
         objects[i]->setTrackId(trackIdByTrackIndex(i));

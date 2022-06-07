@@ -23,9 +23,9 @@ using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
 static const int kTrackLength = 200;
-static const float kMaxObjectHeight = 0.25;
-static const float kObjectWidth = 0.15;
-static const float kDistanceBetweenObjects = 0.05;
+static const float kMaxObjectHeight = 0.25F;
+static const float kObjectWidth = 0.15F;
+static const float kDistanceBetweenObjects = 0.05F;
 
 static const std::string kObjectTypeId = "nx.stub.objectBestShotDemo";
 
