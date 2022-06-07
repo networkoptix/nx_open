@@ -210,6 +210,8 @@ CameraReplacementDialog::CameraReplacementDialog(
     d->resourceSelectionWidget->setTreeEntityFactoryFunction(
         treeEntityCreationFunction(cameraToBeReplaced, showServersInTree(context())));
 
+    ui->refreshButton->setIcon(qnSkin->icon("text_buttons/refresh.png"));
+
     setupUiContols();
     resize(minimumSizeHint());
     updateButtons();
@@ -231,6 +233,15 @@ CameraReplacementDialog::CameraReplacementDialog(
 
     connect(ui->backButton, &QPushButton::clicked,
         this, &CameraReplacementDialog::onBackButtonClicked);
+
+    connect(ui->refreshButton, &QPushButton::clicked, this,
+        [this]
+        {
+            d->resourceSelectionWidget->setSelectedResource({});
+            d->resourceSelectionWidget->setTreeEntityFactoryFunction(
+                treeEntityCreationFunction(d->cameraToBeReplaced, showServersInTree(context())));
+            d->resourceSelectionWidget->resourceViewWidget()->makeRequiredItemsVisible();
+        });
 }
 
 CameraReplacementDialog::~CameraReplacementDialog()
@@ -505,6 +516,7 @@ void CameraReplacementDialog::updateButtons()
                 && !d->cameraToBeReplaced.isNull());
             ui->nextButton->setText(tr("Next"));
             ui->backButton->setHidden(true);
+            ui->refreshButton->setHidden(false);
             break;
 
         case ReplacementApproval:
@@ -514,6 +526,7 @@ void CameraReplacementDialog::updateButtons()
             ui->nextButton->setText(tr("Next"));
             ui->backButton->setEnabled(!d->requestInProgress);
             ui->backButton->setHidden(false);
+            ui->refreshButton->setHidden(true);
             break;
 
         case ReplacementSummary:
@@ -521,6 +534,7 @@ void CameraReplacementDialog::updateButtons()
             ui->nextButton->setEnabled(true);
             ui->nextButton->setText(tr("Finish"));
             ui->backButton->setHidden(true);
+            ui->refreshButton->setHidden(true);
             break;
 
         default:
