@@ -94,12 +94,12 @@
     </message>
     <message>
       <source>The server&amp;apos;s certificate was rejected.</source>
-      <translation type="unfinished">The server&amp;apos;s certificate was rejected.</translation>
+      <translation>此伺服器的憑證遭拒。</translation>
     </message>
     <message>
       <source>Restore the connection to %1 and try again</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Restore the connection to %1 and try again</translation>
+      <translation>恢復與%1的連線並請重試</translation>
     </message>
     <message>
       <source>%1 user login is temporarily unavailable</source>
@@ -210,7 +210,7 @@
     <message>
       <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</translation>
+      <translation>在%2中關閉"每次使用%1帳戶登入時皆要求輸入驗證碼"選項來登入此系統</translation>
     </message>
   </context>
 </TS>

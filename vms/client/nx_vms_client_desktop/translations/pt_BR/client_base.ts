@@ -26,7 +26,7 @@
     <message numerus="yes">
       <source>%1 with %n attributes</source>
       <translation>
-        <numerusform>%1 Com %n atributos</numerusform>
+        <numerusform>%1 com %n atributos</numerusform>
         <numerusform>%1 Com %n atributos</numerusform>
       </translation>
     </message>
@@ -1009,7 +1009,7 @@
     </message>
     <message>
       <source>Copy Bookmarks Text</source>
-      <translation>Copiar texto dos favoritos</translation>
+      <translation>Copiar texto dos marcadores</translation>
     </message>
     <message>
       <source>Web Page Settings...</source>
@@ -1017,7 +1017,7 @@
     </message>
     <message>
       <source>Account Security...</source>
-      <translation type="unfinished">Account Security...</translation>
+      <translation>Segurança da conta...</translation>
     </message>
   </context>
   <context>
@@ -1677,8 +1677,8 @@
     <message numerus="yes">
       <source>and %n more</source>
       <translation>
-        <numerusform>and %n more</numerusform>
-        <numerusform>and %n more</numerusform>
+        <numerusform>e mais %n</numerusform>
+        <numerusform>e mais %n</numerusform>
       </translation>
     </message>
   </context>
@@ -2809,7 +2809,7 @@ a %1</translation>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Erro interno %1. Por favor contacte a equipe de suporte.</translation>
+      <translation>Erro interno %1. Entre em contato com a equipe de suporte.</translation>
     </message>
   </context>
   <context>
@@ -2944,11 +2944,11 @@ a %1</translation>
     </message>
     <message>
       <source>System is not compatible with two-factor authentication</source>
-      <translation type="unfinished">System is not compatible with two-factor authentication</translation>
+      <translation>O sistema não é compatível com autenticação de dois fatores</translation>
     </message>
     <message>
       <source>Failed to log in to &quot;%1&quot; system</source>
-      <translation type="unfinished">Failed to log in to &quot;%1&quot; system</translation>
+      <translation>Falha ao fazer login no sistema &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -4529,7 +4529,7 @@ a %1</translation>
     </message>
     <message>
       <source>Enter Fullscreen</source>
-      <translation>Entrar em tela cheia</translation>
+      <translation>Entrar no modo de tela cheia</translation>
     </message>
   </context>
   <context>
@@ -4854,7 +4854,7 @@ a %1</translation>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
-      <translation type="unfinished">Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</translation>
+      <translation>Os servidores com failover ativado irão automaticamente capturar câmeras de servidores offline com a mesma ID de Localização.</translation>
     </message>
   </context>
   <context>
@@ -7581,7 +7581,7 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation>Mostrar todas as câmaras</translation>
+      <translation>Mostrar todas as câmeras</translation>
     </message>
     <message>
       <source>Select Devices</source>
@@ -7601,7 +7601,7 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     </message>
     <message>
       <source>No cameras available</source>
-      <translation type="unfinished">No cameras available</translation>
+      <translation>Nenhuma câmera disponível</translation>
     </message>
   </context>
   <context>
@@ -8461,7 +8461,7 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     </message>
     <message>
       <source>No Failover</source>
-      <translation type="unfinished">No Failover</translation>
+      <translation>Sem failover</translation>
     </message>
   </context>
   <context>
@@ -9243,7 +9243,7 @@ Você pode forçá-lo, mas pode aumentar significativamente a carga da CPU.</tra
     </message>
     <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
-      <translation type="unfinished">There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</translation>
+      <translation>Não há espaço suficiente em seu computador para baixar a atualização do Cliente. Por favor, libere algum espaço no seu disco rígido e tente novamente.</translation>
     </message>
   </context>
   <context>
@@ -9562,7 +9562,7 @@ Você pode forçá-lo, mas pode aumentar significativamente a carga da CPU.</tra
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation>Proxying todo o conteúdo expõe qualquer serviço ou dispositivo na rede do servidor&apos;s aos usuários desta página</translation>
+      <translation>O proxy de todo o conteúdo expõe qualquer serviço ou dispositivo na rede do servidor&apos;s aos usuários desta página da web</translation>
     </message>
   </context>
   <context>
@@ -10097,19 +10097,19 @@ Não fixe este certificado se você&apos;t modificou o certificado SSL %2 servid
     </message>
     <message>
       <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
-      <translation type="unfinished">You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</translation>
+      <translation>Você tentou se conectar a este servidor, mas apresentou um certificado que não pode ser verificado automaticamente.</translation>
     </message>
     <message>
       <source>Someone may be impersonating this Server to steal your personal information.</source>
-      <translation type="unfinished">Someone may be impersonating this Server to steal your personal information.</translation>
+      <translation>Alguém pode estar se passando por este Servidor para roubar suas informações pessoais.</translation>
     </message>
     <message>
       <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
-      <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
+      <translation>Não se conecte a este servidor a menos que instruído pelo administrador do VMS.</translation>
     </message>
     <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
-      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct Server.</translation>
+      <translation>Revise os detalhes do certificado&apos;s para certificar-se de que você está se conectando ao servidor correto.</translation>
     </message>
   </context>
   <context>
@@ -10923,7 +10923,7 @@ Não fixe este certificado se você&apos;t modificou o certificado SSL %2 servid
     <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
     <message>
       <source>Cannot find an item with the specified id</source>
-      <translation>Não é possível encontrar um item com o Id especificado</translation>
+      <translation>Não é possível encontrar um ‘item’ com o Id especificado</translation>
     </message>
     <message>
       <source>Cannot find a resource with the specified id.</source>
@@ -11391,7 +11391,7 @@ Você pode selecionar outro local de armazenamento na &quot;Gerenciamento de arm
     </message>
     <message>
       <source>Press Esc to stop the tour.</source>
-      <translation>Pressione Esc para parar o tour.</translation>
+      <translation>Pressione Esc para interromper o tour.</translation>
     </message>
   </context>
   <context>

@@ -251,7 +251,7 @@
     </message>
     <message>
       <source>Pending</source>
-      <translation type="unfinished">Pending</translation>
+      <translation>等待中</translation>
     </message>
   </context>
   <context>
@@ -325,7 +325,7 @@
     </message>
     <message>
       <source>360° Equirectangular</source>
-      <translation type="unfinished">360° Equirectangular</translation>
+      <translation>360° 等量投影(Equirectangular)</translation>
     </message>
   </context>
   <context>
@@ -336,7 +336,7 @@
     </message>
     <message>
       <source>See %1 for other events</source>
-      <translation type="unfinished">See %1 for other events</translation>
+      <translation>其他事件請參考 %1</translation>
     </message>
     <message>
       <source>No events</source>
@@ -432,7 +432,7 @@
     </message>
     <message>
       <source>Camera roll correction</source>
-      <translation type="unfinished">Camera roll correction</translation>
+      <translation>攝影機滾動校正</translation>
     </message>
     <message>
       <source>Lens projection</source>
@@ -533,7 +533,7 @@
     </message>
     <message>
       <source>Toggle Repeat</source>
-      <translation type="unfinished">Toggle Repeat</translation>
+      <translation>循環播放</translation>
     </message>
   </context>
   <context>
@@ -579,7 +579,7 @@
     </message>
     <message>
       <source>Log in to the system to configure how to open layouts</source>
-      <translation type="unfinished">Log in to the system to configure how to open layouts</translation>
+      <translation>登入系統來設定打開佈局的方式</translation>
     </message>
   </context>
   <context>
@@ -645,7 +645,7 @@
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+      <translation>在時間軸上選取一段區間並點擊右鍵來建立書籤</translation>
     </message>
   </context>
   <context>
@@ -1057,7 +1057,7 @@ to activate PTZ</source>
     <name>SphereDewarpingSettings</name>
     <message>
       <source>Horizon correction</source>
-      <translation type="unfinished">Horizon correction</translation>
+      <translation>水平校正</translation>
     </message>
     <message>
       <source>Reset</source>

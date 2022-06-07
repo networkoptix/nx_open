@@ -358,15 +358,15 @@
     </message>
     <message>
       <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</translation>
+      <translation>若已停用，請嘗試到I/O模組設定中啟用錄影並降低幀率設定 (錯誤&quot;%1&quot;)。</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</translation>
+      <translation>若已停用，請嘗試到設備設定中啟用錄影並降低幀率設定 (錯誤&quot;%1&quot;)。</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</translation>
+      <translation>若已停用，請嘗試到攝影機設定中啟用錄影並降低幀率設定 (錯誤&quot;%1&quot;)。</translation>
     </message>
   </context>
   <context>
@@ -1689,15 +1689,15 @@
     </message>
     <message>
       <source>Failed to backup file </source>
-      <translation type="unfinished">Failed to backup file </translation>
+      <translation>備份檔案失敗 </translation>
     </message>
     <message>
       <source>Server Certificate Error</source>
-      <translation type="unfinished">Server Certificate Error</translation>
+      <translation>伺服器憑證錯誤</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
-      <translation type="unfinished">Server &quot;%1&quot; certificate error</translation>
+      <translation>伺服器&quot;%1&quot; 憑證錯誤</translation>
     </message>
   </context>
   <context>

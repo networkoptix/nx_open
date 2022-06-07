@@ -1736,7 +1736,7 @@
     </message>
     <message>
       <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
-      <translation type="unfinished">On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</translation>
+      <translation>第一次连线时，若服务器绑定非公开凭证，需先由您确认以进行连线</translation>
     </message>
   </context>
   <context>
@@ -3896,7 +3896,7 @@ to %1</source>
     </message>
     <message>
       <source>Object Search</source>
-      <translation type="unfinished">Object Search</translation>
+      <translation>物件搜寻</translation>
     </message>
   </context>
   <context>
@@ -4464,7 +4464,7 @@ to %1</source>
     </message>
     <message>
       <source>Enter Fullscreen</source>
-      <translation type="unfinished">Enter Fullscreen</translation>
+      <translation>全屏模式</translation>
     </message>
   </context>
   <context>
@@ -4762,19 +4762,19 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Certificates</source>
-      <translation type="unfinished">
-        <numerusform>Certificates</numerusform>
+      <translation>
+        <numerusform>凭证</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server utilizes these %n SSL certificates to authenticate its identity</source>
-      <translation type="unfinished">
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
+      <translation>
+        <numerusform>服务器将使用此 %n SSL凭证来验证身分。</numerusform>
       </translation>
     </message>
     <message>
       <source>Certificate received from the server doesn&apos;t match the certificate this server is pinned to.</source>
-      <translation type="unfinished">Certificate received from the server doesn&apos;t match the certificate this server is pinned to.</translation>
+      <translation>服务器传送的与其绑定的凭证不一致。</translation>
     </message>
     <message>
       <source>Details</source>
@@ -4782,7 +4782,7 @@ to %1</source>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
-      <translation type="unfinished">Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</translation>
+      <translation>已启用备援移转的服务器将自动接手具有离线服务器(同样区域ID)中的摄像机</translation>
     </message>
   </context>
   <context>
@@ -5319,7 +5319,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Storage is available but will not be writable because it is too small in comparison to the already present storages</source>
-      <translation type="unfinished">Storage is available but will not be writable because it is too small in comparison to the already present storages</translation>
+      <translation>由于此储存装置容量过小(与其他现有装置相比)，故将此装置转为保留、不允许写入。</translation>
     </message>
   </context>
   <context>
@@ -6617,27 +6617,27 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>虚拟摄像机、USB或网络摄影机无法移动至其他服务器，下列设备将会保留在服务器%1:</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>USB或者内置摄像机无法移动至其他服务器，下列设备将会保留在服务器%1:</translation>
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">Virtual cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>虚拟摄像机无法移动至其他服务器，下列设备将会保留在服务器%1:</translation>
     </message>
     <message>
       <source>Move Group without Them</source>
-      <translation type="unfinished">Move Group without Them</translation>
+      <translation>移动群组且不包含这些资源</translation>
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers</source>
-      <translation>虚拟摄像机、USB 或网络摄像机无法移动去其他服务器</translation>
+      <translation>虚拟摄像机、USB 或内置摄像机无法移动去其他服务器</translation>
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains virtual cameras, USB or web cameras</source>
-      <translation>选取项目中可能包含虚拟摄像机、USB 或网络摄像机，故%1无法被移动去其他服务器</translation>
+      <translation>选取项目中可能包含虚拟摄像机、USB 或内置摄像机，故%1无法被移动去其他服务器</translation>
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers</source>
@@ -6649,11 +6649,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers</source>
-      <translation>USB 或网络摄像机无法移动去其他服务器</translation>
+      <translation>USB 或内置摄像机无法移动去其他服务器</translation>
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains USB or web cameras</source>
-      <translation>%1 无法被移动去其他服务器，因为包含 USB 或网络摄像机</translation>
+      <translation>%1 无法被移动去其他服务器，因为包含 USB 或内置摄像机</translation>
     </message>
   </context>
   <context>
@@ -6943,39 +6943,39 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Use audio stream from</source>
-      <translation type="unfinished">Use audio stream from</translation>
+      <translation>使用以下设备的音频流</translation>
     </message>
     <message>
       <source>Transmit audio stream to</source>
-      <translation type="unfinished">Transmit audio stream to</translation>
+      <translation>将音频流传输到</translation>
     </message>
     <message>
       <source>This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</source>
-      <translation type="unfinished">This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</translation>
+      <translation>侦测不到此设备的音频输入或设置错误，请选择另一台设备作为音频源。</translation>
     </message>
     <message>
       <source>This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</source>
-      <translation type="unfinished">This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</translation>
+      <translation>侦测不到此摄像机的音频输入或设置错误，请选择另一台摄像机作为音频源。</translation>
     </message>
     <message>
       <source>This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</source>
-      <translation type="unfinished">This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</translation>
+      <translation>侦测不到此设备的音频输出或设置错误，请选择另一台设备播放。</translation>
     </message>
     <message>
       <source>This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</source>
-      <translation type="unfinished">This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</translation>
+      <translation>侦测不到此摄像机的音频输入或设置错误，请选择另一台摄像机播放。</translation>
     </message>
     <message>
       <source>Use this device for audio output</source>
-      <translation type="unfinished">Use this device for audio output</translation>
+      <translation>使用此设备进行音频输出</translation>
     </message>
     <message>
       <source>Use this camera for audio output</source>
-      <translation type="unfinished">Use this camera for audio output</translation>
+      <translation>使用此摄像机进行音频输出</translation>
     </message>
     <message>
       <source>Use audio stream from another device</source>
-      <translation type="unfinished">Use audio stream from another device</translation>
+      <translation>使用其他设备的音频流</translation>
     </message>
     <message>
       <source>Use audio stream from another camera</source>
@@ -6991,27 +6991,27 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</translation>
+      <translation>无法侦测到所选设备的音频输入或设置未完成，无法取得音频。</translation>
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</translation>
+      <translation>无法侦测到所选设备的音频输出或设置未完成，无法取得音频。</translation>
     </message>
     <message>
       <source>The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
-      <translation type="unfinished">The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</translation>
+      <translation>无法侦测到所选设备的音频输入或配置不正确，无法取得音频。</translation>
     </message>
     <message>
       <source>The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
-      <translation type="unfinished">The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</translation>
+      <translation>无法侦测到所选摄像机的音频输入或设置错误，无法取得音讯</translation>
     </message>
     <message>
       <source>The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
-      <translation type="unfinished">The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</translation>
+      <translation>无法侦测到所选设备的音频输出或配置不正确，无法双向语音通话</translation>
     </message>
     <message>
       <source>The selected camera does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
-      <translation type="unfinished">The selected camera does not have an audio output, or it is not configured correctly. 2-way audio is not available.</translation>
+      <translation>无法侦测到所选摄像机的音频输出或配置不正确，无法双向语音通话</translation>
     </message>
     <message>
       <source>Use audio stream from this device</source>
@@ -7078,7 +7078,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupSettingsDecoratorModel</name>
     <message>
       <source>The camera has neither recorded footage nor recording scheduled</source>
-      <translation type="unfinished">The camera has neither recorded footage nor recording scheduled</translation>
+      <translation>沒有此摄像机的录像资料亦没有启用录制计画</translation>
     </message>
     <message>
       <source>Motion detection is disabled</source>
@@ -7125,7 +7125,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>
     <message>
       <source>Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</source>
-      <translation type="unfinished">Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</translation>
+      <translation>可透过%1或%2选取多台设备以进行批次编辑，也可使用%3来选择所有设备。</translation>
     </message>
     <message>
       <source>What to backup</source>
@@ -7169,11 +7169,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Backup will be turned on for new added cameras on all servers in the system.</source>
-      <translation type="unfinished">Backup will be turned on for new added cameras on all servers in the system.</translation>
+      <translation>系统中所有服务器上新加入的摄像机将自动启用备份设定功能</translation>
     </message>
     <message>
       <source>Backup will be turned off for new added cameras on all servers in the system.</source>
-      <translation type="unfinished">Backup will be turned off for new added cameras on all servers in the system.</translation>
+      <translation>系统中所有服务器上新加入的摄像机将不做任何备份</translation>
     </message>
     <message>
       <source>Storage Management</source>
@@ -7182,7 +7182,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation type="unfinished">To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</translation>
+      <translation>若需启用备份功能，请先于%1新增备份储存装置(或可将部分主要储存位置改为备份)</translation>
     </message>
     <message>
       <source>To enable backup add more drives to use them as backup storage in %1</source>
@@ -7260,11 +7260,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraButtonController</name>
     <message>
       <source>Heater</source>
-      <translation type="unfinished">Heater</translation>
+      <translation>加热器</translation>
     </message>
     <message>
       <source>Wiper</source>
-      <translation type="unfinished">Wiper</translation>
+      <translation>雨刷</translation>
     </message>
   </context>
   <context>
@@ -7567,11 +7567,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Change invalid schedule to &quot;Record Always&quot;</source>
-      <translation type="unfinished">Change invalid schedule to &quot;Record Always&quot;</translation>
+      <translation>无效的录制计画设置将被更改为&quot;全时录像&quot;模式</translation>
     </message>
     <message>
       <source>Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</source>
-      <translation type="unfinished">Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</translation>
+      <translation>此摄像机录制计画中，部份使用无效的录像模式:%1，这些排程时间将改以&quot;全时录影&quot;模式执行</translation>
     </message>
     <message>
       <source>Motion Only</source>
@@ -7602,43 +7602,43 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraSettingsDialogStateConversionFunctions</name>
     <message numerus="yes">
       <source>Failed to enable audio on %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to enable audio on %n devices</numerusform>
+      <translation>
+        <numerusform>在 %n 设备上启用音频失败</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These devices do not have audio inputs or are not configured correctly.</source>
-      <translation type="unfinished">
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
+      <translation>
+        <numerusform>无法侦测到这些设备的音频输入或设置不正确。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to enable 2-way audio on %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
+      <translation>
+        <numerusform>在 %n 设备上启用双向语音失败。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These devices do not have audio outputs or are not configured correctly.</source>
-      <translation type="unfinished">
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
+      <translation>
+        <numerusform>无法侦测到这些设备的音频输出或设置不正确。</numerusform>
       </translation>
     </message>
     <message>
       <source>Audio will be disabled</source>
-      <translation type="unfinished">Audio will be disabled</translation>
+      <translation>音频将被停用</translation>
     </message>
     <message>
       <source>You need to select a device that will provide audio.</source>
-      <translation type="unfinished">You need to select a device that will provide audio.</translation>
+      <translation>请选择支援音频源的设备</translation>
     </message>
     <message>
       <source>2-way audio will be disabled</source>
-      <translation type="unfinished">2-way audio will be disabled</translation>
+      <translation>双向语音将被停用</translation>
     </message>
     <message>
       <source>You need to select a device to transmit the audio stream to and use for audio playback.</source>
-      <translation type="unfinished">You need to select a device to transmit the audio stream to and use for audio playback.</translation>
+      <translation>请选择设备传输与播放音频。</translation>
     </message>
   </context>
   <context>
@@ -7653,8 +7653,8 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>%1 are required</source>
       <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are required</numerusform>
+      <translation>
+        <numerusform>需要 %1</numerusform>
       </translation>
     </message>
   </context>
@@ -7674,11 +7674,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Invalid stream address</source>
-      <translation type="unfinished">Invalid stream address</translation>
+      <translation>无效的串流地址</translation>
     </message>
     <message>
       <source>Streaming protocol mismatch</source>
-      <translation type="unfinished">Streaming protocol mismatch</translation>
+      <translation>串流协议不匹配</translation>
     </message>
   </context>
   <context>
@@ -7686,7 +7686,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Select a certificate to authenticate yourself to %1:</source>
       <extracomment>%1 here is a host name for which you provide a certificate.</extracomment>
-      <translation type="unfinished">Select a certificate to authenticate yourself to %1:</translation>
+      <translation>请选择与%1 验证时所使用的凭证</translation>
     </message>
     <message>
       <source>Select</source>
@@ -9805,15 +9805,15 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Failed to set archive encryption password</source>
-      <translation type="unfinished">Failed to set archive encryption password</translation>
+      <translation>录像资料加密的密码设置失败</translation>
     </message>
     <message>
       <source>Does not affect the connections established by server.</source>
-      <translation type="unfinished">Does not affect the connections established by server.</translation>
+      <translation>不影响服务器建立的连接。</translation>
     </message>
     <message>
       <source>Enables RTSP traffic encryption.</source>
-      <translation type="unfinished">Enables RTSP traffic encryption.</translation>
+      <translation>启用 RTSP 流量加密。</translation>
     </message>
     <message>
       <source>days</source>
@@ -9821,16 +9821,16 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
-      <translation type="unfinished">Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</translation>
+      <translation>若本机与LDAP用户连线超过限制时间，用户将自动被登出。</translation>
     </message>
     <message>
       <source>Unlimited user session lifetime threatens overall System security and may lead to degradation in System performance</source>
-      <translation type="unfinished">Unlimited user session lifetime threatens overall System security and may lead to degradation in System performance</translation>
+      <translation>未限制用户连线时间将可能影响系统效能，并有潜在安全性问题</translation>
     </message>
     <message>
       <source>It is recommended to have user session lifetime not greater than %1</source>
       <comment>%1 is the time span with time units</comment>
-      <translation type="unfinished">It is recommended to have user session lifetime not greater than %1</translation>
+      <translation>建议用户连线时间低于 %1</translation>
     </message>
     <message>
       <source>Learn more.</source>
@@ -9839,8 +9839,8 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message numerus="yes">
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
       <comment>%n is digest user count, %1 is total user count</comment>
-      <translation type="unfinished">
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
+      <translation>
+        <numerusform>%1个用户中有%n个用户允许使用Digest验证(较不安全)。</numerusform>
       </translation>
     </message>
   </context>
@@ -9848,60 +9848,60 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <name>nx::vms::client::desktop::ServerCertificateError</name>
     <message>
       <source>Failed to connect to server</source>
-      <translation type="unfinished">Failed to connect to server</translation>
+      <translation>无法与服务器连接</translation>
     </message>
     <message>
       <source>View certificate</source>
-      <translation type="unfinished">View certificate</translation>
+      <translation>检视凭证</translation>
     </message>
     <message>
       <source>Server certificate is invalid.</source>
-      <translation type="unfinished">Server certificate is invalid.</translation>
+      <translation>无效的服务器凭证。</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
     <message>
       <source>The certificate is pinned to %1</source>
-      <translation type="unfinished">The certificate is pinned to %1</translation>
+      <translation>此凭证已绑定至 %1</translation>
     </message>
     <message>
       <source>The certificate was presented by %1</source>
-      <translation type="unfinished">The certificate was presented by %1</translation>
+      <translation>此凭证由 %1提供</translation>
     </message>
     <message>
       <source>Server Id: %1</source>
-      <translation type="unfinished">Server Id: %1</translation>
+      <translation>服务器ID： %1</translation>
     </message>
     <message>
       <source>This certificate does not match the certificate %1 is pinned to.</source>
-      <translation type="unfinished">This certificate does not match the certificate %1 is pinned to.</translation>
+      <translation>此凭证与%1所绑定的凭证不一致。</translation>
     </message>
     <message>
       <source>Custom certificate</source>
-      <translation type="unfinished">Custom certificate</translation>
+      <translation>自定义凭证</translation>
     </message>
     <message>
       <source>Pinned certificate</source>
-      <translation type="unfinished">Pinned certificate</translation>
+      <translation>绑定的凭证</translation>
     </message>
     <message>
       <source>Unknown certificate</source>
-      <translation type="unfinished">Unknown certificate</translation>
+      <translation>未知的凭证</translation>
     </message>
     <message>
       <source>This is a custom certificate installed on %1</source>
-      <translation type="unfinished">This is a custom certificate installed on %1</translation>
+      <translation>此为安装于%1上的自订凭证</translation>
     </message>
     <message>
       <source>Pin this certificate to %1?</source>
-      <translation type="unfinished">Pin this certificate to %1?</translation>
+      <translation>是否将此凭证绑定至 %1?</translation>
     </message>
     <message>
       <source>Someone may be impersonating %1 to steel your personal information.
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steel your personal information.
-Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
+      <translation>可能有人冒充%1 来窃取您隐私资料的风险。
+若您没有修改%2服务器的凭证，请不要绑定此凭证。</translation>
     </message>
     <message>
       <source>Pin</source>
@@ -9912,15 +9912,15 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
     <message>
       <source>View certificate</source>
-      <translation type="unfinished">View certificate</translation>
+      <translation>检视凭证</translation>
     </message>
     <message>
       <source>Connect Anyway</source>
-      <translation type="unfinished">Connect Anyway</translation>
+      <translation>继续连线</translation>
     </message>
     <message>
       <source>I trust this server</source>
-      <translation type="unfinished">I trust this server</translation>
+      <translation>信任此台服务器</translation>
     </message>
     <message>
       <source>System:</source>
@@ -9932,31 +9932,31 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Server ID:</source>
-      <translation type="unfinished">Server ID:</translation>
+      <translation>服务器 ID:</translation>
     </message>
     <message>
       <source>Trust this server?</source>
-      <translation type="unfinished">Trust this server?</translation>
+      <translation>信任此台服务器?</translation>
     </message>
     <message>
       <source>Cannot verify the identity of %1</source>
-      <translation type="unfinished">Cannot verify the identity of %1</translation>
+      <translation>无法验证 %1的身份</translation>
     </message>
     <message>
       <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
-      <translation type="unfinished">You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</translation>
+      <translation>您尝试连接到此服务器，该凭证无法被自动校验。</translation>
     </message>
     <message>
       <source>Someone may be impersonating this Server to steal your personal information.</source>
-      <translation type="unfinished">Someone may be impersonating this Server to steal your personal information.</translation>
+      <translation>此服务器有可能被冒充来窃取您的隐私资料。</translation>
     </message>
     <message>
       <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
-      <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
+      <translation>连接到此服务器之前，请先向您的VMS管理员确认。</translation>
     </message>
     <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
-      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct Server.</translation>
+      <translation>请检查凭证内容以确保连接到正确的服务器。</translation>
     </message>
   </context>
   <context>
@@ -9969,7 +9969,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>There are no suitable servers</source>
-      <translation type="unfinished">There are no suitable servers</translation>
+      <translation>没有合适的服务器</translation>
     </message>
   </context>
   <context>
@@ -10040,7 +10040,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>unknown status</source>
-      <translation type="unfinished">unknown status</translation>
+      <translation>未知状态</translation>
     </message>
   </context>
   <context>
@@ -10148,7 +10148,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>可尝试更改筛选条件或启用移动侦测录像模式</translation>
     </message>
   </context>
   <context>
@@ -10172,13 +10172,13 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message numerus="yes">
       <source>Recording schedule is invalid for %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
+      <translation>
+        <numerusform>%n 台摄像机的录制计划无效</numerusform>
       </translation>
     </message>
     <message>
       <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
-      <translation type="unfinished">Recording schedule on some cameras contains recording modes that are not supported.</translation>
+      <translation>某些摄像机的录制计划包含不受支持的录制模式。</translation>
     </message>
   </context>
   <context>
@@ -10438,7 +10438,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>You will be able to access the %1 login menu at any time by clicking the cloud icon on the navigation panel.</source>
-      <translation type="unfinished">You will be able to access the %1 login menu at any time by clicking the cloud icon on the navigation panel.</translation>
+      <translation>您可以随时通过点击导航面板上的Nx Cloud图标登录 %1 。</translation>
     </message>
     <message>
       <source>Hide</source>
@@ -10446,7 +10446,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Unable to connect to the system because it has become offline</source>
-      <translation type="unfinished">Unable to connect to the system because it has become offline</translation>
+      <translation>系统已脱机，无法连接</translation>
     </message>
   </context>
   <context>
@@ -10756,7 +10756,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::jsapi::detail::ResourcesApiBackend</name>
     <message>
       <source>Resource is not available for the usage with JS API</source>
-      <translation type="unfinished">Resource is not available for the usage with JS API</translation>
+      <translation>资源不能使用于 JS API</translation>
     </message>
   </context>
   <context>
@@ -10813,7 +10813,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::ui::AnalyticsSdkObjectDetectedWidget</name>
     <message>
       <source>Analytics object detection can be set up on a certain cameras.</source>
-      <translation type="unfinished">Analytics object detection can be set up on a certain cameras.</translation>
+      <translation>可于特定摄像机上启用物件侦测功能</translation>
     </message>
     <message>
       <source>Choose cameras using the button above to see the list of supported events.</source>
@@ -10821,7 +10821,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Event will trigger only if there are matches any of attributes. You can see the names of the attributes and their values on the Objects tab.</source>
-      <translation type="unfinished">Event will trigger only if there are matches any of attributes. You can see the names of the attributes and their values on the Objects tab.</translation>
+      <translation>仅当属性匹配时才会触发事件。您可以在“物件”选项卡上查看属性名称及其值。</translation>
     </message>
   </context>
   <context>
