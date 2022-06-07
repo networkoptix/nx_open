@@ -340,10 +340,10 @@ void DeviceAgent::reportIssues(const Issues& issues)
         return false;
     }
 
-    outBoundingBox->x = boundingBox[kTopLeftXField].number_value();
-    outBoundingBox->y = boundingBox[kTopLeftYfield].number_value();
-    outBoundingBox->width = boundingBox[kWidthField].number_value();
-    outBoundingBox->height = boundingBox[kHeightField].number_value();
+    outBoundingBox->x = (float) boundingBox[kTopLeftXField].number_value();
+    outBoundingBox->y = (float) boundingBox[kTopLeftYfield].number_value();
+    outBoundingBox->width = (float) boundingBox[kWidthField].number_value();
+    outBoundingBox->height = (float) boundingBox[kHeightField].number_value();
 
     if (outBoundingBox->x < 0 || outBoundingBox->y < 0
         || outBoundingBox->x + outBoundingBox->width > 1
@@ -388,7 +388,7 @@ void DeviceAgent::reportIssues(const Issues& issues)
     Issues* outIssues)
 {
     if (objectDescription[kTimestampUsField].is_number())
-        *outTimestampUs = objectDescription[kTimestampUsField].number_value();
+        *outTimestampUs = (int64_t) objectDescription[kTimestampUsField].number_value();
     else if (!objectDescription[kTimestampUsField].is_null())
         outIssues->warnings.insert(Issue::timestampIsNotANumber);
 
