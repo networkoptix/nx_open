@@ -94,12 +94,12 @@
     </message>
     <message>
       <source>The server&amp;apos;s certificate was rejected.</source>
-      <translation type="unfinished">The server&amp;apos;s certificate was rejected.</translation>
+      <translation>此伺服器的憑證遭拒。</translation>
     </message>
     <message>
       <source>Restore the connection to %1 and try again</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Restore the connection to %1 and try again</translation>
+      <translation>恢復與%1的連線並請重試</translation>
     </message>
     <message>
       <source>%1 user login is temporarily unavailable</source>

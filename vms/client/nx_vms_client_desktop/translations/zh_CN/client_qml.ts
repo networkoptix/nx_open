@@ -325,7 +325,7 @@
     </message>
     <message>
       <source>360° Equirectangular</source>
-      <translation type="unfinished">360° Equirectangular</translation>
+      <translation>360° 等量投影(Equirectangular)</translation>
     </message>
   </context>
   <context>
@@ -336,7 +336,7 @@
     </message>
     <message>
       <source>See %1 for other events</source>
-      <translation type="unfinished">See %1 for other events</translation>
+      <translation>其他事件请参考 %1</translation>
     </message>
     <message>
       <source>No events</source>
@@ -432,7 +432,7 @@
     </message>
     <message>
       <source>Camera roll correction</source>
-      <translation type="unfinished">Camera roll correction</translation>
+      <translation>摄像机滚动校正</translation>
     </message>
     <message>
       <source>Lens projection</source>
@@ -533,7 +533,7 @@
     </message>
     <message>
       <source>Toggle Repeat</source>
-      <translation type="unfinished">Toggle Repeat</translation>
+      <translation>循环播放</translation>
     </message>
   </context>
   <context>
@@ -579,7 +579,7 @@
     </message>
     <message>
       <source>Log in to the system to configure how to open layouts</source>
-      <translation type="unfinished">Log in to the system to configure how to open layouts</translation>
+      <translation>登录系统设置如何开启布局</translation>
     </message>
   </context>
   <context>
