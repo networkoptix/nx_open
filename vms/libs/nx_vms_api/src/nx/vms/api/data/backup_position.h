@@ -36,8 +36,11 @@ QN_FUSION_DECLARE_FUNCTIONS(BackupPositionIdData, (json), NX_VMS_API)
 
 struct NX_VMS_API BackupPosition: BackupPositionIdData
 {
+    /**%apidoc:integer */
     std::chrono::system_clock::time_point positionLowMs = kDefaultBackupPosition;
+    /**%apidoc:integer */
     std::chrono::system_clock::time_point positionHighMs = kDefaultBackupPosition;
+    /**%apidoc:integer */
     std::chrono::system_clock::time_point bookmarkStartPositionMs = kDefaultBackupPosition;
 
     const BackupPositionIdData& getId() const { return *this; }
@@ -59,7 +62,9 @@ struct NX_VMS_API BackupPositionEx: BackupPosition
     BackupPositionEx() = default;
     BackupPositionEx(const BackupPositionEx&) = default;
     BackupPositionEx(const BackupPosition& other);
+    /**%apidoc:integer */
     std::chrono::milliseconds toBackupLowMs{0};
+    /**%apidoc:integer */
     std::chrono::milliseconds toBackupHighMs{0};
 
     bool operator==(const BackupPositionEx& other) const = default;

@@ -56,7 +56,7 @@ struct NX_VMS_API ModuleInformation: ServerPortInformation
     QnUuid localSystemId;
     HwPlatform hwPlatform;
 
-    /**%apidoc Current time synchronized with the VMS System, in milliseconds since epoch. */
+    /**%apidoc:integer Current time synchronized with the VMS System, in milliseconds since epoch. */
     std::chrono::milliseconds synchronizedTimeMs{0};
 
     /**%apidoc Presented if the System is bound to the Cloud. */
@@ -118,6 +118,7 @@ NX_REFLECTION_INSTRUMENT(ModuleInformationWithAddresses, ModuleInformationWithAd
 struct NX_VMS_API TransactionLogTime
 {
     int64_t sequence{0};
+    /**%apidoc:integer */
     std::chrono::milliseconds ticksMs{0};
 
     TransactionLogTime(Timestamp t = {}): sequence(t.sequence), ticksMs(t.ticks) {}
@@ -146,14 +147,15 @@ struct NX_VMS_API ServerInformation: ModuleInformationWithAddresses
      */
     std::string certificatePem;
 
+    /**%apidoc:integer */
     std::chrono::milliseconds systemIdentityTimeMs{0};
     TransactionLogTime transactionLogTime;
     QStringList hardwareIds;
 
-    /**%apidoc Local OS time on the Server, in milliseconds since epoch. */
+    /**%apidoc:integer Local OS time on the Server, in milliseconds since epoch. */
     milliseconds osTimeMs = 0ms;
 
-    /**%apidoc Time zone offset, in milliseconds. */
+    /**%apidoc:integer Time zone offset, in milliseconds. */
     milliseconds timeZoneOffsetMs = 0ms;
 
     /**%apidoc Identification of the time zone in the text form. */

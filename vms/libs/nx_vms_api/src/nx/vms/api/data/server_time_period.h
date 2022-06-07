@@ -39,10 +39,10 @@ struct NX_VMS_API ServerTimePeriod
      */
     QnUuid serverId;
 
-    /** Start time in milliseconds. */
+    /**%apidoc:integer Start time in milliseconds. */
     std::chrono::milliseconds startTimeMs{0};
 
-    /**%apidoc[opt]
+    /**%apidoc[opt]:integer
      * Duration in milliseconds. In uninitialized state represents a video chunk
      * that is being recorded at the moment.
      */
