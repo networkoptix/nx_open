@@ -10,3 +10,5 @@ add_subdirectory(
 
 # Add generated config.h file to the list of known files to prevent ninja_tool from deleting it.
 nx_store_known_file(${CMAKE_BINARY_DIR}/artifacts/libsrtp/src/config.h)
+
+set_target_properties(srtp2 PROPERTIES FOLDER third_party)
