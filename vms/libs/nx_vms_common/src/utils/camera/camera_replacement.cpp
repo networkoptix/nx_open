@@ -37,6 +37,7 @@ bool cameraSupportsReplacement(const QnResourcePtr& resource)
         && !camera->isMultiSensorCamera()
         && !camera->isNvr()
         && !camera->isIOModule()
+        && camera->hasVideo()
         && !isArchiveCamera(camera);
 }
 
