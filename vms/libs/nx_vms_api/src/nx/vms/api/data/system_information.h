@@ -46,7 +46,7 @@ struct NX_VMS_API SystemInformation
     /**%apidoc For remote Systems only. */
     std::optional<SystemCompatibilityStatus> status;
 
-    /**%apidoc Synchronized time of the VMS System, in milliseconds since epoch. */
+    /**%apidoc:integer Synchronized time of the VMS System, in milliseconds since epoch. */
     std::chrono::milliseconds synchronizedTimeMs{0};
 
     SystemInformation() = default;

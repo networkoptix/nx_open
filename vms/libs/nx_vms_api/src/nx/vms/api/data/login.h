@@ -81,7 +81,9 @@ struct NX_VMS_API LoginSession
     /**%apidoc The session authorization token to be used as HTTP bearer token or URL parameter. */
     std::string token;
 
+    /**%apidoc:integer */
     std::chrono::seconds ageS{0};
+    /**%apidoc:integer */
     std::chrono::seconds expiresInS{0};
 };
 #define LoginSession_Fields (username)(token)(ageS)(expiresInS)
