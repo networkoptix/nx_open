@@ -215,6 +215,12 @@ void serialize(
         std::visit([ctx](auto&& arg) { serializeAdl(ctx, arg); }, val);
 }
 
+template<typename SerializationContext, typename T>
+void serialize(SerializationContext* ctx, const std::reference_wrapper<T>& val)
+{
+    serialize(ctx, val.get());
+}
+
 namespace detail {
 
 template<typename SerializationContext, typename Data>

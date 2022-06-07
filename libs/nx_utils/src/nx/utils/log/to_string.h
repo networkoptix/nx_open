@@ -207,6 +207,12 @@ QString toString(const std::shared_ptr<T>& value)
     return toString(value.get());
 }
 
+template<typename T>
+QString toString(std::reference_wrapper<T> value)
+{
+    return toString(value.get());
+}
+
 //-------------------------------------------------------------------------------------------------
 // Templates.
 
