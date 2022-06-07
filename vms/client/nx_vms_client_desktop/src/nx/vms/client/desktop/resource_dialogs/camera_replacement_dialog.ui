@@ -145,8 +145,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>598</width>
-            <height>258</height>
+            <width>98</width>
+            <height>28</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="dataTransferContentsLayout">
@@ -343,6 +343,22 @@
       <widget class="QPushButton" name="backButton">
        <property name="text">
         <string>Back</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="refreshButton">
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="text">
+        <string>Refresh</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+       <property name="flat">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

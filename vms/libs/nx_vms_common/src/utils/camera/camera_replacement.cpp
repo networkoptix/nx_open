@@ -60,6 +60,9 @@ bool cameraCanBeUsedAsReplacement(
     if (!NX_ASSERT(cameraToBeReplaced && replacementCamera))
         return false;
 
+    if (cameraToBeReplaced == replacementCamera)
+        return false;
+
     if (cameraToBeReplaced->getParentId() != replacementCamera->getParentId())
         return false;
 

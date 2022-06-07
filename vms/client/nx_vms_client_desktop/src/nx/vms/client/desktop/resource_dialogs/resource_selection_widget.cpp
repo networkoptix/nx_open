@@ -106,8 +106,6 @@ void ResourceSelectionWidget::Private::onItemClicked(const QModelIndex& index)
     if (!selectionDecoratorModel->toggleSelection(resourceIndex))
         return;
 
-    const auto selectedResources = selectionDecoratorModel->selectedResources();
-
     updateAlertMessage();
 
     emit q->selectionChanged();
@@ -254,7 +252,11 @@ QSet<QnResourcePtr> ResourceSelectionWidget::selectedResources() const
 
 void ResourceSelectionWidget::setSelectedResources(const QSet<QnResourcePtr>& resources)
 {
+    if (d->selectionDecoratorModel->selectedResources() == resources)
+        return;
+
     d->selectionDecoratorModel->setSelectedResources(resources);
+    emit selectionChanged();
 }
 
 QnUuidSet ResourceSelectionWidget::selectedResourcesIds() const
