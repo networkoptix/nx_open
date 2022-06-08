@@ -26,7 +26,7 @@
     <message numerus="yes">
       <source>%1 with %n attributes</source>
       <translation>
-        <numerusform>%1 Com %n atributos</numerusform>
+        <numerusform>%1 com %n atributos</numerusform>
         <numerusform>%1 Com %n atributos</numerusform>
       </translation>
     </message>
@@ -1009,7 +1009,7 @@
     </message>
     <message>
       <source>Copy Bookmarks Text</source>
-      <translation>Copiar texto dos favoritos</translation>
+      <translation>Copiar texto dos marcadores</translation>
     </message>
     <message>
       <source>Web Page Settings...</source>
@@ -2764,7 +2764,7 @@ a %1</translation>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Erro interno %1. Por favor contacte a equipe de suporte.</translation>
+      <translation>Erro interno %1. Entre em contato com a equipe de suporte.</translation>
     </message>
   </context>
   <context>
@@ -4480,7 +4480,7 @@ a %1</translation>
     </message>
     <message>
       <source>Enter Fullscreen</source>
-      <translation>Entrar em tela cheia</translation>
+      <translation>Entrar no modo de tela cheia</translation>
     </message>
   </context>
   <context>
@@ -7532,7 +7532,7 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation>Mostrar todas as câmaras</translation>
+      <translation>Mostrar todas as câmeras</translation>
     </message>
     <message>
       <source>Select Devices</source>
@@ -9505,7 +9505,7 @@ Você pode forçá-lo, mas pode aumentar significativamente a carga da CPU.</tra
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation>Proxying todo o conteúdo expõe qualquer serviço ou dispositivo na rede do servidor&apos;s aos usuários desta página</translation>
+      <translation>O proxy de todo o conteúdo expõe qualquer serviço ou dispositivo na rede do servidor&apos;s aos usuários desta página da web</translation>
     </message>
   </context>
   <context>
@@ -10866,7 +10866,7 @@ Não fixe este certificado se você&apos;t modificou o certificado SSL %2 servid
     <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
     <message>
       <source>Cannot find an item with the specified id</source>
-      <translation>Não é possível encontrar um item com o Id especificado</translation>
+      <translation>Não é possível encontrar um ‘item’ com o Id especificado</translation>
     </message>
     <message>
       <source>Cannot find a resource with the specified id.</source>
@@ -11334,7 +11334,7 @@ Você pode selecionar outro local de armazenamento na &quot;Gerenciamento de arm
     </message>
     <message>
       <source>Press Esc to stop the tour.</source>
-      <translation>Pressione Esc para parar o tour.</translation>
+      <translation>Pressione Esc para interromper o tour.</translation>
     </message>
   </context>
   <context>

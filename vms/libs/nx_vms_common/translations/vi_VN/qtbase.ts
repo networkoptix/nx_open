@@ -313,19 +313,19 @@ Press ESC to cancel</source>
     <name>QDateTimeParser</name>
     <message>
       <source>AM</source>
-      <translation>Sáng</translation>
+      <translation>AM</translation>
     </message>
     <message>
       <source>am</source>
-      <translation>sáng</translation>
+      <translation>am</translation>
     </message>
     <message>
       <source>PM</source>
-      <translation>Chiều</translation>
+      <translation>PM</translation>
     </message>
     <message>
       <source>pm</source>
-      <translation>chiều</translation>
+      <translation>pm</translation>
     </message>
   </context>
   <context>

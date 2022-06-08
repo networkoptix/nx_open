@@ -9992,8 +9992,8 @@ Waarschuwing: Dit wachtwoord kan niet worden gereset. Als je het verliest, is he
     <message>
       <source>Someone may be impersonating %1 to steel your personal information.
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
-      <translation>Iemand kan zich voordoen als %1 om uw persoonlijke gegevens te stelen.
-Pin dit certificaat niet vast als u het %2 server SSL-certificaat niet hebt gewijzigd.</translation>
+      <translation>Iemand imiteert %1 mogelijk om je persoonlijke gegevens te stuiten.
+Dit certificaat niet vastpinnen als je het hebt gedaan&apos;t de %2 server SSL certificaat wijzigen.</translation>
     </message>
     <message>
       <source>Pin</source>
@@ -10764,7 +10764,7 @@ Pin dit certificaat niet vast als u het %2 server SSL-certificaat niet hebt gewi
     <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
     <message>
       <source>Intercom Alarm Layout</source>
-      <translation>Intercom Alarmlayschermindeling</translation>
+      <translation>Intercom Alarmlay-out</translation>
     </message>
     <message>
       <source>Intercom Open Door</source>
@@ -11561,7 +11561,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Can&apos;t check client update availability. Check your internet connection and try again.</source>
-      <translation>Kan de beschikbaarheid van de client updates niet controleren. Controleer uw internetverbinding en probeer het opnieuw.</translation>
+      <translation>Kan de beschikbaarheid van&apos;niet controleren. Controleer uw internetverbinding en probeer het opnieuw.</translation>
     </message>
   </context>
 </TS>
