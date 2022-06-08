@@ -103,7 +103,7 @@
     </message>
     <message>
       <source>Use Hardware Video Decoding</source>
-      <translation type="unfinished">Use Hardware Video Decoding</translation>
+      <translation>Sử dụng phần cứng giải mã video</translation>
     </message>
     <message>
       <source>Server certificate validation</source>
@@ -156,7 +156,7 @@
     </message>
     <message>
       <source>Object Type:</source>
-      <translation type="unfinished">Object Type:</translation>
+      <translation>Loại đối tượng:</translation>
     </message>
   </context>
   <context>
@@ -592,7 +592,7 @@
     </message>
     <message>
       <source>Use Media2 to fetch profiles</source>
-      <translation type="unfinished">Use Media2 to fetch profiles</translation>
+      <translation>Sử dụng Media2 để nạp cấu hình</translation>
     </message>
     <message>
       <source>Use different values for pan and tilt</source>
@@ -616,7 +616,7 @@
     </message>
     <message>
       <source>RTP Transport</source>
-      <translation type="unfinished">RTP Transport</translation>
+      <translation>RTP Vận chuyển</translation>
     </message>
     <message>
       <source>Use camera native presets</source>
@@ -624,7 +624,7 @@
     </message>
     <message>
       <source>Time Settings</source>
-      <translation type="unfinished">Time Settings</translation>
+      <translation>Cài đặt thời gian</translation>
     </message>
     <message>
       <source>Keep camera time settings</source>
@@ -1239,7 +1239,7 @@
     </message>
     <message>
       <source>Play audio from all cameras on layout</source>
-      <translation type="unfinished">Play audio from all cameras on layout</translation>
+      <translation>Phát âm thanh từ tất cả các camera trên bố cục</translation>
     </message>
     <message>
       <source>Mute audio when the mic is active</source>
@@ -1326,7 +1326,7 @@
     </message>
     <message>
       <source>Export date</source>
-      <translation type="unfinished">Export date</translation>
+      <translation>Ngày xuất video</translation>
     </message>
     <message>
       <source>Font Size</source>
@@ -1677,7 +1677,7 @@
     </message>
     <message>
       <source>Show aim overlay for PTZ cameras</source>
-      <translation type="unfinished">Show aim overlay for PTZ cameras</translation>
+      <translation>Hiển thị lớp phủ có tiêu điểm cho camera PTZ</translation>
     </message>
   </context>
   <context>
@@ -2371,7 +2371,7 @@
     </message>
     <message>
       <source>Motion &amp;&amp; Objects</source>
-      <translation type="unfinished">Motion &amp;&amp; Objects</translation>
+      <translation>Chuyển động &amp;&amp; Đối tượng</translation>
     </message>
   </context>
   <context>
@@ -2398,11 +2398,11 @@
     </message>
     <message>
       <source>Data protection</source>
-      <translation type="unfinished">Data protection</translation>
+      <translation>Bảo vệ dữ liệu</translation>
     </message>
     <message>
       <source>Use only HTTPS to connect to cameras</source>
-      <translation type="unfinished">Use only HTTPS to connect to cameras</translation>
+      <translation>Chỉ sử dụng HTTPS để kết nối với camera</translation>
     </message>
     <message>
       <source>User Activity</source>
@@ -2430,7 +2430,7 @@
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation type="unfinished">Connection with cameras that do not support HTTPS will be lost.</translation>
+      <translation>Sẽ bị mất kết nối với camera không hỗ trợ HTTPS.</translation>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
@@ -2442,7 +2442,7 @@
     </message>
     <message>
       <source>Manage Users</source>
-      <translation type="unfinished">Manage Users</translation>
+      <translation>Quản lý người dùng</translation>
     </message>
   </context>
   <context>

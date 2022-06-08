@@ -205,12 +205,12 @@
     <message>
       <source>You can enable two-factor authentication in your %1.</source>
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">You can enable two-factor authentication in your %1.</translation>
+      <translation>U kunt tweefactorauthenticatie inschakelen in uw %1.</translation>
     </message>
     <message>
       <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</translation>
+      <translation>Om in te loggen op dit systeem, schakelt u "Vraag om een verificatiecode bij elke login met uw %1 -account" in uw %2.</translation>
     </message>
   </context>
 </TS>

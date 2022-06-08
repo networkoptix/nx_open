@@ -6601,7 +6601,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</translation>
+      <translation>提醒：此網頁經由Proxy且允許外部網路(非伺服器所在之內部網路)存取，若此網頁包含隱私或者僅供內部使用之服務，請務必確認存取權限及安全性確認。</translation>
     </message>
     <message>
       <source>Move anyway?</source>
@@ -7177,7 +7177,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Backup will be turned off for new added cameras on all servers in the system.</source>
-      <translation>系統中所有伺服器新加入的攝影機將不做任何備份</translation>
+      <translation>系統中所有伺服器新加入的攝影機將不會自動啟用備份設定</translation>
     </message>
     <message>
       <source>Storage Management</source>
@@ -7210,7 +7210,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Applies only to the cameras connected to current server.</source>
-      <translation>僅套用至目前連接至伺服器的攝影機</translation>
+      <translation>僅針對當前伺服器中的攝影機套用設定。</translation>
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n devices</source>
@@ -7420,7 +7420,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Choose a motion detection sensitivity and select some areas on the preview to set it for.</source>
-      <translation>選擇位移偵測靈敏度並在預覽影像上框選區域來設置</translation>
+      <translation>首先選擇位移偵測靈敏度，然後在預覽影像上框選並設定偵測區域</translation>
     </message>
   </context>
   <context>
@@ -7462,7 +7462,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation>顯示所有的攝影機</translation>
+      <translation>顯示所有攝影機</translation>
     </message>
     <message>
       <source>Select Devices</source>
@@ -7599,7 +7599,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Motion &amp; Objects + Lo-Res</source>
-      <translation>主串流位移、物件偵測+次串流全時錄影</translation>
+      <translation>主串流位移和物件偵測+次串流全時錄影</translation>
     </message>
   </context>
   <context>
@@ -7741,7 +7741,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>There is no enough space to download update file</source>
-      <translation>系統空間不足，無法下載更新檔。</translation>
+      <translation>系統可用空間不足，無法下載更新檔。</translation>
     </message>
   </context>
   <context>
@@ -7823,11 +7823,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ConnectToCloudTool</name>
     <message>
       <source>Local System owner is absent or disabled.</source>
-      <translation>本機系統所有者帳戶已不存在或被禁用。</translation>
+      <translation>系統中沒有系統所有者帳戶或已被停用。</translation>
     </message>
     <message>
       <source>None of your Servers is connected to the Internet.</source>
-      <translation>伺服器皆無可用的網際網路連線</translation>
+      <translation>系統中的所有伺服器均無可用的網際網路連線</translation>
     </message>
     <message>
       <source>System connected to %1</source>
@@ -7852,7 +7852,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Enter your account password to connect System to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>請輸入您的帳戶密碼來將系統連線至 %1</translation>
+      <translation>請輸入您的帳戶密碼來將系統連接至 %1</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -7940,7 +7940,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
-      <translation>所選攝影機的錄影排程包含不支援的錄影模式。若攝影機不支援此錄影模式，則設定會被改成&quot;全時錄影&quot;</translation>
+      <translation>指定的錄影模式無法套用至全部已選取的攝影機。若某攝影機不支援此指定的錄影模式，則將自動設定為&quot;全時錄影&quot;</translation>
     </message>
   </context>
   <context>
@@ -8056,7 +8056,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</source>
-      <translation>設備搜尋僅限於支援HTTPS連線的攝影機，可於%1頁面中更改設定。</translation>
+      <translation>設備搜尋將僅限於支援HTTPS連線的攝影機，若需變更，請於%1頁面中修改設定。</translation>
     </message>
     <message>
       <source>System Administration</source>
@@ -8127,7 +8127,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation>請嘗試更改過濾條件或者新增事件規則</translation>
+      <translation>請嘗試更改篩選條件或者新增事件規則</translation>
     </message>
   </context>
   <context>
@@ -9423,7 +9423,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</translation>
+      <translation>提醒：此網頁經由Proxy且允許外部網路(非伺服器所在之內部網路)存取，若此網頁包含隱私或者僅供內部使用之服務，請務必確認存取權限及安全性確認。</translation>
     </message>
   </context>
   <context>
@@ -11204,7 +11204,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>It cannot be upgraded to subsequent builds as they become available.</source>
-      <translation type="unfinished">It cannot be upgraded to subsequent builds as they become available.</translation>
+      <translation>此版本將使用Beta版Cloud服務，請注意：當正式版本發佈之後，資料將無法移轉或升級至正式版Cloud。</translation>
     </message>
     <message>
       <source>To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</source>

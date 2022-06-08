@@ -1017,7 +1017,7 @@
     </message>
     <message>
       <source>Account Security...</source>
-      <translation type="unfinished">Account Security...</translation>
+      <translation>Accountbeveiliging...</translation>
     </message>
   </context>
   <context>
@@ -2940,11 +2940,11 @@ to %1</source>
     </message>
     <message>
       <source>System is not compatible with two-factor authentication</source>
-      <translation type="unfinished">System is not compatible with two-factor authentication</translation>
+      <translation>Systeem is niet compatibel met tweefactorauthenticatie</translation>
     </message>
     <message>
       <source>Failed to log in to &quot;%1&quot; system</source>
-      <translation type="unfinished">Failed to log in to &quot;%1&quot; system</translation>
+      <translation>Aanmelden bij &quot;%1&quot; systeem mislukt</translation>
     </message>
   </context>
   <context>
@@ -4850,7 +4850,7 @@ to %1</source>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
-      <translation type="unfinished">Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</translation>
+      <translation>Servers met ingeschakelde failover nemen automatisch camera's van offline servers met dezelfde locatie-ID.</translation>
     </message>
   </context>
   <context>
@@ -8458,7 +8458,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     </message>
     <message>
       <source>No Failover</source>
-      <translation type="unfinished">No Failover</translation>
+      <translation>Geen failover</translation>
     </message>
   </context>
   <context>
@@ -9240,7 +9240,7 @@ Je kunt het forceren, maar het kan de CPU-belasting aanzienlijk verhogen.</trans
     </message>
     <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
-      <translation type="unfinished">There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</translation>
+      <translation>Er is onvoldoende ruimte op uw computer om de Client-update te downloaden. Maak wat ruimte vrij op uw harde schijf en probeer het opnieuw.</translation>
     </message>
   </context>
   <context>
@@ -10049,8 +10049,8 @@ Waarschuwing: Dit wachtwoord kan niet worden gereset. Als je het verliest, is he
     <message>
       <source>Someone may be impersonating %1 to steel your personal information.
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
-      <translation>Iemand kan zich voordoen als %1 om uw persoonlijke gegevens te stelen.
-Pin dit certificaat niet vast als u het %2 server SSL-certificaat niet hebt gewijzigd.</translation>
+      <translation>Iemand imiteert %1 mogelijk om je persoonlijke gegevens te stuiten.
+Dit certificaat niet vastpinnen als je het hebt gedaan&apos;t de %2 server SSL certificaat wijzigen.</translation>
     </message>
     <message>
       <source>Pin</source>
@@ -10093,15 +10093,15 @@ Pin dit certificaat niet vast als u het %2 server SSL-certificaat niet hebt gewi
     </message>
     <message>
       <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
-      <translation type="unfinished">You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</translation>
+      <translation>U heeft geprobeerd verbinding te maken met deze server, maar deze heeft een certificaat gepresenteerd dat niet automatisch kan worden geverifieerd.</translation>
     </message>
     <message>
       <source>Someone may be impersonating this Server to steal your personal information.</source>
-      <translation type="unfinished">Someone may be impersonating this Server to steal your personal information.</translation>
+      <translation>Iemand kan zich voordoen als deze server om uw persoonlijke gegevens te stelen.</translation>
     </message>
     <message>
       <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
-      <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
+      <translation>Maak geen verbinding met deze server tenzij uw VMS-beheerder hierom heeft gevraagd.</translation>
     </message>
     <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
@@ -10821,7 +10821,7 @@ Pin dit certificaat niet vast als u het %2 server SSL-certificaat niet hebt gewi
     <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
     <message>
       <source>Intercom Alarm Layout</source>
-      <translation>Intercom Alarmlayschermindeling</translation>
+      <translation>Intercom Alarmlay-out</translation>
     </message>
     <message>
       <source>Intercom Open Door</source>
@@ -11618,7 +11618,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Can&apos;t check client update availability. Check your internet connection and try again.</source>
-      <translation>Kan de beschikbaarheid van de client updates niet controleren. Controleer uw internetverbinding en probeer het opnieuw.</translation>
+      <translation>Kan de beschikbaarheid van&apos;niet controleren. Controleer uw internetverbinding en probeer het opnieuw.</translation>
     </message>
   </context>
 </TS>

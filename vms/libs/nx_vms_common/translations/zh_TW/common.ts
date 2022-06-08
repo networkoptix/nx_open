@@ -358,7 +358,7 @@
     </message>
     <message>
       <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
-      <translation>若已停用，請嘗試到I/O模組設定中啟用錄影並降低幀率設定 (錯誤&quot;%1&quot;)。</translation>
+      <translation>若已停用，請嘗試到I/O模組設定中啟用錄影 (錯誤&quot;%1&quot;)。</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
@@ -1080,7 +1080,7 @@
     </message>
     <message>
       <source>Could not allocate output metadata stream.</source>
-      <translation>無法分配Metadata輸出串流。</translation>
+      <translation>無法配置Metadata輸出串流。</translation>
     </message>
     <message>
       <source>Invalid audio codec information.</source>
@@ -1657,7 +1657,7 @@
     <message>
       <source>%1 at camera &apos;%2&apos;</source>
       <comment> is detected</comment>
-      <translation>攝影機 &apos;%2&apos; 的%1</translation>
+      <translation>在攝影機&apos;%2&apos;上的%1</translation>
     </message>
     <message>
       <source>Plugin: %1</source>
@@ -1669,11 +1669,11 @@
     </message>
     <message>
       <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
-      <translation>錄影過程中無法初始化 AES 加密。 數據以未加密狀態寫入。</translation>
+      <translation>錄影資料寫入時，無法初始化 AES 加密。錄影資料以未加密狀態寫入。</translation>
     </message>
     <message>
       <source>Archive backup failed.</source>
-      <translation>影像備份失敗.</translation>
+      <translation>錄影資料備份失敗</translation>
     </message>
     <message>
       <source>Object detected</source>
@@ -1681,7 +1681,7 @@
     </message>
     <message>
       <source>Archive backup failed</source>
-      <translation>影像備份失敗</translation>
+      <translation>錄影資料備份失敗</translation>
     </message>
     <message>
       <source>Data is backed up to %1</source>
@@ -1689,7 +1689,7 @@
     </message>
     <message>
       <source>Failed to backup file </source>
-      <translation>備份檔案失敗 </translation>
+      <translation>檔案備份失敗 </translation>
     </message>
     <message>
       <source>Server Certificate Error</source>

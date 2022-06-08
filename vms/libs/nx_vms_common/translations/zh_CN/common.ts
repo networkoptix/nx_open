@@ -358,15 +358,15 @@
     </message>
     <message>
       <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</translation>
+      <translation>若已停用，请尝试到I/O模块设置中启用录制 (错误&quot;%1&quot;)。</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</translation>
+      <translation>若已停用，请尝试到设备设置中启用录制并降低帧率设置 (错误&quot;%1&quot;)。</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</translation>
+      <translation>若已停用，请尝试到摄像机设置中启用录制并降低帧率设置 (错误&quot;%1&quot;)。</translation>
     </message>
   </context>
   <context>

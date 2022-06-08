@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Open source libraries</source>
-      <translation>Open source libraries</translation>
+      <translation>Open source bibliotheken</translation>
     </message>
   </context>
   <context>
@@ -260,11 +260,11 @@
     </message>
     <message>
       <source>Fixed</source>
-      <translation>Vast</translation>
+      <translation>Opgelost</translation>
     </message>
     <message>
       <source>Scheduled</source>
-      <translation>Gepland</translation>
+      <translation>Schema</translation>
     </message>
     <message>
       <source>Fix bandwidth to</source>
@@ -1147,7 +1147,7 @@
     </message>
     <message>
       <source>No Failover</source>
-      <translation type="unfinished">No Failover</translation>
+      <translation>Geen failover</translation>
     </message>
   </context>
   <context>
@@ -2534,7 +2534,7 @@
     </message>
     <message>
       <source>Autodetect built-in and USB webcams</source>
-      <translation>Ingebouwde en USB-webcams automatisch detecteren</translation>
+      <translation>Automatische detectie van ingebouwde en USB-webcams</translation>
     </message>
   </context>
   <context>

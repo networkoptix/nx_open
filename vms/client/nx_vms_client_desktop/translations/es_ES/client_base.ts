@@ -26,7 +26,7 @@
     <message numerus="yes">
       <source>%1 with %n attributes</source>
       <translation type="unfinished">
-        <numerusform>%1 with %n attributes</numerusform>
+        <numerusform>%1 con %n atributos</numerusform>
         <numerusform>%1 with %n attributes</numerusform>
       </translation>
     </message>
@@ -1005,19 +1005,19 @@
     </message>
     <message>
       <source>Copy Bookmark Text</source>
-      <translation type="unfinished">Copy Bookmark Text</translation>
+      <translation>Copiar texto de marcador</translation>
     </message>
     <message>
       <source>Copy Bookmarks Text</source>
-      <translation type="unfinished">Copy Bookmarks Text</translation>
+      <translation>Copiar texto de marcadores</translation>
     </message>
     <message>
       <source>Web Page Settings...</source>
-      <translation type="unfinished">Web Page Settings...</translation>
+      <translation>Configuración de la página web...</translation>
     </message>
     <message>
       <source>Account Security...</source>
-      <translation type="unfinished">Account Security...</translation>
+      <translation>Seguridad de la cuenta</translation>
     </message>
   </context>
   <context>
@@ -1753,7 +1753,7 @@
     </message>
     <message>
       <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
-      <translation type="unfinished">On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</translation>
+      <translation>En la primera conexión al servidor, se solicitará su confirmación para aceptar el certificado si contiene errores</translation>
     </message>
   </context>
   <context>
@@ -2741,7 +2741,7 @@ a %1</translation>
     <message>
       <source>You are about to disconnect System from %1</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation type="unfinished">You are about to disconnect System from %1</translation>
+      <translation>Está a punto de desconectar el Sistema de %1</translation>
     </message>
     <message>
       <source>All %1 users will be deleted.</source>
@@ -2750,11 +2750,11 @@ a %1</translation>
     </message>
     <message>
       <source>You will be logged out.</source>
-      <translation type="unfinished">You will be logged out.</translation>
+      <translation>Se cerrará la sesión del usuario</translation>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
-      <translation type="unfinished">System will be accessible through local network with a local administrator account.</translation>
+      <translation>El sistema será accesible a través de la red local con la cuenta del administrador local.</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -2763,7 +2763,7 @@ a %1</translation>
     <message>
       <source>Cannot disconnect the System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot disconnect the System from %1</translation>
+      <translation>No se puede desconectar el sistema de %1</translation>
     </message>
   </context>
   <context>
@@ -2943,11 +2943,11 @@ a %1</translation>
     </message>
     <message>
       <source>System is not compatible with two-factor authentication</source>
-      <translation type="unfinished">System is not compatible with two-factor authentication</translation>
+      <translation>El sistema no es compatible con la autenticación de dos factores</translation>
     </message>
     <message>
       <source>Failed to log in to &quot;%1&quot; system</source>
-      <translation type="unfinished">Failed to log in to &quot;%1&quot; system</translation>
+      <translation>Error al iniciar sesión en el sistema &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -3480,7 +3480,7 @@ a %1</translation>
     </message>
     <message>
       <source>Please enter a password.</source>
-      <translation type="unfinished">Please enter a password.</translation>
+      <translation>Por favor ingrese una contraseña.</translation>
     </message>
   </context>
   <context>
@@ -3948,11 +3948,11 @@ a %1</translation>
     </message>
     <message>
       <source>Motion Search</source>
-      <translation type="unfinished">Motion Search</translation>
+      <translation>Búsqueda de movimiento</translation>
     </message>
     <message>
       <source>Object Search</source>
-      <translation type="unfinished">Object Search</translation>
+      <translation>Búsqueda de objeto</translation>
     </message>
   </context>
   <context>
@@ -4528,7 +4528,7 @@ a %1</translation>
     </message>
     <message>
       <source>Enter Fullscreen</source>
-      <translation type="unfinished">Enter Fullscreen</translation>
+      <translation>Mostrar en pantalla completa</translation>
     </message>
   </context>
   <context>
@@ -4853,7 +4853,7 @@ a %1</translation>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
-      <translation type="unfinished">Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</translation>
+      <translation>Los servidores con conmutación por error habilitada tomarán automáticamente las cámaras de los servidores fuera de línea con la misma ID de ubicación.</translation>
     </message>
   </context>
   <context>
@@ -5578,7 +5578,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Camera recording schedule is invalid</source>
-      <translation type="unfinished">Camera recording schedule is invalid</translation>
+      <translation>El horario de grabación de la cámara no es válido</translation>
     </message>
   </context>
   <context>
@@ -5752,7 +5752,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>With enabled digest authentication</source>
-      <translation type="unfinished">With enabled digest authentication</translation>
+      <translation>Con la autenticación digest habilitada</translation>
     </message>
   </context>
   <context>
@@ -6049,19 +6049,19 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <name>QnWebResourceWidget</name>
     <message>
       <source>Open this web page?</source>
-      <translation type="unfinished">Open this web page?</translation>
+      <translation>¿Abrir esta página web?</translation>
     </message>
     <message>
       <source>Web page</source>
-      <translation type="unfinished">Web page</translation>
+      <translation>Página web</translation>
     </message>
     <message>
       <source>Connect anyway</source>
-      <translation type="unfinished">Connect anyway</translation>
+      <translation>Conéctese de todos modos</translation>
     </message>
     <message>
       <source>Web page settings...</source>
-      <translation type="unfinished">Web page settings...</translation>
+      <translation>Configuración de la página web...</translation>
     </message>
     <message>
       <source>You try to open the
@@ -6069,10 +6069,10 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
 but this web page presented an untrusted certificate auth.
 We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
       <comment>%1 is the web page address</comment>
-      <translation type="unfinished">You try to open the
+      <translation>Intenta abrir el
 %1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</translation>
+pero esta página web presentó un certificado de autenticación que no es de confianza.
+Le recomendamos que no abra esta página web. Si comprende los riesgos, puede abrir la página web.</translation>
     </message>
   </context>
   <context>
@@ -6142,7 +6142,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Camera %1 does not support PTZ</source>
-      <translation type="unfinished">Camera %1 does not support PTZ</translation>
+      <translation>Cámara %1 no soporta PTZ</translation>
     </message>
   </context>
   <context>
@@ -7230,11 +7230,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Not supported</source>
-      <translation type="unfinished">Not supported</translation>
+      <translation>No soportado</translation>
     </message>
     <message>
       <source>Backup is not supported for this device</source>
-      <translation type="unfinished">Backup is not supported for this device</translation>
+      <translation>La copia de seguridad no es compatible con este dispositivo</translation>
     </message>
   </context>
   <context>
@@ -7299,12 +7299,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation type="unfinished">To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</translation>
+      <translation>Para habilitar la copia de seguridad, cambie &quot;Principal&quot; a &quot;Copia de seguridad&quot; de algunos de los almacenamientos en %1</translation>
     </message>
     <message>
       <source>To enable backup add more drives to use them as backup storage in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation type="unfinished">To enable backup add more drives to use them as backup storage in %1</translation>
+      <translation>Para habilitar la copia de seguridad, agregue más unidades para usarlas como almacenamiento de copia de seguridad en %1</translation>
     </message>
   </context>
   <context>
@@ -7380,11 +7380,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraButtonController</name>
     <message>
       <source>Heater</source>
-      <translation type="unfinished">Heater</translation>
+      <translation>Calentador</translation>
     </message>
     <message>
       <source>Wiper</source>
-      <translation type="unfinished">Wiper</translation>
+      <translation>Limpiaparabrisas</translation>
     </message>
   </context>
   <context>
@@ -7458,7 +7458,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Server will not push time settings to the camera.</source>
-      <translation type="unfinished">Server will not push time settings to the camera.</translation>
+      <translation>El servidor no enviará ajustes de tiempo a la cámara.</translation>
     </message>
   </context>
   <context>
@@ -7692,11 +7692,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Change invalid schedule to &quot;Record Always&quot;</source>
-      <translation type="unfinished">Change invalid schedule to &quot;Record Always&quot;</translation>
+      <translation>Cambie la programación no válida a &quot;Grabar siempre&quot;</translation>
     </message>
     <message>
       <source>Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</source>
-      <translation type="unfinished">Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</translation>
+      <translation>Algunas celdas del programa de grabación están configuradas en un modo de grabación no válido: %1. Durante las horas configuradas en un modo de grabación no válido, la cámara grabará en el modo &quot;Grabar siempre&quot;.</translation>
     </message>
     <message>
       <source>Motion Only</source>
@@ -7708,7 +7708,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Motion &amp; Objects Only</source>
-      <translation type="unfinished">Motion &amp; Objects Only</translation>
+      <translation>Solo movimiento y objetos</translation>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
@@ -7716,11 +7716,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>Objetos + Baja Resolución</translation>
     </message>
     <message>
       <source>Motion &amp; Objects + Lo-Res</source>
-      <translation type="unfinished">Motion &amp; Objects + Lo-Res</translation>
+      <translation>Movimiento, objetos + baja resolución</translation>
     </message>
   </context>
   <context>
@@ -7734,9 +7734,9 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>These devices do not have audio inputs or are not configured correctly.</source>
-      <translation type="unfinished">
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
+      <translation>
+        <numerusform>Estos dispositivos no tienen entrada de audio o no están configurados correctamente.</numerusform>
+        <numerusform>Estos dispositivos no tienen entrada de audio o no están configurados correctamente.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7748,9 +7748,9 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>These devices do not have audio outputs or are not configured correctly.</source>
-      <translation type="unfinished">
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
+      <translation>
+        <numerusform>Estos dispositivos no tienen salida de audio o no están configurados correctamente.</numerusform>
+        <numerusform>Estos dispositivos no tienen salida de audio o no están configurados correctamente.</numerusform>
       </translation>
     </message>
     <message>
@@ -8016,7 +8016,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Enter your account password to merge Server to the System</source>
-      <translation type="unfinished">Enter your account password to merge Server to the System</translation>
+      <translation>Ingrese la contraseña de su cuenta para fusionar el servidor con el sistema</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -8067,7 +8067,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
-      <translation type="unfinished">Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</translation>
+      <translation>El programa de grabación contiene modos de grabación que no son compatibles con las cámaras seleccionadas. Los modos de grabación no admitidos se cambiarán a &quot;Grabar siempre&quot;.</translation>
     </message>
   </context>
   <context>
@@ -8186,7 +8186,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</source>
-      <translation type="unfinished">Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</translation>
+      <translation>La búsqueda de dispositivos en la red está restringida a las cámaras que admiten conexiones HTTPS. Esto se puede cambiar en %1 ajustes.</translation>
     </message>
     <message>
       <source>System Administration</source>
@@ -8433,7 +8433,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Export is not available: This camera does not have a video archive for the selected time period.</source>
-      <translation type="unfinished">Export is not available: This camera does not have a video archive for the selected time period.</translation>
+      <translation>La exportación no está disponible: esta cámara no tiene un archivo de video para el período de tiempo seleccionado.</translation>
     </message>
   </context>
   <context>
@@ -8460,7 +8460,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>No Failover</source>
-      <translation type="unfinished">No Failover</translation>
+      <translation>Sin conmutación por error</translation>
     </message>
   </context>
   <context>
@@ -8534,7 +8534,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>Click en el icono para leer más</translation>
     </message>
   </context>
   <context>
@@ -8685,20 +8685,20 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::LocalSessionTokenExpirationWatcher</name>
     <message>
       <source>Your session expires soon</source>
-      <translation type="unfinished">Your session expires soon</translation>
+      <translation>Su sesión caducará pronto</translation>
     </message>
     <message>
       <source>Re-Authenticate Now</source>
-      <translation type="unfinished">Re-Authenticate Now</translation>
+      <translation>Volver a autenticarse ahora</translation>
     </message>
     <message>
       <source>Less than a minute left</source>
-      <translation type="unfinished">Less than a minute left</translation>
+      <translation>Menos de un minuto</translation>
     </message>
     <message numerus="yes">
       <source>%n minutes left</source>
       <translation type="unfinished">
-        <numerusform>%n minutes left</numerusform>
+        <numerusform>%d minutos restantes</numerusform>
         <numerusform>%n minutes left</numerusform>
       </translation>
     </message>
@@ -8776,7 +8776,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Enter your account password to merge Systems</source>
-      <translation type="unfinished">Enter your account password to merge Systems</translation>
+      <translation>Ingrese la contraseña de su cuenta para fusionar sistemas</translation>
     </message>
     <message>
       <source>Merge</source>
