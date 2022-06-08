@@ -6549,7 +6549,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</translation>
+      <translation>提醒：此网页经由Proxy且允许外部网络(非服务器所在之内部网路)存取，若此网页包含隐私或者仅供内部使用之服务，请务必确认存取权限及安全性确认。</translation>
     </message>
     <message>
       <source>Move anyway?</source>
@@ -7638,7 +7638,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>选择</translation>
     </message>
   </context>
   <context>
@@ -7751,11 +7751,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Enter password to continue your session</source>
-      <translation type="unfinished">Enter password to continue your session</translation>
+      <translation>请输入密码以继续进行连线</translation>
     </message>
     <message>
       <source>Your session has expired. Please sign in again to continue.</source>
-      <translation type="unfinished">Your session has expired. Please sign in again to continue.</translation>
+      <translation>连线逾时，请重新登入。</translation>
     </message>
     <message>
       <source>OK</source>
@@ -8071,7 +8071,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+      <translation>请尝试更改筛选条件或新增事件规则</translation>
     </message>
   </context>
   <context>
@@ -8126,11 +8126,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Archive is encrypted.</source>
-      <translation type="unfinished">Archive is encrypted.</translation>
+      <translation>存档已加密。</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
-      <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
+      <translation>目前无法取得录像存档，请稍后再试。</translation>
     </message>
   </context>
   <context>
@@ -8245,7 +8245,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Export is not available: This camera does not have a video archive for the selected time period.</source>
-      <translation type="unfinished">Export is not available: This camera does not have a video archive for the selected time period.</translation>
+      <translation>无法汇出录像: 所选时间里找不到此摄像机的录像资料。</translation>
     </message>
   </context>
   <context>
@@ -8253,7 +8253,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Exported: %1</source>
       <comment>Duration will be substituted</comment>
-      <translation type="unfinished">Exported: %1</translation>
+      <translation>导出: %1</translation>
     </message>
   </context>
   <context>
@@ -8298,11 +8298,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ForceSecureAuthDialog</name>
     <message>
       <source>Force secure authentication?</source>
-      <translation type="unfinished">Force secure authentication?</translation>
+      <translation>强制安全认证?</translation>
     </message>
     <message>
       <source>To revert this change user password reset will be required.</source>
-      <translation type="unfinished">To revert this change user password reset will be required.</translation>
+      <translation>需重置帐户密码来还原此设定。</translation>
     </message>
     <message>
       <source>Do not show this message again</source>
@@ -8344,7 +8344,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>请点击此图了解更多</translation>
     </message>
   </context>
   <context>
@@ -8495,20 +8495,20 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::LocalSessionTokenExpirationWatcher</name>
     <message>
       <source>Your session expires soon</source>
-      <translation type="unfinished">Your session expires soon</translation>
+      <translation>您的连线即将过期</translation>
     </message>
     <message>
       <source>Re-Authenticate Now</source>
-      <translation type="unfinished">Re-Authenticate Now</translation>
+      <translation>立即重新验证</translation>
     </message>
     <message>
       <source>Less than a minute left</source>
-      <translation type="unfinished">Less than a minute left</translation>
+      <translation>剩余时间: 1分钟内</translation>
     </message>
     <message numerus="yes">
       <source>%n minutes left</source>
-      <translation type="unfinished">
-        <numerusform>%n minutes left</numerusform>
+      <translation>
+        <numerusform>剩余 %n 分钟</numerusform>
       </translation>
     </message>
   </context>
@@ -8585,7 +8585,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Enter your account password to merge Systems</source>
-      <translation type="unfinished">Enter your account password to merge Systems</translation>
+      <translation>请输入您的帐户密码以合并系统</translation>
     </message>
     <message>
       <source>Merge</source>

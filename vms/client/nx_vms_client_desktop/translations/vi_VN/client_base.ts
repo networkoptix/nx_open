@@ -91,7 +91,7 @@
     </message>
     <message>
       <source>Verifying update package</source>
-      <translation type="unfinished">Verifying update package</translation>
+      <translation>Đang xác minh gói cập nhật</translation>
     </message>
   </context>
   <context>
@@ -905,7 +905,7 @@
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>Tạo</translation>
     </message>
     <message>
       <source>Welcome Screen</source>
@@ -917,7 +917,7 @@
     </message>
     <message>
       <source>Show Servers</source>
-      <translation type="unfinished">Show Servers</translation>
+      <translation>Hiển thị Máy chủ</translation>
     </message>
     <message>
       <source>Save Window Configuration</source>
@@ -949,16 +949,16 @@
     </message>
     <message>
       <source>Delete Bookmark...</source>
-      <translation type="unfinished">Delete Bookmark...</translation>
+      <translation>Xóa Dấu trang...</translation>
     </message>
     <message>
       <source>Delete Bookmarks...</source>
-      <translation type="unfinished">Delete Bookmarks...</translation>
+      <translation>Xóa Dấu trang...</translation>
     </message>
     <message numerus="yes">
       <source>Show on Items</source>
-      <translation type="unfinished">
-        <numerusform>Show on Items</numerusform>
+      <translation>
+        <numerusform>Hiển thị trên các khoản mục</numerusform>
       </translation>
     </message>
     <message>
@@ -971,11 +971,11 @@
     </message>
     <message>
       <source>Create Group</source>
-      <translation type="unfinished">Create Group</translation>
+      <translation>Tạo nhóm</translation>
     </message>
     <message>
       <source>Remove Group</source>
-      <translation type="unfinished">Remove Group</translation>
+      <translation>Xóa nhóm</translation>
     </message>
     <message>
       <source>Add Proxied Web Page...</source>
@@ -995,11 +995,11 @@
     </message>
     <message>
       <source>Joystick Settings...</source>
-      <translation type="unfinished">Joystick Settings...</translation>
+      <translation>Cài đặt cần điều khiển...</translation>
     </message>
     <message>
       <source>Advanced...</source>
-      <translation type="unfinished">Advanced...</translation>
+      <translation>Nâng cao...</translation>
     </message>
     <message>
       <source>Copy Bookmark Text</source>
@@ -1542,27 +1542,27 @@
     </message>
     <message>
       <source>This camera does not support advanced PTZ</source>
-      <translation type="unfinished">This camera does not support advanced PTZ</translation>
+      <translation>Camera này không hỗ trợ PTZ nâng cao</translation>
     </message>
     <message>
       <source>Zooming out...</source>
-      <translation type="unfinished">Zooming out...</translation>
+      <translation>Đang thu nhỏ...</translation>
     </message>
     <message>
       <source>Moving...</source>
-      <translation type="unfinished">Moving...</translation>
+      <translation>Đang di chuyển...</translation>
     </message>
     <message>
       <source>Zooming in...</source>
-      <translation type="unfinished">Zooming in...</translation>
+      <translation>Đang phóng to...</translation>
     </message>
     <message>
       <source>Focusing...</source>
-      <translation type="unfinished">Focusing...</translation>
+      <translation>Đang lấy nét...</translation>
     </message>
     <message>
       <source>PTZ can only be used in the live mode</source>
-      <translation type="unfinished">PTZ can only be used in the live mode</translation>
+      <translation>PTZ chỉ có thể được sử dụng ở chế độ xem trực tiếp</translation>
     </message>
   </context>
   <context>
@@ -1979,23 +1979,23 @@
     </message>
     <message>
       <source>Storage added</source>
-      <translation type="unfinished">Storage added</translation>
+      <translation>Đã thêm bộ lưu trữ</translation>
     </message>
     <message>
       <source>Storage updated</source>
-      <translation type="unfinished">Storage updated</translation>
+      <translation>Đã cập nhật bộ lưu trữ</translation>
     </message>
     <message>
       <source>Storage removed</source>
-      <translation type="unfinished">Storage removed</translation>
+      <translation>Bộ lưu trữ đã bị xóa</translation>
     </message>
     <message>
       <source>MitM Attack</source>
-      <translation type="unfinished">MitM Attack</translation>
+      <translation>Tấn công MitM</translation>
     </message>
     <message>
       <source>MitM attack from server %1</source>
-      <translation type="unfinished">MitM attack from server %1</translation>
+      <translation>Tấn công MitM từ máy chủ %1</translation>
     </message>
   </context>
   <context>
@@ -2211,7 +2211,7 @@
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+      <translation>Thời gian ghi trước dài sẽ tăng mức sử dụng RAM trên máy chủ</translation>
     </message>
   </context>
   <context>
@@ -2952,7 +2952,7 @@ to %1</source>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Tạo</translation>
     </message>
     <message>
       <source>Restore from Database Backup</source>
@@ -3007,7 +3007,7 @@ to %1</source>
     </message>
     <message>
       <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation type="unfinished">The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
+      <translation>Thiết bị ghi âm không hỗ trợ các định dạng âm thanh phù hợp. Vui lòng chọn thiết bị âm thanh khác hoặc &quot;không có&quot; trong cài đặt Ghi màn hình.</translation>
     </message>
   </context>
   <context>
@@ -3844,11 +3844,11 @@ to %1</source>
     </message>
     <message>
       <source>Motion Search</source>
-      <translation type="unfinished">Motion Search</translation>
+      <translation>Tìm kiếm chuyển động</translation>
     </message>
     <message>
       <source>Object Search</source>
-      <translation type="unfinished">Object Search</translation>
+      <translation>Tìm kiếm đối tượng</translation>
     </message>
   </context>
   <context>
@@ -4446,19 +4446,19 @@ to %1</source>
     <name>QnScreenshotLoader</name>
     <message>
       <source>Top left corner</source>
-      <translation type="unfinished">Top left corner</translation>
+      <translation>Góc trên bên trái</translation>
     </message>
     <message>
       <source>Top right corner</source>
-      <translation type="unfinished">Top right corner</translation>
+      <translation>Góc trên bên phải</translation>
     </message>
     <message>
       <source>Bottom left corner</source>
-      <translation type="unfinished">Bottom left corner</translation>
+      <translation>Góc dưới bên trái</translation>
     </message>
     <message>
       <source>Bottom right corner</source>
-      <translation type="unfinished">Bottom right corner</translation>
+      <translation>Góc dưới bên phải</translation>
     </message>
   </context>
   <context>
@@ -4997,7 +4997,7 @@ to %1</source>
     </message>
     <message>
       <source>Unlock</source>
-      <translation type="unfinished">Unlock</translation>
+      <translation>Mở khóa</translation>
     </message>
   </context>
   <context>
@@ -5121,7 +5121,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Insufficient permissions to store analytics data.</source>
-      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+      <translation>Không đủ quyền để lưu dữ liệu phân tích.</translation>
     </message>
   </context>
   <context>
@@ -5778,7 +5778,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Learn More</source>
-      <translation type="unfinished">Learn More</translation>
+      <translation>Tìm hiểu thêm</translation>
     </message>
   </context>
   <context>
@@ -5989,7 +5989,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>QnWorkbenchController</name>
     <message>
       <source>To switch between cameras press Shift + Arrow</source>
-      <translation type="unfinished">To switch between cameras press Shift + Arrow</translation>
+      <translation>Để chuyển đổi giữa các camera, nhấn Shift + Mũi tên</translation>
     </message>
   </context>
   <context>
@@ -6003,19 +6003,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>QnWorkbenchPtzHandler</name>
     <message>
       <source>Zooming in...</source>
-      <translation type="unfinished">Zooming in...</translation>
+      <translation>Đang phóng to...</translation>
     </message>
     <message>
       <source>Zooming out...</source>
-      <translation type="unfinished">Zooming out...</translation>
+      <translation>Đang thu nhỏ...</translation>
     </message>
     <message>
       <source>Moving...</source>
-      <translation type="unfinished">Moving...</translation>
+      <translation>Đang di chuyển...</translation>
     </message>
     <message>
       <source>Focusing...</source>
-      <translation type="unfinished">Focusing...</translation>
+      <translation>Đang lấy nét...</translation>
     </message>
     <message>
       <source>Camera %1 does not support PTZ</source>
@@ -6108,11 +6108,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>No timestamp</source>
-      <translation type="unfinished">No timestamp</translation>
+      <translation>Không có dấu thời gian</translation>
     </message>
     <message>
       <source>No camera name</source>
-      <translation type="unfinished">No camera name</translation>
+      <translation>Không có tên camera</translation>
     </message>
     <message>
       <source>Camera name:</source>
@@ -6819,7 +6819,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Choose cameras...</source>
-      <translation type="unfinished">Choose cameras...</translation>
+      <translation>Chọn máy ảnh...</translation>
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
@@ -6885,7 +6885,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>DISABLED</source>
-      <translation type="unfinished">DISABLED</translation>
+      <translation>VÔ HIỆU HÓA</translation>
     </message>
   </context>
   <context>
@@ -6998,32 +6998,32 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupQueueSize</name>
     <message numerus="yes">
       <source>%n weeks</source>
-      <translation type="unfinished">
-        <numerusform>%n weeks</numerusform>
+      <translation>
+        <numerusform>%n tuần</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n days</source>
-      <translation type="unfinished">
-        <numerusform>%n days</numerusform>
+      <translation>
+        <numerusform>%n ngày</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n hours</source>
-      <translation type="unfinished">
-        <numerusform>%n hours</numerusform>
+      <translation>
+        <numerusform>%n giờ</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n minutes</source>
-      <translation type="unfinished">
-        <numerusform>%n minutes</numerusform>
+      <translation>
+        <numerusform>%n phút</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n seconds</source>
-      <translation type="unfinished">
-        <numerusform>%n seconds</numerusform>
+      <translation>
+        <numerusform>%n giây</numerusform>
       </translation>
     </message>
   </context>
@@ -7067,7 +7067,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Not supported</source>
-      <translation type="unfinished">Not supported</translation>
+      <translation>Không được hỗ trợ</translation>
     </message>
     <message>
       <source>Backup is not supported for this device</source>
@@ -7262,11 +7262,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Automatic selection</source>
-      <translation type="unfinished">Automatic selection</translation>
+      <translation>Lựa chọn tự động</translation>
     </message>
     <message>
       <source>Use if supported</source>
-      <translation type="unfinished">Use if supported</translation>
+      <translation>Sử dụng nếu được hỗ trợ</translation>
     </message>
     <message>
       <source>Never</source>
@@ -7274,7 +7274,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Force Motion Detection</source>
-      <translation type="unfinished">Force Motion Detection</translation>
+      <translation>Buộc phát hiện chuyển động</translation>
     </message>
     <message>
       <source>Pan</source>
@@ -7400,7 +7400,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+      <translation>Thời gian ghi trước dài sẽ tăng mức sử dụng RAM trên máy chủ</translation>
     </message>
   </context>
   <context>
@@ -7674,11 +7674,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>File %1 does not exist</source>
-      <translation type="unfinished">File %1 does not exist</translation>
+      <translation>Tập tin %1 không tồn tại</translation>
     </message>
     <message>
       <source>There is no valid client package to download</source>
-      <translation type="unfinished">There is no valid client package to download</translation>
+      <translation>Không có gói ứng dụng máy khách hợp lệ nào để tải xuống</translation>
     </message>
     <message>
       <source>Cannot download update file</source>
@@ -7725,7 +7725,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Login to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Login to %1</translation>
+      <translation>Đăng nhập vào %1</translation>
     </message>
   </context>
   <context>
@@ -8230,11 +8230,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Add Info</source>
-      <translation type="unfinished">Add Info</translation>
+      <translation>Thêm thông tin</translation>
     </message>
     <message>
       <source>Delete Info</source>
-      <translation type="unfinished">Delete Info</translation>
+      <translation>Xóa thông tin</translation>
     </message>
     <message>
       <source>Info</source>
@@ -8242,7 +8242,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>AVI format is not recommended to export a recording with audio track.</source>
-      <translation type="unfinished">AVI format is not recommended to export a recording with audio track.</translation>
+      <translation>Định dạng AVI không được khuyến nghị để xuất video có bản âm thanh.</translation>
     </message>
     <message>
       <source>Export is not available: This camera does not have a video archive for the selected time period.</source>
@@ -8254,7 +8254,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Exported: %1</source>
       <comment>Duration will be substituted</comment>
-      <translation type="unfinished">Exported: %1</translation>
+      <translation>Đã xuất: %1</translation>
     </message>
   </context>
   <context>
@@ -8485,7 +8485,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>DISABLED</source>
-      <translation type="unfinished">DISABLED</translation>
+      <translation>VÔ HIỆU HÓA</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -8659,11 +8659,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
-      <translation>Bạn đang hợp nhất hệ thống với bản quyền khởi đầu.</translation>
+      <translation>Bạn sắp hợp nhất Hệ thống với giấy phép Khởi đầu.</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
-      <translation>Chỉ cho phép bản quyền khởi đầu cho mỗi Hệ thống, do đó giấy phép thứ hai sẽ bị vô hiệu hóa.</translation>
+      <translation>Chỉ được dùng một giấy phép Khởi đầu cho mỗi Hệ thống, do đó giấy phép thứ hai sẽ bị vô hiệu hóa.</translation>
     </message>
     <message>
       <source>Merge anyway?</source>
@@ -9076,7 +9076,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Notifications Settings</source>
-      <translation type="unfinished">Notifications Settings</translation>
+      <translation>Cài đặt thông báo</translation>
     </message>
   </context>
   <context>
@@ -9091,7 +9091,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     <name>nx::vms::client::desktop::ObjectTrackingButton</name>
     <message>
       <source>Object tracking is ON</source>
-      <translation type="unfinished">Object tracking is ON</translation>
+      <translation>Theo dõi đối tượng đang BẬT</translation>
     </message>
   </context>
   <context>
@@ -9224,11 +9224,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Update file verification failed.</source>
-      <translation type="unfinished">Update file verification failed.</translation>
+      <translation>Cập nhật xác minh tệp tin không thành công.</translation>
     </message>
     <message>
       <source>Verifying update</source>
-      <translation type="unfinished">Verifying update</translation>
+      <translation>Đang xác minh bản cập nhật</translation>
     </message>
   </context>
   <context>
@@ -9450,11 +9450,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
-      <translation type="unfinished">Motion, Objects</translation>
+      <translation>Chuyển động, Đối tượng</translation>
     </message>
     <message>
       <source>Objects only</source>
-      <translation type="unfinished">Objects only</translation>
+      <translation>Đối tượng chỉ</translation>
     </message>
     <message>
       <source>Motion, Objects + Lo-Res</source>
@@ -9519,7 +9519,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Analytic</source>
-      <translation type="unfinished">Analytic</translation>
+      <translation>Phân tích</translation>
     </message>
     <message>
       <source>Generic</source>
@@ -9819,7 +9819,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Server Id: %1</source>
-      <translation type="unfinished">Server Id: %1</translation>
+      <translation>Id máy chủ: %1</translation>
     </message>
     <message>
       <source>This certificate does not match the certificate %1 is pinned to.</source>
@@ -9868,7 +9868,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>I trust this server</source>
-      <translation type="unfinished">I trust this server</translation>
+      <translation>Tôi tin tưởng máy chủ này</translation>
     </message>
     <message>
       <source>System:</source>
@@ -9880,11 +9880,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Server ID:</source>
-      <translation type="unfinished">Server ID:</translation>
+      <translation>ID máy chủ:</translation>
     </message>
     <message>
       <source>Trust this server?</source>
-      <translation type="unfinished">Trust this server?</translation>
+      <translation>Tin cậy máy chủ này?</translation>
     </message>
     <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
@@ -10304,7 +10304,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::VersionSelectionDialog</name>
     <message>
       <source>Select Version</source>
-      <translation type="unfinished">Select Version</translation>
+      <translation>Chọn phiên bản</translation>
     </message>
     <message>
       <source>Version</source>
@@ -10312,7 +10312,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Invalid version.</source>
-      <translation type="unfinished">Invalid version.</translation>
+      <translation>Phiên bản không hợp lệ.</translation>
     </message>
     <message>
       <source>Password</source>
@@ -10522,11 +10522,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>High-Res</source>
-      <translation type="unfinished">High-Res</translation>
+      <translation>High-Res</translation>
     </message>
     <message>
       <source>Low-Res</source>
-      <translation type="unfinished">Low-Res</translation>
+      <translation>Low-Res</translation>
     </message>
     <message>
       <source>All streams</source>
@@ -10602,11 +10602,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
     <message>
       <source>New Group</source>
-      <translation type="unfinished">New Group</translation>
+      <translation>Nhóm mới</translation>
     </message>
     <message>
       <source>New Group %1</source>
-      <translation type="unfinished">New Group %1</translation>
+      <translation>Nhóm mới %1</translation>
     </message>
   </context>
   <context>
@@ -10621,28 +10621,28 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Open door</source>
-      <translation type="unfinished">Open door</translation>
+      <translation>Mở cửa</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::integrations::OverlappedIdDialogModel</name>
     <message>
       <source>Latest</source>
-      <translation type="unfinished">Latest</translation>
+      <translation>Mới nhất</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::integrations::OverlappedIdIntegration</name>
     <message>
       <source>Overlapped ID...</source>
-      <translation type="unfinished">Overlapped ID...</translation>
+      <translation>ID chồng chéo...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::joystick::JoystickButtonActionChoiceModel</name>
     <message>
       <source>No Action</source>
-      <translation type="unfinished">No Action</translation>
+      <translation>Không có hành động nào</translation>
     </message>
     <message>
       <source>Focus Near</source>
@@ -10654,46 +10654,46 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Autofocus</source>
-      <translation type="unfinished">Autofocus</translation>
+      <translation>Tự động lấy nét</translation>
     </message>
     <message>
       <source>Go to PTZ Position</source>
-      <translation type="unfinished">Go to PTZ Position</translation>
+      <translation>Chuyển đến Vị trí PTZ</translation>
     </message>
     <message>
       <source>Set to Fullscreen</source>
-      <translation type="unfinished">Set to Fullscreen</translation>
+      <translation>Đặt thành Toàn màn hình</translation>
     </message>
     <message>
       <source>Next Camera on Layout</source>
-      <translation type="unfinished">Next Camera on Layout</translation>
+      <translation>Camera tiếp theo trên bố cục</translation>
     </message>
     <message>
       <source>Previous Camera on Layout</source>
-      <translation type="unfinished">Previous Camera on Layout</translation>
+      <translation>Camera trước trên bố cục</translation>
     </message>
     <message>
       <source>Open Layout</source>
-      <translation type="unfinished">Open Layout</translation>
+      <translation>Mở bố cục</translation>
     </message>
     <message>
       <source>Modifier</source>
-      <translation type="unfinished">Modifier</translation>
+      <translation>Bộ điều chỉnh</translation>
     </message>
     <message>
       <source>Multiple</source>
-      <translation type="unfinished">Multiple</translation>
+      <translation>Bội số</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::joystick::JoystickButtonSettingsModel</name>
     <message>
       <source>Select Layout...</source>
-      <translation type="unfinished">Select Layout...</translation>
+      <translation>Chọn Bố cục...</translation>
     </message>
     <message>
       <source>Button</source>
-      <translation type="unfinished">Button</translation>
+      <translation>Nút bấm</translation>
     </message>
     <message>
       <source>Selected Layout</source>
@@ -10880,7 +10880,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Regions of Interest</source>
-      <translation type="unfinished">Regions of Interest</translation>
+      <translation>Khu vực quan tâm</translation>
     </message>
   </context>
   <context>
@@ -11158,7 +11158,7 @@ Bạn có thể chọn một vị trí lưu trữ khác trong tab &quot;Quản l
     <message>
       <source>%1 Beta</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 Beta</translation>
+      <translation>%1 Beta</translation>
     </message>
   </context>
   <context>

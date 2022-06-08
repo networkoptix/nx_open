@@ -21,7 +21,7 @@
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>모든 플러그인</translation>
     </message>
     <message numerus="yes">
       <source>%1 with %n attributes</source>

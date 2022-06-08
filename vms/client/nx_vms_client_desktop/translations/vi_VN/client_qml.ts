@@ -90,13 +90,13 @@
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
+      <translation>
+        <numerusform>%n kết quả mới</numerusform>
       </translation>
     </message>
     <message>
       <source>new results</source>
-      <translation type="unfinished">new results</translation>
+      <translation>kết quả mới</translation>
     </message>
     <message>
       <source>Detected by</source>
@@ -135,13 +135,13 @@
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
+      <translation>
+        <numerusform>%n kết quả mới</numerusform>
       </translation>
     </message>
     <message>
       <source>new results</source>
-      <translation type="unfinished">new results</translation>
+      <translation>kết quả mới</translation>
     </message>
   </context>
   <context>
@@ -173,7 +173,7 @@
     <name>ButtonSettingsDelegate</name>
     <message>
       <source>Hotkey %1</source>
-      <translation type="unfinished">Hotkey %1</translation>
+      <translation>Phím nóng %1</translation>
     </message>
   </context>
   <context>
@@ -243,11 +243,11 @@
     </message>
     <message>
       <source>Unreachable</source>
-      <translation type="unfinished">Unreachable</translation>
+      <translation>Không thể truy cập</translation>
     </message>
     <message>
       <source>Incompatible</source>
-      <translation type="unfinished">Incompatible</translation>
+      <translation>Không tương thích</translation>
     </message>
     <message>
       <source>Pending</source>
@@ -258,7 +258,7 @@
     <name>CloudTile</name>
     <message>
       <source>Log in to </source>
-      <translation type="unfinished">Log in to </translation>
+      <translation>Đăng nhập vào </translation>
     </message>
   </context>
   <context>
@@ -440,15 +440,15 @@
     </message>
     <message>
       <source>Equidistant</source>
-      <translation type="unfinished">Equidistant</translation>
+      <translation>Equidistant</translation>
     </message>
     <message>
       <source>Stereographic</source>
-      <translation type="unfinished">Stereographic</translation>
+      <translation>Stereographic</translation>
     </message>
     <message>
       <source>Equisolid</source>
-      <translation type="unfinished">Equisolid</translation>
+      <translation>Equisolid</translation>
     </message>
     <message>
       <source>Size</source>
@@ -517,7 +517,7 @@
     </message>
     <message>
       <source>Previous Object</source>
-      <translation type="unfinished">Previous Object</translation>
+      <translation>Đối tượng trước đó</translation>
     </message>
     <message>
       <source>Pause</source>
@@ -529,7 +529,7 @@
     </message>
     <message>
       <source>Next Object</source>
-      <translation type="unfinished">Next Object</translation>
+      <translation>Đối tượng tiếp theo</translation>
     </message>
     <message>
       <source>Toggle Repeat</source>
@@ -548,7 +548,7 @@
     </message>
     <message>
       <source>Basic Actions</source>
-      <translation type="unfinished">Basic Actions</translation>
+      <translation>Các thao tác cơ bản</translation>
     </message>
     <message>
       <source>With Modifier</source>
@@ -783,7 +783,7 @@
     <name>PreviewPanel</name>
     <message>
       <source>No Preview</source>
-      <translation type="unfinished">No Preview</translation>
+      <translation>Không xem trước</translation>
     </message>
     <message>
       <source>Select the object to display the preview</source>
@@ -814,36 +814,36 @@
     <message>
       <source>Introducing you
 new PTZ controls</source>
-      <translation type="unfinished">Introducing you
-new PTZ controls</translation>
+      <translation>Giới thiệu với bạn
+trình điều khiển PTZ mới</translation>
     </message>
     <message>
       <source>Here is a quick presentation
 of what has changed</source>
-      <translation type="unfinished">Here is a quick presentation
-of what has changed</translation>
+      <translation>Đây là bản báo cáo nhanh
+về những thay đổi gần đây</translation>
     </message>
     <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
-      <translation type="unfinished">Drag over any part of the video
-to activate PTZ</translation>
+      <translation>Kéo qua bất kỳ phần nào của video
+để kích hoạt PTZ</translation>
     </message>
     <message>
       <source>Press arrows keys to move and plus or minus keys to zoom</source>
-      <translation type="unfinished">Press arrows keys to move and plus or minus keys to zoom</translation>
+      <translation>Nhấn các phím mũi tên để di chuyển và các phím cộng hoặc trừ để thu phóng</translation>
     </message>
     <message>
       <source>Use the mouse wheel to zoom</source>
-      <translation type="unfinished">Use the mouse wheel to zoom</translation>
+      <translation>Sử dụng con lăn chuột để thu phóng</translation>
     </message>
     <message>
       <source>Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</source>
-      <translation type="unfinished">Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</translation>
+      <translation>Nhấp, nhấp đúp hoặc kéo con trỏ chuột cùng với nhấn phím Shift để sử dụng trình PTZ nâng cao</translation>
     </message>
     <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
-      <translation type="unfinished">Go to Local Settings to enable a drag marker over the center of the video</translation>
+      <translation>Đi tới Cài đặt nội bộ để bật điểm đánh dấu kéo vào trung tâm của video</translation>
     </message>
   </context>
   <context>
@@ -1016,7 +1016,7 @@ to activate PTZ</translation>
     <name>SelectOverlappedIdDialog</name>
     <message>
       <source>Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</source>
-      <translation type="unfinished">Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</translation>
+      <translation>Định danh dòng thời gian, được tạo ra khi thời gian bị thay đổi trên một NVR từ xa. Dòng thời gian mới có thể chồng lên dòng hiện tại.</translation>
     </message>
     <message>
       <source>Select</source>
@@ -1122,11 +1122,11 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Server unavailable</source>
-      <translation type="unfinished">Server unavailable</translation>
+      <translation>Máy chủ không có sẵn</translation>
     </message>
     <message>
       <source>No access</source>
-      <translation type="unfinished">No access</translation>
+      <translation>Không truy cập</translation>
     </message>
     <message>
       <source>Device disabled</source>

@@ -100,7 +100,7 @@
     </message>
     <message>
       <source>Detected by</source>
-      <translation type="unfinished">Detected by</translation>
+      <translation>侦测结果来源</translation>
     </message>
   </context>
   <context>
@@ -479,7 +479,7 @@
     <name>InformationBubble</name>
     <message>
       <source>Detected by</source>
-      <translation type="unfinished">Detected by</translation>
+      <translation>侦测结果来源</translation>
     </message>
   </context>
   <context>
@@ -552,7 +552,7 @@
     </message>
     <message>
       <source>With Modifier</source>
-      <translation type="unfinished">With Modifier</translation>
+      <translation>使用组合键</translation>
     </message>
     <message>
       <source>This model is not supported</source>
@@ -690,11 +690,11 @@
     <name>ObjectEditor</name>
     <message>
       <source>Present</source>
-      <translation type="unfinished">Present</translation>
+      <translation>存在</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation type="unfinished">Absent</translation>
+      <translation>不存在</translation>
     </message>
   </context>
   <context>
