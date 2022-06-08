@@ -83,7 +83,7 @@ private:
     QList<CredentialsTileModel> m_credentialsList;
     std::unique_ptr<CredentialsManager> m_credentialsManager;
     QString m_currentUser;
-    bool m_hasSavedCredentials;
+    bool m_hasSavedCredentials = false;
 };
 
 } // namespace nx::vms::client::core
