@@ -84,7 +84,8 @@ public:
 
 NX_REFLECTION_INSTRUMENT(ConnectionOptions, (driverType)(hostName)(port)(dbName)(userName) \
     (password)(connectOptions)(encoding)(maxConnectionCount)(inactivityTimeout) \
-    (maxPeriodQueryWaitsForAvailableConnection)(maxErrorsInARowBeforeClosingConnection))
+    (maxPeriodQueryWaitsForAvailableConnection)(maxErrorsInARowBeforeClosingConnection) \
+    (failOnDbTuneError)(concurrentModificationQueryLimit))
 
 enum class NX_SQL_API QueryType
 {
