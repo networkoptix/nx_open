@@ -94,6 +94,10 @@
         <source>Verifying update package</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Cannot connect to the System</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ContextMenu</name>
@@ -7590,10 +7594,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
         <source>Select Camera</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>No cameras available</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
