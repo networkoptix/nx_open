@@ -30,7 +30,6 @@ public:
 
     Q_INVOKABLE bool activateTrigger(const QnUuid& ruleId);
     Q_INVOKABLE bool deactivateTrigger();
-    Q_INVOKABLE void cancelTriggerAction();
     Q_INVOKABLE QnUuid activeTriggerId() const;
     Q_INVOKABLE bool hasActiveTrigger() const;
 
@@ -40,6 +39,9 @@ signals:
     void triggerActivated(const QnUuid& ruleId, bool success);
     void triggerDeactivated(const QnUuid& ruleId, bool success);
     void triggerCancelled(const QnUuid& ruleId);
+
+private:
+    void cancelTriggerAction();
 
 private:
     struct Private;

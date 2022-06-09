@@ -74,6 +74,7 @@ void Initializer::registerFields() const
     registerEventField<SourceServerField>();
     registerEventField<SourceUserField>();
     registerEventField<StateField>();
+    registerEventField<UniqueIdField>();
 
     registerActionField<ActionTextField>();
     registerActionField<FlagField>();

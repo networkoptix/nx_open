@@ -18,7 +18,7 @@ public:
     OrderedRequestsHelper(QObject* parent = nullptr);
     ~OrderedRequestsHelper();
 
-    void getJsonResult(
+    void postJsonResult(
         const rest::ServerConnectionPtr& connection,
         const QString& action,
         const nx::network::rest::Params& params,

@@ -2,24 +2,32 @@
 
 #include "soft_trigger_event.h"
 
+#include "../event_fields/customizable_icon_field.h"
+#include "../event_fields/customizable_text_field.h"
 #include "../event_fields/source_camera_field.h"
 #include "../event_fields/source_user_field.h"
-#include "../event_fields/text_field.h"
+#include "../event_fields/unique_id_field.h"
 #include "../utils/event_details.h"
+#include "../utils/field.h"
 #include "../utils/string_helper.h"
 
 namespace nx::vms::rules {
 
 SoftTriggerEvent::SoftTriggerEvent(
     std::chrono::microseconds timestamp,
+    State state,
+    QnUuid triggerId,
     QnUuid cameraId,
     QnUuid userId,
-    const QString& triggerName)
+    const QString& name,
+    const QString& icon)
     :
-    BasicEvent(timestamp),
+    BasicEvent(timestamp, state),
+    m_triggerId(triggerId),
     m_cameraId(cameraId),
     m_userId(userId),
-    m_triggerName(triggerName)
+    m_triggerName(name),
+    m_triggerIcon(icon)
 {
 }
 
@@ -51,7 +59,7 @@ QString SoftTriggerEvent::trigger() const
 
 QString SoftTriggerEvent::caption() const
 {
-    return QString("%1 %2").arg(type()).arg(trigger());
+    return QString("%1 %2").arg(manifest().displayName).arg(trigger());
 }
 
 QString SoftTriggerEvent::detailing() const
@@ -73,12 +81,14 @@ const ItemDescriptor& SoftTriggerEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = "nx.events.softTrigger",
-        .displayName = tr("Software Trigger"),
+        .displayName = tr("Soft Trigger"),
         .flags = {ItemFlag::instant, ItemFlag::prolonged},
         .fields = {
-            makeFieldDescriptor<SourceCameraField>("cameraId", tr("Camera ID")),
-            makeFieldDescriptor<SourceUserField>("userId", tr("User ID")),
-            makeFieldDescriptor<EventTextField>("triggerName", tr("Name"))
+            makeFieldDescriptor<UniqueIdField>("triggerId", "Invisible"),
+            makeFieldDescriptor<SourceCameraField>(utils::kCameraIdFieldName, tr("Cameras")),
+            makeFieldDescriptor<SourceUserField>("userId", tr("Users")),
+            makeFieldDescriptor<CustomizableTextField>("triggerName", tr("Name")),
+            makeFieldDescriptor<CustomizableIconField>("triggerIcon", tr("Icon")),
         },
         .emailTemplatePath = ":/email_templates/software_trigger.mustache"
     };

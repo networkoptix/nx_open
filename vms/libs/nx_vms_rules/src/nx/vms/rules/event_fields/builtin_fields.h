@@ -18,3 +18,4 @@
 #include "source_user_field.h"
 #include "state_field.h"
 #include "text_field.h"
+#include "unique_id_field.h"

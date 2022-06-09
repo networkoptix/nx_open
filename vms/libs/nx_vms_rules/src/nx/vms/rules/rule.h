@@ -9,10 +9,12 @@
 
 #include <nx/utils/uuid.h>
 
+class QDateTime;
+
 namespace nx::vms::rules {
 
-class EventFilter;
 class ActionBuilder;
+class EventFilter;
 
 /**
  * VMS rule description.
@@ -54,6 +56,7 @@ public:
 
     void setSchedule(const QByteArray& schedule);
     QByteArray schedule() const;
+    bool timeInSchedule(QDateTime time) const;
 
     void connectSignals();
 

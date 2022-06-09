@@ -214,8 +214,10 @@ public:
      */
     std::unique_ptr<ActionField> buildActionField(const QString& fieldType) const;
 
-private:
+public:
     void processEvent(const EventPtr& event);
+
+private:
     void processAcceptedEvent(const QnUuid& ruleId, const EventData& eventData);
     void processAction(const ActionPtr& action);
 
