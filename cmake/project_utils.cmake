@@ -167,8 +167,15 @@ function(nx_add_target name type)
         nx_target_enable_werror(${name} "${NX_WERROR_IF}")
     endif()
 
-    if(NOT NX_NO_MOC)
-        nx_add_qt_mocables(${name} ${hpp_files} ${NX_ADDITIONAL_MOCABLES}
+    # Always run moc for ADDITIONAL_MOCABLES, even if NO_MOC is set.
+    if(NX_NO_MOC)
+        set(mocable_files ${NX_ADDITIONAL_MOCABLES})
+    else()
+        set(mocable_files ${hpp_files} ${NX_ADDITIONAL_MOCABLES})
+    endif()
+
+    if(NOT NX_NO_MOC OR NX_ADDITIONAL_MOCABLES)
+        nx_add_qt_mocables(${name} ${mocable_files}
             INCLUDE_DIRS
                 ${source_dir}
                 ${NX_ADDITIONAL_MOC_INCLUDE_DIRS}
