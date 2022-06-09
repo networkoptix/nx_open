@@ -80,6 +80,13 @@ public:
 
     void connectSignals();
 
+    template<class T>
+    const T* fieldByName(const QString& name) const
+    {
+        const auto it = m_fields.find(name);
+        return (it == m_fields.end()) ? nullptr : dynamic_cast<T*>(it->second.get());
+    }
+
 signals:
     void stateChanged();
     void action(const ActionPtr& action);

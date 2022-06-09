@@ -12,6 +12,8 @@
 
 class AudioPlayer;
 
+namespace nx::vms::rules { class NotificationAction; }
+
 namespace nx::vms::client::desktop {
 
 class NotificationListModel::Private:
@@ -32,6 +34,7 @@ public:
     static ExtraData extraData(const EventData& event);
 
 private:
+    void onNotificationAction(const QSharedPointer<nx::vms::rules::NotificationAction>& action);
     void addNotification(const vms::event::AbstractActionPtr& action);
     void removeNotification(const vms::event::AbstractActionPtr& action);
 

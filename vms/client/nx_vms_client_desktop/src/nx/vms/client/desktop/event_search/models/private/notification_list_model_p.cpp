@@ -143,39 +143,7 @@ NotificationListModel::Private::Private(NotificationListModel* q):
 
     connect(context()->instance<QnWorkbenchNotificationsExecutor>(),
         &QnWorkbenchNotificationsExecutor::notificationActionReceived,
-        this,
-        [this](const QSharedPointer<nx::vms::rules::NotificationAction>& notificationAction)
-        {
-            EventData eventData;
-            eventData.id = QnUuid::createUuid(); //< #mmalofeev Is it ok to use new id here?
-            eventData.title = notificationAction->caption();
-            eventData.description = notificationAction->description();
-            eventData.toolTip = notificationAction->tooltip();
-            eventData.lifetime = kDisplayTimeout;
-            eventData.removable = true;
-            eventData.timestamp = notificationAction->timestamp();
-
-            if (!notificationAction->source().isNull())
-            {
-                eventData.source = resourcePool()->getResourceById(notificationAction->source());
-                if (eventData.source)
-                {
-                    if (auto camera = eventData.source.dynamicCast<QnVirtualCameraResource>())
-                    {
-                        eventData.previewCamera = camera;
-                        eventData.cameras = {camera};
-                    }
-                }
-            }
-
-            eventData.extraData =
-                QVariant::fromValue(ExtraData(notificationAction->ruleId(), eventData.source));
-
-            if (!this->q->addEvent(eventData))
-                return;
-
-            truncateToMaximumCount();
-        });
+        this, &NotificationListModel::Private::onNotificationAction);
 }
 
 NotificationListModel::Private::~Private()
@@ -187,6 +155,40 @@ NotificationListModel::Private::ExtraData NotificationListModel::Private::extraD
 {
     NX_ASSERT(event.extraData.canConvert<ExtraData>());
     return event.extraData.value<ExtraData>();
+}
+
+void NotificationListModel::Private::onNotificationAction(
+    const QSharedPointer<nx::vms::rules::NotificationAction>& action)
+{
+    EventData eventData;
+    eventData.id = QnUuid::createUuid(); //< #mmalofeev Is it ok to use new id here?
+    eventData.title = action->caption();
+    eventData.description = action->description();
+    eventData.toolTip = action->tooltip();
+    eventData.lifetime = kDisplayTimeout;
+    eventData.removable = true;
+    eventData.timestamp = action->timestamp();
+
+    if (!action->cameraId().isNull())
+    {
+        eventData.source = resourcePool()->getResourceById(action->cameraId());
+        if (eventData.source)
+        {
+            if (auto camera = eventData.source.dynamicCast<QnVirtualCameraResource>())
+            {
+                eventData.previewCamera = camera;
+                eventData.cameras = {camera};
+            }
+        }
+    }
+
+    eventData.extraData =
+        QVariant::fromValue(ExtraData(action->ruleId(), eventData.source));
+
+    if (!this->q->addEvent(eventData))
+        return;
+
+    truncateToMaximumCount();
 }
 
 void NotificationListModel::Private::addNotification(const vms::event::AbstractActionPtr& action)

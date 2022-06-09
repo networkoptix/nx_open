@@ -49,7 +49,7 @@ OrderedRequestsHelper::~OrderedRequestsHelper()
 {
 }
 
-void OrderedRequestsHelper::getJsonResult(
+void OrderedRequestsHelper::postJsonResult(
     const rest::ServerConnectionPtr& connection,
     const QString& action,
     const nx::network::rest::Params& params,
@@ -76,7 +76,7 @@ void OrderedRequestsHelper::getJsonResult(
     const auto request =
         [connection, action, params, internalCallback, targetThread]()
         {
-            return connection->getJsonResult(action, params, internalCallback, targetThread);
+            return connection->postJsonResult(action, params, {}, internalCallback, targetThread);
         };
 
     d->addRequest(request);

@@ -14,7 +14,7 @@ CustomizableIconField::CustomizableIconField()
 
 bool CustomizableIconField::match(const QVariant& value) const
 {
-    NX_ASSERT(false, "Method not implemented");
+    // Field value used for event customization, matches any event value.
     return true;
 }
 

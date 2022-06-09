@@ -19,7 +19,7 @@ class NX_VMS_RULES_API NotificationAction: public nx::vms::rules::BasicAction
     FIELD(nx::vms::rules::UuidSelection, users, setUsers)
     FIELD(int, interval, setInterval)
     FIELD(bool, acknowledge, setAcknowledge)
-    FIELD(QnUuid, source, setSource)
+    FIELD(QnUuid, cameraId, setCameraId)
 
 public:
     static const ItemDescriptor& manifest();

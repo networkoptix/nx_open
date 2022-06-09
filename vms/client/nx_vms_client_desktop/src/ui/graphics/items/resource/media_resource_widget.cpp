@@ -56,6 +56,7 @@
 #include <nx/vms/client/core/media/consuming_motion_metadata_provider.h>
 #include <nx/vms/client/core/motion/motion_grid.h>
 #include <nx/vms/client/core/software_trigger/software_triggers_controller.h>
+#include <nx/vms/client/core/software_trigger/software_triggers_watcher.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
@@ -136,9 +137,10 @@ using namespace ui;
 namespace ptz = nx::vms::common::ptz;
 namespace html = nx::vms::common::html;
 
-using nx::vms::client::core::MotionSelection;
 using nx::vms::client::core::Geometry;
 using nx::vms::client::core::MotionGrid;
+using nx::vms::client::core::MotionSelection;
+using nx::vms::client::core::SoftwareTriggersWatcher;
 
 namespace {
 
@@ -262,6 +264,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(
     m_watermarkPainter(new WatermarkPainter),
     m_encryptedArchivePasswordDialog(new EncryptedArchivePasswordDialog(mainWindow())),
     m_itemId(item->uuid()),
+    m_triggerWatcher(new SoftwareTriggersWatcher(systemContext, this)),
     m_triggersController(
         new nx::vms::client::core::SoftwareTriggersController(systemContext, this)),
     m_buttonController(new CameraButtonController(this)),
@@ -591,22 +594,19 @@ void QnMediaResourceWidget::initSoftwareTriggers()
     static const auto kUpdateTriggersInterval = 1000;
     const auto updateTriggersAvailabilityTimer = new QTimer(this);
     updateTriggersAvailabilityTimer->setInterval(kUpdateTriggersInterval);
+
     connect(updateTriggersAvailabilityTimer, &QTimer::timeout,
-        this, &QnMediaResourceWidget::updateTriggersAvailability);
+        m_triggerWatcher, &SoftwareTriggersWatcher::updateTriggersAvailability);
+
+    connect(m_triggerWatcher, &SoftwareTriggersWatcher::triggerAdded,
+        this, &QnMediaResourceWidget::at_triggerAdded);
+    connect(m_triggerWatcher, &SoftwareTriggersWatcher::triggerRemoved,
+        this, &QnMediaResourceWidget::at_triggerRemoved);
+    connect(m_triggerWatcher, &SoftwareTriggersWatcher::triggerFieldsChanged,
+        this, &QnMediaResourceWidget::at_triggerFieldsChanged);
+
+    m_triggerWatcher->setResourceId(d->resource->getId());
     updateTriggersAvailabilityTimer->start();
-
-    resetTriggers();
-
-    auto eventRuleManager = systemContext()->eventRuleManager();
-
-    connect(eventRuleManager, &nx::vms::event::RuleManager::rulesReset,
-        this, &QnMediaResourceWidget::resetTriggers);
-
-    connect(eventRuleManager, &nx::vms::event::RuleManager::ruleAddedOrUpdated,
-        this, &QnMediaResourceWidget::at_eventRuleAddedOrUpdated);
-
-    connect(eventRuleManager, &nx::vms::event::RuleManager::ruleRemoved,
-        this, &QnMediaResourceWidget::at_eventRuleRemoved);
 }
 
 void QnMediaResourceWidget::initIoModuleOverlay()
@@ -3133,87 +3133,29 @@ QAction* QnMediaResourceWidget::createActionAndButton(const QString& iconName,
 // ------------------------------------------------------------------------------------------------
 // Soft Triggers
 
-QnMediaResourceWidget::SoftwareTriggerInfo QnMediaResourceWidget::makeTriggerInfo(
-    const nx::vms::event::RulePtr& rule) const
+void QnMediaResourceWidget::createTrigger(const SoftwareTriggerInfo& info)
 {
-    return SoftwareTriggerInfo({
-        rule->id(),
-        rule->eventParams().caption,
-        rule->eventParams().description,
-        rule->isActionProlonged() });
-}
-
-void QnMediaResourceWidget::createTriggerIfRelevant(
-    const nx::vms::event::RulePtr& rule)
-{
-    if (!isRelevantTriggerRule(rule))
-        return;
-
-    const auto info = makeTriggerInfo(rule);
-
     const auto lowerBoundPredicate =
-        [](const SoftwareTrigger& left, const SoftwareTriggerInfo& right)
+        [](const SoftwareTriggerInfo& left, const SoftwareTriggerInfo& right)
         {
-            return left.info.name < right.name
-                || (left.info.name == right.name
-                    && left.info.icon < right.icon);
+            return left.name < right.name
+                || (left.name == right.name
+                    && left.icon < right.icon);
         };
 
     const int index = std::lower_bound(m_triggers.cbegin(), m_triggers.cend(), info,
         lowerBoundPredicate) - m_triggers.cbegin();
 
-    std::function<void()> clientSideHandler;
-    if (rule->actionType() == nx::vms::api::ActionType::bookmarkAction)
-    {
-        clientSideHandler =
-            [this] { action(action::BookmarksModeAction)->setChecked(true); };
-    }
-
     const auto button = new SoftwareTriggerButton(this);
-    configureTriggerButton(button, info, clientSideHandler);
+    configureTriggerButton(button, info);
 
-    connect(button, &SoftwareTriggerButton::isLiveChanged, this,
-        [this, rule]()
-        {
-            updateTriggerAvailability(rule);
-        });
-
-    const auto overlayItemId = m_triggersContainer->insertItem(index, button, rule->id());
-    m_triggers.insert(index, SoftwareTrigger{rule->id(), info, overlayItemId});
-}
-
-bool QnMediaResourceWidget::isRelevantTriggerRule(const nx::vms::event::RulePtr& rule) const
-{
-    if (rule->isDisabled() || rule->eventType() != EventType::softwareTriggerEvent)
-        return false;
-
-    const auto resourceId = d->resource->getId();
-    if (!rule->eventResources().empty() && !rule->eventResources().contains(resourceId))
-        return false;
-
-    if (rule->eventParams().metadata.allUsers)
-        return true;
-
-    const auto currentUser = accessController()->user();
-    if (!currentUser)
-        return false; //< All triggers will be added when user is set up.
-
-    const auto subjects = rule->eventParams().metadata.instigators;
-    if (::contains(subjects, currentUser->getId()))
-        return true;
-
-    for (const auto& roleId: currentUser->allUserRoleIds())
-    {
-        if (::contains(subjects, roleId))
-            return true;
-    }
-    return false;
+    const auto overlayItemId = m_triggersContainer->insertItem(index, button, info.ruleId);
+    m_triggers.insert(index, info);
 }
 
 void QnMediaResourceWidget::updateTriggerButtonTooltip(
     SoftwareTriggerButton* button,
-    const SoftwareTriggerInfo& info,
-    bool enabledBySchedule)
+    const SoftwareTriggerInfo& info)
 {
     if (!button)
     {
@@ -3221,7 +3163,7 @@ void QnMediaResourceWidget::updateTriggerButtonTooltip(
         return;
     }
 
-    if (enabledBySchedule)
+    if (info.enabled)
     {
         const auto name = nx::vms::event::StringsHelper::getSoftwareTriggerName(info.name);
         button->setToolTip(info.prolonged
@@ -3236,29 +3178,46 @@ void QnMediaResourceWidget::updateTriggerButtonTooltip(
 }
 
 void QnMediaResourceWidget::configureTriggerButton(SoftwareTriggerButton* button,
-    const SoftwareTriggerInfo& info, std::function<void()> clientSideHandler)
+    const SoftwareTriggerInfo& info)
 {
     NX_ASSERT(button);
 
     button->setIcon(info.icon);
     button->setProlonged(info.prolonged);
-    updateTriggerButtonTooltip(button, info, true);
+
+    const bool buttonEnabled = !button->isLive() || info.enabled;
+    if (button->isEnabled() != buttonEnabled)
+    {
+        if (!buttonEnabled)
+        {
+            const bool longPressed = info.prolonged &&
+                button->state() == SoftwareTriggerButton::State::Waiting;
+            if (longPressed)
+                button->setState(SoftwareTriggerButton::State::Failure);
+        }
+
+        button->setEnabled(buttonEnabled);
+    }
+
+    updateTriggerButtonTooltip(button, info);
+
+    button->disconnect(this);
 
     if (info.prolonged)
     {
         connect(button, &SoftwareTriggerButton::pressed, this,
-            [this, button, clientSideHandler, info]()
+            [this, button, handler = info.clientSideHandler, ruleId = info.ruleId]()
             {
                 if (!button->isLive())
                     return;
 
-                const bool success = m_triggersController->activateTrigger(info.ruleId);
+                const bool success = m_triggersController->activateTrigger(ruleId);
                 button->setState(success
                     ? SoftwareTriggerButton::State::Waiting
                     : SoftwareTriggerButton::State::Failure);
 
-                if (success && clientSideHandler)
-                    clientSideHandler();
+                if (success && handler)
+                    handler();
 
                 menu()->triggerIfPossible(action::SuspendCurrentTourAction);
             });
@@ -3283,19 +3242,19 @@ void QnMediaResourceWidget::configureTriggerButton(SoftwareTriggerButton* button
     else
     {
         connect(button, &SoftwareTriggerButton::clicked, this,
-            [this, button, clientSideHandler, info]()
+            [this, button, handler = info.clientSideHandler, ruleId = info.ruleId]()
             {
                 if (!button->isLive())
                     return;
 
-                const bool success = m_triggersController->activateTrigger(info.ruleId);
+                const bool success = m_triggersController->activateTrigger(ruleId);
                 button->setEnabled(!success);
                 button->setState(success
                     ? SoftwareTriggerButton::State::Waiting
                     : SoftwareTriggerButton::State::Failure);
 
-                if (success && clientSideHandler)
-                    clientSideHandler();
+                if (success && handler)
+                    handler();
             });
     }
 
@@ -3306,25 +3265,12 @@ void QnMediaResourceWidget::configureTriggerButton(SoftwareTriggerButton* button
             if (!button->isLive())
                 menu()->trigger(action::JumpToLiveAction, this);
         });
-}
 
-void QnMediaResourceWidget::resetTriggers()
-{
-    // Delete all trigger buttons.
-    for (const auto& data: m_triggers)
-        m_triggersContainer->deleteItem(data.overlayItemId);
-
-    // Clear triggers information.
-    m_triggers.clear();
-
-    if (!accessController()->hasGlobalPermission(GlobalPermission::userInput))
-        return;
-
-    // Create new relevant triggers.
-    for (const auto& rule: systemContext()->eventRuleManager()->rules())
-        createTriggerIfRelevant(rule); //< Creates a trigger only if the rule is relevant.
-
-    updateTriggersAvailability();
+    connect(button, &SoftwareTriggerButton::isLiveChanged, this,
+        [this, ruleId = info.ruleId]()
+        {
+            m_triggerWatcher->updateTriggerAvailability(ruleId);
+        });
 }
 
 int QnMediaResourceWidget::triggerIndex(const QnUuid& ruleId) const
@@ -3340,90 +3286,68 @@ void QnMediaResourceWidget::removeTrigger(int index)
     if (!NX_ASSERT(index >= 0 && index < m_triggers.size()))
         return;
 
-    m_triggersContainer->deleteItem(m_triggers[index].overlayItemId);
+    m_triggersContainer->deleteItem(m_triggers[index].ruleId);
     m_triggers.removeAt(index);
 }
 
-void QnMediaResourceWidget::at_eventRuleRemoved(const QnUuid& ruleId)
+void QnMediaResourceWidget::at_triggerRemoved(QnUuid id)
 {
-    const int index = triggerIndex(ruleId);
-    if (index >= 0)
-        removeTrigger(index);
+    removeTrigger(triggerIndex(id));
 }
 
-void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const nx::vms::event::RulePtr& rule)
+void QnMediaResourceWidget::at_triggerAdded(
+    QnUuid id,
+    const QString& iconPath,
+    const QString& name,
+    bool prolonged,
+    bool enabled)
 {
-    const int index = triggerIndex(rule->id());
-    if (index < 0)
+    auto info = SoftwareTriggerInfo{
+        .ruleId = id,
+        .name = name,
+        .icon = iconPath,
+        .enabled = enabled,
+        .prolonged = prolonged,
+    };
+
+    // TODO: #amalov Fill client side handler.
+    createTrigger(info);
+}
+
+void QnMediaResourceWidget::at_triggerFieldsChanged(
+    QnUuid id,
+    SoftwareTriggersWatcher::TriggerFields fields)
+{
+    if (!fields)
+        return;
+
+    int index = triggerIndex(id);
+    if (!NX_ASSERT(index > 0))
+        return;
+
+    auto info = m_triggers[index];
+
+    if (fields.testFlag(SoftwareTriggersWatcher::NameField))
+        info.name = m_triggerWatcher->triggerName(id);
+    if (fields.testFlag(SoftwareTriggersWatcher::IconField))
+        info.icon = m_triggerWatcher->triggerIcon(id);
+    if (fields.testFlag(SoftwareTriggersWatcher::ProlongedField))
+        info.prolonged = m_triggerWatcher->prolongedTrigger(id);
+    if (fields.testFlag(SoftwareTriggersWatcher::EnabledField))
+        info.enabled = m_triggerWatcher->triggerEnabled(id);
+
+    if (fields & SoftwareTriggersWatcher::TriggerFields{
+        SoftwareTriggersWatcher::NameField,
+        SoftwareTriggersWatcher::IconField})
     {
-        // Create a new trigger if the rule is relevant.
-        createTriggerIfRelevant(rule);
+        // Recreate trigger to maintain alphabetic order.
+        removeTrigger(index);
+        createTrigger(info);
     }
     else
     {
-        // Delete the trigger.
-        removeTrigger(index);
-
-        // Create a new trigger if the rule is still relevant.
-        createTriggerIfRelevant(rule);
+        configureTriggerButton(
+            static_cast<SoftwareTriggerButton*>(m_triggersContainer->item(index)),
+            info);
     }
-
-    // Forcing update of the trigger button.
-    updateTriggerAvailability(rule);
-};
-
-void QnMediaResourceWidget::updateTriggerAvailability(const nx::vms::event::RulePtr& rule)
-{
-    if (!NX_ASSERT(rule))
-        return;
-
-    const int index = triggerIndex(rule->id());
-    if (index < 0)
-        return;
-
-    const auto& trigger = m_triggers[index];
-
-    const auto button = qobject_cast<SoftwareTriggerButton*>(
-        m_triggersContainer->item(trigger.overlayItemId));
-
-    if (!button)
-        return;
-
-    const auto isScheduleMatchTime =
-        [this](const nx::vms::event::RulePtr& rule)
-        {
-            const auto server = d->camera
-                ? d->camera->getParentServer()
-                : QnMediaServerResourcePtr();
-
-            if (server)
-            {
-                return rule->isScheduleMatchTime(
-                    serverTimeWatcher()->serverTime(server, qnSyncTime->currentMSecsSinceEpoch()));
-            }
-
-            // If no server, fallback to client timezone.
-            return rule->isScheduleMatchTime(qnSyncTime->currentDateTime());
-        };
-
-    const bool buttonEnabled = !button->isLive() || isScheduleMatchTime(rule);
-    if (button->isEnabled() == buttonEnabled)
-        return;
-
-    if (!buttonEnabled)
-    {
-        const bool longPressed = trigger.info.prolonged &&
-            button->state() == SoftwareTriggerButton::State::Waiting;
-        if (longPressed)
-            button->setState(SoftwareTriggerButton::State::Failure);
-    }
-
-    button->setEnabled(buttonEnabled);
-    updateTriggerButtonTooltip(button, trigger.info, buttonEnabled);
-}
-
-void QnMediaResourceWidget::updateTriggersAvailability()
-{
-    for (auto data: m_triggers)
-        updateTriggerAvailability(systemContext()->eventRuleManager()->rule(data.ruleId));
 }

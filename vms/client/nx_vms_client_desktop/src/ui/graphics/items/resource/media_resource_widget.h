@@ -21,6 +21,7 @@
 #include <nx/vms/api/data/image_correction_data.h>
 #include <nx/vms/client/core/common/data/motion_selection.h>
 #include <nx/vms/client/core/media/abstract_analytics_metadata_provider.h>
+#include <nx/vms/client/core/software_trigger/software_triggers_watcher.h>
 #include <nx/vms/client/desktop/camera/camera_fwd.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/types.h>
 #include <nx/vms/common/ptz/datafield.h>
@@ -356,8 +357,18 @@ private slots:
     void at_item_imageEnhancementChanged();
     void at_videoLayoutChanged();
 
-    void at_eventRuleAddedOrUpdated(const nx::vms::event::RulePtr& rule);
-    void at_eventRuleRemoved(const QnUuid& ruleId);
+    void at_triggerRemoved(QnUuid id);
+
+    void at_triggerAdded(
+        QnUuid id,
+        const QString& iconPath,
+        const QString& name,
+        bool prolonged,
+        bool enabled);
+
+    void at_triggerFieldsChanged(
+        QnUuid id,
+        nx::vms::client::core::SoftwareTriggersWatcher::TriggerFields fields);
 
 private:
     void handleItemDataChanged(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
@@ -410,22 +421,9 @@ private:
         QnUuid ruleId;
         QString name;
         QString icon;
+        bool enabled = false;
         bool prolonged = false;
-
-        bool operator ==(const SoftwareTriggerInfo& other) const
-        {
-            return ruleId == other.ruleId
-                && name == other.name
-                && icon == other.icon
-                && prolonged == other.prolonged;
-        }
-    };
-
-    struct SoftwareTrigger
-    {
-        QnUuid ruleId;
-        SoftwareTriggerInfo info;
-        QnUuid overlayItemId;
+        std::function<void()> clientSideHandler;
     };
 
     void initRenderer();
@@ -436,29 +434,19 @@ private:
     void initAnalyticsOverlays();
     void initStatusOverlayController();
 
-    inline SoftwareTriggerInfo makeTriggerInfo(const nx::vms::event::RulePtr& rule) const;
-
-    void createTriggerIfRelevant(const nx::vms::event::RulePtr& rule);
-    bool isRelevantTriggerRule(const nx::vms::event::RulePtr& rule) const;
+    void createTrigger(const SoftwareTriggerInfo& info);
 
     void configureTriggerButton(
         nx::vms::client::desktop::SoftwareTriggerButton* button,
-        const SoftwareTriggerInfo& info,
-        std::function<void()> clientSideHandler = std::function<void()>());
-
-    void resetTriggers();
+        const SoftwareTriggerInfo& info);
 
     int triggerIndex(const QnUuid& ruleId) const;
 
     void removeTrigger(int index);
 
-    void updateTriggersAvailability();
-    void updateTriggerAvailability(const nx::vms::event::RulePtr& rule);
-
     void updateTriggerButtonTooltip(
         nx::vms::client::desktop::SoftwareTriggerButton* button,
-        const SoftwareTriggerInfo& info,
-        bool enabledBySchedule);
+        const SoftwareTriggerInfo& info);
 
     void updateWatermark();
 
@@ -526,9 +514,12 @@ private:
     AreaType m_areaSelectionType{AreaType::none};
     QRectF m_analyticsFilterRect;
 
-    QList<SoftwareTrigger> m_triggers;
     QnUuid m_itemId;
+
+    QList<SoftwareTriggerInfo> m_triggers;
+    nx::vms::client::core::SoftwareTriggersWatcher* m_triggerWatcher = nullptr;
     nx::vms::client::core::SoftwareTriggersController* m_triggersController = nullptr;
+
     nx::vms::client::desktop::CameraButtonController* m_buttonController = nullptr;
     nx::vms::client::desktop::ObjectTrackingButtonController* m_objectTrackingButtonController = nullptr;
 
