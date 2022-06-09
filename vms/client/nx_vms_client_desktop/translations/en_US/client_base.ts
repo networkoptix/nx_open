@@ -7595,6 +7595,10 @@ We recommend you not to open this web page. If you understand the risks, you can
         <source>Select Camera</source>
         <translation></translation>
     </message>
+    <message>
+        <source>No cameras available</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::CameraSettingsDialog</name>
