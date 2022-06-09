@@ -81,6 +81,9 @@ protected:
 private:
     void updateDialogControls();
 
+    // Translatable string is processed incorrectly in the template method in header file.
+    static QString noCamerasAvailableMessage();
+
 private:
     const std::unique_ptr<Ui::CameraSelectionDialog> ui;
     ResourceSelectionWidget* m_resourceSelectionWidget;
@@ -125,7 +128,8 @@ bool CameraSelectionDialog::selectCameras(
 
     if (dialog.resourceSelectionWidget()->isEmpty())
     {
-        QnMessageBox::warning(parent, tr("No cameras available"));
+        // Translatable string is processed incorrectly in the template method in header file.
+        QnMessageBox::warning(parent, noCamerasAvailableMessage());
         return false;
     }
 

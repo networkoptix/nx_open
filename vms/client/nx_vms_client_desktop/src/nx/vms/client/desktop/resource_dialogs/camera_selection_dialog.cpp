@@ -153,4 +153,9 @@ void CameraSelectionDialog::updateDialogControls()
     }
 }
 
+QString CameraSelectionDialog::noCamerasAvailableMessage()
+{
+    return tr("No cameras available");
+}
+
 } // namespace nx::vms::client::desktop
