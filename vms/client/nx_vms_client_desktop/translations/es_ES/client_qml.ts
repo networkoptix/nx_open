@@ -283,7 +283,7 @@
     <name>ContextHintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>Click en el icono para leer más</translation>
     </message>
   </context>
   <context>

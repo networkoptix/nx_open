@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>Automatic client updates</source>
-      <translation type="unfinished">Automatic client updates</translation>
+      <translation>자동 클라이언트 업데이트</translation>
     </message>
     <message>
       <source>Turn this option on to make connected clients update automatically to the latest compatible version.</source>
@@ -45,7 +45,7 @@
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
-      <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
+      <translation>사용자 지정 클라이언트를 사용하고 있습니다. 업데이트 지침을 보려면 %1에 문의하십시오.</translation>
     </message>
   </context>
   <context>
@@ -131,7 +131,7 @@
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>모든 플러그인</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>
@@ -204,11 +204,11 @@
     </message>
     <message>
       <source>Choose devices...</source>
-      <translation type="unfinished">Choose devices...</translation>
+      <translation>장치 선택...</translation>
     </message>
     <message>
       <source>Choose cameras...</source>
-      <translation type="unfinished">Choose cameras...</translation>
+      <translation>카메라 선택...</translation>
     </message>
     <message>
       <source>none</source>
@@ -216,23 +216,23 @@
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
+      <translation>
+        <numerusform>%n 선택된 장치</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
+      <translation>
+        <numerusform>%n 선택된 카메라</numerusform>
       </translation>
     </message>
     <message>
       <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
+      <translation>선택된 장치</translation>
     </message>
     <message>
       <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
+      <translation>선택된 카메라</translation>
     </message>
   </context>
   <context>
@@ -279,7 +279,7 @@
     <name>ContextHintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>자세한 내용을 보려면 아이콘을 클릭하십시오.</translation>
     </message>
   </context>
   <context>
@@ -344,7 +344,7 @@
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+      <translation>필터를 변경하거나 이벤트 규칙을 만드십시오.</translation>
     </message>
     <message>
       <source>Event Log</source>
@@ -633,7 +633,7 @@
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>필터를 변경하거나 모션 녹화를 활성화해 보세요.</translation>
     </message>
     <message>
       <source>Select Camera...</source>
@@ -645,7 +645,7 @@
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+      <translation>타임라인에서 시간 범위를 선택하고 강조 표시된 부분을 마우스 오른쪽 버튼으로 클릭하여 즐겨찾기를 만듭니다.</translation>
     </message>
   </context>
   <context>
@@ -1019,7 +1019,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>선택</translation>
     </message>
     <message>
       <source>Cancel</source>

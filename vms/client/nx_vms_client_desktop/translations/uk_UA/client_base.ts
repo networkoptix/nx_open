@@ -96,6 +96,10 @@
       <source>Verifying update package</source>
       <translation>Перевірка оновлення</translation>
     </message>
+    <message>
+      <source>Cannot connect to the System</source>
+      <translation type="unfinished">Cannot connect to the System</translation>
+    </message>
   </context>
   <context>
     <name>ContextMenu</name>

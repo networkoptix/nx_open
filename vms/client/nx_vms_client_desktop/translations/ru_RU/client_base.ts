@@ -96,6 +96,10 @@
       <source>Verifying update package</source>
       <translation>Проверка пакета обновления</translation>
     </message>
+    <message>
+      <source>Cannot connect to the System</source>
+      <translation type="unfinished">Cannot connect to the System</translation>
+    </message>
   </context>
   <context>
     <name>ContextMenu</name>
@@ -3118,7 +3122,7 @@ to %1</source>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Создать</translation>
     </message>
     <message>
       <source>Restore from Database Backup</source>

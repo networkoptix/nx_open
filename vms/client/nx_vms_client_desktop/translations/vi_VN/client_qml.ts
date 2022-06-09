@@ -13,27 +13,27 @@
     </message>
     <message>
       <source>Notify about available updates</source>
-      <translation type="unfinished">Notify about available updates</translation>
+      <translation>Thông báo về các bản cập nhật khả dụng</translation>
     </message>
     <message>
       <source>Automatic client updates</source>
-      <translation type="unfinished">Automatic client updates</translation>
+      <translation>Cập nhật ứng dụng máy khách tự động</translation>
     </message>
     <message>
       <source>Turn this option on to make connected clients update automatically to the latest compatible version.</source>
-      <translation type="unfinished">Turn this option on to make connected clients update automatically to the latest compatible version.</translation>
+      <translation>Bật tùy chọn này để các ứng dụng máy khách liên kết tự động cập nhật lên phiên bản tương thích mới nhất.</translation>
     </message>
     <message>
       <source>Connecting clients will be automatically updated to the new version when it’s available.</source>
-      <translation type="unfinished">Connecting clients will be automatically updated to the new version when it’s available.</translation>
+      <translation>Các ứng dụng máy khách liên kết sẽ tự động được cập nhật lên phiên bản mới khi có thể.</translation>
     </message>
     <message>
       <source>All connecting clients are updating to version %1.</source>
-      <translation type="unfinished">All connecting clients are updating to version %1.</translation>
+      <translation>Tất cả các máy khách liên kết đang cập nhật lên phiên bản %1.</translation>
     </message>
     <message>
       <source>Connecting clients will be updated to version %1 on %2.</source>
-      <translation type="unfinished">Connecting clients will be updated to version %1 on %2.</translation>
+      <translation>Máy khách liên kết sẽ được cập nhật lên phiên bản %1 trên %2.</translation>
     </message>
     <message>
       <source>Check for updates</source>
@@ -41,11 +41,11 @@
     </message>
     <message>
       <source>Speed up this update</source>
-      <translation type="unfinished">Speed up this update</translation>
+      <translation>Tăng tốc độ cập nhật</translation>
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
-      <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
+      <translation>Bạn đang sử dụng một máy khách được tùy chỉnh. Vui lòng liên hệ %1 để nhận hướng dẫn cập nhật.</translation>
     </message>
   </context>
   <context>
@@ -63,7 +63,7 @@
     <name>AnalyticsFilters</name>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Loại đối tượng</translation>
     </message>
   </context>
   <context>
@@ -86,7 +86,7 @@
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Thử thay đổi bộ lọc hoặc định cấu hình phát hiện đối tượng trong cài đặt plugin camera</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>
@@ -100,14 +100,14 @@
     </message>
     <message>
       <source>Detected by</source>
-      <translation type="unfinished">Detected by</translation>
+      <translation>Được phát hiện bởi</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsSearchDialog</name>
     <message>
       <source>Advanced Object Search</source>
-      <translation type="unfinished">Advanced Object Search</translation>
+      <translation>Tìm kiếm đối tượng nâng cao</translation>
     </message>
     <message>
       <source>Select area</source>
@@ -127,11 +127,11 @@
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Thử thay đổi bộ lọc hoặc định cấu hình phát hiện đối tượng trong cài đặt plugin camera</translation>
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>Bất kỳ plugin nào</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>
@@ -200,15 +200,15 @@
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>Camera được chọn</translation>
     </message>
     <message>
       <source>Choose devices...</source>
-      <translation type="unfinished">Choose devices...</translation>
+      <translation>Chọn thiết bị...</translation>
     </message>
     <message>
       <source>Choose cameras...</source>
-      <translation type="unfinished">Choose cameras...</translation>
+      <translation>Chọn camera...</translation>
     </message>
     <message>
       <source>none</source>
@@ -216,23 +216,23 @@
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
+      <translation>
+        <numerusform>%n thiết bị được chọn</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
+      <translation>
+        <numerusform>%n camera được chọn</numerusform>
       </translation>
     </message>
     <message>
       <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
+      <translation>Thiết bị được chọn</translation>
     </message>
     <message>
       <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
+      <translation>Camera được chọn</translation>
     </message>
   </context>
   <context>
@@ -251,7 +251,7 @@
     </message>
     <message>
       <source>Pending</source>
-      <translation type="unfinished">Pending</translation>
+      <translation>Đang chờ xử lý</translation>
     </message>
   </context>
   <context>
@@ -279,18 +279,18 @@
     <name>ContextHintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>Nhấp vào biểu tượng để đọc thêm</translation>
     </message>
   </context>
   <context>
     <name>CounterBlock</name>
     <message>
       <source>Remove column</source>
-      <translation type="unfinished">Remove column</translation>
+      <translation>Xóa cột</translation>
     </message>
     <message>
       <source>Add column</source>
-      <translation type="unfinished">Add column</translation>
+      <translation>Thêm cột</translation>
     </message>
     <message>
       <source>Hide information</source>
@@ -325,7 +325,7 @@
     </message>
     <message>
       <source>360° Equirectangular</source>
-      <translation type="unfinished">360° Equirectangular</translation>
+      <translation>Làm phẳng 360 °</translation>
     </message>
   </context>
   <context>
@@ -336,7 +336,7 @@
     </message>
     <message>
       <source>See %1 for other events</source>
-      <translation type="unfinished">See %1 for other events</translation>
+      <translation>Xem %1 cho các sự kiện khác</translation>
     </message>
     <message>
       <source>No events</source>
@@ -344,7 +344,7 @@
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+      <translation>Thử thay đổi bộ lọc hoặc tạo Quy tắc sự kiện</translation>
     </message>
     <message>
       <source>Event Log</source>
@@ -404,7 +404,7 @@
     </message>
     <message>
       <source>Show grid</source>
-      <translation type="unfinished">Show grid</translation>
+      <translation>Hiển thị lưới</translation>
     </message>
     <message>
       <source>Auto Calibration</source>
@@ -412,31 +412,31 @@
     </message>
     <message>
       <source>Mount</source>
-      <translation type="unfinished">Mount</translation>
+      <translation>Gắn</translation>
     </message>
     <message>
       <source>Ceiling</source>
-      <translation type="unfinished">Ceiling</translation>
+      <translation>Trần nhà</translation>
     </message>
     <message>
       <source>Wall</source>
-      <translation type="unfinished">Wall</translation>
+      <translation>Gắn lên tường</translation>
     </message>
     <message>
       <source>Floor/table</source>
-      <translation type="unfinished">Floor/table</translation>
+      <translation>Gắn lên Sàn nhà/Bàn</translation>
     </message>
     <message>
       <source>Angle</source>
-      <translation type="unfinished">Angle</translation>
+      <translation>Góc</translation>
     </message>
     <message>
       <source>Camera roll correction</source>
-      <translation type="unfinished">Camera roll correction</translation>
+      <translation>Chỉnh sửa thư viện ảnh</translation>
     </message>
     <message>
       <source>Lens projection</source>
-      <translation type="unfinished">Lens projection</translation>
+      <translation>Chiếu thấu kính</translation>
     </message>
     <message>
       <source>Equidistant</source>
@@ -472,14 +472,14 @@
     <message>
       <source>Hold %1 to activate actions</source>
       <comment>Leave %1 as is. It will be replaced to button name.</comment>
-      <translation type="unfinished">Hold %1 to activate actions</translation>
+      <translation>Giữ %1 để kích hoạt các hành động</translation>
     </message>
   </context>
   <context>
     <name>InformationBubble</name>
     <message>
       <source>Detected by</source>
-      <translation type="unfinished">Detected by</translation>
+      <translation>Được phát hiện bởi</translation>
     </message>
   </context>
   <context>
@@ -533,18 +533,18 @@
     </message>
     <message>
       <source>Toggle Repeat</source>
-      <translation type="unfinished">Toggle Repeat</translation>
+      <translation>Chuyển đổi lặp lại</translation>
     </message>
   </context>
   <context>
     <name>JoystickSettingsDialog</name>
     <message>
       <source>Joystick Settings</source>
-      <translation type="unfinished">Joystick Settings</translation>
+      <translation>Cài đặt cần điều khiển</translation>
     </message>
     <message>
       <source>joystick</source>
-      <translation type="unfinished">joystick</translation>
+      <translation>Cần điều khiển</translation>
     </message>
     <message>
       <source>Basic Actions</source>
@@ -552,34 +552,34 @@
     </message>
     <message>
       <source>With Modifier</source>
-      <translation type="unfinished">With Modifier</translation>
+      <translation>Với Bộ điều chỉnh</translation>
     </message>
     <message>
       <source>This model is not supported</source>
-      <translation type="unfinished">This model is not supported</translation>
+      <translation>Chế độ này không được hỗ trợ</translation>
     </message>
     <message>
       <source>Reset to Default</source>
-      <translation type="unfinished">Reset to Default</translation>
+      <translation>Khôi phục về mặc định</translation>
     </message>
   </context>
   <context>
     <name>JoystickSettingsTab</name>
     <message>
       <source>Pan and Tilt</source>
-      <translation type="unfinished">Pan and Tilt</translation>
+      <translation>Xoay và Nghiêng</translation>
     </message>
     <message>
       <source>Zoom In / Zoom Out</source>
-      <translation type="unfinished">Zoom In / Zoom Out</translation>
+      <translation>Phóng to / thu nhỏ</translation>
     </message>
     <message>
       <source>Select Camera on Layout</source>
-      <translation type="unfinished">Select Camera on Layout</translation>
+      <translation>Chọn Camera trên Bố cục</translation>
     </message>
     <message>
       <source>Log in to the system to configure how to open layouts</source>
-      <translation type="unfinished">Log in to the system to configure how to open layouts</translation>
+      <translation>Đăng nhập vào hệ thống để cấu hình cách mở các bố cục</translation>
     </message>
   </context>
   <context>
@@ -625,7 +625,7 @@
     </message>
     <message>
       <source>Select a camera to see its motion events</source>
-      <translation type="unfinished">Select a camera to see its motion events</translation>
+      <translation>Chọn một máy ảnh để xem các sự kiện chuyển động</translation>
     </message>
     <message>
       <source>No motion detected</source>
@@ -633,11 +633,11 @@
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>Thử thay đổi bộ lọc hoặc bật ghi chuyển động</translation>
     </message>
     <message>
       <source>Select Camera...</source>
-      <translation type="unfinished">Select Camera...</translation>
+      <translation>Chọn camera...</translation>
     </message>
     <message>
       <source>No bookmarks</source>
@@ -645,7 +645,7 @@
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+      <translation>Chọn khoảng thời gian trên dòng thời gian và nhấp chuột phải vào phần nổi bật để tạo dấu trang</translation>
     </message>
   </context>
   <context>
@@ -683,18 +683,18 @@
     </message>
     <message>
       <source>Select an area on the video to filter results</source>
-      <translation type="unfinished">Select an area on the video to filter results</translation>
+      <translation>Chọn một vùng trên video để lọc kết quả</translation>
     </message>
   </context>
   <context>
     <name>ObjectEditor</name>
     <message>
       <source>Present</source>
-      <translation type="unfinished">Present</translation>
+      <translation>Trình bày</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation type="unfinished">Absent</translation>
+      <translation>Vắng mặt</translation>
     </message>
   </context>
   <context>
@@ -712,7 +712,7 @@
     </message>
     <message>
       <source>URL or Host:Port</source>
-      <translation type="unfinished">URL or Host:Port</translation>
+      <translation>URL hoặc Máy chủ:Cổng</translation>
     </message>
     <message>
       <source>Login</source>
@@ -787,7 +787,7 @@
     </message>
     <message>
       <source>Select the object to display the preview</source>
-      <translation type="unfinished">Select the object to display the preview</translation>
+      <translation>Chọn đối tượng để hiển thị bản xem trước</translation>
     </message>
     <message>
       <source>Show on Layout</source>
@@ -795,7 +795,7 @@
     </message>
     <message>
       <source>Preview is not available for the selected object</source>
-      <translation type="unfinished">Preview is not available for the selected object</translation>
+      <translation>Xem trước không khả dụng cho đối tượng đã chọn</translation>
     </message>
   </context>
   <context>
@@ -843,14 +843,14 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
-      <translation>Đi tới Cài đặt nội bộ để bật điểm đánh dấu kéo vào trung tâm của video</translation>
+      <translation>Đi tới Cài đặt cục bộ để bật điểm đánh dấu kéo vào trung tâm của video</translation>
     </message>
   </context>
   <context>
     <name>RangeEditor</name>
     <message>
       <source>from</source>
-      <translation type="unfinished">from</translation>
+      <translation>từ</translation>
     </message>
     <message>
       <source>to</source>
@@ -861,11 +861,11 @@ to activate PTZ</source>
     <name>RecursiveObjectTypeSelector</name>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Loại đối tượng</translation>
     </message>
     <message>
       <source>Subtype</source>
-      <translation type="unfinished">Subtype</translation>
+      <translation>Kiểu phụ</translation>
     </message>
   </context>
   <context>
@@ -887,11 +887,11 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
-      <translation type="unfinished">Drag video files or images to the client window, or add local media folder through the Local Settings dialog</translation>
+      <translation>Kéo tệp video hoặc hình ảnh vào cửa sổ ứng dụng khách hoặc thêm thư mục đa phương tiện cục bộ thông qua hộp thoại Cài đặt cục bộ</translation>
     </message>
     <message>
       <source>Try searching for something else</source>
-      <translation type="unfinished">Try searching for something else</translation>
+      <translation>Thử tìm kiếm những thứ khác</translation>
     </message>
   </context>
   <context>
@@ -911,7 +911,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>OUTDATED</source>
-      <translation type="unfinished">OUTDATED</translation>
+      <translation>Quá hạn</translation>
     </message>
   </context>
   <context>
@@ -922,7 +922,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>All Types</source>
-      <translation type="unfinished">All Types</translation>
+      <translation>Tất cả các loại</translation>
     </message>
     <message>
       <source>Servers</source>
@@ -961,11 +961,11 @@ to activate PTZ</source>
     <name>ResourceToolTip</name>
     <message>
       <source>Cannot load preview</source>
-      <translation type="unfinished">Cannot load preview</translation>
+      <translation>Không thể tải xem trước</translation>
     </message>
     <message>
       <source>Preview is outdated</source>
-      <translation type="unfinished">Preview is outdated</translation>
+      <translation>Bản xem trước đã quá hạn</translation>
     </message>
   </context>
   <context>
@@ -1020,7 +1020,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Chọn</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1057,7 +1057,7 @@ to activate PTZ</source>
     <name>SphereDewarpingSettings</name>
     <message>
       <source>Horizon correction</source>
-      <translation type="unfinished">Horizon correction</translation>
+      <translation>Hiệu chỉnh đường chân trời</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -1114,7 +1114,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>No signal</source>
-      <translation type="unfinished">No signal</translation>
+      <translation>Không có tín hiệu</translation>
     </message>
     <message>
       <source>Not enough licenses</source>
@@ -1130,7 +1130,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Device disabled</source>
-      <translation type="unfinished">Device disabled</translation>
+      <translation>Thiết bị bị vô hiệu hóa</translation>
     </message>
     <message>
       <source>Too many connections</source>
@@ -1138,7 +1138,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Cannot decrypt media</source>
-      <translation type="unfinished">Cannot decrypt media</translation>
+      <translation>Không thể giải mã dữ liệu đa phương tiện</translation>
     </message>
     <message>
       <source>Password required</source>
@@ -1168,7 +1168,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>No Favorite Systems</source>
-      <translation type="unfinished">No Favorite Systems</translation>
+      <translation>Không có hệ thống yêu thích</translation>
     </message>
     <message>
       <source>No Hidden Systems</source>

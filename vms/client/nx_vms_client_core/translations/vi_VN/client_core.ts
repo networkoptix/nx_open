@@ -90,21 +90,21 @@
     </message>
     <message>
       <source>Invalid certificate</source>
-      <translation type="unfinished">Invalid certificate</translation>
+      <translation>Chứng chỉ không hợp lệ</translation>
     </message>
     <message>
       <source>The server&amp;apos;s certificate was rejected.</source>
-      <translation type="unfinished">The server&amp;apos;s certificate was rejected.</translation>
+      <translation>Chứng chỉ của máy chủ đã bị từ chối.</translation>
     </message>
     <message>
       <source>Restore the connection to %1 and try again</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Restore the connection to %1 and try again</translation>
+      <translation>Khôi phục kết nối với %1 và thử lại</translation>
     </message>
     <message>
       <source>%1 user login is temporarily unavailable</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user login is temporarily unavailable</translation>
+      <translation>%1 người dùng đăng nhập tạm thời không khả dụng</translation>
     </message>
     <message>
       <source>Connection timed out</source>
@@ -112,7 +112,7 @@
     </message>
     <message>
       <source>The server is incompatible.</source>
-      <translation type="unfinished">The server is incompatible.</translation>
+      <translation>Máy chủ không tương thích.</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
@@ -128,7 +128,7 @@
     </message>
     <message>
       <source>Session expired. Re-enter your password.</source>
-      <translation type="unfinished">Session expired. Re-enter your password.</translation>
+      <translation>Phiên hết hạn. Nhập lại mật khẩu của bạn.</translation>
     </message>
     <message>
       <source>Invalid login or password</source>
@@ -152,25 +152,25 @@
     </message>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation type="unfinished">Internal error. Please try again later.</translation>
+      <translation>Lỗi bên trong. Vui lòng thử lại sau.</translation>
     </message>
     <message>
       <source>If this error persists, please contact your system administrator.</source>
-      <translation type="unfinished">If this error persists, please contact your system administrator.</translation>
+      <translation>Nếu lỗi này vẫn còn, xin vui lòng liên hệ với quản trị viên hệ thống của bạn.</translation>
     </message>
     <message>
       <source>Connection to %1 is not ready yet. Check your internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check your internet connection or try again later.</translation>
+      <translation>Kết nối với %1 chưa sẵn sàng. Kiểm tra kết nối mạng hoặc thử lại sau.</translation>
     </message>
     <message>
       <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</translation>
+      <translation>Kết nối với %1 chưa sẵn sàng. Kiểm tra kết nối mạng của máy chủ hoặc thử lại sau.</translation>
     </message>
     <message>
       <source>Connection to the server could not be established. Try again later.</source>
-      <translation type="unfinished">Connection to the server could not be established. Try again later.</translation>
+      <translation>Không thể thiết lập kết nối với máy chủ. Thử lại sau.</translation>
     </message>
     <message>
       <source>Your session has expired</source>
@@ -179,38 +179,38 @@
     <message>
       <source>Please log in to %1 again.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Please log in to %1 again.</translation>
+      <translation>Vui lòng đăng nhập lại vào %1.</translation>
     </message>
     <message>
       <source>Log in to %1 to log in to this system with %2 user</source>
       <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in to %1 to log in to this system with %2 user</translation>
+      <translation>Đăng nhập %1 để đăng nhập vào hệ thống này bằng người dùng %2</translation>
     </message>
     <message>
       <source>Session duration limit can be changed by a system administrator.</source>
-      <translation type="unfinished">Session duration limit can be changed by a system administrator.</translation>
+      <translation>Quản trị viên hệ thống có thể thay đổi giới hạn thời lượng phiên.</translation>
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
-      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
+      <translation>Người dùng này đã bị vô hiệu hóa bởi quản trị viên hệ thống.</translation>
     </message>
     <message>
       <source>Too many login attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many login attempts. Try again in a minute.</translation>
+      <translation>Quá nhiều lần thử đăng nhập. Hãy thử lại sau một phút.</translation>
     </message>
     <message>
       <source>Two-factor authentication is required.</source>
-      <translation type="unfinished">Two-factor authentication is required.</translation>
+      <translation>Yêu cầu xác thực hai yếu tố.</translation>
     </message>
     <message>
       <source>You can enable two-factor authentication in your %1.</source>
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">You can enable two-factor authentication in your %1.</translation>
+      <translation>Bạn có thể bật xác thực hai yếu tố trong %1 của mình.</translation>
     </message>
     <message>
       <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</translation>
+      <translation>Để đăng nhập vào Hệ thống này, hãy tắt “Yêu cầu mã xác minh trên mỗi lần đăng nhập bằng tài khoản %1” trong %2 của bạn.</translation>
     </message>
   </context>
 </TS>

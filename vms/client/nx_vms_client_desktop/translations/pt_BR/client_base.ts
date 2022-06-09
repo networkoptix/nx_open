@@ -94,6 +94,10 @@
       <source>Verifying update package</source>
       <translation>Verificando pacote de atualização</translation>
     </message>
+    <message>
+      <source>Cannot connect to the System</source>
+      <translation>Não é possível conectar ao sistema</translation>
+    </message>
   </context>
   <context>
     <name>ContextMenu</name>

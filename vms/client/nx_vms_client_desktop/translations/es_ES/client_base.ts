@@ -94,6 +94,10 @@
       <source>Verifying update package</source>
       <translation>Verificando paquete de actualización</translation>
     </message>
+    <message>
+      <source>Cannot connect to the System</source>
+      <translation type="unfinished">Cannot connect to the System</translation>
+    </message>
   </context>
   <context>
     <name>ContextMenu</name>
@@ -9660,7 +9664,7 @@ Puede forzarlo, pero puede aumentar significativamente la carga de la CPU.</tran
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>Objetos + Baja Resolución</translation>
     </message>
   </context>
   <context>

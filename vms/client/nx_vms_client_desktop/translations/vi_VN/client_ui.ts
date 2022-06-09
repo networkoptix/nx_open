@@ -67,7 +67,7 @@
     <name>AdvancedSettingsWidget</name>
     <message>
       <source>Downmix Audio from 5.1 to 2.1</source>
-      <translation>Những âm thanh từ 5.1 giảm 2.1</translation>
+      <translation>Âm thanh Downmix từ 5.1 đến 2.1</translation>
     </message>
     <message>
       <source>Double Buffering</source>
@@ -83,7 +83,7 @@
     </message>
     <message>
       <source>Clear Local Cache</source>
-      <translation>Bộ nhớ cache của địa phương rõ ràng</translation>
+      <translation>Xóa bộ nhớ cache cục bộ</translation>
     </message>
     <message>
       <source>Reset All Warnings</source>
@@ -1207,7 +1207,7 @@
     </message>
     <message>
       <source>Local Media Folders</source>
-      <translation>Thư mục chưa media</translation>
+      <translation>Thư mục Đa phương tiện Cục bộ</translation>
     </message>
     <message>
       <source>Audio Input</source>
@@ -1430,7 +1430,7 @@
     </message>
     <message>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>Chọn một số người dùng trong &quot;Hiển thị đến&quot; dòng để hiển thị bố cục trong danh sách này</translation>
+      <translation>Chọn một số người dùng trong &quot;Hiển thị đến dòng&quot; để hiển thị bố cục cục bộ của người dùng đó trong danh sách này</translation>
     </message>
   </context>
   <context>
@@ -1599,7 +1599,7 @@
     <name>LocalSettingsDialog</name>
     <message>
       <source>Local Settings</source>
-      <translation>Địa phương thiết lập</translation>
+      <translation>Cài đặt cục bộ</translation>
     </message>
   </context>
   <context>
@@ -1629,7 +1629,7 @@
     <name>LookAndFeelPreferencesWidget</name>
     <message>
       <source>Look and Feel</source>
-      <translation>Điều chỉnh thị giác</translation>
+      <translation>Giao Diện</translation>
     </message>
     <message>
       <source>Background Image</source>
@@ -2209,7 +2209,7 @@
     <name>RecordingSettings</name>
     <message>
       <source>Temporary Folder</source>
-      <translation>Thư mục Scratch</translation>
+      <translation>Thư mục tạm thời</translation>
     </message>
     <message>
       <source>Additional Options</source>
@@ -2434,11 +2434,11 @@
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
-      <translation type="unfinished">Force servers to accept only encrypted connections</translation>
+      <translation>Buộc các máy chủ chỉ chấp nhận các kết nối được mã hóa</translation>
     </message>
     <message>
       <source>Encrypt video traffic to desktop and mobile clients</source>
-      <translation type="unfinished">Encrypt video traffic to desktop and mobile clients</translation>
+      <translation>Mã hóa lưu lượng video cho máy khách máy tính và máy khách di động</translation>
     </message>
     <message>
       <source>Manage Users</source>

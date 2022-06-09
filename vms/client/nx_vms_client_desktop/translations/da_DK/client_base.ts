@@ -94,6 +94,10 @@
       <source>Verifying update package</source>
       <translation>Bekræfter opdateringspakken</translation>
     </message>
+    <message>
+      <source>Cannot connect to the System</source>
+      <translation type="unfinished">Cannot connect to the System</translation>
+    </message>
   </context>
   <context>
     <name>ContextMenu</name>
@@ -8862,7 +8866,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>You are about to merge Systems with NVR licenses.</source>
-      <translation type="unfinished">You are about to merge Systems with NVR licenses.</translation>
+      <translation>Du er ved at flette systemer med NVR-licenser.</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per System, so the second license will be deactivated.</source>

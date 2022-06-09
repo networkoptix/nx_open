@@ -20,7 +20,7 @@
     <name>AuthResultTranslations</name>
     <message>
       <source>This user does not exist.</source>
-      <translation type="unfinished">This user does not exist.</translation>
+      <translation>Người dùng này không tồn tại.</translation>
     </message>
     <message>
       <source>Wrong password.</source>
@@ -28,35 +28,35 @@
     </message>
     <message>
       <source>The password is expired. Please contact your system administrator.</source>
-      <translation type="unfinished">The password is expired. Please contact your system administrator.</translation>
+      <translation>Mật khẩu đã hết hạn. Xin vui lòng liên hệ với quản trị hệ thống.</translation>
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
-      <translation type="unfinished">The LDAP server is not accessible. Please try again later.</translation>
+      <translation>Máy chủ LDAP không thể truy cập được. Vui lòng thử lại sau.</translation>
     </message>
     <message>
       <source>%1 is not accessible yet. Please try again later.</source>
-      <translation type="unfinished">%1 is not accessible yet. Please try again later.</translation>
+      <translation>%1 vẫn chưa thể truy cập được. Vui lòng thử lại sau.</translation>
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
-      <translation type="unfinished">The user is locked out due to several failed attempts. Please try again later.</translation>
+      <translation>Người dùng bị khóa do thử nhiều lần không thành công. Vui lòng thử lại sau.</translation>
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your system administrator.</source>
-      <translation type="unfinished">This authorization method is forbidden. Please contact your system administrator.</translation>
+      <translation>Phương thức ủy quyền này bị hạn chế. Xin vui lòng liên hệ với quản trị hệ thống của bạn.</translation>
     </message>
     <message>
       <source>The session key is invalid or expired.</source>
-      <translation type="unfinished">The session key is invalid or expired.</translation>
+      <translation>Khóa phiên không hợp lệ hoặc hết hạn.</translation>
     </message>
     <message>
       <source>Internal server error (%1). Please contact your system administrator.</source>
-      <translation type="unfinished">Internal server error (%1). Please contact your system administrator.</translation>
+      <translation>Lỗi máy chủ nội bộ (%1). Xin vui lòng liên hệ với quản trị hệ thống của bạn.</translation>
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
-      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
+      <translation>Người dùng này đã bị vô hiệu hóa bởi quản trị viên hệ thống.</translation>
     </message>
   </context>
   <context>
@@ -358,15 +358,15 @@
     </message>
     <message>
       <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</translation>
+      <translation>Nếu đã bị tắt, hãy thử bật Ghi trong Cài đặt mô-đun I/O (error &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</translation>
+      <translation>Nếu bị tắt, hãy thử bật Ghi và giảm FPS trong Cài đặt thiết bị (error &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</translation>
+      <translation>Nếu bị tắt, hãy thử bật Ghi và giảm FPS trong Cài đặt máy ảnh (error &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
@@ -1080,7 +1080,7 @@
     </message>
     <message>
       <source>Could not allocate output metadata stream.</source>
-      <translation type="unfinished">Could not allocate output metadata stream.</translation>
+      <translation>Không thể phân bổ luồng đầu ra siêu dữ liệu.</translation>
     </message>
     <message>
       <source>Invalid audio codec information.</source>
@@ -1652,12 +1652,12 @@
     </message>
     <message>
       <source>Analytics Object Detected</source>
-      <translation type="unfinished">Analytics Object Detected</translation>
+      <translation>Phát hiện phân tích Đối tượng</translation>
     </message>
     <message>
       <source>%1 at camera &apos;%2&apos;</source>
       <comment> is detected</comment>
-      <translation type="unfinished">%1 at camera &apos;%2&apos;</translation>
+      <translation>%1 tại camera &apos;%2&apos;</translation>
     </message>
     <message>
       <source>Plugin: %1</source>
@@ -1669,7 +1669,7 @@
     </message>
     <message>
       <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</translation>
+      <translation>Không thể khởi tạo mã hóa AES trong khi ghi lưu trữ đa phương tiện. Dữ liệu không được mã hóa.</translation>
     </message>
     <message>
       <source>Archive backup failed.</source>
@@ -1677,7 +1677,7 @@
     </message>
     <message>
       <source>Object detected</source>
-      <translation type="unfinished">Object detected</translation>
+      <translation>Phát hiện đối tượng</translation>
     </message>
     <message>
       <source>Archive backup failed</source>
@@ -1685,19 +1685,19 @@
     </message>
     <message>
       <source>Data is backed up to %1</source>
-      <translation type="unfinished">Data is backed up to %1</translation>
+      <translation>Dữ liệu được sao lưu lên đến %1</translation>
     </message>
     <message>
       <source>Failed to backup file </source>
-      <translation type="unfinished">Failed to backup file </translation>
+      <translation>Không thể sao lưu tệp </translation>
     </message>
     <message>
       <source>Server Certificate Error</source>
-      <translation type="unfinished">Server Certificate Error</translation>
+      <translation>Lỗi chứng chỉ máy chủ</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
-      <translation type="unfinished">Server &quot;%1&quot; certificate error</translation>
+      <translation>Máy chủ &quot;%1&quot; lỗi chứng chỉ</translation>
     </message>
   </context>
   <context>

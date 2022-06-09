@@ -1147,7 +1147,7 @@
     </message>
     <message>
       <source>No Failover</source>
-      <translation type="unfinished">No Failover</translation>
+      <translation>장애 조치 없음</translation>
     </message>
   </context>
   <context>

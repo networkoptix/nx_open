@@ -1147,7 +1147,7 @@
     </message>
     <message>
       <source>No Failover</source>
-      <translation type="unfinished">No Failover</translation>
+      <translation>Sin conmutación por error</translation>
     </message>
   </context>
   <context>

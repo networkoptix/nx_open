@@ -25,13 +25,13 @@
     </message>
     <message numerus="yes">
       <source>%1 with %n attributes</source>
-      <translation type="unfinished">
-        <numerusform>%1 with %n attributes</numerusform>
+      <translation>
+        <numerusform>%1 과 %n 속성</numerusform>
       </translation>
     </message>
     <message>
       <source>Any subtype</source>
-      <translation type="unfinished">Any subtype</translation>
+      <translation>모든 하위 유형</translation>
     </message>
   </context>
   <context>
@@ -49,7 +49,7 @@
     </message>
     <message>
       <source>Issuer</source>
-      <translation type="unfinished">Issuer</translation>
+      <translation>발행인</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -92,6 +92,10 @@
     <message>
       <source>Verifying update package</source>
       <translation>업데이트 패키지 확인 중</translation>
+    </message>
+    <message>
+      <source>Cannot connect to the System</source>
+      <translation type="unfinished">Cannot connect to the System</translation>
     </message>
   </context>
   <context>
@@ -917,7 +921,7 @@
     </message>
     <message>
       <source>Show Servers</source>
-      <translation type="unfinished">Show Servers</translation>
+      <translation>서버 표시</translation>
     </message>
     <message>
       <source>Save Window Configuration</source>
@@ -1712,15 +1716,15 @@
     </message>
     <message>
       <source>Connect only servers with public certificate</source>
-      <translation type="unfinished">Connect only servers with public certificate</translation>
+      <translation>공인인증서가 있는 서버만 연결</translation>
     </message>
     <message>
       <source>Certificate storage will be cleared.</source>
-      <translation type="unfinished">Certificate storage will be cleared.</translation>
+      <translation>인증서 저장이 지워집니다.</translation>
     </message>
     <message>
       <source>Current client instance will be disconnected.</source>
-      <translation type="unfinished">Current client instance will be disconnected.</translation>
+      <translation>현재 클라이언트 인스턴스의 연결이 끊어집니다.</translation>
     </message>
     <message>
       <source>All other client windows will be closed.</source>
@@ -2688,7 +2692,7 @@ to %1</source>
     <message>
       <source>Enter your account password to disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to disconnect System from %1</translation>
+      <translation>%1에서 시스템 연결을 끊으려면 계정 암호를 입력하십시오.</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -2697,12 +2701,12 @@ to %1</source>
     <message>
       <source>System disconnected from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">System disconnected from %1</translation>
+      <translation>%1에서 시스템 연결 해제</translation>
     </message>
     <message>
       <source>You are about to disconnect System from %1</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation type="unfinished">You are about to disconnect System from %1</translation>
+      <translation>%1에서 시스템 연결을 해제하려고 합니다.</translation>
     </message>
     <message>
       <source>All %1 users will be deleted.</source>
@@ -2711,11 +2715,11 @@ to %1</source>
     </message>
     <message>
       <source>You will be logged out.</source>
-      <translation type="unfinished">You will be logged out.</translation>
+      <translation>로그아웃됩니다.</translation>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
-      <translation type="unfinished">System will be accessible through local network with a local administrator account.</translation>
+      <translation>로컬 관리자 계정으로 로컬 네트워크를 통해 시스템에 액세스할 수 있습니다.</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -2724,7 +2728,7 @@ to %1</source>
     <message>
       <source>Cannot disconnect the System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot disconnect the System from %1</translation>
+      <translation>%1에서 시스템의 연결을 끊을 수 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -2903,11 +2907,11 @@ to %1</source>
     </message>
     <message>
       <source>System is not compatible with two-factor authentication</source>
-      <translation type="unfinished">System is not compatible with two-factor authentication</translation>
+      <translation>시스템이 이중 인증과 호환되지 않음</translation>
     </message>
     <message>
       <source>Failed to log in to &quot;%1&quot; system</source>
-      <translation type="unfinished">Failed to log in to &quot;%1&quot; system</translation>
+      <translation>&quot;%1&quot; 시스템에 로그인하지 못했습니다.</translation>
     </message>
   </context>
   <context>
@@ -2997,11 +3001,11 @@ to %1</source>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
-      <translation type="unfinished">Enter your account password to create backup</translation>
+      <translation>백업을 생성하려면 계정 비밀번호를 입력하세요</translation>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>만들다</translation>
     </message>
     <message>
       <source>Restore from Database Backup</source>
@@ -3697,7 +3701,7 @@ to %1</source>
     </message>
     <message>
       <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
-      <translation type="unfinished">You do not have a valid license installed. Please activate your commercial or trial license.</translation>
+      <translation>유효한 라이센스가 설치되어 있지 않습니다. 상업용 또는 평가판 라이센스를 활성화하십시오.</translation>
     </message>
   </context>
   <context>
@@ -4769,8 +4773,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Server utilizes these %n SSL certificates to authenticate its identity</source>
-      <translation type="unfinished">
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
+      <translation>
+        <numerusform>서버는 이 %n SSL 인증서를 사용하여 해당 ID를 인증합니다.</numerusform>
       </translation>
     </message>
     <message>
@@ -4783,7 +4787,7 @@ to %1</source>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
-      <translation type="unfinished">Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</translation>
+      <translation>장애 조치가 활성화된 서버는 동일한 위치 ID를 가진 오프라인 서버에서 카메라를 자동으로 가져옵니다.</translation>
     </message>
   </context>
   <context>
@@ -5043,11 +5047,11 @@ to %1</source>
     </message>
     <message>
       <source>Ask your system administrator to enter the encryption password to decrypt this archive</source>
-      <translation type="unfinished">Ask your system administrator to enter the encryption password to decrypt this archive</translation>
+      <translation>이 아카이브의 암호를 해독하려면 시스템 관리자에게 암호화 암호를 입력하도록 요청하십시오.</translation>
     </message>
     <message>
       <source>Unlock</source>
-      <translation type="unfinished">Unlock</translation>
+      <translation>해제</translation>
     </message>
   </context>
   <context>
@@ -5320,7 +5324,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Storage is available but will not be writable because it is too small in comparison to the already present storages</source>
-      <translation type="unfinished">Storage is available but will not be writable because it is too small in comparison to the already present storages</translation>
+      <translation>스토리지는 사용 가능하지만 이미 존재하는 스토리지에 비해 너무 작기 때문에 쓰기가 불가능합니다.</translation>
     </message>
   </context>
   <context>
@@ -5504,11 +5508,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Backup storage is not configured</source>
-      <translation type="unfinished">Backup storage is not configured</translation>
+      <translation>백업 저장소가 구성되지 않았습니다.</translation>
     </message>
     <message>
       <source>Camera recording schedule is invalid</source>
-      <translation type="unfinished">Camera recording schedule is invalid</translation>
+      <translation>카메라 녹화 일정이 잘못되었습니다.</translation>
     </message>
   </context>
   <context>
@@ -5682,7 +5686,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>With enabled digest authentication</source>
-      <translation type="unfinished">With enabled digest authentication</translation>
+      <translation>다이제스트 인증 사용</translation>
     </message>
   </context>
   <context>
@@ -5705,7 +5709,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To enable digest authentication password reset is required</source>
-      <translation type="unfinished">To enable digest authentication password reset is required</translation>
+      <translation>다이제스트 인증을 활성화하려면 비밀번호 재설정이 필요합니다</translation>
     </message>
   </context>
   <context>
@@ -5824,7 +5828,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Allow digest authentication for this user</source>
-      <translation type="unfinished">Allow digest authentication for this user</translation>
+      <translation>이 사용자에 대한 다이제스트 인증 허용</translation>
     </message>
     <message>
       <source>Learn More</source>
@@ -5907,7 +5911,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed.</source>
-      <translation type="unfinished">Only letters, numbers and symbols %1 are allowed.</translation>
+      <translation>문자, 숫자 및 기호 %1 만 허용됩니다.</translation>
     </message>
   </context>
   <context>
@@ -6580,11 +6584,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Merge this group with %1?</source>
-      <translation type="unfinished">Merge this group with %1?</translation>
+      <translation>이 그룹을 %1과 병합하시겠습니까?</translation>
     </message>
     <message>
       <source>Two groups with the same name cannot exist.</source>
-      <translation type="unfinished">Two groups with the same name cannot exist.</translation>
+      <translation>이름이 같은 두 그룹은 존재할 수 없습니다.</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -6600,7 +6604,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</translation>
+      <translation>모든 콘텐츠를 프록시하면 이 웹 페이지의 사용자에게 서버&apos;네트워크의 모든 서비스 또는 장치가 노출됩니다.</translation>
     </message>
     <message>
       <source>Move anyway?</source>
@@ -6616,19 +6620,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Some devices from %1 will not be moved to %2. Move anyways?</source>
-      <translation type="unfinished">Some devices from %1 will not be moved to %2. Move anyways?</translation>
+      <translation>%1의 일부 장치는 %2로 이동되지 않습니다. 그래도 이동할까요?</translation>
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>가상 카메라, USB 또는 웹 카메라는 서버 간에 이동할 수 없습니다. 이러한 장치는 %1으로 유지됩니다.</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>USB 또는 웹 카메라는 서버 간에 이동할 수 없습니다. 이러한 장치는 %1으로 유지됩니다.</translation>
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">Virtual cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>가상 카메라는 서버 간에 이동할 수 없습니다. 이러한 장치는 %1으로 유지됩니다.</translation>
     </message>
     <message>
       <source>Move Group without Them</source>
@@ -6640,7 +6644,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains virtual cameras, USB or web cameras</source>
-      <translation type="unfinished">%1 cannot be moved between servers as it contains virtual cameras, USB or web cameras</translation>
+      <translation>%1에는 가상 카메라, USB 또는 웹 카메라가 포함되어 있으므로 서버 간에 이동할 수 없습니다.</translation>
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers</source>
@@ -6648,7 +6652,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains virtual cameras</source>
-      <translation type="unfinished">%1 cannot be moved between servers as it contains virtual cameras</translation>
+      <translation>%1에는 가상 카메라가 포함되어 있으므로 서버 간에 이동할 수 없습니다.</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers</source>
@@ -6656,7 +6660,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains USB or web cameras</source>
-      <translation type="unfinished">%1 cannot be moved between servers as it contains USB or web cameras</translation>
+      <translation>%1에는 USB 또는 웹 카메라가 포함되어 있으므로 서버 간에 이동할 수 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -6865,7 +6869,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Choose devices...</source>
-      <translation type="unfinished">Choose devices...</translation>
+      <translation>장치 선택...</translation>
     </message>
     <message>
       <source>Choose cameras...</source>
@@ -6873,23 +6877,23 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
+      <translation>
+        <numerusform>%n 선택된 장치</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
+      <translation>
+        <numerusform>%n 선택된 카메라</numerusform>
       </translation>
     </message>
     <message>
       <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
+      <translation>선택된 카메라</translation>
     </message>
     <message>
       <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
+      <translation>선택된 장치</translation>
     </message>
   </context>
   <context>
@@ -6942,7 +6946,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::AudioRedirectPickerWidget</name>
     <message>
       <source>Select Device...</source>
-      <translation type="unfinished">Select Device...</translation>
+      <translation>장치 선택...</translation>
     </message>
     <message>
       <source>Use audio stream from</source>
@@ -6954,43 +6958,43 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</source>
-      <translation type="unfinished">This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</translation>
+      <translation>이 장치에는 오디오 입력이 없거나 올바르게 구성되지 않았습니다. 다른 장치를 오디오 소스로 선택하십시오.</translation>
     </message>
     <message>
       <source>This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</source>
-      <translation type="unfinished">This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</translation>
+      <translation>이 카메라에는 오디오 입력이 없거나 올바르게 구성되지 않았습니다. 다른 카메라를 오디오 소스로 선택하십시오.</translation>
     </message>
     <message>
       <source>This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</source>
-      <translation type="unfinished">This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</translation>
+      <translation>이 장치에는 오디오 출력이 없거나 올바르게 구성되지 않았습니다. 오디오 재생을 위해 다른 장치를 선택하십시오.</translation>
     </message>
     <message>
       <source>This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</source>
-      <translation type="unfinished">This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</translation>
+      <translation>이 카메라에는 오디오 출력이 없거나 올바르게 구성되지 않았습니다. 오디오 재생을 위해 다른 카메라를 선택하십시오.</translation>
     </message>
     <message>
       <source>Use this device for audio output</source>
-      <translation type="unfinished">Use this device for audio output</translation>
+      <translation>오디오 출력에 이 장치 사용</translation>
     </message>
     <message>
       <source>Use this camera for audio output</source>
-      <translation type="unfinished">Use this camera for audio output</translation>
+      <translation>이 카메라를 오디오 출력에 사용</translation>
     </message>
     <message>
       <source>Use audio stream from another device</source>
-      <translation type="unfinished">Use audio stream from another device</translation>
+      <translation>다른 장치의 오디오 스트림 사용</translation>
     </message>
     <message>
       <source>Use audio stream from another camera</source>
-      <translation type="unfinished">Use audio stream from another camera</translation>
+      <translation>다른 카메라의 오디오 스트림 사용</translation>
     </message>
     <message>
       <source>Transmit audio stream to another device</source>
-      <translation type="unfinished">Transmit audio stream to another device</translation>
+      <translation>오디오 스트림을 다른 장치로 전송</translation>
     </message>
     <message>
       <source>Transmit audio stream to another camera</source>
-      <translation type="unfinished">Transmit audio stream to another camera</translation>
+      <translation>오디오 스트림을 다른 카메라로 전송</translation>
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</source>
@@ -7002,78 +7006,78 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
-      <translation type="unfinished">The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</translation>
+      <translation>선택한 장치에 오디오 입력이 없거나&apos;구성되지 않았습니다. 오디오 스트림을 사용할 수 없습니다.</translation>
     </message>
     <message>
       <source>The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
-      <translation type="unfinished">The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</translation>
+      <translation>선택한 카메라에 오디오 입력이 없거나&apos;구성되지 않았습니다. 오디오 스트림을 사용할 수 없습니다.</translation>
     </message>
     <message>
       <source>The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
-      <translation type="unfinished">The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</translation>
+      <translation>선택한 장치에 오디오 출력이 없거나 올바르게 구성되지 않았습니다. 양방향 오디오를 사용할 수 없습니다.</translation>
     </message>
     <message>
       <source>The selected camera does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
-      <translation type="unfinished">The selected camera does not have an audio output, or it is not configured correctly. 2-way audio is not available.</translation>
+      <translation>선택한 카메라에 오디오 출력이 없거나 올바르게 구성되지 않았습니다. 양방향 오디오를 사용할 수 없습니다.</translation>
     </message>
     <message>
       <source>Use audio stream from this device</source>
-      <translation type="unfinished">Use audio stream from this device</translation>
+      <translation>이 장치의 오디오 스트림 사용</translation>
     </message>
     <message>
       <source>Use audio stream from this camera</source>
-      <translation type="unfinished">Use audio stream from this camera</translation>
+      <translation>이 카메라의 오디오 스트림 사용</translation>
     </message>
     <message>
       <source>%1 is connected to another server. Audio stream is not available</source>
-      <translation type="unfinished">%1 is connected to another server. Audio stream is not available</translation>
+      <translation>%1이 다른 서버에 연결되어 있습니다. 오디오 스트림을 사용할 수 없습니다.</translation>
     </message>
     <message>
       <source>Selected device is connected to another server. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device is connected to another server. Audio stream is not available.</translation>
+      <translation>선택한 장치가 다른 서버에 연결되어 있습니다. 오디오 스트림을 사용할 수 없습니다.</translation>
     </message>
     <message>
       <source>Selected camera is connected to another server. Audio stream is not available.</source>
-      <translation type="unfinished">Selected camera is connected to another server. Audio stream is not available.</translation>
+      <translation>선택한 카메라가 다른 서버에 연결되어 있습니다. 오디오 스트림을 사용할 수 없습니다.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupBandwidthSettingsWidget</name>
     <message>
       <source>Select an area on the schedule to apply chosen settings.</source>
-      <translation type="unfinished">Select an area on the schedule to apply chosen settings.</translation>
+      <translation>일정에서 선택한 설정을 적용할 영역을 선택하세요.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupQueueSize</name>
     <message numerus="yes">
       <source>%n weeks</source>
-      <translation type="unfinished">
-        <numerusform>%n weeks</numerusform>
+      <translation>
+        <numerusform>%n 주</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n days</source>
-      <translation type="unfinished">
-        <numerusform>%n days</numerusform>
+      <translation>
+        <numerusform>%n 일</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n hours</source>
-      <translation type="unfinished">
-        <numerusform>%n hours</numerusform>
+      <translation>
+        <numerusform>%n 시간</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n minutes</source>
-      <translation type="unfinished">
-        <numerusform>%n minutes</numerusform>
+      <translation>
+        <numerusform>%n 분</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n seconds</source>
-      <translation type="unfinished">
-        <numerusform>%n seconds</numerusform>
+      <translation>
+        <numerusform>%n 초</numerusform>
       </translation>
     </message>
   </context>
@@ -7081,7 +7085,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupSettingsDecoratorModel</name>
     <message>
       <source>The camera has neither recorded footage nor recording scheduled</source>
-      <translation type="unfinished">The camera has neither recorded footage nor recording scheduled</translation>
+      <translation>카메라에 녹화된 영상이나 녹화 일정이 없습니다.</translation>
     </message>
     <message>
       <source>Motion detection is disabled</source>
@@ -7089,7 +7093,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>No analytics plugins</source>
-      <translation type="unfinished">No analytics plugins</translation>
+      <translation>분석 플러그인 없음</translation>
     </message>
     <message>
       <source>Cameras</source>
@@ -7097,7 +7101,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>What to backup</source>
-      <translation type="unfinished">What to backup</translation>
+      <translation>백업 대상</translation>
     </message>
     <message>
       <source>Quality</source>
@@ -7105,34 +7109,34 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot be modified for new added cameras</source>
-      <translation type="unfinished">Cannot be modified for new added cameras</translation>
+      <translation>새로 추가된 카메라에 대해 수정할 수 없습니다.</translation>
     </message>
     <message>
       <source>This device provides only one data stream</source>
-      <translation type="unfinished">This device provides only one data stream</translation>
+      <translation>이 장치는 하나의 데이터 스트림만 제공합니다.</translation>
     </message>
     <message>
       <source>Stream setting is not applicable to this device type</source>
-      <translation type="unfinished">Stream setting is not applicable to this device type</translation>
+      <translation>스트림 설정이 이 장치 유형에 적용되지 않습니다.</translation>
     </message>
     <message>
       <source>Not supported</source>
-      <translation type="unfinished">Not supported</translation>
+      <translation>지원하지 않음</translation>
     </message>
     <message>
       <source>Backup is not supported for this device</source>
-      <translation type="unfinished">Backup is not supported for this device</translation>
+      <translation>이 장치에서는 백업이 지원되지 않습니다.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>
     <message>
       <source>Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</source>
-      <translation type="unfinished">Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</translation>
+      <translation>%1 또는 %2을 사용하여 일괄 편집할 여러 장치를 선택하십시오. %3을 사용하여 모든 장치를 선택하십시오.</translation>
     </message>
     <message>
       <source>What to backup</source>
-      <translation type="unfinished">What to backup</translation>
+      <translation>백업 대상</translation>
     </message>
     <message>
       <source>Quality</source>
@@ -7140,8 +7144,8 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>Set for %n selected devices</source>
-      <translation type="unfinished">
-        <numerusform>Set for %n selected devices</numerusform>
+      <translation>
+        <numerusform>%n 개의 선택된 장치에 대해 설정</numerusform>
       </translation>
     </message>
   </context>
@@ -7149,7 +7153,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupSettingsViewWidget</name>
     <message>
       <source>Nothing to backup</source>
-      <translation type="unfinished">Nothing to backup</translation>
+      <translation>백업할 항목 없음</translation>
     </message>
   </context>
   <context>
@@ -7160,23 +7164,23 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Bandwidth Limit</source>
-      <translation type="unfinished">Bandwidth Limit</translation>
+      <translation>대역폭 제한</translation>
     </message>
     <message>
       <source>New added cameras</source>
-      <translation type="unfinished">New added cameras</translation>
+      <translation>새로 추가된 카메라</translation>
     </message>
     <message>
       <source>New added cameras settings will apply to all servers in the system.</source>
-      <translation type="unfinished">New added cameras settings will apply to all servers in the system.</translation>
+      <translation>새로 추가된 카메라 설정은 시스템의 모든 서버에 적용됩니다.</translation>
     </message>
     <message>
       <source>Backup will be turned on for new added cameras on all servers in the system.</source>
-      <translation type="unfinished">Backup will be turned on for new added cameras on all servers in the system.</translation>
+      <translation>시스템의 모든 서버에 새로 추가된 카메라에 대한 백업이 켜집니다.</translation>
     </message>
     <message>
       <source>Backup will be turned off for new added cameras on all servers in the system.</source>
-      <translation type="unfinished">Backup will be turned off for new added cameras on all servers in the system.</translation>
+      <translation>시스템의 모든 서버에 새로 추가된 카메라에 대한 백업이 해제됩니다.</translation>
     </message>
     <message>
       <source>Storage Management</source>
@@ -7190,18 +7194,18 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>To enable backup add more drives to use them as backup storage in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation type="unfinished">To enable backup add more drives to use them as backup storage in %1</translation>
+      <translation>백업을 활성화하려면 %1에서 백업 스토리지로 사용할 드라이브를 더 추가하십시오.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupStatusWidget</name>
     <message>
       <source>Backup process will ignore existing footage. Only further recording will be backed up.</source>
-      <translation type="unfinished">Backup process will ignore existing footage. Only further recording will be backed up.</translation>
+      <translation>백업 프로세스는 기존 영상을 무시합니다. 추가 녹화만 백업됩니다.</translation>
     </message>
     <message>
       <source>Skip backup for existing footage?</source>
-      <translation type="unfinished">Skip backup for existing footage?</translation>
+      <translation>기존 영상의 백업을 건너뛰시겠습니까?</translation>
     </message>
     <message>
       <source>This action cannot be undone.</source>
@@ -7209,18 +7213,18 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Applies only to the cameras connected to current server.</source>
-      <translation type="unfinished">Applies only to the cameras connected to current server.</translation>
+      <translation>현재 서버에 연결된 카메라에만 적용됩니다.</translation>
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Backup is enabled for %n devices</numerusform>
+      <translation>
+        <numerusform>%n 개의 장치에 대해 백업이 활성화되었습니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Backup is enabled for %n cameras</numerusform>
+      <translation>
+        <numerusform>%n 개의 카메라에 대해 백업이 활성화되었습니다.</numerusform>
       </translation>
     </message>
   </context>
@@ -7245,7 +7249,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+      <translation>타임라인에서 시간 범위를 선택하고 강조 표시된 부분을 마우스 오른쪽 버튼으로 클릭하여 즐겨찾기를 만듭니다.</translation>
     </message>
   </context>
   <context>
@@ -7267,7 +7271,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Wiper</source>
-      <translation type="unfinished">Wiper</translation>
+      <translation>와이퍼</translation>
     </message>
   </context>
   <context>
@@ -7340,7 +7344,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Server will not push time settings to the camera.</source>
-      <translation type="unfinished">Server will not push time settings to the camera.</translation>
+      <translation>서버는 카메라에 시간 설정을 푸시하지 않습니다.</translation>
     </message>
   </context>
   <context>
@@ -7415,11 +7419,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select areas on the preview to set chosen sensitivity for.</source>
-      <translation type="unfinished">Select areas on the preview to set chosen sensitivity for.</translation>
+      <translation>미리보기에서 선택한 감도를 설정할 영역을 선택합니다.</translation>
     </message>
     <message>
       <source>Choose a motion detection sensitivity and select some areas on the preview to set it for.</source>
-      <translation type="unfinished">Choose a motion detection sensitivity and select some areas on the preview to set it for.</translation>
+      <translation>모션 감지 감도를 선택하고 미리보기에서 설정할 일부 영역을 선택합니다.</translation>
     </message>
   </context>
   <context>
@@ -7457,7 +7461,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message>
       <source>Show all devices</source>
-      <translation type="unfinished">Show all devices</translation>
+      <translation>모든 장치 표시</translation>
     </message>
     <message>
       <source>Show all cameras</source>
@@ -7465,7 +7469,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select Devices</source>
-      <translation type="unfinished">Select Devices</translation>
+      <translation>장치 선택</translation>
     </message>
     <message>
       <source>Select Cameras</source>
@@ -7570,11 +7574,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Change invalid schedule to &quot;Record Always&quot;</source>
-      <translation type="unfinished">Change invalid schedule to &quot;Record Always&quot;</translation>
+      <translation>잘못된 일정을 &quot;으로 변경 항상 기록&quot;</translation>
     </message>
     <message>
       <source>Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</source>
-      <translation type="unfinished">Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</translation>
+      <translation>녹화 일정의 일부 셀이 잘못된 녹화 모드로 설정되어 있습니다. %1. 잘못된 녹화 모드로 설정된 시간 동안 카메라는 &quot;항상 녹화&quot; 모드로 녹화합니다.</translation>
     </message>
     <message>
       <source>Motion Only</source>
@@ -7605,26 +7609,26 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraSettingsDialogStateConversionFunctions</name>
     <message numerus="yes">
       <source>Failed to enable audio on %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to enable audio on %n devices</numerusform>
+      <translation>
+        <numerusform>%n 개의 장치에서 오디오를 활성화하지 못했습니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These devices do not have audio inputs or are not configured correctly.</source>
-      <translation type="unfinished">
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
+      <translation>
+        <numerusform>이러한 장치에는 오디오 입력이 없거나 올바르게 구성되지 않았습니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to enable 2-way audio on %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
+      <translation>
+        <numerusform>%n 개의 장치에서 양방향 오디오를 활성화하지 못했습니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These devices do not have audio outputs or are not configured correctly.</source>
-      <translation type="unfinished">
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
+      <translation>
+        <numerusform>이러한 장치에는 오디오 출력이 없거나 올바르게 구성되지 않았습니다.</numerusform>
       </translation>
     </message>
     <message>
@@ -7633,15 +7637,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>You need to select a device that will provide audio.</source>
-      <translation type="unfinished">You need to select a device that will provide audio.</translation>
+      <translation>오디오를 제공할 장치를 선택해야 합니다.</translation>
     </message>
     <message>
       <source>2-way audio will be disabled</source>
-      <translation type="unfinished">2-way audio will be disabled</translation>
+      <translation>양방향 오디오가 비활성화됩니다.</translation>
     </message>
     <message>
       <source>You need to select a device to transmit the audio stream to and use for audio playback.</source>
-      <translation type="unfinished">You need to select a device to transmit the audio stream to and use for audio playback.</translation>
+      <translation>오디오 스트림을 전송하고 오디오 재생에 사용할 장치를 선택해야 합니다.</translation>
     </message>
   </context>
   <context>
@@ -7656,8 +7660,8 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>%1 are required</source>
       <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are required</numerusform>
+      <translation>
+        <numerusform>%1 이 필요합니다</numerusform>
       </translation>
     </message>
   </context>
@@ -7677,11 +7681,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Invalid stream address</source>
-      <translation type="unfinished">Invalid stream address</translation>
+      <translation>잘못된 스트림 주소</translation>
     </message>
     <message>
       <source>Streaming protocol mismatch</source>
-      <translation type="unfinished">Streaming protocol mismatch</translation>
+      <translation>스트리밍 프로토콜 불일치</translation>
     </message>
   </context>
   <context>
@@ -7693,7 +7697,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>선택</translation>
     </message>
   </context>
   <context>
@@ -7736,11 +7740,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot download update file</source>
-      <translation type="unfinished">Cannot download update file</translation>
+      <translation>업데이트 파일을 다운로드할 수 없습니다</translation>
     </message>
     <message>
       <source>There is no enough space to download update file</source>
-      <translation type="unfinished">There is no enough space to download update file</translation>
+      <translation>업데이트 파일을 다운로드할 공간이 충분하지 않습니다</translation>
     </message>
   </context>
   <context>
@@ -7779,7 +7783,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Login to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Login to %1</translation>
+      <translation>%1에 로그인</translation>
     </message>
   </context>
   <context>
@@ -7794,7 +7798,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Could not connect to server. Application will be closed.</source>
-      <translation type="unfinished">Could not connect to server. Application will be closed.</translation>
+      <translation>서버에 연결할 수 없습니다. 응용 프로그램이 닫힙니다.</translation>
     </message>
     <message>
       <source>Failed to connect to the selected server</source>
@@ -7802,15 +7806,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Re-authentication required</source>
-      <translation type="unfinished">Re-authentication required</translation>
+      <translation>재인증 필요</translation>
     </message>
     <message>
       <source>Enter password to continue your session</source>
-      <translation type="unfinished">Enter password to continue your session</translation>
+      <translation>세션을 계속하려면 비밀번호를 입력하세요.</translation>
     </message>
     <message>
       <source>Your session has expired. Please sign in again to continue.</source>
-      <translation type="unfinished">Your session has expired. Please sign in again to continue.</translation>
+      <translation>세션이 만료되었습니다. 계속하려면 다시 로그인해야 합니다.</translation>
     </message>
     <message>
       <source>OK</source>
@@ -7826,7 +7830,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>None of your Servers is connected to the Internet.</source>
-      <translation type="unfinished">None of your Servers is connected to the Internet.</translation>
+      <translation>인터넷에 연결된 서버가 없습니다.</translation>
     </message>
     <message>
       <source>System connected to %1</source>
@@ -7884,11 +7888,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Merge Server to the System</source>
       <comment>Dialog title</comment>
-      <translation type="unfinished">Merge Server to the System</translation>
+      <translation>서버를 시스템에 병합</translation>
     </message>
     <message>
       <source>Enter your account password to merge Server to the System</source>
-      <translation type="unfinished">Enter your account password to merge Server to the System</translation>
+      <translation>서버를 시스템에 병합하려면 계정 암호를 입력하십시오.</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -8055,7 +8059,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</source>
-      <translation type="unfinished">Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</translation>
+      <translation>네트워크에서 장치 검색은 HTTPS 연결을 지원하는 카메라로 제한됩니다. %1 설정에서 변경할 수 있습니다.</translation>
     </message>
     <message>
       <source>System Administration</source>
@@ -8066,7 +8070,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::EncryptedArchivePasswordDialog</name>
     <message>
       <source>Decrypt</source>
-      <translation type="unfinished">Decrypt</translation>
+      <translation>암호 해독</translation>
     </message>
     <message>
       <source>Invalid password</source>
@@ -8126,7 +8130,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+      <translation>필터를 변경하거나 이벤트 규칙을 만드십시오.</translation>
     </message>
   </context>
   <context>
@@ -8181,11 +8185,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Archive is encrypted.</source>
-      <translation type="unfinished">Archive is encrypted.</translation>
+      <translation>아카이브가 암호화됩니다.</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
-      <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
+      <translation>지금은 아카이브를 사용할 수 없습니다. 나중에 다시 시도 해주십시오.</translation>
     </message>
   </context>
   <context>
@@ -8300,7 +8304,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Export is not available: This camera does not have a video archive for the selected time period.</source>
-      <translation type="unfinished">Export is not available: This camera does not have a video archive for the selected time period.</translation>
+      <translation>내보낼 수 없음: 이 카메라에는 선택한 기간 동안의 비디오 아카이브가 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -8327,7 +8331,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>No Failover</source>
-      <translation type="unfinished">No Failover</translation>
+      <translation>장애 조치 없음</translation>
     </message>
   </context>
   <context>
@@ -8353,11 +8357,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ForceSecureAuthDialog</name>
     <message>
       <source>Force secure authentication?</source>
-      <translation type="unfinished">Force secure authentication?</translation>
+      <translation>보안 인증을 강제 적용하시겠습니까?</translation>
     </message>
     <message>
       <source>To revert this change user password reset will be required.</source>
-      <translation type="unfinished">To revert this change user password reset will be required.</translation>
+      <translation>이 변경 사항을 되돌리려면 사용자 암호를 재설정해야 합니다.</translation>
     </message>
     <message>
       <source>Do not show this message again</source>
@@ -8399,7 +8403,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>자세한 내용을 보려면 아이콘을 클릭하십시오.</translation>
     </message>
   </context>
   <context>
@@ -8550,11 +8554,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::LocalSessionTokenExpirationWatcher</name>
     <message>
       <source>Your session expires soon</source>
-      <translation type="unfinished">Your session expires soon</translation>
+      <translation>세션이 곧 만료됩니다.</translation>
     </message>
     <message>
       <source>Re-Authenticate Now</source>
-      <translation type="unfinished">Re-Authenticate Now</translation>
+      <translation>지금 재인증</translation>
     </message>
     <message>
       <source>Less than a minute left</source>
@@ -8562,8 +8566,8 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>%n minutes left</source>
-      <translation type="unfinished">
-        <numerusform>%n minutes left</numerusform>
+      <translation>
+        <numerusform>%n 분 남음</numerusform>
       </translation>
     </message>
   </context>
@@ -8640,7 +8644,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Enter your account password to merge Systems</source>
-      <translation type="unfinished">Enter your account password to merge Systems</translation>
+      <translation>시스템을 병합하려면 계정 비밀번호를 입력하세요.</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -8697,7 +8701,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</source>
-      <translation type="unfinished">Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</translation>
+      <translation>선택한 시스템에 현재 시스템과 호환되지 않는 이전 소프트웨어 버전이 있습니다. 선택한 시스템을 최신 빌드로 업데이트하여 현재 빌드와 병합합니다.</translation>
     </message>
     <message>
       <source>The password or user name is invalid.</source>
@@ -8756,11 +8760,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Connection to Server could not be established. The Server&apos;s certificate is invalid.</source>
-      <translation type="unfinished">Connection to Server could not be established. The Server&apos;s certificate is invalid.</translation>
+      <translation>서버에 연결할 수 없습니다. Server&apos;의 인증서가 잘못되었습니다.</translation>
     </message>
     <message>
       <source>Connection to Server could not be established. The Server&apos;s certificate was rejected.</source>
-      <translation type="unfinished">Connection to Server could not be established. The Server&apos;s certificate was rejected.</translation>
+      <translation>서버에 연결할 수 없습니다. Server&apos;의 인증서가 거부되었습니다.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -8769,7 +8773,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>%1 systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 systems have different owners. Merge is not allowed.</translation>
+      <translation>%1 시스템에는 다른 소유자가 있습니다. 병합은 허용되지 않습니다.</translation>
     </message>
   </context>
   <context>
@@ -8791,31 +8795,31 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::MotionStreamAlerts</name>
     <message>
       <source>Current stream has high resolution. Analyzing it for motion increases CPU load.</source>
-      <translation type="unfinished">Current stream has high resolution. Analyzing it for motion increases CPU load.</translation>
+      <translation>현재 스트림의 해상도가 높습니다. 모션을 분석하면 CPU 부하가 증가합니다.</translation>
     </message>
     <message>
       <source>Motion detection for this camera is not currently working because of changed stream resolution.
 You can force it, but it may significantly increase CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection for this camera is not currently working because of changed stream resolution.
-You can force it, but it may significantly increase CPU load.</translation>
+      <translation>스트림 해상도가 변경되어 현재 이 카메라의 모션 감지가 작동하지 않습니다.
+강제로 실행할 수 있지만 CPU 부하를 크게 증가시킬 수 있습니다.</translation>
     </message>
     <message>
       <source>Motion detection for some cameras will not be working because the remaining stream has too high resolution.
 You can force it, but it may significantly increase CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection for some cameras will not be working because the remaining stream has too high resolution.
-You can force it, but it may significantly increase CPU load.</translation>
+      <translation>나머지 스트림의 해상도가 너무 높아 일부 카메라의 모션 감지가 작동하지 않습니다.
+강제로 실행할 수 있지만 CPU 부하를 크게 증가시킬 수 있습니다.</translation>
     </message>
     <message>
       <source>Motion detection for this camera will not be working because the remaining stream has too high resolution.
 You can force it, but it may significantly increase CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection for this camera will not be working because the remaining stream has too high resolution.
-You can force it, but it may significantly increase CPU load.</translation>
+      <translation>나머지 스트림의 해상도가 너무 높아 이 카메라의 동작 감지가 작동하지 않습니다.
+강제로 실행할 수 있지만 CPU 부하를 크게 증가시킬 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -9101,11 +9105,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
-      <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
+      <translation>사용자 지정 클라이언트를 사용하고 있습니다. 업데이트 지침을 보려면 %1에 문의하십시오.</translation>
     </message>
     <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
-      <translation type="unfinished">There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</translation>
+      <translation>컴퓨터에 클라이언트 업데이트를 다운로드할 공간이 부족합니다. 하드 드라이브의 공간을 확보한 후 다시 시도하십시오.</translation>
     </message>
   </context>
   <context>
@@ -9134,7 +9138,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Notifications Settings</source>
-      <translation type="unfinished">Notifications Settings</translation>
+      <translation>알림 설정</translation>
     </message>
   </context>
   <context>
@@ -9410,7 +9414,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Edit Proxied Web Page</source>
-      <translation type="unfinished">Edit Proxied Web Page</translation>
+      <translation>프록시 웹 페이지 편집</translation>
     </message>
     <message>
       <source>Edit Web Page</source>
@@ -9422,7 +9426,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</translation>
+      <translation>모든 콘텐츠를 프록시하면 이 웹페이지의 사용자에게 서버&apos;네트워크의 모든 서비스 또는 장치가 노출됩니다.</translation>
     </message>
   </context>
   <context>
@@ -9585,7 +9589,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Input Signal</source>
-      <translation type="unfinished">Input Signal</translation>
+      <translation>입력 신호</translation>
     </message>
     <message>
       <source>Soft Trigger</source>
@@ -9695,11 +9699,11 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this camera</source>
-      <translation type="unfinished">Motion detection is disabled for this camera</translation>
+      <translation>이 카메라의 모션 감지가 비활성화되었습니다.</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected cameras</translation>
+      <translation>선택한 일부 카메라에 대해 모션 감지가 비활성화되었습니다.</translation>
     </message>
     <message>
       <source>Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
@@ -9854,15 +9858,15 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <name>nx::vms::client::desktop::ServerCertificateError</name>
     <message>
       <source>Failed to connect to server</source>
-      <translation type="unfinished">Failed to connect to server</translation>
+      <translation>서버에 연결하지 못했습니다</translation>
     </message>
     <message>
       <source>View certificate</source>
-      <translation type="unfinished">View certificate</translation>
+      <translation>인증서 보기</translation>
     </message>
     <message>
       <source>Server certificate is invalid.</source>
-      <translation type="unfinished">Server certificate is invalid.</translation>
+      <translation>서버 인증서가 유효하지 않습니다.</translation>
     </message>
   </context>
   <context>
@@ -9877,31 +9881,31 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Server Id: %1</source>
-      <translation type="unfinished">Server Id: %1</translation>
+      <translation>서버 ID: %1</translation>
     </message>
     <message>
       <source>This certificate does not match the certificate %1 is pinned to.</source>
-      <translation type="unfinished">This certificate does not match the certificate %1 is pinned to.</translation>
+      <translation>이 인증서는 %1 이(가) 고정된 인증서와 일치하지 않습니다.</translation>
     </message>
     <message>
       <source>Custom certificate</source>
-      <translation type="unfinished">Custom certificate</translation>
+      <translation>사용자 지정 인증서</translation>
     </message>
     <message>
       <source>Pinned certificate</source>
-      <translation type="unfinished">Pinned certificate</translation>
+      <translation>고정 인증서</translation>
     </message>
     <message>
       <source>Unknown certificate</source>
-      <translation type="unfinished">Unknown certificate</translation>
+      <translation>알 수 없는 인증서</translation>
     </message>
     <message>
       <source>This is a custom certificate installed on %1</source>
-      <translation type="unfinished">This is a custom certificate installed on %1</translation>
+      <translation>%1에 설치된 사용자 지정 인증서입니다.</translation>
     </message>
     <message>
       <source>Pin this certificate to %1?</source>
-      <translation type="unfinished">Pin this certificate to %1?</translation>
+      <translation>이 인증서를 %1에 고정하시겠습니까?</translation>
     </message>
     <message>
       <source>Someone may be impersonating %1 to steel your personal information.
@@ -9918,7 +9922,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
     <message>
       <source>View certificate</source>
-      <translation type="unfinished">View certificate</translation>
+      <translation>인증서 보기</translation>
     </message>
     <message>
       <source>Connect Anyway</source>
@@ -10046,7 +10050,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>unknown status</source>
-      <translation type="unfinished">unknown status</translation>
+      <translation>알 수 없는 상태</translation>
     </message>
   </context>
   <context>
@@ -10154,7 +10158,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>필터를 변경하거나 모션 녹화를 활성화해 보세요.</translation>
     </message>
   </context>
   <context>
@@ -10370,7 +10374,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Invalid version.</source>
-      <translation type="unfinished">Invalid version.</translation>
+      <translation>잘못된 버전입니다.</translation>
     </message>
     <message>
       <source>Password</source>
@@ -10444,7 +10448,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>You will be able to access the %1 login menu at any time by clicking the cloud icon on the navigation panel.</source>
-      <translation type="unfinished">You will be able to access the %1 login menu at any time by clicking the cloud icon on the navigation panel.</translation>
+      <translation>탐색 패널에서 클라우드 아이콘을 클릭하면 언제든지 %1 로그인 메뉴에 액세스할 수 있습니다.</translation>
     </message>
     <message>
       <source>Hide</source>
@@ -10452,7 +10456,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Unable to connect to the system because it has become offline</source>
-      <translation type="unfinished">Unable to connect to the system because it has become offline</translation>
+      <translation>시스템이 오프라인 상태가 되었기 때문에 연결할 수 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -10564,7 +10568,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::backup_settings_view::BackupSettingsViewStrings</name>
     <message>
       <source>All archive</source>
-      <translation type="unfinished">All archive</translation>
+      <translation>모든 아카이브</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -10588,7 +10592,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>All streams</source>
-      <translation type="unfinished">All streams</translation>
+      <translation>모든 스트림</translation>
     </message>
   </context>
   <context>
@@ -10660,11 +10664,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
     <message>
       <source>New Group</source>
-      <translation type="unfinished">New Group</translation>
+      <translation>새 그룹</translation>
     </message>
     <message>
       <source>New Group %1</source>
-      <translation type="unfinished">New Group %1</translation>
+      <translation>새 그룹 %1</translation>
     </message>
   </context>
   <context>
@@ -10755,14 +10759,14 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Selected Layout</source>
-      <translation type="unfinished">Selected Layout</translation>
+      <translation>선택된 레이아웃</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::jsapi::detail::ResourcesApiBackend</name>
     <message>
       <source>Resource is not available for the usage with JS API</source>
-      <translation type="unfinished">Resource is not available for the usage with JS API</translation>
+      <translation>JS API와 함께 사용할 수 있는 리소스가 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -10781,11 +10785,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Cannot add the resource to the layout</source>
-      <translation type="unfinished">Cannot add the resource to the layout</translation>
+      <translation>레이아웃에 리소스를 추가할 수 없습니다.</translation>
     </message>
     <message>
       <source>Cannot find a widget corresponding to the specified item.</source>
-      <translation type="unfinished">Cannot find a widget corresponding to the specified item.</translation>
+      <translation>지정된 항목에 해당하는 위젯을 찾을 수 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -10819,7 +10823,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::ui::AnalyticsSdkObjectDetectedWidget</name>
     <message>
       <source>Analytics object detection can be set up on a certain cameras.</source>
-      <translation type="unfinished">Analytics object detection can be set up on a certain cameras.</translation>
+      <translation>분석 개체 감지는 특정 카메라에서 설정할 수 있습니다.</translation>
     </message>
     <message>
       <source>Choose cameras using the button above to see the list of supported events.</source>
@@ -10827,7 +10831,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Event will trigger only if there are matches any of attributes. You can see the names of the attributes and their values on the Objects tab.</source>
-      <translation type="unfinished">Event will trigger only if there are matches any of attributes. You can see the names of the attributes and their values on the Objects tab.</translation>
+      <translation>속성과 일치하는 항목이 있는 경우에만 이벤트가 트리거됩니다. 특성 이름과 해당 값은 개체 탭에서 볼 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -11202,7 +11206,7 @@ Server Settings (서버 설정) 대화 상자의 &quot;Storage Management (스�
     </message>
     <message>
       <source>This build is for demo purposes only.</source>
-      <translation type="unfinished">This build is for demo purposes only.</translation>
+      <translation>이 빌드는 데모용입니다.</translation>
     </message>
     <message>
       <source>It cannot be upgraded to subsequent builds as they become available.</source>
@@ -11211,12 +11215,12 @@ Server Settings (서버 설정) 대화 상자의 &quot;Storage Management (스�
     <message>
       <source>To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</source>
       <comment>%1 is the product name</comment>
-      <translation type="unfinished">To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</translation>
+      <translation>업그레이드하려면 업데이트된 빌드를 설치하기 전에 %1 을 제거하십시오(모든 데이터가 손실됨).</translation>
     </message>
     <message>
       <source>%1 Beta</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 Beta</translation>
+      <translation>%1 베타</translation>
     </message>
   </context>
   <context>
@@ -11227,7 +11231,7 @@ Server Settings (서버 설정) 대화 상자의 &quot;Storage Management (스�
     </message>
     <message>
       <source>Press Esc to stop the tour.</source>
-      <translation type="unfinished">Press Esc to stop the tour.</translation>
+      <translation>투어를 중지하려면 Esc 키를 누르세요.</translation>
     </message>
   </context>
   <context>
@@ -11290,7 +11294,7 @@ Server Settings (서버 설정) 대화 상자의 &quot;Storage Management (스�
     <name>nx::vms::client::desktop::ui::workbench::ResourceGroupingActionHandler</name>
     <message>
       <source>Maximum level of nesting is reached</source>
-      <translation type="unfinished">Maximum level of nesting is reached</translation>
+      <translation>최대 중첩 수준에 도달했습니다</translation>
     </message>
   </context>
   <context>

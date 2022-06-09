@@ -21,17 +21,17 @@
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>Bất kỳ plugin nào</translation>
     </message>
     <message numerus="yes">
       <source>%1 with %n attributes</source>
-      <translation type="unfinished">
-        <numerusform>%1 with %n attributes</numerusform>
+      <translation>
+        <numerusform>%1 với %n đặc tính</numerusform>
       </translation>
     </message>
     <message>
       <source>Any subtype</source>
-      <translation type="unfinished">Any subtype</translation>
+      <translation>Bất kỳ kiểu phụ nào</translation>
     </message>
   </context>
   <context>
@@ -49,7 +49,7 @@
     </message>
     <message>
       <source>Issuer</source>
-      <translation type="unfinished">Issuer</translation>
+      <translation>Nhà phát hành</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -92,6 +92,10 @@
     <message>
       <source>Verifying update package</source>
       <translation>Đang xác minh gói cập nhật</translation>
+    </message>
+    <message>
+      <source>Cannot connect to the System</source>
+      <translation type="unfinished">Cannot connect to the System</translation>
     </message>
   </context>
   <context>
@@ -266,7 +270,7 @@
     </message>
     <message>
       <source>Local Settings...</source>
-      <translation>Thiết lập địa phương...</translation>
+      <translation>Thiết lập cục bộ...</translation>
     </message>
     <message>
       <source>Audit Trail...</source>
@@ -893,11 +897,11 @@
     </message>
     <message>
       <source>Switch to Cameras &amp; Resources tab</source>
-      <translation type="unfinished">Switch to Cameras &amp; Resources tab</translation>
+      <translation>Chuyển sang tab Camera &amp; Tài nguyên</translation>
     </message>
     <message>
       <source>Search Cameras &amp; Resources</source>
-      <translation type="unfinished">Search Cameras &amp; Resources</translation>
+      <translation>Tìm kiếm Camera &amp; Tài nguyên</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
@@ -909,11 +913,11 @@
     </message>
     <message>
       <source>Welcome Screen</source>
-      <translation type="unfinished">Welcome Screen</translation>
+      <translation>Màn hình chào mừng</translation>
     </message>
     <message>
       <source>Add Web Page...</source>
-      <translation type="unfinished">Add Web Page...</translation>
+      <translation>Thêm trang web...</translation>
     </message>
     <message>
       <source>Show Servers</source>
@@ -921,31 +925,31 @@
     </message>
     <message>
       <source>Save Window Configuration</source>
-      <translation type="unfinished">Save Window Configuration</translation>
+      <translation>Lưu cấu hình Window</translation>
     </message>
     <message>
       <source>Save Windows Configuration</source>
-      <translation type="unfinished">Save Windows Configuration</translation>
+      <translation>Lưu cấu hình Windows</translation>
     </message>
     <message>
       <source>Windows Configuration</source>
-      <translation type="unfinished">Windows Configuration</translation>
+      <translation>Cấu hình Windows</translation>
     </message>
     <message>
       <source>Save Current State</source>
-      <translation type="unfinished">Save Current State</translation>
+      <translation>Lưu trạng thái hiện tại</translation>
     </message>
     <message>
       <source>Restore Saved State</source>
-      <translation type="unfinished">Restore Saved State</translation>
+      <translation>Khôi phục trạng thái đã lưu</translation>
     </message>
     <message>
       <source>Delete Saved State</source>
-      <translation type="unfinished">Delete Saved State</translation>
+      <translation>Xóa trạng thái đã lưu</translation>
     </message>
     <message>
       <source>Close all Windows</source>
-      <translation type="unfinished">Close all Windows</translation>
+      <translation>Đóng tất cả cửa sổ</translation>
     </message>
     <message>
       <source>Delete Bookmark...</source>
@@ -967,7 +971,7 @@
     </message>
     <message>
       <source>Rotate to</source>
-      <translation type="unfinished">Rotate to</translation>
+      <translation>Xoay sang</translation>
     </message>
     <message>
       <source>Create Group</source>
@@ -979,19 +983,19 @@
     </message>
     <message>
       <source>Add Proxied Web Page...</source>
-      <translation type="unfinished">Add Proxied Web Page...</translation>
+      <translation>Thêm trang web được ủy quyền...</translation>
     </message>
     <message>
       <source>Cell Spacing</source>
-      <translation type="unfinished">Cell Spacing</translation>
+      <translation>Khoảng cách ô</translation>
     </message>
     <message>
       <source>Show Panel</source>
-      <translation type="unfinished">Show Panel</translation>
+      <translation>Hiển thị bảng điều khiển</translation>
     </message>
     <message>
       <source>Hide Panel</source>
-      <translation type="unfinished">Hide Panel</translation>
+      <translation>Ẩn bảng điều khiển</translation>
     </message>
     <message>
       <source>Joystick Settings...</source>
@@ -1003,19 +1007,19 @@
     </message>
     <message>
       <source>Copy Bookmark Text</source>
-      <translation type="unfinished">Copy Bookmark Text</translation>
+      <translation>Sao chép Văn bản trong Dấu trang</translation>
     </message>
     <message>
       <source>Copy Bookmarks Text</source>
-      <translation type="unfinished">Copy Bookmarks Text</translation>
+      <translation>Sao chép Văn bản trong Dấu trang</translation>
     </message>
     <message>
       <source>Web Page Settings...</source>
-      <translation type="unfinished">Web Page Settings...</translation>
+      <translation>Cài đặt Trang Web...</translation>
     </message>
     <message>
       <source>Account Security...</source>
-      <translation type="unfinished">Account Security...</translation>
+      <translation>Bảo mật tài khoản...</translation>
     </message>
   </context>
   <context>
@@ -1167,7 +1171,7 @@
     </message>
     <message>
       <source>Executable %1 Media File</source>
-      <translation type="unfinished">Executable %1 Media File</translation>
+      <translation>Tệp đa phương tiện %1 có thể thực thi</translation>
     </message>
   </context>
   <context>
@@ -1700,35 +1704,35 @@
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Được khuyến nghị</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation type="unfinished">Strict</translation>
+      <translation>Nghiêm ngặt</translation>
     </message>
     <message>
       <source>May lead to privacy issues</source>
-      <translation type="unfinished">May lead to privacy issues</translation>
+      <translation>Có thể dẫn đến các vấn đề về quyền riêng tư</translation>
     </message>
     <message>
       <source>Connect only servers with public certificate</source>
-      <translation type="unfinished">Connect only servers with public certificate</translation>
+      <translation>Chỉ kết nối các máy chủ có chứng chỉ công khai</translation>
     </message>
     <message>
       <source>Certificate storage will be cleared.</source>
-      <translation type="unfinished">Certificate storage will be cleared.</translation>
+      <translation>Lưu trữ chứng chỉ sẽ bị xóa.</translation>
     </message>
     <message>
       <source>Current client instance will be disconnected.</source>
-      <translation type="unfinished">Current client instance will be disconnected.</translation>
+      <translation>Phiên ứng dụng khách hiện tại sẽ bị ngắt kết nối.</translation>
     </message>
     <message>
       <source>All other client windows will be closed.</source>
-      <translation type="unfinished">All other client windows will be closed.</translation>
+      <translation>Tất cả các cửa sổ máy hàng khác sẽ bị đóng.</translation>
     </message>
     <message>
       <source>Security settings changed</source>
-      <translation type="unfinished">Security settings changed</translation>
+      <translation>Cài đặt bảo mật đã thay đổi</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -1736,7 +1740,7 @@
     </message>
     <message>
       <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
-      <translation type="unfinished">On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</translation>
+      <translation>Trong lần kết nối đầu tiên với máy chủ, nếu chứng chỉ có lỗi, bạn sẽ được yêu cầu xác nhận chấp nhận</translation>
     </message>
   </context>
   <context>
@@ -2310,7 +2314,7 @@
     </message>
     <message>
       <source>Some rules are not valid and may not work</source>
-      <translation type="unfinished">Some rules are not valid and may not work</translation>
+      <translation>Một số quy tắc không hợp lệ và có thể không hoạt động</translation>
     </message>
   </context>
   <context>
@@ -2607,7 +2611,7 @@
     </message>
     <message>
       <source>Password should not be equal to camera&apos;s user name</source>
-      <translation>Mật khẩu shouldnt bằng tên người dùng camera&apos;s</translation>
+      <translation>Mật khẩu không nên giống tên người dùng của camera</translation>
     </message>
   </context>
   <context>
@@ -2687,7 +2691,7 @@ to %1</source>
     <message>
       <source>Enter your account password to disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to disconnect System from %1</translation>
+      <translation>Nhập mật khẩu tài khoản của bạn để ngắt kết nối Hệ thống khỏi %1</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -2696,12 +2700,12 @@ to %1</source>
     <message>
       <source>System disconnected from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">System disconnected from %1</translation>
+      <translation>Hệ thống bị ngắt kết nối khỏi %1</translation>
     </message>
     <message>
       <source>You are about to disconnect System from %1</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation type="unfinished">You are about to disconnect System from %1</translation>
+      <translation>Bạn sắp ngắt kết nối Hệ thống khỏi %1</translation>
     </message>
     <message>
       <source>All %1 users will be deleted.</source>
@@ -2710,11 +2714,11 @@ to %1</source>
     </message>
     <message>
       <source>You will be logged out.</source>
-      <translation type="unfinished">You will be logged out.</translation>
+      <translation>Bạn sẽ bị đăng xuất.</translation>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
-      <translation type="unfinished">System will be accessible through local network with a local administrator account.</translation>
+      <translation>Hệ thống sẽ được truy cập thông qua mạng nội bộ với tài khoản quản trị viên.</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -2723,7 +2727,7 @@ to %1</source>
     <message>
       <source>Cannot disconnect the System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot disconnect the System from %1</translation>
+      <translation>Không thể ngắt kết nối Hệ thống khỏi %1</translation>
     </message>
   </context>
   <context>
@@ -4386,11 +4390,11 @@ to %1</source>
     <name>QnResourceBrowserWidget</name>
     <message>
       <source>Local files</source>
-      <translation>Tập tin trên thiết bị</translation>
+      <translation>Tập tin cục bộ</translation>
     </message>
     <message>
       <source>No local files</source>
-      <translation>Không có tập tin trên thiết bị</translation>
+      <translation>Không có tệp cục bộ</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -4426,7 +4430,7 @@ to %1</source>
     </message>
     <message>
       <source>Local Files</source>
-      <translation>Tập tin có sẵn</translation>
+      <translation>Tập tin cục bộ</translation>
     </message>
     <message>
       <source>Search</source>
@@ -5232,7 +5236,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>local</source>
-      <translation>vị trí</translation>
+      <translation>cục bộ</translation>
     </message>
     <message>
       <source>ram</source>
@@ -5833,7 +5837,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>QnUserSettingsWidget</name>
     <message>
       <source>Local</source>
-      <translation>Địa phương</translation>
+      <translation>Cục bộ</translation>
     </message>
     <message>
       <source>Login</source>
@@ -6598,7 +6602,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</translation>
+      <translation>Việc ủy quyền tất cả nội dung sẽ hiển thị bất kỳ dịch vụ hoặc thiết bị nào trong mạng của máy chủ cho người dùng của trang web này.</translation>
     </message>
     <message>
       <source>Move anyway?</source>
@@ -6626,35 +6630,35 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">Virtual cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>Không thể di chuyển camera ảo giữa các máy chủ. Các thiết bị này sẽ vẫn ở lại %1:</translation>
     </message>
     <message>
       <source>Move Group without Them</source>
-      <translation type="unfinished">Move Group without Them</translation>
+      <translation>Di chuyển nhóm thiết bị mà không bao gồm chúng</translation>
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers</translation>
+      <translation>Không thể di chuyển camera ảo, camera USB hoặc webcam giữa các máy chủ</translation>
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains virtual cameras, USB or web cameras</source>
-      <translation type="unfinished">%1 cannot be moved between servers as it contains virtual cameras, USB or web cameras</translation>
+      <translation>%1 không thể di chuyển giữa các máy chủ vì nó chứa camera ảo, camera USB hoặc webcam</translation>
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual cameras cannot be moved between servers</translation>
+      <translation>Camera ảo không thể được di chuyển giữa các máy chủ</translation>
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains virtual cameras</source>
-      <translation type="unfinished">%1 cannot be moved between servers as it contains virtual cameras</translation>
+      <translation>Không thể di chuyển %1 giữa các máy chủ vì nó chứa camera ảo</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers</source>
-      <translation type="unfinished">USB or web cameras cannot be moved between servers</translation>
+      <translation>Không thể di chuyển camera USB hoặc webcam giữa các máy chủ</translation>
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains USB or web cameras</source>
-      <translation type="unfinished">%1 cannot be moved between servers as it contains USB or web cameras</translation>
+      <translation>Không thể di chuyển %1 giữa các máy chủ vì nó chứa camera USB hoặc webcam</translation>
     </message>
   </context>
   <context>
@@ -6791,7 +6795,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
-      <translation>Để hiển thị các tập tin cục bộ trên bức Video wall, hãy gắn chúng bằng cách sử dụng máy tính nơi Video wall được lưu trữ.</translation>
+      <translation>Để hiển thị các tệp cục bộ trên Video Wall, vui lòng dùng máy tính có Video Wall để đính kèm tệp.</translation>
     </message>
   </context>
   <context>
@@ -6863,7 +6867,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Choose devices...</source>
-      <translation type="unfinished">Choose devices...</translation>
+      <translation>Chọn thiết bị...</translation>
     </message>
     <message>
       <source>Choose cameras...</source>
@@ -6871,23 +6875,23 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
+      <translation>
+        <numerusform>%n thiết bị được chọn</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
+      <translation>
+        <numerusform>%n camera được chọn</numerusform>
       </translation>
     </message>
     <message>
       <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
+      <translation>Camera được chọn</translation>
     </message>
     <message>
       <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
+      <translation>Thiết bị được chọn</translation>
     </message>
   </context>
   <context>
@@ -6922,7 +6926,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Thử thay đổi bộ lọc hoặc định cấu hình phát hiện đối tượng trong cài đặt plugin camera</translation>
     </message>
   </context>
   <context>
@@ -6940,106 +6944,106 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::AudioRedirectPickerWidget</name>
     <message>
       <source>Select Device...</source>
-      <translation type="unfinished">Select Device...</translation>
+      <translation>Chọn thiết bị...</translation>
     </message>
     <message>
       <source>Use audio stream from</source>
-      <translation type="unfinished">Use audio stream from</translation>
+      <translation>Sử dụng luồng âm thanh từ</translation>
     </message>
     <message>
       <source>Transmit audio stream to</source>
-      <translation type="unfinished">Transmit audio stream to</translation>
+      <translation>Truyền luồng âm thanh tới</translation>
     </message>
     <message>
       <source>This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</source>
-      <translation type="unfinished">This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</translation>
+      <translation>Thiết bị này không có đầu vào âm thanh hoặc không được định cấu hình đúng cách. Chọn một thiết bị khác làm nguồn âm thanh.</translation>
     </message>
     <message>
       <source>This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</source>
-      <translation type="unfinished">This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</translation>
+      <translation>Camera này không có đầu vào âm thanh hoặc nó không được định cấu hình đúng cách. Chọn một camera khác làm nguồn âm thanh.</translation>
     </message>
     <message>
       <source>This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</source>
-      <translation type="unfinished">This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</translation>
+      <translation>Thiết bị này không có đầu ra âm thanh hoặc không được định cấu hình đúng cách. Chọn một thiết bị khác để phát lại âm thanh.</translation>
     </message>
     <message>
       <source>This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</source>
-      <translation type="unfinished">This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</translation>
+      <translation>Camera này không có đầu ra âm thanh hoặc nó không được định cấu hình chính xác. Chọn một camera khác để phát lại âm thanh.</translation>
     </message>
     <message>
       <source>Use this device for audio output</source>
-      <translation type="unfinished">Use this device for audio output</translation>
+      <translation>Sử dụng thiết bị này cho đầu ra âm thanh</translation>
     </message>
     <message>
       <source>Use this camera for audio output</source>
-      <translation type="unfinished">Use this camera for audio output</translation>
+      <translation>Sử dụng camera này cho đầu ra âm thanh</translation>
     </message>
     <message>
       <source>Use audio stream from another device</source>
-      <translation type="unfinished">Use audio stream from another device</translation>
+      <translation>Sử dụng luồng âm thanh từ một thiết bị khác</translation>
     </message>
     <message>
       <source>Use audio stream from another camera</source>
-      <translation type="unfinished">Use audio stream from another camera</translation>
+      <translation>Sử dụng luồng âm thanh từ một thiết bị khác</translation>
     </message>
     <message>
       <source>Transmit audio stream to another device</source>
-      <translation type="unfinished">Transmit audio stream to another device</translation>
+      <translation>Truyền luồng âm thanh đến một thiết bị khác</translation>
     </message>
     <message>
       <source>Transmit audio stream to another camera</source>
-      <translation type="unfinished">Transmit audio stream to another camera</translation>
+      <translation>Truyền luồng âm thanh đến một camera khác</translation>
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</translation>
+      <translation>Thiết bị đã chọn không có đầu vào âm thanh hoặc không được định cấu hình. Luồng âm thanh không khả dụng.</translation>
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</translation>
+      <translation>Thiết bị đã chọn không có đầu ra âm thanh hoặc không được định cấu hình. Luồng âm thanh không khả dụng.</translation>
     </message>
     <message>
       <source>The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
-      <translation type="unfinished">The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</translation>
+      <translation>Thiết bị đã chọn không có đầu vào âm thanh hoặc không được định cấu hình chính xác. Luồng âm thanh không khả dụng.</translation>
     </message>
     <message>
       <source>The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
-      <translation type="unfinished">The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</translation>
+      <translation>Thiết bị đã chọn không có đầu vào âm thanh hoặc không được định cấu hình chính xác. Luồng âm thanh không khả dụng.</translation>
     </message>
     <message>
       <source>The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
-      <translation type="unfinished">The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</translation>
+      <translation>Thiết bị đã chọn không có đầu ra âm thanh hoặc không được định cấu hình chính xác. Âm thanh hai chiều không khả dụng.</translation>
     </message>
     <message>
       <source>The selected camera does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
-      <translation type="unfinished">The selected camera does not have an audio output, or it is not configured correctly. 2-way audio is not available.</translation>
+      <translation>Thiết bị đã chọn không có đầu ra âm thanh hoặc không được định cấu hình chính xác. Âm thanh hai chiều không khả dụng.</translation>
     </message>
     <message>
       <source>Use audio stream from this device</source>
-      <translation type="unfinished">Use audio stream from this device</translation>
+      <translation>Sử dụng luồng âm thanh từ thiết bị này</translation>
     </message>
     <message>
       <source>Use audio stream from this camera</source>
-      <translation type="unfinished">Use audio stream from this camera</translation>
+      <translation>Sử dụng luồng âm thanh từ camera này</translation>
     </message>
     <message>
       <source>%1 is connected to another server. Audio stream is not available</source>
-      <translation type="unfinished">%1 is connected to another server. Audio stream is not available</translation>
+      <translation>%1 được kết nối với một máy chủ khác. Luồng âm thanh không khả dụng</translation>
     </message>
     <message>
       <source>Selected device is connected to another server. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device is connected to another server. Audio stream is not available.</translation>
+      <translation>Thiết bị đã chọn được kết nối với một máy chủ khác. Luồng âm thanh không khả dụng.</translation>
     </message>
     <message>
       <source>Selected camera is connected to another server. Audio stream is not available.</source>
-      <translation type="unfinished">Selected camera is connected to another server. Audio stream is not available.</translation>
+      <translation>Camera đã chọn được kết nối với một máy chủ khác. Luồng âm thanh không khả dụng.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupBandwidthSettingsWidget</name>
     <message>
       <source>Select an area on the schedule to apply chosen settings.</source>
-      <translation type="unfinished">Select an area on the schedule to apply chosen settings.</translation>
+      <translation>Chọn một khu vực trên lịch biểu để áp dụng các cài đặt đã chọn.</translation>
     </message>
   </context>
   <context>
@@ -7079,7 +7083,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupSettingsDecoratorModel</name>
     <message>
       <source>The camera has neither recorded footage nor recording scheduled</source>
-      <translation type="unfinished">The camera has neither recorded footage nor recording scheduled</translation>
+      <translation>Camera không ghi lại cảnh quay cũng không ghi theo lịch trình</translation>
     </message>
     <message>
       <source>Motion detection is disabled</source>
@@ -7087,7 +7091,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>No analytics plugins</source>
-      <translation type="unfinished">No analytics plugins</translation>
+      <translation>Không có plugin phân tích</translation>
     </message>
     <message>
       <source>Cameras</source>
@@ -7095,7 +7099,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>What to backup</source>
-      <translation type="unfinished">What to backup</translation>
+      <translation>Những gì cần sao lưu</translation>
     </message>
     <message>
       <source>Quality</source>
@@ -7103,15 +7107,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot be modified for new added cameras</source>
-      <translation type="unfinished">Cannot be modified for new added cameras</translation>
+      <translation>Không thể sửa đổi đối với các camera mới được thêm vào</translation>
     </message>
     <message>
       <source>This device provides only one data stream</source>
-      <translation type="unfinished">This device provides only one data stream</translation>
+      <translation>Thiết bị này chỉ cung cấp một luồng dữ liệu</translation>
     </message>
     <message>
       <source>Stream setting is not applicable to this device type</source>
-      <translation type="unfinished">Stream setting is not applicable to this device type</translation>
+      <translation>Cài đặt luồng không áp dụng cho loại thiết bị này</translation>
     </message>
     <message>
       <source>Not supported</source>
@@ -7119,18 +7123,18 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Backup is not supported for this device</source>
-      <translation type="unfinished">Backup is not supported for this device</translation>
+      <translation>Sao lưu không được hỗ trợ cho thiết bị này</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>
     <message>
       <source>Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</source>
-      <translation type="unfinished">Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</translation>
+      <translation>Sử dụng %1 hoặc %2 để chọn nhiều thiết bị để chỉnh sửa theo nhóm. Sử dụng %3 để chọn tất cả các thiết bị.</translation>
     </message>
     <message>
       <source>What to backup</source>
-      <translation type="unfinished">What to backup</translation>
+      <translation>Những gì cần sao lưu</translation>
     </message>
     <message>
       <source>Quality</source>
@@ -7138,8 +7142,8 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>Set for %n selected devices</source>
-      <translation type="unfinished">
-        <numerusform>Set for %n selected devices</numerusform>
+      <translation>
+        <numerusform>Đặt cho %n thiết bị đã chọn</numerusform>
       </translation>
     </message>
   </context>
@@ -7147,7 +7151,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupSettingsViewWidget</name>
     <message>
       <source>Nothing to backup</source>
-      <translation type="unfinished">Nothing to backup</translation>
+      <translation>Không có gì để sao lưu</translation>
     </message>
   </context>
   <context>
@@ -7158,23 +7162,23 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Bandwidth Limit</source>
-      <translation type="unfinished">Bandwidth Limit</translation>
+      <translation>Giới hạn băng thông</translation>
     </message>
     <message>
       <source>New added cameras</source>
-      <translation type="unfinished">New added cameras</translation>
+      <translation>Camera mới được thêm vào</translation>
     </message>
     <message>
       <source>New added cameras settings will apply to all servers in the system.</source>
-      <translation type="unfinished">New added cameras settings will apply to all servers in the system.</translation>
+      <translation>Cài đặt của camera mới được thêm vào sẽ áp dụng cho tất cả các máy chủ trong hệ thống.</translation>
     </message>
     <message>
       <source>Backup will be turned on for new added cameras on all servers in the system.</source>
-      <translation type="unfinished">Backup will be turned on for new added cameras on all servers in the system.</translation>
+      <translation>Tính năng sao lưu sẽ được bật cho các camera mới được thêm vào trên tất cả các máy chủ trong hệ thống.</translation>
     </message>
     <message>
       <source>Backup will be turned off for new added cameras on all servers in the system.</source>
-      <translation type="unfinished">Backup will be turned off for new added cameras on all servers in the system.</translation>
+      <translation>Tính năng sao lưu sẽ bị tắt cho các camera mới được thêm vào trên tất cả các máy chủ trong hệ thống.</translation>
     </message>
     <message>
       <source>Storage Management</source>
@@ -7183,7 +7187,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation type="unfinished">To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</translation>
+      <translation>Để kích hoạt sao lưu, hãy thay đổi &quot;Chính&quot; thành &quot;Sao lưu&quot; từ một trong số bộ nhớ trong %1</translation>
     </message>
     <message>
       <source>To enable backup add more drives to use them as backup storage in %1</source>
@@ -7243,7 +7247,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+      <translation>Chọn khoảng thời gian trên dòng thời gian và nhấp chuột phải vào phần nổi bật để tạo dấu trang</translation>
     </message>
   </context>
   <context>
@@ -7409,7 +7413,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Force Motion Detection</source>
-      <translation type="unfinished">Force Motion Detection</translation>
+      <translation>Buộc phát hiện chuyển động</translation>
     </message>
     <message>
       <source>Select areas on the preview to set chosen sensitivity for.</source>
@@ -7691,7 +7695,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Chọn</translation>
     </message>
   </context>
   <context>
@@ -8124,7 +8128,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+      <translation>Thử thay đổi bộ lọc hoặc tạo Quy tắc sự kiện</translation>
     </message>
   </context>
   <context>
@@ -8179,11 +8183,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Archive is encrypted.</source>
-      <translation type="unfinished">Archive is encrypted.</translation>
+      <translation>Lưu trữ được mã hóa.</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
-      <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
+      <translation>Lưu trữ hiện không có sẵn. Vui lòng thử lại sau.</translation>
     </message>
   </context>
   <context>
@@ -8274,7 +8278,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Local files, server monitor widgets and webpages will not be exported.</source>
-      <translation>Các tập tin cục bộ, các widget của máy chủ và trang web sẽ không được xuất.</translation>
+      <translation>Tập tin cục bộ, tiện ích theo dõi máy chủ và các trang web sẽ không được xuất.</translation>
     </message>
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
@@ -8298,7 +8302,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Export is not available: This camera does not have a video archive for the selected time period.</source>
-      <translation type="unfinished">Export is not available: This camera does not have a video archive for the selected time period.</translation>
+      <translation>Xuất video không khả dụng: Camera này không có lưu trữ video trong khoảng thời gian đã chọn.</translation>
     </message>
   </context>
   <context>
@@ -8325,7 +8329,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>No Failover</source>
-      <translation type="unfinished">No Failover</translation>
+      <translation>Không có chuyển đổi dự phòng</translation>
     </message>
   </context>
   <context>
@@ -8351,11 +8355,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ForceSecureAuthDialog</name>
     <message>
       <source>Force secure authentication?</source>
-      <translation type="unfinished">Force secure authentication?</translation>
+      <translation>Bắt buộc xác thực an toàn?</translation>
     </message>
     <message>
       <source>To revert this change user password reset will be required.</source>
-      <translation type="unfinished">To revert this change user password reset will be required.</translation>
+      <translation>Để hoàn nguyên thay đổi này, người dùng phải đặt lại mật khẩu.</translation>
     </message>
     <message>
       <source>Do not show this message again</source>
@@ -8397,7 +8401,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>Nhấp vào biểu tượng để đọc thêm</translation>
     </message>
   </context>
   <context>
@@ -8548,20 +8552,20 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::LocalSessionTokenExpirationWatcher</name>
     <message>
       <source>Your session expires soon</source>
-      <translation type="unfinished">Your session expires soon</translation>
+      <translation>Phiên của bạn sắp hết hạn</translation>
     </message>
     <message>
       <source>Re-Authenticate Now</source>
-      <translation type="unfinished">Re-Authenticate Now</translation>
+      <translation>Xác thực lại ngay bây giờ</translation>
     </message>
     <message>
       <source>Less than a minute left</source>
-      <translation type="unfinished">Less than a minute left</translation>
+      <translation>Còn chưa đến một phút</translation>
     </message>
     <message numerus="yes">
       <source>%n minutes left</source>
-      <translation type="unfinished">
-        <numerusform>%n minutes left</numerusform>
+      <translation>
+        <numerusform>Còn %n phút còn lại</numerusform>
       </translation>
     </message>
   </context>
@@ -8638,7 +8642,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Enter your account password to merge Systems</source>
-      <translation type="unfinished">Enter your account password to merge Systems</translation>
+      <translation>Nhập mật khẩu tài khoản của bạn để hợp nhất Hệ thống</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -8695,7 +8699,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</source>
-      <translation type="unfinished">Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</translation>
+      <translation>Hệ thống đã chọn có phiên bản phần mềm cũ hơn không tương thích với Hệ thống hiện tại. Cập nhật Hệ thống đã chọn lên bản dựng mới nhất để hợp nhất với hệ thống hiện tại.</translation>
     </message>
     <message>
       <source>The password or user name is invalid.</source>
@@ -8723,11 +8727,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>You are about to merge Systems with NVR licenses.</source>
-      <translation type="unfinished">You are about to merge Systems with NVR licenses.</translation>
+      <translation>Bạn sắp hợp nhất Hệ thống với giấy phép NVR.</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per System, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one NVR license is allowed per System, so the second license will be deactivated.</translation>
+      <translation>Mỗi Hệ thống chỉ được phép sử dụng một giấy phép NVR, do đó, giấy phép thứ hai sẽ bị vô hiệu hóa.</translation>
     </message>
     <message>
       <source>Could not configure the remote System %1.</source>
@@ -8754,11 +8758,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Connection to Server could not be established. The Server&apos;s certificate is invalid.</source>
-      <translation type="unfinished">Connection to Server could not be established. The Server&apos;s certificate is invalid.</translation>
+      <translation>Không thể thiết lập kết nối với Máy chủ. Chứng chỉ của Máy chủ không hợp lệ.</translation>
     </message>
     <message>
       <source>Connection to Server could not be established. The Server&apos;s certificate was rejected.</source>
-      <translation type="unfinished">Connection to Server could not be established. The Server&apos;s certificate was rejected.</translation>
+      <translation>Không thể thiết lập kết nối với Máy chủ. Chứng chỉ của Máy chủ đã bị từ chối.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -9099,7 +9103,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
-      <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
+      <translation>Bạn đang sử dụng một máy khách được tùy chỉnh. Vui lòng liên hệ %1 để nhận hướng dẫn cập nhật.</translation>
     </message>
     <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
@@ -9166,7 +9170,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Local layouts can only be shown to their owners.</source>
-      <translation>Bố cục địa phương chỉ có thể được hiển thị cho chủ sở hữu của họ.</translation>
+      <translation>Bố cục cục bộ chỉ có thể được hiển thị cho chủ sở hữu bố cục.</translation>
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
@@ -9420,7 +9424,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</translation>
+      <translation>Việc ủy quyền tất cả nội dung sẽ hiển thị bất kỳ dịch vụ hoặc thiết bị nào trong mạng của máy chủ cho người dùng của trang web này</translation>
     </message>
   </context>
   <context>
@@ -9659,7 +9663,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
-      <translation type="unfinished">Motion, Objects</translation>
+      <translation>Chuyển động, Đối tượng</translation>
     </message>
     <message>
       <source>Motion, Objects
@@ -9817,7 +9821,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Enables RTSP traffic encryption.</source>
-      <translation type="unfinished">Enables RTSP traffic encryption.</translation>
+      <translation>Bật mã hóa lưu lượng RTSP.</translation>
     </message>
     <message>
       <source>days</source>
@@ -10152,7 +10156,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>Thử thay đổi bộ lọc hoặc bật ghi chuyển động</translation>
     </message>
   </context>
   <context>
@@ -10291,15 +10295,15 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Synchronized with the local time at the selected server</source>
-      <translation>Đồng bộ hóa với giờ địa phương tại máy chủ được chọn</translation>
+      <translation>Đồng bộ hóa với giờ cục bộ tại máy chủ được chọn</translation>
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation>Không đồng bộ. Mỗi máy chủ sử dụng giờ địa phương của riêng mình.</translation>
+      <translation>Không đồng bộ. Mỗi máy chủ sử dụng giờ cục bộ của riêng mình.</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
-      <translation>Bằng với giờ máy chủ</translation>
+      <translation>Bằng giờ cục bộ của máy chủ</translation>
     </message>
     <message>
       <source>No Internet connection. Time is not being synchronized.</source>
@@ -10500,11 +10504,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Local files not allowed for Multi-Video export</source>
-      <translation>Không cho phép xuất file nội bộ sang Multi-Video</translation>
+      <translation>Không cho phép xuất file cục bộ trong chế độ Đa Video</translation>
     </message>
     <message>
       <source>Please remove all local files from the layout and try again.</source>
-      <translation>Vui lòng xóa tất cả tệp cục bộ khỏi cách bố trí và thử lại.</translation>
+      <translation>Vui lòng xóa tất cả tệp cục bộ khỏi bố cục và thử lại.</translation>
     </message>
     <message>
       <source>Starting export...</source>
@@ -10635,7 +10639,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Local Files</source>
-      <translation>Tập tin có sẵn</translation>
+      <translation>Tập tin cục bộ</translation>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
@@ -11189,10 +11193,10 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation>Cơ sở dữ liệu phân tích chỉ nên được lưu trữ trên một ổ đĩa cục bộ và có thể chiếm dung lượng lớn.
-Khi một vị trí để lưu trữ dữ liệu phân tích được chọn, nó không thể dễ dàng thay đổi mà không làm mất dữ liệu hiện có. Chúng tôi khuyên bạn nên chọn vị trí cẩn thận và tránh sử dụng phân vùng hệ thống vì nó có thể gây ra sự cố hệ thống nghiêm trọng.
+      <translation>Cơ sở dữ liệu phân tích chỉ nên được lưu trữ trên ổ đĩa cục bộ và có thể chiếm nhiều dung lượng.
+Sau khi đã chọn vị trí lưu trữ dữ liệu phân tích, vị trí đó nếu thay đổi sẽ có nguy cơ làm mất dữ liệu hiện có. Chúng tôi khuyến nghị bạn nên chọn vị trí cẩn thận và tránh sử dụng phân vùng hệ thống vì nó có thể gây ra sự cố hệ thống nghiêm trọng.
 Theo mặc định, dữ liệu phân tích sẽ được lưu trữ trên %1.
-Bạn có thể chọn một vị trí lưu trữ khác trong tab &quot;Quản lý lưu trữ&quot; của hộp thoại Cài đặt máy chủ.</translation>
+Bạn có thể chọn một vị trí lưu trữ khác trong tab &quot;Quản lý Lưu trữ&quot; trong hộp thoại Cài đặt Máy chủ.</translation>
     </message>
     <message>
       <source>Window configuration saved</source>
@@ -11436,7 +11440,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Automatic client updates</source>
-      <translation type="unfinished">Automatic client updates</translation>
+      <translation>Cập nhật ứng dụng máy khách tự động</translation>
     </message>
     <message>
       <source>New client-only updates will be installed automatically. You can change this in the settings.</source>
@@ -11456,7 +11460,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Can&apos;t check client update availability. Check your internet connection and try again.</source>
-      <translation type="unfinished">Can&apos;t check client update availability. Check your internet connection and try again.</translation>
+      <translation>Không thể kiểm tra tính khả dụng của bản cập nhật máy khách. Kiểm tra kết nối internet của bạn và thử lại.</translation>
     </message>
   </context>
 </TS>
