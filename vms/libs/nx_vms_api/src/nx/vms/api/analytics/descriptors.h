@@ -8,6 +8,7 @@
 #include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/instrument.h>
 #include <nx/vms/api/analytics/manifest_items.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
 
@@ -46,6 +47,8 @@ struct DescriptorScope
     }
 };
 #define nx_vms_api_analytics_DescriptorScope_Fields (engineId)(groupId)(provider)
+NX_REFLECTION_INSTRUMENT(DescriptorScope, nx_vms_api_analytics_DescriptorScope_Fields);
+
 
 template<typename T, typename = void>
 struct hasGroupId: std::false_type {};
@@ -99,6 +102,7 @@ struct BaseDescriptor
     QString getId() const { return id; }
 };
 #define nx_vms_api_analytics_BaseDescriptor_Fields (id)(name)
+NX_REFLECTION_INSTRUMENT(BaseDescriptor, nx_vms_api_analytics_BaseDescriptor_Fields);
 
 struct BaseScopedDescriptor: BaseDescriptor
 {
@@ -124,6 +128,7 @@ struct BaseScopedDescriptor: BaseDescriptor
 #define nx_vms_api_analytics_BaseScopedDescriptor_Fields \
     nx_vms_api_analytics_BaseDescriptor_Fields \
     (scopes)
+NX_REFLECTION_INSTRUMENT(BaseScopedDescriptor, nx_vms_api_analytics_BaseScopedDescriptor_Fields);
 
 struct PluginDescriptor: BaseDescriptor
 {
@@ -136,6 +141,7 @@ struct PluginDescriptor: BaseDescriptor
     bool operator==(const PluginDescriptor& other) const = default;
 };
 #define nx_vms_api_analyitcs_PluginDescriptor_Fields nx_vms_api_analytics_BaseDescriptor_Fields
+NX_REFLECTION_INSTRUMENT(PluginDescriptor, nx_vms_api_analyitcs_PluginDescriptor_Fields);
 
 struct EngineDescriptor
 {
@@ -163,6 +169,7 @@ struct EngineDescriptor
     QnUuid getId() const { return id; }
 };
 #define nx_vms_api_analytics_EngineDescriptor_Fields (id)(name)(pluginId)(capabilities)
+NX_REFLECTION_INSTRUMENT(EngineDescriptor, nx_vms_api_analytics_EngineDescriptor_Fields);
 
 struct GroupDescriptor: BaseScopedDescriptor
 {
@@ -176,6 +183,7 @@ struct GroupDescriptor: BaseScopedDescriptor
 };
 #define nx_vms_api_analyitcs_GroupDescriptor_Fields \
     nx_vms_api_analytics_BaseScopedDescriptor_Fields
+NX_REFLECTION_INSTRUMENT(GroupDescriptor, nx_vms_api_analyitcs_GroupDescriptor_Fields);
 
 struct ExtendedScopedDescriptor: public BaseScopedDescriptor
 {
@@ -204,6 +212,8 @@ struct ExtendedScopedDescriptor: public BaseScopedDescriptor
     (omittedBaseAttributes) \
     (attributes) \
     (attributeSupportInfo)
+NX_REFLECTION_INSTRUMENT(ExtendedScopedDescriptor,
+    nx_vms_api_analytics_ExtendedScopedDescriptor_Fields);
 
 struct EventTypeDescriptor: public ExtendedScopedDescriptor
 {
@@ -225,6 +235,7 @@ struct EventTypeDescriptor: public ExtendedScopedDescriptor
     nx_vms_api_analytics_ExtendedScopedDescriptor_Fields \
     (flags) \
     (hasEverBeenSupported)
+NX_REFLECTION_INSTRUMENT(EventTypeDescriptor, nx_vms_api_analyitcs_EventTypeDescriptor_Fields);
 
 struct ObjectTypeDescriptor: public ExtendedScopedDescriptor
 {
@@ -246,6 +257,7 @@ struct ObjectTypeDescriptor: public ExtendedScopedDescriptor
     nx_vms_api_analytics_ExtendedScopedDescriptor_Fields \
     (flags) \
     (hasEverBeenSupported)
+NX_REFLECTION_INSTRUMENT(ObjectTypeDescriptor, nx_vms_api_analyitcs_ObjectTypeDescriptor_Fields);
 
 struct ActionTypeDescriptor: BaseDescriptor
 {
@@ -271,6 +283,7 @@ struct ActionTypeDescriptor: BaseDescriptor
     (supportedObjectTypeIds) \
     (parametersModel) \
     (requirements)
+NX_REFLECTION_INSTRUMENT(ActionTypeDescriptor, nx_vms_api_analytics_ActionTypeDescriptor_Fields);
 
 struct EnumTypeDescriptor: public BaseDescriptor
 {
@@ -294,6 +307,7 @@ struct EnumTypeDescriptor: public BaseDescriptor
     (base) \
     (baseItems) \
     (items)
+NX_REFLECTION_INSTRUMENT(EnumTypeDescriptor, nx_vms_api_analytics_EnumTypeDescriptor_Fields);
 
 struct ColorTypeDescriptor: public BaseDescriptor
 {
@@ -317,6 +331,7 @@ struct ColorTypeDescriptor: public BaseDescriptor
     (base) \
     (baseItems) \
     (items)
+NX_REFLECTION_INSTRUMENT(ColorTypeDescriptor, nx_vms_api_analytics_ColorTypeDescriptor_Fields);
 
 // Client and web api uses group ids in the same filter scenarios as event and object type ids.
 static_assert(std::is_same<GroupId, EventTypeId>::value);
@@ -361,6 +376,7 @@ struct NX_VMS_API Descriptors
     (objectTypeDescriptors) \
     (enumTypeDescriptors) \
     (colorTypeDescriptors)
+NX_REFLECTION_INSTRUMENT(Descriptors, nx_vms_api_analytics_Descriptors_Fields);
 
 QN_FUSION_DECLARE_FUNCTIONS(Descriptors, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(DescriptorScope, (json), NX_VMS_API)

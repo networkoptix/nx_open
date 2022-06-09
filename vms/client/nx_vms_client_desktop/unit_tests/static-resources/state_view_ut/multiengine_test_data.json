@@ -1,0 +1,1299 @@
+{
+
+"descriptors": {
+    "engineDescriptors": {
+        "9fee3a77-8200-4e55-97fb-04fae8a78da6": {
+            "id": "9fee3a77-8200-4e55-97fb-04fae8a78da6",
+            "name": "Engine 1"
+        },
+        "5ec1b2ee-6a89-41a1-8e82-22861c11ab73": {
+            "id": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73",
+            "name": "Engine 2"
+        },
+        "0a89f20b-9827-434d-b75c-c18866d6b993": {
+            "id": "0a89f20b-9827-434d-b75c-c18866d6b993",
+            "name": "Engine 3"
+        }
+    },
+    "objectTypeDescriptors": {
+        "base.object.type.1": {
+            "id": "base.object.type.1",
+            "name": "Base Object Type 1",
+            "icon": "base.icon.1",
+            "attributes": [
+                {
+                    "name": "Base Object Type 1, Attribute 1",
+                    "type": "String"
+                }
+            ],
+            "scopes": [
+                { "engineId": "9fee3a77-8200-4e55-97fb-04fae8a78da6" }
+            ]
+        },
+        "base.object.type.2": {
+            "id": "base.object.type.2",
+            "name": "Base Object Type 2",
+            "icon": "base.icon.2",
+            "attributes": [
+                {
+                    "name": "Base Object Type 2, Attribute 1",
+                    "type": "String"
+                }
+            ],
+            "scopes": [
+                { "engineId": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73" }
+            ]
+        },
+        "base.object.type.3": {
+            "id": "base.object.type.3",
+            "name": "Base Object Type 3",
+            "icon": "base.icon.3",
+            "attributes": [
+                {
+                    "name": "Base Object Type 3, Attribute 1",
+                    "type": "String"
+                }
+            ],
+            "scopes": [
+                { "engineId": "0a89f20b-9827-434d-b75c-c18866d6b993" }
+            ]
+        },
+        "base.object.type.4": {
+            "id": "base.object.type.4",
+            "name": "Base Object Type 4",
+            "icon": "base.icon.4",
+            "attributes": [
+                {
+                    "name": "Base Object Type 4, Attribute 1",
+                    "type": "String"
+                }
+            ],
+            "scopes": [
+                { "engineId": "9fee3a77-8200-4e55-97fb-04fae8a78da6" },
+                { "engineId": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73" }
+            ]
+        },
+        "derived.object.type.1": {
+            "id": "derived.object.type.1",
+            "name": "Derived Object Type 1",
+            "icon": "derived.icon.1",
+            "base": "base.object.type.1",
+            "attributes": [
+                {
+                    "name": "Derived Object Type 1, Attribute 1",
+                    "type": "String"
+                }
+            ],
+            "scopes": [
+                { "engineId": "9fee3a77-8200-4e55-97fb-04fae8a78da6" }
+            ]
+        },
+        "derived.object.type.2": {
+            "id": "derived.object.type.2",
+            "name": "Derived Object Type 2",
+            "icon": "derived.icon.2",
+            "base": "base.object.type.2",
+            "attributes": [
+                {
+                    "name": "Derived Object Type 2, Attribute 1",
+                    "type": "String"
+                }
+            ],
+            "scopes": [
+                { "engineId": "0a89f20b-9827-434d-b75c-c18866d6b993" }
+            ]
+
+        },
+        "derived.object.type.3": {
+            "id": "derived.object.type.3",
+            "name": "Derived Object Type 3",
+            "icon": "derived.icon.3",
+            "base": "base.object.type.3",
+            "attributes": [
+                {
+                    "name": "Derived Object Type 3, Attribute 1",
+                    "type": "String"
+                }
+            ],
+            "scopes": [
+                { "engineId": "0a89f20b-9827-434d-b75c-c18866d6b993" }
+            ]
+        },
+        "derived.object.type.4": {
+            "id": "derived.object.type.4",
+            "name": "Derived Object Type 4",
+            "icon": "derived.icon.4",
+            "base": "derived.object.type.3",
+            "attributes": [
+                {
+                    "name": "Derived Object Type 4, Attribute 1",
+                    "type": "String"
+                }
+            ],
+            "scopes": [
+                { "engineId": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73" }
+            ]
+        },
+        "derived.object.type.5": {
+            "id": "derived.object.type.5",
+            "name": "Derived Object Type 5",
+            "icon": "derived.icon.5",
+            "base": "derived.object.type.3",
+            "attributes": [
+                {
+                    "name": "Derived Object Type 5, Attribute 1",
+                    "type": "String"
+                }
+            ],
+            "scopes": [
+                { "engineId": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73" }
+            ]
+        },
+        "derived.object.type.6": {
+            "id": "derived.object.type.6",
+            "name": "Derived Object Type 6",
+            "icon": "derived.icon.6",
+            "base": "derived.object.type.2",
+            "attributes": [
+                {
+                    "name": "Derived Object Type 6, Attribute 1",
+                    "type": "String"
+                }
+            ],
+            "scopes": [
+                { "engineId": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73" }
+            ]
+        },
+        "hidden.derived.object.type.1": {
+            "id": "hidden.derived.object.type.1",
+            "name": "Hidden Derived Object Type 1",
+            "flags": "hiddenDerivedType",
+            "base": "base.object.type.1",
+            "attributes": [
+                {
+                    "name": "Hidden Derived Object Type 1, Attribute 1",
+                    "type": "String"
+                }
+            ],
+            "scopes": [
+                { "engineId": "9fee3a77-8200-4e55-97fb-04fae8a78da6" }
+            ]
+        },
+        "hidden.derived.object.type.2": {
+            "id": "hidden.derived.object.type.2",
+            "name": "Hidden Derived Object Type 2",
+            "flags": "hiddenDerivedType",
+            "base": "base.object.type.2",
+            "attributes": [
+                {
+                    "name": "Hidden Derived Object Type 2, Attribute 1",
+                    "type": "String"
+                }
+            ],
+            "scopes": [
+                { "engineId": "0a89f20b-9827-434d-b75c-c18866d6b993" }
+            ]
+        },
+        "hidden.derived.object.type.3": {
+            "id": "hidden.derived.object.type.3",
+            "name": "Hidden Derived Object Type 3",
+            "flags": "hiddenDerivedType",
+            "base": "base.object.type.3",
+            "attributes": [
+                {
+                    "name": "Hidden Derived Object Type 3, Attribute 1",
+                    "type": "String"
+                }
+            ],
+            "scopes": [
+                { "engineId": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73" }
+            ]
+        },
+        "hidden.derived.object.type.4": {
+            "id": "hidden.derived.object.type.4",
+            "name": "Hidden Derived Object Type 4",
+            "flags": "hiddenDerivedType",
+            "base": "base.object.type.3",
+            "attributes": [
+                {
+                    "name": "Hidden Derived Object Type 4, Attribute 1",
+                    "type": "String"
+                }
+            ],
+            "scopes": [
+                { "engineId": "0a89f20b-9827-434d-b75c-c18866d6b993" }
+            ]
+        },
+        "hidden.derived.object.type.5": {
+            "id": "hidden.derived.object.type.5",
+            "name": "Hidden Derived Object Type 5",
+            "flags": "hiddenDerivedType",
+            "base": "base.object.type.4",
+            "attributes": [
+                {
+                    "name": "Hidden Derived Object Type 5, Attribute 1",
+                    "type": "String"
+                }
+            ],
+            "scopes": [
+                { "engineId": "0a89f20b-9827-434d-b75c-c18866d6b993" }
+            ]
+        },
+        "hidden.derived.object.type.6": {
+            "id": "hidden.derived.object.type.6",
+            "name": "Hidden Derived Object Type 6",
+            "flags": "hiddenDerivedType",
+            "base": "derived.object.type.5",
+            "attributes": [
+                {
+                    "name": "Hidden Derived Object Type 6, Attribute 1",
+                    "type": "String"
+                }
+            ],
+            "scopes": [
+                { "engineId": "9fee3a77-8200-4e55-97fb-04fae8a78da6" }
+            ]
+        },
+        "hidden.derived.object.type.7": {
+            "id": "hidden.derived.object.type.7",
+            "name": "Hidden Derived Object Type 7",
+            "flags": "hiddenDerivedType",
+            "base": "derived.object.type.3",
+            "attributes": [
+                {
+                    "name": "Hidden Derived Object Type 7, Attribute 1",
+                    "type": "String"
+                }
+            ],
+            "scopes": [
+                { "engineId": "9fee3a77-8200-4e55-97fb-04fae8a78da6" },
+                { "engineId": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73" }
+            ]
+        }
+    }
+},
+"testCases": {
+    "multiengineTestCase_withoutHiddenTypes": {
+        "input": {
+            "objectTypes": [
+                "base.object.type.1",
+                "base.object.type.2",
+                "base.object.type.3",
+                "base.object.type.4",
+                "derived.object.type.1",
+                "derived.object.type.2",
+                "derived.object.type.3",
+                "derived.object.type.4",
+                "derived.object.type.5",
+                "derived.object.type.6"
+            ],
+            "attributeSupportInfo": {
+                "base.object.type.1": {
+                    "Base Object Type 1, Attribute 1": ["9fee3a77-8200-4e55-97fb-04fae8a78da6"]
+                },
+                "base.object.type.2": {
+                    "Base Object Type 2, Attribute 1": ["5ec1b2ee-6a89-41a1-8e82-22861c11ab73"]
+                },
+                "base.object.type.3": {
+                    "Base Object Type 3, Attribute 1": ["0a89f20b-9827-434d-b75c-c18866d6b993"]
+                },
+                "base.object.type.4": {
+                    "Base Object Type 4, Attribute 1": [
+                        "9fee3a77-8200-4e55-97fb-04fae8a78da6",
+                        "5ec1b2ee-6a89-41a1-8e82-22861c11ab73"
+                    ]
+                },
+                "derived.object.type.1": {
+                    "Derived Object Type 1, Attribute 1": ["9fee3a77-8200-4e55-97fb-04fae8a78da6"]
+                },
+                "derived.object.type.2": {
+                    "Derived Object Type 2, Attribute 1": ["0a89f20b-9827-434d-b75c-c18866d6b993"]
+                },
+                "derived.object.type.3": {
+                    "Derived Object Type 3, Attribute 1": ["0a89f20b-9827-434d-b75c-c18866d6b993"]
+                },
+                "derived.object.type.4": {
+                    "Derived Object Type 4, Attribute 1": ["5ec1b2ee-6a89-41a1-8e82-22861c11ab73"]
+                },
+                "derived.object.type.5": {
+                    "Derived Object Type 5, Attribute 1": ["5ec1b2ee-6a89-41a1-8e82-22861c11ab73"]
+                },
+                "derived.object.type.6": {
+                    "Derived Object Type 6, Attribute 1": [
+                        "9fee3a77-8200-4e55-97fb-04fae8a78da6",
+                        "5ec1b2ee-6a89-41a1-8e82-22861c11ab73"
+                    ]
+                }
+            }
+        },
+        "expected": {
+            "": {
+                "__comment": "All Engines",
+                "nodes": [
+                    {
+                        "name": "Base Object Type 1",
+                        "icon": "base.icon.1",
+                        "typeIds": ["base.object.type.1"],
+                        "fullSubtreeTypeIds": ["base.object.type.1", "derived.object.type.1"],
+                        "attributes": [
+                            {
+                                "name": "Base Object Type 1, Attribute 1",
+                                "type": "string"
+                            }
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Derived Object Type 1",
+                                "icon": "derived.icon.1",
+                                "typeIds": ["derived.object.type.1"],
+                                "fullSubtreeTypeIds": ["derived.object.type.1"],
+                                "attributes": [
+                                    {
+                                        "name": "Derived Object Type 1, Attribute 1",
+                                        "type": "string"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Base Object Type 2",
+                        "icon": "base.icon.2",
+                        "typeIds": ["base.object.type.2"],
+                        "fullSubtreeTypeIds": [
+                            "base.object.type.2",
+                            "derived.object.type.2",
+                            "derived.object.type.6"
+                        ],
+                        "attributes": [
+                            {
+                                "name": "Base Object Type 2, Attribute 1",
+                                "type": "string"
+                            }
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Derived Object Type 2",
+                                "icon": "derived.icon.2",
+                                "typeIds": ["derived.object.type.2"],
+                                "fullSubtreeTypeIds": [
+                                    "derived.object.type.2",
+                                    "derived.object.type.6"
+                                ],
+                                "attributes": [
+                                    {
+                                        "name": "Derived Object Type 2, Attribute 1",
+                                        "type": "string"
+                                    }
+                                ],
+                                "nodes": [
+                                    {
+                                        "name": "Derived Object Type 6",
+                                        "icon": "derived.icon.6",
+                                        "typeIds": ["derived.object.type.6"],
+                                        "fullSubtreeTypeIds": ["derived.object.type.6"],
+                                        "attributes": [
+                                            {
+                                                "name": "Derived Object Type 6, Attribute 1",
+                                                "type": "string"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Base Object Type 3",
+                        "icon": "base.icon.3",
+                        "typeIds": ["base.object.type.3"],
+                        "fullSubtreeTypeIds": [
+                            "base.object.type.3",
+                            "derived.object.type.3",
+                            "derived.object.type.4",
+                            "derived.object.type.5"
+                        ],
+                        "attributes": [
+                            {
+                                "name": "Base Object Type 3, Attribute 1",
+                                "type": "string"
+                            }
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Derived Object Type 3",
+                                "icon": "derived.icon.3",
+                                "typeIds": ["derived.object.type.3"],
+                                "fullSubtreeTypeIds": [
+                                    "derived.object.type.3",
+                                    "derived.object.type.4",
+                                    "derived.object.type.5"
+                                ],
+                                "attributes": [
+                                    {
+                                        "name": "Derived Object Type 3, Attribute 1",
+                                        "type": "string"
+                                    }
+                                ],
+                                "nodes": [
+                                    {
+                                        "name": "Derived Object Type 4",
+                                        "icon": "derived.icon.4",
+                                        "typeIds": ["derived.object.type.4"],
+                                        "fullSubtreeTypeIds": ["derived.object.type.4"],
+                                        "attributes": [
+                                            {
+                                                "name": "Derived Object Type 4, Attribute 1",
+                                                "type": "string"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "Derived Object Type 5",
+                                        "icon": "derived.icon.5",
+                                        "typeIds": ["derived.object.type.5"],
+                                        "fullSubtreeTypeIds": ["derived.object.type.5"],
+                                        "attributes": [
+                                            {
+                                                "name": "Derived Object Type 5, Attribute 1",
+                                                "type": "string"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Base Object Type 4",
+                        "icon": "base.icon.4",
+                        "typeIds": ["base.object.type.4"],
+                        "fullSubtreeTypeIds": ["base.object.type.4"],
+                        "attributes": [
+                            {
+                                "name": "Base Object Type 4, Attribute 1",
+                                "type": "string"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "9fee3a77-8200-4e55-97fb-04fae8a78da6": {
+                "__comment": "Engine 1",
+                "nodes": [
+                    {
+                        "name": "Base Object Type 1",
+                        "icon": "base.icon.1",
+                        "typeIds": ["base.object.type.1"],
+                        "fullSubtreeTypeIds": [
+                            "base.object.type.1",
+                            "derived.object.type.1"
+                        ],
+                        "attributes": [
+                            {
+                                "name": "Base Object Type 1, Attribute 1",
+                                "type": "string"
+                            }
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Derived Object Type 1",
+                                "icon": "derived.icon.1",
+                                "typeIds": ["derived.object.type.1"],
+                                "fullSubtreeTypeIds": ["derived.object.type.1"],
+                                "attributes": [
+                                    {
+                                        "name": "Derived Object Type 1, Attribute 1",
+                                        "type": "string"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Base Object Type 4",
+                        "icon": "base.icon.4",
+                        "typeIds": ["base.object.type.4"],
+                        "fullSubtreeTypeIds": ["base.object.type.4"],
+                        "attributes": [
+                            {
+                                "name": "Base Object Type 4, Attribute 1",
+                                "type": "string"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "5ec1b2ee-6a89-41a1-8e82-22861c11ab73": {
+                "__comment": "Engine 2",
+                "nodes": [
+                    {
+                        "name": "Base Object Type 2",
+                        "icon": "base.icon.2",
+                        "typeIds": ["base.object.type.2"],
+                        "fullSubtreeTypeIds": [
+                            "base.object.type.2",
+                            "derived.object.type.6"
+                        ],
+                        "attributes": [
+                            {
+                                "name": "Base Object Type 2, Attribute 1",
+                                "type": "string"
+                            }
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Derived Object Type 2",
+                                "icon": "derived.icon.2",
+                                "typeIds": [],
+                                "fullSubtreeTypeIds": ["derived.object.type.6"],
+                                "attributes": [],
+                                "nodes": [
+                                    {
+                                        "name": "Derived Object Type 6",
+                                        "icon": "derived.icon.6",
+                                        "typeIds": ["derived.object.type.6"],
+                                        "fullSubtreeTypeIds": ["derived.object.type.6"],
+                                        "attributes": [
+                                            {
+                                                "name": "Derived Object Type 6, Attribute 1",
+                                                "type": "string"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Base Object Type 3",
+                        "icon": "base.icon.3",
+                        "typeIds": [],
+                        "fullSubtreeTypeIds": [
+                            "derived.object.type.4",
+                            "derived.object.type.5"
+                        ],
+                        "attributes": [],
+                        "nodes": [
+                            {
+                                "name": "Derived Object Type 3",
+                                "icon": "derived.icon.3",
+                                "typeIds": [],
+                                "fullSubtreeTypeIds": [
+                                    "derived.object.type.4",
+                                    "derived.object.type.5"
+                                ],
+                                "attributes": [],
+                                "nodes": [
+                                    {
+                                        "name": "Derived Object Type 4",
+                                        "icon": "derived.icon.4",
+                                        "typeIds": ["derived.object.type.4"],
+                                        "fullSubtreeTypeIds": ["derived.object.type.4"],
+                                        "attributes": [
+                                            {
+                                                "name": "Derived Object Type 4, Attribute 1",
+                                                "type": "string"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "Derived Object Type 5",
+                                        "icon": "derived.icon.5",
+                                        "typeIds": ["derived.object.type.5"],
+                                        "fullSubtreeTypeIds": ["derived.object.type.5"],
+                                        "attributes": [
+                                            {
+                                                "name": "Derived Object Type 5, Attribute 1",
+                                                "type": "string"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Base Object Type 4",
+                        "icon": "base.icon.4",
+                        "typeIds": ["base.object.type.4"],
+                        "fullSubtreeTypeIds": ["base.object.type.4"],
+                        "attributes": [
+                            {
+                                "name": "Base Object Type 4, Attribute 1",
+                                "type": "string"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "0a89f20b-9827-434d-b75c-c18866d6b993": {
+                "__comment": "Engine 3",
+                "nodes": [
+                    {
+                        "name": "Base Object Type 2",
+                        "icon": "base.icon.2",
+                        "typeIds": [],
+                        "fullSubtreeTypeIds": ["derived.object.type.2"],
+                        "attributes": [],
+                        "nodes": [
+                            {
+                                "name": "Derived Object Type 2",
+                                "icon": "derived.icon.2",
+                                "typeIds": ["derived.object.type.2"],
+                                "fullSubtreeTypeIds": ["derived.object.type.2"],
+                                "attributes": [
+                                    {
+                                        "name": "Derived Object Type 2, Attribute 1",
+                                        "type": "string"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Base Object Type 3",
+                        "icon": "base.icon.3",
+                        "typeIds": ["base.object.type.3"],
+                        "fullSubtreeTypeIds": [
+                            "base.object.type.3",
+                            "derived.object.type.3"
+                        ],
+                        "attributes": [
+                            {
+                                "name": "Base Object Type 3, Attribute 1",
+                                "type": "string"
+                            }
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Derived Object Type 3",
+                                "icon": "derived.icon.3",
+                                "typeIds": ["derived.object.type.3"],
+                                "fullSubtreeTypeIds": ["derived.object.type.3"],
+                                "attributes": [
+                                    {
+                                        "name": "Derived Object Type 3, Attribute 1",
+                                        "type": "string"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    "multiengineTestCase_withHiddenTypes": {
+        "input": {
+            "objectTypes": [
+                "base.object.type.1",
+                "base.object.type.2",
+                "base.object.type.3",
+                "base.object.type.4",
+                "derived.object.type.1",
+                "derived.object.type.2",
+                "derived.object.type.3",
+                "derived.object.type.4",
+                "derived.object.type.5",
+                "derived.object.type.6",
+                "hidden.derived.object.type.1",
+                "hidden.derived.object.type.2",
+                "hidden.derived.object.type.3",
+                "hidden.derived.object.type.4",
+                "hidden.derived.object.type.5",
+                "hidden.derived.object.type.6",
+                "hidden.derived.object.type.7"
+            ],
+            "attributeSupportInfo": {
+                "base.object.type.1": {
+                    "Base Object Type 1, Attribute 1": ["9fee3a77-8200-4e55-97fb-04fae8a78da6"]
+                },
+                "base.object.type.2": {
+                    "Base Object Type 2, Attribute 1": ["5ec1b2ee-6a89-41a1-8e82-22861c11ab73"]
+                },
+                "base.object.type.3": {
+                    "Base Object Type 3, Attribute 1": ["0a89f20b-9827-434d-b75c-c18866d6b993"]
+                },
+                "base.object.type.4": {
+                    "Base Object Type 4, Attribute 1": [
+                        "9fee3a77-8200-4e55-97fb-04fae8a78da6",
+                        "5ec1b2ee-6a89-41a1-8e82-22861c11ab73"
+                    ]
+                },
+                "derived.object.type.1": {
+                    "Derived Object Type 1, Attribute 1": ["9fee3a77-8200-4e55-97fb-04fae8a78da6"]
+                },
+                "derived.object.type.2": {
+                    "Derived Object Type 2, Attribute 1": ["0a89f20b-9827-434d-b75c-c18866d6b993"]
+                },
+                "derived.object.type.3": {
+                    "Derived Object Type 3, Attribute 1": ["0a89f20b-9827-434d-b75c-c18866d6b993"]
+                },
+                "derived.object.type.4": {
+                    "Derived Object Type 4, Attribute 1": ["5ec1b2ee-6a89-41a1-8e82-22861c11ab73"]
+                },
+                "derived.object.type.5": {
+                    "Derived Object Type 5, Attribute 1": ["5ec1b2ee-6a89-41a1-8e82-22861c11ab73"]
+                },
+                "derived.object.type.6": {
+                    "Derived Object Type 6, Attribute 1": [
+                        "9fee3a77-8200-4e55-97fb-04fae8a78da6",
+                        "5ec1b2ee-6a89-41a1-8e82-22861c11ab73"
+                    ]
+                },
+                "hidden.derived.object.type.1": {
+                    "Hidden Derived Object Type 1, Attribute 1": [
+                        "9fee3a77-8200-4e55-97fb-04fae8a78da6"
+                    ]
+                },
+                "hidden.derived.object.type.2": {
+                    "Hidden Derived Object Type 2, Attribute 1": [
+                        "0a89f20b-9827-434d-b75c-c18866d6b993"
+                    ]
+                },
+                "hidden.derived.object.type.3": {
+                    "Hidden Derived Object Type 3, Attribute 1": [
+                        "5ec1b2ee-6a89-41a1-8e82-22861c11ab73"
+                    ]
+                },
+                "hidden.derived.object.type.4": {
+                    "Hidden Derived Object Type 4, Attribute 1": [
+                        "0a89f20b-9827-434d-b75c-c18866d6b993"
+                    ]
+                },
+                "hidden.derived.object.type.5": {
+                    "Hidden Derived Object Type 5, Attribute 1": [
+                        "0a89f20b-9827-434d-b75c-c18866d6b993"
+                    ]
+                },
+                "hidden.derived.object.type.6": {
+                    "Hidden Derived Object Type 6, Attribute 1": [
+                        "9fee3a77-8200-4e55-97fb-04fae8a78da6"
+                    ]
+                },
+                "hidden.derived.object.type.7": {
+                    "Hidden Derived Object Type 7, Attribute 1": [
+                        "9fee3a77-8200-4e55-97fb-04fae8a78da6",
+                        "5ec1b2ee-6a89-41a1-8e82-22861c11ab73"
+                    ]
+                }
+            }
+        },
+        "expected": {
+            "": {
+                "__comment": "All Engines",
+                "nodes": [
+                    {
+                        "name": "Base Object Type 1",
+                        "icon": "base.icon.1",
+                        "typeIds": [
+                            "base.object.type.1",
+                            "hidden.derived.object.type.1"
+                        ],
+                        "fullSubtreeTypeIds": [
+                            "base.object.type.1",
+                            "hidden.derived.object.type.1",
+                            "derived.object.type.1"
+                        ],
+                        "attributes": [
+                            {
+                                "name": "Base Object Type 1, Attribute 1",
+                                "type": "string"
+                            },
+                            {
+                                "name": "Hidden Derived Object Type 1, Attribute 1",
+                                "type": "string"
+                            }
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Derived Object Type 1",
+                                "icon": "derived.icon.1",
+                                "typeIds": ["derived.object.type.1"],
+                                "fullSubtreeTypeIds": ["derived.object.type.1"],
+                                "attributes": [
+                                    {
+                                        "name": "Derived Object Type 1, Attribute 1",
+                                        "type": "string"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Base Object Type 2",
+                        "icon": "base.icon.2",
+                        "typeIds": [
+                            "base.object.type.2",
+                            "hidden.derived.object.type.2"
+                        ],
+                        "fullSubtreeTypeIds": [
+                            "base.object.type.2",
+                            "hidden.derived.object.type.2",
+                            "derived.object.type.2",
+                            "derived.object.type.6"
+                        ],
+                        "attributes": [
+                            {
+                                "name": "Base Object Type 2, Attribute 1",
+                                "type": "string"
+                            },
+                            {
+                                "name": "Hidden Derived Object Type 2, Attribute 1",
+                                "type": "string"
+                            }
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Derived Object Type 2",
+                                "icon": "derived.icon.2",
+                                "typeIds": ["derived.object.type.2"],
+                                "fullSubtreeTypeIds": [
+                                    "derived.object.type.2",
+                                    "derived.object.type.6"
+                                ],
+                                "attributes": [
+                                    {
+                                        "name": "Derived Object Type 2, Attribute 1",
+                                        "type": "string"
+                                    }
+                                ],
+                                "nodes": [
+                                    {
+                                        "name": "Derived Object Type 6",
+                                        "icon": "derived.icon.6",
+                                        "typeIds": ["derived.object.type.6"],
+                                        "fullSubtreeTypeIds": ["derived.object.type.6"],
+                                        "attributes": [
+                                            {
+                                                "name": "Derived Object Type 6, Attribute 1",
+                                                "type": "string"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Base Object Type 3",
+                        "icon": "base.icon.3",
+                        "typeIds": [
+                            "base.object.type.3",
+                            "hidden.derived.object.type.3",
+                            "hidden.derived.object.type.4"
+                        ],
+                        "fullSubtreeTypeIds": [
+                            "base.object.type.3",
+                            "hidden.derived.object.type.3",
+                            "hidden.derived.object.type.4",
+                            "derived.object.type.3",
+                            "hidden.derived.object.type.7",
+                            "derived.object.type.4",
+                            "derived.object.type.5",
+                            "hidden.derived.object.type.6"
+                        ],
+                        "attributes": [
+                            {
+                                "name": "Base Object Type 3, Attribute 1",
+                                "type": "string"
+                            },
+                            {
+                                "name": "Hidden Derived Object Type 3, Attribute 1",
+                                "type": "string"
+                            },
+                            {
+                                "name": "Hidden Derived Object Type 4, Attribute 1",
+                                "type": "string"
+                            }
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Derived Object Type 3",
+                                "icon": "derived.icon.3",
+                                "typeIds": [
+                                    "derived.object.type.3",
+                                    "hidden.derived.object.type.7"
+                                ],
+                                "fullSubtreeTypeIds": [
+                                    "derived.object.type.3",
+                                    "hidden.derived.object.type.7",
+                                    "derived.object.type.4",
+                                    "derived.object.type.5",
+                                    "hidden.derived.object.type.6"
+                                ],
+                                "attributes": [
+                                    {
+                                        "name": "Derived Object Type 3, Attribute 1",
+                                        "type": "string"
+                                    },
+                                    {
+                                        "name": "Hidden Derived Object Type 7, Attribute 1",
+                                        "type": "string"
+                                    }
+                                ],
+                                "nodes": [
+                                    {
+                                        "name": "Derived Object Type 4",
+                                        "icon": "derived.icon.4",
+                                        "typeIds": ["derived.object.type.4"],
+                                        "fullSubtreeTypeIds": ["derived.object.type.4"],
+                                        "attributes": [
+                                            {
+                                                "name": "Derived Object Type 4, Attribute 1",
+                                                "type": "string"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "Derived Object Type 5",
+                                        "icon": "derived.icon.5",
+                                        "typeIds": [
+                                            "derived.object.type.5",
+                                            "hidden.derived.object.type.6"
+                                        ],
+                                        "fullSubtreeTypeIds": [
+                                            "derived.object.type.5",
+                                            "hidden.derived.object.type.6"
+                                        ],
+                                        "attributes": [
+                                            {
+                                                "name": "Derived Object Type 5, Attribute 1",
+                                                "type": "string"
+                                            },
+                                            {
+                                                "name": "Hidden Derived Object Type 6, Attribute 1",
+                                                "type": "string"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Base Object Type 4",
+                        "icon": "base.icon.4",
+                        "typeIds": [
+                            "base.object.type.4",
+                            "hidden.derived.object.type.5"
+                        ],
+                        "fullSubtreeTypeIds": [
+                            "base.object.type.4",
+                            "hidden.derived.object.type.5"
+                        ],
+                        "attributes": [
+                            {
+                                "name": "Base Object Type 4, Attribute 1",
+                                "type": "string"
+                            },
+                            {
+                                "name": "Hidden Derived Object Type 5, Attribute 1",
+                                "type": "string"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "9fee3a77-8200-4e55-97fb-04fae8a78da6": {
+                "__comment": "Engine 1",
+                "nodes": [
+                    {
+                        "name": "Base Object Type 1",
+                        "icon": "base.icon.1",
+                        "typeIds": [
+                            "base.object.type.1",
+                            "hidden.derived.object.type.1"
+                        ],
+                        "fullSubtreeTypeIds": [
+                            "base.object.type.1",
+                            "hidden.derived.object.type.1",
+                            "derived.object.type.1"
+                        ],
+                        "attributes": [
+                            {
+                                "name": "Base Object Type 1, Attribute 1",
+                                "type": "string"
+                            },
+                            {
+                                "name": "Hidden Derived Object Type 1, Attribute 1",
+                                "type": "string"
+                            }
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Derived Object Type 1",
+                                "icon": "derived.icon.1",
+                                "typeIds": ["derived.object.type.1"],
+                                "fullSubtreeTypeIds": ["derived.object.type.1"],
+                                "attributes": [
+                                    {
+                                        "name": "Derived Object Type 1, Attribute 1",
+                                        "type": "string"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Base Object Type 3",
+                        "icon": "base.icon.3",
+                        "typeIds": [],
+                        "fullSubtreeTypeIds": [
+                            "hidden.derived.object.type.7",
+                            "hidden.derived.object.type.6"
+                        ],
+                        "attributes": [],
+                        "nodes": [
+                            {
+                                "name": "Derived Object Type 3",
+                                "icon": "derived.icon.3",
+                                "typeIds": ["hidden.derived.object.type.7"],
+                                "fullSubtreeTypeIds": [
+                                    "hidden.derived.object.type.7",
+                                    "hidden.derived.object.type.6"
+                                ],
+                                "attributes": [
+                                    {
+                                        "name": "Hidden Derived Object Type 7, Attribute 1",
+                                        "type": "string"
+                                    }
+                                ],
+                                "nodes": [
+                                    {
+                                        "name": "Derived Object Type 5",
+                                        "icon": "derived.icon.5",
+                                        "typeIds": ["hidden.derived.object.type.6"],
+                                        "fullSubtreeTypeIds": ["hidden.derived.object.type.6"],
+                                        "attributes": [
+                                            {
+                                                "name": "Hidden Derived Object Type 6, Attribute 1",
+                                                "type": "string"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Base Object Type 4",
+                        "icon": "base.icon.4",
+                        "typeIds": ["base.object.type.4"],
+                        "fullSubtreeTypeIds": ["base.object.type.4"],
+                        "attributes": [
+                            {
+                                "name": "Base Object Type 4, Attribute 1",
+                                "type": "string"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "5ec1b2ee-6a89-41a1-8e82-22861c11ab73": {
+                "__comment": "Engine 2",
+                "nodes": [
+                    {
+                        "name": "Base Object Type 2",
+                        "icon": "base.icon.2",
+                        "typeIds": ["base.object.type.2"],
+                        "fullSubtreeTypeIds": [
+                            "base.object.type.2",
+                            "derived.object.type.6"
+                        ],
+                        "attributes": [
+                            {
+                                "name": "Base Object Type 2, Attribute 1",
+                                "type": "string"
+                            }
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Derived Object Type 2",
+                                "icon": "derived.icon.2",
+                                "typeIds": [],
+                                "fullSubtreeTypeIds": ["derived.object.type.6"],
+                                "attributes": [],
+                                "nodes": [
+                                    {
+                                        "name": "Derived Object Type 6",
+                                        "icon": "derived.icon.6",
+                                        "typeIds": ["derived.object.type.6"],
+                                        "fullSubtreeTypeIds": ["derived.object.type.6"],
+                                        "attributes": [
+                                            {
+                                                "name": "Derived Object Type 6, Attribute 1",
+                                                "type": "string"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Base Object Type 3",
+                        "icon": "base.icon.3",
+                        "typeIds": ["hidden.derived.object.type.3"],
+                        "fullSubtreeTypeIds": [
+                            "hidden.derived.object.type.3",
+                            "hidden.derived.object.type.7",
+                            "derived.object.type.4",
+                            "derived.object.type.5"
+                        ],
+                        "attributes": [
+                            {
+                                "name": "Hidden Derived Object Type 3, Attribute 1",
+                                "type": "string"
+                            }
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Derived Object Type 3",
+                                "icon": "derived.icon.3",
+                                "typeIds": ["hidden.derived.object.type.7"],
+                                "fullSubtreeTypeIds": [
+                                    "hidden.derived.object.type.7",
+                                    "derived.object.type.4",
+                                    "derived.object.type.5"
+                                ],
+                                "attributes": [
+                                    {
+                                        "name": "Hidden Derived Object Type 7, Attribute 1",
+                                        "type": "string"
+                                    }
+                                ],
+                                "nodes": [
+                                    {
+                                        "name": "Derived Object Type 4",
+                                        "icon": "derived.icon.4",
+                                        "typeIds": ["derived.object.type.4"],
+                                        "fullSubtreeTypeIds": [
+                                            "derived.object.type.4"
+                                        ],
+                                        "attributes": [
+                                            {
+                                                "name": "Derived Object Type 4, Attribute 1",
+                                                "type": "string"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "Derived Object Type 5",
+                                        "icon": "derived.icon.5",
+                                        "typeIds": ["derived.object.type.5"],
+                                        "fullSubtreeTypeIds": ["derived.object.type.5"],
+                                        "attributes": [
+                                            {
+                                                "name": "Derived Object Type 5, Attribute 1",
+                                                "type": "string"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Base Object Type 4",
+                        "icon": "base.icon.4",
+                        "typeIds": ["base.object.type.4"],
+                        "fullSubtreeTypeIds": ["base.object.type.4"],
+                        "attributes": [
+                            {
+                                "name": "Base Object Type 4, Attribute 1",
+                                "type": "string"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "0a89f20b-9827-434d-b75c-c18866d6b993": {
+                "__comment": "Engine 3",
+                "nodes": [
+                    {
+                        "name": "Base Object Type 2",
+                        "icon": "base.icon.2",
+                        "typeIds": ["hidden.derived.object.type.2"],
+                        "fullSubtreeTypeIds": [
+                            "hidden.derived.object.type.2",
+                            "derived.object.type.2"
+                        ],
+                        "attributes": [
+                            {
+                                "name": "Hidden Derived Object Type 2, Attribute 1",
+                                "type": "string"
+                            }
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Derived Object Type 2",
+                                "icon": "derived.icon.2",
+                                "typeIds": ["derived.object.type.2"],
+                                "fullSubtreeTypeIds": ["derived.object.type.2"],
+                                "attributes": [
+                                    {
+                                        "name": "Derived Object Type 2, Attribute 1",
+                                        "type": "string"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Base Object Type 3",
+                        "icon": "base.icon.3",
+                        "typeIds": [
+                            "base.object.type.3",
+                            "hidden.derived.object.type.4"
+                        ],
+                        "fullSubtreeTypeIds": [
+                            "base.object.type.3",
+                            "hidden.derived.object.type.4",
+                            "derived.object.type.3"
+                        ],
+                        "attributes": [
+                            {
+                                "name": "Base Object Type 3, Attribute 1",
+                                "type": "string"
+                            },
+                            {
+                                "name": "Hidden Derived Object Type 4, Attribute 1",
+                                "type": "string"
+                            }
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Derived Object Type 3",
+                                "icon": "derived.icon.3",
+                                "typeIds": ["derived.object.type.3"],
+                                "fullSubtreeTypeIds": ["derived.object.type.3"],
+                                "attributes": [
+                                    {
+                                        "name": "Derived Object Type 3, Attribute 1",
+                                        "type": "string"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Base Object Type 4",
+                        "icon": "base.icon.4",
+                        "typeIds": ["hidden.derived.object.type.5"],
+                        "fullSubtreeTypeIds": ["hidden.derived.object.type.5"],
+                        "attributes": [
+                            {
+                                "name": "Hidden Derived Object Type 5, Attribute 1",
+                                "type": "string"
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+}
+
+}

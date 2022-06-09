@@ -6,16 +6,16 @@
 
 namespace nx::analytics::taxonomy {
 
-extern const QString kIntegerAttributeSubtype;
-extern const QString kFloatAttributeSubtype;
+NX_VMS_COMMON_API extern const QString kIntegerAttributeSubtype;
+NX_VMS_COMMON_API extern const QString kFloatAttributeSubtype;
 
-extern const QString kPluginDescriptorTypeName;
-extern const QString kEngineDescriptorTypeName;
-extern const QString kGroupDescriptorTypeName;
-extern const QString kEnumTypeDescriptorTypeName;
-extern const QString kColorTypeDescriptorTypeName;
-extern const QString kObjectTypeDescriptorTypeName;
-extern const QString kEventTypeDescriptorTypeName;
+NX_VMS_COMMON_API extern const QString kPluginDescriptorTypeName;
+NX_VMS_COMMON_API extern const QString kEngineDescriptorTypeName;
+NX_VMS_COMMON_API extern const QString kGroupDescriptorTypeName;
+NX_VMS_COMMON_API extern const QString kEnumTypeDescriptorTypeName;
+NX_VMS_COMMON_API extern const QString kColorTypeDescriptorTypeName;
+NX_VMS_COMMON_API extern const QString kObjectTypeDescriptorTypeName;
+NX_VMS_COMMON_API extern const QString kEventTypeDescriptorTypeName;
 
 struct ProcessingError
 {
