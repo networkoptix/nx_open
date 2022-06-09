@@ -167,15 +167,15 @@
     </message>
     <message>
       <source>Keep Archive For...</source>
-      <translation>保留錄影資料天數</translation>
+      <translation>錄影資料保留天數</translation>
     </message>
     <message>
       <source>Max</source>
-      <translation>最多</translation>
+      <translation>至多</translation>
     </message>
     <message>
       <source>Min</source>
-      <translation>最少</translation>
+      <translation>至少</translation>
     </message>
   </context>
   <context>
@@ -260,11 +260,11 @@
     </message>
     <message>
       <source>Fixed</source>
-      <translation>啟用頻寬限制</translation>
+      <translation>固定頻寬</translation>
     </message>
     <message>
       <source>Scheduled</source>
-      <translation>啟用頻寬排程設定</translation>
+      <translation>排程設定</translation>
     </message>
     <message>
       <source>Fix bandwidth to</source>
@@ -298,7 +298,7 @@
     <name>BackupStatusWidget</name>
     <message>
       <source>Backup is not configured yet.</source>
-      <translation>備份尚未設定</translation>
+      <translation>備份尚未設定完成</translation>
     </message>
     <message>
       <source>To start backup enable it for some cameras and apply settings.</source>
@@ -322,7 +322,7 @@
     </message>
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
-      <translation>因儲存裝置問題而導致備份暫時停止，待問題修復後，備份將會自動恢復。</translation>
+      <translation>因儲存裝置問題而導致備份暫時停止，待問題修復後，備份將會自動重啟。</translation>
     </message>
   </context>
   <context>
@@ -596,7 +596,7 @@
     </message>
     <message>
       <source>Use different values for pan and tilt</source>
-      <translation>水平/垂直套用不同的設定</translation>
+      <translation>在水平/垂直使用不同的設定</translation>
     </message>
     <message>
       <source>Tilt</source>
@@ -608,7 +608,7 @@
     </message>
     <message>
       <source>Use system presets</source>
-      <translation>使用系統儲存位置</translation>
+      <translation>使用VMS定義的預設點</translation>
     </message>
     <message>
       <source>PTZ Speed</source>
@@ -620,7 +620,7 @@
     </message>
     <message>
       <source>Use camera native presets</source>
-      <translation>使用攝影機儲存位置</translation>
+      <translation>使用攝影機原生預設點</translation>
     </message>
     <message>
       <source>Time Settings</source>
@@ -814,7 +814,7 @@
     <name>CertificateSelectionDialog</name>
     <message>
       <source>Web site requires a certificate</source>
-      <translation>此網站要求憑證驗證</translation>
+      <translation>此網站需要憑證</translation>
     </message>
   </context>
   <context>
@@ -1127,7 +1127,7 @@
     <name>FailoverPriorityPickerWidget</name>
     <message>
       <source>Set priority:</source>
-      <translation>優先順位設定:</translation>
+      <translation>優先權設定:</translation>
     </message>
     <message>
       <source>No failover</source>
