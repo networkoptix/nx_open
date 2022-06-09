@@ -1,0 +1,2306 @@
+{
+
+"descriptors": {
+    "engineDescriptors": {
+        "2a6397b7-9645-4f9a-b6c3-78320c6a0633" : {
+            "id": "2a6397b7-9645-4f9a-b6c3-78320c6a0633",
+            "name": "Engine 1"
+        }
+    },
+    "enumTypeDescriptors": {
+        "base.enum.type.1": {
+            "id": "base.enum.type.1",
+            "name": "Base Enum Type 1",
+            "items": [
+                "base enum item 1.1",
+                "base enum item 1.2",
+                "base enum item 1.3"
+            ]
+        },
+        "base.enum.type.2": {
+            "id": "base.enum.type.2",
+            "name": "Base Enum Type 2",
+            "items": [
+                "base enum item 2.1",
+                "base enum item 2.2",
+                "base enum item 2.3"
+            ]
+        },
+
+        "derived.enum.type.1": {
+            "id": "derived.enum.type.1",
+            "name": "Derived Enum Type 1",
+            "base": "base.enum.type.1",
+            "items": [
+                "derived enum item 1.1",
+                "derived enum item 1.2",
+                "derived enum item 1.3"
+            ],
+            "baseItems": ["base enum item 1.1", "base enum item 1.2"]
+        },
+        "derived.enum.type.1.1": {
+            "id": "derived.enum.type.1.1",
+            "name": "Derived Enum Type 1.1",
+            "base": "base.enum.type.1",
+            "items": [
+                "derived enum item 1.1.1",
+                "derived enum item 1.1.2",
+                "derived enum item 1.1.3"
+            ],
+            "baseItems": ["base enum item 1.1", "base enum item 1.2"]
+        },
+
+        "derived.enum.type.2": {
+            "id": "derived.enum.type.2",
+            "name": "Derived Enum Type 2",
+            "base": "base.enum.type.2",
+            "items": [
+                "derived enum item 2.1",
+                "derived enum item 2.2",
+                "derived enum item 2.3"
+            ],
+            "baseItems": ["base enum item 2.1", "base enum item 2.2"]
+        },
+        "derived.enum.type.2.1": {
+            "id": "derived.enum.type.2.1",
+            "name": "Derived Enum Type 2.1",
+            "base": "base.enum.type.2",
+            "items": [
+                "derived enum item 2.1.1",
+                "derived enum item 2.1.2",
+                "derived enum item 2.1.3"
+            ],
+            "baseItems": ["base enum item 2.1", "base enum item 2.2"]
+        }
+    },
+    "colorTypeDescriptors": {
+        "base.color.type.1": {
+            "id": "base.color.type.1",
+            "name": "Base Color Type 1",
+            "items": [
+                { "name": "base color 1.1", "rgb": "#000000" },
+                { "name": "base color 1.2", "rgb": "#111111" },
+                { "name": "base color 1.3", "rgb": "#222222" }
+            ]
+        },
+        "base.color.type.2": {
+            "id": "base.color.type.2",
+            "name": "Base Color Type 2",
+            "items": [
+                { "name": "base color 2.1", "rgb": "#333333" },
+                { "name": "base color 2.2", "rgb": "#444444" },
+                { "name": "base color 2.3", "rgb": "#555555" }
+            ]
+        },
+
+        "derived.color.type.1": {
+            "id": "derived.color.type.1",
+            "name": "Derived Color Type 1",
+            "base": "base.color.type.1",
+            "items": [
+                { "name": "derived color 1.1", "rgb": "#010101" },
+                { "name": "derived color 1.2", "rgb": "#121212" },
+                { "name": "derived color 1.3", "rgb": "#232323" }
+            ],
+            "baseItems": ["base color 1.1", "base color 1.2"]
+        },
+        "derived.color.type.1.1": {
+            "id": "derived.color.type.1.1",
+            "name": "Derived Color Type 1.1",
+            "base": "base.color.type.1",
+            "items": [
+                { "name": "derived color 1.1.1", "rgb": "#101010" },
+                { "name": "derived color 1.1.2", "rgb": "#212121" },
+                { "name": "derived color 1.1.3", "rgb": "#323232" }
+            ],
+            "baseItems": ["base color 1.1", "base color 1.2"]
+        },
+
+        "derived.color.type.2": {
+            "id": "derived.color.type.2",
+            "name": "Derived Color Type 2",
+            "base": "base.color.type.2",
+            "items": [
+                { "name": "derived color 2.1", "rgb": "#343434" },
+                { "name": "derived color 2.2", "rgb": "#454545" },
+                { "name": "derived color 2.3", "rgb": "#565656" }
+            ],
+            "baseItems": ["base color 2.1", "base color 2.2"]
+        },
+        "derived.color.type.2.1": {
+            "id": "derived.color.type.2.1",
+            "name": "Derived Color Type 2.1",
+            "base": "base.color.type.2",
+            "items": [
+                { "name": "derived color 2.1.1", "rgb": "#787878" },
+                { "name": "derived color 2.1.2", "rgb": "#898989" },
+                { "name": "derived color 2.1.3", "rgb": "#909090" }
+            ],
+            "baseItems": ["base color 2.1", "base color 2.2"]
+        }
+    },
+    "objectTypeDescriptors": {
+        "nested.object.type.1": {
+            "id": "nested.object.type.1",
+            "name": "Nested Object Type 1",
+            "attributes": [
+                {
+                    "name": "Nested Type 1, Nested String Attribute 1",
+                    "type": "String"
+                },
+                {
+                    "name": "Nested Type 1, Nested Boolean Attribute 1",
+                    "type": "Boolean"
+                },
+                {
+                    "name": "Nested Type 1, Nested Numeric Attribute 1",
+                    "type": "Number",
+                    "subtype": "float"
+                },
+                {
+                    "name": "Nested Type 1, Nested Enumeration Attribute 1",
+                    "type": "Enum",
+                    "subtype": "base.enum.type.2"
+                },
+                {
+                    "name": "Nested Type 1, Nested Color Attribute 1",
+                    "type": "Color",
+                    "subtype": "base.color.type.2"
+                }
+            ]
+        },
+        "nested.derived.object.type.1": {
+            "id": "nested.derived.object.type.1",
+            "name": "Nested Derived Object Type 1",
+            "base": "nested.object.type.1",
+            "attributes": [
+                {
+                    "name": "Nested Type 1, Nested String Attribute 1",
+                    "type": "String",
+                    "_comment": "overridden"
+                },
+                {
+                    "name": "Nested Type 1, Nested Boolean Attribute 1",
+                    "type": "Boolean",
+                    "_comment": "overridden"
+                },
+                {
+                    "name": "Nested Type 1, Nested Numeric Attribute 1",
+                    "type": "Number",
+                    "subtype": "float",
+                    "minValue": 1.0,
+                    "maxValue": 100.0,
+                    "unit": "kg",
+                    "_comment": "overridden"
+                },
+                {
+                    "name": "Nested Type 1, Nested Enumeration Attribute 1",
+                    "type": "Enum",
+                    "subtype": "derived.enum.type.2",
+                    "_comment": "overridden"
+                },
+                {
+                    "name": "Nested Type 1, Nested Color Attribute 1",
+                    "type": "Color",
+                    "subtype": "derived.color.type.2",
+                    "_comment": "overridden"
+                }
+            ]
+        },
+        "nested.derived.object.type.1.1": {
+            "id": "nested.derived.object.type.1.1",
+            "name": "Nested Derived Object Type 1.1",
+            "base": "nested.object.type.1",
+            "attributes": [
+                {
+                    "name": "Nested Type 1, Nested String Attribute 1",
+                    "type": "String",
+                    "_comment": "overridden"
+                },
+                {
+                    "name": "Nested Type 1, Nested Boolean Attribute 1",
+                    "type": "Boolean",
+                    "_comment": "overridden"
+                },
+                {
+                    "name": "Nested Type 1, Nested Numeric Attribute 1",
+                    "type": "Number",
+                    "subtype": "float",
+                    "minValue": 2.0,
+                    "maxValue": 5.0,
+                    "unit": "lb",
+                    "_comment": "overridden"
+                },
+                {
+                    "name": "Nested Type 1, Nested Enumeration Attribute 1",
+                    "type": "Enum",
+                    "subtype": "derived.enum.type.2.1",
+                    "_comment": "overridden"
+                },
+                {
+                    "name": "Nested Type 1, Nested Color Attribute 1",
+                    "type": "Color",
+                    "subtype": "derived.color.type.2.1",
+                    "_comment": "overridden"
+                }
+            ]
+        },
+
+        "base.object.type.1": {
+            "id": "base.object.type.1",
+            "name": "Base Object Type 1",
+            "icon": "base.icon",
+            "attributes": [
+                {
+                    "name": "Base Type String Attribute 1",
+                    "type": "String"
+                },
+                {
+                    "name": "Base Type Boolean Attribute 1",
+                    "type": "Boolean"
+                },
+                {
+                    "name": "Base Type Numeric Attribute 1",
+                    "type": "Number",
+                    "subtype": "float"
+                },
+                {
+                    "name": "Base Type Numeric Attribute 2",
+                    "type": "Number",
+                    "subtype": "float",
+                    "minValue": 1.0,
+                    "maxValue": 10.0,
+                    "unit": "kg"
+                },
+                {
+                    "name": "Base Type Numeric Attribute 3",
+                    "type": "Number",
+                    "subtype": "integer"
+                },
+                {
+                    "name": "Base Type Numeric Attribute 4",
+                    "type": "Number",
+                    "subtype": "integer",
+                    "minValue": 2,
+                    "maxValue": 20,
+                    "unit": "unit"
+                },
+                {
+                    "name": "Base Type Enumeration Attribute 1",
+                    "type": "Enum",
+                    "subtype": "base.enum.type.1"
+                },
+                {
+                    "name": "Base Type Color Attribute 1",
+                    "type": "Color",
+                    "subtype": "base.color.type.1"
+                },
+                {
+                    "name": "Base Type Object Attribute 1",
+                    "type": "Object",
+                    "subtype": "nested.object.type.1"
+                }
+            ]
+        },
+
+        "derived.object.type.1": {
+            "id": "derived.object.type.1",
+            "name": "Derived Object Type 1",
+            "base": "base.object.type.1",
+            "icon": "derived.1.icon",
+            "attributes": [
+                {
+                    "name": "Derived Object Type 1, String Attribute 1",
+                    "type": "String"
+                }
+            ]
+        },
+        "derived.object.type.2": {
+            "id": "derived.object.type.2",
+            "name": "Derived Object Type 2",
+            "base": "base.object.type.1",
+            "icon": "derived.2.icon",
+            "attributes": [
+                {
+                    "name": "Derived Object Type 2, String Attribute 1",
+                    "type": "String"
+                }
+            ]
+        },
+        "derived.object.type.3": {
+            "id": "derived.object.type.3",
+            "name": "Derived Object Type 3",
+            "base": "derived.object.type.2",
+            "icon": "derived.3.icon",
+            "attributes": [
+                {
+                    "name": "Derived Object Type 3, String Attribute 1",
+                    "type": "String"
+                }
+            ]
+        },
+
+        "hidden.derived.object.type.1": {
+            "id": "hidden.derived.object.type.1",
+            "name": "Hidden Derived Object Type 1",
+            "flags": "hiddenDerivedType",
+            "base": "base.object.type.1",
+            "attributes": [
+                {
+                    "name": "Hidden Derived Type 1, String Attribute 1",
+                    "type": "String"
+                },
+                {
+                    "name": "Hidden Derived Type 1, Boolean Attribute 1",
+                    "type": "Boolean"
+                },
+                {
+                    "name": "Hidden Derived Type 1, Numeric Attribute 1",
+                    "type": "Number",
+                    "subtype": "float"
+                },
+                {
+                    "name": "Hidden Derived Type 1, Enumeration Attribute 1",
+                    "type": "Enum",
+                    "subtype": "base.enum.type.1"
+                },
+                {
+                    "name": "Hidden Derived Type 1, Color Attribute 1",
+                    "type": "Color",
+                    "subtype": "base.color.type.1"
+                },
+                {
+                    "name": "Hidden Derived Type 1, Object Attribute 1",
+                    "type": "Object",
+                    "subtype": "nested.object.type.1"
+                }
+            ]
+        },
+        "hidden.derived.object.type.1.1": {
+            "id": "hidden.derived.object.type.1.1",
+            "name": "Hidden Derived Object Type 1.1",
+            "flags": "hiddenDerivedType",
+            "base": "base.object.type.1",
+            "attributes": [
+                {
+                    "name": "Hidden Derived Type 1.1, String Attribute 1",
+                    "type": "String"
+                },
+                {
+                    "name": "Hidden Derived Type 1.1, Boolean Attribute 1",
+                    "type": "Boolean"
+                },
+                {
+                    "name": "Hidden Derived Type 1.1, Numeric Attribute 1",
+                    "type": "Number",
+                    "subtype": "float"
+                },
+                {
+                    "name": "Hidden Derived Type 1.1, Enumeration Attribute 1",
+                    "type": "Enum",
+                    "subtype": "base.enum.type.1"
+                },
+                {
+                    "name": "Hidden Derived Type 1.1, Color Attribute 1",
+                    "type": "Color",
+                    "subtype": "base.color.type.1"
+                },
+                {
+                    "name": "Hidden Derived Type 1.1, Object Attribute 1",
+                    "type": "Object",
+                    "subtype": "nested.object.type.1"
+                }
+            ]
+        },
+        "hidden.derived.object.type.2": {
+            "id": "hidden.derived.object.type.2",
+            "name": "Hidden Derived Object Type 2",
+            "flags": "hiddenDerivedType",
+            "base":"base.object.type.1",
+            "attributes": [
+                {
+                    "name": "Base Type String Attribute 1",
+                    "type": "String",
+                    "_comment": "overridden"
+                },
+                {
+                    "name": "Hidden Derived Type 2, String Attribute 1",
+                    "type": "String"
+                }
+            ]
+        },
+        "hidden.derived.object.type.2.1": {
+            "id": "hidden.derived.object.type.2.1",
+            "name": "Hidden Derived Object Type 2.1",
+            "flags": "hiddenDerivedType",
+            "base":"base.object.type.1",
+            "attributes": [
+                {
+                    "name": "Base Type String Attribute 1",
+                    "type": "String",
+                    "_comment": "overridden"
+                },
+                {
+                    "name": "Hidden Derived Type 2.1, String Attribute 1",
+                    "type": "String"
+                }
+            ]
+        },
+        "hidden.derived.object.type.3": {
+            "id": "hidden.derived.object.type.3",
+            "name": "Hidden Derived Object Type 3",
+            "flags": "hiddenDerivedType",
+            "base":"base.object.type.1",
+            "attributes": [
+                {
+                    "name": "Base Type Boolean Attribute 1",
+                    "type": "Boolean",
+                    "_comment": "overridden"
+                },
+                {
+                    "name": "Hidden Derived Type 3, String Attribute 1",
+                    "type": "String"
+                }
+            ]
+        },
+        "hidden.derived.object.type.3.1": {
+            "id": "hidden.derived.object.type.3.1",
+            "name": "Hidden Derived Object Type 3.1",
+            "flags": "hiddenDerivedType",
+            "base":"base.object.type.1",
+            "attributes": [
+                {
+                    "name": "Base Type Boolean Attribute 1",
+                    "type": "Boolean",
+                    "_comment": "overridden"
+                },
+                {
+                    "name": "Hidden Derived Type 3.1, String Attribute 1",
+                    "type": "String"
+                }
+            ]
+        },
+        "hidden.derived.object.type.4": {
+            "id": "hidden.derived.object.type.4",
+            "name": "Hidden Derived Object Type 4",
+            "flags": "hiddenDerivedType",
+            "base":"base.object.type.1",
+            "attributes": [
+                {
+                    "name": "Base Type Numeric Attribute 1",
+                    "type": "Number",
+                    "subtype": "float",
+                    "minValue": 1.0,
+                    "maxValue": 2.0,
+                    "unit": "kg",
+                    "_comment": "overridden"
+                },
+                {
+                    "name": "Base Type Numeric Attribute 2",
+                    "type": "Number",
+                    "subtype": "float",
+                    "minValue": 1.0,
+                    "maxValue": 2.0,
+                    "unit": "kg",
+                    "_comment": "overridden"
+                },
+                {
+                    "name": "Base Type Numeric Attribute 3",
+                    "type": "Number",
+                    "subtype": "integer",
+                    "minValue": 2,
+                    "maxValue": 12,
+                    "unit": "unit",
+                    "_comment": "overridden"
+                },
+                {
+                    "name": "Base Type Numeric Attribute 4",
+                    "type": "Number",
+                    "subtype": "integer",
+                    "_comment": "overridden"
+                },
+                {
+                    "name": "Hidden Derived Type 4, String Attribute 1",
+                    "type": "String"
+                }
+            ]
+        },
+        "hidden.derived.object.type.4.1": {
+            "id": "hidden.derived.object.type.4.1",
+            "name": "Hidden Derived Object Type 4.1",
+            "flags": "hiddenDerivedType",
+            "base":"base.object.type.1",
+            "attributes": [
+                {
+                    "name": "Base Type Numeric Attribute 1",
+                    "type": "Number",
+                    "subtype": "float",
+                    "minValue": 4.0,
+                    "maxValue": 5.0,
+                    "_comment": "overridden"
+                },
+                {
+                    "name": "Base Type Numeric Attribute 2",
+                    "type": "Number",
+                    "subtype": "float",
+                    "_comment": "overridden"
+                },
+                {
+                    "name": "Base Type Numeric Attribute 3",
+                    "type": "Number",
+                    "subtype": "integer",
+                    "unit": "unit 2",
+                    "_comment": "overridden"
+                },
+                {
+                    "name": "Base Type Numeric Attribute 4",
+                    "type": "Number",
+                    "subtype": "integer",
+                    "minValue": 2,
+                    "maxValue": 3,
+                    "_comment": "overridden"
+                },
+                {
+                    "name": "Hidden Derived Type 4.1, String Attribute 1",
+                    "type": "String"
+                }
+            ]
+        },
+        "hidden.derived.object.type.5": {
+            "id": "hidden.derived.object.type.5",
+            "name": "Hidden Derived Object Type 5",
+            "flags": "hiddenDerivedType",
+            "base":"base.object.type.1",
+            "attributes": [
+                {
+                    "name": "Base Type Enumeration Attribute 1",
+                    "type": "Enum",
+                    "subtype": "derived.enum.type.1",
+                    "_comment": "overridden"
+                },
+                {
+                    "name": "Hidden Derived Type 5, String Attribute 1",
+                    "type": "String"
+                }
+            ]
+        },
+        "hidden.derived.object.type.5.1": {
+            "id": "hidden.derived.object.type.5.1",
+            "name": "Hidden Derived Object Type 5.1",
+            "flags": "hiddenDerivedType",
+            "base":"base.object.type.1",
+            "attributes": [
+                {
+                    "name": "Base Type Enumeration Attribute 1",
+                    "type": "Enum",
+                    "subtype": "derived.enum.type.1.1",
+                    "_comment": "overridden"
+                },
+                {
+                    "name": "Hidden Derived Type 5.1, String Attribute 1",
+                    "type": "String"
+                }
+            ]
+        },
+        "hidden.derived.object.type.6": {
+            "id": "hidden.derived.object.type.6",
+            "name": "Hidden Derived Object Type 6",
+            "flags": "hiddenDerivedType",
+            "base":"base.object.type.1",
+            "attributes": [
+                {
+                    "name": "Base Type Color Attribute 1",
+                    "type": "Color",
+                    "subtype": "derived.color.type.1",
+                    "_comment": "overridden"
+                },
+                {
+                    "name": "Hidden Derived Type 6, String Attribute 1",
+                    "type": "String"
+                }
+            ]
+        },
+        "hidden.derived.object.type.6.1": {
+            "id": "hidden.derived.object.type.6.1",
+            "name": "Hidden Derived Object Type 6.1",
+            "flags": "hiddenDerivedType",
+            "base":"base.object.type.1",
+            "attributes": [
+                {
+                    "name": "Base Type Color Attribute 1",
+                    "type": "Color",
+                    "subtype": "derived.color.type.1.1",
+                    "_comment": "overridden"
+                },
+                {
+                    "name": "Hidden Derived Type 6.1, String Attribute 1",
+                    "type": "String"
+                }
+            ]
+        },
+        "hidden.derived.object.type.7": {
+            "id": "hidden.derived.object.type.7",
+            "name": "Hidden Derived Object Type 7",
+            "flags": "hiddenDerivedType",
+            "base":"base.object.type.1",
+            "attributes": [
+                {
+                    "name": "Base Type Object Attribute 1",
+                    "type": "Object",
+                    "subtype": "nested.derived.object.type.1",
+                    "_comment": "overridden"
+                },
+                {
+                    "name": "Hidden Derived Type 7, String Attribute 1",
+                    "type": "String"
+                }
+            ]
+        },
+        "hidden.derived.object.type.7.1": {
+            "id": "hidden.derived.object.type.7.1",
+            "name": "Hidden Derived Object Type 7.1",
+            "flags": "hiddenDerivedType",
+            "base":"base.object.type.1",
+            "attributes": [
+                {
+                    "name": "Base Type Object Attribute 1",
+                    "type": "Object",
+                    "subtype": "nested.derived.object.type.1.1",
+                    "_comment": "overridden"
+                },
+                {
+                    "name": "Hidden Derived Type 7.1, String Attribute 1",
+                    "type": "String"
+                }
+            ]
+        },
+        "hidden.derived.object.type.8": {
+            "id": "hidden.derived.object.type.8",
+            "name": "Hidden Derived Object Type 8",
+            "flags": "hiddenDerivedType",
+            "base": "derived.object.type.1",
+            "attributes": [
+                {
+                    "name": "Hidden Derived Type 8, String Attribute 1",
+                    "type": "String"
+                }
+            ]
+        },
+        "hidden.derived.object.type.9": {
+            "id": "hidden.derived.object.type.9",
+            "name": "Hidden Derived Object Type 9",
+            "flags": "hiddenDerivedType",
+            "base": "derived.object.type.2",
+            "attributes": [
+                {
+                    "name": "Hidden Derived Type 9, String Attribute 1",
+                    "type": "String"
+                }
+            ]
+        },
+        "hidden.derived.object.type.10": {
+            "id": "hidden.derived.object.type.10",
+            "name": "Hidden Derived Object Type 10",
+            "flags": "hiddenDerivedType",
+            "base": "derived.object.type.3",
+            "attributes": [
+                {
+                    "name": "Hidden Derived Type 10, String Attribute 1",
+                    "type": "String"
+                }
+            ]
+        }
+    }
+},
+
+"testCases": {
+    "singleHiddenType_noClashingAttributes": {
+        "input": {
+            "objectTypes": [
+                "base.object.type.1",
+                "hidden.derived.object.type.1",
+                "nested.object.type.1"
+            ],
+            "attributeSupportInfo": {
+                "base.object.type.1": {
+                    "Base Type String Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Boolean Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Numeric Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Numeric Attribute 2": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Numeric Attribute 3": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Numeric Attribute 4": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Enumeration Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Color Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Object Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"]
+                },
+                "hidden.derived.object.type.1": {
+                    "Hidden Derived Type 1, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Hidden Derived Type 1, Boolean Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Hidden Derived Type 1, Numeric Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Hidden Derived Type 1, Enumeration Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Hidden Derived Type 1, Color Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Hidden Derived Type 1, Object Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                }
+            }
+        },
+        "expected": {
+            "nodes": [
+                {
+                    "name": "Base Object Type 1",
+                    "icon": "base.icon",
+                    "typeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.1"
+                    ],
+                    "fullSubtreeTypeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.1"
+                    ],
+                    "attributes": [
+                        {
+                            "name": "Base Type String Attribute 1",
+                            "type": "string"
+                        },
+                        {
+                            "name": "Base Type Boolean Attribute 1",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "Base Type Numeric Attribute 1",
+                            "type": "number",
+                            "subtype": "float"
+                        },
+                        {
+                            "name": "Base Type Numeric Attribute 2",
+                            "type": "number",
+                            "subtype": "float",
+                            "minValue": 1.0,
+                            "maxValue": 10.0,
+                            "unit": "kg"
+                        },
+                        {
+                            "name": "Base Type Numeric Attribute 3",
+                            "type": "number",
+                            "subtype": "integer"
+                        },
+                        {
+                            "name": "Base Type Numeric Attribute 4",
+                            "type": "number",
+                            "subtype": "integer",
+                            "minValue": 2,
+                            "maxValue": 20,
+                            "unit": "unit"
+                        },
+                        {
+                            "name": "Base Type Enumeration Attribute 1",
+                            "type": "enumeration",
+                            "enumeration": [
+                                "base enum item 1.1",
+                                "base enum item 1.2",
+                                "base enum item 1.3"
+                            ]
+                        },
+                        {
+                            "name": "Base Type Color Attribute 1",
+                            "type": "colorSet",
+                            "colorSet": [
+                                { "name": "base color 1.1", "rgb": "#000000" },
+                                { "name": "base color 1.2", "rgb": "#111111" },
+                                { "name": "base color 1.3", "rgb": "#222222" }
+                            ]
+                        },
+                        {
+                            "name": "Base Type Object Attribute 1",
+                            "type": "attributeSet",
+                            "subtype": "nested.object.type.1",
+                            "attributeSet": []
+                        },
+                        {
+                            "name": "Hidden Derived Type 1, String Attribute 1",
+                            "type": "string"
+                        },
+                        {
+                            "name": "Hidden Derived Type 1, Boolean Attribute 1",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "Hidden Derived Type 1, Numeric Attribute 1",
+                            "type": "number",
+                            "subtype": "float"
+                        },
+                        {
+                            "name": "Hidden Derived Type 1, Enumeration Attribute 1",
+                            "type": "enumeration",
+                            "enumeration": [
+                                "base enum item 1.1",
+                                "base enum item 1.2",
+                                "base enum item 1.3"
+                            ]
+                        },
+                        {
+                            "name": "Hidden Derived Type 1, Color Attribute 1",
+                            "type": "colorSet",
+                            "colorSet": [
+                                { "name": "base color 1.1", "rgb": "#000000" },
+                                { "name": "base color 1.2", "rgb": "#111111" },
+                                { "name": "base color 1.3", "rgb": "#222222" }
+                            ]
+                        },
+                        {
+                            "name": "Hidden Derived Type 1, Object Attribute 1",
+                            "type": "attributeSet",
+                            "attributeSet": []
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "singleHiddenType_clashingNumericAttribute": {
+        "input": {
+            "objectTypes": ["base.object.type.1", "hidden.derived.object.type.4"],
+            "attributeSupportInfo": {
+                "base.object.type.1": {
+                    "Base Type Numeric Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Numeric Attribute 2": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Numeric Attribute 3": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Numeric Attribute 4": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"]
+                },
+                "hidden.derived.object.type.4": {
+                    "Base Type Numeric Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Numeric Attribute 2": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Numeric Attribute 3": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Numeric Attribute 4": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Hidden Derived Type 4, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                }
+            }
+        },
+        "expected": {
+            "nodes": [
+                {
+                    "name": "Base Object Type 1",
+                    "icon": "base.icon",
+                    "typeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.4"
+                    ],
+                    "fullSubtreeTypeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.4"
+                    ],
+                    "attributes": [
+                        {
+                            "name": "Base Type Numeric Attribute 1",
+                            "type": "number",
+                            "subtype": "float"
+                        },
+                        {
+                            "name": "Base Type Numeric Attribute 2",
+                            "type": "number",
+                            "subtype": "float",
+                            "minValue": 1.0,
+                            "maxValue": 10.0,
+                            "unit": "kg"
+                        },
+                        {
+                            "name": "Base Type Numeric Attribute 3",
+                            "type": "number",
+                            "subtype": "integer"
+                        },
+                        {
+                            "name": "Base Type Numeric Attribute 4",
+                            "type": "number",
+                            "subtype": "integer"
+                        },
+                        {
+                            "name": "Hidden Derived Type 4, String Attribute 1",
+                            "type": "String"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "singleHiddenType_clashingEnumerationAttribute": {
+        "input": {
+            "objectTypes": ["base.object.type.1", "hidden.derived.object.type.5"],
+            "attributeSupportInfo": {
+                "base.object.type.1": {
+                    "Base Type Enumeration Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"]
+                },
+                "hidden.derived.object.type.5": {
+                    "Base Type Enumeration Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Hidden Derived Type 5, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                }
+            }
+        },
+        "expected": {
+            "nodes": [
+                {
+                    "name": "Base Object Type 1",
+                    "icon": "base.icon",
+                    "typeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.5"
+                    ],
+                    "fullSubtreeTypeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.5"
+                    ],
+                    "attributes": [
+                        {
+                            "name": "Base Type Enumeration Attribute 1",
+                            "type": "enumeration",
+                            "enumeration": [
+                                "base enum item 1.1",
+                                "base enum item 1.2",
+                                "base enum item 1.3",
+                                "derived enum item 1.1",
+                                "derived enum item 1.2",
+                                "derived enum item 1.3"
+                            ]
+                        },
+                        {
+                            "name": "Hidden Derived Type 5, String Attribute 1",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "singleHiddenType_clashingColorSetAttribute": {
+        "input": {
+            "objectTypes": ["base.object.type.1", "hidden.derived.object.type.6"],
+            "attributeSupportInfo": {
+                "base.object.type.1": {
+                    "Base Type Color Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"]
+                },
+                "hidden.derived.object.type.6": {
+                    "Base Type Color Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Hidden Derived Type 6, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                }
+            }
+        },
+        "expected": {
+            "nodes": [
+                {
+                    "name": "Base Object Type 1",
+                    "icon": "base.icon",
+                    "typeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.6"
+                    ],
+                    "fullSubtreeTypeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.6"
+                    ],
+                    "attributes": [
+                        {
+                            "name": "Base Type Color Attribute 1",
+                            "type": "colorSet",
+                            "colorSet": [
+                                { "name": "base color 1.1", "rgb": "#000000" },
+                                { "name": "base color 1.2", "rgb": "#111111" },
+                                { "name": "base color 1.3", "rgb": "#222222" },
+                                { "name": "derived color 1.1", "rgb": "#010101" },
+                                { "name": "derived color 1.2", "rgb": "#121212" },
+                                { "name": "derived color 1.3", "rgb": "#232323" }
+                            ]
+                        },
+                        {
+                            "name": "Hidden Derived Type 6, String Attribute 1",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "singleHiddenType_clashingAttributeSetAttribute": {
+        "input": {
+            "objectTypes": [
+                "base.object.type.1",
+                "hidden.derived.object.type.7",
+                "nested.object.type.1",
+                "nested.derived.object.type.1"
+            ],
+            "attributeSupportInfo": {
+                "base.object.type.1": {
+                    "Base Type Object Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Object Attribute 1.Nested Type 1, Nested String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Boolean Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Numeric Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Enumeration Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Color Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                },
+                "hidden.derived.object.type.7": {
+                    "Base Type Object Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Object Attribute 1.Nested Type 1, Nested String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Boolean Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Numeric Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Enumeration Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Color Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Hidden Derived Type 7, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                }
+            }
+        },
+        "expected": {
+            "nodes": [
+                {
+                    "name": "Base Object Type 1",
+                    "icon": "base.icon",
+                    "typeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.7"
+                    ],
+                    "fullSubtreeTypeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.7"
+                    ],
+                    "attributes": [
+                        {
+                            "name": "Base Type Object Attribute 1",
+                            "type": "attributeSet",
+                            "attributeSet": [
+                                {
+                                    "name": "Nested Type 1, Nested String Attribute 1",
+                                    "type": "string"
+                                },
+                                {
+                                    "name": "Nested Type 1, Nested Boolean Attribute 1",
+                                    "type": "boolean"
+                                },
+                                {
+                                    "name": "Nested Type 1, Nested Numeric Attribute 1",
+                                    "type": "number",
+                                    "subtype": "float"
+                                },
+                                {
+                                    "name": "Nested Type 1, Nested Enumeration Attribute 1",
+                                    "type": "enumeration",
+                                    "enumeration": [
+                                        "base enum item 2.1",
+                                        "base enum item 2.2",
+                                        "base enum item 2.3",
+                                        "derived enum item 2.1",
+                                        "derived enum item 2.2",
+                                        "derived enum item 2.3"
+                                    ]
+                                },
+                                {
+                                    "name": "Nested Type 1, Nested Color Attribute 1",
+                                    "type": "colorSet",
+                                    "colorSet": [
+                                        { "name": "base color 2.1", "rgb": "#333333" },
+                                        { "name": "base color 2.2", "rgb": "#444444" },
+                                        { "name": "base color 2.3", "rgb": "#555555" },
+                                        { "name": "derived color 2.1", "rgb": "#343434" },
+                                        { "name": "derived color 2.2", "rgb": "#454545" },
+                                        { "name": "derived color 2.3", "rgb": "#565656" }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Hidden Derived Type 7, String Attribute 1",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "singleHiddenType_clashingStringAttribute": {
+        "input": {
+            "objectTypes": ["base.object.type.1", "hidden.derived.object.type.2"],
+            "attributeSupportInfo": {
+                "base.object.type.1": {
+                    "Base Type String Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"]
+                },
+                "hidden.derived.object.type.2": {
+                    "Base Type String Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Hidden Derived Type 2, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                }
+            }
+        },
+        "expected": {
+            "nodes": [
+                {
+                    "name": "Base Object Type 1",
+                    "icon": "base.icon",
+                    "typeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.2"
+                    ],
+                    "fullSubtreeTypeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.2"
+                    ],
+                    "attributes": [
+                        {
+                            "name": "Base Type String Attribute 1",
+                            "type": "string"
+                        },
+                        {
+                            "name": "Hidden Derived Type 2, String Attribute 1",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "singleHiddenType_clashingBooleanAttribute": {
+        "input": {
+            "objectTypes": ["base.object.type.1", "hidden.derived.object.type.3"],
+            "attributeSupportInfo": {
+                "base.object.type.1": {
+                    "Base Type Boolean Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"]
+                },
+                "hidden.derived.object.type.3": {
+                    "Base Type Boolean Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Hidden Derived Type 3, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                }
+            }
+        },
+        "expected": {
+            "nodes": [
+                {
+                    "name": "Base Object Type 1",
+                    "icon": "base.icon",
+                    "typeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.3"
+                    ],
+                    "fullSubtreeTypeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.3"
+                    ],
+                    "attributes": [
+                        {
+                            "name": "Base Type Boolean Attribute 1",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "Hidden Derived Type 3, String Attribute 1",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+
+    "multipleHiddenTypes_noClashingAttributes": {
+        "input": {
+            "objectTypes": [
+                "base.object.type.1",
+                "hidden.derived.object.type.1",
+                "hidden.derived.object.type.1.1",
+                "nested.object.type.1"
+            ],
+            "attributeSupportInfo": {
+                "base.object.type.1": {
+                    "Base Type String Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Boolean Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Numeric Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Numeric Attribute 2": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Numeric Attribute 3": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Numeric Attribute 4": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Enumeration Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Color Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Object Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"]
+                },
+                "hidden.derived.object.type.1": {
+                    "Hidden Derived Type 1, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Hidden Derived Type 1, Boolean Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Hidden Derived Type 1, Numeric Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Hidden Derived Type 1, Enumeration Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Hidden Derived Type 1, Color Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Hidden Derived Type 1, Object Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                },
+                "hidden.derived.object.type.1.1": {
+                    "Hidden Derived Type 1.1, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Hidden Derived Type 1.1, Boolean Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Hidden Derived Type 1.1, Numeric Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Hidden Derived Type 1.1, Enumeration Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Hidden Derived Type 1.1, Color Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Hidden Derived Type 1.1, Object Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                }
+            }
+        },
+        "expected": {
+            "nodes": [
+                {
+                    "name": "Base Object Type 1",
+                    "icon": "base.icon",
+                    "typeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.1",
+                        "hidden.derived.object.type.1.1"
+                    ],
+                    "fullSubtreeTypeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.1",
+                        "hidden.derived.object.type.1.1"
+                    ],
+                    "attributes": [
+                        {
+                            "name": "Base Type String Attribute 1",
+                            "type": "string"
+                        },
+                        {
+                            "name": "Base Type Boolean Attribute 1",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "Base Type Numeric Attribute 1",
+                            "type": "number",
+                            "subtype": "float"
+                        },
+                        {
+                            "name": "Base Type Numeric Attribute 2",
+                            "type": "number",
+                            "subtype": "float",
+                            "minValue": 1.0,
+                            "maxValue": 10.0,
+                            "unit": "kg"
+                        },
+                        {
+                            "name": "Base Type Numeric Attribute 3",
+                            "type": "number",
+                            "subtype": "integer"
+                        },
+                        {
+                            "name": "Base Type Numeric Attribute 4",
+                            "type": "number",
+                            "subtype": "integer",
+                            "minValue": 2,
+                            "maxValue": 20,
+                            "unit": "unit"
+                        },
+                        {
+                            "name": "Base Type Enumeration Attribute 1",
+                            "type": "enumeration",
+                            "enumeration": [
+                                "base enum item 1.1",
+                                "base enum item 1.2",
+                                "base enum item 1.3"
+                            ]
+                        },
+                        {
+                            "name": "Base Type Color Attribute 1",
+                            "type": "colorSet",
+                            "colorSet": [
+                                { "name": "base color 1.1", "rgb": "#000000" },
+                                { "name": "base color 1.2", "rgb": "#111111" },
+                                { "name": "base color 1.3", "rgb": "#222222" }
+                            ]
+                        },
+                        {
+                            "name": "Base Type Object Attribute 1",
+                            "type": "attributeSet",
+                            "subtype": "nested.object.type.1",
+                            "attributeSet": []
+                        },
+                        {
+                            "name": "Hidden Derived Type 1, String Attribute 1",
+                            "type": "string"
+                        },
+                        {
+                            "name": "Hidden Derived Type 1, Boolean Attribute 1",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "Hidden Derived Type 1, Numeric Attribute 1",
+                            "type": "number",
+                            "subtype": "float"
+                        },
+                        {
+                            "name": "Hidden Derived Type 1, Enumeration Attribute 1",
+                            "type": "enumeration",
+                            "enumeration": [
+                                "base enum item 1.1",
+                                "base enum item 1.2",
+                                "base enum item 1.3"
+                            ]
+                        },
+                        {
+                            "name": "Hidden Derived Type 1, Color Attribute 1",
+                            "type": "colorSet",
+                            "colorSet": [
+                                { "name": "base color 1.1", "rgb": "#000000" },
+                                { "name": "base color 1.2", "rgb": "#111111" },
+                                { "name": "base color 1.3", "rgb": "#222222" }
+                            ]
+                        },
+                        {
+                            "name": "Hidden Derived Type 1, Object Attribute 1",
+                            "type": "attributeSet",
+                            "attributeSet": []
+                        },
+                        {
+                            "name": "Hidden Derived Type 1.1, String Attribute 1",
+                            "type": "string"
+                        },
+                        {
+                            "name": "Hidden Derived Type 1.1, Boolean Attribute 1",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "Hidden Derived Type 1.1, Numeric Attribute 1",
+                            "type": "number",
+                            "subtype": "float"
+                        },
+                        {
+                            "name": "Hidden Derived Type 1.1, Enumeration Attribute 1",
+                            "type": "enumeration",
+                            "enumeration": [
+                                "base enum item 1.1",
+                                "base enum item 1.2",
+                                "base enum item 1.3"
+                            ]
+                        },
+                        {
+                            "name": "Hidden Derived Type 1.1, Color Attribute 1",
+                            "type": "colorSet",
+                            "colorSet": [
+                                { "name": "base color 1.1", "rgb": "#000000" },
+                                { "name": "base color 1.2", "rgb": "#111111" },
+                                { "name": "base color 1.3", "rgb": "#222222" }
+                            ]
+                        },
+                        {
+                            "name": "Hidden Derived Type 1.1, Object Attribute 1",
+                            "type": "attributeSet",
+                            "attributeSet": []
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "multipleHiddenTypes_clashingNumericAttribute": {
+        "input": {
+            "objectTypes": [
+                "base.object.type.1",
+                "hidden.derived.object.type.4",
+                "hidden.derived.object.type.4.1"
+            ],
+            "attributeSupportInfo": {
+                "base.object.type.1": {
+                    "Base Type Numeric Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Numeric Attribute 2": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Numeric Attribute 3": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Numeric Attribute 4": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"]
+                },
+                "hidden.derived.object.type.4": {
+                    "Base Type Numeric Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Numeric Attribute 2": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Numeric Attribute 3": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Numeric Attribute 4": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Hidden Derived Type 4, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                },
+                "hidden.derived.object.type.4.1": {
+                    "Base Type Numeric Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Numeric Attribute 2": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Numeric Attribute 3": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Numeric Attribute 4": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Hidden Derived Type 4.1, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                }
+            }
+        },
+        "expected": {
+            "nodes": [
+                {
+                    "name": "Base Object Type 1",
+                    "icon": "base.icon",
+                    "typeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.4",
+                        "hidden.derived.object.type.4.1"
+                    ],
+                    "fullSubtreeTypeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.4",
+                        "hidden.derived.object.type.4.1"
+                    ],
+                    "attributes": [
+                        {
+                            "name": "Base Type Numeric Attribute 1",
+                            "type": "number",
+                            "subtype": "float"
+                        },
+                        {
+                            "name": "Base Type Numeric Attribute 2",
+                            "type": "number",
+                            "subtype": "float"
+                        },
+                        {
+                            "name": "Base Type Numeric Attribute 3",
+                            "type": "number",
+                            "subtype": "integer"
+                        },
+                        {
+                            "name": "Base Type Numeric Attribute 4",
+                            "type": "number",
+                            "subtype": "integer"
+                        },
+                        {
+                            "name": "Hidden Derived Type 4, String Attribute 1",
+                            "type": "string"
+                        },
+                        {
+                            "name": "Hidden Derived Type 4.1, String Attribute 1",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "multipleHiddenTypes_clashingEnumerationAttribute": {
+        "input": {
+            "objectTypes": [
+                "base.object.type.1",
+                "hidden.derived.object.type.5",
+                "hidden.derived.object.type.5.1"
+            ],
+            "attributeSupportInfo": {
+                "base.object.type.1": {
+                    "Base Type Enumeration Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"]
+                },
+                "hidden.derived.object.type.5": {
+                    "Base Type Enumeration Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Hidden Derived Type 5, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                },
+                "hidden.derived.object.type.5.1": {
+                    "Base Type Enumeration Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Hidden Derived Type 5.1, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                }
+            }
+        },
+        "expected": {
+            "nodes": [
+                {
+                    "name": "Base Object Type 1",
+                    "icon": "base.icon",
+                    "typeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.5",
+                        "hidden.derived.object.type.5.1"
+                    ],
+                    "fullSubtreeTypeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.5",
+                        "hidden.derived.object.type.5.1"
+                    ],
+                    "attributes": [
+                        {
+                            "name": "Base Type Enumeration Attribute 1",
+                            "type": "enumeration",
+                            "enumeration": [
+                                "base enum item 1.1",
+                                "base enum item 1.2",
+                                "base enum item 1.3",
+                                "derived enum item 1.1",
+                                "derived enum item 1.1.1",
+                                "derived enum item 1.1.2",
+                                "derived enum item 1.1.3",
+                                "derived enum item 1.2",
+                                "derived enum item 1.3"
+                            ]
+                        },
+                        {
+                            "name": "Hidden Derived Type 5, String Attribute 1",
+                            "type": "string"
+                        },
+                        {
+                            "name": "Hidden Derived Type 5.1, String Attribute 1",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "multipleHiddenTypes_clashingColorSetAttribute": {
+        "input": {
+            "objectTypes": [
+                "base.object.type.1",
+                "hidden.derived.object.type.6",
+                "hidden.derived.object.type.6.1"
+            ],
+            "attributeSupportInfo": {
+                "base.object.type.1": {
+                    "Base Type Color Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"]
+                },
+                "hidden.derived.object.type.6": {
+                    "Base Type Color Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Hidden Derived Type 6, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                },
+                "hidden.derived.object.type.6.1": {
+                    "Base Type Color Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Hidden Derived Type 6.1, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                }
+            }
+        },
+        "expected": {
+            "nodes": [
+                {
+                    "name": "Base Object Type 1",
+                    "icon": "base.icon",
+                    "typeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.6",
+                        "hidden.derived.object.type.6.1"
+                    ],
+                    "fullSubtreeTypeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.6",
+                        "hidden.derived.object.type.6.1"
+                    ],
+                    "attributes": [
+                        {
+                            "name": "Base Type Color Attribute 1",
+                            "type": "colorSet",
+                            "colorSet": [
+                                { "name": "base color 1.1", "rgb": "#000000" },
+                                { "name": "base color 1.2", "rgb": "#111111" },
+                                { "name": "base color 1.3", "rgb": "#222222" },
+                                { "name": "derived color 1.1", "rgb": "#010101" },
+                                { "name": "derived color 1.1.1", "rgb": "#101010" },
+                                { "name": "derived color 1.1.2", "rgb": "#212121" },
+                                { "name": "derived color 1.1.3", "rgb": "#323232" },
+                                { "name": "derived color 1.2", "rgb": "#121212" },
+                                { "name": "derived color 1.3", "rgb": "#232323" }
+                            ]
+                        },
+                        {
+                            "name": "Hidden Derived Type 6, String Attribute 1",
+                            "type": "string"
+                        },
+                        {
+                            "name": "Hidden Derived Type 6.1, String Attribute 1",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "multipleHiddenTypes_clashingAttributeSetAttribute": {
+        "input": {
+            "objectTypes": [
+                "base.object.type.1",
+                "hidden.derived.object.type.7",
+                "hidden.derived.object.type.7.1",
+                "nested.object.type.1",
+                "nested.derived.object.type.1",
+                "nested.derived.object.type.1.1"
+            ],
+            "attributeSupportInfo": {
+                "base.object.type.1": {
+                    "Base Type Object Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Object Attribute 1.Nested Type 1, Nested String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Boolean Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Numeric Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Enumeration Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Color Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Hidden Derived Type 5, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                },
+                "hidden.derived.object.type.7": {
+                    "Base Type Object Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Object Attribute 1.Nested Type 1, Nested String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Boolean Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Numeric Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Enumeration Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Color Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Hidden Derived Type 7, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                },
+                "hidden.derived.object.type.7.1": {
+                    "Base Type Object Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Base Type Object Attribute 1.Nested Type 1, Nested String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Boolean Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Numeric Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Enumeration Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Color Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ],
+                    "Hidden Derived Type 7.1, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                }
+            }
+        },
+        "expected": {
+            "nodes": [
+                {
+                    "name": "Base Object Type 1",
+                    "icon": "base.icon",
+                    "typeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.7",
+                        "hidden.derived.object.type.7.1"
+                    ],
+                    "fullSubtreeTypeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.7",
+                        "hidden.derived.object.type.7.1"
+                    ],
+                    "attributes": [
+                        {
+                            "name": "Base Type Object Attribute 1",
+                            "type": "attributeSet",
+                            "attributeSet": [
+                                {
+                                    "name": "Nested Type 1, Nested String Attribute 1",
+                                    "type": "string"
+                                },
+                                {
+                                    "name": "Nested Type 1, Nested Boolean Attribute 1",
+                                    "type": "boolean"
+                                },
+                                {
+                                    "name": "Nested Type 1, Nested Numeric Attribute 1",
+                                    "type": "number",
+                                    "subtype": "float"
+                                },
+                                {
+                                    "name": "Nested Type 1, Nested Enumeration Attribute 1",
+                                    "type": "enumeration",
+                                    "enumeration": [
+                                        "base enum item 2.1",
+                                        "base enum item 2.2",
+                                        "base enum item 2.3",
+                                        "derived enum item 2.1",
+                                        "derived enum item 2.1.1",
+                                        "derived enum item 2.1.2",
+                                        "derived enum item 2.1.3",
+                                        "derived enum item 2.2",
+                                        "derived enum item 2.3"
+                                    ]
+                                },
+                                {
+                                    "name": "Nested Type 1, Nested Color Attribute 1",
+                                    "type": "colorSet",
+                                    "colorSet": [
+                                        { "name": "base color 2.1", "rgb": "#333333" },
+                                        { "name": "base color 2.2", "rgb": "#444444" },
+                                        { "name": "base color 2.3", "rgb": "#555555" },
+                                        { "name": "derived color 2.1", "rgb": "#343434" },
+                                        { "name": "derived color 2.1.1", "rgb": "#787878" },
+                                        { "name": "derived color 2.1.2", "rgb": "#898989" },
+                                        { "name": "derived color 2.1.3", "rgb": "#909090" },
+                                        { "name": "derived color 2.2", "rgb": "#454545" },
+                                        { "name": "derived color 2.3", "rgb": "#565656" }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Hidden Derived Type 7, String Attribute 1",
+                            "type": "string"
+                        },
+                        {
+                            "name": "Hidden Derived Type 7.1, String Attribute 1",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "multipleHiddenTypes_clashingStringAttribute": {
+        "input": {
+            "objectTypes": [
+                "base.object.type.1",
+                "hidden.derived.object.type.2",
+                "hidden.derived.object.type.2.1"
+            ],
+            "attributeSupportInfo": {
+                "base.object.type.1": {
+                    "Base Type String Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"]
+                },
+                "hidden.derived.object.type.2": {
+                    "Base Type String Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Hidden Derived Type 2, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                },
+                "hidden.derived.object.type.2.1": {
+                    "Base Type String Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Hidden Derived Type 2.1, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                }
+            }
+        },
+        "expected": {
+            "nodes": [
+                {
+                    "name": "Base Object Type 1",
+                    "icon": "base.icon",
+                    "typeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.2",
+                        "hidden.derived.object.type.2.1"
+                    ],
+                    "fullSubtreeTypeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.2",
+                        "hidden.derived.object.type.2.1"
+                    ],
+                    "attributes": [
+                        {
+                            "name": "Base Type String Attribute 1",
+                            "type": "string"
+                        },
+                        {
+                            "name": "Hidden Derived Type 2, String Attribute 1",
+                            "type": "string"
+                        },
+                        {
+                            "name": "Hidden Derived Type 2.1, String Attribute 1",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "multipleHiddenTypes_clashingBooleanAttribute": {
+        "input": {
+            "objectTypes": [
+                "base.object.type.1",
+                "hidden.derived.object.type.3",
+                "hidden.derived.object.type.3.1"
+            ],
+            "attributeSupportInfo": {
+                "base.object.type.1": {
+                    "Base Type Boolean Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"]
+                },
+                "hidden.derived.object.type.3": {
+                    "Base Type Boolean Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Hidden Derived Type 3, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                },
+                "hidden.derived.object.type.3.1": {
+                    "Base Type Boolean Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Hidden Derived Type 3.1, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                }
+            }
+        },
+        "expected": {
+            "nodes": [
+                {
+                    "name": "Base Object Type 1",
+                    "icon": "base.icon",
+                    "typeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.3",
+                        "hidden.derived.object.type.3.1"
+                    ],
+                    "fullSubtreeTypeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.3",
+                        "hidden.derived.object.type.3.1"
+                    ],
+                    "attributes": [
+                        {
+                            "name": "Base Type Boolean Attribute 1",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "Hidden Derived Type 3, String Attribute 1",
+                            "type": "string"
+                        },
+                        {
+                            "name": "Hidden Derived Type 3.1, String Attribute 1",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+
+    "derivedTypes": {
+        "input": {
+            "objectTypes": [
+                "base.object.type.1",
+                "derived.object.type.1",
+                "derived.object.type.2",
+                "derived.object.type.3"
+            ],
+            "attributeSupportInfo": {
+                "base.object.type.1": {
+                    "Base Type String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                },
+                "derived.object.type.1": {
+                    "Derived Object Type 1, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                },
+                "derived.object.type.2": {
+                    "Derived Object Type 2, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                },
+                "derived.object.type.3": {
+                    "Derived Object Type 3, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                }
+            }
+        },
+        "expected": {
+            "nodes": [
+                {
+                    "name": "Base Object Type 1",
+                    "icon": "base.icon",
+                    "typeIds": ["base.object.type.1"],
+                    "fullSubtreeTypeIds": [
+                        "base.object.type.1",
+                        "derived.object.type.1",
+                        "derived.object.type.2",
+                        "derived.object.type.3"
+                    ],
+                    "nodes": [
+                        {
+                            "name": "Derived Object Type 1",
+                            "icon": "derived.1.icon",
+                            "typeIds": ["derived.object.type.1"],
+                            "fullSubtreeTypeIds": ["derived.object.type.1"],
+                            "attributes": [
+                                {
+                                    "name": "Derived Object Type 1, String Attribute 1",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Derived Object Type 2",
+                            "icon": "derived.2.icon",
+                            "typeIds": ["derived.object.type.2"],
+                            "fullSubtreeTypeIds": [
+                                "derived.object.type.2",
+                                "derived.object.type.3"
+                            ],
+                            "nodes": [
+                                {
+                                    "name": "Derived Object Type 3",
+                                    "icon": "derived.3.icon",
+                                    "typeIds": ["derived.object.type.3"],
+                                    "fullSubtreeTypeIds": ["derived.object.type.3"],
+                                    "attributes": [
+                                        {
+                                            "name": "Derived Object Type 3, String Attribute 1",
+                                            "type": "string"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "attributes": [
+                                {
+                                    "name": "Derived Object Type 2, String Attribute 1",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    ],
+                    "attributes": [
+                        {
+                            "name": "Base Type String Attribute 1",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+
+    "derivedTypesWithHiddenDescendants": {
+        "input": {
+            "objectTypes": [
+                "base.object.type.1",
+                "derived.object.type.1",
+                "derived.object.type.2",
+                "derived.object.type.3",
+                "hidden.derived.object.type.2",
+                "hidden.derived.object.type.8",
+                "hidden.derived.object.type.9",
+                "hidden.derived.object.type.10"
+            ],
+            "attributeSupportInfo": {
+                "base.object.type.1": {
+                    "Base Type String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                },
+                "derived.object.type.1": {
+                    "Derived Object Type 1, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                },
+                "derived.object.type.2": {
+                    "Derived Object Type 2, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                },
+                "derived.object.type.3": {
+                    "Derived Object Type 3, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                },
+                "hidden.derived.object.type.2": {
+                    "Base Type String Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
+                    "Hidden Derived Type 2, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                },
+                "hidden.derived.object.type.8": {
+                    "Hidden Derived Type 8, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                },
+                "hidden.derived.object.type.9": {
+                    "Hidden Derived Type 9, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                },
+                "hidden.derived.object.type.10": {
+                    "Hidden Derived Type 10, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                }
+            }
+        },
+        "expected": {
+            "nodes": [
+                {
+                    "name": "Base Object Type 1",
+                    "icon": "base.icon",
+                    "typeIds": [
+                        "base.object.type.1",
+                        "hidden.derived.object.type.2"
+                    ],
+                    "fullSubtreeTypeIds": [
+                        "base.object.type.1",
+                        "derived.object.type.1",
+                        "derived.object.type.2",
+                        "derived.object.type.3",
+                        "hidden.derived.object.type.2",
+                        "hidden.derived.object.type.8",
+                        "hidden.derived.object.type.9",
+                        "hidden.derived.object.type.10"
+                    ],
+                    "nodes": [
+                        {
+                            "name": "Derived Object Type 1",
+                            "icon": "derived.1.icon",
+                            "typeIds": [
+                                "derived.object.type.1",
+                                "hidden.derived.object.type.8"
+                            ],
+                            "fullSubtreeTypeIds": [
+                                "derived.object.type.1",
+                                "hidden.derived.object.type.8"
+                            ],
+                            "attributes": [
+                                {
+                                    "name": "Derived Object Type 1, String Attribute 1",
+                                    "type": "string"
+                                },
+                                {
+                                    "name": "Hidden Derived Type 8, String Attribute 1",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Derived Object Type 2",
+                            "icon": "derived.2.icon",
+                            "typeIds": [
+                                "derived.object.type.2",
+                                "hidden.derived.object.type.9"
+                            ],
+                            "fullSubtreeTypeIds": [
+                                "derived.object.type.2",
+                                "hidden.derived.object.type.9",
+                                "derived.object.type.3",
+                                "hidden.derived.object.type.10"
+                            ],
+                            "nodes": [
+                                {
+                                    "name": "Derived Object Type 3",
+                                    "icon": "derived.3.icon",
+                                    "typeIds": [
+                                        "derived.object.type.3",
+                                        "hidden.derived.object.type.10"
+                                    ],
+                                    "fullSubtreeTypeIds": [
+                                        "derived.object.type.3",
+                                        "hidden.derived.object.type.10"
+                                    ],
+                                    "attributes": [
+                                        {
+                                            "name": "Derived Object Type 3, String Attribute 1",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "Hidden Derived Type 10, String Attribute 1",
+                                            "type": "string"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "attributes": [
+                                {
+                                    "name": "Derived Object Type 2, String Attribute 1",
+                                    "type": "string"
+                                },
+                                {
+                                    "name": "Hidden Derived Type 9, String Attribute 1",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    ],
+                    "attributes": [
+                        {
+                            "name": "Base Type String Attribute 1",
+                            "type": "string"
+                        },
+                        {
+                            "name": "Hidden Derived Type 2, String Attribute 1",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "derivedTypesWithHiddenDescendants_onlyHiddenTypesAreSupported": {
+        "input": {
+            "objectTypes": [
+                "base.object.type.1",
+                "derived.object.type.1",
+                "derived.object.type.2",
+                "derived.object.type.3",
+                "hidden.derived.object.type.2",
+                "hidden.derived.object.type.8",
+                "hidden.derived.object.type.9",
+                "hidden.derived.object.type.10"
+            ],
+            "attributeSupportInfo": {
+                "hidden.derived.object.type.2": {
+                    "Hidden Derived Type 2, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                },
+                "hidden.derived.object.type.8": {
+                    "Hidden Derived Type 8, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                },
+                "hidden.derived.object.type.9": {
+                    "Hidden Derived Type 9, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                },
+                "hidden.derived.object.type.10": {
+                    "Hidden Derived Type 10, String Attribute 1": [
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
+                    ]
+                }
+            }
+
+        },
+        "expected": {
+            "nodes": [
+                {
+                    "name": "Base Object Type 1",
+                    "icon": "base.icon",
+                    "typeIds": [
+                        "hidden.derived.object.type.2"],
+                    "fullSubtreeTypeIds": [
+                        "hidden.derived.object.type.2",
+                        "hidden.derived.object.type.8",
+                        "hidden.derived.object.type.9",
+                        "hidden.derived.object.type.10"
+                    ],
+                    "nodes": [
+                        {
+                            "name": "Derived Object Type 1",
+                            "icon": "derived.1.icon",
+                            "typeIds": ["hidden.derived.object.type.8"],
+                            "fullSubtreeTypeIds": ["hidden.derived.object.type.8"],
+                            "attributes": [
+                                {
+                                    "name": "Hidden Derived Type 8, String Attribute 1",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Derived Object Type 2",
+                            "icon": "derived.2.icon",
+                            "typeIds": ["hidden.derived.object.type.9"],
+                            "fullSubtreeTypeIds": [
+                                "hidden.derived.object.type.9",
+                                "hidden.derived.object.type.10"
+                            ],
+                            "nodes": [
+                                {
+                                    "name": "Derived Object Type 3",
+                                    "icon": "derived.3.icon",
+                                    "typeIds": ["hidden.derived.object.type.10"],
+                                    "fullSubtreeTypeIds": ["hidden.derived.object.type.10"],
+                                    "attributes": [
+                                        {
+                                            "name": "Hidden Derived Type 10, String Attribute 1",
+                                            "type": "string"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "attributes": [
+                                {
+                                    "name": "Hidden Derived Type 9, String Attribute 1",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    ],
+                    "attributes": [
+                        {
+                            "name": "Hidden Derived Type 2, String Attribute 1",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
+
+}

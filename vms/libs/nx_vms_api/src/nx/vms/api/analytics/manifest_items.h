@@ -8,6 +8,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>
+#include <nx/reflect/instrument.h>
 #include <nx/utils/serialization/flags.h>
 #include <nx/utils/uuid.h>
 
@@ -19,6 +20,7 @@ struct NamedItem
     QString name;
 };
 #define NamedItem_Fields (id)(name)
+NX_REFLECTION_INSTRUMENT(NamedItem, NamedItem_Fields);
 
 struct EnumType: public NamedItem
 {
@@ -27,6 +29,7 @@ struct EnumType: public NamedItem
     std::vector<QString> items;
 };
 #define EnumType_Fields NamedItem_Fields (base)(baseItems)(items)
+NX_REFLECTION_INSTRUMENT(EnumType, EnumType_Fields);
 
 struct ColorItem
 {
@@ -36,6 +39,7 @@ struct ColorItem
     bool operator==(const ColorItem& other) const = default;
 };
 #define ColorItem_Fields (name)(rgb)
+NX_REFLECTION_INSTRUMENT(ColorItem, ColorItem_Fields);
 
 struct ColorType: public NamedItem
 {
@@ -44,6 +48,7 @@ struct ColorType: public NamedItem
     std::vector<ColorItem> items;
 };
 #define ColorType_Fields NamedItem_Fields (base)(baseItems)(items)
+NX_REFLECTION_INSTRUMENT(ColorType, ColorType_Fields);
 
 enum class AttributeType
 {
@@ -83,6 +88,7 @@ struct AttributeDescription
     bool operator==(const AttributeDescription& other) const = default;
 };
 #define AttributeDescription_Fields (name)(type)(subtype)(items)(unit)(minValue)(maxValue)
+NX_REFLECTION_INSTRUMENT(AttributeDescription, AttributeDescription_Fields);
 
 struct ExtendedType: public NamedItem
 {
@@ -92,6 +98,7 @@ struct ExtendedType: public NamedItem
     std::vector<AttributeDescription> attributes;
 };
 #define ExtendedType_Fields NamedItem_Fields (icon)(base)(omittedBaseAttributes)(attributes)
+NX_REFLECTION_INSTRUMENT(ExtendedType, ExtendedType_Fields);
 
 /** See the documentation in manifests.md. */
 enum class EventTypeFlag
@@ -128,6 +135,7 @@ struct EventType: public ExtendedType
     bool isStateful() const noexcept { return flags.testFlag(EventTypeFlag::stateDependent); }
 };
 #define EventType_Fields ExtendedType_Fields (flags)(groupId)(provider)
+NX_REFLECTION_INSTRUMENT(EventType, EventType_Fields);
 uint NX_VMS_API qHash(const EventType& eventType);
 
 enum class ObjectTypeFlag
@@ -159,6 +167,7 @@ struct ObjectType: public ExtendedType
     ObjectTypeFlags flags;
 };
 #define ObjectType_Fields ExtendedType_Fields (provider)(flags)
+NX_REFLECTION_INSTRUMENT(ObjectType, ObjectType_Fields);
 
 /**
  * Named group which is referenced from a "groupId" attribute of other types to group them.
@@ -167,6 +176,7 @@ struct Group: NamedItem
 {
 };
 #define Group_Fields NamedItem_Fields
+NX_REFLECTION_INSTRUMENT(Group, Group_Fields);
 
 struct TypeSupportInfo
 {
@@ -181,6 +191,7 @@ struct TypeSupportInfo
     (eventTypeId) \
     (objectTypeId) \
     (attributes)
+NX_REFLECTION_INSTRUMENT(TypeSupportInfo, TypeSupportInfo_Fields);
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(EventTypeFlags)
 Q_DECLARE_OPERATORS_FOR_FLAGS(ObjectTypeFlags)
