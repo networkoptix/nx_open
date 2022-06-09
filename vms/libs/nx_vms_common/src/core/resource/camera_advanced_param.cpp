@@ -299,7 +299,7 @@ QnCameraAdvancedParams QnCameraAdvancedParams::filtered(const QSet<QString> &all
 {
     QnCameraAdvancedParams result;
     result.name = this->name;
-    result.unique_id = this->unique_id;
+    result.deviceId = this->deviceId;
     result.version = this->version;
     result.packet_mode = this->packet_mode;
     for (const QnCameraAdvancedParamGroup &subGroup: groups) {
@@ -411,7 +411,7 @@ void QnCameraAdvancedParams::merge(QnCameraAdvancedParams params)
     // These fields are never used in code, but could still be usefull for debug.
     name += lit(", ") + params.name;
     version += lit(", ") + params.version;
-    unique_id += lit(", ") + params.unique_id;
+    deviceId += lit(", ") + params.deviceId;
     packet_mode |= params.packet_mode;
 
     mergeGroups(&groups, &params.groups);
@@ -446,6 +446,15 @@ bool QnCameraAdvancedParams::hasItemsAvailableInOffline() const
 
     return false;
 }
+
+DeprecatedFieldNames* QnCameraAdvancedParams::getDeprecatedFieldNames()
+{
+    static DeprecatedFieldNames kDeprecatedFieldNames{
+        {"deviceId", "unique_id"}, //< up to v5.0
+    };
+    return &kDeprecatedFieldNames;
+}
+
 
 QnCameraAdvancedParameterCondition::QnCameraAdvancedParameterCondition(
     QnCameraAdvancedParameterCondition::ConditionType type,

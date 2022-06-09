@@ -5,6 +5,7 @@
 #include <cassert>
 #include <optional>
 #include <typeinfo>
+#include <unordered_set>
 
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
@@ -60,8 +61,31 @@ public:
     bool areStringConversionsAllowed() const { return m_allowStringConversions; }
     void setAllowStringConversions(bool value) { m_allowStringConversions = value; }
 
-    bool isOptionalDefaultSerialization() const { return m_optionalDefaultSerialization; }
-    void setOptionalDefaultSerialization(bool value) { m_optionalDefaultSerialization = value; }
+    template<typename T>
+    bool isOptionalDefaultSerialization() const
+    {
+        auto type = std::type_index(typeid(T));
+        return m_optionalDefaultSerialization && m_typeRecursions.find(type) == m_typeRecursions.end();
+    }
+
+    template<typename T>
+    void addTypeToProcessed()
+    {
+        auto type = std::type_index(typeid(T));
+        m_typeRecursions.insert(type);
+    }
+
+    template<typename T>
+    void removeTypeFromProcessed()
+    {
+        auto type = std::type_index(typeid(T));
+        m_typeRecursions.extract(type);
+    }
+
+    void setOptionalDefaultSerialization(bool value)
+    {
+        m_optionalDefaultSerialization = value;
+    }
 
     bool isStrictMode() const { return m_strictMode; }
     void setStrictMode(bool value) { m_strictMode = value; }
@@ -90,6 +114,7 @@ private:
     bool m_chronoSerializedAsDouble = false;
 
     std::pair<QString, QString> m_failed;
+    mutable std::unordered_set<std::type_index> m_typeRecursions;
 };
 
 class QnJsonSerializer:

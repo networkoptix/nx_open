@@ -124,23 +124,35 @@ namespace QJsonDetail {
             result.push_back(element);
         }
 
-        if (result.isEmpty() && ctx->isOptionalDefaultSerialization())
+        if (result.isEmpty() && ctx->isOptionalDefaultSerialization<Collection>())
         {
             using Item = std::decay_t<decltype(*boost::begin(value))>;
             using Tag = typename QnCollection::collection_category<Collection>::type;
+            ctx->addTypeToProcessed<Collection>();
             if constexpr (std::is_same_v<Tag, QnCollection::map_tag>)
             {
-                QJsonObject map;
-                QJson::serialize(ctx, std::decay_t<typename Item::first_type>(), "key", &map);
-                QJson::serialize(ctx, std::decay_t<typename Item::second_type>(), "value", &map);
-                result.push_back(map);
+                if (ctx->isOptionalDefaultSerialization<std::decay_t<typename Item::first_type>>()
+                    || ctx->isOptionalDefaultSerialization<std::decay_t<typename Item::second_type>>())
+                {
+                    QJsonObject map;
+                    ctx->addTypeToProcessed<std::decay_t<typename Item::first_type>()>();
+                    QJson::serialize(ctx, std::decay_t<typename Item::first_type>(), "key", &map);
+                    ctx->removeTypeFromProcessed<std::decay_t<typename Item::first_type>()>();
+                    ctx->addTypeToProcessed<std::decay_t<typename Item::second_type>()>();
+                    QJson::serialize(ctx, std::decay_t<typename Item::second_type>(), "value", &map);
+                    ctx->removeTypeFromProcessed<std::decay_t<typename Item::second_type>()>();
+                    result.push_back(map);
+                }
             }
-            else
+            else if (ctx->isOptionalDefaultSerialization<Item>())
             {
                 QJsonValue item;
+                ctx->addTypeToProcessed<Item>();
                 QJson::serialize(ctx, Item(), &item);
+                ctx->removeTypeFromProcessed<Item>();
                 result.push_back(item);
             }
+            ctx->removeTypeFromProcessed<Collection>();
         }
 
         *target = result;
@@ -306,20 +318,23 @@ namespace QJsonDetail {
     void serialize_string_map(QnJsonContext *ctx, const Map &value, QJsonValue *target) {
         QJsonObject result;
 
+        ctx->addTypeToProcessed<Map>();
         for(auto pos = boost::begin(value); pos != boost::end(value); pos++) {
             QJsonValue jsonValue;
             QJson::serialize(ctx, pos->second, &jsonValue);
             result.insert(toQString(pos->first), jsonValue);
         }
+        ctx->removeTypeFromProcessed<Map>();
 
-        if (result.isEmpty() && ctx->isOptionalDefaultSerialization())
+        using Item = std::decay_t<decltype(*boost::begin(value))>;
+        if (result.isEmpty() && ctx->isOptionalDefaultSerialization<Item>())
         {
-            using Item = std::decay_t<decltype(*boost::begin(value))>;
             QJsonValue jsonValue;
+            ctx->addTypeToProcessed<Item>();
             QJson::serialize(ctx, std::decay_t<typename Item::second_type>(), &jsonValue);
+            ctx->removeTypeFromProcessed<Item>();
             result.insert(toQString(std::decay_t<typename Item::first_type>()), jsonValue);
         }
-
         *target = result;
     }
 
@@ -502,7 +517,7 @@ inline void serialize(
 {
     if (!value)
     {
-        if (ctx->isOptionalDefaultSerialization())
+        if (ctx->isOptionalDefaultSerialization<T>())
             QJson::serialize<T>(ctx, T{}, target);
         return;
     }

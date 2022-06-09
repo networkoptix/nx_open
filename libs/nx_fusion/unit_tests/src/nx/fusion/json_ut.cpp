@@ -50,6 +50,64 @@ struct IntMockData
 };
 #define IntMockData_Fields (a)(b)(c)
 
+static bool operator<(const IntMockData& first, const IntMockData& second)
+{
+    return first.a < second.a && first.b < second.b && first.c < second.c;
+};
+
+struct MockDataWithVectorOfSameStruct
+{
+    std::vector<MockDataWithVectorOfSameStruct> items;
+
+    bool operator==(const MockDataWithVectorOfSameStruct& other) const
+    {
+        return items == other.items;
+    }
+
+    bool operator!=(const MockDataWithVectorOfSameStruct& other) const
+    {
+        return !(*this == other);
+    }
+};
+#define MockDataWithVectorOfSameStruct_Fields (items)
+
+struct MockDataWithMaps
+{
+    std::map<IntMockData, int> intItems;
+    std::map<MockDataWithMaps, int> nestedItems;
+
+    bool operator==(const MockDataWithMaps& other) const
+    {
+        return intItems == other.intItems && nestedItems == other.nestedItems;
+    }
+
+    bool operator!=(const MockDataWithMaps& other) const { return !(*this == other); }
+};
+#define MockDataWithMaps_Fields (intItems)(nestedItems)
+
+static bool operator<(const MockDataWithMaps& first, const MockDataWithMaps& second)
+{
+    return first.intItems < second.intItems;
+};
+
+struct MockDataWithStringMaps
+{
+    std::map<QString, MockDataWithStringMaps> items;
+
+    bool operator==(const MockDataWithStringMaps& other) const
+    {
+        return items == other.items;
+    }
+
+    bool operator!=(const MockDataWithStringMaps& other) const { return !(*this == other); }
+};
+#define MockDataWithStringMaps_Fields (items)
+
+static bool operator<(const MockDataWithStringMaps& first, const MockDataWithStringMaps& second)
+{
+    return first.items < second.items;
+};
+
 struct BriefMockData
 {
     QnUuid id;
@@ -241,6 +299,10 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(IntMockData, (json), IntMockData_Fields, (brief
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     BriefMockDataWithQJsonValue, (json), BriefMockDataWithQJsonValue_Fields, (brief, true))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BriefMockData, (json), BriefMockData_Fields, (brief, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    MockDataWithVectorOfSameStruct, (json), MockDataWithVectorOfSameStruct_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(MockDataWithMaps, (json), MockDataWithMaps_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(MockDataWithStringMaps, (json), MockDataWithStringMaps_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     BriefMockDataWithVector, (json), BriefMockDataWithVector_Fields, (brief, true))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
@@ -601,6 +663,96 @@ TEST_F(QnJsonTextFixture, serializeEmptyVectorBrief)
     const QByteArray jsonStr = QString(R"json({})json").toUtf8();
     ASSERT_EQ(jsonStr, QJson::serialized(data));
     ASSERT_EQ(data, QJson::deserialized<BriefMockDataWithVector>(jsonStr));
+}
+
+TEST_F(QnJsonTextFixture, serializeStructWithStdVectorSameStruct){
+    MockDataWithVectorOfSameStruct data;
+    data.items = std::vector<MockDataWithVectorOfSameStruct>();
+    const QByteArray jsonStr = QString(R"json({"items":[]})json").toUtf8();
+    ASSERT_EQ(jsonStr, QJson::serialized(data));
+    ASSERT_EQ(data, QJson::deserialized<decltype(data)>(jsonStr));
+}
+
+TEST_F(QnJsonTextFixture, serializeStructWithStdMaps)
+{
+    MockDataWithMaps data;
+    data.intItems = std::map<IntMockData, int>();
+    data.nestedItems = std::map<MockDataWithMaps, int>();
+    const QByteArray jsonStr = QString(R"json({"intItems":[],"nestedItems":[]})json").toUtf8();
+    ASSERT_EQ(jsonStr, QJson::serialized(data));
+    ASSERT_EQ(data, QJson::deserialized<decltype(data)>(jsonStr));
+}
+
+TEST_F(QnJsonTextFixture, serializeStructWithStdMapsWithDefaultSerialization)
+{
+    QnJsonContext context;
+    context.setOptionalDefaultSerialization(true);
+    MockDataWithMaps data;
+    data.intItems = std::map<IntMockData, int>();
+    data.nestedItems = std::map<MockDataWithMaps, int>();
+    const QByteArray jsonStr = /*suppress newline*/ 1 + (const char*)
+R"json(
+{
+    "intItems":[
+        {
+            "key":{
+                "a":661,
+                "b":662,
+                "c":663
+            },
+            "value":0
+        }
+    ],
+    "nestedItems":[
+        {
+            "key":{
+                "intItems":[
+                    {
+                        "key":{
+                            "a":661,
+                            "b":662,
+                            "c":663
+                        },
+                        "value":0
+                    }
+                ],
+                "nestedItems":[
+                    
+                ]
+            },
+            "value":0
+        }
+    ]
+})json";
+
+    QByteArray actualJson;
+    QJson::serialize(&context, data, &actualJson);
+
+    ASSERT_EQ(jsonStr, nx::utils::formatJsonString(actualJson));
+}
+
+TEST_F(QnJsonTextFixture, serializeStructWithStringMapsWithDefaultSerialization)
+{
+    QnJsonContext context;
+    context.setOptionalDefaultSerialization(true);
+    MockDataWithStringMaps data;
+    data.items = std::map<QString, MockDataWithStringMaps>();
+    const QByteArray jsonStr = /*suppress newline*/ 1 + (const char*)
+R"json(
+{
+    "items":{
+        "":{
+            "items":{
+                
+            }
+        }
+    }
+})json";
+
+    QByteArray actualJson;
+    QJson::serialize(&context, data, &actualJson);
+
+    ASSERT_EQ(jsonStr, nx::utils::formatJsonString(actualJson));
 }
 
 TEST_F(QnJsonTextFixture, serializeQListBrief)
