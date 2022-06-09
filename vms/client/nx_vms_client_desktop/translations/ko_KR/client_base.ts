@@ -893,11 +893,11 @@
     </message>
     <message>
       <source>Switch to Cameras &amp; Resources tab</source>
-      <translation type="unfinished">Switch to Cameras &amp; Resources tab</translation>
+      <translation>카메라 및 리소스 탭으로 전환</translation>
     </message>
     <message>
       <source>Search Cameras &amp; Resources</source>
-      <translation type="unfinished">Search Cameras &amp; Resources</translation>
+      <translation>카메라 및 리소스 검색</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
@@ -905,15 +905,15 @@
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>새로운</translation>
     </message>
     <message>
       <source>Welcome Screen</source>
-      <translation type="unfinished">Welcome Screen</translation>
+      <translation>시작 화면</translation>
     </message>
     <message>
       <source>Add Web Page...</source>
-      <translation type="unfinished">Add Web Page...</translation>
+      <translation>웹 페이지 추가..</translation>
     </message>
     <message>
       <source>Show Servers</source>
@@ -925,35 +925,35 @@
     </message>
     <message>
       <source>Save Windows Configuration</source>
-      <translation type="unfinished">Save Windows Configuration</translation>
+      <translation>Windows 구성 저장</translation>
     </message>
     <message>
       <source>Windows Configuration</source>
-      <translation type="unfinished">Windows Configuration</translation>
+      <translation>Windows 구성</translation>
     </message>
     <message>
       <source>Save Current State</source>
-      <translation type="unfinished">Save Current State</translation>
+      <translation>현재 상태 저장</translation>
     </message>
     <message>
       <source>Restore Saved State</source>
-      <translation type="unfinished">Restore Saved State</translation>
+      <translation>저장된 상태 복원</translation>
     </message>
     <message>
       <source>Delete Saved State</source>
-      <translation type="unfinished">Delete Saved State</translation>
+      <translation>저장된 상태 삭제</translation>
     </message>
     <message>
       <source>Close all Windows</source>
-      <translation type="unfinished">Close all Windows</translation>
+      <translation>모든 창 닫기</translation>
     </message>
     <message>
       <source>Delete Bookmark...</source>
-      <translation type="unfinished">Delete Bookmark...</translation>
+      <translation>즐겨찾기 삭제...</translation>
     </message>
     <message>
       <source>Delete Bookmarks...</source>
-      <translation type="unfinished">Delete Bookmarks...</translation>
+      <translation>즐겨찾기 삭제...</translation>
     </message>
     <message numerus="yes">
       <source>Show on Items</source>
@@ -967,31 +967,31 @@
     </message>
     <message>
       <source>Rotate to</source>
-      <translation type="unfinished">Rotate to</translation>
+      <translation>회전</translation>
     </message>
     <message>
       <source>Create Group</source>
-      <translation type="unfinished">Create Group</translation>
+      <translation>그룹 생성</translation>
     </message>
     <message>
       <source>Remove Group</source>
-      <translation type="unfinished">Remove Group</translation>
+      <translation>그룹 제거</translation>
     </message>
     <message>
       <source>Add Proxied Web Page...</source>
-      <translation type="unfinished">Add Proxied Web Page...</translation>
+      <translation>프록시 웹 페이지 추가...</translation>
     </message>
     <message>
       <source>Cell Spacing</source>
-      <translation type="unfinished">Cell Spacing</translation>
+      <translation>셀 간격</translation>
     </message>
     <message>
       <source>Show Panel</source>
-      <translation type="unfinished">Show Panel</translation>
+      <translation>패널 표시</translation>
     </message>
     <message>
       <source>Hide Panel</source>
-      <translation type="unfinished">Hide Panel</translation>
+      <translation>패널 숨기기</translation>
     </message>
     <message>
       <source>Joystick Settings...</source>
@@ -999,19 +999,19 @@
     </message>
     <message>
       <source>Advanced...</source>
-      <translation type="unfinished">Advanced...</translation>
+      <translation>고급...</translation>
     </message>
     <message>
       <source>Copy Bookmark Text</source>
-      <translation type="unfinished">Copy Bookmark Text</translation>
+      <translation>즐겨찾기 텍스트 복사</translation>
     </message>
     <message>
       <source>Copy Bookmarks Text</source>
-      <translation type="unfinished">Copy Bookmarks Text</translation>
+      <translation>즐겨찾기 텍스트 복사</translation>
     </message>
     <message>
       <source>Web Page Settings...</source>
-      <translation type="unfinished">Web Page Settings...</translation>
+      <translation>웹 페이지 설정...</translation>
     </message>
   </context>
   <context>
@@ -1163,7 +1163,7 @@
     </message>
     <message>
       <source>Executable %1 Media File</source>
-      <translation type="unfinished">Executable %1 Media File</translation>
+      <translation>실행가능한 %1 미디어 파일</translation>
     </message>
   </context>
   <context>
@@ -1656,15 +1656,15 @@
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>권장</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation type="unfinished">Strict</translation>
+      <translation>엄격한</translation>
     </message>
     <message>
       <source>May lead to privacy issues</source>
-      <translation type="unfinished">May lead to privacy issues</translation>
+      <translation>개인 정보 문제로 이어질 수 있음</translation>
     </message>
     <message>
       <source>Connect only servers with public certificate</source>
@@ -1680,11 +1680,11 @@
     </message>
     <message>
       <source>All other client windows will be closed.</source>
-      <translation type="unfinished">All other client windows will be closed.</translation>
+      <translation>다른 모든 클라이언트 창은 닫힙니다.</translation>
     </message>
     <message>
       <source>Security settings changed</source>
-      <translation type="unfinished">Security settings changed</translation>
+      <translation>보안 설정이 변경됨</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -1692,7 +1692,7 @@
     </message>
     <message>
       <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
-      <translation type="unfinished">On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</translation>
+      <translation>서버에 처음 연결할 때, 오류가 포함된 경우 인증서를 수락할지 확인하는 메세지가 표시됩니다.</translation>
     </message>
   </context>
   <context>
@@ -2945,7 +2945,7 @@ to %1</source>
     </message>
     <message>
       <source>Save Database Backup</source>
-      <translation type="unfinished">Save Database Backup</translation>
+      <translation>데이터베이스 백업 저장</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
@@ -2957,7 +2957,7 @@ to %1</source>
     </message>
     <message>
       <source>Restore from Database Backup</source>
-      <translation type="unfinished">Restore from Database Backup</translation>
+      <translation>데이터베이스 백업에서 복원</translation>
     </message>
     <message>
       <source>Enter your account password to restore System from backup</source>
@@ -3385,7 +3385,7 @@ to %1</source>
     </message>
     <message>
       <source>Please enter a password.</source>
-      <translation type="unfinished">Please enter a password.</translation>
+      <translation>비밀번호를 입력하세요.</translation>
     </message>
   </context>
   <context>
@@ -3845,11 +3845,11 @@ to %1</source>
     </message>
     <message>
       <source>Motion Search</source>
-      <translation type="unfinished">Motion Search</translation>
+      <translation>모션 검색</translation>
     </message>
     <message>
       <source>Object Search</source>
-      <translation type="unfinished">Object Search</translation>
+      <translation>개체 검색</translation>
     </message>
   </context>
   <context>
@@ -4417,7 +4417,7 @@ to %1</source>
     </message>
     <message>
       <source>Enter Fullscreen</source>
-      <translation type="unfinished">Enter Fullscreen</translation>
+      <translation>전체 화면으로 전환</translation>
     </message>
   </context>
   <context>
@@ -4719,8 +4719,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Certificates</source>
-      <translation type="unfinished">
-        <numerusform>Certificates</numerusform>
+      <translation>
+        <numerusform>인증서</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5780,7 +5780,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Learn More</source>
-      <translation type="unfinished">Learn More</translation>
+      <translation>더 알아보기</translation>
     </message>
   </context>
   <context>
@@ -5855,7 +5855,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Password reset is required</source>
-      <translation type="unfinished">Password reset is required</translation>
+      <translation>비밀번호 재설정이 필요합니다</translation>
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed.</source>
@@ -5929,11 +5929,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWebResourceWidget</name>
     <message>
       <source>Open this web page?</source>
-      <translation type="unfinished">Open this web page?</translation>
+      <translation>웹페이지를 여시겠습니까?</translation>
     </message>
     <message>
       <source>Web page</source>
-      <translation type="unfinished">Web page</translation>
+      <translation>웹 페이지</translation>
     </message>
     <message>
       <source>Connect anyway</source>
@@ -5941,7 +5941,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Web page settings...</source>
-      <translation type="unfinished">Web page settings...</translation>
+      <translation>웹페이지 설정...</translation>
     </message>
     <message>
       <source>You try to open the
@@ -6021,7 +6021,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Camera %1 does not support PTZ</source>
-      <translation type="unfinished">Camera %1 does not support PTZ</translation>
+      <translation>카메라 %1 은 PTZ를 지원하지 않습니다.</translation>
     </message>
   </context>
   <context>
@@ -6588,7 +6588,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers</translation>
+      <translation>가상 카메라, USB 또는 웹 카메라는 서버 간에 이동할 수 없습니다.</translation>
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains virtual cameras, USB or web cameras</source>
@@ -6596,7 +6596,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual cameras cannot be moved between servers</translation>
+      <translation>가상 카메라는 서버 간에 이동할 수 없습니다.</translation>
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains virtual cameras</source>
@@ -6604,7 +6604,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers</source>
-      <translation type="unfinished">USB or web cameras cannot be moved between servers</translation>
+      <translation>USB 또는 웹 카메라는 서버 간에 이동할 수 없습니다.</translation>
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains USB or web cameras</source>
@@ -6821,7 +6821,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Choose cameras...</source>
-      <translation type="unfinished">Choose cameras...</translation>
+      <translation>카메라 선택...</translation>
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
@@ -7421,15 +7421,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select Cameras</source>
-      <translation type="unfinished">Select Cameras</translation>
+      <translation>카메라 선택</translation>
     </message>
     <message>
       <source>Select Device</source>
-      <translation type="unfinished">Select Device</translation>
+      <translation>장치 선택</translation>
     </message>
     <message>
       <source>Select Camera</source>
-      <translation type="unfinished">Select Camera</translation>
+      <translation>카메라 선택</translation>
     </message>
   </context>
   <context>
@@ -7577,7 +7577,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Audio will be disabled</source>
-      <translation type="unfinished">Audio will be disabled</translation>
+      <translation>오디오가 비활성화됩니다.</translation>
     </message>
     <message>
       <source>You need to select a device that will provide audio.</source>
@@ -9346,11 +9346,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Add Proxied Web Page</source>
-      <translation type="unfinished">Add Proxied Web Page</translation>
+      <translation>프록시 웹 페이지 추가</translation>
     </message>
     <message>
       <source>Add Web Page</source>
-      <translation type="unfinished">Add Web Page</translation>
+      <translation>웹 페이지 추가</translation>
     </message>
     <message>
       <source>Edit Proxied Web Page</source>
@@ -9882,7 +9882,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Server ID:</source>
-      <translation type="unfinished">Server ID:</translation>
+      <translation>서버 ID:</translation>
     </message>
     <message>
       <source>Trust this server?</source>
@@ -10306,7 +10306,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::VersionSelectionDialog</name>
     <message>
       <source>Select Version</source>
-      <translation type="unfinished">Select Version</translation>
+      <translation>버전 선택</translation>
     </message>
     <message>
       <source>Version</source>
@@ -11365,40 +11365,40 @@ to view more bookmarks</source>
     <name>nx::vms::update::desktop::ClientUpdateManager</name>
     <message>
       <source>Restart Client</source>
-      <translation type="unfinished">Restart Client</translation>
+      <translation>클라이언트 다시 시작</translation>
     </message>
     <message>
       <source>Updates Settings</source>
-      <translation type="unfinished">Updates Settings</translation>
+      <translation>업데이트 설정</translation>
     </message>
     <message>
       <source>Client update is installed</source>
-      <translation type="unfinished">Client update is installed</translation>
+      <translation>클라이언트 업데이트가 설치되었습니다.</translation>
     </message>
     <message>
       <source>Client is updated to version %1. Restart %2 to finish update.</source>
       <comment>%1 is a version like &apos;4.3.0&apos;, %2 is a VMS name like &apos;Nx Witness&apos;</comment>
-      <translation type="unfinished">Client is updated to version %1. Restart %2 to finish update.</translation>
+      <translation>클라이언트가 버전 %1으로 업데이트되었습니다. %2 을 다시 시작하여 업데이트를 완료합니다.</translation>
     </message>
     <message>
       <source>Automatic client updates</source>
-      <translation type="unfinished">Automatic client updates</translation>
+      <translation>자동 클라이언트 업데이트</translation>
     </message>
     <message>
       <source>New client-only updates will be installed automatically. You can change this in the settings.</source>
-      <translation type="unfinished">New client-only updates will be installed automatically. You can change this in the settings.</translation>
+      <translation>새 클라이언트 전용 업데이트가 자동으로 설치됩니다. 설정에서 변경할 수 있습니다.</translation>
     </message>
     <message>
       <source>Cannot check for update.</source>
-      <translation type="unfinished">Cannot check for update.</translation>
+      <translation>업데이트를 확인할 수 없습니다.</translation>
     </message>
     <message>
       <source>Client update package is broken.</source>
-      <translation type="unfinished">Client update package is broken.</translation>
+      <translation>클라이언트 업데이트 패키지가 손상되었습니다.</translation>
     </message>
     <message>
       <source>Client update package is missing for current platform.</source>
-      <translation type="unfinished">Client update package is missing for current platform.</translation>
+      <translation>현재 플랫폼에 대한 클라이언트 업데이트 패키지가 없습니다.</translation>
     </message>
     <message>
       <source>Can&apos;t check client update availability. Check your internet connection and try again.</source>
