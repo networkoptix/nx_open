@@ -2,20 +2,23 @@
 
 #pragma once
 
-#include "../data_macros.h"
 #include "../base_fields/simple_type_field.h"
 
 namespace nx::vms::rules {
 
-class NX_VMS_RULES_API AnalyticsObjectAttributesField: public EventField
+class NX_VMS_RULES_API AnalyticsObjectAttributesField:
+    public SimpleTypeEventField<QString, AnalyticsObjectAttributesField>
 {
     Q_OBJECT
     Q_CLASSINFO("metatype", "nx.events.fields.analyticsObjectAttributes")
 
-    FIELD(QString, value, setValue)
+    Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    virtual bool match(const QVariant& value) const override;
+    virtual bool match(const QVariant& eventValue) const override;
+
+signals:
+    void valueChanged();
 };
 
 } // namespace nx::vms::rules

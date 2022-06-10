@@ -6,7 +6,7 @@ namespace nx::vms::rules {
 
 bool AnalyticsEngineField::match(const QVariant& eventValue) const
 {
-    return m_value.isNull() || eventValue.value<QnUuid>() == m_value;
+    return value().isNull() || eventValue.value<QnUuid>() == value();
 }
 
 } // namespace nx::vms::rules

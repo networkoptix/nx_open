@@ -3,6 +3,7 @@
 #include "rules_table_model.h"
 
 #include <client_core/client_core_module.h>
+#include <nx/utils/qobject.h>
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/action_field.h>
@@ -68,161 +69,216 @@ bool operator==(const Rule& left, const Rule& right)
 
 } // namespace
 
-RulesTableModel::SimplifiedRule::SimplifiedRule(
-    Engine* engine,
-    std::unique_ptr<vms::rules::Rule>&& rule)
-    :
-    engine{engine},
-    actualRule{std::move(rule)}
+SimplifiedRule::SimplifiedRule(Engine* engine, std::unique_ptr<vms::rules::Rule>&& rule):
+    m_engine{engine},
+    m_rule{std::move(rule)}
 {
-    NX_ASSERT(engine);
-    NX_ASSERT(actualRule);
+    NX_ASSERT(m_engine);
+    NX_ASSERT(m_rule);
+
+    startWatchOnRule();
 }
 
-RulesTableModel::SimplifiedRule::~SimplifiedRule()
+SimplifiedRule::~SimplifiedRule()
 {
 }
 
-void RulesTableModel::SimplifiedRule::setRule(std::unique_ptr<vms::rules::Rule>&& rule)
+void SimplifiedRule::setRule(std::unique_ptr<vms::rules::Rule>&& rule)
 {
-    // As users of the class use raw pointers to the fields owned by the actualRule and got by
+    stopWatchOnRule();
+
+    // As users of the class use raw pointers to the fields owned by the rule and got by
     // users with eventFields() and actionFields() methods it is required to prolong lifetime of
     // the fields and delete them only after users is notified about changes.
-    actualRule.swap(rule);
+    m_rule.swap(rule);
 
-    update({Qt::DisplayRole, Qt::CheckStateRole, FieldRole});
+    if (!NX_ASSERT(m_rule))
+        return;
+
+    startWatchOnRule();
+
+    update({Qt::DisplayRole, Qt::CheckStateRole, RulesTableModel::FieldRole});
 }
 
-const vms::rules::Rule* RulesTableModel::SimplifiedRule::rule() const
+const vms::rules::Rule* SimplifiedRule::rule() const
 {
-    return actualRule.get();
+    return m_rule.get();
 }
 
-void RulesTableModel::SimplifiedRule::setModelIndex(const QPersistentModelIndex& modelIndex)
+void SimplifiedRule::setModelIndex(const QPersistentModelIndex& modelIndex)
 {
-    index = modelIndex;
+    NX_ASSERT(modelIndex.isValid());
+    m_index = modelIndex;
 }
 
-QPersistentModelIndex RulesTableModel::SimplifiedRule::modelIndex() const
+QPersistentModelIndex SimplifiedRule::modelIndex() const
 {
-    return index;
+    return m_index;
 }
 
-void RulesTableModel::SimplifiedRule::update()
+void SimplifiedRule::update()
 {
     update({Qt::CheckStateRole});
 }
 
-QnUuid RulesTableModel::SimplifiedRule::id() const
+QnUuid SimplifiedRule::id() const
 {
-    return actualRule->id();
+    return m_rule->id();
 }
 
-QString RulesTableModel::SimplifiedRule::eventType() const
+QString SimplifiedRule::eventType() const
 {
-    if (!actualRule->eventFilters().empty())
-        return actualRule->eventFilters().constFirst()->eventType();
+    if (!m_rule->eventFilters().empty())
+        return m_rule->eventFilters().constFirst()->eventType();
 
     return "";
 }
 
-void RulesTableModel::SimplifiedRule::setEventType(const QString& eventType)
+void SimplifiedRule::setEventType(const QString& eventType)
 {
-    if (!actualRule->eventFilters().empty())
-        actualRule->takeEventFilter(0);
+    if (!m_rule->eventFilters().empty())
+        m_rule->takeEventFilter(0);
 
-    actualRule->addEventFilter(engine->buildEventFilter(eventType));
-    update({Qt::DisplayRole, Qt::CheckStateRole, FieldRole});
+    m_rule->addEventFilter(m_engine->buildEventFilter(eventType));
+    update({Qt::DisplayRole, Qt::CheckStateRole, RulesTableModel::FieldRole});
 }
 
-QHash<QString, Field*> RulesTableModel::SimplifiedRule::eventFields() const
+QHash<QString, Field*> SimplifiedRule::eventFields() const
 {
-    if (actualRule->eventFilters().empty())
+    if (m_rule->eventFilters().empty())
         return {};
 
-    auto fields = actualRule->eventFilters().constFirst()->fields();
+    auto fields = m_rule->eventFilters().constFirst()->fields();
     return QHash<QString, Field*>{fields.cbegin(), fields.cend()};
 }
 
-std::optional<ItemDescriptor> RulesTableModel::SimplifiedRule::eventDescriptor() const
+std::optional<ItemDescriptor> SimplifiedRule::eventDescriptor() const
 {
-    return engine->eventDescriptor(eventType());
+    return m_engine->eventDescriptor(eventType());
 }
 
-QString RulesTableModel::SimplifiedRule::actionType() const
+QString SimplifiedRule::actionType() const
 {
-    if (!actualRule->actionBuilders().empty())
-        return actualRule->actionBuilders().constFirst()->actionType();
+    if (!m_rule->actionBuilders().empty())
+        return m_rule->actionBuilders().constFirst()->actionType();
 
     return "";
 }
 
-void RulesTableModel::SimplifiedRule::setActionType(const QString& actionType)
+void SimplifiedRule::setActionType(const QString& actionType)
 {
-    if (!actualRule->actionBuilders().empty())
-        actualRule->takeActionBuilder(0);
+    if (!m_rule->actionBuilders().empty())
+        m_rule->takeActionBuilder(0);
 
-    actualRule->addActionBuilder(engine->buildActionBuilder(actionType));
-    update({Qt::DisplayRole, Qt::CheckStateRole, FieldRole});
+    m_rule->addActionBuilder(m_engine->buildActionBuilder(actionType));
+    update({Qt::DisplayRole, Qt::CheckStateRole, RulesTableModel::FieldRole});
 }
 
-QHash<QString, Field*> RulesTableModel::SimplifiedRule::actionFields() const
+QHash<QString, Field*> SimplifiedRule::actionFields() const
 {
-    if (actualRule->actionBuilders().empty())
+    if (m_rule->actionBuilders().empty())
         return {};
 
-    auto fields = actualRule->actionBuilders().constFirst()->fields();
+    auto fields = m_rule->actionBuilders().constFirst()->fields();
     return QHash<QString, Field*>{fields.cbegin(), fields.cend()};
 }
 
-std::optional<ItemDescriptor> RulesTableModel::SimplifiedRule::actionDescriptor() const
+std::optional<ItemDescriptor> SimplifiedRule::actionDescriptor() const
 {
-    return engine->actionDescriptor(actionType());
+    return m_engine->actionDescriptor(actionType());
 }
 
-QString RulesTableModel::SimplifiedRule::comment() const
+QString SimplifiedRule::comment() const
 {
-    return actualRule->comment();
+    return m_rule->comment();
 }
 
-void RulesTableModel::SimplifiedRule::setComment(const QString& comment)
+void SimplifiedRule::setComment(const QString& comment)
 {
-    actualRule->setComment(comment);
+    m_rule->setComment(comment);
     update({Qt::CheckStateRole});
 }
 
-bool RulesTableModel::SimplifiedRule::enabled() const
+bool SimplifiedRule::enabled() const
 {
-    return actualRule->enabled();
+    return m_rule->enabled();
 }
 
-void RulesTableModel::SimplifiedRule::setEnabled(bool value)
+void SimplifiedRule::setEnabled(bool value)
 {
-    actualRule->setEnabled(value);
+    m_rule->setEnabled(value);
     update({Qt::CheckStateRole});
 }
 
-QByteArray RulesTableModel::SimplifiedRule::schedule() const
+QByteArray SimplifiedRule::schedule() const
 {
-    return actualRule->schedule();
+    return m_rule->schedule();
 }
 
-void RulesTableModel::SimplifiedRule::setSchedule(const QByteArray& schedule)
+void SimplifiedRule::setSchedule(const QByteArray& schedule)
 {
-    actualRule->setSchedule(schedule);
+    m_rule->setSchedule(schedule);
     update({Qt::CheckStateRole});
 }
 
-void RulesTableModel::SimplifiedRule::update(const QVector<int>& roles)
+void SimplifiedRule::update(const QVector<int>& roles)
 {
-    if (index.isValid())
+    if (m_index.isValid())
     {
-        auto model = dynamic_cast<const RulesTableModel*>(index.model());
+        auto model = dynamic_cast<const RulesTableModel*>(m_index.model());
         if (!model)
             return;
 
         // It is save cast case updateRule() method doesn't invalidate index.
-        const_cast<RulesTableModel*>(model)->updateRule(index, roles);
+        const_cast<RulesTableModel*>(model)->updateRule(m_index, roles);
+    }
+}
+
+void SimplifiedRule::startWatchOnRule() const
+{
+    for (const auto& eventField: eventFields())
+        watchOn(eventField);
+
+    for (const auto& actionField: actionFields())
+        watchOn(actionField);
+}
+
+void SimplifiedRule::stopWatchOnRule() const
+{
+    if (m_rule)
+        return;
+
+    for(const auto eventField: eventFields())
+        eventField->disconnect(this);
+
+    for(const auto actionField: actionFields())
+        actionField->disconnect(this);
+}
+
+void SimplifiedRule::watchOn(QObject* object) const
+{
+    if (!NX_ASSERT(object))
+        return;
+
+    constexpr auto kUpdateMethodSignature = "update()"; //< Invokable SimplifiedRule::update().
+    const auto simplifiedRuleMetaObject = this->metaObject();
+    const auto updateMetaMethod = simplifiedRuleMetaObject->method(
+        simplifiedRuleMetaObject->indexOfMethod(kUpdateMethodSignature));
+
+    if(!NX_ASSERT(updateMetaMethod.isValid()))
+        return;
+
+    const auto propertyNames = utils::propertyNames(object);
+    const auto metaObject = object->metaObject();
+    for (const auto propertyName: propertyNames)
+    {
+        const auto metaProperty =
+            metaObject->property(metaObject->indexOfProperty(propertyName.toUtf8()));
+
+        if (!metaProperty.hasNotifySignal())
+            continue;
+
+        connect(object, metaProperty.notifySignal(), this, updateMetaMethod);
     }
 }
 
@@ -420,7 +476,7 @@ bool RulesTableModel::removeRule(const QnUuid& id)
     return false;
 }
 
-std::weak_ptr<RulesTableModel::SimplifiedRule> RulesTableModel::rule(
+std::weak_ptr<SimplifiedRule> RulesTableModel::rule(
     const QModelIndex& ruleIndex) const
 {
     if (!isIndexValid(ruleIndex))
@@ -429,7 +485,7 @@ std::weak_ptr<RulesTableModel::SimplifiedRule> RulesTableModel::rule(
     return std::weak_ptr<SimplifiedRule>(simplifiedRules[ruleIndex.row()]);
 }
 
-std::weak_ptr<RulesTableModel::SimplifiedRule> RulesTableModel::rule(const QnUuid& id) const
+std::weak_ptr<SimplifiedRule> RulesTableModel::rule(const QnUuid& id) const
 {
     auto simplifiedRule = std::find_if(
         simplifiedRules.cbegin(),
@@ -442,7 +498,7 @@ std::weak_ptr<RulesTableModel::SimplifiedRule> RulesTableModel::rule(const QnUui
     if (simplifiedRule == simplifiedRules.cend())
         return {};
 
-    return std::weak_ptr<RulesTableModel::SimplifiedRule>(*simplifiedRule);
+    return std::weak_ptr<SimplifiedRule>(*simplifiedRule);
 }
 
 void RulesTableModel::updateRule(const QModelIndex& ruleIndex, const QVector<int>& roles)

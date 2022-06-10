@@ -25,8 +25,8 @@ bool AnalyticsEventTypeField::match(const QVariant& value) const
     if (!eventType)
         return false;
 
-    return (eventTypeId == this->typeId())
-        || nx::analytics::taxonomy::eventBelongsToGroup(eventType, this->typeId());
+    return (eventTypeId == m_typeId)
+        || nx::analytics::taxonomy::eventBelongsToGroup(eventType, m_typeId);
 }
 
 QnUuid AnalyticsEventTypeField::engineId() const
@@ -36,7 +36,25 @@ QnUuid AnalyticsEventTypeField::engineId() const
 
 void AnalyticsEventTypeField::setEngineId(QnUuid id)
 {
-    m_engineId = id;
+    if (m_engineId != id)
+    {
+        m_engineId = id;
+        emit engineIdChanged();
+    }
+}
+
+QString AnalyticsEventTypeField::typeId() const
+{
+    return m_typeId;
+}
+
+void AnalyticsEventTypeField::setTypeId(const QString& id)
+{
+    if (m_typeId != id)
+    {
+        m_typeId = id;
+        emit typeIdChanged();
+    }
 }
 
 } // namespace nx::vms::rules

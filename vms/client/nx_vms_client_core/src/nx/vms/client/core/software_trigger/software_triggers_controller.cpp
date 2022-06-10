@@ -156,8 +156,8 @@ bool SoftwareTriggersController::Private::setVmsTriggerState(
         idField->id(),
         resourceId,
         systemContext()->userWatcher()->user()->getId(),
-        nameField->text(),
-        iconField->name());
+        nameField->value(),
+        iconField->value());
 
     systemContext()->vmsRulesEngine()->processEvent(triggerEvent);
 

@@ -2,27 +2,25 @@
 
 #pragma once
 
-#include "../event_field.h"
+#include "../base_fields/simple_type_field.h"
 
 namespace nx::vms::rules {
 
-class NX_VMS_RULES_API CustomizableTextField: public EventField
+class NX_VMS_RULES_API CustomizableTextField:
+    public SimpleTypeEventField<QString, CustomizableTextField>
 {
     Q_OBJECT
     Q_CLASSINFO("metatype", "nx.events.fields.customizableText")
 
-    Q_PROPERTY(QString text READ text WRITE setText)
+    Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    CustomizableTextField();
+    CustomizableTextField() = default;
 
-    virtual bool match(const QVariant& value) const override;
+    virtual bool match(const QVariant& eventValue) const override;
 
-    QString text() const;
-    void setText(const QString& text);
-
-private:
-    QString m_text;
+signals:
+    void valueChanged();
 };
 
 } // namespace nx::vms::rules

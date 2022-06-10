@@ -66,7 +66,7 @@ FooterWidget::~FooterWidget()
 {
 }
 
-void FooterWidget::setRule(std::weak_ptr<RulesTableModel::SimplifiedRule> rule)
+void FooterWidget::setRule(std::weak_ptr<SimplifiedRule> rule)
 {
     displayedRule = rule;
 

@@ -37,13 +37,12 @@ private:
     void updateControlButtons();
     void updateRuleEditorPanel();
     void displayRule();
-    void displayEvent(const RulesTableModel::SimplifiedRule& rule);
-    void displayAction(const RulesTableModel::SimplifiedRule& rule);
+    void displayEvent(const SimplifiedRule& rule);
+    void displayAction(const SimplifiedRule& rule);
     void createEventEditor(const vms::rules::ItemDescriptor& descriptor);
     void createActionEditor(const vms::rules::ItemDescriptor& descriptor);
     void resetFilter();
     void resetSelection();
-    void updateRule();
     void onModelDataChanged(
         const QModelIndex& topLeft,
         const QModelIndex& bottomRight,
@@ -60,7 +59,7 @@ private:
     ParamsWidget* actionEditorWidget{};
     RulesTableModel* rulesTableModel{};
     QSortFilterProxyModel* rulesFilterModel{};
-    std::weak_ptr<RulesTableModel::SimplifiedRule> displayedRule;
+    std::weak_ptr<SimplifiedRule> displayedRule;
 };
 
 } // namespace nx::vms::client::desktop::rules

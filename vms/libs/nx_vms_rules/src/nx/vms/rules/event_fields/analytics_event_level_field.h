@@ -4,20 +4,23 @@
 
 #include <nx/vms/api/types/event_rule_types.h>
 
-#include "../data_macros.h"
-#include "../event_field.h"
+#include "../base_fields/simple_type_field.h"
 
 namespace nx::vms::rules {
 
-class NX_VMS_RULES_API AnalyticsEventLevelField: public EventField
+class NX_VMS_RULES_API AnalyticsEventLevelField:
+    public SimpleTypeEventField<nx::vms::api::EventLevels, AnalyticsEventLevelField>
 {
     Q_OBJECT
     Q_CLASSINFO("metatype", "nx.events.fields.analyticsEventLevel")
 
-    FIELD(nx::vms::api::EventLevels, levels, setLevels)
+    Q_PROPERTY(nx::vms::api::EventLevels value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
     virtual bool match(const QVariant& eventValue) const override;
+
+signals:
+    void valueChanged();
 };
 
 } // namespace nx::vms::rules

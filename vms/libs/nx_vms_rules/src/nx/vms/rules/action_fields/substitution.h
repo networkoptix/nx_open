@@ -11,15 +11,21 @@ class NX_VMS_RULES_API Substitution: public ActionField
     Q_OBJECT
     Q_CLASSINFO("metatype", "nx.actions.fields.substitution")
 
-    Q_PROPERTY(QString fieldName MEMBER m_eventFieldName)
+    Q_PROPERTY(QString fieldName READ fieldName WRITE setFieldName NOTIFY fieldNameChanged)
 
 public:
-    Substitution();
+    Substitution() = default;
 
     virtual QVariant build(const EventPtr& event) const override;
 
+    QString fieldName() const;
+    void setFieldName(const QString& fieldName);
+
+signals:
+    void fieldNameChanged();
+
 private:
-    QString m_eventFieldName;
+    QString m_fieldName;
 };
 
 } // namespace nx::vms::rules

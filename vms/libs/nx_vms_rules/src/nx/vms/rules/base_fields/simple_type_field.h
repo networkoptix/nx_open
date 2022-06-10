@@ -7,8 +7,13 @@
 
 namespace nx::vms::rules {
 
-/** Template field for storing and returning a simple value. Should be used as a base type only. */
-template<class T, class B>
+/**
+ * Template field for storing and returning a simple value and getting notification about
+ * it changes. Template parameter T is the value type, B is a base class type, D is a derived class
+ * that has valueChanged() signal.
+ * Should be used as a base type only.
+ */
+template<class T, class B, class D>
 class SimpleTypeField: public B
 {
 public:
@@ -16,7 +21,16 @@ public:
 
 public:
     T value() const { return m_value; };
-    void setValue(T value) { m_value = std::move(value); };
+    void setValue(T value)
+    {
+        static_assert(std::is_base_of<B, D>());
+
+        if (m_value != value)
+        {
+            m_value = std::move(value);
+            emit static_cast<D*>(this)->valueChanged();
+        }
+    }
 
 protected:
     SimpleTypeField() = default;
@@ -27,10 +41,10 @@ protected:
  * Partial specialization of the SimpleTypeField for the ActionField. Should be used as a base
  * type only.
  */
-template<class T>
-class SimpleTypeActionField: public SimpleTypeField<T, ActionField>
+template<class T, class D>
+class SimpleTypeActionField: public SimpleTypeField<T, ActionField, D>
 {
-    using SimpleTypeField<T, ActionField>::m_value;
+    using SimpleTypeField<T, ActionField, D>::m_value;
 
 public:
     virtual QVariant build(const EventPtr&) const override
@@ -46,10 +60,10 @@ protected:
  * Partial specialization of the SimpleTypeField for the EventField. Should be used as a base
  * type only.
  */
-template<class T>
-class SimpleTypeEventField: public SimpleTypeField<T, EventField>
+template<class T, class D>
+class SimpleTypeEventField: public SimpleTypeField<T, EventField, D>
 {
-    using SimpleTypeField<T, EventField>::m_value;
+    using SimpleTypeField<T, EventField, D>::m_value;
 
 public:
     virtual bool match(const QVariant& value) const override

@@ -28,7 +28,6 @@ public:
 
 private:
     using FieldPickerWidget<F>::connect;
-    using FieldPickerWidget<F>::edited;
     using FieldPickerWidget<F>::fieldDescriptor;
     using FieldPickerWidget<F>::field;
 
@@ -39,7 +38,7 @@ private:
         ui->stateCheckBox->setText(fieldDescriptor->displayName);
     }
 
-    virtual void onFieldSet() override
+    virtual void onFieldsSet() override
     {
         {
             QSignalBlocker blocker{ui->stateCheckBox};
@@ -56,7 +55,6 @@ private:
     void onStateChanged(int state)
     {
         field->setValue(state == Qt::Checked);
-        emit edited();
     }
 };
 

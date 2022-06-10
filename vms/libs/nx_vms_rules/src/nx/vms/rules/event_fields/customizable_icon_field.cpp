@@ -8,24 +8,10 @@
 
 namespace nx::vms::rules {
 
-CustomizableIconField::CustomizableIconField()
-{
-}
-
 bool CustomizableIconField::match(const QVariant& value) const
 {
     // Field value used for event customization, matches any event value.
     return true;
-}
-
-QString CustomizableIconField::name() const
-{
-    return m_name;
-}
-
-void CustomizableIconField::setName(const QString& name)
-{
-    m_name = name;
 }
 
 } // namespace nx::vms::rules

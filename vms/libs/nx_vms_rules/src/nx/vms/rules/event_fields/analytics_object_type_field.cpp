@@ -12,15 +12,15 @@ AnalyticsObjectTypeField::AnalyticsObjectTypeField(nx::vms::common::SystemContex
 {
 }
 
-bool AnalyticsObjectTypeField::match(const QVariant& value) const
+bool AnalyticsObjectTypeField::match(const QVariant& eventValue) const
 {
-    const auto typeId = value.toString();
-    if (typeId == m_value)
+    const auto typeId = eventValue.toString();
+    if (typeId == value())
         return true;
 
     return nx::analytics::taxonomy::isBaseType(
         m_context->analyticsTaxonomyState().get(),
-        m_value,
+        value(),
         typeId);
 }
 

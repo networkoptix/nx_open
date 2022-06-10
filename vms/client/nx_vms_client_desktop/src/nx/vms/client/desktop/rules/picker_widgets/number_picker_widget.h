@@ -53,7 +53,6 @@ public:
 private:
     using FieldPickerWidget<F>::connect;
     using FieldPickerWidget<F>::setLayout;
-    using FieldPickerWidget<F>::edited;
     using FieldPickerWidget<F>::fieldDescriptor;
     using FieldPickerWidget<F>::field;
 
@@ -65,7 +64,7 @@ private:
         label->setText(fieldDescriptor->displayName);
     }
 
-    virtual void onFieldSet() override
+    virtual void onFieldsSet() override
     {
         valueSpinBox->setValue(field->value());
 
@@ -79,7 +78,6 @@ private:
     void onValueChanged(int value)
     {
         field->setValue(value);
-        emit edited();
     }
 };
 

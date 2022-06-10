@@ -9,14 +9,29 @@
 
 namespace nx::vms::rules {
 
+template<class T>
 class NX_VMS_RULES_API ResourceFilterFieldBase
 {
 public:
-    bool acceptAll() const;
-    void setAcceptAll(bool anyCamera);
+    bool acceptAll() const { return m_acceptAll; }
+    void setAcceptAll(bool anyCamera)
+    {
+        if (m_acceptAll != anyCamera)
+        {
+            m_acceptAll = anyCamera;
+            emit static_cast<T*>(this)->acceptAllChanged();
+        }
+    };
 
-    QSet<QnUuid> ids() const;
-    void setIds(const QSet<QnUuid>& ids);
+    QSet<QnUuid> ids() const { return m_ids; }
+    void setIds(const QSet<QnUuid>& ids)
+    {
+        if (m_ids != ids)
+        {
+            m_ids = ids;
+            emit static_cast<T*>(this)->idsChanged();
+        }
+    }
 
 protected:
     // This field type should be used as base class only.
@@ -27,12 +42,18 @@ private:
     QSet<QnUuid> m_ids;
 };
 
-class NX_VMS_RULES_API ResourceFilterEventField: public EventField, public ResourceFilterFieldBase
+class NX_VMS_RULES_API ResourceFilterEventField:
+    public EventField,
+    public ResourceFilterFieldBase<ResourceFilterEventField>
 {
     Q_OBJECT
 
-    Q_PROPERTY(bool acceptAll READ acceptAll WRITE setAcceptAll)
-    Q_PROPERTY(QnUuidSet ids READ ids WRITE setIds)
+    Q_PROPERTY(bool acceptAll READ acceptAll WRITE setAcceptAll NOTIFY acceptAllChanged)
+    Q_PROPERTY(QnUuidSet ids READ ids WRITE setIds NOTIFY idsChanged)
+
+signals:
+    void acceptAllChanged();
+    void idsChanged();
 
 public:
     virtual bool match(const QVariant& value) const override;
@@ -40,12 +61,16 @@ public:
 
 class NX_VMS_RULES_API ResourceFilterActionField:
     public ActionField,
-    public ResourceFilterFieldBase
+    public ResourceFilterFieldBase<ResourceFilterActionField>
 {
     Q_OBJECT
 
-    Q_PROPERTY(bool acceptAll READ acceptAll WRITE setAcceptAll)
-    Q_PROPERTY(QnUuidSet ids READ ids WRITE setIds)
+    Q_PROPERTY(bool acceptAll READ acceptAll WRITE setAcceptAll NOTIFY acceptAllChanged)
+    Q_PROPERTY(QnUuidSet ids READ ids WRITE setIds NOTIFY idsChanged)
+
+signals:
+    void acceptAllChanged();
+    void idsChanged();
 
 public:
     virtual QVariant build(const EventPtr& eventData) const override;

@@ -30,25 +30,21 @@ public:
     /**
      * Sets fields the widget will interacts with. The fields name and type must correspond
      * to the fields in the descriptor. Must be called after the descriptor is set. Fields that
-     * correspons to the descriptor are passed to picker widgets that display and edit the fields.
+     * corresponds to the descriptor are passed to picker widgets that display and edit the fields.
      */
     void setFields(const QHash<QString, vms::rules::Field*>& fields);
 
     /**
-     * Set the prolonguation of the event or action. Used by some of the widgets to hide some
+     * Set the prolongation of the event or action. Used by some of the widgets to hide some
      * fields.
      */
     virtual void setInstant(bool value);
 
     virtual void setReadOnly(bool value);
 
-signals:
-    /** Emits whenever any of the fields is edited. */
-    void edited();
-
 protected:
     /**
-     * Calls after the descriptor is set. Here derived classes must customise the widget using
+     * Calls after the descriptor is set. Here derived classes must customize the widget using
      * the descriptor.
      */
     virtual void onDescriptorSet();
@@ -62,7 +58,6 @@ protected:
 
 private:
     void setupLineEditsPlaceholderColor();
-    void watchOnDataEdited();
 
     vms::rules::ItemDescriptor itemDescriptor;
 };

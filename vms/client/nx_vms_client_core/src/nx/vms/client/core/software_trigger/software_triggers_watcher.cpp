@@ -132,8 +132,8 @@ SoftwareTriggersWatcher::DescriptionPtr SoftwareTriggersWatcher::Description::cr
 
     return DescriptionPtr(new Description{
         /*version*/ 1,
-        iconField->name(),
-        nx::vms::event::StringsHelper::getSoftwareTriggerName(nameField->text()),
+        iconField->value(),
+        nx::vms::event::StringsHelper::getSoftwareTriggerName(nameField->value()),
         nx::vms::rules::isProlonged(engine, rule->actionBuilders()[0]),
         true});
 }

@@ -21,24 +21,4 @@ QVariant ResourceFilterActionField::build(const EventPtr& eventData) const
     });
 }
 
-bool ResourceFilterFieldBase::acceptAll() const
-{
-    return m_acceptAll;
-}
-
-void ResourceFilterFieldBase::setAcceptAll(bool acceptAll)
-{
-    m_acceptAll = acceptAll;
-}
-
-QSet<QnUuid> ResourceFilterFieldBase::ids() const
-{
-    return m_ids;
-}
-
-void ResourceFilterFieldBase::setIds(const QSet<QnUuid>& ids)
-{
-    m_ids = ids;
-}
-
 } // namespace nx::vms::rules

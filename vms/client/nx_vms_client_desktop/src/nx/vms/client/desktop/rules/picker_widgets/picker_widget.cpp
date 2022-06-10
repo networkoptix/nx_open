@@ -29,11 +29,11 @@ bool PickerWidget::hasDescriptor() const
     return fieldDescriptor != std::nullopt;
 }
 
-void PickerWidget::setField(Field* value)
+void PickerWidget::setFields(const QHash<QString, vms::rules::Field*>& /*fields*/)
 {
 }
 
-void PickerWidget::onFieldSet()
+void PickerWidget::onFieldsSet()
 {
 }
 

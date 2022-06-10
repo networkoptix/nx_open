@@ -8,17 +8,20 @@
 namespace nx::vms::rules {
 
 /** Stores event state. Typically displayed as a combobox. */
-class NX_VMS_RULES_API StateField: public SimpleTypeEventField<State>
+class NX_VMS_RULES_API StateField: public SimpleTypeEventField<State, StateField>
 {
     Q_OBJECT
     Q_CLASSINFO("metatype", "nx.events.fields.eventState")
 
-    Q_PROPERTY(nx::vms::api::rules::State value READ value WRITE setValue)
+    Q_PROPERTY(nx::vms::api::rules::State value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
     StateField() = default;
 
     bool match(const QVariant& eventValue) const override;
+
+signals:
+    void valueChanged();
 };
 
 } // namespace nx::vms::rules

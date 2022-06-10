@@ -39,6 +39,9 @@ struct FieldDescriptor
 
     /** Optional properties corresponding to the actual field id. */
     QVariantMap properties;
+
+    /** Field names of the parent item that required for the current field. */
+    QStringList linkedFields;
 };
 
 /** Description of event or action with default field set. */
@@ -67,7 +70,8 @@ FieldDescriptor makeFieldDescriptor(
     const QString& fieldName,
     const QString& displayName,
     const QString& description = {},
-    const QVariantMap& properties = {})
+    const QVariantMap& properties = {},
+    const QStringList& linkedFields = {})
 {
     return FieldDescriptor{
         .id = fieldMetatype<T>(),
@@ -75,6 +79,7 @@ FieldDescriptor makeFieldDescriptor(
         .displayName = displayName,
         .description = description,
         .properties = properties,
+        .linkedFields = linkedFields,
     };
 }
 

@@ -51,7 +51,6 @@ public:
 private:
     using FieldPickerWidget<F>::connect;
     using FieldPickerWidget<F>::setLayout;
-    using FieldPickerWidget<F>::edited;
     using FieldPickerWidget<F>::fieldDescriptor;
     using FieldPickerWidget<F>::field;
 
@@ -63,7 +62,7 @@ private:
         label->setText(fieldDescriptor->displayName);
     }
 
-    virtual void onFieldSet() override
+    virtual void onFieldsSet() override
     {
         {
             QSignalBlocker blocker{timeDurationWidget};
@@ -80,7 +79,6 @@ private:
     void onValueChanged()
     {
         field->setValue(std::chrono::seconds(timeDurationWidget->value()));
-        emit edited();
     }
 };
 
