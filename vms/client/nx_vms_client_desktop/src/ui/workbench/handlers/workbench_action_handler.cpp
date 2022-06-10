@@ -1884,9 +1884,32 @@ void ActionHandler::at_openBusinessLogAction_triggered() {
     }
 }
 
-void ActionHandler::at_openAuditLogAction_triggered() {
-    QnNonModalDialogConstructor<QnAuditLogDialog> dialogConstructor(m_auditLogDialog, mainWindowWidget());
+void ActionHandler::at_openAuditLogAction_triggered()
+{
+    QnNonModalDialogConstructor<QnAuditLogDialog> dialogConstructor(
+        m_auditLogDialog,
+        mainWindowWidget());
+
     const auto parameters = menu()->currentParameters(sender());
+
+    if (parameters.hasArgument(Qn::TextRole))
+    {
+        const auto text = parameters.argument<QString>(Qn::TextRole);
+        m_auditLogDialog->setSearchText(text);
+    }
+
+    if (parameters.hasArgument(Qn::TimePeriodRole))
+    {
+        const auto period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
+        m_auditLogDialog->setSearchPeriod(period);
+    }
+
+    if (parameters.hasArgument(Qn::FocusTabRole))
+    {
+        const auto tabIndex =
+            parameters.argument<int>(Qn::FocusTabRole);
+        m_auditLogDialog->setFocusTab((QnAuditLogDialog::MasterGridTabIndex) tabIndex);
+    }
 }
 
 void ActionHandler::at_cameraListAction_triggered() {
