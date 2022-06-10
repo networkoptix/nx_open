@@ -15,19 +15,23 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-AnalyticsEnginesWatcher::AnalyticsEngineInfo engineInfoFromResource(
-    const AnalyticsEngineResourcePtr& engine)
+AnalyticsEngineInfo engineInfoFromResource(const AnalyticsEngineResourcePtr& engine)
 {
     const auto plugin = engine->getParentResource().dynamicCast<AnalyticsPluginResource>();
     if (!plugin)
         return {};
 
+    const auto pluginManifest = plugin->manifest();
+
     QJsonObject settingsModel = QJson::deserialized<QJsonObject>(
         engine->getProperty(AnalyticsEngineResource::kSettingsModelProperty).toUtf8());
 
-    return AnalyticsEnginesWatcher::AnalyticsEngineInfo {
+    return AnalyticsEngineInfo {
         engine->getId(),
         engine->getName(),
+        pluginManifest.description,
+        pluginManifest.version,
+        pluginManifest.vendor,
         std::move(settingsModel),
         engine->isDeviceDependent()
     };
@@ -169,14 +173,12 @@ AnalyticsEnginesWatcher::~AnalyticsEnginesWatcher()
 {
 }
 
-AnalyticsEnginesWatcher::AnalyticsEngineInfo AnalyticsEnginesWatcher::engineInfo(
-    const QnUuid& engineId) const
+AnalyticsEngineInfo AnalyticsEnginesWatcher::engineInfo(const QnUuid& engineId) const
 {
     return d->engines.value(engineId);
 }
 
-QHash<QnUuid, AnalyticsEnginesWatcher::AnalyticsEngineInfo>
-AnalyticsEnginesWatcher::engineInfos() const
+QHash<QnUuid, AnalyticsEngineInfo> AnalyticsEnginesWatcher::engineInfos() const
 {
     return d->engines;
 }

@@ -104,6 +104,12 @@ std::string Plugin::manifestString() const
                         "type": "Banner",
                         "icon": "info",
                         "text": "Some text"
+                    },
+                    {
+                        "type": "Placeholder",
+                        "header": "Header",
+                        "description": "Description",
+                        "image": "default"
                     }
                 ]
             },

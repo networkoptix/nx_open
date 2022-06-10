@@ -344,6 +344,8 @@ The `"icon"` field is optional and accepts the following values: `"info"` (defau
 
 NOTE: This setting is non-editable and has no value, it is just a visual item in the dialog.
 
+NOTE: There is a similar non-editable item with a different look, called `Placeholder`.
+
 [proprietary]
 
 ![](doc/images/banner_info.png)
@@ -357,6 +359,46 @@ NOTE: This setting is non-editable and has no value, it is just a visual item in
         "type": "Banner",
         "icon": "info",
         "text": "Some text"
+    }
+
+---------------------------------------------------------------------------------------------------
+## Placeholder
+
+A static icon with a header and a description. If there are no other items, takes up all the space.
+
+The `"icon"` field accepts the following values:
+- `"default"` (default)
+- `"email_sent"`
+- `"events"`
+- `"lan_search"`
+- `"motion"`
+- `"no_bookmarks"`
+- `"no_devices"`
+- `"no_groups"`
+- `"no_objects"`
+- `"no_settings"`
+- `"not_found"`
+- `"notification"`
+- `"open_folder"`
+- `"search_by_ip"`
+
+NOTE: This setting is non-editable and has no value, it is just a visual item in the dialog.
+
+NOTE: There is a similar non-editable item with a different look, called `Banner`.
+
+[proprietary]
+
+![](doc/images/placeholder.png)
+
+[/proprietary]
+
+### Setting Model
+
+    {
+        "type": "Placeholder",
+        "icon": "default",
+        "header": "Header",
+        "description": "Description"
     }
 
 ---------------------------------------------------------------------------------------------------

@@ -103,6 +103,10 @@ function _createItemsRecursively(parent, visualParent, model, depth)
 function createItems(parent, model)
 {
     let item = _createItemsRecursively(parent, parent.childrenItem, model, 0)
+
+    if (!item)
+        item = _createItemsRecursively(parent, parent.childrenItem, { "type": "Settings" }, 0)
+
     if (item)
     {
         item.parent = parent

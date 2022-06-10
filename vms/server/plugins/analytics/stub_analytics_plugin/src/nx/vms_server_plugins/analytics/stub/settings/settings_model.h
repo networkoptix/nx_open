@@ -269,6 +269,12 @@ static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R
                     "type": "Banner",
                     "icon": "info",
                     "text": "Some text"
+                },
+                {
+                    "type": "Placeholder",
+                    "header": "Header",
+                    "description": "Description",
+                    "image": "default"
                 }
             ]
         }

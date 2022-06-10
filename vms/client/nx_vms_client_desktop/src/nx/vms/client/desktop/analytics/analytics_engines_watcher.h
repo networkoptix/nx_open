@@ -6,6 +6,7 @@
 #include <QtCore/QJsonObject>
 
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/resource_properties/camera/data/analytics_engine_info.h>
 
 namespace nx::vms::client::desktop {
 
@@ -16,14 +17,6 @@ class AnalyticsEnginesWatcher: public QObject
     using base_type = QObject;
 
 public:
-    struct AnalyticsEngineInfo
-    {
-        QnUuid id;
-        QString name;
-        QJsonObject settingsModel;
-        bool isDeviceDependent = false;
-    };
-
     AnalyticsEnginesWatcher(QObject* parent = nullptr);
     virtual ~AnalyticsEnginesWatcher() override;
 
