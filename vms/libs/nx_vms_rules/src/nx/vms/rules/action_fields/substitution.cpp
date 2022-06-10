@@ -8,20 +8,29 @@
 
 namespace nx::vms::rules {
 
-Substitution::Substitution()
-{
-}
-
 QVariant Substitution::build(const EventPtr& event) const
 {
-    // TODO: #mmalofeev what does substitution mean it case of the aggregated event?
     QVariant value;
     if (event)
-        value = event->property(m_eventFieldName.toUtf8().data());
+        value = event->property(m_fieldName.toUtf8().data());
 
     return value.canConvert(QVariant::String)
         ? value.toString() //< TODO: #spanasenko Refactor.
-        : QString("{%1}").arg(m_eventFieldName);
+        : QString("{%1}").arg(m_fieldName);
+}
+
+QString Substitution::fieldName() const
+{
+    return m_fieldName;
+}
+
+void Substitution::setFieldName(const QString& fieldName)
+{
+    if (m_fieldName != fieldName)
+    {
+        m_fieldName = fieldName;
+        emit fieldNameChanged();
+    }
 }
 
 } // namespace nx::vms::rules

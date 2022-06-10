@@ -2,8 +2,10 @@
 
 #pragma once
 
+#include <QtCore/QPointer>
 #include <QtWidgets/QWidget>
 
+#include <nx/utils/log/assert.h>
 #include <nx/vms/rules/field.h>
 #include <nx/vms/rules/manifest.h>
 
@@ -29,30 +31,26 @@ public:
     bool hasDescriptor() const;
 
     /**
-     * Sets field the picker will use to display and edit. The field must be consistant with the
+     * Sets fields the picker will use to display and edit. The fields must be consistant with the
      * descriptor, otherwise the field will not be edited.
      */
-    virtual void setField(vms::rules::Field* value);
+    virtual void setFields(const QHash<QString, vms::rules::Field*>& fields);
 
     virtual void setReadOnly(bool value) = 0;
 
-signals:
-    /** Emits whenever the field is edited. */
-    void edited(); //< TODO: Probably Field class must notify about it changes.
-
 protected:
     /**
-     * Called when descriptor is set. Here derived classes must customise properties
+     * Called when descriptor is set. Here derived classes must customize properties
      * according to the fieldDescriptor.
      */
     virtual void onDescriptorSet() = 0;
 
     /**
-     * Calls when field is set. Here derived classes must cast the field to the type described
-     * in the fieldDescriptor and display field data. Derived classes might be sure field is
-     * not nullptr.
+     * Calls when field and linkedFields are set. Here derived classes must cast the field to
+     * the type described in the fieldDescriptor and display field data. Derived classes might
+     * be sure field is not nullptr.
      */
-    virtual void onFieldSet();
+    virtual void onFieldsSet();
 
     std::optional<vms::rules::FieldDescriptor> fieldDescriptor;
 };
@@ -63,17 +61,50 @@ class FieldPickerWidget: public PickerWidget
 public:
     FieldPickerWidget(QWidget* parent = nullptr): PickerWidget(parent){}
 
-    void setField(vms::rules::Field* value) override
+    virtual void setFields(const QHash<QString, vms::rules::Field*>& fields) override
     {
-        field = dynamic_cast<F*>(value);
+        if (!NX_ASSERT(fieldDescriptor))
+            return;
+
+        disconnectFromFields();
+
+        field = dynamic_cast<F*>(fields.value(fieldDescriptor->fieldName));
 
         if (field)
-            onFieldSet();
+        {
+            for (const auto linkedFieldName: fieldDescriptor->linkedFields)
+            {
+                const auto linkedField = fields.value(linkedFieldName);
+                if (NX_ASSERT(linkedField))
+                    linkedFields[linkedFieldName] = linkedField;
+            }
+
+            onFieldsSet();
+        }
     }
 
 protected:
     static_assert(std::is_base_of<vms::rules::Field, F>());
-    F* field{};
+
+    /** The field described in the descriptor, the picker gets value for. */
+    QPointer<F> field{};
+
+    /** Another fields from the entity(ActionBuilder or EventFilter fields). */
+    QHash<QString, QPointer<vms::rules::Field>> linkedFields;
+
+private:
+    /** Disconnect the picker from the fields. */
+    void disconnectFromFields()
+    {
+        if (field)
+            field->disconnect(this);
+
+        for (const auto& linkedField: linkedFields)
+        {
+            if (linkedField)
+                linkedField->disconnect(this);
+        }
+    }
 };
 
 } // namespace nx::vms::client::desktop::rules

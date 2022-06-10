@@ -4,7 +4,6 @@
 
 #include <nx/vms/common/system_context_aware.h>
 
-#include "../data_macros.h"
 #include "../event_field.h"
 
 namespace nx::vms::rules {
@@ -19,8 +18,8 @@ class NX_VMS_RULES_API AnalyticsEventTypeField:
 
     Q_CLASSINFO("metatype", "nx.events.fields.analyticsEventType")
 
-    Q_PROPERTY(QnUuid engineId READ engineId WRITE setEngineId)
-    FIELD(QString, typeId, setTypeId)
+    Q_PROPERTY(QnUuid engineId READ engineId WRITE setEngineId NOTIFY engineIdChanged)
+    Q_PROPERTY(QString typeId READ typeId WRITE setTypeId NOTIFY typeIdChanged)
 
 public:
     AnalyticsEventTypeField(nx::vms::common::SystemContext* context);
@@ -30,8 +29,16 @@ public:
     QnUuid engineId() const;
     void setEngineId(QnUuid id);
 
+    QString typeId() const;
+    void setTypeId(const QString& id);
+
+signals:
+    void engineIdChanged();
+    void typeIdChanged();
+
 private:
     QnUuid m_engineId;
+    QString m_typeId;
 };
 
 } // namespace nx::vms::rules

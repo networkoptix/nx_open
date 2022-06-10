@@ -17,7 +17,7 @@ class NX_VMS_RULES_API TextWithFields:
 
     Q_CLASSINFO("metatype", "nx.actions.fields.textWithFields")
 
-    Q_PROPERTY(QString text READ text WRITE setText)
+    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
 
 public:
     TextWithFields(common::SystemContext* context);
@@ -25,8 +25,10 @@ public:
     virtual QVariant build(const EventPtr& event) const override;
 
     QString text() const;
-
     void setText(const QString& text);
+
+signals:
+    void textChanged();
 
 private:
     QString m_text;

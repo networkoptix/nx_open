@@ -61,7 +61,6 @@ public:
 private:
     using FieldPickerWidget<F>::connect;
     using FieldPickerWidget<F>::setLayout;
-    using FieldPickerWidget<F>::edited;
     using FieldPickerWidget<F>::fieldDescriptor;
     using FieldPickerWidget<F>::field;
 
@@ -74,7 +73,7 @@ private:
         lineEdit->setPlaceholderText(fieldDescriptor->description);
     };
 
-    virtual void onFieldSet() override
+    virtual void onFieldsSet() override
     {
         {
             const QSignalBlocker blocker{lineEdit};
@@ -91,7 +90,6 @@ private:
     void onTextChanged(const QString& text)
     {
         setText(text);
-        emit edited();
     }
 
     QString text() const
@@ -123,18 +121,6 @@ QLineEdit* PasswordPicker::createLineEdit()
     passwordLineEdit->setEchoMode(QLineEdit::Password);
 
     return passwordLineEdit;
-}
-
-template<>
-QString CustomizableTextPicker::text() const
-{
-    return field->text();
-}
-
-template<>
-void CustomizableTextPicker::setText(const QString& text)
-{
-    field->setText(text);
 }
 
 template<>

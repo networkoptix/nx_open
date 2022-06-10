@@ -54,6 +54,8 @@ PickerWidget* PickerFactory::createWidget(
         pickerWidget = new DurationPickerWidget<nx::vms::rules::OptionalTimeField>(parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::TargetUserField>())
         pickerWidget = new TargetUserPicker(parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::InputPortField>())
+        pickerWidget = new InputPortPicker(parent);
     else
         pickerWidget = new BlankPickerWidget(parent);
 

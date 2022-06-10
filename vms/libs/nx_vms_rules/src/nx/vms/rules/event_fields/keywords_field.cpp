@@ -27,8 +27,13 @@ QString KeywordsField::string() const
 
 void KeywordsField::setString(const QString& string)
 {
-    m_string = string;
-    m_list = string.split(' ', QString::SkipEmptyParts);
+    if (m_string != string)
+    {
+        m_string = string;
+        m_list = string.split(' ', QString::SkipEmptyParts);
+
+        emit stringChanged();
+    }
 }
 
 } // namespace nx::vms::rules

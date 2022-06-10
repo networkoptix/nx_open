@@ -13,6 +13,65 @@
 
 namespace nx::vms::client::desktop::rules {
 
+/** Facade around Rule class. Simplifies access to the rule properties. */
+class SimplifiedRule: public QObject
+{
+    Q_OBJECT
+
+public:
+    ~SimplifiedRule();
+
+    QnUuid id() const;
+
+    QString eventType() const;
+    void setEventType(const QString& eventType);
+    QHash<QString, nx::vms::rules::Field*> eventFields() const;
+    std::optional<nx::vms::rules::ItemDescriptor> eventDescriptor() const;
+
+    QString actionType() const;
+    void setActionType(const QString& actionType);
+    QHash<QString, nx::vms::rules::Field*> actionFields() const;
+    std::optional<nx::vms::rules::ItemDescriptor> actionDescriptor() const;
+
+    QString comment() const;
+    void setComment(const QString& comment);
+
+    bool enabled() const;
+    void setEnabled(bool value);
+
+    QByteArray schedule() const;
+    void setSchedule(const QByteArray& schedule);
+
+    /** Calls model updateRule() method with the stored through the setModelIndex() method index. */
+    Q_INVOKABLE void update();
+
+    QPersistentModelIndex modelIndex() const;
+
+private:
+    QPersistentModelIndex m_index;
+    nx::vms::rules::Engine* m_engine = nullptr;
+    std::unique_ptr<vms::rules::Rule> m_rule;
+
+    /** Only RulesTableModel must has an ability to create SimplifiedRule instances. */
+    friend class RulesTableModel;
+
+    SimplifiedRule(vms::rules::Engine* engine, std::unique_ptr<vms::rules::Rule>&& rule);
+
+    void setRule(std::unique_ptr<vms::rules::Rule>&& rule);
+    const vms::rules::Rule* rule() const;
+    void setModelIndex(const QPersistentModelIndex& modelIndex);
+    void update(const QVector<int>& roles);
+
+    /** Starts watching on the builder's and filter's changes of the rule set. */
+    void startWatchOnRule() const;
+
+    /** Stops watching on the builder's and filter's changes of the rule set. */
+    void stopWatchOnRule() const;
+
+    /** Connects all the notify signal of the object to the update() method. */
+    void watchOn(QObject* object) const;
+};
+
 class RulesTableModel:
     public QAbstractTableModel,
     public nx::vms::client::core::RemoteConnectionAware
@@ -52,58 +111,6 @@ public:
         int section,
         Qt::Orientation orientation,
         int role = Qt::DisplayRole) const override;
-
-    /** Facade around Rule class. Simplifies access to the rule properties. */
-    class SimplifiedRule
-    {
-    public:
-        ~SimplifiedRule();
-
-        QnUuid id() const;
-
-        QString eventType() const;
-        void setEventType(const QString& eventType);
-        QHash<QString, nx::vms::rules::Field*> eventFields() const;
-        std::optional<nx::vms::rules::ItemDescriptor> eventDescriptor() const;
-
-        QString actionType() const;
-        void setActionType(const QString& actionType);
-        QHash<QString, nx::vms::rules::Field*> actionFields() const;
-        std::optional<nx::vms::rules::ItemDescriptor> actionDescriptor() const;
-
-        QString comment() const;
-        void setComment(const QString& comment);
-
-        bool enabled() const;
-        void setEnabled(bool value);
-
-        QByteArray schedule() const;
-        void setSchedule(const QByteArray& schedule);
-
-        /**
-         * Calls model updateRule() method with the stored through the setModelIndex() method
-         * model index. Must be called manually only if some of the fields is edited because
-         * the Field class doesn't have an ability to notify about it's changes.
-         */
-        void update();
-
-        QPersistentModelIndex modelIndex() const;
-
-    private:
-        QPersistentModelIndex index;
-        nx::vms::rules::Engine* engine = nullptr;
-        std::unique_ptr<vms::rules::Rule> actualRule;
-
-        /** Only RulesTableModel must has an ability to create SimplifiedRule instances. */
-        friend class RulesTableModel;
-
-        SimplifiedRule(vms::rules::Engine* engine, std::unique_ptr<vms::rules::Rule>&& rule);
-
-        void setRule(std::unique_ptr<vms::rules::Rule>&& rule);
-        const vms::rules::Rule* rule() const;
-        void setModelIndex(const QPersistentModelIndex& modelIndex);
-        void update(const QVector<int>& roles);
-    };
 
     /** Add new rule and return its index. Returns invalid index if rule was not added. */
     QModelIndex addRule();

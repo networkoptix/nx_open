@@ -168,6 +168,9 @@ QString TextWithFields::text() const
 
 void TextWithFields::setText(const QString& text)
 {
+    if (m_text == text)
+        return;
+
     m_text = text;
 
     m_types.clear();
@@ -214,6 +217,8 @@ void TextWithFields::setText(const QString& text)
         m_types += FieldType::Text;
         m_values += text.mid(start);
     }
+
+    emit textChanged();
 }
 
 } // namespace nx::vms::rules

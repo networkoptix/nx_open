@@ -269,12 +269,6 @@ void RulesDialog::createEventEditor(const vms::rules::ItemDescriptor& descriptor
     if (!NX_ASSERT(eventEditorWidget))
         return;
 
-    connect(
-        eventEditorWidget,
-        &ParamsWidget::edited,
-        this,
-        &RulesDialog::updateRule);
-
     eventEditorWidget->setReadOnly(readOnly);
 
     ui->eventEditorContainerWidget->layout()->addWidget(eventEditorWidget);
@@ -288,12 +282,6 @@ void RulesDialog::createActionEditor(const vms::rules::ItemDescriptor& descripto
     actionEditorWidget = ActionEditorFactory::createWidget(descriptor);
     if (!NX_ASSERT(actionEditorWidget))
         return;
-
-    connect(
-        actionEditorWidget,
-        &ParamsWidget::edited,
-        this,
-        &RulesDialog::updateRule);
 
     actionEditorWidget->setReadOnly(readOnly);
     actionEditorWidget->setInstant(
@@ -316,7 +304,7 @@ void RulesDialog::displayRule()
     ui->footerWidget->setRule(displayedRule);
 }
 
-void RulesDialog::displayEvent(const RulesTableModel::SimplifiedRule& rule)
+void RulesDialog::displayEvent(const SimplifiedRule& rule)
 {
     {
         const QSignalBlocker blocker(ui->eventTypePicker);
@@ -334,7 +322,7 @@ void RulesDialog::displayEvent(const RulesTableModel::SimplifiedRule& rule)
         eventEditorWidget->setFields(rule.eventFields());
 }
 
-void RulesDialog::displayAction(const RulesTableModel::SimplifiedRule& rule)
+void RulesDialog::displayAction(const SimplifiedRule& rule)
 {
     {
         const QSignalBlocker blocker(ui->actionTypePicker);
@@ -363,12 +351,6 @@ void RulesDialog::resetSelection()
     ui->tableView->clearSelection();
     ui->tableView->setCurrentIndex(QModelIndex{});
     displayRule();
-}
-
-void RulesDialog::updateRule()
-{
-    if (auto rule = displayedRule.lock())
-        rule->update();
 }
 
 void RulesDialog::onModelDataChanged(

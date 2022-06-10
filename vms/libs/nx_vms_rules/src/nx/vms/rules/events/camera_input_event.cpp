@@ -6,6 +6,7 @@
 #include "../event_fields/source_camera_field.h"
 #include "../utils/event_details.h"
 #include "../utils/string_helper.h"
+#include "../utils/field.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -60,8 +61,13 @@ const ItemDescriptor& CameraInputEvent::manifest()
         .displayName = tr("Input Signal on Camera"),
         .flags = ItemFlag::prolonged,
         .fields = {
-            makeFieldDescriptor<SourceCameraField>("source", tr("Camera")),
-            makeFieldDescriptor<InputPortField>("inputPortId", tr("Input ID")),
+            makeFieldDescriptor<SourceCameraField>(utils::kSourceFieldName, tr("Camera")),
+            makeFieldDescriptor<InputPortField>(
+                "inputPortId",
+                tr("Input ID"),
+                {},
+                {},
+                {utils::kSourceFieldName}),
         },
         .emailTemplatePath = ":/email_templates/camera_input.mustache"
     };

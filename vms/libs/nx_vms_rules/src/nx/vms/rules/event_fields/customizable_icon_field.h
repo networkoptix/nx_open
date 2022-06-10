@@ -2,27 +2,25 @@
 
 #pragma once
 
-#include "../event_field.h"
+#include "../base_fields/simple_type_field.h"
 
 namespace nx::vms::rules {
 
-class NX_VMS_RULES_API CustomizableIconField: public EventField
+class NX_VMS_RULES_API CustomizableIconField:
+    public SimpleTypeEventField<QString, CustomizableIconField>
 {
     Q_OBJECT
     Q_CLASSINFO("metatype", "nx.events.fields.customizableIcon")
 
-    Q_PROPERTY(QString name READ name WRITE setName)
+    Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    CustomizableIconField();
+    CustomizableIconField() = default;
 
     virtual bool match(const QVariant& value) const override;
 
-    QString name() const;
-    void setName(const QString& name);
-
-private:
-    QString m_name;
+signals:
+    void valueChanged();
 };
 
 } // namespace nx::vms::rules

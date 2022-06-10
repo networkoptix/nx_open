@@ -6,11 +6,11 @@
 
 namespace nx::vms::rules {
 
-bool AnalyticsObjectAttributesField::match(const QVariant& value) const
+bool AnalyticsObjectAttributesField::match(const QVariant& eventValue) const
 {
     nx::analytics::db::TextMatcher textMatcher;
-    textMatcher.parse(m_value);
-    textMatcher.matchAttributes(value.value<nx::common::metadata::Attributes>());
+    textMatcher.parse(value());
+    textMatcher.matchAttributes(eventValue.value<nx::common::metadata::Attributes>());
 
     return textMatcher.matched();
 }

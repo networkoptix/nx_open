@@ -20,8 +20,8 @@ class NX_VMS_RULES_API EmailMessageField:
 
     Q_CLASSINFO("metatype", "nx.actions.fields.emailMessageField")
 
-    Q_PROPERTY(QString caption READ caption WRITE setCaption)
-    Q_PROPERTY(QString description READ description WRITE setDescription)
+    Q_PROPERTY(QString caption READ caption WRITE setCaption NOTIFY captionChanged)
+    Q_PROPERTY(QString description READ description WRITE setDescription NOTIFY descriptionChanged)
 
 public:
     EmailMessageField(common::SystemContext* context);
@@ -32,6 +32,10 @@ public:
     void setDescription(const QString& description);
 
     virtual QVariant build(const EventPtr& event) const override;
+
+signals:
+    void captionChanged();
+    void descriptionChanged();
 
 protected:
     TextWithFields m_caption;

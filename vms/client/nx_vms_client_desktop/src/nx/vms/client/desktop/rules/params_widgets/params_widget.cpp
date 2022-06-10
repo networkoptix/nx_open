@@ -25,7 +25,6 @@ void ParamsWidget::setDescriptor(const ItemDescriptor& value)
     onDescriptorSet();
 
     // At the moment all pickers must be instantiated.
-    watchOnDataEdited();
     setupLineEditsPlaceholderColor();
 }
 
@@ -60,8 +59,7 @@ void ParamsWidget::setFields(const QHash<QString, Field*>& fields)
         if (!fields.contains(pickerDescriptor->fieldName))
             continue;
 
-        auto field = fields.value(pickerDescriptor->fieldName);
-        picker->setField(fields[pickerDescriptor->fieldName]);
+        picker->setFields(fields);
     }
 }
 
@@ -83,12 +81,6 @@ void ParamsWidget::setupLineEditsPlaceholderColor()
 
     for (auto lineEdit: lineEdits)
         setPaletteColor(lineEdit, QPalette::PlaceholderText, midlightColor);
-}
-
-void ParamsWidget::watchOnDataEdited()
-{
-    for (const auto& picker: findChildren<PickerWidget*>())
-        connect(picker, &PickerWidget::edited, this, &ParamsWidget::edited);
 }
 
 } // namespace nx::vms::client::desktop::rules

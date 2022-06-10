@@ -11,6 +11,8 @@ EmailMessageField::EmailMessageField(common::SystemContext* context):
     m_caption(context),
     m_description(context)
 {
+    connect(&m_caption, &TextWithFields::textChanged, this, &EmailMessageField::captionChanged);
+    connect(&m_description, &TextWithFields::textChanged, this, &EmailMessageField::descriptionChanged);
 }
 
 QString EmailMessageField::caption() const

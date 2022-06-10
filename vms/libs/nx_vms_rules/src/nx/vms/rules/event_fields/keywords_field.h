@@ -12,13 +12,16 @@ class NX_VMS_RULES_API KeywordsField: public EventField
 
     Q_CLASSINFO("metatype", "nx.events.fields.keywords")
 
-    Q_PROPERTY(QString string READ string WRITE setString)
+    Q_PROPERTY(QString string READ string WRITE setString NOTIFY stringChanged)
 
 public:
     virtual bool match(const QVariant& value) const override;
 
     QString string() const;
     void setString(const QString& string);
+
+signals:
+    void stringChanged();
 
 private:
     QString m_string;

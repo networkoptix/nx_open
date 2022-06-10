@@ -7,15 +7,18 @@
 namespace nx::vms::rules {
 
 /** Stores integer. Typically displayed as a spinbox. */
-class NX_VMS_RULES_API IntField: public SimpleTypeEventField<int>
+class NX_VMS_RULES_API IntField: public SimpleTypeEventField<int, IntField>
 {
     Q_OBJECT
     Q_CLASSINFO("metatype", "nx.events.fields.int")
 
-    Q_PROPERTY(int value READ value WRITE setValue)
+    Q_PROPERTY(int value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
     IntField() = default;
+
+signals:
+    void valueChanged();
 };
 
 } // namespace nx::vms::rules

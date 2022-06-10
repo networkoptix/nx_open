@@ -19,7 +19,7 @@ public:
     explicit FooterWidget(QWidget* parent = nullptr);
     virtual ~FooterWidget() override;
 
-    void setRule(std::weak_ptr<RulesTableModel::SimplifiedRule> rule);
+    void setRule(std::weak_ptr<SimplifiedRule> rule);
 
 private:
     void setupCommentLabelInteractions();
@@ -30,7 +30,7 @@ private:
 private:
     QScopedPointer<Ui::FooterWidget> ui;
 
-    std::weak_ptr<RulesTableModel::SimplifiedRule> displayedRule;
+    std::weak_ptr<SimplifiedRule> displayedRule;
 };
 
 } // namespace nx::vms::client::desktop::rules

@@ -8,24 +8,10 @@
 
 namespace nx::vms::rules {
 
-CustomizableTextField::CustomizableTextField()
-{
-}
-
-bool CustomizableTextField::match(const QVariant& value) const
+bool CustomizableTextField::match(const QVariant& eventValue) const
 {
     // Field value used for event customization, matches any event value.
     return true;
-}
-
-QString CustomizableTextField::text() const
-{
-    return m_text;
-}
-
-void CustomizableTextField::setText(const QString& text)
-{
-    m_text = text;
 }
 
 } // namespace nx::vms::rules

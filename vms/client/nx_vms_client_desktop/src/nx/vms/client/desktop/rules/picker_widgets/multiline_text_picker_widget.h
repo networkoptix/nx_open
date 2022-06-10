@@ -34,7 +34,6 @@ public:
 
 private:
     using FieldPickerWidget<F>::connect;
-    using FieldPickerWidget<F>::edited;
     using FieldPickerWidget<F>::fieldDescriptor;
     using FieldPickerWidget<F>::field;
 
@@ -46,7 +45,7 @@ private:
         ui->textEdit->setPlaceholderText(fieldDescriptor->description);
     };
 
-    virtual void onFieldSet() override
+    virtual void onFieldsSet() override
     {
         {
             const QSignalBlocker blocker{ui->textEdit};
@@ -63,7 +62,6 @@ private:
     void onTextChanged()
     {
         setText(ui->textEdit->toPlainText());
-        emit edited();
     }
 
     QString text();
