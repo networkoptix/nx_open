@@ -58,6 +58,7 @@ public:
                     [this](bool isStarted)
                     {
                         m_moduleStartedPromise->set_value(isStarted);
+                        afterModuleStart();
                     });
                 moduleInstantiatedCreatedPromise.set_value();
                 auto result = m_moduleInstance->exec();
@@ -202,6 +203,7 @@ public:
 protected:
     virtual void beforeModuleCreation() {}
     virtual void beforeModuleStart() {}
+    virtual void afterModuleStart() {}
     virtual void afterModuleDestruction() {}
 
 private:

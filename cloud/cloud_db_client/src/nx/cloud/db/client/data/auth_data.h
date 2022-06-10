@@ -68,11 +68,6 @@ NX_REFLECTION_INSTRUMENT(
 
 NX_REFLECTION_INSTRUMENT(SystemNonce, SystemNonce_Fields)
 
-#define SystemUserAuthInfoRecord_Fields AuthInfoRecord_Fields \
-    (systemId)(accountId)
-
-NX_REFLECTION_INSTRUMENT(SystemUserAuthInfoRecord, SystemUserAuthInfoRecord_Fields)
-
 static constexpr char kVmsUserAuthInfoAttributeName[] = "cloudUserAuthenticationInfo";
 
 QN_FUSION_DECLARE_FUNCTIONS(NonceData, (json))
@@ -87,6 +82,5 @@ QN_FUSION_DECLARE_FUNCTIONS(AuthInfoRecord, (json))
 QN_FUSION_DECLARE_FUNCTIONS(AuthInfo, (json))
 QN_FUSION_DECLARE_FUNCTIONS(VmsServerCertificatePublicKey, (json))
 QN_FUSION_DECLARE_FUNCTIONS(SystemNonce, (ubjson)(json))
-QN_FUSION_DECLARE_FUNCTIONS(SystemUserAuthInfoRecord, (ubjson)(json)(sql_record))
 
 } // namespace nx::cloud::db::api
