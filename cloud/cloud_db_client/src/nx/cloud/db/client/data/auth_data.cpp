@@ -61,7 +61,5 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(VmsServerCertificatePublicKey,
     VmsServerCertificatePublicKey_Fields,
     (optional, false))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SystemNonce, (ubjson)(json), SystemNonce_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SystemUserAuthInfoRecord, (ubjson)(json)(sql_record),
-    SystemUserAuthInfoRecord_Fields)
 
 } // namespace nx::cloud::db::api

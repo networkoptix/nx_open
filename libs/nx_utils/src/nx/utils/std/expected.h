@@ -41,8 +41,11 @@ public:
     expected(T t): m_t(std::move(t)) {}
     expected(unexpected<E> e): m_e(std::move(e)) {}
 
-    expected& operator=(const expected<T, E>&) = default;
-    expected& operator=(expected<T, E>&&) = default;
+    expected(const expected&) = default;
+    expected(expected&&) = default;
+
+    expected& operator=(const expected&) = default;
+    expected& operator=(expected&&) = default;
 
     expected& operator=(const T& t)
     {
