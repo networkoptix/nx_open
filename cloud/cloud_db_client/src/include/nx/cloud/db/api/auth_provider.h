@@ -232,15 +232,4 @@ struct SystemNonce
     std::string nonce;
 };
 
-class SystemUserAuthInfoRecord : public AuthInfoRecord
-{
-public:
-    SystemUserAuthInfoRecord(const AuthInfoRecord& base) : AuthInfoRecord(base)
-    {}
-    SystemUserAuthInfoRecord() = default;
-
-    std::string systemId;
-    std::string accountId;
-};
-
 } // namespace nx::cloud::db::api
