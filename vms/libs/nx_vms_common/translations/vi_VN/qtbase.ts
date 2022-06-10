@@ -231,7 +231,7 @@
     <name>QCocoaTheme</name>
     <message>
       <source>Don&apos;t Save</source>
-      <translation>Don&apos;t Lưu</translation>
+      <translation>Không Lưu</translation>
     </message>
   </context>
   <context>
@@ -258,7 +258,7 @@
     </message>
     <message>
       <source>Bl&amp;ue:</source>
-      <translation>Màu xanh da trời:</translation>
+      <translation>Xanh lam:</translation>
     </message>
     <message>
       <source>A&amp;lpha channel:</source>
@@ -407,11 +407,11 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Failure to write block</source>
-      <translation>Thất bại trong việc viết block</translation>
+      <translation>Không thể ghi khối</translation>
     </message>
     <message>
       <source>Cannot create %1 for output</source>
-      <translation>Không thể tạo ra %1 cho đầu ra</translation>
+      <translation>Không thể tạo %1 cho đầu ra</translation>
     </message>
   </context>
   <context>
@@ -569,7 +569,7 @@ Vui lòng kiểm tra lại tên tệp.</translation>
     <message>
       <source>&apos;%1&apos; is write protected.
 Do you want to delete it anyway?</source>
-      <translation>&apos;%1&apos; được bảo vệ. Bạn vẫn muốn xóa?</translation>
+      <translation>&apos;%1&apos; được chống ghi. Bạn vẫn muốn xóa?</translation>
     </message>
     <message>
       <source>Are you sure you want to delete &apos;%1&apos;?</source>

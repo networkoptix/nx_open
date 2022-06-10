@@ -3067,7 +3067,7 @@ to %1</source>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Создать</translation>
     </message>
     <message>
       <source>Restore from Database Backup</source>
