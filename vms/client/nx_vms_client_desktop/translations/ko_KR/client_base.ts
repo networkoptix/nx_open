@@ -9711,7 +9711,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>이 카메라에는 스트림이 하나만 있습니다. 움직임이 있거나 없는 녹화는 동일한 해상도 또는 품질을 공유합니다.</translation>
     </message>
     <message>
       <source>Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
@@ -9743,7 +9743,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this I/O module</source>
-      <translation type="unfinished">Motion detection is disabled for this I/O module</translation>
+      <translation>이 I/O 모듈에 대해 모션 감지가 비활성화되었습니다.</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected I/O modules</source>
@@ -9751,7 +9751,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>This I/O module has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">This I/O module has only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>이 I/O 모듈에는 스트림이 하나만 있습니다. 움직임이 있거나 없는 녹화는 동일한 해상도 또는 품질을 공유합니다.</translation>
     </message>
     <message>
       <source>Some of the selected I/O modules have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
@@ -9806,24 +9806,24 @@ You can still change quality and FPS directly on the camera.</translation>
     <message>
       <source>The encryption password will be required to restore the archive on another system.
 Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</source>
-      <translation type="unfinished">The encryption password will be required to restore the archive on another system.
-Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</translation>
+      <translation>다른 시스템에서 아카이브를 복원하려면 암호화 암호가 필요합니다.
+주의: 이 암호는 재설정할 수 없습니다. 잃어버리면 아카이브를 복구할 수 없습니다.</translation>
     </message>
     <message>
       <source>Encrypts archive data to prevent it from being viewed outside of the system. You will not be required to enter the encryption password to view the video archive within this system.</source>
-      <translation type="unfinished">Encrypts archive data to prevent it from being viewed outside of the system. You will not be required to enter the encryption password to view the video archive within this system.</translation>
+      <translation>아카이브 데이터를 암호화하여 시스템 외부에서 볼 수 없도록 합니다. 이 시스템 내에서 비디오 아카이브를 보기 위해 암호화 암호를 입력할 필요가 없습니다.</translation>
     </message>
     <message>
       <source>Failed to set archive encryption password</source>
-      <translation type="unfinished">Failed to set archive encryption password</translation>
+      <translation>아카이브 암호화 암호를 설정하지 못했습니다.</translation>
     </message>
     <message>
       <source>Does not affect the connections established by server.</source>
-      <translation type="unfinished">Does not affect the connections established by server.</translation>
+      <translation>서버에서 설정한 연결에는 영향을 주지 않습니다.</translation>
     </message>
     <message>
       <source>Enables RTSP traffic encryption.</source>
-      <translation type="unfinished">Enables RTSP traffic encryption.</translation>
+      <translation>RTSP 트래픽 암호화를 활성화합니다.</translation>
     </message>
     <message>
       <source>days</source>
@@ -9831,16 +9831,16 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
-      <translation type="unfinished">Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</translation>
+      <translation>세션이 지정된 기간을 초과하면 로컬 및 LDAP 사용자가 자동으로 로그아웃됩니다.</translation>
     </message>
     <message>
       <source>Unlimited user session lifetime threatens overall System security and may lead to degradation in System performance</source>
-      <translation type="unfinished">Unlimited user session lifetime threatens overall System security and may lead to degradation in System performance</translation>
+      <translation>무제한 사용자 세션 수명은 전체 시스템 보안을 위협하고 시스템 성능 저하로 이어질 수 있습니다.</translation>
     </message>
     <message>
       <source>It is recommended to have user session lifetime not greater than %1</source>
       <comment>%1 is the time span with time units</comment>
-      <translation type="unfinished">It is recommended to have user session lifetime not greater than %1</translation>
+      <translation>사용자 세션 수명은 %1보다 크지 않는 것이 좋습니다.</translation>
     </message>
     <message>
       <source>Learn more.</source>
@@ -9954,7 +9954,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
-      <translation type="unfinished">You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</translation>
+      <translation>이 서버에 연결을 시도했지만 자동으로 확인할 수 없는 인증서를 제공했습니다.</translation>
     </message>
     <message>
       <source>Someone may be impersonating this Server to steal your personal information.</source>
@@ -9962,7 +9962,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
-      <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
+      <translation>VMS 관리자가 지시하지 않는 한 이 서버에 연결하지 마십시오.</translation>
     </message>
     <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
@@ -9979,7 +9979,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>There are no suitable servers</source>
-      <translation type="unfinished">There are no suitable servers</translation>
+      <translation>적합한 서버가 없습니다</translation>
     </message>
   </context>
   <context>
@@ -10182,13 +10182,13 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message numerus="yes">
       <source>Recording schedule is invalid for %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
+      <translation>
+        <numerusform>%n 카메라의 녹화 일정이 잘못되었습니다.</numerusform>
       </translation>
     </message>
     <message>
       <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
-      <translation type="unfinished">Recording schedule on some cameras contains recording modes that are not supported.</translation>
+      <translation>일부 카메라의 녹화 일정에는 지원되지 않는 녹화 모드가 포함되어 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -10444,7 +10444,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::WelcomeScreen</name>
     <message>
       <source>Are you sure you want to hide this tile?</source>
-      <translation type="unfinished">Are you sure you want to hide this tile?</translation>
+      <translation>이 타일을 숨기시겠습니까?</translation>
     </message>
     <message>
       <source>You will be able to access the %1 login menu at any time by clicking the cloud icon on the navigation panel.</source>
@@ -10773,11 +10773,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
     <message>
       <source>Cannot find an item with the specified id</source>
-      <translation type="unfinished">Cannot find an item with the specified id</translation>
+      <translation>지정된 ID를 가진 항목을 찾을 수 없습니다</translation>
     </message>
     <message>
       <source>Cannot find a resource with the specified id.</source>
-      <translation type="unfinished">Cannot find a resource with the specified id.</translation>
+      <translation>지정된 ID를 가진 리소스를 찾을 수 없습니다.</translation>
     </message>
     <message>
       <source>Cannot specify a media parameters for the resource without media stream.</source>

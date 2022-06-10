@@ -1172,15 +1172,15 @@ to activate PTZ</source>
     </message>
     <message>
       <source>No Hidden Systems</source>
-      <translation type="unfinished">No Hidden Systems</translation>
+      <translation>Không có hệ thống ẩn</translation>
     </message>
     <message>
       <source>You can add system to the favorites from the context menu</source>
-      <translation type="unfinished">You can add system to the favorites from the context menu</translation>
+      <translation>Bạn có thể thêm hệ thống vào danh sách yêu thích từ trình đơn ngữ cảnh</translation>
     </message>
     <message>
       <source>You can hide systems from the main list from the context menu</source>
-      <translation type="unfinished">You can hide systems from the main list from the context menu</translation>
+      <translation>Bạn có thể ẩn các hệ thống khỏi danh sách chính từ trình đơn ngữ cảnh</translation>
     </message>
   </context>
   <context>
@@ -1203,11 +1203,11 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Add to Favorites</source>
-      <translation type="unfinished">Add to Favorites</translation>
+      <translation>Thêm vào mục yêu thích</translation>
     </message>
     <message>
       <source>Remove from Favorites</source>
-      <translation type="unfinished">Remove from Favorites</translation>
+      <translation>Xóa khỏi mục yêu thích</translation>
     </message>
   </context>
   <context>
@@ -1246,7 +1246,7 @@ to activate PTZ</source>
     <name>VisibilityMenu</name>
     <message>
       <source>Hidden</source>
-      <translation type="unfinished">Hidden</translation>
+      <translation>Ẩn</translation>
     </message>
     <message>
       <source>All Systems</source>
@@ -1254,22 +1254,22 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Favorites</source>
-      <translation type="unfinished">Favorites</translation>
+      <translation>Yêu thích</translation>
     </message>
   </context>
   <context>
     <name>WelcomeScreen</name>
     <message>
       <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
-      <translation type="unfinished">You don&apos;t have access to the %1. Please check your internet connection.</translation>
+      <translation>Bạn không có quyền truy cập vào %1. Xin vui lòng kiểm tra kết nối Internet của bạn.</translation>
     </message>
     <message>
       <source>Official Website</source>
-      <translation type="unfinished">Official Website</translation>
+      <translation>Trang web chính thức</translation>
     </message>
     <message>
       <source>Help &amp; User Manual</source>
-      <translation type="unfinished">Help &amp; User Manual</translation>
+      <translation>Trợ giúp &amp; Hướng dẫn Sử dụng</translation>
     </message>
     <message>
       <source>Support</source>
