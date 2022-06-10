@@ -9603,7 +9603,7 @@ Puede forzarlo, pero puede aumentar significativamente la carga de la CPU.</tran
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>Objetos + Baja Resolución</translation>
     </message>
   </context>
   <context>

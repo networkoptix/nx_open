@@ -1147,7 +1147,7 @@
     </message>
     <message>
       <source>Select some devices to setup failover priority</source>
-      <translation>請選擇需錯誤備援的裝置並設置優先順位</translation>
+      <translation>請選擇裝置以設定備援優先權</translation>
     </message>
   </context>
   <context>
@@ -1231,7 +1231,7 @@
     </message>
     <message>
       <source>Connect to the previous system on startup</source>
-      <translation>啟動後自動連線至先前的系統</translation>
+      <translation>啟動後自動連線至先前登入的系統</translation>
     </message>
     <message>
       <source>Automatically restore saved windows configuration</source>
@@ -1772,7 +1772,7 @@
     <name>OauthLoginPlaceholder</name>
     <message>
       <source>Try Again</source>
-      <translation>再試一次</translation>
+      <translation>重試</translation>
     </message>
   </context>
   <context>
@@ -2263,7 +2263,7 @@
     <name>RepeatedPasswordDialog</name>
     <message>
       <source>Repeat Password</source>
-      <translation>重複輸入密碼</translation>
+      <translation>再一次輸入密碼</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
@@ -2398,7 +2398,7 @@
     </message>
     <message>
       <source>Data protection</source>
-      <translation>資料保護</translation>
+      <translation>資料安全加密</translation>
     </message>
     <message>
       <source>Use only HTTPS to connect to cameras</source>
@@ -2406,11 +2406,11 @@
     </message>
     <message>
       <source>User Activity</source>
-      <translation>用戶活動</translation>
+      <translation>使用者操作</translation>
     </message>
     <message>
       <source>Display servers in tree for non-administrator users</source>
-      <translation>非管理者亦能於資源樹列表中看到伺服器的顯示</translation>
+      <translation>允許非管理者帳號亦能於資源樹列表中看到伺服器的顯示</translation>
     </message>
     <message>
       <source>Archive encryption</source>
@@ -2418,7 +2418,7 @@
     </message>
     <message>
       <source>Archive encryption increases CPU usage</source>
-      <translation>啟用錄影資料加密將增加CPU使用率</translation>
+      <translation>啟用錄影資料加密將增加CPU資源使用率</translation>
     </message>
     <message>
       <source>Change Password...</source>
@@ -2434,7 +2434,7 @@
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
-      <translation>強制伺服器僅允許加密的連線</translation>
+      <translation>強制伺服器僅允許加密的連線連入</translation>
     </message>
     <message>
       <source>Encrypt video traffic to desktop and mobile clients</source>
@@ -2476,7 +2476,7 @@
     </message>
     <message>
       <source>Expires</source>
-      <translation>到期日</translation>
+      <translation>有效期到</translation>
     </message>
     <message>
       <source>Certificate is expired</source>

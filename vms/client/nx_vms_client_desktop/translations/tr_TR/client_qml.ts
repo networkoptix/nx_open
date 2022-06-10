@@ -132,7 +132,7 @@
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>Herhangi bir eklenti</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>

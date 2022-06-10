@@ -8809,7 +8809,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>You are about to merge Systems with NVR licenses.</source>
-      <translation type="unfinished">You are about to merge Systems with NVR licenses.</translation>
+      <translation>Du er ved at flette systemer med NVR-licenser.</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per System, so the second license will be deactivated.</source>
