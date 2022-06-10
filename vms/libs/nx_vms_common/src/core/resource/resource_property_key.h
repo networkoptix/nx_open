@@ -62,6 +62,10 @@ static const QString kConfigurationalPtzCapabilities("configurationalPtzCapabili
 static const QString kPtzPanTiltSensitivity("ptzPanTiltSensitivity");
 static const QString kForcedAudioStream("forcedAudioStream");
 
+static const QString kAvailableProfiles("availableProfiles");
+static const QString kForcedPrimaryProfile("forcedPrimaryProfile");
+static const QString kForcedSecondaryProfile("forcedSecondaryProfile");
+
 // Used as Resource-type-only property for some kind of recorders.
 static const QString kGroupPlayParamName("groupplay");
 

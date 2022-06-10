@@ -32,6 +32,7 @@
 #include "../data/recording_days.h"
 #include "../data/analytics_engine_info.h"
 #include "../camera_settings_tab.h"
+#include <nx/vms/api/data/device_profile.h>
 
 namespace nx::vms::client::desktop {
 
@@ -293,6 +294,9 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
         int customMediaPortDisplayValue = kDefaultRtspPort;
         bool areOnvifSettingsApplicable = false;
         UserEditableMultiple<bool> trustCameraTime;
+        UserEditableMultiple<QString> forcedPrimaryProfile;
+        UserEditableMultiple<QString> forcedSecondaryProfile;
+        nx::vms::api::DeviceProfiles availableProfiles;
     };
     ExpertSettings expert;
     bool isDefaultExpertSettings = false;

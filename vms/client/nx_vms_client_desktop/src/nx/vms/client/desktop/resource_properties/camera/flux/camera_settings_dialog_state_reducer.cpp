@@ -480,6 +480,11 @@ bool isDefaultExpertSettings(const State& state)
     if (state.expert.trustCameraTime.valueOr(true))
         return false;
 
+    if (state.expert.forcedPrimaryProfile.valueOr({}).isEmpty())
+        return false;
+    if (state.expert.forcedSecondaryProfile.valueOr({}).isEmpty())
+        return false;
+
     return state.expert.rtpTransportType.hasValue()
         && state.expert.rtpTransportType() == vms::api::RtpTransportType::automatic;
 }
@@ -1024,6 +1029,25 @@ State CameraSettingsDialogStateReducer::updatePtzSettings(
     return state;
 }
 
+nx::vms::api::DeviceProfiles intersectProfiles(
+    const nx::vms::api::DeviceProfiles& left,
+    const nx::vms::api::DeviceProfiles& right)
+{
+    nx::vms::api::DeviceProfiles result;
+    for (const auto& p: left)
+    {
+        if (std::any_of(right.begin(), right.end(), 
+            [token = p.token](const auto& p) 
+            { 
+                return p.token == token;
+            }))
+        {
+            result.push_back(p);
+        }
+    }
+    return result;
+}
+
 State CameraSettingsDialogStateReducer::loadCameras(
     State state,
     const Cameras& cameras,
@@ -1084,6 +1108,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.motion = {};
     state.motion.currentSensitivity = QnMotionRegion::kDefaultSensitivity;
     state.virtualCameraIgnoreTimeZone = false;
+    state.expert.availableProfiles.clear();
 
     state.deviceType = singleCamera
         ? QnDeviceDependentStrings::calculateDeviceType(singleCamera->resourcePool(), cameras)
@@ -1211,6 +1236,25 @@ State CameraSettingsDialogStateReducer::loadCameras(
                 camera->getProperty(QnMediaResource::rtpTransportKey()).toStdString(),
                 vms::api::RtpTransportType::automatic);
         });
+    fetchFromCameras<QString>(state.expert.forcedPrimaryProfile, cameras,
+        [](const Camera& camera) { return camera->forcedProfile(nx::vms::api::StreamIndex::primary); });
+    fetchFromCameras<QString>(state.expert.forcedSecondaryProfile, cameras,
+        [](const Camera& camera) { return camera->forcedProfile(nx::vms::api::StreamIndex::secondary); });
+
+    bool firstStep = true;
+    for (const auto& camera: cameras)
+    {
+        if (firstStep)
+        {
+            state.expert.availableProfiles = camera->availableProfiles();
+        }
+        else
+        {
+            state.expert.availableProfiles = 
+                intersectProfiles(state.expert.availableProfiles, (camera->availableProfiles()));
+        }
+        firstStep = false;
+    }
 
     fetchFromCameras<bool>(state.expert.trustCameraTime, cameras,
         [](const Camera& camera)
@@ -2267,6 +2311,28 @@ State CameraSettingsDialogStateReducer::setRtpTransportType(
     return state;
 }
 
+State CameraSettingsDialogStateReducer::setForcedPrimaryProfile(
+    State state, const QString& value)
+{
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
+    state.expert.forcedPrimaryProfile.setUser(value);
+    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setForcedSecondaryProfile(
+    State state, const QString& value)
+{
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
+    state.expert.forcedSecondaryProfile.setUser(value);
+    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+    state.hasChanges = true;
+    return state;
+}
+
 State CameraSettingsDialogStateReducer::setMotionStream(State state, StreamIndex value)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
@@ -2384,6 +2450,8 @@ State CameraSettingsDialogStateReducer::resetExpertSettings(State state)
     state = setForcedPtzPanTiltCapability(std::move(state), false);
     state = setForcedPtzZoomCapability(std::move(state), false);
     state = setRtpTransportType(std::move(state), nx::vms::api::RtpTransportType::automatic);
+    state = setForcedPrimaryProfile(std::move(state), QString());
+    state = setForcedSecondaryProfile(std::move(state), QString());
     state = setCustomMediaPortUsed(std::move(state), false);
     state = setTrustCameraTime(std::move(state), false);
     state = setLogicalId(std::move(state), {});

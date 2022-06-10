@@ -583,6 +583,18 @@ void CameraSettingsDialogStore::setRtpTransportType(nx::vms::api::RtpTransportTy
         [&](State state) { return Reducer::setRtpTransportType(std::move(state), value); });
 }
 
+void CameraSettingsDialogStore::setForcedPrimaryProfile(const QString& value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setForcedPrimaryProfile(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setForcedSecondaryProfile(const QString& value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setForcedSecondaryProfile(std::move(state), value); });
+}
+
 void CameraSettingsDialogStore::setAutoMediaPortUsed(bool value)
 {
     d->executeAction(

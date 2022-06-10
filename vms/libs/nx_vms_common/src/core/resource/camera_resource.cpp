@@ -936,3 +936,37 @@ bool QnVirtualCameraResource::canApplySchedule(const QnScheduleTaskList& schedul
         isMotionDetectionActive(),
         !supportedObjectTypes().empty());
 }
+
+void QnVirtualCameraResource::setAvailableProfiles(const nx::vms::api::DeviceProfiles& value)
+{
+    setProperty(ResourcePropertyKey::kAvailableProfiles,
+        QString::fromStdString(nx::reflect::json::serialize(value)));
+}
+
+nx::vms::api::DeviceProfiles QnVirtualCameraResource::availableProfiles() const
+{
+    nx::vms::api::DeviceProfiles profiles;
+    if (!nx::reflect::json::deserialize(
+        getProperty(ResourcePropertyKey::kAvailableProfiles).toStdString(), &profiles))
+    {
+        NX_WARNING(this, "Failed to deserialize available profiles for device %1", getId());
+    }
+    return profiles;
+}
+
+void QnVirtualCameraResource::setForcedProfile(const QString& token, nx::vms::api::StreamIndex index)
+{
+    using namespace nx::vms::api;
+    setProperty(index == StreamIndex::primary 
+        ? ResourcePropertyKey::kForcedPrimaryProfile 
+        : ResourcePropertyKey::kForcedSecondaryProfile,
+        token);
+}
+
+QString QnVirtualCameraResource::forcedProfile(nx::vms::api::StreamIndex index)
+{
+    return getProperty(
+        index == StreamIndex::primary 
+        ? ResourcePropertyKey::kForcedPrimaryProfile 
+        : ResourcePropertyKey::kForcedSecondaryProfile);
+}

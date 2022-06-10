@@ -16,6 +16,7 @@
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/utils/log/log.h>
 #include <ui/common/read_only.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -28,6 +29,8 @@
 namespace nx::vms::client::desktop {
 
 namespace {
+
+static const int kHintUserRole = Qt::UserRole + 2;
 
 void activateLayouts(const std::initializer_list<QWidget*>& widgets)
 {
@@ -70,6 +73,42 @@ bool isAutoPtzPreset(const CameraSettingsDialogState& state)
     return state.expert.preferredPtzPresetType.equals(nx::core::ptz::PresetType::undefined);
 }
 
+void fillProfiles(
+    const CameraSettingsDialogState& state,
+    const UserEditableMultiple<QString>& userDefinedProfile,
+    ComboBoxWithHint* comboBox,
+    bool isPrimary)
+{
+    static const QString kDefaultProfileHint = CameraExpertSettingsWidget::tr("default");
+
+    comboBox->clear();
+    combo_box_utils::insertMultipleValuesItem(comboBox);
+    comboBox->addItem(CameraExpertSettingsWidget::tr("Auto", "Automatic profile selection"), QString());
+    for (const auto& p : state.expert.availableProfiles)
+    {
+        using namespace nx::vms::api;
+        comboBox->addItem(QString::fromStdString(p.name), QString::fromStdString(p.token));
+        if (p.state == DeviceProfile::State::primaryDefault && isPrimary
+            || p.state == DeviceProfile::State::secondaryDefault && !isPrimary)
+        {
+            comboBox->setItemHint(comboBox->count() - 1, kDefaultProfileHint);
+        }
+    }
+
+    if (userDefinedProfile.hasValue())
+    {
+        const QVariant profileToken = QVariant::fromValue(userDefinedProfile());
+        auto index = comboBox->findData(profileToken);
+        if (index == -1)
+            index = 0; //< Use 'auto' value in case of selected profile is unavailable now.
+        comboBox->setCurrentIndex(index);
+    }
+    else
+    {
+        comboBox->setCurrentIndex(/*multiple values*/ 0);
+    }
+}
+
 } // namespace
 
 CameraExpertSettingsWidget::CameraExpertSettingsWidget(
@@ -104,7 +143,7 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
 
     ui->useMedia2ToFetchProfilesComboBox->clear();
     combo_box_utils::insertMultipleValuesItem(ui->useMedia2ToFetchProfilesComboBox);
-    ui->useMedia2ToFetchProfilesComboBox->addItem(tr("Automatic selection"),
+    ui->useMedia2ToFetchProfilesComboBox->addItem(tr("Auto"),
         QVariant::fromValue(nx::core::resource::UsingOnvifMedia2Type::autoSelect));
     ui->useMedia2ToFetchProfilesComboBox->addItem(tr("Use if supported"),
         QVariant::fromValue(nx::core::resource::UsingOnvifMedia2Type::useIfSupported));
@@ -208,6 +247,22 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
             store->setRtpTransportType(
                 ui->comboBoxTransport->itemData(index).value<vms::api::RtpTransportType>());
         });
+
+    connect(ui->comboBoxPrimaryProfile, QnComboboxCurrentIndexChanged, store,
+        [this, store](int index)
+        {
+            store->setForcedPrimaryProfile(
+                ui->comboBoxPrimaryProfile->itemData(index).value<QString>());
+        });
+
+    connect(ui->comboBoxSecondaryProfile, QnComboboxCurrentIndexChanged, store,
+        [this, store](int index)
+        {
+            store->setForcedSecondaryProfile(
+                ui->comboBoxSecondaryProfile->itemData(index).value<QString>());
+        });
+    ui->comboBoxPrimaryProfile->setHintRole(kHintUserRole);
+    ui->comboBoxSecondaryProfile->setHintRole(kHintUserRole);
 
     connect(ui->restoreDefaultsButton, &QPushButton::clicked,
         store, &CameraSettingsDialogStore::resetExpertSettings);
@@ -338,6 +393,8 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     ui->useMedia2ToFetchProfilesComboBox->setCurrentIndex(index);
 
     ::setReadOnly(ui->useMedia2ToFetchProfilesComboBox, state.readOnly);
+    ::setReadOnly(ui->comboBoxPrimaryProfile, state.readOnly);
+    ::setReadOnly(ui->comboBoxSecondaryProfile, state.readOnly);
 
     // TODO: #vkutin #sivanov Should we disable it too when camera control is disabled?
     ui->bitratePerGopCheckBox->setEnabled(state.settingsOptimizationEnabled);
@@ -427,6 +484,11 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     {
         ui->comboBoxTransport->setCurrentIndex(0/*multiple values*/);
     }
+
+    fillProfiles(state, state.expert.forcedPrimaryProfile, 
+        ui->comboBoxPrimaryProfile, /*isPrimary*/ true);
+    fillProfiles(state, state.expert.forcedSecondaryProfile, 
+        ui->comboBoxSecondaryProfile, /*isPrimary*/ false);
 
     ::setReadOnly(ui->comboBoxTransport, state.readOnly);
     if (state.expert.customMediaPort.hasValue())

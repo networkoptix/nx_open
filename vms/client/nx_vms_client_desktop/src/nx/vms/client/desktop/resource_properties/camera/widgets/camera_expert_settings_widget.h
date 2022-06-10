@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QStringList>
+#include <QtWidgets/QComboBox>
 #include <QtWidgets/QWidget>
 
 #include <common/common_globals.h>
