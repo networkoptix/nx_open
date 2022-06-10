@@ -13,8 +13,6 @@ import Nx.Utils 1.0
 
 import nx.vms.client.core 1.0
 
-import "private"
-
 Item
 {
     id: analyticsSettings
@@ -208,6 +206,13 @@ Item
                 if (currentEngineId)
                     store.setAnalyticsStreamIndex(currentEngineId, currentStreamIndex)
             }
+        }
+
+        placeholderItem: SettingsPlaceholder
+        {
+            header: qsTr("This integration has no settings for this Camera.")
+            description:
+                qsTr("Check System Administration Settings to configure this integration.")
         }
     }
 

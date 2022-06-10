@@ -20,6 +20,7 @@ Item
     property bool contentVisible: true
     property Item scrollBarParent: null
     property Item headerItem: null
+    property Item placeholderItem: null
 
     property var resourceId: NxGlobals.uuid("")
     property var engineId: NxGlobals.uuid("")
@@ -36,7 +37,10 @@ Item
         let scrollPosition = contentItem ? contentItem.verticalScrollBar.position : 0.0
 
         if (contentItem)
+        {
+            contentItem.visible = false
             contentItem.destroy()
+        }
 
         contentItem = Settings.createItems(settingsView, model)
         if (!contentItem)
@@ -46,6 +50,7 @@ Item
         contentItem.contentVisible = Qt.binding(function() { return contentVisible })
         contentItem.scrollBarParent = Qt.binding(function() { return scrollBarParent })
         contentItem.extraHeaderItem = Qt.binding(function() { return headerItem })
+        contentItem.placeholderItem = Qt.binding(function() { return placeholderItem })
         impl.sectionPaths = Settings.buildSectionPaths(model)
 
         if (restoreScrollPosition)

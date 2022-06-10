@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick 2.0
+import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.10
 
 import Nx.Controls 1.0
@@ -17,12 +18,17 @@ StackLayout
     property Item scrollBarParent: null
     property alias verticalScrollBar: view.verticalScrollBar
     property Item extraHeaderItem: null
+    property alias placeholderItem: placeholderContainer.contentItem
 
     property bool contentEnabled: parent && parent.hasOwnProperty("contentEnabled")
         ? parent.contentEnabled
         : true
 
     property bool contentVisible: true
+
+    readonly property bool hasOtherSections: control.children.length > 1
+    readonly property bool hasItems: childrenItem.children.length
+    readonly property bool isEmpty: !hasOtherSections && !hasItems
 
     Scrollable
     {
@@ -40,8 +46,6 @@ StackLayout
 
         contentItem: Column
         {
-            spacing: 32
-
             width:
             {
                 return view.verticalScrollBar && view.verticalScrollBar.parent === view
@@ -71,15 +75,35 @@ StackLayout
                 }
             }
 
+            Control
+            {
+                id: placeholderContainer
+                width: parent.width
+                height: view.height - y
+                visible: control.isEmpty && control.contentVisible
+                onContentItemChanged: contentItem.parent = placeholderContainer
+            }
+
+            Item
+            {
+                id: spacer
+                height: 32
+                width: 1
+                visible: extraHeaderItem && control.hasItems
+            }
+
             AlignedColumn
             {
                 id: column
 
-                spacing: 16
+                // It's allowed to fill the height if there is only one item.
+                readonly property var singleItemHeightHint:
+                    (children.length == 1) ? view.height - y : undefined
 
+                spacing: 16
                 width: parent.width
                 enabled: control.contentEnabled
-                visible: control.contentVisible
+                visible: control.contentVisible && control.hasItems
             }
         }
     }

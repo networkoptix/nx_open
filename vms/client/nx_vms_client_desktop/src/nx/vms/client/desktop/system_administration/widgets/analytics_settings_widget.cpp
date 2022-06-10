@@ -30,15 +30,7 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-QVariantMap engineInfoToVariantMap(const AnalyticsEnginesWatcher::AnalyticsEngineInfo& info)
-{
-    return QVariantMap{
-        {"id", QVariant::fromValue(info.id)},
-        {"name", info.name}
-    };
-}
-
-bool isEngineVisible(const AnalyticsEnginesWatcher::AnalyticsEngineInfo& info)
+bool isEngineVisible(const AnalyticsEngineInfo& info)
 {
     // Device-dependent plugins without settings must be hidden.
     if (!info.isDeviceDependent)
@@ -122,8 +114,7 @@ signals:
     void loadingChanged();
 
 private:
-    void addEngine(
-        const QnUuid& engineId, const AnalyticsEnginesWatcher::AnalyticsEngineInfo& engineInfo);
+    void addEngine(const QnUuid& engineId, const AnalyticsEngineInfo& engineInfo);
     void removeEngine(const QnUuid& engineId);
     void updateEngine(const QnUuid& engineId);
     void setErrors(const QnUuid& engineId, const QJsonObject& errors);
@@ -196,8 +187,7 @@ void AnalyticsSettingsWidget::Private::updateEngines()
 }
 
 void AnalyticsSettingsWidget::Private::addEngine(
-    const QnUuid& /*engineId*/,
-    const AnalyticsEnginesWatcher::AnalyticsEngineInfo& engineInfo)
+    const QnUuid& /*engineId*/, const AnalyticsEngineInfo& engineInfo)
 {
     // Hide device-dependent engines without settings on the model level.
     if (!isEngineVisible(engineInfo))
@@ -209,7 +199,7 @@ void AnalyticsSettingsWidget::Private::addEngine(
             return item.toMap().value("name").toString() < engineInfo.name;
         });
 
-    engines.insert(it, engineInfoToVariantMap(engineInfo));
+    engines.insert(it, engineInfo.toVariantMap());
 
     emit analyticsEnginesChanged();
 }
@@ -246,7 +236,7 @@ void AnalyticsSettingsWidget::Private::updateEngine(const QnUuid& engineId)
     if (!isEngineVisible(engineInfo))
         engines.erase(it);
     else
-        *it = engineInfoToVariantMap(engineInfo);
+        *it = engineInfo.toVariantMap();
 
     emit analyticsEnginesChanged();
 }

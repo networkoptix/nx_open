@@ -15,6 +15,8 @@ Item
 
     property var store
     readonly property alias currentEngineId: menu.currentEngineId
+    property var engines: store ? store.analyticsEngines : []
+    property var currentEngineInfo: engines.find(engine => engine.id == currentEngineId)
 
     AnalyticsSettingsMenu
     {
@@ -23,8 +25,8 @@ Item
         width: 240
         height: parent.height
 
-        engines: store ? store.analyticsEngines : []
-        enabledEngines: engines
+        engines: analyticsSettings.engines
+        enabledEngines: engines.map(engine => engine.id)
 
         onCurrentEngineIdChanged:
             activateEngine(currentEngineId)
@@ -54,6 +56,20 @@ Item
         anchors.left: menu.right
         anchors.right: scrollBarParent.left
         anchors.margins: 16
+
+        headerItem: InformationPanel
+        {
+            checkable: false
+            refreshable: false
+            streamSelectorVisible: false
+            engineInfo: currentEngineInfo
+        }
+
+        placeholderItem: SettingsPlaceholder
+        {
+            header: qsTr("This integration has no settings at System level.")
+            description: qsTr("Check Camera Settings to configure this integration.")
+        }
 
         onValuesEdited: function(activeElement)
         {

@@ -1,3 +1,5 @@
 module Nx.InteractiveSettings
 
 SettingsView 1.0 SettingsView.qml
+SettingsPlaceholder 1.0 SettingsPlaceholder.qml
+InformationPanel 1.0 InformationPanel.qml
