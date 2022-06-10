@@ -37,6 +37,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <recording/time_period.h>
 #include <ui/common/palette.h>
 #include <ui/delegates/audit_item_delegate.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
@@ -57,12 +58,6 @@ using namespace nx::vms::client::desktop;
 using namespace ui;
 
 namespace {
-
-enum MasterGridTabIndex
-{
-    SessionTab,
-    CameraTab
-};
 
 const char* checkBoxCheckedProperty("checkboxChecked");
 const char* checkBoxFilterProperty("checkboxFilter");
@@ -179,7 +174,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
     auto updateDetailsEmptyMessage =
         [detailsAutoHider](int currentTab)
         {
-            detailsAutoHider->setEmptyViewMessage(currentTab == SessionTab
+            detailsAutoHider->setEmptyViewMessage(currentTab == sessionTabIndex
                 ? tr("Select sessions to see their details")
                 : tr("Select cameras to see their details"));
         };
@@ -195,6 +190,24 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
 
 QnAuditLogDialog::~QnAuditLogDialog()
 {
+}
+
+void QnAuditLogDialog::setSearchText(const QString& text)
+{
+    ui->filterLineEdit->setText(text);
+}
+
+void QnAuditLogDialog::setSearchPeriod(const QnTimePeriod& period)
+{
+    if (!period.isValid() || period.isInfinite())
+        return;
+
+    ui->dateRangeWidget->setRange(period.startTimeMs, period.endTimeMs());
+}
+
+void QnAuditLogDialog::setFocusTab(MasterGridTabIndex tabIndex)
+{
+    ui->mainTabWidget->setCurrentIndex(tabIndex);
 }
 
 void QnAuditLogDialog::setupSessionsGrid()
@@ -437,7 +450,7 @@ void QnAuditLogDialog::at_selectAllCheckboxChanged()
 
 void QnAuditLogDialog::at_currentTabChanged()
 {
-    bool allEnabled = (ui->mainTabWidget->currentIndex() == SessionTab);
+    bool allEnabled = (ui->mainTabWidget->currentIndex() == sessionTabIndex);
     const Qn::AuditRecordTypes camerasTypes = Qn::AR_ViewLive | Qn::AR_ViewArchive | Qn::AR_ExportVideo | Qn::AR_CameraUpdate | Qn::AR_CameraInsert | Qn::AR_CameraRemove;
 
     for(QCheckBox* checkBox: m_filterCheckboxes)
@@ -466,7 +479,7 @@ void QnAuditLogDialog::at_filterChanged()
 {
     m_filteredData = applyFilter();
 
-    if (ui->mainTabWidget->currentIndex() == SessionTab)
+    if (ui->mainTabWidget->currentIndex() == sessionTabIndex)
     {
         QSet<QnUuid> filteredIdList;
         for (const QnAuditRecord* record: m_filteredData)
@@ -509,7 +522,7 @@ void QnAuditLogDialog::at_updateDetailModel()
     QString labelText;
     ui->gridDetails->setUpdatesEnabled(false);
 
-    if (ui->mainTabWidget->currentIndex() == SessionTab)
+    if (ui->mainTabWidget->currentIndex() == sessionTabIndex)
     {
         QnAuditRecordRefList checkedRows = m_sessionModel->checkedRows();
         auto data = filterChildDataBySessions(checkedRows);
@@ -1006,7 +1019,7 @@ TableView* QnAuditLogDialog::currentGridView() const
 {
     if (ui->gridDetails->hasFocus())
         return ui->gridDetails;
-    else if (ui->mainTabWidget->currentIndex() == SessionTab)
+    else if (ui->mainTabWidget->currentIndex() == sessionTabIndex)
         return ui->gridMaster;
     else
         return ui->gridCameras;

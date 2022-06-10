@@ -18,6 +18,7 @@ class QnAuditLogMasterModel;
 class QnAuditLogDetailModel;
 class QnAuditItemDelegate;
 class QnAuditLogModel;
+class QnTimePeriod;
 class QLabel;
 
 namespace Ui { class AuditLogDialog; }
@@ -29,11 +30,22 @@ class QnAuditLogDialog: public QnSessionAwareDialog
     using base_type = QnSessionAwareDialog;
 
 public:
+    enum MasterGridTabIndex
+    {
+        sessionTabIndex,
+        cameraTabIndex
+    };
+
+public:
     explicit QnAuditLogDialog(QWidget* parent);
     virtual ~QnAuditLogDialog();
 
     void disableUpdateData();
     void enableUpdateData();
+
+    void setSearchText(const QString& text);
+    void setSearchPeriod(const QnTimePeriod& period);
+    void setFocusTab(MasterGridTabIndex tabIndex);
 
 protected:
     virtual void setVisible(bool value) override;
