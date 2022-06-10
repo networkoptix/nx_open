@@ -20,6 +20,7 @@
 
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 #include <nx/vms/api/types/rtp_types.h>
+#include <nx/vms/api/data/device_profile.h>
 
 class CameraMediaStreams;
 class CameraBitrates;
@@ -223,6 +224,27 @@ public:
     static constexpr QSize kMaximumSecondaryStreamResolution{1024, 768};
     static constexpr int kMaximumMotionDetectionPixels
         = kMaximumSecondaryStreamResolution.width() * kMaximumSecondaryStreamResolution.height();
+
+    /**
+     * Set a list of available device profiles. It can be used on camera Expert dialog
+     * to manually setup camera profile to use
+     */
+    void setAvailableProfiles(const nx::vms::api::DeviceProfiles& value);
+
+    /**
+     * Get a list of available device profiles.
+     */
+    nx::vms::api::DeviceProfiles availableProfiles() const;
+
+    /**
+     * Manually setup a profile ID to use.
+     */
+    void setForcedProfile(const QString& id, nx::vms::api::StreamIndex index);
+
+    /**
+     * Read manually configured profile ID to use. Can be empty.
+     */
+    QString forcedProfile(nx::vms::api::StreamIndex index);
 
 signals:
     void ptzCapabilitiesChanged(const QnVirtualCameraResourcePtr& camera);

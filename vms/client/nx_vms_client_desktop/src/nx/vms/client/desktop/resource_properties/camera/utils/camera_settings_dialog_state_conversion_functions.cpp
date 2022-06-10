@@ -296,6 +296,18 @@ void setRtpTransportType(nx::vms::api::RtpTransportType value, const Cameras& ca
         camera->setProperty(QnMediaResource::rtpTransportKey(), valueStr);
 }
 
+void setForcedPrimaryProfile(const QString& value, const Cameras& cameras)
+{
+    for (const auto& camera: cameras)
+        camera->setForcedProfile(value, nx::vms::api::StreamIndex::primary);
+}
+
+void setForcedSecondaryProfile(const QString& value, const Cameras& cameras)
+{
+    for (const auto& camera: cameras)
+        camera->setForcedProfile(value, nx::vms::api::StreamIndex::secondary);
+}
+
 void setTrustCameraTime(bool value, const Cameras& cameras)
 {
     for (const auto& camera: cameras)
@@ -709,6 +721,12 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
 
     if (state.expert.rtpTransportType.hasValue())
         setRtpTransportType(state.expert.rtpTransportType(), cameras);
+
+    if (state.expert.forcedPrimaryProfile.hasValue())
+        setForcedPrimaryProfile(state.expert.forcedPrimaryProfile(), cameras);
+
+    if (state.expert.forcedSecondaryProfile.hasValue())
+        setForcedSecondaryProfile(state.expert.forcedSecondaryProfile(), cameras);
 
     if (state.expert.customMediaPort.hasValue())
         setCustomMediaPort(state.expert.customMediaPort(), cameras);
