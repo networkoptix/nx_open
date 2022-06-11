@@ -5,7 +5,7 @@
     <name>AdvancedUpdateSettings</name>
     <message>
       <source>Advanced Update Settings</source>
-      <translation>Geavanceerde Update instellingen</translation>
+      <translation>Geavanceerde Update-instellingen</translation>
     </message>
     <message>
       <source>Notifications</source>
