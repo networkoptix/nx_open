@@ -10278,7 +10278,7 @@ Uwaga: To hasło nie może zostać zresetowane. Jeśli je zgubisz, archiwum nie 
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
       <comment>%n is digest user count, %1 is total user count</comment>
       <translation type="unfinished">
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
+        <numerusform>%n z %1 użytkowników może korzystać z niebezpieczniego uwierzytelniania.</numerusform>
         <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
         <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
         <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
@@ -11192,11 +11192,11 @@ Nie przypinaj tego certyfikatu, jeśli &apos; nie zmodyfikowałeś %2 certyfikat
     </message>
     <message>
       <source>Modifier</source>
-      <translation type="unfinished">Modifier</translation>
+      <translation>Modyfikacja</translation>
     </message>
     <message>
       <source>Multiple</source>
-      <translation type="unfinished">Multiple</translation>
+      <translation>Wiele</translation>
     </message>
   </context>
   <context>

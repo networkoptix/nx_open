@@ -364,15 +364,15 @@
     </message>
     <message>
       <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</translation>
+      <translation>Indien uitgeschakeld, probeer dan Opname in te schakelen in I/O Module-instellingen (fout &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</translation>
+      <translation>Indien uitgeschakeld, probeer Opname in te schakelen en de framerate te verlagen in Apparaatinstellingen (fout &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</translation>
+      <translation>Indien uitgeschakeld, probeer Opname in te schakelen en de framerate te verlagen in Camerainstellingen (fout &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>

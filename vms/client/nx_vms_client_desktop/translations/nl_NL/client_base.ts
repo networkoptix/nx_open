@@ -96,7 +96,7 @@
     </message>
     <message>
       <source>Cannot connect to the System</source>
-      <translation type="unfinished">Cannot connect to the System</translation>
+      <translation>Kan geen verbinding maken met het systeem</translation>
     </message>
   </context>
   <context>
@@ -1021,7 +1021,7 @@
     </message>
     <message>
       <source>Account Security...</source>
-      <translation type="unfinished">Account Security...</translation>
+      <translation>Accountbeveiliging...</translation>
     </message>
   </context>
   <context>
@@ -2944,11 +2944,11 @@ to %1</source>
     </message>
     <message>
       <source>System is not compatible with two-factor authentication</source>
-      <translation type="unfinished">System is not compatible with two-factor authentication</translation>
+      <translation>Het systeem is niet geschikt voor tweestapsverificatie</translation>
     </message>
     <message>
       <source>Failed to log in to &quot;%1&quot; system</source>
-      <translation type="unfinished">Failed to log in to &quot;%1&quot; system</translation>
+      <translation>Aanmelden bij &quot;%1&quot; systeem mislukt</translation>
     </message>
   </context>
   <context>
@@ -4854,7 +4854,7 @@ to %1</source>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
-      <translation type="unfinished">Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</translation>
+      <translation>Servers met failover ingeschakeld nemen automatisch camera's over van offline servers met dezelfde locatie ID.</translation>
     </message>
   </context>
   <context>
@@ -7602,7 +7602,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     </message>
     <message>
       <source>No cameras available</source>
-      <translation type="unfinished">No cameras available</translation>
+      <translation>Geen camera's beschikbaar</translation>
     </message>
   </context>
   <context>
@@ -8462,7 +8462,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     </message>
     <message>
       <source>No Failover</source>
-      <translation type="unfinished">No Failover</translation>
+      <translation>Geen failover</translation>
     </message>
   </context>
   <context>
@@ -9244,7 +9244,7 @@ Je kunt het forceren, maar het kan de CPU-belasting aanzienlijk verhogen.</trans
     </message>
     <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
-      <translation type="unfinished">There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</translation>
+      <translation>Er is niet genoeg ruimte op uw computer om de Client update te downloaden. Maak wat ruimte vrij op uw harde schijf en probeer het opnieuw.</translation>
     </message>
   </context>
   <context>
@@ -10098,19 +10098,19 @@ Pin dit certificaat niet vast als u het %2 server SSL-certificaat niet hebt gewi
     </message>
     <message>
       <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
-      <translation type="unfinished">You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</translation>
+      <translation>U hebt geprobeerd om verbinding te maken met deze server, maar het beschikt over een beveiligingscertificaat dat niet automatisch kan worden geverifieerd.</translation>
     </message>
     <message>
       <source>Someone may be impersonating this Server to steal your personal information.</source>
-      <translation type="unfinished">Someone may be impersonating this Server to steal your personal information.</translation>
+      <translation>Iemand kan zich voordoen als deze server om uw persoonlijke gegevens te stelen.</translation>
     </message>
     <message>
       <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
-      <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
+      <translation>Maak geen verbinding met deze server, tenzij u goedkeuring heeft van uw VMS-beheerder.</translation>
     </message>
     <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
-      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct Server.</translation>
+      <translation>Controleer de gegevens van het certificaat om ervoor te zorgen dat u verbinding maakt met de juiste server.</translation>
     </message>
   </context>
   <context>

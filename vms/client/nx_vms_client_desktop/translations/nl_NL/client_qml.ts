@@ -5,7 +5,7 @@
     <name>AdvancedUpdateSettings</name>
     <message>
       <source>Advanced Update Settings</source>
-      <translation>Geavanceerde Update instellingen</translation>
+      <translation>Geavanceerde Update-instellingen</translation>
     </message>
     <message>
       <source>Notifications</source>
@@ -803,7 +803,7 @@
     </message>
     <message>
       <source>Preview is not available for the selected object</source>
-      <translation type="unfinished">Preview is not available for the selected object</translation>
+      <translation>Een voorbeeld is niet beschikbaar voor het geselecteerde object</translation>
     </message>
   </context>
   <context>

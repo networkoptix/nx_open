@@ -95,7 +95,7 @@
     </message>
     <message>
       <source>Cannot connect to the System</source>
-      <translation type="unfinished">Cannot connect to the System</translation>
+      <translation>시스템에 연결할 수 없습니다</translation>
     </message>
   </context>
   <context>
@@ -925,7 +925,7 @@
     </message>
     <message>
       <source>Save Window Configuration</source>
-      <translation type="unfinished">Save Window Configuration</translation>
+      <translation>Window 구성 저장</translation>
     </message>
     <message>
       <source>Save Windows Configuration</source>
@@ -5989,7 +5989,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Connect anyway</source>
-      <translation type="unfinished">Connect anyway</translation>
+      <translation>그래도 연결</translation>
     </message>
     <message>
       <source>Web page settings...</source>
@@ -6001,10 +6001,10 @@ If you intended to move analytics data to another storage location, please conta
 but this web page presented an untrusted certificate auth.
 We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
       <comment>%1 is the web page address</comment>
-      <translation type="unfinished">You try to open the
+      <translation>
 %1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</translation>
+를 열려고 시도했지만 이 웹 페이지는 신뢰할 수 없는 인증을 제공했습니다.
+이 웹 페이지를 열지 않는 것이 좋습니다. 위험을 이해하면 웹 페이지를 열 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -6123,7 +6123,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Could not open file &apos;%1&apos;. Please check if the folder is accessible</source>
-      <translation type="unfinished">Could not open file &apos;%1&apos;. Please check if the folder is accessible</translation>
+      <translation>&apos;%1&apos;파일을 열 수 없습니다. 폴더에 액세스할 수 있는지 확인하십시오.</translation>
     </message>
   </context>
   <context>
@@ -6596,11 +6596,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
-      <translation type="unfinished">You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</translation>
+      <translation>이 웹페이지를 서버 &quot;%1&quot;로 이동하려고 합니다. 이 웹페이지는 요청된 모든 콘텐츠를 프록시하고 해당 프록시 서버는 서버 &quot;%1&quot;로 변경됩니다.</translation>
     </message>
     <message>
       <source>You are about to move this webpage to server &quot;%1&quot;. This webpage proxies all requested contents, and its proxy server will change to server &quot;%1&quot;.</source>
-      <translation type="unfinished">You are about to move this webpage to server &quot;%1&quot;. This webpage proxies all requested contents, and its proxy server will change to server &quot;%1&quot;.</translation>
+      <translation>이 웹페이지를 서버 &quot;%1&quot;로 이동하려고 합니다. 이 웹페이지는 요청된 모든 콘텐츠를 프록시 처리하며 프록시 서버는 서버 &quot;%1&quot;로 변경됩니다.</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
@@ -6928,7 +6928,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>카메라 플러그인 설정에서 필터를 변경하거나 객체 검색을 구성합니다.</translation>
     </message>
   </context>
   <context>
@@ -6950,11 +6950,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Use audio stream from</source>
-      <translation type="unfinished">Use audio stream from</translation>
+      <translation>의 오디오 스트림 사용</translation>
     </message>
     <message>
       <source>Transmit audio stream to</source>
-      <translation type="unfinished">Transmit audio stream to</translation>
+      <translation>오디오 스트림 전송 위치</translation>
     </message>
     <message>
       <source>This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</source>
@@ -7267,7 +7267,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraButtonController</name>
     <message>
       <source>Heater</source>
-      <translation type="unfinished">Heater</translation>
+      <translation>히터</translation>
     </message>
     <message>
       <source>Wiper</source>
@@ -7332,11 +7332,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Pan</source>
-      <translation type="unfinished">Pan</translation>
+      <translation>팬</translation>
     </message>
     <message>
       <source>Pan &amp; Tilt</source>
-      <translation type="unfinished">Pan &amp; Tilt</translation>
+      <translation>팬 &amp; 틸트</translation>
     </message>
     <message>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
@@ -7586,11 +7586,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Objects Only</source>
-      <translation type="unfinished">Objects Only</translation>
+      <translation>객체만</translation>
     </message>
     <message>
       <source>Motion &amp; Objects Only</source>
-      <translation type="unfinished">Motion &amp; Objects Only</translation>
+      <translation>모션 &amp; 객체만</translation>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
@@ -7598,11 +7598,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>객체 + 저해상도</translation>
     </message>
     <message>
       <source>Motion &amp; Objects + Lo-Res</source>
-      <translation type="unfinished">Motion &amp; Objects + Lo-Res</translation>
+      <translation>모션 &amp; 객체 + 저해상도</translation>
     </message>
   </context>
   <context>
@@ -7693,7 +7693,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Select a certificate to authenticate yourself to %1:</source>
       <extracomment>%1 here is a host name for which you provide a certificate.</extracomment>
-      <translation type="unfinished">Select a certificate to authenticate yourself to %1:</translation>
+      <translation>%1에 대해 인증할 인증서를 선택하십시오.</translation>
     </message>
     <message>
       <source>Select</source>
@@ -7826,7 +7826,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ConnectToCloudTool</name>
     <message>
       <source>Local System owner is absent or disabled.</source>
-      <translation type="unfinished">Local System owner is absent or disabled.</translation>
+      <translation>로컬 시스템 소유자가 없거나 비활성화되었습니다.</translation>
     </message>
     <message>
       <source>None of your Servers is connected to the Internet.</source>
@@ -7855,7 +7855,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Enter your account password to connect System to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to connect System to %1</translation>
+      <translation>시스템을 %1에 연결하려면 계정 비밀번호를 입력하세요.</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -7943,7 +7943,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
-      <translation type="unfinished">Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</translation>
+      <translation>선택한 카메라에서 지원하지 않는 녹화 모드가 녹화 일정에 포함되어 있습니다. 지원되지 않는 녹화 모드는 &quot;항상 녹화&quot;로 변경됩니다.</translation>
     </message>
   </context>
   <context>
@@ -9496,35 +9496,35 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Recording motion and objects</source>
-      <translation type="unfinished">Recording motion and objects</translation>
+      <translation>모션 및 객체 녹화</translation>
     </message>
     <message>
       <source>Recording objects only</source>
-      <translation type="unfinished">Recording objects only</translation>
+      <translation>객체만 녹화</translation>
     </message>
     <message>
       <source>Recording motion, objects and low quality</source>
-      <translation type="unfinished">Recording motion, objects and low quality</translation>
+      <translation>모션, 객체 저화질 녹화</translation>
     </message>
     <message>
       <source>Recording objects and low quality</source>
-      <translation type="unfinished">Recording objects and low quality</translation>
+      <translation>객체 저화질 녹화</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
-      <translation type="unfinished">Motion, Objects</translation>
+      <translation>모션, 객체</translation>
     </message>
     <message>
       <source>Objects only</source>
-      <translation type="unfinished">Objects only</translation>
+      <translation>객체만</translation>
     </message>
     <message>
       <source>Motion, Objects + Lo-Res</source>
-      <translation type="unfinished">Motion, Objects + Lo-Res</translation>
+      <translation>모션, 객체 + 저해상도</translation>
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>객체 + 저해상도</translation>
     </message>
   </context>
   <context>
@@ -9597,11 +9597,11 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Stream Issue</source>
-      <translation type="unfinished">Stream Issue</translation>
+      <translation>스트림 문제</translation>
     </message>
     <message>
       <source>Device Disconnect</source>
-      <translation type="unfinished">Device Disconnect</translation>
+      <translation>장치 연결 해제</translation>
     </message>
     <message>
       <source>Device IP Conflict</source>
@@ -9665,23 +9665,23 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
-      <translation type="unfinished">Motion, Objects</translation>
+      <translation>모션, 객체</translation>
     </message>
     <message>
       <source>Motion, Objects
  + Low-Res</source>
-      <translation type="unfinished">Motion, Objects
- + Low-Res</translation>
+      <translation>모션, 객체
+ + 저해상도</translation>
     </message>
     <message>
       <source>Objects Only</source>
-      <translation type="unfinished">Objects Only</translation>
+      <translation>객체만</translation>
     </message>
     <message>
       <source>Objects
  + Low-Res</source>
-      <translation type="unfinished">Objects
- + Low-Res</translation>
+      <translation>객체
+ + 저해상도</translation>
     </message>
     <message>
       <source>Motion Only</source>
@@ -9690,12 +9690,12 @@ You can still change quality and FPS directly on the camera.</translation>
     <message>
       <source>Motion
  + Low-Res</source>
-      <translation type="unfinished">Motion
- + Low-Res</translation>
+      <translation>모션
+ + 저해상도</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected devices</translation>
+      <translation>선택한 일부 장치의 모션 감지가 비활성화되었습니다.</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this camera</source>
@@ -9703,43 +9703,43 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected cameras</source>
-      <translation>선택한 일부 카메라에 대해 모션 감지가 비활성화되었습니다.</translation>
+      <translation>선택한 일부 카메라의 모션 감지가 비활성화되었습니다.</translation>
     </message>
     <message>
       <source>Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>선택한 장치 중 일부는 스트림이 하나만 있습니다. 움직임이 있거나 없는 녹화는 동일한 해상도 또는 품질을 공유합니다.</translation>
     </message>
     <message>
       <source>This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation>이 카메라에는 스트림이 하나만 있습니다. 움직임이 있거나 없는 녹화는 동일한 해상도 또는 품질을 공유합니다.</translation>
+      <translation>이 카메라에는 스트림이 하나만 있습니다. 모션이 있는 경우와 없는 경우 녹화는 동일한 해상도 또는 품질을 공유합니다.</translation>
     </message>
     <message>
       <source>Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>선택한 카메라 중 일부는 스트림이 하나만 있습니다. 모션이 있는 경우와 없는 경우 녹화는 동일한 해상도 또는 품질을 공유합니다.</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected devices</translation>
+      <translation>선택한 일부 장치의 객체 감지가 비활성화되었습니다.</translation>
     </message>
     <message>
       <source>Object detection is disabled for this camera</source>
-      <translation type="unfinished">Object detection is disabled for this camera</translation>
+      <translation>이 카메라의 객체 감지가 비활성화되었습니다.</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected cameras</translation>
+      <translation>선택한 일부 카메라의 객체 감지가 비활성화되었습니다.</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected devices</translation>
+      <translation>선택한 일부 장치의 모션 &amp; 객체 감지가 비활성화되었습니다.</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for this camera</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for this camera</translation>
+      <translation>이 카메라의 모션 및 객체 감지가 비활성화되었습니다.</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected cameras</translation>
+      <translation>선택한 일부 카메라의 모션 및 객체 감지가 비활성화되었습니다.</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this I/O module</source>
@@ -9747,11 +9747,11 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected I/O modules</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected I/O modules</translation>
+      <translation>선택한 일부 I/O 모듈의 모션 감지가 비활성화되었습니다.</translation>
     </message>
     <message>
       <source>This I/O module has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation>이 I/O 모듈에는 스트림이 하나만 있습니다. 움직임이 있거나 없는 녹화는 동일한 해상도 또는 품질을 공유합니다.</translation>
+      <translation>이 I/O 모듈에는 스트림이 하나만 있습니다. 모션이 있는 경우와 없는 경우 녹화는 동일한 해상도 또는 품질을 공유합니다.</translation>
     </message>
     <message>
       <source>Some of the selected I/O modules have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
@@ -9759,19 +9759,19 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Object detection is disabled for this I/O module</source>
-      <translation type="unfinished">Object detection is disabled for this I/O module</translation>
+      <translation>이 I/O 모듈에 대해 객체 감지가 비활성화되었습니다.</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected I/O modules</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected I/O modules</translation>
+      <translation>선택한 일부 I/O 모듈의 객체 감지가 비활성화되었습니다.</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for this I/O module</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for this I/O module</translation>
+      <translation>이 I/O 모듈에 대해 모션 및 객체 감지가 비활성화되었습니다.</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected I/O modules</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected I/O modules</translation>
+      <translation>선택한 일부 I/O 모듈의 모션 &amp; 객체 감지가 비활성화되었습니다.</translation>
     </message>
   </context>
   <context>
@@ -9801,7 +9801,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Archive encryption password</source>
-      <translation type="unfinished">Archive encryption password</translation>
+      <translation>아카이브 암호화 비밀번호</translation>
     </message>
     <message>
       <source>The encryption password will be required to restore the archive on another system.
@@ -9873,11 +9873,11 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
     <message>
       <source>The certificate is pinned to %1</source>
-      <translation type="unfinished">The certificate is pinned to %1</translation>
+      <translation>인증서가 %1에 고정됨</translation>
     </message>
     <message>
       <source>The certificate was presented by %1</source>
-      <translation type="unfinished">The certificate was presented by %1</translation>
+      <translation>%1이(가) 인증서를 제시했습니다.</translation>
     </message>
     <message>
       <source>Server Id: %1</source>
@@ -9930,7 +9930,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>I trust this server</source>
-      <translation type="unfinished">I trust this server</translation>
+      <translation>나는 이 서버를 신뢰한다</translation>
     </message>
     <message>
       <source>System:</source>
@@ -9946,11 +9946,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Trust this server?</source>
-      <translation type="unfinished">Trust this server?</translation>
+      <translation>이 서버를 신뢰하시겠습니까?</translation>
     </message>
     <message>
       <source>Cannot verify the identity of %1</source>
-      <translation type="unfinished">Cannot verify the identity of %1</translation>
+      <translation>%1의 신원을 확인할 수 없습니다</translation>
     </message>
     <message>
       <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
@@ -9958,7 +9958,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Someone may be impersonating this Server to steal your personal information.</source>
-      <translation type="unfinished">Someone may be impersonating this Server to steal your personal information.</translation>
+      <translation>누군가 이 서버를 사칭하여 귀하의 개인 정보를 도용할 수 있습니다.</translation>
     </message>
     <message>
       <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
@@ -10158,7 +10158,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation>필터를 변경하거나 모션 녹화를 활성화해 보세요.</translation>
+      <translation>필터를 변경하거나 모션 녹화를 활성화하십시오.</translation>
     </message>
   </context>
   <context>
@@ -10584,11 +10584,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>High-Res</source>
-      <translation type="unfinished">High-Res</translation>
+      <translation>고해상도</translation>
     </message>
     <message>
       <source>Low-Res</source>
-      <translation type="unfinished">Low-Res</translation>
+      <translation>저해상도</translation>
     </message>
     <message>
       <source>All streams</source>
@@ -11202,7 +11202,7 @@ Server Settings (서버 설정) 대화 상자의 &quot;Storage Management (스�
     </message>
     <message>
       <source>Window configuration saved</source>
-      <translation type="unfinished">Window configuration saved</translation>
+      <translation>Window 구성이 저장됨</translation>
     </message>
     <message>
       <source>This build is for demo purposes only.</source>

@@ -7606,7 +7606,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>No cameras available</source>
-      <translation type="unfinished">No cameras available</translation>
+      <translation>Ingen kameraer tilgjengelig</translation>
     </message>
   </context>
   <context>
