@@ -9581,7 +9581,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Analytic</source>
-      <translation type="unfinished">Analytic</translation>
+      <translation>분석</translation>
     </message>
     <message>
       <source>Generic</source>
@@ -9755,7 +9755,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Some of the selected I/O modules have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">Some of the selected I/O modules have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>선택한 I/O 모듈 중 일부는 스트림이 하나만 있습니다. 모션이 있는 경우와 없는 경우 녹화는 동일한 해상도 또는 품질을 공유합니다.</translation>
     </message>
     <message>
       <source>Object detection is disabled for this I/O module</source>

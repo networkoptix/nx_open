@@ -95,7 +95,7 @@
     </message>
     <message>
       <source>Cannot connect to the System</source>
-      <translation type="unfinished">Cannot connect to the System</translation>
+      <translation>无法连接到系统</translation>
     </message>
   </context>
   <context>
@@ -8698,7 +8698,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</source>
-      <translation type="unfinished">Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</translation>
+      <translation>选择的系统版本较旧且与当前系统版本不兼容，请更新至最新版本再行合并。</translation>
     </message>
     <message>
       <source>The password or user name is invalid.</source>
@@ -8757,11 +8757,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Connection to Server could not be established. The Server&apos;s certificate is invalid.</source>
-      <translation type="unfinished">Connection to Server could not be established. The Server&apos;s certificate is invalid.</translation>
+      <translation>无效的服务器凭证，与服务器建立连线失败。</translation>
     </message>
     <message>
       <source>Connection to Server could not be established. The Server&apos;s certificate was rejected.</source>
-      <translation type="unfinished">Connection to Server could not be established. The Server&apos;s certificate was rejected.</translation>
+      <translation>服务器凭证遭拒，与服务器建立连线失败。</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -8770,7 +8770,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>%1 systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 systems have different owners. Merge is not allowed.</translation>
+      <translation>选定系统(已连接至%1)分属不同所有者，无法进行合并。</translation>
     </message>
   </context>
   <context>
@@ -8792,31 +8792,31 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::MotionStreamAlerts</name>
     <message>
       <source>Current stream has high resolution. Analyzing it for motion increases CPU load.</source>
-      <translation type="unfinished">Current stream has high resolution. Analyzing it for motion increases CPU load.</translation>
+      <translation>选定串流具有高分辨率，执行移动侦测将大幅增加 CPU 负载。</translation>
     </message>
     <message>
       <source>Motion detection for this camera is not currently working because of changed stream resolution.
 You can force it, but it may significantly increase CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection for this camera is not currently working because of changed stream resolution.
-You can force it, but it may significantly increase CPU load.</translation>
+      <translation>由于串流分辨率发生变化，移动侦测无法于此摄像机上正常运作。
+您可以于设置中启用侦测，但CPU负载将大幅增加。</translation>
     </message>
     <message>
       <source>Motion detection for some cameras will not be working because the remaining stream has too high resolution.
 You can force it, but it may significantly increase CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection for some cameras will not be working because the remaining stream has too high resolution.
-You can force it, but it may significantly increase CPU load.</translation>
+      <translation>由于串流分辨率过高，移动侦测无法于摄像机上正常运作。
+您可以于设置中启用侦测，但CPU负载将大幅增加。</translation>
     </message>
     <message>
       <source>Motion detection for this camera will not be working because the remaining stream has too high resolution.
 You can force it, but it may significantly increase CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection for this camera will not be working because the remaining stream has too high resolution.
-You can force it, but it may significantly increase CPU load.</translation>
+      <translation>由于串流分辨率过高，移动侦测无法于此摄像机上正常运作。
+您可以于设置中启用侦测，但CPU负载将大幅增加。</translation>
     </message>
   </context>
   <context>
@@ -9419,11 +9419,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
-      <translation type="unfinished">Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</translation>
+      <translation>在 &lt;b&gt;一般&lt;/b&gt;页面 网页设置中可启用服务器代理转送服务</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</translation>
+      <translation>提醒：此网页经由Proxy且允许外部网路(非服务器所在之内部网路)存取，若此网页包含隐私或者仅供内部使用之服务，请务必确认存取权限及安全性确认。</translation>
     </message>
   </context>
   <context>
@@ -9501,7 +9501,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Recording motion, objects and low quality</source>
-      <translation type="unfinished">Recording motion, objects and low quality</translation>
+      <translation>移动侦测、物件和低分辨率全时录像</translation>
     </message>
     <message>
       <source>Recording objects and low quality</source>
@@ -9647,8 +9647,8 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Allow system to optimize camera settings&quot; option in the &quot;System Administration&quot; dialog.
 You can still change quality and FPS directly on the camera.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Allow system to optimize camera settings&quot; option in the &quot;System Administration&quot; dialog.
-You can still change quality and FPS directly on the camera.</translation>
+      <translation>因此系统关闭了&quot;允许系统优化摄像机设置 &quot;(系统管理页面)，故画质与分辨率设置已停用。
+您仍然可前往摄像机网页修改相关设置。</translation>
     </message>
     <message>
       <source>Quality and FPS settings are disabled for some of the selected cameras.</source>
@@ -9657,8 +9657,8 @@ You can still change quality and FPS directly on the camera.</translation>
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Keep camera stream and profile settings&quot; option on the &quot;Expert&quot; tab.
 You can still change quality and FPS directly on the camera.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Keep camera stream and profile settings&quot; option on the &quot;Expert&quot; tab.
-You can still change quality and FPS directly on the camera.</translation>
+      <translation>因此摄像机启用了&quot;保持摄像机的串流及配置档设定&quot;(专家模式页面)，故画质与分辨率设置已停用。
+您仍然可前往摄像机网页修改相关设置。</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
@@ -9701,15 +9701,15 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>部分所选设备仅提供单一串流。不同的录制模式只能使用同样的串流。</translation>
     </message>
     <message>
       <source>This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>此摄像机仅提供单一串流。不同的录制模式只能使用同样的串流。</translation>
     </message>
     <message>
       <source>Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>部分所选的摄像机仅提供单一串流。不同的录制模式只能使用同样的串流。</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected devices</source>
@@ -9745,11 +9745,11 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>This I/O module has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">This I/O module has only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>此I/O模块仅提供单一串流。不同的录制模式只能使用同样的串流。</translation>
     </message>
     <message>
       <source>Some of the selected I/O modules have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">Some of the selected I/O modules have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>部分所选的I/O模块仅提供单一串流。不同的录制模式只能使用同样的串流。</translation>
     </message>
     <message>
       <source>Object detection is disabled for this I/O module</source>
@@ -9795,17 +9795,17 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Archive encryption password</source>
-      <translation type="unfinished">Archive encryption password</translation>
+      <translation>存档加密密码</translation>
     </message>
     <message>
       <source>The encryption password will be required to restore the archive on another system.
 Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</source>
-      <translation type="unfinished">The encryption password will be required to restore the archive on another system.
-Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</translation>
+      <translation>需要加密密码才能在其他系统还原录像资料。
+注意: 此密码无法重置，请妥善保存。若密码遗失，录影资料将无法恢复。</translation>
     </message>
     <message>
       <source>Encrypts archive data to prevent it from being viewed outside of the system. You will not be required to enter the encryption password to view the video archive within this system.</source>
-      <translation type="unfinished">Encrypts archive data to prevent it from being viewed outside of the system. You will not be required to enter the encryption password to view the video archive within this system.</translation>
+      <translation>加密录像存档可避免被外部窃取查看。您无须输入加密密码依旧可观看此系统中的录像资料。</translation>
     </message>
     <message>
       <source>Failed to set archive encryption password</source>
@@ -11204,7 +11204,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>It cannot be upgraded to subsequent builds as they become available.</source>
-      <translation type="unfinished">It cannot be upgraded to subsequent builds as they become available.</translation>
+      <translation>此版本将使用Beta版Cloud服务，请注意：当正式版本发布之后，资料将无法移转或升级至正式版Cloud。</translation>
     </message>
     <message>
       <source>To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</source>
