@@ -814,7 +814,7 @@
     <name>CertificateSelectionDialog</name>
     <message>
       <source>Web site requires a certificate</source>
-      <translation type="unfinished">Web site requires a certificate</translation>
+      <translation>此网站需要凭证</translation>
     </message>
   </context>
   <context>
@@ -2430,7 +2430,7 @@
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation type="unfinished">Connection with cameras that do not support HTTPS will be lost.</translation>
+      <translation>将丢失不支持 HTTPS 的摄像机的连接。</translation>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
