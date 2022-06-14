@@ -305,7 +305,7 @@ void TabApiBackend::Private::updateItemParams(
                     timeSlider->setOption(QnTimeSlider::StillPosition, false);
 
                 const auto window = params.media->timelineWindow.value();
-                const auto endTime = window.durationMs.count() == QnTimePeriod::kInfiniteDuration
+                const auto endTime = window.durationMs.count() != QnTimePeriod::kInfiniteDuration
                     ? window.startTimeMs + window.durationMs
                     : timeSlider->maximum();
                 timeSlider->setWindow(window.startTimeMs, endTime, /*animate*/ false,
