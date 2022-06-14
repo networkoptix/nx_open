@@ -56,15 +56,15 @@ const char* toString(RdbmsDriverType value)
     }
 }
 
-RdbmsDriverType rdbmsDriverTypeFromString(const char* str)
+RdbmsDriverType rdbmsDriverTypeFromString(const std::string_view& str)
 {
-    if (strcmp(str, "QSQLITE") == 0)
+    if (str == "QSQLITE")
         return RdbmsDriverType::sqlite;
-    else if (strcmp(str, "QMYSQL") == 0)
+    else if (str == "QMYSQL")
         return RdbmsDriverType::mysql;
-    else if (strcmp(str, "QPSQL") == 0)
+    else if (str == "QPSQL")
         return RdbmsDriverType::postgresql;
-    else if (strcmp(str, "QOCI") == 0)
+    else if (str == "QOCI")
         return RdbmsDriverType::oracle;
     else
         return RdbmsDriverType::unknown;

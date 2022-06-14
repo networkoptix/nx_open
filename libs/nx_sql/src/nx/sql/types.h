@@ -5,6 +5,7 @@
 #include <chrono>
 #include <optional>
 #include <stdexcept>
+#include <string_view>
 
 #include <nx/reflect/instrument.h>
 
@@ -44,7 +45,7 @@ NX_REFLECTION_ENUM_CLASS(RdbmsDriverType,
 );
 
 NX_SQL_API const char* toString(RdbmsDriverType value);
-NX_SQL_API RdbmsDriverType rdbmsDriverTypeFromString(const char* str);
+NX_SQL_API RdbmsDriverType rdbmsDriverTypeFromString(const std::string_view& str);
 
 class NX_SQL_API ConnectionOptions
 {

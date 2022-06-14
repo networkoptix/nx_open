@@ -124,8 +124,6 @@ private:
     QSet<QnLayoutStreamSupport*> m_openedFiles;
     QSet<QnLayoutStreamSupport*> m_cachedOpenedFiles;
     nx::Mutex m_fileSync;
-    static nx::Mutex m_storageSync;
-    static QSet<QnLayoutFileStorageResource*> m_allStorages;
 
     nx::core::layout::FileInfo m_info;
     bool m_lockedOpenings = false; //< Used to prevent stream openings when moving file.

@@ -90,8 +90,6 @@ private:
     std::unique_ptr<ConnectorExecutor> m_cloudConnectorExecutor;
     MediatorUdpEndpointFetcher m_mediatorAddressFetcher;
 
-    static utils::ResultCounter<nx::hpm::api::ResultCode> s_mediatorResponseCounter;
-
     void fetchMediatorUdpEndpoint();
 
     void onFetchMediatorAddressCompletion(

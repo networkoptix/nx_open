@@ -28,19 +28,15 @@
 
 namespace {
 
-nx::Mutex s_storeMutex;
-std::unique_ptr<X509_STORE, decltype(&X509_STORE_free)> s_caStore{nullptr, {}};
-
-X509_STORE* caStore()
+class CaStore
 {
-    NX_MUTEX_LOCKER lock(&s_storeMutex);
-
-    if (!s_caStore)
+public:
+    CaStore()
     {
-        s_caStore = nx::utils::wrapUnique(X509_STORE_new(), &X509_STORE_free);
+        m_x509Store = nx::utils::wrapUnique(X509_STORE_new(), &X509_STORE_free);
 
-        if (!NX_ASSERT(s_caStore, "Unable to create certificate store"))
-            return nullptr;
+        if (!NX_ASSERT(m_x509Store, "Unable to create certificate store"))
+            return;
 
         // Fill the store by system certificates. We use QSslConfiguration here to avoid the need
         // to maintain our own list of system-specific certificate paths for different OS.
@@ -52,13 +48,31 @@ X509_STORE* caStore()
             if (!NX_ASSERT(converted.size() == 1))
                 continue;
 
-            X509_STORE_add_cert(s_caStore.get(), converted.at(0).x509());
+            X509_STORE_add_cert(m_x509Store.get(), converted.at(0).x509());
         }
     }
 
-    return s_caStore.get();
-}
+    X509_STORE* x509Store()
+    {
+        m_x509StoreUnused = false;
+        return m_x509Store.get();
+    }
 
+    bool isX509StoreUnused() const
+    {
+        return m_x509StoreUnused.load();
+    }
+
+    static CaStore& instance()
+    {
+        static CaStore caStore;
+        return caStore;
+    }
+
+private:
+    std::unique_ptr<X509_STORE, decltype(&X509_STORE_free)> m_x509Store{nullptr, {}};
+    std::atomic<bool> m_x509StoreUnused{true};
+};
 
 } // namespace
 
@@ -1279,7 +1293,7 @@ std::vector<Certificate> completeCertificateChain(STACK_OF(X509)* chain, bool* o
     if (ok)
         *ok = false;
 
-    auto store = caStore();
+    auto store = CaStore::instance().x509Store();
     if (!store)
     {
         NX_WARNING(NX_SCOPE_TAG,
@@ -1325,8 +1339,8 @@ void addTrustedRootCertificate(const CertificateView& cert)
     conf.addCaCertificate(QSslCertificate(pemByteArray(cert.x509())));
     QSslConfiguration::setDefaultConfiguration(std::move(conf));
 
-    NX_MUTEX_LOCKER lock(&s_storeMutex);
-    NX_ASSERT(!s_caStore, "All trusted root certificates should be loaded on startup");
+    NX_ASSERT(CaStore::instance().isX509StoreUnused(),
+        "All trusted root certificates should be loaded on startup");
 }
 
 } // namespace nx::network::ssl

@@ -81,7 +81,7 @@ ApplicationContext::~ApplicationContext()
 
 ApplicationContext* ApplicationContext::instance()
 {
-    NX_ASSERT(s_instance);
+    //NX_ASSERT(s_instance);
     return s_instance;
 }
 

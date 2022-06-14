@@ -18,8 +18,6 @@ public:
     static QSqlDatabase addDatabase(const QString& type, const QString& connectionName);
 
     static void removeDatabase(const QString& connectionName);
-private:
-    static nx::Mutex m_mutex;
 };
 
 } // namespace nx::sql
