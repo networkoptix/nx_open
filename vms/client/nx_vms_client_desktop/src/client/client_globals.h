@@ -302,6 +302,9 @@ namespace Qn
         RemoteConnectionRole,
         MaximumTooltipSizeRole, /**< Role for passing maximum size of the tooltip (QSize) */
 
+        SortKeyRole, /**< Role for text sort key (QString). */
+        FilterKeyRole, /**< Role for text filter key (QString). */
+
         ItemDataRoleCount,
     };
 

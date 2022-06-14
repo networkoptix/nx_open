@@ -2,17 +2,12 @@
 
 #pragma once
 
-#include <QtWidgets/QWidget>
-
-#include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/connective.h>
 
 namespace nx::vms::client::desktop {
-
-class CheckableHeaderView;
 
 class UserListWidget:
     public Connective<QnAbstractPreferencesWidget>,

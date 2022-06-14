@@ -41,7 +41,7 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
     addPage(GeneralPage, generalWidget, tr("General"));
 
     auto userManagementWidget = ini().enableNewUserSettings
-        ? new UserManagementTabWidget(this)
+        ? new UserManagementTabWidget(userRolesManager(), this)
         : nullptr;
 
     auto deprecatedUserManagementWidget = !ini().enableNewUserSettings

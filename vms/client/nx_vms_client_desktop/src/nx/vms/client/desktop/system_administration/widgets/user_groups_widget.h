@@ -5,6 +5,8 @@
 #include <nx/utils/impl_ptr.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 
+class QnUserRolesManager;
+
 namespace nx::vms::client::desktop {
 
 class UserGroupsWidget: public QnAbstractPreferencesWidget
@@ -13,7 +15,7 @@ class UserGroupsWidget: public QnAbstractPreferencesWidget
     using base_type = QnAbstractPreferencesWidget;
 
 public:
-    explicit UserGroupsWidget(QWidget* parent = nullptr);
+    explicit UserGroupsWidget(QnUserRolesManager* manager, QWidget* parent = nullptr);
     virtual ~UserGroupsWidget() override;
 
     virtual void loadDataToUi() override;
@@ -21,7 +23,8 @@ public:
     virtual bool hasChanges() const override;
 
 private:
-    struct Private;
+    class Private;
+    class Delegate;
     nx::utils::ImplPtr<Private> d;
 };
 

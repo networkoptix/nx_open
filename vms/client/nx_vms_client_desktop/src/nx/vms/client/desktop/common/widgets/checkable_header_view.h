@@ -17,6 +17,9 @@ public:
     Qt::CheckState checkState() const;
     void setCheckState(Qt::CheckState state);
 
+    bool highlightCheckedIndicator() const;
+    void setHighlightCheckedIndicator(bool value);
+
 signals:
     void checkStateChanged(Qt::CheckState state);
 
@@ -30,8 +33,9 @@ private slots:
     void at_sectionClicked(int logicalIndex);
 
 private:
-    int m_checkBoxColumn;
-    Qt::CheckState m_checkState;
+    const int m_checkBoxColumn;
+    bool m_highlightCheckedIndicator = false;
+    Qt::CheckState m_checkState = Qt::Unchecked;
 };
 
 } // namespace nx::vms::client::desktop

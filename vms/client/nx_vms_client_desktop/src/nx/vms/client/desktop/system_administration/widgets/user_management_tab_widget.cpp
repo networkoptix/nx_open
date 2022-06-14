@@ -31,15 +31,12 @@ struct UserManagementTabWidget::Private
     }
 };
 
-UserManagementTabWidget::UserManagementTabWidget(QWidget* parent):
+UserManagementTabWidget::UserManagementTabWidget(QnUserRolesManager* manager, QWidget* parent):
     base_type(parent),
     d(new Private{.q = this})
 {
     const auto userListWidget = new UserListWidget(d->tabWidget);
-    userListWidget->layout()->setContentsMargins(0, 12, 0, 0);
-
-    const auto userGroupsWidget = new UserGroupsWidget(d->tabWidget);
-
+    const auto userGroupsWidget = new UserGroupsWidget(manager, d->tabWidget);
     const auto ldapSettingsWidget = new LdapSettingsWidget(d->tabWidget);
 
     setTabShape(d->tabWidget->tabBar(), style::TabShape::Compact);
