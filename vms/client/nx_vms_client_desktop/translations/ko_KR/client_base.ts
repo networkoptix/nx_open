@@ -8312,7 +8312,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Exported: %1</source>
       <comment>Duration will be substituted</comment>
-      <translation type="unfinished">Exported: %1</translation>
+      <translation>내보낸 횟수: %1</translation>
     </message>
   </context>
   <context>
@@ -8562,7 +8562,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Less than a minute left</source>
-      <translation type="unfinished">Less than a minute left</translation>
+      <translation>1분 미만 남음</translation>
     </message>
     <message numerus="yes">
       <source>%n minutes left</source>
@@ -9926,7 +9926,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Connect Anyway</source>
-      <translation type="unfinished">Connect Anyway</translation>
+      <translation>그래도 연결</translation>
     </message>
     <message>
       <source>I trust this server</source>

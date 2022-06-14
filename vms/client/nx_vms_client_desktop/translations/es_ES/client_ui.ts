@@ -291,7 +291,7 @@
     <name>BackupSettingsWidget</name>
     <message>
       <source>Server is offline. Backup settings are not available.</source>
-      <translation type="unfinished">Server is offline. Backup settings are not available.</translation>
+      <translation>El servidor está fuera de línea. La configuración de la copia de seguridad no está disponible.</translation>
     </message>
   </context>
   <context>
@@ -314,15 +314,15 @@
     </message>
     <message>
       <source>Maximum backup queue size</source>
-      <translation type="unfinished">Maximum backup queue size</translation>
+      <translation>Tamaño máximo de cola de copia de seguridad</translation>
     </message>
     <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
-      <translation type="unfinished">All files are successfully backed up! New files will be backed up automatically</translation>
+      <translation>¡Todos los archivos están respaldados con éxito! Los archivos nuevos se copiarán automáticamente</translation>
     </message>
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
-      <translation type="unfinished">Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</translation>
+      <translation>La copia de seguridad se detuvo debido a un problema de almacenamiento. La copia de seguridad se reanudará automáticamente después de que se resuelva el problema de almacenamiento</translation>
     </message>
   </context>
   <context>
@@ -604,31 +604,31 @@
     </message>
     <message>
       <source>Media Port</source>
-      <translation type="unfinished">Media Port</translation>
+      <translation>Puerto de medios</translation>
     </message>
     <message>
       <source>Use system presets</source>
-      <translation type="unfinished">Use system presets</translation>
+      <translation>Usar ajustes preestablecidos del sistema</translation>
     </message>
     <message>
       <source>PTZ Speed</source>
-      <translation type="unfinished">PTZ Speed</translation>
+      <translation>Velocidad PTZ</translation>
     </message>
     <message>
       <source>RTP Transport</source>
-      <translation type="unfinished">RTP Transport</translation>
+      <translation>Transporte RTP</translation>
     </message>
     <message>
       <source>Use camera native presets</source>
-      <translation type="unfinished">Use camera native presets</translation>
+      <translation>Usar preajustes nativos de la cámara</translation>
     </message>
     <message>
       <source>Time Settings</source>
-      <translation type="unfinished">Time Settings</translation>
+      <translation>Ajustes de hora</translation>
     </message>
     <message>
       <source>Keep camera time settings</source>
-      <translation type="unfinished">Keep camera time settings</translation>
+      <translation>Mantener ajustes de tiempo de la cámara</translation>
     </message>
   </context>
   <context>
@@ -1243,7 +1243,7 @@
     </message>
     <message>
       <source>Mute audio when the mic is active</source>
-      <translation type="unfinished">Mute audio when the mic is active</translation>
+      <translation>Silenciar audio cuando el micrófono está activo</translation>
     </message>
   </context>
   <context>
@@ -1496,7 +1496,7 @@
     </message>
     <message>
       <source>Allow digest authentication for imported user</source>
-      <translation type="unfinished">Allow digest authentication for imported user</translation>
+      <translation>Permitir autenticación implícita para usuarios importados</translation>
     </message>
   </context>
   <context>
@@ -2434,15 +2434,15 @@
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
-      <translation type="unfinished">Force servers to accept only encrypted connections</translation>
+      <translation>Forzar a los servidores a aceptar sólo conexiones cifradas</translation>
     </message>
     <message>
       <source>Encrypt video traffic to desktop and mobile clients</source>
-      <translation type="unfinished">Encrypt video traffic to desktop and mobile clients</translation>
+      <translation>Cifrar el tráfico de video a clientes de escritorio y móviles</translation>
     </message>
     <message>
       <source>Manage Users</source>
-      <translation type="unfinished">Manage Users</translation>
+      <translation>Administrar usuarios</translation>
     </message>
   </context>
   <context>
@@ -2534,7 +2534,7 @@
     </message>
     <message>
       <source>Autodetect built-in and USB webcams</source>
-      <translation type="unfinished">Autodetect built-in and USB webcams</translation>
+      <translation>Detección automática de cámaras web integradas y USB</translation>
     </message>
   </context>
   <context>
@@ -3012,7 +3012,7 @@
     </message>
     <message>
       <source>Allow opening web page without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening web page without SSL certificate checking</translation>
+      <translation>Permitir abrir página web sin verificación de certificado SSL</translation>
     </message>
   </context>
   <context>
