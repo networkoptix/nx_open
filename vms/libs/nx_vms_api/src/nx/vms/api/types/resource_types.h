@@ -13,22 +13,36 @@ namespace nx::vms::api {
 
 enum class ResourceStatus
 {
+    /**%apidoc The Device is inaccessible.
+     */
     offline = 0,
+
+    /**%apidoc The Device does not have correct credentials in the database.
+     */
     unauthorized = 1,
+
+    /**%apidoc The Device is operating normally.
+     */
     online = 2,
+
+    /**%apidoc Applies only to Cameras. The Camera is online and recording video stream.
+     */
     recording = 3,
+
+    /**%apidoc The Device status is unknown. It may show up while Servers synchronize status
+     * information. If this status persists, it indicates an internal system problem.
+     */
     undefined = 4,
 
-    /* Applies only to Server. Server is incompatible only when it has System name different from
-     * the current or it has incompatible protocol version. Note: incompatible Server is not the
-     * same as fake Server that can be created in the client by QnIncompatibleServerWatcher. Fake
-     * Servers can also have unauthorized status. So if you want to check if the Server is fake use
-     * QnMediaServerResource::isFakeServer().
+    /**%apidoc Applies only to Servers. The Server is incompatible only when it has System name
+     * different from the current or it has incompatible protocol version.
      */
     incompatible = 5,
 
-    /* Applies only to Server. Server is in this state if its DB certificate doesn't match with
-     * the certificate provided during SSL handshake on Server to Server connection.
+    /**%apidoc Applies only to Servers. Server is in this state if its DB certificate doesn't
+     * match with the certificate provided during SSL handshake on Server to Server connection.
+     * This may happen in case of the man-in-the-middle attack or in case of certificate lost
+     * on the target server.
      */
     mismatchedCertificate = 6,
 };
