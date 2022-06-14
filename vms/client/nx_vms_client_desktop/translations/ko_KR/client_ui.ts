@@ -2110,7 +2110,7 @@
     </message>
     <message>
       <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
+      <translation>보안 인증 강제 실행</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -2297,7 +2297,7 @@
     </message>
     <message>
       <source>rewind for</source>
-      <translation type="unfinished">rewind for</translation>
+      <translation>되감기</translation>
     </message>
     <message>
       <source>Live</source>
@@ -2468,7 +2468,7 @@
     </message>
     <message>
       <source>Issued by</source>
-      <translation type="unfinished">Issued by</translation>
+      <translation>발급자</translation>
     </message>
     <message>
       <source>Self-signed root certificate</source>
@@ -2992,7 +2992,7 @@
     </message>
     <message>
       <source>Proxy this webpage via server</source>
-      <translation type="unfinished">Proxy this webpage via server</translation>
+      <translation>서버를 통해 이 웹 페이지 프록시</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -3008,7 +3008,7 @@
     </message>
     <message>
       <source>Proxy all requested contents</source>
-      <translation type="unfinished">Proxy all requested contents</translation>
+      <translation>요청된 모든 콘텐츠 프록시</translation>
     </message>
     <message>
       <source>Allow opening web page without SSL certificate checking</source>

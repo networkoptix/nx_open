@@ -1652,7 +1652,7 @@
     </message>
     <message>
       <source>Analytics Object Detected</source>
-      <translation type="unfinished">Analytics Object Detected</translation>
+      <translation>분석 개체 감지됨</translation>
     </message>
     <message>
       <source>%1 at camera &apos;%2&apos;</source>

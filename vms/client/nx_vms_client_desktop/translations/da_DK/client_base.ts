@@ -26,7 +26,7 @@
     <message numerus="yes">
       <source>%1 with %n attributes</source>
       <translation>
-        <numerusform>test</numerusform>
+        <numerusform>%1 med %n attributt</numerusform>
         <numerusform>%1 med %n attributter</numerusform>
       </translation>
     </message>

@@ -96,7 +96,7 @@
     </message>
     <message>
       <source>Cannot connect to the System</source>
-      <translation type="unfinished">Cannot connect to the System</translation>
+      <translation>Impossible de se connecter au système</translation>
     </message>
   </context>
   <context>

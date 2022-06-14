@@ -4779,7 +4779,7 @@ to %1</source>
     </message>
     <message>
       <source>Certificate received from the server doesn&apos;t match the certificate this server is pinned to.</source>
-      <translation type="unfinished">Certificate received from the server doesn&apos;t match the certificate this server is pinned to.</translation>
+      <translation>서버에서 받은 인증서가 이 서버에 고정된 인증서와 일치하지 않는다.</translation>
     </message>
     <message>
       <source>Details</source>
@@ -6636,7 +6636,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Move Group without Them</source>
-      <translation type="unfinished">Move Group without Them</translation>
+      <translation>이 장치들을 제외하고 그룹 이동</translation>
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers</source>
@@ -6998,11 +6998,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</translation>
+      <translation>선택한 장치에 오디오 입력이 없거나 구성되지 않았다. 오디오 스트림을 사용할 수 없다.</translation>
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</translation>
+      <translation>선택한 장치에 오디오 출력이 없거나 구성되지 않았다. 오디오 스트림을 사용할 수 없다.</translation>
     </message>
     <message>
       <source>The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
@@ -7189,7 +7189,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation type="unfinished">To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</translation>
+      <translation>백업을 활성화하려면 %1의 일부 저장소에서 "기본"을 "백업"으로 변경하십시오.</translation>
     </message>
     <message>
       <source>To enable backup add more drives to use them as backup storage in %1</source>
@@ -7328,7 +7328,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Force Motion Detection</source>
-      <translation type="unfinished">Force Motion Detection</translation>
+      <translation>포스 모션 감지</translation>
     </message>
     <message>
       <source>Pan</source>
@@ -7415,7 +7415,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Force Motion Detection</source>
-      <translation type="unfinished">Force Motion Detection</translation>
+      <translation>포스 모션 감지</translation>
     </message>
     <message>
       <source>Select areas on the preview to set chosen sensitivity for.</source>
@@ -9422,7 +9422,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
-      <translation type="unfinished">Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</translation>
+      <translation>일반 탭에서 웹 페이지 프록시를 켜라.</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
@@ -9650,18 +9650,18 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Allow system to optimize camera settings&quot; option in the &quot;System Administration&quot; dialog.
 You can still change quality and FPS directly on the camera.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Allow system to optimize camera settings&quot; option in the &quot;System Administration&quot; dialog.
-You can still change quality and FPS directly on the camera.</translation>
+      <translation>품질 및 FPS 설정이 "시스템 관리" 옵션인 "시스템이 카메라 설정을 최적화하도록 허용" 때문에 비활성화된다.
+당신은 카메라에서 직접 화질과 FPS를 변경할 수 있다.</translation>
     </message>
     <message>
       <source>Quality and FPS settings are disabled for some of the selected cameras.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled for some of the selected cameras.</translation>
+      <translation>선택한 카메라 일부의 품질 및 FPS 설정이 비활성화되었다.</translation>
     </message>
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Keep camera stream and profile settings&quot; option on the &quot;Expert&quot; tab.
 You can still change quality and FPS directly on the camera.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Keep camera stream and profile settings&quot; option on the &quot;Expert&quot; tab.
-You can still change quality and FPS directly on the camera.</translation>
+      <translation>품질 및 FPS 설정이 "전문가" 탭의 옵션인 "카메라 스트림 및 프로필 설정 유지" 때문에  비활성화된다.
+당신은 카메라에서 직접 화질과 FPS를 변경할 수 있다.</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
@@ -9849,8 +9849,8 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message numerus="yes">
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
       <comment>%n is digest user count, %1 is total user count</comment>
-      <translation type="unfinished">
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
+      <translation>
+        <numerusform>%1 사용자 중 %n 은 다이제스트 인증을 사용할 수 있다(보안되지 않음).</numerusform>
       </translation>
     </message>
   </context>
@@ -9910,8 +9910,8 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message>
       <source>Someone may be impersonating %1 to steel your personal information.
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steel your personal information.
-Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
+      <translation>누군가가 개인 정보를 강화하기 위해 %1을 사칭하고 있을 수 있다.
+%2 서버 SSL 인증서를 수정하지 않은 경우 이 인증서를 고정하지 마십시오.</translation>
     </message>
     <message>
       <source>Pin</source>
@@ -9966,7 +9966,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
-      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct Server.</translation>
+      <translation>인증서의 세부 정보를 검토하여 올바른 서버에 연결 중인지 확인한다.</translation>
     </message>
   </context>
   <context>
@@ -10675,11 +10675,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
     <message>
       <source>Intercom Alarm Layout</source>
-      <translation type="unfinished">Intercom Alarm Layout</translation>
+      <translation>인터콤 알람 레이아웃</translation>
     </message>
     <message>
       <source>Intercom Open Door</source>
-      <translation type="unfinished">Intercom Open Door</translation>
+      <translation>인터콤 오픈 도어</translation>
     </message>
     <message>
       <source>Open door</source>
@@ -10781,7 +10781,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Cannot specify a media parameters for the resource without media stream.</source>
-      <translation type="unfinished">Cannot specify a media parameters for the resource without media stream.</translation>
+      <translation>미디어 스트림 없이 리소스에 대한 미디어 매개 변수를 지정할 수 없다.</translation>
     </message>
     <message>
       <source>Cannot add the resource to the layout</source>
@@ -11210,7 +11210,7 @@ Server Settings (서버 설정) 대화 상자의 &quot;Storage Management (스�
     </message>
     <message>
       <source>It cannot be upgraded to subsequent builds as they become available.</source>
-      <translation type="unfinished">It cannot be upgraded to subsequent builds as they become available.</translation>
+      <translation>사용 가능한 후속 빌드로 업그레이드할 수 없다.</translation>
     </message>
     <message>
       <source>To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</source>
@@ -11462,7 +11462,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Can&apos;t check client update availability. Check your internet connection and try again.</source>
-      <translation type="unfinished">Can&apos;t check client update availability. Check your internet connection and try again.</translation>
+      <translation>클라이언트 업데이트 사용 가능 여부를 확인할 수 없다. 인터넷 연결을 확인하고 다시 시도하십시오.</translation>
     </message>
   </context>
 </TS>

@@ -179,12 +179,12 @@
     <message>
       <source>Please log in to %1 again.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Zaloguj się ponownie.</translation>
+      <translation>Zaloguj się ponownie do %1.</translation>
     </message>
     <message>
       <source>Log in to %1 to log in to this system with %2 user</source>
       <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
-      <translation>Zaloguj się do %1 aby uzyskać dostęp do tego systemu jako użytkownik chmury</translation>
+      <translation>Zaloguj się do %1 aby uzyskać dostęp do tego systemu jako użytkownik %2</translation>
     </message>
     <message>
       <source>Session duration limit can be changed by a system administrator.</source>

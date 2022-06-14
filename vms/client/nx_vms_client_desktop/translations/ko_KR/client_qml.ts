@@ -286,11 +286,11 @@
     <name>CounterBlock</name>
     <message>
       <source>Remove column</source>
-      <translation type="unfinished">Remove column</translation>
+      <translation>열 제거</translation>
     </message>
     <message>
       <source>Add column</source>
-      <translation type="unfinished">Add column</translation>
+      <translation>열 추가</translation>
     </message>
     <message>
       <source>Hide information</source>
@@ -472,7 +472,7 @@
     <message>
       <source>Hold %1 to activate actions</source>
       <comment>Leave %1 as is. It will be replaced to button name.</comment>
-      <translation type="unfinished">Hold %1 to activate actions</translation>
+      <translation>작업을 활성화하려면 %1를 누르시오.</translation>
     </message>
   </context>
   <context>
@@ -552,7 +552,7 @@
     </message>
     <message>
       <source>With Modifier</source>
-      <translation type="unfinished">With Modifier</translation>
+      <translation>수정자 포함</translation>
     </message>
     <message>
       <source>This model is not supported</source>
@@ -690,11 +690,11 @@
     <name>ObjectEditor</name>
     <message>
       <source>Present</source>
-      <translation type="unfinished">Present</translation>
+      <translation>현재의</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation type="unfinished">Absent</translation>
+      <translation>부재 중인</translation>
     </message>
   </context>
   <context>
@@ -849,7 +849,7 @@ to activate PTZ</source>
     <name>RangeEditor</name>
     <message>
       <source>from</source>
-      <translation type="unfinished">from</translation>
+      <translation>부터</translation>
     </message>
     <message>
       <source>to</source>
@@ -910,7 +910,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>OUTDATED</source>
-      <translation type="unfinished">OUTDATED</translation>
+      <translation>구식인</translation>
     </message>
   </context>
   <context>
@@ -964,7 +964,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Preview is outdated</source>
-      <translation type="unfinished">Preview is outdated</translation>
+      <translation>미리 보기가 오래됨</translation>
     </message>
   </context>
   <context>
@@ -1056,7 +1056,7 @@ to activate PTZ</source>
     <name>SphereDewarpingSettings</name>
     <message>
       <source>Horizon correction</source>
-      <translation type="unfinished">Horizon correction</translation>
+      <translation>수평 보정</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -1260,7 +1260,7 @@ to activate PTZ</source>
     <name>WelcomeScreen</name>
     <message>
       <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
-      <translation type="unfinished">You don&apos;t have access to the %1. Please check your internet connection.</translation>
+      <translation>%1에 접근할 수 없습니다. 인터넷 연결을 확인하십시오.</translation>
     </message>
     <message>
       <source>Official Website</source>

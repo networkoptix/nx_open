@@ -714,7 +714,7 @@
     <name>OpenedTileItem</name>
     <message>
       <source>Address</source>
-      <translation> Dirección </translation>
+      <translation>Dirección</translation>
     </message>
     <message>
       <source>URL or Host:Port</source>

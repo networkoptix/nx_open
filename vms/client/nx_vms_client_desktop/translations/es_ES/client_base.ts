@@ -5982,7 +5982,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed.</source>
-      <translation>Sólo se permiten letras, números y el guión bajo ("_").</translation>
+      <translation>Solo se permiten letras latinas, números y símbolos de teclado %1.</translation>
     </message>
   </context>
   <context>
@@ -7142,11 +7142,11 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
     <message>
       <source>Selected device is connected to another server. Audio stream is not available.</source>
-      <translation>%1 está conectado a otro servidor. La transmisión de audio no está disponible.</translation>
+      <translation>El dispositivo seleccionado está conectado a otro servidor. La transmisión de audio no está disponible.</translation>
     </message>
     <message>
       <source>Selected camera is connected to another server. Audio stream is not available.</source>
-      <translation>%1 está conectado a otro servidor. La transmisión de audio no está disponible.</translation>
+      <translation>La cámara seleccionada está conectado a otro servidor. La transmisión de audio no está disponible.</translation>
     </message>
   </context>
   <context>

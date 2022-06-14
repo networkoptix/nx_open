@@ -364,15 +364,15 @@
     </message>
     <message>
       <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
-      <translation>Si está deshabilitado, intente habilitar la grabación en la configuración del módulo de E/S .</translation>
+      <translation>Si está deshabilitado, intente habilitar la grabación en la configuración del módulo de E/S (error &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
-      <translation>Si está deshabilitado, intente habilitar la grabación en la configuración del módulo de E/S .</translation>
+      <translation>Si está deshabilitado, intente habilitar la Grabación y disminuir el FPS en la Configuración del dispositivo (error &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
-      <translation>Si está deshabilitado, intente habilitar la grabación en la configuración del módulo de E/S .</translation>
+      <translation>Si está deshabilitado, intente habilitar la Grabación y disminuir el FPS en la Configuración de la cámara (error &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
@@ -1755,7 +1755,7 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
-      <translation>Error de certificado del servidor </translation>
+      <translation>Error de certificado del servidor &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
