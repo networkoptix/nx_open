@@ -16,8 +16,17 @@ static const std::chrono::seconds kMaxAdjustmentHistoryRecordAge(30);
 namespace nx {
 namespace utils {
 
-nx::Mutex TimeHelper::m_camClockMutex;
-QMap<QString, std::shared_ptr<TimeHelper::CamSyncInfo>> TimeHelper::m_camClock;
+struct TimeHelper::TimeHelperGlobalContext
+{
+    nx::Mutex camClockMutex;
+    QMap<QString, std::shared_ptr<CamSyncInfo>> camClock;
+
+    static TimeHelperGlobalContext& instance()
+    {
+        static TimeHelperGlobalContext inst;
+        return inst;
+    }
+};
 
 TimeHelper::CamSyncInfo::CamSyncInfo():
     adjustmentHistory(kMaxAdjustmentHistoryRecordAge)
@@ -29,9 +38,9 @@ TimeHelper::TimeHelper(const QString& resourceId, GetCurrentTimeFunc getTime):
     m_getTime(getTime)
 {
     {
-        NX_MUTEX_LOCKER lock(&m_camClockMutex);
+        NX_MUTEX_LOCKER lock(&TimeHelperGlobalContext::instance().camClockMutex);
 
-        auto& syncInfo = m_camClock[m_resourceId];
+        auto& syncInfo = TimeHelperGlobalContext::instance().camClock[m_resourceId];
         if (!syncInfo)
             syncInfo = std::make_shared<CamSyncInfo>();
         m_cameraClockToLocalDiff = syncInfo;
@@ -40,13 +49,14 @@ TimeHelper::TimeHelper(const QString& resourceId, GetCurrentTimeFunc getTime):
 
 TimeHelper::~TimeHelper()
 {
-    NX_MUTEX_LOCKER lock(&m_camClockMutex);
+    NX_MUTEX_LOCKER lock(&TimeHelperGlobalContext::instance().camClockMutex);
+
     m_cameraClockToLocalDiff.reset();
-    auto it = m_camClock.find(m_resourceId);
-    if (it != m_camClock.end())
+    auto it = TimeHelperGlobalContext::instance().camClock.find(m_resourceId);
+    if (it != TimeHelperGlobalContext::instance().camClock.end())
     {
         if (it.value().use_count() == 1)
-            m_camClock.erase(it);
+            TimeHelperGlobalContext::instance().camClock.erase(it);
     }
 }
 

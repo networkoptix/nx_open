@@ -46,12 +46,6 @@ public:
     static void applyArguments(const ArgumentParser& args);
 
 private:
-    static std::atomic<size_t> s_timeoutMultiplier;
-    static std::atomic<double> s_loadFactor;
-    static std::atomic<bool> s_disableTimeAsserts;
-    static std::atomic<bool> s_keepTemporaryDirectory;
-    static std::atomic<size_t> s_loadMode;
-
     struct TemporaryDirectory
     {
         TemporaryDirectory();
@@ -65,7 +59,15 @@ private:
         QString m_path;
     };
 
-    static TemporaryDirectory s_temporaryDirectory;
+    static TemporaryDirectory& tmpDirInstance();
+
+private:
+    static std::atomic<size_t> s_timeoutMultiplier;
+    static std::atomic<double> s_loadFactor;
+    static std::atomic<bool> s_disableTimeAsserts;
+    static std::atomic<bool> s_keepTemporaryDirectory;
+    static std::atomic<size_t> s_loadMode;
+
     static QString s_moduleName;
 };
 

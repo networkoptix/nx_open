@@ -27,15 +27,24 @@ namespace {
 using namespace nx::core::layout;
 using namespace nx::utils::crypto_functions;
 
-nx::Mutex QnLayoutFileStorageResource::m_storageSync;
-QSet<QnLayoutFileStorageResource*> QnLayoutFileStorageResource::m_allStorages;
+struct QnLayoutFileStorageResourceGlobalContext
+{
+    nx::Mutex storageSync;
+    QSet<QnLayoutFileStorageResource*> allStorages;
+
+    static QnLayoutFileStorageResourceGlobalContext& instance()
+    {
+        static QnLayoutFileStorageResourceGlobalContext inst;
+        return inst;
+    }
+};
 
 QnLayoutFileStorageResource::QnLayoutFileStorageResource():
     base_type(),
     m_fileSync(nx::Mutex::Recursive)
 {
-    NX_MUTEX_LOCKER lock(&m_storageSync);
-    m_allStorages.insert(this);
+    NX_MUTEX_LOCKER lock(&QnLayoutFileStorageResourceGlobalContext::instance().storageSync);
+    QnLayoutFileStorageResourceGlobalContext::instance().allStorages.insert(this);
 }
 
 QnLayoutFileStorageResource::QnLayoutFileStorageResource(const QString& url):
@@ -46,8 +55,8 @@ QnLayoutFileStorageResource::QnLayoutFileStorageResource(const QString& url):
 
 QnLayoutFileStorageResource::~QnLayoutFileStorageResource()
 {
-    NX_MUTEX_LOCKER lock(&m_storageSync);
-    m_allStorages.remove(this);
+    NX_MUTEX_LOCKER lock(&QnLayoutFileStorageResourceGlobalContext::instance().storageSync);
+    QnLayoutFileStorageResourceGlobalContext::instance().allStorages.remove(this);
 }
 
 QnStorageResource* QnLayoutFileStorageResource::instance(const QString& url)
@@ -236,8 +245,8 @@ qint64 QnLayoutFileStorageResource::getTotalSpace() const
 
 bool QnLayoutFileStorageResource::switchToFile(const QString& oldName, const QString& newName, bool dataInOldFile)
 {
-    NX_MUTEX_LOCKER lock(&m_storageSync);
-    for (auto storage: m_allStorages)
+    NX_MUTEX_LOCKER lock(&QnLayoutFileStorageResourceGlobalContext::instance().storageSync);
+    for (auto storage: QnLayoutFileStorageResourceGlobalContext::instance().allStorages)
     {
         QString storageUrl = storage->getUrl();
         if (storageUrl == newName || storageUrl == oldName)
@@ -258,7 +267,7 @@ bool QnLayoutFileStorageResource::switchToFile(const QString& oldName, const QSt
         QFile::remove(oldName);
     }
 
-    for (auto storage: m_allStorages)
+    for (auto storage: QnLayoutFileStorageResourceGlobalContext::instance().allStorages)
     {
         QString storageUrl = storage->getUrl();
         if (storageUrl == newName || storageUrl == oldName)
