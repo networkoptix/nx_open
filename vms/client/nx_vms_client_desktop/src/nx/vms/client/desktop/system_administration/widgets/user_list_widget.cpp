@@ -75,8 +75,11 @@ public:
         switch (index.column())
         {
             case UserListModel::UserTypeColumn:
-            case UserListModel::IsCustomColumn:
                 return Skin::maximumSize(index.data(Qt::DecorationRole).value<QIcon>());
+
+            case UserListModel::IsCustomColumn:
+                return Skin::maximumSize(index.data(Qt::DecorationRole).value<QIcon>())
+                    + QSize(style::Metrics::kStandardPadding * 2, 0);
 
             default:
                 return base_type::sizeHint(option, index);
@@ -91,17 +94,21 @@ public:
         if (index.data(Qn::DisabledRole).toBool())
             painter->setOpacity(painter->opacity() * nx::style::Hints::kDisabledItemOpacity);
 
-        // Paint right-aligned user type icon:
-        if (index.column() == UserListModel::UserTypeColumn)
+        // Paint right-aligned user type icon or left-aligned custom permissions icon:
+        const bool isUserTypeColumn = index.column() == UserListModel::UserTypeColumn;
+        if (isUserTypeColumn || index.column() == UserListModel::IsCustomColumn)
         {
             const auto icon = index.data(Qt::DecorationRole).value<QIcon>();
             if (icon.isNull())
                 return;
 
+            const auto horizontalAlignment = isUserTypeColumn ? Qt::AlignRight : Qt::AlignLeft;
+            const qreal padding = isUserTypeColumn ? 0 : style::Metrics::kStandardPadding;
+
             const auto rect = QStyle::alignedRect(Qt::LeftToRight,
-                Qt::AlignRight | Qt::AlignVCenter,
+                horizontalAlignment | Qt::AlignVCenter,
                 Skin::maximumSize(icon),
-                option.rect);
+                option.rect.adjusted(padding, 0, -padding, 0));
 
             icon.paint(painter, rect);
             return;
@@ -157,7 +164,7 @@ public:
         selectionControls)};
 
 public:
-    Private(UserListWidget* q);
+    explicit Private(UserListWidget* q);
     void setupUi();
     void loadData();
     void filterDigestUsers() { ui->filterButton->setCurrentAction(filterDigestAction); }
@@ -328,6 +335,7 @@ void UserListWidget::Private::setupUi()
     ui->usersTable->setItemDelegate(new UserListWidget::Delegate(q));
 
     header->setVisible(true);
+    header->setHighlightCheckedIndicator(true);
     header->setMaximumSectionSize(kMaximumColumnWidth);
     header->setSectionResizeMode(QHeaderView::ResizeToContents);
     header->setSectionResizeMode(UserListModel::UserGroupsColumn, QHeaderView::Stretch);
@@ -623,9 +631,8 @@ void UserListWidget::Private::handleUsersTableClicked(const QModelIndex& index)
 
 void UserListWidget::Private::loadData()
 {
-    ui->createUserButton->setEnabled(true);
     usersModel->resetUsers(q->resourcePool()->getResources<QnUserResource>());
-    updateSelection();
+    modelUpdated();
 }
 
 } // namespace nx::vms::client::desktop

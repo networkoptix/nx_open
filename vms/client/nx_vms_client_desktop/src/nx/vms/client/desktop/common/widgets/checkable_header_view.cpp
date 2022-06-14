@@ -15,7 +15,8 @@ CheckableHeaderView::CheckableHeaderView(int checkBoxColumn, QWidget* parent):
     m_checkState(Qt::Unchecked)
 {
     setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-    connect(this, &CheckableHeaderView::sectionClicked, this, &CheckableHeaderView::at_sectionClicked);
+    connect(this, &CheckableHeaderView::sectionClicked,
+        this, &CheckableHeaderView::at_sectionClicked);
 }
 
 Qt::CheckState CheckableHeaderView::checkState() const
@@ -33,7 +34,8 @@ void CheckableHeaderView::setCheckState(Qt::CheckState state)
     }
 }
 
-void CheckableHeaderView::paintSection(QPainter* painter, const QRect& rect, int logicalIndex) const
+void CheckableHeaderView::paintSection(
+    QPainter* painter, const QRect& rect, int logicalIndex) const
 {
     base_type::paintSection(painter, rect, logicalIndex);
 
@@ -50,27 +52,47 @@ void CheckableHeaderView::paintSection(QPainter* painter, const QRect& rect, int
     opt.state |= QStyle::State_Raised;
     opt.state &= ~QStyle::State_HasFocus;
 
-    if ((opt.state & QStyle::State_MouseOver) && (logicalIndexAt(mapFromGlobal(QCursor::pos())) != logicalIndex))
+    if (opt.state.testFlag(QStyle::State_MouseOver)
+        && (logicalIndexAt(mapFromGlobal(QCursor::pos())) != logicalIndex))
+    {
         opt.state &= ~QStyle::State_MouseOver;
+    }
 
     opt.rect = rect;
     opt.rect = style()->subElementRect(QStyle::SE_ItemViewItemCheckIndicator, &opt, this);
 
-    switch(m_checkState)
+    switch (m_checkState)
     {
-    case Qt::Checked:
-        opt.state |= QStyle::State_On;
-        break;
-    case Qt::Unchecked:
-        opt.state |= QStyle::State_Off;
-        break;
-    default:
-        opt.state |= QStyle::State_NoChange;
-        break;
+        case Qt::Checked:
+            opt.state |= QStyle::State_On;
+            break;
+        case Qt::Unchecked:
+            opt.state |= QStyle::State_Off;
+            break;
+        default:
+            opt.state |= QStyle::State_NoChange;
+            break;
     }
+
+    if (m_highlightCheckedIndicator && opt.state.testFlag(QStyle::State_On))
+        opt.palette.setBrush(QPalette::Text, opt.palette.buttonText());
 
     QnScopedPainterClipRegionRollback clipRollback(painter, QRegion(rect));
     style()->drawPrimitive(QStyle::PE_IndicatorItemViewItemCheck, &opt, painter, this);
+}
+
+bool CheckableHeaderView::highlightCheckedIndicator() const
+{
+    return m_highlightCheckedIndicator;
+}
+
+void CheckableHeaderView::setHighlightCheckedIndicator(bool value)
+{
+    if (m_highlightCheckedIndicator == value)
+        return;
+
+    m_highlightCheckedIndicator = value;
+    update();
 }
 
 QSize CheckableHeaderView::sectionSizeFromContents(int logicalIndex) const
