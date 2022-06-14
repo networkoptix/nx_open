@@ -1,4 +1,4 @@
-// Copyright 2022-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #pragma once
 
@@ -16,7 +16,7 @@ class ComboBoxWithHint: public QComboBox
     using base_type = QComboBox;
 public:
     explicit ComboBoxWithHint(QWidget* parent = nullptr);
-    
+
     void setItemHint(int index, const QString& text);
 
     void setHintColor(const QColor& color);

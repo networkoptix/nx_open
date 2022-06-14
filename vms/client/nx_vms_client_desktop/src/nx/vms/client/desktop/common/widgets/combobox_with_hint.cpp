@@ -1,4 +1,4 @@
-// Copyright 2022-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "combobox_with_hint.h"
 
