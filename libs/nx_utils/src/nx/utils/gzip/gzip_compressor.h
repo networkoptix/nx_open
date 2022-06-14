@@ -14,6 +14,8 @@ namespace gzip {
 class NX_UTILS_API Compressor
 {
 public:
+    static bool isZlibCompressed(const nx::Buffer& data);
+
     static QByteArray compressData(const QByteArray& data, bool addCrcAndSize = true);
     static nx::Buffer compressData(const nx::Buffer& data, bool addCrcAndSize = true);
 
