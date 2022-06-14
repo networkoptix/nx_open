@@ -54,16 +54,19 @@ void QtDbConnection::close()
 
 bool QtDbConnection::begin()
 {
+    NX_TRACE(this, "BEGIN");
     return m_connection.transaction();
 }
 
 bool QtDbConnection::commit()
 {
+    NX_TRACE(this, "COMMIT");
     return m_connection.commit();
 }
 
 bool QtDbConnection::rollback()
 {
+    NX_TRACE(this, "ROLLBACK");
     return m_connection.rollback();
 }
 
