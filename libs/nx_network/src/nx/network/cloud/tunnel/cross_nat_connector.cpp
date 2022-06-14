@@ -105,6 +105,9 @@ void CrossNatConnector::replaceOriginatingHostAddress(const std::string& address
 
 utils::ResultCounter<nx::hpm::api::ResultCode>& CrossNatConnector::mediatorResponseCounter()
 {
+    static utils::ResultCounter<nx::hpm::api::ResultCode> s_mediatorResponseCounter(
+        [](nx::hpm::api::ResultCode code) { return nx::reflect::toString(code); });
+
     return s_mediatorResponseCounter;
 }
 
@@ -131,9 +134,6 @@ void CrossNatConnector::ioFailure(SystemError::ErrorCode /*errorCode*/)
     //  it will be reported to TunnelConnector::connectSessionReportSent too
     //  and we will handle error there
 }
-
-utils::ResultCounter<nx::hpm::api::ResultCode> CrossNatConnector::s_mediatorResponseCounter(
-    [](nx::hpm::api::ResultCode code) { return nx::reflect::toString(code); });
 
 void CrossNatConnector::fetchMediatorUdpEndpoint()
 {
@@ -171,7 +171,7 @@ void CrossNatConnector::issueConnectRequestToMediator()
         post(
             [this, resultCode = resultCode]() mutable
             {
-                s_mediatorResponseCounter.addResult(hpm::api::ResultCode::badTransport);
+                mediatorResponseCounter().addResult(hpm::api::ResultCode::badTransport);
                 nx::utils::swapAndCall(m_completionHandler, resultCode, nullptr);
             });
         return;
@@ -230,9 +230,7 @@ void CrossNatConnector::onConnectResponse(
     api::ResultCode resultCode,
     api::ConnectResponse response)
 {
-    using namespace std::placeholders;
-
-    s_mediatorResponseCounter.addResult(resultCode);
+    mediatorResponseCounter().addResult(resultCode);
     NX_VERBOSE(this, "cross-nat %1. Received %2 response from mediator",
         m_connectSessionId, resultCode);
 
@@ -265,7 +263,7 @@ void CrossNatConnector::onConnectResponse(
         std::move(mediatorClientSocket));
     m_cloudConnectorExecutor->setTimeout(effectiveConnectTimeout);
     m_cloudConnectorExecutor->start(
-        std::bind(&CrossNatConnector::onConnectorFinished, this, _1, _2, _3));
+        [this](auto&&... args) { onConnectorFinished(std::forward<decltype(args)>(args)...); });
 }
 
 std::chrono::milliseconds CrossNatConnector::calculateTimeLeftForConnect()

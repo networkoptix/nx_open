@@ -27,9 +27,6 @@ static const int TCP_RECEIVE_TIMEOUT_MS = 1000 * 5;
 static const int TCP_CONNECT_TIMEOUT_MS = 1000 * 5;
 static const int SDP_TRACK_STEP = 2;
 
-QByteArray QnRtspClient::m_guid;
-nx::Mutex QnRtspClient::m_guidMutex;
-
 using namespace std::chrono;
 
 namespace {
@@ -994,10 +991,9 @@ void QnRtspClient::addRangeHeader( nx::network::http::Request* const request, qi
 
 QByteArray QnRtspClient::getGuid()
 {
-    NX_MUTEX_LOCKER lock( &m_guidMutex );
-    if (m_guid.isEmpty())
-        m_guid = QnUuid::createUuid().toString().toUtf8();
-    return m_guid;
+    // client guid. used in proprietary extension.
+    static QByteArray s_guid(QnUuid::createUuid().toString().toUtf8());
+    return s_guid;
 }
 
 nx::network::http::Request QnRtspClient::createPlayRequest( qint64 startPos, qint64 endPos )

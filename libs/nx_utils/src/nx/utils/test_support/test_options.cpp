@@ -62,12 +62,12 @@ void TestOptions::setKeepTemporaryDirectory(bool value)
 
 void TestOptions::setTemporaryDirectoryPath(const QString& path)
 {
-    s_temporaryDirectory.setPath(path);
+    tmpDirInstance().setPath(path);
 }
 
 QString TestOptions::temporaryDirectoryPath(bool canCreate)
 {
-   return s_temporaryDirectory.path(canCreate);
+   return tmpDirInstance().path(canCreate);
 }
 
 void TestOptions::setModuleName(const QString& value)
@@ -137,6 +137,12 @@ void TestOptions::applyArguments(const utils::ArgumentParser& arguments)
 #endif
 }
 
+TestOptions::TemporaryDirectory& TestOptions::tmpDirInstance()
+{
+    static TemporaryDirectory instance;
+    return instance;
+}
+
 //-------------------------------------------------------------------------------------------------
 
 TestOptions::TemporaryDirectory::TemporaryDirectory()
@@ -178,7 +184,6 @@ std::atomic<bool> TestOptions::s_disableTimeAsserts(false);
 std::atomic<bool> TestOptions::s_keepTemporaryDirectory(false);
 std::atomic<size_t> TestOptions::s_loadMode(1);
 
-TestOptions::TemporaryDirectory TestOptions::s_temporaryDirectory;
 QString TestOptions::s_moduleName(QnUuid::createUuid().toSimpleString());
 
 } // namespace utils

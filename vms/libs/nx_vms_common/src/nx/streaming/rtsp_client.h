@@ -379,9 +379,6 @@ private:
     QString m_contentBase;
     nx::vms::api::RtpTransportType m_actualTransport;
 
-    static QByteArray m_guid; // client guid. used in proprietary extension
-    static nx::Mutex m_guidMutex;
-
     struct RtpChannel
     {
         bool isRtcp = false;

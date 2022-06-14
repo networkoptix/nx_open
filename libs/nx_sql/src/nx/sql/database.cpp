@@ -4,17 +4,21 @@
 
 namespace nx::sql {
 
-nx::Mutex Database::m_mutex;
+static nx::Mutex& mutex()
+{
+    static nx::Mutex instance;
+    return instance;
+}
 
 QSqlDatabase Database::addDatabase(const QString& type, const QString& connectionName)
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&mutex());
     return QSqlDatabase::addDatabase(type, connectionName);
 }
 
 void Database::removeDatabase(const QString& connectionName)
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&mutex());
     QSqlDatabase::removeDatabase(connectionName);
 }
 

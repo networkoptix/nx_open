@@ -65,12 +65,12 @@ bool SafeDirectConnectionGlobalHelper::isConnected(const EnableSafeDirectConnect
     return m_receivers.find(receiver->uniqueObjectSequence()) != m_receivers.end();
 }
 
-// TODO: #akolesnikov Create this instance on-demand.
-static std::shared_ptr<SafeDirectConnectionGlobalHelper>
-safeDirectConnectionGlobalHelperInstance(std::make_shared<SafeDirectConnectionGlobalHelper>());
-
 std::shared_ptr<SafeDirectConnectionGlobalHelper> SafeDirectConnectionGlobalHelper::instance()
 {
+    static std::shared_ptr<SafeDirectConnectionGlobalHelper>
+        safeDirectConnectionGlobalHelperInstance(
+            std::make_shared<SafeDirectConnectionGlobalHelper>());
+
     return safeDirectConnectionGlobalHelperInstance;
 }
 

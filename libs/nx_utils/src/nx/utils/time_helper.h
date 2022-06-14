@@ -54,10 +54,10 @@ private:
         CamSyncInfo();
     };
 
+    struct TimeHelperGlobalContext;
+
     GetCurrentTimeFunc m_getTime;
     std::shared_ptr<CamSyncInfo> m_cameraClockToLocalDiff;
-    static nx::Mutex m_camClockMutex;
-    static QMap<QString, std::shared_ptr<CamSyncInfo>> m_camClock;
     QElapsedTimer m_timer; //< Checking local time.
     std::chrono::microseconds m_localStartTimeUs;
 

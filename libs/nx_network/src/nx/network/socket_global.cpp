@@ -59,7 +59,6 @@ private:
 
 enum class InitState { none, inintializing, done, deinitializing };
 
-static nx::Mutex s_mutex;
 static std::atomic<InitState> s_initState(InitState::none);
 static size_t s_counter(0);
 static SocketGlobals* s_instance = nullptr;
@@ -213,11 +212,17 @@ int SocketGlobals::initializationFlags()
     return s_instance->m_impl->initializationFlags;
 }
 
+static nx::Mutex& socketGlobalsMutexInstance()
+{
+    static nx::Mutex mtx;
+    return mtx;
+}
+
 void SocketGlobals::init(
     const utils::ArgumentParser& arguments,
     int initializationFlags)
 {
-    NX_MUTEX_LOCKER lock(&s_mutex);
+    NX_MUTEX_LOCKER lock(&socketGlobalsMutexInstance());
 
     if (++s_counter == 1) //< First in.
     {
@@ -253,7 +258,7 @@ void SocketGlobals::init(
 
 void SocketGlobals::deinit()
 {
-    NX_MUTEX_LOCKER lock(&s_mutex);
+    NX_MUTEX_LOCKER lock(&socketGlobalsMutexInstance());
     if (--s_counter == 0) //< Last out.
     {
         {

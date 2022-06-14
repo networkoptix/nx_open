@@ -43,7 +43,12 @@ namespace detail {
         const uint8_t* iv);
 #endif // #if defined(CBC) && CBC
 
-nx::Mutex stateMutex;
+static nx::Mutex& stateMutex()
+{
+    static nx::Mutex mtx;
+    return mtx;
+}
+
 static constexpr size_t kKeySize = 16;
 
 // Hardcoded random key, generated from guid.
@@ -91,7 +96,7 @@ QByteArray encodeAES128CBC(const QByteArray& data, const std::array<uint8_t, 16>
     if (data.isEmpty())
         return QByteArray();
 
-    NX_MUTEX_LOCKER lock(&detail::stateMutex);
+    NX_MUTEX_LOCKER lock(&detail::stateMutex());
     const QByteArray* pdata = &data;
     QByteArray dataCopy;
     const int padSize = 16 - data.size() % 16;
@@ -117,7 +122,7 @@ QByteArray decodeAES128CBC(const QByteArray& data, const std::array<uint8_t, 16>
     if (data.isEmpty())
         return QByteArray();
 
-    NX_MUTEX_LOCKER lock(&detail::stateMutex);
+    NX_MUTEX_LOCKER lock(&detail::stateMutex());
     if (data.size() % 16 != 0)
         return QByteArray();
 

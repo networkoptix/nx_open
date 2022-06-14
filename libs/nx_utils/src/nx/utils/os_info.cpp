@@ -12,10 +12,6 @@
 
 namespace nx::utils {
 
-static nx::ReadWriteLock mutex;
-static QString currentVariantOverride;
-static QString currentVariantVersionOverride;
-
 QJsonObject OsInfo::toJson() const
 {
     return QJsonObject{
@@ -54,9 +50,19 @@ bool OsInfo::operator==(const OsInfo& other) const
         && variantVersion == other.variantVersion;
 }
 
+// Introduced to make the mutex initialization on-demand.
+static nx::ReadWriteLock& mutex()
+{
+    static nx::ReadWriteLock mtx;
+    return mtx;
+}
+
+static QString currentVariantOverride;
+static QString currentVariantVersionOverride;
+
 void OsInfo::override(const QString& variant, const QString& variantVersion)
 {
-    NX_WRITE_LOCKER lock(&mutex);
+    NX_WRITE_LOCKER lock(&mutex());
     currentVariantOverride = variant;
     currentVariantVersionOverride = variantVersion;
 }
@@ -65,7 +71,7 @@ OsInfo OsInfo::current()
 {
     OsInfo result(nx::build_info::applicationPlatformNew());
     {
-        NX_READ_LOCKER lock(&mutex);
+        NX_READ_LOCKER lock(&mutex());
         result.variant = currentVariantOverride;
         result.variantVersion = currentVariantVersionOverride;
     }
