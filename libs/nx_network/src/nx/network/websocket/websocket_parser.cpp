@@ -2,6 +2,7 @@
 
 #include "websocket_parser.h"
 #include <nx/network/socket_common.h>
+#include <nx/utils/gzip/gzip_compressor.h>
 
 #include <algorithm>
 #include <stdint.h>
@@ -140,19 +141,28 @@ void Parser::handleFrame()
 {
     if (m_doUncompress)
     {
-        m_uncompressor.processData(m_frameBuffer);
-        m_frameBuffer = m_uncompressed;
-
-        if (m_fin)
+        if (nx::utils::bstream::gzip::Compressor::isZlibCompressed(m_frameBuffer))
         {
-            // https://datatracker.ietf.org/doc/html/rfc7692#section-7.2.2
-            // Block with "\x00\x00\xff\xff" should be inflated in separate call of 'inflate()',
-            // this logic is copied from Chromium sources.
-            static const nx::Buffer buf("\x00\x00\xff\xff", 4);
-            m_uncompressor.processData(buf);
+            // Fallback for vms 5.0 and older.
+            // Please remove this code then backward support is no longer needed.
+            m_frameBuffer = nx::utils::bstream::gzip::Compressor::uncompressData(m_frameBuffer);
         }
+        else
+        {
+            m_uncompressor.processData(m_frameBuffer);
+            m_frameBuffer = m_uncompressed;
 
-        m_uncompressed.clear();
+            if (m_fin)
+            {
+                // https://datatracker.ietf.org/doc/html/rfc7692#section-7.2.2
+                // Block with "\x00\x00\xff\xff" should be inflated in separate call of 'inflate()',
+                // this logic is copied from Chromium sources.
+                static const nx::Buffer buf("\x00\x00\xff\xff", 4);
+                m_uncompressor.processData(buf);
+            }
+
+            m_uncompressed.clear();
+        }
     }
 
     m_frameHandler(m_firstFrame ? m_opCode : FrameType::continuation, m_frameBuffer, m_fin);
