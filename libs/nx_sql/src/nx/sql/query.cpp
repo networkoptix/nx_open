@@ -80,11 +80,16 @@ void SqlQuery::exec()
 
     const auto ok = m_sqlQuery.exec();
 
-    NX_TRACE(this, "Query %1 completed in %2", m_sqlQuery.lastQuery(),
-        floor<milliseconds>(steady_clock::now() - t0));
-
-    if (!ok)
+    if (ok)
     {
+        NX_TRACE(this, "Query %1 completed in %2", m_sqlQuery.lastQuery(),
+            floor<milliseconds>(steady_clock::now() - t0));
+    }
+    else
+    {
+        NX_TRACE(this, "Query %1 failed. %2", m_sqlQuery.lastQuery(),
+            m_sqlQuery.lastError().text());
+
         throw Exception(
             getLastErrorCode(),
             m_sqlQuery.lastError().text().toStdString());
