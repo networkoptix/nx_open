@@ -83,6 +83,15 @@ struct CreateHashByIdHelper
     QnUuid operator ()(const Param &param) { return param.id; }
 };
 
+struct HardwareIdMappingHashHelper
+{
+    QnUuid operator()(const nx::vms::api::HardwareIdMapping& params)
+    {
+        return QnAbstractTransaction::makeHash(
+            params.physicalIdGuid.toRfc4122(), "hardwareid_mapping");
+    }
+};
+
 template<typename ClassType, typename FieldType>
 struct CreateHashFromCustomField
 {

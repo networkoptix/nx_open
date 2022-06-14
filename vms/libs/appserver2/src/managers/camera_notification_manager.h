@@ -31,6 +31,9 @@ public:
     void triggerNotification(
         const QnTransaction<nx::vms::api::ServerFootageData>& tran,
         NotificationSource source);
+    void triggerNotification(
+        const QnTransaction<nx::vms::api::HardwareIdMapping>& tran,
+        NotificationSource source);
 };
 
 typedef std::shared_ptr<QnCameraNotificationManager> QnCameraNotificationManagerPtr;

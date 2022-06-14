@@ -484,6 +484,42 @@ APPLY(314, removeCameraUserAttributes, nx::vms::api::IdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
+APPLY(315, addHardwareIdMapping, nx::vms::api::HardwareIdMapping, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       false, /*isRemoveOperation*/ \
+                       HardwareIdMappingHashHelper(), /* getHash*/ \
+                       CameraNotificationManagerHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AdminOnlyAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
+APPLY(316, removeHardwareIdMapping, nx::vms::api::IdData, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       true, /*isRemoveOperation*/ \
+                       CreateHashByIdRfc4122Helper("hardwareid_mapping"), /* getHash*/ \
+                       CameraNotificationManagerHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AdminOnlyAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
+APPLY(317, getHardwareIdMappings, nx::vms::api::HardwareIdMappingList, \
+                       false, /* persistent*/ \
+                       false, /* system*/ \
+                       false, /*isRemoveOperation*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       InvalidTriggerNotificationHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
+                       FilterListByAccess<AdminOnlyAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(400, getMediaServers, nx::vms::api::MediaServerDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \

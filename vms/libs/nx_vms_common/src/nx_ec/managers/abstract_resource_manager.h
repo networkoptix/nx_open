@@ -104,8 +104,14 @@ public:
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
+    virtual int removeHardwareIdMapping(
+        const QnUuid& resourceId,
+        Handler<> handler,
+        nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
+
     ErrorCode removeSync(const QVector<QnUuid>& resourceIds);
     ErrorCode removeSync(const nx::vms::api::ResourceParamWithRefData& data);
+    ErrorCode removeHardwareIdMappingSync(const QnUuid& resourceId);
 };
 
 } // namespace ec2

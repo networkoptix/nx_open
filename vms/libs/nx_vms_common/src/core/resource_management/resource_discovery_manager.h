@@ -167,6 +167,7 @@ protected:
     void updateSearcherUsageUnsafe(QnAbstractResourceSearcher *searcher, bool usePartialEnable);
     void updateSearchersUsage();
     bool isRedundancyUsing() const;
+    virtual QnResourceList remapPhysicalIdIfNeed(const QnResourceList& resources);
 
 protected:
     QThreadPool m_threadPool;

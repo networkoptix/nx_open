@@ -514,6 +514,12 @@ QnScheduleTaskList QnSecurityCamResource::getScheduleTasks() const
     return userAttributesPool()->scheduleTasks(getIdForUserAttributes());
 }
 
+QnCameraUserAttributesPtr QnSecurityCamResource::userAttributes() const
+{
+    NX_ASSERT(!getIdForUserAttributes().isNull());
+    return userAttributesPool()->getCopy(getIdForUserAttributes());
+}
+
 bool QnSecurityCamResource::hasDualStreaming() const {
     return m_cachedHasDualStreaming.get();
 }

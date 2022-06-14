@@ -222,6 +222,7 @@ void QnResourceDiscoveryManager::doInitialSearch()
         if ((searcher->discoveryMode() != DiscoveryMode::disabled) && searcher->isLocal())
         {
             QnResourceList lst = searcher->search();
+            lst = remapPhysicalIdIfNeed(lst); //< Used in case of device replacement.
             m_resourceProcessor->processResources(lst);
         }
     }
@@ -409,6 +410,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             QElapsedTimer timer;
             timer.restart();
             QnResourceList lst = searcher->search();
+            lst = remapPhysicalIdIfNeed(lst); //< Used in case of device replacement.
             NX_DEBUG(this, lit("Searcher %1 took %2 ms to find %3 resources").
                 arg(searcher->manufacturer())
                 .arg(timer.elapsed())
@@ -737,4 +739,9 @@ void QnResourceDiscoveryManager::addResourcesImmediatly(QnResourceList& resource
         resource->setCommonModule(commonModule());
     processDiscoveredResources(resources, SearchType::Partial);
     m_resourceProcessor->processResources(resources);
+}
+
+QnResourceList QnResourceDiscoveryManager::remapPhysicalIdIfNeed(const QnResourceList& resources)
+{
+    return resources;
 }

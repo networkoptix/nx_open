@@ -155,6 +155,7 @@ public:
 
     void setScheduleTasks(const QnScheduleTaskList &scheduleTasks);
     QnScheduleTaskList getScheduleTasks() const;
+    QnCameraUserAttributesPtr userAttributes() const;
 
     /** @return Whether dual streaming is supported by the camera internally. */
     virtual bool hasDualStreamingInternal() const;

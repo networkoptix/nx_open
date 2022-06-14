@@ -14,6 +14,7 @@
 
 #include <nx/vms/api/data/runtime_data.h>
 #include <nx/vms/api/data/full_info_data.h>
+#include <nx/vms/api/data/hardware_id_mapping.h>
 #include <nx/vms/api/rules/event_info.h>
 
 #include <nx/utils/singleton.h>
@@ -83,6 +84,8 @@ public:
     void resetUserRoles(const nx::vms::api::UserRoleDataList& roles);
     void resetEventRules(const nx::vms::api::EventRuleDataList& eventRules);
     void resetVmsRules(const nx::vms::api::rules::RuleList& vmsRules);
+    virtual void addHardwareIdMapping(const nx::vms::api::HardwareIdMapping& /*data*/) {}
+    virtual void removeHardwareIdMapping(const QnUuid& /*id*/) {}
 
 signals:
     void connectionOpened();

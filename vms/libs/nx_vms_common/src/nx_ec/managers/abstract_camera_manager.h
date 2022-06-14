@@ -10,6 +10,7 @@
 #include <nx/vms/api/data/camera_data_ex.h>
 #include <nx/vms/api/data/camera_history_data.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
+#include <nx/vms/api/data/hardware_id_mapping.h>
 
 #include <QtCore/QObject>
 
@@ -28,6 +29,9 @@ signals:
 
     void userAttributesChanged(const nx::vms::api::CameraAttributesData& attributes);
     void userAttributesRemoved(const QnUuid& id);
+
+    void hardwareIdMappingAdded(const nx::vms::api::HardwareIdMapping& hardwareIdMapping);
+    void hardwareIdMappingRemoved(const QnUuid& id);
 };
 
 /*!
@@ -54,6 +58,26 @@ public:
         const nx::vms::api::CameraData& data,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
+
+    virtual int addHardwareIdMapping(
+        const nx::vms::api::HardwareIdMapping& hardwareIdMapping,
+        Handler<> handler,
+        nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
+
+    ErrorCode addHardwareIdMappingSync(const nx::vms::api::HardwareIdMapping& hardwareIdMapping);
+
+    virtual int removeHardwareIdMapping(
+        const QnUuid& id,
+        Handler<> handler,
+        nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
+
+    ErrorCode removeHardwareIdMappingSync(const QnUuid& id);
+
+    virtual int getHardwareIdMappings(
+        Handler<nx::vms::api::HardwareIdMappingList> handler,
+        nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
+
+    ErrorCode getHardwareIdMappingsSync(nx::vms::api::HardwareIdMappingList* outHardwareIdMappings);
 
     ErrorCode addCameraSync(const nx::vms::api::CameraData& data);
 

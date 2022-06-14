@@ -126,6 +126,12 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
             updateResource(resource, source);
         };
 
+    const auto on_hardwareIdMappingAdded =
+        [this](const auto& hardwareIdMapping) { addHardwareIdMapping(hardwareIdMapping); };
+
+    const auto on_hardwareIdMappingRemoved =
+        [this](const QnUuid& id) { removeHardwareIdMapping(id); };
+
     const auto connectionType = handlerConnectionType();
 
     connect(
@@ -236,6 +242,18 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         connectionType);
 
     const auto cameraManager = connection->cameraNotificationManager();
+    connect(
+        cameraManager,
+        &ec2::AbstractCameraNotificationManager::hardwareIdMappingAdded,
+        this,
+        on_hardwareIdMappingAdded,
+        connectionType);
+    connect(
+        cameraManager,
+        &ec2::AbstractCameraNotificationManager::hardwareIdMappingRemoved,
+        this,
+        on_hardwareIdMappingRemoved,
+        connectionType);
     connect(
         cameraManager,
         &ec2::AbstractCameraNotificationManager::addedOrUpdated,
