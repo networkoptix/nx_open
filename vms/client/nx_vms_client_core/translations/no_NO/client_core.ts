@@ -90,21 +90,21 @@
     </message>
     <message>
       <source>Invalid certificate</source>
-      <translation type="unfinished">Invalid certificate</translation>
+      <translation>Ugyldig sertifikat</translation>
     </message>
     <message>
       <source>The server&amp;apos;s certificate was rejected.</source>
-      <translation type="unfinished">The server&amp;apos;s certificate was rejected.</translation>
+      <translation>Serveren&amp;apos; sitt sertifikat ble avvist.</translation>
     </message>
     <message>
       <source>Restore the connection to %1 and try again</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Restore the connection to %1 and try again</translation>
+      <translation>Gjenopprett tilkoblingen til %1 og prøv igjen</translation>
     </message>
     <message>
       <source>%1 user login is temporarily unavailable</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user login is temporarily unavailable</translation>
+      <translation>%1 brukerinnlogging er midlertidig utilgjengelig</translation>
     </message>
     <message>
       <source>Connection timed out</source>
@@ -112,7 +112,7 @@
     </message>
     <message>
       <source>The server is incompatible.</source>
-      <translation type="unfinished">The server is incompatible.</translation>
+      <translation>Serveren er inkompatibel.</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
@@ -128,7 +128,7 @@
     </message>
     <message>
       <source>Session expired. Re-enter your password.</source>
-      <translation type="unfinished">Session expired. Re-enter your password.</translation>
+      <translation>Sesjon utløpt. Skriv inn passordet ditt på nytt.</translation>
     </message>
     <message>
       <source>Invalid login or password</source>

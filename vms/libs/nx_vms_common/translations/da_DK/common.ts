@@ -445,7 +445,7 @@
     <name>QnFfmpegVideoTranscoder</name>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation type="unfinished">Could not find encoder for codec %1.</translation>
+      <translation>Kunne ikke finde encoder til codec %1.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
@@ -806,44 +806,44 @@
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Kameraer</numerusform>
-        <numerusform>%n Cameras</numerusform>
+        <numerusform>%n Kameraer</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n kameraer</numerusform>
-        <numerusform>%n cameras</numerusform>
+        <numerusform>%n kameraer</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Modules</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n I/O-Moduler</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
+        <numerusform>%n I/O-Moduler</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n I/O moduler</numerusform>
-        <numerusform>%n I/O modules</numerusform>
+        <numerusform>%n I/O moduler</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Enheder</numerusform>
-        <numerusform>%n Devices</numerusform>
+        <numerusform>%n Enheder</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n enheder</numerusform>
-        <numerusform>%n devices</numerusform>
+        <numerusform>%n enheder</numerusform>
       </translation>
     </message>
   </context>
@@ -1052,11 +1052,11 @@
     </message>
     <message>
       <source>Viewer</source>
-      <translation type="unfinished">Viewer</translation>
+      <translation>Viewer</translation>
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation type="unfinished">Live Viewer</translation>
+      <translation>Live Viewer</translation>
     </message>
     <message>
       <source>Custom Role</source>
@@ -1064,7 +1064,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Brugerdefineret</translation>
     </message>
     <message>
       <source>Can manage all cameras and bookmarks.</source>
@@ -1560,7 +1560,7 @@
     </message>
     <message>
       <source>Soft Trigger</source>
-      <translation type="unfinished">Soft Trigger</translation>
+      <translation>Udløser</translation>
     </message>
     <message>
       <source>Soft Trigger %1 at %2</source>
@@ -1580,7 +1580,7 @@
     </message>
     <message>
       <source>Analytics Event</source>
-      <translation type="unfinished">Analytics Event</translation>
+      <translation>Analyse Begivenhed</translation>
     </message>
     <message>
       <source>%1 at %2</source>

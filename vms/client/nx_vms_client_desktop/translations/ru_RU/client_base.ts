@@ -10191,11 +10191,11 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Does not affect the connections established by server.</source>
-      <translation type="unfinished">Does not affect the connections established by server.</translation>
+      <translation>Не влияет на соединения, установленные сервером.</translation>
     </message>
     <message>
       <source>Enables RTSP traffic encryption.</source>
-      <translation type="unfinished">Enables RTSP traffic encryption.</translation>
+      <translation>Включает шифрование трафика RTSP.</translation>
     </message>
     <message>
       <source>days</source>

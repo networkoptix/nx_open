@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="da_DK" sourcelanguage="en">
+<TS version="2.1" language="gl_ES" sourcelanguage="en">
   <context>
     <name>DownloadInterruptReason</name>
     <message>
@@ -120,7 +120,7 @@
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation>Slå lyd til/fra</translation>
+      <translation type="unfinished">Toggle Mute</translation>
     </message>
     <message>
       <source>Close Page</source>
@@ -195,7 +195,7 @@
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation>Slå lyd til/fra</translation>
+      <translation type="unfinished">Toggle Mute</translation>
     </message>
     <message>
       <source>Close Page</source>
@@ -267,11 +267,11 @@
     </message>
     <message>
       <source>&amp;Back</source>
-      <translation>&amp;Tilbage</translation>
+      <translation type="unfinished">&amp;Back</translation>
     </message>
     <message>
       <source>&amp;Forward</source>
-      <translation>&amp;Fremad</translation>
+      <translation type="unfinished">&amp;Forward</translation>
     </message>
     <message>
       <source>&amp;Reload</source>
@@ -286,11 +286,11 @@
     <name>RenderViewContextMenuQt</name>
     <message>
       <source>Back</source>
-      <translation>Tilbage</translation>
+      <translation type="unfinished">Back</translation>
     </message>
     <message>
       <source>Forward</source>
-      <translation>Fremad</translation>
+      <translation type="unfinished">Forward</translation>
     </message>
     <message>
       <source>Reload</source>
@@ -298,15 +298,15 @@
     </message>
     <message>
       <source>Cut</source>
-      <translation>Klip</translation>
+      <translation type="unfinished">Cut</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation>Kopier</translation>
+      <translation type="unfinished">Copy</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation>Indsæt</translation>
+      <translation type="unfinished">Paste</translation>
     </message>
     <message>
       <source>Undo</source>

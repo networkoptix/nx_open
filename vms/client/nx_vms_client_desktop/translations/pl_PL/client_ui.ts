@@ -2992,7 +2992,7 @@
     </message>
     <message>
       <source>Proxy this webpage via server</source>
-      <translation type="unfinished">Proxy this webpage via server</translation>
+      <translation>Przekazuj tę stronę przez serwer</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -3008,7 +3008,7 @@
     </message>
     <message>
       <source>Proxy all requested contents</source>
-      <translation type="unfinished">Proxy all requested contents</translation>
+      <translation>Przekazuj całą żądaną zawartość</translation>
     </message>
     <message>
       <source>Allow opening web page without SSL certificate checking</source>

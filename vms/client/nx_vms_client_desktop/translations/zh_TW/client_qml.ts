@@ -795,7 +795,7 @@
     </message>
     <message>
       <source>preview is not available for the selected object</source>
-      <translation type="unfinished">preview is not available for the selected object</translation>
+      <translation>無法在所選的物件上取得預覽畫面</translation>
     </message>
   </context>
   <context>

@@ -1,482 +1,474 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="pl_PL" sourcelanguage="en">
+<TS version="2.1" language="gl_ES" sourcelanguage="en">
   <context>
     <name>AdvancedUpdateSettings</name>
     <message>
       <source>Advanced Update Settings</source>
-      <translation>Zaawansowane ustawienia aktualizacji</translation>
+      <translation type="unfinished">Advanced Update Settings</translation>
     </message>
     <message>
       <source>Notifications</source>
-      <translation>Powiadomienia</translation>
+      <translation type="unfinished">Notifications</translation>
     </message>
     <message>
       <source>Notify about available updates</source>
-      <translation>Powiadamiaj o dostępnych aktualizacjach</translation>
+      <translation type="unfinished">Notify about available updates</translation>
     </message>
     <message>
       <source>Automatic client updates</source>
-      <translation>Automatyczne aktualizacje klienta</translation>
+      <translation type="unfinished">Automatic client updates</translation>
     </message>
     <message>
       <source>Turn this option on to make connected clients update automatically to the latest compatible version.</source>
-      <translation>Włącz tę opcję, aby podłączeni klienci automatycznie aktualizowali się do najnowszej kompatybilnej wersji.</translation>
+      <translation type="unfinished">Turn this option on to make connected clients update automatically to the latest compatible version.</translation>
     </message>
     <message>
       <source>Connecting clients will be automatically updated to the new version when it’s available.</source>
-      <translation>Łączący się klienci zostaną automatycznie zaktualizowani do nowej wersji, gdy będzie dostępna.</translation>
+      <translation type="unfinished">Connecting clients will be automatically updated to the new version when it’s available.</translation>
     </message>
     <message>
       <source>All connecting clients are updating to version %1.</source>
-      <translation>Wszyscy łączący się klienci są aktualizowani do wersji %1.</translation>
+      <translation type="unfinished">All connecting clients are updating to version %1.</translation>
     </message>
     <message>
       <source>Connecting clients will be updated to version %1 on %2.</source>
-      <translation>Łączenie klientów zostanie zaktualizowane do wersji %1 na %2.</translation>
+      <translation type="unfinished">Connecting clients will be updated to version %1 on %2.</translation>
     </message>
     <message>
       <source>Check for updates</source>
-      <translation>Sprawdź dostępne aktualizacje</translation>
+      <translation type="unfinished">Check for updates</translation>
     </message>
     <message>
       <source>Speed up this update</source>
-      <translation>Przyspiesz tę aktualizację</translation>
+      <translation type="unfinished">Speed up this update</translation>
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
-      <translation>Używasz klienta niestandardowego. Skontaktuj się z %1, aby uzyskać instrukcje aktualizacji.</translation>
+      <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsEventSelector</name>
     <message>
       <source>Event Type</source>
-      <translation>Typ zdarzenia</translation>
+      <translation type="unfinished">Event Type</translation>
     </message>
     <message>
       <source>All</source>
-      <translation>Wszystko</translation>
+      <translation type="unfinished">All</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsFilters</name>
     <message>
       <source>Object Type</source>
-      <translation>Typ obiektu</translation>
+      <translation type="unfinished">Object Type</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsPanel</name>
     <message>
       <source>Select area</source>
-      <translation>Wybierz obszar</translation>
+      <translation type="unfinished">Select area</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation>Wybierz obszar na wideo...</translation>
+      <translation type="unfinished">Select some area on the video...</translation>
     </message>
     <message>
       <source>In selected area</source>
-      <translation>W zaznaczonym obszarze</translation>
+      <translation type="unfinished">In selected area</translation>
     </message>
     <message>
       <source>No objects</source>
-      <translation>Brak obiektów</translation>
+      <translation type="unfinished">No objects</translation>
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation>Spróbuj zmienić filtry lub skonfiguruj wykrywanie obiektów w ustawieniach wtyczki kamery</translation>
+      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation>
-        <numerusform>%n nowych wyników</numerusform>
-        <numerusform>%n nowych wyników</numerusform>
-        <numerusform>%n nowych wyników</numerusform>
-        <numerusform>%n nowych wyników</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n new results</numerusform>
+        <numerusform>%n new results</numerusform>
       </translation>
     </message>
     <message>
       <source>new results</source>
-      <translation>nowe wyniki</translation>
+      <translation type="unfinished">new results</translation>
     </message>
     <message>
       <source>Detected by</source>
-      <translation>Wykryty przez</translation>
+      <translation type="unfinished">Detected by</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsSearchDialog</name>
     <message>
       <source>Advanced Object Search</source>
-      <translation>Wyszukiwanie zaawansowane</translation>
+      <translation type="unfinished">Advanced Object Search</translation>
     </message>
     <message>
       <source>Select area</source>
-      <translation>Wybierz obszar</translation>
+      <translation type="unfinished">Select area</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation>Wybierz obszar na wideo...</translation>
+      <translation type="unfinished">Select some area on the video...</translation>
     </message>
     <message>
       <source>In selected area</source>
-      <translation>W zaznaczonym obszarze</translation>
+      <translation type="unfinished">In selected area</translation>
     </message>
     <message>
       <source>No objects</source>
-      <translation>Brak obiektów</translation>
+      <translation type="unfinished">No objects</translation>
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation>Spróbuj zmienić filtry lub skonfiguruj wykrywanie obiektów w ustawieniach wtyczki kamery</translation>
+      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
     </message>
     <message>
       <source>Any plugin</source>
-      <translation>Dowolna wtyczka</translation>
+      <translation type="unfinished">Any plugin</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation>
-        <numerusform>%n nowych wyników</numerusform>
-        <numerusform>%n nowych wyników</numerusform>
-        <numerusform>%n nowych wyników</numerusform>
-        <numerusform>%n nowych wyników</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n new results</numerusform>
+        <numerusform>%n new results</numerusform>
       </translation>
     </message>
     <message>
       <source>new results</source>
-      <translation>nowe wyniki</translation>
+      <translation type="unfinished">new results</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsSettings</name>
     <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation>Analityka w kamerze będzie działać tylko wtedy, gdy kamera jest na podglądzie. Należy włączyć nagrywanie, aby analityka działała cały czas.</translation>
+      <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsToolTipPreview</name>
     <message>
       <source>NO DATA</source>
-      <translation>BRAK DANYCH</translation>
+      <translation type="unfinished">NO DATA</translation>
     </message>
   </context>
   <context>
     <name>BooleanRadioGroup</name>
     <message>
       <source>Yes</source>
-      <translation>Tak</translation>
+      <translation type="unfinished">Yes</translation>
     </message>
     <message>
       <source>No</source>
-      <translation>Nie</translation>
+      <translation type="unfinished">No</translation>
     </message>
   </context>
   <context>
     <name>ButtonSettingsDelegate</name>
     <message>
       <source>Hotkey %1</source>
-      <translation>Klawisz skrótu %1</translation>
+      <translation type="unfinished">Hotkey %1</translation>
     </message>
   </context>
   <context>
     <name>CameraSelector</name>
     <message>
       <source>Any device</source>
-      <translation>Dowolne urządzenie</translation>
+      <translation type="unfinished">Any device</translation>
     </message>
     <message>
       <source>Any camera</source>
-      <translation>Dowolna kamera</translation>
+      <translation type="unfinished">Any camera</translation>
     </message>
     <message>
       <source>Devices on layout</source>
-      <translation>Urządzenia w układzie</translation>
+      <translation type="unfinished">Devices on layout</translation>
     </message>
     <message>
       <source>Cameras on layout</source>
-      <translation>Kamery w układzie</translation>
+      <translation type="unfinished">Cameras on layout</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation>Wybrane urządzenie</translation>
+      <translation type="unfinished">Selected device</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation>Wybrana kamera</translation>
+      <translation type="unfinished">Selected camera</translation>
     </message>
     <message>
       <source>Choose devices...</source>
-      <translation>Wybierz urządzenia...</translation>
+      <translation type="unfinished">Choose devices...</translation>
     </message>
     <message>
       <source>Choose cameras...</source>
-      <translation>Wybierz kamery...</translation>
+      <translation type="unfinished">Choose cameras...</translation>
     </message>
     <message>
       <source>none</source>
-      <translation>brak</translation>
+      <translation type="unfinished">none</translation>
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
-      <translation>
-        <numerusform>%n wybranych urządzeń</numerusform>
-        <numerusform>%n wybranych urządzeń</numerusform>
-        <numerusform>%n wybranych urządzeń</numerusform>
-        <numerusform>%n wybranych urządzeń</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n chosen devices</numerusform>
+        <numerusform>%n chosen devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
-      <translation>
-        <numerusform>%n wybranych kamer</numerusform>
-        <numerusform>%n wybranych kamer</numerusform>
-        <numerusform>%n wybranych kamer</numerusform>
-        <numerusform>%n wybranych kamer</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n chosen cameras</numerusform>
+        <numerusform>%n chosen cameras</numerusform>
       </translation>
     </message>
     <message>
       <source>Chosen device</source>
-      <translation>Wybrane urządzenie</translation>
+      <translation type="unfinished">Chosen device</translation>
     </message>
     <message>
       <source>Chosen camera</source>
-      <translation>Wybrana kamera</translation>
+      <translation type="unfinished">Chosen camera</translation>
     </message>
   </context>
   <context>
     <name>ClosedTileItem</name>
     <message>
       <source>Offline</source>
-      <translation>Offline</translation>
+      <translation type="unfinished">Offline</translation>
     </message>
     <message>
       <source>Unreachable</source>
-      <translation>Niedostępne</translation>
+      <translation type="unfinished">Unreachable</translation>
     </message>
     <message>
       <source>Incompatible</source>
-      <translation>Niekompatybilny</translation>
+      <translation type="unfinished">Incompatible</translation>
     </message>
     <message>
       <source>Pending</source>
-      <translation>Oczekujące</translation>
+      <translation type="unfinished">Pending</translation>
     </message>
   </context>
   <context>
     <name>CloudTile</name>
     <message>
       <source>Log in to </source>
-      <translation>Zaloguj się do </translation>
+      <translation type="unfinished">Log in to </translation>
     </message>
   </context>
   <context>
     <name>ConnectButton</name>
     <message>
       <source>Connect to Server</source>
-      <translation>Podłącz do serwera</translation>
+      <translation type="unfinished">Connect to Server</translation>
     </message>
   </context>
   <context>
     <name>ConnectTile</name>
     <message>
       <source>Connect to Server</source>
-      <translation>Podłącz do serwera</translation>
+      <translation type="unfinished">Connect to Server</translation>
     </message>
   </context>
   <context>
     <name>ContextHintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation>Kliknij ikonę, aby przeczytać więcej</translation>
+      <translation type="unfinished">Click on the icon to read more</translation>
     </message>
   </context>
   <context>
     <name>CounterBlock</name>
     <message>
       <source>Remove column</source>
-      <translation>Usuń kolumnę</translation>
+      <translation type="unfinished">Remove column</translation>
     </message>
     <message>
       <source>Add column</source>
-      <translation>Dodaj kolumnę</translation>
+      <translation type="unfinished">Add column</translation>
     </message>
     <message>
       <source>Hide information</source>
-      <translation>Ukryj informacje</translation>
+      <translation type="unfinished">Hide information</translation>
     </message>
     <message>
       <source>Show information</source>
-      <translation>Pokaż informacje</translation>
+      <translation type="unfinished">Show information</translation>
     </message>
     <message>
       <source>Hide thumbnails</source>
-      <translation>Ukryj miniatury</translation>
+      <translation type="unfinished">Hide thumbnails</translation>
     </message>
     <message>
       <source>Show thumbnails</source>
-      <translation>Pokaż miniatury</translation>
+      <translation type="unfinished">Show thumbnails</translation>
     </message>
     <message>
       <source>Preview</source>
-      <translation>Przegląd</translation>
+      <translation type="unfinished">Preview</translation>
     </message>
   </context>
   <context>
     <name>DewarpingSettings</name>
     <message>
       <source>Dewarping</source>
-      <translation>Dewarping</translation>
+      <translation type="unfinished">Dewarping</translation>
     </message>
     <message>
       <source>Fisheye</source>
-      <translation>"Rybie oko"</translation>
+      <translation type="unfinished">Fisheye</translation>
     </message>
     <message>
       <source>360° Equirectangular</source>
-      <translation>360 ° Równokątny</translation>
+      <translation type="unfinished">360° Equirectangular</translation>
     </message>
   </context>
   <context>
     <name>EventsPanel</name>
     <message>
       <source>Category</source>
-      <translation>Kategoria</translation>
+      <translation type="unfinished">Category</translation>
     </message>
     <message>
       <source>See %1 for other events</source>
-      <translation>Zobacz %1 dla innych zdarzeń</translation>
+      <translation type="unfinished">See %1 for other events</translation>
     </message>
     <message>
       <source>No events</source>
-      <translation>Brak zdarzeń</translation>
+      <translation type="unfinished">No events</translation>
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation>Spróbuj zmienić filtry lub utworzyć regułę zdarzenia</translation>
+      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
     </message>
     <message>
       <source>Event Log</source>
-      <translation>Dziennik zdarzeń</translation>
+      <translation type="unfinished">Event Log</translation>
     </message>
   </context>
   <context>
     <name>Figure</name>
     <message>
       <source>Figure</source>
-      <translation>Rysunek</translation>
+      <translation type="unfinished">Figure</translation>
     </message>
     <message>
       <source>Click to add</source>
-      <translation>Kliknij, aby dodać</translation>
+      <translation type="unfinished">Click to add</translation>
     </message>
     <message>
       <source>Display on video</source>
-      <translation>Wyświetl na wideo</translation>
+      <translation type="unfinished">Display on video</translation>
     </message>
   </context>
   <context>
     <name>FigureEditorDialog</name>
     <message>
       <source>Clear</source>
-      <translation>Wyczyść</translation>
+      <translation type="unfinished">Clear</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation type="unfinished">OK</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Anuluj</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
     <name>FigureView</name>
     <message>
       <source>NO PREVIEW</source>
-      <translation>BRAK PODGLĄDU</translation>
+      <translation type="unfinished">NO PREVIEW</translation>
     </message>
   </context>
   <context>
     <name>FisheyeDewarpingSettings</name>
     <message>
       <source>Image is not round</source>
-      <translation>Obraz nie jest okrągły</translation>
+      <translation type="unfinished">Image is not round</translation>
     </message>
     <message>
       <source>Image might be too dim</source>
-      <translation>Obraz może być zbyt ciemny</translation>
+      <translation type="unfinished">Image might be too dim</translation>
     </message>
     <message>
       <source>Invalid input image</source>
-      <translation>Nieprawidłowy obraz wejściowy</translation>
+      <translation type="unfinished">Invalid input image</translation>
     </message>
     <message>
       <source>Show grid</source>
-      <translation>Pokaż siatkę</translation>
+      <translation type="unfinished">Show grid</translation>
     </message>
     <message>
       <source>Auto Calibration</source>
-      <translation>Automatyczna kalibracja</translation>
+      <translation type="unfinished">Auto Calibration</translation>
     </message>
     <message>
       <source>Mount</source>
-      <translation>Montaż</translation>
+      <translation type="unfinished">Mount</translation>
     </message>
     <message>
       <source>Ceiling</source>
-      <translation>Sufit</translation>
+      <translation type="unfinished">Ceiling</translation>
     </message>
     <message>
       <source>Wall</source>
-      <translation>Ściana</translation>
+      <translation type="unfinished">Wall</translation>
     </message>
     <message>
       <source>Floor/table</source>
-      <translation>Podłoga/stół</translation>
+      <translation type="unfinished">Floor/table</translation>
     </message>
     <message>
       <source>Angle</source>
-      <translation>Kąt</translation>
+      <translation type="unfinished">Angle</translation>
     </message>
     <message>
       <source>Camera roll correction</source>
-      <translation>Korekcja przechyłu kadru</translation>
+      <translation type="unfinished">Camera roll correction</translation>
     </message>
     <message>
       <source>Lens projection</source>
-      <translation>Projekcja obiektywu</translation>
+      <translation type="unfinished">Lens projection</translation>
     </message>
     <message>
       <source>Equidistant</source>
-      <translation>Równoodległy</translation>
+      <translation type="unfinished">Equidistant</translation>
     </message>
     <message>
       <source>Stereographic</source>
-      <translation>Stereograficzny</translation>
+      <translation type="unfinished">Stereographic</translation>
     </message>
     <message>
       <source>Equisolid</source>
-      <translation>Equisolid</translation>
+      <translation type="unfinished">Equisolid</translation>
     </message>
     <message>
       <source>Size</source>
-      <translation>Rozmiar</translation>
+      <translation type="unfinished">Size</translation>
     </message>
     <message>
       <source>X Offset</source>
-      <translation>X przesunięcie</translation>
+      <translation type="unfinished">X Offset</translation>
     </message>
     <message>
       <source>Y Offset</source>
-      <translation>Y przesunięcie</translation>
+      <translation type="unfinished">Y Offset</translation>
     </message>
     <message>
       <source>Ellipticity</source>
-      <translation>Eliptyczność</translation>
+      <translation type="unfinished">Ellipticity</translation>
     </message>
   </context>
   <context>
@@ -484,315 +476,307 @@
     <message>
       <source>Hold %1 to activate actions</source>
       <comment>Leave %1 as is. It will be replaced to button name.</comment>
-      <translation>Przytrzymaj %1 aby aktywować</translation>
+      <translation type="unfinished">Hold %1 to activate actions</translation>
     </message>
   </context>
   <context>
     <name>InformationBubble</name>
     <message>
       <source>Detected by</source>
-      <translation>Wykryte przez</translation>
+      <translation type="unfinished">Detected by</translation>
     </message>
   </context>
   <context>
     <name>InformationPanel</name>
     <message>
       <source>Version</source>
-      <translation>Wersja</translation>
+      <translation type="unfinished">Version</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation>Producent</translation>
+      <translation type="unfinished">Vendor</translation>
     </message>
     <message>
       <source>Camera stream</source>
-      <translation>Strumień kamery</translation>
+      <translation type="unfinished">Camera stream</translation>
     </message>
     <message>
       <source>Select video stream from the camera for analysis</source>
-      <translation>Wybierz strumień wideo z kamery do analizy</translation>
+      <translation type="unfinished">Select video stream from the camera for analysis</translation>
     </message>
     <message>
       <source>Refresh</source>
-      <translation>Odśwież</translation>
+      <translation type="unfinished">Refresh</translation>
     </message>
     <message>
       <source>Refreshing...</source>
-      <translation>Odświeżanie...</translation>
+      <translation type="unfinished">Refreshing...</translation>
     </message>
   </context>
   <context>
     <name>IntervalPreviewControls</name>
     <message>
       <source>Toggle Mute</source>
-      <translation>Wycisz</translation>
+      <translation type="unfinished">Toggle Mute</translation>
     </message>
     <message>
       <source>Previous Object</source>
-      <translation>Poprzedni obiekt</translation>
+      <translation type="unfinished">Previous Object</translation>
     </message>
     <message>
       <source>Pause</source>
-      <translation>Zatrzymaj</translation>
+      <translation type="unfinished">Pause</translation>
     </message>
     <message>
       <source>Play</source>
-      <translation>Odtwarzaj</translation>
+      <translation type="unfinished">Play</translation>
     </message>
     <message>
       <source>Next Object</source>
-      <translation>Następny obiekt</translation>
+      <translation type="unfinished">Next Object</translation>
     </message>
     <message>
       <source>Toggle Repeat</source>
-      <translation>Przełącz powtarzanie</translation>
+      <translation type="unfinished">Toggle Repeat</translation>
     </message>
   </context>
   <context>
     <name>JoystickSettingsDialog</name>
     <message>
       <source>Joystick Settings</source>
-      <translation>Ustawienia joysticka</translation>
+      <translation type="unfinished">Joystick Settings</translation>
     </message>
     <message>
       <source>joystick</source>
-      <translation>joystick</translation>
+      <translation type="unfinished">joystick</translation>
     </message>
     <message>
       <source>Basic Actions</source>
-      <translation>Podstawowe akcje</translation>
+      <translation type="unfinished">Basic Actions</translation>
     </message>
     <message>
       <source>With Modifier</source>
-      <translation>Z modyfikatorem</translation>
+      <translation type="unfinished">With Modifier</translation>
     </message>
     <message>
       <source>This model is not supported</source>
-      <translation>Ten model nie jest wspierany</translation>
+      <translation type="unfinished">This model is not supported</translation>
     </message>
     <message>
       <source>Reset to Default</source>
-      <translation>Resetuj do ustawień domyślnych</translation>
+      <translation type="unfinished">Reset to Default</translation>
     </message>
   </context>
   <context>
     <name>JoystickSettingsTab</name>
     <message>
       <source>Pan and Tilt</source>
-      <translation>Pochylenie i obrót</translation>
+      <translation type="unfinished">Pan and Tilt</translation>
     </message>
     <message>
       <source>Zoom In / Zoom Out</source>
-      <translation>Przybliż / Oddal</translation>
+      <translation type="unfinished">Zoom In / Zoom Out</translation>
     </message>
     <message>
       <source>Select Camera on Layout</source>
-      <translation>Wybierz kamerę w układzie</translation>
+      <translation type="unfinished">Select Camera on Layout</translation>
     </message>
     <message>
       <source>Log in to the system to configure how to open layouts</source>
-      <translation>Zaloguj się do systemu, aby skonfigurować sposób otwierania układów</translation>
+      <translation type="unfinished">Log in to the system to configure how to open layouts</translation>
     </message>
   </context>
   <context>
     <name>LabeledItem</name>
     <message>
       <source>Default value:</source>
-      <translation>Wartość domyślna:</translation>
+      <translation type="unfinished">Default value:</translation>
     </message>
   </context>
   <context>
     <name>LeftPanel</name>
     <message>
       <source>Local Files</source>
-      <translation>Pliki lokalne</translation>
+      <translation type="unfinished">Local Files</translation>
     </message>
     <message>
       <source>Cameras</source>
-      <translation>Kamery</translation>
+      <translation type="unfinished">Cameras</translation>
     </message>
     <message>
       <source>Resources</source>
-      <translation>Zasoby</translation>
+      <translation type="unfinished">Resources</translation>
     </message>
     <message>
       <source>Motion</source>
-      <translation>Ruch</translation>
+      <translation type="unfinished">Motion</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Zakładki</translation>
+      <translation type="unfinished">Bookmarks</translation>
     </message>
     <message>
       <source>Events</source>
-      <translation>Zdarzenia</translation>
+      <translation type="unfinished">Events</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation>Obiekty</translation>
+      <translation type="unfinished">Objects</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation>Ustawienia</translation>
+      <translation type="unfinished">Settings</translation>
     </message>
     <message>
       <source>Select a camera to see its motion events</source>
-      <translation>Wybierz kamerę, aby zobaczyć jej zdarzenia ruchu</translation>
+      <translation type="unfinished">Select a camera to see its motion events</translation>
     </message>
     <message>
       <source>No motion detected</source>
-      <translation>Nie wykryto ruchu</translation>
+      <translation type="unfinished">No motion detected</translation>
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation>Spróbuj zmienić filtry lub włącz nagrywanie ruchu</translation>
+      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
     </message>
     <message>
       <source>Select Camera...</source>
-      <translation>Wybierz kamerę...</translation>
+      <translation type="unfinished">Select Camera...</translation>
     </message>
     <message>
       <source>No bookmarks</source>
-      <translation>Brak zakładek</translation>
+      <translation type="unfinished">No bookmarks</translation>
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation>Wybierz przedział czasu na osi czasu i kliknij prawym przyciskiem myszy podświetloną sekcję, aby utworzyć zakładkę</translation>
+      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
     </message>
   </context>
   <context>
     <name>Line</name>
     <message>
       <source>Line is not valid. Remove self-intersections to proceed.</source>
-      <translation>Linia jest nieprawidłowa. Usuń przecięcia, aby kontynuować.</translation>
+      <translation type="unfinished">Line is not valid. Remove self-intersections to proceed.</translation>
     </message>
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
-      <translation>
-        <numerusform>Ta linia wymaga co najmniej %n punktu.</numerusform>
-        <numerusform>Ta linia wymaga co najmniej %n punktów.</numerusform>
-        <numerusform>Ta linia wymaga co najmniej %n punktów.</numerusform>
-        <numerusform>Ta linia wymaga co najmniej %n punktów.</numerusform>
+      <translation type="unfinished">
+        <numerusform>This line requires at least %n points.</numerusform>
+        <numerusform>This line requires at least %n points.</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on the last point to finish drawing the line.</source>
-      <translation>Kliknij ostatni punkt, aby zakończyć rysowanie linii.</translation>
+      <translation type="unfinished">Click on the last point to finish drawing the line.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation>
-        <numerusform>Osiągnięto maksymalną liczbę punktów (%n punkt).</numerusform>
-        <numerusform>Osiągnięto maksymalną liczbę punktów (%n punkty).</numerusform>
-        <numerusform>Osiągnięto maksymalną liczbę punktów (%n punktów).</numerusform>
-        <numerusform>Osiągnięto maksymalną liczbę punktów (%n punktów).</numerusform>
+      <translation type="unfinished">
+        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on each arrow to toggle the desired direction.</source>
-      <translation>Kliknij strzałkę, aby przełączyć na jej pożądany kierunek.</translation>
+      <translation type="unfinished">Click on each arrow to toggle the desired direction.</translation>
     </message>
   </context>
   <context>
     <name>MotionAreaSelector</name>
     <message>
       <source>In selected area</source>
-      <translation>W zaznaczonym obszarze</translation>
+      <translation type="unfinished">In selected area</translation>
     </message>
     <message>
       <source>Select an area on the video to filter results</source>
-      <translation>Wybierz obszar kadru, aby filtrować wyniki</translation>
+      <translation type="unfinished">Select an area on the video to filter results</translation>
     </message>
   </context>
   <context>
     <name>ObjectEditor</name>
     <message>
       <source>Present</source>
-      <translation>Obecnie</translation>
+      <translation type="unfinished">Present</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation>Nieobecny</translation>
+      <translation type="unfinished">Absent</translation>
     </message>
   </context>
   <context>
     <name>ObjectSizeConstraints</name>
     <message>
       <source>Size Constraints</source>
-      <translation>Ograniczenia rozmiarów</translation>
+      <translation type="unfinished">Size Constraints</translation>
     </message>
   </context>
   <context>
     <name>OpenedTileItem</name>
     <message>
       <source>Address</source>
-      <translation>Adres</translation>
+      <translation type="unfinished">Address</translation>
     </message>
     <message>
       <source>URL or Host:Port</source>
-      <translation>Adres URL lub Host: Port</translation>
+      <translation type="unfinished">URL or Host:Port</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation type="unfinished">Login</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Hasło</translation>
+      <translation type="unfinished">Password</translation>
     </message>
     <message>
       <source>Connect</source>
-      <translation>Połącz</translation>
+      <translation type="unfinished">Connect</translation>
     </message>
     <message>
       <source>Remember me</source>
-      <translation>Zapamiętaj mnie</translation>
+      <translation type="unfinished">Remember me</translation>
     </message>
   </context>
   <context>
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
-      <translation>Brak zainstalowanych wtyczek</translation>
+      <translation type="unfinished">No plugins installed</translation>
     </message>
     <message>
       <source>Server is offline</source>
-      <translation>Serwer jest odłączony</translation>
+      <translation type="unfinished">Server is offline</translation>
     </message>
   </context>
   <context>
     <name>PolyFigure</name>
     <message>
       <source>Delete</source>
-      <translation>Usuń</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
   </context>
   <context>
     <name>Polygon</name>
     <message>
       <source>Polygon is not valid. Remove self-intersections to proceed.</source>
-      <translation>Wielokąt jest nieprawidłowy. Usuń przecięcia, aby kontynuować.</translation>
+      <translation type="unfinished">Polygon is not valid. Remove self-intersections to proceed.</translation>
     </message>
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
-      <translation>
-        <numerusform>Ten wielokąt wymaga co najmniej %n punktu.</numerusform>
-        <numerusform>Ten wielokąt wymaga co najmniej %n punktów.</numerusform>
-        <numerusform>Ten wielokąt wymaga co najmniej %n punktów.</numerusform>
-        <numerusform>Ten wielokąt wymaga co najmniej %n punktów.</numerusform>
+      <translation type="unfinished">
+        <numerusform>This polygon requires at least %n points.</numerusform>
+        <numerusform>This polygon requires at least %n points.</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on the last point to finish drawing the polygon.</source>
-      <translation>Kliknij ostatni punkt, aby zakończyć rysowanie wielokąta.</translation>
+      <translation type="unfinished">Click on the last point to finish drawing the polygon.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation>
-        <numerusform>Osiągnięto maksymalną liczbę punktów (%n punkt).</numerusform>
-        <numerusform>Osiągnięto maksymalną liczbę punktów (%n punkty).</numerusform>
-        <numerusform>Osiągnięto maksymalną liczbę punktów (%n punktów).</numerusform>
-        <numerusform>Osiągnięto maksymalną liczbę punktów (%n punktów).</numerusform>
+      <translation type="unfinished">
+        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
       </translation>
     </message>
   </context>
@@ -800,37 +784,37 @@
     <name>Preview</name>
     <message>
       <source>NO DATA</source>
-      <translation>BRAK DANYCH</translation>
+      <translation type="unfinished">NO DATA</translation>
     </message>
   </context>
   <context>
     <name>PreviewPanel</name>
     <message>
       <source>No Preview</source>
-      <translation>Brak podglądu</translation>
+      <translation type="unfinished">No Preview</translation>
     </message>
     <message>
       <source>Select the object to display the preview</source>
-      <translation>Wybierz obiekt, aby wyświetlić podgląd</translation>
+      <translation type="unfinished">Select the object to display the preview</translation>
     </message>
     <message>
       <source>Show on Layout</source>
-      <translation>Pokaż w układzie</translation>
+      <translation type="unfinished">Show on Layout</translation>
     </message>
     <message>
       <source>preview is not available for the selected object</source>
-      <translation>podgląd nie jest dostępny dla wybranego obiektu</translation>
+      <translation type="unfinished">preview is not available for the selected object</translation>
     </message>
   </context>
   <context>
     <name>PromoPageButtons</name>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation type="unfinished">OK</translation>
     </message>
     <message>
       <source>Next</source>
-      <translation>Dalej</translation>
+      <translation type="unfinished">Next</translation>
     </message>
   </context>
   <context>
@@ -838,95 +822,93 @@
     <message>
       <source>Introducing you
 new PTZ controls</source>
-      <translation>Przedstawiamy
-nowe elementy sterujące PTZ</translation>
+      <translation type="unfinished">Introducing you
+new PTZ controls</translation>
     </message>
     <message>
       <source>Here is a quick presentation
 of what has changed</source>
-      <translation>Oto szybka prezentacja tego,
-co się zmieniło</translation>
+      <translation type="unfinished">Here is a quick presentation
+of what has changed</translation>
     </message>
     <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
-      <translation>Przeciągnij na dowolny fragment wideo,
-aby aktywować PTZ</translation>
+      <translation type="unfinished">Drag over any part of the video
+to activate PTZ</translation>
     </message>
     <message>
       <source>Press arrows keys to move and plus or minus keys to zoom</source>
-      <translation>Naciśnij klawisze strzałek, aby poruszać, oraz plus i minus, aby powiększać i pomniejszać</translation>
+      <translation type="unfinished">Press arrows keys to move and plus or minus keys to zoom</translation>
     </message>
     <message>
       <source>Use the mouse wheel to zoom</source>
-      <translation>Użyj kółka myszy, aby powiększyć</translation>
+      <translation type="unfinished">Use the mouse wheel to zoom</translation>
     </message>
     <message>
       <source>Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</source>
-      <translation>Kliknij dwukrotnie lub przeciągnij wskaźnikiem myszy, przytrzymując klawisz Shift, aby użyć funkcji zaawansowanego sterowania PTZ</translation>
+      <translation type="unfinished">Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</translation>
     </message>
     <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
-      <translation>Przejdź do Ustawień lokalnych, aby włączyć znacznik przeciągania na środku obrazu wideo</translation>
+      <translation type="unfinished">Go to Local Settings to enable a drag marker over the center of the video</translation>
     </message>
   </context>
   <context>
     <name>RangeEditor</name>
     <message>
       <source>from</source>
-      <translation>z</translation>
+      <translation type="unfinished">from</translation>
     </message>
     <message>
       <source>to</source>
-      <translation>do</translation>
+      <translation type="unfinished">to</translation>
     </message>
   </context>
   <context>
     <name>RecursiveObjectTypeSelector</name>
     <message>
       <source>Object Type</source>
-      <translation>Typ obiektu</translation>
+      <translation type="unfinished">Object Type</translation>
     </message>
     <message>
       <source>Subtype</source>
-      <translation>Podtyp</translation>
+      <translation type="unfinished">Subtype</translation>
     </message>
   </context>
   <context>
     <name>Repeater</name>
     <message>
       <source>Add</source>
-      <translation>Dodaj</translation>
+      <translation type="unfinished">Add</translation>
     </message>
   </context>
   <context>
     <name>ResourceBrowser</name>
     <message>
       <source>No local files</source>
-      <translation>Brak plików lokalnych</translation>
+      <translation type="unfinished">No local files</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation>Nic nie znaleziono</translation>
+      <translation type="unfinished">Nothing found</translation>
     </message>
     <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
-      <translation>Przeciągnij pliki wideo lub obrazy do okna klienta lub dodaj lokalny folder multimediów w zakładce Ustawienia lokalne</translation>
+      <translation type="unfinished">Drag video files or images to the client window, or add local media folder through the Local Settings dialog</translation>
     </message>
     <message>
       <source>Try searching for something else</source>
-      <translation>Spróbuj wyszukać coś innego</translation>
+      <translation type="unfinished">Try searching for something else</translation>
     </message>
   </context>
   <context>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation>
-        <numerusform>...i jeszcze %n</numerusform>
-        <numerusform>...i jeszcze %n</numerusform>
-        <numerusform>...i jeszcze %n</numerusform>
-        <numerusform>...i jeszcze %n</numerusform>
+      <translation type="unfinished">
+        <numerusform>...and %n more</numerusform>
+        <numerusform>...and %n more</numerusform>
       </translation>
     </message>
   </context>
@@ -934,344 +916,340 @@ aby aktywować PTZ</translation>
     <name>ResourcePreview</name>
     <message>
       <source>NO DATA</source>
-      <translation>BRAK DANYCH</translation>
+      <translation type="unfinished">NO DATA</translation>
     </message>
     <message>
       <source>OUTDATED</source>
-      <translation>PRZESTARZAŁY</translation>
+      <translation type="unfinished">OUTDATED</translation>
     </message>
   </context>
   <context>
     <name>ResourceSearchPane</name>
     <message>
       <source>Search</source>
-      <translation>Szukaj</translation>
+      <translation type="unfinished">Search</translation>
     </message>
     <message>
       <source>All Types</source>
-      <translation>Wszystkie rodzaje</translation>
+      <translation type="unfinished">All Types</translation>
     </message>
     <message>
       <source>Servers</source>
-      <translation>Serwery</translation>
+      <translation type="unfinished">Servers</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation>Kamery i urządzenia</translation>
+      <translation type="unfinished">Cameras &amp; Devices</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation>Układy</translation>
+      <translation type="unfinished">Layouts</translation>
     </message>
     <message>
       <source>Showreels</source>
-      <translation>Sekwencje</translation>
+      <translation type="unfinished">Showreels</translation>
     </message>
     <message>
       <source>Video Walls</source>
-      <translation>Ściany wideo</translation>
+      <translation type="unfinished">Video Walls</translation>
     </message>
     <message>
       <source>Web Pages</source>
-      <translation>Strony www</translation>
+      <translation type="unfinished">Web Pages</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation>Użytkownicy</translation>
+      <translation type="unfinished">Users</translation>
     </message>
     <message>
       <source>Local Files</source>
-      <translation>Pliki lokalne</translation>
+      <translation type="unfinished">Local Files</translation>
     </message>
   </context>
   <context>
     <name>ResourceToolTip</name>
     <message>
       <source>Cannot load preview</source>
-      <translation>Nie można załadować podglądu</translation>
+      <translation type="unfinished">Cannot load preview</translation>
     </message>
     <message>
       <source>Preview is outdated</source>
-      <translation>Podgląd jest nieaktualny</translation>
+      <translation type="unfinished">Preview is outdated</translation>
     </message>
   </context>
   <context>
     <name>RightPanel</name>
     <message>
       <source>Notifications</source>
-      <translation>Powiadomienia</translation>
+      <translation type="unfinished">Notifications</translation>
     </message>
     <message>
       <source>Motion</source>
-      <translation>Ruch</translation>
+      <translation type="unfinished">Motion</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Zakładki</translation>
+      <translation type="unfinished">Bookmarks</translation>
     </message>
     <message>
       <source>Events</source>
-      <translation>Zdarzenia</translation>
+      <translation type="unfinished">Events</translation>
     </message>
     <message>
       <source>Analytics</source>
-      <translation>Analityka</translation>
+      <translation type="unfinished">Analytics</translation>
     </message>
   </context>
   <context>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
-      <translation>Szukaj</translation>
+      <translation type="unfinished">Search</translation>
     </message>
   </context>
   <context>
     <name>SearchField</name>
     <message>
       <source>Search</source>
-      <translation>Szukaj</translation>
+      <translation type="unfinished">Search</translation>
     </message>
   </context>
   <context>
     <name>SelectLayoutDialog</name>
     <message>
       <source>Select layout</source>
-      <translation>Wybierz układ</translation>
+      <translation type="unfinished">Select layout</translation>
     </message>
   </context>
   <context>
     <name>SelectOverlappedIdDialog</name>
     <message>
       <source>Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</source>
-      <translation>Identyfikator osi czasu jest tworzony po zmianie czasu wstecz na zdalnym rejestratorze NVR. Nowa oś czasu może nakładać się na istniejącą.</translation>
+      <translation type="unfinished">Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</translation>
     </message>
     <message>
       <source>Select</source>
-      <translation>Wybierz</translation>
+      <translation type="unfinished">Select</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Anuluj</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
     <name>SensitivityItem</name>
     <message>
       <source>Sensitivity</source>
-      <translation>Czułość</translation>
+      <translation type="unfinished">Sensitivity</translation>
     </message>
   </context>
   <context>
     <name>SizeConstraints</name>
     <message>
       <source>MAX</source>
-      <translation>MAX</translation>
+      <translation type="unfinished">MAX</translation>
     </message>
     <message>
       <source>MIN</source>
-      <translation>MIN</translation>
+      <translation type="unfinished">MIN</translation>
     </message>
     <message>
       <source>Set minimum and maximum object size.</source>
-      <translation>Ustaw minimalny i maksymalny rozmiar obiektu.</translation>
+      <translation type="unfinished">Set minimum and maximum object size.</translation>
     </message>
     <message>
       <source>Minimum object size cannot be greater than maximum.</source>
-      <translation>Minimalny rozmiar obiektu nie może być większy niż maksymalny.</translation>
+      <translation type="unfinished">Minimum object size cannot be greater than maximum.</translation>
     </message>
   </context>
   <context>
     <name>SphereDewarpingSettings</name>
     <message>
       <source>Horizon correction</source>
-      <translation>Korekcja poziomu</translation>
+      <translation type="unfinished">Horizon correction</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation>Zresetuj</translation>
+      <translation type="unfinished">Reset</translation>
     </message>
   </context>
   <context>
     <name>StatusOverlay</name>
     <message>
       <source>Diagnostics</source>
-      <translation>Diagnostyka</translation>
+      <translation type="unfinished">Diagnostics</translation>
     </message>
     <message>
       <source>Enable</source>
-      <translation>Włącz</translation>
+      <translation type="unfinished">Enable</translation>
     </message>
     <message>
       <source>Activate License</source>
-      <translation>Aktywuj licencję</translation>
+      <translation type="unfinished">Activate License</translation>
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation>Ustawienia kamery</translation>
+      <translation type="unfinished">Camera Settings</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation>Ustawienia modułu I/O</translation>
+      <translation type="unfinished">I/O Module Settings</translation>
     </message>
     <message>
       <source>Device Settings</source>
-      <translation>Ustawienia urządzenia</translation>
+      <translation type="unfinished">Device Settings</translation>
     </message>
     <message>
       <source>Set for this Camera</source>
-      <translation>Ustaw dla tej kamery</translation>
+      <translation type="unfinished">Set for this Camera</translation>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
-      <translation>
-        <numerusform>Ustaw dla wszystkich %n kamer</numerusform>
-        <numerusform>Ustaw dla wszystkich %n kamer</numerusform>
-        <numerusform>Ustaw dla wszystkich %n kamer</numerusform>
-        <numerusform>Ustaw dla wszystkich %n kamer</numerusform>
+      <translation type="unfinished">
+        <numerusform>Set for all %n Cameras</numerusform>
+        <numerusform>Set for all %n Cameras</numerusform>
       </translation>
     </message>
     <message>
       <source>No data</source>
-      <translation>Brak danych</translation>
+      <translation type="unfinished">No data</translation>
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation>Nieautoryzowany</translation>
+      <translation type="unfinished">Unauthorized</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
-      <translation>Proszę sprawdzić informacje uwierzytelniające</translation>
+      <translation type="unfinished">Please check authentication information</translation>
     </message>
     <message>
       <source>No signal</source>
-      <translation>Brak sygnału</translation>
+      <translation type="unfinished">No signal</translation>
     </message>
     <message>
       <source>Not enough licenses</source>
-      <translation>Za mało licencji</translation>
+      <translation type="unfinished">Not enough licenses</translation>
     </message>
     <message>
       <source>Server unavailable</source>
-      <translation>Serwer niedostępny</translation>
+      <translation type="unfinished">Server unavailable</translation>
     </message>
     <message>
       <source>No access</source>
-      <translation>Brak dostępu</translation>
+      <translation type="unfinished">No access</translation>
     </message>
     <message>
       <source>Device disabled</source>
-      <translation>Urządzenie wyłączone</translation>
+      <translation type="unfinished">Device disabled</translation>
     </message>
     <message>
       <source>Too many connections</source>
-      <translation>Zbyt wiele połączeń</translation>
+      <translation type="unfinished">Too many connections</translation>
     </message>
     <message>
       <source>Cannot decrypt media</source>
-      <translation>Nie można odszyfrować multimediów</translation>
+      <translation type="unfinished">Cannot decrypt media</translation>
     </message>
     <message>
       <source>Password required</source>
-      <translation>Hasło jest wymagane</translation>
+      <translation type="unfinished">Password required</translation>
     </message>
     <message>
       <source>No live stream</source>
-      <translation>Brak strumienia na żywo</translation>
+      <translation type="unfinished">No live stream</translation>
     </message>
     <message>
       <source>Unsupported firmware version</source>
-      <translation>Nieobsługiwana wersja firmware</translation>
+      <translation type="unfinished">Unsupported firmware version</translation>
     </message>
   </context>
   <context>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID </source>
-      <translation>Identyfikator logiczny </translation>
+      <translation type="unfinished">Logical ID </translation>
     </message>
   </context>
   <context>
     <name>TileGridPlaceholder</name>
     <message>
       <source>Nothing Found</source>
-      <translation>Nic nie znaleziono</translation>
+      <translation type="unfinished">Nothing Found</translation>
     </message>
     <message>
       <source>No Favorite Systems</source>
-      <translation>Brak ulubionych systemów</translation>
+      <translation type="unfinished">No Favorite Systems</translation>
     </message>
     <message>
       <source>No Hidden Systems</source>
-      <translation>Brak ukrytych systemów</translation>
+      <translation type="unfinished">No Hidden Systems</translation>
     </message>
     <message>
       <source>You can add system to the favorites from the context menu</source>
-      <translation>Możesz dodać system do ulubionych z menu kontekstowego</translation>
+      <translation type="unfinished">You can add system to the favorites from the context menu</translation>
     </message>
     <message>
       <source>You can hide systems from the main list from the context menu</source>
-      <translation>Możesz ukryć systemy z głównej listy menu kontekstowego</translation>
+      <translation type="unfinished">You can hide systems from the main list from the context menu</translation>
     </message>
   </context>
   <context>
     <name>TileMenu</name>
     <message>
       <source>Edit</source>
-      <translation>Edytuj</translation>
+      <translation type="unfinished">Edit</translation>
     </message>
     <message>
       <source>Hide</source>
-      <translation>Ukryj</translation>
+      <translation type="unfinished">Hide</translation>
     </message>
     <message>
       <source>Show</source>
-      <translation>Pokaż</translation>
+      <translation type="unfinished">Show</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Usuń</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <source>Add to Favorites</source>
-      <translation>Dodaj do Ulubionych</translation>
+      <translation type="unfinished">Add to Favorites</translation>
     </message>
     <message>
       <source>Remove from Favorites</source>
-      <translation>Usuń z Ulubionych</translation>
+      <translation type="unfinished">Remove from Favorites</translation>
     </message>
   </context>
   <context>
     <name>TimeSelector</name>
     <message>
       <source>Any time</source>
-      <translation>Kiedykolwiek</translation>
+      <translation type="unfinished">Any time</translation>
     </message>
     <message>
       <source>Last day</source>
-      <translation>Ostatni dzień</translation>
+      <translation type="unfinished">Last day</translation>
     </message>
     <message>
       <source>Last 7 days</source>
-      <translation>Ostatnie 7 dni</translation>
+      <translation type="unfinished">Last 7 days</translation>
     </message>
     <message>
       <source>Last 30 days</source>
-      <translation>Ostatnie 30 dni</translation>
+      <translation type="unfinished">Last 30 days</translation>
     </message>
     <message>
       <source>Selected on Timeline</source>
-      <translation>Okres na linii czasu</translation>
+      <translation type="unfinished">Selected on Timeline</translation>
     </message>
   </context>
   <context>
     <name>TreeView</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation>
-        <numerusform>... i jeszcze %n</numerusform>
-        <numerusform>... i jeszcze %n</numerusform>
-        <numerusform>... i jeszcze %n</numerusform>
-        <numerusform>... i jeszcze %n</numerusform>
+      <translation type="unfinished">
+        <numerusform>... and %n more</numerusform>
+        <numerusform>... and %n more</numerusform>
       </translation>
     </message>
   </context>
@@ -1279,38 +1257,38 @@ aby aktywować PTZ</translation>
     <name>VisibilityMenu</name>
     <message>
       <source>Hidden</source>
-      <translation>Ukryte</translation>
+      <translation type="unfinished">Hidden</translation>
     </message>
     <message>
       <source>All Systems</source>
-      <translation>Wszystkie systemy</translation>
+      <translation type="unfinished">All Systems</translation>
     </message>
     <message>
       <source>Favorites</source>
-      <translation>Ulubione</translation>
+      <translation type="unfinished">Favorites</translation>
     </message>
   </context>
   <context>
     <name>WelcomeScreen</name>
     <message>
       <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
-      <translation>Nie masz dostępu do %1. Proszę sprawdzić swoje połączenie z internetem.</translation>
+      <translation type="unfinished">You don&apos;t have access to the %1. Please check your internet connection.</translation>
     </message>
     <message>
       <source>Official Website</source>
-      <translation>Oficjalna strona internetowa</translation>
+      <translation type="unfinished">Official Website</translation>
     </message>
     <message>
       <source>Help &amp; User Manual</source>
-      <translation>Pomoc i podręcznik użytkownika</translation>
+      <translation type="unfinished">Help &amp; User Manual</translation>
     </message>
     <message>
       <source>Support</source>
-      <translation>Wsparcie</translation>
+      <translation type="unfinished">Support</translation>
     </message>
     <message>
       <source>Loading...</source>
-      <translation>Ładowanie...</translation>
+      <translation type="unfinished">Loading...</translation>
     </message>
   </context>
 </TS>
