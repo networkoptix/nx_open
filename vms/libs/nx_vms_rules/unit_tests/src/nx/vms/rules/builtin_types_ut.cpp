@@ -2,16 +2,19 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/utils/range_adapters.h>
 #include <nx/utils/qobject.h>
 #include <nx/vms/common/test_support/test_context.h>
 #include <nx/vms/rules/action_fields/builtin_fields.h>
 #include <nx/vms/rules/actions/builtin_actions.h>
+#include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_fields/builtin_fields.h>
 #include <nx/vms/rules/events/builtin_events.h>
 #include <nx/vms/rules/plugin.h>
 #include <nx/vms/rules/utils/serialization.h>
 
+#include "test_event.h"
 #include "test_router.h"
 
 namespace nx::vms::rules::test {
@@ -45,7 +48,12 @@ public:
             EXPECT_FALSE(field.displayName.isEmpty());
             EXPECT_FALSE(field.fieldName.isEmpty());
 
-            EXPECT_GE(meta.indexOfProperty(field.fieldName.toUtf8().data()), 0);
+            const auto propIndex = meta.indexOfProperty(field.fieldName.toUtf8().data());
+            EXPECT_GE(propIndex, 0);
+
+            const auto prop = meta.property(propIndex);
+            EXPECT_TRUE(prop.isValid());
+            EXPECT_NE(prop.userType(), QMetaType::UnknownType);
         }
     }
 
@@ -94,11 +102,29 @@ public:
     template<class T>
     void testActionRegistration()
     {
-        SCOPED_TRACE(T::manifest().id.toStdString());
+        const auto& manifest = T::manifest();
+        SCOPED_TRACE(manifest.id.toStdString());
 
         testManifestValidity<T>();
+        ASSERT_TRUE(registerAction<T>());
 
-        EXPECT_TRUE(registerAction<T>());
+        const auto builder = engine->buildActionBuilder(manifest.id);
+        ASSERT_TRUE(builder);
+
+        const auto testEvent = QSharedPointer<TestEvent>::create();
+        const auto& meta = T::staticMetaObject;
+        const auto fields = builder->fields();
+
+        // Test property type compatibility.
+        for(const auto [name, field]: nx::utils::constKeyValueRange(fields))
+        {
+            SCOPED_TRACE(name.toStdString());
+            const auto value = field->build(testEvent);
+            EXPECT_TRUE(value.isValid());
+
+            const auto prop = meta.property(meta.indexOfProperty(name.toUtf8().data()));
+            EXPECT_EQ(prop.userType(), value.userType());
+        }
     }
 };
 
@@ -151,6 +177,7 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     // Action fields need to be registered first.
     testActionFieldRegistration<ActionTextField>();
     testActionFieldRegistration<ContentTypeField>();
+    testActionFieldRegistration<EmailMessageField>(systemContext());
     testActionFieldRegistration<FlagField>();
     testActionFieldRegistration<HttpMethodField>();
     testActionFieldRegistration<OptionalTimeField>();
@@ -159,7 +186,7 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionFieldRegistration<TargetDeviceField>();
     testActionFieldRegistration<TargetUserField>();
     testActionFieldRegistration<TextWithFields>(systemContext());
-    testActionFieldRegistration<EmailMessageField>(systemContext());
+    testActionFieldRegistration<VolumeField>();
 
     // TODO: #amalov Uncomment all types after manifest definition.
     //testActionRegistration<BookmarkAction>();
@@ -177,7 +204,7 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     //testActionRegistration<RepeatSoundAction>();
     testActionRegistration<SendEmailAction>();
     //testActionRegistration<ShowOnAlarmLayoutAction>();
-    //testActionRegistration<SpeakAction>();
+    testActionRegistration<SpeakAction>();
     testActionRegistration<TextOverlayAction>();
     //testActionRegistration<WriteToLogAction>();
 }

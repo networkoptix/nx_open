@@ -16,6 +16,7 @@ static constexpr auto kIntervalFieldName = "interval";
 static constexpr auto kServerIdFieldName = "serverId";
 static constexpr auto kSourceFieldName = "source";
 static constexpr auto kStateFieldName = "state";
+static constexpr auto kUsersFieldName = "users";
 
 inline FieldDescriptor makeAggregationIntervalFieldDescriptor(
     const QString& displayName,

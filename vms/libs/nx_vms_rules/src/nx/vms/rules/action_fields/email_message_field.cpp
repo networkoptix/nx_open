@@ -3,6 +3,9 @@
 #include "email_message_field.h"
 
 #include <nx/utils/log/assert.h>
+#include <utils/email/message.h>
+
+#include "../basic_event.h"
 
 namespace nx::vms::rules {
 
@@ -35,10 +38,11 @@ void EmailMessageField::setDescription(const QString& description)
     m_description.setText(description);
 }
 
-QVariant EmailMessageField::build(const EventPtr& /*event*/) const
+QVariant EmailMessageField::build(const EventPtr& event) const
 {
-    NX_ASSERT(false, "Must not be called");
-    return {};
+    // Return correct type for testing.
+    NX_ASSERT(event->type() == "nx.events.test", "Must not be called");
+    return QVariant::fromValue(nx::email::Message{});
 }
 
 } // namespace nx::vms::rules

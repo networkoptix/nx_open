@@ -22,7 +22,7 @@ const ItemDescriptor& TextOverlayAction::manifest()
             makeFieldDescriptor<OptionalTimeField>("duration", tr("Display text for")),
             makeFieldDescriptor<TextWithFields>("text", tr("Text"), {},
                 {
-                    { "text", "{@EventDescription}" }
+                    { "text", "{@EventCaption}" }
                 }),
         }
     };

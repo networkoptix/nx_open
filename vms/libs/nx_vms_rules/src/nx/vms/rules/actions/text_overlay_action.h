@@ -14,7 +14,7 @@ class NX_VMS_RULES_API TextOverlayAction: public BasicAction
 
     FIELD(QnUuidSet, devices, setDevices)
     FIELD(bool, useSource, setUseSource)
-    FIELD(std::chrono::microseconds, duration, setDuration)
+    FIELD(std::chrono::seconds, duration, setDuration)
     FIELD(QString, text, setText)
 
 public:
