@@ -437,21 +437,17 @@ bool QnAviArchiveDelegate::open(
                 && m_archiveIntegrityWatcher)
             {
                 NX_DEBUG(this,
-                    "%1: File %2 is missing but the storage %3 is online. Forcing storage test",
+                    "%1: File %2 is missing but the storage %3 is online. Forcing storage reinitialization",
                     __func__, hidePassword(url), hidePassword(m_storage->getUrl()));
 
-                m_archiveIntegrityWatcher->forceStorageTest(m_storage->isBackup());
+                if (const auto initResult = m_storage->initOrUpdate();
+                    initResult != Qn::StorageInitResult::StorageInit_Ok)
+                {
+                    NX_DEBUG(this, "%1: Storage %2 initialization status is %3",
+                        __func__, hidePassword(m_storage->getUrl()), initResult);
 
-                NX_VERBOSE(this, "%1: Forced storage test finished. Storage %2 status is %3",
-                    __func__, hidePassword(m_storage->getUrl()), m_storage->getStatus());
-            }
-
-            if (m_storage->getStatus() != nx::vms::api::ResourceStatus::online)
-            {
-                NX_DEBUG(this, "%1: Source storage '%2' is offline", __func__,
-                    hidePassword(m_storage->getUrl()));
-
-                return false;
+                    return false;
+                }
             }
 
             if (m_archiveIntegrityWatcher)
