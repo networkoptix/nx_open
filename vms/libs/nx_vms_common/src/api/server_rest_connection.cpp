@@ -1283,6 +1283,25 @@ Handle ServerConnection::postEmptyResult(
         proxyToServer);
 }
 
+Handle ServerConnection::putEmptyResult(
+    const QString& action,
+    const nx::network::rest::Params& params,
+    const QByteArray& body,
+    PostCallback&& callback,
+    QThread* targetThread,
+    std::optional<QnUuid> proxyToServer)
+{
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+    return executePut<EmptyResponseType>(
+        action,
+        params,
+        contentType,
+        body,
+        callback,
+        targetThread,
+        proxyToServer);
+}
+
 Handle ServerConnection::getUbJsonResult(
     const QString& path,
     nx::network::rest::Params params,

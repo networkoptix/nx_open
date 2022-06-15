@@ -7,6 +7,7 @@
 
 #include <nx/utils/log/log_level.h>
 #include <nx/vms/api/data/log_settings.h>
+#include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
 #include <ui/dialogs/common/dialog.h>
 
 namespace Ui { class LogSettingsDialog; }
@@ -17,9 +18,10 @@ struct ConfigurableLogSettings
 {
     ConfigurableLogSettings();
     ConfigurableLogSettings(const nx::vms::api::ServerLogSettings& settings);
-    
-    void applyTo(nx::vms::api::ServerLogSettings* settings) const;
-    
+
+    nx::vms::api::ServerLogSettings applyTo(
+        const nx::vms::api::ServerLogSettings& settings) const;
+
     void intersectWith(const ConfigurableLogSettings& other);
 
     static ConfigurableLogSettings defaults();
@@ -43,7 +45,7 @@ public:
     explicit LogSettingsDialog(QWidget* parent = nullptr);
     virtual ~LogSettingsDialog();
 
-    void init(const QList<QnUuid>& ids, const ConfigurableLogSettings& settings);
+    void init(const QList<LogsManagementUnitPtr>& units);
 
     bool hasChanges() const;
     ConfigurableLogSettings changes() const;

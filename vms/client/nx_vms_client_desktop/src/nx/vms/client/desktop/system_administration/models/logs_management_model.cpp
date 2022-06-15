@@ -2,12 +2,11 @@
 
 #include "logs_management_model.h"
 
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
-#include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
     
@@ -23,12 +22,31 @@ QIcon icon(LogsManagementUnitPtr unit)
         : qnResIconCache->icon(QnResourceIconCache::Client);
 }
 
+QIcon statusIcon(LogsManagementUnitPtr unit)
+{
+    using State = LogsManagementUnit::DownloadState;
+    switch (unit->state())
+    {
+        case State::pending:
+        case State::loading:
+            return qnSkin->icon("text_buttons/rapid_review.png"); //< FIXME: #spanasenko Use a separate icon.
+
+        case State::complete:
+            return qnSkin->icon("text_buttons/ok.png");
+
+        case State::error:
+            return qnSkin->icon("text_buttons/clear_error.png");
+    }
+
+    return {};
+}
+
 nx::utils::log::Level logLevel(LogsManagementUnitPtr unit)
 {
     if (!unit->settings())
         return nx::utils::log::Level::undefined;
 
-    // TODO: should we check that http log has the same settings as main log?
+    // Currently we show MainLog level only, even if settings of other Loggers differ.
     return unit->settings()->mainLog.primaryLevel;
 }
 
@@ -41,82 +59,18 @@ QColor logLevelColor(LogsManagementUnitPtr unit)
 
 } // namespace
 
-LogsManagementUnitPtr LogsManagementUnit::createClientUnit()
-{
-    return std::make_shared<LogsManagementUnit>();
-}
-
-LogsManagementUnitPtr LogsManagementUnit::createServerUnit(QnMediaServerResourcePtr server)
-{
-    auto unit = std::make_shared<LogsManagementUnit>();
-    unit->m_server = server;
-    return unit;
-}
-
-QnMediaServerResourcePtr LogsManagementUnit::server() const
-{
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    return m_server;
-}
-
-bool LogsManagementUnit::isChecked() const
-{
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    return m_checked;
-}
-
-void LogsManagementUnit::setChecked(bool isChecked)
-{
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    m_checked = isChecked;
-}
-
-LogsManagementUnit::DownloadState LogsManagementUnit::state() const
-{
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    return m_state;
-}
-
-void LogsManagementUnit::setState(LogsManagementUnit::DownloadState state)
-{
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    m_state = state;
-}
-
-std::optional<nx::vms::api::ServerLogSettings> LogsManagementUnit::settings() const
-{
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    return m_settings;
-}
-
-void LogsManagementUnit::setSettings(
-    const std::optional<nx::vms::api::ServerLogSettings>& settings)
-{
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    m_settings = settings;
-}
-
-LogsManagementModel::LogsManagementModel(QObject* parent):
+LogsManagementModel::LogsManagementModel(QObject* parent, LogsManagementWatcher* watcher):
     base_type(parent),
-    QnWorkbenchContextAware(parent)
+    m_watcher(watcher)
 {
-    // Init dummy data.
-    m_client = LogsManagementUnit::createClientUnit();
+    // Model uses its own list of shared pointers to LogsManagementUnit instances, which is updated
+    // when receiving a signal from Watcher. This list allows to safely show quite consistent data
+    // w/o any additional synchronization between Model and Watcher during ResourcePool updates.
+    connect(
+        m_watcher, &LogsManagementWatcher::itemListChanged,
+        this, &LogsManagementModel::onItemsListChanged);
 
-    nx::vms::api::ServerLogSettings settings;
-    settings.mainLog.primaryLevel = nx::utils::log::mainLogger()->defaultLevel();
-    m_client->setSettings(settings);
-
-    for (const auto& server: resourcePool()->servers())
-    {
-        auto unit = LogsManagementUnit::createServerUnit(server);
-
-        nx::vms::api::ServerLogSettings settings;
-        settings.mainLog.primaryLevel = nx::utils::log::Level::debug;
-        unit->setSettings(settings);
-
-        m_servers.push_back(unit);
-    }
+    m_items = watcher->items();
 }
 
 int LogsManagementModel::columnCount(const QModelIndex& parent) const
@@ -129,10 +83,10 @@ int LogsManagementModel::columnCount(const QModelIndex& parent) const
 
 int LogsManagementModel::rowCount(const QModelIndex& parent) const
 {
-    if(parent.isValid())
+    if (parent.isValid())
         return 0;
 
-    return m_servers.size() + 1;
+    return m_items.size();
 }
 
 QVariant LogsManagementModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -158,7 +112,7 @@ QVariant LogsManagementModel::data(const QModelIndex& index, int role) const
     if (!index.isValid())
         return {};
 
-    auto unit = itemForRow(index.row());
+    auto unit = m_items.value(index.row());
     if (!NX_ASSERT(unit))
         return {};
 
@@ -180,7 +134,7 @@ QVariant LogsManagementModel::data(const QModelIndex& index, int role) const
 
                 case Qt::DisplayRole:
                     return unit->server()
-                        ? unit->server()->getName()
+                        ? QnResourceDisplayInfo(unit->server()).name()
                         : tr("Client");
 
             }
@@ -209,7 +163,7 @@ QVariant LogsManagementModel::data(const QModelIndex& index, int role) const
             switch (role)
             {
                 case Qt::DecorationRole:
-                    return QIcon(); // TODO: add icons.
+                    return statusIcon(unit);
             }
             break;
 
@@ -229,12 +183,11 @@ bool LogsManagementModel::setData(const QModelIndex& index, const QVariant& valu
     if (index.column() != CheckBoxColumn || role != Qt::CheckStateRole)
         return false;
 
-    const auto state = static_cast<Qt::CheckState>(value.toInt());
-
-    auto unit = itemForRow(index.row());
-    if (!unit)
+    if (!m_watcher)
         return false;
-    unit->setChecked(!unit->isChecked());
+
+    const auto state = static_cast<Qt::CheckState>(value.toInt());
+    m_watcher->setItemIsChecked(m_items.value(index.row()), state == Qt::Checked);
 
     return true;
 }
@@ -267,14 +220,11 @@ QString LogsManagementModel::logLevelName(nx::utils::log::Level level)
     }
 }
 
-LogsManagementUnitPtr LogsManagementModel::itemForRow(int idx) const
+void LogsManagementModel::onItemsListChanged()
 {
-    if (idx < 0 || idx > m_servers.size())
-        return nullptr;
-
-    return idx
-        ? m_servers[idx - 1]
-        : m_client;
+    beginResetModel();
+    m_items = m_watcher->items();
+    endResetModel();
 }
 
 } // namespace nx::vms::client::desktop

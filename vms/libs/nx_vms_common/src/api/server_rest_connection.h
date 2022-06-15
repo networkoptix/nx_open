@@ -706,6 +706,15 @@ public:
         QThread* targetThread = nullptr,
         std::optional<QnUuid> proxyToServer = {});
 
+    /** Sends PUT request with a response to be an EmptyResult. */
+    Handle putEmptyResult(
+        const QString& action,
+        const nx::network::rest::Params& params,
+        const QByteArray& body,
+        PostCallback&& callback,
+        QThread* targetThread = nullptr,
+        std::optional<QnUuid> proxyToServer = {});
+
     Handle getUbJsonResult(
         const QString& action,
         nx::network::rest::Params params,

@@ -2,54 +2,18 @@
 
 #pragma once
 
-#include <memory>
-#include <vector>
-
 #include <QtCore/QAbstractTableModel>
 
 #include <client/client_globals.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/data/log_settings.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
 
 namespace nx::vms::client::desktop {
 
-class LogsManagementUnit
-{
-public:
-    enum class DownloadState
-    {
-        none,
-        pending,
-        complete,
-        error,
-    };
+class LogsManagementWatcher;
 
-    static std::shared_ptr<LogsManagementUnit> createClientUnit();
-    static std::shared_ptr<LogsManagementUnit> createServerUnit(QnMediaServerResourcePtr server);
-
-    QnMediaServerResourcePtr server() const;
-
-    bool isChecked() const;
-    void setChecked(bool isChecked);
-
-    DownloadState state() const;
-    void setState(DownloadState state);
-
-    std::optional<nx::vms::api::ServerLogSettings> settings() const;
-    void setSettings(const std::optional<nx::vms::api::ServerLogSettings>& settings);
-
-private:
-    mutable nx::Mutex m_mutex;
-    QnMediaServerResourcePtr m_server;
-
-    bool m_checked{false};
-    DownloadState m_state{DownloadState::none};
-    std::optional<nx::vms::api::ServerLogSettings> m_settings;
-};
-using LogsManagementUnitPtr = std::shared_ptr<LogsManagementUnit>;
-
-class LogsManagementModel: public QAbstractTableModel, public QnWorkbenchContextAware
+class LogsManagementModel: public QAbstractTableModel
 {
     Q_OBJECT
     typedef QAbstractTableModel base_type;
@@ -83,11 +47,11 @@ public:
     static QString logLevelName(nx::utils::log::Level level);
 
 private:
-    LogsManagementUnitPtr itemForRow(int row) const;
+    void onItemsListChanged();
 
 private:
-    LogsManagementUnitPtr m_client;
-    std::vector<LogsManagementUnitPtr> m_servers;
+    QPointer<LogsManagementWatcher> m_watcher;
+    QList<LogsManagementUnitPtr> m_items;
 };
 
 } // namespace nx::vms::client::desktop
