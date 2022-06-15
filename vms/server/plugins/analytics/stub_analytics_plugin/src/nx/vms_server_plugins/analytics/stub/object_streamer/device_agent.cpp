@@ -140,7 +140,7 @@ std::vector<Ptr<IObjectMetadataPacket>> DeviceAgent::generateObjects(
         for (const auto& item: object.attributes)
             objectMetadata->addAttribute(makePtr<Attribute>(item.first, item.second));
 
-        objectMetadataPacket->addItem(objectMetadata.releasePtr());
+        objectMetadataPacket->addItem(objectMetadata.get());
     }
 
     for (const auto& entry: objectMetadataPacketByTimestamp)
