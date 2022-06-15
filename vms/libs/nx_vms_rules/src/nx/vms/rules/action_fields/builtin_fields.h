@@ -13,3 +13,4 @@
 #include "target_user_field.h"
 #include "text_field.h"
 #include "text_with_fields.h"
+#include "volume_field.h"

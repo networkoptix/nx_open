@@ -3322,7 +3322,7 @@ void QnMediaResourceWidget::at_triggerFieldsChanged(
         return;
 
     int index = triggerIndex(id);
-    if (!NX_ASSERT(index > 0))
+    if (!NX_ASSERT(index >= 0 && index < m_triggers.size()))
         return;
 
     auto info = m_triggers[index];

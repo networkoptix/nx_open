@@ -249,7 +249,7 @@ void QnWorkbenchTextOverlaysHandler::execute(const nx::vms::rules::ActionPtr& ac
         return;
 
     const auto overlayAction = action.dynamicCast<nx::vms::rules::TextOverlayAction>();
-    if (!overlayAction)
+    if (!NX_ASSERT(overlayAction))
         return;
 
     const auto ruleId = overlayAction->ruleId();

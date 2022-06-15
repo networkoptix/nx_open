@@ -49,6 +49,7 @@ void Initializer::registerActions() const
     registerAction<HttpAction>();
     registerAction<NotificationAction>();
     registerAction<SendEmailAction>();
+    registerAction<SpeakAction>();
     registerAction<TextOverlayAction>();
 }
 
@@ -91,6 +92,7 @@ void Initializer::registerFields() const
         fieldMetatype<TextWithFields>(),
         [this] { return new TextWithFields(this->m_context); });
     registerActionField<Substitution>();
+    registerActionField<VolumeField>();
 }
 
 } // namespace nx::vms::rules
