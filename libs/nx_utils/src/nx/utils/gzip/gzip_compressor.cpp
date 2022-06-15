@@ -28,13 +28,12 @@ namespace gzip {
 
 bool Compressor::isZlibCompressed(const nx::Buffer& data)
 {
-    /* For deflate, bit 1 and 2 can't be 1.
-     * https://www.w3.org/Graphics/PNG/RFC-1951#block-details:
-     * 00 - no compression
-     * 01 - compressed with fixed Huffman codes
-     * 10 - compressed with dynamic Huffman codes
-     * 11 - reserved (error)
-     * */
+    // For "deflate", bits 1 and 2 can't be 1.
+    // https://www.w3.org/Graphics/PNG/RFC-1951#block-details:
+    // 00 - no compression
+    // 01 - compressed with fixed Huffman codes
+    // 10 - compressed with dynamic Huffman codes
+    // 11 - reserved (error)
     return data.size() >= kGzipHeaderSize &&
         !memcmp(data.data(), kGzipHeader, kGzipHeaderSize);
 }
