@@ -5929,7 +5929,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed.</source>
-      <translation>Sólo se permiten letras, números y el guión bajo ("_").</translation>
+      <translation>Solo se permiten letras latinas, números y símbolos de teclado %1.</translation>
     </message>
   </context>
   <context>
@@ -7089,11 +7089,11 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
     <message>
       <source>Selected device is connected to another server. Audio stream is not available.</source>
-      <translation>%1 está conectado a otro servidor. La transmisión de audio no está disponible.</translation>
+      <translation>El dispositivo seleccionado está conectado a otro servidor. La transmisión de audio no está disponible.</translation>
     </message>
     <message>
       <source>Selected camera is connected to another server. Audio stream is not available.</source>
-      <translation>%1 está conectado a otro servidor. La transmisión de audio no está disponible.</translation>
+      <translation>La cámara seleccionada está conectado a otro servidor. La transmisión de audio no está disponible.</translation>
     </message>
   </context>
   <context>
@@ -8780,7 +8780,7 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
     <message>
       <source>Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</source>
-      <translation type="unfinished">Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</translation>
+      <translation>Este servidor tiene una versión de software anterior que es incompatible con el sistema actual. Actualícelo a la última compilación para fusionarlo con la actual.</translation>
     </message>
     <message>
       <source>The password or user name is invalid.</source>
@@ -8839,11 +8839,11 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
     <message>
       <source>Connection to Server could not be established. The Server&apos;s certificate is invalid.</source>
-      <translation type="unfinished">Connection to Server could not be established. The Server&apos;s certificate is invalid.</translation>
+      <translation>No se pudo establecer la conexión con el servidor. El certificado del servidor no es válido.</translation>
     </message>
     <message>
       <source>Connection to Server could not be established. The Server&apos;s certificate was rejected.</source>
-      <translation type="unfinished">Connection to Server could not be established. The Server&apos;s certificate was rejected.</translation>
+      <translation>No se pudo establecer la conexión con el servidor. El certificado del servidor no es válido.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -8852,7 +8852,7 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     <message>
       <source>%1 systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 systems have different owners. Merge is not allowed.</translation>
+      <translation>%1 sistemas tienen propietarios diferentes. No se permite fusionar.</translation>
     </message>
   </context>
   <context>
@@ -9575,19 +9575,19 @@ Puede forzarlo, pero puede aumentar significativamente la carga de la CPU.</tran
     </message>
     <message>
       <source>Recording motion and objects</source>
-      <translation type="unfinished">Recording motion and objects</translation>
+      <translation>Grabación por movimiento y objetos</translation>
     </message>
     <message>
       <source>Recording objects only</source>
-      <translation type="unfinished">Recording objects only</translation>
+      <translation>Sólo grabación por objetos</translation>
     </message>
     <message>
       <source>Recording motion, objects and low quality</source>
-      <translation type="unfinished">Recording motion, objects and low quality</translation>
+      <translation>Grabación por movimiento, objetos y baja calidad</translation>
     </message>
     <message>
       <source>Recording objects and low quality</source>
-      <translation type="unfinished">Recording objects and low quality</translation>
+      <translation>Grabación por objetos y baja calidad</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
@@ -9595,11 +9595,11 @@ Puede forzarlo, pero puede aumentar significativamente la carga de la CPU.</tran
     </message>
     <message>
       <source>Objects only</source>
-      <translation type="unfinished">Objects only</translation>
+      <translation>Solo objetos</translation>
     </message>
     <message>
       <source>Motion, Objects + Lo-Res</source>
-      <translation type="unfinished">Motion, Objects + Lo-Res</translation>
+      <translation>Movimiento, objetos + baja resolución</translation>
     </message>
     <message>
       <source>Objects + Lo-Res</source>
@@ -9778,83 +9778,83 @@ Aún puedes cambiar calidad y FPS directamente en la cámara.</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected devices</translation>
+      <translation>La detección de movimiento está deshabilitada para algunos de los dispositivos seleccionados</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this camera</source>
-      <translation type="unfinished">Motion detection is disabled for this camera</translation>
+      <translation>La detección de movimiento está deshabilitada para esta cámara</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected cameras</translation>
+      <translation>La detección de movimiento está deshabilitada para algunas de las cámaras seleccionadas</translation>
     </message>
     <message>
       <source>Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Algunos de los dispositivos seleccionados tienen solo una transmisión. Las grabaciones con y sin movimiento compartirán la misma resolución o calidad.</translation>
     </message>
     <message>
       <source>This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Algunos de los dispositivos seleccionados tienen solo una transmisión. Las grabaciones con y sin movimiento compartirán la misma resolución o calidad.</translation>
     </message>
     <message>
       <source>Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Algunos de los dispositivos seleccionados tienen solo una transmisión. Las grabaciones con y sin movimiento compartirán la misma resolución o calidad.</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected devices</translation>
+      <translation>La detección de movimiento está deshabilitada para algunos de los dispositivos seleccionados</translation>
     </message>
     <message>
       <source>Object detection is disabled for this camera</source>
-      <translation type="unfinished">Object detection is disabled for this camera</translation>
+      <translation>La detección de objetos está deshabilitada para esta cámara</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected cameras</translation>
+      <translation>La detección de objetos está deshabilitada para esta cámara</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected devices</translation>
+      <translation>La detección de movimiento y objetos está deshabilitada para algunos de los dispositivos seleccionados</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for this camera</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for this camera</translation>
+      <translation>La detección de movimiento y objetos está deshabilitada para esta cámara</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected cameras</translation>
+      <translation>La detección de movimiento y objetos está deshabilitada para algunas de las cámaras seleccionadas</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this I/O module</source>
-      <translation type="unfinished">Motion detection is disabled for this I/O module</translation>
+      <translation>La detección de movimiento está desactivada para este módulo de E/S</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected I/O modules</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected I/O modules</translation>
+      <translation>La detección de movimiento está desactivada para algunos de los módulos de E/S seleccionados</translation>
     </message>
     <message>
       <source>This I/O module has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">This I/O module has only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Este módulo de E/S solo tiene un flujo. Las grabaciones con y sin movimiento compartirán la misma resolución o calidad.</translation>
     </message>
     <message>
       <source>Some of the selected I/O modules have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">Some of the selected I/O modules have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Algunos de los módulos de E/S seleccionados tienen solo un flujo. Las grabaciones con y sin movimiento compartirán la misma resolución o calidad.</translation>
     </message>
     <message>
       <source>Object detection is disabled for this I/O module</source>
-      <translation type="unfinished">Object detection is disabled for this I/O module</translation>
+      <translation>La detección de objetos está deshabilitada para este módulo de E/S</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected I/O modules</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected I/O modules</translation>
+      <translation>La detección de objetos está desactivada para algunos de los módulos de E/S seleccionados</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for this I/O module</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for this I/O module</translation>
+      <translation>La detección de movimiento y objetos está desactivada para este módulo de E/S</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected I/O modules</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected I/O modules</translation>
+      <translation>La detección de movimiento está desactivada para algunos de los módulos de E/S seleccionados</translation>
     </message>
   </context>
   <context>
@@ -9902,11 +9902,11 @@ Atención: Esta contraseña no se puede resetear. Si la pierde, el archivo será
     </message>
     <message>
       <source>Does not affect the connections established by server.</source>
-      <translation type="unfinished">Does not affect the connections established by server.</translation>
+      <translation>No afecta a las conexiones establecidas por el servidor.</translation>
     </message>
     <message>
       <source>Enables RTSP traffic encryption.</source>
-      <translation type="unfinished">Enables RTSP traffic encryption.</translation>
+      <translation>Habilita el cifrado de tráfico RTSP.</translation>
     </message>
     <message>
       <source>days</source>
@@ -9914,16 +9914,16 @@ Atención: Esta contraseña no se puede resetear. Si la pierde, el archivo será
     </message>
     <message>
       <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
-      <translation type="unfinished">Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</translation>
+      <translation>Los usuarios locales y LDAP se desconectarán automáticamente si su sesión excede la duración especificada.</translation>
     </message>
     <message>
       <source>Unlimited user session lifetime threatens overall System security and may lead to degradation in System performance</source>
-      <translation type="unfinished">Unlimited user session lifetime threatens overall System security and may lead to degradation in System performance</translation>
+      <translation>Duración ilimitada de la sesión de usuario amenaza la seguridad general del sistema y puede llevar a la degradación en el rendimiento del sistema</translation>
     </message>
     <message>
       <source>It is recommended to have user session lifetime not greater than %1</source>
       <comment>%1 is the time span with time units</comment>
-      <translation type="unfinished">It is recommended to have user session lifetime not greater than %1</translation>
+      <translation>Se recomienda tener el tiempo de la sesión del usuario no superior a %1</translation>
     </message>
     <message>
       <source>Learn more.</source>
@@ -9933,7 +9933,7 @@ Atención: Esta contraseña no se puede resetear. Si la pierde, el archivo será
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
       <comment>%n is digest user count, %1 is total user count</comment>
       <translation type="unfinished">
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
+        <numerusform>%n de %1 usuarios tienen permitido usar autenticación digest (no seguro).</numerusform>
         <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
       </translation>
     </message>
@@ -9973,29 +9973,29 @@ Atención: Esta contraseña no se puede resetear. Si la pierde, el archivo será
     </message>
     <message>
       <source>Custom certificate</source>
-      <translation type="unfinished">Custom certificate</translation>
+      <translation>Certificado personalizado</translation>
     </message>
     <message>
       <source>Pinned certificate</source>
-      <translation type="unfinished">Pinned certificate</translation>
+      <translation>Certificado anclado</translation>
     </message>
     <message>
       <source>Unknown certificate</source>
-      <translation type="unfinished">Unknown certificate</translation>
+      <translation>Certificado desconocido</translation>
     </message>
     <message>
       <source>This is a custom certificate installed on %1</source>
-      <translation type="unfinished">This is a custom certificate installed on %1</translation>
+      <translation>Este es un certificado personalizado instalado en %1</translation>
     </message>
     <message>
       <source>Pin this certificate to %1?</source>
-      <translation type="unfinished">Pin this certificate to %1?</translation>
+      <translation>¿Fijar este certificado a %1?</translation>
     </message>
     <message>
       <source>Someone may be impersonating %1 to steel your personal information.
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steel your personal information.
-Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
+      <translation>Alguien puede estar haciéndose pasar por %1 para robar su información personal.
+No fije este certificado si no&apos;t modificó %2 el certificado SSL del servidor.</translation>
     </message>
     <message>
       <source>Pin</source>
@@ -10269,14 +10269,14 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message numerus="yes">
       <source>Recording schedule is invalid for %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
+      <translation>
+        <numerusform>El horario de grabación no es válido para %n cámaras</numerusform>
+        <numerusform>El horario de grabación no es válido para %n cámaras</numerusform>
       </translation>
     </message>
     <message>
       <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
-      <translation type="unfinished">Recording schedule on some cameras contains recording modes that are not supported.</translation>
+      <translation>Programación de grabación en algunas cámaras contiene modos de grabación que no son compatibles.</translation>
     </message>
   </context>
   <context>
@@ -10659,7 +10659,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::backup_settings_view::BackupSettingsViewStrings</name>
     <message>
       <source>All archive</source>
-      <translation type="unfinished">All archive</translation>
+      <translation>Todo el archivo</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -10675,15 +10675,15 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>High-Res</source>
-      <translation type="unfinished">High-Res</translation>
+      <translation>Alta Resolución</translation>
     </message>
     <message>
       <source>Low-Res</source>
-      <translation type="unfinished">Low-Res</translation>
+      <translation>Baja resolución</translation>
     </message>
     <message>
       <source>All streams</source>
-      <translation type="unfinished">All streams</translation>
+      <translation>Todos los flujos</translation>
     </message>
   </context>
   <context>
@@ -10755,22 +10755,22 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
     <message>
       <source>New Group</source>
-      <translation type="unfinished">New Group</translation>
+      <translation>Nuevo grupo</translation>
     </message>
     <message>
       <source>New Group %1</source>
-      <translation type="unfinished">New Group %1</translation>
+      <translation>Nuevo grupo %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
     <message>
       <source>Intercom Alarm Layout</source>
-      <translation type="unfinished">Intercom Alarm Layout</translation>
+      <translation>Diseño de alarma de intercomunicador</translation>
     </message>
     <message>
       <source>Intercom Open Door</source>
-      <translation type="unfinished">Intercom Open Door</translation>
+      <translation>Intercomunicador Puerta Abierta</translation>
     </message>
     <message>
       <source>Open door</source>
@@ -10850,37 +10850,37 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Selected Layout</source>
-      <translation type="unfinished">Selected Layout</translation>
+      <translation>Diseño seleccionado</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::jsapi::detail::ResourcesApiBackend</name>
     <message>
       <source>Resource is not available for the usage with JS API</source>
-      <translation type="unfinished">Resource is not available for the usage with JS API</translation>
+      <translation>El recurso no está disponible para el uso con la API JS</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
     <message>
       <source>Cannot find an item with the specified id</source>
-      <translation type="unfinished">Cannot find an item with the specified id</translation>
+      <translation>No se puede encontrar un elemento con el id especificado</translation>
     </message>
     <message>
       <source>Cannot find a resource with the specified id.</source>
-      <translation type="unfinished">Cannot find a resource with the specified id.</translation>
+      <translation>No se puede encontrar un recurso con la identificación especificada.</translation>
     </message>
     <message>
       <source>Cannot specify a media parameters for the resource without media stream.</source>
-      <translation type="unfinished">Cannot specify a media parameters for the resource without media stream.</translation>
+      <translation>No se puede especificar un parámetro de medios para el recurso sin flujo de medios.</translation>
     </message>
     <message>
       <source>Cannot add the resource to the layout</source>
-      <translation type="unfinished">Cannot add the resource to the layout</translation>
+      <translation>No se puede agregar el recurso al diseño</translation>
     </message>
     <message>
       <source>Cannot find a widget corresponding to the specified item.</source>
-      <translation type="unfinished">Cannot find a widget corresponding to the specified item.</translation>
+      <translation>No se puede encontrar un widget correspondiente al elemento especificado.</translation>
     </message>
   </context>
   <context>
@@ -11307,21 +11307,21 @@ Puede seleccionar otra ubicación de almacenamiento en la pestaña &quot;Adminis
     </message>
     <message>
       <source>This build is for demo purposes only.</source>
-      <translation type="unfinished">This build is for demo purposes only.</translation>
+      <translation>Esta compilación es solo para fines de demostración.</translation>
     </message>
     <message>
       <source>It cannot be upgraded to subsequent builds as they become available.</source>
-      <translation type="unfinished">It cannot be upgraded to subsequent builds as they become available.</translation>
+      <translation>No se puede actualizar a versiones posteriores a medida que estén disponibles.</translation>
     </message>
     <message>
       <source>To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</source>
       <comment>%1 is the product name</comment>
-      <translation type="unfinished">To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</translation>
+      <translation>Para actualizar, desinstale %1 antes de instalar una compilación actualizada (se perderán todos los datos).</translation>
     </message>
     <message>
       <source>%1 Beta</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 Beta</translation>
+      <translation>%1 Beta</translation>
     </message>
   </context>
   <context>
@@ -11332,7 +11332,7 @@ Puede seleccionar otra ubicación de almacenamiento en la pestaña &quot;Adminis
     </message>
     <message>
       <source>Press Esc to stop the tour.</source>
-      <translation type="unfinished">Press Esc to stop the tour.</translation>
+      <translation>Presione Esc para detener el recorrido.</translation>
     </message>
   </context>
   <context>
@@ -11551,19 +11551,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot check for update.</source>
-      <translation type="unfinished">Cannot check for update.</translation>
+      <translation>No se puede comprobar si hay actualizaciones.</translation>
     </message>
     <message>
       <source>Client update package is broken.</source>
-      <translation type="unfinished">Client update package is broken.</translation>
+      <translation>El paquete de actualización del cliente está roto.</translation>
     </message>
     <message>
       <source>Client update package is missing for current platform.</source>
-      <translation type="unfinished">Client update package is missing for current platform.</translation>
+      <translation>Falta el paquete de actualización del cliente para la plataforma actual.</translation>
     </message>
     <message>
       <source>Can&apos;t check client update availability. Check your internet connection and try again.</source>
-      <translation type="unfinished">Can&apos;t check client update availability. Check your internet connection and try again.</translation>
+      <translation>La activación automática no está disponible. Comprueba tu conexión a Internet e inténtalo de nuevo.</translation>
     </message>
   </context>
 </TS>

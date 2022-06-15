@@ -90,18 +90,18 @@
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
+      <translation>
+        <numerusform>%n nuevos resultados</numerusform>
+        <numerusform>%n nuevos resultados</numerusform>
       </translation>
     </message>
     <message>
       <source>new results</source>
-      <translation type="unfinished">new results</translation>
+      <translation>resultados nuevos</translation>
     </message>
     <message>
       <source>Detected by</source>
-      <translation type="unfinished">Detected by</translation>
+      <translation>Detectado por</translation>
     </message>
   </context>
   <context>
@@ -136,14 +136,14 @@
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
+      <translation>
+        <numerusform>%n Nuevos resultados</numerusform>
+        <numerusform>%n nuevos resultados</numerusform>
       </translation>
     </message>
     <message>
       <source>new results</source>
-      <translation type="unfinished">new results</translation>
+      <translation>resultados nuevos</translation>
     </message>
   </context>
   <context>
@@ -483,7 +483,7 @@
     <name>InformationBubble</name>
     <message>
       <source>Detected by</source>
-      <translation type="unfinished">Detected by</translation>
+      <translation>Detectado por</translation>
     </message>
   </context>
   <context>
@@ -521,7 +521,7 @@
     </message>
     <message>
       <source>Previous Object</source>
-      <translation type="unfinished">Previous Object</translation>
+      <translation>Objeto anterior</translation>
     </message>
     <message>
       <source>Pause</source>
@@ -533,11 +533,11 @@
     </message>
     <message>
       <source>Next Object</source>
-      <translation type="unfinished">Next Object</translation>
+      <translation>Siguiente objeto</translation>
     </message>
     <message>
       <source>Toggle Repeat</source>
-      <translation type="unfinished">Toggle Repeat</translation>
+      <translation>Alternar repetición</translation>
     </message>
   </context>
   <context>
@@ -714,7 +714,7 @@
     <name>OpenedTileItem</name>
     <message>
       <source>Address</source>
-      <translation> Dirección </translation>
+      <translation>Dirección</translation>
     </message>
     <message>
       <source>URL or Host:Port</source>
@@ -803,7 +803,7 @@
     </message>
     <message>
       <source>preview is not available for the selected object</source>
-      <translation type="unfinished">preview is not available for the selected object</translation>
+      <translation>la vista previa no está disponible para el objeto seleccionado</translation>
     </message>
   </context>
   <context>
@@ -873,7 +873,7 @@ para activar PTZ</translation>
     </message>
     <message>
       <source>Subtype</source>
-      <translation type="unfinished">Subtype</translation>
+      <translation>Subtipo</translation>
     </message>
   </context>
   <context>
@@ -1025,7 +1025,7 @@ para activar PTZ</translation>
     <name>SelectOverlappedIdDialog</name>
     <message>
       <source>Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</source>
-      <translation type="unfinished">Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</translation>
+      <translation>Identificador de línea de tiempo, que se crea cuando el tiempo se cambia hacia atrás en un NVR remoto. La nueva línea de tiempo puede superponerse a la existente.</translation>
     </message>
     <message>
       <source>Select</source>
