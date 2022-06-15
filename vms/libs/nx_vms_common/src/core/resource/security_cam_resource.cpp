@@ -1568,6 +1568,10 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
         &QnSecurityCamResource::setVendor,
         isStringEmpty);
     mergeValue(
+        &QnSecurityCamResource::getFirmware,
+        &QnSecurityCamResource::setFirmware,
+        isStringEmpty);
+    mergeValue(
         &QnSecurityCamResource::enforcedDeviceType,
         &QnSecurityCamResource::setDeviceType,
         isDeviceTypeEmpty);
