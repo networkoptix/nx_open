@@ -144,7 +144,7 @@ void Parser::handleFrame()
         if (nx::utils::bstream::gzip::Compressor::isZlibCompressed(m_frameBuffer))
         {
             // Fallback for vms 5.0 and older.
-            // Please remove this code then backward support is no longer needed.
+            // TODO: Remove this code when the backward compatibility is no longer needed.
             m_frameBuffer = nx::utils::bstream::gzip::Compressor::uncompressData(m_frameBuffer);
         }
         else
