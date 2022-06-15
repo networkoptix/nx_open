@@ -6913,7 +6913,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</translation>
+      <translation>Przekazywanie całej zawartości udostępnia dowolną usługę lub urządzenie użytkownikom tej strony internetowej.</translation>
     </message>
     <message>
       <source>Move anyway?</source>
@@ -7434,7 +7434,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>What to backup</source>
-      <translation type="unfinished">What to backup</translation>
+      <translation>Elementy kopii zapasowej</translation>
     </message>
     <message>
       <source>Quality</source>
@@ -7469,7 +7469,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>What to backup</source>
-      <translation type="unfinished">What to backup</translation>
+      <translation>Elementy kopii zapasowej</translation>
     </message>
     <message>
       <source>Quality</source>
@@ -9837,7 +9837,7 @@ Możesz to wymusić, ale może to znacznie zwiększyć obciążenie procesora.</
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</translation>
+      <translation>Przekazywanie całej zawartości udostępnia dowolną usługę lub urządzenie użytkownikom tej strony internetowej</translation>
     </message>
   </context>
   <context>

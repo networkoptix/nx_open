@@ -1294,7 +1294,7 @@ aby aktywować PTZ</translation>
     <name>WelcomeScreen</name>
     <message>
       <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
-      <translation type="unfinished">You don&apos;t have access to the %1. Please check your internet connection.</translation>
+      <translation>Nie masz dostępu do %1. Proszę sprawdzić swoje połączenie z internetem.</translation>
     </message>
     <message>
       <source>Official Website</source>

@@ -1,3056 +1,3056 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="pl_PL" sourcelanguage="en">
+<TS version="2.1" language="gl_ES" sourcelanguage="en">
   <context>
     <name>AboutDialog</name>
     <message>
       <source>About</source>
-      <translation>Informacje o programie</translation>
+      <translation type="unfinished">About</translation>
     </message>
     <message>
       <source>Information</source>
-      <translation>Informacja</translation>
+      <translation type="unfinished">Information</translation>
     </message>
     <message>
       <source>Credits</source>
-      <translation>Twórcy</translation>
+      <translation type="unfinished">Credits</translation>
     </message>
     <message>
       <source>GPU Information</source>
-      <translation>Informacje GPU</translation>
+      <translation type="unfinished">GPU Information</translation>
     </message>
     <message>
       <source>Support</source>
-      <translation>Wsparcie</translation>
+      <translation type="unfinished">Support</translation>
     </message>
     <message>
       <source>System Servers</source>
-      <translation>Serwery systemu</translation>
+      <translation type="unfinished">System Servers</translation>
     </message>
     <message>
       <source>Developer</source>
-      <translation>Programista</translation>
+      <translation type="unfinished">Developer</translation>
     </message>
     <message>
       <source>Open source libraries</source>
-      <translation>Biblioteki open source</translation>
+      <translation type="unfinished">Open source libraries</translation>
     </message>
   </context>
   <context>
     <name>AdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
-      <translation>Poprawianie obrazu</translation>
+      <translation type="unfinished">Image Enhancement</translation>
     </message>
     <message>
       <source>Enable image enhancement</source>
-      <translation>Włącz poprawianie obrazu</translation>
+      <translation type="unfinished">Enable image enhancement</translation>
     </message>
     <message>
       <source>Gamma</source>
-      <translation>Gamma</translation>
+      <translation type="unfinished">Gamma</translation>
     </message>
     <message>
       <source>Auto</source>
-      <translation>Auto</translation>
+      <translation type="unfinished">Auto</translation>
     </message>
     <message>
       <source>Black level</source>
-      <translation>Poziom czerni</translation>
+      <translation type="unfinished">Black level</translation>
     </message>
     <message>
       <source>White level</source>
-      <translation>Poziom bieli</translation>
+      <translation type="unfinished">White level</translation>
     </message>
   </context>
   <context>
     <name>AdvancedSettingsWidget</name>
     <message>
       <source>Downmix Audio from 5.1 to 2.1</source>
-      <translation>Miksuj audio z 5.1 do 2.1</translation>
+      <translation type="unfinished">Downmix Audio from 5.1 to 2.1</translation>
     </message>
     <message>
       <source>Double Buffering</source>
-      <translation>Podwójne buforowanie</translation>
+      <translation type="unfinished">Double Buffering</translation>
     </message>
     <message>
       <source>Maximum Live Buffer Length</source>
-      <translation>Maksymalna długość bufora na żywo</translation>
+      <translation type="unfinished">Maximum Live Buffer Length</translation>
     </message>
     <message>
       <source>Browse Logs</source>
-      <translation>Przeglądaj dzienniki</translation>
+      <translation type="unfinished">Browse Logs</translation>
     </message>
     <message>
       <source>Clear Local Cache</source>
-      <translation>Wyczyść lokalną pamięć podręczną</translation>
+      <translation type="unfinished">Clear Local Cache</translation>
     </message>
     <message>
       <source>Reset All Warnings</source>
-      <translation>Zresetuj wszystkie ostrzeżenia</translation>
+      <translation type="unfinished">Reset All Warnings</translation>
     </message>
     <message>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-      <translation>Karta graficzna Intel HD może powodować problemy, jeśli ma włączony efekt rozmycia (blur). Zalecane jest pozostawienie opcji bez zmian.</translation>
+      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
     </message>
     <message>
       <source>Disable blur</source>
-      <translation>Wyłącz efekt rozmycia</translation>
+      <translation type="unfinished">Disable blur</translation>
     </message>
     <message>
       <source>Limit Frame Rate to save CPU</source>
-      <translation>Ogranicz liczbę klatek na sekundę, aby oszczędzać użycie CPU</translation>
+      <translation type="unfinished">Limit Frame Rate to save CPU</translation>
     </message>
     <message>
       <source>Use Hardware Video Decoding</source>
-      <translation>Użyj sprzętowego dekodowania wideo</translation>
+      <translation type="unfinished">Use Hardware Video Decoding</translation>
     </message>
     <message>
       <source>Server certificate validation</source>
-      <translation>Weryfikacja certyfikatu serwera</translation>
+      <translation type="unfinished">Server certificate validation</translation>
     </message>
   </context>
   <context>
     <name>AggregationWidget</name>
     <message>
       <source>Check to set aggregation period</source>
-      <translation>Zaznacz, aby ustawić okres agregacji</translation>
+      <translation type="unfinished">Check to set aggregation period</translation>
     </message>
     <message>
       <source>Interval of action :</source>
-      <translation>Interwał działania :</translation>
+      <translation type="unfinished">Interval of action :</translation>
     </message>
     <message>
       <source>No more than once per</source>
-      <translation>Nie częściej niż co</translation>
+      <translation type="unfinished">No more than once per</translation>
     </message>
     <message>
       <source>Instant</source>
-      <translation>Szybko</translation>
+      <translation type="unfinished">Instant</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsSdkEventWidget</name>
     <message>
       <source>Keywords separated by space</source>
-      <translation>Słowa kluczowe oddzielone spacją</translation>
+      <translation type="unfinished">Keywords separated by space</translation>
     </message>
     <message>
       <source>Caption contains:</source>
-      <translation>Nagłówek zawiera:</translation>
+      <translation type="unfinished">Caption contains:</translation>
     </message>
     <message>
       <source>Description contains:</source>
-      <translation>Opis zawiera:</translation>
+      <translation type="unfinished">Description contains:</translation>
     </message>
     <message>
       <source>Event Type:</source>
-      <translation>Typ zdarzenia:</translation>
+      <translation type="unfinished">Event Type:</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsSdkObjectDetectedWidget</name>
     <message>
       <source>Attributes:</source>
-      <translation>Atrybuty:</translation>
+      <translation type="unfinished">Attributes:</translation>
     </message>
     <message>
       <source>Object Type:</source>
-      <translation>Typ obiektu:</translation>
+      <translation type="unfinished">Object Type:</translation>
     </message>
   </context>
   <context>
     <name>ArchiveLengthWidget</name>
     <message>
       <source>Auto</source>
-      <translation>Auto</translation>
+      <translation type="unfinished">Auto</translation>
     </message>
     <message>
       <source>Keep Archive For...</source>
-      <translation>Zachowaj archiwum dla...</translation>
+      <translation type="unfinished">Keep Archive For...</translation>
     </message>
     <message>
       <source>Max</source>
-      <translation>Max</translation>
+      <translation type="unfinished">Max</translation>
     </message>
     <message>
       <source>Min</source>
-      <translation>Min</translation>
+      <translation type="unfinished">Min</translation>
     </message>
   </context>
   <context>
     <name>AudioRedirectPickerWidget</name>
     <message>
       <source>Form</source>
-      <translation>Forma</translation>
+      <translation type="unfinished">Form</translation>
     </message>
   </context>
   <context>
     <name>AuditLogDialog</name>
     <message>
       <source>Refresh</source>
-      <translation>Odśwież</translation>
+      <translation type="unfinished">Refresh</translation>
     </message>
     <message>
       <source>User actions</source>
-      <translation>Akcje użytkownika</translation>
+      <translation type="unfinished">User actions</translation>
     </message>
     <message>
       <source>Watching archive</source>
-      <translation>Przeglądanie archiwum</translation>
+      <translation type="unfinished">Watching archive</translation>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation>Eksportowanie wideo</translation>
+      <translation type="unfinished">Exporting video</translation>
     </message>
     <message>
       <source>Watching live</source>
-      <translation>Podglądanie na żywo</translation>
+      <translation type="unfinished">Watching live</translation>
     </message>
     <message>
       <source>Login/logout</source>
-      <translation>Zaloguj/Wyloguj</translation>
+      <translation type="unfinished">Login/logout</translation>
     </message>
     <message>
       <source>Event rules</source>
-      <translation>Reguły zdarzeń</translation>
+      <translation type="unfinished">Event rules</translation>
     </message>
     <message>
       <source>Server actions</source>
-      <translation>Akcje serwera</translation>
+      <translation type="unfinished">Server actions</translation>
     </message>
     <message>
       <source>System actions</source>
-      <translation>Akcje systemu</translation>
+      <translation type="unfinished">System actions</translation>
     </message>
     <message>
       <source>Select all</source>
-      <translation>Zaznacz wszystko</translation>
+      <translation type="unfinished">Select all</translation>
     </message>
     <message>
       <source>Sessions</source>
-      <translation>Sesje</translation>
+      <translation type="unfinished">Sessions</translation>
     </message>
     <message>
       <source>Details</source>
-      <translation>Szczegóły</translation>
+      <translation type="unfinished">Details</translation>
     </message>
     <message>
       <source>Audit Trail</source>
-      <translation>Dziennik dostępu</translation>
+      <translation type="unfinished">Audit Trail</translation>
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation>Wyczyść filtr</translation>
+      <translation type="unfinished">Clear Filter</translation>
     </message>
     <message>
       <source>Email settings</source>
-      <translation>Ustawienia e-mail</translation>
+      <translation type="unfinished">Email settings</translation>
     </message>
     <message>
       <source>All servers are offline. Audit data is not available.</source>
-      <translation>Wszystkie serwery są odłączone. Dane z dziennika są niedostępne.</translation>
+      <translation type="unfinished">All servers are offline. Audit data is not available.</translation>
     </message>
   </context>
   <context>
     <name>BackupBandwidthSettingsWidget</name>
     <message>
       <source>No Limit</source>
-      <translation>Bez limitu</translation>
+      <translation type="unfinished">No Limit</translation>
     </message>
     <message>
       <source>Fixed</source>
-      <translation>Naprawione</translation>
+      <translation type="unfinished">Fixed</translation>
     </message>
     <message>
       <source>Scheduled</source>
-      <translation>Harmonogram</translation>
+      <translation type="unfinished">Scheduled</translation>
     </message>
     <message>
       <source>Fix bandwidth to</source>
-      <translation>Ograniczaj pasmo do</translation>
+      <translation type="unfinished">Fix bandwidth to</translation>
     </message>
     <message>
       <source>Mbit/s</source>
-      <translation>Mbit/s</translation>
+      <translation type="unfinished">Mbit/s</translation>
     </message>
     <message>
       <source>Unlimited</source>
-      <translation>Bez limitu</translation>
+      <translation type="unfinished">Unlimited</translation>
     </message>
     <message>
       <source>Limited to</source>
-      <translation>Ograniczone do</translation>
+      <translation type="unfinished">Limited to</translation>
     </message>
     <message>
       <source>No backup</source>
-      <translation>Brak kopii zapasowej</translation>
+      <translation type="unfinished">No backup</translation>
     </message>
   </context>
   <context>
     <name>BackupSettingsWidget</name>
     <message>
       <source>Server is offline. Backup settings are not available.</source>
-      <translation>Serwer jest odłączony. Ustawienia kopii zapasowej są niedostępne.</translation>
+      <translation type="unfinished">Server is offline. Backup settings are not available.</translation>
     </message>
   </context>
   <context>
     <name>BackupStatusWidget</name>
     <message>
       <source>Backup is not configured yet.</source>
-      <translation>Kopia zapasowa nie została jeszcze skonfigurowana.</translation>
+      <translation type="unfinished">Backup is not configured yet.</translation>
     </message>
     <message>
       <source>To start backup enable it for some cameras and apply settings.</source>
-      <translation>Aby rozpocząć tworzenie kopii zapasowej, włącz ją dla niektórych kamer i zastosuj ustawienia.</translation>
+      <translation type="unfinished">To start backup enable it for some cameras and apply settings.</translation>
     </message>
     <message>
       <source>Refresh</source>
-      <translation>Odśwież</translation>
+      <translation type="unfinished">Refresh</translation>
     </message>
     <message>
       <source>Skip Current Queue</source>
-      <translation>Pomiń bieżącą kolejkę</translation>
+      <translation type="unfinished">Skip Current Queue</translation>
     </message>
     <message>
       <source>Maximum backup queue size</source>
-      <translation>Maksymalny rozmiar kolejki kopii zapasowej</translation>
+      <translation type="unfinished">Maximum backup queue size</translation>
     </message>
     <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
-      <translation>Kopia zapasowa wszystkich plików została pomyślnie utworzona! Kopie zapasowe nowych plików będą tworzone automatycznie</translation>
+      <translation type="unfinished">All files are successfully backed up! New files will be backed up automatically</translation>
     </message>
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
-      <translation>Kopia zapasowa została zatrzymana z powodu problemu z pamięcią. Kopia zapasowa zostanie wznowiona automatycznie po rozwiązaniu problemu z pamięcią</translation>
+      <translation type="unfinished">Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</translation>
     </message>
   </context>
   <context>
     <name>BookmarkBusinessActionWidget</name>
     <message>
       <source>Fixed duration:</source>
-      <translation>Ustalony czas trwania:</translation>
+      <translation type="unfinished">Fixed duration:</translation>
     </message>
     <message>
       <source>seconds</source>
-      <translation>sek.</translation>
+      <translation type="unfinished">seconds</translation>
     </message>
     <message>
       <source>Tags:</source>
-      <translation>Tagi:</translation>
+      <translation type="unfinished">Tags:</translation>
     </message>
     <message>
       <source>Pre-recording:</source>
-      <translation>Nagrywanie przedalarmowe:</translation>
+      <translation type="unfinished">Pre-recording:</translation>
     </message>
     <message>
       <source>Post-recording:</source>
-      <translation>Nagrywanie poalarmowe:</translation>
+      <translation type="unfinished">Post-recording:</translation>
     </message>
   </context>
   <context>
     <name>BookmarkOverlaySettingsWidget</name>
     <message>
       <source>Bookmark Info</source>
-      <translation>Informacje zakładki</translation>
+      <translation type="unfinished">Bookmark Info</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Usuń</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <source>Area Width</source>
-      <translation>Szerokość obszaru</translation>
+      <translation type="unfinished">Area Width</translation>
     </message>
     <message>
       <source>Font Size</source>
-      <translation>Rozmiar czcionki</translation>
+      <translation type="unfinished">Font Size</translation>
     </message>
     <message>
       <source>Include description</source>
-      <translation>Dołącz opis</translation>
+      <translation type="unfinished">Include description</translation>
     </message>
   </context>
   <context>
     <name>BookmarkWidget</name>
     <message>
       <source>Popular tags</source>
-      <translation>Popularne tagi</translation>
+      <translation type="unfinished">Popular tags</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation>Nazwa</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>Opis</translation>
+      <translation type="unfinished">Description</translation>
     </message>
     <message>
       <source>Timeout</source>
-      <translation>Limit czasu</translation>
+      <translation type="unfinished">Timeout</translation>
     </message>
     <message>
       <source>Tags</source>
-      <translation>Tagi</translation>
+      <translation type="unfinished">Tags</translation>
     </message>
     <message>
       <source>List of tags divided by commas</source>
-      <translation>Lista tagów rozdzielonych przecinkami</translation>
+      <translation type="unfinished">List of tags divided by commas</translation>
     </message>
   </context>
   <context>
     <name>BookmarksLog</name>
     <message>
       <source>Refresh</source>
-      <translation>Odśwież</translation>
+      <translation type="unfinished">Refresh</translation>
     </message>
     <message>
       <source>Bookmark Log</source>
-      <translation>Dziennik zakładek</translation>
+      <translation type="unfinished">Bookmark Log</translation>
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation>Wyczyść filtr</translation>
+      <translation type="unfinished">Clear Filter</translation>
     </message>
   </context>
   <context>
     <name>BusinessRuleWidget</name>
     <message>
       <source>Event</source>
-      <translation>Zdarzenie</translation>
+      <translation type="unfinished">Event</translation>
     </message>
     <message>
       <source>Schedule...</source>
-      <translation>Harmonogram...</translation>
+      <translation type="unfinished">Schedule...</translation>
     </message>
     <message>
       <source>Action</source>
-      <translation>Akcja</translation>
+      <translation type="unfinished">Action</translation>
     </message>
     <message>
       <source>Comments:</source>
-      <translation>Komentarze:</translation>
+      <translation type="unfinished">Comments:</translation>
     </message>
     <message>
       <source>When</source>
-      <translation>Jeśli</translation>
+      <translation type="unfinished">When</translation>
     </message>
     <message>
       <source>Do</source>
-      <translation>Wykonaj</translation>
+      <translation type="unfinished">Do</translation>
     </message>
     <message>
       <source>At</source>
-      <translation>Na</translation>
+      <translation type="unfinished">At</translation>
     </message>
     <message>
       <source>Use event source server</source>
-      <translation>Użyj serwera źródłowego dla zdarzenia</translation>
+      <translation type="unfinished">Use event source server</translation>
     </message>
   </context>
   <context>
     <name>BusinessRulesDialog</name>
     <message>
       <source>Add</source>
-      <translation>Dodaj</translation>
+      <translation type="unfinished">Add</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Usuń</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation>Reguły zdarzeń</translation>
+      <translation type="unfinished">Event Rules</translation>
     </message>
     <message>
       <source>Event Log...</source>
-      <translation>Dziennik zdarzeń...</translation>
+      <translation type="unfinished">Event Log...</translation>
     </message>
     <message>
       <source>Test</source>
-      <translation>Test</translation>
+      <translation type="unfinished">Test</translation>
     </message>
   </context>
   <context>
     <name>BuzzerBusinessActionWidget</name>
     <message>
       <source>Fixed duration:</source>
-      <translation>Ustalony czas trwania:</translation>
+      <translation type="unfinished">Fixed duration:</translation>
     </message>
     <message>
       <source>seconds</source>
-      <translation>sek.</translation>
+      <translation type="unfinished">seconds</translation>
     </message>
   </context>
   <context>
     <name>CameraAdvancedParamsWidget</name>
     <message>
       <source>Category</source>
-      <translation>Kategoria</translation>
+      <translation type="unfinished">Category</translation>
     </message>
     <message>
       <source>Refresh</source>
-      <translation>Odśwież</translation>
+      <translation type="unfinished">Refresh</translation>
     </message>
   </context>
   <context>
     <name>CameraCredentialsDialog</name>
     <message>
       <source>Authentication credentials</source>
-      <translation>Dane logowania</translation>
+      <translation type="unfinished">Authentication credentials</translation>
     </message>
   </context>
   <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
       <source>Do not archive primary stream</source>
-      <translation>Nie archiwizuj pierwszego strumienia</translation>
+      <translation type="unfinished">Do not archive primary stream</translation>
     </message>
     <message>
       <source>Do not archive secondary stream</source>
-      <translation>Nie archiwizuj drugiego strumienia</translation>
+      <translation type="unfinished">Do not archive secondary stream</translation>
     </message>
     <message>
       <source>Auto</source>
-      <translation>Auto</translation>
+      <translation type="unfinished">Auto</translation>
     </message>
     <message>
       <source>Restore Defaults</source>
-      <translation>Przywróć domyślne</translation>
+      <translation type="unfinished">Restore Defaults</translation>
     </message>
     <message>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation>Nie zmieniaj tych ustawień, chyba że jesteś całkowicie pewny ich potencjalnego wpływu na wydajność systemu.</translation>
+      <translation type="unfinished">Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</translation>
     </message>
     <message>
       <source>Keep camera stream and profile settings</source>
-      <translation>Zachowaj ustawienia strumieni i profile kamer</translation>
+      <translation type="unfinished">Keep camera stream and profile settings</translation>
     </message>
     <message>
       <source>Calculate bitrate per GOP instead of bitrate per second</source>
-      <translation>Obliczaj bitrate na GOP zamiast bitrate na sekundę</translation>
+      <translation type="unfinished">Calculate bitrate per GOP instead of bitrate per second</translation>
     </message>
     <message>
       <source>It will increase bitrate for camera.</source>
-      <translation>Zwiększy to bitrate dla kamery.</translation>
+      <translation type="unfinished">It will increase bitrate for camera.</translation>
     </message>
     <message>
       <source>Disable secondary stream</source>
-      <translation>Wyłącz drugi strumień</translation>
+      <translation type="unfinished">Disable secondary stream</translation>
     </message>
     <message>
       <source>Motion Detection</source>
-      <translation>Detekcja ruchu</translation>
+      <translation type="unfinished">Motion Detection</translation>
     </message>
     <message>
       <source>Media Streaming</source>
-      <translation>Strumieniowanie mediów</translation>
+      <translation type="unfinished">Media Streaming</translation>
     </message>
     <message>
       <source>PTZ</source>
-      <translation>PTZ</translation>
+      <translation type="unfinished">PTZ</translation>
     </message>
     <message>
       <source>Generate</source>
-      <translation>Generuj</translation>
+      <translation type="unfinished">Generate</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation>Zresetuj</translation>
+      <translation type="unfinished">Reset</translation>
     </message>
     <message>
       <source>Logical ID</source>
-      <translation>ID logiczny</translation>
+      <translation type="unfinished">Logical ID</translation>
     </message>
     <message>
       <source>Trust camera timestamp</source>
-      <translation>Akceptuj czas kamery</translation>
+      <translation type="unfinished">Trust camera timestamp</translation>
     </message>
     <message>
       <source>Native camera presets will not be avaliable.</source>
-      <translation>Natywne ustawienia kamery nie będą dostępne.</translation>
+      <translation type="unfinished">Native camera presets will not be avaliable.</translation>
     </message>
     <message>
       <source>This camera supports pan and tilt</source>
-      <translation>Ta kamera obsługuje Pan i Tilt</translation>
+      <translation type="unfinished">This camera supports pan and tilt</translation>
     </message>
     <message>
       <source>This camera supports zoom</source>
-      <translation>Ta kamera obsługuje Zoom</translation>
+      <translation type="unfinished">This camera supports zoom</translation>
     </message>
     <message>
       <source>Detect motion during archive import</source>
-      <translation>Wykrywaj zdarzenia ruchu podczas importowania archiwum</translation>
+      <translation type="unfinished">Detect motion during archive import</translation>
     </message>
     <message>
       <source>Stream Settings</source>
-      <translation>Ustawienia strumieniowania</translation>
+      <translation type="unfinished">Stream Settings</translation>
     </message>
     <message>
       <source>Initialization Settings</source>
-      <translation>Ustawienia inicjalizacji</translation>
+      <translation type="unfinished">Initialization Settings</translation>
     </message>
     <message>
       <source>Use Media2 to fetch profiles</source>
-      <translation>Użyj Media2 do pobrania profili</translation>
+      <translation type="unfinished">Use Media2 to fetch profiles</translation>
     </message>
     <message>
       <source>Use different values for pan and tilt</source>
-      <translation>Użyj różnych wartości dla pan i tilt</translation>
+      <translation type="unfinished">Use different values for pan and tilt</translation>
     </message>
     <message>
       <source>Tilt</source>
-      <translation>Nachylenie</translation>
+      <translation type="unfinished">Tilt</translation>
     </message>
     <message>
       <source>Media Port</source>
-      <translation>Port mediów</translation>
+      <translation type="unfinished">Media Port</translation>
     </message>
     <message>
       <source>Use system presets</source>
-      <translation>Użyj ustawień systemowych</translation>
+      <translation type="unfinished">Use system presets</translation>
     </message>
     <message>
       <source>PTZ Speed</source>
-      <translation>Prędkość PTZ</translation>
+      <translation type="unfinished">PTZ Speed</translation>
     </message>
     <message>
       <source>RTP Transport</source>
-      <translation>Protokół RTP</translation>
+      <translation type="unfinished">RTP Transport</translation>
     </message>
     <message>
       <source>Use camera native presets</source>
-      <translation>Użyj natywnych ustawień kamery</translation>
+      <translation type="unfinished">Use camera native presets</translation>
     </message>
     <message>
       <source>Time Settings</source>
-      <translation>Ustawienia czasu</translation>
+      <translation type="unfinished">Time Settings</translation>
     </message>
     <message>
       <source>Keep camera time settings</source>
-      <translation>Zachowaj ustawienia czasu kamery</translation>
+      <translation type="unfinished">Keep camera time settings</translation>
     </message>
   </context>
   <context>
     <name>CameraInfoWidget</name>
     <message>
       <source>Model</source>
-      <translation>Model</translation>
+      <translation type="unfinished">Model</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation>Producent</translation>
+      <translation type="unfinished">Vendor</translation>
     </message>
     <message>
       <source>IP Address</source>
-      <translation>Adres IP</translation>
+      <translation type="unfinished">IP Address</translation>
     </message>
     <message>
       <source>Ping</source>
-      <translation>Ping</translation>
+      <translation type="unfinished">Ping</translation>
     </message>
     <message>
       <source>Firmware</source>
-      <translation>Firmware</translation>
+      <translation type="unfinished">Firmware</translation>
     </message>
     <message>
       <source>Camera ID</source>
-      <translation>ID kamery</translation>
+      <translation type="unfinished">Camera ID</translation>
     </message>
     <message>
       <source>Web Page</source>
-      <translation>Strona WWW</translation>
+      <translation type="unfinished">Web Page</translation>
     </message>
     <message>
       <source>Primary Stream</source>
-      <translation>Pierwszy strumień</translation>
+      <translation type="unfinished">Primary Stream</translation>
     </message>
     <message>
       <source>Secondary Stream</source>
-      <translation>Drugi strumień</translation>
+      <translation type="unfinished">Secondary Stream</translation>
     </message>
     <message>
       <source>MAC Address</source>
-      <translation>Adres MAC</translation>
+      <translation type="unfinished">MAC Address</translation>
     </message>
     <message>
       <source>Show on layout</source>
-      <translation>Pokaż w układzie</translation>
+      <translation type="unfinished">Show on layout</translation>
     </message>
     <message>
       <source>Event Log</source>
-      <translation>Dziennik zdarzeń</translation>
+      <translation type="unfinished">Event Log</translation>
     </message>
     <message>
       <source>Camera rules</source>
-      <translation>Reguły kamery</translation>
+      <translation type="unfinished">Camera rules</translation>
     </message>
     <message>
       <source>Logical ID</source>
-      <translation>ID logiczny</translation>
+      <translation type="unfinished">Logical ID</translation>
     </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <source>Input ID</source>
-      <translation>ID wejścia</translation>
+      <translation type="unfinished">Input ID</translation>
     </message>
   </context>
   <context>
     <name>CameraLicensePanelWidget</name>
     <message>
       <source>Activate License...</source>
-      <translation>Aktywuj licencję...</translation>
+      <translation type="unfinished">Activate License...</translation>
     </message>
   </context>
   <context>
     <name>CameraListDialog</name>
     <message>
       <source>Add Device...</source>
-      <translation>Dodaj urządzenie...</translation>
+      <translation type="unfinished">Add Device...</translation>
     </message>
   </context>
   <context>
     <name>CameraMotionSettingsWidget</name>
     <message>
       <source>Motion Detection</source>
-      <translation>Detekcja ruchu</translation>
+      <translation type="unfinished">Motion Detection</translation>
     </message>
     <message>
       <source>Sensitivity</source>
-      <translation>Czułość</translation>
+      <translation type="unfinished">Sensitivity</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation>Zresetuj</translation>
+      <translation type="unfinished">Reset</translation>
     </message>
     <message>
       <source>in</source>
       <comment>e.g. &quot;in Primary Stream&quot;</comment>
-      <translation>w</translation>
+      <translation type="unfinished">in</translation>
     </message>
   </context>
   <context>
     <name>CameraOutputBusinessActionWidget</name>
     <message>
       <source>Fixed duration:</source>
-      <translation>Ustalony czas trwania:</translation>
+      <translation type="unfinished">Fixed duration:</translation>
     </message>
     <message>
       <source>Output ID:</source>
-      <translation>ID wyjściowe:</translation>
+      <translation type="unfinished">Output ID:</translation>
     </message>
   </context>
   <context>
     <name>CameraScheduleWidget</name>
     <message>
       <source>Recording</source>
-      <translation>Nagrywanie</translation>
+      <translation type="unfinished">Recording</translation>
     </message>
     <message>
       <source>Activate License...</source>
-      <translation>Aktywuj licencję...</translation>
+      <translation type="unfinished">Activate License...</translation>
     </message>
     <message>
       <source>Copying Schedule</source>
-      <translation>Kopiowanie harmonogramu</translation>
+      <translation type="unfinished">Copying Schedule</translation>
     </message>
     <message>
       <source>Copy Schedule to...</source>
-      <translation>Kopiuj harmonogram do...</translation>
+      <translation type="unfinished">Copy Schedule to...</translation>
     </message>
     <message>
       <source>Motion &amp;&amp; Objects Recording</source>
-      <translation>Nagrywanie ruchu i obiektów</translation>
+      <translation type="unfinished">Motion &amp;&amp; Objects Recording</translation>
     </message>
   </context>
   <context>
     <name>CameraSelectionDialog</name>
     <message>
       <source>All Cameras</source>
-      <translation>Wszystkie kamery</translation>
+      <translation type="unfinished">All Cameras</translation>
     </message>
     <message>
       <source>Select Cameras</source>
-      <translation>Wybierz kamery</translation>
+      <translation type="unfinished">Select Cameras</translation>
     </message>
   </context>
   <context>
     <name>CameraSettingsGeneralTabWidget</name>
     <message>
       <source>Authentication</source>
-      <translation>Uwierzytelnianie</translation>
+      <translation type="unfinished">Authentication</translation>
     </message>
     <message>
       <source>Edit Credentials</source>
-      <translation>Edytuj dane logowania</translation>
+      <translation type="unfinished">Edit Credentials</translation>
     </message>
     <message>
       <source>Audio</source>
-      <translation>Dźwięk</translation>
+      <translation type="unfinished">Audio</translation>
     </message>
     <message>
       <source>Enable audio</source>
-      <translation>Włącz dźwięk</translation>
+      <translation type="unfinished">Enable audio</translation>
     </message>
     <message>
       <source>Edit Streams...</source>
-      <translation>Edytuj strumienie...</translation>
+      <translation type="unfinished">Edit Streams...</translation>
     </message>
     <message>
       <source>Enable 2-way audio</source>
-      <translation>Włącz 2-kierunkowy dźwięk</translation>
+      <translation type="unfinished">Enable 2-way audio</translation>
     </message>
   </context>
   <context>
     <name>CameraStreamsDialog</name>
     <message>
       <source>Streams Addresses</source>
-      <translation>Adresy strumieni</translation>
+      <translation type="unfinished">Streams Addresses</translation>
     </message>
   </context>
   <context>
     <name>CertificateSelectionDialog</name>
     <message>
       <source>Web site requires a certificate</source>
-      <translation>Witryna internetowa wymaga certyfikatu</translation>
+      <translation type="unfinished">Web site requires a certificate</translation>
     </message>
   </context>
   <context>
     <name>ChangeUserPasswordDialog</name>
     <message>
       <source>Change password</source>
-      <translation>Zmień hasło</translation>
+      <translation type="unfinished">Change password</translation>
     </message>
   </context>
   <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
-      <translation>Łączenie...</translation>
+      <translation type="unfinished">Connecting...</translation>
     </message>
   </context>
   <context>
     <name>ConnectionTestingDialog</name>
     <message>
       <source>Connection Test</source>
-      <translation>Test połączenia</translation>
+      <translation type="unfinished">Connection Test</translation>
     </message>
     <message>
       <source>Testing connection...</source>
-      <translation>Testowanie połączenia...</translation>
+      <translation type="unfinished">Testing connection...</translation>
     </message>
   </context>
   <context>
     <name>CustomBusinessEventWidget</name>
     <message>
       <source>Source contains:</source>
-      <translation>Źródło zawiera:</translation>
+      <translation type="unfinished">Source contains:</translation>
     </message>
     <message>
       <source>Keywords separated by space</source>
-      <translation>Słowa kluczowe oddzielone spacją</translation>
+      <translation type="unfinished">Keywords separated by space</translation>
     </message>
     <message>
       <source>Caption contains:</source>
-      <translation>Nagłówek zawiera:</translation>
+      <translation type="unfinished">Caption contains:</translation>
     </message>
     <message>
       <source>Description contains:</source>
-      <translation>Opis zawiera:</translation>
+      <translation type="unfinished">Description contains:</translation>
     </message>
     <message>
       <source>Omit Logging</source>
-      <translation>Pomiń logowanie</translation>
+      <translation type="unfinished">Omit Logging</translation>
     </message>
   </context>
   <context>
     <name>CustomSettingsWidget</name>
     <message>
       <source>Category</source>
-      <translation>Kategoria</translation>
+      <translation type="unfinished">Category</translation>
     </message>
   </context>
   <context>
     <name>DatabaseManagementWidget</name>
     <message>
       <source>Create Backup...</source>
-      <translation>Utwórz backup...</translation>
+      <translation type="unfinished">Create Backup...</translation>
     </message>
     <message>
       <source>Restore from Backup...</source>
-      <translation>Przywróć z backupu...</translation>
+      <translation type="unfinished">Restore from Backup...</translation>
     </message>
   </context>
   <context>
     <name>DeviceAdditionDialog</name>
     <message>
       <source>to</source>
-      <translation>do</translation>
+      <translation type="unfinished">to</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
-      <translation>WYBIERZ SERWER</translation>
+      <translation type="unfinished">SELECT SERVER</translation>
     </message>
     <message>
       <source>Known Address</source>
-      <translation>Znany adres</translation>
+      <translation type="unfinished">Known Address</translation>
     </message>
     <message>
       <source>Subnet Scan</source>
-      <translation>Skanowanie podsieci</translation>
+      <translation type="unfinished">Subnet Scan</translation>
     </message>
     <message>
       <source>Address</source>
-      <translation>Adres</translation>
+      <translation type="unfinished">Address</translation>
     </message>
     <message>
       <source>Hint</source>
-      <translation>Wskazówka</translation>
+      <translation type="unfinished">Hint</translation>
     </message>
     <message>
       <source>Port</source>
-      <translation>Port</translation>
+      <translation type="unfinished">Port</translation>
     </message>
     <message>
       <source>End IP</source>
-      <translation>Końcowe IP</translation>
+      <translation type="unfinished">End IP</translation>
     </message>
     <message>
       <source>Start IP</source>
-      <translation>Początkowe IP</translation>
+      <translation type="unfinished">Start IP</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Hasło</translation>
+      <translation type="unfinished">Password</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation type="unfinished">Login</translation>
     </message>
     <message>
       <source>Search</source>
-      <translation>Szukaj</translation>
+      <translation type="unfinished">Search</translation>
     </message>
     <message>
       <source>Stop</source>
-      <translation>Stop</translation>
+      <translation type="unfinished">Stop</translation>
     </message>
     <message>
       <source>Add all Devices</source>
-      <translation>Dodaj wszystkie urządzenia</translation>
+      <translation type="unfinished">Add all Devices</translation>
     </message>
     <message>
       <source>Add Devices</source>
-      <translation>Dodaj urządzenia</translation>
+      <translation type="unfinished">Add Devices</translation>
     </message>
     <message>
       <source>Default</source>
-      <translation>Domyślnie</translation>
+      <translation type="unfinished">Default</translation>
     </message>
   </context>
   <context>
     <name>EncryptedArchivePasswordDialog</name>
     <message>
       <source>Encrypted archive</source>
-      <translation>Zaszyfrowane archiwum</translation>
+      <translation type="unfinished">Encrypted archive</translation>
     </message>
     <message>
       <source>Enter your encryption password to view the archive</source>
-      <translation>Wprowadź hasło szyfrowania, aby wyświetlić archiwum</translation>
+      <translation type="unfinished">Enter your encryption password to view the archive</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Hasło</translation>
+      <translation type="unfinished">Password</translation>
     </message>
   </context>
   <context>
     <name>EulaDialog</name>
     <message>
       <source>Copy to Clipboard</source>
-      <translation>Kopiuj do schowka</translation>
+      <translation type="unfinished">Copy to Clipboard</translation>
     </message>
     <message>
       <source>I Do Not Agree</source>
-      <translation>Odrzucam</translation>
+      <translation type="unfinished">I Do Not Agree</translation>
     </message>
     <message>
       <source>I Agree</source>
-      <translation>Akceptuję</translation>
+      <translation type="unfinished">I Agree</translation>
     </message>
   </context>
   <context>
     <name>EventLogDialog</name>
     <message>
       <source>Event Log</source>
-      <translation>Dziennik zdarzeń</translation>
+      <translation type="unfinished">Event Log</translation>
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation>Wyczyść filtr</translation>
+      <translation type="unfinished">Clear Filter</translation>
     </message>
     <message>
       <source>Refresh</source>
-      <translation>Odśwież</translation>
+      <translation type="unfinished">Refresh</translation>
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation>Wszystkie serwery są odłączone. Logi nie są dostępne.</translation>
+      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
     </message>
     <message>
       <source>Event Rules...</source>
-      <translation>Reguły zdarzeń...</translation>
+      <translation type="unfinished">Event Rules...</translation>
     </message>
   </context>
   <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
       <source>HTTP content</source>
-      <translation>Treść HTTP</translation>
+      <translation type="unfinished">HTTP content</translation>
     </message>
     <message>
       <source>Login to authenticate (optional)</source>
-      <translation>Zaloguj, aby uwierzytelnić (opcjonalne)</translation>
+      <translation type="unfinished">Login to authenticate (optional)</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation type="unfinished">Login</translation>
     </message>
     <message>
       <source>Password to authenticate (optional)</source>
-      <translation>Hasło do uwierzytelnienia (opcjonalne)</translation>
+      <translation type="unfinished">Password to authenticate (optional)</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Hasło</translation>
+      <translation type="unfinished">Password</translation>
     </message>
     <message>
       <source>Content type</source>
-      <translation>Typ zawartości</translation>
+      <translation type="unfinished">Content type</translation>
     </message>
     <message>
       <source>HTTP URL</source>
-      <translation>URL HTTP</translation>
+      <translation type="unfinished">HTTP URL</translation>
     </message>
     <message>
       <source>Authentication type</source>
-      <translation>Typ uwierzytelniania</translation>
+      <translation type="unfinished">Authentication type</translation>
     </message>
     <message>
       <source>Request type</source>
-      <translation>Typ zapytania</translation>
+      <translation type="unfinished">Request type</translation>
     </message>
   </context>
   <context>
     <name>ExecPtzPresetBusinessActionWidget</name>
     <message>
       <source>PTZ preset:</source>
-      <translation>Preset PTZ:</translation>
+      <translation type="unfinished">PTZ preset:</translation>
     </message>
   </context>
   <context>
     <name>ExitFullscreenActionWidget</name>
     <message>
       <source>On layout</source>
-      <translation>Na układzie</translation>
+      <translation type="unfinished">On layout</translation>
     </message>
   </context>
   <context>
     <name>ExportLayoutSettingsWidget</name>
     <message>
       <source>Export Settings</source>
-      <translation>Ustawienia eksportu</translation>
+      <translation type="unfinished">Export Settings</translation>
     </message>
     <message>
       <source>Make read-only</source>
-      <translation>Ustaw jako tylko do odczytu</translation>
+      <translation type="unfinished">Make read-only</translation>
     </message>
   </context>
   <context>
     <name>ExportMediaSettingsWidget</name>
     <message>
       <source>Export Settings</source>
-      <translation>Ustawienia eksportu</translation>
+      <translation type="unfinished">Export Settings</translation>
     </message>
     <message>
       <source>Apply Filters</source>
-      <translation>Zastosuj filtry</translation>
+      <translation type="unfinished">Apply Filters</translation>
     </message>
     <message>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation>Obracanie, Dewarping, Korekcja obrazu itp.</translation>
+      <translation type="unfinished">Rotation, Dewarping, Image Enhancement etc.</translation>
     </message>
     <message>
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
-      <translation>Stosowanie filtrów i nakładanie elementów na obraz wymaga transkodowania, które zwiększy użycie procesora i może zająć sporo czasu.</translation>
+      <translation type="unfinished">Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</translation>
     </message>
   </context>
   <context>
     <name>ExportPasswordWidget</name>
     <message>
       <source>Protect with password</source>
-      <translation>Chroń hasłem</translation>
+      <translation type="unfinished">Protect with password</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Hasło</translation>
+      <translation type="unfinished">Password</translation>
     </message>
   </context>
   <context>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Export Video</source>
-      <translation>Eksport wideo</translation>
+      <translation type="unfinished">Export Video</translation>
     </message>
     <message>
       <source>Single Camera</source>
-      <translation>Pojedyncza kamera</translation>
+      <translation type="unfinished">Single Camera</translation>
     </message>
     <message>
       <source>Export Settings</source>
-      <translation>Ustawienia eksportu</translation>
+      <translation type="unfinished">Export Settings</translation>
     </message>
     <message>
       <source>Multi Video</source>
-      <translation>Multi-wideo</translation>
+      <translation type="unfinished">Multi Video</translation>
     </message>
   </context>
   <context>
     <name>FailoverPriorityDialog</name>
     <message>
       <source>Failover Priority</source>
-      <translation>Priorytet failover</translation>
+      <translation type="unfinished">Failover Priority</translation>
     </message>
   </context>
   <context>
     <name>FailoverPriorityPickerWidget</name>
     <message>
       <source>Set priority:</source>
-      <translation>Ustaw priorytet:</translation>
+      <translation type="unfinished">Set priority:</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation>Niski</translation>
+      <translation type="unfinished">Low</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation>Średnia</translation>
+      <translation type="unfinished">Medium</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>Wysoki</translation>
+      <translation type="unfinished">High</translation>
     </message>
     <message>
       <source>Select some devices to setup failover priority</source>
-      <translation>Wybierz jakieś urządzenia, aby skonfigurować priorytet przełączania awaryjnego</translation>
+      <translation type="unfinished">Select some devices to setup failover priority</translation>
     </message>
     <message>
       <source>No Failover</source>
-      <translation>Brak opcji Failover</translation>
+      <translation type="unfinished">No Failover</translation>
     </message>
   </context>
   <context>
     <name>FilenamePanel</name>
     <message>
       <source>Browse...</source>
-      <translation>Przeglądaj...</translation>
+      <translation type="unfinished">Browse...</translation>
     </message>
   </context>
   <context>
     <name>FilteredResourceViewWidget</name>
     <message>
       <source>Nothing found</source>
-      <translation>Nic nie znaleziono</translation>
+      <translation type="unfinished">Nothing found</translation>
     </message>
   </context>
   <context>
     <name>FullscreenCameraActionWidget</name>
     <message>
       <source>On layout</source>
-      <translation>Na układzie</translation>
+      <translation type="unfinished">On layout</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation>Kamera</translation>
+      <translation type="unfinished">Camera</translation>
     </message>
     <message>
       <source>Source camera</source>
-      <translation>Kamera źródłowa</translation>
+      <translation type="unfinished">Source camera</translation>
     </message>
   </context>
   <context>
     <name>GeneralPreferencesWidget</name>
     <message>
       <source>Misc</source>
-      <translation>Inne</translation>
+      <translation type="unfinished">Misc</translation>
     </message>
     <message>
       <source>Auto Pause Video</source>
-      <translation>Auto-pauza</translation>
+      <translation type="unfinished">Auto Pause Video</translation>
     </message>
     <message>
       <source>after</source>
-      <translation>po</translation>
+      <translation type="unfinished">after</translation>
     </message>
     <message>
       <source>Minutes of Inactivity</source>
-      <translation>Minuty bezczynności</translation>
+      <translation type="unfinished">Minutes of Inactivity</translation>
     </message>
     <message>
       <source>Add...</source>
-      <translation>Dodaj...</translation>
+      <translation type="unfinished">Add...</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Usuń</translation>
+      <translation type="unfinished">Remove</translation>
     </message>
     <message>
       <source>Local Media Folders</source>
-      <translation>Lokalne foldery multimedialne</translation>
+      <translation type="unfinished">Local Media Folders</translation>
     </message>
     <message>
       <source>Audio Input</source>
-      <translation>Wejście audio</translation>
+      <translation type="unfinished">Audio Input</translation>
     </message>
     <message>
       <source>First Source</source>
-      <translation>Pierwsze źródło</translation>
+      <translation type="unfinished">First Source</translation>
     </message>
     <message>
       <source>Second Source</source>
-      <translation>Drugie źródło</translation>
+      <translation type="unfinished">Second Source</translation>
     </message>
     <message>
       <source>Run Application when PC Boots up</source>
-      <translation>Uruchom aplikację przy starcie komputera</translation>
+      <translation type="unfinished">Run Application when PC Boots up</translation>
     </message>
     <message>
       <source>Startup</source>
-      <translation>Uruchomienie</translation>
+      <translation type="unfinished">Startup</translation>
     </message>
     <message>
       <source>Connect to the previous system on startup</source>
-      <translation>Połącz się z poprzednim systemem podczas uruchamiania</translation>
+      <translation type="unfinished">Connect to the previous system on startup</translation>
     </message>
     <message>
       <source>Automatically restore saved windows configuration</source>
-      <translation>Automatycznie przywracaj zapisaną konfigurację okien</translation>
+      <translation type="unfinished">Automatically restore saved windows configuration</translation>
     </message>
     <message>
       <source>Play audio from all cameras on layout</source>
-      <translation>Odtwarzaj dźwięk ze wszystkich kamer w układzie</translation>
+      <translation type="unfinished">Play audio from all cameras on layout</translation>
     </message>
     <message>
       <source>Mute audio when the mic is active</source>
-      <translation>Wycisz dźwięk gdy mikrofon jest aktywny</translation>
+      <translation type="unfinished">Mute audio when the mic is active</translation>
     </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
       <source>System Settings</source>
-      <translation>Ustawienia systemu</translation>
+      <translation type="unfinished">System Settings</translation>
     </message>
     <message>
       <source>Backup and Restore</source>
-      <translation>Backup i przywracanie</translation>
+      <translation type="unfinished">Backup and Restore</translation>
     </message>
   </context>
   <context>
     <name>ImageControlWidget</name>
     <message>
       <source>Image Control</source>
-      <translation>Kontrola obrazu</translation>
+      <translation type="unfinished">Image Control</translation>
     </message>
     <message>
       <source>Aspect ratio</source>
-      <translation>Współczynnik proporcji</translation>
+      <translation type="unfinished">Aspect ratio</translation>
     </message>
     <message>
       <source>Default rotation</source>
-      <translation>Domyślny obrót</translation>
+      <translation type="unfinished">Default rotation</translation>
     </message>
   </context>
   <context>
     <name>ImageOverlaySettingsWidget</name>
     <message>
       <source>Image</source>
-      <translation>Obraz</translation>
+      <translation type="unfinished">Image</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Usuń</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <source>Size</source>
-      <translation>Rozmiar</translation>
+      <translation type="unfinished">Size</translation>
     </message>
     <message>
       <source>Opacity</source>
-      <translation>Przezroczystość</translation>
+      <translation type="unfinished">Opacity</translation>
     </message>
     <message>
       <source>Default</source>
-      <translation>Domyślnie</translation>
+      <translation type="unfinished">Default</translation>
     </message>
     <message>
       <source>Browse...</source>
-      <translation>Przeglądaj...</translation>
+      <translation type="unfinished">Browse...</translation>
     </message>
   </context>
   <context>
     <name>ImagePreviewDialog</name>
     <message>
       <source>Image View</source>
-      <translation>Widok obrazu</translation>
+      <translation type="unfinished">Image View</translation>
     </message>
     <message>
       <source>Loading Image...Please Wait.</source>
-      <translation>Ładowanie obrazu... Proszę czekać.</translation>
+      <translation type="unfinished">Loading Image...Please Wait.</translation>
     </message>
     <message>
       <source>No image</source>
-      <translation>Brak obrazu</translation>
+      <translation type="unfinished">No image</translation>
     </message>
   </context>
   <context>
     <name>InfoOverlaySettingsWidget</name>
     <message>
       <source>Info</source>
-      <translation>Info</translation>
+      <translation type="unfinished">Info</translation>
     </message>
     <message>
       <source>Camera name</source>
-      <translation>Nazwa kamery</translation>
+      <translation type="unfinished">Camera name</translation>
     </message>
     <message>
       <source>Export date</source>
-      <translation>Data eksportu</translation>
+      <translation type="unfinished">Export date</translation>
     </message>
     <message>
       <source>Font Size</source>
-      <translation>Rozmiar czcionki</translation>
+      <translation type="unfinished">Font Size</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Usuń</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
   </context>
   <context>
     <name>IoModuleSettingsWidget</name>
     <message>
       <source>Form</source>
-      <translation>Forma</translation>
+      <translation type="unfinished">Form</translation>
     </message>
     <message>
       <source>Enable tile interface</source>
-      <translation>Włącz interfejs kafelkowy</translation>
+      <translation type="unfinished">Enable tile interface</translation>
     </message>
   </context>
   <context>
     <name>LayoutBackgroundSettingsWidget</name>
     <message>
       <source>Processing Image...Please Wait.</source>
-      <translation>Przetwarzanie obrazu... Proszę czekać.</translation>
+      <translation type="unfinished">Processing Image...Please Wait.</translation>
     </message>
     <message>
       <source>Browse...</source>
-      <translation>Przeglądaj...</translation>
+      <translation type="unfinished">Browse...</translation>
     </message>
     <message>
       <source>Clear</source>
-      <translation>Wyczyść</translation>
+      <translation type="unfinished">Clear</translation>
     </message>
     <message>
       <source>View...</source>
-      <translation>Widok...</translation>
+      <translation type="unfinished">View...</translation>
     </message>
     <message>
       <source>Width:</source>
-      <translation>Szerokość:</translation>
+      <translation type="unfinished">Width:</translation>
     </message>
     <message>
       <source>Keep Aspect Ratio</source>
-      <translation>Zachowaj proporcje formatu</translation>
+      <translation type="unfinished">Keep Aspect Ratio</translation>
     </message>
     <message>
       <source>Opacity:</source>
-      <translation>Przezroczystość:</translation>
+      <translation type="unfinished">Opacity:</translation>
     </message>
     <message>
       <source>Height:</source>
-      <translation>Wysokość:</translation>
+      <translation type="unfinished">Height:</translation>
     </message>
     <message>
       <source>Crop to monitor aspect ratio</source>
-      <translation>Przycinaj do formatu monitora</translation>
+      <translation type="unfinished">Crop to monitor aspect ratio</translation>
     </message>
   </context>
   <context>
     <name>LayoutGeneralSettingsWidget</name>
     <message>
       <source>Locked</source>
-      <translation>Zablokowane</translation>
+      <translation type="unfinished">Locked</translation>
     </message>
     <message>
       <source>Width</source>
-      <translation>Szerokość</translation>
+      <translation type="unfinished">Width</translation>
     </message>
     <message>
       <source>Height</source>
-      <translation>Wysokość</translation>
+      <translation type="unfinished">Height</translation>
     </message>
     <message>
       <source>Logical ID</source>
-      <translation>ID logiczny</translation>
+      <translation type="unfinished">Logical ID</translation>
     </message>
     <message>
       <source>Generate</source>
-      <translation>Generuj</translation>
+      <translation type="unfinished">Generate</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation>Zresetuj</translation>
+      <translation type="unfinished">Reset</translation>
     </message>
     <message>
       <source>Minimum Grid Size</source>
-      <translation>Minimalny rozmiar siatki</translation>
+      <translation type="unfinished">Minimum Grid Size</translation>
     </message>
   </context>
   <context>
     <name>LayoutSelectionDialog</name>
     <message>
       <source>Select layout</source>
-      <translation>Wybierz układ</translation>
+      <translation type="unfinished">Select layout</translation>
     </message>
     <message>
       <source>Shared layouts</source>
-      <translation>Udostępnione układy</translation>
+      <translation type="unfinished">Shared layouts</translation>
     </message>
     <message>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>Wybierz jednego użytkownika w linii &quot;Pokaż na&quot;, aby wyświetlić jego lokalne układy na tej liście</translation>
+      <translation type="unfinished">Select some single user in &quot;Show to&quot; line to display his local layouts in this list</translation>
     </message>
   </context>
   <context>
     <name>LdapSettingsDialog</name>
     <message>
       <source>Optional</source>
-      <translation>Opcjonalne</translation>
+      <translation type="unfinished">Optional</translation>
     </message>
     <message>
       <source>Testing...</source>
-      <translation>Testowanie...</translation>
+      <translation type="unfinished">Testing...</translation>
     </message>
     <message>
       <source>LDAP Settings</source>
-      <translation>Ustawienia LDAP</translation>
+      <translation type="unfinished">LDAP Settings</translation>
     </message>
     <message>
       <source>Server URL</source>
-      <translation>URL serwera</translation>
+      <translation type="unfinished">Server URL</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Hasło</translation>
+      <translation type="unfinished">Password</translation>
     </message>
     <message>
       <source>Search Base</source>
-      <translation>Podstawa wyszukiwania</translation>
+      <translation type="unfinished">Search Base</translation>
     </message>
     <message>
       <source>Search Filter</source>
-      <translation>Filtr wyszukiwania</translation>
+      <translation type="unfinished">Search Filter</translation>
     </message>
     <message>
       <source>Search Timeout (s)</source>
-      <translation>Limit czasu wyszukiwania (s)</translation>
+      <translation type="unfinished">Search Timeout (s)</translation>
     </message>
     <message>
       <source>Admin DN or CN</source>
-      <translation>Admin DN lub CN</translation>
+      <translation type="unfinished">Admin DN or CN</translation>
     </message>
   </context>
   <context>
     <name>LdapUsersDialog</name>
     <message>
       <source>Fetch Users from LDAP...</source>
-      <translation>Import użytkowników z LDAP...</translation>
+      <translation type="unfinished">Fetch Users from LDAP...</translation>
     </message>
     <message>
       <source>Loading...</source>
-      <translation>Ładowanie...</translation>
+      <translation type="unfinished">Loading...</translation>
     </message>
     <message>
       <source>Connection error</source>
-      <translation>Błąd połączenia</translation>
+      <translation type="unfinished">Connection error</translation>
     </message>
     <message>
       <source>Role to assign to imported users</source>
-      <translation>Grupa uprawnień przypisywana do importowanych użytkowników</translation>
+      <translation type="unfinished">Role to assign to imported users</translation>
     </message>
     <message>
       <source>Disable imported users</source>
-      <translation>Zablokuj konta importowanym użytkownikom</translation>
+      <translation type="unfinished">Disable imported users</translation>
     </message>
     <message>
       <source>Allow digest authentication for imported user</source>
-      <translation>Zezwalaj na uwierzytelnianie digest dla importowanego użytkownika</translation>
+      <translation type="unfinished">Allow digest authentication for imported user</translation>
     </message>
   </context>
   <context>
     <name>LicenseDetailsDialog</name>
     <message>
       <source>License Details</source>
-      <translation>Szczegóły licencji</translation>
+      <translation type="unfinished">License Details</translation>
     </message>
     <message>
       <source>Generic</source>
-      <translation>Ogólne</translation>
+      <translation type="unfinished">Generic</translation>
     </message>
     <message>
       <source>Features</source>
-      <translation>Cechy</translation>
+      <translation type="unfinished">Features</translation>
     </message>
   </context>
   <context>
     <name>LicenseManagerWidget</name>
     <message>
       <source>Active Licenses</source>
-      <translation>Aktywne licencje</translation>
+      <translation type="unfinished">Active Licenses</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Usuń</translation>
+      <translation type="unfinished">Remove</translation>
     </message>
     <message>
       <source>New License</source>
-      <translation>Nowa licencja</translation>
+      <translation type="unfinished">New License</translation>
     </message>
     <message>
       <source>Details...</source>
-      <translation>Szczegóły...</translation>
+      <translation type="unfinished">Details...</translation>
     </message>
     <message>
       <source>The software is licensed to</source>
-      <translation>Oprogramowanie jest licencjonowane dla</translation>
+      <translation type="unfinished">The software is licensed to</translation>
     </message>
   </context>
   <context>
     <name>LicenseNotificationDialog</name>
     <message>
       <source>Warning</source>
-      <translation>Ostrzeżenie</translation>
+      <translation type="unfinished">Warning</translation>
     </message>
     <message>
       <source>License issues:</source>
-      <translation>Problemy z licencją:</translation>
+      <translation type="unfinished">License issues:</translation>
     </message>
   </context>
   <context>
     <name>LicenseWidget</name>
     <message>
       <source>Manual Activation</source>
-      <translation>Aktywacja ręczna</translation>
+      <translation type="unfinished">Manual Activation</translation>
     </message>
     <message>
       <source>Select License File...</source>
-      <translation>Wybierz plik licencji...</translation>
+      <translation type="unfinished">Select License File...</translation>
     </message>
     <message>
       <source>Browse...</source>
-      <translation>Przeglądaj...</translation>
+      <translation type="unfinished">Browse...</translation>
     </message>
     <message>
       <source>License will be bound to the current server</source>
-      <translation>Licencja zostanie przypisana do bieżącego serwera</translation>
+      <translation type="unfinished">License will be bound to the current server</translation>
     </message>
     <message>
       <source>Activate Free License</source>
-      <translation>Aktywuj licencję bezpłatną</translation>
+      <translation type="unfinished">Activate Free License</translation>
     </message>
     <message>
       <source>Activate License</source>
-      <translation>Aktywuj licencję</translation>
+      <translation type="unfinished">Activate License</translation>
     </message>
     <message>
       <source>Internet Activation</source>
-      <translation>Aktywacja internetowa</translation>
+      <translation type="unfinished">Internet Activation</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation>Klucz licencyjny</translation>
+      <translation type="unfinished">License Key</translation>
     </message>
     <message>
       <source>Invalid License Key</source>
-      <translation>Nieprawidłowy klucz licencyjny</translation>
+      <translation type="unfinished">Invalid License Key</translation>
     </message>
     <message>
       <source>Activation Key File</source>
-      <translation>Plik z kluczem aktywacyjnym</translation>
+      <translation type="unfinished">Activation Key File</translation>
     </message>
     <message>
       <source>Hardware ID</source>
-      <translation>ID sprzętu</translation>
+      <translation type="unfinished">Hardware ID</translation>
     </message>
   </context>
   <context>
     <name>LocalSettingsDialog</name>
     <message>
       <source>Local Settings</source>
-      <translation>Ustawienia lokalne</translation>
+      <translation type="unfinished">Local Settings</translation>
     </message>
   </context>
   <context>
     <name>LoginDialog</name>
     <message>
       <source>Host</source>
-      <translation>Host</translation>
+      <translation type="unfinished">Host</translation>
     </message>
     <message>
       <source>Port</source>
-      <translation>Port</translation>
+      <translation type="unfinished">Port</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation type="unfinished">Login</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Hasło</translation>
+      <translation type="unfinished">Password</translation>
     </message>
     <message>
       <source>Test</source>
-      <translation>Test</translation>
+      <translation type="unfinished">Test</translation>
     </message>
   </context>
   <context>
     <name>LookAndFeelPreferencesWidget</name>
     <message>
       <source>Look and Feel</source>
-      <translation>Wygląd i interfejs</translation>
+      <translation type="unfinished">Look and Feel</translation>
     </message>
     <message>
       <source>Background Image</source>
-      <translation>Obraz tła</translation>
+      <translation type="unfinished">Background Image</translation>
     </message>
     <message>
       <source>Browse...</source>
-      <translation>Przeglądaj...</translation>
+      <translation type="unfinished">Browse...</translation>
     </message>
     <message>
       <source>Language</source>
-      <translation>Język</translation>
+      <translation type="unfinished">Language</translation>
     </message>
     <message>
       <source>Time Mode</source>
-      <translation>Tryb czasu</translation>
+      <translation type="unfinished">Time Mode</translation>
     </message>
     <message>
       <source>Image</source>
-      <translation>Obraz</translation>
+      <translation type="unfinished">Image</translation>
     </message>
     <message>
       <source>Mode</source>
-      <translation>Tryb</translation>
+      <translation type="unfinished">Mode</translation>
     </message>
     <message>
       <source>Intensity</source>
-      <translation>Intensywność</translation>
+      <translation type="unfinished">Intensity</translation>
     </message>
     <message>
       <source>Show additional info in tree</source>
-      <translation>Pokaż dodatkowe info w drzewie</translation>
+      <translation type="unfinished">Show additional info in tree</translation>
     </message>
     <message>
       <source>seconds</source>
-      <translation>sek.</translation>
+      <translation type="unfinished">seconds</translation>
     </message>
     <message>
       <source>Tour cycle</source>
-      <translation>Cykl trasy</translation>
+      <translation type="unfinished">Tour cycle</translation>
     </message>
     <message>
       <source>IP addresses for cameras, and servers, groups for users, etc.</source>
-      <translation>Adresy IP kamer i serwerów, grupy użytkowników itp.</translation>
+      <translation type="unfinished">IP addresses for cameras, and servers, groups for users, etc.</translation>
     </message>
     <message>
       <source>Show aim overlay for PTZ cameras</source>
-      <translation>Pokaż celownik dla kamer PTZ</translation>
+      <translation type="unfinished">Show aim overlay for PTZ cameras</translation>
     </message>
   </context>
   <context>
     <name>MergeSystemsDialog</name>
     <message>
       <source>Merge Systems...</source>
-      <translation>Złącz systemy...</translation>
+      <translation type="unfinished">Merge Systems...</translation>
     </message>
     <message>
       <source>Server URL:</source>
-      <translation>URL serwera:</translation>
+      <translation type="unfinished">Server URL:</translation>
     </message>
     <message>
       <source>Password:</source>
-      <translation>Hasło:</translation>
+      <translation type="unfinished">Password:</translation>
     </message>
     <message>
       <source>Login:</source>
-      <translation>Login:</translation>
+      <translation type="unfinished">Login:</translation>
     </message>
     <message>
       <source>Check</source>
-      <translation>Sprawdź</translation>
+      <translation type="unfinished">Check</translation>
     </message>
     <message>
       <source>Take system name and settings from:</source>
-      <translation>Nazwę systemu i ustawienia pobierz od:</translation>
+      <translation type="unfinished">Take system name and settings from:</translation>
     </message>
   </context>
   <context>
     <name>MultiServerUpdatesWidget</name>
     <message>
       <source>Updating to...</source>
-      <translation>Aktualizacja do...</translation>
+      <translation type="unfinished">Updating to...</translation>
     </message>
     <message>
       <source>You have the latest version installed</source>
-      <translation>Masz zainstalowaną najnowszą wersję</translation>
+      <translation type="unfinished">You have the latest version installed</translation>
     </message>
     <message>
       <source>Download</source>
-      <translation>Pobieranie</translation>
+      <translation type="unfinished">Download</translation>
     </message>
     <message>
       <source>Browse</source>
-      <translation>Przeglądaj</translation>
+      <translation type="unfinished">Browse</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation>Pobierz i zainstaluj</translation>
+      <translation type="unfinished">Download &amp;&amp; Install</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Anuluj</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
     <message>
       <source>Link copied</source>
-      <translation>Link skopiowany</translation>
+      <translation type="unfinished">Link copied</translation>
     </message>
     <message>
       <source>Advanced Update Settings</source>
-      <translation>Zaawansowane ustawienia aktualizacji</translation>
+      <translation type="unfinished">Advanced Update Settings</translation>
     </message>
     <message>
       <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
-      <translation>Wygląda na to, że proces aktualizacji zajmuje więcej czasu niż zwykle. Proszę nadal czekać.</translation>
+      <translation type="unfinished">It looks like the update process is taking more time than usual. Please keep waiting.</translation>
     </message>
     <message>
       <source>Advanced settings</source>
-      <translation>Ustawienia zaawansowane</translation>
+      <translation type="unfinished">Advanced settings</translation>
     </message>
   </context>
   <context>
     <name>MultipleLayoutSelectionDialog</name>
     <message>
       <source>Select Layouts</source>
-      <translation>Wybierz układy</translation>
+      <translation type="unfinished">Select Layouts</translation>
     </message>
   </context>
   <context>
     <name>NewVirtualCameraDialog</name>
     <message>
       <source>New Virtual Camera...</source>
-      <translation>Nowa kamera wirtualna...</translation>
+      <translation type="unfinished">New Virtual Camera...</translation>
     </message>
     <message>
       <source>To server</source>
-      <translation>Do serwera</translation>
+      <translation type="unfinished">To server</translation>
     </message>
   </context>
   <context>
     <name>OauthLoginPlaceholder</name>
     <message>
       <source>Try Again</source>
-      <translation>Spróbuj ponownie</translation>
+      <translation type="unfinished">Try Again</translation>
     </message>
   </context>
   <context>
     <name>OpenLayoutActionWidget</name>
     <message>
       <source>Layout</source>
-      <translation>Układ</translation>
+      <translation type="unfinished">Layout</translation>
     </message>
     <message>
       <source>Show to</source>
-      <translation>Pokaż na</translation>
+      <translation type="unfinished">Show to</translation>
     </message>
     <message>
       <source>Select layout...</source>
-      <translation>Wybierz układ...</translation>
+      <translation type="unfinished">Select layout...</translation>
     </message>
   </context>
   <context>
     <name>PasswordDialog</name>
     <message>
       <source>Sign in</source>
-      <translation>Zarejestruj się</translation>
+      <translation type="unfinished">Sign in</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Hasło</translation>
+      <translation type="unfinished">Password</translation>
     </message>
     <message>
       <source>Username</source>
-      <translation>Nazwa użytkownika</translation>
+      <translation type="unfinished">Username</translation>
     </message>
   </context>
   <context>
     <name>PlaySoundBusinessActionWidget</name>
     <message>
       <source>Manage...</source>
-      <translation>Zarządzaj...</translation>
+      <translation type="unfinished">Manage...</translation>
     </message>
     <message>
       <source>Volume:</source>
-      <translation>Głośność:</translation>
+      <translation type="unfinished">Volume:</translation>
     </message>
     <message>
       <source>Test...</source>
-      <translation>Test...</translation>
+      <translation type="unfinished">Test...</translation>
     </message>
     <message>
       <source>Play to users</source>
-      <translation>Odtwarzaj użytkownikom</translation>
+      <translation type="unfinished">Play to users</translation>
     </message>
   </context>
   <context>
     <name>PluginDiagnosticEventWidget</name>
     <message>
       <source>Source:</source>
-      <translation>Źródło:</translation>
+      <translation type="unfinished">Source:</translation>
     </message>
     <message>
       <source>Caption contains:</source>
-      <translation>Nagłówek zawiera:</translation>
+      <translation type="unfinished">Caption contains:</translation>
     </message>
     <message>
       <source>Keywords separated by space</source>
-      <translation>Słowa kluczowe oddzielone spacją</translation>
+      <translation type="unfinished">Keywords separated by space</translation>
     </message>
     <message>
       <source>Description contains:</source>
-      <translation>Opis zawiera:</translation>
+      <translation type="unfinished">Description contains:</translation>
     </message>
     <message>
       <source>Level:</source>
-      <translation>Poziom:</translation>
+      <translation type="unfinished">Level:</translation>
     </message>
     <message>
       <source>ERROR</source>
-      <translation>BŁĄD</translation>
+      <translation type="unfinished">ERROR</translation>
     </message>
     <message>
       <source>WARNING</source>
-      <translation>OSTRZEŻENIE</translation>
+      <translation type="unfinished">WARNING</translation>
     </message>
     <message>
       <source>INFO</source>
-      <translation>INFO</translation>
+      <translation type="unfinished">INFO</translation>
     </message>
   </context>
   <context>
     <name>PoeSettingsWidget</name>
     <message>
       <source>Attention! Power limit exceeded</source>
-      <translation>Uwaga! Przekroczono limit mocy</translation>
+      <translation type="unfinished">Attention! Power limit exceeded</translation>
     </message>
   </context>
   <context>
     <name>PopupBusinessActionWidget</name>
     <message>
       <source>Force Acknowledgment</source>
-      <translation>Wymuszaj potwierdzenie</translation>
+      <translation type="unfinished">Force Acknowledgment</translation>
     </message>
     <message>
       <source>Use custom text:</source>
-      <translation>Użyj niestandardowego tekstu:</translation>
+      <translation type="unfinished">Use custom text:</translation>
     </message>
     <message>
       <source>to</source>
-      <translation>do</translation>
+      <translation type="unfinished">to</translation>
     </message>
   </context>
   <context>
     <name>PopupSettingsWidget</name>
     <message>
       <source>Show all notifications</source>
-      <translation>Pokaż wszystkie powiadomienia</translation>
+      <translation type="unfinished">Show all notifications</translation>
     </message>
     <message>
       <source>System Notifications</source>
-      <translation>Powiadomienia systemowe</translation>
+      <translation type="unfinished">System Notifications</translation>
     </message>
     <message>
       <source>Events</source>
-      <translation>Zdarzenia</translation>
+      <translation type="unfinished">Events</translation>
     </message>
   </context>
   <context>
     <name>PtzManageDialog</name>
     <message>
       <source>Save Current Position</source>
-      <translation>Zapisz bieżącą pozycję</translation>
+      <translation type="unfinished">Save Current Position</translation>
     </message>
     <message>
       <source>Go To Position</source>
-      <translation>Przejdź do pozycji</translation>
+      <translation type="unfinished">Go To Position</translation>
     </message>
     <message>
       <source>Create Tour</source>
-      <translation>Utwórz trasę</translation>
+      <translation type="unfinished">Create Tour</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation>Rozpocznij trasę</translation>
+      <translation type="unfinished">Start Tour</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Usuń</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <source>Details</source>
-      <translation>Szczegóły</translation>
+      <translation type="unfinished">Details</translation>
     </message>
     <message>
       <source>No Tour Selected</source>
-      <translation>Nie wybrano trasy</translation>
+      <translation type="unfinished">No Tour Selected</translation>
     </message>
     <message>
       <source>Preview</source>
-      <translation>Przegląd</translation>
+      <translation type="unfinished">Preview</translation>
     </message>
     <message>
       <source>No preview available</source>
-      <translation>Brak przeglądu</translation>
+      <translation type="unfinished">No preview available</translation>
     </message>
     <message>
       <source>Get Preview</source>
-      <translation>Pobierz przegląd</translation>
+      <translation type="unfinished">Get Preview</translation>
     </message>
   </context>
   <context>
     <name>PtzPresetDialog</name>
     <message>
       <source>Save Position</source>
-      <translation>Zapisz pozycję</translation>
+      <translation type="unfinished">Save Position</translation>
     </message>
     <message>
       <source>Name:</source>
-      <translation>Nazwa:</translation>
+      <translation type="unfinished">Name:</translation>
     </message>
     <message>
       <source>Hotkey:</source>
-      <translation>Klawisz skrótu:</translation>
+      <translation type="unfinished">Hotkey:</translation>
     </message>
   </context>
   <context>
     <name>PushNotificationBusinessActionWidget</name>
     <message>
       <source>To</source>
-      <translation>Do</translation>
+      <translation type="unfinished">To</translation>
     </message>
     <message>
       <source>Language Settings</source>
-      <translation>Ustawienia językowe</translation>
+      <translation type="unfinished">Language Settings</translation>
     </message>
     <message>
       <source>Custom notification content</source>
-      <translation>Niestandardowa treść powiadomienia</translation>
+      <translation type="unfinished">Custom notification content</translation>
     </message>
     <message>
       <source>Header</source>
-      <translation>Nagłówek</translation>
+      <translation type="unfinished">Header</translation>
     </message>
     <message>
       <source>Default notification title will be used if left empty</source>
-      <translation>Jeśli pozostanie pusty, zostanie użyty domyślny tytuł powiadomienia</translation>
+      <translation type="unfinished">Default notification title will be used if left empty</translation>
     </message>
     <message>
       <source>Body</source>
-      <translation>Treść</translation>
+      <translation type="unfinished">Body</translation>
     </message>
     <message>
       <source>Default text will be used if this field is empty</source>
-      <translation>Jeśli to pole pozostanie puste, zostanie użyty tekst domyślny</translation>
+      <translation type="unfinished">Default text will be used if this field is empty</translation>
     </message>
     <message>
       <source>Add source device name in body</source>
-      <translation>Dodaj w treści nazwę urządzenia źródłowego</translation>
+      <translation type="unfinished">Add source device name in body</translation>
     </message>
   </context>
   <context>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>Attach to Video Wall...</source>
-      <translation>Dołącz do ściany wideo...</translation>
+      <translation type="unfinished">Attach to Video Wall...</translation>
     </message>
     <message>
       <source>Preview</source>
-      <translation>Przegląd</translation>
+      <translation type="unfinished">Preview</translation>
     </message>
   </context>
   <context>
     <name>QnCameraBookmarkDialog</name>
     <message>
       <source>Bookmark</source>
-      <translation>Zakładka</translation>
+      <translation type="unfinished">Bookmark</translation>
     </message>
   </context>
   <context>
     <name>QnCompatibilityVersionInstallationDialog</name>
     <message>
       <source>Installing Compatibility Version...</source>
-      <translation>Instalowanie zgodnej wersji...</translation>
+      <translation type="unfinished">Installing Compatibility Version...</translation>
     </message>
     <message>
       <source>Restart to the updated version when ready</source>
-      <translation>Po zakończeniu uruchom ponownie w zaktualizowanej wersji</translation>
+      <translation type="unfinished">Restart to the updated version when ready</translation>
     </message>
   </context>
   <context>
     <name>QnMessageBox</name>
     <message>
       <source>Do not show this message again</source>
-      <translation>Nie pokazuj ponownie tego komunikatu</translation>
+      <translation type="unfinished">Do not show this message again</translation>
     </message>
   </context>
   <context>
     <name>QnNotificationSoundManagerDialog</name>
     <message>
       <source>Notification Sounds</source>
-      <translation>Dźwięki powiadomień</translation>
+      <translation type="unfinished">Notification Sounds</translation>
     </message>
     <message>
       <source>Play</source>
-      <translation>Odtwarzaj</translation>
+      <translation type="unfinished">Play</translation>
     </message>
     <message>
       <source>Add...</source>
-      <translation>Dodaj...</translation>
+      <translation type="unfinished">Add...</translation>
     </message>
     <message>
       <source>Rename...</source>
-      <translation>Zmień nazwę...</translation>
+      <translation type="unfinished">Rename...</translation>
     </message>
     <message>
       <source>Delete...</source>
-      <translation>Usuń...</translation>
+      <translation type="unfinished">Delete...</translation>
     </message>
   </context>
   <context>
     <name>QnRoutingManagementWidget</name>
     <message>
       <source>Add URL</source>
-      <translation>Dodaj URL</translation>
+      <translation type="unfinished">Add URL</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Usuń</translation>
+      <translation type="unfinished">Remove</translation>
     </message>
     <message>
       <source>Add</source>
-      <translation>Dodaj</translation>
+      <translation type="unfinished">Add</translation>
     </message>
     <message>
       <source>Removing this connection option could lead to System malfunction.</source>
-      <translation>Usunięcie tego połączenia może doprowadzić do awarii systemu.</translation>
+      <translation type="unfinished">Removing this connection option could lead to System malfunction.</translation>
     </message>
   </context>
   <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>System Administration</source>
-      <translation>Administracja systemem</translation>
+      <translation type="unfinished">System Administration</translation>
     </message>
   </context>
   <context>
     <name>QnUserManagementWidget</name>
     <message>
       <source>LDAP Settings...</source>
-      <translation>Ustawienia LDAP...</translation>
+      <translation type="unfinished">LDAP Settings...</translation>
     </message>
     <message>
       <source>New User...</source>
-      <translation>Nowy użytkownik...</translation>
+      <translation type="unfinished">New User...</translation>
     </message>
     <message>
       <source>Fetch Users from LDAP...</source>
-      <translation>Import użytkowników z LDAP...</translation>
+      <translation type="unfinished">Fetch Users from LDAP...</translation>
     </message>
     <message>
       <source>Search users</source>
-      <translation>Szukaj użytkowników</translation>
+      <translation type="unfinished">Search users</translation>
     </message>
     <message>
       <source>Enable</source>
-      <translation>Włącz</translation>
+      <translation type="unfinished">Enable</translation>
     </message>
     <message>
       <source>Disable</source>
-      <translation>Wyłącz</translation>
+      <translation type="unfinished">Disable</translation>
     </message>
     <message>
       <source>Delete...</source>
-      <translation>Usuń...</translation>
+      <translation type="unfinished">Delete...</translation>
     </message>
     <message>
       <source>Edit Roles...</source>
-      <translation>Edytuj grupy...</translation>
+      <translation type="unfinished">Edit Roles...</translation>
     </message>
     <message>
       <source>Force Secure Authentication</source>
-      <translation>Wymuś bezpieczne uwierzytelnianie</translation>
+      <translation type="unfinished">Force Secure Authentication</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation>Nic nie znaleziono</translation>
+      <translation type="unfinished">Nothing found</translation>
     </message>
   </context>
   <context>
     <name>QnVideowallSettingsDialog</name>
     <message>
       <source>Video Wall Settings</source>
-      <translation>Ustawienia ściany wideo</translation>
+      <translation type="unfinished">Video Wall Settings</translation>
     </message>
     <message>
       <source>Launch video wall when Windows starts.</source>
-      <translation>Uruchamiaj ścianę wideo przy starcie systemu Windows.</translation>
+      <translation type="unfinished">Launch video wall when Windows starts.</translation>
     </message>
     <message>
       <source>Place shortcut on desktop.</source>
-      <translation>Umieść skrót na pulpicie.</translation>
+      <translation type="unfinished">Place shortcut on desktop.</translation>
     </message>
     <message>
       <source>Enable timeline on video wall</source>
-      <translation>Włącz oś czasu na ścianie wideo</translation>
+      <translation type="unfinished">Enable timeline on video wall</translation>
     </message>
   </context>
   <context>
     <name>RapidReviewSettingsWidget</name>
     <message>
       <source>Rapid Review</source>
-      <translation>Szybki przegląd</translation>
+      <translation type="unfinished">Rapid Review</translation>
     </message>
     <message>
       <source>Initial video length</source>
-      <translation>Początkowa długość wideo</translation>
+      <translation type="unfinished">Initial video length</translation>
     </message>
     <message>
       <source>Exported video length</source>
-      <translation>Eksportowana długość wideo</translation>
+      <translation type="unfinished">Exported video length</translation>
     </message>
     <message>
       <source>Speed</source>
-      <translation>Szybkość</translation>
+      <translation type="unfinished">Speed</translation>
     </message>
     <message>
       <source>Frames interval</source>
-      <translation>Interwał klatek</translation>
+      <translation type="unfinished">Frames interval</translation>
     </message>
     <message>
       <source>Reset Speed</source>
-      <translation>Resetuj szybkość</translation>
+      <translation type="unfinished">Reset Speed</translation>
     </message>
   </context>
   <context>
     <name>ReconnectInfoDialog</name>
     <message>
       <source>Reconnecting...</source>
-      <translation>Ponowne łączenie...</translation>
+      <translation type="unfinished">Reconnecting...</translation>
     </message>
     <message>
       <source>Please wait while the connection is being restored...</source>
-      <translation>Proszę czekać, trwa przywracanie połączenia...</translation>
+      <translation type="unfinished">Please wait while the connection is being restored...</translation>
     </message>
     <message>
       <source>Server name</source>
-      <translation>Nazwa serwera</translation>
+      <translation type="unfinished">Server name</translation>
     </message>
   </context>
   <context>
     <name>RecordingBusinessActionWidget</name>
     <message>
       <source>Quality:</source>
-      <translation>Jakość:</translation>
+      <translation type="unfinished">Quality:</translation>
     </message>
     <message>
       <source>FPS</source>
-      <translation>kl./s</translation>
+      <translation type="unfinished">FPS</translation>
     </message>
     <message>
       <source>s</source>
-      <translation>s</translation>
+      <translation type="unfinished">s</translation>
     </message>
     <message>
       <source>Pre-Recording:</source>
-      <translation>Nagrywanie przedalarmowe:</translation>
+      <translation type="unfinished">Pre-Recording:</translation>
     </message>
     <message>
       <source>Post-Recording:</source>
-      <translation>Nagrywanie poalarmowe:</translation>
+      <translation type="unfinished">Post-Recording:</translation>
     </message>
     <message>
       <source>Fixed duration:</source>
-      <translation>Ustalony czas trwania:</translation>
+      <translation type="unfinished">Fixed duration:</translation>
     </message>
   </context>
   <context>
     <name>RecordingSettings</name>
     <message>
       <source>Temporary Folder</source>
-      <translation>Folder tymczasowy</translation>
+      <translation type="unfinished">Temporary Folder</translation>
     </message>
     <message>
       <source>Additional Options</source>
-      <translation>Dodatkowe opcje</translation>
+      <translation type="unfinished">Additional Options</translation>
     </message>
     <message>
       <source>Disable Aero</source>
-      <translation>Wyłącz Aero</translation>
+      <translation type="unfinished">Disable Aero</translation>
     </message>
     <message>
       <source>Capture Cursor</source>
-      <translation>Przechwyć kursor</translation>
+      <translation type="unfinished">Capture Cursor</translation>
     </message>
     <message>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>Zalecamy bardzo wydajny komputer dla &quot;najlepszej&quot; jakości i rozdzielczości.</translation>
+      <translation type="unfinished">A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
     </message>
     <message>
       <source>Browse...</source>
-      <translation>Przeglądaj...</translation>
+      <translation type="unfinished">Browse...</translation>
     </message>
     <message>
       <source>Resolution</source>
-      <translation>Rozdzielczość</translation>
+      <translation type="unfinished">Resolution</translation>
     </message>
     <message>
       <source>Recording Quality</source>
-      <translation>Jakość nagrywania</translation>
+      <translation type="unfinished">Recording Quality</translation>
     </message>
     <message>
       <source>Source</source>
-      <translation>Źródło</translation>
+      <translation type="unfinished">Source</translation>
     </message>
     <message>
       <source>Screen</source>
-      <translation>Ekran</translation>
+      <translation type="unfinished">Screen</translation>
     </message>
   </context>
   <context>
     <name>RecordingThresholdWidget</name>
     <message>
       <source>Pre-Recording</source>
-      <translation>Nagrywanie przedalarmowe</translation>
+      <translation type="unfinished">Pre-Recording</translation>
     </message>
     <message>
       <source>Post-Recording</source>
-      <translation>Nagrywanie poalarmowe</translation>
+      <translation type="unfinished">Post-Recording</translation>
     </message>
   </context>
   <context>
     <name>RepeatedPasswordDialog</name>
     <message>
       <source>Repeat Password</source>
-      <translation>Powtórz hasło</translation>
+      <translation type="unfinished">Repeat Password</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation>Hasła nie są takie same</translation>
+      <translation type="unfinished">Passwords do not match</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Hasło</translation>
+      <translation type="unfinished">Password</translation>
     </message>
   </context>
   <context>
     <name>ResourceBrowserWidget</name>
     <message>
       <source>Resources</source>
-      <translation>Zasoby</translation>
+      <translation type="unfinished">Resources</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation>Nic nie znaleziono</translation>
+      <translation type="unfinished">Nothing found</translation>
     </message>
     <message>
       <source>Drag any image or video file to the application window to play them</source>
-      <translation>Przeciągnij dowolny obraz lub plik wideo do okna aplikacji, aby wyświetlić i odtworzyć</translation>
+      <translation type="unfinished">Drag any image or video file to the application window to play them</translation>
     </message>
   </context>
   <context>
     <name>RewindForWidget</name>
     <message>
       <source>Playback time :</source>
-      <translation>Czas odtwarzania :</translation>
+      <translation type="unfinished">Playback time :</translation>
     </message>
     <message>
       <source>rewind for</source>
-      <translation>przewiń do</translation>
+      <translation type="unfinished">rewind for</translation>
     </message>
     <message>
       <source>Live</source>
-      <translation>Na żywo</translation>
+      <translation type="unfinished">Live</translation>
     </message>
   </context>
   <context>
     <name>SayTextBusinessActionWidget</name>
     <message>
       <source>Speak the following:</source>
-      <translation>Powiedz to:</translation>
+      <translation type="unfinished">Speak the following:</translation>
     </message>
     <message>
       <source>Type any text here</source>
-      <translation>Wpisz tutaj dowolny tekst</translation>
+      <translation type="unfinished">Type any text here</translation>
     </message>
     <message>
       <source>Volume:</source>
-      <translation>Głośność:</translation>
+      <translation type="unfinished">Volume:</translation>
     </message>
     <message>
       <source>Test...</source>
-      <translation>Test...</translation>
+      <translation type="unfinished">Test...</translation>
     </message>
     <message>
       <source>Speak to users</source>
-      <translation>Rozmowa z użytkownikami</translation>
+      <translation type="unfinished">Speak to users</translation>
     </message>
   </context>
   <context>
     <name>ScheduleSettingsWidget</name>
     <message>
       <source>Schedule Settings</source>
-      <translation>Ustawienia harmonogramu</translation>
+      <translation type="unfinished">Schedule Settings</translation>
     </message>
     <message>
       <source>Record Always</source>
-      <translation>Nagrywaj zawsze</translation>
+      <translation type="unfinished">Record Always</translation>
     </message>
     <message>
       <source>Motion Only</source>
-      <translation>Tylko ruch</translation>
+      <translation type="unfinished">Motion Only</translation>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation>Ruch + Niska rozdzielczość</translation>
+      <translation type="unfinished">Motion + Lo-Res</translation>
     </message>
     <message>
       <source>Do Not Record</source>
-      <translation>Nie nagrywaj</translation>
+      <translation type="unfinished">Do Not Record</translation>
     </message>
     <message>
       <source>Bitrate</source>
-      <translation>Bitrate</translation>
+      <translation type="unfinished">Bitrate</translation>
     </message>
     <message>
       <source>FPS</source>
-      <translation>kl./s</translation>
+      <translation type="unfinished">FPS</translation>
     </message>
     <message>
       <source>Quality</source>
-      <translation>Jakość</translation>
+      <translation type="unfinished">Quality</translation>
     </message>
     <message>
       <source>Motion</source>
-      <translation>Ruch</translation>
+      <translation type="unfinished">Motion</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation>Obiekty</translation>
+      <translation type="unfinished">Objects</translation>
     </message>
     <message>
       <source>Motion &amp;&amp; Objects</source>
-      <translation>Ruch &amp; Obiekty</translation>
+      <translation type="unfinished">Motion &amp;&amp; Objects</translation>
     </message>
   </context>
   <context>
     <name>SecuritySettingsWidget</name>
     <message>
       <source>Enable audit trail</source>
-      <translation>Zapisuj dziennik dostępu</translation>
+      <translation type="unfinished">Enable audit trail</translation>
     </message>
     <message>
       <source>Display watermark with username over video</source>
-      <translation>Wyświetl znak wodny z nazwą użytkownika na wideo</translation>
+      <translation type="unfinished">Display watermark with username over video</translation>
     </message>
     <message>
       <source>Watermark Preview</source>
-      <translation>Podgląd znaku wodnego</translation>
+      <translation type="unfinished">Watermark Preview</translation>
     </message>
     <message>
       <source>to</source>
-      <translation>do</translation>
+      <translation type="unfinished">to</translation>
     </message>
     <message>
       <source>Limit session duration</source>
-      <translation>Czas trwania sesji</translation>
+      <translation type="unfinished">Limit session duration</translation>
     </message>
     <message>
       <source>Data protection</source>
-      <translation>Ochrona danych</translation>
+      <translation type="unfinished">Data protection</translation>
     </message>
     <message>
       <source>Use only HTTPS to connect to cameras</source>
-      <translation>Używaj tylko protokołu HTTPS do łączenia się z kamerami</translation>
+      <translation type="unfinished">Use only HTTPS to connect to cameras</translation>
     </message>
     <message>
       <source>User Activity</source>
-      <translation>Aktywności użytkownika</translation>
+      <translation type="unfinished">User Activity</translation>
     </message>
     <message>
       <source>Display servers in tree for non-administrator users</source>
-      <translation>Wyświetlaj serwery w drzewie dla użytkowników niebędących administratorami</translation>
+      <translation type="unfinished">Display servers in tree for non-administrator users</translation>
     </message>
     <message>
       <source>Archive encryption</source>
-      <translation>Szyfrowanie archiwum</translation>
+      <translation type="unfinished">Archive encryption</translation>
     </message>
     <message>
       <source>Archive encryption increases CPU usage</source>
-      <translation>Szyfrowanie archiwów zwiększa obciążenie procesora</translation>
+      <translation type="unfinished">Archive encryption increases CPU usage</translation>
     </message>
     <message>
       <source>Change Password...</source>
-      <translation>Zmień hasło...</translation>
+      <translation type="unfinished">Change Password...</translation>
     </message>
     <message>
       <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation>Szyfrowanie transmisji wideo znacząco zwiększy użycie procesora.</translation>
+      <translation type="unfinished">Encrypting video traffic will significantly increase CPU usage.</translation>
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation>Połączenie z kamerami, które nie obsługują protokołu HTTPS, zostanie utracone.</translation>
+      <translation type="unfinished">Connection with cameras that do not support HTTPS will be lost.</translation>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
-      <translation>Wymuś akceptowanie tylko zaszyfrowanych połączeń</translation>
+      <translation type="unfinished">Force servers to accept only encrypted connections</translation>
     </message>
     <message>
       <source>Encrypt video traffic to desktop and mobile clients</source>
-      <translation>Szyfruj ruch wideo do klientów stacjonarnych i mobilnych</translation>
+      <translation type="unfinished">Encrypt video traffic to desktop and mobile clients</translation>
     </message>
     <message>
       <source>Manage Users</source>
-      <translation>Zarządzanie użytkownikami</translation>
+      <translation type="unfinished">Manage Users</translation>
     </message>
   </context>
   <context>
     <name>SendmailBusinessActionWidget</name>
     <message>
       <source>Additional Recipients:</source>
-      <translation>Dodatkowi odbiorcy:</translation>
+      <translation type="unfinished">Additional Recipients:</translation>
     </message>
     <message>
       <source>Global Email Settings...</source>
-      <translation>Ustawienia globalne e-mail...</translation>
+      <translation type="unfinished">Global Email Settings...</translation>
     </message>
   </context>
   <context>
     <name>ServerCertificateViewer</name>
     <message>
       <source>Server certificate</source>
-      <translation>Certyfikat serwera</translation>
+      <translation type="unfinished">Server certificate</translation>
     </message>
     <message>
       <source>General</source>
-      <translation>Ogólne</translation>
+      <translation type="unfinished">General</translation>
     </message>
     <message>
       <source>Issued by</source>
-      <translation>Wydany przez</translation>
+      <translation type="unfinished">Issued by</translation>
     </message>
     <message>
       <source>Self-signed root certificate</source>
-      <translation>Certyfikat z podpisem własnym</translation>
+      <translation type="unfinished">Self-signed root certificate</translation>
     </message>
     <message>
       <source>Expires</source>
-      <translation>Wygasa</translation>
+      <translation type="unfinished">Expires</translation>
     </message>
     <message>
       <source>Certificate is expired</source>
-      <translation>Certyfikat stracił ważność</translation>
+      <translation type="unfinished">Certificate is expired</translation>
     </message>
     <message>
       <source>Fingerprints</source>
-      <translation>Odciski palców</translation>
+      <translation type="unfinished">Fingerprints</translation>
     </message>
     <message>
       <source>Details</source>
-      <translation>Szczegóły</translation>
+      <translation type="unfinished">Details</translation>
     </message>
     <message>
       <source>Pin to this certificate</source>
-      <translation>Podepnij do tego certyfikatu</translation>
+      <translation type="unfinished">Pin to this certificate</translation>
     </message>
     <message>
       <source>View pinned certificate</source>
-      <translation>Wyświetl podłączony certyfikat</translation>
+      <translation type="unfinished">View pinned certificate</translation>
     </message>
   </context>
   <context>
     <name>ServerSelectionDialog</name>
     <message>
       <source>Select Servers</source>
-      <translation>Wybierz serwery</translation>
+      <translation type="unfinished">Select Servers</translation>
     </message>
   </context>
   <context>
     <name>ServerSettingsWidget</name>
     <message>
       <source>Ping</source>
-      <translation>Ping</translation>
+      <translation type="unfinished">Ping</translation>
     </message>
     <message>
       <source>Failover</source>
-      <translation>Failover</translation>
+      <translation type="unfinished">Failover</translation>
     </message>
     <message>
       <source>Failover Priority...</source>
-      <translation>Priorytet failover...</translation>
+      <translation type="unfinished">Failover Priority...</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation>Nazwa</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>IP Address</source>
-      <translation>Adres IP</translation>
+      <translation type="unfinished">IP Address</translation>
     </message>
     <message>
       <source>Port</source>
-      <translation>Port</translation>
+      <translation type="unfinished">Port</translation>
     </message>
     <message>
       <source>Autodetect built-in and USB webcams</source>
-      <translation>Automatyczne wykrywanie kamer wbudowanych i USB</translation>
+      <translation type="unfinished">Autodetect built-in and USB webcams</translation>
     </message>
   </context>
   <context>
     <name>ShowOnAlarmLayoutActionWidget</name>
     <message>
       <source>for</source>
-      <translation>dla</translation>
+      <translation type="unfinished">for</translation>
     </message>
     <message>
       <source>Force Alarm Layout opening</source>
-      <translation>Wymuszaj otwarcie układu alarmowego</translation>
+      <translation type="unfinished">Force Alarm Layout opening</translation>
     </message>
     <message>
       <source>Also show source camera</source>
-      <translation>Pokazuj również kamerę źródłową</translation>
+      <translation type="unfinished">Also show source camera</translation>
     </message>
   </context>
   <context>
     <name>ShowTextOverlayActionWidget</name>
     <message>
       <source>seconds</source>
-      <translation>sek.</translation>
+      <translation type="unfinished">seconds</translation>
     </message>
     <message>
       <source>Display text for:</source>
-      <translation>Wyświetl tekst przez:</translation>
+      <translation type="unfinished">Display text for:</translation>
     </message>
     <message>
       <source>Use custom text:</source>
-      <translation>Użyj niestandardowego tekstu:</translation>
+      <translation type="unfinished">Use custom text:</translation>
     </message>
     <message>
       <source>Rule will work only for prolonged events</source>
-      <translation>Reguła będzie działać tylko w przypadku długotrwałych zdarzeń</translation>
+      <translation type="unfinished">Rule will work only for prolonged events</translation>
     </message>
     <message>
       <source>Also show on source camera</source>
-      <translation>Pokazuj również na kamerze źródłowej</translation>
+      <translation type="unfinished">Also show on source camera</translation>
     </message>
   </context>
   <context>
     <name>SignDialog</name>
     <message>
       <source>Watermark Check</source>
-      <translation>Sprawdzenie znaku wodnego</translation>
+      <translation type="unfinished">Watermark Check</translation>
     </message>
     <message>
       <source>Checked File:</source>
-      <translation>Sprawdzony plik:</translation>
+      <translation type="unfinished">Checked File:</translation>
     </message>
     <message>
       <source>Check Result:</source>
-      <translation>Rezultat sprawdzenia:</translation>
+      <translation type="unfinished">Check Result:</translation>
     </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
     <message>
       <source>Unsecure Connection</source>
-      <translation>Niezabezpieczone połączenie</translation>
+      <translation type="unfinished">Unsecure Connection</translation>
     </message>
     <message>
       <source>(recommended)</source>
-      <translation>(zalecane)</translation>
+      <translation type="unfinished">(recommended)</translation>
     </message>
     <message>
       <source>Secure connection using TLS.</source>
-      <translation>Bezpieczne połączenie przy użyciu protokołu TLS.</translation>
+      <translation type="unfinished">Secure connection using TLS.</translation>
     </message>
     <message>
       <source>Secure connection using SSL.</source>
-      <translation>Bezpieczne połączenie przy użyciu protokołu SSL.</translation>
+      <translation type="unfinished">Secure connection using SSL.</translation>
     </message>
     <message>
       <source>Port:</source>
-      <translation>Port:</translation>
+      <translation type="unfinished">Port:</translation>
     </message>
   </context>
   <context>
     <name>SmtpSettingsWidget</name>
     <message>
       <source>Outgoing Email Settings</source>
-      <translation>Ustawienia poczty wychodzącej</translation>
+      <translation type="unfinished">Outgoing Email Settings</translation>
     </message>
     <message>
       <source>Advanced settings...</source>
-      <translation>Ustawienia zaawansowane...</translation>
+      <translation type="unfinished">Advanced settings...</translation>
     </message>
     <message>
       <source>Test</source>
-      <translation>Test</translation>
+      <translation type="unfinished">Test</translation>
     </message>
   </context>
   <context>
     <name>SmtpTestConnectionWidget</name>
     <message>
       <source>Server:</source>
-      <translation>Serwer:</translation>
+      <translation type="unfinished">Server:</translation>
     </message>
     <message>
       <source>Port:</source>
-      <translation>Port:</translation>
+      <translation type="unfinished">Port:</translation>
     </message>
     <message>
       <source>User:</source>
-      <translation>Użytkownik:</translation>
+      <translation type="unfinished">User:</translation>
     </message>
     <message>
       <source>Security:</source>
-      <translation>Zabezpieczenia:</translation>
+      <translation type="unfinished">Security:</translation>
     </message>
     <message>
       <source>Progress:</source>
-      <translation>Postęp:</translation>
+      <translation type="unfinished">Progress:</translation>
     </message>
     <message>
       <source>Result:</source>
-      <translation>Rezultat:</translation>
+      <translation type="unfinished">Result:</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation type="unfinished">OK</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Anuluj</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
     <name>SoftwareTriggerBusinessEventWidget</name>
     <message>
       <source>Available to</source>
-      <translation>Dostępne dla</translation>
+      <translation type="unfinished">Available to</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation>Nazwa</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Icon</source>
-      <translation>Ikona</translation>
+      <translation type="unfinished">Icon</translation>
     </message>
   </context>
   <context>
     <name>StorageAnalyticsWidget</name>
     <message>
       <source>Current Statistics</source>
-      <translation>Aktualne statystyki</translation>
+      <translation type="unfinished">Current Statistics</translation>
     </message>
     <message>
       <source>Forecast for Full Storage Usage</source>
-      <translation>Prognoza użycia pełnego archiwum</translation>
+      <translation type="unfinished">Forecast for Full Storage Usage</translation>
     </message>
     <message>
       <source>Server is offline. Statistics are not available.</source>
-      <translation>Serwer jest odłączony. Statystyki nie są dostępne.</translation>
+      <translation type="unfinished">Server is offline. Statistics are not available.</translation>
     </message>
     <message>
       <source>Additional storage</source>
-      <translation>Dodatkowe archiwum</translation>
+      <translation type="unfinished">Additional storage</translation>
     </message>
     <message>
       <source>Base forecast on data recorded during</source>
-      <translation>Prognoza dla danych zarejestrowanych podczas</translation>
+      <translation type="unfinished">Base forecast on data recorded during</translation>
     </message>
   </context>
   <context>
     <name>StorageConfigWidget</name>
     <message>
       <source>Add External Storage...</source>
-      <translation>Dodaj archiwum zewnętrzne...</translation>
+      <translation type="unfinished">Add External Storage...</translation>
     </message>
     <message>
       <source>Storage Locations</source>
-      <translation>Lokalizacje archiwum</translation>
+      <translation type="unfinished">Storage Locations</translation>
     </message>
     <message>
       <source>Reindex Archive</source>
-      <translation>Indeksuj archiwum</translation>
+      <translation type="unfinished">Reindex Archive</translation>
     </message>
     <message>
       <source>Reindex Backup</source>
-      <translation>Indeksuj backup</translation>
+      <translation type="unfinished">Reindex Backup</translation>
     </message>
     <message>
       <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation>Dane analityczne będą nadal przechowywane w wyłączonym archiwum.</translation>
+      <translation type="unfinished">Analytics data will continue to be stored on the disabled storage.</translation>
     </message>
     <message>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Nagrywanie na wyłączonym archiwum zostanie wstrzymane. Jednak usuwanie przestarzałego materiału z tego archiwum będzie nadal kontynuowane.</translation>
+      <translation type="unfinished">Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</translation>
     </message>
     <message>
       <source>Recording was enabled on the USB storage</source>
-      <translation>Nagrywanie zostało włączone na nośniku USB</translation>
+      <translation type="unfinished">Recording was enabled on the USB storage</translation>
     </message>
     <message>
       <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
-      <translation>Dane analityczne mogą zajmować dużo przestrzeni dyskowej. Zalecamy wybranie innej lokalizacji zamiast partycji systemowej.</translation>
+      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</translation>
     </message>
   </context>
   <context>
     <name>StorageRebuildWidget</name>
     <message>
       <source>Cancel</source>
-      <translation>Anuluj</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
     <name>StorageUrlDialog</name>
     <message>
       <source>Add External Storage...</source>
-      <translation>Dodaj archiwum zewnętrzne...</translation>
+      <translation type="unfinished">Add External Storage...</translation>
     </message>
     <message>
       <source>Protocol:</source>
-      <translation>Protokół:</translation>
+      <translation type="unfinished">Protocol:</translation>
     </message>
     <message>
       <source>URL:</source>
-      <translation>URL:</translation>
+      <translation type="unfinished">URL:</translation>
     </message>
     <message>
       <source>Login:</source>
-      <translation>Login:</translation>
+      <translation type="unfinished">Login:</translation>
     </message>
     <message>
       <source>Password:</source>
-      <translation>Hasło:</translation>
+      <translation type="unfinished">Password:</translation>
     </message>
   </context>
   <context>
     <name>SubjectSelectionDialog</name>
     <message>
       <source>Roles</source>
-      <translation>Grupy</translation>
+      <translation type="unfinished">Roles</translation>
     </message>
     <message>
       <source>Show all users</source>
-      <translation>Pokaż wszystkich użytkowników</translation>
+      <translation type="unfinished">Show all users</translation>
     </message>
     <message>
       <source>Select Users</source>
-      <translation>Wybierz użytkowników</translation>
+      <translation type="unfinished">Select Users</translation>
     </message>
     <message>
       <source>Nothing matches your search.</source>
-      <translation>Nic nie pasuje do wyszukiwania.</translation>
+      <translation type="unfinished">Nothing matches your search.</translation>
     </message>
   </context>
   <context>
     <name>SystemSettingsWidget</name>
     <message>
       <source>(recommended)</source>
-      <translation>(zalecane)</translation>
+      <translation type="unfinished">(recommended)</translation>
     </message>
     <message>
       <source>Send anonymous usage and crash statistics to software developers</source>
-      <translation>Wysyłaj anonimowe statystyki użytkowania i awarii do programistów</translation>
+      <translation type="unfinished">Send anonymous usage and crash statistics to software developers</translation>
     </message>
     <message>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-      <translation>Uwaga! Spowoduje to, że ustawienia jakości i płynności wideo (kl./s) w harmonogramie nagrywania przestaną mieć znaczenie.</translation>
+      <translation type="unfinished">Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</translation>
     </message>
     <message>
       <source>Custom language for mobile notifications</source>
-      <translation>Niestandardowy język powiadomień mobilnych</translation>
+      <translation type="unfinished">Custom language for mobile notifications</translation>
     </message>
   </context>
   <context>
     <name>TextOverlaySettingsWidget</name>
     <message>
       <source>Text</source>
-      <translation>Tekst</translation>
+      <translation type="unfinished">Text</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Usuń</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <source>Font Size</source>
-      <translation>Rozmiar czcionki</translation>
+      <translation type="unfinished">Font Size</translation>
     </message>
     <message>
       <source>Enter plain text or HTML</source>
-      <translation>Wpisz zwykły tekst lub HTML</translation>
+      <translation type="unfinished">Enter plain text or HTML</translation>
     </message>
     <message>
       <source>Area Width</source>
-      <translation>Szerokość obszaru</translation>
+      <translation type="unfinished">Area Width</translation>
     </message>
   </context>
   <context>
     <name>TimeSynchronizationWidget</name>
     <message>
       <source>Sync Time with the Internet</source>
-      <translation>Synchronizuj czas z Internetem</translation>
+      <translation type="unfinished">Sync Time with the Internet</translation>
     </message>
     <message>
       <source>VMS Time</source>
-      <translation>Czas VMS</translation>
+      <translation type="unfinished">VMS Time</translation>
     </message>
     <message>
       <source>Do not sync time among servers</source>
-      <translation>Nie synchronizuj czasu między serwerami</translation>
+      <translation type="unfinished">Do not sync time among servers</translation>
     </message>
   </context>
   <context>
     <name>TimestampOverlaySettingsWidget</name>
     <message>
       <source>Timestamp</source>
-      <translation>Czas</translation>
+      <translation type="unfinished">Timestamp</translation>
     </message>
     <message>
       <source>Font Size</source>
-      <translation>Rozmiar czcionki</translation>
+      <translation type="unfinished">Font Size</translation>
     </message>
     <message>
       <source>Format</source>
-      <translation>Format</translation>
+      <translation type="unfinished">Format</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Usuń</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
   </context>
   <context>
     <name>UserProfileWidget</name>
     <message>
       <source>Change Password...</source>
-      <translation>Zmień hasło...</translation>
+      <translation type="unfinished">Change Password...</translation>
     </message>
   </context>
   <context>
     <name>UserRoleSettingsWidget</name>
     <message>
       <source>Name</source>
-      <translation>Nazwa</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation>Użytkownicy</translation>
+      <translation type="unfinished">Users</translation>
     </message>
     <message>
       <source>Delete Role</source>
-      <translation>Usuń grupę</translation>
+      <translation type="unfinished">Delete Role</translation>
     </message>
   </context>
   <context>
     <name>UserRolesDialog</name>
     <message>
       <source>User Roles</source>
-      <translation>Grupy użytkowników</translation>
+      <translation type="unfinished">User Roles</translation>
     </message>
     <message>
       <source>New role</source>
-      <translation>Nowa grupa</translation>
+      <translation type="unfinished">New role</translation>
     </message>
     <message>
       <source>There are no custom user roles yet.</source>
-      <translation>Nie ma jeszcze niestandardowych grup użytkowników.</translation>
+      <translation type="unfinished">There are no custom user roles yet.</translation>
     </message>
     <message>
       <source>Click &quot;New role&quot; button to create one.</source>
-      <translation>Kliknij &quot;Nowa grupa&quot; , aby ją utworzyć.</translation>
+      <translation type="unfinished">Click &quot;New role&quot; button to create one.</translation>
     </message>
   </context>
   <context>
     <name>UserSettingsDialog</name>
     <message>
       <source>This user can use digest authentication.</source>
-      <translation>Ten użytkownik może korzystać z uwierzytelniania szyfrowanego.</translation>
+      <translation type="unfinished">This user can use digest authentication.</translation>
     </message>
     <message>
       <source>Force Secure Authentication</source>
-      <translation>Wymuś bezpieczne uwierzytelnianie</translation>
+      <translation type="unfinished">Force Secure Authentication</translation>
     </message>
   </context>
   <context>
     <name>UserSettingsWidget</name>
     <message>
       <source>User Type</source>
-      <translation>Typ użytkownika</translation>
+      <translation type="unfinished">User Type</translation>
     </message>
     <message>
       <source>Role</source>
-      <translation>Grupa</translation>
+      <translation type="unfinished">Role</translation>
     </message>
     <message>
       <source>Edit Roles...</source>
-      <translation>Edytuj grupy...</translation>
+      <translation type="unfinished">Edit Roles...</translation>
     </message>
   </context>
   <context>
     <name>VersionSelectionDialog</name>
     <message>
       <source>Choose a specific build</source>
-      <translation>Wybierz kompilację</translation>
+      <translation type="unfinished">Choose a specific build</translation>
     </message>
   </context>
   <context>
     <name>VirtualCameraMotionWidget</name>
     <message>
       <source>Motion Detection</source>
-      <translation>Detekcja ruchu</translation>
+      <translation type="unfinished">Motion Detection</translation>
     </message>
     <message>
       <source>Detect motion</source>
-      <translation>Wykrywaj ruch</translation>
+      <translation type="unfinished">Detect motion</translation>
     </message>
     <message>
       <source>Sensitivity</source>
-      <translation>Czułość</translation>
+      <translation type="unfinished">Sensitivity</translation>
     </message>
   </context>
   <context>
     <name>VirtualCameraTimeZoneWidget</name>
     <message>
       <source>Form</source>
-      <translation>Forma</translation>
+      <translation type="unfinished">Form</translation>
     </message>
     <message>
       <source>Time</source>
-      <translation>Czas</translation>
+      <translation type="unfinished">Time</translation>
     </message>
     <message>
       <source>Ignore timezone in uploaded files</source>
-      <translation>Ignoruj strefę czasową w przesłanych plikach</translation>
+      <translation type="unfinished">Ignore timezone in uploaded files</translation>
     </message>
   </context>
   <context>
     <name>VirtualCameraUploadWidget</name>
     <message>
       <source>Cancel</source>
-      <translation>Anuluj</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
     <message>
       <source>Upload Footage</source>
-      <translation>Prześlij wideo</translation>
+      <translation type="unfinished">Upload Footage</translation>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation>Prześlij plik...</translation>
+      <translation type="unfinished">Upload File...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation>Prześlij folder...</translation>
+      <translation type="unfinished">Upload Folder...</translation>
     </message>
   </context>
   <context>
     <name>WebpageDialog</name>
     <message>
       <source>General</source>
-      <translation>Ogólne</translation>
+      <translation type="unfinished">General</translation>
     </message>
     <message>
       <source>Proxy this webpage via server</source>
-      <translation>Przekazuj tę stronę przez serwer</translation>
+      <translation type="unfinished">Proxy this webpage via server</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
-      <translation>WYBIERZ SERWER</translation>
+      <translation type="unfinished">SELECT SERVER</translation>
     </message>
     <message>
       <source>Advanced</source>
-      <translation>Zaawansowane</translation>
+      <translation type="unfinished">Advanced</translation>
     </message>
     <message>
       <source>Allow using Client API</source>
-      <translation>Zezwalaj na używanie API klienta</translation>
+      <translation type="unfinished">Allow using Client API</translation>
     </message>
     <message>
       <source>Proxy all requested contents</source>
-      <translation>Przekazuj całą żądaną zawartość</translation>
+      <translation type="unfinished">Proxy all requested contents</translation>
     </message>
     <message>
       <source>Allow opening web page without SSL certificate checking</source>
-      <translation>Zezwalaj na otwieranie strony internetowej bez sprawdzania certyfikatu SSL</translation>
+      <translation type="unfinished">Allow opening web page without SSL certificate checking</translation>
     </message>
   </context>
   <context>
     <name>WeekTimeScheduleDialog</name>
     <message>
       <source>Schedule Settings</source>
-      <translation>Ustawienia harmonogramu</translation>
+      <translation type="unfinished">Schedule Settings</translation>
     </message>
     <message>
       <source>On</source>
-      <translation>Wł.</translation>
+      <translation type="unfinished">On</translation>
     </message>
     <message>
       <source>Off</source>
-      <translation>Wył.</translation>
+      <translation type="unfinished">Off</translation>
     </message>
     <message>
       <source>Schedule</source>
-      <translation>Harmonogram</translation>
+      <translation type="unfinished">Schedule</translation>
     </message>
     <message>
       <source>Note: Schedule is based on server time.</source>
-      <translation>Uwaga: Harmonogram bazuje na czasie serwera.</translation>
+      <translation type="unfinished">Note: Schedule is based on server time.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WatermarkPreviewDialog</name>
     <message>
       <source>Watermark preview</source>
-      <translation>Podgląd znaku wodnego</translation>
+      <translation type="unfinished">Watermark preview</translation>
     </message>
     <message>
       <source>Opacity</source>
-      <translation>Przezroczystość</translation>
+      <translation type="unfinished">Opacity</translation>
     </message>
     <message>
       <source>Frequency</source>
-      <translation>Częstotliwość</translation>
+      <translation type="unfinished">Frequency</translation>
     </message>
   </context>
 </TS>

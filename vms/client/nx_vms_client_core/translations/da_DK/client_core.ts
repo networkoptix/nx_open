@@ -10,7 +10,7 @@
     </message>
     <message>
       <source>Your System</source>
-      <translation type="unfinished">Your System</translation>
+      <translation>Dit System</translation>
     </message>
   </context>
   <context>
@@ -28,7 +28,7 @@
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>System</translation>
     </message>
     <message>
       <source>System (%1)</source>
@@ -40,7 +40,7 @@
     <name>QnLocalSystemDescription</name>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>Ny server</translation>
     </message>
   </context>
   <context>
@@ -59,7 +59,7 @@
     </message>
     <message>
       <source>Your System</source>
-      <translation type="unfinished">Your System</translation>
+      <translation>Dit System</translation>
     </message>
     <message>
       <source>New System</source>

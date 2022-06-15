@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="da_DK" sourcelanguage="en">
+<TS version="2.1" language="gl_ES" sourcelanguage="en">
   <context>
     <name>ArchiveDuration</name>
     <message>
@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>empty</source>
-      <translation>intet indhold</translation>
+      <translation type="unfinished">empty</translation>
     </message>
     <message>
       <source>less than an hour</source>
@@ -20,43 +20,43 @@
     <name>AuthResultTranslations</name>
     <message>
       <source>This user does not exist.</source>
-      <translation>Denne bruger eksisterer ikke.</translation>
+      <translation type="unfinished">This user does not exist.</translation>
     </message>
     <message>
       <source>Wrong password.</source>
-      <translation>Forkert adgangskode.</translation>
+      <translation type="unfinished">Wrong password.</translation>
     </message>
     <message>
       <source>The password is expired. Please contact your system administrator.</source>
-      <translation>Adgangskoden er udløbet. Kontakt venligst din systemadministrator.</translation>
+      <translation type="unfinished">The password is expired. Please contact your system administrator.</translation>
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
-      <translation>LDAP-serveren er ikke tilgængelig. Prøv igen senere.</translation>
+      <translation type="unfinished">The LDAP server is not accessible. Please try again later.</translation>
     </message>
     <message>
       <source>%1 is not accessible yet. Please try again later.</source>
-      <translation>%1 er ikke tilgængelig endnu. Prøv igen senere.</translation>
+      <translation type="unfinished">%1 is not accessible yet. Please try again later.</translation>
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
-      <translation>Brugeren er låst på grund af flere mislykkede forsøg. Prøv igen senere.</translation>
+      <translation type="unfinished">The user is locked out due to several failed attempts. Please try again later.</translation>
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your system administrator.</source>
-      <translation>Denne autorisationsmetode er forbudt. Kontakt venligst din systemadministrator.</translation>
+      <translation type="unfinished">This authorization method is forbidden. Please contact your system administrator.</translation>
     </message>
     <message>
       <source>The session key is invalid or expired.</source>
-      <translation>Sessionsnøglen er ugyldig eller udløbet.</translation>
+      <translation type="unfinished">The session key is invalid or expired.</translation>
     </message>
     <message>
       <source>Internal server error (%1). Please contact your system administrator.</source>
-      <translation>Intern serverfejl (%1). Kontakt venligst din systemadministrator.</translation>
+      <translation type="unfinished">Internal server error (%1). Please contact your system administrator.</translation>
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
-      <translation>Denne bruger er blevet deaktiveret af en systemadministrator.</translation>
+      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
     </message>
   </context>
   <context>
@@ -64,37 +64,37 @@
     <message>
       <source>B</source>
       <comment>Suffix for displaying bytes</comment>
-      <translation>B</translation>
+      <translation type="unfinished">B</translation>
     </message>
     <message>
       <source>KB</source>
       <comment>Suffix for displaying kilobytes</comment>
-      <translation>KB</translation>
+      <translation type="unfinished">KB</translation>
     </message>
     <message>
       <source>MB</source>
       <comment>Suffix for displaying megabytes</comment>
-      <translation>MB</translation>
+      <translation type="unfinished">MB</translation>
     </message>
     <message>
       <source>GB</source>
       <comment>Suffix for displaying gigabytes</comment>
-      <translation>GB</translation>
+      <translation type="unfinished">GB</translation>
     </message>
     <message>
       <source>TB</source>
       <comment>Suffix for displaying terabytes</comment>
-      <translation>TB</translation>
+      <translation type="unfinished">TB</translation>
     </message>
     <message>
       <source>PB</source>
       <comment>Suffix for displaying petabytes</comment>
-      <translation>PB</translation>
+      <translation type="unfinished">PB</translation>
     </message>
     <message numerus="yes">
       <source>Byte(s)</source>
       <comment>Full suffix for displaying bytes</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Byte(s)</numerusform>
         <numerusform>Byte(s)</numerusform>
       </translation>
@@ -102,7 +102,7 @@
     <message numerus="yes">
       <source>Kilobyte(s)</source>
       <comment>Full suffix for displaying kilobytes</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Kilobyte(s)</numerusform>
         <numerusform>Kilobyte(s)</numerusform>
       </translation>
@@ -110,7 +110,7 @@
     <message numerus="yes">
       <source>Megabyte(s)</source>
       <comment>Full suffix for displaying megabytes</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Megabyte(s)</numerusform>
         <numerusform>Megabyte(s)</numerusform>
       </translation>
@@ -118,7 +118,7 @@
     <message numerus="yes">
       <source>Gigabyte(s)</source>
       <comment>Full suffix for displaying gigabytes</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Gigabyte(s)</numerusform>
         <numerusform>Gigabyte(s)</numerusform>
       </translation>
@@ -126,7 +126,7 @@
     <message numerus="yes">
       <source>Terabyte(s)</source>
       <comment>Full suffix for displaying terabytes</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Terabyte(s)</numerusform>
         <numerusform>Terabyte(s)</numerusform>
       </translation>
@@ -134,7 +134,7 @@
     <message numerus="yes">
       <source>Petabyte(s)</source>
       <comment>Full suffix for displaying petabytes</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Petabyte(s)</numerusform>
         <numerusform>Petabyte(s)</numerusform>
       </translation>
@@ -145,38 +145,38 @@
     <message>
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
-      <translation>Systemhændelse</translation>
+      <translation type="unfinished">System Event</translation>
     </message>
   </context>
   <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation type="unfinished">OK</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
-      <translation>Serveren er blevet stoppet.</translation>
+      <translation type="unfinished">Server has been stopped.</translation>
     </message>
     <message>
       <source>Media stream is opened but no media data was received.</source>
-      <translation>Mediestream er åbnet, men der blev ikke modtaget mediedata.</translation>
+      <translation type="unfinished">Media stream is opened but no media data was received.</translation>
     </message>
     <message>
       <source>Unknown error. Please contact support.</source>
-      <translation>Ukendt fejl. Kontakt support.</translation>
+      <translation type="unfinished">Unknown error. Please contact support.</translation>
     </message>
     <message>
       <source>(unknown)</source>
-      <translation>(ukendt)</translation>
+      <translation type="unfinished">(unknown)</translation>
     </message>
     <message>
       <source>Server %1 is not available.</source>
-      <translation>Server %1 er ikke tilgængelig.</translation>
+      <translation type="unfinished">Server %1 is not available.</translation>
     </message>
     <message>
       <source>Check that Server is up and running.</source>
-      <translation>Kontroller, at serveren er oppe og kører.</translation>
+      <translation type="unfinished">Check that Server is up and running.</translation>
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
@@ -200,7 +200,7 @@
     </message>
     <message>
       <source>Please contact support.</source>
-      <translation>Kontakt venligst support.</translation>
+      <translation type="unfinished">Please contact support.</translation>
     </message>
     <message>
       <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
@@ -236,47 +236,47 @@
     </message>
     <message>
       <source>Unknown device issue.</source>
-      <translation>Ukendt enhedsproblem.</translation>
+      <translation type="unfinished">Unknown device issue.</translation>
     </message>
     <message>
       <source>Unknown camera issue.</source>
-      <translation>Ukendt kameraproblem.</translation>
+      <translation type="unfinished">Unknown camera issue.</translation>
     </message>
     <message>
       <source>Invalid data was received from the device %1.</source>
-      <translation>Ugyldige data blev modtaget fra enheden %1.</translation>
+      <translation type="unfinished">Invalid data was received from the device %1.</translation>
     </message>
     <message>
       <source>Invalid data was received from the camera %1.</source>
-      <translation>Ugyldige data blev modtaget fra kamera %1.</translation>
+      <translation type="unfinished">Invalid data was received from the camera %1.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
-      <translation>For mange mediefejl. Åbn dialogboksen for enhedsproblemer for at få flere detaljer.</translation>
+      <translation type="unfinished">Too many media errors. Please open device issues dialog for more details.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open camera issues dialog for more details.</source>
-      <translation>For mange mediefejl. Åbn dialogboksen for enhedsproblemer for at få flere detaljer.</translation>
+      <translation type="unfinished">Too many media errors. Please open camera issues dialog for more details.</translation>
     </message>
     <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
-      <translation>Prøv venligst at genstarte I/O-modulet, og gendan derefter fabriksindstillingerne på websiden.</translation>
+      <translation type="unfinished">Please try to reboot the I/O module, then restore factory defaults on the web-page.</translation>
     </message>
     <message>
       <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
-      <translation>Sørg for, at I/O-modulet er tilsluttet netværket. Prøv at genstarte I/O-modulet.</translation>
+      <translation type="unfinished">Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</translation>
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>I/O-modulanmodning &quot;%1&quot; mislykkedes med fejl &quot;%2&quot;.</translation>
+      <translation type="unfinished">I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
-      <translation>Ukendt I/O-modul problem.</translation>
+      <translation type="unfinished">Unknown I/O module issue.</translation>
     </message>
     <message>
       <source>Invalid data was received from the I/O module %1.</source>
-      <translation>Ugyldige data blev modtaget fra I/O-modul %1.</translation>
+      <translation type="unfinished">Invalid data was received from the I/O module %1.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
@@ -352,38 +352,38 @@
     </message>
     <message>
       <source>Plugin error. %1</source>
-      <translation>Plugin fejl. %1</translation>
+      <translation type="unfinished">Plugin error. %1</translation>
     </message>
     <message>
       <source>Plugin is unavailable</source>
-      <translation>Plugin er ikke tilgængelig</translation>
+      <translation type="unfinished">Plugin is unavailable</translation>
     </message>
     <message>
       <source>Internal server error. %1</source>
-      <translation>Intern serverfejl. %1</translation>
+      <translation type="unfinished">Internal server error. %1</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
-      <translation>Hvis deaktiveret, prøv at aktivere optagelse i I/O-modulindstillinger (fejl &quot;%1&quot;).</translation>
+      <translation type="unfinished">If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
-      <translation>Hvis den er deaktiveret, prøv at aktivere optagelse og sænk FPS i enhedsindstillinger (fejl &quot;%1&quot;).</translation>
+      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
-      <translation>Hvis den er deaktiveret, prøv at aktivere optagelse og reducere FPS i kameraindstillinger (fejl &quot;%1&quot;).</translation>
+      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
     <message>
       <source>Audio context was not specified.</source>
-      <translation>Lydkontekst blev ikke angivet.</translation>
+      <translation type="unfinished">Audio context was not specified.</translation>
     </message>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>Kunne ikke finde encoder til codec %1.</translation>
+      <translation type="unfinished">Could not find encoder for codec %1.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
@@ -434,7 +434,7 @@
     </message>
     <message>
       <source>Could not find codec %1.</source>
-      <translation>Kunne ikke finde codec %1.</translation>
+      <translation type="unfinished">Could not find codec %1.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with container %1.</source>
@@ -445,7 +445,7 @@
     <name>QnFfmpegVideoTranscoder</name>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>Kunne ikke finde encoder til codec %1.</translation>
+      <translation type="unfinished">Could not find encoder for codec %1.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
@@ -456,15 +456,15 @@
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
-      <translation>Analog</translation>
+      <translation type="unfinished">Analog</translation>
     </message>
     <message>
       <source>Professional</source>
-      <translation>Professionel</translation>
+      <translation type="unfinished">Professional</translation>
     </message>
     <message>
       <source>Edge</source>
-      <translation>Edge</translation>
+      <translation type="unfinished">Edge</translation>
     </message>
     <message>
       <source>Vmax</source>
@@ -472,174 +472,174 @@
     </message>
     <message>
       <source>Video Wall</source>
-      <translation>Videovæg</translation>
+      <translation type="unfinished">Video Wall</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>I/O Modul</translation>
+      <translation type="unfinished">I/O Module</translation>
     </message>
     <message>
       <source>Start</source>
-      <translation>Start</translation>
+      <translation type="unfinished">Start</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
-      <translation>Analog encoder</translation>
+      <translation type="unfinished">Analog Encoder</translation>
     </message>
     <message>
       <source>Analog Licenses</source>
-      <translation>Analoge licenser</translation>
+      <translation type="unfinished">Analog Licenses</translation>
     </message>
     <message>
       <source>Professional Licenses</source>
-      <translation>Professionelle licenser</translation>
+      <translation type="unfinished">Professional Licenses</translation>
     </message>
     <message>
       <source>Edge Licenses</source>
-      <translation>Edge-licenser</translation>
+      <translation type="unfinished">Edge Licenses</translation>
     </message>
     <message>
       <source>Vmax Licenses</source>
-      <translation>Vmax-licenser</translation>
+      <translation type="unfinished">Vmax Licenses</translation>
     </message>
     <message>
       <source>Analog Encoder Licenses</source>
-      <translation>Analog encoder-licenser</translation>
+      <translation type="unfinished">Analog Encoder Licenses</translation>
     </message>
     <message>
       <source>Video Wall Licenses</source>
-      <translation>Videovæg-licenser</translation>
+      <translation type="unfinished">Video Wall Licenses</translation>
     </message>
     <message>
       <source>I/O Module Licenses</source>
-      <translation>I/O Modul Licenser</translation>
+      <translation type="unfinished">I/O Module Licenses</translation>
     </message>
     <message>
       <source>Start Licenses</source>
-      <translation>Starter licenser</translation>
+      <translation type="unfinished">Start Licenses</translation>
     </message>
     <message>
       <source>Invalid</source>
-      <translation>Ugyldig</translation>
+      <translation type="unfinished">Invalid</translation>
     </message>
     <message>
       <source>Invalid Licenses</source>
-      <translation>Ugyldigt licens</translation>
+      <translation type="unfinished">Invalid Licenses</translation>
     </message>
     <message>
       <source>Free</source>
-      <translation>Gratis</translation>
+      <translation type="unfinished">Free</translation>
     </message>
     <message>
       <source>Time</source>
-      <translation>Tid</translation>
+      <translation type="unfinished">Time</translation>
     </message>
     <message>
       <source>Time Licenses</source>
-      <translation>Tidslicenser</translation>
+      <translation type="unfinished">Time Licenses</translation>
     </message>
     <message>
       <source>Bridge</source>
-      <translation>Bridge</translation>
+      <translation type="unfinished">Bridge</translation>
     </message>
     <message>
       <source>Bridge Licenses</source>
-      <translation>Bridge-licenser</translation>
+      <translation type="unfinished">Bridge Licenses</translation>
     </message>
     <message numerus="yes">
       <source>%n Time Licenses</source>
-      <translation>
-        <numerusform>%n Tidslicenser</numerusform>
-        <numerusform>%n Tidslicenser</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n Time Licenses</numerusform>
+        <numerusform>%n Time Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Licenses</source>
-      <translation>
-        <numerusform>%n Analoge licenser</numerusform>
-        <numerusform>%n Analoge licenser</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n Analog Licenses</numerusform>
+        <numerusform>%n Analog Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Professional Licenses</source>
-      <translation>
-        <numerusform>%n Professionelle licenser</numerusform>
-        <numerusform>%n Professionelle licenser</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n Professional Licenses</numerusform>
+        <numerusform>%n Professional Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Edge Licenses</source>
-      <translation>
-        <numerusform>%n Edge-licenser</numerusform>
-        <numerusform>%n Edge-licenser</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n Edge Licenses</numerusform>
+        <numerusform>%n Edge Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Vmax Licenses</source>
-      <translation>
-        <numerusform>%n Vmax-licenser</numerusform>
-        <numerusform>%n Vmax-licenser</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n Vmax Licenses</numerusform>
+        <numerusform>%n Vmax Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Encoder Licenses</source>
-      <translation>
-        <numerusform>%n Analog Encoder-licenser</numerusform>
-        <numerusform>%n Analog Encoder-licenser</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n Analog Encoder Licenses</numerusform>
+        <numerusform>%n Analog Encoder Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Video Wall Licenses</source>
-      <translation>
-        <numerusform>%n Videovæg-licenser</numerusform>
-        <numerusform>%n Videovæg-licenser</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n Video Wall Licenses</numerusform>
+        <numerusform>%n Video Wall Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Module Licenses</source>
-      <translation>
-        <numerusform>%n I/O Modul licenser</numerusform>
-        <numerusform>%n I/O Modul licenser</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n I/O Module Licenses</numerusform>
+        <numerusform>%n I/O Module Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Start Licenses</source>
-      <translation>
-        <numerusform>%n Start licenser</numerusform>
-        <numerusform>%n Start licenser</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n Start Licenses</numerusform>
+        <numerusform>%n Start Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Bridge Licenses</source>
-      <translation>
-        <numerusform>%n Bridge-licenser</numerusform>
-        <numerusform>%n Bridge-licenser</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n Bridge Licenses</numerusform>
+        <numerusform>%n Bridge Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Invalid Licenses</source>
-      <translation>
-        <numerusform>%n Ugyldige licenser</numerusform>
-        <numerusform>%n Ugyldige licenser</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n Invalid Licenses</numerusform>
+        <numerusform>%n Invalid Licenses</numerusform>
       </translation>
     </message>
     <message>
       <source>Free Licenses</source>
-      <translation>Gratis Licenser</translation>
+      <translation type="unfinished">Free Licenses</translation>
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
-      <translation>
-        <numerusform>%n Gratis licenser</numerusform>
-        <numerusform>%n Gratis licenser</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n Free Licenses</numerusform>
+        <numerusform>%n Free Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Time Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation>
-        <numerusform>%n/%1 Tidslicenser</numerusform>
-        <numerusform>%n/%1 Tidslicenser</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Time Licenses</numerusform>
+        <numerusform>%n/%1 Time Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -732,11 +732,11 @@
     </message>
     <message>
       <source>NVR</source>
-      <translation>NVR</translation>
+      <translation type="unfinished">NVR</translation>
     </message>
     <message>
       <source>NVR Licenses</source>
-      <translation>NVR Licenser</translation>
+      <translation type="unfinished">NVR Licenses</translation>
     </message>
     <message numerus="yes">
       <source>%n NVR Licenses</source>
@@ -758,92 +758,92 @@
     <name>QnResourceNameStrings</name>
     <message>
       <source>Cameras</source>
-      <translation>Kameraer</translation>
+      <translation type="unfinished">Cameras</translation>
     </message>
     <message>
       <source>cameras</source>
-      <translation>kameraer</translation>
+      <translation type="unfinished">cameras</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation>Kamera</translation>
+      <translation type="unfinished">Camera</translation>
     </message>
     <message>
       <source>camera</source>
-      <translation>kamera</translation>
+      <translation type="unfinished">camera</translation>
     </message>
     <message>
       <source>Devices</source>
-      <translation>Enheder</translation>
+      <translation type="unfinished">Devices</translation>
     </message>
     <message>
       <source>devices</source>
-      <translation>enheder</translation>
+      <translation type="unfinished">devices</translation>
     </message>
     <message>
       <source>Device</source>
-      <translation>Enhed</translation>
+      <translation type="unfinished">Device</translation>
     </message>
     <message>
       <source>device</source>
-      <translation>enhed</translation>
+      <translation type="unfinished">device</translation>
     </message>
     <message>
       <source>I/O Modules</source>
-      <translation>I/O Moduler</translation>
+      <translation type="unfinished">I/O Modules</translation>
     </message>
     <message>
       <source>I/O modules</source>
-      <translation>I/O moduler</translation>
+      <translation type="unfinished">I/O modules</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>I/O Modul</translation>
+      <translation type="unfinished">I/O Module</translation>
     </message>
     <message>
       <source>I/O module</source>
-      <translation>I/O modul</translation>
+      <translation type="unfinished">I/O module</translation>
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
-      <translation>
-        <numerusform>%n Kameraer</numerusform>
-        <numerusform>%n Kameraer</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n Cameras</numerusform>
+        <numerusform>%n Cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation>
-        <numerusform>%n kameraer</numerusform>
-        <numerusform>%n kameraer</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n cameras</numerusform>
+        <numerusform>%n cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Modules</source>
-      <translation>
-        <numerusform>%n I/O-Moduler</numerusform>
-        <numerusform>%n I/O-Moduler</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n I/O Modules</numerusform>
+        <numerusform>%n I/O Modules</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules</source>
-      <translation>
-        <numerusform>%n I/O moduler</numerusform>
-        <numerusform>%n I/O moduler</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n I/O modules</numerusform>
+        <numerusform>%n I/O modules</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Devices</source>
-      <translation>
-        <numerusform>%n Enheder</numerusform>
-        <numerusform>%n Enheder</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n Devices</numerusform>
+        <numerusform>%n Devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices</source>
-      <translation>
-        <numerusform>%n enheder</numerusform>
-        <numerusform>%n enheder</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n devices</numerusform>
+        <numerusform>%n devices</numerusform>
       </translation>
     </message>
   </context>
@@ -851,23 +851,23 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>Ukendt</translation>
+      <translation type="unfinished">Unknown</translation>
     </message>
     <message>
       <source>FREE License</source>
-      <translation>GRATIS licens</translation>
+      <translation type="unfinished">FREE License</translation>
     </message>
     <message>
       <source>Licensed To: %1</source>
-      <translation>Licenseret til: %1</translation>
+      <translation type="unfinished">Licensed To: %1</translation>
     </message>
     <message>
       <source>Watermark: %1</source>
-      <translation>Vandmærke: %1</translation>
+      <translation type="unfinished">Watermark: %1</translation>
     </message>
     <message>
       <source>Hardware ID: %1</source>
-      <translation>Hardware ID: %1</translation>
+      <translation type="unfinished">Hardware ID: %1</translation>
     </message>
   </context>
   <context>
@@ -875,72 +875,72 @@
     <message>
       <source>ms</source>
       <comment>Suffix for displaying milliseconds</comment>
-      <translation>ms</translation>
+      <translation type="unfinished">ms</translation>
     </message>
     <message>
       <source>s</source>
       <comment>Suffix for displaying seconds</comment>
-      <translation>s</translation>
+      <translation type="unfinished">s</translation>
     </message>
     <message>
       <source>m</source>
       <comment>Suffix for displaying minutes</comment>
-      <translation>m</translation>
+      <translation type="unfinished">m</translation>
     </message>
     <message>
       <source>h</source>
       <comment>Suffix for displaying hours</comment>
-      <translation>t</translation>
+      <translation type="unfinished">h</translation>
     </message>
     <message>
       <source>d</source>
       <comment>Suffix for displaying days</comment>
-      <translation>d</translation>
+      <translation type="unfinished">d</translation>
     </message>
     <message>
       <source>w</source>
       <comment>Suffix for displaying weeks</comment>
-      <translation>u</translation>
+      <translation type="unfinished">w</translation>
     </message>
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation>M</translation>
+      <translation type="unfinished">M</translation>
     </message>
     <message>
       <source>y</source>
       <comment>Suffix for displaying years</comment>
-      <translation>år</translation>
+      <translation type="unfinished">y</translation>
     </message>
     <message>
       <source>msec</source>
       <comment>Long suffix for displaying milliseconds</comment>
-      <translation>msek</translation>
+      <translation type="unfinished">msec</translation>
     </message>
     <message>
       <source>sec</source>
       <comment>Long suffix for displaying seconds</comment>
-      <translation>sek</translation>
+      <translation type="unfinished">sec</translation>
     </message>
     <message>
       <source>min</source>
       <comment>Long suffix for displaying minutes</comment>
-      <translation>min</translation>
+      <translation type="unfinished">min</translation>
     </message>
     <message>
       <source>hrs</source>
       <comment>Long suffix for displaying hours</comment>
-      <translation>time</translation>
+      <translation type="unfinished">hrs</translation>
     </message>
     <message>
       <source>days</source>
       <comment>Long suffix for displaying days</comment>
-      <translation>dage</translation>
+      <translation type="unfinished">days</translation>
     </message>
     <message>
       <source>wks</source>
       <comment>Long suffix for displaying weeks</comment>
-      <translation>uge</translation>
+      <translation type="unfinished">wks</translation>
     </message>
     <message>
       <source>mos</source>
@@ -963,57 +963,57 @@
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
-      <translation>
-        <numerusform>sekunder</numerusform>
-        <numerusform>sekunder</numerusform>
+      <translation type="unfinished">
+        <numerusform>seconds</numerusform>
+        <numerusform>seconds</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
-      <translation>
-        <numerusform>minutter</numerusform>
-        <numerusform>minutter</numerusform>
+      <translation type="unfinished">
+        <numerusform>minutes</numerusform>
+        <numerusform>minutes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
-      <translation>
-        <numerusform>timer</numerusform>
-        <numerusform>timer</numerusform>
+      <translation type="unfinished">
+        <numerusform>hours</numerusform>
+        <numerusform>hours</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
-      <translation>
-        <numerusform>dage</numerusform>
-        <numerusform>dage</numerusform>
+      <translation type="unfinished">
+        <numerusform>days</numerusform>
+        <numerusform>days</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>weeks</source>
       <comment>Full suffix for displaying weeks</comment>
-      <translation>
-        <numerusform>uger</numerusform>
-        <numerusform>uger</numerusform>
+      <translation type="unfinished">
+        <numerusform>weeks</numerusform>
+        <numerusform>weeks</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>months</source>
       <comment>Full suffix for displaying months</comment>
-      <translation>
-        <numerusform>måneder</numerusform>
-        <numerusform>måneder</numerusform>
+      <translation type="unfinished">
+        <numerusform>months</numerusform>
+        <numerusform>months</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>years</source>
       <comment>Full suffix for displaying years</comment>
-      <translation>
-        <numerusform>år</numerusform>
-        <numerusform>år</numerusform>
+      <translation type="unfinished">
+        <numerusform>years</numerusform>
+        <numerusform>years</numerusform>
       </translation>
     </message>
   </context>
@@ -1040,23 +1040,23 @@
     <name>QnUserRolesManager</name>
     <message>
       <source>Owner</source>
-      <translation>Ejer</translation>
+      <translation type="unfinished">Owner</translation>
     </message>
     <message>
       <source>Administrator</source>
-      <translation>Administrator</translation>
+      <translation type="unfinished">Administrator</translation>
     </message>
     <message>
       <source>Advanced Viewer</source>
-      <translation>Avanceret visning</translation>
+      <translation type="unfinished">Advanced Viewer</translation>
     </message>
     <message>
       <source>Viewer</source>
-      <translation>Viewer</translation>
+      <translation type="unfinished">Viewer</translation>
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation>Live Viewer</translation>
+      <translation type="unfinished">Live Viewer</translation>
     </message>
     <message>
       <source>Custom Role</source>
@@ -1064,7 +1064,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation>Brugerdefineret</translation>
+      <translation type="unfinished">Custom</translation>
     </message>
     <message>
       <source>Can manage all cameras and bookmarks.</source>
@@ -1099,14 +1099,14 @@
     <name>SystemHelpers</name>
     <message>
       <source>New System</source>
-      <translation>Nyt system</translation>
+      <translation type="unfinished">New System</translation>
     </message>
   </context>
   <context>
     <name>nx::recording::Error</name>
     <message>
       <source>Internal error</source>
-      <translation>Intern fejl</translation>
+      <translation type="unfinished">Internal error</translation>
     </message>
     <message>
       <source>Corresponding container in FFMPEG library was not found.</source>
@@ -1126,7 +1126,7 @@
     </message>
     <message>
       <source>Could not allocate output metadata stream.</source>
-      <translation>Kunne ikke tildele output metadata stream.</translation>
+      <translation type="unfinished">Could not allocate output metadata stream.</translation>
     </message>
     <message>
       <source>Invalid audio codec information.</source>
@@ -1168,7 +1168,7 @@
     <name>nx::vms::event::StringsHelper</name>
     <message>
       <source>Bookmark</source>
-      <translation>Bogmærke</translation>
+      <translation type="unfinished">Bookmark</translation>
     </message>
     <message>
       <source>Panic recording</source>
@@ -1184,15 +1184,15 @@
     </message>
     <message>
       <source>Play sound</source>
-      <translation>Afspil lyd</translation>
+      <translation type="unfinished">Play sound</translation>
     </message>
     <message>
       <source>Speak</source>
-      <translation>Tal</translation>
+      <translation type="unfinished">Speak</translation>
     </message>
     <message>
       <source>Execute PTZ preset</source>
-      <translation>Udfør PTZ-forudindstilling</translation>
+      <translation type="unfinished">Execute PTZ preset</translation>
     </message>
     <message>
       <source>Show text overlay</source>
@@ -1510,11 +1510,11 @@
     </message>
     <message>
       <source>start</source>
-      <translation>start</translation>
+      <translation type="unfinished">start</translation>
     </message>
     <message>
       <source>stop</source>
-      <translation>stop</translation>
+      <translation type="unfinished">stop</translation>
     </message>
     <message>
       <source>While %1</source>
@@ -1560,7 +1560,7 @@
     </message>
     <message>
       <source>Soft Trigger</source>
-      <translation>Udløser</translation>
+      <translation type="unfinished">Soft Trigger</translation>
     </message>
     <message>
       <source>Soft Trigger %1 at %2</source>
@@ -1580,7 +1580,7 @@
     </message>
     <message>
       <source>Analytics Event</source>
-      <translation>Analyse Begivenhed</translation>
+      <translation type="unfinished">Analytics Event</translation>
     </message>
     <message>
       <source>%1 at %2</source>
@@ -1710,16 +1710,16 @@
     </message>
     <message>
       <source>Analytics Object Detected</source>
-      <translation>Analyse Objekt Fundet</translation>
+      <translation type="unfinished">Analytics Object Detected</translation>
     </message>
     <message>
       <source>%1 at camera &apos;%2&apos;</source>
       <comment> is detected</comment>
-      <translation>%1 ved kamera &apos;%2&apos;</translation>
+      <translation type="unfinished">%1 at camera &apos;%2&apos;</translation>
     </message>
     <message>
       <source>Plugin: %1</source>
-      <translation>Plugin: %1</translation>
+      <translation type="unfinished">Plugin: %1</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
@@ -1727,35 +1727,35 @@
     </message>
     <message>
       <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
-      <translation>&apos;ikke initialisere AES-kryptering under optagelse af mediearkiv. Data skrives ukrypteret.</translation>
+      <translation type="unfinished">Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</translation>
     </message>
     <message>
       <source>Archive backup failed.</source>
-      <translation>Arkivbackup mislykkedes.</translation>
+      <translation type="unfinished">Archive backup failed.</translation>
     </message>
     <message>
       <source>Object detected</source>
-      <translation>Objekt fundet</translation>
+      <translation type="unfinished">Object detected</translation>
     </message>
     <message>
       <source>Archive backup failed</source>
-      <translation>Sikkerhedskopiering af arkiv mislykkedes</translation>
+      <translation type="unfinished">Archive backup failed</translation>
     </message>
     <message>
       <source>Data is backed up to %1</source>
-      <translation>Data sikkerhedskopieres til %1</translation>
+      <translation type="unfinished">Data is backed up to %1</translation>
     </message>
     <message>
       <source>Failed to backup file </source>
-      <translation>Sikkerhedskopiering af fil mislykkedes </translation>
+      <translation type="unfinished">Failed to backup file </translation>
     </message>
     <message>
       <source>Server Certificate Error</source>
-      <translation>Servercertifikat fejl</translation>
+      <translation type="unfinished">Server Certificate Error</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
-      <translation>Server &quot;%1&quot; certifikatfejl</translation>
+      <translation type="unfinished">Server &quot;%1&quot; certificate error</translation>
     </message>
   </context>
   <context>

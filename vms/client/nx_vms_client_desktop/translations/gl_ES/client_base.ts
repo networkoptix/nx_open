@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ru_RU" sourcelanguage="en">
+<TS version="2.1" language="gl_ES" sourcelanguage="en">
   <context>
     <name>AnalyticsSearchWidget::Private</name>
     <message>
       <source>Any type</source>
-      <translation>Любой тип</translation>
+      <translation type="unfinished">Any type</translation>
     </message>
     <message>
       <source>Select area</source>
-      <translation>Выберите область</translation>
+      <translation type="unfinished">Select area</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation>Выберите область на видео...</translation>
+      <translation type="unfinished">Select some area on the video...</translation>
     </message>
     <message>
       <source>In selected area</source>
-      <translation>В выбранной области</translation>
+      <translation type="unfinished">In selected area</translation>
     </message>
     <message>
       <source>Any plugin</source>
@@ -26,8 +26,6 @@
     <message numerus="yes">
       <source>%1 with %n attributes</source>
       <translation type="unfinished">
-        <numerusform>%1 with %n attributes</numerusform>
-        <numerusform>%1 with %n attributes</numerusform>
         <numerusform>%1 with %n attributes</numerusform>
         <numerusform>%1 with %n attributes</numerusform>
       </translation>
@@ -41,14 +39,14 @@
     <name>CameraDiagnostics::DiagnoseTool</name>
     <message>
       <source>No connection to Server %1.</source>
-      <translation>Нет соединения с сервером %1.</translation>
+      <translation type="unfinished">No connection to Server %1.</translation>
     </message>
   </context>
   <context>
     <name>CertificatesModel</name>
     <message>
       <source>Subject</source>
-      <translation>Тема</translation>
+      <translation type="unfinished">Subject</translation>
     </message>
     <message>
       <source>Issuer</source>
@@ -56,45 +54,45 @@
     </message>
     <message>
       <source>Expires</source>
-      <translation>Срок действия</translation>
+      <translation type="unfinished">Expires</translation>
     </message>
   </context>
   <context>
     <name>ComboBoxUtils</name>
     <message>
       <source>multiple values</source>
-      <translation>несколько значений</translation>
+      <translation type="unfinished">multiple values</translation>
     </message>
   </context>
   <context>
     <name>CompatibilityVersionInstallationDialog</name>
     <message>
       <source>Installing version %1</source>
-      <translation>Устанавливается версия %1</translation>
+      <translation type="unfinished">Installing version %1</translation>
     </message>
     <message>
       <source>Installation failed</source>
-      <translation>Ошибка установки</translation>
+      <translation type="unfinished">Installation failed</translation>
     </message>
     <message>
       <source>Installation completed</source>
-      <translation>Установка завершена</translation>
+      <translation type="unfinished">Installation completed</translation>
     </message>
     <message>
       <source>Getting update information from the server</source>
-      <translation>Получение информации об обновлениях с сервера</translation>
+      <translation type="unfinished">Getting update information from the server</translation>
     </message>
     <message>
       <source>Downloading update package</source>
-      <translation>Загрузка пакета обновления</translation>
+      <translation type="unfinished">Downloading update package</translation>
     </message>
     <message>
       <source>Installing</source>
-      <translation>Установка</translation>
+      <translation type="unfinished">Installing</translation>
     </message>
     <message>
       <source>Verifying update package</source>
-      <translation>Проверка пакета обновления</translation>
+      <translation type="unfinished">Verifying update package</translation>
     </message>
     <message>
       <source>Cannot connect to the System</source>
@@ -105,802 +103,802 @@
     <name>ContextMenu</name>
     <message>
       <source>Filter...</source>
-      <translation>Фильтр...</translation>
+      <translation type="unfinished">Filter...</translation>
     </message>
     <message>
       <source>Connect to System</source>
-      <translation>Подключиться к системе</translation>
+      <translation type="unfinished">Connect to System</translation>
     </message>
     <message>
       <source>Help</source>
-      <translation>Помощь</translation>
+      <translation type="unfinished">Help</translation>
     </message>
     <message>
       <source>Event Log...</source>
-      <translation>Журнал событий...</translation>
+      <translation type="unfinished">Event Log...</translation>
     </message>
     <message>
       <source>Control Video Wall</source>
-      <translation>Управление видеостеной</translation>
+      <translation type="unfinished">Control Video Wall</translation>
     </message>
     <message>
       <source>Push my screen</source>
-      <translation>Передать мой экоан</translation>
+      <translation type="unfinished">Push my screen</translation>
     </message>
     <message>
       <source>Select Time Server</source>
-      <translation>Выбрать сервер времени</translation>
+      <translation type="unfinished">Select Time Server</translation>
     </message>
     <message>
       <source>Fit in View</source>
-      <translation>Вписать в экран</translation>
+      <translation type="unfinished">Fit in View</translation>
     </message>
     <message>
       <source>Main Menu</source>
-      <translation>Главное меню</translation>
+      <translation type="unfinished">Main Menu</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation>Подключиться к серверу...</translation>
+      <translation type="unfinished">Connect to Server...</translation>
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation>Отключение от сервера</translation>
+      <translation type="unfinished">Disconnect from Server</translation>
     </message>
     <message>
       <source>Browse Local Files</source>
-      <translation>Просмотр локальных файлов</translation>
+      <translation type="unfinished">Browse Local Files</translation>
     </message>
     <message>
       <source>Show Welcome Screen</source>
-      <translation>Показать заставку</translation>
+      <translation type="unfinished">Show Welcome Screen</translation>
     </message>
     <message>
       <source>Tab</source>
-      <translation>Вкладку</translation>
+      <translation type="unfinished">Tab</translation>
     </message>
     <message>
       <source>New Tab</source>
-      <translation>Создать вкладку</translation>
+      <translation type="unfinished">New Tab</translation>
     </message>
     <message>
       <source>Window</source>
-      <translation>Окно</translation>
+      <translation type="unfinished">Window</translation>
     </message>
     <message>
       <source>New Window</source>
-      <translation>Создать окно</translation>
+      <translation type="unfinished">New Window</translation>
     </message>
     <message>
       <source>User...</source>
-      <translation>Пользователя...</translation>
+      <translation type="unfinished">User...</translation>
     </message>
     <message>
       <source>New User...</source>
-      <translation>Создать пользователя...</translation>
+      <translation type="unfinished">New User...</translation>
     </message>
     <message>
       <source>Video Wall...</source>
-      <translation>Видеостену...</translation>
+      <translation type="unfinished">Video Wall...</translation>
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation>Новая видеостена...</translation>
+      <translation type="unfinished">New Video Wall...</translation>
     </message>
     <message>
       <source>Web Page...</source>
-      <translation>Web-страница...</translation>
+      <translation type="unfinished">Web Page...</translation>
     </message>
     <message>
       <source>New Layout...</source>
-      <translation>Создать раскладку...</translation>
+      <translation type="unfinished">New Layout...</translation>
     </message>
     <message>
       <source>Open Layout...</source>
-      <translation>Открыть раскладку...</translation>
+      <translation type="unfinished">Open Layout...</translation>
     </message>
     <message>
       <source>Folder...</source>
-      <translation>Папк(и)...</translation>
+      <translation type="unfinished">Folder...</translation>
     </message>
     <message>
       <source>Web Client...</source>
-      <translation>Web клиент...</translation>
+      <translation type="unfinished">Web Client...</translation>
     </message>
     <message>
       <source>Open Web Client...</source>
-      <translation>Открыть Web клиент...</translation>
+      <translation type="unfinished">Open Web Client...</translation>
     </message>
     <message>
       <source>Save Current Layout</source>
-      <translation>Сохранить раскладку</translation>
+      <translation type="unfinished">Save Current Layout</translation>
     </message>
     <message>
       <source>Save Current Layout As...</source>
-      <translation>Сохранить раскладку как...</translation>
+      <translation type="unfinished">Save Current Layout As...</translation>
     </message>
     <message>
       <source>Save Video Wall View</source>
-      <translation>Сохранить раскладку видеостены</translation>
+      <translation type="unfinished">Save Video Wall View</translation>
     </message>
     <message>
       <source>Start Screen Recording</source>
-      <translation>Начать захват экрана</translation>
+      <translation type="unfinished">Start Screen Recording</translation>
     </message>
     <message>
       <source>Stop Screen Recording</source>
-      <translation>Закончить захват экрана</translation>
+      <translation type="unfinished">Stop Screen Recording</translation>
     </message>
     <message>
       <source>Stop current action</source>
-      <translation>Остановить текущее действие</translation>
+      <translation type="unfinished">Stop current action</translation>
     </message>
     <message>
       <source>Go to Fullscreen</source>
-      <translation>На полный экран</translation>
+      <translation type="unfinished">Go to Fullscreen</translation>
     </message>
     <message>
       <source>Exit Fullscreen</source>
-      <translation>В оконный режим</translation>
+      <translation type="unfinished">Exit Fullscreen</translation>
     </message>
     <message>
       <source>Minimize</source>
-      <translation>Свернуть</translation>
+      <translation type="unfinished">Minimize</translation>
     </message>
     <message>
       <source>Maximize</source>
-      <translation>Развернуть</translation>
+      <translation type="unfinished">Maximize</translation>
     </message>
     <message>
       <source>Restore Down</source>
-      <translation>Уменьшить в окно</translation>
+      <translation type="unfinished">Restore Down</translation>
     </message>
     <message>
       <source>Open in Browser...</source>
-      <translation>Открыть в браузере...</translation>
+      <translation type="unfinished">Open in Browser...</translation>
     </message>
     <message>
       <source>System Administration...</source>
-      <translation>Администрирование системы...</translation>
+      <translation type="unfinished">System Administration...</translation>
     </message>
     <message>
       <source>System Update...</source>
-      <translation>Обновление системы...</translation>
+      <translation type="unfinished">System Update...</translation>
     </message>
     <message>
       <source>User Management...</source>
-      <translation>Управление пользователями...</translation>
+      <translation type="unfinished">User Management...</translation>
     </message>
     <message>
       <source>Local Settings...</source>
-      <translation>Локальные настройки...</translation>
+      <translation type="unfinished">Local Settings...</translation>
     </message>
     <message>
       <source>Audit Trail...</source>
-      <translation>Аудит...</translation>
+      <translation type="unfinished">Audit Trail...</translation>
     </message>
     <message>
       <source>Log in to %1...</source>
       <comment>Log in to Nx Cloud</comment>
-      <translation>Войти в %1...</translation>
+      <translation type="unfinished">Log in to %1...</translation>
     </message>
     <message>
       <source>Log out from %1</source>
       <comment>Log out from Nx Cloud</comment>
-      <translation>Отсоединиться от %1</translation>
+      <translation type="unfinished">Log out from %1</translation>
     </message>
     <message>
       <source>Open %1 Portal...</source>
       <comment>Open Nx Cloud Portal</comment>
-      <translation>Открыть портал %1...</translation>
+      <translation type="unfinished">Open %1 Portal...</translation>
     </message>
     <message>
       <source>Account Settings...</source>
-      <translation>Настройки учётной записи...</translation>
+      <translation type="unfinished">Account Settings...</translation>
     </message>
     <message>
       <source>Create Account...</source>
-      <translation>Зарегистрироваться...</translation>
+      <translation type="unfinished">Create Account...</translation>
     </message>
     <message>
       <source>Event Rules...</source>
-      <translation>Правила событий...</translation>
+      <translation type="unfinished">Event Rules...</translation>
     </message>
     <message>
       <source>Devices List</source>
-      <translation>Список устройств</translation>
+      <translation type="unfinished">Devices List</translation>
     </message>
     <message>
       <source>Cameras List</source>
-      <translation>Список камер</translation>
+      <translation type="unfinished">Cameras List</translation>
     </message>
     <message>
       <source>Merge Systems...</source>
-      <translation>Объединить системы...</translation>
+      <translation type="unfinished">Merge Systems...</translation>
     </message>
     <message>
       <source>About...</source>
-      <translation>О программе...</translation>
+      <translation type="unfinished">About...</translation>
     </message>
     <message>
       <source>Exit</source>
-      <translation>Выход</translation>
+      <translation type="unfinished">Exit</translation>
     </message>
     <message>
       <source>Mark Selection Start</source>
-      <translation>Отметить начало выделения</translation>
+      <translation type="unfinished">Mark Selection Start</translation>
     </message>
     <message>
       <source>Mark Selection End</source>
-      <translation>Отметить конец выделения</translation>
+      <translation type="unfinished">Mark Selection End</translation>
     </message>
     <message>
       <source>Clear Selection</source>
-      <translation>Очистить выделение</translation>
+      <translation type="unfinished">Clear Selection</translation>
     </message>
     <message>
       <source>Zoom to Selection</source>
-      <translation>Приблизить выделенный фрагмент</translation>
+      <translation type="unfinished">Zoom to Selection</translation>
     </message>
     <message>
       <source>Add Bookmark...</source>
-      <translation>Добавить закладку...</translation>
+      <translation type="unfinished">Add Bookmark...</translation>
     </message>
     <message>
       <source>Edit Bookmark...</source>
-      <translation>Редактировать закладку...</translation>
+      <translation type="unfinished">Edit Bookmark...</translation>
     </message>
     <message>
       <source>Preview Search...</source>
-      <translation>Поиск по интервалам...</translation>
+      <translation type="unfinished">Preview Search...</translation>
     </message>
     <message>
       <source>Server...</source>
-      <translation>Сервер...</translation>
+      <translation type="unfinished">Server...</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation>Открыть</translation>
+      <translation type="unfinished">Open</translation>
     </message>
     <message>
       <source>Monitor</source>
-      <translation>Мониторинг</translation>
+      <translation type="unfinished">Monitor</translation>
     </message>
     <message>
       <source>Open in New Tab</source>
-      <translation>Открыть в новой вкладке</translation>
+      <translation type="unfinished">Open in New Tab</translation>
     </message>
     <message>
       <source>Monitor in New Tab</source>
-      <translation>Открыть мониторинг в новой вкладке</translation>
+      <translation type="unfinished">Monitor in New Tab</translation>
     </message>
     <message>
       <source>Open in Alarm Layout</source>
-      <translation>Открыть на тревожной раскладке</translation>
+      <translation type="unfinished">Open in Alarm Layout</translation>
     </message>
     <message>
       <source>Open in New Window</source>
-      <translation>Открыть в новом окне</translation>
+      <translation type="unfinished">Open in New Window</translation>
     </message>
     <message>
       <source>Monitor in New Window</source>
-      <translation>Открыть мониторинг в новом окне</translation>
+      <translation type="unfinished">Monitor in New Window</translation>
     </message>
     <message>
       <source>Open Video Wall</source>
-      <translation>Открыть видеостену</translation>
+      <translation type="unfinished">Open Video Wall</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation>Открыть в каталоге</translation>
+      <translation type="unfinished">Open Containing Folder</translation>
     </message>
     <message>
       <source>Identify</source>
-      <translation>Идентифицировать</translation>
+      <translation type="unfinished">Identify</translation>
     </message>
     <message>
       <source>Attach to Video Wall...</source>
-      <translation>Прикрепить к видеостене...</translation>
+      <translation type="unfinished">Attach to Video Wall...</translation>
     </message>
     <message>
       <source>Switch to Video Wall mode...</source>
-      <translation>Переключиться в режим видеостены...</translation>
+      <translation type="unfinished">Switch to Video Wall mode...</translation>
     </message>
     <message>
       <source>Save Video Wall</source>
-      <translation>Сохранить видеостену</translation>
+      <translation type="unfinished">Save Video Wall</translation>
     </message>
     <message>
       <source>Save Current Matrix</source>
-      <translation>Сохранить текущую матрицу</translation>
+      <translation type="unfinished">Save Current Matrix</translation>
     </message>
     <message>
       <source>Load Matrix</source>
-      <translation>Загрузить матрицу</translation>
+      <translation type="unfinished">Load Matrix</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Удалить</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <source>Stop Video Wall</source>
-      <translation>Остановить видеостену</translation>
+      <translation type="unfinished">Stop Video Wall</translation>
     </message>
     <message>
       <source>Clear Screen</source>
-      <translation>Очистить экран</translation>
+      <translation type="unfinished">Clear Screen</translation>
     </message>
     <message>
       <source>Save Layout</source>
-      <translation>Сохранить раскладку</translation>
+      <translation type="unfinished">Save Layout</translation>
     </message>
     <message>
       <source>Save Layout As...</source>
-      <translation>Сохранить раскладку как...</translation>
+      <translation type="unfinished">Save Layout As...</translation>
     </message>
     <message>
       <source>Maximize Item</source>
-      <translation>Видео на полный экран</translation>
+      <translation type="unfinished">Maximize Item</translation>
     </message>
     <message>
       <source>Restore Item</source>
-      <translation>Видео в режим сетки</translation>
+      <translation type="unfinished">Restore Item</translation>
     </message>
     <message>
       <source>Save Current Position...</source>
-      <translation>Записать позицию...</translation>
+      <translation type="unfinished">Save Current Position...</translation>
     </message>
     <message>
       <source>Manage...</source>
-      <translation>Настроить...</translation>
+      <translation type="unfinished">Manage...</translation>
     </message>
     <message>
       <source>Show Motion/Smart Search</source>
-      <translation>Показать движение/поиск по движению</translation>
+      <translation type="unfinished">Show Motion/Smart Search</translation>
     </message>
     <message>
       <source>Show Motion</source>
-      <translation>Показать движение</translation>
+      <translation type="unfinished">Show Motion</translation>
     </message>
     <message>
       <source>Hide Motion/Smart Search</source>
-      <translation>Скрыть движение/поиск по движению</translation>
+      <translation type="unfinished">Hide Motion/Smart Search</translation>
     </message>
     <message>
       <source>Hide Motion</source>
-      <translation>Скрыть движение</translation>
+      <translation type="unfinished">Hide Motion</translation>
     </message>
     <message>
       <source>Clear Motion Selection</source>
-      <translation>Очистить регион поиска движения</translation>
+      <translation type="unfinished">Clear Motion Selection</translation>
     </message>
     <message>
       <source>Check File Watermark</source>
-      <translation>Проверить целостность файла</translation>
+      <translation type="unfinished">Check File Watermark</translation>
     </message>
     <message>
       <source>Image Enhancement...</source>
-      <translation>Коррекция изображения...</translation>
+      <translation type="unfinished">Image Enhancement...</translation>
     </message>
     <message>
       <source>0 degrees</source>
-      <translation>0 градусов</translation>
+      <translation type="unfinished">0 degrees</translation>
     </message>
     <message>
       <source>90 degrees</source>
-      <translation>90 градусов</translation>
+      <translation type="unfinished">90 degrees</translation>
     </message>
     <message>
       <source>180 degrees</source>
-      <translation>180 градусов</translation>
+      <translation type="unfinished">180 degrees</translation>
     </message>
     <message>
       <source>270 degrees</source>
-      <translation>270 градусов</translation>
+      <translation type="unfinished">270 degrees</translation>
     </message>
     <message>
       <source>Remove from Layout</source>
-      <translation>Убрать с раскладки</translation>
+      <translation type="unfinished">Remove from Layout</translation>
     </message>
     <message>
       <source>Stop Sharing Layout</source>
-      <translation>Убрать раскладку из общего</translation>
+      <translation type="unfinished">Stop Sharing Layout</translation>
     </message>
     <message>
       <source>Rename</source>
-      <translation>Переименовать</translation>
+      <translation type="unfinished">Rename</translation>
     </message>
     <message>
       <source>Delete from Disk</source>
-      <translation>Удалить с диска</translation>
+      <translation type="unfinished">Delete from Disk</translation>
     </message>
     <message>
       <source>Set as Layout Background</source>
-      <translation>Установить как фон на раскладку</translation>
+      <translation type="unfinished">Set as Layout Background</translation>
     </message>
     <message>
       <source>User Settings...</source>
-      <translation>Настройки пользователя...</translation>
+      <translation type="unfinished">User Settings...</translation>
     </message>
     <message>
       <source>User Roles...</source>
-      <translation>Роли пользователей...</translation>
+      <translation type="unfinished">User Roles...</translation>
     </message>
     <message>
       <source>Role Settings...</source>
-      <translation>Настройки роли...</translation>
+      <translation type="unfinished">Role Settings...</translation>
     </message>
     <message>
       <source>Check Device Issues...</source>
-      <translation>Проверить устройство на ошибки...</translation>
+      <translation type="unfinished">Check Device Issues...</translation>
     </message>
     <message>
       <source>Check Devices Issues...</source>
-      <translation>Проверить устройства на ошибки...</translation>
+      <translation type="unfinished">Check Devices Issues...</translation>
     </message>
     <message>
       <source>Check Camera Issues...</source>
-      <translation>Проверить камеру на ошибки...</translation>
+      <translation type="unfinished">Check Camera Issues...</translation>
     </message>
     <message>
       <source>Check Cameras Issues...</source>
-      <translation>Проверить камеры на ошибки...</translation>
+      <translation type="unfinished">Check Cameras Issues...</translation>
     </message>
     <message>
       <source>Check I/O Module Issues...</source>
-      <translation>Проверить модуль ввода-вывода на ошибки...</translation>
+      <translation type="unfinished">Check I/O Module Issues...</translation>
     </message>
     <message>
       <source>Check I/O Modules Issues...</source>
-      <translation>Проверить модули ввода-вывода на ошибки...</translation>
+      <translation type="unfinished">Check I/O Modules Issues...</translation>
     </message>
     <message>
       <source>Device Rules...</source>
-      <translation>Правила для устройства...</translation>
+      <translation type="unfinished">Device Rules...</translation>
     </message>
     <message>
       <source>Devices Rules...</source>
-      <translation>Правила для устройств...</translation>
+      <translation type="unfinished">Devices Rules...</translation>
     </message>
     <message>
       <source>Camera Rules...</source>
-      <translation>Правила для камеры...</translation>
+      <translation type="unfinished">Camera Rules...</translation>
     </message>
     <message>
       <source>Cameras Rules...</source>
-      <translation>Правила для камер...</translation>
+      <translation type="unfinished">Cameras Rules...</translation>
     </message>
     <message>
       <source>I/O Module Rules...</source>
-      <translation>Правила для модуля ввода-вывода...</translation>
+      <translation type="unfinished">I/O Module Rules...</translation>
     </message>
     <message>
       <source>I/O Modules Rules...</source>
-      <translation>Правила для модулей ввода-вывода...</translation>
+      <translation type="unfinished">I/O Modules Rules...</translation>
     </message>
     <message>
       <source>Device Settings...</source>
-      <translation>Настройки устройства...</translation>
+      <translation type="unfinished">Device Settings...</translation>
     </message>
     <message>
       <source>Devices Settings...</source>
-      <translation>Настройки устройств...</translation>
+      <translation type="unfinished">Devices Settings...</translation>
     </message>
     <message>
       <source>Camera Settings...</source>
-      <translation>Настройки камеры...</translation>
+      <translation type="unfinished">Camera Settings...</translation>
     </message>
     <message>
       <source>Cameras Settings...</source>
-      <translation>Настройки камер...</translation>
+      <translation type="unfinished">Cameras Settings...</translation>
     </message>
     <message>
       <source>I/O Module Settings...</source>
-      <translation>Настройки модуля ввода-вывода...</translation>
+      <translation type="unfinished">I/O Module Settings...</translation>
     </message>
     <message>
       <source>I/O Modules Settings...</source>
-      <translation>Настройки модулей ввода-вывода...</translation>
+      <translation type="unfinished">I/O Modules Settings...</translation>
     </message>
     <message>
       <source>File Settings...</source>
-      <translation>Настройки...</translation>
+      <translation type="unfinished">File Settings...</translation>
     </message>
     <message>
       <source>Layout Settings...</source>
-      <translation>Настройки раскладки...</translation>
+      <translation type="unfinished">Layout Settings...</translation>
     </message>
     <message>
       <source>Video Wall Settings...</source>
-      <translation>Настройки видеостены...</translation>
+      <translation type="unfinished">Video Wall Settings...</translation>
     </message>
     <message>
       <source>Add Device...</source>
-      <translation>Добавить устройство...</translation>
+      <translation type="unfinished">Add Device...</translation>
     </message>
     <message>
       <source>Devices List by Server...</source>
-      <translation>Список устройств на сервере...</translation>
+      <translation type="unfinished">Devices List by Server...</translation>
     </message>
     <message>
       <source>Cameras List by Server...</source>
-      <translation>Список камер на сервере...</translation>
+      <translation type="unfinished">Cameras List by Server...</translation>
     </message>
     <message>
       <source>Server Logs...</source>
-      <translation>Журнал сервера...</translation>
+      <translation type="unfinished">Server Logs...</translation>
     </message>
     <message>
       <source>Server Diagnostics...</source>
-      <translation>Диагностика сервера...</translation>
+      <translation type="unfinished">Server Diagnostics...</translation>
     </message>
     <message>
       <source>Server Web Page...</source>
-      <translation>Открыть web-страницу сервера...</translation>
+      <translation type="unfinished">Server Web Page...</translation>
     </message>
     <message>
       <source>Server Settings...</source>
-      <translation>Настройки сервера...</translation>
+      <translation type="unfinished">Server Settings...</translation>
     </message>
     <message>
       <source>Merge to Currently Connected System...</source>
-      <translation>Присоединить сервер к текущей системе...</translation>
+      <translation type="unfinished">Merge to Currently Connected System...</translation>
     </message>
     <message>
       <source>None</source>
-      <translation>Нет</translation>
+      <translation type="unfinished">None</translation>
     </message>
     <message>
       <source>Small</source>
-      <translation>Маленькое</translation>
+      <translation type="unfinished">Small</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation>Среднее</translation>
+      <translation type="unfinished">Medium</translation>
     </message>
     <message>
       <source>Large</source>
-      <translation>Большое</translation>
+      <translation type="unfinished">Large</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation>Настройки</translation>
+      <translation type="unfinished">Settings</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation>Закрыть</translation>
+      <translation type="unfinished">Close</translation>
     </message>
     <message>
       <source>Close All But This</source>
-      <translation>Закрыть все кроме этой</translation>
+      <translation type="unfinished">Close All But This</translation>
     </message>
     <message>
       <source>Play</source>
-      <translation>Воспроизведение</translation>
+      <translation type="unfinished">Play</translation>
     </message>
     <message>
       <source>Pause</source>
-      <translation>Пауза</translation>
+      <translation type="unfinished">Pause</translation>
     </message>
     <message>
       <source>Previous Frame</source>
-      <translation>Предыдущий кадр</translation>
+      <translation type="unfinished">Previous Frame</translation>
     </message>
     <message>
       <source>Next Frame</source>
-      <translation>Следующий кадр</translation>
+      <translation type="unfinished">Next Frame</translation>
     </message>
     <message>
       <source>To Start</source>
-      <translation>В начало</translation>
+      <translation type="unfinished">To Start</translation>
     </message>
     <message>
       <source>To End</source>
-      <translation>В конец</translation>
+      <translation type="unfinished">To End</translation>
     </message>
     <message>
       <source>Volume Down</source>
-      <translation>Тише</translation>
+      <translation type="unfinished">Volume Down</translation>
     </message>
     <message>
       <source>Volume Up</source>
-      <translation>Громче</translation>
+      <translation type="unfinished">Volume Up</translation>
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation>Вкл/Выкл звук</translation>
+      <translation type="unfinished">Toggle Mute</translation>
     </message>
     <message>
       <source>Jump to Live</source>
-      <translation>Видео в реальном времени</translation>
+      <translation type="unfinished">Jump to Live</translation>
     </message>
     <message>
       <source>Synchronize Streams</source>
-      <translation>Сонхронизация видео</translation>
+      <translation type="unfinished">Synchronize Streams</translation>
     </message>
     <message>
       <source>Disable Stream Synchronization</source>
-      <translation>Отключить синхронизацию видео</translation>
+      <translation type="unfinished">Disable Stream Synchronization</translation>
     </message>
     <message>
       <source>Show Bookmarks</source>
-      <translation>Показать закладки</translation>
+      <translation type="unfinished">Show Bookmarks</translation>
     </message>
     <message>
       <source>Hide Bookmarks</source>
-      <translation>Скрыть закладки</translation>
+      <translation type="unfinished">Hide Bookmarks</translation>
     </message>
     <message>
       <source>Show Calendar</source>
-      <translation>Показать календарь</translation>
+      <translation type="unfinished">Show Calendar</translation>
     </message>
     <message>
       <source>Hide Calendar</source>
-      <translation>Скрыть календарь</translation>
+      <translation type="unfinished">Hide Calendar</translation>
     </message>
     <message>
       <source>Show Title Bar</source>
-      <translation>Показать заголовок</translation>
+      <translation type="unfinished">Show Title Bar</translation>
     </message>
     <message>
       <source>Hide Title Bar</source>
-      <translation>Скрыть заголовок</translation>
+      <translation type="unfinished">Hide Title Bar</translation>
     </message>
     <message>
       <source>Show Timeline</source>
-      <translation>Показать шкалу времени</translation>
+      <translation type="unfinished">Show Timeline</translation>
     </message>
     <message>
       <source>Hide Timeline</source>
-      <translation>Скрыть шкалу времени</translation>
+      <translation type="unfinished">Hide Timeline</translation>
     </message>
     <message>
       <source>Bookmark Log...</source>
-      <translation>Журнал закладок...</translation>
+      <translation type="unfinished">Bookmark Log...</translation>
     </message>
     <message>
       <source>Showreel...</source>
-      <translation>Прокрутка...</translation>
+      <translation type="unfinished">Showreel...</translation>
     </message>
     <message>
       <source>New Showreel...</source>
-      <translation>Новая прокрутка...</translation>
+      <translation type="unfinished">New Showreel...</translation>
     </message>
     <message>
       <source>Remove from Showreel</source>
-      <translation>Удалить из прокрутки</translation>
+      <translation type="unfinished">Remove from Showreel</translation>
     </message>
     <message>
       <source>Make Showreel</source>
-      <translation>Сделать прокрутку</translation>
+      <translation type="unfinished">Make Showreel</translation>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation>Загрузить файл...</translation>
+      <translation type="unfinished">Upload File...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation>Загрузить папку...</translation>
+      <translation type="unfinished">Upload Folder...</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation>Некоторые камеры требуют установки паролей</translation>
+      <translation type="unfinished">Some cameras require passwords to be set</translation>
     </message>
     <message>
       <source>Export Video...</source>
-      <translation>Экспортировать видео...</translation>
+      <translation type="unfinished">Export Video...</translation>
     </message>
     <message>
       <source>Export Bookmark...</source>
-      <translation>Экспорт закладки...</translation>
+      <translation type="unfinished">Export Bookmark...</translation>
     </message>
     <message>
       <source>Resolution...</source>
-      <translation>Разрешение...</translation>
+      <translation type="unfinished">Resolution...</translation>
     </message>
     <message>
       <source>Cell Aspect Ratio...</source>
-      <translation>Соотношение сторон ячеек...</translation>
+      <translation type="unfinished">Cell Aspect Ratio...</translation>
     </message>
     <message>
       <source>Screen Settings...</source>
-      <translation>Настройки экрана...</translation>
+      <translation type="unfinished">Screen Settings...</translation>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation>Экспорт закладок...</translation>
+      <translation type="unfinished">Export Bookmarks...</translation>
     </message>
     <message>
       <source>Forget password</source>
-      <translation>Забыли пароль</translation>
+      <translation type="unfinished">Forget password</translation>
     </message>
     <message>
       <source>Cancel Upload...</source>
-      <translation>Отменить загрузку...</translation>
+      <translation type="unfinished">Cancel Upload...</translation>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
-      <translation>Настройки движка аналитики...</translation>
+      <translation type="unfinished">Analytics Engine Settings...</translation>
     </message>
     <message>
       <source>Show Thumbnails</source>
-      <translation>Показать миниатюры</translation>
+      <translation type="unfinished">Show Thumbnails</translation>
     </message>
     <message>
       <source>Hide Thumbnails</source>
-      <translation>Скрыть миниатюры</translation>
+      <translation type="unfinished">Hide Thumbnails</translation>
     </message>
     <message>
       <source>Virtual Camera...</source>
-      <translation>Виртуальная камера...</translation>
+      <translation type="unfinished">Virtual Camera...</translation>
     </message>
     <message>
       <source>New Virtual Camera...</source>
-      <translation>Новая виртуальная камера...</translation>
+      <translation type="unfinished">New Virtual Camera...</translation>
     </message>
     <message>
       <source>Show Tree</source>
-      <translation>Показать дерево</translation>
+      <translation type="unfinished">Show Tree</translation>
     </message>
     <message>
       <source>Hide Tree</source>
-      <translation>Скрыть дерево</translation>
+      <translation type="unfinished">Hide Tree</translation>
     </message>
     <message>
       <source>Show Notifications</source>
-      <translation>Показать уведомления</translation>
+      <translation type="unfinished">Show Notifications</translation>
     </message>
     <message>
       <source>Hide Notifications</source>
-      <translation>Скрыть уведомления</translation>
+      <translation type="unfinished">Hide Notifications</translation>
     </message>
     <message>
       <source>Files...</source>
-      <translation>Файлы...</translation>
+      <translation type="unfinished">Files...</translation>
     </message>
     <message>
       <source>Switch to Notifications tab</source>
-      <translation>Переключиться на вкладку Уведомления</translation>
+      <translation type="unfinished">Switch to Notifications tab</translation>
     </message>
     <message>
       <source>Switch to Motion tab</source>
-      <translation>Переключиться на вкладку «Движение»</translation>
+      <translation type="unfinished">Switch to Motion tab</translation>
     </message>
     <message>
       <source>Switch to Bookmarks tab</source>
-      <translation>Переключиться на закладки</translation>
+      <translation type="unfinished">Switch to Bookmarks tab</translation>
     </message>
     <message>
       <source>Switch to Events tab</source>
-      <translation>Перейти на вкладку «События»</translation>
+      <translation type="unfinished">Switch to Events tab</translation>
     </message>
     <message>
       <source>Switch to Objects tab</source>
-      <translation>Переключиться на вкладку «Объекты»</translation>
+      <translation type="unfinished">Switch to Objects tab</translation>
     </message>
     <message>
       <source>Pin Calendar</source>
-      <translation>Прикрепить календарь</translation>
+      <translation type="unfinished">Pin Calendar</translation>
     </message>
     <message>
       <source>Unpin Calendar</source>
-      <translation>Открепить календарь</translation>
+      <translation type="unfinished">Unpin Calendar</translation>
     </message>
     <message>
       <source>Page...</source>
-      <translation>Страница...</translation>
+      <translation type="unfinished">Page...</translation>
     </message>
     <message>
       <source>Connect to this Server</source>
-      <translation>Подключиться к этому серверу</translation>
+      <translation type="unfinished">Connect to this Server</translation>
     </message>
     <message>
       <source>Pin</source>
-      <translation>Закрепить</translation>
+      <translation type="unfinished">Pin</translation>
     </message>
     <message>
       <source>Switch to Cameras &amp; Resources tab</source>
-      <translation>Переключиться на вкладку Камеры и Ресурсы</translation>
+      <translation type="unfinished">Switch to Cameras &amp; Resources tab</translation>
     </message>
     <message>
       <source>Search Cameras &amp; Resources</source>
@@ -908,7 +906,7 @@
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation>Подключиться к другому серверу...</translation>
+      <translation type="unfinished">Connect to Another Server...</translation>
     </message>
     <message>
       <source>New</source>
@@ -920,92 +918,90 @@
     </message>
     <message>
       <source>Add Web Page...</source>
-      <translation>Добавить веб-страницу...</translation>
+      <translation type="unfinished">Add Web Page...</translation>
     </message>
     <message>
       <source>Show Servers</source>
-      <translation>Показать серверы</translation>
+      <translation type="unfinished">Show Servers</translation>
     </message>
     <message>
       <source>Save Window Configuration</source>
-      <translation>Сохранить настройки окна</translation>
+      <translation type="unfinished">Save Window Configuration</translation>
     </message>
     <message>
       <source>Save Windows Configuration</source>
-      <translation>Сохранить настройки окон</translation>
+      <translation type="unfinished">Save Windows Configuration</translation>
     </message>
     <message>
       <source>Windows Configuration</source>
-      <translation>Настройка окон</translation>
+      <translation type="unfinished">Windows Configuration</translation>
     </message>
     <message>
       <source>Save Current State</source>
-      <translation>Сохранить текущее состояние</translation>
+      <translation type="unfinished">Save Current State</translation>
     </message>
     <message>
       <source>Restore Saved State</source>
-      <translation>Восстановить сохраненное состояние</translation>
+      <translation type="unfinished">Restore Saved State</translation>
     </message>
     <message>
       <source>Delete Saved State</source>
-      <translation>Удалить сохраненное состояние</translation>
+      <translation type="unfinished">Delete Saved State</translation>
     </message>
     <message>
       <source>Close all Windows</source>
-      <translation>Закрыть все окна</translation>
+      <translation type="unfinished">Close all Windows</translation>
     </message>
     <message>
       <source>Delete Bookmark...</source>
-      <translation>Удалить закладку...</translation>
+      <translation type="unfinished">Delete Bookmark...</translation>
     </message>
     <message>
       <source>Delete Bookmarks...</source>
-      <translation>Удалить закладки...</translation>
+      <translation type="unfinished">Delete Bookmarks...</translation>
     </message>
     <message numerus="yes">
       <source>Show on Items</source>
-      <translation>
-        <numerusform>Показывать на элементе</numerusform>
-        <numerusform>Показывать на элементах</numerusform>
-        <numerusform>Показывать на элементах</numerusform>
-        <numerusform>Показывать на элементах</numerusform>
+      <translation type="unfinished">
+        <numerusform>Show on Items</numerusform>
+        <numerusform>Show on Items</numerusform>
       </translation>
     </message>
     <message>
       <source>PTZ</source>
-      <translation>PTZ</translation>
+      <translation type="unfinished">PTZ</translation>
     </message>
     <message>
       <source>Rotate to</source>
-      <translation>Повернуть на</translation>
+      <translation type="unfinished">Rotate to</translation>
     </message>
     <message>
       <source>Create Group</source>
-      <translation>Создать группу</translation>
+      <translation type="unfinished">Create Group</translation>
     </message>
     <message>
       <source>Remove Group</source>
-      <translation>Удалить группу</translation>
+      <translation type="unfinished">Remove Group</translation>
     </message>
     <message>
       <source>Add Proxied Web Page...</source>
-      <translation>Добавить проксированную веб-страницу...</translation>
+      <translation type="unfinished">Add Proxied Web Page...</translation>
     </message>
     <message>
       <source>Cell Spacing</source>
-      <translation>Расстояние между ячейками</translation>
+      <translation type="unfinished">Cell Spacing</translation>
     </message>
     <message>
       <source>Show Panel</source>
-      <translation>Показать панель</translation>
+      <translation type="unfinished">Show Panel</translation>
     </message>
     <message>
       <source>Hide Panel</source>
-      <translation>Скрыть панель</translation>
+      <translation type="unfinished">Hide Panel</translation>
     </message>
     <message>
       <source>Joystick Settings...</source>
-      <translation>Настройки джойстика...</translation>
+      <translation type="unfinished">Joystick Settings...</translation>
     </message>
     <message>
       <source>Advanced...</source>
@@ -1032,116 +1028,114 @@
     <name>Deactivator</name>
     <message>
       <source>Unknown error.</source>
-      <translation>Неизвестная ошибка.</translation>
+      <translation type="unfinished">Unknown error.</translation>
     </message>
     <message>
       <source>License does not exist.</source>
-      <translation>Лицензия не существует.</translation>
+      <translation type="unfinished">License does not exist.</translation>
     </message>
     <message>
       <source>License is disabled.</source>
-      <translation>Лицензия отключена.</translation>
+      <translation type="unfinished">License is disabled.</translation>
     </message>
     <message>
       <source>License is inactive.</source>
-      <translation>Лицензия неактивна.</translation>
+      <translation type="unfinished">License is inactive.</translation>
     </message>
     <message>
       <source>Invalid license.</source>
-      <translation>Лицензия недействительна.</translation>
+      <translation type="unfinished">Invalid license.</translation>
     </message>
     <message>
       <source>License is trial.</source>
-      <translation>Лицензия пробная.</translation>
+      <translation type="unfinished">License is trial.</translation>
     </message>
     <message>
       <source>License is in pending deactivation state, but has not been deactivated yet.</source>
-      <translation>Лицензия находится в ожидании деактивации, но еще не деактивирована.</translation>
+      <translation type="unfinished">License is in pending deactivation state, but has not been deactivated yet.</translation>
     </message>
     <message>
       <source>Number of deactivations exceeded limit for this license.</source>
-      <translation>Количество деактиваций для этой лицензии превысило лимит.</translation>
+      <translation type="unfinished">Number of deactivations exceeded limit for this license.</translation>
     </message>
     <message>
       <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
-      <translation>Аппаратный идентификатор сервера с этой лицензией не соответствует идентификатору сервера, на котором она была активирована.</translation>
+      <translation type="unfinished">Hardware ID of Server with this license does not match Hardware ID on which license was activated.</translation>
     </message>
   </context>
   <context>
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
-      <translation>Пожалуйста, введите корректный пароль</translation>
+      <translation type="unfinished">Please enter a valid password</translation>
     </message>
     <message>
       <source>The password is not valid.</source>
-      <translation>Этот пароль некорректен.</translation>
+      <translation type="unfinished">The password is not valid.</translation>
     </message>
     <message>
       <source>Encrypted layout</source>
-      <translation>Зашифрованная раскладка</translation>
+      <translation type="unfinished">Encrypted layout</translation>
     </message>
     <message>
       <source>The file %1 is encrypted. Please enter the password:</source>
-      <translation>Файл %1 зашифрован. Пожалуйста, введите пароль:</translation>
+      <translation type="unfinished">The file %1 is encrypted. Please enter the password:</translation>
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
-      <translation>Пожалуйста, введите пароль для раскладки %1 еще раз:</translation>
+      <translation type="unfinished">Please re-enter password for layout %1:</translation>
     </message>
   </context>
   <context>
     <name>EventSearchWidget::Private</name>
     <message>
       <source>Server events</source>
-      <translation>События сервера</translation>
+      <translation type="unfinished">Server events</translation>
     </message>
     <message>
       <source>Analytics events</source>
-      <translation>События аналитики</translation>
+      <translation type="unfinished">Analytics events</translation>
     </message>
     <message>
       <source>Any event</source>
-      <translation>Любое событие</translation>
+      <translation type="unfinished">Any event</translation>
     </message>
     <message>
       <source>Any device issue</source>
-      <translation>Любая проблема с устройством</translation>
+      <translation type="unfinished">Any device issue</translation>
     </message>
     <message>
       <source>Any camera issue</source>
-      <translation>Любая проблема с камерой</translation>
+      <translation type="unfinished">Any camera issue</translation>
     </message>
     <message>
       <source>Any server event</source>
-      <translation>Любое событие сервера</translation>
+      <translation type="unfinished">Any server event</translation>
     </message>
     <message>
       <source>Device issues</source>
-      <translation>Проблемы с устройством</translation>
+      <translation type="unfinished">Device issues</translation>
     </message>
     <message>
       <source>Camera issues</source>
-      <translation>Проблемы с камерой</translation>
+      <translation type="unfinished">Camera issues</translation>
     </message>
     <message>
       <source>Any analytics event</source>
-      <translation>Любое событие аналитики</translation>
+      <translation type="unfinished">Any analytics event</translation>
     </message>
   </context>
   <context>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
-      <translation>Выберите раскладку...</translation>
+      <translation type="unfinished">Select layout...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation>
-        <numerusform>%n раскладкa</numerusform>
-        <numerusform>%n раскладки</numerusform>
-        <numerusform>%n раскладкок</numerusform>
-        <numerusform>%n раскладкок</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
       </translation>
     </message>
   </context>
@@ -1149,34 +1143,34 @@
     <name>FileExtensions</name>
     <message>
       <source>Pictures</source>
-      <translation>Изображения</translation>
+      <translation type="unfinished">Pictures</translation>
     </message>
     <message>
       <source>Video</source>
-      <translation>Видео</translation>
+      <translation type="unfinished">Video</translation>
     </message>
     <message>
       <source>All Files</source>
-      <translation>Все файлы</translation>
+      <translation type="unfinished">All Files</translation>
     </message>
   </context>
   <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
-      <translation>Audio Video Interleave</translation>
+      <translation type="unfinished">Audio Video Interleave</translation>
     </message>
     <message>
       <source>Matroska</source>
-      <translation>Matroska</translation>
+      <translation type="unfinished">Matroska</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
-      <translation>MPEG-4, часть 14</translation>
+      <translation type="unfinished">MPEG-4 Part 14</translation>
     </message>
     <message>
       <source>%1 Media File</source>
-      <translation>%1 Файл мультимедиа</translation>
+      <translation type="unfinished">%1 Media File</translation>
     </message>
     <message>
       <source>Executable %1 Media File</source>
@@ -1187,33 +1181,31 @@
     <name>FullscreenActionHelper</name>
     <message>
       <source>Source camera</source>
-      <translation>Исходная камера</translation>
+      <translation type="unfinished">Source camera</translation>
     </message>
     <message>
       <source>Select device...</source>
-      <translation>Выберите устройство...</translation>
+      <translation type="unfinished">Select device...</translation>
     </message>
     <message>
       <source>Select camera...</source>
-      <translation>Выберите камеру...</translation>
+      <translation type="unfinished">Select camera...</translation>
     </message>
     <message>
       <source>Select layout...</source>
-      <translation>Выберите раскладку...</translation>
+      <translation type="unfinished">Select layout...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation>
-        <numerusform>%n раскладка</numerusform>
-        <numerusform>%n раскладки</numerusform>
-        <numerusform>%n раскладкок</numerusform>
-        <numerusform>%n раскладкок</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 on %2</source>
       <comment>Camera %1 on layout %2</comment>
-      <translation>%1 на %2</translation>
+      <translation type="unfinished">%1 on %2</translation>
     </message>
   </context>
   <context>
@@ -1221,160 +1213,150 @@
     <message>
       <source>Language Name</source>
       <comment>Language name that will be displayed to the user.</comment>
-      <translation>Русский</translation>
+      <translation type="unfinished">Language Name</translation>
     </message>
   </context>
   <context>
     <name>LayoutTourTextFactory</name>
     <message>
       <source>Start Showreel</source>
-      <translation>Запустить прокрутки</translation>
+      <translation type="unfinished">Start Showreel</translation>
     </message>
   </context>
   <context>
     <name>LicenseActivationDialogs</name>
     <message>
       <source>Incompatible license</source>
-      <translation>Несовместимая лицензия</translation>
+      <translation type="unfinished">Incompatible license</translation>
     </message>
     <message>
       <source>License you are trying to activate is incompatible with your software.</source>
-      <translation>Лицензия, которую вы пытаетесь активировать, несовместима с программным обеспечением.</translation>
+      <translation type="unfinished">License you are trying to activate is incompatible with your software.</translation>
     </message>
     <message>
       <source>To report the issue please contact %1.</source>
-      <translation>Чтобы сообщить о проблеме, пожалуйста, свяжитесь с %1.</translation>
+      <translation type="unfinished">To report the issue please contact %1.</translation>
     </message>
     <message>
       <source>Failed to activate license</source>
-      <translation>Не удалось активировать лицензию</translation>
+      <translation type="unfinished">Failed to activate license</translation>
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation>Получены недопустимые данные.</translation>
+      <translation type="unfinished">Invalid data received.</translation>
     </message>
     <message>
       <source>Database error occurred.</source>
-      <translation>Произошла ошибка базы данных.</translation>
+      <translation type="unfinished">Database error occurred.</translation>
     </message>
     <message>
       <source>Invalid License Key</source>
-      <translation>Недопустимый лицензионный ключ</translation>
+      <translation type="unfinished">Invalid License Key</translation>
     </message>
     <message>
       <source>Please make sure it is entered correctly.</source>
-      <translation>Пожалуйста, убедитесь, что он введен правильно.</translation>
+      <translation type="unfinished">Please make sure it is entered correctly.</translation>
     </message>
     <message>
       <source>Invalid activation key file</source>
-      <translation>Недопустимый файл с ключами активации</translation>
+      <translation type="unfinished">Invalid activation key file</translation>
     </message>
     <message>
       <source>Select a valid activation key file to continue.</source>
-      <translation>Выберите правильный ключ активации для продолжения.</translation>
+      <translation type="unfinished">Select a valid activation key file to continue.</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1</source>
-      <translation>Эта лицензия уже активирована и связана с аппаратным ID %1</translation>
+      <translation type="unfinished">This license is already activated and linked to Hardware ID %1</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-      <translation>Эта лицензия уже активирована и связана с аппаратным ID %1 на %2</translation>
+      <translation type="unfinished">This license is already activated and linked to Hardware ID %1 on %2</translation>
     </message>
     <message>
       <source>License already activated on another server</source>
-      <translation>Лицензия уже активирована на другом сервере</translation>
+      <translation type="unfinished">License already activated on another server</translation>
     </message>
     <message>
       <source>You already activated this license</source>
-      <translation>Вы уже активировали эту лицензию</translation>
+      <translation type="unfinished">You already activated this license</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
-      <translation>Чтобы активировать лицензионный ключ вручную, пожалуйста, свяжитесь с %1.</translation>
+      <translation type="unfinished">To activate License Key manually please contact %1.</translation>
     </message>
     <message>
       <source>Network error</source>
-      <translation>Сетевая ошибка</translation>
+      <translation type="unfinished">Network error</translation>
     </message>
     <message>
       <source>License activated</source>
-      <translation>Лицензия активирована</translation>
+      <translation type="unfinished">License activated</translation>
     </message>
     <message>
       <source>To report the issue please contact your Regional / License support:</source>
-      <translation>Чтобы сообщить о проблеме, обратитесь в региональную / лицензионную службу поддержки:</translation>
+      <translation type="unfinished">To report the issue please contact your Regional / License support:</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your Regional / License support:</source>
-      <translation>Чтобы активировать лицензионный ключ вручную, обратитесь в региональную / лицензионную службу поддержки:</translation>
+      <translation type="unfinished">To activate License Key manually please contact your Regional / License support:</translation>
     </message>
   </context>
   <context>
     <name>LicenseDeactivationDialogs</name>
     <message numerus="yes">
       <source>Failed to deactivate %n licenses</source>
-      <translation>
-        <numerusform>Не удалось деактивировать %n лицензию</numerusform>
-        <numerusform>Не удалось деактивировать %n лицензии</numerusform>
-        <numerusform>Не удалось деактивировать %n лицензий</numerusform>
-        <numerusform>Не удалось деактивировать %n лицензий</numerusform>
+      <translation type="unfinished">
+        <numerusform>Failed to deactivate %n licenses</numerusform>
+        <numerusform>Failed to deactivate %n licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n licenses cannot be deactivated</source>
-      <translation>
-        <numerusform>%1 из %n лицензий не может быть деактивирована</numerusform>
-        <numerusform>%1 из %n лицензий не могут быть деактивированы</numerusform>
-        <numerusform>%1 из %n лицензий не могут быть деактивированы</numerusform>
-        <numerusform>%1 из %n лицензий не могут быть деактивированы</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
-      <translation>
-        <numerusform>Деактивировать еще %n</numerusform>
-        <numerusform>Деактивировать еще %n</numerusform>
-        <numerusform>Деактивировать еще %n</numerusform>
-        <numerusform>Деактивировать еще %n</numerusform>
+      <translation type="unfinished">
+        <numerusform>Deactivate %n Other</numerusform>
+        <numerusform>Deactivate %n Other</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
-      <translation>
-        <numerusform>Не удалось деактивировать лицензию</numerusform>
-        <numerusform>Не удалось деактивировать лицензии</numerusform>
-        <numerusform>Не удалось деактивировать лицензии</numerusform>
-        <numerusform>Не удалось деактивировать лицензии</numerusform>
+      <translation type="unfinished">
+        <numerusform>Cannot deactivate licenses</numerusform>
+        <numerusform>Cannot deactivate licenses</numerusform>
       </translation>
     </message>
     <message>
       <source>Please try again later.</source>
-      <translation>Повторите попытку позже.</translation>
+      <translation type="unfinished">Please try again later.</translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
-      <translation>Не удается подключиться к серверу лицензий</translation>
+      <translation type="unfinished">Cannot connect to the License Server</translation>
     </message>
     <message>
       <source>Please make sure your server has active Internet connection or check firewall settings.</source>
-      <translation>Убедитесь, что ваш сервер имеет активное подключение к Интернету или проверьте настройки брандмауэра.</translation>
+      <translation type="unfinished">Please make sure your server has active Internet connection or check firewall settings.</translation>
     </message>
     <message>
       <source>License Server error</source>
-      <translation>Ошибка сервера лицензий</translation>
+      <translation type="unfinished">License Server error</translation>
     </message>
     <message>
       <source>Failed to remove license from Server</source>
-      <translation>Не удалось удалить лицензию с сервера</translation>
+      <translation type="unfinished">Failed to remove license from Server</translation>
     </message>
     <message numerus="yes">
       <source>%n licenses deactivated</source>
-      <translation>
-        <numerusform>%n лицензия деактивирована</numerusform>
-        <numerusform>%n лицензии деактивировано</numerusform>
-        <numerusform>%n лицензий деактивировано</numerusform>
-        <numerusform>%n лицензий деактивировано</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n licenses deactivated</numerusform>
+        <numerusform>%n licenses deactivated</numerusform>
       </translation>
     </message>
   </context>
@@ -1382,68 +1364,64 @@
     <name>LicenseManagementMessagesPrivate</name>
     <message numerus="yes">
       <source>%n channels.</source>
-      <translation>
-        <numerusform>%n канал.</numerusform>
-        <numerusform>%n канала.</numerusform>
-        <numerusform>%n каналов.</numerusform>
-        <numerusform>%n каналов.</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n channels.</numerusform>
+        <numerusform>%n channels.</numerusform>
       </translation>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
-      <translation>Чтобы получить действительный лицензионный ключ, пожалуйста, свяжитесь с %1.</translation>
+      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
-      <translation>Если проблема сохраняется, пожалуйста, свяжитесь с %1.</translation>
+      <translation type="unfinished">If the problem persists, please contact %1.</translation>
     </message>
     <message>
       <source>Please contact %1.</source>
-      <translation>Пожалуйста, свяжитесь с %1.</translation>
+      <translation type="unfinished">Please contact %1.</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact your Regional / License support:</source>
-      <translation>Чтобы получить действующий лицензионный ключ, обратитесь в региональную / лицензионную службу поддержки:</translation>
+      <translation type="unfinished">To get a valid License Key please contact your Regional / License support:</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your Regional / License support:</source>
-      <translation>Если проблема не устранена, обратитесь в региональную / лицензионную службу поддержки:</translation>
+      <translation type="unfinished">If the problem persists, please contact your Regional / License support:</translation>
     </message>
     <message>
       <source>Please contact your Regional / License support:</source>
-      <translation>Пожалуйста, обратитесь в региональную / лицензионную службу поддержки:</translation>
+      <translation type="unfinished">Please contact your Regional / License support:</translation>
     </message>
   </context>
   <context>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
-      <translation>Неправильный путь &quot;%1&quot;. Попробуйте другой путь.</translation>
+      <translation type="unfinished">Path &quot;%1&quot; is invalid. Please try another path.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; already exists. Please try another name.</source>
-      <translation>Файл &quot;%1&quot; уже существует. Попробуйте другое имя.</translation>
+      <translation type="unfinished">File &quot;%1&quot; already exists. Please try another name.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process.</source>
-      <translation>Файл &quot;%1&quot; используется другим процессом.</translation>
+      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
-      <translation>Файл &quot;%1&quot; не может быть записан. Попробуйте другое имя.</translation>
+      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
     </message>
     <message>
       <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation>Файл &quot;%1&quot; зарезервирован операционной системой. Попробуйте другое имя.</translation>
+      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
     </message>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
-      <translation>
-        <numerusform>Имя файла не должно содержать следующий зарезервированный символ:</numerusform>
-        <numerusform>Имя файла не должно содержать следующие зарезервированные символы:</numerusform>
-        <numerusform>Имя файла не должно содержать следующие зарезервированные символы:</numerusform>
-        <numerusform>Имя файла не должно содержать следующие зарезервированные символы:</numerusform>
+      <translation type="unfinished">
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
       </translation>
     </message>
   </context>
@@ -1451,272 +1429,260 @@
     <name>PasswordInformation</name>
     <message>
       <source>Good</source>
-      <translation>Хороший</translation>
+      <translation type="unfinished">Good</translation>
     </message>
     <message>
       <source>Fair</source>
-      <translation>Средний</translation>
+      <translation type="unfinished">Fair</translation>
     </message>
     <message>
       <source>Weak</source>
-      <translation>Слабый</translation>
+      <translation type="unfinished">Weak</translation>
     </message>
     <message>
       <source>Password should contain different types of symbols.</source>
-      <translation>Пароль должен содержать различные типы символов.</translation>
+      <translation type="unfinished">Password should contain different types of symbols.</translation>
     </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
-      <translation>
-        <numerusform>Пароль должен содержать %n различную комбинацию букв, символов или цифр</numerusform>
-        <numerusform>Пароль должен содержать %n различные комбинации букв, символов или цифр</numerusform>
-        <numerusform>Пароль должен содержать %n различных комбинаций букв, символов или цифр</numerusform>
-        <numerusform>Пароль должен содержать %n различных комбинаций букв, символов или цифр</numerusform>
+      <translation type="unfinished">
+        <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
+        <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
       </translation>
     </message>
     <message>
       <source>Short</source>
-      <translation>Короткий</translation>
+      <translation type="unfinished">Short</translation>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long.</source>
-      <translation>
-        <numerusform>Пароль должен содержать минимум %n символ.</numerusform>
-        <numerusform>Пароль должен содержать минимум %n символа.</numerusform>
-        <numerusform>Пароль должен содержать минимум %n символов.</numerusform>
-        <numerusform>Пароль должен содержать минимум %n символов.</numerusform>
+      <translation type="unfinished">
+        <numerusform>Password must be at least %n characters long.</numerusform>
+        <numerusform>Password must be at least %n characters long.</numerusform>
       </translation>
     </message>
     <message>
       <source>Long</source>
-      <translation>Длинный</translation>
+      <translation type="unfinished">Long</translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
-      <translation>
-        <numerusform>Пароль должен быть длиной не более %n символа.</numerusform>
-        <numerusform>Пароль должен быть длиной не более %n символов.</numerusform>
-        <numerusform>Пароль должен быть длиной не более %n символов.</numerusform>
-        <numerusform>Пароль должен быть длиной не более %n символов.</numerusform>
+      <translation type="unfinished">
+        <numerusform>Password must be no longer than %n characters.</numerusform>
+        <numerusform>Password must be no longer than %n characters.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together.</source>
-      <translation>
-        <numerusform>Пароль не должен содержать %n или более последовательных символов.</numerusform>
-        <numerusform>Пароль не должен содержать %n или более последовательных символов.</numerusform>
-        <numerusform>Пароль не должен содержать %n или более последовательных символов.</numerusform>
-        <numerusform>Пароль не должен содержать %n или более последовательных символов.</numerusform>
+      <translation type="unfinished">
+        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
+        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters.</source>
-      <translation>
-        <numerusform>Пароль не должен содержать %n или более повторяющихся символов.</numerusform>
-        <numerusform>Пароль не должен содержать %n или более повторяющихся символов.</numerusform>
-        <numerusform>Пароль не должен содержать %n или более повторяющихся символов.</numerusform>
-        <numerusform>Пароль не должен содержать %n или более повторяющихся символов.</numerusform>
+      <translation type="unfinished">
+        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
+        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
       </translation>
     </message>
     <message>
       <source>Common</source>
-      <translation>Типичный</translation>
+      <translation type="unfinished">Common</translation>
     </message>
     <message>
       <source>This password is in list of the most popular passwords.</source>
-      <translation>Этот пароль включён в список самых популярных паролей.</translation>
+      <translation type="unfinished">This password is in list of the most popular passwords.</translation>
     </message>
     <message>
       <source>Incorrect</source>
-      <translation>Некорректный</translation>
+      <translation type="unfinished">Incorrect</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation>Допускаются только латинские буквы, цифры и символы %1.</translation>
+      <translation type="unfinished">Only latin letters, numbers and keyboard symbols %1 are allowed.</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
-      <translation>Допускаются только латинские буквы, цифры и символы.</translation>
+      <translation type="unfinished">Only latin letters, numbers and keyboard symbols are allowed.</translation>
     </message>
   </context>
   <context>
     <name>PermissionsInfoTable</name>
     <message>
       <source>Cameras &amp; Resources</source>
-      <translation>Камеры и ресурсы</translation>
+      <translation type="unfinished">Cameras &amp; Resources</translation>
     </message>
     <message>
       <source>Shared Layouts</source>
-      <translation>Раскладки с общим доступом</translation>
+      <translation type="unfinished">Shared Layouts</translation>
     </message>
     <message>
       <source>Permissions</source>
-      <translation>Полномочия</translation>
+      <translation type="unfinished">Permissions</translation>
     </message>
     <message>
       <source>All</source>
       <comment>This will be a part of &quot;All Cameras &amp; Resources&quot; or &quot;All Shared Layouts&quot;</comment>
-      <translation>Все</translation>
+      <translation type="unfinished">All</translation>
     </message>
   </context>
   <context>
     <name>Ptz</name>
     <message>
       <source>Cannot get the current position from camera &quot;%1&quot;</source>
-      <translation>Не удаётся получить текущую позицию от камеры &quot;%1&quot;</translation>
+      <translation type="unfinished">Cannot get the current position from camera &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Please wait for the camera to go online.</source>
-      <translation>Пожалуйста дождитесь включения камеры.</translation>
+      <translation type="unfinished">Please wait for the camera to go online.</translation>
     </message>
     <message>
       <source>Failed to get current position</source>
-      <translation>Не удалось получить текущую позицию</translation>
+      <translation type="unfinished">Failed to get current position</translation>
     </message>
     <message>
       <source>Cannot set the current position for camera &quot;%1&quot;</source>
-      <translation>Не удаётся задать текущую позицию камеры &quot;%1&quot;</translation>
+      <translation type="unfinished">Cannot set the current position for camera &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Failed to set current position</source>
-      <translation>Не удалось задать текущую позицию</translation>
+      <translation type="unfinished">Failed to set current position</translation>
     </message>
     <message>
       <source>Preset used by some tours. Delete it anyway?</source>
-      <translation>Позиция используется в нескольких турах. Удалить ее?</translation>
+      <translation type="unfinished">Preset used by some tours. Delete it anyway?</translation>
     </message>
     <message>
       <source>These tours will become invalid.</source>
-      <translation>Эти туры станут недействительными.</translation>
+      <translation type="unfinished">These tours will become invalid.</translation>
     </message>
   </context>
   <context>
     <name>PtzInstrument</name>
     <message>
       <source>Layout is locked</source>
-      <translation>Раскладка заблокирована</translation>
+      <translation type="unfinished">Layout is locked</translation>
     </message>
     <message>
       <source>This camera does not support advanced PTZ</source>
-      <translation>Эта камера не поддерживает расширенные функции PTZ</translation>
+      <translation type="unfinished">This camera does not support advanced PTZ</translation>
     </message>
     <message>
       <source>Zooming out...</source>
-      <translation>Уменьшение...</translation>
+      <translation type="unfinished">Zooming out...</translation>
     </message>
     <message>
       <source>Moving...</source>
-      <translation>Перемещение...</translation>
+      <translation type="unfinished">Moving...</translation>
     </message>
     <message>
       <source>Zooming in...</source>
-      <translation>Увеличение...</translation>
+      <translation type="unfinished">Zooming in...</translation>
     </message>
     <message>
       <source>Focusing...</source>
-      <translation>Фокусировка...</translation>
+      <translation type="unfinished">Focusing...</translation>
     </message>
     <message>
       <source>PTZ can only be used in the live mode</source>
-      <translation>PTZ можно использовать только в режиме реального времени</translation>
+      <translation type="unfinished">PTZ can only be used in the live mode</translation>
     </message>
   </context>
   <context>
     <name>PtzOverlayWidget</name>
     <message>
       <source>Zoom In</source>
-      <translation>Приблизить</translation>
+      <translation type="unfinished">Zoom In</translation>
     </message>
     <message>
       <source>Zoom Out</source>
-      <translation>Отдалить</translation>
+      <translation type="unfinished">Zoom Out</translation>
     </message>
     <message>
       <source>Focus Far</source>
-      <translation>Отдалить фокус</translation>
+      <translation type="unfinished">Focus Far</translation>
     </message>
     <message>
       <source>Focus Near</source>
-      <translation>Приблизить фокус</translation>
+      <translation type="unfinished">Focus Near</translation>
     </message>
     <message>
       <source>Auto Focus</source>
-      <translation>Автофокусировка</translation>
+      <translation type="unfinished">Auto Focus</translation>
     </message>
     <message>
       <source>Change Dewarping Mode</source>
-      <translation>Изменить режим развёртки</translation>
+      <translation type="unfinished">Change Dewarping Mode</translation>
     </message>
   </context>
   <context>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation>Покинуть страницу? Сделанные изменения могут быть утеряны.</translation>
+      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
     </message>
   </context>
   <context>
     <name>QnAboutDialog</name>
     <message>
       <source>OpenGL version</source>
-      <translation>Версия OpenGL</translation>
+      <translation type="unfinished">OpenGL version</translation>
     </message>
     <message>
       <source>OpenGL renderer</source>
-      <translation>Движок OpenGL</translation>
+      <translation type="unfinished">OpenGL renderer</translation>
     </message>
     <message>
       <source>OpenGL vendor</source>
-      <translation>Производитель драйвера OpenGL</translation>
+      <translation type="unfinished">OpenGL vendor</translation>
     </message>
     <message>
       <source>OpenGL max texture size</source>
-      <translation>Размер текстур OpenGL</translation>
+      <translation type="unfinished">OpenGL max texture size</translation>
     </message>
     <message>
       <source>%1 version %2 (%3).</source>
-      <translation>%1 версии %2 (%3).</translation>
+      <translation type="unfinished">%1 version %2 (%3).</translation>
     </message>
     <message>
       <source>Built for %1-%2 with %3.</source>
-      <translation>Built for %1-%2 with %3.</translation>
+      <translation type="unfinished">Built for %1-%2 with %3.</translation>
     </message>
     <message>
       <source>Regional / License support</source>
-      <translation>Региональная / лицензионная служба поддержки</translation>
+      <translation type="unfinished">Regional / License support</translation>
     </message>
   </context>
   <context>
     <name>QnAbstractPtzDialog</name>
     <message>
       <source>Loading...</source>
-      <translation>Загрузка...</translation>
+      <translation type="unfinished">Loading...</translation>
     </message>
     <message>
       <source>Saving...</source>
-      <translation>Сохранение...</translation>
+      <translation type="unfinished">Saving...</translation>
     </message>
   </context>
   <context>
     <name>QnAccessibleLayoutsWidget</name>
     <message>
       <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
-      <translation>Предоставляя доступ для некоторых раскладок, вы даете доступ ко всем камерам на них. Также пользователь получит доступ ко всем новым камерам на этих раскладках.</translation>
+      <translation type="unfinished">Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</translation>
     </message>
   </context>
   <context>
     <name>QnAccessibleMediaWidget</name>
     <message>
       <source>Access granted by:</source>
-      <translation>Доступ предоставлен:</translation>
+      <translation type="unfinished">Access granted by:</translation>
     </message>
     <message numerus="yes">
       <source>and %n more</source>
-      <translation>
-        <numerusform>и еще %n</numerusform>
-        <numerusform>и еще %n</numerusform>
-        <numerusform>и еще %n</numerusform>
-        <numerusform>и еще %n</numerusform>
+      <translation type="unfinished">
+        <numerusform>and %n more</numerusform>
+        <numerusform>and %n more</numerusform>
       </translation>
     </message>
   </context>
@@ -1724,34 +1690,34 @@
     <name>QnAdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
-      <translation>Коррекция изображения</translation>
+      <translation type="unfinished">Image Enhancement</translation>
     </message>
     <message>
       <source>Image Enhancement - %1</source>
-      <translation>Коррекция изображенияt - %1</translation>
+      <translation type="unfinished">Image Enhancement - %1</translation>
     </message>
   </context>
   <context>
     <name>QnAdvancedSettingsWidget</name>
     <message>
       <source>Folder not found</source>
-      <translation>Папка не найдена</translation>
+      <translation type="unfinished">Folder not found</translation>
     </message>
     <message>
       <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
-      <translation>Помогает избежать проблем с отрисовкой OpenGL, приводящей к 100% загрузке процессора.</translation>
+      <translation type="unfinished">Helps avoid problems with OpenGL drawing which result in 100% CPU load.</translation>
     </message>
     <message>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
-      <translation>Откорректируйте до наименьшего значения, которое не ухудшает просмотр в реальном времени. Больший буфер делает воспроизведение более плавным, но увеличивает задержку между реальным и отображаемым временем; меньший буфер уменьшает задержку, но может привести к рывкам изображения.</translation>
+      <translation type="unfinished">Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</translation>
     </message>
     <message>
       <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
-      <translation>Предупреждение! Это экспериментальная опция, которая экономит процессор, но может повлиять на анимацию.</translation>
+      <translation type="unfinished">Warning! This is an experimental option that saves CPU but may affect animation.</translation>
     </message>
     <message>
       <source>Disabled</source>
-      <translation>Отключено</translation>
+      <translation type="unfinished">Disabled</translation>
     </message>
     <message>
       <source>Recommended</source>
@@ -1767,7 +1733,7 @@
     </message>
     <message>
       <source>Connect only servers with public certificate</source>
-      <translation>Подключайте только серверы с публичным сертификатом</translation>
+      <translation type="unfinished">Connect only servers with public certificate</translation>
     </message>
     <message>
       <source>Certificate storage will be cleared.</source>
@@ -1787,7 +1753,7 @@
     </message>
     <message>
       <source>Continue</source>
-      <translation>Продолжить</translation>
+      <translation type="unfinished">Continue</translation>
     </message>
     <message>
       <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
@@ -1798,142 +1764,128 @@
     <name>QnAuditItemDelegate</name>
     <message>
       <source>Play</source>
-      <translation>Воспроизведение</translation>
+      <translation type="unfinished">Play</translation>
     </message>
     <message>
       <source>User settings...</source>
-      <translation>Настройки пользователя...</translation>
+      <translation type="unfinished">User settings...</translation>
     </message>
     <message>
       <source>Server settings...</source>
-      <translation>Настройки сервера...</translation>
+      <translation type="unfinished">Server settings...</translation>
     </message>
     <message>
       <source>Camera settings...</source>
-      <translation>Настройки камеры...</translation>
+      <translation type="unfinished">Camera settings...</translation>
     </message>
   </context>
   <context>
     <name>QnAuditLogDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>Скопировать выделение в буфер обмена</translation>
+      <translation type="unfinished">Copy Selection to Clipboard</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>Экспорт выделения в файл...</translation>
+      <translation type="unfinished">Export Selection to File...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Выбрать всё</translation>
+      <translation type="unfinished">Select All</translation>
     </message>
     <message>
       <source>Export selected records to a file</source>
-      <translation>Выгрузить выбранные записи в файл</translation>
+      <translation type="unfinished">Export selected records to a file</translation>
     </message>
     <message>
       <source>Devices</source>
-      <translation>Устройства</translation>
+      <translation type="unfinished">Devices</translation>
     </message>
     <message>
       <source>Cameras</source>
-      <translation>Камеры</translation>
+      <translation type="unfinished">Cameras</translation>
     </message>
     <message>
       <source>Device actions</source>
-      <translation>Действия для устройств</translation>
+      <translation type="unfinished">Device actions</translation>
     </message>
     <message>
       <source>Camera actions</source>
-      <translation>Действия для камер</translation>
+      <translation type="unfinished">Camera actions</translation>
     </message>
     <message>
       <source>No sessions</source>
-      <translation>Нет сеансов</translation>
+      <translation type="unfinished">No sessions</translation>
     </message>
     <message>
       <source>No cameras</source>
-      <translation>Нет камер</translation>
+      <translation type="unfinished">No cameras</translation>
     </message>
     <message>
       <source>Select sessions to see their details</source>
-      <translation>Выберите сеансы, чтобы увидеть информацию</translation>
+      <translation type="unfinished">Select sessions to see their details</translation>
     </message>
     <message>
       <source>Select cameras to see their details</source>
-      <translation>Выберите камеры, чтобы увидеть информацию</translation>
+      <translation type="unfinished">Select cameras to see their details</translation>
     </message>
     <message>
       <source>No archive for this position</source>
-      <translation>Нет архивных записей для этой позиции</translation>
+      <translation type="unfinished">No archive for this position</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from System</source>
-      <translation>
-        <numerusform>Это устройство было удалено из системы</numerusform>
-        <numerusform>Эти устройства были удалены из системы</numerusform>
-        <numerusform>Эти устройства были удалены из системы</numerusform>
-        <numerusform>Эти устройства были удалены из системы</numerusform>
+      <translation type="unfinished">
+        <numerusform>These devices are removed from System</numerusform>
+        <numerusform>These devices are removed from System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from System</source>
-      <translation>
-        <numerusform>Эта камера была удалена из системы</numerusform>
-        <numerusform>Эти камеры были удалены из системы</numerusform>
-        <numerusform>Эти камеры были удалены из системы</numerusform>
-        <numerusform>Эти камеры были удалены из системы</numerusform>
+      <translation type="unfinished">
+        <numerusform>These cameras are removed from System</numerusform>
+        <numerusform>These cameras are removed from System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These servers are removed from System</source>
-      <translation>
-        <numerusform>Этот сервер был удален из системы</numerusform>
-        <numerusform>Эти серверы были удалены из системы</numerusform>
-        <numerusform>Эти серверы были удалены из системы</numerusform>
-        <numerusform>Эти серверы были удалены из системы</numerusform>
+      <translation type="unfinished">
+        <numerusform>These servers are removed from System</numerusform>
+        <numerusform>These servers are removed from System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These users are removed from System</source>
-      <translation>
-        <numerusform>Этот пользователь был удален из системы</numerusform>
-        <numerusform>Эти пользователи были удалены из системы</numerusform>
-        <numerusform>Эти пользователи были удалены из системы</numerusform>
-        <numerusform>Эти пользователи были удалены из системы</numerusform>
+      <translation type="unfinished">
+        <numerusform>These users are removed from System</numerusform>
+        <numerusform>These users are removed from System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from System</source>
-      <translation>
-        <numerusform>Этот ресурс был удален из системы</numerusform>
-        <numerusform>Эти ресурсы были удалены из системы</numerusform>
-        <numerusform>Эти ресурсы были удалены из системы</numerusform>
-        <numerusform>Эти ресурсы были удалены из системы</numerusform>
+      <translation type="unfinished">
+        <numerusform>These resources are removed from System</numerusform>
+        <numerusform>These resources are removed from System</numerusform>
       </translation>
     </message>
     <message>
       <source>Audit trail replay</source>
-      <translation>Воспроизвести журнал аудита</translation>
+      <translation type="unfinished">Audit trail replay</translation>
     </message>
     <message numerus="yes">
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation>
-        <numerusform>Детали по %n сеансу из %1</numerusform>
-        <numerusform>Детали по %n сеансам из %1</numerusform>
-        <numerusform>Детали по %n сеансам из %1</numerusform>
-        <numerusform>Детали по %n сеансам из %1</numerusform>
+      <translation type="unfinished">
+        <numerusform>Details for %n sessions of %1</numerusform>
+        <numerusform>Details for %n sessions of %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation>
-        <numerusform>Детали по %n камерe из %1</numerusform>
-        <numerusform>Детали по %n камерам из %1</numerusform>
-        <numerusform>Детали по %n камерам из %1</numerusform>
-        <numerusform>Детали по %n камерам из %1</numerusform>
+      <translation type="unfinished">
+        <numerusform>Details for %n cameras of %1</numerusform>
+        <numerusform>Details for %n cameras of %1</numerusform>
       </translation>
     </message>
   </context>
@@ -1941,195 +1893,191 @@
     <name>QnAuditLogModel</name>
     <message>
       <source>Unknown</source>
-      <translation>Неизвестно</translation>
+      <translation type="unfinished">Unknown</translation>
     </message>
     <message>
       <source>Unsuccessful login</source>
-      <translation>Неудачная попытка авторизации</translation>
+      <translation type="unfinished">Unsuccessful login</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation>Логин</translation>
+      <translation type="unfinished">Login</translation>
     </message>
     <message>
       <source>User updated</source>
-      <translation>Пользователь обновлен</translation>
+      <translation type="unfinished">User updated</translation>
     </message>
     <message>
       <source>Watching live</source>
-      <translation>Просмотр видео в реальном времени</translation>
+      <translation type="unfinished">Watching live</translation>
     </message>
     <message>
       <source>Watching archive</source>
-      <translation>Просмотр архива</translation>
+      <translation type="unfinished">Watching archive</translation>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation>Экспорт видео</translation>
+      <translation type="unfinished">Exporting video</translation>
     </message>
     <message>
       <source>System name changed</source>
-      <translation>Изменено имя системы</translation>
+      <translation type="unfinished">System name changed</translation>
     </message>
     <message>
       <source>System merge</source>
-      <translation>Объединение систем</translation>
+      <translation type="unfinished">System merge</translation>
     </message>
     <message>
       <source>General settings updated</source>
-      <translation>Изменение общих настроек</translation>
+      <translation type="unfinished">General settings updated</translation>
     </message>
     <message>
       <source>Server updated</source>
-      <translation>Сервер обновлён</translation>
+      <translation type="unfinished">Server updated</translation>
     </message>
     <message>
       <source>Server removed</source>
-      <translation>Сервер удалён</translation>
+      <translation type="unfinished">Server removed</translation>
     </message>
     <message>
       <source>User removed</source>
-      <translation>Пользователь удалён</translation>
+      <translation type="unfinished">User removed</translation>
     </message>
     <message>
       <source>Database restored</source>
-      <translation>Восстановлена база данных</translation>
+      <translation type="unfinished">Database restored</translation>
     </message>
     <message>
       <source>Session begins</source>
-      <translation>Начата сессия</translation>
+      <translation type="unfinished">Session begins</translation>
     </message>
     <message>
       <source>Session ends</source>
-      <translation>Сессия завершена</translation>
+      <translation type="unfinished">Session ends</translation>
     </message>
     <message>
       <source>Duration</source>
-      <translation>Длительность</translation>
+      <translation type="unfinished">Duration</translation>
     </message>
     <message>
       <source>User</source>
-      <translation>Пользователь</translation>
+      <translation type="unfinished">User</translation>
     </message>
     <message>
       <source>IP</source>
-      <translation>IP</translation>
+      <translation type="unfinished">IP</translation>
     </message>
     <message>
       <source>Activity</source>
-      <translation>Активность</translation>
+      <translation type="unfinished">Activity</translation>
     </message>
     <message>
       <source>Date</source>
-      <translation>Дата</translation>
+      <translation type="unfinished">Date</translation>
     </message>
     <message>
       <source>Time</source>
-      <translation>Время</translation>
+      <translation type="unfinished">Time</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>Описание</translation>
+      <translation type="unfinished">Description</translation>
     </message>
     <message>
       <source>Click to expand</source>
-      <translation>Нажмите, чтобы раскрыть</translation>
+      <translation type="unfinished">Click to expand</translation>
     </message>
     <message>
       <source>Device updated</source>
-      <translation>Устройство обновлено</translation>
+      <translation type="unfinished">Device updated</translation>
     </message>
     <message>
       <source>Camera updated</source>
-      <translation>Камера обновлена</translation>
+      <translation type="unfinished">Camera updated</translation>
     </message>
     <message>
       <source>Device added</source>
-      <translation>Устройство добавлено</translation>
+      <translation type="unfinished">Device added</translation>
     </message>
     <message>
       <source>Camera added</source>
-      <translation>Камера добавлена</translation>
+      <translation type="unfinished">Camera added</translation>
     </message>
     <message>
       <source>Device removed</source>
-      <translation>Устройство удалено</translation>
+      <translation type="unfinished">Device removed</translation>
     </message>
     <message>
       <source>Camera removed</source>
-      <translation>Камера удалена</translation>
+      <translation type="unfinished">Camera removed</translation>
     </message>
     <message>
       <source>Device name</source>
-      <translation>Имя устройства</translation>
+      <translation type="unfinished">Device name</translation>
     </message>
     <message>
       <source>Camera name</source>
-      <translation>Имя камеры</translation>
+      <translation type="unfinished">Camera name</translation>
     </message>
     <message>
       <source>Email settings changed</source>
-      <translation>Настройки Email изменены</translation>
+      <translation type="unfinished">Email settings changed</translation>
     </message>
     <message>
       <source>Filled circle mark means the archive is still available</source>
-      <translation>Сплошной кружок означает, что архив все ещё доступен</translation>
+      <translation type="unfinished">Filled circle mark means the archive is still available</translation>
     </message>
     <message>
       <source>Update installed</source>
-      <translation>Обновление установлено</translation>
+      <translation type="unfinished">Update installed</translation>
     </message>
     <message numerus="yes">
       <source>%n actions</source>
-      <translation>
-        <numerusform>%n действие</numerusform>
-        <numerusform>%n действия</numerusform>
-        <numerusform>%n действий</numerusform>
-        <numerusform>%n действий</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n actions</numerusform>
+        <numerusform>%n actions</numerusform>
       </translation>
     </message>
     <message>
       <source>Event rule changed</source>
-      <translation>Правило события изменено</translation>
+      <translation type="unfinished">Event rule changed</translation>
     </message>
     <message>
       <source>Event rule removed</source>
-      <translation>Правило события удалено</translation>
+      <translation type="unfinished">Event rule removed</translation>
     </message>
     <message>
       <source>Event rules reset to default</source>
-      <translation>Правила событий сброшены по умолчанию</translation>
+      <translation type="unfinished">Event rules reset to default</translation>
     </message>
     <message>
       <source>Storage added</source>
-      <translation>Хранилище добавлено</translation>
+      <translation type="unfinished">Storage added</translation>
     </message>
     <message>
       <source>Storage updated</source>
-      <translation>Хранилище обновлено</translation>
+      <translation type="unfinished">Storage updated</translation>
     </message>
     <message>
       <source>Storage removed</source>
-      <translation>Хранилище удалено</translation>
+      <translation type="unfinished">Storage removed</translation>
     </message>
     <message>
       <source>MitM Attack</source>
-      <translation>Атака "Человек посередине"</translation>
+      <translation type="unfinished">MitM Attack</translation>
     </message>
     <message>
       <source>MitM attack from server %1</source>
-      <translation>Атака "Человек посередине" с сервера %1</translation>
+      <translation type="unfinished">MitM attack from server %1</translation>
     </message>
   </context>
   <context>
     <name>QnBlinkingImageButtonWidget</name>
     <message numerus="yes">
       <source>You have %n notifications</source>
-      <translation>
-        <numerusform>У вас %n оповещение</numerusform>
-        <numerusform>У вас %n оповещения</numerusform>
-        <numerusform>У вас %n оповещений</numerusform>
-        <numerusform>У вас %n оповещений</numerusform>
+      <translation type="unfinished">
+        <numerusform>You have %n notifications</numerusform>
+        <numerusform>You have %n notifications</numerusform>
       </translation>
     </message>
   </context>
@@ -2137,177 +2085,167 @@
     <name>QnBookmarkWidget</name>
     <message>
       <source>Do not lock archive</source>
-      <translation>Удалять с архивом</translation>
+      <translation type="unfinished">Do not lock archive</translation>
     </message>
     <message>
       <source>1 month</source>
-      <translation>1 месяц</translation>
+      <translation type="unfinished">1 month</translation>
     </message>
     <message>
       <source>3 month</source>
-      <translation>3 месяца</translation>
+      <translation type="unfinished">3 month</translation>
     </message>
     <message>
       <source>6 month</source>
-      <translation>6 месяцев</translation>
+      <translation type="unfinished">6 month</translation>
     </message>
     <message>
       <source>year</source>
-      <translation>год</translation>
+      <translation type="unfinished">year</translation>
     </message>
     <message>
       <source>Name cannot be empty.</source>
-      <translation>Имя не может быть пустым.</translation>
+      <translation type="unfinished">Name cannot be empty.</translation>
     </message>
     <message>
       <source>Description cannot be empty</source>
-      <translation>Описание не может быть пустым</translation>
+      <translation type="unfinished">Description cannot be empty</translation>
     </message>
   </context>
   <context>
     <name>QnBusinessResourceValidationStrings</name>
     <message numerus="yes">
       <source>%1 of %n devices</source>
-      <translation>
-        <numerusform>%1 из %n устройств</numerusform>
-        <numerusform>%1 из %n устройств</numerusform>
-        <numerusform>%1 из %n устройств</numerusform>
-        <numerusform>%1 из %n устройств</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 of %n devices</numerusform>
+        <numerusform>%1 of %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n cameras</source>
-      <translation>
-        <numerusform>%1 из %n камер</numerusform>
-        <numerusform>%1 из %n камер</numerusform>
-        <numerusform>%1 из %n камер</numerusform>
-        <numerusform>%1 из %n камер</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 of %n cameras</numerusform>
+        <numerusform>%1 of %n cameras</numerusform>
       </translation>
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation>Выберите хотя бы одно устройство</translation>
+      <translation type="unfinished">Select at least one device</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation>Выберите хотя бы одну камеру</translation>
+      <translation type="unfinished">Select at least one camera</translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n I/O modules</source>
-      <translation>
-        <numerusform>%1 из %n модулей ввода/вывода</numerusform>
-        <numerusform>%1 из %n модулей ввода/вывода</numerusform>
-        <numerusform>%1 из %n модулей ввода/вывода</numerusform>
-        <numerusform>%1 из %n модулей ввода/вывода</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 of %n I/O modules</numerusform>
+        <numerusform>%1 of %n I/O modules</numerusform>
       </translation>
     </message>
     <message>
       <source>Any Device</source>
-      <translation>Любое устройство</translation>
+      <translation type="unfinished">Any Device</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation>Любая Камера</translation>
+      <translation type="unfinished">Any Camera</translation>
     </message>
   </context>
   <context>
     <name>QnBusinessRuleItemDelegate</name>
     <message>
       <source>Manage Bookmarks</source>
-      <translation>Управление закладками</translation>
+      <translation type="unfinished">Manage Bookmarks</translation>
     </message>
   </context>
   <context>
     <name>QnBusinessRuleViewModel</name>
     <message>
       <source>Error: %1</source>
-      <translation>Ошибка: %1</translation>
+      <translation type="unfinished">Error: %1</translation>
     </message>
     <message>
       <source>Instant</source>
-      <translation>Мгновенно</translation>
+      <translation type="unfinished">Instant</translation>
     </message>
     <message>
       <source>Stops</source>
-      <translation>Кончается</translation>
+      <translation type="unfinished">Stops</translation>
     </message>
     <message>
       <source>Starts</source>
-      <translation>Начинается</translation>
+      <translation type="unfinished">Starts</translation>
     </message>
     <message>
       <source>Occurs</source>
-      <translation>Произошло</translation>
+      <translation type="unfinished">Occurs</translation>
     </message>
     <message>
       <source>N/A</source>
-      <translation>Нет</translation>
+      <translation type="unfinished">N/A</translation>
     </message>
     <message>
       <source>Every %1</source>
-      <translation>Каждый %1</translation>
+      <translation type="unfinished">Every %1</translation>
     </message>
     <message>
       <source>System</source>
-      <translation>Система</translation>
+      <translation type="unfinished">System</translation>
     </message>
     <message>
       <source>Any Server</source>
-      <translation>Любой сервер</translation>
+      <translation type="unfinished">Any Server</translation>
     </message>
     <message>
       <source>Any Device</source>
-      <translation>Любое устройство</translation>
+      <translation type="unfinished">Any Device</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation>Любая Камера</translation>
+      <translation type="unfinished">Any Camera</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation>
-        <numerusform>%n Server</numerusform>
-        <numerusform>%n сервера</numerusform>
-        <numerusform>%n серверов</numerusform>
-        <numerusform>%n Server</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n Servers</numerusform>
+        <numerusform>%n Servers</numerusform>
       </translation>
     </message>
     <message>
       <source>User</source>
-      <translation>Пользователь</translation>
+      <translation type="unfinished">User</translation>
     </message>
     <message>
       <source>Source Server</source>
-      <translation>Исходный сервер</translation>
+      <translation type="unfinished">Source Server</translation>
     </message>
     <message>
       <source>Source Camera</source>
-      <translation>Исходная камера</translation>
+      <translation type="unfinished">Source Camera</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation>
-        <numerusform>Исходная камера и ещё %n камера</numerusform>
-        <numerusform>Исходная камера и ещё %n камеры</numerusform>
-        <numerusform>Исходная камера и ещё %n камер</numerusform>
-        <numerusform>Исходная камера и ещё %n камер</numerusform>
+      <translation type="unfinished">
+        <numerusform>Source and %n more Cameras</numerusform>
+        <numerusform>Source and %n more Cameras</numerusform>
       </translation>
     </message>
     <message>
       <source>Select at least one Device</source>
-      <translation>Выберите хотя бы одно устройство</translation>
+      <translation type="unfinished">Select at least one Device</translation>
     </message>
     <message>
       <source>Select at least one Camera</source>
-      <translation>Выберите хотя бы одну камеру</translation>
+      <translation type="unfinished">Select at least one Camera</translation>
     </message>
     <message>
       <source>Select Server</source>
-      <translation>Выберите сервер</translation>
+      <translation type="unfinished">Select Server</translation>
     </message>
     <message>
       <source>Source Server and %1</source>
-      <translation>Исходный сервер и %1</translation>
+      <translation type="unfinished">Source Server and %1</translation>
     </message>
   </context>
   <context>
@@ -2315,159 +2253,157 @@
     <message>
       <source>to</source>
       <extracomment>&quot;to&quot; is from the sentence &quot;Send email _to_:&quot;</extracomment>
-      <translation>кому</translation>
+      <translation type="unfinished">to</translation>
     </message>
     <message>
       <source>at</source>
       <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
-      <translation>на</translation>
+      <translation type="unfinished">at</translation>
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation>Выберите хотя бы одно устройство</translation>
+      <translation type="unfinished">Select at least one device</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation>Выберите хотя бы одну камеру</translation>
+      <translation type="unfinished">Select at least one camera</translation>
     </message>
     <message>
       <source>Devices</source>
-      <translation>Устройства</translation>
+      <translation type="unfinished">Devices</translation>
     </message>
     <message>
       <source>Cameras</source>
-      <translation>Камеры</translation>
+      <translation type="unfinished">Cameras</translation>
     </message>
     <message>
       <source>Any Device</source>
-      <translation>Любое устройство</translation>
+      <translation type="unfinished">Any Device</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation>Любая Камера</translation>
+      <translation type="unfinished">Any Camera</translation>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
-      <translation>Принудительное подтверждение будет работать только для произвольных событий, если в URL события используются идентификаторы камеры</translation>
+      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</translation>
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation>Большое время предварительной записи увеличит использование оперативной памяти на сервере</translation>
+      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
     </message>
   </context>
   <context>
     <name>QnBusinessRulesDialog</name>
     <message>
       <source>&amp;New...</source>
-      <translation>&amp;Создать...</translation>
+      <translation type="unfinished">&amp;New...</translation>
     </message>
     <message>
       <source>&amp;Delete</source>
-      <translation>&amp;Удалить</translation>
+      <translation type="unfinished">&amp;Delete</translation>
     </message>
     <message>
       <source>&amp;Schedule...</source>
-      <translation>&amp;Расписание...</translation>
+      <translation type="unfinished">&amp;Schedule...</translation>
     </message>
     <message>
       <source>Restore All Rules to Default</source>
-      <translation>Восстановить все правила по умолчанию</translation>
+      <translation type="unfinished">Restore All Rules to Default</translation>
     </message>
     <message>
       <source>No event rules</source>
-      <translation>Нет правил событий</translation>
+      <translation type="unfinished">No event rules</translation>
     </message>
     <message>
       <source>Filter by devices...</source>
-      <translation>Фильтр по устройствам...</translation>
+      <translation type="unfinished">Filter by devices...</translation>
     </message>
     <message>
       <source>Filter by cameras...</source>
-      <translation>Фильтр по камерам...</translation>
+      <translation type="unfinished">Filter by cameras...</translation>
     </message>
     <message>
       <source>Failed to retrieve rules</source>
-      <translation>Не удалось получить правила</translation>
+      <translation type="unfinished">Failed to retrieve rules</translation>
     </message>
     <message>
       <source>Failed to save rule</source>
-      <translation>Не удалось сохранить правило</translation>
+      <translation type="unfinished">Failed to save rule</translation>
     </message>
     <message>
       <source>Apply changes before exit?</source>
-      <translation>Применить изменения перед выходом?</translation>
+      <translation type="unfinished">Apply changes before exit?</translation>
     </message>
     <message>
       <source>This action cannot be undone.</source>
-      <translation>Это действие нельзя будет отменить.</translation>
+      <translation type="unfinished">This action cannot be undone.</translation>
     </message>
     <message>
       <source>Restore all rules to default?</source>
-      <translation>Восстановить все правила по умолчанию?</translation>
+      <translation type="unfinished">Restore all rules to default?</translation>
     </message>
     <message>
       <source>Some rules are not valid and may not work</source>
-      <translation>Некоторые правила недействительны и могут не работать</translation>
+      <translation type="unfinished">Some rules are not valid and may not work</translation>
     </message>
   </context>
   <context>
     <name>QnBusinessRulesViewModel</name>
     <message>
       <source>On</source>
-      <translation>Вкл</translation>
+      <translation type="unfinished">On</translation>
     </message>
     <message>
       <source>Event</source>
-      <translation>Событие</translation>
+      <translation type="unfinished">Event</translation>
     </message>
     <message>
       <source>Source</source>
-      <translation>Источник</translation>
+      <translation type="unfinished">Source</translation>
     </message>
     <message>
       <source>Action</source>
-      <translation>Действие</translation>
+      <translation type="unfinished">Action</translation>
     </message>
     <message>
       <source>Target</source>
-      <translation>Объект</translation>
+      <translation type="unfinished">Target</translation>
     </message>
     <message>
       <source>Interval of Action</source>
-      <translation>Интервал срабатывания</translation>
+      <translation type="unfinished">Interval of Action</translation>
     </message>
   </context>
   <context>
     <name>QnBuzzerPolicy</name>
     <message>
       <source>Servers that support buzzer</source>
-      <translation>Серверы, поддерживающие зуммер</translation>
+      <translation type="unfinished">Servers that support buzzer</translation>
     </message>
   </context>
   <context>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
-      <translation>Аналитика недоступна для %1</translation>
+      <translation type="unfinished">Analytics is not available for %1</translation>
     </message>
   </context>
   <context>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
       <source>Select device</source>
-      <translation>Выбор устройства</translation>
+      <translation type="unfinished">Select device</translation>
     </message>
     <message>
       <source>Select camera</source>
-      <translation>Выберите камеру</translation>
+      <translation type="unfinished">Select camera</translation>
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
-      <translation>
-        <numerusform>%1 не поддерживает двусторонний звук</numerusform>
-        <numerusform>%1 не поддерживают двусторонний звук</numerusform>
-        <numerusform>%1 не поддерживают двусторонний звук</numerusform>
-        <numerusform>%1 не поддерживают двусторонний звук</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 does not support two-way audio</numerusform>
+        <numerusform>%1 does not support two-way audio</numerusform>
       </translation>
     </message>
   </context>
@@ -2475,89 +2411,87 @@
     <name>QnCameraDiagnosticsDialog</name>
     <message>
       <source>OK</source>
-      <translation>ОК</translation>
+      <translation type="unfinished">OK</translation>
     </message>
     <message>
       <source>FAILED: %1</source>
-      <translation>ОШИБКА: %1</translation>
+      <translation type="unfinished">FAILED: %1</translation>
     </message>
     <message>
       <source>Confirming server availability.</source>
-      <translation>Проверка доступности сервера.</translation>
+      <translation type="unfinished">Confirming server availability.</translation>
     </message>
     <message>
       <source>Evaluating media stream for errors.</source>
-      <translation>Проверка корректности медиапотока.</translation>
+      <translation type="unfinished">Evaluating media stream for errors.</translation>
     </message>
     <message>
       <source>Diagnostics for device %1</source>
-      <translation>Диагностика устройства %1</translation>
+      <translation type="unfinished">Diagnostics for device %1</translation>
     </message>
     <message>
       <source>Diagnostics for camera %1</source>
-      <translation>Диагностика камеры %1</translation>
+      <translation type="unfinished">Diagnostics for camera %1</translation>
     </message>
     <message>
       <source>Device Diagnostics</source>
-      <translation>Диагностика устройства</translation>
+      <translation type="unfinished">Device Diagnostics</translation>
     </message>
     <message>
       <source>Camera Diagnostics</source>
-      <translation>Диагностика камеры</translation>
+      <translation type="unfinished">Camera Diagnostics</translation>
     </message>
     <message>
       <source>Confirming device is accessible.</source>
-      <translation>Устройство доступно.</translation>
+      <translation type="unfinished">Confirming device is accessible.</translation>
     </message>
     <message>
       <source>Confirming camera is accessible.</source>
-      <translation>Камера доступна.</translation>
+      <translation type="unfinished">Confirming camera is accessible.</translation>
     </message>
     <message>
       <source>Confirming target device provides media stream.</source>
-      <translation>Выбранное устройство предоставляет медиа-поток.</translation>
+      <translation type="unfinished">Confirming target device provides media stream.</translation>
     </message>
     <message>
       <source>Confirming target camera provides media stream.</source>
-      <translation>Выбранная камера предоставляет медиа-поток.</translation>
+      <translation type="unfinished">Confirming target camera provides media stream.</translation>
     </message>
     <message>
       <source>Diagnostics for I/O module %1</source>
-      <translation>Диагностика модуля ввода/вывода %1</translation>
+      <translation type="unfinished">Diagnostics for I/O module %1</translation>
     </message>
     <message>
       <source>I/O Module Diagnostics</source>
-      <translation>Диагностика модуля ввода/вывода</translation>
+      <translation type="unfinished">I/O Module Diagnostics</translation>
     </message>
     <message>
       <source>Confirming I/O module is accessible.</source>
-      <translation>Подтверждение доступности модуля ввода/вывода.</translation>
+      <translation type="unfinished">Confirming I/O module is accessible.</translation>
     </message>
     <message>
       <source>Confirming target I/O module provides media stream.</source>
-      <translation>Подтверждение получения данных с модуля ввода/вывода.</translation>
+      <translation type="unfinished">Confirming target I/O module provides media stream.</translation>
     </message>
     <message>
       <source>Diagnostics complete</source>
-      <translation>Диагностика завершена</translation>
+      <translation type="unfinished">Diagnostics complete</translation>
     </message>
   </context>
   <context>
     <name>QnCameraInputBusinessEventWidget</name>
     <message>
       <source>automatic</source>
-      <translation>автоматическая</translation>
+      <translation type="unfinished">automatic</translation>
     </message>
   </context>
   <context>
     <name>QnCameraInputPolicy</name>
     <message numerus="yes">
       <source>%1 have no input ports</source>
-      <translation>
-        <numerusform>%1 не имеет тревожных входов</numerusform>
-        <numerusform>%1 не имеют тревожных входов</numerusform>
-        <numerusform>%1 не имеют тревожных входов</numerusform>
-        <numerusform>%1 не имеют тревожных входов</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 have no input ports</numerusform>
+        <numerusform>%1 have no input ports</numerusform>
       </translation>
     </message>
   </context>
@@ -2565,140 +2499,132 @@
     <name>QnCameraListDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>Скопировать в буфер обмена</translation>
+      <translation type="unfinished">Copy Selection to Clipboard</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>Экспорт выделения в файл...</translation>
+      <translation type="unfinished">Export Selection to File...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Выбрать все</translation>
+      <translation type="unfinished">Select All</translation>
     </message>
     <message>
       <source>Devices List</source>
-      <translation>Список устройств</translation>
+      <translation type="unfinished">Devices List</translation>
     </message>
     <message>
       <source>Cameras List</source>
-      <translation>Список камер</translation>
+      <translation type="unfinished">Cameras List</translation>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation>
-        <numerusform>Найдено %n устройство</numerusform>
-        <numerusform>Найдено %n устройства</numerusform>
-        <numerusform>Найдено %n устройств</numerusform>
-        <numerusform>Найдено %n устройств</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n devices found</numerusform>
+        <numerusform>%n devices found</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras found</source>
-      <translation>
-        <numerusform>Найдено %n камера</numerusform>
-        <numerusform>Найдено %n камеры</numerusform>
-        <numerusform>Найдено %n камер</numerusform>
-        <numerusform>Найдено %n камер</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n cameras found</numerusform>
+        <numerusform>%n cameras found</numerusform>
       </translation>
     </message>
     <message>
       <source>Export selected devices to a file.</source>
-      <translation>Экспортировать выбранные устройства в файл.</translation>
+      <translation type="unfinished">Export selected devices to a file.</translation>
     </message>
     <message>
       <source>Export selected cameras to a file.</source>
-      <translation>Экспортировать выбранные камеры в файл.</translation>
+      <translation type="unfinished">Export selected cameras to a file.</translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules found</source>
-      <translation>
-        <numerusform>Найдено %n модуль ввода-вывода</numerusform>
-        <numerusform>Найдено %n модуля ввода-вывода</numerusform>
-        <numerusform>Найдено %n модулей ввода-вывода</numerusform>
-        <numerusform>Найдено %n модулей ввода-вывода</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n I/O modules found</numerusform>
+        <numerusform>%n I/O modules found</numerusform>
       </translation>
     </message>
     <message>
       <source>No cameras</source>
-      <translation>Нет камер</translation>
+      <translation type="unfinished">No cameras</translation>
     </message>
     <message>
       <source>Devices List for %1</source>
       <comment>%1 will be substituted with a server name</comment>
-      <translation>Список устройств %1</translation>
+      <translation type="unfinished">Devices List for %1</translation>
     </message>
     <message>
       <source>Cameras List for %1</source>
       <comment>%1 will be substituted with a server name</comment>
-      <translation>Список камер %1</translation>
+      <translation type="unfinished">Cameras List for %1</translation>
     </message>
   </context>
   <context>
     <name>QnCameraListModel</name>
     <message>
       <source>Recording</source>
-      <translation>Запись</translation>
+      <translation type="unfinished">Recording</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation>Имя</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation>Производитель</translation>
+      <translation type="unfinished">Vendor</translation>
     </message>
     <message>
       <source>Model</source>
-      <translation>Модель</translation>
+      <translation type="unfinished">Model</translation>
     </message>
     <message>
       <source>Firmware</source>
-      <translation>Прошивка</translation>
+      <translation type="unfinished">Firmware</translation>
     </message>
     <message>
       <source>IP/Name</source>
-      <translation>IP/Имя хоста</translation>
+      <translation type="unfinished">IP/Name</translation>
     </message>
     <message>
       <source>MAC address</source>
-      <translation>MAC адрес</translation>
+      <translation type="unfinished">MAC address</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation>Сервер</translation>
+      <translation type="unfinished">Server</translation>
     </message>
     <message>
       <source>ID</source>
-      <translation>Идентификатор</translation>
+      <translation type="unfinished">ID</translation>
     </message>
     <message>
       <source>Logical ID</source>
-      <translation>Логический ID</translation>
+      <translation type="unfinished">Logical ID</translation>
     </message>
   </context>
   <context>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>Запись или детекция движения отключены для %1</translation>
+      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
     </message>
   </context>
   <context>
     <name>QnCameraOutputBusinessActionWidget</name>
     <message>
       <source>automatic</source>
-      <translation>автоматическая</translation>
+      <translation type="unfinished">automatic</translation>
     </message>
   </context>
   <context>
     <name>QnCameraOutputPolicy</name>
     <message numerus="yes">
       <source>%1 have no output relays</source>
-      <translation>
-        <numerusform>%1 не имеет тревожных выходов</numerusform>
-        <numerusform>%1 не имеют тревожных выходов</numerusform>
-        <numerusform>%1 не имеют тревожных выходов</numerusform>
-        <numerusform>%1 не имеют тревожных выходов</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 have no output relays</numerusform>
+        <numerusform>%1 have no output relays</numerusform>
       </translation>
     </message>
   </context>
@@ -2706,57 +2632,57 @@
     <name>QnCameraPasswordChangeDialog</name>
     <message>
       <source>New Password</source>
-      <translation>Новый пароль</translation>
+      <translation type="unfinished">New Password</translation>
     </message>
     <message>
       <source>Repeat Password</source>
-      <translation>Повторите Пароль</translation>
+      <translation type="unfinished">Repeat Password</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
-      <translation>Введённые пароли не совпадают.</translation>
+      <translation type="unfinished">Passwords do not match.</translation>
     </message>
     <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
-      <translation>Пароль должен содержать не менее 8 символов и содержать разные типы символов.</translation>
+      <translation type="unfinished">Password should be at least 8 symbols long and contain different types of characters.</translation>
     </message>
     <message>
       <source>Password should not be equal to camera&apos;s user name</source>
-      <translation>Пароль на камере не должен быть такой же как имя пользователя</translation>
+      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
     </message>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation>Запись для %1 отключена</translation>
+      <translation type="unfinished">Recording is disabled for %1</translation>
     </message>
   </context>
   <context>
     <name>QnChangeUserPasswordDialog</name>
     <message>
       <source>New Password</source>
-      <translation>Новый пароль</translation>
+      <translation type="unfinished">New Password</translation>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation>Подтверждение пароля</translation>
+      <translation type="unfinished">Confirm Password</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
-      <translation>Введённые пароли не совпадают.</translation>
+      <translation type="unfinished">Passwords do not match.</translation>
     </message>
     <message>
       <source>Current Password</source>
-      <translation>Текущий пароль</translation>
+      <translation type="unfinished">Current Password</translation>
     </message>
     <message>
       <source>To modify your password please enter the existing one.</source>
-      <translation>Чтобы изменить свой пароль, пожалуйста, введите существующий.</translation>
+      <translation type="unfinished">To modify your password please enter the existing one.</translation>
     </message>
     <message>
       <source>Invalid current password.</source>
-      <translation>Текущий пароль неверен.</translation>
+      <translation type="unfinished">Invalid current password.</translation>
     </message>
   </context>
   <context>
@@ -2765,43 +2691,43 @@
       <source>Connect to your Systems
 from anywhere with any
 devices</source>
-      <translation>Подключайтесь к системам 
-из любого места 
-с любых устройств</translation>
+      <translation type="unfinished">Connect to your Systems
+from anywhere with any
+devices</translation>
     </message>
     <message>
       <source>Disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Отключить систему от %1</translation>
+      <translation type="unfinished">Disconnect System from %1</translation>
     </message>
     <message>
       <source>Open %1 Portal</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Открыть портал %1</translation>
+      <translation type="unfinished">Open %1 Portal</translation>
     </message>
     <message>
       <source>Connect System to %1...</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Подключить систему к %1...</translation>
+      <translation type="unfinished">Connect System to %1...</translation>
     </message>
     <message>
       <source>Create %1
 account</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Создать учётную 
-запись %1</translation>
+      <translation type="unfinished">Create %1
+account</translation>
     </message>
     <message>
       <source>Connect System
 to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Подключить 
-систему к %1</translation>
+      <translation type="unfinished">Connect System
+to %1</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Подробнее о %1</translation>
+      <translation type="unfinished">Learn more about %1</translation>
     </message>
     <message>
       <source>Enter your account password to disconnect System from %1</source>
@@ -2810,7 +2736,7 @@ to %1</source>
     </message>
     <message>
       <source>Disconnect</source>
-      <translation>Отключить</translation>
+      <translation type="unfinished">Disconnect</translation>
     </message>
     <message>
       <source>System disconnected from %1</source>
@@ -2825,7 +2751,7 @@ to %1</source>
     <message>
       <source>All %1 users will be deleted.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>Все %1 пользователи будут удалены.</translation>
+      <translation type="unfinished">All %1 users will be deleted.</translation>
     </message>
     <message>
       <source>You will be logged out.</source>
@@ -2837,7 +2763,7 @@ to %1</source>
     </message>
     <message>
       <source>Continue</source>
-      <translation>Продолжить</translation>
+      <translation type="unfinished">Continue</translation>
     </message>
     <message>
       <source>Cannot disconnect the System from %1</source>
@@ -2849,92 +2775,92 @@ to %1</source>
     <name>QnCloudResultInfo</name>
     <message>
       <source>Successful.</source>
-      <translation>Успешно.</translation>
+      <translation type="unfinished">Successful.</translation>
     </message>
     <message>
       <source>Invalid login or password.</source>
-      <translation>Неверный логин или пароль.</translation>
+      <translation type="unfinished">Invalid login or password.</translation>
     </message>
     <message>
       <source>Requested operation is not allowed with provided credentials.</source>
-      <translation>Запрошенная операция недопустима для данной учётной записи.</translation>
+      <translation type="unfinished">Requested operation is not allowed with provided credentials.</translation>
     </message>
     <message>
       <source>This account is not activated. Please check your email.</source>
-      <translation>Учётная запись неактивна. Пожалуйста, проверьте почту.</translation>
+      <translation type="unfinished">This account is not activated. Please check your email.</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation>Слишком много попыток. Повторите позже.</translation>
+      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
-      <translation>Ошибка сети. Пожалуйста, проверьте ваше интернет-соединение и попробуйте снова.</translation>
+      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
     </message>
     <message>
       <source>Invalid login.</source>
-      <translation>Неверный логин.</translation>
+      <translation type="unfinished">Invalid login.</translation>
     </message>
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>%1 временно недоступен. Пожалуйста, повторите попытку позже.</translation>
+      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
     </message>
     <message>
       <source>Credentials are no longer valid.</source>
-      <translation>Учётные данные больше не действительны.</translation>
+      <translation type="unfinished">Credentials are no longer valid.</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Внутренняя ошибка %1. Обратитесь в службу поддержки.</translation>
+      <translation type="unfinished">Internal %1 error. Please contact support team.</translation>
     </message>
   </context>
   <context>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Account not found</source>
-      <translation>Учетная запись не найдена</translation>
+      <translation type="unfinished">Account not found</translation>
     </message>
     <message>
       <source>Account is not activated.</source>
-      <translation>Учетная запись не активирована.</translation>
+      <translation type="unfinished">Account is not activated.</translation>
     </message>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
       <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
-      <translation>Пожалуйста, войдите в %1 и следуйте инструкциям.</translation>
+      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
     </message>
     <message>
       <source>Invalid password</source>
-      <translation>Неверный пароль</translation>
+      <translation type="unfinished">Invalid password</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation>Слишком много попыток. Повторите позже.</translation>
+      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
     </message>
   </context>
   <context>
     <name>QnCloudStatusPanel</name>
     <message>
       <source>Logging in...</source>
-      <translation>Вход...</translation>
+      <translation type="unfinished">Logging in...</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Не удаётся подключиться к %1</translation>
+      <translation type="unfinished">Cannot connect to %1</translation>
     </message>
     <message>
       <source>Connect to Server</source>
-      <translation>Подключиться к серверу</translation>
+      <translation type="unfinished">Connect to Server</translation>
     </message>
   </context>
   <context>
     <name>QnCloudUserPanelWidget</name>
     <message>
       <source>Account Settings</source>
-      <translation>Настройки учётной записи</translation>
+      <translation type="unfinished">Account Settings</translation>
     </message>
   </context>
   <context>
@@ -2942,11 +2868,9 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
       <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation>
-        <numerusform>%n из %1 выбранных пользователей не является %2 пользователем и не будут получать мобильные уведомления.</numerusform>
-        <numerusform>%n из %1 выбранных пользователей не являются %2 пользователями и не будут получать мобильные уведомления.</numerusform>
-        <numerusform>%n из %1 выбранных пользователей не являются %2 пользователями и не будут получать мобильные уведомления.</numerusform>
-        <numerusform>%n из %1 выбранных пользователей не являются %2 пользователями и не будут получать мобильные уведомления.</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
+        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
       </translation>
     </message>
   </context>
@@ -2954,73 +2878,73 @@ to %1</source>
     <name>QnConnectionDiagnosticsHelper</name>
     <message>
       <source>Please close the application and start it again using the shortcut in the start menu.</source>
-      <translation>Похалуйста закройте приложение и запустите его, используя ярлык в меню Пуск.</translation>
+      <translation type="unfinished">Please close the application and start it again using the shortcut in the start menu.</translation>
     </message>
     <message>
       <source>Failed to connect to Server</source>
-      <translation>Не удалось подключиться к серверу</translation>
+      <translation type="unfinished">Failed to connect to Server</translation>
     </message>
     <message>
       <source>Client and Server have different versions</source>
-      <translation>Клиент и сервер имеют разные версии</translation>
+      <translation type="unfinished">Client and Server have different versions</translation>
     </message>
     <message>
       <source>Client - %1</source>
       <comment>%1 is version</comment>
-      <translation>Клиент - %1</translation>
+      <translation type="unfinished">Client - %1</translation>
     </message>
     <message>
       <source>Server - %1</source>
       <comment>%1 is version</comment>
-      <translation>Сервер - %1</translation>
+      <translation type="unfinished">Server - %1</translation>
     </message>
     <message>
       <source>Download Client version %1?</source>
-      <translation>Скачать версию %1?</translation>
+      <translation type="unfinished">Download Client version %1?</translation>
     </message>
     <message>
       <source>Restart</source>
-      <translation>Перезагрузить</translation>
+      <translation type="unfinished">Restart</translation>
     </message>
     <message>
       <source>Failed to download and launch version %1</source>
-      <translation>Не удалось загрузить и запустить версию %1</translation>
+      <translation type="unfinished">Failed to download and launch version %1</translation>
     </message>
     <message>
       <source>Try Again</source>
-      <translation>Повторить</translation>
+      <translation type="unfinished">Try Again</translation>
     </message>
     <message>
       <source>Failed to restart %1 in compatibility mode</source>
-      <translation>Не удалось перезапустить %1 в режиме совместимости</translation>
+      <translation type="unfinished">Failed to restart %1 in compatibility mode</translation>
     </message>
     <message>
       <source>Please close %1 and start it again using the shortcut in the start menu.</source>
-      <translation>Пожалуйста, закройте %1 и запустите его заново, используя ярлык в меню Пуск.</translation>
+      <translation type="unfinished">Please close %1 and start it again using the shortcut in the start menu.</translation>
     </message>
     <message>
       <source>You have to download another version of %1 to connect to this Server.</source>
-      <translation>Требуется скачать другую версию %1 для подключения к этому серверу.</translation>
+      <translation type="unfinished">You have to download another version of %1 to connect to this Server.</translation>
     </message>
     <message>
       <source>You have to restart %1 in compatibility mode to connect to this Server.</source>
-      <translation>Требуется перезапустить %1 в режиме совместимости для подключения к этому серверу.</translation>
+      <translation type="unfinished">You have to restart %1 in compatibility mode to connect to this Server.</translation>
     </message>
     <message>
       <source>Restart %1 in compatibility mode?</source>
-      <translation>Перезапустить %1 в режиме совместимости?</translation>
+      <translation type="unfinished">Restart %1 in compatibility mode?</translation>
     </message>
     <message>
       <source>Failed to restart %1</source>
-      <translation>Не удалось перезапустить %1</translation>
+      <translation type="unfinished">Failed to restart %1</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation>Загрузить и установить</translation>
+      <translation type="unfinished">Download &amp;&amp; Install</translation>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
-      <translation>Не удалось перейти в режим совместимости для версии %1</translation>
+      <translation type="unfinished">Failed to enter compatibility mode for version %1</translation>
     </message>
     <message>
       <source>System is not compatible with two-factor authentication</source>
@@ -3035,82 +2959,82 @@ to %1</source>
     <name>QnCustomBusinessEventWidget</name>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation>Если поле пустое, событие всегда будет вызываться.</translation>
+      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
-      <translation>Событие будет срабатывать только в том случае, если в источнике есть совпадения с любым из введенных ключевых слов.</translation>
+      <translation type="unfinished">Event will trigger only if there are matches in the source with any of the entered keywords.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>Событие будет срабатывать только в том случае, если в заголовке есть совпадения с любым из введенных ключевых слов.</translation>
+      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
-      <translation>Событие будет срабатывать только в том случае, если в описании есть совпадения с любым из введенных ключевых слов.</translation>
+      <translation type="unfinished">Event will trigger only if there are matches in the description with any of the entered keywords.</translation>
     </message>
     <message>
       <source>Server API</source>
-      <translation>API сервера</translation>
+      <translation type="unfinished">Server API</translation>
     </message>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
-      <translation>Для создания произвольного события см. %1.</translation>
+      <translation type="unfinished">To generate Generic Event, please refer to %1.</translation>
     </message>
   </context>
   <context>
     <name>QnDatabaseManagementWidget</name>
     <message>
       <source>Save Database Backup...</source>
-      <translation>Сохранить резервную копию БД...</translation>
+      <translation type="unfinished">Save Database Backup...</translation>
     </message>
     <message>
       <source>Downloading Database Backup</source>
-      <translation>Загружается резервная копия БД</translation>
+      <translation type="unfinished">Downloading Database Backup</translation>
     </message>
     <message>
       <source>Database backup is being downloaded from the server. Please wait.</source>
-      <translation>Резервная копия БД загружается с сервера. Пожалуйста, подождите.</translation>
+      <translation type="unfinished">Database backup is being downloaded from the server. Please wait.</translation>
     </message>
     <message>
       <source>Open Database Backup...</source>
-      <translation>Открыть резервную копию БД...</translation>
+      <translation type="unfinished">Open Database Backup...</translation>
     </message>
     <message>
       <source>Restoring Database Backup</source>
-      <translation>Восстанавливаю БД</translation>
+      <translation type="unfinished">Restoring Database Backup</translation>
     </message>
     <message>
       <source>Database backup is being uploaded to the server. Please wait.</source>
-      <translation>Резервная копия БД загружается на сервер. Пожалуйста, подождите.</translation>
+      <translation type="unfinished">Database backup is being uploaded to the server. Please wait.</translation>
     </message>
     <message>
       <source>Failed to back up database</source>
-      <translation>Не удалось создать резервную копию базы данных</translation>
+      <translation type="unfinished">Failed to back up database</translation>
     </message>
     <message>
       <source>Database backed up to file</source>
-      <translation>Резервное копирование базы данных в файл выполнено</translation>
+      <translation type="unfinished">Database backed up to file</translation>
     </message>
     <message>
       <source>Failed to open file</source>
-      <translation>Не удалось открыть файл</translation>
+      <translation type="unfinished">Failed to open file</translation>
     </message>
     <message>
       <source>Database successfully restored</source>
-      <translation>База данных успешно восстановлена</translation>
+      <translation type="unfinished">Database successfully restored</translation>
     </message>
     <message>
       <source>Server application will restart shortly.</source>
-      <translation>Сервер будет перезагружен в ближайшее время.</translation>
+      <translation type="unfinished">Server application will restart shortly.</translation>
     </message>
     <message>
       <source>Failed to restore database</source>
-      <translation>Не удалось восстановить базу данных</translation>
+      <translation type="unfinished">Failed to restore database</translation>
     </message>
     <message>
       <source>Database Backup Files</source>
-      <translation>Файл резервной копии базы данных</translation>
+      <translation type="unfinished">Database Backup Files</translation>
     </message>
     <message>
       <source>Save Database Backup</source>
@@ -3122,7 +3046,7 @@ to %1</source>
     </message>
     <message>
       <source>Create</source>
-      <translation>Создать</translation>
+      <translation type="unfinished">Create</translation>
     </message>
     <message>
       <source>Restore from Database Backup</source>
@@ -3134,205 +3058,191 @@ to %1</source>
     </message>
     <message>
       <source>Restore</source>
-      <translation>Восстановить</translation>
+      <translation type="unfinished">Restore</translation>
     </message>
     <message>
       <source>Restore database?</source>
-      <translation>Восстановить базу данных?</translation>
+      <translation type="unfinished">Restore database?</translation>
     </message>
     <message>
       <source>System configuration will be restored from backup, Server application will be restarted.</source>
-      <translation>Конфигурация системы будет восстановлена из резервной копии, сервер будет перезапущен.</translation>
+      <translation type="unfinished">System configuration will be restored from backup, Server application will be restarted.</translation>
     </message>
   </context>
   <context>
     <name>QnDesktopDataProvider</name>
     <message>
       <source>Could not find video encoder %1.</source>
-      <translation>Невозможно обнаружить видео кодек %1.</translation>
+      <translation type="unfinished">Could not find video encoder %1.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation>Невозможно инициализировать видео кодек.</translation>
+      <translation type="unfinished">Could not initialize video encoder.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Невозможно инициализировать звуковой кодек.</translation>
+      <translation type="unfinished">Could not initialize audio encoder.</translation>
     </message>
     <message>
       <source>Could not start primary audio device.</source>
-      <translation>Невозможно инициализировать первичное звуковое устройство.</translation>
+      <translation type="unfinished">Could not start primary audio device.</translation>
     </message>
     <message>
       <source>Screen width must be a multiple of 8.</source>
-      <translation>Ширина экрана должна быть кратна 8.</translation>
+      <translation type="unfinished">Screen width must be a multiple of 8.</translation>
     </message>
     <message>
       <source>Could not initialize audio device &quot;%1&quot;.</source>
-      <translation>Невозможно инициализировать звуковое устройство &quot;%1&quot;.</translation>
+      <translation type="unfinished">Could not initialize audio device &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Could not detect capturing resolution</source>
-      <translation>Не удалось обнаружить разрешение захвата</translation>
+      <translation type="unfinished">Could not detect capturing resolution</translation>
     </message>
     <message>
       <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation>Устройство захвата звука не поддерживает подходящие аудиоформаты. Выберите другое аудиоустройство или &quot;нет&quot; в настройках записи экрана.</translation>
+      <translation type="unfinished">The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
     </message>
   </context>
   <context>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
       <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation>Режим Panic Recording переключает параметры записи для всех камер на максимальную частоту кадров и качество.</translation>
+      <translation type="unfinished">Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</translation>
     </message>
   </context>
   <context>
     <name>QnEventLogDialog</name>
     <message>
       <source>Filter Similar Rows</source>
-      <translation>Отфильтровать похожие строки</translation>
+      <translation type="unfinished">Filter Similar Rows</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>Скопировать в буфер обмена</translation>
+      <translation type="unfinished">Copy Selection to Clipboard</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>Экспорт выделенного в файл...</translation>
+      <translation type="unfinished">Export Selection to File...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Выделить все</translation>
+      <translation type="unfinished">Select All</translation>
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation>Очистить фильтр</translation>
+      <translation type="unfinished">Clear Filter</translation>
     </message>
     <message>
       <source>Export selected events to file</source>
-      <translation>Экспорт выбранных событий в файл</translation>
+      <translation type="unfinished">Export selected events to file</translation>
     </message>
     <message>
       <source>Any Action</source>
-      <translation>Любое действие</translation>
+      <translation type="unfinished">Any Action</translation>
     </message>
     <message>
       <source>No events</source>
-      <translation>Нет событий</translation>
+      <translation type="unfinished">No events</translation>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
-      <translation>
-        <numerusform>Журнал событий за период с %1 по %2 - найдено %n событиe</numerusform>
-        <numerusform>Журнал событий за период с %1 по %2 - найдено %n событиz</numerusform>
-        <numerusform>Журнал событий за период с %1 по %2 - найдено %n событий</numerusform>
-        <numerusform>Журнал событий за период с %1 по %2 - найдено %n событий</numerusform>
+      <translation type="unfinished">
+        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
-      <translation>
-        <numerusform>Журнал событий за %1 - найдено %n событие</numerusform>
-        <numerusform>Журнал событий за %1 - найдено %n события</numerusform>
-        <numerusform>Журнал событий за %1 - найдено %n событий</numerusform>
-        <numerusform>Журнал событий за %1 - найдено %n событий</numerusform>
+      <translation type="unfinished">
+        <numerusform>Event log for %1 - %n events found</numerusform>
+        <numerusform>Event log for %1 - %n events found</numerusform>
       </translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>Описание</translation>
+      <translation type="unfinished">Description</translation>
     </message>
   </context>
   <context>
     <name>QnEventLogModel</name>
     <message>
       <source>Motion video</source>
-      <translation>Движение в видео</translation>
+      <translation type="unfinished">Motion video</translation>
     </message>
     <message>
       <source>Date/Time</source>
-      <translation>Дата/Время</translation>
+      <translation type="unfinished">Date/Time</translation>
     </message>
     <message>
       <source>Event</source>
-      <translation>Событие</translation>
+      <translation type="unfinished">Event</translation>
     </message>
     <message>
       <source>Source</source>
-      <translation>Источник</translation>
+      <translation type="unfinished">Source</translation>
     </message>
     <message>
       <source>Action</source>
-      <translation>Действие</translation>
+      <translation type="unfinished">Action</translation>
     </message>
     <message>
       <source>Target</source>
-      <translation>Объект</translation>
+      <translation type="unfinished">Target</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>Описание</translation>
+      <translation type="unfinished">Description</translation>
     </message>
     <message>
       <source>All users</source>
-      <translation>Все пользователи</translation>
+      <translation type="unfinished">All users</translation>
     </message>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation>
-        <numerusform>%1 из (%n раза)</numerusform>
-        <numerusform>%1 из (%n раз)</numerusform>
-        <numerusform>%1 из (%n раз)</numerusform>
-        <numerusform>%1 из (%n раза)</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 (%n times)</numerusform>
+        <numerusform>%1 (%n times)</numerusform>
       </translation>
     </message>
     <message>
       <source>Open camera</source>
-      <translation>Открыть камеру</translation>
+      <translation type="unfinished">Open camera</translation>
     </message>
     <message numerus="yes">
       <source>and %n users more...</source>
-      <translation>
-        <numerusform>and %n more user...</numerusform>
-        <numerusform>and %n more users...</numerusform>
-        <numerusform>и ещё %n пользователей...</numerusform>
-        <numerusform>and %n more users...</numerusform>
+      <translation type="unfinished">
+        <numerusform>and %n users more...</numerusform>
+        <numerusform>and %n users more...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>and %n more...</source>
-      <translation>
-        <numerusform>и ещё %n...</numerusform>
-        <numerusform>и ещё %n...</numerusform>
-        <numerusform>и ещё %n...</numerusform>
-        <numerusform>и ещё %n...</numerusform>
+      <translation type="unfinished">
+        <numerusform>and %n more...</numerusform>
+        <numerusform>and %n more...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Removed subjects</source>
-      <translation>
-        <numerusform>%n удаленный объект</numerusform>
-        <numerusform>%n удаленных объекта</numerusform>
-        <numerusform>%n удаленных объектов</numerusform>
-        <numerusform>%n удаленных объектов</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n Removed subjects</numerusform>
+        <numerusform>%n Removed subjects</numerusform>
       </translation>
     </message>
     <message>
       <source>Subject removed</source>
-      <translation>Тема удалена</translation>
+      <translation type="unfinished">Subject removed</translation>
     </message>
     <message numerus="yes">
       <source>%1 (%n cameras)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation>
-        <numerusform>%1 (%n камера)</numerusform>
-        <numerusform>%1 (%n камеры)</numerusform>
-        <numerusform>%1 (%n камер)</numerusform>
-        <numerusform>%1 (%n камер)</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 (%n cameras)</numerusform>
+        <numerusform>%1 (%n cameras)</numerusform>
       </translation>
     </message>
   </context>
@@ -3340,238 +3250,238 @@ to %1</source>
     <name>QnExecHttpRequestActionWidget</name>
     <message>
       <source>Auto</source>
-      <translation>Авто</translation>
+      <translation type="unfinished">Auto</translation>
     </message>
     <message>
       <source>Basic</source>
-      <translation>Основной</translation>
+      <translation type="unfinished">Basic</translation>
     </message>
   </context>
   <context>
     <name>QnExecPtzPresetPolicy</name>
     <message>
       <source>Select exactly one camera</source>
-      <translation>Выберите ровно одну камеру</translation>
+      <translation type="unfinished">Select exactly one camera</translation>
     </message>
     <message>
       <source>%1 has no PTZ presets</source>
-      <translation>У %1 нет настроенных позиций PTZ</translation>
+      <translation type="unfinished">%1 has no PTZ presets</translation>
     </message>
   </context>
   <context>
     <name>QnFanErrorPolicy</name>
     <message>
       <source>Servers that support fan diagnostic</source>
-      <translation>Серверы, которые поддерживают диагностику вентиляторов</translation>
+      <translation type="unfinished">Servers that support fan diagnostic</translation>
     </message>
   </context>
   <context>
     <name>QnFileMessages</name>
     <message>
       <source>Overwrite existing file?</source>
-      <translation>Перезаписать существующий файл?</translation>
+      <translation type="unfinished">Overwrite existing file?</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation>Не удалось перезаписать файл</translation>
+      <translation type="unfinished">Failed to overwrite file</translation>
     </message>
   </context>
   <context>
     <name>QnFullscreenCameraActionWidget</name>
     <message>
       <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation>Этой камеры нет на некоторых выбранных раскладках. Действие будет работать, если камера будет добавлена ​​до срабатывания события.</translation>
+      <translation type="unfinished">This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation>Эта камера не добавлена на некоторые выбранные раскладки. Действие будет работать, если камера будет добавлена ​​до срабатывания события.</translation>
+      <translation type="unfinished">This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</translation>
     </message>
   </context>
   <context>
     <name>QnFullscreenCameraPolicy</name>
     <message>
       <source>Select exactly one camera</source>
-      <translation>Выберите ровно одну камеру</translation>
+      <translation type="unfinished">Select exactly one camera</translation>
     </message>
   </context>
   <context>
     <name>QnGLCheckerInstrument</name>
     <message>
       <source>Video card drivers are outdated or not installed</source>
-      <translation>Драйверы видеокарты устарели или не установлены</translation>
+      <translation type="unfinished">Video card drivers are outdated or not installed</translation>
     </message>
     <message>
       <source>%1 may not work properly.</source>
-      <translation>%1 может работать некорректно.</translation>
+      <translation type="unfinished">%1 may not work properly.</translation>
     </message>
   </context>
   <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
-      <translation>Выбрать каталог...</translation>
+      <translation type="unfinished">Select folder...</translation>
     </message>
     <message>
       <source>Folder already added</source>
-      <translation>Папка уже добавлена</translation>
+      <translation type="unfinished">Folder already added</translation>
     </message>
     <message>
       <source>None</source>
-      <translation>Нет</translation>
+      <translation type="unfinished">None</translation>
     </message>
     <message>
       <source>Auto (%1)</source>
-      <translation>Авто (%1)</translation>
+      <translation type="unfinished">Auto (%1)</translation>
     </message>
   </context>
   <context>
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
       <source>Open Event Log</source>
-      <translation>Открыть журнал событий</translation>
+      <translation type="unfinished">Open Event Log</translation>
     </message>
     <message>
       <source>Open Bookmarks List</source>
-      <translation>Открыть закладки</translation>
+      <translation type="unfinished">Open Bookmarks List</translation>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation>Правила событий</translation>
+      <translation type="unfinished">Event Rules</translation>
     </message>
     <message>
       <source>Event Log</source>
-      <translation>Журнал событий</translation>
+      <translation type="unfinished">Event Log</translation>
     </message>
     <message>
       <source>Audit Trail</source>
-      <translation>Аудит</translation>
+      <translation type="unfinished">Audit Trail</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Закладки</translation>
+      <translation type="unfinished">Bookmarks</translation>
     </message>
     <message>
       <source>Device List</source>
-      <translation>Список устройств</translation>
+      <translation type="unfinished">Device List</translation>
     </message>
     <message>
       <source>Camera List</source>
-      <translation>Список камер</translation>
+      <translation type="unfinished">Camera List</translation>
     </message>
     <message>
       <source>Open Event Rules Management</source>
-      <translation>Открыть настройку правил связей с событиями</translation>
+      <translation type="unfinished">Open Event Rules Management</translation>
     </message>
     <message>
       <source>Open Audit Trail Log</source>
-      <translation>Открыть журнал аудита</translation>
+      <translation type="unfinished">Open Audit Trail Log</translation>
     </message>
     <message>
       <source>Open Device List</source>
-      <translation>Открыть список устройств</translation>
+      <translation type="unfinished">Open Device List</translation>
     </message>
     <message>
       <source>Open Camera List</source>
-      <translation>Открыть список камер</translation>
+      <translation type="unfinished">Open Camera List</translation>
     </message>
     <message>
       <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation>Резервное копирование включает в себя настройки серверов и камер, пользователей, веб-страницы, правила событий и т. Д. Видео не сохраняется.</translation>
+      <translation type="unfinished">Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</translation>
     </message>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation>Cоздает резервную копию системных настроек для восстановления в случае краха системы.</translation>
+      <translation type="unfinished">Creates a backup of System configuration that can be restored in case of failure.</translation>
     </message>
   </context>
   <context>
     <name>QnHistogramWidget</name>
     <message>
       <source>Gamma %1</source>
-      <translation>Гамма %1</translation>
+      <translation type="unfinished">Gamma %1</translation>
     </message>
   </context>
   <context>
     <name>QnIOPortsViewModel</name>
     <message>
       <source>Type</source>
-      <translation>Тип</translation>
+      <translation type="unfinished">Type</translation>
     </message>
     <message>
       <source>Default state</source>
-      <translation>По умолчанию</translation>
+      <translation type="unfinished">Default state</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation>Имя</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Unknown</source>
       <comment>IO Port Type</comment>
-      <translation>Неизвестно</translation>
+      <translation type="unfinished">Unknown</translation>
     </message>
     <message>
       <source>Disabled</source>
       <comment>IO Port Type</comment>
-      <translation>Отключено</translation>
+      <translation type="unfinished">Disabled</translation>
     </message>
     <message>
       <source>Input</source>
       <comment>IO Port Type</comment>
-      <translation>Вход</translation>
+      <translation type="unfinished">Input</translation>
     </message>
     <message>
       <source>Output</source>
       <comment>IO Port Type</comment>
-      <translation>Выход</translation>
+      <translation type="unfinished">Output</translation>
     </message>
     <message>
       <source>Invalid</source>
       <comment>IO Port Type</comment>
-      <translation>Некорректный</translation>
+      <translation type="unfinished">Invalid</translation>
     </message>
     <message>
       <source>Grounded circuit</source>
       <comment>IO Port State</comment>
-      <translation>Заземлённая цепь</translation>
+      <translation type="unfinished">Grounded circuit</translation>
     </message>
     <message>
       <source>Invalid state</source>
       <comment>IO Port State</comment>
-      <translation>Некорректное состояние</translation>
+      <translation type="unfinished">Invalid state</translation>
     </message>
     <message>
       <source>On click</source>
-      <translation>По щелчку</translation>
+      <translation type="unfinished">On click</translation>
     </message>
     <message>
       <source>Duration</source>
-      <translation>Длительность</translation>
+      <translation type="unfinished">Duration</translation>
     </message>
     <message>
       <source>Open circuit</source>
       <comment>IO Port State</comment>
-      <translation>Разомкнутая цепь</translation>
+      <translation type="unfinished">Open circuit</translation>
     </message>
     <message>
       <source>Toggle state</source>
       <comment>IO Output Port Action</comment>
-      <translation>Переключение состояния</translation>
+      <translation type="unfinished">Toggle state</translation>
     </message>
     <message>
       <source>Impulse</source>
       <comment>IO Output Port Action</comment>
-      <translation>Импульс</translation>
+      <translation type="unfinished">Impulse</translation>
     </message>
     <message>
       <source>ID</source>
-      <translation>Идентификатор</translation>
+      <translation type="unfinished">ID</translation>
     </message>
   </context>
   <context>
     <name>QnInputDialog</name>
     <message>
       <source>Please enter a value.</source>
-      <translation>Пожалуйста, введите значение.</translation>
+      <translation type="unfinished">Please enter a value.</translation>
     </message>
     <message>
       <source>Please enter a password.</source>
@@ -3582,480 +3492,464 @@ to %1</source>
     <name>QnIoModuleOverlayWidgetPrivate</name>
     <message>
       <source>Failed to turn off I/O port %1</source>
-      <translation>Не удалось отключить %1 порт ввода-вывода</translation>
+      <translation type="unfinished">Failed to turn off I/O port %1</translation>
     </message>
     <message>
       <source>Failed to turn on I/O port %1</source>
-      <translation>Не удалось включить %1 порт ввода/вывода</translation>
+      <translation type="unfinished">Failed to turn on I/O port %1</translation>
     </message>
   </context>
   <context>
     <name>QnLdapSettingsDialog</name>
     <message>
       <source>Test</source>
-      <translation>Проверка</translation>
+      <translation type="unfinished">Test</translation>
     </message>
     <message>
       <source>Test failed</source>
-      <translation>Проверка не удалась</translation>
+      <translation type="unfinished">Test failed</translation>
     </message>
     <message numerus="yes">
       <source>Test completed successfully: %n users found.</source>
-      <translation>
-        <numerusform>Проверка завершилась успешно: найден %n пользователь.</numerusform>
-        <numerusform>Проверка завершилась успешно: найдены %n пользователя.</numerusform>
-        <numerusform>Проверка завершилась успешно: найдено %n пользователей.</numerusform>
-        <numerusform>Проверка завершилась успешно: найден %n пользователь.</numerusform>
+      <translation type="unfinished">
+        <numerusform>Test completed successfully: %n users found.</numerusform>
+        <numerusform>Test completed successfully: %n users found.</numerusform>
       </translation>
     </message>
     <message>
       <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
-      <translation>Изменение любых параметров LDAP, кроме фильтра, приведет к потере связи для всех пользователей, выбранных для LDAP.</translation>
+      <translation type="unfinished">Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</translation>
     </message>
   </context>
   <context>
     <name>QnLdapSettingsDialogPrivate</name>
     <message>
       <source>The provided settings are not valid.</source>
-      <translation>Указанные настройки не верны.</translation>
+      <translation type="unfinished">The provided settings are not valid.</translation>
     </message>
     <message>
       <source>Could not perform a test.</source>
-      <translation>Невозможно выполнить проверку.</translation>
+      <translation type="unfinished">Could not perform a test.</translation>
     </message>
     <message>
       <source>Timed Out</source>
-      <translation>Время ожидания истекло</translation>
+      <translation type="unfinished">Timed Out</translation>
     </message>
   </context>
   <context>
     <name>QnLdapUserListModel</name>
     <message>
       <source>Login</source>
-      <translation>Логин</translation>
+      <translation type="unfinished">Login</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation type="unfinished">Email</translation>
     </message>
     <message>
       <source>DN</source>
-      <translation>DN</translation>
+      <translation type="unfinished">DN</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation>Имя</translation>
+      <translation type="unfinished">Name</translation>
     </message>
   </context>
   <context>
     <name>QnLdapUsersDialog</name>
     <message>
       <source>The provided settings are not valid.</source>
-      <translation>Указанные настройки не верны.</translation>
+      <translation type="unfinished">The provided settings are not valid.</translation>
     </message>
     <message>
       <source>Could not perform a test.</source>
-      <translation>Невозможно выполнить проверку.</translation>
+      <translation type="unfinished">Could not perform a test.</translation>
     </message>
     <message>
       <source>Could not load users.</source>
-      <translation>Невозможно загрузить пользователей.</translation>
+      <translation type="unfinished">Could not load users.</translation>
     </message>
     <message>
       <source>Error while loading users.</source>
-      <translation>Ошибка при загрузке пользователей.</translation>
+      <translation type="unfinished">Error while loading users.</translation>
     </message>
     <message>
       <source>No new users found.</source>
-      <translation>Новые пользователи не найдены.</translation>
+      <translation type="unfinished">No new users found.</translation>
     </message>
     <message>
       <source>Timed Out</source>
-      <translation>Время ожидания истекло</translation>
+      <translation type="unfinished">Timed Out</translation>
     </message>
     <message>
       <source>Import Selected</source>
-      <translation>Импортировать выбранных</translation>
+      <translation type="unfinished">Import Selected</translation>
     </message>
   </context>
   <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>License Type</source>
-      <translation>Тип лицензии</translation>
+      <translation type="unfinished">License Type</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation>Ключ</translation>
+      <translation type="unfinished">License Key</translation>
     </message>
     <message>
       <source>Locked to Hardware ID</source>
-      <translation>Привязано к аппаратному ID</translation>
+      <translation type="unfinished">Locked to Hardware ID</translation>
     </message>
     <message>
       <source>Generic</source>
-      <translation>Общее</translation>
+      <translation type="unfinished">Generic</translation>
     </message>
     <message>
       <source>Features</source>
-      <translation>Особенности</translation>
+      <translation type="unfinished">Features</translation>
     </message>
     <message>
       <source>Screens Allowed</source>
-      <translation>Разрешённое число экранов</translation>
+      <translation type="unfinished">Screens Allowed</translation>
     </message>
     <message>
       <source>Control Sessions Allowed</source>
-      <translation>Разрешённое число управляемых подключений</translation>
+      <translation type="unfinished">Control Sessions Allowed</translation>
     </message>
     <message>
       <source>Archive Streams Allowed</source>
-      <translation>Разрешённое число потоков записи</translation>
+      <translation type="unfinished">Archive Streams Allowed</translation>
     </message>
     <message>
       <source>Deactivations Remaining</source>
-      <translation>Оставшиеся деактивации</translation>
+      <translation type="unfinished">Deactivations Remaining</translation>
     </message>
   </context>
   <context>
     <name>QnLicenseListModel</name>
     <message>
       <source>Type</source>
-      <translation>Тип</translation>
+      <translation type="unfinished">Type</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation>Ключ</translation>
+      <translation type="unfinished">License Key</translation>
     </message>
     <message>
       <source>Status</source>
-      <translation>Статус</translation>
+      <translation type="unfinished">Status</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation>Сервер</translation>
+      <translation type="unfinished">Server</translation>
     </message>
     <message>
       <source>Never</source>
-      <translation>Никогда</translation>
+      <translation type="unfinished">Never</translation>
     </message>
     <message>
       <source>Expired</source>
-      <translation>Срок закончен</translation>
+      <translation type="unfinished">Expired</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation>ОК</translation>
+      <translation type="unfinished">OK</translation>
     </message>
     <message>
       <source>Error</source>
-      <translation>Ошибка</translation>
+      <translation type="unfinished">Error</translation>
     </message>
     <message>
       <source>Server not found</source>
-      <translation>Сервер не найден</translation>
+      <translation type="unfinished">Server not found</translation>
     </message>
     <message>
       <source>Expires</source>
-      <translation>Срок действия</translation>
+      <translation type="unfinished">Expires</translation>
     </message>
     <message>
       <source>License is active</source>
-      <translation>Лицензия активна</translation>
+      <translation type="unfinished">License is active</translation>
     </message>
     <message>
       <source>License is expired</source>
-      <translation>Истёк срок действия лицензии</translation>
+      <translation type="unfinished">License is expired</translation>
     </message>
     <message>
       <source>Expires soon</source>
-      <translation>Срок действия скоро истекает</translation>
+      <translation type="unfinished">Expires soon</translation>
     </message>
     <message>
       <source>License expires today</source>
-      <translation>Срок действия истекает сегодня</translation>
+      <translation type="unfinished">License expires today</translation>
     </message>
     <message>
       <source>License expires tomorrow</source>
-      <translation>Срок действия истекает завтра</translation>
+      <translation type="unfinished">License expires tomorrow</translation>
     </message>
     <message numerus="yes">
       <source>License expires in %n days</source>
-      <translation>
-        <numerusform>License expires in %n day</numerusform>
-        <numerusform>Срок действия истекает через %n дня</numerusform>
-        <numerusform>Срок действия истекает через %n дней</numerusform>
-        <numerusform>License expires in %n day</numerusform>
+      <translation type="unfinished">
+        <numerusform>License expires in %n days</numerusform>
+        <numerusform>License expires in %n days</numerusform>
       </translation>
     </message>
     <message>
       <source>Channels</source>
-      <translation>Канала</translation>
+      <translation type="unfinished">Channels</translation>
     </message>
   </context>
   <context>
     <name>QnLicenseManagerWidget</name>
     <message>
       <source>Export</source>
-      <translation>Экспорт</translation>
+      <translation type="unfinished">Export</translation>
     </message>
     <message>
       <source>Export licenses to a file</source>
-      <translation>Экспорт лицензий в файл</translation>
+      <translation type="unfinished">Export licenses to a file</translation>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation>
-        <numerusform>Деактивировать лицензию?</numerusform>
-        <numerusform>Деактивировать лицензии?</numerusform>
-        <numerusform>Деактивировать лицензии?</numerusform>
-        <numerusform>Деактивировать лицензии?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Deactivate licenses?</numerusform>
+        <numerusform>Deactivate licenses?</numerusform>
       </translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Удалить</translation>
+      <translation type="unfinished">Remove</translation>
     </message>
     <message>
       <source>Deactivate</source>
-      <translation>Деактивировать</translation>
+      <translation type="unfinished">Deactivate</translation>
     </message>
     <message numerus="yes">
       <source>%n channels.</source>
-      <translation>
-        <numerusform>%n канал.</numerusform>
-        <numerusform>%n канала.</numerusform>
-        <numerusform>%n каналов.</numerusform>
-        <numerusform>%n каналов.</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n channels.</numerusform>
+        <numerusform>%n channels.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 уже используeтся</numerusform>
-        <numerusform>%1 уже используются</numerusform>
-        <numerusform>%1 уже используются</numerusform>
-        <numerusform>%1 уже используются</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 are currently in use</numerusform>
+        <numerusform>%1 are currently in use</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>Требуется по крайней мере %1</numerusform>
-        <numerusform>Требуются по крайней мере %1</numerusform>
-        <numerusform>Требуются по крайней мере %1</numerusform>
-        <numerusform>Требуются по крайней мере %1</numerusform>
+      <translation type="unfinished">
+        <numerusform>At least %1 are required</numerusform>
+        <numerusform>At least %1 are required</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n deactivations remaining.</source>
-      <translation>
-        <numerusform>Осталось %n деактивация.</numerusform>
-        <numerusform>Осталось %n деактивации.</numerusform>
-        <numerusform>Осталось %n деактиваций.</numerusform>
-        <numerusform>Осталось %n деактиваций.</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n deactivations remaining.</numerusform>
+        <numerusform>%n deactivations remaining.</numerusform>
       </translation>
     </message>
     <message>
       <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
-      <translation>У вас не установлена действующая лицензия. Пожалуйста, активируйте свою коммерческую или пробную лицензию.</translation>
+      <translation type="unfinished">You do not have a valid license installed. Please activate your commercial or trial license.</translation>
     </message>
   </context>
   <context>
     <name>QnLicenseWidget</name>
     <message>
       <source>Activate Trial License</source>
-      <translation>Активировать временную лицензию</translation>
+      <translation type="unfinished">Activate Trial License</translation>
     </message>
     <message>
       <source>Open License File</source>
-      <translation>Открыть файл лицензии</translation>
+      <translation type="unfinished">Open License File</translation>
     </message>
     <message>
       <source>Failed to open file</source>
-      <translation>Не удалось открыть файл</translation>
+      <translation type="unfinished">Failed to open file</translation>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
-      <translation>Чтобы получить файл с ключом активации, отправьте предоставленный лицензионный ключ и аппаратный ID на %1.</translation>
+      <translation type="unfinished">To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
-      <translation>Пожалуйста, отправьте предоставленный лицензионный ключ и идентификатор оборудования в региональную / лицензионную службу поддержки для получения файла ключа активации.</translation>
+      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation>Пожалуйста, отправьте предоставленный лицензионный ключ и идентификатор оборудования в региональную / лицензионную службу поддержки (%1) для получения файла ключа активации.</translation>
+      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</translation>
     </message>
   </context>
   <context>
     <name>QnLocalSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation>Общие</translation>
+      <translation type="unfinished">General</translation>
     </message>
     <message>
       <source>Look and Feel</source>
-      <translation>Интерфейс</translation>
+      <translation type="unfinished">Look and Feel</translation>
     </message>
     <message>
       <source>Screen Recording</source>
-      <translation>Захват экрана</translation>
+      <translation type="unfinished">Screen Recording</translation>
     </message>
     <message>
       <source>Notifications</source>
-      <translation>Уведомления</translation>
+      <translation type="unfinished">Notifications</translation>
     </message>
     <message>
       <source>Advanced</source>
-      <translation>Расширенные</translation>
+      <translation type="unfinished">Advanced</translation>
     </message>
     <message>
       <source>Settings file is read-only. Please contact your system administrator. All changes will be lost after program exit.</source>
-      <translation>Файл настроек доступен только для чтения. Пожалуйста, обратитесь к системному администратору. Все изменения будут потеряны после выхода из программы.</translation>
+      <translation type="unfinished">Settings file is read-only. Please contact your system administrator. All changes will be lost after program exit.</translation>
     </message>
     <message>
       <source>Settings cannot be saved. Please contact your system administrator. All changes will be lost after program exit.</source>
-      <translation>Невозможно сохранить настройки. Пожалуйста, обратитесь к системному администратору. Все изменения будут потеряны после выхода из программы.</translation>
+      <translation type="unfinished">Settings cannot be saved. Please contact your system administrator. All changes will be lost after program exit.</translation>
     </message>
     <message>
       <source>Restart required</source>
-      <translation>Требуется перезапуск</translation>
+      <translation type="unfinished">Restart required</translation>
     </message>
     <message>
       <source>Restart Now</source>
-      <translation>Перезагрузить сейчас</translation>
+      <translation type="unfinished">Restart Now</translation>
     </message>
     <message>
       <source>Restart Later</source>
-      <translation>Перезагрузить позже</translation>
+      <translation type="unfinished">Restart Later</translation>
     </message>
     <message>
       <source>Some changes will take effect only after %1 restart</source>
-      <translation>Некоторые изменения вступят в силу только после перезапуска %1</translation>
+      <translation type="unfinished">Some changes will take effect only after %1 restart</translation>
     </message>
   </context>
   <context>
     <name>QnLookAndFeelPreferencesWidget</name>
     <message>
       <source>Preparing Image...</source>
-      <translation>Подготовка изображения...</translation>
+      <translation type="unfinished">Preparing Image...</translation>
     </message>
     <message>
       <source>Please wait while image is being prepared...</source>
-      <translation>Пожалуйста, подождите пока подготавливается изображение...</translation>
+      <translation type="unfinished">Please wait while image is being prepared...</translation>
     </message>
     <message>
       <source>Server Time</source>
-      <translation>Время сервера</translation>
+      <translation type="unfinished">Server Time</translation>
     </message>
     <message>
       <source>Client Time</source>
-      <translation>Время клиента</translation>
+      <translation type="unfinished">Client Time</translation>
     </message>
     <message>
       <source>Stretch</source>
-      <translation>Растянуть</translation>
+      <translation type="unfinished">Stretch</translation>
     </message>
     <message>
       <source>Fit</source>
-      <translation>Подогнать</translation>
+      <translation type="unfinished">Fit</translation>
     </message>
     <message>
       <source>Crop</source>
-      <translation>Обрезать</translation>
+      <translation type="unfinished">Crop</translation>
     </message>
     <message>
       <source>This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</source>
-      <translation>Эта настройка не повлияет на Расписание записи. Расписание записи всегда ведётся с учётом времени сервера.</translation>
+      <translation type="unfinished">This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</translation>
     </message>
     <message>
       <source>Select File...</source>
-      <translation>Выбрать файл...</translation>
+      <translation type="unfinished">Select File...</translation>
     </message>
     <message>
       <source>No image</source>
-      <translation>Нет изображения</translation>
+      <translation type="unfinished">No image</translation>
     </message>
     <message>
       <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
-      <translation>Устанавливает время для использования в клиенте (временная шкала, временные метки и т. д.), когда клиентские и серверные машины находятся в разных часовых поясах.</translation>
+      <translation type="unfinished">Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</translation>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>Отображает IP-адреса для камер и серверов и роли для пользователей.</translation>
+      <translation type="unfinished">Displays IP addresses for cameras and servers and roles for users.</translation>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
-      <translation>Сколько времени каждая камера будет отображаться на раскладке при запуске тура.</translation>
+      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Tour.</translation>
     </message>
   </context>
   <context>
     <name>QnMediaResourceWidget</name>
     <message>
       <source>Screenshot</source>
-      <translation>Стоп-кадр</translation>
+      <translation type="unfinished">Screenshot</translation>
     </message>
     <message>
       <source>PTZ</source>
-      <translation>PTZ</translation>
+      <translation type="unfinished">PTZ</translation>
     </message>
     <message>
       <source>Dewarping</source>
-      <translation>Коррекция искривления</translation>
+      <translation type="unfinished">Dewarping</translation>
     </message>
     <message>
       <source>Create Zoom Window</source>
-      <translation>Создать окно увеличения</translation>
+      <translation type="unfinished">Create Zoom Window</translation>
     </message>
     <message>
       <source>Hi-Res</source>
-      <translation>Выс</translation>
+      <translation type="unfinished">Hi-Res</translation>
     </message>
     <message>
       <source>LIVE</source>
-      <translation>LIVE</translation>
+      <translation type="unfinished">LIVE</translation>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
-      <translation>%1 (Активен маршрут обхода &quot;%2&quot;)</translation>
+      <translation type="unfinished">%1 (Tour &quot;%2&quot; is active)</translation>
     </message>
     <message>
       <source>Zoom Window</source>
-      <translation>Окно увеличения</translation>
+      <translation type="unfinished">Zoom Window</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>Модуль ввода-вывода</translation>
+      <translation type="unfinished">I/O Module</translation>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation>Низ</translation>
+      <translation type="unfinished">Lo-Res</translation>
     </message>
     <message>
       <source>press and hold</source>
       <comment>Soft Trigger</comment>
-      <translation>длинное нажатие</translation>
+      <translation type="unfinished">press and hold</translation>
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation>Отключено по расписанию</translation>
+      <translation type="unfinished">Disabled by schedule</translation>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
-      <translation>
-        <numerusform>Установить для %n камеры</numerusform>
-        <numerusform>Установить для всех %n камер</numerusform>
-        <numerusform>Установить для всех %n камер</numerusform>
-        <numerusform>Установить для всех %n камер</numerusform>
+      <translation type="unfinished">
+        <numerusform>Set for all %n Cameras</numerusform>
+        <numerusform>Set for all %n Cameras</numerusform>
       </translation>
     </message>
     <message>
       <source>Area Zoom</source>
-      <translation>Масштабирование области</translation>
+      <translation type="unfinished">Area Zoom</translation>
     </message>
     <message>
       <source>Motion Search</source>
@@ -4070,283 +3964,277 @@ to %1</source>
     <name>QnMessageBox</name>
     <message>
       <source>Overwrite</source>
-      <translation>Перезаписать</translation>
+      <translation type="unfinished">Overwrite</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Удалить</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation>Сбросить</translation>
+      <translation type="unfinished">Reset</translation>
     </message>
     <message>
       <source>Skip</source>
-      <translation>Пропустить</translation>
+      <translation type="unfinished">Skip</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation>Закрыть</translation>
+      <translation type="unfinished">Close</translation>
     </message>
     <message>
       <source>Stop</source>
-      <translation>Остановить</translation>
+      <translation type="unfinished">Stop</translation>
     </message>
   </context>
   <context>
     <name>QnNewVirtualCameraDialog</name>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;Виртуальная камера&quot; - это виртуальное хранилище для видеофайлов, которое может быть загружено на любой сервер вашей системы и доступно любому пользователю.</translation>
+      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
     </message>
     <message>
       <source>Virtual Camera</source>
-      <translation>Виртуальная камера</translation>
+      <translation type="unfinished">Virtual Camera</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
-      <translation>Виртуальная камера %1</translation>
+      <translation type="unfinished">Virtual Camera %1</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation>Имя</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Name cannot be empty</source>
-      <translation>Имя не может быть пустым</translation>
+      <translation type="unfinished">Name cannot be empty</translation>
     </message>
   </context>
   <context>
     <name>QnNotificationSoundManagerDialog</name>
     <message>
       <source>Clip sound up to %1 seconds</source>
-      <translation>Воспроизводить %1 секунд</translation>
+      <translation type="unfinished">Clip sound up to %1 seconds</translation>
     </message>
     <message>
       <source>Rename sound</source>
-      <translation>Переименовать звук</translation>
+      <translation type="unfinished">Rename sound</translation>
     </message>
     <message>
       <source>Custom title:</source>
-      <translation>Особый заголовок:</translation>
+      <translation type="unfinished">Custom title:</translation>
     </message>
     <message>
       <source>Sound Files</source>
-      <translation>Звуковые файлы</translation>
+      <translation type="unfinished">Sound Files</translation>
     </message>
     <message>
       <source>Select File...</source>
-      <translation>Выбрать файл...</translation>
+      <translation type="unfinished">Select File...</translation>
     </message>
     <message>
       <source>Enter New Title:</source>
-      <translation>Введите новое название:</translation>
+      <translation type="unfinished">Enter New Title:</translation>
     </message>
     <message>
       <source>Failed to add file</source>
-      <translation>Не удалось добавить файл</translation>
+      <translation type="unfinished">Failed to add file</translation>
     </message>
     <message>
       <source>Failed to set new title</source>
-      <translation>Не удалось задать новый заголовок</translation>
+      <translation type="unfinished">Failed to set new title</translation>
     </message>
     <message>
       <source>Delete sound?</source>
-      <translation>Удалить звук?</translation>
+      <translation type="unfinished">Delete sound?</translation>
     </message>
   </context>
   <context>
     <name>QnNotificationSoundModel</name>
     <message>
       <source>Downloading sound list...</source>
-      <translation>Загружается список звуков...</translation>
+      <translation type="unfinished">Downloading sound list...</translation>
     </message>
     <message>
       <source>No Sound</source>
-      <translation>Нет звука</translation>
+      <translation type="unfinished">No Sound</translation>
     </message>
     <message>
       <source>Downloading sound...</source>
-      <translation>Загружается звук...</translation>
+      <translation type="unfinished">Downloading sound...</translation>
     </message>
     <message>
       <source>Uploading sound...</source>
-      <translation>Звук загружается на сервер...</translation>
+      <translation type="unfinished">Uploading sound...</translation>
     </message>
   </context>
   <context>
     <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
     <message>
       <source>Rotation</source>
-      <translation>Поворот</translation>
+      <translation type="unfinished">Rotation</translation>
     </message>
   </context>
   <context>
     <name>QnPerformanceTest</name>
     <message>
       <source>%1 can work in configuration mode only</source>
-      <translation>%1 может работать только в режиме настройки</translation>
+      <translation type="unfinished">%1 can work in configuration mode only</translation>
     </message>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
-      <translation>Производительность данного компьютера позволяет запускать %1 только в режиме настройки.</translation>
+      <translation type="unfinished">Performance of this computer allows running %1 in configuration mode only.</translation>
     </message>
     <message>
       <source>For full-featured mode please use another computer</source>
-      <translation>Для полноценного режима используйте другой компьютер</translation>
+      <translation type="unfinished">For full-featured mode please use another computer</translation>
     </message>
   </context>
   <context>
     <name>QnPermissionsWidget</name>
     <message>
       <source>Edit camera settings</source>
-      <translation>Изменение настроек камеры</translation>
+      <translation type="unfinished">Edit camera settings</translation>
     </message>
     <message>
       <source>This is also required to create/edit PTZ presets and tours.</source>
-      <translation>А также настройка PTZ позиций и туров.</translation>
+      <translation type="unfinished">This is also required to create/edit PTZ presets and tours.</translation>
     </message>
     <message>
       <source>Control video walls</source>
-      <translation>Управление видеостенами</translation>
+      <translation type="unfinished">Control video walls</translation>
     </message>
     <message>
       <source>View event log</source>
-      <translation>Просмотр журнала событий</translation>
+      <translation type="unfinished">View event log</translation>
     </message>
     <message>
       <source>View archive</source>
-      <translation>Просмотр архива</translation>
+      <translation type="unfinished">View archive</translation>
     </message>
     <message>
       <source>Export archive</source>
-      <translation>Экспорт архива</translation>
+      <translation type="unfinished">Export archive</translation>
     </message>
     <message>
       <source>View bookmarks</source>
-      <translation>Просмотр закладок</translation>
+      <translation type="unfinished">View bookmarks</translation>
     </message>
     <message>
       <source>Modify bookmarks</source>
-      <translation>Изменение закладок</translation>
+      <translation type="unfinished">Modify bookmarks</translation>
     </message>
     <message>
       <source>User Input</source>
-      <translation>Другие действия</translation>
+      <translation type="unfinished">User Input</translation>
     </message>
     <message>
       <source>PTZ, Device Output, 2-Way Audio, Soft Triggers.</source>
-      <translation>PTZ, выход устройства, двухстороннее аудио, программные триггеры.</translation>
+      <translation type="unfinished">PTZ, Device Output, 2-Way Audio, Soft Triggers.</translation>
     </message>
   </context>
   <context>
     <name>QnPoeOverBudgetPolicy</name>
     <message>
       <source>Servers that support PoE monitoring</source>
-      <translation>Серверы, поддерживающие PoE мониторинг</translation>
+      <translation type="unfinished">Servers that support PoE monitoring</translation>
     </message>
   </context>
   <context>
     <name>QnPopupBusinessActionWidget</name>
     <message>
       <source>Manage Bookmarks</source>
-      <translation>Управление закладками</translation>
+      <translation type="unfinished">Manage Bookmarks</translation>
     </message>
     <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-      <translation>Уведомление будет показываться пока один из пользователей, которые его видят, не создаст закладку с описанием события</translation>
+      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
     </message>
   </context>
   <context>
     <name>QnPtzManageDialog</name>
     <message>
       <source>Manage PTZ for %1...</source>
-      <translation>Управление позициями PTX для %1...</translation>
+      <translation type="unfinished">Manage PTZ for %1...</translation>
     </message>
     <message>
       <source>Apply changes before exit?</source>
-      <translation>Применить изменения перед выходом?</translation>
+      <translation type="unfinished">Apply changes before exit?</translation>
     </message>
   </context>
   <context>
     <name>QnPtzManageModel</name>
     <message>
       <source>Name</source>
-      <translation>Имя</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Hotkey</source>
-      <translation>Горячая клавиша</translation>
+      <translation type="unfinished">Hotkey</translation>
     </message>
     <message>
       <source>Home</source>
-      <translation>Дом</translation>
+      <translation type="unfinished">Home</translation>
     </message>
     <message>
       <source>Details</source>
-      <translation>Детали</translation>
+      <translation type="unfinished">Details</translation>
     </message>
     <message>
       <source>Tours</source>
-      <translation>Маршруты</translation>
+      <translation type="unfinished">Tours</translation>
     </message>
     <message>
       <source>Positions</source>
-      <translation>Позиции</translation>
+      <translation type="unfinished">Positions</translation>
     </message>
     <message>
       <source>None</source>
-      <translation>Нет</translation>
+      <translation type="unfinished">None</translation>
     </message>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
-      <translation>
-        <numerusform>Будет активирована после %n минуту бездействия</numerusform>
-        <numerusform>Будет активирована после %n минуты бездействия</numerusform>
-        <numerusform>Будет активирована после %n минут бездействия</numerusform>
-        <numerusform>Будет активирована после %n минуту бездействия</numerusform>
+      <translation type="unfinished">
+        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
+        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
-      <translation>
-        <numerusform>В маршруте обхода %n идентичная позиция</numerusform>
-        <numerusform>В маршруте обхода %n идентичные позиции</numerusform>
-        <numerusform>В маршруте обхода %n идентичных позиций</numerusform>
-        <numerusform>В маршруте обхода %n идентичные позиции</numerusform>
+      <translation type="unfinished">
+        <numerusform>Tour has %n identical positions</numerusform>
+        <numerusform>Tour has %n identical positions</numerusform>
       </translation>
     </message>
     <message>
       <source>less than a minute</source>
-      <translation>менее минуты</translation>
+      <translation type="unfinished">less than a minute</translation>
     </message>
     <message>
       <source>Invalid tour</source>
-      <translation>Некорректный маршрут обхода</translation>
+      <translation type="unfinished">Invalid tour</translation>
     </message>
     <message>
       <source>New Tour %1</source>
-      <translation>Новый маршрут %1</translation>
+      <translation type="unfinished">New Tour %1</translation>
     </message>
     <message>
       <source>Saved Position %1</source>
-      <translation>Сохраненная позиция %1</translation>
+      <translation type="unfinished">Saved Position %1</translation>
     </message>
     <message>
       <source>Tour should contain at least 2 positions.</source>
-      <translation>Маршрут обхода должен содержать хотя бы 2 позиции.</translation>
+      <translation type="unfinished">Tour should contain at least 2 positions.</translation>
     </message>
     <message>
       <source>Tour Time: %1.</source>
-      <translation>Время маршрута обхода: %1.</translation>
+      <translation type="unfinished">Tour Time: %1.</translation>
     </message>
     <message numerus="yes">
       <source>about %n minutes</source>
-      <translation>
-        <numerusform>около %n минуты</numerusform>
-        <numerusform>около %n минут</numerusform>
-        <numerusform>около %n минут</numerusform>
-        <numerusform>около %n минут</numerusform>
+      <translation type="unfinished">
+        <numerusform>about %n minutes</numerusform>
+        <numerusform>about %n minutes</numerusform>
       </translation>
     </message>
   </context>
@@ -4354,144 +4242,138 @@ to %1</source>
     <name>QnPtzPresetDialog</name>
     <message>
       <source>Saved Position %1</source>
-      <translation>Сохраненная позиция %1</translation>
+      <translation type="unfinished">Saved Position %1</translation>
     </message>
     <message>
       <source>None</source>
-      <translation>Нет</translation>
+      <translation type="unfinished">None</translation>
     </message>
   </context>
   <context>
     <name>QnPtzPresetHotkeyItemDelegate</name>
     <message>
       <source>None</source>
-      <translation>Нет</translation>
+      <translation type="unfinished">None</translation>
     </message>
     <message>
       <source>Reassign</source>
-      <translation>Переопределить</translation>
+      <translation type="unfinished">Reassign</translation>
     </message>
     <message>
       <source>Hotkey used by preset &quot;%1&quot;</source>
-      <translation>Горячая клавиша уже используется позицией &quot;%1&quot;</translation>
+      <translation type="unfinished">Hotkey used by preset &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Hotkey used by tour &quot;%1&quot;</source>
-      <translation>Горячая клавиша уже используется туром &quot;%1&quot;</translation>
+      <translation type="unfinished">Hotkey used by tour &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
     <name>QnPtzTourSpotsModel</name>
     <message>
       <source>Lowest</source>
-      <translation>Самая низкая</translation>
+      <translation type="unfinished">Lowest</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation>Низкая</translation>
+      <translation type="unfinished">Low</translation>
     </message>
     <message>
       <source>Normal</source>
-      <translation>Нормальная</translation>
+      <translation type="unfinished">Normal</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>Высокая</translation>
+      <translation type="unfinished">High</translation>
     </message>
     <message>
       <source>Highest</source>
-      <translation>Самая высокая</translation>
+      <translation type="unfinished">Highest</translation>
     </message>
     <message>
       <source>Instant</source>
-      <translation>Немедленно</translation>
+      <translation type="unfinished">Instant</translation>
     </message>
     <message>
       <source>Position</source>
-      <translation>Позиция</translation>
+      <translation type="unfinished">Position</translation>
     </message>
     <message>
       <source>Stay Time</source>
-      <translation>Время остановки</translation>
+      <translation type="unfinished">Stay Time</translation>
     </message>
     <message>
       <source>Speed</source>
-      <translation>Скорость</translation>
+      <translation type="unfinished">Speed</translation>
     </message>
     <message>
       <source>Invalid</source>
-      <translation>Неверный</translation>
+      <translation type="unfinished">Invalid</translation>
     </message>
   </context>
   <context>
     <name>QnRecordingSettingsWidget</name>
     <message>
       <source>Screen %1 - %2x%3</source>
-      <translation>Экран %1 - %2х%3</translation>
+      <translation type="unfinished">Screen %1 - %2x%3</translation>
     </message>
     <message>
       <source>%1 (Primary)</source>
-      <translation>%1 (Основной)</translation>
+      <translation type="unfinished">%1 (Primary)</translation>
     </message>
     <message>
       <source>Select folder...</source>
-      <translation>Выбрать каталог...</translation>
+      <translation type="unfinished">Select folder...</translation>
     </message>
     <message>
       <source>Best</source>
-      <translation>Наилучшее</translation>
+      <translation type="unfinished">Best</translation>
     </message>
     <message>
       <source>Average</source>
-      <translation>Среднее</translation>
+      <translation type="unfinished">Average</translation>
     </message>
     <message>
       <source>Performance</source>
-      <translation>Производительность</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Native</source>
-      <translation>Оригинальное</translation>
+      <translation type="unfinished">Native</translation>
     </message>
     <message>
       <source>Quarter Native</source>
-      <translation>1/4 Оригинального</translation>
+      <translation type="unfinished">Quarter Native</translation>
     </message>
   </context>
   <context>
     <name>QnRecordingStats</name>
     <message>
       <source>Cameras from other servers and removed cameras</source>
-      <translation>Камеры с других серверов, а также удаленные камеры</translation>
+      <translation type="unfinished">Cameras from other servers and removed cameras</translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation>
-        <numerusform>Total %1 %n device</numerusform>
-        <numerusform>Всего %1 %n устройства</numerusform>
-        <numerusform>Всего %1 %n устройств</numerusform>
-        <numerusform>Total %1 %n device</numerusform>
+      <translation type="unfinished">
+        <numerusform>Total %1 %n devices</numerusform>
+        <numerusform>Total %1 %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n cameras</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation>
-        <numerusform>Total %1 %n camera</numerusform>
-        <numerusform>Всего %1 %n камеры</numerusform>
-        <numerusform>Всего %1 %n камер</numerusform>
-        <numerusform>Total %1 %n camera</numerusform>
+      <translation type="unfinished">
+        <numerusform>Total %1 %n cameras</numerusform>
+        <numerusform>Total %1 %n cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n I/O modules</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation>
-        <numerusform>Total %1 %n I/O module</numerusform>
-        <numerusform>Всего %1 %n модуля ввода-вывода</numerusform>
-        <numerusform>Всего %1 %n модулей ввода-вывода</numerusform>
-        <numerusform>Total %1 %n I/O module</numerusform>
+      <translation type="unfinished">
+        <numerusform>Total %1 %n I/O modules</numerusform>
+        <numerusform>Total %1 %n I/O modules</numerusform>
       </translation>
     </message>
   </context>
@@ -4499,35 +4381,35 @@ to %1</source>
     <name>QnRecordingStatsModel</name>
     <message>
       <source>Space</source>
-      <translation>Доступно</translation>
+      <translation type="unfinished">Space</translation>
     </message>
     <message>
       <source>Calendar Days</source>
-      <translation>Дней</translation>
+      <translation type="unfinished">Calendar Days</translation>
     </message>
     <message>
       <source>%1 Mbps</source>
-      <translation>%1 Мбит/с</translation>
+      <translation type="unfinished">%1 Mbps</translation>
     </message>
     <message>
       <source>Device</source>
-      <translation>Устройство</translation>
+      <translation type="unfinished">Device</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation>Камера</translation>
+      <translation type="unfinished">Camera</translation>
     </message>
     <message>
       <source>%1 TB</source>
-      <translation>%1 ТБ</translation>
+      <translation type="unfinished">%1 TB</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 ГБ</translation>
+      <translation type="unfinished">%1 GB</translation>
     </message>
     <message>
       <source>Current Bitrate</source>
-      <translation>Текущий битрейт</translation>
+      <translation type="unfinished">Current Bitrate</translation>
     </message>
   </context>
   <context>
@@ -4535,41 +4417,37 @@ to %1</source>
     <message>
       <source>Role %1 has no %2 permission</source>
       <comment>%1 is the name of selected role, %2 is permission name</comment>
-      <translation>Роль %1 не имеет полномочий на %2</translation>
+      <translation type="unfinished">Role %1 has no %2 permission</translation>
     </message>
     <message>
       <source>Selected roles have no %1 permission</source>
       <comment>%1 is permission name</comment>
-      <translation>Выбранные роли не имеют разрешения на %1</translation>
+      <translation type="unfinished">Selected roles have no %1 permission</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 selected roles have no %2 permission</source>
       <comment>%1 is number of selected roles, %2 is permission name</comment>
-      <translation>
-        <numerusform>%n выбранная роль из %1 не имеет полномочий на %2</numerusform>
-        <numerusform>%n выбранные роли из %1 не имеют полномочий на %2</numerusform>
-        <numerusform>%n выбранных ролей из %1 не имеют полномочий на %2</numerusform>
-        <numerusform>%n выбранных ролей из %1 не имеют полномочий на %2</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
+        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
       </translation>
     </message>
     <message>
       <source>User %1 has no %2 permission</source>
       <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation>Пользователь %1 не имеет полномочий на %2</translation>
+      <translation type="unfinished">User %1 has no %2 permission</translation>
     </message>
     <message>
       <source>Selected users have no %1 permission</source>
       <comment>%1 is permission name</comment>
-      <translation>Выбранные пользователи не имеют полномочий на %1</translation>
+      <translation type="unfinished">Selected users have no %1 permission</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 selected users have no %2 permission</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation>
-        <numerusform>%n выбранный пользователь из %1 не имеет разрешения %2</numerusform>
-        <numerusform>%n выбранных пользователя из %1 не имеют разрешения %2</numerusform>
-        <numerusform>%n выбранных пользователей из %1 не имеют разрешения %2</numerusform>
-        <numerusform>%n выбранных пользователей из %1 не имеют разрешения %2</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
+        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
       </translation>
     </message>
   </context>
@@ -4577,81 +4455,81 @@ to %1</source>
     <name>QnResourceBrowserWidget</name>
     <message>
       <source>Local files</source>
-      <translation>Локальные файлы</translation>
+      <translation type="unfinished">Local files</translation>
     </message>
     <message>
       <source>No local files</source>
-      <translation>Нет локальных файлов</translation>
+      <translation type="unfinished">No local files</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation>Ничего не найдено</translation>
+      <translation type="unfinished">Nothing found</translation>
     </message>
     <message>
       <source>All types</source>
-      <translation>Все типы</translation>
+      <translation type="unfinished">All types</translation>
     </message>
     <message>
       <source>Servers</source>
-      <translation>Серверы</translation>
+      <translation type="unfinished">Servers</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation>Раскладки</translation>
+      <translation type="unfinished">Layouts</translation>
     </message>
     <message>
       <source>Showreels</source>
-      <translation>Прокрутки</translation>
+      <translation type="unfinished">Showreels</translation>
     </message>
     <message>
       <source>Video Walls</source>
-      <translation>Видеостены</translation>
+      <translation type="unfinished">Video Walls</translation>
     </message>
     <message>
       <source>Web Pages</source>
-      <translation>Web-страницы</translation>
+      <translation type="unfinished">Web Pages</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation>Пользователи</translation>
+      <translation type="unfinished">Users</translation>
     </message>
     <message>
       <source>Local Files</source>
-      <translation>Локальные файлы</translation>
+      <translation type="unfinished">Local Files</translation>
     </message>
     <message>
       <source>Search</source>
-      <translation>Поиск</translation>
+      <translation type="unfinished">Search</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation>Камеры и устройства</translation>
+      <translation type="unfinished">Cameras &amp; Devices</translation>
     </message>
   </context>
   <context>
     <name>QnResourceItemDelegate</name>
     <message>
       <source>Health Monitor</source>
-      <translation>Мониторинг ресурсов</translation>
+      <translation type="unfinished">Health Monitor</translation>
     </message>
   </context>
   <context>
     <name>QnResourceWidget</name>
     <message>
       <source>Close</source>
-      <translation>Закрыть</translation>
+      <translation type="unfinished">Close</translation>
     </message>
     <message>
       <source>Information</source>
-      <translation>Информация</translation>
+      <translation type="unfinished">Information</translation>
     </message>
     <message>
       <source>Rotate</source>
-      <translation>Повернуть</translation>
+      <translation type="unfinished">Rotate</translation>
     </message>
     <message>
       <source>Exit Fullscreen</source>
-      <translation>В оконный режим</translation>
+      <translation type="unfinished">Exit Fullscreen</translation>
     </message>
     <message>
       <source>Enter Fullscreen</source>
@@ -4662,138 +4540,136 @@ to %1</source>
     <name>QnRoutingManagementWidget</name>
     <message>
       <source>Enter URL</source>
-      <translation>Введите URL</translation>
+      <translation type="unfinished">Enter URL</translation>
     </message>
     <message>
       <source>URL</source>
-      <translation>URL</translation>
+      <translation type="unfinished">URL</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation>Сервер</translation>
+      <translation type="unfinished">Server</translation>
     </message>
     <message>
       <source>Invalid URL</source>
-      <translation>Недопустимый URL-адрес</translation>
+      <translation type="unfinished">Invalid URL</translation>
     </message>
     <message>
       <source>URL already added</source>
-      <translation>URL-адрес уже добавлен</translation>
+      <translation type="unfinished">URL already added</translation>
     </message>
   </context>
   <context>
     <name>QnScreenshotLoader</name>
     <message>
       <source>Top left corner</source>
-      <translation>Верхний левый угол</translation>
+      <translation type="unfinished">Top left corner</translation>
     </message>
     <message>
       <source>Top right corner</source>
-      <translation>Верхний правый угол</translation>
+      <translation type="unfinished">Top right corner</translation>
     </message>
     <message>
       <source>Bottom left corner</source>
-      <translation>Нижний левый угол</translation>
+      <translation type="unfinished">Bottom left corner</translation>
     </message>
     <message>
       <source>Bottom right corner</source>
-      <translation>Нижний правый угол</translation>
+      <translation type="unfinished">Bottom right corner</translation>
     </message>
   </context>
   <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>No bookmarks</source>
-      <translation>Нет закладок</translation>
+      <translation type="unfinished">No bookmarks</translation>
     </message>
     <message>
       <source>Search</source>
-      <translation>Поиск</translation>
+      <translation type="unfinished">Search</translation>
     </message>
   </context>
   <context>
     <name>QnSearchBookmarksModel</name>
     <message>
       <source>Name</source>
-      <translation>Имя</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Start time</source>
-      <translation>Время начала</translation>
+      <translation type="unfinished">Start time</translation>
     </message>
     <message>
       <source>Length</source>
-      <translation>Длительность</translation>
+      <translation type="unfinished">Length</translation>
     </message>
     <message>
       <source>Tags</source>
-      <translation>Теги</translation>
+      <translation type="unfinished">Tags</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation>Камера</translation>
+      <translation type="unfinished">Camera</translation>
     </message>
     <message>
       <source>Created</source>
-      <translation>Создан</translation>
+      <translation type="unfinished">Created</translation>
     </message>
     <message>
       <source>Creator</source>
-      <translation>Автор</translation>
+      <translation type="unfinished">Creator</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>Описание</translation>
+      <translation type="unfinished">Description</translation>
     </message>
   </context>
   <context>
     <name>QnSelectDevicesButton</name>
     <message>
       <source>Any Device</source>
-      <translation>Любое устройство</translation>
+      <translation type="unfinished">Any Device</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation>Любая Камера</translation>
+      <translation type="unfinished">Any Camera</translation>
     </message>
     <message>
       <source>All Devices</source>
-      <translation>Все устройства</translation>
+      <translation type="unfinished">All Devices</translation>
     </message>
     <message>
       <source>All Cameras</source>
-      <translation>Все камеры</translation>
+      <translation type="unfinished">All Cameras</translation>
     </message>
     <message>
       <source>Select devices...</source>
-      <translation>Выберите устройства...</translation>
+      <translation type="unfinished">Select devices...</translation>
     </message>
     <message>
       <source>Select cameras...</source>
-      <translation>Выберите камеры...</translation>
+      <translation type="unfinished">Select cameras...</translation>
     </message>
   </context>
   <context>
     <name>QnSelectServersButton</name>
     <message>
       <source>Any Server</source>
-      <translation>Любой сервер</translation>
+      <translation type="unfinished">Any Server</translation>
     </message>
     <message>
       <source>All Servers</source>
-      <translation>Все серверы</translation>
+      <translation type="unfinished">All Servers</translation>
     </message>
     <message>
       <source>Select Servers...</source>
-      <translation>Выберите серверы...</translation>
+      <translation type="unfinished">Select Servers...</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation>
-        <numerusform>%n Server</numerusform>
-        <numerusform>%n сервера</numerusform>
-        <numerusform>%n серверов</numerusform>
-        <numerusform>%n Server</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n Servers</numerusform>
+        <numerusform>%n Servers</numerusform>
       </translation>
     </message>
   </context>
@@ -4801,23 +4677,21 @@ to %1</source>
     <name>QnSelectUsersButton</name>
     <message>
       <source>Any User</source>
-      <translation>Любой пользователь</translation>
+      <translation type="unfinished">Any User</translation>
     </message>
     <message>
       <source>All Users</source>
-      <translation>Все пользователи</translation>
+      <translation type="unfinished">All Users</translation>
     </message>
     <message>
       <source>Select Users...</source>
-      <translation>Выберите пользователей...</translation>
+      <translation type="unfinished">Select Users...</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation>
-        <numerusform>%n User</numerusform>
-        <numerusform>%n пользователя</numerusform>
-        <numerusform>%n пользователей</numerusform>
-        <numerusform>%n пользователь</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n Users</numerusform>
+        <numerusform>%n Users</numerusform>
       </translation>
     </message>
   </context>
@@ -4825,152 +4699,144 @@ to %1</source>
     <name>QnSendEmailActionDelegate</name>
     <message numerus="yes">
       <source>%n additional</source>
-      <translation>
-        <numerusform>ещё %n</numerusform>
-        <numerusform>ещё %n</numerusform>
-        <numerusform>ещё %n</numerusform>
-        <numerusform>ещё %n</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n additional</numerusform>
+        <numerusform>%n additional</numerusform>
       </translation>
     </message>
     <message>
       <source>User %1 has invalid email address</source>
-      <translation>У пользователя %1 неправильный Email</translation>
+      <translation type="unfinished">User %1 has invalid email address</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 users have invalid email address</source>
-      <translation>
-        <numerusform>У %n из %1 пользователя некорректный Email</numerusform>
-        <numerusform>У %n из %1 пользователя некорректный Email</numerusform>
-        <numerusform>У %n из %1 пользователя некорректный Email</numerusform>
-        <numerusform>У %n из %1 пользователя некорректный Email</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n of %1 users have invalid email address</numerusform>
+        <numerusform>%n of %1 users have invalid email address</numerusform>
       </translation>
     </message>
     <message>
       <source>Invalid email address %1</source>
-      <translation>Некорректный Email %1</translation>
+      <translation type="unfinished">Invalid email address %1</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
-      <translation>
-        <numerusform>%n из %1 дополнительных адресов некорректен</numerusform>
-        <numerusform>%n из %1 дополнительных адресов некорректен</numerusform>
-        <numerusform>%n из %1 дополнительных адресов некорректен</numerusform>
-        <numerusform>%n из %1 дополнительных адресов некорректен</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
       </translation>
     </message>
     <message>
       <source>Send email to %1</source>
-      <translation>Отправить письмо %1</translation>
+      <translation type="unfinished">Send email to %1</translation>
     </message>
   </context>
   <context>
     <name>QnServerAddressesModel</name>
     <message>
       <source>Address</source>
-      <translation>Адрес</translation>
+      <translation type="unfinished">Address</translation>
     </message>
   </context>
   <context>
     <name>QnServerResourceWidget</name>
     <message>
       <source>Show Log</source>
-      <translation>Показать журнал</translation>
+      <translation type="unfinished">Show Log</translation>
     </message>
     <message>
       <source>Check Issues</source>
-      <translation>Найти проблемы</translation>
+      <translation type="unfinished">Check Issues</translation>
     </message>
     <message>
       <source>%1 (up %2)</source>
-      <translation>%1 (из %2)</translation>
+      <translation type="unfinished">%1 (up %2)</translation>
     </message>
   </context>
   <context>
     <name>QnServerSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation>Общие</translation>
+      <translation type="unfinished">General</translation>
     </message>
     <message>
       <source>Storage Analytics</source>
-      <translation>Анализ хранилища</translation>
+      <translation type="unfinished">Storage Analytics</translation>
     </message>
     <message>
       <source>Server Settings - %1 (readonly)</source>
-      <translation>Настройки сервера - %1 (только для чтения)</translation>
+      <translation type="unfinished">Server Settings - %1 (readonly)</translation>
     </message>
     <message>
       <source>Server Settings - %1</source>
-      <translation>Настройки сервера - %1</translation>
+      <translation type="unfinished">Server Settings - %1</translation>
     </message>
     <message>
       <source>Server Settings</source>
-      <translation>Настройки сервера</translation>
+      <translation type="unfinished">Server Settings</translation>
     </message>
     <message>
       <source>Storage Management</source>
-      <translation>Управление хранилищами</translation>
+      <translation type="unfinished">Storage Management</translation>
     </message>
     <message>
       <source>Apply changes before switching to another server?</source>
-      <translation>Применить изменения перед переключением на другой сервер?</translation>
+      <translation type="unfinished">Apply changes before switching to another server?</translation>
     </message>
     <message>
       <source>Server Web Page</source>
-      <translation>Открыть web-страницу сервера</translation>
+      <translation type="unfinished">Server Web Page</translation>
     </message>
     <message>
       <source>Plugins</source>
-      <translation>Плагины</translation>
+      <translation type="unfinished">Plugins</translation>
     </message>
     <message>
       <source>PoE</source>
-      <translation>PoE</translation>
+      <translation type="unfinished">PoE</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation>Резервное</translation>
+      <translation type="unfinished">Backup</translation>
     </message>
   </context>
   <context>
     <name>QnServerSettingsWidget</name>
     <message>
       <source>At least two servers are required for this feature.</source>
-      <translation>Для этого требуется как минимум 2 сервера.</translation>
+      <translation type="unfinished">At least two servers are required for this feature.</translation>
     </message>
     <message>
       <source>Max devices on this server:</source>
-      <translation>Макс. устройств на сервер:</translation>
+      <translation type="unfinished">Max devices on this server:</translation>
     </message>
     <message>
       <source>Max cameras on this server:</source>
-      <translation>Макс. камер на сервер:</translation>
+      <translation type="unfinished">Max cameras on this server:</translation>
     </message>
     <message>
       <source>This server already has more than max devices</source>
-      <translation>На данный сервер уже подключено больше максимального числа устройств</translation>
+      <translation type="unfinished">This server already has more than max devices</translation>
     </message>
     <message>
       <source>This server already has more than max cameras</source>
-      <translation>На данный сервер уже подключено больше максимального числа камер</translation>
+      <translation type="unfinished">This server already has more than max cameras</translation>
     </message>
     <message>
       <source>To avoid issues adjust max number of devices</source>
-      <translation>Во избежание сбоев измените максимальное количество устройств</translation>
+      <translation type="unfinished">To avoid issues adjust max number of devices</translation>
     </message>
     <message>
       <source>To avoid issues adjust max number of cameras</source>
-      <translation>Во избежание сбоев измените максимальное количество камер</translation>
+      <translation type="unfinished">To avoid issues adjust max number of cameras</translation>
     </message>
     <message>
       <source>Failover</source>
-      <translation>Резервирование</translation>
+      <translation type="unfinished">Failover</translation>
     </message>
     <message numerus="yes">
       <source>Certificates</source>
       <translation type="unfinished">
-        <numerusform>Certificates</numerusform>
-        <numerusform>Certificates</numerusform>
         <numerusform>Certificates</numerusform>
         <numerusform>Certificates</numerusform>
       </translation>
@@ -4978,8 +4844,6 @@ to %1</source>
     <message numerus="yes">
       <source>Server utilizes these %n SSL certificates to authenticate its identity</source>
       <translation type="unfinished">
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
         <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
         <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
       </translation>
@@ -4990,7 +4854,7 @@ to %1</source>
     </message>
     <message>
       <source>Details</source>
-      <translation>Детали</translation>
+      <translation type="unfinished">Details</translation>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
@@ -5001,11 +4865,11 @@ to %1</source>
     <name>QnSessionAwareTabbedDialog</name>
     <message>
       <source>Unsaved changes:</source>
-      <translation>Несохраненные изменения:</translation>
+      <translation type="unfinished">Unsaved changes:</translation>
     </message>
     <message>
       <source>Save changes before exit?</source>
-      <translation>Применить изменения перед выходом?</translation>
+      <translation type="unfinished">Save changes before exit?</translation>
     </message>
   </context>
   <context>
@@ -5015,7 +4879,7 @@ to %1</source>
 &lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
       <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
 &apos; sequence</comment>
-      <translation>В тексте могут быть использованы следующие HTML теги:
+      <translation type="unfinished">Html tags could be used within custom text:
 &lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</translation>
     </message>
   </context>
@@ -5023,230 +4887,230 @@ to %1</source>
     <name>QnSignInfo</name>
     <message>
       <source>Analyzing: %1%</source>
-      <translation>Анализ: %1%</translation>
+      <translation type="unfinished">Analyzing: %1%</translation>
     </message>
     <message>
       <source>Invalid watermark</source>
-      <translation>Неверный водяной знак</translation>
+      <translation type="unfinished">Invalid watermark</translation>
     </message>
     <message>
       <source>Watermark Not Found</source>
-      <translation>Водяной знак не найден</translation>
+      <translation type="unfinished">Watermark Not Found</translation>
     </message>
     <message>
       <source>Watermark Matched</source>
-      <translation>Корректный водяной знак</translation>
+      <translation type="unfinished">Watermark Matched</translation>
     </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
     <message>
       <source>Auto</source>
-      <translation>Авто</translation>
+      <translation type="unfinished">Auto</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation type="unfinished">Email</translation>
     </message>
     <message>
       <source>SMTP Server</source>
-      <translation>SMTP-сервер</translation>
+      <translation type="unfinished">SMTP Server</translation>
     </message>
     <message>
       <source>Server cannot be empty.</source>
-      <translation>Сервер не может быть пустым.</translation>
+      <translation type="unfinished">Server cannot be empty.</translation>
     </message>
     <message>
       <source>User</source>
-      <translation>Пользователь</translation>
+      <translation type="unfinished">User</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Пароль</translation>
+      <translation type="unfinished">Password</translation>
     </message>
     <message>
       <source>System Signature</source>
-      <translation>Информация о системе</translation>
+      <translation type="unfinished">System Signature</translation>
     </message>
     <message>
       <source>Support Signature</source>
-      <translation>Информация о технической поддержке</translation>
+      <translation type="unfinished">Support Signature</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
-      <translation>Введите краткое описание системы.</translation>
+      <translation type="unfinished">Enter a short System description here.</translation>
     </message>
   </context>
   <context>
     <name>QnSmtpSimpleSettingsWidget</name>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation type="unfinished">Email</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
-      <translation>Некорректный Email.</translation>
+      <translation type="unfinished">Email is not valid.</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Пароль</translation>
+      <translation type="unfinished">Password</translation>
     </message>
     <message>
       <source>Password cannot be empty.</source>
-      <translation>Пароль должен быть задан.</translation>
+      <translation type="unfinished">Password cannot be empty.</translation>
     </message>
     <message>
       <source>System Signature</source>
-      <translation>Информация о системе</translation>
+      <translation type="unfinished">System Signature</translation>
     </message>
     <message>
       <source>Support Signature</source>
-      <translation>Информация о технической поддержке</translation>
+      <translation type="unfinished">Support Signature</translation>
     </message>
     <message>
       <source>No preset found. Use &quot;Advanced&quot; option.</source>
-      <translation>Не найдена настроенная позиция. Воспользуйтесь дополнительными настройками.</translation>
+      <translation type="unfinished">No preset found. Use &quot;Advanced&quot; option.</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
-      <translation>Введите краткое описание системы.</translation>
+      <translation type="unfinished">Enter a short System description here.</translation>
     </message>
   </context>
   <context>
     <name>QnSmtpTestConnectionWidget</name>
     <message>
       <source>Timed Out</source>
-      <translation>Время ожидания истекло</translation>
+      <translation type="unfinished">Timed Out</translation>
     </message>
     <message>
       <source>TLS</source>
-      <translation>TLS</translation>
+      <translation type="unfinished">TLS</translation>
     </message>
     <message>
       <source>SSL</source>
-      <translation>SSL</translation>
+      <translation type="unfinished">SSL</translation>
     </message>
     <message>
       <source>Unsecured</source>
-      <translation>Незащищенное</translation>
+      <translation type="unfinished">Unsecured</translation>
     </message>
     <message>
       <source>In Progress...</source>
-      <translation>Выполняется...</translation>
+      <translation type="unfinished">In Progress...</translation>
     </message>
     <message>
       <source>Success</source>
-      <translation>Успешно</translation>
+      <translation type="unfinished">Success</translation>
     </message>
     <message>
       <source>Connection timed out</source>
-      <translation>Истекло время ожидания соединения</translation>
+      <translation type="unfinished">Connection timed out</translation>
     </message>
     <message>
       <source>Authentication failed</source>
-      <translation>Ошибка авторизации</translation>
+      <translation type="unfinished">Authentication failed</translation>
     </message>
     <message>
       <source>SMTP Error %1</source>
-      <translation>%1 ошибка SMTP</translation>
+      <translation type="unfinished">SMTP Error %1</translation>
     </message>
     <message>
       <source>Network error</source>
-      <translation>Сетевая ошибка</translation>
+      <translation type="unfinished">Network error</translation>
     </message>
     <message>
       <source>Invalid parameters</source>
-      <translation>Недопустимые параметры</translation>
+      <translation type="unfinished">Invalid parameters</translation>
     </message>
     <message>
       <source>Cannot perform the test.</source>
-      <translation>Не удаётся выполнить проверку.</translation>
+      <translation type="unfinished">Cannot perform the test.</translation>
     </message>
   </context>
   <context>
     <name>QnSoftwareTriggerBusinessEventWidget</name>
     <message>
       <source>User Input</source>
-      <translation>Другие действия</translation>
+      <translation type="unfinished">User Input</translation>
     </message>
   </context>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
       <source>NO DATA</source>
-      <translation>НЕТ ДАННЫХ</translation>
+      <translation type="unfinished">NO DATA</translation>
     </message>
     <message>
       <source>UNAUTHORIZED</source>
-      <translation>ОШИБКА АВТОРИЗАЦИИ</translation>
+      <translation type="unfinished">UNAUTHORIZED</translation>
     </message>
     <message>
       <source>SERVER UNAVAILABLE</source>
-      <translation>СЕРВЕР НЕДОСТУПЕН</translation>
+      <translation type="unfinished">SERVER UNAVAILABLE</translation>
     </message>
     <message>
       <source>NO ACCESS</source>
-      <translation>НЕТ ДОСТУПА</translation>
+      <translation type="unfinished">NO ACCESS</translation>
     </message>
     <message>
       <source>DEVICE DISABLED</source>
-      <translation>УСТРОЙСТВО ОТКЛЮЧЕНО</translation>
+      <translation type="unfinished">DEVICE DISABLED</translation>
     </message>
     <message>
       <source>Device Settings</source>
-      <translation>Настройки устройства</translation>
+      <translation type="unfinished">Device Settings</translation>
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation>Настройки камеры</translation>
+      <translation type="unfinished">Camera Settings</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation>Настройки модуля ввода-вывода</translation>
+      <translation type="unfinished">I/O Module Settings</translation>
     </message>
     <message>
       <source>Diagnostics</source>
-      <translation>Диагностика</translation>
+      <translation type="unfinished">Diagnostics</translation>
     </message>
     <message>
       <source>Enable</source>
-      <translation>Включить</translation>
+      <translation type="unfinished">Enable</translation>
     </message>
     <message>
       <source>Activate License</source>
-      <translation>Активировать лицензию</translation>
+      <translation type="unfinished">Activate License</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
-      <translation>Пожалуйста, проверьте настройки аутентификации</translation>
+      <translation type="unfinished">Please check authentication information</translation>
     </message>
     <message>
       <source>NO LIVE STREAM</source>
-      <translation>НЕТ ЖИВОГО ВИДЕО</translation>
+      <translation type="unfinished">NO LIVE STREAM</translation>
     </message>
     <message>
       <source>TOO MANY CONNECTIONS</source>
-      <translation>СЛИШКОМ МНОГО СОЕДИНЕНИЙ</translation>
+      <translation type="unfinished">TOO MANY CONNECTIONS</translation>
     </message>
     <message>
       <source>PASSWORD REQUIRED</source>
-      <translation>ТРЕБУЕТСЯ ПАРОЛЬ</translation>
+      <translation type="unfinished">PASSWORD REQUIRED</translation>
     </message>
     <message>
       <source>Set for this Camera</source>
-      <translation>Установить для этой камеры</translation>
+      <translation type="unfinished">Set for this Camera</translation>
     </message>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
-      <translation>ВЕРСИЯ ПРОШИВКИ НЕ ПОДДЕРЖИВАЕТСЯ</translation>
+      <translation type="unfinished">UNSUPPORTED FIRMWARE VERSION</translation>
     </message>
     <message>
       <source>NOT ENOUGH LICENSES</source>
-      <translation>НЕ ХВАТАЕТ ЛИЦЕНЗИЙ</translation>
+      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation>НЕ В СЕТИ</translation>
+      <translation type="unfinished">OFFLINE</translation>
     </message>
     <message>
       <source>ARCHIVE ENCRYPTED</source>
@@ -5265,214 +5129,212 @@ to %1</source>
     <name>QnStorageAnalyticsWidget</name>
     <message>
       <source>Select All</source>
-      <translation>Выделить все</translation>
+      <translation type="unfinished">Select All</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>Экспорт выделенного в файл...</translation>
+      <translation type="unfinished">Export Selection to File...</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>Скопировать в буфер обмена</translation>
+      <translation type="unfinished">Copy Selection to Clipboard</translation>
     </message>
     <message>
       <source>Refresh</source>
-      <translation>Обновить</translation>
+      <translation type="unfinished">Refresh</translation>
     </message>
     <message>
       <source>Export selected events to file</source>
-      <translation>Экспорт выбранных событий в файл</translation>
+      <translation type="unfinished">Export selected events to file</translation>
     </message>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation>
-        <numerusform>%n ТБ</numerusform>
-        <numerusform>%n ТБ</numerusform>
-        <numerusform>%n ТБ</numerusform>
-        <numerusform>%n ТБ</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n TB</numerusform>
+        <numerusform>%n TB</numerusform>
       </translation>
     </message>
     <message>
       <source>TB</source>
       <comment>TB - terabytes</comment>
-      <translation>ТБ</translation>
+      <translation type="unfinished">TB</translation>
     </message>
     <message>
       <source>Last 5 minutes</source>
-      <translation>Последние 5 минут</translation>
+      <translation type="unfinished">Last 5 minutes</translation>
     </message>
     <message>
       <source>Last 60 minutes</source>
-      <translation>Последние 60 минут</translation>
+      <translation type="unfinished">Last 60 minutes</translation>
     </message>
     <message>
       <source>Last 24 hours</source>
-      <translation>Последние 24 часа</translation>
+      <translation type="unfinished">Last 24 hours</translation>
     </message>
     <message>
       <source>Longest period available</source>
-      <translation>Самый длинный доступный период</translation>
+      <translation type="unfinished">Longest period available</translation>
     </message>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
-      <translation>Прогноз доступен только для камер с включенной записью.</translation>
+      <translation type="unfinished">Forecast available only for cameras with enabled recording.</translation>
     </message>
   </context>
   <context>
     <name>QnStorageConfigWidget</name>
     <message>
       <source>Main</source>
-      <translation>Главное</translation>
+      <translation type="unfinished">Main</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation>Резервное</translation>
+      <translation type="unfinished">Backup</translation>
     </message>
     <message>
       <source>Depending on the total size of the archive, reindexing can take up to several hours.</source>
-      <translation>В зависимости от общего размера архива переиндексации может занять до нескольких часов.</translation>
+      <translation type="unfinished">Depending on the total size of the archive, reindexing can take up to several hours.</translation>
     </message>
     <message>
       <source>Reindexing is only necessary if your archive folders have been moved, renamed or deleted.</source>
-      <translation>Переиндексация необходима только если архивные папки были перемещены, переименованы или удалены.</translation>
+      <translation type="unfinished">Reindexing is only necessary if your archive folders have been moved, renamed or deleted.</translation>
     </message>
     <message>
       <source>You can cancel this operation at any moment without data loss.</source>
-      <translation>Вы можете отменить эту операцию в любой момент без потери данных.</translation>
+      <translation type="unfinished">You can cancel this operation at any moment without data loss.</translation>
     </message>
     <message>
       <source>Continue anyway?</source>
-      <translation>Продолжить?</translation>
+      <translation type="unfinished">Continue anyway?</translation>
     </message>
     <message>
       <source>Hard disk load will increase significantly</source>
-      <translation>Нагрузка жесткого диска значительно возрастет</translation>
+      <translation type="unfinished">Hard disk load will increase significantly</translation>
     </message>
     <message>
       <source>Archive reindexing completed</source>
-      <translation>Переиндексация архива завершена</translation>
+      <translation type="unfinished">Archive reindexing completed</translation>
     </message>
     <message>
       <source>Backup reindexing completed</source>
-      <translation>Переиндексация резервного архива завершена</translation>
+      <translation type="unfinished">Backup reindexing completed</translation>
     </message>
     <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
-      <translation>Переиндексация может исправить проблемы с архивом или резервной копией, если они были утрачены или повреждены, или если некоторое оборудование было заменено.</translation>
+      <translation type="unfinished">Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</translation>
     </message>
     <message>
       <source>What to do with current analytics data?</source>
-      <translation>Что делать с текущими данными аналитики?</translation>
+      <translation type="unfinished">What to do with current analytics data?</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Удалить</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <source>Keep</source>
-      <translation>Оставить</translation>
+      <translation type="unfinished">Keep</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Отмена</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation>Текущие данные аналитики не будут автоматически перемещены в другое место и станут недоступными. Вы можете сохранить их и вручную переместить позже или удалить навсегда.
-Если вы хотите переместить данные аналитики в другое место хранения, пожалуйста, свяжитесь с поддержкой перед продолжением.</translation>
+      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
     </message>
     <message>
       <source>Insufficient permissions to store analytics data.</source>
-      <translation>Недостаточно прав для хранения данных аналитики.</translation>
+      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
     </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
     <message>
       <source>Invalid storage</source>
-      <translation>Неверное хранилище</translation>
+      <translation type="unfinished">Invalid storage</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Удалить</translation>
+      <translation type="unfinished">Remove</translation>
     </message>
     <message>
       <source>Inaccessible</source>
-      <translation>Недоступен</translation>
+      <translation type="unfinished">Inaccessible</translation>
     </message>
     <message>
       <source>%1 (Checking...)</source>
-      <translation>%1 (Проверка...)</translation>
+      <translation type="unfinished">%1 (Checking...)</translation>
     </message>
     <message>
       <source>%1 (Scanning... %2%)</source>
-      <translation>%1 (Сканирование... %2%)</translation>
+      <translation type="unfinished">%1 (Scanning... %2%)</translation>
     </message>
     <message>
       <source>%1 (Rebuilding... %2%)</source>
-      <translation>%1 (Восстановление... %2%)</translation>
+      <translation type="unfinished">%1 (Rebuilding... %2%)</translation>
     </message>
     <message>
       <source>Loading...</source>
-      <translation>Загрузка...</translation>
+      <translation type="unfinished">Loading...</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation>Резервное</translation>
+      <translation type="unfinished">Backup</translation>
     </message>
     <message>
       <source>Main</source>
-      <translation>Главное</translation>
+      <translation type="unfinished">Main</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 ГБ</translation>
+      <translation type="unfinished">%1 GB</translation>
     </message>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
-      <translation>Слишком маленькие и системные разделы зарезервированы и не используются для записи, если имеется достаточно свободного места на другом хранилище.</translation>
+      <translation type="unfinished">Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</translation>
     </message>
     <message>
       <source>Use to store analytics data</source>
-      <translation>Использовать для хранения данных аналитики</translation>
+      <translation type="unfinished">Use to store analytics data</translation>
     </message>
     <message>
       <source>Stores analytics data</source>
-      <translation>Хранит данные аналитики</translation>
+      <translation type="unfinished">Stores analytics data</translation>
     </message>
     <message>
       <source>Reserved</source>
-      <translation>Зарезервировано</translation>
+      <translation type="unfinished">Reserved</translation>
     </message>
     <message>
       <source>local</source>
-      <translation>локальное</translation>
+      <translation type="unfinished">local</translation>
     </message>
     <message>
       <source>ram</source>
-      <translation>озу</translation>
+      <translation type="unfinished">ram</translation>
     </message>
     <message>
       <source>optical</source>
-      <translation>оптическое</translation>
+      <translation type="unfinished">optical</translation>
     </message>
     <message>
       <source>swap</source>
-      <translation>своп</translation>
+      <translation type="unfinished">swap</translation>
     </message>
     <message>
       <source>network</source>
-      <translation>сетевое</translation>
+      <translation type="unfinished">network</translation>
     </message>
     <message>
       <source>usb</source>
-      <translation>usb</translation>
+      <translation type="unfinished">usb</translation>
     </message>
     <message>
       <source>%1 TB</source>
-      <translation>%1 Тб</translation>
+      <translation type="unfinished">%1 TB</translation>
     </message>
     <message>
       <source>smb</source>
@@ -5483,54 +5345,54 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnStorageRebuildWidget</name>
     <message>
       <source>Fast Backup Scan...</source>
-      <translation>Быстрое сканирование резервного архива...</translation>
+      <translation type="unfinished">Fast Backup Scan...</translation>
     </message>
     <message>
       <source>Fast Archive Scan...</source>
-      <translation>Быстрое сканирование архива...</translation>
+      <translation type="unfinished">Fast Archive Scan...</translation>
     </message>
     <message>
       <source>Reindexing Backup...</source>
-      <translation>Переиндексация резервного архива...</translation>
+      <translation type="unfinished">Reindexing Backup...</translation>
     </message>
     <message>
       <source>Reindexing Archive...</source>
-      <translation>Переиндексация архива...</translation>
+      <translation type="unfinished">Reindexing Archive...</translation>
     </message>
   </context>
   <context>
     <name>QnStorageUrlDialog</name>
     <message>
       <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
-      <translation>\\&lt;Имя компьютера&gt;\&lt;Папка&gt;</translation>
+      <translation type="unfinished">\\&lt;Computer Name&gt;\&lt;Folder&gt;</translation>
     </message>
     <message>
       <source>Network Shared Resource</source>
-      <translation>Общий ресурс сети Windows</translation>
+      <translation type="unfinished">Network Shared Resource</translation>
     </message>
     <message>
       <source>Invalid credentials for external storage</source>
-      <translation>Недопустимые учётные данные для внешнего хранилища</translation>
+      <translation type="unfinished">Invalid credentials for external storage</translation>
     </message>
     <message>
       <source>Invalid storage path</source>
-      <translation>Недопустимый путь к внешнему хранилищу</translation>
+      <translation type="unfinished">Invalid storage path</translation>
     </message>
     <message>
       <source>Add this storage anyway?</source>
-      <translation>Добавить это хранилище в любом случае?</translation>
+      <translation type="unfinished">Add this storage anyway?</translation>
     </message>
     <message>
       <source>Storage path used by another server</source>
-      <translation>Путь, указанный для хранилища, используется другим сервером</translation>
+      <translation type="unfinished">Storage path used by another server</translation>
     </message>
     <message>
       <source>Add Storage</source>
-      <translation>Добавить хранилище</translation>
+      <translation type="unfinished">Add Storage</translation>
     </message>
     <message>
       <source>It is not recommended to use one recording location for different servers.</source>
-      <translation>Не рекомендуется использовать один и тот же путь для записи на разных серверах.</translation>
+      <translation type="unfinished">It is not recommended to use one recording location for different servers.</translation>
     </message>
     <message>
       <source>Storage is available but will not be writable because it is too small in comparison to the already present storages</source>
@@ -5541,180 +5403,180 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>General</source>
-      <translation>Общие</translation>
+      <translation type="unfinished">General</translation>
     </message>
     <message>
       <source>Licenses</source>
-      <translation>Лицензии</translation>
+      <translation type="unfinished">Licenses</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation type="unfinished">Email</translation>
     </message>
     <message>
       <source>Updates</source>
-      <translation>Обновления</translation>
+      <translation type="unfinished">Updates</translation>
     </message>
     <message>
       <source>Routing Management</source>
-      <translation>Маршрутизация</translation>
+      <translation type="unfinished">Routing Management</translation>
     </message>
     <message>
       <source>Time Synchronization</source>
-      <translation>Синхронизация времени</translation>
+      <translation type="unfinished">Time Synchronization</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation>Пользователи</translation>
+      <translation type="unfinished">Users</translation>
     </message>
     <message>
       <source>Plugins</source>
-      <translation>Плагины</translation>
+      <translation type="unfinished">Plugins</translation>
     </message>
     <message>
       <source>Security</source>
-      <translation>Безопасность</translation>
+      <translation type="unfinished">Security</translation>
     </message>
   </context>
   <context>
     <name>QnSystemHealthStringsHelper</name>
     <message>
       <source>Email address is not set</source>
-      <translation>Не настроен адрес Email</translation>
+      <translation type="unfinished">Email address is not set</translation>
     </message>
     <message>
       <source>No licenses</source>
-      <translation>Нет лицензий</translation>
+      <translation type="unfinished">No licenses</translation>
     </message>
     <message>
       <source>Email server is not set</source>
-      <translation>Не настроен сервер Email</translation>
+      <translation type="unfinished">Email server is not set</translation>
     </message>
     <message>
       <source>Storage is not configured</source>
-      <translation>Хранилище не настроено</translation>
+      <translation type="unfinished">Storage is not configured</translation>
     </message>
     <message>
       <source>Rebuilding archive index is completed</source>
-      <translation>Восстановление архива завершено</translation>
+      <translation type="unfinished">Rebuilding archive index is completed</translation>
     </message>
     <message>
       <source>Rebuilding archive index is canceled by user</source>
-      <translation>Восстановление архива отменено позьзователем</translation>
+      <translation type="unfinished">Rebuilding archive index is canceled by user</translation>
     </message>
     <message>
       <source>Email address is not set for user %1</source>
-      <translation>У пользователя %1 не настроен адрес Email</translation>
+      <translation type="unfinished">Email address is not set for user %1</translation>
     </message>
     <message>
       <source>Email address is not set.</source>
-      <translation>Адрес Email не настроен.</translation>
+      <translation type="unfinished">Email address is not set.</translation>
     </message>
     <message>
       <source>Email server is not set.</source>
-      <translation>Сервер Email не настроен.</translation>
+      <translation type="unfinished">Email server is not set.</translation>
     </message>
     <message>
       <source>You have no licenses.</source>
-      <translation>Нет лицензий.</translation>
+      <translation type="unfinished">You have no licenses.</translation>
     </message>
     <message>
       <source>You cannot record video from cameras.</source>
-      <translation>Запись видео с камер невозможна.</translation>
+      <translation type="unfinished">You cannot record video from cameras.</translation>
     </message>
     <message>
       <source>Rebuilding archive index is completed on the following Server:</source>
-      <translation>Завершено восстановление архива на сервере:</translation>
+      <translation type="unfinished">Rebuilding archive index is completed on the following Server:</translation>
     </message>
     <message>
       <source>Rebuilding archive index is canceled by user on the following Server:</source>
-      <translation>Восстановление архива отменено позьзователем на сервере:</translation>
+      <translation type="unfinished">Rebuilding archive index is canceled by user on the following Server:</translation>
     </message>
     <message>
       <source>Learn more</source>
-      <translation>Подробнее</translation>
+      <translation type="unfinished">Learn more</translation>
     </message>
     <message>
       <source>Connect</source>
-      <translation>Соединение</translation>
+      <translation type="unfinished">Connect</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
-      <translation>У некоторых пользователей не настроен адрес Email</translation>
+      <translation type="unfinished">Some users have not set their email addresses</translation>
     </message>
     <message>
       <source>You cannot receive System notifications by email.</source>
-      <translation>Вы не можете получать оповещения по Email.</translation>
+      <translation type="unfinished">You cannot receive System notifications by email.</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses.</source>
-      <translation>У некоторых пользователей не настроен адрес Email.</translation>
+      <translation type="unfinished">Some users have not set their email addresses.</translation>
     </message>
     <message>
       <source>They cannot receive System notifications by email.</source>
-      <translation>Они не могут получать оповещения по Email.</translation>
+      <translation type="unfinished">They cannot receive System notifications by email.</translation>
     </message>
     <message>
       <source>Error while sending email</source>
-      <translation>Ошибка отправки Email</translation>
+      <translation type="unfinished">Error while sending email</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been started</source>
-      <translation>Синхронизация удаленного архива запущена</translation>
+      <translation type="unfinished">Remote archive synchronization has been started</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been finished</source>
-      <translation>Синхронизация удаленного архива завершена</translation>
+      <translation type="unfinished">Remote archive synchronization has been finished</translation>
     </message>
     <message>
       <source>Remote archive synchronization is in progress</source>
-      <translation>Выполняется синхронизация удаленного архива</translation>
+      <translation type="unfinished">Remote archive synchronization is in progress</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been started for the following device:</source>
-      <translation>Синхронизация удаленного архива была запущена для следующего устройства:</translation>
+      <translation type="unfinished">Remote archive synchronization has been started for the following device:</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been finished for the following device:</source>
-      <translation>Завершена синхронизация удаленного архива для следующего устройства:</translation>
+      <translation type="unfinished">Remote archive synchronization has been finished for the following device:</translation>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation>Remote archive synchronization</translation>
+      <translation type="unfinished">Remote archive synchronization</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
-      <translation>Обнаружена проблема целостности архива</translation>
+      <translation type="unfinished">Archive integrity problem detected</translation>
     </message>
     <message>
       <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Подключите свою систему к %1 &amp;mdash;, чтобы сделать ее доступной отовсюду!</translation>
+      <translation type="unfinished">Connect your System to %1 &amp;mdash; make it accessible from anywhere!</translation>
     </message>
     <message>
       <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Узнать больше о %1 &amp;mdash; подключение к системе из любого места!</translation>
+      <translation type="unfinished">Check out %1 &amp;mdash; connect to your System from anywhere!</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation>Некоторые камеры требуют установки паролей</translation>
+      <translation type="unfinished">Some cameras require passwords to be set</translation>
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
-      <translation>Ни один сервер не имеет доступа в интернет для синхронизации времени</translation>
+      <translation type="unfinished">No server has internet access for time synchronization</translation>
     </message>
     <message>
       <source>The System has no internet access for time synchronization</source>
-      <translation>Система не имеет доступа в интернет для синхронизации времени</translation>
+      <translation type="unfinished">The System has no internet access for time synchronization</translation>
     </message>
     <message>
       <source>No online server in the System has internet access for time synchronization.</source>
-      <translation>Ни один онлайн сервер в системе не имеет доступа в интернет для синхронизации времени.</translation>
+      <translation type="unfinished">No online server in the System has internet access for time synchronization.</translation>
     </message>
     <message>
       <source>Error occurred during remote archive synchronization</source>
-      <translation>Ошибка при синхронизации удаленного архива</translation>
+      <translation type="unfinished">Error occurred during remote archive synchronization</translation>
     </message>
     <message>
       <source>Backup storage is not configured</source>
@@ -5729,170 +5591,170 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnSystemSettingsWidget</name>
     <message>
       <source>Allow System to optimize device settings</source>
-      <translation>Разрешить системе оптимизировать настройки устройств</translation>
+      <translation type="unfinished">Allow System to optimize device settings</translation>
     </message>
     <message>
       <source>Allow System to optimize camera settings</source>
-      <translation>Разрешить системе оптимизировать настройки камер</translation>
+      <translation type="unfinished">Allow System to optimize camera settings</translation>
     </message>
     <message>
       <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
-      <translation>Включает информацию о системе, такую ​​как модели камер и версии прошивки, количество серверов и т. д.</translation>
+      <translation type="unfinished">Includes information about system, such as cameras models and firmware versions, number of servers, etc.</translation>
     </message>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
-      <translation>Не содержит никакой личной информации и является полностью анонимным.</translation>
+      <translation type="unfinished">Does not include any personal information and is completely anonymous.</translation>
     </message>
     <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
-      <translation>Включить автообнаружение устройств и серверов и автоматическую проверку состояния устройства</translation>
+      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
     </message>
     <message>
       <source>Enable cameras and servers autodiscovery and automated camera status check</source>
-      <translation>Включить автообнаружение камер и серверов и автоматическую проверку состояния камеры</translation>
+      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
     </message>
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
-      <translation>При включении система постоянно обнаруживает новые камеры и серверы и отправляет запросы на поиск камерам для обновления статуса.</translation>
+      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
     </message>
     <message>
       <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
-      <translation>При Failover сервер по-прежнему будет запрашивать обновления статуса камеры независимо от этой настройки.</translation>
+      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
     </message>
   </context>
   <context>
     <name>QnTableExportHelper</name>
     <message>
       <source>Close all programs which may use this file and try again</source>
-      <translation>Закройте все программы, которые могут использовать этот файл и повторите попытку</translation>
+      <translation type="unfinished">Close all programs which may use this file and try again</translation>
     </message>
     <message>
       <source>File used by another process</source>
-      <translation>Файл используется другим процессом</translation>
+      <translation type="unfinished">File used by another process</translation>
     </message>
     <message>
       <source>HTML file</source>
-      <translation>Файл HTML</translation>
+      <translation type="unfinished">HTML file</translation>
     </message>
     <message>
       <source>Spread Sheet (CSV) File</source>
-      <translation>Файл таблицы (CSV)</translation>
+      <translation type="unfinished">Spread Sheet (CSV) File</translation>
     </message>
   </context>
   <context>
     <name>QnTimeSlider</name>
     <message>
       <source>No thumbnails available</source>
-      <translation>Нет доступных миниатюр</translation>
+      <translation type="unfinished">No thumbnails available</translation>
     </message>
   </context>
   <context>
     <name>QnTwoWayAudioWidget::Private</name>
     <message>
       <source>Input device is not selected</source>
-      <translation>Устройство ввода не выбрано</translation>
+      <translation type="unfinished">Input device is not selected</translation>
     </message>
     <message>
       <source>Streaming is not ready yet</source>
-      <translation>Потоковая передача ещё не готова</translation>
+      <translation type="unfinished">Streaming is not ready yet</translation>
     </message>
     <message>
       <source>Network error</source>
-      <translation>Сетевая ошибка</translation>
+      <translation type="unfinished">Network error</translation>
     </message>
     <message>
       <source>Hold to Speak</source>
-      <translation>Нажмите и говорите</translation>
+      <translation type="unfinished">Hold to Speak</translation>
     </message>
   </context>
   <context>
     <name>QnUserListModel</name>
     <message>
       <source>LDAP user</source>
-      <translation>Пользователь LDAP</translation>
+      <translation type="unfinished">LDAP user</translation>
     </message>
     <message>
       <source>Enabled</source>
-      <translation>Активирован</translation>
+      <translation type="unfinished">Enabled</translation>
     </message>
     <message>
       <source>Disabled</source>
-      <translation>Деактивирован</translation>
+      <translation type="unfinished">Disabled</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation>Имя</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Local user</source>
-      <translation>Локальный пользователь</translation>
+      <translation type="unfinished">Local user</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation>Логин</translation>
+      <translation type="unfinished">Login</translation>
     </message>
     <message>
       <source>Role</source>
-      <translation>Роль</translation>
+      <translation type="unfinished">Role</translation>
     </message>
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 пользователь</translation>
+      <translation type="unfinished">%1 user</translation>
     </message>
   </context>
   <context>
     <name>QnUserListModelPrivate</name>
     <message>
       <source>Owner</source>
-      <translation>Владелец</translation>
+      <translation type="unfinished">Owner</translation>
     </message>
     <message>
       <source>Administrator</source>
-      <translation>Администратор</translation>
+      <translation type="unfinished">Administrator</translation>
     </message>
     <message>
       <source>View live video</source>
-      <translation>Просмотр видео в реальном времени</translation>
+      <translation type="unfinished">View live video</translation>
     </message>
     <message>
       <source>Use PTZ controls</source>
-      <translation>Использование PTZ</translation>
+      <translation type="unfinished">Use PTZ controls</translation>
     </message>
     <message>
       <source>View video archives</source>
-      <translation>Просмотр архива</translation>
+      <translation type="unfinished">View video archives</translation>
     </message>
     <message>
       <source>Export video</source>
-      <translation>Экспорт видео</translation>
+      <translation type="unfinished">Export video</translation>
     </message>
     <message>
       <source>Adjust device settings</source>
-      <translation>Настройка камер</translation>
+      <translation type="unfinished">Adjust device settings</translation>
     </message>
     <message>
       <source>Adjust camera settings</source>
-      <translation>Настройка устройств</translation>
+      <translation type="unfinished">Adjust camera settings</translation>
     </message>
     <message>
       <source>Control Video Walls</source>
-      <translation>Управление видеостенами</translation>
+      <translation type="unfinished">Control Video Walls</translation>
     </message>
   </context>
   <context>
     <name>QnUserManagementWidget</name>
     <message>
       <source>Edit</source>
-      <translation>Правка</translation>
+      <translation type="unfinished">Edit</translation>
     </message>
     <message>
       <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
-      <translation>Пользователи могут быть импортированы с сервера LDAP. Они смогут входить в систему только в том случае, если сервер LDAP подключен к сети, и их учетные записи активны.</translation>
+      <translation type="unfinished">Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</translation>
     </message>
     <message>
       <source>All users</source>
-      <translation>Все пользователи</translation>
+      <translation type="unfinished">All users</translation>
     </message>
     <message>
       <source>With enabled digest authentication</source>
@@ -5903,19 +5765,19 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnUserProfileWidget</name>
     <message>
       <source>Login</source>
-      <translation>Логин</translation>
+      <translation type="unfinished">Login</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation>Имя</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Role</source>
-      <translation>Роль</translation>
+      <translation type="unfinished">Role</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation type="unfinished">Email</translation>
     </message>
     <message>
       <source>To enable digest authentication password reset is required</source>
@@ -5926,42 +5788,40 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnUserRoleSettingsWidget</name>
     <message>
       <source>Role name cannot be empty.</source>
-      <translation>Имя роли не может быть пустым.</translation>
+      <translation type="unfinished">Role name cannot be empty.</translation>
     </message>
     <message>
       <source>Role with same name already exists.</source>
-      <translation>Роль с таким же именем уже существует.</translation>
+      <translation type="unfinished">Role with same name already exists.</translation>
     </message>
   </context>
   <context>
     <name>QnUserRoleSettingsWidgetPrivate</name>
     <message>
       <source>No users have this role</source>
-      <translation>Роль не назначена ни одному пользлвателю</translation>
+      <translation type="unfinished">No users have this role</translation>
     </message>
     <message>
       <source>Custom with no permissions</source>
-      <translation>Особая, без полномочий</translation>
+      <translation type="unfinished">Custom with no permissions</translation>
     </message>
     <message>
       <source>Users will have no permissions unless changed later.</source>
-      <translation>Пользователи не будут иметь полномочий, пока настройка не будет изменена.</translation>
+      <translation type="unfinished">Users will have no permissions unless changed later.</translation>
     </message>
     <message>
       <source>Assign a new role</source>
-      <translation>Назначить новую роль</translation>
+      <translation type="unfinished">Assign a new role</translation>
     </message>
     <message>
       <source>Delete such users</source>
-      <translation>Удалить таких пользователей</translation>
+      <translation type="unfinished">Delete such users</translation>
     </message>
     <message numerus="yes">
       <source>Please select an action to perform on %n users with this role</source>
-      <translation>
-        <numerusform>Пожалуйста, выберите действие для выполнения с %n пользователем с этой ролью</numerusform>
-        <numerusform>Пожалуйста, выберите действие для выполнения с %n пользователями с этой ролью</numerusform>
-        <numerusform>Пожалуйста, выберите действие для выполнения с %n пользователями с этой ролью</numerusform>
-        <numerusform>Пожалуйста, выберите действие для выполнения с %n пользователями с этой ролью</numerusform>
+      <translation type="unfinished">
+        <numerusform>Please select an action to perform on %n users with this role</numerusform>
+        <numerusform>Please select an action to perform on %n users with this role</numerusform>
       </translation>
     </message>
   </context>
@@ -5969,75 +5829,75 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnUserRolesDialog</name>
     <message>
       <source>Role Info</source>
-      <translation>Информация о роли</translation>
+      <translation type="unfinished">Role Info</translation>
     </message>
     <message>
       <source>Permissions</source>
-      <translation>Полномочия</translation>
+      <translation type="unfinished">Permissions</translation>
     </message>
     <message>
       <source>Cameras &amp;&amp; Resources</source>
-      <translation>Камеры и ресурсы</translation>
+      <translation type="unfinished">Cameras &amp;&amp; Resources</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation>Раскладки</translation>
+      <translation type="unfinished">Layouts</translation>
     </message>
     <message>
       <source>New Role</source>
-      <translation>Новая роль</translation>
+      <translation type="unfinished">New Role</translation>
     </message>
     <message>
       <source>New Role %1</source>
-      <translation>Новая роль %1</translation>
+      <translation type="unfinished">New Role %1</translation>
     </message>
   </context>
   <context>
     <name>QnUserSettingsDialog</name>
     <message>
       <source>User Information</source>
-      <translation>Информация пользователе</translation>
+      <translation type="unfinished">User Information</translation>
     </message>
     <message>
       <source>Permissions</source>
-      <translation>Полномочия</translation>
+      <translation type="unfinished">Permissions</translation>
     </message>
     <message>
       <source>Cameras &amp;&amp; Resources</source>
-      <translation>Камеры и ресурсы</translation>
+      <translation type="unfinished">Cameras &amp;&amp; Resources</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation>Раскладки</translation>
+      <translation type="unfinished">Layouts</translation>
     </message>
     <message>
       <source>New User...</source>
-      <translation>Создать пользователя...</translation>
+      <translation type="unfinished">New User...</translation>
     </message>
     <message>
       <source>User Settings - %1 (readonly)</source>
-      <translation>Настройки пользователя - %1 (только для чтения)</translation>
+      <translation type="unfinished">User Settings - %1 (readonly)</translation>
     </message>
     <message>
       <source>User Settings - %1</source>
-      <translation>Настройки пользователя - %1</translation>
+      <translation type="unfinished">User Settings - %1</translation>
     </message>
     <message>
       <source>Enabled</source>
-      <translation>Активирован</translation>
+      <translation type="unfinished">Enabled</translation>
     </message>
     <message>
       <source>User is disabled</source>
-      <translation>Пользователь отключен</translation>
+      <translation type="unfinished">User is disabled</translation>
     </message>
     <message>
       <source>Apply changes before switching to another user?</source>
-      <translation>Применить изменения перед переходом к другому пользователю?</translation>
+      <translation type="unfinished">Apply changes before switching to another user?</translation>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Этот пользователь еще не зарегистрировался в %1</translation>
+      <translation type="unfinished">This user has not yet signed up for %1</translation>
     </message>
     <message>
       <source>Allow digest authentication for this user</source>
@@ -6052,75 +5912,75 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnUserSettingsWidget</name>
     <message>
       <source>Local</source>
-      <translation>Локальный</translation>
+      <translation type="unfinished">Local</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation>Логин</translation>
+      <translation type="unfinished">Login</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
-      <translation>Логин должен быть задан.</translation>
+      <translation type="unfinished">Login cannot be empty.</translation>
     </message>
     <message>
       <source>User with specified login already exists.</source>
-      <translation>Пользователь с таким логином уже существует.</translation>
+      <translation type="unfinished">User with specified login already exists.</translation>
     </message>
     <message>
       <source>User has been renamed. Password must be updated.</source>
-      <translation>Имя пользователя изменено. Пароль должен быть обновлён.</translation>
+      <translation type="unfinished">User has been renamed. Password must be updated.</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation>Имя</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation type="unfinished">Email</translation>
     </message>
     <message>
       <source>Email cannot be empty.</source>
-      <translation>Email не может быть пустым.</translation>
+      <translation type="unfinished">Email cannot be empty.</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Пароль</translation>
+      <translation type="unfinished">Password</translation>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation>Подтверждение пароля</translation>
+      <translation type="unfinished">Confirm Password</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
-      <translation>Введённые пароли не совпадают.</translation>
+      <translation type="unfinished">Passwords do not match.</translation>
     </message>
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 пользователь с таким Email уже существует.</translation>
+      <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
     <message>
       <source>Local users</source>
-      <translation>Локальные пользователи</translation>
+      <translation type="unfinished">Local users</translation>
     </message>
     <message>
       <source>%1 users</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 пользователь</translation>
+      <translation type="unfinished">%1 users</translation>
     </message>
     <message>
       <source>%1 belong to this system only and are fully managed by system administrators.</source>
       <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
-      <translation>%1 принадлежат только этой системе и полностью управляются системными администраторами.</translation>
+      <translation type="unfinished">%1 belong to this system only and are fully managed by system administrators.</translation>
     </message>
     <message>
       <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
       <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
-      <translation>%1 может иметь доступ ко многим системам. Администраторы могут управлять только своими правами.</translation>
+      <translation type="unfinished">%1 can have access to many Systems. Administrators can manage their rights only.</translation>
     </message>
     <message>
       <source>Password reset is required</source>
-      <translation>Требуется сброс пароля</translation>
+      <translation type="unfinished">Password reset is required</translation>
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed.</source>
@@ -6131,65 +5991,63 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnValidatorStrings</name>
     <message>
       <source>Email cannot be empty.</source>
-      <translation>Email не может быть пустым.</translation>
+      <translation type="unfinished">Email cannot be empty.</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
-      <translation>Некорректный Email.</translation>
+      <translation type="unfinished">Email is not valid.</translation>
     </message>
     <message>
       <source>Password cannot be empty.</source>
-      <translation>Пароль должен быть задан.</translation>
+      <translation type="unfinished">Password cannot be empty.</translation>
     </message>
     <message>
       <source>Avoid leading and trailing spaces.</source>
-      <translation>Избегайте пробелов в начале и конце.</translation>
+      <translation type="unfinished">Avoid leading and trailing spaces.</translation>
     </message>
   </context>
   <context>
     <name>QnVideowallManageWidget</name>
     <message>
       <source>Screen</source>
-      <translation>Экран</translation>
+      <translation type="unfinished">Screen</translation>
     </message>
     <message>
       <source>Screen %1</source>
-      <translation>Экран %1</translation>
+      <translation type="unfinished">Screen %1</translation>
     </message>
   </context>
   <context>
     <name>QnVideowallManageWidgetPrivate</name>
     <message>
       <source>New Item</source>
-      <translation>Новый элемент</translation>
+      <translation type="unfinished">New Item</translation>
     </message>
     <message>
       <source>Display %1</source>
-      <translation>Дисплей %1</translation>
+      <translation type="unfinished">Display %1</translation>
     </message>
     <message>
       <source>Delete &quot;%1&quot;?</source>
-      <translation>Удалить &quot;%1&quot;?</translation>
+      <translation type="unfinished">Delete &quot;%1&quot;?</translation>
     </message>
   </context>
   <context>
     <name>QnVideowallScreenWidget</name>
     <message>
       <source>PC %1</source>
-      <translation>PC %1</translation>
+      <translation type="unfinished">PC %1</translation>
     </message>
     <message>
       <source>PC %1 - Display %2</source>
-      <translation>ПК %1 - дисплей %2</translation>
+      <translation type="unfinished">PC %1 - Display %2</translation>
     </message>
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
-      <translation>
-        <numerusform>ПК %1 - дисплей %2</numerusform>
-        <numerusform>ПК %1 - дисплеи %2</numerusform>
-        <numerusform>ПК %1 - дисплеи %2</numerusform>
-        <numerusform>ПК %1 - дисплеи %2</numerusform>
+      <translation type="unfinished">
+        <numerusform>PC %1 - Displays %2</numerusform>
+        <numerusform>PC %1 - Displays %2</numerusform>
       </translation>
     </message>
   </context>
@@ -6227,34 +6085,32 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>QnWorkbenchAlarmLayoutHandler</name>
     <message>
       <source>Alarms</source>
-      <translation>Тревога</translation>
+      <translation type="unfinished">Alarms</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchBookmarksHandler</name>
     <message>
       <source>Bookmark</source>
-      <translation>Закладка</translation>
+      <translation type="unfinished">Bookmark</translation>
     </message>
     <message>
       <source>Server offline</source>
-      <translation>Сервер не в сети</translation>
+      <translation type="unfinished">Server offline</translation>
     </message>
     <message>
       <source>Bookmarks can only be edited on an online Server.</source>
-      <translation>Закладка может быть отредактирована только на сервере, находящемся в сети.</translation>
+      <translation type="unfinished">Bookmarks can only be edited on an online Server.</translation>
     </message>
     <message>
       <source>Delete bookmark?</source>
-      <translation>Удалить закладку?</translation>
+      <translation type="unfinished">Delete bookmark?</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
-      <translation>
-        <numerusform>Удалить %n закладку?</numerusform>
-        <numerusform>Удалить %n закладки?</numerusform>
-        <numerusform>Удалить %n закладок?</numerusform>
-        <numerusform>Удалить %n закладок?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Delete %n bookmarks?</numerusform>
+        <numerusform>Delete %n bookmarks?</numerusform>
       </translation>
     </message>
   </context>
@@ -6262,33 +6118,33 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>QnWorkbenchController</name>
     <message>
       <source>To switch between cameras press Shift + Arrow</source>
-      <translation>Для переключения между камерами нажмите Shift + Стрелку</translation>
+      <translation type="unfinished">To switch between cameras press Shift + Arrow</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchNotificationsHandler</name>
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
-      <translation>Невозможно подтвердить событие на удаленной камере.</translation>
+      <translation type="unfinished">Unable to acknowledge event on removed camera.</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchPtzHandler</name>
     <message>
       <source>Zooming in...</source>
-      <translation>Увеличение...</translation>
+      <translation type="unfinished">Zooming in...</translation>
     </message>
     <message>
       <source>Zooming out...</source>
-      <translation>Уменьшение...</translation>
+      <translation type="unfinished">Zooming out...</translation>
     </message>
     <message>
       <source>Moving...</source>
-      <translation>Перемещение...</translation>
+      <translation type="unfinished">Moving...</translation>
     </message>
     <message>
       <source>Focusing...</source>
-      <translation>Фокусировка...</translation>
+      <translation type="unfinished">Focusing...</translation>
     </message>
     <message>
       <source>Camera %1 does not support PTZ</source>
@@ -6299,24 +6155,20 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message numerus="yes">
       <source>The following %n items are not saved:</source>
-      <translation>
-        <numerusform>%n элемент не сохранен:</numerusform>
-        <numerusform>%n элемента не сохранено:</numerusform>
-        <numerusform>%n элементов не сохранено:</numerusform>
-        <numerusform>%n элементов не сохранено:</numerusform>
+      <translation type="unfinished">
+        <numerusform>The following %n items are not saved:</numerusform>
+        <numerusform>The following %n items are not saved:</numerusform>
       </translation>
     </message>
     <message>
       <source>Failed to save changes</source>
-      <translation>Не удалось сохранить изменения</translation>
+      <translation type="unfinished">Failed to save changes</translation>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n items:</source>
-      <translation>
-        <numerusform>Failed to delete %n item:</numerusform>
-        <numerusform>Не удалось удалить %n элемента:</numerusform>
-        <numerusform>Не удалось удалить %n элементов:</numerusform>
-        <numerusform>Failed to delete %n item:</numerusform>
+      <translation type="unfinished">
+        <numerusform>Failed to delete %n items:</numerusform>
+        <numerusform>Failed to delete %n items:</numerusform>
       </translation>
     </message>
   </context>
@@ -6324,23 +6176,23 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>QnWorkbenchScreenRecordingHandler</name>
     <message>
       <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
-      <translation>Подсистема захвата экрана ещё не инициализирована. Пожалуйста, попытайтесь позже.</translation>
+      <translation type="unfinished">Screen capturing subsystem is not initialized yet. Please try again later.</translation>
     </message>
     <message>
       <source>Recording in %1...</source>
-      <translation>Запись через %1...</translation>
+      <translation type="unfinished">Recording in %1...</translation>
     </message>
     <message>
       <source>Recorded Video</source>
-      <translation>Записанное видео</translation>
+      <translation type="unfinished">Recorded Video</translation>
     </message>
     <message>
       <source>Save Recording As...</source>
-      <translation>Сохранить запись как...</translation>
+      <translation type="unfinished">Save Recording As...</translation>
     </message>
     <message>
       <source>Failed to start recording</source>
-      <translation>Не удалось начать запись</translation>
+      <translation type="unfinished">Failed to start recording</translation>
     </message>
     <message>
       <source>AVI (Audio/Video Interleaved)</source>
@@ -6355,546 +6207,486 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>QnWorkbenchScreenshotHandler</name>
     <message>
       <source>Save Screenshot As...</source>
-      <translation>Сохранить скриншот как...</translation>
+      <translation type="unfinished">Save Screenshot As...</translation>
     </message>
     <message>
       <source>Timestamp:</source>
-      <translation>Отметки времени:</translation>
+      <translation type="unfinished">Timestamp:</translation>
     </message>
     <message>
       <source>Saving %1</source>
-      <translation>Сохранение %1</translation>
+      <translation type="unfinished">Saving %1</translation>
     </message>
     <message>
       <source>Saving Screenshot...</source>
-      <translation>Сохранение скриншота...</translation>
+      <translation type="unfinished">Saving Screenshot...</translation>
     </message>
     <message>
       <source>Failed to save screenshot</source>
-      <translation>Не удалось сохранить снимок экрана</translation>
+      <translation type="unfinished">Failed to save screenshot</translation>
     </message>
     <message>
       <source>Failed to take screenshot</source>
-      <translation>Не удалось выполнить снимок экрана</translation>
+      <translation type="unfinished">Failed to take screenshot</translation>
     </message>
     <message>
       <source>PNG Image</source>
-      <translation>Изображение PNG</translation>
+      <translation type="unfinished">PNG Image</translation>
     </message>
     <message>
       <source>JPEG Image</source>
-      <translation>Изображение JPEG</translation>
+      <translation type="unfinished">JPEG Image</translation>
     </message>
     <message>
       <source>No timestamp</source>
-      <translation>Нкт отметки времени</translation>
+      <translation type="unfinished">No timestamp</translation>
     </message>
     <message>
       <source>No camera name</source>
-      <translation>Нет имени камеры</translation>
+      <translation type="unfinished">No camera name</translation>
     </message>
     <message>
       <source>Camera name:</source>
-      <translation>Имя камеры:</translation>
+      <translation type="unfinished">Camera name:</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchVideoWallHandler</name>
     <message>
       <source>Video Wall</source>
-      <translation>Видеостена</translation>
+      <translation type="unfinished">Video Wall</translation>
     </message>
     <message>
       <source>Video Wall %1</source>
-      <translation>Видеостена %1</translation>
+      <translation type="unfinished">Video Wall %1</translation>
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation>Новая видеостена...</translation>
+      <translation type="unfinished">New Video Wall...</translation>
     </message>
     <message>
       <source>New Matrix %1</source>
-      <translation>Новая матрица %1</translation>
+      <translation type="unfinished">New Matrix %1</translation>
     </message>
     <message>
       <source>To enable this feature, please activate a Video Wall license.</source>
-      <translation>Для включения этой функции, пожалуйста, активируйте лицензию на видеостену.</translation>
+      <translation type="unfinished">To enable this feature, please activate a Video Wall license.</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
-      <translation>Не удалось применить изменения</translation>
+      <translation type="unfinished">Failed to apply changes</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation>
-        <numerusform>Удалить %n элемент?</numerusform>
-        <numerusform>Удалить %n элемента?</numerusform>
-        <numerusform>Удалить %n элементов?</numerusform>
-        <numerusform>Удалить %n элементов?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Delete %n items?</numerusform>
+        <numerusform>Delete %n items?</numerusform>
       </translation>
     </message>
     <message>
       <source>Stop Video Wall?</source>
-      <translation>Остановить видеостену?</translation>
+      <translation type="unfinished">Stop Video Wall?</translation>
     </message>
     <message>
       <source>To start it again, you should have physical access to its computer.</source>
-      <translation>Чтобы запустить ее снова вы должны иметь физический доступ к компьютеру.</translation>
+      <translation type="unfinished">To start it again, you should have physical access to its computer.</translation>
     </message>
     <message>
       <source>Stop</source>
-      <translation>Остановить</translation>
+      <translation type="unfinished">Stop</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
-      <translation>
-        <numerusform>Удалить %n матрицу?</numerusform>
-        <numerusform>Удалить %n матрицы?</numerusform>
-        <numerusform>Удалить %n матриц?</numerusform>
-        <numerusform>Удалить %n матриц?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Delete %n matrices?</numerusform>
+        <numerusform>Delete %n matrices?</numerusform>
       </translation>
     </message>
     <message>
       <source>More Video Wall licenses required</source>
-      <translation>Требуются дополнительные лицензии на видеостену</translation>
+      <translation type="unfinished">More Video Wall licenses required</translation>
     </message>
     <message>
       <source>Control session cannot be started.</source>
-      <translation>Невозможно запустить сеанс управления.</translation>
+      <translation type="unfinished">Control session cannot be started.</translation>
     </message>
     <message>
       <source>Cannot save empty matrix</source>
-      <translation>Не удаётся сохранить пустую матрицу</translation>
+      <translation type="unfinished">Cannot save empty matrix</translation>
     </message>
     <message>
       <source>Screen is being controlled by another user</source>
-      <translation>Экран управляется другим пользователем</translation>
+      <translation type="unfinished">Screen is being controlled by another user</translation>
     </message>
     <message>
       <source>Enter the name of Video Wall to create:</source>
-      <translation>Введите название видеостены:</translation>
+      <translation type="unfinished">Enter the name of Video Wall to create:</translation>
     </message>
     <message>
       <source>Activate License...</source>
-      <translation>Активировать лицензию...</translation>
+      <translation type="unfinished">Activate License...</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchVirtualCameraHandler</name>
     <message>
       <source>Failed to add virtual camera</source>
-      <translation>Не удалось добавить виртуальную камеру</translation>
+      <translation type="unfinished">Failed to add virtual camera</translation>
     </message>
     <message>
       <source>Open Virtual Camera Recordings...</source>
-      <translation>Открыть записи виртуальной камеры...</translation>
+      <translation type="unfinished">Open Virtual Camera Recordings...</translation>
     </message>
     <message>
       <source>No video files found in selected folder</source>
-      <translation>В выбранной папке нет видеофайлов</translation>
+      <translation type="unfinished">No video files found in selected folder</translation>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation>Остановить загрузку?</translation>
+      <translation type="unfinished">Stop uploading?</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
-      <translation>Уже загруженные файлы будут сохранены.</translation>
+      <translation type="unfinished">Already uploaded files will be kept.</translation>
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
-      <translation>
-        <numerusform>Формат выбранного файла не поддерживается</numerusform>
-        <numerusform>Формат выбранноых файлов не поддерживается</numerusform>
-        <numerusform>Формат выбранноых файлов не поддерживается</numerusform>
-        <numerusform>Формат выбранноых файлов не поддерживается</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected file formats are not supported</numerusform>
+        <numerusform>Selected file formats are not supported</numerusform>
       </translation>
     </message>
     <message>
       <source>Use .MKV, .AVI, .MP4 or other video files.</source>
-      <translation>Используйте .MKV, .AVI, .MP4 или другие видеофайлы.</translation>
+      <translation type="unfinished">Use .MKV, .AVI, .MP4 or other video files.</translation>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
-      <translation>
-        <numerusform>Выбранный файл не имеет временных меток</numerusform>
-        <numerusform>Выбранные файлы не имеют временных меток</numerusform>
-        <numerusform>Выбранные файлы не имеют временных меток</numerusform>
-        <numerusform>Выбранные файлы не имеют временных меток</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected files do not have timestamps</numerusform>
+        <numerusform>Selected files do not have timestamps</numerusform>
       </translation>
     </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
-      <translation>Поддерживаются только видеофайлы с правильными отметками времени.</translation>
+      <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
-      <translation>
-        <numerusform>Выбранный файл слишком старый</numerusform>
-        <numerusform>Выбранные файлы слишком старые</numerusform>
-        <numerusform>Выбранные файлы слишком старые</numerusform>
-        <numerusform>Выбранные файлы слишком старые</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected files are too old</numerusform>
+        <numerusform>Selected files are too old</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation>
-        <numerusform>Выбранный файл был записан %1, но могут быть загружены только файлы, записанные за последний %n день. Вы можете изменить это в настройках архива камеры.</numerusform>
-        <numerusform>Выбранны файл был записан %1, но могут быть загружены только файлы, записанные за последние %n дня. Вы можете изменить это в настройках архива камеры.</numerusform>
-        <numerusform>Выбранны файл был записан %1, но могут быть загружены только файлы, записанные за последниq %n дней. Вы можете изменить это в настройках архива камеры.</numerusform>
-        <numerusform>Выбранны файл был записан %1, но могут быть загружены только файлы, записанные за последниq %n дней. Вы можете изменить это в настройках архива камеры.</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation>
-        <numerusform>Выбранны файл был записан между %1 и %2, но могут быть загружены только файлы, записанные за последний %n день. Вы можете изменить это в настройках архива камеры.</numerusform>
-        <numerusform>Выбранны файл был записан между %1 и %2, но могут быть загружены только файлы, записанные за последние %n дня. Вы можете изменить это в настройках архива камеры.</numerusform>
-        <numerusform>Выбранны файл был записан между %1 и %2, но могут быть загружены только файлы, записанные за последние %n дней. Вы можете изменить это в настройках архива камеры.</numerusform>
-        <numerusform>Выбранны файл был записан между %1 и %2, но могут быть загружены только файлы, записанные за последние %n дней. Вы можете изменить это в настройках архива камеры.</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation>
-        <numerusform>Выбранный файл охватывает период, для которого видео уже присутствует</numerusform>
-        <numerusform>Выбранные файлы охватывают периоды, для которых видео уже присутствуют</numerusform>
-        <numerusform>Выбранные файлы охватывают периоды, для которых видео уже присутствуют</numerusform>
-        <numerusform>Выбранные файлы охватывают периоды, для которых видео уже присутствуют</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation>
-        <numerusform>Вы можете загрузить этот файл в другой экземпляр виртуальной камеры.</numerusform>
-        <numerusform>Вы можете загрузить эти файлы в другой экземпляр виртуальной камеры.</numerusform>
-        <numerusform>Вы можете загрузить эти файлы в другой экземпляр виртуальной камеры.</numerusform>
-        <numerusform>Вы можете загрузить эти файлы в другой экземпляр виртуальной камеры.</numerusform>
+      <translation type="unfinished">
+        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation>
-        <numerusform>Выбранный файл охватывает период, для которог видео уже загружено</numerusform>
-        <numerusform>Выбранные файлы охватывают периоды, для которых видео уже загружено</numerusform>
-        <numerusform>Выбранные файлы охватывают периоды, для которых видео уже загружено</numerusform>
-        <numerusform>Выбранные файлы охватывают периоды, для которых видео уже загружено</numerusform>
+      <translation type="unfinished">
+        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
       </translation>
     </message>
     <message>
       <source>Not enough space on server storage</source>
-      <translation>Недостаточно свободного места на хранилище</translation>
+      <translation type="unfinished">Not enough space on server storage</translation>
     </message>
     <message>
       <source>Selected files will not be uploaded</source>
-      <translation>Выбранные файлы не будут загружены</translation>
+      <translation type="unfinished">Selected files will not be uploaded</translation>
     </message>
     <message>
       <source>Some files will not be uploaded</source>
-      <translation>Некоторые файлы не будут загружены</translation>
+      <translation type="unfinished">Some files will not be uploaded</translation>
     </message>
     <message>
       <source>No new files to upload in selected folder</source>
-      <translation>Нет новых файлов для загрузки в выбранной папке</translation>
+      <translation type="unfinished">No new files to upload in selected folder</translation>
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
-      <translation>
-        <numerusform>Некоторые фрагменты архива могут быть удалены после загрузки этого файла</numerusform>
-        <numerusform>Некоторые фрагменты архива могут быть удалены после загрузки этих файлов</numerusform>
-        <numerusform>Некоторые фрагменты архива могут быть удалены после загрузки этих файлов</numerusform>
-        <numerusform>Некоторые фрагменты архива могут быть удалены после загрузки этих файлов</numerusform>
+      <translation type="unfinished">
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation>
-        <numerusform>На сервере почти не осталось свободного места. Чтобы освободить место некоторые старые записи можно удалить. Обратите внимание, что если выбранные файлы являются самыми старыми на сервере, они будут удалены сразу же после их загрузки.</numerusform>
-        <numerusform>На сервере почти не осталось свободного места. Чтобы освободить место некоторые старые записи можно удалить. Обратите внимание, что если выбранные файлы являются самыми старыми на сервере, они будут удалены сразу же после их загрузки.</numerusform>
-        <numerusform>На сервере почти не осталось свободного места. Чтобы освободить место некоторые старые записи можно удалить. Обратите внимание, что если выбранные файлы являются самыми старыми на сервере, они будут удалены сразу же после их загрузки.</numerusform>
-        <numerusform>На сервере почти не осталось свободного места. Чтобы освободить место некоторые старые записи можно удалить. Обратите внимание, что если выбранные файлы являются самыми старыми на сервере, они будут удалены сразу же после их загрузки.</numerusform>
+      <translation type="unfinished">
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
       </translation>
     </message>
     <message>
       <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
-      <translation>Чтобы предотвратить это, вы можете добавить дополнительное хранилище. Вы также можете контролировать, какие фрагменты архива будут удалены сначала, изменив время сохранения архива в настройках камеры.</translation>
+      <translation type="unfinished">To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</translation>
     </message>
     <message>
       <source>Upload anyway?</source>
-      <translation>Загрузить в любом случае?</translation>
+      <translation type="unfinished">Upload anyway?</translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation>Невозможно начать загрузку, так как пользователь &quot;%1&quot; в настоящее время загружает архив на эту камеру.</translation>
+      <translation type="unfinished">Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</translation>
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
-      <translation>Невозможно начать загрузку, так как другой пользователь в настоящее время загружает архив на эту камеру.</translation>
+      <translation type="unfinished">Could not start upload as another user is currently uploading footage to this camera.</translation>
     </message>
     <message>
       <source>Could not finish upload to %1</source>
-      <translation>Не удалось завершить загрузку на %1</translation>
+      <translation type="unfinished">Could not finish upload to %1</translation>
     </message>
     <message>
       <source>Make sure there is enough space on server storage.</source>
-      <translation>Убедитесь, что на сервере достаточно места.</translation>
+      <translation type="unfinished">Make sure there is enough space on server storage.</translation>
     </message>
     <message>
       <source>Uploading footage</source>
-      <translation>Загрузка записей</translation>
+      <translation type="unfinished">Uploading footage</translation>
     </message>
     <message>
       <source>%1 has unsupported format.</source>
       <comment>Filename will be substituted</comment>
-      <translation>Формат файла %1 не поддерживается.</translation>
+      <translation type="unfinished">%1 has unsupported format.</translation>
     </message>
     <message>
       <source>%1 does not have timestamp.</source>
       <comment>Filename will be substituted</comment>
-      <translation>Файл %1 не содержит временных меток.</translation>
+      <translation type="unfinished">%1 does not have timestamp.</translation>
     </message>
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
       <comment>Filename will be substituted</comment>
-      <translation>Файл %1 старше, чем разрешено в настройках архива камеры.</translation>
+      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
       <comment>Filename will be substituted</comment>
-      <translation>%1 охватывает период, за который видео уже загружено.</translation>
+      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
       <comment>Filename will be substituted</comment>
-      <translation>%1 охватывает период, за который загружается видео.</translation>
+      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
     </message>
   </context>
   <context>
     <name>Resources</name>
     <message>
       <source>There is another layout with the same name</source>
-      <translation>Существует другая раскладка с тем же именем</translation>
+      <translation type="unfinished">There is another layout with the same name</translation>
     </message>
     <message>
       <source>You do not have permission to overwrite it.</source>
-      <translation>Отсутствуют полномочия на перезапись.</translation>
+      <translation type="unfinished">You do not have permission to overwrite it.</translation>
     </message>
     <message>
       <source>Overwrite existing layout?</source>
-      <translation>Перезаписать существующую раскладку?</translation>
+      <translation type="unfinished">Overwrite existing layout?</translation>
     </message>
     <message>
       <source>There is another layout with the same name.</source>
-      <translation>Существует другая раскладка с тем же именем.</translation>
+      <translation type="unfinished">There is another layout with the same name.</translation>
     </message>
     <message numerus="yes">
       <source>User will still have access to %n removed resources:</source>
-      <translation>
-        <numerusform>User will still have access to %n removed resource:</numerusform>
-        <numerusform>User will still have access to %n removed resource:</numerusform>
-        <numerusform>User will still have access to %n removed resource:</numerusform>
-        <numerusform>User will still have access to %n removed resource:</numerusform>
+      <translation type="unfinished">
+        <numerusform>User will still have access to %n removed resources:</numerusform>
+        <numerusform>User will still have access to %n removed resources:</numerusform>
       </translation>
     </message>
     <message>
       <source>To remove access, please go to User Settings.</source>
-      <translation>Чтобы удалить доступ перейдите к настройкам пользователя.</translation>
+      <translation type="unfinished">To remove access, please go to User Settings.</translation>
     </message>
     <message numerus="yes">
       <source>All users with this role will get access to %n resources:</source>
-      <translation>
-        <numerusform>All users with this role will get access to %n resource:</numerusform>
-        <numerusform>All users with this role will get access to %n resource:</numerusform>
-        <numerusform>All users with this role will get access to %n resource:</numerusform>
-        <numerusform>All users with this role will get access to %n resource:</numerusform>
+      <translation type="unfinished">
+        <numerusform>All users with this role will get access to %n resources:</numerusform>
+        <numerusform>All users with this role will get access to %n resources:</numerusform>
       </translation>
     </message>
     <message>
       <source>To remove access, please go to Role Settings.</source>
-      <translation>Чтобы удалить доступ перейдите к настройкам роли.</translation>
+      <translation type="unfinished">To remove access, please go to Role Settings.</translation>
     </message>
     <message numerus="yes">
       <source>All users with this role will still have access to %n removed resources:</source>
-      <translation>
-        <numerusform>All users with this role will still have access to %n removed resource:</numerusform>
-        <numerusform>All users with this role will still have access to %n removed resource:</numerusform>
-        <numerusform>All users with this role will still have access to %n removed resource:</numerusform>
-        <numerusform>All users with this role will still have access to %n removed resource:</numerusform>
+      <translation type="unfinished">
+        <numerusform>All users with this role will still have access to %n removed resources:</numerusform>
+        <numerusform>All users with this role will still have access to %n removed resources:</numerusform>
       </translation>
     </message>
     <message>
       <source>Changes will affect other users</source>
-      <translation>Изменения повлияют на других пользователей</translation>
+      <translation type="unfinished">Changes will affect other users</translation>
     </message>
     <message>
       <source>This layout is shared with other users, so you change it for them too.</source>
-      <translation>Эта раскладка используется совместно с другими пользователями, поэтому изменение коснутся также и их.</translation>
+      <translation type="unfinished">This layout is shared with other users, so you change it for them too.</translation>
     </message>
     <message numerus="yes">
       <source>User will lose access to %n resources:</source>
-      <translation>
-        <numerusform>User will lose access to %n resource:</numerusform>
-        <numerusform>User will lose access to %n resource:</numerusform>
-        <numerusform>User will lose access to %n resource:</numerusform>
-        <numerusform>User will lose access to %n resource:</numerusform>
+      <translation type="unfinished">
+        <numerusform>User will lose access to %n resources:</numerusform>
+        <numerusform>User will lose access to %n resources:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All users with this role will lose access to %n resources:</source>
-      <translation>
-        <numerusform>All users with this role will lose access to %n resource:</numerusform>
-        <numerusform>All users with this role will lose access to %n resource:</numerusform>
-        <numerusform>All users with this role will lose access to %n resource:</numerusform>
-        <numerusform>All users with this role will lose access to %n resource:</numerusform>
+      <translation type="unfinished">
+        <numerusform>All users with this role will lose access to %n resources:</numerusform>
+        <numerusform>All users with this role will lose access to %n resources:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n shared layouts?</source>
-      <translation>
-        <numerusform>Удалить %n общую раскладку?</numerusform>
-        <numerusform>Удалить %n общую раскладку?</numerusform>
-        <numerusform>Удалить %n общую раскладку?</numerusform>
-        <numerusform>Удалить %n общую раскладку?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Delete %n shared layouts?</numerusform>
+        <numerusform>Delete %n shared layouts?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-      <translation>
-        <numerusform>Эти %n раскладок используются совместно с другими пользователями, поэтому удаление коснется также и их.</numerusform>
-        <numerusform>Эти %n раскладок используются совместно с другими пользователями, поэтому удаление коснется также и их.</numerusform>
-        <numerusform>Эти %n раскладок используются совместно с другими пользователями, поэтому удаление коснется также и их.</numerusform>
-        <numerusform>Эти %n раскладок используются совместно с другими пользователями, поэтому удаление коснется также и их.</numerusform>
+      <translation type="unfinished">
+        <numerusform>These %n layouts are shared with other users, so you delete it for them too.</numerusform>
+        <numerusform>These %n layouts are shared with other users, so you delete it for them too.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
-      <translation>
-        <numerusform>Remove %n item from layout?</numerusform>
-        <numerusform>Remove %n item from layout?</numerusform>
-        <numerusform>Remove %n item from layout?</numerusform>
-        <numerusform>Remove %n item from layout?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Remove %n items from layout?</numerusform>
+        <numerusform>Remove %n items from layout?</numerusform>
       </translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Удалить</translation>
+      <translation type="unfinished">Remove</translation>
     </message>
     <message>
       <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
-      <translation>Вы собираетесь удалить некоторые ресурсы, доступные только из режима видеостены. Вы не увидите их в списке ресурсов после этого и не сможете снова добавить их на видеостену.</translation>
+      <translation type="unfinished">You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</translation>
     </message>
     <message>
       <source>You will lose access to following resources:</source>
-      <translation>Вы потеряете доступ к следующим ресурсам:</translation>
+      <translation type="unfinished">You will lose access to following resources:</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n users?</source>
-      <translation>
-        <numerusform>Delete %n user?</numerusform>
-        <numerusform>Delete %n user?</numerusform>
-        <numerusform>Delete %n user?</numerusform>
-        <numerusform>Delete %n user?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Delete %n users?</numerusform>
+        <numerusform>Delete %n users?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n devices?</source>
-      <translation>
-        <numerusform>Delete %n device?</numerusform>
-        <numerusform>Delete %n device?</numerusform>
-        <numerusform>Delete %n device?</numerusform>
-        <numerusform>Delete %n device?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Delete %n devices?</numerusform>
+        <numerusform>Delete %n devices?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n cameras?</source>
-      <translation>
-        <numerusform>Delete %n camera?</numerusform>
-        <numerusform>Delete %n camera?</numerusform>
-        <numerusform>Delete %n camera?</numerusform>
-        <numerusform>Delete %n camera?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Delete %n cameras?</numerusform>
+        <numerusform>Delete %n cameras?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n I/O Modules?</source>
-      <translation>
-        <numerusform>Delete %n I/O Module?</numerusform>
-        <numerusform>Delete %n I/O Module?</numerusform>
-        <numerusform>Delete %n I/O Module?</numerusform>
-        <numerusform>Delete %n I/O Module?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Delete %n I/O Modules?</numerusform>
+        <numerusform>Delete %n I/O Modules?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation>
-        <numerusform>Удалить %n элемент?</numerusform>
-        <numerusform>Удалить %n элемент?</numerusform>
-        <numerusform>Удалить %n элемент?</numerusform>
-        <numerusform>Удалить %n элемента?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Delete %n items?</numerusform>
+        <numerusform>Delete %n items?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of them are auto-discovered.</source>
-      <translation>
-        <numerusform>%n of them is auto-discovered.</numerusform>
-        <numerusform>%n of them is auto-discovered.</numerusform>
-        <numerusform>%n of them is auto-discovered.</numerusform>
-        <numerusform>%n of them is auto-discovered.</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n of them are auto-discovered.</numerusform>
+        <numerusform>%n of them are auto-discovered.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras are auto-discovered.</source>
-      <translation>
-        <numerusform>%n camera is auto-discovered.</numerusform>
-        <numerusform>%n camera is auto-discovered.</numerusform>
-        <numerusform>%n camera is auto-discovered.</numerusform>
-        <numerusform>%n camera is auto-discovered.</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n cameras are auto-discovered.</numerusform>
+        <numerusform>%n cameras are auto-discovered.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules are auto-discovered.</source>
-      <translation>
-        <numerusform>%n I/O module is auto-discovered.</numerusform>
-        <numerusform>%n I/O module is auto-discovered.</numerusform>
-        <numerusform>%n I/O module is auto-discovered.</numerusform>
-        <numerusform>%n I/O module is auto-discovered.</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n I/O modules are auto-discovered.</numerusform>
+        <numerusform>%n I/O modules are auto-discovered.</numerusform>
       </translation>
     </message>
     <message>
       <source>They may be auto-discovered again after removing.</source>
-      <translation>Они могут быть снова автоматически обнаружены после удаления.</translation>
+      <translation type="unfinished">They may be auto-discovered again after removing.</translation>
     </message>
     <message>
       <source>Overwrite existing showreel?</source>
-      <translation>Перезаписать существующую прокрутку?</translation>
+      <translation type="unfinished">Overwrite existing showreel?</translation>
     </message>
     <message>
       <source>There is another showreel with the same name.</source>
-      <translation>Существует другая прокрутка.</translation>
+      <translation type="unfinished">There is another showreel with the same name.</translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
-      <translation>
-        <numerusform>Удалить %n элемент из прокрутки?</numerusform>
-        <numerusform>Удалить %n элемента из прокрутки?</numerusform>
-        <numerusform>Удалить %n элементов из прокрутки?</numerusform>
-        <numerusform>Удалить %n элементов из прокрутки?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Remove %n items from showreel?</numerusform>
+        <numerusform>Remove %n items from showreel?</numerusform>
       </translation>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation>Остановить загрузку?</translation>
+      <translation type="unfinished">Stop uploading?</translation>
     </message>
     <message>
       <source>Stop</source>
-      <translation>Остановить</translation>
+      <translation type="unfinished">Stop</translation>
     </message>
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
-      <translation>
-        <numerusform>Эти видео файлы до сих пор загружаются в %n виртуальную камеру:</numerusform>
-        <numerusform>Эти видео файлы до сих пор загружаются в %n виртуальные камеры:</numerusform>
-        <numerusform>Эти видео файлы до сих пор загружаются в %n виртуальных камер:</numerusform>
-        <numerusform>Эти видео файлы до сих пор загружаются в %n виртуальных камер:</numerusform>
+      <translation type="unfinished">
+        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
+        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
       </translation>
     </message>
     <message>
@@ -6907,7 +6699,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Merge</source>
-      <translation>Объединить</translation>
+      <translation type="unfinished">Merge</translation>
     </message>
     <message>
       <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
@@ -6927,11 +6719,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Move</source>
-      <translation>Переместить</translation>
+      <translation type="unfinished">Move</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Отмена</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
     <message>
       <source>Some devices from %1 will not be moved to %2. Move anyways?</source>
@@ -6982,205 +6774,205 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>SimpleMotionSearchWidget::Private</name>
     <message>
       <source>Select area on the video to filter results</source>
-      <translation>Выберите область на видео для фильтрации результатов</translation>
+      <translation type="unfinished">Select area on the video to filter results</translation>
     </message>
     <message>
       <source>In selected area</source>
-      <translation>В выбранной области</translation>
+      <translation type="unfinished">In selected area</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation>Выбранная камера</translation>
+      <translation type="unfinished">Selected camera</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation>Выбранное устройство</translation>
+      <translation type="unfinished">Selected device</translation>
     </message>
     <message>
       <source>Selected media</source>
-      <translation>Выбранные медиа</translation>
+      <translation type="unfinished">Selected media</translation>
     </message>
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation>нет</translation>
+      <translation type="unfinished">none</translation>
     </message>
   </context>
   <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
-      <translation>Самая низкая</translation>
+      <translation type="unfinished">Lowest</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation>Низкий</translation>
+      <translation type="unfinished">Low</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation>Среднее</translation>
+      <translation type="unfinished">Medium</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>Высокий</translation>
+      <translation type="unfinished">High</translation>
     </message>
     <message>
       <source>Best</source>
-      <translation>Наилучшее</translation>
+      <translation type="unfinished">Best</translation>
     </message>
     <message>
       <source>Preset</source>
-      <translation>Предустановленное</translation>
+      <translation type="unfinished">Preset</translation>
     </message>
     <message>
       <source>Undefined</source>
-      <translation>Неопределено</translation>
+      <translation type="unfinished">Undefined</translation>
     </message>
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>Наих</translation>
+      <translation type="unfinished">Lst</translation>
     </message>
     <message>
       <source>Lo</source>
       <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation>Низк</translation>
+      <translation type="unfinished">Lo</translation>
     </message>
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation>Средн</translation>
+      <translation type="unfinished">Me</translation>
     </message>
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>Выс</translation>
+      <translation type="unfinished">Hi</translation>
     </message>
     <message>
       <source>Bst</source>
       <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation>Лучш</translation>
+      <translation type="unfinished">Bst</translation>
     </message>
     <message>
       <source>Ps</source>
       <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation>Пред</translation>
+      <translation type="unfinished">Ps</translation>
     </message>
   </context>
   <context>
     <name>UpdateStrings</name>
     <message>
       <source>This Linux platform is no longer supported</source>
-      <translation>Эта Linux платформа больше не поддерживается</translation>
+      <translation type="unfinished">This Linux platform is no longer supported</translation>
     </message>
     <message>
       <source>This OS version is no longer supported</source>
-      <translation>Эта версия ОС больше не поддерживается</translation>
+      <translation type="unfinished">This OS version is no longer supported</translation>
     </message>
     <message>
       <source>This %1 version is no longer supported</source>
       <comment>%1 is OS name, e.g. Windows</comment>
-      <translation>Эта версия %1 больше не поддерживается</translation>
+      <translation type="unfinished">This %1 version is no longer supported</translation>
     </message>
     <message>
       <source>%1 %2 is no longer supported</source>
       <comment>%1 %2 are OS name and version, e.g. Windows 7</comment>
-      <translation>%1 %2 больше не поддерживается</translation>
+      <translation type="unfinished">%1 %2 is no longer supported</translation>
     </message>
   </context>
   <context>
     <name>Videowall</name>
     <message>
       <source>There is another video wall with the same name</source>
-      <translation>Существует другая видеостена с тем же именем</translation>
+      <translation type="unfinished">There is another video wall with the same name</translation>
     </message>
     <message>
       <source>Close %1 before starting Video Wall?</source>
-      <translation>Закрыть %1 перед запуском видеостены?</translation>
+      <translation type="unfinished">Close %1 before starting Video Wall?</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation>Закрыть</translation>
+      <translation type="unfinished">Close</translation>
     </message>
     <message>
       <source>Keep</source>
-      <translation>Оставить</translation>
+      <translation type="unfinished">Keep</translation>
     </message>
     <message>
       <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
-      <translation>Локальные файлы не могут быть помещены на экран видеостены, подключенном к другому компьютеру</translation>
+      <translation type="unfinished">Local files cannot be placed on Video Wall Screen attached to another computer</translation>
     </message>
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
-      <translation>Для отображения локальных файлов на видеостене, пожалуйста, поместите их на видеостену на компьютере, с которого она управляется.</translation>
+      <translation type="unfinished">To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AbstractSearchWidget::Private</name>
     <message>
       <source>Hide information</source>
-      <translation>Скрыть информацию</translation>
+      <translation type="unfinished">Hide information</translation>
     </message>
     <message>
       <source>Show information</source>
-      <translation>Показать информацию</translation>
+      <translation type="unfinished">Show information</translation>
     </message>
     <message>
       <source>Hide thumbnails</source>
-      <translation>Скрыть миниатюры</translation>
+      <translation type="unfinished">Hide thumbnails</translation>
     </message>
     <message>
       <source>Show thumbnails</source>
-      <translation>Показать миниатюры</translation>
+      <translation type="unfinished">Show thumbnails</translation>
     </message>
     <message>
       <source>Last day</source>
-      <translation>Последний день</translation>
+      <translation type="unfinished">Last day</translation>
     </message>
     <message>
       <source>Last 7 days</source>
-      <translation>Последние 7 дней</translation>
+      <translation type="unfinished">Last 7 days</translation>
     </message>
     <message>
       <source>Last 30 days</source>
-      <translation>Последние 30 дней</translation>
+      <translation type="unfinished">Last 30 days</translation>
     </message>
     <message>
       <source>Selected on Timeline</source>
-      <translation>Выбрано на временной шкале</translation>
+      <translation type="unfinished">Selected on Timeline</translation>
     </message>
     <message>
       <source>Any time</source>
-      <translation>Любое время</translation>
+      <translation type="unfinished">Any time</translation>
     </message>
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation>нет</translation>
+      <translation type="unfinished">none</translation>
     </message>
     <message>
       <source>Devices on layout</source>
-      <translation>Устройства на раскладке</translation>
+      <translation type="unfinished">Devices on layout</translation>
     </message>
     <message>
       <source>Cameras on layout</source>
-      <translation>Камеры на раскладке</translation>
+      <translation type="unfinished">Cameras on layout</translation>
     </message>
     <message>
       <source>Any device</source>
-      <translation>Любое устройство</translation>
+      <translation type="unfinished">Any device</translation>
     </message>
     <message>
       <source>Any camera</source>
-      <translation>Любая камера</translation>
+      <translation type="unfinished">Any camera</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation>Выбранное устройство</translation>
+      <translation type="unfinished">Selected device</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation>Выбранная камера</translation>
+      <translation type="unfinished">Selected camera</translation>
     </message>
     <message>
       <source>Choose devices...</source>
@@ -7195,15 +6987,11 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation type="unfinished">
         <numerusform>%n chosen devices</numerusform>
         <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
       <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
         <numerusform>%n chosen cameras</numerusform>
         <numerusform>%n chosen cameras</numerusform>
       </translation>
@@ -7221,33 +7009,31 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::AccessibleMediaViewHeaderWidget</name>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation>Все камеры и ресурсы</translation>
+      <translation type="unfinished">All Cameras &amp; Resources</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation>удаленная камера</translation>
+      <translation type="unfinished">deleted camera</translation>
     </message>
     <message>
       <source>Unknown track</source>
-      <translation>Неизвестный трек</translation>
+      <translation type="unfinished">Unknown track</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchWidget</name>
     <message>
       <source>No objects</source>
-      <translation>Нет объектов</translation>
+      <translation type="unfinished">No objects</translation>
     </message>
     <message numerus="yes">
       <source>%n objects</source>
-      <translation>
-        <numerusform>%n объект</numerusform>
-        <numerusform>%n объекта</numerusform>
-        <numerusform>%n объектов</numerusform>
-        <numerusform>%n объектов</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n objects</numerusform>
+        <numerusform>%n objects</numerusform>
       </translation>
     </message>
     <message>
@@ -7259,11 +7045,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
     <message>
       <source>NO DATA</source>
-      <translation>НЕТ ДАННЫХ</translation>
+      <translation type="unfinished">NO DATA</translation>
     </message>
     <message>
       <source>DISABLED</source>
-      <translation>ОТКЛЮЧЕНО</translation>
+      <translation type="unfinished">DISABLED</translation>
     </message>
   </context>
   <context>
@@ -7379,26 +7165,20 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation type="unfinished">
         <numerusform>%n weeks</numerusform>
         <numerusform>%n weeks</numerusform>
-        <numerusform>%n weeks</numerusform>
-        <numerusform>%n weeks</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n days</source>
-      <translation>
-        <numerusform>%n дней</numerusform>
-        <numerusform>%n дней</numerusform>
-        <numerusform>%n дней</numerusform>
-        <numerusform>%n дней</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n days</numerusform>
+        <numerusform>%n days</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n hours</source>
-      <translation>
-        <numerusform>%n часов</numerusform>
-        <numerusform>%n часов</numerusform>
-        <numerusform>%n часов</numerusform>
-        <numerusform>%n часов</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n hours</numerusform>
+        <numerusform>%n hours</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7406,17 +7186,13 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation type="unfinished">
         <numerusform>%n minutes</numerusform>
         <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n seconds</source>
-      <translation>
-        <numerusform>%n сек</numerusform>
-        <numerusform>%n сек</numerusform>
-        <numerusform>%n сек</numerusform>
-        <numerusform>%n сек</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n seconds</numerusform>
+        <numerusform>%n seconds</numerusform>
       </translation>
     </message>
   </context>
@@ -7428,7 +7204,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Motion detection is disabled</source>
-      <translation>Обнаружение движения отключено</translation>
+      <translation type="unfinished">Motion detection is disabled</translation>
     </message>
     <message>
       <source>No analytics plugins</source>
@@ -7436,7 +7212,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cameras</source>
-      <translation>Камеры</translation>
+      <translation type="unfinished">Cameras</translation>
     </message>
     <message>
       <source>What to backup</source>
@@ -7444,7 +7220,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Quality</source>
-      <translation>Качество</translation>
+      <translation type="unfinished">Quality</translation>
     </message>
     <message>
       <source>Cannot be modified for new added cameras</source>
@@ -7479,15 +7255,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Quality</source>
-      <translation>Качество</translation>
+      <translation type="unfinished">Quality</translation>
     </message>
     <message numerus="yes">
       <source>Set for %n selected devices</source>
-      <translation>
-        <numerusform>Установить для %n выбранных устройств</numerusform>
-        <numerusform>Установить для %n выбранных устройств</numerusform>
-        <numerusform>Установить для %n выбранных устройств</numerusform>
-        <numerusform>Установить для %n выбранных устройств</numerusform>
+      <translation type="unfinished">
+        <numerusform>Set for %n selected devices</numerusform>
+        <numerusform>Set for %n selected devices</numerusform>
       </translation>
     </message>
   </context>
@@ -7502,7 +7276,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupSettingsWidget</name>
     <message>
       <source>Settings</source>
-      <translation>Настройки</translation>
+      <translation type="unfinished">Settings</translation>
     </message>
     <message>
       <source>Bandwidth Limit</source>
@@ -7526,7 +7300,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Storage Management</source>
-      <translation>Управление хранилищами</translation>
+      <translation type="unfinished">Storage Management</translation>
     </message>
     <message>
       <source>To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</source>
@@ -7551,7 +7325,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>This action cannot be undone.</source>
-      <translation>Это действие нельзя будет отменить.</translation>
+      <translation type="unfinished">This action cannot be undone.</translation>
     </message>
     <message>
       <source>Applies only to the cameras connected to current server.</source>
@@ -7562,15 +7336,11 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation type="unfinished">
         <numerusform>Backup is enabled for %n devices</numerusform>
         <numerusform>Backup is enabled for %n devices</numerusform>
-        <numerusform>Backup is enabled for %n devices</numerusform>
-        <numerusform>Backup is enabled for %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n cameras</source>
       <translation type="unfinished">
-        <numerusform>Backup is enabled for %n cameras</numerusform>
-        <numerusform>Backup is enabled for %n cameras</numerusform>
         <numerusform>Backup is enabled for %n cameras</numerusform>
         <numerusform>Backup is enabled for %n cameras</numerusform>
       </translation>
@@ -7580,22 +7350,20 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation>удаленная камера</translation>
+      <translation type="unfinished">deleted camera</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchWidget</name>
     <message>
       <source>No bookmarks</source>
-      <translation>Нет закладок</translation>
+      <translation type="unfinished">No bookmarks</translation>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
-      <translation>
-        <numerusform>%n закладка</numerusform>
-        <numerusform>%n закладки</numerusform>
-        <numerusform>%n закладок</numerusform>
-        <numerusform>%n закладок</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n bookmarks</numerusform>
+        <numerusform>%n bookmarks</numerusform>
       </translation>
     </message>
     <message>
@@ -7607,11 +7375,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraAdvancedParamsWidget</name>
     <message>
       <source>Loading values...</source>
-      <translation>Загрузка значений...</translation>
+      <translation type="unfinished">Loading values...</translation>
     </message>
     <message>
       <source>Applying changes...</source>
-      <translation>Изменения применяются...</translation>
+      <translation type="unfinished">Applying changes...</translation>
     </message>
   </context>
   <context>
@@ -7629,11 +7397,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
     <message>
       <source>Login</source>
-      <translation>Логин</translation>
+      <translation type="unfinished">Login</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Пароль</translation>
+      <translation type="unfinished">Password</translation>
     </message>
   </context>
   <context>
@@ -7641,44 +7409,42 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Auto</source>
       <comment>Automatic RTP transport type</comment>
-      <translation>Авто</translation>
+      <translation type="unfinished">Auto</translation>
     </message>
     <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
-      <translation>Помогает устранить проблемы с качеством изображения на некоторых камерах; для других это приведет к значительному увеличению битрейта.</translation>
+      <translation type="unfinished">Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</translation>
     </message>
     <message>
       <source>Custom number that can be assigned to a camera for quick identification and access</source>
-      <translation>Произвольный номер, который можно назначить для камеры для быстрой идентификации и доступа к ней</translation>
+      <translation type="unfinished">Custom number that can be assigned to a camera for quick identification and access</translation>
     </message>
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras:</source>
-      <translation>
-        <numerusform>Этот идентификатор уже используется для следующих %n камер:</numerusform>
-        <numerusform>Этот идентификатор уже используется для следующих %n камер:</numerusform>
-        <numerusform>Этот идентификатор уже используется для следующих %n камер:</numerusform>
-        <numerusform>Этот идентификатор уже используется для следующих %n камер:</numerusform>
+      <translation type="unfinished">
+        <numerusform>This ID is already used on the following %n cameras:</numerusform>
+        <numerusform>This ID is already used on the following %n cameras:</numerusform>
       </translation>
     </message>
     <message>
       <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
-      <translation>Сервер не будет изменять настройки камер, он будет получать и использовать поток с камеры как есть.</translation>
+      <translation type="unfinished">Server will not change any cameras settings, it will receive and use camera stream as-is.</translation>
     </message>
     <message>
       <source>Multicast</source>
-      <translation>Multicast</translation>
+      <translation type="unfinished">Multicast</translation>
     </message>
     <message>
       <source>Automatic selection</source>
-      <translation>Автоматический выбор</translation>
+      <translation type="unfinished">Automatic selection</translation>
     </message>
     <message>
       <source>Use if supported</source>
-      <translation>Использовать, если поддерживается</translation>
+      <translation type="unfinished">Use if supported</translation>
     </message>
     <message>
       <source>Never</source>
-      <translation>Никогда</translation>
+      <translation type="unfinished">Never</translation>
     </message>
     <message>
       <source>Force Motion Detection</source>
@@ -7694,7 +7460,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
-      <translation>Настройки качества и частоты кадров (FPS) в расписании записи станут неактуальными.</translation>
+      <translation type="unfinished">Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</translation>
     </message>
     <message>
       <source>Server will not push time settings to the camera.</source>
@@ -7705,34 +7471,32 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraInfoWidget</name>
     <message>
       <source>Device Rules</source>
-      <translation>Правила для устройства</translation>
+      <translation type="unfinished">Device Rules</translation>
     </message>
     <message>
       <source>Camera Rules</source>
-      <translation>Правила для камеры</translation>
+      <translation type="unfinished">Camera Rules</translation>
     </message>
     <message>
       <source>I/O Module Rules</source>
-      <translation>Правила для модуля ввода-вывода</translation>
+      <translation type="unfinished">I/O Module Rules</translation>
     </message>
     <message>
       <source>More Info</source>
-      <translation>Подробнее</translation>
+      <translation type="unfinished">More Info</translation>
     </message>
     <message>
       <source>Less Info</source>
-      <translation>Меньше информации</translation>
+      <translation type="unfinished">Less Info</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraLicensePanelWidget</name>
     <message numerus="yes">
       <source>Use License</source>
-      <translation>
-        <numerusform>Использовать лицензию</numerusform>
-        <numerusform>Использовать лицензии</numerusform>
-        <numerusform>Использовать лицензии</numerusform>
-        <numerusform>Использовать лицензии</numerusform>
+      <translation type="unfinished">
+        <numerusform>Use License</numerusform>
+        <numerusform>Use License</numerusform>
       </translation>
     </message>
   </context>
@@ -7740,35 +7504,35 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraMotionSettingsWidget</name>
     <message>
       <source>Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation>Обнаружение движения будет работать только при просмотре камеры. Включите запись для постоянного обнаружения движения.</translation>
+      <translation type="unfinished">Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
     </message>
     <message>
       <source>Maximum number of motion detection rectangles for current camera is reached</source>
-      <translation>Достигнуто максимальное количество зон обнаружения движения для текущей камеры</translation>
+      <translation type="unfinished">Maximum number of motion detection rectangles for current camera is reached</translation>
     </message>
     <message>
       <source>Maximum number of ignore motion rectangles for current camera is reached</source>
-      <translation>Достигнуто максимальное количество зон игнорирования движения для текущей камеры</translation>
+      <translation type="unfinished">Maximum number of ignore motion rectangles for current camera is reached</translation>
     </message>
     <message>
       <source>Maximum number of detect motion rectangles for current camera is reached</source>
-      <translation>Достигнуто максимальное количество зон обнаружения движения для текущей камеры</translation>
+      <translation type="unfinished">Maximum number of detect motion rectangles for current camera is reached</translation>
     </message>
     <message>
       <source>Reset motion regions to default?</source>
-      <translation>Сбросить области обнаружения движения на настройки по умолчанию?</translation>
+      <translation type="unfinished">Reset motion regions to default?</translation>
     </message>
     <message>
       <source>This action cannot be undone.</source>
-      <translation>Это действие нельзя будет отменить.</translation>
+      <translation type="unfinished">This action cannot be undone.</translation>
     </message>
     <message>
       <source>Primary Stream</source>
-      <translation>Основной поток</translation>
+      <translation type="unfinished">Primary Stream</translation>
     </message>
     <message>
       <source>Secondary Stream</source>
-      <translation>Вторичный поток</translation>
+      <translation type="unfinished">Secondary Stream</translation>
     </message>
     <message>
       <source>Force Motion Detection</source>
@@ -7787,31 +7551,31 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraScheduleWidget</name>
     <message>
       <source>Recording Schedule</source>
-      <translation>Расписание записи</translation>
+      <translation type="unfinished">Recording Schedule</translation>
     </message>
     <message>
       <source>based on server time</source>
-      <translation>по времени сервера</translation>
+      <translation type="unfinished">based on server time</translation>
     </message>
     <message>
       <source>Select areas on the schedule to apply chosen parameters to.</source>
-      <translation>Выберите области на расписании для применения выбранных параметров.</translation>
+      <translation type="unfinished">Select areas on the schedule to apply chosen parameters to.</translation>
     </message>
     <message>
       <source>Set recording parameters and select areas on the schedule grid to apply them to.</source>
-      <translation>Установите параметры записи и выберите области на сетке расписания, на которые применить их.</translation>
+      <translation type="unfinished">Set recording parameters and select areas on the schedule grid to apply them to.</translation>
     </message>
     <message>
       <source>High minimum value can lead to archive length decrease on other devices.</source>
-      <translation>Высокое минимальное значение может привести к уменьшению размера архива на других устройствах.</translation>
+      <translation type="unfinished">High minimum value can lead to archive length decrease on other devices.</translation>
     </message>
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
-      <translation>Высокое минимальное значение может привести к уменьшению размера архива на других камерах.</translation>
+      <translation type="unfinished">High minimum value can lead to archive length decrease on other cameras.</translation>
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation>Большое время предварительной записи увеличит использование оперативной памяти на сервере</translation>
+      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
     </message>
   </context>
   <context>
@@ -7822,7 +7586,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation>Показать все камеры</translation>
+      <translation type="unfinished">Show all cameras</translation>
     </message>
     <message>
       <source>Select Devices</source>
@@ -7849,94 +7613,88 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation>Общие</translation>
+      <translation type="unfinished">General</translation>
     </message>
     <message>
       <source>Recording</source>
-      <translation>Запись</translation>
+      <translation type="unfinished">Recording</translation>
     </message>
     <message>
       <source>I/O Ports</source>
-      <translation>Порты ввода/вывода</translation>
+      <translation type="unfinished">I/O Ports</translation>
     </message>
     <message>
       <source>Motion</source>
-      <translation>Движение</translation>
+      <translation type="unfinished">Motion</translation>
     </message>
     <message>
       <source>Advanced</source>
-      <translation>Расширенные</translation>
+      <translation type="unfinished">Advanced</translation>
     </message>
     <message>
       <source>Web Page</source>
-      <translation>Web-страница</translation>
+      <translation type="unfinished">Web Page</translation>
     </message>
     <message>
       <source>Expert</source>
-      <translation>Экспертные</translation>
+      <translation type="unfinished">Expert</translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
-      <translation>
-        <numerusform>Changes to the following %n device are not saved:</numerusform>
-        <numerusform>Изменения для следующих %n устройств не сохранены:</numerusform>
-        <numerusform>Изменения для следующих %n устройств не сохранены:</numerusform>
-        <numerusform>Changes to the following %n device are not saved:</numerusform>
+      <translation type="unfinished">
+        <numerusform>Changes to the following %n devices are not saved:</numerusform>
+        <numerusform>Changes to the following %n devices are not saved:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n cameras are not saved:</source>
-      <translation>
-        <numerusform>Changes to the following %n camera are not saved:</numerusform>
-        <numerusform>Изменения для следующих %n камер не сохранены:</numerusform>
-        <numerusform>Изменения для следующих %n камер не сохранены:</numerusform>
-        <numerusform>Changes to the following %n camera are not saved:</numerusform>
+      <translation type="unfinished">
+        <numerusform>Changes to the following %n cameras are not saved:</numerusform>
+        <numerusform>Changes to the following %n cameras are not saved:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n I/O Modules are not saved:</source>
-      <translation>
-        <numerusform>Changes to the following %n I/O Module are not saved:</numerusform>
-        <numerusform>Изменения для следующих %n модулей ввода-вывода не сохранены:</numerusform>
-        <numerusform>Изменения для следующих %n модулей ввода-вывода не сохранены:</numerusform>
-        <numerusform>Changes to the following %n I/O Module are not saved:</numerusform>
+      <translation type="unfinished">
+        <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
+        <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
       </translation>
     </message>
     <message>
       <source>Apply changes before switching to another camera?</source>
-      <translation>Применить изменения перед переключением на другую камеру?</translation>
+      <translation type="unfinished">Apply changes before switching to another camera?</translation>
     </message>
     <message>
       <source>Device Settings</source>
-      <translation>Настройки устройства</translation>
+      <translation type="unfinished">Device Settings</translation>
     </message>
     <message>
       <source>Devices Settings</source>
-      <translation>Настройки устройств</translation>
+      <translation type="unfinished">Devices Settings</translation>
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation>Настройки камеры</translation>
+      <translation type="unfinished">Camera Settings</translation>
     </message>
     <message>
       <source>Cameras Settings</source>
-      <translation>Настройки камер</translation>
+      <translation type="unfinished">Cameras Settings</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation>Настройки модуля ввода-вывода</translation>
+      <translation type="unfinished">I/O Module Settings</translation>
     </message>
     <message>
       <source>I/O Modules Settings</source>
-      <translation>Настройки модулей ввода-вывода</translation>
+      <translation type="unfinished">I/O Modules Settings</translation>
     </message>
     <message>
       <source>Plugins</source>
-      <translation>Плагины</translation>
+      <translation type="unfinished">Plugins</translation>
     </message>
     <message>
       <source>Dewarping</source>
-      <translation>Коррекция искривления</translation>
+      <translation type="unfinished">Dewarping</translation>
     </message>
     <message>
       <source>Change invalid schedule to &quot;Record Always&quot;</source>
@@ -7948,7 +7706,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Motion Only</source>
-      <translation>Только движение (ДД)</translation>
+      <translation type="unfinished">Motion Only</translation>
     </message>
     <message>
       <source>Objects Only</source>
@@ -7960,7 +7718,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation>Дд + Низ</translation>
+      <translation type="unfinished">Motion + Lo-Res</translation>
     </message>
     <message>
       <source>Objects + Lo-Res</source>
@@ -7978,15 +7736,11 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation type="unfinished">
         <numerusform>Failed to enable audio on %n devices</numerusform>
         <numerusform>Failed to enable audio on %n devices</numerusform>
-        <numerusform>Failed to enable audio on %n devices</numerusform>
-        <numerusform>Failed to enable audio on %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These devices do not have audio inputs or are not configured correctly.</source>
       <translation type="unfinished">
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
         <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
         <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
       </translation>
@@ -7996,8 +7750,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation type="unfinished">
         <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
         <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8005,13 +7757,11 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation type="unfinished">
         <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
         <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
       </translation>
     </message>
     <message>
       <source>Audio will be disabled</source>
-      <translation>Звук будет отключен</translation>
+      <translation type="unfinished">Audio will be disabled</translation>
     </message>
     <message>
       <source>You need to select a device that will provide audio.</source>
@@ -8031,19 +7781,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>%1 are used</source>
       <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 используется</numerusform>
-        <numerusform>%1 используются</numerusform>
-        <numerusform>%1 используются</numerusform>
-        <numerusform>%1 используются</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 are used</numerusform>
+        <numerusform>%1 are used</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 are required</source>
       <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
       <translation type="unfinished">
-        <numerusform>%1 are required</numerusform>
-        <numerusform>%1 are required</numerusform>
         <numerusform>%1 are required</numerusform>
         <numerusform>%1 are required</numerusform>
       </translation>
@@ -8053,15 +7799,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraStreamsDialog</name>
     <message>
       <source>Primary Stream</source>
-      <translation>Основной поток</translation>
+      <translation type="unfinished">Primary Stream</translation>
     </message>
     <message>
       <source>Secondary Stream</source>
-      <translation>Вторичный поток</translation>
+      <translation type="unfinished">Secondary Stream</translation>
     </message>
     <message>
       <source>No secondary stream</source>
-      <translation>Нет вторичного потока</translation>
+      <translation type="unfinished">No secondary stream</translation>
     </message>
     <message>
       <source>Invalid stream address</source>
@@ -8088,39 +7834,39 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
       <source>This update is already installed.</source>
-      <translation>Это обновление уже установлено.</translation>
+      <translation type="unfinished">This update is already installed.</translation>
     </message>
     <message>
       <source>This version is not installed.</source>
-      <translation>Эта версия не установлена.</translation>
+      <translation type="unfinished">This version is not installed.</translation>
     </message>
     <message>
       <source>Invalid version format.</source>
-      <translation>Неверный формат версии.</translation>
+      <translation type="unfinished">Invalid version format.</translation>
     </message>
     <message>
       <source>Broken update package.</source>
-      <translation>Пакет обновления сломан.</translation>
+      <translation type="unfinished">Broken update package.</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation>Внутренняя ошибка.</translation>
+      <translation type="unfinished">Internal error.</translation>
     </message>
     <message>
       <source>Not enough space on disk to install the client update.</source>
-      <translation>Недостаточно места на диске для установки обновления клиента.</translation>
+      <translation type="unfinished">Not enough space on disk to install the client update.</translation>
     </message>
     <message>
       <source>Installation package has been lost.</source>
-      <translation>Пакет установки был потерян.</translation>
+      <translation type="unfinished">Installation package has been lost.</translation>
     </message>
     <message>
       <source>File %1 does not exist</source>
-      <translation>Файл %1 не существует</translation>
+      <translation type="unfinished">File %1 does not exist</translation>
     </message>
     <message>
       <source>There is no valid client package to download</source>
-      <translation>Нет требуемого клиентского пакета для загрузки</translation>
+      <translation type="unfinished">There is no valid client package to download</translation>
     </message>
     <message>
       <source>Cannot download update file</source>
@@ -8136,30 +7882,30 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Copy</source>
       <comment>to Clipboard</comment>
-      <translation>Копировать</translation>
+      <translation type="unfinished">Copy</translation>
     </message>
     <message>
       <source>Copy to Clipboard</source>
-      <translation>Скопировать в буфер обмена</translation>
+      <translation type="unfinished">Copy to Clipboard</translation>
     </message>
     <message>
       <source>Paste</source>
       <comment>from Clipboard</comment>
-      <translation>Вставить</translation>
+      <translation type="unfinished">Paste</translation>
     </message>
     <message>
       <source>Paste from Clipboard</source>
-      <translation>Вставить из буфера обмена</translation>
+      <translation type="unfinished">Paste from Clipboard</translation>
     </message>
     <message>
       <source>Copied</source>
       <comment>to Clipboard</comment>
-      <translation>Скопировано</translation>
+      <translation type="unfinished">Copied</translation>
     </message>
     <message>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
-      <translation>Вставлено</translation>
+      <translation type="unfinished">Pasted</translation>
     </message>
   </context>
   <context>
@@ -8174,19 +7920,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ConnectActionsHandler</name>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
-      <translation>Видеостена удалена на сервере и будет закрыта.</translation>
+      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
     </message>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
-      <translation>Не удалось подключиться к серверу. Видеостена будет закрыта.</translation>
+      <translation type="unfinished">Could not connect to server. Video Wall will be closed.</translation>
     </message>
     <message>
       <source>Could not connect to server. Application will be closed.</source>
-      <translation>Не удалось подключиться к серверу. Приложение будет закрыто.</translation>
+      <translation type="unfinished">Could not connect to server. Application will be closed.</translation>
     </message>
     <message>
       <source>Failed to connect to the selected server</source>
-      <translation>Не удалось подключиться к выбранному серверу</translation>
+      <translation type="unfinished">Failed to connect to the selected server</translation>
     </message>
     <message>
       <source>Re-authentication required</source>
@@ -8203,7 +7949,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>OK</source>
       <comment>Dialog button text.</comment>
-      <translation>ОК</translation>
+      <translation type="unfinished">OK</translation>
     </message>
   </context>
   <context>
@@ -8219,22 +7965,22 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>System connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Система подключена к %1</translation>
+      <translation type="unfinished">System connected to %1</translation>
     </message>
     <message>
       <source>Failed to connect System to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Не удалось подключить систему к %1</translation>
+      <translation type="unfinished">Failed to connect System to %1</translation>
     </message>
     <message>
       <source>Connect System to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Подключить систему к %1</translation>
+      <translation type="unfinished">Connect System to %1</translation>
     </message>
     <message>
       <source>Connect System to %1?</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Подключить систему к %1?</translation>
+      <translation type="unfinished">Connect System to %1?</translation>
     </message>
     <message>
       <source>Enter your account password to connect System to %1</source>
@@ -8244,30 +7990,30 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Connect</source>
       <comment>Connect current System to cloud</comment>
-      <translation>Соединение</translation>
+      <translation type="unfinished">Connect</translation>
     </message>
     <message>
       <source>Internal server error. Please try again later.</source>
-      <translation>Внутренняя ошибка сервера. Пожалуйста, попробуйте позже.</translation>
+      <translation type="unfinished">Internal server error. Please try again later.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ConnectToCurrentSystemTool</name>
     <message>
       <source>Configuring Server</source>
-      <translation>Настройка сервера</translation>
+      <translation type="unfinished">Configuring Server</translation>
     </message>
     <message>
       <source>Total amount of licenses will decrease</source>
-      <translation>Общее количество лицензий уменьшится</translation>
+      <translation type="unfinished">Total amount of licenses will decrease</translation>
     </message>
     <message>
       <source>Enter password...</source>
-      <translation>Введите пароль...</translation>
+      <translation type="unfinished">Enter password...</translation>
     </message>
     <message>
       <source>Administrator password</source>
-      <translation>Пароль администратора</translation>
+      <translation type="unfinished">Administrator password</translation>
     </message>
     <message>
       <source>Merge Server to the System</source>
@@ -8281,49 +8027,49 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Merge</source>
       <comment>Merge Server to the current System (dialog button text)</comment>
-      <translation>Объединить</translation>
+      <translation type="unfinished">Merge</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ConnectionTestingDialog</name>
     <message>
       <source>Connect</source>
-      <translation>Соединение</translation>
+      <translation type="unfinished">Connect</translation>
     </message>
     <message>
       <source>Setup</source>
-      <translation>Настройка</translation>
+      <translation type="unfinished">Setup</translation>
     </message>
     <message>
       <source>Success</source>
-      <translation>Успешно</translation>
+      <translation type="unfinished">Success</translation>
     </message>
     <message>
       <source>Test Failed</source>
-      <translation>Проверка не удалась</translation>
+      <translation type="unfinished">Test Failed</translation>
     </message>
     <message>
       <source>Request timeout</source>
-      <translation>Истекло время ожидания ответа на запрос</translation>
+      <translation type="unfinished">Request timeout</translation>
     </message>
     <message>
       <source>New System</source>
-      <translation>Новая система</translation>
+      <translation type="unfinished">New System</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CopyScheduleCameraSelectionDialog</name>
     <message>
       <source>Recording cannot be enabled for some cameras.</source>
-      <translation>Невозможно включить запись на некоторых камерах.</translation>
+      <translation type="unfinished">Recording cannot be enabled for some cameras.</translation>
     </message>
     <message>
       <source>Schedule settings are not compatible with some devices.</source>
-      <translation>Настройки расписания несовместимы с некоторыми устройствами.</translation>
+      <translation type="unfinished">Schedule settings are not compatible with some devices.</translation>
     </message>
     <message>
       <source>Copy archive length settings</source>
-      <translation>Скопировать настройки длительности архива</translation>
+      <translation type="unfinished">Copy archive length settings</translation>
     </message>
     <message>
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
@@ -8334,121 +8080,115 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::DefaultPasswordAlertBar</name>
     <message>
       <source>This camera requires password to be set up.</source>
-      <translation>Эта камера требует установки пароля.</translation>
+      <translation type="unfinished">This camera requires password to be set up.</translation>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up.</source>
-      <translation>Некоторые из выбранных камер требуют настройки пароля.</translation>
+      <translation type="unfinished">Some of selected cameras require password to be set up.</translation>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
-      <translation>Для этого следует обратиться к системному администратору.</translation>
+      <translation type="unfinished">Ask your system administrator to do it.</translation>
     </message>
     <message>
       <source>Set Password</source>
-      <translation>Установить пароли</translation>
+      <translation type="unfinished">Set Password</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::DeviceAdditionDialog</name>
     <message>
       <source>Start address</source>
-      <translation>Начальный адрес</translation>
+      <translation type="unfinished">Start address</translation>
     </message>
     <message>
       <source>End address</source>
-      <translation>Конечный адрес</translation>
+      <translation type="unfinished">End address</translation>
     </message>
     <message>
       <source>IP / Hostname / RTSP link / UDP link</source>
-      <translation>IP / Имя хоста / RTSP ссылка / UDP ссылка</translation>
+      <translation type="unfinished">IP / Hostname / RTSP link / UDP link</translation>
     </message>
     <message>
       <source>Examples:</source>
-      <translation>Примеры:</translation>
+      <translation type="unfinished">Examples:</translation>
     </message>
     <message>
       <source>Server offline</source>
-      <translation>Сервер не в сети</translation>
+      <translation type="unfinished">Server offline</translation>
     </message>
     <message>
       <source>Device search failed</source>
-      <translation>Ошибка при поиске устройств</translation>
+      <translation type="unfinished">Device search failed</translation>
     </message>
     <message numerus="yes">
       <source>Failed to add %n devices</source>
-      <translation>
-        <numerusform>Не удалось добавить %n устройство</numerusform>
-        <numerusform>Не удалось добавить %n устройства</numerusform>
-        <numerusform>Не удалось добавить %n устройств</numerusform>
-        <numerusform>Не удалось добавить %n устройств</numerusform>
+      <translation type="unfinished">
+        <numerusform>Failed to add %n devices</numerusform>
+        <numerusform>Failed to add %n devices</numerusform>
       </translation>
     </message>
     <message>
       <source>Scan</source>
-      <translation>Сканировать</translation>
+      <translation type="unfinished">Scan</translation>
     </message>
     <message>
       <source>Search</source>
-      <translation>Поиск</translation>
+      <translation type="unfinished">Search</translation>
     </message>
     <message>
       <source>Initializing scan...</source>
-      <translation>Сканирование инициализируется...</translation>
+      <translation type="unfinished">Initializing scan...</translation>
     </message>
     <message>
       <source>Scanning online hosts...</source>
-      <translation>Сканирование узлов в сети...</translation>
+      <translation type="unfinished">Scanning online hosts...</translation>
     </message>
     <message>
       <source>Checking host...</source>
-      <translation>Проверка хоста...</translation>
+      <translation type="unfinished">Checking host...</translation>
     </message>
     <message>
       <source>Finished</source>
-      <translation>Завершено</translation>
+      <translation type="unfinished">Finished</translation>
     </message>
     <message>
       <source>Aborted</source>
-      <translation>Прервано</translation>
+      <translation type="unfinished">Aborted</translation>
     </message>
     <message>
       <source>Searching...</source>
-      <translation>Поиск...</translation>
+      <translation type="unfinished">Searching...</translation>
     </message>
     <message>
       <source>No devices found</source>
-      <translation>Устройства не найдены</translation>
+      <translation type="unfinished">No devices found</translation>
     </message>
     <message>
       <source>All devices are already added</source>
-      <translation>Все устройства уже добавлены</translation>
+      <translation type="unfinished">All devices are already added</translation>
     </message>
     <message numerus="yes">
       <source>%n devices are being added. You can close this dialog or start a new search</source>
-      <translation>
-        <numerusform>Добавляeтся %n устройство. Вы можете закрыть это диалоговое окно или начать новый поиск</numerusform>
-        <numerusform>Добавляeтся %n устройства. Вы можете закрыть это диалоговое окно или начать новый поиск</numerusform>
-        <numerusform>Добавляeтся %n устройств. Вы можете закрыть это диалоговое окно или начать новый поиск</numerusform>
-        <numerusform>Добавляeтся %n устройств. Вы можете закрыть это диалоговое окно или начать новый поиск</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
+        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
       </translation>
     </message>
     <message>
       <source>Add all Devices</source>
-      <translation>Добавить все устройства</translation>
+      <translation type="unfinished">Add all Devices</translation>
     </message>
     <message numerus="yes">
       <source>Add %n Devices</source>
-      <translation>
-        <numerusform>Добавить %n устройство</numerusform>
-        <numerusform>Добавить %n устройства</numerusform>
-        <numerusform>Добавить %n устройств</numerusform>
-        <numerusform>Добавить %n устройств</numerusform>
+      <translation type="unfinished">
+        <numerusform>Add %n Devices</numerusform>
+        <numerusform>Add %n Devices</numerusform>
       </translation>
     </message>
     <message>
       <source>Address field cannot be empty</source>
-      <translation>Поле адреса не может быть пустым</translation>
+      <translation type="unfinished">Address field cannot be empty</translation>
     </message>
     <message>
       <source>Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</source>
@@ -8456,29 +8196,29 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>System Administration</source>
-      <translation>Администрирование системы</translation>
+      <translation type="unfinished">System Administration</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EncryptedArchivePasswordDialog</name>
     <message>
       <source>Decrypt</source>
-      <translation>Расшифровать</translation>
+      <translation type="unfinished">Decrypt</translation>
     </message>
     <message>
       <source>Invalid password</source>
-      <translation>Неверный пароль</translation>
+      <translation type="unfinished">Invalid password</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EulaDialog</name>
     <message>
       <source>Please review and agree to the %1 in order to proceed</source>
-      <translation>Пожалуйста, проверьте и согласитесь с %1 для продолжения</translation>
+      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
     </message>
     <message>
       <source>To use the software you must agree with the end user license agreement</source>
-      <translation>Чтобы использовать По, вы должны принять лицензионное соглашение с конечным пользователем</translation>
+      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
     </message>
   </context>
   <context>
@@ -8486,42 +8226,40 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Notifications</source>
       <comment>Notifications tab title</comment>
-      <translation>Уведомления</translation>
+      <translation type="unfinished">Notifications</translation>
     </message>
     <message>
       <source>Motion</source>
       <comment>Motion tab title</comment>
-      <translation>Движение</translation>
+      <translation type="unfinished">Motion</translation>
     </message>
     <message>
       <source>Bookmarks</source>
       <comment>Bookmarks tab title</comment>
-      <translation>Закладки</translation>
+      <translation type="unfinished">Bookmarks</translation>
     </message>
     <message>
       <source>Events</source>
       <comment>Events tab title</comment>
-      <translation>События</translation>
+      <translation type="unfinished">Events</translation>
     </message>
     <message>
       <source>Objects</source>
       <comment>Analytics tab title</comment>
-      <translation>Объекты</translation>
+      <translation type="unfinished">Objects</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
       <source>No events</source>
-      <translation>Нет событий</translation>
+      <translation type="unfinished">No events</translation>
     </message>
     <message numerus="yes">
       <source>%n events</source>
-      <translation>
-        <numerusform>%n событие</numerusform>
-        <numerusform>%n события</numerusform>
-        <numerusform>%n событий</numerusform>
-        <numerusform>%n событий</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n events</numerusform>
+        <numerusform>%n events</numerusform>
       </translation>
     </message>
     <message>
@@ -8533,11 +8271,9 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::EventTile</name>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation>
-        <numerusform>...и ещё %n</numerusform>
-        <numerusform>...и ещё %n</numerusform>
-        <numerusform>...и ещё %n</numerusform>
-        <numerusform>...и ещё %n</numerusform>
+      <translation type="unfinished">
+        <numerusform>...and %n more</numerusform>
+        <numerusform>...and %n more</numerusform>
       </translation>
     </message>
   </context>
@@ -8545,161 +8281,161 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ExportPasswordWidget</name>
     <message>
       <source>Please enter the password.</source>
-      <translation>Пожалуйста, введите пароль.</translation>
+      <translation type="unfinished">Please enter the password.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ExportProcess</name>
     <message>
       <source>Unsupported media for data export.</source>
-      <translation>Неподдерживаемые тип данных для экспорта данных.</translation>
+      <translation type="unfinished">Unsupported media for data export.</translation>
     </message>
     <message>
       <source>Selected format is not supported by FFMPEG library.</source>
-      <translation>Выбранный формат не поддерживается библиотекой FFMPEG.</translation>
+      <translation type="unfinished">Selected format is not supported by FFMPEG library.</translation>
     </message>
     <message>
       <source>FFMPEG library error.</source>
-      <translation>Ошибка библиотеки FFMPEG.</translation>
+      <translation type="unfinished">FFMPEG library error.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with selected format.</source>
-      <translation>Видео или аудио кодек несовместим с выбранным форматом.</translation>
+      <translation type="unfinished">Video or audio codec is incompatible with selected format.</translation>
     </message>
     <message>
       <source>File write error.</source>
-      <translation>Ошибка записи файла.</translation>
+      <translation type="unfinished">File write error.</translation>
     </message>
     <message>
       <source>No data exported.</source>
-      <translation>Нет данных для экспорта.</translation>
+      <translation type="unfinished">No data exported.</translation>
     </message>
     <message>
       <source>Internal error</source>
-      <translation>Внутренняя ошибка</translation>
+      <translation type="unfinished">Internal error</translation>
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation>Требуется транскодирование видео.</translation>
+      <translation type="unfinished">Video transcoding required.</translation>
     </message>
     <message>
       <source>Archive is encrypted.</source>
-      <translation>Архив зашифрован.</translation>
+      <translation type="unfinished">Archive is encrypted.</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
-      <translation>Архив сейчас недоступен. Пожалуйста, повторите попытку позже.</translation>
+      <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ExportSettingsDialog</name>
     <message>
       <source>Export</source>
-      <translation>Экспорт</translation>
+      <translation type="unfinished">Export</translation>
     </message>
     <message>
       <source>Rapid Review</source>
-      <translation>Быстрая прокрутка</translation>
+      <translation type="unfinished">Rapid Review</translation>
     </message>
     <message>
       <source>Export Settings</source>
-      <translation>Настройки экспорта</translation>
+      <translation type="unfinished">Export Settings</translation>
     </message>
     <message>
       <source>Add Timestamp</source>
-      <translation>Добавить отметку времени</translation>
+      <translation type="unfinished">Add Timestamp</translation>
     </message>
     <message>
       <source>Delete Timestamp</source>
-      <translation>Удалить отметку времени</translation>
+      <translation type="unfinished">Delete Timestamp</translation>
     </message>
     <message>
       <source>Timestamp</source>
-      <translation>Отметки времени</translation>
+      <translation type="unfinished">Timestamp</translation>
     </message>
     <message>
       <source>Add Image</source>
-      <translation>Добавить изображение</translation>
+      <translation type="unfinished">Add Image</translation>
     </message>
     <message>
       <source>Delete Image</source>
-      <translation>Удалить изображение</translation>
+      <translation type="unfinished">Delete Image</translation>
     </message>
     <message>
       <source>Image</source>
-      <translation>Изображение</translation>
+      <translation type="unfinished">Image</translation>
     </message>
     <message>
       <source>Add Text</source>
-      <translation>Добавить текст</translation>
+      <translation type="unfinished">Add Text</translation>
     </message>
     <message>
       <source>Delete Text</source>
-      <translation>Удалить текст</translation>
+      <translation type="unfinished">Delete Text</translation>
     </message>
     <message>
       <source>Text</source>
-      <translation>Текст</translation>
+      <translation type="unfinished">Text</translation>
     </message>
     <message>
       <source>Reset Speed</source>
-      <translation>Сбросить скорость</translation>
+      <translation type="unfinished">Reset Speed</translation>
     </message>
     <message>
       <source>Add Bookmark Info</source>
-      <translation>Добавить информацию о закладке</translation>
+      <translation type="unfinished">Add Bookmark Info</translation>
     </message>
     <message>
       <source>Delete Bookmark Info</source>
-      <translation>Удалить информацию о закладке</translation>
+      <translation type="unfinished">Delete Bookmark Info</translation>
     </message>
     <message>
       <source>Bookmark Info</source>
-      <translation>Информация о закладке</translation>
+      <translation type="unfinished">Bookmark Info</translation>
     </message>
     <message>
       <source>exported</source>
-      <translation>экспортирован(о)</translation>
+      <translation type="unfinished">exported</translation>
     </message>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
-      <translation>Выбранные настройки требуют перекодирования. Это увеличит нагрузку на процессор и может занять значительное время.</translation>
+      <translation type="unfinished">Chosen settings require transcoding. It will increase CPU usage and may take significant time.</translation>
     </message>
     <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
-      <translation>Мы рекомендуем экспортировать видео с этой камеры как "Multi Video" чтобы избежать ухудшения качества.</translation>
+      <translation type="unfinished">We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</translation>
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation>Экспортированный файл .EXE будет иметь размер более 4 ГБ и не может быть открыт двойным щелчком в Windows. Его можно воспроизводить только в %1 клиенте.</translation>
+      <translation type="unfinished">Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</translation>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation>Настройки недоступны для файлов .NOV и .EXE.</translation>
+      <translation type="unfinished">Settings are not available for .NOV and .EXE files.</translation>
     </message>
     <message>
       <source>Local files, server monitor widgets and webpages will not be exported.</source>
-      <translation>Локальные файлы, виджеты мониторинга серверов и веб-страницы экспортироваться не будут.</translation>
+      <translation type="unfinished">Local files, server monitor widgets and webpages will not be exported.</translation>
     </message>
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
-      <translation>Вы собираетесь экспортировать длинное видео. Это может потребовать много места для хранения и занять значительное время.</translation>
+      <translation type="unfinished">You are about to export a long video. It may require a lot of storage space and take significant time.</translation>
     </message>
     <message>
       <source>Add Info</source>
-      <translation>Добавить информацию</translation>
+      <translation type="unfinished">Add Info</translation>
     </message>
     <message>
       <source>Delete Info</source>
-      <translation>Удалить информацию</translation>
+      <translation type="unfinished">Delete Info</translation>
     </message>
     <message>
       <source>Info</source>
-      <translation>Информация</translation>
+      <translation type="unfinished">Info</translation>
     </message>
     <message>
       <source>AVI format is not recommended to export a recording with audio track.</source>
-      <translation>Формат AVI не рекомендуется для экспорта записи с аудиодорожкой.</translation>
+      <translation type="unfinished">AVI format is not recommended to export a recording with audio track.</translation>
     </message>
     <message>
       <source>Export is not available: This camera does not have a video archive for the selected time period.</source>
@@ -8711,22 +8447,22 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Exported: %1</source>
       <comment>Duration will be substituted</comment>
-      <translation>Экспортировано: %1</translation>
+      <translation type="unfinished">Exported: %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::FailoverPriorityDialogItemDelegate</name>
     <message>
       <source>Low</source>
-      <translation>Низкая</translation>
+      <translation type="unfinished">Low</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation>Среднее</translation>
+      <translation type="unfinished">Medium</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>Высокая</translation>
+      <translation type="unfinished">High</translation>
     </message>
     <message>
       <source>No Failover</source>
@@ -8737,19 +8473,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::FilenamePanel</name>
     <message>
       <source>Folder</source>
-      <translation>Папка</translation>
+      <translation type="unfinished">Folder</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation>Имя</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Name cannot be empty.</source>
-      <translation>Имя не может быть пустым.</translation>
+      <translation type="unfinished">Name cannot be empty.</translation>
     </message>
     <message>
       <source>Select folder...</source>
-      <translation>Выбрать каталог...</translation>
+      <translation type="unfinished">Select folder...</translation>
     </message>
   </context>
   <context>
@@ -8764,43 +8500,39 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Do not show this message again</source>
-      <translation>Больше не показывать это сообщение</translation>
+      <translation type="unfinished">Do not show this message again</translation>
     </message>
     <message>
       <source>Enable</source>
-      <translation>Включить</translation>
+      <translation type="unfinished">Enable</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
     <message>
       <source>Brand</source>
-      <translation>Брэнд</translation>
+      <translation type="unfinished">Brand</translation>
     </message>
     <message>
       <source>Model</source>
-      <translation>Модель</translation>
+      <translation type="unfinished">Model</translation>
     </message>
     <message>
       <source>Address</source>
-      <translation>Адрес</translation>
+      <translation type="unfinished">Address</translation>
     </message>
     <message numerus="yes">
       <source>%n new</source>
-      <translation>
-        <numerusform>%n новый</numerusform>
-        <numerusform>%n новых</numerusform>
-        <numerusform>%n новых</numerusform>
-        <numerusform>%n новых</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n new</numerusform>
+        <numerusform>%n new</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices total</source>
-      <translation>
-        <numerusform>Найдено %n устройство</numerusform>
-        <numerusform>Найдено %n устройства</numerusform>
-        <numerusform>Найдено %n устройств</numerusform>
-        <numerusform>Найдено %n устройств</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n devices total</numerusform>
+        <numerusform>%n devices total</numerusform>
       </translation>
     </message>
   </context>
@@ -8815,144 +8547,144 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ImageControlWidget</name>
     <message>
       <source>Auto</source>
-      <translation>Авто</translation>
+      <translation type="unfinished">Auto</translation>
     </message>
     <message>
       <source>%1 degrees</source>
-      <translation>%1 градусов</translation>
+      <translation type="unfinished">%1 degrees</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ImageOverlaySettingsWidget</name>
     <message>
       <source>Select file...</source>
-      <translation>Выбрать файл...</translation>
+      <translation type="unfinished">Select file...</translation>
     </message>
     <message>
       <source>Error</source>
-      <translation>Ошибка</translation>
+      <translation type="unfinished">Error</translation>
     </message>
     <message>
       <source>Image cannot be loaded.</source>
-      <translation>Невозможно загрузить изображение.</translation>
+      <translation type="unfinished">Image cannot be loaded.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::IncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
-      <translation>Системы будут объединены в ближайшее время</translation>
+      <translation type="unfinished">Systems will be merged shortly</translation>
     </message>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
-      <translation>Серверы с другой системы будут отображаться в дереве ресурсов.</translation>
+      <translation type="unfinished">Servers from the other System will appear in the resource tree.</translation>
     </message>
     <message>
       <source>Connecting to the current System...</source>
-      <translation>Подключение к текущей системе...</translation>
+      <translation type="unfinished">Connecting to the current System...</translation>
     </message>
     <message>
       <source>Server will be connected to System shortly</source>
-      <translation>Сервер будет подключен к системе в ближайшее время</translation>
+      <translation type="unfinished">Server will be connected to System shortly</translation>
     </message>
     <message>
       <source>It will appear in the resource tree when the database synchronization is finished.</source>
-      <translation>Он появится в дереве ресурсов, когда синхронизация базы данных будет завершена.</translation>
+      <translation type="unfinished">It will appear in the resource tree when the database synchronization is finished.</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our system.</source>
-      <translation>Не удалось объединить %1 с нашей системой.</translation>
+      <translation type="unfinished">Failed to merge %1 to our system.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
       <source>Copy</source>
-      <translation>Копировать</translation>
+      <translation type="unfinished">Copy</translation>
     </message>
     <message>
       <source>Copy Link Location</source>
-      <translation>Копировать адрес ссылки</translation>
+      <translation type="unfinished">Copy Link Location</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LayoutBackgroundSettingsWidget</name>
     <message>
       <source>cells</source>
-      <translation>ячеек</translation>
+      <translation type="unfinished">cells</translation>
     </message>
     <message>
       <source>No picture</source>
-      <translation>Нет картинки</translation>
+      <translation type="unfinished">No picture</translation>
     </message>
     <message>
       <source>Error while loading picture</source>
-      <translation>Ошибка загрузки изображения</translation>
+      <translation type="unfinished">Error while loading picture</translation>
     </message>
     <message>
       <source>Error while uploading picture</source>
-      <translation>Ошибка загрузки изображения</translation>
+      <translation type="unfinished">Error while uploading picture</translation>
     </message>
     <message>
       <source>Select file...</source>
-      <translation>Выбрать файл...</translation>
+      <translation type="unfinished">Select file...</translation>
     </message>
     <message>
       <source>Picture cannot be read</source>
-      <translation>Изображение не читается</translation>
+      <translation type="unfinished">Picture cannot be read</translation>
     </message>
     <message>
       <source>Picture is too big. Maximum size is %1 MB</source>
-      <translation>Слишком большое изображение. Максимальный размер - %1 МБ</translation>
+      <translation type="unfinished">Picture is too big. Maximum size is %1 MB</translation>
     </message>
     <message>
       <source>Picture cannot be loaded</source>
-      <translation>Невозможно загрузить изображение</translation>
+      <translation type="unfinished">Picture cannot be loaded</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LayoutGeneralSettingsWidget</name>
     <message>
       <source>cells</source>
-      <translation>ячеек</translation>
+      <translation type="unfinished">cells</translation>
     </message>
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
-      <translation>Произвольный номер, который можно назначить для раскладки для быстрой идентификации и доступа к ней</translation>
+      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
     </message>
     <message>
       <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
-      <translation>Этот ID уже используется в системе. Используйте кнопку Сгенерировать, чтобы найти свободный ID.</translation>
+      <translation type="unfinished">This ID is already used in the System. Use Generate button to find a free ID.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LayoutSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation>Общие</translation>
+      <translation type="unfinished">General</translation>
     </message>
     <message>
       <source>Background</source>
-      <translation>Фон</translation>
+      <translation type="unfinished">Background</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LayoutThumbnailLoader</name>
     <message>
       <source>NO DATA</source>
-      <translation>НЕТ ДАННЫХ</translation>
+      <translation type="unfinished">NO DATA</translation>
     </message>
     <message>
       <source>NOT A CAMERA</source>
-      <translation>НЕ КАМЕРА</translation>
+      <translation type="unfinished">NOT A CAMERA</translation>
     </message>
     <message>
       <source>DISABLED</source>
-      <translation>ОТКЛЮЧЕНО</translation>
+      <translation type="unfinished">DISABLED</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation>НЕ В СЕТИ</translation>
+      <translation type="unfinished">OFFLINE</translation>
     </message>
   </context>
   <context>
@@ -8974,8 +8706,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation type="unfinished">
         <numerusform>%n minutes left</numerusform>
         <numerusform>%n minutes left</numerusform>
-        <numerusform>%n minutes left</numerusform>
-        <numerusform>%n minutes left</numerusform>
       </translation>
     </message>
   </context>
@@ -8983,72 +8713,72 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::LoginDialog</name>
     <message>
       <source>Connect to Server...</source>
-      <translation>Подключиться к серверу...</translation>
+      <translation type="unfinished">Connect to Server...</translation>
     </message>
     <message>
       <source>Version %1</source>
-      <translation>Версия %1</translation>
+      <translation type="unfinished">Version %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ManualDeviceSearcher</name>
     <message>
       <source>Server is not specified</source>
-      <translation>Сервер не указан</translation>
+      <translation type="unfinished">Server is not specified</translation>
     </message>
     <message>
       <source>Server offline</source>
-      <translation>Сервер не в сети</translation>
+      <translation type="unfinished">Server offline</translation>
     </message>
     <message>
       <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
-      <translation>Поле адрес устройства должно содержать URL, IP адрес или RTSP-ссылку.</translation>
+      <translation type="unfinished">Device address field must contain a valid URL, IP address, or RTSP link.</translation>
     </message>
     <message>
       <source>First address in range is greater than the last one.</source>
-      <translation>Начальный адрес диапазона больше конечного.</translation>
+      <translation type="unfinished">First address in range is greater than the last one.</translation>
     </message>
     <message>
       <source>The specified IP address range has more than 255 addresses.</source>
-      <translation>Выбранный диапазон содержит более 255 адресов.</translation>
+      <translation type="unfinished">The specified IP address range has more than 255 addresses.</translation>
     </message>
     <message>
       <source>Can not start the search process</source>
-      <translation>Не могу начать процесс поиска</translation>
+      <translation type="unfinished">Can not start the search process</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MediaFileSettingsDialog</name>
     <message>
       <source>File Settings</source>
-      <translation>Настройки файла</translation>
+      <translation type="unfinished">File Settings</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MergeSystemsDialog</name>
     <message>
       <source>You are about to merge the current System %1 with System</source>
-      <translation>Вы собираетесь объединить систему %1 с текущей системой</translation>
+      <translation type="unfinished">You are about to merge the current System %1 with System</translation>
     </message>
     <message>
       <source>%1 (current)</source>
-      <translation>%1 (текущая)</translation>
+      <translation type="unfinished">%1 (current)</translation>
     </message>
     <message>
       <source>URL is invalid.</source>
-      <translation>Неверный URL-адрес.</translation>
+      <translation type="unfinished">URL is invalid.</translation>
     </message>
     <message>
       <source>The login cannot be empty.</source>
-      <translation>Логин должен быть задан.</translation>
+      <translation type="unfinished">The login cannot be empty.</translation>
     </message>
     <message>
       <source>Testing...</source>
-      <translation>Проверка...</translation>
+      <translation type="unfinished">Testing...</translation>
     </message>
     <message>
       <source>Merge Systems</source>
-      <translation>Объединить системы</translation>
+      <translation type="unfinished">Merge Systems</translation>
     </message>
     <message>
       <source>Enter your account password to merge Systems</source>
@@ -9057,55 +8787,55 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Merge</source>
       <comment>Merge two Systems together (dialog button text)</comment>
-      <translation>Объединить</translation>
+      <translation type="unfinished">Merge</translation>
     </message>
     <message>
       <source>Merging Systems...</source>
-      <translation>Объединение систем...</translation>
+      <translation type="unfinished">Merging Systems...</translation>
     </message>
     <message>
       <source>Use a specific hostname or IP address rather than %1.</source>
-      <translation>Использовать особое имя хоста или ip адрес вместо %1.</translation>
+      <translation type="unfinished">Use a specific hostname or IP address rather than %1.</translation>
     </message>
     <message>
       <source>This is the current System URL.</source>
-      <translation>Этот URL используется в данный момент.</translation>
+      <translation type="unfinished">This is the current System URL.</translation>
     </message>
     <message>
       <source>Merge with %1</source>
-      <translation>Объединить с %1</translation>
+      <translation type="unfinished">Merge with %1</translation>
     </message>
     <message>
       <source>Servers from the other System will appear in the resource tree when the database synchronization is finished.</source>
-      <translation>Серверы из другой системы появятся в дереве ресурсов, когда синхронизация базы данных будет завершена.</translation>
+      <translation type="unfinished">Servers from the other System will appear in the resource tree when the database synchronization is finished.</translation>
     </message>
     <message>
       <source>You will be reconnected.</source>
-      <translation>Будет выполнено повторное подключение.</translation>
+      <translation type="unfinished">You will be reconnected.</translation>
     </message>
     <message>
       <source>Systems will be merged shortly</source>
-      <translation>Системы будут объединены в ближайшее время</translation>
+      <translation type="unfinished">Systems will be merged shortly</translation>
     </message>
     <message>
       <source>Failed to merge Systems</source>
-      <translation>Не удалось объединить системы</translation>
+      <translation type="unfinished">Failed to merge Systems</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MergeSystemsTool</name>
     <message>
       <source>New System</source>
-      <translation>Новая система</translation>
+      <translation type="unfinished">New System</translation>
     </message>
     <message>
       <source>System was not found.</source>
-      <translation>Система не найдена.</translation>
+      <translation type="unfinished">System was not found.</translation>
     </message>
     <message>
       <source>The discovered System %1 has an incompatible version %2.</source>
       <comment>%1 is name of System, %2 is version information</comment>
-      <translation>Найденная система %1 несовместима с версией %2.</translation>
+      <translation type="unfinished">The discovered System %1 has an incompatible version %2.</translation>
     </message>
     <message>
       <source>Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</source>
@@ -9113,58 +8843,58 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>The password or user name is invalid.</source>
-      <translation>Неверное имя пользователя или пароль.</translation>
+      <translation type="unfinished">The password or user name is invalid.</translation>
     </message>
     <message>
       <source>This user does not have permissions for the requested operation.</source>
-      <translation>Этот пользователь не имеет полномочий для запрашиваемой операции.</translation>
+      <translation type="unfinished">This user does not have permissions for the requested operation.</translation>
     </message>
     <message>
       <source>Cannot create database backup.</source>
-      <translation>Не удаётся создать резервную копию базы данных.</translation>
+      <translation type="unfinished">Cannot create database backup.</translation>
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
-      <translation>Будут объедины системы с лицензиями Starter.</translation>
+      <translation type="unfinished">You are about to merge Systems with Starter licenses.</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
-      <translation>В системе разрешается использовать только одну Starter лицензию, поэтому вторая лицензия будет деактивирована.</translation>
+      <translation type="unfinished">Only one Starter license is allowed per System, so the second license will be deactivated.</translation>
     </message>
     <message>
       <source>Merge anyway?</source>
-      <translation>Объединить?</translation>
+      <translation type="unfinished">Merge anyway?</translation>
     </message>
     <message>
       <source>You are about to merge Systems with NVR licenses.</source>
-      <translation>Будут объедины системы с лицензиями NVR.</translation>
+      <translation type="unfinished">You are about to merge Systems with NVR licenses.</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per System, so the second license will be deactivated.</source>
-      <translation>В системе разрешается использовать только одну NVR лицензию, поэтому вторая лицензия будет деактивирована.</translation>
+      <translation type="unfinished">Only one NVR license is allowed per System, so the second license will be deactivated.</translation>
     </message>
     <message>
       <source>Could not configure the remote System %1.</source>
       <comment>%1 is name of System</comment>
-      <translation>Не удалось настроить удаленную систему %1.</translation>
+      <translation type="unfinished">Could not configure the remote System %1.</translation>
     </message>
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 система может быть объединена только с не-%1. Системное имя и пароль берутся из %1 системы.</translation>
+      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Обе системы подключены к %1. Объединение не допускается.</translation>
+      <translation type="unfinished">Both Systems are connected to %1. Merge is not allowed.</translation>
     </message>
     <message>
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation>Невозможно объединить системы, поскольку они имеют как минимум 1 сервер с одинаковым идентификатором. Пожалуйста, удалите этот сервер и попробуйте снова.</translation>
+      <translation type="unfinished">Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</translation>
     </message>
     <message>
       <source>System name is not configured yet.</source>
-      <translation>Имя системы ещё не настроено.</translation>
+      <translation type="unfinished">System name is not configured yet.</translation>
     </message>
     <message>
       <source>Connection to Server could not be established. The Server&apos;s certificate is invalid.</source>
@@ -9176,7 +8906,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>Неизвестная ошибка.</translation>
+      <translation type="unfinished">Unknown error.</translation>
     </message>
     <message>
       <source>%1 systems have different owners. Merge is not allowed.</source>
@@ -9188,15 +8918,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::MotionSearchListModel::Private</name>
     <message>
       <source>Motion</source>
-      <translation>Движение</translation>
+      <translation type="unfinished">Motion</translation>
     </message>
     <message>
       <source>deleted camera</source>
-      <translation>удаленная камера</translation>
+      <translation type="unfinished">deleted camera</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
-      <translation>Добавить в закладки...</translation>
+      <translation type="unfinished">Bookmark it...</translation>
     </message>
   </context>
   <context>
@@ -9234,285 +8964,283 @@ You can force it, but it may significantly increase CPU load.</translation>
     <name>nx::vms::client::desktop::MultiServerUpdatesWidget</name>
     <message>
       <source>Release notes</source>
-      <translation>Что нового</translation>
+      <translation type="unfinished">Release notes</translation>
     </message>
     <message>
       <source>Download in External Browser</source>
-      <translation>Скачать во внешнем браузере</translation>
+      <translation type="unfinished">Download in External Browser</translation>
     </message>
     <message>
       <source>Copy Link to Clipboard</source>
-      <translation>Копировать ссылку в буфер обмена</translation>
+      <translation type="unfinished">Copy Link to Clipboard</translation>
     </message>
     <message>
       <source>You have already installed this version.</source>
-      <translation>Вы уже установили эту версию.</translation>
+      <translation type="unfinished">You have already installed this version.</translation>
     </message>
     <message>
       <source>Build not found</source>
-      <translation>Сборка не найдена</translation>
+      <translation type="unfinished">Build not found</translation>
     </message>
     <message>
       <source>Cannot update from the selected file</source>
-      <translation>Не удается обновить из выбранного файла</translation>
+      <translation type="unfinished">Cannot update from the selected file</translation>
     </message>
     <message>
       <source>Invalid update information</source>
-      <translation>Неверная информация об обновлении</translation>
+      <translation type="unfinished">Invalid update information</translation>
     </message>
     <message>
       <source>Downgrade to earlier versions is not possible</source>
-      <translation>Переход на более ранние версии невозможен</translation>
+      <translation type="unfinished">Downgrade to earlier versions is not possible</translation>
     </message>
     <message>
       <source>Update file is not found</source>
-      <translation>Файл обновления не найден</translation>
+      <translation type="unfinished">Update file is not found</translation>
     </message>
     <message>
       <source>Upgrade package is broken</source>
-      <translation>Пакет обновлений поврежден</translation>
+      <translation type="unfinished">Upgrade package is broken</translation>
     </message>
     <message>
       <source>Missing update package for some servers</source>
-      <translation>Отсутствует пакет обновлений для некоторых серверов</translation>
+      <translation type="unfinished">Missing update package for some servers</translation>
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>Несовместимый компонент %1. Для обновления сначала отключите систему от %1.</translation>
+      <translation type="unfinished">Incompatible %1 instance. To update disconnect System from %1 first.</translation>
     </message>
     <message>
       <source>No update package available</source>
-      <translation>Пакет обновления недоступен</translation>
+      <translation type="unfinished">No update package available</translation>
     </message>
     <message>
       <source>Select Update File...</source>
-      <translation>Выберите файл обновлений...</translation>
+      <translation type="unfinished">Select Update File...</translation>
     </message>
     <message>
       <source>Update Files</source>
-      <translation>Файлы обновлений</translation>
+      <translation type="unfinished">Update Files</translation>
     </message>
     <message>
       <source>Some servers are offline and will not be updated. Skip them?</source>
-      <translation>Некоторые серверы не в сети и не будут обновлены. Пропустить их?</translation>
+      <translation type="unfinished">Some servers are offline and will not be updated. Skip them?</translation>
     </message>
     <message numerus="yes">
       <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>Отсутствует пакет обновления для клиента и %n сервера</numerusform>
-        <numerusform>Отсутствует пакет обновления для клиента и %n серверов</numerusform>
-        <numerusform>Отсутствует пакет обновления для клиента и %n серверов</numerusform>
-        <numerusform>Отсутствует пакет обновления для клиента и %n серверов</numerusform>
+      <translation type="unfinished">
+        <numerusform>Missing update package for the client and %n servers</numerusform>
+        <numerusform>Missing update package for the client and %n servers</numerusform>
       </translation>
     </message>
     <message>
       <source>Missing update package for the client</source>
-      <translation>Отсутствует пакет обновления для клиента</translation>
+      <translation type="unfinished">Missing update package for the client</translation>
     </message>
     <message>
       <source>There are no online servers to update.</source>
-      <translation>Нет онлайн серверов для обновления.</translation>
+      <translation type="unfinished">There are no online servers to update.</translation>
     </message>
     <message>
       <source>Cancel update and delete all downloaded data?</source>
-      <translation>Отменить обновление и удалить все загруженные данные?</translation>
+      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>Версии ОС некоторых компонентов больше не поддерживаются. Удалите их из Системы или обновите их ОС до поддерживаемой версии.</translation>
+      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
     </message>
     <message>
       <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>Версия ОС клиента больше не поддерживается. Пожалуйста, обновите ОС до поддерживаемой версии.</translation>
+      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
     </message>
     <message>
       <source>Failed to start update</source>
-      <translation>Не удалось запустить обновление</translation>
+      <translation type="unfinished">Failed to start update</translation>
     </message>
     <message>
       <source>Failed to cancel update</source>
-      <translation>Не удалось отменить обновление</translation>
+      <translation type="unfinished">Failed to cancel update</translation>
     </message>
     <message>
       <source>Failed to start installation</source>
-      <translation>Не удалось запустить установку</translation>
+      <translation type="unfinished">Failed to start installation</translation>
     </message>
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation>Некоторые серверы не завершили процесс обновления. Завершить его в любом случае?</translation>
+      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
-      <translation>Не удалось загрузить пакеты обновления для некоторых компонентов</translation>
+      <translation type="unfinished">Failed to download update packages to some components</translation>
     </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
-      <translation>Если проблема не устранена, обратитесь в службу поддержки.</translation>
+      <translation type="unfinished">If the problem persists, please contact Customer Support.</translation>
     </message>
     <message>
       <source>Try again</source>
-      <translation>Повторить</translation>
+      <translation type="unfinished">Try again</translation>
     </message>
     <message>
       <source>Cancel Update</source>
-      <translation>Отменить обновление</translation>
+      <translation type="unfinished">Cancel Update</translation>
     </message>
     <message>
       <source>Update completed</source>
-      <translation>Обновление завершено</translation>
+      <translation type="unfinished">Update completed</translation>
     </message>
     <message>
       <source>Update completed, but some components have failed an update</source>
-      <translation>Обновление завершено, но некоторые компоненты не смогли обновиться</translation>
+      <translation type="unfinished">Update completed, but some components have failed an update</translation>
     </message>
     <message>
       <source>Please update %1 manually using an installation package.</source>
-      <translation>Обновите %1 вручную, используя инсталлятор.</translation>
+      <translation type="unfinished">Please update %1 manually using an installation package.</translation>
     </message>
     <message>
       <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 будет перезапущен на обновленную версию.</translation>
+      <translation type="unfinished">%1 will be restarted to the updated version.</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation>ОК</translation>
+      <translation type="unfinished">OK</translation>
     </message>
     <message>
       <source>There was an error while installing updates:</source>
-      <translation>При установке обновлений произошла ошибка:</translation>
+      <translation type="unfinished">There was an error while installing updates:</translation>
     </message>
     <message>
       <source>Downloading updates...</source>
-      <translation>Загрузка обновлений...</translation>
+      <translation type="unfinished">Downloading updates...</translation>
     </message>
     <message>
       <source>Finish Update</source>
-      <translation>Завершить обновление</translation>
+      <translation type="unfinished">Finish Update</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Отмена</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
     <message>
       <source>The latest version is already installed</source>
-      <translation>Последняя версия уже установлена</translation>
+      <translation type="unfinished">The latest version is already installed</translation>
     </message>
     <message>
       <source>This version is already installed</source>
-      <translation>Эта версия уже установлена</translation>
+      <translation type="unfinished">This version is already installed</translation>
     </message>
     <message>
       <source>Install update</source>
-      <translation>Установить обновление</translation>
+      <translation type="unfinished">Install update</translation>
     </message>
     <message>
       <source>Upload</source>
-      <translation>Загрузить</translation>
+      <translation type="unfinished">Upload</translation>
     </message>
     <message>
       <source>Upload &amp;&amp; Install</source>
-      <translation>Загрузить и установить</translation>
+      <translation type="unfinished">Upload &amp;&amp; Install</translation>
     </message>
     <message>
       <source>Download</source>
-      <translation>Скачать</translation>
+      <translation type="unfinished">Download</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation>Загрузить и установить</translation>
+      <translation type="unfinished">Download &amp;&amp; Install</translation>
     </message>
     <message>
       <source>Browse for Another File...</source>
-      <translation>Выбрать другой файл...</translation>
+      <translation type="unfinished">Browse for Another File...</translation>
     </message>
     <message>
       <source>Select Another Build</source>
-      <translation>Выбрать другую сборку</translation>
+      <translation type="unfinished">Select Another Build</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
-      <translation>Обновить до указанной сборки</translation>
+      <translation type="unfinished">Update to Specific Build</translation>
     </message>
     <message>
       <source>Uploading updates...</source>
-      <translation>Загрузка обновлений...</translation>
+      <translation type="unfinished">Uploading updates...</translation>
     </message>
     <message>
       <source>Downloading client package...</source>
-      <translation>Загрузка клиентского пакета...</translation>
+      <translation type="unfinished">Downloading client package...</translation>
     </message>
     <message>
       <source>Installing updates...</source>
-      <translation>Установка обновлений...</translation>
+      <translation type="unfinished">Installing updates...</translation>
     </message>
     <message>
       <source>Installing client updates...</source>
-      <translation>Установка обновления клиента...</translation>
+      <translation type="unfinished">Installing client updates...</translation>
     </message>
     <message>
       <source>Starting update to ...</source>
-      <translation>Начинается обновление до...</translation>
+      <translation type="unfinished">Starting update to ...</translation>
     </message>
     <message>
       <source>Updating to ...</source>
-      <translation>Обновляется на ...</translation>
+      <translation type="unfinished">Updating to ...</translation>
     </message>
     <message>
       <source>Ready to update to</source>
-      <translation>Все готово для обновления до</translation>
+      <translation type="unfinished">Ready to update to</translation>
     </message>
     <message>
       <source>System updated to</source>
-      <translation>Система обновлена до</translation>
+      <translation type="unfinished">System updated to</translation>
     </message>
     <message>
       <source>Some servers have no update packages available.</source>
-      <translation>Для некоторых серверов нет доступных пакетов обновлений.</translation>
+      <translation type="unfinished">Some servers have no update packages available.</translation>
     </message>
     <message>
       <source>Some servers have encountered an internal error.</source>
-      <translation>На некоторых серверах произошла внутренней ошибкой.</translation>
+      <translation type="unfinished">Some servers have encountered an internal error.</translation>
     </message>
     <message>
       <source>Please contact Customer Support.</source>
-      <translation>Пожалуйста, свяжитесь со службой технической поддержки.</translation>
+      <translation type="unfinished">Please contact Customer Support.</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>Некоторые серверы отключены. Пожалуйста, подождите, пока они не станут онлайн, чтобы продолжить.</translation>
+      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
     </message>
     <message>
       <source>System update in process</source>
-      <translation>Выполняется обновление системы</translation>
+      <translation type="unfinished">System update in process</translation>
     </message>
     <message>
       <source>Continue in Background</source>
-      <translation>Продолжить в фоновом режиме</translation>
+      <translation type="unfinished">Continue in Background</translation>
     </message>
     <message>
       <source>Latest Available Update</source>
-      <translation>Последнее доступное обновление</translation>
+      <translation type="unfinished">Latest Available Update</translation>
     </message>
     <message>
       <source>Specific Build</source>
-      <translation>Указать номер сборки</translation>
+      <translation type="unfinished">Specific Build</translation>
     </message>
     <message>
       <source>Browse for Update File</source>
-      <translation>Найти файл обновления</translation>
+      <translation type="unfinished">Browse for Update File</translation>
     </message>
     <message>
       <source>Update from mediaservers</source>
-      <translation>Обновление с медиа-серверов</translation>
+      <translation type="unfinished">Update from mediaservers</translation>
     </message>
     <message>
       <source>Unable to check updates on the Internet</source>
-      <translation>Не удаётся проверить обновления в Интернете</translation>
+      <translation type="unfinished">Unable to check updates on the Internet</translation>
     </message>
     <message>
       <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation>Не рекомендуется обновлять систему в конце недели.</translation>
+      <translation type="unfinished">Applying System updates at the end of the week is not recommended.</translation>
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
@@ -9527,25 +9255,25 @@ You can force it, but it may significantly increase CPU load.</translation>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
     <message>
       <source>You do not have any layouts</source>
-      <translation>У вас нет раскладок</translation>
+      <translation type="unfinished">You do not have any layouts</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
     <message>
       <source>Alarm: %1</source>
-      <translation>Тревога: %1</translation>
+      <translation type="unfinished">Alarm: %1</translation>
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation>Подтвердить</translation>
+      <translation type="unfinished">Acknowledge</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
     <message>
       <source>No new notifications</source>
-      <translation>Нет новых уведомлений</translation>
+      <translation type="unfinished">No new notifications</translation>
     </message>
     <message>
       <source>Notifications Settings</source>
@@ -9557,215 +9285,215 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the cloud name like Nx Cloud</comment>
-      <translation>Не удаётся подключиться к %1</translation>
+      <translation type="unfinished">Cannot connect to %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ObjectTrackingButton</name>
     <message>
       <source>Object tracking is ON</source>
-      <translation>Слежение за объектом включено</translation>
+      <translation type="unfinished">Object tracking is ON</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
-      <translation>Ни один из выбранных пользователей не имеет доступа к выбранной раскладке. Действие не будет работать.</translation>
+      <translation type="unfinished">None of selected users have access to the selected layout. Action will not work.</translation>
     </message>
     <message>
       <source>Select layout...</source>
-      <translation>Выберите раскладку...</translation>
+      <translation type="unfinished">Select layout...</translation>
     </message>
     <message>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>Выберите одного пользователя в строке &quot;Показать&quot; чтобы отобразить его локальные раскладки в этом списке</translation>
+      <translation type="unfinished">Select some single user in &quot;Show to&quot; line to display his local layouts in this list</translation>
     </message>
     <message>
       <source>Local layouts can only be shown to their owners.</source>
-      <translation>Локальные раскладки могут отображаться только их владельцам.</translation>
+      <translation type="unfinished">Local layouts can only be shown to their owners.</translation>
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
-      <translation>Ни одна из выбранных ролей не содержит пользователей. Действие не будет работать.</translation>
+      <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
-      <translation>У некоторых пользователей нет доступа к выбранной раскладке. Действие не будет работать для них.</translation>
+      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PasswordDialog</name>
     <message>
       <source>Sign In</source>
-      <translation>Войти</translation>
+      <translation type="unfinished">Sign In</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PeerStateTracker</name>
     <message>
       <source>The server is taking too long to respond</source>
-      <translation>Сервер слишком долго отвечает</translation>
+      <translation type="unfinished">The server is taking too long to respond</translation>
     </message>
     <message>
       <source>No update task</source>
-      <translation>Нет задачи обновления</translation>
+      <translation type="unfinished">No update task</translation>
     </message>
     <message>
       <source>Ready to download update</source>
-      <translation>Готов к загрузке обновления</translation>
+      <translation type="unfinished">Ready to download update</translation>
     </message>
     <message>
       <source>Downloading update</source>
-      <translation>Заргузка обновления</translation>
+      <translation type="unfinished">Downloading update</translation>
     </message>
     <message>
       <source>Ready to restart to the new version</source>
-      <translation>Готов к перезапуску на новую версию</translation>
+      <translation type="unfinished">Ready to restart to the new version</translation>
     </message>
     <message>
       <source>Installing update</source>
-      <translation>Установка обновления</translation>
+      <translation type="unfinished">Installing update</translation>
     </message>
     <message>
       <source>Installed</source>
-      <translation>Установлен</translation>
+      <translation type="unfinished">Installed</translation>
     </message>
     <message>
       <source>Waiting for peer data</source>
-      <translation>Ожидание данных пира</translation>
+      <translation type="unfinished">Waiting for peer data</translation>
     </message>
     <message>
       <source>There is not enough space to download update files.</source>
-      <translation>Недостаточно места для загрузки файлов обновлений.</translation>
+      <translation type="unfinished">There is not enough space to download update files.</translation>
     </message>
     <message>
       <source>There is not enough space to extract update files.</source>
-      <translation>Недостаточно места для извлечения файлов обновления.</translation>
+      <translation type="unfinished">There is not enough space to extract update files.</translation>
     </message>
     <message>
       <source>Failed to download update packages.</source>
-      <translation>Не удалось загрузить пакеты обновления.</translation>
+      <translation type="unfinished">Failed to download update packages.</translation>
     </message>
     <message>
       <source>Update contents are invalid.</source>
-      <translation>Неверное содержимое обновления.</translation>
+      <translation type="unfinished">Update contents are invalid.</translation>
     </message>
     <message>
       <source>Update archive is corrupted.</source>
-      <translation>Архив обновления поврежден.</translation>
+      <translation type="unfinished">Update archive is corrupted.</translation>
     </message>
     <message>
       <source>Update files cannot be extracted.</source>
-      <translation>Невозможно извлечь файлы обновления.</translation>
+      <translation type="unfinished">Update files cannot be extracted.</translation>
     </message>
     <message>
       <source>Internal downloader error.</source>
-      <translation>Внутренняя ошибка загрузчика.</translation>
+      <translation type="unfinished">Internal downloader error.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>Неизвестная ошибка.</translation>
+      <translation type="unfinished">Unknown error.</translation>
     </message>
     <message>
       <source>Unexpected error code.</source>
-      <translation>Неожиданный код ошибки.</translation>
+      <translation type="unfinished">Unexpected error code.</translation>
     </message>
     <message>
       <source>Ready to install update</source>
-      <translation>Готов к установке обновления</translation>
+      <translation type="unfinished">Ready to install update</translation>
     </message>
     <message>
       <source>Update package is not found.</source>
-      <translation>Пакет обновления не найден.</translation>
+      <translation type="unfinished">Update package is not found.</translation>
     </message>
     <message>
       <source>There is not enough space to install update.</source>
-      <translation>Недостаточно места для установки обновления.</translation>
+      <translation type="unfinished">There is not enough space to install update.</translation>
     </message>
     <message>
       <source>Internal server error.</source>
-      <translation>Внутренняя ошибка сервера.</translation>
+      <translation type="unfinished">Internal server error.</translation>
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
-      <translation>Эта версия ОС больше не поддерживается.</translation>
+      <translation type="unfinished">This OS version is no longer supported.</translation>
     </message>
     <message>
       <source>Update installation failed.</source>
-      <translation>Установка обновления не удалась.</translation>
+      <translation type="unfinished">Update installation failed.</translation>
     </message>
     <message>
       <source>Update file verification failed.</source>
-      <translation>Ошибка проверки файла обновления.</translation>
+      <translation type="unfinished">Update file verification failed.</translation>
     </message>
     <message>
       <source>Verifying update</source>
-      <translation>Проверка обновления</translation>
+      <translation type="unfinished">Verifying update</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
     <message>
       <source>Disconnected</source>
-      <translation>Отключено</translation>
+      <translation type="unfinished">Disconnected</translation>
     </message>
     <message>
       <source>Connected</source>
-      <translation>Подключено</translation>
+      <translation type="unfinished">Connected</translation>
     </message>
     <message>
       <source>Powered</source>
-      <translation>Запитано</translation>
+      <translation type="unfinished">Powered</translation>
     </message>
     <message>
       <source>Unexpected</source>
-      <translation>Неожиданно</translation>
+      <translation type="unfinished">Unexpected</translation>
     </message>
     <message>
       <source>Empty</source>
       <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
-      <translation>Пусто</translation>
+      <translation type="unfinished">Empty</translation>
     </message>
     <message>
       <source>Port</source>
-      <translation>Порт</translation>
+      <translation type="unfinished">Port</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation>Камера</translation>
+      <translation type="unfinished">Camera</translation>
     </message>
     <message>
       <source>Consumption</source>
-      <translation>Потребление</translation>
+      <translation type="unfinished">Consumption</translation>
     </message>
     <message>
       <source>Status</source>
-      <translation>Статус</translation>
+      <translation type="unfinished">Status</translation>
     </message>
     <message>
       <source>Power</source>
-      <translation>Питание</translation>
+      <translation type="unfinished">Power</translation>
     </message>
     <message>
       <source>Unknown device</source>
-      <translation>Неизвестное устройство</translation>
+      <translation type="unfinished">Unknown device</translation>
     </message>
     <message>
       <source>Unknown device %1</source>
       <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation>Неизвестное устройство %1</translation>
+      <translation type="unfinished">Unknown device %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PresentedStateDelegate</name>
     <message>
       <source>Added</source>
-      <translation>Добавлено</translation>
+      <translation type="unfinished">Added</translation>
     </message>
     <message>
       <source>Adding</source>
-      <translation>Добавление</translation>
+      <translation type="unfinished">Adding</translation>
     </message>
   </context>
   <context>
@@ -9773,29 +9501,25 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>Система не подключена к %1. Мобильные уведомления работают только при подключении системы к %1.</translation>
+      <translation type="unfinished">The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</translation>
     </message>
     <message>
       <source>%1 Settings</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>Настройки %1</translation>
+      <translation type="unfinished">%1 Settings</translation>
     </message>
     <message numerus="yes">
       <source>%n symbols over</source>
-      <translation>
-        <numerusform>Более %n символа</numerusform>
-        <numerusform>Более %n символов</numerusform>
-        <numerusform>Более %n символов</numerusform>
-        <numerusform>Более %n символов</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n symbols over</numerusform>
+        <numerusform>%n symbols over</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n symbols left</source>
-      <translation>
-        <numerusform>Остался %n символ</numerusform>
-        <numerusform>Осталось %n символа</numerusform>
-        <numerusform>Осталось %n символов</numerusform>
-        <numerusform>Осталось %n символов</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n symbols left</numerusform>
+        <numerusform>%n symbols left</numerusform>
       </translation>
     </message>
   </context>
@@ -9803,23 +9527,23 @@ You can force it, but it may significantly increase CPU load.</translation>
     <name>nx::vms::client::desktop::QnWebpageDialog</name>
     <message>
       <source>Name</source>
-      <translation>Имя</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>URL</source>
-      <translation>URL</translation>
+      <translation type="unfinished">URL</translation>
     </message>
     <message>
       <source>URL cannot be empty.</source>
-      <translation>URL не может быть пустым.</translation>
+      <translation type="unfinished">URL cannot be empty.</translation>
     </message>
     <message>
       <source>Wrong URL format.</source>
-      <translation>Неверный формат URL.</translation>
+      <translation type="unfinished">Wrong URL format.</translation>
     </message>
     <message>
       <source>Web Page</source>
-      <translation>Web-страница</translation>
+      <translation type="unfinished">Web Page</translation>
     </message>
     <message>
       <source>Add Proxied Web Page</source>
@@ -9835,7 +9559,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Edit Web Page</source>
-      <translation>Редактировать web-страницу</translation>
+      <translation type="unfinished">Edit Web Page</translation>
     </message>
     <message>
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
@@ -9850,37 +9574,35 @@ You can force it, but it may significantly increase CPU load.</translation>
     <name>nx::vms::client::desktop::RadassActionFactory</name>
     <message>
       <source>Auto</source>
-      <translation>Авто</translation>
+      <translation type="unfinished">Auto</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation>Низкий</translation>
+      <translation type="unfinished">Low</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>Высокий</translation>
+      <translation type="unfinished">High</translation>
     </message>
     <message>
       <source>Custom</source>
-      <translation>Особые</translation>
+      <translation type="unfinished">Custom</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::RadassActionHandler</name>
     <message>
       <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
-      <translation>Установите разрешение &quot;Auto&quot; на раскладке чтобы увеличить производительность.</translation>
+      <translation type="unfinished">Set layout resolution to &quot;Auto&quot; to increase performance.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::RapidReviewSettingsWidget</name>
     <message numerus="yes">
       <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
-      <translation>
-        <numerusform>Для экспорта с быстрой прокруткой длина видео должна быть не менее %n секунды.</numerusform>
-        <numerusform>Для экспорта с быстрой прокруткой длина видео должна быть не менее %n секунд.</numerusform>
-        <numerusform>Для экспорта с быстрой прокруткой длина видео должна быть не менее %n секунд.</numerusform>
-        <numerusform>Для экспорта с быстрой прокруткой длина видео должна быть не менее %n секунд.</numerusform>
+      <translation type="unfinished">
+        <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
+        <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
       </translation>
     </message>
   </context>
@@ -9888,31 +9610,31 @@ You can force it, but it may significantly increase CPU load.</translation>
     <name>nx::vms::client::desktop::RecordingStatusHelper</name>
     <message>
       <source>Not recording</source>
-      <translation>Не записывается</translation>
+      <translation type="unfinished">Not recording</translation>
     </message>
     <message>
       <source>Recording everything</source>
-      <translation>Записывается постоянно</translation>
+      <translation type="unfinished">Recording everything</translation>
     </message>
     <message>
       <source>Recording motion only</source>
-      <translation>Записывается только движение</translation>
+      <translation type="unfinished">Recording motion only</translation>
     </message>
     <message>
       <source>Recording motion and low quality</source>
-      <translation>Записывается движение и низкое качество</translation>
+      <translation type="unfinished">Recording motion and low quality</translation>
     </message>
     <message>
       <source>Continuous</source>
-      <translation>Постоянная</translation>
+      <translation type="unfinished">Continuous</translation>
     </message>
     <message>
       <source>Motion only</source>
-      <translation>Только движение (ДД)</translation>
+      <translation type="unfinished">Motion only</translation>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation>Дд + Низ</translation>
+      <translation type="unfinished">Motion + Lo-Res</translation>
     </message>
     <message>
       <source>Recording motion and objects</source>
@@ -9951,64 +9673,56 @@ You can force it, but it may significantly increase CPU load.</translation>
     <name>nx::vms::client::desktop::RemoteConnectionUserInteractionDelegate</name>
     <message>
       <source>Connect to System</source>
-      <translation>Подключиться к системе</translation>
+      <translation type="unfinished">Connect to System</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ResourceTreeModelAdapter</name>
     <message>
       <source>add to current layout</source>
-      <translation>добавить на текущую раскладку</translation>
+      <translation type="unfinished">add to current layout</translation>
     </message>
     <message>
       <source>open all at a new layout</source>
-      <translation>открыть все на новой раскладке</translation>
+      <translation type="unfinished">open all at a new layout</translation>
     </message>
     <message>
       <source>open all</source>
-      <translation>открыть все</translation>
+      <translation type="unfinished">open all</translation>
     </message>
     <message>
       <source>Health Monitor</source>
-      <translation>Мониторинг ресурсов</translation>
+      <translation type="unfinished">Health Monitor</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::RightPanelModelsAdapter</name>
     <message numerus="yes">
       <source>%n motion events</source>
-      <translation>
-        <numerusform>%n событие движения</numerusform>
-        <numerusform>%n события движения</numerusform>
-        <numerusform>%n событий движения</numerusform>
-        <numerusform>%n событий движения</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n motion events</numerusform>
+        <numerusform>%n motion events</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
-      <translation>
-        <numerusform>%n закладка</numerusform>
-        <numerusform>%n закладки</numerusform>
-        <numerusform>%n закладок</numerusform>
-        <numerusform>%n закладок</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n bookmarks</numerusform>
+        <numerusform>%n bookmarks</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n events</source>
-      <translation>
-        <numerusform>%n событие</numerusform>
-        <numerusform>%n события</numerusform>
-        <numerusform>%n событий</numerusform>
-        <numerusform>%n событий</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n events</numerusform>
+        <numerusform>%n events</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n objects</source>
-      <translation>
-        <numerusform>%n объект</numerusform>
-        <numerusform>%n объекта</numerusform>
-        <numerusform>%n объектов</numerusform>
-        <numerusform>%n объектов</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n objects</numerusform>
+        <numerusform>%n objects</numerusform>
       </translation>
     </message>
     <message>
@@ -10017,15 +9731,15 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Generic</source>
-      <translation>Общее</translation>
+      <translation type="unfinished">Generic</translation>
     </message>
     <message>
       <source>Input Signal</source>
-      <translation>Входной сигнал</translation>
+      <translation type="unfinished">Input Signal</translation>
     </message>
     <message>
       <source>Soft Trigger</source>
-      <translation>Программный триггер</translation>
+      <translation type="unfinished">Soft Trigger</translation>
     </message>
     <message>
       <source>Stream Issue</source>
@@ -10037,15 +9751,13 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Device IP Conflict</source>
-      <translation>Конфликт IP адреса устройств</translation>
+      <translation type="unfinished">Device IP Conflict</translation>
     </message>
     <message numerus="yes">
       <source>+%n values</source>
-      <translation>
-        <numerusform>+%n значение</numerusform>
-        <numerusform>+%n значения</numerusform>
-        <numerusform>+%n значений</numerusform>
-        <numerusform>+%n значений</numerusform>
+      <translation type="unfinished">
+        <numerusform>+%n values</numerusform>
+        <numerusform>+%n values</numerusform>
       </translation>
     </message>
   </context>
@@ -10053,34 +9765,34 @@ You can force it, but it may significantly increase CPU load.</translation>
     <name>nx::vms::client::desktop::ScheduleGridWidget</name>
     <message>
       <source>All</source>
-      <translation>Все</translation>
+      <translation type="unfinished">All</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ScheduleSettingsWidget</name>
     <message>
       <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
-      <translation>Настройка качества определяет только степень сжатия и не влияет на разрешение. предустановленные значения битрейта: низкие, средние, высокие и наилучшие.</translation>
+      <translation type="unfinished">Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</translation>
     </message>
     <message>
       <source>Mbit/s</source>
-      <translation>Мбит/с</translation>
+      <translation type="unfinished">Mbit/s</translation>
     </message>
     <message>
       <source>Less Settings</source>
-      <translation>Меньше настроек</translation>
+      <translation type="unfinished">Less Settings</translation>
     </message>
     <message>
       <source>More Settings</source>
-      <translation>Больше настроек</translation>
+      <translation type="unfinished">More Settings</translation>
     </message>
     <message>
       <source>Motion detection is disabled or not supported</source>
-      <translation>Обнаружение движения отключено или не поддерживается</translation>
+      <translation type="unfinished">Motion detection is disabled or not supported</translation>
     </message>
     <message>
       <source>Dual-streaming is disabled or not supported</source>
-      <translation>Двойной поток отключен или не поддерживается</translation>
+      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
     </message>
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Allow system to optimize camera settings&quot; option in the &quot;System Administration&quot; dialog.
@@ -10120,7 +9832,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion Only</source>
-      <translation>Только движение (ДД)</translation>
+      <translation type="unfinished">Motion Only</translation>
     </message>
     <message>
       <source>Motion
@@ -10213,26 +9925,26 @@ You can still change quality and FPS directly on the camera.</translation>
     <name>nx::vms::client::desktop::SearchLineEdit</name>
     <message>
       <source>Search</source>
-      <translation>Поиск</translation>
+      <translation type="unfinished">Search</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SecuritySettingsWidget</name>
     <message>
       <source>Tracks and logs all user actions.</source>
-      <translation>Отслеживает и регистрирует все действия пользователя.</translation>
+      <translation type="unfinished">Tracks and logs all user actions.</translation>
     </message>
     <message>
       <source>minutes</source>
-      <translation>минуты</translation>
+      <translation type="unfinished">minutes</translation>
     </message>
     <message>
       <source>hours</source>
-      <translation>часа</translation>
+      <translation type="unfinished">hours</translation>
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation>Водяные знаки будут отображаться поверх живого, архивного и экспортированного видео только для пользователей без прав администратора. Вы и другие администраторы их не увидите.</translation>
+      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
     </message>
     <message>
       <source>Archive encryption password</source>
@@ -10254,15 +9966,15 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Does not affect the connections established by server.</source>
-      <translation>Не влияет на соединения, установленные сервером.</translation>
+      <translation type="unfinished">Does not affect the connections established by server.</translation>
     </message>
     <message>
       <source>Enables RTSP traffic encryption.</source>
-      <translation>Включает шифрование трафика RTSP.</translation>
+      <translation type="unfinished">Enables RTSP traffic encryption.</translation>
     </message>
     <message>
       <source>days</source>
-      <translation>дней</translation>
+      <translation type="unfinished">days</translation>
     </message>
     <message>
       <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
@@ -10279,14 +9991,12 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Learn more.</source>
-      <translation>Подробнее.</translation>
+      <translation type="unfinished">Learn more.</translation>
     </message>
     <message numerus="yes">
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
       <comment>%n is digest user count, %1 is total user count</comment>
       <translation type="unfinished">
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
         <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
         <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
       </translation>
@@ -10296,15 +10006,15 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <name>nx::vms::client::desktop::ServerCertificateError</name>
     <message>
       <source>Failed to connect to server</source>
-      <translation>Не удалось подключиться к серверу</translation>
+      <translation type="unfinished">Failed to connect to server</translation>
     </message>
     <message>
       <source>View certificate</source>
-      <translation>Посмотреть сертификат</translation>
+      <translation type="unfinished">View certificate</translation>
     </message>
     <message>
       <source>Server certificate is invalid.</source>
-      <translation>Сертификат сервера недействителен.</translation>
+      <translation type="unfinished">Server certificate is invalid.</translation>
     </message>
   </context>
   <context>
@@ -10353,14 +10063,14 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Pin</source>
-      <translation>Закрепить</translation>
+      <translation type="unfinished">Pin</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
     <message>
       <source>View certificate</source>
-      <translation>Посмотреть сертификат</translation>
+      <translation type="unfinished">View certificate</translation>
     </message>
     <message>
       <source>Connect Anyway</source>
@@ -10372,11 +10082,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>System:</source>
-      <translation>Система:</translation>
+      <translation type="unfinished">System:</translation>
     </message>
     <message>
       <source>Server:</source>
-      <translation>Сервер:</translation>
+      <translation type="unfinished">Server:</translation>
     </message>
     <message>
       <source>Server ID:</source>
@@ -10411,11 +10121,9 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::ServerSelectionDialog</name>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation>
-        <numerusform>%n камер</numerusform>
-        <numerusform>%n камер</numerusform>
-        <numerusform>%n камер</numerusform>
-        <numerusform>%n камер</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n cameras</numerusform>
+        <numerusform>%n cameras</numerusform>
       </translation>
     </message>
     <message>
@@ -10427,67 +10135,67 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
     <message>
       <source>Library</source>
-      <translation>Библиотека</translation>
+      <translation type="unfinished">Library</translation>
     </message>
     <message>
       <source>Version</source>
-      <translation>Версия</translation>
+      <translation type="unfinished">Version</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation>Производитель</translation>
+      <translation type="unfinished">Vendor</translation>
     </message>
     <message>
       <source>no error</source>
-      <translation>нет ошибок</translation>
+      <translation type="unfinished">no error</translation>
     </message>
     <message>
       <source>library file cannot be loaded</source>
-      <translation>файл библиотеки не может быть загружен</translation>
+      <translation type="unfinished">library file cannot be loaded</translation>
     </message>
     <message>
       <source>invalid or incompatible plugin library</source>
-      <translation>неверная или несовместимая библиотека плагинов</translation>
+      <translation type="unfinished">invalid or incompatible plugin library</translation>
     </message>
     <message>
       <source>plugin library failed to initialize</source>
-      <translation>не удалось инициализировать библиотеку плагинов</translation>
+      <translation type="unfinished">plugin library failed to initialize</translation>
     </message>
     <message>
       <source>plugin returned bad manifest</source>
-      <translation>плагин вернул плохой манифест</translation>
+      <translation type="unfinished">plugin returned bad manifest</translation>
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
-      <translation>версия API плагина больше не поддерживается</translation>
+      <translation type="unfinished">plugin API version is no longer supported</translation>
     </message>
     <message>
       <source>unknown error</source>
-      <translation>неизвестная ошибка</translation>
+      <translation type="unfinished">unknown error</translation>
     </message>
     <message>
       <source>Not loaded</source>
-      <translation>Не загружен</translation>
+      <translation type="unfinished">Not loaded</translation>
     </message>
     <message>
       <source>Loaded</source>
-      <translation>Загружен</translation>
+      <translation type="unfinished">Loaded</translation>
     </message>
     <message>
       <source>plugin is in the black list</source>
-      <translation>плагин в чёрном списке</translation>
+      <translation type="unfinished">plugin is in the black list</translation>
     </message>
     <message>
       <source>Status</source>
-      <translation>Состояние</translation>
+      <translation type="unfinished">Status</translation>
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
-      <translation>плагин не является обязательным и не входит в белый список</translation>
+      <translation type="unfinished">plugin is optional and is not in the white list</translation>
     </message>
     <message>
       <source>internal error</source>
-      <translation>внутренняя ошибка</translation>
+      <translation type="unfinished">internal error</translation>
     </message>
     <message>
       <source>unknown status</source>
@@ -10498,106 +10206,104 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
     <message>
       <source>Skipped</source>
-      <translation>Пропущен</translation>
+      <translation type="unfinished">Skipped</translation>
     </message>
     <message>
       <source>Installed</source>
-      <translation>Установлен</translation>
+      <translation type="unfinished">Installed</translation>
     </message>
     <message>
       <source>Installing...</source>
-      <translation>Установка...</translation>
+      <translation type="unfinished">Installing...</translation>
     </message>
     <message>
       <source>Downloaded</source>
-      <translation>Загружен</translation>
+      <translation type="unfinished">Downloaded</translation>
     </message>
     <message>
       <source>Waiting for server to respond...</source>
-      <translation>Ожидание ответа сервера...</translation>
+      <translation type="unfinished">Waiting for server to respond...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdateTool</name>
     <message>
       <source>No connection to the server.</source>
-      <translation>Соединение с сервером потеряно.</translation>
+      <translation type="unfinished">No connection to the server.</translation>
     </message>
     <message>
       <source>Network error.</source>
-      <translation>Сетевая ошибка.</translation>
+      <translation type="unfinished">Network error.</translation>
     </message>
     <message>
       <source>Server error.</source>
-      <translation>Ошибка сервера.</translation>
+      <translation type="unfinished">Server error.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
     <message>
       <source>Status</source>
-      <translation>Статус</translation>
+      <translation type="unfinished">Status</translation>
     </message>
     <message>
       <source>Message</source>
-      <translation>Сообщение</translation>
+      <translation type="unfinished">Message</translation>
     </message>
     <message>
       <source>Store Update Files</source>
-      <translation>Хранить загруженные файлы</translation>
+      <translation type="unfinished">Store Update Files</translation>
     </message>
     <message>
       <source>Client</source>
-      <translation>Клиент</translation>
+      <translation type="unfinished">Client</translation>
     </message>
     <message>
       <source>Component</source>
-      <translation>Компонент</translation>
+      <translation type="unfinished">Component</translation>
     </message>
     <message>
       <source>Installed Version</source>
-      <translation>Установленная версия</translation>
+      <translation type="unfinished">Installed Version</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SessionRefreshDialog</name>
     <message>
       <source>Login</source>
-      <translation>Логин</translation>
+      <translation type="unfinished">Login</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Пароль</translation>
+      <translation type="unfinished">Password</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>Неизвестная ошибка</translation>
+      <translation type="unfinished">Unknown error</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchListModel</name>
     <message>
       <source>Motion</source>
-      <translation>Движение</translation>
+      <translation type="unfinished">Motion</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
-      <translation>Добавить в закладки...</translation>
+      <translation type="unfinished">Bookmark it...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
       <source>No motion detected</source>
-      <translation>Движение не обнаружено</translation>
+      <translation type="unfinished">No motion detected</translation>
     </message>
     <message numerus="yes">
       <source>%n motion events</source>
-      <translation>
-        <numerusform>%n событие движения</numerusform>
-        <numerusform>%n события движения</numerusform>
-        <numerusform>%n событий движения</numerusform>
-        <numerusform>%n событий движения</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n motion events</numerusform>
+        <numerusform>%n motion events</numerusform>
       </translation>
     </message>
     <message>
@@ -10609,29 +10315,25 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::SoftwareTriggerButton</name>
     <message>
       <source>Go to Live</source>
-      <translation>Перейти к просмотру видео в реальном времени</translation>
+      <translation type="unfinished">Go to Live</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
-      <translation>
-        <numerusform>Адрес электронной почты не установлен для %n пользователя</numerusform>
-        <numerusform>Адрес электронной почты не установлен для %n пользователей</numerusform>
-        <numerusform>Адрес электронной почты не установлен для %n пользователей</numerusform>
-        <numerusform>Адрес электронной почты не установлен для %n пользователей</numerusform>
+      <translation type="unfinished">
+        <numerusform>Email address is not set for %n users</numerusform>
+        <numerusform>Email address is not set for %n users</numerusform>
       </translation>
     </message>
     <message>
       <source>Set Passwords</source>
-      <translation>Установить пароли</translation>
+      <translation type="unfinished">Set Passwords</translation>
     </message>
     <message numerus="yes">
       <source>Recording schedule is invalid for %n cameras</source>
       <translation type="unfinished">
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
         <numerusform>Recording schedule is invalid for %n cameras</numerusform>
         <numerusform>Recording schedule is invalid for %n cameras</numerusform>
       </translation>
@@ -10645,177 +10347,173 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::TileInteractionHandler</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation>
-        <numerusform>... и ещё %n</numerusform>
-        <numerusform>... и ещё %n</numerusform>
-        <numerusform>... и ещё %n</numerusform>
-        <numerusform>... и ещё %n</numerusform>
+      <translation type="unfinished">
+        <numerusform>... and %n more</numerusform>
+        <numerusform>... and %n more</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation>
-        <numerusform>Дважды щелкните чтобы добавить камеры на текущую раскладку или нажмите Ctrl и щелкните чтобы открыть в новой вкладке</numerusform>
-        <numerusform>Дважды щелкните чтобы добавить камеры на текущую раскладку или нажмите Ctrl и щелкните чтобы открыть в новой вкладке</numerusform>
-        <numerusform>Дважды щелкните чтобы добавить камеры на текущую раскладку или нажмите Ctrl и щелкните чтобы открыть в новой вкладке</numerusform>
-        <numerusform>Дважды щелкните чтобы добавить камеры на текущую раскладку или нажмите Ctrl и щелкните чтобы открыть в новой вкладке</numerusform>
+      <translation type="unfinished">
+        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
       </translation>
     </message>
     <message>
       <source>No available archive</source>
-      <translation>Нет доступного архива</translation>
+      <translation type="unfinished">No available archive</translation>
     </message>
     <message>
       <source>Failed to execute plugin action</source>
-      <translation>Не удалось выполнить действие плагина</translation>
+      <translation type="unfinished">Failed to execute plugin action</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation>Имя</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation>Камера</translation>
+      <translation type="unfinished">Camera</translation>
     </message>
     <message>
       <source>Start time</source>
-      <translation>Время начала</translation>
+      <translation type="unfinished">Start time</translation>
     </message>
     <message>
       <source>Length</source>
-      <translation>Длительность</translation>
+      <translation type="unfinished">Length</translation>
     </message>
     <message>
       <source>Created</source>
-      <translation>Создан</translation>
+      <translation type="unfinished">Created</translation>
     </message>
     <message>
       <source>Creator</source>
-      <translation>Автор</translation>
+      <translation type="unfinished">Creator</translation>
     </message>
     <message>
       <source>Tags</source>
-      <translation>Теги</translation>
+      <translation type="unfinished">Tags</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>Описание</translation>
+      <translation type="unfinished">Description</translation>
     </message>
     <message>
       <source>Enter parameters</source>
-      <translation>Введите параметры</translation>
+      <translation type="unfinished">Enter parameters</translation>
     </message>
     <message>
       <source>Action requires some parameters to be filled.</source>
-      <translation>Действие требует заполнения некоторых параметров.</translation>
+      <translation type="unfinished">Action requires some parameters to be filled.</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation>Открыть</translation>
+      <translation type="unfinished">Open</translation>
     </message>
     <message>
       <source>Open in New Tab</source>
-      <translation>Открыть в новой вкладке</translation>
+      <translation type="unfinished">Open in New Tab</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::TimeSynchronizationServersModel</name>
     <message>
       <source>Server</source>
-      <translation>Сервер</translation>
+      <translation type="unfinished">Server</translation>
     </message>
     <message>
       <source>Time Zone</source>
-      <translation>Часовой пояс</translation>
+      <translation type="unfinished">Time Zone</translation>
     </message>
     <message>
       <source>Date</source>
-      <translation>Дата</translation>
+      <translation type="unfinished">Date</translation>
     </message>
     <message>
       <source>Server OS Time</source>
-      <translation>Время ОС сервера</translation>
+      <translation type="unfinished">Server OS Time</translation>
     </message>
     <message>
       <source>VMS Time</source>
-      <translation>Время VMS</translation>
+      <translation type="unfinished">VMS Time</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation>Время, общее и синхронизированное между всеми серверами. Может отличаться от времени ОС на любом конкретном сервере.</translation>
+      <translation type="unfinished">Time, common and synchronized between all servers. Can be different with OS time on any particular server.</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>
-      <translation>Синхронизировано с Интернетом</translation>
+      <translation type="unfinished">Synchronized with the Internet</translation>
     </message>
     <message>
       <source>Synchronized with the local time at the selected server</source>
-      <translation>Синхронизировано с местным временем на выбранном сервере</translation>
+      <translation type="unfinished">Synchronized with the local time at the selected server</translation>
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation>Не синхронизировано. Каждый сервер использует свое местное время.</translation>
+      <translation type="unfinished">Not synchronized. Each server uses its own local time.</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
-      <translation>Равное местному времени сервера</translation>
+      <translation type="unfinished">Equal to the server local time</translation>
     </message>
     <message>
       <source>No Internet connection. Time is not being synchronized.</source>
-      <translation>Подключение к Интернету отсутствует. Время не синхронизируется.</translation>
+      <translation type="unfinished">No Internet connection. Time is not being synchronized.</translation>
     </message>
     <message>
       <source>Time Server is offline. Time is not being synchronized.</source>
-      <translation>Сервер времени не в сети. Время не синхронизируется.</translation>
+      <translation type="unfinished">Time Server is offline. Time is not being synchronized.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::TimestampOverlaySettingsWidget</name>
     <message>
       <source>Long</source>
-      <translation>Длинный</translation>
+      <translation type="unfinished">Long</translation>
     </message>
     <message>
       <source>Short</source>
-      <translation>Короткий</translation>
+      <translation type="unfinished">Short</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::UploadWorker</name>
     <message>
       <source>Could not open file &quot;%1&quot;</source>
-      <translation>Не удалось открыть файл &quot;%1&quot;</translation>
+      <translation type="unfinished">Could not open file &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation>Не удалось вычислить md5 для файла &quot;%1&quot;</translation>
+      <translation type="unfinished">Could not calculate md5 for file &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not create upload on the server side: %1</source>
-      <translation>Не удалось создать загрузку на стороне сервера: %1</translation>
+      <translation type="unfinished">Could not create upload on the server side: %1</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
-      <translation>Не удалось загрузить фрагмент файла на сервер</translation>
+      <translation type="unfinished">Could not upload file chunk to the server</translation>
     </message>
     <message>
       <source>Could not check uploaded file on the server</source>
-      <translation>Не удалось проверить загруженный файл на сервере</translation>
+      <translation type="unfinished">Could not check uploaded file on the server</translation>
     </message>
     <message>
       <source>File was corrupted while being uploaded to the server</source>
-      <translation>Файл был поврежден при загрузке на сервер</translation>
+      <translation type="unfinished">File was corrupted while being uploaded to the server</translation>
     </message>
     <message>
       <source>Remote file &quot;%1&quot; is corrupted</source>
-      <translation>Удаленный файл &quot;%1&quot; поврежден</translation>
+      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
     </message>
     <message>
       <source>Server already has this file &quot;%1&quot;</source>
-      <translation>На сервере уже есть этот файл &quot;%1&quot;</translation>
+      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -10826,7 +10524,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Version</source>
-      <translation>Версия</translation>
+      <translation type="unfinished">Version</translation>
     </message>
     <message>
       <source>Invalid version.</source>
@@ -10834,66 +10532,66 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Password</source>
-      <translation>Пароль</translation>
+      <translation type="unfinished">Password</translation>
     </message>
     <message>
       <source>The password is incorrect.</source>
-      <translation>Неверный пароль.</translation>
+      <translation type="unfinished">The password is incorrect.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::VirtualCameraMotionWidget</name>
     <message>
       <source>Motion is being detected only during video uploading.</source>
-      <translation>Движение обнаруживается только во время загрузки видео.</translation>
+      <translation type="unfinished">Motion is being detected only during video uploading.</translation>
     </message>
     <message>
       <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
-      <translation>Включение или отключение этого параметра ничего не меняет в существующем архиве.</translation>
+      <translation type="unfinished">Enabling or disabling this setting does not change anything in the existing archive.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::VirtualCameraUploadWidget</name>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
-      <translation>Другой пользователь в настоящее время загружает архив на эту камеру.</translation>
+      <translation type="unfinished">Another user is currently uploading footage to this camera.</translation>
     </message>
     <message>
       <source>User %1 is currently uploading footage to this camera.</source>
-      <translation>Пользователь %1 в настоящее время загружает архив на эту камеру.</translation>
+      <translation type="unfinished">User %1 is currently uploading footage to this camera.</translation>
     </message>
     <message>
       <source>(%1 of %2)</source>
       <comment>Uploaded and total number of files will be substituted</comment>
-      <translation>(%1 из %2)</translation>
+      <translation type="unfinished">(%1 of %2)</translation>
     </message>
     <message>
       <source>Finalizing %1...</source>
       <comment>Filename will be substituted</comment>
-      <translation>Завершение %1...</translation>
+      <translation type="unfinished">Finalizing %1...</translation>
     </message>
     <message>
       <source>Uploading %1...</source>
       <comment>Filename will be substituted</comment>
-      <translation>Загрузка %1...</translation>
+      <translation type="unfinished">Uploading %1...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::VirtualCameraWorker</name>
     <message>
       <source>Failed to send request to the server.</source>
-      <translation>Не удалось отправить запрос на сервер.</translation>
+      <translation type="unfinished">Failed to send request to the server.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WebViewController</name>
     <message>
       <source>The proxy %1 requires a username and password.</source>
-      <translation>Прокси %1 требует имя пользователя и пароль.</translation>
+      <translation type="unfinished">The proxy %1 requires a username and password.</translation>
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation>Выберите каталог для передачи</translation>
+      <translation type="unfinished">Select folder to upload</translation>
     </message>
   </context>
   <context>
@@ -10908,7 +10606,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Hide</source>
-      <translation>Скрыть</translation>
+      <translation type="unfinished">Hide</translation>
     </message>
     <message>
       <source>Unable to connect to the system because it has become offline</source>
@@ -10919,108 +10617,106 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
     <message numerus="yes">
       <source>%n bookmarks</source>
-      <translation>
-        <numerusform>%n закладка</numerusform>
-        <numerusform>%n закладки</numerusform>
-        <numerusform>%n закладок</numerusform>
-        <numerusform>%n закладок</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n bookmarks</numerusform>
+        <numerusform>%n bookmarks</numerusform>
       </translation>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation>Экспорт видео</translation>
+      <translation type="unfinished">Exporting video</translation>
     </message>
     <message>
       <source>Stop Export</source>
-      <translation>Остановить экспорт</translation>
+      <translation type="unfinished">Stop Export</translation>
     </message>
     <message>
       <source>Minimize</source>
-      <translation>Свернуть</translation>
+      <translation type="unfinished">Minimize</translation>
     </message>
     <message>
       <source>Cannot write file</source>
-      <translation>Не удается записать файл</translation>
+      <translation type="unfinished">Cannot write file</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation>%1 используется другим процессом экспорта.</translation>
+      <translation type="unfinished">%1 is in use by another export.</translation>
     </message>
     <message>
       <source>Export completed</source>
-      <translation>Экспорт завершён</translation>
+      <translation type="unfinished">Export completed</translation>
     </message>
     <message>
       <source>Export failed</source>
-      <translation>Ошибка экспорта</translation>
+      <translation type="unfinished">Export failed</translation>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation>Выбранный период не может быть экспортирован для текущей камеры.</translation>
+      <translation type="unfinished">Selected period cannot be exported for the current camera.</translation>
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
-      <translation>Несколько закладок можно экспортировать только как раскладку.</translation>
+      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
     </message>
     <message>
       <source>Local files not allowed for Multi-Video export</source>
-      <translation>Мульти видео экспорт не может включать Локальные файлы</translation>
+      <translation type="unfinished">Local files not allowed for Multi-Video export</translation>
     </message>
     <message>
       <source>Please remove all local files from the layout and try again.</source>
-      <translation>Удалите все локальные файлы из раскладки и повторите попытку.</translation>
+      <translation type="unfinished">Please remove all local files from the layout and try again.</translation>
     </message>
     <message>
       <source>Starting export...</source>
-      <translation>Начало экспорта...</translation>
+      <translation type="unfinished">Starting export...</translation>
     </message>
     <message>
       <source>Saving layout</source>
-      <translation>Сохранение раскладки</translation>
+      <translation type="unfinished">Saving layout</translation>
     </message>
     <message>
       <source>Stop Saving</source>
-      <translation>Остановить сохранение</translation>
+      <translation type="unfinished">Stop Saving</translation>
     </message>
     <message>
       <source>Saving failed</source>
-      <translation>Ошибка сохранения</translation>
+      <translation type="unfinished">Saving failed</translation>
     </message>
     <message>
       <source>Starting saving...</source>
-      <translation>Начинается сохранение...</translation>
+      <translation type="unfinished">Starting saving...</translation>
     </message>
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
-      <translation>Мы готовим файлы для экспорта. Пожалуйста, подождите несколько секунд.</translation>
+      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
-      <translation>Требуется транскодирование. Экспорт перезапущен.</translation>
+      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WorkbenchUpdateWatcher</name>
     <message>
       <source>%1 version available</source>
-      <translation>Доступна версия %1</translation>
+      <translation type="unfinished">%1 version available</translation>
     </message>
     <message>
       <source>Release Notes</source>
-      <translation>Заметки к релизу</translation>
+      <translation type="unfinished">Release Notes</translation>
     </message>
     <message>
       <source>Major issues have been fixed. Update is strongly recommended.</source>
-      <translation>Обновление рекомендуется у установке. Были исправлены критические ошибки.</translation>
+      <translation type="unfinished">Major issues have been fixed. Update is strongly recommended.</translation>
     </message>
     <message>
       <source>Update...</source>
-      <translation>Обновление...</translation>
+      <translation type="unfinished">Update...</translation>
     </message>
     <message>
       <source>Do not notify again about this update</source>
-      <translation>Не уведомлять больше об этом обновлении</translation>
+      <translation type="unfinished">Do not notify again about this update</translation>
     </message>
   </context>
   <context>
@@ -11031,15 +10727,15 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Motion</source>
-      <translation>Движение</translation>
+      <translation type="unfinished">Motion</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation>Объекты</translation>
+      <translation type="unfinished">Objects</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Закладки</translation>
+      <translation type="unfinished">Bookmarks</translation>
     </message>
     <message>
       <source>High-Res</source>
@@ -11047,76 +10743,76 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Low-Res</source>
-      <translation>Низ</translation>
+      <translation type="unfinished">Low-Res</translation>
     </message>
     <message>
       <source>All streams</source>
-      <translation>Все потоки</translation>
+      <translation type="unfinished">All streams</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::detail::BaseInputField</name>
     <message>
       <source>multiple values</source>
-      <translation>несколько значений</translation>
+      <translation type="unfinished">multiple values</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeEntityBuilder</name>
     <message>
       <source>New System</source>
-      <translation>Новая система</translation>
+      <translation type="unfinished">New System</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeItemFactory</name>
     <message>
       <source>Servers</source>
-      <translation>Серверы</translation>
+      <translation type="unfinished">Servers</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation>Камеры и устройства</translation>
+      <translation type="unfinished">Cameras &amp; Devices</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation>Раскладки</translation>
+      <translation type="unfinished">Layouts</translation>
     </message>
     <message>
       <source>Showreels</source>
-      <translation>Прокрутки</translation>
+      <translation type="unfinished">Showreels</translation>
     </message>
     <message>
       <source>Web Pages</source>
-      <translation>Web-страницы</translation>
+      <translation type="unfinished">Web Pages</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation>Пользователи</translation>
+      <translation type="unfinished">Users</translation>
     </message>
     <message>
       <source>Other Systems</source>
-      <translation>Другие системы</translation>
+      <translation type="unfinished">Other Systems</translation>
     </message>
     <message>
       <source>Local Files</source>
-      <translation>Локальные файлы</translation>
+      <translation type="unfinished">Local Files</translation>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation>Все камеры и ресурсы</translation>
+      <translation type="unfinished">All Cameras &amp; Resources</translation>
     </message>
     <message>
       <source>All Shared Layouts</source>
-      <translation>Все Раскладки с общим доступом</translation>
+      <translation type="unfinished">All Shared Layouts</translation>
     </message>
     <message>
       <source>Cameras &amp; Resources</source>
-      <translation>Камеры и ресурсы</translation>
+      <translation type="unfinished">Cameras &amp; Resources</translation>
     </message>
     <message>
       <source>Shared Layouts</source>
-      <translation>Раскладки с общим доступом</translation>
+      <translation type="unfinished">Shared Layouts</translation>
     </message>
   </context>
   <context>
@@ -11142,79 +10838,79 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Open door</source>
-      <translation>Открыть дверь</translation>
+      <translation type="unfinished">Open door</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::integrations::OverlappedIdDialogModel</name>
     <message>
       <source>Latest</source>
-      <translation>Последний</translation>
+      <translation type="unfinished">Latest</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::integrations::OverlappedIdIntegration</name>
     <message>
       <source>Overlapped ID...</source>
-      <translation>Перекрывающийся идентификатор...</translation>
+      <translation type="unfinished">Overlapped ID...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::joystick::JoystickButtonActionChoiceModel</name>
     <message>
       <source>No Action</source>
-      <translation>Нет действия</translation>
+      <translation type="unfinished">No Action</translation>
     </message>
     <message>
       <source>Focus Near</source>
-      <translation>Приблизить фокус</translation>
+      <translation type="unfinished">Focus Near</translation>
     </message>
     <message>
       <source>Focus Far</source>
-      <translation>Отдалить фокус</translation>
+      <translation type="unfinished">Focus Far</translation>
     </message>
     <message>
       <source>Autofocus</source>
-      <translation>Автофокус</translation>
+      <translation type="unfinished">Autofocus</translation>
     </message>
     <message>
       <source>Go to PTZ Position</source>
-      <translation>Перейти к позиции PTZ</translation>
+      <translation type="unfinished">Go to PTZ Position</translation>
     </message>
     <message>
       <source>Set to Fullscreen</source>
-      <translation>На полный экран</translation>
+      <translation type="unfinished">Set to Fullscreen</translation>
     </message>
     <message>
       <source>Next Camera on Layout</source>
-      <translation>Следующая камера на раскладке</translation>
+      <translation type="unfinished">Next Camera on Layout</translation>
     </message>
     <message>
       <source>Previous Camera on Layout</source>
-      <translation>Предыдущая камера на раскладке</translation>
+      <translation type="unfinished">Previous Camera on Layout</translation>
     </message>
     <message>
       <source>Open Layout</source>
-      <translation>Открыть раскладку</translation>
+      <translation type="unfinished">Open Layout</translation>
     </message>
     <message>
       <source>Modifier</source>
-      <translation>Модификатор</translation>
+      <translation type="unfinished">Modifier</translation>
     </message>
     <message>
       <source>Multiple</source>
-      <translation>Несколько</translation>
+      <translation type="unfinished">Multiple</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::joystick::JoystickButtonSettingsModel</name>
     <message>
       <source>Select Layout...</source>
-      <translation>Выбрать раскладку...</translation>
+      <translation type="unfinished">Select Layout...</translation>
     </message>
     <message>
       <source>Button</source>
-      <translation>Кнопка</translation>
+      <translation type="unfinished">Button</translation>
     </message>
     <message>
       <source>Selected Layout</source>
@@ -11255,27 +10951,27 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
       <source>Analytics events can be set up on a certain cameras.</source>
-      <translation>События аналитики могут быть настроены на определенных камерах.</translation>
+      <translation type="unfinished">Analytics events can be set up on a certain cameras.</translation>
     </message>
     <message>
       <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation>Выберите камеры с помощью кнопки выше чтобы просмотреть список поддерживаемых событий.</translation>
+      <translation type="unfinished">Choose cameras using the button above to see the list of supported events.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>Событие будет срабатывать только в том случае, если в заголовке есть совпадения с любым из введенных ключевых слов.</translation>
+      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation>Если поле пустое, событие всегда будет вызываться.</translation>
+      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation>Это поле чувствительно к регистру.</translation>
+      <translation type="unfinished">This field is case sensitive.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation>Событие будет срабатывать только в том случае, если в описании есть совпадения с любым из введенных ключевых слов.</translation>
+      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
     </message>
   </context>
   <context>
@@ -11286,7 +10982,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation>Выберите камеры с помощью кнопки выше чтобы просмотреть список поддерживаемых событий.</translation>
+      <translation type="unfinished">Choose cameras using the button above to see the list of supported events.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches any of attributes. You can see the names of the attributes and their values on the Objects tab.</source>
@@ -11297,83 +10993,83 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
       <source>Drag layout or camera here to add it to the showreel</source>
-      <translation>Перетащите раскадку или камеру сюда чтобы добавить их в прокрутку</translation>
+      <translation type="unfinished">Drag layout or camera here to add it to the showreel</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation>Любой плагин</translation>
+      <translation type="unfinished">Any Plugin</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>Событие будет срабатывать только в том случае, если в заголовке есть совпадения с любым из введенных ключевых слов.</translation>
+      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation>Если поле пустое, событие всегда будет вызываться.</translation>
+      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation>Это поле чувствительно к регистру.</translation>
+      <translation type="unfinished">This field is case sensitive.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation>Событие будет срабатывать только в том случае, если в описании есть совпадения с любым из введенных ключевых слов.</translation>
+      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::SubjectSelectionDialog</name>
     <message>
       <source>All Users</source>
-      <translation>Все пользователи</translation>
+      <translation type="unfinished">All Users</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation>Пользователи</translation>
+      <translation type="unfinished">Users</translation>
     </message>
     <message>
       <source>Custom Users</source>
-      <translation>Особые пользователи</translation>
+      <translation type="unfinished">Custom Users</translation>
     </message>
     <message>
       <source>%1 users</source>
       <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation>%1 пользователь</translation>
+      <translation type="unfinished">%1 users</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::action::LayoutTourSettingsFactory</name>
     <message>
       <source>Switch with Hotkeys</source>
-      <translation>Переключить с помощью горячих клавиш</translation>
+      <translation type="unfinished">Switch with Hotkeys</translation>
     </message>
     <message>
       <source>Switch on Timer</source>
-      <translation>Переключить по таймеру</translation>
+      <translation type="unfinished">Switch on Timer</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::action::LayoutTourTextFactory</name>
     <message>
       <source>Stop Tour</source>
-      <translation>Остановить маршрут обхода</translation>
+      <translation type="unfinished">Stop Tour</translation>
     </message>
     <message>
       <source>Stop Showreel</source>
-      <translation>Остановить прокрутку</translation>
+      <translation type="unfinished">Stop Showreel</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation>Начать маршрут обхода</translation>
+      <translation type="unfinished">Start Tour</translation>
     </message>
     <message>
       <source>Start Showreel</source>
-      <translation>Запустить прокрутки</translation>
+      <translation type="unfinished">Start Showreel</translation>
     </message>
   </context>
   <context>
@@ -11381,82 +11077,80 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <message>
       <source>%1 (active)</source>
       <comment>Template for active PTZ preset</comment>
-      <translation>%1 (активен)</translation>
+      <translation type="unfinished">%1 (active)</translation>
     </message>
     <message>
       <source>%1 (active)</source>
       <comment>Template for active PTZ tour</comment>
-      <translation>%1 (активен)</translation>
+      <translation type="unfinished">%1 (active)</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::action::ShowOnItemsFactory</name>
     <message>
       <source>Info</source>
-      <translation>Информация</translation>
+      <translation type="unfinished">Info</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation>Объекты</translation>
+      <translation type="unfinished">Objects</translation>
     </message>
     <message>
       <source>Regions of Interest</source>
-      <translation>Область интересующего объекта</translation>
+      <translation type="unfinished">Regions of Interest</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
     <message>
       <source>Next</source>
-      <translation>Далее</translation>
+      <translation type="unfinished">Next</translation>
     </message>
     <message>
       <source>Name is necessary</source>
-      <translation>Имя (обязательно)</translation>
+      <translation type="unfinished">Name is necessary</translation>
     </message>
     <message>
       <source>Reason is necessary</source>
-      <translation>Причина (обязательно)</translation>
+      <translation type="unfinished">Reason is necessary</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation>Имя</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation type="unfinished">Email</translation>
     </message>
     <message>
       <source>Reason for deactivation</source>
-      <translation>Причина деактивации</translation>
+      <translation type="unfinished">Reason for deactivation</translation>
     </message>
     <message>
       <source>- Choose one -</source>
-      <translation>- выберите из списка -</translation>
+      <translation type="unfinished">- Choose one -</translation>
     </message>
     <message>
       <source>I am upgrading my machine</source>
-      <translation>Я модернизирую свой компьютер</translation>
+      <translation type="unfinished">I am upgrading my machine</translation>
     </message>
     <message>
       <source>I accidentally assigned the license to a wrong machine</source>
-      <translation>Я случайно назначил лицензию на неправильную машину</translation>
+      <translation type="unfinished">I accidentally assigned the license to a wrong machine</translation>
     </message>
     <message>
       <source>Other Reason</source>
-      <translation>Другая причина</translation>
+      <translation type="unfinished">Other Reason</translation>
     </message>
     <message>
       <source>Please complete the following for license deactivation</source>
-      <translation>Пожалуйста, выполните следующее для деактивации лицензии</translation>
+      <translation type="unfinished">Please complete the following for license deactivation</translation>
     </message>
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
-      <translation>
-        <numerusform>Обратите внимание, что каждый лицензионный ключ может быть деактивирован максимум %n раз.</numerusform>
-        <numerusform>Обратите внимание, что каждый лицензионный ключ может быть деактивирован максимум %n раза.</numerusform>
-        <numerusform>Обратите внимание, что каждый лицензионный ключ может быть деактивирован максимум %n раз.</numerusform>
-        <numerusform>Обратите внимание, что каждый лицензионный ключ может быть деактивирован максимум %n раз.</numerusform>
+      <translation type="unfinished">
+        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
+        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
       </translation>
     </message>
   </context>
@@ -11464,11 +11158,9 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::RoleListDelegate</name>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation>
-        <numerusform>%n User</numerusform>
-        <numerusform>%n пользователя</numerusform>
-        <numerusform>%n пользователей</numerusform>
-        <numerusform>%n пользователь</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n Users</numerusform>
+        <numerusform>%n Users</numerusform>
       </translation>
     </message>
   </context>
@@ -11476,218 +11168,202 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::ui::workbench::ActionHandler</name>
     <message>
       <source>Layout is full</source>
-      <translation>Раскладка заполнена</translation>
+      <translation type="unfinished">Layout is full</translation>
     </message>
     <message>
       <source>Failed to change password</source>
-      <translation>Не удалось изменить пароль</translation>
+      <translation type="unfinished">Failed to change password</translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n devices</source>
-      <translation>
-        <numerusform>Failed to move %n device</numerusform>
-        <numerusform>Не удалось переместить %n устройства</numerusform>
-        <numerusform>Не удалось переместить %n устройств</numerusform>
-        <numerusform>Failed to move %n device</numerusform>
+      <translation type="unfinished">
+        <numerusform>Failed to move %n devices</numerusform>
+        <numerusform>Failed to move %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n cameras</source>
-      <translation>
-        <numerusform>Failed to move %n camera</numerusform>
-        <numerusform>Не удалось переместить %n камеры</numerusform>
-        <numerusform>Не удалось переместить %n камер</numerusform>
-        <numerusform>Failed to move %n camera</numerusform>
+      <translation type="unfinished">
+        <numerusform>Failed to move %n cameras</numerusform>
+        <numerusform>Failed to move %n cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n I/O Modules</source>
-      <translation>
-        <numerusform>Failed to move %n I/O Module</numerusform>
-        <numerusform>Не удалось переместить %n модуля ввода-вывода</numerusform>
-        <numerusform>Не удалось переместить %n модулей ввода-вывода</numerusform>
-        <numerusform>Failed to move %n I/O Module</numerusform>
+      <translation type="unfinished">
+        <numerusform>Failed to move %n I/O Modules</numerusform>
+        <numerusform>Failed to move %n I/O Modules</numerusform>
       </translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; is not responding.</source>
-      <translation>Сервер &quot;%1&quot; не отвечает.</translation>
+      <translation type="unfinished">Server &quot;%1&quot; is not responding.</translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
-      <translation>
-        <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
-        <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
-        <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
-        <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
-      <translation>
-        <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n камерам. Переместить их в любом случае?</numerusform>
-        <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n камерам. Переместить их в любом случае?</numerusform>
-        <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n камерам. Переместить их в любом случае?</numerusform>
-        <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n камерам. Переместить их в любом случае?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
-      <translation>
-        <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
-        <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
-        <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
-        <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
       </translation>
     </message>
     <message>
       <source>Move</source>
-      <translation>Переместить</translation>
+      <translation type="unfinished">Move</translation>
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
-      <translation>Раскладка заблокирована и не может быть изменена</translation>
+      <translation type="unfinished">Layout is locked and cannot be changed</translation>
     </message>
     <message>
       <source>Open File</source>
-      <translation>Открыть файл</translation>
+      <translation type="unfinished">Open File</translation>
     </message>
     <message>
       <source>All Supported</source>
-      <translation>Все поддерживаемые</translation>
+      <translation type="unfinished">All Supported</translation>
     </message>
     <message>
       <source>Select folder...</source>
-      <translation>Выбрать каталог...</translation>
+      <translation type="unfinished">Select folder...</translation>
     </message>
     <message>
       <source>Too short period selected</source>
-      <translation>Выбран слишком короткий период</translation>
+      <translation type="unfinished">Too short period selected</translation>
     </message>
     <message>
       <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
-      <translation>Не удаётся выполнить поиск по интервалам. Пожалуйста, выберите период 15 секунд или дольше.</translation>
+      <translation type="unfinished">Cannot perform Preview Search. Please select a period of 15 seconds or longer.</translation>
     </message>
     <message>
       <source>Preview Search for %1</source>
-      <translation>Поиск по фрагментам для %1</translation>
+      <translation type="unfinished">Preview Search for %1</translation>
     </message>
     <message>
       <source>Confirm files deleting</source>
-      <translation>Подтвердите удаление файлов</translation>
+      <translation type="unfinished">Confirm files deleting</translation>
     </message>
     <message numerus="yes">
       <source>Are you sure you want to permanently delete these %n files?</source>
-      <translation>
-        <numerusform>Вы уверены, что хотите навсегда удалить %n файл?</numerusform>
-        <numerusform>Вы уверены, что хотите навсегда удалить эти %n файла?</numerusform>
-        <numerusform>Вы уверены, что хотите навсегда удалить эти %n файлов?</numerusform>
-        <numerusform>Вы уверены, что хотите навсегда удалить эти %n файлов?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
+        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
       </translation>
     </message>
     <message>
       <source>There is another user with the same name</source>
-      <translation>Существует другой пользователь с тем же именем</translation>
+      <translation type="unfinished">There is another user with the same name</translation>
     </message>
     <message>
       <source>Updating Background...</source>
-      <translation>Обновление заднего фона...</translation>
+      <translation type="unfinished">Updating Background...</translation>
     </message>
     <message>
       <source>Image processing may take a few moments. Please be patient.</source>
-      <translation>Обработка изображения может занять длительное время. Наберитесь терпения.</translation>
+      <translation type="unfinished">Image processing may take a few moments. Please be patient.</translation>
     </message>
     <message>
       <source>Image too big</source>
-      <translation>Изображение слишком большое</translation>
+      <translation type="unfinished">Image too big</translation>
     </message>
     <message>
       <source>Maximum size is %1 MB.</source>
-      <translation>Максимальный размер составляет %1 МБ.</translation>
+      <translation type="unfinished">Maximum size is %1 MB.</translation>
     </message>
     <message>
       <source>Failed to upload image</source>
-      <translation>Не удалось загрузить изображение</translation>
+      <translation type="unfinished">Failed to upload image</translation>
     </message>
     <message>
       <source>Components of System have different versions:</source>
-      <translation>Компоненты системы имеют разные версии:</translation>
+      <translation type="unfinished">Components of System have different versions:</translation>
     </message>
     <message>
       <source>Please update all components to the version %1</source>
-      <translation>Пожалуйста, обновите все компоненты системы на версию %1</translation>
+      <translation type="unfinished">Please update all components to the version %1</translation>
     </message>
     <message>
       <source>Update...</source>
-      <translation>Обновление...</translation>
+      <translation type="unfinished">Update...</translation>
     </message>
     <message>
       <source>Skip</source>
-      <translation>Пропустить</translation>
+      <translation type="unfinished">Skip</translation>
     </message>
     <message>
       <source>Beta version %1</source>
-      <translation>Бета-версия %1</translation>
+      <translation type="unfinished">Beta version %1</translation>
     </message>
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
-      <translation>Обновитесь до следующей официальной версии или патча после появления.</translation>
+      <translation type="unfinished">Please upgrade to a next available patch or release version once available.</translation>
     </message>
     <message>
       <source>System sends anonymous usage statistics</source>
-      <translation>Система отправляет анонимную статистику использования</translation>
+      <translation type="unfinished">System sends anonymous usage statistics</translation>
     </message>
     <message>
       <source>It will be used by software development team to improve your user experience.</source>
-      <translation>Она будет использоваться командой разработки для того чтобы сделать систему проще и понятнее для пользователей.</translation>
+      <translation type="unfinished">It will be used by software development team to improve your user experience.</translation>
     </message>
     <message>
       <source>To disable it, go to System Administration dialog.</source>
-      <translation>Чтобы отключить ее, перейдите на диалоговое окно Системное администрирование.</translation>
+      <translation type="unfinished">To disable it, go to System Administration dialog.</translation>
     </message>
     <message>
       <source>Failed to open server web page</source>
-      <translation>Не удалось открыть web-страницу сервера</translation>
+      <translation type="unfinished">Failed to open server web page</translation>
     </message>
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
-      <translation>
-        <numerusform>Не удалось сменить пароль на %n камер из %1</numerusform>
-        <numerusform>Не удалось сменить пароль на %n камерах из %1</numerusform>
-        <numerusform>Не удалось сменить пароль на %n камерах из %1</numerusform>
-        <numerusform>Не удалось сменить пароль на %n камерах из %1</numerusform>
+      <translation type="unfinished">
+        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+        <numerusform>Failed to change password on %n cameras of %1</numerusform>
       </translation>
     </message>
     <message>
       <source>This build is for testing purposes only.</source>
-      <translation>Предупреждение! Эта сборка предназначена только для тестирования.</translation>
+      <translation type="unfinished">This build is for testing purposes only.</translation>
     </message>
     <message>
       <source>Open Server Settings</source>
-      <translation>Открыть настройки сервера</translation>
+      <translation type="unfinished">Open Server Settings</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation>ОК</translation>
+      <translation type="unfinished">OK</translation>
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
-      <translation>Подтвердите местоположение хранилища для хранения данных аналитики на &quot;%1&quot;</translation>
+      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
     </message>
     <message>
       <source>the largest available partition</source>
-      <translation>самый большой доступный раздел</translation>
+      <translation type="unfinished">the largest available partition</translation>
     </message>
     <message>
       <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation>База данных аналитики должна храниться только на локальном диске и может занимать много места.
-После выбора места для хранения аналитических данных его нельзя легко изменить без потери существующих данных. Мы рекомендуем тщательно выбирать местоположение и избегать использования системного раздела, так как это может привести к серьезной неисправности системы.
-По умолчанию аналитические данные будут храниться в %1.
-Вы можете выбрать другое место хранения на вкладке &quot;Storage Management&quot; диалога Server Settings.</translation>
+      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
     </message>
     <message>
       <source>Window configuration saved</source>
@@ -11716,7 +11392,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <name>nx::vms::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
       <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
-      <translation>Используйте клавиши со стрелками для переключения раскладок. Для выхода из проктутки нажмите Esc.</translation>
+      <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the showreel press Esc.</translation>
     </message>
     <message>
       <source>Press Esc to stop the tour.</source>
@@ -11728,55 +11404,55 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <message>
       <source>Switch by</source>
       <comment>Arrows will follow</comment>
-      <translation>Переключить на</translation>
+      <translation type="unfinished">Switch by</translation>
     </message>
     <message>
       <source>Display for</source>
       <comment>Time selector will follow</comment>
-      <translation>Показать для</translation>
+      <translation type="unfinished">Display for</translation>
     </message>
     <message>
       <source>Display selected for</source>
       <comment>Time will follow</comment>
-      <translation>Отобразить выбранные для</translation>
+      <translation type="unfinished">Display selected for</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
       <source>Showreel</source>
-      <translation>Прокрутка</translation>
+      <translation type="unfinished">Showreel</translation>
     </message>
     <message>
       <source>Showreel %1</source>
-      <translation>Прокрутка %1</translation>
+      <translation type="unfinished">Showreel %1</translation>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation>Delete Showreel %1?</translation>
+      <translation type="unfinished">Delete Showreel %1?</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::workbench::LayoutsHandler</name>
     <message>
       <source>Save Layout As</source>
-      <translation>Сохранить раскладку как</translation>
+      <translation type="unfinished">Save Layout As</translation>
     </message>
     <message>
       <source>Enter Layout Name:</source>
-      <translation>Введите имя раскладки:</translation>
+      <translation type="unfinished">Enter Layout Name:</translation>
     </message>
     <message>
       <source>New Layout</source>
-      <translation>Новая раскладка</translation>
+      <translation type="unfinished">New Layout</translation>
     </message>
     <message>
       <source>Enter the name of the layout to create:</source>
-      <translation>Введите имя создаваемой раскладки:</translation>
+      <translation type="unfinished">Enter the name of the layout to create:</translation>
     </message>
     <message>
       <source>New Layout %1</source>
-      <translation>Новая раскладка %1</translation>
+      <translation type="unfinished">New Layout %1</translation>
     </message>
   </context>
   <context>
@@ -11790,39 +11466,39 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <name>nx::vms::client::desktop::utils::WebDownloader</name>
     <message>
       <source>Save File As...</source>
-      <translation>Сохранить файл как...</translation>
+      <translation type="unfinished">Save File As...</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation>Не удалось перезаписать файл</translation>
+      <translation type="unfinished">Failed to overwrite file</translation>
     </message>
     <message>
       <source>Failed to save file</source>
-      <translation>Не удалось сохранить файл</translation>
+      <translation type="unfinished">Failed to save file</translation>
     </message>
     <message>
       <source>%1 folder is blocked for writing.</source>
-      <translation>Папка %1 заблокирована для записи.</translation>
+      <translation type="unfinished">%1 folder is blocked for writing.</translation>
     </message>
     <message>
       <source>Downloading file...</source>
-      <translation>Файл скачивается...</translation>
+      <translation type="unfinished">Downloading file...</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation>Открыть в каталоге</translation>
+      <translation type="unfinished">Open Containing Folder</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>
-      <translation>Остановить загрузку?</translation>
+      <translation type="unfinished">Stop file downloading?</translation>
     </message>
     <message>
       <source>File downloaded</source>
-      <translation>Файл загружен</translation>
+      <translation type="unfinished">File downloaded</translation>
     </message>
     <message>
       <source>File downloading failed</source>
-      <translation>Ошибка загрузки файла</translation>
+      <translation type="unfinished">File downloading failed</translation>
     </message>
   </context>
   <context>
@@ -11831,84 +11507,84 @@ You can select another storage location in the &quot;Storage Management&quot; ta
       <source>Zoom timeline
 to view more bookmarks</source>
       <comment>It is highly recommended to split message in two lines</comment>
-      <translation>Увеличьте масштаб шкалы времени
-чтобы увидеть больше закладок</translation>
+      <translation type="unfinished">Zoom timeline
+to view more bookmarks</translation>
     </message>
     <message>
       <source>Play bookmark from the beginning</source>
-      <translation>Воспроизвести закладку с начала</translation>
+      <translation type="unfinished">Play bookmark from the beginning</translation>
     </message>
     <message>
       <source>Edit bookmark</source>
-      <translation>Изменить закладку</translation>
+      <translation type="unfinished">Edit bookmark</translation>
     </message>
     <message>
       <source>Export bookmark</source>
-      <translation>Экспортировать закладку</translation>
+      <translation type="unfinished">Export bookmark</translation>
     </message>
     <message>
       <source>Delete bookmark</source>
-      <translation>Удалить закладку</translation>
+      <translation type="unfinished">Delete bookmark</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::workbench::timeline::ControlWidget</name>
     <message>
       <source>NVR cameras do not support not-synchronized playback</source>
-      <translation>Камеры с NVR не поддерживают асинхронное воспроизведение</translation>
+      <translation type="unfinished">NVR cameras do not support not-synchronized playback</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::workbench::timeline::NavigationWidget</name>
     <message>
       <source>Speed Down</source>
-      <translation>Замедлить</translation>
+      <translation type="unfinished">Speed Down</translation>
     </message>
     <message>
       <source>Previous Frame</source>
-      <translation>Предыдущий кадр</translation>
+      <translation type="unfinished">Previous Frame</translation>
     </message>
     <message>
       <source>Speed Up</source>
-      <translation>Ускорить</translation>
+      <translation type="unfinished">Speed Up</translation>
     </message>
     <message>
       <source>Next Frame</source>
-      <translation>Следующий кадр</translation>
+      <translation type="unfinished">Next Frame</translation>
     </message>
     <message>
       <source>Previous Chunk</source>
-      <translation>Предыдущий фрагмент</translation>
+      <translation type="unfinished">Previous Chunk</translation>
     </message>
     <message>
       <source>To Start</source>
-      <translation>В начало</translation>
+      <translation type="unfinished">To Start</translation>
     </message>
     <message>
       <source>Next Chunk</source>
-      <translation>Следующий фрагмент</translation>
+      <translation type="unfinished">Next Chunk</translation>
     </message>
     <message>
       <source>To End</source>
-      <translation>В конец</translation>
+      <translation type="unfinished">To End</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::workbench::timeline::SpeedSlider</name>
     <message>
       <source>%1x</source>
-      <translation>%1х</translation>
+      <translation type="unfinished">%1x</translation>
     </message>
     <message>
       <source>Paused</source>
-      <translation>Приостановлено</translation>
+      <translation type="unfinished">Paused</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::workbench::timeline::VolumeSlider</name>
     <message>
       <source>Muted</source>
-      <translation>Беззвучный</translation>
+      <translation type="unfinished">Muted</translation>
     </message>
   </context>
   <context>

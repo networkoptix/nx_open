@@ -506,7 +506,7 @@
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Opdater</translation>
     </message>
     <message>
       <source>Refreshing...</source>
@@ -722,7 +722,7 @@
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Log på</translation>
     </message>
     <message>
       <source>Password</source>
@@ -814,7 +814,7 @@
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Næste</translation>
     </message>
   </context>
   <context>
@@ -927,7 +927,7 @@ to activate PTZ</translation>
     <name>ResourceSearchPane</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Søg</translation>
     </message>
     <message>
       <source>All Types</source>
@@ -1004,7 +1004,7 @@ to activate PTZ</translation>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Søg</translation>
     </message>
   </context>
   <context>

@@ -2434,11 +2434,11 @@
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
-      <translation type="unfinished">Force servers to accept only encrypted connections</translation>
+      <translation>Принудительно принимать только зашифрованные соединения</translation>
     </message>
     <message>
       <source>Encrypt video traffic to desktop and mobile clients</source>
-      <translation type="unfinished">Encrypt video traffic to desktop and mobile clients</translation>
+      <translation>Шифровать видеотрафик для настольных и мобильных клиентов</translation>
     </message>
     <message>
       <source>Manage Users</source>

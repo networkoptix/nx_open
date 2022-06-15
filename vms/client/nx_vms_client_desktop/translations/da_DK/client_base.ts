@@ -54,7 +54,7 @@
     </message>
     <message>
       <source>Expires</source>
-      <translation type="unfinished">Expires</translation>
+      <translation>Udløber</translation>
     </message>
   </context>
   <context>
@@ -646,7 +646,7 @@
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Ingen</translation>
     </message>
     <message>
       <source>Small</source>
@@ -654,7 +654,7 @@
     </message>
     <message>
       <source>Medium</source>
-      <translation type="unfinished">Medium</translation>
+      <translation>Middel</translation>
     </message>
     <message>
       <source>Large</source>
@@ -662,7 +662,7 @@
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Indstillinger</translation>
     </message>
     <message>
       <source>Close</source>
@@ -674,11 +674,11 @@
     </message>
     <message>
       <source>Play</source>
-      <translation type="unfinished">Play</translation>
+      <translation>Afspil</translation>
     </message>
     <message>
       <source>Pause</source>
-      <translation type="unfinished">Pause</translation>
+      <translation>Pause</translation>
     </message>
     <message>
       <source>Previous Frame</source>
@@ -706,7 +706,7 @@
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Slå lyd til/fra</translation>
     </message>
     <message>
       <source>Jump to Live</source>
@@ -969,7 +969,7 @@
     </message>
     <message>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
     <message>
       <source>Rotate to</source>
@@ -1193,11 +1193,11 @@
     </message>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Vælg layout...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n layouts</numerusform>
         <numerusform>%n layouts</numerusform>
       </translation>
@@ -1524,7 +1524,7 @@
     <message>
       <source>All</source>
       <comment>This will be a part of &quot;All Cameras &amp; Resources&quot; or &quot;All Shared Layouts&quot;</comment>
-      <translation type="unfinished">All</translation>
+      <translation>Alle</translation>
     </message>
   </context>
   <context>
@@ -1783,11 +1783,11 @@
     <name>QnAuditLogDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation type="unfinished">Copy Selection to Clipboard</translation>
+      <translation>Kopier markering til udklipsholder</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation type="unfinished">Export Selection to File...</translation>
+      <translation>Eksporter markering til fil...</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -1799,11 +1799,11 @@
     </message>
     <message>
       <source>Devices</source>
-      <translation type="unfinished">Devices</translation>
+      <translation>Enheder</translation>
     </message>
     <message>
       <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
+      <translation>Kamera</translation>
     </message>
     <message>
       <source>Device actions</source>
@@ -2191,7 +2191,7 @@
     </message>
     <message>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>System</translation>
     </message>
     <message>
       <source>Any Server</source>
@@ -2199,11 +2199,11 @@
     </message>
     <message>
       <source>Any Device</source>
-      <translation type="unfinished">Any Device</translation>
+      <translation>Enhver enhed</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation type="unfinished">Any Camera</translation>
+      <translation>Ethvert kamera</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
@@ -2214,7 +2214,7 @@
     </message>
     <message>
       <source>User</source>
-      <translation type="unfinished">User</translation>
+      <translation>Bruger</translation>
     </message>
     <message>
       <source>Source Server</source>
@@ -2253,7 +2253,7 @@
     <message>
       <source>to</source>
       <extracomment>&quot;to&quot; is from the sentence &quot;Send email _to_:&quot;</extracomment>
-      <translation type="unfinished">to</translation>
+      <translation>til</translation>
     </message>
     <message>
       <source>at</source>
@@ -2499,11 +2499,11 @@
     <name>QnCameraListDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation type="unfinished">Copy Selection to Clipboard</translation>
+      <translation>Kopier markering til udklipsholder</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation type="unfinished">Export Selection to File...</translation>
+      <translation>Eksporter markering til fil...</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -2548,7 +2548,7 @@
     </message>
     <message>
       <source>No cameras</source>
-      <translation type="unfinished">No cameras</translation>
+      <translation>Ingen kameraer</translation>
     </message>
     <message>
       <source>Devices List for %1</source>
@@ -2565,7 +2565,7 @@
     <name>QnCameraListModel</name>
     <message>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>Optagelse</translation>
     </message>
     <message>
       <source>Name</source>
@@ -2573,7 +2573,7 @@
     </message>
     <message>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>Leverandør</translation>
     </message>
     <message>
       <source>Model</source>
@@ -2593,7 +2593,7 @@
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Server</translation>
     </message>
     <message>
       <source>ID</source>
@@ -2601,7 +2601,7 @@
     </message>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>Logisk ID</translation>
     </message>
   </context>
   <context>
@@ -2632,15 +2632,15 @@
     <name>QnCameraPasswordChangeDialog</name>
     <message>
       <source>New Password</source>
-      <translation type="unfinished">New Password</translation>
+      <translation>Ny adgangskode</translation>
     </message>
     <message>
       <source>Repeat Password</source>
-      <translation type="unfinished">Repeat Password</translation>
+      <translation>Gentag adgangskode</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
-      <translation type="unfinished">Passwords do not match.</translation>
+      <translation>Adgangskoderne er ikke ens.</translation>
     </message>
     <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
@@ -2662,19 +2662,19 @@
     <name>QnChangeUserPasswordDialog</name>
     <message>
       <source>New Password</source>
-      <translation type="unfinished">New Password</translation>
+      <translation>Ny adgangskode</translation>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation type="unfinished">Confirm Password</translation>
+      <translation>Bekræft adgangskode</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
-      <translation type="unfinished">Passwords do not match.</translation>
+      <translation>Adgangskoderne er ikke ens.</translation>
     </message>
     <message>
       <source>Current Password</source>
-      <translation type="unfinished">Current Password</translation>
+      <translation>Nuværende kodeord</translation>
     </message>
     <message>
       <source>To modify your password please enter the existing one.</source>
@@ -2708,7 +2708,7 @@ devices</translation>
     <message>
       <source>Connect System to %1...</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect System to %1...</translation>
+      <translation>Forbind System til %1...</translation>
     </message>
     <message>
       <source>Create %1
@@ -2860,7 +2860,7 @@ to %1</translation>
     <name>QnCloudUserPanelWidget</name>
     <message>
       <source>Account Settings</source>
-      <translation type="unfinished">Account Settings</translation>
+      <translation>Kontoindstillinger</translation>
     </message>
   </context>
   <context>
@@ -2904,7 +2904,7 @@ to %1</translation>
     </message>
     <message>
       <source>Restart</source>
-      <translation type="unfinished">Restart</translation>
+      <translation>Genstart</translation>
     </message>
     <message>
       <source>Failed to download and launch version %1</source>
@@ -3143,7 +3143,7 @@ to %1</translation>
     </message>
     <message>
       <source>No events</source>
-      <translation type="unfinished">No events</translation>
+      <translation>Ingen hændelser</translation>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n events found</source>
@@ -3163,7 +3163,7 @@ to %1</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Beskrivelse</translation>
     </message>
   </context>
   <context>
@@ -3194,7 +3194,7 @@ to %1</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Beskrivelse</translation>
     </message>
     <message>
       <source>All users</source>
@@ -3221,9 +3221,9 @@ to %1</translation>
     </message>
     <message numerus="yes">
       <source>and %n more...</source>
-      <translation type="unfinished">
-        <numerusform>and %n more...</numerusform>
-        <numerusform>and %n more...</numerusform>
+      <translation>
+        <numerusform>og %n mere...</numerusform>
+        <numerusform>og %n mere...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -3250,7 +3250,7 @@ to %1</translation>
     <name>QnExecHttpRequestActionWidget</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>Basic</source>
@@ -3327,7 +3327,7 @@ to %1</translation>
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Ingen</translation>
     </message>
     <message>
       <source>Auto (%1)</source>
@@ -3350,7 +3350,7 @@ to %1</translation>
     </message>
     <message>
       <source>Event Log</source>
-      <translation type="unfinished">Event Log</translation>
+      <translation>Hændelseslog</translation>
     </message>
     <message>
       <source>Audit Trail</source>
@@ -3358,7 +3358,7 @@ to %1</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Bogmærker</translation>
     </message>
     <message>
       <source>Device List</source>
@@ -3437,7 +3437,7 @@ to %1</translation>
     <message>
       <source>Invalid</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Invalid</translation>
+      <translation>Ugyldig</translation>
     </message>
     <message>
       <source>Grounded circuit</source>
@@ -3455,7 +3455,7 @@ to %1</translation>
     </message>
     <message>
       <source>Duration</source>
-      <translation type="unfinished">Duration</translation>
+      <translation>Varighed</translation>
     </message>
     <message>
       <source>Open circuit</source>
@@ -3540,7 +3540,7 @@ to %1</translation>
     <name>QnLdapUserListModel</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Log på</translation>
     </message>
     <message>
       <source>Email</source>
@@ -3641,7 +3641,7 @@ to %1</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Server</translation>
     </message>
     <message>
       <source>Never</source>
@@ -3657,7 +3657,7 @@ to %1</translation>
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Fejl</translation>
     </message>
     <message>
       <source>Server not found</source>
@@ -3665,7 +3665,7 @@ to %1</translation>
     </message>
     <message>
       <source>Expires</source>
-      <translation type="unfinished">Expires</translation>
+      <translation>Udløber</translation>
     </message>
     <message>
       <source>License is active</source>
@@ -3696,7 +3696,7 @@ to %1</translation>
     </message>
     <message>
       <source>Channels</source>
-      <translation type="unfinished">Channels</translation>
+      <translation>Kanaler</translation>
     </message>
   </context>
   <context>
@@ -3718,7 +3718,7 @@ to %1</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Fjern</translation>
     </message>
     <message>
       <source>Deactivate</source>
@@ -3791,7 +3791,7 @@ to %1</translation>
     <name>QnLocalSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Generelt</translation>
     </message>
     <message>
       <source>Look and Feel</source>
@@ -3807,7 +3807,7 @@ to %1</translation>
     </message>
     <message>
       <source>Advanced</source>
-      <translation type="unfinished">Advanced</translation>
+      <translation>Avanceret</translation>
     </message>
     <message>
       <source>Settings file is read-only. Please contact your system administrator. All changes will be lost after program exit.</source>
@@ -3897,11 +3897,11 @@ to %1</translation>
     </message>
     <message>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
     <message>
       <source>Dewarping</source>
-      <translation type="unfinished">Dewarping</translation>
+      <translation>Dewarping</translation>
     </message>
     <message>
       <source>Create Zoom Window</source>
@@ -3909,7 +3909,7 @@ to %1</translation>
     </message>
     <message>
       <source>Hi-Res</source>
-      <translation type="unfinished">Hi-Res</translation>
+      <translation>Høj Opløsning</translation>
     </message>
     <message>
       <source>LIVE</source>
@@ -3925,11 +3925,11 @@ to %1</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation type="unfinished">I/O Module</translation>
+      <translation>I/O Modul</translation>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation type="unfinished">Lo-Res</translation>
+      <translation>Lav Opløsning</translation>
     </message>
     <message>
       <source>press and hold</source>
@@ -3938,13 +3938,13 @@ to %1</translation>
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation type="unfinished">Disabled by schedule</translation>
+      <translation>Deaktiveret efter tidsplan</translation>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Set for all %n Cameras</numerusform>
-        <numerusform>Set for all %n Cameras</numerusform>
+      <translation>
+        <numerusform>Indstil for alle %n kameraer</numerusform>
+        <numerusform>Indstil for alle %n kameraer</numerusform>
       </translation>
     </message>
     <message>
@@ -3972,11 +3972,11 @@ to %1</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Nulstil</translation>
     </message>
     <message>
       <source>Skip</source>
-      <translation type="unfinished">Skip</translation>
+      <translation>Spring over</translation>
     </message>
     <message>
       <source>Close</source>
@@ -4072,7 +4072,7 @@ to %1</translation>
     <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
     <message>
       <source>Rotation</source>
-      <translation type="unfinished">Rotation</translation>
+      <translation>Rotation</translation>
     </message>
   </context>
   <context>
@@ -4174,7 +4174,7 @@ to %1</translation>
     </message>
     <message>
       <source>Home</source>
-      <translation type="unfinished">Home</translation>
+      <translation>Hjem</translation>
     </message>
     <message>
       <source>Details</source>
@@ -4190,7 +4190,7 @@ to %1</translation>
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Ingen</translation>
     </message>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
@@ -4246,14 +4246,14 @@ to %1</translation>
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Ingen</translation>
     </message>
   </context>
   <context>
     <name>QnPtzPresetHotkeyItemDelegate</name>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Ingen</translation>
     </message>
     <message>
       <source>Reassign</source>
@@ -4276,7 +4276,7 @@ to %1</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Lav</translation>
     </message>
     <message>
       <source>Normal</source>
@@ -4284,7 +4284,7 @@ to %1</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Høj</translation>
     </message>
     <message>
       <source>Highest</source>
@@ -4308,7 +4308,7 @@ to %1</translation>
     </message>
     <message>
       <source>Invalid</source>
-      <translation type="unfinished">Invalid</translation>
+      <translation>Ugyldig</translation>
     </message>
   </context>
   <context>
@@ -4327,7 +4327,7 @@ to %1</translation>
     </message>
     <message>
       <source>Best</source>
-      <translation type="unfinished">Best</translation>
+      <translation>Bedste</translation>
     </message>
     <message>
       <source>Average</source>
@@ -4381,7 +4381,7 @@ to %1</translation>
     <name>QnRecordingStatsModel</name>
     <message>
       <source>Space</source>
-      <translation type="unfinished">Space</translation>
+      <translation>Mellemrum</translation>
     </message>
     <message>
       <source>Calendar Days</source>
@@ -4393,19 +4393,19 @@ to %1</translation>
     </message>
     <message>
       <source>Device</source>
-      <translation type="unfinished">Device</translation>
+      <translation>Enhed</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Kamera</translation>
     </message>
     <message>
       <source>%1 TB</source>
-      <translation type="unfinished">%1 TB</translation>
+      <translation>%1 TB</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation type="unfinished">%1 GB</translation>
+      <translation>%1 GB</translation>
     </message>
     <message>
       <source>Current Bitrate</source>
@@ -4459,11 +4459,11 @@ to %1</translation>
     </message>
     <message>
       <source>No local files</source>
-      <translation type="unfinished">No local files</translation>
+      <translation>Ingen lokale filer</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Intet fundet</translation>
     </message>
     <message>
       <source>All types</source>
@@ -4471,23 +4471,23 @@ to %1</translation>
     </message>
     <message>
       <source>Servers</source>
-      <translation type="unfinished">Servers</translation>
+      <translation>Servere</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Layout</translation>
     </message>
     <message>
       <source>Showreels</source>
-      <translation type="unfinished">Showreels</translation>
+      <translation>Udstillingshjul</translation>
     </message>
     <message>
       <source>Video Walls</source>
-      <translation type="unfinished">Video Walls</translation>
+      <translation>Videovæg</translation>
     </message>
     <message>
       <source>Web Pages</source>
-      <translation type="unfinished">Web Pages</translation>
+      <translation>Websider</translation>
     </message>
     <message>
       <source>Users</source>
@@ -4495,15 +4495,15 @@ to %1</translation>
     </message>
     <message>
       <source>Local Files</source>
-      <translation type="unfinished">Local Files</translation>
+      <translation>Lokale filer</translation>
     </message>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Søg</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>Kameraer &amp; Enheder</translation>
     </message>
   </context>
   <context>
@@ -4521,7 +4521,7 @@ to %1</translation>
     </message>
     <message>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>Information</translation>
     </message>
     <message>
       <source>Rotate</source>
@@ -4548,11 +4548,11 @@ to %1</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Server</translation>
     </message>
     <message>
       <source>Invalid URL</source>
-      <translation type="unfinished">Invalid URL</translation>
+      <translation>Ugyldig URL</translation>
     </message>
     <message>
       <source>URL already added</source>
@@ -4582,11 +4582,11 @@ to %1</translation>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>No bookmarks</source>
-      <translation type="unfinished">No bookmarks</translation>
+      <translation>Ingen bogmærker</translation>
     </message>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Søg</translation>
     </message>
   </context>
   <context>
@@ -4605,11 +4605,11 @@ to %1</translation>
     </message>
     <message>
       <source>Tags</source>
-      <translation type="unfinished">Tags</translation>
+      <translation>Tags</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Kamera</translation>
     </message>
     <message>
       <source>Created</source>
@@ -4628,11 +4628,11 @@ to %1</translation>
     <name>QnSelectDevicesButton</name>
     <message>
       <source>Any Device</source>
-      <translation type="unfinished">Any Device</translation>
+      <translation>Enhver enhed</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation type="unfinished">Any Camera</translation>
+      <translation>Ethvert kamera</translation>
     </message>
     <message>
       <source>All Devices</source>
@@ -4735,7 +4735,7 @@ to %1</translation>
     <name>QnServerAddressesModel</name>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Adresse</translation>
     </message>
   </context>
   <context>
@@ -4757,7 +4757,7 @@ to %1</translation>
     <name>QnServerSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Generelt</translation>
     </message>
     <message>
       <source>Storage Analytics</source>
@@ -4797,7 +4797,7 @@ to %1</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation type="unfinished">Backup</translation>
+      <translation>Sikkerhedskopi</translation>
     </message>
   </context>
   <context>
@@ -4906,7 +4906,7 @@ to %1</translation>
     <name>QnSmtpAdvancedSettingsWidget</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>Email</source>
@@ -4922,7 +4922,7 @@ to %1</translation>
     </message>
     <message>
       <source>User</source>
-      <translation type="unfinished">User</translation>
+      <translation>Bruger</translation>
     </message>
     <message>
       <source>Password</source>
@@ -5004,7 +5004,7 @@ to %1</translation>
     </message>
     <message>
       <source>Connection timed out</source>
-      <translation type="unfinished">Connection timed out</translation>
+      <translation>Forbindelsen fik timeout</translation>
     </message>
     <message>
       <source>Authentication failed</source>
@@ -5038,7 +5038,7 @@ to %1</translation>
     <name>QnStatusOverlayController</name>
     <message>
       <source>NO DATA</source>
-      <translation type="unfinished">NO DATA</translation>
+      <translation>INGEN DATA</translation>
     </message>
     <message>
       <source>UNAUTHORIZED</source>
@@ -5058,31 +5058,31 @@ to %1</translation>
     </message>
     <message>
       <source>Device Settings</source>
-      <translation type="unfinished">Device Settings</translation>
+      <translation>Enhed Indstillinger</translation>
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Kameraindstillinger</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation type="unfinished">I/O Module Settings</translation>
+      <translation>I/O-modulindstillinger</translation>
     </message>
     <message>
       <source>Diagnostics</source>
-      <translation type="unfinished">Diagnostics</translation>
+      <translation>Diagnostik</translation>
     </message>
     <message>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>Aktivér</translation>
     </message>
     <message>
       <source>Activate License</source>
-      <translation type="unfinished">Activate License</translation>
+      <translation>Aktivér licens</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
-      <translation type="unfinished">Please check authentication information</translation>
+      <translation>Tjek venligst godkendelsesoplysningerne</translation>
     </message>
     <message>
       <source>NO LIVE STREAM</source>
@@ -5098,7 +5098,7 @@ to %1</translation>
     </message>
     <message>
       <source>Set for this Camera</source>
-      <translation type="unfinished">Set for this Camera</translation>
+      <translation>Indstil for dette kamera</translation>
     </message>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
@@ -5133,24 +5133,24 @@ to %1</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation type="unfinished">Export Selection to File...</translation>
+      <translation>Eksporter markering til fil...</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation type="unfinished">Copy Selection to Clipboard</translation>
+      <translation>Kopier markering til udklipsholder</translation>
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Opdater</translation>
     </message>
     <message>
       <source>Export selected events to file</source>
-      <translation type="unfinished">Export selected events to file</translation>
+      <translation>Eksporter valgte begivenheder til fil</translation>
     </message>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
       </translation>
@@ -5158,7 +5158,7 @@ to %1</translation>
     <message>
       <source>TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">TB</translation>
+      <translation>TB</translation>
     </message>
     <message>
       <source>Last 5 minutes</source>
@@ -5185,11 +5185,11 @@ to %1</translation>
     <name>QnStorageConfigWidget</name>
     <message>
       <source>Main</source>
-      <translation type="unfinished">Main</translation>
+      <translation>Primær</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation type="unfinished">Backup</translation>
+      <translation>Sikkerhedskopi</translation>
     </message>
     <message>
       <source>Depending on the total size of the archive, reindexing can take up to several hours.</source>
@@ -5233,7 +5233,7 @@ to %1</translation>
     </message>
     <message>
       <source>Keep</source>
-      <translation type="unfinished">Keep</translation>
+      <translation>Behold</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -5258,11 +5258,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Fjern</translation>
     </message>
     <message>
       <source>Inaccessible</source>
-      <translation type="unfinished">Inaccessible</translation>
+      <translation>Utilgængelig</translation>
     </message>
     <message>
       <source>%1 (Checking...)</source>
@@ -5278,19 +5278,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Indlæser...</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation type="unfinished">Backup</translation>
+      <translation>Sikkerhedskopi</translation>
     </message>
     <message>
       <source>Main</source>
-      <translation type="unfinished">Main</translation>
+      <translation>Primær</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation type="unfinished">%1 GB</translation>
+      <translation>%1 GB</translation>
     </message>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
@@ -5306,7 +5306,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Reserved</source>
-      <translation type="unfinished">Reserved</translation>
+      <translation>Reserveret</translation>
     </message>
     <message>
       <source>local</source>
@@ -5334,7 +5334,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%1 TB</source>
-      <translation type="unfinished">%1 TB</translation>
+      <translation>%1 TB</translation>
     </message>
     <message>
       <source>smb</source>
@@ -5403,7 +5403,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Generelt</translation>
     </message>
     <message>
       <source>Licenses</source>
@@ -5494,7 +5494,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Learn more</source>
-      <translation type="unfinished">Learn more</translation>
+      <translation>Læs mere</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -5691,7 +5691,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Log på</translation>
     </message>
     <message>
       <source>Role</source>
@@ -5707,11 +5707,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnUserListModelPrivate</name>
     <message>
       <source>Owner</source>
-      <translation type="unfinished">Owner</translation>
+      <translation>Ejer</translation>
     </message>
     <message>
       <source>Administrator</source>
-      <translation type="unfinished">Administrator</translation>
+      <translation>Administrator</translation>
     </message>
     <message>
       <source>View live video</source>
@@ -5765,7 +5765,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnUserProfileWidget</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Log på</translation>
     </message>
     <message>
       <source>Name</source>
@@ -5841,7 +5841,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Layout</translation>
     </message>
     <message>
       <source>New Role</source>
@@ -5868,11 +5868,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Layout</translation>
     </message>
     <message>
       <source>New User...</source>
-      <translation type="unfinished">New User...</translation>
+      <translation>Ny bruger...</translation>
     </message>
     <message>
       <source>User Settings - %1 (readonly)</source>
@@ -5888,7 +5888,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>User is disabled</source>
-      <translation type="unfinished">User is disabled</translation>
+      <translation>Brugeren er deaktiveret</translation>
     </message>
     <message>
       <source>Apply changes before switching to another user?</source>
@@ -5916,11 +5916,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Log på</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
-      <translation type="unfinished">Login cannot be empty.</translation>
+      <translation>Login må ikke være tom.</translation>
     </message>
     <message>
       <source>User with specified login already exists.</source>
@@ -5948,11 +5948,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation type="unfinished">Confirm Password</translation>
+      <translation>Bekræft adgangskode</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
-      <translation type="unfinished">Passwords do not match.</translation>
+      <translation>Adgangskoderne er ikke ens.</translation>
     </message>
     <message>
       <source>%1 user with specified email already exists.</source>
@@ -6091,11 +6091,11 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>QnWorkbenchBookmarksHandler</name>
     <message>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>Bogmærke</translation>
     </message>
     <message>
       <source>Server offline</source>
-      <translation type="unfinished">Server offline</translation>
+      <translation>Server offline</translation>
     </message>
     <message>
       <source>Bookmarks can only be edited on an online Server.</source>
@@ -6103,7 +6103,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Delete bookmark?</source>
-      <translation type="unfinished">Delete bookmark?</translation>
+      <translation>Slet bogmærke?</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
@@ -6246,7 +6246,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Camera name:</source>
-      <translation type="unfinished">Camera name:</translation>
+      <translation>Kameranavn:</translation>
     </message>
   </context>
   <context>
@@ -6261,7 +6261,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation type="unfinished">New Video Wall...</translation>
+      <translation>Ny videovæg...</translation>
     </message>
     <message>
       <source>New Matrix %1</source>
@@ -6588,7 +6588,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Fjern</translation>
     </message>
     <message>
       <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
@@ -6718,7 +6718,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Move</source>
-      <translation type="unfinished">Move</translation>
+      <translation>Flyt</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -6777,15 +6777,15 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>I det valgte område</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>Valgt kamera</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Valgt enhed</translation>
     </message>
     <message>
       <source>Selected media</source>
@@ -6794,7 +6794,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation type="unfinished">none</translation>
+      <translation>ingen</translation>
     </message>
   </context>
   <context>
@@ -6805,19 +6805,19 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Lav</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation type="unfinished">Medium</translation>
+      <translation>Middel</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Høj</translation>
     </message>
     <message>
       <source>Best</source>
-      <translation type="unfinished">Best</translation>
+      <translation>Bedste</translation>
     </message>
     <message>
       <source>Preset</source>
@@ -6895,7 +6895,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Keep</source>
-      <translation type="unfinished">Keep</translation>
+      <translation>Behold</translation>
     </message>
     <message>
       <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
@@ -6910,68 +6910,68 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::AbstractSearchWidget::Private</name>
     <message>
       <source>Hide information</source>
-      <translation type="unfinished">Hide information</translation>
+      <translation>Skjul information</translation>
     </message>
     <message>
       <source>Show information</source>
-      <translation type="unfinished">Show information</translation>
+      <translation>Vis information</translation>
     </message>
     <message>
       <source>Hide thumbnails</source>
-      <translation type="unfinished">Hide thumbnails</translation>
+      <translation>Skjul miniaturebillede</translation>
     </message>
     <message>
       <source>Show thumbnails</source>
-      <translation type="unfinished">Show thumbnails</translation>
+      <translation>Vis miniaturebillede</translation>
     </message>
     <message>
       <source>Last day</source>
-      <translation type="unfinished">Last day</translation>
+      <translation>Sidste dag</translation>
     </message>
     <message>
       <source>Last 7 days</source>
-      <translation type="unfinished">Last 7 days</translation>
+      <translation>Sidste 7 dage</translation>
     </message>
     <message>
       <source>Last 30 days</source>
-      <translation type="unfinished">Last 30 days</translation>
+      <translation>Sidste 30 dage</translation>
     </message>
     <message>
       <source>Selected on Timeline</source>
-      <translation type="unfinished">Selected on Timeline</translation>
+      <translation>Valgt på tidslinjen</translation>
     </message>
     <message>
       <source>Any time</source>
-      <translation type="unfinished">Any time</translation>
+      <translation>Enhver tid</translation>
     </message>
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation type="unfinished">none</translation>
+      <translation>ingen</translation>
     </message>
     <message>
       <source>Devices on layout</source>
-      <translation type="unfinished">Devices on layout</translation>
+      <translation>Enheder på layout</translation>
     </message>
     <message>
       <source>Cameras on layout</source>
-      <translation type="unfinished">Cameras on layout</translation>
+      <translation>Kameraer på layout</translation>
     </message>
     <message>
       <source>Any device</source>
-      <translation type="unfinished">Any device</translation>
+      <translation>Enhver enhed</translation>
     </message>
     <message>
       <source>Any camera</source>
-      <translation type="unfinished">Any camera</translation>
+      <translation>Ethvert kamera</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Valgt enhed</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>Valgt kamera</translation>
     </message>
     <message>
       <source>Choose devices...</source>
@@ -7026,7 +7026,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::AnalyticsSearchWidget</name>
     <message>
       <source>No objects</source>
-      <translation type="unfinished">No objects</translation>
+      <translation>Ingen objekter</translation>
     </message>
     <message numerus="yes">
       <source>%n objects</source>
@@ -7044,7 +7044,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
     <message>
       <source>NO DATA</source>
-      <translation type="unfinished">NO DATA</translation>
+      <translation>INGEN DATA</translation>
     </message>
     <message>
       <source>DISABLED</source>
@@ -7211,7 +7211,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
+      <translation>Kamera</translation>
     </message>
     <message>
       <source>What to backup</source>
@@ -7275,7 +7275,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::BackupSettingsWidget</name>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Indstillinger</translation>
     </message>
     <message>
       <source>Bandwidth Limit</source>
@@ -7356,7 +7356,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::BookmarkSearchWidget</name>
     <message>
       <source>No bookmarks</source>
-      <translation type="unfinished">No bookmarks</translation>
+      <translation>Ingen bogmærker</translation>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
@@ -7396,7 +7396,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Log på</translation>
     </message>
     <message>
       <source>Password</source>
@@ -7408,7 +7408,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <message>
       <source>Auto</source>
       <comment>Automatic RTP transport type</comment>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
@@ -7612,11 +7612,11 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::CameraSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Generelt</translation>
     </message>
     <message>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>Optagelse</translation>
     </message>
     <message>
       <source>I/O Ports</source>
@@ -7624,11 +7624,11 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Bevægelse</translation>
     </message>
     <message>
       <source>Advanced</source>
-      <translation type="unfinished">Advanced</translation>
+      <translation>Avanceret</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -7665,7 +7665,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Device Settings</source>
-      <translation type="unfinished">Device Settings</translation>
+      <translation>Enhed Indstillinger</translation>
     </message>
     <message>
       <source>Devices Settings</source>
@@ -7673,7 +7673,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Kameraindstillinger</translation>
     </message>
     <message>
       <source>Cameras Settings</source>
@@ -7681,7 +7681,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation type="unfinished">I/O Module Settings</translation>
+      <translation>I/O-modulindstillinger</translation>
     </message>
     <message>
       <source>I/O Modules Settings</source>
@@ -7693,7 +7693,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Dewarping</source>
-      <translation type="unfinished">Dewarping</translation>
+      <translation>Dewarping</translation>
     </message>
     <message>
       <source>Change invalid schedule to &quot;Record Always&quot;</source>
@@ -7849,7 +7849,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>Intern fejl.</translation>
     </message>
     <message>
       <source>Not enough space on disk to install the client update.</source>
@@ -8053,7 +8053,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Nyt system</translation>
     </message>
   </context>
   <context>
@@ -8114,7 +8114,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Server offline</source>
-      <translation type="unfinished">Server offline</translation>
+      <translation>Server offline</translation>
     </message>
     <message>
       <source>Device search failed</source>
@@ -8133,7 +8133,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Søg</translation>
     </message>
     <message>
       <source>Initializing scan...</source>
@@ -8230,29 +8230,29 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <message>
       <source>Motion</source>
       <comment>Motion tab title</comment>
-      <translation type="unfinished">Motion</translation>
+      <translation>Bevægelse</translation>
     </message>
     <message>
       <source>Bookmarks</source>
       <comment>Bookmarks tab title</comment>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Bogmærker</translation>
     </message>
     <message>
       <source>Events</source>
       <comment>Events tab title</comment>
-      <translation type="unfinished">Events</translation>
+      <translation>Begivenheder</translation>
     </message>
     <message>
       <source>Objects</source>
       <comment>Analytics tab title</comment>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objekter</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
       <source>No events</source>
-      <translation type="unfinished">No events</translation>
+      <translation>Ingen hændelser</translation>
     </message>
     <message numerus="yes">
       <source>%n events</source>
@@ -8270,9 +8270,9 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::EventTile</name>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation type="unfinished">
-        <numerusform>...and %n more</numerusform>
-        <numerusform>...and %n more</numerusform>
+      <translation>
+        <numerusform>...og %n mere</numerusform>
+        <numerusform>...og %n mere</numerusform>
       </translation>
     </message>
   </context>
@@ -8311,7 +8311,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Internal error</source>
-      <translation type="unfinished">Internal error</translation>
+      <translation>Intern fejl</translation>
     </message>
     <message>
       <source>Video transcoding required.</source>
@@ -8430,7 +8430,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Information</translation>
     </message>
     <message>
       <source>AVI format is not recommended to export a recording with audio track.</source>
@@ -8453,15 +8453,15 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::FailoverPriorityDialogItemDelegate</name>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Lav</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation type="unfinished">Medium</translation>
+      <translation>Middel</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Høj</translation>
     </message>
     <message>
       <source>No Failover</source>
@@ -8472,7 +8472,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::FilenamePanel</name>
     <message>
       <source>Folder</source>
-      <translation type="unfinished">Folder</translation>
+      <translation>Mappe</translation>
     </message>
     <message>
       <source>Name</source>
@@ -8503,7 +8503,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>Aktivér</translation>
     </message>
   </context>
   <context>
@@ -8518,7 +8518,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Adresse</translation>
     </message>
     <message numerus="yes">
       <source>%n new</source>
@@ -8546,7 +8546,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::ImageControlWidget</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>%1 degrees</source>
@@ -8561,7 +8561,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Fejl</translation>
     </message>
     <message>
       <source>Image cannot be loaded.</source>
@@ -8660,7 +8660,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::LayoutSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Generelt</translation>
     </message>
     <message>
       <source>Background</source>
@@ -8671,7 +8671,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::LayoutThumbnailLoader</name>
     <message>
       <source>NO DATA</source>
-      <translation type="unfinished">NO DATA</translation>
+      <translation>INGEN DATA</translation>
     </message>
     <message>
       <source>NOT A CAMERA</source>
@@ -8727,7 +8727,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Server offline</source>
-      <translation type="unfinished">Server offline</translation>
+      <translation>Server offline</translation>
     </message>
     <message>
       <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
@@ -8825,7 +8825,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::MergeSystemsTool</name>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Nyt system</translation>
     </message>
     <message>
       <source>System was not found.</source>
@@ -8917,7 +8917,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::MotionSearchListModel::Private</name>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Bevægelse</translation>
     </message>
     <message>
       <source>deleted camera</source>
@@ -8963,7 +8963,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     <name>nx::vms::client::desktop::MultiServerUpdatesWidget</name>
     <message>
       <source>Release notes</source>
-      <translation type="unfinished">Release notes</translation>
+      <translation>Udgivelsesnoter</translation>
     </message>
     <message>
       <source>Download in External Browser</source>
@@ -9302,7 +9302,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Vælg layout...</translation>
     </message>
     <message>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
@@ -9392,7 +9392,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Ukendt fejl.</translation>
     </message>
     <message>
       <source>Unexpected error code.</source>
@@ -9456,11 +9456,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>Port</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Kamera</translation>
     </message>
     <message>
       <source>Consumption</source>
@@ -9573,19 +9573,19 @@ You can force it, but it may significantly increase CPU load.</translation>
     <name>nx::vms::client::desktop::RadassActionFactory</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Lav</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Høj</translation>
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Brugerdefineret</translation>
     </message>
   </context>
   <context>
@@ -9764,7 +9764,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     <name>nx::vms::client::desktop::ScheduleGridWidget</name>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>Alle</translation>
     </message>
   </context>
   <context>
@@ -9923,7 +9923,7 @@ You can still change quality and FPS directly on the camera.</translation>
     <name>nx::vms::client::desktop::SearchLineEdit</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Søg</translation>
     </message>
   </context>
   <context>
@@ -9934,11 +9934,11 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>minutes</source>
-      <translation type="unfinished">minutes</translation>
+      <translation>minutter</translation>
     </message>
     <message>
       <source>hours</source>
-      <translation type="unfinished">hours</translation>
+      <translation>timer</translation>
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
@@ -10119,9 +10119,9 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     <name>nx::vms::client::desktop::ServerSelectionDialog</name>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n kameraer</numerusform>
+        <numerusform>%n kameraer</numerusform>
       </translation>
     </message>
     <message>
@@ -10137,11 +10137,11 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     </message>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Version</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>Leverandør</translation>
     </message>
     <message>
       <source>no error</source>
@@ -10169,7 +10169,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     </message>
     <message>
       <source>unknown error</source>
-      <translation type="unfinished">unknown error</translation>
+      <translation>ukendt fejl</translation>
     </message>
     <message>
       <source>Not loaded</source>
@@ -10193,7 +10193,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     </message>
     <message>
       <source>internal error</source>
-      <translation type="unfinished">internal error</translation>
+      <translation>intern fejl</translation>
     </message>
     <message>
       <source>unknown status</source>
@@ -10284,7 +10284,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     <name>nx::vms::client::desktop::SimpleMotionSearchListModel</name>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Bevægelse</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -10295,7 +10295,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
       <source>No motion detected</source>
-      <translation type="unfinished">No motion detected</translation>
+      <translation>Ingen bevægelse registreret</translation>
     </message>
     <message numerus="yes">
       <source>%n motion events</source>
@@ -10345,9 +10345,9 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     <name>nx::vms::client::desktop::TileInteractionHandler</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... og %n mere</numerusform>
+        <numerusform>... og %n mere</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -10371,7 +10371,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Kamera</translation>
     </message>
     <message>
       <source>Start time</source>
@@ -10391,7 +10391,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     </message>
     <message>
       <source>Tags</source>
-      <translation type="unfinished">Tags</translation>
+      <translation>Tags</translation>
     </message>
     <message>
       <source>Description</source>
@@ -10418,7 +10418,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     <name>nx::vms::client::desktop::TimeSynchronizationServersModel</name>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Server</translation>
     </message>
     <message>
       <source>Time Zone</source>
@@ -10426,7 +10426,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     </message>
     <message>
       <source>Date</source>
-      <translation type="unfinished">Date</translation>
+      <translation>Dato</translation>
     </message>
     <message>
       <source>Server OS Time</source>
@@ -10522,7 +10522,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     </message>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Version</translation>
     </message>
     <message>
       <source>Invalid version.</source>
@@ -10622,7 +10622,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     </message>
     <message>
       <source>Exporting video</source>
-      <translation type="unfinished">Exporting video</translation>
+      <translation>Eksporterer video</translation>
     </message>
     <message>
       <source>Stop Export</source>
@@ -10702,7 +10702,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     </message>
     <message>
       <source>Release Notes</source>
-      <translation type="unfinished">Release Notes</translation>
+      <translation>Udgivelsesnoter</translation>
     </message>
     <message>
       <source>Major issues have been fixed. Update is strongly recommended.</source>
@@ -10725,15 +10725,15 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Bevægelse</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objekter</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Bogmærker</translation>
     </message>
     <message>
       <source>High-Res</source>
@@ -10752,37 +10752,37 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     <name>nx::vms::client::desktop::detail::BaseInputField</name>
     <message>
       <source>multiple values</source>
-      <translation type="unfinished">multiple values</translation>
+      <translation>flere værdier</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeEntityBuilder</name>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Nyt system</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeItemFactory</name>
     <message>
       <source>Servers</source>
-      <translation type="unfinished">Servers</translation>
+      <translation>Servere</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>Kameraer &amp; Enheder</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Layout</translation>
     </message>
     <message>
       <source>Showreels</source>
-      <translation type="unfinished">Showreels</translation>
+      <translation>Udstillingshjul</translation>
     </message>
     <message>
       <source>Web Pages</source>
-      <translation type="unfinished">Web Pages</translation>
+      <translation>Websider</translation>
     </message>
     <message>
       <source>Users</source>
@@ -10794,7 +10794,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     </message>
     <message>
       <source>Local Files</source>
-      <translation type="unfinished">Local Files</translation>
+      <translation>Lokale filer</translation>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
@@ -11087,11 +11087,11 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     <name>nx::vms::client::desktop::ui::action::ShowOnItemsFactory</name>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Information</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objekter</translation>
     </message>
     <message>
       <source>Regions of Interest</source>
@@ -11102,7 +11102,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     <name>nx::vms::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Næste</translation>
     </message>
     <message>
       <source>Name is necessary</source>
@@ -11220,7 +11220,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     </message>
     <message>
       <source>Move</source>
-      <translation type="unfinished">Move</translation>
+      <translation>Flyt</translation>
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
@@ -11299,7 +11299,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     </message>
     <message>
       <source>Skip</source>
-      <translation type="unfinished">Skip</translation>
+      <translation>Spring over</translation>
     </message>
     <message>
       <source>Beta version %1</source>
