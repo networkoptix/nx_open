@@ -59,19 +59,24 @@ ConfigurableLogSettings::ConfigurableLogSettings(const nx::vms::api::ServerLogSe
     // and the http loggers.
 }
 
-void ConfigurableLogSettings::applyTo(nx::vms::api::ServerLogSettings* settings) const
+nx::vms::api::ServerLogSettings ConfigurableLogSettings::applyTo(
+    const nx::vms::api::ServerLogSettings& settings) const
 {
+    nx::vms::api::ServerLogSettings result = settings;
+
     if (loggingLevel)
-        settings->mainLog.primaryLevel = settings->httpLog.primaryLevel = *loggingLevel;
+        result.mainLog.primaryLevel = result.httpLog.primaryLevel = *loggingLevel;
 
     if (maxVolumeSizeB)
-        settings->maxVolumeSizeB = *maxVolumeSizeB;
+        result.maxVolumeSizeB = *maxVolumeSizeB;
 
     if (maxFileSizeB)
-        settings->maxFileSizeB = *maxFileSizeB;
+        result.maxFileSizeB = *maxFileSizeB;
 
     if (maxFileTime)
-        settings->maxFileTimePeriodS = *maxFileTime;
+        result.maxFileTimePeriodS = *maxFileTime;
+
+    return result;
 }
 
 void ConfigurableLogSettings::intersectWith(const ConfigurableLogSettings& other)
@@ -158,19 +163,38 @@ LogSettingsDialog::LogSettingsDialog(QWidget* parent):
         ui->loggingLevel, QnComboboxCurrentIndexChanged,
         this, &LogSettingsDialog::updateWarnings);
 
-    init({}, {});
+    init({});
 }
 
 LogSettingsDialog::~LogSettingsDialog()
 {
 }
 
-void LogSettingsDialog::init(const QList<QnUuid>& ids, const ConfigurableLogSettings& settings)
+void LogSettingsDialog::init(const QList<LogsManagementUnitPtr>& units)
 {
-    m_ids = ids;
-    m_initialSettings = settings;
+    m_ids.clear();
+    m_initialSettings = ConfigurableLogSettings();
 
-    loadDataToUi(settings);
+    bool hasSettings = false;
+    for (auto unit: units)
+    {
+        m_ids << unit->id();
+
+        if (auto settings = unit->settings())
+        {
+            if (hasSettings)
+            {
+                m_initialSettings.intersectWith(*settings);
+            }
+            else
+            {
+                m_initialSettings = *settings;
+                hasSettings = true;
+            }
+        }
+    }
+
+    loadDataToUi(m_initialSettings);
 }
 
 bool LogSettingsDialog::hasChanges() const

@@ -4,6 +4,7 @@
 
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <utils/common/connective.h>
 
@@ -33,6 +34,7 @@ protected:
 
 private:
     void setupUi();
+    void updateWidgets(LogsManagementWatcher::State state);
 
 private:
     QScopedPointer<Ui::LogsManagementWidget> ui;
