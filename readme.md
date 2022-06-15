@@ -29,8 +29,8 @@ Currently the following platforms and architectures are supported by this reposi
 
 - **Windows**: this guide implies Windows 10 x64 - other versions may require some adaptation. The
     build can be triggered from the command line of `cmd`, MinGW (Git Bash), or **Cygwin**.
-- **Linux**: this guide implies Debian 10 or Ubuntu (18.04 or 20.04) - other flavors/versions may
-    require some adaptation.
+- **Linux**: this guide implies Ubuntu 18.04 or 20.04 - other flavors/versions may require some
+    adaptation.
 
 Here we describe the pre-requisites which are needed to build all of the Components.
 
@@ -57,7 +57,7 @@ The Components use CMake as a build system. CMake 3.19.0+ must be installed (the
 version is recommended) and be available on `PATH` as `cmake`.
 
 - **Linux**: either from https://cmake.org/download/, or from the official Kitware APT repository
-    for Debian and Ubuntu (https://apt.kitware.com/). It is recommended to completely remove
+    for Ubuntu (https://apt.kitware.com/). It is recommended to completely remove
     (`apt purge -y --auto-remove cmake`) the CMake package from the Main repository before
     installing the one from the Kitware repository.
 - **Windows**: CMake which comes with Microsoft Visual Studio is suitable. If desired, a
@@ -129,7 +129,7 @@ on `PATH`.
         ```
     - Install Ninja build tool using either way:
         - From https://ninja-build.org/; make sure `ninja` is on `PATH`.
-        - **Debian/Ubuntu**: Install via apt:
+        - **Ubuntu**: Install via apt:
             ```
             sudo apt install ninja-build
             ```
