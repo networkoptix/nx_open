@@ -37,6 +37,7 @@ bool isMessageVisibleInSettings(MessageType message)
         case RemoteArchiveSyncFinished:
         case RemoteArchiveSyncProgress:
         case RemoteArchiveSyncError:
+        case deviceIsReplacedWith:
             return false;
 
         default:
