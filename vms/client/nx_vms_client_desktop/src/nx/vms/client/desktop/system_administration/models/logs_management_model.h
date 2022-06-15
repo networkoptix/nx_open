@@ -7,6 +7,7 @@
 
 #include <QtCore/QAbstractTableModel>
 
+#include <client/client_globals.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/data/log_settings.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -63,7 +64,12 @@ public:
         ColumnCount
     };
 
-    explicit LogsManagementModel(QObject* parent);
+    enum Roles
+    {
+        IpAddressRole = Qn::ItemDataRoleCount,
+    };
+
+    explicit LogsManagementModel(QObject* parent, LogsManagementWatcher* watcher);
 
     virtual int columnCount(const QModelIndex& parent) const override;
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;

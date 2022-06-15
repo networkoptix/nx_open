@@ -162,9 +162,12 @@ QVariant LogsManagementModel::data(const QModelIndex& index, int role) const
     if (!NX_ASSERT(unit))
         return {};
 
-    if (role == Qn::ResourceRole)
+    if (role == IpAddressRole)
     {
-        return {}; // TODO: media server resource.
+        if (auto server = unit->server())
+            return QnResourceDisplayInfo(server).host();
+
+        return {};
     }
 
     switch (index.column())

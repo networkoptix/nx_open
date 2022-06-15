@@ -4,6 +4,7 @@
 #include "ui_logs_management_widget.h"
 
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_administration/delegates/logs_management_table_delegate.h>
 #include <nx/vms/client/desktop/system_administration/models/logs_management_model.h>
 
 namespace nx::vms::client::desktop {
@@ -42,6 +43,8 @@ void LogsManagementWidget::setupUi()
 
     ui->unitsTable->setModel(new LogsManagementModel(this));
     ui->unitsTable->setColumnHidden(LogsManagementModel::Columns::StatusColumn, true);
+    ui->unitsTable->setItemDelegate(new LogsManagementTableDelegate(this));
+
     ui->unitsTable->horizontalHeader()->setSectionResizeMode(
         LogsManagementModel::Columns::NameColumn, QHeaderView::Stretch);
     ui->unitsTable->horizontalHeader()->setSectionResizeMode(
