@@ -345,7 +345,7 @@ void ConnectionBase::onHttpClientDone()
         m_p2pTransport.reset(new P2PHttpClientTransport(
             std::move(m_httpClient),
             m_connectionGuid,
-            frameType,
+            network::websocket::FrameType::binary,
             url));
     }
 
