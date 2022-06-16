@@ -4969,7 +4969,7 @@ to %1</source>
     <message numerus="yes">
       <source>Certificates</source>
       <translation type="unfinished">
-        <numerusform>Сертификаты</numerusform>
+        <numerusform>Сертификат</numerusform>
         <numerusform>Сертификаты</numerusform>
         <numerusform>Набор сертификатов</numerusform>
         <numerusform>Certificates</numerusform>
@@ -4978,7 +4978,7 @@ to %1</source>
     <message numerus="yes">
       <source>Server utilizes these %n SSL certificates to authenticate its identity</source>
       <translation>
-        <numerusform>Сервер использует этот %n SSL-сертификат для аутентификации своей личности</numerusform>
+        <numerusform>Сервер использует этот SSL-сертификат для аутентификации своей личности</numerusform>
         <numerusform>Сервер использует эти %n SSL-сертификата для аутентификации своей личности</numerusform>
         <numerusform>Сервер использует эти %n SSL-сертификатов для аутентификации своей личности</numerusform>
         <numerusform>Сервер использует эти %n SSL-сертификатов для аутентификации своей личности</numerusform>
@@ -4986,7 +4986,7 @@ to %1</source>
     </message>
     <message>
       <source>Certificate received from the server doesn&apos;t match the certificate this server is pinned to.</source>
-      <translation>Сертификат, полученный от&apos;, не соответствует сертификату, к которому привязан этот сервер.</translation>
+      <translation>Сертификат, полученный от сервера, не соответствует сертификату, к которому привязан этот сервер.</translation>
     </message>
     <message>
       <source>Details</source>
@@ -5254,8 +5254,7 @@ to %1</source>
     </message>
     <message>
       <source>Ask your system administrator to enter the encryption password to decrypt this archive</source>
-      <translation>Попросите системного администратора ввести пароль шифрования
-для расшифровки этого архива</translation>
+      <translation>Попросите системного администратора ввести пароль шифрования для расшифровки этого архива</translation>
     </message>
     <message>
       <source>Unlock</source>

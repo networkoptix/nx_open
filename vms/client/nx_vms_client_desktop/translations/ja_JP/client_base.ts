@@ -210,7 +210,7 @@
     </message>
     <message>
       <source>Save Current Layout</source>
-      <translation>レイアウトの保存</translation>
+      <translation>現在のレイアウトを保存</translation>
     </message>
     <message>
       <source>Save Current Layout As...</source>
