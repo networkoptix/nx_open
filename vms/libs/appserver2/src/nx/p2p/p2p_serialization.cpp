@@ -501,7 +501,7 @@ vms::api::PeerDataEx deserializePeerData(const network::http::Request& request)
     {
         result.peerType = nx::reflect::fromString<vms::api::PeerType>(
             query.queryItemValue("peerType").toStdString(),
-            vms::api::PeerType::desktopClient);
+            vms::api::PeerType::notDefined);
     }
 
     if (result.id.isNull())
