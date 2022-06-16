@@ -95,7 +95,8 @@ void P2PHttpClientTransport::readSomeAsync(
                 const auto queueBuffer = m_incomingMessageQueue.front();
                 m_incomingMessageQueue.pop();
                 stopOrResumeReaderWhileInAioThread();
-                buffer->append(nx::utils::fromBase64(queueBuffer));
+                buffer->append(m_messageType == network::websocket::FrameType::binary
+                    ? nx::utils::fromBase64(queueBuffer) : queueBuffer);
                 handler(SystemError::noError, queueBuffer.size());
                 return;
             }
@@ -145,7 +146,8 @@ void P2PHttpClientTransport::sendAsync(
 
             m_writeHttpClient->setRequestBody(std::make_unique<PostBodySource>(
                 m_messageType,
-                nx::utils::toBase64(buffer)));
+                m_messageType == network::websocket::FrameType::binary
+                    ? nx::utils::toBase64(buffer) : buffer));
 
             network::http::HttpHeaders additionalHeaders;
             additionalHeaders.emplace(Qn::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionGuid);
@@ -231,7 +233,10 @@ void P2PHttpClientTransport::startReading()
                     }
                     else
                     {
-                        m_userReadHandlerPair->first->append(nx::utils::fromBase64(data));
+                        m_userReadHandlerPair->first->append(
+                            m_messageType == network::websocket::FrameType::binary
+                            ? nx::utils::fromBase64(data)
+                            : data);
 
                         utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
                         m_userReadHandlerPair->second(SystemError::noError, data.size());
@@ -295,7 +300,9 @@ void P2PHttpClientTransport::startReading()
                 {
                     outBuffer = m_incomingMessageQueue.front();
                     m_incomingMessageQueue.pop();
-                    m_userReadHandlerPair->first->append(nx::utils::fromBase64(outBuffer));
+                    m_userReadHandlerPair->first->append(
+                        m_messageType == network::websocket::FrameType::binary
+                        ? nx::utils::fromBase64(outBuffer) : outBuffer);
 
                 }
                 else
