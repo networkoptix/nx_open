@@ -45,7 +45,7 @@
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
-      <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
+      <translation>Вы используете пользовательский клиент. Пожалуйста, свяжитесь с %1, чтобы получить инструкции по обновлению.</translation>
     </message>
   </context>
   <context>
@@ -86,31 +86,31 @@
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Попробуйте изменить фильтры или настроить обнаружение объектов в настройках плагина камеры</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
+      <translation>
+        <numerusform>%n новый результат</numerusform>
+        <numerusform>%n новых результата</numerusform>
+        <numerusform>%n новых результатов</numerusform>
+        <numerusform>%n новых результатов</numerusform>
       </translation>
     </message>
     <message>
       <source>new results</source>
-      <translation type="unfinished">new results</translation>
+      <translation>новые результаты</translation>
     </message>
     <message>
       <source>Detected by</source>
-      <translation type="unfinished">Detected by</translation>
+      <translation>Обнаружено</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsSearchDialog</name>
     <message>
       <source>Advanced Object Search</source>
-      <translation type="unfinished">Advanced Object Search</translation>
+      <translation>Расширенный поиск объектов</translation>
     </message>
     <message>
       <source>Select area</source>
@@ -130,24 +130,24 @@
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Попробуйте изменить фильтры или настроить обнаружение объектов в настройках плагина камеры</translation>
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>Любой плагин</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
+      <translation>
+        <numerusform>%n новый результат</numerusform>
+        <numerusform>%n новых результата</numerusform>
+        <numerusform>%n новых результатов</numerusform>
+        <numerusform>%n новых результатов</numerusform>
       </translation>
     </message>
     <message>
       <source>new results</source>
-      <translation type="unfinished">new results</translation>
+      <translation>новые результаты</translation>
     </message>
   </context>
   <context>
@@ -210,11 +210,11 @@
     </message>
     <message>
       <source>Choose devices...</source>
-      <translation type="unfinished">Choose devices...</translation>
+      <translation>Выбрать устройства...</translation>
     </message>
     <message>
       <source>Choose cameras...</source>
-      <translation type="unfinished">Choose cameras...</translation>
+      <translation>Выбрать камеры...</translation>
     </message>
     <message>
       <source>none</source>
@@ -222,11 +222,11 @@
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
+      <translation>
+        <numerusform>%n выбранное устройство</numerusform>
+        <numerusform>%n выбранных устройства</numerusform>
+        <numerusform>%n выбранных устройств</numerusform>
+        <numerusform>%n выбранных устройств</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -240,11 +240,11 @@
     </message>
     <message>
       <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
+      <translation>Выбранное устройство</translation>
     </message>
     <message>
       <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
+      <translation>Выбранная камера</translation>
     </message>
   </context>
   <context>
@@ -259,18 +259,18 @@
     </message>
     <message>
       <source>Incompatible</source>
-      <translation>hесовместима</translation>
+      <translation>Несовместим</translation>
     </message>
     <message>
       <source>Pending</source>
-      <translation type="unfinished">Pending</translation>
+      <translation>В ожидании</translation>
     </message>
   </context>
   <context>
     <name>CloudTile</name>
     <message>
       <source>Log in to </source>
-      <translation type="unfinished">Log in to </translation>
+      <translation>Войти в </translation>
     </message>
   </context>
   <context>
@@ -291,7 +291,7 @@
     <name>ContextHintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>Нажмите на иконку, чтобы прочитать больше</translation>
     </message>
   </context>
   <context>
@@ -348,7 +348,7 @@
     </message>
     <message>
       <source>See %1 for other events</source>
-      <translation type="unfinished">See %1 for other events</translation>
+      <translation>См. %1 для других событий</translation>
     </message>
     <message>
       <source>No events</source>
@@ -356,7 +356,7 @@
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+      <translation>Попробуйте изменить фильтры или создать правило события</translation>
     </message>
     <message>
       <source>Event Log</source>
@@ -436,7 +436,7 @@
     </message>
     <message>
       <source>Floor/table</source>
-      <translation type="unfinished">Floor/table</translation>
+      <translation>На полу / столе</translation>
     </message>
     <message>
       <source>Angle</source>
@@ -444,7 +444,7 @@
     </message>
     <message>
       <source>Camera roll correction</source>
-      <translation type="unfinished">Camera roll correction</translation>
+      <translation>Коррекция вращения камеры</translation>
     </message>
     <message>
       <source>Lens projection</source>
@@ -491,7 +491,7 @@
     <name>InformationBubble</name>
     <message>
       <source>Detected by</source>
-      <translation type="unfinished">Detected by</translation>
+      <translation>Обнаружено</translation>
     </message>
   </context>
   <context>
@@ -529,7 +529,7 @@
     </message>
     <message>
       <source>Previous Object</source>
-      <translation type="unfinished">Previous Object</translation>
+      <translation>Предыдущий объект</translation>
     </message>
     <message>
       <source>Pause</source>
@@ -541,11 +541,11 @@
     </message>
     <message>
       <source>Next Object</source>
-      <translation type="unfinished">Next Object</translation>
+      <translation>Следующий объект</translation>
     </message>
     <message>
       <source>Toggle Repeat</source>
-      <translation type="unfinished">Toggle Repeat</translation>
+      <translation>Сменить повтор</translation>
     </message>
   </context>
   <context>
@@ -568,7 +568,7 @@
     </message>
     <message>
       <source>This model is not supported</source>
-      <translation type="unfinished">This model is not supported</translation>
+      <translation>Эта модель не поддерживается</translation>
     </message>
     <message>
       <source>Reset to Default</source>
@@ -637,7 +637,7 @@
     </message>
     <message>
       <source>Select a camera to see its motion events</source>
-      <translation type="unfinished">Select a camera to see its motion events</translation>
+      <translation>Выберите камеру для просмотра событий движения</translation>
     </message>
     <message>
       <source>No motion detected</source>
@@ -645,11 +645,11 @@
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>Попробуйте изменить фильтры или включить запись движения</translation>
     </message>
     <message>
       <source>Select Camera...</source>
-      <translation type="unfinished">Select Camera...</translation>
+      <translation>Выберите камеру...</translation>
     </message>
     <message>
       <source>No bookmarks</source>
@@ -657,7 +657,7 @@
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+      <translation>Выберите промежуток времени на временной шкале и щелкните правой кнопкой мыши выделенный раздел, чтобы создать закладку</translation>
     </message>
   </context>
   <context>
@@ -701,18 +701,18 @@
     </message>
     <message>
       <source>Select an area on the video to filter results</source>
-      <translation type="unfinished">Select an area on the video to filter results</translation>
+      <translation>Выберите область на видео для фильтрации результатов</translation>
     </message>
   </context>
   <context>
     <name>ObjectEditor</name>
     <message>
       <source>Present</source>
-      <translation type="unfinished">Present</translation>
+      <translation>Присутствующий</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation type="unfinished">Absent</translation>
+      <translation>Отсутствующий</translation>
     </message>
   </context>
   <context>
@@ -807,11 +807,11 @@
     <name>PreviewPanel</name>
     <message>
       <source>No Preview</source>
-      <translation type="unfinished">No Preview</translation>
+      <translation>Нет предварительного просмотра</translation>
     </message>
     <message>
       <source>Select the object to display the preview</source>
-      <translation type="unfinished">Select the object to display the preview</translation>
+      <translation>Выберите объект для отображения предварительного просмотра</translation>
     </message>
     <message>
       <source>Show on Layout</source>
@@ -819,7 +819,7 @@
     </message>
     <message>
       <source>Preview is not available for the selected object</source>
-      <translation type="unfinished">Preview is not available for the selected object</translation>
+      <translation>Предпросмотр недоступен для выбранного объекта</translation>
     </message>
   </context>
   <context>
@@ -874,7 +874,7 @@ to activate PTZ</source>
     <name>RangeEditor</name>
     <message>
       <source>from</source>
-      <translation type="unfinished">from</translation>
+      <translation>откуда</translation>
     </message>
     <message>
       <source>to</source>
@@ -889,7 +889,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Subtype</source>
-      <translation type="unfinished">Subtype</translation>
+      <translation>Подтип</translation>
     </message>
   </context>
   <context>
@@ -911,11 +911,11 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
-      <translation type="unfinished">Drag video files or images to the client window, or add local media folder through the Local Settings dialog</translation>
+      <translation>Перетащите видеофайлы или изображения в окно клиента или добавьте локальную папку мультимедиа в диалоговом окне «Локальные настройки»</translation>
     </message>
     <message>
       <source>Try searching for something else</source>
-      <translation type="unfinished">Try searching for something else</translation>
+      <translation>Попробуйте другие параметры поиска</translation>
     </message>
   </context>
   <context>
@@ -938,7 +938,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>OUTDATED</source>
-      <translation type="unfinished">OUTDATED</translation>
+      <translation>УСТАРЕЛО</translation>
     </message>
   </context>
   <context>
@@ -949,7 +949,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>All Types</source>
-      <translation type="unfinished">All Types</translation>
+      <translation>Все типы</translation>
     </message>
     <message>
       <source>Servers</source>
@@ -988,11 +988,11 @@ to activate PTZ</source>
     <name>ResourceToolTip</name>
     <message>
       <source>Cannot load preview</source>
-      <translation type="unfinished">Cannot load preview</translation>
+      <translation>Не удается загрузить предпросмотр</translation>
     </message>
     <message>
       <source>Preview is outdated</source>
-      <translation type="unfinished">Preview is outdated</translation>
+      <translation>Предварительный просмотр устарел</translation>
     </message>
   </context>
   <context>
@@ -1047,7 +1047,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Выбрать</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1084,7 +1084,7 @@ to activate PTZ</source>
     <name>SphereDewarpingSettings</name>
     <message>
       <source>Horizon correction</source>
-      <translation type="unfinished">Horizon correction</translation>
+      <translation>Коррекция горизонта</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -1144,7 +1144,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>No signal</source>
-      <translation type="unfinished">No signal</translation>
+      <translation>Нет сигнала</translation>
     </message>
     <message>
       <source>Not enough licenses</source>

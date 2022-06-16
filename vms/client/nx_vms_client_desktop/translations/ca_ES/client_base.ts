@@ -1134,7 +1134,7 @@
     <message numerus="yes">
       <source>%n layouts</source>
       <translation>
-        <numerusform>%n dissenys</numerusform>
+        <numerusform>%n disseny</numerusform>
         <numerusform>%n dissenys</numerusform>
       </translation>
     </message>
@@ -5550,12 +5550,12 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     <message>
       <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Connecteu el vostre sistema a %1 perquè sigui accessible des de qualsevol lloc.</translation>
+      <translation>Connecteu el vostre sistema a %1 perquè sigui accessible des de qualsevol lloc!</translation>
     </message>
     <message>
       <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Feu una ullada a %1 i connecteu-vos al vostre sistema des de qualsevol lloc.</translation>
+      <translation>Feu una ullada a %1 i connecteu-vos al vostre sistema des de qualsevol lloc!</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>

@@ -940,7 +940,7 @@
     <message>
       <source>wks</source>
       <comment>Long suffix for displaying weeks</comment>
-      <translation>setm.</translation>
+      <translation>setm</translation>
     </message>
     <message>
       <source>mos</source>

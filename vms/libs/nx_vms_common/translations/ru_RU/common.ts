@@ -56,7 +56,7 @@
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
-      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
+      <translation>Этот пользователь отключен системным администратором.</translation>
     </message>
   </context>
   <context>
@@ -376,15 +376,15 @@
     </message>
     <message>
       <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</translation>
+      <translation>Если отключено, попробуйте включить запись в настройках модуля ввода-вывода (ошибка &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</translation>
+      <translation>Если отключено, попробуйте включить запись и уменьшить FPS в настройках устройства (ошибка &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</translation>
+      <translation>Если отключено, попробуйте включить запись и уменьшить FPS в настройках камеры (ошибка &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
