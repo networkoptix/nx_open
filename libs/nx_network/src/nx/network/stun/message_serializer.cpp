@@ -179,14 +179,14 @@ server::SerializerState MessageSerializer::serializeAttributeValue_XORMappedAddr
     else
     {
         std::uint16_t xor_addr[8];
-        xor_addr[0] = attribute.address.ipv6.array[0] ^ MAGIC_COOKIE_LOW;
-        xor_addr[1] = attribute.address.ipv6.array[1] ^ MAGIC_COOKIE_HIGH;
+        xor_addr[0] = attribute.address.ipv6.words[0] ^ MAGIC_COOKIE_LOW;
+        xor_addr[1] = attribute.address.ipv6.words[1] ^ MAGIC_COOKIE_HIGH;
         // XOR for the transaction id
         for (std::size_t i = 2; i < 8; ++i)
         {
             const auto tid = m_message->header.transactionId.data() + (i - 2) * 2;
             xor_addr[i] = *reinterpret_cast< const std::uint16_t* >(tid) ^
-                attribute.address.ipv6.array[i];
+                attribute.address.ipv6.words[i];
         }
 
         if (buffer->WriteIPV6Address(xor_addr) == NULL)

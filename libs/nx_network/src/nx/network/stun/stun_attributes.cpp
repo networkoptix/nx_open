@@ -29,25 +29,27 @@ std::unique_ptr<SerializableAttribute> AttributeFactory::create(int attributeTyp
 }
 
 //-------------------------------------------------------------------------------------------------
-// class MappedAddress
+// class AddressAttribute
 
-MappedAddress::MappedAddress()
+AddressAttribute::AddressAttribute(int type):
+    m_type(type)
 {
 }
 
-MappedAddress::MappedAddress(SocketAddress endpoint):
+AddressAttribute::AddressAttribute(int type, SocketAddress endpoint):
+    m_type(type),
     m_endpoint(std::move(endpoint))
 {
     NX_ASSERT(m_endpoint.address.isIpAddress());
     NX_ASSERT(m_endpoint.address.ipV4() || m_endpoint.address.ipV6().first);
 }
 
-int MappedAddress::getType() const
+int AddressAttribute::getType() const
 {
-    return TYPE;
+    return m_type;
 }
 
-nx::network::server::SerializerState MappedAddress::serialize(
+nx::network::server::SerializerState AddressAttribute::serialize(
     MessageSerializerBuffer* buffer,
     std::size_t* bytesWritten) const
 {
@@ -56,7 +58,7 @@ nx::network::server::SerializerState MappedAddress::serialize(
     if (buffer->WriteByte(0) == nullptr)
         return nx::network::server::SerializerState::needMoreBufferSpace;
 
-    const uint8_t addressFamily = m_endpoint.address.ipV4() ? kAddressTypeIpV4 : kAddressTypeIpV6;
+    const uint8_t addressFamily = m_endpoint.address.ipV4() ? kAddressFamilyIpV4 : kAddressFamilyIpV6;
     if (buffer->WriteByte(addressFamily) == nullptr)
         return nx::network::server::SerializerState::needMoreBufferSpace;
 
@@ -79,7 +81,7 @@ nx::network::server::SerializerState MappedAddress::serialize(
     return nx::network::server::SerializerState::done;
 }
 
-bool MappedAddress::deserialize(MessageParserBuffer* buffer)
+bool AddressAttribute::deserialize(MessageParserBuffer* buffer)
 {
     bool ok = false;
 
@@ -92,7 +94,7 @@ bool MappedAddress::deserialize(MessageParserBuffer* buffer)
     const uint8_t addressFamily = buffer->NextByte(&ok);
     if (!ok)
         return false;
-    if (addressFamily != kAddressTypeIpV4 && addressFamily != kAddressTypeIpV6)
+    if (addressFamily != kAddressFamilyIpV4 && addressFamily != kAddressFamilyIpV6)
         return false;
 
     m_endpoint.port = buffer->NextUint16(&ok);
@@ -101,7 +103,7 @@ bool MappedAddress::deserialize(MessageParserBuffer* buffer)
 
     switch (addressFamily)
     {
-        case kAddressTypeIpV4:
+        case kAddressFamilyIpV4:
         {
             in_addr addr;
             memset(&addr, 0, sizeof(addr));
@@ -112,7 +114,7 @@ bool MappedAddress::deserialize(MessageParserBuffer* buffer)
             break;
         }
 
-        case kAddressTypeIpV6:
+        case kAddressFamilyIpV6:
         {
             in6_addr addr;
             memset(&addr, 0, sizeof(addr));
@@ -130,46 +132,52 @@ bool MappedAddress::deserialize(MessageParserBuffer* buffer)
     return true;
 }
 
-const SocketAddress& MappedAddress::endpoint() const
+const SocketAddress& AddressAttribute::endpoint() const
 {
     return m_endpoint;
 }
 
-const SocketAddress& MappedAddress::get() const
+const SocketAddress& AddressAttribute::get() const
 {
     return m_endpoint;
 }
 
-bool MappedAddress::operator==(const MappedAddress& rhs) const
+bool AddressAttribute::operator==(const AddressAttribute& rhs) const
 {
     return m_endpoint == rhs.m_endpoint;
 }
 
 //-------------------------------------------------------------------------------------------------
+// class MappedAddress
+
+MappedAddress::MappedAddress():
+    AddressAttribute(TYPE)
+{
+}
+
+MappedAddress::MappedAddress(SocketAddress endpoint):
+    AddressAttribute(TYPE, std::move(endpoint))
+{
+}
+
+//-------------------------------------------------------------------------------------------------
 // class AlternateServer
 
-AlternateServer::AlternateServer()
+AlternateServer::AlternateServer():
+    AddressAttribute(TYPE)
 {
 }
 
 AlternateServer::AlternateServer(SocketAddress endpoint):
-    MappedAddress(std::move(endpoint))
+    AddressAttribute(TYPE, std::move(endpoint))
 {
-}
-
-int AlternateServer::getType() const
-{
-    return TYPE;
 }
 
 //-------------------------------------------------------------------------------------------------
 // class XorMappedAddress
 
-XorMappedAddress::XorMappedAddress():
-    family(0), // invalid
-    port(0)
-{
-}
+static_assert(sizeof(in6_addr().s6_addr) == sizeof(XorMappedAddress().address.ipv6.words),
+    "XorMappedAddress().address.ipv6 type is wrong");
 
 XorMappedAddress::XorMappedAddress(int port_, uint32_t ipv4_):
     family(IPV4),
@@ -184,6 +192,47 @@ XorMappedAddress::XorMappedAddress(int port_, Ipv6 ipv6_):
 {
     address.ipv6 = ipv6_;
 }
+
+XorMappedAddress::XorMappedAddress(const SocketAddress& addr)
+{
+    port = addr.port;
+    if (addr.address.ipV4())
+    {
+        family = kAddressFamilyIpV4;
+        address.ipv4 = htonl(addr.address.ipV4()->s_addr);
+    }
+    else if (addr.address.ipV6().first)
+    {
+        family = kAddressFamilyIpV6;
+        memcpy(address.ipv6.words, addr.address.ipV6().first->s6_addr,
+            sizeof(addr.address.ipV6().first->s6_addr));
+    }
+}
+
+SocketAddress XorMappedAddress::addr() const
+{
+    SocketAddress result;
+    result.port = port;
+    if (family == kAddressFamilyIpV4)
+    {
+        in_addr ipv4;
+        memset(&ipv4, 0, sizeof(ipv4));
+        ipv4.s_addr = ntohl(address.ipv4);
+        result.address = HostAddress(ipv4);
+    }
+    else if (family == kAddressFamilyIpV6)
+    {
+        in6_addr ipv6;
+        memset(&ipv6, 0, sizeof(ipv6));
+        memcpy(ipv6.s6_addr, address.ipv6.words, sizeof(ipv6.s6_addr));
+        result.address = HostAddress(ipv6);
+    }
+
+    return result;
+}
+
+//-------------------------------------------------------------------------------------------------
+// class BufferedValue
 
 BufferedValue::BufferedValue(nx::Buffer buffer_)
     : m_buffer(std::move(buffer_))
@@ -266,7 +315,7 @@ int IntAttribute::value() const
     int valueInNetworkByteOrder = 0;
     if (buf.size() != sizeof(valueInNetworkByteOrder))
         return 0;
-    
+
     memcpy(
         &valueInNetworkByteOrder,
         buf.data(),

@@ -36,6 +36,10 @@ namespace attrs {
 enum Type
 {
     mappedAddress = 0x0001,
+    reserved2 = 0x0002,
+    reserved3 = 0x0003,
+    reserved4 = 0x0004,
+    reserved5 = 0x0005,
     userName = 0x0006,
     messageIntegrity = 0x0008,
     errorCode = 0x0009,
@@ -77,14 +81,15 @@ public:
     static std::unique_ptr<SerializableAttribute> create(int attributeType);
 };
 
-class NX_NETWORK_API MappedAddress:
+static constexpr int kAddressFamilyIpV4 = 1;
+static constexpr int kAddressFamilyIpV6 = 2;
+
+class NX_NETWORK_API AddressAttribute:
     public SerializableAttribute
 {
 public:
-    static constexpr int TYPE = mappedAddress;
-
-    MappedAddress();
-    MappedAddress(SocketAddress endpoint);
+    AddressAttribute(int type);
+    AddressAttribute(int type, SocketAddress endpoint);
 
     virtual int getType() const override;
 
@@ -97,25 +102,31 @@ public:
     const SocketAddress& endpoint() const;
     const SocketAddress& get() const;
 
-    bool operator==(const MappedAddress& rhs) const;
+    bool operator==(const AddressAttribute& rhs) const;
 
 private:
-    static constexpr int kAddressTypeIpV4 = 1;
-    static constexpr int kAddressTypeIpV6 = 2;
-
+    const int m_type;
     SocketAddress m_endpoint;
 };
 
+class NX_NETWORK_API MappedAddress:
+    public AddressAttribute
+{
+public:
+    static constexpr int TYPE = mappedAddress;
+
+    MappedAddress();
+    MappedAddress(SocketAddress endpoint);
+};
+
 class NX_NETWORK_API AlternateServer:
-    public MappedAddress
+    public AddressAttribute
 {
 public:
     static constexpr int TYPE = alternateServer;
 
     AlternateServer();
     AlternateServer(SocketAddress endpoint);
-
-    virtual int getType() const override;
 };
 
 struct NX_NETWORK_API XorMappedAddress: Attribute
@@ -135,17 +146,20 @@ struct NX_NETWORK_API XorMappedAddress: Attribute
             uint64_t hi;
             uint64_t lo;
         } numeric;
-        uint16_t array[8];
+        uint16_t words[8];
     };
 
-    XorMappedAddress();
+    XorMappedAddress() = default;
     XorMappedAddress(int port_, uint32_t ipv4_);
     XorMappedAddress(int port_, Ipv6 ipv6_);
+    XorMappedAddress(const SocketAddress& addr);
 
     virtual int getType() const override { return TYPE; }
 
-    int family;
-    int port;
+    SocketAddress addr() const;
+
+    int family = 0;
+    int port = 0;
     union
     {
         uint32_t ipv4;
