@@ -143,17 +143,17 @@ Attribute* MessageParser::parseXORMappedAddress()
         // XOR with high part of MAGIC_COOKIE
         xor_comp = buffer.NextUint16(&ok);
         NX_ASSERT(ok);
-        attribute->address.ipv6.array[0] = xor_comp ^ MAGIC_COOKIE_LOW;
+        attribute->address.ipv6.words[0] = xor_comp ^ MAGIC_COOKIE_LOW;
         // XOR with low part of MAGIC_COOKIE
         xor_comp = buffer.NextUint16(&ok);
         NX_ASSERT(ok);
-        attribute->address.ipv6.array[1] = xor_comp ^ MAGIC_COOKIE_HIGH;
+        attribute->address.ipv6.words[1] = xor_comp ^ MAGIC_COOKIE_HIGH;
         // XOR with rest of the transaction id
         for (std::size_t i = 0; i < 6; ++i)
         {
             xor_comp = buffer.NextUint16(&ok);
             NX_ASSERT(ok);
-            attribute->address.ipv6.array[i + 2] =
+            attribute->address.ipv6.words[i + 2] =
                 xor_comp ^ *reinterpret_cast< const std::uint16_t* >(
                     m_header.transactionId.data() + i * 2);
         }
