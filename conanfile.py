@@ -98,7 +98,7 @@ class NxOpenConan(ConanFile):
 
             if not self.isEdge1:
                 self.requires("flite/2.2" "#97d02c44abce7573ef767ddb6260835a")
-                self.requires("range-v3/0.11.0" "#87141718efd688254b5216e4b4480076")
+                self.requires("range-v3/0.11.0" "#8d874cb9cdd7b81806d624493b82f9c0")
 
         if self.isWindows or self.isAndroid:
             self.requires("openal/1.19.1" "#5e48f04d6f5a6f7c7b25e5ec6437c9c4")
