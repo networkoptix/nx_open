@@ -21,18 +21,18 @@
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>Enhver plugin</translation>
     </message>
     <message numerus="yes">
       <source>%1 with %n attributes</source>
       <translation type="unfinished">
-        <numerusform>%1 with %n attributes</numerusform>
+        <numerusform>%1 med %n attributter</numerusform>
         <numerusform>%1 with %n attributes</numerusform>
       </translation>
     </message>
     <message>
       <source>Any subtype</source>
-      <translation type="unfinished">Any subtype</translation>
+      <translation>Enhver undertype</translation>
     </message>
   </context>
   <context>
@@ -50,7 +50,7 @@
     </message>
     <message>
       <source>Issuer</source>
-      <translation type="unfinished">Issuer</translation>
+      <translation>Utsteder</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -894,11 +894,11 @@
     </message>
     <message>
       <source>Switch to Cameras &amp; Resources tab</source>
-      <translation type="unfinished">Switch to Cameras &amp; Resources tab</translation>
+      <translation>Bytt til Kameraer og ressurser-fanen</translation>
     </message>
     <message>
       <source>Search Cameras &amp; Resources</source>
-      <translation type="unfinished">Search Cameras &amp; Resources</translation>
+      <translation>Søk etter kameraer og ressurser</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
@@ -906,55 +906,55 @@
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>Ny</translation>
     </message>
     <message>
       <source>Welcome Screen</source>
-      <translation type="unfinished">Welcome Screen</translation>
+      <translation>Velkomstskjerm</translation>
     </message>
     <message>
       <source>Add Web Page...</source>
-      <translation type="unfinished">Add Web Page...</translation>
+      <translation>Legg til nettside...</translation>
     </message>
     <message>
       <source>Show Servers</source>
-      <translation type="unfinished">Show Servers</translation>
+      <translation>Vis servere</translation>
     </message>
     <message>
       <source>Save Window Configuration</source>
-      <translation type="unfinished">Save Window Configuration</translation>
+      <translation>Lagre konfigurasjonen</translation>
     </message>
     <message>
       <source>Save Windows Configuration</source>
-      <translation type="unfinished">Save Windows Configuration</translation>
+      <translation>Lagre Windows-konfigurasjonen</translation>
     </message>
     <message>
       <source>Windows Configuration</source>
-      <translation type="unfinished">Windows Configuration</translation>
+      <translation>Windows-konfigurasjon</translation>
     </message>
     <message>
       <source>Save Current State</source>
-      <translation type="unfinished">Save Current State</translation>
+      <translation>Lagre gjeldende tilstand</translation>
     </message>
     <message>
       <source>Restore Saved State</source>
-      <translation type="unfinished">Restore Saved State</translation>
+      <translation>Gjenopprett lagret tilstand</translation>
     </message>
     <message>
       <source>Delete Saved State</source>
-      <translation type="unfinished">Delete Saved State</translation>
+      <translation>Slett lagret tilstand</translation>
     </message>
     <message>
       <source>Close all Windows</source>
-      <translation type="unfinished">Close all Windows</translation>
+      <translation>Lukk alle vinduer</translation>
     </message>
     <message>
       <source>Delete Bookmark...</source>
-      <translation type="unfinished">Delete Bookmark...</translation>
+      <translation>Slett bokmerke...</translation>
     </message>
     <message>
       <source>Delete Bookmarks...</source>
-      <translation type="unfinished">Delete Bookmarks...</translation>
+      <translation>Slett bokmerker...</translation>
     </message>
     <message numerus="yes">
       <source>Show on Items</source>
@@ -969,31 +969,31 @@
     </message>
     <message>
       <source>Rotate to</source>
-      <translation type="unfinished">Rotate to</translation>
+      <translation>Roter til</translation>
     </message>
     <message>
       <source>Create Group</source>
-      <translation type="unfinished">Create Group</translation>
+      <translation>Opprett gruppe</translation>
     </message>
     <message>
       <source>Remove Group</source>
-      <translation type="unfinished">Remove Group</translation>
+      <translation>Fjern gruppe</translation>
     </message>
     <message>
       <source>Add Proxied Web Page...</source>
-      <translation type="unfinished">Add Proxied Web Page...</translation>
+      <translation>Legg til proxy-nettside...</translation>
     </message>
     <message>
       <source>Cell Spacing</source>
-      <translation type="unfinished">Cell Spacing</translation>
+      <translation>Celleavstand</translation>
     </message>
     <message>
       <source>Show Panel</source>
-      <translation type="unfinished">Show Panel</translation>
+      <translation>Vis panel</translation>
     </message>
     <message>
       <source>Hide Panel</source>
-      <translation type="unfinished">Hide Panel</translation>
+      <translation>Skjul panel</translation>
     </message>
     <message>
       <source>Joystick Settings...</source>
@@ -1001,19 +1001,19 @@
     </message>
     <message>
       <source>Advanced...</source>
-      <translation type="unfinished">Advanced...</translation>
+      <translation>Avansert...</translation>
     </message>
     <message>
       <source>Copy Bookmark Text</source>
-      <translation type="unfinished">Copy Bookmark Text</translation>
+      <translation>Kopier bokmerketekst</translation>
     </message>
     <message>
       <source>Copy Bookmarks Text</source>
-      <translation type="unfinished">Copy Bookmarks Text</translation>
+      <translation>Kopier bokmerketekst</translation>
     </message>
     <message>
       <source>Web Page Settings...</source>
-      <translation type="unfinished">Web Page Settings...</translation>
+      <translation>Nettsideinnstillinger...</translation>
     </message>
   </context>
   <context>
@@ -1166,7 +1166,7 @@
     </message>
     <message>
       <source>Executable %1 Media File</source>
-      <translation type="unfinished">Executable %1 Media File</translation>
+      <translation>Kjørbar %1 mediefil</translation>
     </message>
   </context>
   <context>
@@ -1672,35 +1672,35 @@
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Anbefalt</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation type="unfinished">Strict</translation>
+      <translation>Streng</translation>
     </message>
     <message>
       <source>May lead to privacy issues</source>
-      <translation type="unfinished">May lead to privacy issues</translation>
+      <translation>Kan føre til personvernproblemer</translation>
     </message>
     <message>
       <source>Connect only servers with public certificate</source>
-      <translation type="unfinished">Connect only servers with public certificate</translation>
+      <translation>Koble kun til servere med offentlig sertifikat</translation>
     </message>
     <message>
       <source>Certificate storage will be cleared.</source>
-      <translation type="unfinished">Certificate storage will be cleared.</translation>
+      <translation>Sertifikatlagring vil bli tømt.</translation>
     </message>
     <message>
       <source>Current client instance will be disconnected.</source>
-      <translation type="unfinished">Current client instance will be disconnected.</translation>
+      <translation>Gjeldende klientforekomst vil bli frakoblet.</translation>
     </message>
     <message>
       <source>All other client windows will be closed.</source>
-      <translation type="unfinished">All other client windows will be closed.</translation>
+      <translation>Alle andre klientvinduer vil bli lukket.</translation>
     </message>
     <message>
       <source>Security settings changed</source>
-      <translation type="unfinished">Security settings changed</translation>
+      <translation>Sikkerhetsinnstillinger endret</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -1708,7 +1708,7 @@
     </message>
     <message>
       <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
-      <translation type="unfinished">On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</translation>
+      <translation>Ved den første tilkoblingen til serveren vil du bli bedt om å godta sertifikatet hvis det inneholder feil</translation>
     </message>
   </context>
   <context>
@@ -2015,11 +2015,11 @@
     </message>
     <message>
       <source>MitM Attack</source>
-      <translation type="unfinished">MitM Attack</translation>
+      <translation>MitM angrep</translation>
     </message>
     <message>
       <source>MitM attack from server %1</source>
-      <translation type="unfinished">MitM attack from server %1</translation>
+      <translation>MitM-angrep fra server %1</translation>
     </message>
   </context>
   <context>
@@ -2296,7 +2296,7 @@
     </message>
     <message>
       <source>Some rules are not valid and may not work</source>
-      <translation type="unfinished">Some rules are not valid and may not work</translation>
+      <translation>Noen regler er ikke gyldige og fungerer kanskje ikke</translation>
     </message>
   </context>
   <context>
@@ -2683,7 +2683,7 @@ til %1</translation>
     <message>
       <source>Enter your account password to disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to disconnect System from %1</translation>
+      <translation>Skriv inn passordet til kontoen din for å koble fra systemet fra %1</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -2692,12 +2692,12 @@ til %1</translation>
     <message>
       <source>System disconnected from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">System disconnected from %1</translation>
+      <translation>Systemet er koblet fra %1</translation>
     </message>
     <message>
       <source>You are about to disconnect System from %1</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation type="unfinished">You are about to disconnect System from %1</translation>
+      <translation>Du er i ferd med å koble systemet fra %1</translation>
     </message>
     <message>
       <source>All %1 users will be deleted.</source>
@@ -2710,7 +2710,7 @@ til %1</translation>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
-      <translation type="unfinished">System will be accessible through local network with a local administrator account.</translation>
+      <translation>Systemet vil være tilgjengelig via lokalt nettverk med en lokal administratorkonto.</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -2719,7 +2719,7 @@ til %1</translation>
     <message>
       <source>Cannot disconnect the System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot disconnect the System from %1</translation>
+      <translation>Kan ikke koble systemet fra %1</translation>
     </message>
   </context>
   <context>
@@ -2985,27 +2985,27 @@ til %1</translation>
     </message>
     <message>
       <source>Save Database Backup</source>
-      <translation type="unfinished">Save Database Backup</translation>
+      <translation>Lagre sikkerhetskopi av database</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
-      <translation type="unfinished">Enter your account password to create backup</translation>
+      <translation>Skriv inn kontopassordet ditt for å lage sikkerhetskopi</translation>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Opprett</translation>
     </message>
     <message>
       <source>Restore from Database Backup</source>
-      <translation type="unfinished">Restore from Database Backup</translation>
+      <translation>Gjenopprett fra databasesikkerhetskopiering</translation>
     </message>
     <message>
       <source>Enter your account password to restore System from backup</source>
-      <translation type="unfinished">Enter your account password to restore System from backup</translation>
+      <translation>Skriv inn kontopassordet for å gjenopprette systemet fra sikkerhetskopi</translation>
     </message>
     <message>
       <source>Restore</source>
-      <translation type="unfinished">Restore</translation>
+      <translation>Gjenopprett</translation>
     </message>
     <message>
       <source>Restore database?</source>
@@ -3432,7 +3432,7 @@ til %1</translation>
     </message>
     <message>
       <source>Please enter a password.</source>
-      <translation type="unfinished">Please enter a password.</translation>
+      <translation>Vennligst angi et passord.</translation>
     </message>
   </context>
   <context>
@@ -3703,7 +3703,7 @@ til %1</translation>
     </message>
     <message>
       <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
-      <translation type="unfinished">You do not have a valid license installed. Please activate your commercial or trial license.</translation>
+      <translation>Du har ikke en gyldig lisens installert. Aktiver din kommersielle eller prøvelisens.</translation>
     </message>
   </context>
   <context>
@@ -3900,11 +3900,11 @@ til %1</translation>
     </message>
     <message>
       <source>Motion Search</source>
-      <translation type="unfinished">Motion Search</translation>
+      <translation>Bevegelsessøk</translation>
     </message>
     <message>
       <source>Object Search</source>
-      <translation type="unfinished">Object Search</translation>
+      <translation>Objektsøk</translation>
     </message>
   </context>
   <context>
@@ -4480,7 +4480,7 @@ til %1</translation>
     </message>
     <message>
       <source>Enter Fullscreen</source>
-      <translation type="unfinished">Enter Fullscreen</translation>
+      <translation>Se i fullskjerm</translation>
     </message>
   </context>
   <context>
@@ -4787,21 +4787,21 @@ til %1</translation>
     </message>
     <message numerus="yes">
       <source>Certificates</source>
-      <translation type="unfinished">
-        <numerusform>Certificates</numerusform>
-        <numerusform>Certificates</numerusform>
+      <translation>
+        <numerusform>Sertifikater</numerusform>
+        <numerusform>Sertifikater</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server utilizes these %n SSL certificates to authenticate its identity</source>
-      <translation type="unfinished">
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
+      <translation>
+        <numerusform>Serveren bruker disse %n SSL-sertifikatene for å autentisere sin identitet</numerusform>
+        <numerusform>Serveren bruker disse %n SSL-sertifikatene for å autentisere sin identitet</numerusform>
       </translation>
     </message>
     <message>
       <source>Certificate received from the server doesn&apos;t match the certificate this server is pinned to.</source>
-      <translation type="unfinished">Certificate received from the server doesn&apos;t match the certificate this server is pinned to.</translation>
+      <translation>Sertifikatet mottatt fra serveren&apos;passer ikke med sertifikatet denne serveren er festet til.</translation>
     </message>
     <message>
       <source>Details</source>
@@ -5061,15 +5061,15 @@ til %1</translation>
     </message>
     <message>
       <source>ARCHIVE ENCRYPTED</source>
-      <translation type="unfinished">ARCHIVE ENCRYPTED</translation>
+      <translation>ARKIV KRYPTERT</translation>
     </message>
     <message>
       <source>Ask your system administrator to enter the encryption password to decrypt this archive</source>
-      <translation type="unfinished">Ask your system administrator to enter the encryption password to decrypt this archive</translation>
+      <translation>Be systemadministratoren om å angi krypteringspassordet for å dekryptere dette arkivet</translation>
     </message>
     <message>
       <source>Unlock</source>
-      <translation type="unfinished">Unlock</translation>
+      <translation>Lås opp</translation>
     </message>
   </context>
   <context>
@@ -5343,7 +5343,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Storage is available but will not be writable because it is too small in comparison to the already present storages</source>
-      <translation type="unfinished">Storage is available but will not be writable because it is too small in comparison to the already present storages</translation>
+      <translation>Lagring er tilgjengelig, men vil ikke være skrivbart fordi det er for lite i forhold til de allerede eksisterende lagrene</translation>
     </message>
   </context>
   <context>
@@ -5527,11 +5527,11 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Backup storage is not configured</source>
-      <translation type="unfinished">Backup storage is not configured</translation>
+      <translation>Lagring er ikke konfigurert</translation>
     </message>
     <message>
       <source>Camera recording schedule is invalid</source>
-      <translation type="unfinished">Camera recording schedule is invalid</translation>
+      <translation>Kameraopptaksplanen er ugyldig</translation>
     </message>
   </context>
   <context>
@@ -5705,7 +5705,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>With enabled digest authentication</source>
-      <translation type="unfinished">With enabled digest authentication</translation>
+      <translation>Med aktivert sammendrag-autentisering</translation>
     </message>
   </context>
   <context>
@@ -5728,7 +5728,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>To enable digest authentication password reset is required</source>
-      <translation type="unfinished">To enable digest authentication password reset is required</translation>
+      <translation>For å aktivere digest-autentisering kreves tilbakestilling av passord</translation>
     </message>
   </context>
   <context>
@@ -5848,11 +5848,11 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Allow digest authentication for this user</source>
-      <translation type="unfinished">Allow digest authentication for this user</translation>
+      <translation>Tillat sammendrag-autentisering for denne brukeren</translation>
     </message>
     <message>
       <source>Learn More</source>
-      <translation type="unfinished">Learn More</translation>
+      <translation>Finn ut mer</translation>
     </message>
   </context>
   <context>
@@ -5927,11 +5927,11 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Password reset is required</source>
-      <translation type="unfinished">Password reset is required</translation>
+      <translation>Tilbakestilling av passord er nødvendig</translation>
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed.</source>
-      <translation type="unfinished">Only letters, numbers and symbols %1 are allowed.</translation>
+      <translation>Bare bokstaver, tall og symboler %1 er tillatt.</translation>
     </message>
   </context>
   <context>
@@ -6002,19 +6002,19 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <name>QnWebResourceWidget</name>
     <message>
       <source>Open this web page?</source>
-      <translation type="unfinished">Open this web page?</translation>
+      <translation>Åpne denne nettsiden?</translation>
     </message>
     <message>
       <source>Web page</source>
-      <translation type="unfinished">Web page</translation>
+      <translation>Nettside</translation>
     </message>
     <message>
       <source>Connect anyway</source>
-      <translation type="unfinished">Connect anyway</translation>
+      <translation>Koble til likevel</translation>
     </message>
     <message>
       <source>Web page settings...</source>
-      <translation type="unfinished">Web page settings...</translation>
+      <translation>Nettsideinnstillinger...</translation>
     </message>
     <message>
       <source>You try to open the
@@ -6022,10 +6022,10 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
 but this web page presented an untrusted certificate auth.
 We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
       <comment>%1 is the web page address</comment>
-      <translation type="unfinished">You try to open the
+      <translation>Du prøver å åpne
 %1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</translation>
+men denne nettsiden presenterte en uklarert sertifikatautentisering.
+Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan du åpne nettsiden.</translation>
     </message>
   </context>
   <context>
@@ -6095,7 +6095,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Camera %1 does not support PTZ</source>
-      <translation type="unfinished">Camera %1 does not support PTZ</translation>
+      <translation>Kamera %1 støtter ikke PTZ</translation>
     </message>
   </context>
   <context>
@@ -6147,7 +6147,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Could not open file &apos;%1&apos;. Please check if the folder is accessible</source>
-      <translation type="unfinished">Could not open file &apos;%1&apos;. Please check if the folder is accessible</translation>
+      <translation>Kunne ikke åpne filen &apos;%1&apos;. Vennligst sjekk om mappen er tilgjengelig</translation>
     </message>
   </context>
   <context>
@@ -6638,11 +6638,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Merge this group with %1?</source>
-      <translation type="unfinished">Merge this group with %1?</translation>
+      <translation>Slå sammen denne gruppen med %1?</translation>
     </message>
     <message>
       <source>Two groups with the same name cannot exist.</source>
-      <translation type="unfinished">Two groups with the same name cannot exist.</translation>
+      <translation>To grupper med samme navn kan ikke eksistere.</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -6650,11 +6650,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
-      <translation type="unfinished">You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</translation>
+      <translation>Du er i ferd med å flytte disse nettsidene til server &quot;%1&quot;. Disse nettsidene gir proxy for alt etterspurt innhold, og deres proxy-server vil endres til server &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>You are about to move this webpage to server &quot;%1&quot;. This webpage proxies all requested contents, and its proxy server will change to server &quot;%1&quot;.</source>
-      <translation type="unfinished">You are about to move this webpage to server &quot;%1&quot;. This webpage proxies all requested contents, and its proxy server will change to server &quot;%1&quot;.</translation>
+      <translation>Du er i ferd med å flytte disse nettsidene til server &quot;%1&quot;. Disse nettsidene gir proxy for alt etterspurt innhold, og deres proxy-server vil endres til server &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
@@ -6662,7 +6662,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Move anyway?</source>
-      <translation type="unfinished">Move anyway?</translation>
+      <translation>Flytte likevel?</translation>
     </message>
     <message>
       <source>Move</source>
@@ -6674,27 +6674,27 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Some devices from %1 will not be moved to %2. Move anyways?</source>
-      <translation type="unfinished">Some devices from %1 will not be moved to %2. Move anyways?</translation>
+      <translation>Noen enheter fra %1 vil ikke bli flyttet til %2. Flytte uansett?</translation>
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>Virtuelle kameraer, USB- eller webkameraer kan ikke flyttes mellom servere. Disse enhetene forblir på %1:</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>USB- eller webkameraer kan ikke flyttes mellom servere. Disse enhetene forblir på %1:</translation>
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">Virtual cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>Virtuelle kameraer kan ikke flyttes mellom servere. Disse enhetene forblir på %1:</translation>
     </message>
     <message>
       <source>Move Group without Them</source>
-      <translation type="unfinished">Move Group without Them</translation>
+      <translation>Flytt gruppe uten dem</translation>
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers</translation>
+      <translation>Virtuelle kameraer, USB- eller webkameraer kan ikke flyttes mellom servere</translation>
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains virtual cameras, USB or web cameras</source>
@@ -6710,11 +6710,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers</source>
-      <translation type="unfinished">USB or web cameras cannot be moved between servers</translation>
+      <translation>USB- eller webkameraer kan ikke flyttes mellom servere</translation>
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains USB or web cameras</source>
-      <translation type="unfinished">%1 cannot be moved between servers as it contains USB or web cameras</translation>
+      <translation>%1 kan ikke flyttes mellom servere da den inneholder USB- eller webkameraer</translation>
     </message>
   </context>
   <context>
@@ -6923,17 +6923,17 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Choose devices...</source>
-      <translation type="unfinished">Choose devices...</translation>
+      <translation>Velg enheter...</translation>
     </message>
     <message>
       <source>Choose cameras...</source>
-      <translation type="unfinished">Choose cameras...</translation>
+      <translation>Velg kameraer...</translation>
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
+      <translation>
+        <numerusform>%n valgte enheter</numerusform>
+        <numerusform>%n valgte enheter</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8397,7 +8397,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::FailoverPriorityDialogItemDelegate</name>
     <message>
       <source>No failover</source>
-      <translation type="unfinished">No failover</translation>
+      <translation>Ingen failover</translation>
     </message>
     <message>
       <source>Low</source>
@@ -10037,7 +10037,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
-      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct server.</translation>
+      <translation>Se gjennom sertifikatets detaljer for å forsikre deg om at du kobler til riktig server.</translation>
     </message>
     <message>
       <source>Cannot verify the identity of %1</source>
@@ -10045,15 +10045,15 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Someone may be impersonating %1 to steal your personal information.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.</translation>
+      <translation>Noen kan utgi seg for å være %1 for å stjele din personlige informasjon.</translation>
     </message>
     <message>
       <source>Do not connect to this server unless instructed by your VMS administrator.</source>
-      <translation type="unfinished">Do not connect to this server unless instructed by your VMS administrator.</translation>
+      <translation>Ikke koble til denne serveren uten instruks fra din VMS-administrator.</translation>
     </message>
     <message>
       <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
-      <translation type="unfinished">You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</translation>
+      <translation>Du forsøkte å koble til: %1, men serveren presenterte et sertifikat som ikke kan verifiseres automatisk.</translation>
     </message>
   </context>
   <context>

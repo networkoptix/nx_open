@@ -3520,7 +3520,7 @@ to %1</source>
     </message>
     <message>
       <source>Please enter a password.</source>
-      <translation type="unfinished">Please enter a password.</translation>
+      <translation>Пожалуйста, введите пароль.</translation>
     </message>
   </context>
   <context>
@@ -4004,11 +4004,11 @@ to %1</source>
     </message>
     <message>
       <source>Motion Search</source>
-      <translation type="unfinished">Motion Search</translation>
+      <translation>Поиск движения</translation>
     </message>
     <message>
       <source>Object Search</source>
-      <translation type="unfinished">Object Search</translation>
+      <translation>Поиск объекта</translation>
     </message>
   </context>
   <context>
@@ -4600,7 +4600,7 @@ to %1</source>
     </message>
     <message>
       <source>Enter Fullscreen</source>
-      <translation type="unfinished">Enter Fullscreen</translation>
+      <translation>Войти в полноэкранный режим</translation>
     </message>
   </context>
   <context>
@@ -4918,24 +4918,24 @@ to %1</source>
     <message numerus="yes">
       <source>Certificates</source>
       <translation type="unfinished">
-        <numerusform>Certificates</numerusform>
-        <numerusform>Certificates</numerusform>
-        <numerusform>Certificates</numerusform>
+        <numerusform>Сертификаты</numerusform>
+        <numerusform>Сертификаты</numerusform>
+        <numerusform>Набор сертификатов</numerusform>
         <numerusform>Certificates</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server utilizes these %n SSL certificates to authenticate its identity</source>
-      <translation type="unfinished">
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
+      <translation>
+        <numerusform>Сервер использует этот %n SSL-сертификат для аутентификации своей личности</numerusform>
+        <numerusform>Сервер использует эти %n SSL-сертификата для аутентификации своей личности</numerusform>
+        <numerusform>Сервер использует эти %n SSL-сертификатов для аутентификации своей личности</numerusform>
+        <numerusform>Сервер использует эти %n SSL-сертификатов для аутентификации своей личности</numerusform>
       </translation>
     </message>
     <message>
       <source>Certificate received from the server doesn&apos;t match the certificate this server is pinned to.</source>
-      <translation type="unfinished">Certificate received from the server doesn&apos;t match the certificate this server is pinned to.</translation>
+      <translation>Сертификат, полученный от&apos;, не соответствует сертификату, к которому привязан этот сервер.</translation>
     </message>
     <message>
       <source>Details</source>
@@ -5195,15 +5195,16 @@ to %1</source>
     </message>
     <message>
       <source>ARCHIVE ENCRYPTED</source>
-      <translation type="unfinished">ARCHIVE ENCRYPTED</translation>
+      <translation>АРХИВ ЗАШИФРОВАН</translation>
     </message>
     <message>
       <source>Ask your system administrator to enter the encryption password to decrypt this archive</source>
-      <translation type="unfinished">Ask your system administrator to enter the encryption password to decrypt this archive</translation>
+      <translation>Попросите системного администратора ввести пароль шифрования
+для расшифровки этого архива</translation>
     </message>
     <message>
       <source>Unlock</source>
-      <translation type="unfinished">Unlock</translation>
+      <translation>Разблокировать</translation>
     </message>
   </context>
   <context>
@@ -5479,7 +5480,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Storage is available but will not be writable because it is too small in comparison to the already present storages</source>
-      <translation type="unfinished">Storage is available but will not be writable because it is too small in comparison to the already present storages</translation>
+      <translation>Хранилище доступно, но не будет доступно для записи, поскольку оно слишком мало по сравнению с уже имеющимися хранилищами</translation>
     </message>
   </context>
   <context>
@@ -5663,11 +5664,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Backup storage is not configured</source>
-      <translation type="unfinished">Backup storage is not configured</translation>
+      <translation>Хранилище резервных копий не настроено</translation>
     </message>
     <message>
       <source>Camera recording schedule is invalid</source>
-      <translation type="unfinished">Camera recording schedule is invalid</translation>
+      <translation>Некорректный график записи камеры</translation>
     </message>
   </context>
   <context>
@@ -5841,7 +5842,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>With enabled digest authentication</source>
-      <translation type="unfinished">With enabled digest authentication</translation>
+      <translation>С включенной дайджест-аутентификацией</translation>
     </message>
   </context>
   <context>
@@ -5864,7 +5865,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To enable digest authentication password reset is required</source>
-      <translation type="unfinished">To enable digest authentication password reset is required</translation>
+      <translation>Для включения дайджест-аутентификации требуется сброс пароля</translation>
     </message>
   </context>
   <context>
@@ -5986,11 +5987,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Allow digest authentication for this user</source>
-      <translation type="unfinished">Allow digest authentication for this user</translation>
+      <translation>Разрешить дайджест-аутентификацию для этого пользователя</translation>
     </message>
     <message>
       <source>Learn More</source>
-      <translation type="unfinished">Learn More</translation>
+      <translation>Подробнее</translation>
     </message>
   </context>
   <context>
@@ -6069,7 +6070,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed.</source>
-      <translation type="unfinished">Only letters, numbers and symbols %1 are allowed.</translation>
+      <translation>Допускаются только буквы, цифры и символы %1.</translation>
     </message>
   </context>
   <context>
@@ -6142,19 +6143,19 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWebResourceWidget</name>
     <message>
       <source>Open this web page?</source>
-      <translation type="unfinished">Open this web page?</translation>
+      <translation>Открыть эту веб-страницу?</translation>
     </message>
     <message>
       <source>Web page</source>
-      <translation type="unfinished">Web page</translation>
+      <translation>Веб-страница</translation>
     </message>
     <message>
       <source>Connect anyway</source>
-      <translation type="unfinished">Connect anyway</translation>
+      <translation>Подключиться в любом случае</translation>
     </message>
     <message>
       <source>Web page settings...</source>
-      <translation type="unfinished">Web page settings...</translation>
+      <translation>Настройки веб-страницы...</translation>
     </message>
     <message>
       <source>You try to open the
@@ -6162,10 +6163,10 @@ If you intended to move analytics data to another storage location, please conta
 but this web page presented an untrusted certificate auth.
 We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
       <comment>%1 is the web page address</comment>
-      <translation type="unfinished">You try to open the
-%1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</translation>
+      <translation>Вы пытаетесь открыть
+%1,
+но на этой веб-странице представлен ненадежный сертификат аутентификации.
+Мы рекомендуем вам не открывать эту веб-страницу. Если вы понимаете риски, вы можете открыть веб-страницу.</translation>
     </message>
   </context>
   <context>
@@ -6237,7 +6238,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Camera %1 does not support PTZ</source>
-      <translation type="unfinished">Camera %1 does not support PTZ</translation>
+      <translation>Камера %1 не поддерживает PTZ</translation>
     </message>
   </context>
   <context>
@@ -6293,7 +6294,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Could not open file &apos;%1&apos;. Please check if the folder is accessible</source>
-      <translation type="unfinished">Could not open file &apos;%1&apos;. Please check if the folder is accessible</translation>
+      <translation>Не удалось открыть файл &apos;%1&apos;. Пожалуйста, проверьте, доступна ли папка</translation>
     </message>
   </context>
   <context>
@@ -6844,11 +6845,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Merge this group with %1?</source>
-      <translation type="unfinished">Merge this group with %1?</translation>
+      <translation>Объединить эту группу с %1?</translation>
     </message>
     <message>
       <source>Two groups with the same name cannot exist.</source>
-      <translation type="unfinished">Two groups with the same name cannot exist.</translation>
+      <translation>Две группы с одинаковым именем не могут существовать.</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -6856,19 +6857,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
-      <translation type="unfinished">You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</translation>
+      <translation>Вы собираетесь переместить эти веб-страницы на сервер &quot;%1&quot;. Эти веб-страницы проксируют все запрошенное содержимое, и их прокси-сервер изменится на сервер &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>You are about to move this webpage to server &quot;%1&quot;. This webpage proxies all requested contents, and its proxy server will change to server &quot;%1&quot;.</source>
-      <translation type="unfinished">You are about to move this webpage to server &quot;%1&quot;. This webpage proxies all requested contents, and its proxy server will change to server &quot;%1&quot;.</translation>
+      <translation>Вы собираетесь переместить эту веб-страницу на сервер &quot;%1&quot;. Эта веб-страница проксирует все запрошенное содержимое, и ее прокси-сервер изменится на сервер &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</translation>
+      <translation>Проксирование всего содержимого предоставляет доступ к любому сервису или устройству в сети сервера&apos;пользователям этой веб-страницы.</translation>
     </message>
     <message>
       <source>Move anyway?</source>
-      <translation type="unfinished">Move anyway?</translation>
+      <translation>Переместить в любом случае?</translation>
     </message>
     <message>
       <source>Move</source>
@@ -6880,47 +6881,47 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Some devices from %1 will not be moved to %2. Move anyways?</source>
-      <translation type="unfinished">Some devices from %1 will not be moved to %2. Move anyways?</translation>
+      <translation>Некоторые устройства с %1 не будут перемещены в %2. Переместить в любом случае?</translation>
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>Виртуальные камеры, USB-камеры или веб-камеры нельзя перемещать между серверами. Эти устройства останутся на %1:</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>USB или веб-камеры не могут быть перемещены между серверами. Эти устройства останутся на %1:</translation>
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">Virtual cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>Виртуальные камеры нельзя перемещать между серверами. Эти устройства останутся на %1:</translation>
     </message>
     <message>
       <source>Move Group without Them</source>
-      <translation type="unfinished">Move Group without Them</translation>
+      <translation>Переместить группу без них</translation>
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers</translation>
+      <translation>Виртуальные камеры, USB-камеры или веб-камеры нельзя перемещать между серверами</translation>
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains virtual cameras, USB or web cameras</source>
-      <translation type="unfinished">%1 cannot be moved between servers as it contains virtual cameras, USB or web cameras</translation>
+      <translation>%1 нельзя перемещать между серверами, так как он содержит виртуальные камеры, USB или веб-камеры</translation>
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual cameras cannot be moved between servers</translation>
+      <translation>Виртуальные камеры нельзя перемещать между серверами</translation>
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains virtual cameras</source>
-      <translation type="unfinished">%1 cannot be moved between servers as it contains virtual cameras</translation>
+      <translation>%1 нельзя перемещать между серверами, так как он содержит виртуальные камеры</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers</source>
-      <translation type="unfinished">USB or web cameras cannot be moved between servers</translation>
+      <translation>USB-камеры или веб-камеры нельзя перемещать между серверами</translation>
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains USB or web cameras</source>
-      <translation type="unfinished">%1 cannot be moved between servers as it contains USB or web cameras</translation>
+      <translation>%1 нельзя перемещать между серверами, так как он содержит USB или веб-камеры</translation>
     </message>
   </context>
   <context>
@@ -7129,11 +7130,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Choose devices...</source>
-      <translation type="unfinished">Choose devices...</translation>
+      <translation>Выбрать устройства...</translation>
     </message>
     <message>
       <source>Choose cameras...</source>
-      <translation type="unfinished">Choose cameras...</translation>
+      <translation>Выбрать камеры...</translation>
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
@@ -7155,11 +7156,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
+      <translation>Выбранная камера</translation>
     </message>
     <message>
       <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
+      <translation>Выбранное устройство</translation>
     </message>
   </context>
   <context>
@@ -7197,7 +7198,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Попробуйте изменить фильтры или настроить обнаружение объектов в настройках плагина камеры</translation>
     </message>
   </context>
   <context>

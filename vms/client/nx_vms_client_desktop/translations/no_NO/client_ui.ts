@@ -1131,7 +1131,7 @@
     </message>
     <message>
       <source>No failover</source>
-      <translation type="unfinished">No failover</translation>
+      <translation>Ingen failover</translation>
     </message>
     <message>
       <source>Low</source>
