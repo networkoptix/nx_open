@@ -1309,15 +1309,22 @@ void QnWorkbenchController::at_item_middleClicked(QGraphicsView* /*view*/, QGrap
     }
 }
 
-void QnWorkbenchController::at_item_doubleClicked(QGraphicsView* /*view*/, QGraphicsItem* item, const ClickInfo& /*info*/)
+void QnWorkbenchController::at_item_doubleClicked(
+    QGraphicsView* /*view*/,
+    QGraphicsItem* item,
+    const ClickInfo& info)
 {
-    TRACE("ITEM DOUBLECLICKED");
+    NX_VERBOSE(this, "ITEM DOUBLECLICKED");
 
-    QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : nullptr;
-    if(widget == nullptr)
+    if (info.modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier))
         return;
 
-    at_item_doubleClicked(widget);
+    QnResourceWidget* widget = item->isWidget()
+        ? qobject_cast<QnResourceWidget*>(item->toGraphicsObject())
+        : nullptr;
+
+    if (widget)
+        at_item_doubleClicked(widget);
 }
 
 void QnWorkbenchController::at_item_doubleClicked(QnMediaResourceWidget* widget)
