@@ -117,6 +117,7 @@ constexpr auto nxReflectVisitAllEnumItems(EventTypeFlag*, Visitor&& visitor)
     using Item = nx::reflect::enumeration::Item<EventTypeFlag>;
     return visitor(
         Item{EventTypeFlag::noFlags, ""},
+        Item{EventTypeFlag::noFlags, "noFlags"},
         Item{EventTypeFlag::stateDependent, "stateDependent"},
         Item{EventTypeFlag::regionDependent, "regionDependent"},
         Item{EventTypeFlag::hidden, "hidden"},
@@ -153,6 +154,7 @@ constexpr auto nxReflectVisitAllEnumItems(ObjectTypeFlag*, Visitor&& visitor)
     using Item = nx::reflect::enumeration::Item<ObjectTypeFlag>;
     return visitor(
         Item{ObjectTypeFlag::noFlags, ""},
+        Item{ObjectTypeFlag::noFlags, "noFlags"},
         Item{ObjectTypeFlag::hiddenDerivedType, "hiddenDerivedType"},
         Item{ObjectTypeFlag::nonIndexable, "nonIndexable"},
         Item{ObjectTypeFlag::liveOnly, "liveOnly"});
