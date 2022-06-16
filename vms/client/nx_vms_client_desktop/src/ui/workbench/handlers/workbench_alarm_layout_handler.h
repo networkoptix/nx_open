@@ -65,5 +65,5 @@ private:
      */
     QList<ActionKey> m_processingActions;
 
-    QnLayoutResourcePtr m_alarmLayout;
+    QnUuid m_alarmLayoutId;
 };
