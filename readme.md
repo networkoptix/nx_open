@@ -63,7 +63,8 @@ version is recommended) and be available on `PATH` as `cmake`.
 - **Windows**: CMake which comes with Microsoft Visual Studio is suitable. If desired, a
     standalone installation of CMake can be performed from https://cmake.org/download/; after
     installing, choose "Add CMake to the system PATH for all users" and add the path to `cmake.exe`
-    to `CMakeSettings.json` (see the "Generation" section of this guide).
+    to `CMakeSettings.json` (see the "Building and debugging in Visual Studio" section of this
+    guide).
     - ATTENTION: If you use Cygwin, make sure the Cygwin's `cmake` is not on `PATH`.
 
 ### Python
@@ -115,6 +116,12 @@ NOTE: Conan requires the `markupsafe` package of version no later than 2.0.1.
 
 ATTENTION: `pip` installs package binaries to `~/.local/bin/`, so make sure that this directory is
 on `PATH`.
+
+The VMS build system is configured in such a way that Conan stores the downloaded artifacts in the
+`.conan/` directory in the build directory. To avoid re-downloading all the artifacts from the
+internet for every clean build, set the environment variable `NX_CONAN_DOWNLOAD_CACHE` to the full
+path of a directory that will be used as a transparent download cache; for example, create the
+directory `conan_cache/` next to the repository root and the build directories.
 
 ### Build tools
 
@@ -235,7 +242,7 @@ Below are the usage examples, where `<build>` is `./build.sh` on Linux and `buil
 - To make a clean Release build with the distribution package and unit test archive, delete the
     build directory (if any), and run the command:
     ```
-    <build> -DcustomizationPackageFile=<customization.zip> -DdeveloperBuild=OFF -DwithDistributions=ON -DwithUnitTestsArchive=ON
+    <build> -DcustomizationPackageFile=<customization.zip> -DdeveloperBuild=OFF -DwithDistributions=ON -DwithTests=ON -DwithUnitTestsArchive=ON
     ```
     The built distribution packages and unit test archive will be placed in
     `nx_open-build/distrib/`. To run the unit tests, unpack the unit test archive and run all the
@@ -264,7 +271,7 @@ argument `-DtargetDevice=<value>`, where <value> is one of the following:
 ---------------------------------------------------------------------------------------------------
 ## Running VMS Desktop Client
 
-The VMS Desktop Client can be run direclty from the build directory, without installing a
+The VMS Desktop Client can be run directly from the build directory, without installing a
 distribution package.
 
 After the successful build, the Desktop Client executable is located in `nx_open-build/bin/`; its
@@ -306,6 +313,72 @@ the same customization package. If, however, for experimental purposes (not for 
 you need to connect to a Server with a different customization, the following option can be added
 to `desktop_client.ini`: `developerMode=true`. For the details, see the documentation for the
 IniConfig mechanism of the Nx Kit library located at `artifacts/nx_kit/`.
+
+---------------------------------------------------------------------------------------------------
+## Building and debugging in Visual Studio
+
+On Windows, besides the command-line way described above, you can use the Visual Studio IDE to
+build and debug the Client.
+
+The build configurations (Debug, Release and the like) used by the IDE are defined in the file
+`CMakeSettings.json` in the repository root directory. Initially, this file is absent - you can
+copy the provided example file `CMakeSettings.json.template` located in the repository root
+directory to `CMakeSettings.json` for a start. For each build configuration, this file defines the
+name of the build directory: in the provided example, it is the source directory appended with
+`-build-debug` for Debug configurations, and `-build` for Release configurations.
+
+If you use a *separately installed CMake* (not the one supplied with Visual Studio), set the
+`cmakeExecutable` parameter in `CMakeSettings.json` for every configuration to the full path to the
+CMake executable; to use the version supplied with Visual Studio, leave this value empty.
+
+Open Visual Studio, select "Open a local folder" and choose the repository root folder.
+Alternatively, run `devenv.exe` (Visual Studio IDE executable) supplying the repository root
+directory as an argument.
+
+Right after opening the directory, Visual Studio will start the CMake generation stage using the
+default build configuration - `Debug (minimal)`. If this build configuration is not the desired
+one, in the toolbar at the top of the Visual Studio window, select the desired build configuration;
+the CMake generation stage for the newly selected configuration will be started immediately, using
+the respective build directory defined in `CMakeSettings.json`. The build directory from the
+previously selected configuration (if any) is not needed anymore and can be deleted manually.
+
+If you don't need advanced debugging features, you may choose one of the Release configurations -
+the basics of visual debugging like breakpoins and step-by-step execution will work anyway in most
+cases, and the build time and disk usage will be noticeably lower than with a Debug configuration.
+
+After choosing the desired build configuration and successfully finishing the CMake generation
+stage, open the "Solution Explorer" side window, click the "Switch between solutions and available
+views" toolbar button at the top of this side window (looking like a document icon with a Visual
+Studio logo on it), and in the tree below double-click the "CMake Targets View". The CMake
+generation stage will be run again, and when finished, the tree of CMake targets will appear -
+watch the "Output" window for the generetion stage progress.
+
+To build the solution, right-click on "vms Project" in "Solution Explorer" and select "Build All".
+Alternatively, build only the required project of the solution, for example, right-click on
+"desktop_client" and select "Build".
+    
+### Running/debugging
+    
+To be able to run and debug the built Desktop Client from the IDE, the file `launch.vs.json` must
+be created in the `.vs/` directory which Visual Studio creates in the source (repository root)
+directory. You can copy the provided `launch.vs.json.template` example file in the repository root
+directory to `.vs/launch.vs.json`. This file defines the parameters and other details like `PATH`
+for the particular executables of the solution.
+
+Also you need to specify the actual path to the Qt library binaries in the file
+`CMakeSettings.json` in the repository root directory, as follows. First, find the Qt directory
+used by the current build: it is located in the `.conan/` directory inside the build directory, and
+has the path like `.conan/data/qt/#.#.#/_/_/package/.../bin`, where `...` is a checksum, and
+`#.#.#` is the Qt version. Then set the `qtdir` parameter of each configuration in
+`CMakeSettings.json` to its full path.
+
+ATTENTION: The path to the Qt directory in `CMakeSettings.json` must be adjusted when switching
+between git branches that use different Qt versions.
+
+After performing the above steps, right-click the required executable, e.g. "desktop_client", in
+the "CMake Targets View" of the "Solution Explorer" side window, and select either "Debug" to run
+it immediately, or "Set As Startup Item" to allow running it using the green triangle ("play") icon
+in the toolbar at the top of the main Visual Studio window.
 
 ---------------------------------------------------------------------------------------------------
 ## Free and Open-Source Software Notices
