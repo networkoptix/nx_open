@@ -1,0 +1,69 @@
+﻿{
+  "configurations": [
+   {
+      "name": "Debug+ut",
+      "cmakeExecutable": "",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "buildRoot": "${projectDir}-build-debug",
+      "cmakeCommandArgs": "-DwithTests=ON -DCMAKE_C_COMPILER_WORKS=1 -DCMAKE_CXX_COMPILER_WORKS=1",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "variables": [],
+      "environments": [
+        {
+          "qtdir": "${env.USERPROFILE}/.conan/data/qt/5.15.2/_/_/package/77f30be2ea492b561ef6a5684bdc283505176ad0/bin"
+        } ]
+    },
+    {
+      "name": "Debug (minimal)",
+      "cmakeExecutable": "",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "buildRoot": "${projectDir}-build-debug",
+      "cmakeCommandArgs": "-DCMAKE_C_COMPILER_WORKS=1 -DCMAKE_CXX_COMPILER_WORKS=1",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "variables": [],
+      "environments": [
+        {
+          "qtdir": "${env.USERPROFILE}/.conan/data/qt/5.15.2/_/_/package/77f30be2ea492b561ef6a5684bdc283505176ad0/bin"
+        } ]
+    },
+    {
+      "name": "Release+ut",
+      "cmakeExecutable": "",
+      "generator": "Ninja",
+      "configurationType": "Release",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "buildRoot": "${projectDir}-build",
+      "cmakeCommandArgs": "-DwithTests=ON -DCMAKE_C_COMPILER_WORKS=1 -DCMAKE_CXX_COMPILER_WORKS=1",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "variables": [],
+      "environments": [
+        {
+          "qtdir": "${env.USERPROFILE}/.conan/data/qt/5.15.2/_/_/package/189784f1080359e8f6d1dfd7e8aa7dccd1cbae4c/bin"
+        } ]
+    },
+    {
+      "name": "Release+ut+distrib",
+      "cmakeExecutable": "",
+      "generator": "Ninja",
+      "configurationType": "Release",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "buildRoot": "${projectDir}-build",
+      "cmakeCommandArgs": "-DwithDistributions=ON -DwithTests=ON -DwithUnitTestsArchive=ON -DCMAKE_C_COMPILER_WORKS=1 -DCMAKE_CXX_COMPILER_WORKS=1",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "variables": [],
+      "environments": [
+        {
+          "qtdir": "${env.USERPROFILE}/.conan/data/qt/5.15.2/_/_/package/189784f1080359e8f6d1dfd7e8aa7dccd1cbae4c/bin"
+        } ]
+    }
+  ]
+}
+
