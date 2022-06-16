@@ -79,13 +79,7 @@ NX_REFLECTION_ENUM_CLASS(RemoteConnectionErrorCode,
     userIsLockedOut,
 
     /** Server version is too low. */
-    versionIsTooLow,
-
-    /**
-     *  Connection could not be established since the system does not support OAuth cloud
-     *  authorization. To continue connection process digest credentials should be specified.
-     */
-    digestCloudCredentialsRequired
+    versionIsTooLow
 );
 
 struct NX_VMS_CLIENT_CORE_API RemoteConnectionError
