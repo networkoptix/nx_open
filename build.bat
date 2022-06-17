@@ -2,7 +2,7 @@
 
 @call; &:: Reset errorlevel to ensure that "call ... || exit /b" works as expected.
 
-call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat" || exit /b
+call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat" || exit /b
 
 :: Make the build dir at the same level as the parent dir of this script, suffixed with "-build".
 @set SOURCE_DIR_WITH_BACKSLASH=%~dp0
