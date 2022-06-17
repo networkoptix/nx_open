@@ -6,8 +6,8 @@
 
 namespace nx::vms::client::desktop::rules {
 
-SoundPickerWidget::SoundPickerWidget(QWidget* parent):
-    PickerWidget(parent),
+SoundPickerWidget::SoundPickerWidget(common::SystemContext* context, QWidget* parent):
+    PickerWidget(context, parent),
     ui(new Ui::SoundPickerWidget)
 {
     ui->setupUi(this);

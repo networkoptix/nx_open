@@ -6,6 +6,7 @@
 #include <QtCore/QVariant>
 #include <QtWidgets/QWidget>
 
+#include <nx/vms/common/system_context_aware.h>
 #include <nx/vms/rules/field.h>
 #include <nx/vms/rules/manifest.h>
 
@@ -15,12 +16,12 @@ namespace nx::vms::client::desktop::rules {
  * Base class for the action and event parameters widgets. Represents a set of data pickers
  * according to the ItemDescriptor.
  */
-class ParamsWidget: public QWidget
+class ParamsWidget: public QWidget, public common::SystemContextAware
 {
     Q_OBJECT
 
 public:
-    ParamsWidget(QWidget* parent = nullptr);
+    ParamsWidget(common::SystemContext* context, QWidget* parent = nullptr);
 
     /** Sets descriptor the widget customization is depends on. */
     void setDescriptor(const vms::rules::ItemDescriptor& value);

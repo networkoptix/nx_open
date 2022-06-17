@@ -4,8 +4,6 @@
 
 #include <QtWidgets/QHBoxLayout>
 
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
@@ -40,8 +38,8 @@ template<typename F>
 class SourcePickerWidget: public FieldPickerWidget<F>
 {
 public:
-    explicit SourcePickerWidget(QWidget* parent = nullptr):
-        FieldPickerWidget<F>(parent)
+    SourcePickerWidget(common::SystemContext* context, QWidget* parent = nullptr):
+        FieldPickerWidget<F>(context, parent)
     {
         auto mainLayout = new QHBoxLayout;
         mainLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
@@ -101,6 +99,7 @@ private:
     using FieldPickerWidget<F>::setLayout;
     using FieldPickerWidget<F>::fieldDescriptor;
     using FieldPickerWidget<F>::field;
+    using FieldPickerWidget<F>::resourcePool;
 
     QnElidedLabel* label{};
     QnSelectResourcesButton* selectResourceButton{};
@@ -135,9 +134,7 @@ private:
 
     void updateUi()
     {
-        auto resourcePool = qnClientCoreModule->resourcePool();
-
-        auto resourceList = resourcePool->getResourcesByIds<QnUserResource>(field->ids());
+        auto resourceList = resourcePool()->template getResourcesByIds<QnUserResource>(field->ids());
 
         auto selectUsersButtonPtr = static_cast<QnSelectUsersButton*>(selectResourceButton);
         if (field->acceptAll())
@@ -191,9 +188,7 @@ QnSelectResourcesButton* ServerPicker::createSelectButton()
 template<>
 void CameraPicker::updateUi()
 {
-    auto resourcePool = qnClientCoreModule->resourcePool();
-
-    auto resourceList = resourcePool->getResourcesByIds<QnVirtualCameraResource>(field->ids());
+    auto resourceList = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(field->ids());
 
     auto selectDeviceButtonPtr = static_cast<QnSelectDevicesButton*>(selectResourceButton);
     selectDeviceButtonPtr->selectDevices(resourceList);
@@ -206,9 +201,9 @@ void CameraPicker::updateUi()
             tr("Select at least one I/O module")
         };
 
-        const auto allCameras = resourcePool->getAllCameras();
+        const auto allCameras = resourcePool()->getAllCameras();
         const auto deviceType
-            = QnDeviceDependentStrings::calculateDeviceType(resourcePool, allCameras);
+            = QnDeviceDependentStrings::calculateDeviceType(resourcePool(), allCameras);
 
         alertLabel->setText(deviceStringSet.getString(deviceType));
         alertLabel->setVisible(true);
@@ -222,9 +217,7 @@ void CameraPicker::updateUi()
 template<>
 void ServerPicker::updateUi()
 {
-    auto resourcePool = qnClientCoreModule->resourcePool();
-
-    auto resourceList = resourcePool->getResourcesByIds<QnMediaServerResource>(field->ids());
+    auto resourceList = resourcePool()->getResourcesByIds<QnMediaServerResource>(field->ids());
 
     auto selectServersButtonPtr = static_cast<QnSelectServersButton*>(selectResourceButton);
     selectServersButtonPtr->selectServers(resourceList);

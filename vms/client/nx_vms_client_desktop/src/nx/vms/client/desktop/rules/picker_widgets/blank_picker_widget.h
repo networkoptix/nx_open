@@ -12,7 +12,7 @@ class BlankPickerWidget: public PickerWidget
     Q_OBJECT
 
 public:
-    explicit BlankPickerWidget(QWidget* parent = nullptr);
+    BlankPickerWidget(common::SystemContext* context, QWidget* parent = nullptr);
 
     virtual void setReadOnly(bool value) override;
 

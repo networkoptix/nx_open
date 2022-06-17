@@ -265,7 +265,7 @@ void RulesDialog::createEventEditor(const vms::rules::ItemDescriptor& descriptor
     if (eventEditorWidget)
         eventEditorWidget->deleteLater();
 
-    eventEditorWidget = EventEditorFactory::createWidget(descriptor);
+    eventEditorWidget = EventEditorFactory::createWidget(descriptor, systemContext());
     if (!NX_ASSERT(eventEditorWidget))
         return;
 
@@ -279,7 +279,7 @@ void RulesDialog::createActionEditor(const vms::rules::ItemDescriptor& descripto
     if (actionEditorWidget)
         actionEditorWidget->deleteLater();
 
-    actionEditorWidget = ActionEditorFactory::createWidget(descriptor);
+    actionEditorWidget = ActionEditorFactory::createWidget(descriptor, systemContext());
     if (!NX_ASSERT(actionEditorWidget))
         return;
 

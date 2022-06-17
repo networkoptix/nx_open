@@ -5,10 +5,8 @@
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QHBoxLayout>
 
-#include <client_core/client_core_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/rules/action_fields/content_type_field.h>
@@ -34,8 +32,8 @@ template<typename F>
 class DropdownTextPickerWidget: public FieldPickerWidget<F>
 {
 public:
-    explicit DropdownTextPickerWidget(QWidget* parent = nullptr):
-        FieldPickerWidget<F>(parent)
+    explicit DropdownTextPickerWidget(common::SystemContext* context, QWidget* parent = nullptr):
+        FieldPickerWidget<F>(context, parent)
     {
         auto mainLayout = new QHBoxLayout;
         mainLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
@@ -175,13 +173,11 @@ void InputPortPicker::customizeComboBox()
     comboBox->addItem(kAutoValue, QString());
 
     QnVirtualCameraResourceList cameras;
-    const auto resourcePool =
-        nx::vms::client::desktop::appContext()->currentSystemContext()->resourcePool();
 
     if (sourceCameraField->acceptAll())
-        cameras = resourcePool->getAllCameras();
+        cameras = resourcePool()->getAllCameras();
     else
-        cameras = resourcePool->getResourcesByIds<QnVirtualCameraResource>(sourceCameraField->ids());
+        cameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(sourceCameraField->ids());
 
     const auto inputComparator =
         [](const QnIOPortData& l, const QnIOPortData& r)

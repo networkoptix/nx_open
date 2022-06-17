@@ -13,7 +13,7 @@ class VolumePickerWidget: public PickerWidget
     Q_OBJECT
 
 public:
-    explicit VolumePickerWidget(QWidget* parent = nullptr);
+    VolumePickerWidget(common::SystemContext* context, QWidget* parent = nullptr);
     virtual ~VolumePickerWidget() override;
 
     virtual void setReadOnly(bool value) override;

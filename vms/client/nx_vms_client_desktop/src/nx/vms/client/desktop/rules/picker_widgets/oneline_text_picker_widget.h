@@ -32,8 +32,8 @@ template<typename F>
 class OnelineTextPickerWidget: public FieldPickerWidget<F>
 {
 public:
-    explicit OnelineTextPickerWidget(QWidget* parent = nullptr):
-        FieldPickerWidget<F>(parent)
+    OnelineTextPickerWidget(common::SystemContext* context, QWidget* parent = nullptr):
+        FieldPickerWidget<F>(context, parent)
     {
         auto mainLayout = new QHBoxLayout;
         mainLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());

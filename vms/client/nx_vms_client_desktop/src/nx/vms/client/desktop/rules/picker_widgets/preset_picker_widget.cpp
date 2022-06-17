@@ -6,8 +6,8 @@
 
 namespace nx::vms::client::desktop::rules {
 
-PresetPickerWidget::PresetPickerWidget(QWidget* parent):
-    PickerWidget(parent),
+PresetPickerWidget::PresetPickerWidget(common::SystemContext* context, QWidget* parent):
+    PickerWidget(context, parent),
     ui(new Ui::PresetPickerWidget)
 {
     ui->setupUi(this);

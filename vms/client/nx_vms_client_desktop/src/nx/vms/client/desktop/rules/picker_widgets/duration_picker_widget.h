@@ -17,8 +17,8 @@ template<typename F>
 class DurationPickerWidget: public FieldPickerWidget<F>
 {
 public:
-    explicit DurationPickerWidget(QWidget* parent = nullptr):
-        FieldPickerWidget<F>(parent)
+    DurationPickerWidget(common::SystemContext* context, QWidget* parent = nullptr):
+        FieldPickerWidget<F>(context, parent)
     {
         auto mainLayout = new QHBoxLayout;
         mainLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());

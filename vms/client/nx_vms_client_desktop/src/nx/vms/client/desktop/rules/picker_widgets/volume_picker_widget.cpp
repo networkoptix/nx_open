@@ -6,8 +6,8 @@
 
 namespace nx::vms::client::desktop::rules {
 
-VolumePickerWidget::VolumePickerWidget(QWidget* parent):
-    PickerWidget(parent),
+VolumePickerWidget::VolumePickerWidget(common::SystemContext* context, QWidget* parent):
+    PickerWidget(context, parent),
     ui(new Ui::VolumePickerWidget)
 {
     ui->setupUi(this);
