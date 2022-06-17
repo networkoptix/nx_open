@@ -99,9 +99,9 @@ void TransactionMessageBusAdapter::dropConnections()
     m_bus->dropConnections();
 }
 
-ConnectionInfoList TransactionMessageBusAdapter::connectionsInfo() const
+ConnectionInfos TransactionMessageBusAdapter::connectionInfos() const
 {
-    return m_bus->connectionsInfo();
+    return m_bus->connectionInfos();
 }
 
 void TransactionMessageBusAdapter::setHandler(ECConnectionNotificationManager* handler)

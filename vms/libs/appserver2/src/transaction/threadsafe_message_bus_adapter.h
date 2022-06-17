@@ -36,7 +36,7 @@ public:
 
     virtual void dropConnections() override;
 
-    virtual ConnectionInfoList connectionsInfo() const override;
+    virtual ConnectionInfos connectionInfos() const override;
 
     virtual void setHandler(ECConnectionNotificationManager* handler) override;
     virtual void removeHandler(ECConnectionNotificationManager* handler) override;

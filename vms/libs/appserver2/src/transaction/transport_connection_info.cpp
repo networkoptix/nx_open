@@ -9,6 +9,7 @@ namespace ec2 {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     QnTransportConnectionInfo, (json), QnTransportConnectionInfo_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ConnectionInfoList, (json), ConnectionInfoList_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ConnectionInfos, (json), ConnectionInfos_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(P2pStats, (json), P2pStats_Fields)
 
 } // namespace ec2

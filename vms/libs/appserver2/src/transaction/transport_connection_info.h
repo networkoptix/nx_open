@@ -8,38 +8,49 @@
 #include <nx/utils/url.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/peer_data.h>
+#include <nx/vms/api/data/p2p_statistics_data.h>
 
 namespace ec2
 {
-    struct QnTransportConnectionInfo
-    {
-        QnUuid remotePeerId;
-        QnUuid remotePeerDbId;
-        nx::utils::Url url;
-        QString state;
-        QString previousState;
-        bool isIncoming = false;
-        bool isStarted = false;
-        bool gotPeerInfo = false;
-        nx::vms::api::PeerType peerType;
-        QVector<nx::vms::api::PersistentIdData> subscribedTo;
-        QVector<nx::vms::api::PersistentIdData> subscribedFrom;
-    };
+struct QnTransportConnectionInfo
+{
+    QnUuid remotePeerId;
+    QnUuid remotePeerDbId;
+    /**%apidoc:string */
+    nx::utils::Url url;
+    QString state;
+    QString previousState;
+    bool isIncoming = false;
+    bool isStarted = false;
+    bool gotPeerInfo = false;
+    nx::vms::api::PeerType peerType;
+    std::vector<nx::vms::api::PersistentIdData> subscribedTo;
+    std::vector<nx::vms::api::PersistentIdData> subscribedFrom;
+};
 
-    struct ConnectionInfoList
-    {
-        QVector<QnTransportConnectionInfo> connections;
-        nx::vms::api::PersistentIdData idData;
-    };
+struct ConnectionInfos
+{
+    std::vector<QnTransportConnectionInfo> connections;
+    nx::vms::api::PersistentIdData idData;
+};
 
 #define QnTransportConnectionInfo_Fields \
     (remotePeerId)(remotePeerDbId)(url)(state)(previousState)(isIncoming)(isStarted)(gotPeerInfo)(peerType) \
     (subscribedTo)(subscribedFrom)
 
-#define ConnectionInfoList_Fields \
+#define ConnectionInfos_Fields \
     (connections)(idData)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnTransportConnectionInfo, (json))
-QN_FUSION_DECLARE_FUNCTIONS(ConnectionInfoList, (json))
+QN_FUSION_DECLARE_FUNCTIONS(ConnectionInfos, (json))
+
+struct P2pStats
+{
+    QnUuid serverId;
+    nx::vms::api::P2pStatisticsData data;
+    ConnectionInfos connections;
+};
+#define P2pStats_Fields (serverId)(data)(connections)
+NX_VMS_API_DECLARE_STRUCT(P2pStats)
 
 } // namespace ec2
