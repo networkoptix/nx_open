@@ -14,7 +14,7 @@
       "projectTarget": "nx_vms_client_desktop_ut.exe (bin\\nx_vms_client_desktop_ut.exe)",
       "name": "nx_vms_client_desktop_ut.exe (bin\\nx_vms_client_desktop_ut.exe)",
       "args": [
-        "--gtest_filter=ClientStateHandlerTest.*:*SharedMemory*.*"
+        "--gtest_filter=*"
       ],
       "env": "PATH=${env.qtdir};${env.PATH}"
     },
