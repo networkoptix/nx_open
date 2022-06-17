@@ -84,7 +84,7 @@ public:
         const QnUuid& dstPeer, int* distance, nx::network::SocketAddress* knownPeerAddress) const override;
     virtual int distanceToPeer(const QnUuid& dstPeer) const override;
     virtual void dropConnections() override;
-    virtual ConnectionInfoList connectionsInfo() const override;
+    virtual ConnectionInfos connectionInfos() const override;
 
     template<class T> void sendTransaction(const ec2::QnTransaction<T>& tran);
 

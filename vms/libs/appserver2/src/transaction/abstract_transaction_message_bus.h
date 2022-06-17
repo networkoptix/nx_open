@@ -56,7 +56,7 @@ public:
 
     virtual void dropConnections() = 0;
 
-    virtual ConnectionInfoList connectionsInfo() const = 0;
+    virtual ConnectionInfos connectionInfos() const = 0;
 
     virtual void setHandler(ECConnectionNotificationManager* handler) = 0;
     virtual void removeHandler(ECConnectionNotificationManager* handler) = 0;

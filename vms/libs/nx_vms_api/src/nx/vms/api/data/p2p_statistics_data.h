@@ -7,22 +7,20 @@
 
 #include "data_macros.h"
 
-namespace nx {
-namespace vms {
-namespace api {
+namespace nx::vms::api {
 
 struct NX_VMS_API P2pStatisticsData
 {
     qint64 totalBytesSent = 0;
     qint64 totalDbData = 0;
+
+    /**%apidoc:object */
     QMap<QString, qint64> p2pCounters;
 };
 #define P2pStatisticsData_Fields \
     (totalBytesSent)(totalDbData)(p2pCounters)
 NX_VMS_API_DECLARE_STRUCT(P2pStatisticsData)
 
-} // namespace api
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::api
 
 Q_DECLARE_METATYPE(nx::vms::api::P2pStatisticsData)

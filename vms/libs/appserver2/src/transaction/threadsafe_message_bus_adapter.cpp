@@ -68,10 +68,10 @@ void ThreadsafeMessageBusAdapter::dropConnections()
     base_type::dropConnections();
 }
 
-ConnectionInfoList ThreadsafeMessageBusAdapter::connectionsInfo() const
+ConnectionInfos ThreadsafeMessageBusAdapter::connectionInfos() const
 {
     NX_MUTEX_LOCKER guard(&m_mutex);
-    return base_type::connectionsInfo();
+    return base_type::connectionInfos();
 }
 
 void ThreadsafeMessageBusAdapter::setHandler(ECConnectionNotificationManager* handler)

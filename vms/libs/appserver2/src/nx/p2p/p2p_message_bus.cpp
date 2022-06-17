@@ -1344,9 +1344,9 @@ ConnectionContext* MessageBus::context(const P2pConnectionPtr& connection)
     return static_cast<ConnectionContext*> (connection->opaqueObject());
 }
 
-ConnectionInfoList MessageBus::connectionsInfo() const
+ConnectionInfos MessageBus::connectionInfos() const
 {
-    ConnectionInfoList result;
+    ConnectionInfos result;
     NX_MUTEX_LOCKER lock(&m_mutex);
 
     auto remoteUrls = m_remoteUrls;
@@ -1365,8 +1365,10 @@ ConnectionInfoList MessageBus::connectionsInfo() const
             info.remotePeerDbId = connection->remotePeer().persistentId;
             info.isStarted = context->isLocalStarted;
             info.peerType = connection->remotePeer().peerType;
-            info.subscribedTo = context->localSubscription;
-            info.subscribedFrom = context->remoteSubscription.values.keys().toVector();
+            auto vLocal = context->localSubscription;
+            info.subscribedTo = std::vector<PersistentIdData>(vLocal.begin(), vLocal.end());
+            auto vRemote = context->remoteSubscription.values.keys().toVector();
+            info.subscribedFrom = std::vector<PersistentIdData>(vRemote.begin(), vRemote.end());
 
             // Has got peerInfo message from remote server. Open new connection is blocked
             // unless server have opening connection that hasn't got this answer from remote server
