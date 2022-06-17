@@ -260,7 +260,7 @@
     </message>
     <message>
       <source>Fixed</source>
-      <translation>修正済</translation>
+      <translation>固定</translation>
     </message>
     <message>
       <source>Scheduled</source>
@@ -268,7 +268,7 @@
     </message>
     <message>
       <source>Fix bandwidth to</source>
-      <translation>帯域幅を修正:</translation>
+      <translation>帯域幅を固定:</translation>
     </message>
     <message>
       <source>Mbit/s</source>
@@ -3000,7 +3000,7 @@
     </message>
     <message>
       <source>Advanced</source>
-      <translation>アドバンス</translation>
+      <translation>詳細</translation>
     </message>
     <message>
       <source>Allow using Client API</source>

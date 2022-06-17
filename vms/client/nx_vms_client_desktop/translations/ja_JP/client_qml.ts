@@ -408,11 +408,11 @@
     </message>
     <message>
       <source>Auto Calibration</source>
-      <translation>自動キャリブレーション</translation>
+      <translation>自動較正</translation>
     </message>
     <message>
       <source>Mount</source>
-      <translation>取付箇所</translation>
+      <translation>設置方法</translation>
     </message>
     <message>
       <source>Ceiling</source>
@@ -852,7 +852,7 @@ PTZを行います</translation>
     </message>
     <message>
       <source>to</source>
-      <translation>宛先</translation>
+      <translation>終了</translation>
     </message>
   </context>
   <context>
