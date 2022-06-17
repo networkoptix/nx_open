@@ -65,7 +65,7 @@ public:
             });
     }
 
-    // TODO: #ak Rename to updateStructSync() after removing the deprecated function.
+    // TODO: #akolesnikov Rename to updateStructSync() after removing the deprecated function.
     void updateStructSyncThrow();
 
     /**
