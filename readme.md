@@ -75,9 +75,9 @@ Python 3.8+ should be installed and available on `PATH` either as `python` or `p
     version of Python may be installed as well, but must appear on `PATH` as a symlink (this makes
     it not visible to Windows-native programs including `cmake`).
 - **Linux**:
-    - `distutils` must be installed explicitly:
+    - `distutils` and `pip` must be installed explicitly:
         ```
-        sudo apt install python3-distutils
+        sudo apt install python3-distutils python3-pip
         ```
     - **Ubuntu 18**: Make sure that the right version of Python is installed. First, check the
         currently installed version of `python3`:
@@ -140,7 +140,7 @@ directory `conan_cache/` next to the repository root and the build directories.
             ```
             sudo apt install ninja-build
             ```
-    - Install the following build dependencies:
+    - Install the following build and runtime dependencies:
         - zlib: `zlib1g-dev`
         - OpenAL: `libopenal-dev`
         - Mesa 3D: `mesa-common-dev`
@@ -155,12 +155,13 @@ directory `conan_cache/` next to the repository root and the build directories.
         - Zip archiver: `zip` (command, required for ARM distribution building)
         - Pkg-config: `pkg-config`
         - Autoconf: `autoconf`
+        - X C Binding, xinerama extension: `libxcb-xinerama0`
 
         A typical command to install all of the above:
         ```
         sudo apt install zlib1g-dev libopenal-dev mesa-common-dev libgl1-mesa-dev \
             libglu1-mesa-dev libldap2-dev libxfixes-dev libxss-dev libgstreamer1.0-0 \
-            libgstreamer-plugins-base1.0-0 libxslt1.1 pkg-config autoconf
+            libgstreamer-plugins-base1.0-0 libxslt1.1 pkg-config autoconf libxcb-xinerama0
         ```
     - **Ubuntu 20+**: Install `libtinfo5` library:
         ```
@@ -356,9 +357,9 @@ watch the "Output" window for the generetion stage progress.
 To build the solution, right-click on "vms Project" in "Solution Explorer" and select "Build All".
 Alternatively, build only the required project of the solution, for example, right-click on
 "desktop_client" and select "Build".
-    
+
 ### Running/debugging
-    
+
 To be able to run and debug the built Desktop Client from the IDE, the file `launch.vs.json` must
 be created in the `.vs/` directory which Visual Studio creates in the source (repository root)
 directory. You can copy the provided `launch.vs.json.template` example file in the repository root
