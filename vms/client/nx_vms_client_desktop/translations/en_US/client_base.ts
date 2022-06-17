@@ -10040,7 +10040,8 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message>
         <source>Someone may be impersonating %1 to steel your personal information.
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
-        <translation></translation>
+        <translation>Someone may be impersonating %1 to steal your personal information.
+Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
     </message>
     <message>
         <source>Pin</source>
