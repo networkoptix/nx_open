@@ -89,5 +89,7 @@ add_subdirectory(libs)
 include(cmake/distribution/common.cmake)
 add_subdirectory(vms)
 
+nx_create_dev_qt_conf()
+
 nx_save_known_files()
 nx_save_ninja_preprocessor_script()
