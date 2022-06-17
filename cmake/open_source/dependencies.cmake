@@ -6,12 +6,6 @@ if(LINUX)
     set(OS_DEPS_ROOT ${CONAN_OS_DEPS_FOR_DESKTOP_LINUX_ROOT})
     include(${OS_DEPS_ROOT}/os_deps.cmake)
 
-    set(addition_rpaths "")
-    string(APPEND addition_rpaths " -Wl,-rpath,${QT_DIR}/lib")
-
-    string(APPEND CMAKE_EXE_LINKER_FLAGS "${addition_rpaths}")
-    string(APPEND CMAKE_SHARED_LINKER_FLAGS "${addition_rpaths}")
-
     if(arch STREQUAL "arm")
         set(icu_version 52)
     else()
