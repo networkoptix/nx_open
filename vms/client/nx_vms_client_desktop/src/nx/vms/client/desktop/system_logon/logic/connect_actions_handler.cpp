@@ -574,18 +574,20 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
             if (NX_ASSERT(d->reconnectDialog))
                 d->reconnectDialog->setCurrentServer(server);
         });
+
+    const auto serverModuleInformation = connection->moduleInformation();
     connect(session.get(),
         &RemoteSession::reconnectFailed,
         this,
-        [this](RemoteConnectionErrorCode errorCode)
+        [this, serverModuleInformation](RemoteConnectionErrorCode errorCode)
         {
             executeDelayedParented(
-                [this, errorCode]()
+                [this, errorCode, serverModuleInformation]()
                 {
                     QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
                         context(),
                         errorCode,
-                        /*moduleInformation*/ {},
+                        serverModuleInformation,
                         commonModule()->engineVersion()
                     );
                 },
