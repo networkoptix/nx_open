@@ -23,7 +23,7 @@
   <String Id="InstallInstallButton">Instal·la</String>
   <String Id="InstallCloseButton">Tanca</String>
   <String Id="InstallAcceptCheckbox">Accepto</String>
-  <String Id="InstallLicenseLinkText">l\'acord de llicència d\'usuari final</String>
+  <String Id="InstallLicenseLinkText">L\'acord de llicència d\'usuari final</String>
   <String Id="OptionsHeader">Opcions de configuració</String>
   <String Id="OptionsLocationLabel">Ubicació de l\'instal·lació:</String>
   <String Id="OptionsBrowseButton">Explora</String>
