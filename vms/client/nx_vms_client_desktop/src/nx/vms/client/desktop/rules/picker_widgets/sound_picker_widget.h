@@ -13,7 +13,7 @@ class SoundPickerWidget: public PickerWidget
     Q_OBJECT
 
 public:
-    explicit SoundPickerWidget(QWidget* parent = nullptr);
+    SoundPickerWidget(common::SystemContext* context, QWidget* parent = nullptr);
     virtual ~SoundPickerWidget() override;
 
     virtual void setReadOnly(bool value) override;

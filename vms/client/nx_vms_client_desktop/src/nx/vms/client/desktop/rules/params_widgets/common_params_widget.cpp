@@ -9,8 +9,8 @@
 
 namespace nx::vms::client::desktop::rules {
 
-CommonParamsWidget::CommonParamsWidget(QWidget* parent):
-    ParamsWidget(parent)
+CommonParamsWidget::CommonParamsWidget(common::SystemContext* context, QWidget* parent):
+    ParamsWidget(context, parent)
 {
 }
 
@@ -22,7 +22,7 @@ void CommonParamsWidget::onDescriptorSet()
 
     for (const auto& fieldDescriptor: descriptor().fields)
     {
-        PickerWidget* picker = PickerFactory::createWidget(fieldDescriptor);
+        PickerWidget* picker = PickerFactory::createWidget(fieldDescriptor, systemContext());
         layout->addWidget(picker);
     }
 

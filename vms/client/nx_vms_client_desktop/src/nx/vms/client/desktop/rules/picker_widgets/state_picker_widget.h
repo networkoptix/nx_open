@@ -14,8 +14,8 @@ template<typename F>
 class StatePickerWidget: public FieldPickerWidget<F>
 {
 public:
-    explicit StatePickerWidget(QWidget* parent = nullptr):
-        FieldPickerWidget<F>(parent),
+    StatePickerWidget(common::SystemContext* context, QWidget* parent = nullptr):
+        FieldPickerWidget<F>(context, parent),
         ui(new Ui::StatePickerWidget)
     {
         ui->setupUi(this);

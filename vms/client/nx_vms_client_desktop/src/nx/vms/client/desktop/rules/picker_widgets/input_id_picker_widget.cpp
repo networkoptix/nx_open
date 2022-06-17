@@ -6,8 +6,8 @@
 
 namespace nx::vms::client::desktop::rules {
 
-InputIDPickerWidget::InputIDPickerWidget(QWidget* parent):
-    PickerWidget(parent),
+InputIDPickerWidget::InputIDPickerWidget(common::SystemContext* context, QWidget* parent):
+    PickerWidget(context, parent),
     ui(new Ui::InputIDPickerWidget)
 {
     ui->setupUi(this);

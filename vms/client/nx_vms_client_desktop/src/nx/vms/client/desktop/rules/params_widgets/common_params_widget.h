@@ -15,7 +15,7 @@ class CommonParamsWidget: public ParamsWidget
     Q_OBJECT
 
 public:
-    explicit CommonParamsWidget(QWidget* parent = nullptr);
+    CommonParamsWidget(common::SystemContext* context, QWidget* parent = nullptr);
 
 private:
     virtual void onDescriptorSet() override;

@@ -20,8 +20,8 @@ template<typename F>
 class MultilineTextPickerWidget: public FieldPickerWidget<F>
 {
 public:
-    explicit MultilineTextPickerWidget(QWidget* parent = nullptr):
-        FieldPickerWidget<F>(parent),
+    MultilineTextPickerWidget(common::SystemContext* context, QWidget* parent = nullptr):
+        FieldPickerWidget<F>(context, parent),
         ui(new Ui::MultilineTextPickerWidget)
     {
         ui->setupUi(this);

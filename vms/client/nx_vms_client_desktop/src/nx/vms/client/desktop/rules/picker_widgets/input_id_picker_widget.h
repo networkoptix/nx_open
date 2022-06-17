@@ -13,7 +13,7 @@ class InputIDPickerWidget: public PickerWidget
     Q_OBJECT
 
 public:
-    explicit InputIDPickerWidget(QWidget* parent = nullptr);
+    InputIDPickerWidget(common::SystemContext* context, QWidget* parent = nullptr);
     virtual ~InputIDPickerWidget() override;
 
     virtual void setReadOnly(bool value) override;

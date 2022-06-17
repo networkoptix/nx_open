@@ -17,8 +17,8 @@ template<typename F>
 class NumberPickerWidget: public FieldPickerWidget<F>
 {
 public:
-    explicit NumberPickerWidget(QWidget* parent = nullptr):
-        FieldPickerWidget<F>(parent)
+    NumberPickerWidget(common::SystemContext* context, QWidget* parent = nullptr):
+        FieldPickerWidget<F>(context, parent)
     {
         auto mainLayout = new QHBoxLayout;
         mainLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());

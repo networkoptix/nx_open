@@ -2,10 +2,13 @@
 
 #pragma once
 
+#include <optional>
+
 #include <QtCore/QPointer>
 #include <QtWidgets/QWidget>
 
 #include <nx/utils/log/assert.h>
+#include <nx/vms/common/system_context_aware.h>
 #include <nx/vms/rules/field.h>
 #include <nx/vms/rules/manifest.h>
 
@@ -15,12 +18,12 @@ namespace nx::vms::client::desktop::rules {
  * Base class for the data pickers. Represents and edit Field's data according to
  * the FieldDescriptor.
  */
-class PickerWidget: public QWidget
+class PickerWidget: public QWidget, public common::SystemContextAware
 {
     Q_OBJECT
 
 public:
-    explicit PickerWidget(QWidget* parent = nullptr);
+    PickerWidget(common::SystemContext* context, QWidget* parent = nullptr);
 
     /** Sets field descriptor the picker customization is depends on. */
     void setDescriptor(const vms::rules::FieldDescriptor& descriptor);
@@ -59,7 +62,10 @@ template<typename F>
 class FieldPickerWidget: public PickerWidget
 {
 public:
-    FieldPickerWidget(QWidget* parent = nullptr): PickerWidget(parent){}
+    FieldPickerWidget(common::SystemContext* context, QWidget* parent = nullptr):
+        PickerWidget(context, parent)
+    {
+    }
 
     virtual void setFields(const QHash<QString, vms::rules::Field*>& fields) override
     {

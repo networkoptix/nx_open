@@ -13,7 +13,7 @@ class QualityPickerWidget: public PickerWidget
     Q_OBJECT
 
 public:
-    explicit QualityPickerWidget(QWidget* parent = nullptr);
+    QualityPickerWidget(common::SystemContext* context, QWidget* parent = nullptr);
     virtual ~QualityPickerWidget() override;
 
     virtual void setReadOnly(bool value) override;

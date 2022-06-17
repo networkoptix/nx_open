@@ -6,8 +6,8 @@
 
 namespace nx::vms::client::desktop::rules {
 
-QualityPickerWidget::QualityPickerWidget(QWidget* parent):
-    PickerWidget(parent),
+QualityPickerWidget::QualityPickerWidget(common::SystemContext* context, QWidget* parent):
+    PickerWidget(context, parent),
     ui(new Ui::QualityPickerWidget)
 {
     ui->setupUi(this);

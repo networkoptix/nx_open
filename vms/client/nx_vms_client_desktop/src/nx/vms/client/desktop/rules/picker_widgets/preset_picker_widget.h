@@ -13,7 +13,7 @@ class PresetPickerWidget: public PickerWidget
     Q_OBJECT
 
 public:
-    explicit PresetPickerWidget(QWidget* parent = nullptr);
+    PresetPickerWidget(common::SystemContext* context, QWidget* parent = nullptr);
     virtual ~PresetPickerWidget() override;
 
     virtual void setReadOnly(bool value) override;

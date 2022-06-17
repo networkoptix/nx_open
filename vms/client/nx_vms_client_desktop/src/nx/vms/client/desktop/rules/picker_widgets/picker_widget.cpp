@@ -7,8 +7,9 @@ namespace nx::vms::client::desktop::rules {
 using Field = vms::rules::Field;
 using FieldDescriptor = vms::rules::FieldDescriptor;
 
-PickerWidget::PickerWidget(QWidget* parent):
-    QWidget(parent)
+PickerWidget::PickerWidget(common::SystemContext* context, QWidget* parent):
+    QWidget(parent),
+    common::SystemContextAware(context)
 {
 }
 
