@@ -94,6 +94,7 @@ using SharedGuard = ScopeGuard<SharedGuardCallback>;
 using SharedGuardPtr = std::shared_ptr<SharedGuard>;
 
 /**
+ * @param func is triggered when the last copy of the returned object is destroyed.
  * WARNING: It is not safe to fire shared guard explicitely in a multi-threaded environment.
  * So, to be on safe side, never do it!
  */
