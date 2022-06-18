@@ -362,11 +362,11 @@
     </message>
     <message>
       <source>Plugin is unavailable</source>
-      <translation>Plugin không có sẵn</translation>
+      <translation>Plugin không hợp lệ</translation>
     </message>
     <message>
       <source>Internal server error. %1</source>
-      <translation>Lỗi nội bộ máy chủ. %1</translation>
+      <translation>Lỗi máy chủ nội bộ. %1</translation>
     </message>
   </context>
   <context>
@@ -420,11 +420,11 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>Không thể để phân bổ đầu ra video với streaming.</translation>
+      <translation>Không thể phân bổ luồng đầu ra để ghi.</translation>
     </message>
     <message>
       <source>Could not perform direct stream copy because frame size is undefined.</source>
-      <translation>Có thể không được trực tiếp xem trực tiếp để sao chép, bởi vì định nghĩa của chưa quyết định kích thước khung hình bộ nhớ.</translation>
+      <translation>Không thể thực hiện sao chép luồng trực tiếp vì kích thước khung chưa được xác định.</translation>
     </message>
     <message>
       <source>Could not find codec %1.</source>
@@ -432,7 +432,7 @@
     </message>
     <message>
       <source>Video or audio codec is incompatible with container %1.</source>
-      <translation>Video hay mã hóa âm thanh và container %1 Không tương thích.</translation>
+      <translation>Mã hóa video hoặc âm thanh không tương thích với vùng chứa %1.</translation>
     </message>
   </context>
   <context>
@@ -458,11 +458,11 @@
     </message>
     <message>
       <source>Edge</source>
-      <translation>Cạnh</translation>
+      <translation>Biên</translation>
     </message>
     <message>
       <source>Vmax</source>
-      <translation>V-Max</translation>
+      <translation>Vmax</translation>
     </message>
     <message>
       <source>Video Wall</source>
@@ -502,7 +502,7 @@
     </message>
     <message>
       <source>Video Wall Licenses</source>
-      <translation>Giấy phép Bức tường Video</translation>
+      <translation>Giấy phép Tường Video</translation>
     </message>
     <message>
       <source>I/O Module Licenses</source>
@@ -510,7 +510,7 @@
     </message>
     <message>
       <source>Start Licenses</source>
-      <translation>Giấy phép Khởi đầu</translation>
+      <translation>Giấy phép Bắt đầu</translation>
     </message>
     <message>
       <source>Invalid</source>
@@ -534,7 +534,7 @@
     </message>
     <message>
       <source>Bridge</source>
-      <translation>Cầu</translation>
+      <translation>Cầu nối</translation>
     </message>
     <message>
       <source>Bridge Licenses</source>
@@ -549,37 +549,37 @@
     <message numerus="yes">
       <source>%n Analog Licenses</source>
       <translation>
-        <numerusform>%n Phép loại suy giấy phép</numerusform>
+        <numerusform>Giấy phép Analog %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Professional Licenses</source>
       <translation>
-        <numerusform>%n Giấy phép chuyên nghiệp</numerusform>
+        <numerusform>Giấy phép Chuyên nghiệp %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Edge Licenses</source>
       <translation>
-        <numerusform>%n Giấy phép cạnh</numerusform>
+        <numerusform>Giấy phép biên %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Vmax Licenses</source>
       <translation>
-        <numerusform>%n Giấy phép Vmax</numerusform>
+        <numerusform>Giấy phép Vmax %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Encoder Licenses</source>
       <translation>
-        <numerusform>%n Giấy phép phép loại suy encoder</numerusform>
+        <numerusform>Giấy phép Mã hóa Analog %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Video Wall Licenses</source>
       <translation>
-        <numerusform>%n Giấy phép bức tường video</numerusform>
+        <numerusform>Giấy phép Tường video %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -591,13 +591,13 @@
     <message numerus="yes">
       <source>%n Start Licenses</source>
       <translation>
-        <numerusform>%n Start giấy phép</numerusform>
+        <numerusform>Giấy phép Bắt đầu %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Bridge Licenses</source>
       <translation>
-        <numerusform>%n Giấy phép Cầu</numerusform>
+        <numerusform>Giấy phép Cầu nối %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -608,26 +608,26 @@
     </message>
     <message>
       <source>Free Licenses</source>
-      <translation>Bản quyền miễn phí</translation>
+      <translation>Giấy phép miễn phí</translation>
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
       <translation>
-        <numerusform>%n Bản quyền miễn phí</numerusform>
+        <numerusform>%n Giấy phép miễn phí</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Time Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n%1 Bản quyền theo thời gian</numerusform>
+        <numerusform>%n/%1 Giấy phép thời gian giới hạn</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Analog Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n%1 Phép loại suy giấy phép</numerusform>
+        <numerusform>%n/%1 Giấy phép Analog</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -641,7 +641,7 @@
       <source>%n/%1 Edge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n%1 Giấy phép cạnh</numerusform>
+        <numerusform>%n/%1 Giấy phép biên</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -655,42 +655,42 @@
       <source>%n/%1 Analog Encoder Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n%1 Giấy phép phép loại suy encoder</numerusform>
+        <numerusform>%n/%1 Giấy phép Mã hóa Analog</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Video Wall Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n%1 Giấy phép bức tường video</numerusform>
+        <numerusform>%n/%1 Giấy phép Tường video</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 I/O Module Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>Giấy phép Mô-đun I/O %n/%1</numerusform>
+        <numerusform>%n/%1 Giấy phép Mô-đun I/O</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Start Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n%1 Start giấy phép</numerusform>
+        <numerusform>%n/%1 Giấy phép Bắt đầu</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n%1 Bản quyền miễn phí</numerusform>
+        <numerusform>%n/%1 Giấy phép miễn phí</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Bridge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n%1 Giấy phép Cầu</numerusform>
+        <numerusform>%n/%1 Giấy phép Cầu nối</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -975,19 +975,19 @@
     <name>QnTranscoder</name>
     <message>
       <source>OpenCL transcoding is not implemented.</source>
-      <translation>OpenCL chuyển mã không được thực hiện.</translation>
+      <translation>Chuyển mã OpenCL không được triển khai.</translation>
     </message>
     <message>
       <source>Unknown transcoding method.</source>
-      <translation>Chế độ chuyển mã không rõ.</translation>
+      <translation>Phương thức chuyển mã không xác định.</translation>
     </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
-      <translation>OpenCL chuyển mã không được thực hiện.</translation>
+      <translation>Chuyển mã OpenCL không được triển khai.</translation>
     </message>
     <message>
       <source>Unknown transcode method</source>
-      <translation>Cách chuyển mã Unknown</translation>
+      <translation>Phương pháp chuyển mã không xác định</translation>
     </message>
   </context>
   <context>
@@ -1002,7 +1002,7 @@
     </message>
     <message>
       <source>Advanced Viewer</source>
-      <translation>Trình xem nâng cao</translation>
+      <translation>Người xem nâng cao</translation>
     </message>
     <message>
       <source>Viewer</source>
@@ -1010,11 +1010,11 @@
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation>Xem trực tiếp</translation>
+      <translation>Người xem trực tiếp</translation>
     </message>
     <message>
       <source>Custom Role</source>
-      <translation>Tùy chỉnh role</translation>
+      <translation>Tùy chỉnh vai trò</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1022,7 +1022,7 @@
     </message>
     <message>
       <source>Can manage all cameras and bookmarks.</source>
-      <translation>Có thể quản lý tất cả camea và bookmark.</translation>
+      <translation>Có thể quản lý tất cả các camera và dấu trang.</translation>
     </message>
     <message>
       <source>Can view all cameras and export video.</source>
@@ -1034,11 +1034,11 @@
     </message>
     <message>
       <source>Custom user role.</source>
-      <translation>Vai trò người dùng.</translation>
+      <translation>Tùy chỉnh Vai trò người dùng.</translation>
     </message>
     <message>
       <source>Custom permissions.</source>
-      <translation>Cho phép tùy chỉnh.</translation>
+      <translation>Quyền tùy chỉnh.</translation>
     </message>
     <message>
       <source>Has access to whole System and can do everything.</source>
@@ -1046,7 +1046,7 @@
     </message>
     <message>
       <source>Has access to whole System and can manage it. Can create users.</source>
-      <translation>Có quyền truy cập vào toàn bộ Hệ thống và có thể quản lý nó. Có thể tạo người dùng.</translation>
+      <translation>Có quyền truy cập vào toàn bộ Hệ thống và quản lý nó. Có thể tạo người dùng.</translation>
     </message>
   </context>
   <context>
@@ -1072,7 +1072,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>Không thể để phân bổ đầu ra video với streaming.</translation>
+      <translation>Không thể phân bổ luồng đầu ra để ghi.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
@@ -1115,14 +1115,14 @@
     </message>
     <message>
       <source>Damaged crypted stream header.</source>
-      <translation>Tiêu đề dòng mã hóa bị hỏng.</translation>
+      <translation>Tiêu đề luồng được mã hóa bị hỏng.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::event::StringsHelper</name>
     <message>
       <source>Bookmark</source>
-      <translation>Bookmark</translation>
+      <translation>Dấu trang</translation>
     </message>
     <message>
       <source>Panic recording</source>
@@ -1130,7 +1130,7 @@
     </message>
     <message>
       <source>Write to log</source>
-      <translation>Ghi vào kỷ lục</translation>
+      <translation>Ghi vào nhật ký</translation>
     </message>
     <message>
       <source>Repeat sound</source>
@@ -1138,7 +1138,7 @@
     </message>
     <message>
       <source>Play sound</source>
-      <translation>Nghe âm thanh</translation>
+      <translation>Phát âm thanh</translation>
     </message>
     <message>
       <source>Speak</source>
@@ -1146,7 +1146,7 @@
     </message>
     <message>
       <source>Execute PTZ preset</source>
-      <translation>Thực PTZ cài sẵn</translation>
+      <translation>Thực thi cài đặt trước PTZ</translation>
     </message>
     <message>
       <source>Show text overlay</source>
@@ -1154,7 +1154,7 @@
     </message>
     <message>
       <source>Show on Alarm Layout</source>
-      <translation>Hiển thị trên diện cảnh báo</translation>
+      <translation>Hiển thị trên Bố cục cảnh báo</translation>
     </message>
     <message>
       <source>Do HTTP request</source>
@@ -1208,7 +1208,7 @@
     </message>
     <message>
       <source>Any Server Issue</source>
-      <translation>Bất kỳ vấn đề máy chủ</translation>
+      <translation>Mọi vấn đề về máy chủ</translation>
     </message>
     <message>
       <source>Any Event</source>
@@ -1241,26 +1241,26 @@
     <message numerus="yes">
       <source>Devices IP Conflict</source>
       <translation>
-        <numerusform>Thiết bị xung đột IP</numerusform>
+        <numerusform>Xung đột IP của thiết bị</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras IP Conflict</source>
       <translation>
-        <numerusform>Camera xung đột IP</numerusform>
+        <numerusform>Xung đột IP của camera</numerusform>
       </translation>
     </message>
     <message>
       <source>Any Device Issue</source>
-      <translation>Bất kỳ vấn đề thiết bị</translation>
+      <translation>Mọi vấn đề về thiết bị</translation>
     </message>
     <message>
       <source>Any Camera Issue</source>
-      <translation>Bất kỳ hành máy ảnh</translation>
+      <translation>Mọi vấn đề về camera</translation>
     </message>
     <message>
       <source>Undefined event has occurred on %1</source>
-      <translation>Sự kiện không xác định trong %1</translation>
+      <translation>Sự kiện không xác định đã xảy ra vào %1</translation>
     </message>
     <message>
       <source>Device %1 was disconnected</source>
@@ -1268,7 +1268,7 @@
     </message>
     <message>
       <source>Camera %1 was disconnected</source>
-      <translation>Máy ảnh %1 đã được ngắt kết nối</translation>
+      <translation>Camera %1 đã bị ngắt kết nối</translation>
     </message>
     <message>
       <source>I/O Module %1 was disconnected</source>
@@ -1527,7 +1527,7 @@
     <message>
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
-      <translation>%1 đến %2</translation>
+      <translation>%1 tại %2</translation>
     </message>
     <message>
       <source>Storage Issue</source>
@@ -1535,23 +1535,23 @@
     </message>
     <message>
       <source>Storage Issue at %1</source>
-      <translation>Vấn đề lưu trữ ở %1</translation>
+      <translation>Vấn đề lưu trữ tại %1</translation>
     </message>
     <message>
       <source>Set to fullscreen</source>
-      <translation>Chuyển sang màn hình đầy đủ</translation>
+      <translation>Đặt thành toàn màn hình</translation>
     </message>
     <message>
       <source>Exit fullscreen</source>
-      <translation>Để lại toàn màn hình</translation>
+      <translation>Thoát toàn màn hình</translation>
     </message>
     <message>
       <source>Open layout</source>
-      <translation>Mở bố trí</translation>
+      <translation>Mở bố cục</translation>
     </message>
     <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation>Không thể ép buộc sử dụng thời gian camera, nó bị trễ quá nhiều, thời gian hệ thống sẽ được sử dụng</translation>
+      <translation>Không thể bắt buộc sử dụng thời gian của camera, nó bị trễ quá nhiều, sẽ sử dụng thời gian hệ thống</translation>
     </message>
     <message>
       <source>Camera time is back to normal</source>
@@ -1559,7 +1559,7 @@
     </message>
     <message>
       <source>Multiple %1 events have occurred</source>
-      <translation>Nhiều %1 sự kiện đã xảy ra</translation>
+      <translation>Nhiều sự kiện %1 đã xảy ra</translation>
     </message>
     <message>
       <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
@@ -1579,7 +1579,7 @@
     </message>
     <message>
       <source>Plugin Diagnostic Event</source>
-      <translation>Plugin chẩn đoán sự kiện</translation>
+      <translation>Sự kiện chẩn đoán plugin</translation>
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
@@ -1591,11 +1591,11 @@
     </message>
     <message>
       <source>Buzzer</source>
-      <translation>Bộ rung</translation>
+      <translation>Buzzer</translation>
     </message>
     <message>
       <source>Archive Backup Finished</source>
-      <translation>Hoàn thành sao lưu video</translation>
+      <translation>Hoàn thành sao lưu bộ lưu trữ</translation>
     </message>
     <message>
       <source>PoE over Budget</source>
@@ -1607,11 +1607,11 @@
     </message>
     <message>
       <source>PoE over budget at %1</source>
-      <translation>Quá tải PoE ở %1</translation>
+      <translation>Quá tải PoE tại %1</translation>
     </message>
     <message>
       <source>Fan error at %1</source>
-      <translation>Lỗi quạt ở %1</translation>
+      <translation>Lỗi quạt tại %1</translation>
     </message>
     <message>
       <source>Reason: Power limit exceeded (%1)</source>
@@ -1628,7 +1628,7 @@
     </message>
     <message>
       <source>Consumption</source>
-      <translation>Tiêu dùng</translation>
+      <translation>Mức tiêu thụ</translation>
     </message>
     <message>
       <source>Device was disconnected</source>
@@ -1636,7 +1636,7 @@
     </message>
     <message>
       <source>Camera was disconnected</source>
-      <translation>Máy ảnh bị ngắt kết nối</translation>
+      <translation>Camera bị ngắt kết nối</translation>
     </message>
     <message>
       <source>I/O Module was disconnected</source>
@@ -1648,7 +1648,7 @@
     </message>
     <message>
       <source>RTP error in secondary stream (%1)</source>
-      <translation>Lỗi RTP trong luồng thứ cấp (%1)</translation>
+      <translation>Lỗi RTP trong luồng phụ (%1)</translation>
     </message>
     <message>
       <source>Analytics Object Detected</source>
@@ -1665,7 +1665,7 @@
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
-      <translation>Phân tích bộ nhớ &quot;%1&quot; Lỗi DB: Không đủ quyền tại điểm gắn kết.</translation>
+      <translation>Bộ nhớ Phân tích &quot;%1&quot; Lỗi DB: Không đủ quyền tại điểm gắn kết.</translation>
     </message>
     <message>
       <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
@@ -1704,7 +1704,7 @@
     <name>utils::QnCameraNamesWatcher</name>
     <message>
       <source>Removed camera</source>
-      <translation>Di chuyển máy ảnh</translation>
+      <translation>Camera bị xóa</translation>
     </message>
   </context>
 </TS>

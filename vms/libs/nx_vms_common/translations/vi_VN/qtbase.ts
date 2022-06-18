@@ -715,14 +715,14 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>%1 byte(s)</source>
-      <translation>%1 byte(s)</translation>
+      <translation>%1 byte</translation>
     </message>
   </context>
   <context>
     <name>QGnomeTheme</name>
     <message>
       <source>&amp;OK</source>
-      <translation>&amp;Xác nhận</translation>
+      <translation>&amp;OK</translation>
     </message>
     <message>
       <source>&amp;Save</source>
@@ -980,7 +980,7 @@ Do you want to delete it anyway?</source>
     <name>QSaveFile</name>
     <message>
       <source>Existing file %1 is not writable</source>
-      <translation>Tập tin hiện tại %1 không thể chỉnh sửa</translation>
+      <translation>Tập tin %1 hiện tại không thể ghi</translation>
     </message>
     <message>
       <source>Filename refers to a directory</source>
@@ -988,7 +988,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Writing canceled by application</source>
-      <translation>Chỉnh sửa bị hủy bỏ</translation>
+      <translation>Ứng dụng hủy chế độ ghi</translation>
     </message>
   </context>
   <context>
@@ -1098,7 +1098,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Shared Data</source>
-      <translation>Dữ liệu chung</translation>
+      <translation>Dữ liệu được chia sẻ</translation>
     </message>
     <message>
       <source>Runtime</source>
@@ -1110,11 +1110,11 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Shared Configuration</source>
-      <translation>Cấu hình chung</translation>
+      <translation>Cấu hình được chia sẻ</translation>
     </message>
     <message>
       <source>Shared Cache</source>
-      <translation>Bộ nhớ đệm chung</translation>
+      <translation>Bộ nhớ đệm được chia sẻ</translation>
     </message>
     <message>
       <source>Download</source>
