@@ -781,11 +781,11 @@
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation>Một số camera yêu cầu mật khẩu được thiết lập</translation>
+      <translation>Một số camera yêu cầu thiết lập mật khẩu</translation>
     </message>
     <message>
       <source>Export Video...</source>
-      <translation>Xuất hình ảnh...</translation>
+      <translation>Xuất video...</translation>
     </message>
     <message>
       <source>Export Bookmark...</source>
@@ -797,7 +797,7 @@
     </message>
     <message>
       <source>Cell Aspect Ratio...</source>
-      <translation>Khuôn tỉ lệ...</translation>
+      <translation>Tỷ lệ ô khung hình...</translation>
     </message>
     <message>
       <source>Screen Settings...</source>
@@ -825,7 +825,7 @@
     </message>
     <message>
       <source>Hide Thumbnails</source>
-      <translation>Không hiển thị thumbnail</translation>
+      <translation>Ẩn hình thu nhỏ</translation>
     </message>
     <message>
       <source>Virtual Camera...</source>
@@ -853,7 +853,7 @@
     </message>
     <message>
       <source>Files...</source>
-      <translation>Văn khố...</translation>
+      <translation>Tập tin...</translation>
     </message>
     <message>
       <source>Switch to Notifications tab</source>
@@ -881,7 +881,7 @@
     </message>
     <message>
       <source>Unpin Calendar</source>
-      <translation>Lịch Unpin</translation>
+      <translation>Bỏ ghim lịch</translation>
     </message>
     <message>
       <source>Page...</source>
@@ -1058,7 +1058,7 @@
     </message>
     <message>
       <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
-      <translation>ID phần cứng của máy chủ có giấy phép này không khớp với ID phần cứng mà giấy phép được kích hoạt.</translation>
+      <translation>ID phần cứng của Máy chủ có giấy phép này không khớp với ID phần cứng mà giấy phép đã được kích hoạt.</translation>
     </message>
   </context>
   <context>
@@ -1635,7 +1635,7 @@
     </message>
     <message>
       <source>Regional / License support</source>
-      <translation>Khu vực / Hỗ trợ giấy phép</translation>
+      <translation>Bộ phận hỗ trợ khu vực / giấy phép</translation>
     </message>
   </context>
   <context>
@@ -1688,15 +1688,15 @@
     </message>
     <message>
       <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
-      <translation>Giúp tránh các vấn đề với OpenGL vẽ mà kết quả trong tải CPU 100%.</translation>
+      <translation>Giúp tránh các sự cố với bản vẽ OpenGL dẫn đến tải CPU 100%.</translation>
     </message>
     <message>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
-      <translation>Điều chỉnh thành giá trị nhỏ nhất không làm giảm chất lượng của chế độ xem trực tiếp. Bộ đệm lớn hơn giúp phát lại mượt mà hơn nhưng tăng độ trễ giữa thời gian thực và chế độ xem trực tiếp; bộ đệm nhỏ hơn làm giảm độ trễ nhưng có thể làm cho nó không trơn tru.</translation>
+      <translation>Điều chỉnh thành giá trị nhỏ nhất không làm giảm chất lượng của chế độ xem trực tiếp. Bộ đệm lớn hơn giúp phát lại mượt mà hơn nhưng tăng độ trễ giữa thời gian thực và chế độ xem trực tiếp; bộ đệm nhỏ hơn làm giảm độ trễ nhưng có thể khiến video không được mượt mà.</translation>
     </message>
     <message>
       <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
-      <translation>Cảnh báo! Đây là một tùy chọn thử nghiệm giúp tiết kiệm CPU nhưng có thể ảnh hưởng đến hoạt hình.</translation>
+      <translation>Cảnh báo! Đây là một tùy chọn thử nghiệm giúp tiết kiệm mức sử dụng CPU nhưng có thể ảnh hưởng đến chất lượng hình ảnh.</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -1854,14 +1854,14 @@
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
       <translation>
-        <numerusform>Chi tiết cho %n phiên %1</numerusform>
+        <numerusform>Chi tiết cho phiên %n của %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
       <translation>
-        <numerusform>Chi tiết cho %n camera của %1</numerusform>
+        <numerusform>Chi tiết cho camera %n của %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2005,12 +2005,12 @@
     </message>
     <message>
       <source>Update installed</source>
-      <translation>Cập nhật cài đặt</translation>
+      <translation>Đã cài đặt bản cập nhật</translation>
     </message>
     <message numerus="yes">
       <source>%n actions</source>
       <translation>
-        <numerusform>%n hành động</numerusform>
+        <numerusform>%n thao tác</numerusform>
       </translation>
     </message>
     <message>
@@ -2197,7 +2197,7 @@
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
       <translation>
-        <numerusform>Nguồn và %n máy ảnh khác</numerusform>
+        <numerusform>Nguồn và %n camera khác</numerusform>
       </translation>
     </message>
     <message>
@@ -2255,7 +2255,7 @@
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
-      <translation>Buộc công nhận sẽ chỉ hoạt động cho các sự kiện chung nếu số nhận dạng camera được sử dụng trong URL sự kiện chung</translation>
+      <translation>Buộc công nhận sẽ chỉ hoạt động cho Sự kiện chung nếu mã xác nhận camera được sử dụng trong URL Sự kiện chung</translation>
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
@@ -2565,7 +2565,7 @@
     </message>
     <message>
       <source>Logical ID</source>
-      <translation>ID hợp lý</translation>
+      <translation>ID logic</translation>
     </message>
   </context>
   <context>
@@ -2710,7 +2710,7 @@ to %1</source>
     <message>
       <source>All %1 users will be deleted.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>Tất cả %1 người dùng sẽ bị xóa.</translation>
+      <translation>Tất cả người dùng %1 sẽ bị xóa.</translation>
     </message>
     <message>
       <source>You will be logged out.</source>
@@ -2828,7 +2828,7 @@ to %1</source>
       <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
       <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
       <translation>
-        <numerusform>%n trên %1 người dùng được chọn không phải là %2 người dùng và sẽ không nhận được thông báo di động.</numerusform>
+        <numerusform>%n trên %1 người dùng được chọn không phải là người dùng %2 và sẽ không nhận được thông báo di động.</numerusform>
       </translation>
     </message>
   </context>
@@ -2902,7 +2902,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
-      <translation>Không thể vào chế độ tương thích cho phiên bản %1</translation>
+      <translation>Không vào được chế độ tương thích cho phiên bản %1</translation>
     </message>
     <message>
       <source>System is not compatible with two-factor authentication</source>
@@ -2917,27 +2917,27 @@ to %1</source>
     <name>QnCustomBusinessEventWidget</name>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation>Nếu lĩnh vực này là trống rỗng, sự kiện sẽ luôn luôn kích hoạt.</translation>
+      <translation>Nếu trường trống, sẽ luôn kích hoạt sự kiện.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
-      <translation>Sự kiện sẽ kích hoạt chỉ khi có những trận đấu trong nguồn với bất kỳ từ khóa đã nhập.</translation>
+      <translation>Sự kiện sẽ chỉ kích hoạt nếu có các kết quả khớp với các từ khóa nào đã nhập.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>Sự kiện sẽ kích hoạt chỉ khi có những trận đấu trong chú thích với bất kỳ từ khóa đã nhập.</translation>
+      <translation>Sự kiện sẽ chỉ kích hoạt nếu có kết quả khớp với chú thích của từ khóa đã nhập.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
-      <translation>Sự kiện sẽ kích hoạt chỉ khi có những trận đấu trong mô tả với bất kỳ từ khóa đã nhập.</translation>
+      <translation>Sự kiện sẽ chỉ kích hoạt nếu có kết quả khớp với phần mô tả của từ khóa nào đã nhập.</translation>
     </message>
     <message>
       <source>Server API</source>
-      <translation>Máy chủ API</translation>
+      <translation>API Máy chủ</translation>
     </message>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
-      <translation>Để tạo ra sự kiện chung chung, vui lòng tham khảo %1.</translation>
+      <translation>Để tạo Sự kiện chung, vui lòng tham khảo %1.</translation>
     </message>
   </context>
   <context>
@@ -2992,7 +2992,7 @@ to %1</source>
     </message>
     <message>
       <source>Database Backup Files</source>
-      <translation>Cơ sở dữ liệu tập tin sao lưu</translation>
+      <translation>Tệp sao lưu cơ sở dữ liệu</translation>
     </message>
     <message>
       <source>Save Database Backup</source>
@@ -5021,19 +5021,19 @@ to %1</source>
     </message>
     <message>
       <source>PASSWORD REQUIRED</source>
-      <translation>MẬT KHẨU ĐƯỢC YÊU CÂU</translation>
+      <translation>YÊU CÂU MẬT KHẨU</translation>
     </message>
     <message>
       <source>Set for this Camera</source>
-      <translation>Đặt cho Máy ảnh này</translation>
+      <translation>Đặt cho camera này</translation>
     </message>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
-      <translation>KHÔNG HỖ TRỢ FIRMWARE CHO PHIÊN BẢN NÀY</translation>
+      <translation>PHIÊN BẢN FIRMWARE KHÔNG ĐƯỢC HỖ TRỢ</translation>
     </message>
     <message>
       <source>NOT ENOUGH LICENSES</source>
-      <translation>KHÔNG CẤP BẢN QUYỀN</translation>
+      <translation>KHÔNG ĐỦ GIẤY PHÉP</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -5088,11 +5088,11 @@ to %1</source>
     </message>
     <message>
       <source>Last 5 minutes</source>
-      <translation>5 phút cuối</translation>
+      <translation>5 phút qua</translation>
     </message>
     <message>
       <source>Last 60 minutes</source>
-      <translation>60 phút cuối</translation>
+      <translation>60 phút qua</translation>
     </message>
     <message>
       <source>Last 24 hours</source>
@@ -5100,11 +5100,11 @@ to %1</source>
     </message>
     <message>
       <source>Longest period available</source>
-      <translation>Thời gian dài nhất có sẵn</translation>
+      <translation>Thời gian dài nhất khả dụng</translation>
     </message>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
-      <translation>Dự báo chỉ có sẵn cho camera có kích hoạt ghi.</translation>
+      <translation>Dự báo chỉ khả dụng cho các camera có bật ghi hình.</translation>
     </message>
   </context>
   <context>
@@ -5232,11 +5232,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Reserved</source>
-      <translation>Dự trữ</translation>
+      <translation>Đã đặt trước</translation>
     </message>
     <message>
       <source>local</source>
-      <translation>cục bộ</translation>
+      <translation>nội bộ</translation>
     </message>
     <message>
       <source>ram</source>
@@ -5244,11 +5244,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>optical</source>
-      <translation>quang</translation>
+      <translation>quang học</translation>
     </message>
     <message>
       <source>swap</source>
-      <translation>swap</translation>
+      <translation>hoán đổi</translation>
     </message>
     <message>
       <source>network</source>
@@ -5260,7 +5260,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>%1 TB</source>
-      <translation>%1 Tb</translation>
+      <translation>%1 TB</translation>
     </message>
     <message>
       <source>smb</source>
@@ -5472,7 +5472,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Archive integrity problem detected</source>
-      <translation>Đã phát hiện vấn đề toàn vẹn lưu trữ</translation>
+      <translation>Đã phát hiện sự cố về tính toàn vẹn của kho lưu trữ</translation>
     </message>
     <message>
       <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
@@ -5486,7 +5486,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation>Một số máy ảnh yêu cầu mật khẩu được thiết lập</translation>
+      <translation>Một số camera yêu cầu thiết lập mật khẩu</translation>
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
@@ -5525,7 +5525,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
-      <translation>Bao gồm các thông tin về hệ thống, chẳng hạn như mô hình camera và các phiên bản phần vững, số lượng máy chủ, vv.</translation>
+      <translation>Bao gồm các thông tin về hệ thống, chẳng hạn như mã camera và các phiên bản firmware, số lượng máy chủ, vv.</translation>
     </message>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
@@ -5533,15 +5533,15 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
-      <translation>Cho phép tự động phát hiện thiết bị và máy chủ và kiểm tra trạng thái thiết bị tự động</translation>
+      <translation>Bật tính năng tự động phát hiện thiết bị và máy chủ và kiểm tra trạng thái thiết bị tự động</translation>
     </message>
     <message>
       <source>Enable cameras and servers autodiscovery and automated camera status check</source>
-      <translation>Cho phép tự động phát hiện camera và máy chủ và kiểm tra trạng thái camera tự động</translation>
+      <translation>Bật tính năng tự động phát hiện camera và máy chủ cũng như kiểm tra trạng thái camera tự động</translation>
     </message>
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
-      <translation>Khi được bật, hệ thống liên tục phát hiện các camera và máy chủ mới và gửi yêu cầu khám phá tới các camera để cập nhật trạng thái.</translation>
+      <translation>Khi được bật, hệ thống sẽ liên tục phát hiện các camera và máy chủ mới và gửi yêu cầu khám phá tới các camera để cập nhật trạng thái.</translation>
     </message>
     <message>
       <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
@@ -6315,7 +6315,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
       <translation>
-        <numerusform>Bạn có thể tải các tệp này lên một phiên bản khác của camera ảo.</numerusform>
+        <numerusform>Bạn có thể tải các tệp này lên một phiên bản camera ảo khác.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6388,7 +6388,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>%1 does not have timestamp.</source>
       <comment>Filename will be substituted</comment>
-      <translation>%1 - không có dấu thời gian.</translation>
+      <translation>%1 không có dấu thời gian.</translation>
     </message>
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
@@ -10249,7 +10249,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Action requires some parameters to be filled.</source>
-      <translation>Hành động yêu cầu một số tham số được điền.</translation>
+      <translation>Thao tác yêu cầu điền một vài tham số.</translation>
     </message>
     <message>
       <source>Open</source>

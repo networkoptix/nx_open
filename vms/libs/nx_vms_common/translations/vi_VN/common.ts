@@ -1665,7 +1665,7 @@
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
-      <translation>Phân tích bộ nhớ &quot;%1&quot; Lỗi DB: Không đủ quyền tại điểm gắn kết.</translation>
+      <translation>Bộ nhớ Phân tích &quot;%1&quot; Lỗi DB: Không đủ quyền tại điểm gắn kết.</translation>
     </message>
     <message>
       <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
@@ -1704,7 +1704,7 @@
     <name>utils::QnCameraNamesWatcher</name>
     <message>
       <source>Removed camera</source>
-      <translation>Di chuyển máy ảnh</translation>
+      <translation>Camera bị xóa</translation>
     </message>
   </context>
 </TS>

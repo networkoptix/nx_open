@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Connecting clients will be updated to version %1 on %2.</source>
-      <translation>接続クライアントは %2 のバージョン %1 に更新されます。</translation>
+      <translation>接続クライアントは %2 にバージョン %1 へ更新されます。</translation>
     </message>
     <message>
       <source>Check for updates</source>
