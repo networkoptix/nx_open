@@ -72,6 +72,9 @@ public:
     // For Qn::CustomUserRole and Qn::CustomPermissions returns null uuid.
     static QnUuid predefinedRoleId(Qn::UserRole userRole);
 
+    // Returns pseudo-uuid for predefined user role according to permissions preset.
+    static std::optional<QnUuid> predefinedRoleId(GlobalPermissions permissions);
+
     // Returns list of ids of predefined admin roles.
     static const QList<QnUuid>& adminRoleIds();
 

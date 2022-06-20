@@ -27,7 +27,7 @@ public:
     /** List of all subjects of the resources access: users and roles (excl. predefined). */
     std::unordered_set<QnResourceAccessSubject> allSubjects() const;
 
-    /** List of all subjects included in the role (without recursion). */
+    /** List of all subjects included in the role (without recursion, predefined roles are also supported). */
     std::unordered_set<QnResourceAccessSubject> subjectsInRole(const QnUuid& roleId) const;
 
     /** List of users, belonging to given role (including recursive roles, predefined roles are also supported). */
@@ -50,9 +50,13 @@ private:
     void removeUserFromRole(const QnUserResourcePtr& user, const QnUuid& roleId);
 
     void updateSubjectRoles(
-        const QnResourceAccessSubject& subject, const std::vector<QnUuid>& newRoleIds);
+        const QnResourceAccessSubject& subject,
+        const std::vector<QnUuid>& newRoleIds,
+        GlobalPermissions rawPermissions);
     void updateSubjectRoles(
-        const QnResourceAccessSubject& subject, const std::vector<QnUuid>& newRoleIds,
+        const QnResourceAccessSubject& subject,
+        const std::vector<QnUuid>& newRoleIds,
+        GlobalPermissions rawPermissions,
         const nx::MutexLocker& lock);
 
     template<typename Action>
