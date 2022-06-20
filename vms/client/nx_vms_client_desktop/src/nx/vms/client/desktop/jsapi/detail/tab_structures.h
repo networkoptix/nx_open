@@ -85,8 +85,9 @@ NX_REFLECTION_INSTRUMENT(ItemSelection, (focusedItem)(selectedItems))
 struct LayoutProperties
 {
     std::optional<Size> minimumSize;
+    std::optional<bool> locked;
 };
-NX_REFLECTION_INSTRUMENT(LayoutProperties, (minimumSize))
+NX_REFLECTION_INSTRUMENT(LayoutProperties, (minimumSize)(locked))
 
 /** Represent full state of the tab. */
 struct State

@@ -47,6 +47,7 @@ LayoutProperties propertiesState(QnWorkbenchLayout* layout)
     {
         result.minimumSize = Size{minimumSize.width(), minimumSize.height()};
     }
+    result.locked = layout->locked();
     return result;
 }
 
@@ -116,9 +117,7 @@ struct TabApiBackend::Private: public QObject
 
     void handleResourceWidgetAdded(QnResourceWidget* widget);
 
-    bool hasPermission(
-        const QnResourcePtr& resource,
-        const Qn::Permission permission);
+    bool hasPermissions(const QnResourcePtr& resource, Qn::Permissions permissions);
 
     void handleSliderChanged();
 };
@@ -625,11 +624,10 @@ void TabApiBackend::Private::handleResourceWidgetAdded(QnResourceWidget* widget)
     handleSelectedStateChanged(widget);
 }
 
-bool TabApiBackend::Private::hasPermission(
-    const QnResourcePtr& resource,
-    const Qn::Permission permission)
+bool TabApiBackend::Private::hasPermissions(
+    const QnResourcePtr& resource, Qn::Permissions permissions)
 {
-    return context->accessController()->hasPermissions(resource, permission);
+    return context->accessController()->hasPermissions(resource, permissions);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -691,7 +689,7 @@ ItemResult TabApiBackend::addItem(
             tr("Cannot specify a media parameters for the resource without media stream.")));
     }
 
-    if (!d->hasPermission(resource, Qn::ViewContentPermission))
+    if (!d->hasPermissions(resource, Qn::ViewContentPermission))
         return d->itemOperationResult(Error::denied());
 
     const auto actionParams = ui::action::Parameters(resource);
@@ -779,12 +777,23 @@ Error TabApiBackend::setLayoutProperties(const LayoutProperties& properties)
     if (!d->layout)
         return Error::failed();
 
-    if (!d->hasPermission(d->layout->resource(), Qn::WritePermission))
-        return Error::denied();
+    Qn::Permissions requiredPermissions;
+    if (properties.locked.has_value())
+        requiredPermissions |= Qn::EditLayoutSettingsPermission;
+
+    if (properties.minimumSize.has_value())
+        requiredPermissions |= Qn::SavePermission;
 
     const auto layoutResource = d->layout->resource();
-    const auto size = properties.minimumSize.value_or(Size{0, 0});
-    layoutResource->setFixedSize(QSize(size.width, size.height));
+    if (!d->hasPermissions(layoutResource, requiredPermissions))
+        return Error::denied();
+
+    if (auto locked = properties.locked)
+        layoutResource->setLocked(*locked);
+
+    if (auto size = properties.minimumSize)
+        layoutResource->setFixedSize(QSize(size->width, size->height));
+
     return Error::success();
 }
 
@@ -793,7 +802,7 @@ Error TabApiBackend::saveLayout()
     if (!d->layout)
         return Error::failed();
 
-    if (!d->hasPermission(d->layout->resource(), Qn::SavePermission))
+    if (!d->hasPermissions(d->layout->resource(), Qn::SavePermission))
         return Error::denied();
 
     const auto layoutResource = d->layout->resource();
