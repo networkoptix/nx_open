@@ -262,7 +262,7 @@ void ServerCertificateViewer::pinCertificate()
     message.setIcon(QnMessageBox::Icon::Question);
     message.setText(tr("Pin this certificate to %1?").arg(name));
     message.setInformativeText(
-        tr("Someone may be impersonating %1 to steel your personal information.\n"
+        tr("Someone may be impersonating %1 to steal your personal information.\n"
             "Do not pin this certificate if you didn't modify %2 server SSL certificate.")
             .arg(name, name));
     message.addButton(
