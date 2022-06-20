@@ -140,6 +140,7 @@ if(WINDOWS)
         -D_WINSOCKAPI_=
         -DNOMINMAX=
         -DUNICODE
+        -DWIN32_LEAN_AND_MEAN
     )
 endif()
 

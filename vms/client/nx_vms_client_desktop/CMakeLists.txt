@@ -138,6 +138,7 @@ nx_add_target(nx_vms_client_desktop LIBRARY
         hidapi::hidapi
         range-v3::range-v3
     FOLDER client/libs
+    GDI
     MACOS_ARG_MAX_WORKAROUND
 )
 nx_make_target_translatable(nx_vms_client_desktop)

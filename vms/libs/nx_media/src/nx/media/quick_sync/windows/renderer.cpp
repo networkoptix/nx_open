@@ -2,6 +2,9 @@
 
 #ifdef _WIN32
 
+#include <Windows.h>
+#include <wingdi.h>
+
 #include <QtGui/QOffscreenSurface>
 #include <QtGui/QOpenGLContext>
 #include <QtPlatformHeaders/QWGLNativeContext>

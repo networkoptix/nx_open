@@ -8,7 +8,6 @@
 #include <QtMultimedia/QAudioInput>
 
 #include <nx/streaming/audio_data_packet.h>
-#include <core/resource/resource.h>
 #include <utils/media/voice_spectrum_analyzer.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 
@@ -19,7 +18,7 @@ class QnAbstractDataConsumer;
 class NX_VMS_CLIENT_CORE_API QnDesktopDataProviderBase : public QnAbstractMediaStreamDataProvider
 {
 public:
-    QnDesktopDataProviderBase(QnResourcePtr ptr);
+    QnDesktopDataProviderBase(const QnResourcePtr& ptr);
 
     static void stereoAudioMux(qint16* a1, qint16* a2, int lenInShort);
     static void monoToStereo(qint16* dst, qint16* src, int lenInShort);

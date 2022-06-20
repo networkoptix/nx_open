@@ -43,7 +43,10 @@ if(NOT APPLE AND arch STREQUAL "x64")
     endif()
 endif()
 
-nx_add_target(nx_media LIBRARY NO_API_MACROS
+nx_add_target(nx_media
+    LIBRARY
+    NO_API_MACROS
+    GDI
     PUBLIC_LIBS
         nx_kit
         nx_audio

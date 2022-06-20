@@ -9,9 +9,8 @@
 // TODO: Remove this file when Storage and Camera SDKs are merged into Analytics SDK.
 
 #if defined(_WIN32)
+    #define NOMINMAX //< Needed to prevent windows.h from defining macros min() and max().
     #include <Windows.h>
-    #undef min
-    #undef max
 #endif
 
 #include <cstdlib>

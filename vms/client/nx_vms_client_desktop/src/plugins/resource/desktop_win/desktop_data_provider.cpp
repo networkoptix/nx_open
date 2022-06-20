@@ -13,7 +13,11 @@ extern "C" {
 #include <libavutil/opt.h>
 } // extern "C"
 
+#include <speex/speex_preprocess.h>
+
+#include <core/resource/resource.h>
 #include <decoders/audio/ffmpeg_audio_decoder.h>
+#include <nx/media/ffmpeg/audio_encoder.h>
 #include <nx/streaming/abstract_data_consumer.h>
 #include <nx/streaming/av_codec_media_context.h>
 #include <nx/streaming/config.h>
@@ -29,6 +33,8 @@ extern "C" {
 #include <utils/media/av_options.h>
 #include <utils/media/ffmpeg_helper.h>
 
+#include "buffered_screen_grabber.h"
+
 using namespace nx::vms::client::desktop;
 
 namespace {
@@ -40,13 +46,47 @@ static const int MAX_VIDEO_JITTER = 2;
 
 } // namespace
 
-QnDesktopDataProvider::EncodedAudioInfo::EncodedAudioInfo(QnDesktopDataProvider* owner):
+class EncodedAudioInfo
+{
+public:
+    static const int AUDIO_BUFFERS_COUNT = 2;
+    EncodedAudioInfo(QnDesktopDataProvider* owner);
+    ~EncodedAudioInfo();
+    // doubled audio objects
+    QnAudioDeviceInfo m_audioDevice;
+    QAudioFormat m_audioFormat;
+    QnSafeQueue<QnWritableCompressedAudioDataPtr>  m_audioQueue;
+    QnWritableCompressedAudioData m_tmpAudioBuffer;
+    SpeexPreprocessState* m_speexPreprocess = nullptr;
+
+    int audioPacketSize();
+    bool setupFormat(QString& errMessage);
+    bool setupPostProcess(int frameSize, int channels, int sampleRate);
+    qint64 currentTime() const { return m_owner->currentTime(); }
+    bool start();
+    void stop();
+    int nameToWaveIndex();
+    bool addBuffer();
+    void gotAudioPacket(const char* data, int packetSize);
+    void gotData();
+    void clearBuffers();
+private:
+    QnDesktopDataProvider* const m_owner;
+    HWAVEIN hWaveIn = 0;
+    QQueue<WAVEHDR*> m_buffers;
+    nx::Mutex m_mtx;
+    std::atomic<bool> m_terminated = false;
+    bool m_waveInOpened = false;
+    std::vector<char> m_intermediateAudioBuffer;
+};
+
+EncodedAudioInfo::EncodedAudioInfo(QnDesktopDataProvider* owner):
     m_tmpAudioBuffer(AV_INPUT_BUFFER_MIN_SIZE),
     m_owner(owner)
 {
 }
 
-QnDesktopDataProvider::EncodedAudioInfo::~EncodedAudioInfo()
+EncodedAudioInfo::~EncodedAudioInfo()
 {
     stop();
     if (m_speexPreprocess)
@@ -54,7 +94,7 @@ QnDesktopDataProvider::EncodedAudioInfo::~EncodedAudioInfo()
     m_speexPreprocess = 0;
 }
 
-int QnDesktopDataProvider::EncodedAudioInfo::nameToWaveIndex()
+int EncodedAudioInfo::nameToWaveIndex()
 {
     int iNumDevs = waveInGetNumDevs();
     QString name = m_audioDevice.name();
@@ -82,7 +122,7 @@ static void QT_WIN_CALLBACK waveInProc(HWAVEIN /*hWaveIn*/,
                                 DWORD_PTR /*dwParam1*/,
                                 DWORD_PTR /*dwParam2*/)
 {
-    QnDesktopDataProvider::EncodedAudioInfo* audio = (QnDesktopDataProvider::EncodedAudioInfo*) dwInstance;
+    EncodedAudioInfo* audio = (EncodedAudioInfo*) dwInstance;
     switch(uMsg)
     {
         case WIM_OPEN:
@@ -97,7 +137,7 @@ static void QT_WIN_CALLBACK waveInProc(HWAVEIN /*hWaveIn*/,
     }
 }
 
-void QnDesktopDataProvider::EncodedAudioInfo::clearBuffers()
+void EncodedAudioInfo::clearBuffers()
 {
     while (m_buffers.size() > 0)
     {
@@ -108,7 +148,7 @@ void QnDesktopDataProvider::EncodedAudioInfo::clearBuffers()
     }
 }
 
-void QnDesktopDataProvider::EncodedAudioInfo::gotAudioPacket(const char* data, int packetSize)
+void EncodedAudioInfo::gotAudioPacket(const char* data, int packetSize)
 {
     QnWritableCompressedAudioDataPtr outData(new QnWritableCompressedAudioData(packetSize));
     outData->m_data.write(data, packetSize);
@@ -116,7 +156,7 @@ void QnDesktopDataProvider::EncodedAudioInfo::gotAudioPacket(const char* data, i
     m_audioQueue.push(outData);
 }
 
-void QnDesktopDataProvider::EncodedAudioInfo::gotData()
+void EncodedAudioInfo::gotData()
 {
     NX_MUTEX_LOCKER lock( &m_mtx );
     if (m_terminated)
@@ -134,12 +174,14 @@ void QnDesktopDataProvider::EncodedAudioInfo::gotData()
         }
         else
         {
-            std::copy(data->lpData, data->lpData + data->dwBytesRecorded, std::back_inserter(m_intermediateAudioBuffer));
+            std::copy(data->lpData, data->lpData + data->dwBytesRecorded,
+                std::back_inserter(m_intermediateAudioBuffer));
             if (m_intermediateAudioBuffer.size() >= data->dwBufferLength)
             {
                 gotAudioPacket(m_intermediateAudioBuffer.data(), data->dwBufferLength);
                 m_intermediateAudioBuffer.erase(
-                    m_intermediateAudioBuffer.begin(), m_intermediateAudioBuffer.begin() + data->dwBufferLength);
+                    m_intermediateAudioBuffer.begin(),
+                    m_intermediateAudioBuffer.begin() + data->dwBufferLength);
             }
         }
         waveInUnprepareHeader(hWaveIn, data, sizeof(WAVEHDR));
@@ -150,7 +192,7 @@ void QnDesktopDataProvider::EncodedAudioInfo::gotData()
     }
 }
 
-bool QnDesktopDataProvider::EncodedAudioInfo::addBuffer()
+bool EncodedAudioInfo::addBuffer()
 {
     WAVEHDR* buffer = new WAVEHDR();
     HRESULT hr;
@@ -169,7 +211,7 @@ bool QnDesktopDataProvider::EncodedAudioInfo::addBuffer()
     return true;
 }
 
-void QnDesktopDataProvider::EncodedAudioInfo::stop()
+void EncodedAudioInfo::stop()
 {
     {
         NX_MUTEX_LOCKER lock( &m_mtx );
@@ -184,7 +226,7 @@ void QnDesktopDataProvider::EncodedAudioInfo::stop()
     clearBuffers();
 }
 
-bool QnDesktopDataProvider::EncodedAudioInfo::start()
+bool EncodedAudioInfo::start()
 {
     NX_MUTEX_LOCKER lock(&m_mtx);
     if (m_terminated)
@@ -192,12 +234,12 @@ bool QnDesktopDataProvider::EncodedAudioInfo::start()
     return waveInStart(hWaveIn) == S_OK;
 }
 
-int QnDesktopDataProvider::EncodedAudioInfo::audioPacketSize()
+int EncodedAudioInfo::audioPacketSize()
 {
-    return m_owner->m_frameSize * m_audioFormat.channelCount() * m_audioFormat.sampleSize()/8;
+    return m_owner->frameSize() * m_audioFormat.channelCount() * m_audioFormat.sampleSize()/8;
 }
 
-bool QnDesktopDataProvider::EncodedAudioInfo::setupFormat(QString& errMessage)
+bool EncodedAudioInfo::setupFormat(QString& errMessage)
 {
     m_audioFormat = m_audioDevice.preferredFormat();
     m_audioFormat.setSampleRate(AUDIO_CAPTURE_FREQUENCY);
@@ -208,7 +250,8 @@ bool QnDesktopDataProvider::EncodedAudioInfo::setupFormat(QString& errMessage)
     m_audioFormat = m_audioDevice.nearestFormat(m_audioFormat);
     if (!m_audioFormat.isValid())
     {
-        errMessage = tr("The audio capturing device supports no suitable audio formats."
+        errMessage = QnDesktopDataProvider::tr(
+            "The audio capturing device supports no suitable audio formats."
             "Please select another audio device or \"none\" in the Screen Recording settings.");
 
         return false;
@@ -218,7 +261,7 @@ bool QnDesktopDataProvider::EncodedAudioInfo::setupFormat(QString& errMessage)
     return true;
 }
 
-bool QnDesktopDataProvider::EncodedAudioInfo::setupPostProcess(
+bool EncodedAudioInfo::setupPostProcess(
     int frameSize,
     int channels,
     int sampleRate)
@@ -265,8 +308,52 @@ bool QnDesktopDataProvider::EncodedAudioInfo::setupPostProcess(
     return true;
 }
 
+struct QnDesktopDataProvider::Private
+{
+    const int desktopNum;
+    const Qn::CaptureMode captureMode;
+    const bool captureCursor;
+    const QSize captureResolution;
+    const float encodeQualuty;
+    QWidget* const widget;
+    const QPixmap logo;
+
+    int encodedFrames = 0;
+    QnBufferedScreenGrabber* grabber = nullptr;
+    quint8* videoBuf = nullptr;
+    int videoBufSize = 0;
+    AVCodecContext* videoCodecCtx = nullptr;
+    CodecParametersConstPtr videoContext;
+    AVFrame* frame = nullptr;
+
+    QVector<quint8> buffer;
+
+    // single audio objects
+    int audioFramesCount = 0;
+    double audioFrameDuration = 0.0;
+    qint64 storedAudioPts = 0;
+    int maxAudioJitter = 0;
+    QVector<EncodedAudioInfo*> audioInfo;
+
+    bool capturingStopped = false;
+
+    qint64 initTime;
+    mutable nx::Mutex startMutex;
+    bool started = false;
+    bool isAudioInitialized = false;
+    bool isVideoInitialized = false;
+
+    QPointer<QnVoiceSpectrumAnalyzer> soundAnalyzer;
+    AVPacket* outPacket = av_packet_alloc();
+    nx::media::ffmpeg::AudioEncoder audioEncoder;
+    int frameSize = 0;
+    std::unique_ptr<QElapsedTimer> timer;
+    std::unique_ptr<AudioDeviceChangeNotifier> audioDeviceChangeNotifier =
+        std::make_unique<AudioDeviceChangeNotifier>();
+};
+
 QnDesktopDataProvider::QnDesktopDataProvider(
-    QnResourcePtr res,
+    const QnResourcePtr& res,
     int desktopNum,
     const QnAudioDeviceInfo* audioDevice,
     const QnAudioDeviceInfo* audioDevice2,
@@ -278,33 +365,33 @@ QnDesktopDataProvider::QnDesktopDataProvider(
     const QPixmap& logo)
     :
     QnDesktopDataProviderBase(res),
-    m_desktopNum(desktopNum),
-    m_captureMode(captureMode),
-    m_captureCursor(captureCursor),
-    m_captureResolution(captureResolution),
-    m_encodeQualuty(encodeQualuty),
-    m_widget(glWidget),
-    m_logo(logo),
-    m_outPacket(av_packet_alloc()),
-    m_audioDeviceChangeNotifier(new nx::vms::client::desktop::AudioDeviceChangeNotifier())
+    d(new Private{
+        .desktopNum = desktopNum,
+        .captureMode = captureMode,
+        .captureCursor = captureCursor,
+        .captureResolution = captureResolution,
+        .encodeQualuty = encodeQualuty,
+        .widget = glWidget,
+        .logo = logo
+        })
 {
     if (audioDevice || audioDevice2)
     {
-        m_audioInfo << new EncodedAudioInfo(this);
-        m_audioInfo[0]->m_audioDevice = audioDevice ? *audioDevice : *audioDevice2;
+        d->audioInfo << new EncodedAudioInfo(this);
+        d->audioInfo[0]->m_audioDevice = audioDevice ? *audioDevice : *audioDevice2;
     }
 
     if (audioDevice && audioDevice2)
     {
-        m_audioInfo << new EncodedAudioInfo(this); // second channel
-        m_audioInfo[1]->m_audioDevice = *audioDevice2;
+        d->audioInfo << new EncodedAudioInfo(this); // second channel
+        d->audioInfo[1]->m_audioDevice = *audioDevice2;
     }
 
     using AudioDeviceChangeNotifier = nx::vms::client::desktop::AudioDeviceChangeNotifier;
     const auto stopOnDeviceDisappeared =
         [this](const QString& deviceName)
         {
-            const bool deviceInUse = std::any_of(std::cbegin(m_audioInfo), std::cend(m_audioInfo),
+            const bool deviceInUse = std::any_of(std::cbegin(d->audioInfo), std::cend(d->audioInfo),
                 [&deviceName](const auto& audioInfo)
                 {
                     return audioInfo->m_audioDevice.name() == deviceName;}
@@ -314,14 +401,14 @@ QnDesktopDataProvider::QnDesktopDataProvider(
                 pleaseStop();
         };
 
-    connect(m_audioDeviceChangeNotifier.get(), &AudioDeviceChangeNotifier::deviceUnplugged,
+    connect(d->audioDeviceChangeNotifier.get(), &AudioDeviceChangeNotifier::deviceUnplugged,
         this, stopOnDeviceDisappeared, Qt::DirectConnection);
 
-    connect(m_audioDeviceChangeNotifier.get(), &AudioDeviceChangeNotifier::deviceNotPresent,
+    connect(d->audioDeviceChangeNotifier.get(), &AudioDeviceChangeNotifier::deviceNotPresent,
         this, stopOnDeviceDisappeared, Qt::DirectConnection);
 
     m_needStop = false;
-    m_timer = std::make_unique<QElapsedTimer>();
+    d->timer = std::make_unique<QElapsedTimer>();
 }
 
 QnDesktopDataProvider::~QnDesktopDataProvider()
@@ -333,10 +420,10 @@ int QnDesktopDataProvider::calculateBitrate(const char* codecName)
 {
     double bitrate = BASE_BITRATE;
 
-    bitrate /=  1920.0*1080.0 / m_grabber->width() / m_grabber->height();
+    bitrate /=  1920.0*1080.0 / d->grabber->width() / d->grabber->height();
 
-    bitrate *= m_encodeQualuty;
-    if (m_grabber->width() <= 320)
+    bitrate *= d->encodeQualuty;
+    if (d->grabber->width() <= 320)
         bitrate *= 1.5;
     if (strcmp(codecName, "libopenh264") == 0)
     {
@@ -348,24 +435,24 @@ int QnDesktopDataProvider::calculateBitrate(const char* codecName)
 
 bool QnDesktopDataProvider::initVideoCapturing()
 {
-    m_grabber = new QnBufferedScreenGrabber(
-        m_desktopNum,
+    d->grabber = new QnBufferedScreenGrabber(
+        d->desktopNum,
         QnBufferedScreenGrabber::DEFAULT_QUEUE_SIZE,
         QnBufferedScreenGrabber::DEFAULT_FRAME_RATE,
-        m_captureMode,
-        m_captureCursor,
-        m_captureResolution,
-        m_widget);
-    m_grabber->setLogo(m_logo);
-    m_grabber->setTimer(m_timer.get());
+        d->captureMode,
+        d->captureCursor,
+        d->captureResolution,
+        d->widget);
+    d->grabber->setLogo(d->logo);
+    d->grabber->setTimer(d->timer.get());
 
 
-    m_videoBufSize = av_image_get_buffer_size((AVPixelFormat) m_grabber->format(), m_grabber->width(), m_grabber->height(), /*align*/ 1);
-    m_videoBuf = (quint8*) av_malloc(m_videoBufSize);
+    d->videoBufSize = av_image_get_buffer_size((AVPixelFormat) d->grabber->format(), d->grabber->width(), d->grabber->height(), /*align*/ 1);
+    d->videoBuf = (quint8*) av_malloc(d->videoBufSize);
 
-    m_frame = av_frame_alloc();
-    int ret = av_image_alloc(m_frame->data, m_frame->linesize,
-        m_grabber->width(), m_grabber->height(), m_grabber->format(), /*align*/ 1);
+    d->frame = av_frame_alloc();
+    int ret = av_image_alloc(d->frame->data, d->frame->linesize,
+        d->grabber->width(), d->grabber->height(), d->grabber->format(), /*align*/ 1);
     if (ret < 0)
     {
         m_lastErrorStr = tr("Could not detect capturing resolution");
@@ -373,7 +460,7 @@ bool QnDesktopDataProvider::initVideoCapturing()
     }
 
     QString videoCodecName;
-    if (m_encodeQualuty <= 0.5)
+    if (d->encodeQualuty <= 0.5)
         videoCodecName = getResource()->systemContext()->globalSettings()->lowQualityScreenVideoCodec();
     else
         videoCodecName = getResource()->systemContext()->globalSettings()->defaultExportVideoCodec();
@@ -390,54 +477,54 @@ bool QnDesktopDataProvider::initVideoCapturing()
         return false;
     }
 
-    if (m_grabber->width() % 8 != 0) {
+    if (d->grabber->width() % 8 != 0) {
         m_lastErrorStr = tr("Screen width must be a multiple of 8.");
         return false;
     }
 
-    m_videoCodecCtx = avcodec_alloc_context3(videoCodec);
-    m_videoCodecCtx->codec_id = videoCodec->id;
-    m_videoCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO ;
-    m_videoCodecCtx->thread_count = QThread::idealThreadCount();
+    d->videoCodecCtx = avcodec_alloc_context3(videoCodec);
+    d->videoCodecCtx->codec_id = videoCodec->id;
+    d->videoCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO ;
+    d->videoCodecCtx->thread_count = QThread::idealThreadCount();
 
 
-    m_videoCodecCtx->time_base = m_grabber->getFrameRate();
+    d->videoCodecCtx->time_base = d->grabber->getFrameRate();
 
-    m_videoCodecCtx->pix_fmt = m_grabber->format();
-    m_videoCodecCtx->coded_width = m_videoCodecCtx->width = m_grabber->width();
-    m_videoCodecCtx->coded_height = m_videoCodecCtx->height = m_grabber->height();
-    m_videoCodecCtx->bit_rate = calculateBitrate(videoCodec->name);
+    d->videoCodecCtx->pix_fmt = d->grabber->format();
+    d->videoCodecCtx->coded_width = d->videoCodecCtx->width = d->grabber->width();
+    d->videoCodecCtx->coded_height = d->videoCodecCtx->height = d->grabber->height();
+    d->videoCodecCtx->bit_rate = calculateBitrate(videoCodec->name);
 
     QString codec_prop;
 
-    if (m_encodeQualuty == 1)
+    if (d->encodeQualuty == 1)
     {
-        m_videoCodecCtx->has_b_frames = 1;
-        m_videoCodecCtx->level = 50;
-        m_videoCodecCtx->gop_size = 25;
-        m_videoCodecCtx->trellis = 2;
-        m_videoCodecCtx->flags |= AV_CODEC_FLAG_AC_PRED;
-        m_videoCodecCtx->flags |= AV_CODEC_FLAG_4MV;
+        d->videoCodecCtx->has_b_frames = 1;
+        d->videoCodecCtx->level = 50;
+        d->videoCodecCtx->gop_size = 25;
+        d->videoCodecCtx->trellis = 2;
+        d->videoCodecCtx->flags |= AV_CODEC_FLAG_AC_PRED;
+        d->videoCodecCtx->flags |= AV_CODEC_FLAG_4MV;
     }
 
-    if (m_captureResolution.width() > 0)
+    if (d->captureResolution.width() > 0)
     {
-        double srcAspect = m_grabber->screenWidth() / (double) m_grabber->screenHeight();
-        double dstAspect = m_captureResolution.width() / (double) m_captureResolution.height();
+        double srcAspect = d->grabber->screenWidth() / (double) d->grabber->screenHeight();
+        double dstAspect = d->captureResolution.width() / (double) d->captureResolution.height();
         double sar = srcAspect / dstAspect;
-        m_videoCodecCtx->sample_aspect_ratio = av_d2q(sar, 255);
+        d->videoCodecCtx->sample_aspect_ratio = av_d2q(sar, 255);
     }
     else {
-        m_videoCodecCtx->sample_aspect_ratio.num = 1;
-        m_videoCodecCtx->sample_aspect_ratio.den = 1;
+        d->videoCodecCtx->sample_aspect_ratio.num = 1;
+        d->videoCodecCtx->sample_aspect_ratio.den = 1;
     }
 
-    const auto codecParameters = new CodecParameters(m_videoCodecCtx);
-    m_videoContext = CodecParametersConstPtr(codecParameters);
+    const auto codecParameters = new CodecParameters(d->videoCodecCtx);
+    d->videoContext = CodecParametersConstPtr(codecParameters);
 
     AvOptions options;
     options.set("motion_est", "epzs", 0);
-    if (avcodec_open2(m_videoCodecCtx, videoCodec, options) < 0)
+    if (avcodec_open2(d->videoCodecCtx, videoCodec, options) < 0)
     {
         m_lastErrorStr = tr("Could not initialize video encoder.");
         return false;
@@ -445,29 +532,29 @@ bool QnDesktopDataProvider::initVideoCapturing()
 
     // CodecParameters was created before open() call to avoid encoder specific fields.
     // Transfer extradata manually.
-    codecParameters->setExtradata(m_videoCodecCtx->extradata, m_videoCodecCtx->extradata_size);
+    codecParameters->setExtradata(d->videoCodecCtx->extradata, d->videoCodecCtx->extradata_size);
 
     return true;
 }
 
 bool QnDesktopDataProvider::initAudioCapturing()
 {
-    m_initTime = AV_NOPTS_VALUE;
+    d->initTime = AV_NOPTS_VALUE;
 
     // init audio capture
-    if (!m_audioInfo.isEmpty())
+    if (!d->audioInfo.isEmpty())
     {
-        foreach(EncodedAudioInfo* audioChannel, m_audioInfo)
+        foreach(EncodedAudioInfo* audioChannel, d->audioInfo)
         {
             if (!audioChannel->setupFormat(m_lastErrorStr))
                 return false;
         }
 
-        const auto& format = m_audioInfo.at(0)->m_audioFormat;
+        const auto& format = d->audioInfo.at(0)->m_audioFormat;
         int sampleRate = format.sampleRate();
-        int channels = m_audioInfo.size() > 1 ? /*stereo*/ 2 : format.channelCount();
+        int channels = d->audioInfo.size() > 1 ? /*stereo*/ 2 : format.channelCount();
 
-        if (!m_audioEncoder.initialize(AV_CODEC_ID_MP2,
+        if (!d->audioEncoder.initialize(AV_CODEC_ID_MP2,
             sampleRate,
             channels,
             fromQtAudioFormat(format),
@@ -478,28 +565,26 @@ bool QnDesktopDataProvider::initAudioCapturing()
             return false;
         }
 
-        m_frameSize = m_audioEncoder.codecParams()->getFrameSize();
-        m_audioFrameDuration = m_frameSize / (double) sampleRate * 1000; // keep in ms
+        d->frameSize = d->audioEncoder.codecParams()->getFrameSize();
+        d->audioFrameDuration = d->frameSize / (double) sampleRate * 1000; // keep in ms
 
-        m_soundAnalyzer = appContext()->voiceSpectrumAnalyzer();
-        m_soundAnalyzer->initialize(sampleRate, channels);
+        d->soundAnalyzer = appContext()->voiceSpectrumAnalyzer();
+        d->soundAnalyzer->initialize(sampleRate, channels);
 
-        foreach(EncodedAudioInfo* audioChannel, m_audioInfo)
+        foreach(EncodedAudioInfo* audioChannel, d->audioInfo)
         {
-            if (!audioChannel->setupPostProcess(m_frameSize, channels, sampleRate))
+            if (!audioChannel->setupPostProcess(d->frameSize, channels, sampleRate))
             {
                 m_lastErrorStr = tr("Could not initialize audio device \"%1\".").arg(audioChannel->m_audioDevice.fullName());
                 return false;
             }
         }
     }
-    // 50 ms as max jitter
+    // 50 ms as max jitter.
     // Qt uses 25fps timer for audio grabbing, so jitter 40ms + 10ms reserved.
-    m_maxAudioJitter = 1000 / 20; // keep in ms
-    //m_maxAudioJitter = m_audioOutStream->time_base.den / (double) m_audioOutStream->time_base.num / 20;
+    d->maxAudioJitter = 1000 / 20; //< Keep in ms.
 
-
-    foreach (EncodedAudioInfo* info, m_audioInfo)
+    foreach (EncodedAudioInfo* info, d->audioInfo)
     {
         if (!info->start())
         {
@@ -513,15 +598,15 @@ bool QnDesktopDataProvider::initAudioCapturing()
 
 int QnDesktopDataProvider::processData(bool flush)
 {
-    if (m_videoCodecCtx == 0)
+    if (d->videoCodecCtx == 0)
         return -1;
-    if (m_frame->width <= 0 || m_frame->height <= 0)
+    if (d->frame->width <= 0 || d->frame->height <= 0)
         return -1;
 
-    m_outPacket->data = m_videoBuf;
-    m_outPacket->size = m_videoBufSize;
+    d->outPacket->data = d->videoBuf;
+    d->outPacket->size = d->videoBufSize;
     int got_packet = 0;
-    int encodeResult = avcodec_encode_video2(m_videoCodecCtx, m_outPacket, flush ? 0 : m_frame, &got_packet);
+    int encodeResult = avcodec_encode_video2(d->videoCodecCtx, d->outPacket, flush ? 0 : d->frame, &got_packet);
 
 
     if (encodeResult < 0)
@@ -531,19 +616,19 @@ int QnDesktopDataProvider::processData(bool flush)
     timeBaseNative.num = 1;
     timeBaseNative.den = 1000000;
 
-    if (m_initTime == AV_NOPTS_VALUE)
-        m_initTime = qnSyncTime->currentUSecsSinceEpoch();
+    if (d->initTime == AV_NOPTS_VALUE)
+        d->initTime = qnSyncTime->currentUSecsSinceEpoch();
 
     if (got_packet > 0)
     {
 
         QnWritableCompressedVideoDataPtr video = QnWritableCompressedVideoDataPtr(
-            new QnWritableCompressedVideoData(m_outPacket->size, m_videoContext));
-        video->m_data.write((const char*) m_videoBuf, m_outPacket->size);
-        video->compressionType = m_videoCodecCtx->codec_id;
-        video->timestamp = av_rescale_q(m_videoCodecCtx->coded_frame->pts, m_videoCodecCtx->time_base, timeBaseNative) + m_initTime;
+            new QnWritableCompressedVideoData(d->outPacket->size, d->videoContext));
+        video->m_data.write((const char*) d->videoBuf, d->outPacket->size);
+        video->compressionType = d->videoCodecCtx->codec_id;
+        video->timestamp = av_rescale_q(d->videoCodecCtx->coded_frame->pts, d->videoCodecCtx->time_base, timeBaseNative) + d->initTime;
 
-        if(m_videoCodecCtx->coded_frame->key_frame)
+        if(d->videoCodecCtx->coded_frame->key_frame)
             video->flags |= QnAbstractMediaData::MediaFlags_AVKey;
         video->flags |= QnAbstractMediaData::MediaFlags_LIVE;
         video->dataProvider = this;
@@ -552,34 +637,34 @@ int QnDesktopDataProvider::processData(bool flush)
 
     putAudioData();
 
-    return m_outPacket->size;
+    return d->outPacket->size;
 }
 
 void QnDesktopDataProvider::putAudioData()
 {
     // write all audio frames
-    EncodedAudioInfo* ai = m_audioInfo.size() > 0 ? m_audioInfo[0] : 0;
-    EncodedAudioInfo* ai2 = m_audioInfo.size() > 1 ? m_audioInfo[1] : 0;
+    EncodedAudioInfo* ai = d->audioInfo.size() > 0 ? d->audioInfo[0] : 0;
+    EncodedAudioInfo* ai2 = d->audioInfo.size() > 1 ? d->audioInfo[1] : 0;
     while (ai && ai->m_audioQueue.size() > 0 && (ai2 == 0 || ai2->m_audioQueue.size() > 0))
     {
         QnWritableCompressedAudioDataPtr audioData;
         ai->m_audioQueue.pop(audioData);
 
-        qint64 audioPts = audioData->timestamp - m_audioFrameDuration;
-        qint64 expectedAudioPts = m_storedAudioPts + m_audioFramesCount * m_audioFrameDuration;
+        qint64 audioPts = audioData->timestamp - d->audioFrameDuration;
+        qint64 expectedAudioPts = d->storedAudioPts + d->audioFramesCount * d->audioFrameDuration;
         int audioJitter = qAbs(audioPts - expectedAudioPts);
 
-        if (audioJitter < m_maxAudioJitter)
+        if (audioJitter < d->maxAudioJitter)
         {
             audioPts = expectedAudioPts;
         }
         else {
-            m_storedAudioPts = audioPts;
-            m_audioFramesCount = 0;
+            d->storedAudioPts = audioPts;
+            d->audioFramesCount = 0;
         }
 
 
-        m_audioFramesCount++;
+        d->audioFramesCount++;
 
         // todo: add audio resample here
 
@@ -595,14 +680,14 @@ void QnDesktopDataProvider::putAudioData()
             if (ai2->m_speexPreprocess)
                 speex_preprocess(ai2->m_speexPreprocess, buffer2, nullptr);
 
-            int stereoPacketSize = m_frameSize * 2 * ai->m_audioFormat.sampleSize()/8;
+            int stereoPacketSize = d->frameSize * 2 * ai->m_audioFormat.sampleSize()/8;
             /*
             // first mono to left, second mono to right
             // may be it is mode usefull?
-            if (m_audioFormat.channels() == 1 && m_audioFormat2.channels() == 1)
+            if (d->audioFormat.channels() == 1 && d->audioFormat2.channels() == 1)
             {
-                monoToStereo((qint16*) m_tmpAudioBuffer1.data.data(), buffer1, buffer2, stereoPacketSize/4);
-                buffer1 = (qint16*) m_tmpAudioBuffer1.data.data();
+                monoToStereo((qint16*) d->tmpAudioBuffer1.data.data(), buffer1, buffer2, stereoPacketSize/4);
+                buffer1 = (qint16*) d->tmpAudioBuffer1.data.data();
                 buffer2 = 0;
             }
             */
@@ -619,22 +704,22 @@ void QnDesktopDataProvider::putAudioData()
             if (buffer2)
                 stereoAudioMux(buffer1, buffer2, stereoPacketSize / 2);
         }
-        m_soundAnalyzer->processData(buffer1, m_frameSize);
+        d->soundAnalyzer->processData(buffer1, d->frameSize);
 
-        if (!m_audioEncoder.sendFrame((uint8_t*)buffer1, m_frameSize))
+        if (!d->audioEncoder.sendFrame((uint8_t*)buffer1, d->frameSize))
             return;
 
         QnWritableCompressedAudioDataPtr packet;
         while (!needToStop())
         {
-            if (!m_audioEncoder.receivePacket(packet))
+            if (!d->audioEncoder.receivePacket(packet))
                 return;
 
             if (!packet)
                 break;
 
-            if (m_initTime == AV_NOPTS_VALUE)
-                m_initTime = qnSyncTime->currentUSecsSinceEpoch();
+            if (d->initTime == AV_NOPTS_VALUE)
+                d->initTime = qnSyncTime->currentUSecsSinceEpoch();
 
             packet->flags |= QnAbstractMediaData::MediaFlags_LIVE;
             packet->dataProvider = this;
@@ -648,7 +733,7 @@ void QnDesktopDataProvider::putAudioData()
             timeBaseMs.num = 1;
             timeBaseMs.den = 1000;
 
-            packet->timestamp = av_rescale_q(audioPts, timeBaseMs, timeBaseNative) + m_initTime;
+            packet->timestamp = av_rescale_q(audioPts, timeBaseMs, timeBaseNative) + d->initTime;
             putData(packet);
         }
     }
@@ -656,13 +741,13 @@ void QnDesktopDataProvider::putAudioData()
 
 void QnDesktopDataProvider::start(Priority priority)
 {
-    NX_MUTEX_LOCKER lock( &m_startMutex );
-    if (m_started)
+    NX_MUTEX_LOCKER lock( &d->startMutex );
+    if (d->started)
         return;
-    m_started = true;
+    d->started = true;
 
-    m_isAudioInitialized = initAudioCapturing();
-    if (!m_isAudioInitialized)
+    d->isAudioInitialized = initAudioCapturing();
+    if (!d->isAudioInitialized)
     {
         m_needStop = true;
         NX_WARNING(this, "Could not initialize audio capturing: %1", m_lastErrorStr);
@@ -673,7 +758,7 @@ void QnDesktopDataProvider::start(Priority priority)
 
 bool QnDesktopDataProvider::isInitialized() const
 {
-    return m_isAudioInitialized;
+    return d->isAudioInitialized;
 }
 
 bool QnDesktopDataProvider::needVideoData() const
@@ -690,66 +775,66 @@ bool QnDesktopDataProvider::needVideoData() const
 void QnDesktopDataProvider::run()
 {
     QThread::currentThread()->setPriority(QThread::HighPriority);
-    m_timer->restart();
+    d->timer->restart();
 
-    while (!needToStop() || (m_grabber && m_grabber->dataExist()))
+    while (!needToStop() || (d->grabber && d->grabber->dataExist()))
     {
         if (needVideoData())
         {
-            if (!m_isVideoInitialized)
+            if (!d->isVideoInitialized)
             {
-                m_isVideoInitialized = initVideoCapturing();
-                if (!m_isVideoInitialized)
+                d->isVideoInitialized = initVideoCapturing();
+                if (!d->isVideoInitialized)
                 {
                     m_needStop = true;
                     break;
                 }
             }
 
-            m_grabber->start(QThread::HighestPriority);
+            d->grabber->start(QThread::HighestPriority);
 
-            if (needToStop() && !m_capturingStopped)
+            if (needToStop() && !d->capturingStopped)
             {
                 stopCapturing();
-                m_capturingStopped = true;
+                d->capturingStopped = true;
             }
 
-            CaptureInfoPtr capturedData = m_grabber->getNextFrame();
+            CaptureInfoPtr capturedData = d->grabber->getNextFrame();
             if (!capturedData || !capturedData->opaque || capturedData->width == 0 || capturedData->height == 0)
                 continue;
-            m_grabber->capturedDataToFrame(capturedData, m_frame);
+            d->grabber->capturedDataToFrame(capturedData, d->frame);
 
             AVRational r;
             r.num = 1;
             r.den = 1000;
-            qint64 capturedPts = av_rescale_q(m_frame->pts, r, m_grabber->getFrameRate());
-            if (m_encodedFrames == 0)
-                m_encodedFrames = capturedPts;
+            qint64 capturedPts = av_rescale_q(d->frame->pts, r, d->grabber->getFrameRate());
+            if (d->encodedFrames == 0)
+                d->encodedFrames = capturedPts;
 
             bool firstStep = true;
-            while (firstStep || capturedPts - m_encodedFrames >= MAX_VIDEO_JITTER)
+            while (firstStep || capturedPts - d->encodedFrames >= MAX_VIDEO_JITTER)
             {
-                m_frame->pts = m_encodedFrames;
+                d->frame->pts = d->encodedFrames;
                 if (processData(false) < 0)
                 {
                     NX_WARNING(this, "Video encoding error. Stop recording.");
                     break;
                 }
 
-                m_encodedFrames++;
+                d->encodedFrames++;
                 firstStep = false;
             }
         }
         else
         {
-            if (m_grabber)
-                m_grabber->pleaseStop();
+            if (d->grabber)
+                d->grabber->pleaseStop();
             putAudioData();
         }
         if (needToStop())
             break;
     }
-    if (!m_capturingStopped)
+    if (!d->capturingStopped)
         stopCapturing();
 
     NX_VERBOSE(this, "flushing video buffer");
@@ -764,50 +849,55 @@ void QnDesktopDataProvider::run()
 
 void QnDesktopDataProvider::stopCapturing()
 {
-    foreach(EncodedAudioInfo* info, m_audioInfo)
+    foreach(EncodedAudioInfo* info, d->audioInfo)
         info->stop();
-    if (m_grabber)
-        m_grabber->pleaseStop();
+    if (d->grabber)
+        d->grabber->pleaseStop();
 }
 
 void QnDesktopDataProvider::closeStream()
 {
-    delete m_grabber;
-    m_grabber = 0;
+    delete d->grabber;
+    d->grabber = 0;
 
-    avcodec_free_context(&m_videoCodecCtx);
+    avcodec_free_context(&d->videoCodecCtx);
 
-    if (m_frame) {
-        avpicture_free((AVPicture*) m_frame);
-        av_free(m_frame);
-        m_frame = 0;
+    if (d->frame) {
+        avpicture_free((AVPicture*) d->frame);
+        av_free(d->frame);
+        d->frame = 0;
     }
 
-    if (m_videoBuf)
-        av_free(m_videoBuf);
-    m_videoBuf = 0;
+    if (d->videoBuf)
+        av_free(d->videoBuf);
+    d->videoBuf = 0;
 
-    foreach(EncodedAudioInfo* audioChannel, m_audioInfo)
+    foreach(EncodedAudioInfo* audioChannel, d->audioInfo)
         delete audioChannel;
-    m_audioInfo.clear();
+    d->audioInfo.clear();
 }
 
 AudioLayoutConstPtr QnDesktopDataProvider::getAudioLayout()
 {
-    if (m_audioEncoder.codecParams() && !m_audioLayout)
-        m_audioLayout.reset(new AudioLayout(m_audioEncoder.codecParams()));
+    if (d->audioEncoder.codecParams() && !m_audioLayout)
+        m_audioLayout.reset(new AudioLayout(d->audioEncoder.codecParams()));
 
     return m_audioLayout;
 }
 
 qint64 QnDesktopDataProvider::currentTime() const
 {
-    return m_timer->elapsed();
+    return d->timer->elapsed();
+}
+
+int QnDesktopDataProvider::frameSize() const
+{
+    return d->frameSize;
 }
 
 void QnDesktopDataProvider::beforeDestroyDataProvider(QnAbstractMediaDataReceptor* consumer)
 {
-    NX_MUTEX_LOCKER lock( &m_startMutex );
+    NX_MUTEX_LOCKER lock( &d->startMutex );
     removeDataProcessor(consumer);
     if (processorsCount() == 0)
         pleaseStop();
@@ -815,17 +905,17 @@ void QnDesktopDataProvider::beforeDestroyDataProvider(QnAbstractMediaDataRecepto
 
 void QnDesktopDataProvider::addDataProcessor(QnAbstractMediaDataReceptor* consumer)
 {
-    NX_MUTEX_LOCKER lock( &m_startMutex );
+    NX_MUTEX_LOCKER lock( &d->startMutex );
     if (needToStop()) {
         wait(); // wait previous thread instance
-        m_started = false; // now we ready to restart
+        d->started = false; // now we ready to restart
     }
     QnAbstractMediaStreamDataProvider::addDataProcessor(consumer);
 }
 
 bool QnDesktopDataProvider::readyToStop() const
 {
-    NX_MUTEX_LOCKER lock( &m_startMutex );
+    NX_MUTEX_LOCKER lock(&d->startMutex);
     return processorsCount() == 0;
 }
 
@@ -837,18 +927,18 @@ void QnDesktopDataProvider::putData(QnAbstractDataPacketPtr data)
         return;
 
     NX_MUTEX_LOCKER mutex( &m_mutex );
-    for (int i = 0; i < m_dataprocessors.size(); ++i)
+    for (int i = 0; i < d->dataprocessors.size(); ++i)
     {
-        QnAbstractDataConsumer* dp = m_dataprocessors.at(i);
+        QnAbstractDataConsumer* dp = d->dataprocessors.at(i);
         if (dp->canAcceptData())
         {
             if (media->dataType == QnAbstractMediaData::VIDEO)
             {
-                QSet<void*>::iterator itr = m_needKeyData.find(dp);
-                if (itr != m_needKeyData.end())
+                QSet<void*>::iterator itr = d->needKeyData.find(dp);
+                if (itr != d->needKeyData.end())
                 {
                     if (media->flags | AV_PKT_FLAG_KEY)
-                        m_needKeyData.erase(itr);
+                        d->needKeyData.erase(itr);
                     else
                         continue; // skip data
                 }
@@ -856,7 +946,7 @@ void QnDesktopDataProvider::putData(QnAbstractDataPacketPtr data)
             dp->putData(data);
         }
         else {
-            m_needKeyData << dp;
+            d->needKeyData << dp;
         }
     }
 }

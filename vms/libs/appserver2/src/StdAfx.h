@@ -8,8 +8,4 @@
     #include <iphlpapi.h>
 #endif
 
-/* Boost headers. */
-#include <boost/algorithm/cxx11/all_of.hpp>
-#include <boost/algorithm/cxx11/any_of.hpp>
-
 #include <nx/utils/literal.h>

@@ -11,6 +11,7 @@
 
 #include <tchar.h>
 #include <Windows.h>
+#include <shellapi.h>
 #include <Commctrl.h>
 #include <Shlobj.h>
 #include "version.h"

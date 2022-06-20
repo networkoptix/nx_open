@@ -6,6 +6,7 @@
 #include <cstdlib>
 
 #include <windows.h>
+#include <winioctl.h>
 #include <tlhelp32.h>
 #include <psapi.h>
 #include <iphlpapi.h>

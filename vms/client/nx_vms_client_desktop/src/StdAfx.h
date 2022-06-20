@@ -27,10 +27,6 @@ extern "C" {
 #include <algorithm>
 #include <functional>
 
-/* Boost headers. */
-#include <boost/algorithm/cxx11/all_of.hpp>
-#include <boost/algorithm/cxx11/any_of.hpp>
-
 /* QT headers. */
 
 #include <QtCore/QObject>

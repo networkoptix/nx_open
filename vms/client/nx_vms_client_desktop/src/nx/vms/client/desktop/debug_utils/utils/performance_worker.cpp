@@ -14,7 +14,7 @@
 #include <nx/monitoring/activity_monitor.h>
 
 #if defined(Q_OS_WIN)
-    #include "windows.h"
+    #include <windows.h>
     #include <tlhelp32.h>
 #endif
 

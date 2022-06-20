@@ -1,10 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifdef _WIN32
-#   define FD_SETSIZE 2048
-#   include <winsock2.h>
-#   include <windows.h> /* You HAVE to include winsock2.h BEFORE windows.h */
-#else
+#if !defined(_WIN32)
 #   include <arpa/inet.h>
 #endif
 
@@ -16,10 +12,6 @@
 /* STL headers. */
 #include <algorithm>
 #include <functional>
-
-/* Boost headers. */
-#include <boost/algorithm/cxx11/all_of.hpp>
-#include <boost/algorithm/cxx11/any_of.hpp>
 
 /* QT headers. */
 
@@ -39,7 +31,6 @@
 #include <QtCore/QQueue>
 #include <QtCore/QRect>
 #include <QtCore/QRectF>
-#include <QtCore/QSemaphore>
 #include <QtCore/QSet>
 #include <QtCore/QSize>
 #include <QtCore/QString>
@@ -48,7 +39,6 @@
 #include <QtCore/QThreadPool>
 #include <QtCore/QTime>
 #include <QtCore/QTimer>
-#include <QtCore/QtDebug>
 #include <QtCore/QUrlQuery>
 
 #endif
