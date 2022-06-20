@@ -8,7 +8,6 @@
 #include <camera/loaders/abstract_camera_data_loader.h>
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
 
@@ -18,8 +17,7 @@
  * Source data period is solid, no spaces are allowed.
  */
 class QnFlatCameraDataLoader:
-    public QnAbstractCameraDataLoader,
-    public nx::vms::client::core::RemoteConnectionAware
+    public QnAbstractCameraDataLoader
 {
     Q_OBJECT
 public:

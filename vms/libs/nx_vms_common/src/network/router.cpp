@@ -2,74 +2,62 @@
 
 #include "router.h"
 
-#include <common/static_common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/vms/api/data/peer_data.h>
+#include <nx/vms/common/application_context.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/discovery/manager.h>
 #include <nx_ec/abstract_ec_connection.h>
 
-QString QnRoute::toString() const
-{
-    return nx::format("%1 (%2 %3)").args(
-        id,
-        gatewayId.isNull() ? QString("direct") : (
-            gatewayId.toString() + "+" + QString::number(distance)),
-        reverseConnect ? "reverse" : addr.toString());
-}
+using namespace nx::vms::common;
 
-QnRouter::QnRouter(nx::vms::discovery::Manager* moduleManager, QObject* parent):
-    QObject(parent),
-    m_moduleManager(moduleManager)
-{
-}
+namespace {
 
-QnRoute QnRouter::routeTo(const QnUuid& serverId, nx::vms::common::SystemContext* context)
-{
-    if (!NX_ASSERT(context))
-        return {};
-
-    auto server = context->resourcePool()->getResourceById<QnMediaServerResource>(serverId);
-    return routeTo(server);
-}
-
-QnRoute QnRouter::routeTo(const QnMediaServerResourcePtr& server)
+QnRoute routeTo(
+    SystemContext* systemContext,
+    const QnUuid& serverId,
+    const QnMediaServerResourcePtr& server)
 {
     if (!server || server->getStatus() != nx::vms::api::ResourceStatus::online)
-        return {}; //< Do not route to unknown or offline server.
+        return {}; //< Do not route to unknown or offline Server.
+
+    if (!NX_ASSERT(systemContext) || !systemContext->moduleDiscoveryManager())
+        return {}; // Routing is not enabled in the Context.
+
+    auto moduleDiscoveryManager = systemContext->moduleDiscoveryManager();
 
     QnRoute result;
-    result.id = server->getId();
+    result.id = serverId;
 
     // Route to itself (mediaserver-side only).
-    if (server->getId() == server->systemContext()->peerId())
+    if (serverId == systemContext->peerId())
     {
         result.addr = nx::network::url::getEndpoint(server->getApiUrl());
         return result;
     }
 
     // Check if we have direct access to peer.
-    if (const auto endpoint = m_moduleManager->getEndpoint(result.id))
+    if (const auto endpoint = moduleDiscoveryManager->getEndpoint(result.id))
     {
         result.addr = *endpoint;
         return result;
     }
 
-    auto connection = server->systemContext()->ec2Connection();
+    auto connection = systemContext->ec2Connection();
     if (!connection)
         return result; //< No connection to the peer network, can't route.
 
-    if (nx::vms::api::PeerData::isClient(qnStaticCommon->localPeerType()))
+    if (nx::vms::api::PeerData::isClient(appContext()->localPeerType()))
     {
         // Proxy via current server to the other servers (client side only)
         result.gatewayId = connection->moduleInformation().id;
 
-        if (const auto endpoint = m_moduleManager->getEndpoint(result.gatewayId))
+        if (const auto endpoint = moduleDiscoveryManager->getEndpoint(result.gatewayId))
             result.addr = *endpoint;
         else
-            NX_WARNING(this, "No primary interface found for current server yet.");
+            NX_WARNING(NX_SCOPE_TAG, "No primary interface found for current server yet.");
 
         return result;
     }
@@ -91,7 +79,7 @@ QnRoute QnRouter::routeTo(const QnMediaServerResourcePtr& server)
 
     // route gateway is found
     result.gatewayId = routeVia;
-    if (const auto endpoint = m_moduleManager->getEndpoint(result.gatewayId))
+    if (const auto endpoint = moduleDiscoveryManager->getEndpoint(result.gatewayId))
     {
         result.addr = *endpoint;
     }
@@ -104,4 +92,32 @@ QnRoute QnRouter::routeTo(const QnMediaServerResourcePtr& server)
     }
 
     return result;
+}
+
+} // namespace
+
+QString QnRoute::toString() const
+{
+    return nx::format("%1 (%2 %3)").args(
+        id,
+        gatewayId.isNull() ? QString("direct") : (
+            gatewayId.toString() + "+" + QString::number(distance)),
+        reverseConnect ? "reverse" : addr.toString());
+}
+
+QnRoute QnRouter::routeTo(const QnUuid& serverId, SystemContext* context)
+{
+    if (!NX_ASSERT(context))
+        return {};
+
+    auto server = context->resourcePool()->getResourceById<QnMediaServerResource>(serverId);
+    return ::routeTo(context, serverId, server);
+}
+
+QnRoute QnRouter::routeTo(const QnMediaServerResourcePtr& server)
+{
+    if (!NX_ASSERT(server))
+        return {};
+
+    return ::routeTo(server->systemContext(), server->getId(), server);
 }

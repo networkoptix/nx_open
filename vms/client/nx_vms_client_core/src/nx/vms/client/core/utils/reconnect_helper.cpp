@@ -24,8 +24,8 @@ ReconnectHelper::ReconnectHelper(std::optional<QnUuid> stickyReconnectTo)
     else  // List of all known m_servers. Should not be updated as we are disconnected.
         m_servers.append(resourcePool()->servers());
 
-    // Check if there are no m_servers in the system.
-    NX_ASSERT(!m_servers.empty());
+    // Check if there are no servers in the system (e.g connection was broken before resources are
+    // received).
     if (m_servers.empty())
         return;
 
@@ -40,10 +40,14 @@ ReconnectHelper::ReconnectHelper(std::optional<QnUuid> stickyReconnectTo)
 
 QnMediaServerResourcePtr ReconnectHelper::currentServer() const
 {
+    // Reconnect process was not initialized.
+    if (m_currentIndex < 0)
+        return {};
+
     if (NX_ASSERT(m_currentIndex >= 0 && m_currentIndex < m_servers.size()))
         return m_servers[m_currentIndex];
 
-    return QnMediaServerResourcePtr();
+    return {};
 }
 
 std::optional<nx::network::SocketAddress> ReconnectHelper::currentAddress() const

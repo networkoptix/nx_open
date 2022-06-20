@@ -1378,9 +1378,6 @@ enum IDType
 
     ChangeDefaultCameraPasswordAction,
 
-    /** Start searching for local files. */
-    UpdateLocalFilesAction,
-
     /**
      * Opens dialog to copy recording parameters & schedule of specified camera.
      */

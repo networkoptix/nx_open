@@ -10,18 +10,13 @@
 #include <client/client_globals.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
 
 #include "image_provider.h"
 
 namespace nx::vms::client::desktop {
 
 // TODO: #vkutin Use AbstractResourceThumbnail and its dependants instead of this class if needed.
-class CameraThumbnailManager:
-    public ImageProvider,
-    public nx::vms::client::core::CommonModuleAware,
-    public nx::vms::client::core::RemoteConnectionAware
+class CameraThumbnailManager: public ImageProvider
 {
     Q_OBJECT
     using base_type = ImageProvider;
@@ -60,8 +55,8 @@ protected:
     virtual void doLoadAsync() override;
 
 private:
-    void at_resPool_statusChanged(const QnResourcePtr& resource);
-    void at_resPool_resourceRemoved(const QnResourcePtr& resource);
+    void atCameraStatusChanged(const QnResourcePtr& resource);
+    void atResourcesRemoved(const QnResourceList& resources);
 
 private:
     rest::Handle loadThumbnailForCamera(const QnVirtualCameraResourcePtr& camera);

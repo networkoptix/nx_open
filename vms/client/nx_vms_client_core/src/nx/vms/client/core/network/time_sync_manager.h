@@ -8,12 +8,14 @@
 
 namespace nx::vms::client::core {
 
+class SystemContext;
+
 class TimeSyncManager: public nx::vms::time::TimeSyncManager
 {
     Q_OBJECT
     using base_type = nx::vms::time::TimeSyncManager;
 public:
-    TimeSyncManager(QnCommonModule* commonModule, const QnUuid& serverId);
+    TimeSyncManager(SystemContext* systemContext, const QnUuid& serverId);
     virtual ~TimeSyncManager() override;
 
     virtual void resync() override;

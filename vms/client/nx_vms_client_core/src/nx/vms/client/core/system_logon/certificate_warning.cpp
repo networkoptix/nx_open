@@ -46,6 +46,7 @@ QString CertificateWarning::details(
         case Reason::serverCertificateChanged:
             details = tr("You attempted to connect to this Server but the Server's certificate has "
                 "changed.");
+            break;
         default:
             NX_ASSERT(false, "Unreachable");
             break;

@@ -174,7 +174,7 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
                             context(),
                             RemoteConnectionErrorCode::sessionExpired,
                             /*moduleInformation*/ {},
-                            commonModule()->engineVersion()
+                            appContext()->version()
                         );
                     },
                     this);
@@ -402,7 +402,7 @@ void ConnectActionsHandler::setupConnectTimeoutTimer(milliseconds timeout)
                 context(),
                 RemoteConnectionErrorCode::connectionTimeout,
                 /*moduleInformation*/ {},
-                commonModule()->engineVersion());
+                appContext()->version());
         });
 }
 
@@ -479,7 +479,7 @@ void ConnectActionsHandler::handleConnectionError(RemoteConnectionError error)
                 mainWindowWidget(),
                 d->currentConnectionProcess->context->moduleInformation,
                 d->currentConnectionProcess->context->logonData,
-                commonModule()->engineVersion()))
+                appContext()->version()))
             {
                 ConnectionInfo compatibilityInfo{
                     .address = d->currentConnectionProcess->context->logonData.address,
@@ -502,7 +502,7 @@ void ConnectActionsHandler::handleConnectionError(RemoteConnectionError error)
                 QnConnectionDiagnosticsHelper::showConnectionErrorMessage(context(),
                     error,
                     d->currentConnectionProcess->context->moduleInformation,
-                    commonModule()->engineVersion(),
+                    appContext()->version(),
                     mainWindowWidget());
             }
             break;
@@ -588,7 +588,7 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
                         context(),
                         errorCode,
                         serverModuleInformation,
-                        commonModule()->engineVersion()
+                        appContext()->version()
                     );
                 },
                 this);
@@ -1173,9 +1173,15 @@ bool ConnectActionsHandler::disconnectFromServer(DisconnectFlags flags)
         globalSettings()->synchronizeNow();
 
     if (flags.testFlag(DisconnectFlag::SwitchingServer))
+    {
         setState(LogicalState::connecting);
+    }
     else
+    {
         setState(LogicalState::disconnected);
+        if (auto welcomeScreen = mainWindow()->welcomeScreen())
+            welcomeScreen->dropConnectingState();
+    }
 
     clearConnection();
     return true;

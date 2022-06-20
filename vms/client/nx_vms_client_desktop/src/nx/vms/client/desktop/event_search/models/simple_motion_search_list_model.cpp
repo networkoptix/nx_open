@@ -15,6 +15,7 @@
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
@@ -178,12 +179,22 @@ void SimpleMotionSearchListModel::clearData()
         m_loader->disconnect(this);
 
     m_data.clear();
+    m_loader.reset();
 
-    const auto mediaResource = navigator()->currentResource().dynamicCast<QnMediaResource>();
+    const auto resource = navigator()->currentResource();
+    if (!resource)
+        return;
 
-    m_loader = mediaResource
-        ? navigator()->cameraDataManager()->loader(mediaResource, true)
-        : QnCachingCameraDataLoaderPtr();
+    auto systemContext = SystemContext::fromResource(resource);
+    if (!NX_ASSERT(systemContext))
+        return;
+
+    if (const auto mediaResource = resource.dynamicCast<QnMediaResource>())
+    {
+        m_loader = systemContext->cameraDataManager()->loader(
+            mediaResource,
+            /*createIfNotExists*/ true);
+    }
 
     if (!m_loader)
         return;

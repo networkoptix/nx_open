@@ -36,6 +36,8 @@ public:
     SystemContext(QnUuid peerId, QObject* parent = nullptr);
     virtual ~SystemContext() override;
 
+    static SystemContext* fromResource(const QnResourcePtr& resource);
+
     static std::unique_ptr<nx::vms::common::SystemContextInitializer> fromQmlContext(
         QObject* source);
     void storeToQmlContext(QQmlContext* qmlContext);

@@ -5,6 +5,7 @@
 #include <chrono>
 
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QThread>
 #include <QtQuick/QQuickItem>
 #include <QtWebEngine/QQuickWebEngineProfile>
 #include <QtWidgets/QApplication>

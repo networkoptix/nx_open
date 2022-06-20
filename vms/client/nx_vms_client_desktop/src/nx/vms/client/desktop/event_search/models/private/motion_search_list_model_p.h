@@ -2,10 +2,7 @@
 
 #pragma once
 
-#include "../motion_search_list_model.h"
-
 #include <deque>
-#include <bitset>
 #include <vector>
 
 #include <QtCore/QScopedPointer>
@@ -13,10 +10,11 @@
 #include <QtCore/QTimer>
 
 #include <motion/motion_detection.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
-#include <nx/vms/client/desktop/event_search/models/private/abstract_async_search_list_model_p.h>
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
+
+#include "abstract_async_search_list_model_p.h"
+#include "../motion_search_list_model.h"
 
 class QMenu;
 class QTimer;
@@ -35,8 +33,7 @@ struct MotionChunk
 };
 
 class MotionSearchListModel::Private:
-    public AbstractAsyncSearchListModel::Private,
-    public nx::vms::client::core::RemoteConnectionAware
+    public AbstractAsyncSearchListModel::Private
 {
     Q_OBJECT
     using base_type = AbstractAsyncSearchListModel::Private;

@@ -12,7 +12,6 @@
 
 class QOpenGLWidget;
 class QnClientCoreModule;
-class QnCameraDataManager;
 
 namespace nx::vms::api { enum class PeerType; }
 
@@ -30,7 +29,6 @@ class AnalyticsSettingsManager;
 class ClientStateHandler;
 class LicenseHealthWatcher;
 class PerformanceMonitor;
-class ResourceDirectoryBrowser;
 class RunningInstancesManager;
 class SharedMemoryManager;
 class SystemContext;
@@ -55,14 +53,12 @@ public:
     void initDesktopCamera(QOpenGLWidget* window);
     void startLocalSearchers();
 
-    QnCameraDataManager* cameraDataManager() const;
     QnClientCoreModule* clientCoreModule() const;
 
     nx::vms::client::desktop::SystemContext* systemContext() const;
 
     QnStartupParameters startupParameters() const;
 
-    nx::vms::client::desktop::ResourceDirectoryBrowser* resourceDirectoryBrowser() const;
     nx::vms::client::desktop::AnalyticsSettingsManager* analyticsSettingsManager() const;
 
     nx::vms::client::desktop::PerformanceMonitor* performanceMonitor() const;
@@ -77,7 +73,6 @@ private:
     static void initSurfaceFormat();
     void initNetwork();
     void initSkin();
-    void initLocalResources();
     void registerResourceDataProviders();
 
 private:
@@ -86,9 +81,7 @@ private:
 
     QScopedPointer<nx::vms::client::desktop::AnalyticsMetadataProviderFactory>
         m_analyticsMetadataProviderFactory;
-    QScopedPointer<nx::vms::client::desktop::ResourceDirectoryBrowser> m_resourceDirectoryBrowser;
 
-    QnCameraDataManager* m_cameraDataManager = nullptr;
     QScopedPointer<nx::vms::client::desktop::PerformanceMonitor> m_performanceMonitor;
     QScopedPointer<nx::vms::client::desktop::LicenseHealthWatcher> m_licenseHealthWatcher;
 };

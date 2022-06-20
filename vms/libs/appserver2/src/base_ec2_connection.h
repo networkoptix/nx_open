@@ -42,7 +42,7 @@ public:
     BaseEc2Connection(QueryProcessorType* queryProcessor);
     virtual ~BaseEc2Connection();
 
-    void init(QnCommonModule* commonModule);
+    void init(QnCommonModule* commonModule, nx::vms::discovery::Manager* discoveryManager);
 
     virtual AbstractResourceManagerPtr getResourceManager(const Qn::UserSession& userSession) override;
     virtual AbstractMediaServerManagerPtr getMediaServerManager(const Qn::UserSession& userSession) override;
@@ -147,7 +147,9 @@ BaseEc2Connection<QueryProcessorType>::~BaseEc2Connection()
 }
 
 template<class QueryProcessorType>
-void BaseEc2Connection<QueryProcessorType>::init(QnCommonModule* commonModule)
+void BaseEc2Connection<QueryProcessorType>::init(
+    QnCommonModule* commonModule,
+    nx::vms::discovery::Manager* discoveryManager)
 {
     m_licenseNotificationManager = std::make_shared<QnLicenseNotificationManager>();
     m_resourceNotificationManager = std::make_shared<QnResourceNotificationManager>();
@@ -162,7 +164,8 @@ void BaseEc2Connection<QueryProcessorType>::init(QnCommonModule* commonModule)
     m_webPageNotificationManager = std::make_shared<QnWebPageNotificationManager>();
     m_storedFileNotificationManager = std::make_shared<QnStoredFileNotificationManager>();
     m_miscNotificationManager = std::make_shared<QnMiscNotificationManager>();
-    m_discoveryNotificationManager = std::make_shared<QnDiscoveryNotificationManager>(commonModule);
+    m_discoveryNotificationManager = std::make_shared<QnDiscoveryNotificationManager>(
+        discoveryManager);
     m_timeNotificationManager = std::make_shared<QnTimeNotificationManager>();
     m_analyticsNotificationManager = std::make_shared<AnalyticsNotificationManager>();
     m_notificationManager = std::make_unique<ECConnectionNotificationManager>(

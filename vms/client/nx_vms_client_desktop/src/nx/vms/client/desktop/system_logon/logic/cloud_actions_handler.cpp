@@ -6,7 +6,6 @@
 #include <QtWidgets/QAction>
 
 #include <client/client_globals.h>
-#include <common/common_module.h>
 #include <helpers/cloud_url_helper.h>
 #include <helpers/system_helpers.h>
 #include <nx/branding.h>
@@ -114,7 +113,7 @@ void CloudActionsHandler::at_forcedLogout()
         context(),
         nx::vms::client::core::RemoteConnectionErrorCode::cloudSessionExpired,
         /*moduleInformation*/ {},
-        commonModule()->engineVersion());
+        appContext()->version());
 }
 
 } // namespace nx::vms::client::desktop

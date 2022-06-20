@@ -3,6 +3,7 @@
 #include "storage_config_widget.h"
 #include "ui_storage_config_widget.h"
 
+#include <QtCore/QTimer>
 #include <QtGui/QKeyEvent>
 #include <QtWidgets/QMenu>
 

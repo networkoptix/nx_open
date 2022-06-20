@@ -23,9 +23,7 @@ Context::Context(nx::core::access::Mode resourceAccessMode):
         /*peerId*/ QnUuid::createUuid(),
         /*sessionId*/ QnUuid::createUuid(),
         resourceAccessMode);
-    d->commonModule = std::make_unique<QnCommonModule>(
-        d->systemContext.get(),
-        /*moduleDiscoveryManager*/ nullptr);
+    d->commonModule = std::make_unique<QnCommonModule>(d->systemContext.get());
 }
 
 Context::~Context()

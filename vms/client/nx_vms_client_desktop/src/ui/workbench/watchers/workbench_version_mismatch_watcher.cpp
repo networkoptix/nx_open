@@ -2,15 +2,14 @@
 
 #include "workbench_version_mismatch_watcher.h"
 
-#include <nx/utils/log/log.h>
-
-#include <common/common_module.h>
-
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/resource.h>
 #include <core/resource/media_server_resource.h>
-
+#include <core/resource/resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/utils/log/log.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <ui/workbench/workbench_context.h>
+
+using namespace nx::vms::client::desktop;
 
 using Data = QnWorkbenchVersionMismatchWatcher::Data;
 
@@ -132,7 +131,7 @@ void QnWorkbenchVersionMismatchWatcher::updateComponents()
 {
     m_components.clear();
 
-    Data clientData(Component::client, commonModule()->engineVersion());
+    Data clientData(Component::client, appContext()->version());
     m_components.push_back(clientData);
 
     for (const auto& server: resourcePool()->servers())

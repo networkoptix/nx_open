@@ -32,6 +32,7 @@
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
+#include <utils/common/id.h>
 
 namespace nx::vms::client::desktop {
 namespace test {

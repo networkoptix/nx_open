@@ -29,7 +29,6 @@ public:
 
 signals:
     void recordingSettingsChanged();
-    void mediaDirectoriesChanged();
 
 private:
     void at_addMediaFolderButton_clicked();

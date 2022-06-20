@@ -10,6 +10,8 @@
 
 class QnStoragePluginFactory;
 
+namespace nx::utils { class TimerManager; }
+
 namespace nx::vms::common {
 
 /**
@@ -49,6 +51,8 @@ public:
     QString moduleDisplayName(const QnUuid& id) const;
 
     QnStoragePluginFactory* storagePluginFactory() const;
+
+    nx::utils::TimerManager* timerManager() const;
 
 private:
     struct Private;

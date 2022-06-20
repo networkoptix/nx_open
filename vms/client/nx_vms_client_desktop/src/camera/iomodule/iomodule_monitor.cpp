@@ -96,7 +96,7 @@ bool QnIOModuleMonitor::open()
     query.addQueryItem(QString::fromLatin1(Qn::PHYSICAL_ID_URL_QUERY_ITEM), m_camera->getPhysicalId());
     requestUrl.setQuery(query);
 
-    QnRoute route = commonModule()->router()->routeTo(server);
+    QnRoute route = QnRouter::routeTo(server);
     if (!route.gatewayId.isNull())
     {
         if (route.addr.isNull())

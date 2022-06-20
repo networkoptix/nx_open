@@ -37,6 +37,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 #include <nx/vms/client/desktop/resources/resource_factory.h>
+#include <nx/vms/client/desktop/resources/unified_resource_pool.h>
 #include <nx/vms/client/desktop/session_manager/default_process_interface.h>
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
 #include <nx/vms/client/desktop/settings/ipc_settings_synchronizer.h>
@@ -56,9 +57,17 @@
 #include <nx/vms/utils/external_resources.h>
 #include <nx/vms/utils/translation/translation_manager.h>
 #include <platform/platform_abstraction.h>
+#include <core/resource_management/resource_discovery_manager.h>
+#include <core/storage/file_storage/layout_storage_resource.h>
+#include <core/storage/file_storage/qtfile_storage_resource.h>
+#include <core/resource/storage_plugin_factory.h>
+#include <client/client_resource_processor.h>
+#include <client/system_weights_manager.h>
+#include <core/resource/local_resource_status_watcher.h>
+#include <core/resource/resource_directory_browser.h>
 
 #if defined(Q_OS_MACOS)
-#include <ui/workaround/mac_utils.h>
+    #include <ui/workaround/mac_utils.h>
 #endif
 
 #include "system_context.h"
@@ -413,7 +422,7 @@ struct ApplicationContext::Private
             if (!version.isNull())
             {
                 NX_INFO(this, "Override engine version: %1", version);
-                clientCoreModule->commonModule()->setEngineVersion(version);
+                overriddenVersion = version;
             }
         }
     }
@@ -441,13 +450,45 @@ struct ApplicationContext::Private
             qmlEngine->addImportPath(path);
     }
 
+    void initializeLocalResourcesSearch()
+    {
+        // client uses ordinary QT file to access file system
+        q->storagePluginFactory()->registerStoragePlugin(
+            "file",
+            QnQtFileStorageResource::instance,
+            /*isDefaultProtocol*/ true);
+        q->storagePluginFactory()->registerStoragePlugin(
+            "qtfile",
+            QnQtFileStorageResource::instance);
+        q->storagePluginFactory()->registerStoragePlugin(
+            "layout",
+            QnLayoutFileStorageResource::instance);
+
+        // In the future there will be a separate system context for local resources.
+        auto localContext = mainSystemContext.get();
+
+        resourceDiscoveryManager = std::make_unique<QnResourceDiscoveryManager>(localContext);
+        clientResourceProcessor = std::make_unique<QnClientResourceProcessor>(localContext);
+        clientResourceProcessor->moveToThread(resourceDiscoveryManager.get());
+        resourceDiscoveryManager->setResourceProcessor(clientResourceProcessor.get());
+        resourceDiscoveryManager->setReady(true);
+
+        localResourceStatusWatcher =
+            std::make_unique<QnLocalResourceStatusWatcher>(localContext);
+
+        if (!startupParameters.skipMediaFolderScan && !startupParameters.acsMode)
+            resourceDirectoryBrowser = std::make_unique<ResourceDirectoryBrowser>(localContext);
+    }
+
     ApplicationContext* const q;
     const Mode mode;
     const QnStartupParameters startupParameters;
+    std::optional<nx::utils::SoftwareVersion> overriddenVersion;
     std::vector<QPointer<SystemContext>> systemContexts;
     std::vector<QPointer<WindowContext>> windowContexts;
     std::unique_ptr<SystemContext> mainSystemContext; //< Main System Context;
     std::unique_ptr<QnClientCoreModule> clientCoreModule;
+    std::unique_ptr<UnifiedResourcePool> unifiedResourcePool;
 
     // Settings modules.
     std::unique_ptr<QnClientSettings> settings;
@@ -462,6 +503,12 @@ struct ApplicationContext::Private
     std::unique_ptr<session::DefaultProcessInterface> processInterface;
     std::unique_ptr<session::SessionManager> sessionManager;
 
+    // Local resources search modules.
+    std::unique_ptr<QnResourceDiscoveryManager> resourceDiscoveryManager;
+    std::unique_ptr<QnClientResourceProcessor> clientResourceProcessor;
+    std::unique_ptr<QnLocalResourceStatusWatcher> localResourceStatusWatcher;
+    std::unique_ptr<ResourceDirectoryBrowser> resourceDirectoryBrowser;
+
     // Specialized context parts.
     std::unique_ptr<ContextStatisticsModule> statisticsModule;
 
@@ -473,6 +520,7 @@ struct ApplicationContext::Private
     std::unique_ptr<RadassController> radassController;
     std::unique_ptr<ResourceFactory> resourceFactory;
     std::unique_ptr<UploadManager> uploadManager;
+    std::unique_ptr<QnSystemsWeightsManager> systemsWeightsManager;
 
     // Network modules
     std::unique_ptr<CloudCrossSystemManager> cloudCrossSystemManager;
@@ -531,13 +579,17 @@ ApplicationContext::ApplicationContext(
             d->statisticsModule = std::make_unique<ContextStatisticsModule>();
             d->initializeNetworkModules();
             d->initializeSystemContext();
+            d->unifiedResourcePool = std::make_unique<UnifiedResourcePool>();
+            d->mainSystemContext->enableRouting(moduleDiscoveryManager());
             d->initializeClientCoreModule();
             d->initializeQml();
+            d->initializeLocalResourcesSearch();
             d->applauncherGuard = std::make_unique<ApplauncherGuard>();
             d->autoRunWatcher = std::make_unique<QnClientAutoRunWatcher>();
             d->radassController = std::make_unique<RadassController>();
             d->resourceFactory = std::make_unique<ResourceFactory>();
             d->uploadManager = std::make_unique<UploadManager>();
+            d->systemsWeightsManager = std::make_unique<QnSystemsWeightsManager>();
             break;
         }
     }
@@ -556,6 +608,13 @@ ApplicationContext* ApplicationContext::instance()
 {
     NX_ASSERT(s_instance);
     return s_instance;
+}
+
+nx::utils::SoftwareVersion ApplicationContext::version() const
+{
+    return d->overriddenVersion
+        ? *d->overriddenVersion
+        : nx::utils::SoftwareVersion(nx::build_info::vmsVersion());
 }
 
 SystemContext* ApplicationContext::currentSystemContext() const
@@ -580,6 +639,7 @@ std::vector<SystemContext*> ApplicationContext::systemContexts() const
 void ApplicationContext::addSystemContext(SystemContext* systemContext)
 {
     d->systemContexts.push_back(systemContext);
+    emit systemContextAdded(systemContext);
 }
 
 void ApplicationContext::removeSystemContext(SystemContext* systemContext)
@@ -587,6 +647,7 @@ void ApplicationContext::removeSystemContext(SystemContext* systemContext)
     auto iter = std::find(d->systemContexts.begin(), d->systemContexts.end(), systemContext);
     if (NX_ASSERT(iter != d->systemContexts.end()))
         d->systemContexts.erase(iter);
+    emit systemContextRemoved(systemContext);
 }
 
 SystemContext* ApplicationContext::systemContextByCloudSystemId(const QString& cloudSystemId) const
@@ -642,6 +703,11 @@ ContextStatisticsModule* ApplicationContext::statisticsModule() const
     return d->statisticsModule.get();
 }
 
+UnifiedResourcePool* ApplicationContext::unifiedResourcePool() const
+{
+    return d->unifiedResourcePool.get();
+}
+
 ObjectDisplaySettings* ApplicationContext::objectDisplaySettings() const
 {
     return d->objectDisplaySettings.get();
@@ -692,5 +758,9 @@ UploadManager* ApplicationContext::uploadManager() const
     return d->uploadManager.get();
 }
 
+QnResourceDiscoveryManager* ApplicationContext::resourceDiscoveryManager() const
+{
+    return d->resourceDiscoveryManager.get();
+}
 
 } // namespace nx::vms::client::desktop

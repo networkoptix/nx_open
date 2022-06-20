@@ -4,7 +4,6 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
 
 #include "async_image_result.h"
 
@@ -12,9 +11,7 @@ namespace nx::api { struct CameraImageRequest; }
 
 namespace nx::vms::client::core {
 
-class NX_VMS_CLIENT_CORE_API CameraAsyncImageRequest:
-    public AsyncImageResult,
-    public RemoteConnectionAware
+class NX_VMS_CLIENT_CORE_API CameraAsyncImageRequest: public AsyncImageResult
 {
     Q_OBJECT
     using base_type = AsyncImageResult;

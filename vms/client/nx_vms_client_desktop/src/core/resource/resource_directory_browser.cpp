@@ -7,8 +7,7 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QThread>
 
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
+#include <client/client_settings.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/avi/filetypesupport.h>
 #include <core/resource/file_layout_resource.h>
@@ -21,8 +20,15 @@
 
 namespace nx::vms::client::desktop {
 
-UpdateFileLayoutHelper::UpdateFileLayoutHelper(QObject* parent):
-    QObject(parent)
+//-------------------------------------------------------------------------------------------------
+// UpdateFileLayoutHelper
+
+UpdateFileLayoutHelper::UpdateFileLayoutHelper(
+    nx::vms::common::SystemContext* systemContext,
+    QObject* parent)
+    :
+    QObject(parent),
+    SystemContextAware(systemContext)
 {
 }
 
@@ -45,9 +51,8 @@ void UpdateFileLayoutHelper::finishUpdateLayout(const QnFileLayoutResourcePtr& l
     NX_ASSERT(QCoreApplication::instance()->thread() == thread(),
         "Must be called from the main thread");
 
-    QnResourcePool* resourcePool = qnClientCoreModule->resourcePool();
-    auto sourceLayout =
-        resourcePool->getResourceByUrl(loadedLayout->getUrl()).dynamicCast<QnFileLayoutResource>();
+    auto sourceLayout = resourcePool()->getResourceByUrl(loadedLayout->getUrl())
+        .dynamicCast<QnFileLayoutResource>();
 
     if (loadedLayout && sourceLayout)
     {
@@ -56,12 +61,120 @@ void UpdateFileLayoutHelper::finishUpdateLayout(const QnFileLayoutResourcePtr& l
     }
 }
 
+//-------------------------------------------------------------------------------------------------
+// LocalResourceProducer
 
-ResourceDirectoryBrowser::ResourceDirectoryBrowser(QObject* parent):
+LocalResourceProducer::LocalResourceProducer(
+    nx::vms::common::SystemContext* systemContext,
+    UpdateFileLayoutHelper* helper,
+    QObject* parent)
+    :
     QObject(parent),
+    SystemContextAware(systemContext),
+    m_updateFileLayoutHelper(helper)
+{
+}
+
+void LocalResourceProducer::createLocalResources(const QStringList& pathList)
+{
+    if (QThread::currentThread()->isInterruptionRequested())
+        return;
+
+    QPointer<QnResourcePool> resourcePool(this->resourcePool());
+
+    QnResourceList newResources;
+    for (const auto& filePath: pathList)
+    {
+        if (QThread::currentThread()->isInterruptionRequested())
+            return;
+
+        QnResourcePtr resource =
+            ResourceDirectoryBrowser::createArchiveResource(filePath, resourcePool);
+        if (!resource)
+            continue;
+
+        const auto resourcePath = resource->getUrl();
+        if (resource->getId().isNull() && !resourcePath.isEmpty())
+        {
+            // Create same IDs for the same files.
+            resource->setIdUnsafe(QnUuid::fromArbitraryData(resourcePath));
+        }
+
+        // Some resources can already be added to the Resource Pool.
+        if (!resource->systemContext())
+            newResources.append(resource);
+    }
+    if (QThread::currentThread()->isInterruptionRequested())
+        return;
+
+    resourcePool->addResources(newResources);
+}
+
+void LocalResourceProducer::updateFileLayoutResource(const QString& path)
+{
+    if (QThread::currentThread()->isInterruptionRequested())
+        return;
+
+    if (auto fileLayout = resourcePool()->getResourceByUrl(path)
+        .dynamicCast<QnFileLayoutResource>())
+    {
+        // Remove layouts items in the main thread.
+        QMetaObject::invokeMethod(m_updateFileLayoutHelper,
+            "startUpdateLayout",
+            Qt::BlockingQueuedConnection,
+            Q_ARG(QnFileLayoutResourcePtr, fileLayout));
+
+        QString password = layout::password(fileLayout);
+        QnFileLayoutResourcePtr updatedLayout =
+            layout::layoutFromFile(fileLayout->getUrl(), password);
+        if (!updatedLayout)
+            return;
+
+        if (QThread::currentThread()->isInterruptionRequested())
+            return;
+
+        // Update source layout using loaded layout in the main thread.
+        QMetaObject::invokeMethod(m_updateFileLayoutHelper,
+            "finishUpdateLayout",
+            Qt::BlockingQueuedConnection,
+            Q_ARG(QnFileLayoutResourcePtr, updatedLayout));
+    }
+}
+
+void LocalResourceProducer::updateVideoFileResource(const QString& path)
+{
+    if (QThread::currentThread()->isInterruptionRequested())
+        return;
+
+    if (auto aviResource = resourcePool()->getResourceByUrl(path).dynamicCast<QnAviResource>())
+    {
+        if (QThread::currentThread()->isInterruptionRequested())
+            return;
+
+        resourcePool()->removeResource(aviResource);
+
+        if (QThread::currentThread()->isInterruptionRequested())
+            return;
+
+        QnResourcePtr updatedAviResource(new QnAviResource(path));
+        resourcePool()->addResource(updatedAviResource);
+    }
+}
+
+//-------------------------------------------------------------------------------------------------
+// ResourceDirectoryBrowser
+
+ResourceDirectoryBrowser::ResourceDirectoryBrowser(
+    nx::vms::common::SystemContext* systemContext,
+    QObject* parent)
+    :
+    QObject(parent),
+    SystemContextAware(systemContext),
     m_localResourceDirectoryModel(new LocalResourcesDirectoryModel(this)),
     m_resourceProducerThread(new QThread(this)),
-    m_resourceProducer(new LocalResourceProducer(new UpdateFileLayoutHelper(this)))
+    m_resourceProducer(new LocalResourceProducer(
+        systemContext,
+        new UpdateFileLayoutHelper(systemContext, this)))
 {
     m_resourceProducer->moveToThread(m_resourceProducerThread);
 
@@ -78,6 +191,12 @@ ResourceDirectoryBrowser::ResourceDirectoryBrowser(QObject* parent):
         m_resourceProducer, &LocalResourceProducer::deleteLater);
 
     m_resourceProducerThread->start(QThread::IdlePriority);
+
+    setLocalResourcesDirectories(qnSettings->mediaFolders());
+    connect(qnSettings->notifier(QnClientSettings::MEDIA_FOLDERS),
+        &QnPropertyNotifier::valueChanged,
+        this,
+        [this]() { setLocalResourcesDirectories(qnSettings->mediaFolders()); });
 }
 
 ResourceDirectoryBrowser::~ResourceDirectoryBrowser()
@@ -192,7 +311,6 @@ QnResourcePtr ResourceDirectoryBrowser::createArchiveResource(
 
 void ResourceDirectoryBrowser::dropResourcesFromDirectory(const QString& path)
 {
-    QnResourcePool* resourcePool = qnClientCoreModule->resourcePool();
     const QString canonicalDirPath = QDir(path).canonicalPath();
 
     QnResourceList resourcesToRemove;
@@ -206,18 +324,18 @@ void ResourceDirectoryBrowser::dropResourcesFromDirectory(const QString& path)
             return canonicalFilePath.startsWith(canonicalDirPath);
         };
 
-    for (const auto& aviResource: resourcePool->getResources<QnAviResource>())
+    for (const auto& aviResource: resourcePool()->getResources<QnAviResource>())
     {
         if(shouldBeRemoved(aviResource))
             resourcesToRemove.append(aviResource);
     }
-    for (const auto& fileLayoutResource: resourcePool->getResources<QnFileLayoutResource>())
+    for (const auto& fileLayoutResource: resourcePool()->getResources<QnFileLayoutResource>())
     {
         if (shouldBeRemoved(fileLayoutResource))
             resourcesToRemove.append(fileLayoutResource);
     }
     NX_DEBUG(this, "Drop resources from directory");
-    resourcePool->removeResources(resourcesToRemove);
+    resourcePool()->removeResources(resourcesToRemove);
 }
 
 void ResourceDirectoryBrowser::stopInternal()
@@ -227,109 +345,6 @@ void ResourceDirectoryBrowser::stopInternal()
     m_resourceProducerThread->requestInterruption();
     m_resourceProducerThread->exit();
     m_resourceProducerThread->wait();
-}
-
-LocalResourceProducer::LocalResourceProducer(UpdateFileLayoutHelper* helper, QObject* parent):
-    QObject(parent),
-    m_updateFileLayoutHelper(helper)
-{
-}
-
-void LocalResourceProducer::createLocalResources(const QStringList& pathList)
-{
-    if (QThread::currentThread()->isInterruptionRequested())
-        return;
-
-    auto clientCoreModule = qnClientCoreModule;
-    if (!clientCoreModule)
-        return;
-
-    QPointer<QnResourcePool> resourcePool(clientCoreModule->resourcePool());
-
-    QnResourceList newResources;
-    for (const auto& filePath: pathList)
-    {
-        if (QThread::currentThread()->isInterruptionRequested())
-            return;
-
-        QnResourcePtr resource =
-            ResourceDirectoryBrowser::createArchiveResource(filePath, resourcePool);
-        if (!resource)
-            continue;
-
-        const auto resourcePath = resource->getUrl();
-        if (resource->getId().isNull() && !resourcePath.isEmpty())
-        {
-            // Create same IDs for the same files.
-            resource->setIdUnsafe(QnUuid::fromArbitraryData(resourcePath));
-        }
-
-        // Some resources can already be added to the Resource Pool.
-        if (!resource->systemContext())
-            newResources.append(resource);
-    }
-    if (QThread::currentThread()->isInterruptionRequested())
-        return;
-
-    resourcePool->addResources(newResources);
-}
-
-void LocalResourceProducer::updateFileLayoutResource(const QString& path)
-{
-    if (QThread::currentThread()->isInterruptionRequested())
-        return;
-
-    QnResourcePool* resourcePool = qnClientCoreModule->resourcePool();
-    if (auto fileLayout =
-        resourcePool->getResourceByUrl(path).dynamicCast<QnFileLayoutResource>())
-    {
-        // Remove layouts items in the main thread.
-        QMetaObject::invokeMethod(m_updateFileLayoutHelper,
-            "startUpdateLayout",
-            Qt::BlockingQueuedConnection,
-            Q_ARG(QnFileLayoutResourcePtr, fileLayout));
-
-        QString password = layout::password(fileLayout);
-        QnFileLayoutResourcePtr updatedLayout =
-            layout::layoutFromFile(fileLayout->getUrl(), password);
-        if (!updatedLayout)
-            return;
-
-        if (QThread::currentThread()->isInterruptionRequested())
-            return;
-
-        // Update source layout using loaded layout in the main thread.
-        QMetaObject::invokeMethod(m_updateFileLayoutHelper,
-            "finishUpdateLayout",
-            Qt::BlockingQueuedConnection,
-            Q_ARG(QnFileLayoutResourcePtr, updatedLayout));
-    }
-}
-
-void LocalResourceProducer::updateVideoFileResource(const QString& path)
-{
-    if (QThread::currentThread()->isInterruptionRequested())
-        return;
-
-    auto clientCoreModule = qnClientCoreModule;
-    if (!clientCoreModule)
-        return;
-
-    const auto resourcePool = clientCoreModule->resourcePool();
-
-    if (auto aviResource = resourcePool->getResourceByUrl(path).dynamicCast<QnAviResource>())
-    {
-        if (QThread::currentThread()->isInterruptionRequested())
-            return;
-
-        resourcePool->removeResource(aviResource);
-
-        if (QThread::currentThread()->isInterruptionRequested())
-            return;
-
-        QnResourcePtr updatedAviResource(new QnAviResource(path));
-        resourcePool->addResource(updatedAviResource);
-    }
 }
 
 } // namespace nx::vms::client::desktop

@@ -15,25 +15,17 @@
 #include <QtWidgets/QToolTip>
 
 #include <api/network_proxy_factory.h>
-#include <camera/camera_data_manager.h>
-#include <client_core/client_core_module.h>
-#include <client_core/client_core_settings.h>
-#include <client/client_resource_processor.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
 #include <client/forgotten_systems_manager.h>
-#include <client/system_weights_manager.h>
+#include <client_core/client_core_module.h>
+#include <client_core/client_core_settings.h>
 #include <common/common_module.h>
 #include <core/dataprovider/data_provider_factory.h>
-#include <core/resource_management/resource_discovery_manager.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/client_camera.h>
-#include <core/resource/local_resource_status_watcher.h>
-#include <core/resource/resource_directory_browser.h>
-#include <core/resource/storage_plugin_factory.h>
-#include <core/storage/file_storage/layout_storage_resource.h>
-#include <core/storage/file_storage/qtfile_storage_resource.h>
+#include <core/resource_management/resource_discovery_manager.h>
+#include <core/resource_management/resource_pool.h>
 #include <decoders/video/abstract_video_decoder.h>
 #include <finders/systems_finder.h>
 #include <nx/build_info.h>
@@ -46,8 +38,8 @@
 #include <nx/vms/client/core/watchers/known_server_connections.h>
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/analytics/analytics_metadata_provider_factory.h>
-#include <nx/vms/client/desktop/analytics/analytics_settings_manager_factory.h>
 #include <nx/vms/client/desktop/analytics/analytics_settings_manager.h>
+#include <nx/vms/client/desktop/analytics/analytics_settings_manager_factory.h>
 #include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/components/debug_info_storage.h>
@@ -86,8 +78,8 @@
     #include <ui/workaround/mac_utils.h>
 #endif
 
-#include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/state/running_instances_manager.h>
+#include <nx/vms/client/desktop/state/shared_memory_manager.h>
 
 using namespace nx;
 using namespace nx::vms::client::desktop;
@@ -138,11 +130,6 @@ template<> QnClientModule* Singleton<QnClientModule>::s_instance = nullptr;
 
 struct QnClientModule::Private
 {
-    Private(const QnStartupParameters& startupParameters):
-        startupParameters(startupParameters)
-    {
-    }
-
     void initLicensesModule()
     {
         using namespace nx::vms::license;
@@ -159,12 +146,11 @@ struct QnClientModule::Private
     std::unique_ptr<nx::vms::client::desktop::analytics::AttributeHelper> analyticsAttributeHelper;
     std::unique_ptr<nx::vms::license::VideoWallLicenseUsageHelper> videoWallLicenseUsageHelper;
     std::unique_ptr<DebugInfoStorage> debugInfoStorage;
-    QnResourceDiscoveryManager* resourceDiscoveryManager = nullptr; //< Parent is common module.
 };
 
 QnClientModule::QnClientModule(const QnStartupParameters& startupParameters, QObject* parent):
     QObject(parent),
-    d(new Private(startupParameters))
+    d(new Private{.startupParameters = startupParameters})
 {
     // Shortened initialization if run in self-update mode.
     if (d->startupParameters.selfUpdateMode)
@@ -176,8 +162,6 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParameters, QOb
 
     commonModule->store(new nx::cloud::gateway::VmsGatewayEmbeddable(true));
     commonModule->store(new LocalProxyServer());
-
-    m_cameraDataManager = commonModule->store(new QnCameraDataManager(commonModule));
 
     commonModule->store(new SystemInternetAccessWatcher(commonModule));
     commonModule->findInstance<nx::vms::client::core::watchers::KnownServerConnections>()->start();
@@ -208,22 +192,14 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParameters, QOb
     // Initialize application UI.
     initSkin();
 
-    initLocalResources();
     initSurfaceFormat();
 }
 
 QnClientModule::~QnClientModule()
 {
-    // Discovery manager may not exist in self-update mode.
-    if (d->resourceDiscoveryManager)
-        d->resourceDiscoveryManager->stop();
-
     // Stop all long runnables before deinitializing singletons. Pool may not exist in update mode.
     if (auto longRunnablePool = QnLongRunnablePool::instance())
         longRunnablePool->stopAll();
-
-    if (m_resourceDirectoryBrowser)
-        m_resourceDirectoryBrowser->stop();
 
     // Restoring default message handler.
     nx::utils::disableQtMessageAsserts();
@@ -240,12 +216,12 @@ void QnClientModule::initDesktopCamera([[maybe_unused]] QOpenGLWidget* window)
 #endif
     auto desktopSearcher = commonModule->store(new QnDesktopResourceSearcher(impl));
     desktopSearcher->setLocal(true);
-    d->resourceDiscoveryManager->addDeviceSearcher(desktopSearcher);
+    appContext()->resourceDiscoveryManager()->addDeviceSearcher(desktopSearcher);
 }
 
 void QnClientModule::startLocalSearchers()
 {
-    d->resourceDiscoveryManager->start();
+    appContext()->resourceDiscoveryManager()->start();
 }
 
 void QnClientModule::initSurfaceFormat()
@@ -270,9 +246,6 @@ void QnClientModule::initSurfaceFormat()
 void QnClientModule::initNetwork()
 {
     auto commonModule = clientCoreModule()->commonModule();
-
-    if (!d->startupParameters.videoWallGuid.isNull())
-        commonModule->setVideowallGuid(d->startupParameters.videoWallGuid);
 
     appContext()->moduleDiscoveryManager()->start(systemContext()->resourcePool());
 
@@ -355,44 +328,6 @@ void QnClientModule::initWebEngine()
     }
 }
 
-void QnClientModule::initLocalResources()
-{
-    auto commonModule = clientCoreModule()->commonModule();
-    // client uses ordinary QT file to access file system
-
-    appContext()->storagePluginFactory()->registerStoragePlugin(
-        "file",
-        QnQtFileStorageResource::instance,
-        /*isDefaultProtocol*/ true);
-    appContext()->storagePluginFactory()->registerStoragePlugin(
-        "qtfile",
-        QnQtFileStorageResource::instance);
-    appContext()->storagePluginFactory()->registerStoragePlugin(
-        "layout",
-        QnLayoutFileStorageResource::instance);
-
-    auto resourceProcessor = commonModule->store(new QnClientResourceProcessor());
-
-    d->resourceDiscoveryManager = new QnResourceDiscoveryManager(commonModule);
-    commonModule->setResourceDiscoveryManager(d->resourceDiscoveryManager);
-    resourceProcessor->moveToThread(d->resourceDiscoveryManager);
-    d->resourceDiscoveryManager->setResourceProcessor(resourceProcessor);
-
-    d->resourceDiscoveryManager->setReady(true);
-    commonModule->store(new QnSystemsWeightsManager());
-    commonModule->store(new QnLocalResourceStatusWatcher());
-    if (!d->startupParameters.skipMediaFolderScan && !d->startupParameters.acsMode)
-    {
-        m_resourceDirectoryBrowser.reset(new ResourceDirectoryBrowser());
-        m_resourceDirectoryBrowser->setLocalResourcesDirectories(qnSettings->mediaFolders());
-    }
-}
-
-QnCameraDataManager* QnClientModule::cameraDataManager() const
-{
-    return m_cameraDataManager;
-}
-
 QnClientCoreModule* QnClientModule::clientCoreModule() const
 {
     return appContext()->clientCoreModule();
@@ -430,11 +365,6 @@ nx::vms::client::desktop::analytics::AttributeHelper*
     QnClientModule::analyticsAttributeHelper() const
 {
     return d->analyticsAttributeHelper.get();
-}
-
-ResourceDirectoryBrowser* QnClientModule::resourceDirectoryBrowser() const
-{
-    return m_resourceDirectoryBrowser.data();
 }
 
 AnalyticsSettingsManager* QnClientModule::analyticsSettingsManager() const

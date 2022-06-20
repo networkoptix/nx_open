@@ -386,6 +386,13 @@ void RemoteSession::tryToRestoreConnection()
             std::make_unique<ReconnectHelper>();
     }
 
+    if (d->reconnectHelper->empty())
+    {
+        d->activeServerReconnectErrorCode = RemoteConnectionErrorCode::internalError;
+        checkIfReconnectFailed();
+        return;
+    }
+
     setState(State::reconnecting);
     reconnectStep();
 }

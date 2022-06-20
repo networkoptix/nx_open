@@ -31,6 +31,7 @@ class DescriptorContainer;
 
 namespace ec2 { class AbstractECConnection; }
 namespace nx::core::access { class ResourceAccessProvider; }
+namespace nx::vms::discovery { class Manager; }
 namespace nx::vms::event { class RuleManager; }
 namespace nx::vms::rules { class Engine; }
 
@@ -66,11 +67,6 @@ public:
     virtual ~SystemContext();
 
     /**
-     * Enable network-related functionality. Can be disabled in unit tests.
-     */
-    void initNetworking(QnRouter* router, AbstractCertificateVerifier* certificateVerifier);
-
-    /**
      * Id of the current peer in the Message Bus. It is persistent and is not changed between the
      * application runs. It is stored in the application settings. VMS Server uses it as a Server
      * Resource id. Desktop Client calculates actual peer id depending on the stored persistent id
@@ -89,14 +85,30 @@ public:
     void updateRunningInstanceGuid();
 
     /**
-     * Helper class to find the shortest route to the VMS Server. Can be null, e.g. in unit tests.
+     * Enable network-related functionality. Can be disabled in unit tests.
      */
-    QnRouter* router() const;
+    void enableNetworking(AbstractCertificateVerifier* certificateVerifier);
 
     /**
      * Interface to create SSL certificate validation functors.
      */
     AbstractCertificateVerifier* certificateVerifier() const;
+
+    /**
+     * Enable access to Context's servers using alternative routes, found by the provided manager.
+     */
+    void enableRouting(nx::vms::discovery::Manager* moduleDiscoveryManager);
+
+    /**
+     * Whether Module Disovery Manager is set to the context.
+     */
+    bool isRoutingEnabled() const;
+
+    /**
+     * Helper class to find the shortest route to the VMS Server. Can be null, e.g. in unit tests
+     * or in the cross-System contexts.
+     */
+    nx::vms::discovery::Manager* moduleDiscoveryManager() const;
 
     /**
      * Interface for the Message Bus connection.

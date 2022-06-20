@@ -1933,8 +1933,7 @@ bool setupAuth(
     request.headers.emplace(
         Qn::EC2_RUNTIME_GUID_HEADER_NAME, systemContext->sessionId().toByteArray());
 
-    auto router = systemContext->router();
-    QnRoute route = NX_ASSERT(router) ? router->routeTo(server) : QnRoute();
+    const QnRoute route = QnRouter::routeTo(server);
 
     if (route.reverseConnect)
     {

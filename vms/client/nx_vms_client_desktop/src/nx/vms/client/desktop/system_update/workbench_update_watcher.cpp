@@ -7,12 +7,12 @@
 #include <QtWidgets/QPushButton>
 
 #include <client/client_settings.h>
-#include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <network/system_helpers.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/random.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/webview_widget.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/webview_style.h>
@@ -165,13 +165,13 @@ void WorkbenchUpdateWatcher::atStartCheckUpdate()
     if (versionOverride.isNull())
     {
         m_private->updateCheck = m_private->serverUpdateTool->checkForUpdate(
-            updateUrl, update::LatestVmsVersionParams{commonModule()->engineVersion()});
+            updateUrl, update::LatestVmsVersionParams{appContext()->version()});
     }
     else
     {
         m_private->updateCheck = m_private->serverUpdateTool->checkForUpdate(
             updateUrl,
-            update::CertainVersionParams{versionOverride, commonModule()->engineVersion()});
+            update::CertainVersionParams{versionOverride, appContext()->version()});
     }
 }
 
@@ -201,7 +201,7 @@ void WorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& cont
         return;
 
     // Current version is greater or equal to latest.
-    if (commonModule()->engineVersion() >= targetVersion)
+    if (appContext()->version() >= targetVersion)
         return;
 
     // User is not interested in this update.
@@ -259,7 +259,7 @@ void WorkbenchUpdateWatcher::showUpdateNotification(
 {
     m_notifiedVersion = targetVersion;
 
-    const auto current = commonModule()->engineVersion();
+    const auto current = appContext()->version();
     const bool majorVersionChange = ((targetVersion.major() > current.major())
         || (targetVersion.minor() > current.minor())) && !description.isEmpty();
 

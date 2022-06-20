@@ -4,6 +4,7 @@
 
 #include <QtCore/QCoreApplication> //for Q_DECLARE_TR_FUNCTIONS
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QTimer>
 #include <QtWidgets/QGraphicsLinearLayout>
 
 #include <api/server_rest_connection.h>

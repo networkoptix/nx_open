@@ -89,6 +89,14 @@ SystemContext::~SystemContext()
 {
 }
 
+SystemContext* SystemContext::fromResource(const QnResourcePtr& resource)
+{
+    if (!resource)
+        return {};
+
+    return dynamic_cast<SystemContext*>(resource->systemContext());
+}
+
 std::unique_ptr<nx::vms::common::SystemContextInitializer> SystemContext::fromQmlContext(
     QObject* source)
 {

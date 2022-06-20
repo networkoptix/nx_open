@@ -7,10 +7,10 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/network/abstract_socket.h>
-#include <nx/vms/time/abstract_time_sync_manager.h>
-#include <common/common_module_aware.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/time.h>
+#include <nx/vms/common/system_context_aware.h>
+#include <nx/vms/time/abstract_time_sync_manager.h>
 
 class AbstractSystemClock
 {
@@ -54,7 +54,7 @@ struct QnRoute;
 
 namespace nx::vms::time {
 
-class TimeSyncManager: public common::AbstractTimeSyncManager, public /*mixin*/ QnCommonModuleAware
+class TimeSyncManager: public common::AbstractTimeSyncManager, public common::SystemContextAware
 {
     Q_OBJECT
 public:
@@ -71,7 +71,7 @@ public:
     /**
      * TimeSynchronizationManager::start MUST be called before using class instance.
      */
-    TimeSyncManager(QnCommonModule* commonModule);
+    TimeSyncManager(common::SystemContext* systemContext);
     virtual ~TimeSyncManager();
 
     virtual void stop() override;

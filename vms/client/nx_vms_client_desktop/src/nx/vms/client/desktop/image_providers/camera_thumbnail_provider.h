@@ -5,8 +5,6 @@
 #include <QtCore/QObject>
 
 #include <nx/api/mediaserver/image_request.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
 
 #include "image_provider.h"
 
@@ -16,10 +14,7 @@ namespace nx::vms::client::desktop {
 * This class allows receiving of thumbnails via http request to server.
 * Every setRequest() call will bring a new screenshot.
 */
-class CameraThumbnailProvider:
-    public ImageProvider,
-    public nx::vms::client::core::CommonModuleAware,
-    public nx::vms::client::core::RemoteConnectionAware
+class CameraThumbnailProvider: public ImageProvider
 {
     Q_OBJECT
     using base_type = ImageProvider;

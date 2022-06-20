@@ -10,7 +10,6 @@
 #include <nx/utils/uuid.h>
 
 namespace nx::vms::common { class SystemContext; }
-namespace nx::vms::discovery { class Manager; }
 
 struct NX_VMS_COMMON_API QnRoute
 {
@@ -33,17 +32,12 @@ struct NX_VMS_COMMON_API QnRoute
     QString toString() const;
 };
 
-class NX_VMS_COMMON_API QnRouter: public QObject
+class NX_VMS_COMMON_API QnRouter
 {
-    Q_OBJECT
 public:
-    explicit QnRouter(
-        nx::vms::discovery::Manager* moduleManager,
-        QObject* parent = nullptr);
-
-    QnRoute routeTo(const QnUuid& serverId, nx::vms::common::SystemContext* context);
-    QnRoute routeTo(const QnMediaServerResourcePtr& server);
+    static QnRoute routeTo(const QnUuid& serverId, nx::vms::common::SystemContext* context);
+    static QnRoute routeTo(const QnMediaServerResourcePtr& server);
 
 private:
-    const nx::vms::discovery::Manager* m_moduleManager;
+    QnRouter() {}; // < This class should not be constructed.
 };

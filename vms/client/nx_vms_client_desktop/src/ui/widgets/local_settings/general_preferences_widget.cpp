@@ -108,8 +108,6 @@ void QnGeneralPreferencesWidget::applyChanges()
 
     if (recorderSettingsChanged)
         emit recordingSettingsChanged();
-
-    emit mediaDirectoriesChanged();
 }
 
 void QnGeneralPreferencesWidget::loadDataToUi()

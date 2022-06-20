@@ -24,6 +24,7 @@
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx/branding.h>
 #include <nx/utils/app_info.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
@@ -352,7 +353,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
                 {
                     m_updateCheck = m_serverUpdateTool->checkForUpdate(
                         common::update::updateFeedUrl(),
-                        update::LatestVmsVersionParams{commonModule()->engineVersion()});
+                        update::LatestVmsVersionParams{appContext()->version()});
                 }
             }
         });
@@ -485,7 +486,7 @@ void MultiServerUpdatesWidget::initDownloadActions()
         {
             QSet<QnUuid> targets = m_stateTracker->allPeers();
             auto url = generateUpdatePackageUrl(
-                commonModule()->engineVersion(),
+                appContext()->version(),
                 m_updateInfo, targets,
                 resourcePool()).toString();
 
@@ -497,7 +498,7 @@ void MultiServerUpdatesWidget::initDownloadActions()
         {
             QSet<QnUuid> targets = m_stateTracker->allPeers();
             auto url = generateUpdatePackageUrl(
-                commonModule()->engineVersion(),
+                appContext()->version(),
                 m_updateInfo,
                 targets,
                 resourcePool()).toString();
@@ -927,7 +928,7 @@ void MultiServerUpdatesWidget::recheckSpecificBuild()
     clearUpdateInfo();
     m_updateCheck = m_serverUpdateTool->checkForUpdate(
         common::update::updateFeedUrl(),
-        update::CertainVersionParams{m_pickedSpecificBuild, commonModule()->engineVersion()});
+        update::CertainVersionParams{m_pickedSpecificBuild, appContext()->version()});
     loadDataToUi();
 }
 
@@ -969,7 +970,7 @@ void MultiServerUpdatesWidget::checkForInternetUpdates(bool initial)
         clearUpdateInfo();
         m_updateCheck = m_serverUpdateTool->checkForUpdate(
             common::update::updateFeedUrl(),
-            update::LatestVmsVersionParams{commonModule()->engineVersion()});
+            update::LatestVmsVersionParams{appContext()->version()});
         m_updateReport.compareAndSet(m_updateReport->checking, isChecking());
         // We have changed 'isChecking' here.
         syncUpdateCheckToUi();
@@ -1622,7 +1623,7 @@ void MultiServerUpdatesWidget::processInitialState()
         clearUpdateInfo();
         m_updateCheck = m_serverUpdateTool->checkForUpdate(
             common::update::updateFeedUrl(),
-            update::LatestVmsVersionParams{commonModule()->engineVersion()});
+            update::LatestVmsVersionParams{appContext()->version()});
     }
 
     if (!m_serverUpdateCheck.valid())

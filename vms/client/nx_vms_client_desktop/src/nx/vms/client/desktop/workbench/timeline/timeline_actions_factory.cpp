@@ -6,7 +6,9 @@
 
 #include <camera/camera_data_manager.h>
 #include <nx/vms/api/types/storage_location.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/camera/storage_location_camera_controller.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
 
@@ -26,10 +28,12 @@ QList<QAction*> ChunksFilterActionFactory::newActions(
     auto actionGroup = new QActionGroup(parent);
     actionGroup->setExclusive(true);
 
-    const auto currentMode = navigator()->cameraDataManager()->storageLocation();
+    auto cameraDataManager = appContext()->currentSystemContext()->cameraDataManager();
+
+    const auto currentMode = cameraDataManager->storageLocation();
 
     auto addAction =
-        [this, actionGroup, parent, currentMode]
+        [this, actionGroup, parent, currentMode, cameraDataManager]
         (StorageLocation mode, const QString& text)
         {
             auto action = new QAction(parent);
@@ -37,9 +41,9 @@ QList<QAction*> ChunksFilterActionFactory::newActions(
             action->setCheckable(true);
             action->setChecked(currentMode == mode);
             connect(action, &QAction::triggered, this,
-                [this, mode]
+                [this, mode, cameraDataManager]
                 {
-                    navigator()->cameraDataManager()->setStorageLocation(mode);
+                    cameraDataManager->setStorageLocation(mode);
                     context()->instance<StorageLocationCameraController>()->setStorageLocation(mode);
                 });
             actionGroup->addAction(action);

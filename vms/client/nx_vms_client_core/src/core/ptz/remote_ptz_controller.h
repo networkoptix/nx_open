@@ -8,14 +8,12 @@
 #include <core/ptz/abstract_ptz_controller.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
 
 namespace nx::network::rest { struct JsonResult; }
 namespace nx::network::rest { class Params; }
 
 class NX_VMS_CLIENT_CORE_API QnRemotePtzController:
-    public QnAbstractPtzController,
-    public nx::vms::client::core::RemoteConnectionAware
+    public QnAbstractPtzController
 {
     Q_OBJECT
     typedef QnAbstractPtzController base_type;

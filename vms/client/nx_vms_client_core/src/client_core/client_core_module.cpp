@@ -49,9 +49,7 @@ QnClientCoreModule::QnClientCoreModule(
     base_type(),
     d(new Private())
 {
-    d->commonModule = std::make_unique<QnCommonModule>(
-        systemContext,
-        appContext()->moduleDiscoveryManager());
+    d->commonModule = std::make_unique<QnCommonModule>(systemContext);
 
     d->commonModule->instance<QnResourcesChangesManager>();
     d->commonModule->instance<QnClientPtzControllerPool>();

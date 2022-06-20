@@ -15,7 +15,6 @@
 #include <core/resource/media_stream_capability.h>
 #include <core/resource/motion_window.h>
 #include <core/resource/network_resource.h>
-#include <core/resource_management/resource_discovery_manager.h>
 #include <nx/core/resource/using_media2_type.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/value_cache.h>

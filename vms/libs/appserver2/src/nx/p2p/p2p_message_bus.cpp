@@ -284,7 +284,7 @@ void MessageBus::createOutgoingConnections(
     if (hasStartingConnections())
         return;
 
-    if (commonModule()->isStandAloneMode())
+    if (isStandAloneMode())
         return;
 
     int intervalMs = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -1095,6 +1095,16 @@ void MessageBus::updateOfflineDistance(
         };
     updateDistance(connection->remotePeer());
     updateDistance(localPeer());
+}
+
+bool MessageBus::isStandAloneMode() const
+{
+    return m_standAloneMode;
+}
+
+void MessageBus::setStandAloneMode(bool value)
+{
+    m_standAloneMode = value;
 }
 
 void MessageBus::cleanupRuntimeInfo(const PersistentIdData& peer)

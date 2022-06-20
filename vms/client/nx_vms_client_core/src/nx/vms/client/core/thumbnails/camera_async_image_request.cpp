@@ -2,15 +2,12 @@
 
 #include "camera_async_image_request.h"
 
-#include <QtCore/QFutureWatcher>
 #include <QtConcurrent/QtConcurrentRun>
+#include <QtCore/QFutureWatcher>
 
 #include <api/server_rest_connection.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_media_layout.h>
-#include <utils/common/delayed.h>
-
 #include <nx/api/mediaserver/image_request.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/custom_headers.h>
@@ -19,6 +16,8 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/common/utils/custom_thread_pool.h>
+#include <nx/vms/client/core/system_context.h>
+#include <utils/common/delayed.h>
 
 namespace nx::vms::client::core {
 
@@ -94,15 +93,17 @@ CameraAsyncImageRequest::CameraAsyncImageRequest(
     base_type(parent),
     d(new Private())
 {
+    auto systemContext = SystemContext::fromResource(requestParams.camera);
     if (!NX_ASSERT(requestParams.camera)
         || !requestParams.camera->hasVideo()
+        || !NX_ASSERT(systemContext)
         || !NX_ASSERT(d->threadPool()))
     {
         setImage({});
         return;
     }
 
-    const auto api = connectedServerApi();
+    const auto api = systemContext->connectedServerApi();
     if (!api)
     {
         setImage({});

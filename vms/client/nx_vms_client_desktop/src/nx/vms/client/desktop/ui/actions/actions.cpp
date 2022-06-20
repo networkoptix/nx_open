@@ -668,9 +668,6 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("User Management..."))
         .condition(condition::treeNodeType(ResourceTree::NodeType::users));
 
-    factory(UpdateLocalFilesAction)
-        .flags(NoTarget);
-
     factory(PreferencesGeneralTabAction)
         .flags(Main)
         .text(ContextMenu::tr("Local Settings..."))
