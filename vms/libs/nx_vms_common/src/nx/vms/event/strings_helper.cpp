@@ -1026,7 +1026,7 @@ QString StringsHelper::backupResultText(const EventParameters& params)
     switch (params.reasonCode)
     {
         case EventReason::backupFailedSourceFileError:
-            return tr("Failed to backup file ") + params.description;
+            return tr("Failed to backup file") + " " + params.description;
 
         default:
             NX_ASSERT(false);

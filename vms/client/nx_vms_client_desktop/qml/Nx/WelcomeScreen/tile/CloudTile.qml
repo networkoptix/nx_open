@@ -53,7 +53,7 @@ Button
             font.pixelSize: 17
             color: ColorTheme.colors.light4
 
-            text: qsTr("Log in to ") + Branding.cloudName()
+            text: qsTr("Log in to") + " " + Branding.cloudName()
         }
 
         MenuButton

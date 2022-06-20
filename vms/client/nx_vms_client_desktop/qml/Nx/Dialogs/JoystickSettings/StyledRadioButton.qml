@@ -88,7 +88,7 @@ RadioButton
             visible: control.logicalId != 0
 
             // `u2013` is a long dash.
-            text: " \u2013 " + qsTr("Logical ID ") + control.logicalId
+            text: " \u2013 " + qsTr("Logical ID") + " " + control.logicalId
         }
     }
 }
