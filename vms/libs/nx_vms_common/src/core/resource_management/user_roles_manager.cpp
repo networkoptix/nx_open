@@ -199,6 +199,29 @@ QnUuid QnUserRolesManager::predefinedRoleId(Qn::UserRole userRole)
     return predefinedRoleIds[userRole];
 }
 
+std::optional<QnUuid> QnUserRolesManager::predefinedRoleId(GlobalPermissions permissions)
+{
+    if (permissions.testFlag(GlobalPermission::owner))
+        return predefinedRoleId(Qn::UserRole::owner);
+
+    if (permissions.testFlag(GlobalPermission::admin))
+        return predefinedRoleId(Qn::UserRole::administrator);
+
+    if (permissions.testFlag(GlobalPermission::customUser))
+        return std::nullopt;
+
+    if (permissions.testFlag(GlobalPermission::advancedViewerPermissions))
+        return predefinedRoleId(Qn::UserRole::advancedViewer);
+
+    if (permissions.testFlag(GlobalPermission::viewerPermissions))
+        return predefinedRoleId(Qn::UserRole::viewer);
+
+    if (permissions.testFlag(GlobalPermission::liveViewerPermissions))
+        return predefinedRoleId(Qn::UserRole::liveViewer);
+
+    return std::nullopt;
+}
+
 const QList<QnUuid>& QnUserRolesManager::adminRoleIds()
 {
     static const QList<QnUuid> kAdminRoleIds {

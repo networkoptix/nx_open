@@ -30,7 +30,10 @@ QnUserResourcePtr QnResourcePoolTestHelper::createUser(GlobalPermissions globalP
     QnUserResourcePtr user(new QnUserResource(userType));
     user->setIdUnsafe(QnUuid::createUuid());
     user->setName(name);
-    user->setRawPermissions(globalPermissions);
+    if (globalPermissions.testFlag(GlobalPermission::owner))
+        user->setOwner(true);
+    else
+        user->setRawPermissions(globalPermissions);
     user->addFlags(Qn::remote);
     return user;
 }

@@ -10,6 +10,14 @@
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/common/system_context.h>
 
+static GlobalPermissions permissions(const QnUserResourcePtr& user)
+{
+    auto p = user->getRawPermissions();
+    if (user->isOwner())
+        p |= GlobalPermission::owner;
+    return p;
+}
+
 QnResourceAccessSubjectsCache::QnResourceAccessSubjectsCache(
     nx::vms::common::SystemContext* context,
     QObject* parent)
@@ -60,10 +68,10 @@ QnResourceAccessSubjectsCache::QnResourceAccessSubjectsCache(
         [this](const QnResourceAccessSubject& subject)
         {
             if (const auto user = subject.user())
-                return updateSubjectRoles(subject, user->userRoleIds());
+                return updateSubjectRoles(subject, user->userRoleIds(), permissions(user));
 
             const auto role = m_context->userRolesManager()->userRole(subject.id());
-            updateSubjectRoles(subject, role.parentRoleIds);
+            updateSubjectRoles(subject, role.parentRoleIds, role.permissions);
         });
 
     for (const auto& user: m_context->resourcePool()->getResources<QnUserResource>())
@@ -135,18 +143,13 @@ void QnResourceAccessSubjectsCache::handleUserAdded(const QnUserResourcePtr& use
     connect(user.get(), &QnUserResource::userRolesChanged, this,
         [this](const QnUserResourcePtr& user)
         {
-            const auto roleFlag = user->userRole();
-            const auto newRoleIds = roleFlag == Qn::UserRole::customUserRole
-                ? user->userRoleIds()
-                : std::vector<QnUuid>{QnUserRolesManager::predefinedRoleId(roleFlag)};
-
-            updateSubjectRoles(user, newRoleIds);
+            updateSubjectRoles(user, user->userRoleIds(), permissions(user));
         });
     QnResourceAccessSubject subject(user);
 
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_subjects.insert(subject);
-    updateSubjectRoles(subject, user->userRoleIds(), lock);
+    updateSubjectRoles(subject, user->userRoleIds(), permissions(user), lock);
 }
 
 void QnResourceAccessSubjectsCache::handleUserRemoved(const QnUserResourcePtr& user)
@@ -155,7 +158,7 @@ void QnResourceAccessSubjectsCache::handleUserRemoved(const QnUserResourcePtr& u
     QnResourceAccessSubject subject(user);
 
     NX_MUTEX_LOCKER lock(&m_mutex);
-    updateSubjectRoles(subject, {}, lock);
+    updateSubjectRoles(subject, {}, {}, lock);
     m_subjects.erase(subject);
 }
 
@@ -165,7 +168,7 @@ void QnResourceAccessSubjectsCache::handleRoleAddedOrUpdated(const nx::vms::api:
 
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_subjects.insert(subject);
-    updateSubjectRoles(subject, userRole.parentRoleIds, lock);
+    updateSubjectRoles(subject, userRole.parentRoleIds, userRole.permissions, lock);
 }
 
 void QnResourceAccessSubjectsCache::handleRoleRemoved(const nx::vms::api::UserRoleData& userRole)
@@ -173,24 +176,30 @@ void QnResourceAccessSubjectsCache::handleRoleRemoved(const nx::vms::api::UserRo
     const QnResourceAccessSubject subject(userRole);
 
     NX_MUTEX_LOCKER lock(&m_mutex);
-    updateSubjectRoles(subject, {}, lock);
+    updateSubjectRoles(subject, {}, {}, lock);
     // Keep m_subjectsInRole unchanged so other caches may use it to update inherited permissions.
     // TODO: Think what we gonna do about this role ids in other objects (like users, other roles, etc).
     m_subjects.erase(subject);
 }
 
 void QnResourceAccessSubjectsCache::updateSubjectRoles(
-    const QnResourceAccessSubject& subject, const std::vector<QnUuid>& newRoleIds)
+    const QnResourceAccessSubject& subject,
+    const std::vector<QnUuid>& newRoleIds,
+    GlobalPermissions rawPermissions)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    updateSubjectRoles(subject, newRoleIds, lock);
+    updateSubjectRoles(subject, newRoleIds, rawPermissions, lock);
 }
 
 void QnResourceAccessSubjectsCache::updateSubjectRoles(
-    const QnResourceAccessSubject& subject, const std::vector<QnUuid>& newRoleIds,
+    const QnResourceAccessSubject& subject,
+    const std::vector<QnUuid>& newRoleIds,
+    GlobalPermissions rawPermissions,
     const nx::MutexLocker&)
 {
     std::unordered_set<QnResourceAccessSubject> newRoles;
+    if (const auto& id = QnUserRolesManager::predefinedRoleId(rawPermissions))
+        newRoles.insert(nx::vms::api::UserRoleData{*id, ""});
     for (const auto& id: newRoleIds)
         newRoles.insert(nx::vms::api::UserRoleData{id, ""});
 
