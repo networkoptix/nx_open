@@ -2,24 +2,26 @@
 
 #pragma once
 
-#include <QtCore/QObject>
 #include <QtCore/QHash>
+#include <QtCore/QObject>
 
 #include <common/common_globals.h>
-#include <common/common_module_aware.h>
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/api/types/storage_location.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 class QnCachingCameraDataLoader;
 using QnCachingCameraDataLoaderPtr = QSharedPointer<QnCachingCameraDataLoader>;
 
-class QnCameraDataManager: public QObject, public QnCommonModuleAware
+class QnCameraDataManager: public QObject, public nx::vms::client::desktop::SystemContextAware
 {
     Q_OBJECT
 public:
-    explicit QnCameraDataManager(QnCommonModule* commonModule, QObject* parent = nullptr);
+    explicit QnCameraDataManager(
+        nx::vms::client::desktop::SystemContext* systemContext,
+        QObject* parent = nullptr);
     virtual ~QnCameraDataManager();
 
     QnCachingCameraDataLoaderPtr loader(

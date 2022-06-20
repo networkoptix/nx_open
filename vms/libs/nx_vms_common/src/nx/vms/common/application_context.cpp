@@ -9,11 +9,13 @@
 #include <network/cloud/cloud_media_server_endpoint_verificator.h>
 #include <nx/network/cloud/tunnel/tcp/tunnel_tcp_endpoint_verificator_factory.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/timer_manager.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/thread/mutex.h>
 #include <utils/common/long_runable_cleanup.h>
 #include <utils/common/synctime.h>
 #include <utils/media/ffmpeg_initializer.h>
+#include <utils/media/ffmpeg_helper.h>
 
 // Resources initialization must be located outside of the namespace.
 static void initializeResources()
@@ -41,6 +43,7 @@ struct ApplicationContext::Private
     std::unique_ptr<QnFfmpegInitializer> ffmpegInitializer;
     std::unique_ptr<QnSyncTime> syncTime;
     std::unique_ptr<QnStoragePluginFactory> storagePluginFactory;
+    std::unique_ptr<nx::utils::TimerManager> timerManager;
 };
 
 ApplicationContext::ApplicationContext(
@@ -63,11 +66,13 @@ ApplicationContext::ApplicationContext(
     d->longRunnablePool = std::make_unique<QnLongRunnablePool>();
     d->longRunableCleanup = std::make_unique<QnLongRunableCleanup>();
     d->ffmpegInitializer = std::make_unique<QnFfmpegInitializer>();
+    QnFfmpegHelper::registerLogCallback();
 
     initNetworking(customCloudHost);
 
     d->syncTime = std::make_unique<QnSyncTime>();
     d->storagePluginFactory = std::make_unique<QnStoragePluginFactory>();
+    d->timerManager = std::make_unique<nx::utils::TimerManager>("CommonTimerManager");
 }
 
 ApplicationContext::~ApplicationContext()
@@ -143,6 +148,11 @@ QString ApplicationContext::moduleDisplayName(const QnUuid& id) const
 QnStoragePluginFactory* ApplicationContext::storagePluginFactory() const
 {
     return d->storagePluginFactory.get();
+}
+
+nx::utils::TimerManager* ApplicationContext::timerManager() const
+{
+    return d->timerManager.get();
 }
 
 } // namespace nx::vms::common

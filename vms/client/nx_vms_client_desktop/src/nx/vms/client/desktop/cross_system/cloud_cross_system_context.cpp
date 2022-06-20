@@ -2,6 +2,8 @@
 
 #include "cloud_cross_system_context.h"
 
+#include <QtCore/QTimer>
+
 #include <api/server_rest_connection.h>
 #include <client_core/client_core_module.h>
 #include <core/resource/user_resource.h>

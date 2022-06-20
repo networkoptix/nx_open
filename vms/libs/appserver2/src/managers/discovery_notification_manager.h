@@ -8,14 +8,15 @@
 #include <transaction/transaction.h>
 #include <common/common_module_aware.h>
 
+namespace nx::vms::discovery { class Manager; }
+
 namespace ec2 {
 
 class QnDiscoveryNotificationManager:
-    public AbstractDiscoveryNotificationManager,
-    public /*mixin*/ QnCommonModuleAware
+    public AbstractDiscoveryNotificationManager
 {
 public:
-    QnDiscoveryNotificationManager(QnCommonModule* commonModule);
+    QnDiscoveryNotificationManager(nx::vms::discovery::Manager* discoveryManager);
 
     void triggerNotification(
         const QnTransaction<nx::vms::api::DiscoverPeerData>& transaction, NotificationSource source);
@@ -29,6 +30,9 @@ public:
         const QnTransaction<nx::vms::api::DiscoveredServerData>& tran, NotificationSource source);
     void triggerNotification(
         const QnTransaction<nx::vms::api::DiscoveredServerDataList>& tran, NotificationSource source);
+
+private:
+    nx::vms::discovery::Manager* const m_discoveryManager;
 };
 
 using QnDiscoveryNotificationManagerPtr = std::shared_ptr<QnDiscoveryNotificationManager>;

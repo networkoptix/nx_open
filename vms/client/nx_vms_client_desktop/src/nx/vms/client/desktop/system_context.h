@@ -11,6 +11,7 @@
 #include "system_context_aware.h"  //< Forward declarations.
 
 class QnCameraBookmarksManager;
+class QnCameraDataManager;
 class QnResourceRuntimeDataManager;
 class QnServerStorageManager;
 
@@ -45,6 +46,7 @@ public:
     ServerRuntimeEventConnector* serverRuntimeEventConnector() const;
     QnServerStorageManager* serverStorageManager() const;
     QnCameraBookmarksManager* cameraBookmarksManager() const;
+    QnCameraDataManager* cameraDataManager() const;
     QnResourceRuntimeDataManager* resourceRuntimeDataManager() const;
     VirtualCameraManager* virtualCameraManager() const;
     VideoCache* videoCache() const;

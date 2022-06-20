@@ -4,14 +4,16 @@
 
 #include <QtCore/QEventLoop>
 
+#include <api/server_rest_connection.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <api/server_rest_connection.h>
-#include <nx/utils/guarded_callback.h>
 #include <nx/network/rest/params.h>
+#include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/core/system_context.h>
 
 using namespace nx::core;
 using namespace nx::vms::common::ptz;
+using namespace nx::vms::client::core;
 
 namespace {
 
@@ -111,7 +113,7 @@ bool QnRemotePtzController::sendRequest(
     NX_VERBOSE(this, "Sending command %1 to %2", command, m_camera);
 
     auto server = m_camera->getParentServer();
-    
+
     // It is possible that a camera is received earlier than the camera's server (merging process).
     if (!server)
         return false;
@@ -122,7 +124,12 @@ bool QnRemotePtzController::sendRequest(
         return false;
     }
 
-    if (!NX_ASSERT(connection()))
+    auto systemContext = SystemContext::fromResource(m_camera);
+    if (!NX_ASSERT(systemContext))
+        return false;
+
+    auto api = systemContext->connectedServerApi();
+    if (!api)
         return false;
 
     nx::network::rest::Params params = baseParams;
@@ -142,7 +149,7 @@ bool QnRemotePtzController::sendRequest(
             emit notConstThis->finished(command, value);
         });
 
-    connectedServerApi()->postJsonResult(
+    api->postJsonResult(
         "/api/ptz",
         params,
         body,

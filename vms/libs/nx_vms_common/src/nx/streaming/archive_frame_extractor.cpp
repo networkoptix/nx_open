@@ -5,6 +5,7 @@
 #include <atomic>
 #include <deque>
 #include <memory>
+#include <thread>
 
 #include <QtCore/QMetaMethod>
 #include <QtCore/QMetaObject>

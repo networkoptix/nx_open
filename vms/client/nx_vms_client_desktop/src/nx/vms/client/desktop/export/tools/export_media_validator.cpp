@@ -4,7 +4,6 @@
 
 #include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
-#include <client/client_module.h>
 #include <client_core/client_core_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
@@ -16,6 +15,7 @@
 #include <nx/vms/client/desktop/export/data/export_media_settings.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resources/resource_descriptor.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
 
@@ -92,7 +92,15 @@ static const QSize kMaximumResolution(std::numeric_limits<int>::max(),
 ExportMediaValidator::Results ExportMediaValidator::validateSettings(
     const ExportMediaSettings& settings, QnMediaResourcePtr mediaResource)
 {
-    const auto loader = qnClientModule->cameraDataManager()->loader(mediaResource, false);
+    const QnResourcePtr resource = mediaResource->toResourcePtr();
+    auto systemContext = SystemContext::fromResource(resource);
+    if (!NX_ASSERT(systemContext))
+        return {};
+
+    const auto loader = systemContext->cameraDataManager()->loader(
+        mediaResource,
+        /*createIfNotExists*/ false);
+
     const auto periods = loader
         ? loader->periods(Qn::RecordingContent).intersected(settings.period)
         : QnTimePeriodList();
@@ -104,7 +112,7 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
 
     // The local video file may not have timestamps.
     // This does not mean that there is no data in it. We can export it.
-    const QnResourcePtr resource = mediaResource->toResourcePtr();
+
     const auto isLocalVideoFile = resource->hasFlags(Qn::local_video) && !resource->hasFlags(Qn::periods);
 
     if (periods.isEmpty() && !isLocalVideoFile)
@@ -181,7 +189,11 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
             continue;
         }
 
-        const auto loader = qnClientModule->cameraDataManager()->loader(mediaResource, false);
+        auto systemContext = SystemContext::fromResource(resource);
+        if (!NX_ASSERT(systemContext))
+            continue;
+
+        const auto loader = systemContext->cameraDataManager()->loader(mediaResource, false);
         const auto durationMs = loader
             ? loader->periods(Qn::RecordingContent).intersected(settings.period).duration()
             : settings.period.durationMs;

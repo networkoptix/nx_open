@@ -6,12 +6,13 @@
 
 #include <api/helpers/thumbnail_request_data.h>
 #include <api/server_rest_connection.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource_management/resource_pool.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/resources/unified_resource_pool.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <utils/common/delayed.h>
 
 using nx::vms::client::core::Geometry;
@@ -42,10 +43,11 @@ CameraThumbnailManager::CameraThumbnailManager(QObject* parent) :
 
     connect(m_refreshingTimer, &QTimer::timeout, this,
         &CameraThumbnailManager::forceRefreshThumbnails);
-    connect(resourcePool(), &QnResourcePool::statusChanged, this,
-        &CameraThumbnailManager::at_resPool_statusChanged);
-    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
-        &CameraThumbnailManager::at_resPool_resourceRemoved);
+
+    connect(appContext()->unifiedResourcePool(),
+        &UnifiedResourcePool::resourcesRemoved,
+        this,
+        &CameraThumbnailManager::atResourcesRemoved);
 
     m_refreshingTimer->start();
 }
@@ -63,8 +65,8 @@ void CameraThumbnailManager::selectCamera(const QnVirtualCameraResourcePtr& came
 {
     if (m_selectedCamera == camera)
         return;
-    m_selectedCamera = camera;
 
+    m_selectedCamera = camera;
     if (!camera)
     {
         emit statusChanged(Qn::ThumbnailStatus::Invalid);
@@ -72,6 +74,10 @@ void CameraThumbnailManager::selectCamera(const QnVirtualCameraResourcePtr& came
         emit imageChanged(QImage());
         return;
     }
+
+    connect(camera.get(), &QnResource::statusChanged,
+        this, &CameraThumbnailManager::atCameraStatusChanged,
+        Qt::UniqueConnection);
 
     ThumbnailData& data = m_thumbnailByCamera[camera];
     if (data.status == Qn::ThumbnailStatus::Invalid || data.status == Qn::ThumbnailStatus::NoData)
@@ -276,7 +282,7 @@ QImage CameraThumbnailManager::thumbnailForCamera(const QnVirtualCameraResourceP
 
 rest::Handle CameraThumbnailManager::loadThumbnailForCamera(const QnVirtualCameraResourcePtr& camera)
 {
-    if (!camera || !camera->hasVideo(nullptr))
+    if (!camera || !camera->hasVideo())
         return kInvalidHandle;
 
     nx::api::CameraImageRequest request;
@@ -286,7 +292,11 @@ rest::Handle CameraThumbnailManager::loadThumbnailForCamera(const QnVirtualCamer
         ? nx::api::ImageRequest::kDefaultRotation
         : 0;
 
-    auto api = connectedServerApi();
+    auto systemContext = SystemContext::fromResource(camera);
+    if (!NX_ASSERT(systemContext))
+        return kInvalidHandle;
+
+    auto api = systemContext->connectedServerApi();
     if (!api)
         return kInvalidHandle;
 
@@ -346,10 +356,10 @@ void CameraThumbnailManager::doLoadAsync()
     NX_ASSERT(false);
 }
 
-void CameraThumbnailManager::at_resPool_statusChanged(const QnResourcePtr& resource)
+void CameraThumbnailManager::atCameraStatusChanged(const QnResourcePtr& resource)
 {
     const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-    if (!camera)
+    if (!NX_ASSERT(camera))
         return;
 
     if (!m_thumbnailByCamera.contains(camera))
@@ -366,13 +376,17 @@ void CameraThumbnailManager::at_resPool_statusChanged(const QnResourcePtr& resou
          : Qn::ThumbnailStatus::NoData;
 }
 
-void CameraThumbnailManager::at_resPool_resourceRemoved(const QnResourcePtr& resource)
+void CameraThumbnailManager::atResourcesRemoved(const QnResourceList& resources)
 {
-    if (auto camera = resource.dynamicCast<QnVirtualCameraResource>())
-        m_thumbnailByCamera.remove(camera);
+    for (const auto& resource: resources)
+    {
+        resource->disconnect(this);
+        if (auto camera = resource.dynamicCast<QnVirtualCameraResource>())
+            m_thumbnailByCamera.remove(camera);
 
-    if (m_selectedCamera == resource)
-        selectCamera(QnVirtualCameraResourcePtr());
+        if (m_selectedCamera == resource)
+            selectCamera(QnVirtualCameraResourcePtr());
+    }
 }
 
 bool CameraThumbnailManager::isUpdating(Qn::ThumbnailStatus status) const

@@ -34,10 +34,7 @@ CameraThumbnailProvider::CameraThumbnailProvider(
     m_request(request),
     m_status(Qn::ThumbnailStatus::Invalid)
 {
-    NX_ASSERT(request.camera, "Camera must exist here");
-    NX_ASSERT(connection(), "We must be connected here");
-
-    if (!request.camera || !request.camera->hasVideo(nullptr))
+    if (!NX_ASSERT(request.camera, "Camera must exist here") || !request.camera->hasVideo())
     {
         // We will rise an event there. But client could not expect it before doLoadAsync call
         setStatus(Qn::ThumbnailStatus::NoData);
@@ -170,8 +167,16 @@ void CameraThumbnailProvider::doLoadAsync()
         return;
     }
 
-    auto api = connectedServerApi();
+    auto systemContext = SystemContext::fromResource(m_request.camera);
+    if (!NX_ASSERT(systemContext))
+    {
+        NX_VERBOSE(this, "doLoadAsync(%1) - camera is not in a system context.",
+            m_request.camera->getName());
+        emit imageDataLoadedInternal(QByteArray(), Qn::ThumbnailStatus::NoData, 0, false);
+        return;
+    }
 
+    auto api = systemContext->connectedServerApi();
     if (!api)
     {
         NX_VERBOSE(this, "doLoadAsync(%1) - no server is available. Returning early",

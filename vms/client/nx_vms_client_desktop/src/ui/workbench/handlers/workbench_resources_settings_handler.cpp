@@ -63,9 +63,6 @@ QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject
     connect(action(action::CopyRecordingScheduleAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_copyRecordingScheduleAction_triggered);
 
-    connect(action(action::UpdateLocalFilesAction), &QAction::triggered, this,
-        &QnWorkbenchResourcesSettingsHandler::at_updateLocalFilesAction_triggered);
-
     registerDebugAction(
         "Tracing: Layout settings",
         [](auto /*context*/) { LayoutSettingsDialogStateReducer::setTracingEnabled(true); });
@@ -306,14 +303,6 @@ void QnWorkbenchResourcesSettingsHandler::at_copyRecordingScheduleAction_trigger
         dialog->resourceSelectionWidget()->selectedResourcesIds());
 
     qnResourcesChangesManager->saveCameras(selectedCameras, applyChanges);
-}
-
-void QnWorkbenchResourcesSettingsHandler::at_updateLocalFilesAction_triggered()
-{
-    // We should update local media directories
-    // Is there a better place for it?
-    if (auto localFilesSearcher = qnClientModule->resourceDirectoryBrowser())
-        localFilesSearcher->setLocalResourcesDirectories(qnSettings->mediaFolders());
 }
 
 void QnWorkbenchResourcesSettingsHandler::openLayoutSettingsDialog(

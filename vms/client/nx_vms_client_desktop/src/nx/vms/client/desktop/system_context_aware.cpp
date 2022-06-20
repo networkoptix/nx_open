@@ -8,6 +8,11 @@
 
 namespace nx::vms::client::desktop {
 
+SystemContextAware::SystemContextAware(SystemContext* systemContext):
+    base_type(systemContext)
+{
+}
+
 SystemContext* SystemContextAware::systemContext() const
 {
     return dynamic_cast<SystemContext*>(nx::vms::common::SystemContextAware::systemContext());

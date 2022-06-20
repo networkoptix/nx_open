@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "../event_search_list_model.h"
-
 #include <deque>
 
 #include <QtCore/QHash>
@@ -11,10 +9,11 @@
 
 #include <api/server_rest_connection_fwd.h>
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
-#include <nx/vms/client/desktop/event_search/models/private/abstract_async_search_list_model_p.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/event_fwd.h>
+
+#include "../event_search_list_model.h"
+#include "abstract_async_search_list_model_p.h"
 
 class QTimer;
 class QnUuid;
@@ -24,8 +23,7 @@ namespace nx::vms::event { class StringsHelper; }
 namespace nx::vms::client::desktop {
 
 class EventSearchListModel::Private:
-    public AbstractAsyncSearchListModel::Private,
-    public core::RemoteConnectionAware
+    public AbstractAsyncSearchListModel::Private
 {
     Q_OBJECT
     using base_type = AbstractAsyncSearchListModel::Private;

@@ -8,6 +8,8 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/p2p/p2p_message_bus.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx_ec/abstract_ec_connection_factory.h>
 #include <transaction/json_transaction_serializer.h>
 #include <transaction/threadsafe_message_bus_adapter.h>
@@ -234,8 +236,11 @@ void RemoteConnection::initializeMessageBusConnection(
     if (!NX_ASSERT(!d->messageBus, "Connection is already initialized"))
         return;
 
+    // FIXME: #sivanov Make Remote Connection - System Context Aware.
+    auto systemContext = dynamic_cast<SystemContext*>(commonModule->systemContext());
+
     d->timeSynchronizationManager =
-        std::make_shared<TimeSyncManager>(commonModule, d->moduleInformation.id);
+        std::make_shared<TimeSyncManager>(systemContext, d->moduleInformation.id);
     d->messageBus = std::make_unique<ThreadsafeMessageBusAdapter>(
         commonModule,
         d->jsonTranSerializer.get(),
@@ -246,7 +251,7 @@ void RemoteConnection::initializeMessageBusConnection(
         d->queryProcessor,
         d->messageBus.get(),
         d->timeSynchronizationManager);
-    d->messageBusConnection->init(commonModule);
+    d->messageBusConnection->init(commonModule, appContext()->moduleDiscoveryManager());
 }
 
 const nx::vms::api::ModuleInformation& RemoteConnection::moduleInformation() const

@@ -10,7 +10,6 @@
 #include <QtCore/QThreadPool>
 
 #include <api/runtime_info_manager.h>
-#include <common/common_module.h>
 #include <core/resource/abstract_storage_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -19,17 +18,18 @@
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource/storage_resource.h>
-#include <core/resource_management/camera_driver_restriction_list.h>
 #include <core/resource_management/resource_management_ini.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_searcher.h>
 #include <nx/build_info.h>
+#include <nx/network/nettools.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/analytics_data.h>
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/common/application_context.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
@@ -68,9 +68,11 @@ void QnResourceDiscoveryManagerTimeoutDelegate::onTimeout()
 
 // ------------------------------------ QnResourceDiscoveryManager -----------------------------
 
-QnResourceDiscoveryManager::QnResourceDiscoveryManager(QObject* parent)
-:
-    QnCommonModuleAware(parent),
+QnResourceDiscoveryManager::QnResourceDiscoveryManager(
+    nx::vms::common::SystemContext* systemContext,
+    QObject* parent)
+    :
+    nx::vms::common::SystemContextAware(systemContext),
     m_ready(false),
     m_state(InitialSearch),
     m_discoveryUpdateIdx(0),
@@ -326,12 +328,12 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
         return false;
 
     if (camera->hasCameraCapabilities(nx::vms::api::DeviceCapability::boundToServer)
-        && camera->getParentId() != peerId())
+        && camera->getParentId() != systemContext()->peerId())
     {
         return false;
     }
 
-    QnUuid ownGuid = peerId();
+    QnUuid ownGuid = systemContext()->peerId();
     QnMediaServerResourcePtr mServer = camera->getParentServer();
     const auto& resPool = resourcePool();
     auto rpCamera = resPool->getResourceByPhysicalId<QnSecurityCamResource>(camera->getPhysicalId());
@@ -349,7 +351,7 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
     if (mServer->locationId() != ownServer->locationId())
         return false;
 
-    QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
+    QnPeerRuntimeInfo localInfo = systemContext()->runtimeInfoManager()->localInfo();
     using namespace nx::vms::api;
     const bool noStorages = localInfo.data.flags.testFlag(RuntimeFlag::noStorages);
     if (noStorages)
@@ -376,7 +378,7 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
     if (rpCamera && rpCamera->preferredServerId() == ownGuid)
         return true; //< Return back preferred camera.
 
-    QnPeerRuntimeInfo remoteInfo = runtimeInfoManager()->item(mServer->getId());
+    QnPeerRuntimeInfo remoteInfo = systemContext()->runtimeInfoManager()->item(mServer->getId());
     if (mServer->getStatus() == nx::vms::api::ResourceStatus::online
         && !remoteInfo.data.flags.testFlag(nx::vms::api::RuntimeFlag::noStorages))
     {
@@ -437,8 +439,10 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
                 const QnSecurityCamResource* camRes = dynamic_cast<QnSecurityCamResource*>(it->data());
                 // Do not allow drivers to add cameras which are supposed to be added by different
                 // drivers.
-                if( camRes &&
-                    !commonModule()->cameraDriverRestrictionList()->driverAllowedForCamera( searcher->manufacturer(), camRes->getVendor(), camRes->getModel() ) )
+                if (camRes && !isCameraAllowed(
+                    searcher->manufacturer(),
+                    camRes->getVendor(),
+                    camRes->getModel()))
                 {
                     it = lst.erase( it );
                     continue;
@@ -691,7 +695,7 @@ QnResourceDiscoveryManager::State QnResourceDiscoveryManager::state() const
 
 DiscoveryMode QnResourceDiscoveryManager::discoveryMode() const
 {
-    if (globalSettings()->isAutoDiscoveryEnabled())
+    if (systemSettings()->isAutoDiscoveryEnabled())
         return DiscoveryMode::fullyEnabled;
     if (isRedundancyUsing())
         return DiscoveryMode::partiallyEnabled;
@@ -714,7 +718,7 @@ bool QnResourceDiscoveryManager::isRedundancyUsing() const
 
 void QnResourceDiscoveryManager::updateSearcherUsageUnsafe(QnAbstractResourceSearcher *searcher, bool usePartialEnable)
 {
-    DiscoveryMode discoveryMode = globalSettings()->isAutoDiscoveryEnabled()
+    DiscoveryMode discoveryMode = systemSettings()->isAutoDiscoveryEnabled()
         ? DiscoveryMode::fullyEnabled
         : DiscoveryMode::partiallyEnabled;
     if( searcher->isLocal() ||                  // local resources should always be found
@@ -729,7 +733,7 @@ void QnResourceDiscoveryManager::updateSearcherUsageUnsafe(QnAbstractResourceSea
         //     setting, but MUST check disabledVendors for all other vendors (if they enabled on
         //     edge server).
         if (!nx::build_info::isEdgeServer())
-            disabledVendorsForAutoSearch = globalSettings()->disabledVendorsSet();
+            disabledVendorsForAutoSearch = systemSettings()->disabledVendorsSet();
 
         //no lower_bound, since QSet is built on top of hash
         if( disabledVendorsForAutoSearch.contains(searcher->manufacturer()+lit("=partial")) )
@@ -766,4 +770,12 @@ void QnResourceDiscoveryManager::addResourcesImmediatly(QnResourceList& resource
 QnResourceList QnResourceDiscoveryManager::remapPhysicalIdIfNeed(const QnResourceList& resources)
 {
     return resources;
+}
+
+bool QnResourceDiscoveryManager::isCameraAllowed(
+    const QString& /*driverName*/,
+    const QString& /*cameraVendor*/,
+    const QString& /*cameraModel*/) const
+{
+    return true;
 }

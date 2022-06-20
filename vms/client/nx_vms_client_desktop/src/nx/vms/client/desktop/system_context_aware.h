@@ -12,9 +12,12 @@ namespace nx::vms::client::desktop {
 
 class SystemContext;
 
-class SystemContextAware: public nx::vms::client::core::SystemContextAware
+class SystemContextAware: public core::SystemContextAware
 {
+    using base_type = core::SystemContextAware;
+
 public:
+    SystemContextAware(SystemContext* systemContext);
     using nx::vms::client::core::SystemContextAware::SystemContextAware;
 
     SystemContext* systemContext() const;

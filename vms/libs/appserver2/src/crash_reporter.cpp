@@ -14,6 +14,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/vms/api/data/os_information.h>
+#include <nx/vms/common/application_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/statistics/settings.h>
 #include <utils/common/scoped_thread_rollback.h>
@@ -79,7 +80,7 @@ CrashReporter::~CrashReporter()
     }
 
     if (timerId)
-        commonModule()->timerManager()->joinAndDeleteTimer(*timerId);
+        nx::vms::common::appContext()->timerManager()->joinAndDeleteTimer(*timerId);
 
     // wait for the last scanAndReportAsync
     m_activeCollection.cancel();
@@ -191,7 +192,7 @@ void CrashReporter::scanAndReportByTimer(QSettings* settings)
 
     NX_MUTEX_LOCKER lk(&m_mutex);
     if (!m_terminated)
-        m_timerId = commonModule()->timerManager()->addTimer(
+        m_timerId = nx::vms::common::appContext()->timerManager()->addTimer(
             std::bind(&CrashReporter::scanAndReportByTimer, this, settings),
             std::chrono::milliseconds(SCAN_TIMER_CYCLE));
 }

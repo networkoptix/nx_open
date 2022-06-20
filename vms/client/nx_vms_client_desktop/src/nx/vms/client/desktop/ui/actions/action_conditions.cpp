@@ -270,7 +270,6 @@ bool canExportPeriods(
     QnWorkbenchContext* context,
     bool ignoreLoadedChunks = false)
 {
-    const auto cameraManager = qnClientModule->cameraDataManager();
     const auto accessController = context->accessController();
     return std::any_of(
         resources.cbegin(),
@@ -298,8 +297,13 @@ bool canExportPeriods(
             if (ignoreLoadedChunks)
                 return true;
 
+            auto systemContext = SystemContext::fromResource(resource);
+            if (!NX_ASSERT(systemContext))
+                return false;
+
             // This condition can be checked in the bookmarks dialog when loader is not created.
-            const auto loader = cameraManager->loader(media, true);
+            const auto loader =
+                systemContext->cameraDataManager()->loader(media, /*createIfNotExists*/ true);
             return loader && loader->periods(Qn::RecordingContent).intersects(period);
         });
 }

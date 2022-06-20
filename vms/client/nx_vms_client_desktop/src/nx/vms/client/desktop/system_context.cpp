@@ -4,6 +4,7 @@
 
 #include <api/runtime_info_manager.h>
 #include <camera/camera_bookmarks_manager.h>
+#include <camera/camera_data_manager.h>
 #include <client/client_message_processor.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/incompatible_server_watcher.h>
@@ -40,6 +41,7 @@ struct SystemContext::Private
     std::unique_ptr<ServerRuntimeEventConnector> serverRuntimeEventConnector;
     std::unique_ptr<QnServerStorageManager> serverStorageManager;
     std::unique_ptr<QnCameraBookmarksManager> cameraBookmarksManager;
+    std::unique_ptr<QnCameraDataManager> cameraDataManager;
     std::unique_ptr<QnResourceRuntimeDataManager> resourceRuntimeDataManager;
     std::unique_ptr<StatisticsSender> statisticsSender;
     std::unique_ptr<VirtualCameraManager> virtualCameraManager;
@@ -57,6 +59,7 @@ struct SystemContext::Private
         runtimeData.videoWallInstanceGuid = appContext()->videoWallInstanceId();
         q->runtimeInfoManager()->updateLocalItem(runtimeData);
     }
+
 };
 
 SystemContext::SystemContext(QnUuid peerId, QObject* parent):
@@ -75,6 +78,7 @@ SystemContext::SystemContext(QnUuid peerId, QObject* parent):
     d->serverStorageManager = std::make_unique<QnServerStorageManager>(this);
 
     d->cameraBookmarksManager = std::make_unique<QnCameraBookmarksManager>(this);
+    d->cameraDataManager = std::make_unique<QnCameraDataManager>(this);
 
     d->resourceRuntimeDataManager = std::make_unique<QnResourceRuntimeDataManager>(this);
 
@@ -115,6 +119,11 @@ QnServerStorageManager* SystemContext::serverStorageManager() const
 QnCameraBookmarksManager* SystemContext::cameraBookmarksManager() const
 {
     return d->cameraBookmarksManager.get();
+}
+
+QnCameraDataManager* SystemContext::cameraDataManager() const
+{
+    return d->cameraDataManager.get();
 }
 
 QnResourceRuntimeDataManager* SystemContext::resourceRuntimeDataManager() const

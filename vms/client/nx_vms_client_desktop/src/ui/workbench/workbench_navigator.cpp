@@ -91,8 +91,6 @@ namespace {
 
 const int kCameraHistoryRetryTimeoutMs = 5 * 1000;
 
-const int kDiscardCacheIntervalMs = 60 * 60 * 1000;
-
 /** Size of timeline window near live when there is no recorded periods on cameras. */
 const int kTimelineWindowNearLive = 10 * 1000;
 
@@ -142,60 +140,15 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
 {
     m_updateSliderTimer.restart();
 
+    connect(appContext(),
+        &ApplicationContext::systemContextAdded,
+        this,
+        &QnWorkbenchNavigator::connectToContext);
+    connectToContext(appContext()->currentSystemContext());
+
     connect(this, &QnWorkbenchNavigator::currentWidgetChanged, this, &QnWorkbenchNavigator::updateTimelineRelevancy);
     connect(this, &QnWorkbenchNavigator::isRecordingChanged, this, &QnWorkbenchNavigator::updateTimelineRelevancy);
     connect(this, &QnWorkbenchNavigator::hasArchiveChanged, this, &QnWorkbenchNavigator::updateTimelineRelevancy);
-
-    m_cameraDataManager = qnClientModule->cameraDataManager();
-    connect(m_cameraDataManager, &QnCameraDataManager::periodsChanged, this,
-        &QnWorkbenchNavigator::updatePeriods);
-
-    connect(qnServerStorageManager, &QnServerStorageManager::serverRebuildArchiveFinished,
-        m_cameraDataManager, &QnCameraDataManager::clearCache);
-
-    connect(qnServerStorageManager, &QnServerStorageManager::activeMetadataStorageChanged, this,
-        [this](const QnMediaServerResourcePtr& server)
-        {
-            const auto serverFootageCameras = cameraHistoryPool()->getServerFootageCameras(server);
-            for (const auto& camera: serverFootageCameras)
-            {
-                const auto loader = m_cameraDataManager->loader(camera, /*createIfNotExists*/ false);
-                if (loader)
-                    loader->discardCachedDataType(Qn::AnalyticsContent);
-            }
-        });
-
-    connect(
-        appContext()->currentSystemContext()->serverRuntimeEventConnector(),
-        &ServerRuntimeEventConnector::deviceFootageChanged,
-        this,
-        [this](const std::vector<QnUuid>& deviceIds)
-        {
-            for (const auto& device:
-                 resourcePool()->getResourcesByIds<QnVirtualCameraResource>(deviceIds))
-            {
-                const QnCachingCameraDataLoaderPtr loader = m_cameraDataManager->loader(
-                    device,
-                    /*createIfNotExists*/ false);
-
-                if (loader)
-                    loader->discardCachedData();
-            }
-        });
-
-    // TODO: #sivanov Temporary fix. Correct change would be: expand getTimePeriods query with
-    // Region data, then truncate cached chunks by this region and synchronize the cache.
-    QTimer* discardCacheTimer = new QTimer(this);
-    discardCacheTimer->setInterval(kDiscardCacheIntervalMs);
-    discardCacheTimer->setSingleShot(false);
-    connect(discardCacheTimer, &QTimer::timeout, m_cameraDataManager, &QnCameraDataManager::clearCache);
-    connect(resourcePool(), &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr& res)
-    {
-        // TODO: #sivanov Check if should be placed into camera manager.
-        if (res.dynamicCast<QnStorageResource>())
-            m_cameraDataManager->clearCache();
-    });
-    discardCacheTimer->start();
 
     connect(resourcePool(), &QnResourcePool::statusChanged, this,
         [this](const QnResourcePtr& resource)
@@ -214,12 +167,6 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     {
         if (hasWidgetWithCamera(camera))
             updateHistoryForCamera(camera);
-    });
-
-    connect(cameraHistoryPool(), &QnCameraHistoryPool::cameraFootageChanged, this, [this](const QnSecurityCamResourcePtr &camera)
-    {
-        if (auto loader =  m_cameraDataManager->loader(camera))
-            loader->discardCachedData();
     });
 
     for (int i = 0; i < Qn::TimePeriodContentCount; ++i)
@@ -824,6 +771,9 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget)
         return;
 
     auto syncedResource = widget->resource();
+    auto systemContext = SystemContext::fromResource(syncedResource->toResourcePtr());
+    if (!NX_ASSERT(systemContext))
+        return;
 
     m_syncedWidgets.insert(widget);
     ++m_syncedResources[syncedResource];
@@ -833,7 +783,7 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget)
     connect(syncedResource->toResourcePtr(), &QnResource::propertyChanged,
         this, &QnWorkbenchNavigator::updateLocalOffset);
 
-    if (auto loader = m_cameraDataManager->loader(syncedResource))
+    if (auto loader = systemContext->cameraDataManager()->loader(syncedResource))
     {
         QnCachingCameraDataLoader::AllowedContent content =
             {Qn::RecordingContent, Qn::MotionContent};
@@ -891,7 +841,13 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget)
 
     if (noMoreWidgetsOfThisResource)
     {
-        if (auto loader = m_cameraDataManager->loader(syncedResource, false))
+        auto systemContext = SystemContext::fromResource(syncedResource->toResourcePtr());
+        if (!NX_ASSERT(systemContext))
+            return;
+
+        if (auto loader = systemContext->cameraDataManager()->loader(
+            syncedResource,
+            /*createIfNotExists*/ false))
         {
             loader->setMotionSelection({});
             loader->setAllowedContent({});
@@ -1485,6 +1441,15 @@ bool QnWorkbenchNavigator::isCurrentWidgetSynced() const
 {
     const auto streamSynchronizer = workbench()->windowContext()->streamSynchronizer();
     return streamSynchronizer->isRunning() && m_currentWidgetFlags.testFlag(WidgetSupportsSync);
+}
+
+void QnWorkbenchNavigator::connectToContext(SystemContext* systemContext)
+{
+    auto cameraDataManager = systemContext->cameraDataManager();
+    connect(cameraDataManager,
+        &QnCameraDataManager::periodsChanged,
+        this,
+        &QnWorkbenchNavigator::updatePeriods);
 }
 
 void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
@@ -2357,16 +2322,21 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     }
 }
 
-QnCachingCameraDataLoaderPtr QnWorkbenchNavigator::loaderByWidget(const QnMediaResourceWidget* widget, bool createIfNotExists)
+QnCachingCameraDataLoaderPtr QnWorkbenchNavigator::loaderByWidget(
+    const QnMediaResourceWidget* widget,
+    bool createIfNotExists)
 {
     if (!widget || !widget->resource())
-        return QnCachingCameraDataLoaderPtr();
-    return m_cameraDataManager->loader(widget->resource(), createIfNotExists);
-}
+        return {};
 
-QnCameraDataManager* QnWorkbenchNavigator::cameraDataManager() const
-{
-    return m_cameraDataManager;
+    auto systemContext = widget->systemContext();
+    if (!NX_ASSERT(systemContext)
+        || !NX_ASSERT(systemContext == widget->resource()->toResourcePtr()->systemContext()))
+    {
+        return {};
+    }
+
+    return systemContext->cameraDataManager()->loader(widget->resource(), createIfNotExists);
 }
 
 bool QnWorkbenchNavigator::hasArchiveForCamera(const QnSecurityCamResourcePtr& camera) const
@@ -2378,7 +2348,13 @@ bool QnWorkbenchNavigator::hasArchiveForCamera(const QnSecurityCamResourcePtr& c
     if (footageServers.empty())
         return false;
 
-    if (const auto loader = m_cameraDataManager->loader(camera, /*createIfNotExists*/ false))
+    auto systemContext = SystemContext::fromResource(camera);
+    if (!NX_ASSERT(systemContext))
+        return false;
+
+    if (const auto loader = systemContext->cameraDataManager()->loader(
+        camera,
+        /*createIfNotExists*/ false))
     {
         if (!loader->periods(Qn::RecordingContent).empty())
             return true;
@@ -2403,24 +2379,29 @@ bool QnWorkbenchNavigator::hasArchiveForCamera(const QnSecurityCamResourcePtr& c
     return true;
 }
 
-void QnWorkbenchNavigator::updatePeriods(const QnMediaResourcePtr& resource,
+void QnWorkbenchNavigator::updatePeriods(
+    const QnMediaResourcePtr& resource,
     Qn::TimePeriodContent type,
     qint64 startTimeMs)
 {
-    if (m_currentMediaWidget && m_currentMediaWidget->resource() == resource)
+    const bool isCurrent = m_currentMediaWidget && m_currentMediaWidget->resource() == resource;
+    const bool isSynced = m_syncedResources.contains(resource);
+
+    if (isCurrent)
     {
         updateCurrentPeriods(type);
         if (type == Qn::RecordingContent)
             updateThumbnailsLoader();
     }
 
-    if (m_syncedResources.contains(resource))
+    if (isSynced)
     {
         updateSyncedPeriods(type, startTimeMs);
         updateHasArchive();
     }
 
-    updatePlaybackMask();
+    if (isCurrent || isSynced)
+        updatePlaybackMask();
 }
 
 QnTimePeriod QnWorkbenchNavigator::timelineWindow() const

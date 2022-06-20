@@ -11,7 +11,6 @@
 #include <api/helpers/chunks_request_data.h>
 #include <api/server_rest_connection.h>
 #include <client/client_globals.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -26,8 +25,10 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/metatypes.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
@@ -132,8 +133,8 @@ QVariant MotionSearchListModel::Private::data(const QModelIndex& index, int role
 
             // Not translatable debug string.
             return nx::format("Begin: %1<br>End: %2<br>Duration: %3").args(
-                utils::timestampToDebugString(chunk.period.startTimeMs),
-                utils::timestampToDebugString(chunk.period.endTimeMs()),
+                nx::utils::timestampToDebugString(chunk.period.startTimeMs),
+                nx::utils::timestampToDebugString(chunk.period.endTimeMs()),
                 text::HumanReadable::timeSpan(chunk.period.duration())).toQString();
         }
 
@@ -240,8 +241,8 @@ bool MotionSearchListModel::Private::commitInternal(const QnTimePeriod& periodTo
     }
 
     NX_VERBOSE(q, "Committing %1 motion periods:\n    from: %2\n    to: %3", count,
-        utils::timestampToDebugString((end - 1)->period.startTimeMs),
-        utils::timestampToDebugString(begin->period.startTimeMs));
+        nx::utils::timestampToDebugString((end - 1)->period.startTimeMs),
+        nx::utils::timestampToDebugString(begin->period.startTimeMs));
 
     ScopedInsertRows insertRows(q, position, position + count - 1);
 
@@ -283,7 +284,7 @@ void MotionSearchListModel::Private::fetchLive()
 rest::Handle MotionSearchListModel::Private::getMotion(
     const QnTimePeriod& period, Qt::SortOrder order, int limit)
 {
-    if (!NX_ASSERT(connection() && !q->isFilterDegenerate()))
+    if (!NX_ASSERT(!q->isFilterDegenerate()))
         return {};
 
     QnChunksRequestData request;
@@ -301,13 +302,27 @@ rest::Handle MotionSearchListModel::Private::getMotion(
 
     NX_VERBOSE(q, "Requesting motion periods:\n"
         "    from: %1\n    to: %2\n    filter: %3\n    sort: %4\n    limit: %5",
-        utils::timestampToDebugString(period.startTimeMs),
-        utils::timestampToDebugString(period.endTimeMs()),
+        nx::utils::timestampToDebugString(period.startTimeMs),
+        nx::utils::timestampToDebugString(period.endTimeMs()),
         request.filter,
         QVariant::fromValue(request.sortOrder).toString(),
         request.limit);
 
-    return connectedServerApi()->recordedTimePeriods(request, nx::utils::guarded(this,
+    auto systemContext = appContext()->currentSystemContext();
+    if (q->cameraSet()->type() == ManagedCameraSet::Type::single
+        && !q->cameras().empty())
+    {
+        systemContext = SystemContext::fromResource(*q->cameras().begin());
+    }
+
+    if (!NX_ASSERT(systemContext))
+        return {};
+
+    auto api = systemContext->connectedServerApi();
+    if (!NX_ASSERT(api))
+        return {};
+
+    return api->recordedTimePeriods(request, nx::utils::guarded(this,
         [this](bool status, int handle, MultiServerPeriodDataList response)
         {
             processReceivedTimePeriods(status, handle, response);

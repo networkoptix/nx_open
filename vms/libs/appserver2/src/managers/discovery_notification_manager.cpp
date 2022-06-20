@@ -3,12 +3,12 @@
 #include "discovery_notification_manager.h"
 #include "discovery_manager.h"
 
-#include <common/common_module.h>
-
 namespace ec2 {
 
-QnDiscoveryNotificationManager::QnDiscoveryNotificationManager(QnCommonModule* commonModule) :
-    QnCommonModuleAware(commonModule)
+QnDiscoveryNotificationManager::QnDiscoveryNotificationManager(
+    nx::vms::discovery::Manager* discoveryManager)
+    :
+    m_discoveryManager(discoveryManager)
 {
 }
 
@@ -17,9 +17,12 @@ void QnDiscoveryNotificationManager::triggerNotification(
 {
     NX_ASSERT(transaction.command == ApiCommand::discoverPeer, "Invalid command for this function");
 
-    // TODO: maybe it's better to move it out and use signal?..
-    if (const auto manager = commonModule()->moduleDiscoveryManager())
-        manager->checkEndpoint(nx::utils::Url(transaction.params.url), transaction.params.id);
+    // TODO: #rvasilenko Move it out and use signal.
+    if (m_discoveryManager)
+    {
+        m_discoveryManager->checkEndpoint(
+            nx::utils::Url(transaction.params.url), transaction.params.id);
+    }
 
     //    emit peerDiscoveryRequested(QUrl(transaction.params.url));
 }

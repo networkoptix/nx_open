@@ -27,6 +27,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/types/connection_types.h>
 #include <nx/vms/client/core/network/network_module.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/clipboard_button.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
@@ -52,9 +53,9 @@
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
 
-using namespace nx::vms::common;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::license;
+namespace html = nx::vms::common::html;
 
 namespace {
 
@@ -454,7 +455,7 @@ void QnLicenseManagerWidget::updateFromServer(
     const auto runtimeData = remoteInfo(runtimeInfoManager()).data;
 
     params.addQueryItem(lit("brand"), runtimeData.brand);
-    params.addQueryItem(lit("version"), commonModule()->engineVersion().toString());
+    params.addQueryItem(lit("version"), appContext()->version().toString());
     params.addQueryItem(lit("lang"), qnRuntime->locale());
 
     if (!runtimeData.nx1mac.isEmpty())

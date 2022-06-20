@@ -2,17 +2,33 @@
 
 #include "camera_data_manager.h"
 
+#include <chrono>
+
+#include <QtCore/QTimer>
+
 #include <camera/loaders/caching_camera_data_loader.h>
-#include <common/common_module.h>
 #include <core/resource/camera_bookmark.h>
+#include <core/resource/camera_history.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <server/server_storage_manager.h>
 
+using namespace std::chrono;
 using namespace nx::vms::client::desktop;
 
 using StorageLocation = nx::vms::api::StorageLocation;
+
+namespace {
+
+constexpr auto kDiscardCacheInterval = 1h;
+
+} // namespace
 
 struct QnCameraDataManager::Private
 {
@@ -20,20 +36,75 @@ struct QnCameraDataManager::Private
     StorageLocation storageLocation = StorageLocation::both;
 };
 
-QnCameraDataManager::QnCameraDataManager(QnCommonModule* commonModule, QObject* parent):
+QnCameraDataManager::QnCameraDataManager(SystemContext* systemContext, QObject* parent):
     QObject(parent),
-    QnCommonModuleAware(commonModule),
+    SystemContextAware(systemContext),
     d(new Private())
 {
-    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
-        [this](const QnResourcePtr& resource)
+    connect(systemContext->resourcePool(),
+        &QnResourcePool::resourcesRemoved,
+        this,
+        [this](const QnResourceList& resources)
         {
-            if (auto mediaResource = resource.dynamicCast<QnMediaResource>())
+            for (const auto& resource: resources)
             {
-                NX_DEBUG(this, "Removing loader %1", resource);
-                d->loaderByResource.remove(mediaResource);
+                if (auto mediaResource = resource.dynamicCast<QnMediaResource>())
+                {
+                    NX_DEBUG(this, "Removing loader %1", resource);
+                    d->loaderByResource.remove(mediaResource);
+                }
             }
         });
+
+    connect(cameraHistoryPool(),
+        &QnCameraHistoryPool::cameraFootageChanged,
+        this,
+        [this](const QnSecurityCamResourcePtr& camera)
+        {
+            if (const auto loader = this->loader(camera, /*createIfNotExists*/ false))
+                loader->discardCachedData();
+        });
+
+    connect(systemContext->serverStorageManager(),
+        &QnServerStorageManager::serverRebuildArchiveFinished,
+        this,
+        &QnCameraDataManager::clearCache);
+
+    connect(systemContext->serverStorageManager(),
+        &QnServerStorageManager::activeMetadataStorageChanged,
+        this,
+        [this](const QnMediaServerResourcePtr& server)
+        {
+            const auto serverFootageCameras =
+                cameraHistoryPool()->getServerFootageCameras(server);
+            for (const auto& camera: serverFootageCameras)
+            {
+                if (const auto loader = this->loader(camera, /*createIfNotExists*/ false))
+                    loader->discardCachedDataType(Qn::AnalyticsContent);
+            }
+        });
+
+    connect(systemContext->serverRuntimeEventConnector(),
+        &ServerRuntimeEventConnector::deviceFootageChanged,
+        this,
+        [this](const std::vector<QnUuid>& deviceIds)
+        {
+            const auto devices =
+                resourcePool()->getResourcesByIds<QnVirtualCameraResource>(deviceIds);
+            for (const auto& device: devices)
+            {
+                if (const auto loader = this->loader(device, /*createIfNotExists*/ false))
+                    loader->discardCachedData();
+            }
+        });
+
+    // TODO: #sivanov Temporary fix. Correct change would be: expand getTimePeriods query with
+    // Region data, then truncate cached chunks by this region and synchronize the cache.
+    auto discardCacheTimer = new QTimer(this);
+    discardCacheTimer->setInterval(kDiscardCacheInterval);
+    discardCacheTimer->setSingleShot(false);
+    connect(discardCacheTimer, &QTimer::timeout, this, &QnCameraDataManager::clearCache);
+    discardCacheTimer->start();
 }
 
 QnCameraDataManager::~QnCameraDataManager() {}
@@ -43,17 +114,20 @@ QnCachingCameraDataLoaderPtr QnCameraDataManager::loader(
     bool createIfNotExists)
 {
     auto pos = d->loaderByResource.find(resource);
-    if(pos != d->loaderByResource.end())
+    if (pos != d->loaderByResource.end())
         return *pos;
 
     if (ini().disableChunksLoading)
         return {};
 
     if (!createIfNotExists)
-        return QnCachingCameraDataLoaderPtr();
+        return {};
 
     if (!QnCachingCameraDataLoader::supportedResource(resource))
-        return QnCachingCameraDataLoaderPtr();
+        return {};
+
+    NX_ASSERT(resource->toResourcePtr()->systemContext() == systemContext(),
+        "Resource belongs to another System Context");
 
     QnCachingCameraDataLoaderPtr loader(new QnCachingCameraDataLoader(resource));
 

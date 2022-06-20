@@ -13,11 +13,11 @@
 
 #include <client/client_settings.h>
 #include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <network/system_helpers.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection_factory.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
@@ -237,7 +237,7 @@ void LoginDialog::sendTestConnectionRequest(const nx::utils::Url& url)
                                 this,
                                 d->connectionProcess->context->moduleInformation,
                                 d->connectionProcess->context->logonData,
-                                commonModule()->engineVersion()))
+                                appContext()->version()))
                         {
                             menu()->trigger(ui::action::DelayedForcedExitAction);
                         }
@@ -259,7 +259,7 @@ void LoginDialog::sendTestConnectionRequest(const nx::utils::Url& url)
                             context(),
                             *error,
                             d->connectionProcess->context->moduleInformation,
-                            commonModule()->engineVersion(),
+                            appContext()->version(),
                             this);
                         break;
                 }
@@ -386,7 +386,7 @@ void LoginDialog::at_testButton_clicked()
     nx::network::http::PasswordCredentials credentials(
         url.userName().toLower().toStdString(),
         url.password().toStdString());
-    dialog->testConnection(address, credentials, commonModule()->engineVersion());
+    dialog->testConnection(address, credentials, appContext()->version());
 
     updateFocus();
     if (requestedConnection)

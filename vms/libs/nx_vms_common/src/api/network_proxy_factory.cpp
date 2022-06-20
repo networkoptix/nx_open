@@ -73,8 +73,7 @@ QNetworkProxy QnNetworkProxyFactory::proxyToResource(
     if (!context)
         return QNetworkProxy(QNetworkProxy::NoProxy);
 
-    auto router = context->router();
-    if (!router) //< Cloud cross-system contexts have no routing.
+    if (!context->isRoutingEnabled()) //< Cloud cross-system contexts have no routing.
         return QNetworkProxy(QNetworkProxy::NoProxy);
 
     QnMediaServerResourcePtr server;
@@ -97,7 +96,7 @@ QNetworkProxy QnNetworkProxyFactory::proxyToResource(
     if (server && connection)
     {
         const QnUuid id = server->getOriginalGuid();
-        QnRoute route = router->routeTo(id, context);
+        QnRoute route = QnRouter::routeTo(id, context);
         if (!route.gatewayId.isNull() || camera)
         {
             if (route.addr.isNull() && !route.reverseConnect)

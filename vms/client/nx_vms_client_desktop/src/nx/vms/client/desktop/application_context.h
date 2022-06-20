@@ -3,10 +3,12 @@
 #pragma once
 
 #include <nx/utils/impl_ptr.h>
+#include <nx/utils/software_version.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/application_context.h>
 
 class QnClientCoreModule;
+class QnResourceDiscoveryManager;
 
 struct QnStartupParameters;
 
@@ -23,6 +25,7 @@ class ResourceFactory;
 class RunningInstancesManager;
 class SharedMemoryManager;
 class SystemContext;
+class UnifiedResourcePool;
 class UploadManager;
 class WindowContext;
 
@@ -64,8 +67,13 @@ public:
     static ApplicationContext* instance();
 
     /**
+     * Version of the application. Can be overridden with command-line parameters.
+     */
+    nx::utils::SoftwareVersion version() const;
+
+    /**
      * Context of the System we are currently connected to. Also contains local files.
-    */
+     */
     SystemContext* currentSystemContext() const;
 
     /**
@@ -134,6 +142,11 @@ public:
     ContextStatisticsModule* statisticsModule() const;
 
     /**
+     * Unified interface to access all available Resource Pools.
+     */
+    UnifiedResourcePool* unifiedResourcePool() const;
+
+    /**
      * Map of analytics objects colors by object type. Persistently stored on a PC.
      */
     ObjectDisplaySettings* objectDisplaySettings() const;
@@ -152,6 +165,12 @@ public:
     ResourceFactory* resourceFactory() const;
 
     UploadManager* uploadManager() const;
+
+    QnResourceDiscoveryManager* resourceDiscoveryManager() const;
+
+signals:
+    void systemContextAdded(SystemContext* systemContext);
+    void systemContextRemoved(SystemContext* systemContext);
 
 private:
     struct Private;

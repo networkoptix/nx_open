@@ -25,11 +25,11 @@
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource/camera_history.h>
 #include <licensing/license.h>
-#include <network/router.h>
 #include <nx/analytics/taxonomy/descriptor_container.h>
 #include <nx/analytics/taxonomy/state_watcher.h>
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx/vms/discovery/manager.h>
 #include <nx/vms/event/rule_manager.h>
 
 namespace nx::vms::common {
@@ -62,8 +62,8 @@ struct SystemContext::Private
     std::unique_ptr<taxonomy::DescriptorContainer> analyticsDescriptorContainer;
     std::unique_ptr<taxonomy::AbstractStateWatcher> analyticsTaxonomyStateWatcher;
 
-    QPointer<QnRouter> router;
     QPointer<AbstractCertificateVerifier> certificateVerifier;
+    QPointer<nx::vms::discovery::Manager> moduleDiscoveryManager;
 };
 
 SystemContext::SystemContext(
@@ -127,14 +127,6 @@ SystemContext::~SystemContext()
     d->resourceAccessProvider->clear();
 }
 
-void SystemContext::initNetworking(
-    QnRouter* router,
-    AbstractCertificateVerifier* certificateVerifier)
-{
-    d->router = router;
-    d->certificateVerifier = certificateVerifier;
-}
-
 const QnUuid& SystemContext::peerId() const
 {
     return d->peerId;
@@ -153,14 +145,29 @@ void SystemContext::updateRunningInstanceGuid()
     runtimeInfoManager()->updateLocalItem(data);
 }
 
-QnRouter* SystemContext::router() const
+void SystemContext::enableNetworking(AbstractCertificateVerifier* certificateVerifier)
 {
-    return d->router;
+    d->certificateVerifier = certificateVerifier;
 }
 
 AbstractCertificateVerifier* SystemContext::certificateVerifier() const
 {
     return d->certificateVerifier;
+}
+
+void SystemContext::enableRouting(nx::vms::discovery::Manager* moduleDiscoveryManager)
+{
+    d->moduleDiscoveryManager = moduleDiscoveryManager;
+}
+
+bool SystemContext::isRoutingEnabled() const
+{
+    return !d->moduleDiscoveryManager.isNull();
+}
+
+nx::vms::discovery::Manager* SystemContext::moduleDiscoveryManager() const
+{
+    return d->moduleDiscoveryManager;
 }
 
 std::shared_ptr<ec2::AbstractECConnection> SystemContext::ec2Connection() const

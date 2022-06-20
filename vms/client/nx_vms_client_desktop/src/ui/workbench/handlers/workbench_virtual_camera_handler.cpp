@@ -534,8 +534,12 @@ void QnWorkbenchVirtualCameraHandler::at_virtualCameraManager_stateChanged(const
     // Update chunks if we've just finished consume request.
     if (state.consumeProgress == 100 && state.status == VirtualCameraState::Consuming)
     {
+        auto systemContext = SystemContext::fromResource(camera);
+        if (!NX_ASSERT(systemContext))
+            return;
+
         QnCachingCameraDataLoaderPtr loader =
-            qnClientModule->cameraDataManager()->loader(camera, /*create=*/true);
+            systemContext->cameraDataManager()->loader(camera, /*create=*/true);
         loader->invalidateCachedData();
         loader->load(/*forced=*/true);
     }

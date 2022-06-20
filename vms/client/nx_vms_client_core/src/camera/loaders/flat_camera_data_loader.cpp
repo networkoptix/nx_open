@@ -5,7 +5,6 @@
 #include <analytics/db/analytics_db_types.h>
 #include <api/helpers/chunks_request_data.h>
 #include <api/server_rest_connection.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/fusion/model_functions.h>
@@ -13,7 +12,10 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <recording/time_period_list.h>
+#include <nx/vms/client/core/system_context.h>
 #include <utils/common/synctime.h>
+
+using namespace nx::vms::client::core;
 
 namespace {
 
@@ -45,7 +47,6 @@ QString periodsLogString(const QnTimePeriodList& periodList, int count = 100)
                 periodList[i].endTime().count()));
     return result.join('\n');
 }
-
 
 } // namespace
 
@@ -123,7 +124,12 @@ void QnFlatCameraDataLoader::setStorageLocation(nx::vms::api::StorageLocation va
 
 int QnFlatCameraDataLoader::sendRequest(qint64 startTimeMs, qint64 resolutionMs)
 {
-    if (!connection())
+    auto systemContext = SystemContext::fromResource(m_resource);
+    if (!NX_ASSERT(systemContext))
+        return 0;
+
+    auto connection = systemContext->connectedServerApi();
+    if (!connection)
     {
         NX_VERBOSE(this, "There is no current server, cannot send request");
         return 0;   //< TODO: #sivanov #bookmarks make sure invalid value is handled.
@@ -138,7 +144,7 @@ int QnFlatCameraDataLoader::sendRequest(qint64 startTimeMs, qint64 resolutionMs)
     requestData.detailLevel = std::chrono::milliseconds(resolutionMs);
     requestData.storageLocation = m_storageLocation;
 
-    return connectedServerApi()->recordedTimePeriods(requestData,
+    return connection->recordedTimePeriods(requestData,
         nx::utils::guarded(this,
             [this](bool success, int handle, const MultiServerPeriodDataList& timePeriods)
             {

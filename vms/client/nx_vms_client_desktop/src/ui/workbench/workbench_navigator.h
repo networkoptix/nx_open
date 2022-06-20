@@ -45,13 +45,14 @@ class QnMediaResourceWidget;
 class QnAbstractArchiveStreamReader;
 class QnCachingCameraDataLoader;
 typedef QSharedPointer<QnCachingCameraDataLoader> QnCachingCameraDataLoaderPtr;
-class QnCameraDataManager;
 class QnCalendarWidget;
 class QnDayTimeWidget;
 class QnSearchQueryStrategy;
 class VariantAnimator;
 
 namespace nx { namespace utils { class PendingOperation; }}
+
+namespace nx::vms::client::desktop { class SystemContext; }
 
 class QnWorkbenchNavigator:
     public Connective<QObject>,
@@ -152,8 +153,6 @@ public:
 
     Qn::TimePeriodContent selectedExtraContent() const; //< Qn::RecordingContent if none.
     void setSelectedExtraContent(Qn::TimePeriodContent value);
-
-    QnCameraDataManager* cameraDataManager() const;
 
     void setTimelineWindow(const QnTimePeriod& value);
     QnTimePeriod timelineWindow() const;
@@ -277,6 +276,8 @@ protected slots:
     void at_dayTimeWidget_timeClicked(const QTime &time);
 
 private:
+    void connectToContext(nx::vms::client::desktop::SystemContext* systemContext);
+
     enum class UpdateSliderMode
     {
         KeepInWindow,
@@ -365,8 +366,6 @@ private:
     QScopedPointer<QCompleter> m_bookmarkTagsCompleter;
 
     nx::utils::PendingOperation *m_sliderBookmarksRefreshOperation;
-
-    QPointer<QnCameraDataManager> m_cameraDataManager;
 
     int m_chunkMergingProcessHandle = 0;
     std::array<std::unique_ptr<QnThreadedChunksMergeTool>, Qn::TimePeriodContentCount> m_threadedChunksMergeTool;

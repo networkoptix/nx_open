@@ -3,6 +3,7 @@
 #include "caching_camera_data_loader.h"
 
 #include <QtCore/QMetaType>
+#include <QtCore/QTimer>
 
 #include <camera/loaders/flat_camera_data_loader.h>
 #include <camera/loaders/layout_file_camera_data_loader.h>

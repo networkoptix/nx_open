@@ -2,6 +2,7 @@
 
 #include "event_search_list_model_p.h"
 
+#include <QtCore/QTimer>
 #include <QtGui/QPalette>
 #include <QtGui/QPixmap>
 
@@ -10,7 +11,6 @@
 #include <api/server_rest_connection.h>
 #include <client/client_globals.h>
 #include <client/client_module.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -18,8 +18,10 @@
 #include <nx/utils/metatypes.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/event/strings_helper.h>
@@ -405,7 +407,7 @@ void EventSearchListModel::Private::fetchLive()
 rest::Handle EventSearchListModel::Private::getEvents(
     const QnTimePeriod& period, GetCallback callback, Qt::SortOrder order, int limit) const
 {
-    if (!NX_ASSERT(callback && connection() && !q->isFilterDegenerate()))
+    if (!NX_ASSERT(callback && !q->isFilterDegenerate()))
         return {};
 
     QnEventLogMultiserverRequestData request;
@@ -441,7 +443,21 @@ rest::Handle EventSearchListModel::Private::getEvents(
                 callback(success, handle, std::move(data.data));
         };
 
-    return connectedServerApi()->getEvents(request, internalCallback, thread());
+    auto systemContext = appContext()->currentSystemContext();
+    if (q->cameraSet()->type() == ManagedCameraSet::Type::single
+        && !q->cameras().empty())
+    {
+        systemContext = SystemContext::fromResource(*q->cameras().begin());
+    }
+
+    if (!NX_ASSERT(systemContext))
+        return {};
+
+    auto api = systemContext->connectedServerApi();
+    if (!NX_ASSERT(api))
+        return {};
+
+    return api->getEvents(request, internalCallback, thread());
 }
 
 QString EventSearchListModel::Private::title(const vms::event::EventParameters& parameters) const

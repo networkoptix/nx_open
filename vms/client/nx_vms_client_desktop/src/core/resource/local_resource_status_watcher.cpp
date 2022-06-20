@@ -4,8 +4,6 @@
 
 #include <QtCore/QFileInfo>
 
-#include <common/common_module.h>
-#include <client_core/client_core_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/avi/avi_archive_delegate.h>
@@ -48,13 +46,16 @@ void setResourceStatus(const QnResourcePtr resource, nx::vms::api::ResourceStatu
 
 } // namespace
 
-QnLocalResourceStatusWatcher::QnLocalResourceStatusWatcher(QObject* parent /*= nullptr*/):
-    QObject(parent)
+QnLocalResourceStatusWatcher::QnLocalResourceStatusWatcher(
+    nx::vms::common::SystemContext* systemContext,
+    QObject* parent)
+    :
+    QObject(parent),
+    nx::vms::common::SystemContextAware(systemContext)
 {
     using namespace std::literals::chrono_literals;
 
-    auto resourcePool = qnClientCoreModule->resourcePool();
-    connect(resourcePool, &QnResourcePool::resourceAdded,
+    connect(resourcePool(), &QnResourcePool::resourceAdded,
         this, &QnLocalResourceStatusWatcher::onResourceAdded);
 
     static constexpr auto kUpdatePeriod = 3s;
@@ -95,7 +96,6 @@ void QnLocalResourceStatusWatcher::onResourceAdded(const QnResourcePtr& resource
 
 void QnLocalResourceStatusWatcher::timerEvent(QTimerEvent* event)
 {
-    const auto resourcePool = qnClientCoreModule->resourcePool();
     for (auto it = m_watchedResources.begin(); it != m_watchedResources.end();)
     {
         NX_ASSERT(it->statusFuture.valid());
@@ -105,7 +105,7 @@ void QnLocalResourceStatusWatcher::timerEvent(QTimerEvent* event)
             ++it;
             continue;
         }
-        if (auto resource = resourcePool->getResourceById(it->resourceId))
+        if (auto resource = resourcePool()->getResourceById(it->resourceId))
         {
             setResourceStatus(resource, it->statusFuture.get());
             it->statusFuture = std::async(std::launch::async, it->statusEvaluator);

@@ -8,7 +8,6 @@
 #include <camera/camera_data_manager.h>
 #include <camera/client_video_camera.h>
 #include <camera/loaders/caching_camera_data_loader.h>
-#include <client/client_module.h>
 #include <client/client_settings.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_resource.h>
@@ -26,6 +25,7 @@
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
 #include <nx/vms/client/desktop/resources/resource_descriptor.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
 #include <nx_ec/data/api_conversion_functions.h>
@@ -324,7 +324,11 @@ bool ExportLayoutTool::exportMetadata(const ItemInfoList &items)
         QByteArray data;
         if (d->settings.bookmarks.empty())
         {
-            auto loader = qnClientModule->cameraDataManager()->loader(resource);
+            auto systemContext = SystemContext::fromResource(resource->toResourcePtr());
+            if (!NX_ASSERT(systemContext))
+                continue;
+
+            auto loader = systemContext->cameraDataManager()->loader(resource);
             if (!loader)
                 continue;
 

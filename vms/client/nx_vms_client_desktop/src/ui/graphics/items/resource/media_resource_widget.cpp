@@ -2427,9 +2427,14 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
     if (d->display()->camDisplay()->isLongWaiting())
     {
-        auto loader = qnClientModule->cameraDataManager()->loader(d->mediaResource, false);
-        if (loader && loader->periods(Qn::RecordingContent).containTime(d->display()->camDisplay()->getExternalTime() / 1000))
-            return base_type::calculateStatusOverlay(nx::vms::api::ResourceStatus::online, d->hasVideo);
+        auto loader = systemContext()->cameraDataManager()->loader(d->mediaResource,
+            /*createIfNotExists*/ false);
+        if (loader && loader->periods(Qn::RecordingContent)
+            .containTime(d->display()->camDisplay()->getExternalTime() / 1000))
+        {
+            return base_type::calculateStatusOverlay(nx::vms::api::ResourceStatus::online,
+                d->hasVideo);
+        }
 
         return Qn::NoDataOverlay;
     }

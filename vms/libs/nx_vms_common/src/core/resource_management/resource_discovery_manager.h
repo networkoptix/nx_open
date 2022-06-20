@@ -6,29 +6,26 @@
 #include <atomic>
 #include <memory>
 
-#include <QThreadPool>
-
-#include <nx/utils/thread/mutex.h>
 #include <QtCore/QThread>
+#include <QtCore/QThreadPool>
 #include <QtCore/QTimer>
 #include <QtNetwork/QAuthenticator>
+#include <QtNetwork/QHostAddress>
 
-#include <nx/utils/thread/long_runnable.h>
-#include <nx/utils/url.h>
-#include <nx/network/nettools.h>
-
-#include <api/model/manual_camera_seach_reply.h>
-
-#include <core/resource/resource_fwd.h>
-#include <core/resource/resource_factory.h>
-#include <core/resource/resource_processor.h>
-
-#include <utils/common/connective.h>
-#include <nx/utils/log/log.h>
-#include <common/common_module_aware.h>
-#include "resource_searcher.h"
-#include <core/resource_access/user_access_data.h>
 #include <api/model/audit/auth_session.h>
+#include <api/model/manual_camera_seach_reply.h>
+#include <core/resource/resource_factory.h>
+#include <core/resource/resource_fwd.h>
+#include <core/resource/resource_processor.h>
+#include <core/resource_access/user_access_data.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/thread/long_runnable.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/url.h>
+#include <nx/vms/common/system_context_aware.h>
+#include <utils/common/connective.h>
+
+#include "resource_searcher.h"
 
 class QnAbstractResourceSearcher;
 
@@ -69,15 +66,13 @@ private:
     QnResourceDiscoveryManager* m_discoveryManager;
 };
 
-class CameraDriverRestrictionList;
-
 // this class just searches for new resources
 // it uses others plugins
 // it puts result into resource pool
 class NX_VMS_COMMON_API QnResourceDiscoveryManager:
     public Connective<QnLongRunnable>,
     public QnResourceFactory,
-    public /*mixin*/ QnCommonModuleAware
+    public nx::vms::common::SystemContextAware
 {
     Q_OBJECT
     using base_type = Connective<QnLongRunnable>;
@@ -91,7 +86,9 @@ public:
 
     typedef QList<QnAbstractResourceSearcher*> ResourceSearcherList;
 
-    QnResourceDiscoveryManager(QObject* parent);
+    QnResourceDiscoveryManager(
+        nx::vms::common::SystemContext* systemContext,
+        QObject* parent = nullptr);
     virtual ~QnResourceDiscoveryManager() override;
 
     // this function returns only new devices( not in all_devices list);
@@ -169,6 +166,12 @@ protected:
     void updateSearchersUsage();
     bool isRedundancyUsing() const;
     virtual QnResourceList remapPhysicalIdIfNeed(const QnResourceList& resources);
+
+    virtual bool isCameraAllowed(
+        const QString& driverName,
+        const QString& cameraVendor,
+        const QString& cameraModel) const;
+
 protected:
     QThreadPool m_threadPool;
 

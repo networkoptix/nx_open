@@ -2,20 +2,20 @@
 
 #include "time_sync_manager.h"
 
-#include <common/common_module.h>
 #include <network/router.h>
-#include <nx_ec/managers/abstract_time_manager.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx_ec/managers/abstract_time_manager.h>
 
 using namespace nx::vms::common;
 
 namespace nx::vms::client::core {
 
-TimeSyncManager::TimeSyncManager(QnCommonModule* commonModule, const QnUuid& serverId):
-    base_type(commonModule),
+TimeSyncManager::TimeSyncManager(SystemContext* systemContext, const QnUuid& serverId):
+    base_type(systemContext),
     m_serverId(serverId)
 {
-    connect(globalSettings(),
+    connect(systemSettings(),
         &SystemSettings::timeSynchronizationSettingsChanged,
         this,
         &TimeSyncManager::resync);
@@ -33,8 +33,8 @@ void TimeSyncManager::resync()
 
 void TimeSyncManager::updateTime()
 {
-    auto route = commonModule()->router()->routeTo(m_serverId, commonModule()->systemContext());
-    auto networkTimeSyncInterval = globalSettings()->syncTimeExchangePeriod();
+    auto route = QnRouter::routeTo(m_serverId, systemContext());
+    auto networkTimeSyncInterval = systemSettings()->syncTimeExchangePeriod();
     if (route.isValid())
     {
         if (!m_lastSyncTimeInterval.hasExpired(networkTimeSyncInterval))
