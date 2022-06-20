@@ -401,11 +401,13 @@ bool QnServerStorageManager::sendArchiveRebuildRequest(
     params.insert("action", action);
     params.insert("mainPool", pool == QnServerStoragesPool::Main);
 
-    const auto handle = connectedServerApi()->getJsonResult(
+    const auto handle = connectedServerApi()->postJsonResult(
         "/api/rebuildArchive",
         params,
+        /*body*/ {},
         methodCallback(this, &QnServerStorageManager::at_archiveRebuildReply),
         thread(),
+        /*timeouts*/ std::nullopt,
         server->getId());
 
     NX_VERBOSE(this, "Send request %1 to rebuild pool %2 of %3 (action %4)",
