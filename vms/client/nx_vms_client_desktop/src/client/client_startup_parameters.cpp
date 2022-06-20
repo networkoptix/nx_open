@@ -4,6 +4,7 @@
 
 #if defined(Q_OS_WIN)
     #include <Windows.h>
+    #include <shellapi.h>
 #endif
 
 #include <QtCore/QDir>

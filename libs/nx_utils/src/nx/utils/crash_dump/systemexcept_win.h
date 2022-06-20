@@ -3,7 +3,6 @@
 #pragma once
 
 #include <string>
-#include <windows.h>
 
 //!Used to dump unhandled structured exception call stack to file ({application_name}_{pid}.except near application binary)
 /*!

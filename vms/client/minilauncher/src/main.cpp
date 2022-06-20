@@ -7,8 +7,9 @@
 #include <iostream>
 
 #include <Windows.h>
-#include "Shlwapi.h"
-#include "shlobj.h"
+#include <Shlwapi.h>
+#include <shlobj.h>
+#include <shellapi.h>
 
 #include "version.h"
 

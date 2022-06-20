@@ -14,6 +14,7 @@
 #if defined(_WIN32)
     #define NOMINMAX //< Needed to prevent windows.h define macros min() and max().
     #include <windows.h>
+    #include <shellapi.h>
     #include <codecvt>
 #elif defined(__APPLE__)
     #include <nx/kit/apple_utils.h>

@@ -33,7 +33,15 @@ endfunction()
 # its code for exporting purposes. On Windows such library is forced to be static. On other systems
 # if such library is shared then its CXX_VISIBILTY_PRESET is set to default.
 function(nx_add_target name type)
-    set(options NO_MOC NO_RC_FILE WERROR NO_WERROR SIGNED MACOS_ARG_MAX_WORKAROUND NO_API_MACROS)
+    set(options
+        NO_MOC
+        NO_RC_FILE
+        WERROR
+        NO_WERROR
+        SIGNED
+        GDI #< Requires Windows GDI headers to compile
+        MACOS_ARG_MAX_WORKAROUND
+        NO_API_MACROS)
     set(oneValueArgs LIBRARY_TYPE RC_FILE FOLDER SOURCE_DIR)
     set(multiValueArgs
         ADDITIONAL_SOURCES ADDITIONAL_RESOURCES ADDITIONAL_MOCABLES ADDITIONAL_MOC_INCLUDE_DIRS
@@ -133,6 +141,7 @@ function(nx_add_target name type)
             endif()
 
             project(${name})
+
             set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${name})
         endif()
     elseif("${type}" STREQUAL "LIBRARY")
@@ -200,6 +209,10 @@ function(nx_add_target name type)
 
     if(WINDOWS)
         nx_store_known_file("${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${name}.pdb")
+    endif()
+
+    if(WINDOWS AND NOT NX_GDI)
+        add_definitions(-DNOGDI=)
     endif()
 endfunction()
 

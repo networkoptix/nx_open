@@ -2,10 +2,9 @@
 
 #pragma once
 
-#include <boost/algorithm/cxx11/all_of.hpp>
-#include <boost/algorithm/cxx11/any_of.hpp>
-#include <boost/range/algorithm/count_if.hpp>
+#include <algorithm>
 
+#include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/condition/condition_types.h>
 
 namespace nx::vms::client::desktop {
@@ -21,15 +20,15 @@ public:
         switch (match)
         {
             case MatchMode::Any:
-                return boost::algorithm::any_of(sequence, checkOne);
+                return std::any_of(sequence.cbegin(), sequence.cend(), checkOne);
             case MatchMode::All:
-                return boost::algorithm::all_of(sequence, checkOne);
+                return std::all_of(sequence.cbegin(), sequence.cend(), checkOne);
             case MatchMode::ExactlyOne:
-                return (boost::count_if(sequence, checkOne) == 1);
+                return (std::count_if(sequence.cbegin(), sequence.cend(), checkOne) == 1);
             default:
                 break;
         }
-        NX_ASSERT(false, nx::format("Invalid match mode '%1'.").arg(static_cast<int>(match)));
+        NX_ASSERT(false, "Invalid match mode '%1'.", static_cast<int>(match));
         return false;
     }
 
@@ -37,7 +36,7 @@ public:
     static ConditionResult check(const ItemSequence& sequence,
         std::function<bool(const Item& item)> checkOne)
     {
-        int count = boost::count_if(sequence, checkOne);
+        int count = std::count_if(sequence.cbegin(), sequence.cend(), checkOne);
 
         if (count == 0)
             return ConditionResult::None;

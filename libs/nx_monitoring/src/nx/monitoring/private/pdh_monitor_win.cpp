@@ -3,6 +3,7 @@
 #include "pdh_monitor_win.h"
 
 #include <windows.h>
+#include <winioctl.h>
 #include <pdhmsg.h>
 
 #include <nx/utils/log/log.h>

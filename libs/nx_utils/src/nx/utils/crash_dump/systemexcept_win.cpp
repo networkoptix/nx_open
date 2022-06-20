@@ -7,8 +7,8 @@
 #include <sstream>
 #include <string>
 
-#include <Dbghelp.h>
 #include <Windows.h>
+#include <Dbghelp.h>
 #include <ShlObj.h>
 #include <signal.h>
 

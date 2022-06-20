@@ -2,7 +2,7 @@
 
 #include "desktop_data_provider_base.h"
 
-QnDesktopDataProviderBase::QnDesktopDataProviderBase(QnResourcePtr ptr) :
+QnDesktopDataProviderBase::QnDesktopDataProviderBase(const QnResourcePtr& ptr) :
     QnAbstractMediaStreamDataProvider(ptr)
 {
 

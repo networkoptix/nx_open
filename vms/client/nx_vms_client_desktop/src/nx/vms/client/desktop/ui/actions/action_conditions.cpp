@@ -77,9 +77,6 @@
 #include <ui/workbench/workbench.h>
 #include <utils/camera/camera_replacement.h>
 
-using boost::algorithm::any_of;
-using boost::algorithm::all_of;
-
 namespace nx::vms::client::desktop {
 namespace ui {
 namespace action {
@@ -645,7 +642,8 @@ ActionVisibility ResourceRemovalCondition::check(const Parameters& parameters, Q
         return true;
     };
 
-    return any_of(parameters.resources(), canBeDeleted)
+    auto resources = parameters.resources();
+    return std::any_of(resources.cbegin(), resources.cend(), canBeDeleted)
         ? EnabledAction
         : InvisibleAction;
 }
@@ -1155,7 +1153,7 @@ bool OpenInLayoutCondition::canOpen(
 
     if (!layout)
     {
-        return any_of(resources,
+        return std::any_of(resources.cbegin(), resources.cend(),
             [getAccessController](const QnResourcePtr& resource)
             {
                 auto accessController = getAccessController(resource);
@@ -1672,7 +1670,7 @@ ActionVisibility ItemsCountCondition::check(const Parameters& /*parameters*/, Qn
 
 ActionVisibility IoModuleCondition::check(const QnResourceList& resources, QnWorkbenchContext* /*context*/)
 {
-    bool pureIoModules = boost::algorithm::all_of(resources,
+    bool pureIoModules = std::all_of(resources.cbegin(), resources.cend(),
         [](const QnResourcePtr& resource)
         {
             if (!resource->hasFlags(Qn::io_module))

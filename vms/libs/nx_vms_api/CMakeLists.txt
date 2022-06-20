@@ -21,7 +21,3 @@ target_compile_definitions(nx_vms_api
 if(withTests)
     add_subdirectory(unit_tests)
 endif()
-
-if(WINDOWS)
-    add_definitions(-DNOGDI=)
-endif()

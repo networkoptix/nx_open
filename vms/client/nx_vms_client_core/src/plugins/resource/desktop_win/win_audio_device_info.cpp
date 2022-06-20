@@ -10,6 +10,7 @@
 #include <KsMedia.h>
 #include <strsafe.h>
 #include <devpkey.h>
+#include <mmeapi.h>
 #include <mmdeviceapi.h>
 
 #include <dsound.h>
