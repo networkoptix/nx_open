@@ -146,7 +146,6 @@
 #include <ui/widgets/main_window.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/handlers/workbench_layouts_handler.h> //< TODO: #sivanov Fix dependencies.
-#include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -2252,6 +2251,8 @@ void ActionHandler::replaceCameraActionTriggered()
 
 void ActionHandler::undoReplaceCameraActionTriggered()
 {
+    using namespace rest;
+
     const auto camera =
         menu()->currentParameters(sender()).resource().dynamicCast<QnVirtualCameraResource>();
 
@@ -2259,18 +2260,12 @@ void ActionHandler::undoReplaceCameraActionTriggered()
         return;
 
     const auto callback = nx::utils::guarded(this,
-        [this]
-        (bool success,
-            rest::Handle requestId, rest::ServerConnection::EmptyResponseType requestResult)
+        [this] (bool success, Handle requestId, ServerConnection::EmptyResponseType requestResult)
         {
             if (success)
             {
                 QnMessageBox::success(mainWindowWidget(),
                     tr("Undo replacement completed successfully!"));
-                const auto notificationsHandler =
-                    context()->instance<QnWorkbenchNotificationsHandler>();
-                notificationsHandler->setSystemHealthEventVisible(
-                    QnSystemHealth::deviceIsReplacedWith, false);
             }
         });
 

@@ -39,6 +39,11 @@ protected:
 
     virtual void handleRemotePeerFound(QnUuid peer, nx::vms::api::PeerType peerType) override;
     virtual void handleRemotePeerLost(QnUuid peer, nx::vms::api::PeerType peerType) override;
+    virtual void removeHardwareIdMapping(const QnUuid& id) override;
+
+signals:
+    void hardwareIdMappingRemoved(const QnUuid& id);
+
 private:
     QnClientConnectionStatus m_status;
     bool m_connected = false;

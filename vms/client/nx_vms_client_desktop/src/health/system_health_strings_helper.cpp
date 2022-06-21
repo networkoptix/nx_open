@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "system_health_helper.h"
+#include "system_health_strings_helper.h"
 
 #include <helpers/cloud_url_helper.h>
 #include <nx/branding.h>

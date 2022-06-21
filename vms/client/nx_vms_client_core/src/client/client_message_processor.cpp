@@ -237,6 +237,11 @@ void QnClientMessageProcessor::handleRemotePeerLost(QnUuid peer, nx::vms::api::P
     }
 }
 
+void QnClientMessageProcessor::removeHardwareIdMapping(const QnUuid& id)
+{
+    emit hardwareIdMappingRemoved(id);
+}
+
 void QnClientMessageProcessor::onGotInitialNotification(const nx::vms::api::FullInfoData& fullData)
 {
     if (m_status.state() != QnConnectionState::Connected &&

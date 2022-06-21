@@ -12,7 +12,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <health/system_health_helper.h>
+#include <health/system_health_strings_helper.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
@@ -22,6 +22,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/system_health/system_health_data_helper.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/strings_helper.h>
 #include <ui/common/notification_levels.h>
@@ -32,13 +33,6 @@
 #include <ui/help/business_help.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/workbench_context.h>
-
-namespace {
-
-static const auto kDeviceModelAttribute = "deviceModel";
-static const auto kOldDeviceUrlAttribute = "oldDeviceUrl";
-
-} // namespace
 
 namespace nx::vms::client::desktop {
 
@@ -198,28 +192,24 @@ QString SystemHealthListModel::Private::text(int index) const
                 m_camerasWithInvalidSchedule.size());
         }
 
-        case QnSystemHealth::deviceIsReplacedWith:
+        case QnSystemHealth::replacedDeviceDiscovered:
         {
             using namespace nx::vms::common;
-            using namespace nx::common::metadata;
-            using namespace nx::vms::client::desktop;
 
             static const auto kDeviceNameColor = ColorTheme::instance()->color("light10");
 
+            const auto attributes = item.serverData->getRuntimeParams().attributes;
+
             const auto caption = tr("Replaced camera discovered");
 
-            auto attributes = item.serverData->getRuntimeParams().attributes;
-            const auto deviceModelAttrItr =
-                findFirstAttributeByName(&attributes, kDeviceModelAttribute);
+            auto result = html::paragraph(caption);
+            if (const auto discoveredDeviceModel =
+                system_health::getDeviceModelFromAttributes(attributes))
+            {
+                result += html::paragraph(html::colored(*discoveredDeviceModel, kDeviceNameColor));
+            }
 
-           auto result = html::paragraph(caption);
-           if (deviceModelAttrItr != attributes.cend())
-           {
-               result += html::paragraph(
-                   html::colored(deviceModelAttrItr->value, kDeviceNameColor));
-           }
-
-           return result;
+            return result;
         }
 
         case QnSystemHealth::RemoteArchiveSyncStarted:
@@ -283,32 +273,28 @@ QString SystemHealthListModel::Private::toolTip(int index) const
         return result.join(kLineBreak);
     }
 
-    if (item.message == QnSystemHealth::deviceIsReplacedWith)
+    if (item.message == QnSystemHealth::replacedDeviceDiscovered)
     {
         using namespace nx::vms::common;
-        using namespace nx::common::metadata;
 
-        auto attributes = item.serverData->getRuntimeParams().attributes;
+        const auto camera = item.resource.dynamicCast<QnVirtualCameraResource>();
+        if (!NX_ASSERT(camera, "Invalid notification parameter"))
+            return {};
 
-        const auto discoveredCameraModelAttrItr =
-            findFirstAttributeByName(&attributes, kDeviceModelAttribute);
-        const auto discoveredCameraUrlAttrItr =
-            findFirstAttributeByName(&attributes, kOldDeviceUrlAttribute);
+        const auto attributes = item.serverData->getRuntimeParams().attributes;
+        const auto discoveredDeviceUrl = system_health::getDeviceUrlFromAttributes(attributes);
+        const auto discoveredDeviceModel = system_health::getDeviceModelFromAttributes(attributes);
 
-        QString discoveredCameraText;
-        if (discoveredCameraModelAttrItr != attributes.cend()
-            && discoveredCameraUrlAttrItr != attributes.cend())
-        {
-            const auto discoveredCameraHost =
-                nx::utils::Url(discoveredCameraUrlAttrItr->value).host();
-
-            discoveredCameraText = QStringList(
-                {html::bold(discoveredCameraModelAttrItr->value), discoveredCameraHost})
-                    .join(QChar::Space);
-        }
+        QStringList discoveredCameraTextLines;
+        if (discoveredDeviceModel)
+            discoveredCameraTextLines.append(html::bold(*discoveredDeviceModel));
+        if (discoveredDeviceUrl)
+            discoveredCameraTextLines.append(discoveredDeviceUrl->host());
+        const auto discoveredCameraText = discoveredCameraTextLines.join(QChar::Space);
 
         const auto replacementCameraText = QStringList({
-            html::bold(item.resource->getName()), QnResourceDisplayInfo(item.resource).host()})
+            html::bold(camera->getModel()),
+            QnResourceDisplayInfo(camera).host()})
                 .join(QChar::Space);
 
         QStringList tooltipLines;
@@ -380,7 +366,7 @@ CommandActionPtr SystemHealthListModel::Private::commandAction(int index) const
             return action;
         }
 
-        case QnSystemHealth::deviceIsReplacedWith:
+        case QnSystemHealth::replacedDeviceDiscovered:
         {
             const auto action = CommandActionPtr(new CommandAction(tr("Undo Replace")));
             connect(action.data(), &QAction::triggered, this,

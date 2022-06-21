@@ -37,7 +37,7 @@ bool isMessageVisibleInSettings(MessageType message)
         case RemoteArchiveSyncFinished:
         case RemoteArchiveSyncProgress:
         case RemoteArchiveSyncError:
-        case deviceIsReplacedWith:
+        case replacedDeviceDiscovered:
             return false;
 
         default:
@@ -59,7 +59,7 @@ bool isMessageLocked(MessageType message)
         case StoragesNotConfigured:
         case NoInternetForTimeSync:
         case cameraRecordingScheduleIsInvalid:
-        case deviceIsReplacedWith:
+        case replacedDeviceDiscovered:
             return true;
         default:
             return false;

@@ -47,6 +47,8 @@ using Attributes = std::vector<Attribute>;
 
 NX_VMS_COMMON_API void addAttributeIfNotExists(Attributes* result, const Attribute& a);
 NX_VMS_COMMON_API Attributes::iterator findFirstAttributeByName(Attributes* a, const QString& name);
+NX_VMS_COMMON_API Attributes::const_iterator findFirstAttributeByName(
+    const Attributes* a, const QString& name);
 
 struct RangePoint
 {

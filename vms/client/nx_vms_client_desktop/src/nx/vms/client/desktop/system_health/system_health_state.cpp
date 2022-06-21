@@ -7,25 +7,27 @@
 #include <QtCore/QSet>
 #include <QtWidgets/QAction>
 
-#include <api/common_message_processor.h>
 #include <api/runtime_info_manager.h>
-#include <client_core/client_core_module.h>
+#include <client/client_message_processor.h>
 #include <client/client_show_once_settings.h>
+#include <client_core/client_core_module.h>
 #include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <licensing/license.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
 #include <nx/vms/client/desktop/system_health/invalid_recording_schedule_watcher.h>
 #include <nx/vms/client/desktop/system_health/system_internet_access_watcher.h>
 #include <nx/vms/client/desktop/system_health/user_emails_watcher.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/system_settings.h>
+#include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/email/email.h>
@@ -110,7 +112,9 @@ SystemHealthState::Private::Private(SystemHealthState* q) :
     connect(q->globalSettings(), &SystemSettings::timeSynchronizationSettingsChanged,
         q, update(NoInternetForTimeSync));
 
-    const auto messageProcessor = q->commonModule()->messageProcessor();
+    const auto messageProcessor =
+        dynamic_cast<QnClientMessageProcessor*>(q->systemContext()->messageProcessor());
+
     connect(messageProcessor, &QnCommonMessageProcessor::initialResourcesReceived, q,
         [this]()
         {
@@ -122,6 +126,19 @@ SystemHealthState::Private::Private(SystemHealthState* q) :
         q, update(NoInternetForTimeSync));
 
     update(NoInternetForTimeSync)();
+
+    // replacedDeviceDiscovered.
+
+    connect(messageProcessor, &QnClientMessageProcessor::hardwareIdMappingRemoved, q,
+        [this](const QnUuid& id)
+        {
+            const auto resource = this->q->resourcePool()->getResourceById(id);
+            const auto notificationsHandler =
+                this->q->context()->instance<QnWorkbenchNotificationsHandler>();
+
+            notificationsHandler->setSystemHealthEventVisible(
+                QnSystemHealth::replacedDeviceDiscovered, resource, false);
+        });
 
     // DefaultCameraPasswords.
 
