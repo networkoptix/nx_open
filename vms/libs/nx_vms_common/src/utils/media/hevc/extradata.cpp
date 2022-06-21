@@ -26,7 +26,7 @@ void updatePTL(const ProfileTierLevel& ptl, HEVCDecoderConfigurationRecord& hvcc
     } else {
         hvcc.general_level_idc = std::max<uint8_t>(hvcc.general_level_idc, ptl.general.level_idc);
     }
-    hvcc.general_tier_flag = hvcc.general_tier_flag | ptl.general.tier_flag;
+    hvcc.general_tier_flag = hvcc.general_tier_flag || ptl.general.tier_flag;
     hvcc.general_profile_idc = std::max<uint8_t>(hvcc.general_profile_idc, ptl.general.profile_idc);
     hvcc.general_profile_compatibility_flags &= ptl.general.profile_compatibility_flags.to_ulong();
     hvcc.general_constraint_indicator_flags &= ptl.general.constraint_indicator_flags();

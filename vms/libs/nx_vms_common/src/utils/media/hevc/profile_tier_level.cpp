@@ -51,12 +51,11 @@ bool ProfileTierLevel::Layer::read(BitStreamReader& reader)
 uint64_t ProfileTierLevel::Layer::constraint_indicator_flags() const
 {
     uint64_t result = 0;
-    if (progressive_source_flag) result |= (1L << 47);
-    if (interlaced_source_flag) result |= (1L<< 46);
-    if (non_packed_constraint_flag) result |= (1L << 45);
-    if (frame_only_constraint_flag) result |= (1L << 44);
+    if (progressive_source_flag) result |= (1ull << 47);
+    if (interlaced_source_flag) result |= (1ull<< 46);
+    if (non_packed_constraint_flag) result |= (1ull << 45);
+    if (frame_only_constraint_flag) result |= (1ull << 44);
     return result;
 }
-
 
 } // namespace nx::media::hevc

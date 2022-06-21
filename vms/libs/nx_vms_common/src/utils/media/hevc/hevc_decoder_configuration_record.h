@@ -15,7 +15,7 @@ struct NX_VMS_COMMON_API HEVCDecoderConfigurationRecord
 
     uint8_t  configurationVersion;
     uint8_t  general_profile_space;
-    uint8_t  general_tier_flag;
+    bool general_tier_flag;
     uint8_t  general_profile_idc;
     uint32_t general_profile_compatibility_flags;
     uint64_t general_constraint_indicator_flags;
