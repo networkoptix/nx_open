@@ -15,6 +15,7 @@
 #include <nx/kit/debug.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/metatypes.h>
 
 namespace nx {
 namespace appserver {
