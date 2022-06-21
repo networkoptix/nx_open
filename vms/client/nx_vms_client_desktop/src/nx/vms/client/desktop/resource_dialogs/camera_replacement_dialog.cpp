@@ -185,7 +185,39 @@ struct CameraReplacementDialog::Private
     ResourceSelectionWidget* resourceSelectionWidget;
     std::optional<nx::vms::api::DeviceReplacementResponse> deviceReplacementResponce;
     bool requestInProgress = false;
+
+    bool hasCompatibleApiResponce() const;
+    void reportFailureByMessageBox() const;
 };
+
+bool CameraReplacementDialog::Private::hasCompatibleApiResponce() const
+{
+    return deviceReplacementResponce && deviceReplacementResponce->compatible;
+}
+
+void CameraReplacementDialog::Private::reportFailureByMessageBox() const
+{
+    if (!NX_ASSERT(!hasCompatibleApiResponce()))
+        return;
+
+    QString caption = tr("Failed to replace camera");
+    QString message;
+
+    if (deviceReplacementResponce && !deviceReplacementResponce->report.empty())
+    {
+        const auto reportItem = deviceReplacementResponce->report.front();
+        caption = reportItem.name;
+        if (!reportItem.messages.empty())
+            message = *reportItem.messages.begin();
+    }
+
+    QnMessageBox::critical(
+        q,
+        caption,
+        message,
+        QDialogButtonBox::Ok,
+        QDialogButtonBox::Ok);
+}
 
 CameraReplacementDialog::CameraReplacementDialog(
     const QnVirtualCameraResourcePtr& cameraToBeReplaced,
@@ -220,10 +252,8 @@ CameraReplacementDialog::CameraReplacementDialog(
     connect(d->resourceSelectionWidget, &ResourceSelectionWidget::selectionChanged, this,
         [this]()
         {
-            const auto selectedCamera = d->resourceSelectionWidget->selectedResource()
+            d->replacementCamera = d->resourceSelectionWidget->selectedResource()
                 .dynamicCast<QnVirtualCameraResource>();
-
-            d->replacementCamera = selectedCamera;
 
             updateButtons();
         });
@@ -376,12 +406,20 @@ void CameraReplacementDialog::makeReplacementRequest(bool getReportOnly)
 
             if (getReportOnly)
             {
-                updateDataTransferReportPage();
-                updateButtons();
+                if (d->hasCompatibleApiResponce())
+                {
+                    updateButtons();
+                    updateDataTransferReportPage();
+                }
+                else
+                {
+                    d->reportFailureByMessageBox();
+                    onBackButtonClicked(); //< Return to camera selection page.
+                }
             }
             else
             {
-                if (d->deviceReplacementResponce && d->deviceReplacementResponce->compatible)
+                if (d->hasCompatibleApiResponce())
                 {
                     ui->stackedWidget->setCurrentWidget(ui->cameraReplacementSummaryPage);
                     updateButtons();
@@ -389,9 +427,7 @@ void CameraReplacementDialog::makeReplacementRequest(bool getReportOnly)
                 }
                 else
                 {
-                    // TODO: #vbreus Show error description from response if there is any.
-                    QnMessageBox::critical(this, tr("Failed to replace camera"), {},
-                        QDialogButtonBox::Ok, QDialogButtonBox::Ok);
+                    d->reportFailureByMessageBox();
                     reject();
                 }
             }
@@ -442,48 +478,32 @@ void CameraReplacementDialog::updateDataTransferReportPage()
 
     clearLayoutContents(ui->dataTransferContentsLayout);
 
-    if (!d->deviceReplacementResponce)
-    {
-        ui->dataTransferContentsLayout->addLayout(createDataTransferReportItem(
-            tr("Unable to replace camera"), {}, DeviceReplacementInfo::Level::critical));
-        ui->dataTransferContentsLayout->addStretch();
+    if (!NX_ASSERT(d->deviceReplacementResponce && d->deviceReplacementResponce->compatible))
         return;
-    }
 
-    if (!d->deviceReplacementResponce->compatible)
+    const auto& report = d->deviceReplacementResponce.value().report;
+    for (const auto& reportItem: report)
     {
-        // TODO: #vbreus Show error description from response if there is any.
-        ui->dataTransferContentsLayout->addLayout(createDataTransferReportItem(
-            tr("Unable to replace camera"),
-            {tr("Cameras are not compatible")},
-            DeviceReplacementInfo::Level::critical));
-    }
-    else
-    {
-        const auto& report = d->deviceReplacementResponce.value().report;
-        for (const auto& reportItem: report)
+        QStringList descriptionLines(reportItem.messages.cbegin(), reportItem.messages.cend());
+
+        // Description messages from the report item are perpended with the dash prefix.
+        for (auto& descriptionLine: descriptionLines)
+            descriptionLine = QStringList({{kEmDashChar}, descriptionLine}).join(QChar::Space);
+
+        // Additional sub caption message is added for detailed warning and error report items.
+        if (!descriptionLines.empty())
         {
-            QStringList descriptionLines(reportItem.messages.cbegin(), reportItem.messages.cend());
+            if (reportItem.level == DeviceReplacementInfo::Level::warning)
+                descriptionLines.push_front(tr("Will be transferred partially:"));
 
-            // Description messages from the report item are prepended with the dash prefix.
-            for (auto& descriptionLine: descriptionLines)
-                descriptionLine = QStringList({{kEmDashChar}, descriptionLine}).join(QChar::Space);
-
-            // Additional sub caption message is added for detailed warning and error report items.
-            if (!descriptionLines.empty())
-            {
-                if (reportItem.level == DeviceReplacementInfo::Level::warning)
-                    descriptionLines.push_front(tr("Will be transferred partially:"));
-
-                if (reportItem.level == DeviceReplacementInfo::Level::error)
-                    descriptionLines.push_front(tr("Will not be transferred:"));
-            }
-
-            ui->dataTransferContentsLayout->addLayout(createDataTransferReportItem(
-                reportItem.name,
-                descriptionLines,
-                reportItem.level));
+            if (reportItem.level == DeviceReplacementInfo::Level::error)
+                descriptionLines.push_front(tr("Will not be transferred:"));
         }
+
+        ui->dataTransferContentsLayout->addLayout(createDataTransferReportItem(
+            reportItem.name,
+            descriptionLines,
+            reportItem.level));
     }
 
     ui->dataTransferContentsLayout->addStretch();

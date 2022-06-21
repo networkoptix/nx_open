@@ -38,7 +38,8 @@ bool cameraSupportsReplacement(const QnResourcePtr& resource)
         && !camera->isNvr()
         && !camera->isIOModule()
         && camera->hasVideo()
-        && !isArchiveCamera(camera);
+        && !isArchiveCamera(camera)
+        && camera->getStatus() != nx::vms::api::ResourceStatus::unauthorized;
 }
 
 bool cameraCanBeReplaced(const QnResourcePtr& resource)

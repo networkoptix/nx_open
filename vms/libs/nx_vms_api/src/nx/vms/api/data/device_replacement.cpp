@@ -33,8 +33,8 @@ std::vector<DeviceReplacementInfo>::iterator DeviceReplacementResponse::addSecti
 }
 
 void DeviceReplacementResponse::add(
-    const QString& section, 
-    DeviceReplacementInfo::Level level, 
+    const QString& section,
+    DeviceReplacementInfo::Level level,
     const QString& message)
 {
     auto itr = addSection(section);

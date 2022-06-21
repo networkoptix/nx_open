@@ -2264,8 +2264,11 @@ void ActionHandler::undoReplaceCameraActionTriggered()
         {
             if (success)
             {
-                QnMessageBox::success(mainWindowWidget(),
-                    tr("Undo replacement completed successfully!"));
+                QnMessageBox::success(
+                    mainWindowWidget(),
+                    tr("Undo replacement completed successfully!"),
+                    tr("Some settings may not be transferred from the replaced camera due to "
+                        "compatibility issues."));
             }
         });
 

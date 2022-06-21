@@ -588,7 +588,7 @@ public:
 };
 
 /**
- * Calculates visual state of "Replace Camera With..." context menu action.
+ * Calculates visual state of "Replace Camera..." context menu action.
  * @return <tt>Enabled</tt> if parameters have camera, camera is offline, it's not a virtual
  *     camera, it's not a multisensor camera, it's not the one attached to an NVR, it's not an
  *     I/O module and camera's parent server is online. <tt>Disabled</tt> if all the same as above
