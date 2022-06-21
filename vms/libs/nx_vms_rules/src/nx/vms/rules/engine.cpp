@@ -741,6 +741,8 @@ void Engine::processEvent(const EventPtr& event)
         }
     }
 
+    NX_DEBUG(this, "Matched with %1 rules", ruleIds.size());
+
     if (!ruleIds.empty())
     {
         eventData = serializeProperties(event.get(), eventFields);

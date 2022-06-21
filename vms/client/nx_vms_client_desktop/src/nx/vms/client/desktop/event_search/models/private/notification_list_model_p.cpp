@@ -22,6 +22,7 @@
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/event/actions/abstract_action.h>
+#include <nx/vms/event/aggregation_info.h>
 #include <nx/vms/event/events/poe_over_budget_event.h>
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
@@ -241,27 +242,6 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
         title = tr("Alarm: %1").arg(title);
     }
 
-    const Qn::ResourceInfoLevel resourceInfoLevel = qnSettings->resourceInfoLevel();
-    QStringList tooltip = m_helper->eventDescription(action, vms::event::AggregationInfo(),
-        resourceInfoLevel, nx::vms::event::AttrSerializePolicy::none);
-
-    // TODO: #sivanov Move this code to ::eventDetails().
-    if (params.eventType == EventType::licenseIssueEvent
-        && params.reasonCode == vms::api::EventReason::licenseRemoved)
-    {
-        QStringList disabledCameras;
-        for (const auto& stringId: params.description.split(';'))
-        {
-            QnUuid id = QnUuid::fromStringSafe(stringId);
-            NX_ASSERT(!id.isNull());
-            if (auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id))
-            {
-                if (accessController()->hasPermissions(camera, Qn::ViewContentPermission))
-                    tooltip << QnResourceDisplayInfo(camera).toString(resourceInfoLevel);
-            }
-        }
-    }
-
     const auto actionId = action->getParams().actionId;
     const bool actionHasId = !actionId.isNull();
 
@@ -269,7 +249,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     eventData.id = actionHasId ? actionId : QnUuid::createUuid();
     eventData.title = title;
     eventData.description = description(params);
-    eventData.toolTip = tooltip.join(nx::vms::common::html::kLineBreak);
+    eventData.toolTip = tooltip(action);
     eventData.helpId = QnBusiness::eventHelpId(params.eventType);
     eventData.level = QnNotificationLevel::valueOf(action);
     eventData.timestamp = timestamp;
@@ -529,6 +509,37 @@ QString NotificationListModel::Private::description(
     }
 
     return m_helper->notificationDescription(parameters);
+}
+
+QString NotificationListModel::Private::tooltip(const vms::event::AbstractActionPtr& action) const
+{
+    const auto& params = action->getRuntimeParams();
+    const Qn::ResourceInfoLevel resourceInfoLevel = qnSettings->resourceInfoLevel();
+
+    QStringList tooltip = m_helper->eventDescription(
+        action,
+        vms::event::AggregationInfo(),
+        resourceInfoLevel,
+        nx::vms::event::AttrSerializePolicy::none);
+
+    // TODO: #sivanov Move this code to ::eventDetails().
+    if (params.eventType == EventType::licenseIssueEvent
+        && params.reasonCode == vms::api::EventReason::licenseRemoved)
+    {
+        QStringList disabledCameras;
+        for (const auto& stringId: params.description.split(';'))
+        {
+            QnUuid id = QnUuid::fromStringSafe(stringId);
+            NX_ASSERT(!id.isNull());
+            if (auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id))
+            {
+                if (accessController()->hasPermissions(camera, Qn::ViewContentPermission))
+                    tooltip << QnResourceDisplayInfo(camera).toString(resourceInfoLevel);
+            }
+        }
+    }
+
+    return tooltip.join(nx::vms::common::html::kLineBreak);
 }
 
 QPixmap NotificationListModel::Private::pixmapForAction(
