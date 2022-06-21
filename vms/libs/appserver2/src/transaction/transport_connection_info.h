@@ -43,6 +43,8 @@ struct ConnectionInfos
 
 QN_FUSION_DECLARE_FUNCTIONS(QnTransportConnectionInfo, (json))
 QN_FUSION_DECLARE_FUNCTIONS(ConnectionInfos, (json))
+NX_REFLECTION_INSTRUMENT(QnTransportConnectionInfo, QnTransportConnectionInfo_Fields)
+NX_REFLECTION_INSTRUMENT(ConnectionInfos, ConnectionInfos_Fields)
 
 struct P2pStats
 {
@@ -51,6 +53,7 @@ struct P2pStats
     ConnectionInfos connections;
 };
 #define P2pStats_Fields (serverId)(data)(connections)
-NX_VMS_API_DECLARE_STRUCT(P2pStats)
+QN_FUSION_DECLARE_FUNCTIONS(P2pStats, (json))
+NX_REFLECTION_INSTRUMENT(P2pStats, P2pStats_Fields)
 
 } // namespace ec2
