@@ -43,5 +43,3 @@ private:
 
 } // namespace appserver
 } // namespace nx
-
-Q_DECLARE_METATYPE(std::chrono::milliseconds);

@@ -9,8 +9,6 @@
 
 using namespace nx::utils;
 
-Q_DECLARE_METATYPE(std::chrono::minutes);
-
 class TestQSettings : public nx::utils::AbstractQSettings
 {
 public:

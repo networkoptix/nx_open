@@ -262,5 +262,3 @@ private:
 
 } // namespace utils
 } // namespace nx
-
-Q_DECLARE_METATYPE(std::chrono::seconds);
