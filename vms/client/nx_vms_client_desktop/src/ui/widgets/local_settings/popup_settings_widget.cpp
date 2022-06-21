@@ -14,7 +14,7 @@
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
 
-#include <health/system_health_helper.h>
+#include <health/system_health_strings_helper.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>

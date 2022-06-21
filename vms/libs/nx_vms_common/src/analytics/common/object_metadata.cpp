@@ -2,6 +2,7 @@
 
 #include "object_metadata.h"
 
+#include <algorithm>
 #include <unordered_map>
 
 #include <QtCore/QRegularExpression>
@@ -398,12 +399,14 @@ void addAttributeIfNotExists(Attributes* result, const Attribute& a)
 
 Attributes::iterator findFirstAttributeByName(Attributes* a, const QString& name)
 {
-    for (auto it = a->begin(); it != a->end(); ++it)
-    {
-        if (it->name == name)
-            return it;
-    }
-    return a->end();
+    return std::find_if(a->begin(), a->end(),
+        [&name](const auto& attribute) { return attribute.name == name; });
+}
+
+Attributes::const_iterator findFirstAttributeByName(const Attributes* a, const QString& name)
+{
+    return std::find_if(a->cbegin(), a->cend(),
+        [&name](const auto& attribute) { return attribute.name == name; });
 }
 
 } // namespace metadata
