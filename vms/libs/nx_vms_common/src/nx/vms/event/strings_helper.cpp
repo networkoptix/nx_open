@@ -13,25 +13,26 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
-#include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/analytics/taxonomy/abstract_state.h>
+#include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/nettools.h> //< For resolveAddress.
 #include <nx/network/url/url_builder.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/log/assert.h>
-#include <nx/utils/string.h>
 #include <nx/utils/qset.h>
+#include <nx/utils/string.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_context.h>
-#include <nx/vms/event/aggregation_info.h>
-#include <nx/vms/event/events/events.h>
-#include <nx/vms/event/rule.h>
 #include <nx/vms/time/formatter.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <utils/common/id.h>
+
+#include "aggregation_info.h"
+#include "events/events.h"
+#include "rule.h"
 
 namespace {
 

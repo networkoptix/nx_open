@@ -44,6 +44,7 @@ private:
     QString caption(const nx::vms::event::EventParameters& parameters,
         const QnVirtualCameraResourcePtr& camera) const;
     QString description(const nx::vms::event::EventParameters& parameters) const;
+    QString tooltip(const vms::event::AbstractActionPtr& action) const;
 
     QString getPoeOverBudgetDescription(const nx::vms::event::EventParameters& parameters) const;
 

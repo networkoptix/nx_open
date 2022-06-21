@@ -18,6 +18,7 @@
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
+#include <nx/vms/event/strings_helper.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_fields/customizable_icon_field.h>
 #include <nx/vms/rules/event_fields/customizable_text_field.h>
@@ -42,6 +43,12 @@ struct TriggerInfo
 
     bool isValid() const { return !ruleId.isNull(); }
 };
+
+// TODO: #amalov Event property may not be empty. May be removed when trigger icon widget ready.
+QString notNullString(const QString& str)
+{
+    return str.isNull() ? "" : str;
+}
 
 } // namespace
 
@@ -156,8 +163,8 @@ bool SoftwareTriggersController::Private::setVmsTriggerState(
         idField->id(),
         resourceId,
         systemContext()->userWatcher()->user()->getId(),
-        nameField->value(),
-        iconField->value());
+        nx::vms::event::StringsHelper::getSoftwareTriggerName(nameField->value()),
+        notNullString(iconField->value()));
 
     systemContext()->vmsRulesEngine()->processEvent(triggerEvent);
 

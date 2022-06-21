@@ -6,13 +6,15 @@
 
 #include <nx/vms/common/system_context_aware.h>
 #include <nx/vms/event/actions/abstract_action.h>
-#include <nx/vms/event/aggregation_info.h>
-#include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/events/abstract_event.h>
+
+#include "event_fwd.h"
 
 namespace nx {
 namespace vms {
 namespace event {
+
+class AggregationInfo;
 
 enum class AttrSerializePolicy
 {
@@ -62,10 +64,6 @@ public:
         const AggregationInfo& aggregationInfo,
         Qn::ResourceInfoLevel detailLevel,
         AttrSerializePolicy policy) const;
-
-    QStringList eventDetailsWithTimestamp(const EventParameters &params,
-        int aggregationCount, AttrSerializePolicy policy) const;
-
     QStringList eventDetails(
         const EventParameters& params, AttrSerializePolicy policy) const;
 
@@ -84,26 +82,20 @@ public:
         const std::optional<nx::network::SocketAddress>& proxyAddress = std::nullopt) const;
 
     QString toggleStateToString(EventState state) const;
-    QString eventTypeString(EventType eventType,
-                                   EventState eventState,
-                                   ActionType actionType,
-                                   const ActionParameters &actionParams) const;
     QString ruleDescriptionText(const RulePtr& rule) const;
+
+    QString eventTypeString(
+        EventType eventType,
+        EventState eventState,
+        ActionType actionType,
+        const ActionParameters& actionParams) const;
+
     QnResourcePtr eventSource(const EventParameters &params) const;
-
-    /** Details of event: aggregation info, date and time, other info, split by lines. */
-    QStringList aggregatedEventDetails(
-        const AbstractActionPtr& action,
-        const AggregationInfo& aggregationInfo,
-        AttrSerializePolicy policy) const;
-
     QString eventReason(const EventParameters& params) const;
 
-    QString eventTimestamp(const EventParameters &params, int aggregationCount) const;
+    QString eventTimestampInHtml(const EventParameters &params, int aggregationCount) const;
     QString eventTimestampTime(const EventParameters &params) const;
     QString eventTimestampDate(const EventParameters &params) const;
-
-    QString eventTimestampInHtml(const EventParameters &params, int aggregationCount) const;
 
     QString getResoureNameFromParams(const EventParameters& params,
         Qn::ResourceInfoLevel detailLevel) const;
@@ -141,6 +133,18 @@ public:
         bool useHtml = true) const;
 
     QString notificationDescription(const EventParameters& parameters) const;
+
+private:
+    QString eventTimestamp(const EventParameters &params, int aggregationCount) const;
+
+    QStringList eventDetailsWithTimestamp(const EventParameters &params,
+        int aggregationCount, AttrSerializePolicy policy) const;
+
+    /** Details of event: aggregation info, date and time, other info, split by lines. */
+    QStringList aggregatedEventDetails(
+        const AbstractActionPtr& action,
+        const AggregationInfo& aggregationInfo,
+        AttrSerializePolicy policy) const;
 };
 
 } // namespace event

@@ -9,6 +9,8 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QVariant>
 
+#include <nx/utils/log/log.h>
+
 #include "basic_event.h"
 #include "event_field.h"
 
@@ -105,15 +107,21 @@ const QHash<QString, EventField*> EventFilter::fields() const
 
 bool EventFilter::match(const EventPtr& event) const
 {
+    NX_VERBOSE(this, "Matching filter id: %1", m_id);
+
     for (const auto& [name, field]: m_fields)
     {
         const auto& value = event->property(name.toUtf8().data());
+        NX_VERBOSE(this, "Matching property: %1, null: %2", name, value.isNull());
+
         if (value.isNull())
             return false;
 
         if (!field->match(value))
             return false;
     }
+
+    NX_VERBOSE(this, "Matched filter id: %1", m_id);
     return true;
 }
 
