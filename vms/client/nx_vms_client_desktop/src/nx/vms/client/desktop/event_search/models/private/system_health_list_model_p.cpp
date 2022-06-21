@@ -303,7 +303,8 @@ QString SystemHealthListModel::Private::toolTip(int index) const
             .arg(discoveredCameraText)
             .arg(replacementCameraText));
 
-        tooltipLines.append(tr("Click on the \"Undo Replace\" to continue using two devices."));
+        tooltipLines.append(
+            tr("Click on the \"Undo Replace\" button to continue using two devices."));
 
         return tooltipLines.join("<br>");
     }

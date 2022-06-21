@@ -1535,7 +1535,7 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .flags(Scene | Tree | SingleTarget | ResourceTarget)
         .requiredGlobalPermission(GlobalPermission::admin)
-        .text(ContextMenu::tr("Replace Camera With..."))
+        .text(ContextMenu::tr("Replace Camera..."))
         .condition(ConditionWrapper(new ReplaceCameraCondition())
             && condition::isTrue(ini().enableCameraReplacementFeature)
             && condition::scoped(SceneScope,
