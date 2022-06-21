@@ -49,7 +49,7 @@ bool HRDParameters::read(
         {
             sub_pic_hrd_params_present_flag = 0;
             sub_pic_cpb_params_in_pic_timing_sei_flag = 0;
-            sub_pic_cpb_params_in_pic_timing_sei_flag = 23;
+            initial_cpb_removal_delay_length_minus1 = 23;
             au_cpb_removal_delay_length_minus1 = 23;
             dpb_output_delay_length_minus1 = 23;
         }
