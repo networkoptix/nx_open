@@ -398,16 +398,15 @@ void TestListeningPeer::onConnectionAckResponseReceived(
     m_udtStreamSocket = std::move(udtStreamSocket);
     m_udtStreamServerSocket = std::move(udtStreamServerSocket);
 
-    NX_VERBOSE(this, nx::format("Starting rendezvous connect from %1 to %2")
-        .arg(m_udtStreamSocket->getLocalAddress())
-        .arg(m_connectionRequestedData.udpEndpointList.front()));
+    NX_VERBOSE(this, "Starting rendezvous connect from %1 to %2",
+        m_udtStreamSocket->getLocalAddress(), m_connectionRequestedData.udpEndpointList.front());
 
-    using namespace std::placeholders;
     m_udtStreamSocket->connectAsync(
         m_connectionRequestedData.udpEndpointList.front(),
-        std::bind(&TestListeningPeer::onUdtConnectDone, this, _1));
+        [this](auto&&... args) { onUdtConnectDone(std::forward<decltype(args)>(args)...); });
+
     m_udtStreamServerSocket->acceptAsync(
-        std::bind(&TestListeningPeer::onUdtConnectionAccepted, this, _1, _2));
+        [this](auto&&... args) { onUdtConnectionAccepted(std::forward<decltype(args)>(args)...); });
 }
 
 void TestListeningPeer::onUdtConnectDone(SystemError::ErrorCode errorCode)
@@ -419,9 +418,9 @@ void TestListeningPeer::onUdtConnectDone(SystemError::ErrorCode errorCode)
         std::move(m_udtStreamSocket));
     m_stunPipeline->bindToAioThread(getAioThread());
     m_udtStreamSocket.reset();
-    using namespace std::placeholders;
+
     m_stunPipeline->setMessageHandler(
-        std::bind(&TestListeningPeer::onMessageReceived, this, _1));
+        [this](auto&&... args) { onMessageReceived(std::forward<decltype(args)>(args)...); });
     m_stunPipeline->startReadingConnection();
 }
 
@@ -508,11 +507,14 @@ std::unique_ptr<TestListeningPeer> TestListeningPeer::buildServer(
         return nullptr;
     }
 
-    if (serverConf.bindEndpoint && server->bind() != nx::hpm::api::ResultCode::ok)
+    if (serverConf.bindEndpoint)
     {
-        NX_ERROR(typeid(TestListeningPeer), "Failed to bind server: %1, endpoint=%2",
-            server->fullName(), server->endpoint());
-        return nullptr;
+        if (const auto rc = server->bind(); rc != nx::hpm::api::ResultCode::ok)
+        {
+            NX_ERROR(typeid(TestListeningPeer), "Failed to bind server: %1, endpoint=%2: %3",
+                server->fullName(), server->endpoint(), rc);
+            return nullptr;
+        }
     }
 
     return server;
