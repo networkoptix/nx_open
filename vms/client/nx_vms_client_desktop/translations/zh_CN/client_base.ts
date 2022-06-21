@@ -7265,7 +7265,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Use if supported</source>
-      <translation type="unfinished">Use if supported</translation>
+      <translation>如有支持请使用</translation>
     </message>
     <message>
       <source>Never</source>
