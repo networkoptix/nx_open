@@ -57,6 +57,16 @@ struct RtpHeader
         // TODO #lbusygin: Incorrect check.
         return payloadType >= 72 && payloadType <= 76;
     }
+
+    static std::optional<int> getPayloadType(const uint8_t* data, int size)
+    {
+        if (!data || size < kSize)
+            return {};
+        const RtpHeader* header = (RtpHeader*)(data);
+        std::optional<int> res;
+        res.emplace(header->payloadType);
+        return res;
+    }
 };
 
 struct RtpHeaderExtensionHeader

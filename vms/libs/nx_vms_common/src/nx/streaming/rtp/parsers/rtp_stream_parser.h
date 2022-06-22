@@ -3,6 +3,7 @@
 #pragma once
 
 #include <deque>
+#include <optional>
 
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/sdp.h>
@@ -15,12 +16,14 @@ namespace nx::streaming::rtp {
 class NX_VMS_COMMON_API StreamParser
 {
 public:
-    virtual ~StreamParser() {};
+    virtual ~StreamParser() = default;
 
     virtual void setSdpInfo(const Sdp::Media& sdp) = 0;
     virtual QnAbstractMediaDataPtr nextData() = 0;
     virtual Result processRtpExtension(
-        const RtpHeaderExtensionHeader& /*extensionHeader*/, quint8* /*data*/, int /*size*/) { return {true}; };
+        const RtpHeaderExtensionHeader& /*extensionHeader*/,
+        quint8* /*data*/,
+        int /*size*/) { return true; }
     virtual Result processData(
         const RtpHeader& header,
         quint8* rtpBufferBase,
@@ -30,7 +33,9 @@ public:
 
     virtual void clear() = 0;
 
-    int getFrequency() { return m_frequency; };
+    virtual bool forceProcessEmptyData() const { return false; }
+
+    int getFrequency() const { return m_frequency; };
 
 protected:
     void setFrequency(int frequency) { m_frequency = frequency; }
