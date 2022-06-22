@@ -13,27 +13,27 @@
     </message>
     <message>
       <source>Notify about available updates</source>
-      <translation type="unfinished">Notify about available updates</translation>
+      <translation>Varsle om tilgjengelige oppdateringer</translation>
     </message>
     <message>
       <source>Automatic client updates</source>
-      <translation type="unfinished">Automatic client updates</translation>
+      <translation>Automatiske klientoppdateringer</translation>
     </message>
     <message>
       <source>Turn this option on to make connected clients update automatically to the latest compatible version.</source>
-      <translation type="unfinished">Turn this option on to make connected clients update automatically to the latest compatible version.</translation>
+      <translation>Slå på dette alternativet for å få tilkoblede klienter til å oppdatere automatisk til den nyeste kompatible versjonen.</translation>
     </message>
     <message>
       <source>Connecting clients will be automatically updated to the new version when it’s available.</source>
-      <translation type="unfinished">Connecting clients will be automatically updated to the new version when it’s available.</translation>
+      <translation>Tilkoblede klienter vil automatisk bli oppdatert til den nye versjonen når den er tilgjengelig.</translation>
     </message>
     <message>
       <source>All connecting clients are updating to version %1.</source>
-      <translation type="unfinished">All connecting clients are updating to version %1.</translation>
+      <translation>Alle tilkoblede klienter oppdateres til versjon %1.</translation>
     </message>
     <message>
       <source>Connecting clients will be updated to version %1 on %2.</source>
-      <translation type="unfinished">Connecting clients will be updated to version %1 on %2.</translation>
+      <translation>Tilkoblede klienter vil bli oppdatert til versjon %1 på %2.</translation>
     </message>
     <message>
       <source>Check for updates</source>
@@ -41,11 +41,11 @@
     </message>
     <message>
       <source>Speed up this update</source>
-      <translation type="unfinished">Speed up this update</translation>
+      <translation>Få fart på denne oppdateringen</translation>
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
-      <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
+      <translation>Du bruker en tilpasset klient. Ta kontakt med %1 for å få oppdateringsinstruksjonene.</translation>
     </message>
   </context>
   <context>
@@ -63,7 +63,7 @@
     <name>AnalyticsFilters</name>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Objekttype</translation>
     </message>
   </context>
   <context>
@@ -86,29 +86,29 @@
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Prøv å endre filtrene eller konfigurer objektdeteksjon i innstillingene for kameraplugin</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
+      <translation>
+        <numerusform>%n nye resultater</numerusform>
+        <numerusform>%n nye resultater</numerusform>
       </translation>
     </message>
     <message>
       <source>new results</source>
-      <translation type="unfinished">new results</translation>
+      <translation>nye resultater</translation>
     </message>
     <message>
       <source>Detected by</source>
-      <translation type="unfinished">Detected by</translation>
+      <translation>Oppdaget av</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsSearchDialog</name>
     <message>
       <source>Advanced Object Search</source>
-      <translation type="unfinished">Advanced Object Search</translation>
+      <translation>Avansert objektsøk</translation>
     </message>
     <message>
       <source>Select area</source>
@@ -128,22 +128,22 @@
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Prøv å endre filtrene eller konfigurer objektdeteksjon i innstillingene for kameraplugin</translation>
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>Hvilken som helst plugin</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>
       <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
+        <numerusform>%n nye resultater</numerusform>
         <numerusform>%n new results</numerusform>
       </translation>
     </message>
     <message>
       <source>new results</source>
-      <translation type="unfinished">new results</translation>
+      <translation>nye resultater</translation>
     </message>
   </context>
   <context>
@@ -175,7 +175,7 @@
     <name>ButtonSettingsDelegate</name>
     <message>
       <source>Hotkey %1</source>
-      <translation type="unfinished">Hotkey %1</translation>
+      <translation>Hurtigtast %1</translation>
     </message>
   </context>
   <context>
@@ -202,15 +202,15 @@
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>Valgt kamera</translation>
     </message>
     <message>
       <source>Choose devices...</source>
-      <translation type="unfinished">Choose devices...</translation>
+      <translation>Velg enheter...</translation>
     </message>
     <message>
       <source>Choose cameras...</source>
-      <translation type="unfinished">Choose cameras...</translation>
+      <translation>Velg kameraer...</translation>
     </message>
     <message>
       <source>none</source>
@@ -218,25 +218,25 @@
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
+      <translation>
+        <numerusform>%n valgte enheter</numerusform>
+        <numerusform>%n valgte enheter</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
+      <translation>
+        <numerusform>%n valgte kameraer</numerusform>
+        <numerusform>%n valgte kameraer</numerusform>
       </translation>
     </message>
     <message>
       <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
+      <translation>Valgt enhet</translation>
     </message>
     <message>
       <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
+      <translation>Valgt kamera</translation>
     </message>
   </context>
   <context>
@@ -247,7 +247,7 @@
     </message>
     <message>
       <source>Unreachable</source>
-      <translation type="unfinished">Unreachable</translation>
+      <translation>Utilgjengelig</translation>
     </message>
     <message>
       <source>Incompatible</source>
@@ -255,14 +255,14 @@
     </message>
     <message>
       <source>Pending</source>
-      <translation type="unfinished">Pending</translation>
+      <translation>Ventende</translation>
     </message>
   </context>
   <context>
     <name>CloudTile</name>
     <message>
       <source>Log in to </source>
-      <translation type="unfinished">Log in to </translation>
+      <translation>Logg på </translation>
     </message>
   </context>
   <context>
@@ -283,18 +283,18 @@
     <name>ContextHintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>Klikk på ikonet for å lese mer</translation>
     </message>
   </context>
   <context>
     <name>CounterBlock</name>
     <message>
       <source>Remove column</source>
-      <translation type="unfinished">Remove column</translation>
+      <translation>Fjern kolonne</translation>
     </message>
     <message>
       <source>Add column</source>
-      <translation type="unfinished">Add column</translation>
+      <translation>Legg til kolonne</translation>
     </message>
     <message>
       <source>Hide information</source>
@@ -329,7 +329,7 @@
     </message>
     <message>
       <source>360° Equirectangular</source>
-      <translation type="unfinished">360° Equirectangular</translation>
+      <translation>360° ekvirektangulær</translation>
     </message>
   </context>
   <context>
@@ -340,7 +340,7 @@
     </message>
     <message>
       <source>See %1 for other events</source>
-      <translation type="unfinished">See %1 for other events</translation>
+      <translation>Se %1 for andre arrangementer</translation>
     </message>
     <message>
       <source>No events</source>
@@ -348,7 +348,7 @@
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+      <translation>Prøv å endre filtrene eller opprett en hendelsesregel</translation>
     </message>
     <message>
       <source>Event Log</source>
@@ -408,7 +408,7 @@
     </message>
     <message>
       <source>Show grid</source>
-      <translation type="unfinished">Show grid</translation>
+      <translation>Vis rutenett</translation>
     </message>
     <message>
       <source>Auto Calibration</source>
@@ -416,43 +416,43 @@
     </message>
     <message>
       <source>Mount</source>
-      <translation type="unfinished">Mount</translation>
+      <translation>Monter</translation>
     </message>
     <message>
       <source>Ceiling</source>
-      <translation type="unfinished">Ceiling</translation>
+      <translation>Tak</translation>
     </message>
     <message>
       <source>Wall</source>
-      <translation type="unfinished">Wall</translation>
+      <translation>Vegg</translation>
     </message>
     <message>
       <source>Floor/table</source>
-      <translation type="unfinished">Floor/table</translation>
+      <translation>Gulv/bord</translation>
     </message>
     <message>
       <source>Angle</source>
-      <translation type="unfinished">Angle</translation>
+      <translation>Vinkel</translation>
     </message>
     <message>
       <source>Camera roll correction</source>
-      <translation type="unfinished">Camera roll correction</translation>
+      <translation>Kamerarullkorreksjon</translation>
     </message>
     <message>
       <source>Lens projection</source>
-      <translation type="unfinished">Lens projection</translation>
+      <translation>Linseprojeksjon</translation>
     </message>
     <message>
       <source>Equidistant</source>
-      <translation type="unfinished">Equidistant</translation>
+      <translation>Ekvidistant</translation>
     </message>
     <message>
       <source>Stereographic</source>
-      <translation type="unfinished">Stereographic</translation>
+      <translation>Stereografisk</translation>
     </message>
     <message>
       <source>Equisolid</source>
-      <translation type="unfinished">Equisolid</translation>
+      <translation>Equisolid</translation>
     </message>
     <message>
       <source>Size</source>
@@ -476,14 +476,14 @@
     <message>
       <source>Hold %1 to activate actions</source>
       <comment>Leave %1 as is. It will be replaced to button name.</comment>
-      <translation type="unfinished">Hold %1 to activate actions</translation>
+      <translation>Hold %1 for å aktivere handlinger</translation>
     </message>
   </context>
   <context>
     <name>InformationBubble</name>
     <message>
       <source>Detected by</source>
-      <translation type="unfinished">Detected by</translation>
+      <translation>Oppdaget av</translation>
     </message>
   </context>
   <context>
@@ -521,7 +521,7 @@
     </message>
     <message>
       <source>Previous Object</source>
-      <translation type="unfinished">Previous Object</translation>
+      <translation>Forrige objekt</translation>
     </message>
     <message>
       <source>Pause</source>
@@ -533,57 +533,57 @@
     </message>
     <message>
       <source>Next Object</source>
-      <translation type="unfinished">Next Object</translation>
+      <translation>Neste objekt</translation>
     </message>
     <message>
       <source>Toggle Repeat</source>
-      <translation type="unfinished">Toggle Repeat</translation>
+      <translation>Slå på gjentakelse</translation>
     </message>
   </context>
   <context>
     <name>JoystickSettingsDialog</name>
     <message>
       <source>Joystick Settings</source>
-      <translation type="unfinished">Joystick Settings</translation>
+      <translation>Joystick-innstillinger</translation>
     </message>
     <message>
       <source>joystick</source>
-      <translation type="unfinished">joystick</translation>
+      <translation>joystick</translation>
     </message>
     <message>
       <source>Basic Actions</source>
-      <translation type="unfinished">Basic Actions</translation>
+      <translation>Grunnleggende handlinger</translation>
     </message>
     <message>
       <source>With Modifier</source>
-      <translation type="unfinished">With Modifier</translation>
+      <translation>Med Modifikator</translation>
     </message>
     <message>
       <source>This model is not supported</source>
-      <translation type="unfinished">This model is not supported</translation>
+      <translation>Denne modellen støttes ikke</translation>
     </message>
     <message>
       <source>Reset to Default</source>
-      <translation type="unfinished">Reset to Default</translation>
+      <translation>Tilbakestill til standard</translation>
     </message>
   </context>
   <context>
     <name>JoystickSettingsTab</name>
     <message>
       <source>Pan and Tilt</source>
-      <translation type="unfinished">Pan and Tilt</translation>
+      <translation>Pan og Tilt</translation>
     </message>
     <message>
       <source>Zoom In / Zoom Out</source>
-      <translation type="unfinished">Zoom In / Zoom Out</translation>
+      <translation>Zoom inn / Zoom ut</translation>
     </message>
     <message>
       <source>Select Camera on Layout</source>
-      <translation type="unfinished">Select Camera on Layout</translation>
+      <translation>Velg Kamera på layout</translation>
     </message>
     <message>
       <source>Log in to the system to configure how to open layouts</source>
-      <translation type="unfinished">Log in to the system to configure how to open layouts</translation>
+      <translation>Logg på systemet for å konfigurere hvordan du åpner oppsett</translation>
     </message>
   </context>
   <context>
@@ -629,7 +629,7 @@
     </message>
     <message>
       <source>Select a camera to see its motion events</source>
-      <translation type="unfinished">Select a camera to see its motion events</translation>
+      <translation>Velg et kamera for å se dets bevegelseshendelser</translation>
     </message>
     <message>
       <source>No motion detected</source>
@@ -637,11 +637,11 @@
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>Prøv å endre filtrene eller aktiver bevegelsesopptak</translation>
     </message>
     <message>
       <source>Select Camera...</source>
-      <translation type="unfinished">Select Camera...</translation>
+      <translation>Velg kamera...</translation>
     </message>
     <message>
       <source>No bookmarks</source>
@@ -649,7 +649,7 @@
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+      <translation>Velg et tidsrom på tidslinjen og høyreklikk på den uthevede delen for å lage et bokmerke</translation>
     </message>
   </context>
   <context>
@@ -689,18 +689,18 @@
     </message>
     <message>
       <source>Select an area on the video to filter results</source>
-      <translation type="unfinished">Select an area on the video to filter results</translation>
+      <translation>Velg et område på videoen for å filtrere resultatene</translation>
     </message>
   </context>
   <context>
     <name>ObjectEditor</name>
     <message>
       <source>Present</source>
-      <translation type="unfinished">Present</translation>
+      <translation>Nåværende</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation type="unfinished">Absent</translation>
+      <translation>Fraværende</translation>
     </message>
   </context>
   <context>
@@ -718,7 +718,7 @@
     </message>
     <message>
       <source>URL or Host:Port</source>
-      <translation type="unfinished">URL or Host:Port</translation>
+      <translation>URL eller Host:Port</translation>
     </message>
     <message>
       <source>Login</source>
@@ -791,11 +791,11 @@
     <name>PreviewPanel</name>
     <message>
       <source>No Preview</source>
-      <translation type="unfinished">No Preview</translation>
+      <translation>Ingen forhåndsvisning</translation>
     </message>
     <message>
       <source>Select the object to display the preview</source>
-      <translation type="unfinished">Select the object to display the preview</translation>
+      <translation>Velg objektet for å vise forhåndsvisningen</translation>
     </message>
     <message>
       <source>Show on Layout</source>
@@ -803,7 +803,7 @@
     </message>
     <message>
       <source>Preview is not available for the selected object</source>
-      <translation type="unfinished">Preview is not available for the selected object</translation>
+      <translation>Forhåndsvisning er ikke tilgjengelig for det valgte objektet</translation>
     </message>
   </context>
   <context>
@@ -858,7 +858,7 @@ to activate PTZ</translation>
     <name>RangeEditor</name>
     <message>
       <source>from</source>
-      <translation type="unfinished">from</translation>
+      <translation>fra</translation>
     </message>
     <message>
       <source>to</source>
@@ -869,11 +869,11 @@ to activate PTZ</translation>
     <name>RecursiveObjectTypeSelector</name>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Objekttype</translation>
     </message>
     <message>
       <source>Subtype</source>
-      <translation type="unfinished">Subtype</translation>
+      <translation>Undertype</translation>
     </message>
   </context>
   <context>
@@ -895,11 +895,11 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
-      <translation type="unfinished">Drag video files or images to the client window, or add local media folder through the Local Settings dialog</translation>
+      <translation>Dra videofiler eller bilder til klientvinduet, eller legg til lokal mediemappe via dialogboksen Lokale innstillinger</translation>
     </message>
     <message>
       <source>Try searching for something else</source>
-      <translation type="unfinished">Try searching for something else</translation>
+      <translation>Prøv å søke etter noe annet</translation>
     </message>
   </context>
   <context>
@@ -920,7 +920,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>OUTDATED</source>
-      <translation type="unfinished">OUTDATED</translation>
+      <translation>UTDATERT</translation>
     </message>
   </context>
   <context>
@@ -931,7 +931,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>All Types</source>
-      <translation type="unfinished">All Types</translation>
+      <translation>Alle typer</translation>
     </message>
     <message>
       <source>Servers</source>
@@ -970,11 +970,11 @@ to activate PTZ</translation>
     <name>ResourceToolTip</name>
     <message>
       <source>Cannot load preview</source>
-      <translation type="unfinished">Cannot load preview</translation>
+      <translation>Kan ikke laste inn forhåndsvisning</translation>
     </message>
     <message>
       <source>Preview is outdated</source>
-      <translation type="unfinished">Preview is outdated</translation>
+      <translation>Forhåndsvisningen er utdatert</translation>
     </message>
   </context>
   <context>
@@ -1018,7 +1018,7 @@ to activate PTZ</translation>
     <name>SelectLayoutDialog</name>
     <message>
       <source>Select layout</source>
-      <translation type="unfinished">Select layout</translation>
+      <translation>Velg visning</translation>
     </message>
   </context>
   <context>
@@ -1029,7 +1029,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Velg</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1066,7 +1066,7 @@ to activate PTZ</translation>
     <name>SphereDewarpingSettings</name>
     <message>
       <source>Horizon correction</source>
-      <translation type="unfinished">Horizon correction</translation>
+      <translation>Horisontkorrigering</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -1085,7 +1085,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Activate License</source>
-      <translation type="unfinished">Activate License</translation>
+      <translation>Aktive lisens</translation>
     </message>
     <message>
       <source>Camera Settings</source>
@@ -1097,7 +1097,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Device Settings</source>
-      <translation type="unfinished">Device Settings</translation>
+      <translation>Enhetsinnstillinger</translation>
     </message>
     <message>
       <source>Set for this Camera</source>
@@ -1124,7 +1124,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>No signal</source>
-      <translation type="unfinished">No signal</translation>
+      <translation>Ikke noe signal</translation>
     </message>
     <message>
       <source>Not enough licenses</source>
@@ -1132,15 +1132,15 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Server unavailable</source>
-      <translation type="unfinished">Server unavailable</translation>
+      <translation>Server utilgjengelig</translation>
     </message>
     <message>
       <source>No access</source>
-      <translation type="unfinished">No access</translation>
+      <translation>Ingen tilgang</translation>
     </message>
     <message>
       <source>Device disabled</source>
-      <translation type="unfinished">Device disabled</translation>
+      <translation>Enheten er deaktivert</translation>
     </message>
     <message>
       <source>Too many connections</source>
@@ -1178,19 +1178,19 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>No Favorite Systems</source>
-      <translation type="unfinished">No Favorite Systems</translation>
+      <translation>Ingen favorittsystemer</translation>
     </message>
     <message>
       <source>No Hidden Systems</source>
-      <translation type="unfinished">No Hidden Systems</translation>
+      <translation>Ingen skjulte systemer</translation>
     </message>
     <message>
       <source>You can add system to the favorites from the context menu</source>
-      <translation type="unfinished">You can add system to the favorites from the context menu</translation>
+      <translation>Du kan legge til system til favorittene fra kontekstmenyen</translation>
     </message>
     <message>
       <source>You can hide systems from the main list from the context menu</source>
-      <translation type="unfinished">You can hide systems from the main list from the context menu</translation>
+      <translation>Du kan skjule systemer fra hovedlisten fra menyen for kontekst</translation>
     </message>
   </context>
   <context>
@@ -1213,11 +1213,11 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Add to Favorites</source>
-      <translation type="unfinished">Add to Favorites</translation>
+      <translation>Legg til i favoritter</translation>
     </message>
     <message>
       <source>Remove from Favorites</source>
-      <translation type="unfinished">Remove from Favorites</translation>
+      <translation>Fjern fra favoritter</translation>
     </message>
   </context>
   <context>
@@ -1257,7 +1257,7 @@ to activate PTZ</translation>
     <name>VisibilityMenu</name>
     <message>
       <source>Hidden</source>
-      <translation type="unfinished">Hidden</translation>
+      <translation>Skjult</translation>
     </message>
     <message>
       <source>All Systems</source>
@@ -1265,22 +1265,22 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Favorites</source>
-      <translation type="unfinished">Favorites</translation>
+      <translation>Favoritter</translation>
     </message>
   </context>
   <context>
     <name>WelcomeScreen</name>
     <message>
       <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
-      <translation type="unfinished">You don&apos;t have access to the %1. Please check your internet connection.</translation>
+      <translation>Du har ikke tilgang til&apos; %1Vennligst sjekk internettforbindelsen din.</translation>
     </message>
     <message>
       <source>Official Website</source>
-      <translation type="unfinished">Official Website</translation>
+      <translation>Offisiell webside</translation>
     </message>
     <message>
       <source>Help &amp; User Manual</source>
-      <translation type="unfinished">Help &amp; User Manual</translation>
+      <translation>Hjelp og brukerhåndbok</translation>
     </message>
     <message>
       <source>Support</source>

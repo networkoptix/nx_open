@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Open source libraries</source>
-      <translation type="unfinished">Open source libraries</translation>
+      <translation>Åpen kildekode-biblioteker</translation>
     </message>
   </context>
   <context>
@@ -107,7 +107,7 @@
     </message>
     <message>
       <source>Server certificate validation</source>
-      <translation type="unfinished">Server certificate validation</translation>
+      <translation>Serversertifikatvalidering</translation>
     </message>
   </context>
   <context>
@@ -152,11 +152,11 @@
     <name>AnalyticsSdkObjectDetectedWidget</name>
     <message>
       <source>Attributes:</source>
-      <translation type="unfinished">Attributes:</translation>
+      <translation>Egenskaper:</translation>
     </message>
     <message>
       <source>Object Type:</source>
-      <translation type="unfinished">Object Type:</translation>
+      <translation>Objekttype:</translation>
     </message>
   </context>
   <context>
@@ -167,15 +167,15 @@
     </message>
     <message>
       <source>Keep Archive For...</source>
-      <translation type="unfinished">Keep Archive For...</translation>
+      <translation>Behold arkiv i...</translation>
     </message>
     <message>
       <source>Max</source>
-      <translation type="unfinished">Max</translation>
+      <translation>Maks</translation>
     </message>
     <message>
       <source>Min</source>
-      <translation type="unfinished">Min</translation>
+      <translation>Min</translation>
     </message>
   </context>
   <context>
@@ -256,19 +256,19 @@
     <name>BackupBandwidthSettingsWidget</name>
     <message>
       <source>No Limit</source>
-      <translation type="unfinished">No Limit</translation>
+      <translation>Ingen grense</translation>
     </message>
     <message>
       <source>Fixed</source>
-      <translation type="unfinished">Fixed</translation>
+      <translation>Fast</translation>
     </message>
     <message>
       <source>Scheduled</source>
-      <translation type="unfinished">Scheduled</translation>
+      <translation>Planlagt</translation>
     </message>
     <message>
       <source>Fix bandwidth to</source>
-      <translation type="unfinished">Fix bandwidth to</translation>
+      <translation>Lås båndbredde til</translation>
     </message>
     <message>
       <source>Mbit/s</source>
@@ -276,33 +276,33 @@
     </message>
     <message>
       <source>Unlimited</source>
-      <translation type="unfinished">Unlimited</translation>
+      <translation>Ubegrenset</translation>
     </message>
     <message>
       <source>Limited to</source>
-      <translation type="unfinished">Limited to</translation>
+      <translation>Begrenset til</translation>
     </message>
     <message>
       <source>No backup</source>
-      <translation type="unfinished">No backup</translation>
+      <translation>Ingen backup</translation>
     </message>
   </context>
   <context>
     <name>BackupSettingsWidget</name>
     <message>
       <source>Server is offline. Backup settings are not available.</source>
-      <translation type="unfinished">Server is offline. Backup settings are not available.</translation>
+      <translation>Serveren er frakoblet. Sikkerhetskopieringsinnstillinger er ikke tilgjengelige.</translation>
     </message>
   </context>
   <context>
     <name>BackupStatusWidget</name>
     <message>
       <source>Backup is not configured yet.</source>
-      <translation type="unfinished">Backup is not configured yet.</translation>
+      <translation>Sikkerhetskopiering er ikke konfigurert ennå.</translation>
     </message>
     <message>
       <source>To start backup enable it for some cameras and apply settings.</source>
-      <translation type="unfinished">To start backup enable it for some cameras and apply settings.</translation>
+      <translation>For å starte sikkerhetskopiering, aktiver den for noen kameraer og bruk innstillinger.</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -310,19 +310,19 @@
     </message>
     <message>
       <source>Skip Current Queue</source>
-      <translation type="unfinished">Skip Current Queue</translation>
+      <translation>Hopp over gjeldende kø</translation>
     </message>
     <message>
       <source>Maximum backup queue size</source>
-      <translation type="unfinished">Maximum backup queue size</translation>
+      <translation>Maksimal størrelse for backupkø</translation>
     </message>
     <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
-      <translation type="unfinished">All files are successfully backed up! New files will be backed up automatically</translation>
+      <translation>Alle filene er sikkerhetskopiert! Nye filer vil bli sikkerhetskopiert automatisk</translation>
     </message>
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
-      <translation type="unfinished">Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</translation>
+      <translation>Sikkerhetskopiering er stoppet på grunn av lagringsproblem. Sikkerhetskopieringen gjenopptas automatisk etter at lagringsproblemet er løst</translation>
     </message>
   </context>
   <context>
@@ -584,11 +584,11 @@
     </message>
     <message>
       <source>Stream Settings</source>
-      <translation type="unfinished">Stream Settings</translation>
+      <translation>Strøminnstillinger</translation>
     </message>
     <message>
       <source>Initialization Settings</source>
-      <translation type="unfinished">Initialization Settings</translation>
+      <translation>Initialiseringsinnstillinger</translation>
     </message>
     <message>
       <source>Use Media2 to fetch profiles</source>
@@ -596,39 +596,39 @@
     </message>
     <message>
       <source>Use different values for pan and tilt</source>
-      <translation type="unfinished">Use different values for pan and tilt</translation>
+      <translation>Bruk forskjellige verdier for panorering og tilt</translation>
     </message>
     <message>
       <source>Tilt</source>
-      <translation type="unfinished">Tilt</translation>
+      <translation>Tilt</translation>
     </message>
     <message>
       <source>Media Port</source>
-      <translation type="unfinished">Media Port</translation>
+      <translation>Medieport</translation>
     </message>
     <message>
       <source>Use system presets</source>
-      <translation type="unfinished">Use system presets</translation>
+      <translation>Bruk system posisjoner</translation>
     </message>
     <message>
       <source>PTZ Speed</source>
-      <translation type="unfinished">PTZ Speed</translation>
+      <translation>PTZ-hastighet</translation>
     </message>
     <message>
       <source>RTP Transport</source>
-      <translation type="unfinished">RTP Transport</translation>
+      <translation>RTP-transport</translation>
     </message>
     <message>
       <source>Use camera native presets</source>
-      <translation type="unfinished">Use camera native presets</translation>
+      <translation>Bruk kameraets posisjoner</translation>
     </message>
     <message>
       <source>Time Settings</source>
-      <translation type="unfinished">Time Settings</translation>
+      <translation>Tidsinnstillinger</translation>
     </message>
     <message>
       <source>Keep camera time settings</source>
-      <translation type="unfinished">Keep camera time settings</translation>
+      <translation>Behold kameraets tidsinnstillinger</translation>
     </message>
   </context>
   <context>
@@ -728,7 +728,7 @@
     <message>
       <source>in</source>
       <comment>e.g. &quot;in Primary Stream&quot;</comment>
-      <translation type="unfinished">in</translation>
+      <translation>i</translation>
     </message>
   </context>
   <context>
@@ -762,7 +762,7 @@
     </message>
     <message>
       <source>Motion &amp;&amp; Objects Recording</source>
-      <translation type="unfinished">Motion &amp;&amp; Objects Recording</translation>
+      <translation>Opptak av bevegelse og objekter</translation>
     </message>
   </context>
   <context>
@@ -800,7 +800,7 @@
     </message>
     <message>
       <source>Enable 2-way audio</source>
-      <translation type="unfinished">Enable 2-way audio</translation>
+      <translation>Aktiver 2-veis lyd</translation>
     </message>
   </context>
   <context>
@@ -814,7 +814,7 @@
     <name>CertificateSelectionDialog</name>
     <message>
       <source>Web site requires a certificate</source>
-      <translation type="unfinished">Web site requires a certificate</translation>
+      <translation>Nettstedet krever et sertifikat</translation>
     </message>
   </context>
   <context>
@@ -954,11 +954,11 @@
     <name>EncryptedArchivePasswordDialog</name>
     <message>
       <source>Encrypted archive</source>
-      <translation type="unfinished">Encrypted archive</translation>
+      <translation>Kryptert arkiv</translation>
     </message>
     <message>
       <source>Enter your encryption password to view the archive</source>
-      <translation type="unfinished">Enter your encryption password to view the archive</translation>
+      <translation>Skriv inn krypteringspassordet ditt for å se arkivet</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1127,7 +1127,7 @@
     <name>FailoverPriorityPickerWidget</name>
     <message>
       <source>Set priority:</source>
-      <translation type="unfinished">Set priority:</translation>
+      <translation>Angi prioritet:</translation>
     </message>
     <message>
       <source>Low</source>
@@ -1143,11 +1143,11 @@
     </message>
     <message>
       <source>Select some devices to setup failover priority</source>
-      <translation type="unfinished">Select some devices to setup failover priority</translation>
+      <translation>Velg noen enheter for å konfigurere failover-prioritet</translation>
     </message>
     <message>
       <source>No Failover</source>
-      <translation type="unfinished">No Failover</translation>
+      <translation>Ingen failover</translation>
     </message>
   </context>
   <context>
@@ -1227,15 +1227,15 @@
     </message>
     <message>
       <source>Startup</source>
-      <translation type="unfinished">Startup</translation>
+      <translation>Oppstart</translation>
     </message>
     <message>
       <source>Connect to the previous system on startup</source>
-      <translation type="unfinished">Connect to the previous system on startup</translation>
+      <translation>Koble til det forrige systemet ved oppstart</translation>
     </message>
     <message>
       <source>Automatically restore saved windows configuration</source>
-      <translation type="unfinished">Automatically restore saved windows configuration</translation>
+      <translation>Gjenopprett automatisk lagret vindu konfigurasjon</translation>
     </message>
     <message>
       <source>Play audio from all cameras on layout</source>
@@ -1243,7 +1243,7 @@
     </message>
     <message>
       <source>Mute audio when the mic is active</source>
-      <translation type="unfinished">Mute audio when the mic is active</translation>
+      <translation>Demp lyden når mikrofonen er aktiv</translation>
     </message>
   </context>
   <context>
@@ -1496,7 +1496,7 @@
     </message>
     <message>
       <source>Allow digest authentication for imported user</source>
-      <translation type="unfinished">Allow digest authentication for imported user</translation>
+      <translation>Tillat "digest autentisering" for importert bruker</translation>
     </message>
   </context>
   <context>
@@ -1747,7 +1747,7 @@
     </message>
     <message>
       <source>Advanced settings</source>
-      <translation type="unfinished">Advanced settings</translation>
+      <translation>Avanserte innstillinger</translation>
     </message>
   </context>
   <context>
@@ -2110,7 +2110,7 @@
     </message>
     <message>
       <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
+      <translation>Krev sikker autentisering</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -2293,11 +2293,11 @@
     <name>RewindForWidget</name>
     <message>
       <source>Playback time :</source>
-      <translation type="unfinished">Playback time :</translation>
+      <translation>Avspillingstid:</translation>
     </message>
     <message>
       <source>rewind for</source>
-      <translation type="unfinished">rewind for</translation>
+      <translation>spole tilbake for</translation>
     </message>
     <message>
       <source>Live</source>
