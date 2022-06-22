@@ -52,6 +52,16 @@ struct RtpHeader
     uint32_t payloadOffset() const { return kSize + CSRCCount * kCsrcSize; }
     uint32_t getTimestamp() const { return ntohl(timestamp); }
     uint16_t getSequence() const { return ntohs(sequence); }
+
+    static std::optional<int> getPayloadType(const uint8_t* data, int size)
+    {
+        if (!data || size < kSize)
+            return {};
+        const RtpHeader* header = (RtpHeader*)(data);
+        std::optional<int> res;
+        res.emplace(header->payloadType);
+        return res;
+    }
 };
 
 struct RtpHeaderExtensionHeader
