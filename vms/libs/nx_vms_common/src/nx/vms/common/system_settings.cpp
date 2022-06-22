@@ -728,8 +728,12 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         "useHttpsOnlyForCameras", false, this, [] { return tr("Use only HTTPS for Cameras"); });
 
     m_insecureDeprecatedApiEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        Names::insecureDeprecatedApiEnabled, Names::insecureDeprecatedApiEnabledDefault, this,
+        Names::insecureDeprecatedApiEnabled, true, this,
         [] { return tr("Enable insecure deprecated API"); });
+
+    m_insecureDeprecatedApiInUseEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        Names::insecureDeprecatedApiInUseEnabled, true, this,
+        [] { return tr("Enable insecure deprecated API functions curently in use by Nx products"); });
 
     m_showMouseTimelinePreviewAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "showMouseTimelinePreview", true, this, [] { return tr("Show mouse timeline preview"); });
@@ -1026,6 +1030,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << m_videoTrafficEncryptionForcedAdaptor
         << m_useHttpsOnlyCamerasAdaptor
         << m_insecureDeprecatedApiEnabledAdaptor
+        << m_insecureDeprecatedApiInUseEnabledAdaptor
         << m_eventLogPeriodDaysAdaptor
         << m_autoDiscoveryEnabledAdaptor
         << m_autoDiscoveryResponseEnabledAdaptor
@@ -2171,6 +2176,16 @@ bool SystemSettings::isInsecureDeprecatedApiEnabled() const
 void SystemSettings::enableInsecureDeprecatedApi(bool value)
 {
     m_insecureDeprecatedApiEnabledAdaptor->setValue(value);
+}
+
+bool SystemSettings::isInsecureDeprecatedApiInUseEnabled() const
+{
+    return m_insecureDeprecatedApiInUseEnabledAdaptor->value();
+}
+
+void SystemSettings::enableInsecureDeprecatedApiInUse(bool value)
+{
+    m_insecureDeprecatedApiInUseEnabledAdaptor->setValue(value);
 }
 
 } // namespace nx::vms::common

@@ -42,6 +42,7 @@ struct SystemSettingNames
     DECLARE_SETTING_NAME(cloudSystemID); //< TODO: rename it to cloudSystemId
     DECLARE_SETTING_NAME(disabledVendors);
     DECLARE_SETTING_NAME(insecureDeprecatedApiEnabled);
+    DECLARE_SETTING_NAME(insecureDeprecatedApiInUseEnabled);
     DECLARE_SETTING_NAME(lastMergeMasterId);
     DECLARE_SETTING_NAME(lastMergeSlaveId);
     DECLARE_SETTING_NAME(ldapAdminDn);
@@ -69,9 +70,6 @@ struct SystemSettingNames
     DECLARE_SETTING_NAME(systemName);
     DECLARE_SETTING_NAME(trafficEncryptionForced);
     DECLARE_SETTING_NAME(webSocketEnabled);
-
-    // TODO: Should be false, when all clients witch to new APIs.
-    static const inline bool insecureDeprecatedApiEnabledDefault = true;
 
     static const inline std::set<QString> kReadOnlyNames = {
         cloudAccountName,
@@ -202,6 +200,9 @@ public:
 
     bool isInsecureDeprecatedApiEnabled() const;
     void enableInsecureDeprecatedApi(bool value = true);
+
+    bool isInsecureDeprecatedApiInUseEnabled() const;
+    void enableInsecureDeprecatedApiInUse(bool value = true);
 
     bool isAutoDiscoveryEnabled() const;
     void setAutoDiscoveryEnabled(bool enabled);
@@ -672,6 +673,7 @@ private:
     QnResourcePropertyAdaptor<QString>* m_frameOptionsHeaderAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_useHttpsOnlyCamerasAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_insecureDeprecatedApiEnabledAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_insecureDeprecatedApiInUseEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_showMouseTimelinePreviewAdaptor = nullptr;
 
     AdaptorList m_allAdaptors;
