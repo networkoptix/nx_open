@@ -6711,7 +6711,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</translation>
+      <translation>Finner all innhold hvilken som helst tjeneste eller enhet på serveren&apos;s nettverk til brukerne på denne nettsiden.</translation>
     </message>
     <message>
       <source>Move anyway?</source>
@@ -6751,15 +6751,15 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains virtual cameras, USB or web cameras</source>
-      <translation type="unfinished">%1 cannot be moved between servers as it contains virtual cameras, USB or web cameras</translation>
+      <translation>%1 kan ikke flyttes mellom servere da den inneholder virtuelle kameraer, USB- eller webkameraer</translation>
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual cameras cannot be moved between servers</translation>
+      <translation>Virtuelle kameraer kan ikke flyttes mellom servere</translation>
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains virtual cameras</source>
-      <translation type="unfinished">%1 cannot be moved between servers as it contains virtual cameras</translation>
+      <translation>%1 kan ikke flyttes mellom servere da den inneholder virtuelle kameraer</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers</source>
@@ -6991,18 +6991,18 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
+      <translation>
+        <numerusform>%n valgte kameraer</numerusform>
+        <numerusform>%n valgte kameraer</numerusform>
       </translation>
     </message>
     <message>
       <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
+      <translation>Valgt kamera</translation>
     </message>
     <message>
       <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
+      <translation>Valgt enhet</translation>
     </message>
   </context>
   <context>
@@ -7038,7 +7038,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Prøv å endre filtrene eller konfigurer objektdeteksjon i innstillingene for kameraplugin</translation>
     </message>
   </context>
   <context>
@@ -7056,143 +7056,143 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <name>nx::vms::client::desktop::AudioRedirectPickerWidget</name>
     <message>
       <source>Select Device...</source>
-      <translation type="unfinished">Select Device...</translation>
+      <translation>Velg enhet...</translation>
     </message>
     <message>
       <source>Use audio stream from</source>
-      <translation type="unfinished">Use audio stream from</translation>
+      <translation>Bruk lydstrøm fra</translation>
     </message>
     <message>
       <source>Transmit audio stream to</source>
-      <translation type="unfinished">Transmit audio stream to</translation>
+      <translation>Overfør lydstrøm til</translation>
     </message>
     <message>
       <source>This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</source>
-      <translation type="unfinished">This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</translation>
+      <translation>Denne enheten har ikke lydinngang, eller den er ikke riktig konfigurert. Velg en annen enhet som lydkilde.</translation>
     </message>
     <message>
       <source>This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</source>
-      <translation type="unfinished">This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</translation>
+      <translation>Dette kameraet har ikke lydinngang, eller det er ikke riktig konfigurert. Velg et annet kamera som lydkilde.</translation>
     </message>
     <message>
       <source>This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</source>
-      <translation type="unfinished">This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</translation>
+      <translation>Denne enheten har ikke lydutgang, eller den er ikke riktig konfigurert. Velg en annen enhet for lydavspilling.</translation>
     </message>
     <message>
       <source>This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</source>
-      <translation type="unfinished">This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</translation>
+      <translation>Dette kameraet har ikke lydutgang, eller det er ikke riktig konfigurert. Velg et annet kamera for lydavspilling.</translation>
     </message>
     <message>
       <source>Use this device for audio output</source>
-      <translation type="unfinished">Use this device for audio output</translation>
+      <translation>Bruk denne enheten for lydutgang</translation>
     </message>
     <message>
       <source>Use this camera for audio output</source>
-      <translation type="unfinished">Use this camera for audio output</translation>
+      <translation>Bruk dette kameraet til lydutgang</translation>
     </message>
     <message>
       <source>Use audio stream from another device</source>
-      <translation type="unfinished">Use audio stream from another device</translation>
+      <translation>Bruk lydstrøm fra en annen enhet</translation>
     </message>
     <message>
       <source>Use audio stream from another camera</source>
-      <translation type="unfinished">Use audio stream from another camera</translation>
+      <translation>Bruk lydstrøm fra et annet kamera</translation>
     </message>
     <message>
       <source>Transmit audio stream to another device</source>
-      <translation type="unfinished">Transmit audio stream to another device</translation>
+      <translation>Overfør lydstrøm til en annen enhet</translation>
     </message>
     <message>
       <source>Transmit audio stream to another camera</source>
-      <translation type="unfinished">Transmit audio stream to another camera</translation>
+      <translation>Overfør lydstrøm til et annet kamera</translation>
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</translation>
+      <translation>Den valgte enheten har ikke&apos;, eller den er ikke konfigurert&apos;Lydstrøm er ikke tilgjengelig.</translation>
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</translation>
+      <translation>Den valgte enheten har ikke&apos;eller den er ikke konfigurert&apos;Lydstrømming er ikke tilgjengelig.</translation>
     </message>
     <message>
       <source>The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
-      <translation type="unfinished">The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</translation>
+      <translation>Den valgte enheten har ikke&apos;, lydutgang eller den er ikke riktig konfigurert. Lydstrøm er ikke tilgjengelig.</translation>
     </message>
     <message>
       <source>The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
-      <translation type="unfinished">The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</translation>
+      <translation>Den valgte enheten har ikke&apos;, lydinngang eller den er ikke riktig konfigurert.Lydstrøm er ikke tilgjengelig.</translation>
     </message>
     <message>
       <source>The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
-      <translation type="unfinished">The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</translation>
+      <translation>Den valgte enheten har ikke en lydutgang, eller den er ikke riktig konfigurert. 2-veis lyd er ikke tilgjengelig.</translation>
     </message>
     <message>
       <source>The selected camera does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
-      <translation type="unfinished">The selected camera does not have an audio output, or it is not configured correctly. 2-way audio is not available.</translation>
+      <translation>Det valgte kameraet har ikke lydutgang, eller det er ikke riktig konfigurert. 2-veis lyd er ikke tilgjengelig.</translation>
     </message>
     <message>
       <source>Use audio stream from this device</source>
-      <translation type="unfinished">Use audio stream from this device</translation>
+      <translation>Bruk lydstrøm fra denne enheten</translation>
     </message>
     <message>
       <source>Use audio stream from this camera</source>
-      <translation type="unfinished">Use audio stream from this camera</translation>
+      <translation>Bruk lydstrøm fra dette kameraet</translation>
     </message>
     <message>
       <source>%1 is connected to another server. Audio stream is not available</source>
-      <translation type="unfinished">%1 is connected to another server. Audio stream is not available</translation>
+      <translation>%1 er koblet til en annen server. Lydstrøm er ikke tilgjengelig</translation>
     </message>
     <message>
       <source>Selected device is connected to another server. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device is connected to another server. Audio stream is not available.</translation>
+      <translation>Den valgte enheten er koblet til en annen server. Lydstrøm er ikke tilgjengelig.</translation>
     </message>
     <message>
       <source>Selected camera is connected to another server. Audio stream is not available.</source>
-      <translation type="unfinished">Selected camera is connected to another server. Audio stream is not available.</translation>
+      <translation>Det valgte kameraet er koblet til en annen server. Lydstrøm er ikke tilgjengelig.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupBandwidthSettingsWidget</name>
     <message>
       <source>Select an area on the schedule to apply chosen settings.</source>
-      <translation type="unfinished">Select an area on the schedule to apply chosen settings.</translation>
+      <translation>Velg et område på timeplanen for å bruke valgte innstillinger.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupQueueSize</name>
     <message numerus="yes">
       <source>%n weeks</source>
-      <translation type="unfinished">
-        <numerusform>%n weeks</numerusform>
-        <numerusform>%n weeks</numerusform>
+      <translation>
+        <numerusform>%n uker</numerusform>
+        <numerusform>%n uker</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n days</source>
-      <translation type="unfinished">
-        <numerusform>%n days</numerusform>
-        <numerusform>%n days</numerusform>
+      <translation>
+        <numerusform>%n dager</numerusform>
+        <numerusform>%n dager</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n hours</source>
-      <translation type="unfinished">
-        <numerusform>%n hours</numerusform>
-        <numerusform>%n hours</numerusform>
+      <translation>
+        <numerusform>%n timer</numerusform>
+        <numerusform>%n timer</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n minutes</source>
-      <translation type="unfinished">
-        <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
+      <translation>
+        <numerusform>%n minutter</numerusform>
+        <numerusform>%n minutter</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n seconds</source>
-      <translation type="unfinished">
-        <numerusform>%n seconds</numerusform>
-        <numerusform>%n seconds</numerusform>
+      <translation>
+        <numerusform>%n sekunder</numerusform>
+        <numerusform>%n sekunder</numerusform>
       </translation>
     </message>
   </context>
@@ -7200,7 +7200,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <name>nx::vms::client::desktop::BackupSettingsDecoratorModel</name>
     <message>
       <source>The camera has neither recorded footage nor recording scheduled</source>
-      <translation type="unfinished">The camera has neither recorded footage nor recording scheduled</translation>
+      <translation>Kameraet har verken tatt opp opptak eller planlagt opptak</translation>
     </message>
     <message>
       <source>Motion detection is disabled</source>
@@ -7208,7 +7208,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>No analytics plugins</source>
-      <translation type="unfinished">No analytics plugins</translation>
+      <translation>Ingen analyseplugins</translation>
     </message>
     <message>
       <source>Cameras</source>
@@ -7216,7 +7216,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>What to backup</source>
-      <translation type="unfinished">What to backup</translation>
+      <translation>Hva skal sikkerhetskopieres</translation>
     </message>
     <message>
       <source>Quality</source>
@@ -7224,34 +7224,34 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Cannot be modified for new added cameras</source>
-      <translation type="unfinished">Cannot be modified for new added cameras</translation>
+      <translation>Kan ikke endres for nye ekstra kameraer</translation>
     </message>
     <message>
       <source>This device provides only one data stream</source>
-      <translation type="unfinished">This device provides only one data stream</translation>
+      <translation>Denne enheten gir kun én datastrøm</translation>
     </message>
     <message>
       <source>Stream setting is not applicable to this device type</source>
-      <translation type="unfinished">Stream setting is not applicable to this device type</translation>
+      <translation>Strøminnstillingen gjelder ikke for denne enhetstypen</translation>
     </message>
     <message>
       <source>Not supported</source>
-      <translation type="unfinished">Not supported</translation>
+      <translation>Støttes ikke</translation>
     </message>
     <message>
       <source>Backup is not supported for this device</source>
-      <translation type="unfinished">Backup is not supported for this device</translation>
+      <translation>Sikkerhetskopiering støttes ikke for denne enheten</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>
     <message>
       <source>Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</source>
-      <translation type="unfinished">Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</translation>
+      <translation>Bruk %1 eller %2 for å velge flere enheter for batchredigering. Bruk %3 for å velge alle enheter.</translation>
     </message>
     <message>
       <source>What to backup</source>
-      <translation type="unfinished">What to backup</translation>
+      <translation>Hva skal sikkerhetskopieres</translation>
     </message>
     <message>
       <source>Quality</source>
@@ -7259,9 +7259,9 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message numerus="yes">
       <source>Set for %n selected devices</source>
-      <translation type="unfinished">
-        <numerusform>Set for %n selected devices</numerusform>
-        <numerusform>Set for %n selected devices</numerusform>
+      <translation>
+        <numerusform>Still inn for %n valgte enheter</numerusform>
+        <numerusform>Angi for %n valgte enheter</numerusform>
       </translation>
     </message>
   </context>
@@ -7269,7 +7269,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <name>nx::vms::client::desktop::BackupSettingsViewWidget</name>
     <message>
       <source>Nothing to backup</source>
-      <translation type="unfinished">Nothing to backup</translation>
+      <translation>Ingenting å sikkerhetskopiere</translation>
     </message>
   </context>
   <context>
@@ -7280,23 +7280,23 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Bandwidth Limit</source>
-      <translation type="unfinished">Bandwidth Limit</translation>
+      <translation>Båndbreddegrense</translation>
     </message>
     <message>
       <source>New added cameras</source>
-      <translation type="unfinished">New added cameras</translation>
+      <translation>Nye tillagte kamera</translation>
     </message>
     <message>
       <source>New added cameras settings will apply to all servers in the system.</source>
-      <translation type="unfinished">New added cameras settings will apply to all servers in the system.</translation>
+      <translation>Nye ekstra kamerainnstillinger vil gjelde for alle servere i systemet.</translation>
     </message>
     <message>
       <source>Backup will be turned on for new added cameras on all servers in the system.</source>
-      <translation type="unfinished">Backup will be turned on for new added cameras on all servers in the system.</translation>
+      <translation>Sikkerhetskopiering vil bli slått på for nye ekstra kameraer på alle servere i systemet.</translation>
     </message>
     <message>
       <source>Backup will be turned off for new added cameras on all servers in the system.</source>
-      <translation type="unfinished">Backup will be turned off for new added cameras on all servers in the system.</translation>
+      <translation>Sikkerhetskopiering vil bli slått av for nye ekstra kameraer på alle servere i systemet.</translation>
     </message>
     <message>
       <source>Storage Management</source>
@@ -7305,23 +7305,23 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message>
       <source>To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation type="unfinished">To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</translation>
+      <translation>For å aktivere sikkerhetskopiering, endre &quot;Main&quot; til &quot;Backup&quot; fra noen av lagringene i %1</translation>
     </message>
     <message>
       <source>To enable backup add more drives to use them as backup storage in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation type="unfinished">To enable backup add more drives to use them as backup storage in %1</translation>
+      <translation>For å aktivere sikkerhetskopiering, legg til flere stasjoner for å bruke dem som backuplagring i %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupStatusWidget</name>
     <message>
       <source>Backup process will ignore existing footage. Only further recording will be backed up.</source>
-      <translation type="unfinished">Backup process will ignore existing footage. Only further recording will be backed up.</translation>
+      <translation>Sikkerhetskopieringsprosessen vil ignorere eksisterende opptak. Bare videre opptak vil bli sikkerhetskopiert.</translation>
     </message>
     <message>
       <source>Skip backup for existing footage?</source>
-      <translation type="unfinished">Skip backup for existing footage?</translation>
+      <translation>Vil du hoppe over sikkerhetskopiering av eksisterende opptak?</translation>
     </message>
     <message>
       <source>This action cannot be undone.</source>
@@ -7329,20 +7329,20 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Applies only to the cameras connected to current server.</source>
-      <translation type="unfinished">Applies only to the cameras connected to current server.</translation>
+      <translation>Gjelder kun for kameraene som er koblet til gjeldende server.</translation>
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Backup is enabled for %n devices</numerusform>
-        <numerusform>Backup is enabled for %n devices</numerusform>
+      <translation>
+        <numerusform>Sikkerhetskopiering er aktivert for %n enheter</numerusform>
+        <numerusform>Sikkerhetskopiering er aktivert for %n enheter</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Backup is enabled for %n cameras</numerusform>
-        <numerusform>Backup is enabled for %n cameras</numerusform>
+      <translation>
+        <numerusform>Sikkerhetskopiering er aktivert for %n kameraer</numerusform>
+        <numerusform>Sikkerhetskopiering er aktivert for %n kameraer</numerusform>
       </translation>
     </message>
   </context>
@@ -7368,7 +7368,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+      <translation>Velg et tidsrom på tidslinjen og høyreklikk på den uthevede delen for å lage et bokmerke</translation>
     </message>
   </context>
   <context>
@@ -7386,11 +7386,11 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <name>nx::vms::client::desktop::CameraButtonController</name>
     <message>
       <source>Heater</source>
-      <translation type="unfinished">Heater</translation>
+      <translation>Varmeapparat</translation>
     </message>
     <message>
       <source>Wiper</source>
-      <translation type="unfinished">Wiper</translation>
+      <translation>Vindusvisker</translation>
     </message>
   </context>
   <context>
@@ -7448,15 +7448,15 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Force Motion Detection</source>
-      <translation type="unfinished">Force Motion Detection</translation>
+      <translation>Aktiver bevegelsesdeteksjon</translation>
     </message>
     <message>
       <source>Pan</source>
-      <translation type="unfinished">Pan</translation>
+      <translation>Panne</translation>
     </message>
     <message>
       <source>Pan &amp; Tilt</source>
-      <translation type="unfinished">Pan &amp; Tilt</translation>
+      <translation>Pan &amp; Tilt</translation>
     </message>
     <message>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
@@ -7464,7 +7464,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Server will not push time settings to the camera.</source>
-      <translation type="unfinished">Server will not push time settings to the camera.</translation>
+      <translation>Server vil ikke sende tidsinnstillinger til kameraet.</translation>
     </message>
   </context>
   <context>
@@ -7536,15 +7536,15 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Force Motion Detection</source>
-      <translation type="unfinished">Force Motion Detection</translation>
+      <translation>Aktiver bevegelsesdeteksjon</translation>
     </message>
     <message>
       <source>Select areas on the preview to set chosen sensitivity for.</source>
-      <translation type="unfinished">Select areas on the preview to set chosen sensitivity for.</translation>
+      <translation>Velg områder på forhåndsvisningen du vil angi valgt følsomhet for.</translation>
     </message>
     <message>
       <source>Choose a motion detection sensitivity and select some areas on the preview to set it for.</source>
-      <translation type="unfinished">Choose a motion detection sensitivity and select some areas on the preview to set it for.</translation>
+      <translation>Velg en følsomhet for bevegelsesdeteksjon og velg noen områder på forhåndsvisningen du vil angi den for.</translation>
     </message>
   </context>
   <context>
@@ -7582,7 +7582,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message>
       <source>Show all devices</source>
-      <translation type="unfinished">Show all devices</translation>
+      <translation>Vis alle enheter</translation>
     </message>
     <message>
       <source>Show all cameras</source>
@@ -7590,19 +7590,19 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Select Devices</source>
-      <translation type="unfinished">Select Devices</translation>
+      <translation>Velg enheter</translation>
     </message>
     <message>
       <source>Select Cameras</source>
-      <translation type="unfinished">Select Cameras</translation>
+      <translation>Velg kameraer</translation>
     </message>
     <message>
       <source>Select Device</source>
-      <translation type="unfinished">Select Device</translation>
+      <translation>Velg enhet</translation>
     </message>
     <message>
       <source>Select Camera</source>
-      <translation type="unfinished">Select Camera</translation>
+      <translation>Velg kamera</translation>
     </message>
     <message>
       <source>No cameras available</source>
@@ -7698,11 +7698,11 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Change invalid schedule to &quot;Record Always&quot;</source>
-      <translation type="unfinished">Change invalid schedule to &quot;Record Always&quot;</translation>
+      <translation>Endre ugyldig tidsplan til &quot;Registrer alltid&quot;</translation>
     </message>
     <message>
       <source>Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</source>
-      <translation type="unfinished">Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</translation>
+      <translation>Noen celler i opptaksplanen er satt til en ugyldig opptaksmodus: %1. I løpet av timene som er satt til en ugyldig opptaksmodus, vil kameraet ta opp i &quot;Record Allways&quot; -modus.</translation>
     </message>
     <message>
       <source>Motion Only</source>
@@ -7710,11 +7710,11 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Objects Only</source>
-      <translation type="unfinished">Objects Only</translation>
+      <translation>Kun objekter</translation>
     </message>
     <message>
       <source>Motion &amp; Objects Only</source>
-      <translation type="unfinished">Motion &amp; Objects Only</translation>
+      <translation>Kun bevegelse og objekter</translation>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
@@ -7722,11 +7722,11 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>Objekter + Lo-Res</translation>
     </message>
     <message>
       <source>Motion &amp; Objects + Lo-Res</source>
-      <translation type="unfinished">Motion &amp; Objects + Lo-Res</translation>
+      <translation>Bevegelse og objekter + Lo-Res</translation>
     </message>
   </context>
   <context>
@@ -7734,46 +7734,46 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message numerus="yes">
       <source>Failed to enable audio on %n devices</source>
       <translation type="unfinished">
-        <numerusform>Failed to enable audio on %n devices</numerusform>
+        <numerusform>Kunne ikke aktivere lyd på %n enheter</numerusform>
         <numerusform>Failed to enable audio on %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These devices do not have audio inputs or are not configured correctly.</source>
-      <translation type="unfinished">
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
+      <translation>
+        <numerusform>Disse enhetene har ikke lydinnganger eller er ikke riktig konfigurert.</numerusform>
+        <numerusform>Disse enhetene har ikke lydinnganger eller er ikke riktig konfigurert.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to enable 2-way audio on %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
+      <translation>
+        <numerusform>Kunne ikke aktivere 2-veis lyd på %n enheter</numerusform>
+        <numerusform>Kunne ikke aktivere 2-veis lyd på %n enheter</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These devices do not have audio outputs or are not configured correctly.</source>
-      <translation type="unfinished">
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
+      <translation>
+        <numerusform>Disse enhetene har ikke lydinnganger eller er ikke riktig konfigurert.</numerusform>
+        <numerusform>Disse enhetene har ikke lydinnganger eller er ikke riktig konfigurert.</numerusform>
       </translation>
     </message>
     <message>
       <source>Audio will be disabled</source>
-      <translation type="unfinished">Audio will be disabled</translation>
+      <translation>Lyden vil bli deaktivert</translation>
     </message>
     <message>
       <source>You need to select a device that will provide audio.</source>
-      <translation type="unfinished">You need to select a device that will provide audio.</translation>
+      <translation>Du må velge en enhet som skal gi lyd.</translation>
     </message>
     <message>
       <source>2-way audio will be disabled</source>
-      <translation type="unfinished">2-way audio will be disabled</translation>
+      <translation>2-veis lyd vil bli deaktivert</translation>
     </message>
     <message>
       <source>You need to select a device to transmit the audio stream to and use for audio playback.</source>
-      <translation type="unfinished">You need to select a device to transmit the audio stream to and use for audio playback.</translation>
+      <translation>Du må velge en enhet du vil overføre lydstrømmen til og bruke til lydavspilling.</translation>
     </message>
   </context>
   <context>
@@ -7789,9 +7789,9 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message numerus="yes">
       <source>%1 are required</source>
       <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are required</numerusform>
-        <numerusform>%1 are required</numerusform>
+      <translation>
+        <numerusform>%1 kreves</numerusform>
+        <numerusform>%1 kreves</numerusform>
       </translation>
     </message>
   </context>
@@ -7811,11 +7811,11 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Invalid stream address</source>
-      <translation type="unfinished">Invalid stream address</translation>
+      <translation>Ugyldig strømadresse</translation>
     </message>
     <message>
       <source>Streaming protocol mismatch</source>
-      <translation type="unfinished">Streaming protocol mismatch</translation>
+      <translation>Strømmeprotokoll samsvarer ikke</translation>
     </message>
   </context>
   <context>
@@ -7823,11 +7823,11 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message>
       <source>Select a certificate to authenticate yourself to %1:</source>
       <extracomment>%1 here is a host name for which you provide a certificate.</extracomment>
-      <translation type="unfinished">Select a certificate to authenticate yourself to %1:</translation>
+      <translation>Velg et sertifikat for å autentisere deg til %1:</translation>
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Velg</translation>
     </message>
   </context>
   <context>
@@ -7870,11 +7870,11 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Cannot download update file</source>
-      <translation type="unfinished">Cannot download update file</translation>
+      <translation>Kan ikke laste ned oppdateringsfilen</translation>
     </message>
     <message>
       <source>There is no enough space to download update file</source>
-      <translation type="unfinished">There is no enough space to download update file</translation>
+      <translation>Det er ikke nok plass til å laste ned oppdateringsfiler</translation>
     </message>
   </context>
   <context>
@@ -7913,7 +7913,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message>
       <source>Login to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Login to %1</translation>
+      <translation>Logg inn på %1</translation>
     </message>
   </context>
   <context>
@@ -7928,7 +7928,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Could not connect to server. Application will be closed.</source>
-      <translation type="unfinished">Could not connect to server. Application will be closed.</translation>
+      <translation>Kunne ikke koble til server. Applikasjonen blir lukket.</translation>
     </message>
     <message>
       <source>Failed to connect to the selected server</source>
@@ -7936,15 +7936,15 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Re-authentication required</source>
-      <translation type="unfinished">Re-authentication required</translation>
+      <translation>Re-autentisering kreves</translation>
     </message>
     <message>
       <source>Enter password to continue your session</source>
-      <translation type="unfinished">Enter password to continue your session</translation>
+      <translation>Skriv inn passord for å fortsette økten</translation>
     </message>
     <message>
       <source>Your session has expired. Please sign in again to continue.</source>
-      <translation type="unfinished">Your session has expired. Please sign in again to continue.</translation>
+      <translation>Økten din har utløpt. Vennligst logg inn igjen for å fortsette.</translation>
     </message>
     <message>
       <source>OK</source>
@@ -7956,11 +7956,11 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <name>nx::vms::client::desktop::ConnectToCloudTool</name>
     <message>
       <source>Local System owner is absent or disabled.</source>
-      <translation type="unfinished">Local System owner is absent or disabled.</translation>
+      <translation>Lokal systemeier er fraværende eller deaktivert.</translation>
     </message>
     <message>
       <source>None of your Servers is connected to the Internet.</source>
-      <translation type="unfinished">None of your Servers is connected to the Internet.</translation>
+      <translation>Ingen av serverne dine er koblet til Internett.</translation>
     </message>
     <message>
       <source>System connected to %1</source>
@@ -7985,7 +7985,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message>
       <source>Enter your account password to connect System to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to connect System to %1</translation>
+      <translation>Skriv inn kontopassordet ditt for å koble System til %1</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -8018,11 +8018,11 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message>
       <source>Merge Server to the System</source>
       <comment>Dialog title</comment>
-      <translation type="unfinished">Merge Server to the System</translation>
+      <translation>Slå sammen server til systemet</translation>
     </message>
     <message>
       <source>Enter your account password to merge Server to the System</source>
-      <translation type="unfinished">Enter your account password to merge Server to the System</translation>
+      <translation>Skriv inn kontopassordet for å slå sammen serveren til systemet</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -8073,7 +8073,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
-      <translation type="unfinished">Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</translation>
+      <translation>Opptaksplan inneholder opptaksmoduser som ikke støttes av de valgte kameraene. Ustøttede opptaksmoduser vil bli endret til &quot;Ta opp alltid&quot;.</translation>
     </message>
   </context>
   <context>
@@ -9551,11 +9551,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Add Web Page</source>
-      <translation type="unfinished">Add Web Page</translation>
+      <translation>Legg til nettside</translation>
     </message>
     <message>
       <source>Edit Proxied Web Page</source>
-      <translation type="unfinished">Edit Proxied Web Page</translation>
+      <translation>Rediger proxy-nettside</translation>
     </message>
     <message>
       <source>Edit Web Page</source>
@@ -9563,11 +9563,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
-      <translation type="unfinished">Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</translation>
+      <translation>Slå på proxy for nettsider på fanen &lt;b&gt;Generelt&lt;/b&gt;.</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</translation>
+      <translation>Finner all innhold hvilken som helst tjeneste eller enhet på serveren&apos;s nettverk til brukerne på denne nettsiden</translation>
     </message>
   </context>
   <context>
@@ -9638,35 +9638,35 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Recording motion and objects</source>
-      <translation type="unfinished">Recording motion and objects</translation>
+      <translation>Registrerer bevegelser og objekter</translation>
     </message>
     <message>
       <source>Recording objects only</source>
-      <translation type="unfinished">Recording objects only</translation>
+      <translation>Kun opptak av objekter</translation>
     </message>
     <message>
       <source>Recording motion, objects and low quality</source>
-      <translation type="unfinished">Recording motion, objects and low quality</translation>
+      <translation>Registrerer bevegelse, objekter og lav kvalitet</translation>
     </message>
     <message>
       <source>Recording objects and low quality</source>
-      <translation type="unfinished">Recording objects and low quality</translation>
+      <translation>Opptak av objekter og lav kvalitet</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
-      <translation type="unfinished">Motion, Objects</translation>
+      <translation>Bevegelse, objekter</translation>
     </message>
     <message>
       <source>Objects only</source>
-      <translation type="unfinished">Objects only</translation>
+      <translation>Kun objekter</translation>
     </message>
     <message>
       <source>Motion, Objects + Lo-Res</source>
-      <translation type="unfinished">Motion, Objects + Lo-Res</translation>
+      <translation>Bevegelse og objekter + Lo-Res</translation>
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>Objekter + Lo-Res</translation>
     </message>
   </context>
   <context>
@@ -9727,7 +9727,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Analytic</source>
-      <translation type="unfinished">Analytic</translation>
+      <translation>Analyse</translation>
     </message>
     <message>
       <source>Generic</source>
@@ -9735,7 +9735,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Input Signal</source>
-      <translation type="unfinished">Input Signal</translation>
+      <translation>Innkommende signaler</translation>
     </message>
     <message>
       <source>Soft Trigger</source>
@@ -9743,15 +9743,15 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Stream Issue</source>
-      <translation type="unfinished">Stream Issue</translation>
+      <translation>Strømproblem</translation>
     </message>
     <message>
       <source>Device Disconnect</source>
-      <translation type="unfinished">Device Disconnect</translation>
+      <translation>Enhet frakoblet</translation>
     </message>
     <message>
       <source>Device IP Conflict</source>
-      <translation type="unfinished">Device IP Conflict</translation>
+      <translation>Enhets IP-konflikt</translation>
     </message>
     <message numerus="yes">
       <source>+%n values</source>
@@ -9797,38 +9797,36 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Allow system to optimize camera settings&quot; option in the &quot;System Administration&quot; dialog.
 You can still change quality and FPS directly on the camera.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Allow system to optimize camera settings&quot; option in the &quot;System Administration&quot; dialog.
-You can still change quality and FPS directly on the camera.</translation>
+      <translation>Kvalitets- og FPS-innstillinger er deaktivert på grunn av &quot;Tillat systemet å optimalisere kamerainnstillinger&quot; valg i &quot;Systemadministrasjon&quot; dialog.
+Du kan fortsatt endre kvalitet og FPS direkte på kameraet.</translation>
     </message>
     <message>
       <source>Quality and FPS settings are disabled for some of the selected cameras.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled for some of the selected cameras.</translation>
+      <translation>Kvalitets- og FPS-innstillinger er deaktivert for noen av de valgte kameraene.</translation>
     </message>
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Keep camera stream and profile settings&quot; option on the &quot;Expert&quot; tab.
 You can still change quality and FPS directly on the camera.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Keep camera stream and profile settings&quot; option on the &quot;Expert&quot; tab.
-You can still change quality and FPS directly on the camera.</translation>
+      <translation>Kvalitets- og FPS-innstillinger er deaktivert på grunn av alternativet &quot;Behold kamerastrøm og profilinnstillinger&quot; på &quot;Expert&quot; -fanen.
+Du kan fortsatt endre kvalitet og FPS direkte på kameraet.</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
-      <translation type="unfinished">Motion, Objects</translation>
+      <translation>Bevegelse, objekter</translation>
     </message>
     <message>
       <source>Motion, Objects
  + Low-Res</source>
-      <translation type="unfinished">Motion, Objects
- + Low-Res</translation>
+      <translation>Bevegelse og objekter + Lo-Res</translation>
     </message>
     <message>
       <source>Objects Only</source>
-      <translation type="unfinished">Objects Only</translation>
+      <translation>Kun objekter</translation>
     </message>
     <message>
       <source>Objects
  + Low-Res</source>
-      <translation type="unfinished">Objects
- + Low-Res</translation>
+      <translation>Objekter + Lo-Res</translation>
     </message>
     <message>
       <source>Motion Only</source>
@@ -9837,12 +9835,11 @@ You can still change quality and FPS directly on the camera.</translation>
     <message>
       <source>Motion
  + Low-Res</source>
-      <translation type="unfinished">Motion
- + Low-Res</translation>
+      <translation>Bevegelse + Lavoppløselig</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected devices</translation>
+      <translation>Bevegelsesdeteksjon er deaktivert for noen av de valgte enhetene</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this camera</source>

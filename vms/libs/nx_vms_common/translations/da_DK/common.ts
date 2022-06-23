@@ -188,7 +188,7 @@
     </message>
     <message>
       <source>Cannot connect to http port %1.</source>
-      <translation type="unfinished">Cannot connect to http port %1.</translation>
+      <translation>Kan ikke oprette forbindelse til http-port %1.</translation>
     </message>
     <message>
       <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
@@ -212,7 +212,7 @@
     </message>
     <message>
       <source>Please try to reboot the device, then restore factory defaults on the web-page.</source>
-      <translation type="unfinished">Please try to reboot the device, then restore factory defaults on the web-page.</translation>
+      <translation>Prøv at genstarte enheden, og gendan derefter fabriksindstillingerne på websiden.</translation>
     </message>
     <message>
       <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
@@ -395,7 +395,7 @@
     </message>
     <message>
       <source>Could not find decoder for codec %1.</source>
-      <translation type="unfinished">Could not find decoder for codec %1.</translation>
+      <translation>Kunne ikke finde dekoder til codec %1.</translation>
     </message>
     <message>
       <source>Could not send audio frame to encoder, Error code: %1.</source>
@@ -1498,15 +1498,15 @@
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on following devices:</translation>
+      <translation>Ikke nok licenser. Optagelse er blevet deaktiveret på følgende enheder:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on following cameras:</translation>
+      <translation>Ikke nok licenser. Optagelse er blevet deaktiveret på følgende kameraer:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on following I/O modules:</translation>
+      <translation>Ikke nok licenser. Optagelse er blevet deaktiveret på følgende I/O-moduler:</translation>
     </message>
     <message>
       <source>start</source>
@@ -1762,7 +1762,7 @@
     <name>utils::QnCameraNamesWatcher</name>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Fjernet kamera</translation>
     </message>
   </context>
 </TS>

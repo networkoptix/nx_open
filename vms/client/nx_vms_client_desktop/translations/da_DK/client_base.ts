@@ -223,31 +223,31 @@
     </message>
     <message>
       <source>Start Screen Recording</source>
-      <translation type="unfinished">Start Screen Recording</translation>
+      <translation>Start skærmoptagelse</translation>
     </message>
     <message>
       <source>Stop Screen Recording</source>
-      <translation type="unfinished">Stop Screen Recording</translation>
+      <translation>Stop skærmoptagelse</translation>
     </message>
     <message>
       <source>Stop current action</source>
-      <translation type="unfinished">Stop current action</translation>
+      <translation>Stop den aktuelle handling</translation>
     </message>
     <message>
       <source>Go to Fullscreen</source>
-      <translation type="unfinished">Go to Fullscreen</translation>
+      <translation>Gå til fuldskærm</translation>
     </message>
     <message>
       <source>Exit Fullscreen</source>
-      <translation type="unfinished">Exit Fullscreen</translation>
+      <translation>Afslut fuldskærm</translation>
     </message>
     <message>
       <source>Minimize</source>
-      <translation type="unfinished">Minimize</translation>
+      <translation>Minimér</translation>
     </message>
     <message>
       <source>Maximize</source>
-      <translation type="unfinished">Maximize</translation>
+      <translation>Maksimér</translation>
     </message>
     <message>
       <source>Restore Down</source>
@@ -4529,7 +4529,7 @@ to %1</translation>
     </message>
     <message>
       <source>Exit Fullscreen</source>
-      <translation type="unfinished">Exit Fullscreen</translation>
+      <translation>Afslut fuldskærm</translation>
     </message>
     <message>
       <source>Enter Fullscreen</source>
