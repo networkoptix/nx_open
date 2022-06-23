@@ -47,6 +47,11 @@ bool PoeOverBudgetEvent::Parameters::isEmpty() const
         && qFuzzyIsNull(lowerLimitWatts);
 }
 
+const PoeOverBudgetEvent::Parameters& PoeOverBudgetEvent::poeParameters() const
+{
+    return m_parameters;
+}
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PoeOverBudgetEvent::Parameters, (json),
     nx_vms_event_PoeOverBudgetEvent_Parameters_Fields, (brief, true))
 

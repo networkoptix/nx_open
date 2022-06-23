@@ -2,15 +2,26 @@
 
 #include "license_issue_event.h"
 
+#include <core/resource/camera_resource.h>
+#include <core/resource/device_dependent_strings.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/utils/log/assert.h>
+#include <nx/vms/common/system_context.h>
+
 #include "../utils/event_details.h"
 #include "../utils/string_helper.h"
 
 namespace nx::vms::rules {
 
-QString LicenseIssueEvent::uniqueName() const
+LicenseIssueEvent::LicenseIssueEvent(
+    std::chrono::microseconds timestamp,
+    QnUuid serverId,
+    const QnUuidSet& disabledCameras)
+    :
+    BasicEvent(timestamp),
+    m_serverId(serverId),
+    m_cameras(disabledCameras)
 {
-    // Licence issue event does not require uniqness offered by the ReasonedEvent::uniqueName().
-    return BasicEvent::uniqueName();
 }
 
 QVariantMap LicenseIssueEvent::details(common::SystemContext* context) const
@@ -18,6 +29,7 @@ QVariantMap LicenseIssueEvent::details(common::SystemContext* context) const
     auto result = BasicEvent::details(context);
 
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
+    utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing(context));
     result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
 
     return result;
@@ -43,6 +55,26 @@ const ItemDescriptor& LicenseIssueEvent::manifest()
         .emailTemplatePath = ":/email_templates/license_issue.mustache"
     };
     return kDescriptor;
+}
+
+QString LicenseIssueEvent::detailing(nx::vms::common::SystemContext* context) const
+{
+    QnVirtualCameraResourceList disabledCameras =
+        context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(cameras());
+
+    if (!NX_ASSERT(!disabledCameras.isEmpty(),
+        "At least one camera should be disabled on this event"))
+    {
+        return {};
+    }
+
+    return QnDeviceDependentStrings::getNameFromSet(
+        context->resourcePool(),
+        QnCameraDeviceStringSet(
+            tr("Not enough licenses. Recording has been disabled on following devices:"),
+            tr("Not enough licenses. Recording has been disabled on following cameras:"),
+            tr("Not enough licenses. Recording has been disabled on following I/O modules:")),
+        disabledCameras);
 }
 
 } // namespace nx::vms::rules
