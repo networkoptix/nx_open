@@ -2,8 +2,10 @@
 
 #pragma once
 
-#include <nx/vms/rules/basic_event.h>
-#include <nx/vms/api/types/resource_types.h>
+#include "../basic_event.h"
+#include "../data_macros.h"
+
+namespace nx::vms::api { enum class ResourceStatus; }
 
 namespace nx::vms::rules {
 
@@ -11,12 +13,9 @@ class NX_VMS_RULES_API CameraEvent: public BasicEvent
 {
     Q_OBJECT
 
-    Q_PROPERTY(QnUuid source READ source WRITE setSource)
+    FIELD(QnUuid, cameraId, setCameraId)
 
 public:
-    QnUuid source() const;
-    void setSource(QnUuid id);
-
     virtual QVariantMap details(common::SystemContext* context) const override;
 
 protected:
@@ -24,9 +23,7 @@ protected:
     CameraEvent(std::chrono::microseconds timestamp, State state, QnUuid id);
 
 private:
-    QnUuid m_source;
-
-    vms::api::ResourceStatus sourceStatus(common::SystemContext* context) const;
+    nx::vms::api::ResourceStatus sourceStatus(common::SystemContext* context) const;
 };
 
 } // namespace nx::vms::rules

@@ -35,6 +35,7 @@ public:
     {
         const auto& manifest = T::manifest();
         const auto& meta = T::staticMetaObject;
+        QSet<QString> fieldNames;
 
         EXPECT_FALSE(manifest.id.isEmpty());
         EXPECT_FALSE(manifest.displayName.isEmpty());
@@ -43,6 +44,7 @@ public:
         for (const auto& field: manifest.fields)
         {
             SCOPED_TRACE(field.id.toStdString());
+            fieldNames.insert(field.fieldName);
 
             EXPECT_FALSE(field.id.isEmpty());
             EXPECT_FALSE(field.displayName.isEmpty());
@@ -54,6 +56,18 @@ public:
             const auto prop = meta.property(propIndex);
             EXPECT_TRUE(prop.isValid());
             EXPECT_NE(prop.userType(), QMetaType::UnknownType);
+        }
+
+        ASSERT_EQ(fieldNames.size(), manifest.fields.size());
+
+        // Check linked fields are exist.
+        for (const auto& field: manifest.fields)
+        {
+            for (const auto& link: field.linkedFields)
+            {
+                SCOPED_TRACE(nx::format("Linked field: %1->%2", field.id, link).toStdString());
+                EXPECT_TRUE(fieldNames.contains(link));
+            }
         }
     }
 

@@ -47,7 +47,7 @@ QString CameraInputEvent::extendedCaption(common::SystemContext* context) const
 {
     if (totalEventCount() == 1)
     {
-        const auto resourceName = utils::StringHelper(context).resource(source(), Qn::RI_WithUrl);
+        const auto resourceName = utils::StringHelper(context).resource(cameraId(), Qn::RI_WithUrl);
         return tr("Input on %1").arg(resourceName);
     }
 
@@ -61,13 +61,14 @@ const ItemDescriptor& CameraInputEvent::manifest()
         .displayName = tr("Input Signal on Camera"),
         .flags = ItemFlag::prolonged,
         .fields = {
-            makeFieldDescriptor<SourceCameraField>(utils::kSourceFieldName, tr("Camera")),
+            utils::makeStateFieldDescriptor(tr("State")),
+            makeFieldDescriptor<SourceCameraField>(utils::kCameraIdFieldName, tr("Camera")),
             makeFieldDescriptor<InputPortField>(
                 "inputPortId",
                 tr("Input ID"),
                 {},
                 {},
-                {utils::kSourceFieldName}),
+                {utils::kCameraIdFieldName}),
         },
         .emailTemplatePath = ":/email_templates/camera_input.mustache"
     };

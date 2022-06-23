@@ -5,6 +5,7 @@
 #include "../event_fields/state_field.h"
 #include "../event_fields/keywords_field.h"
 #include "../utils/event_details.h"
+#include "../utils/field.h"
 #include "../utils/string_helper.h"
 
 namespace nx::vms::rules {
@@ -50,7 +51,7 @@ const ItemDescriptor& GenericEvent::manifest()
         .displayName = tr("Generic"),
         .flags = {ItemFlag::instant, ItemFlag::prolonged},
         .fields = {
-            makeFieldDescriptor<StateField>("state", tr("State"), {}),
+            makeFieldDescriptor<StateField>(utils::kStateFieldName, tr("State"), {}),
             makeFieldDescriptor<KeywordsField>("source", tr("Source"), kKeywordFieldDescription),
             makeFieldDescriptor<KeywordsField>("caption", tr("Caption"), kKeywordFieldDescription),
             makeFieldDescriptor<KeywordsField>("description",

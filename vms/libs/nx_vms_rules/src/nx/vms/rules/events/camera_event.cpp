@@ -5,6 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/metatypes.h>
+#include <nx/vms/api/types/resource_types.h>
 #include <nx/vms/common/system_context.h>
 
 #include "../utils/event_details.h"
@@ -12,27 +13,17 @@
 
 namespace nx::vms::rules {
 
-CameraEvent::CameraEvent(std::chrono::microseconds timestamp, State state, QnUuid id):
+CameraEvent::CameraEvent(std::chrono::microseconds timestamp, State state, QnUuid deviceId):
     BasicEvent(timestamp, state),
-    m_source(id)
+    m_cameraId(deviceId)
 {
-}
-
-QnUuid CameraEvent::source() const
-{
-    return m_source;
-}
-
-void CameraEvent::setSource(QnUuid id)
-{
-    m_source = id;
 }
 
 QVariantMap CameraEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);
 
-    utils::insertIfValid(result, utils::kSourceIdDetailName, QVariant::fromValue(m_source));
+    utils::insertIfValid(result, utils::kSourceIdDetailName, QVariant::fromValue(cameraId()));
     result.insert(utils::kHasScreenshotDetailName, true);
     result.insert(utils::kScreenshotLifetimeDetailName, QVariant::fromValue(utils::kScreenshotLifetime));
     result.insert(utils::kSourceStatusDetailName, QVariant::fromValue(sourceStatus(context)));
@@ -40,10 +31,10 @@ QVariantMap CameraEvent::details(common::SystemContext* context) const
     return result;
 }
 
-vms::api::ResourceStatus CameraEvent::sourceStatus(common::SystemContext* context) const
+nx::vms::api::ResourceStatus CameraEvent::sourceStatus(common::SystemContext* context) const
 {
     const auto camera =
-        context->resourcePool()->getResourceById<QnVirtualCameraResource>(m_source);
+        context->resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId());
 
     if (!camera)
         return api::ResourceStatus::undefined;
