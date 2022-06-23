@@ -230,3 +230,8 @@ nx::vms::api::StorageStatuses QnStorageResource::statusFlag() const
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_status;
 }
+
+bool QnStorageResource::canStoreAnalytics() const
+{
+    return isUsedForWriting() && isOnline() && isDbReady();
+}

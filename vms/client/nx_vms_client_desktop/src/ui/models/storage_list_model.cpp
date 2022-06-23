@@ -527,8 +527,11 @@ bool QnStorageListModel::canRemoveStorage(const QnStorageModelInfo& data) const
 
 bool QnStorageListModel::couldStoreAnalytics(const QnStorageModelInfo& data) const
 {
-    //TODO: use PartitionType enum value here instead of the serialized literal
-    return data.isOnline && data.storageType == "local";
+    // TODO: #vbreus Fix QnClientStorageResource::getCapabilities() to make
+    // QnStorageResource::isDbReady() method and subsequent
+    // QnStorageResource::canStoreAnalytics() method work correctly in client.
+
+    return data.isWritable && data.isOnline && data.isDbReady;
 }
 
 bool QnStorageListModel::storageIsActive(const QnStorageModelInfo& data) const
