@@ -8,7 +8,7 @@
 
 namespace nx::vms::client::core {
 
-struct MediaDewarpingParams: public nx::vms::api::dewarping::MediaData
+struct NX_VMS_CLIENT_CORE_API MediaDewarpingParams: public nx::vms::api::dewarping::MediaData
 {
     Q_GADGET
     Q_ENUMS(nx::vms::api::dewarping::FisheyeCameraMount nx::vms::api::dewarping::CameraProjection)
