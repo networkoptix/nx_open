@@ -4,11 +4,6 @@
 
 namespace nx::cloud::db {
 
-// deprecated.
-static constexpr char kAccountGetPath[] = "/cdb/account/get";
-static constexpr char kAccountUpdatePath[] = "/cdb/account/update";
-// end of deprecated.
-
 static constexpr char kAccountRegisterPath[] = "/cdb/account/register";
 static constexpr char kAccountActivatePath[] = "/cdb/account/activate";
 static constexpr char kAccountPasswordResetPath[] = "/cdb/account/resetPassword";
@@ -25,27 +20,19 @@ static constexpr char kAccountEmailParam[] = "email";
 
 //-------------------------------------------------------------------------------------------------
 
-// deprecated.
-static constexpr char kSystemUnbindPath[] = "/cdb/system/unbind";
-static constexpr char kSystemGetPath[] = "/cdb/system/get";
-static constexpr char kSystemRenamePath[] = "/cdb/system/rename";
-static constexpr char kSystemUpdatePath[] = "/cdb/system/update";
-static constexpr char kSystemGetCloudUsersPath[] = "/cdb/system/getCloudUsers";
-// end of deprecated.
+static constexpr char kSystemBindPath[] = "/cdb/systems/bind";
+static constexpr char kSystemSharePath[] = "/cdb/systems/share";
+static constexpr char kSystemGetAccessRoleListPath[] = "/cdb/systems/getAccessRoleList";
+static constexpr char kSystemRecordUserSessionStartPath[] = "/cdb/systems/recordUserSessionStart";
 
-static constexpr char kSystemBindPath[] = "/cdb/system/bind";
-static constexpr char kSystemSharePath[] = "/cdb/system/share";
-static constexpr char kSystemGetAccessRoleListPath[] = "/cdb/system/getAccessRoleList";
-static constexpr char kSystemRecordUserSessionStartPath[] = "/cdb/system/recordUserSessionStart";
+static constexpr char kSystemsPath[] = "/cdb/systems";
 
-static constexpr char kSystemsPath[] = "/cdb/system/";
-
-static constexpr char kSystemPath[] = "/cdb/system/{systemId}";
-static constexpr char kSystemHealthHistoryPath[] = "/cdb/system/{systemId}/health-history";
-static constexpr char kSystemsMergedToASpecificSystem[] = "/cdb/system/{systemId}/merged_systems/";
-static constexpr char kSystemsValidateMSSignature[] = "/cdb/system/{systemId}/signature/validate";
-static constexpr char kSystemUsersPath[] = "/cdb/system/{systemId}/users";
-static constexpr char kSystemUserPath[] = "/cdb/system/{systemId}/users/{email}";
+static constexpr char kSystemPath[] = "/cdb/systems/{systemId}";
+static constexpr char kSystemHealthHistoryPath[] = "/cdb/systems/{systemId}/health-history";
+static constexpr char kSystemsMergedToASpecificSystem[] = "/cdb/systems/{systemId}/merged_systems/";
+static constexpr char kSystemsValidateMSSignature[] = "/cdb/systems/{systemId}/signature/validate";
+static constexpr char kSystemUsersPath[] = "/cdb/systems/{systemId}/users";
+static constexpr char kSystemUserPath[] = "/cdb/systems/{systemId}/users/{email}";
 
 static constexpr char kAuthGetNoncePath[] = "/cdb/auth/getNonce";
 static constexpr char kAuthGetAuthenticationPath[] = "/cdb/auth/getAuthentication";
@@ -106,5 +93,20 @@ static constexpr char kFingerprintParam[] = "fingerprint";
 static constexpr char kIsValidParam[] = "valid";
 
 static constexpr char kObjectLocationPrefix[] = "/cdb/objectLocation";
+
+//-------------------------------------------------------------------------------------------------
+
+namespace deprecated {
+
+static constexpr char kAccountGetPath[] = "/cdb/account/get";
+static constexpr char kAccountUpdatePath[] = "/cdb/account/update";
+
+static constexpr char kSystemUnbindPath[] = "/cdb/systems/unbind";
+static constexpr char kSystemGetPath[] = "/cdb/systems/get";
+static constexpr char kSystemRenamePath[] = "/cdb/systems/rename";
+static constexpr char kSystemUpdatePath[] = "/cdb/systems/update";
+static constexpr char kSystemGetCloudUsersPath[] = "/cdb/systems/getCloudUsers";
+
+} // namespace deprecated
 
 } // namespace nx::cloud::db

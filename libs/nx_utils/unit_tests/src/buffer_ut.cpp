@@ -202,4 +202,10 @@ TEST(Buffer, assign)
     buf = nx::Buffer("Hello, world");
 }
 
+TEST(Buffer, base64_encoding_is_invertible)
+{
+    nx::Buffer buf("Hello, world");
+    ASSERT_EQ(buf, nx::Buffer::fromBase64(buf.toBase64()));
+}
+
 } // namespace nx::test
