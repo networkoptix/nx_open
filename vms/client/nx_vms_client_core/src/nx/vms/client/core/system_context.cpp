@@ -5,6 +5,7 @@
 #include <QtQml/QtQml>
 
 #include <client/client_message_processor.h>
+#include <core/ptz/client_ptz_controller_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/thread/mutex.h>
@@ -54,6 +55,7 @@ private:
 
 struct SystemContext::Private
 {
+    std::unique_ptr<QnClientPtzControllerPool> ptzControllerPool;
     std::unique_ptr<UserWatcher> userWatcher;
     std::unique_ptr<WatermarkWatcher> watermarkWatcher;
     std::unique_ptr<ServerTimeWatcher> serverTimeWatcher;
@@ -76,6 +78,7 @@ SystemContext::SystemContext(QnUuid peerId, QObject* parent):
         parent),
     d(new Private())
 {
+    d->ptzControllerPool = std::make_unique<QnClientPtzControllerPool>(this);
     d->userWatcher = std::make_unique<UserWatcher>(this);
     d->watermarkWatcher = std::make_unique<WatermarkWatcher>(this);
     d->serverTimeWatcher = std::make_unique<ServerTimeWatcher>(this);
@@ -164,6 +167,11 @@ rest::ServerConnectionPtr SystemContext::connectedServerApi() const
         return connection->serverApi();
 
     return {};
+}
+
+QnPtzControllerPool* SystemContext::ptzControllerPool() const
+{
+    return d->ptzControllerPool.get();
 }
 
 UserWatcher* SystemContext::userWatcher() const

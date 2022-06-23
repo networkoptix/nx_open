@@ -11,11 +11,11 @@
 #include <camera/camera_bookmarks_manager.h>
 #include <camera/camera_bookmarks_query.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource_management/resource_pool.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/resources/unified_resource_pool.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -60,8 +60,10 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject* parent):
     // user will see bookmarks even if there are more than 5000 of them.
     setupTimelineWindowQuery();
 
-    connect(resourcePool(), &QnResourcePool::resourceRemoved,
-        this, &QnTimelineBookmarksWatcher::onResourceRemoved);
+    connect(appContext()->unifiedResourcePool(),
+        &UnifiedResourcePool::resourcesRemoved,
+        this,
+        &QnTimelineBookmarksWatcher::onResourcesRemoved);
 
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged, this,
         &QnTimelineBookmarksWatcher::updateCurrentCamera);
@@ -117,18 +119,13 @@ QnCameraBookmarkList QnTimelineBookmarksWatcher::rawBookmarksAtPosition(
     return helpers::bookmarksAtPosition(bookmarks, positionMs);
 }
 
-void QnTimelineBookmarksWatcher::onResourceRemoved(const QnResourcePtr& resource)
+void QnTimelineBookmarksWatcher::onResourcesRemoved(const QnResourceList& resources)
 {
-    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-    if (!camera)
-        return;
-
-    if (!m_queriesCache->hasQuery(camera))
-        return;
-
-    const auto query = m_queriesCache->getOrCreateQuery(camera);
-    disconnect(query, &QnCameraBookmarksQuery::bookmarksChanged, this, nullptr);
-    m_queriesCache->removeQueryByCamera(camera);
+    for (const auto& resource: resources)
+    {
+        if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
+            m_queriesCache->removeQueryByCamera(camera);
+    }
 }
 
 void QnTimelineBookmarksWatcher::setupTimelineWindowQuery()

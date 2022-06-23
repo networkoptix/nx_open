@@ -21,6 +21,7 @@ public:
     CloudCrossSystemManager(QObject* parent = nullptr);
     virtual ~CloudCrossSystemManager() override;
 
+    QStringList cloudSystems() const;
     CloudCrossSystemContext* systemContext(const QString& systemId) const;
 
 signals:

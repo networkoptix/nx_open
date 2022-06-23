@@ -10,8 +10,11 @@
 #include <core/resource_management/resource_pool.h>
 #include <utils/common/delete_later.h>
 
-QnClientPtzControllerPool::QnClientPtzControllerPool(QObject* parent):
-    base_type(parent)
+QnClientPtzControllerPool::QnClientPtzControllerPool(
+    nx::vms::common::SystemContext* systemContext,
+    QObject* parent)
+    :
+    base_type(systemContext, parent)
 {
     // Controller may potentially be created with delay.
     connect(this, &QnPtzControllerPool::controllerChanged,
@@ -34,7 +37,7 @@ void QnClientPtzControllerPool::registerResource(const QnResourcePtr &resource)
     if (!camera)
         return;
 
-    connect(camera, &QnVirtualCameraResource::ptzCapabilitiesChanged, this,
+    connect(camera.get(), &QnVirtualCameraResource::ptzCapabilitiesChanged, this,
         [this](const QnVirtualCameraResourcePtr& camera)
         {
             updateController(camera);
@@ -44,7 +47,7 @@ void QnClientPtzControllerPool::registerResource(const QnResourcePtr &resource)
                 emit controller->changed(nx::vms::common::ptz::DataField::capabilities);
         });
 
-    connect(camera, &QnResource::propertyChanged, this,
+    connect(camera.get(), &QnResource::propertyChanged, this,
         [this](const QnResourcePtr& resource, const QString& key)
         {
             const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
@@ -58,7 +61,7 @@ void QnClientPtzControllerPool::registerResource(const QnResourcePtr &resource)
             }
         });
 
-    connect(camera, &QnResource::statusChanged,
+    connect(camera.get(), &QnResource::statusChanged,
         this, &QnClientPtzControllerPool::cacheCameraPresets);
 
     cacheCameraPresets(camera);

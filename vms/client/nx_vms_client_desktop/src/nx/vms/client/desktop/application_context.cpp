@@ -374,8 +374,7 @@ struct ApplicationContext::Private
             q->peerId());
         initializeServerCompatibilityValidator();
         q->core::ApplicationContext::initializeNetworkModules();
-        if (ini().crossSystemLayouts)
-            cloudCrossSystemManager = std::make_unique<CloudCrossSystemManager>();
+        cloudCrossSystemManager = std::make_unique<CloudCrossSystemManager>();
     }
 
     void initializeTranslations()

@@ -85,6 +85,14 @@ CloudCrossSystemManager::~CloudCrossSystemManager()
 {
 }
 
+QStringList CloudCrossSystemManager::cloudSystems() const
+{
+    QStringList result;
+    for (const auto& [id, _]: d->cloudSystems)
+        result.push_back(id);
+    return result;
+}
+
 CloudCrossSystemContext* CloudCrossSystemManager::systemContext(const QString& systemId) const
 {
     auto iter = d->cloudSystems.find(systemId);

@@ -9,7 +9,6 @@
 
 #include <common/common_module.h>
 #include <core/dataprovider/data_provider_factory.h>
-#include <core/ptz/client_ptz_controller_pool.h>
 #include <core/resource_management/layout_tour_state_manager.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <nx/core/access/access_types.h>
@@ -52,7 +51,6 @@ QnClientCoreModule::QnClientCoreModule(
     d->commonModule = std::make_unique<QnCommonModule>(systemContext);
 
     d->commonModule->instance<QnResourcesChangesManager>();
-    d->commonModule->instance<QnClientPtzControllerPool>();
     d->commonModule->instance<QnLayoutTourStateManager>();
 
     d->commonModule->store(new nx::vms::client::core::LocalNetworkInterfacesManager());
@@ -106,11 +104,6 @@ QnResourcePool* QnClientCoreModule::resourcePool() const
 QnCommonModule* QnClientCoreModule::commonModule() const
 {
     return d->commonModule.get();
-}
-
-QnPtzControllerPool* QnClientCoreModule::ptzControllerPool() const
-{
-    return d->commonModule->instance<QnClientPtzControllerPool>();
 }
 
 QnLayoutTourStateManager* QnClientCoreModule::layoutTourStateManager() const

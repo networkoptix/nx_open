@@ -56,7 +56,6 @@ public:
      */
     QnResourcePool* resourcePool() const;
     QnCommonModule* commonModule() const;
-    QnPtzControllerPool* ptzControllerPool() const;
     QnLayoutTourStateManager* layoutTourStateManager() const;
     QnDataProviderFactory* dataProviderFactory() const;
     nx::vms::client::core::SessionTokenTerminator* sessionTokenTerminator() const;

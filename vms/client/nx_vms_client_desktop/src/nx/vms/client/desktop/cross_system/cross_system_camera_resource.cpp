@@ -7,7 +7,7 @@
 
 namespace nx::vms::client::desktop {
 
-CrossSystemCameraResource::CrossSystemCameraResource(nx::vms::api::DeviceModel source):
+CrossSystemCameraResource::CrossSystemCameraResource(nx::vms::api::CameraDataEx source):
     QnClientCameraResource(source.typeId),
     m_source(std::move(source))
 {
@@ -29,7 +29,7 @@ CrossSystemCameraResource::CrossSystemCameraResource(nx::vms::api::DeviceModel s
         addFlags(Qn::virtual_camera);
 }
 
-void CrossSystemCameraResource::update(nx::vms::api::DeviceModel data)
+void CrossSystemCameraResource::update(nx::vms::api::CameraDataEx data)
 {
     NotifierList notifiers;
     {

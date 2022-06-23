@@ -337,7 +337,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(
                 emit licenseStatusChanged();
             });
 
-        auto ptzPool = qnClientCoreModule->ptzControllerPool();
+        auto ptzPool = systemContext->ptzControllerPool();
         connect(ptzPool, &QnPtzControllerPool::controllerChanged, this,
             [this](const QnResourcePtr& resource)
             {
@@ -1025,8 +1025,8 @@ void QnMediaResourceWidget::updatePtzController()
     if (!item())
         return;
 
-    const auto threadPool = qnClientCoreModule->ptzControllerPool()->commandThreadPool();
-    const auto executorThread = qnClientCoreModule->ptzControllerPool()->executorThread();
+    const auto threadPool = systemContext()->ptzControllerPool()->commandThreadPool();
+    const auto executorThread = systemContext()->ptzControllerPool()->executorThread();
 
     /* Set up PTZ controller. */
     QnPtzControllerPtr fisheyeController;
@@ -1055,7 +1055,7 @@ void QnMediaResourceWidget::updatePtzController()
 
     if (d->camera)
     {
-        auto ptzPool = qnClientCoreModule->ptzControllerPool();
+        auto ptzPool = systemContext()->ptzControllerPool();
         if (QnPtzControllerPtr serverController = ptzPool->controller(d->camera))
         {
             serverController.reset(new QnActivityPtzController(
