@@ -6,6 +6,7 @@
 
 #include "../event_fields/source_server_field.h"
 #include "../utils/event_details.h"
+#include "../utils/field.h"
 #include "../utils/string_helper.h"
 #include "../utils/type.h"
 
@@ -49,7 +50,8 @@ const ItemDescriptor& PoeOverBudgetEvent::manifest()
         .displayName = tr("PoE over Budget"),
         .flags = ItemFlag::prolonged,
         .fields = {
-            makeFieldDescriptor<SourceServerField>("serverId", tr("Server")),
+            utils::makeStateFieldDescriptor(tr("State")),
+            makeFieldDescriptor<SourceServerField>(utils::kServerIdFieldName, tr("Server")),
         },
         .emailTemplatePath = ":/email_templates/poe_over_budget.mustache"
     };

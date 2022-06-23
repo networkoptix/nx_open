@@ -8,6 +8,7 @@
 #include "../action_fields/password_field.h"
 #include "../action_fields/text_field.h"
 #include "../action_fields/text_with_fields.h"
+#include "../utils/field.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -19,7 +20,7 @@ const ItemDescriptor& HttpAction::manifest()
         .displayName = tr("Do HTTP request"),
         .description = "",
         .fields = {
-            makeFieldDescriptor<OptionalTimeField>("interval", tr("Interval of action")),
+            utils::makeIntervalFieldDescriptor(tr("Interval of action")),
             makeFieldDescriptor<TextWithFields>("url", tr("HTTP Url")),
             makeFieldDescriptor<TextWithFields>("content", tr("HTTP Content")),
             makeFieldDescriptor<ContentTypeField>("contentType", tr("Content type")),

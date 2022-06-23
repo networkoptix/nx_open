@@ -12,6 +12,7 @@
 #include "../event_fields/analytics_object_attributes_field.h"
 #include "../event_fields/keywords_field.h"
 #include "../utils/event_details.h"
+#include "../utils/field.h"
 #include "../utils/string_helper.h"
 #include "../utils/type.h"
 
@@ -88,7 +89,8 @@ const ItemDescriptor& AnalyticsEvent::manifest()
         .description = "",
         .flags = {ItemFlag::instant, ItemFlag::prolonged},
         .fields = {
-            makeFieldDescriptor<SourceCameraField>("cameraId", tr("Camera")),
+            utils::makeStateFieldDescriptor(tr("State")),
+            makeFieldDescriptor<SourceCameraField>(utils::kCameraIdFieldName, tr("Camera")),
             makeFieldDescriptor<AnalyticsEventTypeField>("eventTypeId", tr("Event Type")),
             makeFieldDescriptor<KeywordsField>("caption", tr("Caption")),
             makeFieldDescriptor<KeywordsField>("description", tr("Description")),

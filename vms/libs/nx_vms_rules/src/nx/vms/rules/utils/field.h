@@ -3,31 +3,39 @@
 #pragma once
 
 #include "../action_fields/optional_time_field.h"
+#include "../event_fields/state_field.h"
 #include "../manifest.h"
 
 namespace nx::vms::rules::utils {
 
-static constexpr auto kAggregationIntervalFieldName = "aggregationInterval";
 static constexpr auto kCameraIdFieldName = "cameraId";
-static constexpr auto kDeviceIdFieldName = "deviceId";
 static constexpr auto kDurationFieldName = "duration";
 static constexpr auto kEngineIdFieldName = "engineId";
 static constexpr auto kIntervalFieldName = "interval";
 static constexpr auto kServerIdFieldName = "serverId";
-static constexpr auto kSourceFieldName = "source";
 static constexpr auto kStateFieldName = "state";
 static constexpr auto kUsersFieldName = "users";
 
-inline FieldDescriptor makeAggregationIntervalFieldDescriptor(
+inline FieldDescriptor makeIntervalFieldDescriptor(
     const QString& displayName,
-    const QString& description = {},
-    const QVariantMap& properties = {})
+    const QString& description = {})
 {
     return makeFieldDescriptor<OptionalTimeField>(
-        kAggregationIntervalFieldName,
+        kIntervalFieldName,
         displayName,
         description,
-        properties);
+        {});
+}
+
+inline FieldDescriptor makeStateFieldDescriptor(
+    const QString& displayName,
+    const QString& description = {})
+{
+    return makeFieldDescriptor<StateField>(
+        kStateFieldName,
+        displayName,
+        description,
+        {});
 }
 
 } // namespace nx::vms::rules::utils

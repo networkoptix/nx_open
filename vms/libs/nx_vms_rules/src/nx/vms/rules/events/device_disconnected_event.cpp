@@ -9,6 +9,7 @@
 
 #include "../event_fields/source_camera_field.h"
 #include "../utils/event_details.h"
+#include "../utils/field.h"
 #include "../utils/string_helper.h"
 
 namespace nx::vms::rules {
@@ -18,13 +19,13 @@ DeviceDisconnectedEvent::DeviceDisconnectedEvent(
     QnUuid deviceId)
     :
     base_type(timestamp),
-    m_deviceId(deviceId)
+    m_cameraId(deviceId)
 {
 }
 
 QString DeviceDisconnectedEvent::uniqueName() const
 {
-    return makeName(BasicEvent::uniqueName(), m_deviceId.toString());
+    return makeName(BasicEvent::uniqueName(), m_cameraId.toString());
 }
 
 QVariantMap DeviceDisconnectedEvent::details(common::SystemContext* context) const
@@ -33,7 +34,7 @@ QVariantMap DeviceDisconnectedEvent::details(common::SystemContext* context) con
 
     utils::insertIfNotEmpty(result, utils::kCaptionDetailName, caption(context));
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
-    utils::insertIfValid(result, utils::kSourceIdDetailName, QVariant::fromValue(m_deviceId));
+    utils::insertIfValid(result, utils::kSourceIdDetailName, QVariant::fromValue(m_cameraId));
     result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
 
     return result;
@@ -41,7 +42,7 @@ QVariantMap DeviceDisconnectedEvent::details(common::SystemContext* context) con
 
 QString DeviceDisconnectedEvent::caption(common::SystemContext* context) const
 {
-    const auto camera = context->resourcePool()->getResourceById<QnVirtualCameraResource>(m_deviceId);
+    const auto camera = context->resourcePool()->getResourceById<QnVirtualCameraResource>(m_cameraId);
 
     return QnDeviceDependentStrings::getNameFromSet(
         context->resourcePool(),
@@ -54,11 +55,11 @@ QString DeviceDisconnectedEvent::caption(common::SystemContext* context) const
 
 QString DeviceDisconnectedEvent::extendedCaption(common::SystemContext* context) const
 {
-    const auto camera = context->resourcePool()->getResourceById<QnVirtualCameraResource>(m_deviceId);
+    const auto camera = context->resourcePool()->getResourceById<QnVirtualCameraResource>(m_cameraId);
 
     if (totalEventCount() == 1)
     {
-        const auto resourceName = utils::StringHelper(context).resource(m_deviceId, Qn::RI_WithUrl);
+        const auto resourceName = utils::StringHelper(context).resource(m_cameraId, Qn::RI_WithUrl);
 
         return QnDeviceDependentStrings::getNameFromSet(
             context->resourcePool(),
@@ -79,7 +80,7 @@ const ItemDescriptor& DeviceDisconnectedEvent::manifest()
         .displayName = tr("Device Disconnected"),
         .description = "",
         .fields = {
-            makeFieldDescriptor<SourceCameraField>("deviceId", tr("Device ID")),
+            makeFieldDescriptor<SourceCameraField>(utils::kCameraIdFieldName, tr("Device ID")),
         },
         .emailTemplatePath = ":/email_templates/camera_disconnect.mustache"
     };

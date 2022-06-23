@@ -6,6 +6,7 @@
 #include "../action_fields/optional_time_field.h"
 #include "../action_fields/target_user_field.h"
 #include "../action_fields/text_with_fields.h"
+#include "../utils/field.h"
 #include "../utils/type.h"
 
 namespace nx::vms::rules {
@@ -17,8 +18,8 @@ const ItemDescriptor& NotificationAction::manifest()
         .displayName = tr("Show Notification"),
         .description = "",
         .fields = {
-            makeFieldDescriptor<TargetUserField>("users", tr("To")),
-            makeFieldDescriptor<OptionalTimeField>("interval", tr("Interval of action")),
+            makeFieldDescriptor<TargetUserField>(utils::kUsersFieldName, tr("To")),
+            utils::makeIntervalFieldDescriptor(tr("Interval of action")),
             makeFieldDescriptor<FlagField>("acknowledge", tr("Force Acknowledgement")),
             makeFieldDescriptor<TextWithFields>("caption", tr("Caption"), QString(),
                 {

@@ -108,7 +108,7 @@ void ActionBuilder::addField(const QString& name, std::unique_ptr<ActionField> f
     if (!NX_ASSERT(field))
         return;
 
-    if (name == utils::kAggregationIntervalFieldName)
+    if (name == utils::kIntervalFieldName)
     {
         auto optionalTimeField = dynamic_cast<OptionalTimeField*>(field.get());
         if (NX_ASSERT(optionalTimeField))

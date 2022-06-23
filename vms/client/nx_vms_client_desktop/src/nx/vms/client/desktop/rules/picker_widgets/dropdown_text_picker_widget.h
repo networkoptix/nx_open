@@ -165,7 +165,7 @@ void InputPortPicker::customizeComboBox()
     comboBox->clear();
 
     auto sourceCameraField = dynamic_cast<SourceCameraField*>(
-        linkedFields.value(vms::rules::utils::kSourceFieldName).data());
+        linkedFields.value(vms::rules::utils::kCameraIdFieldName).data());
 
     if (!NX_ASSERT(sourceCameraField))
         return;
@@ -243,7 +243,7 @@ void InputPortPicker::connectLinkedFields()
 
     using vms::rules::SourceCameraField;
     auto sourceCameraField = dynamic_cast<SourceCameraField*>(
-        linkedFields.value(vms::rules::utils::kSourceFieldName).data());
+        linkedFields.value(vms::rules::utils::kCameraIdFieldName).data());
 
     if (!NX_ASSERT(sourceCameraField))
         return;

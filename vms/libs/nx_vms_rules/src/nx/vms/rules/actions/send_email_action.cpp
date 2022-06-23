@@ -6,6 +6,7 @@
 #include "../action_fields/optional_time_field.h"
 #include "../action_fields/target_user_field.h"
 #include "../action_fields/text_field.h"
+#include "../utils/field.h"
 
 namespace nx::vms::rules {
 
@@ -16,8 +17,8 @@ const ItemDescriptor& SendEmailAction::manifest()
         .displayName = tr("Send email"),
         .description = "",
         .fields = {
-            makeFieldDescriptor<TargetUserField>("users", tr("to")),
-            makeFieldDescriptor<OptionalTimeField>("interval", tr("Interval of action")),
+            makeFieldDescriptor<TargetUserField>(utils::kUsersFieldName, tr("to")),
+            utils::makeIntervalFieldDescriptor(tr("Interval of action")),
             makeFieldDescriptor<ActionTextField>("emails", tr("Additional recipients")),
             makeFieldDescriptor<EmailMessageField>(
                 "message",
