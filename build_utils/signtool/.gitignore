@@ -1,2 +1,2 @@
-certs/*
-!certs/.keep
+genkey/*.p12
+genkey/*.pem

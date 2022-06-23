@@ -41,54 +41,34 @@ class ExecuteCommandResult:
 def sign_file(
         in_file_path: Path,
         out_file_path: Path,
-        trusted_timestamping: bool = False,
+        config_file: Path,
         sign_timeout_s: int = 0) -> ExecuteCommandResult:
 
-    config_file = (working_dir / 'config' / 'config.yaml').resolve()
     with open(config_file, 'r') as f:
         config = yaml.safe_load(f)
 
-    result = _sign_with_signtool(
-        unsigned_file=in_file_path,
-        signed_file=out_file_path,
-        config=config,
-        trusted_timestamping=trusted_timestamping,
-        timeout_s=sign_timeout_s)
-
-    if not result:
-        logging.error(f'Signing tool failed: {result}')
-
-    return result
-
-
-def _sign_with_signtool(
-        unsigned_file: Path,
-        signed_file: Path,
-        config: Dict[str, str],
-        trusted_timestamping: bool,
-        timeout_s: int) -> ExecuteCommandResult:
-
-    if signed_file and signed_file != unsigned_file:
-        shutil.copyfile(unsigned_file, signed_file)
-        file_to_sign = signed_file
+    if out_file_path and out_file_path != in_file_path:
+        shutil.copyfile(in_file_path, out_file_path)
+        file_to_sign = out_file_path
     else:
-        file_to_sign = unsigned_file
+        file_to_sign = in_file_path
+
+    timestamp_servers = config.get('timestamp_servers')
 
     logger.info(
-        f'Signing {unsigned_file!s} using signtool.exe '
-        f'({"trusted" if trusted_timestamping else "no timestamp"}). Output file: '
-        f'{file_to_sign}')
+        f'Signing {in_file_path!s} using signtool.exe '
+        f'({"trusted" if timestamp_servers else "no timestamp"}). Output file: {file_to_sign!s}')
 
-    timestamp_server = None
-    if trusted_timestamping:
-        timestamp_servers = config.get('timestamp_servers')
+    if timestamp_servers:
         timestamp_server = random.choice(timestamp_servers)
         logging.info(f'Using trusted timestamping server: {timestamp_server}')
+    else:
+        timestamp_server = None
 
-    certificate_file = (working_dir / 'certs' / config.get('file')).resolve()
+    certificate_file = (config_file.parent / config.get('file')).resolve()
     sign_password = config.get('password')
 
-    logging.info(f'Using certificate file: {certificate_file}')
+    logging.info(f'Using certificate file: {certificate_file!s}')
     print_certificate_info(certificate_file, sign_password)
 
     command = [
@@ -102,7 +82,7 @@ def _sign_with_signtool(
     command += ['/p', sign_password]
     command += [str(file_to_sign)]
 
-    return execute_command(command, timeout_s=timeout_s)
+    return execute_command(command, timeout_s=sign_timeout_s)
 
 
 def execute_command(command: List[str], timeout_s: int = 0) -> ExecuteCommandResult:
@@ -128,7 +108,7 @@ def execute_command(command: List[str], timeout_s: int = 0) -> ExecuteCommandRes
 
 def print_certificate_info(certificate_file: Path, password: str):
     if not certificate_file.exists():
-        logging.warning(f'File {certificate_file!r} was not found')
+        logging.warning(f'File {certificate_file!s} was not found')
         return
 
     command = ['certutil', '-dump', '-p', password, str(certificate_file)]
@@ -146,10 +126,7 @@ def main():
         '-f', '--file', help='Path to file for signing', type=Path, required=True)
     parser.add_argument(
         '-o', '--output', help='File with signature', type=Path, required=False, default=None)
-    parser.add_argument(
-        '-t', '--trusted-timestamping',
-        action='store_true',
-        help='Trusted timestamping')
+    parser.add_argument('-c', '--config', type=Path, required=True, help='Tool configuration file')
     parser.add_argument(
         '--sign-timeout',
         help=f'Signing timeout in seconds ({DEFAULT_SIGN_TIMEOUT_S})',
@@ -172,13 +149,13 @@ def main():
     result = sign_file(
         in_file_path=in_file_path,
         out_file_path=out_file_path,
-        trusted_timestamping=args.trusted_timestamping,
+        config_file=args.config.resolve(),
         sign_timeout_s=args.sign_timeout)
 
     if result:
-        print(f'File {in_file_path!r} was successfully signed.')
+        print(f'File {in_file_path!s} was successfully signed.')
     else:
-        sys.exit(f'FATAL ERROR: {in_file_path!r} was not signed.')
+        sys.exit(f'FATAL ERROR: {in_file_path!s} was not signed.')
 
 
 if __name__ == '__main__':
