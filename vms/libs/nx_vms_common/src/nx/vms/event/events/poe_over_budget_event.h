@@ -45,6 +45,8 @@ public:
 
     static Parameters consumptionParameters(const EventParameters &params);
 
+    const Parameters& poeParameters() const;
+
 private:
     Parameters m_parameters;
 };

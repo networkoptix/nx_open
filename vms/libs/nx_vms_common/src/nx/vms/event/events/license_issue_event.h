@@ -4,19 +4,21 @@
 
 #include <nx/vms/event/events/reasoned_event.h>
 
-namespace nx {
-namespace vms {
-namespace event {
+namespace nx::vms::event {
 
 class NX_VMS_COMMON_API LicenseIssueEvent: public ReasonedEvent
 {
     using base_type = ReasonedEvent;
 
 public:
-    explicit LicenseIssueEvent(const QnResourcePtr& resource, qint64 timeStamp,
-        EventReason reasonCode, const QString& reasonText);
+    explicit LicenseIssueEvent(
+        const QnResourcePtr& resource,
+        qint64 timeStamp,
+        EventReason reasonCode,
+        const QnUuidSet& disabledCameras);
+
+    static QString encodeCameras(const QnUuidSet& cameras);
+    static QnUuidSet decodeCameras(const EventParameters& params);
 };
 
-} // namespace event
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::event

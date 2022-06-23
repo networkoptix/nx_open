@@ -2,20 +2,46 @@
 
 #include "license_issue_event.h"
 
-namespace nx {
-namespace vms {
-namespace event {
+namespace nx::vms::event {
+
+namespace {
+
+constexpr auto kDelimiter = ';';
+
+} // namespace
 
 LicenseIssueEvent::LicenseIssueEvent(
     const QnResourcePtr& resource,
     qint64 timeStamp,
     EventReason reasonCode,
-    const QString& reasonText)
+    const QnUuidSet& disabledCameras)
     :
-    base_type(EventType::licenseIssueEvent, resource, timeStamp, reasonCode, reasonText)
+    base_type(
+        EventType::licenseIssueEvent,
+        resource,
+        timeStamp,
+        reasonCode,
+        encodeCameras(disabledCameras))
 {
 }
 
-} // namespace event
-} // namespace vms
-} // namespace nx
+QString LicenseIssueEvent::encodeCameras(const QnUuidSet& cameras)
+{
+    QStringList stringList;
+    for (const auto id : cameras)
+        stringList.push_back(id.toString());
+
+    return stringList.join(kDelimiter);
+}
+
+QnUuidSet LicenseIssueEvent::decodeCameras(const EventParameters& params)
+{
+    QnUuidSet result;
+
+    for (const auto& str: params.description.split(kDelimiter))
+        result.insert(QnUuid(str));
+
+    return result;
+}
+
+} // namespace nx::vms::event

@@ -714,7 +714,7 @@ QString StringsHelper::eventReason(const EventParameters& params) const
         case EventReason::licenseRemoved:
         {
             QnVirtualCameraResourceList disabledCameras;
-            for (const auto& id: reasonParamsEncoded.split(';'))
+            for (const auto& id: nx::vms::event::LicenseIssueEvent::decodeCameras(params))
             {
                 if (const auto& camera =
                         resourcePool()->getResourceById<QnVirtualCameraResource>(

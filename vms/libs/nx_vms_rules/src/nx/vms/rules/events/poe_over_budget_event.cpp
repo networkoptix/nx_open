@@ -12,24 +12,60 @@
 
 namespace nx::vms::rules {
 
+namespace {
+
+QString formatValue(double value)
+{
+    return QString::number(value, 'f', 1);
+}
+
+} // namespace
+
+PoeOverBudgetEvent::PoeOverBudgetEvent(
+    std::chrono::microseconds timestamp,
+    State state,
+    QnUuid serverId,
+    double currentConsumptionW,
+    double upperLimitW,
+    double lowerLimitW)
+    :
+    BasicEvent(timestamp, state),
+    m_serverId(serverId),
+    m_currentConsumptionW(currentConsumptionW),
+    m_upperLimitW(upperLimitW),
+    m_lowerLimitW(lowerLimitW)
+{
+}
+
 QVariantMap PoeOverBudgetEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);
 
     utils::insertIfNotEmpty(result, utils::kDescriptionDetailName, description());
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
+    utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing());
     result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
 
     return result;
 }
 
-QString PoeOverBudgetEvent::description() const
+QString PoeOverBudgetEvent::overallConsumption() const
 {
-    const QString consumptionString; // TODO: #mmalofeev Add consumption params to the PoeOverBudgetEvent.
-    if (consumptionString.isEmpty())
+    if (isEmpty())
         return {};
 
-    return QString("%1 %2").arg(common::html::bold(tr("Consumption"))).arg(consumptionString);
+    return nx::format("%1 W / %2 W",
+        formatValue(m_currentConsumptionW),
+        formatValue(m_upperLimitW));
+}
+
+QString PoeOverBudgetEvent::description() const
+{
+    const auto consumption = overallConsumption();
+    if (consumption.isEmpty())
+        return {};
+
+    return QString("%1 %2").arg(common::html::bold(tr("Consumption"))).arg(consumption);
 }
 
 QString PoeOverBudgetEvent::extendedCaption(common::SystemContext* context) const
@@ -41,6 +77,15 @@ QString PoeOverBudgetEvent::extendedCaption(common::SystemContext* context) cons
     }
 
     return BasicEvent::extendedCaption();
+}
+
+QString PoeOverBudgetEvent::detailing() const
+{
+    const auto consumption = overallConsumption();
+    if (consumption.isEmpty())
+        return {};
+
+    return tr("Reason: Power limit exceeded (%1)", "%1 is consumption").arg(consumption);
 }
 
 const ItemDescriptor& PoeOverBudgetEvent::manifest()
@@ -56,6 +101,13 @@ const ItemDescriptor& PoeOverBudgetEvent::manifest()
         .emailTemplatePath = ":/email_templates/poe_over_budget.mustache"
     };
     return kDescriptor;
+}
+
+bool PoeOverBudgetEvent::isEmpty() const
+{
+    return qFuzzyIsNull(m_currentConsumptionW)
+        && qFuzzyIsNull(m_upperLimitW)
+        && qFuzzyIsNull(m_lowerLimitW);
 }
 
 } // namespace nx::vms::rules
