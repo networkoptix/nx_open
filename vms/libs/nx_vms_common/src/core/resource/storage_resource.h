@@ -76,7 +76,7 @@ public:
         const QString &fileName,
         QIODevice::OpenMode openMode) override;
 
-    virtual bool canStoreAnalytics() const { return false; }
+    virtual bool canStoreAnalytics() const;
 
 signals:
     /*
