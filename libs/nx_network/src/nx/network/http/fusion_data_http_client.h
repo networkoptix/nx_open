@@ -11,6 +11,7 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/fusion/serialization/lexical_functions.h>
+#include <nx/reflect/json.h>
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/http_async_client.h>
@@ -182,11 +183,13 @@ protected:
             !response ||
             !StatusCode::isSuccessCode(response->statusLine.statusCode))
         {
-            bool ok = false;
-            m_lastFusionRequestResult = QJson::deserialized(msgBody, ApiRequestResult(), &ok);
             // The message body has already been fetched to try and deserialize this structure.
             // If it failed, there may still be an error message in the body that should be saved.
-            if (!ok)
+
+            nx::reflect::DeserializationResult result;
+            std::tie(m_lastFusionRequestResult, result) =
+                nx::reflect::json::deserialize<decltype(m_lastFusionRequestResult)>(msgBody);
+            if (!result)
                 m_lastFusionRequestResult.setErrorText(msgBody.toStdString());
         }
     }
@@ -217,7 +220,17 @@ protected:
         if (!msgBody.empty())
         {
             bool success = false;
-            outputData = QJson::deserialized<OutputData>(msgBody, OutputData(), &success);
+            if constexpr (nx::reflect::IsInstrumentedV<OutputData>)
+            {
+                nx::reflect::DeserializationResult res;
+                std::tie(outputData, res) = nx::reflect::json::deserialize<OutputData>(msgBody);
+                success = res.success;
+            }
+            else
+            {
+                outputData = QJson::deserialized<OutputData>(msgBody, OutputData(), &success);
+            }
+
             if (!success)
             {
                 handler(SystemError::invalidData, response, OutputData());
@@ -282,7 +295,11 @@ public:
         :
         base_type(std::move(url), std::move(credentials), std::move(adapterFunc))
     {
-        this->m_requestBody = QJson::serialized(input).toStdString();
+        if constexpr (nx::reflect::IsInstrumentedV<InputData>)
+            this->m_requestBody = nx::reflect::json::serialize(input);
+        else
+            this->m_requestBody = QJson::serialized(input).toStdString();
+
         this->m_requestContentType =
             Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     }
@@ -297,7 +314,11 @@ public:
         base_type(
             std::move(url), std::move(info), std::move(adapterFunc), std::move(proxyAdapterFunc))
     {
-        this->m_requestBody = QJson::serialized(input).toStdString();
+        if constexpr (nx::reflect::IsInstrumentedV<InputData>)
+            this->m_requestBody = nx::reflect::json::serialize(input);
+        else
+            this->m_requestBody = QJson::serialized(input).toStdString();
+
         this->m_requestContentType =
             Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     }
@@ -377,7 +398,11 @@ public:
         :
         ParentType(std::move(url), std::move(credentials), std::move(adapterFunc))
     {
-        this->m_requestBody = QJson::serialized(input).toStdString();
+        if constexpr (nx::reflect::IsInstrumentedV<InputData>)
+            this->m_requestBody = nx::reflect::json::serialize(input);
+        else
+            this->m_requestBody = QJson::serialized(input).toStdString();
+
         this->m_requestContentType =
             Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     }
@@ -392,7 +417,11 @@ public:
         ParentType(
             std::move(url), std::move(info), std::move(adapterFunc), std::move(proxyAdapterFunc))
     {
-        this->m_requestBody = QJson::serialized(input).toStdString();
+        if constexpr (nx::reflect::IsInstrumentedV<InputData>)
+            this->m_requestBody = nx::reflect::json::serialize(input);
+        else
+            this->m_requestBody = QJson::serialized(input).toStdString();
+
         this->m_requestContentType =
             Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     }

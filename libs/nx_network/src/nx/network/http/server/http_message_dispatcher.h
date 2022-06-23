@@ -278,7 +278,7 @@ public:
 
     void addModRewriteRule(std::string oldPrefix, std::string newPrefix)
     {
-        NX_DEBUG(this, nx::format("New rewrite rule '%1*' to '%2*'").args(oldPrefix, newPrefix));
+        NX_DEBUG(this, "New rewrite rule '%1*' to '%2*'", oldPrefix, newPrefix);
         m_rewritePrefixes.emplace(std::move(oldPrefix), std::move(newPrefix));
     }
 

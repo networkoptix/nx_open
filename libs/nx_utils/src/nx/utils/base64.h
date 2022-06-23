@@ -16,15 +16,16 @@ namespace nx::utils {
  */
 NX_UTILS_API int toBase64(
     const void* data, int size,
-    void* outBuf, int outBufCapacity);
+    char* outBuf, int outBufCapacity);
 
 /**
  * @return If outBuf != NULL, number of bytes written to outBuf is returned.
  * If output buffer size is insufficient, then -1 is returned.
- * If outBuf == NULL, returns number of bytes required to store decoded representation of data.
+ * If outBuf == NULL, returns maximum number of bytes required to store decoded representation of data.
+ * Note: this is a very rough estimate, slightly less bytes may be used when actually decoding.
  */
 NX_UTILS_API int fromBase64(
-    const void* data, int size,
+    const char* data, int size,
     void* outBuf, int outBufCapacity);
 
 inline std::string toBase64(const std::string_view& str)

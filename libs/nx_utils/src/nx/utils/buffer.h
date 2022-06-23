@@ -1221,8 +1221,8 @@ BasicBuffer<CharType> BasicBuffer<CharType>::fromBase64(const std::string_view& 
     const auto byteCount = (std::size_t) utils::fromBase64(str.data(), (int) str.size(), nullptr, 0);
     result.resize((byteCount + sizeof(CharType) - 1) / sizeof(CharType));
 
-    utils::fromBase64(str.data(), (int) str.size(),
-        result.data(), (int) result.size() * sizeof(CharType));
+    result.resize(utils::fromBase64(str.data(), (int) str.size(),
+        result.data(), (int) result.size() * sizeof(CharType)));
     return result;
 }
 

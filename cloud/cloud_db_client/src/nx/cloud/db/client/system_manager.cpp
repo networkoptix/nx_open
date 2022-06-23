@@ -58,7 +58,7 @@ void SystemManager::getSystemsFiltered(
 {
     executeRequest<api::SystemDataExList>(
         nx::network::http::Method::get,
-        kSystemGetPath,
+        kSystemsPath,
         filter,
         std::move(completionHandler));
 }
@@ -79,7 +79,7 @@ void SystemManager::getSystems(
 {
     executeRequest<api::SystemDataExList>(
         nx::network::http::Method::get,
-        kSystemGetPath,
+        kSystemsPath,
         std::move(systemIdList),
         std::move(completionHandler));
 }

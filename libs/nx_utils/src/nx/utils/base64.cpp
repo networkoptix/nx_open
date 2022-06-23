@@ -11,7 +11,7 @@ namespace nx::utils {
 
 int toBase64(
     const void* data, int size,
-    void* outBuf, int outBufCapacity)
+    char* outBuf, int outBufCapacity)
 {
     const auto encodedLength = ((size / 3) + 1) * 4;
 
@@ -26,11 +26,24 @@ int toBase64(
     return encoded.size();
 }
 
+static int estimateDecodedLen(const char* encoded, int size)
+{
+    // Removing padding if present.
+    while (size > 0 && encoded[size-1] == '=')
+        --size;
+
+    // one byte is encoded to 2 characters, 2 bytes are encoded to 3 characters.
+    static constexpr int kRemainderLenToDataLen[] = {0, 1, 1, 2};
+
+    return (size / 4) * 3 // full 4-byte words.
+        + kRemainderLenToDataLen[size % 4];
+}
+
 int fromBase64(
-    const void* data, int size,
+    const char* data, int size,
     void* outBuf, int outBufCapacity)
 {
-    const auto decodedLength = ((size / 4) + 1) * 3;
+    const auto decodedLength = estimateDecodedLen(data, size);
 
     if (outBuf == nullptr)
         return decodedLength;
@@ -38,7 +51,7 @@ int fromBase64(
     if (outBufCapacity < decodedLength)
         return -1;
 
-    const auto decoded = QByteArray::fromBase64(QByteArray::fromRawData((const char*) data, size));
+    const auto decoded = QByteArray::fromBase64(QByteArray::fromRawData(data, size));
     memcpy(outBuf, decoded.data(), decoded.size());
     return decoded.size();
 }
