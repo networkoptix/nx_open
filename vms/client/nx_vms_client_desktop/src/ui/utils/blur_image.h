@@ -4,7 +4,7 @@
 
 #include <QtWidgets/QWidget>
 
-#if (QT_VERSION <= QT_VERSION_CHECK(6, 3, 0)) && (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
+#if (QT_VERSION < QT_VERSION_CHECK(6, 5, 0)) && (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
 QT_BEGIN_NAMESPACE
 extern Q_WIDGETS_EXPORT void qt_blurImage(
     QImage& image,
