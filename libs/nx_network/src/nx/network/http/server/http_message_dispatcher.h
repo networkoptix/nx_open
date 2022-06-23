@@ -71,13 +71,13 @@ public:
         MessageBodyDeliveryType requestBodyDeliveryType = MessageBodyDeliveryType::buffer)
     {
         using RequestHandlerType =
-            nx::network::http::server::handler::CustomRequestHandler<const Func&>;
+            nx::network::http::server::handler::CustomRequestHandler<Func>;
 
         return registerRequestProcessor(
             path,
             [func = std::move(func), requestBodyDeliveryType]()
             {
-                auto handler = std::make_unique<RequestHandlerType>(func);
+                auto handler = std::make_unique<RequestHandlerType>(std::move(func));
                 handler->setRequestBodyDeliveryType(requestBodyDeliveryType);
                 return handler;
             },

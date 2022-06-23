@@ -12,7 +12,7 @@ class CustomRequestHandler:
 {
 public:
     CustomRequestHandler(Func func):
-        m_func(func)
+        m_func(std::move(func))
     {
     }
 
