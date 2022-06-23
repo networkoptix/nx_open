@@ -36,7 +36,7 @@ public:
     /**
      * Set the callback to call when some data has been downloaded and saved.
      */
-    void setOnProgressHasBeenMade(nx::utils::MoveOnlyFunc<void(size_t, std::optional<double>)> handler);
+    void setOnProgressHasBeenMade(nx::utils::MoveOnlyFunc<void(nx::Buffer&&, std::optional<double>)> handler);
 
     /**
      * Set the callback to call when the download has been finished.
@@ -84,7 +84,7 @@ private:
     };
 
     nx::utils::MoveOnlyFunc<void(std::optional<size_t>)> m_onResponseReceived;
-    nx::utils::MoveOnlyFunc<void(size_t, std::optional<double>)> m_onProgressHasBeenMade;
+    nx::utils::MoveOnlyFunc<void(nx::Buffer&&, std::optional<double>)> m_onProgressHasBeenMade;
     nx::utils::MoveOnlyFunc<void()> m_onDone;
 
     State m_state = State::init;

@@ -285,9 +285,9 @@ protected:
                 contextPtr->contentLength = contentLength.value_or(0);
             });
         context->downloader->setOnProgressHasBeenMade(
-            [contextPtr](auto size, auto percentage)
+            [contextPtr](auto&& buf, auto percentage)
             {
-                contextPtr->downloaded += size;
+                contextPtr->downloaded += buf.size();
                 if (percentage)
                     ASSERT_EQ(*percentage, (double)contextPtr->downloaded / contextPtr->contentLength);
                 contextPtr->calls++;
@@ -333,6 +333,7 @@ TEST_F(AsyncFileDownloader, successfull)
 
     ASSERT_TRUE(context->doneFuture.get());
 
+    ASSERT_TRUE(context->downloader->hasRequestSucceeded());
     ASSERT_GT(context->calls, 0);
     ASSERT_EQ(context->downloaded, contentLength);
     ASSERT_EQ(context->downloaded, context->file->size());
@@ -354,6 +355,7 @@ TEST_F(AsyncFileDownloader, interrupted)
     auto status = context->doneFuture.wait_for(std::chrono::milliseconds(100));
     ASSERT_EQ(status, std::future_status::timeout);
 
+    ASSERT_TRUE(context->downloader->hasRequestSucceeded());
     ASSERT_EQ(SystemError::noError, context->downloader->lastSysErrorCode());
     ASSERT_GT(context->calls, 0);
     ASSERT_GT(context->downloaded, 0);
@@ -373,6 +375,7 @@ TEST_F(AsyncFileDownloader, interruptedBeforeContent)
     auto status = context->doneFuture.wait_for(std::chrono::milliseconds(100));
     ASSERT_EQ(status, std::future_status::timeout);
 
+    ASSERT_TRUE(context->downloader->hasRequestSucceeded());
     ASSERT_EQ(SystemError::noError, context->downloader->lastSysErrorCode());
     ASSERT_EQ(context->calls, 0);
     ASSERT_EQ(context->downloaded, 0);
@@ -393,6 +396,7 @@ TEST_F(AsyncFileDownloader, resetConnection)
     m_httpServer->server().closeAllConnections();
     ASSERT_FALSE(context->doneFuture.get());
 
+    ASSERT_FALSE(context->downloader->hasRequestSucceeded());
     ASSERT_EQ(SystemError::connectionReset, context->downloader->lastSysErrorCode());
     ASSERT_GT(context->calls, 0);
     ASSERT_LT(context->downloaded, contentLength);
@@ -413,6 +417,7 @@ TEST_F(AsyncFileDownloader, refusedConnection)
     ASSERT_EQ(status, std::future_status::timeout);
     ASSERT_FALSE(context->doneFuture.get());
 
+    ASSERT_FALSE(context->downloader->hasRequestSucceeded());
     ASSERT_EQ(SystemError::connectionRefused, context->downloader->lastSysErrorCode());
     ASSERT_EQ(context->calls, 0);
     ASSERT_EQ(context->downloaded, 0);
@@ -431,6 +436,7 @@ TEST_F(AsyncFileDownloader, timedOut)
 
     ASSERT_FALSE(context->doneFuture.get());
 
+    ASSERT_FALSE(context->downloader->hasRequestSucceeded());
     ASSERT_EQ(SystemError::timedOut, context->downloader->lastSysErrorCode());
     ASSERT_GT(context->calls, 0);
     ASSERT_LT(context->downloaded, contentLength);
@@ -449,6 +455,7 @@ TEST_F(AsyncFileDownloader, timedOutBeforeContent)
 
     ASSERT_FALSE(context->doneFuture.get());
 
+    ASSERT_FALSE(context->downloader->hasRequestSucceeded());
     ASSERT_EQ(SystemError::timedOut, context->downloader->lastSysErrorCode());
     ASSERT_EQ(context->calls, 0);
     ASSERT_EQ(context->downloaded, 0);
@@ -467,6 +474,7 @@ TEST_F(AsyncFileDownloader, sequential)
 
     ASSERT_TRUE(context->doneFuture.get());
 
+    ASSERT_TRUE(context->downloader->hasRequestSucceeded());
     ASSERT_GT(context->calls, 0);
     ASSERT_EQ(context->downloaded, contentLength);
     ASSERT_EQ(context->downloaded, context->file->size());
@@ -498,6 +506,7 @@ TEST_F(AsyncFileDownloader, sequential)
 
     ASSERT_TRUE(secondFuture.get());
 
+    ASSERT_TRUE(context->downloader->hasRequestSucceeded());
     ASSERT_GT(context->calls, 0);
     ASSERT_EQ(context->downloaded, contentLength);
     ASSERT_EQ(context->downloaded, context->file->size());
@@ -518,6 +527,7 @@ TEST_F(AsyncFileDownloader, viaProxy)
 
     ASSERT_TRUE(context->doneFuture.get());
 
+    ASSERT_TRUE(context->downloader->hasRequestSucceeded());
     ASSERT_GT(context->calls, 0);
     ASSERT_EQ(context->downloaded, contentLength);
     ASSERT_EQ(context->downloaded, context->file->size());
@@ -540,6 +550,7 @@ TEST_F(AsyncFileDownloader, viaTransparentProxy)
 
     ASSERT_TRUE(context->doneFuture.get());
 
+    ASSERT_TRUE(context->downloader->hasRequestSucceeded());
     ASSERT_GT(context->calls, 0);
     ASSERT_EQ(context->downloaded, contentLength);
     ASSERT_EQ(context->downloaded, context->file->size());
