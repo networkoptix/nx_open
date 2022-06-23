@@ -232,6 +232,14 @@ def main():
                 source_dir=src_bin_dir,
                 file_list=["client_external.dat", "bytedance_iconpark.dat"])
 
+        # Archive VMS external resources.
+        if not parse_boolean(conf.IS_OPEN_SOURCE):
+            archiveFiles(
+                a,
+                target_dir=bin_dir,
+                source_dir=src_bin_dir,
+                file_list=["external.dat"])
+
         # Archive translations
         archiveByGlob(a, "translations", translations_dir,
             join(src_bin_dir, "translations"), "*.dat")

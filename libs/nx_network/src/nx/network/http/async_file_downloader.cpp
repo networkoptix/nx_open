@@ -35,7 +35,7 @@ void AsyncFileDownloader::setOnResponseReceived(nx::utils::MoveOnlyFunc<void(std
     m_onResponseReceived = std::move(handler);
 }
 
-void AsyncFileDownloader::setOnProgressHasBeenMade(nx::utils::MoveOnlyFunc<void(size_t, std::optional<double>)> handler)
+void AsyncFileDownloader::setOnProgressHasBeenMade(nx::utils::MoveOnlyFunc<void(nx::Buffer&&, std::optional<double>)> handler)
 {
     m_onProgressHasBeenMade = std::move(handler);
 }
@@ -183,7 +183,7 @@ void AsyncFileDownloader::onSomeMessageBodyAvailable()
         if (m_contentLength && *m_contentLength != 0)
             percentage = (double)m_file->size() / *m_contentLength;
 
-        m_onProgressHasBeenMade(buf.size(), percentage);
+        m_onProgressHasBeenMade(std::move(buf), percentage);
     }
 }
 
