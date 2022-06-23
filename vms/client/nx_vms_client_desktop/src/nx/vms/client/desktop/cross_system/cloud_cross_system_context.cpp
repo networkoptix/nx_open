@@ -11,12 +11,13 @@
 #include <finders/systems_finder.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/guarded_callback.h>
-#include <nx/vms/api/data/device_model.h>
+#include <nx/vms/api/data/camera_data_ex.h>
 #include <nx/vms/api/data/user_model.h>
 #include <nx/vms/client/core/network/cloud_system_endpoint.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <watchers/cloud_status_watcher.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -79,12 +80,20 @@ struct CloudCrossSystemContext::Private
     CrossSystemServerResourcePtr server;
 
     /**
+     * Debug log representation.
+     */
+    QString toString() const { return systemDescription->name(); }
+
+    /**
      * Debug log representation. Used by toString(const T*).
      */
-    QString idForToStringFromPtr() const { return systemDescription->name(); }
+    QString idForToStringFromPtr() const { return toString(); }
 
     bool ensureConnection()
     {
+        if (!ini().crossSystemLayouts)
+            return false;
+
         if (systemContext)
             return true;
 
@@ -160,9 +169,13 @@ struct CloudCrossSystemContext::Private
                     emit q->camerasRemoved(cameras);
             });
         appContext()->addSystemContext(systemContext.get());
+
+        auto cameras = systemContext->resourcePool()->getAllCameras();
+        NX_ASSERT(cameras.empty());
+        emit q->camerasAdded(cameras);
     }
 
-    void addCamerasToResourcePool(std::vector<nx::vms::api::DeviceModel> cameras)
+    void addCamerasToResourcePool(std::vector<nx::vms::api::CameraDataEx> cameras)
     {
         if (!NX_ASSERT(systemContext))
             return;
@@ -170,18 +183,18 @@ struct CloudCrossSystemContext::Private
         auto resourcePool = systemContext->resourcePool();
         auto camerasToRemove = resourcePool->getAllCameras();
         QnResourceList newlyCreatedCameras;
-        for (const auto& cameraModel: cameras)
+        for (const auto& cameraData: cameras)
         {
             if (auto existingCamera = resourcePool->getResourceById<CrossSystemCameraResource>(
-                cameraModel.id))
+                cameraData.id))
             {
                 camerasToRemove.removeOne(existingCamera);
-                existingCamera->update(cameraModel);
+                existingCamera->update(cameraData);
             }
             else
             {
                 auto camera = CrossSystemCameraResourcePtr(
-                    new CrossSystemCameraResource(cameraModel));
+                    new CrossSystemCameraResource(cameraData));
                 camera->setParentId(server->getId());
                 newlyCreatedCameras.push_back(camera);
             }
@@ -192,18 +205,17 @@ struct CloudCrossSystemContext::Private
         if (!camerasToRemove.empty())
             resourcePool->removeResources(camerasToRemove);
 
-        for (const auto& cameraModel: cameras)
+        for (const auto& cameraData: cameras)
         {
             auto camera = resourcePool->getResourceById<CrossSystemCameraResource>(
-                cameraModel.id);
+                cameraData.id);
 
             if (!NX_ASSERT(camera))
                 continue;
 
-            if (cameraModel.status)
-                camera->setStatus(*cameraModel.status);
-            for (const auto& [name, value]: cameraModel.parameters)
-                camera->setProperty(name, value.toString(), /*markDirty*/ false);
+            camera->setStatus(cameraData.status);
+            for (const auto& param: cameraData.addParams)
+                camera->setProperty(param.name, param.value, /*markDirty*/ false);
         }
     }
 
@@ -313,7 +325,7 @@ struct CloudCrossSystemContext::Private
                      return;
                 }
 
-                std::vector<nx::vms::api::DeviceModel> result;
+                std::vector<nx::vms::api::CameraDataEx> result;
                 if (!QJson::deserialize(data, &result))
                 {
                     NX_WARNING(this, "Cameras list cannot be deserialized");
@@ -325,7 +337,7 @@ struct CloudCrossSystemContext::Private
             });
 
         systemContext->connectedServerApi()->getRawResult(
-            "/rest/v1/devices",
+            "/ec2/getCamerasEx",
             {},
             callback,
             q->thread());
@@ -360,7 +372,12 @@ QnVirtualCameraResourceList CloudCrossSystemContext::cameras() const
 
 QString CloudCrossSystemContext::idForToStringFromPtr() const
 {
-    return d->idForToStringFromPtr();
+    return d->toString();
+}
+
+QString CloudCrossSystemContext::toString() const
+{
+    return d->toString();
 }
 
 } // namespace nx::vms::client::desktop

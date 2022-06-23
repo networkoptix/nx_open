@@ -10,7 +10,9 @@ class QnClientPtzControllerPool: public QnPtzControllerPool
     typedef QnPtzControllerPool base_type;
 
 public:
-    QnClientPtzControllerPool(QObject *parent = nullptr);
+    QnClientPtzControllerPool(
+        nx::vms::common::SystemContext* systemContext,
+        QObject* parent = nullptr);
 
 protected:
     virtual void registerResource(const QnResourcePtr& resource) override;

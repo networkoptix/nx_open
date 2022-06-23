@@ -4,24 +4,19 @@
 
 #include <QtCore/QObject>
 
-#include <nx/utils/singleton.h>
-#include <utils/common/connective.h>
-
-#include <core/resource/resource_fwd.h>
 #include <core/ptz/ptz_fwd.h>
-#include <common/common_module_aware.h>
+#include <core/resource/resource_fwd.h>
+#include <nx/utils/impl_ptr.h>
+#include <nx/vms/common/system_context_aware.h>
 
 class QThread;
 class QThreadPool;
 
-class QnPtzControllerPoolPrivate;
-
 class NX_VMS_COMMON_API QnPtzControllerPool:
-    public Connective<QObject>,
-    public /*mixin*/ QnCommonModuleAware
+    public QObject,
+    public nx::vms::common::SystemContextAware
 {
     Q_OBJECT
-    typedef Connective<QObject> base_type;
 
 public:
     enum ControllerConstructionMode
@@ -30,21 +25,22 @@ public:
         ThreadedControllerConstruction
     };
 
-    QnPtzControllerPool(QObject* parent);
+    QnPtzControllerPool(nx::vms::common::SystemContext* systemContext, QObject* parent = nullptr);
     virtual ~QnPtzControllerPool();
 
-    QThread *executorThread() const;
-    QThreadPool *commandThreadPool() const;
+    QThread* executorThread() const;
+    QThreadPool* commandThreadPool() const;
 
     ControllerConstructionMode constructionMode() const;
     void setConstructionMode(ControllerConstructionMode mode);
 
-    QnPtzControllerPtr controller(const QnResourcePtr &resource) const;
+    QnPtzControllerPtr controller(const QnResourcePtr& resource) const;
 
     virtual void init();
+
 signals:
-    void controllerAboutToBeChanged(const QnResourcePtr &resource);
-    void controllerChanged(const QnResourcePtr &resource);
+    void controllerAboutToBeChanged(const QnResourcePtr& resource);
+    void controllerChanged(const QnResourcePtr& resource);
 
 protected:
     /**
@@ -52,18 +48,17 @@ protected:
      * \returns                         Newly created PTZ controller for the given resource.
      * \note                            This function is supposed to be thread-safe.
      */
-    Q_SLOT virtual QnPtzControllerPtr createController(const QnResourcePtr &resource) const;
+    virtual QnPtzControllerPtr createController(const QnResourcePtr& resource) const;
 
-    Q_SLOT virtual void registerResource(const QnResourcePtr &resource);
-    Q_SLOT virtual void unregisterResource(const QnResourcePtr &resource);
+    virtual void registerResource(const QnResourcePtr& resource);
+    virtual void unregisterResource(const QnResourcePtr& resource);
 
-    Q_SLOT void updateController(const QnResourcePtr &resource);
+    void updateController(const QnResourcePtr& resource);
 
     virtual void deinitialize();
 
 private:
     friend class QnPtzControllerCreationCommand;
-    friend class QnPtzControllerPoolPrivate;
-    QScopedPointer<QnPtzControllerPoolPrivate> d;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
-

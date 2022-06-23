@@ -2,13 +2,17 @@
 
 #include "fisheye_home_ptz_controller.h"
 
-#include <client_core/client_core_module.h>
-
-#include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/home_ptz_executor.h>
+#include <core/ptz/ptz_controller_pool.h>
+#include <nx/vms/client/desktop/system_context.h>
 
-QnFisheyeHomePtzController::QnFisheyeHomePtzController(const QnPtzControllerPtr &baseController) :
-    QnHomePtzController(baseController, qnClientCoreModule->ptzControllerPool()->executorThread()),
+using namespace nx::vms::client::desktop;
+
+QnFisheyeHomePtzController::QnFisheyeHomePtzController(const QnPtzControllerPtr& baseController):
+    QnHomePtzController(
+        baseController,
+        SystemContext::fromResource(
+            baseController->resource())->ptzControllerPool()->executorThread()),
     m_suspended(false)
 {
 }

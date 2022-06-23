@@ -5,25 +5,26 @@
 #include <QtCore/QVector>
 
 #include <common/common_module.h>
-#include <finders/systems_finder.h>
+#include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/common/system_settings.h>
 
-using namespace nx::vms::common;
+namespace nx::vms::client::desktop {
+namespace entity_resource_tree {
 
 namespace {
 
-QVector<QString> getOtherCloudSystemsIds(SystemSettings* globalSettings)
+QVector<QString> getOtherCloudSystemsIds(const QString& thisCloudSystemId)
 {
     QVector<QString> result;
 
-    const auto thisCloudSystemId = globalSettings->cloudSystemId();
+    const auto cloudSystemsManager = appContext()->cloudCrossSystemManager();
 
-    const auto systemsDescriptions = qnSystemsFinder->systems();
-    for (const auto& systemDescription: systemsDescriptions)
+    for (const auto& systemId: cloudSystemsManager->cloudSystems())
     {
-        if (systemDescription->isCloudSystem() && systemDescription->id() != thisCloudSystemId)
-            result.append(systemDescription->id());
+        if (systemId != thisCloudSystemId)
+            result.append(systemId);
     }
 
     return result;
@@ -31,39 +32,38 @@ QVector<QString> getOtherCloudSystemsIds(SystemSettings* globalSettings)
 
 } // namespace
 
-namespace nx::vms::client::desktop {
-namespace entity_resource_tree {
-
 CloudSystemsSource::CloudSystemsSource(const QnCommonModule* commonModule):
     m_commonModule(commonModule)
 {
     initializeRequest =
         [this]
         {
-            const auto systemsFinder = appContext()->systemsFinder();
-            const bool isUnitTestsEnvironment = !systemsFinder;
+            const auto cloudSystemsManager = appContext()->cloudCrossSystemManager();
+            const bool isUnitTestsEnvironment = !cloudSystemsManager;
             if (isUnitTestsEnvironment)
                 return;
 
-            m_connectionsGuard.add(systemsFinder->QObject::connect(
-                systemsFinder, &QnSystemsFinder::systemDiscovered,
-                    [this](const QnSystemDescriptionPtr& systemDescription)
+            m_connectionsGuard.add(QObject::connect(
+                cloudSystemsManager, &CloudCrossSystemManager::systemFound,
+                    [this](const QString& systemId)
                     {
-                        if (systemDescription->isCloudSystem() && systemDescription->id()
-                            != m_commonModule->globalSettings()->cloudSystemId())
+                        if (systemId != m_commonModule->globalSettings()->cloudSystemId())
                         {
-                            (*addKeyHandler)(systemDescription->id());
+                            NX_VERBOSE(this, "New cloud system added: %1", systemId);
+                            (*addKeyHandler)(systemId);
                         }
                     }));
 
-            m_connectionsGuard.add(systemsFinder->QObject::connect(
-                systemsFinder, &QnSystemsFinder::systemLost,
+            m_connectionsGuard.add(QObject::connect(
+                cloudSystemsManager, &CloudCrossSystemManager::systemLost,
                     [this](const QString& systemId)
                     {
+                        NX_VERBOSE(this, "Cloud system lost: %1", systemId);
                         (*removeKeyHandler)(systemId);
                     }));
 
-            setKeysHandler(getOtherCloudSystemsIds(m_commonModule->globalSettings()));
+            setKeysHandler(
+                getOtherCloudSystemsIds(m_commonModule->globalSettings()->cloudSystemId()));
         };
 }
 

@@ -5,24 +5,23 @@
 
 #include <QtCore/QScopedValueRollback>
 
-#include <nx/vms/event/action_parameters.h>
-
+#include <client_core/client_core_module.h>
+#include <core/ptz/activity_ptz_controller.h>
+#include <core/ptz/fallback_ptz_controller.h>
+#include <core/ptz/preset_ptz_controller.h>
+#include <core/ptz/ptz_controller_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/event/action_parameters.h>
+#include <ui/fisheye/fisheye_ptz_controller.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include "core/ptz/ptz_preset.h"
-#include "core/ptz/ptz_controller_pool.h"
-#include "core/ptz/fallback_ptz_controller.h"
-#include "core/ptz/preset_ptz_controller.h"
-#include "core/ptz/activity_ptz_controller.h"
-#include "ui/fisheye/fisheye_ptz_controller.h"
-#include "ui/workaround/widgets_signals_workaround.h"
-#include <common/common_module.h>
-#include <client_core/client_core_module.h>
+#include <ui/workaround/widgets_signals_workaround.h>
 
-using namespace nx;
+#include "core/ptz/ptz_preset.h"
+
+using namespace nx::vms::client::desktop;
 
 QnExecPtzPresetBusinessActionWidget::QnExecPtzPresetBusinessActionWidget(QWidget *parent) :
     base_type(parent),
@@ -67,13 +66,14 @@ void QnExecPtzPresetBusinessActionWidget::at_model_dataChanged(Fields fields) {
 void QnExecPtzPresetBusinessActionWidget::setupPtzController(const QnVirtualCameraResourcePtr& camera)
 {
     if (m_ptzController)
-        disconnect(m_ptzController.data(), nullptr, this, nullptr);
+        m_ptzController->disconnect(this);
 
     QnPtzControllerPtr fisheyeController;
     fisheyeController.reset(new QnFisheyePtzController(camera), &QObject::deleteLater);
     fisheyeController.reset(new QnPresetPtzController(fisheyeController));
 
-    auto ptzPool = qnClientCoreModule->ptzControllerPool();
+    auto systemContext = SystemContext::fromResource(camera);
+    auto ptzPool = systemContext->ptzControllerPool();
     if (QnPtzControllerPtr serverController = ptzPool->controller(camera))
     {
         serverController.reset(new QnActivityPtzController(
@@ -110,7 +110,7 @@ void QnExecPtzPresetBusinessActionWidget::paramsChanged()
     if (!model() || m_updating)
         return;
 
-    vms::event::ActionParameters params = model()->actionParams();
+    nx::vms::event::ActionParameters params = model()->actionParams();
     params.presetId = ui->presetComboBox->itemData(ui->presetComboBox->currentIndex()).toString();
     model()->setActionParams(params);
 }

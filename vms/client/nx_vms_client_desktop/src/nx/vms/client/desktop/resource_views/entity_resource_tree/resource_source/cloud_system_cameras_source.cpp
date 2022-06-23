@@ -24,7 +24,8 @@ struct CloudSystemCamerasSource::Private
     CloudSystemCamerasSource* const q;
     const QString systemId;
     QPointer<CloudCrossSystemContext> systemContext;
-    nx::utils::ScopedConnections connections;
+    nx::utils::ScopedConnections managerConnections;
+    nx::utils::ScopedConnections contextConnections;
 
     void connectToContext()
     {
@@ -32,26 +33,32 @@ struct CloudSystemCamerasSource::Private
         if (!NX_ASSERT(systemContext))
             return;
 
-        connections.reset();
-        connections << QObject::connect(systemContext,
+        NX_VERBOSE(this, "Connect to %1", *systemContext);
+
+        contextConnections << QObject::connect(systemContext,
             &CloudCrossSystemContext::camerasAdded,
             [this](const QnVirtualCameraResourceList& cameras)
             {
+                NX_VERBOSE(this, "%1 cameras added to %2", cameras.size(), *systemContext);
+
                 auto handler = q->addKeyHandler;
                 for (auto& camera: cameras)
                     (*handler)(camera);
             });
 
-        connections << QObject::connect(systemContext,
+        contextConnections << QObject::connect(systemContext,
             &CloudCrossSystemContext::camerasRemoved,
             [this](const QnVirtualCameraResourceList& cameras)
             {
+                NX_VERBOSE(this, "%1 cameras removed from %2", cameras.size(), *systemContext);
+
                 auto handler = q->removeKeyHandler;
                 for (auto& camera: cameras)
                     (*handler)(camera);
             });
 
         auto cameras = systemContext->cameras();
+        NX_VERBOSE(this, "%1 cameras already exist in the %2", cameras.size(), *systemContext);
         q->setKeysHandler(QVector<QnResourcePtr>(cameras.cbegin(), cameras.cend()));
     };
 };
@@ -62,20 +69,26 @@ CloudSystemCamerasSource::CloudSystemCamerasSource(const QString& systemId):
     initializeRequest =
         [this, systemId]
         {
-            if (appContext()->cloudCrossSystemManager()->systemContext(systemId))
-            {
-                d->connectToContext();
-            }
-            else
-            {
-                d->connections << QObject::connect(appContext()->cloudCrossSystemManager(),
-                    &CloudCrossSystemManager::systemFound,
-                    [this, systemId](const QString& foundSystemId)
+            d->managerConnections << QObject::connect(appContext()->cloudCrossSystemManager(),
+                &CloudCrossSystemManager::systemFound,
+                [this, systemId](const QString& foundSystemId)
+                {
+                    if (systemId == foundSystemId)
+                        d->connectToContext();
+                });
+            d->managerConnections << QObject::connect(appContext()->cloudCrossSystemManager(),
+                &CloudCrossSystemManager::systemLost,
+                [this, systemId](const QString& lostSystemId)
+                {
+                    if (systemId == lostSystemId)
                     {
-                        if (systemId == foundSystemId)
-                            d->connectToContext();
-                    });
-            }
+                        d->contextConnections.reset();
+                        setKeysHandler({}); //< Hide cameras when system is lost.
+                    }
+                });
+
+            if (appContext()->cloudCrossSystemManager()->systemContext(systemId))
+                d->connectToContext();
         };
 }
 

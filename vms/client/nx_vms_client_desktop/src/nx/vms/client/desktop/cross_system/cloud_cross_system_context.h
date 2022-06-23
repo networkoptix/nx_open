@@ -40,6 +40,11 @@ public:
      */
     QString idForToStringFromPtr() const;
 
+    /**
+     * Debug log representation.
+     */
+    QString toString() const;
+
 signals:
     void camerasAdded(const QnVirtualCameraResourceList& cameras);
     void camerasRemoved(const QnVirtualCameraResourceList& cameras);

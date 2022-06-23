@@ -50,7 +50,7 @@ public:
     void setTextFilter(const QString& value);
 
 private:
-    void onResourceRemoved(const QnResourcePtr& resource);
+    void onResourcesRemoved(const QnResourceList& resources);
 
 private:
     void setupTimelineWindowQuery();

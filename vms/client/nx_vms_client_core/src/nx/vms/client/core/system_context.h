@@ -10,6 +10,7 @@
 
 #include "system_context_aware.h" //< Forward declarations.
 
+class QnPtzControllerPool;
 class QQmlContext;
 
 namespace nx::vms::rules { class Engine; }
@@ -84,6 +85,8 @@ public:
 
     /** API interface of the currently connected server. */
     rest::ServerConnectionPtr connectedServerApi() const;
+
+    QnPtzControllerPool* ptzControllerPool() const;
 
     UserWatcher* userWatcher() const;
 

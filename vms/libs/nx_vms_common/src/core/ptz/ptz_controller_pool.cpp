@@ -5,18 +5,19 @@
 #include <QtCore/QAtomicInt>
 #include <QtCore/QThreadPool>
 
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/vms/common/system_context.h>
 #include <utils/common/delayed.h>
 #include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
 
 #include "abstract_ptz_controller.h"
 #include "proxy_ptz_controller.h"
 
+using namespace nx::vms::common;
 
 namespace {
 
@@ -38,26 +39,17 @@ void moveControllerToThread(QnPtzControllerPtr controller, QThread* thread)
 
 //-------------------------------------------------------------------------------------------------
 
-class QnPtzControllerPoolPrivate
+struct QnPtzControllerPool::Private
 {
-public:
-    QnPtzControllerPoolPrivate():
-        mode(QnPtzControllerPool::NormalControllerConstruction),
-        executorThread(NULL),
-        commandThreadPool(NULL),
-        deinitialized(false)
-    {
-    }
-
     void updateController(const QnResourcePtr& resource);
 
     mutable nx::Mutex mutex;
-    QAtomicInt mode;
+    QAtomicInt mode = QnPtzControllerPool::NormalControllerConstruction;
     QHash<QnResourcePtr, QnPtzControllerPtr> controllerByResource;
-    QThread *executorThread;
-    QThreadPool *commandThreadPool;
+    QThread *executorThread = nullptr;
+    QThreadPool *commandThreadPool = nullptr;
     QnPtzControllerPool *q;
-    std::atomic<bool> deinitialized;
+    std::atomic<bool> deinitialized = false;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -81,10 +73,10 @@ private:
 //-------------------------------------------------------------------------------------------------
 // QnPtzControllerPool methods
 
-QnPtzControllerPool::QnPtzControllerPool(QObject* parent):
-    base_type(parent),
-    QnCommonModuleAware(parent),
-    d(new QnPtzControllerPoolPrivate())
+QnPtzControllerPool::QnPtzControllerPool(SystemContext* systemContext, QObject* parent):
+    QObject(parent),
+    SystemContextAware(systemContext),
+    d(new Private())
 {
     d->q = this;
 
@@ -209,7 +201,7 @@ void QnPtzControllerPool::updateController(const QnResourcePtr& resource)
     }
 }
 
-void QnPtzControllerPoolPrivate::updateController(const QnResourcePtr& resource)
+void QnPtzControllerPool::Private::updateController(const QnResourcePtr& resource)
 {
     QnPtzControllerPtr controller = q->createController(resource);
     QnPtzControllerPtr oldController;
