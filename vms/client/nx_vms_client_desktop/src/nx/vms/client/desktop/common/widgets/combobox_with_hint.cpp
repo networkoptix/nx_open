@@ -57,7 +57,11 @@ QSize ComboBoxWithHint::sizeHint() const
     QFontMetrics metrics(font());
     int textWidth = 0;
     for (int i = 0; i < count(); ++i)
-        textWidth = std::max(textWidth, metrics.width(itemData(i, m_hintRole).toString()));
+    {
+        textWidth = std::max(
+            textWidth,
+            metrics.horizontalAdvance(itemData(i, m_hintRole).toString()));
+    }
 
     const int spacing = nx::style::Metrics::kDefaultLayoutSpacing.width();
     size.setWidth(size.width() + textWidth + spacing);
