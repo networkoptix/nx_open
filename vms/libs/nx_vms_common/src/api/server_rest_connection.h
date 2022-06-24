@@ -587,8 +587,21 @@ public:
         GetCallback callback,
         QThread* targetThread = nullptr);
 
+    /**
+     * Checks if the connection with SMTP server described in the corresponding data structure
+     * passed as parameter is successful.
+     */
     Handle testEmailSettings(
         const QnEmailSettings& settings,
+        Result<RestResultWithData<QnTestEmailSettingsReply>>::type&& callback,
+        QThread* targetThread = nullptr,
+        std::optional<QnUuid> proxyToServer = {});
+
+    /**
+     * Checks if the connection with SMTP server described in the corresponding data structure
+     * stored at server's system settings is successful.
+     */
+    Handle testEmailSettings(
         Result<RestResultWithData<QnTestEmailSettingsReply>>::type&& callback,
         QThread* targetThread = nullptr,
         std::optional<QnUuid> proxyToServer = {});

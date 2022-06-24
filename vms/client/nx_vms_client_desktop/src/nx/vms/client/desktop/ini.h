@@ -234,6 +234,11 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, enableNewUserSettings,
         "[Feature] Makes new User Settings with LDAP groups support available in the client.");
 
+    // VMS-32543
+    NX_INI_FLAG(false, allowConfigureCloudServiceToSendEmail,
+        "[Feature] Makes the option to send emails via cloud service available in the\n"
+        "outgoing email settings dialog.");
+
     // ---------------------------------------------------------------------------------------------
     // Support section.
     // Flags here can be removed when support engineers decide whether to discard the flag or move

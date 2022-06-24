@@ -10,6 +10,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_administration/widgets/analytics_settings_widget.h>
+#include <nx/vms/client/desktop/system_administration/widgets/outgoing_mail_settings_widget.h>
 #include <nx/vms/client/desktop/system_administration/widgets/security_settings_widget.h>
 #include <nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.h>
 #include <nx/vms/client/desktop/system_administration/widgets/user_list_widget.h>
@@ -23,7 +24,6 @@
 #include <ui/widgets/system_settings/general_system_administration_widget.h>
 #include <ui/widgets/system_settings/license_manager_widget.h>
 #include <ui/widgets/system_settings/routing_management_widget.h>
-#include <ui/widgets/system_settings/smtp/smtp_settings_widget.h>
 
 using namespace nx::vms::client::desktop;
 
@@ -59,8 +59,8 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
 
     addPage(LicensesPage, new QnLicenseManagerWidget(this), tr("Licenses"));
 
-    auto smtpWidget = new QnSmtpSettingsWidget(this);
-    addPage(SmtpPage, smtpWidget, tr("Email"));
+    auto outgoingMailSettingsWidget = new OutgoingMailSettingsWidget(systemContext(), this);
+    addPage(MailSettingsPage, outgoingMailSettingsWidget, tr("Email"));
 
     auto securityWidget = new SecuritySettingsWidget(this);
     addPage(SecurityPage, securityWidget, tr("Security"));

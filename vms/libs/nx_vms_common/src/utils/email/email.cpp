@@ -84,7 +84,8 @@ int QnEmailSettings::defaultPort(QnEmail::ConnectionType connectionType)
 
 bool QnEmailSettings::isValid() const
 {
-    return !email.isEmpty() && !server.isEmpty();
+    return nx::email::isValidAddress(email)
+        && nx::utils::Url::fromUserInput(server).isValid();
 }
 
 bool QnEmailSettings::equals(const QnEmailSettings &other, bool compareView /* = false*/) const
