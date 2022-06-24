@@ -64,9 +64,9 @@ struct IntercomIntegration::Private: public QObject
         camerasListener->addOnSignalHandler(
             &QnVirtualCameraResource::compatibleEventTypesMaybeChanged,
             [this](const QnVirtualCameraResourcePtr& camera)
-                {
-                    tryCreateRules({camera});
-                });
+            {
+                tryCreateRules({camera});
+            });
 
         camerasListener->start();
 
@@ -122,6 +122,8 @@ struct IntercomIntegration::Private: public QObject
 
     void tryCreateRules(const QnVirtualCameraResourceList& cameras) const
     {
+        // TODO: #dfisenko Delete this function and its dependencies.
+#if 0
         if (!currentUser)
             return;
 
@@ -158,6 +160,7 @@ struct IntercomIntegration::Private: public QObject
             };
 
         manager->getEventRules(createRulesIfHandlerDoesNotExist, q);
+#endif
     }
 
     void tryCreateAlarmLayoutRule(
