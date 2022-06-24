@@ -1,12 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-/**********************************************************
-* 27 dec 2014
-* a.kolesnikov
-***********************************************************/
-
-#ifndef WAITING_FOR_QTHREAD_TO_EMPTY_EVENT_QUEUE_H
-#define WAITING_FOR_QTHREAD_TO_EMPTY_EVENT_QUEUE_H
+#pragma once
 
 #include <QObject>
 #include <QThread>
@@ -48,5 +42,3 @@ private:
     nx::Mutex m_mutex;
     nx::WaitCondition m_condVar;
 };
-
-#endif  //WAITING_FOR_QTHREAD_TO_EMPTY_EVENT_QUEUE_H

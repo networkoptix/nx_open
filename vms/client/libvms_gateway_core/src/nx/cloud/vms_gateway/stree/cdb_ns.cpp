@@ -1,10 +1,5 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-/**********************************************************
-* Oct 19, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "cdb_ns.h"
 
 

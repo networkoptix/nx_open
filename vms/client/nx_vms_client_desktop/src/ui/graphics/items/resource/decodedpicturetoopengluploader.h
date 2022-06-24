@@ -1,12 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-/**********************************************************
-* 08 oct 2012
-* a.kolesnikov
-***********************************************************/
-
-#ifndef DECODEDPICTURETOOPENGLUPLOADER_H
-#define DECODEDPICTURETOOPENGLUPLOADER_H
+#pragma once
 
 #include <deque>
 #include <memory>
@@ -271,5 +265,3 @@ private:
     DecodedPictureToOpenGLUploader( const DecodedPictureToOpenGLUploader& );
     DecodedPictureToOpenGLUploader& operator=( const DecodedPictureToOpenGLUploader& );
 };
-
-#endif  //DECODEDPICTURETOOPENGLUPLOADER_H

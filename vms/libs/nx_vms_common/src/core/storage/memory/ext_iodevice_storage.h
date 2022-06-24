@@ -1,12 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-/**********************************************************
-* 29 apr 2013
-* a.kolesnikov
-***********************************************************/
-
-#ifndef EXT_IODEVICE_STORAGE_H
-#define EXT_IODEVICE_STORAGE_H
+#pragma once
 
 #include <map>
 
@@ -74,5 +68,3 @@ private:
 };
 
 typedef QnSharedResourcePointer<QnExtIODeviceStorageResource> QnExtIODeviceStorageResourcePtr;
-
-#endif  //EXT_IODEVICE_STORAGE_H

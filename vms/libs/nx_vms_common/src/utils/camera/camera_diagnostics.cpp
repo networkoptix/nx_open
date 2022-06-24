@@ -1,10 +1,5 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-/**********************************************************
-* 23 jul 2013
-* a.kolesnikov
-***********************************************************/
-
 #include "camera_diagnostics.h"
 
 #include <QtCore/QCoreApplication>
