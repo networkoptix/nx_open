@@ -29,7 +29,7 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageT
 
         // Gray notifications.
         case QnSystemHealth::ArchiveRebuildCanceled:
-        case QnSystemHealth::RemoteArchiveSyncPending:
+        case QnSystemHealth::RemoteArchiveSyncAvailable:
         case QnSystemHealth::RemoteArchiveSyncStarted:
         case QnSystemHealth::RemoteArchiveSyncProgress:
             return QnNotificationLevel::Value::CommonNotification;
