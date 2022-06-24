@@ -16,8 +16,9 @@
 
 namespace nx::vms::api::metrics {
 
-struct NX_VMS_API Value: QJsonValue //< TODO: std::variant<QString, int>.
+class NX_VMS_API Value: public QJsonValue //< TODO: std::variant<QString, int>.
 {
+public:
     using QJsonValue::QJsonValue;
     Value(std::chrono::milliseconds duration): QJsonValue(double(duration.count()) / 1000) {}
 };
@@ -41,7 +42,10 @@ using SystemValues
 
 struct NX_VMS_API Label
 {
+    /**%apidoc Parameter id. */
     QString id;
+
+    /**%apidoc Parameter name. */
     QString name;
 
     Label(QString id = {}, QString name = {});
@@ -69,8 +73,13 @@ constexpr auto nxReflectVisitAllEnumItems(Display*, Visitor&& visitor)
 
 struct NX_VMS_API ValueManifest: Label
 {
+    /**%apidoc Parameter description. */
     QString description;
+
+    /**%apidoc Display type. */
     Displays display;
+
+    /**%apidoc Parameter format or units. */
     QString format;
 
     ValueManifest(QString id = {}, QString name = {});
@@ -78,8 +87,13 @@ struct NX_VMS_API ValueManifest: Label
 #define ValueManifest_Fields (id)(name)(description)(format)(display)
 QN_FUSION_DECLARE_FUNCTIONS(ValueManifest, (json), NX_VMS_API)
 
+/**%apidoc
+ * %param id Parameter group id.
+ * %param name Parameter group name.
+ */
 struct NX_VMS_API ValueGroupManifest: Label
 {
+    /**%apidoc Parameter group manifest. */
     std::vector<ValueManifest> values;
 
     using Label::Label;
@@ -87,9 +101,16 @@ struct NX_VMS_API ValueGroupManifest: Label
 #define ValueGroupManifest_Fields (id)(name)(values)
 QN_FUSION_DECLARE_FUNCTIONS(ValueGroupManifest, (json), NX_VMS_API)
 
+/**%apidoc
+ * %param id Resource group id.
+ * %param name Resource group name.
+ */
 struct NX_VMS_API ResourceManifest: Label
 {
+    /**%apidoc Resource label. */
     QString resource;
+
+    /**%apidoc Resource group manifest. */
     std::vector<ValueGroupManifest> values;
 
     using Label::Label;
