@@ -37,6 +37,7 @@ bool requiresCameraResource(ActionType actionType)
         case ActionType::showOnAlarmLayoutAction:
         case ActionType::acknowledgeAction:
         case ActionType::fullscreenCameraAction:
+        case ActionType::showIntercomInformer:
             return true;
 
         default:
@@ -67,6 +68,7 @@ bool requiresUserResource(ActionType actionType)
         case ActionType::fullscreenCameraAction:
         case ActionType::exitFullscreenAction:
         case ActionType::buzzerAction:
+        case ActionType::showIntercomInformer:
             return false;
 
         case ActionType::acknowledgeAction:
@@ -99,6 +101,7 @@ bool requiresAdditionalUserResource(ActionType actionType)
         case ActionType::fullscreenCameraAction:
         case ActionType::exitFullscreenAction:
         case ActionType::buzzerAction:
+        case ActionType::showIntercomInformer:
             return false;
 
         case ActionType::bookmarkAction:
@@ -143,6 +146,7 @@ bool hasToggleState(ActionType actionType)
         case ActionType::acknowledgeAction:
         case ActionType::openLayoutAction:
         case ActionType::exitFullscreenAction:
+        case ActionType::showIntercomInformer:
             return false;
 
         case ActionType::cameraOutputAction:
@@ -248,6 +252,7 @@ QList<ActionType> userAvailableActions()
         ActionType::fullscreenCameraAction,
         ActionType::exitFullscreenAction,
         ActionType::buzzerAction,
+        ActionType::showIntercomInformer,
     };
 
     return result;

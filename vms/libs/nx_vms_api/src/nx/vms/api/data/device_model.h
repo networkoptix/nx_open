@@ -202,7 +202,10 @@ NX_REFLECTION_ENUM_CLASS(DeviceCapability,
     noAnalytics = 1 << 22,
 
     /**%apidoc The Device is initialized as an ONVIF device. */
-    isOnvif = 1 << 23
+    isOnvif = 1 << 23,
+
+    /**%apidoc The Device is an intercom. */
+    isIntercom = 1 << 24
 )
 Q_DECLARE_FLAGS(DeviceCapabilities, DeviceCapability)
 
