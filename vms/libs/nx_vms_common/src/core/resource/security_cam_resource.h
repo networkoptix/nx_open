@@ -417,6 +417,9 @@ public:
     void setPreferredServerId(const QnUuid& value);
     QnUuid preferredServerId() const;
 
+    void setRemoteArchiveSynchronizationDisabled(bool disabled);
+    bool remoteArchiveSynchronizationDisabled() const;
+
     /**
      * If preferred server is not set, assigns current server as preferred.
      */
