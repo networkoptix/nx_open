@@ -297,6 +297,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
         UserEditableMultiple<QString> forcedPrimaryProfile;
         UserEditableMultiple<QString> forcedSecondaryProfile;
         nx::vms::api::DeviceProfiles availableProfiles;
+        UserEditableMultiple<bool> remoteArchiveAutoExportDisabled;
     };
     ExpertSettings expert;
     bool isDefaultExpertSettings = false;

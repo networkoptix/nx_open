@@ -206,6 +206,9 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     connect(ui->trustCameraTimeCheckBox, &QCheckBox::clicked,
         store, &CameraSettingsDialogStore::setTrustCameraTime);
 
+    connect(ui->disableAutoExportCheckBox, &QCheckBox::clicked,
+        store, &CameraSettingsDialogStore::setRemoteArchiveAutoExportDisabled);
+
     connect(ui->logicalIdSpinBox, QnSpinboxIntValueChanged,
         store, &CameraSettingsDialogStore::setLogicalId);
 
@@ -341,6 +344,9 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     const auto logicalIdHint = HintButton::createGroupBoxHint(ui->logicalIdGroupBox);
     logicalIdHint->setHintText(
         tr("Custom number that can be assigned to a camera for quick identification and access"));
+
+    ui->disableAutoExportCheckBox->setHint(tr("Video recorded on the internal camera's "
+        "storage will not be uploaded to the main archive."));
 }
 
 CameraExpertSettingsWidget::~CameraExpertSettingsWidget()
@@ -485,9 +491,9 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
         ui->comboBoxTransport->setCurrentIndex(0/*multiple values*/);
     }
 
-    fillProfiles(state, state.expert.forcedPrimaryProfile, 
+    fillProfiles(state, state.expert.forcedPrimaryProfile,
         ui->comboBoxPrimaryProfile, /*isPrimary*/ true);
-    fillProfiles(state, state.expert.forcedSecondaryProfile, 
+    fillProfiles(state, state.expert.forcedSecondaryProfile,
         ui->comboBoxSecondaryProfile, /*isPrimary*/ false);
 
     ::setReadOnly(ui->comboBoxTransport, state.readOnly);
@@ -523,6 +529,12 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
 
     check_box_utils::setupTristateCheckbox(ui->trustCameraTimeCheckBox, state.expert.trustCameraTime);
     ::setReadOnly(ui->trustCameraTimeCheckBox, state.readOnly);
+
+    // ONVIF Profile G remote archive automatic export.
+
+    ui->remoteArchiveAutoExportGroupBox->setVisible(remoteArchiveMdSupported);
+    ui->disableAutoExportCheckBox->setChecked(
+        state.expert.remoteArchiveAutoExportDisabled.valueOr(false));
 
     // PTZ control block.
     ui->groupBoxPtzControl->setVisible(state.canSwitchPtzPresetTypes()

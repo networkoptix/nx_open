@@ -1122,6 +1122,23 @@ QnUuid QnSecurityCamResource::preferredServerId() const
     return m_userAttributes.preferredServerId;
 }
 
+void QnSecurityCamResource::setRemoteArchiveSynchronizationDisabled(bool disabled)
+{
+    QString value;
+    QnLexical::serialize(disabled, &value);
+    setProperty(ResourcePropertyKey::kRemoteArchiveSynchronizationDisabled, value);
+}
+
+bool QnSecurityCamResource::remoteArchiveSynchronizationDisabled() const
+{
+    bool isRemoteArchiveSynchronizationDisabled = false;
+    QnLexical::deserialize(
+        getProperty(ResourcePropertyKey::kRemoteArchiveSynchronizationDisabled),
+        &isRemoteArchiveSynchronizationDisabled);
+
+    return isRemoteArchiveSynchronizationDisabled;
+}
+
 void QnSecurityCamResource::updatePreferredServerId()
 {
     if (preferredServerId().isNull())
