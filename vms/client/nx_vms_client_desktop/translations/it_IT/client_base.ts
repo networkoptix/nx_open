@@ -25,9 +25,9 @@
     </message>
     <message numerus="yes">
       <source>%1 with %n attributes</source>
-      <translation type="unfinished">
-        <numerusform>%1 with %n attributes</numerusform>
-        <numerusform>%1 with %n attributes</numerusform>
+      <translation>
+        <numerusform>%1 con %n attributi</numerusform>
+        <numerusform>%1 con %n attributi</numerusform>
       </translation>
     </message>
     <message>
@@ -1005,15 +1005,15 @@
     </message>
     <message>
       <source>Copy Bookmark Text</source>
-      <translation type="unfinished">Copy Bookmark Text</translation>
+      <translation>Copia il testo del segnalibro</translation>
     </message>
     <message>
       <source>Copy Bookmarks Text</source>
-      <translation type="unfinished">Copy Bookmarks Text</translation>
+      <translation>Copia il testo dei segnalibri</translation>
     </message>
     <message>
       <source>Web Page Settings...</source>
-      <translation type="unfinished">Web Page Settings...</translation>
+      <translation>Impostazioni pagina Web...</translation>
     </message>
   </context>
   <context>
@@ -1684,23 +1684,23 @@
     </message>
     <message>
       <source>Connect only servers with public certificate</source>
-      <translation type="unfinished">Connect only servers with public certificate</translation>
+      <translation>Connetti solo server con certificato pubblico</translation>
     </message>
     <message>
       <source>Certificate storage will be cleared.</source>
-      <translation type="unfinished">Certificate storage will be cleared.</translation>
+      <translation>L'archiviazione del certificato verrà cancellata.</translation>
     </message>
     <message>
       <source>Current client instance will be disconnected.</source>
-      <translation type="unfinished">Current client instance will be disconnected.</translation>
+      <translation>L'istanza client corrente verrà disconnessa.</translation>
     </message>
     <message>
       <source>All other client windows will be closed.</source>
-      <translation type="unfinished">All other client windows will be closed.</translation>
+      <translation>Tutte le altre finestre client verranno chiuse.</translation>
     </message>
     <message>
       <source>Security settings changed</source>
-      <translation type="unfinished">Security settings changed</translation>
+      <translation>Impostazioni di sicurezza modificate</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -1708,7 +1708,7 @@
     </message>
     <message>
       <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
-      <translation type="unfinished">On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</translation>
+      <translation>Alla prima connessione al server, verrà richiesta la tua conferma di accettazione del certificato se contiene errori</translation>
     </message>
   </context>
   <context>
@@ -2015,11 +2015,11 @@
     </message>
     <message>
       <source>MitM Attack</source>
-      <translation type="unfinished">MitM Attack</translation>
+      <translation>Attacco MitM</translation>
     </message>
     <message>
       <source>MitM attack from server %1</source>
-      <translation type="unfinished">MitM attack from server %1</translation>
+      <translation>Attacco MitM dal server %1</translation>
     </message>
   </context>
   <context>
@@ -2296,7 +2296,7 @@
     </message>
     <message>
       <source>Some rules are not valid and may not work</source>
-      <translation type="unfinished">Some rules are not valid and may not work</translation>
+      <translation>Alcune regole non sono valide e potrebbero non funzionare</translation>
     </message>
   </context>
   <context>
@@ -2680,7 +2680,7 @@ to %1</source>
     <message>
       <source>Enter your account password to disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to disconnect System from %1</translation>
+      <translation>Inserisci la password del tuo account per disconnettere il sistema da %1</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -2689,12 +2689,12 @@ to %1</source>
     <message>
       <source>System disconnected from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">System disconnected from %1</translation>
+      <translation>Sistema disconnesso da %1</translation>
     </message>
     <message>
       <source>You are about to disconnect System from %1</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation type="unfinished">You are about to disconnect System from %1</translation>
+      <translation>Stai per disconnettere il sistema da %1</translation>
     </message>
     <message>
       <source>All %1 users will be deleted.</source>
@@ -2703,11 +2703,11 @@ to %1</source>
     </message>
     <message>
       <source>You will be logged out.</source>
-      <translation type="unfinished">You will be logged out.</translation>
+      <translation>Verrai disconnesso.</translation>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
-      <translation type="unfinished">System will be accessible through local network with a local administrator account.</translation>
+      <translation>Il sistema sarà accessibile tramite la rete locale con un account amministratore locale.</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -2716,7 +2716,7 @@ to %1</source>
     <message>
       <source>Cannot disconnect the System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot disconnect the System from %1</translation>
+      <translation>Impossibile disconnettere il sistema da %1</translation>
     </message>
   </context>
   <context>
@@ -2982,11 +2982,11 @@ to %1</source>
     </message>
     <message>
       <source>Save Database Backup</source>
-      <translation type="unfinished">Save Database Backup</translation>
+      <translation>Salva backup del database</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
-      <translation type="unfinished">Enter your account password to create backup</translation>
+      <translation>Inserisci la password del tuo account per creare il backup</translation>
     </message>
     <message>
       <source>Create</source>
@@ -2994,15 +2994,15 @@ to %1</source>
     </message>
     <message>
       <source>Restore from Database Backup</source>
-      <translation type="unfinished">Restore from Database Backup</translation>
+      <translation>Ripristino da backup del database</translation>
     </message>
     <message>
       <source>Enter your account password to restore System from backup</source>
-      <translation type="unfinished">Enter your account password to restore System from backup</translation>
+      <translation>Inserisci la password del tuo account per ripristinare il sistema dal backup</translation>
     </message>
     <message>
       <source>Restore</source>
-      <translation type="unfinished">Restore</translation>
+      <translation>Ripristina</translation>
     </message>
     <message>
       <source>Restore database?</source>
@@ -3429,7 +3429,7 @@ to %1</source>
     </message>
     <message>
       <source>Please enter a password.</source>
-      <translation type="unfinished">Please enter a password.</translation>
+      <translation>Per favore inserire una password.</translation>
     </message>
   </context>
   <context>
@@ -3700,7 +3700,7 @@ to %1</source>
     </message>
     <message>
       <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
-      <translation type="unfinished">You do not have a valid license installed. Please activate your commercial or trial license.</translation>
+      <translation>Non hai una licenza valida installata. Si prega di attivare la licenza commerciale o di prova.</translation>
     </message>
   </context>
   <context>
@@ -3897,11 +3897,11 @@ to %1</source>
     </message>
     <message>
       <source>Motion Search</source>
-      <translation type="unfinished">Motion Search</translation>
+      <translation>Ricerca Movimento</translation>
     </message>
     <message>
       <source>Object Search</source>
-      <translation type="unfinished">Object Search</translation>
+      <translation>Ricerca oggetti</translation>
     </message>
   </context>
   <context>
@@ -4477,7 +4477,7 @@ to %1</source>
     </message>
     <message>
       <source>Enter Fullscreen</source>
-      <translation type="unfinished">Enter Fullscreen</translation>
+      <translation>Passa a schermo intero</translation>
     </message>
   </context>
   <context>
@@ -4784,21 +4784,21 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Certificates</source>
-      <translation type="unfinished">
-        <numerusform>Certificates</numerusform>
-        <numerusform>Certificates</numerusform>
+      <translation>
+        <numerusform>Certificati</numerusform>
+        <numerusform>Certificati</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server utilizes these %n SSL certificates to authenticate its identity</source>
-      <translation type="unfinished">
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
+      <translation>
+        <numerusform>Il server utilizza questi %n certificati SSL per autenticare la propria identità</numerusform>
+        <numerusform>Il server utilizza questi %n certificati SSL per autenticare la propria identità</numerusform>
       </translation>
     </message>
     <message>
       <source>Certificate received from the server doesn&apos;t match the certificate this server is pinned to.</source>
-      <translation type="unfinished">Certificate received from the server doesn&apos;t match the certificate this server is pinned to.</translation>
+      <translation>Il certificato ricevuto dal server non corrisponde al certificato a cui è&apos;questo server.</translation>
     </message>
     <message>
       <source>Details</source>
@@ -5058,15 +5058,15 @@ to %1</source>
     </message>
     <message>
       <source>ARCHIVE ENCRYPTED</source>
-      <translation type="unfinished">ARCHIVE ENCRYPTED</translation>
+      <translation>ARCHIVIO CRIPTATO</translation>
     </message>
     <message>
       <source>Ask your system administrator to enter the encryption password to decrypt this archive</source>
-      <translation type="unfinished">Ask your system administrator to enter the encryption password to decrypt this archive</translation>
+      <translation>Chiedi al tuo amministratore di sistema di inserire la password di crittografia per decrittografare questo archivio</translation>
     </message>
     <message>
       <source>Unlock</source>
-      <translation type="unfinished">Unlock</translation>
+      <translation>Sbloccare</translation>
     </message>
   </context>
   <context>
@@ -5340,7 +5340,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>Storage is available but will not be writable because it is too small in comparison to the already present storages</source>
-      <translation type="unfinished">Storage is available but will not be writable because it is too small in comparison to the already present storages</translation>
+      <translation>La memoria è disponibile ma non sarà scrivibile perché troppo piccola rispetto alla memoria già presente</translation>
     </message>
   </context>
   <context>
@@ -5524,11 +5524,11 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>Backup storage is not configured</source>
-      <translation type="unfinished">Backup storage is not configured</translation>
+      <translation>L'archiviazione di backup non è configurata</translation>
     </message>
     <message>
       <source>Camera recording schedule is invalid</source>
-      <translation type="unfinished">Camera recording schedule is invalid</translation>
+      <translation>La programmazione della registrazione della telecamera non è valido</translation>
     </message>
   </context>
   <context>
@@ -5702,7 +5702,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>With enabled digest authentication</source>
-      <translation type="unfinished">With enabled digest authentication</translation>
+      <translation>Con autenticazione digest abilitata</translation>
     </message>
   </context>
   <context>
@@ -5725,7 +5725,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>To enable digest authentication password reset is required</source>
-      <translation type="unfinished">To enable digest authentication password reset is required</translation>
+      <translation>Per abilitare l'autenticazione digest è necessario reimpostare la password</translation>
     </message>
   </context>
   <context>
@@ -5845,11 +5845,11 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>Allow digest authentication for this user</source>
-      <translation type="unfinished">Allow digest authentication for this user</translation>
+      <translation>Consenti l'autenticazione digest per questo utente</translation>
     </message>
     <message>
       <source>Learn More</source>
-      <translation type="unfinished">Learn More</translation>
+      <translation>Per saperne di più</translation>
     </message>
   </context>
   <context>
@@ -5924,11 +5924,11 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>Password reset is required</source>
-      <translation type="unfinished">Password reset is required</translation>
+      <translation>È necessaria la reimpostazione della password</translation>
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed.</source>
-      <translation type="unfinished">Only letters, numbers and symbols %1 are allowed.</translation>
+      <translation>Sono consentite solo lettere, numeri e simboli %1.</translation>
     </message>
   </context>
   <context>
@@ -5999,7 +5999,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <name>QnWebResourceWidget</name>
     <message>
       <source>Open this web page?</source>
-      <translation type="unfinished">Open this web page?</translation>
+      <translation>Aprire questa pagina web?</translation>
     </message>
     <message>
       <source>Web page</source>
@@ -7080,63 +7080,63 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Use audio stream from this camera</source>
-      <translation type="unfinished">Use audio stream from this camera</translation>
+      <translation>Usa il flusso audio da questa telecamera</translation>
     </message>
     <message>
       <source>%1 is connected to another server. Audio stream is not available</source>
-      <translation type="unfinished">%1 is connected to another server. Audio stream is not available</translation>
+      <translation>%1 è connesso a un altro server. Il flusso audio non è disponibile</translation>
     </message>
     <message>
       <source>Selected device is connected to another server. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device is connected to another server. Audio stream is not available.</translation>
+      <translation>Il dispositivo selezionato è collegato ad un altro server. Il flusso audio non è disponibile.</translation>
     </message>
     <message>
       <source>Selected camera is connected to another server. Audio stream is not available.</source>
-      <translation type="unfinished">Selected camera is connected to another server. Audio stream is not available.</translation>
+      <translation>La telecamera selezionata è collegata ad un altro server. Il flusso audio non è disponibile.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupBandwidthSettingsWidget</name>
     <message>
       <source>Select an area on the schedule to apply chosen settings.</source>
-      <translation type="unfinished">Select an area on the schedule to apply chosen settings.</translation>
+      <translation>Seleziona un'area della pianificazione per applicare le impostazioni scelte.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupQueueSize</name>
     <message numerus="yes">
       <source>%n weeks</source>
-      <translation type="unfinished">
-        <numerusform>%n weeks</numerusform>
-        <numerusform>%n weeks</numerusform>
+      <translation>
+        <numerusform>%n settimane</numerusform>
+        <numerusform>%n settimane</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n days</source>
-      <translation type="unfinished">
-        <numerusform>%n days</numerusform>
-        <numerusform>%n days</numerusform>
+      <translation>
+        <numerusform>%n giorni</numerusform>
+        <numerusform>%n giorni</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n hours</source>
-      <translation type="unfinished">
-        <numerusform>%n hours</numerusform>
-        <numerusform>%n hours</numerusform>
+      <translation>
+        <numerusform>%n ore</numerusform>
+        <numerusform>%n ore</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n minutes</source>
-      <translation type="unfinished">
-        <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
+      <translation>
+        <numerusform>%n minuti</numerusform>
+        <numerusform>%n minuti</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n seconds</source>
-      <translation type="unfinished">
-        <numerusform>%n seconds</numerusform>
-        <numerusform>%n seconds</numerusform>
+      <translation>
+        <numerusform>%n secondi</numerusform>
+        <numerusform>%n secondi</numerusform>
       </translation>
     </message>
   </context>
@@ -7144,7 +7144,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupSettingsDecoratorModel</name>
     <message>
       <source>The camera has neither recorded footage nor recording scheduled</source>
-      <translation type="unfinished">The camera has neither recorded footage nor recording scheduled</translation>
+      <translation>La telecamera non ha né filmati né registrazioni programmate</translation>
     </message>
     <message>
       <source>Motion detection is disabled</source>
@@ -7152,7 +7152,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>No analytics plugins</source>
-      <translation type="unfinished">No analytics plugins</translation>
+      <translation>Nessun plug-in di analisi</translation>
     </message>
     <message>
       <source>Cameras</source>
@@ -7160,7 +7160,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>What to backup</source>
-      <translation type="unfinished">What to backup</translation>
+      <translation>Cosa registrare come backup</translation>
     </message>
     <message>
       <source>Quality</source>
@@ -7168,34 +7168,34 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot be modified for new added cameras</source>
-      <translation type="unfinished">Cannot be modified for new added cameras</translation>
+      <translation>Non può essere modificato per le nuove telecamere aggiunte</translation>
     </message>
     <message>
       <source>This device provides only one data stream</source>
-      <translation type="unfinished">This device provides only one data stream</translation>
+      <translation>Questo dispositivo fornisce un solo flusso di dati</translation>
     </message>
     <message>
       <source>Stream setting is not applicable to this device type</source>
-      <translation type="unfinished">Stream setting is not applicable to this device type</translation>
+      <translation>L'impostazione del flusso non è applicabile a questo tipo di dispositivo</translation>
     </message>
     <message>
       <source>Not supported</source>
-      <translation type="unfinished">Not supported</translation>
+      <translation>Non supportato</translation>
     </message>
     <message>
       <source>Backup is not supported for this device</source>
-      <translation type="unfinished">Backup is not supported for this device</translation>
+      <translation>Il backup non è supportato per questo dispositivo</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>
     <message>
       <source>Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</source>
-      <translation type="unfinished">Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</translation>
+      <translation>Utilizzare %1 o %2 per selezionare più dispositivi per la modifica in batch. Utilizzare %3 per selezionare tutti i dispositivi.</translation>
     </message>
     <message>
       <source>What to backup</source>
-      <translation type="unfinished">What to backup</translation>
+      <translation>Cosa registrare come backup</translation>
     </message>
     <message>
       <source>Quality</source>
@@ -7203,9 +7203,9 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>Set for %n selected devices</source>
-      <translation type="unfinished">
-        <numerusform>Set for %n selected devices</numerusform>
-        <numerusform>Set for %n selected devices</numerusform>
+      <translation>
+        <numerusform>Imposta per %n dispositivi selezionati</numerusform>
+        <numerusform>Imposta per %n dispositivi selezionati</numerusform>
       </translation>
     </message>
   </context>
@@ -7213,7 +7213,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupSettingsViewWidget</name>
     <message>
       <source>Nothing to backup</source>
-      <translation type="unfinished">Nothing to backup</translation>
+      <translation>Niente di cui fare il backup</translation>
     </message>
   </context>
   <context>
@@ -7224,11 +7224,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Bandwidth Limit</source>
-      <translation type="unfinished">Bandwidth Limit</translation>
+      <translation>Limite di banda</translation>
     </message>
     <message>
       <source>New added cameras</source>
-      <translation type="unfinished">New added cameras</translation>
+      <translation>Nuove telecamere aggiunte</translation>
     </message>
     <message>
       <source>New added cameras settings will apply to all servers in the system.</source>

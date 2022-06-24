@@ -8135,18 +8135,18 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</source>
-      <translation type="unfinished">Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</translation>
+      <translation>Søking etter enheter på nettverket er begrenset til kameraer som støtter HTTPS-tilkoblinger. Dette kan endres i %1 -innstillinger.</translation>
     </message>
     <message>
       <source>System Administration</source>
-      <translation type="unfinished">System Administration</translation>
+      <translation>Systemadministrasjon</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EncryptedArchivePasswordDialog</name>
     <message>
       <source>Decrypt</source>
-      <translation type="unfinished">Decrypt</translation>
+      <translation>Dekrypter</translation>
     </message>
     <message>
       <source>Invalid password</source>
@@ -8207,7 +8207,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+      <translation>Prøv å endre filtrene eller opprett en hendelsesregel</translation>
     </message>
   </context>
   <context>
@@ -8263,11 +8263,11 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Archive is encrypted.</source>
-      <translation type="unfinished">Archive is encrypted.</translation>
+      <translation>Arkivet er kryptert.</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
-      <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
+      <translation>Arkivet er utilgjengelig nå. Prøv igjen senere.</translation>
     </message>
   </context>
   <context>
@@ -8382,7 +8382,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Export is not available: This camera does not have a video archive for the selected time period.</source>
-      <translation type="unfinished">Export is not available: This camera does not have a video archive for the selected time period.</translation>
+      <translation>Eksport er ikke tilgjengelig: Dette kameraet har ikke et videoarkiv for den valgte tidsperioden.</translation>
     </message>
   </context>
   <context>
@@ -8390,7 +8390,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message>
       <source>Exported: %1</source>
       <comment>Duration will be substituted</comment>
-      <translation type="unfinished">Exported: %1</translation>
+      <translation>Eksportert: %1</translation>
     </message>
   </context>
   <context>
@@ -8435,11 +8435,11 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <name>nx::vms::client::desktop::ForceSecureAuthDialog</name>
     <message>
       <source>Force secure authentication?</source>
-      <translation type="unfinished">Force secure authentication?</translation>
+      <translation>Tvinge sikker autentisering?</translation>
     </message>
     <message>
       <source>To revert this change user password reset will be required.</source>
-      <translation type="unfinished">To revert this change user password reset will be required.</translation>
+      <translation>For å tilbakestille denne endringen vil tilbakestilling av brukerpassord være nødvendig.</translation>
     </message>
     <message>
       <source>Do not show this message again</source>
@@ -8483,7 +8483,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>Klikk på ikonet for å lese mer</translation>
     </message>
   </context>
   <context>
@@ -8634,21 +8634,21 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <name>nx::vms::client::desktop::LocalSessionTokenExpirationWatcher</name>
     <message>
       <source>Your session expires soon</source>
-      <translation type="unfinished">Your session expires soon</translation>
+      <translation>Økten din utløper snart</translation>
     </message>
     <message>
       <source>Re-Authenticate Now</source>
-      <translation type="unfinished">Re-Authenticate Now</translation>
+      <translation>Autentiser på nytt nå</translation>
     </message>
     <message>
       <source>Less than a minute left</source>
-      <translation type="unfinished">Less than a minute left</translation>
+      <translation>Mindre enn ett minutt igjen</translation>
     </message>
     <message numerus="yes">
       <source>%n minutes left</source>
-      <translation type="unfinished">
-        <numerusform>%n minutes left</numerusform>
-        <numerusform>%n minutes left</numerusform>
+      <translation>
+        <numerusform>%n minutter igjen</numerusform>
+        <numerusform>%n minutter igjen</numerusform>
       </translation>
     </message>
   </context>
@@ -8694,7 +8694,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <name>nx::vms::client::desktop::MediaFileSettingsDialog</name>
     <message>
       <source>File Settings</source>
-      <translation type="unfinished">File Settings</translation>
+      <translation>Filinnstillinger</translation>
     </message>
   </context>
   <context>
@@ -8725,7 +8725,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Enter your account password to merge Systems</source>
-      <translation type="unfinished">Enter your account password to merge Systems</translation>
+      <translation>Skriv inn kontopassordet ditt for å slå sammen Systemer</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -8782,7 +8782,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</source>
-      <translation type="unfinished">Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</translation>
+      <translation>Valgt system har en eldre programvareversjon som er inkompatibel med gjeldende system. Oppdater det valgte systemet til det siste versjon for å slå det sammen med det gjeldende.</translation>
     </message>
     <message>
       <source>The password or user name is invalid.</source>
@@ -8810,11 +8810,11 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>You are about to merge Systems with NVR licenses.</source>
-      <translation type="unfinished">You are about to merge Systems with NVR licenses.</translation>
+      <translation>Du er i ferd med å slå sammen Systemer med NVR-lisenser.</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per System, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one NVR license is allowed per System, so the second license will be deactivated.</translation>
+      <translation>Bare én NVR-lisens er tillatt per system, så den andre lisensen vil bli deaktivert.</translation>
     </message>
     <message>
       <source>Could not configure the remote System %1.</source>
