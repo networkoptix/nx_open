@@ -1,10 +1,5 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-/**********************************************************
-* 27 may 2014
-* a.kolesnikov
-***********************************************************/
-
 #include "jpeg_utils.h"
 
 #include <nx/utils/log/assert.h>

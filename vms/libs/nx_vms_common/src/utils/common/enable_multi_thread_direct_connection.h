@@ -1,12 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-/**********************************************************
-* 16 dec 2014
-* a.kolesnikov
-***********************************************************/
-
-#ifndef ENABLE_MULTI_THREAD_DIRECT_CONNECTION_H
-#define ENABLE_MULTI_THREAD_DIRECT_CONNECTION_H
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -77,5 +71,3 @@ private:
         m_cond.wakeAll();
     }
 };
-
-#endif  //ENABLE_MULTI_THREAD_DIRECT_CONNECTION_H

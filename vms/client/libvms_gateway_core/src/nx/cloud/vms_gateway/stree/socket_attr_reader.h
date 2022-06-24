@@ -1,10 +1,5 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-/**********************************************************
-* Sep 15, 2015
-* a.kolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <nx/utils/stree/resourcecontainer.h>

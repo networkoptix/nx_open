@@ -1,10 +1,5 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-/**********************************************************
-* Jul 30, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include <nx/utils/string.h>
 
 #include <gtest/gtest.h>

@@ -1,12 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-/**********************************************************
-* 6 may 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_CDB_ATTR_NS_H
-#define NX_CDB_ATTR_NS_H
+#pragma once
 
 #include <nx/utils/stree/resourcenameset.h>
 
@@ -72,5 +66,3 @@ public:
 }   //namespace cloud
 }   //namespace gateway
 }   //namespace nx
-
-#endif  //NX_CDB_ATTR_NS_H

@@ -1,10 +1,5 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-/**********************************************************
-* 27 dec 2014
-* a.kolesnikov
-***********************************************************/
-
 #include "waiting_for_qthread_to_empty_event_queue.h"
 
 #include <nx/utils/thread/mutex.h>

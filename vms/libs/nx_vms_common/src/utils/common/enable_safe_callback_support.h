@@ -1,12 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-/**********************************************************
-* 23 dec 2014
-* a.kolesnikov
-***********************************************************/
-
-#ifndef ENABLE_SAFE_CALLBACK_SUPPORT_H
-#define ENABLE_SAFE_CALLBACK_SUPPORT_H
+#pragma once
 
 #include <condition_variable>
 #include <mutex>
@@ -86,5 +80,3 @@ private:
     qint64 m_receiverUsed;
     qint64 m_prevGivenReceiverID;
 };
-
-#endif  //ENABLE_SAFE_CALLBACK_SUPPORT_H

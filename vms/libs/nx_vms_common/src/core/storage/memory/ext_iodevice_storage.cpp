@@ -1,10 +1,5 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-/**********************************************************
-* 29 apr 2013
-* a.kolesnikov
-***********************************************************/
-
 #include "ext_iodevice_storage.h"
 
 #include <nx/utils/thread/mutex.h>

@@ -1,10 +1,5 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-/**********************************************************
-* 08 oct 2012
-* a.kolesnikov
-***********************************************************/
-
 #include "decodedpicturetoopengluploader.h"
 
 #include <algorithm>

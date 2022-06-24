@@ -1,12 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-/**********************************************************
-* 3 sep 2014
-* a.kolesnikov
-***********************************************************/
-
-#ifndef QN_CAMERA_LIST_REPLY_H
-#define QN_CAMERA_LIST_REPLY_H
+#pragma once
 
 #include <nx/utils/uuid.h>
 
@@ -24,5 +18,3 @@ public:
 
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraListReply, (json)(ubjson), NX_VMS_COMMON_API)
 Q_DECLARE_METATYPE(QnCameraListReply)
-
-#endif  //QN_CAMERA_LIST_REPLY_H

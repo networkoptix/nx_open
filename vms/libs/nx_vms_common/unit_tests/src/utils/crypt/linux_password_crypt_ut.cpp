@@ -1,10 +1,5 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-/**********************************************************
-* Oct 21, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include <gtest/gtest.h>
 
 #include <nx/utils/crypt/linux_passwd_crypt.h>
