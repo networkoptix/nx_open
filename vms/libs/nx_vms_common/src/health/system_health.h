@@ -49,7 +49,7 @@ enum MessageType
     cameraRecordingScheduleIsInvalid = 22, //< Generated on the client side.
     replacedDeviceDiscovered = 23, //< Camera discovered is currently replaced by the given one.
 
-    RemoteArchiveSyncPending = 24,
+    RemoteArchiveSyncAvailable = 24,
 
     // IMPORTANT!!!
     // Enum order change is forbidden as leads to stored settings failure and protocol change.

@@ -99,8 +99,8 @@ QString QnSystemHealthStringsHelper::messageText(QnSystemHealth::MessageType mes
         case QnSystemHealth::NoInternetForTimeSync:
             return tr("No server has internet access for time synchronization");
 
-        case QnSystemHealth::RemoteArchiveSyncPending:
-            return tr("Remote archive synchronization pending");
+        case QnSystemHealth::RemoteArchiveSyncAvailable:
+            return tr("Remote archive synchronization available");
         case QnSystemHealth::RemoteArchiveSyncStarted:
             return tr("Remote archive synchronization has been started");
         case QnSystemHealth::RemoteArchiveSyncFinished:
