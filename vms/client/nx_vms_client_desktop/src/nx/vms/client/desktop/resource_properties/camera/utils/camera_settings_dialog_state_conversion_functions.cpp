@@ -296,6 +296,12 @@ void setRtpTransportType(nx::vms::api::RtpTransportType value, const Cameras& ca
         camera->setProperty(QnMediaResource::rtpTransportKey(), valueStr);
 }
 
+void setRemoteArchiveAutoExportDisabled(const bool& value, const Cameras& cameras)
+{
+    for (const auto& camera: cameras)
+        camera->setRemoteArchiveSynchronizationDisabled(value);
+}
+
 void setTrustCameraTime(bool value, const Cameras& cameras)
 {
     for (const auto& camera: cameras)
@@ -709,6 +715,13 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
 
     if (state.expert.rtpTransportType.hasValue())
         setRtpTransportType(state.expert.rtpTransportType(), cameras);
+
+    if (state.expert.remoteArchiveAutoExportDisabled.hasValue())
+    {
+        setRemoteArchiveAutoExportDisabled(
+            state.expert.remoteArchiveAutoExportDisabled(),
+            cameras);
+    }
 
     if (state.expert.customMediaPort.hasValue())
         setCustomMediaPort(state.expert.customMediaPort(), cameras);

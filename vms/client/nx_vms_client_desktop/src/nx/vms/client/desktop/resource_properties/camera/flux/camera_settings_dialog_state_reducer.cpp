@@ -479,6 +479,9 @@ bool isDefaultExpertSettings(const State& state)
     if (state.expert.trustCameraTime.valueOr(true))
         return false;
 
+    if (state.expert.remoteArchiveAutoExportDisabled.valueOr(true))
+        return false;
+
     return state.expert.rtpTransportType.hasValue()
         && state.expert.rtpTransportType() == vms::api::RtpTransportType::automatic;
 }
@@ -1210,6 +1213,9 @@ State CameraSettingsDialogStateReducer::loadCameras(
                 camera->getProperty(QnMediaResource::rtpTransportKey()).toStdString(),
                 vms::api::RtpTransportType::automatic);
         });
+
+    fetchFromCameras<bool>(state.expert.remoteArchiveAutoExportDisabled, cameras,
+        [](const Camera& camera) { return camera->remoteArchiveSynchronizationDisabled(); });
 
     fetchFromCameras<bool>(state.expert.trustCameraTime, cameras,
         [](const Camera& camera)
@@ -2266,6 +2272,17 @@ State CameraSettingsDialogStateReducer::setRtpTransportType(
     return state;
 }
 
+State CameraSettingsDialogStateReducer::setRemoteArchiveAutoExportDisabled(
+    State state, const bool& value)
+{
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
+    state.expert.remoteArchiveAutoExportDisabled.setUser(value);
+    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+    state.hasChanges = true;
+    return state;
+}
+
 State CameraSettingsDialogStateReducer::setMotionStream(State state, StreamIndex value)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
@@ -2383,6 +2400,7 @@ State CameraSettingsDialogStateReducer::resetExpertSettings(State state)
     state = setForcedPtzPanTiltCapability(std::move(state), false);
     state = setForcedPtzZoomCapability(std::move(state), false);
     state = setRtpTransportType(std::move(state), nx::vms::api::RtpTransportType::automatic);
+    state = setRemoteArchiveAutoExportDisabled(std::move(state), false);
     state = setCustomMediaPortUsed(std::move(state), false);
     state = setTrustCameraTime(std::move(state), false);
     state = setLogicalId(std::move(state), {});

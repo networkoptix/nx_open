@@ -363,6 +363,31 @@
               </widget>
              </item>
              <item>
+              <widget class="QGroupBox" name="remoteArchiveAutoExportGroupBox">
+               <property name="title">
+                <string>Export From SD Cards</string>
+               </property>
+               <property name="flat">
+                <bool>true</bool>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_6_1">
+                <item>
+                 <widget class="nx::vms::client::desktop::CheckBoxWithHint" name="disableAutoExportCheckBox">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>Do not export video automatically</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
               <widget class="QGroupBox" name="timeSettingsGroupBox">
                <property name="title">
                 <string>Time Settings</string>
