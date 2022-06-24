@@ -265,7 +265,7 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::PreferencesLicensesTabAction), &QAction::triggered, this,
         [this] { openSystemAdministrationDialog(QnSystemAdministrationDialog::LicensesPage); });
     connect(action(action::PreferencesSmtpTabAction), &QAction::triggered, this,
-        [this] { openSystemAdministrationDialog(QnSystemAdministrationDialog::SmtpPage); });
+        [this] { openSystemAdministrationDialog(QnSystemAdministrationDialog::MailSettingsPage); });
     connect(action(action::PreferencesCloudTabAction), &QAction::triggered, this,
         [this]{ openSystemAdministrationDialog(QnSystemAdministrationDialog::CloudManagement); });
     connect(action(action::SystemUpdateAction), &QAction::triggered, this,

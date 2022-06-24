@@ -1365,6 +1365,19 @@ Handle ServerConnection::testEmailSettings(
         proxyToServer);
 }
 
+Handle ServerConnection::testEmailSettings(
+    Result<RestResultWithData<QnTestEmailSettingsReply>>::type&& callback,
+    QThread* targetThread,
+    std::optional<QnUuid> proxyToServer)
+{
+    return executePost(
+        "/api/testEmailSettings",
+        /*messageBody*/ QByteArray(),
+        std::move(callback),
+        targetThread,
+        proxyToServer);
+}
+
 Handle ServerConnection::getStorageStatus(
     const QnUuid& serverId,
     const QString& path,

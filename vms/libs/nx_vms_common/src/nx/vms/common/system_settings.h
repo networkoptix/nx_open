@@ -163,7 +163,7 @@ public:
     void setAutoUpdateThumbnailsEnabled(bool value);
 
     /**
-     * Send email via Cloud service instead of direct smtp connection
+     * Send email via Cloud service instead of direct SMTP connection.
      */
     bool useCloudServiceToSendEmail() const;
     void setUseCloudServiceToSendEmail(bool value);
@@ -482,6 +482,7 @@ signals:
     void cameraSettingsOptimizationChanged();
     void useHttpsOnlyCamerasChanged();
     void autoUpdateThumbnailsChanged();
+    void useCloudServiceToSendEmailChanged();
     void maxSceneItemsChanged();
     void useTextEmailFormatChanged();
     void useWindowsEmailLineFeedChanged();

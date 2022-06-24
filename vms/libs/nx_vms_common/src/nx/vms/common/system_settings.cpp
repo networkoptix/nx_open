@@ -460,7 +460,13 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         "autoUpdateThumbnails", true, this, [] { return tr("Thumbnails auto-update"); });
 
     m_useCloudServiceToSendEmailAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        "useCloudServiceToSendEmail", true, this, [] { return tr("Use cloud service to send emails instead of smtp client"); });
+        "useCloudServiceToSendEmail", false, this,
+            []
+            {
+                //: %1 will be substituted with branded cloud service name e.g. "Nx Cloud".
+                return tr("Use %1 service to send emails instead of SMTP client")
+                    .arg(nx::branding::cloudName());
+            });
 
     m_maxSceneItemsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "maxSceneItems", 0, this, [] { return tr("Max scene items (0 means default)"); });
@@ -500,7 +506,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         [] { return tr("Enable auto-update notifications"); });
 
     m_updateNotificationsEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        "updateNotificationsEnabled", true, this, [] { return tr("Enable update notificatinos"); });
+        "updateNotificationsEnabled", true, this, [] { return tr("Enable update notifications"); });
 
      m_upnpPortMappingEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "upnpPortMappingEnabled", true, this, [] { return tr("Enable UPNP port-mapping"); });
@@ -557,7 +563,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
 
     m_maxRtspConnectDuration = new QnLexicalResourcePropertyAdaptor<int>(
         "maxRtspConnectDurationSeconds", 0, this,
-        [] { return tr("MaxRTSP connection duration (seconds)"); });
+        [] { return tr("Max RTSP connection duration (seconds)"); });
 
     m_cloudConnectUdpHolePunchingEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "cloudConnectUdpHolePunchingEnabled", true, this,
@@ -580,7 +586,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
     m_maxRemoteArchiveSynchronizationThreads = new QnLexicalResourcePropertyAdaptor<int>(
         "maxRemoteArchiveSynchronizationThreads", -1,
         [](auto v) { return v >= -1 && v <= 32; }, this,
-        [] { return tr("Maxthread count for remote archive syncronization (<=0 - auto, max 32"); });
+        [] { return tr("Max thread count for remote archive synchronization (<=0 - auto, max 32"); });
 
     m_targetUpdateInformationAdaptor = new QnLexicalResourcePropertyAdaptor<QByteArray>(
         "targetUpdateInformation", QByteArray(), this,
@@ -614,7 +620,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
 
     m_sessionsLimitPerUserAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         Names::sessionsLimitPerUser, 5000, [](const int& value) { return value >= 0; }, this,
-        [] { return tr("Maxsession token count per user on single Server"); });
+        [] { return tr("Max session token count per user on single Server"); });
 
     m_remoteSessionUpdateAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         Names::remoteSessionUpdateS, 10, [](const int& value) { return value > 0; }, this,
@@ -683,7 +689,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
 
     m_additionalLocalFsTypesAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         "additionalLocalFsTypes", "", this,
-        [] { return tr("Aditional local FS storage types for recording"); });
+        [] { return tr("Additional local FS storage types for recording"); });
 
     m_keepIoPortStateIntactOnInitializationAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "keepIoPortStateIntactOnInitialization", false, this,
@@ -813,6 +819,13 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
         &SystemSettings::autoUpdateThumbnailsChanged,
+        Qt::QueuedConnection);
+
+    connect(
+        m_useCloudServiceToSendEmailAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &SystemSettings::useCloudServiceToSendEmailChanged,
         Qt::QueuedConnection);
 
     connect(

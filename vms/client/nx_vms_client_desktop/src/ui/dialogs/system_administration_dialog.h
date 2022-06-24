@@ -21,7 +21,7 @@ public:
         UserManagement,
         UpdatesPage,
         LicensesPage,
-        SmtpPage,
+        MailSettingsPage,
         SecurityPage,
         CloudManagement,
         TimeServerSelection,
