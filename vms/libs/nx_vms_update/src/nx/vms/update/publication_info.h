@@ -42,7 +42,7 @@ struct NX_VMS_UPDATE_API Package
 
 QN_FUSION_DECLARE_FUNCTIONS(Package, (hash)(json), NX_VMS_UPDATE_API)
 
-enum class NX_VMS_UPDATE_API FindPackageError
+enum class FindPackageError
 {
     notFound,
     osVersionNotSupported,

@@ -27,7 +27,7 @@ struct NX_VMS_COMMON_API Information: nx::vms::update::PublicationInfo
 
 QN_FUSION_DECLARE_FUNCTIONS(Information, (json), NX_VMS_COMMON_API)
 
-enum class NX_VMS_COMMON_API InformationError
+enum class InformationError
 {
     noError,
     networkError,
