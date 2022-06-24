@@ -520,7 +520,10 @@ QnMediaServerResourcePtr QnResourcePool::getIncompatibleServerById(
         return it.value();
 
     if (useCompatible)
-        return m_resources.value(id, QnResourcePtr()).dynamicCast<QnMediaServerResource>();
+    {
+        locker.unlock();
+        return getResourceById<QnMediaServerResource>(id);
+    }
 
     return QnMediaServerResourcePtr();
 }
