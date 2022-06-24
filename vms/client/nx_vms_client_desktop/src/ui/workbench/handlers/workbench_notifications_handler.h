@@ -4,15 +4,18 @@
 
 #include <QtCore/QObject>
 
-#include <nx/vms/event/actions/abstract_action.h>
-#include <nx/vms/event/events/abstract_event.h>
 #include <core/resource/resource_fwd.h>
 #include <health/system_health.h>
+#include <nx/vms/event/actions/abstract_action.h>
+#include <nx/vms/event/events/abstract_event.h>
 #include <ui/workbench/workbench_state_manager.h>
 
 #include <utils/common/connective.h>
 
 class QnBusinessEventsFilterResourcePropertyAdaptor;
+
+namespace nx::vms::rules { class NotificationAction; }
+namespace nx::vms::client::desktop { class CrossSystemNotificationsListener; }
 
 class QnWorkbenchNotificationsHandler:
     public Connective<QObject>,
@@ -42,6 +45,8 @@ signals:
 
     void notificationAdded(const nx::vms::event::AbstractActionPtr& action);
     void notificationRemoved(const nx::vms::event::AbstractActionPtr& action);
+    void notificationActionReceived(
+        const QSharedPointer<nx::vms::rules::NotificationAction>& notificationAction);
 
     void cleared();
 
@@ -65,4 +70,5 @@ private:
 
 private:
     QnBusinessEventsFilterResourcePropertyAdaptor* m_adaptor;
+    std::unique_ptr<nx::vms::client::desktop::CrossSystemNotificationsListener> m_listener;
 };

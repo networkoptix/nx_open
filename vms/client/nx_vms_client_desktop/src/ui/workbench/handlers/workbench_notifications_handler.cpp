@@ -27,6 +27,8 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/rules/cross_system_notifications_listener.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
@@ -34,6 +36,7 @@
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/event/actions/common_action.h>
 #include <nx/vms/event/strings_helper.h>
+#include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_event_rules_manager.h>
@@ -386,7 +389,18 @@ void QnWorkbenchNotificationsHandler::at_context_userChanged()
 {
     m_adaptor->setResource(context()->user());
     if (!context()->user())
+    {
         clear();
+        m_listener.reset();
+    }
+    else if (context()->user()->isCloud() && ini().crossSystemNotifications)
+    {
+        m_listener = std::make_unique<CrossSystemNotificationsListener>();
+        connect(m_listener.get(),
+            &CrossSystemNotificationsListener::notificationActionReceived,
+            this,
+            &QnWorkbenchNotificationsHandler::notificationActionReceived);
+    }
 }
 
 void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(

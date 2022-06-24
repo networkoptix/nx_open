@@ -11,6 +11,11 @@
 
 namespace nx::vms::rules {
 
+NotificationAction::NotificationAction():
+    m_id(QnUuid::createUuid())
+{
+}
+
 const ItemDescriptor& NotificationAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
@@ -36,6 +41,16 @@ const ItemDescriptor& NotificationAction::manifest()
         }
     };
     return kDescriptor;
+}
+
+QnUuid NotificationAction::id() const
+{
+    return m_id;
+}
+
+void NotificationAction::setId(const QnUuid& id)
+{
+    m_id = id;
 }
 
 } // namespace nx::vms::rules

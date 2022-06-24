@@ -12,6 +12,7 @@ namespace nx::vms::api {
 
 struct Notification
 {
+    QnUuid id;
     QString caption;
     QString description;
     QString tooltip;
@@ -21,7 +22,7 @@ struct Notification
     std::chrono::microseconds timestampUs;
 };
 #define Notification_Fields \
-    (caption)(description)(tooltip)(acknowledge)(cameraId)(ruleId)(timestampUs)
+    (id)(caption)(description)(tooltip)(acknowledge)(cameraId)(ruleId)(timestampUs)
 
 NX_REFLECTION_INSTRUMENT(Notification, Notification_Fields)
 
@@ -34,5 +35,15 @@ struct CloudNotificationRequest
 #define CloudNotificationRequest_Fields (systemId)(targets)(notification)
 
 NX_REFLECTION_INSTRUMENT(CloudNotificationRequest, CloudNotificationRequest_Fields)
+
+struct CloudNotification
+{
+    QString type;
+    QString systemId;
+    Notification notification;
+};
+#define CloudNotification_Fields (type)(systemId)(notification)
+
+NX_REFLECTION_INSTRUMENT(CloudNotification, CloudNotification_Fields)
 
 } // namespace nx::vms::api

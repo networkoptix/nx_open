@@ -145,6 +145,9 @@ NotificationListModel::Private::Private(NotificationListModel* q):
     connect(context()->instance<QnWorkbenchNotificationsExecutor>(),
         &QnWorkbenchNotificationsExecutor::notificationActionReceived,
         this, &NotificationListModel::Private::onNotificationAction);
+    connect(context()->instance<QnWorkbenchNotificationsHandler>(),
+        &QnWorkbenchNotificationsHandler::notificationActionReceived,
+        this, &NotificationListModel::Private::onNotificationAction);
 }
 
 NotificationListModel::Private::~Private()
@@ -162,7 +165,7 @@ void NotificationListModel::Private::onNotificationAction(
     const QSharedPointer<nx::vms::rules::NotificationAction>& action)
 {
     EventData eventData;
-    eventData.id = QnUuid::createUuid(); //< #mmalofeev Is it ok to use new id here?
+    eventData.id = action->id();
     eventData.title = action->caption();
     eventData.description = action->description();
     eventData.toolTip = action->tooltip();
