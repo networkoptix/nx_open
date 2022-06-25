@@ -7090,11 +7090,11 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Selected device is connected to another server. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device is connected to another server. Audio stream is not available.</translation>
+      <translation>Den valgte enhed er forbundet til en anden server. Audio stream er ikke tilgængelig.</translation>
     </message>
     <message>
       <source>Selected camera is connected to another server. Audio stream is not available.</source>
-      <translation type="unfinished">Selected camera is connected to another server. Audio stream is not available.</translation>
+      <translation>Det valgte kamera er forbundet til en anden server. Audio stream er ikke tilgængelig.</translation>
     </message>
   </context>
   <context>
@@ -7193,7 +7193,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>
     <message>
       <source>Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</source>
-      <translation type="unfinished">Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</translation>
+      <translation>Brug %1 eller %2 til at vælge flere enheder til batch redigering. Brug %3 til at vælge alle enheder.</translation>
     </message>
     <message>
       <source>What to backup</source>
@@ -7234,15 +7234,15 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>New added cameras settings will apply to all servers in the system.</source>
-      <translation type="unfinished">New added cameras settings will apply to all servers in the system.</translation>
+      <translation>Nye tilføjede kameraindstillinger vil gælde for alle servere i systemet.</translation>
     </message>
     <message>
       <source>Backup will be turned on for new added cameras on all servers in the system.</source>
-      <translation type="unfinished">Backup will be turned on for new added cameras on all servers in the system.</translation>
+      <translation>Backup vil blive slået til for nye tilføjede kameraer på alle servere i systemet.</translation>
     </message>
     <message>
       <source>Backup will be turned off for new added cameras on all servers in the system.</source>
-      <translation type="unfinished">Backup will be turned off for new added cameras on all servers in the system.</translation>
+      <translation>Backup vil blive slået fra for nye tilføjede kameraer på alle servere i systemet.</translation>
     </message>
     <message>
       <source>Storage Management</source>
@@ -7251,19 +7251,19 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <message>
       <source>To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation type="unfinished">To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</translation>
+      <translation>For at aktivere backup ændring &quot;Main&quot; til &quot;Backup&quot; fra nogle af lagrene i %1</translation>
     </message>
     <message>
       <source>To enable backup add more drives to use them as backup storage in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation type="unfinished">To enable backup add more drives to use them as backup storage in %1</translation>
+      <translation>For at aktivere sikkerhedskopi skal du tilføje flere drev for at bruge dem som backup-lager i %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupStatusWidget</name>
     <message>
       <source>Backup process will ignore existing footage. Only further recording will be backed up.</source>
-      <translation type="unfinished">Backup process will ignore existing footage. Only further recording will be backed up.</translation>
+      <translation>Backup proces vil ignorere eksisterende optagelser. Kun yderligere optagelse vil blive sikkerhedskopieret.</translation>
     </message>
     <message>
       <source>Skip backup for existing footage?</source>
@@ -7406,11 +7406,11 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
-      <translation type="unfinished">Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</translation>
+      <translation>Indstillingerne for kvalitet og billedfrekvens (FPS) i optagelsesskemaet bliver irrelevante.</translation>
     </message>
     <message>
       <source>Server will not push time settings to the camera.</source>
-      <translation type="unfinished">Server will not push time settings to the camera.</translation>
+      <translation>Serveren sender ikke tidsindstillinger til kameraet.</translation>
     </message>
   </context>
   <context>
@@ -7486,11 +7486,11 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Select areas on the preview to set chosen sensitivity for.</source>
-      <translation type="unfinished">Select areas on the preview to set chosen sensitivity for.</translation>
+      <translation>Vælg områder på forhåndsvisningen for at indstille den valgte følsomhed.</translation>
     </message>
     <message>
       <source>Choose a motion detection sensitivity and select some areas on the preview to set it for.</source>
-      <translation type="unfinished">Choose a motion detection sensitivity and select some areas on the preview to set it for.</translation>
+      <translation>Vælg en følsomhed for bevægelsesdetektering, og vælg områder på forhåndsvisningen for at indstille den.</translation>
     </message>
   </context>
   <context>
@@ -7644,7 +7644,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</source>
-      <translation type="unfinished">Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</translation>
+      <translation>Nogle celler i optagelsesplanen er indstillet til en ugyldig optagetilstand: %1. I løbet af de timer, der er indstillet til en ugyldig optagetilstand, optager kameraet i tilstanden &quot;Optag altid&quot;.</translation>
     </message>
     <message>
       <source>Motion Only</source>
@@ -8015,7 +8015,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
-      <translation type="unfinished">Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</translation>
+      <translation>Optagelsesplanen indeholder optagetilstande, der ikke understøttes af de valgte kameraer. Ikke-understøttede optagetilstande vil blive ændret til &quot;Optag altid&quot;.</translation>
     </message>
   </context>
   <context>
@@ -8134,7 +8134,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</source>
-      <translation type="unfinished">Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</translation>
+      <translation>Søgning efter enheder på netværket er begrænset til kameraer, der understøtter HTTPS-forbindelser. Dette kan ændres i %1 -indstillinger.</translation>
     </message>
     <message>
       <source>System Administration</source>
@@ -8266,7 +8266,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
-      <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
+      <translation>Arkivet er ikke tilgængeligt nu. Prøv igen senere.</translation>
     </message>
   </context>
   <context>
@@ -8381,7 +8381,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Export is not available: This camera does not have a video archive for the selected time period.</source>
-      <translation type="unfinished">Export is not available: This camera does not have a video archive for the selected time period.</translation>
+      <translation>Eksport er ikke tilgængelig: Dette kamera har ikke et videoarkiv i den valgte periode.</translation>
     </message>
   </context>
   <context>
@@ -8438,7 +8438,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>To revert this change user password reset will be required.</source>
-      <translation type="unfinished">To revert this change user password reset will be required.</translation>
+      <translation>For at fortryde denne ændring vil det være nødvendigt at nulstille brugeradgangskoden.</translation>
     </message>
     <message>
       <source>Do not show this message again</source>
@@ -8781,7 +8781,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</source>
-      <translation type="unfinished">Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</translation>
+      <translation>Det valgte system har en ældre softwareversion, der er uforenelig med det nuværende system. Opdater det valgte system til det seneste version for at flette det sammen med det nuværende.</translation>
     </message>
     <message>
       <source>The password or user name is invalid.</source>
@@ -8823,16 +8823,16 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+      <translation>%1 System kan kun flettes med ikke-%1. Systemnavn og adgangskode er taget fra %1 System.</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Both Systems are connected to %1. Merge is not allowed.</translation>
+      <translation>Begge systemer er forbundet til %1. Sammenfletning er ikke tilladt.</translation>
     </message>
     <message>
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation type="unfinished">Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</translation>
+      <translation>Kan ikke flette systemer, fordi de har mindst én server med den samme id. Fjern venligst denne server og prøv igen.</translation>
     </message>
     <message>
       <source>System name is not configured yet.</source>
@@ -8840,11 +8840,11 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Connection to Server could not be established. The Server&apos;s certificate is invalid.</source>
-      <translation type="unfinished">Connection to Server could not be established. The Server&apos;s certificate is invalid.</translation>
+      <translation>Forbindelsen til serveren kunne ikke oprettes. Server&apos;s certifikatet er ugyldigt.</translation>
     </message>
     <message>
       <source>Connection to Server could not be established. The Server&apos;s certificate was rejected.</source>
-      <translation type="unfinished">Connection to Server could not be established. The Server&apos;s certificate was rejected.</translation>
+      <translation>Forbindelsen til serveren kunne ikke etableres. Server&apos;s certifikatet blev afvist.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -8853,7 +8853,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <message>
       <source>%1 systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 systems have different owners. Merge is not allowed.</translation>
+      <translation>%1 systemerne har forskellige ejere. Sammenfletning er ikke tilladt.</translation>
     </message>
   </context>
   <context>
@@ -8875,7 +8875,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::MotionStreamAlerts</name>
     <message>
       <source>Current stream has high resolution. Analyzing it for motion increases CPU load.</source>
-      <translation type="unfinished">Current stream has high resolution. Analyzing it for motion increases CPU load.</translation>
+      <translation>Nuværende billedstream har høj opløsning. Analyse af denne til bevægelse øger CPU belastning.</translation>
     </message>
     <message>
       <source>Motion detection for this camera is not currently working because of changed stream resolution.
@@ -8890,16 +8890,16 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
 You can force it, but it may significantly increase CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection for some cameras will not be working because the remaining stream has too high resolution.
-You can force it, but it may significantly increase CPU load.</translation>
+      <translation>Bevægelsesdetektering for nogle kameraer vil ikke fungere, fordi den resterende billedstream har for høj opløsning.
+Du kan gennemtvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     </message>
     <message>
       <source>Motion detection for this camera will not be working because the remaining stream has too high resolution.
 You can force it, but it may significantly increase CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection for this camera will not be working because the remaining stream has too high resolution.
-You can force it, but it may significantly increase CPU load.</translation>
+      <translation>Bevægelsesdetektion for dette kamera fungerer ikke, fordi den resterende billedstream har for høj opløsning.
+Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     </message>
   </context>
   <context>
@@ -9182,7 +9182,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation type="unfinished">Applying System updates at the end of the week is not recommended.</translation>
+      <translation>Anvendelse af systemopdateringer i slutningen af ugen anbefales ikke.</translation>
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
@@ -9505,7 +9505,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</translation>
+      <translation>Proxying alt indhold udsætter enhver tjeneste eller enhed på serveren&apos;s netværk til brugerne af denne webside</translation>
     </message>
   </context>
   <context>
@@ -9735,18 +9735,18 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Allow system to optimize camera settings&quot; option in the &quot;System Administration&quot; dialog.
 You can still change quality and FPS directly on the camera.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Allow system to optimize camera settings&quot; option in the &quot;System Administration&quot; dialog.
-You can still change quality and FPS directly on the camera.</translation>
+      <translation>Kvalitet og FPS indstillinger er deaktiveret på grund af &quot;Tillad systemet at optimere kameraindstillinger&quot; indstilling i &quot;System Administration&quot; dialogen.
+Du kan stadig ændre kvalitet og FPS direkte på kameraet.</translation>
     </message>
     <message>
       <source>Quality and FPS settings are disabled for some of the selected cameras.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled for some of the selected cameras.</translation>
+      <translation>Kvalitets- og FPS-indstillinger er deaktiveret for nogle af de valgte kameraer.</translation>
     </message>
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Keep camera stream and profile settings&quot; option on the &quot;Expert&quot; tab.
 You can still change quality and FPS directly on the camera.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Keep camera stream and profile settings&quot; option on the &quot;Expert&quot; tab.
-You can still change quality and FPS directly on the camera.</translation>
+      <translation>Kvalitets- og FPS-indstillinger er deaktiveret på grund af indstillingerne &quot;Hold billedstream og profil&quot; på &quot;Ekspert&quot; fanen.
+Du kan stadig ændre kvalitet og FPS direkte på kameraet.</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
@@ -9779,7 +9779,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected devices</translation>
+      <translation>Bevægelsesdetektion er deaktiveret for nogle af de valgte kameraer</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this camera</source>
@@ -9791,27 +9791,27 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Nogle af de valgte enheder har kun én billedstream. Optagelser med og uden bevægelse vil have samme opløsning eller kvalitet.</translation>
     </message>
     <message>
       <source>This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Dette kamera har kun én billedstream. Optagelser med og uden bevægelse vil dele den samme opløsning eller kvalitet.</translation>
     </message>
     <message>
       <source>Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Nogle af de valgte kameraer har kun én stream. Optagelser med og uden bevægelse vil have den samme opløsning eller kvalitet.</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected devices</translation>
+      <translation>Objektdetektering er deaktiveret for nogle af de valgte enheder</translation>
     </message>
     <message>
       <source>Object detection is disabled for this camera</source>
-      <translation type="unfinished">Object detection is disabled for this camera</translation>
+      <translation>Objektregistrering er deaktiveret for dette kamera</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected cameras</translation>
+      <translation>Objektdetektering er deaktiveret for nogle af de valgte kameraer</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected devices</source>
@@ -9839,7 +9839,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Some of the selected I/O modules have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">Some of the selected I/O modules have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Nogle af de valgte I/O-moduler har kun én strøm. Optagelser med og uden bevægelse vil have samme opløsning eller kvalitet.</translation>
     </message>
     <message>
       <source>Object detection is disabled for this I/O module</source>
