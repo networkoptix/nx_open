@@ -365,14 +365,11 @@ int QnSecurityCamResource::getMaxFps(StreamIndex streamIndex) const
     return value.isNull() ? kDefaultMaxFps : value.toInt();
 }
 
-void QnSecurityCamResource::setMaxFps(int fps)
+void QnSecurityCamResource::setMaxFps(int fps, StreamIndex streamIndex)
 {
     nx::media::CameraMediaCapability capability = cameraMediaCapability();
-    capability.streamCapabilities[StreamIndex::primary].maxFps = fps;
+    capability.streamCapabilities[streamIndex].maxFps = fps;
     setCameraMediaCapability(capability);
-
-    setProperty(ResourcePropertyKey::kMediaCapabilities,
-        QString::fromLatin1(QJson::serialized(capability)));
 }
 
 int QnSecurityCamResource::reservedSecondStreamFps() const
