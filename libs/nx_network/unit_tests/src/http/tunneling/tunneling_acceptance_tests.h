@@ -316,7 +316,6 @@ private:
     std::unique_ptr<Client> m_tunnelingClient;
     detail::ClientFactory m_localFactory;
     detail::ClientFactory::Function m_clientFactoryBak;
-    std::unique_ptr<TestHttpServer> m_httpServer;
     http::HttpHeaders m_customHeaders;
     OpenTunnelResult m_prevClientTunnelResult;
     nx::utils::Url m_baseUrl;
@@ -326,6 +325,7 @@ private:
     std::optional<std::chrono::milliseconds> m_tunnelAuthorizationDelay;
     nx::utils::SyncQueue</*dummy*/ int> m_tunnelAuthorizationRequestedEvent;
     std::optional<std::future<void>> m_continueFuture;
+    std::unique_ptr<TestHttpServer> m_httpServer;
 
     virtual void authorize(
         const RequestContext* requestContext,
