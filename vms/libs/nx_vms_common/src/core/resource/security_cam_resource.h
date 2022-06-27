@@ -119,7 +119,7 @@ public:
 
     virtual int getMaxFps(StreamIndex streamIndex = StreamIndex::primary) const;
 
-    virtual void setMaxFps(int fps);
+    virtual void setMaxFps(int fps, StreamIndex streamIndex = StreamIndex::primary);
 
     virtual int reservedSecondStreamFps() const;
 
