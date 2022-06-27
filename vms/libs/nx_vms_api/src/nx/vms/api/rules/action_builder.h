@@ -18,11 +18,10 @@ public:
     QnUuid id;
     QString actionType;
     QList<Field> fields;
-    std::chrono::seconds intervalS = std::chrono::seconds(0);
 };
 
 #define nx_vms_api_rules_ActionBuilder_Fields \
-    (id)(actionType)(fields)(intervalS)
+    (id)(actionType)(fields)
 
 QN_FUSION_DECLARE_FUNCTIONS(ActionBuilder, (json)(ubjson)(xml), NX_VMS_API)
 
