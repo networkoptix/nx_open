@@ -270,6 +270,40 @@ argument `-DtargetDevice=<value>`, where <value> is one of the following:
 - `macos_arm64`
 
 ---------------------------------------------------------------------------------------------------
+## Signing executable files
+
+On Windows platform there is an option of signing the built executables (including the
+distribution file itself) with the software publisher certificate. To perform it, a valid
+certificate file in the PKCS#12 format is needed.
+
+Signing is performed by the `signtool.py` script which is a wrapper around native Windows
+`signtool.exe`. To enable signing, the following preparation steps must be done:
+- Save the publisher certificate file somewhere in your file system.
+- Create (preferably outside of the source tree) the configuration file. This file must contain the
+    following fields:
+    - `file`: the path to the publisher certificate file. It must be either an absolute path or a
+    path relative to the directory where the configuration file resides.
+    - `password`: the password protecting the publisher certificate file.
+    - `timestamp_servers` (optional): a list of the URLs of the trusted timestamping server. If
+        this field is present in the configuration file, the signed file will be time-stamped using
+        one of the listed servers. If this field is absent, the signed file will not be
+        time-stamped.
+
+    The example of a configuration file can be found in
+    `open/build_utils/signtool/config/config.yaml`.
+- Add a CMake argument `-DsigntoolConfig=<configuration_file_path>` to the generation stage. If
+this argument is missing, no signing will be performed.
+
+Also you can sign any file manually by calling `signtool.py` directly:
+`python build_utils/signtool/signtool.py --config <configuration_file> --file <unsigned_file> --output <signed_file>`
+
+To test the signing procedure, you can use a self-signed certificate. To generate such certificate,
+you can use the file `open/build_utils/signtool/genkey/genkey_signtool.bat`. When run, it creates
+the `certificate.p12` file and a couple of auxillary `*.pem` files in the same directory where it
+is run. We recommend to move these files outside of the source directory to maintain the
+out-of-source build concept.
+
+---------------------------------------------------------------------------------------------------
 ## Running VMS Desktop Client
 
 The VMS Desktop Client can be run directly from the build directory, without installing a
@@ -344,7 +378,7 @@ the respective build directory defined in `CMakeSettings.json`. The build direct
 previously selected configuration (if any) is not needed anymore and can be deleted manually.
 
 If you don't need advanced debugging features, you may choose one of the Release configurations -
-the basics of visual debugging like breakpoins and step-by-step execution will work anyway in most
+the basics of visual debugging like breakpoints and step-by-step execution will work anyway in most
 cases, and the build time and disk usage will be noticeably lower than with a Debug configuration.
 
 After choosing the desired build configuration and successfully finishing the CMake generation
@@ -352,7 +386,7 @@ stage, open the "Solution Explorer" side window, click the "Switch between solut
 views" toolbar button at the top of this side window (looking like a document icon with a Visual
 Studio logo on it), and in the tree below double-click the "CMake Targets View". The CMake
 generation stage will be run again, and when finished, the tree of CMake targets will appear -
-watch the "Output" window for the generetion stage progress.
+watch the "Output" window for the generation stage progress.
 
 To build the solution, right-click on "vms Project" in "Solution Explorer" and select "Build All".
 Alternatively, build only the required project of the solution, for example, right-click on
