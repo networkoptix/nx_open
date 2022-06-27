@@ -401,9 +401,9 @@ void ConnectionBase::setState(State state)
     if (state == m_state)
         return;
 
-    if (m_state >= State::Error)
+    if (state != State::Error && m_state >= State::Error)
     {
-        if (NX_ASSERT(state >= State::Error,
+        if (NX_ASSERT(state > State::Error,
             "State %1 is final and should not be changed to %2",
             toString(m_state), toString(state)))
         {
