@@ -24,6 +24,8 @@ public:
 
     nx::vms::client::desktop::GraphicsWebEngineView* webView() const;
 
+    void setMinimalTitleBarMode(bool value);
+
 protected:
     virtual int helpTopicAt(const QPointF& pos) const override;
 
@@ -31,13 +33,15 @@ protected:
     virtual QPixmap calculateDetailsIcon() const override;
     virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const override;
     virtual int calculateButtonsVisibility() const override;
+    virtual QString calculateTitleText() const override;
 
     virtual Qn::RenderStatus paintChannelBackground(
         QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) override;
 
 private:
-    void initWebActionText();
+    void initClientApiSupport();
     void setupOverlays();
+    void setupWidget();
     bool verifyCertificate(const QString& pemString, const QUrl& url);
     bool askUserToAcceptCertificate(
         const nx::network::ssl::CertificateChain& chain, const nx::utils::Url& url);
@@ -46,4 +50,5 @@ private:
     std::unique_ptr<nx::vms::client::desktop::GraphicsWebEngineView> m_webEngineView;
     bool m_validCertificate = true;
     bool m_pageLoaded = false;
+    bool m_isMinimalTitleBar = false;
 };

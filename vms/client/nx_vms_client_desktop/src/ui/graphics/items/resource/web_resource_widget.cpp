@@ -29,6 +29,12 @@
 
 using namespace nx::vms::client::desktop;
 
+namespace {
+
+const auto kDefaultWidgetMargins = QMargins(0, 36, 0, 0);
+
+} // namespace
+
 QnWebResourceWidget::QnWebResourceWidget(
     SystemContext* systemContext,
     WindowContext* windowContext,
@@ -59,11 +65,7 @@ QnWebResourceWidget::QnWebResourceWidget(
             return result;
         });
 
-    const auto contentMargins = QMarginsF(0, 36, 0, 0);
-    const auto webParams = detail::OverlayParams(Visible, OverlayFlag::bindToViewport, BaseLayer,
-        contentMargins);
-
-    addOverlayWidget(m_webEngineView.get(), webParams);
+    setupWidget();
     setFocusProxy(m_webEngineView.get());
     connect(this, &QGraphicsWidget::geometryChanged,
         m_webEngineView.get(), &GraphicsQmlView::updateWindowGeometry);
@@ -153,6 +155,17 @@ void QnWebResourceWidget::setupOverlays()
     }
 }
 
+void QnWebResourceWidget::setupWidget()
+{
+    removeOverlayWidget(m_webEngineView.get());
+
+    const auto contentMargins = m_isMinimalTitleBar ? QMargins{} : kDefaultWidgetMargins;
+    const auto webParams =
+        detail::OverlayParams(Visible, OverlayFlag::bindToViewport, BaseLayer, contentMargins);
+
+    addOverlayWidget(m_webEngineView.get(), webParams);
+}
+
 Qn::ResourceStatusOverlay QnWebResourceWidget::calculateStatusOverlay() const
 {
     switch (m_webEngineView->status())
@@ -181,6 +194,15 @@ bool QnWebResourceWidget::eventFilter(QObject* object, QEvent* event)
             if (mouseEvent->button() == Qt::RightButton)
                 return true;
         }
+        if (m_isMinimalTitleBar && event->type() == QEvent::GraphicsSceneHoverMove)
+        {
+            const auto mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
+            const bool isTitleBarHovered = titleBar()->geometry().contains(mouseEvent->pos());
+
+            // Moving a widget is only possible when the GraphicsWebEngineView accepts no buttons.
+            m_webEngineView->setAcceptedMouseButtons(
+                isTitleBarHovered ? Qt::NoButton : Qt::AllButtons);
+        }
         if (event->type() == QEvent::GraphicsSceneContextMenu)
             return true;
         if ((event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease) && !isFocused())
@@ -192,8 +214,15 @@ bool QnWebResourceWidget::eventFilter(QObject* object, QEvent* event)
 
 int QnWebResourceWidget::calculateButtonsVisibility() const
 {
-    return (base_type::calculateButtonsVisibility()
-        | Qn::FullscreenButton | Qn::BackButton | Qn::ReloadPageButton);
+    return m_isMinimalTitleBar
+        ? Qn::CloseButton
+        : (base_type::calculateButtonsVisibility()
+            | Qn::FullscreenButton | Qn::BackButton | Qn::ReloadPageButton);
+}
+
+QString QnWebResourceWidget::calculateTitleText() const
+{
+    return m_isMinimalTitleBar ? "" : base_type::calculateTitleText();
 }
 
 Qn::RenderStatus QnWebResourceWidget::paintChannelBackground(QPainter* painter, int channel,
@@ -223,6 +252,15 @@ QPixmap QnWebResourceWidget::calculateDetailsIcon() const
 nx::vms::client::desktop::GraphicsWebEngineView* QnWebResourceWidget::webView() const
 {
     return m_webEngineView.get();
+}
+
+void QnWebResourceWidget::setMinimalTitleBarMode(bool value)
+{
+    m_isMinimalTitleBar = value;
+    setOption(AlwaysShowName, !m_isMinimalTitleBar);
+    setupWidget();
+    updateButtonsVisibility();
+    updateTitleText();
 }
 
 bool QnWebResourceWidget::verifyCertificate(const QString& pemString, const QUrl& url)

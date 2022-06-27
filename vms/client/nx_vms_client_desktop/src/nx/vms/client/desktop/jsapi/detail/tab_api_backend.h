@@ -11,6 +11,7 @@
 
 class QnWorkbenchLayout;
 class QnWorkbenchContext;
+class QnWorkbenchItem;
 
 namespace nx::vms::client::desktop::jsapi::detail {
 
@@ -29,6 +30,7 @@ public:
      */
     TabApiBackend(
         QnWorkbenchContext* context,
+        QnWorkbenchItem* item,
         QnWorkbenchLayout* layout,
         QObject* parent = nullptr);
 
@@ -71,6 +73,9 @@ public:
 
     /** Save layout. */
     Error saveLayout();
+
+    /** Sets the web-page widget minimal interface mode. */
+    Error setItemMinimalInterfaceMode(bool value);
 
 signals:
     void itemAdded(const Item& item);
