@@ -552,8 +552,6 @@ std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const api::ActionBuild
         builder->addField(fieldInfo.name, std::move(field));
     }
 
-    builder->setAggregationInterval(serialized.intervalS);
-
     return builder;
 }
 
@@ -661,14 +659,7 @@ std::unique_ptr<EventField> Engine::buildEventField(const QString& fieldType) co
 std::unique_ptr<ActionField> Engine::buildActionField(const api::Field& serialized) const
 {
     auto field = buildActionField(serialized.metatype);
-
-    for (auto it = serialized.props.begin(); it != serialized.props.end(); ++it)
-    {
-        const auto& propName = it.key();
-        const auto& propValue = it.value();
-        // TODO: #spanasenko Check manifested names.
-        field->setProperty(propName.toUtf8().data(), propValue);
-    }
+    deserializeProperties(serialized.props, field.get());
 
     return field;
 }

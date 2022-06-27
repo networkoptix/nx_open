@@ -75,7 +75,6 @@ public:
      */
     void process(EventPtr event);
 
-    void setAggregationInterval(std::chrono::seconds interval);
     std::chrono::seconds aggregationInterval() const;
 
     void connectSignals();
@@ -95,6 +94,7 @@ private:
     void onTimeout();
     void updateState();
     ActionPtr buildAction();
+    void setAggregationInterval(std::chrono::seconds interval);
 
 private:
     QnUuid m_id;
