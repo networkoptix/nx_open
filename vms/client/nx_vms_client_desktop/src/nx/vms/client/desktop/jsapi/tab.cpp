@@ -13,12 +13,9 @@
 
 namespace nx::vms::client::desktop::jsapi {
 
-Tab::Tab(
-    QnWorkbenchContext* context,
-    QObject* parent)
-    :
+Tab::Tab(QnWorkbenchContext* context, QnWorkbenchItem* item, QObject* parent):
     base_type(parent),
-    d(new detail::TabApiBackend(context, context->workbench()->currentLayout()))
+    d(new detail::TabApiBackend(context, item, context->workbench()->currentLayout()))
 {
     using namespace detail;
 
@@ -99,5 +96,9 @@ QJsonObject Tab::saveLayout()
     return detail::toJsonObject(d->saveLayout());
 }
 
-} // namespace nx::vms::client::desktop::jsapi
+QJsonObject Tab::setItemMinimalInterfaceMode(bool value)
+{
+    return detail::toJsonObject(d->setItemMinimalInterfaceMode(value));
+}
 
+} // namespace nx::vms::client::desktop::jsapi
