@@ -52,20 +52,10 @@ public:
      */
     virtual QString uniqueName() const;
 
-    /**
-     * Aggregates the event. If the event is unique, then uniqueEventCount increases,
-     * totalEventCount otherwise.
-     */
-    virtual void aggregate(const EventPtr& event);
-
-    /** Returns amount of the unique aggregated events. Uniqueness is determined by the uniqueName(). */
-    size_t uniqueEventCount() const;
-
-    /** Returns total amount of the aggregated events. */
-    size_t totalEventCount() const;
-
     /** Returns the event details(such as caption, description, timestamp, source etc.). */
     virtual QVariantMap details(common::SystemContext* context) const;
+
+    QString name() const;
 
 protected:
     BasicEvent() = default;
@@ -83,11 +73,6 @@ private:
     QString m_type;
     std::chrono::microseconds m_timestamp;
     State m_state = State::none;
-
-    /** Holds events occurencies count. */
-    std::unordered_map</*unique name*/ QString, /*count*/ size_t> m_eventsHash;
-
-    QString name() const;
 };
 
 } // namespace nx::vms::rules

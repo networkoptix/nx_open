@@ -82,21 +82,25 @@ public:
     template<class T>
     const T* fieldByName(const QString& name) const
     {
-        const auto it = m_fields.find(name);
-        return (it == m_fields.end()) ? nullptr : dynamic_cast<T*>(it->second.get());
+        return fieldByNameImpl<T>(name);
     }
 
 signals:
     void stateChanged();
     void action(const ActionPtr& action);
 
+protected:
+    void buildAndEmitAction();
+
+    EventAggregatorPtr m_eventAggregator;
+
 private:
     void onTimeout();
     void updateState();
-    ActionPtr buildAction();
     void setAggregationInterval(std::chrono::seconds interval);
+    void buildAndEmitActionForTargetUsers();
+    ActionPtr buildAction(const EventAggregatorPtr& eventAggregator);
 
-private:
     QnUuid m_id;
     QnUuid m_ruleId;
     QString m_actionType;
@@ -105,8 +109,14 @@ private:
     QList<ActionField*> m_targetFields;
     std::chrono::seconds m_interval = std::chrono::seconds(0);
     QTimer m_timer;
-    EventPtr m_event;
     bool m_updateInProgress = false;
+
+    template<class T>
+    T* fieldByNameImpl(const QString& name) const
+    {
+        const auto it = m_fields.find(name);
+        return (it == m_fields.end()) ? nullptr : dynamic_cast<T*>(it->second.get());
+    }
 };
 
 } // namespace nx::vms::rules

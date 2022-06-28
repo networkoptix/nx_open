@@ -19,13 +19,8 @@ QVariantMap ServerFailureEvent::details(common::SystemContext* context) const
 
 QString ServerFailureEvent::extendedCaption(common::SystemContext* context) const
 {
-    if (totalEventCount() == 1)
-    {
-        const auto resourceName = utils::StringHelper(context).resource(serverId(), Qn::RI_WithUrl);
-        return tr("Server \"%1\" Failure").arg(resourceName);
-    }
-
-    return BasicEvent::extendedCaption();
+    const auto resourceName = utils::StringHelper(context).resource(serverId(), Qn::RI_WithUrl);
+    return tr("Server \"%1\" Failure").arg(resourceName);
 }
 
 const ItemDescriptor& ServerFailureEvent::manifest()

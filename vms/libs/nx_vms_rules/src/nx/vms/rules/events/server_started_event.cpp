@@ -26,13 +26,8 @@ QVariantMap ServerStartedEvent::details(common::SystemContext* context) const
 
 QString ServerStartedEvent::extendedCaption(common::SystemContext* context) const
 {
-    if (totalEventCount() == 1)
-    {
-        const auto resourceName = utils::StringHelper(context).resource(m_serverId, Qn::RI_WithUrl);
-        return tr("Server \"%1\" Started").arg(resourceName);
-    }
-
-    return BasicEvent::extendedCaption();
+    const auto resourceName = utils::StringHelper(context).resource(m_serverId, Qn::RI_WithUrl);
+    return tr("Server \"%1\" Started").arg(resourceName);
 }
 
 const ItemDescriptor& ServerStartedEvent::manifest()

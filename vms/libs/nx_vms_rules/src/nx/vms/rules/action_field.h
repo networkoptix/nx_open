@@ -11,7 +11,7 @@ namespace nx::vms::rules {
 /**
  * Abstract base class for storing configuration values for action builders.
  * Derived classes should provide Q_PROPERTY's for for all values used for
- * configuration of corespongind action field as well as build procedure
+ * configuration of corresponding action field as well as build procedure
  * used to get actual field value for given values and given event.
  */
 class NX_VMS_RULES_API ActionField: public Field
@@ -22,7 +22,7 @@ public:
     ActionField();
 
     virtual QSet<QString> requiredEventFields() const;
-    virtual QVariant build(const EventPtr& event) const = 0;
+    virtual QVariant build(const EventAggregatorPtr& eventAggregator) const = 0;
 };
 
 } // namespace nx::vms::rules

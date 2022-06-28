@@ -52,16 +52,11 @@ QString DeviceIpConflictEvent::detailing() const
 
 QString DeviceIpConflictEvent::extendedCaption(common::SystemContext* context) const
 {
-    if (totalEventCount() == 1)
-    {
-        const auto resourceName = utils::StringHelper(context).resource(serverId(), Qn::RI_WithUrl);
-        return QnDeviceDependentStrings::getDefaultNameFromSet(
-            context->resourcePool(),
-            tr("Device IP Conflict at %1", "Device IP Conflict at <server_name>"),
-            tr("Camera IP Conflict at %1", "Camera IP Conflict at <server_name>")).arg(resourceName);
-    }
-
-    return BasicEvent::extendedCaption();
+    const auto resourceName = utils::StringHelper(context).resource(serverId(), Qn::RI_WithUrl);
+    return QnDeviceDependentStrings::getDefaultNameFromSet(
+        context->resourcePool(),
+        tr("Device IP Conflict at %1", "Device IP Conflict at <server_name>"),
+        tr("Camera IP Conflict at %1", "Camera IP Conflict at <server_name>")).arg(resourceName);
 }
 
 const ItemDescriptor& DeviceIpConflictEvent::manifest()

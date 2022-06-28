@@ -73,7 +73,9 @@ signals:
     void idsChanged();
 
 public:
-    virtual QVariant build(const EventPtr& eventData) const override;
+    virtual QVariant build(const EventAggregatorPtr& eventAggregator) const override;
+
+    void setSelection(const UuidSelection& selection);
 };
 
 } // namespace nx::vms::rules

@@ -45,13 +45,8 @@ QString PluginDiagnosticEvent::eventCaption() const
 
 QString PluginDiagnosticEvent::extendedCaption(common::SystemContext* context) const
 {
-    if (totalEventCount() == 1)
-    {
-        const auto resourceName = utils::StringHelper(context).resource(cameraId(), Qn::RI_WithUrl);
-        return tr("%1 - %2").arg(resourceName).arg(eventCaption());
-    }
-
-    return BasicEvent::extendedCaption();
+    const auto resourceName = utils::StringHelper(context).resource(cameraId(), Qn::RI_WithUrl);
+    return tr("%1 - %2").arg(resourceName).arg(eventCaption());
 }
 
 const ItemDescriptor& PluginDiagnosticEvent::manifest()

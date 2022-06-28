@@ -4,7 +4,7 @@
 
 namespace nx::vms::rules {
 
-QVariant TargetDeviceField::build(const EventPtr& eventData) const
+QVariant TargetDeviceField::build(const EventAggregatorPtr& /*eventAggregator*/) const
 {
     return QVariant::fromValue(ids());
 }

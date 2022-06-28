@@ -13,12 +13,18 @@ bool ResourceFilterEventField::match(const QVariant& value) const
         : ids().contains(value.value<QnUuid>());
 }
 
-QVariant ResourceFilterActionField::build(const EventPtr& eventData) const
+QVariant ResourceFilterActionField::build(const EventAggregatorPtr& /*eventData*/) const
 {
     return QVariant::fromValue(UuidSelection{
         .ids = ids(),
         .all = acceptAll(),
     });
+}
+
+void ResourceFilterActionField::setSelection(const UuidSelection& selection)
+{
+    setAcceptAll(selection.all);
+    setIds(selection.ids);
 }
 
 } // namespace nx::vms::rules

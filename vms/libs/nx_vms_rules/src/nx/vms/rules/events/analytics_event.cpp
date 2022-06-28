@@ -68,17 +68,12 @@ QString AnalyticsEvent::analyticsEventCaption(common::SystemContext* context) co
 
 QString AnalyticsEvent::extendedCaption(common::SystemContext* context) const
 {
-    if (totalEventCount() == 1)
-    {
-        const auto resourceName = utils::StringHelper(context).resource(cameraId(), Qn::RI_WithUrl);
-        const auto eventCaption = analyticsEventCaption(context);
+    const auto resourceName = utils::StringHelper(context).resource(cameraId(), Qn::RI_WithUrl);
+    const auto eventCaption = analyticsEventCaption(context);
 
-        return tr("%1 at %2", "Analytics Event at some camera")
-            .arg(eventCaption)
-            .arg(resourceName);
-    }
-
-    return BasicEvent::extendedCaption();
+    return tr("%1 at %2", "Analytics Event at some camera")
+        .arg(eventCaption)
+        .arg(resourceName);
 }
 
 const ItemDescriptor& AnalyticsEvent::manifest()

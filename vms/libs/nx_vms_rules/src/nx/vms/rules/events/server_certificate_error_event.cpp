@@ -29,13 +29,8 @@ QVariantMap ServerCertificateErrorEvent::details(common::SystemContext* context)
 
 QString ServerCertificateErrorEvent::extendedCaption(common::SystemContext* context) const
 {
-    if (totalEventCount() == 1)
-    {
-        const auto resourceName = utils::StringHelper(context).resource(m_serverId, Qn::RI_WithUrl);
-        return tr("Server \"%1\" certificate error").arg(resourceName);
-    }
-
-    return BasicEvent::extendedCaption();
+    const auto resourceName = utils::StringHelper(context).resource(m_serverId, Qn::RI_WithUrl);
+    return tr("Server \"%1\" certificate error").arg(resourceName);
 }
 
 const ItemDescriptor& ServerCertificateErrorEvent::manifest()

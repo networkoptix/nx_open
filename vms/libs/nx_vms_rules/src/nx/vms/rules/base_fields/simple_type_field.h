@@ -47,7 +47,7 @@ class SimpleTypeActionField: public SimpleTypeField<T, ActionField, D>
     using SimpleTypeField<T, ActionField, D>::m_value;
 
 public:
-    virtual QVariant build(const EventPtr&) const override
+    virtual QVariant build(const EventAggregatorPtr&) const override
     {
         return QVariant::fromValue(m_value);
     };

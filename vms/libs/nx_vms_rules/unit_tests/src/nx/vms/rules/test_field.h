@@ -46,7 +46,7 @@ class TestActionField: public nx::vms::rules::ActionField
     Q_CLASSINFO("metatype", "nx.actions.field.test")
 
 public:
-    virtual QVariant build(const EventPtr&) const override { return {}; }
+    virtual QVariant build(const EventAggregatorPtr&) const override { return {}; }
 };
 
 } // namespace nx::vms::rules::test

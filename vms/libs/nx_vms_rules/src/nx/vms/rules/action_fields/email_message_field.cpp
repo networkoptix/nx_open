@@ -6,6 +6,7 @@
 #include <utils/email/message.h>
 
 #include "../basic_event.h"
+#include "../event_aggregator.h"
 
 namespace nx::vms::rules {
 
@@ -38,10 +39,10 @@ void EmailMessageField::setDescription(const QString& description)
     m_description.setText(description);
 }
 
-QVariant EmailMessageField::build(const EventPtr& event) const
+QVariant EmailMessageField::build(const EventAggregatorPtr& eventAggregator) const
 {
     // Return correct type for testing.
-    NX_ASSERT(event->type() == "nx.events.test", "Must not be called");
+    NX_ASSERT(eventAggregator->type() == "nx.events.test", "Must not be called");
     return QVariant::fromValue(nx::email::Message{});
 }
 

@@ -29,13 +29,8 @@ QVariantMap MotionEvent::details(common::SystemContext* context) const
 
 QString MotionEvent::extendedCaption(common::SystemContext* context) const
 {
-    if (totalEventCount() == 1)
-    {
-        const auto resourceName = utils::StringHelper(context).resource(cameraId(), Qn::RI_WithUrl);
-        return tr("Motion on %1").arg(resourceName);
-    }
-
-    return BasicEvent::extendedCaption();
+    const auto resourceName = utils::StringHelper(context).resource(cameraId(), Qn::RI_WithUrl);
+    return tr("Motion on %1").arg(resourceName);
 }
 
 const ItemDescriptor& MotionEvent::manifest()

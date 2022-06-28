@@ -5,14 +5,15 @@
 #include <QtCore/QVariant>
 
 #include "../basic_event.h"
+#include "../event_aggregator.h"
 
 namespace nx::vms::rules {
 
-QVariant Substitution::build(const EventPtr& event) const
+QVariant Substitution::build(const EventAggregatorPtr& eventAggregator) const
 {
     QVariant value;
-    if (event)
-        value = event->property(m_fieldName.toUtf8().data());
+    if (eventAggregator)
+        value = eventAggregator->property(m_fieldName.toUtf8().data());
 
     return value.canConvert(QVariant::String)
         ? value.toString() //< TODO: #spanasenko Refactor.

@@ -7,13 +7,22 @@
 #include <QtCore/QSet>
 #include <QtCore/QVariant>
 
+#include <core/resource/camera_resource.h>
+#include <core/resource/user_resource.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/resource_access_subject.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/qobject.h>
+#include <nx/vms/common/system_context.h>
 
 #include "action_field.h"
+#include "action_fields/target_user_field.h"
 #include "basic_action.h"
 #include "basic_event.h"
+#include "event_aggregator.h"
 #include "utils/field.h"
+#include "utils/type.h"
 
 namespace nx::vms::rules {
 
@@ -148,22 +157,22 @@ QSet<QnUuid> ActionBuilder::affectedResources(const EventPtr& event) const
 
 void ActionBuilder::process(EventPtr event)
 {
-    if (!m_event)
-        m_event = event;
+    if (!m_eventAggregator)
+        m_eventAggregator = EventAggregatorPtr::create(event);
     else
-        m_event->aggregate(event);
+        m_eventAggregator->aggregate(event);
 
     if (m_interval.count())
     {
         if (!m_timer.isActive())
         {
             m_timer.start();
-            emit action(buildAction());
+            buildAndEmitAction();
         }
     }
     else
     {
-        emit action(buildAction());
+        buildAndEmitAction();
     }
 }
 
@@ -188,10 +197,10 @@ void ActionBuilder::connectSignals()
 
 void ActionBuilder::onTimeout()
 {
-    if (!m_event)
+    if (m_eventAggregator)
     {
         m_timer.start();
-        emit action(buildAction());
+        buildAndEmitAction();
     }
 }
 
@@ -206,13 +215,76 @@ void ActionBuilder::updateState()
     emit stateChanged();
 }
 
-ActionPtr ActionBuilder::buildAction()
+void ActionBuilder::buildAndEmitAction()
 {
-    EventPtr event = std::move(m_event);
+    if (!NX_ASSERT(m_constructor) || !NX_ASSERT(m_eventAggregator))
+        return;
 
-    if (!NX_ASSERT(m_constructor) || !NX_ASSERT(event))
-        return {};
+    if (m_fields.contains(utils::kUsersFieldName))
+        buildAndEmitActionForTargetUsers();
+    else
+        emit action(buildAction(m_eventAggregator));
 
+    m_eventAggregator.reset();
+}
+
+void ActionBuilder::buildAndEmitActionForTargetUsers()
+{
+    auto targetUsersField = fieldByNameImpl<TargetUserField>(utils::kUsersFieldName);
+    if (!NX_ASSERT(targetUsersField))
+        return;
+
+    UuidSelection initialFieldValue {
+        .ids = targetUsersField->ids(),
+        .all = targetUsersField->acceptAll()
+    };
+    QSignalBlocker signalBlocker{targetUsersField};
+
+    // If the action should be shown to some users it is required to check if the user has
+    // appropriate rights to see the event details.
+    for (const auto& user: targetUsersField->users()) //< TODO: Unite users with the same access rights.
+    {
+        // Checks whether the user has rights to view the event. At the moment only cameras is
+        // required to be checked.
+        const auto filter =
+            [&user, context = targetUsersField->systemContext()](const EventPtr& event)
+            {
+                auto cameraIdProperty = event->property(utils::kCameraIdFieldName);
+                if (!cameraIdProperty.isValid() || !cameraIdProperty.canConvert<QnUuid>())
+                    return true;
+
+                QnUuid cameraId = cameraIdProperty.value<QnUuid>();
+
+                const auto cameraResource =
+                    context->resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId);
+                if (!cameraResource)
+                    return true;
+
+                return context->resourceAccessManager()->hasPermission(
+                    user,
+                    cameraResource,
+                    Qn::Permission::ViewContentPermission);
+            };
+
+        auto filteredEventAggregator = m_eventAggregator->filtered(filter);
+
+        if (!filteredEventAggregator)
+            continue;
+
+        // Substitute the initial target users with the user the aggregated event has been filtered.
+        targetUsersField->setSelection({
+            .ids = {user->getId()},
+            .all = false});
+
+        emit action(buildAction(filteredEventAggregator));
+    }
+
+    // Recover initial target users selection.
+    targetUsersField->setSelection(initialFieldValue);
+}
+
+ActionPtr ActionBuilder::buildAction(const EventAggregatorPtr& eventAggregator)
+{
     ActionPtr action(m_constructor());
     if (!action)
         return {};
@@ -228,16 +300,16 @@ ActionPtr ActionBuilder::buildAction()
         if (m_fields.contains(propertyName))
         {
             auto& field = m_fields.at(propertyName);
-            const auto value = field->build(event);
+            const auto value = field->build(eventAggregator);
             action->setProperty(propertyNameUtf8, value);
         }
         else
         {
             // Set property value only if it exists.
             if (action->property(propertyNameUtf8).isValid()
-                && event->property(propertyNameUtf8).isValid())
+                && eventAggregator->property(propertyNameUtf8).isValid())
             {
-                action->setProperty(propertyNameUtf8, event->property(propertyNameUtf8));
+                action->setProperty(propertyNameUtf8, eventAggregator->property(propertyNameUtf8));
             }
         }
     }
