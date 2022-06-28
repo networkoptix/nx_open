@@ -133,6 +133,11 @@ struct NX_VMS_COMMON_API EventParameters
     /**%apidoc[opt] */
     nx::common::metadata::Attributes attributes;
 
+    /**%apidoc[opt]
+     * Used for INVIF Profile G archive synchronization progress.
+     */
+    qreal progress = 0;
+
     bool operator==(const EventParameters& other) const = default;
 
     // TODO: #sivanov #vkutin #rvasilenko Consider implementing via std::variant or similar.
@@ -153,7 +158,6 @@ struct NX_VMS_COMMON_API EventParameters
     nx::vms::api::EventLevels getDiagnosticEventLevels() const;
     void setDiagnosticEventLevels(nx::vms::api::EventLevels levels);
 
-
     /** Hash for events aggregation. */
     QnUuid getParamsHash() const;
 };
@@ -161,7 +165,7 @@ struct NX_VMS_COMMON_API EventParameters
 #define EventParameters_Fields \
     (eventType)(eventTimestampUsec)(eventResourceId)(resourceName)(sourceServerId) \
     (reasonCode)(inputPortId)(caption)(description)(metadata)(omitDbLogging)(analyticsPluginId) \
-    (analyticsEngineId)(objectTrackId)(key)(attributes)
+    (analyticsEngineId)(objectTrackId)(key)(attributes)(progress)
 QN_FUSION_DECLARE_FUNCTIONS(EventParameters, (ubjson)(json)(xml)(csv_record), NX_VMS_COMMON_API);
 
 NX_REFLECTION_INSTRUMENT(EventParameters, EventParameters_Fields)

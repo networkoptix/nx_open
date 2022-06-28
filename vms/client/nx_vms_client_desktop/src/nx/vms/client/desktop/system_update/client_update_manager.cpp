@@ -296,7 +296,7 @@ void ClientUpdateManager::Private::notifyUserAboutSuccessfulInstallation()
     notificationsManager->setIcon(
         installationNotificationId, qnSkin->pixmap("events/update_complete.svg"));
     notificationsManager->setProgress(
-        installationNotificationId, workbench::LocalNotificationsManager::Progress::completed);
+        installationNotificationId, ProgressState::completed);
     notificationsManager->setAction(installationNotificationId, restartAction);
 }
 
@@ -327,7 +327,7 @@ void ClientUpdateManager::Private::notifyUserAboutClientAutoUpdate()
     notificationsManager->setIcon(
         autoUpdateFeatureNotificationId, qnSkin->pixmap("events/update_auto.svg"));
     notificationsManager->setProgress(
-        autoUpdateFeatureNotificationId, workbench::LocalNotificationsManager::Progress::completed);
+        autoUpdateFeatureNotificationId, ProgressState::completed);
     notificationsManager->setAction(autoUpdateFeatureNotificationId, settingsAction);
 }
 
@@ -360,7 +360,7 @@ void ClientUpdateManager::Private::showErrorNotification(const QString& message)
     {
         errorNotificationId = notificationsManager->add(message);
         notificationsManager->setProgress(
-            errorNotificationId, workbench::LocalNotificationsManager::Progress::failed);
+            errorNotificationId, ProgressState::failed);
     }
     else
     {

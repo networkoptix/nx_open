@@ -374,19 +374,19 @@ void WebDownloader::setState(State state)
         case State::Downloading:
             NX_ASSERT(prevState == State::Init);
             progressManager->setProgress(
-                m_notificationId, workbench::LocalNotificationsManager::Progress::indefinite);
+                m_notificationId, ProgressState::indefinite);
             m_downloadTimer.start();
             break;
         case State::Completed:
             NX_ASSERT(prevState == State::Downloading);
             progressManager->setProgress(m_notificationId,
-                workbench::LocalNotificationsManager::Progress::completed);
+                ProgressState::completed);
             progressManager->setTitle(m_notificationId, tr("File downloaded"));
             break;
         case State::Failed:
             NX_ASSERT(prevState == State::Downloading);
             progressManager->setProgress(
-                m_notificationId, workbench::LocalNotificationsManager::Progress::failed);
+                m_notificationId, ProgressState::failed);
             progressManager->setTitle(m_notificationId, tr("File downloading failed"));
             break;
         default:

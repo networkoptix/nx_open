@@ -27,6 +27,7 @@
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
+#include <nx/vms/client/desktop/common/utils/progress_state.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -302,10 +303,9 @@ void EventRibbon::Private::updateTile(int index)
 
     // Check whether the tile is a special progress bar tile.
     const auto progressVariant = modelIndex.data(Qn::ProgressValueRole);
-    if (progressVariant.canConvert<workbench::LocalNotificationsManager::Progress>())
+    if (progressVariant.canConvert<ProgressState>())
     {
-        const auto progress =
-            progressVariant.value<workbench::LocalNotificationsManager::Progress>();
+        const auto progress = progressVariant.value<ProgressState>();
 
         if (progress.isIndefinite() || progress.value())
         {

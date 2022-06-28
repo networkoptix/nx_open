@@ -44,7 +44,6 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageT
         case QnSystemHealth::EmailIsEmpty:
         case QnSystemHealth::NoLicenses:
         case QnSystemHealth::SmtpIsNotSet:
-        case QnSystemHealth::RemoteArchiveSyncError:
         case QnSystemHealth::DefaultCameraPasswords:
         case QnSystemHealth::NoInternetForTimeSync:
         case QnSystemHealth::UsersEmailIsEmpty:
@@ -57,6 +56,7 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageT
         case QnSystemHealth::ArchiveIntegrityFailed:
         case QnSystemHealth::backupStoragesNotConfigured:
         case QnSystemHealth::StoragesNotConfigured:
+        case QnSystemHealth::RemoteArchiveSyncError:
             return QnNotificationLevel::Value::CriticalNotification;
 
         default:
