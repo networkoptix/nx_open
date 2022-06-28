@@ -68,7 +68,7 @@ public:
     QUrlQuery toUrlQuery() const;
     QList<QPair<QString, QString>> toList() const;
     QMultiMap<QString, QString> toMap() const;
-    QJsonObject toJson() const;
+    QJsonObject toJson(bool excludeCommon = false) const;
 
     QString toString() const { return nx::containerString(toList()); }
 
