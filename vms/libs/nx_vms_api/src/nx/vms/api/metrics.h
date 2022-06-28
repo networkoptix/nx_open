@@ -123,7 +123,12 @@ using SystemManifest
 
 // -----------------------------------------------------------------------------------------------
 
-enum class AlarmLevel { none, warning, error };
+enum class AlarmLevel
+{
+    none,
+    warning,
+    error,
+};
 
 template<typename Visitor>
 constexpr auto nxReflectVisitAllEnumItems(AlarmLevel*, Visitor&& visitor)
@@ -162,7 +167,7 @@ QN_FUSION_DECLARE_FUNCTIONS(ValueRule, (json), NX_VMS_API)
 struct NX_VMS_API ValueGroupRules
 {
     QString name;
-    std::map<QString /*id*/, ValueRule> values;
+    std::map<QString, ValueRule> values;
 };
 #define ValueGroupRules_Fields (name)(values)
 QN_FUSION_DECLARE_FUNCTIONS(ValueGroupRules, (json), NX_VMS_API)
@@ -171,7 +176,7 @@ struct NX_VMS_API ResourceRules
 {
     QString name;
     QString resource;
-    std::map<QString /*id*/, ValueGroupRules> values;
+    std::map<QString, ValueGroupRules> values;
 };
 #define ResourceRules_Fields (name)(resource)(values)
 QN_FUSION_DECLARE_FUNCTIONS(ResourceRules, (json), NX_VMS_API)
