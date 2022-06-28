@@ -3,43 +3,41 @@
 #include "main_window_title_bar_widget.h"
 
 #include <QtCore/QScopedValueRollback>
-
 #include <QtGui/QDragMoveEvent>
-
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QGraphicsProxyWidget>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QMenu>
 
-#include <common/common_module.h>
 #include <client_core/client_core_module.h>
-
-#include <core/resource_access/resource_access_filter.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/layout_tour_manager.h>
+#include <common/common_module.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/layout_resource.h>
-#include <utils/math/math.h>
-
+#include <core/resource_access/resource_access_filter.h>
+#include <core/resource_management/layout_tour_manager.h>
+#include <core/resource_management/resource_pool.h>
+#include <finders/systems_finder.h>
+#include <nx/utils/app_info.h>
+#include <nx/vms/client/desktop/common/widgets/tool_button.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/system_tab_bar/system_tab_bar.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/desktop/utils/mime_data.h>
 #include <ui/common/palette.h>
 #include <ui/help/help_topic_accessor.h>
-#include <nx/vms/client/desktop/style/helper.h>
 #include <ui/widgets/cloud_status_panel.h>
 #include <ui/widgets/layout_tab_bar.h>
-#include <nx/vms/client/desktop/common/widgets/tool_button.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
-#include <ui/workbench/workbench_layout.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_display.h>
-
+#include <ui/workbench/workbench_layout.h>
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
-#include <nx/vms/client/desktop/utils/mime_data.h>
-#include <nx/utils/app_info.h>
+#include <utils/math/math.h>
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
@@ -49,6 +47,7 @@ namespace {
 const int kTitleBarHeight = 24;
 const QSize kControlButtonSize(36, kTitleBarHeight);
 const auto kTabBarButtonSize = QSize(kTitleBarHeight, kTitleBarHeight);
+const auto kSystemBarButtonSize = QSize(41, 32);
 
 QFrame* newVLine()
 {
@@ -112,6 +111,7 @@ public:
 public:
     ToolButton* mainMenuButton = nullptr;
     QnLayoutTabBar* tabBar = nullptr;
+    SystemTabBar* systemBar = nullptr;
     ToolButton* newTabButton = nullptr;
     ToolButton* currentLayoutsButton = nullptr;
     QnCloudStatusPanel* cloudPanel = nullptr;
@@ -149,7 +149,6 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
 
     setFocusPolicy(Qt::NoFocus);
     setAutoFillBackground(true);
-    setFixedHeight(kTitleBarHeight);
     setAcceptDrops(true);
     setPaletteColor(this, QPalette::Base, colorTheme()->color("dark7"));
     setPaletteColor(this, QPalette::Window, colorTheme()->color("dark7"));
@@ -204,16 +203,6 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     d->cloudPanel->setFocusPolicy(Qt::NoFocus);
     d->cloudPanel->setFixedHeight(kTitleBarHeight);
 
-    /* Layout for window buttons that can be removed from the title bar. */
-    QHBoxLayout* layout = new QHBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(0);
-
-    layout->addWidget(d->mainMenuButton);
-    layout->addWidget(newVLine());
-    layout->addWidget(d->tabBar);
-    layout->addWidget(newVLine());
-
     d->newTabButton = newActionButton(
         action::OpenNewTabAction,
         Qn::MainWindow_TitleBar_NewLayout_Help,
@@ -239,35 +228,10 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
             executeButtonMenu(d->currentLayoutsButton, layoutsMenu.data());
         });
 
-    layout->addWidget(d->newTabButton);
-    layout->addWidget(d->currentLayoutsButton);
-    layout->addStretch(1);
-    layout->addSpacing(80);
-    layout->addWidget(newVLine());
-    layout->addWidget(d->cloudPanel);
-    layout->addWidget(newVLine());
-#ifdef ENABLE_LOGIN_TO_ANOTHER_SYSTEM_BUTTON
-    layout->addWidget(newActionButton(
-        action::OpenLoginDialogAction,
-        Qn::Login_Help,
-        kControlButtonSize));
-#else
-    layout->addSpacing(8);
-#endif
-    layout->addWidget(newActionButton(
-        action::WhatsThisAction,
-        Qn::MainWindow_ContextHelp_Help,
-        kControlButtonSize));
-    layout->addWidget(newActionButton(
-        action::MinimizeAction,
-        kControlButtonSize));
-    layout->addWidget(newActionButton(
-        action::EffectiveMaximizeAction,
-        Qn::MainWindow_Fullscreen_Help,
-        kControlButtonSize));
-    layout->addWidget(newActionButton(
-        action::ExitAction,
-        kControlButtonSize));
+    if (ini().enableMultiSystemTabBar && qnSystemsFinder->systems().count() > 1)
+        initMultiSystemTabBar();
+    else
+        initLayoutsOnlyTabBar();
 
     installEventHandler({this}, {QEvent::Resize, QEvent::Move},
         this, &QnMainWindowTitleBarWidget::geometryChanged);
@@ -396,4 +360,97 @@ ToolButton* QnMainWindowTitleBarWidget::newActionButton(
     const QSize& fixedSize)
 {
     return newActionButton(actionId, Qn::Empty_Help, fixedSize);
+}
+
+void QnMainWindowTitleBarWidget::initMultiSystemTabBar()
+{
+    Q_D(QnMainWindowTitleBarWidget);
+
+    d->systemBar = new SystemTabBar(this);
+    d->systemBar->setFocusPolicy(Qt::NoFocus);
+
+    QVBoxLayout* mainLayout = new QVBoxLayout(this);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setSpacing(0);
+
+    QHBoxLayout* systemLayout = new QHBoxLayout(this);
+    QHBoxLayout* tabLayout = new QHBoxLayout(this);
+    mainLayout->addLayout(systemLayout);
+    mainLayout->addLayout(tabLayout);
+
+    systemLayout->addWidget(d->mainMenuButton);
+    systemLayout->addWidget(newVLine());
+    systemLayout->addWidget(d->systemBar);
+    systemLayout->addWidget(newVLine());
+    systemLayout->addStretch(1);
+    systemLayout->addSpacing(80);
+    systemLayout->addWidget(newVLine());
+    systemLayout->addWidget(d->cloudPanel);
+    systemLayout->addWidget(newVLine());
+    systemLayout->addWidget(newActionButton(
+        action::WhatsThisAction,
+        Qn::MainWindow_ContextHelp_Help,
+        kControlButtonSize));
+    systemLayout->addWidget(newActionButton(
+        action::MinimizeAction,
+        kControlButtonSize));
+    systemLayout->addWidget(newActionButton(
+        action::EffectiveMaximizeAction,
+        Qn::MainWindow_Fullscreen_Help,
+        kControlButtonSize));
+    systemLayout->addWidget(newActionButton(
+        action::ExitAction,
+        kControlButtonSize));
+
+    tabLayout->addWidget(d->tabBar);
+    tabLayout->addWidget(newVLine());
+
+    tabLayout->addWidget(d->newTabButton);
+    tabLayout->addWidget(d->currentLayoutsButton);
+    tabLayout->addStretch(1);
+}
+
+void QnMainWindowTitleBarWidget::initLayoutsOnlyTabBar()
+{
+    Q_D(QnMainWindowTitleBarWidget);
+
+    /* Layout for window buttons that can be removed from the title bar. */
+    QHBoxLayout* layout = new QHBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
+
+    layout->addWidget(d->mainMenuButton);
+    layout->addWidget(newVLine());
+    layout->addWidget(d->tabBar);
+    layout->addWidget(newVLine());
+
+    layout->addWidget(d->newTabButton);
+    layout->addWidget(d->currentLayoutsButton);
+    layout->addStretch(1);
+    layout->addSpacing(80);
+    layout->addWidget(newVLine());
+    layout->addWidget(d->cloudPanel);
+    layout->addWidget(newVLine());
+#ifdef ENABLE_LOGIN_TO_ANOTHER_SYSTEM_BUTTON
+    layout->addWidget(newActionButton(
+        action::OpenLoginDialogAction,
+        Qn::Login_Help,
+        kControlButtonSize));
+#else
+    layout->addSpacing(8);
+#endif
+    layout->addWidget(newActionButton(
+        action::WhatsThisAction,
+        Qn::MainWindow_ContextHelp_Help,
+        kControlButtonSize));
+    layout->addWidget(newActionButton(
+        action::MinimizeAction,
+        kControlButtonSize));
+    layout->addWidget(newActionButton(
+        action::EffectiveMaximizeAction,
+        Qn::MainWindow_Fullscreen_Help,
+        kControlButtonSize));
+    layout->addWidget(newActionButton(
+        action::ExitAction,
+        kControlButtonSize));
 }

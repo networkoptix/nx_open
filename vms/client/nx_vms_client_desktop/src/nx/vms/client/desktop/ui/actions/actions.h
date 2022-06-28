@@ -52,6 +52,11 @@ enum IDType
     DisconnectMainMenuAction,
 
     /**
+     * Removes system from system tab bar.
+     */
+    RemoveSystemFromTabBarAction,
+
+    /**
     * Switches mode to browse resources/show welcome screen
     */
     ResourcesModeAction,

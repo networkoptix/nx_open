@@ -7,11 +7,6 @@
 #include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnWorkbenchLayoutSnapshotManager;
-class QnWorkbenchContext;
-class QnWorkbenchLayout;
-class QnWorkbench;
-
 class QnLayoutTabBar:
     public QTabBar,
     public QnWorkbenchContextAware,

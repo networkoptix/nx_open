@@ -174,7 +174,8 @@ QRectF ViewportAnimator::adjustedToReal(const QGraphicsView *view, const QRectF 
         margins.setRight(margins.right() - rightCorrection);
     }
 
-    NX_ASSERT(margins.top() + margins.bottom() < viewportSize.height());
+    if (margins.top() + margins.bottom() >= viewportSize.height())
+        return adjustedRect;
 
     QMarginsF relativeMargins = Geometry::cwiseDiv(margins, view->viewport()->size());
 

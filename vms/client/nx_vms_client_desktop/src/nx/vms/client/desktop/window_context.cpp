@@ -4,6 +4,7 @@
 
 #include <QtCore/QPointer>
 
+#include <nx/vms/client/desktop/system_tab_bar/system_tab_bar_model.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/watchers/workbench_layout_aspect_ratio_watcher.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
@@ -18,6 +19,7 @@ struct WindowContext::Private
     std::unique_ptr<QnWorkbenchRenderWatcher> resourceWidgetRenderWatcher;
     std::unique_ptr<QnWorkbenchLayoutAspectRatioWatcher> layoutAspectRatioWatcher;
     std::unique_ptr<QnWorkbenchStreamSynchronizer> streamSynchronizer;
+    std::unique_ptr<SystemTabBarModel> systemTabBarModel;
 };
 
 WindowContext::WindowContext(QnWorkbenchContext* workbenchContext, QObject* parent):
@@ -32,6 +34,8 @@ WindowContext::WindowContext(QnWorkbenchContext* workbenchContext, QObject* pare
 
     // Depends on resourceWidgetRenderWatcher.
     d->streamSynchronizer = std::make_unique<QnWorkbenchStreamSynchronizer>(this);
+
+    d->systemTabBarModel = std::make_unique<SystemTabBarModel>(this);
 }
 
 WindowContext::~WindowContext()
@@ -51,6 +55,11 @@ QnWorkbenchRenderWatcher* WindowContext::resourceWidgetRenderWatcher() const
 QnWorkbenchStreamSynchronizer* WindowContext::streamSynchronizer() const
 {
     return d->streamSynchronizer.get();
+}
+
+SystemTabBarModel* WindowContext::systemTabBarModel() const
+{
+    return d->systemTabBarModel.get();
 }
 
 } // namespace nx::vms::client::desktop

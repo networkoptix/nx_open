@@ -881,6 +881,8 @@ void initialize(Manager* manager, Action* root)
     factory(BeforeExitAction)
         .flags(NoTarget);
 
+    factory(RemoveSystemFromTabBarAction)
+        .flags(NoTarget);
 
 //-------------------------------------------------------------------------------------------------
 // Slider actions.

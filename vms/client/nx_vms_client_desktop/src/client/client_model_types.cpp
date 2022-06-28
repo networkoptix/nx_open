@@ -46,4 +46,12 @@ bool QnWorkbenchState::isValid() const
         && !localSystemId.isNull();
 }
 
+namespace nx::vms::common {
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ResourceDescriptor, (json), (id)(path))
+} // namespace nx::vms::common
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnLayoutItemData, (json), \
+    QnWorkbenchStateUnsavedLayoutItem_Fields);
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnWorkbenchState::UnsavedLayout, (json), \
+    QnWorkbenchStateUnsavedLayout_Fields, (brief, true));
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnWorkbenchState, (json), QnWorkbenchState_Fields, (brief, true));

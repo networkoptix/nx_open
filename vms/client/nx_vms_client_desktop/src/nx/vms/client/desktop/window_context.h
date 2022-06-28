@@ -12,6 +12,8 @@ class QnWorkbenchStreamSynchronizer;
 
 namespace nx::vms::client::desktop {
 
+class SystemTabBarModel;
+
 class WindowContext: public QObject
 {
     Q_OBJECT
@@ -38,6 +40,8 @@ public:
      * Manages the necessary machinery for synchronized playback of cameras on the scene.
      */
     QnWorkbenchStreamSynchronizer* streamSynchronizer() const;
+
+    SystemTabBarModel* systemTabBarModel() const;
 
 private:
     struct Private;
