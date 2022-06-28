@@ -39,6 +39,9 @@ public:
     QString toolTip(int index) const;
     QString decorationPath(int index) const;
     QColor color(int index) const;
+    QString description(int index) const;
+    QVariant progress(int index) const;
+    QVariant timestamp(int index) const;
     QnResourceList displayedResourceList(int index) const;
     int helpId(int index) const;
     int priority(int index) const;

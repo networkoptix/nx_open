@@ -10,10 +10,11 @@
 #include <QtCore/QObject>
 #include <QtGui/QIcon>
 
-#include <ui/common/notification_levels.h>
-#include <nx/vms/client/desktop/common/utils/command_action.h>
-#include <nx/utils/uuid.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/common/utils/command_action.h>
+#include <nx/vms/client/desktop/common/utils/progress_state.h>
+#include <ui/common/notification_levels.h>
 
 namespace nx::vms::client::desktop::workbench {
 
@@ -22,33 +23,6 @@ class LocalNotificationsManager: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
-
-public:
-    class Progress
-    {
-    public:
-        enum State
-        {
-            completed,
-            failed,
-            indefinite,
-        };
-
-    public:
-        Progress() = default;
-        Progress(State state);
-        Progress(qreal value);
-
-        bool isCompleted() const;
-        bool isFailed() const;
-        bool isIndefinite() const;
-        std::optional<qreal> value() const;
-
-        bool operator==(const Progress& progress) const = default;
-
-    private:
-        std::variant<State, qreal> m_state = 0.0;
-    };
 
 public:
     LocalNotificationsManager(QObject* parent = nullptr);
@@ -71,8 +45,8 @@ public:
     QPixmap icon(const QnUuid& notificationId) const;
     void setIcon(const QnUuid& notificationId, const QPixmap& value);
 
-    std::optional<Progress> progress(const QnUuid& notificationId) const;
-    void setProgress(const QnUuid& notificationId, std::optional<Progress> value);
+    std::optional<ProgressState> progress(const QnUuid& notificationId) const;
+    void setProgress(const QnUuid& notificationId, std::optional<ProgressState> value);
 
     QString progressFormat(const QnUuid& notificationId) const;
     void setProgressFormat(const QnUuid& notificationId, const QString& value);
@@ -102,7 +76,7 @@ signals:
     void removed(const QnUuid& notificationId);
     void cancelRequested(const QnUuid& notificationId);
     void interactionRequested(const QnUuid& notificationId);
-    void progressChanged(const QnUuid& notificationId, std::optional<Progress> progress);
+    void progressChanged(const QnUuid& notificationId, std::optional<ProgressState> progress);
     void progressFormatChanged(const QnUuid& notificationId, const QString& format);
     void cancellableChanged(const QnUuid& notificationId, bool isCancellable);
     void titleChanged(const QnUuid& notificationId, const QString& title);
@@ -118,7 +92,7 @@ private:
         QString title;
         QString description;
         bool cancellable = false;
-        std::optional<Progress> progress;
+        std::optional<ProgressState> progress;
         CommandActionPtr action = nullptr;
         QString format;
         QPixmap icon;
@@ -130,7 +104,7 @@ private:
             const QString& title,
             const QString& description,
             bool cancellable,
-            std::optional<Progress> progress)
+            std::optional<ProgressState> progress)
             :
             title(title),
             description(description),
@@ -148,5 +122,3 @@ private:
 };
 
 } // namespace nx::vms::client::desktop::workbench
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::workbench::LocalNotificationsManager::Progress)

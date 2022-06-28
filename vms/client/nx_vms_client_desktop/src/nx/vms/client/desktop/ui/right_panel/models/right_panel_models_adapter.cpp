@@ -487,11 +487,11 @@ QVariant RightPanelModelsAdapter::data(const QModelIndex& index, int role) const
         case Qn::ProgressValueRole:
         {
             const auto progressVariant = base_type::data(index, role);
-            if (!progressVariant.canConvert<workbench::LocalNotificationsManager::Progress>())
+            if (!progressVariant.canConvert<ProgressState>())
                 return {};
 
             const auto progress
-                = progressVariant.value<workbench::LocalNotificationsManager::Progress>();
+                = progressVariant.value<ProgressState>();
 
             return progress.value() ? *progress.value() : QVariant{};
         }

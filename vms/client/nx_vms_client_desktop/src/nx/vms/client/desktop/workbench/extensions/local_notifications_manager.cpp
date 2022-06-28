@@ -4,48 +4,6 @@
 
 namespace nx::vms::client::desktop::workbench {
 
-LocalNotificationsManager::Progress::Progress(State state):
-    m_state(state)
-{
-}
-
-LocalNotificationsManager::Progress::Progress(qreal value):
-    m_state(value)
-{
-}
-
-bool LocalNotificationsManager::Progress::isCompleted() const
-{
-    if (auto state = std::get_if<State>(&m_state))
-        return *state == completed;
-
-    return false;
-}
-
-bool LocalNotificationsManager::Progress::isFailed() const
-{
-    if (auto state = std::get_if<State>(&m_state))
-        return *state == failed;
-
-    return false;
-}
-
-bool LocalNotificationsManager::Progress::isIndefinite() const
-{
-    if (auto state = std::get_if<State>(&m_state))
-        return *state == indefinite;
-
-    return false;
-}
-
-std::optional<qreal> LocalNotificationsManager::Progress::value() const
-{
-    if (auto value = std::get_if<qreal>(&m_state))
-        return *value;
-
-    return {};
-}
-
 LocalNotificationsManager::LocalNotificationsManager(QObject* parent):
     base_type(parent)
 {
@@ -152,7 +110,7 @@ void LocalNotificationsManager::setIcon(const QnUuid& notificationId, const QPix
     emit iconChanged(notificationId, value);
 }
 
-std::optional<LocalNotificationsManager::Progress> LocalNotificationsManager::progress(
+std::optional<ProgressState> LocalNotificationsManager::progress(
     const QnUuid& notificationId) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
@@ -160,7 +118,7 @@ std::optional<LocalNotificationsManager::Progress> LocalNotificationsManager::pr
 }
 
 void LocalNotificationsManager::setProgress(
-    const QnUuid& notificationId, std::optional<LocalNotificationsManager::Progress> value)
+    const QnUuid& notificationId, std::optional<ProgressState> value)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     auto iter = m_lookup.find(notificationId);

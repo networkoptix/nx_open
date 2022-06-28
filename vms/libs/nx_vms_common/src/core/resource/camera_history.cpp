@@ -164,12 +164,14 @@ void QnCameraHistoryPool::setMessageProcessor(const QnCommonMessageProcessor* me
                     if (healthMessage == QnSystemHealth::ArchiveRebuildFinished
                         || healthMessage == QnSystemHealth::ArchiveFastScanFinished
                         || healthMessage == QnSystemHealth::RemoteArchiveSyncFinished
+                        || healthMessage == QnSystemHealth::RemoteArchiveSyncError
                         || healthMessage == QnSystemHealth::RemoteArchiveSyncProgress)
                     {
                         auto eventParams = businessAction->getRuntimeParams();
                         QSet<QnUuid> cameras;
 
                         if (healthMessage == QnSystemHealth::RemoteArchiveSyncFinished
+                            || healthMessage == QnSystemHealth::RemoteArchiveSyncError
                             || healthMessage == QnSystemHealth::RemoteArchiveSyncProgress)
                         {
                             if (eventParams.metadata.cameraRefs.empty())

@@ -13,8 +13,10 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <health/system_health_helper.h>
+#include <nx/utils/metatypes.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
+#include <nx/vms/client/desktop/common/utils/progress_state.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
 #include <nx/vms/client/desktop/system_health/system_health_state.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
@@ -191,9 +193,10 @@ QString SystemHealthListModel::Private::text(int index) const
                 m_camerasWithInvalidSchedule.size());
         }
 
+        case QnSystemHealth::RemoteArchiveSyncProgress:
+            return tr("Export in progress...");
         case QnSystemHealth::RemoteArchiveSyncStarted:
         case QnSystemHealth::RemoteArchiveSyncFinished:
-        case QnSystemHealth::RemoteArchiveSyncProgress:
         case QnSystemHealth::RemoteArchiveSyncError:
         {
             // TODO: #vkutin This is bad, remove it after VMS-7724 refactor is done.
@@ -265,6 +268,47 @@ QColor SystemHealthListModel::Private::color(int index) const
 {
     return QnNotificationLevel::notificationTextColor(
         QnNotificationLevel::valueOf(m_items[index].message));
+}
+
+QString SystemHealthListModel::Private::description(int index) const
+{
+    const auto& item = m_items[index];
+    switch (item.message)
+    {
+        case QnSystemHealth::RemoteArchiveSyncProgress:
+            return item.serverData->getRuntimeParams().description;
+    }
+    return {};
+}
+
+QVariant SystemHealthListModel::Private::progress(int index) const
+{
+    const auto& item = m_items[index];
+    switch (item.message)
+    {
+        case QnSystemHealth::RemoteArchiveSyncProgress:
+        {
+            return QVariant::fromValue(
+                ProgressState(item.serverData->getRuntimeParams().progress));
+        }
+    }
+    return {};
+}
+
+QVariant SystemHealthListModel::Private::timestamp(int index) const
+{
+    const auto& item = m_items[index];
+    switch (item.message)
+    {
+        case QnSystemHealth::RemoteArchiveSyncStarted:
+        case QnSystemHealth::RemoteArchiveSyncFinished:
+        case QnSystemHealth::RemoteArchiveSyncError:
+        {
+            return QVariant::fromValue(std::chrono::microseconds(
+                item.serverData->getRuntimeParams().eventTimestampUsec));
+        }
+    }
+    return {};
 }
 
 int SystemHealthListModel::Private::helpId(int index) const
@@ -465,11 +509,22 @@ void SystemHealthListModel::Private::doAddItem(
     Item item(message, resource);
     item.serverData = action;
 
-    const auto position = std::lower_bound(m_items.cbegin(), m_items.cend(), item);
-    const auto index = std::distance(m_items.cbegin(), position);
+    auto position = std::lower_bound(m_items.begin(), m_items.end(), item);
+    const auto index = std::distance(m_items.begin(), position);
 
     if (position != m_items.end() && *position == item)
+    {
+        if (message == QnSystemHealth::MessageType::RemoteArchiveSyncProgress)
+        {
+            *position = item;
+            q->dataChanged(q->index(index), q->index(index), {
+                    Qt::DisplayRole,
+                    Qn::DescriptionTextRole,
+                    Qn::ProgressValueRole
+                });
+        }
         return; //< Item already exists.
+    }
 
     updateCachedData(message);
 
