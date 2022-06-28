@@ -49,4 +49,36 @@ public:
     nx::vms::rules::CameraConflictList conflicts;
 };
 
+class TestCameraEvent: public nx::vms::rules::BasicEvent
+{
+    Q_OBJECT
+    Q_CLASSINFO("type", "nx.events.camera")
+
+    Q_PROPERTY(QnUuid cameraId MEMBER m_cameraId)
+
+public:
+    using BasicEvent::BasicEvent;
+
+    QString uniqueName() const override
+    {
+        return makeName(m_cameraId.toString(), BasicEvent::uniqueName());
+    }
+
+    QnUuid m_cameraId;
+};
+
+class TestTimestampDependentEvent: public nx::vms::rules::BasicEvent
+{
+    Q_OBJECT
+    Q_CLASSINFO("type", "nx.events.time")
+
+public:
+    using BasicEvent::BasicEvent;
+
+    QString uniqueName() const override
+    {
+        return makeName(QString::number(timestamp().count()), BasicEvent::uniqueName());
+    }
+};
+
 } // namespace nx::vms::rules::test

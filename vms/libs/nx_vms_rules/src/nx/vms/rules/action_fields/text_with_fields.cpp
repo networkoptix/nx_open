@@ -8,6 +8,7 @@
 
 #include "../basic_event.h"
 #include "../engine.h"
+#include "../event_aggregator.h"
 #include "../manifest.h"
 #include "../utils/event_details.h"
 #include "../utils/string_helper.h"
@@ -16,60 +17,60 @@ namespace nx::vms::rules {
 
 namespace {
 
-using FormatFunction = std::function<QString(const EventPtr&, common::SystemContext*)>;
+using FormatFunction = std::function<QString(const EventAggregatorPtr&, common::SystemContext*)>;
 
 static const QChar kFunctionPrefix = '@';
 
-QString createGuid(const EventPtr&, common::SystemContext* context = nullptr)
+QString createGuid(const EventAggregatorPtr&, common::SystemContext* context = nullptr)
 {
     return QUuid::createUuid().toString(QUuid::StringFormat::WithoutBraces);
 }
 
-QString eventType(const EventPtr& event, common::SystemContext* constext = nullptr)
+QString eventType(const EventAggregatorPtr& eventAggregator, common::SystemContext* constext = nullptr)
 {
-    return event ? event->type() : QString();
+    return eventAggregator ? eventAggregator->type() : QString();
 }
 
-QString eventName(const EventPtr& event, common::SystemContext* context)
+QString eventName(const EventAggregatorPtr& eventAggregator, common::SystemContext* context)
 {
-    const auto name = event->details(context).value(utils::kNameDetailName);
+    const auto name = eventAggregator->details(context).value(utils::kNameDetailName);
     if (name.canConvert<QString>())
         return name.toString();
 
     return {};
 }
 
-QString eventCaption(const EventPtr& event, common::SystemContext* context)
+QString eventCaption(const EventAggregatorPtr& eventAggregator, common::SystemContext* context)
 {
-    const auto caption = event->details(context).value(utils::kCaptionDetailName);
+    const auto caption = eventAggregator->details(context).value(utils::kCaptionDetailName);
     if (caption.canConvert<QString>())
         return caption.toString();
 
-    if (const auto value = event->property("caption"); value.canConvert<QString>())
+    if (const auto value = eventAggregator->property("caption"); value.canConvert<QString>())
         return value.toString();
 
-    return eventName(event, context);
+    return eventName(eventAggregator, context);
 }
 
-QString eventDescription(const EventPtr& event, common::SystemContext* context)
+QString eventDescription(const EventAggregatorPtr& eventAggregator, common::SystemContext* context)
 {
-    const auto description = event->details(context).value(utils::kDescriptionDetailName);
+    const auto description = eventAggregator->details(context).value(utils::kDescriptionDetailName);
     if (description.canConvert<QString>())
         return description.toString();
 
-    if (const auto value = event->property("description"); value.canConvert<QString>())
+    if (const auto value = eventAggregator->property("description"); value.canConvert<QString>())
         return value.toString();
 
-    auto descriptor = Engine::instance()->eventDescriptor(eventType(event));
+    auto descriptor = Engine::instance()->eventDescriptor(eventType(eventAggregator));
     return descriptor ? descriptor->description : QString();
 }
 
-QString eventTooltip(const EventPtr& event, common::SystemContext* context)
+QString eventTooltip(const EventAggregatorPtr& eventAggregator, common::SystemContext* context)
 {
     QStringList result;
     const utils::StringHelper stringsHelper(context);
 
-    const auto details = event->details(context);
+    const auto details = eventAggregator->details(context);
 
     const auto name = details.value(utils::kNameDetailName);
     if (name.canConvert<QString>())
@@ -91,7 +92,7 @@ QString eventTooltip(const EventPtr& event, common::SystemContext* context)
 
     const auto count = details.value(utils::kCountDetailName);
     if (count.canConvert<size_t>())
-        result << stringsHelper.timestamp(event->timestamp(), count.value<size_t>());
+        result << stringsHelper.timestamp(eventAggregator->timestamp(), count.value<size_t>());
 
     const auto detailing = details.value(utils::kDetailingDetailName);
     if (detailing.canConvert<QString>())
@@ -121,7 +122,7 @@ TextWithFields::TextWithFields(common::SystemContext* context):
 {
 }
 
-QVariant TextWithFields::build(const EventPtr& event) const
+QVariant TextWithFields::build(const EventAggregatorPtr& eventAggregator) const
 {
     QString result;
 
@@ -134,12 +135,12 @@ QVariant TextWithFields::build(const EventPtr& event) const
             {
                 if (const auto function = formatFunction(name))
                 {
-                    result += function(event, systemContext());
+                    result += function(eventAggregator, systemContext());
                     continue;
                 }
             }
 
-            const auto propertyValue = event->property(name.toUtf8().data());
+            const auto propertyValue = eventAggregator->property(name.toUtf8().data());
             if (propertyValue.isValid() && propertyValue.canConvert(QVariant::String))
             {
                 // Found a valid event field, use it instead of the placeholder.

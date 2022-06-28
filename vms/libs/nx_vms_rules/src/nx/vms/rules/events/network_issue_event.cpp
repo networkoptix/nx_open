@@ -27,13 +27,8 @@ QVariantMap NetworkIssueEvent::details(common::SystemContext* context) const
 
 QString NetworkIssueEvent::extendedCaption(common::SystemContext* context) const
 {
-    if (totalEventCount() == 1)
-    {
-        const auto resourceName = utils::StringHelper(context).resource(serverId(), Qn::RI_WithUrl);
-        return tr("Network Issue at %1").arg(resourceName);
-    }
-
-    return BasicEvent::extendedCaption();
+    const auto resourceName = utils::StringHelper(context).resource(serverId(), Qn::RI_WithUrl);
+    return tr("Network Issue at %1").arg(resourceName);
 }
 
 const ItemDescriptor& NetworkIssueEvent::manifest()

@@ -45,13 +45,8 @@ QString CameraInputEvent::detailing() const
 
 QString CameraInputEvent::extendedCaption(common::SystemContext* context) const
 {
-    if (totalEventCount() == 1)
-    {
-        const auto resourceName = utils::StringHelper(context).resource(cameraId(), Qn::RI_WithUrl);
-        return tr("Input on %1").arg(resourceName);
-    }
-
-    return BasicEvent::extendedCaption();
+    const auto resourceName = utils::StringHelper(context).resource(cameraId(), Qn::RI_WithUrl);
+    return tr("Input on %1").arg(resourceName);
 }
 
 const ItemDescriptor& CameraInputEvent::manifest()

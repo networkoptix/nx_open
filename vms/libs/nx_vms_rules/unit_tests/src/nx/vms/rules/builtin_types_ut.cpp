@@ -2,13 +2,14 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/utils/range_adapters.h>
 #include <nx/utils/qobject.h>
+#include <nx/utils/range_adapters.h>
 #include <nx/vms/common/test_support/test_context.h>
+#include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/action_fields/builtin_fields.h>
 #include <nx/vms/rules/actions/builtin_actions.h>
-#include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/event_aggregator.h>
 #include <nx/vms/rules/event_fields/builtin_fields.h>
 #include <nx/vms/rules/events/builtin_events.h>
 #include <nx/vms/rules/plugin.h>
@@ -125,7 +126,7 @@ public:
         const auto builder = engine->buildActionBuilder(manifest.id);
         ASSERT_TRUE(builder);
 
-        const auto testEvent = QSharedPointer<TestEvent>::create();
+        const auto testEvent = EventAggregatorPtr::create(QSharedPointer<TestEvent>::create());
         const auto& meta = T::staticMetaObject;
         const auto fields = builder->fields();
 
@@ -198,7 +199,7 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionFieldRegistration<PasswordField>();
     testActionFieldRegistration<Substitution>();
     testActionFieldRegistration<TargetDeviceField>();
-    testActionFieldRegistration<TargetUserField>();
+    testActionFieldRegistration<TargetUserField>(systemContext());
     testActionFieldRegistration<TextWithFields>(systemContext());
     testActionFieldRegistration<VolumeField>();
 

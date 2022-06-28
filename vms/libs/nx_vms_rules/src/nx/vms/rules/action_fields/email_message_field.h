@@ -31,7 +31,7 @@ public:
     QString description() const;
     void setDescription(const QString& description);
 
-    virtual QVariant build(const EventPtr& event) const override;
+    virtual QVariant build(const EventAggregatorPtr& eventAggregator) const override;
 
 signals:
     void captionChanged();

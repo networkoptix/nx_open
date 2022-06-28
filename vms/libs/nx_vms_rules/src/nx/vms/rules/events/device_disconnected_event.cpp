@@ -56,21 +56,15 @@ QString DeviceDisconnectedEvent::caption(common::SystemContext* context) const
 QString DeviceDisconnectedEvent::extendedCaption(common::SystemContext* context) const
 {
     const auto camera = context->resourcePool()->getResourceById<QnVirtualCameraResource>(m_cameraId);
+    const auto resourceName = utils::StringHelper(context).resource(m_cameraId, Qn::RI_WithUrl);
 
-    if (totalEventCount() == 1)
-    {
-        const auto resourceName = utils::StringHelper(context).resource(m_cameraId, Qn::RI_WithUrl);
-
-        return QnDeviceDependentStrings::getNameFromSet(
-            context->resourcePool(),
-            QnCameraDeviceStringSet(
-                tr("Device %1 was disconnected"),
-                tr("Camera %1 was disconnected"),
-                tr("I/O Module %1 was disconnected")),
-            camera).arg(resourceName);
-    }
-
-    return BasicEvent::extendedCaption();
+    return QnDeviceDependentStrings::getNameFromSet(
+        context->resourcePool(),
+        QnCameraDeviceStringSet(
+            tr("Device %1 was disconnected"),
+            tr("Camera %1 was disconnected"),
+            tr("I/O Module %1 was disconnected")),
+        camera).arg(resourceName);
 }
 
 const ItemDescriptor& DeviceDisconnectedEvent::manifest()

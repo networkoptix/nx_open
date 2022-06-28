@@ -19,7 +19,6 @@ class TestProlongedAction: public nx::vms::rules::BasicAction
     Q_CLASSINFO("type", "nx.actions.test.prolonged")
 
 public:
-
     static ItemDescriptor manifest()
     {
         return ItemDescriptor{
@@ -28,6 +27,19 @@ public:
             .flags = ItemFlag::prolonged,
         };
     }
+};
+
+class TestActionWithTargetUsers: public nx::vms::rules::BasicAction
+{
+    Q_OBJECT
+    Q_CLASSINFO("type", "nx.actions.test.withTargetUsers")
+
+    Q_PROPERTY(nx::vms::rules::UuidSelection users MEMBER m_users)
+    Q_PROPERTY(QnUuid cameraId MEMBER m_cameraId)
+
+public:
+    nx::vms::rules::UuidSelection m_users;
+    QnUuid m_cameraId;
 };
 
 } // namespace nx::vms::rules::test

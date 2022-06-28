@@ -62,13 +62,8 @@ QString ServerConflictEvent::detailing() const
 
 QString ServerConflictEvent::extendedCaption(common::SystemContext* context) const
 {
-    if (totalEventCount() == 1)
-    {
-        const auto resourceName = utils::StringHelper(context).resource({}, Qn::RI_WithUrl); //< TODO: add resource id to the event.
-        return tr("Server \"%1\" Conflict").arg(resourceName);
-    }
-
-    return BasicEvent::extendedCaption();
+    const auto resourceName = utils::StringHelper(context).resource({}, Qn::RI_WithUrl); //< TODO: add resource id to the event.
+    return tr("Server \"%1\" Conflict").arg(resourceName);
 }
 
 const ItemDescriptor& ServerConflictEvent::manifest()

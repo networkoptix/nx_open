@@ -33,14 +33,9 @@ QVariantMap GenericEvent::details(common::SystemContext* context) const
 
 QString GenericEvent::extendedCaption() const
 {
-    if (totalEventCount() == 1)
-    {
-        return m_source.isEmpty()
-            ? tr("Generic Event")
-            : tr("Generic Event at %1").arg(m_source);
-    }
-
-    return BasicEvent::extendedCaption();
+    return m_source.isEmpty()
+        ? tr("Generic Event")
+        : tr("Generic Event at %1").arg(m_source);
 }
 
 const ItemDescriptor& GenericEvent::manifest()

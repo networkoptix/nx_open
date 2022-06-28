@@ -5,6 +5,7 @@
 #include <nx/vms/common/test_support/test_context.h>
 #include <nx/vms/rules/action_fields/builtin_fields.h>
 #include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/event_aggregator.h>
 
 #include "test_event.h"
 #include "test_router.h"
@@ -40,7 +41,7 @@ void testSimpleTypeField(const std::initializer_list<T>& values)
 
 } // namespace
 
-TEST(ActionFieldTest, SimpleTypes)
+TEST(SimpleTypeActionFieldTest, SimpleTypes)
 {
     testSimpleTypeField<FlagField>({true, false});
     testSimpleTypeField<OptionalTimeField>({-1, 0, 60, 300, 86400});
@@ -53,7 +54,7 @@ struct FormatResult
     QString format;
 };
 
-class TextWithFieldsTest:
+class ActionFieldTest:
     public common::test::ContextBasedTest,
     public ::testing::WithParamInterface<FormatResult>
 {
@@ -68,8 +69,8 @@ public:
 
     std::unique_ptr<Engine> engine;
 
-    TextWithFieldsTest()
-        :engine(new Engine(std::make_unique<TestRouter>()))
+    ActionFieldTest():
+        engine(new Engine(std::make_unique<TestRouter>()))
     {
         engine->registerEvent(TestEvent::manifest(), []{ return new TestEvent(); });
     }
@@ -80,65 +81,72 @@ public:
     }
 };
 
-TEST_F(TextWithFieldsTest, CreateGuid)
+TEST_F(ActionFieldTest, CreateGuid)
 {
     TextWithFields field(systemContext());
     field.setText("{@CreateGuid}");
-    EXPECT_TRUE(QnUuid::isUuidString(field.build(makeEvent()).toString()));
+    EXPECT_TRUE(
+        QnUuid::isUuidString(field.build(EventAggregatorPtr::create(makeEvent())).toString()));
 }
 
-TEST_F(TextWithFieldsTest, EventType)
+TEST_F(ActionFieldTest, EventType)
 {
     TextWithFields field(systemContext());
     field.setText("{@EventType}");
-    EXPECT_EQ(TestEvent::manifest().id, field.build(makeEvent()).toString());
+    EXPECT_EQ(
+        TestEvent::manifest().id,
+        field.build(EventAggregatorPtr::create(makeEvent())).toString());
 }
 
-TEST_F(TextWithFieldsTest, EventName)
+TEST_F(ActionFieldTest, EventName)
 {
     TextWithFields field(systemContext());
     field.setText("{@EventName}");
-    EXPECT_EQ(TestEvent::manifest().displayName, field.build(makeEvent()).toString());
+    EXPECT_EQ(
+        TestEvent::manifest().displayName,
+        field.build(EventAggregatorPtr::create(makeEvent())).toString());
 }
 
-TEST_F(TextWithFieldsTest, EventCaption)
+TEST_F(ActionFieldTest, EventCaption)
 {
     TextWithFields field(systemContext());
-    EventPtr event(makeEvent());
+    auto event = makeEvent();
+    auto eventAggregator = EventAggregatorPtr::create(event);
 
     field.setText("{@EventCaption}");
-    EXPECT_EQ(TestEvent::manifest().displayName, field.build(event).toString());
+    EXPECT_EQ(TestEvent::manifest().displayName, field.build(eventAggregator).toString());
 
     constexpr auto kEventCaption = "Test caption";
     event->setProperty("caption", kEventCaption);
 
-    EXPECT_EQ(kEventCaption, field.build(event).toString());
+    EXPECT_EQ(kEventCaption, field.build(eventAggregator).toString());
 }
 
-TEST_F(TextWithFieldsTest, EventDescription)
+TEST_F(ActionFieldTest, EventDescription)
 {
     TextWithFields field(systemContext());
-    EventPtr event(makeEvent());
+    auto event = makeEvent();
+    auto eventAggregator = EventAggregatorPtr::create(event);
 
     field.setText("{@EventDescription}");
-    EXPECT_EQ(TestEvent::manifest().description, field.build(event).toString());
+    EXPECT_EQ(TestEvent::manifest().description, field.build(eventAggregator).toString());
 
     constexpr auto kEventDescription = "Test description override";
     event->setProperty("description", kEventDescription);
 
-    EXPECT_EQ(kEventDescription, field.build(event).toString());
+    EXPECT_EQ(kEventDescription, field.build(eventAggregator).toString());
 }
 
-TEST_F(TextWithFieldsTest, EventTooltip)
+TEST_F(ActionFieldTest, EventTooltip)
 {
     TextWithFields field(systemContext());
 
     field.setText("{@EventTooltip}");
     // Tooltip must not be empty, at least event name and timestamp must exists.
-    EXPECT_FALSE(field.build(makeEvent()).toString().isEmpty());
+    EXPECT_FALSE(field.build(EventAggregatorPtr::create(makeEvent())).toString().isEmpty());
 }
 
-TEST_P(TextWithFieldsTest, FormatLine)
+TEST_P(ActionFieldTest, FormatLine)
 {
     const auto [expected, format] = GetParam();
 
@@ -146,7 +154,7 @@ TEST_P(TextWithFieldsTest, FormatLine)
     field.setText(format);
     SCOPED_TRACE(nx::format("Format line: %1", field.text()).toStdString());
 
-    auto result = field.build(makeEvent());
+    auto result = field.build(EventAggregatorPtr::create(makeEvent()));
     ASSERT_TRUE(result.isValid());
 
     EXPECT_EQ(expected.toStdString(), result.toString().toStdString());
@@ -183,17 +191,17 @@ static const std::vector<FormatResult> kFormatResults
 };
 
 INSTANTIATE_TEST_SUITE_P(CommonSet,
-    TextWithFieldsTest,
+    ActionFieldTest,
     ::testing::ValuesIn(kFormatResults));
 
 
-TEST(ActionFieldTest, TargetUserField)
+TEST_F(ActionFieldTest, TargetUserField)
 {
     UuidSelection selection;
     selection.ids << QnUuid::createUuid() << QnUuid::createUuid();
     selection.all = true;
 
-    TargetUserField field;
+    TargetUserField field(systemContext());
     field.setIds(selection.ids);
     field.setAcceptAll(selection.all);
 

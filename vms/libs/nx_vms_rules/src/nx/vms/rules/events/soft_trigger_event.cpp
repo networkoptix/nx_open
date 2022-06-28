@@ -69,12 +69,9 @@ QString SoftTriggerEvent::detailing() const
 
 QString SoftTriggerEvent::extendedCaption(common::SystemContext* context) const
 {
-    return totalEventCount() == 1
-        ? tr("Soft Trigger %1 at %2")
-            .arg(trigger())
-            .arg(utils::StringHelper(context).resource(cameraId(), Qn::RI_WithUrl))
-        : tr("Soft Trigger %1 has been activated multiple times")
-            .arg(trigger());
+    return tr("Soft Trigger %1 at %2")
+        .arg(trigger())
+        .arg(utils::StringHelper(context).resource(cameraId(), Qn::RI_WithUrl));
 }
 
 const ItemDescriptor& SoftTriggerEvent::manifest()

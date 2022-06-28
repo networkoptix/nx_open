@@ -58,15 +58,12 @@ QString AnalyticsObjectEvent::analyticsObjectCaption(common::SystemContext* cont
 
 QString AnalyticsObjectEvent::extendedCaption(common::SystemContext* context) const
 {
-    if (totalEventCount() == 1)
-    {
-        const auto resourceName = utils::StringHelper(context).resource(cameraId(), Qn::RI_WithUrl);
-        const auto objectCaption = analyticsObjectCaption(context);
+    const auto resourceName = utils::StringHelper(context).resource(cameraId(), Qn::RI_WithUrl);
+    const auto objectCaption = analyticsObjectCaption(context);
 
-        return tr("%1 at camera '%2'", " is detected")
-            .arg(objectCaption)
-            .arg(resourceName);
-    }
+    return tr("%1 at camera '%2'", " is detected")
+        .arg(objectCaption)
+        .arg(resourceName);
 
     return BasicEvent::extendedCaption();
 }

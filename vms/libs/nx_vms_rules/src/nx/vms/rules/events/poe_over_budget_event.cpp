@@ -70,13 +70,8 @@ QString PoeOverBudgetEvent::description() const
 
 QString PoeOverBudgetEvent::extendedCaption(common::SystemContext* context) const
 {
-    if (totalEventCount() == 1)
-    {
-        const auto resourceName = utils::StringHelper(context).resource(m_serverId, Qn::RI_WithUrl);
-        return tr("PoE over budget at %1").arg(resourceName);
-    }
-
-    return BasicEvent::extendedCaption();
+    const auto resourceName = utils::StringHelper(context).resource(m_serverId, Qn::RI_WithUrl);
+    return tr("PoE over budget at %1").arg(resourceName);
 }
 
 QString PoeOverBudgetEvent::detailing() const

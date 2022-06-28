@@ -59,33 +59,6 @@ QString BasicEvent::uniqueName() const
     return type();
 }
 
-void BasicEvent::aggregate(const EventPtr& event)
-{
-    if (!NX_ASSERT(event))
-        return;
-
-    const auto aggregateEvent =
-        [this](const QString& uniqueName)
-        {
-            if (const auto eventItr = m_eventsHash.find(uniqueName); eventItr != m_eventsHash.end())
-                ++eventItr->second; //< Increase event occurrences count.
-            else
-                m_eventsHash.emplace(uniqueName, 1);
-        };
-
-    if (m_eventsHash.empty())
-        aggregateEvent(uniqueName()); //< Lazy aggregation of the event.
-
-    if (event->m_eventsHash.empty())
-    {
-        aggregateEvent(event->uniqueName());
-        return;
-    }
-
-    for (const auto& aggregatedEvent: event->m_eventsHash)
-        aggregateEvent(aggregatedEvent.first);
-}
-
 QVariantMap BasicEvent::details(common::SystemContext*) const
 {
     QVariantMap result;
@@ -93,27 +66,8 @@ QVariantMap BasicEvent::details(common::SystemContext*) const
     utils::insertIfNotEmpty(result, utils::kTypeDetailName, type());
     utils::insertIfNotEmpty(result, utils::kNameDetailName, name());
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption());
-    utils::insertIfValid(result, utils::kCountDetailName, QVariant::fromValue(totalEventCount()));
 
     return result;
-}
-
-size_t BasicEvent::uniqueEventCount() const
-{
-    return m_eventsHash.size();
-}
-
-size_t BasicEvent::totalEventCount() const
-{
-    if (m_eventsHash.empty())
-        return 1; //< At least the event itself must be counted.
-
-    size_t total = 0;
-
-    for (const auto& aggregatedEvent: m_eventsHash)
-        total += aggregatedEvent.second;
-
-    return total;
 }
 
 QString BasicEvent::name() const
@@ -124,9 +78,7 @@ QString BasicEvent::name() const
 
 QString BasicEvent::extendedCaption() const
 {
-    return totalEventCount() == 1
-        ? tr("%1 event has occurred").arg(name())
-        : tr("Multiple %1 events have occurred").arg(name());
+    return tr("%1 event has occurred").arg(name());
 }
 
 } // namespace nx::vms::rules
