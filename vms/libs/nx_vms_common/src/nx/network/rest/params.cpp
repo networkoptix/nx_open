@@ -93,7 +93,7 @@ QMultiMap<QString, QString> Params::toMap() const
     return m_values;
 }
 
-QJsonObject Params::toJson() const
+QJsonObject Params::toJson(bool excludeCommon) const
 {
     QJsonObject object;
     if (m_values.isEmpty())
@@ -110,12 +110,14 @@ QJsonObject Params::toJson() const
             values.append(QJsonValue(it.value()));
             continue;
         }
-        object.insert(key, (values.size() == 1) ? values[0] : QJsonValue(values));
+        if (!excludeCommon || !key.startsWith(QChar('_')))
+            object.insert(key, (values.size() == 1) ? values[0] : QJsonValue(values));
         values = QJsonArray();
         values.append(QJsonValue(it.value()));
         key = it.key();
     }
-    object.insert(key, (values.size() == 1) ? values[0] : QJsonValue(values));
+    if (!excludeCommon || !key.startsWith(QChar('_')))
+        object.insert(key, (values.size() == 1) ? values[0] : QJsonValue(values));
     return object;
 }
 
