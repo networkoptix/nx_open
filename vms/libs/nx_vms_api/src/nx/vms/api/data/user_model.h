@@ -86,7 +86,7 @@ QN_FUSION_DECLARE_FUNCTIONS(UserModelBase, (csv_record)(json)(ubjson)(xml), NX_V
 
 struct NX_VMS_API UserModelV1: public UserModelBase
 {
-    /**%apidoc[opt] User role id, can be obtained from `GET /rest/v1/userRoles`. */
+    /**%apidoc[opt] User role id, can be obtained from `GET /rest/v{1-}/userRoles`. */
     QnUuid userRoleId;
 
     bool operator==(const UserModelV1& other) const = default;
@@ -103,23 +103,27 @@ QN_FUSION_DECLARE_FUNCTIONS(UserModelV1, (csv_record)(json)(ubjson)(xml), NX_VMS
 
 // -------------------------------------------------------------------------------------------------
 
-struct NX_VMS_API UserModelV2: public UserModelBase
+/**
+ * This is for the new expiremental API which was supposed to be introduced in /rest/v2 but is
+ * going to be delayed for the future API versions.
+ */
+struct NX_VMS_API UserModelVX: public UserModelBase
 {
-    /**%apidoc[opt] User group id, can be obtained from `GET /rest/v{2-}/userGroups`. */
+    /**%apidoc[opt] User group id, can be obtained from `GET /rest/v{2-}/exp_userGroups`. */
     std::vector<QnUuid> userGroupIds;
 
-    bool operator==(const UserModelV2& other) const = default;
+    bool operator==(const UserModelVX& other) const = default;
 
     DbUpdateTypes toDbTypes() &&;
-    static std::vector<UserModelV2> fromDbTypes(DbListTypes data);
+    static std::vector<UserModelVX> fromDbTypes(DbListTypes data);
 
-    static_assert(isCreateModelV<UserModelV2>);
-    static_assert(isUpdateModelV<UserModelV2>);
+    static_assert(isCreateModelV<UserModelVX>);
+    static_assert(isUpdateModelV<UserModelVX>);
 };
-#define UserModelV2_Fields UserModelBase_Fields(userGroupIds)
+#define UserModelVX_Fields UserModelBase_Fields(userGroupIds)
 
-QN_FUSION_DECLARE_FUNCTIONS(UserModelV2, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(UserModelVX, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
 
-using UserModel = UserModelV2;
+using UserModel = UserModelV1;
 
 } // namespace nx::vms::api

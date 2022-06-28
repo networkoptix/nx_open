@@ -121,10 +121,10 @@ std::vector<UserModelV1> UserModelV1::fromDbTypes(DbListTypes data)
     return result;
 }
 
-QN_FUSION_ADAPT_STRUCT(UserModelV2, UserModelV2_Fields)
-QN_FUSION_DEFINE_FUNCTIONS(UserModelV2, (csv_record)(json)(ubjson)(xml))
+QN_FUSION_ADAPT_STRUCT(UserModelVX, UserModelVX_Fields)
+QN_FUSION_DEFINE_FUNCTIONS(UserModelVX, (csv_record)(json)(ubjson)(xml))
 
-UserModelV1::DbUpdateTypes UserModelV2::toDbTypes() &&
+UserModelV1::DbUpdateTypes UserModelVX::toDbTypes() &&
 {
     auto result = std::move(*this).toDbTypesBase();
     auto& user = std::get<UserDataEx>(result);
@@ -132,16 +132,16 @@ UserModelV1::DbUpdateTypes UserModelV2::toDbTypes() &&
     return result;
 }
 
-std::vector<UserModelV2> UserModelV2::fromDbTypes(DbListTypes data)
+std::vector<UserModelVX> UserModelVX::fromDbTypes(DbListTypes data)
 {
     auto& baseList = std::get<std::vector<UserData>>(data);
     auto& accessRights = std::get<AccessRightsDataList>(data);
 
-    std::vector<UserModelV2> result;
+    std::vector<UserModelVX> result;
     result.reserve(baseList.size());
     for (auto& baseData: baseList)
     {
-        UserModelV2 model;
+        UserModelVX model;
         static_cast<UserModelBase&>(model) =
             fromDbTypesBase(std::move(baseData), std::move(accessRights));
 
