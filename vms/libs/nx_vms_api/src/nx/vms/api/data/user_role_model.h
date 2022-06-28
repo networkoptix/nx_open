@@ -9,8 +9,6 @@ namespace nx::vms::api {
 /**%apidoc User role information object.
  * %param[unused] parentRoleIds
  * %param[unused] type
- * %// Deprecated, used in /rest/v1/userRoles only, use UserGroupModel with /rest/v{2-}/userGroups
- * %// instead.
  */
 struct UserRoleModel: UserGroupModel
 {
