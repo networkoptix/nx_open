@@ -55,6 +55,8 @@ private:
     nx::vms::client::desktop::ToolButton* newActionButton(
         nx::vms::client::desktop::ui::action::IDType actionId,
         const QSize& fixedSize = QSize());
+    void initMultiSystemTabBar();
+    void initLayoutsOnlyTabBar();
 
 private:
     Q_DECLARE_PRIVATE(QnMainWindowTitleBarWidget)

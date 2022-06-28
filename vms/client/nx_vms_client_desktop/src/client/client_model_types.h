@@ -12,7 +12,7 @@
 #include <QtGui/QVector3D>
 
 #include <client/client_globals.h>
-#include <nx/fusion/model_functions_fwd.h>
+#include <core/resource/layout_item_data.h>
 #include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
 #include <recording/time_period.h>
@@ -43,21 +43,41 @@ Q_DECLARE_METATYPE(QnThumbnailsSearchState)
 class QnWorkbenchState
 {
 public:
+    struct UnsavedLayout
+    {
+        QnUuid id;
+        QString name;
+        qreal cellSpacing = 0.0;
+        float cellAspectRatio = 0.0;
+        QString backgroundImageFilename;
+        qreal backgroundOpacity = 0.0;
+        QSize backgroundSize;
+        QList<QnLayoutItemData> items;
+    };
+
     QnWorkbenchState();
     QnUuid userId;          /*< Id of the user. Works as first part of the key. */
     QnUuid localSystemId;   /*< Id of the system. Works as second part of the key. */
     QnUuid currentLayoutId;
     QnUuid runningTourId;
     QList<QnUuid> layoutUuids;
+    QList<UnsavedLayout> unsavedLayouts;
 
     bool isValid() const;
 };
+
+#define QnWorkbenchStateUnsavedLayoutItem_Fields (resource)(uuid)(flags)(combinedGeometry) \
+    (zoomTargetUuid)(zoomRect)(rotation)(displayInfo)(controlPtz)(displayAnalyticsObjects) \
+    (displayRoi)(contrastParams)(dewarpingParams)
+#define QnWorkbenchStateUnsavedLayout_Fields (id)(name)(cellSpacing)(cellAspectRatio) \
+    (backgroundImageFilename)(backgroundOpacity)(backgroundSize)(items)
 #define QnWorkbenchState_Fields \
     (userId)(localSystemId)(currentLayoutId)(runningTourId)(layoutUuids)
 
 using QnWorkbenchStateList = QList<QnWorkbenchState>;
 
-QN_FUSION_DECLARE_FUNCTIONS(QnWorkbenchState, (json)(metatype));
+QN_FUSION_DECLARE_FUNCTIONS(QnWorkbenchState, (json)(metatype))
+QN_FUSION_DECLARE_FUNCTIONS(QnWorkbenchState::UnsavedLayout, (json))
 
 // -------------------------------------------------------------------------- //
 // QnLicenseWarningState

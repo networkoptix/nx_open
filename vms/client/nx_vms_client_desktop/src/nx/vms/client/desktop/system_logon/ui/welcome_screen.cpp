@@ -37,6 +37,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/connection_url_parser.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/style/svg_icon_provider.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -539,6 +540,8 @@ void WelcomeScreen::connectToSystemInternal(
         return; //< Connection process is in progress
 
     NX_DEBUG(this, "Delayed connect to the system %1 after click on tile", address);
+    if (context()->user())
+        appContext()->clientStateHandler()->saveWindowsConfiguration();
 
     LogonData logonData(core::LogonData{
         .address = address,

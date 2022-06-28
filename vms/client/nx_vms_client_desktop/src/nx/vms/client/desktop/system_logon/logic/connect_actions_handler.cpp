@@ -519,8 +519,12 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
     const auto session = std::make_shared<desktop::RemoteSession>(connection);
 
     session->setStickyReconnect(qnSettings->stickReconnectToServer());
+    LogonData logonData = connection->createLogonData();
+    const auto serverModuleInformation = connection->moduleInformation();
+    QnUuid systemId(::helpers::getTargetSystemId(serverModuleInformation));
+
     connect(session.get(), &RemoteSession::stateChanged, this,
-        [this](RemoteSession::State state)
+        [this, logonData, systemId](RemoteSession::State state)
         {
             if (state == RemoteSession::State::reconnecting)
             {
@@ -553,10 +557,11 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
                 // It's done delayed because some things - for example globalSettings() -
                 // are updated in QueuedConnection to initial notification or resource addition.
                 const auto workbenchStateUpdate =
-                    [this]()
+                    [this, logonData, systemId]()
                     {
                         context()->instance<QnWorkbenchStateManager>()->forcedUpdate();
                         context()->menu()->trigger(ui::action::InitialResourcesReceivedEvent);
+                        workbench()->addSystem(systemId, logonData);
                     };
 
                 executeLater(workbenchStateUpdate, this);
@@ -575,7 +580,6 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
                 d->reconnectDialog->setCurrentServer(server);
         });
 
-    const auto serverModuleInformation = connection->moduleInformation();
     connect(session.get(),
         &RemoteSession::reconnectFailed,
         this,
@@ -594,6 +598,7 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
                 this);
             disconnectFromServer(DisconnectFlag::Force);
         });
+
     connect(session.get(),
         &RemoteSession::reconnectRequired,
         this,
@@ -611,7 +616,7 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
     appContext()->clientStateHandler()->clientConnected(
         qnSettings->restoreUserSessionData(),
         session->sessionId(),
-        connection->createLogonData());
+        logonData);
 }
 
 void ConnectActionsHandler::storeConnectionRecord(
@@ -1047,7 +1052,8 @@ void ConnectActionsHandler::at_disconnectAction_triggered()
     if (disconnectFromServer(flags) && wasLoggedIn)
         appContext()->clientStateHandler()->clientDisconnected();
 
-    mainWindow()->welcomeScreen()->dropConnectingState();
+    menu()->trigger(ui::action::RemoveSystemFromTabBarAction);
+    emit mainWindow()->welcomeScreen()->dropConnectingState();
 }
 
 void ConnectActionsHandler::at_selectCurrentServerAction_triggered()

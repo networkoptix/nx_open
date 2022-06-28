@@ -7,6 +7,7 @@
 #include <client/client_globals.h>
 #include <client/client_model_types.h>
 #include <core/resource/resource_fwd.h>
+#include <network/base_system_description.h>
 
 #include "workbench_context_aware.h"
 
@@ -15,7 +16,10 @@ class QnWorkbenchGridMapper;
 class QnWorkbenchItem;
 class QQuickItem;
 
-namespace nx::vms::client::desktop { class WindowContext; }
+namespace nx::vms::client::desktop {
+class WindowContext;
+struct LogonData;
+} // namespace nx::vms::client::desktop
 
 /**
  * Workbench ties layout, items and current UI-related "state" together.
@@ -160,6 +164,12 @@ public:
      * \param index                     New current layout index.
      */
     void setCurrentLayoutIndex(int index);
+    QnWorkbenchLayout* findLayout(QnUuid id);
+
+    void addSystem(QnUuid systemId, const nx::vms::client::desktop::LogonData& logonData);
+    void addSystem(const QString& systemId, const nx::vms::client::desktop::LogonData& logonData);
+    void removeSystem(const QnSystemDescriptionPtr& systemDescription);
+    void removeSystem(const QString& systemId);
 
     /**
      * \returns                         Grid mapper for this workbench.
@@ -186,6 +196,7 @@ public:
     void applyLoadedState();
 
     bool isInLayoutChangeProcess() const;
+
 signals:
     /**
      * This signal is emitted while the workbench is still intact, but is about
@@ -248,6 +259,8 @@ signals:
      * This signal is emitted whenever the layout change process is fully finished.
      */
     void layoutChangeProcessFinished();
+
+    void currentSystemChanged(QnSystemDescriptionPtr systemDescription);
 
 private slots:
     void at_layout_itemAdded(QnWorkbenchItem *item);

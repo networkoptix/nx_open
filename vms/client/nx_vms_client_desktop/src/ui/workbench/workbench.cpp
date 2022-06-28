@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "workbench.h"
+#include "workbench_layout_synchronizer.h"
 
 #include <common/common_module.h>
 #include <core/resource/file_layout_resource.h>
@@ -10,12 +11,14 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/layout_tour_manager.h>
 #include <core/resource_management/resource_pool.h>
+#include <finders/systems_finder.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_tab_bar/system_tab_bar_model.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/webengine_profile_manager.h>
 #include <nx/vms/client/desktop/window_context.h>
@@ -32,8 +35,6 @@
 #include <utils/common/checked_cast.h>
 #include <utils/common/util.h>
 #include <utils/web_downloader.h>
-
-#include "workbench_layout_synchronizer.h"
 
 using namespace nx::vms::client::desktop;
 using namespace ui;
@@ -58,7 +59,7 @@ public:
         m_state.currentLayoutId = QnUuid(state.value(kCurrentLayoutId).toString());
         m_state.runningTourId = QnUuid(state.value(kRunningTourId).toString());
         QJson::deserialize(state.value(kLayoutUuids), &m_state.layoutUuids);
-
+        QJson::deserialize(state.value(kUnsavedLayouts), &m_state.unsavedLayouts);
         return true;
     }
 
@@ -73,6 +74,7 @@ public:
             result[kCurrentLayoutId] = m_state.currentLayoutId.toString();
             result[kRunningTourId] = m_state.runningTourId.toString();
             QJson::serialize(m_state.layoutUuids, &result[kLayoutUuids]);
+            QJson::serialize(m_state.unsavedLayouts, &result[kUnsavedLayouts]);
             *state = result;
         }
     }
@@ -93,7 +95,6 @@ public:
 
     void updateWorkbench()
     {
-        m_workbench->clear();
         m_workbench->update(m_state);
     }
 
@@ -104,6 +105,7 @@ private:
     const QString kCurrentLayoutId = "currentLayoutId";
     const QString kRunningTourId = "runningTourId";
     const QString kLayoutUuids = "layoutUids";
+    const QString kUnsavedLayouts = "unsavedLayouts";
 };
 
 namespace {
@@ -174,7 +176,8 @@ QnWorkbench::QnWorkbench(QObject *parent):
         });
 }
 
-QnWorkbench::~QnWorkbench() {
+QnWorkbench::~QnWorkbench()
+{
     bool signalsBlocked = blockSignals(false);
     emit aboutToBeDestroyed();
     blockSignals(signalsBlocked);
@@ -226,6 +229,16 @@ QnWorkbenchLayout *QnWorkbench::layout(int index) const {
 
 void QnWorkbench::addLayout(QnWorkbenchLayout *layout) {
     insertLayout(layout, m_layouts.size());
+}
+
+void QnWorkbench::removeSystem(const QnSystemDescriptionPtr& systemDescription)
+{
+    windowContext()->systemTabBarModel()->removeSystem(systemDescription);
+}
+
+void QnWorkbench::removeSystem(const QString& systemId)
+{
+    windowContext()->systemTabBarModel()->removeSystem(systemId);
 }
 
 void QnWorkbench::insertLayout(QnWorkbenchLayout *layout, int index)
@@ -310,6 +323,39 @@ void QnWorkbench::setCurrentLayoutIndex(int index) {
         return;
 
     setCurrentLayout(m_layouts[qBound(0, index, m_layouts.size())]);
+}
+
+QnWorkbenchLayout* QnWorkbench::findLayout(QnUuid id)
+{
+    auto it = std::find_if(m_layouts.begin(), m_layouts.end(),
+        [&id](QnWorkbenchLayout* item)
+        {
+            return item->resource()->getId() == id;
+        });
+
+    return it == m_layouts.end() ? nullptr : *it;
+}
+
+void QnWorkbench::addSystem(QnUuid systemId, const LogonData& logonData)
+{
+    auto systemDescription = qnSystemsFinder->getSystem(systemId.toString());
+    if (systemDescription.isNull())
+        systemDescription = qnSystemsFinder->getSystem(systemId.toSimpleString());
+
+    NX_ASSERT(systemDescription);
+
+    windowContext()->systemTabBarModel()->addSystem(systemDescription, logonData);
+    emit currentSystemChanged(systemDescription);
+}
+
+void QnWorkbench::addSystem(const QString& systemId, const LogonData& logonData)
+{
+    auto systemDescription = qnSystemsFinder->getSystem(systemId);
+
+    NX_ASSERT(systemDescription);
+
+    windowContext()->systemTabBarModel()->addSystem(systemDescription, logonData);
+    emit currentSystemChanged(systemDescription);
 }
 
 void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout)
@@ -527,6 +573,42 @@ void QnWorkbench::update(const QnWorkbenchState& state)
         }
     }
 
+    for (const auto& stateLayout: state.unsavedLayouts)
+    {
+        QnResourcePtr resource = resourcePool()->getResourceById(stateLayout.id);
+        QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
+
+        if (!layoutResource)
+        {
+            layoutResource.reset(new QnLayoutResource());
+            layoutResource->setIdUnsafe(stateLayout.id);
+            resourcePool()->addResource(layoutResource);
+        }
+
+        layoutResource->setName(stateLayout.name);
+        layoutResource->setCellSpacing(stateLayout.cellSpacing);
+        layoutResource->setCellAspectRatio(stateLayout.cellAspectRatio);
+        layoutResource->setBackgroundImageFilename(stateLayout.backgroundImageFilename);
+        layoutResource->setBackgroundOpacity(stateLayout.backgroundOpacity);
+        layoutResource->setBackgroundSize(stateLayout.backgroundSize);
+
+        for (const auto& itemData: stateLayout.items)
+        {
+            layoutResource->removeItem(itemData.uuid);
+            layoutResource->addItem(itemData);
+        }
+
+        if (QnWorkbenchLayout* layout = findLayout(stateLayout.id))
+        {
+            layout->update(layoutResource);
+        }
+        else
+        {
+            layout = qnWorkbenchLayoutsFactory->create(layoutResource, this);
+            addLayout(layout);
+        }
+    }
+
     if (!state.currentLayoutId.isNull())
     {
         const auto layout = resourcePool()->getResourceById<QnLayoutResource>(state.currentLayoutId);
@@ -588,11 +670,32 @@ void QnWorkbench::submit(QnWorkbenchState& state)
             state.currentLayoutId = sourceId(currentResource);
     }
 
-    for (auto layout: m_layouts)
+    for (const auto& layout: m_layouts)
     {
         auto resource = layout->resource();
-        if (resource && isLayoutSupported(resource))
-            state.layoutUuids.push_back(sourceId(resource));
+        if (resource)
+        {
+            if (isLayoutSupported(resource))
+                state.layoutUuids.push_back(sourceId(resource));
+
+            if (resource->hasFlags(Qn::local) || snapshotManager()->isSaveable(resource))
+            {
+                QnWorkbenchState::UnsavedLayout unsavedLayout;
+                unsavedLayout.id = resource->getId();
+                unsavedLayout.name = layout->name();
+                unsavedLayout.cellSpacing = resource->cellSpacing();
+                unsavedLayout.cellAspectRatio = resource->cellAspectRatio();
+                unsavedLayout.backgroundImageFilename = resource->backgroundImageFilename();
+                unsavedLayout.backgroundOpacity = resource->backgroundOpacity();
+                unsavedLayout.backgroundSize = resource->backgroundSize();
+
+                for (const auto& itemData: resource->getItems().values())
+                {
+                    unsavedLayout.items << itemData;
+                }
+                state.unsavedLayouts << unsavedLayout;
+            }
+        }
     }
 
     state.runningTourId = context()->instance<LayoutToursHandler>()->runningTour();
