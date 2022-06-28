@@ -11,14 +11,9 @@
 #include <nx/utils/url.h>
 #include <nx/vms/client/desktop/common/widgets/webview_controller.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/integrations/c2p/jsapi/external.h>
-#include <nx/vms/client/desktop/jsapi/auth.h>
-#include <nx/vms/client/desktop/jsapi/globals.h>
-#include <nx/vms/client/desktop/jsapi/logger.h>
-#include <nx/vms/client/desktop/jsapi/resources.h>
-#include <nx/vms/client/desktop/jsapi/tab.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/dialogs/client_api_auth_dialog.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
@@ -101,48 +96,14 @@ QnWebResourceWidget::QnWebResourceWidget(
     setupOverlays();
     updateButtonsVisibility();
 
-    initClientApiSupport();
-}
-
-void QnWebResourceWidget::initClientApiSupport()
-{
-    m_webEngineView->controller()->registerApiObjectWithFactory("external",
-        [this](QObject* parent) -> QObject*
+    const auto controller = m_webEngineView->controller();
+    auto authCondition =
+        [this, controller]
         {
-            using External = integrations::c2p::jsapi::External;
-            return new External(workbench()->context(), this->item(), parent);
-        });
+            return ClientApiAuthDialog::isApproved(resource(), controller->url());
+        };
 
-    m_webEngineView->controller()->registerApiObjectWithFactory("vms.tab",
-        [this](QObject* parent) -> QObject*
-        {
-            return new jsapi::Tab(workbench()->context(), parent);
-        });
-
-    m_webEngineView->controller()->registerApiObjectWithFactory("vms.resources",
-        [this](QObject* parent) -> QObject*
-        {
-            return new jsapi::Resources(workbench()->context(), parent);
-        });
-
-    m_webEngineView->controller()->registerApiObjectWithFactory("vms.log",
-        [](QObject* parent) -> QObject*
-        {
-            return new jsapi::Logger(parent);
-        });
-
-    m_webEngineView->controller()->registerApiObjectWithFactory("vms.auth",
-        [this](QObject* parent) -> QObject*
-        {
-            auto urlProvider = [this] { return m_webEngineView->controller()->url(); };
-            return new jsapi::Auth(urlProvider, resource(), parent);
-        });
-
-    m_webEngineView->controller()->registerApiObjectWithFactory("vms",
-        [](QObject* parent) -> QObject*
-        {
-            return new jsapi::Globals(parent);
-        });
+    controller->initClientApiSupport(workbench()->context(), this->item(), authCondition);
 }
 
 QnWebResourceWidget::~QnWebResourceWidget()

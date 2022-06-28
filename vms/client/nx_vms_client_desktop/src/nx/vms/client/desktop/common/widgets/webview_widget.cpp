@@ -2,14 +2,6 @@
 
 #include "webview_widget.h"
 
-#include "webview_controller.h"
-
-#include <functional>
-#include <vector>
-
-#include <QtWidgets/QMenu>
-#include <QtQuick/QQuickItem>
-
 #include <client_core/client_core_module.h>
 
 using namespace nx::vms::client::desktop;

@@ -4,17 +4,14 @@
 
 #include <QtQuick/QQuickItem>
 
-#include <ui/graphics/instruments/hand_scroll_instrument.h>
-#include <nx/vms/client/desktop/style/webview_style.h>
-
-#include <nx/vms/client/desktop/resource_properties/camera/utils/camera_web_page_workarounds.h>
-
-#include <common/common_module.h>
 #include <client_core/client_core_module.h>
-#include <core/resource_management/resource_pool.h>
+#include <common/common_module.h>
 #include <core/resource/webpage_resource.h>
-
+#include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/common/widgets/webview_controller.h>
+#include <nx/vms/client/desktop/resource_properties/camera/utils/camera_web_page_workarounds.h>
+#include <nx/vms/client/desktop/style/webview_style.h>
+#include <ui/graphics/instruments/hand_scroll_instrument.h>
 
 namespace
 {

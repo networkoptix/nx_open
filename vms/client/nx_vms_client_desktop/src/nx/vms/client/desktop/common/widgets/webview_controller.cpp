@@ -1,7 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "webview_controller.h"
-#include "webview_window.h"
 
 #include <chrono>
 #include <vector>
@@ -10,9 +9,9 @@
 #include <QtGui/private/qinputcontrol_p.h>
 #include <QtQuick/QQuickItem>
 #include <QtWebChannel/QWebChannel>
+#include <QtWebEngine/QQuickWebEngineProfile>
 #include <QtWebEngine/private/qquickwebengineaction_p.h>
 #include <QtWebEngine/private/qquickwebengineview_p.h>
-#include <QtWebEngine/QQuickWebEngineProfile>
 #include <QtWidgets/QColorDialog>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
@@ -27,11 +26,19 @@
 #include <core/resource/webpage_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/nx_network_ini.h>
+#include <nx/vms/client/desktop/integrations/c2p/jsapi/external.h>
+#include <nx/vms/client/desktop/jsapi/auth.h>
+#include <nx/vms/client/desktop/jsapi/globals.h>
+#include <nx/vms/client/desktop/jsapi/logger.h>
+#include <nx/vms/client/desktop/jsapi/resources.h>
+#include <nx/vms/client/desktop/jsapi/tab.h>
 #include <nx/vms/client/desktop/resource_properties/camera/utils/camera_web_page_workarounds.h>
 #include <ui/dialogs/common/certificate_selection_dialog.h>
 #include <ui/dialogs/common/password_dialog.h>
 #include <ui/graphics/items/standard/graphics_qml_view.h>
 #include <utils/web_downloader.h>
+
+#include "webview_window.h"
 
 Q_DECLARE_METATYPE(std::shared_ptr<QQuickItem>)
 
@@ -821,6 +828,52 @@ void WebViewController::resume(QVariant state)
 void WebViewController::setCertificateValidator(CertificateValidationFunc validator)
 {
     d->certificateValidator = validator;
+}
+
+void WebViewController::initClientApiSupport(
+    QnWorkbenchContext* context,
+    QnWorkbenchItem* item,
+    ClientApiAuthCondition authCondition)
+{
+    if (!NX_ASSERT(context))
+        return;
+
+    registerApiObjectWithFactory("external",
+        [=](QObject* parent) -> QObject*
+        {
+            using External = integrations::c2p::jsapi::External;
+            return new External(context, item, parent);
+        });
+
+    registerApiObjectWithFactory("vms.tab",
+        [=](QObject* parent) -> QObject*
+        {
+            return new jsapi::Tab(context, parent);
+        });
+
+    registerApiObjectWithFactory("vms.resources",
+        [=](QObject* parent) -> QObject*
+        {
+            return new jsapi::Resources(context, parent);
+        });
+
+    registerApiObjectWithFactory("vms.log",
+        [](QObject* parent) -> QObject*
+        {
+            return new jsapi::Logger(parent);
+        });
+
+    registerApiObjectWithFactory("vms.auth",
+        [=](QObject* parent) -> QObject*
+        {
+            return new jsapi::Auth(authCondition, parent);
+        });
+
+    registerApiObjectWithFactory("vms",
+        [](QObject* parent) -> QObject*
+        {
+            return new jsapi::Globals(parent);
+        });
 }
 
 void WebViewController::registerMetaType()

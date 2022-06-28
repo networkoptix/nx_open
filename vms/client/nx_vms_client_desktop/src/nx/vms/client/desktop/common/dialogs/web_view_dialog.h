@@ -6,9 +6,9 @@
 
 #include <ui/dialogs/common/button_box_dialog.h>
 
-namespace nx::vms::client::desktop {
+class QnWorkbenchContext;
 
-class WebWidget;
+namespace nx::vms::client::desktop {
 
 class WebViewDialog: public QnButtonBoxDialog
 {
@@ -16,10 +16,18 @@ class WebViewDialog: public QnButtonBoxDialog
     using base_type = QnButtonBoxDialog;
 
 public:
-    explicit WebViewDialog(const QUrl& url, QWidget* parent = nullptr);
+    explicit WebViewDialog(
+        const QUrl& url,
+        bool enableClientApi = false,
+        QnWorkbenchContext* context = nullptr,
+        QWidget* parent = nullptr);
+
     virtual ~WebViewDialog() override = default;
 
-    static void showUrl(const QUrl& url, QWidget* parent = nullptr);
+    static void showUrl(const QUrl& url,
+        bool enableClientApi = false,
+        QnWorkbenchContext* context = nullptr,
+        QWidget* parent = nullptr);
 };
 
 } // namespace nx::vms::client::desktop
