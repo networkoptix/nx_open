@@ -4,16 +4,17 @@
 
 #include <client/client_globals.h>
 #include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
-#include <core/resource/resource_display_info.h>
 #include <core/resource/resource.h>
+#include <core/resource/resource_display_info.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
 #include <finders/systems_finder.h>
 #include <nx/vms/api/data/user_role_data.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/generic_item/generic_item_builder.h>
+#include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/cloud_system_status_item.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/resource_item.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/showreel_item.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/videowall_matrix_item.h>
@@ -455,6 +456,11 @@ AbstractItemPtr ResourceTreeItemFactory::createVideoWallMatrixItem(
     const QnUuid& matrixUuid)
 {
     return std::make_unique<VideoWallMatrixItem>(viedeoWall, matrixUuid);
+}
+
+AbstractItemPtr ResourceTreeItemFactory::createCloudSystemStatusItem(const QString& systemId)
+{
+    return std::make_unique<CloudSystemStatusItem>(systemId);
 }
 
 QnResourcePool* ResourceTreeItemFactory::resourcePool() const

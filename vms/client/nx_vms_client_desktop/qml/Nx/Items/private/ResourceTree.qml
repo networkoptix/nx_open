@@ -450,8 +450,16 @@ TreeView
             readonly property int kIconWidth: 20
 
             readonly property string iconSource:
-                (model && model.iconKey && model.iconKey !== 0
+            {
+                if (!model)
+                    return ""
+
+                if (model.decorationPath)
+                    return "qrc:/skin/" + model.decorationPath
+
+                return (model.iconKey && model.iconKey !== 0
                     && ("image://resource/" + model.iconKey + "/" + itemState)) || ""
+            }
 
             readonly property color mainTextColor:
             {

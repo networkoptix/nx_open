@@ -305,6 +305,12 @@ namespace Qn
         SortKeyRole, /**< Role for text sort key (QString). */
         FilterKeyRole, /**< Role for text filter key (QString). */
 
+        /**
+         * Role for node-controlled flattening control in the resource tree (bool).
+         * See FlatteningGroupEntity for the details.
+         */
+        FlattenedRole,
+
         ItemDataRoleCount,
     };
 

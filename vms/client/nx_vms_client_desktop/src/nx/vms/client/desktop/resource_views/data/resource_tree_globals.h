@@ -63,6 +63,7 @@ NX_REFLECTION_ENUM_CLASS(NodeType,
     videoWallMatrix, //< Videowall saved matrix. Has a guid.
 
     cloudSystem, //< Available cloud system.
+    cloudSystemStatus, //< Cross-System Resources status preloader for the Cloud System.
     localSystem, //< Local system but the current.
 
     // Resource dialogs specific types, never occur in the main resource tree.

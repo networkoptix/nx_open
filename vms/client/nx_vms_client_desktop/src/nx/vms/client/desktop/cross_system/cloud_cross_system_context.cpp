@@ -73,6 +73,7 @@ struct CloudCrossSystemContext::Private
 
     CloudCrossSystemContext* const q;
     QnSystemDescriptionPtr const systemDescription;
+    Status status = Status::uninitialized;
     core::RemoteConnectionFactory::ProcessPtr connectionProcess;
     std::unique_ptr<SystemContext> systemContext;
     bool isRestApiSupported = false;
@@ -89,9 +90,21 @@ struct CloudCrossSystemContext::Private
      */
     QString idForToStringFromPtr() const { return toString(); }
 
-    bool ensureConnection()
+    void updateStatus(Status value)
+    {
+        if (status == value)
+            return;
+
+        status = value;
+        emit q->statusChanged();
+    }
+
+    bool ensureConnection(bool allowUserInteraction = false)
     {
         if (!ini().crossSystemLayouts)
+            return false;
+
+        if (status == Status::unsupported)
             return false;
 
         if (systemContext)
@@ -115,10 +128,13 @@ struct CloudCrossSystemContext::Private
                     else if (const auto error = std::get_if<core::RemoteConnectionError>(&result))
                     {
                         NX_WARNING(this, "Error while establishing connection %1", error->code);
+                        updateStatus(Status::connectionFailure);
                     }
 
                     connectionProcess.reset();
                 };
+
+            updateStatus(Status::connecting);
 
             auto endpoint = core::cloudSystemEndpoint(systemDescription);
             if (!endpoint)
@@ -130,7 +146,8 @@ struct CloudCrossSystemContext::Private
                     .address = endpoint->address,
                     .credentials = {},
                     .userType = nx::vms::api::UserType::cloud,
-                    .expectedServerId = endpoint->serverId
+                    .expectedServerId = endpoint->serverId,
+                    .userInteractionAllowed = allowUserInteraction
                 },
                 handleConnection);
         }
@@ -141,8 +158,15 @@ struct CloudCrossSystemContext::Private
     void initializeContext(core::RemoteConnectionPtr connection)
     {
         isRestApiSupported = (connection->moduleInformation().version >= kRestApiSupportedVersion);
+        if (!isRestApiSupported)
+        {
+            updateStatus(Status::unsupported);
+            return;
+        }
 
-        systemContext = std::make_unique<SystemContext>(appContext()->peerId());
+        systemContext = std::make_unique<SystemContext>(
+            appContext()->peerId(),
+            nx::core::access::Mode::direct);
         systemContext->setConnection(connection);
 
         server = CrossSystemServerResourcePtr(new CrossSystemServerResource(connection));
@@ -169,10 +193,6 @@ struct CloudCrossSystemContext::Private
                     emit q->camerasRemoved(cameras);
             });
         appContext()->addSystemContext(systemContext.get());
-
-        auto cameras = systemContext->resourcePool()->getAllCameras();
-        NX_ASSERT(cameras.empty());
-        emit q->camerasAdded(cameras);
     }
 
     void addCamerasToResourcePool(std::vector<nx::vms::api::CameraDataEx> cameras)
@@ -252,7 +272,7 @@ struct CloudCrossSystemContext::Private
         if (!NX_ASSERT(systemContext))
             return false;
 
-        if (!isRestApiSupported)
+        if (!NX_ASSERT(isRestApiSupported))
             return false;
 
         if (!systemDescription->isReachable())
@@ -302,9 +322,6 @@ struct CloudCrossSystemContext::Private
         if (!ensureConnection() || !ensureUser())
             return;
 
-        if (!isRestApiSupported)
-            return;
-
         if (!systemDescription->isReachable())
         {
             NX_VERBOSE(this, "System is unreachable");
@@ -334,6 +351,7 @@ struct CloudCrossSystemContext::Private
 
                 NX_VERBOSE(this, "Received %1 cameras", result.size());
                 addCamerasToResourcePool(std::move(result));
+                updateStatus(Status::connected);
             });
 
         systemContext->connectedServerApi()->getRawResult(
@@ -357,6 +375,11 @@ CloudCrossSystemContext::~CloudCrossSystemContext()
 {
 }
 
+CloudCrossSystemContext::Status CloudCrossSystemContext::status() const
+{
+    return d->status;
+}
+
 SystemContext* CloudCrossSystemContext::systemContext() const
 {
     return d->systemContext.get();
@@ -378,6 +401,13 @@ QString CloudCrossSystemContext::idForToStringFromPtr() const
 QString CloudCrossSystemContext::toString() const
 {
     return d->toString();
+}
+
+void CloudCrossSystemContext::initializeConnectionWithUserInteraction()
+{
+    d->connectionProcess.reset();
+    d->updateStatus(Status::connecting);
+    d->ensureConnection(/*allowUserInteraction*/ true);
 }
 
 } // namespace nx::vms::client::desktop

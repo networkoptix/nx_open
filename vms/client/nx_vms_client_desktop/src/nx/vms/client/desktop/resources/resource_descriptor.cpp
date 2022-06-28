@@ -50,10 +50,9 @@ nx::vms::common::ResourceDescriptor descriptor(const QnResourcePtr& resource)
 QnResourcePtr getResourceByDescriptor(const nx::vms::common::ResourceDescriptor& descriptor)
 {
     SystemContext* systemContext = nullptr;
-    if (descriptor.path.startsWith(kCloudScheme))
+    if (isCrossSystemResource(descriptor))
     {
-        QString cloudSystemId = descriptor.path.mid(kCloudScheme.length());
-        cloudSystemId = cloudSystemId.mid(0, cloudSystemId.indexOf('.'));
+        const QString cloudSystemId = crossSystemResourceSystemId(descriptor);
         systemContext = appContext()->systemContextByCloudSystemId(cloudSystemId);
     }
     if (!systemContext)
@@ -68,6 +67,14 @@ QnResourcePtr getResourceByDescriptor(const nx::vms::common::ResourceDescriptor&
 bool isCrossSystemResource(const nx::vms::common::ResourceDescriptor& descriptor)
 {
     return descriptor.path.startsWith(kCloudScheme);
+}
+
+QString crossSystemResourceSystemId(const nx::vms::common::ResourceDescriptor& descriptor)
+{
+    NX_ASSERT(isCrossSystemResource(descriptor));
+    return descriptor.path.mid(
+        kCloudScheme.length(),
+        descriptor.path.indexOf('.') - kCloudScheme.length());
 }
 
 } // namespace nx::vms::client::desktop

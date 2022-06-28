@@ -2,11 +2,11 @@
 
 #include "flattening_group_entity.h"
 
+#include <client/client_globals.h>
 #include <nx/utils/log/assert.h>
-
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity_model_mapping.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/entity_notification_guard.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/base_notification_observer.h>
+#include <nx/vms/client/desktop/resource_views/entity_item_model/entity/entity_notification_guard.h>
+#include <nx/vms/client/desktop/resource_views/entity_item_model/entity_model_mapping.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/generic_item/generic_item_builder.h>
 
 namespace {
@@ -198,6 +198,13 @@ void FlatteningGroupEntity::setupHeadItemNotifications()
     m_headItem->setDataChangedCallback(
         [this](const QVector<int>& roles)
         {
+            if (m_autoFlatteningPolicy == AutoFlatteningPolicy::headItemControl)
+            {
+                // Empty roles list means "all roles".
+                if (roles.empty() || roles.contains(Qn::FlattenedRole))
+                    checkFlatteningCondition();
+            }
+
             if (!isFlattened())
                 dataChanged(modelMapping(), roles, 0);
         });
@@ -235,15 +242,29 @@ void FlatteningGroupEntity::checkFlatteningCondition()
     switch (m_autoFlatteningPolicy)
     {
         case AutoFlatteningPolicy::noChildrenPolicy:
+        {
             setFlattened(nestedEntityRowCount == 0);
-            return;
+            break;
+        }
 
         case AutoFlatteningPolicy::singleChildPolicy:
+        {
             setFlattened(nestedEntityRowCount < 2);
-            return;
+            break;
+        }
+
+        case AutoFlatteningPolicy::headItemControl:
+        {
+            const auto flattenedData = m_headItem->data(Qn::FlattenedRole);
+            if (flattenedData.isValid())
+                setFlattened(flattenedData.toBool());
+            break;
+        }
 
         case AutoFlatteningPolicy::noPolicy:
-            return;
+        {
+            break;
+        }
     }
 }
 

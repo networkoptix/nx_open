@@ -134,7 +134,15 @@ LayoutItemCreator layoutItemCreator(
 
             const auto itemResource = getResourceByDescriptor(itemData.resource);
             if (!itemResource)
+            {
+                if (isCrossSystemResource(itemData.resource))
+                {
+                    const QString systemId = crossSystemResourceSystemId(itemData.resource);
+                    return factory->createCloudSystemStatusItem(systemId);
+                }
+
                 return AbstractItemPtr();
+            }
 
             return std::make_unique<MainTreeResourceItemDecorator>(
                 factory->createResourceItem(itemResource),
@@ -879,7 +887,10 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createCloudSystemCamerasEntity(
     auto list = makeKeyList<QnResourcePtr>(itemCreator, numericOrder());
     list->installItemSource(m_itemKeySourcePool->cloudSystemCamerasSource(systemId));
 
-    return list;
+    return makeFlatteningGroup(
+        m_itemFactory->createCloudSystemStatusItem(systemId),
+        std::move(list),
+        FlatteningGroupEntity::AutoFlatteningPolicy::headItemControl);
 }
 
 AbstractEntityPtr ResourceTreeEntityBuilder::createOtherSystemsGroupEntity() const

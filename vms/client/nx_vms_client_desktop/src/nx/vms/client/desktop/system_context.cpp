@@ -62,8 +62,12 @@ struct SystemContext::Private
 
 };
 
-SystemContext::SystemContext(QnUuid peerId, QObject* parent):
-    base_type(std::move(peerId), parent),
+SystemContext::SystemContext(
+    QnUuid peerId,
+    nx::core::access::Mode resourceAccessMode,
+    QObject* parent)
+    :
+    base_type(std::move(peerId), resourceAccessMode, parent),
     d(new Private{.q = this})
 {
     d->initLocalRuntimeInfo();

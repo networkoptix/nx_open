@@ -20,8 +20,11 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/build_info.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/models/filter_proxy_model.h>
 #include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -533,6 +536,22 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
             {
                 callback();
             }
+
+            break;
+        }
+
+        case ResourceTree::NodeType::cloudSystemStatus:
+        {
+            if (activationType != ResourceTree::ActivationType::doubleClick)
+                return;
+
+            const QString systemId = index.data(Qn::CloudSystemIdRole).toString();
+            auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
+            if (!NX_ASSERT(context))
+                return;
+
+            if (context->status() == CloudCrossSystemContext::Status::connectionFailure)
+                context->initializeConnectionWithUserInteraction();
 
             break;
         }

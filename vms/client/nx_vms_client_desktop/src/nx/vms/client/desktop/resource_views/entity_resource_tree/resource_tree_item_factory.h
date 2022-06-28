@@ -89,6 +89,9 @@ public:
     AbstractItemPtr createVideoWallMatrixItem(const QnVideoWallResourcePtr& viedeoWall,
         const QnUuid& matrixUuid);
 
+    // Resource Tree Cross-System Resources status preloader for the Cloud System.
+    AbstractItemPtr createCloudSystemStatusItem(const QString& systemId);
+
 private:
     QnResourcePool* resourcePool() const;
     nx::vms::common::SystemSettings* globalSettings() const;

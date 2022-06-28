@@ -28,6 +28,7 @@ public:
         noPolicy,
         noChildrenPolicy,
         singleChildPolicy,
+        headItemControl, //< Head item will control state using Qn::FlattenedRole.
     };
 
     /**

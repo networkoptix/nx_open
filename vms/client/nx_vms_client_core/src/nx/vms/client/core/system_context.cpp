@@ -70,11 +70,15 @@ struct SystemContext::Private
     RemoteConnectionPtr connection;
 };
 
-SystemContext::SystemContext(QnUuid peerId, QObject* parent):
+SystemContext::SystemContext(
+    QnUuid peerId,
+    nx::core::access::Mode resourceAccessMode,
+    QObject* parent)
+    :
     base_type(
         std::move(peerId),
         /*sessionId*/ QnUuid::createUuid(),
-        nx::core::access::Mode::cached,
+        resourceAccessMode,
         parent),
     d(new Private())
 {

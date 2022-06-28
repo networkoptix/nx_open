@@ -24,8 +24,7 @@ struct CloudSystemCamerasSource::Private
     CloudSystemCamerasSource* const q;
     const QString systemId;
     QPointer<CloudCrossSystemContext> systemContext;
-    nx::utils::ScopedConnections managerConnections;
-    nx::utils::ScopedConnections contextConnections;
+    nx::utils::ScopedConnections connections;
 
     void connectToContext()
     {
@@ -35,7 +34,7 @@ struct CloudSystemCamerasSource::Private
 
         NX_VERBOSE(this, "Connect to %1", *systemContext);
 
-        contextConnections << QObject::connect(systemContext,
+        connections << QObject::connect(systemContext,
             &CloudCrossSystemContext::camerasAdded,
             [this](const QnVirtualCameraResourceList& cameras)
             {
@@ -46,7 +45,7 @@ struct CloudSystemCamerasSource::Private
                     (*handler)(camera);
             });
 
-        contextConnections << QObject::connect(systemContext,
+        connections << QObject::connect(systemContext,
             &CloudCrossSystemContext::camerasRemoved,
             [this](const QnVirtualCameraResourceList& cameras)
             {
@@ -67,28 +66,10 @@ CloudSystemCamerasSource::CloudSystemCamerasSource(const QString& systemId):
     d(new Private(this, systemId))
 {
     initializeRequest =
-        [this, systemId]
+        [this]
         {
-            d->managerConnections << QObject::connect(appContext()->cloudCrossSystemManager(),
-                &CloudCrossSystemManager::systemFound,
-                [this, systemId](const QString& foundSystemId)
-                {
-                    if (systemId == foundSystemId)
-                        d->connectToContext();
-                });
-            d->managerConnections << QObject::connect(appContext()->cloudCrossSystemManager(),
-                &CloudCrossSystemManager::systemLost,
-                [this, systemId](const QString& lostSystemId)
-                {
-                    if (systemId == lostSystemId)
-                    {
-                        d->contextConnections.reset();
-                        setKeysHandler({}); //< Hide cameras when system is lost.
-                    }
-                });
-
-            if (appContext()->cloudCrossSystemManager()->systemContext(systemId))
-                d->connectToContext();
+            // Context must already exist.
+            d->connectToContext();
         };
 }
 
