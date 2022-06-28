@@ -34,6 +34,7 @@
 #include <nx/vms/client/desktop/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/desktop/analytics/object_display_settings.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/desktop/cross_system/cross_system_layouts_watcher.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 #include <nx/vms/client/desktop/resources/resource_factory.h>
@@ -375,6 +376,7 @@ struct ApplicationContext::Private
         initializeServerCompatibilityValidator();
         q->core::ApplicationContext::initializeNetworkModules();
         cloudCrossSystemManager = std::make_unique<CloudCrossSystemManager>();
+        crossSystemLayoutsWatcher = std::make_unique<CrossSystemLayoutsWatcher>();
     }
 
     void initializeTranslations()
@@ -523,6 +525,7 @@ struct ApplicationContext::Private
 
     // Network modules
     std::unique_ptr<CloudCrossSystemManager> cloudCrossSystemManager;
+    std::unique_ptr<CrossSystemLayoutsWatcher> crossSystemLayoutsWatcher;
 };
 
 ApplicationContext::ApplicationContext(

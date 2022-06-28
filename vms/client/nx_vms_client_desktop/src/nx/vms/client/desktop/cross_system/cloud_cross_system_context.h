@@ -31,6 +31,16 @@ public:
     CloudCrossSystemContext(QnSystemDescriptionPtr systemDescription, QObject* parent = nullptr);
     virtual ~CloudCrossSystemContext() override;
 
+    enum class Status
+    {
+        uninitialized,
+        connecting,
+        connectionFailure,
+        unsupported,
+        connected,
+    };
+    Status status() const;
+
     SystemContext* systemContext() const;
 
     QnVirtualCameraResourceList cameras() const;
@@ -45,7 +55,13 @@ public:
      */
     QString toString() const;
 
+    /**
+     * Try to establish connection with user interaction allowed.
+     */
+    void initializeConnectionWithUserInteraction();
+
 signals:
+    void statusChanged();
     void camerasAdded(const QnVirtualCameraResourceList& cameras);
     void camerasRemoved(const QnVirtualCameraResourceList& cameras);
 

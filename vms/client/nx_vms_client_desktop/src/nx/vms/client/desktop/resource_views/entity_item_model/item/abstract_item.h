@@ -8,9 +8,11 @@
 #include <QtCore/QVariant>
 
 namespace nx::vms::client::desktop {
-namespace entity_item_model
-{
+namespace entity_item_model {
 
+/**
+ * Abstract interface for the single resource tree item.
+ */
 class NX_VMS_CLIENT_DESKTOP_API AbstractItem
 {
 public:

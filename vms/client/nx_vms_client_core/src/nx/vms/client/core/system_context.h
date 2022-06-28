@@ -33,8 +33,15 @@ public:
      *     between the application runs. Desktop Client calculates actual peer id depending on the
      *     stored persistent id and on the number of the running client instance, so different
      *     Client windows have different peer ids.
+     * @param resourceAccessMode Mode of the Resource permissions mechanism work. Direct mode is
+     *     used on the Server side, all calculations occur on the fly. Cached mode is used for the
+     *     current context on the Client side, where we need to actively listen for the changes and
+     *     emit signals. Cross-system contexts also use direct mode.
      */
-    SystemContext(QnUuid peerId, QObject* parent = nullptr);
+    SystemContext(
+        QnUuid peerId,
+        nx::core::access::Mode resourceAccessMode = nx::core::access::Mode::cached,
+        QObject* parent = nullptr);
     virtual ~SystemContext() override;
 
     static SystemContext* fromResource(const QnResourcePtr& resource);

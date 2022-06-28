@@ -180,6 +180,7 @@ QHash<int, QByteArray> EntityItemModel::roleNames() const
     roles.insert(Qn::ResourceIconKeyRole, "iconKey");
     roles.insert(Qn::ExtraInfoRole, "extraInfo");
     roles.insert(Qn::CameraExtraStatusRole, "cameraExtraStatus");
+    roles.insert(Qn::DecorationPathRole, "decorationPath");
     return roles;
 }
 

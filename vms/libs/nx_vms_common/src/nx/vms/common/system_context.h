@@ -56,8 +56,9 @@ public:
      * @param sessionId Id of the connection session. On the server side it is randomly generated
      *     on the server start. On the client side it is generated separately for each connection.
      * @param resourceAccessMode Mode of the Resource permissions mechanism work. Direct mode is
-     *     used on the Server side, all calculations occur on the fly. Cached mode is used on the
-     *     Client side, where we need to actively listen for the changes and emit signals.
+     *     used on the Server side, all calculations occur on the fly. Cached mode is used for the
+     *     current context on the Client side, where we need to actively listen for the changes and
+     *     emit signals. Cross-system contexts also use direct mode.
      */
     SystemContext(
         QnUuid peerId,

@@ -16,4 +16,7 @@ QnResourcePtr getResourceByDescriptor(const nx::vms::common::ResourceDescriptor&
 /** Whether Resource belongs to another cloud System. */
 bool isCrossSystemResource(const nx::vms::common::ResourceDescriptor& descriptor);
 
+/** Get System Id of the Cloud System this cross-system Resource belongs to. */
+QString crossSystemResourceSystemId(const nx::vms::common::ResourceDescriptor& descriptor);
+
 } // namespace nx::vms::client::desktop
