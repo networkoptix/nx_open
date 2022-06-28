@@ -2,11 +2,11 @@
 
 #include "web_view_dialog.h"
 
-#include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkReply>
 #include <QtWidgets/QDialogButtonBox>
-#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QFrame>
+#include <QtWidgets/QVBoxLayout>
 
 #include <nx/vms/client/desktop/common/widgets/web_widget.h>
 
@@ -18,7 +18,12 @@ static constexpr QSize kBaseDialogSize(600, 500);
 
 namespace nx::vms::client::desktop {
 
-WebViewDialog::WebViewDialog(const QUrl& url, QWidget* parent):
+WebViewDialog::WebViewDialog(
+    const QUrl& url,
+    bool enableClientApi,
+    QnWorkbenchContext* context,
+    QWidget* parent)
+    :
     base_type(parent, Qt::Window)
 {
     auto webWidget = new WebWidget(this);
@@ -39,11 +44,21 @@ WebViewDialog::WebViewDialog(const QUrl& url, QWidget* parent):
     resize(kBaseDialogSize);
 
     webWidget->controller()->load(url);
+
+    if (enableClientApi && context)
+    {
+        auto authCondition = [] { return true; };
+        webWidget->controller()->initClientApiSupport(context, /*item*/ nullptr, authCondition);
+    }
 }
 
-void WebViewDialog::showUrl(const QUrl& url, QWidget* parent)
+void WebViewDialog::showUrl(
+    const QUrl& url,
+    bool enableClientApi,
+    QnWorkbenchContext* context,
+    QWidget* parent)
 {
-    QScopedPointer<WebViewDialog> dialog(new WebViewDialog(url, parent));
+    QScopedPointer<WebViewDialog> dialog(new WebViewDialog(url, enableClientApi, context, parent));
     dialog->exec();
 }
 

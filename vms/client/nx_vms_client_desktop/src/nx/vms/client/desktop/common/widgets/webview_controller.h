@@ -15,6 +15,9 @@
 class QQuickWebEngineProfile;
 class QQuickWebEngineScript;
 
+class QnWorkbenchContext;
+class QnWorkbenchItem;
+
 namespace nx::vms::client::desktop {
 
 class GraphicsQmlView;
@@ -47,6 +50,8 @@ public:
     using AuthCallback = std::function<std::optional<Credentials>(const QUrl&)>;
     using CertificateValidationFunc =
         std::function<bool(const QString& certificateChain, const QUrl& url)>;
+
+    using ClientApiAuthCondition = std::function<bool()>;
 
 public:
     WebViewController(QObject* parent);
@@ -149,6 +154,10 @@ public:
      * This validator is called only when Chromium engine failed to verify certificate by itself.
      */
     void setCertificateValidator(CertificateValidationFunc validator);
+
+    /** Initializes Client API. */
+    void initClientApiSupport(
+        QnWorkbenchContext* context, QnWorkbenchItem* item, ClientApiAuthCondition authCondition);
 
     /** Register the save state metatype for suspend()/resume() methods. */
     static void registerMetaType();

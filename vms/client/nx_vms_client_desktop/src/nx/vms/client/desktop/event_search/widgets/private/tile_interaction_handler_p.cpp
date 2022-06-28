@@ -335,7 +335,13 @@ void TileInteractionHandler::executePluginAction(
                 QnMessageBox::success(mainWindowWidget(), reply.messageToUser);
 
             if (!reply.actionUrl.isEmpty())
-                WebViewDialog::showUrl(QUrl(reply.actionUrl));
+            {
+                WebViewDialog::showUrl(
+                    QUrl(reply.actionUrl),
+                    /*enableClientApi*/ true,
+                    workbench()->context(),
+                    mainWindowWidget());
+            }
         };
 
     connectedServerApi()->executeAnalyticsAction(

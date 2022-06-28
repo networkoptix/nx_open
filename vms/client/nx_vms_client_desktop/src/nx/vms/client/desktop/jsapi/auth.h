@@ -5,9 +5,7 @@
 #include <functional>
 
 #include <QtCore/QObject>
-#include <QtCore/QUrl>
 
-#include <core/resource/resource.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
 
 namespace nx::vms::client::desktop::jsapi {
@@ -16,19 +14,14 @@ class Auth: public QObject, public core::RemoteConnectionAware
 {
     Q_OBJECT
 public:
-    using base_type = QObject;
-    using UrlProvider = std::function<QUrl()>;
+    using AuthCondition = std::function<bool()>;
 
-    Auth(UrlProvider urlProvider, const QnResourcePtr& resource, QObject* parent = nullptr);
+    Auth(AuthCondition authCondition, QObject* parent = nullptr);
 
     Q_INVOKABLE QString sessionToken() const;
 
 private:
-    bool isApproved(const QUrl& url) const;
-
-private:
-    UrlProvider m_url;
-    QnResourcePtr m_resource;
+    AuthCondition m_checkCondition;
 };
 
 } // namespace nx::vms::client::desktop::jsapi

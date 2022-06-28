@@ -36,7 +36,6 @@ protected:
         QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) override;
 
 private:
-    void initClientApiSupport();
     void initWebActionText();
     void setupOverlays();
     bool verifyCertificate(const QString& pemString, const QUrl& url);
