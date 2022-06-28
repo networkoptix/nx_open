@@ -33,7 +33,7 @@ QPixmap levelDecoration(QnNotificationLevel::Value level)
     return {};
 }
 
-QPixmap progressDecoration(workbench::LocalNotificationsManager::Progress progress)
+QPixmap progressDecoration(ProgressState progress)
 {
     if (progress.isFailed())
         return qnSkin->pixmap("events/alert_yellow.png");
@@ -188,7 +188,7 @@ QVariant LocalNotificationsListModel::data(const QModelIndex& index, int role) c
         case Qn::TimeoutRole:
             return manager->isCancellable(notificationId)
                 && manager->progress(notificationId)
-                    == workbench::LocalNotificationsManager::Progress::failed
+                    == ProgressState::failed
                 ? QVariant::fromValue(kFailedDisplayTimeout)
                 : QVariant();
 
