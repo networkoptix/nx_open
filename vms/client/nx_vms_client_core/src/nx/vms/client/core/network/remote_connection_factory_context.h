@@ -19,6 +19,7 @@
 
 #include "connection_info.h"
 #include "remote_connection_error.h"
+#include "remote_connection_user_interaction_delegate.h"
 
 namespace nx::vms::client::core {
 
@@ -35,6 +36,7 @@ struct RemoteConnectionFactoryContext: public QObject
     nx::network::ssl::CertificateChain certificateChain;
     bool targetHasUserProvidedCertificate = false;
     std::shared_ptr<CertificateCache> certificateCache;
+    std::unique_ptr<AbstractRemoteConnectionUserInteractionDelegate> customUserInteractionDelegate;
 
     std::optional<RemoteConnectionError> error;
 

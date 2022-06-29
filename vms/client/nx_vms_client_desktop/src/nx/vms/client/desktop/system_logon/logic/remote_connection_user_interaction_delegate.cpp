@@ -17,11 +17,11 @@ namespace nx::vms::client::desktop {
 using ServerCertificateValidationLevel = nx::vms::client::core::ServerCertificateValidationLevel;
 
 RemoteConnectionUserInteractionDelegate::RemoteConnectionUserInteractionDelegate(
-    QWidget* mainWindow,
+    QWidget* parentWidget,
     QObject* parent)
     :
     base_type(parent),
-    m_mainWindow(mainWindow)
+    m_parentWidget(parentWidget)
 {
 }
 
@@ -112,10 +112,10 @@ bool RemoteConnectionUserInteractionDelegate::askUserToAcceptCertificate(
     const nx::network::ssl::CertificateChain& chain,
     ServerCertificateWarning::Reason warningType)
 {
-    if (!m_mainWindow)
+    if (!m_parentWidget)
         return false;
 
-    ServerCertificateWarning warning(target, primaryAddress, chain, warningType, m_mainWindow);
+    ServerCertificateWarning warning(target, primaryAddress, chain, warningType, m_parentWidget);
     warning.exec();
 
     // Dialog uses both standard and custom buttons. Check button role instead of result code.
@@ -127,7 +127,7 @@ void RemoteConnectionUserInteractionDelegate::showCertificateError(
     const nx::network::SocketAddress& primaryAddress,
     const nx::network::ssl::CertificateChain& chain)
 {
-    if (!m_mainWindow)
+    if (!m_parentWidget)
         return;
 
     if (const auto session = qnClientCoreModule->networkModule()->session();
@@ -136,17 +136,17 @@ void RemoteConnectionUserInteractionDelegate::showCertificateError(
         return;
     }
 
-    ServerCertificateError msg(target, primaryAddress, chain, m_mainWindow);
+    ServerCertificateError msg(target, primaryAddress, chain, m_parentWidget);
     msg.exec();
 }
 
 bool RemoteConnectionUserInteractionDelegate::request2FaValidation(const std::string& token)
 {
-    if (!m_mainWindow)
+    if (!m_parentWidget)
         return false;
 
     return OauthLoginDialog::validateToken(
-        m_mainWindow, tr("Connect to System"), token);
+        m_parentWidget, tr("Connect to System"), token);
 }
 
 } // namespace nx::vms::client::desktop

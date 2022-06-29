@@ -25,7 +25,6 @@ struct QnPingReply;
 
 namespace nx::vms::client::core {
 
-class AbstractRemoteConnectionUserInteractionDelegate;
 class CertificateVerifier;
 
 /**
@@ -78,7 +77,9 @@ public:
         ConnectionInfo connectionInfo,
         std::optional<QnUuid> expectedServerId,
         Callback callback,
-        Context::Purpose purpose = Context::Purpose::connect);
+        Context::Purpose purpose = Context::Purpose::connect,
+        std::unique_ptr<AbstractRemoteConnectionUserInteractionDelegate>
+            customUserInteractionDelegate = {});
 
     virtual void shutdown() override;
 

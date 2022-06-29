@@ -18,7 +18,7 @@ class RemoteConnectionUserInteractionDelegate:
     Q_OBJECT
 
 public:
-    RemoteConnectionUserInteractionDelegate(QWidget* mainWindow, QObject* parent = nullptr);
+    RemoteConnectionUserInteractionDelegate(QWidget* parentWidget, QObject* parent = nullptr);
 
     virtual bool acceptNewCertificate(
         const nx::vms::api::ModuleInformation& target,
@@ -50,7 +50,7 @@ private:
         const nx::network::ssl::CertificateChain& chain);
 
 private:
-    QPointer<QWidget> const m_mainWindow;
+    QPointer<QWidget> const m_parentWidget;
 };
 
 } // namespace nx::vms::client::desktop

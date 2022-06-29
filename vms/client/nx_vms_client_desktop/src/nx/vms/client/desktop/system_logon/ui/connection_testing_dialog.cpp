@@ -10,6 +10,7 @@
 #include <nx/network/nx_network_ini.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection_error_strings.h>
@@ -19,6 +20,8 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <utils/connection_diagnostics_helper.h>
+
+#include "../logic/remote_connection_user_interaction_delegate.h"
 
 using namespace nx::vms::client::core;
 
@@ -74,6 +77,7 @@ Qn::HelpTopic helpTopicId(RemoteConnectionErrorCode errorCode)
 
 struct ConnectionTestingDialog::Private
 {
+    ConnectionTestingDialog* const q;
     nx::vms::api::SoftwareVersion engineVersion;
     RemoteConnectionFactory::ProcessPtr connectionProcess;
     DiagnosticResult result;
@@ -82,11 +86,78 @@ struct ConnectionTestingDialog::Private
     std::unique_ptr<QTimer> timeoutTimer = std::make_unique<QTimer>();
     std::unique_ptr<Ui::ConnectionTestingDialog> ui =
         std::make_unique<Ui::ConnectionTestingDialog>();
+
+    auto pauseTimer()
+    {
+        timeoutTimer->stop();
+        ui->progressBar->setValue(0);
+        return nx::utils::ScopeGuard([this]() { timeoutTimer->start();} );
+    }
+
+    class ConnectionUserInteractionDelegate: public RemoteConnectionUserInteractionDelegate
+    {
+        using base_type = RemoteConnectionUserInteractionDelegate;
+
+    public:
+        ConnectionUserInteractionDelegate(ConnectionTestingDialog* owner):
+            RemoteConnectionUserInteractionDelegate(owner),
+            m_owner(owner)
+        {
+        }
+
+        virtual bool acceptNewCertificate(
+            const nx::vms::api::ModuleInformation& target,
+            const nx::network::SocketAddress& primaryAddress,
+            const nx::network::ssl::CertificateChain& chain) override
+        {
+            if (!m_owner)
+                return false;
+
+            auto guard = m_owner->d->pauseTimer();
+            return base_type::acceptNewCertificate(target, primaryAddress, chain);
+        }
+
+        virtual bool acceptCertificateAfterMismatch(
+            const nx::vms::api::ModuleInformation& target,
+            const nx::network::SocketAddress& primaryAddress,
+            const nx::network::ssl::CertificateChain& chain) override
+        {
+            if (!m_owner)
+                return false;
+
+            auto guard = m_owner->d->pauseTimer();
+            return base_type::acceptCertificateAfterMismatch(target, primaryAddress, chain);
+        }
+
+        virtual bool acceptCertificateOfServerInTargetSystem(
+            const nx::vms::api::ModuleInformation& target,
+            const nx::network::SocketAddress& primaryAddress,
+            const nx::network::ssl::CertificateChain& chain) override
+        {
+            if (!m_owner)
+                return false;
+
+            auto guard = m_owner->d->pauseTimer();
+            return base_type::acceptCertificateOfServerInTargetSystem(target, primaryAddress, chain);
+        }
+
+        virtual bool request2FaValidation(const std::string& token) override
+        {
+            if (!m_owner)
+                return false;
+
+            auto guard = m_owner->d->pauseTimer();
+            return base_type::request2FaValidation(token);
+        }
+
+    private:
+        QPointer<ConnectionTestingDialog> m_owner;
+    };
 };
 
 ConnectionTestingDialog::ConnectionTestingDialog(QWidget* parent):
     QnButtonBoxDialog(parent),
-    d(new Private())
+    d(new Private{.q = this})
 {
     d->ui->setupUi(this);
     setHelpTopic(this, Qn::Login_Help);
@@ -170,7 +241,9 @@ void ConnectionTestingDialog::testConnection(
     d->connectionProcess = remoteConnectionFactory->connect(
         {address, credentials, nx::vms::api::UserType::local},
         /*expectedServerId*/ std::nullopt,
-        callback);
+        callback,
+        RemoteConnectionFactory::Context::Purpose::connect,
+        std::make_unique<Private::ConnectionUserInteractionDelegate>(this));
 
     d->timeoutTimer->start();
     exec();
