@@ -18,7 +18,6 @@
 
 #include <client/client_globals.h>
 #include <core/resource/resource_fwd.h>
-#include <utils/common/connective.h>
 
 class QLabel;
 class QStackedWidget;
@@ -34,10 +33,10 @@ class ImageProvider;
  * The widget shows image that it receives from ImageProvider.
  * Busy indicator is shown until the image is loaded.
  */
-class AsyncImageWidget : public Connective<QWidget>
+class AsyncImageWidget : public QWidget
 {
     Q_OBJECT
-    using base_type = Connective<QWidget>;
+    using base_type = QWidget;
 
 public:
     explicit AsyncImageWidget(QWidget* parent = nullptr);

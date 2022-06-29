@@ -91,15 +91,15 @@ void QnResourceListModel::setResources(const QnResourceList &resources)
     ScopedReset resetModel(this);
 
     foreach(const QnResourcePtr &resource, m_resources)
-        disconnect(resource, nullptr, this, nullptr);
+        disconnect(resource.get(), nullptr, this, nullptr);
 
     m_resources = resources;
 
     for (const QnResourcePtr &resource : m_resources)
     {
-        connect(resource, &QnResource::nameChanged,    this, &QnResourceListModel::at_resource_resourceChanged);
-        connect(resource, &QnResource::statusChanged,  this, &QnResourceListModel::at_resource_resourceChanged);
-        connect(resource, &QnResource::resourceChanged,this, &QnResourceListModel::at_resource_resourceChanged);
+        connect(resource.get(), &QnResource::nameChanged,    this, &QnResourceListModel::at_resource_resourceChanged);
+        connect(resource.get(), &QnResource::statusChanged,  this, &QnResourceListModel::at_resource_resourceChanged);
+        connect(resource.get(), &QnResource::resourceChanged,this, &QnResourceListModel::at_resource_resourceChanged);
     }
 }
 
@@ -107,9 +107,9 @@ void QnResourceListModel::addResource(const QnResourcePtr &resource)
 {
     NX_ASSERT(m_resources.indexOf(resource) < 0);
 
-    connect(resource, &QnResource::nameChanged, this, &QnResourceListModel::at_resource_resourceChanged);
-    connect(resource, &QnResource::statusChanged, this, &QnResourceListModel::at_resource_resourceChanged);
-    connect(resource, &QnResource::resourceChanged, this, &QnResourceListModel::at_resource_resourceChanged);
+    connect(resource.get(), &QnResource::nameChanged, this, &QnResourceListModel::at_resource_resourceChanged);
+    connect(resource.get(), &QnResource::statusChanged, this, &QnResourceListModel::at_resource_resourceChanged);
+    connect(resource.get(), &QnResource::resourceChanged, this, &QnResourceListModel::at_resource_resourceChanged);
 
     int row = m_resources.size();
     ScopedInsertRows insertRows(this, QModelIndex(), row, row);

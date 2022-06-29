@@ -435,7 +435,7 @@ void QnCameraBookmarksManagerPrivate::registerQuery(const QnCameraBookmarksQuery
     /* Do not store shared pointer in the functor so it can be safely unregistered. */
     QUuid queryId = query->id();
     m_queries.insert(queryId, QueryInfo(query));
-    connect(query, &QnCameraBookmarksQuery::queryChanged, this, [this, queryId]
+    connect(query.get(), &QnCameraBookmarksQuery::queryChanged, this, [this, queryId]
     {
         updateQueryAsync(queryId);
     });
@@ -550,7 +550,7 @@ QnCameraBookmarksQueryPtr QnCameraBookmarksManagerPrivate::createQuery(const QnC
     QUuid queryId = query->id();
     registerQuery(query);
 
-    connect(query, &QObject::destroyed, this, [this, queryId]()
+    connect(query.get(), &QObject::destroyed, this, [this, queryId]()
     {
         unregisterQuery(queryId);
     });

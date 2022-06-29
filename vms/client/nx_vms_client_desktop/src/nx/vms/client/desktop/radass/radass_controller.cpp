@@ -654,7 +654,7 @@ RadassController::RadassController(TimerFactoryPtr timerFactory, QObject* parent
     base_type(parent),
     d(new Private(timerFactory))
 {
-    connect(d->mainTimer, &AbstractTimer::timeout, this, &RadassController::onTimer);
+    connect(d->mainTimer.get(), &AbstractTimer::timeout, this, &RadassController::onTimer);
     d->mainTimer->start(kTimerInterval);
 }
 

@@ -38,13 +38,13 @@ void ModelDataAccessor::setModel(const QVariant& modelVariant)
     if (!m_model)
         return;
 
-    connect(m_model, &QAbstractItemModel::modelReset,
+    connect(m_model.data(), &QAbstractItemModel::modelReset,
         this, &ModelDataAccessor::countChanged);
-    connect(m_model, &QAbstractItemModel::rowsRemoved,
+    connect(m_model.data(), &QAbstractItemModel::rowsRemoved,
         this, &ModelDataAccessor::countChanged);
-    connect(m_model, &QAbstractItemModel::rowsInserted,
+    connect(m_model.data(), &QAbstractItemModel::rowsInserted,
         this, &ModelDataAccessor::countChanged);
-    connect(m_model, &QAbstractItemModel::rowsMoved,
+    connect(m_model.data(), &QAbstractItemModel::rowsMoved,
         this, &ModelDataAccessor::rowsMoved);
 
     QObject::connect(m_model, &QAbstractItemModel::rowsInserted, this,

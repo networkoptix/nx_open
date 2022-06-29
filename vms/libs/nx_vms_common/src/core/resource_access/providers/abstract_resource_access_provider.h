@@ -6,7 +6,6 @@
 
 #include <nx/core/access/access_types.h>
 
-#include <utils/common/connective.h>
 #include <utils/common/updatable.h>
 #include <core/resource/resource_fwd.h>
 
@@ -18,11 +17,11 @@ namespace nx::core::access {
  * Public interface for all Resource Access Provider classes.
  */
 class NX_VMS_COMMON_API AbstractResourceAccessProvider:
-    public Connective<QObject>,
+    public QObject,
     public QnUpdatable
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     using Mode = nx::core::access::Mode;

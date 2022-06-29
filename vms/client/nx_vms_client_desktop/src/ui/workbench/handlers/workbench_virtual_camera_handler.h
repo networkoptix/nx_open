@@ -9,15 +9,14 @@
 #include <core/resource/resource_fwd.h>
 #include <api/model/api_model_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <utils/common/connective.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_fwd.h>
 
 class QnWorkbenchVirtualCameraHandler:
-    public Connective<QObject>,
+    public QObject,
     public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     explicit QnWorkbenchVirtualCameraHandler(QObject* parent = nullptr);

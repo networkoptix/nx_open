@@ -8,7 +8,6 @@
 
 #include <recording/stream_recorder_data.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <utils/common/connective.h>
 
 class QnCountdownTimer;
 class QnDesktopDataProviderWrapper;
@@ -18,10 +17,10 @@ class ExportStorageStreamRecorder;
 class SceneBanner;
 } // namespace nx::vms::client::desktop
 
-class QnWorkbenchScreenRecordingHandler: public Connective<QObject>, public QnWorkbenchContextAware
+class QnWorkbenchScreenRecordingHandler: public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     /*

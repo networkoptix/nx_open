@@ -30,7 +30,6 @@
 
 #include <nx/utils/scope_guard.h>
 
-#include <utils/common/connective.h>
 
 #include <ui/widgets/common/emulated_frame_widget.h>
 
@@ -89,9 +88,9 @@ QScreen* getScreen(const QPoint& scaled)
     return (it == screens.end() ? nullptr : *it);
 }
 
-class MenuScreenCorrector: public Connective<QObject>
+class MenuScreenCorrector: public QObject
 {
-    typedef Connective<QObject> base_type;
+    typedef QObject base_type;
 
 public:
     MenuScreenCorrector(QMenu* parent):

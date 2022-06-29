@@ -10,7 +10,6 @@
 #include <nx/vms/event/events/abstract_event.h>
 #include <ui/workbench/workbench_state_manager.h>
 
-#include <utils/common/connective.h>
 
 class QnBusinessEventsFilterResourcePropertyAdaptor;
 
@@ -18,11 +17,11 @@ namespace nx::vms::rules { class NotificationAction; }
 namespace nx::vms::client::desktop { class CrossSystemNotificationsListener; }
 
 class QnWorkbenchNotificationsHandler:
-    public Connective<QObject>,
+    public QObject,
     public QnSessionAwareDelegate
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     explicit QnWorkbenchNotificationsHandler(QObject* parent = nullptr);

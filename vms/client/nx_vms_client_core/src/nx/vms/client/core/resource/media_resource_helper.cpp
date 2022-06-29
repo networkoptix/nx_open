@@ -8,7 +8,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/client/core/system_context.h>
-#include <utils/common/connective.h>
 
 namespace nx::vms::client::core {
 
@@ -18,7 +17,7 @@ static constexpr bool kFisheyeDewarpingFeatureEnabled = true;
 
 } // namespace
 
-class MediaResourceHelper::Private: public Connective<QObject>
+class MediaResourceHelper::Private: public QObject
 {
     MediaResourceHelper* const q = nullptr;
 
@@ -211,18 +210,18 @@ void MediaResourceHelper::Private::handleResourceChanged()
 
     if (camera)
     {
-        connect(camera, &QnResource::propertyChanged, this, &Private::handlePropertyChanged);
-        connect(camera, &QnResource::parentIdChanged, this, &Private::updateServer);
+        connect(camera.get(), &QnResource::propertyChanged, this, &Private::handlePropertyChanged);
+        connect(camera.get(), &QnResource::parentIdChanged, this, &Private::updateServer);
 
-        connect(camera, &QnResource::videoLayoutChanged,
+        connect(camera.get(), &QnResource::videoLayoutChanged,
             q, &MediaResourceHelper::videoLayoutChanged);
-        connect(camera, &QnResource::mediaDewarpingParamsChanged,
+        connect(camera.get(), &QnResource::mediaDewarpingParamsChanged,
             q, &MediaResourceHelper::fisheyeParamsChanged);
-        connect(camera, &QnVirtualCameraResource::scheduleEnabledChanged,
+        connect(camera.get(), &QnVirtualCameraResource::scheduleEnabledChanged,
             q, &MediaResourceHelper::analogCameraWithoutLicenseChanged);
-        connect(camera, &QnResource::rotationChanged,
+        connect(camera.get(), &QnResource::rotationChanged,
             q, &MediaResourceHelper::customRotationChanged);
-        connect(camera, &QnVirtualCameraResource::audioEnabledChanged,
+        connect(camera.get(), &QnVirtualCameraResource::audioEnabledChanged,
             q, &MediaResourceHelper::audioEnabledChanged);
 
         updateServer();

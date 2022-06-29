@@ -12,7 +12,6 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/common/utils/volatile_unique_ptr.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <utils/common/connective.h>
 
 #include "utils/color_space/image_correction.h"
 #include "workbench_context_aware.h"
@@ -59,11 +58,11 @@ class WeakGraphicsItemPointerList;
 /**
  * This class implements default scene manipulation logic.
  */
-class QnWorkbenchController: public Connective<QObject>, public QnWorkbenchContextAware
+class QnWorkbenchController: public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
-    typedef Connective<QObject> base_type;
+    typedef QObject base_type;
 
 public:
     /**

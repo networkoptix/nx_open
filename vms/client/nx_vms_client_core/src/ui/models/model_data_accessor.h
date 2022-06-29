@@ -3,15 +3,14 @@
 #pragma once
 
 #include <QtCore/QAbstractItemModel>
-
-#include <utils/common/connective.h>
+#include <QtCore/QPointer>
 
 namespace nx {
 namespace client {
 
-class ModelDataAccessor: public Connective<QObject>
+class ModelDataAccessor: public QObject
 {
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
     Q_OBJECT
     Q_PROPERTY(QVariant model READ model WRITE setModel NOTIFY modelChanged)

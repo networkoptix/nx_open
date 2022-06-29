@@ -9,13 +9,12 @@
 #include <QtWidgets/QGraphicsLayout>
 
 #include <ui/processors/clickable.h>
-#include <utils/common/connective.h>
 
 
-class QnIoModuleOverlayContentsPrivate: public Connective<QObject>
+class QnIoModuleOverlayContentsPrivate: public QObject
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
     Q_DISABLE_COPY(QnIoModuleOverlayContentsPrivate)
     Q_DECLARE_PUBLIC(QnIoModuleOverlayContents)

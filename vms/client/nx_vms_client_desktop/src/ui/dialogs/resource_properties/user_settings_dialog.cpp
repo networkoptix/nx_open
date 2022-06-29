@@ -542,13 +542,13 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user)
 
     if (m_user)
     {
-        connect(m_user, &QnResource::propertyChanged, this,
+        connect(m_user.get(), &QnResource::propertyChanged, this,
             [this](const QnResourcePtr& resource, const QString& propertyName)
             {
                 if (resource == m_user && propertyName == cloudAuthInfoPropertyName)
                     forcedUpdate();
             });
-        connect(m_user, &QnUserResource::digestChanged, this,
+        connect(m_user.get(), &QnUserResource::digestChanged, this,
             [this](const auto& /*user*/) { QnUserSettingsDialog::updateButtonBox(); });
     }
 

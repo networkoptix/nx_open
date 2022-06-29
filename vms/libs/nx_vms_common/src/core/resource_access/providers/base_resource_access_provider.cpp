@@ -240,11 +240,11 @@ void BaseResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resour
     if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
     {
         /* Disabled user should have no access to anything. */
-        connect(user, &QnUserResource::enabledChanged, this,
+        connect(user.get(), &QnUserResource::enabledChanged, this,
             &BaseResourceAccessProvider::updateAccessBySubject);
 
         /* Changing of role means change of all user access rights. */
-        connect(user, &QnUserResource::userRolesChanged, this,
+        connect(user.get(), &QnUserResource::userRolesChanged, this,
             &BaseResourceAccessProvider::updateAccessBySubject);
 
         handleSubjectAdded(user);

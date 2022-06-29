@@ -19,14 +19,14 @@ QnBusinessRuleViewModelPtr QnAbstractBusinessParamsWidget::model() {
 
 void QnAbstractBusinessParamsWidget::setModel(const QnBusinessRuleViewModelPtr &model) {
     if (m_model)
-        disconnect(m_model, nullptr, this, nullptr);
+        disconnect(m_model.get(), nullptr, this, nullptr);
 
     m_model = model;
 
     if(!m_model)
         return;
 
-    connect(m_model, &QnBusinessRuleViewModel::dataChanged, this, &QnAbstractBusinessParamsWidget::at_model_dataChanged);
+    connect(m_model.get(), &QnBusinessRuleViewModel::dataChanged, this, &QnAbstractBusinessParamsWidget::at_model_dataChanged);
     at_model_dataChanged(Field::all);
 }
 

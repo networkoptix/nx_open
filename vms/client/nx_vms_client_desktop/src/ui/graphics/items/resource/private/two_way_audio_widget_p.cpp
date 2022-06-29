@@ -29,7 +29,6 @@
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/resource/two_way_audio_widget.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
-#include <utils/common/connective.h>
 #include <utils/common/delayed.h>
 #include <utils/common/scoped_painter_rollback.h>
 

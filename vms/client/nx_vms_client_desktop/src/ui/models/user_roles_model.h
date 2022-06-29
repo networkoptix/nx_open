@@ -7,17 +7,16 @@
 
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
-#include <utils/common/connective.h>
 
 #include <nx/utils/scoped_model_operations.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/user_role_data.h>
 
 class QnUserRolesModelPrivate;
-class QnUserRolesModel: public ScopedModelOperations<Connective<QAbstractItemModel>>
+class QnUserRolesModel: public ScopedModelOperations<QAbstractItemModel>
 {
     Q_OBJECT
-    using base_type = ScopedModelOperations<Connective<QAbstractItemModel>>;
+    using base_type = ScopedModelOperations<QAbstractItemModel>;
 
 public:
     enum DisplayRoleFlag

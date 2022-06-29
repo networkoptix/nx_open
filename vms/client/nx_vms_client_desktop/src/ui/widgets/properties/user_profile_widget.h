@@ -9,16 +9,15 @@
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-#include <utils/common/connective.h>
 
 namespace Ui { class UserProfileWidget; }
 namespace nx::vms::client::desktop { class Aligner; }
 class QnUserSettingsModel;
 
-class QnUserProfileWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
+class QnUserProfileWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    typedef Connective<QnAbstractPreferencesWidget> base_type;
+    typedef QnAbstractPreferencesWidget base_type;
 
 public:
     QnUserProfileWidget(QnUserSettingsModel* model, QWidget* parent = 0);

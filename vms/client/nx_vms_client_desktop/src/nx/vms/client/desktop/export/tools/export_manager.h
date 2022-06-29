@@ -5,7 +5,6 @@
 #include <QtCore/QObject>
 
 #include <nx/vms/client/desktop/export/data/export_types.h>
-#include <utils/common/connective.h>
 
 #include <nx/utils/uuid.h>
 
@@ -29,9 +28,9 @@ struct ExportProcessInfo
 /**
  * ExportProcess class deals with showing process of video exporting
  */
-class ExportProcess: public Connective<QObject>
+class ExportProcess: public QObject
 {
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
     Q_OBJECT
 
 public:

@@ -286,10 +286,10 @@ QnMediaResourceWidget::QnMediaResourceWidget(
 
     setupHud();
 
-    connect(base_type::resource(), &QnResource::propertyChanged, this,
+    connect(base_type::resource().get(), &QnResource::propertyChanged, this,
         &QnMediaResourceWidget::at_resource_propertyChanged);
 
-    connect(base_type::resource(), &QnResource::mediaDewarpingParamsChanged, this,
+    connect(base_type::resource().get(), &QnResource::mediaDewarpingParamsChanged, this,
         &QnMediaResourceWidget::updateDewarpingParams);
 
     connect(item, &QnWorkbenchItem::dewarpingParamsChanged, this,
@@ -395,7 +395,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(
     initStatusOverlayController();
 
     // TODO: #sivanov Get rid of resourceChanged.
-    connect(base_type::resource(), &QnResource::resourceChanged, this,
+    connect(base_type::resource().get(), &QnResource::resourceChanged, this,
         &QnMediaResourceWidget::updateButtonsVisibility);
 
     connect(this, &QnResourceWidget::aspectRatioChanged,
@@ -630,7 +630,7 @@ void QnMediaResourceWidget::initIoModuleOverlay()
         updateButtonsVisibility();
         updateIoModuleVisibility(false);
 
-        connect(d->camera, &QnResource::statusChanged, this,
+        connect(d->camera.get(), &QnResource::statusChanged, this,
             [this]
             {
                 updateIoModuleVisibility(animationAllowed());
@@ -1073,7 +1073,7 @@ void QnMediaResourceWidget::updatePtzController()
         m_ptzController = fisheyeController;
     }
 
-    connect(m_ptzController, &QnAbstractPtzController::changed, this,
+    connect(m_ptzController.get(), &QnAbstractPtzController::changed, this,
         &QnMediaResourceWidget::at_ptzController_changed);
 
     emit ptzControllerChanged();
@@ -1525,7 +1525,7 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr& display)
 
         connect(display->camDisplay(), &QnCamDisplay::liveMode, this,
             &QnMediaResourceWidget::at_camDisplay_liveChanged);
-        connect(d->resource, &QnResource::videoLayoutChanged, this,
+        connect(d->resource.get(), &QnResource::videoLayoutChanged, this,
             &QnMediaResourceWidget::at_videoLayoutChanged);
 
         if (const auto archiveReader = display->archiveReader())

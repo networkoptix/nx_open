@@ -7,19 +7,18 @@
 #include <nx/utils/singleton.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
-#include <utils/common/connective.h>
 
 /**
  * Utility class for saving resources user attributes.
  * Supports changes rollback in case they cannot be saved on server.
  */
-class NX_VMS_CLIENT_CORE_API QnResourcesChangesManager: public Connective<QObject>,
+class NX_VMS_CLIENT_CORE_API QnResourcesChangesManager: public QObject,
     public Singleton<QnResourcesChangesManager>,
     public nx::vms::client::core::CommonModuleAware,
     public nx::vms::client::core::RemoteConnectionAware
 {
     Q_OBJECT
-    typedef Connective<QObject> base_type;
+    typedef QObject base_type;
 
 public:
     QnResourcesChangesManager(QObject* parent = nullptr);

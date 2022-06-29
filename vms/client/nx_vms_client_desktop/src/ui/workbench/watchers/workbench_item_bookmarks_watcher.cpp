@@ -113,9 +113,9 @@ namespace
 
 //
 
-class QnWorkbenchItemBookmarksWatcher::WidgetData : public Connective<QObject>
+class QnWorkbenchItemBookmarksWatcher::WidgetData : public QObject
 {
-    typedef Connective<QObject> base_type;
+    typedef QObject base_type;
 
     typedef QPointer<QnTimelineBookmarksWatcher> QnTimelineBookmarksWatcherPtr;
 public:
@@ -189,16 +189,16 @@ QnWorkbenchItemBookmarksWatcher::WidgetData::WidgetData(
 {
     m_query->setFilter(kInitialFilter);
     m_query->setCamera(camera->getId());
-    connect(m_query, &QnCameraBookmarksQuery::bookmarksChanged
-        , this, &WidgetData::updateBookmarks);
+    connect(m_query.get(), &QnCameraBookmarksQuery::bookmarksChanged,
+        this, &WidgetData::updateBookmarks);
 
-    connect(m_mediaWidget, &QnMediaResourceWidget::positionChanged
-        , this, &WidgetData::updatePos);
+    connect(m_mediaWidget, &QnMediaResourceWidget::positionChanged,
+        this, &WidgetData::updatePos);
 }
 
 QnWorkbenchItemBookmarksWatcher::WidgetData::~WidgetData()
 {
-    disconnect(m_query, nullptr, this, nullptr);
+    disconnect(m_query.get(), nullptr, this, nullptr);
 }
 
 void QnWorkbenchItemBookmarksWatcher::WidgetData::updatePos(qint64 posMs)

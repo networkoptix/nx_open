@@ -10,7 +10,6 @@
 
 #include <nx/utils/uuid.h>
 #include <nx/utils/singleton.h>
-#include <utils/common/connective.h>
 
 class NX_VMS_CLIENT_CORE_API QnForgottenSystemsManager:
     public QObject,

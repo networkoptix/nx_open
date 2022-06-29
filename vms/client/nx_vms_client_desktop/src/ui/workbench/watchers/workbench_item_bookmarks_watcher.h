@@ -4,7 +4,6 @@
 
 #include <QtCore/QObject>
 
-#include <utils/common/connective.h>
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -12,11 +11,11 @@
 class QnMediaResourceWidget;
 
 // @brief Loads bookmarks for all items on current layout in vicinity of current position.
-class QnWorkbenchItemBookmarksWatcher: public Connective<QObject>, public QnWorkbenchContextAware
+class QnWorkbenchItemBookmarksWatcher: public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
-    typedef Connective<QObject> base_type;
+    typedef QObject base_type;
 
 public:
     explicit QnWorkbenchItemBookmarksWatcher(QObject *parent);

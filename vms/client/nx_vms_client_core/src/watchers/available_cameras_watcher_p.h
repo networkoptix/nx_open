@@ -6,11 +6,11 @@
 
 namespace detail {
 
-class Watcher: public Connective<QObject>, public QnCommonModuleAware
+class Watcher: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
 
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     Watcher(const QnUserResourcePtr& user, QnCommonModule* commonModule);
@@ -47,6 +47,8 @@ private:
 
 class PermissionsBasedWatcher: public Watcher
 {
+    Q_OBJECT
+
 public:
     PermissionsBasedWatcher(const QnUserResourcePtr& user, QnCommonModule* commonModule);
 

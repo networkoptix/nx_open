@@ -12,7 +12,6 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-#include <utils/common/connective.h>
 
 #include <nx/utils/uuid.h>
 
@@ -27,10 +26,10 @@ class SceneBanner;
 namespace ui {
 namespace workbench {
 
-class LayoutTourExecutor: public Connective<QObject>, public QnWorkbenchContextAware
+class LayoutTourExecutor: public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     LayoutTourExecutor(QObject* parent = nullptr);

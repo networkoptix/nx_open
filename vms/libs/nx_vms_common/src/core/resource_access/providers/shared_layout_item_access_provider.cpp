@@ -128,7 +128,7 @@ void SharedLayoutItemAccessProvider::handleResourceAdded(const QnResourcePtr& re
 
     if (auto layout = resource.dynamicCast<QnLayoutResource>())
     {
-        connect(layout, &QnResource::parentIdChanged, this,
+        connect(layout.get(), &QnResource::parentIdChanged, this,
             [this, layout]
             {
                 updateAccessToLayout(layout);
@@ -288,9 +288,9 @@ QnLayoutItemAggregatorPtr SharedLayoutItemAccessProvider::ensureAggregatorForSub
             return *existing;
 
         QnLayoutItemAggregatorPtr aggregator(new QnLayoutItemAggregator());
-        connect(aggregator, &QnLayoutItemAggregator::itemAdded, this,
+        connect(aggregator.get(), &QnLayoutItemAggregator::itemAdded, this,
             updateAccessToResourceBySubject);
-        connect(aggregator, &QnLayoutItemAggregator::itemRemoved, this,
+        connect(aggregator.get(), &QnLayoutItemAggregator::itemRemoved, this,
             updateAccessToResourceBySubject);
         m_aggregatorsBySubject.insert(id, aggregator);
         return aggregator;

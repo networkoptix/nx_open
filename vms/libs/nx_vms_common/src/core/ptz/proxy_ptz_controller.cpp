@@ -26,9 +26,9 @@ void QnProxyPtzController::setBaseController(const QnPtzControllerPtr& controlle
     if (!m_controller)
         return;
 
-    connect(m_controller, &QnAbstractPtzController::finished,
+    connect(m_controller.get(), &QnAbstractPtzController::finished,
         this, &QnProxyPtzController::baseFinished);
-    connect(m_controller, &QnAbstractPtzController::changed,
+    connect(m_controller.get(), &QnAbstractPtzController::changed,
         this, &QnProxyPtzController::baseChanged);
 }
 

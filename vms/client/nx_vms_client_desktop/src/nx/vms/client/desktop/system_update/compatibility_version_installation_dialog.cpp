@@ -309,7 +309,7 @@ void CompatibilityVersionInstallationDialog::startUpdate()
         m_private->connectionProcess->context->logonData,
         m_private->connectionProcess->context->certificateCache.get());
 
-    connect(m_private->clientUpdateTool, &ClientUpdateTool::updateStateChanged,
+    connect(m_private->clientUpdateTool.get(), &ClientUpdateTool::updateStateChanged,
         this, &CompatibilityVersionInstallationDialog::atUpdateStateChanged);
 
     const QString updateUrl = nx::vms::common::update::updateFeedUrl();

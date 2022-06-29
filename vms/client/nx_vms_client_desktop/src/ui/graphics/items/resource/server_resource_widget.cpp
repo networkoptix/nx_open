@@ -447,8 +447,8 @@ QnServerResourceWidget::QnServerResourceWidget(
 
     /* Note that this slot is already connected to nameChanged signal in
      * base class's constructor.*/
-    connect(m_resource, &QnResource::urlChanged,    this, &QnServerResourceWidget::updateTitleText);
-    connect(m_resource, &QnResource::statusChanged, this, &QnServerResourceWidget::updateTitleText);
+    connect(m_resource.get(), &QnResource::urlChanged,    this, &QnServerResourceWidget::updateTitleText);
+    connect(m_resource.get(), &QnResource::statusChanged, this, &QnServerResourceWidget::updateTitleText);
 
     addOverlays();
     createButtons();

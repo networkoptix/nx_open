@@ -73,7 +73,7 @@ QnVideowallScreenWidget::QnVideowallScreenWidget(
     setInfoVisible(true, false);
     updateInfoText();
 
-    connect(m_videowall, &QnVideoWallResource::itemChanged, this,
+    connect(m_videowall.get(), &QnVideoWallResource::itemChanged, this,
         &QnVideowallScreenWidget::at_videoWall_itemChanged);
 }
 

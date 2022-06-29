@@ -17,7 +17,6 @@
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-#include <utils/common/connective.h>
 
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/api/types/resource_types.h>
@@ -27,11 +26,11 @@ class QMenu;
 class QnStorageListModel;
 
 class QnStorageConfigWidget:
-    public Connective<QnAbstractPreferencesWidget>,
+    public QnAbstractPreferencesWidget,
     public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using base_type = Connective<QnAbstractPreferencesWidget>;
+    using base_type = QnAbstractPreferencesWidget;
 
 public:
     QnStorageConfigWidget(QWidget* parent = nullptr);

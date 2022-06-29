@@ -7,15 +7,14 @@
 #include <nx/vms/client/desktop/common/widgets/dropdown_button.h>
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
-#include <utils/common/connective.h>
 
 class QMenu;
 class QnUuid;
 
-class QnChooseServerButton: public Connective<DropdownButton>, public QnCommonModuleAware
+class QnChooseServerButton: public DropdownButton, public QnCommonModuleAware
 {
     Q_OBJECT
-    using base_type = Connective<DropdownButton>;
+    using base_type = DropdownButton;
 
 public:
     QnChooseServerButton(QWidget* parent = nullptr);

@@ -13,7 +13,6 @@
 #include <nx/reflect/json.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/license/usage_helper.h>
-#include <utils/common/connective.h>
 #include <utils/common/delayed.h>
 
 namespace detail {
@@ -86,9 +85,9 @@ LicenseErrorMap extractErrors(const std::string_view& messageBody)
     return result;
 }
 
-class LicenseDeactivatorPrivate: public Connective<QObject>
+class LicenseDeactivatorPrivate: public QObject
 {
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
     using Handler = Deactivator::Handler;
     using Result = Deactivator::Result;
 

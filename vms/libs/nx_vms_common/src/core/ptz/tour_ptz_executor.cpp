@@ -14,7 +14,6 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/common/ptz/vector.h>
 #include <nx/vms/common/system_context.h>
-#include <utils/common/connective.h>
 #include <utils/common/invocation_event.h>
 #include <utils/math/math.h>
 
@@ -54,7 +53,7 @@ struct QnPtzTourData {
 // -------------------------------------------------------------------------- //
 // QnTourPtzExecutorPrivate
 // -------------------------------------------------------------------------- //
-class QnTourPtzExecutorPrivate: public ConnectiveBase
+class QnTourPtzExecutorPrivate
 {
 public:
     enum State {
@@ -158,7 +157,7 @@ void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller, QThrea
          * and tour executor can be moved between threads after construction. */
         baseController->setParent(q);
     }
-    connect(baseController, &QnAbstractPtzController::finished, q, &QnTourPtzExecutor::at_controller_finished);
+    q->connect(baseController.get(), &QnAbstractPtzController::finished, q, &QnTourPtzExecutor::at_controller_finished);
     QnResourceData resourceData = controller->resource()->systemContext()->resourceDataPool()
         ->data(baseController->resource().dynamicCast<QnSecurityCamResource>());
     tourGetPosWorkaround = resourceData.value<bool>("tourGetPosWorkaround", false);

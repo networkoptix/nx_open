@@ -4,7 +4,6 @@
 
 #include <QtWidgets/QWidget>
 
-#include <utils/common/connective.h>
 
 namespace Ui { class CustomSettingsWidget; }
 
@@ -14,10 +13,10 @@ using QnCameraAdvancedParamValueList = QList<QnCameraAdvancedParamValue>;
 
 namespace nx::vms::client::desktop {
 
-class CustomSettingsWidget: public Connective<QWidget>
+class CustomSettingsWidget: public QWidget
 {
     Q_OBJECT
-    using base_type = Connective<QWidget>;
+    using base_type = QWidget;
 public:
     CustomSettingsWidget(QWidget* parent = nullptr);
     virtual ~CustomSettingsWidget() override;

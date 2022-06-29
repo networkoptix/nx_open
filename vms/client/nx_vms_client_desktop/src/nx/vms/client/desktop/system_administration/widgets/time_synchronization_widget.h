@@ -5,7 +5,6 @@
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
-#include <utils/common/connective.h>
 
 namespace Ui { class TimeSynchronizationWidget; }
 
@@ -19,12 +18,12 @@ class TimeSynchronizationServerStateWatcher;
 class TimeSynchronizationServersDelegate;
 
 class TimeSynchronizationWidget:
-    public Connective<QnAbstractPreferencesWidget>,
+    public QnAbstractPreferencesWidget,
     public nx::vms::client::core::CommonModuleAware,
     public nx::vms::client::core::RemoteConnectionAware
 {
     Q_OBJECT
-    using base_type = Connective<QnAbstractPreferencesWidget>;
+    using base_type = QnAbstractPreferencesWidget;
 
 public:
     explicit TimeSynchronizationWidget(QWidget* parent = nullptr);

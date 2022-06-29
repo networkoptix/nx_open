@@ -71,7 +71,7 @@ void LayoutAccessor::setLayout(const QnLayoutResourcePtr& layout)
 
     if (layout)
     {
-        connect(layout, &QnLayoutResource::nameChanged, this, &LayoutAccessor::nameChanged);
+        connect(layout.get(), &QnLayoutResource::nameChanged, this, &LayoutAccessor::nameChanged);
     }
 
     emit layoutChanged();

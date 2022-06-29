@@ -16,7 +16,6 @@
 #include <nx/vms/license/license_usage_fwd.h>
 #include <nx_ec/ec_api_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <utils/common/connective.h>
 
 class QnWorkbenchItem;
 class QnWorkbenchLayout;
@@ -26,11 +25,11 @@ class QnUuidPool;
 
 namespace nx::vms::api { struct VideowallControlMessageData; }
 
-class QnWorkbenchVideoWallHandler: public Connective<QObject>, public QnWorkbenchContextAware
+class QnWorkbenchVideoWallHandler: public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
-    typedef Connective<QObject> base_type;
+    typedef QObject base_type;
 
 public:
     explicit QnWorkbenchVideoWallHandler(QObject* parent = 0);

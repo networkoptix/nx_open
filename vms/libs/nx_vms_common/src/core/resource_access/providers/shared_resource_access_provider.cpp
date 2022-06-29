@@ -76,7 +76,7 @@ void SharedResourceAccessProvider::handleResourceAdded(const QnResourcePtr& reso
 
     if (auto layout = resource.dynamicCast<QnLayoutResource>())
     {
-        connect(layout, &QnResource::parentIdChanged, this,
+        connect(layout.get(), &QnResource::parentIdChanged, this,
             &SharedResourceAccessProvider::updateAccessToResource);
     }
 }

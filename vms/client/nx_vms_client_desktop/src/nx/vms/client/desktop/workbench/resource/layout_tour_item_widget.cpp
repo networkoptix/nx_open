@@ -105,7 +105,7 @@ LayoutTourItemWidget::LayoutTourItemWidget(
         QString name = lit("Tour@%1").arg(resource()->getName());
         layout->setName(name);
 
-        connect(resource(), &QnResource::rotationChanged, this,
+        connect(resource().get(), &QnResource::rotationChanged, this,
             [this]()
             {
                 m_previewPainter->setLayout(layoutFromResource(resource()));
@@ -154,8 +154,8 @@ void LayoutTourItemWidget::initOverlay()
             icon->setPixmap(pixmap);
         };
     updateIcon();
-    connect(resource(), &QnResource::parentIdChanged, this, updateIcon);
-    connect(resource(), &QnResource::statusChanged, this, updateIcon);
+    connect(resource().get(), &QnResource::parentIdChanged, this, updateIcon);
+    connect(resource().get(), &QnResource::statusChanged, this, updateIcon);
 
     auto title = new GraphicsLabel();
     title->setAcceptedMouseButtons(Qt::NoButton);
@@ -169,7 +169,7 @@ void LayoutTourItemWidget::initOverlay()
             title->setText(nx::utils::elideString(resource()->getName(), kMaxTitleLength));
         };
     updateTitle();
-    connect(resource(), &QnResource::nameChanged, this, updateTitle);
+    connect(resource().get(), &QnResource::nameChanged, this, updateTitle);
 
     auto closeButton = new QnImageButtonWidget();
     const auto closeButtonIcon = qnSkin->icon(lit("text_buttons/clear.png"));

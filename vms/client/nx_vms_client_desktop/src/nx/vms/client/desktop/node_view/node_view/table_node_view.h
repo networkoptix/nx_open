@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <utils/common/connective.h>
 #include <nx/vms/client/desktop/common/widgets/table_view.h>
 #include <nx/utils/impl_ptr.h>
 
@@ -11,10 +10,10 @@
 namespace nx::vms::client::desktop {
 namespace node_view {
 
-class TableNodeView: public Connective<TableView>
+class TableNodeView: public TableView
 {
     Q_OBJECT
-    using base_type = Connective<TableView>;
+    using base_type = TableView;
 
 public:
     TableNodeView(int columnCount, QWidget* parent = nullptr);

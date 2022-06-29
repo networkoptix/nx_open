@@ -16,19 +16,18 @@
 #include <nx/vms/common/system_context_aware.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx_ec/ec_api_fwd.h>
-#include <utils/common/connective.h>
 
 namespace nx::vms::api { struct ServerRuntimeEventData; }
 
 class QnResourceFactory;
 
 class NX_VMS_COMMON_API QnCommonMessageProcessor:
-    public Connective<QObject>,
+    public QObject,
     public nx::vms::common::SystemContextAware
 {
     Q_OBJECT
 
-    typedef Connective<QObject> base_type;
+    typedef QObject base_type;
 public:
     explicit QnCommonMessageProcessor(
         nx::vms::common::SystemContext* context,

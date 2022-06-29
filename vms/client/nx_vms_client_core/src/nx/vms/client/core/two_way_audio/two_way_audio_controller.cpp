@@ -38,7 +38,7 @@ TwoWayAudioController::Private::Private(TwoWayAudioController* q):
     q(q),
     availabilityWatcher(new TwoWayAudioAvailabilityWatcher())
 {
-    connect(availabilityWatcher, &TwoWayAudioAvailabilityWatcher::availabilityChanged,
+    connect(availabilityWatcher.get(), &TwoWayAudioAvailabilityWatcher::availabilityChanged,
         q, &TwoWayAudioController::availabilityChanged);
 }
 

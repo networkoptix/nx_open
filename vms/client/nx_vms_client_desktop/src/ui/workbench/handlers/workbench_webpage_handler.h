@@ -4,14 +4,13 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-#include <utils/common/connective.h>
 
 class QnWorkbenchWebPageHandler:
-    public Connective<QObject>,
+    public QObject,
     public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     QnWorkbenchWebPageHandler(QObject* parent = nullptr);

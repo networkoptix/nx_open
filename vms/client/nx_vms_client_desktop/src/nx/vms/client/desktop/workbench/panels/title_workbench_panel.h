@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <utils/common/connective.h>
 
 #include "abstract_workbench_panel.h"
 
@@ -13,9 +12,9 @@ class QnMainWindowTitleBarWidget;
 
 namespace nx::vms::client::desktop {
 
-class TitleWorkbenchPanel: public Connective<AbstractWorkbenchPanel>
+class TitleWorkbenchPanel: public AbstractWorkbenchPanel
 {
-    using base_type = Connective<AbstractWorkbenchPanel>;
+    using base_type = AbstractWorkbenchPanel;
 
     Q_OBJECT
 public:

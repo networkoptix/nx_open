@@ -22,7 +22,6 @@
 
 #include <nx/utils/uuid.h>
 
-#include <utils/common/connective.h>
 
 class QGraphicsScene;
 class QGraphicsView;
@@ -58,13 +57,13 @@ class QnCamDisplay;
  * It presents some low-level functions for viewport and item manipulation.
  */
 class QnWorkbenchDisplay:
-    public Connective<QObject>,
+    public QObject,
     public QnWorkbenchContextAware,
     protected QnSceneTransformations
 {
     Q_OBJECT
 
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
     using ThumbnailPtr = nx::vms::client::desktop::workbench::timeline::ThumbnailPtr;
 
 public:

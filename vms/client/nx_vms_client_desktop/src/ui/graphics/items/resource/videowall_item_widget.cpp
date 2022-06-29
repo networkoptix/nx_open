@@ -108,7 +108,7 @@ QnVideowallItemWidget::QnVideowallItemWidget(
     setClickableButtons(Qt::LeftButton | Qt::RightButton);
     setPaletteColor(this, QPalette::Window, colorTheme()->color("dark4"));
 
-    connect(m_videowall, &QnVideoWallResource::itemChanged, this,
+    connect(m_videowall.get(), &QnVideoWallResource::itemChanged, this,
         &QnVideowallItemWidget::at_videoWall_itemChanged);
     connect(this, &QnClickableWidget::doubleClicked, this,
         &QnVideowallItemWidget::at_doubleClicked);
@@ -421,21 +421,21 @@ void QnVideowallItemWidget::updateLayout()
 
         m_layoutThumbnailProvider->loadAsync();
 
-        connect(m_layout, &QnLayoutResource::itemAdded, this,
+        connect(m_layout.get(), &QnLayoutResource::itemAdded, this,
             &QnVideowallItemWidget::updateView);
-        connect(m_layout, &QnLayoutResource::itemChanged, this,
+        connect(m_layout.get(), &QnLayoutResource::itemChanged, this,
             &QnVideowallItemWidget::updateView);
-        connect(m_layout, &QnLayoutResource::itemRemoved, this,
+        connect(m_layout.get(), &QnLayoutResource::itemRemoved, this,
             &QnVideowallItemWidget::updateView);
-        connect(m_layout, &QnLayoutResource::cellAspectRatioChanged, this,
+        connect(m_layout.get(), &QnLayoutResource::cellAspectRatioChanged, this,
             &QnVideowallItemWidget::updateView);
-        connect(m_layout, &QnLayoutResource::cellSpacingChanged, this,
+        connect(m_layout.get(), &QnLayoutResource::cellSpacingChanged, this,
             &QnVideowallItemWidget::updateView);
-        connect(m_layout, &QnLayoutResource::backgroundImageChanged, this,
+        connect(m_layout.get(), &QnLayoutResource::backgroundImageChanged, this,
             &QnVideowallItemWidget::updateView);
-        connect(m_layout, &QnLayoutResource::backgroundSizeChanged, this,
+        connect(m_layout.get(), &QnLayoutResource::backgroundSizeChanged, this,
             &QnVideowallItemWidget::updateView);
-        connect(m_layout, &QnLayoutResource::backgroundOpacityChanged, this,
+        connect(m_layout.get(), &QnLayoutResource::backgroundOpacityChanged, this,
             &QnVideowallItemWidget::updateView);
     }
 }

@@ -7,14 +7,13 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/scoped_model_operations.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <utils/common/connective.h>
 
 class QnCameraListModel:
-    public Connective<ScopedModelOperations<QAbstractItemModel>>,
+    public ScopedModelOperations<QAbstractItemModel>,
     public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using base_type = Connective<ScopedModelOperations<QAbstractItemModel>>;
+    using base_type = ScopedModelOperations<QAbstractItemModel>;
 
 public:
     enum Column

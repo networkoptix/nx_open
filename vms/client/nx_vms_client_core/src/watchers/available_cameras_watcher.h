@@ -6,17 +6,16 @@
 
 #include <nx/utils/uuid.h>
 #include <core/resource/resource_fwd.h>
-#include <utils/common/connective.h>
 
 class QnAvailableCamerasWatcherPrivate;
 
 class NX_VMS_CLIENT_CORE_API QnAvailableCamerasWatcher:
-    public Connective<QObject>,
+    public QObject,
     public QnCommonModuleAware
 {
     Q_OBJECT
 
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     QnAvailableCamerasWatcher(QObject* parent = nullptr);

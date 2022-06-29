@@ -342,25 +342,25 @@ void QnWorkbenchAccessController::recalculateAllPermissions()
 
 void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResourcePtr& resource)
 {
-    connect(resource, &QnResource::flagsChanged, this,
+    connect(resource.get(), &QnResource::flagsChanged, this,
         &QnWorkbenchAccessController::updatePermissions);
 
-    connect(resource, &QnResource::flagsChanged, this,
+    connect(resource.get(), &QnResource::flagsChanged, this,
         &QnWorkbenchAccessController::updatePermissions);
 
     if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
-        connect(camera, &QnVirtualCameraResource::scheduleEnabledChanged, this,
+        connect(camera.get(), &QnVirtualCameraResource::scheduleEnabledChanged, this,
             &QnWorkbenchAccessController::updatePermissions);
     }
 
     // Capture password setting or dropping for layout.
     if (const auto& fileLayout = resource.dynamicCast<QnFileLayoutResource>())
     {
-        connect(fileLayout, &QnFileLayoutResource::passwordChanged, this,
+        connect(fileLayout.get(), &QnFileLayoutResource::passwordChanged, this,
             &QnWorkbenchAccessController::updatePermissions);
         // readOnly may also change when re-reading encrypted layout.
-        connect(fileLayout, &QnFileLayoutResource::readOnlyChanged, this,
+        connect(fileLayout.get(), &QnFileLayoutResource::readOnlyChanged, this,
             &QnWorkbenchAccessController::updatePermissions);
     }
 

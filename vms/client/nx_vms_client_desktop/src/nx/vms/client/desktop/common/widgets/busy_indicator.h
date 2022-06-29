@@ -8,7 +8,6 @@
 #include <ui/animation/animation_timer_listener.h>
 #include <qt_graphics_items/graphics_widget.h>
 
-#include <utils/common/connective.h>
 
 namespace nx::vms::client::desktop {
 
@@ -110,10 +109,10 @@ private:
 /*
  * Widget class representing animated dot indicator.
  */
-class BusyIndicatorWidget: public Connective<QWidget>
+class BusyIndicatorWidget: public QWidget
 {
     Q_OBJECT
-    using base_type = Connective<QWidget>;
+    using base_type = QWidget;
 
     Q_PROPERTY(BusyIndicator* dots READ dots)
     Q_PROPERTY(QPalette::ColorRole indicatorRole READ indicatorRole  WRITE setIndicatorRole)
@@ -151,10 +150,10 @@ private:
 /*
 * Graphics Widget class representing animated dot indicator.
 */
-class BusyIndicatorGraphicsWidget: public Connective<GraphicsWidget>
+class BusyIndicatorGraphicsWidget: public GraphicsWidget
 {
     Q_OBJECT
-    using base_type = Connective<GraphicsWidget>;
+    using base_type = GraphicsWidget;
 
     Q_PROPERTY(BusyIndicator* dots READ dots)
     Q_PROPERTY(QColor indicatorColor READ indicatorColor WRITE setIndicatorColor)

@@ -430,7 +430,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
             d->store->setSelectedTab((CameraSettingsTab)currentPage());
         });
 
-    connect(ui->tabWidget, &QTabWidget::currentChanged, d, &Private::updatePreviewIfNeeded);
+    connect(ui->tabWidget, &QTabWidget::currentChanged, d.get(), &Private::updatePreviewIfNeeded);
 
     setHelpTopic(this, Qn::CameraSettings_Help);
 }

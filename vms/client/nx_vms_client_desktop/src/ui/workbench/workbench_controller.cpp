@@ -1641,7 +1641,7 @@ void QnWorkbenchController::at_workbench_currentLayoutChanged()
 {
     if (const auto layout = workbench()->currentLayout()->resource())
     {
-        connect(layout, &QnLayoutResource::lockedChanged, this,
+        connect(layout.get(), &QnLayoutResource::lockedChanged, this,
             &QnWorkbenchController::updateCurrentLayoutInstruments);
     }
     updateCurrentLayoutInstruments();

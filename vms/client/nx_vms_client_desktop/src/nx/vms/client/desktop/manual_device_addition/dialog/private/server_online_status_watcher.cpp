@@ -36,7 +36,7 @@ void ServerOnlineStatusWatcher::setServer(const QnMediaServerResourcePtr& server
     if (!m_server)
         return;
 
-    connect(m_server, &QnMediaServerResource::statusChanged,
+    connect(m_server.get(), &QnMediaServerResource::statusChanged,
         this, &ServerOnlineStatusWatcher::statusChanged);
 
     emit statusChanged();

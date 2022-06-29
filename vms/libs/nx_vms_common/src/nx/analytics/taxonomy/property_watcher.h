@@ -8,7 +8,6 @@
 #include <QtCore/QString>
 
 #include <core/resource/resource_fwd.h>
-#include <utils/common/connective.h>
 
 #include <nx/utils/thread/mutex.h>
 
@@ -16,7 +15,7 @@ class QnResourcePool;
 
 namespace nx::analytics::taxonomy {
 
-class PropertyWatcher: public Connective<QObject>
+class PropertyWatcher: public QObject
 {
     Q_OBJECT
 

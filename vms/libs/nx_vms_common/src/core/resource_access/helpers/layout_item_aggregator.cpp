@@ -25,13 +25,13 @@ bool QnLayoutItemAggregator::addWatchedLayout(const QnLayoutResourcePtr& layout)
     for (auto item: layout->getItems())
         handleItemAdded(item);
 
-    connect(layout, &QnLayoutResource::itemAdded, this,
+    connect(layout.get(), &QnLayoutResource::itemAdded, this,
         [this](const QnLayoutResourcePtr& /*layout*/, const QnLayoutItemData& item)
         {
             handleItemAdded(item);
         });
 
-    connect(layout, &QnLayoutResource::itemRemoved, this,
+    connect(layout.get(), &QnLayoutResource::itemRemoved, this,
         [this](const QnLayoutResourcePtr& /*layout*/, const QnLayoutItemData& item)
         {
             handleItemRemoved(item);

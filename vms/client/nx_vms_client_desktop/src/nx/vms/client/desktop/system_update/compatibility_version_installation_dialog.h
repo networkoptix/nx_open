@@ -8,7 +8,6 @@
 #include <nx/vms/api/data/software_version.h>
 #include <nx/vms/client/desktop/system_update/client_update_tool.h>
 #include <ui/dialogs/common/dialog.h>
-#include <utils/common/connective.h>
 
 namespace Ui { class QnCompatibilityVersionInstallationDialog; }
 
@@ -18,10 +17,10 @@ namespace nx::vms::client::desktop { struct UpdateContents; }
 
 // TODO: #dklychkov rename class in 2.4
 class CompatibilityVersionInstallationDialog:
-    public Connective<QnDialog>
+    public QnDialog
 {
     Q_OBJECT
-    using base_type = Connective<QnDialog>;
+    using base_type = QnDialog;
 
 public:
     CompatibilityVersionInstallationDialog(

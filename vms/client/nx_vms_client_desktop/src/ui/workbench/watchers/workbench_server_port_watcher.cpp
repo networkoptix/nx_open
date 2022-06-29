@@ -27,7 +27,7 @@ QnWorkbenchServerPortWatcher::QnWorkbenchServerPortWatcher(QObject *parent)
             if (resource != m_currentServer)
                 return;
 
-            disconnect(m_currentServer, nullptr, this, nullptr);
+            disconnect(m_currentServer.get(), nullptr, this, nullptr);
             m_currentServer.clear();
         });
 
@@ -53,7 +53,7 @@ QnWorkbenchServerPortWatcher::QnWorkbenchServerPortWatcher(QObject *parent)
             m_currentServer = server;
             updateConnectionAddress();
 
-            connect(server,
+            connect(server.get(),
                 &QnMediaServerResource::primaryAddressChanged,
                 this,
                 [this, updateConnectionAddress](const QnResourcePtr& resource)

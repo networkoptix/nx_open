@@ -266,14 +266,14 @@ void QnServerSettingsWidget::setServer(const QnMediaServerResourcePtr &server)
 
     if (m_server)
     {
-        disconnect(m_server, nullptr, this, nullptr);
+        disconnect(m_server.get(), nullptr, this, nullptr);
     }
 
     m_server = server;
 
     if (m_server)
     {
-        connect(m_server, &QnResource::nameChanged, this, [this](const QnResourcePtr &resource)
+        connect(m_server.get(), &QnResource::nameChanged, this, [this](const QnResourcePtr &resource)
         {
             if (ui->nameLineEdit->text() != m_initServerName)   /// Field was changed
                 return;
@@ -282,18 +282,18 @@ void QnServerSettingsWidget::setServer(const QnMediaServerResourcePtr &server)
             ui->nameLineEdit->setText(m_initServerName);
         });
 
-        connect(m_server, &QnResource::urlChanged, this, [this](const QnResourcePtr &resource)
+        connect(m_server.get(), &QnResource::urlChanged, this, [this](const QnResourcePtr &resource)
         {
             Q_UNUSED(resource);
             updateUrl();
         });
 
-        connect(m_server, &QnMediaServerResource::webCamerasDiscoveryChanged, this,
+        connect(m_server.get(), &QnMediaServerResource::webCamerasDiscoveryChanged, this,
             &QnServerSettingsWidget::updateWebCamerasDiscoveryEnabled);
 
-        connect(m_server, &QnMediaServerResource::certificateChanged, this,
+        connect(m_server.get(), &QnMediaServerResource::certificateChanged, this,
             &QnServerSettingsWidget::updateCertificatesInfo);
-        connect(m_server, &QnMediaServerResource::statusChanged, this,
+        connect(m_server.get(), &QnMediaServerResource::statusChanged, this,
             &QnServerSettingsWidget::updateCertificatesInfo);
     }
 

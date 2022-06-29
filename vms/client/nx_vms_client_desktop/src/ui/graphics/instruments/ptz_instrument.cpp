@@ -709,7 +709,7 @@ void PtzInstrument::updateOverlayWidget()
 void PtzInstrument::updateWidgetPtzController(QnMediaResourceWidget* widget)
 {
     PtzData& data = m_dataByWidget[widget];
-    data.capabilitiesConnection = connect(widget->ptzController(),
+    data.capabilitiesConnection = connect(widget->ptzController().get(),
         &QnAbstractPtzController::changed,
         this,
         [this, widget](DataFields fields)

@@ -10,7 +10,6 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/layout_tour_data.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <utils/common/connective.h>
 
 class QnWorkbenchLayout;
 class QnWorkbenchItem;
@@ -25,10 +24,10 @@ class LayoutTourDropPlaceholder;
 
 namespace workbench {
 
-class LayoutTourReviewController: public Connective<QObject>, public QnWorkbenchContextAware
+class LayoutTourReviewController: public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     LayoutTourReviewController(QObject* parent = nullptr);

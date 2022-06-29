@@ -4,7 +4,6 @@
 
 #include <QtCore/QObject>
 
-#include <utils/common/connective.h>
 
 #include "radass_fwd.h"
 #include "utils/abstract_timers.h"
@@ -13,10 +12,10 @@ namespace nx::vms::client::desktop {
 
 class AbstractVideoDisplay;
 
-class NX_VMS_CLIENT_DESKTOP_API RadassController: public Connective<QObject>
+class NX_VMS_CLIENT_DESKTOP_API RadassController: public QObject
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     explicit RadassController(QObject* parent = nullptr);

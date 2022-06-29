@@ -148,27 +148,27 @@ MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(
 
     NX_ASSERT(mediaResource);
 
-    connect(resource, &QnResource::statusChanged, this,
+    connect(resource.get(), &QnResource::statusChanged, this,
         &MediaResourceWidgetPrivate::updateIsOffline);
-    connect(resource, &QnResource::statusChanged, this,
+    connect(resource.get(), &QnResource::statusChanged, this,
         &MediaResourceWidgetPrivate::updateIsUnauthorized);
 
     if (camera)
     {
         using namespace nx::vms::license;
         m_licenseStatusHelper.reset(new SingleCamLicenseStatusHelper(camera));
-        connect(m_licenseStatusHelper, &SingleCamLicenseStatusHelper::licenseStatusChanged,
+        connect(m_licenseStatusHelper.get(), &SingleCamLicenseStatusHelper::licenseStatusChanged,
             this, &MediaResourceWidgetPrivate::licenseStatusChanged);
-        connect(m_licenseStatusHelper, &SingleCamLicenseStatusHelper::licenseStatusChanged,
+        connect(m_licenseStatusHelper.get(), &SingleCamLicenseStatusHelper::licenseStatusChanged,
             this, &MediaResourceWidgetPrivate::stateChanged);
 
-        connect(camera, &QnVirtualCameraResource::userEnabledAnalyticsEnginesChanged, this,
+        connect(camera.get(), &QnVirtualCameraResource::userEnabledAnalyticsEnginesChanged, this,
             &MediaResourceWidgetPrivate::updateIsAnalyticsSupported);
-        connect(camera, &QnVirtualCameraResource::compatibleAnalyticsEnginesChanged, this,
+        connect(camera.get(), &QnVirtualCameraResource::compatibleAnalyticsEnginesChanged, this,
             &MediaResourceWidgetPrivate::updateIsAnalyticsSupported);
-        connect(camera, &QnVirtualCameraResource::compatibleObjectTypesMaybeChanged, this,
+        connect(camera.get(), &QnVirtualCameraResource::compatibleObjectTypesMaybeChanged, this,
             &MediaResourceWidgetPrivate::updateIsAnalyticsSupported);
-        connect(camera, &QnVirtualCameraResource::motionRegionChanged, this,
+        connect(camera.get(), &QnVirtualCameraResource::motionRegionChanged, this,
             [this] { m_motionSkipMaskCache.reset(); } );
 
         updateIsAnalyticsSupported();

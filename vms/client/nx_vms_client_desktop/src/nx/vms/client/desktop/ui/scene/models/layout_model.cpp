@@ -7,7 +7,6 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <utils/common/connective.h>
 
 #include "layout_item_adaptor.h"
 
@@ -16,7 +15,7 @@ namespace nx::vms::client::desktop {
 using ItemAdaptorPtr = QSharedPointer<LayoutItemAdaptor>;
 
 class LayoutModel::Private:
-    public Connective<QObject>,
+    public QObject,
     public nx::vms::client::core::CommonModuleAware
 {
     LayoutModel* const q;
@@ -66,9 +65,9 @@ void LayoutModel::Private::setLayout(const QnLayoutResourcePtr& newLayout)
         return;
     }
 
-    connect(layout, &QnLayoutResource::itemAdded, this, &Private::at_itemAdded);
-    connect(layout, &QnLayoutResource::itemRemoved, this, &Private::at_itemRemoved);
-    connect(layout, &QnLayoutResource::itemChanged, this, &Private::at_itemChanged);
+    connect(layout.get(), &QnLayoutResource::itemAdded, this, &Private::at_itemAdded);
+    connect(layout.get(), &QnLayoutResource::itemRemoved, this, &Private::at_itemRemoved);
+    connect(layout.get(), &QnLayoutResource::itemChanged, this, &Private::at_itemChanged);
 
     for (const auto& item: layout->getItems())
         itemIds.insert(std::lower_bound(itemIds.begin(), itemIds.end(), item.uuid), item.uuid);

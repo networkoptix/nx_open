@@ -102,10 +102,10 @@ struct ExportMediaTool::Private
             mediaResource->getVideoLayout());
         exportRecorder->setTranscodeFilters(filters);
 
-        connect(exportRecorder, &QnStreamRecorder::recordingProgress, q,
+        connect(exportRecorder.get(), &QnStreamRecorder::recordingProgress, q,
             &ExportMediaTool::valueChanged);
 
-        connect(exportRecorder, &QnStreamRecorder::recordingFinished, q,
+        connect(exportRecorder.get(), &QnStreamRecorder::recordingFinished, q,
             [this](const std::optional<nx::recording::Error>& /*status*/, const QString& /*fileName*/)
             {
                 emit q->valueChanged(100);

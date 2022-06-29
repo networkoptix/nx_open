@@ -327,8 +327,8 @@ BusyIndicatorWidget::BusyIndicatorWidget(QWidget* parent):
     setFocusPolicy(Qt::NoFocus);
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
-    connect(m_indicator, &BusyIndicator::sizeChanged, this, &QWidget::updateGeometry);
-    connect(m_indicator, &BusyIndicator::updated, this, &BusyIndicatorWidget::updateIndicator);
+    connect(m_indicator.get(), &BusyIndicator::sizeChanged, this, &QWidget::updateGeometry);
+    connect(m_indicator.get(), &BusyIndicator::updated, this, &BusyIndicatorWidget::updateIndicator);
 }
 
 BusyIndicator* BusyIndicatorWidget::dots() const
@@ -429,9 +429,9 @@ BusyIndicatorGraphicsWidget::BusyIndicatorGraphicsWidget(
     setFocusPolicy(Qt::NoFocus);
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
-    connect(m_indicator, &BusyIndicator::sizeChanged,
+    connect(m_indicator.get(), &BusyIndicator::sizeChanged,
         this, &BusyIndicatorGraphicsWidget::updateGeometry);
-    connect(m_indicator, &BusyIndicator::updated,
+    connect(m_indicator.get(), &BusyIndicator::updated,
         this, &BusyIndicatorGraphicsWidget::updateIndicator);
 }
 

@@ -10,7 +10,6 @@
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/software_version.h>
 #include <nx/vms/common/update/update_information.h>
-#include <utils/common/connective.h>
 
 #include "client_update_tool.h"
 
@@ -95,10 +94,10 @@ using UpdateItemPtr = std::shared_ptr<UpdateItem>;
  * ServerUpdateTool passes mediaserver responses here.
  */
 class NX_VMS_CLIENT_DESKTOP_API PeerStateTracker:
-    public Connective<QObject>
+    public QObject
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     PeerStateTracker(QObject* parent = nullptr);

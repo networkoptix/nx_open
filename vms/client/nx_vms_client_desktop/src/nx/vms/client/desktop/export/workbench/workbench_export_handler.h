@@ -7,7 +7,6 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <nx/utils/uuid.h>
-#include <utils/common/connective.h>
 #include <nx/vms/client/desktop/export/data/export_layout_settings.h>
 #include <nx/vms/client/desktop/export/data/export_media_settings.h>
 
@@ -24,11 +23,11 @@ class ExportSettingsDialog;
 /**
  * @brief Handler for video and layout export related actions.
  */
-class WorkbenchExportHandler: public Connective<QObject>, public QnWorkbenchContextAware
+class WorkbenchExportHandler: public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 public:
     WorkbenchExportHandler(QObject* parent = nullptr);
     virtual ~WorkbenchExportHandler() override;

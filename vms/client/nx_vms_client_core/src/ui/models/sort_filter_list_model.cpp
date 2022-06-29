@@ -5,11 +5,10 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/qset.h>
-#include <utils/common/connective.h>
 
-class QnSortFilterListModelPrivate: public Connective<QObject>
+class QnSortFilterListModelPrivate: public QObject
 {
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
     Q_DECLARE_PUBLIC(QnSortFilterListModel)
     QnSortFilterListModel* q_ptr;

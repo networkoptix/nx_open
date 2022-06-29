@@ -13,7 +13,6 @@
 #include <core/ptz/ptz_object.h>
 #include <core/ptz/ptz_auxiliary_trait.h>
 #include <core/resource/resource_fwd.h>
-#include <utils/common/connective.h>
 
 #include <nx/vms/common/ptz/command.h>
 #include <nx/vms/common/ptz/coordinate_space.h>
@@ -23,10 +22,10 @@
 /**
  * A thread-safe blocking interface for accessing camera's PTZ functions.
  */
-class NX_VMS_COMMON_API QnAbstractPtzController: public Connective<QObject>
+class NX_VMS_COMMON_API QnAbstractPtzController: public QObject
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 protected:
     using Command = nx::vms::common::ptz::Command;

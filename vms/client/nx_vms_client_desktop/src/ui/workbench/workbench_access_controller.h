@@ -11,7 +11,6 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
-#include <utils/common/connective.h>
 
 class QnWorkbenchContext;
 class QnResourcePool;
@@ -37,12 +36,12 @@ private:
  * This class implements access control.
  */
 class NX_VMS_CLIENT_DESKTOP_API QnWorkbenchAccessController:
-    public Connective<QObject>,
+    public QObject,
     public nx::vms::client::desktop::SystemContextAware
 {
     Q_OBJECT
 
-    typedef Connective<QObject> base_type;
+    typedef QObject base_type;
 
 public:
     QnWorkbenchAccessController(

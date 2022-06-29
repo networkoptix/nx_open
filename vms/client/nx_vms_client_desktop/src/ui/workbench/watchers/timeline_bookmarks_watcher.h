@@ -14,7 +14,6 @@
 #include <core/resource/camera_bookmark.h>
 #include <camera/camera_bookmarks_manager_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <utils/common/connective.h>
 
 class QTimer;
 class QnUuid;
@@ -29,10 +28,10 @@ namespace nx::utils { class PendingOperation; }
  * Caches specified count of bookmarks (5000) for all cameras. Also monitors current timeline window
  * and requests 500 bookmarks for it. Results are merged and pushed to the timeline.
  */
-class QnTimelineBookmarksWatcher: public Connective<QObject>, public QnWorkbenchContextAware
+class QnTimelineBookmarksWatcher: public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
     using milliseconds = std::chrono::milliseconds;
 
 public:

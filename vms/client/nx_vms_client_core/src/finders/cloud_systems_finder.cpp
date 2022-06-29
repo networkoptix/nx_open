@@ -2,6 +2,7 @@
 
 #include "cloud_systems_finder.h"
 
+#include <QtCore/QPointer>
 #include <QtCore/QTimer>
 
 #include <network/system_helpers.h>
@@ -48,7 +49,7 @@ QnCloudSystemsFinder::QnCloudSystemsFinder(QObject* parent):
         this,
         &QnCloudSystemsFinder::setCloudSystems);
 
-    connect(m_updateSystemsTimer, &QTimer::timeout, this, &QnCloudSystemsFinder::updateSystems);
+    connect(m_updateSystemsTimer.get(), &QTimer::timeout, this, &QnCloudSystemsFinder::updateSystems);
     m_updateSystemsTimer->setInterval(kCloudSystemsRefreshPeriod.count());
     m_updateSystemsTimer->start();
 

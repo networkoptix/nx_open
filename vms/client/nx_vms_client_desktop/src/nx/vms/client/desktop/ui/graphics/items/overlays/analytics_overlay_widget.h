@@ -5,18 +5,17 @@
 #include <nx/utils/uuid.h>
 #include <nx/utils/impl_ptr.h>
 #include <qt_graphics_items/graphics_widget.h>
-#include <utils/common/connective.h>
 
 #include "figure/types.h"
 
 namespace nx::vms::client::desktop {
 
 /** Overlay widget which draws different types of objects. */
-class AnalyticsOverlayWidget: public Connective<GraphicsWidget>
+class AnalyticsOverlayWidget: public GraphicsWidget
 {
     Q_OBJECT
 
-    using base_type = Connective<GraphicsWidget>;
+    using base_type = GraphicsWidget;
 
 public:
     struct AreaInfo

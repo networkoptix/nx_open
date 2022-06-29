@@ -238,9 +238,9 @@ void QnWorkbenchScreenRecordingHandler::startRecordingInternal()
 
     m_recorder->setContainer(lit("avi"));
 
-    connect(m_recorder, &QnStreamRecorder::recordingStarted, this,
+    connect(m_recorder.get(), &QnStreamRecorder::recordingStarted, this,
         &QnWorkbenchScreenRecordingHandler::onStreamRecordingStarted);
-    connect(m_recorder, &QnStreamRecorder::recordingFinished, this,
+    connect(m_recorder.get(), &QnStreamRecorder::recordingFinished, this,
         &QnWorkbenchScreenRecordingHandler::onStreamRecordingFinished);
 
     connect(m_dataProvider->owner(), &QnAbstractStreamDataProvider::finished, this,

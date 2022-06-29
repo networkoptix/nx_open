@@ -34,11 +34,11 @@ bool isCustomUser(const QnUserResourcePtr& user)
 } // namespace
 
 class UserListModel::Private:
-    public Connective<QObject>,
+    public QObject,
     public nx::vms::client::core::CommonModuleAware
 {
     Q_DECLARE_TR_FUNCTIONS(UserListModel)
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
     UserListModel* const model;
 
@@ -250,17 +250,17 @@ void UserListModel::Private::removeUser(const QnUserResourcePtr& user)
 
 void UserListModel::Private::addUserInternal(const QnUserResourcePtr& user)
 {
-    connect(user, &QnUserResource::nameChanged, this,
+    connect(user.get(), &QnUserResource::nameChanged, this,
         &UserListModel::Private::at_resourcePool_resourceChanged);
-    connect(user, &QnUserResource::fullNameChanged, this,
+    connect(user.get(), &QnUserResource::fullNameChanged, this,
         &UserListModel::Private::at_resourcePool_resourceChanged);
-    connect(user, &QnUserResource::enabledChanged, this,
+    connect(user.get(), &QnUserResource::enabledChanged, this,
         [this](const QnUserResourcePtr &user)
         {
             enableChangedUsers.remove(user);
             handleUserChanged(user);
         });
-    connect(user, &QnUserResource::digestChanged,
+    connect(user.get(), &QnUserResource::digestChanged,
         this,
         [this](const QnUserResourcePtr& user)
         {
@@ -271,7 +271,7 @@ void UserListModel::Private::addUserInternal(const QnUserResourcePtr& user)
 
 void UserListModel::Private::removeUserInternal(const QnUserResourcePtr& user)
 {
-    disconnect(user, nullptr, this, nullptr);
+    disconnect(user.get(), nullptr, this, nullptr);
     checkedUsers.remove(user);
     enableChangedUsers.remove(user);
     digestChangedUsers.remove(user);

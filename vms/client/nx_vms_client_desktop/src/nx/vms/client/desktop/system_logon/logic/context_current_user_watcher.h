@@ -9,7 +9,6 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_state_manager.h>
 
-#include <utils/common/connective.h>
 
 namespace nx::vms::client::desktop {
 
@@ -24,10 +23,10 @@ namespace nx::vms::client::desktop {
  * Implements logic for automatic reconnect on user password change.
  * Automatic reconnect can be prevented by setReconnectOnPasswordChange(false) call.
  */
-class ContextCurrentUserWatcher: public Connective<QObject>, public QnSessionAwareDelegate
+class ContextCurrentUserWatcher: public QObject, public QnSessionAwareDelegate
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     ContextCurrentUserWatcher(QObject* parent = nullptr);

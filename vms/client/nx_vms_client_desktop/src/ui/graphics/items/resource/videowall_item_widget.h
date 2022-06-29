@@ -16,7 +16,6 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-#include <utils/common/connective.h>
 
 class DragProcessor;
 class VariantAnimator;
@@ -39,11 +38,11 @@ class LayoutThumbnailLoader;
 } // namespace nx::vms::client::desktop
 
 class QnVideowallItemWidget:
-    public Overlayed<Animated<Connective<QnClickableWidget>>>,
+    public Overlayed<Animated<QnClickableWidget>>,
     protected DragProcessHandler,
     public QnWorkbenchContextAware
 {
-    typedef Overlayed<Animated<Connective<QnClickableWidget>>> base_type;
+    typedef Overlayed<Animated<QnClickableWidget>> base_type;
     Q_OBJECT
 
 public:

@@ -10,7 +10,6 @@
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-#include <utils/common/connective.h>
 
 namespace Ui{
 class SpecialLayoutPanelWidget;
@@ -21,11 +20,11 @@ namespace ui {
 namespace workbench {
 
 class SpecialLayoutPanelWidget:
-    public Connective<QnMaskedProxyWidget>,
+    public QnMaskedProxyWidget,
     public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using base_type = Connective<QnMaskedProxyWidget>;
+    using base_type = QnMaskedProxyWidget;
 
 public:
     SpecialLayoutPanelWidget(const QnLayoutResourcePtr& layoutResource, QObject* parent = nullptr);

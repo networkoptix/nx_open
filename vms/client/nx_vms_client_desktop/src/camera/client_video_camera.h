@@ -10,19 +10,18 @@
 #include <nx/streaming/config.h>
 #include <nx/vms/client/desktop/export/tools/export_storage_stream_recorder.h>
 
-#include <utils/common/connective.h>
 #include <recording/time_period_list.h>
 
 class QnlTimeSource;
 class QnMediaStreamStatistics;
 class QnAbstractArchiveStreamReader;
 
-class QnClientVideoCamera : public Connective<QObject> {
+class QnClientVideoCamera : public QObject {
     Q_OBJECT
 
     Q_ENUMS(ClientVideoCameraError)
 
-    typedef Connective<QObject> base_type;
+    typedef QObject base_type;
 public:
     QnClientVideoCamera(const QnMediaResourcePtr &resource, QnAbstractMediaStreamDataProvider* reader = 0);
 

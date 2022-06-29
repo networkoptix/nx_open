@@ -6,15 +6,14 @@
 
 #include <ui/workbench/workbench.h>
 #include <nx/vms/client/desktop/workbench/layouts/special_layout.h>
-#include <utils/common/connective.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {
 namespace workbench {
 
-class SpecialLayoutPanelPrivate: public Connective<QObject>, public QnWorkbenchContextAware
+class SpecialLayoutPanelPrivate: public QObject, public QnWorkbenchContextAware
 {
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
     Q_DECLARE_PUBLIC(SpecialLayoutPanel)
     SpecialLayoutPanel* q_ptr = nullptr;

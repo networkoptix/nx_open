@@ -11,7 +11,6 @@
 #include <nx/vms/client/desktop/export/settings/export_media_persistent_settings.h>
 #include <ui/dialogs/common/button_box_dialog.h>
 #include <ui/workbench/workbench_state_manager.h>
-#include <utils/common/connective.h>
 
 namespace Ui { class ExportSettingsDialog; }
 

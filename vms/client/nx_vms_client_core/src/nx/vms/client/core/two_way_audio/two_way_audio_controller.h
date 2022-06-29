@@ -8,7 +8,6 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <utils/common/connective.h>
 
 class SingleCamLicenseStatusHelper;
 
@@ -17,11 +16,11 @@ namespace nx::vms::client::core {
 class TwoWayAudioAvailabilityWatcher;
 class OrderedRequestsManager;
 
-class NX_VMS_CLIENT_CORE_API TwoWayAudioController: public Connective<QObject>,
+class NX_VMS_CLIENT_CORE_API TwoWayAudioController: public QObject,
     public CommonModuleAware
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
     Q_PROPERTY(bool available READ available NOTIFY availabilityChanged)
     Q_PROPERTY(bool started READ started NOTIFY startedChanged)

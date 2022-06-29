@@ -3,14 +3,13 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QPointer>
+
 #include <core/resource/resource_consumer.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
-
 #include <nx/media/abstract_metadata_consumer.h>
 #include <nx/vms/client/desktop/camera/camera_fwd.h>
-
-#include <utils/common/connective.h>
 
 class QnAbstractArchiveStreamReader;
 class QnAbstractMediaStreamDataProvider;
@@ -31,10 +30,10 @@ class CounterWithSignal;
  * Proxy class to route video data and metadata through it.
  * Also allows media distribution between several receivers.
  */
-class QnResourceDisplay: public Connective<QObject>, protected QnResourceConsumer {
+class QnResourceDisplay: public QObject, protected QnResourceConsumer {
     Q_OBJECT
 
-    typedef Connective<QObject> base_type;
+    typedef QObject base_type;
 public:
     /**
      * Constructor.

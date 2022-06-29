@@ -4,16 +4,15 @@
 
 #include <QtCore/QStringListModel>
 
-#include <utils/common/connective.h>
 
 class AbstractSystemsController;
 class QnSystemsModelPrivate;
 
-class NX_VMS_CLIENT_CORE_API QnSystemsModel: public Connective<QAbstractListModel>
+class NX_VMS_CLIENT_CORE_API QnSystemsModel: public QAbstractListModel
 {
     Q_OBJECT
 
-    using base_type = Connective<QAbstractListModel>;
+    using base_type = QAbstractListModel;
 
 public:
     enum RoleId

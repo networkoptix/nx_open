@@ -480,8 +480,8 @@ void ExportLayoutTool::finishExport(bool success)
 bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
 {
     m_currentCamera.reset(new QnClientVideoCamera(resource));
-    connect(m_currentCamera, SIGNAL(exportProgress(int)), this, SLOT(at_camera_progressChanged(int)));
-    connect(m_currentCamera, &QnClientVideoCamera::exportFinished, this,
+    connect(m_currentCamera.get(), SIGNAL(exportProgress(int)), this, SLOT(at_camera_progressChanged(int)));
+    connect(m_currentCamera.get(), &QnClientVideoCamera::exportFinished, this,
         &ExportLayoutTool::at_camera_exportFinished);
 
     int numberOfChannels = resource->getVideoLayout()->channelCount();

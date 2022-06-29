@@ -277,9 +277,9 @@ WorkbenchExportHandler::WorkbenchExportHandler(QObject *parent):
     QnWorkbenchContextAware(parent),
     d(new Private(this))
 {
-    connect(d->exportManager, &ExportManager::processUpdated, this,
+    connect(d->exportManager.get(), &ExportManager::processUpdated, this,
         &WorkbenchExportHandler::exportProcessUpdated);
-    connect(d->exportManager, &ExportManager::processFinished, this,
+    connect(d->exportManager.get(), &ExportManager::processFinished, this,
         &WorkbenchExportHandler::exportProcessFinished);
 
     connect(action(ui::action::ExportVideoAction), &QAction::triggered, this,

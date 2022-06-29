@@ -17,11 +17,10 @@
 #include <nx/vms/client/core/common/data/motion_selection.h>
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
-#include <utils/common/connective.h>
 
-class NX_VMS_CLIENT_CORE_API QnCachingCameraDataLoader: public Connective<QObject> {
+class NX_VMS_CLIENT_CORE_API QnCachingCameraDataLoader: public QObject {
     Q_OBJECT;
-    typedef Connective<QObject> base_type;
+    typedef QObject base_type;
 
     using MotionSelection = nx::vms::client::core::MotionSelection;
 

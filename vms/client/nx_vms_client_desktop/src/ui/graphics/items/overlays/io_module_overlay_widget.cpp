@@ -25,7 +25,6 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
-#include <utils/common/connective.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
 
@@ -44,11 +43,11 @@ constexpr int kStateCheckIntervalMs = 1000;
 } // namespace
 
 class QnIoModuleOverlayWidgetPrivate:
-    public Connective<QObject>,
+    public QObject,
     public nx::vms::client::core::CommonModuleAware,
     public nx::vms::client::core::RemoteConnectionAware
 {
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
     using Style = QnIoModuleOverlayWidget::Style;
 
     Q_DISABLE_COPY(QnIoModuleOverlayWidgetPrivate)
@@ -123,7 +122,7 @@ void QnIoModuleOverlayWidgetPrivate::setContents(QnIoModuleOverlayContents* newC
 
     layout->addItem(newContents);
 
-    connect(contents, &QnIoModuleOverlayContents::userClicked,
+    connect(contents.get(), &QnIoModuleOverlayContents::userClicked,
         this, &QnIoModuleOverlayWidgetPrivate::toggleState);
 
     updateContents();
@@ -184,16 +183,16 @@ void QnIoModuleOverlayWidgetPrivate::setIOModule(const QnVirtualCameraResourcePt
 
     monitor.reset(new QnIOModuleMonitor(module));
 
-    connect(monitor, &QnIOModuleMonitor::connectionOpened,
+    connect(monitor.get(), &QnIOModuleMonitor::connectionOpened,
         this, &QnIoModuleOverlayWidgetPrivate::at_connectionOpened);
-    connect(monitor, &QnIOModuleMonitor::connectionClosed,
+    connect(monitor.get(), &QnIOModuleMonitor::connectionClosed,
         this, &QnIoModuleOverlayWidgetPrivate::at_connectionClosed);
-    connect(monitor, &QnIOModuleMonitor::ioStateChanged,
+    connect(monitor.get(), &QnIOModuleMonitor::ioStateChanged,
         this, &QnIoModuleOverlayWidgetPrivate::at_stateChanged);
 
-    connect(module, &QnResource::propertyChanged,
+    connect(module.get(), &QnResource::propertyChanged,
         this, &QnIoModuleOverlayWidgetPrivate::at_cameraPropertyChanged);
-    connect(module, &QnResource::statusChanged,
+    connect(module.get(), &QnResource::statusChanged,
         this, &QnIoModuleOverlayWidgetPrivate::at_cameraStatusChanged);
 
     updateOverlayStyle();

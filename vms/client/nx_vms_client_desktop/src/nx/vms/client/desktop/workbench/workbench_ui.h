@@ -4,20 +4,16 @@
 
 #include <array>
 
-#include <QtCore/QObject>
-#include <QtCore/QTimer>
 #include <QtCore/QMargins>
+#include <QtCore/QObject>
 #include <QtCore/QRect>
-
-#include <utils/common/disconnective.h>
-
-#include <core/resource/resource_fwd.h>
-
-#include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
-#include <ui/animation/animation_timer_listener.h>
+#include <QtCore/QTimer>
 
 #include <client/client_globals.h>
-
+#include <core/resource/resource_fwd.h>
+#include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
+#include <ui/animation/animation_timer_listener.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_pane_settings.h>
 
@@ -53,7 +49,7 @@ class TitleWorkbenchPanel;
 namespace ui::workbench { class SpecialLayoutPanel; }
 
 class WorkbenchUi:
-    public Disconnective<QObject>,
+    public QObject,
     public QnWorkbenchContextAware,
     public ui::action::TargetProvider,
     public AnimationTimerListener
@@ -61,7 +57,7 @@ class WorkbenchUi:
     Q_OBJECT
     Q_ENUMS(Flags Flag)
 
-    using base_type = Disconnective<QObject>;
+    using base_type = QObject;
 public:
     enum Flag
     {
@@ -274,6 +270,8 @@ private:
     QPointer<CalendarWorkbenchPanel> m_calendar;
 
     QnPaneSettingsMap m_settings;
+
+    nx::utils::ScopedConnections m_connections;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(WorkbenchUi::Flags)

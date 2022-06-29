@@ -51,8 +51,8 @@ void QnAbstractPtzDialog::setController(const QnPtzControllerPtr &controller) {
     m_controller = controller;
 
     if (m_controller) {
-        connect(m_controller, &QnAbstractPtzController::finished, this, &QnAbstractPtzDialog::at_controller_finished);
-        connect(m_controller, &QnAbstractPtzController::changed,  this, &QnAbstractPtzDialog::at_controller_changed);
+        connect(m_controller.get(), &QnAbstractPtzController::finished, this, &QnAbstractPtzDialog::at_controller_finished);
+        connect(m_controller.get(), &QnAbstractPtzController::changed,  this, &QnAbstractPtzDialog::at_controller_changed);
         synchronize(tr("Loading..."));
     }
 }

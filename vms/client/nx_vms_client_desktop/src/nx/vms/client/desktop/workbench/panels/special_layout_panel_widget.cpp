@@ -52,9 +52,9 @@ SpecialLayoutPanelWidget::SpecialLayoutPanelWidget(
 
     setWidget(body);
 
-    connect(m_layoutResource, &QnLayoutResource::dataChanged,
+    connect(m_layoutResource.get(), &QnLayoutResource::dataChanged,
         this, &SpecialLayoutPanelWidget::handleResourceDataChanged);
-    connect(m_layoutResource, &QnResource::nameChanged, this,
+    connect(m_layoutResource.get(), &QnResource::nameChanged, this,
         &SpecialLayoutPanelWidget::updateTitle);
 
     updateTitle();

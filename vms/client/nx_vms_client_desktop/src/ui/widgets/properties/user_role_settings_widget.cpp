@@ -22,10 +22,10 @@
 using namespace nx::vms::client::desktop;
 
 class QnUserRoleSettingsWidgetPrivate:
-    public Connective<QObject>,
+    public QObject,
     public nx::vms::client::core::CommonModuleAware
 {
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
     Q_DECLARE_TR_FUNCTIONS(QnUserRoleSettingsWidgetPrivate)
 public:
@@ -65,7 +65,7 @@ public:
                 if (!user)
                     return;
 
-                disconnect(user, nullptr, this, nullptr);
+                disconnect(user.get(), nullptr, this, nullptr);
 
                 if (user->firstRoleId() == this->model->selectedUserRoleId())
                     userMaybeRemoved(user);
@@ -74,7 +74,7 @@ public:
 
     void connectUserSignals(const QnUserResourcePtr& user)
     {
-        connect(user, &QnResource::nameChanged, this,
+        connect(user.get(), &QnResource::nameChanged, this,
             [this](const QnResourcePtr& resource)
             {
                 auto user = resource.staticCast<QnUserResource>();
@@ -82,7 +82,7 @@ public:
                     userAddedOrUpdated(user);
             });
 
-        connect(user, &QnUserResource::userRolesChanged, this,
+        connect(user.get(), &QnUserResource::userRolesChanged, this,
             [this](const QnUserResourcePtr& user)
             {
                 if (user->firstRoleId() == model->selectedUserRoleId())

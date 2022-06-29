@@ -9,7 +9,6 @@
 #include <nx_ec/ec_api_fwd.h>
 #include <licensing/license_fwd.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
-#include <utils/common/connective.h>
 #include <nx/vms/client/desktop/license/license_helpers.h>
 
 #include <ui/workbench/workbench_context_aware.h>
@@ -30,11 +29,11 @@ class LicenseManagerWidget;
 }
 
 class QnLicenseManagerWidget:
-    public Connective<QnAbstractPreferencesWidget>,
+    public QnAbstractPreferencesWidget,
     public QnWorkbenchContextAware
 {
     Q_OBJECT
-    typedef Connective<QnAbstractPreferencesWidget> base_type;
+    typedef QnAbstractPreferencesWidget base_type;
 
 public:
     explicit QnLicenseManagerWidget(QWidget* parent = nullptr);

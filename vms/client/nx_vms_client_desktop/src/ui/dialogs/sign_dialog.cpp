@@ -105,21 +105,21 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget* parent):
 
     m_camDispay.reset(new QnSignDialogDisplay(m_resource));
 
-    connect(m_camDispay, &QnSignDialogDisplay::gotSignature, ui->signInfoLabel,
+    connect(m_camDispay.get(), &QnSignDialogDisplay::gotSignature, ui->signInfoLabel,
         &QnSignInfo::at_gotSignature);
-    connect(m_camDispay, &QnSignDialogDisplay::calcSignInProgress, ui->signInfoLabel,
+    connect(m_camDispay.get(), &QnSignDialogDisplay::calcSignInProgress, ui->signInfoLabel,
         &QnSignInfo::at_calcSignInProgress);
-    connect(m_camDispay, &QnSignDialogDisplay::gotSignatureDescription, ui->signInfoLabel,
+    connect(m_camDispay.get(), &QnSignDialogDisplay::gotSignatureDescription, ui->signInfoLabel,
         &QnSignInfo::at_gotSignatureDescription);
-    connect(m_camDispay, &QnSignDialogDisplay::gotSignatureDescription, m_srcVideoInfo,
+    connect(m_camDispay.get(), &QnSignDialogDisplay::gotSignatureDescription, m_srcVideoInfo,
         &QnSignInfo::at_gotSignatureDescription);
 
-    connect(m_camDispay, &QnSignDialogDisplay::calcSignInProgress, this,
+    connect(m_camDispay.get(), &QnSignDialogDisplay::calcSignInProgress, this,
         &SignDialog::at_calcSignInProgress);
-    connect(m_camDispay, &QnSignDialogDisplay::gotSignature, this,
+    connect(m_camDispay.get(), &QnSignDialogDisplay::gotSignature, this,
         &SignDialog::at_gotSignature);
 
-    connect(m_camDispay, &QnSignDialogDisplay::gotImageSize, this,
+    connect(m_camDispay.get(), &QnSignDialogDisplay::gotImageSize, this,
         &SignDialog::at_gotImageSize);
 
     const auto ensureInitialized =

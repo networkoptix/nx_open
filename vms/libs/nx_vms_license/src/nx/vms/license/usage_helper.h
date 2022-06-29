@@ -10,7 +10,6 @@
 #include <licensing/license.h>
 #include <nx/utils/url.h>
 #include <nx/vms/common/system_context_aware.h>
-#include <utils/common/connective.h>
 
 #include "list_helper.h"
 
@@ -37,11 +36,11 @@ enum class UsageStatus
 };
 
 class UsageWatcher:
-    public Connective<QObject>,
+    public QObject,
     public /*mixin*/ common::SystemContextAware
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 public:
     UsageWatcher(common::SystemContext* context, QObject* parent = nullptr);
 
@@ -52,11 +51,11 @@ signals:
 typedef std::array<int, Qn::LC_Count> licensesArray;
 
 class UsageHelper:
-    public Connective<QObject>,
+    public QObject,
     public /*mixin*/ common::SystemContextAware
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 public:
     UsageHelper(common::SystemContext* context, QObject* parent = nullptr);
     virtual ~UsageHelper() override;
@@ -209,10 +208,10 @@ private:
     QSet<QnVirtualCameraResourcePtr> m_proposedToDisable;
 };
 
-class SingleCamLicenseStatusHelper: public Connective<QObject>
+class SingleCamLicenseStatusHelper: public QObject
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     explicit SingleCamLicenseStatusHelper(

@@ -4,7 +4,6 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-#include <utils/common/connective.h>
 
 class AnimationTimer;
 class QGraphicsWidget;
@@ -12,9 +11,9 @@ struct QnPaneSettings;
 
 namespace nx::vms::client::desktop {
 
-class AbstractWorkbenchPanel: public Connective<QObject>, public QnWorkbenchContextAware
+class AbstractWorkbenchPanel: public QObject, public QnWorkbenchContextAware
 {
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
     Q_OBJECT
 public:
