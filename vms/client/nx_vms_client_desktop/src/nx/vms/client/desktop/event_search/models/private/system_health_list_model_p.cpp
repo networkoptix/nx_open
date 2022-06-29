@@ -528,9 +528,17 @@ void SystemHealthListModel::Private::doAddItem(
 
     updateCachedData(message);
 
-    // New item.
-    ScopedInsertRows insertRows(q, index, index, !initial);
-    m_items.insert(position, item);
+    {
+        // New item.
+        ScopedInsertRows insertRows(q, index, index, !initial);
+        m_items.insert(position, item);
+    }
+
+    if (message == QnSystemHealth::MessageType::RemoteArchiveSyncFinished
+        || message == QnSystemHealth::MessageType::RemoteArchiveSyncError)
+    {
+        removeItem(QnSystemHealth::MessageType::RemoteArchiveSyncProgress, params);
+    }
 }
 
 void SystemHealthListModel::Private::removeItem(
