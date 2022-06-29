@@ -11,7 +11,6 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/client/core/network/remote_connection_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <utils/common/connective.h>
 
 namespace nx::vms::common { struct Credentials; }
 namespace nx::utils { class Url; }
@@ -23,10 +22,10 @@ namespace nx::vms::client::desktop {
 
 class ConnectTilesProxyModel;
 
-class WelcomeScreen: public Connective<QQuickWidget>, public QnWorkbenchContextAware
+class WelcomeScreen: public QQuickWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using base_type = Connective<QQuickWidget>;
+    using base_type = QQuickWidget;
 
     Q_PROPERTY(QObject* systemModel READ systemModel NOTIFY systemModelChanged)
 

@@ -61,10 +61,10 @@ VideoWallItemAccessProvider::VideoWallItemAccessProvider(
             this,
             &VideoWallItemAccessProvider::updateAccessBySubject);
 
-        connect(m_itemAggregator, &QnLayoutItemAggregator::itemAdded,
+        connect(m_itemAggregator.get(), &QnLayoutItemAggregator::itemAdded,
             this, &VideoWallItemAccessProvider::handleItemAdded);
 
-        connect(m_itemAggregator, &QnLayoutItemAggregator::itemRemoved,
+        connect(m_itemAggregator.get(), &QnLayoutItemAggregator::itemRemoved,
             this, &VideoWallItemAccessProvider::handleItemRemoved);
     }
 }
@@ -221,7 +221,7 @@ void VideoWallItemAccessProvider::handleResourceAdded(const QnResourcePtr& resou
     }
     else if (auto layout = resource.dynamicCast<QnLayoutResource>())
     {
-        connect(layout, &QnLayoutResource::parentIdChanged, this,
+        connect(layout.get(), &QnLayoutResource::parentIdChanged, this,
             [this, layout]
             {
                 updateAccessToLayout(layout);
@@ -335,11 +335,11 @@ void VideoWallItemAccessProvider::handleVideoWallAdded(const QnVideoWallResource
         }
     }
 
-    connect(videoWall, &QnVideoWallResource::itemAdded, this,
+    connect(videoWall.get(), &QnVideoWallResource::itemAdded, this,
         &VideoWallItemAccessProvider::handleVideowallItemAdded);
-    connect(videoWall, &QnVideoWallResource::itemChanged, this,
+    connect(videoWall.get(), &QnVideoWallResource::itemChanged, this,
         &VideoWallItemAccessProvider::handleVideowallItemChanged);
-    connect(videoWall, &QnVideoWallResource::itemRemoved, this,
+    connect(videoWall.get(), &QnVideoWallResource::itemRemoved, this,
         &VideoWallItemAccessProvider::handleVideowallItemRemoved);
 }
 

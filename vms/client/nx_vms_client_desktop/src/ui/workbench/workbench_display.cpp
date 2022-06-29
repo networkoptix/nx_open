@@ -2297,16 +2297,16 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
 
     if (const auto layoutResource = workbenchLayout->resource())
     {
-        connect(layoutResource, &QnLayoutResource::backgroundImageChanged,
+        connect(layoutResource.get(), &QnLayoutResource::backgroundImageChanged,
             this, &QnWorkbenchDisplay::updateBackground);
 
-        connect(layoutResource, &QnLayoutResource::backgroundSizeChanged,
+        connect(layoutResource.get(), &QnLayoutResource::backgroundSizeChanged,
             this, &QnWorkbenchDisplay::updateBackground);
 
-        connect(layoutResource, &QnLayoutResource::backgroundOpacityChanged,
+        connect(layoutResource.get(), &QnLayoutResource::backgroundOpacityChanged,
             this, &QnWorkbenchDisplay::updateBackground);
 
-        connect(layoutResource, &QnLayoutResource::fixedSizeChanged, this,
+        connect(layoutResource.get(), &QnLayoutResource::fixedSizeChanged, this,
             [this]
             {
                 synchronizeSceneBounds();

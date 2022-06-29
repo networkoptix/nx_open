@@ -23,7 +23,6 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/url.h>
 #include <nx/vms/common/system_context_aware.h>
-#include <utils/common/connective.h>
 
 #include "resource_searcher.h"
 
@@ -70,12 +69,12 @@ private:
 // it uses others plugins
 // it puts result into resource pool
 class NX_VMS_COMMON_API QnResourceDiscoveryManager:
-    public Connective<QnLongRunnable>,
+    public QnLongRunnable,
     public QnResourceFactory,
     public nx::vms::common::SystemContextAware
 {
     Q_OBJECT
-    using base_type = Connective<QnLongRunnable>;
+    using base_type = QnLongRunnable;
 
 public:
     enum State

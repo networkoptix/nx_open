@@ -14,7 +14,6 @@
 #include <nx/vms/common/update/update_check_params.h>
 #include <nx/vms/common/update/update_information.h>
 #include <nx/vms/common/utils/file_signature.h>
-#include <utils/common/connective.h>
 
 namespace nx::vms::applauncher::api { enum class ResultType; }
 
@@ -36,12 +35,12 @@ namespace nx::vms::client::desktop {
  * ClientUpdateTool uses p2p downloader to get update package.
  */
 class ClientUpdateTool:
-    public Connective<QObject>,
+    public QObject,
     public nx::vms::client::core::CommonModuleAware,
     public nx::vms::client::core::RemoteConnectionAware
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
     using Downloader = vms::common::p2p::downloader::Downloader;
     using FileInformation = vms::common::p2p::downloader::FileInformation;
     using PeerManagerPtr = nx::vms::common::p2p::downloader::AbstractPeerManager*;

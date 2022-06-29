@@ -4,17 +4,16 @@
 
 #include <QtCore/QObject>
 
-#include <utils/common/connective.h>
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>
 
-class NX_VMS_CLIENT_CORE_API QnAbstractSaveStateManager: public Connective<QObject>
+class NX_VMS_CLIENT_CORE_API QnAbstractSaveStateManager: public QObject
 {
     Q_OBJECT
     Q_FLAGS(SaveStateFlags)
 
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     enum SaveStateFlag

@@ -189,7 +189,7 @@ QSize QnBusinessRulesViewModel::columnSizeHint(Column column) const
 int QnBusinessRulesViewModel::addRuleModelInternal(const QnBusinessRuleViewModelPtr& ruleModel)
 {
     QnUuid id = ruleModel->id();
-    connect(ruleModel, &QnBusinessRuleViewModel::dataChanged, this,
+    connect(ruleModel.get(), &QnBusinessRuleViewModel::dataChanged, this,
         [this, id](Fields fields)
         {
             at_rule_dataChanged(id, fields);

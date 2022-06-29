@@ -53,7 +53,6 @@
 #include <ui/statistics/modules/certificate_statistics_module.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
-#include <utils/common/connective.h>
 #include <utils/common/delayed.h>
 #include <utils/common/util.h>
 #include <watchers/cloud_status_watcher.h>

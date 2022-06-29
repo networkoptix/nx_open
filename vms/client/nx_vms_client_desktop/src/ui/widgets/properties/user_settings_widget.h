@@ -9,7 +9,6 @@
 #include <nx/utils/uuid.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <utils/common/connective.h>
 
 namespace Ui { class UserSettingsWidget; }
 namespace nx::vms::client::desktop {
@@ -22,10 +21,10 @@ class Aligner;
 class QnUserSettingsModel;
 class QnUserRolesModel;
 
-class QnUserSettingsWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
+class QnUserSettingsWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    typedef Connective<QnAbstractPreferencesWidget> base_type;
+    typedef QnAbstractPreferencesWidget base_type;
 
 public:
     QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* parent = nullptr);

@@ -19,16 +19,15 @@
 #include <nx/vms/client/desktop/system_update/client_update_tool.h>
 #include <nx_ec/ec_api_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <utils/common/connective.h>
 
 namespace nx::vms::api { struct ModuleInformation; }
 
 namespace nx::vms::client::desktop {
 
-class ConnectActionsHandler: public Connective<QObject>, public QnWorkbenchContextAware
+class ConnectActionsHandler: public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
     using RemoteConnectionPtr = nx::vms::client::core::RemoteConnectionPtr;
     using RemoteConnectionError = nx::vms::client::core::RemoteConnectionError;
     using RemoteConnectionFactory = nx::vms::client::core::RemoteConnectionFactory;

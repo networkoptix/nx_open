@@ -6,14 +6,13 @@
 
 #include <nx/vms/client/desktop/export/data/export_types.h>
 
-#include <utils/common/connective.h>
 
 namespace nx::vms::client::desktop {
 
-class AbstractExportTool: public Connective<QObject>
+class AbstractExportTool: public QObject
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     AbstractExportTool(QObject* parent = nullptr);

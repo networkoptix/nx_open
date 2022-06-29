@@ -233,7 +233,7 @@ RoiFiguresWatcher::RoiFiguresWatcher(
         camera,
         AnalyticsSettingsMultiListener::ListenPolicy::enabledEngines));
 
-    connect(d->settingsListener, &AnalyticsSettingsMultiListener::dataChanged, this,
+    connect(d->settingsListener.get(), &AnalyticsSettingsMultiListener::dataChanged, this,
         [this](const EngineId& engineId, const DeviceAgentData& data)
         {
             d->handleEngineDataUpdated(engineId, data);
@@ -246,7 +246,7 @@ RoiFiguresWatcher::RoiFiguresWatcher(
             for (const auto& engineId: d->settingsListener->engineIds())
                 d->handleEngineDataUpdated(engineId, d->settingsListener->data(engineId));
         };
-    connect(d->settingsListener, &AnalyticsSettingsMultiListener::enginesChanged,
+    connect(d->settingsListener.get(), &AnalyticsSettingsMultiListener::enginesChanged,
         this, handleEnginesChanged);
 
     handleEnginesChanged();

@@ -5,7 +5,6 @@
 
 #include <QtCore/QScopedPointer>
 
-#include <utils/common/connective.h>
 
 #include "masked_proxy_widget.h"
 
@@ -18,7 +17,7 @@ class QLabel;
  *
  * See https://bugreports.qt-project.org/browse/QTBUG-14622.
  */
-class QnProxyLabel: public Connective<QnMaskedProxyWidget> {
+class QnProxyLabel: public QnMaskedProxyWidget {
     Q_OBJECT
     Q_PROPERTY(QString text READ text WRITE setText)
     Q_PROPERTY(Qt::TextFormat textFormat READ textFormat WRITE setTextFormat)
@@ -31,7 +30,7 @@ class QnProxyLabel: public Connective<QnMaskedProxyWidget> {
     Q_PROPERTY(bool hasSelectedText READ hasSelectedText)
     Q_PROPERTY(QString selectedText READ selectedText)
 
-    typedef Connective<QnMaskedProxyWidget> base_type;
+    typedef QnMaskedProxyWidget base_type;
 
 public:
     explicit QnProxyLabel(

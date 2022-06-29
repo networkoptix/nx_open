@@ -11,7 +11,6 @@
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
-#include <utils/common/connective.h>
 
 #include "../flux/camera_settings_dialog_state.h"
 #include "../flux/camera_settings_dialog_store.h"
@@ -43,7 +42,7 @@ AnalyticsEngineInfo engineInfoFromResource(const AnalyticsEngineResourcePtr& eng
 } // namespace
 
 class CameraSettingsAnalyticsEnginesWatcher::Private:
-    public Connective<QObject>,
+    public QObject,
     public QnCommonModuleAware
 {
 public:
@@ -155,8 +154,8 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::setCamera(
 
     if (camera)
     {
-        connect(camera, &QnResource::parentIdChanged, this, &Private::updateStore);
-        connect(camera, &QnResource::propertyChanged, this,
+        connect(camera.get(), &QnResource::parentIdChanged, this, &Private::updateStore);
+        connect(camera.get(), &QnResource::propertyChanged, this,
             [this](const QnResourcePtr& resource, const QString& key)
             {
                 if (resource == camera
@@ -213,9 +212,9 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::at_resourceAdded(
 
         engines[info.id] = info;
 
-        connect(engine, &QnResource::nameChanged,
+        connect(engine.get(), &QnResource::nameChanged,
             this, &Private::at_engineNameChanged);
-        connect(engine, &AnalyticsEngineResource::manifestChanged,
+        connect(engine.get(), &AnalyticsEngineResource::manifestChanged,
             this, &Private::at_engineManifestChanged);
 
         updateStore();

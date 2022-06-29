@@ -96,14 +96,14 @@ void QnWorkbenchLayoutSynchronizer::initialize() {
     connect(m_layout,   &QnWorkbenchLayout::cellSpacingChanged,     this, &QnWorkbenchLayoutSynchronizer::at_layout_cellSpacingChanged);
     connect(m_layout,   &QnWorkbenchLayout::aboutToBeDestroyed,     this, &QnWorkbenchLayoutSynchronizer::at_layout_aboutToBeDestroyed);
     // TODO: #sivanov Get rid of resourceChanged.
-    connect(m_resource, &QnLayoutResource::resourceChanged,         this, &QnWorkbenchLayoutSynchronizer::at_resource_resourceChanged);
-    connect(m_resource, &QnLayoutResource::nameChanged,             this, &QnWorkbenchLayoutSynchronizer::at_resource_nameChanged);
-    connect(m_resource, &QnLayoutResource::cellAspectRatioChanged,  this, &QnWorkbenchLayoutSynchronizer::at_resource_cellAspectRatioChanged);
-    connect(m_resource, &QnLayoutResource::cellSpacingChanged,      this, &QnWorkbenchLayoutSynchronizer::at_resource_cellSpacingChanged);
-    connect(m_resource, &QnLayoutResource::lockedChanged,           this, &QnWorkbenchLayoutSynchronizer::at_resource_lockedChanged);
-    connect(m_resource, &QnLayoutResource::itemAdded,               this, &QnWorkbenchLayoutSynchronizer::at_resource_itemAdded);
-    connect(m_resource, &QnLayoutResource::itemRemoved,             this, &QnWorkbenchLayoutSynchronizer::at_resource_itemRemoved);
-    connect(m_resource, &QnLayoutResource::itemChanged,             this, &QnWorkbenchLayoutSynchronizer::at_resource_itemChanged);
+    connect(m_resource.get(), &QnLayoutResource::resourceChanged,         this, &QnWorkbenchLayoutSynchronizer::at_resource_resourceChanged);
+    connect(m_resource.get(), &QnLayoutResource::nameChanged,             this, &QnWorkbenchLayoutSynchronizer::at_resource_nameChanged);
+    connect(m_resource.get(), &QnLayoutResource::cellAspectRatioChanged,  this, &QnWorkbenchLayoutSynchronizer::at_resource_cellAspectRatioChanged);
+    connect(m_resource.get(), &QnLayoutResource::cellSpacingChanged,      this, &QnWorkbenchLayoutSynchronizer::at_resource_cellSpacingChanged);
+    connect(m_resource.get(), &QnLayoutResource::lockedChanged,           this, &QnWorkbenchLayoutSynchronizer::at_resource_lockedChanged);
+    connect(m_resource.get(), &QnLayoutResource::itemAdded,               this, &QnWorkbenchLayoutSynchronizer::at_resource_itemAdded);
+    connect(m_resource.get(), &QnLayoutResource::itemRemoved,             this, &QnWorkbenchLayoutSynchronizer::at_resource_itemRemoved);
+    connect(m_resource.get(), &QnLayoutResource::itemChanged,             this, &QnWorkbenchLayoutSynchronizer::at_resource_itemChanged);
 
     m_update = m_submit = true;
 }

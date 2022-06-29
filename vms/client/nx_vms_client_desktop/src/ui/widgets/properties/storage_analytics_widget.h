@@ -15,7 +15,6 @@
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-#include <utils/common/connective.h>
 #include <nx/vms/client/desktop/common/widgets/hint_button.h>
 
 class QnRecordingStatsModel;
@@ -27,10 +26,10 @@ class SnappedScrollBar;
 class WidgetAnchor;
 } // namespace nx::vms::client::desktop
 
-class QnStorageAnalyticsWidget: public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
+class QnStorageAnalyticsWidget: public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using base_type = Connective<QnAbstractPreferencesWidget>;
+    using base_type = QnAbstractPreferencesWidget;
 
 public:
     QnStorageAnalyticsWidget(QWidget* parent = 0);

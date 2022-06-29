@@ -13,7 +13,6 @@
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/network/local_network_interfaces_manager.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
-#include <utils/common/connective.h>
 #include <utils/math/math.h>
 
 namespace {
@@ -51,9 +50,9 @@ QSet<nx::utils::Url> formAdditionalUrlsSet(
 } // namespace
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
-class QnSystemHostsModel::HostsModel: public Connective<QAbstractListModel>
+class QnSystemHostsModel::HostsModel: public QAbstractListModel
 {
-    using base_type = Connective<QAbstractListModel>;
+    using base_type = QAbstractListModel;
 
     struct ServerUrlData
     {
@@ -294,13 +293,13 @@ void QnSystemHostsModel::HostsModel::reloadHosts()
             for (const auto& server: system->servers())
                 addServer(system, server.id);
 
-            m_connections << connect(system, &QnBaseSystemDescription::serverAdded, this,
+            m_connections << connect(system.get(), &QnBaseSystemDescription::serverAdded, this,
                 [this, system](const QnUuid& id) { addServer(system, id); });
 
-            m_connections << connect(system, &QnBaseSystemDescription::serverRemoved, this,
+            m_connections << connect(system.get(), &QnBaseSystemDescription::serverRemoved, this,
                 [this, system](const QnUuid& id) { removeServer(system, id); });
 
-            m_connections << connect(system, &QnBaseSystemDescription::serverChanged, this,
+            m_connections << connect(system.get(), &QnBaseSystemDescription::serverChanged, this,
                 [this, system](const QnUuid& id, QnServerFields fields)
                 {
                     if (fields.testFlag(QnServerField::Host))

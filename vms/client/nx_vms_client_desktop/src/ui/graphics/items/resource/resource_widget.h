@@ -23,7 +23,6 @@
 #include <ui/common/help_topic_queryable.h>
 #include <ui/graphics/instruments/instrumented.h>
 #include <ui/graphics/items/overlays/overlayed.h>
-#include <utils/common/connective.h>
 
 class QGraphicsLinearLayout;
 
@@ -41,7 +40,7 @@ class QnStatusOverlayWidget;
 class QnHudOverlayWidget;
 
 class QnResourceWidget:
-    public Overlayed<Animated<Instrumented<Connective<GraphicsWidget>>>>,
+    public Overlayed<Animated<Instrumented<GraphicsWidget>>>,
     public nx::vms::client::desktop::SystemContextAware,
     public nx::vms::client::desktop::WindowContextAware,
     public ConstrainedResizable,
@@ -56,7 +55,7 @@ class QnResourceWidget:
     Q_PROPERTY(bool isZoomWindow READ isZoomWindow)
     Q_FLAGS(Options Option)
 
-    using base_type = Overlayed<Animated<Instrumented<Connective<GraphicsWidget>>>>;
+    using base_type = Overlayed<Animated<Instrumented<GraphicsWidget>>>;
 
 public:
     enum Option

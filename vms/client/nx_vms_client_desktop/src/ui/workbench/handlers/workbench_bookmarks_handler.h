@@ -9,16 +9,15 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-#include <utils/common/connective.h>
 
 /**
  * @brief The QnWorkbenchBookmarksHandler class         Handler for camera bookmarks management.
  */
-class QnWorkbenchBookmarksHandler: public Connective<QObject>, public QnWorkbenchContextAware
+class QnWorkbenchBookmarksHandler: public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
-    typedef Connective<QObject> base_type;
+    typedef QObject base_type;
 public:
     QnWorkbenchBookmarksHandler(QObject *parent = nullptr);
 

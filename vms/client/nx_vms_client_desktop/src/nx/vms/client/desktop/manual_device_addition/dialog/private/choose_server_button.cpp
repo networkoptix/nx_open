@@ -94,9 +94,9 @@ QAction* QnChooseServerButton::addMenuItemForServer(const QnMediaServerResourceP
     action->setIcon(getIcon(server));
     action->setIconVisibleInMenu(true);
 
-    connect(server, &QnMediaServerResource::nameChanged, this,
+    connect(server.get(), &QnMediaServerResource::nameChanged, this,
         [action, server]() { action->setText(getText(server)); });
-    connect(server, &QnMediaServerResource::statusChanged, this,
+    connect(server.get(), &QnMediaServerResource::statusChanged, this,
         [action, server]() { action->setIcon(getIcon(server)); });
     connect(action, &QAction::triggered, this,
         [this, server]() { setCurrentServer(server); });

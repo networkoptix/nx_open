@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QPointer>
+
 #include "instrument.h"
 
 class QnResourceWidget;

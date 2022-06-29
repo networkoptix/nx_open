@@ -48,12 +48,12 @@ namespace
     };
 }
 
-class QnSystemsModelPrivate: public Connective<QObject>
+class QnSystemsModelPrivate: public QObject
 {
     QnSystemsModel* q_ptr;
     Q_DECLARE_PUBLIC(QnSystemsModel)
 
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     QnSystemsModelPrivate(QnSystemsModel* parent);
@@ -343,7 +343,7 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
     const auto data = InternalSystemDataPtr(new InternalSystemData({systemDescription}));
 
     data->connections
-        << connect(systemDescription, &QnBaseSystemDescription::serverChanged, this,
+        << connect(systemDescription.get(), &QnBaseSystemDescription::serverChanged, this,
             [this, systemDescription] (const QnUuid &serverId, QnServerFields fields)
             {
                 searchServerNamesHostsCache.remove(systemDescription->id());
@@ -352,7 +352,7 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
             });
 
     data->connections
-        << connect(systemDescription, &QnBaseSystemDescription::systemNameChanged, this,
+        << connect(systemDescription.get(), &QnBaseSystemDescription::systemNameChanged, this,
             [this, systemDescription]()
             {
                 searchServerNamesHostsCache.remove(systemDescription->id());
@@ -361,7 +361,7 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
             });
 
     data->connections
-        << connect(systemDescription, &QnBaseSystemDescription::ownerChanged, this,
+        << connect(systemDescription.get(), &QnBaseSystemDescription::ownerChanged, this,
             [this, systemDescription]()
             {
                 emitDataChanged(systemDescription, QVector<int>()
@@ -381,55 +381,55 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
         };
 
     data->connections
-        << connect(systemDescription, &QnBaseSystemDescription::serverAdded, this, serverAction);
+        << connect(systemDescription.get(), &QnBaseSystemDescription::serverAdded, this, serverAction);
 
     data->connections
-        << connect(systemDescription, &QnBaseSystemDescription::serverRemoved, this, serverAction);
+        << connect(systemDescription.get(), &QnBaseSystemDescription::serverRemoved, this, serverAction);
 
     data->connections
-        << connect(systemDescription, &QnBaseSystemDescription::serverChanged, this,
+        << connect(systemDescription.get(), &QnBaseSystemDescription::serverChanged, this,
             [this, systemDescription]()
             {
                 searchServerNamesHostsCache.remove(systemDescription->id());
             });
 
     data->connections
-        << connect(systemDescription, &QnBaseSystemDescription::newSystemStateChanged, this,
+        << connect(systemDescription.get(), &QnBaseSystemDescription::newSystemStateChanged, this,
             [this, systemDescription]()
             {
                 emitDataChanged(systemDescription, QnSystemsModel::IsFactorySystemRoleId);
             });
 
     data->connections
-        << connect(systemDescription, &QnBaseSystemDescription::reachableStateChanged, this,
+        << connect(systemDescription.get(), &QnBaseSystemDescription::reachableStateChanged, this,
             [this, systemDescription]()
             {
                 emitDataChanged(systemDescription, QnSystemsModel::IsReachableRoleId);
             });
 
     data->connections
-        << connect(systemDescription, &QnBaseSystemDescription::onlineStateChanged, this,
+        << connect(systemDescription.get(), &QnBaseSystemDescription::onlineStateChanged, this,
             [this, systemDescription]()
             {
                 emitDataChanged(systemDescription, QnSystemsModel::IsOnlineRoleId);
             });
 
     data->connections
-        << connect(systemDescription, &QnBaseSystemDescription::system2faEnabledChanged, this,
+        << connect(systemDescription.get(), &QnBaseSystemDescription::system2faEnabledChanged, this,
             [this, systemDescription]()
             {
                 emitDataChanged(systemDescription, QnSystemsModel::Is2FaEnabledForSystem);
             });
 
     data->connections
-        << connect(systemDescription, &QnBaseSystemDescription::oauthSupportedChanged, this,
+        << connect(systemDescription.get(), &QnBaseSystemDescription::oauthSupportedChanged, this,
            [this, systemDescription]()
            {
                emitDataChanged(systemDescription, QnSystemsModel::IsCloudOauthSupportedRoleId);
            });
 
     data->connections
-        << connect(systemDescription, &QnBaseSystemDescription::isCloudSystemChanged, this,
+        << connect(systemDescription.get(), &QnBaseSystemDescription::isCloudSystemChanged, this,
             [this, systemDescription]()
             {
                 QVector<int> roles;

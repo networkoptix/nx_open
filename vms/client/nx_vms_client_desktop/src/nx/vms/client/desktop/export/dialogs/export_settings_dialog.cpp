@@ -137,7 +137,7 @@ ExportSettingsDialog::ExportSettingsDialog(
 
     connect(d.data(), &Private::validated, this, &ExportSettingsDialog::updateAlerts);
 
-    connect(this, &QDialog::accepted, d, &Private::saveSettings);
+    connect(this, &QDialog::accepted, d.get(), &Private::saveSettings);
 
     ui->rapidReviewSettingsPage->setSourcePeriodLengthMs(timePeriod.durationMs);
 
@@ -145,30 +145,30 @@ ExportSettingsDialog::ExportSettingsDialog(
     ui->layoutFilenamePanel->setAllowedExtensions(d->allowedFileExtensions(Mode::Layout));
 
     connect(ui->exportMediaSettingsPage, &ExportMediaSettingsWidget::dataEdited,
-        d, [this](const ExportMediaSettingsWidget::Data& data) { d->dispatch(Reducer::setApplyFilters, data.applyFilters); });
+        d.get(), [this](const ExportMediaSettingsWidget::Data& data) { d->dispatch(Reducer::setApplyFilters, data.applyFilters); });
     connect(ui->exportLayoutSettingsPage, &ExportLayoutSettingsWidget::dataEdited,
-        d, [this](const ExportLayoutSettingsWidget::Data& data) { d->dispatch(Reducer::setLayoutReadOnly, data.readOnly); });
+        d.get(), [this](const ExportLayoutSettingsWidget::Data& data) { d->dispatch(Reducer::setLayoutReadOnly, data.readOnly); });
     connect(m_passwordWidget, &ExportPasswordWidget::dataEdited,
-        d, [this](const ExportPasswordWidget::Data& data) { d->dispatch(Reducer::setLayoutEncryption, data.cryptVideo, data.password); });
+        d.get(), [this](const ExportPasswordWidget::Data& data) { d->dispatch(Reducer::setLayoutEncryption, data.cryptVideo, data.password); });
 
     connect(ui->mediaFilenamePanel, &FilenamePanel::filenameChanged,
-        d, d->dispatchTo(Reducer::setMediaFilename));
+        d.get(), d->dispatchTo(Reducer::setMediaFilename));
     connect(ui->layoutFilenamePanel, &FilenamePanel::filenameChanged,
-        d, d->dispatchTo(Reducer::setLayoutFilename));
+        d.get(), d->dispatchTo(Reducer::setLayoutFilename));
 
     connect(ui->timestampSettingsPage, &TimestampOverlaySettingsWidget::dataChanged,
-        d, d->dispatchTo(Reducer::setTimestampOverlaySettings));
+        d.get(), d->dispatchTo(Reducer::setTimestampOverlaySettings));
     connect(ui->timestampSettingsPage, &TimestampOverlaySettingsWidget::formatChanged,
-        d, d->dispatchTo(Reducer::setFormatTimestampOverlay));
+        d.get(), d->dispatchTo(Reducer::setFormatTimestampOverlay));
 
     connect(ui->imageSettingsPage, &ImageOverlaySettingsWidget::dataChanged,
-        d, d->dispatchTo(Reducer::setImageOverlaySettings));
+        d.get(), d->dispatchTo(Reducer::setImageOverlaySettings));
 
     connect(ui->textSettingsPage, &TextOverlaySettingsWidget::dataChanged,
-        d, d->dispatchTo(Reducer::setTextOverlaySettings));
+        d.get(), d->dispatchTo(Reducer::setTextOverlaySettings));
 
     connect(ui->bookmarkSettingsPage, &BookmarkOverlaySettingsWidget::dataChanged,
-        d, d->dispatchTo(Reducer::setBookmarkOverlaySettings));
+        d.get(), d->dispatchTo(Reducer::setBookmarkOverlaySettings));
 
     connect(ui->infoSettingsPage, &InfoOverlaySettingsWidget::dataChanged, this,
         [this](ExportInfoOverlayPersistentSettings data)
@@ -373,7 +373,7 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->bookmarkButton->setProperty(kOverlayPropertyName,
         QVariant::fromValue(ExportOverlayType::bookmark));
 
-    connect(d, &Private::overlaySelected, this, d->dispatchTo(Reducer::selectOverlay));
+    connect(d.get(), &Private::overlaySelected, this, d->dispatchTo(Reducer::selectOverlay));
 
     auto group = new SelectableTextButtonGroup(this);
     group->add(ui->cameraExportSettingsButton);

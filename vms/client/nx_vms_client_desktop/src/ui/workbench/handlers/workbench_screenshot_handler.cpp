@@ -714,7 +714,7 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
     }
 
     QScopedPointer<QnScreenshotLoader> loader(new QnScreenshotLoader(localParameters, this));
-    connect(loader, &ImageProvider::imageChanged, this,   &QnWorkbenchScreenshotHandler::at_imageLoaded);
+    connect(loader.get(), &ImageProvider::imageChanged, this,   &QnWorkbenchScreenshotHandler::at_imageLoaded);
     loader->setBaseProvider(imageProvider); // preload screenshot here
 
     /* Check if name is already given - that usually means silent mode. */
@@ -729,7 +729,7 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
         //qnSettings->setTimestampCorner(localParameters.timestampPosition);
 
         showProgressDelayed(tr("Saving %1").arg(QFileInfo(localParameters.filename).fileName()));
-        connect(m_screenshotProgressDialog, &ProgressDialog::canceled, loader,
+        connect(m_screenshotProgressDialog, &ProgressDialog::canceled, loader.get(),
             &QnScreenshotLoader::deleteLater);
     }
 

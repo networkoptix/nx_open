@@ -154,7 +154,7 @@ QnBusinessRuleViewModelPtr QnBusinessRuleWidget::model() const
 void QnBusinessRuleWidget::setModel(const QnBusinessRuleViewModelPtr &model)
 {
     if (m_model)
-        disconnect(m_model, nullptr, this, nullptr);
+        disconnect(m_model.get(), nullptr, this, nullptr);
 
     m_model = model;
 
@@ -168,7 +168,7 @@ void QnBusinessRuleWidget::setModel(const QnBusinessRuleViewModelPtr &model)
         ui->actionTypeComboBox->setModel(m_model->actionTypesModel());
     }
 
-    connect(m_model, &QnBusinessRuleViewModel::dataChanged, this, &QnBusinessRuleWidget::at_model_dataChanged);
+    connect(m_model.get(), &QnBusinessRuleViewModel::dataChanged, this, &QnBusinessRuleWidget::at_model_dataChanged);
     at_model_dataChanged(Field::all);
 }
 

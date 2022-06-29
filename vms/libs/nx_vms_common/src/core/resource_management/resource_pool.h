@@ -15,7 +15,6 @@
 
 #include <common/common_globals.h>
 
-#include <utils/common/connective.h>
 
 #include <nx/utils/uuid.h>
 #include <nx/utils/thread/mutex.h>
@@ -37,10 +36,10 @@ namespace nx::vms::common { class SystemContext; }
  * resources.
  */
 class NX_VMS_COMMON_API QnResourcePool:
-    public Connective<QObject>
+    public QObject
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     enum Filter

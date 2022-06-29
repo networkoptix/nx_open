@@ -1,20 +1,19 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QPointer>
 
-#include <utils/common/connective.h>
 #include <statistics/base/base_fwd.h>
 #include <statistics/base/abstract_metric.h>
 
 class QnWorkbench;
 
-class AvgTabsCountMetric : public Connective<QObject>
+class AvgTabsCountMetric : public QObject
     , public QnAbstractMetric
 {
-    typedef Connective<QObject> base_type;
+    typedef QObject base_type;
 
 public:
     AvgTabsCountMetric(QnWorkbench *workbench);

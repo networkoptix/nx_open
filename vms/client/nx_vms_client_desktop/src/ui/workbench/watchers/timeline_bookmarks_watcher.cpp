@@ -88,7 +88,7 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject* parent):
     navigator()->timeSlider()->setBookmarksHelper(m_mergeHelper);
 
     m_updateStaticQueriesTimer->setInterval(kUpdateStaticQueriesInterval);
-    connect(m_updateStaticQueriesTimer, &QTimer::timeout, m_queriesCache,
+    connect(m_updateStaticQueriesTimer.get(), &QTimer::timeout, m_queriesCache.get(),
         &QnBookmarkQueriesCache::refreshQueries);
     m_updateStaticQueriesTimer->start();
 }
@@ -278,7 +278,7 @@ void QnTimelineBookmarksWatcher::setCurrentCamera(const QnVirtualCameraResourceP
         m_timelineWindowQuery = SystemContext::fromResource(m_currentCamera)
             ->cameraBookmarksManager()->createQuery(filter);
 
-        connect(m_timelineWindowQuery, &QnCameraBookmarksQuery::bookmarksChanged, this,
+        connect(m_timelineWindowQuery.get(), &QnCameraBookmarksQuery::bookmarksChanged, this,
             [this](const QnCameraBookmarkList& bookmarks)
             {
                 NX_VERBOSE(this, "Timeline query result: %1 bookmarks", bookmarks.size());
@@ -297,7 +297,7 @@ void QnTimelineBookmarksWatcher::ensureStaticQueryForCamera(
         return;
 
     const auto query = m_queriesCache->getOrCreateQuery(camera);
-    connect(query, &QnCameraBookmarksQuery::bookmarksChanged, this,
+    connect(query.get(), &QnCameraBookmarksQuery::bookmarksChanged, this,
         [this, camera](const QnCameraBookmarkList& bookmarks)
         {
             NX_VERBOSE(this, "Static query result: %1 bookmarks", bookmarks.size());

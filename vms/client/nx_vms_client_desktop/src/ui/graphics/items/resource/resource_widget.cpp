@@ -152,8 +152,8 @@ QnResourceWidget::QnResourceWidget(
 
     /* Initialize resource. */
     m_resource = item->resource();
-    connect(m_resource, &QnResource::nameChanged, this, &QnResourceWidget::updateTitleText);
-    connect(m_resource, &QnResource::statusChanged, this,
+    connect(m_resource.get(), &QnResource::nameChanged, this, &QnResourceWidget::updateTitleText);
+    connect(m_resource.get(), &QnResource::statusChanged, this,
         [this]
         {
             const bool animate = display()->animationAllowed();
@@ -254,7 +254,7 @@ QnResourceWidget::QnResourceWidget(
     {
         if (const auto layoutResource = layout->resource())
         {
-            connect(layoutResource, &QnLayoutResource::lockedChanged, this,
+            connect(layoutResource.get(), &QnLayoutResource::lockedChanged, this,
                 [this](const QnLayoutResourcePtr&)
                 {
                     updateButtonsVisibility();
@@ -277,7 +277,7 @@ void QnResourceWidget::setupOverlayButtonsHandlers()
             updateCustomOverlayButton();
         };
 
-    connect(m_resource, &QnResource::statusChanged, this, updateButtons);
+    connect(m_resource.get(), &QnResource::statusChanged, this, updateButtons);
     connect(m_statusController, &QnStatusOverlayController::statusOverlayChanged, this,
         [this, updateButtons](bool animated)
         {

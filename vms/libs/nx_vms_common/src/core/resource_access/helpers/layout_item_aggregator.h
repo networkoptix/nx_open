@@ -4,7 +4,6 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <utils/common/connective.h>
 #include <utils/common/counter_hash.h>
 
 #include <nx/utils/uuid.h>
@@ -17,11 +16,11 @@
  * NOTE: class does not depend on resource pool, so even deleted layouts must be removed manually.
  * WARNING: this class is not thread-safe.
  */
-class NX_VMS_COMMON_API QnLayoutItemAggregator: public Connective<QObject>
+class NX_VMS_COMMON_API QnLayoutItemAggregator: public QObject
 {
     Q_OBJECT
 
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 public:
 
     QnLayoutItemAggregator(QObject* parent = nullptr);

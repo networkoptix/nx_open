@@ -22,7 +22,6 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
-#include <utils/common/connective.h>
 
 using namespace nx::vms::common;
 
@@ -43,7 +42,7 @@ bool isEngineVisible(const AnalyticsEngineInfo& info)
 } // namespace
 
 class AnalyticsSettingsWidget::Private:
-    public Connective<QObject>,
+    public QObject,
     public nx::vms::client::core::CommonModuleAware,
     public nx::vms::client::core::RemoteConnectionAware
 {
@@ -158,12 +157,12 @@ AnalyticsSettingsWidget::Private::Private(AnalyticsSettingsWidget* q):
     currentEngineId.connectNotifySignal(this,
         [this]() { refreshSettingsValues(currentEngineId); });
 
-    connect(enginesWatcher, &AnalyticsEnginesWatcher::engineAdded, this, &Private::addEngine);
-    connect(enginesWatcher, &AnalyticsEnginesWatcher::engineRemoved, this, &Private::removeEngine);
-    connect(enginesWatcher, &AnalyticsEnginesWatcher::engineUpdated,
+    connect(enginesWatcher.get(), &AnalyticsEnginesWatcher::engineAdded, this, &Private::addEngine);
+    connect(enginesWatcher.get(), &AnalyticsEnginesWatcher::engineRemoved, this, &Private::removeEngine);
+    connect(enginesWatcher.get(), &AnalyticsEnginesWatcher::engineUpdated,
         this, &Private::updateEngine);
 
-    connect(enginesWatcher, &AnalyticsEnginesWatcher::engineSettingsModelChanged, this,
+    connect(enginesWatcher.get(), &AnalyticsEnginesWatcher::engineSettingsModelChanged, this,
         [this](const QnUuid& engineId)
         {
             if (engineId == currentEngineId)

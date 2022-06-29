@@ -202,7 +202,7 @@ void QnResourceDiscoveryManager::run()
 
     QnResourceDiscoveryManagerTimeoutDelegate timoutDelegate(this);
 
-    connect(m_timer, &QTimer::timeout,
+    connect(m_timer.get(), &QTimer::timeout,
         &timoutDelegate, &QnResourceDiscoveryManagerTimeoutDelegate::onTimeout);
 
     m_timer->start(0);    //immediate execution

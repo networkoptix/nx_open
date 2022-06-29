@@ -104,24 +104,24 @@ void QnSystemDescriptionAggregator::mergeSystem(int priority,
      * We gather all servers for aggregated systems - for example, we may have
      * offline cloud system and same discovered local one
      */
-    connect(system, &QnBaseSystemDescription::serverAdded,
+    connect(system.get(), &QnBaseSystemDescription::serverAdded,
         this, &QnSystemDescriptionAggregator::updateServers);
-    connect(system, &QnBaseSystemDescription::serverRemoved,
+    connect(system.get(), &QnBaseSystemDescription::serverRemoved,
         this, &QnSystemDescriptionAggregator::updateServers);
 
-    connect(system, &QnBaseSystemDescription::newSystemStateChanged,
+    connect(system.get(), &QnBaseSystemDescription::newSystemStateChanged,
         this, &QnSystemDescriptionAggregator::newSystemStateChanged);
 
-    connect(system, &QnBaseSystemDescription::serverChanged,
+    connect(system.get(), &QnBaseSystemDescription::serverChanged,
         this, &QnSystemDescriptionAggregator::handleServerChanged);
-    connect(system, &QnBaseSystemDescription::systemNameChanged, this,
+    connect(system.get(), &QnBaseSystemDescription::systemNameChanged, this,
         [this, system]() { onSystemNameChanged(system); });
 
-    connect(system, &QnBaseSystemDescription::onlineStateChanged,
+    connect(system.get(), &QnBaseSystemDescription::onlineStateChanged,
         this, &QnSystemDescriptionAggregator::onOnlineStateChanged);
-    connect(system, &QnBaseSystemDescription::reachableStateChanged,
+    connect(system.get(), &QnBaseSystemDescription::reachableStateChanged,
         this, &QnBaseSystemDescription::reachableStateChanged);
-    connect(system, &QnBaseSystemDescription::oauthSupportedChanged,
+    connect(system.get(), &QnBaseSystemDescription::oauthSupportedChanged,
         this, &QnBaseSystemDescription::oauthSupportedChanged);
 
     updateServers();

@@ -4,7 +4,6 @@
 
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_layout.h>
-#include <utils/common/connective.h>
 
 class QGraphicsWidget;
 
@@ -16,10 +15,10 @@ namespace workbench {
  * @brief SpecialLayout class. Represents layout with autofilled background and top-anchored
  * workbench panel. Uses SpecialLayoutPanelWidget as default implementation for panel.
  */
-class SpecialLayout: public Connective<QnWorkbenchLayout>
+class SpecialLayout: public QnWorkbenchLayout
 {
     Q_OBJECT
-    using base_type = Connective<QnWorkbenchLayout>;
+    using base_type = QnWorkbenchLayout;
 
 public:
     SpecialLayout(const QnLayoutResourcePtr& resource, QObject* parent = nullptr);

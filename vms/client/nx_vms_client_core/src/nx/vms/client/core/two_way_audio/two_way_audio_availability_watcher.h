@@ -6,7 +6,6 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <utils/common/connective.h>
 
 class QnUuid;
 namespace nx::vms::license { class SingleCamLicenseStatusHelper; }
@@ -14,11 +13,11 @@ namespace nx::vms::license { class SingleCamLicenseStatusHelper; }
 namespace nx::vms::client::core {
 
 class NX_VMS_CLIENT_CORE_API TwoWayAudioAvailabilityWatcher:
-    public Connective<QObject>,
+    public QObject,
     public CommonModuleAware
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
     Q_PROPERTY(bool available READ available NOTIFY availabilityChanged)
 

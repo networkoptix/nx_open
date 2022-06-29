@@ -3,6 +3,8 @@
 #ifndef QN_GRID_ADJUSTMENT_INSTRUMENT_H
 #define QN_GRID_ADJUSTMENT_INSTRUMENT_H
 
+#include <QtCore/QPointer>
+
 #include "instrument.h"
 
 class QnWorkbench;

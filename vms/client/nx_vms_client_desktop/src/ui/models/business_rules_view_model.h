@@ -14,12 +14,11 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <nx/utils/uuid.h>
-#include <utils/common/connective.h>
 
-class QnBusinessRulesViewModel : public Connective<QAbstractItemModel>, public QnWorkbenchContextAware
+class QnBusinessRulesViewModel : public QAbstractItemModel, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    typedef Connective<QAbstractItemModel> base_type;
+    typedef QAbstractItemModel base_type;
 
 public:
     using Field = QnBusinessRuleViewModel::Field;

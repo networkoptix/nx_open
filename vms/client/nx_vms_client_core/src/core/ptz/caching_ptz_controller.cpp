@@ -324,8 +324,8 @@ void QnCachingPtzController::initialize()
                 controller->initializeInternal();
         };
 
-    connect(resource(), &QnResource::statusChanged, this, safeInitialize);
-    connect(resource(), &QnResource::parentIdChanged, this, safeInitialize);
+    connect(resource().get(), &QnResource::statusChanged, this, safeInitialize);
+    connect(resource().get(), &QnResource::parentIdChanged, this, safeInitialize);
     initializeInternal();
 }
 

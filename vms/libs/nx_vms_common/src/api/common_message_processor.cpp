@@ -146,37 +146,37 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     const auto connectionType = handlerConnectionType();
 
     connect(
-        connection,
+        connection.get(),
         &ec2::AbstractECConnection::remotePeerFound,
         this,
         &QnCommonMessageProcessor::on_remotePeerFound,
         connectionType);
     connect(
-        connection,
+        connection.get(),
         &ec2::AbstractECConnection::remotePeerLost,
         this,
         &QnCommonMessageProcessor::on_remotePeerLost,
         connectionType);
     connect(
-        connection,
+        connection.get(),
         &ec2::AbstractECConnection::initNotification,
         this,
         &QnCommonMessageProcessor::on_gotInitialNotification,
         connectionType);
     connect(
-        connection,
+        connection.get(),
         &ec2::AbstractECConnection::runtimeInfoChanged,
         this,
         &QnCommonMessageProcessor::runtimeInfoChanged,
         connectionType);
     connect(
-        connection,
+        connection.get(),
         &ec2::AbstractECConnection::runtimeInfoRemoved,
         this,
         &QnCommonMessageProcessor::runtimeInfoRemoved,
         connectionType);
     connect(
-        connection,
+        connection.get(),
         &ec2::AbstractECConnection::serverRuntimeEventOccurred,
         this,
         &QnCommonMessageProcessor::serverRuntimeEventOccurred,
@@ -184,31 +184,31 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 
     const auto resourceManager = connection->resourceNotificationManager();
     connect(
-        resourceManager,
+        resourceManager.get(),
         &ec2::AbstractResourceNotificationManager::statusChanged,
         this,
         &QnCommonMessageProcessor::on_resourceStatusChanged,
         connectionType);
     connect(
-        resourceManager,
+        resourceManager.get(),
         &ec2::AbstractResourceNotificationManager::resourceParamChanged,
         this,
         &QnCommonMessageProcessor::on_resourceParamChanged,
         connectionType);
     connect(
-        resourceManager,
+        resourceManager.get(),
         &ec2::AbstractResourceNotificationManager::resourceParamRemoved,
         this,
         &QnCommonMessageProcessor::on_resourceParamRemoved,
         connectionType);
     connect(
-        resourceManager,
+        resourceManager.get(),
         &ec2::AbstractResourceNotificationManager::resourceRemoved,
         this,
         &QnCommonMessageProcessor::on_resourceRemoved,
         connectionType);
     connect(
-        resourceManager,
+        resourceManager.get(),
         &ec2::AbstractResourceNotificationManager::resourceStatusRemoved,
         this,
         &QnCommonMessageProcessor::on_resourceStatusRemoved,
@@ -216,37 +216,37 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 
     const auto mediaServerManager = connection->mediaServerNotificationManager();
     connect(
-        mediaServerManager,
+        mediaServerManager.get(),
         &ec2::AbstractMediaServerNotificationManager::addedOrUpdated,
         this,
         on_resourceUpdated,
         connectionType);
     connect(
-        mediaServerManager,
+        mediaServerManager.get(),
         &ec2::AbstractMediaServerNotificationManager::storageChanged,
         this,
         on_resourceUpdated,
         connectionType);
     connect(
-        mediaServerManager,
+        mediaServerManager.get(),
         &ec2::AbstractMediaServerNotificationManager::removed,
         this,
         &QnCommonMessageProcessor::on_resourceRemoved,
         connectionType);
     connect(
-        mediaServerManager,
+        mediaServerManager.get(),
         &ec2::AbstractMediaServerNotificationManager::storageRemoved,
         this,
         &QnCommonMessageProcessor::on_resourceRemoved,
         connectionType);
     connect(
-        mediaServerManager,
+        mediaServerManager.get(),
         &ec2::AbstractMediaServerNotificationManager::userAttributesChanged,
         this,
         &QnCommonMessageProcessor::on_mediaServerUserAttributesChanged,
         connectionType);
     connect(
-        mediaServerManager,
+        mediaServerManager.get(),
         &ec2::AbstractMediaServerNotificationManager::userAttributesRemoved,
         this,
         &QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved,
@@ -254,43 +254,43 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 
     const auto cameraManager = connection->cameraNotificationManager();
     connect(
-        cameraManager,
+        cameraManager.get(),
         &ec2::AbstractCameraNotificationManager::hardwareIdMappingAdded,
         this,
         on_hardwareIdMappingAdded,
         connectionType);
     connect(
-        cameraManager,
+        cameraManager.get(),
         &ec2::AbstractCameraNotificationManager::hardwareIdMappingRemoved,
         this,
         on_hardwareIdMappingRemoved,
         connectionType);
     connect(
-        cameraManager,
+        cameraManager.get(),
         &ec2::AbstractCameraNotificationManager::addedOrUpdated,
         this,
         on_resourceUpdated,
         connectionType);
     connect(
-        cameraManager,
+        cameraManager.get(),
         &ec2::AbstractCameraNotificationManager::userAttributesChanged,
         this,
         &QnCommonMessageProcessor::on_cameraUserAttributesChanged,
         connectionType);
     connect(
-        cameraManager,
+        cameraManager.get(),
         &ec2::AbstractCameraNotificationManager::userAttributesRemoved,
         this,
         &QnCommonMessageProcessor::on_cameraUserAttributesRemoved,
         connectionType);
     connect(
-        cameraManager,
+        cameraManager.get(),
         &ec2::AbstractCameraNotificationManager::cameraHistoryChanged,
         this,
         &QnCommonMessageProcessor::on_cameraHistoryChanged,
         connectionType);
     connect(
-        cameraManager,
+        cameraManager.get(),
         &ec2::AbstractCameraNotificationManager::removed,
         this,
         &QnCommonMessageProcessor::on_resourceRemoved,
@@ -298,31 +298,31 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 
     const auto userManager = connection->userNotificationManager();
     connect(
-        userManager,
+        userManager.get(),
         &ec2::AbstractUserNotificationManager::addedOrUpdated,
         this,
         on_resourceUpdated,
         connectionType);
     connect(
-        userManager,
+        userManager.get(),
         &ec2::AbstractUserNotificationManager::removed,
         this,
         &QnCommonMessageProcessor::on_resourceRemoved,
         connectionType);
     connect(
-        userManager,
+        userManager.get(),
         &ec2::AbstractUserNotificationManager::accessRightsChanged,
         this,
         &QnCommonMessageProcessor::on_accessRightsChanged,
         connectionType);
     connect(
-        userManager,
+        userManager.get(),
         &ec2::AbstractUserNotificationManager::userRoleAddedOrUpdated,
         this,
         &QnCommonMessageProcessor::on_userRoleChanged,
         connectionType);
     connect(
-        userManager,
+        userManager.get(),
         &ec2::AbstractUserNotificationManager::userRoleRemoved,
         this,
         &QnCommonMessageProcessor::on_userRoleRemoved,
@@ -330,13 +330,13 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 
     const auto layoutManager = connection->layoutNotificationManager();
     connect(
-        layoutManager,
+        layoutManager.get(),
         &ec2::AbstractLayoutNotificationManager::addedOrUpdated,
         this,
         on_resourceUpdated,
         connectionType);
     connect(
-        layoutManager,
+        layoutManager.get(),
         &ec2::AbstractLayoutNotificationManager::removed,
         this,
         &QnCommonMessageProcessor::on_resourceRemoved,
@@ -344,19 +344,19 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 
     const auto videowallManager = connection->videowallNotificationManager();
     connect(
-        videowallManager,
+        videowallManager.get(),
         &ec2::AbstractVideowallNotificationManager::addedOrUpdated,
         this,
         on_resourceUpdated,
         connectionType);
     connect(
-        videowallManager,
+        videowallManager.get(),
         &ec2::AbstractVideowallNotificationManager::removed,
         this,
         &QnCommonMessageProcessor::on_resourceRemoved,
         connectionType);
     connect(
-        videowallManager,
+        videowallManager.get(),
         &ec2::AbstractVideowallNotificationManager::controlMessage,
         this,
         &QnCommonMessageProcessor::videowallControlMessageReceived,
@@ -364,13 +364,13 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 
     const auto webPageManager = connection->webPageNotificationManager();
     connect(
-        webPageManager,
+        webPageManager.get(),
         &ec2::AbstractWebPageNotificationManager::addedOrUpdated,
         this,
         on_resourceUpdated,
         connectionType);
     connect(
-        webPageManager,
+        webPageManager.get(),
         &ec2::AbstractWebPageNotificationManager::removed,
         this,
         &QnCommonMessageProcessor::on_resourceRemoved,
@@ -378,13 +378,13 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 
     const auto licenseManager = connection->licenseNotificationManager();
     connect(
-        licenseManager,
+        licenseManager.get(),
         &ec2::AbstractLicenseNotificationManager::licenseChanged,
         this,
         &QnCommonMessageProcessor::on_licenseChanged,
         connectionType);
     connect(
-        licenseManager,
+        licenseManager.get(),
         &ec2::AbstractLicenseNotificationManager::licenseRemoved,
         this,
         &QnCommonMessageProcessor::on_licenseRemoved,
@@ -392,25 +392,25 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 
     const auto eventManager = connection->businessEventNotificationManager();
     connect(
-        eventManager,
+        eventManager.get(),
         &ec2::AbstractBusinessEventNotificationManager::addedOrUpdated,
         this,
         &QnCommonMessageProcessor::on_eventRuleAddedOrUpdated,
         connectionType);
     connect(
-        eventManager,
+        eventManager.get(),
         &ec2::AbstractBusinessEventNotificationManager::removed,
         this,
         &QnCommonMessageProcessor::on_businessEventRemoved,
         connectionType);
     connect(
-        eventManager,
+        eventManager.get(),
         &ec2::AbstractBusinessEventNotificationManager::businessRuleReset,
         this,
         &QnCommonMessageProcessor::resetEventRules,
         connectionType);
     connect(
-        eventManager,
+        eventManager.get(),
         &ec2::AbstractBusinessEventNotificationManager::gotBroadcastAction,
         this,
         &QnCommonMessageProcessor::on_broadcastBusinessAction,
@@ -418,25 +418,25 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 
     const auto vmsRulesManager = connection->vmsRulesNotificationManager();
     connect(
-        vmsRulesManager,
+        vmsRulesManager.get(),
         &ec2::AbstractVmsRulesNotificationManager::eventReceived,
         this,
         &QnCommonMessageProcessor::vmsEventReceived,
         connectionType);
     connect(
-        vmsRulesManager,
+        vmsRulesManager.get(),
         &ec2::AbstractVmsRulesNotificationManager::reset,
         this,
         [this]{ resetVmsRules({}); },
         connectionType);
     connect(
-        vmsRulesManager,
+        vmsRulesManager.get(),
         &ec2::AbstractVmsRulesNotificationManager::ruleUpdated,
         this,
         &QnCommonMessageProcessor::vmsRuleUpdated,
         connectionType);
     connect(
-        vmsRulesManager,
+        vmsRulesManager.get(),
         &ec2::AbstractVmsRulesNotificationManager::ruleRemoved,
         this,
         &QnCommonMessageProcessor::vmsRuleRemoved,
@@ -444,19 +444,19 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 
     const auto storedFileManager = connection->storedFileNotificationManager();
     connect(
-        storedFileManager,
+        storedFileManager.get(),
         &ec2::AbstractStoredFileNotificationManager::added,
         this,
         &QnCommonMessageProcessor::fileAdded,
         connectionType);
     connect(
-        storedFileManager,
+        storedFileManager.get(),
         &ec2::AbstractStoredFileNotificationManager::updated,
         this,
         &QnCommonMessageProcessor::fileUpdated,
         connectionType);
     connect(
-        storedFileManager,
+        storedFileManager.get(),
         &ec2::AbstractStoredFileNotificationManager::removed,
         this,
         &QnCommonMessageProcessor::fileRemoved,
@@ -464,19 +464,19 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 
     const auto discoveryManager = connection->discoveryNotificationManager();
     connect(
-        discoveryManager,
+        discoveryManager.get(),
         &ec2::AbstractDiscoveryNotificationManager::gotInitialDiscoveredServers,
         this,
         &QnCommonMessageProcessor::gotInitialDiscoveredServers,
         connectionType);
     connect(
-        discoveryManager,
+        discoveryManager.get(),
         &ec2::AbstractDiscoveryNotificationManager::discoveryInformationChanged,
         this,
         &QnCommonMessageProcessor::on_gotDiscoveryData,
         connectionType);
     connect(
-        discoveryManager,
+        discoveryManager.get(),
         &ec2::AbstractDiscoveryNotificationManager::discoveredServerChanged,
         this,
         &QnCommonMessageProcessor::discoveredServerChanged,
@@ -484,13 +484,13 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 
     const auto layoutTourManager = connection->layoutTourNotificationManager();
     connect(
-        layoutTourManager,
+        layoutTourManager.get(),
         &ec2::AbstractLayoutTourNotificationManager::addedOrUpdated,
         this,
         &QnCommonMessageProcessor::handleTourAddedOrUpdated,
         connectionType);
     connect(
-        layoutTourManager,
+        layoutTourManager.get(),
         &ec2::AbstractLayoutTourNotificationManager::removed,
         m_context->layoutTourManager(),
         &QnLayoutTourManager::removeTour,
@@ -498,25 +498,25 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 
     const auto analyticsManager = connection->analyticsNotificationManager();
     connect(
-        analyticsManager,
+        analyticsManager.get(),
         &ec2::AbstractAnalyticsNotificationManager::analyticsPluginAddedOrUpdated,
         this,
         on_resourceUpdated,
         connectionType);
     connect(
-        analyticsManager,
+        analyticsManager.get(),
         &ec2::AbstractAnalyticsNotificationManager::analyticsPluginRemoved,
         this,
         &QnCommonMessageProcessor::on_resourceRemoved,
         connectionType);
     connect(
-        analyticsManager,
+        analyticsManager.get(),
         &ec2::AbstractAnalyticsNotificationManager::analyticsEngineAddedOrUpdated,
         this,
         on_resourceUpdated,
         connectionType);
     connect(
-        analyticsManager,
+        analyticsManager.get(),
         &ec2::AbstractAnalyticsNotificationManager::analyticsEngineRemoved,
         this,
         &QnCommonMessageProcessor::on_resourceRemoved,

@@ -3,17 +3,16 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
-#include <utils/common/connective.h>
 
 #include "image_provider.h"
 
 
 namespace nx::vms::client::desktop {
 
-class LayoutBackgroundImageProvider: public Connective<ImageProvider>
+class LayoutBackgroundImageProvider: public ImageProvider
 {
     Q_OBJECT
-    using base_type = Connective<ImageProvider>;
+    using base_type = ImageProvider;
 
 public:
     explicit LayoutBackgroundImageProvider(const QnLayoutResourcePtr& layout,

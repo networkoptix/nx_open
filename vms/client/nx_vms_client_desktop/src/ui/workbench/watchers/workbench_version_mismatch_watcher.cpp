@@ -24,10 +24,10 @@ QnWorkbenchVersionMismatchWatcher::QnWorkbenchVersionMismatchWatcher(QObject* pa
             if (!server)
                 return;
 
-            connect(server, &QnMediaServerResource::versionChanged,
+            connect(server.get(), &QnMediaServerResource::versionChanged,
                 this, &QnWorkbenchVersionMismatchWatcher::updateComponents);
 
-            connect(server, &QnResource::statusChanged, this,
+            connect(server.get(), &QnResource::statusChanged, this,
                 [this](const QnResourcePtr& resource, Qn::StatusChangeReason /*reason*/)
                 {
                     NX_DEBUG(NX_SCOPE_TAG, "Server %1 status changed", resource->getName());
@@ -50,9 +50,9 @@ QnWorkbenchVersionMismatchWatcher::QnWorkbenchVersionMismatchWatcher(QObject* pa
 
     for (const auto& server: resourcePool()->servers())
     {
-        connect(server, &QnMediaServerResource::versionChanged,
+        connect(server.get(), &QnMediaServerResource::versionChanged,
             this, &QnWorkbenchVersionMismatchWatcher::updateComponents);
-        connect(server, &QnResource::statusChanged, this,
+        connect(server.get(), &QnResource::statusChanged, this,
             [this](const QnResourcePtr& resource, Qn::StatusChangeReason /*reason*/)
             {
                 NX_DEBUG(NX_SCOPE_TAG, "Server %1 status changed", resource->getName());

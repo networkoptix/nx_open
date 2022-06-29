@@ -206,11 +206,11 @@ void QnCameraListModel::addCamera(const QnVirtualCameraResourcePtr& camera, bool
     if (!NX_ASSERT(camera) || m_cameras.contains(camera) || !cameraFits(camera))
         return;
 
-    connect(camera, &QnResource::parentIdChanged,
+    connect(camera.get(), &QnResource::parentIdChanged,
         this, &QnCameraListModel::handleParentIdChanged);
 
     // TODO: #sivanov Get rid of resourceChanged.
-    connect(camera, &QnResource::resourceChanged,
+    connect(camera.get(), &QnResource::resourceChanged,
         this, &QnCameraListModel::handleResourceChanged);
 
     const int row = m_cameras.size();

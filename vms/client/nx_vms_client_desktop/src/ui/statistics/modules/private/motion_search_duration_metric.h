@@ -1,23 +1,22 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-
 #pragma once
 
 #include <set>
 
 #include <QtCore/QObject>
+#include <QtCore/QPointer>
 
-#include <utils/common/connective.h>
 #include <statistics/base/time_duration_metric.h>
 
 class QnResourceWidget;
 class QnMediaResourceWidget;
 class QnWorkbenchContext;
 
-class MotionSearchDurationMetric : public Connective<QObject>
+class MotionSearchDurationMetric : public QObject
     , public QnTimeDurationMetric
 {
-    typedef Connective<QObject> base_type;
+    typedef QObject base_type;
 
 public:
     MotionSearchDurationMetric(QnWorkbenchContext *context);

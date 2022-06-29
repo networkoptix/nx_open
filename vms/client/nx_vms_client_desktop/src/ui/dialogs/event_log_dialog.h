@@ -19,7 +19,6 @@
 
 #include <ui/dialogs/common/session_aware_dialog.h>
 
-#include <utils/common/connective.h>
 
 class QnEventLogModel;
 namespace nx { namespace vms { namespace event { class StringsHelper; }}}
@@ -28,11 +27,11 @@ namespace Ui {
     class EventLogDialog;
 }
 
-class QnEventLogDialog: public Connective<QnSessionAwareDialog>
+class QnEventLogDialog: public QnSessionAwareDialog
 {
     Q_OBJECT
 
-    using base_type = Connective<QnSessionAwareDialog>;
+    using base_type = QnSessionAwareDialog;
 
 public:
     explicit QnEventLogDialog(QWidget *parent);

@@ -3,20 +3,19 @@
 #ifndef QN_BUTTON_BOX_DIALOG_H
 #define QN_BUTTON_BOX_DIALOG_H
 
-
+#include <QtCore/QPointer>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QDialogButtonBox>
 
 #include <ui/dialogs/common/dialog.h>
-#include <utils/common/connective.h>
 
 /**
  * Button box dialog that can be queried for the button that was clicked to close it.
  */
-class QnButtonBoxDialog: public Connective<QnDialog> {
+class QnButtonBoxDialog: public QnDialog {
     Q_OBJECT;
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
-    typedef Connective<QnDialog> base_type;
+    typedef QnDialog base_type;
 
 public:
     QnButtonBoxDialog(QWidget *parent, Qt::WindowFlags windowFlags = {});

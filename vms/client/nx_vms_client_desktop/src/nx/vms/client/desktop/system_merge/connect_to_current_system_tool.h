@@ -3,7 +3,6 @@
 #pragma once
 
 #include <ui/workbench/workbench_state_manager.h>
-#include <utils/common/connective.h>
 #include <utils/merge_systems_common.h>
 
 namespace nx::vms::api { struct ModuleInformation; }
@@ -15,10 +14,10 @@ namespace nx::vms::client::desktop {
 
 class MergeSystemsTool;
 
-class ConnectToCurrentSystemTool: public Connective<QObject>, public QnSessionAwareDelegate
+class ConnectToCurrentSystemTool: public QObject, public QnSessionAwareDelegate
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     using Delegate = nx::vms::client::core::AbstractRemoteConnectionUserInteractionDelegate;

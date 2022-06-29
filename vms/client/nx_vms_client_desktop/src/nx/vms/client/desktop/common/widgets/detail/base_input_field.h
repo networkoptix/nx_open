@@ -4,7 +4,6 @@
 
 #include <QtWidgets/QWidget>
 
-#include <utils/common/connective.h>
 
 #include <nx/vms/client/desktop/common/utils/validators.h>
 #include <nx/utils/std/optional.h>
@@ -19,10 +18,10 @@ class AbstractAccessor;
 namespace detail {
 
 class BaseInputFieldPrivate;
-class BaseInputField: public Connective<QWidget>
+class BaseInputField: public QWidget
 {
     Q_OBJECT
-    using base_type = Connective<QWidget>;
+    using base_type = QWidget;
 
     Q_PROPERTY(bool isValid READ isValid NOTIFY isValidChanged)
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged USER true)

@@ -21,11 +21,11 @@
 using namespace nx::vms::client::desktop;
 
 class QnDeprecatedUserListModelPrivate:
-    public Connective<QObject>,
+    public QObject,
     public nx::vms::client::core::CommonModuleAware
 {
     Q_DECLARE_TR_FUNCTIONS(QnDeprecatedUserListModelPrivate)
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     QnDeprecatedUserListModel* model;
@@ -239,17 +239,17 @@ void QnDeprecatedUserListModelPrivate::removeUser(const QnUserResourcePtr& user)
 
 void QnDeprecatedUserListModelPrivate::addUserInternal(const QnUserResourcePtr& user)
 {
-    connect(user, &QnUserResource::nameChanged, this,
+    connect(user.get(), &QnUserResource::nameChanged, this,
         &QnDeprecatedUserListModelPrivate::at_resourcePool_resourceChanged);
-    connect(user, &QnUserResource::fullNameChanged, this,
+    connect(user.get(), &QnUserResource::fullNameChanged, this,
         &QnDeprecatedUserListModelPrivate::at_resourcePool_resourceChanged);
-    connect(user, &QnUserResource::enabledChanged, this,
+    connect(user.get(), &QnUserResource::enabledChanged, this,
         [this](const QnUserResourcePtr &user)
         {
             enableChangedUsers.remove(user);
             handleUserChanged(user);
         });
-    connect(user, &QnUserResource::digestChanged,
+    connect(user.get(), &QnUserResource::digestChanged,
         this,
         [this](const QnUserResourcePtr& user)
         {
@@ -260,7 +260,7 @@ void QnDeprecatedUserListModelPrivate::addUserInternal(const QnUserResourcePtr& 
 
 void QnDeprecatedUserListModelPrivate::removeUserInternal(const QnUserResourcePtr& user)
 {
-    disconnect(user, nullptr, this, nullptr);
+    disconnect(user.get(), nullptr, this, nullptr);
     checkedUsers.remove(user);
     enableChangedUsers.remove(user);
     digestChangedUsers.remove(user);

@@ -6,17 +6,16 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-#include <utils/common/connective.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/datetime.h>
 
 class QnWorkbenchLayout;
 class QnWorkbenchItem;
 
-class QnWorkbenchAlarmLayoutHandler: public Connective<QObject>, public QnWorkbenchContextAware {
+class QnWorkbenchAlarmLayoutHandler: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
 
-    typedef Connective<QObject> base_type;
+    typedef QObject base_type;
 public:
     QnWorkbenchAlarmLayoutHandler(QObject *parent = nullptr);
     virtual ~QnWorkbenchAlarmLayoutHandler();

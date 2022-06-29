@@ -157,9 +157,9 @@ void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFl
 
     for (const auto& resource: std::as_const(addedResources))
     {
-        connect(resource, &QnResource::statusChanged, this, &QnResourcePool::statusChanged);
-        connect(resource, &QnResource::statusChanged, this, &QnResourcePool::resourceChanged);
-        connect(resource, &QnResource::resourceChanged, this, &QnResourcePool::resourceChanged);
+        connect(resource.get(), &QnResource::statusChanged, this, &QnResourcePool::statusChanged);
+        connect(resource.get(), &QnResource::statusChanged, this, &QnResourcePool::resourceChanged);
+        connect(resource.get(), &QnResource::resourceChanged, this, &QnResourcePool::resourceChanged);
     }
 
     for (const auto& resource: std::as_const(addedResources))

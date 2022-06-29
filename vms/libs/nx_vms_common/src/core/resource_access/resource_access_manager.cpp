@@ -431,24 +431,24 @@ void QnResourceAccessManager::handleResourceAdded(const QnResourcePtr& resource)
     {
         /* If layout become shared AND user is admin - he will not receive access notification
          * (because he already had access) but permissions must be recalculated. */
-        connect(layout, &QnResource::parentIdChanged, this,
+        connect(layout.get(), &QnResource::parentIdChanged, this,
              &QnResourceAccessManager::updatePermissionsToResource);
-        connect(layout, &QnLayoutResource::lockedChanged, this,
+        connect(layout.get(), &QnLayoutResource::lockedChanged, this,
             &QnResourceAccessManager::updatePermissionsToResource);
     }
 
     if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
-        connect(camera, &QnVirtualCameraResource::licenseTypeChanged, this,
+        connect(camera.get(), &QnVirtualCameraResource::licenseTypeChanged, this,
             &QnResourceAccessManager::updatePermissionsToResource);
 
-        connect(camera, &QnVirtualCameraResource::licenseTypeChanged, this,
+        connect(camera.get(), &QnVirtualCameraResource::licenseTypeChanged, this,
             &QnResourceAccessManager::updatePermissionsToResource);
 
-        connect(camera, &QnVirtualCameraResource::scheduleEnabledChanged, this,
+        connect(camera.get(), &QnVirtualCameraResource::scheduleEnabledChanged, this,
             &QnResourceAccessManager::updatePermissionsToResource);
 
-        connect(camera, &QnVirtualCameraResource::capabilitiesChanged, this,
+        connect(camera.get(), &QnVirtualCameraResource::capabilitiesChanged, this,
             &QnResourceAccessManager::updatePermissionsToResource);
     }
 

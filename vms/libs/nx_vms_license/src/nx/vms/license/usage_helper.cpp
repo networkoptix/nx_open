@@ -386,15 +386,15 @@ CamLicenseUsageWatcher::CamLicenseUsageWatcher(
     auto connectToCamera =
         [this](const QnVirtualCameraResourcePtr& camera)
         {
-            connect(camera, &QnVirtualCameraResource::scheduleEnabledChanged, this,
+            connect(camera.get(), &QnVirtualCameraResource::scheduleEnabledChanged, this,
                 &UsageWatcher::licenseUsageChanged);
-            connect(camera, &QnVirtualCameraResource::groupNameChanged, this,
+            connect(camera.get(), &QnVirtualCameraResource::groupNameChanged, this,
                 &UsageWatcher::licenseUsageChanged);
-            connect(camera, &QnVirtualCameraResource::groupIdChanged, this,
+            connect(camera.get(), &QnVirtualCameraResource::groupIdChanged, this,
                 &UsageWatcher::licenseUsageChanged);
-            connect(camera, &QnSecurityCamResource::licenseTypeChanged, this,
+            connect(camera.get(), &QnSecurityCamResource::licenseTypeChanged, this,
                 &UsageWatcher::licenseUsageChanged);
-            connect(camera, &QnSecurityCamResource::parentIdChanged, this,
+            connect(camera.get(), &QnSecurityCamResource::parentIdChanged, this,
                 &UsageWatcher::licenseUsageChanged);
     };
 
@@ -619,7 +619,7 @@ SingleCamLicenseStatusHelper::SingleCamLicenseStatusHelper(
         return;
 
     m_helper.reset(new CamLicenseUsageHelper(camera, true, camera->systemContext()));
-    connect(m_helper, &CamLicenseUsageHelper::licenseUsageChanged,
+    connect(m_helper.get(), &CamLicenseUsageHelper::licenseUsageChanged,
         this, &SingleCamLicenseStatusHelper::licenseStatusChanged);
 }
 
@@ -656,11 +656,11 @@ VideoWallLicenseUsageWatcher::VideoWallLicenseUsageWatcher(
     auto connectTo =
         [this](const QnVideoWallResourcePtr& videowall)
         {
-            connect(videowall,
+            connect(videowall.get(),
                 &QnVideoWallResource::itemAdded,
                 this,
                 &UsageWatcher::licenseUsageChanged);
-            connect(videowall,
+            connect(videowall.get(),
                 &QnVideoWallResource::itemRemoved,
                 this,
                 &UsageWatcher::licenseUsageChanged);

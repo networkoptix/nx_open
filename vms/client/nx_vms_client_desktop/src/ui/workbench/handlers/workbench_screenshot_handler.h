@@ -17,7 +17,6 @@
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/api/data/image_correction_data.h>
 
-#include <utils/common/connective.h>
 #include <utils/common/aspect_ratio.h>
 
 #include <nx/core/transcoding/filters/timestamp_params.h>
@@ -80,11 +79,11 @@ private:
  * @brief The QnWorkbenchScreenshotHandler class            Handler for the screenshots related actions.
  */
 class QnWorkbenchScreenshotHandler:
-    public Connective<QObject>,
+    public QObject,
     public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     QnWorkbenchScreenshotHandler(QObject *parent = nullptr);

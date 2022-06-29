@@ -17,7 +17,6 @@
 #include <nx/vms/common/update/update_check_params.h>
 #include <nx/vms/common/update/update_information.h>
 #include <nx/zip/extractor.h>
-#include <utils/common/connective.h>
 
 namespace nx::vms::client::desktop {
 
@@ -36,12 +35,12 @@ struct UpdateItem;
  * Note: this class should survive some time until its internal threads are dead.
  */
 class NX_VMS_CLIENT_DESKTOP_API ServerUpdateTool:
-    public Connective<QObject>,
+    public QObject,
     public nx::vms::client::core::CommonModuleAware,
     public nx::vms::client::core::RemoteConnectionAware
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
     using Downloader = vms::common::p2p::downloader::Downloader;
     using FileInformation = vms::common::p2p::downloader::FileInformation;
     using Clock = std::chrono::steady_clock;

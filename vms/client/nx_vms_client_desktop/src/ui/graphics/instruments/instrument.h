@@ -8,7 +8,6 @@
 #include <QtCore/QSet>
 #include <QtCore/QList>
 
-#include <utils/common/connective.h>
 
 #include <ui/common/scene_transformations.h>
 
@@ -126,11 +125,11 @@ struct CompoundCondition
  * inside derived class's destructor if it reimplements either
  * <tt>aboutToBeDisabledNotify()</tt> or <tt>aboutToBeUninstalledNotify()</tt>.
  */
-class Instrument: public Connective<QObject>, protected QnSceneTransformations
+class Instrument: public QObject, protected QnSceneTransformations
 {
     Q_OBJECT
 
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     /**

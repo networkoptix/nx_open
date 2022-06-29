@@ -5,7 +5,6 @@
 #include <core/resource/client_resource_fwd.h>
 #include <nx/utils/uuid.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <utils/common/connective.h>
 
 namespace nx::vms::api { struct ModuleInformation; }
 
@@ -19,11 +18,11 @@ class MergeSystemsDialog;
 
 // TODO: #ynikitenkov Rename class. Change "incompatible" to something more sensible (like 'fake')
 class IncompatibleServersActionHandler:
-    public Connective<QObject>,
+    public QObject,
     public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
     using ConnectToCurrentSystemTool = nx::vms::client::desktop::ConnectToCurrentSystemTool;
 
 public:

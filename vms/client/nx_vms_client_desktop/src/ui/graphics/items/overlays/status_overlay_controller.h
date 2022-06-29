@@ -2,20 +2,20 @@
 
 #pragma once
 
-#include <core/resource/resource_fwd.h>
-#include <client/client_globals.h>
-#include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
+#include <QtCore/QPointer>
 
-#include <utils/common/connective.h>
+#include <client/client_globals.h>
+#include <core/resource/resource_fwd.h>
+#include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
 
 class QnStatusOverlayWidget;
 
-class QnStatusOverlayController: public Connective<QObject>
+class QnStatusOverlayController: public QObject
 {
     Q_OBJECT
 
     typedef QPointer<QnStatusOverlayWidget> StatusOverlayWidgetPtr;
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 public:
     QnStatusOverlayController(const QnResourcePtr& resource,
         const StatusOverlayWidgetPtr& widget, QObject* parent = nullptr);

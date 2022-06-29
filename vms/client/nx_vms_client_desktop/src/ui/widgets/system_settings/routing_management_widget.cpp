@@ -512,9 +512,10 @@ void QnRoutingManagementWidget::at_serversView_currentIndexChanged(const QModelI
     updateModel();
     updateUi();
 
-    if (server) {
-        connect(server,      &QnMediaServerResource::resourceChanged,    this,   &QnRoutingManagementWidget::updateModel);
-        connect(server,      &QnMediaServerResource::auxUrlsChanged,     this,   &QnRoutingManagementWidget::updateModel);
+    if (server)
+    {
+        connect(server.get(), &QnMediaServerResource::resourceChanged, this, &QnRoutingManagementWidget::updateModel);
+        connect(server.get(), &QnMediaServerResource::auxUrlsChanged, this, &QnRoutingManagementWidget::updateModel);
     }
 }
 

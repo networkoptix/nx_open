@@ -9,15 +9,14 @@
 #include <nx/utils/uuid.h>
 #include <nx/utils/impl_ptr.h>
 #include <core/resource/resource_fwd.h>
-#include <utils/common/connective.h>
 
 namespace nx::vms::client::desktop::figure {
 
 /** Watches on figures and their updates for the specified camera. */
-class RoiFiguresWatcher: public Connective<QObject>
+class RoiFiguresWatcher: public QObject
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     static FiguresWatcherPtr create(

@@ -11,7 +11,7 @@
 
 namespace nx::vms::client::core {
 
-class ChunkProvider::ChunkProviderInternal: public Connective<QObject>
+class ChunkProvider::ChunkProviderInternal: public QObject
 {
 public:
     ChunkProviderInternal(
@@ -87,13 +87,13 @@ void ChunkProvider::ChunkProviderInternal::setResourceId(const QnUuid& id)
     setLoading(true);
     m_loader.reset(new QnFlatCameraDataLoader(camera, m_contentType));
 
-    connect(m_loader, &QnFlatCameraDataLoader::ready, this,
+    connect(m_loader.get(), &QnFlatCameraDataLoader::ready, this,
         [this](qint64 /*startTimeMs*/)
         {
             notifyAboutTimePeriodsChange();
             setLoading(false);
         });
-    connect(m_loader, &QnFlatCameraDataLoader::failed, this,
+    connect(m_loader.get(), &QnFlatCameraDataLoader::failed, this,
         [this]()
         {
             if (--updateTriesCount > 0)
@@ -103,7 +103,7 @@ void ChunkProvider::ChunkProviderInternal::setResourceId(const QnUuid& id)
         });
 
     const auto historyPool = q->cameraHistoryPool();
-    connect(historyPool, &QnCameraHistoryPool::cameraFootageChanged, m_loader,
+    connect(historyPool, &QnCameraHistoryPool::cameraFootageChanged, m_loader.get(),
         [this](){ m_loader->discardCachedData(); });
     connect(historyPool, &QnCameraHistoryPool::cameraHistoryInvalidated, this,
         [this]() { update(); });

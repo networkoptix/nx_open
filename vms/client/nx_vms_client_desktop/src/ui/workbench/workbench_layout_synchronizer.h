@@ -10,7 +10,6 @@
 #include <client/client_globals.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <utils/common/connective.h>
 
 class QnWorkbench;
 class QnWorkbenchItem;
@@ -21,11 +20,11 @@ class QnWorkbenchLayout;
  * <tt>QnWorkbenchLayout</tt> and <tt>QnLayoutResource</tt>.
  */
 class QnWorkbenchLayoutSynchronizer:
-    public Connective<QObject>,
+    public QObject,
     public nx::vms::client::core::CommonModuleAware
 {
     Q_OBJECT
-    typedef Connective<QObject> base_type;
+    typedef QObject base_type;
 
 public:
     QnWorkbenchLayoutSynchronizer(QnWorkbenchLayout *layout, const QnLayoutResourcePtr &resource, QObject *parent);

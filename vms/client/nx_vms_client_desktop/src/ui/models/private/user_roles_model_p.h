@@ -7,7 +7,6 @@
 
 #include <ui/models/user_roles_model.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <utils/common/connective.h>
 
 class QnUserRolesModel;
 
@@ -25,9 +24,9 @@ struct RoleDescription
     QnUuid roleUuid;
 };
 
-class QnUserRolesModelPrivate: public Connective<QObject>, public QnWorkbenchContextAware
+class QnUserRolesModelPrivate: public QObject, public QnWorkbenchContextAware
 {
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
     using UserRoleData = nx::vms::api::UserRoleData;
     using UserRoleDataList = nx::vms::api::UserRoleDataList;

@@ -205,7 +205,7 @@ void QnServerSettingsDialog::setServer(const QnMediaServerResourcePtr& server)
 
     if (d->server)
     {
-        connect(d->server, &QnResource::statusChanged,
+        connect(d->server.get(), &QnResource::statusChanged,
             this, &QnServerSettingsDialog::updateWebPageLink);
     }
 

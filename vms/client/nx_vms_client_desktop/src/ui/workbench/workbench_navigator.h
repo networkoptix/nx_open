@@ -27,7 +27,6 @@
 #include <ui/common/speed_range.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-#include <utils/common/connective.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <utils/threaded_chunks_merge_tool.h>
 
@@ -55,13 +54,13 @@ namespace nx { namespace utils { class PendingOperation; }}
 namespace nx::vms::client::desktop { class SystemContext; }
 
 class QnWorkbenchNavigator:
-    public Connective<QObject>,
+    public QObject,
     public QnWorkbenchContextAware,
     public nx::vms::client::desktop::ui::action::TargetProvider
 {
     Q_OBJECT;
 
-    typedef Connective<QObject> base_type;
+    typedef QObject base_type;
 
     using milliseconds = std::chrono::milliseconds;
 

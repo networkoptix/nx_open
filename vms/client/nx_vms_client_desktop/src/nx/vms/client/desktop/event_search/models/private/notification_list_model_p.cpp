@@ -81,7 +81,7 @@ QSharedPointer<AudioPlayer> loopSound(const QString& filePath)
 
             QObject::disconnect(loopConnection);
             if (player->isRunning())
-                connect(player, &AudioPlayer::done, player, &AudioPlayer::deleteLater);
+                QObject::connect(player, &AudioPlayer::done, player, &AudioPlayer::deleteLater);
             else
                 player->deleteLater();
         });

@@ -17,7 +17,6 @@
 #include <nx/vms/common/api/client_update_settings.h>
 #include <nx/vms/common/system_context_aware.h>
 #include <nx/vms/common/update/persistent_update_storage.h>
-#include <utils/common/connective.h>
 #include <utils/common/ldap_fwd.h>
 #include <utils/common/optional.h>
 #include <utils/email/email_fwd.h>
@@ -118,11 +117,11 @@ struct SystemSettingNames
 using FileToPeerList = QMap<QString, QList<QnUuid>>;
 
 class NX_VMS_COMMON_API SystemSettings:
-    public Connective<QObject>,
+    public QObject,
     public SystemContextAware
 {
     Q_OBJECT
-    typedef Connective<QObject> base_type;
+    typedef QObject base_type;
 
 public:
     using Names = SystemSettingNames;

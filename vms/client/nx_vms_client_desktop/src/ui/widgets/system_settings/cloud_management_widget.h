@@ -4,7 +4,6 @@
 
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <utils/common/connective.h>
 
 namespace Ui
 {
@@ -16,11 +15,11 @@ class QnCloudUrlHelper;
 namespace nx::vms::client::desktop{ class ConnectToCloudTool; }
 
 class QnCloudManagementWidget:
-    public Connective<QnAbstractPreferencesWidget>,
+    public QnAbstractPreferencesWidget,
     public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using base_type = Connective<QnAbstractPreferencesWidget>;
+    using base_type = QnAbstractPreferencesWidget;
 
 public:
     QnCloudManagementWidget(QWidget *parent = nullptr);

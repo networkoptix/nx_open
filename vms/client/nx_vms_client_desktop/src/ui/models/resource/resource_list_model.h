@@ -10,12 +10,11 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/scoped_model_operations.h>
 #include <nx/utils/uuid.h>
-#include <utils/common/connective.h>
 
-class QnResourceListModel: public ScopedModelOperations<Connective<QAbstractItemModel>>
+class QnResourceListModel: public ScopedModelOperations<QAbstractItemModel>
 {
     Q_OBJECT
-    using base_type = ScopedModelOperations<Connective<QAbstractItemModel>>;
+    using base_type = ScopedModelOperations<QAbstractItemModel>;
 
 public:
     enum Column

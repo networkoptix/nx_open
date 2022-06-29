@@ -13,7 +13,6 @@
 #include <core/resource_access/user_access_data.h>
 #include <nx/core/core_fwd.h>
 #include <nx/vms/common/system_context_aware.h>
-#include <utils/common/connective.h>
 #include <utils/common/updatable.h>
 
 class QnResourceAccessSubject;
@@ -33,12 +32,12 @@ struct WebPageData;
 } // namespace nx::vms::api
 
 class NX_VMS_COMMON_API QnResourceAccessManager:
-    public Connective<QObject>,
+    public QObject,
     public QnUpdatable,
     public nx::vms::common::SystemContextAware
 {
     Q_OBJECT
-    typedef Connective<QObject> base_type;
+    typedef QObject base_type;
 
 public:
     QnResourceAccessManager(

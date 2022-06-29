@@ -131,9 +131,9 @@ QList<int> sortOutEqualQualities(QualityInfoList qualities)
 
 } // namespace
 
-class PlayerPrivate: public Connective<QObject>
+class PlayerPrivate: public QObject
 {
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
     Q_DECLARE_PUBLIC(Player)
     Player* q_ptr;
@@ -851,15 +851,15 @@ bool PlayerPrivate::initDataProvider()
         });
 
     archiveReader->addDataProcessor(dataConsumer.get());
-    connect(dataConsumer, &PlayerDataConsumer::gotMetadata,
+    connect(dataConsumer.get(), &PlayerDataConsumer::gotMetadata,
         this, &PlayerPrivate::at_gotMetadata);
-    connect(dataConsumer, &PlayerDataConsumer::gotVideoFrame,
+    connect(dataConsumer.get(), &PlayerDataConsumer::gotVideoFrame,
         this, &PlayerPrivate::at_gotVideoFrame);
-    connect(dataConsumer, &PlayerDataConsumer::hurryUp,
+    connect(dataConsumer.get(), &PlayerDataConsumer::hurryUp,
         this, &PlayerPrivate::at_hurryUp);
-    connect(dataConsumer, &PlayerDataConsumer::jumpOccurred,
+    connect(dataConsumer.get(), &PlayerDataConsumer::jumpOccurred,
         this, &PlayerPrivate::at_jumpOccurred);
-    connect(dataConsumer, &PlayerDataConsumer::mediaEventChanged,
+    connect(dataConsumer.get(), &PlayerDataConsumer::mediaEventChanged,
         this, &PlayerPrivate::handleMediaEventChanged);
 
     if (!liveMode)

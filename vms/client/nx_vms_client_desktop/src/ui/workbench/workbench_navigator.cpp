@@ -778,9 +778,9 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget)
     m_syncedWidgets.insert(widget);
     ++m_syncedResources[syncedResource];
 
-    connect(syncedResource->toResourcePtr(), &QnResource::parentIdChanged,
+    connect(syncedResource->toResourcePtr().get(), &QnResource::parentIdChanged,
         this, &QnWorkbenchNavigator::updateLocalOffset);
-    connect(syncedResource->toResourcePtr(), &QnResource::propertyChanged,
+    connect(syncedResource->toResourcePtr().get(), &QnResource::propertyChanged,
         this, &QnWorkbenchNavigator::updateLocalOffset);
 
     if (auto loader = systemContext->cameraDataManager()->loader(syncedResource))
@@ -817,7 +817,8 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget)
 
     auto syncedResource = widget->resource();
 
-    disconnect(syncedResource->toResourcePtr(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
+    disconnect(syncedResource->toResourcePtr().get(), &QnResource::parentIdChanged,
+        this, &QnWorkbenchNavigator::updateLocalOffset);
 
     if (display() && !display()->isChangingLayout())
     {
@@ -1117,7 +1118,7 @@ void QnWorkbenchNavigator::updateCentralWidget()
 
     if (m_centralWidget)
     {
-        m_centralWidgetConnections << connect(m_centralWidget->resource(),
+        m_centralWidgetConnections << connect(m_centralWidget->resource().get(),
             &QnResource::parentIdChanged,
             this,
             &QnWorkbenchNavigator::updateLocalOffset);
@@ -1191,7 +1192,7 @@ void QnWorkbenchNavigator::updateCurrentWidget()
 
     if (m_currentWidget)
     {
-        m_currentWidgetConnections << connect(m_currentWidget->resource(),
+        m_currentWidgetConnections << connect(m_currentWidget->resource().get(),
             &QnResource::nameChanged,
             this,
             &QnWorkbenchNavigator::updateLines);
@@ -2630,7 +2631,7 @@ void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget)
     connect(widget, &QnResourceWidget::optionsChanged, this,
         [this, widget] { at_widget_optionsChanged(widget); });
 
-    connect(widget->resource(), &QnResource::flagsChanged, this,
+    connect(widget->resource().get(), &QnResource::flagsChanged, this,
         &QnWorkbenchNavigator::at_resource_flagsChanged);
 }
 

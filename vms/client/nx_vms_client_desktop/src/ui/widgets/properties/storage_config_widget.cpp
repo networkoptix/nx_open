@@ -771,7 +771,7 @@ void QnStorageConfigWidget::setServer(const QnMediaServerResourcePtr& server)
 
     if (m_server)
     {
-        connect(m_server, &QnMediaServerResource::propertyChanged, this,
+        connect(m_server.get(), &QnMediaServerResource::propertyChanged, this,
             [this](const QnResourcePtr&, const QString& key)
             {
                 // Now metadata storage is changed instantly, so we don't fire hasChangedChanged().
@@ -779,7 +779,7 @@ void QnStorageConfigWidget::setServer(const QnMediaServerResourcePtr& server)
                     m_model->setMetadataStorageId(m_server->metadataStorageId());
             });
 
-        connect(m_server, &QnResource::statusChanged,
+        connect(m_server.get(), &QnResource::statusChanged,
             this, &QnStorageConfigWidget::updateRebuildInfo);
     }
 }

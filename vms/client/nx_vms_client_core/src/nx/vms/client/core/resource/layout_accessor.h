@@ -6,20 +6,20 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <utils/common/connective.h>
+
 
 namespace nx::vms::client::core {
 namespace resource {
 
 class NX_VMS_CLIENT_CORE_API LayoutAccessor:
-    public Connective<QObject>,
+    public QObject,
     public CommonModuleAware
 {
     Q_OBJECT
     Q_PROPERTY(QString layoutId READ layoutId WRITE setLayoutId NOTIFY layoutChanged)
     Q_PROPERTY(QString name READ name NOTIFY nameChanged)
 
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     LayoutAccessor(QObject* parent = nullptr);

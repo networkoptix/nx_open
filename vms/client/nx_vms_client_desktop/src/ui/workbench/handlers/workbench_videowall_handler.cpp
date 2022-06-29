@@ -2331,9 +2331,9 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &
         };
     handleAutoRunChanged(videoWall);
 
-    connect(videoWall, &QnVideoWallResource::autorunChanged, this, handleAutoRunChanged);
+    connect(videoWall.get(), &QnVideoWallResource::autorunChanged, this, handleAutoRunChanged);
 
-    connect(videoWall, &QnVideoWallResource::pcAdded, this,
+    connect(videoWall.get(), &QnVideoWallResource::pcAdded, this,
         [getServerUrl](const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc)
         {
             if (pc.uuid != qnSettings->pcUuid())
@@ -2345,7 +2345,7 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &
                 getServerUrl());
         });
 
-    connect(videoWall, &QnVideoWallResource::pcRemoved, this,
+    connect(videoWall.get(), &QnVideoWallResource::pcRemoved, this,
         [](const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc)
         {
             if (pc.uuid != qnSettings->pcUuid())
@@ -2357,9 +2357,9 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &
     {
         if (videoWall->getId() == m_videoWallMode.guid)
         {
-            connect(videoWall, &QnVideoWallResource::itemChanged,
+            connect(videoWall.get(), &QnVideoWallResource::itemChanged,
                 this, &QnWorkbenchVideoWallHandler::at_videoWall_itemChanged_activeMode);
-            connect(videoWall, &QnVideoWallResource::itemRemoved,
+            connect(videoWall.get(), &QnVideoWallResource::itemRemoved,
                 this, &QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved_activeMode);
             VideoWallShortcutHelper::setVideoWallAutorunEnabled(
                 videoWall->getId(),
@@ -2373,7 +2373,7 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &
                     menu()->triggerIfPossible(action::ShowTimeLineOnVideowallAction);
                 };
 
-            connect(videoWall, &QnVideoWallResource::timelineEnabledChanged, this,
+            connect(videoWall.get(), &QnVideoWallResource::timelineEnabledChanged, this,
                 handleTimelineEnabledChanged);
 
             handleTimelineEnabledChanged(videoWall);
@@ -2384,17 +2384,17 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &
     }
     else
     {
-        connect(videoWall, &QnVideoWallResource::pcAdded,
+        connect(videoWall.get(), &QnVideoWallResource::pcAdded,
             this, &QnWorkbenchVideoWallHandler::at_videoWall_pcAdded);
-        connect(videoWall, &QnVideoWallResource::pcChanged,
+        connect(videoWall.get(), &QnVideoWallResource::pcChanged,
             this, &QnWorkbenchVideoWallHandler::at_videoWall_pcChanged);
-        connect(videoWall, &QnVideoWallResource::pcRemoved,
+        connect(videoWall.get(), &QnVideoWallResource::pcRemoved,
             this, &QnWorkbenchVideoWallHandler::at_videoWall_pcRemoved);
-        connect(videoWall, &QnVideoWallResource::itemAdded,
+        connect(videoWall.get(), &QnVideoWallResource::itemAdded,
             this, &QnWorkbenchVideoWallHandler::at_videoWall_itemAdded);
-        connect(videoWall, &QnVideoWallResource::itemChanged,
+        connect(videoWall.get(), &QnVideoWallResource::itemChanged,
             this, &QnWorkbenchVideoWallHandler::at_videoWall_itemChanged);
-        connect(videoWall, &QnVideoWallResource::itemRemoved,
+        connect(videoWall.get(), &QnVideoWallResource::itemRemoved,
             this, &QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved);
 
         for (const auto& item: videoWall->items()->getItems())
@@ -2411,7 +2411,7 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceRemoved(const QnResourcePtr
     if (!videoWall)
         return;
 
-    disconnect(videoWall, nullptr, this, nullptr);
+    disconnect(videoWall.get(), nullptr, this, nullptr);
     if (m_videoWallMode.active)
     {
         if (resource->getId() != m_videoWallMode.guid)

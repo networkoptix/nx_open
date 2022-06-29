@@ -6,7 +6,6 @@
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
-#include <utils/common/connective.h>
 #include <nx/fusion/model_functions.h>
 
 using namespace nx::vms::common;
@@ -40,7 +39,7 @@ AnalyticsEngineInfo engineInfoFromResource(const AnalyticsEngineResourcePtr& eng
 } // namespace
 
 class AnalyticsEnginesWatcher::Private:
-    public Connective<QObject>,
+    public QObject,
     public nx::vms::client::core::CommonModuleAware
 {
     AnalyticsEnginesWatcher* const q = nullptr;
@@ -78,16 +77,16 @@ void AnalyticsEnginesWatcher::Private::at_resourceAdded(const QnResourcePtr& res
 
         engines[info.id] = info;
 
-        connect(engine, &QnResource::nameChanged, this, &Private::at_engineNameChanged);
-        connect(engine, &AnalyticsEngineResource::manifestChanged,
+        connect(engine.get(), &QnResource::nameChanged, this, &Private::at_engineNameChanged);
+        connect(engine.get(), &AnalyticsEngineResource::manifestChanged,
             this, &Private::at_engineManifestChanged);
-        connect(engine, &QnResource::propertyChanged, this, &Private::at_enginePropertyChanged);
+        connect(engine.get(), &QnResource::propertyChanged, this, &Private::at_enginePropertyChanged);
 
         emit q->engineAdded(info.id, info);
     }
     else if (const auto& plugin = resource.dynamicCast<AnalyticsPluginResource>())
     {
-        connect(plugin, &QnResource::propertyChanged,
+        connect(plugin.get(), &QnResource::propertyChanged,
             this, &Private::at_pluginPropertyChanged);
     }
 }

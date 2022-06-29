@@ -5,7 +5,6 @@
 #include <QtCore/QAtomicInt>
 #include <QSettings>
 
-#include <utils/common/connective.h>
 
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/fusion/serialization/lexical_functions.h>
@@ -115,11 +114,11 @@ public:
  * This class is thread-safe.
  */
 class NX_VMS_COMMON_API QnAbstractResourcePropertyAdaptor:
-    public Connective<QObject>,
+    public QObject,
     public /*mixin*/ Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
-    typedef Connective<QObject> base_type;
+    typedef QObject base_type;
 
 public:
     QnAbstractResourcePropertyAdaptor(

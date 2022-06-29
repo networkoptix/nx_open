@@ -150,7 +150,7 @@ void QnSystemsFinder::onBaseSystemDiscovered(const QnSystemDescriptionPtr& syste
 
     const AggregatorPtr target(new QnSystemDescriptionAggregator(priority, system));
     m_systems.insert(target->id(), target);
-    connect(target, &QnBaseSystemDescription::systemNameChanged, this,
+    connect(target.get(), &QnBaseSystemDescription::systemNameChanged, this,
         [this, target]() { updateRecentConnections(target->localId(), target->name()); });
 
     updateRecentConnections(target->localId(), target->name());

@@ -13,7 +13,7 @@ ExportProcess::ExportProcess(const QnUuid& id, std::unique_ptr<AbstractExportToo
     m_info(id),
     m_tool(std::move(tool))
 {
-    connect(m_tool, &ExportMediaTool::rangeChanged, this,
+    connect(m_tool.get(), &ExportMediaTool::rangeChanged, this,
         [this](int from, int to)
         {
             m_info.rangeStart = from;
@@ -22,14 +22,14 @@ ExportProcess::ExportProcess(const QnUuid& id, std::unique_ptr<AbstractExportToo
             emit infoChanged(m_info);
         });
 
-    connect(m_tool, &ExportMediaTool::valueChanged, this,
+    connect(m_tool.get(), &ExportMediaTool::valueChanged, this,
         [this](int value)
         {
             m_info.progressValue = qBound(m_info.rangeStart, value, m_info.rangeEnd);
             emit infoChanged(m_info);
         });
 
-    connect(m_tool, &ExportMediaTool::statusChanged, this,
+    connect(m_tool.get(), &ExportMediaTool::statusChanged, this,
         [this](ExportProcessStatus status)
         {
             m_info.status = status;
@@ -37,7 +37,7 @@ ExportProcess::ExportProcess(const QnUuid& id, std::unique_ptr<AbstractExportToo
             emit infoChanged(m_info);
         });
 
-    connect(m_tool, &ExportMediaTool::finished, this,
+    connect(m_tool.get(), &ExportMediaTool::finished, this,
         [this]
         {
             emit finished(m_info.id);

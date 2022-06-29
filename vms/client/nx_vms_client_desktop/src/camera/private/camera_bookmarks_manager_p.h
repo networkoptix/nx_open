@@ -14,18 +14,17 @@
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/event_fwd.h>
-#include <utils/common/connective.h>
 #include <utils/common/id.h>
 
 struct QnMultiserverRequestData;
 
 class QnCameraBookmarksManagerPrivate:
-    public Connective<QObject>,
+    public QObject,
     public nx::vms::client::desktop::SystemContextAware
 {
     Q_OBJECT
 
-    typedef Connective<QObject> base_type;
+    typedef QObject base_type;
 public:
     QnCameraBookmarksManagerPrivate(
         nx::vms::client::desktop::SystemContext* systemContext,

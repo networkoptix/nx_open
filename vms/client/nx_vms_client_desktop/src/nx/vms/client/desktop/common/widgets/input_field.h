@@ -6,7 +6,6 @@
 #include <QtWidgets/QLineEdit>
 
 #include <nx/vms/client/desktop/common/utils/validators.h>
-#include <utils/common/connective.h>
 
 #include <nx/vms/client/desktop/common/widgets/detail/base_input_field.h>
 

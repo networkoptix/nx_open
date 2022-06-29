@@ -5,17 +5,16 @@
 #include <QtCore/QSet>
 
 #include <core/resource/resource_fwd.h>
-#include <utils/common/connective.h>
 #include <common/common_module_aware.h>
 
 namespace nx::vms::client::desktop {
 
 class DefaultPasswordCamerasWatcher:
-    public Connective<QObject>,
+    public QObject,
     public QnCommonModuleAware
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     explicit DefaultPasswordCamerasWatcher(QObject* parent = nullptr);

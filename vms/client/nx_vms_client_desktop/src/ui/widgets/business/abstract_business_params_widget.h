@@ -7,14 +7,13 @@
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/event/event_fwd.h>
 #include <ui/models/business_rules_view_model.h>
-#include <utils/common/connective.h>
 
 class QnAbstractBusinessParamsWidget:
-    public Connective<QWidget>,
+    public QWidget,
     public nx::vms::client::core::CommonModuleAware
 {
     Q_OBJECT
-    typedef Connective<QWidget> base_type;
+    typedef QWidget base_type;
 
 public:
     explicit QnAbstractBusinessParamsWidget(QWidget *parent = 0);

@@ -9,7 +9,6 @@
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-#include <utils/common/connective.h>
 
 namespace Ui
 {
@@ -20,10 +19,10 @@ class QnUserRolesSettingsModel;
 class QnUserRolesModel;
 class QnUserRoleSettingsWidgetPrivate;
 
-class QnUserRoleSettingsWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
+class QnUserRoleSettingsWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    typedef Connective<QnAbstractPreferencesWidget> base_type;
+    typedef QnAbstractPreferencesWidget base_type;
 
 public:
     QnUserRoleSettingsWidget(QnUserRolesSettingsModel* model, QWidget* parent = 0);

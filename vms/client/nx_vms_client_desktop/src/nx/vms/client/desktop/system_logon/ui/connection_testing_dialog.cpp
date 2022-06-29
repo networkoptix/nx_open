@@ -117,7 +117,7 @@ ConnectionTestingDialog::ConnectionTestingDialog(QWidget* parent):
     d->ui->progressBar->setValue(0);
     d->ui->progressBar->setMaximum(connectionTimeoutMs / timerIntervalMs);
 
-    connect(d->timeoutTimer, &QTimer::timeout, this, &ConnectionTestingDialog::tick);
+    connect(d->timeoutTimer.get(), &QTimer::timeout, this, &ConnectionTestingDialog::tick);
     d->timeoutTimer->setInterval(timerIntervalMs);
     d->timeoutTimer->setSingleShot(false);
 

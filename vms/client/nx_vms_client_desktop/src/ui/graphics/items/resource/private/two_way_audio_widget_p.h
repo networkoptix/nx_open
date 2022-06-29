@@ -13,7 +13,6 @@
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/core/two_way_audio/two_way_audio_controller.h>
 #include <nx/vms/license/usage_helper.h>
-#include <utils/common/connective.h>
 #include <utils/media/voice_spectrum_analyzer.h>
 
 class QnImageButtonWidget;
@@ -24,11 +23,11 @@ class SingleCamLicenseStatusHelper;
 typedef decltype(QnSpectrumData::data) VisualizerData;
 
 class QnTwoWayAudioWidget::Private:
-    public Connective<QObject>,
+    public QObject,
     public nx::vms::client::core::CommonModuleAware
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     QnImageButtonWidget* const button;

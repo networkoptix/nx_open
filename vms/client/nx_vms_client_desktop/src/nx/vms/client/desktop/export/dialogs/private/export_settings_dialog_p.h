@@ -17,7 +17,6 @@
 #include <nx/vms/client/desktop/export/widgets/image_overlay_settings_widget.h>
 #include <nx/vms/client/desktop/export/widgets/text_overlay_settings_widget.h>
 #include <nx/vms/client/desktop/export/widgets/timestamp_overlay_settings_widget.h>
-#include <utils/common/connective.h>
 
 #include "../export_settings_dialog.h"
 #include "export_settings_dialog_state.h"
@@ -35,11 +34,11 @@ class AsyncImageWidget;
 class ImageProvider;
 
 class ExportSettingsDialog::Private:
-    public Connective<QObject>,
+    public QObject,
     public FluxStateStore<ExportSettingsDialogState>
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     explicit Private(const QnCameraBookmark& bookmark,

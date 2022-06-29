@@ -74,8 +74,8 @@ void DefaultPasswordCamerasWatcher::handleResourceAdded(const QnResourcePtr& res
             d->handleCameraChanged(camera);
         };
 
-    connect(camera, &QnVirtualCameraResource::statusChanged, this, handleCameraChanged);
-    connect(camera, &QnVirtualCameraResource::capabilitiesChanged, this, handleCameraChanged);
+    connect(camera.get(), &QnVirtualCameraResource::statusChanged, this, handleCameraChanged);
+    connect(camera.get(), &QnVirtualCameraResource::capabilitiesChanged, this, handleCameraChanged);
 
     d->handleCameraChanged(camera);
 }

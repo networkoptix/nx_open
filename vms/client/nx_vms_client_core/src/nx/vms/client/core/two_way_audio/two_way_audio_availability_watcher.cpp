@@ -56,16 +56,16 @@ void TwoWayAudioAvailabilityWatcher::setResourceId(const QnUuid& uuid)
 
     if (m_camera)
     {
-        connect(m_camera, &QnVirtualCameraResource::statusChanged,
+        connect(m_camera.get(), &QnVirtualCameraResource::statusChanged,
             this, &TwoWayAudioAvailabilityWatcher::updateAvailability);
-        connect(m_camera, &QnSecurityCamResource::twoWayAudioEnabledChanged,
+        connect(m_camera.get(), &QnSecurityCamResource::twoWayAudioEnabledChanged,
             this, &TwoWayAudioAvailabilityWatcher::updateAvailability);
-        connect(m_camera, &QnSecurityCamResource::audioOutputDeviceIdChanged,
+        connect(m_camera.get(), &QnSecurityCamResource::audioOutputDeviceIdChanged,
             this, &TwoWayAudioAvailabilityWatcher::updateAvailability);
 
         if (m_licenseHelper)
         {
-            connect(m_licenseHelper, &SingleCamLicenseStatusHelper::licenseStatusChanged,
+            connect(m_licenseHelper.get(), &SingleCamLicenseStatusHelper::licenseStatusChanged,
                 this, &TwoWayAudioAvailabilityWatcher::updateAvailability);
         }
     }

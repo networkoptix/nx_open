@@ -69,9 +69,9 @@ void ContextCurrentUserWatcher::setCurrentUser(const QnUserResourcePtr &user)
     {
         m_userDigest = m_user->getDigest();
 
-        connect(m_user, &QnResource::nameChanged, this,
+        connect(m_user.get(), &QnResource::nameChanged, this,
             &ContextCurrentUserWatcher::at_user_resourceChanged);
-        connect(m_user, &QnUserResource::passwordChanged, this,
+        connect(m_user.get(), &QnUserResource::passwordChanged, this,
             &ContextCurrentUserWatcher::at_user_resourceChanged);
     }
 

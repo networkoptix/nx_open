@@ -64,7 +64,7 @@ void LayoutBasedWatcher::at_resourceAdded(const QnResourcePtr& resource)
     if (!layout)
         return;
 
-    connect(layout, &QnLayoutResource::parentIdChanged, this,
+    connect(layout.get(), &QnLayoutResource::parentIdChanged, this,
         [this](const QnResourcePtr& resource)
         {
             const auto layout = resource.dynamicCast<QnLayoutResource>();

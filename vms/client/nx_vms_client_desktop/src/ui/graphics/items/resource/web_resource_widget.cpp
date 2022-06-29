@@ -71,7 +71,7 @@ QnWebResourceWidget::QnWebResourceWidget(
     addOverlayWidget(m_webEngineView.get(), webParams);
     setFocusProxy(m_webEngineView.get());
     connect(this, &QGraphicsWidget::geometryChanged,
-        m_webEngineView, &GraphicsQmlView::updateWindowGeometry);
+        m_webEngineView.get(), &GraphicsQmlView::updateWindowGeometry);
 
     setOption(QnResourceWidget::WindowRotationForbidden, true);
     updateTitleText();
@@ -90,8 +90,8 @@ QnWebResourceWidget::QnWebResourceWidget(
             updateStatusOverlay(true);
         };
 
-    connect(m_webEngineView, &GraphicsWebEngineView::statusChanged, this, updateStatusesHandler);
-    connect(m_webEngineView, &GraphicsWebEngineView::loadFinished, this,
+    connect(m_webEngineView.get(), &GraphicsWebEngineView::statusChanged, this, updateStatusesHandler);
+    connect(m_webEngineView.get(), &GraphicsWebEngineView::loadFinished, this,
         [this](bool ok)
         {
             if (ok)
@@ -165,18 +165,18 @@ void QnWebResourceWidget::setupOverlays()
         auto backButton = createStatisticAwareButton(lit("web_widget_back"));
         backButton->setIcon(loadSvgIcon("item/back.svg"));
         backButton->setObjectName("BackButton");
-        connect(backButton, &QnImageButtonWidget::clicked, m_webEngineView, &GraphicsWebEngineView::back);
+        connect(backButton, &QnImageButtonWidget::clicked, m_webEngineView.get(), &GraphicsWebEngineView::back);
         buttonsBar->addButton(Qn::BackButton, backButton);
         buttonsBar->setButtonsEnabled(Qn::BackButton, false);
 
-        connect(m_webEngineView, &GraphicsWebEngineView::canGoBackChanged, this,
+        connect(m_webEngineView.get(), &GraphicsWebEngineView::canGoBackChanged, this,
             [this, buttonsBar]()
             {
                 buttonsBar->setButtonsEnabled(Qn::BackButton, m_webEngineView->canGoBack());
             });
 
         // Should force HUD to update details text with new URL.
-        connect(m_webEngineView, &GraphicsWebEngineView::loadStarted, this,
+        connect(m_webEngineView.get(), &GraphicsWebEngineView::loadStarted, this,
             [this]()
             {
                 this->updateDetailsText();
@@ -186,7 +186,7 @@ void QnWebResourceWidget::setupOverlays()
         reloadButton->setIcon(loadSvgIcon("item/refresh.svg"));
         reloadButton->setObjectName("ReloadButton");
         connect(reloadButton, &QnImageButtonWidget::clicked,
-            m_webEngineView, &GraphicsWebEngineView::reload);
+            m_webEngineView.get(), &GraphicsWebEngineView::reload);
 
         buttonsBar->addButton(Qn::ReloadPageButton, reloadButton);
     }

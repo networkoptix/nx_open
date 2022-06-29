@@ -12,7 +12,6 @@
 #include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/desktop/camera/camera_fwd.h>
 #include <nx/vms/license/usage_helper.h>
-#include <utils/common/connective.h>
 
 #include "motion_skip_mask.h"
 
@@ -26,7 +25,7 @@ namespace nx::vms::client::desktop {
 
 class WidgetAnalyticsController;
 
-class MediaResourceWidgetPrivate: public Connective<QObject>
+class MediaResourceWidgetPrivate: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool hasVideo MEMBER hasVideo CONSTANT)
@@ -38,7 +37,7 @@ class MediaResourceWidgetPrivate: public Connective<QObject>
     Q_PROPERTY(nx::vms::license::UsageStatus
         licenseStatus READ licenseStatus NOTIFY licenseStatusChanged)
 
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     const QnResourcePtr resource;

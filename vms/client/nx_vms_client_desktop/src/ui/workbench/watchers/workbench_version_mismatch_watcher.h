@@ -6,17 +6,16 @@
 
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
-#include <utils/common/connective.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <nx/utils/software_version.h>
 
 class QnWorkbenchVersionMismatchWatcher:
-    public Connective<QObject>,
+    public QObject,
     public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     enum class Component

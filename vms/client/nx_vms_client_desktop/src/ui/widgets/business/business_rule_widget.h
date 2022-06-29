@@ -16,7 +16,6 @@
 #include <nx/vms/client/desktop/common/widgets/panel.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-#include <utils/common/connective.h>
 
 class QStateMachine;
 class QStandardItemModel;
@@ -31,11 +30,11 @@ class Aligner;
 namespace Ui { class BusinessRuleWidget; }
 
 class QnBusinessRuleWidget:
-    public Connective<nx::vms::client::desktop::Panel>,
+    public nx::vms::client::desktop::Panel,
     public QnWorkbenchContextAware
 {
     Q_OBJECT
-    typedef Connective<nx::vms::client::desktop::Panel> base_type;
+    typedef nx::vms::client::desktop::Panel base_type;
 
 public:
     explicit QnBusinessRuleWidget(QWidget *parent = 0);

@@ -7,11 +7,10 @@
 
 #include <network/base_system_description.h>
 #include <nx/vms/api/data/module_information.h>
-#include <utils/common/connective.h>
 
-class QnSystemDescriptionAggregator: public Connective<QnBaseSystemDescription>
+class QnSystemDescriptionAggregator: public QnBaseSystemDescription
 {
-    using base_type = Connective<QnBaseSystemDescription>;
+    using base_type = QnBaseSystemDescription;
 
 public:
     QnSystemDescriptionAggregator(int priority, const QnSystemDescriptionPtr& systemDescription);

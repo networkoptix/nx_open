@@ -52,7 +52,7 @@ LayoutBackgroundImageProvider::LayoutBackgroundImageProvider(const QnLayoutResou
     d->loader->setInput(d->cache->getFullPath(layout->backgroundImageFilename()));
     d->loader->setSize(d->sizeHint());
 
-    connect(d->loader, &ThreadedImageLoader::imageLoaded, this,
+    connect(d->loader.get(), &ThreadedImageLoader::imageLoaded, this,
         [this](const QImage& image)
         {
             d->image = image;

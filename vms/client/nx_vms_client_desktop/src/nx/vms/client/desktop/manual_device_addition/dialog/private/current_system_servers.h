@@ -7,14 +7,13 @@
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
 #include <nx/utils/uuid.h>
-#include <utils/common/connective.h>
 
 namespace nx::vms::client::desktop {
 
-class CurrentSystemServers: public Connective<QObject>, public QnCommonModuleAware
+class CurrentSystemServers: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 
 public:
     CurrentSystemServers(QObject* parent = nullptr);

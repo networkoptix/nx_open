@@ -24,13 +24,13 @@ QnFallbackPtzController::QnFallbackPtzController(
         mainController->resource()->getName(),
         fallbackController->resource()->getName());
 
-    connect(mainController, &QnAbstractPtzController::finished,
+    connect(mainController.get(), &QnAbstractPtzController::finished,
         this, &QnFallbackPtzController::baseFinished);
-    connect(fallbackController, &QnAbstractPtzController::finished,
+    connect(fallbackController.get(), &QnAbstractPtzController::finished,
         this, &QnFallbackPtzController::baseFinished);
-    connect(mainController, &QnAbstractPtzController::changed,
+    connect(mainController.get(), &QnAbstractPtzController::changed,
         this, &QnFallbackPtzController::baseChanged);
-    connect(fallbackController, &QnAbstractPtzController::changed,
+    connect(fallbackController.get(), &QnAbstractPtzController::changed,
         this, &QnFallbackPtzController::baseChanged);
 
     baseChanged(DataField::capabilities);

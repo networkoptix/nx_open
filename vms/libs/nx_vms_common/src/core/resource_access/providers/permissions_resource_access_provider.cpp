@@ -70,13 +70,13 @@ void PermissionsResourceAccessProvider::handleResourceAdded(const QnResourcePtr&
     base_type::handleResourceAdded(resource);
     if (isLayout(resource))
     {
-        connect(resource, &QnResource::parentIdChanged, this,
+        connect(resource.get(), &QnResource::parentIdChanged, this,
             &PermissionsResourceAccessProvider::updateAccessToResource);
     }
 
     if (resource->hasFlags(Qn::desktop_camera))
     {
-        connect(resource, &QnResource::nameChanged, this,
+        connect(resource.get(), &QnResource::nameChanged, this,
             &PermissionsResourceAccessProvider::updateAccessToResource);
     }
 }

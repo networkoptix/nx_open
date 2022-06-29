@@ -10,7 +10,6 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <core/resource/resource_fwd.h>
 
-#include <utils/common/connective.h>
 #include <utils/common/id.h>
 
 namespace Ui {
@@ -23,9 +22,9 @@ class QnResourceListModel;
 
 class RoutingManagementChanges;
 
-class QnRoutingManagementWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware {
+class QnRoutingManagementWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware {
     Q_OBJECT
-    typedef Connective<QnAbstractPreferencesWidget> base_type;
+    typedef QnAbstractPreferencesWidget base_type;
 
 public:
     explicit QnRoutingManagementWidget(QWidget *parent = 0);
