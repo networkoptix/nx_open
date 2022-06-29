@@ -26,6 +26,7 @@
 #include <nx/vms/rules/event_fields/state_field.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/events/soft_trigger_event.h>
+#include <nx/vms/rules/ini.h>
 #include <nx/vms/rules/rule.h>
 #include <nx/vms/rules/utils/action.h>
 #include <nx/vms/rules/utils/field.h>
@@ -157,14 +158,17 @@ SoftwareTriggersWatcher::SoftwareTriggersWatcher(
         this, &SoftwareTriggersWatcher::tryRemoveTrigger);
 
 
-    auto rulesEngine = systemContext()->vmsRulesEngine();
+    if (!nx::vms::rules::ini().serverSideOnly)
+    {
+        auto rulesEngine = systemContext()->vmsRulesEngine();
 
-    connect(rulesEngine, &nx::vms::rules::Engine::rulesReset,
-        this, &SoftwareTriggersWatcher::updateTriggers);
-    connect(rulesEngine, &nx::vms::rules::Engine::ruleAddedOrUpdated, this,
-        [this, rulesEngine](QnUuid id) { updateTriggerByVmsRule(rulesEngine->rule(id)); });
-    connect(rulesEngine, &nx::vms::rules::Engine::ruleRemoved,
-        this, &SoftwareTriggersWatcher::tryRemoveTrigger);
+        connect(rulesEngine, &nx::vms::rules::Engine::rulesReset,
+            this, &SoftwareTriggersWatcher::updateTriggers);
+        connect(rulesEngine, &nx::vms::rules::Engine::ruleAddedOrUpdated, this,
+            [this, rulesEngine](QnUuid id) { updateTriggerByVmsRule(rulesEngine->rule(id)); });
+        connect(rulesEngine, &nx::vms::rules::Engine::ruleRemoved,
+            this, &SoftwareTriggersWatcher::tryRemoveTrigger);
+    }
 
     connect(this, &SoftwareTriggersWatcher::resourceIdChanged,
         this, &SoftwareTriggersWatcher::updateTriggers);
@@ -262,10 +266,13 @@ void SoftwareTriggersWatcher::updateTriggers()
         removedIds.remove(rule->id());
     }
 
-    for (const auto [id, rule]: systemContext()->vmsRulesEngine()->rules())
+    if (!nx::vms::rules::ini().serverSideOnly)
     {
-        updateTriggerByVmsRule(rule);
-        removedIds.remove(id);
+        for (const auto [id, rule]: systemContext()->vmsRulesEngine()->rules())
+        {
+            updateTriggerByVmsRule(rule);
+            removedIds.remove(id);
+        }
     }
 
     for (const auto& removedId: removedIds)
