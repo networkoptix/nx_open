@@ -18,7 +18,11 @@ public:
 
     Auth(AuthCondition authCondition, QObject* parent = nullptr);
 
+    /** Returns a session token. */
     Q_INVOKABLE QString sessionToken() const;
+
+    /** Returns a refresh token. */
+    Q_INVOKABLE QString cloudToken() const;
 
 private:
     AuthCondition m_checkCondition;
