@@ -12,6 +12,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/network/http/async_file_downloader.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -111,6 +112,158 @@ struct LogsManagementWatcher::Unit::Private
         m_state = state;
     }
 
+    void startDownload(
+        const QString& folder,
+        const nx::utils::Url& apiUrl,
+        const network::http::Credentials& credentials,
+        std::function<void()> callback)
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        NX_ASSERT(m_state == DownloadState::none);
+
+        m_downloader = std::make_unique<nx::network::http::AsyncFileDownloader>(
+            nx::network::ssl::kAcceptAnyCertificate); //XXX!
+
+        m_downloader->setCredentials(credentials);
+
+        auto serverId = m_server->getId().toSimpleString();
+        nx::utils::Url url = apiUrl;
+        url.setPath(QString("/rest/v2/servers/%1/logArchive").arg(serverId));
+
+        QDir dir(folder);
+        QString base = serverId;
+        QString filename;
+        for (int i = 0;; i++)
+        {
+            filename = i
+                ? QString("%1 (%2).zip").arg(base).arg(i)
+                : QString("%1.zip").arg(base);
+
+            if (!dir.exists(filename))
+                break;
+        }
+        auto file = std::make_shared<QFile>(dir.absoluteFilePath(filename));
+        file->open(QIODevice::WriteOnly);
+
+        m_bytesLoaded = 0;
+        m_fileSize = {};
+
+        m_initElapsed = 0;
+        m_initBytesLoaded = 0;
+        m_timer.start();
+
+        m_downloader->setOnResponseReceived(
+            [this, callback](std::optional<size_t> size)
+            {
+                NX_MUTEX_LOCKER lock(&m_mutex);
+
+                m_fileSize = size;
+                m_state = DownloadState::loading;
+
+                lock.unlock();
+                if (callback)
+                    callback();
+            });
+
+        m_downloader->setOnProgressHasBeenMade(
+            [this, callback](size_t bytesLoaded, std::optional<double> progress)
+            {
+                NX_MUTEX_LOCKER lock(&m_mutex);
+
+                m_bytesLoaded += bytesLoaded;
+
+                if (m_initElapsed == 0)
+                {
+                    m_initElapsed = m_timer.elapsed();
+                    m_initBytesLoaded = m_bytesLoaded;
+                }
+
+                lock.unlock();
+                if (callback)
+                    callback();
+            });
+
+        m_downloader->setOnDone(
+            [this, callback]
+            {
+                NX_MUTEX_LOCKER lock(&m_mutex);
+
+                m_state = m_downloader->failed() ? DownloadState::error : DownloadState::complete;
+
+                lock.unlock();
+                if (callback)
+                    callback();
+            });
+
+        m_state = DownloadState::pending;
+        m_downloader->start(url, file);
+    }
+
+    void stopDownload()
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+
+        m_downloader.reset();
+        m_state = DownloadState::none;
+    }
+
+    double speed() const //< Bytes per second.
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+
+        if (m_state != DownloadState::loading)
+            return 0;
+
+        if (m_initElapsed == 0)
+            return 0;
+
+        return 1000. * (m_bytesLoaded - m_initBytesLoaded) / (m_timer.elapsed() - m_initElapsed);
+    }
+
+    double progress() const
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+
+        switch (m_state)
+        {
+            case DownloadState::none:
+            case DownloadState::pending:
+                return {};
+
+            case DownloadState::loading:
+            {
+                if (!m_fileSize)
+                    return {};
+
+                return 1. * m_bytesLoaded / *m_fileSize;
+            }
+
+            case DownloadState::complete:
+            case DownloadState::error:
+                return 1;
+        }
+
+        NX_ASSERT(false);
+        return {};
+    }
+
+    size_t bytesLoaded() const
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+
+        switch (m_state)
+        {
+            case DownloadState::none:
+            case DownloadState::pending:
+                return 0;
+
+            case DownloadState::loading:
+            case DownloadState::complete:
+            case DownloadState::error:
+                return m_bytesLoaded;
+        }
+    }
+
 private:
     mutable nx::Mutex m_mutex;
     QnMediaServerResourcePtr m_server;
@@ -118,6 +271,16 @@ private:
     bool m_checked{false};
     DownloadState m_state{DownloadState::none};
     std::optional<nx::vms::api::ServerLogSettings> m_settings;
+
+    std::unique_ptr<nx::network::http::AsyncFileDownloader> m_downloader;
+
+    size_t m_bytesLoaded{0};
+    std::optional<size_t> m_fileSize;
+
+    QElapsedTimer m_timer;
+    size_t m_initElapsed{0};
+    size_t m_initBytesLoaded{0};
+
 };
 
 QnUuid LogsManagementWatcher::Unit::id() const
@@ -490,6 +653,8 @@ LogsManagementWatcher::LogsManagementWatcher(SystemContext* context, QObject* pa
             if (removed)
                 emit itemListChanged();
         });
+
+    qRegisterMetaType<State>();
 }
 
 LogsManagementWatcher::~LogsManagementWatcher()
@@ -543,21 +708,21 @@ void LogsManagementWatcher::startDownload(const QString& path)
     const auto newState = State::loading;
 
     d->path = path;
-
-    if (d->client->isChecked())
-        downloadClientLogs(d->client);
-
-    for (auto server: d->servers)
-    {
-        if (server->isChecked())
-            downloadServerLogs(server); // TODO: unlock.
-    }
-
+    auto units = d->checkedItems();
     d->state = newState;
 
     lock.unlock();
+
     emit stateChanged(newState);
     emit progressChanged(0);
+
+    for (auto& unit: units)
+    {
+        if (unit->server())
+            downloadServerLogs(path, unit);
+        else
+            downloadClientLogs(path, unit);
+    }
 }
 
 void LogsManagementWatcher::cancelDownload()
@@ -570,7 +735,7 @@ void LogsManagementWatcher::cancelDownload()
     d->client->data()->setState(Unit::DownloadState::none);
     for (auto server: d->servers)
     {
-        server->data()->setState(Unit::DownloadState::none);
+        server->data()->stopDownload();
     }
 
     d->path = "";
@@ -586,19 +751,32 @@ void LogsManagementWatcher::restartFailed()
     NX_ASSERT(d->state == State::hasErrors);
     const auto newState = State::loading;
 
+    auto path = d->path;
+    QList<UnitPtr> unitsToRestart;
+
     if (d->client->state() == Unit::DownloadState::error)
-        downloadClientLogs(d->client); // TODO: unlock.
+        unitsToRestart << d->client;
 
     for (auto server: d->servers)
     {
         if (server->state() == Unit::DownloadState::error)
-            downloadServerLogs(d->client);
+            unitsToRestart << server;
     }
 
     d->state = newState;
 
     lock.unlock();
+
     emit stateChanged(newState);
+    emit progressChanged(0);
+
+    for (auto& unit: unitsToRestart)
+    {
+        if (unit->server())
+            downloadServerLogs(path, unit);
+        else
+            downloadClientLogs(path, unit);
+    }
 }
 
 void LogsManagementWatcher::completeDownload()
@@ -650,8 +828,9 @@ void LogsManagementWatcher::applySettings(const ConfigurableLogSettings& setting
     for (auto server: d->servers)
     {
         if (server->isChecked())
-            d->api->storeServerSettings(server, settings); // TODO: unlock.
+            d->api->storeServerSettings(server, settings); // XXX
     }
+
     d->updateClientLogLevelWarning();
     d->updateServerLogLevelWarning();
 }
@@ -667,58 +846,29 @@ void LogsManagementWatcher::onReceivedServerLogSettings(
         if (server->id() == serverId)
         {
             server->data()->setSettings(settings);
+
             if (needLogLevelWarningFor(server))
                 d->updateServerLogLevelWarning();
+
             return;
         }
     }
 }
 
-void LogsManagementWatcher::downloadClientLogs(LogsManagementUnitPtr unit)
+void LogsManagementWatcher::downloadClientLogs(const QString& folder, LogsManagementUnitPtr unit)
 {
     unit->data()->setState(Unit::DownloadState::error);
 
     executeLater([this]{ updateDownloadState(); }, this);
 }
 
-void LogsManagementWatcher::downloadServerLogs(LogsManagementUnitPtr unit)
+void LogsManagementWatcher::downloadServerLogs(const QString& folder, LogsManagementUnitPtr unit)
 {
-    unit->data()->setState(Unit::DownloadState::loading);
-
-    auto callback = nx::utils::guarded(this,
-        [this, unit](bool success, rest::Handle requestId, QByteArray result, auto headers)
-        {
-            unit->data()->setState(success
-                ? Unit::DownloadState::complete
-                : Unit::DownloadState::error);
-
-            // TODO: a better way to name files.
-            QDir dir(d->path);
-            QString base = unit->server() ? unit->id().toSimpleString() : "client_log";
-            QString filename;
-            for (int i = 0;; i++)
-            {
-                filename = i
-                    ? nx::format("%1 (%2).zip", base, i)
-                    : nx::format("%1.zip", base);
-
-                if (!dir.exists(filename))
-                    break;
-            }
-            QFile file(dir.absoluteFilePath(filename));
-            file.open(QIODevice::WriteOnly);
-            file.write(result);
-            file.close();
-
-            updateDownloadState();
-        });
-
-    connection()->serverApi()->getRawResult(
-        QString("/rest/v2/servers/%1/logArchive").arg(unit->server()->getId().toString()),
-        {},
-        callback,
-        thread()
-    );
+    unit->data()->startDownload(
+        folder,
+        unit->server()->getApiUrl(),
+        connection()->credentials(),
+        [this]{ updateDownloadState(); });
 }
 
 void LogsManagementWatcher::updateDownloadState()
@@ -726,12 +876,15 @@ void LogsManagementWatcher::updateDownloadState()
     NX_MUTEX_LOCKER lock(&d->mutex);
 
     int loadingCount = 0, successCount = 0, errorCount = 0;
+    double totalProgress = 0;
+
     auto updateCounters =
         [&](const LogsManagementUnitPtr& unit)
         {
             using State = Unit::DownloadState;
             switch (unit->state())
             {
+                case State::pending:
                 case State::loading:
                     loadingCount++;
                     break;
@@ -744,10 +897,19 @@ void LogsManagementWatcher::updateDownloadState()
             }
         };
 
+    auto updateProgress =
+        [&](const LogsManagementUnitPtr& unit)
+        {
+            totalProgress += unit->data()->progress();
+        };
+
     updateCounters(d->client);
+    updateProgress(d->client);
+
     for (auto server: d->servers)
     {
         updateCounters(server);
+        updateProgress(server);
     }
 
     auto newState = loadingCount
@@ -763,9 +925,8 @@ void LogsManagementWatcher::updateDownloadState()
     if (changed)
         emit stateChanged(newState);
 
-    auto completedCount = successCount + errorCount;
-    auto totalCount = completedCount + loadingCount;
-    emit progressChanged(1. * completedCount / totalCount);
+    auto totalCount = loadingCount + successCount + errorCount;
+    emit progressChanged(totalProgress / totalCount);
 }
 
 } // namespace nx::vms::client::desktop

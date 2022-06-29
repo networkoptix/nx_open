@@ -75,7 +75,7 @@ public:
     void applySettings(const ConfigurableLogSettings& settings);
 
 signals:
-    void stateChanged(State state);
+    void stateChanged(nx::vms::client::desktop::LogsManagementWatcher::State state);
     void progressChanged(double progress);
     void itemListChanged();
     void itemChanged(int idx);
@@ -87,8 +87,8 @@ private:
         const QnUuid& serverId,
         const nx::vms::api::ServerLogSettings& settings);
 
-    void downloadClientLogs(UnitPtr unit);
-    void downloadServerLogs(UnitPtr unit);
+    void downloadClientLogs(const QString& folder, UnitPtr unit);
+    void downloadServerLogs(const QString& folder, UnitPtr unit);
 
     void updateDownloadState();
 
@@ -99,3 +99,5 @@ private:
 using LogsManagementUnitPtr = LogsManagementWatcher::UnitPtr;
 
 } // namespace nx::vms::client::desktop
+
+Q_DECLARE_METATYPE(nx::vms::client::desktop::LogsManagementWatcher::State);
