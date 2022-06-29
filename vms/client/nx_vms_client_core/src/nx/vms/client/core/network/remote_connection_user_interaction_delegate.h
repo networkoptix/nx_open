@@ -12,7 +12,7 @@ namespace nx::network::http { class Credentials; }
 
 namespace nx::vms::client::core {
 
-class AbstractRemoteConnectionUserInteractionDelegate: public QObject
+class NX_VMS_CLIENT_CORE_API AbstractRemoteConnectionUserInteractionDelegate: public QObject
 {
     Q_OBJECT
     using base_type = QObject;

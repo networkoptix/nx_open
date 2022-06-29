@@ -25,7 +25,6 @@ struct QnPingReply;
 
 namespace nx::vms::client::core {
 
-class AbstractRemoteConnectionUserInteractionDelegate;
 class CertificateVerifier;
 
 /**
@@ -73,7 +72,11 @@ public:
      *     called.
      */
     [[nodiscard]]
-    ProcessPtr connect(LogonData logonData, Callback callback);
+    ProcessPtr connect(
+        LogonData logonData,
+        Callback callback,
+        std::unique_ptr<AbstractRemoteConnectionUserInteractionDelegate>
+            customUserInteractionDelegate = {});
 
     virtual void shutdown() override;
 

@@ -139,13 +139,18 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
             /*auditId*/ sessionId());
     }
 
-    bool executeInUiThreadSync(std::function<bool()> handler)
+    bool executeInUiThreadSync(
+        ContextPtr context,
+        std::function<bool(AbstractRemoteConnectionUserInteractionDelegate* delegate)> handler)
     {
         std::promise<bool> isAccepted;
-        executeInThread(userInteractionDelegate->thread(),
-            [&isAccepted, handler]()
+        auto delegate = context->customUserInteractionDelegate
+            ? context->customUserInteractionDelegate.get()
+            : userInteractionDelegate.get();
+        executeInThread(delegate->thread(),
+            [&isAccepted, handler, delegate]()
             {
-                isAccepted.set_value(handler());
+                isAccepted.set_value(handler(delegate));
             });
         return isAccepted.get_future().get();
     }
@@ -262,18 +267,18 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
         NX_VERBOSE(this, errorMessage);
 
         auto accept =
-            [this, status, context]
+            [status, context](AbstractRemoteConnectionUserInteractionDelegate* delegate)
             {
                 if (status == CertificateVerifier::Status::notFound)
                 {
-                    return userInteractionDelegate->acceptNewCertificate(
+                    return delegate->acceptNewCertificate(
                         context->moduleInformation,
                         context->address(),
                         context->certificateChain);
                 }
                 else if (status == CertificateVerifier::Status::mismatch)
                 {
-                    return userInteractionDelegate->acceptCertificateAfterMismatch(
+                    return delegate->acceptCertificateAfterMismatch(
                         context->moduleInformation,
                         context->address(),
                         context->certificateChain);
@@ -282,7 +287,7 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
             };
 
         if (auto accepted = context->logonData.userInteractionAllowed
-            && executeInUiThreadSync(accept))
+            && executeInUiThreadSync(context, accept))
         {
             pinTargetServerCertificate();
         }
@@ -448,13 +453,14 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
                         nx::network::http::BearerAuthToken(response.access_token);
 
                     auto validate =
-                        [this, credentials = std::move(credentials)]
+                        [credentials = std::move(credentials)]
+                            (AbstractRemoteConnectionUserInteractionDelegate* delegate)
                         {
-                            return userInteractionDelegate->request2FaValidation(credentials);
+                            return delegate->request2FaValidation(credentials);
                         };
 
                     const bool validated = context->logonData.userInteractionAllowed
-                        && executeInUiThreadSync(validate);
+                        && executeInUiThreadSync(context, validate);
 
                     if (!validated)
                         context->error = RemoteConnectionErrorCode::unauthorized;
@@ -531,15 +537,16 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
                     }
 
                     auto accept =
-                        [this, serverInfo, serverUrl, chain]
+                        [serverInfo, serverUrl, chain]
+                            (AbstractRemoteConnectionUserInteractionDelegate* delegate)
                         {
-                            return userInteractionDelegate->acceptCertificateOfServerInTargetSystem(
+                            return delegate->acceptCertificateOfServerInTargetSystem(
                                 serverInfo,
                                 nx::network::SocketAddress::fromUrl(serverUrl),
                                 chain);
                         };
                     if (const auto accepted = context->logonData.userInteractionAllowed
-                        && executeInUiThreadSync(accept))
+                        && executeInUiThreadSync(context, accept))
                     {
                         certificateVerifier->pinCertificate(serverId, currentKey, type);
                         return true;
@@ -679,11 +686,14 @@ void RemoteConnectionFactory::shutdown()
 }
 
 RemoteConnectionFactory::ProcessPtr RemoteConnectionFactory::connect(
-    LogonData logonData, Callback callback)
+    LogonData logonData,
+    Callback callback,
+    std::unique_ptr<AbstractRemoteConnectionUserInteractionDelegate> customUserInteractionDelegate)
 {
     auto process = std::make_shared<RemoteConnectionProcess>();
 
     process->context->logonData = logonData;
+    process->context->customUserInteractionDelegate = std::move(customUserInteractionDelegate);
 
     process->future = std::async(std::launch::async,
         [this, contextPtr = WeakContextPtr(process->context), callback]
