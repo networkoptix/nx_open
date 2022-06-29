@@ -116,24 +116,29 @@ std::unordered_set<QnResourceAccessSubject> QnResourceAccessSubjectsCache::allSu
     return result;
 }
 
-std::unordered_set<QnResourceAccessSubject> QnResourceAccessSubjectsCache::subjectWithParents(
+static void insertWithParents(
+    const QnResourceAccessSubject& subject,
+    const std::unordered_map<QnUuid, std::unordered_set<QnResourceAccessSubject>>& rolesOfSubject,
+    std::vector<QnUuid> *result)
+{
+    if (const auto it = rolesOfSubject.find(subject.id()); it != rolesOfSubject.end())
+    {
+        for (const auto parentSubject: it->second)
+        {
+            result->push_back(parentSubject.id());
+            insertWithParents(parentSubject, rolesOfSubject, result);
+        }
+    }
+}
+
+std::vector<QnUuid> QnResourceAccessSubjectsCache::subjectWithParents(
     const QnResourceAccessSubject& subject) const
 {
-    std::unordered_set<QnResourceAccessSubject> result;
-    nx::vms::api::UserRoleDataList parentRoles;
-    if (const auto user = subject.user())
+    std::vector<QnUuid> result{subject.id()};
     {
-        result.insert(subject);
-        parentRoles = m_context->userRolesManager()->userRoles(user->userRoleIds());
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        insertWithParents(subject, m_rolesOfSubject, &result);
     }
-    else
-    {
-        parentRoles = m_context->userRolesManager()->userRoles(std::array<QnUuid, 1>{subject.id()});
-    }
-
-    for (const auto& role: parentRoles)
-        result.insert(role);
-
     NX_VERBOSE(this, "All subjects for %1 - %2", subject, nx::containerString(result));
     return result;
 }
@@ -177,8 +182,6 @@ void QnResourceAccessSubjectsCache::handleRoleRemoved(const nx::vms::api::UserRo
 
     NX_MUTEX_LOCKER lock(&m_mutex);
     updateSubjectRoles(subject, {}, {}, lock);
-    // Keep m_subjectsInRole unchanged so other caches may use it to update inherited permissions.
-    // TODO: Think what we gonna do about this role ids in other objects (like users, other roles, etc).
     m_subjects.erase(subject);
 }
 

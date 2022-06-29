@@ -37,8 +37,10 @@ public:
     std::unordered_set<QnResourceAccessSubject> allSubjectsInRole(const QnUuid& roleId) const;
 
     /** All parent roles including inheritance. */
-    std::unordered_set<QnResourceAccessSubject> subjectWithParents(
-        const QnResourceAccessSubject& subject) const;
+    // This function returns std::vector<QnUuid> instead of
+    // std::unordered_set<QnResourceAccessSubject> due to significant performance difference
+    // in Resource Access Providers in cache mode.
+    std::vector<QnUuid> subjectWithParents(const QnResourceAccessSubject& subject) const;
 
 private:
     void handleUserAdded(const QnUserResourcePtr& user);
