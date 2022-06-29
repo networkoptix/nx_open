@@ -339,6 +339,10 @@ struct LogsManagementWatcher::Private
     QPointer<workbench::LocalNotificationsManager> notificationManager;
     QnUuid clientLogLevelWarning;
     QnUuid serverLogLevelWarning;
+    QnUuid logsDownloadNotification;
+
+    double speed{0};
+    double progress{0};
 
     QList<LogsManagementUnitPtr> items() const
     {
@@ -453,6 +457,118 @@ struct LogsManagementWatcher::Private
         }
     }
 
+    void updateLogsDownloadNotification()
+    {
+        if (!NX_ASSERT(notificationManager))
+            return;
+
+        bool show = (state != State::empty) && (state != State::hasSelection);
+
+        if (show)
+        {
+            if (logsDownloadNotification.isNull())
+            {
+                logsDownloadNotification = notificationManager->add({}, {}, true);
+                notificationManager->setLevel(logsDownloadNotification,
+                    QnNotificationLevel::Value::ImportantNotification);
+            }
+
+            QList<UnitPtr> units;
+            QList<QnMediaServerResourcePtr> resources;
+            QList<Unit::DownloadState> filter;
+
+            switch (state)
+            {
+                case State::loading:
+                    filter << Unit::DownloadState::pending
+                        << Unit::DownloadState::loading
+                        << Unit::DownloadState::complete
+                        << Unit::DownloadState::error;
+                    break;
+
+                case State::finished:
+                    filter << Unit::DownloadState::complete;
+                    break;
+
+                case State::hasErrors:
+                    filter << Unit::DownloadState::error;
+                    break;
+            }
+
+            for (auto& server: servers)
+            {
+                if (filter.contains(server->data()->state()))
+                {
+                    units << server;
+                    resources << server->server();
+                }
+            }
+
+            QnNotificationLevel::Value level;
+            QString title;
+            QString additionalText;
+            std::optional<ProgressState> progress;
+            switch (state)
+            {
+                case State::loading:
+                {
+                    level = QnNotificationLevel::Value::ImportantNotification;
+
+                    title = speed > 0 ? tr("Downloading file...") : tr("Pending download...");
+
+                    additionalText = nx::format("<b>%1</b> <br/> %2",
+                        tr("%n Servers", "", units.size()),
+                        "0Mbps"); //< TOOD: speed & time
+
+                    progress = {this->progress};
+
+                    break;
+                }
+
+                case State::finished:
+                {
+                    level = QnNotificationLevel::Value::ImportantNotification;
+
+                    title = tr("Logs downloaded");
+
+                    additionalText = nx::format("<b>%1</b>",
+                        tr("%n Servers", "", units.size()));
+
+                    progress = {ProgressState::completed};
+
+                    break;
+                }
+
+                case State::hasErrors:
+                {
+                    level = QnNotificationLevel::Value::ImportantNotification;
+
+                    title = tr("Logs downloading failed");
+
+                    additionalText = shortList(resources);
+
+                    progress = {ProgressState::failed};
+
+                    break;
+                }
+            }
+
+            notificationManager->setLevel(logsDownloadNotification, level);
+            notificationManager->setTitle(logsDownloadNotification, title);
+            notificationManager->setAdditionalText(logsDownloadNotification, additionalText);
+            notificationManager->setProgress(logsDownloadNotification, progress);
+
+        }
+        else
+        {
+            if (logsDownloadNotification.isNull())
+                return;
+
+            notificationManager->remove(logsDownloadNotification);
+            logsDownloadNotification = {};
+        }
+    }
+
     void hideNotification(const QnUuid& notificationId)
     {
         if (notificationId == clientLogLevelWarning)
@@ -464,6 +580,12 @@ struct LogsManagementWatcher::Private
         {
             notificationManager->remove(serverLogLevelWarning);
             serverLogLevelWarning = {};
+        }
+        else if (notificationId == logsDownloadNotification)
+        {
+            notificationManager->remove(logsDownloadNotification);
+            logsDownloadNotification = {};
+            // TODO: cancel download.
         }
     }
 
@@ -868,7 +990,7 @@ void LogsManagementWatcher::downloadServerLogs(const QString& folder, LogsManage
         folder,
         unit->server()->getApiUrl(),
         connection()->credentials(),
-        [this]{ updateDownloadState(); });
+        [this]{ executeInThread(thread(), [this]{ updateDownloadState(); }); });
 }
 
 void LogsManagementWatcher::updateDownloadState()
@@ -876,7 +998,9 @@ void LogsManagementWatcher::updateDownloadState()
     NX_MUTEX_LOCKER lock(&d->mutex);
 
     int loadingCount = 0, successCount = 0, errorCount = 0;
+
     double totalProgress = 0;
+    double totalSpeed = 0;
 
     auto updateCounters =
         [&](const LogsManagementUnitPtr& unit)
@@ -901,6 +1025,7 @@ void LogsManagementWatcher::updateDownloadState()
         [&](const LogsManagementUnitPtr& unit)
         {
             totalProgress += unit->data()->progress();
+            totalSpeed += unit->data()->speed();
         };
 
     updateCounters(d->client);
@@ -921,11 +1046,15 @@ void LogsManagementWatcher::updateDownloadState()
     bool changed = (d->state != newState);
     d->state = newState;
 
+    auto totalCount = loadingCount + successCount + errorCount;
+    d->speed = totalSpeed;
+    d->progress = totalProgress / totalCount;
+    d->updateLogsDownloadNotification();
+
     lock.unlock();
     if (changed)
         emit stateChanged(newState);
 
-    auto totalCount = loadingCount + successCount + errorCount;
     emit progressChanged(totalProgress / totalCount);
 }
 
