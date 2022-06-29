@@ -10,14 +10,44 @@
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/media_server_resource.h>
+#include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_administration/widgets/log_settings_dialog.h> // TODO
+#include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
+#include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h> // TODO
 
 namespace nx::vms::client::desktop {
+
+namespace {
+
+bool needLogLevelWarningFor(const LogsManagementWatcher::UnitPtr& unit)
+{
+    auto settings = unit->settings();
+    return settings && settings->mainLog.primaryLevel > nx::utils::log::Level::info;
+}
+
+QString shortList(const QList<QnMediaServerResourcePtr>& servers)
+{
+    QString result;
+
+    for (int i = 0; i < qMin(3, servers.size()); ++i)
+    {
+        auto info = QnResourceDisplayInfo(servers[i]);
+        result += nx::format("<b>%1</b> (%2) <br/>", info.name(), info.host());
+    }
+
+    if (servers.size() > 3)
+        result += LogsManagementWatcher::tr("... and %n more", "", servers.size() - 3);
+
+    return result;
+}
+
+} // namespace
 
 struct LogsManagementWatcher::Unit::Private
 {
@@ -136,13 +166,16 @@ struct LogsManagementWatcher::Private
     mutable nx::Mutex mutex;
     LogsManagementWatcher* const q;
 
+    QString path;
     State state{State::empty};
+    bool updatesEnabled{false};
 
     LogsManagementUnitPtr client;
     QList<LogsManagementUnitPtr> servers;
 
-    QString path;
-    bool updatesEnabled{false};
+    QPointer<workbench::LocalNotificationsManager> notificationManager;
+    QnUuid clientLogLevelWarning;
+    QnUuid serverLogLevelWarning;
 
     QList<LogsManagementUnitPtr> items() const
     {
@@ -176,6 +209,99 @@ struct LogsManagementWatcher::Private
             isChecked |= server->isChecked();
         }
         return isChecked ? State::hasSelection : State::empty;
+    }
+
+    void initNotificationManager()
+    {
+        if (!notificationManager)
+        {
+            notificationManager = appContext()->mainWindowContext()->workbenchContext()
+                ->instance<workbench::LocalNotificationsManager>();
+
+            q->connect(notificationManager, &workbench::LocalNotificationsManager::cancelRequested, q,
+                [this](const QnUuid& notificationId)
+                {
+                    NX_MUTEX_LOCKER lock(&mutex);
+                    hideNotification(notificationId);
+                });
+        }
+    }
+
+    void updateClientLogLevelWarning()
+    {
+        if (!NX_ASSERT(notificationManager))
+            return;
+
+        if (needLogLevelWarningFor(client))
+        {
+            if (clientLogLevelWarning.isNull())
+            {
+                clientLogLevelWarning = notificationManager->add(
+                    tr("Debug Logging is enabled on Client"),
+                    {},
+                    true);
+                notificationManager->setLevel(clientLogLevelWarning,
+                    QnNotificationLevel::Value::ImportantNotification);
+            }
+        }
+        else
+        {
+            if (clientLogLevelWarning.isNull())
+                return;
+
+            notificationManager->remove(clientLogLevelWarning);
+            clientLogLevelWarning = {};
+        }
+    }
+
+    void updateServerLogLevelWarning()
+    {
+        if (!NX_ASSERT(notificationManager))
+            return;
+
+        QList<QnMediaServerResourcePtr> resList;
+        for (auto& s: servers)
+        {
+            if (needLogLevelWarningFor(s))
+                resList << s->server();
+        }
+
+        if (!resList.isEmpty())
+        {
+            if (serverLogLevelWarning.isNull())
+            {
+                serverLogLevelWarning = notificationManager->add({}, {}, true);
+                notificationManager->setLevel(serverLogLevelWarning,
+                    QnNotificationLevel::Value::ImportantNotification);
+            }
+
+            notificationManager->setTitle(serverLogLevelWarning,
+                tr("Debug Logging is enabled on %n Servers", "", resList.size()));
+
+            notificationManager->setAdditionalText(serverLogLevelWarning, shortList(resList));
+        }
+        else
+        {
+            if (serverLogLevelWarning.isNull())
+                return;
+
+            notificationManager->remove(serverLogLevelWarning);
+            serverLogLevelWarning = {};
+        }
+    }
+
+    void hideNotification(const QnUuid& notificationId)
+    {
+        if (notificationId == clientLogLevelWarning)
+        {
+            notificationManager->remove(clientLogLevelWarning);
+            clientLogLevelWarning = {};
+        }
+        else if (notificationId == serverLogLevelWarning)
+        {
+            notificationManager->remove(serverLogLevelWarning);
+            serverLogLevelWarning = {};
+        }
     }
 
     // A helper struct with long-running functions that should be called without locking the mutex.
@@ -298,6 +424,10 @@ LogsManagementWatcher::LogsManagementWatcher(SystemContext* context, QObject* pa
                 NX_MUTEX_LOCKER lock(&d->mutex);
                 d->path = "";
                 d->state = State::empty;
+
+                d->initNotificationManager();
+                d->updateClientLogLevelWarning();
+                d->updateServerLogLevelWarning();
             }
 
             d->api->loadInitialSettings();
@@ -522,6 +652,8 @@ void LogsManagementWatcher::applySettings(const ConfigurableLogSettings& setting
         if (server->isChecked())
             d->api->storeServerSettings(server, settings); // TODO: unlock.
     }
+    d->updateClientLogLevelWarning();
+    d->updateServerLogLevelWarning();
 }
 
 void LogsManagementWatcher::onReceivedServerLogSettings(
@@ -535,6 +667,8 @@ void LogsManagementWatcher::onReceivedServerLogSettings(
         if (server->id() == serverId)
         {
             server->data()->setSettings(settings);
+            if (needLogLevelWarningFor(server))
+                d->updateServerLogLevelWarning();
             return;
         }
     }
