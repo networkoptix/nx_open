@@ -409,7 +409,7 @@ void QnUserSettingsWidget::applyChanges()
         // We must set special 'Custom' flag for the users to avoid collisions with built-in roles.
         m_model->user()->setRawPermissions(selectedRole() == Qn::UserRole::customPermissions
             ? GlobalPermission::customUser
-            : QnUserRolesManager::userRolePermissions(selectedRole()));
+            : QnPredefinedUserRoles::permissions(selectedRole()));
     }
 
     if (!ui->userTypeWidget->isHidden())

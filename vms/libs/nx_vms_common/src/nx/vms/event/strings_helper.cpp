@@ -993,7 +993,7 @@ QString StringsHelper::actionSubjects(
             .arg(tr("%n Users", "", users.size()));
     }
 
-    static const auto kAdminRoles = nx::utils::toQSet(QnUserRolesManager::adminRoleIds());
+    static const auto kAdminRoles = nx::utils::toQSet(QnPredefinedUserRoles::adminIds());
     if (nx::utils::toQSet(roles) == kAdminRoles)
         return tr("All Administrators");
 

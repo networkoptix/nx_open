@@ -17,6 +17,7 @@ UserGroupModel::DbUpdateTypes UserGroupModel::toDbTypes() &&
     userRole.id = std::move(id);
     userRole.name = std::move(name);
     userRole.description = std::move(description);
+    userRole.isPredefined = isPredefined;
     userRole.isLdap = (type == UserType::ldap);
     userRole.permissions = std::move(permissions);
     userRole.parentRoleIds = std::move(parentGroupIds);
@@ -47,6 +48,7 @@ std::vector<UserGroupModel> UserGroupModel::fromDbTypes(DbListTypes all)
         model.description = std::move(baseData.description);
         model.type = baseData.isLdap ? UserType::ldap : UserType::local;
         model.permissions = std::move(baseData.permissions);
+        model.isPredefined = baseData.isPredefined;
         model.parentGroupIds = std::move(baseData.parentRoleIds);
 
         auto accessRights = nx::utils::find_if(

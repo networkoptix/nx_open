@@ -21,18 +21,13 @@ bool lessRoleByName(const nx::vms::api::UserRoleData& r1, const nx::vms::api::Us
     return nx::utils::naturalStringCompare(r1.name, r2.name, Qt::CaseInsensitive) < 0;
 };
 
-QList<Qn::UserRole> allStandardRoles()
-{
-    return QnUserRolesManager::predefinedRoles();
-}
-
 } // namespace
 
 RoleDescription::RoleDescription(const Qn::UserRole roleType):
     roleType(roleType),
-    name(QnUserRolesManager::userRoleName(roleType)),
-    description(QnUserRolesManager::userRoleDescription(roleType)),
-    permissions(QnUserRolesManager::userRolePermissions(roleType)),
+    name(QnPredefinedUserRoles::name(roleType)),
+    description(QnPredefinedUserRoles::description(roleType)),
+    permissions(QnPredefinedUserRoles::permissions(roleType)),
     roleUuid(QnUuid())
 {
 }
@@ -40,8 +35,8 @@ RoleDescription::RoleDescription(const Qn::UserRole roleType):
 RoleDescription::RoleDescription(const nx::vms::api::UserRoleData& userRole):
     roleType(Qn::UserRole::customUserRole),
     name(userRole.name),
-    description(QnUserRolesManager::userRoleDescription(roleType)),
-    permissions(QnUserRolesManager::userRolePermissions(roleType)),
+    description(QnPredefinedUserRoles::description(roleType)),
+    permissions(QnPredefinedUserRoles::permissions(roleType)),
     roleUuid(userRole.id)
 {
 }
@@ -56,10 +51,6 @@ QnUserRolesModelPrivate::QnUserRolesModelPrivate(
     m_customRoleEnabled(flags.testFlag(QnUserRolesModel::CustomRoleFlag)),
     m_onlyAssignable(flags.testFlag(QnUserRolesModel::AssignableFlag))
 {
-    connect(context(), &QnWorkbenchContext::userChanged, this,
-        &QnUserRolesModelPrivate::updateStandardRoles);
-    updateStandardRoles();
-
     connect(parent, &QAbstractItemModel::modelAboutToBeReset, this,
         [this]() { m_checked.clear(); });
 
@@ -124,33 +115,6 @@ void QnUserRolesModelPrivate::setUserRoles(UserRoleDataList value)
     Q_Q(QnUserRolesModel);
     QnUserRolesModel::ScopedReset reset(q);
     m_userRoles = value;
-}
-
-void QnUserRolesModelPrivate::updateStandardRoles()
-{
-    QList<Qn::UserRole> available;
-    if (m_onlyAssignable)
-    {
-        if (auto user = context()->user())
-        {
-            for (auto role: allStandardRoles())
-            {
-                if (resourceAccessManager()->canCreateUser(user, role))
-                    available << role;
-            }
-        }
-    }
-    else
-    {
-        available = allStandardRoles();
-    }
-
-    if (available == m_standardRoles)
-        return;
-
-    Q_Q(QnUserRolesModel);
-    QnUserRolesModel::ScopedReset reset(q);
-    m_standardRoles = available;
 }
 
 bool QnUserRolesModelPrivate::updateUserRole(const UserRoleData& userRole)
@@ -302,6 +266,6 @@ QnUuid QnUserRolesModelPrivate::id(int row, bool predefinedRoleIdsEnabled) const
 {
     const auto role = roleByRow(row);
     return role.roleType != Qn::UserRole::customUserRole && predefinedRoleIdsEnabled
-        ? QnUserRolesManager::predefinedRoleId(role.roleType)
+        ? QnPredefinedUserRoles::id(role.roleType)
         : role.roleUuid;
 }

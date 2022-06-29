@@ -8,6 +8,54 @@
 #include <nx/vms/api/data/user_role_data.h>
 #include <nx/vms/common/system_context_aware.h>
 
+// TODO: Move to approperate namespace with QnUserRolesManager when Permission Management
+// refactoring is over.
+class NX_VMS_COMMON_API QnPredefinedUserRoles:
+    public QObject
+{
+    Q_OBJECT
+
+public:
+    using UserRoleData = nx::vms::api::UserRoleData;
+    using UserRoleDataList = nx::vms::api::UserRoleDataList;
+
+    // TODO: Qn::UserRole with all corresponding methods thould be removed.
+
+    // Returns list of predefined user roles.
+    static const QList<Qn::UserRole>& enumValues();
+
+    // Returns predefined user role for corresponding pseudo-uuid.
+    // For null uuid returns Qn::CustomPermissions.
+    // For any other uuid returns Qn::CustomUserRole without checking
+    //  if a role with such uuid actually exists.
+    static Qn::UserRole enumValue(const QnUuid& id);
+
+    // Returns pseudo-uuid for predefined user role.
+    // For Qn::CustomUserRole and Qn::CustomPermissions returns null uuid.
+    static QnUuid id(Qn::UserRole userRole);
+
+    // Returns human-readable name of specified user role.
+    static QString name(Qn::UserRole userRole);
+
+    // Returns human-readable description of specified user role.
+    static QString description(Qn::UserRole userRole);
+
+    // Returns global permission flags for specified user role.
+    static GlobalPermissions permissions(Qn::UserRole userRole);
+
+    // Returns pseudo-uuid for predefined user role according to permissions preset.
+    static std::optional<QnUuid> presetId(GlobalPermissions permissions);
+
+    // Returns list of predefined user role information structures.
+    static UserRoleDataList list();
+
+    // Returns predefined user role information structure if found
+    static std::optional<UserRoleData> get(const QnUuid& id);
+
+    // Returns list of ids of predefined admin roles.
+    static const QList<QnUuid>& adminIds();
+};
+
 class NX_VMS_COMMON_API QnUserRolesManager:
     public QObject,
     public nx::vms::common::SystemContextAware
@@ -18,8 +66,6 @@ class NX_VMS_COMMON_API QnUserRolesManager:
 public:
     using UserRoleData = nx::vms::api::UserRoleData;
     using UserRoleDataList = nx::vms::api::UserRoleDataList;
-    using PredefinedRoleData = nx::vms::api::PredefinedRoleData;
-    using PredefinedRoleDataList = nx::vms::api::PredefinedRoleDataList;
 
 public:
     QnUserRolesManager(nx::vms::common::SystemContext* context, QObject* parent = nullptr);
@@ -50,42 +96,13 @@ public:
     // Returns information structure for custom user role with specified uuid.
     UserRoleData userRole(const QnUuid& id) const;
 
-    // Returns list of predefined user roles.
-    static const QList<Qn::UserRole>& predefinedRoles();
-
-    // Returns human-readable description of specified user role.
-    static QString userRoleDescription(Qn::UserRole userRole);
-
-    // Returns global permission flags for specified user role.
-    static GlobalPermissions userRolePermissions(Qn::UserRole userRole);
-
-    // Returns human-readable name of specified user role.
-    static QString userRoleName(Qn::UserRole userRole);
-
+    // TODO: Remove usages to add multi-role support.
     // Returns human-readable name of specified user role.
     QString userRoleName(const QnUuid& userRoleId);
 
+    // TODO: Remove usages to add multi-role support.
     // Returns human-readable name of user role of specified user.
     QString userRoleName(const QnUserResourcePtr& user) const;
-
-    // Returns pseudo-uuid for predefined user role.
-    // For Qn::CustomUserRole and Qn::CustomPermissions returns null uuid.
-    static QnUuid predefinedRoleId(Qn::UserRole userRole);
-
-    // Returns pseudo-uuid for predefined user role according to permissions preset.
-    static std::optional<QnUuid> predefinedRoleId(GlobalPermissions permissions);
-
-    // Returns list of ids of predefined admin roles.
-    static const QList<QnUuid>& adminRoleIds();
-
-    // Returns predefined user role for corresponding pseudo-uuid.
-    // For null uuid returns Qn::CustomPermissions.
-    // For any other uuid returns Qn::CustomUserRole without checking
-    //  if a role with such uuid actually exists.
-    static Qn::UserRole predefinedRole(const QnUuid& id);
-
-    // Returns list of predefined user role information structures.
-    static PredefinedRoleDataList getPredefinedRoles();
 
 // Slots called by the message processor:
 

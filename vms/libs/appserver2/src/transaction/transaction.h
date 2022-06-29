@@ -785,18 +785,6 @@ APPLY(507, removeUserRole, nx::vms::api::IdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(508, getPredefinedRoles, nx::vms::api::PredefinedRoleDataList, \
-                       false, /* persistent*/ \
-                       false, /* system*/ \
-                       false, /*isRemoveOperation*/ \
-                       InvalidGetHashHelper(), /* getHash*/ \
-                       InvalidTriggerNotificationHelper(), /* trigger notification*/ \
-                       InvalidAccess(), /* save permission checker */ \
-                       InvalidAccess(), /* read permission checker */ \
-                       InvalidFilterFunc(), /* Filter save func */ \
-                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
-                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(510, saveUsers,  nx::vms::api::UserDataList, \
                        true, /* persistent*/ \
                        false, /* system*/ \

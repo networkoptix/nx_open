@@ -47,8 +47,6 @@ public:
     void setCustomRoleStrings(const QString& name, const QString& description);
 
 private:
-    void updateStandardRoles();
-
     bool updateUserRole(const nx::vms::api::UserRoleData& userRole);
     bool removeUserRole(const nx::vms::api::UserRoleData& userRole);
     bool removeUserRoleById(const QnUuid& roleId);

@@ -65,7 +65,7 @@ struct UserGroupListModel::Private
     static bool isBuiltIn(const UserGroupData& group)
     {
         // TODO: #vkutin Implement it properly when possible.
-        return QnUserRolesManager::predefinedRole(group.id) != Qn::UserRole::customUserRole;
+        return (bool) QnPredefinedUserRoles::get(group.id);
     }
 
     static bool hasOwnPermissions(const UserGroupData& group)

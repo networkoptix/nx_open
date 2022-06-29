@@ -135,7 +135,6 @@ void Metatypes::initialize()
     qRegisterMetaType<PeerAliveData>();
     qRegisterMetaType<PeerSyncTimeData>();
     qRegisterMetaType<PersistentIdData>();
-    qRegisterMetaType<PredefinedRoleData>();
     qRegisterMetaType<ResourceData>();
     qRegisterMetaType<ResourceStatus>();
     qRegisterMetaType<ResourceStatusData>();

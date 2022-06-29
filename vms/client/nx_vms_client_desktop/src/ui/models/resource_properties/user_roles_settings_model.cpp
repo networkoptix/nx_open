@@ -45,10 +45,10 @@ QnUserRolesSettingsModel::QnUserRolesSettingsModel(QObject* parent /*= nullptr*/
     m_currentUserRoleId(),
     m_userRoles()
 {
-    auto predefinedRoles = userRolesManager()->predefinedRoles();
+    auto predefinedRoles = QnPredefinedUserRoles::enumValues();
     predefinedRoles << Qn::UserRole::customPermissions << Qn::UserRole::customUserRole;
     for (auto role : predefinedRoles)
-        m_predefinedNames << userRolesManager()->userRoleName(role).trimmed().toLower();
+        m_predefinedNames << QnPredefinedUserRoles::name(role).trimmed().toLower();
 }
 
 QnUserRolesSettingsModel::~QnUserRolesSettingsModel()

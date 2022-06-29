@@ -202,14 +202,17 @@ TEST_F(ActionBuilderTest, builderProperlyHandleAllUsersSelection)
 
 TEST_F(ActionBuilderTest, builderProperlyHandleUserRoles)
 {
+    const auto kAdminRoleId
+        = *QnPredefinedUserRoles::presetId(nx::vms::api::GlobalPermission::adminPermissions);
+
     const auto admin = addUser(nx::vms::api::GlobalPermission::adminPermissions);
+    admin->setUserRoleIds({kAdminRoleId});
+
     const auto user = addUser(nx::vms::api::GlobalPermission::accessAllMedia);
     const auto camera = addCamera();
 
-    auto adminRoleId = QnUserRolesManager::predefinedRoleId(nx::vms::api::GlobalPermission::adminPermissions);
-
     UuidSelection selection{
-        .ids = {*adminRoleId},
+        .ids = {kAdminRoleId},
         .all = false};
 
     auto builder = makeBuilderWithTargetUserField(selection);

@@ -3,37 +3,213 @@
 #include "user_roles_manager.h"
 
 #include <set>
+#include <unordered_map>
 #include <vector>
 
 #include <QtCore/QVector>
 #include <QtCore/QList>
 #include <QtCore/QSet>
 
-#include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/user_resource.h>
+#include <nx/utils/log/log_main.h>
 #include <nx/vms/common/system_context.h>
 
-#include <nx/utils/log/log_main.h>
-
-namespace Qn {
-
-static uint qHash(UserRole role)
+const QList<Qn::UserRole>& QnPredefinedUserRoles::enumValues()
 {
-    return uint(role);
+    static const QList<Qn::UserRole> kList({
+        Qn::UserRole::owner,
+        Qn::UserRole::administrator,
+        Qn::UserRole::advancedViewer,
+        Qn::UserRole::viewer,
+        Qn::UserRole::liveViewer,
+    });
+    return kList;
 }
 
-} // namespace Qn
-
-namespace {
-
-QnUuid predefinedRoleUuid(Qn::UserRole role)
+Qn::UserRole QnPredefinedUserRoles::enumValue(const QnUuid& id)
 {
-    return int(role) < 0
-        ? QnUuid()
-        : QnUuid(QString("00000000-0000-0000-0000-1000%1").arg(int(role), 8, 16, QChar('0')));
+    static const std::unordered_map<QnUuid, Qn::UserRole> kValues =
+        []()
+        {
+            std::unordered_map<QnUuid, Qn::UserRole> result;
+            for (Qn::UserRole role: enumValues())
+                result[QnPredefinedUserRoles::id(role)] = role;
+
+            result[QnUuid()] = Qn::UserRole::customPermissions;
+            return result;
+        }();
+
+    if (const auto it = kValues.find(id); it != kValues.end())
+        return it->second;
+    return Qn::UserRole::customUserRole;
 }
 
-} // namespace
+QnUuid QnPredefinedUserRoles::id(Qn::UserRole userRole)
+{
+    static const std::unordered_map<Qn::UserRole, QnUuid> kIds =
+        []()
+        {
+            std::unordered_map<Qn::UserRole, QnUuid> result;
+            for (Qn::UserRole role: enumValues())
+            {
+                result[role] = QnUuid(QString("00000000-0000-0000-0000-1000%1")
+                    .arg(int(role), 8, 16, QChar('0')));
+            }
+            return result;
+        }();
+
+    if (const auto it = kIds.find(userRole); it != kIds.end())
+        return it->second;
+    return QnUuid{};
+}
+
+QString QnPredefinedUserRoles::name(Qn::UserRole userRole)
+{
+    switch (userRole)
+    {
+        case Qn::UserRole::owner:
+            return tr("Owner");
+
+        case Qn::UserRole::administrator:
+            return tr("Administrator");
+
+        case Qn::UserRole::advancedViewer:
+            return tr("Advanced Viewer");
+
+        case Qn::UserRole::viewer:
+            return tr("Viewer");
+
+        case Qn::UserRole::liveViewer:
+            return tr("Live Viewer");
+
+        case Qn::UserRole::customUserRole:
+            return tr("Custom Role");
+
+        case Qn::UserRole::customPermissions:
+            return tr("Custom");
+    }
+
+    return QString();
+}
+
+QString QnPredefinedUserRoles::description(Qn::UserRole userRole)
+{
+    switch (userRole)
+    {
+        case Qn::UserRole::owner:
+            return tr("Has access to whole System and can do everything.");
+
+        case Qn::UserRole::administrator:
+            return tr("Has access to whole System and can manage it. Can create users.");
+
+        case Qn::UserRole::advancedViewer:
+            return tr("Can manage all cameras and bookmarks.");
+
+        case Qn::UserRole::viewer:
+            return tr("Can view all cameras and export video.");
+
+        case Qn::UserRole::liveViewer:
+            return tr("Can view live video from all cameras.");
+
+        case Qn::UserRole::customUserRole:
+            return tr("Custom user role.");
+
+        case Qn::UserRole::customPermissions:
+            return tr("Custom permissions.");
+    }
+
+    return QString();
+}
+
+GlobalPermissions QnPredefinedUserRoles::permissions(Qn::UserRole userRole)
+{
+    switch (userRole)
+    {
+        case Qn::UserRole::owner:
+        case Qn::UserRole::administrator:
+            return GlobalPermission::adminPermissions;
+
+        case Qn::UserRole::advancedViewer:
+            return GlobalPermission::advancedViewerPermissions;
+
+        case Qn::UserRole::viewer:
+            return GlobalPermission::viewerPermissions;
+
+        case Qn::UserRole::liveViewer:
+            return GlobalPermission::liveViewerPermissions;
+
+        case Qn::UserRole::customPermissions:
+            return GlobalPermission::customUser;
+
+        case Qn::UserRole::customUserRole:
+            return {};
+    }
+
+    return {};
+}
+
+std::optional<QnUuid> QnPredefinedUserRoles::presetId(GlobalPermissions permissions)
+{
+    if (permissions.testFlag(GlobalPermission::owner))
+        return id(Qn::UserRole::owner);
+
+    if (permissions.testFlag(GlobalPermission::admin))
+        return id(Qn::UserRole::administrator);
+
+    if (permissions.testFlag(GlobalPermission::customUser))
+        return std::nullopt;
+
+    if (permissions.testFlag(GlobalPermission::advancedViewerPermissions))
+        return id(Qn::UserRole::advancedViewer);
+
+    if (permissions.testFlag(GlobalPermission::viewerPermissions))
+        return id(Qn::UserRole::viewer);
+
+    if (permissions.testFlag(GlobalPermission::liveViewerPermissions))
+        return id(Qn::UserRole::liveViewer);
+
+    return std::nullopt;
+}
+
+QnPredefinedUserRoles::UserRoleDataList QnPredefinedUserRoles::list()
+{
+    static UserRoleDataList kPredefinedRoles =
+        []()
+        {
+            UserRoleDataList roles;
+            for (auto role: enumValues())
+            {
+                roles.emplace_back(UserRoleData::makePredefined(
+                    id(role),
+                    name(role),
+                    permissions(role)));
+            }
+            return roles;
+        }();
+    return kPredefinedRoles;
+}
+
+std::optional<QnPredefinedUserRoles::UserRoleData> QnPredefinedUserRoles::get(const QnUuid& id)
+{
+    static const auto kPredefinedRolesById =
+        []()
+        {
+            std::map<QnUuid, UserRoleData> result;
+            for (auto role: QnPredefinedUserRoles::list())
+                result[role.id] = role;
+            return result;
+        }();
+    if (const auto it = kPredefinedRolesById.find(id); it != kPredefinedRolesById.end())
+        return it->second;
+    return std::nullopt;
+}
+
+const QList<QnUuid>& QnPredefinedUserRoles::adminIds()
+{
+    static const QList<QnUuid> kIds{id(Qn::UserRole::owner), id(Qn::UserRole::administrator)};
+    return kIds;
+}
 
 QnUserRolesManager::QnUserRolesManager(nx::vms::common::SystemContext* context, QObject* parent):
     base_type(parent),
@@ -173,171 +349,10 @@ void QnUserRolesManager::removeUserRole(const QnUuid& id)
     emit userRoleRemoved(role);
 }
 
-const QList<Qn::UserRole>& QnUserRolesManager::predefinedRoles()
-{
-    static const QList<Qn::UserRole> predefinedRoleList({
-        Qn::UserRole::owner,
-        Qn::UserRole::administrator,
-        Qn::UserRole::advancedViewer,
-        Qn::UserRole::viewer,
-        Qn::UserRole::liveViewer});
-
-    return predefinedRoleList;
-}
-
-QnUuid QnUserRolesManager::predefinedRoleId(Qn::UserRole userRole)
-{
-    static const QHash<Qn::UserRole, QnUuid> predefinedRoleIds =
-        []()
-        {
-            QHash<Qn::UserRole, QnUuid> result;
-            for (Qn::UserRole role: QnUserRolesManager::predefinedRoles())
-                result[role] = predefinedRoleUuid(role);
-            return result;
-        }();
-
-    return predefinedRoleIds[userRole];
-}
-
-std::optional<QnUuid> QnUserRolesManager::predefinedRoleId(GlobalPermissions permissions)
-{
-    if (permissions.testFlag(GlobalPermission::owner))
-        return predefinedRoleId(Qn::UserRole::owner);
-
-    if (permissions.testFlag(GlobalPermission::admin))
-        return predefinedRoleId(Qn::UserRole::administrator);
-
-    if (permissions.testFlag(GlobalPermission::customUser))
-        return std::nullopt;
-
-    if (permissions.testFlag(GlobalPermission::advancedViewerPermissions))
-        return predefinedRoleId(Qn::UserRole::advancedViewer);
-
-    if (permissions.testFlag(GlobalPermission::viewerPermissions))
-        return predefinedRoleId(Qn::UserRole::viewer);
-
-    if (permissions.testFlag(GlobalPermission::liveViewerPermissions))
-        return predefinedRoleId(Qn::UserRole::liveViewer);
-
-    return std::nullopt;
-}
-
-const QList<QnUuid>& QnUserRolesManager::adminRoleIds()
-{
-    static const QList<QnUuid> kAdminRoleIds {
-        predefinedRoleId(Qn::UserRole::owner),
-        predefinedRoleId(Qn::UserRole::administrator) };
-
-    return kAdminRoleIds;
-}
-
-Qn::UserRole QnUserRolesManager::predefinedRole(const QnUuid& id)
-{
-    static const QHash<QnUuid, Qn::UserRole> predefinedRolesById =
-        []()
-        {
-            QHash<QnUuid, Qn::UserRole> result;
-            for (Qn::UserRole role: QnUserRolesManager::predefinedRoles())
-                result[QnUserRolesManager::predefinedRoleId(role)] = role;
-
-            result[QnUuid()] = Qn::UserRole::customPermissions;
-            return result;
-        }();
-
-    return predefinedRolesById.value(id, Qn::UserRole::customUserRole);
-}
-
-QString QnUserRolesManager::userRoleName(Qn::UserRole userRole)
-{
-    switch (userRole)
-    {
-        case Qn::UserRole::owner:
-            return tr("Owner");
-
-        case Qn::UserRole::administrator:
-            return tr("Administrator");
-
-        case Qn::UserRole::advancedViewer:
-            return tr("Advanced Viewer");
-
-        case Qn::UserRole::viewer:
-            return tr("Viewer");
-
-        case Qn::UserRole::liveViewer:
-            return tr("Live Viewer");
-
-        case Qn::UserRole::customUserRole:
-            return tr("Custom Role");
-
-        case Qn::UserRole::customPermissions:
-            return tr("Custom");
-    }
-
-    return QString();
-}
-
 QString QnUserRolesManager::userRoleName(const QnUuid& userRoleId)
 {
-    const auto role = predefinedRole(userRoleId);
-    return role == Qn::UserRole::customUserRole
-        ? userRole(userRoleId).name
-        : userRoleName(role);
-}
-
-QString QnUserRolesManager::userRoleDescription(Qn::UserRole userRole)
-{
-    switch (userRole)
-    {
-        case Qn::UserRole::owner:
-            return tr("Has access to whole System and can do everything.");
-
-        case Qn::UserRole::administrator:
-            return tr("Has access to whole System and can manage it. Can create users.");
-
-        case Qn::UserRole::advancedViewer:
-            return tr("Can manage all cameras and bookmarks.");
-
-        case Qn::UserRole::viewer:
-            return tr("Can view all cameras and export video.");
-
-        case Qn::UserRole::liveViewer:
-            return tr("Can view live video from all cameras.");
-
-        case Qn::UserRole::customUserRole:
-            return tr("Custom user role.");
-
-        case Qn::UserRole::customPermissions:
-            return tr("Custom permissions.");
-    }
-
-    return QString();
-}
-
-GlobalPermissions QnUserRolesManager::userRolePermissions(Qn::UserRole userRole)
-{
-    switch (userRole)
-    {
-        case Qn::UserRole::owner:
-        case Qn::UserRole::administrator:
-            return GlobalPermission::adminPermissions;
-
-        case Qn::UserRole::advancedViewer:
-            return GlobalPermission::advancedViewerPermissions;
-
-        case Qn::UserRole::viewer:
-            return GlobalPermission::viewerPermissions;
-
-        case Qn::UserRole::liveViewer:
-            return GlobalPermission::liveViewerPermissions;
-
-        case Qn::UserRole::customPermissions:
-            return GlobalPermission::customUser;
-
-        case Qn::UserRole::customUserRole:
-            return {};
-    }
-
-    return {};
+    // TODO: Add support for translations for predefined roles.
+    return userRole(userRoleId).name;
 }
 
 QString QnUserRolesManager::userRoleName(const QnUserResourcePtr& user) const
@@ -354,29 +369,13 @@ QString QnUserRolesManager::userRoleName(const QnUserResourcePtr& user) const
         return names.join(", ");
     }
 
-    return userRoleName(userRole);
-}
-
-QnUserRolesManager::PredefinedRoleDataList QnUserRolesManager::getPredefinedRoles()
-{
-    static PredefinedRoleDataList kPredefinedRoles;
-    if (kPredefinedRoles.empty())
-    {
-        for (auto role: predefinedRoles())
-        {
-            kPredefinedRoles.emplace_back(
-                userRoleName(role),
-                userRolePermissions(role),
-                role == Qn::UserRole::owner);
-        }
-    }
-    return kPredefinedRoles;
+    return QnPredefinedUserRoles::name(userRole);
 }
 
 // This function is not thread-safe and should be called under external mutex lock.
 bool QnUserRolesManager::isValidRoleId(const QnUuid& id) const
 {
-    switch (predefinedRole(id))
+    switch (QnPredefinedUserRoles::enumValue(id))
     {
         case Qn::UserRole::customUserRole:
             return m_roles.contains(id); //< Existing custom role.

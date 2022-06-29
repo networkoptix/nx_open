@@ -306,7 +306,7 @@ bool QnSendEmailActionDelegate::isValid(const QnUuid& resourceId) const
     /* We can get here either user id or role id. User should be checked additionally, role is
      * always counted as valid (if exists). */
     return !userRolesManager()->userRole(resourceId).id.isNull()
-        || userRolesManager()->predefinedRole(resourceId) != Qn::UserRole::customUserRole;
+        || QnPredefinedUserRoles::enumValue(resourceId) != Qn::UserRole::customUserRole;
 }
 
 bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QString& additional)
@@ -665,7 +665,7 @@ QValidator::State QnRequiredPermissionSubjectPolicy::roleValidity(const QnUuid& 
 
 bool QnRequiredPermissionSubjectPolicy::isRoleValid(const QnUuid& roleId) const
 {
-    const auto role = userRolesManager()->predefinedRole(roleId);
+    const auto role = QnPredefinedUserRoles::enumValue(roleId);
     switch (role)
     {
         case Qn::UserRole::customPermissions:
@@ -682,7 +682,7 @@ bool QnRequiredPermissionSubjectPolicy::isRoleValid(const QnUuid& roleId) const
 
         default:
         {
-            const auto permissions = userRolesManager()->userRolePermissions(role);
+            const auto permissions = QnPredefinedUserRoles::permissions(role);
             return permissions.testFlag(m_requiredPermission);
         }
     }
@@ -773,7 +773,7 @@ QValidator::State QnLayoutAccessValidationPolicy::roleValidity(const QnUuid& rol
     if (m_layout)
     {
         // Admins have access to all layouts.
-        if (QnUserRolesManager::adminRoleIds().contains(roleId))
+        if (QnPredefinedUserRoles::adminIds().contains(roleId))
             return QValidator::Acceptable;
 
         // For other users access permissions depend on the layout kind.

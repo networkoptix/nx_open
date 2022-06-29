@@ -81,7 +81,7 @@ bool SharedLayoutItemAccessProvider::calculateAccess(const QnResourceAccessSubje
         {
             // We may got here if role is deleted while user is not or in case of predefined role.
             NX_ASSERT(subject.isUser()
-                || QnUserRolesManager::predefinedRole(effectiveId) != Qn::UserRole::customUserRole,
+                || QnPredefinedUserRoles::enumValue(effectiveId) != Qn::UserRole::customUserRole,
                 "Subject %1 inherited by %2 does not have an aggregator", subject, effectiveId);
 
             aggregator = m_aggregatorsBySubject.value(subject.id());
