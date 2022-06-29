@@ -18,6 +18,7 @@
 
 #include "logon_data.h"
 #include "remote_connection_error.h"
+#include "remote_connection_user_interaction_delegate.h"
 
 namespace nx::vms::client::core {
 
@@ -31,6 +32,7 @@ struct NX_VMS_CLIENT_CORE_API RemoteConnectionFactoryContext: public QObject
     nx::network::ssl::CertificateChain certificateChain;
     bool targetHasUserProvidedCertificate = false;
     std::shared_ptr<CertificateCache> certificateCache;
+    std::unique_ptr<AbstractRemoteConnectionUserInteractionDelegate> customUserInteractionDelegate;
 
     std::optional<RemoteConnectionError> error;
 
