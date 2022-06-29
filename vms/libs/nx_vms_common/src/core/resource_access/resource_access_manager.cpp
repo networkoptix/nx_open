@@ -1084,7 +1084,7 @@ bool QnResourceAccessManager::canCreateUser(const QnResourceAccessSubject& subje
 bool QnResourceAccessManager::canCreateUser(const QnResourceAccessSubject& subject,
     Qn::UserRole role) const
 {
-    const auto permissions = QnUserRolesManager::userRolePermissions(role);
+    const auto permissions = QnPredefinedUserRoles::permissions(role);
     const bool isOwner = (role == Qn::UserRole::owner);
     return canCreateUser(subject, permissions, isOwner);
 }

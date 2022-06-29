@@ -336,11 +336,11 @@ QnUserRoleSettingsWidget::QnUserRoleSettingsWidget(
                 return ValidationResult(tr("Role with same name already exists."));
             }
 
-            auto predefined = userRolesManager()->predefinedRoles();
+            auto predefined = QnPredefinedUserRoles::enumValues();
             predefined << Qn::UserRole::customPermissions << Qn::UserRole::customUserRole;
             for (auto role: predefined)
             {
-                if (userRolesManager()->userRoleName(role).trimmed().toLower() != name)
+                if (QnPredefinedUserRoles::name(role).trimmed().toLower() != name)
                     continue;
 
                 return ValidationResult(tr("Role with same name already exists."));

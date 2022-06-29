@@ -36,6 +36,9 @@ struct NX_VMS_API UserGroupModel
     /**%apidoc[opt] List of User Groups to inherit permissions. */
     std::vector<QnUuid> parentGroupIds;
 
+    /**%apidoc[readonly] Whether this Role comes with the System. */
+    bool isPredefined = false;
+
     /**%apidoc[opt] List of accessible resource ids for this User Group. */
     std::optional<std::vector<QnUuid>> accessibleResources;
 
@@ -56,7 +59,7 @@ struct NX_VMS_API UserGroupModel
 };
 
 #define UserGroupModel_Fields \
-    (id)(name)(description)(type)(permissions)(parentGroupIds)(accessibleResources)
+    (id)(name)(description)(type)(permissions)(parentGroupIds)(accessibleResources)(isPredefined)
 
 QN_FUSION_DECLARE_FUNCTIONS(UserGroupModel, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
 

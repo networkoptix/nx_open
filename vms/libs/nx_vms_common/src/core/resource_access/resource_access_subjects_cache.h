@@ -53,12 +53,10 @@ private:
 
     void updateSubjectRoles(
         const QnResourceAccessSubject& subject,
-        const std::vector<QnUuid>& newRoleIds,
-        GlobalPermissions rawPermissions);
+        const std::vector<QnUuid>& newRoleIds);
     void updateSubjectRoles(
         const QnResourceAccessSubject& subject,
         const std::vector<QnUuid>& newRoleIds,
-        GlobalPermissions rawPermissions,
         const nx::MutexLocker& lock);
 
     template<typename Action>

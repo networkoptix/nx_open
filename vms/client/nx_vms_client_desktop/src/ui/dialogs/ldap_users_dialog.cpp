@@ -193,7 +193,6 @@ void QnLdapUsersDialog::importUsers(const QnLdapUsers &users)
     const bool enableUsers = !ui->disableUsersCheckBox->isChecked();
     const Qn::UserRole selectedRole = ui->userRoleComboBox->itemData(
         ui->userRoleComboBox->currentIndex(), Qn::UserRoleRole).value<Qn::UserRole>();
-    const GlobalPermissions permissions = QnUserRolesManager::userRolePermissions(selectedRole);
     const QnUuid selectedUserRoleId = ui->userRoleComboBox->itemData(
         ui->userRoleComboBox->currentIndex(), Qn::UuidRole).value<QnUuid>();
 
@@ -206,10 +205,7 @@ void QnLdapUsersDialog::importUsers(const QnLdapUsers &users)
         user->setFullName(ldapUser.fullName);
         user->fillIdUnsafe();
         user->setEnabled(enableUsers);
-        if (selectedRole == Qn::UserRole::customUserRole)
-            user->setSingleUserRole(selectedUserRoleId); //< TODO: Handle more than 1 role.
-        else
-            user->setRawPermissions(permissions);
+        user->setSingleUserRole(selectedUserRoleId);
         addedUsers.push_back(user);
     }
 

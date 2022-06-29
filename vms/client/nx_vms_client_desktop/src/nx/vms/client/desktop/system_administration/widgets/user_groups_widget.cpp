@@ -343,7 +343,7 @@ void UserGroupsWidget::Private::handleSelectionChanged()
     const bool canDelete = std::any_of(checkedGroupIds.cbegin(), checkedGroupIds.cend(),
         [this](const QnUuid& groupId)
         {
-            return QnUserRolesManager::predefinedRole(groupId) == Qn::UserRole::customUserRole;
+            return QnPredefinedUserRoles::enumValue(groupId) == Qn::UserRole::customUserRole;
         });
 
     deleteSelectedButton->setVisible(canDelete);
@@ -380,21 +380,7 @@ void UserGroupsWidget::Private::deleteSelected()
 
 nx::vms::api::UserRoleDataList UserGroupsWidget::Private::userRoles() const
 {
-    auto result = manager->userRoles();
-    const auto predefinedRoles = QnUserRolesManager::predefinedRoles();
-
-    // TODO: #vkutin Remove this when predefined roles are reimplemented.
-    for (const auto& predefinedRole: predefinedRoles)
-    {
-        nx::vms::api::UserRoleData predefinedGroup;
-        predefinedGroup.id = QnUserRolesManager::predefinedRoleId(predefinedRole);
-        predefinedGroup.name = QnUserRolesManager::userRoleName(predefinedRole);
-        predefinedGroup.permissions = QnUserRolesManager::userRolePermissions(predefinedRole);
-        predefinedGroup.description = QnUserRolesManager::userRoleDescription(predefinedRole);
-        result.push_back(predefinedGroup);
-    }
-
-    return result;
+    return manager->userRoles();
 }
 
 QSet<QnUuid> UserGroupsWidget::Private::visibleGroupIds() const

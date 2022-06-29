@@ -6,6 +6,27 @@
 
 namespace nx::vms::api {
 
+UserRoleData::UserRoleData(
+    const QnUuid& id,
+    const QString& name,
+    GlobalPermissions permissions,
+    std::vector<QnUuid> parentRoleIds)
+    :
+    IdData(id),
+    name(name),
+    permissions(permissions),
+    parentRoleIds(std::move(parentRoleIds))
+{
+}
+
+UserRoleData UserRoleData::makePredefined(
+    const QnUuid& id, const QString& name, GlobalPermissions permissions)
+{
+    UserRoleData role(id, name, permissions);
+    role.isPredefined = true;
+    return role;
+}
+
 QString UserRoleData::toString() const
 {
     return QJson::serialized(*this);
@@ -13,7 +34,5 @@ QString UserRoleData::toString() const
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     UserRoleData, (ubjson)(json)(xml)(sql_record)(csv_record), UserRoleData_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    PredefinedRoleData, (ubjson)(json)(xml)(sql_record)(csv_record), PredefinedRoleData_Fields)
 
 } // namespace nx::vms::api

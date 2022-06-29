@@ -251,7 +251,7 @@ void UserListModel::setCustomUsersOnly(bool value)
 
 bool UserListModel::systemHasCustomUsers() const
 {
-    const auto id = userRolesManager()->predefinedRoleId(Qn::UserRole::customPermissions);
+    const auto id = QnPredefinedUserRoles::id(Qn::UserRole::customPermissions);
     return countEnabledUsers(resourceAccessSubjectsCache()->allUsersInRole(id)) > 0;
 }
 
@@ -323,7 +323,7 @@ bool UserListModel::isIndirectlyChecked(const QModelIndex& index) const
     const auto role = user->userRole();
     const auto roleId = role == Qn::UserRole::customUserRole
         ? user->firstRoleId()
-        : QnUserRolesManager::predefinedRoleId(role);
+        : QnPredefinedUserRoles::id(role);
 
     return m_rolesModel->checkedRoles().contains(roleId);
 }

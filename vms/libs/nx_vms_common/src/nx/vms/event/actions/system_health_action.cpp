@@ -27,7 +27,7 @@ SystemHealthAction::SystemHealthAction(
     setRuntimeParams(runtimeParams);
 
     ActionParameters actionParams;
-    const auto& ids = QnUserRolesManager::adminRoleIds();
+    const auto& ids = QnPredefinedUserRoles::adminIds();
     actionParams.additionalResources = std::vector(ids.begin(), ids.end());
     setParams(actionParams);
 }

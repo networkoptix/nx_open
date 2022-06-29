@@ -111,7 +111,7 @@ Matches matchSearchWords(const QStringList& searchWords, const QnResourcePtr& re
         {
             const QString roleName = user->systemContext()
                 ? user->systemContext()->userRolesManager()->userRoleName(user)
-                : QnUserRolesManager::userRoleName(user->userRole());
+                : QnPredefinedUserRoles::name(user->userRole());
             checkParameter(Parameter::roleName, roleName);
         }
     }

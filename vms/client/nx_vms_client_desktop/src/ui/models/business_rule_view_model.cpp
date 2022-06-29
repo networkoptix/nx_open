@@ -240,7 +240,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
     for (const auto actionType: lexComparator.lexSortedActions(clientActions))
         addActionItem(actionType);
 
-    m_actionParams.additionalResources = toStdVector(userRolesManager()->adminRoleIds());
+    m_actionParams.additionalResources = toStdVector(QnPredefinedUserRoles::adminIds());
 
     updateActionTypesModel();
     updateEventStateModel();
@@ -766,7 +766,7 @@ void QnBusinessRuleViewModel::setActionType(const vms::api::ActionType value)
 
         actionParams.allUsers = false;
         actionParams.additionalResources = additionalUserIsRequired
-            ? toStdVector(userRolesManager()->adminRoleIds())
+            ? toStdVector(QnPredefinedUserRoles::adminIds())
             : std::vector<QnUuid>();
 
         switch (m_actionType)
@@ -790,7 +790,7 @@ void QnBusinessRuleViewModel::setActionType(const vms::api::ActionType value)
     m_actionParams = m_cachedActionParams[m_actionType];
 
     if (userIsRequired && !userWasRequired)
-        m_actionResources = nx::utils::toQSet(userRolesManager()->adminRoleIds());
+        m_actionResources = nx::utils::toQSet(QnPredefinedUserRoles::adminIds());
 
     Fields fields = Field::actionType | Field::actionParams | Field::modified;
     if (cameraIsRequired != cameraWasRequired || userIsRequired != userWasRequired)
@@ -1155,7 +1155,7 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                     const auto isRoleValid =
                         [this](const QnUuid& roleId)
                         {
-                            const auto role = userRolesManager()->predefinedRole(roleId);
+                            const auto role = QnPredefinedUserRoles::enumValue(roleId);
                             switch (role)
                             {
                                 case Qn::UserRole::customPermissions:
@@ -1167,7 +1167,7 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                                 }
                                 default:
                                 {
-                                    const auto permissions = userRolesManager()->userRolePermissions(role);
+                                    const auto permissions = QnPredefinedUserRoles::permissions(role);
                                     return permissions.testFlag(GlobalPermission::userInput);
                                 }
                             }

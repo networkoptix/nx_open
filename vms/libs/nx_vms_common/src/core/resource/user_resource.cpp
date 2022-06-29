@@ -427,7 +427,7 @@ void QnUserResource::setUserRoleIds(const std::vector<QnUuid>& userRoleIds)
 std::vector<QnUuid> QnUserResource::allUserRoleIds() const
 {
     if (const auto role = userRole(); role != Qn::UserRole::customUserRole)
-        return {QnUserRolesManager::predefinedRoleId(role)};
+        return {QnPredefinedUserRoles::id(role)};
 
     const auto system = systemContext();
     if (!system)

@@ -16,8 +16,7 @@ namespace event {
 
 namespace {
 
-static const QList<QnUuid> kOwnerRoleIds {
-    QnUserRolesManager::predefinedRoleId(Qn::UserRole::owner) };
+static const QList<QnUuid> kOwnerRoleIds{QnPredefinedUserRoles::id(Qn::UserRole::owner)};
 
 } // namespace
 

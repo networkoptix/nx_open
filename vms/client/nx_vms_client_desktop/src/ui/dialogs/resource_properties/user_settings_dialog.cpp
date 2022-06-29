@@ -484,7 +484,7 @@ void QnUserSettingsDialog::updatePermissions()
         }
         else
         {
-            permissionsText = QnUserRolesManager::userRoleDescription(role);
+            permissionsText = QnPredefinedUserRoles::description(role);
         }
 
         m_profilePage->updatePermissionsLabel(permissionsText);
@@ -514,7 +514,7 @@ void QnUserSettingsDialog::updatePermissions()
         }
         else
         {
-            permissionsText = QnUserRolesManager::userRoleDescription(roleType);
+            permissionsText = QnPredefinedUserRoles::description(roleType);
         }
 
         m_settingsPage->updatePermissionsLabel(permissionsText);

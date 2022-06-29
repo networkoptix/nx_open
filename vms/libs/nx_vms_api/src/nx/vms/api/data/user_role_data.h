@@ -24,6 +24,10 @@ struct NX_VMS_API UserRoleData: IdData
     /**%apidoc[opt] List of roles to inherit permissions. */
     std::vector<QnUuid> parentRoleIds; //< TODO: Rename to parentGroupIds on gneral renaming.
 
+    /**%apidoc[readonly] Whether this Role comes with the System. */
+    bool isPredefined = false;
+
+    /**%apidoc Whether this Role is imported from LDAP group. */
     bool isLdap = false;
 
     /**%apidoc[opt] */
@@ -32,11 +36,10 @@ struct NX_VMS_API UserRoleData: IdData
     UserRoleData() = default;
     UserRoleData(
         const QnUuid& id, const QString& name,
-        GlobalPermissions permissions = {}, std::vector<QnUuid> parentRoleIds = {})
-        :
-        IdData(id), name(name), permissions(permissions), parentRoleIds(std::move(parentRoleIds))
-    {
-    }
+        GlobalPermissions permissions = {}, std::vector<QnUuid> parentRoleIds = {});
+
+    static UserRoleData makePredefined(
+        const QnUuid& id, const QString& name, GlobalPermissions permissions);
 
     bool operator==(const UserRoleData& other) const = default;
     QString toString() const;
@@ -47,32 +50,11 @@ struct NX_VMS_API UserRoleData: IdData
     (permissions) \
     (parentRoleIds) \
     (isLdap) \
-    (description)
+    (description) \
+    (isPredefined)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(UserRoleData)
-
-/**%apidoc Predefined non-editable role.
- */
-struct NX_VMS_API PredefinedRoleData
-{
-    QString name;
-    GlobalPermissions permissions;
-    bool isOwner = false;
-
-    PredefinedRoleData() = default;
-    PredefinedRoleData(const QString& name, GlobalPermissions permissions, bool isOwner):
-        name(name), permissions(permissions), isOwner(isOwner) {}
-
-    bool operator==(const PredefinedRoleData& other) const = default;
-};
-#define PredefinedRoleData_Fields \
-    (name) \
-    (permissions) \
-    (isOwner)
-NX_VMS_API_DECLARE_STRUCT_AND_LIST(PredefinedRoleData)
 
 } // namespace nx::vms::api
 
 Q_DECLARE_METATYPE(nx::vms::api::UserRoleData)
 Q_DECLARE_METATYPE(nx::vms::api::UserRoleDataList)
-Q_DECLARE_METATYPE(nx::vms::api::PredefinedRoleData)
-Q_DECLARE_METATYPE(nx::vms::api::PredefinedRoleDataList)
