@@ -2,65 +2,17 @@
 
 #pragma once
 
-#include <memory>
-
-#include <nx/utils/thread/mutex.h>
+#include <nx/utils/impl_ptr.h>
 #include <nx/vms/api/data/log_settings.h>
-#include <ui/workbench/workbench_context_aware.h>
-
-namespace nx::vms::api { struct ServerLogSettings; }
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
-struct ConfigurableLogSettings; 
+struct ConfigurableLogSettings;
 
-class LogsManagementUnit
-{
-public:
-    enum class DownloadState
-    {
-        none,
-        pending,
-        loading,
-        complete,
-        error,
-    };
-
-    QnUuid id() const;
-    QnMediaServerResourcePtr server() const;
-
-    bool isChecked() const;
-
-    DownloadState state() const;
-
-    std::optional<nx::vms::api::ServerLogSettings> settings() const;
-
-private:
-    friend class LogsManagementWatcher;
-
-    static std::shared_ptr<LogsManagementUnit> createClientUnit();
-    static std::shared_ptr<LogsManagementUnit> createServerUnit(QnMediaServerResourcePtr server);
-
-    void setChecked(bool isChecked);
-    void setState(DownloadState state);
-    void setSettings(const std::optional<nx::vms::api::ServerLogSettings>& settings);
-
-private:
-    mutable nx::Mutex m_mutex;
-    QnMediaServerResourcePtr m_server;
-
-    bool m_checked{false};
-    DownloadState m_state{DownloadState::none};
-    std::optional<nx::vms::api::ServerLogSettings> m_settings;
-};
-using LogsManagementUnitPtr = std::shared_ptr<LogsManagementUnit>;
-
-/**
- * 
- */
 class NX_VMS_CLIENT_DESKTOP_API LogsManagementWatcher:
     public QObject,
-    public QnWorkbenchContextAware
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;
@@ -75,20 +27,50 @@ public:
         hasErrors,
     };
 
-public:
-    LogsManagementWatcher(QObject* parent = nullptr);
+    class Unit
+    {
+    public:
+        Unit();
+        enum class DownloadState
+        {
+            none,
+            pending,
+            loading,
+            complete,
+            error,
+        };
 
-    QList<LogsManagementUnitPtr> items() const;
-    QList<LogsManagementUnitPtr> checkedItems() const;
+        QnUuid id() const;
+        bool isChecked() const;
+        QnMediaServerResourcePtr server() const;
+        std::optional<nx::vms::api::ServerLogSettings> settings() const;
+        DownloadState state() const;
+
+        struct Private;
+        Private* data();
+
+    private:
+        nx::utils::ImplPtr<Private> d;
+    };
+    using UnitPtr = std::shared_ptr<Unit>;
+
+public:
+    LogsManagementWatcher(SystemContext* context, QObject* parent = nullptr);
+    ~LogsManagementWatcher();
+
+    QList<UnitPtr> items() const;
+    QList<UnitPtr> checkedItems() const;
 
     QString path() const;
 
-    void setItemIsChecked(LogsManagementUnitPtr item, bool checked);
+    void setItemIsChecked(UnitPtr item, bool checked);
 
     void startDownload(const QString& path);
     void cancelDownload();
     void restartFailed();
     void completeDownload();
+
+    void setUpdatesEnabled(bool enabled);
 
     void applySettings(const ConfigurableLogSettings& settings);
 
@@ -98,30 +80,22 @@ signals:
     void itemListChanged();
     void itemChanged(int idx);
 
+    void logLevelChanged();
+
 private:
-    void loadInitialSettings();
-    void loadServerSettings(const QnUuid& serverId);
-    
     void onReceivedServerLogSettings(
         const QnUuid& serverId,
         const nx::vms::api::ServerLogSettings& settings);
 
-    bool storeServerSettings(
-        LogsManagementUnitPtr server,
-        const ConfigurableLogSettings& settings);
-
-    void downloadClientLogs(LogsManagementUnitPtr unit);
-    void downloadServerLogs(LogsManagementUnitPtr unit);
+    void downloadClientLogs(UnitPtr unit);
+    void downloadServerLogs(UnitPtr unit);
 
     void updateDownloadState();
 
 private:
-    mutable nx::Mutex m_mutex;
-    State m_state;
-
-    LogsManagementUnitPtr m_client;
-    QList<LogsManagementUnitPtr> m_servers;
-    QString m_path;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
+using LogsManagementUnitPtr = LogsManagementWatcher::UnitPtr;
 
 } // namespace nx::vms::client::desktop

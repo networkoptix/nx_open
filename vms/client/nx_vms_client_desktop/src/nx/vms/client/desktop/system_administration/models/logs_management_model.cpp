@@ -9,7 +9,7 @@
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 namespace nx::vms::client::desktop {
-    
+
 namespace {
 
 const QString kNormalLogLevelColor = "light16";
@@ -24,7 +24,7 @@ QIcon icon(LogsManagementUnitPtr unit)
 
 QIcon statusIcon(LogsManagementUnitPtr unit)
 {
-    using State = LogsManagementUnit::DownloadState;
+    using State = LogsManagementWatcher::Unit::DownloadState;
     switch (unit->state())
     {
         case State::pending:

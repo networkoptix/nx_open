@@ -19,6 +19,7 @@ namespace nx::vms::client::desktop {
 class ClientStateHandler;
 class CloudCrossSystemManager;
 class ContextStatisticsModule;
+class LogsManagementWatcher;
 class ObjectDisplaySettings;
 class RadassController;
 class ResourceFactory;
@@ -152,6 +153,7 @@ public:
     ObjectDisplaySettings* objectDisplaySettings() const;
 
     ClientStateHandler* clientStateHandler() const;
+    LogsManagementWatcher* logsManagementWatcher() const;
     SharedMemoryManager* sharedMemoryManager() const;
     RunningInstancesManager* runningInstancesManager() const;
     session::SessionManager* sessionManager() const;

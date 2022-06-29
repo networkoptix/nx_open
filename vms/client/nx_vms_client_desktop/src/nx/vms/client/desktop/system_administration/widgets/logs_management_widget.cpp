@@ -7,22 +7,18 @@
 #include <QtGui/QDesktopServices>
 #include <QtWidgets/QFileDialog>
 
-#include <client_core/client_core_module.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/media_server_resource.h>
-#include <nx/vms/client/core/network/network_module.h>
-
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_administration/delegates/logs_management_table_delegate.h>
 #include <nx/vms/client/desktop/system_administration/models/logs_management_model.h>
-#include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
 #include <nx/vms/client/desktop/system_administration/widgets/log_settings_dialog.h>
 
 namespace nx::vms::client::desktop {
 
 LogsManagementWidget::LogsManagementWidget(QWidget* parent):
     base_type(parent),
-    ui(new Ui::LogsManagementWidget)
+    ui(new Ui::LogsManagementWidget),
+    m_watcher(appContext()->logsManagementWatcher())
 {
     setupUi();
 }
@@ -48,24 +44,36 @@ void LogsManagementWidget::setReadOnlyInternal(bool readOnly)
 {
 }
 
+void LogsManagementWidget::showEvent(QShowEvent* event)
+{
+    base_type::showEvent(event);
+    if (NX_ASSERT(m_watcher))
+        m_watcher->setUpdatesEnabled(true);
+}
+
+void LogsManagementWidget::hideEvent(QHideEvent* event)
+{
+    base_type::hideEvent(event);
+    if (NX_ASSERT(m_watcher))
+        m_watcher->setUpdatesEnabled(false);
+}
+
 void LogsManagementWidget::setupUi()
 {
     ui->setupUi(this);
 
-    auto m = new LogsManagementWatcher(this);
-
     connect(
-        m, &LogsManagementWatcher::stateChanged,
+        m_watcher, &LogsManagementWatcher::stateChanged,
         this, &LogsManagementWidget::updateWidgets);
 
     connect(
-        m, &LogsManagementWatcher::progressChanged, this,
+        m_watcher, &LogsManagementWatcher::progressChanged, this,
         [this](double progress)
         {
             ui->progressBar->setValue(100 * progress); //< The range is [0..100].
         });
 
-    ui->unitsTable->setModel(new LogsManagementModel(this, m));
+    ui->unitsTable->setModel(new LogsManagementModel(this, m_watcher));
     ui->unitsTable->setItemDelegate(new LogsManagementTableDelegate(this));
 
     ui->unitsTable->horizontalHeader()->setSectionResizeMode(
@@ -86,10 +94,13 @@ void LogsManagementWidget::setupUi()
     ui->openFolderButton->setFlat(true);
 
     connect(ui->settingsButton, &QPushButton::clicked, this,
-        [this, m]
+        [this]
         {
+            if (!NX_ASSERT(m_watcher))
+                return;
+
             auto dialog = new LogSettingsDialog();
-            dialog->init(m->checkedItems());
+            dialog->init(m_watcher->checkedItems());
 
             if (dialog->exec() == QDialog::Rejected)
                 return;
@@ -97,18 +108,22 @@ void LogsManagementWidget::setupUi()
             if (!dialog->hasChanges())
                 return;
 
-            m->applySettings(dialog->changes());
+            m_watcher->applySettings(dialog->changes());
         });
 
     connect(ui->resetButton, &QPushButton::clicked, this,
-        [this, m]
+        [this]
         {
-            m->applySettings(ConfigurableLogSettings::defaults());
+            if (NX_ASSERT(m_watcher))
+                m_watcher->applySettings(ConfigurableLogSettings::defaults());
         });
 
     connect(ui->downloadButton, &QPushButton::clicked, this,
-        [this, m]
+        [this]
         {
+            if (!NX_ASSERT(m_watcher))
+                return;
+
             QString dir = QFileDialog::getExistingDirectory(
                 this,
                 tr("Select folder..."),
@@ -116,13 +131,16 @@ void LogsManagementWidget::setupUi()
                 QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
             if (!dir.isEmpty())
-                m->startDownload(dir);
+                m_watcher->startDownload(dir);
         });
 
     connect(ui->openFolderButton, &QPushButton::clicked, this,
-        [this, m]
+        [this]
         {
-            const auto path = m->path();
+            if (!NX_ASSERT(m_watcher))
+                return;
+
+            const auto path = m_watcher->path();
             if (!NX_ASSERT(!path.isEmpty()))
                 return;
 
@@ -131,15 +149,15 @@ void LogsManagementWidget::setupUi()
 
     connect(
         ui->cancelButton, &QPushButton::clicked,
-        m, &LogsManagementWatcher::cancelDownload);
+        m_watcher, &LogsManagementWatcher::cancelDownload);
 
     connect(
         ui->retryButton, &QPushButton::clicked,
-        m, &LogsManagementWatcher::restartFailed);
+        m_watcher, &LogsManagementWatcher::restartFailed);
 
     connect(
         ui->doneButton, &QPushButton::clicked,
-        m, &LogsManagementWatcher::completeDownload);
+        m_watcher, &LogsManagementWatcher::completeDownload);
 
     updateWidgets(LogsManagementWatcher::State::empty); // TODO: get actual state.
 }
