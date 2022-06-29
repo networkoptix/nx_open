@@ -132,7 +132,7 @@
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>Herhangi bir eklenti</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>
@@ -802,8 +802,8 @@
       <translation>Ekranda göster</translation>
     </message>
     <message>
-      <source>preview is not available for the selected object</source>
-      <translation type="unfinished">preview is not available for the selected object</translation>
+      <source>Preview is not available for the selected object</source>
+      <translation type="unfinished">Preview is not available for the selected object</translation>
     </message>
   </context>
   <context>

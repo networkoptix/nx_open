@@ -1130,10 +1130,6 @@
       <translation>Ange prioritet:</translation>
     </message>
     <message>
-      <source>No failover</source>
-      <translation>Ingen failover</translation>
-    </message>
-    <message>
       <source>Low</source>
       <translation>Låg</translation>
     </message>
@@ -1148,6 +1144,10 @@
     <message>
       <source>Select some devices to setup failover priority</source>
       <translation>Välj några enheter för att konfigurera failoverprioritet</translation>
+    </message>
+    <message>
+      <source>No Failover</source>
+      <translation>Ingen failover</translation>
     </message>
   </context>
   <context>

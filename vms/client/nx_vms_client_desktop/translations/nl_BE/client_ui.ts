@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Open source libraries</source>
-      <translation>Open source libraries</translation>
+      <translation>Open source bibliotheken</translation>
     </message>
   </context>
   <context>
@@ -260,11 +260,11 @@
     </message>
     <message>
       <source>Fixed</source>
-      <translation>Vast</translation>
+      <translation>Opgelost</translation>
     </message>
     <message>
       <source>Scheduled</source>
-      <translation>Gepland</translation>
+      <translation>Schema</translation>
     </message>
     <message>
       <source>Fix bandwidth to</source>
@@ -1130,10 +1130,6 @@
       <translation>Prioriteit Instellen:</translation>
     </message>
     <message>
-      <source>No failover</source>
-      <translation>Geen failover</translation>
-    </message>
-    <message>
       <source>Low</source>
       <translation>Lage</translation>
     </message>
@@ -1148,6 +1144,10 @@
     <message>
       <source>Select some devices to setup failover priority</source>
       <translation>Selecteer apparaten om de failover-prioriteit op te stellen</translation>
+    </message>
+    <message>
+      <source>No Failover</source>
+      <translation>Geen failover</translation>
     </message>
   </context>
   <context>
@@ -2534,7 +2534,7 @@
     </message>
     <message>
       <source>Autodetect built-in and USB webcams</source>
-      <translation>Ingebouwde en USB-webcams automatisch detecteren</translation>
+      <translation>Automatische detectie van ingebouwde en USB-webcams</translation>
     </message>
   </context>
   <context>

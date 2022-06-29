@@ -231,7 +231,7 @@
     <name>QCocoaTheme</name>
     <message>
       <source>Don&apos;t Save</source>
-      <translation>Don&apos;t Lưu</translation>
+      <translation>Không Lưu</translation>
     </message>
   </context>
   <context>
@@ -258,7 +258,7 @@
     </message>
     <message>
       <source>Bl&amp;ue:</source>
-      <translation>Màu xanh da trời:</translation>
+      <translation>Xanh lam:</translation>
     </message>
     <message>
       <source>A&amp;lpha channel:</source>
@@ -313,19 +313,19 @@ Press ESC to cancel</source>
     <name>QDateTimeParser</name>
     <message>
       <source>AM</source>
-      <translation>Sáng</translation>
+      <translation>AM</translation>
     </message>
     <message>
       <source>am</source>
-      <translation>sáng</translation>
+      <translation>am</translation>
     </message>
     <message>
       <source>PM</source>
-      <translation>Chiều</translation>
+      <translation>PM</translation>
     </message>
     <message>
       <source>pm</source>
-      <translation>chiều</translation>
+      <translation>pm</translation>
     </message>
   </context>
   <context>
@@ -407,11 +407,11 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Failure to write block</source>
-      <translation>Thất bại trong việc viết block</translation>
+      <translation>Không thể ghi khối</translation>
     </message>
     <message>
       <source>Cannot create %1 for output</source>
-      <translation>Không thể tạo ra %1 cho đầu ra</translation>
+      <translation>Không thể tạo %1 cho đầu ra</translation>
     </message>
   </context>
   <context>
@@ -569,7 +569,7 @@ Vui lòng kiểm tra lại tên tệp.</translation>
     <message>
       <source>&apos;%1&apos; is write protected.
 Do you want to delete it anyway?</source>
-      <translation>&apos;%1&apos; được bảo vệ. Bạn vẫn muốn xóa?</translation>
+      <translation>&apos;%1&apos; được chống ghi. Bạn vẫn muốn xóa?</translation>
     </message>
     <message>
       <source>Are you sure you want to delete &apos;%1&apos;?</source>
@@ -715,14 +715,14 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>%1 byte(s)</source>
-      <translation>%1 byte(s)</translation>
+      <translation>%1 byte</translation>
     </message>
   </context>
   <context>
     <name>QGnomeTheme</name>
     <message>
       <source>&amp;OK</source>
-      <translation>&amp;Xác nhận</translation>
+      <translation>&amp;OK</translation>
     </message>
     <message>
       <source>&amp;Save</source>
@@ -980,7 +980,7 @@ Do you want to delete it anyway?</source>
     <name>QSaveFile</name>
     <message>
       <source>Existing file %1 is not writable</source>
-      <translation>Tập tin hiện tại %1 không thể chỉnh sửa</translation>
+      <translation>Tập tin %1 hiện tại không thể ghi</translation>
     </message>
     <message>
       <source>Filename refers to a directory</source>
@@ -988,7 +988,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Writing canceled by application</source>
-      <translation>Chỉnh sửa bị hủy bỏ</translation>
+      <translation>Ứng dụng hủy chế độ ghi</translation>
     </message>
   </context>
   <context>
@@ -1098,7 +1098,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Shared Data</source>
-      <translation>Dữ liệu chung</translation>
+      <translation>Dữ liệu được chia sẻ</translation>
     </message>
     <message>
       <source>Runtime</source>
@@ -1110,11 +1110,11 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Shared Configuration</source>
-      <translation>Cấu hình chung</translation>
+      <translation>Cấu hình được chia sẻ</translation>
     </message>
     <message>
       <source>Shared Cache</source>
-      <translation>Bộ nhớ đệm chung</translation>
+      <translation>Bộ nhớ đệm được chia sẻ</translation>
     </message>
     <message>
       <source>Download</source>

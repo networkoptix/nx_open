@@ -347,18 +347,6 @@
       <translation>Die Kamera wurde aus dem Archiv wiederhergestellt. Löschen Sie die Kamera und fügen Sie sie erneut hinzu, um das Live-Video anzuzeigen.</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation>Versuchen Sie zuerst die Aufnahme einzuschalten (falls ausgeschaltet) und verringern Sie die fps in den Geräteeinstellungen (Fehler &quot;%1&quot;).</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation>Versuchen Sie zuerst die Aufnahme einzuschalten (falls ausgeschaltet) und verringern Sie die fps in den Kameraeinstellungen (Fehler &quot;%1&quot;).</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation>Versuchen Sie zuerst die Aufnahme einzuschalten (falls ausgeschaltet) und verringern Sie die fps in den I/O-Einstellungen (Fehler &quot;%1&quot;).</translation>
-    </message>
-    <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
       <translation>Bitte aktualisieren Sie Firmware. Minimale unterstützte Version ist %1. Aktuelle Version ist %2</translation>
     </message>
@@ -373,6 +361,18 @@
     <message>
       <source>Internal server error. %1</source>
       <translation>Interner Serverfehler. %1</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
+      <translation>Falls deaktiviert, versuchen Sie, die Aufzeichnung in den I/O-Modul-Einstellungen zu aktivieren (Fehler &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
+      <translation>Falls deaktiviert, versuchen Sie, die Aufnahme zu aktivieren und die FPS in den Geräteeinstellungen zu verringern (Fehler &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
+      <translation>Falls deaktiviert, versuchen Sie, die Aufnahme zu aktivieren und die FPS in den Kameraeinstellungen zu verringern (Fehler &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
@@ -1422,7 +1422,7 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>

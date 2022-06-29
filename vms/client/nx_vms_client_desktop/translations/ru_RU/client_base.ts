@@ -1001,7 +1001,7 @@
     </message>
     <message>
       <source>Joystick Settings...</source>
-      <translation type="unfinished">Joystick Settings...</translation>
+      <translation>Настройки джойстика...</translation>
     </message>
     <message>
       <source>Advanced...</source>
@@ -1018,6 +1018,10 @@
     <message>
       <source>Web Page Settings...</source>
       <translation type="unfinished">Web Page Settings...</translation>
+    </message>
+    <message>
+      <source>Account Security...</source>
+      <translation type="unfinished">Account Security...</translation>
     </message>
   </context>
   <context>
@@ -1614,6 +1618,33 @@
     </message>
   </context>
   <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+      <source>Zoom In</source>
+      <translation>Приблизить</translation>
+    </message>
+    <message>
+      <source>Zoom Out</source>
+      <translation>Отдалить</translation>
+    </message>
+    <message>
+      <source>Focus Far</source>
+      <translation>Отдалить фокус</translation>
+    </message>
+    <message>
+      <source>Focus Near</source>
+      <translation>Приблизить фокус</translation>
+    </message>
+    <message>
+      <source>Auto Focus</source>
+      <translation>Автофокусировка</translation>
+    </message>
+    <message>
+      <source>Change Dewarping Mode</source>
+      <translation>Изменить режим развёртки</translation>
+    </message>
+  </context>
+  <context>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
@@ -1667,6 +1698,22 @@
     <message>
       <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
       <translation>Предоставляя доступ для некоторых раскладок, вы даете доступ ко всем камерам на них. Также пользователь получит доступ ко всем новым камерам на этих раскладках.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnAccessibleMediaWidget</name>
+    <message>
+      <source>Access granted by:</source>
+      <translation>Доступ предоставлен:</translation>
+    </message>
+    <message numerus="yes">
+      <source>and %n more</source>
+      <translation>
+        <numerusform>и еще %n</numerusform>
+        <numerusform>и еще %n</numerusform>
+        <numerusform>и еще %n</numerusform>
+        <numerusform>и еще %n</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -2972,8 +3019,12 @@ to %1</source>
       <translation>Не удалось перейти в режим совместимости для версии %1</translation>
     </message>
     <message>
-      <source>Your session has expired</source>
-      <translation>Истек срок действия вашей сессии</translation>
+      <source>System is not compatible with two-factor authentication</source>
+      <translation type="unfinished">System is not compatible with two-factor authentication</translation>
+    </message>
+    <message>
+      <source>Failed to log in to &quot;%1&quot; system</source>
+      <translation type="unfinished">Failed to log in to &quot;%1&quot; system</translation>
     </message>
   </context>
   <context>
@@ -3067,7 +3118,7 @@ to %1</source>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Создать</translation>
     </message>
     <message>
       <source>Restore from Database Backup</source>
@@ -3520,7 +3571,7 @@ to %1</source>
     </message>
     <message>
       <source>Please enter a password.</source>
-      <translation type="unfinished">Please enter a password.</translation>
+      <translation>Пожалуйста, введите пароль.</translation>
     </message>
   </context>
   <context>
@@ -4004,11 +4055,11 @@ to %1</source>
     </message>
     <message>
       <source>Motion Search</source>
-      <translation type="unfinished">Motion Search</translation>
+      <translation>Поиск движения</translation>
     </message>
     <message>
       <source>Object Search</source>
-      <translation type="unfinished">Object Search</translation>
+      <translation>Поиск объекта</translation>
     </message>
   </context>
   <context>
@@ -4600,7 +4651,7 @@ to %1</source>
     </message>
     <message>
       <source>Enter Fullscreen</source>
-      <translation type="unfinished">Enter Fullscreen</translation>
+      <translation>Войти в полноэкранный режим</translation>
     </message>
   </context>
   <context>
@@ -4911,35 +4962,35 @@ to %1</source>
       <source>Failover</source>
       <translation>Резервирование</translation>
     </message>
-    <message>
-      <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation>Серверы с включенным резервированием будут автоматически брать камеры с отключенных серверов.</translation>
-    </message>
     <message numerus="yes">
       <source>Certificates</source>
       <translation type="unfinished">
-        <numerusform>Certificates</numerusform>
-        <numerusform>Certificates</numerusform>
-        <numerusform>Certificates</numerusform>
+        <numerusform>Сертификат</numerusform>
+        <numerusform>Сертификаты</numerusform>
+        <numerusform>Набор сертификатов</numerusform>
         <numerusform>Certificates</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server utilizes these %n SSL certificates to authenticate its identity</source>
-      <translation type="unfinished">
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
+      <translation>
+        <numerusform>Сервер использует этот SSL-сертификат для аутентификации своей личности</numerusform>
+        <numerusform>Сервер использует эти %n SSL-сертификата для аутентификации своей личности</numerusform>
+        <numerusform>Сервер использует эти %n SSL-сертификатов для аутентификации своей личности</numerusform>
+        <numerusform>Сервер использует эти %n SSL-сертификатов для аутентификации своей личности</numerusform>
       </translation>
     </message>
     <message>
       <source>Certificate received from the server doesn&apos;t match the certificate this server is pinned to.</source>
-      <translation type="unfinished">Certificate received from the server doesn&apos;t match the certificate this server is pinned to.</translation>
+      <translation>Сертификат, полученный от сервера, не соответствует сертификату, к которому привязан этот сервер.</translation>
     </message>
     <message>
       <source>Details</source>
       <translation>Детали</translation>
+    </message>
+    <message>
+      <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
+      <translation>Серверы с включенным резервированием будут автоматически брать камеры с отключенных серверов с тем же идентификатором местоположения.</translation>
     </message>
   </context>
   <context>
@@ -5195,15 +5246,15 @@ to %1</source>
     </message>
     <message>
       <source>ARCHIVE ENCRYPTED</source>
-      <translation type="unfinished">ARCHIVE ENCRYPTED</translation>
+      <translation>АРХИВ ЗАШИФРОВАН</translation>
     </message>
     <message>
       <source>Ask your system administrator to enter the encryption password to decrypt this archive</source>
-      <translation type="unfinished">Ask your system administrator to enter the encryption password to decrypt this archive</translation>
+      <translation>Попросите системного администратора ввести пароль шифрования для расшифровки этого архива</translation>
     </message>
     <message>
       <source>Unlock</source>
-      <translation type="unfinished">Unlock</translation>
+      <translation>Разблокировать</translation>
     </message>
   </context>
   <context>
@@ -5479,7 +5530,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Storage is available but will not be writable because it is too small in comparison to the already present storages</source>
-      <translation type="unfinished">Storage is available but will not be writable because it is too small in comparison to the already present storages</translation>
+      <translation>Хранилище доступно, но не будет доступно для записи, поскольку оно слишком мало по сравнению с уже имеющимися хранилищами</translation>
     </message>
   </context>
   <context>
@@ -5663,11 +5714,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Backup storage is not configured</source>
-      <translation type="unfinished">Backup storage is not configured</translation>
+      <translation>Хранилище резервных копий не настроено</translation>
     </message>
     <message>
       <source>Camera recording schedule is invalid</source>
-      <translation type="unfinished">Camera recording schedule is invalid</translation>
+      <translation>Некорректный график записи камеры</translation>
     </message>
   </context>
   <context>
@@ -5841,7 +5892,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>With enabled digest authentication</source>
-      <translation type="unfinished">With enabled digest authentication</translation>
+      <translation>С включенной дайджест-аутентификацией</translation>
     </message>
   </context>
   <context>
@@ -5864,7 +5915,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To enable digest authentication password reset is required</source>
-      <translation type="unfinished">To enable digest authentication password reset is required</translation>
+      <translation>Для включения дайджест-аутентификации требуется сброс пароля</translation>
     </message>
   </context>
   <context>
@@ -5986,11 +6037,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Allow digest authentication for this user</source>
-      <translation type="unfinished">Allow digest authentication for this user</translation>
+      <translation>Разрешить дайджест-аутентификацию для этого пользователя</translation>
     </message>
     <message>
       <source>Learn More</source>
-      <translation type="unfinished">Learn More</translation>
+      <translation>Подробнее</translation>
     </message>
   </context>
   <context>
@@ -6069,7 +6120,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed.</source>
-      <translation type="unfinished">Only letters, numbers and symbols %1 are allowed.</translation>
+      <translation>Допускаются только буквы, цифры и символы %1.</translation>
     </message>
   </context>
   <context>
@@ -6142,19 +6193,19 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWebResourceWidget</name>
     <message>
       <source>Open this web page?</source>
-      <translation type="unfinished">Open this web page?</translation>
+      <translation>Открыть эту веб-страницу?</translation>
     </message>
     <message>
       <source>Web page</source>
-      <translation type="unfinished">Web page</translation>
+      <translation>Веб-страница</translation>
     </message>
     <message>
       <source>Connect anyway</source>
-      <translation type="unfinished">Connect anyway</translation>
+      <translation>Подключиться в любом случае</translation>
     </message>
     <message>
       <source>Web page settings...</source>
-      <translation type="unfinished">Web page settings...</translation>
+      <translation>Настройки веб-страницы...</translation>
     </message>
     <message>
       <source>You try to open the
@@ -6162,10 +6213,10 @@ If you intended to move analytics data to another storage location, please conta
 but this web page presented an untrusted certificate auth.
 We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
       <comment>%1 is the web page address</comment>
-      <translation type="unfinished">You try to open the
-%1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</translation>
+      <translation>Вы пытаетесь открыть
+%1,
+но на этой веб-странице представлен ненадежный сертификат аутентификации.
+Мы рекомендуем вам не открывать эту веб-страницу. Если вы понимаете риски, вы можете открыть веб-страницу.</translation>
     </message>
   </context>
   <context>
@@ -6237,7 +6288,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Camera %1 does not support PTZ</source>
-      <translation type="unfinished">Camera %1 does not support PTZ</translation>
+      <translation>Камера %1 не поддерживает PTZ</translation>
     </message>
   </context>
   <context>
@@ -6293,7 +6344,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Could not open file &apos;%1&apos;. Please check if the folder is accessible</source>
-      <translation type="unfinished">Could not open file &apos;%1&apos;. Please check if the folder is accessible</translation>
+      <translation>Не удалось открыть файл &apos;%1&apos;. Пожалуйста, проверьте, доступна ли папка</translation>
     </message>
   </context>
   <context>
@@ -6844,11 +6895,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Merge this group with %1?</source>
-      <translation type="unfinished">Merge this group with %1?</translation>
+      <translation>Объединить эту группу с %1?</translation>
     </message>
     <message>
       <source>Two groups with the same name cannot exist.</source>
-      <translation type="unfinished">Two groups with the same name cannot exist.</translation>
+      <translation>Две группы с одинаковым именем не могут существовать.</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -6856,19 +6907,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
-      <translation type="unfinished">You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</translation>
+      <translation>Вы собираетесь переместить эти веб-страницы на сервер &quot;%1&quot;. Эти веб-страницы проксируют все запрошенное содержимое, и их прокси-сервер изменится на сервер &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>You are about to move this webpage to server &quot;%1&quot;. This webpage proxies all requested contents, and its proxy server will change to server &quot;%1&quot;.</source>
-      <translation type="unfinished">You are about to move this webpage to server &quot;%1&quot;. This webpage proxies all requested contents, and its proxy server will change to server &quot;%1&quot;.</translation>
+      <translation>Вы собираетесь переместить эту веб-страницу на сервер &quot;%1&quot;. Эта веб-страница проксирует все запрошенное содержимое, и ее прокси-сервер изменится на сервер &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</translation>
+      <translation>Проксирование всего содержимого предоставляет доступ к любому сервису или устройству в сети сервера&apos;пользователям этой веб-страницы.</translation>
     </message>
     <message>
       <source>Move anyway?</source>
-      <translation type="unfinished">Move anyway?</translation>
+      <translation>Переместить в любом случае?</translation>
     </message>
     <message>
       <source>Move</source>
@@ -6880,47 +6931,47 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Some devices from %1 will not be moved to %2. Move anyways?</source>
-      <translation type="unfinished">Some devices from %1 will not be moved to %2. Move anyways?</translation>
+      <translation>Некоторые устройства с %1 не будут перемещены в %2. Переместить в любом случае?</translation>
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>Виртуальные камеры, USB-камеры или веб-камеры нельзя перемещать между серверами. Эти устройства останутся на %1:</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>USB или веб-камеры не могут быть перемещены между серверами. Эти устройства останутся на %1:</translation>
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">Virtual cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>Виртуальные камеры нельзя перемещать между серверами. Эти устройства останутся на %1:</translation>
     </message>
     <message>
       <source>Move Group without Them</source>
-      <translation type="unfinished">Move Group without Them</translation>
+      <translation>Переместить группу без них</translation>
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers</translation>
+      <translation>Виртуальные камеры, USB-камеры или веб-камеры нельзя перемещать между серверами</translation>
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains virtual cameras, USB or web cameras</source>
-      <translation type="unfinished">%1 cannot be moved between servers as it contains virtual cameras, USB or web cameras</translation>
+      <translation>%1 нельзя перемещать между серверами, так как он содержит виртуальные камеры, USB или веб-камеры</translation>
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual cameras cannot be moved between servers</translation>
+      <translation>Виртуальные камеры нельзя перемещать между серверами</translation>
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains virtual cameras</source>
-      <translation type="unfinished">%1 cannot be moved between servers as it contains virtual cameras</translation>
+      <translation>%1 нельзя перемещать между серверами, так как он содержит виртуальные камеры</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers</source>
-      <translation type="unfinished">USB or web cameras cannot be moved between servers</translation>
+      <translation>USB-камеры или веб-камеры нельзя перемещать между серверами</translation>
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains USB or web cameras</source>
-      <translation type="unfinished">%1 cannot be moved between servers as it contains USB or web cameras</translation>
+      <translation>%1 нельзя перемещать между серверами, так как он содержит USB или веб-камеры</translation>
     </message>
   </context>
   <context>
@@ -7129,11 +7180,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Choose devices...</source>
-      <translation type="unfinished">Choose devices...</translation>
+      <translation>Выбрать устройства...</translation>
     </message>
     <message>
       <source>Choose cameras...</source>
-      <translation type="unfinished">Choose cameras...</translation>
+      <translation>Выбрать камеры...</translation>
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
@@ -7155,11 +7206,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
+      <translation>Выбранная камера</translation>
     </message>
     <message>
       <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
+      <translation>Выбранное устройство</translation>
     </message>
   </context>
   <context>
@@ -7197,7 +7248,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Попробуйте изменить фильтры или настроить обнаружение объектов в настройках плагина камеры</translation>
     </message>
   </context>
   <context>
@@ -7615,11 +7666,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Automatic selection</source>
-      <translation type="unfinished">Automatic selection</translation>
+      <translation>Автоматический выбор</translation>
     </message>
     <message>
       <source>Use if supported</source>
-      <translation type="unfinished">Use if supported</translation>
+      <translation>Использовать, если поддерживается</translation>
     </message>
     <message>
       <source>Never</source>
@@ -7784,6 +7835,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Select Camera</source>
       <translation type="unfinished">Select Camera</translation>
+    </message>
+    <message>
+      <source>No cameras available</source>
+      <translation type="unfinished">No cameras available</translation>
     </message>
   </context>
   <context>
@@ -8658,10 +8713,6 @@ We recommend you not to open this web page. If you understand the risks, you can
   <context>
     <name>nx::vms::client::desktop::FailoverPriorityDialogItemDelegate</name>
     <message>
-      <source>No failover</source>
-      <translation type="unfinished">No failover</translation>
-    </message>
-    <message>
       <source>Low</source>
       <translation>Низкая</translation>
     </message>
@@ -8672,6 +8723,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>High</source>
       <translation>Высокая</translation>
+    </message>
+    <message>
+      <source>No Failover</source>
+      <translation type="unfinished">No Failover</translation>
     </message>
   </context>
   <context>
@@ -9459,6 +9514,10 @@ You can force it, but it may significantly increase CPU load.</translation>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
       <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
     </message>
+    <message>
+      <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
+      <translation type="unfinished">There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -10191,11 +10250,11 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Does not affect the connections established by server.</source>
-      <translation type="unfinished">Does not affect the connections established by server.</translation>
+      <translation>Не влияет на соединения, установленные сервером.</translation>
     </message>
     <message>
       <source>Enables RTSP traffic encryption.</source>
-      <translation type="unfinished">Enables RTSP traffic encryption.</translation>
+      <translation>Включает шифрование трафика RTSP.</translation>
     </message>
     <message>
       <source>days</source>
@@ -10324,24 +10383,24 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation type="unfinished">Trust this server?</translation>
     </message>
     <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
-      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct server.</translation>
-    </message>
-    <message>
       <source>Cannot verify the identity of %1</source>
       <translation type="unfinished">Cannot verify the identity of %1</translation>
     </message>
     <message>
-      <source>Someone may be impersonating %1 to steal your personal information.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.</translation>
+      <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
+      <translation type="unfinished">You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</translation>
     </message>
     <message>
-      <source>Do not connect to this server unless instructed by your VMS administrator.</source>
-      <translation type="unfinished">Do not connect to this server unless instructed by your VMS administrator.</translation>
+      <source>Someone may be impersonating this Server to steal your personal information.</source>
+      <translation type="unfinished">Someone may be impersonating this Server to steal your personal information.</translation>
     </message>
     <message>
-      <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
-      <translation type="unfinished">You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</translation>
+      <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
+      <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
+    </message>
+    <message>
+      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
+      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct Server.</translation>
     </message>
   </context>
   <context>
@@ -11100,7 +11159,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::joystick::JoystickButtonActionChoiceModel</name>
     <message>
       <source>No Action</source>
-      <translation type="unfinished">No Action</translation>
+      <translation>Нет действия</translation>
     </message>
     <message>
       <source>Focus Near</source>
@@ -11112,46 +11171,46 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Autofocus</source>
-      <translation type="unfinished">Autofocus</translation>
+      <translation>Автофокус</translation>
     </message>
     <message>
       <source>Go to PTZ Position</source>
-      <translation type="unfinished">Go to PTZ Position</translation>
+      <translation>Перейти к позиции PTZ</translation>
     </message>
     <message>
       <source>Set to Fullscreen</source>
-      <translation type="unfinished">Set to Fullscreen</translation>
+      <translation>На полный экран</translation>
     </message>
     <message>
       <source>Next Camera on Layout</source>
-      <translation type="unfinished">Next Camera on Layout</translation>
+      <translation>Следующая камера на раскладке</translation>
     </message>
     <message>
       <source>Previous Camera on Layout</source>
-      <translation type="unfinished">Previous Camera on Layout</translation>
+      <translation>Предыдущая камера на раскладке</translation>
     </message>
     <message>
       <source>Open Layout</source>
-      <translation type="unfinished">Open Layout</translation>
+      <translation>Открыть раскладку</translation>
     </message>
     <message>
       <source>Modifier</source>
-      <translation type="unfinished">Modifier</translation>
+      <translation>Модификатор</translation>
     </message>
     <message>
       <source>Multiple</source>
-      <translation type="unfinished">Multiple</translation>
+      <translation>Несколько</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::joystick::JoystickButtonSettingsModel</name>
     <message>
       <source>Select Layout...</source>
-      <translation type="unfinished">Select Layout...</translation>
+      <translation>Выбрать раскладку...</translation>
     </message>
     <message>
       <source>Button</source>
-      <translation type="unfinished">Button</translation>
+      <translation>Кнопка</translation>
     </message>
     <message>
       <source>Selected Layout</source>

@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Connecting clients will be updated to version %1 on %2.</source>
-      <translation>接続クライアントは %2 のバージョン %1 に更新されます。</translation>
+      <translation>接続クライアントは %2 にバージョン %1 へ更新されます。</translation>
     </message>
     <message>
       <source>Check for updates</source>
@@ -408,11 +408,11 @@
     </message>
     <message>
       <source>Auto Calibration</source>
-      <translation>自動キャリブレーション</translation>
+      <translation>自動較正</translation>
     </message>
     <message>
       <source>Mount</source>
-      <translation>取付箇所</translation>
+      <translation>設置方法</translation>
     </message>
     <message>
       <source>Ceiling</source>
@@ -794,8 +794,8 @@
       <translation>レイアウトに表示</translation>
     </message>
     <message>
-      <source>preview is not available for the selected object</source>
-      <translation>選択したオブジェクトのプレビューは使用できません</translation>
+      <source>Preview is not available for the selected object</source>
+      <translation>選択したオブジェクトのプレビューは利用できません</translation>
     </message>
   </context>
   <context>
@@ -852,7 +852,7 @@ PTZを行います</translation>
     </message>
     <message>
       <source>to</source>
-      <translation>宛先</translation>
+      <translation>終了</translation>
     </message>
   </context>
   <context>

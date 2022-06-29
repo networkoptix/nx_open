@@ -347,18 +347,6 @@
       <translation>Kameran återställdes från arkivet. Ta bort kameran och lägg till den igen för att visa Live video.</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation>Först försök att aktivera inspelningen (om den är av) och minska fps i enhetens inställningar (fel &quot;%1&quot;).</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation>Försök först att aktivera inspelning (om den är avstängd) och minska fps i kameran inställningar (fel &quot;%1&quot;).</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation>Försök först aktivera inspelning (om den är avstängd) och minska fps i I/O modulinställningar (fel &quot;%1&quot;).</translation>
-    </message>
-    <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
       <translation>Uppdatera firmware. Minimal version som stöds är %1. Nuvarande version är %2</translation>
     </message>
@@ -373,6 +361,18 @@
     <message>
       <source>Internal server error. %1</source>
       <translation>Internt serverfel. %1</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
+      <translation>Om den är inaktiverad, försök att aktivera inspelning i I/O-modulinställningar (fel &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
+      <translation>Om den är inaktiverad, försök att aktivera inspelning i I/O-modulinställningar (fel &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
+      <translation>Om den är inaktiverad, försök att aktivera inspelning och minska FPS i kamerainställningar (fel &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>

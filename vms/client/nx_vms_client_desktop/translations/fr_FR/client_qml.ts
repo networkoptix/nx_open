@@ -802,8 +802,8 @@
       <translation>Afficher sur mise en page</translation>
     </message>
     <message>
-      <source>preview is not available for the selected object</source>
-      <translation>l'aperçu n'est pas disponible pour l'objet sélectionné</translation>
+      <source>Preview is not available for the selected object</source>
+      <translation>L'aperçu n'est pas disponible pour l'objet sélectionné</translation>
     </message>
   </context>
   <context>

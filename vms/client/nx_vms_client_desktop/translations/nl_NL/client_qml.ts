@@ -5,7 +5,7 @@
     <name>AdvancedUpdateSettings</name>
     <message>
       <source>Advanced Update Settings</source>
-      <translation>Geavanceerde Update instellingen</translation>
+      <translation>Geavanceerde Update-instellingen</translation>
     </message>
     <message>
       <source>Notifications</source>
@@ -802,8 +802,8 @@
       <translation>Toon op de schermindeling</translation>
     </message>
     <message>
-      <source>preview is not available for the selected object</source>
-      <translation>voorbeeld is niet beschikbaar voor het geselecteerde object</translation>
+      <source>Preview is not available for the selected object</source>
+      <translation>Een voorbeeld is niet beschikbaar voor het geselecteerde object</translation>
     </message>
   </context>
   <context>
@@ -1025,7 +1025,7 @@ om PTZ te activeren</translation>
     <name>SelectOverlappedIdDialog</name>
     <message>
       <source>Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</source>
-      <translation>Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</translation>
+      <translation>Tijdlijn-ID, die wordt gemaakt wanneer de tijd achteruit wordt gewijzigd op een externe NVR. De nieuwe tijdlijn kan de bestaande overlappen.</translation>
     </message>
     <message>
       <source>Select</source>

@@ -19,7 +19,7 @@
   <String Id="ServerOnlyDesc">The Server application is used to store System information and archives</String>
   <String Id="HelpHeader">Setup Help</String>
   <String Id="HelpCloseButton">Luk</String>
-  <String Id="InstallOptionsButton">Options</String>
+  <String Id="InstallOptionsButton">Valgmuligheder</String>
   <String Id="InstallInstallButton">Accept and Install</String>
   <String Id="InstallCloseButton">Luk</String>
   <String Id="InstallAcceptCheckbox">I agree to the license terms and conditions</String>
@@ -42,13 +42,13 @@
   <String Id="SuccessInstallHeader">Installation Successfully Completed</String>
   <String Id="SuccessLaunchButton">Launch</String>
   <String Id="SuccessRestartText">You must restart your computer before you can use the software</String>
-  <String Id="SuccessRestartButton">Restart</String>
+  <String Id="SuccessRestartButton">Genstart</String>
   <String Id="SuccessCloseButton">Luk</String>
   <String Id="FailureHeader">Setup Failed</String>
   <String Id="FailureHyperlinkLogText">One or more issues caused the setup to fail. Please fix the issues and then retry setup. For more information see the</String>
   <String Id="FailureHyperlinkLogTextLink">log file</String>
   <String Id="FailureRestartText">You must restart your computer to complete the rollback of the software</String>
-  <String Id="FailureRestartButton">Restart</String>
+  <String Id="FailureRestartButton">Genstart</String>
   <String Id="FailureCloseButton">Luk</String>
   <String Id="WillInstall">[WixBundleName] will be installed on your device</String>
   <String Id="FilesInUseHeader">Files In Use</String>
@@ -57,7 +57,7 @@
   <String Id="FilesInUseDontCloseRadioButton">Do not close applications. A reboot will be required</String>
   <String Id="FilesInUseOkButton">OK</String>
   <String Id="FilesInUseCancelButton">Annuller</String>
-  <String Id="Options">Options</String>
+  <String Id="Options">Valgmuligheder</String>
   <String Id="SelectApps">Select applications to be installed:</String>
   <String Id="msierrFirewallCannotConnect">Cannot connect to Windows Firewall.  ([2]   [3]   [4]   [5])</String>
   <String Id="WixSchedFirewallExceptionsInstall">Configuring Windows Firewall</String>

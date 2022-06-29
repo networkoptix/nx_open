@@ -26,7 +26,7 @@
     <message numerus="yes">
       <source>%1 with %n attributes</source>
       <translation>
-        <numerusform>%1 Com %n atributos</numerusform>
+        <numerusform>%1 com %n atributos</numerusform>
         <numerusform>%1 Com %n atributos</numerusform>
       </translation>
     </message>
@@ -1009,11 +1009,15 @@
     </message>
     <message>
       <source>Copy Bookmarks Text</source>
-      <translation>Copiar texto dos favoritos</translation>
+      <translation>Copiar texto dos marcadores</translation>
     </message>
     <message>
       <source>Web Page Settings...</source>
       <translation>Configurações da página da Web...</translation>
+    </message>
+    <message>
+      <source>Account Security...</source>
+      <translation>Segurança da conta...</translation>
     </message>
   </context>
   <context>
@@ -1582,6 +1586,33 @@
     </message>
   </context>
   <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+      <source>Zoom In</source>
+      <translation>Mais Zoom</translation>
+    </message>
+    <message>
+      <source>Zoom Out</source>
+      <translation>Menos Zoom</translation>
+    </message>
+    <message>
+      <source>Focus Far</source>
+      <translation>Focar Longe</translation>
+    </message>
+    <message>
+      <source>Focus Near</source>
+      <translation>Focar Perto</translation>
+    </message>
+    <message>
+      <source>Auto Focus</source>
+      <translation>Foco Automático</translation>
+    </message>
+    <message>
+      <source>Change Dewarping Mode</source>
+      <translation>Alterar Modo Dewarping</translation>
+    </message>
+  </context>
+  <context>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
@@ -1635,6 +1666,20 @@
     <message>
       <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
       <translation>Dando acesso a alguns layouts, você dá acesso a todas as câmeras neles. O usuário também terá acesso a todas as novas câmeras nesses layouts.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnAccessibleMediaWidget</name>
+    <message>
+      <source>Access granted by:</source>
+      <translation>Acesso concedido por:</translation>
+    </message>
+    <message numerus="yes">
+      <source>and %n more</source>
+      <translation>
+        <numerusform>e mais %n</numerusform>
+        <numerusform>e mais %n</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -2764,7 +2809,7 @@ a %1</translation>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Erro interno %1. Por favor contacte a equipe de suporte.</translation>
+      <translation>Erro interno %1. Entre em contato com a equipe de suporte.</translation>
     </message>
   </context>
   <context>
@@ -2898,8 +2943,12 @@ a %1</translation>
       <translation>Falha ao entrar no modo de compatibilidade para a versão %1</translation>
     </message>
     <message>
-      <source>Your session has expired</source>
-      <translation>Sua sessão expirou</translation>
+      <source>System is not compatible with two-factor authentication</source>
+      <translation>O sistema não é compatível com autenticação de dois fatores</translation>
+    </message>
+    <message>
+      <source>Failed to log in to &quot;%1&quot; system</source>
+      <translation>Falha ao fazer login no sistema &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -4480,7 +4529,7 @@ a %1</translation>
     </message>
     <message>
       <source>Enter Fullscreen</source>
-      <translation>Entrar em tela cheia</translation>
+      <translation>Entrar no modo de tela cheia</translation>
     </message>
   </context>
   <context>
@@ -4781,10 +4830,6 @@ a %1</translation>
       <source>Failover</source>
       <translation>Failover</translation>
     </message>
-    <message>
-      <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation>Servidores com failover ativado irão automaticamente "capturar" câmeras de servidores que estejam offline.</translation>
-    </message>
     <message numerus="yes">
       <source>Certificates</source>
       <translation>
@@ -4806,6 +4851,10 @@ a %1</translation>
     <message>
       <source>Details</source>
       <translation>Detalhes</translation>
+    </message>
+    <message>
+      <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
+      <translation>Os servidores com failover ativado irão automaticamente capturar câmeras de servidores offline com a mesma ID de Localização.</translation>
     </message>
   </context>
   <context>
@@ -7532,7 +7581,7 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation>Mostrar todas as câmaras</translation>
+      <translation>Mostrar todas as câmeras</translation>
     </message>
     <message>
       <source>Select Devices</source>
@@ -7549,6 +7598,10 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     <message>
       <source>Select Camera</source>
       <translation>Selecione a câmera</translation>
+    </message>
+    <message>
+      <source>No cameras available</source>
+      <translation>Nenhuma câmera disponível</translation>
     </message>
   </context>
   <context>
@@ -8395,10 +8448,6 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
   <context>
     <name>nx::vms::client::desktop::FailoverPriorityDialogItemDelegate</name>
     <message>
-      <source>No failover</source>
-      <translation>Sem failover</translation>
-    </message>
-    <message>
       <source>Low</source>
       <translation>Baixo</translation>
     </message>
@@ -8409,6 +8458,10 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     <message>
       <source>High</source>
       <translation>Alto</translation>
+    </message>
+    <message>
+      <source>No Failover</source>
+      <translation>Sem failover</translation>
     </message>
   </context>
   <context>
@@ -9188,6 +9241,10 @@ Você pode forçá-lo, mas pode aumentar significativamente a carga da CPU.</tra
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
       <translation>Você está usando um cliente personalizado. Entre em contato com %1 para obter as instruções de atualização.</translation>
     </message>
+    <message>
+      <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
+      <translation>Não há espaço suficiente em seu computador para baixar a atualização do Cliente. Por favor, libere algum espaço no seu disco rígido e tente novamente.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -9505,7 +9562,7 @@ Você pode forçá-lo, mas pode aumentar significativamente a carga da CPU.</tra
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation>Proxying todo o conteúdo expõe qualquer serviço ou dispositivo na rede do servidor&apos;s aos usuários desta página</translation>
+      <translation>O proxy de todo o conteúdo expõe qualquer serviço ou dispositivo na rede do servidor&apos;s aos usuários desta página da web</translation>
     </message>
   </context>
   <context>
@@ -10035,24 +10092,24 @@ Não fixe este certificado se você&apos;t modificou o certificado SSL %2 servid
       <translation>Deseja confiar neste servidor?</translation>
     </message>
     <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
-      <translation>Revise os&apos;s para certificar-se de que está se conectando ao servidor correto.</translation>
-    </message>
-    <message>
       <source>Cannot verify the identity of %1</source>
       <translation>Não é possível verificar a identidade de %1</translation>
     </message>
     <message>
-      <source>Someone may be impersonating %1 to steal your personal information.</source>
-      <translation>Alguém pode estar se passando por %1 para roubar suas informações pessoais.</translation>
+      <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
+      <translation>Você tentou se conectar a este servidor, mas apresentou um certificado que não pode ser verificado automaticamente.</translation>
     </message>
     <message>
-      <source>Do not connect to this server unless instructed by your VMS administrator.</source>
-      <translation>Não conecte a este servidor a menos que instruído pelo administrador do VMS.</translation>
+      <source>Someone may be impersonating this Server to steal your personal information.</source>
+      <translation>Alguém pode estar se passando por este Servidor para roubar suas informações pessoais.</translation>
     </message>
     <message>
-      <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
-      <translation>Você tentou se conectar a: %1, mas o servidor apresentou um certificado que não pode ser verificado automaticamente.</translation>
+      <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
+      <translation>Não se conecte a este servidor a menos que instruído pelo administrador do VMS.</translation>
+    </message>
+    <message>
+      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
+      <translation>Revise os detalhes do certificado&apos;s para certificar-se de que você está se conectando ao servidor correto.</translation>
     </message>
   </context>
   <context>
@@ -10866,7 +10923,7 @@ Não fixe este certificado se você&apos;t modificou o certificado SSL %2 servid
     <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
     <message>
       <source>Cannot find an item with the specified id</source>
-      <translation>Não é possível encontrar um item com o Id especificado</translation>
+      <translation>Não é possível encontrar um ‘item’ com o Id especificado</translation>
     </message>
     <message>
       <source>Cannot find a resource with the specified id.</source>
@@ -11334,7 +11391,7 @@ Você pode selecionar outro local de armazenamento na &quot;Gerenciamento de arm
     </message>
     <message>
       <source>Press Esc to stop the tour.</source>
-      <translation>Pressione Esc para parar o tour.</translation>
+      <translation>Pressione Esc para interromper o tour.</translation>
     </message>
   </context>
   <context>

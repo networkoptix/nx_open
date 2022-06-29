@@ -90,20 +90,20 @@
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
+      <translation>
+        <numerusform>%n nowych wyników</numerusform>
+        <numerusform>%n nowych wyników</numerusform>
+        <numerusform>%n nowych wyników</numerusform>
+        <numerusform>%n nowych wyników</numerusform>
       </translation>
     </message>
     <message>
       <source>new results</source>
-      <translation type="unfinished">new results</translation>
+      <translation>nowe wyniki</translation>
     </message>
     <message>
       <source>Detected by</source>
-      <translation type="unfinished">Detected by</translation>
+      <translation>Wykryty przez</translation>
     </message>
   </context>
   <context>
@@ -138,16 +138,16 @@
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
+      <translation>
+        <numerusform>%n nowych wyników</numerusform>
+        <numerusform>%n nowych wyników</numerusform>
+        <numerusform>%n nowych wyników</numerusform>
+        <numerusform>%n nowych wyników</numerusform>
       </translation>
     </message>
     <message>
       <source>new results</source>
-      <translation type="unfinished">new results</translation>
+      <translation>nowe wyniki</translation>
     </message>
   </context>
   <context>
@@ -291,7 +291,7 @@
     <name>ContextHintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>Kliknij ikonę, aby przeczytać więcej</translation>
     </message>
   </context>
   <context>
@@ -337,7 +337,7 @@
     </message>
     <message>
       <source>360° Equirectangular</source>
-      <translation type="unfinished">360° Equirectangular</translation>
+      <translation>360 ° Równokątny</translation>
     </message>
   </context>
   <context>
@@ -491,7 +491,7 @@
     <name>InformationBubble</name>
     <message>
       <source>Detected by</source>
-      <translation type="unfinished">Detected by</translation>
+      <translation>Wykryte przez</translation>
     </message>
   </context>
   <context>
@@ -529,7 +529,7 @@
     </message>
     <message>
       <source>Previous Object</source>
-      <translation type="unfinished">Previous Object</translation>
+      <translation>Poprzedni obiekt</translation>
     </message>
     <message>
       <source>Pause</source>
@@ -541,11 +541,11 @@
     </message>
     <message>
       <source>Next Object</source>
-      <translation type="unfinished">Next Object</translation>
+      <translation>Następny obiekt</translation>
     </message>
     <message>
       <source>Toggle Repeat</source>
-      <translation type="unfinished">Toggle Repeat</translation>
+      <translation>Przełącz powtarzanie</translation>
     </message>
   </context>
   <context>
@@ -818,8 +818,8 @@
       <translation>Pokaż w układzie</translation>
     </message>
     <message>
-      <source>preview is not available for the selected object</source>
-      <translation type="unfinished">preview is not available for the selected object</translation>
+      <source>Preview is not available for the selected object</source>
+      <translation>Podgląd nie jest dostępny dla wybranego obiektu</translation>
     </message>
   </context>
   <context>
@@ -889,7 +889,7 @@ aby aktywować PTZ</translation>
     </message>
     <message>
       <source>Subtype</source>
-      <translation type="unfinished">Subtype</translation>
+      <translation>Podtyp</translation>
     </message>
   </context>
   <context>
@@ -1043,7 +1043,7 @@ aby aktywować PTZ</translation>
     <name>SelectOverlappedIdDialog</name>
     <message>
       <source>Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</source>
-      <translation type="unfinished">Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</translation>
+      <translation>Identyfikator osi czasu jest tworzony po zmianie czasu wstecz na zdalnym rejestratorze NVR. Nowa oś czasu może nakładać się na istniejącą.</translation>
     </message>
     <message>
       <source>Select</source>
@@ -1294,7 +1294,7 @@ aby aktywować PTZ</translation>
     <name>WelcomeScreen</name>
     <message>
       <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
-      <translation type="unfinished">You don&apos;t have access to the %1. Please check your internet connection.</translation>
+      <translation>Nie masz dostępu do %1. Proszę sprawdzić swoje połączenie z internetem.</translation>
     </message>
     <message>
       <source>Official Website</source>

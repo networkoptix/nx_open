@@ -198,5 +198,19 @@
       <source>Too many login attempts. Try again in a minute.</source>
       <translation>Alltför många försök. Försök igen om någon minut.</translation>
     </message>
+    <message>
+      <source>Two-factor authentication is required.</source>
+      <translation>Tvåfaktorsautentisering krävs.</translation>
+    </message>
+    <message>
+      <source>You can enable two-factor authentication in your %1.</source>
+      <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>Du kan aktivera tvåfaktorsautentisering i din %1.</translation>
+    </message>
+    <message>
+      <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>För att logga in på detta system, inaktivera "Be om en verifieringskod vid varje inloggning med ditt %1 -konto" i din %2.</translation>
+    </message>
   </context>
 </TS>

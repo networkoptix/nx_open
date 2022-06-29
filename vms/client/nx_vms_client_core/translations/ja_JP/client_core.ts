@@ -198,5 +198,19 @@
       <source>Too many login attempts. Try again in a minute.</source>
       <translation>ログイン試行回数が多すぎます。しばらくしてからもう一度お試しください。</translation>
     </message>
+    <message>
+      <source>Two-factor authentication is required.</source>
+      <translation>二要素認証が必要です。</translation>
+    </message>
+    <message>
+      <source>You can enable two-factor authentication in your %1.</source>
+      <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>%1 で二要素認証を有効にできます。</translation>
+    </message>
+    <message>
+      <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>このシステムにログインするには、 %2 で「%1 アカウントでログインするたびに認証コードを要求する」を無効にします。</translation>
+    </message>
   </context>
 </TS>

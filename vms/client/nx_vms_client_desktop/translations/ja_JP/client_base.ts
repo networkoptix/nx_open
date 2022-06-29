@@ -53,7 +53,7 @@
     </message>
     <message>
       <source>Expires</source>
-      <translation>期限切れ</translation>
+      <translation>有効期限</translation>
     </message>
   </context>
   <context>
@@ -206,7 +206,7 @@
     </message>
     <message>
       <source>Save Current Layout</source>
-      <translation>レイアウトの保存</translation>
+      <translation>現在のレイアウトを保存</translation>
     </message>
     <message>
       <source>Save Current Layout As...</source>
@@ -517,11 +517,11 @@
     </message>
     <message>
       <source>User Roles...</source>
-      <translation>ユーザーの役割...</translation>
+      <translation>ユーザーロール...</translation>
     </message>
     <message>
       <source>Role Settings...</source>
-      <translation>役割設定...</translation>
+      <translation>ロール設定...</translation>
     </message>
     <message>
       <source>Check Device Issues...</source>
@@ -1013,6 +1013,10 @@
       <source>Web Page Settings...</source>
       <translation>Webページ設定...</translation>
     </message>
+    <message>
+      <source>Account Security...</source>
+      <translation>アカウントのセキュリティ...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1219,7 +1223,7 @@
     </message>
     <message>
       <source>License you are trying to activate is incompatible with your software.</source>
-      <translation>アクティブ化しようとしているライセンスはソフトウェアと互換性がありません</translation>
+      <translation>有効化しようとしているライセンスは、このソフトウェアとの互換性がありません。</translation>
     </message>
     <message>
       <source>To report the issue please contact %1.</source>
@@ -1275,7 +1279,7 @@
     </message>
     <message>
       <source>Network error</source>
-      <translation>ネットワークエラー.</translation>
+      <translation>ネットワークエラー</translation>
     </message>
     <message>
       <source>License activated</source>
@@ -1527,7 +1531,7 @@
     </message>
     <message>
       <source>Preset used by some tours. Delete it anyway?</source>
-      <translation>プリセットはツアーで使用されてます 削除しますか？</translation>
+      <translation>ツアーに使用されているプリセットです。削除しますか?</translation>
     </message>
     <message>
       <source>These tours will become invalid.</source>
@@ -1563,6 +1567,33 @@
     <message>
       <source>PTZ can only be used in the live mode</source>
       <translation>PTZはライブモードでのみ使用できます</translation>
+    </message>
+  </context>
+  <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+      <source>Zoom In</source>
+      <translation>ズームイン</translation>
+    </message>
+    <message>
+      <source>Zoom Out</source>
+      <translation>ズームアウト</translation>
+    </message>
+    <message>
+      <source>Focus Far</source>
+      <translation>フォーカス遠</translation>
+    </message>
+    <message>
+      <source>Focus Near</source>
+      <translation>フォーカス近</translation>
+    </message>
+    <message>
+      <source>Auto Focus</source>
+      <translation>オートフォーカス</translation>
+    </message>
+    <message>
+      <source>Change Dewarping Mode</source>
+      <translation>歪み補正モードを変更</translation>
     </message>
   </context>
   <context>
@@ -1619,6 +1650,19 @@
     <message>
       <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
       <translation>割り当てたレイアウトに含まれる全てのカメラへのアクセス権も付与されます。そのレイアウトに新しく追加されたカメラへのアクセス権も自動的に付与されます。</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnAccessibleMediaWidget</name>
+    <message>
+      <source>Access granted by:</source>
+      <translation>アクセスが許可されました:</translation>
+    </message>
+    <message numerus="yes">
+      <source>and %n more</source>
+      <translation>
+        <numerusform>ほか %n 件</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -2266,7 +2310,7 @@
     </message>
     <message>
       <source>Some rules are not valid and may not work</source>
-      <translation>一部のルールは有効ではないため、動作しない可能性があります</translation>
+      <translation>一部のルールは不完全であり、動作しない可能性があります</translation>
     </message>
   </context>
   <context>
@@ -2702,7 +2746,7 @@ to %1</source>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation>試行回数が多すぎます。しばらくしてからもう一度お試しください</translation>
+      <translation>試行回数が多すぎます。しばらくしてからもう一度お試しください。</translation>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
@@ -2748,7 +2792,7 @@ to %1</source>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation>試行回数が多すぎます。しばらくしてからもう一度お試しください</translation>
+      <translation>試行回数が多すぎます。しばらくしてからもう一度お試しください。</translation>
     </message>
   </context>
   <context>
@@ -2857,8 +2901,12 @@ to %1</source>
       <translation>バージョン %1 互換モードへの切り替えに失敗しました</translation>
     </message>
     <message>
-      <source>Your session has expired</source>
-      <translation>セッションの期限が切れました</translation>
+      <source>System is not compatible with two-factor authentication</source>
+      <translation>システムは二要素認証と互換性がありません</translation>
+    </message>
+    <message>
+      <source>Failed to log in to &quot;%1&quot; system</source>
+      <translation>&quot;%1&quot; システムへのログインに失敗しました</translation>
     </message>
   </context>
   <context>
@@ -3563,7 +3611,7 @@ to %1</source>
     </message>
     <message>
       <source>Expires</source>
-      <translation>期限切れ</translation>
+      <translation>有効期限</translation>
     </message>
     <message>
       <source>License is active</source>
@@ -3571,7 +3619,7 @@ to %1</source>
     </message>
     <message>
       <source>License is expired</source>
-      <translation>ライセンスの期限が切れ</translation>
+      <translation>ライセンスの期限切れ</translation>
     </message>
     <message>
       <source>Expires soon</source>
@@ -3667,16 +3715,16 @@ to %1</source>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
-      <translation>アクティベーションキーファイルを取得するには、提供されたライセンスキーとハードウェアIDを %1に送信してください。</translation>
+      <translation>ライセンスファイルを取得するには、ライセンスキーとハードウェアIDを %1 までご連絡ください。</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
-      <translation>アクティベーションキーファイルを取得するには、提供されたライセンスキーとハードウェアIDを地域/ライセンスサポートに送信してください。</translation>
+      <translation>ライセンスファイルを取得するには、ライセンスキーとハードウェアIDを地域/ライセンスサポートまでご連絡ください。</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation>アクティベーションキーファイルを取得するには、提供されたライセンスキーとハードウェアIDを地域/ライセンスサポート(%1) に送信してください。</translation>
+      <translation>ライセンスファイルを取得するには、ライセンスキーとハードウェアIDを地域/ライセンスサポート (%1) までご連絡ください。</translation>
     </message>
   </context>
   <context>
@@ -3774,11 +3822,11 @@ to %1</source>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>カメラやサーバーのIPアドレスおよびユーザーの役割を表示します。</translation>
+      <translation>カメラやサーバーのIPアドレスおよびユーザーのロールを表示します。</translation>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
-      <translation>ツアー表示中のカメラ1台あたりの表示時間。</translation>
+      <translation>ツアー表示中のレイアウト切り替え間隔。</translation>
     </message>
   </context>
   <context>
@@ -3989,11 +4037,11 @@ to %1</source>
     </message>
     <message>
       <source>This is also required to create/edit PTZ presets and tours.</source>
-      <translation>PTZ プリセットやツアーを作成/編集するために必要です</translation>
+      <translation>PTZ プリセットやツアーを作成/編集する場合にも必要</translation>
     </message>
     <message>
       <source>Control video walls</source>
-      <translation>ビデオウォールコントロール</translation>
+      <translation>ビデオウォールの制御</translation>
     </message>
     <message>
       <source>View event log</source>
@@ -4009,11 +4057,11 @@ to %1</source>
     </message>
     <message>
       <source>View bookmarks</source>
-      <translation>ブックマーク表示</translation>
+      <translation>ブックマークの表示</translation>
     </message>
     <message>
       <source>Modify bookmarks</source>
-      <translation>ブックマークを変更</translation>
+      <translation>ブックマークの変更</translation>
     </message>
     <message>
       <source>User Input</source>
@@ -4302,18 +4350,18 @@ to %1</source>
     <message>
       <source>Role %1 has no %2 permission</source>
       <comment>%1 is the name of selected role, %2 is permission name</comment>
-      <translation>役割%1には%2権限がありません</translation>
+      <translation>ロール %1 には %2 の権限がありません</translation>
     </message>
     <message>
       <source>Selected roles have no %1 permission</source>
       <comment>%1 is permission name</comment>
-      <translation>選択した役割には%1権限がありません</translation>
+      <translation>選択されたロールには %1 権限がありません</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 selected roles have no %2 permission</source>
       <comment>%1 is number of selected roles, %2 is permission name</comment>
       <translation>
-        <numerusform>選択した%1個のうち%n個の役割に%2権限がありません</numerusform>
+        <numerusform>選択した %1 ロールのうち %n つは、 %2 の権限がありません</numerusform>
       </translation>
     </message>
     <message>
@@ -4586,7 +4634,7 @@ to %1</source>
     </message>
     <message>
       <source>User %1 has invalid email address</source>
-      <translation>ユーザー %1 の無効なメール アドレス</translation>
+      <translation>ユーザー %1 のメールアドレスが無効</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 users have invalid email address</source>
@@ -4712,10 +4760,6 @@ to %1</source>
       <source>Failover</source>
       <translation>フェイルオーバー</translation>
     </message>
-    <message>
-      <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation>フェイルオーバーが有効になっているサーバーは、自動的にオフラインサーバーからカメラを引き継ぎます。</translation>
-    </message>
     <message numerus="yes">
       <source>Certificates</source>
       <translation>
@@ -4725,7 +4769,7 @@ to %1</source>
     <message numerus="yes">
       <source>Server utilizes these %n SSL certificates to authenticate its identity</source>
       <translation>
-        <numerusform>サーバーはこれら %n つのSSL 証明書を使用して身元を認証します。</numerusform>
+        <numerusform>サーバーはこちらのSSL 証明書 %n つ を使用して身元を証明します。</numerusform>
       </translation>
     </message>
     <message>
@@ -4735,6 +4779,10 @@ to %1</source>
     <message>
       <source>Details</source>
       <translation>詳細</translation>
+    </message>
+    <message>
+      <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
+      <translation>フェイルオーバーが有効なサーバーは、同じロケーションIDをもつオフラインサーバーからカメラを自動的に引き継ぎます。</translation>
     </message>
   </context>
   <context>
@@ -4790,7 +4838,7 @@ to %1</source>
     </message>
     <message>
       <source>SMTP Server</source>
-      <translation>SMTP サーバ</translation>
+      <translation>SMTPサーバー</translation>
     </message>
     <message>
       <source>Server cannot be empty.</source>
@@ -4845,7 +4893,7 @@ to %1</source>
     </message>
     <message>
       <source>No preset found. Use &quot;Advanced&quot; option.</source>
-      <translation>プリセットが見つかりません &quot;アドバンス&quot;オプションを使用してください</translation>
+      <translation>プリセットが見つかりません。 &quot;アドバンス&quot;オプションを使用してください。</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
@@ -4856,7 +4904,7 @@ to %1</source>
     <name>QnSmtpTestConnectionWidget</name>
     <message>
       <source>Timed Out</source>
-      <translation>タイムアウト</translation>
+      <translation>タイムアウトしました</translation>
     </message>
     <message>
       <source>TLS</source>
@@ -5321,7 +5369,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No licenses</source>
-      <translation>ライセンスなし</translation>
+      <translation>ライセンスがありません</translation>
     </message>
     <message>
       <source>Email server is not set</source>
@@ -5333,11 +5381,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Rebuilding archive index is completed</source>
-      <translation>アーカイブインデックスのリビルド終了</translation>
+      <translation>アーカイブインデックスの再構築が完了しました</translation>
     </message>
     <message>
       <source>Rebuilding archive index is canceled by user</source>
-      <translation>アーカイブインデックスのリビルドがユーザーによってキャンセルされました</translation>
+      <translation>アーカイブインデックスの再構築はユーザーによってキャンセルされました</translation>
     </message>
     <message>
       <source>Email address is not set for user %1</source>
@@ -5345,27 +5393,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Email address is not set.</source>
-      <translation>Emailアドレスが設定されていません</translation>
+      <translation>Emailアドレスが設定されていません。</translation>
     </message>
     <message>
       <source>Email server is not set.</source>
-      <translation>Emailサーバーが設定されていません</translation>
+      <translation>Emailサーバーが設定されていません。</translation>
     </message>
     <message>
       <source>You have no licenses.</source>
-      <translation>ライセンスがありません</translation>
+      <translation>ライセンスがありません。</translation>
     </message>
     <message>
       <source>You cannot record video from cameras.</source>
-      <translation>カメラ映像を記録できません</translation>
+      <translation>カメラ映像を録画できません。</translation>
     </message>
     <message>
       <source>Rebuilding archive index is completed on the following Server:</source>
-      <translation>アーカイブインデックスのリビルド終了　サーバー:</translation>
+      <translation>アーカイブインデックスの再構築が次のサーバーで完了しました:</translation>
     </message>
     <message>
       <source>Rebuilding archive index is canceled by user on the following Server:</source>
-      <translation>アーカイブインデックスのリビルドキャンセル　サーバー:</translation>
+      <translation>アーカイブインデックスの再構築は次のサーバーでキャンセルされました:</translation>
     </message>
     <message>
       <source>Learn more</source>
@@ -5381,15 +5429,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You cannot receive System notifications by email.</source>
-      <translation>システム通知メールを受信できません</translation>
+      <translation>システム通知をメールで受信できません。</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses.</source>
-      <translation>一部のユーザーにメール アドレスが設定されていません</translation>
+      <translation>一部のユーザーにメールアドレスが設定されていません。</translation>
     </message>
     <message>
       <source>They cannot receive System notifications by email.</source>
-      <translation>システム通知メールを受信できません</translation>
+      <translation>システム通知をメールで受信できません。</translation>
     </message>
     <message>
       <source>Error while sending email</source>
@@ -5435,7 +5483,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation>一部のカメラにパスワードの設定が必要です</translation>
+      <translation>一部カメラにパスワード設定が必要です</translation>
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
@@ -5451,7 +5499,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Error occurred during remote archive synchronization</source>
-      <translation>リモートアーカイブの同期中にエラーが発生しました</translation>
+      <translation>カメラストレージとの同期中にエラーが発生しました</translation>
     </message>
     <message>
       <source>Backup storage is not configured</source>
@@ -5570,7 +5618,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Role</source>
-      <translation>役割</translation>
+      <translation>ロール</translation>
     </message>
     <message>
       <source>%1 user</source>
@@ -5648,7 +5696,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Role</source>
-      <translation>役割</translation>
+      <translation>ロール</translation>
     </message>
     <message>
       <source>Email</source>
@@ -5663,18 +5711,18 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnUserRoleSettingsWidget</name>
     <message>
       <source>Role name cannot be empty.</source>
-      <translation>役割名称は空白にできません</translation>
+      <translation>ロール名は空欄にできません。</translation>
     </message>
     <message>
       <source>Role with same name already exists.</source>
-      <translation>同じ名前の役割が既に存在します</translation>
+      <translation>同じ名前のロールが既に存在します。</translation>
     </message>
   </context>
   <context>
     <name>QnUserRoleSettingsWidgetPrivate</name>
     <message>
       <source>No users have this role</source>
-      <translation>この役割が割り当てられたユーザーはいません</translation>
+      <translation>このロールに割り当てられたユーザーはいません</translation>
     </message>
     <message>
       <source>Custom with no permissions</source>
@@ -5686,11 +5734,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Assign a new role</source>
-      <translation>新しい役割を割り当てる</translation>
+      <translation>新しいロールを割り当てる</translation>
     </message>
     <message>
       <source>Delete such users</source>
-      <translation>このようなユーザーを削除します</translation>
+      <translation>該当ユーザーを削除する</translation>
     </message>
     <message numerus="yes">
       <source>Please select an action to perform on %n users with this role</source>
@@ -5703,7 +5751,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnUserRolesDialog</name>
     <message>
       <source>Role Info</source>
-      <translation>役割情報</translation>
+      <translation>ロール情報</translation>
     </message>
     <message>
       <source>Permissions</source>
@@ -5719,11 +5767,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>New Role</source>
-      <translation>新しい役割</translation>
+      <translation>新しいロール</translation>
     </message>
     <message>
       <source>New Role %1</source>
-      <translation>新しい役割 %1</translation>
+      <translation>新しいロール %1</translation>
     </message>
   </context>
   <context>
@@ -6385,17 +6433,17 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>All users with this role will get access to %n resources:</source>
       <translation>
-        <numerusform>この役割を持つすべてのユーザーは、%n リソースへアクセスできます:</numerusform>
+        <numerusform>このロールを持つすべてのユーザーは、%n リソースへアクセスできます:</numerusform>
       </translation>
     </message>
     <message>
       <source>To remove access, please go to Role Settings.</source>
-      <translation>アクセスを削除するには、ユーザーの役割をご覧ください</translation>
+      <translation>アクセス権を削除するには、ロール設定に移動してください。</translation>
     </message>
     <message numerus="yes">
       <source>All users with this role will still have access to %n removed resources:</source>
       <translation>
-        <numerusform>この役割を持つすべてのユーザーは削除された %n リソースへアクセスできます</numerusform>
+        <numerusform>このロールを持つすべてのユーザーは、削除された %n リソースへアクセスできます:</numerusform>
       </translation>
     </message>
     <message>
@@ -6415,7 +6463,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>All users with this role will lose access to %n resources:</source>
       <translation>
-        <numerusform>この役割を持つすべてのユーザーは、%n リソースへアクセスできなくなります:</numerusform>
+        <numerusform>このロールを持つすべてのユーザーは、%n リソースへアクセスできなくなります:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7140,7 +7188,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>To enable backup add more drives to use them as backup storage in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation>バックアップを有効にするには、%1 にドライブを追加してバックアップ用に設定してください</translation>
+      <translation>バックアップを有効にするには、%1 でドライブを追加してバックアップ用に設定してください</translation>
     </message>
   </context>
   <context>
@@ -7428,6 +7476,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Select Camera</source>
       <translation>カメラ選択</translation>
+    </message>
+    <message>
+      <source>No cameras available</source>
+      <translation>利用可能なカメラはありません</translation>
     </message>
   </context>
   <context>
@@ -8260,10 +8312,6 @@ We recommend you not to open this web page. If you understand the risks, you can
   <context>
     <name>nx::vms::client::desktop::FailoverPriorityDialogItemDelegate</name>
     <message>
-      <source>No failover</source>
-      <translation>フェイルオーバーなし</translation>
-    </message>
-    <message>
       <source>Low</source>
       <translation>低</translation>
     </message>
@@ -8274,6 +8322,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>High</source>
       <translation>高</translation>
+    </message>
+    <message>
+      <source>No Failover</source>
+      <translation>フェイルオーバーなし</translation>
     </message>
   </context>
   <context>
@@ -8643,7 +8695,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</source>
-      <translation>選択されたシステムには、現在のシステムと互換性のない古いソフトウェアバージョンが含まれています。 選択したシステムを最新のビルドに更新してから、現在のシステムと統合してください。</translation>
+      <translation>ご指定のシステムは、現在のシステムと互換性のない古いソフトウェアバージョンです。対象システムを最新のビルドに更新してから、現在のシステムと統合してください。</translation>
     </message>
     <message>
       <source>The password or user name is invalid.</source>
@@ -9049,6 +9101,10 @@ You can force it, but it may significantly increase CPU load.</source>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
       <translation>現在、カスタムクライアントを使用しています。更新手順については、 %1 にお問い合わせください。</translation>
     </message>
+    <message>
+      <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
+      <translation>クライアントアップデートをダウンロードするのに十分な空き容量がありません。ハードドライブの空き容量を確保して、もう一度お試しください。</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -9114,7 +9170,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
-      <translation>選択されたユーザー役割にユーザーが含まれていません。アクションは動作しません。</translation>
+      <translation>選択されたユーザーロールにユーザーが含まれていません。アクションは動作しません。</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
@@ -9738,17 +9794,17 @@ You can still change quality and FPS directly on the camera.</source>
     </message>
     <message>
       <source>Archive encryption password</source>
-      <translation>暗号化パスワードをアーカイブする</translation>
+      <translation>アーカイブ暗号化パスワード</translation>
     </message>
     <message>
       <source>The encryption password will be required to restore the archive on another system.
 Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</source>
-      <translation>アーカイブを別のシステムに復元するには暗号化パスワードが必要です。
-注意：このパスワードはリセットできません。紛失した場合、アーカイブは復元できなくなります。</translation>
+      <translation>アーカイブを別のシステムで復元するには暗号化パスワードが必要です。
+注意: このパスワードはリセットできません。紛失した場合、アーカイブは復元できなくなります。</translation>
     </message>
     <message>
       <source>Encrypts archive data to prevent it from being viewed outside of the system. You will not be required to enter the encryption password to view the video archive within this system.</source>
-      <translation>アーカイブデータを暗号化して、システムの外部で表示されないようにします。このシステム内でビデオアーカイブを表示するために暗号化パスワードを入力する必要はありません。</translation>
+      <translation>アーカイブデータを暗号化して、システムの外部で閲覧されないようにします。このシステム内でビデオアーカイブを表示する場合、暗号化パスワードを入力する必要はありません。</translation>
     </message>
     <message>
       <source>Failed to set archive encryption password</source>
@@ -9756,7 +9812,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Does not affect the connections established by server.</source>
-      <translation>サーバーによって確立された接続には影響しません。</translation>
+      <translation>サーバーからの接続には影響しません。</translation>
     </message>
     <message>
       <source>Enables RTSP traffic encryption.</source>
@@ -9886,24 +9942,24 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation>このサーバーを信用しますか？</translation>
     </message>
     <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
-      <translation>証明書の詳細を確認して、正しいサーバーに接続していることを確認してください。</translation>
-    </message>
-    <message>
       <source>Cannot verify the identity of %1</source>
       <translation>%1 の識別情報を確認できません</translation>
     </message>
     <message>
-      <source>Someone may be impersonating %1 to steal your personal information.</source>
-      <translation>誰かがあなたの個人情報を盗むために %1 になりすましている可能性があります。</translation>
+      <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
+      <translation>このサーバーに接続しようとしましたが、自動的に検証できない証明書が表示されました。</translation>
     </message>
     <message>
-      <source>Do not connect to this server unless instructed by your VMS administrator.</source>
+      <source>Someone may be impersonating this Server to steal your personal information.</source>
+      <translation>誰かがあなたの個人情報を盗むためにこのサーバーになりすましている可能性があります。</translation>
+    </message>
+    <message>
+      <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
       <translation>VMS管理者の指示がない限り、このサーバーに接続しないでください。</translation>
     </message>
     <message>
-      <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
-      <translation>%1 に接続しようとしましたが、自動的に検証できない証明書がサーバーによって提示されました。</translation>
+      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
+      <translation>証明書の詳細を確認して、正しいサーバーに接続していることを確認してください。</translation>
     </message>
   </context>
   <context>
@@ -10775,7 +10831,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
       <source>Drag layout or camera here to add it to the showreel</source>
-      <translation>レイアウトやカメラをドラッグしてシーケンス表示に追加する</translation>
+      <translation>レイアウトまたはカメラをここにドラッグしてシーケンスに追加</translation>
     </message>
   </context>
   <context>
@@ -11164,7 +11220,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <name>nx::vms::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
       <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
-      <translation>キーボードの矢印キーでレイアウトの切替え　シーケンス表示を終了するには、Escキーを押します</translation>
+      <translation>キーボードの矢印キーでレイアウト切替、Escキーでシーケンス表示を終了</translation>
     </message>
     <message>
       <source>Press Esc to stop the tour.</source>

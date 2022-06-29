@@ -592,7 +592,7 @@
     </message>
     <message>
       <source>Use Media2 to fetch profiles</source>
-      <translation type="unfinished">Use Media2 to fetch profiles</translation>
+      <translation>Использовать Media2 для получения профилей</translation>
     </message>
     <message>
       <source>Use different values for pan and tilt</source>
@@ -1130,10 +1130,6 @@
       <translation type="unfinished">Set priority:</translation>
     </message>
     <message>
-      <source>No failover</source>
-      <translation type="unfinished">No failover</translation>
-    </message>
-    <message>
       <source>Low</source>
       <translation>Низкая</translation>
     </message>
@@ -1148,6 +1144,10 @@
     <message>
       <source>Select some devices to setup failover priority</source>
       <translation type="unfinished">Select some devices to setup failover priority</translation>
+    </message>
+    <message>
+      <source>No Failover</source>
+      <translation type="unfinished">No Failover</translation>
     </message>
   </context>
   <context>
@@ -2402,7 +2402,7 @@
     </message>
     <message>
       <source>Use only HTTPS to connect to cameras</source>
-      <translation type="unfinished">Use only HTTPS to connect to cameras</translation>
+      <translation>Использовать только HTTPS для подключения к камерам</translation>
     </message>
     <message>
       <source>User Activity</source>
@@ -2430,15 +2430,15 @@
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation type="unfinished">Connection with cameras that do not support HTTPS will be lost.</translation>
+      <translation>Соединение с камерами, не поддерживающими HTTPS, будет потеряно.</translation>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
-      <translation type="unfinished">Force servers to accept only encrypted connections</translation>
+      <translation>Принудительно принимать только зашифрованные соединения</translation>
     </message>
     <message>
       <source>Encrypt video traffic to desktop and mobile clients</source>
-      <translation type="unfinished">Encrypt video traffic to desktop and mobile clients</translation>
+      <translation>Шифровать видеотрафик для настольных и мобильных клиентов</translation>
     </message>
     <message>
       <source>Manage Users</source>

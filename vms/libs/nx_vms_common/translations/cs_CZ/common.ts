@@ -359,18 +359,6 @@
       <translation>Kamera byla obnovena z archivu. Odstraňte kameru a znovu ji přidejte, abyste mohli sledovat živé video.</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation>Nejprve se pokuste zapnout záznam (pokud je vypnutý) a snížit fps v nastavení zařízení (chyba &quot;%1&quot;).</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation>Nejdříve zkuste zapnout záznam (pokud je vypnut) a snížit fps v nastavení kamery (chyba &quot;%1&quot;).</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation>Nejdříve zkuste zapnout záznam (pokud je vypnut) a snížit fps v nastavení I/O modulu (chyba &quot;%1&quot;).</translation>
-    </message>
-    <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
       <translation>Prosím aktualizujte firmware. Minimální podporovaná verze je %1. Aktuální verze je %2</translation>
     </message>
@@ -385,6 +373,18 @@
     <message>
       <source>Internal server error. %1</source>
       <translation>Interní chyba serveru. %1</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
+      <translation type="unfinished">If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
+      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
+      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>

@@ -1015,6 +1015,10 @@
       <source>Web Page Settings...</source>
       <translation>Webseiten-Einstellungen...</translation>
     </message>
+    <message>
+      <source>Account Security...</source>
+      <translation>Konto Sicherheit...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1582,6 +1586,33 @@
     </message>
   </context>
   <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+      <source>Zoom In</source>
+      <translation>Heranzoomen</translation>
+    </message>
+    <message>
+      <source>Zoom Out</source>
+      <translation>Herauszoomen</translation>
+    </message>
+    <message>
+      <source>Focus Far</source>
+      <translation>Fokus fern</translation>
+    </message>
+    <message>
+      <source>Focus Near</source>
+      <translation>Fokus nah</translation>
+    </message>
+    <message>
+      <source>Auto Focus</source>
+      <translation>Autofokus</translation>
+    </message>
+    <message>
+      <source>Change Dewarping Mode</source>
+      <translation>Ändern des Dewarping-Modus</translation>
+    </message>
+  </context>
+  <context>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
@@ -1635,6 +1666,20 @@
     <message>
       <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
       <translation>Wenn Sie mehreren Layouts Zugänge vergeben, vergeben Sie damit Zugriff auf alle Kameras auf diesen Layouts. Ebenso erhalten die Benutzer Zugriff auf alle neuen Kamera in diesen Layouts.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnAccessibleMediaWidget</name>
+    <message>
+      <source>Access granted by:</source>
+      <translation>Zugang gewährt:</translation>
+    </message>
+    <message numerus="yes">
+      <source>and %n more</source>
+      <translation>
+        <numerusform>und %n mehr</numerusform>
+        <numerusform>und %n mehr</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -2894,8 +2939,12 @@ to %1</source>
       <translation>Der Kompatibilitätsmodus für die Version %1 konnte nicht aufgerufen werden</translation>
     </message>
     <message>
-      <source>Your session has expired</source>
-      <translation>Ihre Sitzung ist abgelaufen</translation>
+      <source>System is not compatible with two-factor authentication</source>
+      <translation>Das System ist nicht mit der Zwei-Faktor-Authentifizierung kompatibel</translation>
+    </message>
+    <message>
+      <source>Failed to log in to &quot;%1&quot; system</source>
+      <translation>Anmeldung bei System &quot;%1&quot; fehlgeschlagen</translation>
     </message>
   </context>
   <context>
@@ -4777,10 +4826,6 @@ to %1</source>
       <source>Failover</source>
       <translation>Failover</translation>
     </message>
-    <message>
-      <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation>Server mit aktiviertem Failover übernehmen automatisch Kameras von Offline-Servern.</translation>
-    </message>
     <message numerus="yes">
       <source>Certificates</source>
       <translation>
@@ -4802,6 +4847,10 @@ to %1</source>
     <message>
       <source>Details</source>
       <translation>Details</translation>
+    </message>
+    <message>
+      <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
+      <translation>Server mit aktiviertem Failover übernehmen automatisch Kameras von Offline-Servern mit der gleichen Standort-ID.</translation>
     </message>
   </context>
   <context>
@@ -7547,6 +7596,10 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
       <source>Select Camera</source>
       <translation>Kamera auswählen</translation>
     </message>
+    <message>
+      <source>No cameras available</source>
+      <translation>Keine Kameras verfügbar</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSettingsDialog</name>
@@ -8392,10 +8445,6 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
   <context>
     <name>nx::vms::client::desktop::FailoverPriorityDialogItemDelegate</name>
     <message>
-      <source>No failover</source>
-      <translation>Kein Failover</translation>
-    </message>
-    <message>
       <source>Low</source>
       <translation>Niedrig</translation>
     </message>
@@ -8406,6 +8455,10 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     <message>
       <source>High</source>
       <translation>Hoch</translation>
+    </message>
+    <message>
+      <source>No Failover</source>
+      <translation>Kein Failover</translation>
     </message>
   </context>
   <context>
@@ -9184,6 +9237,10 @@ Sie können es erzwingen, aber es kann die CPU-Last erheblich erhöhen.</transla
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
       <translation>Sie verwenden einen benutzerdefinierten Client. Bitte kontaktieren Sie %1, um die Updateanweisungen zu erhalten.</translation>
+    </message>
+    <message>
+      <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
+      <translation>Auf Ihrem Computer ist nicht genügend Speicherplatz vorhanden, um das Client-Update herunterzuladen. Bitte geben Sie etwas Speicherplatz auf Ihrer Festplatte frei und versuchen Sie es erneut.</translation>
     </message>
   </context>
   <context>
@@ -10032,24 +10089,24 @@ Pinnen Sie dieses Zertifikat nicht an, wenn Sie das SSL-Zertifikat des %2-Server
       <translation>Diesem Server vertrauen?</translation>
     </message>
     <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
-      <translation>Überprüfen Sie die Details des Zertifikats, um sicherzustellen, dass Sie sich mit dem richtigen Server verbinden.</translation>
-    </message>
-    <message>
       <source>Cannot verify the identity of %1</source>
       <translation>Kann die Identität von %1 nicht verifizieren</translation>
     </message>
     <message>
-      <source>Someone may be impersonating %1 to steal your personal information.</source>
-      <translation>Jemand könnte sich als %1 ausgeben, um Ihre persönlichen Daten zu stehlen.</translation>
+      <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
+      <translation>Sie haben versucht, eine Verbindung zu diesem Server herzustellen, aber er hat ein Zertifikat vorgelegt, das nicht automatisch überprüft werden kann.</translation>
     </message>
     <message>
-      <source>Do not connect to this server unless instructed by your VMS administrator.</source>
-      <translation>Stellen Sie keine Verbindung zu diesem Server her, es sei denn, Sie werden von Ihrem VMS-Administrator dazu aufgefordert.</translation>
+      <source>Someone may be impersonating this Server to steal your personal information.</source>
+      <translation>Jemand könnte sich als dieser Server ausgeben, um Ihre persönlichen Daten zu stehlen.</translation>
     </message>
     <message>
-      <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
-      <translation>Sie haben versucht, eine Verbindung zu: %1 aufzubauen, aber der Server hat ein Zertifikat vorgelegt, das nicht automatisch überprüft werden kann.</translation>
+      <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
+      <translation>Stellen Sie nur dann eine Verbindung zu diesem Server her, wenn Sie von Ihrem VMS-Administrator dazu aufgefordert werden.</translation>
+    </message>
+    <message>
+      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
+      <translation>Überprüfen Sie die Zertifikatsdetails, um sicherzustellen, dass Sie sich mit dem richtigen Server verbinden.</translation>
     </message>
   </context>
   <context>

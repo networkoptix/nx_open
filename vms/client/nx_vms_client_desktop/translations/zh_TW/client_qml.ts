@@ -5,7 +5,7 @@
     <name>AdvancedUpdateSettings</name>
     <message>
       <source>Advanced Update Settings</source>
-      <translation>進階更新設定</translation>
+      <translation>更新進階設定</translation>
     </message>
     <message>
       <source>Notifications</source>
@@ -13,15 +13,15 @@
     </message>
     <message>
       <source>Notify about available updates</source>
-      <translation>通知可用更新</translation>
+      <translation>當有可用更新時請通知我</translation>
     </message>
     <message>
       <source>Automatic client updates</source>
-      <translation>自動客戶端更新</translation>
+      <translation>客戶端自動更新</translation>
     </message>
     <message>
       <source>Turn this option on to make connected clients update automatically to the latest compatible version.</source>
-      <translation>開啟此選項可使連接的客戶端自動更新至最新的相容版本。</translation>
+      <translation>啟用此選項將允許連接的客戶端自動更新至最新的相容版本。</translation>
     </message>
     <message>
       <source>Connecting clients will be automatically updated to the new version when it’s available.</source>
@@ -29,11 +29,11 @@
     </message>
     <message>
       <source>All connecting clients are updating to version %1.</source>
-      <translation>所有連接的客戶端都將更新至%1版本。</translation>
+      <translation>所有連接的客戶端都將更新至版本%1。</translation>
     </message>
     <message>
       <source>Connecting clients will be updated to version %1 on %2.</source>
-      <translation>連接的客戶端已更新至 %2 的版本 %1。</translation>
+      <translation>已連接的客戶端將會於 %2 時更新至版本 %1。</translation>
     </message>
     <message>
       <source>Check for updates</source>
@@ -41,11 +41,11 @@
     </message>
     <message>
       <source>Speed up this update</source>
-      <translation>加速更新</translation>
+      <translation>提前更新時間</translation>
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
-      <translation>您正在使用自訂模式客戶端。欲了解更新說明請聯繫 %1 。</translation>
+      <translation>您正在使用非正式發布版本的客戶端，請聯繫 %1 以取得更新說明與協助。</translation>
     </message>
   </context>
   <context>
@@ -70,64 +70,64 @@
     <name>AnalyticsPanel</name>
     <message>
       <source>Select area</source>
-      <translation>選取範圍</translation>
+      <translation>選擇區域</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation>選擇影片上的某區域。</translation>
+      <translation>在影像上框選欲搜尋的區域</translation>
     </message>
     <message>
       <source>In selected area</source>
-      <translation>在選定區域</translation>
+      <translation>所選擇的區域</translation>
     </message>
     <message>
       <source>No objects</source>
-      <translation>無物件</translation>
+      <translation>沒有任何物件</translation>
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation>嘗試在攝影機套件設定中更改篩選器或物件偵測參數</translation>
+      <translation>可嘗試更改篩選條件，或在攝影機擴充套件中設定物件偵測功能</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
+      <translation>
+        <numerusform>%n 筆新結果</numerusform>
       </translation>
     </message>
     <message>
       <source>new results</source>
-      <translation type="unfinished">new results</translation>
+      <translation>新結果</translation>
     </message>
     <message>
       <source>Detected by</source>
-      <translation type="unfinished">Detected by</translation>
+      <translation>偵測結果來源</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsSearchDialog</name>
     <message>
       <source>Advanced Object Search</source>
-      <translation type="unfinished">Advanced Object Search</translation>
+      <translation>進階物件搜尋</translation>
     </message>
     <message>
       <source>Select area</source>
-      <translation>選取範圍</translation>
+      <translation>選擇區域</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation>選擇影片上的某區域。</translation>
+      <translation>在影像上框選欲搜尋的區域</translation>
     </message>
     <message>
       <source>In selected area</source>
-      <translation>在選定區域</translation>
+      <translation>所選擇的區域</translation>
     </message>
     <message>
       <source>No objects</source>
-      <translation>無物件</translation>
+      <translation>沒有任何物件</translation>
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation>嘗試在攝影機套件設定中更改篩選器或物件偵測參數</translation>
+      <translation>可嘗試更改篩選條件，或在攝影機擴充套件中設定物件偵測功能</translation>
     </message>
     <message>
       <source>Any plugin</source>
@@ -135,13 +135,13 @@
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
+      <translation>
+        <numerusform>%n 筆新結果</numerusform>
       </translation>
     </message>
     <message>
       <source>new results</source>
-      <translation type="unfinished">new results</translation>
+      <translation>新結果</translation>
     </message>
   </context>
   <context>
@@ -173,7 +173,7 @@
     <name>ButtonSettingsDelegate</name>
     <message>
       <source>Hotkey %1</source>
-      <translation type="unfinished">Hotkey %1</translation>
+      <translation>快捷鍵 %1</translation>
     </message>
   </context>
   <context>
@@ -196,19 +196,19 @@
     </message>
     <message>
       <source>Selected device</source>
-      <translation>選取設備</translation>
+      <translation>所選擇的設備</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation>選取攝影機</translation>
+      <translation>所選擇的攝影機</translation>
     </message>
     <message>
       <source>Choose devices...</source>
-      <translation>選擇設備...</translation>
+      <translation>選取設備...</translation>
     </message>
     <message>
       <source>Choose cameras...</source>
-      <translation>選擇攝影機...</translation>
+      <translation>選取攝影機...</translation>
     </message>
     <message>
       <source>none</source>
@@ -216,23 +216,23 @@
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
+      <translation>
+        <numerusform>%n 已選取的設備</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
+      <translation>
+        <numerusform>%n 已選取的攝影機</numerusform>
       </translation>
     </message>
     <message>
       <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
+      <translation>已選取的設備</translation>
     </message>
     <message>
       <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
+      <translation>已選取的攝影機</translation>
     </message>
   </context>
   <context>
@@ -243,22 +243,22 @@
     </message>
     <message>
       <source>Unreachable</source>
-      <translation type="unfinished">Unreachable</translation>
+      <translation>無法連接</translation>
     </message>
     <message>
       <source>Incompatible</source>
-      <translation type="unfinished">Incompatible</translation>
+      <translation>不相容</translation>
     </message>
     <message>
       <source>Pending</source>
-      <translation type="unfinished">Pending</translation>
+      <translation>等待中</translation>
     </message>
   </context>
   <context>
     <name>CloudTile</name>
     <message>
       <source>Log in to </source>
-      <translation type="unfinished">Log in to </translation>
+      <translation>登入 </translation>
     </message>
   </context>
   <context>
@@ -279,26 +279,26 @@
     <name>ContextHintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>點選圖示以查看更多</translation>
     </message>
   </context>
   <context>
     <name>CounterBlock</name>
     <message>
       <source>Remove column</source>
-      <translation type="unfinished">Remove column</translation>
+      <translation>移除欄位</translation>
     </message>
     <message>
       <source>Add column</source>
-      <translation type="unfinished">Add column</translation>
+      <translation>新增欄位</translation>
     </message>
     <message>
       <source>Hide information</source>
-      <translation>隱藏訊息</translation>
+      <translation>隱藏資訊</translation>
     </message>
     <message>
       <source>Show information</source>
-      <translation>顯示訊息</translation>
+      <translation>顯示資訊</translation>
     </message>
     <message>
       <source>Hide thumbnails</source>
@@ -325,7 +325,7 @@
     </message>
     <message>
       <source>360° Equirectangular</source>
-      <translation type="unfinished">360° Equirectangular</translation>
+      <translation>360° 等量投影(Equirectangular)</translation>
     </message>
   </context>
   <context>
@@ -336,15 +336,15 @@
     </message>
     <message>
       <source>See %1 for other events</source>
-      <translation type="unfinished">See %1 for other events</translation>
+      <translation>其他事件請參考 %1</translation>
     </message>
     <message>
       <source>No events</source>
-      <translation>沒有事件</translation>
+      <translation>沒有任何事件</translation>
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+      <translation>請嘗試更改過濾條件或者新增事件規則</translation>
     </message>
     <message>
       <source>Event Log</source>
@@ -392,19 +392,19 @@
     <name>FisheyeDewarpingSettings</name>
     <message>
       <source>Image is not round</source>
-      <translation>圖像不是圓的</translation>
+      <translation>影像並非球形</translation>
     </message>
     <message>
       <source>Image might be too dim</source>
-      <translation>圖像可能太暗</translation>
+      <translation>影像亮度不足</translation>
     </message>
     <message>
       <source>Invalid input image</source>
-      <translation>圖片有誤。</translation>
+      <translation>無效的輸入影像</translation>
     </message>
     <message>
       <source>Show grid</source>
-      <translation>顯示網格</translation>
+      <translation>顯示格線</translation>
     </message>
     <message>
       <source>Auto Calibration</source>
@@ -412,7 +412,7 @@
     </message>
     <message>
       <source>Mount</source>
-      <translation>安裝</translation>
+      <translation>安裝位置</translation>
     </message>
     <message>
       <source>Ceiling</source>
@@ -424,15 +424,15 @@
     </message>
     <message>
       <source>Floor/table</source>
-      <translation type="unfinished">Floor/table</translation>
+      <translation>地板或桌面</translation>
     </message>
     <message>
       <source>Angle</source>
-      <translation>視角</translation>
+      <translation>角度</translation>
     </message>
     <message>
       <source>Camera roll correction</source>
-      <translation type="unfinished">Camera roll correction</translation>
+      <translation>攝影機滾動校正</translation>
     </message>
     <message>
       <source>Lens projection</source>
@@ -452,7 +452,7 @@
     </message>
     <message>
       <source>Size</source>
-      <translation>大小</translation>
+      <translation>校正範圍</translation>
     </message>
     <message>
       <source>X Offset</source>
@@ -472,14 +472,14 @@
     <message>
       <source>Hold %1 to activate actions</source>
       <comment>Leave %1 as is. It will be replaced to button name.</comment>
-      <translation type="unfinished">Hold %1 to activate actions</translation>
+      <translation>按住 %1 以觸發動作</translation>
     </message>
   </context>
   <context>
     <name>InformationBubble</name>
     <message>
       <source>Detected by</source>
-      <translation type="unfinished">Detected by</translation>
+      <translation>偵測結果來源</translation>
     </message>
   </context>
   <context>
@@ -513,11 +513,11 @@
     <name>IntervalPreviewControls</name>
     <message>
       <source>Toggle Mute</source>
-      <translation>靜音模式切換</translation>
+      <translation>切換靜音模式</translation>
     </message>
     <message>
       <source>Previous Object</source>
-      <translation type="unfinished">Previous Object</translation>
+      <translation>前一個物件</translation>
     </message>
     <message>
       <source>Pause</source>
@@ -529,57 +529,57 @@
     </message>
     <message>
       <source>Next Object</source>
-      <translation type="unfinished">Next Object</translation>
+      <translation>下一個物件</translation>
     </message>
     <message>
       <source>Toggle Repeat</source>
-      <translation type="unfinished">Toggle Repeat</translation>
+      <translation>循環播放</translation>
     </message>
   </context>
   <context>
     <name>JoystickSettingsDialog</name>
     <message>
       <source>Joystick Settings</source>
-      <translation type="unfinished">Joystick Settings</translation>
+      <translation>搖桿設定</translation>
     </message>
     <message>
       <source>joystick</source>
-      <translation type="unfinished">joystick</translation>
+      <translation>搖桿</translation>
     </message>
     <message>
       <source>Basic Actions</source>
-      <translation type="unfinished">Basic Actions</translation>
+      <translation>基本動作</translation>
     </message>
     <message>
       <source>With Modifier</source>
-      <translation type="unfinished">With Modifier</translation>
+      <translation>使用組合鍵</translation>
     </message>
     <message>
       <source>This model is not supported</source>
-      <translation type="unfinished">This model is not supported</translation>
+      <translation>尚未支援此設備型號</translation>
     </message>
     <message>
       <source>Reset to Default</source>
-      <translation type="unfinished">Reset to Default</translation>
+      <translation>還原為出廠預設值</translation>
     </message>
   </context>
   <context>
     <name>JoystickSettingsTab</name>
     <message>
       <source>Pan and Tilt</source>
-      <translation type="unfinished">Pan and Tilt</translation>
+      <translation>水平與垂直位移</translation>
     </message>
     <message>
       <source>Zoom In / Zoom Out</source>
-      <translation type="unfinished">Zoom In / Zoom Out</translation>
+      <translation>放大／縮小</translation>
     </message>
     <message>
       <source>Select Camera on Layout</source>
-      <translation type="unfinished">Select Camera on Layout</translation>
+      <translation>在佈局上選取攝影機</translation>
     </message>
     <message>
       <source>Log in to the system to configure how to open layouts</source>
-      <translation type="unfinished">Log in to the system to configure how to open layouts</translation>
+      <translation>登入系統來設定打開佈局的方式</translation>
     </message>
   </context>
   <context>
@@ -625,7 +625,7 @@
     </message>
     <message>
       <source>Select a camera to see its motion events</source>
-      <translation type="unfinished">Select a camera to see its motion events</translation>
+      <translation>選擇一個攝影機以查看位移事件</translation>
     </message>
     <message>
       <source>No motion detected</source>
@@ -633,11 +633,11 @@
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>可嘗試更改篩選條件或啟用位移偵測錄影模式</translation>
     </message>
     <message>
       <source>Select Camera...</source>
-      <translation type="unfinished">Select Camera...</translation>
+      <translation>選取攝影機...</translation>
     </message>
     <message>
       <source>No bookmarks</source>
@@ -645,7 +645,7 @@
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+      <translation>在時間軸上選取一段區間並點擊右鍵來建立書籤</translation>
     </message>
   </context>
   <context>
@@ -679,22 +679,22 @@
     <name>MotionAreaSelector</name>
     <message>
       <source>In selected area</source>
-      <translation>在選定區域</translation>
+      <translation>在所選擇的區域</translation>
     </message>
     <message>
       <source>Select an area on the video to filter results</source>
-      <translation type="unfinished">Select an area on the video to filter results</translation>
+      <translation>在影像上框選區域來篩選結果</translation>
     </message>
   </context>
   <context>
     <name>ObjectEditor</name>
     <message>
       <source>Present</source>
-      <translation type="unfinished">Present</translation>
+      <translation>存在</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation type="unfinished">Absent</translation>
+      <translation>不存在</translation>
     </message>
   </context>
   <context>
@@ -712,7 +712,7 @@
     </message>
     <message>
       <source>URL or Host:Port</source>
-      <translation type="unfinished">URL or Host:Port</translation>
+      <translation>URL位址或主機:埠號</translation>
     </message>
     <message>
       <source>Login</source>
@@ -783,19 +783,19 @@
     <name>PreviewPanel</name>
     <message>
       <source>No Preview</source>
-      <translation type="unfinished">No Preview</translation>
+      <translation>無預覽影像</translation>
     </message>
     <message>
       <source>Select the object to display the preview</source>
-      <translation type="unfinished">Select the object to display the preview</translation>
+      <translation>選擇欲顯示預覽畫面的物件</translation>
     </message>
     <message>
       <source>Show on Layout</source>
       <translation>在佈局上顯示</translation>
     </message>
     <message>
-      <source>preview is not available for the selected object</source>
-      <translation type="unfinished">preview is not available for the selected object</translation>
+      <source>Preview is not available for the selected object</source>
+      <translation>無法在所選的物件上取得預覽畫面</translation>
     </message>
   </context>
   <context>
@@ -850,7 +850,7 @@ to activate PTZ</source>
     <name>RangeEditor</name>
     <message>
       <source>from</source>
-      <translation type="unfinished">from</translation>
+      <translation>從</translation>
     </message>
     <message>
       <source>to</source>
@@ -865,7 +865,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Subtype</source>
-      <translation type="unfinished">Subtype</translation>
+      <translation>子類型</translation>
     </message>
   </context>
   <context>
@@ -887,11 +887,11 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
-      <translation type="unfinished">Drag video files or images to the client window, or add local media folder through the Local Settings dialog</translation>
+      <translation>將串流檔案、圖像拖曳至客戶端視窗，或透過“本機設定”選項來加入本機媒體資料夾</translation>
     </message>
     <message>
       <source>Try searching for something else</source>
-      <translation type="unfinished">Try searching for something else</translation>
+      <translation>請嘗試搜尋其他內容</translation>
     </message>
   </context>
   <context>
@@ -911,7 +911,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>OUTDATED</source>
-      <translation type="unfinished">OUTDATED</translation>
+      <translation>已逾時</translation>
     </message>
   </context>
   <context>
@@ -922,7 +922,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>All Types</source>
-      <translation type="unfinished">All Types</translation>
+      <translation>所有類型</translation>
     </message>
     <message>
       <source>Servers</source>
@@ -946,7 +946,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Web Pages</source>
-      <translation>Web 頁面</translation>
+      <translation>網頁</translation>
     </message>
     <message>
       <source>Users</source>
@@ -961,11 +961,11 @@ to activate PTZ</source>
     <name>ResourceToolTip</name>
     <message>
       <source>Cannot load preview</source>
-      <translation type="unfinished">Cannot load preview</translation>
+      <translation>無法載入預覽影像</translation>
     </message>
     <message>
       <source>Preview is outdated</source>
-      <translation type="unfinished">Preview is outdated</translation>
+      <translation>預覽影像已逾時</translation>
     </message>
   </context>
   <context>
@@ -1020,7 +1020,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>選取</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1057,7 +1057,7 @@ to activate PTZ</source>
     <name>SphereDewarpingSettings</name>
     <message>
       <source>Horizon correction</source>
-      <translation type="unfinished">Horizon correction</translation>
+      <translation>水平校正</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -1076,7 +1076,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Activate License</source>
-      <translation>啟動授權</translation>
+      <translation>啟用授權</translation>
     </message>
     <message>
       <source>Camera Settings</source>
@@ -1092,7 +1092,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Set for this Camera</source>
-      <translation>設定這支攝影機</translation>
+      <translation>設定此攝影機</translation>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
@@ -1106,15 +1106,15 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation>未經身分認証</translation>
+      <translation>未驗證</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
-      <translation>請檢查身分驗證資訊</translation>
+      <translation>請檢查驗證資訊</translation>
     </message>
     <message>
       <source>No signal</source>
-      <translation type="unfinished">No signal</translation>
+      <translation>沒有訊號</translation>
     </message>
     <message>
       <source>Not enough licenses</source>
@@ -1122,15 +1122,15 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Server unavailable</source>
-      <translation type="unfinished">Server unavailable</translation>
+      <translation>伺服器暫時無法使用</translation>
     </message>
     <message>
       <source>No access</source>
-      <translation type="unfinished">No access</translation>
+      <translation>無法存取</translation>
     </message>
     <message>
       <source>Device disabled</source>
-      <translation type="unfinished">Device disabled</translation>
+      <translation>設備已停用</translation>
     </message>
     <message>
       <source>Too many connections</source>
@@ -1138,11 +1138,11 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Cannot decrypt media</source>
-      <translation type="unfinished">Cannot decrypt media</translation>
+      <translation>無法解密影像檔案</translation>
     </message>
     <message>
       <source>Password required</source>
-      <translation>需要密碼</translation>
+      <translation>請輸入密碼</translation>
     </message>
     <message>
       <source>No live stream</source>
@@ -1150,7 +1150,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Unsupported firmware version</source>
-      <translation>不支援的分位版本</translation>
+      <translation>不支援的韌體版本</translation>
     </message>
   </context>
   <context>
@@ -1164,23 +1164,23 @@ to activate PTZ</source>
     <name>TileGridPlaceholder</name>
     <message>
       <source>Nothing Found</source>
-      <translation>無搜尋結果</translation>
+      <translation>找不到任何內容</translation>
     </message>
     <message>
       <source>No Favorite Systems</source>
-      <translation type="unfinished">No Favorite Systems</translation>
+      <translation>沒有收藏的系統</translation>
     </message>
     <message>
       <source>No Hidden Systems</source>
-      <translation type="unfinished">No Hidden Systems</translation>
+      <translation>沒有隱藏的系統</translation>
     </message>
     <message>
       <source>You can add system to the favorites from the context menu</source>
-      <translation type="unfinished">You can add system to the favorites from the context menu</translation>
+      <translation>您可以透過右上角的對話選單，將系統加入收藏夾中。</translation>
     </message>
     <message>
       <source>You can hide systems from the main list from the context menu</source>
-      <translation type="unfinished">You can hide systems from the main list from the context menu</translation>
+      <translation>您可以透過右上角的對話選單來將系統隱藏。</translation>
     </message>
   </context>
   <context>
@@ -1203,11 +1203,11 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Add to Favorites</source>
-      <translation type="unfinished">Add to Favorites</translation>
+      <translation>加入收藏</translation>
     </message>
     <message>
       <source>Remove from Favorites</source>
-      <translation type="unfinished">Remove from Favorites</translation>
+      <translation>從收藏夾中移除</translation>
     </message>
   </context>
   <context>
@@ -1218,7 +1218,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Last day</source>
-      <translation>一天內</translation>
+      <translation>前一天</translation>
     </message>
     <message>
       <source>Last 7 days</source>
@@ -1246,7 +1246,7 @@ to activate PTZ</source>
     <name>VisibilityMenu</name>
     <message>
       <source>Hidden</source>
-      <translation type="unfinished">Hidden</translation>
+      <translation>已隱藏</translation>
     </message>
     <message>
       <source>All Systems</source>
@@ -1254,26 +1254,26 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Favorites</source>
-      <translation type="unfinished">Favorites</translation>
+      <translation>收藏夾</translation>
     </message>
   </context>
   <context>
     <name>WelcomeScreen</name>
     <message>
       <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
-      <translation type="unfinished">You don&apos;t have access to the %1. Please check your internet connection.</translation>
+      <translation>目前無法連線至 %1，請檢查您的網路連線。</translation>
     </message>
     <message>
       <source>Official Website</source>
-      <translation type="unfinished">Official Website</translation>
+      <translation>官方網站</translation>
     </message>
     <message>
       <source>Help &amp; User Manual</source>
-      <translation type="unfinished">Help &amp; User Manual</translation>
+      <translation>使用手冊</translation>
     </message>
     <message>
       <source>Support</source>
-      <translation>支援</translation>
+      <translation>技術支援</translation>
     </message>
     <message>
       <source>Loading...</source>

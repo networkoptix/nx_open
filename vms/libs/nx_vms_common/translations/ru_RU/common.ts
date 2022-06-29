@@ -56,7 +56,7 @@
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
-      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
+      <translation>Этот пользователь отключен системным администратором.</translation>
     </message>
   </context>
   <context>
@@ -359,18 +359,6 @@
       <translation>Камера была восстановлена ​​из архива. Удалите камеру и добавьте ее снова, чтобы просмотреть видео в реальном времени.</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках устройства (ошибка "%1").</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках камеры (ошибка "%1").</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках I/O модуля (ошибка "%1").</translation>
-    </message>
-    <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
       <translation>Обновите прошивку. Минимальная поддерживаемая версия - %1. Текущая версия - %2</translation>
     </message>
@@ -385,6 +373,18 @@
     <message>
       <source>Internal server error. %1</source>
       <translation>Внутренняя ошибка сервера. %1</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
+      <translation>Если отключено, попробуйте включить запись в настройках модуля ввода-вывода (ошибка &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
+      <translation>Если отключено, попробуйте включить запись и уменьшить FPS в настройках устройства (ошибка &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
+      <translation>Если отключено, попробуйте включить запись и уменьшить FPS в настройках камеры (ошибка &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>

@@ -1013,6 +1013,10 @@
       <source>Web Page Settings...</source>
       <translation type="unfinished">Web Page Settings...</translation>
     </message>
+    <message>
+      <source>Account Security...</source>
+      <translation type="unfinished">Account Security...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1566,6 +1570,33 @@
     </message>
   </context>
   <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+      <source>Zoom In</source>
+      <translation>ซูมเข้า</translation>
+    </message>
+    <message>
+      <source>Zoom Out</source>
+      <translation>ซูมออก</translation>
+    </message>
+    <message>
+      <source>Focus Far</source>
+      <translation>ปรับโฟกัลระยะไกล</translation>
+    </message>
+    <message>
+      <source>Focus Near</source>
+      <translation>ปรับโฟกัสระยะใกล้</translation>
+    </message>
+    <message>
+      <source>Auto Focus</source>
+      <translation>ปรับโฟกัสอัตโนมัติ</translation>
+    </message>
+    <message>
+      <source>Change Dewarping Mode</source>
+      <translation>เปลี่ยนโหมด Dewarping</translation>
+    </message>
+  </context>
+  <context>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
@@ -1619,6 +1650,19 @@
     <message>
       <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
       <translation>ให้สิทธิ์การเข้าถึงรูปแบบที่คุณสามารถเข้าถึงกล้องทั้งหมดได้ นอกจากนี้ผู้ใช้จะได้รับสิทธิ์เข้าถึงกล้องถ่ายรูปใหม่ทั้งหมดในรูปแบบเหล่านี้</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnAccessibleMediaWidget</name>
+    <message>
+      <source>Access granted by:</source>
+      <translation>สิทธิ์การเข้าถึงโดย:</translation>
+    </message>
+    <message numerus="yes">
+      <source>and %n more</source>
+      <translation>
+        <numerusform>และ %n อื่น ๆ</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -2857,8 +2901,12 @@ to %1</source>
       <translation>ไม่สามารถเข้าสู่โหมดความเข้ากันได้สำหรับรุ่น %1</translation>
     </message>
     <message>
-      <source>Your session has expired</source>
-      <translation>เซสชันของคุณหมดอายุ</translation>
+      <source>System is not compatible with two-factor authentication</source>
+      <translation type="unfinished">System is not compatible with two-factor authentication</translation>
+    </message>
+    <message>
+      <source>Failed to log in to &quot;%1&quot; system</source>
+      <translation type="unfinished">Failed to log in to &quot;%1&quot; system</translation>
     </message>
   </context>
   <context>
@@ -4712,10 +4760,6 @@ to %1</source>
       <source>Failover</source>
       <translation>ล้มเหลว</translation>
     </message>
-    <message>
-      <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation>เซิร์ฟเวอร์ที่เปิดใช้งาน failover จะใช้กล้องจากเซิร์ฟเวอร์ออฟไลน์โดยอัตโนมัติ</translation>
-    </message>
     <message numerus="yes">
       <source>Certificates</source>
       <translation type="unfinished">
@@ -4735,6 +4779,10 @@ to %1</source>
     <message>
       <source>Details</source>
       <translation>รายละเอียด</translation>
+    </message>
+    <message>
+      <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
+      <translation type="unfinished">Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</translation>
     </message>
   </context>
   <context>
@@ -7429,6 +7477,10 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>Select Camera</source>
       <translation type="unfinished">Select Camera</translation>
     </message>
+    <message>
+      <source>No cameras available</source>
+      <translation type="unfinished">No cameras available</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSettingsDialog</name>
@@ -8260,10 +8312,6 @@ We recommend you not to open this web page. If you understand the risks, you can
   <context>
     <name>nx::vms::client::desktop::FailoverPriorityDialogItemDelegate</name>
     <message>
-      <source>No failover</source>
-      <translation type="unfinished">No failover</translation>
-    </message>
-    <message>
       <source>Low</source>
       <translation>ต่ำ</translation>
     </message>
@@ -8274,6 +8322,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>High</source>
       <translation>สูง</translation>
+    </message>
+    <message>
+      <source>No Failover</source>
+      <translation type="unfinished">No Failover</translation>
     </message>
   </context>
   <context>
@@ -9048,6 +9100,10 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
       <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
+    </message>
+    <message>
+      <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
+      <translation type="unfinished">There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</translation>
     </message>
   </context>
   <context>
@@ -9888,24 +9944,24 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation type="unfinished">Trust this server?</translation>
     </message>
     <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
-      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct server.</translation>
-    </message>
-    <message>
       <source>Cannot verify the identity of %1</source>
       <translation type="unfinished">Cannot verify the identity of %1</translation>
     </message>
     <message>
-      <source>Someone may be impersonating %1 to steal your personal information.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.</translation>
+      <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
+      <translation type="unfinished">You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</translation>
     </message>
     <message>
-      <source>Do not connect to this server unless instructed by your VMS administrator.</source>
-      <translation type="unfinished">Do not connect to this server unless instructed by your VMS administrator.</translation>
+      <source>Someone may be impersonating this Server to steal your personal information.</source>
+      <translation type="unfinished">Someone may be impersonating this Server to steal your personal information.</translation>
     </message>
     <message>
-      <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
-      <translation type="unfinished">You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</translation>
+      <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
+      <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
+    </message>
+    <message>
+      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
+      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct Server.</translation>
     </message>
   </context>
   <context>

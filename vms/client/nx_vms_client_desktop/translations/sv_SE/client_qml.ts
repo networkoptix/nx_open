@@ -802,8 +802,8 @@
       <translation>Visa på Layout</translation>
     </message>
     <message>
-      <source>preview is not available for the selected object</source>
-      <translation>förhandsgranskning är inte tillgänglig för det valda objektet</translation>
+      <source>Preview is not available for the selected object</source>
+      <translation>Förhandsgranskning är inte tillgänglig för det valda objektet</translation>
     </message>
   </context>
   <context>

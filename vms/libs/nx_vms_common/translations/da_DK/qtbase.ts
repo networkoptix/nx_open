@@ -314,19 +314,19 @@ Press ESC to cancel</translation>
     <name>QDateTimeParser</name>
     <message>
       <source>AM</source>
-      <translation type="unfinished">AM</translation>
+      <translation>AM</translation>
     </message>
     <message>
       <source>am</source>
-      <translation type="unfinished">am</translation>
+      <translation>am</translation>
     </message>
     <message>
       <source>PM</source>
-      <translation type="unfinished">PM</translation>
+      <translation>PM</translation>
     </message>
     <message>
       <source>pm</source>
-      <translation type="unfinished">pm</translation>
+      <translation>pm</translation>
     </message>
   </context>
   <context>
@@ -495,7 +495,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>&amp;Open</source>
-      <translation type="unfinished">&amp;Open</translation>
+      <translation>&amp;Åbn</translation>
     </message>
     <message>
       <source>&amp;Choose</source>
@@ -503,7 +503,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>&amp;Save</source>
-      <translation type="unfinished">&amp;Save</translation>
+      <translation>&amp;Gem</translation>
     </message>
     <message>
       <source>All Files (*)</source>
@@ -511,7 +511,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Show </source>
-      <translation type="unfinished">Show </translation>
+      <translation>Vis </translation>
     </message>
     <message>
       <source>&amp;Rename</source>
@@ -527,7 +527,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>&amp;New Folder</source>
-      <translation type="unfinished">&amp;New Folder</translation>
+      <translation>&amp;Ny Mappe</translation>
     </message>
     <message>
       <source>All files (*)</source>
@@ -583,7 +583,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Recent Places</source>
-      <translation type="unfinished">Recent Places</translation>
+      <translation>Seneste Steder</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -1108,7 +1108,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Configuration</source>
-      <translation type="unfinished">Configuration</translation>
+      <translation>Opsætning</translation>
     </message>
     <message>
       <source>Shared Configuration</source>
@@ -1127,11 +1127,11 @@ Do you want to delete it anyway?</translation>
     <name>QTabBar</name>
     <message>
       <source>Scroll Left</source>
-      <translation type="unfinished">Scroll Left</translation>
+      <translation>Rul til venstre</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation type="unfinished">Scroll Right</translation>
+      <translation>Rul til højre</translation>
     </message>
   </context>
   <context>

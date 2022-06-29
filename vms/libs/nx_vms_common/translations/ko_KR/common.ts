@@ -28,19 +28,19 @@
     </message>
     <message>
       <source>The password is expired. Please contact your system administrator.</source>
-      <translation type="unfinished">The password is expired. Please contact your system administrator.</translation>
+      <translation>비밀번호가 만료되었습니다. 시스템 관리자에게 문의하십시오.</translation>
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
-      <translation type="unfinished">The LDAP server is not accessible. Please try again later.</translation>
+      <translation>LDAP 서버에 액세스할 수 없습니다. 나중에 다시 시도 해주십시오.</translation>
     </message>
     <message>
       <source>%1 is not accessible yet. Please try again later.</source>
-      <translation type="unfinished">%1 is not accessible yet. Please try again later.</translation>
+      <translation>%1 은(는) 아직 액세스할 수 없습니다. 나중에 다시 시도 해주십시오.</translation>
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
-      <translation type="unfinished">The user is locked out due to several failed attempts. Please try again later.</translation>
+      <translation>여러 번의 실패로 인해 사용자가 잠겼습니다. 나중에 다시 시도해 주십시오.</translation>
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your system administrator.</source>
@@ -48,15 +48,15 @@
     </message>
     <message>
       <source>The session key is invalid or expired.</source>
-      <translation type="unfinished">The session key is invalid or expired.</translation>
+      <translation>세션 키가 잘못되었거나 만료되었습니다.</translation>
     </message>
     <message>
       <source>Internal server error (%1). Please contact your system administrator.</source>
-      <translation type="unfinished">Internal server error (%1). Please contact your system administrator.</translation>
+      <translation>내부 서버 오류(%1)입니다. 시스템 관리자에게 문의하십시오.</translation>
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
-      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
+      <translation>이 사용자는 시스템 관리자에 의해 비활성화되었습니다.</translation>
     </message>
   </context>
   <context>
@@ -341,18 +341,6 @@
       <translation>카메라 아카이브에서 복원 되었습니다. 라이브 비디오를 보려면 카메라를 삭제 한후 다시 추가하십시요.</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation>우선, 장치 설정에서 녹화모드를 켜고 FPS를 줄이세요 (오류 &quot;%1&quot;).</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation>장치 설정에서 우선 녹화모드 On하고 Fps를 줄이세요 (오류 &quot;%1&quot;).</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation>장치 설정에서 우선 녹화모드 On하고 Fps를 줄이세요 (오류 &quot;%1&quot;).</translation>
-    </message>
-    <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
       <translation>펌웨어를 업데이트하십시오. 최소 지원 버전은 %1입니다. 현재 버전은 %2입니다</translation>
     </message>
@@ -367,6 +355,18 @@
     <message>
       <source>Internal server error. %1</source>
       <translation>인터넷 서버 오류. %1</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
+      <translation>비활성화된 경우 I/O 모듈 설정에서 녹화를 활성화하십시오(오류 &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
+      <translation>비활성화된 경우 장치 설정에서 녹화를 활성화하고 FPS를 줄이십시오(오류 &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
+      <translation>비활성화된 경우 카메라 설정에서 녹화를 활성화하고 FPS를 줄이십시오(오류 &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
@@ -1080,7 +1080,7 @@
     </message>
     <message>
       <source>Could not allocate output metadata stream.</source>
-      <translation type="unfinished">Could not allocate output metadata stream.</translation>
+      <translation>출력 메타데이터 스트림을 할당할 수 없습니다.</translation>
     </message>
     <message>
       <source>Invalid audio codec information.</source>
@@ -1652,12 +1652,12 @@
     </message>
     <message>
       <source>Analytics Object Detected</source>
-      <translation type="unfinished">Analytics Object Detected</translation>
+      <translation>분석 개체 감지됨</translation>
     </message>
     <message>
       <source>%1 at camera &apos;%2&apos;</source>
       <comment> is detected</comment>
-      <translation type="unfinished">%1 at camera &apos;%2&apos;</translation>
+      <translation>%1 카메라 &apos;%2&apos;</translation>
     </message>
     <message>
       <source>Plugin: %1</source>
@@ -1669,7 +1669,7 @@
     </message>
     <message>
       <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</translation>
+      <translation>미디어 아카이브를 기록하는 동안&apos;암호화를 초기화할 수 없습니다. 데이터는 암호화되지 않은 상태로 기록됩니다.</translation>
     </message>
     <message>
       <source>Archive backup failed.</source>
@@ -1677,7 +1677,7 @@
     </message>
     <message>
       <source>Object detected</source>
-      <translation type="unfinished">Object detected</translation>
+      <translation>감지된 객체</translation>
     </message>
     <message>
       <source>Archive backup failed</source>
@@ -1685,19 +1685,19 @@
     </message>
     <message>
       <source>Data is backed up to %1</source>
-      <translation type="unfinished">Data is backed up to %1</translation>
+      <translation>데이터가 %1로 백업됨</translation>
     </message>
     <message>
       <source>Failed to backup file </source>
-      <translation type="unfinished">Failed to backup file </translation>
+      <translation>파일을 백업하지 못했습니다.</translation>
     </message>
     <message>
       <source>Server Certificate Error</source>
-      <translation type="unfinished">Server Certificate Error</translation>
+      <translation>서버 인증서 오류</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
-      <translation type="unfinished">Server &quot;%1&quot; certificate error</translation>
+      <translation>서버 &quot;%1&quot; 인증서 오류</translation>
     </message>
   </context>
   <context>

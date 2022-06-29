@@ -359,18 +359,6 @@
       <translation>Kamera została przywrócona z archiwum. Usuń kamerę i dodaj ją ponownie, aby wyświetlić podgląd na żywo.</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation>Najpierw spróbuj włączyć nagrywanie (jeśli jest wyłączone) i zmniejszyć liczbę klatek/s w ustawieniach urządzenia (błąd &quot;%1&quot;).</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation>Najpierw spróbuj włączyć nagrywanie (jeśli jest wyłączone) i zmniejszyć liczbę klatek/s w ustawieniach kamery (błąd &quot;%1&quot;).</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation>Najpierw spróbuj włączyć nagrywanie (jeśli jest wyłączone) i zmniejszyć liczbę klatek/s w ustawieniach modułu I/O (błąd &quot;%1&quot;).</translation>
-    </message>
-    <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
       <translation>Proszę zaktualizować firmware. Minimalna obsługiwana wersja to %1. Obecna wersja to %2</translation>
     </message>
@@ -385,6 +373,18 @@
     <message>
       <source>Internal server error. %1</source>
       <translation>Wewnętrzny błąd serwera. %1</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
+      <translation>Jeśli niedostępne, spróbuj włączyć nagrywanie w ustawieniach modułu I/O (błąd &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
+      <translation>Jeśli niedostępne, spróbuj włączyć nagrywanie i zmniejszyć FPS w ustawieniach urządzenia (błąd &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
+      <translation>Jeśli niedostępne, spróbuj włączyć nagrywanie i zmniejszyć FPS w ustawieniach kamery (błąd &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>

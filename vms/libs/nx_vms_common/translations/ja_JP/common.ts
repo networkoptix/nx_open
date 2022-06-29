@@ -341,18 +341,6 @@
       <translation>カメラはアーカイブから復元されました。カメラを削除して再度登録すると、ライブ映像が表示されます。</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation>まず、(録画オフの場合は)録画をOnにして、デバイス設定で fps を下げてください (エラー&quot;%1&quot;)。</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation>まず、(録画オフの場合は)録画をOnにして、カメラ設定で fps を下げてください (エラー&quot;%1&quot;)。</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation>まず、(録画オフの場合は)録画をOnにして、I/Oモジュール設定で fps を下げてください (エラー&quot;%1&quot;)。</translation>
-    </message>
-    <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
       <translation>ファームウェアを更新してください。サポートバージョンは %1 以上です。現在のバージョンは %2 です。</translation>
     </message>
@@ -367,6 +355,18 @@
     <message>
       <source>Internal server error. %1</source>
       <translation>内部サーバーエラー %1</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
+      <translation>無効になっている場合は、I/O モジュール設定で録画を有効にしてください (エラー &quot;%1&quot;)。</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
+      <translation>無効になっている場合は、デバイス設定で録画を有効にしてFPSを下げてください (エラー &quot;%1&quot;)。</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
+      <translation>無効になっている場合は、カメラ設定で録画を有効にしてFPSを下げてください (エラー &quot;%1&quot;)。</translation>
     </message>
   </context>
   <context>
@@ -1014,7 +1014,7 @@
     </message>
     <message>
       <source>Custom Role</source>
-      <translation>カスタムの役割</translation>
+      <translation>カスタムロール</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1034,7 +1034,7 @@
     </message>
     <message>
       <source>Custom user role.</source>
-      <translation>カスタムのユーザーの役割</translation>
+      <translation>カスタムのユーザーロール。</translation>
     </message>
     <message>
       <source>Custom permissions.</source>
@@ -1474,7 +1474,7 @@
     </message>
     <message>
       <source>Role</source>
-      <translation>役割</translation>
+      <translation>ロール</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
@@ -1485,7 +1485,7 @@
     <message numerus="yes">
       <source>%n Roles</source>
       <translation>
-        <numerusform>%n 役割</numerusform>
+        <numerusform>%n ロール</numerusform>
       </translation>
     </message>
     <message>
@@ -1644,11 +1644,11 @@
     </message>
     <message>
       <source>RTP error in primary stream (%1)</source>
-      <translation>プライマリストリーム (%1) でのRTPエラー</translation>
+      <translation>プライマリストリームのRTPエラー (%1)</translation>
     </message>
     <message>
       <source>RTP error in secondary stream (%1)</source>
-      <translation>セカンダリストリーム (%1) でのRTPエラー</translation>
+      <translation>セカンダリストリームのRTPエラー (%1)</translation>
     </message>
     <message>
       <source>Analytics Object Detected</source>

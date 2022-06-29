@@ -506,7 +506,7 @@
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Opdater</translation>
     </message>
     <message>
       <source>Refreshing...</source>
@@ -722,7 +722,7 @@
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Log på</translation>
     </message>
     <message>
       <source>Password</source>
@@ -802,8 +802,8 @@
       <translation>Vis på layout</translation>
     </message>
     <message>
-      <source>preview is not available for the selected object</source>
-      <translation>forhåndsvisning er ikke tilgængelig for det valgte objekt</translation>
+      <source>Preview is not available for the selected object</source>
+      <translation>Forhåndsvisning er ikke tilgængelig for det valgte objekt</translation>
     </message>
   </context>
   <context>
@@ -814,7 +814,7 @@
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Næste</translation>
     </message>
   </context>
   <context>
@@ -927,7 +927,7 @@ to activate PTZ</translation>
     <name>ResourceSearchPane</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Søg</translation>
     </message>
     <message>
       <source>All Types</source>
@@ -1004,7 +1004,7 @@ to activate PTZ</translation>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Søg</translation>
     </message>
   </context>
   <context>
@@ -1047,15 +1047,15 @@ to activate PTZ</translation>
     <name>SizeConstraints</name>
     <message>
       <source>MAX</source>
-      <translation type="unfinished">MAX</translation>
+      <translation>MAKS</translation>
     </message>
     <message>
       <source>MIN</source>
-      <translation type="unfinished">MIN</translation>
+      <translation>MIN</translation>
     </message>
     <message>
       <source>Set minimum and maximum object size.</source>
-      <translation type="unfinished">Set minimum and maximum object size.</translation>
+      <translation>Indstil minimum og maksimum objektstørrelse.</translation>
     </message>
     <message>
       <source>Minimum object size cannot be greater than maximum.</source>

@@ -56,7 +56,7 @@
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
-      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
+      <translation>Este usuario está deshabilitado por el administrador del sistema.</translation>
     </message>
   </context>
   <context>
@@ -347,18 +347,6 @@
       <translation>La cámara se ha restaurado del archivo. Elimine la cámara y agrégala de nuevo para ver el video en vivo.</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation>Primero, trate de habilitar la grabación (si está desactivado) y disminuya los fotogramas en la configuración del dispositivo (error &quot;%1&quot;).</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation>Primero, trate de habilitar la grabación (si está desactivado) y disminuya los fotogramas en la configuración de la cámara (error &quot;%1&quot;).</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation>Primero, trate de habilitar la grabación (si está desactivado) y disminuya los fotogramas en la configuración del módulo E/S (error &quot;%1&quot;).</translation>
-    </message>
-    <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
       <translation>Por favor actualice el firmware. La versión mínima admitida es %1. La versión actual es %2</translation>
     </message>
@@ -373,6 +361,18 @@
     <message>
       <source>Internal server error. %1</source>
       <translation>Error de servidor interno. %1</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
+      <translation>Si está deshabilitado, intente habilitar la grabación en la configuración del módulo de E/S (error &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
+      <translation>Si está deshabilitado, intente habilitar la Grabación y disminuir el FPS en la Configuración del dispositivo (error &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
+      <translation>Si está deshabilitado, intente habilitar la Grabación y disminuir el FPS en la Configuración de la cámara (error &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
@@ -1755,7 +1755,7 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
-      <translation>Error de certificado del servidor </translation>
+      <translation>Error de certificado del servidor &quot;%1&quot;</translation>
     </message>
   </context>
   <context>

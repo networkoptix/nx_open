@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>The file cannot be written locally, due to access restrictions</source>
-      <translation>Các tập tin không thể được ghi cục bộ, do hạn chế truy cập</translation>
+      <translation>Các tập tin không thể được ghi cục bộ do các hạn chế về quyền truy cập</translation>
     </message>
     <message>
       <source>Insufficient space on the target drive</source>
@@ -37,7 +37,7 @@
     </message>
     <message>
       <source>The file was blocked due to local policy</source>
-      <translation>Các tập tin đã bị chặn do chính sách địa phương</translation>
+      <translation>Các tập tin đã bị chặn do chính sách cục bộ</translation>
     </message>
     <message>
       <source>Checking the safety of the download failed due to unexpected reasons</source>

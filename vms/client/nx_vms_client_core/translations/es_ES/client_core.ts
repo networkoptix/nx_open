@@ -156,21 +156,21 @@
     </message>
     <message>
       <source>If this error persists, please contact your system administrator.</source>
-      <translation type="unfinished">If this error persists, please contact your system administrator.</translation>
+      <translation>Si este error persiste, comuníquese con el administrador del sistema.</translation>
     </message>
     <message>
       <source>Connection to %1 is not ready yet. Check your internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check your internet connection or try again later.</translation>
+      <translation>La conexión a %1 aún no está lista. Comprueba tu conexión a Internet o vuelve a intentarlo más tarde.</translation>
     </message>
     <message>
       <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</translation>
+      <translation>La conexión a %1 aún no está lista. Compruebe la conexión a Internet del servidor o vuelva a intentarlo más tarde.</translation>
     </message>
     <message>
       <source>Connection to the server could not be established. Try again later.</source>
-      <translation type="unfinished">Connection to the server could not be established. Try again later.</translation>
+      <translation>No se pudo establecer la conexión con el servidor. Vuelva a intentarlo más tarde.</translation>
     </message>
     <message>
       <source>Your session has expired</source>
@@ -179,24 +179,38 @@
     <message>
       <source>Please log in to %1 again.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Please log in to %1 again.</translation>
+      <translation>Inicie sesión en %1 nuevamente.</translation>
     </message>
     <message>
       <source>Log in to %1 to log in to this system with %2 user</source>
       <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in to %1 to log in to this system with %2 user</translation>
+      <translation>Iniciar sesión en %1 para iniciar sesión en este sistema con el usuario %2</translation>
     </message>
     <message>
       <source>Session duration limit can be changed by a system administrator.</source>
-      <translation type="unfinished">Session duration limit can be changed by a system administrator.</translation>
+      <translation>El límite de duración de la sesión puede ser cambiado por los administradores del sistema.</translation>
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
-      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
+      <translation>Este usuario está deshabilitado por el administrador del sistema.</translation>
     </message>
     <message>
       <source>Too many login attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many login attempts. Try again in a minute.</translation>
+      <translation>Demasiados intentos de inicio de sesión. Inténtalo más tarde.</translation>
+    </message>
+    <message>
+      <source>Two-factor authentication is required.</source>
+      <translation>La autenticación de dos factores es obligatoria.</translation>
+    </message>
+    <message>
+      <source>You can enable two-factor authentication in your %1.</source>
+      <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>Puede habilitar la autenticación de dos factores en su %1.</translation>
+    </message>
+    <message>
+      <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>Para iniciar sesión en este Sistema, deshabilite "Solicitar un código de verificación en cada inicio de sesión con su cuenta %1 " en su %2.</translation>
     </message>
   </context>
 </TS>

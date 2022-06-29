@@ -20,7 +20,7 @@
     <name>AuthResultTranslations</name>
     <message>
       <source>This user does not exist.</source>
-      <translation type="unfinished">This user does not exist.</translation>
+      <translation>Denne brukeren eksisterer ikke.</translation>
     </message>
     <message>
       <source>Wrong password.</source>
@@ -28,35 +28,35 @@
     </message>
     <message>
       <source>The password is expired. Please contact your system administrator.</source>
-      <translation type="unfinished">The password is expired. Please contact your system administrator.</translation>
+      <translation>Passordet er utløpt. Ta kontakt med systemadministratoren din.</translation>
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
-      <translation type="unfinished">The LDAP server is not accessible. Please try again later.</translation>
+      <translation>LDAP-serveren er ikke tilgjengelig. Prøv igjen senere.</translation>
     </message>
     <message>
       <source>%1 is not accessible yet. Please try again later.</source>
-      <translation type="unfinished">%1 is not accessible yet. Please try again later.</translation>
+      <translation>%1 er ikke tilgjengelig ennå. Prøv igjen senere.</translation>
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
-      <translation type="unfinished">The user is locked out due to several failed attempts. Please try again later.</translation>
+      <translation>Brukeren er utestengt på grunn av flere mislykkede forsøk. Prøv igjen senere.</translation>
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your system administrator.</source>
-      <translation type="unfinished">This authorization method is forbidden. Please contact your system administrator.</translation>
+      <translation>Denne autorisasjonsmetoden er forbudt. Ta kontakt med systemadministratoren din.</translation>
     </message>
     <message>
       <source>The session key is invalid or expired.</source>
-      <translation type="unfinished">The session key is invalid or expired.</translation>
+      <translation>Sesjonsnøkkelen er ugyldig eller utløpt.</translation>
     </message>
     <message>
       <source>Internal server error (%1). Please contact your system administrator.</source>
-      <translation type="unfinished">Internal server error (%1). Please contact your system administrator.</translation>
+      <translation>Intern serverfeil (%1). Ta kontakt med systemadministratoren din.</translation>
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
-      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
+      <translation>Denne brukeren har blitt deaktivert av en systemadministrator.</translation>
     </message>
   </context>
   <context>
@@ -347,18 +347,6 @@
       <translation>Kameraet ble gjenopprettet fra arkivet. Slett kameraet og legg det til igjen for å vise Live video.</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation>Forsøk å slå på opptak (hvis den er av) og reduser fps i enhetsinnstillinger (feil &quot;%1&quot;).</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation>Forsøk å slå på opptak (hvis den er av) og reduser fps i enhetsinnstillinger (feil &quot;%1&quot;).</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation>Forsøk å slå på opptak (hvis den er av) og reduser fps i enhetsinnstillinger (feil &quot;%1&quot;).</translation>
-    </message>
-    <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
       <translation>Vennligst oppdater firmware. Minimal støttet versjon er %1. Nåværende versjon er %2</translation>
     </message>
@@ -373,6 +361,18 @@
     <message>
       <source>Internal server error. %1</source>
       <translation>Intern server feil. %1</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
+      <translation>Hvis deaktivert, prøv å aktivere opptak i I/O-modulinnstillinger (feil &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
+      <translation>Hvis deaktivert, prøv å aktivere opptak og redusere BPS i enhetsinnstillinger (feil &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
+      <translation>Hvis deaktivert, prøv å aktivere opptak og redusere BPS i kamerainnstillinger (feil &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
@@ -1126,7 +1126,7 @@
     </message>
     <message>
       <source>Could not allocate output metadata stream.</source>
-      <translation type="unfinished">Could not allocate output metadata stream.</translation>
+      <translation>Kunne ikke allokere metadatastrøm.</translation>
     </message>
     <message>
       <source>Invalid audio codec information.</source>
@@ -1710,16 +1710,16 @@
     </message>
     <message>
       <source>Analytics Object Detected</source>
-      <translation type="unfinished">Analytics Object Detected</translation>
+      <translation>Analyse Objekt Oppdaget</translation>
     </message>
     <message>
       <source>%1 at camera &apos;%2&apos;</source>
       <comment> is detected</comment>
-      <translation type="unfinished">%1 at camera &apos;%2&apos;</translation>
+      <translation>%1 ved kamera &apos;%2&apos;</translation>
     </message>
     <message>
       <source>Plugin: %1</source>
-      <translation type="unfinished">Plugin: %1</translation>
+      <translation>Plugin: %1</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
@@ -1727,7 +1727,7 @@
     </message>
     <message>
       <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</translation>
+      <translation>&apos;ikke initialisere AES-kryptering under opptak av mediearkiv. Data skrives ukryptert.</translation>
     </message>
     <message>
       <source>Archive backup failed.</source>
@@ -1735,7 +1735,7 @@
     </message>
     <message>
       <source>Object detected</source>
-      <translation type="unfinished">Object detected</translation>
+      <translation>Objekt oppdaget</translation>
     </message>
     <message>
       <source>Archive backup failed</source>
@@ -1743,19 +1743,19 @@
     </message>
     <message>
       <source>Data is backed up to %1</source>
-      <translation type="unfinished">Data is backed up to %1</translation>
+      <translation>Data er sikkerhetskopiert til %1</translation>
     </message>
     <message>
       <source>Failed to backup file </source>
-      <translation type="unfinished">Failed to backup file </translation>
+      <translation>Kunne ikke sikkerhetskopiere filen </translation>
     </message>
     <message>
       <source>Server Certificate Error</source>
-      <translation type="unfinished">Server Certificate Error</translation>
+      <translation>Serversertifikatfeil</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
-      <translation type="unfinished">Server &quot;%1&quot; certificate error</translation>
+      <translation>Server &quot;%1&quot; sertifikatfeil</translation>
     </message>
   </context>
   <context>

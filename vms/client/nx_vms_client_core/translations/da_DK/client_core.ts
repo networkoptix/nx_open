@@ -10,7 +10,7 @@
     </message>
     <message>
       <source>Your System</source>
-      <translation type="unfinished">Your System</translation>
+      <translation>Dit System</translation>
     </message>
   </context>
   <context>
@@ -28,7 +28,7 @@
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>System</translation>
     </message>
     <message>
       <source>System (%1)</source>
@@ -40,7 +40,7 @@
     <name>QnLocalSystemDescription</name>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>Ny server</translation>
     </message>
   </context>
   <context>
@@ -59,7 +59,7 @@
     </message>
     <message>
       <source>Your System</source>
-      <translation type="unfinished">Your System</translation>
+      <translation>Dit System</translation>
     </message>
     <message>
       <source>New System</source>
@@ -197,6 +197,20 @@
     <message>
       <source>Too many login attempts. Try again in a minute.</source>
       <translation>For mange loginforsøg. Prøv igen om et minut.</translation>
+    </message>
+    <message>
+      <source>Two-factor authentication is required.</source>
+      <translation>Tofaktorgodkendelseskode krævet.</translation>
+    </message>
+    <message>
+      <source>You can enable two-factor authentication in your %1.</source>
+      <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>Du kan aktivere to-faktor-godkendelse i din %1.</translation>
+    </message>
+    <message>
+      <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>For at logge ind på dette system skal du deaktivere "Spørg om en bekræftelseskode ved hvert login med din %1 -konto" i din %2.</translation>
     </message>
   </context>
 </TS>

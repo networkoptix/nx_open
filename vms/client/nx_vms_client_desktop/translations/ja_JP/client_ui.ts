@@ -260,7 +260,7 @@
     </message>
     <message>
       <source>Fixed</source>
-      <translation>修正済</translation>
+      <translation>固定</translation>
     </message>
     <message>
       <source>Scheduled</source>
@@ -268,7 +268,7 @@
     </message>
     <message>
       <source>Fix bandwidth to</source>
-      <translation>帯域幅を修正:</translation>
+      <translation>帯域幅を固定:</translation>
     </message>
     <message>
       <source>Mbit/s</source>
@@ -1130,10 +1130,6 @@
       <translation>優先順位設定:</translation>
     </message>
     <message>
-      <source>No failover</source>
-      <translation>フェイルオーバーなし</translation>
-    </message>
-    <message>
       <source>Low</source>
       <translation>低</translation>
     </message>
@@ -1148,6 +1144,10 @@
     <message>
       <source>Select some devices to setup failover priority</source>
       <translation>デバイスを選択してフェイルオーバーの優先順位を設定してください</translation>
+    </message>
+    <message>
+      <source>No Failover</source>
+      <translation>フェイルオーバーなし</translation>
     </message>
   </context>
   <context>
@@ -1488,7 +1488,7 @@
     </message>
     <message>
       <source>Role to assign to imported users</source>
-      <translation>インポートされたユーザーに割り当てる役割</translation>
+      <translation>インポートしたユーザーに割り当てるロール</translation>
     </message>
     <message>
       <source>Disable imported users</source>
@@ -1564,7 +1564,7 @@
     </message>
     <message>
       <source>License will be bound to the current server</source>
-      <translation>ライセンスは既存のサーバーに統合されます</translation>
+      <translation>ライセンスは現在のサーバーに紐づけされます</translation>
     </message>
     <message>
       <source>Activate Free License</source>
@@ -1580,7 +1580,7 @@
     </message>
     <message>
       <source>License Key</source>
-      <translation>ライセンスキー:</translation>
+      <translation>ライセンスキー</translation>
     </message>
     <message>
       <source>Invalid License Key</source>
@@ -1588,7 +1588,7 @@
     </message>
     <message>
       <source>Activation Key File</source>
-      <translation>ライセンスファイル:</translation>
+      <translation>ライセンスファイル</translation>
     </message>
     <message>
       <source>Hardware ID</source>
@@ -1704,7 +1704,7 @@
     </message>
     <message>
       <source>Take system name and settings from:</source>
-      <translation>システム名と設定を取得:</translation>
+      <translation>次のシステム名および設定を使用:</translation>
     </message>
   </context>
   <context>
@@ -2106,7 +2106,7 @@
     </message>
     <message>
       <source>Edit Roles...</source>
-      <translation>役割を編集...</translation>
+      <translation>ロールを編集...</translation>
     </message>
     <message>
       <source>Force Secure Authentication</source>
@@ -2410,7 +2410,7 @@
     </message>
     <message>
       <source>Display servers in tree for non-administrator users</source>
-      <translation>管理者以外のユーザーのツリーにサーバーを表示する</translation>
+      <translation>サーバーを非管理者ユーザーのツリーにも表示する</translation>
     </message>
     <message>
       <source>Archive encryption</source>
@@ -2476,7 +2476,7 @@
     </message>
     <message>
       <source>Expires</source>
-      <translation>期限切れ</translation>
+      <translation>有効期限</translation>
     </message>
     <message>
       <source>Certificate is expired</source>
@@ -2667,7 +2667,7 @@
     <name>SoftwareTriggerBusinessEventWidget</name>
     <message>
       <source>Available to</source>
-      <translation>役割</translation>
+      <translation>ユーザー</translation>
     </message>
     <message>
       <source>Name</source>
@@ -2709,7 +2709,7 @@
     </message>
     <message>
       <source>Storage Locations</source>
-      <translation>ストレージの場所</translation>
+      <translation>保存先</translation>
     </message>
     <message>
       <source>Reindex Archive</source>
@@ -2770,7 +2770,7 @@
     <name>SubjectSelectionDialog</name>
     <message>
       <source>Roles</source>
-      <translation>役割</translation>
+      <translation>ロール</translation>
     </message>
     <message>
       <source>Show all users</source>
@@ -2880,26 +2880,26 @@
     </message>
     <message>
       <source>Delete Role</source>
-      <translation>役割を削除</translation>
+      <translation>ロールを削除</translation>
     </message>
   </context>
   <context>
     <name>UserRolesDialog</name>
     <message>
       <source>User Roles</source>
-      <translation>ユーザーの役割</translation>
+      <translation>ユーザーロール</translation>
     </message>
     <message>
       <source>New role</source>
-      <translation>新しい役割</translation>
+      <translation>新しいロール</translation>
     </message>
     <message>
       <source>There are no custom user roles yet.</source>
-      <translation>カスタムユーザーの役割はまだありません</translation>
+      <translation>カスタムのユーザーロールはまだありません。</translation>
     </message>
     <message>
       <source>Click &quot;New role&quot; button to create one.</source>
-      <translation>作成するには、 &quot;役割&quot; ボタンをクリックしてください。</translation>
+      <translation>作成するには、 &quot;新しいロール&quot; ボタンをクリックしてください。</translation>
     </message>
   </context>
   <context>
@@ -2921,11 +2921,11 @@
     </message>
     <message>
       <source>Role</source>
-      <translation>役割</translation>
+      <translation>ロール</translation>
     </message>
     <message>
       <source>Edit Roles...</source>
-      <translation>役割を編集...</translation>
+      <translation>ロールを編集...</translation>
     </message>
   </context>
   <context>
@@ -3000,7 +3000,7 @@
     </message>
     <message>
       <source>Advanced</source>
-      <translation>アドバンス</translation>
+      <translation>詳細</translation>
     </message>
     <message>
       <source>Allow using Client API</source>

@@ -802,8 +802,8 @@
       <translation>Mostrar no layout</translation>
     </message>
     <message>
-      <source>preview is not available for the selected object</source>
-      <translation>pré-visualização não está disponível para o objeto selecionado</translation>
+      <source>Preview is not available for the selected object</source>
+      <translation>A visualização não está disponível para o objeto selecionado</translation>
     </message>
   </context>
   <context>

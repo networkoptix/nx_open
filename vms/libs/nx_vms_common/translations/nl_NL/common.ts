@@ -347,18 +347,6 @@
       <translation>Camera is hersteld vanuit het archief. Verwijder de camera en voeg het opnieuw toe om live video te bekijken.</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation>Probeer eerst de opname aan te zetten (als deze uit staat) en verminder het aantal fps in apparaatinstellingen (fout &quot;%1&quot;).</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation>Probeer eerst de opname aan te zetten (als deze uit staat) en verminder het aantal fps in camera-instellingen (fout &quot;%1&quot;).</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation>Probeer eerst de opname aan te zetten (als deze uit staat) en verminder het aantal fps in I/O instellingen (fout &quot;%1&quot;).</translation>
-    </message>
-    <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
       <translation>Werk de firmware bij. Minimale ondersteunde versie is %1. De huidige versie is %2</translation>
     </message>
@@ -373,6 +361,18 @@
     <message>
       <source>Internal server error. %1</source>
       <translation>Interne server error. %1</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
+      <translation>Indien uitgeschakeld, probeer dan Opname in te schakelen in I/O Module-instellingen (fout &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
+      <translation>Indien uitgeschakeld, probeer Opname in te schakelen en de framerate te verlagen in Apparaatinstellingen (fout &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
+      <translation>Indien uitgeschakeld, probeer Opname in te schakelen en de framerate te verlagen in Camerainstellingen (fout &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
