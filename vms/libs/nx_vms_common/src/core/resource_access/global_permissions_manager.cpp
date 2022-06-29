@@ -65,9 +65,10 @@ GlobalPermissions QnGlobalPermissionsManager::globalPermissions(
         GlobalPermissions result;
         bool haveUnknownValues = false;
         NX_MUTEX_LOCKER lk(&m_mutex);
-        for (const auto& s: m_context->resourceAccessSubjectsCache()->subjectWithParents(subject))
+        for (const auto& effectiveId:
+            m_context->resourceAccessSubjectsCache()->subjectWithParents(subject))
         {
-            auto iter = m_cache.find(s.id());
+            auto iter = m_cache.find(effectiveId);
             if (iter == m_cache.cend())
             {
                 haveUnknownValues = true;

@@ -74,8 +74,8 @@ QSet<QnUuid> QnSharedResourcesManager::sharedResources(
 
     NX_MUTEX_LOCKER lk(&m_mutex);
     QSet<QnUuid> result;
-    for (const auto& s: m_context->resourceAccessSubjectsCache()->subjectWithParents(subject))
-        result.unite(m_sharedResources[s.id()]);
+    for (const auto& id: m_context->resourceAccessSubjectsCache()->subjectWithParents(subject))
+        result.unite(m_sharedResources[id]);
     return result;
 }
 
@@ -83,9 +83,10 @@ bool QnSharedResourcesManager::hasSharedResource(
     const QnResourceAccessSubject& subject, const QnUuid& resourceId) const
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
-    for (const auto& s: m_context->resourceAccessSubjectsCache()->subjectWithParents(subject))
+    for (const auto& effectiveId:
+        m_context->resourceAccessSubjectsCache()->subjectWithParents(subject))
     {
-        if (m_sharedResources[s.id()].contains(resourceId))
+        if (m_sharedResources[effectiveId].contains(resourceId))
             return true;
     }
     return false;

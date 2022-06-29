@@ -2,12 +2,13 @@
 
 #include "shared_layout_item_access_provider.h"
 
-#include <core/resource/layout_resource.h>
-#include <core/resource/user_resource.h>
 #include <core/resource_access/helpers/layout_item_aggregator.h>
 #include <core/resource_access/resource_access_subjects_cache.h>
 #include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource/user_resource.h>
 #include <nx/vms/common/system_context.h>
 
 namespace nx::core::access {
@@ -71,15 +72,18 @@ bool SharedLayoutItemAccessProvider::calculateAccess(const QnResourceAccessSubje
 
     // Method is called under the mutex.
     // Using effective ids as aggregators are created for users and roles separately.
-    for (const auto& s: m_context->resourceAccessSubjectsCache()->subjectWithParents(subject))
+    for (const auto& effectiveId:
+        m_context->resourceAccessSubjectsCache()->subjectWithParents(subject))
     {
-        QnLayoutItemAggregatorPtr aggregator = m_aggregatorsBySubject.value(s.id());
+        QnLayoutItemAggregatorPtr aggregator = m_aggregatorsBySubject.value(effectiveId);
 
         if (!aggregator)
         {
-            // We may got here if role is deleted while user is not
-            NX_ASSERT(subject.isUser());
-            NX_ASSERT_HEAVY_CONDITION(subject.user()->userRole() == Qn::UserRole::customUserRole);
+            // We may got here if role is deleted while user is not or in case of predefined role.
+            NX_ASSERT(subject.isUser()
+                || QnUserRolesManager::predefinedRole(effectiveId) != Qn::UserRole::customUserRole,
+                "Subject %1 inherited by %2 does not have an aggregator", subject, effectiveId);
+
             aggregator = m_aggregatorsBySubject.value(subject.id());
         }
 
