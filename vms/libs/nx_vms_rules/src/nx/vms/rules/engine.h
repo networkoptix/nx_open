@@ -57,6 +57,7 @@ public:
     bool addEventConnector(EventConnector* eventConnector);
     bool addActionExecutor(const QString& actionType, ActionExecutor* actionExecutor);
 
+public:
     /** Returns all the rules engine contains. */
     const std::unordered_map<QnUuid, const Rule*> rules() const;
 
@@ -69,10 +70,10 @@ public:
     /** Returns a copy of the rule with the given id or nullptr. */
     std::unique_ptr<Rule> cloneRule(const QnUuid& id) const;
 
-    void setRules(RuleSet&& rules);
-
     /** Returns rule with the given id or nullptr. */
     const Rule* rule(const QnUuid& id) const;
+
+    void resetRules(const std::vector<api::Rule>& rulesData);
 
     /** Returns true if rule was added, false otherwise. */
     bool updateRule(const api::Rule& ruleData);
@@ -145,29 +146,7 @@ public:
      */
     bool addRule(const api::Rule& serialized);
 
-private: //< ?
-    bool registerEventField(
-        const QJsonObject& manifest,
-        const std::function<bool()>& checker);
-
-    bool registerActionField(
-        const QJsonObject& manifest,
-        const std::function<QJsonValue()>& reducer);
-
-    bool registerEventType(
-        const QJsonObject& manifest,
-        const std::function<EventPtr()>& constructor/*, QObject* source*/);
-
-    bool registerActionType(
-        const QJsonObject& manifest,
-        const std::function<EventPtr()>& constructor,
-        QObject* executor);
-
 public:
-    // Declare following methods public for testing purposes.
-    std::unique_ptr<Rule> buildRule(const api::Rule& serialized) const;
-    api::Rule serialize(const Rule* rule) const;
-
     /**
      * Builds an event from the eventData and returns it.
      * If the eventData doesn't contains 'type' value or there is no constructor is registered
@@ -216,6 +195,28 @@ public:
 
 public:
     void processEvent(const EventPtr& event);
+
+public: // Declare following methods public for testing purposes.
+    std::unique_ptr<Rule> buildRule(const api::Rule& serialized) const;
+    api::Rule serialize(const Rule* rule) const;
+
+private:
+    bool registerEventField(
+        const QJsonObject& manifest,
+        const std::function<bool()>& checker);
+
+    bool registerActionField(
+        const QJsonObject& manifest,
+        const std::function<QJsonValue()>& reducer);
+
+    bool registerEventType(
+        const QJsonObject& manifest,
+        const std::function<EventPtr()>& constructor/*, QObject* source*/);
+
+    bool registerActionType(
+        const QJsonObject& manifest,
+        const std::function<EventPtr()>& constructor,
+        QObject* executor);
 
 private:
     void processAcceptedEvent(const QnUuid& ruleId, const EventData& eventData);

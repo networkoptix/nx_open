@@ -7,6 +7,7 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLayout>
 
+#include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/shared_resource_pointer.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>

@@ -178,9 +178,12 @@ void Engine::removeRule(QnUuid ruleId)
     emit ruleRemoved(ruleId);
 }
 
-void Engine::setRules(RuleSet&& rules)
+void Engine::resetRules(const std::vector<api::Rule>& rulesData)
 {
-    m_rules = std::move(rules);
+    m_rules.clear();
+    for (const auto& data: rulesData)
+        addRule(data);
+
     emit rulesReset();
 }
 

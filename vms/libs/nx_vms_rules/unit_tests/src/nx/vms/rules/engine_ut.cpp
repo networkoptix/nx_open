@@ -330,12 +330,12 @@ TEST_F(EngineTest, resetRules)
 
     EXPECT_CALL(mockEvents, onRulesReset());
     EXPECT_TRUE(engine->cloneRules().empty());
-    engine->setRules({});
+    engine->resetRules({});
 
     EXPECT_CALL(mockEvents, onRuleAddedOrUpdated(ruleData1.id, true));
     EXPECT_CALL(mockEvents, onRulesReset());
     EXPECT_TRUE(engine->updateRule(ruleData1));
-    engine->setRules({});
+    engine->resetRules({});
 }
 
 } // nx::vms::rules::test

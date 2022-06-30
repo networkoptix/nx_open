@@ -2,6 +2,7 @@
 
 #include "notification_levels.h"
 
+#include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 using namespace nx;
