@@ -253,8 +253,6 @@ class WebSocket:
 protected:
     WebSocket():
         clientSendBuf("hello"),
-        m_clientSocketDestroyed(false),
-        m_serverSocketDestroyed(false),
         readyFuture(readyPromise.get_future())
     {
     }
@@ -528,7 +526,7 @@ protected:
                 {
                     try { readyPromise.set_value(); } catch (...) {}
                 }
-               if (ecode != SystemError::noError)
+                if (ecode != SystemError::noError)
                     return;
                 clientReadBuf.clear();
 
@@ -549,7 +547,7 @@ protected:
                 {
                     try { readyPromise.set_value(); } catch (...) {}
                 }
-               if (ecode != SystemError::noError)
+                if (ecode != SystemError::noError)
                     return;
                 serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
             };
@@ -643,18 +641,15 @@ protected:
     std::function<void(SystemError::ErrorCode, size_t)> serverSendCb;
     std::function<void(SystemError::ErrorCode, size_t)> serverReadCb;
 
-    std::atomic<bool> m_clientSocketDestroyed;
-    std::atomic<bool> m_serverSocketDestroyed;
-
-    std::unique_ptr<TestWebSocket> clientWebSocket;
-    std::unique_ptr<TestWebSocket> serverWebSocket;
-
-    std::promise<void> startPromise;
-    std::future<void> startFuture;
+    std::atomic<bool> m_clientSocketDestroyed{false};
+    std::atomic<bool> m_serverSocketDestroyed{false};
 
     std::promise<void> readyPromise;
     std::future<void> readyFuture;
     Role serverRole = Role::server;
+
+    std::unique_ptr<TestWebSocket> clientWebSocket;
+    std::unique_ptr<TestWebSocket> serverWebSocket;
 
     const std::chrono::milliseconds kAliveTimeout = std::chrono::milliseconds(100000);
     const std::chrono::milliseconds kShortTimeout = std::chrono::milliseconds(3000);
@@ -821,8 +816,8 @@ protected:
             {
                 if (ecode != SystemError::noError)
                 {
-                    resetClientSocket();
                     processError(ecode);
+                    resetClientSocket();
                     return;
                 }
 
@@ -830,8 +825,8 @@ protected:
 
                 if (sentMessageCount >= kTotalMessageCount)
                 {
-                    resetClientSocket();
                     try { readyPromise.set_value(); } catch (...) {}
+                    resetClientSocket();
                     return;
                 }
 
@@ -843,9 +838,8 @@ protected:
             {
                 if (ecode != SystemError::noError || transferred == 0)
                 {
-                    resetClientSocket();
                     processError(ecode);
-
+                    resetClientSocket();
                     return;
                 }
 
@@ -859,8 +853,8 @@ protected:
 
                 if (ecode != SystemError::noError)
                 {
-                    resetServerSocket();
                     processError(ecode);
+                    resetServerSocket();
                     return;
                 }
 
@@ -878,8 +872,8 @@ protected:
 
                 if (ecode != SystemError::noError || transferred == 0)
                 {
-                    resetServerSocket();
                     processError(ecode);
+                    resetServerSocket();
                     return;
                 }
 
@@ -1170,9 +1164,8 @@ TEST_P(WebSocket, UnexpectedClose_ReadReturnedZero)
         {
             if (ecode != SystemError::noError)
             {
+                try { readyPromise.set_value(); } catch (...) {}
                 resetClientSocket();
-                try { readyPromise.set_value(); }
-                catch (...) {}
                 return;
             }
             sentMessageCount++;
@@ -1189,9 +1182,8 @@ TEST_P(WebSocket, UnexpectedClose_ReadReturnedZero)
         {
             if (bytesRead == 0)
             {
+                try { readyPromise.set_value(); } catch (...) {}
                 resetServerSocket();
-                try { readyPromise.set_value(); }
-                catch (...) {}
                 return;
             }
             serverReadBuf.clear();
