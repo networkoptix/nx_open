@@ -394,7 +394,7 @@
     </message>
     <message>
       <source>Attach to Video Wall...</source>
-      <translation>Fest ved videovegg...</translation>
+      <translation>Koble skjerm til videovegg...</translation>
     </message>
     <message>
       <source>Switch to Video Wall mode...</source>
