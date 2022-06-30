@@ -5,10 +5,8 @@
 #include <vector>
 
 #include <QtCore/QList>
-#include <QtCore/QMap>
 #include <QtCore/QSharedPointer>
 
-#include <common/common_globals.h>
 #include <nx/vms/api/types/event_rule_types.h>
 
 namespace nx::vms::event {
