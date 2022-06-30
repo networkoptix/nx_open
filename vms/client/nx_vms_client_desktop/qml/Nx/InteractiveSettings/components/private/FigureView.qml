@@ -198,9 +198,16 @@ Item
         frameWidth: 1
     }
 
-    onFigureChanged:
+    // For some reason QML emits "changed" signal every time when a `var` property is assigned
+    // (even to the same value). Thus, every time the plugin settings are reset, and values are
+    // re-assigned to all of the FigureView items, the handler below is invoked and thumbnail is
+    // re-requested forcefully. There's a simple workaround: store the figure value in a typed
+    // property and subscribe to its changes. This works as expected: the handler runs only when
+    // the value is really changed.
+    property string figureStringified: figure ? JSON.stringify(figure) : ""
+    onFigureStringifiedChanged:
     {
-        thumbnailSource.update(/*forceRefresh*/ true)
+        thumbnailSource.update(/*forceRefresh*/ !!figure)
         updateTimer.restart()
     }
 
