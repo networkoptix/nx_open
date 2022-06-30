@@ -101,6 +101,11 @@ public:
 
     int calc_rbsp_trailing_bits_cnt(uint8_t val);
 
+    static NALUnitType decodeType(quint8 data)
+    {
+        return (NALUnitType)(data & 0x1f);
+    }
+
 protected:
     //GetBitContext getBitContext;
     BitStreamReader bitReader;

@@ -109,7 +109,7 @@ void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
             const quint8* end = curNal + data->dataSize();
             for(curNal = NALUnit::findNextNAL(curNal, end); curNal < end; curNal = NALUnit::findNextNAL(curNal, end))
             {
-                quint8 nalType = *curNal & 0x1f;
+                const auto nalType = NALUnit::decodeType(*curNal);
                 if (nalType >= nuSliceNonIDR && nalType <= nuSliceIDR) {
                     BitStreamReader bitReader;
                     try {
@@ -350,7 +350,7 @@ bool QnFfmpegVideoDecoder::decode(
                 if (curPtr + nalLen >= dataEnd)
                     break;
 
-                auto nalUnitType = curPtr[nalLen] & 0x1f;
+                const auto nalUnitType = NALUnit::decodeType(curPtr[nalLen]);
                 if (nalUnitType == nuSPS)
                 {
                     SPSUnit sps;

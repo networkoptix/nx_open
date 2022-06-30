@@ -182,7 +182,7 @@ bool NALUnit::isIFrame(const quint8* data, int dataLen)
     if (dataLen < 2)
         return false;
 
-    quint8 nalType = *data & 0x1f;
+    const auto nalType = decodeType(*data);
     bool isSlice = isSliceNal(nalType);
     if (!isSlice)
         return false;
@@ -301,11 +301,11 @@ int NALUnit::deserialize(quint8* buffer, quint8* end)
 
     //NX_ASSERT((*buffer & 0x80) == 0);
     if ((*buffer & 0x80) != 0) {
-        qWarning() << "Invalid forbidden_zero_bit for nal unit " << (*buffer & 0x1f);
+        qWarning() << "Invalid forbidden_zero_bit for nal unit " << decodeType(*buffer);
     }
 
     nal_ref_idc   = (*buffer >> 5) & 0x3;
-    nal_unit_type = *buffer & 0x1f;
+    nal_unit_type = decodeType(*buffer);
     return 0;
 }
 
@@ -1439,7 +1439,7 @@ int SliceUnit::serializeSliceHeader(BitStreamWriter& bitWriter, const QMap<quint
             if( m_field_pic_flag )
                 bitWriter.putBit(bottom_field_flag);
         }
-        if( nal_unit_type == 5)
+        if(nal_unit_type == nuSliceIDR)
             writeUEGolombCode(bitWriter, idr_pic_id);
         if( sps->pic_order_cnt_type ==  0)
         {
@@ -1510,10 +1510,12 @@ int SliceUnit::serializeSliceHeader(BitStreamWriter& bitWriter, const QMap<quint
 
 void SliceUnit::write_dec_ref_pic_marking(BitStreamWriter& bitWriter)
 {
-    if( nal_unit_type  ==  5 ) {
+    if(nal_unit_type == nuSliceIDR)
+    {
         bitWriter.putBit(no_output_of_prior_pics_flag);
         bitWriter.putBit(long_term_reference_flag);
-    } else
+    }
+    else
     {
         bitWriter.putBit(adaptive_ref_pic_marking_mode_flag);
         if( adaptive_ref_pic_marking_mode_flag )

@@ -72,7 +72,7 @@ bool extractSps(const QnCompressedVideoData* videoData, SPSUnit& sps)
 
     for (const auto& nalu: nalUnits)
     {
-        if ((*nalu.data & 0x1f) == nuSPS)
+        if (NALUnit::decodeType(*nalu.data) == nuSPS)
         {
             sps.decodeBuffer(nalu.data, nalu.data + nalu.size);
             return sps.deserialize() == 0;
@@ -104,10 +104,10 @@ void getSpsPps(const uint8_t* data, int32_t size,
     auto nalUnits = nal::findNalUnitsAnnexB(data, size);
     for (const auto& nalu: nalUnits)
     {
-        if ((*nalu.data & 0x1f) == nuSPS)
+        const auto nalType = NALUnit::decodeType(*nalu.data);
+        if (nalType == nuSPS)
             spsVector.emplace_back(nalu.data, nalu.data + nalu.size);
-
-        if ((*nalu.data & 0x1f) == nuPPS)
+        else if (nalType == nuPPS)
             ppsVector.emplace_back(nalu.data, nalu.data + nalu.size);
     }
 }
@@ -119,7 +119,8 @@ std::vector<uint8_t> buildExtraDataAnnexB(const uint8_t* data, int32_t size)
     auto nalUnits = nx::media::nal::findNalUnitsAnnexB(data, size);
     for (const auto& nalu: nalUnits)
     {
-        if ((*nalu.data & 0x1F) == nuSPS || (*nalu.data & 0x1F) == nuPPS)
+        const auto nalType = NALUnit::decodeType(*nalu.data);
+        if (nalType == nuSPS || nalType == nuPPS)
         {
             extraData.insert(extraData.end(), startcode.begin(), startcode.end());
             extraData.insert(extraData.end(), nalu.data, nalu.data + nalu.size);
