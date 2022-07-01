@@ -8,6 +8,7 @@
 #include <QtCore/QDir>
 
 #include <nx/utils/log/log_main.h>
+#include <nx/utils/qset.h>
 
 #include "device_win.h"
 #include "descriptors.h"
@@ -74,8 +75,10 @@ DevicePtr ManagerWindows::createDevice(
         return result;
     }
 
-    m_intitializingDevices[path] = QSharedPointer<DeviceWindows>(
-        new DeviceWindows(directInputDeviceObject, deviceConfig, path, &m_pollTimer));
+    auto device = QSharedPointer<DeviceWindows>(
+        new DeviceWindows(directInputDeviceObject, deviceConfig, path, pollTimer()));
+    connect(device.data(), &Device::failed, this, [this, path] { onDeviceFailed(path); });
+    m_intitializingDevices[path] = device;
 
     return {};
 }
@@ -207,6 +210,17 @@ bool ManagerWindows::enumDevicesCallback(LPCDIDEVICEINSTANCE deviceInstance, LPV
     manager->m_foundDevices.append({inputDevice, modelName, guid});
 
     return DIENUM_CONTINUE;
+}
+
+void ManagerWindows::onDeviceFailed(const QString& path)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (!NX_ASSERT(m_devices.contains(path)))
+        return;
+
+    QSet<QString> stillActiveDevices = nx::utils::toQSet(m_devices.keys());
+    stillActiveDevices.remove(path);
+    removeUnpluggedJoysticks(stillActiveDevices);
 }
 
 } // namespace nx::vms::client::desktop::joystick

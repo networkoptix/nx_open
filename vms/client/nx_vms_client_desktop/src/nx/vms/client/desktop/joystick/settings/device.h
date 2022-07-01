@@ -6,8 +6,6 @@
 #include <QtCore/QString>
 #include <QtCore/QTimer>
 
-#include <nx/utils/thread/mutex.h>
-
 namespace nx::vms::client::desktop::joystick {
 
 struct JoystickDescriptor;
@@ -98,6 +96,11 @@ signals:
      */
     void stateChanged(const StickPosition& stick, const ButtonStates& buttons);
 
+    /**
+     * Device request failed, probably it was disconnected.
+     */
+    void failed();
+
 protected:
     virtual State getNewState() = 0;
     virtual AxisLimits parseAxisLimits(
@@ -107,8 +110,6 @@ protected:
     void pollData();
 
 protected:
-    Mutex m_mutex;
-
     QString m_id;
     QString m_modelName;
     QString m_path;

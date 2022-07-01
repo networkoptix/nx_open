@@ -63,6 +63,7 @@ Device::State DeviceWindows::getNewState()
     if (status != DI_OK)
     {
         NX_WARNING(this, "Failed to get device state");
+        emit failed();
         return {};
     }
 

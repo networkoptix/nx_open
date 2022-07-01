@@ -65,7 +65,7 @@ void ManagerHid::enumerateDevices()
                 {
                     const auto config = *iter;
 
-                    DevicePtr device(new DeviceHid(config, path, &m_pollTimer));
+                    DevicePtr device(new DeviceHid(config, path, pollTimer()));
                     if (device->isValid())
                         initializeDevice(device, config, path);
                 }
