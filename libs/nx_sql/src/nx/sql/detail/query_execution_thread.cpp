@@ -17,10 +17,17 @@ QueryExecutionThread::QueryExecutionThread(
     QueryExecutorQueue* const queryExecutorQueue)
 :
     BaseQueryExecutor(connectionOptions, queryExecutorQueue),
-    m_state(ConnectionState::initializing),
-    m_terminated(false),
-    m_numberOfFailedRequestsInARow(0),
     m_dbConnectionHolder(connectionOptions)
+{
+}
+
+QueryExecutionThread::QueryExecutionThread(
+    const ConnectionOptions& connectionOptions,
+    std::unique_ptr<AbstractDbConnection> connection,
+    QueryExecutorQueue* const queryExecutorQueue)
+    :
+    BaseQueryExecutor(connectionOptions, queryExecutorQueue),
+    m_dbConnectionHolder(connectionOptions, std::move(connection))
 {
 }
 
@@ -54,10 +61,10 @@ void QueryExecutionThread::setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> ha
     m_onClosedHandler = std::move(handler);
 }
 
-void QueryExecutionThread::start()
+void QueryExecutionThread::start(std::chrono::milliseconds connectDelay)
 {
-    m_queryExecutionThread =
-        std::thread(std::bind(&QueryExecutionThread::queryExecutionThreadMain, this));
+    m_connectDelay = connectDelay;
+    m_queryExecutionThread = std::thread([this]() { queryExecutionThreadMain(); });
 }
 
 void QueryExecutionThread::queryExecutionThreadMain()
@@ -71,6 +78,9 @@ void QueryExecutionThread::queryExecutionThreadMain()
             if (m_onClosedHandler)
                 m_onClosedHandler();
         });
+
+    if (m_connectDelay > std::chrono::milliseconds::zero())
+        std::this_thread::sleep_for(m_connectDelay);
 
     if (!m_dbConnectionHolder.open())
     {
@@ -93,8 +103,8 @@ void QueryExecutionThread::queryExecutionThreadMain()
                  connectionOptions().inactivityTimeout))
             {
                 // Dropping connection by timeout.
-                NX_VERBOSE(this, nx::format("Closing DB connection by timeout (%1)")
-                    .arg(connectionOptions().inactivityTimeout));
+                NX_VERBOSE(this, "Closing DB connection by timeout (%1)",
+                    connectionOptions().inactivityTimeout);
                 closeConnection();
                 break;
             }

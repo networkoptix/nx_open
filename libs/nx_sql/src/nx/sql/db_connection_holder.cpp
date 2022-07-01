@@ -13,7 +13,16 @@ namespace nx::sql {
 
 DbConnectionHolder::DbConnectionHolder(const ConnectionOptions& connectionOptions):
     m_connectionOptions(connectionOptions),
-    m_connection(connectionOptions)
+    m_connection(std::make_unique<QtDbConnection>(connectionOptions))
+{
+}
+
+DbConnectionHolder::DbConnectionHolder(
+    const ConnectionOptions& connectionOptions,
+    std::unique_ptr<AbstractDbConnection> connection)
+    :
+    m_connectionOptions(connectionOptions),
+    m_connection(std::move(connection))
 {
 }
 
@@ -29,11 +38,11 @@ const ConnectionOptions& DbConnectionHolder::connectionOptions() const
 
 bool DbConnectionHolder::open()
 {
-    if (!m_connection.open())
+    if (!m_connection->open())
     {
         NX_WARNING(this, "Failed to establish connection to %1 DB %2 at %3:%4. %5",
             connectionOptions().driverType, connectionOptions().dbName, connectionOptions().hostName,
-            connectionOptions().port, toString(m_connection.lastError()));
+            connectionOptions().port, toString(m_connection->lastError()));
         return false;
     }
 
@@ -48,12 +57,12 @@ bool DbConnectionHolder::open()
 
 AbstractDbConnection* DbConnectionHolder::dbConnection()
 {
-    return &m_connection;
+    return m_connection.get();
 }
 
 void DbConnectionHolder::close()
 {
-    m_connection.close();
+    m_connection->close();
 }
 
 std::shared_ptr<nx::sql::QueryContext> DbConnectionHolder::begin()
@@ -76,7 +85,7 @@ bool DbConnectionHolder::tuneMySqlConnection()
 {
     if (!connectionOptions().encoding.isEmpty())
     {
-        auto query = m_connection.createQuery();
+        auto query = m_connection->createQuery();
         query->prepare(nx::format("SET NAMES '%1'").args(connectionOptions().encoding).toStdString());
         try
         {
@@ -84,8 +93,8 @@ bool DbConnectionHolder::tuneMySqlConnection()
         }
         catch (const Exception& e)
         {
-            NX_WARNING(this, nx::format("Failed to set connection character set to \"%1\". %2")
-                .args(connectionOptions().encoding, e.what()));
+            NX_WARNING(this,"Failed to set connection character set to \"%1\". %2",
+                connectionOptions().encoding, e.what());
             return false;
         }
     }

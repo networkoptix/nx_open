@@ -16,12 +16,11 @@
 #include <nx/utils/test_support/utils.h>
 
 #include <nx/sql/async_sql_query_executor.h>
-#include <nx/sql/async_sql_query_executor.h>
+#include <nx/sql/detail/query_execution_thread.h>
 #include <nx/sql/filter.h>
 #include <nx/sql/sql_cursor.h>
-#include <nx/sql/detail/query_executor_factory.h>
-#include <nx/sql/detail/query_execution_thread.h>
 #include <nx/sql/query.h>
+#include <nx/sql/test_support/db_connection_mock.h>
 
 #include "base_db_test.h"
 
@@ -50,36 +49,6 @@ void readSqlRecord(SqlQuery* query, Company* company)
 }
 
 //-------------------------------------------------------------------------------------------------
-// QueryExecutionThreadTestWrapper
-
-class QueryExecutionThreadTestWrapper:
-    public detail::QueryExecutionThread
-{
-public:
-    QueryExecutionThreadTestWrapper(
-        const ConnectionOptions& connectionOptions,
-        detail::QueryExecutorQueue* const queryExecutorQueue)
-        :
-        detail::QueryExecutionThread(connectionOptions, queryExecutorQueue)
-    {
-    }
-
-    ~QueryExecutionThreadTestWrapper()
-    {
-        if (m_onDestructionHandler)
-            m_onDestructionHandler();
-    }
-
-    void setOnDestructionHandler(nx::utils::MoveOnlyFunc<void()> handler)
-    {
-        m_onDestructionHandler = std::move(handler);
-    }
-
-private:
-    nx::utils::MoveOnlyFunc<void()> m_onDestructionHandler;
-};
-
-//-------------------------------------------------------------------------------------------------
 // AsyncSqlQueryExecutor
 
 class DbConnectionEventsReceiver
@@ -100,13 +69,12 @@ class DbAsyncSqlQueryExecutor:
     using base_type = test::BaseDbTest;
 
 public:
-    DbAsyncSqlQueryExecutor()
+    DbAsyncSqlQueryExecutor():
+        m_forcedDbConnectionError(std::make_shared<DBResult>(DBResult::ok))
     {
-        using namespace std::placeholders;
-
-        m_requestExecutorFactoryBak =
-            detail::RequestExecutorFactory::instance().setCustomFunc(
-                std::bind(&DbAsyncSqlQueryExecutor::createConnection, this, _1, _2));
+        setConnectionFactory([this](auto&&... args) {
+            return createConnection(std::forward<decltype(args)>(args)...);
+        });
 
         connectionOptions().maxConnectionCount = kDefaultMaxConnectionCount;
     }
@@ -115,8 +83,7 @@ public:
     {
         closeDatabase();
 
-        detail::RequestExecutorFactory::instance().setCustomFunc(
-            std::move(m_requestExecutorFactoryBak));
+        setConnectionFactory(std::nullopt);
     }
 
     void setConnectionEventsReceiver(DbConnectionEventsReceiver* eventsReceiver)
@@ -129,16 +96,16 @@ protected:
     {
         std::vector<Company> generatedData;
 
-        executeUpdate(
-            "INSERT INTO company (name, yearFounded) VALUES ('Example company 1', 1975)");
+        EXPECT_EQ(DBResult::ok, executeUpdate(
+            "INSERT INTO company (name, yearFounded) VALUES ('Example company 1', 1975)"));
         generatedData.push_back(Company{"Example company 1", 1975});
 
-        executeUpdate(
-            "INSERT INTO company (name, yearFounded) VALUES ('Example company 2', 1998)");
+        EXPECT_EQ(DBResult::ok, executeUpdate(
+            "INSERT INTO company (name, yearFounded) VALUES ('Example company 2', 1998)"));
         generatedData.push_back(Company{"Example company 2", 1998});
 
-        executeUpdate(
-            "INSERT INTO company (name, yearFounded) VALUES ('Example company 3', 2010)");
+        EXPECT_EQ(DBResult::ok, executeUpdate(
+            "INSERT INTO company (name, yearFounded) VALUES ('Example company 3', 2010)"));
         generatedData.push_back(Company{"Example company 3", 2010});
 
         return generatedData;
@@ -240,7 +207,8 @@ protected:
     {
         BaseDbTest::initializeDatabase();
 
-        executeUpdate("CREATE TABLE company(name VARCHAR(256), yearFounded INTEGER)");
+        ASSERT_EQ(DBResult::ok, executeUpdate(
+            "CREATE TABLE company(name VARCHAR(256), yearFounded INTEGER)"));
     }
 
     void emulateUnrecoverableQueryError()
@@ -262,10 +230,10 @@ protected:
         asyncSqlQueryExecutor().executeSelect(
             [this, &queryExecuted](QueryContext* queryContext)
             {
-                SqlQuery query(queryContext->connection());
-                query.setForwardOnly(true);
-                query.prepare("SELECT * FROM company");
-                query.exec();
+                auto query = queryContext->connection()->createQuery();
+                query->setForwardOnly(true);
+                query->prepare("SELECT * FROM company");
+                query->exec();
                 queryExecuted.set_value();
                 m_finishHangingQuery.get_future().wait();
                 return DBResult::ok;
@@ -304,6 +272,16 @@ protected:
         ASSERT_EQ(DBResult::ok, m_queryResults.pop());
     }
 
+    void makeDbUnavailable()
+    {
+        *m_forcedDbConnectionError = DBResult::connectionError;
+    }
+
+    void makeDbAvailable()
+    {
+        *m_forcedDbConnectionError = DBResult::ok;
+    }
+
 private:
     DbConnectionEventsReceiver* m_eventsReceiver = nullptr;
     nx::utils::SyncQueue<DBResult> m_queryResults;
@@ -311,8 +289,24 @@ private:
     nx::utils::promise<void> m_finishHangingQuery;
     std::atomic<int> m_maxNumberOfConcurrentDataModificationRequests = 0;
     std::atomic<int> m_concurrentDataModificationRequests = 0;
-    detail::RequestExecutorFactory::Function m_requestExecutorFactoryBak;
     bool m_lastDbOpenResult = false;
+    std::shared_ptr<DBResult> m_forcedDbConnectionError;
+
+    std::unique_ptr<AbstractDbConnection> createConnection(
+        const ConnectionOptions& connectionOptions)
+    {
+        auto connection = std::make_unique<DbConnectionMock>(
+            connectionOptions, m_forcedDbConnectionError);
+
+        if (m_eventsReceiver)
+        {
+            m_eventsReceiver->onConnectionCreated();
+            connection->setOnDestructionHandler(
+                std::bind(&DbConnectionEventsReceiver::onConnectionDestroyed, m_eventsReceiver));
+        }
+
+        return connection;
+    }
 
     void emulateQueryError(DBResult dbResultToEmulate)
     {
@@ -321,23 +315,7 @@ private:
             {
                 return dbResultToEmulate;
             });
-        NX_GTEST_ASSERT_EQ(dbResultToEmulate, dbResult);
-    }
-
-    std::unique_ptr<detail::BaseQueryExecutor> createConnection(
-        const ConnectionOptions& connectionOptions,
-        detail::QueryExecutorQueue* const queryExecutorQueue)
-    {
-        auto connection = std::make_unique<QueryExecutionThreadTestWrapper>(
-            connectionOptions,
-            queryExecutorQueue);
-        if (m_eventsReceiver)
-        {
-            m_eventsReceiver->onConnectionCreated();
-            connection->setOnDestructionHandler(
-                std::bind(&DbConnectionEventsReceiver::onConnectionDestroyed, m_eventsReceiver));
-        }
-        return connection;
+        ASSERT_EQ(dbResultToEmulate, dbResult);
     }
 
     void issueSelect()
@@ -394,7 +372,8 @@ private:
 TEST_F(DbAsyncSqlQueryExecutor, able_to_execute_query)
 {
     initializeDatabase();
-    executeUpdate("INSERT INTO company (name, yearFounded) VALUES ('Example company 3', 2010)");
+    ASSERT_EQ(DBResult::ok, executeUpdate(
+        "INSERT INTO company (name, yearFounded) VALUES ('Example company 3', 2010)"));
     const auto companies = executeSelect<Company>("SELECT * FROM company");
 
     ASSERT_EQ(1U, companies.size());
@@ -410,9 +389,11 @@ TEST_F(DbAsyncSqlQueryExecutor, db_connection_reopens_after_error)
     EXPECT_CALL(connectionEventsReceiver, onConnectionDestroyed()).Times(2);
 
     initializeDatabase();
-    executeUpdate("INSERT INTO company (name, yearFounded) VALUES ('Example company 1', 1975)");
+    ASSERT_EQ(DBResult::ok, executeUpdate(
+        "INSERT INTO company (name, yearFounded) VALUES ('Example company 1', 1975)"));
     emulateUnrecoverableQueryError();
-    executeUpdate("INSERT INTO company (name, yearFounded) VALUES ('Example company 2', 1998)");
+    ASSERT_EQ(DBResult::ok, executeUpdate(
+        "INSERT INTO company (name, yearFounded) VALUES ('Example company 2', 1998)"));
 
     const auto companies = executeSelect<Company>("SELECT * FROM company");
     ASSERT_EQ(2U, companies.size());
@@ -428,9 +409,11 @@ TEST_F(DbAsyncSqlQueryExecutor, db_connection_does_not_reopen_after_recoverable_
     EXPECT_CALL(connectionEventsReceiver, onConnectionDestroyed()).Times(1);
 
     initializeDatabase();
-    executeUpdate("INSERT INTO company (name, yearFounded) VALUES ('Example company 1', 1975)");
+    ASSERT_EQ(DBResult::ok, executeUpdate(
+        "INSERT INTO company (name, yearFounded) VALUES ('Example company 1', 1975)"));
     emulateRecoverableQueryError();
-    executeUpdate("INSERT INTO company (name, yearFounded) VALUES ('Example company 2', 1998)");
+    ASSERT_EQ(DBResult::ok, executeUpdate(
+        "INSERT INTO company (name, yearFounded) VALUES ('Example company 2', 1998)"));
 
     const auto companies = executeSelect<Company>("SELECT * FROM company");
     ASSERT_EQ(2U, companies.size());
@@ -448,10 +431,12 @@ TEST_F(DbAsyncSqlQueryExecutor, many_recoverable_errors_in_a_row_cause_reconnect
     EXPECT_CALL(connectionEventsReceiver, onConnectionDestroyed()).Times(2);
 
     initializeDatabase();
-    executeUpdate("INSERT INTO company (name, yearFounded) VALUES ('Example company 1', 1975)");
+    ASSERT_EQ(DBResult::ok, executeUpdate(
+        "INSERT INTO company (name, yearFounded) VALUES ('Example company 1', 1975)"));
     for (int i = 0; i < connectionOptions().maxErrorsInARowBeforeClosingConnection + 1; ++i)
         emulateRecoverableQueryError();
-    executeUpdate("INSERT INTO company (name, yearFounded) VALUES ('Example company 2', 1998)");
+    ASSERT_EQ(DBResult::ok, executeUpdate(
+        "INSERT INTO company (name, yearFounded) VALUES ('Example company 2', 1998)"));
 
     const auto companies = executeSelect<Company>("SELECT * FROM company");
     ASSERT_EQ(2U, companies.size());
@@ -463,6 +448,23 @@ TEST_F(DbAsyncSqlQueryExecutor, initial_error_to_open_a_connection_is_reported)
 {
     whenInitializeDbWithInaccessibleFilePath();
     thenDbInitializationFailed();
+}
+
+TEST_F(DbAsyncSqlQueryExecutor, reconnect_after_db_failure)
+{
+    // Given working DB.
+    initializeDatabase();
+    ASSERT_EQ(DBResult::ok, executeUpdate("INSERT INTO company VALUES ('Foo', 1975)"));
+
+    makeDbUnavailable();
+
+    // Then query fails.
+    ASSERT_NE(DBResult::ok, executeUpdate("INSERT INTO company VALUES ('Bar', 1976)"));
+
+    makeDbAvailable();
+
+    // Then DB becomes available again.
+    ASSERT_EQ(DBResult::ok, executeUpdate("INSERT INTO company VALUES ('Bar', 1976)"));
 }
 
 //-------------------------------------------------------------------------------------------------
