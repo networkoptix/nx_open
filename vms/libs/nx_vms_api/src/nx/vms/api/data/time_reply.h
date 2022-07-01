@@ -5,6 +5,7 @@
 #include <chrono>
 
 #include <QtCore/QMetaType>
+#include <QtCore/QJsonObject>
 
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/data_macros.h>
@@ -15,6 +16,8 @@ using namespace std::chrono;
 
 struct NX_VMS_API TimeReplyCore
 {
+    bool operator==(const TimeReplyCore& other) const = default;
+
     /**%apidoc
      * Local OS time on the Server, in milliseconds since epoch.
      * %deprecated
@@ -44,6 +47,7 @@ struct NX_VMS_API TimeReply : public TimeReplyCore
 };
 #define TimeReply_Fields (osTime)(vmsTime)(timeZoneOffset)(timeZoneId)(realm)
 NX_VMS_API_DECLARE_STRUCT(TimeReply)
+NX_REFLECTION_INSTRUMENT(TimeReply, TimeReply_Fields);
 
 struct NX_VMS_API ServerTimeReply : public TimeReplyCore
 {
