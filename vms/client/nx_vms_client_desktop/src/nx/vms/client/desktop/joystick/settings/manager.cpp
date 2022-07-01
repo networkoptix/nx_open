@@ -3,7 +3,9 @@
 #include "manager.h"
 
 #include <QtCore/QDir>
+#include <QtCore/QMap>
 #include <QtCore/QStandardPaths>
+#include <QtCore/QElapsedTimer>
 
 #include <nx/reflect/json.h>
 #include <nx/utils/log/log_main.h>
@@ -24,17 +26,98 @@
 
 using namespace std::chrono;
 
+namespace nx::vms::client::desktop::joystick {
+
 namespace {
 
+enum class SearchState
+{
+    /** Client just started, try to find a joystick quickly. */
+    initial,
+
+    /** No joysticks found, repeat search periodically. */
+    periodic,
+
+    /** Joystick is found, stop search. */
+    idle,
+};
+
 // Other constants.
-constexpr milliseconds kEnumerationInterval = 2500ms;
+static const QMap<SearchState, milliseconds> kSearchIntervals{
+    {SearchState::initial, 2500ms},
+    {SearchState::periodic, 10s}
+};
+
 constexpr milliseconds kUsbPollInterval = 100ms;
+constexpr milliseconds kInitialSearchPeriod = 20s;
 
 const QString kSettingsDirName("/hid_configs/");
 
 } // namespace
 
-namespace nx::vms::client::desktop::joystick {
+struct Manager::Private
+{
+    Manager* const q;
+
+    // Configs for known device models.
+    DeviceConfigs defaultDeviceConfigs;
+    std::map<QString, nx::utils::ScopedConnections> deviceConnections;
+    QMap<QString, QString> deviceConfigRelativePath;
+    QMap<QString, ActionFactoryPtr> actionFactories;
+    bool deviceActionsEnabled = true;
+
+    SearchState searchState = SearchState::initial;
+    QTimer* const enumerateTimer;
+    QTimer* const pollTimer;
+    QElapsedTimer initialSearchTimer;
+
+    void updateSearchState()
+    {
+        SearchState targetState = searchState;
+        const bool devicesFound = !q->devices().empty();
+
+        switch (searchState)
+        {
+            case SearchState::initial:
+            {
+                if (devicesFound)
+                    targetState = SearchState::idle;
+                else if (!initialSearchTimer.isValid())
+                    initialSearchTimer.start();
+                else if (initialSearchTimer.hasExpired(kInitialSearchPeriod.count()))
+                    targetState = SearchState::periodic;
+                break;
+            }
+            case SearchState::periodic:
+            {
+                // If joystick was found, stop search.
+                if (devicesFound)
+                    targetState = SearchState::idle;
+                break;
+            }
+            case SearchState::idle:
+            {
+                // If joystick was disconnected, switch to quick search.
+                if (!devicesFound)
+                    targetState = SearchState::initial;
+                break;
+            }
+        }
+
+        if (targetState != searchState)
+        {
+            searchState = targetState;
+            initialSearchTimer.invalidate();
+            enumerateTimer->stop();
+            if (searchState != SearchState::idle)
+            {
+                enumerateTimer->setInterval(kSearchIntervals[searchState]);
+                enumerateTimer->start();
+            }
+            NX_VERBOSE(this, "Switch to search state %1", (int)searchState);
+        }
+    }
+};
 
 Manager* Manager::create(QObject* parent)
 {
@@ -49,16 +132,27 @@ Manager* Manager::create(QObject* parent)
 
 Manager::Manager(QObject* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(parent),
+    d(new Private{
+        .q = this,
+        .enumerateTimer = new QTimer(this),
+        .pollTimer = new QTimer(this)
+    })
 {
     loadConfig();
 
-    connect(&m_enumerateTimer, &QTimer::timeout, this, &Manager::enumerateDevices);
-    m_enumerateTimer.setInterval(kEnumerationInterval);
-    m_enumerateTimer.start();
+    connect(d->enumerateTimer, &QTimer::timeout, this,
+        [this]()
+        {
+            enumerateDevices();
+            d->updateSearchState();
+        });
+    d->enumerateTimer->setInterval(kSearchIntervals[d->searchState]);
+    d->enumerateTimer->start();
+    d->initialSearchTimer.start();
 
-    m_pollTimer.setInterval(kUsbPollInterval);
-    m_pollTimer.start();
+    d->pollTimer->setInterval(kUsbPollInterval);
+    d->pollTimer->start();
 }
 
 Manager::~Manager()
@@ -74,7 +168,7 @@ QList<DevicePtr> Manager::devices() const
 JoystickDescriptor Manager::getDefaultDeviceDescription(const QString& id) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    return m_defaultDeviceConfigs[id];
+    return d->defaultDeviceConfigs[id];
 }
 
 JoystickDescriptor Manager::getDeviceDescription(const QString& id) const
@@ -87,7 +181,7 @@ void Manager::updateDeviceDescription(const JoystickDescriptor& config)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_deviceConfigs[config.id] = config;
-    for (auto& actionFactory: m_actionFactories)
+    for (auto& actionFactory: d->actionFactories)
     {
         if (actionFactory->id() == config.id)
             actionFactory->updateConfig(config);
@@ -105,32 +199,31 @@ void Manager::updateDeviceDescription(const JoystickDescriptor& config)
 
 void Manager::setDeviceActionsEnabled(bool enabled)
 {
-    m_deviceActionsEnabled = enabled;
+    d->deviceActionsEnabled = enabled;
 }
 
 void Manager::loadConfig()
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
 
-    m_defaultDeviceConfigs.clear();
-    m_deviceConfigRelativePath.clear();
+    d->defaultDeviceConfigs.clear();
+    d->deviceConfigRelativePath.clear();
     loadConfig(":" + kSettingsDirName,
-        m_defaultDeviceConfigs,
-        m_deviceConfigRelativePath);
+        d->defaultDeviceConfigs,
+        d->deviceConfigRelativePath);
 
-    m_deviceConfigs = m_defaultDeviceConfigs;
-    loadConfig(
-        QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + kSettingsDirName,
+    m_deviceConfigs = d->defaultDeviceConfigs;
+    loadConfig(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + kSettingsDirName,
         m_deviceConfigs,
-        m_deviceConfigRelativePath);
+        d->deviceConfigRelativePath);
 }
 
 void Manager::saveConfig(const QString& id)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
 
-    const auto configPathIter = m_deviceConfigRelativePath.find(id);
-    if (configPathIter == m_deviceConfigRelativePath.end())
+    const auto configPathIter = d->deviceConfigRelativePath.find(id);
+    if (configPathIter == d->deviceConfigRelativePath.end())
     {
         NX_ASSERT(false, "Invalid joystick device id.");
         return;
@@ -194,6 +287,8 @@ void Manager::loadConfig(
 
 void Manager::removeUnpluggedJoysticks(const QSet<QString>& foundDevicePaths)
 {
+    bool deviceWasRemoved = false;
+
     for (auto it = m_devices.begin(); it != m_devices.end(); )
     {
         const auto path = it.key();
@@ -202,16 +297,20 @@ void Manager::removeUnpluggedJoysticks(const QSet<QString>& foundDevicePaths)
             NX_VERBOSE(this, "Joystick has been removed: %1", path);
 
             it = m_devices.erase(it);
+            d->deviceConnections.erase(path);
+            d->actionFactories.remove(path);
 
-            m_deviceConnections.erase(path);
-
-            m_actionFactories.remove(path);
+            deviceWasRemoved = true;
         }
         else
         {
             ++it;
         }
     }
+
+    // Restart search if needed.
+    if (deviceWasRemoved)
+        d->updateSearchState();
 }
 
 void Manager::initializeDevice(
@@ -221,24 +320,29 @@ void Manager::initializeDevice(
 {
     auto factory = ActionFactoryPtr(new ActionFactory(description, this));
 
-    m_deviceConnections[devicePath] <<
+    d->deviceConnections[devicePath] <<
         connect(device.get(), &Device::stateChanged, this,
             [this, factory](const Device::StickPosition& stick, const Device::ButtonStates& buttons)
             {
-                if (m_deviceActionsEnabled)
+                if (d->deviceActionsEnabled)
                     factory->handleStateChanged(stick, buttons);
             });
 
-    m_deviceConnections[devicePath] <<
+    d->deviceConnections[devicePath] <<
         connect(factory.get(), &ActionFactory::actionReady, menu(),
             [this](ui::action::IDType id, const ui::action::Parameters& parameters)
             {
                 menu()->triggerIfPossible(id, parameters);
             });
 
-    m_actionFactories[devicePath] = factory;
+    d->actionFactories[devicePath] = factory;
 
     m_devices[devicePath] = device;
+}
+
+QTimer* Manager::pollTimer() const
+{
+    return d->pollTimer;
 }
 
 } // namespace nx::vms::client::desktop::joystick

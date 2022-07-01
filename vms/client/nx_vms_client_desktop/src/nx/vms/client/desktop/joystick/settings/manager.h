@@ -11,6 +11,7 @@
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/thread/mutex.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include <nx/utils/impl_ptr.h>
 
 namespace nx::vms::client::desktop {
 namespace joystick {
@@ -36,10 +37,10 @@ class Manager:
     using base_type = QObject;
 
 public:
-   static Manager* create(QObject* parent = 0);
+   static Manager* create(QObject* parent = nullptr);
 
 protected:
-    Manager(QObject* parent = 0);
+    Manager(QObject* parent = nullptr);
 
 public:
     virtual ~Manager();
@@ -80,23 +81,18 @@ protected:
         const JoystickDescriptor& description,
         const QString& devicePath);
 
+    QTimer* pollTimer() const;
+
 protected:
     mutable nx::Mutex m_mutex;
 
-    // Configs for known device models.
-    DeviceConfigs m_defaultDeviceConfigs;
     DeviceConfigs m_deviceConfigs;
-    std::map<QString, nx::utils::ScopedConnections> m_deviceConnections;
-
-    QMap<QString, QString> m_deviceConfigRelativePath;
 
     QMap<QString, DevicePtr> m_devices;
-    QMap<QString, ActionFactoryPtr> m_actionFactories;
 
-    QTimer m_enumerateTimer;
-    QTimer m_pollTimer;
-
-    bool m_deviceActionsEnabled = true;
+private:
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace joystick
