@@ -6706,7 +6706,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</translation>
+      <translation>Proxying af alt indhold offentligører enhver tjeneste eller enhed på serveren&apos;s netværk til brugerne af denne webside.</translation>
     </message>
     <message>
       <source>Move anyway?</source>
@@ -9900,19 +9900,19 @@ Du kan stadig ændre kvalitet og FPS direkte på kameraet.</translation>
     </message>
     <message>
       <source>Object detection is disabled for this I/O module</source>
-      <translation type="unfinished">Object detection is disabled for this I/O module</translation>
+      <translation>Bevægelsesdetektion er deaktiveret for dette I/O-modul</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected I/O modules</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected I/O modules</translation>
+      <translation>Objektdetektion er deaktiveret for nogle af de valgte I/O-moduler</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for this I/O module</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for this I/O module</translation>
+      <translation>Bevægelses- og objektdetektering er deaktiveret for dette I/O-modul</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected I/O modules</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected I/O modules</translation>
+      <translation>Bevægelses- og objektdetektering er deaktiveret for nogle af de valgte I/O-moduler</translation>
     </message>
   </context>
   <context>
@@ -9947,12 +9947,12 @@ Du kan stadig ændre kvalitet og FPS direkte på kameraet.</translation>
     <message>
       <source>The encryption password will be required to restore the archive on another system.
 Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</source>
-      <translation type="unfinished">The encryption password will be required to restore the archive on another system.
-Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</translation>
+      <translation>Krypteringsadgangskoden vil være påkrævet for at gendanne arkivet på et andet system.
+Forsigtig: Denne adgangskode kan ikke nulstilles. Hvis du mister det, vil arkivet være uopretteligt.</translation>
     </message>
     <message>
       <source>Encrypts archive data to prevent it from being viewed outside of the system. You will not be required to enter the encryption password to view the video archive within this system.</source>
-      <translation type="unfinished">Encrypts archive data to prevent it from being viewed outside of the system. You will not be required to enter the encryption password to view the video archive within this system.</translation>
+      <translation>Krypterer arkivdata for at forhindre, at de kan ses uden for systemet. Du skal ikke indtaste krypteringsadgangskoden for at se videoarkivet i dette system.</translation>
     </message>
     <message>
       <source>Failed to set archive encryption password</source>
@@ -9972,16 +9972,16 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
-      <translation type="unfinished">Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</translation>
+      <translation>Lokale og LDAP-brugere vil automatisk blive logget ud, hvis deres session overskrider den angivne varighed.</translation>
     </message>
     <message>
       <source>Unlimited user session lifetime threatens overall System security and may lead to degradation in System performance</source>
-      <translation type="unfinished">Unlimited user session lifetime threatens overall System security and may lead to degradation in System performance</translation>
+      <translation>Ubegrænset levetid for brugersessioner truer den overordnede systemsikkerhed og kan føre til forringelse af systemets ydeevne</translation>
     </message>
     <message>
       <source>It is recommended to have user session lifetime not greater than %1</source>
       <comment>%1 is the time span with time units</comment>
-      <translation type="unfinished">It is recommended to have user session lifetime not greater than %1</translation>
+      <translation>Det anbefales at have en levetid for brugersessioner, der ikke er længere end %1</translation>
     </message>
     <message>
       <source>Learn more.</source>
@@ -9990,9 +9990,9 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message numerus="yes">
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
       <comment>%n is digest user count, %1 is total user count</comment>
-      <translation type="unfinished">
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
+      <translation>
+        <numerusform>%n ud af %1 brugere har tilladelse til at bruge digest-godkendelse (ikke sikker).</numerusform>
+        <numerusform>%n ud af %1 brugere har tilladelse til at bruge digest-godkendelse (ikke sikker).</numerusform>
       </translation>
     </message>
   </context>
@@ -10027,7 +10027,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>This certificate does not match the certificate %1 is pinned to.</source>
-      <translation type="unfinished">This certificate does not match the certificate %1 is pinned to.</translation>
+      <translation>Dette certifikat matcher ikke det certifikat %1 er fastgjort til.</translation>
     </message>
     <message>
       <source>Custom certificate</source>
@@ -10096,19 +10096,19 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     </message>
     <message>
       <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
-      <translation type="unfinished">You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</translation>
+      <translation>Du forsøgte at oprette forbindelse til denne server, men den præsenterede et certifikat, der ikke kan bekræftes automatisk.</translation>
     </message>
     <message>
       <source>Someone may be impersonating this Server to steal your personal information.</source>
-      <translation type="unfinished">Someone may be impersonating this Server to steal your personal information.</translation>
+      <translation>Nogen udgiver sig muligvis for at være denne server for at stjæle dine personlige oplysninger.</translation>
     </message>
     <message>
       <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
-      <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
+      <translation>Opret ikke forbindelse til denne server, medmindre du er instrueret af din VMS-administrator.</translation>
     </message>
     <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
-      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct Server.</translation>
+      <translation>Gennemgå certifikatets&apos;s detaljer for at sikre, at du opretter forbindelse til den korrekte server.</translation>
     </message>
   </context>
   <context>
@@ -10596,7 +10596,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     </message>
     <message>
       <source>You will be able to access the %1 login menu at any time by clicking the cloud icon on the navigation panel.</source>
-      <translation type="unfinished">You will be able to access the %1 login menu at any time by clicking the cloud icon on the navigation panel.</translation>
+      <translation>Du vil til enhver tid kunne få adgang til %1 login-menuen ved at klikke på Cloud ikonet på navigationspanelet.</translation>
     </message>
     <message>
       <source>Hide</source>
@@ -10604,7 +10604,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     </message>
     <message>
       <source>Unable to connect to the system because it has become offline</source>
-      <translation type="unfinished">Unable to connect to the system because it has become offline</translation>
+      <translation>Kan ikke oprette forbindelse til systemet, fordi det er offline</translation>
     </message>
   </context>
   <context>

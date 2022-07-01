@@ -640,7 +640,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Files</source>
-      <translation type="unfinished">Files</translation>
+      <translation>Filer</translation>
     </message>
     <message>
       <source>Alt+Left</source>
