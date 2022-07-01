@@ -14,11 +14,15 @@ if(MACOSX)
     set(mac_sources src/utils/mac_utils.mm)
 endif()
 
+set(aes_library_root "${open_source_root}/artifacts/tiny_aes_c")
+file(GLOB_RECURSE aes_library_sources "${aes_library_root}/src/tiny_aes_c/*")
+
 nx_add_target(nx_vms_common LIBRARY
     ADDITIONAL_SOURCES
         ${mac_sources}
         ${date_time_formatter_sources}
         ${device_vendor_names_sources}
+        ${aes_library_sources}
     ADDITIONAL_RESOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/resources"
     PUBLIC_LIBS
@@ -61,6 +65,7 @@ target_include_directories(nx_vms_common
     PRIVATE
         ${Qt5Core_PRIVATE_INCLUDE_DIRS}
         ${device_vendor_names_root}/src
+        ${aes_library_root}/src
     PUBLIC
         ${date_time_formatter_root}/src
 )
