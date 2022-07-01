@@ -75,8 +75,6 @@ double Device::mapAxisState(int rawValue, const AxisLimits& limits)
 
 void Device::pollData()
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
-
     const auto newState = getNewState();
 
     if (newState.buttonStates.empty())

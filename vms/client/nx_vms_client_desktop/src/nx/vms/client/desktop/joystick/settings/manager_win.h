@@ -39,6 +39,8 @@ private:
 
     static bool enumDevicesCallback(LPCDIDEVICEINSTANCE deviceInstance, LPVOID managerPtr);
 
+    void onDeviceFailed(const QString& path);
+
 private:
     LPDIRECTINPUT8 m_directInput = nullptr; // Actually, it must be single per app.
 
