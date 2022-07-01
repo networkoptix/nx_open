@@ -19,6 +19,7 @@ public:
     FanErrorEvent() = default;
     FanErrorEvent(QnUuid serverId, std::chrono::microseconds timestamp);
 
+    virtual QString uniqueName() const override;
     virtual QVariantMap details(common::SystemContext* context) const override;
 
     static const ItemDescriptor& manifest();

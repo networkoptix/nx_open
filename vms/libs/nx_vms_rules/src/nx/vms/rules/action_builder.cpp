@@ -18,9 +18,10 @@
 
 #include "action_field.h"
 #include "action_fields/target_user_field.h"
+#include "aggregated_event.h"
+#include "aggregator.h"
 #include "basic_action.h"
 #include "basic_event.h"
-#include "event_aggregator.h"
 #include "utils/field.h"
 #include "utils/type.h"
 
@@ -35,6 +36,10 @@ ActionBuilder::ActionBuilder(const QnUuid& id, const QString& actionType, const 
 {
     // TODO: #spanasenko Build m_targetFields list.
     m_timer.setSingleShot(true);
+    // The interval is how often does it required to check if aggregator has events with the elapsed
+    // aggregation time.
+    constexpr auto kPollAggregatorInterval = seconds(1);
+    m_timer.setInterval(kPollAggregatorInterval);
     connect(&m_timer, &QTimer::timeout, this, &ActionBuilder::onTimeout);
 }
 
@@ -149,7 +154,7 @@ QSet<QString> ActionBuilder::requiredEventFields() const
     return result;
 }
 
-QSet<QnUuid> ActionBuilder::affectedResources(const EventPtr& event) const
+QSet<QnUuid> ActionBuilder::affectedResources(const EventPtr& /*event*/) const
 {
     NX_ASSERT(false, "Not implemented");
     return {};
@@ -157,28 +162,36 @@ QSet<QnUuid> ActionBuilder::affectedResources(const EventPtr& event) const
 
 void ActionBuilder::process(EventPtr event)
 {
-    if (!m_eventAggregator)
-        m_eventAggregator = EventAggregatorPtr::create(event);
-    else
-        m_eventAggregator->aggregate(event);
+    if (m_aggregator && !m_timer.isActive())
+        m_timer.start();
 
-    if (m_interval.count())
+    processEvent(event);
+}
+
+void ActionBuilder::processEvent(const EventPtr& event)
+{
+    if (m_aggregator && m_aggregator->aggregate(event))
     {
-        if (!m_timer.isActive())
-        {
-            m_timer.start();
-            buildAndEmitAction();
-        }
+        NX_VERBOSE(this, "Event %1 occurred and was aggregated", event->type());
     }
     else
     {
-        buildAndEmitAction();
+        NX_VERBOSE(this, "Event %1 occurred and was sent to execution", event->type());
+        buildAndEmitAction(AggregatedEventPtr::create(event));
     }
 }
 
 void ActionBuilder::setAggregationInterval(seconds interval)
 {
     m_interval = interval;
+    if (m_interval != seconds::zero())
+    {
+        // TODO: #mmalofeev move aggregation key function to the manifest or to some action
+        // dependent strategy class when another aggregation logic will be required.
+        m_aggregator = QSharedPointer<Aggregator>::create(
+            m_interval,
+            [](const EventPtr& e) { return e->uniqueName(); });
+    }
 }
 
 seconds ActionBuilder::aggregationInterval() const
@@ -197,11 +210,12 @@ void ActionBuilder::connectSignals()
 
 void ActionBuilder::onTimeout()
 {
-    if (m_eventAggregator)
-    {
-        m_timer.start();
-        buildAndEmitAction();
-    }
+    if (!NX_ASSERT(m_aggregator) || m_aggregator->empty())
+        return;
+
+    m_timer.start();
+
+    handleAggregatedEvents();
 }
 
 void ActionBuilder::updateState()
@@ -215,20 +229,18 @@ void ActionBuilder::updateState()
     emit stateChanged();
 }
 
-void ActionBuilder::buildAndEmitAction()
+void ActionBuilder::buildAndEmitAction(const AggregatedEventPtr& aggregatedEvent)
 {
-    if (!NX_ASSERT(m_constructor) || !NX_ASSERT(m_eventAggregator))
+    if (!NX_ASSERT(m_constructor) || !NX_ASSERT(aggregatedEvent))
         return;
 
     if (m_fields.contains(utils::kUsersFieldName))
-        buildAndEmitActionForTargetUsers();
+        buildAndEmitActionForTargetUsers(aggregatedEvent);
     else
-        emit action(buildAction(m_eventAggregator));
-
-    m_eventAggregator.reset();
+        emit action(buildAction(aggregatedEvent));
 }
 
-void ActionBuilder::buildAndEmitActionForTargetUsers()
+void ActionBuilder::buildAndEmitActionForTargetUsers(const AggregatedEventPtr& aggregatedEvent)
 {
     auto targetUsersField = fieldByNameImpl<TargetUserField>(utils::kUsersFieldName);
     if (!NX_ASSERT(targetUsersField))
@@ -244,7 +256,7 @@ void ActionBuilder::buildAndEmitActionForTargetUsers()
     // appropriate rights to see the event details.
     for (const auto& user: targetUsersField->users()) //< TODO: Unite users with the same access rights.
     {
-        // Checks whether the user has rights to view the event. At the moment only cameras is
+        // Checks whether the user has rights to view the event. At the moment only cameras are
         // required to be checked.
         const auto filter =
             [&user, context = targetUsersField->systemContext()](const EventPtr& event)
@@ -266,9 +278,9 @@ void ActionBuilder::buildAndEmitActionForTargetUsers()
                     Qn::Permission::ViewContentPermission);
             };
 
-        auto filteredEventAggregator = m_eventAggregator->filtered(filter);
+        auto filteredAggregatedEvent = aggregatedEvent->filtered(filter);
 
-        if (!filteredEventAggregator)
+        if (!filteredAggregatedEvent)
             continue;
 
         // Substitute the initial target users with the user the aggregated event has been filtered.
@@ -276,14 +288,14 @@ void ActionBuilder::buildAndEmitActionForTargetUsers()
             .ids = {user->getId()},
             .all = false});
 
-        emit action(buildAction(filteredEventAggregator));
+        emit action(buildAction(filteredAggregatedEvent));
     }
 
     // Recover initial target users selection.
     targetUsersField->setSelection(initialFieldValue);
 }
 
-ActionPtr ActionBuilder::buildAction(const EventAggregatorPtr& eventAggregator)
+ActionPtr ActionBuilder::buildAction(const AggregatedEventPtr& aggregatedEvent)
 {
     ActionPtr action(m_constructor());
     if (!action)
@@ -300,21 +312,27 @@ ActionPtr ActionBuilder::buildAction(const EventAggregatorPtr& eventAggregator)
         if (m_fields.contains(propertyName))
         {
             auto& field = m_fields.at(propertyName);
-            const auto value = field->build(eventAggregator);
+            const auto value = field->build(aggregatedEvent);
             action->setProperty(propertyNameUtf8, value);
         }
         else
         {
             // Set property value only if it exists.
             if (action->property(propertyNameUtf8).isValid()
-                && eventAggregator->property(propertyNameUtf8).isValid())
+                && aggregatedEvent->property(propertyNameUtf8).isValid())
             {
-                action->setProperty(propertyNameUtf8, eventAggregator->property(propertyNameUtf8));
+                action->setProperty(propertyNameUtf8, aggregatedEvent->property(propertyNameUtf8));
             }
         }
     }
 
     return action;
+}
+
+void ActionBuilder::handleAggregatedEvents()
+{
+    for (const auto& aggregationInfo: m_aggregator->popEvents())
+        buildAndEmitAction(AggregatedEventPtr::create(aggregationInfo));
 }
 
 } // namespace nx::vms::rules

@@ -4,12 +4,12 @@
 
 #include <QtCore/QVariant>
 
+#include "../aggregated_event.h"
 #include "../basic_event.h"
-#include "../event_aggregator.h"
 
 namespace nx::vms::rules {
 
-QVariant Substitution::build(const EventAggregatorPtr& eventAggregator) const
+QVariant Substitution::build(const AggregatedEventPtr& eventAggregator) const
 {
     QVariant value;
     if (eventAggregator)

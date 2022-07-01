@@ -73,7 +73,7 @@ signals:
     void idsChanged();
 
 public:
-    virtual QVariant build(const EventAggregatorPtr& eventAggregator) const override;
+    virtual QVariant build(const AggregatedEventPtr& eventAggregator) const override;
 
     void setSelection(const UuidSelection& selection);
 };

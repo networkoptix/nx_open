@@ -13,7 +13,7 @@ bool ResourceFilterEventField::match(const QVariant& value) const
         : ids().contains(value.value<QnUuid>());
 }
 
-QVariant ResourceFilterActionField::build(const EventAggregatorPtr& /*eventData*/) const
+QVariant ResourceFilterActionField::build(const AggregatedEventPtr& /*eventData*/) const
 {
     return QVariant::fromValue(UuidSelection{
         .ids = ids(),

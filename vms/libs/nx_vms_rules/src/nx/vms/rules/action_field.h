@@ -22,7 +22,7 @@ public:
     ActionField();
 
     virtual QSet<QString> requiredEventFields() const;
-    virtual QVariant build(const EventAggregatorPtr& eventAggregator) const = 0;
+    virtual QVariant build(const AggregatedEventPtr& eventAggregator) const = 0;
 };
 
 } // namespace nx::vms::rules

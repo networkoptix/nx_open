@@ -14,7 +14,7 @@ class NX_VMS_RULES_API TargetDeviceField: public ResourceFilterActionField
 public:
     TargetDeviceField() = default;
 
-    QVariant build(const EventAggregatorPtr& eventAggregator) const override;
+    QVariant build(const AggregatedEventPtr& eventAggregator) const override;
 };
 
 } // namespace nx::vms::rules

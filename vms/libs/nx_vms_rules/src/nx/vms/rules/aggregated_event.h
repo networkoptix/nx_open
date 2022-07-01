@@ -4,20 +4,21 @@
 
 #include <QtCore/QHash>
 
+#include "aggregator.h"
 #include "basic_event.h"
 
 namespace nx::vms::rules {
 
-/** Aggregates events by their unique name. */
-class NX_VMS_RULES_API EventAggregator: public QObject
+/** Wrapper around a list of event aggregation information. */
+class NX_VMS_RULES_API AggregatedEvent: public QObject
 {
     Q_OBJECT
 
 public:
-    explicit EventAggregator(const EventPtr& event);
-    ~EventAggregator() = default;
-
-    void aggregate(const EventPtr& event);
+    explicit AggregatedEvent(const EventPtr& event);
+    explicit AggregatedEvent(const AggregationInfo& aggregationInfo);
+    explicit AggregatedEvent(const std::list<AggregationInfo>& aggregationInfoList);
+    ~AggregatedEvent() = default;
 
     /** Returns property with the given name of the initial event. */
     QVariant property(const char* name) const;
@@ -35,16 +36,16 @@ public:
      * Filters aggregated events by the given filter condition. If there is no appropriate events
      * nullptr returned.
      */
-    EventAggregatorPtr filtered(const std::function<bool(const EventPtr&)>& filter) const;
+    AggregatedEventPtr filtered(const std::function<bool(const EventPtr&)>& filter) const;
 
     size_t totalCount() const;
     size_t uniqueCount() const;
 
 private:
-    EventPtr m_initialEvent;
-    QHash</*unique name*/ QString, QPair<EventPtr, /*count*/ size_t>> m_aggregatedEvents;
+    std::list<AggregationInfo> m_aggregationInfoList;
 
-    EventAggregator() = default;
+    AggregatedEvent() = default;
+    EventPtr initialEvent() const;
 };
 
 } // namespace nx::vms::rules

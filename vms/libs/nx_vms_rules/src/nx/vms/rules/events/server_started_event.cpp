@@ -14,6 +14,11 @@ ServerStartedEvent::ServerStartedEvent(std::chrono::microseconds timestamp, QnUu
 {
 }
 
+QString ServerStartedEvent::uniqueName() const
+{
+    return makeName(BasicEvent::uniqueName(), m_serverId.toSimpleString());
+}
+
 QVariantMap ServerStartedEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);

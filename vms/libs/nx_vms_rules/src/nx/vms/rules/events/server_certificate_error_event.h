@@ -19,6 +19,7 @@ public:
     ServerCertificateErrorEvent() = default;
     ServerCertificateErrorEvent(std::chrono::microseconds timestamp, QnUuid serverId);
 
+    virtual QString uniqueName() const override;
     virtual QVariantMap details(common::SystemContext* context) const override;
 
     static const ItemDescriptor& manifest();

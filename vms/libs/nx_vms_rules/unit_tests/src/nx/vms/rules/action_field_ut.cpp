@@ -4,8 +4,8 @@
 
 #include <nx/vms/common/test_support/test_context.h>
 #include <nx/vms/rules/action_fields/builtin_fields.h>
+#include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/engine.h>
-#include <nx/vms/rules/event_aggregator.h>
 
 #include "test_event.h"
 #include "test_router.h"
@@ -86,7 +86,7 @@ TEST_F(ActionFieldTest, CreateGuid)
     TextWithFields field(systemContext());
     field.setText("{@CreateGuid}");
     EXPECT_TRUE(
-        QnUuid::isUuidString(field.build(EventAggregatorPtr::create(makeEvent())).toString()));
+        QnUuid::isUuidString(field.build(AggregatedEventPtr::create(makeEvent())).toString()));
 }
 
 TEST_F(ActionFieldTest, EventType)
@@ -95,7 +95,7 @@ TEST_F(ActionFieldTest, EventType)
     field.setText("{@EventType}");
     EXPECT_EQ(
         TestEvent::manifest().id,
-        field.build(EventAggregatorPtr::create(makeEvent())).toString());
+        field.build(AggregatedEventPtr::create(makeEvent())).toString());
 }
 
 TEST_F(ActionFieldTest, EventName)
@@ -104,14 +104,14 @@ TEST_F(ActionFieldTest, EventName)
     field.setText("{@EventName}");
     EXPECT_EQ(
         TestEvent::manifest().displayName,
-        field.build(EventAggregatorPtr::create(makeEvent())).toString());
+        field.build(AggregatedEventPtr::create(makeEvent())).toString());
 }
 
 TEST_F(ActionFieldTest, EventCaption)
 {
     TextWithFields field(systemContext());
     auto event = makeEvent();
-    auto eventAggregator = EventAggregatorPtr::create(event);
+    auto eventAggregator = AggregatedEventPtr::create(event);
 
     field.setText("{@EventCaption}");
     EXPECT_EQ(TestEvent::manifest().displayName, field.build(eventAggregator).toString());
@@ -126,7 +126,7 @@ TEST_F(ActionFieldTest, EventDescription)
 {
     TextWithFields field(systemContext());
     auto event = makeEvent();
-    auto eventAggregator = EventAggregatorPtr::create(event);
+    auto eventAggregator = AggregatedEventPtr::create(event);
 
     field.setText("{@EventDescription}");
     EXPECT_EQ(TestEvent::manifest().description, field.build(eventAggregator).toString());
@@ -143,7 +143,7 @@ TEST_F(ActionFieldTest, EventTooltip)
 
     field.setText("{@EventTooltip}");
     // Tooltip must not be empty, at least event name and timestamp must exists.
-    EXPECT_FALSE(field.build(EventAggregatorPtr::create(makeEvent())).toString().isEmpty());
+    EXPECT_FALSE(field.build(AggregatedEventPtr::create(makeEvent())).toString().isEmpty());
 }
 
 TEST_P(ActionFieldTest, FormatLine)
@@ -154,7 +154,7 @@ TEST_P(ActionFieldTest, FormatLine)
     field.setText(format);
     SCOPED_TRACE(nx::format("Format line: %1", field.text()).toStdString());
 
-    auto result = field.build(EventAggregatorPtr::create(makeEvent()));
+    auto result = field.build(AggregatedEventPtr::create(makeEvent()));
     ASSERT_TRUE(result.isValid());
 
     EXPECT_EQ(expected.toStdString(), result.toString().toStdString());

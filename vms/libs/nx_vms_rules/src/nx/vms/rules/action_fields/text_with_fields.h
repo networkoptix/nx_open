@@ -22,7 +22,7 @@ class NX_VMS_RULES_API TextWithFields:
 public:
     TextWithFields(common::SystemContext* context);
 
-    virtual QVariant build(const EventAggregatorPtr& eventAggregator) const override;
+    virtual QVariant build(const AggregatedEventPtr& eventAggregator) const override;
 
     QString text() const;
     void setText(const QString& text);

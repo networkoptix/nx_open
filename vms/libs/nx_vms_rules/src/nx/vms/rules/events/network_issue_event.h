@@ -12,7 +12,6 @@ class NX_VMS_RULES_API NetworkIssueEvent: public ReasonedEvent
     Q_CLASSINFO("type", "nx.events.networkIssue")
 
 public:
-    virtual QString uniqueName() const override;
     virtual QVariantMap details(common::SystemContext* context) const override;
 
     static const ItemDescriptor& manifest();
