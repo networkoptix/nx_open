@@ -585,6 +585,12 @@ void QnUserResource::updateInternal(const QnResourcePtr& source, NotifierList& n
         const bool wasEnabled = m_isEnabled.exchange(isEnabled);
         if (isEnabled != wasEnabled)
             notifiers << [r = toSharedPointer(this)]{ emit r->enabledChanged(r); };
+
+        if (m_isOwner != localOther->m_isOwner)
+        {
+            m_isOwner.store(localOther->m_isOwner.load());
+            notifiers << [r = toSharedPointer(this)] { emit r->permissionsChanged(r); };
+        }
     }
 }
 
