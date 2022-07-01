@@ -8,7 +8,7 @@
 
 namespace nx::sql {
 
-class QtDbConnection:
+class NX_SQL_API QtDbConnection:
     public AbstractDbConnection
 {
 public:

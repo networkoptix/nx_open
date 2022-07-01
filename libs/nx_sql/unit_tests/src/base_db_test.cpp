@@ -2,6 +2,8 @@
 
 #include "base_db_test.h"
 
+#include <gtest/gtest.h>
+
 #include <QtCore/QDir>
 
 #include <nx/sql/query.h>
@@ -37,17 +39,16 @@ void BasicFixture::initializeDatabase()
     ASSERT_TRUE(initializeQueryExecutor(m_connectionOptions));
 }
 
-void BasicFixture::executeUpdate(const std::string_view& queryText)
+DBResult BasicFixture::executeUpdate(const std::string_view& queryText)
 {
-    const auto dbResult = executeQuery(
+    return executeQuery(
         [queryText](nx::sql::QueryContext* queryContext)
         {
-            SqlQuery query(queryContext->connection());
-            query.prepare(queryText);
-            query.exec();
+            auto query = queryContext->connection()->createQuery();
+            query->prepare(queryText);
+            query->exec();
             return DBResult::ok;
         });
-    NX_GTEST_ASSERT_EQ(DBResult::ok, dbResult);
 }
 
 nx::utils::filesystem::path BasicFixture::dbFilePath() const
@@ -57,9 +58,25 @@ nx::utils::filesystem::path BasicFixture::dbFilePath() const
 
 //-------------------------------------------------------------------------------------------------
 
+void BaseDbTest::setConnectionFactory(
+    std::optional<AsyncSqlQueryExecutor::ConnectionFactoryFunc> connectionFactory)
+{
+    m_connectionFactory = std::move(connectionFactory);
+}
+
 bool BaseDbTest::initializeQueryExecutor(const ConnectionOptions& connectionOptions)
 {
     m_dbInstanceController = std::make_unique<InstanceController>(connectionOptions);
+
+    if (m_connectionFactory)
+    {
+        static_cast<AsyncSqlQueryExecutor&>(asyncSqlQueryExecutor())
+            .setCustomConnectionFactory([this](auto&&... args)
+            {
+                return (*m_connectionFactory)(std::forward<decltype(args)>(args)...);
+            });
+    }
+
     return m_dbInstanceController->initialize();
 }
 

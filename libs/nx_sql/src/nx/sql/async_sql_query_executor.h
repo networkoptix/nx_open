@@ -362,6 +362,11 @@ public:
 
     virtual int openCursorCount() const override;
 
+    using ConnectionFactoryFunc = nx::utils::MoveOnlyFunc<std::unique_ptr<AbstractDbConnection>(
+        const ConnectionOptions& connectionOptions)>;
+
+    void setCustomConnectionFactory(std::optional<ConnectionFactoryFunc> func);
+
 private:
     struct CursorProcessorContext
     {
@@ -376,14 +381,17 @@ private:
     std::vector<std::unique_ptr<detail::BaseQueryExecutor>> m_dbThreadList;
     nx::utils::thread m_dropConnectionThread;
     nx::utils::SyncQueue<std::unique_ptr<detail::BaseQueryExecutor>> m_connectionsToDropQueue;
-    bool m_terminated;
+    bool m_terminated = false;
+    std::optional<ConnectionFactoryFunc> m_connectionFactory;
 
     detail::QueryQueue m_cursorTaskQueue;
     std::vector<std::unique_ptr<CursorProcessorContext>> m_cursorProcessorContexts;
 
     bool isNewConnectionNeeded(const nx::Locker<nx::Mutex>& /*lk*/) const;
 
-    void openNewConnection(const nx::Locker<nx::Mutex>& /*lk*/);
+    void openNewConnection(
+        const nx::Locker<nx::Mutex>& /*lk*/,
+        std::chrono::milliseconds connectDelay = std::chrono::milliseconds::zero());
 
     void saveOpenedConnection(
         const nx::Locker<nx::Mutex>& lock,
@@ -391,7 +399,7 @@ private:
 
     std::unique_ptr<detail::BaseQueryExecutor> createNewConnectionThread(
         const ConnectionOptions& connectionOptions,
-        detail::QueryQueue* const queryQueue);
+        detail::QueryQueue* queryQueue);
 
     void dropExpiredConnectionsThreadFunc();
     void reportQueryCancellation(std::unique_ptr<detail::AbstractExecutor>);

@@ -76,6 +76,11 @@ public:
      */
     std::optional<int> concurrentModificationQueryLimit;
 
+    /**
+     * Delay between retries to restore a lost DB connection.
+     */
+    std::chrono::milliseconds reconnectAfterFailureDelay = std::chrono::seconds(1);
+
     ConnectionOptions();
 
     void loadFromSettings(const QnSettings& settings, const QString& groupName = "db");

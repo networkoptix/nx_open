@@ -34,7 +34,7 @@ protected:
     ConnectionOptions& connectionOptions();
     const ConnectionOptions& connectionOptions() const;
     void initializeDatabase();
-    void executeUpdate(const std::string_view& queryText);
+    DBResult executeUpdate(const std::string_view& queryText);
 
     template<typename RecordStructure>
     std::vector<RecordStructure> executeSelect(const std::string_view& queryText)
@@ -109,12 +109,16 @@ class BaseDbTest:
 public:
     using base_type::base_type;
 
+    void setConnectionFactory(
+        std::optional<AsyncSqlQueryExecutor::ConnectionFactoryFunc> connectionFactory);
+
 protected:
     virtual bool initializeQueryExecutor(const ConnectionOptions& connectionOptions) override;
     virtual void closeDatabase() override;
     virtual AbstractAsyncSqlQueryExecutor& asyncSqlQueryExecutor() override;
 
 private:
+    std::optional<AsyncSqlQueryExecutor::ConnectionFactoryFunc> m_connectionFactory;
     std::unique_ptr<InstanceController> m_dbInstanceController;
 };
 

@@ -6,7 +6,7 @@
 
 #include <nx/utils/log/log.h>
 
-#include "detail/query_executor_factory.h"
+#include "detail/query_execution_thread.h"
 #include "sql_query_execution_helper.h"
 #include "query.h"
 
@@ -34,8 +34,7 @@ AsyncSqlQueryExecutor::AsyncSqlQueryExecutor(
     const ConnectionOptions& connectionOptions)
     :
     m_connectionOptions(connectionOptions),
-    m_statisticsCollector(kDefaultStatisticsAggregationPeriod),
-    m_terminated(false)
+    m_statisticsCollector(kDefaultStatisticsAggregationPeriod)
 {
     m_dropConnectionThread = nx::utils::thread(
         std::bind(&AsyncSqlQueryExecutor::dropExpiredConnectionsThreadFunc, this));
@@ -218,6 +217,12 @@ int AsyncSqlQueryExecutor::openCursorCount() const
         });
 }
 
+void AsyncSqlQueryExecutor::setCustomConnectionFactory(
+    std::optional<ConnectionFactoryFunc> func)
+{
+    m_connectionFactory = std::move(func);
+}
+
 void AsyncSqlQueryExecutor::setConcurrentModificationQueryLimit(int value)
 {
     m_queryQueue.setConcurrentModificationQueryLimit(value);
@@ -247,12 +252,14 @@ bool AsyncSqlQueryExecutor::isNewConnectionNeeded(
     return true;
 }
 
-void AsyncSqlQueryExecutor::openNewConnection(const nx::Locker<nx::Mutex>& lock)
+void AsyncSqlQueryExecutor::openNewConnection(
+    const nx::Locker<nx::Mutex>& lock,
+    std::chrono::milliseconds connectDelay)
 {
     auto executorThread = createNewConnectionThread(m_connectionOptions, &m_queryQueue);
     auto executorThreadPtr = executorThread.get();
     saveOpenedConnection(lock, std::move(executorThread));
-    executorThreadPtr->start();
+    executorThreadPtr->start(connectDelay);
 }
 
 void AsyncSqlQueryExecutor::saveOpenedConnection(
@@ -266,11 +273,19 @@ void AsyncSqlQueryExecutor::saveOpenedConnection(
 
 std::unique_ptr<detail::BaseQueryExecutor> AsyncSqlQueryExecutor::createNewConnectionThread(
     const ConnectionOptions& connectionOptions,
-    detail::QueryQueue* const queryQueue)
+    detail::QueryQueue* queryQueue)
 {
-    return detail::RequestExecutorFactory::instance().create(
-        connectionOptions,
-        queryQueue);
+    if (m_connectionFactory)
+    {
+        return std::make_unique<detail::QueryExecutionThread>(
+            connectionOptions,
+            (*m_connectionFactory)(connectionOptions),
+            queryQueue);
+    }
+    else
+    {
+        return std::make_unique<detail::QueryExecutionThread>(connectionOptions, queryQueue);
+    }
 }
 
 void AsyncSqlQueryExecutor::dropExpiredConnectionsThreadFunc()
@@ -300,7 +315,8 @@ void AsyncSqlQueryExecutor::onConnectionClosed(
     NX_MUTEX_LOCKER lk(&m_mutex);
     dropConnectionAsync(lk, executorThreadPtr);
     if (m_dbThreadList.empty() && !m_terminated)
-        openNewConnection(lk);
+        // Attempting to open a connection only after a delay.
+        openNewConnection(lk, m_connectionOptions.reconnectAfterFailureDelay);
 }
 
 void AsyncSqlQueryExecutor::dropConnectionAsync(
