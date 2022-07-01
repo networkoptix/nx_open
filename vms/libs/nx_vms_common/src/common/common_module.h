@@ -97,7 +97,6 @@ private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
     std::shared_ptr<nx::metrics::Storage> m_metrics;
-
     qint64 m_systemIdentityTime = 0;
 
     QnAuditManager* m_auditManager = nullptr;

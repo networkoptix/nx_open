@@ -10,6 +10,7 @@
 #include <nx/reflect/instrument.h>
 #include <nx/utils/os_info.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/data/time_reply.h>
 #include <nx/vms/api/types/resource_types.h>
 
 #include "data_macros.h"
@@ -25,7 +26,16 @@ NX_REFLECTION_ENUM_CLASS(HwPlatform,
     bananaPi
 )
 
-struct NX_VMS_API ModuleInformation
+struct NX_VMS_API ServerPortInformation
+{
+    int port = 0;
+    QnUuid id;
+    bool operator==(const ServerPortInformation& other) const = default;
+};
+NX_VMS_API_DECLARE_STRUCT_EX(ServerPortInformation, (ubjson)(json)(xml)(csv_record))
+NX_REFLECTION_INSTRUMENT(ServerPortInformation, (port)(id));
+
+struct NX_VMS_API ModuleInformation: ServerPortInformation
 {
     QString type;
     QString customization;
@@ -34,8 +44,6 @@ struct NX_VMS_API ModuleInformation
     nx::utils::OsInfo osInfo;
     QString systemName;
     QString name;
-    int port = 0;
-    QnUuid id;
     bool sslAllowed = true;
     int protoVersion = 0;
     QnUuid runtimeId;
@@ -140,16 +148,42 @@ struct NX_VMS_API ServerInformation: ModuleInformationWithAddresses
 
     std::chrono::milliseconds systemIdentityTimeMs{0};
     TransactionLogTime transactionLogTime;
+    QStringList hardwareIds;
+
+    /**%apidoc
+     * Local OS time on the Server, in milliseconds since epoch.
+     * %deprecated
+     */
+    milliseconds osTimeMs = 0ms;
+
+    /**%apidoc
+     * Time zone offset, in milliseconds.
+     * %deprecated
+     */
+    milliseconds timeZoneOffsetMs = 0ms;
+
+    /**%apidoc Identification of the time zone in the text form. */
+    QString timeZoneId;
 
     ServerInformation() = default;
     ServerInformation(const ServerInformation& rhs) = default;
     ServerInformation(const ModuleInformationWithAddresses& rhs): ModuleInformationWithAddresses(rhs) {}
 
     bool operator==(const ServerInformation& other) const = default;
+
+    QnUuid getId() const { return id; }
 };
 
 #define ServerInformation_Fields ModuleInformationWithAddresses_Fields \
-    (userProvidedCertificatePem)(certificatePem)(systemIdentityTimeMs)(transactionLogTime)
+    (userProvidedCertificatePem) \
+    (certificatePem) \
+    (systemIdentityTimeMs) \
+    (transactionLogTime) \
+    (hardwareIds) \
+    (osTimeMs) \
+    (timeZoneOffsetMs) \
+    (timeZoneId)
+
 NX_VMS_API_DECLARE_STRUCT_EX(ServerInformation, (json))
 NX_REFLECTION_INSTRUMENT(ServerInformation, ServerInformation_Fields);
 
