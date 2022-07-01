@@ -16,6 +16,11 @@ class NX_SQL_API DbConnectionHolder
 {
 public:
     DbConnectionHolder(const ConnectionOptions& connectionOptions);
+
+    DbConnectionHolder(
+        const ConnectionOptions& connectionOptions,
+        std::unique_ptr<AbstractDbConnection> connection);
+
     ~DbConnectionHolder();
 
     const ConnectionOptions& connectionOptions() const;
@@ -35,7 +40,7 @@ public:
 
 private:
     const ConnectionOptions m_connectionOptions;
-    QtDbConnection m_connection;
+    std::unique_ptr<AbstractDbConnection> m_connection;
     QString m_connectionName;
 
     bool tuneConnection();
@@ -46,7 +51,5 @@ private:
     DbConnectionHolder(const DbConnectionHolder&) = delete;
     DbConnectionHolder& operator=(const DbConnectionHolder&) = delete;
 };
-
-DBResult lastDbError(QSqlDatabase* dbConnection);
 
 } // namespace nx::sql
