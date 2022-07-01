@@ -743,8 +743,9 @@ void applyColumnFilter(
         data.authKey.clear();
 }
 
-void applyColumnFilter(
-    QnCommonModule*, const Qn::UserAccessData& accessData, api::MediaServerDataEx& data)
+void applyColumnFilter(QnCommonModule* commonModule,
+    const Qn::UserAccessData& accessData,
+    api::MediaServerDataEx& data)
 {
     if (accessData != Qn::kSystemAccess)
         data.authKey.clear();
@@ -1477,6 +1478,23 @@ struct FilterListByAccess
                 return !SingleAccess()(commonModule, accessData, param);
             }),
             outList.end());
+    }
+
+    void operator()(
+        QnCommonModule* commonModule, const Qn::UserAccessData& accessData, api::MediaServerDataExList& outList)
+    {
+        outList.erase(std::remove_if(
+            outList.begin(),
+            outList.end(),
+            [&accessData, commonModule](const auto& param) -> bool
+            {
+                return !SingleAccess()(commonModule, accessData, param);
+            }),
+            outList.end());
+
+        for (auto& i: outList)
+            FilterListByAccess()(commonModule, accessData, i.storages);
+
     }
 };
 
