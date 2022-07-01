@@ -30,6 +30,7 @@ QnUserResourcePtr QnResourcePoolTestHelper::createUser(GlobalPermissions globalP
     QnUserResourcePtr user(new QnUserResource(userType));
     user->setIdUnsafe(QnUuid::createUuid());
     user->setName(name);
+    user->setPasswordAndGenerateHash(name);
     if (globalPermissions.testFlag(GlobalPermission::owner))
         user->setOwner(true);
     else
