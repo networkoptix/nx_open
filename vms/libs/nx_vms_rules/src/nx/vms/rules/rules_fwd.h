@@ -20,7 +20,7 @@ class ActionExecutor;
 class BasicEvent;
 class BasicAction;
 
-class EventAggregator;
+class AggregatedEvent;
 
 class ActionBuilder;
 class EventFilter;
@@ -35,7 +35,7 @@ struct ItemDescriptor;
 using EventPtr = QSharedPointer<BasicEvent>;
 using ActionPtr = QSharedPointer<BasicAction>;
 
-using EventAggregatorPtr = QSharedPointer<EventAggregator>;
+using AggregatedEventPtr = QSharedPointer<AggregatedEvent>;
 
 using EventData = QMap<QString, QJsonValue>; // TODO: #spanasenko Move to separate class?
 

@@ -8,8 +8,8 @@
 #include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/action_fields/builtin_fields.h>
 #include <nx/vms/rules/actions/builtin_actions.h>
+#include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/engine.h>
-#include <nx/vms/rules/event_aggregator.h>
 #include <nx/vms/rules/event_fields/builtin_fields.h>
 #include <nx/vms/rules/events/builtin_events.h>
 #include <nx/vms/rules/plugin.h>
@@ -126,7 +126,7 @@ public:
         const auto builder = engine->buildActionBuilder(manifest.id);
         ASSERT_TRUE(builder);
 
-        const auto testEvent = EventAggregatorPtr::create(QSharedPointer<TestEvent>::create());
+        const auto testEvent = AggregatedEventPtr::create(QSharedPointer<TestEvent>::create());
         const auto& meta = T::staticMetaObject;
         const auto fields = builder->fields();
 

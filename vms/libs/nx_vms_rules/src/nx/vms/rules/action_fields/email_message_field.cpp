@@ -5,8 +5,8 @@
 #include <nx/utils/log/assert.h>
 #include <utils/email/message.h>
 
+#include "../aggregated_event.h"
 #include "../basic_event.h"
-#include "../event_aggregator.h"
 
 namespace nx::vms::rules {
 
@@ -39,7 +39,7 @@ void EmailMessageField::setDescription(const QString& description)
     m_description.setText(description);
 }
 
-QVariant EmailMessageField::build(const EventAggregatorPtr& eventAggregator) const
+QVariant EmailMessageField::build(const AggregatedEventPtr& eventAggregator) const
 {
     // Return correct type for testing.
     NX_ASSERT(eventAggregator->type() == "nx.events.test", "Must not be called");

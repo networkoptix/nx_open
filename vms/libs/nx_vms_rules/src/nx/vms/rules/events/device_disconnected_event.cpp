@@ -25,7 +25,7 @@ DeviceDisconnectedEvent::DeviceDisconnectedEvent(
 
 QString DeviceDisconnectedEvent::uniqueName() const
 {
-    return makeName(BasicEvent::uniqueName(), m_cameraId.toString());
+    return makeName(BasicEvent::uniqueName(), m_cameraId.toSimpleString());
 }
 
 QVariantMap DeviceDisconnectedEvent::details(common::SystemContext* context) const

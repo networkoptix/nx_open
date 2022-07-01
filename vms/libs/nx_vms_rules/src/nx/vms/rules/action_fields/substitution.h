@@ -16,7 +16,7 @@ class NX_VMS_RULES_API Substitution: public ActionField
 public:
     Substitution() = default;
 
-    virtual QVariant build(const EventAggregatorPtr& eventAggregator) const override;
+    virtual QVariant build(const AggregatedEventPtr& eventAggregator) const override;
 
     QString fieldName() const;
     void setFieldName(const QString& fieldName);

@@ -24,7 +24,7 @@ CameraInputEvent::CameraInputEvent(
 
 QString CameraInputEvent::uniqueName() const
 {
-    return makeName(BasicEvent::uniqueName(), m_inputPortId);
+    return makeName(CameraEvent::uniqueName(), m_inputPortId);
 }
 
 QVariantMap CameraInputEvent::details(common::SystemContext* context) const

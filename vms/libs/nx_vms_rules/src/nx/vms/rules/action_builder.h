@@ -15,6 +15,7 @@
 namespace nx::vms::rules {
 
 class ActionField;
+class Aggregator;
 class BasicAction;
 
 /**
@@ -90,16 +91,16 @@ signals:
     void action(const ActionPtr& action);
 
 protected:
-    void buildAndEmitAction();
-
-    EventAggregatorPtr m_eventAggregator;
+    void processEvent(const EventPtr& event);
+    void buildAndEmitAction(const AggregatedEventPtr& aggregatedEvent);
+    void handleAggregatedEvents();
 
 private:
     void onTimeout();
     void updateState();
     void setAggregationInterval(std::chrono::seconds interval);
-    void buildAndEmitActionForTargetUsers();
-    ActionPtr buildAction(const EventAggregatorPtr& eventAggregator);
+    void buildAndEmitActionForTargetUsers(const AggregatedEventPtr& aggregatedEvent);
+    ActionPtr buildAction(const AggregatedEventPtr& aggregatedEvent);
 
     QnUuid m_id;
     QnUuid m_ruleId;
@@ -109,6 +110,7 @@ private:
     QList<ActionField*> m_targetFields;
     std::chrono::seconds m_interval = std::chrono::seconds(0);
     QTimer m_timer;
+    QSharedPointer<Aggregator> m_aggregator;
     bool m_updateInProgress = false;
 
     template<class T>

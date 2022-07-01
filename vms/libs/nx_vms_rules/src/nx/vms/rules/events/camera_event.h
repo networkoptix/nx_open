@@ -16,6 +16,7 @@ class NX_VMS_RULES_API CameraEvent: public BasicEvent
     FIELD(QnUuid, cameraId, setCameraId)
 
 public:
+    virtual QString uniqueName() const override;
     virtual QVariantMap details(common::SystemContext* context) const override;
 
 protected:

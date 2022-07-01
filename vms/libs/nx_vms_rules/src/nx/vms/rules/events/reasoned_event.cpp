@@ -32,11 +32,13 @@ QString ReasonedEvent::uniqueName() const
         case EventReason::encryptionFailed:
             return makeName(
                 BasicEvent::uniqueName(),
+                m_serverId.toSimpleString(),
                 QString::number(static_cast<int>(m_reasonCode)),
                 m_reasonText);
         default:
             return makeName(
                 BasicEvent::uniqueName(),
+                m_serverId.toSimpleString(),
                 QString::number(static_cast<int>(m_reasonCode)));
     }
 }

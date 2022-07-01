@@ -6,9 +6,9 @@
 #include <nx/utils/metatypes.h>
 #include <nx/vms/common/html/html.h>
 
+#include "../aggregated_event.h"
 #include "../basic_event.h"
 #include "../engine.h"
-#include "../event_aggregator.h"
 #include "../manifest.h"
 #include "../utils/event_details.h"
 #include "../utils/string_helper.h"
@@ -17,21 +17,21 @@ namespace nx::vms::rules {
 
 namespace {
 
-using FormatFunction = std::function<QString(const EventAggregatorPtr&, common::SystemContext*)>;
+using FormatFunction = std::function<QString(const AggregatedEventPtr&, common::SystemContext*)>;
 
 static const QChar kFunctionPrefix = '@';
 
-QString createGuid(const EventAggregatorPtr&, common::SystemContext* context = nullptr)
+QString createGuid(const AggregatedEventPtr&, common::SystemContext* context = nullptr)
 {
     return QUuid::createUuid().toString(QUuid::StringFormat::WithoutBraces);
 }
 
-QString eventType(const EventAggregatorPtr& eventAggregator, common::SystemContext* constext = nullptr)
+QString eventType(const AggregatedEventPtr& eventAggregator, common::SystemContext* constext = nullptr)
 {
     return eventAggregator ? eventAggregator->type() : QString();
 }
 
-QString eventName(const EventAggregatorPtr& eventAggregator, common::SystemContext* context)
+QString eventName(const AggregatedEventPtr& eventAggregator, common::SystemContext* context)
 {
     const auto name = eventAggregator->details(context).value(utils::kNameDetailName);
     if (name.canConvert<QString>())
@@ -40,7 +40,7 @@ QString eventName(const EventAggregatorPtr& eventAggregator, common::SystemConte
     return {};
 }
 
-QString eventCaption(const EventAggregatorPtr& eventAggregator, common::SystemContext* context)
+QString eventCaption(const AggregatedEventPtr& eventAggregator, common::SystemContext* context)
 {
     const auto caption = eventAggregator->details(context).value(utils::kCaptionDetailName);
     if (caption.canConvert<QString>())
@@ -52,7 +52,7 @@ QString eventCaption(const EventAggregatorPtr& eventAggregator, common::SystemCo
     return eventName(eventAggregator, context);
 }
 
-QString eventDescription(const EventAggregatorPtr& eventAggregator, common::SystemContext* context)
+QString eventDescription(const AggregatedEventPtr& eventAggregator, common::SystemContext* context)
 {
     const auto description = eventAggregator->details(context).value(utils::kDescriptionDetailName);
     if (description.canConvert<QString>())
@@ -65,7 +65,7 @@ QString eventDescription(const EventAggregatorPtr& eventAggregator, common::Syst
     return descriptor ? descriptor->description : QString();
 }
 
-QString eventTooltip(const EventAggregatorPtr& eventAggregator, common::SystemContext* context)
+QString eventTooltip(const AggregatedEventPtr& eventAggregator, common::SystemContext* context)
 {
     QStringList result;
     const utils::StringHelper stringsHelper(context);
@@ -122,7 +122,7 @@ TextWithFields::TextWithFields(common::SystemContext* context):
 {
 }
 
-QVariant TextWithFields::build(const EventAggregatorPtr& eventAggregator) const
+QVariant TextWithFields::build(const AggregatedEventPtr& eventAggregator) const
 {
     QString result;
 
