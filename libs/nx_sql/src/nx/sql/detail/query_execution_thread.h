@@ -25,6 +25,12 @@ public:
     QueryExecutionThread(
         const ConnectionOptions& connectionOptions,
         QueryExecutorQueue* const queryExecutorQueue);
+
+    QueryExecutionThread(
+        const ConnectionOptions& connectionOptions,
+        std::unique_ptr<AbstractDbConnection> connection,
+        QueryExecutorQueue* const queryExecutorQueue);
+
     virtual ~QueryExecutionThread() override;
 
     virtual void pleaseStop() override;
@@ -32,7 +38,7 @@ public:
 
     virtual ConnectionState state() const override;
     virtual void setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler) override;
-    virtual void start() override;
+    virtual void start(std::chrono::milliseconds connectDelay = std::chrono::milliseconds::zero()) override;
 
 protected:
     virtual void processTask(std::unique_ptr<AbstractExecutor> task);
@@ -41,11 +47,12 @@ protected:
     void handleExecutionResult(DBResult result);
 
 private:
-    std::atomic<ConnectionState> m_state;
+    std::chrono::milliseconds m_connectDelay = std::chrono::milliseconds::zero();
+    std::atomic<ConnectionState> m_state{ConnectionState::initializing};
     nx::utils::MoveOnlyFunc<void()> m_onClosedHandler;
     std::thread m_queryExecutionThread;
-    std::atomic<bool> m_terminated;
-    int m_numberOfFailedRequestsInARow;
+    std::atomic<bool> m_terminated{false};
+    int m_numberOfFailedRequestsInARow = 0;
     DbConnectionHolder m_dbConnectionHolder;
 
     void queryExecutionThreadMain();

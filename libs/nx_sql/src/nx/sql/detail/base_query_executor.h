@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <memory>
 
 #include <nx/utils/move_only_func.h>
@@ -37,7 +38,11 @@ public:
 
     virtual ConnectionState state() const = 0;
     virtual void setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler) = 0;
-    virtual void start() = 0;
+
+    /**
+     * @param connectDelay Delay before connection to the DB.
+     */
+    virtual void start(std::chrono::milliseconds connectDelay = std::chrono::milliseconds::zero()) = 0;
 
     const ConnectionOptions& connectionOptions() const;
 
