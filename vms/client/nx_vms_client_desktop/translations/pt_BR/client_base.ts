@@ -562,7 +562,7 @@
     </message>
     <message>
       <source>Camera Rules...</source>
-      <translation>Regra da câmera...</translation>
+      <translation>Regras da câmera...</translation>
     </message>
     <message>
       <source>Cameras Rules...</source>
@@ -2565,7 +2565,7 @@
     <name>QnCameraListModel</name>
     <message>
       <source>Recording</source>
-      <translation>Gravando</translation>
+      <translation>Gravação</translation>
     </message>
     <message>
       <source>Name</source>
@@ -3066,7 +3066,7 @@ a %1</translation>
     </message>
     <message>
       <source>System configuration will be restored from backup, Server application will be restarted.</source>
-      <translation>A configuração do sistema será restaurada a partir do backup, o aplicativo do servidor será reiniciado.</translation>
+      <translation>A configuração do sistema será restaurada a partir do ‘backup’, o aplicativo do servidor será reiniciado.</translation>
     </message>
   </context>
   <context>
@@ -3390,7 +3390,7 @@ a %1</translation>
     </message>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation>Cria um backup da configuração do Sistema que pode ser restaurada em caso de falha.</translation>
+      <translation>Cria um ‘backup’ da configuração do sistema que pode ser restaurado em caso de falha.</translation>
     </message>
   </context>
   <context>
@@ -4797,7 +4797,7 @@ a %1</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation>Backup</translation>
+      <translation>‘Backup’ / Redundância de Gravações</translation>
     </message>
   </context>
   <context>
@@ -5189,7 +5189,7 @@ a %1</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation>Backup</translation>
+      <translation type="unfinished">Backup</translation>
     </message>
     <message>
       <source>Depending on the total size of the archive, reindexing can take up to several hours.</source>

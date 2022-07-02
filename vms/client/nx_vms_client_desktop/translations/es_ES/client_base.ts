@@ -3794,7 +3794,7 @@ a %1</translation>
     </message>
     <message>
       <source>Look and Feel</source>
-      <translation>Aspecto y tacto</translation>
+      <translation>Apariencia</translation>
     </message>
     <message>
       <source>Screen Recording</source>
