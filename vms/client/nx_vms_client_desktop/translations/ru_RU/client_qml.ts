@@ -337,7 +337,7 @@
     </message>
     <message>
       <source>360° Equirectangular</source>
-      <translation type="unfinished">360° Equirectangular</translation>
+      <translation>360° Равноугольный</translation>
     </message>
   </context>
   <context>
@@ -1152,11 +1152,11 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Server unavailable</source>
-      <translation type="unfinished">Server unavailable</translation>
+      <translation>Сервер недоступен</translation>
     </message>
     <message>
       <source>No access</source>
-      <translation type="unfinished">No access</translation>
+      <translation>Нет доступа</translation>
     </message>
     <message>
       <source>Device disabled</source>

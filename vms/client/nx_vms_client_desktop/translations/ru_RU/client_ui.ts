@@ -600,35 +600,35 @@
     </message>
     <message>
       <source>Tilt</source>
-      <translation type="unfinished">Tilt</translation>
+      <translation>Наклон</translation>
     </message>
     <message>
       <source>Media Port</source>
-      <translation type="unfinished">Media Port</translation>
+      <translation>Медиа-порт</translation>
     </message>
     <message>
       <source>Use system presets</source>
-      <translation type="unfinished">Use system presets</translation>
+      <translation>Использовать системные настройки</translation>
     </message>
     <message>
       <source>PTZ Speed</source>
-      <translation type="unfinished">PTZ Speed</translation>
+      <translation>Скорость PTZ</translation>
     </message>
     <message>
       <source>RTP Transport</source>
-      <translation type="unfinished">RTP Transport</translation>
+      <translation>Транспорт RTP</translation>
     </message>
     <message>
       <source>Use camera native presets</source>
-      <translation type="unfinished">Use camera native presets</translation>
+      <translation>Использовать родные настройки камеры</translation>
     </message>
     <message>
       <source>Time Settings</source>
-      <translation type="unfinished">Time Settings</translation>
+      <translation>Настройки времени</translation>
     </message>
     <message>
       <source>Keep camera time settings</source>
-      <translation type="unfinished">Keep camera time settings</translation>
+      <translation>Сохранить настройки времени камеры</translation>
     </message>
   </context>
   <context>
@@ -728,7 +728,7 @@
     <message>
       <source>in</source>
       <comment>e.g. &quot;in Primary Stream&quot;</comment>
-      <translation type="unfinished">in</translation>
+      <translation>в</translation>
     </message>
   </context>
   <context>
@@ -762,7 +762,7 @@
     </message>
     <message>
       <source>Motion &amp;&amp; Objects Recording</source>
-      <translation type="unfinished">Motion &amp;&amp; Objects Recording</translation>
+      <translation>Запись движения &amp;&amp; объектов</translation>
     </message>
   </context>
   <context>
@@ -800,7 +800,7 @@
     </message>
     <message>
       <source>Enable 2-way audio</source>
-      <translation type="unfinished">Enable 2-way audio</translation>
+      <translation>Включить двухсторонний звук</translation>
     </message>
   </context>
   <context>
@@ -814,7 +814,7 @@
     <name>CertificateSelectionDialog</name>
     <message>
       <source>Web site requires a certificate</source>
-      <translation type="unfinished">Web site requires a certificate</translation>
+      <translation>Веб-сайт требует сертификат</translation>
     </message>
   </context>
   <context>
@@ -954,11 +954,11 @@
     <name>EncryptedArchivePasswordDialog</name>
     <message>
       <source>Encrypted archive</source>
-      <translation type="unfinished">Encrypted archive</translation>
+      <translation>Зашифрованный архив</translation>
     </message>
     <message>
       <source>Enter your encryption password to view the archive</source>
-      <translation type="unfinished">Enter your encryption password to view the archive</translation>
+      <translation>Введите пароль для просмотра архива</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1127,7 +1127,7 @@
     <name>FailoverPriorityPickerWidget</name>
     <message>
       <source>Set priority:</source>
-      <translation type="unfinished">Set priority:</translation>
+      <translation>Задать приоритет:</translation>
     </message>
     <message>
       <source>Low</source>
@@ -1143,11 +1143,11 @@
     </message>
     <message>
       <source>Select some devices to setup failover priority</source>
-      <translation type="unfinished">Select some devices to setup failover priority</translation>
+      <translation>Выберите устройства для настройки приоритета резервирования</translation>
     </message>
     <message>
       <source>No Failover</source>
-      <translation type="unfinished">No Failover</translation>
+      <translation>Без резервирования</translation>
     </message>
   </context>
   <context>
@@ -1227,15 +1227,15 @@
     </message>
     <message>
       <source>Startup</source>
-      <translation type="unfinished">Startup</translation>
+      <translation>Запуск</translation>
     </message>
     <message>
       <source>Connect to the previous system on startup</source>
-      <translation type="unfinished">Connect to the previous system on startup</translation>
+      <translation>Подключиться к предыдущей системе при запуске</translation>
     </message>
     <message>
       <source>Automatically restore saved windows configuration</source>
-      <translation type="unfinished">Automatically restore saved windows configuration</translation>
+      <translation>Автоматически восстанавливать сохраненные настройки окон</translation>
     </message>
     <message>
       <source>Play audio from all cameras on layout</source>
@@ -1243,7 +1243,7 @@
     </message>
     <message>
       <source>Mute audio when the mic is active</source>
-      <translation type="unfinished">Mute audio when the mic is active</translation>
+      <translation>Отключить звук, когда микрофон активен</translation>
     </message>
   </context>
   <context>
@@ -1496,7 +1496,7 @@
     </message>
     <message>
       <source>Allow digest authentication for imported user</source>
-      <translation type="unfinished">Allow digest authentication for imported user</translation>
+      <translation>Разрешить дайджест-аутентификацию для импортированного пользователя</translation>
     </message>
   </context>
   <context>
@@ -1747,7 +1747,7 @@
     </message>
     <message>
       <source>Advanced settings</source>
-      <translation type="unfinished">Advanced settings</translation>
+      <translation>Расширенные настройки</translation>
     </message>
   </context>
   <context>
@@ -2110,7 +2110,7 @@
     </message>
     <message>
       <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
+      <translation>Принудительная безопасная аутентификация</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -2293,11 +2293,11 @@
     <name>RewindForWidget</name>
     <message>
       <source>Playback time :</source>
-      <translation type="unfinished">Playback time :</translation>
+      <translation>Время воспроизведения :</translation>
     </message>
     <message>
       <source>rewind for</source>
-      <translation type="unfinished">rewind for</translation>
+      <translation>перемотать назад на</translation>
     </message>
     <message>
       <source>Live</source>
@@ -2371,7 +2371,7 @@
     </message>
     <message>
       <source>Motion &amp;&amp; Objects</source>
-      <translation type="unfinished">Motion &amp;&amp; Objects</translation>
+      <translation>Движение &amp;&amp; Объекты</translation>
     </message>
   </context>
   <context>
@@ -2398,7 +2398,7 @@
     </message>
     <message>
       <source>Data protection</source>
-      <translation type="unfinished">Data protection</translation>
+      <translation>Защита данных</translation>
     </message>
     <message>
       <source>Use only HTTPS to connect to cameras</source>
@@ -2406,19 +2406,19 @@
     </message>
     <message>
       <source>User Activity</source>
-      <translation type="unfinished">User Activity</translation>
+      <translation>Активность пользователя</translation>
     </message>
     <message>
       <source>Display servers in tree for non-administrator users</source>
-      <translation type="unfinished">Display servers in tree for non-administrator users</translation>
+      <translation>Отображать серверы в дереве для пользователей без прав администратора</translation>
     </message>
     <message>
       <source>Archive encryption</source>
-      <translation type="unfinished">Archive encryption</translation>
+      <translation>Шифрование архива</translation>
     </message>
     <message>
       <source>Archive encryption increases CPU usage</source>
-      <translation type="unfinished">Archive encryption increases CPU usage</translation>
+      <translation>Шифрование архива увеличивает загрузку ЦП</translation>
     </message>
     <message>
       <source>Change Password...</source>
@@ -2442,7 +2442,7 @@
     </message>
     <message>
       <source>Manage Users</source>
-      <translation type="unfinished">Manage Users</translation>
+      <translation>Управление пользователями</translation>
     </message>
   </context>
   <context>
@@ -2460,7 +2460,7 @@
     <name>ServerCertificateViewer</name>
     <message>
       <source>Server certificate</source>
-      <translation type="unfinished">Server certificate</translation>
+      <translation>Сертификат сервера</translation>
     </message>
     <message>
       <source>General</source>
@@ -2468,11 +2468,11 @@
     </message>
     <message>
       <source>Issued by</source>
-      <translation type="unfinished">Issued by</translation>
+      <translation>Выдан</translation>
     </message>
     <message>
       <source>Self-signed root certificate</source>
-      <translation type="unfinished">Self-signed root certificate</translation>
+      <translation>Самоподписанный корневой сертификат</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -2480,11 +2480,11 @@
     </message>
     <message>
       <source>Certificate is expired</source>
-      <translation type="unfinished">Certificate is expired</translation>
+      <translation>Срок действия сертификата истек</translation>
     </message>
     <message>
       <source>Fingerprints</source>
-      <translation type="unfinished">Fingerprints</translation>
+      <translation>Отпечатки пальцев</translation>
     </message>
     <message>
       <source>Details</source>
@@ -2492,11 +2492,11 @@
     </message>
     <message>
       <source>Pin to this certificate</source>
-      <translation type="unfinished">Pin to this certificate</translation>
+      <translation>Прикрепить к этому сертификату</translation>
     </message>
     <message>
       <source>View pinned certificate</source>
-      <translation type="unfinished">View pinned certificate</translation>
+      <translation>Просмотр закрепленного сертификата</translation>
     </message>
   </context>
   <context>
@@ -2534,7 +2534,7 @@
     </message>
     <message>
       <source>Autodetect built-in and USB webcams</source>
-      <translation type="unfinished">Autodetect built-in and USB webcams</translation>
+      <translation>Автоопределение встроенных и USB веб-камер</translation>
     </message>
   </context>
   <context>
@@ -2906,11 +2906,11 @@
     <name>UserSettingsDialog</name>
     <message>
       <source>This user can use digest authentication.</source>
-      <translation type="unfinished">This user can use digest authentication.</translation>
+      <translation>Этот пользователь может использовать дайджест-аутентификацию.</translation>
     </message>
     <message>
       <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
+      <translation>Принудительная безопасная аутентификация</translation>
     </message>
   </context>
   <context>
@@ -2992,7 +2992,7 @@
     </message>
     <message>
       <source>Proxy this webpage via server</source>
-      <translation type="unfinished">Proxy this webpage via server</translation>
+      <translation>Проксировать эту веб-страницу через сервер</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -3004,15 +3004,15 @@
     </message>
     <message>
       <source>Allow using Client API</source>
-      <translation type="unfinished">Allow using Client API</translation>
+      <translation>Разрешить использование клиентского API</translation>
     </message>
     <message>
       <source>Proxy all requested contents</source>
-      <translation type="unfinished">Proxy all requested contents</translation>
+      <translation>Проксировать все запрашиваемое содержимое</translation>
     </message>
     <message>
       <source>Allow opening web page without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening web page without SSL certificate checking</translation>
+      <translation>Разрешить открытие веб-страницы без проверки SSL-сертификата</translation>
     </message>
   </context>
   <context>
