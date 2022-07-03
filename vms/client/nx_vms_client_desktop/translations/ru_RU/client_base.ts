@@ -4917,11 +4917,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Certificates</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Сертификат</numerusform>
-        <numerusform>Сертификаты</numerusform>
-        <numerusform>Набор сертификатов</numerusform>
-        <numerusform>Certificates</numerusform>
+        <numerusform>Сертификата</numerusform>
+        <numerusform>Сертификатов</numerusform>
+        <numerusform>Сертификатов</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -11075,7 +11075,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Intercom Open Door</source>
-      <translation type="unfinished">Intercom Open Door</translation>
+      <translation>Домофон открыть дверь</translation>
     </message>
     <message>
       <source>Open door</source>
@@ -11155,7 +11155,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Selected Layout</source>
-      <translation type="unfinished">Selected Layout</translation>
+      <translation>Выбранная раскладка</translation>
     </message>
   </context>
   <context>
