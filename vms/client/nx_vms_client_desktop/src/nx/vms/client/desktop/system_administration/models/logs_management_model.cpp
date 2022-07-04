@@ -52,7 +52,7 @@ nx::utils::log::Level logLevel(LogsManagementUnitPtr unit)
 
 QColor logLevelColor(LogsManagementUnitPtr unit)
 {
-    return logLevel(unit) == nx::utils::log::Level::info
+    return logLevel(unit) == LogsManagementWatcher::defaultLogLevel()
         ? colorTheme()->color(kNormalLogLevelColor)
         : colorTheme()->color(kWarningLogLevelColor);
 }
