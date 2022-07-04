@@ -29,7 +29,7 @@ namespace {
 bool needLogLevelWarningFor(const LogsManagementWatcher::UnitPtr& unit)
 {
     auto settings = unit->settings();
-    return settings && settings->mainLog.primaryLevel > nx::utils::log::Level::info;
+    return settings && settings->mainLog.primaryLevel > LogsManagementWatcher::defaultLogLevel();
 }
 
 QString shortList(const QList<QnMediaServerResourcePtr>& servers)
@@ -955,6 +955,12 @@ void LogsManagementWatcher::applySettings(const ConfigurableLogSettings& setting
 
     d->updateClientLogLevelWarning();
     d->updateServerLogLevelWarning();
+}
+
+const nx::utils::log::Level LogsManagementWatcher::defaultLogLevel()
+{
+    // We don't use the constant from logs_settings.h because it is build-type denepdent.
+    return nx::utils::log::Level::info;
 }
 
 void LogsManagementWatcher::onReceivedServerLogSettings(

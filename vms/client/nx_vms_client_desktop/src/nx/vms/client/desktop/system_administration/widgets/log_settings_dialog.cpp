@@ -97,7 +97,7 @@ void ConfigurableLogSettings::intersectWith(const ConfigurableLogSettings& other
 ConfigurableLogSettings ConfigurableLogSettings::defaults()
 {
     ConfigurableLogSettings result;
-    result.loggingLevel = nx::utils::log::Level::info;
+    result.loggingLevel = LogsManagementWatcher::defaultLogLevel();
     result.maxVolumeSizeB = 250 * kMegabyte;
     result.maxFileSizeB = 10 * kMegabyte;
     result.maxFileTime = std::chrono::seconds::zero(); //< Disabled by default.
@@ -140,7 +140,8 @@ LogSettingsDialog::LogSettingsDialog(QWidget* parent):
 
     ui->detailsWarning->setText(tr(
         "Notice: Not enough information could be collected on the current Logging level.\n"
-        "The Logging level \"info\" will provide more granular information."));
+        "The Logging level \"%1\" will provide more granular information.")
+        .arg(LogsManagementModel::logLevelName(LogsManagementWatcher::defaultLogLevel())));
     ui->performanceWarning->setText(tr(
         "Notice: The selected Logging level may degrade the performance of the system.\n"
         "Do not forget to return the Logging level to its default setting after you have collected enough logs."));
@@ -222,27 +223,14 @@ void LogSettingsDialog::resetToDefault()
 
 void LogSettingsDialog::updateWarnings()
 {
-    if (auto level = loggingLevel())
-    {
-        switch (*level)
-        {
-            case nx::utils::log::Level::none:
-            case nx::utils::log::Level::error:
-            case nx::utils::log::Level::warning:
-                ui->detailsWarning->show();
-                ui->performanceWarning->hide();
-                return;
-
-            case nx::utils::log::Level::debug:
-            case nx::utils::log::Level::verbose:
-                ui->detailsWarning->hide();
-                ui->performanceWarning->show();
-                return;
-        }
-    }
-
     ui->detailsWarning->hide();
     ui->performanceWarning->hide();
+
+    if (auto level = loggingLevel())
+    {
+        ui->detailsWarning->setVisible(*level < LogsManagementWatcher::defaultLogLevel());
+        ui->performanceWarning->setVisible(*level > LogsManagementWatcher::defaultLogLevel());
+    }
 }
 
 void LogSettingsDialog::loadDataToUi(const ConfigurableLogSettings& settings)

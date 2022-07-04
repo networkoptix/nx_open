@@ -74,6 +74,8 @@ public:
 
     void applySettings(const ConfigurableLogSettings& settings);
 
+    static const nx::utils::log::Level defaultLogLevel();
+
 signals:
     void stateChanged(nx::vms::client::desktop::LogsManagementWatcher::State state);
     void progressChanged(double progress);
