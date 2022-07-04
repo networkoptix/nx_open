@@ -10,7 +10,7 @@
 #include <nx/kit/utils.h>
 
 #include <nx/sdk/helpers/error.h>
-#include <nx/sdk/helpers/settings_response.h>
+#include <nx/sdk/helpers/active_setting_changed_response.h>
 #include <nx/vms_server_plugins/analytics/stub/utils.h>
 
 #include "active_settings_rules.h"
@@ -90,16 +90,55 @@ Result<const ISettingsResponse*> DeviceAgent::settingsReceived()
     return settingsResponse;
 }
 
-void DeviceAgent::doGetSettingsOnActiveSettingChange(
-    Result<const ISettingsResponse*>* outResult,
-    const IString* activeSettingId,
-    const IString* settingsModel,
-    const IStringMap* settingsValues)
+void DeviceAgent::dumpStringMap(
+    const char* prefix, const char* appendix, const IStringMap* stringMap) const
 {
+    if (!stringMap)
+    {
+        NX_PRINT << prefix << "    null" << appendix;
+        return;
+    }
+
+    NX_PRINT << prefix << "{";
+    for (int i = 0; i < stringMap->count(); ++i)
+    {
+        NX_PRINT << prefix << "    " << nx::kit::utils::toString(stringMap->key(i)) << ": "
+            << nx::kit::utils::toString(stringMap->value(i))
+            << ((i == stringMap->count() - 1) ? "" : ",");
+    }
+    NX_PRINT << prefix << "}" << appendix;
+}
+
+void DeviceAgent::dumpActiveSettingChangedAction(
+    const IActiveSettingChangedAction* activeSettingChangeAction) const
+{
+    NX_PRINT << "IActiveSettingChangedAction:";
+    NX_PRINT << "{";
+    NX_PRINT << "    \"activeSettingId\": "
+        << nx::kit::utils::toString(activeSettingChangeAction->activeSettingId()) << ",";
+    NX_PRINT << "    \"settingsModel\": "
+        << nx::kit::utils::toString(activeSettingChangeAction->settingsModel()) << ",";
+    NX_PRINT << "    \"settingsValues\":";
+    dumpStringMap(/*prefix*/ "    ", /*appendix*/ ",",
+        activeSettingChangeAction->settingsValues().get());
+    NX_PRINT << "    \"params\":";
+    dumpStringMap(/*prefix*/ "    ", /*appendix*/ "",
+        activeSettingChangeAction->params().get());
+    NX_PRINT << "}";
+}
+
+void DeviceAgent::doGetSettingsOnActiveSettingChange(
+    Result<const IActiveSettingChangedResponse*>* outResult,
+    const IActiveSettingChangedAction* activeSettingChangeAction)
+{
+    if (NX_DEBUG_ENABLE_OUTPUT)
+        dumpActiveSettingChangedAction(activeSettingChangeAction);
+
     using namespace nx::kit;
 
     std::string parseError;
-    Json::object model = Json::parse(settingsModel->str(), parseError).object_items();
+    Json::object model = Json::parse(
+        activeSettingChangeAction->settingsModel(), parseError).object_items();
     Json::array sections = model[kSections].array_items();
 
     auto activeSettingsSectionIt = std::find_if(sections.begin(), sections.end(),
@@ -114,9 +153,10 @@ void DeviceAgent::doGetSettingsOnActiveSettingChange(
         return;
     }
 
-    const std::string settingId(activeSettingId->str());
+    const std::string settingId(activeSettingChangeAction->activeSettingId());
     Json activeSettingsItems = (*activeSettingsSectionIt)[kItems];
-    std::map<std::string, std::string> values = toStdMap(shareToPtr(settingsValues));
+    std::map<std::string, std::string> values = toStdMap(shareToPtr(
+        activeSettingChangeAction->settingsValues()));
 
     m_activeSettingsBuilder.updateSettings(settingId, &activeSettingsItems, &values);
 
@@ -126,11 +166,13 @@ void DeviceAgent::doGetSettingsOnActiveSettingChange(
     *activeSettingsSectionIt = updatedActiveSection;
     model[kSections] = sections;
 
-    const auto response = new SettingsResponse();
-    response->setValues(makePtr<StringMap>(values));
-    response->setModel(makePtr<String>(Json(model).dump()));
+    const auto settingsResponse = makePtr<SettingsResponse>();
+    settingsResponse->setValues(makePtr<StringMap>(values));
+    settingsResponse->setModel(makePtr<String>(Json(model).dump()));
 
-    *outResult = response;
+    auto response = makePtr<ActiveSettingChangedResponse>();
+    response->setSettingsResponse(settingsResponse);
+    *outResult = response.releasePtr();
 }
 
 void DeviceAgent::doSetNeededMetadataTypes(

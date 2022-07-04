@@ -419,7 +419,62 @@ static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R
                     "name": ")json" + kActiveCheckBoxId + R"json(",
                     "caption": "Active CheckBox",
                     "defaultValue": false,
-                    "isActive": true
+                    "isActive": true,
+                    "parametersModel":
+                    {
+                        "type": "Settings",
+                        "items":
+                        [
+                            {
+                                "type": "TextField",
+                                "name": "testTextField",
+                                "caption": "Text Field Parameter",
+                                "description": "A text field",
+                                "defaultValue": "a text"
+                            },
+                            {
+                                "type": "GroupBox",
+                                "caption": "Parameter Group",
+                                "items":
+                                [
+                                    {
+                                        "type": "SpinBox",
+                                        "caption": "SpinBox Parameter",
+                                        "name": "testSpinBox",
+                                        "defaultValue": 42,
+                                        "minValue": 0,
+                                        "maxValue": 100
+                                    },
+                                    {
+                                        "type": "DoubleSpinBox",
+                                        "caption": "DoubleSpinBox Parameter",
+                                        "name": "testDoubleSpinBox",
+                                        "defaultValue": 3.1415,
+                                        "minValue": 0.0,
+                                        "maxValue": 100.0
+                                    },
+                                    {
+                                        "type": "ComboBox",
+                                        "caption": "ComboBox Parameter",
+                                        "name": "testComboBox",
+                                        "defaultValue": "value2",
+                                        "range": ["value1", "value2", "value3"]
+                                    },
+                                    {
+                                        "type": "CheckBox",
+                                        "caption": "CheckBox Parameter",
+                                        "name": "testCheckBox",
+                                        "defaultValue": true
+                                    },
+                                    {
+                                        "type": "TextArea",
+                                        "caption": "TextArea Parameter",
+                                        "name": "testTextArea"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
                 },
                 {
                     "type": "RadioButtonGroup",

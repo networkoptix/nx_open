@@ -312,4 +312,3 @@ DeviceAgent Manifest is a JSON Object containing the following fields:
 
     The structure of this JSON object is described in the dedicated document
     [src/nx/sdk/analytics/taxonomy.md](@ref md_src_nx_sdk_analytics_taxonomy).
-

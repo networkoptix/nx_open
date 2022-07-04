@@ -19,6 +19,12 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     (brief, true))
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    EngineActiveSettingChangedResponse,
+    (json),
+    nx_vms_api_analytics_EngineActiveSettingChangedResponse_Fields,
+    (brief, true))
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     EngineActiveSettingChangedRequest,
     (json),
     nx_vms_api_analytics_EngineActiveSettingChangedRequest_Fields,

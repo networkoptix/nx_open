@@ -33,6 +33,12 @@ public:
     public: Ptr<IStringMap> errors() const { return toPtr(getErrors()); }
 };
 
+/**
+ * The data to be returned from the plugin describing the desired settings.
+ * 
+ * A combination of optional individual setting errors, optional new setting values in case they
+ * were adjusted, and an optional new Settings Model.
+ */
 class ISettingsResponse: public Interface<ISettingsResponse, ISettingsResponse0>
 {
 public:

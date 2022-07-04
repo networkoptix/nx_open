@@ -41,6 +41,26 @@ struct NX_VMS_API EngineSettingsResponse
     (settingsErrors)
 QN_FUSION_DECLARE_FUNCTIONS(EngineSettingsResponse, (json), NX_VMS_API)
 
+struct NX_VMS_API EngineActiveSettingChangedResponse: EngineSettingsResponse
+{
+    /**%apidoc
+     * If not empty, the Client will open this URL in an embedded browser.
+     */
+    QString actionUrl;
+
+    /**%apidoc
+     * If not empty, the Client will show this text to the user.
+     */
+    QString messageToUser;
+
+    bool operator==(const EngineActiveSettingChangedResponse& other) const = default;
+};
+#define nx_vms_api_analytics_EngineActiveSettingChangedResponse_Fields \
+    nx_vms_api_analytics_EngineSettingsResponse_Fields \
+    (actionUrl) \
+    (messageToUser)
+QN_FUSION_DECLARE_FUNCTIONS(EngineActiveSettingChangedResponse, (json), NX_VMS_API)
+
 struct NX_VMS_API EngineSettingsRequest
 {
     /**%apidoc
@@ -88,13 +108,19 @@ struct NX_VMS_API EngineActiveSettingChangedRequest
      */
     QJsonObject settingsValues;
 
+    /**%apidoc
+     * Name-value map with param values, using JSON types corresponding to each setting type.
+     */
+    QJsonObject paramValues;
+
     bool operator==(const EngineActiveSettingChangedRequest& other) const = default;
 };
 #define nx_vms_api_analytics_EngineActiveSettingChangedRequest_Fields \
     (analyticsEngineId) \
     (activeSettingId) \
     (settingsModel) \
-    (settingsValues)
+    (settingsValues) \
+    (paramValues)
 
 QN_FUSION_DECLARE_FUNCTIONS(EngineActiveSettingChangedRequest, (json), NX_VMS_API)
 
