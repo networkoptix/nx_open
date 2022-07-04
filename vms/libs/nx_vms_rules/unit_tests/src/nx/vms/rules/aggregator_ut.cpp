@@ -118,7 +118,7 @@ TEST_F(AggregatorTest, aggregationIntervalWorks)
 
 TEST_F(AggregatorTest, aggregatorHandlesDifferentEventsProperly)
 {
-    constexpr auto kAggregationInterval = 10ms;
+    constexpr auto kAggregationInterval = 100ms;
     auto aggregator = makeAggregator(kAggregationInterval);
 
     auto eventA1 = makeEvent("a");
@@ -132,7 +132,7 @@ TEST_F(AggregatorTest, aggregatorHandlesDifferentEventsProperly)
     auto eventA3 = makeEvent("a");
     ASSERT_TRUE(aggregator.aggregate(eventA3));
 
-    std::this_thread::sleep_for(1ms);
+    std::this_thread::sleep_for(20ms);
 
     auto eventB2 = makeEvent("b");
     ASSERT_TRUE(aggregator.aggregate(eventB2));

@@ -133,7 +133,10 @@ protected:
 signals:
     void localSearchDone();
     void localInterfacesChanged();
-    void CameraIPConflict(QHostAddress addr, QStringList macAddrList);
+    void CameraIPConflict(
+        std::chrono::microseconds timestamp,
+        const QHostAddress& addr,
+        const QStringList& macAddrList);
 
 protected:
     enum class SearchType

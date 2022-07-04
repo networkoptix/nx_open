@@ -120,10 +120,20 @@ void EventParameters::setDiagnosticEventLevels(nx::vms::api::EventLevels levels)
     inputPortId = QString::fromStdString(nx::reflect::toString(levels));
 }
 
+QnUuid EventParameters::getUniqueId() const
+{
+    QByteArray data;
+    QDataStream stream(&data, QIODevice::WriteOnly);
+    stream << eventTimestampUsec << eventResourceId;
+
+    return QnUuid::fromArbitraryData(data);
+}
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     EventMetaData, (ubjson)(json)(xml)(csv_record), EventMetaData_Fields, (brief, true))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     EventParameters, (ubjson)(json)(xml)(csv_record), EventParameters_Fields, (brief, true))
+
 bool checkForKeywords(const QString& value, const QString& keywords)
 {
     if (keywords.trimmed().isEmpty())

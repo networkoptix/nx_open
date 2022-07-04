@@ -16,6 +16,9 @@ class TestEvent: public nx::vms::rules::BasicEvent
     Q_OBJECT
     Q_CLASSINFO("type", "nx.events.test")
 
+    Q_PROPERTY(QnUuid serverId MEMBER m_serverId)
+    Q_PROPERTY(QnUuid cameraId MEMBER m_cameraId)
+
     Q_PROPERTY(int intField MEMBER m_intField)
     Q_PROPERTY(QString stringField MEMBER m_stringField)
     Q_PROPERTY(bool boolField MEMBER m_boolField)
@@ -37,6 +40,9 @@ public:
     }
 
     using BasicEvent::BasicEvent;
+
+    QnUuid m_serverId;
+    QnUuid m_cameraId;
 
     int m_intField{};
     QString m_stringField;

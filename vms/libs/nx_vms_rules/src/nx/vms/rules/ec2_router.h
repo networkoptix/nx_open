@@ -26,6 +26,7 @@ public:
         const QSet<QnUuid>& triggeredRules,
         const QSet<QnUuid>& affectedResources) override;
 
+private:
     void onEventReceived(const nx::vms::api::rules::EventInfo& eventInfo);
 
 private:

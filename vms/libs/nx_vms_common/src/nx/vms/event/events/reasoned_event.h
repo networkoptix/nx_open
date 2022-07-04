@@ -18,6 +18,9 @@ public:
 
     virtual EventParameters getRuntimeParams() const override;
 
+    EventReason getReasonCode() const;
+    const QString& getReasonText() const;
+
 protected:
     const EventReason m_reasonCode;
     const QString m_reasonParamsEncoded;

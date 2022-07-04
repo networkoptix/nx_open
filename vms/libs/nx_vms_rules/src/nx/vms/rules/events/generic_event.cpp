@@ -12,6 +12,7 @@ namespace nx::vms::rules {
 
 GenericEvent::GenericEvent(
     std::chrono::microseconds timestamp,
+    State state,
     const QString& caption,
     const QString& description,
     const QString& source)
@@ -19,6 +20,7 @@ GenericEvent::GenericEvent(
     DescribedEvent(timestamp, caption, description),
     m_source(source)
 {
+    setState(state);
 }
 
 QVariantMap GenericEvent::details(common::SystemContext* context) const

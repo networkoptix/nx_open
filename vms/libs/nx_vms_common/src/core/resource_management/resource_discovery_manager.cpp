@@ -31,8 +31,6 @@
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
-#include <utils/common/sleep.h>
-#include <utils/common/synctime.h>
 #include <utils/common/util.h>
 
 #ifdef __arm__

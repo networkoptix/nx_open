@@ -124,7 +124,9 @@ signals:
     void lost(QnUuid information);
 
     /** Found the module with the same UUID as we are. */
-    void conflict(nx::vms::discovery::ModuleEndpoint module);
+    void conflict(
+        std::chrono::microseconds timestamp,
+        const nx::vms::discovery::ModuleEndpoint& module);
 
 private:
     void updateEndpoints(const QnMediaServerResourcePtr& server);

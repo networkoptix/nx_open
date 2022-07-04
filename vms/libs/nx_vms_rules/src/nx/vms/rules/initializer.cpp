@@ -83,6 +83,7 @@ void Initializer::registerFields() const
     m_engine->registerActionField(
         fieldMetatype<EmailMessageField>(),
         [this] { return new EmailMessageField(this->m_context); });
+    registerActionField<EventIdField>();
     registerActionField<HttpMethodField>();
     registerActionField<OptionalTimeField>();
     registerActionField<PasswordField>();

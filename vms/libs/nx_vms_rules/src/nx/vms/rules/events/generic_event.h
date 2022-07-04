@@ -20,6 +20,7 @@ public:
     GenericEvent() = default;
     GenericEvent(
         std::chrono::microseconds timestamp,
+        State state,
         const QString& caption,
         const QString& description,
         const QString& source);

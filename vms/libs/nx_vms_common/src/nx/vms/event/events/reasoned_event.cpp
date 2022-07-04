@@ -27,6 +27,16 @@ EventParameters ReasonedEvent::getRuntimeParams() const
     return params;
 }
 
+EventReason ReasonedEvent::getReasonCode() const
+{
+    return m_reasonCode;
+}
+
+const QString& ReasonedEvent::getReasonText() const
+{
+    return m_reasonParamsEncoded;
+}
+
 } // namespace event
 } // namespace vms
 } // namespace nx
