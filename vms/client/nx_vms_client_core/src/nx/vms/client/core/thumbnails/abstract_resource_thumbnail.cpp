@@ -297,16 +297,17 @@ void AbstractResourceThumbnail::setObsolescenceMinutes(int value)
 }
 
 QnAspectRatio AbstractResourceThumbnail::calculateAspectRatio(
-    const QnResourcePtr& resource, const QnAspectRatio& defaultAspectRatio, bool* usedDefault)
+    const QnResourcePtr& resource,
+    const QnAspectRatio& defaultAspectRatio,
+    bool* aspectRatioPredefined)
 {
     auto ar = channelAspectRatio(resource);
-    const bool shouldUseDefault = !ar.isValid();
 
-    if (shouldUseDefault)
+    if (aspectRatioPredefined)
+        *aspectRatioPredefined = ar.isValid();
+
+    if (!ar.isValid())
         ar = defaultAspectRatio;
-
-    if (usedDefault)
-        *usedDefault = shouldUseDefault;
 
     QnConstResourceVideoLayoutPtr layout;
     if (const auto mediaResource = resource.dynamicCast<QnMediaResource>())

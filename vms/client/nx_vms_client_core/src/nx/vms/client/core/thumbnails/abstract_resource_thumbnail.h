@@ -130,7 +130,7 @@ public:
 
     static QnAspectRatio calculateAspectRatio(const QnResourcePtr& resource,
         const QnAspectRatio& defaultAspectRatio = QnAspectRatio(),
-        bool* usedDefault = nullptr);
+        bool* aspectRatioPredefined = nullptr);
 
     static void registerQmlType();
 
