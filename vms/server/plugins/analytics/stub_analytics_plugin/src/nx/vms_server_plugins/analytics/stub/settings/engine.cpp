@@ -13,7 +13,7 @@
 #include <nx/kit/debug.h>
 
 #include <nx/sdk/helpers/error.h>
-#include <nx/sdk/helpers/settings_response.h>
+#include <nx/sdk/helpers/active_setting_changed_response.h>
 #include <nx/vms_server_plugins/analytics/stub/utils.h>
 
 namespace nx {
@@ -106,15 +106,14 @@ void Engine::getPluginSideSettings(Result<const ISettingsResponse*>* outResult) 
 }
 
 void Engine::doGetSettingsOnActiveSettingChange(
-    Result<const nx::sdk::ISettingsResponse*>* outResult,
-    const IString* activeSettingId,
-    const IString* settingsModel,
-    const IStringMap* settingsValues)
+    Result<const IActiveSettingChangedResponse*>* outResult,
+    const IActiveSettingChangedAction* activeSettingChangeAction)
 {
     using namespace nx::kit;
 
     std::string parseError;
-    Json::object model = Json::parse(settingsModel->str(), parseError).object_items();
+    Json::object model = Json::parse(
+        activeSettingChangeAction->settingsModel(), parseError).object_items();
     Json::array items = model[kItems].array_items();
 
     auto activeSettingsGroupBoxIt = std::find_if(items.begin(), items.end(),
@@ -129,9 +128,10 @@ void Engine::doGetSettingsOnActiveSettingChange(
         return;
     }
 
-    const std::string settingId(activeSettingId->str());
+    const std::string settingId(activeSettingChangeAction->activeSettingId());
     Json activeSettingsItems = (*activeSettingsGroupBoxIt)[kItems];
-    std::map<std::string, std::string> values = toStdMap(shareToPtr(settingsValues));
+    std::map<std::string, std::string> values = toStdMap(shareToPtr(
+        activeSettingChangeAction->settingsValues()));
 
     m_activeSettingsBuilder.updateSettings(settingId, &activeSettingsItems, &values);
 
@@ -141,11 +141,13 @@ void Engine::doGetSettingsOnActiveSettingChange(
     *activeSettingsGroupBoxIt = updatedActiveGroupBox;
     model[kItems] = items;
 
-    const auto response = new SettingsResponse();
-    response->setValues(makePtr<StringMap>(values));
-    response->setModel(makePtr<String>(Json(model).dump()));
+    const auto settingsResponse = makePtr<SettingsResponse>();
+    settingsResponse->setValues(makePtr<StringMap>(values));
+    settingsResponse->setModel(makePtr<String>(Json(model).dump()));
 
-    *outResult = response;
+    auto response = makePtr<ActiveSettingChangedResponse>();
+    response->setSettingsResponse(settingsResponse);
+    *outResult = response.releasePtr();
 }
 
 } // namespace settings

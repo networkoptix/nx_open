@@ -38,10 +38,8 @@ protected:
         nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult) const override;
 
     virtual void doGetSettingsOnActiveSettingChange(
-        nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult,
-        const nx::sdk::IString* activeSettingId,
-        const nx::sdk::IString* settingsModel,
-        const nx::sdk::IStringMap* settingsValues) override;
+        nx::sdk::Result<const nx::sdk::IActiveSettingChangedResponse*>* outResult,
+        const nx::sdk::IActiveSettingChangedAction* activeSettingChangeAction) override;
 
 private:
     nx::sdk::analytics::Plugin* const m_plugin;

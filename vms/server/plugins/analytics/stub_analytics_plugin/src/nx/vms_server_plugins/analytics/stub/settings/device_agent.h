@@ -8,6 +8,9 @@
 #include "engine.h"
 #include "stub_analytics_plugin_settings_ini.h"
 
+namespace nx { namespace sdk { class IActiveSettingChangedAction; }} //< private
+namespace nx { namespace sdk { class IStringMap; }} //< private
+
 namespace nx {
 namespace vms_server_plugins {
 namespace analytics {
@@ -33,10 +36,15 @@ protected:
     virtual nx::sdk::Result<const nx::sdk::ISettingsResponse*> settingsReceived() override;
 
     virtual void doGetSettingsOnActiveSettingChange(
-        nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult,
-        const nx::sdk::IString* activeSettingId,
-        const nx::sdk::IString* settingsModel,
-        const nx::sdk::IStringMap* settingsValues) override;
+        nx::sdk::Result<const nx::sdk::IActiveSettingChangedResponse*>* outResult,
+        const nx::sdk::IActiveSettingChangedAction* activeSettingChangeAction) override;
+
+private:
+    void dumpStringMap(
+        const char* prefix, const char* appendix, const nx::sdk::IStringMap* stringMap) const;
+
+    void dumpActiveSettingChangedAction(
+        const nx::sdk::IActiveSettingChangedAction* activeSettingChangeAction) const;
 
 private:
     Engine* const m_engine;

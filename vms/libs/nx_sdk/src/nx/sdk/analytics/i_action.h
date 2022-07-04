@@ -57,10 +57,10 @@ public:
      */
     struct Result
     {
-        /** If neither null nor empty, Client will open this URL in an embedded browser. */
+        /** If neither null nor empty, the Client will open this URL in an embedded browser. */
         Ptr<IString> actionUrl;
 
-        /** If neither null nor empty, Client will show this text to the user. */
+        /** If neither null nor empty, the Client will show this text to the user. */
         Ptr<IString> messageToUser;
     };
 };

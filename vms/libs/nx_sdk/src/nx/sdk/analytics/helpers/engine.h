@@ -94,10 +94,8 @@ protected:
     IHandler* handler() const { return m_handler.get(); }
 
     virtual void doGetSettingsOnActiveSettingChange(
-        Result<const ISettingsResponse*>* outResult,
-        const IString* activeSettingId,
-        const IString* settingsModel,
-        const IStringMap* settingsValues) override;
+        Result<const IActiveSettingChangedResponse*>* outResult,
+        const IActiveSettingChangedAction* activeSettingChangeAction) override;
 
 public:
     virtual ~Engine() override;

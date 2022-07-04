@@ -40,13 +40,19 @@ struct NX_VMS_API DeviceAgentActiveSettingChangedRequest
      * Settings model.
      */
     SettingsModel settingsModel;
+
+    /**%apidoc
+     * Name-value map with param values, using JSON types corresponding to each setting type.
+     */
+    SettingsValues paramValues;
 };
 #define nx_vms_api_analytics_DeviceAgentActiveSettingChangedRequest_Fields \
     (deviceId) \
     (analyticsEngineId) \
     (activeSettingId) \
     (settingsValues) \
-    (settingsModel)
+    (settingsModel) \
+    (paramValues)
 
 QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentActiveSettingChangedRequest, (json), NX_VMS_API)
 

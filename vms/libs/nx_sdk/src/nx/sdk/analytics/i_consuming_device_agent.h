@@ -4,6 +4,9 @@
 
 #include <nx/sdk/interface.h>
 
+#include <nx/sdk/i_active_setting_changed_action.h>
+#include <nx/sdk/i_active_setting_changed_response.h>
+
 #include "i_data_packet.h"
 #include "i_device_agent.h"
 
@@ -52,10 +55,8 @@ public:
 
     /** Called by getSettingsOnActiveSettingChange() */
     protected: virtual void doGetSettingsOnActiveSettingChange(
-        Result<const ISettingsResponse*>* outResult,
-        const IString* activeSettingId,
-        const IString* settingsModel,
-        const IStringMap* settingsValues) = 0;
+        Result<const IActiveSettingChangedResponse*>* outResult,
+        const IActiveSettingChangedAction* activeSettingChangeAction) = 0;
     /**
      * When a setting marked as Active changes its value in the GUI, the Server calls this method
      * to notify the Plugin and allow it to adjust the values of the settings and the Settings
@@ -63,24 +64,15 @@ public:
      * for example, switching a checkbox or a drop-down can lead to some other setting being
      * replaced with another, or some values being converted to a different measurement unit.
      *
-     * @param activeSettingId Id of a setting which has triggered this notification.
-     *
-     * @param settingsModel Model of settings the Active setting has been triggered on. Never null.
-     *
-     * @param settingsValues Values currently set in the GUI. Never null.
-     *
      * @return An error code with a message in case of some general failure that affected the
-     *     procedure of analyzing the settings, or a combination of optional individual setting
-     *     errors, optional new setting values in case they were adjusted, and an optional new
-     *     Settings Model. Can be null if none of the above items are present.
+     *     procedure of analyzing the settings, or data defining the interaction with the user and
+     *     the new state of the settings dialog. Can be null if no user interaction is needed.
      */
-    public: Result<const ISettingsResponse*> getSettingsOnActiveSettingChange(
-        const IString* activeSettingId,
-        const IString* settingsModel,
-        const IStringMap* settingsValues)
+    public: Result<const IActiveSettingChangedResponse*> getSettingsOnActiveSettingChange(
+        const IActiveSettingChangedAction* activeSettingChangeAction)
     {
-        Result<const ISettingsResponse*> result;
-        doGetSettingsOnActiveSettingChange(&result, activeSettingId, settingsModel, settingsValues);
+        Result<const IActiveSettingChangedResponse*> result;
+        doGetSettingsOnActiveSettingChange(&result, activeSettingChangeAction);
         return result;
     }
 };

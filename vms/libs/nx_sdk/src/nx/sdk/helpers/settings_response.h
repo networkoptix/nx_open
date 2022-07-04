@@ -16,6 +16,7 @@ class SettingsResponse: public RefCountable<ISettingsResponse>
 {
 public:
     SettingsResponse() = default;
+
     SettingsResponse(
         Ptr<StringMap> values,
         Ptr<StringMap> errors = nullptr,
