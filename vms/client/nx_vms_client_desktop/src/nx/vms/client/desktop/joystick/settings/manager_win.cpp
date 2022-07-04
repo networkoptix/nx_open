@@ -186,13 +186,21 @@ bool ManagerWindows::enumDevicesCallback(LPCDIDEVICEINSTANCE deviceInstance, LPV
     if (status != DI_OK)
     {
         inputDevice->Release();
-        NX_WARNING(manager, "Failed to set data format for joystick");
+        NX_WARNING(
+            manager,
+            "Failed to set data format for joystick: %1",
+            errorCodeToString(status));
         return DIENUM_CONTINUE;
     }
 
-    if (inputDevice->Acquire() != DI_OK)
+    status = inputDevice->Acquire();
+    if (status != DI_OK)
     {
         inputDevice->Release();
+        NX_WARNING(
+            manager,
+            "Failed to acquire access for joystick: %1",
+            errorCodeToString(status));
         return DIENUM_CONTINUE;
     }
 
@@ -203,6 +211,11 @@ bool ManagerWindows::enumDevicesCallback(LPCDIDEVICEINSTANCE deviceInstance, LPV
 
     if (modelName.isEmpty() && guid.isEmpty())
     {
+        NX_VERBOSE(
+            manager,
+            "Empty device model and guid",
+            errorCodeToString(status));
+
         inputDevice->Release();
         return DIENUM_CONTINUE;
     }
