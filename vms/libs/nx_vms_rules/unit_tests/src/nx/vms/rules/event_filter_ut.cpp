@@ -30,6 +30,16 @@ protected:
         filter.reset();
     }
 
+    EventPtr makeEvent(QString source, QString caption, QString description)
+    {
+        return QSharedPointer<GenericEvent>::create(
+            std::chrono::milliseconds::zero(),
+            State::instant,
+            source,
+            caption,
+            description);
+    }
+
     std::unique_ptr<EventFilter> filter;
     KeywordsField* sourceField{};
     KeywordsField* captionField{};
@@ -46,8 +56,7 @@ protected:
 
 TEST_F(EventFilterTest, allEventFieldsMatchToAllFilterFieldsTest)
 {
-    EventPtr genericEvent(
-        new GenericEvent{{}, "Source string", "Caption string", "Description string"});
+    auto genericEvent = makeEvent("Source string", "Caption string", "Description string");
 
     sourceField->setString("Source string");
     captionField->setString("Caption string");
@@ -58,8 +67,7 @@ TEST_F(EventFilterTest, allEventFieldsMatchToAllFilterFieldsTest)
 
 TEST_F(EventFilterTest, allEventFieldsMismatchToFilterFieldsTest)
 {
-    EventPtr genericEvent(
-        new GenericEvent{{}, "Source string", "Caption string", "Description string"});
+    auto genericEvent = makeEvent("Source string", "Caption string", "Description string");
 
     sourceField->setString("Foo");
     captionField->setString("Bar");
@@ -70,8 +78,7 @@ TEST_F(EventFilterTest, allEventFieldsMismatchToFilterFieldsTest)
 
 TEST_F(EventFilterTest, oneEventFieldMismatchToFilterFieldTest)
 {
-    EventPtr genericEvent(
-        new GenericEvent{{}, "Source string", "Caption string", "Description string"});
+    auto genericEvent = makeEvent("Source string", "Caption string", "Description string");
 
     sourceField->setString("Foo");
     captionField->setString("Caption");

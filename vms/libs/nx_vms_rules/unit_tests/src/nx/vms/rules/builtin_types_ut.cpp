@@ -193,6 +193,7 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionFieldRegistration<ActionTextField>();
     testActionFieldRegistration<ContentTypeField>();
     testActionFieldRegistration<EmailMessageField>(systemContext());
+    testActionFieldRegistration<EventIdField>();
     testActionFieldRegistration<FlagField>();
     testActionFieldRegistration<HttpMethodField>();
     testActionFieldRegistration<OptionalTimeField>();

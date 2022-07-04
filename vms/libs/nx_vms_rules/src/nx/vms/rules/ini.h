@@ -12,9 +12,10 @@ struct NX_VMS_RULES_API Ini: public nx::kit::IniConfig
 
     NX_INI_STRING("old", rulesEngine, "Version of VMS Rules Engine (old / new / both)");
 
-    // TODO: #amalov Temporary solution for 5.1 version.
-    NX_INI_FLAG(true, serverSideOnly,
-        "Effectively use VMS Rules engine on server side only.");
+    // TODO: #amalov Temporary solution for 5.1. Should be removed in the future.
+    NX_INI_FLAG(false, fullSupport,
+        "Process cloud notification only when set to false."
+    );
 };
 
 NX_VMS_RULES_API Ini& ini();

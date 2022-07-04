@@ -11,6 +11,8 @@
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_vms_rules_manager.h>
 
+#include "ini.h"
+
 namespace {
 
 const auto kFakeHandler = [](int /*handle*/, ec2::ErrorCode errorCode)
@@ -69,12 +71,19 @@ void Ec2Router::routeEvent(
     nx::vms::api::rules::EventInfo info;
     info.props = eventData;
 
-    for (const auto& ruleId: triggeredRules)
+    for (const auto ruleId: triggeredRules)
     {
         info.id = ruleId;
 
-        m_context->ec2Connection()->getVmsRulesManager(Qn::kSystemAccess)->broadcastEvent(
-            info, kFakeHandler);
+        if (nx::vms::rules::ini().fullSupport)
+        {
+            m_context->ec2Connection()->getVmsRulesManager(Qn::kSystemAccess)
+                ->broadcastEvent(info, kFakeHandler);
+        }
+        else // Execute locally.
+        {
+            onEventReceived(info);
+        }
     }
 }
 

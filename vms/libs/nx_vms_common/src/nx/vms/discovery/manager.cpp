@@ -12,6 +12,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/utils/scoped_connections.h>
+#include <utils/common/synctime.h>
 
 #include "deprecated_multicast_finder.h"
 #include "module_connector.h"
@@ -73,7 +74,7 @@ struct Manager::Private
                     NX_DEBUG(this, "Conflicting module %1 found on %2",
                         module.id,
                         module.endpoint);
-                    emit q->conflict(module);
+                    emit q->conflict(qnSyncTime->currentTimePoint(), module);
                     return;
                 }
 

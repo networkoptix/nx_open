@@ -158,7 +158,7 @@ SoftwareTriggersWatcher::SoftwareTriggersWatcher(
         this, &SoftwareTriggersWatcher::tryRemoveTrigger);
 
 
-    if (!nx::vms::rules::ini().serverSideOnly)
+    if (nx::vms::rules::ini().fullSupport)
     {
         auto rulesEngine = systemContext()->vmsRulesEngine();
 
@@ -266,7 +266,7 @@ void SoftwareTriggersWatcher::updateTriggers()
         removedIds.remove(rule->id());
     }
 
-    if (!nx::vms::rules::ini().serverSideOnly)
+    if (nx::vms::rules::ini().fullSupport)
     {
         for (const auto [id, rule]: systemContext()->vmsRulesEngine()->rules())
         {
