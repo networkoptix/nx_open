@@ -215,7 +215,8 @@ bool ManagerWindows::enumDevicesCallback(LPCDIDEVICEINSTANCE deviceInstance, LPV
 void ManagerWindows::onDeviceFailed(const QString& path)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    if (!NX_ASSERT(m_devices.contains(path)))
+    // Device can already be removed, but we still getting callbacks from winapi.
+    if (!m_devices.contains(path))
         return;
 
     QSet<QString> stillActiveDevices = nx::utils::toQSet(m_devices.keys());
