@@ -7,6 +7,8 @@ nx_add_target(nx_vms_rules
     FOLDER common/libs
 )
 
+nx_make_target_translatable(nx_vms_rules)
+
 target_compile_definitions(nx_vms_rules
     PRIVATE NX_VMS_RULES_API=${API_EXPORT_MACRO}
     INTERFACE NX_VMS_RULES_API=${API_IMPORT_MACRO})
