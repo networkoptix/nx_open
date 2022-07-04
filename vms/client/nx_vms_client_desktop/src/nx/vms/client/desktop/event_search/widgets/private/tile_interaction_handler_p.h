@@ -46,9 +46,9 @@ private:
     void openSource(const QModelIndex& index, bool inNewTab, bool fromDoubleClick);
     void performDragAndDrop(const QModelIndex& index, const QPoint& pos, const QSize& size);
     void showContextMenu(
-        const QModelIndex& index, 
+        const QModelIndex& index,
         const QPoint& globalPos,
-        bool withStandardInteraction, 
+        bool withStandardInteraction,
         QWidget* parent);
 
     void showMessage(const QString& text);
@@ -77,9 +77,6 @@ signals:
 private:
     template<typename T>
     static TileInteractionHandler* doInstall(QnWorkbenchContext* context, T* tileInteractionSource);
-
-    bool requestPluginActionSettings(const QJsonObject& settingsModel,
-        QMap<QString, QString>& settingsValues) const;
 
 private:
     const QScopedPointer<nx::utils::PendingOperation> m_showPendingMessages;

@@ -189,11 +189,23 @@ public:
     Q_INVOKABLE QJsonObject deviceAgentSettingsModel(const QnUuid& engineId) const;
     Q_INVOKABLE QJsonObject deviceAgentSettingsValues(const QnUuid& engineId) const;
     Q_INVOKABLE void setDeviceAgentSettingsValues(
-        const QnUuid& engineId, const QString& activeElement, const QJsonObject& values);
+        const QnUuid& engineId,
+        const QString& activeElement,
+        const QJsonObject& paramsModel,
+        const QJsonObject& values);
+
     Q_INVOKABLE void refreshDeviceAgentSettings(const QnUuid& engineId);
     void resetDeviceAgentData(
         const QnUuid& engineId, const DeviceAgentData& data, bool resetUser = true);
     Q_INVOKABLE QJsonObject deviceAgentSettingsErrors(const QnUuid& engineId) const;
+
+    using AnalyticsSettingsActionCallback = std::function<void(const AnalyticsActionResult&)>;
+    using RequestAnalyticsSettingsCallback =
+        std::function<std::optional<QJsonObject>(const QJsonObject& model)>;
+
+    void setAnalyticsSettingsActionCallbacks(
+        RequestAnalyticsSettingsCallback requestSettings,
+        AnalyticsSettingsActionCallback onAction);
 
     Q_INVOKABLE bool dualStreamingEnabled() const;
     Q_INVOKABLE bool recordingEnabled() const;

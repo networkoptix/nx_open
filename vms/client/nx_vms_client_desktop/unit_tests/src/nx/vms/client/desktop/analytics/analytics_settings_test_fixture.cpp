@@ -45,7 +45,8 @@ rest::Handle AnalyticsSettingsMockApiInterface::activeSettingsChanged(
     const QString& activeElement,
     const QJsonObject& settingsModel,
     const QJsonObject& settingsValues,
-    AnalyticsSettingsCallback callback)
+    const QJsonObject& paramValues,
+    AnalyticsActiveSettingsCallback callback)
 {
     return makeRequest(RequestInfo::Type::get, device, engine, callback).handle;
 }
@@ -84,6 +85,15 @@ AnalyticsSettingsMockApiInterface::RequestInfo AnalyticsSettingsMockApiInterface
         callback }
     );
     return m_requests.back();
+}
+
+AnalyticsSettingsMockApiInterface::RequestInfo AnalyticsSettingsMockApiInterface::makeRequest(
+    RequestInfo::Type type,
+    const QnVirtualCameraResourcePtr& device,
+    const AnalyticsEngineResourcePtr& engine,
+    AnalyticsActiveSettingsCallback callback)
+{
+    return {};
 }
 
 ListenerNotifier::ListenerNotifier(const AnalyticsSettingsListenerPtr& listener)

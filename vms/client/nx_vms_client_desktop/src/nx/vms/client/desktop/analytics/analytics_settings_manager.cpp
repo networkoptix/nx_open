@@ -5,6 +5,7 @@
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/api/analytics/device_agent_active_setting_changed_response.h>
 #include <nx/vms/api/analytics/device_agent_settings_response.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
@@ -346,7 +347,8 @@ bool AnalyticsSettingsManager::activeSettingsChanged(
     const QString& activeElement,
     const QJsonObject& settingsModel,
     const QJsonObject& settingsValues,
-    PreviewSettings previewSettings)
+    const QJsonObject& paramValues,
+    DeviceAgentDataPreviewCallback previewSettings)
 {
     if (!NX_ASSERT(d->serverInterface))
         return false;
@@ -361,10 +363,11 @@ bool AnalyticsSettingsManager::activeSettingsChanged(
         activeElement,
         settingsModel,
         settingsValues,
+        paramValues,
         [this, agentId, previewSettings](
             bool success,
             rest::Handle requestId,
-            const DeviceAgentSettingsResponse& result)
+            const DeviceAgentActiveSettingChangedResponse& result)
         {
             previewSettings(
                 success,
@@ -373,7 +376,12 @@ bool AnalyticsSettingsManager::activeSettingsChanged(
                     .values = result.settingsValues,
                     .errors = result.settingsErrors,
                     .modelId = result.settingsModelId,
-                    .status = DeviceAgentData::Status::ok});
+                    .status = DeviceAgentData::Status::ok
+                },
+                AnalyticsActionResult{
+                    .actionUrl = result.actionUrl,
+                    .messageToUser = result.messageToUser
+                });
         });
 
     return handle > 0;

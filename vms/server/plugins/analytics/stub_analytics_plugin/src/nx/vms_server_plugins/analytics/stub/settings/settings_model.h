@@ -42,6 +42,23 @@ static const std::string kShowAdditionalRadioButtonValue = "Show something";
 static const std::string kHideAdditionalRadioButtonValue = "Hide me";
 static const std::string kDefaultActiveRadioButtonGroupValue = "Some value";
 
+static const std::string kShowMessageButtonId = "showMessageButton";
+static const std::string kShowUrlButtonId = "showUrlButton";
+static const std::string kParametersModel = /*suppress newline*/ 1 + (const char*) R"json(
+{
+    "type": "Settings",
+    "items":
+    [
+        {
+            "type": "TextField",
+            "name": "url",
+            "caption": "Url",
+            "defaultValue": "https://example.com/"
+        }
+    ]
+}
+)json";
+
 // ------------------------------------------------------------------------------------------------
 
 static const std::string kAlternativeSettingsModel =
@@ -274,7 +291,7 @@ static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R
                     "type": "Placeholder",
                     "header": "Header",
                     "description": "Description",
-                    "image": "default"
+                    "icon": "default"
                 }
             ]
         }
@@ -487,6 +504,19 @@ static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R
                         "Some value",
                         ")json" + kShowAdditionalRadioButtonValue + R"json("
                     ]
+                },
+                {
+                    "type": "Button",
+                    "name": ")json" + kShowMessageButtonId + R"json(",
+                    "caption": "Show a message",
+                    "isActive": true
+                },
+                {
+                    "type": "Button",
+                    "name": ")json" + kShowUrlButtonId + R"json(",
+                    "caption": "Show a web-page",
+                    "isActive": true,
+                    "parametersModel": )json" + kParametersModel + R"json(
                 }
             ]
         }

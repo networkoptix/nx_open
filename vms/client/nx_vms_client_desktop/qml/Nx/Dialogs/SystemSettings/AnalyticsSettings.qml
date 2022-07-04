@@ -71,9 +71,13 @@ Item
             description: qsTr("Check Camera Settings to configure this integration.")
         }
 
-        onValuesEdited: function(activeElement)
+        onValuesEdited: function(activeItem)
         {
-            store.setSettingsValues(currentEngineId, activeElement, getValues())
+            store.setSettingsValues(
+                currentEngineId,
+                activeItem ? activeItem.name : "",
+                activeItem ? activeItem.parametersModel : "",
+                getValues())
         }
     }
 

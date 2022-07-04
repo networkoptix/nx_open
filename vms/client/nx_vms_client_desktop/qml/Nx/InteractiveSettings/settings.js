@@ -30,6 +30,34 @@ function preprocessModel(model)
     _nameSectionsRecursively(model, "")
 }
 
+function _connectSignals(parent, item)
+{
+    if (item.activeValueChanged)
+    {
+        item.activeValueChanged.connect(
+            () => settingsView.triggerValuesEdited(item.isActive ? item : null))
+    }
+
+    if (item.valueChanged)
+    {
+        // An item can be active and only have a `valueChanged` signal.
+        let isDedicatedActiveSignalUsed = item.activeValueChanged
+        let activeItem =
+            (item.isActive && !isDedicatedActiveSignalUsed) ? item : null
+
+        item.valueChanged.connect(() => settingsView.triggerValuesEdited(activeItem))
+    }
+
+    if (item.activated)
+        item.activated.connect(() => settingsView.triggerValuesEdited(item))
+
+    if (item.filledChanged && parent.processFilledChanged)
+    {
+        item.filledChanged.connect(function() { parent.processFilledChanged(item) })
+        parent.processFilledChanged(item)
+    }
+}
+
 function _createItemsRecursively(parent, visualParent, model, depth)
 {
     var type = model.type
@@ -51,27 +79,7 @@ function _createItemsRecursively(parent, visualParent, model, depth)
 
     if (item)
     {
-        if (item.activeValueChanged)
-        {
-            item.activeValueChanged.connect(
-                () => settingsView.triggerValuesEdited(item.isActive ? item.name : ""))
-        }
-
-        if (item.valueChanged)
-        {
-            // An item can be active and only have a `valueChanged` signal.
-            let isDedicatedActiveSignalUsed = item.activeValueChanged
-            let activeElementName =
-                (item.isActive && !isDedicatedActiveSignalUsed) ? item.name : ""
-
-            item.valueChanged.connect(() => settingsView.triggerValuesEdited(activeElementName))
-        }
-
-        if (item.filledChanged && parent.processFilledChanged)
-        {
-            item.filledChanged.connect(function() { parent.processFilledChanged(item) })
-            parent.processFilledChanged(item)
-        }
+        _connectSignals(parent, item)
 
         if (item.childrenItem && model.items)
         {
@@ -235,4 +243,3 @@ function setErrors(rootItem, errors)
                 item.setErrorMessage(errors[item.name])
         })
 }
-

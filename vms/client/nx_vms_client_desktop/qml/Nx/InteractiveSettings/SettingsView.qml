@@ -13,7 +13,7 @@ Item
     id: settingsView
 
     signal valuesChanged()
-    signal valuesEdited(string activeElement)
+    signal valuesEdited(Item activeItem)
 
     property Item contentItem: null
     property bool contentEnabled: true
@@ -92,12 +92,12 @@ Item
             valuesChanged()
     }
 
-    function triggerValuesEdited(activeElement)
+    function triggerValuesEdited(activeItem)
     {
         if (!impl.valuesChangedEnabled)
             return
 
-        valuesEdited(activeElement)
+        valuesEdited(activeItem)
         valuesChanged()
     }
 

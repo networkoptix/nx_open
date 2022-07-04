@@ -45,7 +45,8 @@ public:
         const QString& activeElement,
         const QJsonObject& settingsModel,
         const QJsonObject& settingsValues,
-        AnalyticsSettingsCallback callback) override;
+        const QJsonObject& paramValues,
+        AnalyticsActiveSettingsCallback callback) override;
 
     bool requestWasSent(const DeviceAgentId& agentId) const;
 
@@ -60,6 +61,12 @@ private:
         const QnVirtualCameraResourcePtr& device,
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
         AnalyticsSettingsCallback callback);
+
+    RequestInfo makeRequest(
+        RequestInfo::Type type,
+        const QnVirtualCameraResourcePtr& device,
+        const nx::vms::common::AnalyticsEngineResourcePtr& engine,
+        AnalyticsActiveSettingsCallback callback);
 
     rest::Handle m_lastHandle = 0;
     std::deque<RequestInfo> m_requests;

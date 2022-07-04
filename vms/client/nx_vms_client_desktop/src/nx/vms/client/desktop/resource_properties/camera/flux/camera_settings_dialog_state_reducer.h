@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <api/model/analytics_actions.h>
 #include <core/resource/resource_fwd.h>
 
 #include "camera_settings_dialog_state.h"
@@ -156,15 +157,13 @@ public:
     static State setAnalyticsStreamIndex(
         State state, const QnUuid& engineId, State::StreamIndex value, ModificationSource source);
 
-    using PreviewSettings =
-        std::function<void(bool success, const DeviceAgentData&)>;
-
     static std::pair<bool, State> setDeviceAgentSettingsValues(
         State state,
         const QnUuid& engineId,
         const QString& activeElement,
         const QJsonObject& values,
-        PreviewSettings previewSettings = {});
+        const QJsonObject& paramValues,
+        DeviceAgentDataPreviewCallback previewSettings = {});
 
     static State refreshDeviceAgentSettings(State state, const QnUuid& engineId);
 

@@ -2578,7 +2578,8 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsV
     const QnUuid& engineId,
     const QString& activeElement,
     const QJsonObject& values,
-    PreviewSettings previewSettings)
+    const QJsonObject& paramValues,
+    DeviceAgentDataPreviewCallback previewSettings)
 {
     if (!std::any_of(
         state.analytics.engines.begin(),
@@ -2589,7 +2590,7 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsV
     }
 
     auto& storedValues = state.analytics.settingsByEngineId[engineId].values;
-    if (storedValues.get() == values)
+    if (storedValues.get() == values && activeElement.isEmpty())
         return {false, std::move(state)};
 
     storedValues.setUser(values);
@@ -2602,6 +2603,7 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsV
             activeElement,
             state.analytics.settingsByEngineId[engineId].model,
             values,
+            paramValues,
             previewSettings);
 
         state.analytics.settingsByEngineId[engineId].loading = loading;

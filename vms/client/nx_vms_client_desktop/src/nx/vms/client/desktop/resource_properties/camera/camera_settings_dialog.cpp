@@ -19,6 +19,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <nx/utils/qset.h>
+#include <nx/vms/client/desktop/analytics/analytics_settings_actions_helper.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -428,6 +429,14 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         [this]
         {
             d->store->setSelectedTab((CameraSettingsTab)currentPage());
+        });
+
+    using Helper = AnalyticsSettingsActionsHelper;
+    d->store->setAnalyticsSettingsActionCallbacks(
+        [](const QJsonObject& model) { return Helper::requestSettingsJson(model); },
+        [this](const AnalyticsActionResult& result)
+        {
+            Helper::processResult(result, context(), this);
         });
 
     connect(ui->tabWidget, &QTabWidget::currentChanged, d.get(), &Private::updatePreviewIfNeeded);

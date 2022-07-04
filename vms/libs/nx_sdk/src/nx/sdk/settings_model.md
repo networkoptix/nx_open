@@ -21,12 +21,21 @@ Some field names have the same meaning through all the controls and can have som
 - `"defaultValue"` - Default value of the control. Will be sent to the engine on applying changes.
 
 Certain fields are supported by some of the controls.
-- `"isActive"` - Boolean. Marks the control as an active one. It means that every change of the
-    control value in the GUI leads to sending a settings request to the Server immediately without
-    waiting for the confirmation with the "Apply" button. Results of such requests aren't saved in
-    the Server database, and reaction of the Plugin to such requests shouldn't lead to the actual
-    state change of the Plugin. The main purpose of active settings is to give Plugins a way to
-    change the Settings Model and values on-the-fly, providing better user experience to the User.
+- `"isActive"` - Boolean. Marks the control as "active" - it means that every change of the control
+    value in the GUI immediately triggers sending a request to the Server, without waiting for the
+    confirmation with the "Apply" button. The request executes the code of the Active Setting
+    handler of the entity being set up by these Settings. The setting values sent in such a request
+    are not meant to be "applied" (stored in a database) - they are intended only for preparing a
+    proper reply to the user, which may include an adjusted Settings Model, adjusted values of the
+    GUI controls, and a message to be shown to the user or a URL to be opened in the web browser.
+    The main purpose of Active settings is to give the entities being set up a way to change the
+    Settings Model and values on-the-fly, providing a better user experience. An example could be
+    an Active combo-box which lists the supported measurement units, and the handler code which
+    converts the entered value into the selected unit.
+- `"parametersModel"` - Settings Model JSON object. Applies only for controls with the `"isActive"`
+    property set to `true`. Additional parameters are requested when the active control is triggered.
+    NOTE: The `"parametersModel"` model does not support items with the `"isActive"` property set
+    to `true`.
 
 The Settings Model itself is a JSON object, which field `"items"` is a JSON array containing
 top-level Setting Models for individual Settings, and those Settings that support inner Settings
@@ -563,18 +572,19 @@ Has neither label nor display on camera options. Therefore may have no color.
 
 The `"positions"` field is a hint for the client where to position min/max boxes, and is optional.
 
-[proprietary]
-
 ---------------------------------------------------------------------------------------------------
 ## Button
 
-**NOT IMPLEMENTED**
+An action button. Technically it is a setting which does not have a value, but can be marked with
+`"isActive" = "true"`. As for any Active setting, it allows to request a set of parameters via
+offering a dialog to the user, and implement any reaction in the Active Setting call-back code, as
+well as display a message to the user or open a URL in the web browser.
+
+[proprietary]
 
 ![](doc/images/button.png)
 
-Action button
-
-[VMS-15786](https://networkoptix.atlassian.net/browse/VMS-15786)
+[/proprietary]
 
 ### Setting Model
 
@@ -582,14 +592,21 @@ Action button
         "type": "Button",
         "name": "button1",
         "caption": "Button 1",
-        "description": "Action 1"
+        "description": "Action 1",
+        "isActive": true,
+        "parametersModel": {
+            "type": "Settings",
+            "items":
+            [
+                {
+                    "type": "TextField",
+                    "name": "url",
+                    "caption": "Url",
+                    "defaultValue": "https://example.com/"
+                }
+            ]
+        }
     }
-
-### Setting Value
-
-**NOT IMPLEMENTED**
-
-[/proprietary]
 
 ---------------------------------------------------------------------------------------------------
 ## Structure

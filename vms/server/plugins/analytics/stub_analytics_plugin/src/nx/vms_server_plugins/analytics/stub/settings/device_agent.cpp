@@ -172,6 +172,21 @@ void DeviceAgent::doGetSettingsOnActiveSettingChange(
 
     auto response = makePtr<ActiveSettingChangedResponse>();
     response->setSettingsResponse(settingsResponse);
+
+    if (settingId == kShowMessageButtonId)
+    {
+        const auto actionResponse = makePtr<ActionResponse>();
+        actionResponse->setMessageToUser("Message Example");
+        response->setActionResponse(actionResponse);
+    }
+    if (settingId == kShowUrlButtonId)
+    {
+        const auto actionResponse = makePtr<ActionResponse>();
+        const auto url = activeSettingChangeAction->params()->value("url");
+        actionResponse->setActionUrl(url);
+        response->setActionResponse(actionResponse);
+    }
+
     *outResult = response.releasePtr();
 }
 

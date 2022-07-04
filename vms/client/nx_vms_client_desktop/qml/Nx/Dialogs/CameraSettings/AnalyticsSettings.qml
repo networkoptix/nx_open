@@ -171,9 +171,13 @@ Item
         contentVisible: contentEnabled
         scrollBarParent: scrollBarsParent
 
-        onValuesEdited: function(activeElement)
+        onValuesEdited: function(activeItem)
         {
-            store.setDeviceAgentSettingsValues(currentEngineId, activeElement, getValues())
+            store.setDeviceAgentSettingsValues(
+                currentEngineId,
+                activeItem ? activeItem.name : "",
+                activeItem ? activeItem.parametersModel : "",
+                getValues())
         }
 
         headerItem: InformationPanel

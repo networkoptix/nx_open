@@ -10,6 +10,12 @@ Button
     property string name: ""
     property alias caption: control.text
     property string description: ""
+    property bool isActive: true
+    property var parametersModel: null
 
     GlobalToolTip.text: description
+
+    signal activated()
+
+    onClicked: activated()
 }

@@ -4,10 +4,11 @@
 
 #include <nx/utils/uuid.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
-class AnalyticsSettingsWidget: public QnAbstractPreferencesWidget
+class AnalyticsSettingsWidget: public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
