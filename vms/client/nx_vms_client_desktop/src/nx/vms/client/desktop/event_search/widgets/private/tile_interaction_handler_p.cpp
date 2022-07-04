@@ -34,6 +34,7 @@
 #include <nx/utils/qset.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/analytics/analytics_settings_actions_helper.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
@@ -313,8 +314,13 @@ void TileInteractionHandler::executePluginAction(
     if (!actionDescriptor->parametersModel.isEmpty())
     {
         // Show dialog to enter required parameters.
-        if (!requestPluginActionSettings(actionDescriptor->parametersModel, actionData.params))
+        auto params = AnalyticsSettingsActionsHelper::requestSettings(
+            actionDescriptor->parametersModel, mainWindowWidget());
+
+        if (!params)
             return;
+
+        actionData.params = *params;
     }
 
     const auto resultCallback =
@@ -331,17 +337,8 @@ void TileInteractionHandler::executePluginAction(
                 return;
 
             const auto reply = result.deserialized<AnalyticsActionResult>();
-            if (!reply.messageToUser.isEmpty())
-                QnMessageBox::success(mainWindowWidget(), reply.messageToUser);
-
-            if (!reply.actionUrl.isEmpty())
-            {
-                WebViewDialog::showUrl(
-                    QUrl(reply.actionUrl),
-                    /*enableClientApi*/ true,
-                    workbench()->context(),
-                    mainWindowWidget());
-            }
+            AnalyticsSettingsActionsHelper::processResult(
+                reply, workbench()->context(), mainWindowWidget());
         };
 
     connectedServerApi()->executeAnalyticsAction(
@@ -466,57 +463,6 @@ void TileInteractionHandler::copyBookmarkToClipboard(const QModelIndex &index)
         mimeData->setHtml(htmlData);
         QApplication::clipboard()->setMimeData(mimeData);
     }
-}
-
-bool TileInteractionHandler::requestPluginActionSettings(const QJsonObject& settingsModel,
-    QMap<QString, QString>& settingsValues) const
-{
-    QnMessageBox parametersDialog(mainWindowWidget());
-    parametersDialog.addButton(QDialogButtonBox::Ok);
-    parametersDialog.addButton(QDialogButtonBox::Cancel);
-    parametersDialog.setText(tr("Enter parameters"));
-    parametersDialog.setInformativeText(tr("Action requires some parameters to be filled."));
-    parametersDialog.setIcon(QnMessageBoxIcon::Information);
-
-    const auto view = new QQuickWidget(qnClientCoreModule->mainQmlEngine(), &parametersDialog);
-    view->setClearColor(parametersDialog.palette().window().color());
-    view->setResizeMode(QQuickWidget::SizeRootObjectToView);
-    view->setSource(QUrl("Nx/InteractiveSettings/SettingsView.qml"));
-
-    const auto root = view->rootObject();
-    if (!NX_ASSERT(root))
-        return false;
-
-    QMetaObject::invokeMethod(
-        root,
-        "loadModel",
-        Qt::DirectConnection,
-        Q_ARG(QVariant, settingsModel.toVariantMap()),
-        /*initialValues*/ Q_ARG(QVariant, {}),
-        /*restoreScrollPosition*/ Q_ARG(QVariant, false));
-
-    const auto panel = new QScrollArea(&parametersDialog);
-    panel->setFixedHeight(400);
-    const auto layout = new QHBoxLayout(panel);
-    layout->addWidget(view);
-
-    parametersDialog.addCustomWidget(panel, QnMessageBox::Layout::Main);
-    if (parametersDialog.exec() != QDialogButtonBox::Ok)
-        return false;
-
-    QVariant result;
-    QMetaObject::invokeMethod(
-        root,
-        "getValues",
-        Qt::DirectConnection,
-        Q_RETURN_ARG(QVariant, result));
-
-    settingsValues.clear();
-    const auto resultMap = result.value<QVariantMap>();
-    for (auto iter = resultMap.cbegin(); iter != resultMap.cend(); ++iter)
-        settingsValues.insert(iter.key(), iter.value().toString());
-
-    return true;
 }
 
 void TileInteractionHandler::openSource(

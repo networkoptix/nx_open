@@ -109,7 +109,7 @@ std::string Plugin::manifestString() const
                         "type": "Placeholder",
                         "header": "Header",
                         "description": "Description",
-                        "image": "default"
+                        "icon": "default"
                     }
                 ]
             },
@@ -148,6 +148,19 @@ std::string Plugin::manifestString() const
                             "Some value",
                             ")json" + kShowAdditionalRadioButtonValue + R"json("
                         ]
+                    },
+                    {
+                        "type": "Button",
+                        "name": ")json" + kShowMessageButtonId + R"json(",
+                        "caption": "Show a message",
+                        "isActive": true
+                    },
+                    {
+                        "type": "Button",
+                        "name": ")json" + kShowUrlButtonId + R"json(",
+                        "caption": "Show a web-page",
+                        "isActive": true,
+                        "parametersModel": )json" + kParametersModel + R"json(
                     }
                 ]
             }

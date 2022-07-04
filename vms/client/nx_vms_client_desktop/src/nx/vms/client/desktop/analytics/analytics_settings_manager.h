@@ -7,24 +7,34 @@
 #include <QtCore/QObject>
 #include <QtCore/QJsonObject>
 
+#include <api/model/analytics_actions.h>
 #include <api/server_rest_connection_fwd.h>
-
 #include <core/resource/resource_fwd.h>
-
-#include <nx/utils/uuid.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/utils/uuid.h>
 
 #include "analytics_settings_types.h"
 
 class QnCommonMessageProcessor;
 
-namespace nx::vms::api::analytics { struct DeviceAgentSettingsResponse; }
+namespace nx::vms::api::analytics {
+
+struct DeviceAgentSettingsResponse;
+struct DeviceAgentActiveSettingChangedResponse;
+
+} // namespace nx::vms::api::analytics
 
 namespace nx::vms::client::desktop {
 
 class AnalyticsSettingsManager;
+
 using AnalyticsSettingsCallback =
     rest::Callback<nx::vms::api::analytics::DeviceAgentSettingsResponse>;
+
+using AnalyticsActiveSettingsCallback =
+    rest::Callback<nx::vms::api::analytics::DeviceAgentActiveSettingChangedResponse>;
+
+using AnalyticsSettingsActionCallback = rest::Callback<AnalyticsActionResult>;
 
 class NX_VMS_CLIENT_DESKTOP_API AnalyticsSettingsServerInterface
 {
@@ -47,7 +57,8 @@ public:
         const QString& activeElement,
         const QJsonObject& settingsModel,
         const QJsonObject& settingsValues,
-        AnalyticsSettingsCallback callback) = 0;
+        const QJsonObject& paramValues,
+        AnalyticsActiveSettingsCallback callback) = 0;
 };
 using AnalyticsSettingsServerInterfacePtr = std::shared_ptr<AnalyticsSettingsServerInterface>;
 
@@ -111,13 +122,13 @@ public:
         const DeviceAgentId& agentId,
         const nx::vms::api::analytics::DeviceAgentSettingsResponse& data);
 
-    using PreviewSettings = std::function<void(bool success, const DeviceAgentData&)>;
     bool activeSettingsChanged(
         const DeviceAgentId& agentId,
         const QString& activeElement,
         const QJsonObject& settingsModel,
         const QJsonObject& settingsValues,
-        PreviewSettings previewSettings);
+        const QJsonObject& paramValues,
+        DeviceAgentDataPreviewCallback previewSettings);
 
     AnalyticsSettingsListenerPtr getListener(const DeviceAgentId& agentId);
 

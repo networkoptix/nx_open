@@ -2,11 +2,11 @@
 
 #include "analytics_settings_widget.h"
 
-#include <QtQuickWidgets/QQuickWidget>
-#include <QtQuick/QQuickItem>
 #include <QtCore/QMetaObject>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QUrlQuery>
+#include <QtQuick/QQuickItem>
+#include <QtQuickWidgets/QQuickWidget>
 
 #include <api/server_rest_connection.h>
 #include <client_core/client_core_module.h>
@@ -18,6 +18,7 @@
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <nx/vms/client/desktop/analytics/analytics_engines_watcher.h>
+#include <nx/vms/client/desktop/analytics/analytics_settings_actions_helper.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
@@ -62,13 +63,16 @@ public:
     }
 
     Q_INVOKABLE void setSettingsValues(
-        const QnUuid& engineId, const QString& activeElement, const QJsonObject& values)
+        const QnUuid& engineId,
+        const QString& activeElement,
+        const QJsonObject& paramsModel,
+        const QJsonObject& values)
     {
         settingsValuesByEngineId.insert(engineId, SettingsValues{values, true});
         hasChanges = true;
 
         if (!activeElement.isEmpty())
-            activeElementChanged(currentEngineId, activeElement);
+            activeElementChanged(currentEngineId, activeElement, paramsModel);
 
         emit q->hasChangesChanged();
     }
@@ -102,7 +106,11 @@ public:
     }
 
     void refreshSettingsValues(const QnUuid& engineId);
-    void activeElementChanged(const QnUuid& engineId, const QString& activeElement);
+    void activeElementChanged(
+        const QnUuid& engineId,
+        const QString& activeElement,
+        const QJsonObject& paramsModel);
+
     void applySettingsValues();
 
 signals:
@@ -358,7 +366,9 @@ void AnalyticsSettingsWidget::Private::applySettingsValues()
 }
 
 void AnalyticsSettingsWidget::Private::activeElementChanged(
-    const QnUuid& engineId, const QString& activeElement)
+    const QnUuid& engineId,
+    const QString& activeElement,
+    const QJsonObject& paramsModel)
 {
     if (!pendingApplyRequests.isEmpty() || !pendingRefreshRequests.isEmpty())
         return;
@@ -370,16 +380,21 @@ void AnalyticsSettingsWidget::Private::activeElementChanged(
     if (!NX_ASSERT(engine))
         return;
 
+    auto paramValues = AnalyticsSettingsActionsHelper::requestSettingsJson(paramsModel);
+    if (!paramValues)
+        return;
+
     const auto handle = connectedServerApi()->engineAnalyticsActiveSettingsChanged(
         engine,
         activeElement,
         settingsModel(engineId),
         settingsValuesByEngineId[engineId].values,
+        *paramValues,
         nx::utils::guarded(this,
             [this, engineId](
                 bool success,
                 rest::Handle requestId,
-                const nx::vms::api::analytics::EngineSettingsResponse& result)
+                const nx::vms::api::analytics::EngineActiveSettingChangedResponse& result)
             {
                 if (!pendingApplyRequests.removeOne(requestId))
                     return;
@@ -395,6 +410,13 @@ void AnalyticsSettingsWidget::Private::activeElementChanged(
                 m_previewSettingsModel[engineId] = result.settingsModel;
                 emit settingsModelChanged(engineId);
                 setErrors(engineId, result.settingsErrors);
+
+                AnalyticsSettingsActionsHelper::processResult(
+                    AnalyticsActionResult{
+                        .actionUrl = result.actionUrl,
+                        .messageToUser = result.messageToUser},
+                    q->context(),
+                    /*parent*/ q);
             }),
             thread());
 
@@ -408,6 +430,7 @@ void AnalyticsSettingsWidget::Private::activeElementChanged(
 
 AnalyticsSettingsWidget::AnalyticsSettingsWidget(QWidget* parent):
     base_type(parent),
+    QnWorkbenchContextAware(parent),
     d(new Private(this))
 {
     anchorWidgetToParent(d->view.get());

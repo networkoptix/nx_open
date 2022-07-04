@@ -11,6 +11,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/server_runtime_event_data.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <utils/common/delayed.h>
 
 #include "analytics_settings_manager.h"
 
@@ -69,7 +70,8 @@ public:
         const QString& activeElement,
         const QJsonObject& settingsModel,
         const QJsonObject& settingsValues,
-        AnalyticsSettingsCallback callback) override
+        const QJsonObject& paramValues,
+        AnalyticsActiveSettingsCallback callback) override
     {
         if (!NX_ASSERT(device) || !NX_ASSERT(engine) || !NX_ASSERT(m_owner))
             return {};
@@ -80,6 +82,7 @@ public:
             activeElement,
             settingsModel,
             settingsValues,
+            paramValues,
             nx::utils::guarded(m_owner, callback),
             m_owner->thread());
     }

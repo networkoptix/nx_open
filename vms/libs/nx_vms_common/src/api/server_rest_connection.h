@@ -26,6 +26,7 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/system_error.h>
 #include <nx/vms/api/analytics/analytics_engine_settings_data.h>
+#include <nx/vms/api/analytics/device_agent_active_setting_changed_response.h>
 #include <nx/vms/api/analytics/device_agent_settings_response.h>
 #include <nx/vms/api/data/analytics_data.h>
 #include <nx/vms/api/data/backup_position.h>
@@ -556,7 +557,8 @@ public:
         const QString& activeElement,
         const QJsonObject& settingsModel,
         const QJsonObject& settingsValues,
-        Result<nx::vms::api::analytics::EngineSettingsResponse>::type&& callback,
+        const QJsonObject& paramValues,
+        Result<nx::vms::api::analytics::EngineActiveSettingChangedResponse>::type&& callback,
         QThread* targetThread = nullptr);
 
     Handle getDeviceAnalyticsSettings(
@@ -579,7 +581,8 @@ public:
         const QString& activeElement,
         const QJsonObject& settingsModel,
         const QJsonObject& settingsValues,
-        Result<nx::vms::api::analytics::DeviceAgentSettingsResponse>::type&& callback,
+        const QJsonObject& paramValues,
+        Result<nx::vms::api::analytics::DeviceAgentActiveSettingChangedResponse>::type&& callback,
         QThread* targetThread = nullptr);
 
     Handle getPluginInformation(
