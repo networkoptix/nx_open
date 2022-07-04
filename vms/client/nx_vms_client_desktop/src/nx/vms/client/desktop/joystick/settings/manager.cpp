@@ -133,6 +133,7 @@ Manager* Manager::create(QObject* parent)
 Manager::Manager(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
+    m_mutex(nx::Mutex::Recursive),
     d(new Private{
         .q = this,
         .enumerateTimer = new QTimer(this),
