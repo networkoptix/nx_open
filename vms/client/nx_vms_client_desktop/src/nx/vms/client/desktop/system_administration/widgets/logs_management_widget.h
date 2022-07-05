@@ -4,17 +4,15 @@
 
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
-#include <utils/common/connective.h>
 
 namespace Ui { class LogsManagementWidget; }
 
 namespace nx::vms::client::desktop {
 
-class LogsManagementWidget:
-    public Connective<QnAbstractPreferencesWidget>
+class LogsManagementWidget: public QnAbstractPreferencesWidget
 {
     Q_OBJECT
-    using base_type = Connective<QnAbstractPreferencesWidget>;
+    using base_type = QnAbstractPreferencesWidget;
 
 public:
     explicit LogsManagementWidget(QWidget* parent = nullptr);
