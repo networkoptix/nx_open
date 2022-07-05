@@ -149,6 +149,15 @@ struct ConnectActionsHandler::Private
                 currentConnectionProcess.reset();
             });
     }
+
+    void handleWSError(RemoteConnectionErrorCode errorCode) const
+    {
+        const auto welcomeScreen = q->mainWindow()->welcomeScreen();
+        const bool connectingTileExists =
+            welcomeScreen && welcomeScreen->connectingTileExists();
+        if (connectingTileExists)
+            welcomeScreen->openConnectingTile(errorCode);
+    }
 };
 
 ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
@@ -169,9 +178,12 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
                 executeDelayedParented(
                     [this]()
                     {
+                        const auto errorCode = RemoteConnectionErrorCode::sessionExpired;
+                        d->handleWSError(errorCode);
+
                         QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
                             context(),
-                            RemoteConnectionErrorCode::sessionExpired,
+                            errorCode,
                             /*moduleInformation*/ {},
                             commonModule()->engineVersion()
                         );
@@ -399,10 +411,13 @@ void ConnectActionsHandler::setupConnectTimeoutTimer(milliseconds timeout)
     connect(connectTimeoutTimer, &QTimer::timeout, this,
         [this]()
         {
+            const auto errorCode = RemoteConnectionErrorCode::connectionTimeout;
+            d->handleWSError(errorCode);
+
             disconnectFromServer(DisconnectFlag::Force);
             QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
                 context(),
-                RemoteConnectionErrorCode::connectionTimeout,
+                errorCode,
                 /*moduleInformation*/ {},
                 commonModule()->engineVersion());
         });
@@ -580,6 +595,8 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
             executeDelayedParented(
                 [this, errorCode, serverModuleInformation]()
                 {
+                    d->handleWSError(errorCode);
+
                     QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
                         context(),
                         errorCode,
