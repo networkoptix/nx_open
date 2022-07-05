@@ -11,6 +11,7 @@ namespace nx::vms::client::desktop {
 
 class ClientApiAuthDialog: public QnMessageBox
 {
+    Q_OBJECT
 public:
     ClientApiAuthDialog(const QnResourcePtr& resource, QWidget* parent = nullptr);
     static bool isApproved(const QnResourcePtr& resource, const QUrl& url);
