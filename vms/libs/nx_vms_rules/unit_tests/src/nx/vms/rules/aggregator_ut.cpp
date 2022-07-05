@@ -56,6 +56,12 @@ TEST_F(AggregatorTest, firstEventIsNotAggregated)
     auto events = aggregator.popEvents();
     EXPECT_EQ(events.size(), 0);
     EXPECT_TRUE(aggregator.empty());
+
+    std::this_thread::sleep_for(kDefaultAggregationInterval);
+
+    events = aggregator.popEvents();
+    EXPECT_EQ(events.size(), 0);
+    EXPECT_TRUE(aggregator.empty());
 }
 
 TEST_F(AggregatorTest, aggregationIntervalWorks)

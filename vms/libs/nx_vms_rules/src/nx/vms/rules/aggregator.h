@@ -44,9 +44,6 @@ private:
         // The time relative to which the aggregator checks if the event aggregation time is
         // elapsed. At the moment it is got from the initial event timestamp.
         std::chrono::microseconds firstOccurrenceTimestamp;
-
-        // The last occurred event timestamp.
-        std::chrono::microseconds lastOccurrenceTimestamp;
     };
 
     std::chrono::microseconds m_interval;
