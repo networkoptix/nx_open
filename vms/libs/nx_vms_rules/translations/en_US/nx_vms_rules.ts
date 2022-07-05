@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_US" sourcelanguage="en">
 <context>
+    <name>nx::vms::rules::AggregatedEvent</name>
+    <message>
+        <source>Multiple %1 events have occurred</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::rules::AnalyticsEvent</name>
     <message>
         <source>Analytics Event</source>
@@ -186,13 +193,6 @@
     </message>
     <message>
         <source>Device IP Conflict</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::vms::rules::EventAggregator</name>
-    <message>
-        <source>Multiple %1 events have occurred</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

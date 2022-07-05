@@ -198,6 +198,20 @@
         <source>Too many login attempts. Try again in a minute.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
+        <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Two-factor authentication is required.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You can enable two-factor authentication in your %1.</source>
+        <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::core::CertificateWarning</name>
@@ -207,10 +221,6 @@
     </message>
     <message>
         <source>Cannot verify the identity of %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Someone may be impersonating %1 to steal your personal information.</source>
         <translation></translation>
     </message>
     <message>
@@ -230,19 +240,27 @@
         <translation></translation>
     </message>
     <message>
-        <source>Do not connect to this server unless instructed by your VMS administrator.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Server certificate is invalid.</source>
         <translation></translation>
     </message>
     <message>
-        <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
+        <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You attempted to connect to: %1 but the Server&apos;s certificate has changed.</source>
+        <source>Someone may be impersonating this Server to steal your personal information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You attempted to connect to this Server but the Server&apos;s certificate has changed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -152,6 +152,22 @@
         <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>This integration has no settings for this Camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check System Administration Settings to configure this integration.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This integration has no settings at System level.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check Camera Settings to configure this integration.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AnalyticsToolTipPreview</name>
@@ -261,8 +277,8 @@
 <context>
     <name>CloudTile</name>
     <message>
-        <source>Log in to </source>
-        <translation></translation>
+        <source>Log in to</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -809,8 +825,8 @@
         <translation></translation>
     </message>
     <message>
-        <source>preview is not available for the selected object</source>
-        <translation></translation>
+        <source>Preview is not available for the selected object</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -885,6 +901,10 @@ to activate PTZ</source>
     <message>
         <source>Add</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1170,8 +1190,8 @@ to activate PTZ</source>
 <context>
     <name>StyledRadioButton</name>
     <message>
-        <source>Logical ID </source>
-        <translation></translation>
+        <source>Logical ID</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

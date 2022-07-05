@@ -347,18 +347,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
         <translation></translation>
     </message>
@@ -373,6 +361,18 @@
     <message>
         <source>Internal server error. %1</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1103,6 +1103,466 @@
     </message>
 </context>
 <context>
+    <name>SystemSettings</name>
+    <message>
+        <source>SMTP host</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Email from</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SMTP user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SMTP password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Email signature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Email support link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SMTP connection type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SMTP port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SMTP timeout (seconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SMTP use simple settings view in Client</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SMTP name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LDAP URI</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LDAP Admin DN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LDAP Admin password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LDAP search base</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LDAP search filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LDAP password expiration (milliseconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LDAP search timeout (seconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Anonymous statistics report allowed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Anonymous statistics report last time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Anonymous statistics report last version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Anonymous statistics report last number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Anonymous statistics time cycle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Anonymous statistics report delay after update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Anonymous Statistics Report Server URL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Anonymous statistics report Client settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System alive update interval (seconds, 1s-1h)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proxy connection timeout (seconds, 1s-1h)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time synchronization enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Primary time synchronization Server ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max difference between local and source time (milliseconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OS time change check period</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sync time synchronization interval for network requests</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cloud owner account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cloud System ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cloud authorization key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Local System ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last master System merge ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last slave System merge ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disable Device vendors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Optimize Camera settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Thumbnails auto-update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use %1 service to send emails instead of SMTP client</source>
+        <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max scene items (0 means default)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send plain-text emails</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Windows line feed in emails</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable audit trail</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audit trail period (days, 14-730)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event log period (days)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enforce HTTPS (data traffic encryption)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enforce RTSPS (video traffic encryption)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable auto-discovery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable auto-update notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable update notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable UPNP port-mapping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cloud host override</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable crossdomain policy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable RTSP for Arecont</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable sequential Flir ONVIF searcher</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max P2P queue size (bytes, 32-512MB)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max P2P all clients size (bytes, 32-512MB)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max record queue size (bytes, 6-96MB)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max record queue size (elements, 250-4000)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value &gt;=2 to this parameter.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RTP retry count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RTP timeout (milliseconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max RTSP connection duration (seconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable cloud-connect UDP hole-punching</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable cloud-connect relays usage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enforce SSL for cloud-connect relays</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable recording on EDGE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable WebSocket for p2p</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Target update information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Installed update information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Downloader peers for files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Client update settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Thread count limit for Camera archive synchronization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watermark settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Authorization Session token lifetime (minutes)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Session token count limit on a single Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max session token count per user on single Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update interval for remote session token cache (other Servers and Cloud)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timeout for remote session token cache (other Servers and Cloud)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default video codec</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default codec for export video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low quality screen video codec</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>License server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URI for resource_data.json automatic update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Meta data storage change policy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Persistent Servers for update storage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Persistent Servers where updates are stored</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VMS Server version specific features</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Language for mobile push notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional local FS storage types for recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep IO port state on when Server connects to the Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media buffer size (KB, 10KB-4Mb)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media buffer size for audio only Devices (KB, 1Kb-1MB)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Force analytics DB storage mount point permissions in case of failure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check video stream period (milliseconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage encryption enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current storage encryption key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Servers in tree for non-admins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HTTP header: Origin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HTTP header: X-Frame-Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use only HTTPS for Cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable insecure deprecated API</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable insecure deprecated API functions curently in use by Nx products</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show mouse timeline preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::recording::Error</name>
     <message>
         <source>Internal error</source>
@@ -1746,16 +2206,20 @@
         <translation></translation>
     </message>
     <message>
-        <source>Failed to backup file </source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Server Certificate Error</source>
         <translation></translation>
     </message>
     <message>
         <source>Server &quot;%1&quot; certificate error</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Intercom informer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to backup file</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

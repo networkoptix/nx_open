@@ -42,10 +42,6 @@
         <source>Do</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Do HTTP request</source>
-        <translation></translation>
-    </message>
 </context>
 <context>
     <name>AdjustVideoDialog</name>
@@ -574,10 +570,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Force motion detection for stream</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Trust camera timestamp</source>
         <translation></translation>
     </message>
@@ -599,10 +591,6 @@
     </message>
     <message>
         <source>Stream Settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Initialization Settings</source>
         <translation></translation>
     </message>
     <message>
@@ -644,6 +632,26 @@
     <message>
         <source>Keep camera time settings</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>ONVIF Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Secondary stream profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Primary stream profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export From SD Cards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not export video automatically</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -758,6 +766,33 @@
     </message>
 </context>
 <context>
+    <name>CameraReplacementDialog</name>
+    <message>
+        <source>Camera Replacement</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Refresh</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CameraScheduleWidget</name>
     <message>
         <source>Recording</source>
@@ -855,6 +890,21 @@
     <message>
         <source>Testing connection...</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>ContinuousActionAlertWidget</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This action can be set only for instant events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select another event or action</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1019,25 +1069,6 @@
     </message>
 </context>
 <context>
-    <name>EventRulesDialog</name>
-    <message>
-        <source>Alarm/Event Rules</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>New Rule</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Delete Rule</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Reset default rules</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>EventTypePickerWidget</name>
     <message>
         <source>When</source>
@@ -1045,18 +1076,6 @@
     </message>
     <message>
         <source>Generic event</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Occurs</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Starts</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Stops</source>
         <translation></translation>
     </message>
 </context>
@@ -1222,6 +1241,25 @@
     </message>
 </context>
 <context>
+    <name>FooterWidget</name>
+    <message>
+        <source>Add Comment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Test Action</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add some comment</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>FullscreenCameraActionWidget</name>
     <message>
         <source>On layout</source>
@@ -1315,76 +1353,6 @@
     </message>
 </context>
 <context>
-    <name>GenericEventParamsWidget</name>
-    <message>
-        <source>Source contains</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Keywords separated by space</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Caption contains</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Description contains</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>To generate Generic Event, please refer to &lt;a href=&quot;https://support.networkoptix.com/hc/en-us/articles/219573367-Nx-Server-HTTP-REST-API&quot;&gt;Server&amp;nbsp;API&lt;/a&gt;</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>HttpActionParamsWidget</name>
-    <message>
-        <source>HTTP URL</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>HTTP content</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Content type</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Auto</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Login</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Login (optional)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Authentication type</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Basic</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Password</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Password (optional)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Request type</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>ImageControlWidget</name>
     <message>
         <source>Image Control</source>
@@ -1462,6 +1430,13 @@
     <message>
         <source>Delete</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>InputIDPickerWidget</name>
+    <message>
+        <source>Input ID</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1878,6 +1853,17 @@
     </message>
 </context>
 <context>
+    <name>MultilineTextPickerWidget</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Text</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MultipleLayoutSelectionDialog</name>
     <message>
         <source>Select Layouts</source>
@@ -1915,6 +1901,45 @@
     <message>
         <source>Select layout...</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>OutgoingMailSettingsWidget</name>
+    <message>
+        <source>Connection Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Email</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Security Protocol</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Email Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Support Signature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System Singnature</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2021,6 +2046,17 @@
     <message>
         <source>Events</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>PresetPickerWidget</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preset</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2146,6 +2182,49 @@
     </message>
 </context>
 <context>
+    <name>QnDeprecatedUserManagementWidget</name>
+    <message>
+        <source>Search users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Force Secure Authentication</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nothing found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New User...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Roles...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LDAP Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fetch Users from LDAP...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnMessageBox</name>
     <message>
         <source>Do not show this message again</source>
@@ -2202,49 +2281,6 @@
     </message>
 </context>
 <context>
-    <name>QnUserManagementWidget</name>
-    <message>
-        <source>LDAP Settings...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>New User...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Fetch Users from LDAP...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Search users</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enable</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Disable</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Delete...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Edit Roles...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Force Secure Authentication</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Nothing found</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>QnVideowallSettingsDialog</name>
     <message>
         <source>Video Wall Settings</source>
@@ -2261,6 +2297,17 @@
     <message>
         <source>Enable timeline on video wall</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>QualityPickerWidget</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Quality</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2402,21 +2449,6 @@
     </message>
 </context>
 <context>
-    <name>ResourceBrowserWidget</name>
-    <message>
-        <source>Resources</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Nothing found</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Drag any image or video file to the application window to play them</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>RewindForWidget</name>
     <message>
         <source>Playback time :</source>
@@ -2429,6 +2461,29 @@
     <message>
         <source>Live</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>RulesDialog</name>
+    <message>
+        <source>Alarm/Event Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete Rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select some rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset default rules</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2665,25 +2720,6 @@
     </message>
 </context>
 <context>
-    <name>ShowNotificationActionParamsWidget</name>
-    <message>
-        <source>To administrators only</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Global Notification Settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>This action can be setted only for instant events</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Select another event or action</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>ShowOnAlarmLayoutActionWidget</name>
     <message>
         <source>for</source>
@@ -2737,79 +2773,6 @@
     </message>
 </context>
 <context>
-    <name>SmtpAdvancedSettingsWidget</name>
-    <message>
-        <source>Unsecure Connection</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>(recommended)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Secure connection using TLS.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Secure connection using SSL.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Port:</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>SmtpSettingsWidget</name>
-    <message>
-        <source>Outgoing Email Settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Advanced settings...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Test</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>SmtpTestConnectionWidget</name>
-    <message>
-        <source>Server:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Port:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>User:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Security:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Progress:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Result:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>SoftwareTriggerBusinessEventWidget</name>
     <message>
         <source>Available to</source>
@@ -2822,6 +2785,32 @@
     <message>
         <source>Icon</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>SoundPickerWidget</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sound</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manage</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StatePickerWidget</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>State</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3008,6 +2997,36 @@
     </message>
 </context>
 <context>
+    <name>UserGroupsWidget</name>
+    <message>
+        <source>Search users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>+ Add Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No groups found</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>UserListWidget</name>
+    <message>
+        <source>Search users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>+ Add User</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No users found</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>UserProfileWidget</name>
     <message>
         <source>Change Password...</source>
@@ -3131,67 +3150,18 @@
     </message>
 </context>
 <context>
-    <name>VmsRuleEditorWindow</name>
+    <name>VolumePickerWidget</name>
     <message>
-        <source>Alarm/Event Rules</source>
-        <translation></translation>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Delete Rule</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>VmsRulesDialog</name>
-    <message>
-        <source>Alarm/Event Rules</source>
-        <translation></translation>
+        <source>Volume</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>New Rule</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Delete Rule</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Reset Default Rules</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>VmsRulesFooterWidget</name>
-    <message>
-        <source>Add Comment</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Add some comment</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Set Schedule</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Set Max Frequency</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Test Action</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>VmsRulesListHeaderWidget</name>
-    <message>
-        <source>Event</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Action</source>
-        <translation></translation>
+        <source>Test</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

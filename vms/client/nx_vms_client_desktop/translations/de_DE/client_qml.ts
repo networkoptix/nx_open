@@ -152,6 +152,22 @@
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation>Die Kameraanalytik funktioniert nur, wenn die Kamera betrachtet wird. Aktivieren Sie die Aufnahme, damit sie die ganze Zeit funktioniert.</translation>
     </message>
+    <message>
+      <source>This integration has no settings for this Camera.</source>
+      <translation type="unfinished">This integration has no settings for this Camera.</translation>
+    </message>
+    <message>
+      <source>Check System Administration Settings to configure this integration.</source>
+      <translation type="unfinished">Check System Administration Settings to configure this integration.</translation>
+    </message>
+    <message>
+      <source>This integration has no settings at System level.</source>
+      <translation type="unfinished">This integration has no settings at System level.</translation>
+    </message>
+    <message>
+      <source>Check Camera Settings to configure this integration.</source>
+      <translation type="unfinished">Check Camera Settings to configure this integration.</translation>
+    </message>
   </context>
   <context>
     <name>AnalyticsToolTipPreview</name>
@@ -261,8 +277,8 @@
   <context>
     <name>CloudTile</name>
     <message>
-      <source>Log in to </source>
-      <translation>Anmelden bei </translation>
+      <source>Log in to</source>
+      <translation type="unfinished">Log in to</translation>
     </message>
   </context>
   <context>
@@ -469,6 +485,13 @@
     <message>
       <source>Ellipticity</source>
       <translation>Elliptizität</translation>
+    </message>
+  </context>
+  <context>
+    <name>GlobalLoaderIndicator</name>
+    <message>
+      <source>Loading...</source>
+      <translation>Wird geladen...</translation>
     </message>
   </context>
   <context>
@@ -802,7 +825,7 @@
       <translation>Im Layout anzeigen</translation>
     </message>
     <message>
-      <source>preview is not available for the selected object</source>
+      <source>Preview is not available for the selected object</source>
       <translation>Vorschau ist für das ausgewählte Objekt nicht verfügbar</translation>
     </message>
   </context>
@@ -881,6 +904,10 @@ to activate PTZ</source>
     <message>
       <source>Add</source>
       <translation>Hinzufügen</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Löschen</translation>
     </message>
   </context>
   <context>
@@ -1166,8 +1193,8 @@ to activate PTZ</source>
   <context>
     <name>StyledRadioButton</name>
     <message>
-      <source>Logical ID </source>
-      <translation>Logical-ID </translation>
+      <source>Logical ID</source>
+      <translation type="unfinished">Logical ID</translation>
     </message>
   </context>
   <context>
@@ -1285,10 +1312,6 @@ to activate PTZ</source>
     <message>
       <source>Support</source>
       <translation>Support</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>Wird geladen...</translation>
     </message>
   </context>
 </TS>

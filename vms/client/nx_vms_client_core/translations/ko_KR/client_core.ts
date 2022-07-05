@@ -198,5 +198,70 @@
       <source>Too many login attempts. Try again in a minute.</source>
       <translation>로그인 시도가 너무 많습니다. 잠시 후에 다시 시도하십시오.</translation>
     </message>
+    <message>
+      <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>이 시스템에 로그인하려면, %2에서 " %1 계정으로 로그인할 때마다 인증 코드 요청"을 비활성화하십시오.</translation>
+    </message>
+    <message>
+      <source>Two-factor authentication is required.</source>
+      <translation>이중 인증이 필요합니다.</translation>
+    </message>
+    <message>
+      <source>You can enable two-factor authentication in your %1.</source>
+      <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>%1에서 2단계 인증을 사용할 수 있습니다.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::CertificateWarning</name>
+    <message>
+      <source>Trust this server?</source>
+      <translation>이 서버를 신뢰하시겠습니까?</translation>
+    </message>
+    <message>
+      <source>Cannot verify the identity of %1</source>
+      <translation>%1의 신원을 확인할 수 없습니다</translation>
+    </message>
+    <message>
+      <source>System:</source>
+      <translation>시스템:</translation>
+    </message>
+    <message>
+      <source>Server:</source>
+      <translation>서버:</translation>
+    </message>
+    <message>
+      <source>Server ID:</source>
+      <translation>서버 ID:</translation>
+    </message>
+    <message>
+      <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
+      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct server.</translation>
+    </message>
+    <message>
+      <source>Server certificate is invalid.</source>
+      <translation>서버 인증서가 유효하지 않습니다.</translation>
+    </message>
+    <message>
+      <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
+      <translation type="unfinished">You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</translation>
+    </message>
+    <message>
+      <source>Someone may be impersonating this Server to steal your personal information.</source>
+      <translation type="unfinished">Someone may be impersonating this Server to steal your personal information.</translation>
+    </message>
+    <message>
+      <source>You attempted to connect to this Server but the Server&apos;s certificate has changed.</source>
+      <translation type="unfinished">You attempted to connect to this Server but the Server&apos;s certificate has changed.</translation>
+    </message>
+    <message>
+      <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
+      <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
+    </message>
+    <message>
+      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
+      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct Server.</translation>
+    </message>
   </context>
 </TS>

@@ -30,10 +30,6 @@
         <numerusform>%n öznitelik ile %1</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any subtype</source>
-      <translation>Herhangi bir alt başlık</translation>
-    </message>
   </context>
   <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
@@ -55,6 +51,17 @@
     <message>
       <source>Expires</source>
       <translation>Bitiş tarihi</translation>
+    </message>
+  </context>
+  <context>
+    <name>CloudSystemStatusItem::Private</name>
+    <message>
+      <source>Loading...</source>
+      <translation>Yükleniyor...</translation>
+    </message>
+    <message>
+      <source>User interaction required</source>
+      <translation type="unfinished">User interaction required</translation>
     </message>
   </context>
   <context>
@@ -93,6 +100,10 @@
     <message>
       <source>Verifying update package</source>
       <translation>Güncelleme paketi doğrulanıyor</translation>
+    </message>
+    <message>
+      <source>Cannot connect to the System</source>
+      <translation type="unfinished">Cannot connect to the System</translation>
     </message>
   </context>
   <context>
@@ -1004,6 +1015,10 @@
       <translation type="unfinished">Advanced...</translation>
     </message>
     <message>
+      <source>Archive filter...</source>
+      <translation type="unfinished">Archive filter...</translation>
+    </message>
+    <message>
       <source>Copy Bookmark Text</source>
       <translation type="unfinished">Copy Bookmark Text</translation>
     </message>
@@ -1014,6 +1029,14 @@
     <message>
       <source>Web Page Settings...</source>
       <translation type="unfinished">Web Page Settings...</translation>
+    </message>
+    <message>
+      <source>Account Security...</source>
+      <translation type="unfinished">Account Security...</translation>
+    </message>
+    <message>
+      <source>Replace Camera...</source>
+      <translation type="unfinished">Replace Camera...</translation>
     </message>
   </context>
   <context>
@@ -1293,6 +1316,40 @@
       <source>To activate License Key manually please contact your Regional / License support:</source>
       <translation>Lisans Anahtarını manuel olarak etkinleştirmek için lütfen Bölgesel / Lisans desteğine başvurun:</translation>
     </message>
+    <message>
+      <source>If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to %1.</source>
+      <translation type="unfinished">If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to %1.</translation>
+    </message>
+    <message>
+      <source>If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to your Regional / License support:</source>
+      <translation type="unfinished">If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to your Regional / License support:</translation>
+    </message>
+    <message>
+      <source>Hardware ID</source>
+      <translation type="unfinished">Hardware ID</translation>
+    </message>
+    <message>
+      <source>License Key</source>
+      <translation>Lisans Anahtarı</translation>
+    </message>
+    <message>
+      <source>Failed to activate free license</source>
+      <translation type="unfinished">Failed to activate free license</translation>
+    </message>
+    <message>
+      <source>Copy parameters</source>
+      <translation type="unfinished">Copy parameters</translation>
+    </message>
+    <message>
+      <source>Copied</source>
+      <translation>Kopyalandı</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1
+License Key: %2</source>
+      <translation type="unfinished">Hardware ID: %1
+License Key: %2</translation>
+    </message>
   </context>
   <context>
     <name>LicenseDeactivationDialogs</name>
@@ -1415,6 +1472,104 @@
         <numerusform>Dosya adı ayrılmış şu karakterleri içermemelidir:</numerusform>
         <numerusform>Dosya adı ayrılmış şu karakterleri içermemelidir:</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>OauthLoginDialog</name>
+    <message>
+      <source>Connect to System</source>
+      <translation>Sisteme bağlan</translation>
+    </message>
+  </context>
+  <context>
+    <name>OutgoingMailSettingsWidget::Private</name>
+    <message>
+      <source>TLS</source>
+      <translation>TLS</translation>
+    </message>
+    <message>
+      <source>SSL</source>
+      <translation>SSL</translation>
+    </message>
+    <message>
+      <source>Unsecure</source>
+      <translation type="unfinished">Unsecure</translation>
+    </message>
+    <message>
+      <source>Check</source>
+      <translation type="unfinished">Check</translation>
+    </message>
+    <message>
+      <source>Email is not valid.</source>
+      <translation>E-posta geçerli değil.</translation>
+    </message>
+    <message>
+      <source>URL is not valid.</source>
+      <translation type="unfinished">URL is not valid.</translation>
+    </message>
+    <message>
+      <source>Enter a short System description here.</source>
+      <translation>Kısa bir sistem açıklaması girin.</translation>
+    </message>
+    <message>
+      <source>Active</source>
+      <translation type="unfinished">Active</translation>
+    </message>
+    <message>
+      <source>Not configured</source>
+      <translation type="unfinished">Not configured</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation>Hata</translation>
+    </message>
+    <message>
+      <source>Set your email address or SMTP server</source>
+      <translation type="unfinished">Set your email address or SMTP server</translation>
+    </message>
+    <message>
+      <source>Unable to test email settings due to no internetconnection on any of the active servers</source>
+      <translation type="unfinished">Unable to test email settings due to no internetconnection on any of the active servers</translation>
+    </message>
+    <message>
+      <source>%1 users are receiving emails</source>
+      <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
+      <translation type="unfinished">%1 users are receiving emails</translation>
+    </message>
+    <message>
+      <source>%1 users will start receiving emails right after you apply settings</source>
+      <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
+      <translation type="unfinished">%1 users will start receiving emails right after you apply settings</translation>
+    </message>
+    <message>
+      <source>%1 is not available</source>
+      <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
+      <translation type="unfinished">%1 is not available</translation>
+    </message>
+    <message>
+      <source>Route via %1</source>
+      <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
+      <translation type="unfinished">Route via %1</translation>
+    </message>
+    <message>
+      <source>Route via SMTP server</source>
+      <translation type="unfinished">Route via SMTP server</translation>
+    </message>
+    <message>
+      <source>Success</source>
+      <translation>Başarılı</translation>
+    </message>
+    <message>
+      <source>Connection timed out</source>
+      <translation>Bağlantı zaman aşımına uğradı</translation>
+    </message>
+    <message>
+      <source>Authentication failed</source>
+      <translation>Kimlik doğrulaması başarısız oldu</translation>
+    </message>
+    <message>
+      <source>Unknown error</source>
+      <translation>Bilinmeyen hata</translation>
     </message>
   </context>
   <context>
@@ -1579,6 +1734,33 @@
     <message>
       <source>PTZ can only be used in the live mode</source>
       <translation>PTZ yalnızca canlı modda kullanılabilir</translation>
+    </message>
+  </context>
+  <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+      <source>Zoom In</source>
+      <translation>Yakınlaştır</translation>
+    </message>
+    <message>
+      <source>Zoom Out</source>
+      <translation>Uzaklaştır</translation>
+    </message>
+    <message>
+      <source>Focus Far</source>
+      <translation>Uzağa Odakla</translation>
+    </message>
+    <message>
+      <source>Focus Near</source>
+      <translation>Yakına Odakla</translation>
+    </message>
+    <message>
+      <source>Auto Focus</source>
+      <translation>Otomatik Odaklama</translation>
+    </message>
+    <message>
+      <source>Change Dewarping Mode</source>
+      <translation>Eğrilik Modunu Değiştir</translation>
     </message>
   </context>
   <context>
@@ -2894,8 +3076,12 @@ to %1</source>
       <translation>Sürüm %1 için uyumluluk moduna girilemedi</translation>
     </message>
     <message>
-      <source>Your session has expired</source>
-      <translation>Oturumunun süresi dolu</translation>
+      <source>System is not compatible with two-factor authentication</source>
+      <translation type="unfinished">System is not compatible with two-factor authentication</translation>
+    </message>
+    <message>
+      <source>Failed to log in to &quot;%1&quot; system</source>
+      <translation type="unfinished">Failed to log in to &quot;%1&quot; system</translation>
     </message>
   </context>
   <context>
@@ -3010,6 +3196,100 @@ to %1</source>
     <message>
       <source>System configuration will be restored from backup, Server application will be restarted.</source>
       <translation>Sistem konfigürasyonu yedekten geri yüklendi. Sunucu yeniden başlatılacak.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnDeprecatedUserListModel</name>
+    <message>
+      <source>Local user</source>
+      <translation>Yerel kullanıcı</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 kullanıcı</translation>
+    </message>
+    <message>
+      <source>LDAP user</source>
+      <translation>LDAP Kullanıcı</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Etkinleştir</translation>
+    </message>
+    <message>
+      <source>Disabled</source>
+      <translation>Devre Dışı</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Giriş</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>İsim</translation>
+    </message>
+    <message>
+      <source>Role</source>
+      <translation>Yetki</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnDeprecatedUserListModelPrivate</name>
+    <message>
+      <source>Owner</source>
+      <translation>Sahibi</translation>
+    </message>
+    <message>
+      <source>Administrator</source>
+      <translation>Yönetici</translation>
+    </message>
+    <message>
+      <source>View live video</source>
+      <translation>Canlı Videoyu Görüntüle</translation>
+    </message>
+    <message>
+      <source>Adjust device settings</source>
+      <translation>Aygıt Ayarlarını Belirle</translation>
+    </message>
+    <message>
+      <source>Adjust camera settings</source>
+      <translation>Kamera Ayarlarını Belirle</translation>
+    </message>
+    <message>
+      <source>Use PTZ controls</source>
+      <translation>PTZ Denetimini Kullan</translation>
+    </message>
+    <message>
+      <source>View video archives</source>
+      <translation>Video Arşivlerini Görüntüle</translation>
+    </message>
+    <message>
+      <source>Export video</source>
+      <translation>Videoyu Dışa Aktar</translation>
+    </message>
+    <message>
+      <source>Control Video Walls</source>
+      <translation>Video Duvarını Kontrol Et</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnDeprecatedUserManagementWidget</name>
+    <message>
+      <source>Edit</source>
+      <translation>Düzenle</translation>
+    </message>
+    <message>
+      <source>All users</source>
+      <translation>Tüm Kullanıcılar</translation>
+    </message>
+    <message>
+      <source>With enabled digest authentication</source>
+      <translation type="unfinished">With enabled digest authentication</translation>
+    </message>
+    <message>
+      <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
+      <translation>Kullanıcılar bir LDAP sunucusundan içe aktarılabilir. Sadece LDAP sunucusu çevrimiçi ve hesapları aktif ise giriş yapabilecekler.</translation>
     </message>
   </context>
   <context>
@@ -4019,21 +4299,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnPerformanceTest</name>
-    <message>
-      <source>%1 can work in configuration mode only</source>
-      <translation>%1 sadece yapılandırma modunda çalışabilir</translation>
-    </message>
-    <message>
-      <source>Performance of this computer allows running %1 in configuration mode only.</source>
-      <translation>Bu Bilgisayarın Performansı %1 'i Yalnızca Yapılandırma Modunda Çalıştırmaya İzin Veriyor.</translation>
-    </message>
-    <message>
-      <source>For full-featured mode please use another computer</source>
-      <translation>Tüm özellikler için lütfen başka bilgisayar kullanın</translation>
-    </message>
-  </context>
-  <context>
     <name>QnPermissionsWidget</name>
     <message>
       <source>Edit camera settings</source>
@@ -4395,61 +4660,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnResourceBrowserWidget</name>
-    <message>
-      <source>Local files</source>
-      <translation>Yerel dosyalar</translation>
-    </message>
-    <message>
-      <source>No local files</source>
-      <translation>Yerel dosya yok</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>Hiçbir şey bulunamadı</translation>
-    </message>
-    <message>
-      <source>All types</source>
-      <translation>Tüm Türler</translation>
-    </message>
-    <message>
-      <source>Servers</source>
-      <translation>Sunucular</translation>
-    </message>
-    <message>
-      <source>Layouts</source>
-      <translation>Ekran Düzenleri</translation>
-    </message>
-    <message>
-      <source>Showreels</source>
-      <translation>Showreel</translation>
-    </message>
-    <message>
-      <source>Video Walls</source>
-      <translation>Video Wall</translation>
-    </message>
-    <message>
-      <source>Web Pages</source>
-      <translation>Web sayfaları</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>Kullanıcılar</translation>
-    </message>
-    <message>
-      <source>Local Files</source>
-      <translation>Yerel Dosya</translation>
-    </message>
-    <message>
-      <source>Search</source>
-      <translation>Ara</translation>
-    </message>
-    <message>
-      <source>Cameras &amp; Devices</source>
-      <translation>Kameralar ve Cihazlar</translation>
-    </message>
-  </context>
-  <context>
     <name>QnResourceItemDelegate</name>
     <message>
       <source>Health Monitor</source>
@@ -4777,10 +4987,6 @@ to %1</source>
       <source>Failover</source>
       <translation>Failover</translation>
     </message>
-    <message>
-      <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation>Failover olarak etkinleştirilmiş sunucular otomatik olarak kameraları çevrimdışı sunuculardan alacaktır.</translation>
-    </message>
     <message numerus="yes">
       <source>Certificates</source>
       <translation type="unfinished">
@@ -4802,6 +5008,10 @@ to %1</source>
     <message>
       <source>Details</source>
       <translation>Detaylar</translation>
+    </message>
+    <message>
+      <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
+      <translation type="unfinished">Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</translation>
     </message>
   </context>
   <context>
@@ -4842,131 +5052,6 @@ to %1</source>
     <message>
       <source>Watermark Matched</source>
       <translation>Filigran Eşleştirildi</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnSmtpAdvancedSettingsWidget</name>
-    <message>
-      <source>Auto</source>
-      <translation>Otomatik</translation>
-    </message>
-    <message>
-      <source>Email</source>
-      <translation>E-posta</translation>
-    </message>
-    <message>
-      <source>SMTP Server</source>
-      <translation>SMTP Sunucusu</translation>
-    </message>
-    <message>
-      <source>Server cannot be empty.</source>
-      <translation>Sunucu boş olamaz.</translation>
-    </message>
-    <message>
-      <source>User</source>
-      <translation>Kullanıcı</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Parola</translation>
-    </message>
-    <message>
-      <source>System Signature</source>
-      <translation>Sistem imzası</translation>
-    </message>
-    <message>
-      <source>Support Signature</source>
-      <translation>Destek imzası</translation>
-    </message>
-    <message>
-      <source>Enter a short System description here.</source>
-      <translation>Kısa bir sistem açıklaması girin.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnSmtpSimpleSettingsWidget</name>
-    <message>
-      <source>Email</source>
-      <translation>E-posta</translation>
-    </message>
-    <message>
-      <source>Email is not valid.</source>
-      <translation>E-posta geçerli değil.</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Parola</translation>
-    </message>
-    <message>
-      <source>Password cannot be empty.</source>
-      <translation>Parola boş bırakılamaz.</translation>
-    </message>
-    <message>
-      <source>System Signature</source>
-      <translation>Sistem imzası</translation>
-    </message>
-    <message>
-      <source>Support Signature</source>
-      <translation>Destek imzası</translation>
-    </message>
-    <message>
-      <source>No preset found. Use &quot;Advanced&quot; option.</source>
-      <translation>Ön tanımlı rota bulunamadı. &quot;Gelişmiş ayarları&quot; kullanın.</translation>
-    </message>
-    <message>
-      <source>Enter a short System description here.</source>
-      <translation>Kısa bir sistem açıklaması girin.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnSmtpTestConnectionWidget</name>
-    <message>
-      <source>Timed Out</source>
-      <translation>Zaman Aşımı</translation>
-    </message>
-    <message>
-      <source>TLS</source>
-      <translation>TLS</translation>
-    </message>
-    <message>
-      <source>SSL</source>
-      <translation>SSL</translation>
-    </message>
-    <message>
-      <source>Unsecured</source>
-      <translation>Güvensiz</translation>
-    </message>
-    <message>
-      <source>In Progress...</source>
-      <translation>İlerleme Halinde...</translation>
-    </message>
-    <message>
-      <source>Success</source>
-      <translation>Başarılı</translation>
-    </message>
-    <message>
-      <source>Connection timed out</source>
-      <translation>Bağlantı zaman aşımına uğradı</translation>
-    </message>
-    <message>
-      <source>Authentication failed</source>
-      <translation>Kimlik doğrulaması başarısız oldu</translation>
-    </message>
-    <message>
-      <source>SMTP Error %1</source>
-      <translation>SMTP Hatası %1</translation>
-    </message>
-    <message>
-      <source>Network error</source>
-      <translation>Bağlantı hatası</translation>
-    </message>
-    <message>
-      <source>Invalid parameters</source>
-      <translation>Geçersiz parametreler</translation>
-    </message>
-    <message>
-      <source>Cannot perform the test.</source>
-      <translation>Test yapılamadı.</translation>
     </message>
   </context>
   <context>
@@ -5372,12 +5457,16 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Kullanıcılar</translation>
     </message>
     <message>
-      <source>Plugins</source>
-      <translation>Eklentiler</translation>
-    </message>
-    <message>
       <source>Security</source>
       <translation>Güvenlik</translation>
+    </message>
+    <message>
+      <source>User Management</source>
+      <translation type="unfinished">User Management</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation type="unfinished">Integrations</translation>
     </message>
   </context>
   <context>
@@ -5528,6 +5617,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <source>Camera recording schedule is invalid</source>
       <translation type="unfinished">Camera recording schedule is invalid</translation>
     </message>
+    <message>
+      <source>Remote archive synchronization available</source>
+      <translation type="unfinished">Remote archive synchronization available</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -5607,100 +5700,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Hold to Speak</source>
       <translation>Konuşmak için basılı tutun</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserListModel</name>
-    <message>
-      <source>LDAP user</source>
-      <translation>LDAP Kullanıcı</translation>
-    </message>
-    <message>
-      <source>Enabled</source>
-      <translation>Etkinleştir</translation>
-    </message>
-    <message>
-      <source>Disabled</source>
-      <translation>Devre Dışı Bırak</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>Ad</translation>
-    </message>
-    <message>
-      <source>Local user</source>
-      <translation>Yerel kullanıcı</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>Giriş</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>Yetki</translation>
-    </message>
-    <message>
-      <source>%1 user</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 kullanıcı</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserListModelPrivate</name>
-    <message>
-      <source>Owner</source>
-      <translation>Sahibi</translation>
-    </message>
-    <message>
-      <source>Administrator</source>
-      <translation>Yönetici</translation>
-    </message>
-    <message>
-      <source>View live video</source>
-      <translation>Canlı Videoyu Görüntüle</translation>
-    </message>
-    <message>
-      <source>Use PTZ controls</source>
-      <translation>PTZ Denetimini Kullan</translation>
-    </message>
-    <message>
-      <source>View video archives</source>
-      <translation>Video Arşivlerini Görüntüle</translation>
-    </message>
-    <message>
-      <source>Export video</source>
-      <translation>Videoyu Dışa Aktar</translation>
-    </message>
-    <message>
-      <source>Adjust device settings</source>
-      <translation>Aygıt Ayarlarını Belirle</translation>
-    </message>
-    <message>
-      <source>Adjust camera settings</source>
-      <translation>Kamera Ayarlarını Belirle</translation>
-    </message>
-    <message>
-      <source>Control Video Walls</source>
-      <translation>Video Duvarını Kontrol Et</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserManagementWidget</name>
-    <message>
-      <source>Edit</source>
-      <translation>Düzenle</translation>
-    </message>
-    <message>
-      <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
-      <translation>Kullanıcılar bir LDAP sunucusundan içe aktarılabilir. Sadece LDAP sunucusu çevrimiçi ve hesapları aktif ise giriş yapabilecekler.</translation>
-    </message>
-    <message>
-      <source>All users</source>
-      <translation>Tüm Kullanıcılar</translation>
-    </message>
-    <message>
-      <source>With enabled digest authentication</source>
-      <translation type="unfinished">With enabled digest authentication</translation>
     </message>
   </context>
   <context>
@@ -6643,13 +6642,12 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>Merge</source>
       <translation>Birleştir</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
-      <translation type="unfinished">You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</translation>
-    </message>
-    <message>
-      <source>You are about to move this webpage to server &quot;%1&quot;. This webpage proxies all requested contents, and its proxy server will change to server &quot;%1&quot;.</source>
-      <translation type="unfinished">You are about to move this webpage to server &quot;%1&quot;. This webpage proxies all requested contents, and its proxy server will change to server &quot;%1&quot;.</translation>
+      <translation type="unfinished">
+        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
+        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
+      </translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
@@ -6684,10 +6682,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation type="unfinished">Virtual cameras cannot be moved between servers. These devices will remain on %1:</translation>
     </message>
     <message>
-      <source>Move Group without Them</source>
-      <translation type="unfinished">Move Group without Them</translation>
-    </message>
-    <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers</source>
       <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers</translation>
     </message>
@@ -6710,6 +6704,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>%1 cannot be moved between servers as it contains USB or web cameras</source>
       <translation type="unfinished">%1 cannot be moved between servers as it contains USB or web cameras</translation>
+    </message>
+    <message>
+      <source>Move Group without them</source>
+      <translation type="unfinished">Move Group without them</translation>
     </message>
   </context>
   <context>
@@ -6820,6 +6818,45 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>%1 %2 is no longer supported</source>
       <comment>%1 %2 are OS name and version, e.g. Windows 7</comment>
       <translation>%1 %2 artık desteklenmiyor</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserListModel</name>
+    <message>
+      <source>Owner</source>
+      <translation>Sahibi</translation>
+    </message>
+    <message>
+      <source>Administrator</source>
+      <translation>Yönetici</translation>
+    </message>
+    <message>
+      <source>View live video</source>
+      <translation>Canlı Videoyu Görüntüle</translation>
+    </message>
+    <message>
+      <source>Adjust device settings</source>
+      <translation>Aygıt Ayarlarını Belirle</translation>
+    </message>
+    <message>
+      <source>Adjust camera settings</source>
+      <translation>Kamera Ayarlarını Belirle</translation>
+    </message>
+    <message>
+      <source>Use PTZ controls</source>
+      <translation>PTZ Denetimini Kullan</translation>
+    </message>
+    <message>
+      <source>View video archives</source>
+      <translation>Video Arşivlerini Görüntüle</translation>
+    </message>
+    <message>
+      <source>Export video</source>
+      <translation>Videoyu Dışa Aktar</translation>
+    </message>
+    <message>
+      <source>Control Video Walls</source>
+      <translation>Video Duvarını Kontrol Et</translation>
     </message>
   </context>
   <context>
@@ -7377,10 +7414,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>Çoklu Yayın</translation>
     </message>
     <message>
-      <source>Automatic selection</source>
-      <translation type="unfinished">Automatic selection</translation>
-    </message>
-    <message>
       <source>Use if supported</source>
       <translation type="unfinished">Use if supported</translation>
     </message>
@@ -7407,6 +7440,23 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Server will not push time settings to the camera.</source>
       <translation type="unfinished">Server will not push time settings to the camera.</translation>
+    </message>
+    <message>
+      <source>default</source>
+      <translation type="unfinished">default</translation>
+    </message>
+    <message>
+      <source>Auto</source>
+      <comment>Automatic profile selection</comment>
+      <translation>Oto</translation>
+    </message>
+    <message>
+      <source>Auto</source>
+      <translation>Oto</translation>
+    </message>
+    <message>
+      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</source>
+      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</translation>
     </message>
   </context>
   <context>
@@ -7490,6 +7540,58 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::CameraReplacementDialog</name>
+    <message>
+      <source>Failed to replace camera</source>
+      <translation type="unfinished">Failed to replace camera</translation>
+    </message>
+    <message>
+      <source>Abort camera replacement?</source>
+      <translation type="unfinished">Abort camera replacement?</translation>
+    </message>
+    <message>
+      <source>Will be transferred partially:</source>
+      <translation type="unfinished">Will be transferred partially:</translation>
+    </message>
+    <message>
+      <source>Will not be transferred:</source>
+      <translation type="unfinished">Will not be transferred:</translation>
+    </message>
+    <message>
+      <source>Next</source>
+      <translation>İleri</translation>
+    </message>
+    <message>
+      <source>Finish</source>
+      <translation type="unfinished">Finish</translation>
+    </message>
+    <message>
+      <source>Camera for Replacement</source>
+      <translation type="unfinished">Camera for Replacement</translation>
+    </message>
+    <message>
+      <source>%1 will be replaced by selected camera and removed from the system</source>
+      <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
+      <translation type="unfinished">%1 will be replaced by selected camera and removed from the system</translation>
+    </message>
+    <message>
+      <source>Data for Transfer</source>
+      <translation type="unfinished">Data for Transfer</translation>
+    </message>
+    <message>
+      <source>Checking if the data from the camera can be transferred to the new one.</source>
+      <translation type="unfinished">Checking if the data from the camera can be transferred to the new one.</translation>
+    </message>
+    <message>
+      <source>Some data and settings may not supported for new Camera</source>
+      <translation type="unfinished">Some data and settings may not supported for new Camera</translation>
+    </message>
+    <message>
+      <source>Camera replaced!</source>
+      <translation type="unfinished">Camera replaced!</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::CameraScheduleWidget</name>
     <message>
       <source>Recording Schedule</source>
@@ -7545,6 +7647,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Select Camera</source>
       <translation type="unfinished">Select Camera</translation>
+    </message>
+    <message>
+      <source>No cameras available</source>
+      <translation type="unfinished">No cameras available</translation>
     </message>
   </context>
   <context>
@@ -7627,10 +7733,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>I/O Modül Ayarları</translation>
     </message>
     <message>
-      <source>Plugins</source>
-      <translation>Eklentiler</translation>
-    </message>
-    <message>
       <source>Dewarping</source>
       <translation>Düzeltme</translation>
     </message>
@@ -7665,6 +7767,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Motion &amp; Objects + Lo-Res</source>
       <translation type="unfinished">Motion &amp; Objects + Lo-Res</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation type="unfinished">Integrations</translation>
     </message>
   </context>
   <context>
@@ -7766,6 +7872,37 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Select</source>
       <translation type="unfinished">Select</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ChunksFilterActionFactory</name>
+    <message>
+      <source>No filter</source>
+      <translation type="unfinished">No filter</translation>
+    </message>
+    <message>
+      <source>Main storage only</source>
+      <translation type="unfinished">Main storage only</translation>
+    </message>
+    <message>
+      <source>Backup storage only</source>
+      <translation type="unfinished">Backup storage only</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ClientApiAuthDialog</name>
+    <message>
+      <source>This webpage is requesting access to your account for authorization</source>
+      <translation type="unfinished">This webpage is requesting access to your account for authorization</translation>
+    </message>
+    <message>
+      <source>Your confirmation is required to provide a token to</source>
+      <comment>... a web page (below there is a web page name with an icon)</comment>
+      <translation type="unfinished">Your confirmation is required to provide a token to</translation>
+    </message>
+    <message>
+      <source>Allow</source>
+      <translation type="unfinished">Allow</translation>
     </message>
   </context>
   <context>
@@ -8389,11 +8526,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::FailoverPriorityDialogItemDelegate</name>
-    <message>
-      <source>No failover</source>
-      <translation type="unfinished">No failover</translation>
-    </message>
+    <name>nx::vms::client::desktop::FailoverPriorityColumnItemDelegate</name>
     <message>
       <source>Low</source>
       <translation>Düşük</translation>
@@ -8405,6 +8538,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>High</source>
       <translation>Yüksek</translation>
+    </message>
+    <message>
+      <source>No Failover</source>
+      <translation type="unfinished">No Failover</translation>
     </message>
   </context>
   <context>
@@ -8532,6 +8669,20 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Failed to merge %1 to our system.</source>
       <translation>%1 sizin sisteminizle birleştirilirken hata oluştu.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::IndirectAccessDecoratorModel</name>
+    <message>
+      <source>Access granted by:</source>
+      <translation>Erişim onaylandı:</translation>
+    </message>
+    <message numerus="yes">
+      <source>and %n more</source>
+      <translation>
+        <numerusform>ve %n den fazlası</numerusform>
+        <numerusform>ve %n den fazlası</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -9101,10 +9252,6 @@ You can force it, but it may significantly increase CPU load.</translation>
       <translation>Özel yapıya Güncelle</translation>
     </message>
     <message>
-      <source>Uploading updates...</source>
-      <translation>Güncellemeler karşıya yükleniyor...</translation>
-    </message>
-    <message>
       <source>Downloading client package...</source>
       <translation>Client paketi indiriliyor...</translation>
     </message>
@@ -9183,6 +9330,14 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
       <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
+    </message>
+    <message>
+      <source>Uploading client packages to Servers...</source>
+      <translation type="unfinished">Uploading client packages to Servers...</translation>
+    </message>
+    <message>
+      <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
+      <translation type="unfinished">There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</translation>
     </message>
   </context>
   <context>
@@ -9503,6 +9658,10 @@ You can force it, but it may significantly increase CPU load.</translation>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
       <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</translation>
     </message>
+    <message>
+      <source>The webpage is able to interact with the Desktop Client and request access to the user session</source>
+      <translation type="unfinished">The webpage is able to interact with the Desktop Client and request access to the user session</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::RadassActionFactory</name>
@@ -9601,13 +9760,6 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>Objects + Lo-Res</source>
       <translation type="unfinished">Objects + Lo-Res</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::RemoteConnectionUserInteractionDelegate</name>
-    <message>
-      <source>Connect to System</source>
-      <translation>Sisteme bağlan</translation>
     </message>
   </context>
   <context>
@@ -9946,10 +10098,6 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <source>View certificate</source>
       <translation type="unfinished">View certificate</translation>
     </message>
-    <message>
-      <source>Server certificate is invalid.</source>
-      <translation type="unfinished">Server certificate is invalid.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
@@ -9990,14 +10138,14 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <translation type="unfinished">Pin this certificate to %1?</translation>
     </message>
     <message>
-      <source>Someone may be impersonating %1 to steel your personal information.
-Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steel your personal information.
-Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
-    </message>
-    <message>
       <source>Pin</source>
       <translation>Pin</translation>
+    </message>
+    <message>
+      <source>Someone may be impersonating %1 to steal your personal information.
+Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
+      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
+Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
     </message>
   </context>
   <context>
@@ -10013,42 +10161,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <message>
       <source>I trust this server</source>
       <translation type="unfinished">I trust this server</translation>
-    </message>
-    <message>
-      <source>System:</source>
-      <translation>Sistem:</translation>
-    </message>
-    <message>
-      <source>Server:</source>
-      <translation>Sunucu:</translation>
-    </message>
-    <message>
-      <source>Server ID:</source>
-      <translation type="unfinished">Server ID:</translation>
-    </message>
-    <message>
-      <source>Trust this server?</source>
-      <translation type="unfinished">Trust this server?</translation>
-    </message>
-    <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
-      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct server.</translation>
-    </message>
-    <message>
-      <source>Cannot verify the identity of %1</source>
-      <translation type="unfinished">Cannot verify the identity of %1</translation>
-    </message>
-    <message>
-      <source>Someone may be impersonating %1 to steal your personal information.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.</translation>
-    </message>
-    <message>
-      <source>Do not connect to this server unless instructed by your VMS administrator.</source>
-      <translation type="unfinished">Do not connect to this server unless instructed by your VMS administrator.</translation>
-    </message>
-    <message>
-      <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
-      <translation type="unfinished">You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</translation>
     </message>
   </context>
   <context>
@@ -10276,6 +10388,26 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
       <translation type="unfinished">Recording schedule on some cameras contains recording modes that are not supported.</translation>
     </message>
+    <message>
+      <source>Replaced camera discovered</source>
+      <translation type="unfinished">Replaced camera discovered</translation>
+    </message>
+    <message>
+      <source>Export in progress...</source>
+      <translation type="unfinished">Export in progress...</translation>
+    </message>
+    <message>
+      <source>Camera %1 has been replaced by %2.</source>
+      <translation type="unfinished">Camera %1 has been replaced by %2.</translation>
+    </message>
+    <message>
+      <source>Click on the &quot;Undo Replace&quot; button to continue using two devices.</source>
+      <translation type="unfinished">Click on the &quot;Undo Replace&quot; button to continue using two devices.</translation>
+    </message>
+    <message>
+      <source>Undo Replace</source>
+      <translation type="unfinished">Undo Replace</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::TileInteractionHandler</name>
@@ -10448,6 +10580,122 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <message>
       <source>Server already has this file &quot;%1&quot;</source>
       <translation>Sunucu zaten bu dosyada &quot;%1&quot;</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::UserGroupListModel</name>
+    <message>
+      <source>LDAP group</source>
+      <translation type="unfinished">LDAP group</translation>
+    </message>
+    <message>
+      <source>Built-in group</source>
+      <translation type="unfinished">Built-in group</translation>
+    </message>
+    <message>
+      <source>Custom group</source>
+      <translation type="unfinished">Custom group</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>İsim</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>Açıklama</translation>
+    </message>
+    <message>
+      <source>Member of</source>
+      <translation type="unfinished">Member of</translation>
+    </message>
+    <message>
+      <source>Permissions</source>
+      <translation>Erişim İzinleri</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::UserGroupsWidget</name>
+    <message>
+      <source>Delete</source>
+      <translation>Sil</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::UserListModel</name>
+    <message>
+      <source>Local user</source>
+      <translation>Yerel kullanıcı</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 kullanıcı</translation>
+    </message>
+    <message>
+      <source>LDAP user</source>
+      <translation>LDAP Kullanıcı</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Giriş</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>İsim</translation>
+    </message>
+    <message>
+      <source>Email</source>
+      <translation>E Posta</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation type="unfinished">Groups</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <translation>Özel Ayarlar</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::UserListWidget</name>
+    <message>
+      <source>Enable</source>
+      <translation>Etkinleştir</translation>
+    </message>
+    <message>
+      <source>Disable</source>
+      <translation type="unfinished">Disable</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Sil</translation>
+    </message>
+    <message>
+      <source>Force Secure Authentication</source>
+      <translation type="unfinished">Force Secure Authentication</translation>
+    </message>
+    <message>
+      <source>All users</source>
+      <translation>Tüm Kullanıcılar</translation>
+    </message>
+    <message>
+      <source>With enabled digest authentication</source>
+      <translation type="unfinished">With enabled digest authentication</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::UserManagementTabWidget</name>
+    <message>
+      <source>Users</source>
+      <translation>Kullanıcılar</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation type="unfinished">Groups</translation>
+    </message>
+    <message>
+      <source>LDAP</source>
+      <translation type="unfinished">LDAP</translation>
     </message>
   </context>
   <context>
@@ -10879,6 +11127,80 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <message>
       <source>Cannot find a widget corresponding to the specified item.</source>
       <translation type="unfinished">Cannot find a widget corresponding to the specified item.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::DropdownTextPickerWidget</name>
+    <message>
+      <source>Auto</source>
+      <translation>Oto</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::EventTypePickerWidget</name>
+    <message>
+      <source>None</source>
+      <translation>Yok</translation>
+    </message>
+    <message>
+      <source>Starts</source>
+      <translation>Başlat</translation>
+    </message>
+    <message>
+      <source>Stops</source>
+      <translation>Bitir</translation>
+    </message>
+    <message>
+      <source>Instant</source>
+      <translation>Derhal</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::ModificationMarkItemDelegate</name>
+    <message>
+      <source>Not saved</source>
+      <translation type="unfinished">Not saved</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::RulesDialog</name>
+    <message>
+      <source>Apply changes before exit?</source>
+      <translation>Çıkış yapmadan önce değişiklikler uygulansın mı?</translation>
+    </message>
+    <message>
+      <source>Apply changes failed.</source>
+      <translation type="unfinished">Apply changes failed.</translation>
+    </message>
+    <message>
+      <source>Restore all rules to default?</source>
+      <translation>Tüm Ayarları Varsayılan Ayarlara Döndür?</translation>
+    </message>
+    <message>
+      <source>This action cannot be undone.</source>
+      <translation>Bu işlem geri alınamaz.</translation>
+    </message>
+    <message>
+      <source>Restore rules failed.</source>
+      <translation type="unfinished">Restore rules failed.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::RulesTableModel</name>
+    <message>
+      <source>Event</source>
+      <translation>Durum</translation>
+    </message>
+    <message>
+      <source>Action</source>
+      <translation>Hareket</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::SourcePickerWidget</name>
+    <message>
+      <source>Select at least one User</source>
+      <translation type="unfinished">Select at least one User</translation>
     </message>
   </context>
   <context>
@@ -11321,6 +11643,18 @@ Depolama yerini, Sunucu Ayarları iletişim kutusundaki &quot;Depolama Yönetimi
       <source>%1 Beta</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation type="unfinished">%1 Beta</translation>
+    </message>
+    <message>
+      <source>There are no suitable cameras for replacement on the %1</source>
+      <translation type="unfinished">There are no suitable cameras for replacement on the %1</translation>
+    </message>
+    <message>
+      <source>Undo replacement completed successfully!</source>
+      <translation type="unfinished">Undo replacement completed successfully!</translation>
+    </message>
+    <message>
+      <source>Some settings may not be transferred from the replaced camera due to compatibility issues.</source>
+      <translation type="unfinished">Some settings may not be transferred from the replaced camera due to compatibility issues.</translation>
     </message>
   </context>
   <context>

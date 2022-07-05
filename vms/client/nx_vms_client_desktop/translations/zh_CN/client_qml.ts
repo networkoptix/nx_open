@@ -150,6 +150,22 @@
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation>摄像机分析功能将只在观看影像时有作用. 请启用录像来使其全时运作.</translation>
     </message>
+    <message>
+      <source>This integration has no settings for this Camera.</source>
+      <translation type="unfinished">This integration has no settings for this Camera.</translation>
+    </message>
+    <message>
+      <source>Check System Administration Settings to configure this integration.</source>
+      <translation type="unfinished">Check System Administration Settings to configure this integration.</translation>
+    </message>
+    <message>
+      <source>This integration has no settings at System level.</source>
+      <translation type="unfinished">This integration has no settings at System level.</translation>
+    </message>
+    <message>
+      <source>Check Camera Settings to configure this integration.</source>
+      <translation type="unfinished">Check Camera Settings to configure this integration.</translation>
+    </message>
   </context>
   <context>
     <name>AnalyticsToolTipPreview</name>
@@ -257,8 +273,8 @@
   <context>
     <name>CloudTile</name>
     <message>
-      <source>Log in to </source>
-      <translation>登录到 </translation>
+      <source>Log in to</source>
+      <translation type="unfinished">Log in to</translation>
     </message>
   </context>
   <context>
@@ -465,6 +481,13 @@
     <message>
       <source>Ellipticity</source>
       <translation>椭圆</translation>
+    </message>
+  </context>
+  <context>
+    <name>GlobalLoaderIndicator</name>
+    <message>
+      <source>Loading...</source>
+      <translation>加载中...</translation>
     </message>
   </context>
   <context>
@@ -794,7 +817,7 @@
       <translation>显示导出布局</translation>
     </message>
     <message>
-      <source>preview is not available for the selected object</source>
+      <source>Preview is not available for the selected object</source>
       <translation>预览不适用于所选对象</translation>
     </message>
   </context>
@@ -873,6 +896,10 @@ to activate PTZ</source>
     <message>
       <source>Add</source>
       <translation>添加</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>删除</translation>
     </message>
   </context>
   <context>
@@ -1156,8 +1183,8 @@ to activate PTZ</source>
   <context>
     <name>StyledRadioButton</name>
     <message>
-      <source>Logical ID </source>
-      <translation>逻辑 ID </translation>
+      <source>Logical ID</source>
+      <translation type="unfinished">Logical ID</translation>
     </message>
   </context>
   <context>
@@ -1274,10 +1301,6 @@ to activate PTZ</source>
     <message>
       <source>Support</source>
       <translation>技术支持</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>加载中...</translation>
     </message>
   </context>
 </TS>
