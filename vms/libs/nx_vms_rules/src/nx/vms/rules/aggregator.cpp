@@ -30,10 +30,9 @@ bool Aggregator::aggregate(const EventPtr& event)
         auto& aggregationInfo = it->second;
 
         if (aggregationInfo.count == 0
-            && qnSyncTime->currentTimePoint() - aggregationInfo.lastOccurrenceTimestamp >= m_interval)
+            && qnSyncTime->currentTimePoint() - aggregationInfo.firstOccurrenceTimestamp >= m_interval)
         {
             aggregationInfo.firstOccurrenceTimestamp = event->timestamp();
-            aggregationInfo.lastOccurrenceTimestamp = event->timestamp();
             return false;
         }
 
@@ -41,15 +40,13 @@ bool Aggregator::aggregate(const EventPtr& event)
             aggregationInfo.event = event;
 
         aggregationInfo.count++;
-        aggregationInfo.lastOccurrenceTimestamp = event->timestamp();
 
         return true;
     }
     else
     {
         AggregationInfoExt aggregationInfo {
-            .firstOccurrenceTimestamp = event->timestamp(),
-            .lastOccurrenceTimestamp = event->timestamp()
+            .firstOccurrenceTimestamp = event->timestamp()
         };
         m_aggregatedEvents.insert({key, aggregationInfo});
         return false;
@@ -75,11 +72,14 @@ std::list<AggregationInfo> Aggregator::popEvents()
 
                 aggregationInfo.event.reset();
                 aggregationInfo.count = 0;
-                aggregationInfo.firstOccurrenceTimestamp = aggregationInfo.lastOccurrenceTimestamp;
+                // Store the time aggregated event is popped out to conform the logic that
+                // events should be processed not often than once per the installed interval.
+                aggregationInfo.firstOccurrenceTimestamp = now;
             }
             else
             {
                 it = m_aggregatedEvents.erase(it);
+                continue;
             }
         }
 
