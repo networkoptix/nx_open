@@ -34,7 +34,7 @@ enum MessageType
 
     CloudPromo = 13, /**< Promo message. Generated on the client side. */
 
-    RemoteArchiveSyncStarted = 14,
+    // RemoteArchiveSyncStarted = 14,
     RemoteArchiveSyncFinished = 15,
     RemoteArchiveSyncProgress = 16,
     RemoteArchiveSyncError = 17,

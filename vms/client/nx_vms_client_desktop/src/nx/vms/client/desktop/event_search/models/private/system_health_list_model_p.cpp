@@ -195,7 +195,6 @@ QString SystemHealthListModel::Private::text(int index) const
 
         case QnSystemHealth::RemoteArchiveSyncProgress:
             return tr("Export in progress...");
-        case QnSystemHealth::RemoteArchiveSyncStarted:
         case QnSystemHealth::RemoteArchiveSyncFinished:
         case QnSystemHealth::RemoteArchiveSyncError:
         {
@@ -300,7 +299,6 @@ QVariant SystemHealthListModel::Private::timestamp(int index) const
     const auto& item = m_items[index];
     switch (item.message)
     {
-        case QnSystemHealth::RemoteArchiveSyncStarted:
         case QnSystemHealth::RemoteArchiveSyncFinished:
         case QnSystemHealth::RemoteArchiveSyncError:
         {
