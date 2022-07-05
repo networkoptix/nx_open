@@ -6,7 +6,6 @@
 
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
 #include <nx/kit/debug.h>
-#include <nx/kit/json.h>
 #include <nx/kit/utils.h>
 
 #include <nx/sdk/helpers/error.h>
@@ -23,6 +22,7 @@ namespace analytics {
 namespace stub {
 namespace settings {
 
+using nx::kit::Json;
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
@@ -64,29 +64,31 @@ Result<const ISettingsResponse*> DeviceAgent::settingsReceived()
 {
     const auto settingsResponse = new sdk::SettingsResponse();
 
-    const std::string settingsModel = settingValue(kSettingsModelSettings);
+    const std::string settingsModelType = settingValue(kSettingsModelSettings);
 
-    if (ini().sendSettingsModelWithValues)
+    std::string settingsModel;
+    if (settingsModelType == kAlternativeSettingsModelOption)
     {
-        if (settingsModel == kAlternativeSettingsModelOption)
-        {
-            settingsResponse->setModel(kAlternativeSettingsModel);
-        }
-        else if (settingsModel == kRegularSettingsModelOption)
-        {
-            const std::string languagePart = (settingValue(kCitySelector) == kGermanOption)
-                ? kGermanCitiesSettingsModelPart
-                : kEnglishCitiesSettingsModelPart;
+        settingsModel = kAlternativeSettingsModel;
+    }
+    else if (settingsModelType == kRegularSettingsModelOption)
+    {
+        const std::string languagePart = (settingValue(kCitySelector) == kGermanOption)
+            ? kGermanCitiesSettingsModelPart
+            : kEnglishCitiesSettingsModelPart;
 
-            settingsResponse->setModel(kRegularSettingsModelPart1
-                + languagePart
-                + kRegularSettingsModelPart2);
-        }
+        settingsModel = kRegularSettingsModelPart1
+            + languagePart
+            + kRegularSettingsModelPart2;
     }
 
-    // The manifest depends on some of the above parsed settings, so sending the new manifest.
-    pushManifest(manifestString());
+    std::string parsingError;
+    Json parsedSettingsModel = Json::parse(settingsModel, parsingError);
+    std::map<std::string, std::string> settingsValues = currentSettings();
+    processActiveSettings(&parsedSettingsModel, &settingsValues);
 
+    settingsResponse->setModel(parsedSettingsModel.dump());
+    settingsResponse->setValues(makePtr<StringMap>(settingsValues));
     return settingsResponse;
 }
 
@@ -188,6 +190,46 @@ void DeviceAgent::doGetSettingsOnActiveSettingChange(
     }
 
     *outResult = response.releasePtr();
+}
+
+void DeviceAgent::processActiveSettings(
+    nx::kit::Json* inOutSettingsModel,
+    std::map<std::string, std::string>* inOutSettingsValues)
+{
+
+    Json::array sections = (*inOutSettingsModel)[kSections].array_items();
+    auto activeSettingsSectionIt = std::find_if(sections.begin(), sections.end(),
+        [](Json& section)
+        {
+            return section[kCaption].string_value() == kActiveSettingsSectionCaption;
+        });
+
+    if (activeSettingsSectionIt == sections.cend())
+        return;
+
+    Json activeSettingsItems = (*activeSettingsSectionIt)[kItems];
+    std::vector<std::string> activeSettingIds;
+    for (const Json& item: activeSettingsItems.array_items())
+    {
+        if (item[kIsActive].bool_value())
+            activeSettingIds.push_back(item[kName].string_value());
+    }
+
+    for (const std::string& activeSettingId: activeSettingIds)
+    {
+        m_activeSettingsBuilder.updateSettings(
+            activeSettingId, &activeSettingsItems, inOutSettingsValues);
+    }
+
+    Json::array updatedActiveSettingsItems = activeSettingsItems.array_items();
+    Json::object updatedActiveSection = activeSettingsSectionIt->object_items();
+    updatedActiveSection[kItems] = updatedActiveSettingsItems;
+    *activeSettingsSectionIt = updatedActiveSection;
+
+    Json::object updatedModel = inOutSettingsModel->object_items();
+    updatedModel[kSections] = sections;
+
+    *inOutSettingsModel = Json(updatedModel);
 }
 
 void DeviceAgent::doSetNeededMetadataTypes(

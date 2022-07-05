@@ -23,7 +23,10 @@ static const std::string kGermanOption = "German";
 
 static const std::string kCaption = "caption";
 static const std::string kSections = "sections";
+static const std::string kName = "name";
+static const std::string kRange = "range";
 static const std::string kItems = "items";
+static const std::string kIsActive = "isActive";
 static const std::string kActiveSettingsSectionCaption = "Active settings section";
 static const std::string kActiveSettingsGroupBoxCaption = "Active settings";
 

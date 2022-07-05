@@ -19,9 +19,6 @@ namespace settings {
 using namespace nx::sdk;
 using namespace nx::kit;
 
-const std::string kName = "name";
-const std::string kRange = "range";
-
 const std::string kAdditionalComboBoxSetting = R"json(
     {
         "type": "ComboBox",
@@ -40,7 +37,7 @@ const std::string kAdditionalCheckBoxSetting = R"json(
     {
         "type": "CheckBox",
         "name": ")json" + kAdditionalCheckBoxId + R"json(",
-        "caption": "Active CheckBox",
+        "caption": "Additional CheckBox",
         "defaultValue": false
     }
 )json";
@@ -93,15 +90,16 @@ void showAdditionalSetting(
 
     std::string error;
     Json newItem = Json::parse(additionalSettingTemplate, error);
+    const std::string newItemName = newItem[kName].string_value();
 
     const auto settingIt = findSetting(activeSettingId, &items);
     if (settingIt != items.end())
         items.insert(settingIt + 1, newItem);
 
     *inOutModel = Json(items);
-    const auto valueIt = inOutValues->find(kAdditionalComboBoxValue);
+    const auto valueIt = inOutValues->find(newItemName);
     if (valueIt == inOutValues->cend())
-        inOutValues->emplace(kAdditionalComboBoxId, kAdditionalComboBoxValue);
+        inOutValues->emplace(newItemName, additionalSettingValue);
 }
 
 void hideAdditionalSetting(
@@ -131,15 +129,19 @@ void showAdditionalSettingOption(
     {
         Json::object settingWithRange = settingIt->object_items();
         Json::array range = settingWithRange[kRange].array_items();
-        range.push_back(additionalSettingOption);
-        settingWithRange[kRange] = range;
-        *settingIt = Json(settingWithRange);
+
+        if (std::find(range.begin(), range.end(), additionalSettingOption) == range.cend())
+        {
+            range.push_back(additionalSettingOption);
+            settingWithRange[kRange] = range;
+            *settingIt = Json(settingWithRange);
+        }
     }
 
     *inOutModel = Json(items);
-    const auto valueIt = inOutValues->find(kAdditionalComboBoxValue);
+    const auto valueIt = inOutValues->find(activeSettingId);
     if (valueIt == inOutValues->cend())
-        inOutValues->emplace(kAdditionalComboBoxId, kAdditionalComboBoxValue);
+        inOutValues->emplace(activeSettingId, additionalSettingOption);
 }
 
 void hideAdditionalSettingOption(

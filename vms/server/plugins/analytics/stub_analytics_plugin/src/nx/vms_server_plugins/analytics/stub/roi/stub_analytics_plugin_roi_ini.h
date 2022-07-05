@@ -18,9 +18,6 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, enableOutput, "");
 
     NX_INI_FLAG(0, deviceDependent, "Respective capability in the manifest.");
-
-    NX_INI_FLAG(0, usePluginAsSettingsOrigin,
-        "If set, Engine will declare the corresponding capability in the manifest.");
 };
 
 Ini& ini();
