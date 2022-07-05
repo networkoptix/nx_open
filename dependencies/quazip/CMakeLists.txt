@@ -24,14 +24,11 @@ set_target_properties(quazip PROPERTIES FOLDER third_party)
 
 target_include_directories(quazip PUBLIC ${quazip_dir}/..)
 if(WINDOWS)
-    target_include_directories(quazip PUBLIC ${QT_DIR}/include/QtZlib)
+    find_package(ZLIB REQUIRED)
+    add_library(z ALIAS ZLIB::ZLIB)
 endif()
 
-target_link_libraries(quazip Qt6::Core Qt6::Core5Compat)
-
-if(NOT WINDOWS)
-    target_link_libraries(quazip z)
-endif()
+target_link_libraries(quazip Qt6::Core Qt6::Core5Compat z)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(quazip PRIVATE -Wno-deprecated-declarations -Wno-misleading-indentation)
