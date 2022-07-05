@@ -4,6 +4,8 @@
 
 #include <nx/sdk/analytics/helpers/consuming_device_agent.h>
 
+#include <nx/kit/json.h>
+
 #include "active_settings_builder.h"
 #include "engine.h"
 #include "stub_analytics_plugin_settings_ini.h"
@@ -45,6 +47,11 @@ private:
 
     void dumpActiveSettingChangedAction(
         const nx::sdk::IActiveSettingChangedAction* activeSettingChangeAction) const;
+
+private:
+    void processActiveSettings(
+        nx::kit::Json* inOutSettingModel,
+        std::map<std::string, std::string>* inOutSettingValue);
 
 private:
     Engine* const m_engine;

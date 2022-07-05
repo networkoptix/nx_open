@@ -62,9 +62,6 @@ static std::string buildCapabilities()
     if (ini().deviceDependent)
         capabilities += "|deviceDependent";
 
-    if (ini().usePluginAsSettingsOrigin)
-        capabilities += "|usePluginAsSettingsOrigin";
-
     // Delete first '|', if any.
     if (!capabilities.empty() && capabilities.at(0) == '|')
         capabilities.erase(0, 1);
