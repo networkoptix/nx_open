@@ -16,11 +16,13 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/system_administration/widgets/log_settings_dialog.h> // TODO
+#include <nx/vms/client/desktop/system_administration/widgets/log_settings_dialog.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
+#include <nx/vms/common/network/abstract_certificate_verifier.h>
 #include <ui/workbench/workbench_context.h>
-#include <utils/common/delayed.h> // TODO
+#include <utils/common/delayed.h>
 
 namespace nx::vms::client::desktop {
 
@@ -116,15 +118,16 @@ struct LogsManagementWatcher::Unit::Private
         const QString& folder,
         const nx::utils::Url& apiUrl,
         const network::http::Credentials& credentials,
+        nx::network::ssl::AdapterFunc adapterFunc,
         std::function<void()> callback)
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
-        NX_ASSERT(m_state == DownloadState::none);
+        NX_ASSERT(m_state == DownloadState::none || m_state == DownloadState::error);
 
-        m_downloader = std::make_unique<nx::network::http::AsyncFileDownloader>(
-            nx::network::ssl::kAcceptAnyCertificate); //XXX!
+        m_downloader = std::make_unique<nx::network::http::AsyncFileDownloader>(adapterFunc);
 
         m_downloader->setCredentials(credentials);
+        m_downloader->setTimeouts(nx::network::http::AsyncClient::kInfiniteTimeouts);
 
         auto serverId = m_server->getId().toSimpleString();
         nx::utils::Url url = apiUrl;
@@ -135,7 +138,7 @@ struct LogsManagementWatcher::Unit::Private
         QString filename;
         for (int i = 0;; i++)
         {
-            filename = i
+            filename = i > 0
                 ? QString("%1 (%2).zip").arg(base).arg(i)
                 : QString("%1.zip").arg(base);
 
@@ -203,6 +206,8 @@ struct LogsManagementWatcher::Unit::Private
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
 
+        if (m_downloader)
+            m_downloader->pleaseStopSync();
         m_downloader.reset();
         m_state = DownloadState::none;
     }
@@ -518,7 +523,7 @@ struct LogsManagementWatcher::Private
 
                     additionalText = nx::format("<b>%1</b> <br/> %2",
                         tr("%n Servers", "", units.size()),
-                        "0Mbps"); //< TOOD: speed & time
+                        "0Mbps"); //TODO: #spanasenko Speed & time.
 
                     progress = {this->progress};
 
@@ -585,7 +590,7 @@ struct LogsManagementWatcher::Private
         {
             notificationManager->remove(logsDownloadNotification);
             logsDownloadNotification = {};
-            // TODO: cancel download.
+            //TODO: #spanasenko Cancel download.
         }
     }
 
@@ -657,7 +662,7 @@ struct LogsManagementWatcher::Private
         {
             auto existing = server->settings();
             if (!existing)
-                return false; // TODO: report an error.
+                return false; //TODO: #spanasenko Report an error.
 
             auto oldSettings = *existing;
             auto newSettings = settings.applyTo(*existing);
@@ -672,7 +677,7 @@ struct LogsManagementWatcher::Private
                     if (!success)
                         server->data()->setSettings(oldSettings);
 
-                    // TODO: report an error.
+                    //TODO: #spanasenko Report an error.
                 });
 
             q->connection()->serverApi()->putEmptyResult(
@@ -853,7 +858,7 @@ void LogsManagementWatcher::cancelDownload()
     NX_ASSERT(d->state == State::loading);
     const auto newState = d->selectionState();
 
-    // TODO: stop active downloads.
+    //TODO: #spanasenko Stop client log collection.
     d->client->data()->setState(Unit::DownloadState::none);
     for (auto server: d->servers)
     {
@@ -907,7 +912,7 @@ void LogsManagementWatcher::completeDownload()
     NX_ASSERT(d->state == State::finished || d->state == State::hasErrors);
     const auto newState = d->selectionState();
 
-    // TODO: some clean-up?
+    //TODO: #spanasenko Clean-up.
     d->client->data()->setState(Unit::DownloadState::none);
     for (auto server: d->servers)
     {
@@ -944,17 +949,24 @@ void LogsManagementWatcher::applySettings(const ConfigurableLogSettings& setting
             return;
 
         d->client->data()->setSettings(settings.applyTo(*existing));
-        // TODO: actually store.
+        //TODO: #spanasenko Store client settings.
     }
 
+    QList<UnitPtr> serversToStore;
     for (auto server: d->servers)
     {
         if (server->isChecked())
-            d->api->storeServerSettings(server, settings); // XXX
+            serversToStore << server;
     }
 
     d->updateClientLogLevelWarning();
     d->updateServerLogLevelWarning();
+
+    lock.unlock();
+    for (auto server: serversToStore)
+    {
+        d->api->storeServerSettings(server, settings);
+    }
 }
 
 const nx::utils::log::Level LogsManagementWatcher::defaultLogLevel()
@@ -994,8 +1006,9 @@ void LogsManagementWatcher::downloadServerLogs(const QString& folder, LogsManage
 {
     unit->data()->startDownload(
         folder,
-        unit->server()->getApiUrl(),
+        currentServer()->getApiUrl(),
         connection()->credentials(),
+        systemContext()->certificateVerifier()->makeAdapterFunc(currentServerId()),
         [this]{ executeInThread(thread(), [this]{ updateDownloadState(); }); });
 }
 
