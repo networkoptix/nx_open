@@ -150,6 +150,22 @@
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation>Phân tích camera sẽ chỉ hoạt động khi camera đang được xem. Cho phép ghi âm để làm cho nó hoạt động tất cả các thời gian.</translation>
     </message>
+    <message>
+      <source>This integration has no settings for this Camera.</source>
+      <translation type="unfinished">This integration has no settings for this Camera.</translation>
+    </message>
+    <message>
+      <source>Check System Administration Settings to configure this integration.</source>
+      <translation type="unfinished">Check System Administration Settings to configure this integration.</translation>
+    </message>
+    <message>
+      <source>This integration has no settings at System level.</source>
+      <translation type="unfinished">This integration has no settings at System level.</translation>
+    </message>
+    <message>
+      <source>Check Camera Settings to configure this integration.</source>
+      <translation type="unfinished">Check Camera Settings to configure this integration.</translation>
+    </message>
   </context>
   <context>
     <name>AnalyticsToolTipPreview</name>
@@ -257,8 +273,8 @@
   <context>
     <name>CloudTile</name>
     <message>
-      <source>Log in to </source>
-      <translation>Đăng nhập vào </translation>
+      <source>Log in to</source>
+      <translation type="unfinished">Log in to</translation>
     </message>
   </context>
   <context>
@@ -465,6 +481,13 @@
     <message>
       <source>Ellipticity</source>
       <translation>Xem kiểu elip</translation>
+    </message>
+  </context>
+  <context>
+    <name>GlobalLoaderIndicator</name>
+    <message>
+      <source>Loading...</source>
+      <translation>Đang tải...</translation>
     </message>
   </context>
   <context>
@@ -794,8 +817,8 @@
       <translation>Hiển thị trên Layout</translation>
     </message>
     <message>
-      <source>preview is not available for the selected object</source>
-      <translation>xem trước không khả dụng cho đối tượng đã chọn</translation>
+      <source>Preview is not available for the selected object</source>
+      <translation>Xem trước không khả dụng cho đối tượng đã chọn</translation>
     </message>
   </context>
   <context>
@@ -873,6 +896,10 @@ to activate PTZ</source>
     <message>
       <source>Add</source>
       <translation>Thêm vào</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Xóa bỏ</translation>
     </message>
   </context>
   <context>
@@ -1156,8 +1183,8 @@ to activate PTZ</source>
   <context>
     <name>StyledRadioButton</name>
     <message>
-      <source>Logical ID </source>
-      <translation>ID hợp lý </translation>
+      <source>Logical ID</source>
+      <translation type="unfinished">Logical ID</translation>
     </message>
   </context>
   <context>
@@ -1274,10 +1301,6 @@ to activate PTZ</source>
     <message>
       <source>Support</source>
       <translation>Hỗ trợ</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>Đang tải...</translation>
     </message>
   </context>
 </TS>

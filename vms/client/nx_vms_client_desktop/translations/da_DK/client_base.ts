@@ -30,10 +30,6 @@
         <numerusform>%1 med %n attributter</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any subtype</source>
-      <translation>Enhver undertype</translation>
-    </message>
   </context>
   <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
@@ -55,6 +51,17 @@
     <message>
       <source>Expires</source>
       <translation>Udløber</translation>
+    </message>
+  </context>
+  <context>
+    <name>CloudSystemStatusItem::Private</name>
+    <message>
+      <source>Loading...</source>
+      <translation>Indlæser...</translation>
+    </message>
+    <message>
+      <source>User interaction required</source>
+      <translation type="unfinished">User interaction required</translation>
     </message>
   </context>
   <context>
@@ -93,6 +100,10 @@
     <message>
       <source>Verifying update package</source>
       <translation>Bekræfter opdateringspakken</translation>
+    </message>
+    <message>
+      <source>Cannot connect to the System</source>
+      <translation>Kan ikke oprette forbindelse til systemet</translation>
     </message>
   </context>
   <context>
@@ -1004,6 +1015,10 @@
       <translation>Avanceret...</translation>
     </message>
     <message>
+      <source>Archive filter...</source>
+      <translation type="unfinished">Archive filter...</translation>
+    </message>
+    <message>
       <source>Copy Bookmark Text</source>
       <translation>Kopiér Bogmærketekst</translation>
     </message>
@@ -1014,6 +1029,14 @@
     <message>
       <source>Web Page Settings...</source>
       <translation>Websideindstillinger...</translation>
+    </message>
+    <message>
+      <source>Account Security...</source>
+      <translation>Kontosikkerhed...</translation>
+    </message>
+    <message>
+      <source>Replace Camera...</source>
+      <translation type="unfinished">Replace Camera...</translation>
     </message>
   </context>
   <context>
@@ -1293,6 +1316,40 @@
       <source>To activate License Key manually please contact your Regional / License support:</source>
       <translation type="unfinished">To activate License Key manually please contact your Regional / License support:</translation>
     </message>
+    <message>
+      <source>If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to %1.</source>
+      <translation type="unfinished">If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to %1.</translation>
+    </message>
+    <message>
+      <source>If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to your Regional / License support:</source>
+      <translation type="unfinished">If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to your Regional / License support:</translation>
+    </message>
+    <message>
+      <source>Hardware ID</source>
+      <translation type="unfinished">Hardware ID</translation>
+    </message>
+    <message>
+      <source>License Key</source>
+      <translation type="unfinished">License Key</translation>
+    </message>
+    <message>
+      <source>Failed to activate free license</source>
+      <translation type="unfinished">Failed to activate free license</translation>
+    </message>
+    <message>
+      <source>Copy parameters</source>
+      <translation type="unfinished">Copy parameters</translation>
+    </message>
+    <message>
+      <source>Copied</source>
+      <translation type="unfinished">Copied</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1
+License Key: %2</source>
+      <translation type="unfinished">Hardware ID: %1
+License Key: %2</translation>
+    </message>
   </context>
   <context>
     <name>LicenseDeactivationDialogs</name>
@@ -1415,6 +1472,104 @@
         <numerusform>File name must not contain the following reserved characters:</numerusform>
         <numerusform>File name must not contain the following reserved characters:</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>OauthLoginDialog</name>
+    <message>
+      <source>Connect to System</source>
+      <translation>Opret forbindelse til systemet</translation>
+    </message>
+  </context>
+  <context>
+    <name>OutgoingMailSettingsWidget::Private</name>
+    <message>
+      <source>TLS</source>
+      <translation type="unfinished">TLS</translation>
+    </message>
+    <message>
+      <source>SSL</source>
+      <translation type="unfinished">SSL</translation>
+    </message>
+    <message>
+      <source>Unsecure</source>
+      <translation type="unfinished">Unsecure</translation>
+    </message>
+    <message>
+      <source>Check</source>
+      <translation type="unfinished">Check</translation>
+    </message>
+    <message>
+      <source>Email is not valid.</source>
+      <translation type="unfinished">Email is not valid.</translation>
+    </message>
+    <message>
+      <source>URL is not valid.</source>
+      <translation type="unfinished">URL is not valid.</translation>
+    </message>
+    <message>
+      <source>Enter a short System description here.</source>
+      <translation type="unfinished">Enter a short System description here.</translation>
+    </message>
+    <message>
+      <source>Active</source>
+      <translation type="unfinished">Active</translation>
+    </message>
+    <message>
+      <source>Not configured</source>
+      <translation type="unfinished">Not configured</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation>Fejl</translation>
+    </message>
+    <message>
+      <source>Set your email address or SMTP server</source>
+      <translation type="unfinished">Set your email address or SMTP server</translation>
+    </message>
+    <message>
+      <source>Unable to test email settings due to no internetconnection on any of the active servers</source>
+      <translation type="unfinished">Unable to test email settings due to no internetconnection on any of the active servers</translation>
+    </message>
+    <message>
+      <source>%1 users are receiving emails</source>
+      <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
+      <translation type="unfinished">%1 users are receiving emails</translation>
+    </message>
+    <message>
+      <source>%1 users will start receiving emails right after you apply settings</source>
+      <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
+      <translation type="unfinished">%1 users will start receiving emails right after you apply settings</translation>
+    </message>
+    <message>
+      <source>%1 is not available</source>
+      <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
+      <translation type="unfinished">%1 is not available</translation>
+    </message>
+    <message>
+      <source>Route via %1</source>
+      <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
+      <translation type="unfinished">Route via %1</translation>
+    </message>
+    <message>
+      <source>Route via SMTP server</source>
+      <translation type="unfinished">Route via SMTP server</translation>
+    </message>
+    <message>
+      <source>Success</source>
+      <translation type="unfinished">Success</translation>
+    </message>
+    <message>
+      <source>Connection timed out</source>
+      <translation>Forbindelsen fik timeout</translation>
+    </message>
+    <message>
+      <source>Authentication failed</source>
+      <translation type="unfinished">Authentication failed</translation>
+    </message>
+    <message>
+      <source>Unknown error</source>
+      <translation>Ukendt fejl</translation>
     </message>
   </context>
   <context>
@@ -1579,6 +1734,33 @@
     <message>
       <source>PTZ can only be used in the live mode</source>
       <translation type="unfinished">PTZ can only be used in the live mode</translation>
+    </message>
+  </context>
+  <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+      <source>Zoom In</source>
+      <translation>Zoom ind</translation>
+    </message>
+    <message>
+      <source>Zoom Out</source>
+      <translation>Zoom ud</translation>
+    </message>
+    <message>
+      <source>Focus Far</source>
+      <translation type="unfinished">Focus Far</translation>
+    </message>
+    <message>
+      <source>Focus Near</source>
+      <translation type="unfinished">Focus Near</translation>
+    </message>
+    <message>
+      <source>Auto Focus</source>
+      <translation>Autofokus</translation>
+    </message>
+    <message>
+      <source>Change Dewarping Mode</source>
+      <translation>Skift dewarping-tilstand</translation>
     </message>
   </context>
   <context>
@@ -2898,8 +3080,12 @@ to %1</translation>
       <translation type="unfinished">Failed to enter compatibility mode for version %1</translation>
     </message>
     <message>
-      <source>Your session has expired</source>
-      <translation>Din session er udløbet</translation>
+      <source>System is not compatible with two-factor authentication</source>
+      <translation>Systemet er ikke kompatibelt med to-faktor-godkendelse</translation>
+    </message>
+    <message>
+      <source>Failed to log in to &quot;%1&quot; system</source>
+      <translation>Kunne ikke logge på &quot;%1&quot; -systemet</translation>
     </message>
   </context>
   <context>
@@ -3014,6 +3200,100 @@ to %1</translation>
     <message>
       <source>System configuration will be restored from backup, Server application will be restarted.</source>
       <translation type="unfinished">System configuration will be restored from backup, Server application will be restarted.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnDeprecatedUserListModel</name>
+    <message>
+      <source>Local user</source>
+      <translation type="unfinished">Local user</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">%1 user</translation>
+    </message>
+    <message>
+      <source>LDAP user</source>
+      <translation type="unfinished">LDAP user</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation type="unfinished">Enabled</translation>
+    </message>
+    <message>
+      <source>Disabled</source>
+      <translation type="unfinished">Disabled</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Log på</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Navn</translation>
+    </message>
+    <message>
+      <source>Role</source>
+      <translation type="unfinished">Role</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnDeprecatedUserListModelPrivate</name>
+    <message>
+      <source>Owner</source>
+      <translation>Ejer</translation>
+    </message>
+    <message>
+      <source>Administrator</source>
+      <translation>Administrator</translation>
+    </message>
+    <message>
+      <source>View live video</source>
+      <translation type="unfinished">View live video</translation>
+    </message>
+    <message>
+      <source>Adjust device settings</source>
+      <translation type="unfinished">Adjust device settings</translation>
+    </message>
+    <message>
+      <source>Adjust camera settings</source>
+      <translation type="unfinished">Adjust camera settings</translation>
+    </message>
+    <message>
+      <source>Use PTZ controls</source>
+      <translation type="unfinished">Use PTZ controls</translation>
+    </message>
+    <message>
+      <source>View video archives</source>
+      <translation type="unfinished">View video archives</translation>
+    </message>
+    <message>
+      <source>Export video</source>
+      <translation type="unfinished">Export video</translation>
+    </message>
+    <message>
+      <source>Control Video Walls</source>
+      <translation type="unfinished">Control Video Walls</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnDeprecatedUserManagementWidget</name>
+    <message>
+      <source>Edit</source>
+      <translation>Redigere</translation>
+    </message>
+    <message>
+      <source>All users</source>
+      <translation type="unfinished">All users</translation>
+    </message>
+    <message>
+      <source>With enabled digest authentication</source>
+      <translation>Med aktiveret digest-godkendelse</translation>
+    </message>
+    <message>
+      <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
+      <translation type="unfinished">Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</translation>
     </message>
   </context>
   <context>
@@ -4023,21 +4303,6 @@ to %1</translation>
     </message>
   </context>
   <context>
-    <name>QnPerformanceTest</name>
-    <message>
-      <source>%1 can work in configuration mode only</source>
-      <translation type="unfinished">%1 can work in configuration mode only</translation>
-    </message>
-    <message>
-      <source>Performance of this computer allows running %1 in configuration mode only.</source>
-      <translation type="unfinished">Performance of this computer allows running %1 in configuration mode only.</translation>
-    </message>
-    <message>
-      <source>For full-featured mode please use another computer</source>
-      <translation type="unfinished">For full-featured mode please use another computer</translation>
-    </message>
-  </context>
-  <context>
     <name>QnPermissionsWidget</name>
     <message>
       <source>Edit camera settings</source>
@@ -4399,61 +4664,6 @@ to %1</translation>
     </message>
   </context>
   <context>
-    <name>QnResourceBrowserWidget</name>
-    <message>
-      <source>Local files</source>
-      <translation type="unfinished">Local files</translation>
-    </message>
-    <message>
-      <source>No local files</source>
-      <translation>Ingen lokale filer</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>Intet fundet</translation>
-    </message>
-    <message>
-      <source>All types</source>
-      <translation type="unfinished">All types</translation>
-    </message>
-    <message>
-      <source>Servers</source>
-      <translation>Servere</translation>
-    </message>
-    <message>
-      <source>Layouts</source>
-      <translation>Layout</translation>
-    </message>
-    <message>
-      <source>Showreels</source>
-      <translation>Udstillingshjul</translation>
-    </message>
-    <message>
-      <source>Video Walls</source>
-      <translation>Videovæg</translation>
-    </message>
-    <message>
-      <source>Web Pages</source>
-      <translation>Websider</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>Brugere</translation>
-    </message>
-    <message>
-      <source>Local Files</source>
-      <translation>Lokale filer</translation>
-    </message>
-    <message>
-      <source>Search</source>
-      <translation>Søg</translation>
-    </message>
-    <message>
-      <source>Cameras &amp; Devices</source>
-      <translation>Kameraer &amp; Enheder</translation>
-    </message>
-  </context>
-  <context>
     <name>QnResourceItemDelegate</name>
     <message>
       <source>Health Monitor</source>
@@ -4781,10 +4991,6 @@ to %1</translation>
       <source>Failover</source>
       <translation type="unfinished">Failover</translation>
     </message>
-    <message>
-      <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation type="unfinished">Servers with failover enabled will automatically take cameras from offline servers.</translation>
-    </message>
     <message numerus="yes">
       <source>Certificates</source>
       <translation>
@@ -4806,6 +5012,10 @@ to %1</translation>
     <message>
       <source>Details</source>
       <translation type="unfinished">Details</translation>
+    </message>
+    <message>
+      <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
+      <translation>Servere med failover aktiveret vil automatisk tage kameraer fra offline Servere med det samme lokations-ID.</translation>
     </message>
   </context>
   <context>
@@ -4847,131 +5057,6 @@ to %1</translation>
     <message>
       <source>Watermark Matched</source>
       <translation type="unfinished">Watermark Matched</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnSmtpAdvancedSettingsWidget</name>
-    <message>
-      <source>Auto</source>
-      <translation>Auto</translation>
-    </message>
-    <message>
-      <source>Email</source>
-      <translation>E-mail</translation>
-    </message>
-    <message>
-      <source>SMTP Server</source>
-      <translation type="unfinished">SMTP Server</translation>
-    </message>
-    <message>
-      <source>Server cannot be empty.</source>
-      <translation type="unfinished">Server cannot be empty.</translation>
-    </message>
-    <message>
-      <source>User</source>
-      <translation>Bruger</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Adgangskode</translation>
-    </message>
-    <message>
-      <source>System Signature</source>
-      <translation type="unfinished">System Signature</translation>
-    </message>
-    <message>
-      <source>Support Signature</source>
-      <translation type="unfinished">Support Signature</translation>
-    </message>
-    <message>
-      <source>Enter a short System description here.</source>
-      <translation type="unfinished">Enter a short System description here.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnSmtpSimpleSettingsWidget</name>
-    <message>
-      <source>Email</source>
-      <translation>E-mail</translation>
-    </message>
-    <message>
-      <source>Email is not valid.</source>
-      <translation type="unfinished">Email is not valid.</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Adgangskode</translation>
-    </message>
-    <message>
-      <source>Password cannot be empty.</source>
-      <translation>Adgangskoden skal angives.</translation>
-    </message>
-    <message>
-      <source>System Signature</source>
-      <translation type="unfinished">System Signature</translation>
-    </message>
-    <message>
-      <source>Support Signature</source>
-      <translation type="unfinished">Support Signature</translation>
-    </message>
-    <message>
-      <source>No preset found. Use &quot;Advanced&quot; option.</source>
-      <translation type="unfinished">No preset found. Use &quot;Advanced&quot; option.</translation>
-    </message>
-    <message>
-      <source>Enter a short System description here.</source>
-      <translation type="unfinished">Enter a short System description here.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnSmtpTestConnectionWidget</name>
-    <message>
-      <source>Timed Out</source>
-      <translation type="unfinished">Timed Out</translation>
-    </message>
-    <message>
-      <source>TLS</source>
-      <translation type="unfinished">TLS</translation>
-    </message>
-    <message>
-      <source>SSL</source>
-      <translation type="unfinished">SSL</translation>
-    </message>
-    <message>
-      <source>Unsecured</source>
-      <translation type="unfinished">Unsecured</translation>
-    </message>
-    <message>
-      <source>In Progress...</source>
-      <translation type="unfinished">In Progress...</translation>
-    </message>
-    <message>
-      <source>Success</source>
-      <translation type="unfinished">Success</translation>
-    </message>
-    <message>
-      <source>Connection timed out</source>
-      <translation>Forbindelsen fik timeout</translation>
-    </message>
-    <message>
-      <source>Authentication failed</source>
-      <translation type="unfinished">Authentication failed</translation>
-    </message>
-    <message>
-      <source>SMTP Error %1</source>
-      <translation type="unfinished">SMTP Error %1</translation>
-    </message>
-    <message>
-      <source>Network error</source>
-      <translation type="unfinished">Network error</translation>
-    </message>
-    <message>
-      <source>Invalid parameters</source>
-      <translation type="unfinished">Invalid parameters</translation>
-    </message>
-    <message>
-      <source>Cannot perform the test.</source>
-      <translation type="unfinished">Cannot perform the test.</translation>
     </message>
   </context>
   <context>
@@ -5377,12 +5462,16 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Brugere</translation>
     </message>
     <message>
-      <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
-    </message>
-    <message>
       <source>Security</source>
       <translation>Sikkerhed</translation>
+    </message>
+    <message>
+      <source>User Management</source>
+      <translation type="unfinished">User Management</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation type="unfinished">Integrations</translation>
     </message>
   </context>
   <context>
@@ -5533,6 +5622,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Camera recording schedule is invalid</source>
       <translation>Kameraets optagelsesplan er ugyldig</translation>
     </message>
+    <message>
+      <source>Remote archive synchronization available</source>
+      <translation type="unfinished">Remote archive synchronization available</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -5612,100 +5705,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Hold to Speak</source>
       <translation type="unfinished">Hold to Speak</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserListModel</name>
-    <message>
-      <source>LDAP user</source>
-      <translation type="unfinished">LDAP user</translation>
-    </message>
-    <message>
-      <source>Enabled</source>
-      <translation type="unfinished">Enabled</translation>
-    </message>
-    <message>
-      <source>Disabled</source>
-      <translation type="unfinished">Disabled</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>Navn</translation>
-    </message>
-    <message>
-      <source>Local user</source>
-      <translation type="unfinished">Local user</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>Log på</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation type="unfinished">Role</translation>
-    </message>
-    <message>
-      <source>%1 user</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserListModelPrivate</name>
-    <message>
-      <source>Owner</source>
-      <translation>Ejer</translation>
-    </message>
-    <message>
-      <source>Administrator</source>
-      <translation>Administrator</translation>
-    </message>
-    <message>
-      <source>View live video</source>
-      <translation type="unfinished">View live video</translation>
-    </message>
-    <message>
-      <source>Use PTZ controls</source>
-      <translation type="unfinished">Use PTZ controls</translation>
-    </message>
-    <message>
-      <source>View video archives</source>
-      <translation type="unfinished">View video archives</translation>
-    </message>
-    <message>
-      <source>Export video</source>
-      <translation type="unfinished">Export video</translation>
-    </message>
-    <message>
-      <source>Adjust device settings</source>
-      <translation type="unfinished">Adjust device settings</translation>
-    </message>
-    <message>
-      <source>Adjust camera settings</source>
-      <translation type="unfinished">Adjust camera settings</translation>
-    </message>
-    <message>
-      <source>Control Video Walls</source>
-      <translation type="unfinished">Control Video Walls</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserManagementWidget</name>
-    <message>
-      <source>Edit</source>
-      <translation>Redigere</translation>
-    </message>
-    <message>
-      <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
-      <translation type="unfinished">Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</translation>
-    </message>
-    <message>
-      <source>All users</source>
-      <translation type="unfinished">All users</translation>
-    </message>
-    <message>
-      <source>With enabled digest authentication</source>
-      <translation>Med aktiveret digest-godkendelse</translation>
     </message>
   </context>
   <context>
@@ -6647,13 +6646,12 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
       <source>Merge</source>
       <translation>Flet</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
-      <translation>Du er ved at flytte disse websider til server &quot;%1&quot;. Disse websider proxyer alt forespurgt indhold, og deres proxy server vil skifte til server &quot;%1&quot;.</translation>
-    </message>
-    <message>
-      <source>You are about to move this webpage to server &quot;%1&quot;. This webpage proxies all requested contents, and its proxy server will change to server &quot;%1&quot;.</source>
-      <translation>Du er ved at flytte denne webside til server &quot;%1&quot;. Denne webside proxyer alt anmodet indhold, og dens proxyserver skifter til server &quot;%1&quot;.</translation>
+      <translation type="unfinished">
+        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
+        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
+      </translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
@@ -6688,10 +6686,6 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
       <translation>Virtuelle kameraer kan ikke flyttes mellem servere. Disse enheder vil forblive på %1:</translation>
     </message>
     <message>
-      <source>Move Group without Them</source>
-      <translation>Flyt gruppe uden dem</translation>
-    </message>
-    <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers</source>
       <translation>Virtuelle kameraer, USB- eller webkameraer kan ikke flyttes mellem servere</translation>
     </message>
@@ -6714,6 +6708,10 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <message>
       <source>%1 cannot be moved between servers as it contains USB or web cameras</source>
       <translation>%1 kan ikke flyttes mellem servere, da den indeholder USB- eller webkameraer</translation>
+    </message>
+    <message>
+      <source>Move Group without them</source>
+      <translation type="unfinished">Move Group without them</translation>
     </message>
   </context>
   <context>
@@ -6824,6 +6822,45 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
       <source>%1 %2 is no longer supported</source>
       <comment>%1 %2 are OS name and version, e.g. Windows 7</comment>
       <translation type="unfinished">%1 %2 is no longer supported</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserListModel</name>
+    <message>
+      <source>Owner</source>
+      <translation>Ejer</translation>
+    </message>
+    <message>
+      <source>Administrator</source>
+      <translation>Administrator</translation>
+    </message>
+    <message>
+      <source>View live video</source>
+      <translation type="unfinished">View live video</translation>
+    </message>
+    <message>
+      <source>Adjust device settings</source>
+      <translation type="unfinished">Adjust device settings</translation>
+    </message>
+    <message>
+      <source>Adjust camera settings</source>
+      <translation type="unfinished">Adjust camera settings</translation>
+    </message>
+    <message>
+      <source>Use PTZ controls</source>
+      <translation type="unfinished">Use PTZ controls</translation>
+    </message>
+    <message>
+      <source>View video archives</source>
+      <translation type="unfinished">View video archives</translation>
+    </message>
+    <message>
+      <source>Export video</source>
+      <translation type="unfinished">Export video</translation>
+    </message>
+    <message>
+      <source>Control Video Walls</source>
+      <translation type="unfinished">Control Video Walls</translation>
     </message>
   </context>
   <context>
@@ -7381,10 +7418,6 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
       <translation type="unfinished">Multicast</translation>
     </message>
     <message>
-      <source>Automatic selection</source>
-      <translation type="unfinished">Automatic selection</translation>
-    </message>
-    <message>
       <source>Use if supported</source>
       <translation type="unfinished">Use if supported</translation>
     </message>
@@ -7411,6 +7444,23 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <message>
       <source>Server will not push time settings to the camera.</source>
       <translation>Serveren sender ikke tidsindstillinger til kameraet.</translation>
+    </message>
+    <message>
+      <source>default</source>
+      <translation type="unfinished">default</translation>
+    </message>
+    <message>
+      <source>Auto</source>
+      <comment>Automatic profile selection</comment>
+      <translation>Auto</translation>
+    </message>
+    <message>
+      <source>Auto</source>
+      <translation>Auto</translation>
+    </message>
+    <message>
+      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</source>
+      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</translation>
     </message>
   </context>
   <context>
@@ -7494,6 +7544,58 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::CameraReplacementDialog</name>
+    <message>
+      <source>Failed to replace camera</source>
+      <translation type="unfinished">Failed to replace camera</translation>
+    </message>
+    <message>
+      <source>Abort camera replacement?</source>
+      <translation type="unfinished">Abort camera replacement?</translation>
+    </message>
+    <message>
+      <source>Will be transferred partially:</source>
+      <translation type="unfinished">Will be transferred partially:</translation>
+    </message>
+    <message>
+      <source>Will not be transferred:</source>
+      <translation type="unfinished">Will not be transferred:</translation>
+    </message>
+    <message>
+      <source>Next</source>
+      <translation>Næste</translation>
+    </message>
+    <message>
+      <source>Finish</source>
+      <translation type="unfinished">Finish</translation>
+    </message>
+    <message>
+      <source>Camera for Replacement</source>
+      <translation type="unfinished">Camera for Replacement</translation>
+    </message>
+    <message>
+      <source>%1 will be replaced by selected camera and removed from the system</source>
+      <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
+      <translation type="unfinished">%1 will be replaced by selected camera and removed from the system</translation>
+    </message>
+    <message>
+      <source>Data for Transfer</source>
+      <translation type="unfinished">Data for Transfer</translation>
+    </message>
+    <message>
+      <source>Checking if the data from the camera can be transferred to the new one.</source>
+      <translation type="unfinished">Checking if the data from the camera can be transferred to the new one.</translation>
+    </message>
+    <message>
+      <source>Some data and settings may not supported for new Camera</source>
+      <translation type="unfinished">Some data and settings may not supported for new Camera</translation>
+    </message>
+    <message>
+      <source>Camera replaced!</source>
+      <translation type="unfinished">Camera replaced!</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::CameraScheduleWidget</name>
     <message>
       <source>Recording Schedule</source>
@@ -7549,6 +7651,10 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <message>
       <source>Select Camera</source>
       <translation>Vælg Kamera</translation>
+    </message>
+    <message>
+      <source>No cameras available</source>
+      <translation>Ingen tilgængelige kameraer</translation>
     </message>
   </context>
   <context>
@@ -7631,10 +7737,6 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
       <translation type="unfinished">I/O Modules Settings</translation>
     </message>
     <message>
-      <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
-    </message>
-    <message>
       <source>Dewarping</source>
       <translation>Dewarping</translation>
     </message>
@@ -7669,6 +7771,10 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <message>
       <source>Motion &amp; Objects + Lo-Res</source>
       <translation>Bevægelse, Objekter + Lav opløsning</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation type="unfinished">Integrations</translation>
     </message>
   </context>
   <context>
@@ -7770,6 +7876,37 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <message>
       <source>Select</source>
       <translation>Vælg</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ChunksFilterActionFactory</name>
+    <message>
+      <source>No filter</source>
+      <translation type="unfinished">No filter</translation>
+    </message>
+    <message>
+      <source>Main storage only</source>
+      <translation type="unfinished">Main storage only</translation>
+    </message>
+    <message>
+      <source>Backup storage only</source>
+      <translation type="unfinished">Backup storage only</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ClientApiAuthDialog</name>
+    <message>
+      <source>This webpage is requesting access to your account for authorization</source>
+      <translation type="unfinished">This webpage is requesting access to your account for authorization</translation>
+    </message>
+    <message>
+      <source>Your confirmation is required to provide a token to</source>
+      <comment>... a web page (below there is a web page name with an icon)</comment>
+      <translation type="unfinished">Your confirmation is required to provide a token to</translation>
+    </message>
+    <message>
+      <source>Allow</source>
+      <translation type="unfinished">Allow</translation>
     </message>
   </context>
   <context>
@@ -8393,11 +8530,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::FailoverPriorityDialogItemDelegate</name>
-    <message>
-      <source>No failover</source>
-      <translation>Ingen failover</translation>
-    </message>
+    <name>nx::vms::client::desktop::FailoverPriorityColumnItemDelegate</name>
     <message>
       <source>Low</source>
       <translation>Lav</translation>
@@ -8409,6 +8542,10 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <message>
       <source>High</source>
       <translation>Høj</translation>
+    </message>
+    <message>
+      <source>No Failover</source>
+      <translation>Ingen failover</translation>
     </message>
   </context>
   <context>
@@ -8536,6 +8673,20 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <message>
       <source>Failed to merge %1 to our system.</source>
       <translation type="unfinished">Failed to merge %1 to our system.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::IndirectAccessDecoratorModel</name>
+    <message>
+      <source>Access granted by:</source>
+      <translation>Adgang givet af:</translation>
+    </message>
+    <message numerus="yes">
+      <source>and %n more</source>
+      <translation>
+        <numerusform>og %n mere</numerusform>
+        <numerusform>og %n mere</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -9105,10 +9256,6 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
       <translation type="unfinished">Update to Specific Build</translation>
     </message>
     <message>
-      <source>Uploading updates...</source>
-      <translation type="unfinished">Uploading updates...</translation>
-    </message>
-    <message>
       <source>Downloading client package...</source>
       <translation type="unfinished">Downloading client package...</translation>
     </message>
@@ -9187,6 +9334,14 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
       <translation>Du bruger en tilpasset klient. Kontakt venligst %1 for at få opdateringsinstruktionerne.</translation>
+    </message>
+    <message>
+      <source>Uploading client packages to Servers...</source>
+      <translation type="unfinished">Uploading client packages to Servers...</translation>
+    </message>
+    <message>
+      <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
+      <translation>Der er ikke plads nok på din computer til at downloade klientopdateringen. Frigør venligst plads på harddisken og prøv igen.</translation>
     </message>
   </context>
   <context>
@@ -9507,6 +9662,10 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
       <translation>Proxying alt indhold udsætter enhver tjeneste eller enhed på serveren&apos;s netværk til brugerne af denne webside</translation>
     </message>
+    <message>
+      <source>The webpage is able to interact with the Desktop Client and request access to the user session</source>
+      <translation type="unfinished">The webpage is able to interact with the Desktop Client and request access to the user session</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::RadassActionFactory</name>
@@ -9605,13 +9764,6 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     <message>
       <source>Objects + Lo-Res</source>
       <translation>Objekter + Lav opløsning</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::RemoteConnectionUserInteractionDelegate</name>
-    <message>
-      <source>Connect to System</source>
-      <translation>Opret forbindelse til systemet</translation>
     </message>
   </context>
   <context>
@@ -9949,10 +10101,6 @@ Forsigtig: Denne adgangskode kan ikke nulstilles. Hvis du mister det, vil arkive
       <source>View certificate</source>
       <translation>Vis certifikat</translation>
     </message>
-    <message>
-      <source>Server certificate is invalid.</source>
-      <translation>Servercertifikat er ugyldigt.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
@@ -9993,14 +10141,14 @@ Forsigtig: Denne adgangskode kan ikke nulstilles. Hvis du mister det, vil arkive
       <translation>Fastgør dette certifikat til %1?</translation>
     </message>
     <message>
-      <source>Someone may be impersonating %1 to steel your personal information.
-Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
-      <translation>Nogen udgiver sig muligvis som %1 for at stjæle dine personlige oplysninger.
-Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-certifikat.</translation>
-    </message>
-    <message>
       <source>Pin</source>
       <translation>Fastgør</translation>
+    </message>
+    <message>
+      <source>Someone may be impersonating %1 to steal your personal information.
+Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
+      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
+Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
     </message>
   </context>
   <context>
@@ -10016,42 +10164,6 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     <message>
       <source>I trust this server</source>
       <translation>Jeg tillid til denne server</translation>
-    </message>
-    <message>
-      <source>System:</source>
-      <translation>System:</translation>
-    </message>
-    <message>
-      <source>Server:</source>
-      <translation>Server:</translation>
-    </message>
-    <message>
-      <source>Server ID:</source>
-      <translation>Server ID:</translation>
-    </message>
-    <message>
-      <source>Trust this server?</source>
-      <translation>Hav tillid til denne server?</translation>
-    </message>
-    <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
-      <translation>Gennemgå certifikatets&apos;s detaljer for at sikre, at du opretter forbindelse til den korrekte server.</translation>
-    </message>
-    <message>
-      <source>Cannot verify the identity of %1</source>
-      <translation>Kan ikke bekræfte identiteten af %1</translation>
-    </message>
-    <message>
-      <source>Someone may be impersonating %1 to steal your personal information.</source>
-      <translation>Nogen udgiver sig muligvis for at være %1 for at stjæle dine personlige oplysninger.</translation>
-    </message>
-    <message>
-      <source>Do not connect to this server unless instructed by your VMS administrator.</source>
-      <translation>Forbind ikke til denne server, medmindre din VMS-administrator har givet besked.</translation>
-    </message>
-    <message>
-      <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
-      <translation>Du forsøgte at oprette forbindelse til: %1, men serveren præsenterede et certifikat, der ikke kan bekræftes automatisk.</translation>
     </message>
   </context>
   <context>
@@ -10279,6 +10391,26 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
       <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
       <translation>Optagelsesplan på nogle kameraer indeholder optagetilstande, der ikke understøttes.</translation>
     </message>
+    <message>
+      <source>Replaced camera discovered</source>
+      <translation type="unfinished">Replaced camera discovered</translation>
+    </message>
+    <message>
+      <source>Export in progress...</source>
+      <translation type="unfinished">Export in progress...</translation>
+    </message>
+    <message>
+      <source>Camera %1 has been replaced by %2.</source>
+      <translation type="unfinished">Camera %1 has been replaced by %2.</translation>
+    </message>
+    <message>
+      <source>Click on the &quot;Undo Replace&quot; button to continue using two devices.</source>
+      <translation type="unfinished">Click on the &quot;Undo Replace&quot; button to continue using two devices.</translation>
+    </message>
+    <message>
+      <source>Undo Replace</source>
+      <translation type="unfinished">Undo Replace</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::TileInteractionHandler</name>
@@ -10451,6 +10583,122 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     <message>
       <source>Server already has this file &quot;%1&quot;</source>
       <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::UserGroupListModel</name>
+    <message>
+      <source>LDAP group</source>
+      <translation type="unfinished">LDAP group</translation>
+    </message>
+    <message>
+      <source>Built-in group</source>
+      <translation type="unfinished">Built-in group</translation>
+    </message>
+    <message>
+      <source>Custom group</source>
+      <translation type="unfinished">Custom group</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Navn</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>Beskrivelse</translation>
+    </message>
+    <message>
+      <source>Member of</source>
+      <translation type="unfinished">Member of</translation>
+    </message>
+    <message>
+      <source>Permissions</source>
+      <translation type="unfinished">Permissions</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::UserGroupsWidget</name>
+    <message>
+      <source>Delete</source>
+      <translation>Slet</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::UserListModel</name>
+    <message>
+      <source>Local user</source>
+      <translation type="unfinished">Local user</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">%1 user</translation>
+    </message>
+    <message>
+      <source>LDAP user</source>
+      <translation type="unfinished">LDAP user</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Log på</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Navn</translation>
+    </message>
+    <message>
+      <source>Email</source>
+      <translation>E-mail</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation type="unfinished">Groups</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <translation>Brugerdefineret</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::UserListWidget</name>
+    <message>
+      <source>Enable</source>
+      <translation>Aktivér</translation>
+    </message>
+    <message>
+      <source>Disable</source>
+      <translation type="unfinished">Disable</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Slet</translation>
+    </message>
+    <message>
+      <source>Force Secure Authentication</source>
+      <translation type="unfinished">Force Secure Authentication</translation>
+    </message>
+    <message>
+      <source>All users</source>
+      <translation type="unfinished">All users</translation>
+    </message>
+    <message>
+      <source>With enabled digest authentication</source>
+      <translation>Med aktiveret digest-godkendelse</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::UserManagementTabWidget</name>
+    <message>
+      <source>Users</source>
+      <translation>Brugere</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation type="unfinished">Groups</translation>
+    </message>
+    <message>
+      <source>LDAP</source>
+      <translation type="unfinished">LDAP</translation>
     </message>
   </context>
   <context>
@@ -10882,6 +11130,80 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     <message>
       <source>Cannot find a widget corresponding to the specified item.</source>
       <translation>Kan ikke finde en widget, der svarer til det angivne element.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::DropdownTextPickerWidget</name>
+    <message>
+      <source>Auto</source>
+      <translation>Auto</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::EventTypePickerWidget</name>
+    <message>
+      <source>None</source>
+      <translation>Ingen</translation>
+    </message>
+    <message>
+      <source>Starts</source>
+      <translation type="unfinished">Starts</translation>
+    </message>
+    <message>
+      <source>Stops</source>
+      <translation type="unfinished">Stops</translation>
+    </message>
+    <message>
+      <source>Instant</source>
+      <translation type="unfinished">Instant</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::ModificationMarkItemDelegate</name>
+    <message>
+      <source>Not saved</source>
+      <translation type="unfinished">Not saved</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::RulesDialog</name>
+    <message>
+      <source>Apply changes before exit?</source>
+      <translation type="unfinished">Apply changes before exit?</translation>
+    </message>
+    <message>
+      <source>Apply changes failed.</source>
+      <translation type="unfinished">Apply changes failed.</translation>
+    </message>
+    <message>
+      <source>Restore all rules to default?</source>
+      <translation type="unfinished">Restore all rules to default?</translation>
+    </message>
+    <message>
+      <source>This action cannot be undone.</source>
+      <translation type="unfinished">This action cannot be undone.</translation>
+    </message>
+    <message>
+      <source>Restore rules failed.</source>
+      <translation type="unfinished">Restore rules failed.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::RulesTableModel</name>
+    <message>
+      <source>Event</source>
+      <translation type="unfinished">Event</translation>
+    </message>
+    <message>
+      <source>Action</source>
+      <translation type="unfinished">Action</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::SourcePickerWidget</name>
+    <message>
+      <source>Select at least one User</source>
+      <translation type="unfinished">Select at least one User</translation>
     </message>
   </context>
   <context>
@@ -11323,6 +11645,18 @@ You can select another storage location in the &quot;Storage Management&quot; ta
       <source>%1 Beta</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 Beta</translation>
+    </message>
+    <message>
+      <source>There are no suitable cameras for replacement on the %1</source>
+      <translation type="unfinished">There are no suitable cameras for replacement on the %1</translation>
+    </message>
+    <message>
+      <source>Undo replacement completed successfully!</source>
+      <translation type="unfinished">Undo replacement completed successfully!</translation>
+    </message>
+    <message>
+      <source>Some settings may not be transferred from the replaced camera due to compatibility issues.</source>
+      <translation type="unfinished">Some settings may not be transferred from the replaced camera due to compatibility issues.</translation>
     </message>
   </context>
   <context>

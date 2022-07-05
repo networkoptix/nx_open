@@ -37,6 +37,13 @@
     </message>
   </context>
   <context>
+    <name>ActionTypePickerWidget</name>
+    <message>
+      <source>Do</source>
+      <translation>Actie</translation>
+    </message>
+  </context>
+  <context>
     <name>AdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
@@ -587,10 +594,6 @@
       <translation>Stream Instellingen</translation>
     </message>
     <message>
-      <source>Initialization Settings</source>
-      <translation>Initialisatie instellingen</translation>
-    </message>
-    <message>
       <source>Use Media2 to fetch profiles</source>
       <translation>Gebruik Media2 om profielen op te halen</translation>
     </message>
@@ -629,6 +632,26 @@
     <message>
       <source>Keep camera time settings</source>
       <translation>Cameratijdinstellingen behouden</translation>
+    </message>
+    <message>
+      <source>ONVIF Settings</source>
+      <translation type="unfinished">ONVIF Settings</translation>
+    </message>
+    <message>
+      <source>Secondary stream profile</source>
+      <translation type="unfinished">Secondary stream profile</translation>
+    </message>
+    <message>
+      <source>Primary stream profile</source>
+      <translation type="unfinished">Primary stream profile</translation>
+    </message>
+    <message>
+      <source>Export From SD Cards</source>
+      <translation type="unfinished">Export From SD Cards</translation>
+    </message>
+    <message>
+      <source>Do not export video automatically</source>
+      <translation type="unfinished">Do not export video automatically</translation>
     </message>
   </context>
   <context>
@@ -743,6 +766,33 @@
     </message>
   </context>
   <context>
+    <name>CameraReplacementDialog</name>
+    <message>
+      <source>Camera Replacement</source>
+      <translation type="unfinished">Camera Replacement</translation>
+    </message>
+    <message>
+      <source>New device</source>
+      <translation type="unfinished">New device</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Naam</translation>
+    </message>
+    <message>
+      <source>Back</source>
+      <translation type="unfinished">Back</translation>
+    </message>
+    <message>
+      <source>Refresh</source>
+      <translation>Verversen</translation>
+    </message>
+    <message>
+      <source>Next</source>
+      <translation type="unfinished">Next</translation>
+    </message>
+  </context>
+  <context>
     <name>CameraScheduleWidget</name>
     <message>
       <source>Recording</source>
@@ -840,6 +890,21 @@
     <message>
       <source>Testing connection...</source>
       <translation>Verbinding testen...</translation>
+    </message>
+  </context>
+  <context>
+    <name>ContinuousActionAlertWidget</name>
+    <message>
+      <source>Form</source>
+      <translation>Formulier</translation>
+    </message>
+    <message>
+      <source>This action can be set only for instant events</source>
+      <translation type="unfinished">This action can be set only for instant events</translation>
+    </message>
+    <message>
+      <source>Select another event or action</source>
+      <translation type="unfinished">Select another event or action</translation>
     </message>
   </context>
   <context>
@@ -1004,6 +1069,17 @@
     </message>
   </context>
   <context>
+    <name>EventTypePickerWidget</name>
+    <message>
+      <source>When</source>
+      <translation>Wanneer</translation>
+    </message>
+    <message>
+      <source>Generic event</source>
+      <translation type="unfinished">Generic event</translation>
+    </message>
+  </context>
+  <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
       <source>HTTP content</source>
@@ -1130,10 +1206,6 @@
       <translation>Prioriteit Instellen:</translation>
     </message>
     <message>
-      <source>No failover</source>
-      <translation>Geen failover</translation>
-    </message>
-    <message>
       <source>Low</source>
       <translation>Lage</translation>
     </message>
@@ -1149,6 +1221,10 @@
       <source>Select some devices to setup failover priority</source>
       <translation>Selecteer apparaten om de failover-prioriteit op te stellen</translation>
     </message>
+    <message>
+      <source>No Failover</source>
+      <translation>Geen failover</translation>
+    </message>
   </context>
   <context>
     <name>FilenamePanel</name>
@@ -1162,6 +1238,25 @@
     <message>
       <source>Nothing found</source>
       <translation>Niets gevonden</translation>
+    </message>
+  </context>
+  <context>
+    <name>FooterWidget</name>
+    <message>
+      <source>Add Comment</source>
+      <translation type="unfinished">Add Comment</translation>
+    </message>
+    <message>
+      <source>Set Schedule</source>
+      <translation type="unfinished">Set Schedule</translation>
+    </message>
+    <message>
+      <source>Test Action</source>
+      <translation type="unfinished">Test Action</translation>
+    </message>
+    <message>
+      <source>Add some comment</source>
+      <translation type="unfinished">Add some comment</translation>
     </message>
   </context>
   <context>
@@ -1335,6 +1430,13 @@
     <message>
       <source>Delete</source>
       <translation>Verwijder</translation>
+    </message>
+  </context>
+  <context>
+    <name>InputIDPickerWidget</name>
+    <message>
+      <source>Input ID</source>
+      <translation>Ingang ID</translation>
     </message>
   </context>
   <context>
@@ -1751,6 +1853,17 @@
     </message>
   </context>
   <context>
+    <name>MultilineTextPickerWidget</name>
+    <message>
+      <source>Form</source>
+      <translation>Formulier</translation>
+    </message>
+    <message>
+      <source>Text</source>
+      <translation>Tekst</translation>
+    </message>
+  </context>
+  <context>
     <name>MultipleLayoutSelectionDialog</name>
     <message>
       <source>Select Layouts</source>
@@ -1788,6 +1901,45 @@
     <message>
       <source>Select layout...</source>
       <translation>Selecteer schermindeling...</translation>
+    </message>
+  </context>
+  <context>
+    <name>OutgoingMailSettingsWidget</name>
+    <message>
+      <source>Connection Settings</source>
+      <translation type="unfinished">Connection Settings</translation>
+    </message>
+    <message>
+      <source>Email</source>
+      <translation type="unfinished">Email</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Wachtwoord</translation>
+    </message>
+    <message>
+      <source>User</source>
+      <translation type="unfinished">User</translation>
+    </message>
+    <message>
+      <source>Server Address</source>
+      <translation type="unfinished">Server Address</translation>
+    </message>
+    <message>
+      <source>Security Protocol</source>
+      <translation type="unfinished">Security Protocol</translation>
+    </message>
+    <message>
+      <source>Email Settings</source>
+      <translation type="unfinished">Email Settings</translation>
+    </message>
+    <message>
+      <source>Support Signature</source>
+      <translation type="unfinished">Support Signature</translation>
+    </message>
+    <message>
+      <source>System Singnature</source>
+      <translation type="unfinished">System Singnature</translation>
     </message>
   </context>
   <context>
@@ -1894,6 +2046,17 @@
     <message>
       <source>Events</source>
       <translation>Events</translation>
+    </message>
+  </context>
+  <context>
+    <name>PresetPickerWidget</name>
+    <message>
+      <source>Form</source>
+      <translation>Formulier</translation>
+    </message>
+    <message>
+      <source>Preset</source>
+      <translation type="unfinished">Preset</translation>
     </message>
   </context>
   <context>
@@ -2019,6 +2182,49 @@
     </message>
   </context>
   <context>
+    <name>QnDeprecatedUserManagementWidget</name>
+    <message>
+      <source>Search users</source>
+      <translation>Zoek gebruikers</translation>
+    </message>
+    <message>
+      <source>Enable</source>
+      <translation>Inschakelen</translation>
+    </message>
+    <message>
+      <source>Disable</source>
+      <translation>Uitschakelen</translation>
+    </message>
+    <message>
+      <source>Delete...</source>
+      <translation>Verwijder...</translation>
+    </message>
+    <message>
+      <source>Force Secure Authentication</source>
+      <translation>Beveiligde authenticatie forceren</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Niets gevonden</translation>
+    </message>
+    <message>
+      <source>New User...</source>
+      <translation>Nieuwe gebruiker...</translation>
+    </message>
+    <message>
+      <source>Edit Roles...</source>
+      <translation>Rollen bewerken...</translation>
+    </message>
+    <message>
+      <source>LDAP Settings...</source>
+      <translation>LDAP-instellingen...</translation>
+    </message>
+    <message>
+      <source>Fetch Users from LDAP...</source>
+      <translation>Gebruikers ophalen van LDAP...</translation>
+    </message>
+  </context>
+  <context>
     <name>QnMessageBox</name>
     <message>
       <source>Do not show this message again</source>
@@ -2075,49 +2281,6 @@
     </message>
   </context>
   <context>
-    <name>QnUserManagementWidget</name>
-    <message>
-      <source>LDAP Settings...</source>
-      <translation>LDAP-instellingen...</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>Nieuwe gebruiker...</translation>
-    </message>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>Gebruikers ophalen via LDAP...</translation>
-    </message>
-    <message>
-      <source>Search users</source>
-      <translation>Zoek gebruikers</translation>
-    </message>
-    <message>
-      <source>Enable</source>
-      <translation>Inschakelen</translation>
-    </message>
-    <message>
-      <source>Disable</source>
-      <translation>Uitschakelen</translation>
-    </message>
-    <message>
-      <source>Delete...</source>
-      <translation>Verwijder...</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>Rollen bewerken...</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>Beveiligde authenticatie forceren</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>Niets gevonden</translation>
-    </message>
-  </context>
-  <context>
     <name>QnVideowallSettingsDialog</name>
     <message>
       <source>Video Wall Settings</source>
@@ -2134,6 +2297,17 @@
     <message>
       <source>Enable timeline on video wall</source>
       <translation>Schakel tijdlijn op de videowall in</translation>
+    </message>
+  </context>
+  <context>
+    <name>QualityPickerWidget</name>
+    <message>
+      <source>Form</source>
+      <translation>Formulier</translation>
+    </message>
+    <message>
+      <source>Quality</source>
+      <translation>Kwaliteit</translation>
     </message>
   </context>
   <context>
@@ -2275,21 +2449,6 @@
     </message>
   </context>
   <context>
-    <name>ResourceBrowserWidget</name>
-    <message>
-      <source>Resources</source>
-      <translation>Bronbestanden</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>Niets gevonden</translation>
-    </message>
-    <message>
-      <source>Drag any image or video file to the application window to play them</source>
-      <translation>Sleep een afbeelding of videobestand naar het toepassingsvenster om ze af te spelen</translation>
-    </message>
-  </context>
-  <context>
     <name>RewindForWidget</name>
     <message>
       <source>Playback time :</source>
@@ -2302,6 +2461,29 @@
     <message>
       <source>Live</source>
       <translation>Live</translation>
+    </message>
+  </context>
+  <context>
+    <name>RulesDialog</name>
+    <message>
+      <source>Alarm/Event Rules</source>
+      <translation type="unfinished">Alarm/Event Rules</translation>
+    </message>
+    <message>
+      <source>New Rule</source>
+      <translation type="unfinished">New Rule</translation>
+    </message>
+    <message>
+      <source>Delete Rule</source>
+      <translation type="unfinished">Delete Rule</translation>
+    </message>
+    <message>
+      <source>Select some rule</source>
+      <translation type="unfinished">Select some rule</translation>
+    </message>
+    <message>
+      <source>Reset default rules</source>
+      <translation type="unfinished">Reset default rules</translation>
     </message>
   </context>
   <context>
@@ -2591,79 +2773,6 @@
     </message>
   </context>
   <context>
-    <name>SmtpAdvancedSettingsWidget</name>
-    <message>
-      <source>Unsecure Connection</source>
-      <translation>Niet-beveiligde verbinding</translation>
-    </message>
-    <message>
-      <source>(recommended)</source>
-      <translation>(aanbevolen)</translation>
-    </message>
-    <message>
-      <source>Secure connection using TLS.</source>
-      <translation>Beveiligde verbinding via TLS.</translation>
-    </message>
-    <message>
-      <source>Secure connection using SSL.</source>
-      <translation>Beveiligde verbinding via SSL.</translation>
-    </message>
-    <message>
-      <source>Port:</source>
-      <translation>Poort:</translation>
-    </message>
-  </context>
-  <context>
-    <name>SmtpSettingsWidget</name>
-    <message>
-      <source>Outgoing Email Settings</source>
-      <translation>Uitgaande e-mailinstellingen</translation>
-    </message>
-    <message>
-      <source>Advanced settings...</source>
-      <translation>Geavanceerde instellingen...</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation>Test</translation>
-    </message>
-  </context>
-  <context>
-    <name>SmtpTestConnectionWidget</name>
-    <message>
-      <source>Server:</source>
-      <translation>Server:</translation>
-    </message>
-    <message>
-      <source>Port:</source>
-      <translation>Poort:</translation>
-    </message>
-    <message>
-      <source>User:</source>
-      <translation>Gebruiker:</translation>
-    </message>
-    <message>
-      <source>Security:</source>
-      <translation>Beveiliging:</translation>
-    </message>
-    <message>
-      <source>Progress:</source>
-      <translation>Voortgang:</translation>
-    </message>
-    <message>
-      <source>Result:</source>
-      <translation>Resultaat:</translation>
-    </message>
-    <message>
-      <source>OK</source>
-      <translation>Oké</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Annuleren</translation>
-    </message>
-  </context>
-  <context>
     <name>SoftwareTriggerBusinessEventWidget</name>
     <message>
       <source>Available to</source>
@@ -2676,6 +2785,32 @@
     <message>
       <source>Icon</source>
       <translation>Icoon</translation>
+    </message>
+  </context>
+  <context>
+    <name>SoundPickerWidget</name>
+    <message>
+      <source>Form</source>
+      <translation>Formulier</translation>
+    </message>
+    <message>
+      <source>Sound</source>
+      <translation type="unfinished">Sound</translation>
+    </message>
+    <message>
+      <source>Manage</source>
+      <translation type="unfinished">Manage</translation>
+    </message>
+  </context>
+  <context>
+    <name>StatePickerWidget</name>
+    <message>
+      <source>Form</source>
+      <translation>Formulier</translation>
+    </message>
+    <message>
+      <source>State</source>
+      <translation type="unfinished">State</translation>
     </message>
   </context>
   <context>
@@ -2862,6 +2997,36 @@
     </message>
   </context>
   <context>
+    <name>UserGroupsWidget</name>
+    <message>
+      <source>Search users</source>
+      <translation>Zoek gebruikers</translation>
+    </message>
+    <message>
+      <source>+ Add Group</source>
+      <translation type="unfinished">+ Add Group</translation>
+    </message>
+    <message>
+      <source>No groups found</source>
+      <translation type="unfinished">No groups found</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserListWidget</name>
+    <message>
+      <source>Search users</source>
+      <translation>Zoek gebruikers</translation>
+    </message>
+    <message>
+      <source>+ Add User</source>
+      <translation type="unfinished">+ Add User</translation>
+    </message>
+    <message>
+      <source>No users found</source>
+      <translation type="unfinished">No users found</translation>
+    </message>
+  </context>
+  <context>
     <name>UserProfileWidget</name>
     <message>
       <source>Change Password...</source>
@@ -2982,6 +3147,21 @@
     <message>
       <source>Upload Folder...</source>
       <translation>Upload map...</translation>
+    </message>
+  </context>
+  <context>
+    <name>VolumePickerWidget</name>
+    <message>
+      <source>Form</source>
+      <translation>Formulier</translation>
+    </message>
+    <message>
+      <source>Volume</source>
+      <translation type="unfinished">Volume</translation>
+    </message>
+    <message>
+      <source>Test</source>
+      <translation>Test</translation>
     </message>
   </context>
   <context>

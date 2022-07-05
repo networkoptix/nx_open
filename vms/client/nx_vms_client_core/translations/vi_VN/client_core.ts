@@ -198,5 +198,70 @@
       <source>Too many login attempts. Try again in a minute.</source>
       <translation>Quá nhiều lần thử đăng nhập. Hãy thử lại sau một phút.</translation>
     </message>
+    <message>
+      <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>Để đăng nhập vào Hệ thống này, hãy tắt “Yêu cầu mã xác minh trên mỗi lần đăng nhập bằng tài khoản %1” trong %2 của bạn.</translation>
+    </message>
+    <message>
+      <source>Two-factor authentication is required.</source>
+      <translation>Yêu cầu xác thực hai yếu tố.</translation>
+    </message>
+    <message>
+      <source>You can enable two-factor authentication in your %1.</source>
+      <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>Bạn có thể bật xác thực hai yếu tố trong %1 của mình.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::CertificateWarning</name>
+    <message>
+      <source>Trust this server?</source>
+      <translation>Tin tưởng máy chủ này?</translation>
+    </message>
+    <message>
+      <source>Cannot verify the identity of %1</source>
+      <translation>Không thể xác minh danh tính của %1</translation>
+    </message>
+    <message>
+      <source>System:</source>
+      <translation>Hệ thống:</translation>
+    </message>
+    <message>
+      <source>Server:</source>
+      <translation>Máy chủ:</translation>
+    </message>
+    <message>
+      <source>Server ID:</source>
+      <translation>ID máy chủ:</translation>
+    </message>
+    <message>
+      <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
+      <translation>Xem lại các chi tiết của chứng chỉ để đảm bảo rằng bạn đang kết nối với đúng Máy chủ.</translation>
+    </message>
+    <message>
+      <source>Server certificate is invalid.</source>
+      <translation>Chứng chỉ máy chủ không hợp lệ.</translation>
+    </message>
+    <message>
+      <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
+      <translation type="unfinished">You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</translation>
+    </message>
+    <message>
+      <source>Someone may be impersonating this Server to steal your personal information.</source>
+      <translation type="unfinished">Someone may be impersonating this Server to steal your personal information.</translation>
+    </message>
+    <message>
+      <source>You attempted to connect to this Server but the Server&apos;s certificate has changed.</source>
+      <translation type="unfinished">You attempted to connect to this Server but the Server&apos;s certificate has changed.</translation>
+    </message>
+    <message>
+      <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
+      <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
+    </message>
+    <message>
+      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
+      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct Server.</translation>
+    </message>
   </context>
 </TS>

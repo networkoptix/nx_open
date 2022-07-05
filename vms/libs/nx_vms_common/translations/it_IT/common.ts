@@ -347,18 +347,6 @@
       <translation>Telecamera è stata ripristinata dall' archivio. Elimina la telecamera ed aggiungerla nuovamente per visualizzare il video in diretta.</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation>Innanzitutto, provare ad attivare la registrazione (se è disattivata) e ridurre l'impostazione fps del dispositivo (errore &quot;%1&quot;).</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation>Innanzitutto, provare ad attivare la registrazione (se è disattivata) e ridurre i valori fps nelle impostazioni della telecamera (errore &quot;%1&quot;).</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation>Innanzitutto, provare ad attivare la registrazione (se è disattivata) e ridurre i fps nelle impostazioni del modulo I / O (errore &quot;%1&quot;).</translation>
-    </message>
-    <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
       <translation>Si prega di aggiornare il firmware. La versione minima supportata è %1. La versione corrente è %2</translation>
     </message>
@@ -373,6 +361,18 @@
     <message>
       <source>Internal server error. %1</source>
       <translation>Errore interno del server. %1</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
+      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
+      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
+      <translation type="unfinished">If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
@@ -1103,6 +1103,466 @@
     </message>
   </context>
   <context>
+    <name>SystemSettings</name>
+    <message>
+      <source>SMTP host</source>
+      <translation type="unfinished">SMTP host</translation>
+    </message>
+    <message>
+      <source>Email from</source>
+      <translation type="unfinished">Email from</translation>
+    </message>
+    <message>
+      <source>SMTP user</source>
+      <translation type="unfinished">SMTP user</translation>
+    </message>
+    <message>
+      <source>SMTP password</source>
+      <translation type="unfinished">SMTP password</translation>
+    </message>
+    <message>
+      <source>Email signature</source>
+      <translation type="unfinished">Email signature</translation>
+    </message>
+    <message>
+      <source>Email support link</source>
+      <translation type="unfinished">Email support link</translation>
+    </message>
+    <message>
+      <source>SMTP connection type</source>
+      <translation type="unfinished">SMTP connection type</translation>
+    </message>
+    <message>
+      <source>SMTP port</source>
+      <translation type="unfinished">SMTP port</translation>
+    </message>
+    <message>
+      <source>SMTP timeout (seconds)</source>
+      <translation type="unfinished">SMTP timeout (seconds)</translation>
+    </message>
+    <message>
+      <source>SMTP use simple settings view in Client</source>
+      <translation type="unfinished">SMTP use simple settings view in Client</translation>
+    </message>
+    <message>
+      <source>SMTP name</source>
+      <translation type="unfinished">SMTP name</translation>
+    </message>
+    <message>
+      <source>LDAP URI</source>
+      <translation type="unfinished">LDAP URI</translation>
+    </message>
+    <message>
+      <source>LDAP Admin DN</source>
+      <translation type="unfinished">LDAP Admin DN</translation>
+    </message>
+    <message>
+      <source>LDAP Admin password</source>
+      <translation type="unfinished">LDAP Admin password</translation>
+    </message>
+    <message>
+      <source>LDAP search base</source>
+      <translation type="unfinished">LDAP search base</translation>
+    </message>
+    <message>
+      <source>LDAP search filter</source>
+      <translation type="unfinished">LDAP search filter</translation>
+    </message>
+    <message>
+      <source>LDAP password expiration (milliseconds)</source>
+      <translation type="unfinished">LDAP password expiration (milliseconds)</translation>
+    </message>
+    <message>
+      <source>LDAP search timeout (seconds)</source>
+      <translation type="unfinished">LDAP search timeout (seconds)</translation>
+    </message>
+    <message>
+      <source>Anonymous statistics report allowed</source>
+      <translation type="unfinished">Anonymous statistics report allowed</translation>
+    </message>
+    <message>
+      <source>Anonymous statistics report last time</source>
+      <translation type="unfinished">Anonymous statistics report last time</translation>
+    </message>
+    <message>
+      <source>Anonymous statistics report last version</source>
+      <translation type="unfinished">Anonymous statistics report last version</translation>
+    </message>
+    <message>
+      <source>Anonymous statistics report last number</source>
+      <translation type="unfinished">Anonymous statistics report last number</translation>
+    </message>
+    <message>
+      <source>Anonymous statistics time cycle</source>
+      <translation type="unfinished">Anonymous statistics time cycle</translation>
+    </message>
+    <message>
+      <source>Anonymous statistics report delay after update</source>
+      <translation type="unfinished">Anonymous statistics report delay after update</translation>
+    </message>
+    <message>
+      <source>Anonymous Statistics Report Server URL</source>
+      <translation type="unfinished">Anonymous Statistics Report Server URL</translation>
+    </message>
+    <message>
+      <source>Anonymous statistics report Client settings</source>
+      <translation type="unfinished">Anonymous statistics report Client settings</translation>
+    </message>
+    <message>
+      <source>System alive update interval (seconds, 1s-1h)</source>
+      <translation type="unfinished">System alive update interval (seconds, 1s-1h)</translation>
+    </message>
+    <message>
+      <source>Proxy connection timeout (seconds, 1s-1h)</source>
+      <translation type="unfinished">Proxy connection timeout (seconds, 1s-1h)</translation>
+    </message>
+    <message>
+      <source>Time synchronization enabled</source>
+      <translation type="unfinished">Time synchronization enabled</translation>
+    </message>
+    <message>
+      <source>Primary time synchronization Server ID</source>
+      <translation type="unfinished">Primary time synchronization Server ID</translation>
+    </message>
+    <message>
+      <source>Max difference between local and source time (milliseconds)</source>
+      <translation type="unfinished">Max difference between local and source time (milliseconds)</translation>
+    </message>
+    <message>
+      <source>OS time change check period</source>
+      <translation type="unfinished">OS time change check period</translation>
+    </message>
+    <message>
+      <source>Sync time synchronization interval for network requests</source>
+      <translation type="unfinished">Sync time synchronization interval for network requests</translation>
+    </message>
+    <message>
+      <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
+      <translation type="unfinished">Sync time epsilon. New value is not applied if time delta less than epsilon</translation>
+    </message>
+    <message>
+      <source>Cloud owner account</source>
+      <translation type="unfinished">Cloud owner account</translation>
+    </message>
+    <message>
+      <source>Cloud System ID</source>
+      <translation type="unfinished">Cloud System ID</translation>
+    </message>
+    <message>
+      <source>Cloud authorization key</source>
+      <translation type="unfinished">Cloud authorization key</translation>
+    </message>
+    <message>
+      <source>System name</source>
+      <translation type="unfinished">System name</translation>
+    </message>
+    <message>
+      <source>Local System ID</source>
+      <translation type="unfinished">Local System ID</translation>
+    </message>
+    <message>
+      <source>Last master System merge ID</source>
+      <translation type="unfinished">Last master System merge ID</translation>
+    </message>
+    <message>
+      <source>Last slave System merge ID</source>
+      <translation type="unfinished">Last slave System merge ID</translation>
+    </message>
+    <message>
+      <source>Disable Device vendors</source>
+      <translation type="unfinished">Disable Device vendors</translation>
+    </message>
+    <message>
+      <source>Optimize Camera settings</source>
+      <translation type="unfinished">Optimize Camera settings</translation>
+    </message>
+    <message>
+      <source>Thumbnails auto-update</source>
+      <translation type="unfinished">Thumbnails auto-update</translation>
+    </message>
+    <message>
+      <source>Use %1 service to send emails instead of SMTP client</source>
+      <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
+      <translation type="unfinished">Use %1 service to send emails instead of SMTP client</translation>
+    </message>
+    <message>
+      <source>Max scene items (0 means default)</source>
+      <translation type="unfinished">Max scene items (0 means default)</translation>
+    </message>
+    <message>
+      <source>Send plain-text emails</source>
+      <translation type="unfinished">Send plain-text emails</translation>
+    </message>
+    <message>
+      <source>Use Windows line feed in emails</source>
+      <translation type="unfinished">Use Windows line feed in emails</translation>
+    </message>
+    <message>
+      <source>Enable audit trail</source>
+      <translation type="unfinished">Enable audit trail</translation>
+    </message>
+    <message>
+      <source>Audit trail period (days, 14-730)</source>
+      <translation type="unfinished">Audit trail period (days, 14-730)</translation>
+    </message>
+    <message>
+      <source>Event log period (days)</source>
+      <translation type="unfinished">Event log period (days)</translation>
+    </message>
+    <message>
+      <source>Enforce HTTPS (data traffic encryption)</source>
+      <translation type="unfinished">Enforce HTTPS (data traffic encryption)</translation>
+    </message>
+    <message>
+      <source>Enforce RTSPS (video traffic encryption)</source>
+      <translation type="unfinished">Enforce RTSPS (video traffic encryption)</translation>
+    </message>
+    <message>
+      <source>Enable auto-discovery</source>
+      <translation type="unfinished">Enable auto-discovery</translation>
+    </message>
+    <message>
+      <source>Enable auto-update notifications</source>
+      <translation type="unfinished">Enable auto-update notifications</translation>
+    </message>
+    <message>
+      <source>Enable update notifications</source>
+      <translation type="unfinished">Enable update notifications</translation>
+    </message>
+    <message>
+      <source>Enable UPNP port-mapping</source>
+      <translation type="unfinished">Enable UPNP port-mapping</translation>
+    </message>
+    <message>
+      <source>Backup settings</source>
+      <translation type="unfinished">Backup settings</translation>
+    </message>
+    <message>
+      <source>Cloud host override</source>
+      <translation type="unfinished">Cloud host override</translation>
+    </message>
+    <message>
+      <source>Enable crossdomain policy</source>
+      <translation type="unfinished">Enable crossdomain policy</translation>
+    </message>
+    <message>
+      <source>Enable RTSP for Arecont</source>
+      <translation type="unfinished">Enable RTSP for Arecont</translation>
+    </message>
+    <message>
+      <source>Enable sequential Flir ONVIF searcher</source>
+      <translation type="unfinished">Enable sequential Flir ONVIF searcher</translation>
+    </message>
+    <message>
+      <source>Max P2P queue size (bytes, 32-512MB)</source>
+      <translation type="unfinished">Max P2P queue size (bytes, 32-512MB)</translation>
+    </message>
+    <message>
+      <source>Max P2P all clients size (bytes, 32-512MB)</source>
+      <translation type="unfinished">Max P2P all clients size (bytes, 32-512MB)</translation>
+    </message>
+    <message>
+      <source>Max record queue size (bytes, 6-96MB)</source>
+      <translation type="unfinished">Max record queue size (bytes, 6-96MB)</translation>
+    </message>
+    <message>
+      <source>Max record queue size (elements, 250-4000)</source>
+      <translation type="unfinished">Max record queue size (elements, 250-4000)</translation>
+    </message>
+    <message>
+      <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value &gt;=2 to this parameter.</source>
+      <translation type="unfinished">Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value &gt;=2 to this parameter.</translation>
+    </message>
+    <message>
+      <source>RTP retry count</source>
+      <translation type="unfinished">RTP retry count</translation>
+    </message>
+    <message>
+      <source>RTP timeout (milliseconds)</source>
+      <translation type="unfinished">RTP timeout (milliseconds)</translation>
+    </message>
+    <message>
+      <source>Max RTSP connection duration (seconds)</source>
+      <translation type="unfinished">Max RTSP connection duration (seconds)</translation>
+    </message>
+    <message>
+      <source>Enable cloud-connect UDP hole-punching</source>
+      <translation type="unfinished">Enable cloud-connect UDP hole-punching</translation>
+    </message>
+    <message>
+      <source>Enable cloud-connect relays usage</source>
+      <translation type="unfinished">Enable cloud-connect relays usage</translation>
+    </message>
+    <message>
+      <source>Enforce SSL for cloud-connect relays</source>
+      <translation type="unfinished">Enforce SSL for cloud-connect relays</translation>
+    </message>
+    <message>
+      <source>Enable recording on EDGE</source>
+      <translation type="unfinished">Enable recording on EDGE</translation>
+    </message>
+    <message>
+      <source>Enable WebSocket for p2p</source>
+      <translation type="unfinished">Enable WebSocket for p2p</translation>
+    </message>
+    <message>
+      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32</source>
+      <translation type="unfinished">Max thread count for remote archive synchronization (&lt;=0 - auto, max 32</translation>
+    </message>
+    <message>
+      <source>Target update information</source>
+      <translation type="unfinished">Target update information</translation>
+    </message>
+    <message>
+      <source>Installed update information</source>
+      <translation type="unfinished">Installed update information</translation>
+    </message>
+    <message>
+      <source>Downloader peers for files</source>
+      <translation type="unfinished">Downloader peers for files</translation>
+    </message>
+    <message>
+      <source>Client update settings</source>
+      <translation type="unfinished">Client update settings</translation>
+    </message>
+    <message>
+      <source>Thread count limit for Camera archive synchronization</source>
+      <translation type="unfinished">Thread count limit for Camera archive synchronization</translation>
+    </message>
+    <message>
+      <source>Watermark settings</source>
+      <translation type="unfinished">Watermark settings</translation>
+    </message>
+    <message>
+      <source>Authorization Session token lifetime (minutes)</source>
+      <translation type="unfinished">Authorization Session token lifetime (minutes)</translation>
+    </message>
+    <message>
+      <source>Session token count limit on a single Server</source>
+      <translation type="unfinished">Session token count limit on a single Server</translation>
+    </message>
+    <message>
+      <source>Max session token count per user on single Server</source>
+      <translation type="unfinished">Max session token count per user on single Server</translation>
+    </message>
+    <message>
+      <source>Update interval for remote session token cache (other Servers and Cloud)</source>
+      <translation type="unfinished">Update interval for remote session token cache (other Servers and Cloud)</translation>
+    </message>
+    <message>
+      <source>Timeout for remote session token cache (other Servers and Cloud)</source>
+      <translation type="unfinished">Timeout for remote session token cache (other Servers and Cloud)</translation>
+    </message>
+    <message>
+      <source>Default video codec</source>
+      <translation type="unfinished">Default video codec</translation>
+    </message>
+    <message>
+      <source>Default codec for export video</source>
+      <translation type="unfinished">Default codec for export video</translation>
+    </message>
+    <message>
+      <source>Low quality screen video codec</source>
+      <translation type="unfinished">Low quality screen video codec</translation>
+    </message>
+    <message>
+      <source>License server</source>
+      <translation type="unfinished">License server</translation>
+    </message>
+    <message>
+      <source>URI for resource_data.json automatic update</source>
+      <translation type="unfinished">URI for resource_data.json automatic update</translation>
+    </message>
+    <message>
+      <source>Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
+      <translation type="unfinished">Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
+    </message>
+    <message>
+      <source>Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
+      <translation type="unfinished">Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</translation>
+    </message>
+    <message>
+      <source>Meta data storage change policy</source>
+      <translation type="unfinished">Meta data storage change policy</translation>
+    </message>
+    <message>
+      <source>Persistent Servers for update storage</source>
+      <translation type="unfinished">Persistent Servers for update storage</translation>
+    </message>
+    <message>
+      <source>Persistent Servers where updates are stored</source>
+      <translation type="unfinished">Persistent Servers where updates are stored</translation>
+    </message>
+    <message>
+      <source>VMS Server version specific features</source>
+      <translation type="unfinished">VMS Server version specific features</translation>
+    </message>
+    <message>
+      <source>Language for mobile push notifications</source>
+      <translation type="unfinished">Language for mobile push notifications</translation>
+    </message>
+    <message>
+      <source>Additional local FS storage types for recording</source>
+      <translation type="unfinished">Additional local FS storage types for recording</translation>
+    </message>
+    <message>
+      <source>Keep IO port state on when Server connects to the Device</source>
+      <translation type="unfinished">Keep IO port state on when Server connects to the Device</translation>
+    </message>
+    <message>
+      <source>Media buffer size (KB, 10KB-4Mb)</source>
+      <translation type="unfinished">Media buffer size (KB, 10KB-4Mb)</translation>
+    </message>
+    <message>
+      <source>Media buffer size for audio only Devices (KB, 1Kb-1MB)</source>
+      <translation type="unfinished">Media buffer size for audio only Devices (KB, 1Kb-1MB)</translation>
+    </message>
+    <message>
+      <source>Force analytics DB storage mount point permissions in case of failure</source>
+      <translation type="unfinished">Force analytics DB storage mount point permissions in case of failure</translation>
+    </message>
+    <message>
+      <source>Check video stream period (milliseconds)</source>
+      <translation type="unfinished">Check video stream period (milliseconds)</translation>
+    </message>
+    <message>
+      <source>Storage encryption enabled</source>
+      <translation type="unfinished">Storage encryption enabled</translation>
+    </message>
+    <message>
+      <source>Current storage encryption key</source>
+      <translation type="unfinished">Current storage encryption key</translation>
+    </message>
+    <message>
+      <source>Show Servers in tree for non-admins</source>
+      <translation type="unfinished">Show Servers in tree for non-admins</translation>
+    </message>
+    <message>
+      <source>HTTP header: Origin</source>
+      <translation type="unfinished">HTTP header: Origin</translation>
+    </message>
+    <message>
+      <source>HTTP header: X-Frame-Options</source>
+      <translation type="unfinished">HTTP header: X-Frame-Options</translation>
+    </message>
+    <message>
+      <source>Use only HTTPS for Cameras</source>
+      <translation type="unfinished">Use only HTTPS for Cameras</translation>
+    </message>
+    <message>
+      <source>Enable insecure deprecated API</source>
+      <translation type="unfinished">Enable insecure deprecated API</translation>
+    </message>
+    <message>
+      <source>Enable insecure deprecated API functions curently in use by Nx products</source>
+      <translation type="unfinished">Enable insecure deprecated API functions curently in use by Nx products</translation>
+    </message>
+    <message>
+      <source>Show mouse timeline preview</source>
+      <translation type="unfinished">Show mouse timeline preview</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::recording::Error</name>
     <message>
       <source>Internal error</source>
@@ -1746,16 +2206,20 @@
       <translation type="unfinished">Data is backed up to %1</translation>
     </message>
     <message>
-      <source>Failed to backup file </source>
-      <translation type="unfinished">Failed to backup file </translation>
-    </message>
-    <message>
       <source>Server Certificate Error</source>
       <translation type="unfinished">Server Certificate Error</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
       <translation type="unfinished">Server &quot;%1&quot; certificate error</translation>
+    </message>
+    <message>
+      <source>Intercom informer</source>
+      <translation type="unfinished">Intercom informer</translation>
+    </message>
+    <message>
+      <source>Failed to backup file</source>
+      <translation type="unfinished">Failed to backup file</translation>
     </message>
   </context>
   <context>

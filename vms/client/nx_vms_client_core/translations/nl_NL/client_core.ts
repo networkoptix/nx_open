@@ -198,5 +198,70 @@
       <source>Too many login attempts. Try again in a minute.</source>
       <translation>Te veel inlogpogingen. Probeer het over een minuut opnieuw.</translation>
     </message>
+    <message>
+      <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>Om in te loggen op dit systeem, schakelt u "Vraag om een verificatiecode bij elke login met uw %1 account" in uw %2.</translation>
+    </message>
+    <message>
+      <source>Two-factor authentication is required.</source>
+      <translation>Tweestapsverificatie is vereist.</translation>
+    </message>
+    <message>
+      <source>You can enable two-factor authentication in your %1.</source>
+      <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation>U kunt tweefactorauthenticatie inschakelen in uw %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::CertificateWarning</name>
+    <message>
+      <source>Trust this server?</source>
+      <translation>Deze server vertrouwen?</translation>
+    </message>
+    <message>
+      <source>Cannot verify the identity of %1</source>
+      <translation>Kan de identiteit van %1 niet verifiëren</translation>
+    </message>
+    <message>
+      <source>System:</source>
+      <translation>Systeem:</translation>
+    </message>
+    <message>
+      <source>Server:</source>
+      <translation>Server:</translation>
+    </message>
+    <message>
+      <source>Server ID:</source>
+      <translation>Server ID:</translation>
+    </message>
+    <message>
+      <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
+      <translation>Bekijk de details van het certificaat om er zeker van te zijn dat u verbinding maakt met de juiste server.</translation>
+    </message>
+    <message>
+      <source>Server certificate is invalid.</source>
+      <translation>Servercertificaat is ongeldig.</translation>
+    </message>
+    <message>
+      <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
+      <translation type="unfinished">You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</translation>
+    </message>
+    <message>
+      <source>Someone may be impersonating this Server to steal your personal information.</source>
+      <translation type="unfinished">Someone may be impersonating this Server to steal your personal information.</translation>
+    </message>
+    <message>
+      <source>You attempted to connect to this Server but the Server&apos;s certificate has changed.</source>
+      <translation type="unfinished">You attempted to connect to this Server but the Server&apos;s certificate has changed.</translation>
+    </message>
+    <message>
+      <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
+      <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
+    </message>
+    <message>
+      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
+      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct Server.</translation>
+    </message>
   </context>
 </TS>

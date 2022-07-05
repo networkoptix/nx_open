@@ -150,6 +150,22 @@
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation>카메라 분석은 카메라를 볼 때만 작동합니다. 항상 작동하도록 녹음을 활성화하십시오.</translation>
     </message>
+    <message>
+      <source>This integration has no settings for this Camera.</source>
+      <translation type="unfinished">This integration has no settings for this Camera.</translation>
+    </message>
+    <message>
+      <source>Check System Administration Settings to configure this integration.</source>
+      <translation type="unfinished">Check System Administration Settings to configure this integration.</translation>
+    </message>
+    <message>
+      <source>This integration has no settings at System level.</source>
+      <translation type="unfinished">This integration has no settings at System level.</translation>
+    </message>
+    <message>
+      <source>Check Camera Settings to configure this integration.</source>
+      <translation type="unfinished">Check Camera Settings to configure this integration.</translation>
+    </message>
   </context>
   <context>
     <name>AnalyticsToolTipPreview</name>
@@ -257,8 +273,8 @@
   <context>
     <name>CloudTile</name>
     <message>
-      <source>Log in to </source>
-      <translation>로그인 </translation>
+      <source>Log in to</source>
+      <translation type="unfinished">Log in to</translation>
     </message>
   </context>
   <context>
@@ -465,6 +481,13 @@
     <message>
       <source>Ellipticity</source>
       <translation>타원</translation>
+    </message>
+  </context>
+  <context>
+    <name>GlobalLoaderIndicator</name>
+    <message>
+      <source>Loading...</source>
+      <translation>읽는 중...</translation>
     </message>
   </context>
   <context>
@@ -794,7 +817,7 @@
       <translation>레이아웃에 표시</translation>
     </message>
     <message>
-      <source>preview is not available for the selected object</source>
+      <source>Preview is not available for the selected object</source>
       <translation>선택한 객체에 대해 미리보기를 사용할 수 없습니다.</translation>
     </message>
   </context>
@@ -872,6 +895,10 @@ to activate PTZ</source>
     <message>
       <source>Add</source>
       <translation>추가</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>삭제</translation>
     </message>
   </context>
   <context>
@@ -1155,8 +1182,8 @@ to activate PTZ</source>
   <context>
     <name>StyledRadioButton</name>
     <message>
-      <source>Logical ID </source>
-      <translation>논리적 ID </translation>
+      <source>Logical ID</source>
+      <translation type="unfinished">Logical ID</translation>
     </message>
   </context>
   <context>
@@ -1273,10 +1300,6 @@ to activate PTZ</source>
     <message>
       <source>Support</source>
       <translation>지원</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>읽는 중...</translation>
     </message>
   </context>
 </TS>

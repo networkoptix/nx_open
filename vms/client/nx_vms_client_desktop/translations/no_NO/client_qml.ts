@@ -152,6 +152,22 @@
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation>Kameraanalyser fungerer bare når kameraet blir vist. Aktiver opptak for å få det til å fungere hele tiden.</translation>
     </message>
+    <message>
+      <source>This integration has no settings for this Camera.</source>
+      <translation type="unfinished">This integration has no settings for this Camera.</translation>
+    </message>
+    <message>
+      <source>Check System Administration Settings to configure this integration.</source>
+      <translation type="unfinished">Check System Administration Settings to configure this integration.</translation>
+    </message>
+    <message>
+      <source>This integration has no settings at System level.</source>
+      <translation type="unfinished">This integration has no settings at System level.</translation>
+    </message>
+    <message>
+      <source>Check Camera Settings to configure this integration.</source>
+      <translation type="unfinished">Check Camera Settings to configure this integration.</translation>
+    </message>
   </context>
   <context>
     <name>AnalyticsToolTipPreview</name>
@@ -261,8 +277,8 @@
   <context>
     <name>CloudTile</name>
     <message>
-      <source>Log in to </source>
-      <translation>Logg på </translation>
+      <source>Log in to</source>
+      <translation type="unfinished">Log in to</translation>
     </message>
   </context>
   <context>
@@ -469,6 +485,13 @@
     <message>
       <source>Ellipticity</source>
       <translation>Elliptisk</translation>
+    </message>
+  </context>
+  <context>
+    <name>GlobalLoaderIndicator</name>
+    <message>
+      <source>Loading...</source>
+      <translation>Laster...</translation>
     </message>
   </context>
   <context>
@@ -802,8 +825,8 @@
       <translation>Vis på visning</translation>
     </message>
     <message>
-      <source>preview is not available for the selected object</source>
-      <translation>forhåndsvisning er ikke tilgjengelig for det valgte objektet</translation>
+      <source>Preview is not available for the selected object</source>
+      <translation>Forhåndsvisning er ikke tilgjengelig for det valgte objektet</translation>
     </message>
   </context>
   <context>
@@ -881,6 +904,10 @@ to activate PTZ</translation>
     <message>
       <source>Add</source>
       <translation>Legg til</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Slett</translation>
     </message>
   </context>
   <context>
@@ -1166,8 +1193,8 @@ to activate PTZ</translation>
   <context>
     <name>StyledRadioButton</name>
     <message>
-      <source>Logical ID </source>
-      <translation>Logisk ID </translation>
+      <source>Logical ID</source>
+      <translation type="unfinished">Logical ID</translation>
     </message>
   </context>
   <context>
@@ -1285,10 +1312,6 @@ to activate PTZ</translation>
     <message>
       <source>Support</source>
       <translation>Brukerstøtte</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>Laster...</translation>
     </message>
   </context>
 </TS>
