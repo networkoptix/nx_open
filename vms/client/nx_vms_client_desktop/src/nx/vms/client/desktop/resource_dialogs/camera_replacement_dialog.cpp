@@ -435,7 +435,8 @@ void CameraReplacementDialog::makeReplacementRequest(bool getReportOnly)
 
         d->requestInProgress = true;
 
-        connectedServerApi()->replaceDevice(
+        const auto server = d->cameraToBeReplaced->getParentServer();
+        server->restConnection()->replaceDevice(
             d->cameraToBeReplaced->getId(),
             d->replacementCamera->getPhysicalId(),
             getReportOnly,
