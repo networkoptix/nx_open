@@ -358,19 +358,10 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(
     /* Some messages are not to be displayed to users. */
     canShow &= (QnSystemHealth::isMessageVisible(message));
 
-    // TODO: Remove this when VMS-7724 is implemented.
-    auto filterMessageKey = message;
-    if (message == QnSystemHealth::RemoteArchiveSyncFinished
-        || message == QnSystemHealth::RemoteArchiveSyncProgress
-        || message == QnSystemHealth::RemoteArchiveSyncError)
-    {
-        filterMessageKey = QnSystemHealth::RemoteArchiveSyncStarted;
-    }
-
     // Checking that user wants to see this message (if he is able to hide it).
-    if (isMessageVisibleInSettings(filterMessageKey))
+    if (isMessageVisibleInSettings(message))
     {
-        const bool isAllowedByFilter = qnSettings->popupSystemHealth().contains(filterMessageKey);
+        const bool isAllowedByFilter = qnSettings->popupSystemHealth().contains(message);
         canShow &= isAllowedByFilter;
     }
 
