@@ -41,7 +41,7 @@ static constexpr auto kStatusLabelPixelSize = 18;
 static constexpr auto kStatueLabelFontWeight = QFont::Medium;
 
 static constexpr int kStatusHintLabelPixelSize = 12;
-static constexpr int kStatusHintLabelFontWeight = QFont::Normal;
+static constexpr auto kStatusHintLabelFontWeight = QFont::Normal;
 
 static constexpr auto kSmtpTestingTimeout = 5s;
 
