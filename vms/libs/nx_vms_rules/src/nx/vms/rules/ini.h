@@ -17,6 +17,11 @@ struct NX_VMS_RULES_API Ini: public nx::kit::IniConfig
     NX_INI_FLAG(false, fullSupport,
         "Process cloud notification only when set to false."
     );
+
+    // TODO: #mmalofeev Temporary solution for the test purposes. Should be removed in the future.
+    NX_INI_FLAG(false, amendEventIds,
+        "If true, new event ids is different from the old ones."
+    );
 };
 
 NX_VMS_RULES_API Ini& ini();
