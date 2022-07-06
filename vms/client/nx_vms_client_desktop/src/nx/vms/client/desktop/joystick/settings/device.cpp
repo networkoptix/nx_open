@@ -45,6 +45,21 @@ Device::StickPosition Device::currentStickPosition() const
     return m_stickPosition;
 }
 
+void Device::resetState()
+{
+    for (int i = 0; i < m_buttonStates.size(); ++i)
+    {
+        if (m_buttonStates[i])
+            emit buttonReleased(i);
+    }
+    std::fill(m_buttonStates.begin(), m_buttonStates.end(), false);
+
+    m_stickPosition.fill(0);
+    emit stickMoved(0, 0, 0);
+
+    emit stateChanged(m_stickPosition, m_buttonStates);
+}
+
 void Device::updateStickAxisLimits(const JoystickDescriptor& modelInfo)
 {
     m_axisLimits[xIndex] = parseAxisLimits(modelInfo.xAxis, m_axisLimits[xIndex]);
