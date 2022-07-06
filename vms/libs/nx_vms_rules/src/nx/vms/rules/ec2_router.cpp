@@ -17,7 +17,8 @@ namespace {
 
 const auto kFakeHandler = [](int /*handle*/, ec2::ErrorCode errorCode)
 {
-    qDebug() << toString(errorCode);
+    if (errorCode != ec2::ErrorCode::ok)
+        NX_ERROR(NX_SCOPE_TAG, "Event routing error: %1", toString(errorCode));
 };
 
 }
