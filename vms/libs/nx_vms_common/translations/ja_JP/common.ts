@@ -1104,47 +1104,47 @@
     </message>
     <message>
       <source>LDAP URI</source>
-      <translation type="unfinished">LDAP URI</translation>
+      <translation>LDAP URI</translation>
     </message>
     <message>
       <source>LDAP Admin DN</source>
-      <translation type="unfinished">LDAP Admin DN</translation>
+      <translation>LDAP管理者DN</translation>
     </message>
     <message>
       <source>LDAP Admin password</source>
-      <translation type="unfinished">LDAP Admin password</translation>
+      <translation>LDAP管理者パスワード</translation>
     </message>
     <message>
       <source>LDAP search base</source>
-      <translation type="unfinished">LDAP search base</translation>
+      <translation>LDAP検索ベース</translation>
     </message>
     <message>
       <source>LDAP search filter</source>
-      <translation type="unfinished">LDAP search filter</translation>
+      <translation>LDAP検索フィルター</translation>
     </message>
     <message>
       <source>LDAP password expiration (milliseconds)</source>
-      <translation type="unfinished">LDAP password expiration (milliseconds)</translation>
+      <translation>LDAPパスワードの有効期限 (ミリ秒)</translation>
     </message>
     <message>
       <source>LDAP search timeout (seconds)</source>
-      <translation type="unfinished">LDAP search timeout (seconds)</translation>
+      <translation>LDAP 検索タイムアウト(秒)</translation>
     </message>
     <message>
       <source>Anonymous statistics report allowed</source>
-      <translation type="unfinished">Anonymous statistics report allowed</translation>
+      <translation>匿名の統計レポートを許可</translation>
     </message>
     <message>
       <source>Anonymous statistics report last time</source>
-      <translation type="unfinished">Anonymous statistics report last time</translation>
+      <translation>前回の匿名統計レポート</translation>
     </message>
     <message>
       <source>Anonymous statistics report last version</source>
-      <translation type="unfinished">Anonymous statistics report last version</translation>
+      <translation>匿名統計レポートの最終バージョン</translation>
     </message>
     <message>
       <source>Anonymous statistics report last number</source>
-      <translation type="unfinished">Anonymous statistics report last number</translation>
+      <translation>匿名統計レポートの最後の番号</translation>
     </message>
     <message>
       <source>Anonymous statistics time cycle</source>

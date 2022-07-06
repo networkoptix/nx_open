@@ -61,7 +61,7 @@
     </message>
     <message>
       <source>User interaction required</source>
-      <translation type="unfinished">User interaction required</translation>
+      <translation>Ação do usuário necessária</translation>
     </message>
   </context>
   <context>
@@ -1016,7 +1016,7 @@
     </message>
     <message>
       <source>Archive filter...</source>
-      <translation type="unfinished">Archive filter...</translation>
+      <translation>Filtro de arquivo...</translation>
     </message>
     <message>
       <source>Copy Bookmark Text</source>
@@ -1036,7 +1036,7 @@
     </message>
     <message>
       <source>Replace Camera...</source>
-      <translation type="unfinished">Replace Camera...</translation>
+      <translation>Substituir câmera...</translation>
     </message>
   </context>
   <context>
@@ -1318,15 +1318,15 @@
     </message>
     <message>
       <source>If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to %1.</source>
-      <translation type="unfinished">If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to %1.</translation>
+      <translation>Se o sistema&apos;não tiver acesso à Internet, para obter o arquivo de ativação, envie a chave de licença e o ID de hardware fornecidos para %1.</translation>
     </message>
     <message>
       <source>If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to your Regional / License support:</source>
-      <translation type="unfinished">If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to your Regional / License support:</translation>
+      <translation>Se o sistema&apos;não tiver acesso à Internet, para obter o arquivo de ativação, envie a chave de licença e o ID de hardware fornecidos para o suporte regional/de licença:</translation>
     </message>
     <message>
       <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <translation>ID do hardware</translation>
     </message>
     <message>
       <source>License Key</source>
@@ -1334,11 +1334,11 @@
     </message>
     <message>
       <source>Failed to activate free license</source>
-      <translation type="unfinished">Failed to activate free license</translation>
+      <translation>Falha ao ativar a licença gratuita</translation>
     </message>
     <message>
       <source>Copy parameters</source>
-      <translation type="unfinished">Copy parameters</translation>
+      <translation>Copiar parâmetros</translation>
     </message>
     <message>
       <source>Copied</source>
@@ -1347,8 +1347,8 @@
     <message>
       <source>Hardware ID: %1
 License Key: %2</source>
-      <translation type="unfinished">Hardware ID: %1
-License Key: %2</translation>
+      <translation>ID de hardware: %1
+Chave de licença: %2</translation>
     </message>
   </context>
   <context>
@@ -1493,11 +1493,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Unsecure</source>
-      <translation type="unfinished">Unsecure</translation>
+      <translation>Inseguro</translation>
     </message>
     <message>
       <source>Check</source>
-      <translation type="unfinished">Check</translation>
+      <translation>Verificar</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
@@ -1505,7 +1505,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>URL is not valid.</source>
-      <translation type="unfinished">URL is not valid.</translation>
+      <translation>URL não válida.</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
@@ -1513,11 +1513,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Active</source>
-      <translation type="unfinished">Active</translation>
+      <translation>Ativo</translation>
     </message>
     <message>
       <source>Not configured</source>
-      <translation type="unfinished">Not configured</translation>
+      <translation>Não configurado</translation>
     </message>
     <message>
       <source>Error</source>
@@ -1525,35 +1525,35 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Set your email address or SMTP server</source>
-      <translation type="unfinished">Set your email address or SMTP server</translation>
+      <translation>Defina seu endereço de e-mail ou servidor SMTP</translation>
     </message>
     <message>
       <source>Unable to test email settings due to no internetconnection on any of the active servers</source>
-      <translation type="unfinished">Unable to test email settings due to no internetconnection on any of the active servers</translation>
+      <translation>Não foi possível testar as configurações de e-mail devido à falta de conexão com a Internet em nenhum dos servidores ativos</translation>
     </message>
     <message>
       <source>%1 users are receiving emails</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users are receiving emails</translation>
+      <translation>%1 usuários estão recebendo e-mails</translation>
     </message>
     <message>
       <source>%1 users will start receiving emails right after you apply settings</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users will start receiving emails right after you apply settings</translation>
+      <translation>%1 usuários começarão a receber e-mails logo após você aplicar as configurações</translation>
     </message>
     <message>
       <source>%1 is not available</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 is not available</translation>
+      <translation>%1 não está disponível</translation>
     </message>
     <message>
       <source>Route via %1</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">Route via %1</translation>
+      <translation>Rota por %1</translation>
     </message>
     <message>
       <source>Route via SMTP server</source>
-      <translation type="unfinished">Route via SMTP server</translation>
+      <translation>Rota via servidor SMTP</translation>
     </message>
     <message>
       <source>Success</source>
@@ -5467,11 +5467,11 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>User Management</source>
-      <translation type="unfinished">User Management</translation>
+      <translation>Gerenciamento de usuários</translation>
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Integrações</translation>
     </message>
   </context>
   <context>
@@ -5624,7 +5624,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Remote archive synchronization available</source>
-      <translation type="unfinished">Remote archive synchronization available</translation>
+      <translation>Sincronização remota de arquivos disponível</translation>
     </message>
   </context>
   <context>
@@ -6711,7 +6711,7 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     </message>
     <message>
       <source>Move Group without them</source>
-      <translation type="unfinished">Move Group without them</translation>
+      <translation>Mover grupo sem eles</translation>
     </message>
   </context>
   <context>
@@ -7447,7 +7447,7 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     </message>
     <message>
       <source>default</source>
-      <translation type="unfinished">default</translation>
+      <translation>padrão</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -7460,7 +7460,7 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     </message>
     <message>
       <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</translation>
+      <translation>O vídeo gravado no armazenamento interno da câmera&apos;s não será carregado no arquivo principal.</translation>
     </message>
   </context>
   <context>
@@ -7547,19 +7547,19 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     <name>nx::vms::client::desktop::CameraReplacementDialog</name>
     <message>
       <source>Failed to replace camera</source>
-      <translation type="unfinished">Failed to replace camera</translation>
+      <translation>Falha ao substituir a câmera</translation>
     </message>
     <message>
       <source>Abort camera replacement?</source>
-      <translation type="unfinished">Abort camera replacement?</translation>
+      <translation>Cancelar substituição da câmera?</translation>
     </message>
     <message>
       <source>Will be transferred partially:</source>
-      <translation type="unfinished">Will be transferred partially:</translation>
+      <translation>Serão transferidos parcialmente:</translation>
     </message>
     <message>
       <source>Will not be transferred:</source>
-      <translation type="unfinished">Will not be transferred:</translation>
+      <translation>Não será transferido:</translation>
     </message>
     <message>
       <source>Next</source>
@@ -7567,32 +7567,32 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     </message>
     <message>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Concluído</translation>
     </message>
     <message>
       <source>Camera for Replacement</source>
-      <translation type="unfinished">Camera for Replacement</translation>
+      <translation>Câmera para substituição</translation>
     </message>
     <message>
       <source>%1 will be replaced by selected camera and removed from the system</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation type="unfinished">%1 will be replaced by selected camera and removed from the system</translation>
+      <translation>%1 será substituído pela câmera selecionada e removido do sistema</translation>
     </message>
     <message>
       <source>Data for Transfer</source>
-      <translation type="unfinished">Data for Transfer</translation>
+      <translation>Dados para transferência</translation>
     </message>
     <message>
       <source>Checking if the data from the camera can be transferred to the new one.</source>
-      <translation type="unfinished">Checking if the data from the camera can be transferred to the new one.</translation>
+      <translation>Verificando se os dados da câmera podem ser transferidos para a nova.</translation>
     </message>
     <message>
       <source>Some data and settings may not supported for new Camera</source>
-      <translation type="unfinished">Some data and settings may not supported for new Camera</translation>
+      <translation>Alguns dados e configurações podem não ser compatíveis com a nova câmera</translation>
     </message>
     <message>
       <source>Camera replaced!</source>
-      <translation type="unfinished">Camera replaced!</translation>
+      <translation>Câmera substituída!</translation>
     </message>
   </context>
   <context>
@@ -7774,7 +7774,7 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Integrações</translation>
     </message>
   </context>
   <context>
@@ -7882,31 +7882,31 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     <name>nx::vms::client::desktop::ChunksFilterActionFactory</name>
     <message>
       <source>No filter</source>
-      <translation type="unfinished">No filter</translation>
+      <translation>Sem filtro</translation>
     </message>
     <message>
       <source>Main storage only</source>
-      <translation type="unfinished">Main storage only</translation>
+      <translation>Apenas armazenamento principal</translation>
     </message>
     <message>
       <source>Backup storage only</source>
-      <translation type="unfinished">Backup storage only</translation>
+      <translation>Apenas armazenamento de backup</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ClientApiAuthDialog</name>
     <message>
       <source>This webpage is requesting access to your account for authorization</source>
-      <translation type="unfinished">This webpage is requesting access to your account for authorization</translation>
+      <translation>Esta página da Web está solicitando acesso à sua conta para autorização</translation>
     </message>
     <message>
       <source>Your confirmation is required to provide a token to</source>
       <comment>... a web page (below there is a web page name with an icon)</comment>
-      <translation type="unfinished">Your confirmation is required to provide a token to</translation>
+      <translation>Sua confirmação é necessária para fornecer um token para</translation>
     </message>
     <message>
       <source>Allow</source>
-      <translation type="unfinished">Allow</translation>
+      <translation>Permitir</translation>
     </message>
   </context>
   <context>
@@ -9337,7 +9337,7 @@ Você pode forçá-lo, mas pode aumentar significativamente a carga da CPU.</tra
     </message>
     <message>
       <source>Uploading client packages to Servers...</source>
-      <translation type="unfinished">Uploading client packages to Servers...</translation>
+      <translation>Enviando pacotes do cliente para os servidores...</translation>
     </message>
     <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
@@ -9664,7 +9664,7 @@ Você pode forçá-lo, mas pode aumentar significativamente a carga da CPU.</tra
     </message>
     <message>
       <source>The webpage is able to interact with the Desktop Client and request access to the user session</source>
-      <translation type="unfinished">The webpage is able to interact with the Desktop Client and request access to the user session</translation>
+      <translation>A página da Web é capaz de interagir com o Desktop Client e solicitar acesso à sessão do usuário</translation>
     </message>
   </context>
   <context>
@@ -10148,8 +10148,8 @@ Cuidado: Esta senha não pode ser redefinida. Se você perdê-lo, o arquivo ser�
     <message>
       <source>Someone may be impersonating %1 to steal your personal information.
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
-Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
+      <translation>Alguém pode estar se passando por %1 para roubar suas informações pessoais.
+Não fixe este certificado se você&apos;t modificou o certificado SSL %2 servidores.</translation>
     </message>
   </context>
   <context>
@@ -10394,23 +10394,23 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Replaced camera discovered</source>
-      <translation type="unfinished">Replaced camera discovered</translation>
+      <translation>Câmera substituída descoberta</translation>
     </message>
     <message>
       <source>Export in progress...</source>
-      <translation type="unfinished">Export in progress...</translation>
+      <translation>Exportação em andamento...</translation>
     </message>
     <message>
       <source>Camera %1 has been replaced by %2.</source>
-      <translation type="unfinished">Camera %1 has been replaced by %2.</translation>
+      <translation>A câmera %1 foi substituída por %2.</translation>
     </message>
     <message>
       <source>Click on the &quot;Undo Replace&quot; button to continue using two devices.</source>
-      <translation type="unfinished">Click on the &quot;Undo Replace&quot; button to continue using two devices.</translation>
+      <translation>Clique no botão &quot;Undo Replace&quot; para continuar usando dois dispositivos.</translation>
     </message>
     <message>
       <source>Undo Replace</source>
-      <translation type="unfinished">Undo Replace</translation>
+      <translation>Desfazer Substituir</translation>
     </message>
   </context>
   <context>
@@ -10590,15 +10590,15 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::UserGroupListModel</name>
     <message>
       <source>LDAP group</source>
-      <translation type="unfinished">LDAP group</translation>
+      <translation>Grupo LDAP</translation>
     </message>
     <message>
       <source>Built-in group</source>
-      <translation type="unfinished">Built-in group</translation>
+      <translation>Grupos incorporados</translation>
     </message>
     <message>
       <source>Custom group</source>
-      <translation type="unfinished">Custom group</translation>
+      <translation>Grupo personalizado</translation>
     </message>
     <message>
       <source>Name</source>
@@ -10610,7 +10610,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Member of</source>
-      <translation type="unfinished">Member of</translation>
+      <translation>Membro de</translation>
     </message>
     <message>
       <source>Permissions</source>
@@ -10653,7 +10653,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupos</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -10668,7 +10668,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>Desativar</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -10676,7 +10676,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
+      <translation>Forçar autenticação segura</translation>
     </message>
     <message>
       <source>All users</source>
@@ -10695,11 +10695,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupos</translation>
     </message>
     <message>
       <source>LDAP</source>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
   </context>
   <context>
@@ -11163,7 +11163,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::rules::ModificationMarkItemDelegate</name>
     <message>
       <source>Not saved</source>
-      <translation type="unfinished">Not saved</translation>
+      <translation>Não salvo</translation>
     </message>
   </context>
   <context>
@@ -11174,7 +11174,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Apply changes failed.</source>
-      <translation type="unfinished">Apply changes failed.</translation>
+      <translation>Falha ao aplicar as alterações.</translation>
     </message>
     <message>
       <source>Restore all rules to default?</source>
@@ -11186,7 +11186,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Restore rules failed.</source>
-      <translation type="unfinished">Restore rules failed.</translation>
+      <translation>As regras de restauração falharam.</translation>
     </message>
   </context>
   <context>
@@ -11204,7 +11204,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::rules::SourcePickerWidget</name>
     <message>
       <source>Select at least one User</source>
-      <translation type="unfinished">Select at least one User</translation>
+      <translation>Selecione pelo menos um usuário</translation>
     </message>
   </context>
   <context>
@@ -11649,15 +11649,15 @@ Você pode selecionar outro local de armazenamento na &quot;Gerenciamento de arm
     </message>
     <message>
       <source>There are no suitable cameras for replacement on the %1</source>
-      <translation type="unfinished">There are no suitable cameras for replacement on the %1</translation>
+      <translation>Não há câmeras adequadas para substituição no %1</translation>
     </message>
     <message>
       <source>Undo replacement completed successfully!</source>
-      <translation type="unfinished">Undo replacement completed successfully!</translation>
+      <translation>Desfazer substituição concluída com sucesso!</translation>
     </message>
     <message>
       <source>Some settings may not be transferred from the replaced camera due to compatibility issues.</source>
-      <translation type="unfinished">Some settings may not be transferred from the replaced camera due to compatibility issues.</translation>
+      <translation>Algumas configurações podem não ser transferidas da câmera substituída devido a problemas de compatibilidade.</translation>
     </message>
   </context>
   <context>

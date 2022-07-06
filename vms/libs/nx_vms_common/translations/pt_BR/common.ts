@@ -1106,460 +1106,460 @@
     <name>SystemSettings</name>
     <message>
       <source>SMTP host</source>
-      <translation type="unfinished">SMTP host</translation>
+      <translation>Servidor SMTP</translation>
     </message>
     <message>
       <source>Email from</source>
-      <translation type="unfinished">Email from</translation>
+      <translation>E-mail de</translation>
     </message>
     <message>
       <source>SMTP user</source>
-      <translation type="unfinished">SMTP user</translation>
+      <translation>Usuário SMTP</translation>
     </message>
     <message>
       <source>SMTP password</source>
-      <translation type="unfinished">SMTP password</translation>
+      <translation>Senha SMTP</translation>
     </message>
     <message>
       <source>Email signature</source>
-      <translation type="unfinished">Email signature</translation>
+      <translation>Assinatura de e-mail</translation>
     </message>
     <message>
       <source>Email support link</source>
-      <translation type="unfinished">Email support link</translation>
+      <translation>Link de suporte por e-mail</translation>
     </message>
     <message>
       <source>SMTP connection type</source>
-      <translation type="unfinished">SMTP connection type</translation>
+      <translation>Tipo de conexão SMTP</translation>
     </message>
     <message>
       <source>SMTP port</source>
-      <translation type="unfinished">SMTP port</translation>
+      <translation>Porta SMTP</translation>
     </message>
     <message>
       <source>SMTP timeout (seconds)</source>
-      <translation type="unfinished">SMTP timeout (seconds)</translation>
+      <translation>Tempo limite SMTP (segundos)</translation>
     </message>
     <message>
       <source>SMTP use simple settings view in Client</source>
-      <translation type="unfinished">SMTP use simple settings view in Client</translation>
+      <translation>SMTP usa a visualização de configurações simples no cliente</translation>
     </message>
     <message>
       <source>SMTP name</source>
-      <translation type="unfinished">SMTP name</translation>
+      <translation>Nome SMTP</translation>
     </message>
     <message>
       <source>LDAP URI</source>
-      <translation type="unfinished">LDAP URI</translation>
+      <translation>URL do LDAP</translation>
     </message>
     <message>
       <source>LDAP Admin DN</source>
-      <translation type="unfinished">LDAP Admin DN</translation>
+      <translation>LDAP Admin DN</translation>
     </message>
     <message>
       <source>LDAP Admin password</source>
-      <translation type="unfinished">LDAP Admin password</translation>
+      <translation>Senha de administrador LDAP</translation>
     </message>
     <message>
       <source>LDAP search base</source>
-      <translation type="unfinished">LDAP search base</translation>
+      <translation>Base de pesquisa LDAP</translation>
     </message>
     <message>
       <source>LDAP search filter</source>
-      <translation type="unfinished">LDAP search filter</translation>
+      <translation>Filtro de pesquisa LDAP</translation>
     </message>
     <message>
       <source>LDAP password expiration (milliseconds)</source>
-      <translation type="unfinished">LDAP password expiration (milliseconds)</translation>
+      <translation>Expiração da senha LDAP (milissegundos)</translation>
     </message>
     <message>
       <source>LDAP search timeout (seconds)</source>
-      <translation type="unfinished">LDAP search timeout (seconds)</translation>
+      <translation>Tempo limite de pesquisa LDAP (segundos)</translation>
     </message>
     <message>
       <source>Anonymous statistics report allowed</source>
-      <translation type="unfinished">Anonymous statistics report allowed</translation>
+      <translation>Relatório de estatísticas anônimas permitido</translation>
     </message>
     <message>
       <source>Anonymous statistics report last time</source>
-      <translation type="unfinished">Anonymous statistics report last time</translation>
+      <translation>Relatório de estatísticas anônimas da última vez</translation>
     </message>
     <message>
       <source>Anonymous statistics report last version</source>
-      <translation type="unfinished">Anonymous statistics report last version</translation>
+      <translation>Relatório de estatísticas anônimas última versão</translation>
     </message>
     <message>
       <source>Anonymous statistics report last number</source>
-      <translation type="unfinished">Anonymous statistics report last number</translation>
+      <translation>Estatísticas anônimas informam o último número</translation>
     </message>
     <message>
       <source>Anonymous statistics time cycle</source>
-      <translation type="unfinished">Anonymous statistics time cycle</translation>
+      <translation>Ciclo de tempo de estatísticas anônimas</translation>
     </message>
     <message>
       <source>Anonymous statistics report delay after update</source>
-      <translation type="unfinished">Anonymous statistics report delay after update</translation>
+      <translation>Estatísticas anônimas relatam atraso após atualização</translation>
     </message>
     <message>
       <source>Anonymous Statistics Report Server URL</source>
-      <translation type="unfinished">Anonymous Statistics Report Server URL</translation>
+      <translation>URL do servidor de relatório de estatísticas anônimas</translation>
     </message>
     <message>
       <source>Anonymous statistics report Client settings</source>
-      <translation type="unfinished">Anonymous statistics report Client settings</translation>
+      <translation>Relatório de estatísticas anônimas Configurações do cliente</translation>
     </message>
     <message>
       <source>System alive update interval (seconds, 1s-1h)</source>
-      <translation type="unfinished">System alive update interval (seconds, 1s-1h)</translation>
+      <translation>Intervalo de atualização ativa do sistema (segundos, 1s-1h)</translation>
     </message>
     <message>
       <source>Proxy connection timeout (seconds, 1s-1h)</source>
-      <translation type="unfinished">Proxy connection timeout (seconds, 1s-1h)</translation>
+      <translation>Tempo limite de conexão do proxy (segundos, 1s-1h)</translation>
     </message>
     <message>
       <source>Time synchronization enabled</source>
-      <translation type="unfinished">Time synchronization enabled</translation>
+      <translation>Sincronização de tempo ativada</translation>
     </message>
     <message>
       <source>Primary time synchronization Server ID</source>
-      <translation type="unfinished">Primary time synchronization Server ID</translation>
+      <translation>ID do servidor de sincronização de horário principal</translation>
     </message>
     <message>
       <source>Max difference between local and source time (milliseconds)</source>
-      <translation type="unfinished">Max difference between local and source time (milliseconds)</translation>
+      <translation>Diferença máxima entre hora local e de origem (milissegundos)</translation>
     </message>
     <message>
       <source>OS time change check period</source>
-      <translation type="unfinished">OS time change check period</translation>
+      <translation>Período de verificação de mudança de horário do SO</translation>
     </message>
     <message>
       <source>Sync time synchronization interval for network requests</source>
-      <translation type="unfinished">Sync time synchronization interval for network requests</translation>
+      <translation>Intervalo de sincronização de tempo de sincronização para solicitações de rede</translation>
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
-      <translation type="unfinished">Sync time epsilon. New value is not applied if time delta less than epsilon</translation>
+      <translation>Sincronizar tempo epsilon. O novo valor não é aplicado se o delta do tempo for menor que epsilon</translation>
     </message>
     <message>
       <source>Cloud owner account</source>
-      <translation type="unfinished">Cloud owner account</translation>
+      <translation>Conta do proprietário da nuvem</translation>
     </message>
     <message>
       <source>Cloud System ID</source>
-      <translation type="unfinished">Cloud System ID</translation>
+      <translation>Id do sistema em nuvem</translation>
     </message>
     <message>
       <source>Cloud authorization key</source>
-      <translation type="unfinished">Cloud authorization key</translation>
+      <translation>Chave de autorização na nuvem</translation>
     </message>
     <message>
       <source>System name</source>
-      <translation type="unfinished">System name</translation>
+      <translation>Nome do Sistema</translation>
     </message>
     <message>
       <source>Local System ID</source>
-      <translation type="unfinished">Local System ID</translation>
+      <translation>ID do sistema local</translation>
     </message>
     <message>
       <source>Last master System merge ID</source>
-      <translation type="unfinished">Last master System merge ID</translation>
+      <translation>Último ID de mesclagem do sistema mestre</translation>
     </message>
     <message>
       <source>Last slave System merge ID</source>
-      <translation type="unfinished">Last slave System merge ID</translation>
+      <translation>ID de mesclagem do último sistema escravo</translation>
     </message>
     <message>
       <source>Disable Device vendors</source>
-      <translation type="unfinished">Disable Device vendors</translation>
+      <translation>Desativar fornecedores de dispositivos</translation>
     </message>
     <message>
       <source>Optimize Camera settings</source>
-      <translation type="unfinished">Optimize Camera settings</translation>
+      <translation>Otimize as configurações da câmera</translation>
     </message>
     <message>
       <source>Thumbnails auto-update</source>
-      <translation type="unfinished">Thumbnails auto-update</translation>
+      <translation>Atualização automática de miniaturas</translation>
     </message>
     <message>
       <source>Use %1 service to send emails instead of SMTP client</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">Use %1 service to send emails instead of SMTP client</translation>
+      <translation>Use %1 serviço para enviar e-mails em vez do cliente SMTP</translation>
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
-      <translation type="unfinished">Max scene items (0 means default)</translation>
+      <translation>Máximo de itens de cena (0 significa padrão)</translation>
     </message>
     <message>
       <source>Send plain-text emails</source>
-      <translation type="unfinished">Send plain-text emails</translation>
+      <translation>Envie e-mails de texto simples</translation>
     </message>
     <message>
       <source>Use Windows line feed in emails</source>
-      <translation type="unfinished">Use Windows line feed in emails</translation>
+      <translation>Use o feed de linha do Windows em e-mails</translation>
     </message>
     <message>
       <source>Enable audit trail</source>
-      <translation type="unfinished">Enable audit trail</translation>
+      <translation>Ativar trilha de auditoria</translation>
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
-      <translation type="unfinished">Audit trail period (days, 14-730)</translation>
+      <translation>Período da trilha de auditoria (dias, 14-730)</translation>
     </message>
     <message>
       <source>Event log period (days)</source>
-      <translation type="unfinished">Event log period (days)</translation>
+      <translation>Período de registro de eventos (dias)</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption)</source>
-      <translation type="unfinished">Enforce HTTPS (data traffic encryption)</translation>
+      <translation>Aplicar HTTPS (criptografia de tráfego de dados)</translation>
     </message>
     <message>
       <source>Enforce RTSPS (video traffic encryption)</source>
-      <translation type="unfinished">Enforce RTSPS (video traffic encryption)</translation>
+      <translation>Aplicar RTSPS (criptografia de tráfego de vídeo)</translation>
     </message>
     <message>
       <source>Enable auto-discovery</source>
-      <translation type="unfinished">Enable auto-discovery</translation>
+      <translation>Ativar descoberta automática</translation>
     </message>
     <message>
       <source>Enable auto-update notifications</source>
-      <translation type="unfinished">Enable auto-update notifications</translation>
+      <translation>Ativar notificações de atualização automática</translation>
     </message>
     <message>
       <source>Enable update notifications</source>
-      <translation type="unfinished">Enable update notifications</translation>
+      <translation>Ativar notificações de atualização</translation>
     </message>
     <message>
       <source>Enable UPNP port-mapping</source>
-      <translation type="unfinished">Enable UPNP port-mapping</translation>
+      <translation>Ativar mapeamento de porta UPNP</translation>
     </message>
     <message>
       <source>Backup settings</source>
-      <translation type="unfinished">Backup settings</translation>
+      <translation>Configurações de backup</translation>
     </message>
     <message>
       <source>Cloud host override</source>
-      <translation type="unfinished">Cloud host override</translation>
+      <translation>Substituição do host da nuvem</translation>
     </message>
     <message>
       <source>Enable crossdomain policy</source>
-      <translation type="unfinished">Enable crossdomain policy</translation>
+      <translation>Ativar política entre domínios</translation>
     </message>
     <message>
       <source>Enable RTSP for Arecont</source>
-      <translation type="unfinished">Enable RTSP for Arecont</translation>
+      <translation>Habilitar RTSP para Arecont</translation>
     </message>
     <message>
       <source>Enable sequential Flir ONVIF searcher</source>
-      <translation type="unfinished">Enable sequential Flir ONVIF searcher</translation>
+      <translation>Ativar buscador sequencial Flir ONVIF</translation>
     </message>
     <message>
       <source>Max P2P queue size (bytes, 32-512MB)</source>
-      <translation type="unfinished">Max P2P queue size (bytes, 32-512MB)</translation>
+      <translation>Tamanho máximo da fila P₂P (‘bytes’, 32 – 512 Mb)</translation>
     </message>
     <message>
       <source>Max P2P all clients size (bytes, 32-512MB)</source>
-      <translation type="unfinished">Max P2P all clients size (bytes, 32-512MB)</translation>
+      <translation>Tamanho máximo da fila P₂P (‘bytes’, 32 – 512 Mb)</translation>
     </message>
     <message>
       <source>Max record queue size (bytes, 6-96MB)</source>
-      <translation type="unfinished">Max record queue size (bytes, 6-96MB)</translation>
+      <translation>Tamanho máximo da fila de gravação (bytes, 6-96 MB)</translation>
     </message>
     <message>
       <source>Max record queue size (elements, 250-4000)</source>
-      <translation type="unfinished">Max record queue size (elements, 250-4000)</translation>
+      <translation>Tamanho máximo da fila de registros (elementos, 250-4000)</translation>
     </message>
     <message>
       <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value &gt;=2 to this parameter.</source>
-      <translation type="unfinished">Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value &gt;=2 to this parameter.</translation>
+      <translation>Quantidade máxima de conexões HTTP usando transcodificação para o servidor. O Chrome abre 2 conexões ao mesmo tempo e fecha a primeira. Portanto, é recomendável definir o valor &gt;=2 para este parâmetro.</translation>
     </message>
     <message>
       <source>RTP retry count</source>
-      <translation type="unfinished">RTP retry count</translation>
+      <translation>Contagem de tentativas de RTP</translation>
     </message>
     <message>
       <source>RTP timeout (milliseconds)</source>
-      <translation type="unfinished">RTP timeout (milliseconds)</translation>
+      <translation>Tempo limite RTP (milissegundos)</translation>
     </message>
     <message>
       <source>Max RTSP connection duration (seconds)</source>
-      <translation type="unfinished">Max RTSP connection duration (seconds)</translation>
+      <translation>Duração máxima da conexão RTSP (segundos)</translation>
     </message>
     <message>
       <source>Enable cloud-connect UDP hole-punching</source>
-      <translation type="unfinished">Enable cloud-connect UDP hole-punching</translation>
+      <translation>Ativar perfuração UDP de conexão na nuvem</translation>
     </message>
     <message>
       <source>Enable cloud-connect relays usage</source>
-      <translation type="unfinished">Enable cloud-connect relays usage</translation>
+      <translation>Ativar o uso de retransmissores conectados à nuvem</translation>
     </message>
     <message>
       <source>Enforce SSL for cloud-connect relays</source>
-      <translation type="unfinished">Enforce SSL for cloud-connect relays</translation>
+      <translation>Aplicar SSL para retransmissões conectadas à nuvem</translation>
     </message>
     <message>
       <source>Enable recording on EDGE</source>
-      <translation type="unfinished">Enable recording on EDGE</translation>
+      <translation>Ativar gravação no EDGE</translation>
     </message>
     <message>
       <source>Enable WebSocket for p2p</source>
-      <translation type="unfinished">Enable WebSocket for p2p</translation>
+      <translation>Habilitar WebSocket para p2p</translation>
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32</source>
-      <translation type="unfinished">Max thread count for remote archive synchronization (&lt;=0 - auto, max 32</translation>
+      <translation>Contagem máxima de encadeamentos para sincronização de arquivo remoto (&lt;= 0 - automático, máximo 32</translation>
     </message>
     <message>
       <source>Target update information</source>
-      <translation type="unfinished">Target update information</translation>
+      <translation>Informações de atualização de destino</translation>
     </message>
     <message>
       <source>Installed update information</source>
-      <translation type="unfinished">Installed update information</translation>
+      <translation>Informações de atualização instalada</translation>
     </message>
     <message>
       <source>Downloader peers for files</source>
-      <translation type="unfinished">Downloader peers for files</translation>
+      <translation>Pares de download de arquivos</translation>
     </message>
     <message>
       <source>Client update settings</source>
-      <translation type="unfinished">Client update settings</translation>
+      <translation>Configurações de atualização do cliente</translation>
     </message>
     <message>
       <source>Thread count limit for Camera archive synchronization</source>
-      <translation type="unfinished">Thread count limit for Camera archive synchronization</translation>
+      <translation>Contagem limite de tópicos para a sincronização do arquivo da câmera</translation>
     </message>
     <message>
       <source>Watermark settings</source>
-      <translation type="unfinished">Watermark settings</translation>
+      <translation>Configurações de marca d'água</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (minutes)</source>
-      <translation type="unfinished">Authorization Session token lifetime (minutes)</translation>
+      <translation>Tempo de vida do token da sessão de autorização (minutos)</translation>
     </message>
     <message>
       <source>Session token count limit on a single Server</source>
-      <translation type="unfinished">Session token count limit on a single Server</translation>
+      <translation>Limite de contagem de token de sessão em um único servidor</translation>
     </message>
     <message>
       <source>Max session token count per user on single Server</source>
-      <translation type="unfinished">Max session token count per user on single Server</translation>
+      <translation>Contagem máxima de tokens de sessão por usuário em um único servidor</translation>
     </message>
     <message>
       <source>Update interval for remote session token cache (other Servers and Cloud)</source>
-      <translation type="unfinished">Update interval for remote session token cache (other Servers and Cloud)</translation>
+      <translation>Intervalo de atualização para cache de token de sessão remota (outros servidores e nuvem)</translation>
     </message>
     <message>
       <source>Timeout for remote session token cache (other Servers and Cloud)</source>
-      <translation type="unfinished">Timeout for remote session token cache (other Servers and Cloud)</translation>
+      <translation>Tempo limite para cache de token de sessão remota (outros servidores e nuvem)</translation>
     </message>
     <message>
       <source>Default video codec</source>
-      <translation type="unfinished">Default video codec</translation>
+      <translation>Codec de vídeo padrão</translation>
     </message>
     <message>
       <source>Default codec for export video</source>
-      <translation type="unfinished">Default codec for export video</translation>
+      <translation>Codec padrão para vídeo de exportação</translation>
     </message>
     <message>
       <source>Low quality screen video codec</source>
-      <translation type="unfinished">Low quality screen video codec</translation>
+      <translation>Codec de vídeo de tela de baixa qualidade</translation>
     </message>
     <message>
       <source>License server</source>
-      <translation type="unfinished">License server</translation>
+      <translation>Servidor de licenças</translation>
     </message>
     <message>
       <source>URI for resource_data.json automatic update</source>
-      <translation type="unfinished">URI for resource_data.json automatic update</translation>
+      <translation>URI para atualização automática de resource_data.json</translation>
     </message>
     <message>
       <source>Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation type="unfinished">Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
+      <translation>Máximo de registros de log de eventos a serem mantidos no banco de dados. A quantidade real de registros não excluídos pode ser até 20% maior que o valor especificado.</translation>
     </message>
     <message>
       <source>Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
-      <translation type="unfinished">Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</translation>
+      <translation>Se alguns quadros devem ser armazenados em cache para o fluxo primário. Valores: &apos;sim&apos; - sempre habilitado (pode usar muita RAM), &apos;não&apos; - sempre desabilitado exceto quando exigido pelo playback (ex. HLS), &apos;auto&apos; - semelhante a &apos;não&apos;, mas ligado quando melhora o experiência do usuário (por exemplo, quando algum plug-in do Analytics está funcionando na câmera).</translation>
     </message>
     <message>
       <source>Meta data storage change policy</source>
-      <translation type="unfinished">Meta data storage change policy</translation>
+      <translation>Política de alteração de armazenamento de metadados</translation>
     </message>
     <message>
       <source>Persistent Servers for update storage</source>
-      <translation type="unfinished">Persistent Servers for update storage</translation>
+      <translation>Servidores persistentes para armazenamento de atualizações</translation>
     </message>
     <message>
       <source>Persistent Servers where updates are stored</source>
-      <translation type="unfinished">Persistent Servers where updates are stored</translation>
+      <translation>Servidores persistentes onde as atualizações são armazenadas</translation>
     </message>
     <message>
       <source>VMS Server version specific features</source>
-      <translation type="unfinished">VMS Server version specific features</translation>
+      <translation>Recursos específicos da versão do servidor VMS</translation>
     </message>
     <message>
       <source>Language for mobile push notifications</source>
-      <translation type="unfinished">Language for mobile push notifications</translation>
+      <translation>Idioma para notificações push "Mobile"</translation>
     </message>
     <message>
       <source>Additional local FS storage types for recording</source>
-      <translation type="unfinished">Additional local FS storage types for recording</translation>
+      <translation>Tipos adicionais de armazenamento FS local para gravação</translation>
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the Device</source>
-      <translation type="unfinished">Keep IO port state on when Server connects to the Device</translation>
+      <translation>Mantenha o estado da porta IO ativado quando o servidor se conectar ao dispositivo</translation>
     </message>
     <message>
       <source>Media buffer size (KB, 10KB-4Mb)</source>
-      <translation type="unfinished">Media buffer size (KB, 10KB-4Mb)</translation>
+      <translation>Tamanho do buffer de mídia (KB, 10KB-4Mb)</translation>
     </message>
     <message>
       <source>Media buffer size for audio only Devices (KB, 1Kb-1MB)</source>
-      <translation type="unfinished">Media buffer size for audio only Devices (KB, 1Kb-1MB)</translation>
+      <translation>Tamanho do buffer de mídia para dispositivos somente de áudio (KB, 1Kb-1MB)</translation>
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>
-      <translation type="unfinished">Force analytics DB storage mount point permissions in case of failure</translation>
+      <translation>Forçar permissões de ponto de montagem de armazenamento de banco de dados de análise em caso de falha</translation>
     </message>
     <message>
       <source>Check video stream period (milliseconds)</source>
-      <translation type="unfinished">Check video stream period (milliseconds)</translation>
+      <translation>Verifique o período do fluxo de vídeo (milissegundos)</translation>
     </message>
     <message>
       <source>Storage encryption enabled</source>
-      <translation type="unfinished">Storage encryption enabled</translation>
+      <translation>Criptografia de armazenamento ativada</translation>
     </message>
     <message>
       <source>Current storage encryption key</source>
-      <translation type="unfinished">Current storage encryption key</translation>
+      <translation>Chave de criptografia de armazenamento atual</translation>
     </message>
     <message>
       <source>Show Servers in tree for non-admins</source>
-      <translation type="unfinished">Show Servers in tree for non-admins</translation>
+      <translation>Exibir Servidores na árvore para não-administradores</translation>
     </message>
     <message>
       <source>HTTP header: Origin</source>
-      <translation type="unfinished">HTTP header: Origin</translation>
+      <translation>Cabeçalho HTTP: Origem</translation>
     </message>
     <message>
       <source>HTTP header: X-Frame-Options</source>
-      <translation type="unfinished">HTTP header: X-Frame-Options</translation>
+      <translation>Cabeçalho HTTP: X-Frame-Options</translation>
     </message>
     <message>
       <source>Use only HTTPS for Cameras</source>
-      <translation type="unfinished">Use only HTTPS for Cameras</translation>
+      <translation>Use apenas HTTPS para câmeras</translation>
     </message>
     <message>
       <source>Enable insecure deprecated API</source>
-      <translation type="unfinished">Enable insecure deprecated API</translation>
+      <translation>Ativar API obsoleta insegura</translation>
     </message>
     <message>
       <source>Enable insecure deprecated API functions curently in use by Nx products</source>
-      <translation type="unfinished">Enable insecure deprecated API functions curently in use by Nx products</translation>
+      <translation>Habilitar funções de API obsoletas inseguras atualmente em uso por produtos Nx</translation>
     </message>
     <message>
       <source>Show mouse timeline preview</source>
-      <translation type="unfinished">Show mouse timeline preview</translation>
+      <translation>Mostrar visualização da linha do tempo do mouse</translation>
     </message>
   </context>
   <context>
@@ -2215,11 +2215,11 @@
     </message>
     <message>
       <source>Intercom informer</source>
-      <translation type="unfinished">Intercom informer</translation>
+      <translation>Informante de intercomunicação</translation>
     </message>
     <message>
       <source>Failed to backup file</source>
-      <translation type="unfinished">Failed to backup file</translation>
+      <translation>Falha ao fazer backup do arquivo</translation>
     </message>
   </context>
   <context>

@@ -635,23 +635,23 @@
     </message>
     <message>
       <source>ONVIF Settings</source>
-      <translation type="unfinished">ONVIF Settings</translation>
+      <translation>ONVIF-Einstellungen</translation>
     </message>
     <message>
       <source>Secondary stream profile</source>
-      <translation type="unfinished">Secondary stream profile</translation>
+      <translation>Sekundäres Stream-Profil</translation>
     </message>
     <message>
       <source>Primary stream profile</source>
-      <translation type="unfinished">Primary stream profile</translation>
+      <translation>Primäres Stream-Profil</translation>
     </message>
     <message>
       <source>Export From SD Cards</source>
-      <translation type="unfinished">Export From SD Cards</translation>
+      <translation>Exportieren von SD-Karten</translation>
     </message>
     <message>
       <source>Do not export video automatically</source>
-      <translation type="unfinished">Do not export video automatically</translation>
+      <translation>Video nicht automatisch exportieren</translation>
     </message>
   </context>
   <context>
@@ -769,11 +769,11 @@
     <name>CameraReplacementDialog</name>
     <message>
       <source>Camera Replacement</source>
-      <translation type="unfinished">Camera Replacement</translation>
+      <translation>Kamera-Ersatz</translation>
     </message>
     <message>
       <source>New device</source>
-      <translation type="unfinished">New device</translation>
+      <translation>Neues Gerät</translation>
     </message>
     <message>
       <source>Name</source>
@@ -781,7 +781,7 @@
     </message>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>Zurück</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -789,7 +789,7 @@
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Weiter</translation>
     </message>
   </context>
   <context>
@@ -900,11 +900,11 @@
     </message>
     <message>
       <source>This action can be set only for instant events</source>
-      <translation type="unfinished">This action can be set only for instant events</translation>
+      <translation>Diese Aktion kann nur für sofortige Ereignisse festgelegt werden</translation>
     </message>
     <message>
       <source>Select another event or action</source>
-      <translation type="unfinished">Select another event or action</translation>
+      <translation>Wählen Sie ein anderes Ereignis oder Aktion</translation>
     </message>
   </context>
   <context>
@@ -1076,7 +1076,7 @@
     </message>
     <message>
       <source>Generic event</source>
-      <translation type="unfinished">Generic event</translation>
+      <translation>Generisches Ereignis</translation>
     </message>
   </context>
   <context>
@@ -1244,19 +1244,19 @@
     <name>FooterWidget</name>
     <message>
       <source>Add Comment</source>
-      <translation type="unfinished">Add Comment</translation>
+      <translation>Kommentar hinzufügen</translation>
     </message>
     <message>
       <source>Set Schedule</source>
-      <translation type="unfinished">Set Schedule</translation>
+      <translation>Zeitplan festlegen</translation>
     </message>
     <message>
       <source>Test Action</source>
-      <translation type="unfinished">Test Action</translation>
+      <translation>Test-Aktion</translation>
     </message>
     <message>
       <source>Add some comment</source>
-      <translation type="unfinished">Add some comment</translation>
+      <translation>Kommentar hinzufügen</translation>
     </message>
   </context>
   <context>
@@ -1907,11 +1907,11 @@
     <name>OutgoingMailSettingsWidget</name>
     <message>
       <source>Connection Settings</source>
-      <translation type="unfinished">Connection Settings</translation>
+      <translation>Verbindungseinstellungen</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1919,27 +1919,27 @@
     </message>
     <message>
       <source>User</source>
-      <translation type="unfinished">User</translation>
+      <translation>Benutzer</translation>
     </message>
     <message>
       <source>Server Address</source>
-      <translation type="unfinished">Server Address</translation>
+      <translation>Server-Adresse</translation>
     </message>
     <message>
       <source>Security Protocol</source>
-      <translation type="unfinished">Security Protocol</translation>
+      <translation>Sicherheitsprotokoll</translation>
     </message>
     <message>
       <source>Email Settings</source>
-      <translation type="unfinished">Email Settings</translation>
+      <translation>Email-Einstellungen</translation>
     </message>
     <message>
       <source>Support Signature</source>
-      <translation type="unfinished">Support Signature</translation>
+      <translation>Supportsignatur</translation>
     </message>
     <message>
       <source>System Singnature</source>
-      <translation type="unfinished">System Singnature</translation>
+      <translation>Systemsignatur</translation>
     </message>
   </context>
   <context>
@@ -2056,7 +2056,7 @@
     </message>
     <message>
       <source>Preset</source>
-      <translation type="unfinished">Preset</translation>
+      <translation>Voreinstellung</translation>
     </message>
   </context>
   <context>
@@ -2467,23 +2467,23 @@
     <name>RulesDialog</name>
     <message>
       <source>Alarm/Event Rules</source>
-      <translation type="unfinished">Alarm/Event Rules</translation>
+      <translation>Alarm-/Ereignisregeln</translation>
     </message>
     <message>
       <source>New Rule</source>
-      <translation type="unfinished">New Rule</translation>
+      <translation>Neue Regel</translation>
     </message>
     <message>
       <source>Delete Rule</source>
-      <translation type="unfinished">Delete Rule</translation>
+      <translation>Regel löschen</translation>
     </message>
     <message>
       <source>Select some rule</source>
-      <translation type="unfinished">Select some rule</translation>
+      <translation>Regel auswählen</translation>
     </message>
     <message>
       <source>Reset default rules</source>
-      <translation type="unfinished">Reset default rules</translation>
+      <translation>Standardregeln zurücksetzen</translation>
     </message>
   </context>
   <context>
@@ -2795,11 +2795,11 @@
     </message>
     <message>
       <source>Sound</source>
-      <translation type="unfinished">Sound</translation>
+      <translation>Sound</translation>
     </message>
     <message>
       <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
+      <translation>Verwalten</translation>
     </message>
   </context>
   <context>
@@ -2810,7 +2810,7 @@
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Zustand</translation>
     </message>
   </context>
   <context>
@@ -3004,11 +3004,11 @@
     </message>
     <message>
       <source>+ Add Group</source>
-      <translation type="unfinished">+ Add Group</translation>
+      <translation>+ Gruppe hinzufügen</translation>
     </message>
     <message>
       <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <translation>Keine Gruppen gefunden</translation>
     </message>
   </context>
   <context>
@@ -3019,11 +3019,11 @@
     </message>
     <message>
       <source>+ Add User</source>
-      <translation type="unfinished">+ Add User</translation>
+      <translation>+ Benutzer hinzufügen</translation>
     </message>
     <message>
       <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
+      <translation>Keine Benutzer gefunden</translation>
     </message>
   </context>
   <context>
@@ -3157,7 +3157,7 @@
     </message>
     <message>
       <source>Volume</source>
-      <translation type="unfinished">Volume</translation>
+      <translation>Lautstärke</translation>
     </message>
     <message>
       <source>Test</source>

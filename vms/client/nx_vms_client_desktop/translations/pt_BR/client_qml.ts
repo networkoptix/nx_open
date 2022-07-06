@@ -154,19 +154,19 @@
     </message>
     <message>
       <source>This integration has no settings for this Camera.</source>
-      <translation type="unfinished">This integration has no settings for this Camera.</translation>
+      <translation>Esta integração não possui configurações para esta Câmera.</translation>
     </message>
     <message>
       <source>Check System Administration Settings to configure this integration.</source>
-      <translation type="unfinished">Check System Administration Settings to configure this integration.</translation>
+      <translation>Verifique as configurações de administração do sistema para configurar esta integração.</translation>
     </message>
     <message>
       <source>This integration has no settings at System level.</source>
-      <translation type="unfinished">This integration has no settings at System level.</translation>
+      <translation>Esta integração não tem configurações no nível do sistema.</translation>
     </message>
     <message>
       <source>Check Camera Settings to configure this integration.</source>
-      <translation type="unfinished">Check Camera Settings to configure this integration.</translation>
+      <translation>Verifique as configurações da câmera para configurar esta integração.</translation>
     </message>
   </context>
   <context>
@@ -278,7 +278,7 @@
     <name>CloudTile</name>
     <message>
       <source>Log in to</source>
-      <translation type="unfinished">Log in to</translation>
+      <translation>Iniciar sessão em</translation>
     </message>
   </context>
   <context>
@@ -1194,7 +1194,7 @@ para ativar PTZ</translation>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>ID lógico</translation>
     </message>
   </context>
   <context>

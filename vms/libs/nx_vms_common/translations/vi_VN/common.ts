@@ -1060,51 +1060,51 @@
     <name>SystemSettings</name>
     <message>
       <source>SMTP host</source>
-      <translation type="unfinished">SMTP host</translation>
+      <translation>Máy chủ SMTP</translation>
     </message>
     <message>
       <source>Email from</source>
-      <translation type="unfinished">Email from</translation>
+      <translation>Email từ</translation>
     </message>
     <message>
       <source>SMTP user</source>
-      <translation type="unfinished">SMTP user</translation>
+      <translation>Người dùng SMTP</translation>
     </message>
     <message>
       <source>SMTP password</source>
-      <translation type="unfinished">SMTP password</translation>
+      <translation>Mật khẩu SMTP</translation>
     </message>
     <message>
       <source>Email signature</source>
-      <translation type="unfinished">Email signature</translation>
+      <translation>Chữ ký email</translation>
     </message>
     <message>
       <source>Email support link</source>
-      <translation type="unfinished">Email support link</translation>
+      <translation>Liên kết hỗ trợ qua email</translation>
     </message>
     <message>
       <source>SMTP connection type</source>
-      <translation type="unfinished">SMTP connection type</translation>
+      <translation>Kiểu kết nối SMTP</translation>
     </message>
     <message>
       <source>SMTP port</source>
-      <translation type="unfinished">SMTP port</translation>
+      <translation>Cổng SMTP</translation>
     </message>
     <message>
       <source>SMTP timeout (seconds)</source>
-      <translation type="unfinished">SMTP timeout (seconds)</translation>
+      <translation>Thời gian chờ SMTP (giây)</translation>
     </message>
     <message>
       <source>SMTP use simple settings view in Client</source>
-      <translation type="unfinished">SMTP use simple settings view in Client</translation>
+      <translation>SMTP sử dụng chế độ xem cài đặt đơn giản trong Ứng dụng khách</translation>
     </message>
     <message>
       <source>SMTP name</source>
-      <translation type="unfinished">SMTP name</translation>
+      <translation>Tên SMTP</translation>
     </message>
     <message>
       <source>LDAP URI</source>
-      <translation type="unfinished">LDAP URI</translation>
+      <translation>URI LDAP</translation>
     </message>
     <message>
       <source>LDAP Admin DN</source>
