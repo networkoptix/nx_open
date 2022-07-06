@@ -298,8 +298,6 @@ static ActivityMonitor::PartitionType getRealDriveType(const QString& drive)
         return ActivityMonitor::UnknownPartition;
 
     const auto busType = getBusType(*handle);
-    if (busType == BusTypeUnknown)
-        return ActivityMonitor::UnknownPartition;;
 
     return busType == BusTypeUsb
         ? ActivityMonitor::RemovableDiskPartition : ActivityMonitor::LocalDiskPartition;
