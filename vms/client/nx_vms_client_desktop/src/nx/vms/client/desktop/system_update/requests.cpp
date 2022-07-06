@@ -90,10 +90,10 @@ UpdateContents getUpdateContents(
         {
             contents.error = InformationError::noNewVersion;
         }
-    }
 
-    if (contents.error != InformationError::networkError)
-        return contents;
+        if (contents.error != InformationError::networkError)
+            return contents;
+    }
 
     NX_WARNING(NX_SCOPE_TAG, "Checking for updates using mediaserver as proxy");
 
