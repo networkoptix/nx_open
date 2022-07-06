@@ -2259,6 +2259,16 @@ void ActionHandler::undoReplaceCameraActionTriggered()
     if (!NX_ASSERT(camera, "Expected parameter is missing"))
         return;
 
+    const auto pressedButton = QnMessageBox::question(
+        mainWindowWidget(),
+        tr("Confirm undo replacement?"),
+        /*extraText*/ {},
+        QDialogButtonBox::Yes | QDialogButtonBox::Cancel,
+        QDialogButtonBox::Yes);
+
+    if (pressedButton == QDialogButtonBox::Cancel)
+        return;
+
     const auto callback = nx::utils::guarded(this,
         [this] (bool success, Handle requestId, ServerConnection::EmptyResponseType requestResult)
         {
