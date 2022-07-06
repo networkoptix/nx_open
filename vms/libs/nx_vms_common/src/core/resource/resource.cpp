@@ -531,8 +531,3 @@ QString QnResource::idForToStringFromPtr() const
 {
     return getId().toSimpleString();
 }
-
-bool QnResource::needRecreateToUpdateTo(const QnResourcePtr& resource)
-{
-    return getTypeId() != resource->getTypeId();
-}

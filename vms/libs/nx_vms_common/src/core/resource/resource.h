@@ -348,13 +348,6 @@ public:
      */
     void forceUsingLocalProperties();
 
-    /**
-     * @return true in case of new resource has significant changes to the current resource.
-     * For example, current resource is camera of Vendor1 but new resource is a camera of Vendor2.
-     * At this case resource can't be correctly updated but should be re-created complitly.
-     */
-    virtual bool needRecreateToUpdateTo(const QnResourcePtr& resource);
-
 signals:
     void statusChanged(const QnResourcePtr& resource, Qn::StatusChangeReason reason);
     void nameChanged(const QnResourcePtr& resource);
