@@ -63,7 +63,9 @@ function(nx_go_build_test target working_dir package_path)
     set(multi_value_args DEPENDS)
     cmake_parse_arguments(GO_BUILD_TEST "" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
-    add_custom_target(${target})
+    nx_find_files(go_sources ${package_path} "go")
+    add_executable(${target} ${go_sources})
+    set_target_properties(${target} PROPERTIES LINKER_LANGUAGE GO)
 
     if(GO_BUILD_TEST_FOLDER)
         set_target_properties(${target} PROPERTIES FOLDER ${GO_BUILD_TEST_FOLDER})
