@@ -3,14 +3,14 @@
 #include "manager.h"
 
 #include <QtCore/QDir>
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QMap>
 #include <QtCore/QStandardPaths>
-#include <QtCore/QElapsedTimer>
+#include <QtGui/QGuiApplication>
 
 #include <nx/reflect/json.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <ui/workbench/workbench_context_aware.h>
 
 #include "action_factory.h"
 #include "device.h"
@@ -154,6 +154,22 @@ Manager::Manager(QObject* parent):
 
     d->pollTimer->setInterval(kUsbPollInterval);
     d->pollTimer->start();
+
+    connect(qApp, &QGuiApplication::applicationStateChanged,
+        [this](Qt::ApplicationState state)
+        {
+            if (state == Qt::ApplicationActive)
+            {
+                d->pollTimer->start();
+            }
+            else
+            {
+                d->pollTimer->stop();
+
+                for (auto& device: m_devices)
+                    device->resetState();
+            }
+        });
 }
 
 Manager::~Manager()
