@@ -169,11 +169,11 @@ struct LogsManagementWatcher::Unit::Private
             });
 
         m_downloader->setOnProgressHasBeenMade(
-            [this, callback](size_t bytesLoaded, std::optional<double> progress)
+            [this, callback](nx::Buffer&& buffer, std::optional<double> progress)
             {
                 NX_MUTEX_LOCKER lock(&m_mutex);
 
-                m_bytesLoaded += bytesLoaded;
+                m_bytesLoaded += buffer.size();
 
                 if (m_initElapsed == 0)
                 {
