@@ -3,12 +3,13 @@
 #pragma once
 
 #include <map>
+#include <string>
+#include <string_view>
 
-#include <QtCore/QString>
+#include <nx/utils/string.h>
+#include <nx/reflect/string_conversion.h>
 
-namespace nx {
-namespace utils {
-namespace stree {
+namespace nx::utils::stree {
 
 namespace detail {
 
@@ -44,13 +45,15 @@ public:
         return rhs < *this;
     }
 
-    QString toString() const
+    std::string toString() const
     {
-        return QString::fromLatin1("%1-%2").arg(left).arg(right);
+        return buildString(left, "-", right);
     }
 };
 
 } // namespace detail
+
+//-------------------------------------------------------------------------------------------------
 
 /**
  * Finds range that contains given value.
@@ -127,34 +130,46 @@ private:
     InternalContainerType m_container;
 };
 
+//-------------------------------------------------------------------------------------------------
+
 template<typename Key>
 class RangeConverter
 {
 public:
-    typedef typename detail::Range<Key> Range;
-    typedef Key KeyType;
-    typedef Key SearchValueType;
+    using Range = typename detail::Range<Key>;
+    using KeyType = Key;
+    using SearchValueType = Key;
 
-    static Range convertToKey(const QVariant& value)
+    static Range convertToKey(const std::string_view& valueStr)
     {
-        const auto& values = value.toString().split(QLatin1Char('-'));
-        if (values.empty())
+        const auto [values, valueCount] = split_n<2>(valueStr, '-');
+        if (valueCount == 0)
             return Range();
+
         Range range;
-        range.left = QVariant(values[0]).value<Key>();
-        if (values.size() >= 2)
-            range.right = QVariant(values[1]).value<Key>();
+        if (!nx::reflect::fromString(values[0], &range.left))
+            return Range();
+
+        if (valueCount >= 2)
+        {
+            if (!nx::reflect::fromString(values[1], &range.right))
+                return Range();
+        }
         else
+        {
             range.right = range.left;
+        }
+
         return range;
     }
 
-    static Key convertToSearchValue(const QVariant& value)
+    static Key convertToSearchValue(const std::string_view& str)
     {
-        return value.value<Key>();
+        Key key;
+        if (!nx::reflect::fromString(str, &key))
+            return {};
+        return key;
     }
 };
 
-} // namespace stree
-} // namespace utils
-} // namespace nx
+} // namespace nx::utils::stree

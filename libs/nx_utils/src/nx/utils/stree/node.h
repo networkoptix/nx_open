@@ -2,9 +2,12 @@
 
 #pragma once
 
-#include "resourcecontainer.h"
+#include <string_view>
 
+#include <nx/reflect/string_conversion.h>
 #include <nx/utils/log/log.h>
+
+#include "attribute_dictionary.h"
 
 /**
  * Contains implementation of simple search tree.
@@ -23,14 +26,17 @@ public:
     /**
      * Do node processing. This method can put some value to out and/or call get of some child node.
      */
-    virtual void get(const AbstractResourceReader& in, AbstractResourceWriter* const out) const = 0;
+    virtual void get(const AbstractAttributeReader& in, AbstractAttributeWriter* const out) const = 0;
+
     /**
      * Add child node. Takes ownership of child in case of success.
      * Implementation is allowed to reject adding child. In this case it must return false.
      * If noded added, true is returned and ownership of child object is taken.
      */
-    virtual bool addChild(const QVariant& value, std::unique_ptr<AbstractNode> child) = 0;
+    virtual bool addChild(const std::string_view& value, std::unique_ptr<AbstractNode> child) = 0;
 };
+
+//-------------------------------------------------------------------------------------------------
 
 /**
  * Iterates through all its children in order, defined by child value, cast to signed int.
@@ -41,35 +47,45 @@ class NX_UTILS_API SequenceNode:
 {
 public:
     SequenceNode() = default;
-    SequenceNode(SequenceNode&&) = delete;
-    SequenceNode& operator=(SequenceNode&&) = delete;
+    SequenceNode(SequenceNode&&) = default;
     SequenceNode(const SequenceNode&) = delete;
-    SequenceNode& operator=(const SequenceNode&) = delete;
 
-    virtual void get(const AbstractResourceReader& in, AbstractResourceWriter* const out) const override;
-    virtual bool addChild(const QVariant& value, std::unique_ptr<AbstractNode> child) override;
+    virtual void get(
+        const AbstractAttributeReader& in,
+        AbstractAttributeWriter* const out) const override;
+
+    virtual bool addChild(
+        const std::string_view& value,
+        std::unique_ptr<AbstractNode> child) override;
 
 private:
     std::multimap<int, std::unique_ptr<AbstractNode>> m_children;
 };
 
+//-------------------------------------------------------------------------------------------------
+
 template<typename Key>
 class DefaultKeyConverter
 {
 public:
-    typedef Key KeyType;
-    typedef Key SearchValueType;
+    using KeyType = Key;
+    using SearchValueType = Key;
 
-    static Key convertToKey(const QVariant& value)
+    static Key convertToKey(const std::string_view& str)
     {
-        return value.value<Key>();
+        Key key;
+        if (!nx::reflect::fromString(str, &key))
+            return {};
+        return key;
     }
 
-    static Key convertToSearchValue(const QVariant& value)
+    static Key convertToSearchValue(const std::string_view& value)
     {
-        return value.value<Key>();
+        return convertToKey(value);
     }
 };
+
+//-------------------------------------------------------------------------------------------------
 
 /**
  * Chooses child node to follow based on some condition.
@@ -81,33 +97,34 @@ public:
 template<
     typename Key,
     template<typename, typename> class ConditionContainer,
-    typename KeyConversionFunc = DefaultKeyConverter<Key>>
+    typename KeyConversionFunc = DefaultKeyConverter<Key>
+>
 class ConditionNode:
     public AbstractNode
 {
-    typedef ConditionContainer<Key, std::unique_ptr<AbstractNode>> Container;
+    using Container = ConditionContainer<Key, std::unique_ptr<AbstractNode>>;
 
 public:
-    ConditionNode(int matchResID):
-        m_matchResId(matchResID)
+    ConditionNode(std::string attrToMatchName):
+        m_attrToMatchName(std::move(attrToMatchName))
     {
     }
 
     virtual void get(
-        const AbstractResourceReader& in,
-        AbstractResourceWriter* const out) const override
+        const AbstractAttributeReader& in,
+        AbstractAttributeWriter* const out) const override
     {
-        NX_TRACE(this, "Condition. Selecting child by resource %1", m_matchResId);
+        NX_TRACE(this, "Condition. Selecting child by attribute %1", m_attrToMatchName);
 
-        QVariant value;
-        if (!in.get(m_matchResId, &value))
+        auto value = in.get<std::string>(m_attrToMatchName);
+        if (!value)
         {
-            NX_TRACE(this, "Condition. Resource (%1) not found in input data", m_matchResId);
+            NX_TRACE(this, "Condition. Attribute (%1) not found in input data", m_attrToMatchName);
             return;
         }
 
         const typename KeyConversionFunc::SearchValueType& typedValue =
-            KeyConversionFunc::convertToSearchValue(value);
+            KeyConversionFunc::convertToSearchValue(*value);
         typename Container::const_iterator it = m_children.find(typedValue);
         if (it == m_children.end())
         {
@@ -115,13 +132,12 @@ public:
             return;
         }
 
-        NX_TRACE(this, nx::format("Condition. Found child with value %1 by search value %2")
-            .arg(it->first).arg(value.toString()));
+        NX_TRACE(this, "Condition. Found child with value %1 by search value %2", it->first, value);
         it->second->get(in, out);
     }
 
     virtual bool addChild(
-        const QVariant& value,
+        const std::string_view& value,
         std::unique_ptr<AbstractNode> child) override
     {
         return m_children.emplace(
@@ -131,49 +147,51 @@ public:
 
 private:
     Container m_children;
-    int m_matchResId;
+    const std::string m_attrToMatchName;
 };
 
+//-------------------------------------------------------------------------------------------------
+
 /**
- * Checks presense of specified resource in input container.
+ * Checks presense of specified attribute in input container.
  * Allows only 2 children: false and true.
  */
-class NX_UTILS_API ResPresenceNode:
+class NX_UTILS_API AttrPresenceNode:
     public AbstractNode
 {
 public:
-    ResPresenceNode(int matchResID);
+    AttrPresenceNode(std::string attrToMatchName);
 
-    virtual void get(const AbstractResourceReader& in, AbstractResourceWriter* const out) const override;
-    virtual bool addChild(const QVariant& value, std::unique_ptr<AbstractNode> child) override;
+    virtual void get(const AbstractAttributeReader& in, AbstractAttributeWriter* const out) const override;
+    virtual bool addChild(const std::string_view& value, std::unique_ptr<AbstractNode> child) override;
 
 private:
     /** [0] - for false. [1] - for true. */
     std::unique_ptr<AbstractNode> m_children[2];
-    int m_matchResId;
+    const std::string m_attrToMatchName;
 };
 
+//-------------------------------------------------------------------------------------------------
+
 /**
- * Puts some resource value to output.
+ * Puts some attribute value to output.
  */
 class NX_UTILS_API SetNode:
     public AbstractNode
 {
 public:
-    SetNode(
-        int resourceID,
-        const QVariant& valueToSet);
+    SetNode(std::string name, std::string value);
 
     /**
-     * Adds to out resource and then calls m_child->get() (if child exists).
+     * Adds to out attribute and then calls m_child->get() (if child exists).
      */
-    virtual void get(const AbstractResourceReader& in, AbstractResourceWriter* const out) const override;
-    virtual bool addChild(const QVariant& value, std::unique_ptr<AbstractNode> child) override;
+    virtual void get(const AbstractAttributeReader& in, AbstractAttributeWriter* const out) const override;
+    virtual bool addChild(const std::string_view& value, std::unique_ptr<AbstractNode> child) override;
 
 private:
     std::unique_ptr<AbstractNode> m_child;
-    int m_resourceID;
-    const QVariant m_valueToSet;
+    const std::string m_name;
+    const std::string m_value;
 };
 
 } // namespace nx::utils::stree

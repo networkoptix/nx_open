@@ -8,30 +8,27 @@
 
 namespace nx::utils::stree::test {
 
+namespace Attributes {
+
+static constexpr char intAttr[] = "intAttr";
+static constexpr char strAttr[] = "strAttr";
+static constexpr char outAttr[] = "outAttr";
+
+} // namespace Attributes
+
 class StreeFixture:
     public ::testing::Test
 {
-public:
-    enum Attributes
-    {
-        intAttr = 1,
-        strAttr,
-        outAttr,
-    };
-
-    StreeFixture();
-
 protected:
-    bool prepareTree(const char* xmlDataStr, int parseFlags);
+    bool prepareTree(const char* xmlDataStr);
     const std::unique_ptr<AbstractNode>& streeRoot() const;
 
     /**
      * @return Attributes::outAttr value.
      */
-    std::string search(const ResourceContainer& inputData);
+    std::string search(const AttributeDictionary& inputData);
 
 private:
-    ResourceNameSet m_nameSet;
     std::unique_ptr<AbstractNode> m_streeRoot;
 };
 

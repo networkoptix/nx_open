@@ -7,29 +7,21 @@
 
 #pragma once
 
-#include <nx/utils/stree/resourcecontainer.h>
+#include <nx/utils/stree/attribute_dictionary.h>
 #include <nx/network/http/http_types.h>
 
+namespace nx::cloud::gateway {
 
-namespace nx {
-namespace cloud {
-namespace gateway {
-
-//TODO #akolesnikov this is a copy-paste. move to common or somewhere else. Deal with attr enum
-class HttpRequestResourceReader
-:
-    public nx::utils::stree::AbstractResourceReader
+class HttpRequestResourceReader:
+    public nx::utils::stree::AbstractAttributeReader
 {
 public:
     HttpRequestResourceReader(const nx::network::http::Request& request);
 
-    //!Implementation of \a AbstractResourceReader::getAsVariant
-    virtual bool getAsVariant(int resID, QVariant* const value) const override;
+    virtual std::optional<std::string> getStr(const nx::utils::stree::AttrName& name) const override;
 
 private:
     const nx::network::http::Request& m_request;
 };
 
-}   //namespace cloud
-}   //namespace gateway
-}   //namespace nx
+} // namespace nx::cloud::gateway

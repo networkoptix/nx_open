@@ -84,7 +84,7 @@ void BaseAuthenticationManager::reportAuthenticationFailure(
 {
     completionHandler(nx::network::http::server::AuthenticationResult(
         isProxy ? StatusCode::proxyAuthenticationRequired : StatusCode::unauthorized,
-        nx::utils::stree::ResourceContainer(),
+        nx::utils::stree::AttributeDictionary(),
         nx::network::http::HttpHeaders{generateWwwAuthenticateHeader(isProxy)},
         nullptr));
 }

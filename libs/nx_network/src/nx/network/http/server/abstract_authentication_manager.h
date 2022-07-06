@@ -5,7 +5,7 @@
 #include <memory>
 
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/stree/resourcecontainer.h>
+#include <nx/utils/stree/attribute_dictionary.h>
 #include <nx/utils/std/optional.h>
 
 #include "../abstract_msg_body_source.h"
@@ -32,7 +32,7 @@ struct AuthenticationResult
      * Properties found during authentication can be stored here
      * (e.g., some application-specific user ID) and will be later forwarded to a request handler.
      */
-    nx::utils::stree::ResourceContainer authInfo;
+    nx::utils::stree::AttributeDictionary authInfo;
 
     nx::network::http::HttpHeaders responseHeaders;
     std::unique_ptr<nx::network::http::AbstractMsgBodySource> msgBody;
@@ -41,7 +41,7 @@ struct AuthenticationResult
 
     AuthenticationResult(
         StatusCode::Value statusCode,
-        nx::utils::stree::ResourceContainer authInfo,
+        nx::utils::stree::AttributeDictionary authInfo,
         nx::network::http::HttpHeaders responseHeaders,
         std::unique_ptr<nx::network::http::AbstractMsgBodySource> msgBody)
         :

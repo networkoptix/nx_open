@@ -25,18 +25,18 @@ protected:
                 "</condition>\n"
             "</sequence>\n";
 
-        ASSERT_TRUE(prepareTree(document, ParseFlag::ignoreUnknownResources));
+        ASSERT_TRUE(prepareTree(document));
     }
 
     void assertDocumentDataIsAvailable()
     {
-        ResourceContainer data;
-        data.put(Attributes::intAttr, 11);
+        AttributeDictionary data;
+        data.put(Attributes::intAttr, "11");
         streeRoot()->get(data, &data);
 
-        const auto foundValue = data.get(Attributes::outAttr);
+        const auto foundValue = data.get<std::string>(Attributes::outAttr);
         ASSERT_TRUE(static_cast<bool>(foundValue));
-        ASSERT_EQ("eleven", foundValue->toString());
+        ASSERT_EQ("eleven", *foundValue);
     }
 };
 

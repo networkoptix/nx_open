@@ -2,28 +2,21 @@
 
 #pragma once
 
-#include <nx/utils/stree/resourcecontainer.h>
+#include <nx/utils/stree/attribute_dictionary.h>
 #include <nx/network/socket.h>
 
+namespace nx::cloud::gateway {
 
-namespace nx {
-namespace cloud {
-namespace gateway {
-
-class SocketResourceReader
-:
-    public nx::utils::stree::AbstractResourceReader
+class SocketResourceReader:
+    public nx::utils::stree::AbstractAttributeReader
 {
 public:
     SocketResourceReader(const network::AbstractCommunicatingSocket& sock);
 
-    //!Implementation of \a AbstractResourceReader::getAsVariant
-    virtual bool getAsVariant(int resID, QVariant* const value) const override;
+    virtual std::optional<std::string> getStr(const nx::utils::stree::AttrName& name) const override;
 
 private:
     const network::AbstractCommunicatingSocket& m_socket;
 };
 
-}   //namespace cloud
-}   //namespace gateway
-}   //namespace nx
+} // namespace nx::cloud::gateway

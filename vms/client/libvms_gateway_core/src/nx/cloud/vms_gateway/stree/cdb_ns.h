@@ -2,67 +2,16 @@
 
 #pragma once
 
-#include <nx/utils/stree/resourcenameset.h>
+namespace nx::cloud::gateway::attr {
 
+static constexpr char userName[] = "user.name";
+static constexpr char userPassword[] = "user.password";
+static constexpr char ha1[] = "ha1";
+static constexpr char authenticated[] = "authenticated";
 
-namespace nx {
-namespace cloud {
-namespace gateway {
+static constexpr char socketIntfIP[] = "socket.intf.ip";
+static constexpr char socketRemoteIP[] = "socket.remoteIP";
 
-//!Attributes to be used with stree
-namespace attr {
-enum Value
-{
-    operation = 1,
+static constexpr char requestPath[] = "request.path";
 
-    //source data attributes
-    accountID,
-    accountEmail,
-    ha1,
-    userName,
-    userPassword,
-    accountStatus,
-    systemAccessRole,
-
-    systemID,
-    systemStatus,   /** int */
-
-    dataAccountRightsOnSystem,
-
-    //authentication/authorization intermediate attributes
-    authenticated,
-    authorized,
-    authAccountRightsOnSystem,
-    authAccountEmail,
-    authSystemID,
-    /** Operation data contains accountID equal to the one been authenticated */
-    authSelfAccountAccessRequested,
-    /** Operation data contains systemID equal to the one been authenticated */
-    authSelfSystemAccessRequested,
-    /** request has been authenticated by code sent to account email */
-    authenticatedByEmailCode,
-    resultCode,
-
-    entity,
-    action,
-    secureSource,
-
-    socketIntfIP,
-    socketRemoteIP,
-
-    requestPath
-};
-}   //namespace attr
-
-//!Contains description of stree attributes used by cloud_db
-class CdbAttrNameSet
-:
-    public nx::utils::stree::ResourceNameSet
-{
-public:
-    CdbAttrNameSet();
-};
-
-}   //namespace cloud
-}   //namespace gateway
-}   //namespace nx
+} // namespace nx::cloud::gateway::attr

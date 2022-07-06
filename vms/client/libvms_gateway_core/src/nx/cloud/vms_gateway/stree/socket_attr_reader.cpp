@@ -4,32 +4,22 @@
 
 #include "cdb_ns.h"
 
+namespace nx::cloud::gateway {
 
-namespace nx {
-namespace cloud {
-namespace gateway {
-
-SocketResourceReader::SocketResourceReader(const network::AbstractCommunicatingSocket& sock)
-:
+SocketResourceReader::SocketResourceReader(const network::AbstractCommunicatingSocket& sock):
     m_socket(sock)
 {
 }
 
-bool SocketResourceReader::getAsVariant(int resID, QVariant* const value) const
+std::optional<std::string> SocketResourceReader::getStr(
+    const nx::utils::stree::AttrName& name) const
 {
-    switch (resID)
-    {
-        case attr::socketIntfIP:
-            *value = QString::fromStdString(m_socket.getLocalAddress().address.toString());
-            return true;
-        case attr::socketRemoteIP:
-            *value = QString::fromStdString(m_socket.getForeignAddress().address.toString());
-            return true;
-        default:
-            return false;
-    }
+    if (name == attr::socketIntfIP)
+        return m_socket.getLocalAddress().address.toString();
+    else if (name == attr::socketRemoteIP)
+        return m_socket.getForeignAddress().address.toString();
+
+    return std::nullopt;
 }
 
-}   //namespace cloud
-}   //namespace gateway
-}   //namespace nx
+} // namespace nx::cloud::gateway

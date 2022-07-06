@@ -37,7 +37,7 @@ public:
 class AuthInfoFetcher
 {
 public:
-    using type = nx::utils::stree::ResourceContainer;
+    using type = nx::utils::stree::AttributeDictionary;
 
     type operator()(
         const network::http::RequestContext& requestContext) const

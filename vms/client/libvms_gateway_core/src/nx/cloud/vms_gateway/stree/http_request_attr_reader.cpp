@@ -9,29 +9,22 @@
 
 #include "cdb_ns.h"
 
+namespace nx::cloud::gateway {
 
-namespace nx {
-namespace cloud {
-namespace gateway {
-
-HttpRequestResourceReader::HttpRequestResourceReader(const nx::network::http::Request& request)
-:
+HttpRequestResourceReader::HttpRequestResourceReader(
+    const nx::network::http::Request& request)
+    :
     m_request(request)
 {
 }
 
-bool HttpRequestResourceReader::getAsVariant(int resID, QVariant* const value) const
+std::optional<std::string> HttpRequestResourceReader::getStr(
+    const nx::utils::stree::AttrName& name) const
 {
-    switch (resID)
-    {
-        case attr::requestPath:
-            *value = m_request.requestLine.url.path();
-            return true;
-        default:
-            return false;
-    }
+    if (name == attr::requestPath)
+        return m_request.requestLine.url.path().toStdString();
+
+    return std::nullopt;
 }
 
-}   //namespace cloud
-}   //namespace gateway
-}   //namespace nx
+} // namespace nx::cloud::gateway

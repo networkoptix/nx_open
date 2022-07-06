@@ -51,7 +51,7 @@ public:
         nx::utils::AsyncOperationGuard m_guard;
     };
 
-    CloudModuleUrlFetcher(const std::string& moduleName);
+    CloudModuleUrlFetcher(std::string moduleName);
 
     /**
      * Retrieves endpoint if unknown.
@@ -71,13 +71,13 @@ public:
 
 protected:
     virtual bool analyzeXmlSearchResult(
-        const nx::utils::stree::ResourceContainer& searchResult) override;
+        const nx::utils::stree::AttributeDictionary& searchResult) override;
     virtual void invokeHandler(
         const Handler& handler,
         nx::network::http::StatusCode::Value statusCode) override;
 
 private:
-    const int m_moduleAttrName;
+    const std::string m_moduleAttrName;
     std::optional<nx::utils::Url> m_url;
 };
 

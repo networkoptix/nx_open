@@ -11,12 +11,9 @@
 
 namespace nx::network::cloud {
 
-CloudModuleUrlFetcher::CloudModuleUrlFetcher(const std::string& moduleName):
-    m_moduleAttrName(nameset().findResourceByName(moduleName).id)
+CloudModuleUrlFetcher::CloudModuleUrlFetcher(std::string moduleName):
+    m_moduleAttrName(std::move(moduleName))
 {
-    NX_ASSERT(
-        m_moduleAttrName != nx::utils::stree::INVALID_RES_ID,
-        nx::format("Given bad cloud module name %1").arg(moduleName));
 }
 
 void CloudModuleUrlFetcher::setUrl(nx::utils::Url url)
@@ -34,7 +31,6 @@ void CloudModuleUrlFetcher::get(
     http::AuthInfo auth, ssl::AdapterFunc proxyAdapterFunc, Handler handler)
 {
     using namespace std::chrono;
-    using namespace std::placeholders;
 
     //if requested endpoint is known, providing it to the output
     NX_MUTEX_LOCKER lk(&m_mutex);
@@ -51,13 +47,13 @@ void CloudModuleUrlFetcher::get(
 }
 
 bool CloudModuleUrlFetcher::analyzeXmlSearchResult(
-    const nx::utils::stree::ResourceContainer& searchResult)
+    const nx::utils::stree::AttributeDictionary& searchResult)
 {
-    std::string foundEndpointStr;
-    if (!searchResult.get(m_moduleAttrName, &foundEndpointStr))
+    std::optional<std::string> foundEndpointStr = searchResult.get<std::string>(m_moduleAttrName);
+    if (!foundEndpointStr)
         return false;
 
-    m_url = buildUrl(foundEndpointStr, m_moduleAttrName);
+    m_url = buildUrl(*foundEndpointStr, m_moduleAttrName);
     return true;
 }
 

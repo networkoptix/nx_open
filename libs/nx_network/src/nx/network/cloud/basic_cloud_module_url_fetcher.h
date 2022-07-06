@@ -12,8 +12,7 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/optional.h>
 #include <nx/utils/stree/node.h>
-#include <nx/utils/stree/resourcenameset.h>
-#include <nx/utils/stree/resourcecontainer.h>
+#include <nx/utils/stree/attribute_dictionary.h>
 #include <nx/utils/stree/stree_manager.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/url.h>
@@ -30,33 +29,27 @@ static constexpr char kConnectionMediatorUdpUrlName[] = "hpm.udpUrl";
 static constexpr char kNotificationModuleName[] = "notification_module";
 static constexpr char kSpeedTestModuleName[] = "speedtest_module";
 
-static constexpr std::chrono::seconds kHttpRequestTimeout{10};
+namespace CloudInstanceSelectionAttributeNameset {
 
-class NX_NETWORK_API CloudInstanceSelectionAttributeNameset:
-    public nx::utils::stree::ResourceNameSet
-{
-public:
-    enum AttributeType
-    {
-        cloudInstanceName = 1,
-        vmsVersionMajor,
-        vmsVersionMinor,
-        vmsVersionBugfix,
-        vmsVersionBuild,
-        vmsVersionFull,
-        vmsCustomization,
-        cdbUrl,
-        hpmUrl,
-        hpmTcpUrl,
-        hpmUdpUrl,
-        notificationModuleUrl,
-        speedTestModuleUrl,
-    };
+static constexpr char cloudInstanceName[] = "cloud.instance.name";
+static constexpr char vmsVersionMajor[] = "vms.version.major";
+static constexpr char vmsVersionMinor[] = "vms.version.minor";
+static constexpr char vmsVersionBugfix[] = "vms.version.bugfix";
+static constexpr char vmsVersionBuild[] = "vms.version.build";
+static constexpr char vmsVersionFull[] = "vms.version.full";
+static constexpr char vmsCustomization[] = "vms.customization";
+static constexpr auto cdbUrl = kCloudDbModuleName;
+static constexpr auto hpmUrl = kConnectionMediatorModuleName;
+static constexpr auto hpmTcpUrl = kConnectionMediatorTcpUrlName;
+static constexpr auto hpmUdpUrl = kConnectionMediatorUdpUrlName;
+static constexpr auto notificationModuleUrl = kNotificationModuleName;
+static constexpr auto speedTestModuleUrl = kSpeedTestModuleName;
 
-    CloudInstanceSelectionAttributeNameset();
-};
+} // namespace CloudInstanceSelectionAttributeNameset
 
 //-------------------------------------------------------------------------------------------------
+
+static constexpr std::chrono::seconds kHttpRequestTimeout{10};
 
 /**
  * Looks up online API url of a specified cloud module.
@@ -109,15 +102,11 @@ protected:
     mutable nx::Mutex m_mutex;
 
     virtual bool analyzeXmlSearchResult(
-        const nx::utils::stree::ResourceContainer& searchResult) = 0;
+        const nx::utils::stree::AttributeDictionary& searchResult) = 0;
+
     virtual void invokeHandler(
         const Handler& handler,
         nx::network::http::StatusCode::Value statusCode) = 0;
-
-    const CloudInstanceSelectionAttributeNameset& nameset() const
-    {
-        return m_nameset;
-    }
 
     void initiateModulesXmlRequestIfNeeded(
         const nx::network::http::AuthInfo& auth,
@@ -129,9 +118,9 @@ protected:
 
         if (!m_modulesXmlUrl)
         {
-            post(
-                [this, handler = std::move(handler)]()
-                { invokeHandler(handler, http::StatusCode::badRequest); });
+            post([this, handler = std::move(handler)]() {
+                invokeHandler(handler, http::StatusCode::badRequest);
+            });
             return;
         }
 
@@ -167,10 +156,10 @@ protected:
 
         m_httpClient->doGet(
             *m_modulesXmlUrl,
-            std::bind(&BasicCloudModuleUrlFetcher::onHttpClientDone, this, _1));
+            [this](auto&&... args) { onHttpClientDone(std::forward<decltype(args)>(args)...); });
     }
 
-    nx::utils::Url buildUrl(const std::string& str, int moduleAttrName)
+    nx::utils::Url buildUrl(const std::string& str, const std::string& moduleAttrName)
     {
         nx::utils::Url url(str);
         if (url.host().isEmpty())
@@ -185,8 +174,7 @@ protected:
 
         if (url.scheme().isEmpty())
         {
-            const auto it = m_moduleToDefaultUrlScheme.find(
-                nameset().findResourceByID(moduleAttrName).name);
+            const auto it = m_moduleToDefaultUrlScheme.find(moduleAttrName);
 
             if (it != m_moduleToDefaultUrlScheme.end())
                 url.setScheme(it->second);
@@ -206,7 +194,6 @@ protected:
 private:
     std::optional<nx::utils::Url> m_modulesXmlUrl;
     nx::network::http::AsyncHttpClientPtr m_httpClient;
-    const CloudInstanceSelectionAttributeNameset m_nameset;
     std::vector<Handler> m_resolveHandlers;
     bool m_requestIsRunning;
     std::list<std::pair<std::string, std::string>> m_additionalHttpHeadersForGetRequest;
@@ -241,10 +228,7 @@ private:
 
         QByteArray xmlData = toByteArray(client->fetchMessageBodyBuffer());
         std::unique_ptr<nx::utils::stree::AbstractNode> stree =
-            nx::utils::stree::StreeManager::loadStree(
-                xmlData,
-                m_nameset,
-                nx::utils::stree::ParseFlag::ignoreUnknownResources);
+            nx::utils::stree::StreeManager::loadStree(xmlData);
         if (!stree)
         {
             resultCode = nx::network::http::StatusCode::serviceUnavailable;
@@ -263,7 +247,7 @@ private:
 
     bool findModuleUrl(const nx::utils::stree::AbstractNode& treeRoot)
     {
-        nx::utils::stree::ResourceContainer inputData;
+        nx::utils::stree::AttributeDictionary inputData;
         const nx::utils::SoftwareVersion productVersion(nx::build_info::vmsVersion());
         inputData.put(
             CloudInstanceSelectionAttributeNameset::vmsVersionMajor,
@@ -284,9 +268,9 @@ private:
             CloudInstanceSelectionAttributeNameset::vmsCustomization,
             nx::branding::customization());
 
-        nx::utils::stree::ResourceContainer outputData;
+        nx::utils::stree::AttributeDictionary outputData;
         treeRoot.get(
-            nx::utils::stree::MultiSourceResourceReader(inputData, outputData),
+            nx::utils::stree::makeMultiReader(inputData, outputData),
             &outputData);
 
         return analyzeXmlSearchResult(outputData);

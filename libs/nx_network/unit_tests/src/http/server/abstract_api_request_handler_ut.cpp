@@ -85,7 +85,7 @@ protected:
                 RequestContext(
                     nullptr,
                     SocketAddress(),
-                    nx::utils::stree::ResourceContainer(),
+                    nx::utils::stree::AttributeDictionary(),
                     m_request),
                 [this](auto&&... args) { onRequestProcessed(std::forward<decltype(args)>(args)...); });
         }

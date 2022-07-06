@@ -32,25 +32,24 @@ void ConnectionMediatorUrlFetcher::get(
 }
 
 bool ConnectionMediatorUrlFetcher::analyzeXmlSearchResult(
-    const nx::utils::stree::ResourceContainer& searchResult)
+    const nx::utils::stree::AttributeDictionary& searchResult)
 {
-    std::string foundTcpUrlStr;
-    std::string foundUdpUrlStr;
-    if (searchResult.get(CloudInstanceSelectionAttributeNameset::hpmTcpUrl, &foundTcpUrlStr) &&
-        searchResult.get(CloudInstanceSelectionAttributeNameset::hpmUdpUrl, &foundUdpUrlStr))
+    auto foundTcpUrlStr = searchResult.get<std::string>(CloudInstanceSelectionAttributeNameset::hpmTcpUrl);
+    auto foundUdpUrlStr = searchResult.get<std::string>(CloudInstanceSelectionAttributeNameset::hpmUdpUrl);
+    if (foundTcpUrlStr && foundUdpUrlStr)
     {
         m_mediatorHostDescriptor = MediatorHostDescriptor();
-        m_mediatorHostDescriptor->tcpUrl = nx::utils::Url(foundTcpUrlStr);
-        m_mediatorHostDescriptor->udpUrl = nx::utils::Url(foundUdpUrlStr);
+        m_mediatorHostDescriptor->tcpUrl = nx::utils::Url(*foundTcpUrlStr);
+        m_mediatorHostDescriptor->udpUrl = nx::utils::Url(*foundUdpUrlStr);
         return true;
     }
 
-    std::string foundHpmUrlStr;
-    if (searchResult.get(CloudInstanceSelectionAttributeNameset::hpmUrl, &foundHpmUrlStr))
+    auto foundHpmUrlStr = searchResult.get<std::string>(CloudInstanceSelectionAttributeNameset::hpmUrl);
+    if (foundHpmUrlStr)
     {
         m_mediatorHostDescriptor = MediatorHostDescriptor();
         m_mediatorHostDescriptor->tcpUrl = buildUrl(
-            foundHpmUrlStr,
+            *foundHpmUrlStr,
             CloudInstanceSelectionAttributeNameset::hpmUrl);
         m_mediatorHostDescriptor->udpUrl = m_mediatorHostDescriptor->tcpUrl;
         return true;

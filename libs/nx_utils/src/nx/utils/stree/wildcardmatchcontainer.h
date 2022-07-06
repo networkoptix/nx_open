@@ -10,7 +10,7 @@ namespace nx::utils::stree {
 
 /**
  * Associative dictionary. Element key interpreted as wildcard mask.
- * Find methods look up the first element that satisfies supplied string.
+ * Find methods look up the first element with key satisfying supplied string.
  * NOTE: Performs validation to mask by sequentially checking all elements.
  * So do not use it when high performance is needed.
  * NOTE: Elements are tested in decreasing mask length order.
@@ -20,16 +20,15 @@ template<class KeyType, class MappedType>
 class WildcardMatchContainer
 {
     template<typename T>
-    struct LongestStringComparator
+    struct LongestStringFirstComp
     {
-        bool operator()(const T& l, const T& r) const {
-            return l.size() == r.size()
-                ? l < r
-                : l.size() > r.size();
+        bool operator()(const T& l, const T& r) const
+        {
+            return l.size() == r.size() ? l < r : l.size() > r.size();
         }
     };
 
-    using InternalContainerType = std::map<KeyType, MappedType, LongestStringComparator<KeyType>>;
+    using InternalContainerType = std::map<KeyType, MappedType, LongestStringFirstComp<KeyType>>;
 
 public:
     using iterator = typename InternalContainerType::iterator;

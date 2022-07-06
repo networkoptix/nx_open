@@ -26,7 +26,7 @@ class NX_NETWORK_API TestHttpServer
 public:
     using ProcessHttpRequestFunc = nx::utils::MoveOnlyFunc<void(
         nx::network::http::HttpServerConnection* const /*connection*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
+        nx::utils::stree::AttributeDictionary /*authInfo*/,
         nx::network::http::Request /*request*/,
         nx::network::http::Response* const /*response*/,
         nx::network::http::RequestProcessedHandler /*completionHandler*/)>;
