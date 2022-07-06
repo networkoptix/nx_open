@@ -76,6 +76,9 @@ public:
 
     StickPosition currentStickPosition() const;
 
+    /* Set sticks to zero-point and buttons to released state. */
+    void resetState();
+
 signals:
     /** i-th button on the device has been pressed. */
     void buttonPressed(int id);
