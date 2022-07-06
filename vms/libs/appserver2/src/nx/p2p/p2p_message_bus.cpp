@@ -50,11 +50,12 @@ struct GotTransactionFuction
         MessageBus *bus,
         const QnTransaction<T>& transaction,
         const P2pConnectionPtr& connection,
-        const TransportHeader& transportHeader) const
+        const TransportHeader& transportHeader,
+        nx::Locker<nx::Mutex>* lock) const
     {
         if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
             bus->printTran(connection, transaction, Connection::Direction::incoming);
-        bus->gotTransaction(transaction, connection, transportHeader);
+        bus->gotTransaction(transaction, connection, transportHeader, lock);
     }
 };
 
@@ -67,9 +68,10 @@ struct GotUnicastTransactionFuction
         MessageBus *bus,
         const QnTransaction<T>& transaction,
         const P2pConnectionPtr& connection,
-        const TransportHeader& transportHeader) const
+        const TransportHeader& transportHeader,
+        nx::Locker<nx::Mutex>* lock) const
     {
-        bus->gotUnicastTransaction(transaction, connection, transportHeader);
+        bus->gotUnicastTransaction(transaction, connection, transportHeader, lock);
     }
 };
 
@@ -688,20 +690,21 @@ void MessageBus::at_gotMessage(
         result = handleSubscribeForAllDataUpdates(connection, payload);
         break;
     case MessageType::pushTransactionData:
-        result = handlePushTransactionData(connection, payload, TransportHeader());
+        result = handlePushTransactionData(connection, payload, TransportHeader(), &lock);
         break;
     case MessageType::pushTransactionList:
-        result = handlePushTransactionList(connection, payload);
+        result = handlePushTransactionList(connection, payload, &lock);
         break;
     case MessageType::pushImpersistentUnicastTransaction:
         result = handleTransactionWithHeader(
             this,
             connection,
             payload,
-            GotUnicastTransactionFuction());
+            GotUnicastTransactionFuction(),
+            &lock);
         break;
     case MessageType::pushImpersistentBroadcastTransaction:
-        result = handlePushImpersistentBroadcastTransaction(connection, payload);
+        result = handlePushImpersistentBroadcastTransaction(connection, payload, &lock);
         break;
     default:
         NX_ASSERT(0, "Unknown message type: %1", (int) messageType);
@@ -713,13 +716,14 @@ void MessageBus::at_gotMessage(
 
 bool MessageBus::handlePushImpersistentBroadcastTransaction(
     const P2pConnectionPtr& connection,
-    const QByteArray& payload)
+    const QByteArray& payload,
+    nx::Locker<nx::Mutex>* lock)
 {
     return handleTransactionWithHeader(
         this,
         connection,
         payload,
-        GotTransactionFuction());
+        GotTransactionFuction(), lock);
 }
 
 bool MessageBus::handleResolvePeerNumberRequest(const P2pConnectionPtr& connection, const QByteArray& data)
@@ -1142,7 +1146,8 @@ template <>
 void MessageBus::gotTransaction(
     const QnTransaction<nx::vms::api::UpdateSequenceData> &tran,
     const P2pConnectionPtr& connection,
-    [[maybe_unused]] const TransportHeader& transportHeader)
+    [[maybe_unused]] const TransportHeader& transportHeader,
+    nx::Locker<nx::Mutex>* /*lock*/)
 {
     PersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
     updateOfflineDistance(connection, peerId, tran.persistentInfo.sequence);
@@ -1152,7 +1157,8 @@ template <>
 void MessageBus::gotTransaction(
     const QnTransaction<nx::vms::api::RuntimeData>& tran,
     const P2pConnectionPtr& connection,
-    const TransportHeader& transportHeader)
+    const TransportHeader& transportHeader,
+    nx::Locker<nx::Mutex>* lock)
 {
     if (localPeer().isServer() && !isSubscribedTo(connection->remotePeer()))
         return; // Ignore deprecated transaction.
@@ -1171,7 +1177,10 @@ void MessageBus::gotTransaction(
     m_lastRuntimeInfo[peerId] = tran.params;
 
     if (m_handler)
+    {
+        nx::Unlocker<nx::Mutex> unlock(lock);
         m_handler->triggerNotification(tran, NotificationSource::Remote);
+    }
     emitPeerFoundLostSignals();
     // Proxy transaction to subscribed peers
     sendTransaction(tran, transportHeader);
@@ -1181,17 +1190,22 @@ template <class T>
 void MessageBus::gotTransaction(
     const QnTransaction<T>& tran,
     const P2pConnectionPtr& /*connection*/,
-    const TransportHeader& /*transportHeader*/)
+    const TransportHeader& /*transportHeader*/,
+    nx::Locker<nx::Mutex>* lock)
 {
     if (m_handler)
+    {
+        nx::Unlocker<nx::Mutex> unlock(lock);
         m_handler->triggerNotification(tran, NotificationSource::Remote);
+    }
 }
 
 template <class T>
 void MessageBus::gotUnicastTransaction(
     const QnTransaction<T>& tran,
     const P2pConnectionPtr& connection,
-    const TransportHeader& header)
+    const TransportHeader& header,
+    nx::Locker<nx::Mutex>* lock)
 {
     if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
         printTran(connection, tran, Connection::Direction::incoming);
@@ -1202,7 +1216,10 @@ void MessageBus::gotUnicastTransaction(
         if (peer == localPeer().id)
         {
             if (m_handler)
+            {
+                nx::Unlocker<nx::Mutex> unlock(lock);
                 m_handler->triggerNotification(tran, NotificationSource::Remote);
+            }
             continue;
         }
         unprocessedPeers.insert(peer);
@@ -1230,7 +1247,10 @@ void MessageBus::gotUnicastTransaction(
     sendUnicastTransactionImpl(tran, dstByConnection);
 }
 
-bool MessageBus::handlePushTransactionList(const P2pConnectionPtr& connection, const QByteArray& data)
+bool MessageBus::handlePushTransactionList(
+    const P2pConnectionPtr& connection, 
+    const QByteArray& data,
+    nx::Locker<nx::Mutex>* lock)
 {
     if (data.isEmpty())
     {
@@ -1243,7 +1263,7 @@ bool MessageBus::handlePushTransactionList(const P2pConnectionPtr& connection, c
         return false;
     for (const auto& transaction: tranList)
     {
-        if (!handlePushTransactionData(connection, transaction, TransportHeader()))
+        if (!handlePushTransactionData(connection, transaction, TransportHeader(), lock))
             return false;
     }
     return true;
@@ -1252,7 +1272,8 @@ bool MessageBus::handlePushTransactionList(const P2pConnectionPtr& connection, c
 bool MessageBus::handlePushTransactionData(
     const P2pConnectionPtr& connection,
     const QByteArray& serializedTran,
-    const TransportHeader& header)
+    const TransportHeader& header,
+    nx::Locker<nx::Mutex>* lock)
 {
     // Workaround for compatibility with server 3.1/3.2 with p2p mode on
     // It could send subscribeForDataUpdates binary message among json data.
@@ -1268,7 +1289,7 @@ bool MessageBus::handlePushTransactionData(
         this,
         connection->localPeer().dataFormat,
         std::move(serializedTran),
-        std::bind(GotTransactionFuction(), this, _1, connection, header),
+        std::bind(GotTransactionFuction(), this, _1, connection, header, lock),
         [](Qn::SerializationFormat, const QnAbstractTransaction&, const QByteArray&) { return false; });
 }
 

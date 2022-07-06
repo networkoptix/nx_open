@@ -132,12 +132,14 @@ protected:
         vms::api::TranState newSubscription,
         bool addImplicitData);
     virtual bool handlePushTransactionData(
-    const P2pConnectionPtr& connection,
-    const QByteArray& data,
-    const TransportHeader& header);
+        const P2pConnectionPtr& connection,
+        const QByteArray& data,
+        const TransportHeader& header,
+        nx::Locker<nx::Mutex>* lock);
     virtual bool handlePushImpersistentBroadcastTransaction(
-    const P2pConnectionPtr& connection,
-    const QByteArray& payload);
+        const P2pConnectionPtr& connection,
+        const QByteArray& payload,
+        nx::Locker<nx::Mutex>* lock);
 protected:
     static QString peerName(const QnUuid& id);
     QMap<vms::api::PersistentIdData, P2pConnectionPtr> getCurrentSubscription() const;
@@ -153,7 +155,11 @@ protected:
     void sendRuntimeData(const P2pConnectionPtr& connection, const QList<vms::api::PersistentIdData>& peers);
 
     template <class T>
-    void gotTransaction(const QnTransaction<T>& tran, const P2pConnectionPtr& connection, const TransportHeader& transportHeader);
+    void gotTransaction(
+        const QnTransaction<T>& tran, 
+        const P2pConnectionPtr& connection, 
+        const TransportHeader& transportHeader, 
+        nx::Locker<nx::Mutex>* lock);
 private:
     void sendAlivePeersMessage(const P2pConnectionPtr& connection = P2pConnectionPtr());
 
@@ -164,7 +170,7 @@ private:
     bool handlePeersMessage(const P2pConnectionPtr& connection, const QByteArray& data);
     bool handleSubscribeForDataUpdates(const P2pConnectionPtr& connection, const QByteArray& data);
     bool handleSubscribeForAllDataUpdates(const P2pConnectionPtr& connection, const QByteArray& data);
-    bool handlePushTransactionList(const P2pConnectionPtr& connection, const QByteArray& tranList);
+    bool handlePushTransactionList(const P2pConnectionPtr& connection, const QByteArray& tranList, nx::Locker<nx::Mutex>* lock);
 
     friend struct GotTransactionFuction;
     friend struct GotUnicastTransactionFuction;
@@ -174,7 +180,8 @@ private:
     void gotUnicastTransaction(
         const QnTransaction<T>& tran,
         const P2pConnectionPtr& connection,
-        const TransportHeader& records);
+        const TransportHeader& records,
+        nx::Locker<nx::Mutex>* lock);
 
     /*
      * In P2P mode a Client gets transactions only, without any protocol related system messages.
