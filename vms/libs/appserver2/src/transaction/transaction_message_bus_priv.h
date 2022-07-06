@@ -152,7 +152,8 @@ bool handleTransactionWithHeader(
     MessageBus* bus,
     const nx::p2p::P2pConnectionPtr& connection,
     const QByteArray& data,
-    Function function)
+    Function function,
+    nx::Locker<nx::Mutex>* lock)
 {
     int headerSize = 0;
     nx::p2p::TransportHeader header;
@@ -167,7 +168,7 @@ bool handleTransactionWithHeader(
         bus,
         connection->remotePeer().dataFormat,
         data.mid(headerSize),
-        std::bind(function, bus, _1, connection, header),
+        std::bind(function, bus, _1, connection, header, lock),
         [](Qn::SerializationFormat, const QnAbstractTransaction&, const QByteArray&) { return false; });
 
     return true;
