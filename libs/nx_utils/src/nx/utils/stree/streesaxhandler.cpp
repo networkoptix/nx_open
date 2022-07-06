@@ -15,32 +15,7 @@
 
 namespace nx::utils::stree {
 
-namespace MatchType {
-
-Value fromString(const std::string_view& str)
-{
-    if (str == "equal")
-        return equal;
-    if (str == "greater")
-        return greater;
-    if (str == "less")
-        return less;
-    if (str == "wildcard")
-        return wildcard;
-    if (str == "presence")
-        return presence;
-    if (str == "range")
-        return range;
-    return unknown;
-}
-
-} // namespace MatchType
-
-SaxHandler::SaxHandler(const ResourceNameSet& resourceNameSet):
-    m_resourceNameSet(resourceNameSet)
-{
-}
-
+SaxHandler::SaxHandler() = default;
 SaxHandler::~SaxHandler() = default;
 
 bool SaxHandler::startDocument()
@@ -62,14 +37,6 @@ bool SaxHandler::startElement(
     }
 
     auto [newNode, resultCode] = createNode(name.toString(), attrs);
-    if ((m_flags & ParseFlag::ignoreUnknownResources) > 0 &&
-        resultCode == ResultCode::unknownResource)
-    {
-        m_state = skippingNode;
-        m_inlineLevel = 1;
-        return true;
-    }
-
     if (!newNode.get())
         return false;
     auto newNodePtr = newNode.get();
@@ -79,9 +46,7 @@ bool SaxHandler::startElement(
     {
         m_root = std::move(newNode);
     }
-    else if (!m_nodes.top()->addChild(
-        value.isEmpty() ? QVariant() : QVariant(value.toString()),
-        std::move(newNode)))
+    else if (!m_nodes.top()->addChild(value.toString().toStdString(), std::move(newNode)))
     {
         m_state = skippingNode;
         m_inlineLevel = 1;
@@ -124,11 +89,6 @@ QString SaxHandler::errorString() const
     return m_errorDescription;
 }
 
-void SaxHandler::setFlags(int flags)
-{
-    m_flags = flags;
-}
-
 const std::unique_ptr<AbstractNode>& SaxHandler::root() const
 {
     return m_root;
@@ -151,22 +111,15 @@ std::tuple<std::unique_ptr<AbstractNode>, SaxHandler::ResultCode> SaxHandler::cr
             m_errorDescription = "No required attribute \"resName\" in ConditionNode";
             return {nullptr, ResultCode::missingAttribute};
         }
-        const auto resName = atts.value("resName");
-        const ResourceNameSet::ResourceDescription& res =
-            m_resourceNameSet.findResourceByName(resName.toString().toStdString());
-        if (res.id == -1)
-        {
-            m_errorDescription = QString(
-                "Unknown resource %1 found as \"resName\" attribute of ConditionNode").arg(resName);
-            return {nullptr, ResultCode::unknownResource};
-        }
+        const auto resName = atts.value("resName").toString().toStdString();
 
-        MatchType::Value matchType = MatchType::equal;
+        MatchType matchType = MatchType::equal;
         if (atts.hasAttribute("matchType"))
         {
             const auto matchTypeStr = atts.value("matchType");
-            matchType = MatchType::fromString(matchTypeStr.toString().toStdString());
-            if (matchType == MatchType::unknown)
+            bool ok = false;
+            matchType = nx::reflect::fromString<MatchType>(matchTypeStr.toString().toStdString(), &ok);
+            if (!ok)
             {
                 m_errorDescription = QString("ConditionNode does not support match type %1")
                     .arg(matchTypeStr);
@@ -174,33 +127,7 @@ std::tuple<std::unique_ptr<AbstractNode>, SaxHandler::ResultCode> SaxHandler::cr
             }
         }
 
-        switch (res.type)
-        {
-            case QVariant::Int:
-                return {createConditionNode<int>(matchType, res.id), ResultCode::ok};
-
-            case QVariant::UInt:
-                return {createConditionNode<unsigned int>(matchType, res.id), ResultCode::ok};
-
-            case QVariant::ULongLong:
-                return {createConditionNode<qulonglong>(matchType, res.id), ResultCode::ok};
-
-            case QVariant::Double:
-                return {createConditionNode<double>(matchType, res.id), ResultCode::ok};
-
-            case QVariant::String:
-                return {createConditionNodeForStringRes(matchType, res.id), ResultCode::ok};
-
-            case QVariant::Bool:
-                return {createConditionNode<bool>(matchType, res.id), ResultCode::ok};
-
-            default:
-                m_errorDescription =
-                    nx::format("ConditionNode currently does not support resource of type %1 "
-                        "(resource name %2). Only %3 types are supported")
-                        .arg(res.type).arg(resName).arg("int, double, string");
-                return {nullptr, ResultCode::other};
-        }
+        return {createConditionNodeForStringRes(matchType, resName), ResultCode::ok};
     }
     else if (nodeName == "sequence")
     {
@@ -213,85 +140,59 @@ std::tuple<std::unique_ptr<AbstractNode>, SaxHandler::ResultCode> SaxHandler::cr
             m_errorDescription = QString("No required attribute \"resName\" in SetNode");
             return {nullptr, ResultCode::missingAttribute};
         }
-        const auto resName = atts.value("resName");
+        const auto resName = atts.value("resName").toString().toStdString();
 
         if (!atts.hasAttribute("resValue"))
         {
             m_errorDescription = "No required attribute \"resValue\" in SetNode";
             return {nullptr, ResultCode::missingAttribute};
         }
+        const auto resValue = atts.value("resValue").toString().toStdString();
 
-        const ResourceNameSet::ResourceDescription& res =
-            m_resourceNameSet.findResourceByName(resName.toString().toStdString());
-        if (res.id == -1)
-        {
-            m_errorDescription =
-                QString("Unknown resource %1 found as \"resName\" attribute of SetNode")
-                    .arg(resName);
-            return {nullptr, ResultCode::unknownResource};
-        }
-
-        //converting value to appropriate type
-        const auto resValueStr = atts.value("resValue");
-        QVariant resValue(resValueStr.toString());
-        if (!resValue.convert(res.type))
-        {
-            m_errorDescription =
-                QString("Could not convert value %1 of resource %2 to type %3")
-                    .arg(resValueStr).arg(resName).arg(res.type);
-            return {nullptr, ResultCode::other};
-        }
-
-        return {std::make_unique<SetNode>(res.id, resValue), ResultCode::ok};
+        return {std::make_unique<SetNode>(resName, resValue), ResultCode::ok};
     }
 
     return {nullptr, ResultCode::unknownNodeType};
 }
 
-template<typename ResValueType>
-std::unique_ptr<AbstractNode> SaxHandler::createConditionNode(
-    MatchType::Value matchType,
-    int matchResID) const
-{
-    switch (matchType)
-    {
-        case MatchType::equal:
-            return std::make_unique<ConditionNode<ResValueType, EqualMatchContainer>>(matchResID);
-        case MatchType::greater:
-            return std::make_unique<ConditionNode<ResValueType, MaxLesserMatchContainer>>(matchResID);
-        case MatchType::less:
-            return std::make_unique<ConditionNode<ResValueType, MinGreaterMatchContainer>>(matchResID);
-        case MatchType::presence:
-            return std::make_unique<ResPresenceNode>(matchResID);
-        case MatchType::range:
-            return std::make_unique<ConditionNode<ResValueType, RangeMatchContainer, RangeConverter<ResValueType>>>(matchResID);
-        default:
-            NX_ASSERT(false);
-            return NULL;
-    }
-}
-
 std::unique_ptr<AbstractNode> SaxHandler::createConditionNodeForStringRes(
-    MatchType::Value matchType,
-    int matchResID) const
+    MatchType matchType,
+    const std::string& attrName) const
 {
     switch (matchType)
     {
         case MatchType::equal:
-            return std::make_unique<ConditionNode<QString, EqualMatchContainer>>(matchResID);
+            return std::make_unique<ConditionNode<std::string, EqualMatchContainer>>(attrName);
+
         case MatchType::greater:
-            return std::make_unique<ConditionNode<QString, MaxLesserMatchContainer>>(matchResID);
+            return std::make_unique<ConditionNode<std::string, MaxLesserMatchContainer>>(attrName);
+
+        case MatchType::intGreater:
+            return std::make_unique<ConditionNode<int, MaxLesserMatchContainer>>(attrName);
+
         case MatchType::less:
-            return std::make_unique<ConditionNode<QString, MinGreaterMatchContainer>>(matchResID);
+            return std::make_unique<ConditionNode<std::string, MinGreaterMatchContainer>>(attrName);
+
+        case MatchType::intLess:
+            return std::make_unique<ConditionNode<int, MinGreaterMatchContainer>>(attrName);
+
         case MatchType::wildcard:
-            return std::make_unique<ConditionNode<QString, WildcardMatchContainer>>(matchResID);
+            return std::make_unique<ConditionNode<std::string, WildcardMatchContainer>>(attrName);
+
         case MatchType::presence:
-            return std::make_unique<ResPresenceNode>(matchResID);
+            return std::make_unique<AttrPresenceNode>(attrName);
+
         case MatchType::range:
-            return std::make_unique<ConditionNode<QString, RangeMatchContainer, RangeConverter<QString>>>(matchResID);
+            return std::make_unique<ConditionNode<std::string, RangeMatchContainer,
+                RangeConverter<std::string>>>(attrName);
+
+        case MatchType::intRange:
+            return std::make_unique<ConditionNode<int, RangeMatchContainer,
+                RangeConverter<int>>>(attrName);
+
         default:
             NX_ASSERT(false);
-            return NULL;
+            return nullptr;
     }
 }
 

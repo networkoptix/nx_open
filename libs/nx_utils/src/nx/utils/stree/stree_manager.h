@@ -9,15 +9,9 @@
 #include <nx/utils/buffer.h>
 
 #include "node.h"
-#include "resourcecontainer.h"
-#include "resourcenameset.h"
+#include "attribute_dictionary.h"
 
 namespace nx::utils::stree {
-
-enum ParseFlag
-{
-    ignoreUnknownResources = 0x01,
-};
 
 class NX_UTILS_API StreeManager
 {
@@ -26,24 +20,19 @@ public:
      * Performs initial parsing.
      * @throw std::runtime_error in case of parse error.
      */
-    StreeManager(
-        const nx::utils::stree::ResourceNameSet& resourceNameSet,
-        const std::string& xmlFilePath) noexcept(false);
+    StreeManager(const std::string& xmlFilePath) noexcept(false);
 
     void search(
-        const nx::utils::stree::AbstractResourceReader& input,
-        nx::utils::stree::AbstractResourceWriter* const output) const;
+        const nx::utils::stree::AbstractAttributeReader& input,
+        nx::utils::stree::AbstractAttributeWriter* const output) const;
 
-    const nx::utils::stree::ResourceNameSet& resourceNameSet() const;
-
-    static std::unique_ptr<nx::utils::stree::AbstractNode> loadStree(
-        const nx::Buffer& data,
-        const nx::utils::stree::ResourceNameSet& resourceNameSet,
-        int parseFlags = 0);
+    /**
+     * Parse tree from the provided xml.
+     */
+    static std::unique_ptr<nx::utils::stree::AbstractNode> loadStree(const nx::Buffer& xmlData);
 
 private:
     std::unique_ptr<nx::utils::stree::AbstractNode> m_stree;
-    const nx::utils::stree::ResourceNameSet& m_attrNameSet;
     const std::string m_xmlFilePath;
 
     void loadStree() noexcept(false);

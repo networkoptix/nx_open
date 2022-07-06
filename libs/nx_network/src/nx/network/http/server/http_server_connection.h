@@ -17,7 +17,7 @@
 #include "request_processing_types.h"
 
 namespace nx::network::aio { class AsyncChannelBridge; }
-namespace nx::utils::stree { class ResourceContainer; }
+namespace nx::utils::stree { class AttributeDictionary; }
 
 namespace nx::network::http {
 

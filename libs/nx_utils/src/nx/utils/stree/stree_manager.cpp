@@ -13,41 +13,27 @@
 
 namespace nx::utils::stree {
 
-StreeManager::StreeManager(
-    const nx::utils::stree::ResourceNameSet& resourceNameSet,
-    const std::string& xmlFilePath) noexcept(false)
-:
-    m_attrNameSet(resourceNameSet),
+StreeManager::StreeManager(const std::string& xmlFilePath) noexcept(false):
     m_xmlFilePath(xmlFilePath)
 {
     loadStree();
 }
 
 void StreeManager::search(
-    const nx::utils::stree::AbstractResourceReader& input,
-    nx::utils::stree::AbstractResourceWriter* const output) const
+    const nx::utils::stree::AbstractAttributeReader& input,
+    nx::utils::stree::AbstractAttributeWriter* const output) const
 {
     m_stree->get(input, output);
 }
 
-const nx::utils::stree::ResourceNameSet& StreeManager::resourceNameSet() const
+std::unique_ptr<nx::utils::stree::AbstractNode> StreeManager::loadStree(const nx::Buffer& data)
 {
-    return m_attrNameSet;
-}
-
-std::unique_ptr<nx::utils::stree::AbstractNode> StreeManager::loadStree(
-    const nx::Buffer& data,
-    const nx::utils::stree::ResourceNameSet& resourceNameSet,
-    int parseFlags)
-{
-    nx::utils::stree::SaxHandler xmlHandler(resourceNameSet);
-    xmlHandler.setFlags(parseFlags);
+    nx::utils::stree::SaxHandler xmlHandler;
 
     QXmlStreamReader reader(data.toRawByteArray());
     if (!nx::utils::parseXml(reader, xmlHandler))
     {
-        NX_WARNING(typeid(StreeManager), "Failed to parse stree xml: %1",
-            reader.errorString());
+        NX_WARNING(typeid(StreeManager), "Failed to parse stree xml: %1", reader.errorString());
         return nullptr;
     }
 
@@ -64,7 +50,7 @@ void StreeManager::loadStree() noexcept(false)
     }
 
     NX_DEBUG(this, "Parsing stree xml file (%1)", m_xmlFilePath);
-    m_stree = loadStree(xmlFile.readAll(), m_attrNameSet);
+    m_stree = loadStree(xmlFile.readAll());
     if (!m_stree)
         throw std::runtime_error("Failed to parse stree xml file " + m_xmlFilePath);
 }

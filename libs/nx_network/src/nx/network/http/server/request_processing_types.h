@@ -6,7 +6,7 @@
 
 #include <nx/network/http/http_types.h>
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/stree/resourcecontainer.h>
+#include <nx/utils/stree/attribute_dictionary.h>
 
 namespace nx::network::http {
 
@@ -64,7 +64,7 @@ struct RequestContext
     /**
      * Attributes added by the authenticator when authenticating the request.
      */
-    nx::utils::stree::ResourceContainer authInfo;
+    nx::utils::stree::AttributeDictionary authInfo;
     http::Request request;
 
     /**
@@ -86,7 +86,7 @@ struct RequestContext
     RequestContext(
         http::HttpServerConnection* connection,
         const SocketAddress& clientEndpoint,
-        nx::utils::stree::ResourceContainer authInfo,
+        nx::utils::stree::AttributeDictionary authInfo,
         http::Request request,
         std::unique_ptr<AbstractMsgBodySourceWithCache> body = nullptr)
         :

@@ -6,22 +6,10 @@
 
 namespace nx::utils::stree::test {
 
-StreeFixture::StreeFixture()
-{
-    m_nameSet.registerResource(intAttr, "intAttr", QVariant::Int);
-    m_nameSet.registerResource(strAttr, "strAttr", QVariant::String);
-    m_nameSet.registerResource(outAttr, "outAttr", QVariant::String);
-}
-
-bool StreeFixture::prepareTree(
-    const char* xmlDataStr,
-    int parseFlags)
+bool StreeFixture::prepareTree(const char* xmlDataStr)
 {
     auto xmlData = QByteArray::fromRawData(xmlDataStr, (int) std::strlen(xmlDataStr));
-    m_streeRoot = StreeManager::loadStree(
-        xmlData,
-        m_nameSet,
-        parseFlags);
+    m_streeRoot = StreeManager::loadStree(xmlData);
     return m_streeRoot != nullptr;
 }
 
@@ -30,10 +18,10 @@ const std::unique_ptr<AbstractNode>& StreeFixture::streeRoot() const
     return m_streeRoot;
 }
 
-std::string StreeFixture::search(const ResourceContainer& inputData)
+std::string StreeFixture::search(const AttributeDictionary& inputData)
 {
-    ResourceContainer outputData;
-    streeRoot()->get(MultiSourceResourceReader(inputData, outputData), &outputData);
+    AttributeDictionary outputData;
+    streeRoot()->get(makeMultiReader(inputData, outputData), &outputData);
     if (auto outVal = outputData.get<std::string>(Attributes::outAttr))
         return *outVal;
     return std::string();

@@ -103,14 +103,11 @@ int VmsGatewayProcess::serviceMain(
             return 1;
         }
 
-        CdbAttrNameSet attrNameSet;
         nx::utils::stree::StreeManager streeManager(
-            attrNameSet,
             settings.auth().rulesXmlPath.toStdString());
 
         nx::network::http::server::rest::MessageDispatcher httpMessageDispatcher;
 
-        // TODO: #akolesnikov Move following to stree xml.
         nx::network::http::AuthMethodRestrictionList authRestrictionList;
 
         AuthenticationManager authenticationManager(

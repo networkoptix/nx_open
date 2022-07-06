@@ -127,7 +127,7 @@ protected:
                 RequestContext(
                     nullptr,
                     SocketAddress(),
-                    nx::utils::stree::ResourceContainer(),
+                    nx::utils::stree::AttributeDictionary(),
                     prepareDummyRequest(method, path)),
                 [](auto&&...) {}));
     }
@@ -148,7 +148,7 @@ protected:
                 RequestContext(
                     nullptr,
                     SocketAddress(),
-                    nx::utils::stree::ResourceContainer(),
+                    nx::utils::stree::AttributeDictionary(),
                     prepareDummyRequest(method, path)),
                 [](auto&&...) {}));
     }

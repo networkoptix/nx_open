@@ -1749,7 +1749,53 @@ std::string replace(
 //-------------------------------------------------------------------------------------------------
 
 /**
+ * Comparator for case-sensitive comparison in STL associative containers.
+ * Supports both std::string and std::string_view. Allows specifying std::string_view to find()
+ * when dictionary uses std::string as a key type.
+ */
+struct StringLessTransparentComp
+{
+    using is_transparent = std::true_type;
+
+    /** Case-independent (ci) compare_less binary function. */
+    bool operator() (const std::string& c1, const std::string& c2) const
+    {
+        return nx::utils::stricmp(c1, c2) < 0;
+    }
+
+    //---------------------------------------------------------------------------------------------
+    // std::string_view support for lookup.
+
+    bool operator() (const std::string& c1, const std::string_view& c2) const
+    {
+        return nx::utils::stricmp(c1, c2) < 0;
+    }
+
+    bool operator() (const std::string_view& c1, const std::string& c2) const
+    {
+        return nx::utils::stricmp(c1, c2) < 0;
+    }
+
+    //---------------------------------------------------------------------------------------------
+    // const char* support for lookup.
+
+    bool operator() (const std::string& c1, const char* c2) const
+    {
+        return nx::utils::stricmp(c1, c2) < 0;
+    }
+
+    bool operator() (const char* c1, const std::string& c2) const
+    {
+        return nx::utils::stricmp(c1, c2) < 0;
+    }
+};
+
+//-------------------------------------------------------------------------------------------------
+
+/**
  * Comparator for case-insensitive comparison in STL associative containers.
+ * Supports both std::string and std::string_view. Allows specifying std::string_view to find()
+ * when dictionary uses std::string as a key type.
  */
 struct ci_less
 {

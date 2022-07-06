@@ -25,13 +25,13 @@ class StreeWildcardMatch:
 protected:
     virtual void SetUp() override
     {
-        ASSERT_TRUE(prepareTree(kTestXmlData, 0));
+        ASSERT_TRUE(prepareTree(kTestXmlData));
     }
 
     std::string search(const std::string& strAttrVal)
     {
-        ResourceContainer inputData;
-        inputData.putStr(Attributes::strAttr, strAttrVal);
+        AttributeDictionary inputData;
+        inputData.put(Attributes::strAttr, strAttrVal);
         return base_type::search(inputData);
     }
 };

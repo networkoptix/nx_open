@@ -34,7 +34,7 @@ public:
 
 protected:
     virtual bool analyzeXmlSearchResult(
-        const nx::utils::stree::ResourceContainer& searchResult) override;
+        const nx::utils::stree::AttributeDictionary& searchResult) override;
     
     virtual void invokeHandler(
         const Handler& handler,

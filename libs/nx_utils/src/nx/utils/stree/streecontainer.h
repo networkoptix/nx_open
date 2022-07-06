@@ -4,9 +4,7 @@
 
 #include <map>
 
-namespace nx {
-namespace utils {
-namespace stree {
+namespace nx::utils::stree {
 
 template <class KeyType, class MappedType>
 class EqualMatchContainer: public std::map<KeyType, MappedType>
@@ -92,6 +90,4 @@ class MaxLesserMatchContainer:
 {
 };
 
-} // namespace stree
-} // namespace utils
-} // namespace nx
+} // namespace nx::utils::stree

@@ -75,22 +75,20 @@ void AuthenticationManager::authenticate(
     }
 
     //performing stree search
-    nx::utils::stree::ResourceContainer authTraversalResult;
-    nx::utils::stree::ResourceContainer inputRes;
+    nx::utils::stree::AttributeDictionary authTraversalResult;
+    nx::utils::stree::AttributeDictionary inputRes;
     if (authHeader && !authHeader->userid().empty())
         inputRes.putStr(attr::userName, authHeader->userid());
     SocketResourceReader socketResources(*connection.socket());
     HttpRequestResourceReader httpRequestResources(request);
-    const auto authSearchInputData = nx::utils::stree::MultiSourceResourceReader(
+    const auto authSearchInputData = nx::utils::stree::makeMultiReader(
         socketResources,
         httpRequestResources,
         inputRes);
-    m_stree.search(
-        authSearchInputData,
-        &authTraversalResult);
-    if (auto authenticated = authTraversalResult.get(attr::authenticated))
+    m_stree.search(authSearchInputData, &authTraversalResult);
+    if (auto authenticated = authTraversalResult.get<bool>(attr::authenticated))
     {
-        if (authenticated->toBool())
+        if (*authenticated)
         {
             authenticationResult.statusCode = nx::network::http::StatusCode::ok;
             return;
@@ -119,20 +117,17 @@ void AuthenticationManager::authenticate(
         };
 
     //analyzing authSearchResult for password or ha1 pesence
-    if (auto foundHa1 = authTraversalResult.get(attr::ha1))
+    if (auto foundHa1 = authTraversalResult.get<std::string>(attr::ha1))
     {
-        if (validateHa1Func(foundHa1->toString().toLatin1()))
+        if (validateHa1Func(*foundHa1))
         {
             authenticationResult.statusCode = nx::network::http::StatusCode::ok;
             return;
         }
     }
-    if (auto password = authTraversalResult.get(attr::userPassword))
+    if (auto password = authTraversalResult.get<std::string>(attr::userPassword))
     {
-        if (validateHa1Func(calcHa1(
-                userID,
-                realm(),
-                password->toString().toStdString())))
+        if (validateHa1Func(calcHa1(userID, realm(), *password)))
         {
             authenticationResult.statusCode = nx::network::http::StatusCode::ok;
             return;

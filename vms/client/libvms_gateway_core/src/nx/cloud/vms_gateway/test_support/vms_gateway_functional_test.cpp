@@ -50,7 +50,7 @@ VmsGatewayFunctionalTest::VmsGatewayFunctionalTest(int flags):
     addArg("-e");
     addArg("-general/listenOn"); addArg("127.0.0.1:0");
     addArg("-general/dataDir"); addArg(m_tmpDir.toLatin1().constData());
-    addArg("-log/logLevel"); addArg("DEBUG2");
+    addArg("-log/logLevel"); addArg("none");
 }
 
 VmsGatewayFunctionalTest::~VmsGatewayFunctionalTest()
