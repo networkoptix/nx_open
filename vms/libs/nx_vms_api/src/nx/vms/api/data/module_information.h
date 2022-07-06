@@ -150,16 +150,10 @@ struct NX_VMS_API ServerInformation: ModuleInformationWithAddresses
     TransactionLogTime transactionLogTime;
     QStringList hardwareIds;
 
-    /**%apidoc
-     * Local OS time on the Server, in milliseconds since epoch.
-     * %deprecated
-     */
+    /**%apidoc Local OS time on the Server, in milliseconds since epoch. */
     milliseconds osTimeMs = 0ms;
 
-    /**%apidoc
-     * Time zone offset, in milliseconds.
-     * %deprecated
-     */
+    /**%apidoc Time zone offset, in milliseconds. */
     milliseconds timeZoneOffsetMs = 0ms;
 
     /**%apidoc Identification of the time zone in the text form. */
