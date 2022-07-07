@@ -26,7 +26,7 @@ int differentSign(int left, int right)
 bool hasRepeatingSymbols(const QString& password,
     int maxCount = nx::utils::PasswordLimitations::kRepeatingCharactersLimit)
 {
-    const auto count = password.count();
+    const auto count = password.size();
     if (!maxCount || count < maxCount || count <= 1)
         return false;
 
@@ -51,7 +51,7 @@ bool hasRepeatingSymbols(const QString& password,
 bool hasConsecutiveSequence(const QString& password,
     int maxCount = nx::utils::PasswordLimitations::kConsecutiveCharactersLimit)
 {
-    const auto count = password.count();
+    const auto count = password.size();
     if (!maxCount || count < maxCount || count <= 1)
         return false;
 

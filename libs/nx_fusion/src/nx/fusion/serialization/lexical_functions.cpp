@@ -269,7 +269,7 @@ bool serialize(const QRect& value, QString* target)
 
 bool deserialize(const QString& value, QRect* target)
 {
-    const auto params = value.splitRef(',');
+    const auto params = QStringView(value).split(',');
     if (params.size() != 3)
         return false;
     const auto dimensions = params[2].split('x');
@@ -308,7 +308,7 @@ bool serialize(const QRectF& value, QString* target)
 
 bool deserialize(const QString& value, QRectF* target)
 {
-    const auto params = value.splitRef(',');
+    const auto params = QStringView(value).split(',');
     if (params.size() != 3)
         return false;
     const auto dimensions = params[2].split('x');

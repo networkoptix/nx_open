@@ -285,10 +285,10 @@ NumericRange AttributeEx::parseRangeFromValue(const QString& value)
     if (unquotedValue.endsWith(L')') || unquotedValue.endsWith(L']'))
         unquotedValue.chop(1);
 
-    const auto params = unquotedValue.splitRef(kRangeDelimiter);
+    const auto params = QStringView(unquotedValue).split(kRangeDelimiter);
     if (params.size() != 2)
         return NumericRange(); //< Invalid value
-    if (params[0] != "-inf")
+    if (params[0] != QLatin1String("-inf"))
     {
         left = RangePoint();
         left->value = params[0].toFloat(&ok);
@@ -296,7 +296,7 @@ NumericRange AttributeEx::parseRangeFromValue(const QString& value)
         if (!ok)
             return NumericRange(); //< Invalid value
     }
-    if (params[1] != "inf")
+    if (params[1] != QLatin1String("inf"))
     {
         right = RangePoint();
         right->value = params[1].toFloat(&ok);

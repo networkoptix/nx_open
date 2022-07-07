@@ -263,7 +263,7 @@ TEST_F(SharedMemoryManagerTest, assignStatesUnderfilled)
     ASSERT_EQ(rawProcessSharedMemoryAt(3).command, Command::none);
 
     // Check the command data.
-    auto receivedName = QString::fromLatin1(rawProcessSharedMemoryAt(1).commandData);
+    auto receivedName = QString::fromLatin1(rawProcessSharedMemoryAt(1).commandData.constData());
     ASSERT_EQ(stateName, receivedName);
 }
 
@@ -294,8 +294,8 @@ TEST_F(SharedMemoryManagerTest, assignStatesOverflown)
     ASSERT_EQ(rawProcessSharedMemoryAt(3).command, Command::none);
 
     // Check the command data.
-    auto receivedName1 = QString::fromLatin1(rawProcessSharedMemoryAt(1).commandData);
-    auto receivedName2 = QString::fromLatin1(rawProcessSharedMemoryAt(2).commandData);
+    auto receivedName1 = QString::fromLatin1(rawProcessSharedMemoryAt(1).commandData.constData());
+    auto receivedName2 = QString::fromLatin1(rawProcessSharedMemoryAt(2).commandData.constData());
     ASSERT_EQ(stateName1, receivedName1);
     ASSERT_EQ(stateName2, receivedName2);
 }

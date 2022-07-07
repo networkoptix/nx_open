@@ -118,8 +118,8 @@ QString QnEmailAddress::user() const
 {
     /* Support for tagged addressing: username+tag@domain.com */
 
-    int idx = m_email.indexOf(L'@');
-    int idxSuffix = m_email.indexOf(L'+');
+    const auto idx = m_email.indexOf('@');
+    const auto idxSuffix = m_email.indexOf('+');
     if (idx >= 0)
     {
         if (idxSuffix >= 0)
@@ -132,7 +132,7 @@ QString QnEmailAddress::user() const
 
 QString QnEmailAddress::domain() const
 {
-    int idx = m_email.indexOf(L'@');
+    const auto idx = m_email.indexOf('@');
     return m_email.mid(idx + 1);
 }
 
