@@ -1588,7 +1588,7 @@ QColor QnTimeSlider::tickmarkLineColor(int level) const
         colorTheme()->color("dark9"),
     }};
 
-    return kTickmarkLinesColors[std::clamp(level, 0, kTickmarkLinesColors.size() - 1)];
+    return kTickmarkLinesColors[std::clamp(level, 0, (int) kTickmarkLinesColors.size() - 1)];
 }
 
 QColor QnTimeSlider::tickmarkTextColor(int level) const
@@ -1599,7 +1599,7 @@ QColor QnTimeSlider::tickmarkTextColor(int level) const
         colorTheme()->color("dark15"),
     }};
 
-    return kTickmarkTextColors[std::clamp(level, 0, kTickmarkTextColors.size() - 1)];
+    return kTickmarkTextColors[std::clamp(level, 0, (int)kTickmarkTextColors.size() - 1)];
 }
 
 QRectF QnTimeSlider::dateBarRect() const

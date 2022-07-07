@@ -164,7 +164,7 @@ struct JoystickButtonSettingsModel::Private
 
     QString modifierButtonName;
     bool zAxisIsInitialized = false;
-    int initializedButtonsNumber = 0;
+    qsizetype initializedButtonsNumber = 0;
 
     bool connectedToServer = false;
 

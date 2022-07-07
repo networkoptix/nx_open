@@ -21,7 +21,7 @@ template<class T> class QSet;
 template<class T> class QList;
 template<class T> class QLinkedList;
 template<class T> class QVector;
-template<class T, int N> class QVarLengthArray;
+template<class T, qsizetype N> class QVarLengthArray;
 template<class Key, class T> class QMap;
 template<class Key, class T> class QHash;
 

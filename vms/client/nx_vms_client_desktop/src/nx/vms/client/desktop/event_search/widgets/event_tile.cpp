@@ -66,7 +66,7 @@ static constexpr int kProgressBarResolution = 1000;
 
 static constexpr int kSeparatorHeight = 6;
 
-static constexpr int kMaximumResourceListSize = 3; //< Before "...and n more"
+static constexpr qsizetype kMaximumResourceListSize = 3; //< Before "...and n more"
 
 static constexpr int kMaximumPreviewHeightWithHeader = 135;
 static constexpr int kMaximumPreviewHeightWithoutHeader = 151;

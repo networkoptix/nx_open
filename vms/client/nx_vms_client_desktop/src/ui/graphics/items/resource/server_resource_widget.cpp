@@ -501,9 +501,9 @@ QColor QnServerResourceWidget::getColor(Qn::StatisticsDeviceType deviceType, int
     case Qn::StatisticsRAM:
         return colorTheme()->color("server.statistics.ram");
     case Qn::StatisticsHDD:
-        return kHddColors[qMod(index, kHddColors.size())];
+        return kHddColors[qMod((qsizetype) index, kHddColors.size())];
     case Qn::StatisticsNETWORK:
-        return kNetworkColors[qMod(index, kNetworkColors.size())];
+        return kNetworkColors[qMod((qsizetype) index, kNetworkColors.size())];
     default:
         return QColor(Qt::white);
     }

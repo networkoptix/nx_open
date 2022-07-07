@@ -78,7 +78,7 @@ public:
     int zAxisIsInitialized() const;
 
     /** The number of buttons which has been returned by device. */
-    int initializedButtonsNumber() const;
+    qsizetype initializedButtonsNumber() const;
 
     void updateStickAxisLimits(const JoystickDescriptor& modelInfo);
 

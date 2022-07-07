@@ -80,7 +80,7 @@ QString WidgetProfiler::getWidgetHierarchy(const QWidget* parent /*= nullptr*/)
 QString WidgetProfiler::getWidgetStatistics()
 {
     QHash<QString, int> countByClassName;
-    int longestClassName = 0;
+    qsizetype longestClassName = 0;
     for (const auto& widget: QApplication::allWidgets())
     {
         const QString className(widget->metaObject()->className());

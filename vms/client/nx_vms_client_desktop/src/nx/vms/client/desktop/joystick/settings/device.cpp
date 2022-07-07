@@ -64,7 +64,7 @@ int Device::zAxisIsInitialized() const
     return m_zAxisInitialized;
 }
 
-int Device::initializedButtonsNumber() const
+qsizetype Device::initializedButtonsNumber() const
 {
     return m_initializedButtonsNumber;
 }

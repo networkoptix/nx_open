@@ -9,7 +9,7 @@
 
 namespace nx::vms::api::analytics {
 
-static const int kNumberOfEntriesToTransform = 3;
+static const qsizetype kNumberOfEntriesToTransform = 3;
 
 class DeviceAgentManifestValidationTest: public BaseManifestValidationTest<DeviceAgentManifest>
 {

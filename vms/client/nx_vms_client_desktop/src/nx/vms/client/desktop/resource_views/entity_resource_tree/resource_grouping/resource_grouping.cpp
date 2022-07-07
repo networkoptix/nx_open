@@ -240,7 +240,7 @@ QString extractSubId(const QString& compositeId, int subIdOrder)
 
     if (subIdOrder == 0)
     {
-        int stoppedAt = 0;
+        qsizetype stoppedAt = 0;
         const auto trailingDelimiterItr = findDelimiter(begin, end, 0, &stoppedAt);
         if (trailingDelimiterItr == end)
             return compositeId;
@@ -249,7 +249,7 @@ QString extractSubId(const QString& compositeId, int subIdOrder)
             return compositeId.left(std::distance(begin, trailingDelimiterItr));
     }
 
-    int stoppedAt = 0;
+    qsizetype stoppedAt = 0;
     auto leadingDelimiterItr = findDelimiter(begin, end, subIdOrder - 1, &stoppedAt);
     if (stoppedAt != (subIdOrder - 1))
     {
@@ -371,7 +371,7 @@ QString removeSubId(const QString& compositeId, int subIdOrder)
 
     if (subIdOrder == 0)
     {
-        int stoppedAt = 0;
+        qsizetype stoppedAt = 0;
         const auto trailingDelimiterItr = findDelimiter(begin, end, 0, &stoppedAt);
         if (trailingDelimiterItr == end)
             return QString();
@@ -379,7 +379,7 @@ QString removeSubId(const QString& compositeId, int subIdOrder)
         return compositeId.right(std::distance(std::next(trailingDelimiterItr), end));
     }
 
-    int stoppedAt = 0;
+    qsizetype stoppedAt = 0;
     auto leadingDelimiterItr = findDelimiter(begin, end, subIdOrder - 1, &stoppedAt);
     if (stoppedAt != (subIdOrder - 1))
     {
@@ -424,7 +424,7 @@ QString replaceSubId(const QString& compositeId, const QString& subId, int subId
 
     if (subIdOrder == 0)
     {
-        int stoppedAt = 0;
+        qsizetype stoppedAt = 0;
         const auto trailingDelimiterItr = findDelimiter(begin, end, 0, &stoppedAt);
         if (trailingDelimiterItr == end)
             return subId;
@@ -432,7 +432,7 @@ QString replaceSubId(const QString& compositeId, const QString& subId, int subId
         return subId + compositeId.right(std::distance(trailingDelimiterItr, end));
     }
 
-    int stoppedAt = 0;
+    qsizetype stoppedAt = 0;
     auto leadingDelimiterItr = findDelimiter(begin, end, subIdOrder - 1, &stoppedAt);
     if (stoppedAt != (subIdOrder - 1))
     {

@@ -129,7 +129,7 @@ CLVideoDecoderOutputPtr ImageToFramePainter::drawToFfmpeg(const CLVideoDecoderOu
     };
 
     quint8* dstData[4] = { (quint8*)m_finalImage.bits(), nullptr, nullptr, nullptr };
-    int dstStride[4] = { m_finalImage.bytesPerLine(), 0, 0, 0 };
+    int dstStride[4] = { (int) m_finalImage.bytesPerLine(), 0, 0, 0 };
     sws_scale(
         m_toImageContext, frameData, frame->linesize,
         0, m_finalImage.height(),

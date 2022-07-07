@@ -62,7 +62,7 @@ AesKey makeKey(const QString& password, Algorithm algorithm, const QByteArray& s
     std::array<uint8_t, EVP_MAX_IV_LENGTH>  iv{};
 
     std::array<unsigned char, 8> saltBuffer{};
-    memcpy(saltBuffer.data(), result.salt.data(), std::min((int) saltBuffer.size(), result.salt.size()));
+    memcpy(saltBuffer.data(), result.salt.data(), std::min((qsizetype) saltBuffer.size(), result.salt.size()));
 
     if (!EVP_BytesToKey(
         toCipher(algorithm),

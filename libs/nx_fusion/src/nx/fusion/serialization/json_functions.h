@@ -673,7 +673,7 @@ QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(QSet, (class T), (T), collecti
 QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(QList, (class T), (T), collection);
 QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(QLinkedList, (class T), (T), collection);
 QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(QVector, (class T), (T), collection);
-QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(QVarLengthArray, (class T, int N), (T, N), collection);
+QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(QVarLengthArray, (class T, qsizetype N), (T, N), collection);
 QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(QMap, (class Key, class T), (Key, T), collection);
 QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(QHash, (class Key, class T), (Key, T), collection);
 QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(std::vector, (class T, class Allocator), (T, Allocator), collection);
