@@ -136,9 +136,9 @@
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n nye resultater</numerusform>
-        <numerusform>%n new results</numerusform>
+        <numerusform>%n nye resultater</numerusform>
       </translation>
     </message>
     <message>

@@ -2835,7 +2835,7 @@
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>VMS tid</translation>
     </message>
     <message>
       <source>Do not sync time among servers</source>

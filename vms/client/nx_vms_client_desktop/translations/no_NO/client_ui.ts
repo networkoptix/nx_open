@@ -2910,7 +2910,7 @@
     </message>
     <message>
       <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
+      <translation>Krev sikker autentisering</translation>
     </message>
   </context>
   <context>

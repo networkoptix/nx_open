@@ -4659,7 +4659,7 @@ to %1</translation>
     </message>
     <message>
       <source>All Servers</source>
-      <translation type="unfinished">All Servers</translation>
+      <translation>Alle servere</translation>
     </message>
     <message>
       <source>Select Servers...</source>
@@ -10434,7 +10434,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>VMS tid</translation>
     </message>
   </context>
   <context>
@@ -10630,7 +10630,7 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     </message>
     <message>
       <source>Minimize</source>
-      <translation type="unfinished">Minimize</translation>
+      <translation>Minimér</translation>
     </message>
     <message>
       <source>Cannot write file</source>

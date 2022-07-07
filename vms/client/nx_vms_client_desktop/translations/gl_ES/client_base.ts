@@ -2820,7 +2820,7 @@ to %1</translation>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Account not found</source>
-      <translation type="unfinished">Account not found</translation>
+      <translation>Conta non atopada</translation>
     </message>
     <message>
       <source>Account is not activated.</source>
