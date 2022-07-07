@@ -626,7 +626,7 @@ void QnLicense::verify(const QByteArray& v1LicenseBlock, const QByteArray& v2Lic
     if (type() == Qn::LC_Cloud)
     {
         auto rawData = m_rawLicense;
-        rawData.replace(m_cloudData.signature, "");
+        rawData.replace(m_cloudData.signature.toUtf8(), "");
         m_isValid1 = isSignatureMatch(rawData.data(),
             QByteArray::fromBase64(m_signature), nxRSAPublicKey3);
     }

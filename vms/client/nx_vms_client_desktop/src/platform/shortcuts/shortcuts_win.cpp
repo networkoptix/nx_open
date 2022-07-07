@@ -184,7 +184,7 @@ QnPlatformShortcuts::ShortcutInfo QnWindowsShortcuts::getShortcutInfo(
     pShellLink->GetArguments((LPWSTR) linkArgsString.data(), kMaxStringLength);
     nx::utils::truncateToNul(&linkArgsString);
     result.arguments = QDir::fromNativeSeparators(linkArgsString)
-        .split(' ', QString::SkipEmptyParts);
+        .split(' ', Qt::SkipEmptyParts);
 
     QString iconLocationString(kMaxStringLength, QChar(0));
     int iconIndex = 0;
