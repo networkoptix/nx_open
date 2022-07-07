@@ -205,12 +205,12 @@ struct ResourceTreeModelAdapter::Private
         if (!isFiltering || q->rowCount(rootIndex) == 0)
             return {};
 
-        static const QVector<ResourceTree::ShortcutHint> kResourceHints({
-            {{Qt::Key_Enter}, tr("add to current layout")},
-            {{Qt::Key_Control, Qt::Key_Enter}, tr("open all at a new layout")}});
+        static const QVector<ResourceTree::ShortcutHint> kResourceHints{
+            ResourceTree::ShortcutHint(QList{Qt::Key_Enter}, tr("add to current layout")),
+            ResourceTree::ShortcutHint(QList{Qt::Key_Control, Qt::Key_Enter}, tr("open all at a new layout"))};
 
-        static const QVector<ResourceTree::ShortcutHint> kLayoutHints({
-            {{Qt::Key_Control, Qt::Key_Enter}, tr("open all")}});
+        static const QVector<ResourceTree::ShortcutHint> kLayoutHints{
+            ResourceTree::ShortcutHint({Qt::Key_Control, Qt::Key_Enter}, tr("open all"))};
 
         switch (effectiveFilterType())
         {
