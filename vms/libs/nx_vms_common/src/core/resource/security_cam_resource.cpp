@@ -1119,6 +1119,13 @@ QnUuid QnSecurityCamResource::preferredServerId() const
     return m_userAttributes.preferredServerId;
 }
 
+void QnSecurityCamResource::synchronizeRemoteArchiveOnce()
+{
+    QString value;
+    QnLexical::serialize(true, &value);
+    setProperty(ResourcePropertyKey::kRemoteArchiveSynchronizationEnabledOnce, value);
+}
+
 void QnSecurityCamResource::setRemoteArchiveSynchronizationDisabled(bool disabled)
 {
     QString value;
