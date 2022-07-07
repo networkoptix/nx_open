@@ -45,6 +45,12 @@ bool NX_VMS_COMMON_API cameraCanBeUsedAsReplacement(
     const QnResourcePtr& cameraToBeReplaced,
     const QnResourcePtr& replacementCamera);
 
+/**
+ * @param resource Valid pointer to the camera resource expected.
+ * @return True if given camera is used as replacement one for some another camera.
+ */
+bool NX_VMS_COMMON_API isReplacedCamera(const QnResourcePtr& resource);
+
 } // namespace camera_replacement
 } // namespace utils
 } // namespace nx::vms::common

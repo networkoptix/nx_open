@@ -11,6 +11,9 @@ namespace {
 // Constant redefinition. The same constant defined in the nx_vms_server module is unreachable.
 static constexpr auto kArchiveCameraResourceTypeName = "ARCHIVE_CAMERA";
 
+// Constant redefinition. The same constant defined in the nx_vms_server module is unreachable.
+static constexpr auto kReplacedWithIdPropertyName = "replaceWithId";
+
 bool isArchiveCamera(const QnVirtualCameraResourcePtr& camera)
 {
     const auto resourceTypeName = qnResTypePool->getResourceType(camera->getTypeId())->getName();
@@ -70,7 +73,19 @@ bool cameraCanBeUsedAsReplacement(
     if (!cameraSupportsReplacement(replacementCamera))
         return false;
 
+    if (isReplacedCamera(replacementCamera))
+        return false;
+
     return replacementCamera->isOnline();
+}
+
+bool isReplacedCamera(const QnResourcePtr& resource)
+{
+    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return false;
+
+    return !camera->getProperty(kReplacedWithIdPropertyName).isEmpty();
 }
 
 } // namespace camera_replacement
