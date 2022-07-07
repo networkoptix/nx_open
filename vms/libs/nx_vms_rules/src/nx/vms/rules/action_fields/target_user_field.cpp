@@ -35,9 +35,9 @@ QnUserResourceList TargetUserField::users() const
             usersInRoles.insert(subject.user());
     }
 
-    usersInRoles += users.toSet();
+    usersInRoles += QnUserResourceSet{users.cbegin(), users.cend()};
 
-    return usersInRoles.toList();
+    return usersInRoles.values();
 }
 
 } // namespace nx::vms::rules
