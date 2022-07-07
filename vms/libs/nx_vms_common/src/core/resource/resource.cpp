@@ -127,8 +127,7 @@ void QnResource::updateInternal(const QnResourcePtr& source, NotifierList& notif
             };
     }
 
-    m_locallySavedProperties = source->m_locallySavedProperties;
-    if (useLocalProperties() && !source->useLocalProperties())
+    if (useLocalProperties())
     {
         for (const auto& p: source->getProperties())
             m_locallySavedProperties.emplace(p.name, p.value);
