@@ -2,6 +2,7 @@
 
 #include "windows_desktop_resource.h"
 
+#include <QtMultimedia/QMediaDevices>
 #include <QtOpenGLWidgets/QOpenGLWidget>
 
 #include <core/resource/media_server_resource.h>
@@ -65,7 +66,8 @@ void WindowsDesktopResource::createSharedDataProvider()
     core::AudioDeviceInfo secondAudioDevice;
     if (recorderSettings.secondaryAudioDevice().fullName() != audioDevice.fullName())
         secondAudioDevice = recorderSettings.secondaryAudioDevice();
-    if (core::AudioDeviceInfo::availableDevices(QAudio::AudioInput).isEmpty()) {
+    if (QMediaDevices::audioInputs().isEmpty())
+    {
         audioDevice = core::AudioDeviceInfo(); // no audio devices
         secondAudioDevice = core::AudioDeviceInfo();
     }

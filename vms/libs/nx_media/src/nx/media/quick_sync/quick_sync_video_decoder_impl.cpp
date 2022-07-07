@@ -275,7 +275,7 @@ bool QuickSyncVideoDecoderImpl::buildQVideoFrame(
         buffer = new MfxQtVideoBuffer(surface, m_allocator);
 
     QSize frameSize(surface->Info.CropW, surface->Info.CropH);
-    result->reset(new QVideoFrame(buffer, frameSize, QVideoFrame::Format_NV12));
+    result->reset(new QVideoFrame(buffer, {frameSize, QVideoFrameFormat::Format_NV12}));
     result->get()->setStartTime(surface->Data.TimeStamp);
     return true;
 }

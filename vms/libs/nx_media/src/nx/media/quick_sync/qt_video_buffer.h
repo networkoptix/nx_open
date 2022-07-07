@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include <QtMultimedia/QAbstractVideoBuffer>
+#include <QtMultimedia/QVideoFrame>
+#include <QtMultimedia/private/qabstractvideobuffer_p.h>
 
 #include "quick_sync_surface.h"
 
@@ -12,7 +13,7 @@ class QtVideoBuffer: public QAbstractVideoBuffer
 {
 public:
     QtVideoBuffer(QuickSyncSurface surfaceData):
-        QAbstractVideoBuffer(QAbstractVideoBuffer::HandleType(kHandleTypeQsvSurface)),
+        QAbstractVideoBuffer(QVideoFrame::NoHandle),
         m_surfaceData(surfaceData)
     {
         auto decoder = m_surfaceData.decoder.lock();
@@ -31,14 +32,14 @@ public:
         decoder->releaseSurface(m_surfaceData.surface);
     }
 
-    virtual MapMode mapMode() const override
+    virtual QVideoFrame::MapMode mapMode() const override
     {
-        return NotMapped;
+        return QVideoFrame::NotMapped;
     }
 
-    virtual uchar* map(MapMode /*mode*/, int* /*numBytes*/, int* /*bytesPerLine*/) override
+    virtual MapData map(QVideoFrame::MapMode /*mode*/) override
     {
-        return nullptr;
+        return {};
     }
 
     virtual void unmap() override {}
@@ -46,6 +47,11 @@ public:
     QVariant handle() const
     {
         return QVariant::fromValue(m_surfaceData);
+    }
+
+    virtual quint64 textureHandle(int /*plane*/) const override
+    {
+        return reinterpret_cast<quint64>(m_surfaceData.surface);
     }
 
 private:

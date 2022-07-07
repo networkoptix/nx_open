@@ -236,14 +236,14 @@ bool EncodedAudioInfo::start()
 
 int EncodedAudioInfo::audioPacketSize()
 {
-    return m_owner->frameSize() * m_audioFormat.channelCount() * m_audioFormat.sampleSize()/8;
+    return m_owner->frameSize() * m_audioFormat.channelCount() * m_audioFormat.bytesPerSample();
 }
 
 bool EncodedAudioInfo::setupFormat(QString& errMessage)
 {
     m_audioFormat = m_audioDevice.preferredFormat();
     m_audioFormat.setSampleRate(AUDIO_CAPTURE_FREQUENCY);
-    m_audioFormat.setSampleSize(16);
+    m_audioFormat.setSampleFormat(QAudioFormat::Int16);
     m_audioFormat.setChannelCount(2);
 
     if (!m_audioDevice.isFormatSupported(m_audioFormat))
@@ -291,7 +291,7 @@ bool EncodedAudioInfo::setupPostProcess(
     WAVEFORMATEX wfx;
     //HRESULT hr;
     wfx.nSamplesPerSec = m_audioFormat.sampleRate();
-    wfx.wBitsPerSample = m_audioFormat.sampleSize();
+    wfx.wBitsPerSample = m_audioFormat.bytesPerSample() * 8;
     wfx.nChannels = m_audioFormat.channelCount();
     wfx.cbSize = 0;
 
@@ -311,7 +311,7 @@ bool EncodedAudioInfo::setupPostProcess(
             return false;
     }
 
-    core::WinAudioDeviceInfo extInfo(m_audioDevice.deviceName());
+    core::WinAudioDeviceInfo extInfo(m_audioDevice.description());
     if (extInfo.isMicrophone())
     {
         m_speexPreprocess = speex_preprocess_state_init(frameSize * channels, sampleRate);
@@ -697,7 +697,7 @@ void DesktopDataProvider::putAudioData()
             if (ai2->m_speexPreprocess)
                 speex_preprocess(ai2->m_speexPreprocess, buffer2, nullptr);
 
-            int stereoPacketSize = d->frameSize * 2 * ai->m_audioFormat.sampleSize()/8;
+            int stereoPacketSize = d->frameSize * 2 * ai->m_audioFormat.bytesPerSample();
             /*
             // first mono to left, second mono to right
             // may be it is mode usefull?
