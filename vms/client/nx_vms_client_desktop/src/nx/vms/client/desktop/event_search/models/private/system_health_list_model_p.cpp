@@ -9,6 +9,7 @@
 
 #include <client/client_settings.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -182,6 +183,8 @@ QnResourcePtr SystemHealthListModel::Private::resource(int index) const
 QString SystemHealthListModel::Private::text(int index) const
 {
     const auto& item = m_items[index];
+    const QString resourceName = item.resource ? item.resource->getName() : "";
+
     switch (item.message)
     {
         case QnSystemHealth::UsersEmailIsEmpty:
@@ -193,17 +196,14 @@ QString SystemHealthListModel::Private::text(int index) const
                 m_camerasWithInvalidSchedule.size());
         }
 
+        case QnSystemHealth::RemoteArchiveSyncAvailable:
+            return tr("SD archive found");
         case QnSystemHealth::RemoteArchiveSyncProgress:
             return tr("Export in progress...");
         case QnSystemHealth::RemoteArchiveSyncFinished:
+            return tr("Export archive from %1 completed").arg(resourceName);
         case QnSystemHealth::RemoteArchiveSyncError:
-        {
-            // TODO: #vkutin This is bad, remove it after VMS-7724 refactor is done.
-            const auto description = item.serverData->getRuntimeParams().description;
-            if (!description.isEmpty())
-                return description;
-        }
-        [[fallthrough]];
+            return tr("Export archive from %1 failed").arg(resourceName);
 
         default:
             return QnSystemHealthStringsHelper::messageText(item.message,
@@ -272,10 +272,24 @@ QColor SystemHealthListModel::Private::color(int index) const
 QString SystemHealthListModel::Private::description(int index) const
 {
     const auto& item = m_items[index];
+    const auto camera = item.resource.dynamicCast<QnVirtualCameraResource>();
+    const QString resourceName = item.resource ? item.resource->getName() : "";
+
     switch (item.message)
     {
+        case QnSystemHealth::RemoteArchiveSyncAvailable:
+        {
+            return QnDeviceDependentStrings::getNameFromSet(
+                resourcePool(),
+                QnCameraDeviceStringSet(
+                    tr("Not exported archive found on Device %1").arg(resourceName),
+                    tr("Not exported archive found on Camera %1").arg(resourceName)),
+                camera);
+        }
         case QnSystemHealth::RemoteArchiveSyncProgress:
-            return item.serverData->getRuntimeParams().description;
+        {
+            return tr("Export archive from %1").arg(resourceName);
+        }
     }
     return {};
 }
@@ -331,21 +345,42 @@ bool SystemHealthListModel::Private::isCloseable(int index) const
 
 CommandActionPtr SystemHealthListModel::Private::commandAction(int index) const
 {
-    if (m_items[index].message != QnSystemHealth::DefaultCameraPasswords)
-        return {};
+    const auto& item = m_items[index];
 
-    auto action = CommandActionPtr(new CommandAction(tr("Set Passwords")));
-    connect(action.data(), &QAction::triggered, this,
-        [this]()
+    switch (item.message)
+    {
+        case QnSystemHealth::DefaultCameraPasswords:
         {
-            const auto state = context()->instance<SystemHealthState>();
-            const auto parameters = action::Parameters(m_camerasWithDefaultPassword)
-                .withArgument(Qn::ForceShowCamerasList, true);
+            auto action = CommandActionPtr(new CommandAction(tr("Set Passwords")));
+            connect(action.data(), &QAction::triggered, this,
+                [this]()
+                {
+                    const auto state = context()->instance<SystemHealthState>();
+                    const auto parameters = action::Parameters(m_camerasWithDefaultPassword)
+                        .withArgument(Qn::ForceShowCamerasList, true);
 
-            menu()->triggerIfPossible(action::ChangeDefaultCameraPasswordAction, parameters);
-        });
+                    menu()->triggerIfPossible(action::ChangeDefaultCameraPasswordAction, parameters);
+                });
+            return action;
+        }
 
-    return action;
+        case QnSystemHealth::RemoteArchiveSyncAvailable:
+        {
+            const auto action = CommandActionPtr(new CommandAction(tr("Export")));
+            connect(action.data(), &QAction::triggered, this,
+                [this, resource = item.resource]
+                {
+                    auto camera = resource.dynamicCast<QnSecurityCamResource>();
+                    if (NX_ASSERT(camera))
+                        camera->synchronizeRemoteArchiveOnce();
+                });
+
+            return action;
+        }
+
+        default:
+            return {};
+    }
 }
 
 action::IDType SystemHealthListModel::Private::action(int index) const
@@ -730,6 +765,9 @@ QString SystemHealthListModel::Private::decorationPath(QnSystemHealth::MessageTy
 
         case QnSystemHealth::CloudPromo:
             return "cloud/cloud_20.png";
+
+        case QnSystemHealth::RemoteArchiveSyncAvailable:
+            return "events/sd_card.png";
 
         default:
             return QString();
