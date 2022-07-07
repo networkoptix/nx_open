@@ -245,23 +245,23 @@
     </message>
     <message>
       <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
-      <translation type="unfinished">You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</translation>
+      <translation>このサーバーに接続しようとしましたが、自動的に検証できない証明書が表示されました。</translation>
     </message>
     <message>
       <source>Someone may be impersonating this Server to steal your personal information.</source>
-      <translation type="unfinished">Someone may be impersonating this Server to steal your personal information.</translation>
+      <translation>誰かがあなたの個人情報を盗むためにこのサーバーになりすましている可能性があります。</translation>
     </message>
     <message>
       <source>You attempted to connect to this Server but the Server&apos;s certificate has changed.</source>
-      <translation type="unfinished">You attempted to connect to this Server but the Server&apos;s certificate has changed.</translation>
+      <translation>このサーバーに接続しようとしましたが、サーバー証明書が変更されていました。</translation>
     </message>
     <message>
       <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
-      <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
+      <translation>VMS管理者の指示がない限り、このサーバーに接続しないでください。</translation>
     </message>
     <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
-      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct Server.</translation>
+      <translation>証明書の詳細を確認して、正しいサーバーに接続していることを確認してください。</translation>
     </message>
   </context>
 </TS>

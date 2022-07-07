@@ -80,33 +80,33 @@
     </message>
     <message>
       <source>Backup Finished</source>
-      <translation type="unfinished">Backup Finished</translation>
+      <translation>Backup concluído</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::BasicEvent</name>
     <message>
       <source>Unknown event</source>
-      <translation type="unfinished">Unknown event</translation>
+      <translation>Evento desconhecido</translation>
     </message>
     <message>
       <source>%1 event has occurred</source>
-      <translation type="unfinished">%1 event has occurred</translation>
+      <translation>%1 evento ocorreu</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::CameraInputEvent</name>
     <message>
       <source>Input Port: %1</source>
-      <translation>Porta de entrada de alarme: %1</translation>
+      <translation>Porta de entrada: %1</translation>
     </message>
     <message>
       <source>Input on %1</source>
-      <translation>Input em %1</translation>
+      <translation>Entrada em %1</translation>
     </message>
     <message>
       <source>Input Signal on Camera</source>
-      <translation type="unfinished">Input Signal on Camera</translation>
+      <translation>Sinal de entrada na câmera</translation>
     </message>
     <message>
       <source>State</source>
@@ -118,14 +118,14 @@
     </message>
     <message>
       <source>Input ID</source>
-      <translation>ID de Input</translation>
+      <translation>ID de entrada</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::DebugEvent</name>
     <message>
       <source>Debug Event</source>
-      <translation type="unfinished">Debug Event</translation>
+      <translation>Evento de depuração</translation>
     </message>
     <message>
       <source>Action</source>
@@ -133,14 +133,14 @@
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Valor</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::DeviceDisconnectedEvent</name>
     <message>
       <source>Device was disconnected</source>
-      <translation>Dispositivo desconectado</translation>
+      <translation>O dispositivo foi desconectado</translation>
     </message>
     <message>
       <source>Camera was disconnected</source>
@@ -152,19 +152,19 @@
     </message>
     <message>
       <source>Device %1 was disconnected</source>
-      <translation>O Dispositivo %1 foi desligado</translation>
+      <translation>O dispositivo %1 foi desconectado</translation>
     </message>
     <message>
       <source>Camera %1 was disconnected</source>
-      <translation>A CÂmara %1 foi desligada</translation>
+      <translation>A câmera %1 foi desconectada</translation>
     </message>
     <message>
       <source>I/O Module %1 was disconnected</source>
-      <translation>O módulo I/O %1 foi desligado</translation>
+      <translation>O Módulo I/O foi desconectado</translation>
     </message>
     <message>
       <source>Device Disconnected</source>
-      <translation type="unfinished">Device Disconnected</translation>
+      <translation>Dispositivo desconectado</translation>
     </message>
     <message>
       <source>Device ID</source>

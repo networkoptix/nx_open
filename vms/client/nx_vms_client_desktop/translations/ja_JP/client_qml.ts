@@ -152,19 +152,19 @@
     </message>
     <message>
       <source>This integration has no settings for this Camera.</source>
-      <translation type="unfinished">This integration has no settings for this Camera.</translation>
+      <translation>このインテグレーションには、このカメラに対する設定がありません。</translation>
     </message>
     <message>
       <source>Check System Administration Settings to configure this integration.</source>
-      <translation type="unfinished">Check System Administration Settings to configure this integration.</translation>
+      <translation>このインテグレーションを構成するには、システム管理設定を確認してください。</translation>
     </message>
     <message>
       <source>This integration has no settings at System level.</source>
-      <translation type="unfinished">This integration has no settings at System level.</translation>
+      <translation>このインテグレーションには、システムレベルでの設定はありません。</translation>
     </message>
     <message>
       <source>Check Camera Settings to configure this integration.</source>
-      <translation type="unfinished">Check Camera Settings to configure this integration.</translation>
+      <translation>このインテグレーションを構成するには、カメラ設定を確認してください。</translation>
     </message>
   </context>
   <context>
@@ -274,7 +274,7 @@
     <name>CloudTile</name>
     <message>
       <source>Log in to</source>
-      <translation type="unfinished">Log in to</translation>
+      <translation>ログイン:</translation>
     </message>
   </context>
   <context>
@@ -1182,7 +1182,7 @@ PTZを行います</translation>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>自定義ID</translation>
     </message>
   </context>
   <context>
