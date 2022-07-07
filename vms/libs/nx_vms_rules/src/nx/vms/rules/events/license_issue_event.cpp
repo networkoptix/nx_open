@@ -21,7 +21,7 @@ LicenseIssueEvent::LicenseIssueEvent(
     :
     BasicEvent(timestamp),
     m_serverId(serverId),
-    m_deviceIds(disabledCameras.toList())
+    m_deviceIds(disabledCameras.values())
 {
 }
 

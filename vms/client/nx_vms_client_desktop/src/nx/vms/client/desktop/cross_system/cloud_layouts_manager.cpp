@@ -108,12 +108,14 @@ struct CloudLayoutsManager::Private
     void addLayoutsToResourcePool(std::vector<CrossSystemLayoutData> layouts)
     {
         auto resourcePool = systemContext->resourcePool();
-        auto layoutsToRemove = resourcePool->getResources().filtered<CrossSystemLayoutResource>(
+        const auto layoutsList = resourcePool->getResources().filtered<CrossSystemLayoutResource>(
             [](const CrossSystemLayoutResourcePtr& layout)
             {
                 // Do not remove layouts which are still not saved.
                 return layout->hasFlags(Qn::remote);
-            }).toSet();
+            });
+
+        auto layoutsToRemove = QSet(layoutsList.begin(), layoutsList.end());
 
         QnResourceList newlyCreatedLayouts;
         for (const auto& layoutData: layouts)
