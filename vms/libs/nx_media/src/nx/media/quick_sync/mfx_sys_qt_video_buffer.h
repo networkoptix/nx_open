@@ -2,87 +2,70 @@
 
 #pragma once
 
-#include <QtMultimedia/QAbstractVideoBuffer>
 #include <QtMultimedia/private/qabstractvideobuffer_p.h>
 
 #include <nx/utils/log/log.h>
+#include <sysmem_allocator.h>
 
 namespace nx::media::quick_sync {
 
-class MfxQtVideoBufferPrivate: public QAbstractVideoBufferPrivate
-{
-public:
-    MfxQtVideoBufferPrivate(
-        mfxFrameSurface1* surface, const std::shared_ptr<MFXFrameAllocator>& allocator):
-        allocator(allocator),
-        surface(surface),
-        mapMode(QAbstractVideoBuffer::NotMapped)
-    {
-    }
-
-    virtual int map(
-        QAbstractVideoBuffer::MapMode /*mode*/,
-        int* numBytes,
-        int linesize[4],
-        uchar* data[4]) override
-    {
-        allocator->LockFrame(surface->Data.MemId, &surface->Data);
-        mfxU16 Height2 = (mfxU16)MSDK_ALIGN32(surface->Info.Height);
-        *numBytes = surface->Data.PitchLow * Height2 * 2;
-        linesize[0] = surface->Data.PitchLow;
-        linesize[1] = surface->Data.PitchLow;
-        linesize[2] = surface->Data.PitchLow;
-        linesize[3] = 0;
-        data[0] = surface->Data.Y;
-        data[1] = surface->Data.U;
-        data[2] = surface->Data.V;
-        data[3] = nullptr;
-        return 3;
-    }
-
-public:
-    std::shared_ptr<MFXFrameAllocator> allocator;
-    mfxFrameSurface1* surface;
-    QAbstractVideoBuffer::MapMode mapMode;
-};
-
 class MfxQtVideoBuffer: public QAbstractVideoBuffer
 {
-
-    Q_DECLARE_PRIVATE(MfxQtVideoBuffer)
 public:
     MfxQtVideoBuffer(
         mfxFrameSurface1* surface,
-        const std::shared_ptr<MFXFrameAllocator>& allocator):
-        QAbstractVideoBuffer(*(new MfxQtVideoBufferPrivate(surface, allocator)), NoHandle)
+        const std::shared_ptr<MFXFrameAllocator>& allocator)
+        :
+        QAbstractVideoBuffer(QVideoFrame::NoHandle),
+        m_allocator(allocator),
+        m_surface(surface)
     {}
+
     virtual ~MfxQtVideoBuffer()
     {
     }
 
-    virtual MapMode mapMode() const override
+    virtual QVideoFrame::MapMode mapMode() const override
     {
-        return d_func()->mapMode;
+        return m_mapMode;
     }
 
-    virtual uchar* map(MapMode /*mode*/, int *numBytes, int *bytesPerLine) override
+    virtual MapData map(QVideoFrame::MapMode /*mode*/) override
     {
-        Q_D(MfxQtVideoBuffer);
-
-        d->allocator->LockFrame(d->surface->Data.MemId, &d->surface->Data);
-        *bytesPerLine = d->surface->Data.PitchLow;
-        *numBytes = GetSurfaceSize(
-            d->surface->Info.FourCC,
-            MSDK_ALIGN32(d->surface->Info.Width),
-            MSDK_ALIGN32(d->surface->Info.Height));
-        return d->surface->Data.Y;
+        MapData data;
+        m_allocator->LockFrame(m_surface->Data.MemId, &m_surface->Data);
+        mfxU16 Height2 = (mfxU16) MSDK_ALIGN32(m_surface->Info.Height);
+        data.size[0] = m_surface->Data.PitchLow * Height2;
+        data.size[1] = m_surface->Data.PitchLow * Height2 / 2;
+        data.size[2] = m_surface->Data.PitchLow * Height2 / 2;
+        data.size[3] = 0;
+        data.bytesPerLine[0] = m_surface->Data.PitchLow;
+        data.bytesPerLine[1] = m_surface->Data.PitchLow;
+        data.bytesPerLine[2] = m_surface->Data.PitchLow;
+        data.bytesPerLine[3] = 0;
+        data.data[0] = m_surface->Data.Y;
+        data.data[1] = m_surface->Data.U;
+        data.data[2] = m_surface->Data.V;
+        data.data[3] = nullptr;
+        data.nPlanes = 3;
+        return data;
     }
 
     virtual void unmap() override
     {
-        Q_D(MfxQtVideoBuffer);
-        d->allocator->UnlockFrame(d->surface->Data.MemId, &d->surface->Data);
+        m_allocator->UnlockFrame(m_surface->Data.MemId, &m_surface->Data);
     }
+
+    virtual quint64 textureHandle(int /*plane*/) const override
+    {
+        return reinterpret_cast<quint64>(m_surface);
+    }
+
+private:
+    std::shared_ptr<MFXFrameAllocator> m_allocator;
+    mfxFrameSurface1* m_surface;
+    QVideoFrame::MapMode m_mapMode = QVideoFrame::NotMapped;
+
 };
 
 } // namespace nx::media::quick_sync

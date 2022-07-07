@@ -7,10 +7,14 @@
 #include <QtGui/QOpenGLContext>
 #include <QtMultimedia/QVideoFrame>
 
+namespace nx::media::quick_sync { class QuickSyncVideoDecoderImpl; }
+
 class QuickSyncVideoFrame: public AbstractVideoSurface
 {
 public:
-    QuickSyncVideoFrame(const std::shared_ptr<QVideoFrame>& frame);
+    QuickSyncVideoFrame(
+        const std::shared_ptr<QVideoFrame>& frame,
+        std::weak_ptr<nx::media::quick_sync::QuickSyncVideoDecoderImpl> decoder);
 
     bool renderToRgb(
         bool isNewTexture,
@@ -26,6 +30,7 @@ public:
 private:
     // Contain video surface
     std::shared_ptr<QVideoFrame> m_frame;
+    std::weak_ptr<nx::media::quick_sync::QuickSyncVideoDecoderImpl> m_decoder;
 };
 
 inline bool renderToRgb(

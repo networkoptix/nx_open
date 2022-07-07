@@ -3,9 +3,7 @@
 #pragma once
 
 #include <mfx/mfxvideo.h>
-#include <QtMultimedia/QAbstractVideoBuffer>
 
-constexpr int kHandleTypeQsvSurface = QAbstractVideoBuffer::UserHandle + 1;
 
 namespace nx::media::quick_sync {
 class QuickSyncVideoDecoderImpl;

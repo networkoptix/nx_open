@@ -8,9 +8,29 @@
 #include <nx/media/quick_sync/quick_sync_surface.h>
 #include <nx/media/quick_sync/quick_sync_video_decoder_impl.h>
 
-QuickSyncVideoFrame::QuickSyncVideoFrame(const std::shared_ptr<QVideoFrame>& frame)
+#include "qt_video_buffer.h"
+#include "mfx_sys_qt_video_buffer.h"
+
+namespace {
+
+mfxFrameSurface1* getSurface(const std::shared_ptr<QVideoFrame>& frame)
+{
+    QAbstractVideoBuffer* videoBuffer = frame->videoBuffer();
+
+    NX_ASSERT(dynamic_cast<nx::media::quick_sync::QtVideoBuffer*>(videoBuffer)
+        || dynamic_cast<nx::media::quick_sync::MfxQtVideoBuffer*>(videoBuffer));
+
+    return reinterpret_cast<mfxFrameSurface1*>(videoBuffer->textureHandle(/*unused*/ 0));
+}
+
+} // namespace
+
+QuickSyncVideoFrame::QuickSyncVideoFrame(
+    const std::shared_ptr<QVideoFrame>& frame,
+    std::weak_ptr<nx::media::quick_sync::QuickSyncVideoDecoderImpl> decoder)
 {
     m_frame = frame;
+    m_decoder = decoder;
 }
 
 bool QuickSyncVideoFrame::renderToRgb(
@@ -21,20 +41,21 @@ bool QuickSyncVideoFrame::renderToRgb(
     float* cropWidth,
     float* cropHeight)
 {
-    auto surfaceInfo = m_frame->handle().value<QuickSyncSurface>();
-    auto decoderLock = surfaceInfo.decoder.lock();
+    auto surface = getSurface(m_frame);
+
+    auto decoderLock = m_decoder.lock();
     if (!decoderLock)
         return false;
 
-    mfxFrameSurface1* scaledSurface = surfaceInfo.surface;
+    mfxFrameSurface1* scaledSurface = surface;
 
 #ifndef Q_OS_LINUX // Linux version is faster with downscale in vaCopySurfaceGLX_nx call
     if (scaleFactor != 1)
     {
-        QSize sourceSize(surfaceInfo.surface->Info.Width, surfaceInfo.surface->Info.Height);
+        QSize sourceSize(surface->Info.Width, surface->Info.Height);
         QSize targetSize = sourceSize / scaleFactor;
 
-        if (!decoderLock->scaleFrame(surfaceInfo.surface, &scaledSurface, targetSize))
+        if (!decoderLock->scaleFrame(surface, &scaledSurface, targetSize))
         {
             NX_WARNING(this, "Failed to scale video surface");
             return false;
@@ -53,15 +74,15 @@ AVFrame QuickSyncVideoFrame::lockFrame()
 {
     AVFrame result;
     memset(&result, 0, sizeof(AVFrame));
-    auto surfaceInfo = m_frame->handle().value<QuickSyncSurface>();
-    auto decoderLock = surfaceInfo.decoder.lock();
+
+    auto decoderLock = m_decoder.lock();
     if (!decoderLock)
     {
         NX_DEBUG(this, "Quick sync decoder already deleted, failed to lock frame");
         return result;
     }
 
-    mfxFrameSurface1* surface = surfaceInfo.surface;
+    mfxFrameSurface1* surface = getSurface(m_frame);
     auto status = decoderLock->getDevice().getAllocator()->LockFrame(
         surface->Data.MemId, &surface->Data);
     if (MFX_ERR_NONE != status)
@@ -85,18 +106,16 @@ AVFrame QuickSyncVideoFrame::lockFrame()
 
 void QuickSyncVideoFrame::unlockFrame()
 {
-    auto surfaceInfo = m_frame->handle().value<QuickSyncSurface>();
-    auto decoderLock = surfaceInfo.decoder.lock();
+    auto decoderLock = m_decoder.lock();
     if (!decoderLock)
     {
         NX_VERBOSE(this, "Quick sync decoder already deleted, failed to unlock frame");
         return;
     }
 
-    mfxFrameSurface1* surface = surfaceInfo.surface;
+    mfxFrameSurface1* surface = getSurface(m_frame);
     auto status = decoderLock->getDevice().getAllocator()->UnlockFrame(
         surface->Data.MemId, &surface->Data);
     if (MFX_ERR_NONE != status)
         NX_DEBUG(this, "Failed to unlock video memory frame, error: %1", status);
 }
-

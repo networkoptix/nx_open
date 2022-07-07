@@ -6,6 +6,7 @@
 
 #include <QtCore/QVector>
 #include <QtCore/QStack>
+#include <QtMultimedia/QMediaDevices>
 #include <QtQml/QtQml>
 
 #include <client/client_globals.h>
