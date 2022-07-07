@@ -12203,7 +12203,7 @@ to view more bookmarks</source>
     <message>
       <source>Client is updated to version %1. Restart %2 to finish update.</source>
       <comment>%1 is a version like &apos;4.3.0&apos;, %2 is a VMS name like &apos;Nx Witness&apos;</comment>
-      <translation type="unfinished">Client is updated to version %1. Restart %2 to finish update.</translation>
+      <translation>Клиент обновлен до версии %1. Перезапустите %2, чтобы завершить обновление.</translation>
     </message>
     <message>
       <source>Automatic client updates</source>
