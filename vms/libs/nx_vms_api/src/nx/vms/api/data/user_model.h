@@ -109,7 +109,7 @@ QN_FUSION_DECLARE_FUNCTIONS(UserModelV1, (csv_record)(json)(ubjson)(xml), NX_VMS
  */
 struct NX_VMS_API UserModelVX: public UserModelBase
 {
-    /**%apidoc[opt] User group id, can be obtained from `GET /rest/v{2-}/exp_userGroups`. */
+    /**%apidoc[opt] User group id, can be obtained from `GET /rest/v{3-}/exp_userGroups`. */
     std::vector<QnUuid> userGroupIds;
 
     bool operator==(const UserModelVX& other) const = default;
