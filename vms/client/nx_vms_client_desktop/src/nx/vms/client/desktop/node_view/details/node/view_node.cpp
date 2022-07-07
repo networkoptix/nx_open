@@ -103,7 +103,7 @@ void ViewNode::insertChildren(int index, const NodeList& children)
 
 void ViewNode::removeChild(int index)
 {
-    if (!qBetween(0, index, d->nodes.size()))
+    if (!qBetween(0, index, (int) d->nodes.size()))
     {
         NX_ASSERT(false, "Wrong index!");
         return;

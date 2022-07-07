@@ -44,7 +44,7 @@ QModelIndex QnBusinessRulesViewModel::index(int row, int column, const QModelInd
     if (!hasIndex(row, column, parent))
         return QModelIndex();
 
-    return qBetween(0, row, m_rules.size())
+    return qBetween(0, row, (int) m_rules.size())
         ? createIndex(row, column)
         : QModelIndex();
 }
@@ -279,7 +279,7 @@ QnBusinessRuleViewModelPtr QnBusinessRulesViewModel::rule(const QModelIndex& ind
 {
     if (index.model() == this)
     {
-        return qBetween(0, index.row(), m_rules.size())
+        return qBetween(0, index.row(), (int) m_rules.size())
             ? m_rules[index.row()]
             : QnBusinessRuleViewModelPtr();
     }

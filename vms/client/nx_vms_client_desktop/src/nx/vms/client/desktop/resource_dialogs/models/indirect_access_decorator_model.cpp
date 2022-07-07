@@ -16,7 +16,7 @@
 
 namespace {
 
-static const int kMaxTooltipResourceLines = 10;
+static const qsizetype kMaxTooltipResourceLines = 10;
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::common;

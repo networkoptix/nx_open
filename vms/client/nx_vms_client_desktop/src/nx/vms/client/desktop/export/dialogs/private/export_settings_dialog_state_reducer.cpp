@@ -68,7 +68,7 @@ QSize textMargins(const QFontMetrics& fontMetrics)
 
 QString calculateLongestStringViewDateTime(TimestampFormat format)
 {
-    int maxLength{0};
+    qsizetype maxLength{0};
     static const QTime kLongestTime(20, 20, 28, 888);
     for (int month = 1; month <= 12; ++month)
     {

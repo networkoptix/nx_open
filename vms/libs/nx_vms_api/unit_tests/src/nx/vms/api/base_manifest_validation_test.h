@@ -36,13 +36,13 @@ QList<Entry> makeEntries(const QString& entryTypeName)
 template<typename Entry, typename TransformationFunc>
 void transformSomeEntries(
     QList<Entry>* inOutEntries,
-    int numberOfEntriesToTransform,
+    qsizetype numberOfEntriesToTransform,
     TransformationFunc transformationFunc)
 {
     if (!NX_ASSERT(inOutEntries))
         return;
 
-    for (int i = 0; i < std::min(inOutEntries->size(), numberOfEntriesToTransform); ++i)
+    for (qsizetype i = 0; i < std::min(inOutEntries->size(), numberOfEntriesToTransform); ++i)
         transformationFunc(&(*inOutEntries)[i]);
 }
 

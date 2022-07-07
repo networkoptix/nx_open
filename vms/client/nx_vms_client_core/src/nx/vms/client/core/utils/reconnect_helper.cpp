@@ -35,7 +35,7 @@ ReconnectHelper::ReconnectHelper(std::optional<QnUuid> stickyReconnectTo)
             return left->getId() < right->getId();
         });
 
-    m_currentIndex = std::max(m_servers.indexOf(currentServer), 0);
+    m_currentIndex = std::max(m_servers.indexOf(currentServer), (qsizetype) 0);
 }
 
 QnMediaServerResourcePtr ReconnectHelper::currentServer() const

@@ -137,7 +137,7 @@ QnResourceListModel* QnResourceListView::model() const
 QSize QnResourceListView::sizeHint() const
 {
     return QSize(kRecommendedWidth,
-        nx::style::Metrics::kViewRowHeight * std::min(kMaximumRows, resources().size()));
+        nx::style::Metrics::kViewRowHeight * std::min(kMaximumRows, (int) resources().size()));
 }
 
 void QnResourceListView::resetSortModel(QSortFilterProxyModel* model)

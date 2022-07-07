@@ -82,7 +82,7 @@ void External::Private::resetC2pLayout(
 
     QnLayoutItemDataList items;
 
-    const int size = std::max(cameras.size(), 1);
+    const int size = std::max((int) cameras.size(), 1);
 
     auto currentItem = widgetItem->data();
     currentItem.combinedGeometry = QRectF(0, 0, size, size);

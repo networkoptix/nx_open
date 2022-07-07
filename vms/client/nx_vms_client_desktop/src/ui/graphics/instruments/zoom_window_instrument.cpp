@@ -499,7 +499,7 @@ QColor ZoomWindowInstrument::nextZoomWindowColor() const
             return color;
     }
 
-    return kFrameColors[nx::utils::random::number(0, kFrameColors.size() - 1)];
+    return kFrameColors[nx::utils::random::number(0, (int) kFrameColors.size() - 1)];
 }
 
 QPointer<ZoomOverlayWidget> ZoomWindowInstrument::overlayWidget(QnMediaResourceWidget* widget) const

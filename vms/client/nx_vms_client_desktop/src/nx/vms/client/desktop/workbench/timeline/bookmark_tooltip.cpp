@@ -18,7 +18,7 @@ namespace nx::vms::client::desktop::workbench::timeline {
 namespace {
 
 static constexpr int kWidgetWidth = 252;
-static constexpr int kMaxBookmarksNumber = 3;
+static constexpr qsizetype kMaxBookmarksNumber = 3;
 static constexpr int kRoundingRadius = 2;
 static constexpr BaseTooltip::TailGeometry kTailGeometry = {3, 6, 2};
 

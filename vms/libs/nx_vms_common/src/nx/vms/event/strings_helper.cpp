@@ -68,7 +68,7 @@ QString serializeAttributes(
         QString groupName = group.name;
         groupName.replace(".", nestedAttributeDelimiter);
 
-        const int count = std::min(group.values.size(), kMaxValuesInGroup);
+        const auto count = std::min<qsizetype>(group.values.size(), kMaxValuesInGroup);
         result += NX_FMT("%1: %2",
             groupName,
             nx::utils::strJoin(group.values.cbegin(), group.values.cbegin() + count, ", "));
@@ -87,7 +87,7 @@ QStringList serializeAttributesMultiline(
         QString groupName = group.name;
         groupName.replace(".", nestedAttributeDelimiter);
 
-        const int count = std::min(group.values.size(), kMaxValuesInGroup);
+        const auto count = std::min<qsizetype>(group.values.size(), kMaxValuesInGroup);
         result << NX_FMT("%1: %2",
             groupName,
             nx::utils::strJoin(group.values.cbegin(), group.values.cbegin() + count, ", "));

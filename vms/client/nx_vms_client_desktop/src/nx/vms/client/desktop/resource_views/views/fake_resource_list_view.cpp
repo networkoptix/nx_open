@@ -9,7 +9,7 @@
 
 namespace {
 
-static constexpr int kMaximumRows = 10;
+static constexpr qsizetype kMaximumRows = 10;
 static constexpr int kRecommendedWidth = 284;
 
 } // namespace

@@ -14,12 +14,12 @@ void appendProperty(
     static_cast<PropertiesSync*>(list->object)->append(property);
 }
 
-int propertiesCount(QQmlListProperty<PropertiesSyncProperty>* list)
+qsizetype propertiesCount(QQmlListProperty<PropertiesSyncProperty>* list)
 {
     return static_cast<PropertiesSync*>(list->object)->count();
 }
 
-PropertiesSyncProperty* getProperty(QQmlListProperty<PropertiesSyncProperty>* list, int index)
+PropertiesSyncProperty* getProperty(QQmlListProperty<PropertiesSyncProperty>* list, qsizetype index)
 {
     return static_cast<PropertiesSync*>(list->object)->synchedProperty(index);
 }

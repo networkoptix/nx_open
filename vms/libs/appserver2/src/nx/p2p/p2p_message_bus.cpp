@@ -438,7 +438,9 @@ bool MessageBus::hasStartingConnections() const
 
 void MessageBus::MiscData::update()
 {
-    expectedConnections = std::max(1, std::max(owner->m_connections.size(), (int) owner->m_remoteUrls.size()));
+    expectedConnections = std::max(
+        (qsizetype) 1,
+        std::max(owner->m_connections.size(), (qsizetype) owner->m_remoteUrls.size()));
     maxSubscriptionToResubscribe = qRound(std::sqrt(expectedConnections)) * 2;
     maxDistanceToUseProxy = std::max(2, int(std::sqrt(std::sqrt(expectedConnections))));
     newConnectionsAtOnce = std::max(1, int(qRound(std::sqrt(expectedConnections))) / 2);
