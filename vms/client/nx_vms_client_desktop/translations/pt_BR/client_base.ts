@@ -558,7 +558,7 @@
     </message>
     <message>
       <source>Camera Rules...</source>
-      <translation type="unfinished">Camera Rules...</translation>
+      <translation>Regras da câmera...</translation>
     </message>
     <message>
       <source>Cameras Rules...</source>
@@ -2561,7 +2561,7 @@
     <name>QnCameraListModel</name>
     <message>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>Gravação</translation>
     </message>
     <message>
       <source>Name</source>
@@ -3386,7 +3386,7 @@ a %1</translation>
     </message>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation type="unfinished">Creates a backup of System configuration that can be restored in case of failure.</translation>
+      <translation>Cria um ‘backup’ da configuração do sistema que pode ser restaurado em caso de falha.</translation>
     </message>
   </context>
   <context>
@@ -4793,7 +4793,7 @@ a %1</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation type="unfinished">Backup</translation>
+      <translation>Backup</translation>
     </message>
   </context>
   <context>
@@ -5185,7 +5185,7 @@ a %1</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation type="unfinished">Backup</translation>
+      <translation>Backup</translation>
     </message>
     <message>
       <source>Depending on the total size of the archive, reindexing can take up to several hours.</source>

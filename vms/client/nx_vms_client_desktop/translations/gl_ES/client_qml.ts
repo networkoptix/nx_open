@@ -734,7 +734,7 @@
     </message>
     <message>
       <source>Remember me</source>
-      <translation type="unfinished">Remember me</translation>
+      <translation>Recorda os meus datos</translation>
     </message>
   </context>
   <context>
