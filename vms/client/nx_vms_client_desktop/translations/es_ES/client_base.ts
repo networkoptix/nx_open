@@ -1021,7 +1021,7 @@
     </message>
     <message>
       <source>Account Security...</source>
-      <translation>Seguridad de la cuenta</translation>
+      <translation>Seguridad de la cuenta...</translation>
     </message>
   </context>
   <context>
@@ -2754,7 +2754,7 @@ a %1</translation>
     </message>
     <message>
       <source>You will be logged out.</source>
-      <translation>Se cerrará la sesión del usuario</translation>
+      <translation>Se cerrará la sesión del usuario.</translation>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
@@ -8702,7 +8702,7 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     <message numerus="yes">
       <source>%n minutes left</source>
       <translation type="unfinished">
-        <numerusform>%d minutos restantes</numerusform>
+        <numerusform>%n minutos restantes</numerusform>
         <numerusform>%n minutes left</numerusform>
       </translation>
     </message>

@@ -1376,7 +1376,7 @@
     <message numerus="yes">
       <source>Devices Disconnected</source>
       <translation>
-        <numerusform>Zařízení byla odpojena</numerusform>
+        <numerusform>Zařízení odpojena</numerusform>
         <numerusform>Zařízení byla odpojena</numerusform>
         <numerusform>Zařízení byla odpojena</numerusform>
         <numerusform>Zařízení byla odpojena</numerusform>

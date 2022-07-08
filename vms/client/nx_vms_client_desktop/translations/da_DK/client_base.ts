@@ -2755,7 +2755,7 @@ to %1</translation>
     </message>
     <message>
       <source>You will be logged out.</source>
-      <translation>Du er blevet logget ud</translation>
+      <translation>Du er blevet logget ud.</translation>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
