@@ -31,6 +31,16 @@ AnalyticsObjectEvent::AnalyticsObjectEvent(
 {
 }
 
+QString AnalyticsObjectEvent::uniqueName() const
+{
+    return makeName(AnalyticsEngineEvent::uniqueName(), m_objectTrackId.toSimpleString());
+}
+
+QString AnalyticsObjectEvent::resourceKey() const
+{
+    return makeName(AnalyticsEngineEvent::resourceKey(), m_objectTrackId.toSimpleString());
+}
+
 QVariantMap AnalyticsObjectEvent::details(common::SystemContext* context) const
 {
     auto result = AnalyticsEngineEvent::details(context);

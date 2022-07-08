@@ -2,19 +2,36 @@
 
 #include "event_filter.h"
 
-#include <vector>
 #include <tuple>
+#include <vector>
 
-#include <QtCore/QSharedPointer>
 #include <QtCore/QScopedValueRollback>
+#include <QtCore/QSharedPointer>
 #include <QtCore/QVariant>
 
 #include <nx/utils/log/log.h>
+#include <utils/common/synctime.h>
 
 #include "basic_event.h"
 #include "event_field.h"
+#include "events/analytics_object_event.h"
+#include "utils/type.h"
 
 namespace nx::vms::rules {
+
+namespace {
+
+// The following timeouts got from the event rule processor.
+constexpr std::chrono::seconds kObjectDetectedEventTimeout(30);
+constexpr std::chrono::seconds kCleanupTimeout(5);
+
+bool isProlonged(const EventPtr& event)
+{
+    const auto eventState = event->state();
+    return eventState == State::started || eventState == State::stopped;
+}
+
+} // namespace
 
 EventFilter::EventFilter(const QnUuid& id, const QString& eventType):
     m_id(id),
@@ -22,6 +39,9 @@ EventFilter::EventFilter(const QnUuid& id, const QString& eventType):
 {
     NX_ASSERT(!id.isNull());
     NX_ASSERT(!m_eventType.isEmpty());
+
+    connect(&m_clearCacheTimer, &QTimer::timeout, this, &EventFilter::clearCache);
+    m_clearCacheTimer.setInterval(kCleanupTimeout);
 }
 
 EventFilter::~EventFilter()
@@ -109,6 +129,46 @@ bool EventFilter::match(const EventPtr& event) const
 {
     NX_VERBOSE(this, "Matching filter id: %1", m_id);
 
+    // TODO: #mmalofeev Consider move this check to the engine.
+    if (isProlonged(event))
+    {
+        // It is required to check if the prolonged events are coming in the right order - for the
+        // each stopped event musts preceded started event. Also the same event must not be
+        // processed twice with the same state.
+
+        const auto resourceKey = event->resourceKey();
+        const bool isEventRunning = m_runningEvents.contains(resourceKey);
+
+        if (event->state() == State::started)
+        {
+            if (isEventRunning)
+            {
+                NX_VERBOSE(
+                    this,
+                    "Event %1-%2 doesn't match since started state already handled",
+                    event->type(),
+                    resourceKey);
+                return false;
+            }
+
+            m_runningEvents.insert(resourceKey);
+        }
+        else
+        {
+            if (!isEventRunning)
+            {
+                NX_VERBOSE(
+                    this,
+                    "Event %1-%2 doesn't match since before the stopped, started state must be received",
+                    event->type(),
+                    resourceKey);
+                return false;
+            }
+
+            m_runningEvents.erase(resourceKey);
+        }
+    }
+
     for (const auto& [name, field]: m_fields)
     {
         const auto& value = event->property(name.toUtf8().data());
@@ -119,6 +179,40 @@ bool EventFilter::match(const EventPtr& event) const
 
         if (!field->match(value))
             return false;
+    }
+
+    // At the moment only AnalyticsObjectEvent might be suppressed and processed not often than once
+    // per kObjectDetectedEventTimeout interval.
+    const bool isSuppressibleEvent = event->type() == utils::type<AnalyticsObjectEvent>();
+    // TODO: #mmalofeev Consider move this check to the engine.
+    if (isSuppressibleEvent)
+    {
+        const auto currentTimePoint = qnSyncTime->currentTimePoint();
+        const auto resourceKey = event->resourceKey();
+        if (auto it = m_suppressedEvents.find(event->uniqueName()); it != m_suppressedEvents.end())
+        {
+            if (currentTimePoint - it->second < kObjectDetectedEventTimeout)
+            {
+                NX_VERBOSE(
+                    this,
+                    "Event %1-%2 doesn't match since mightn't be processed often than once per %3 sec",
+                    event->type(),
+                    resourceKey,
+                    kObjectDetectedEventTimeout.count());
+                return false;
+            }
+            else
+            {
+                m_suppressedEvents.erase(it);
+            }
+        }
+        else
+        {
+            m_suppressedEvents.insert({resourceKey, currentTimePoint});
+
+            if (!m_clearCacheTimer.isActive())
+                m_clearCacheTimer.start();
+        }
     }
 
     NX_VERBOSE(this, "Matched filter id: %1", m_id);
@@ -143,6 +237,21 @@ void EventFilter::updateState()
 
     QScopedValueRollback<bool> guard(m_updateInProgress, true);
     emit stateChanged();
+}
+
+void EventFilter::clearCache()
+{
+    const auto now = qnSyncTime->currentTimePoint();
+    for (auto it = m_suppressedEvents.begin(); it != m_suppressedEvents.end();)
+    {
+        if (now - it->second >= kObjectDetectedEventTimeout)
+            it = m_suppressedEvents.erase(it);
+        else
+            ++it;
+    }
+
+    if (m_suppressedEvents.empty())
+        m_clearCacheTimer.stop();
 }
 
 } // namespace nx::vms::rules

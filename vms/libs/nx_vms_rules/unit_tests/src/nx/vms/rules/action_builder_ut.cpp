@@ -308,9 +308,9 @@ TEST_F(ActionBuilderTest, usersReceivedActionsWithAppropriateCameraId)
     EXPECT_CALL(mock, targetedUsers(expectedSelection2)).Times(1);
     EXPECT_CALL(mock, targetedCameraId(cameraOfUser2->getId())).Times(1);
 
-    std::list<AggregationInfo> aggregationInfoList;
-    aggregationInfoList.push_front({makeEventWithCameraId(cameraOfUser1->getId()), 1});
-    aggregationInfoList.push_front({makeEventWithCameraId(cameraOfUser2->getId()), 1});
+    AggregationInfoList aggregationInfoList;
+    aggregationInfoList.push_back({makeEventWithCameraId(cameraOfUser1->getId()), 1});
+    aggregationInfoList.push_back({makeEventWithCameraId(cameraOfUser2->getId()), 1});
 
     auto eventAggregator = AggregatedEventPtr::create(aggregationInfoList);
 

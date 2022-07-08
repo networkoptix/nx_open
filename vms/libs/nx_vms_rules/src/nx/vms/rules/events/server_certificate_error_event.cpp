@@ -22,6 +22,11 @@ QString ServerCertificateErrorEvent::uniqueName() const
     return makeName(BasicEvent::uniqueName(), m_serverId.toSimpleString());
 }
 
+QString ServerCertificateErrorEvent::resourceKey() const
+{
+    return m_serverId.toSimpleString();
+}
+
 QVariantMap ServerCertificateErrorEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);
