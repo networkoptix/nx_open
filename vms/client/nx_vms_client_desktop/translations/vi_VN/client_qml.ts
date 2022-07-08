@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>Notifications</source>
-      <translation>thông báo</translation>
+      <translation>Thông báo</translation>
     </message>
     <message>
       <source>Notify about available updates</source>
@@ -171,7 +171,7 @@
     <name>AnalyticsToolTipPreview</name>
     <message>
       <source>NO DATA</source>
-      <translation>không có sẵn</translation>
+      <translation>Không có sẵn</translation>
     </message>
   </context>
   <context>
@@ -274,7 +274,7 @@
     <name>CloudTile</name>
     <message>
       <source>Log in to</source>
-      <translation type="unfinished">Log in to</translation>
+      <translation>Đăng nhập vào</translation>
     </message>
   </context>
   <context>
@@ -544,7 +544,7 @@
     </message>
     <message>
       <source>Pause</source>
-      <translation>giờ nghĩ giảo lao</translation>
+      <translation>Giờ nghĩ giảo lao</translation>
     </message>
     <message>
       <source>Play</source>
@@ -567,7 +567,7 @@
     </message>
     <message>
       <source>joystick</source>
-      <translation>Cần điều khiển</translation>
+      <translation>cần điều khiển</translation>
     </message>
     <message>
       <source>Basic Actions</source>
@@ -799,7 +799,7 @@
     <name>Preview</name>
     <message>
       <source>NO DATA</source>
-      <translation>không có sẵn</translation>
+      <translation>Không có sẵn</translation>
     </message>
   </context>
   <context>
@@ -934,7 +934,7 @@ to activate PTZ</source>
     <name>ResourcePreview</name>
     <message>
       <source>NO DATA</source>
-      <translation>không có sẵn</translation>
+      <translation>Không có sẵn</translation>
     </message>
     <message>
       <source>OUTDATED</source>
@@ -999,7 +999,7 @@ to activate PTZ</source>
     <name>RightPanel</name>
     <message>
       <source>Notifications</source>
-      <translation>thông báo</translation>
+      <translation>Thông báo</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -1099,11 +1099,11 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Enable</source>
-      <translation>cho phép</translation>
+      <translation>Cho phép</translation>
     </message>
     <message>
       <source>Activate License</source>
-      <translation>Bắt đầu Authorization </translation>
+      <translation>Bắt đầu Authorization</translation>
     </message>
     <message>
       <source>Camera Settings</source>
@@ -1184,7 +1184,7 @@ to activate PTZ</source>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>ID logic</translation>
     </message>
   </context>
   <context>

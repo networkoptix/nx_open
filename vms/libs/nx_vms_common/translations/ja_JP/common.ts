@@ -1289,7 +1289,7 @@
     </message>
     <message>
       <source>Backup settings</source>
-      <translation>設定のバックアップ</translation>
+      <translation>バックアップ設定</translation>
     </message>
     <message>
       <source>Cloud host override</source>

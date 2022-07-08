@@ -6645,9 +6645,9 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     </message>
     <message numerus="yes">
       <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
-      <translation type="unfinished">
-        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
-        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
+      <translation>
+        <numerusform>Sie sind dabei, diese Webseiten auf den Server &quot;%1&quot; zu verschieben. Diese Webseiten stellen alle angeforderten Inhalte als Proxy bereit, und ihr Proxyserver ändert sich zu Server &quot;%1&quot;.</numerusform>
+        <numerusform>Sie sind dabei, diese Webseiten auf den Server &quot;%1&quot; zu verschieben. Diese Webseiten stellen alle angeforderten Inhalte als Proxy bereit, und ihr Proxyserver ändert sich zu Server &quot;%1&quot;.</numerusform>
       </translation>
     </message>
     <message>
@@ -7196,7 +7196,7 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     </message>
     <message>
       <source>What to backup</source>
-      <translation>Was soll gesichert werden?</translation>
+      <translation>Was soll gesichert werden</translation>
     </message>
     <message>
       <source>Quality</source>
@@ -7231,7 +7231,7 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     </message>
     <message>
       <source>What to backup</source>
-      <translation>Was soll gesichert werden?</translation>
+      <translation>Was soll gesichert werden</translation>
     </message>
     <message>
       <source>Quality</source>
@@ -8971,7 +8971,7 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1system kann nur mit einer nicht-%1 zusammengeführt werden. Systemname und Passwort werden vom %1system übernommen.</translation>
+      <translation>%1 system kann nur mit einer nicht-%1 zusammengeführt werden. Systemname und Passwort werden vom %1 system übernommen.</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
@@ -10061,7 +10061,7 @@ Achtung: Dieses Passwort kann nicht zurückgesetzt werden. Wenn Sie es verlieren
     </message>
     <message>
       <source>days</source>
-      <translation>Tag</translation>
+      <translation>tag</translation>
     </message>
     <message>
       <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>

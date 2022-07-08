@@ -136,9 +136,9 @@
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n nye resultater</numerusform>
-        <numerusform>%n new results</numerusform>
+        <numerusform>%n nye resultater</numerusform>
       </translation>
     </message>
     <message>
@@ -278,7 +278,7 @@
     <name>CloudTile</name>
     <message>
       <source>Log in to</source>
-      <translation type="unfinished">Log in to</translation>
+      <translation>Logg på</translation>
     </message>
   </context>
   <context>
@@ -1194,7 +1194,7 @@ to activate PTZ</translation>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>Logisk ID</translation>
     </message>
   </context>
   <context>

@@ -1334,7 +1334,7 @@
     </message>
     <message>
       <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <translation>ID sprzętu</translation>
     </message>
     <message>
       <source>License Key</source>
@@ -1519,7 +1519,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Check</source>
-      <translation type="unfinished">Check</translation>
+      <translation>Sprawdź</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
@@ -5602,7 +5602,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Integracje</translation>
     </message>
   </context>
   <context>
@@ -6849,11 +6849,11 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message numerus="yes">
       <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
-      <translation type="unfinished">
-        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
-        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
-        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
-        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
+      <translation>
+        <numerusform>Zamierzasz przenieść te strony na serwer &quot;%1&quot;. Te strony internetowe obsługują wszystkie żądane treści, a ich serwer proxy zmieni się na serwer &quot;%1&quot;.</numerusform>
+        <numerusform>Zamierzasz przenieść te strony na serwer &quot;%1&quot;. Te strony internetowe obsługują wszystkie żądane treści, a ich serwer proxy zmieni się na serwer &quot;%1&quot;.</numerusform>
+        <numerusform>Zamierzasz przenieść te strony na serwer &quot;%1&quot;. Te strony internetowe obsługują wszystkie żądane treści, a ich serwer proxy zmieni się na serwer &quot;%1&quot;.</numerusform>
+        <numerusform>Zamierzasz przenieść te strony na serwer &quot;%1&quot;. Te strony internetowe obsługują wszystkie żądane treści, a ich serwer proxy zmieni się na serwer &quot;%1&quot;.</numerusform>
       </translation>
     </message>
     <message>
@@ -7676,7 +7676,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>default</source>
-      <translation type="unfinished">default</translation>
+      <translation>domyślnie</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -7798,7 +7798,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Zakończ</translation>
     </message>
     <message>
       <source>Camera for Replacement</source>
@@ -8011,7 +8011,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Integracje</translation>
     </message>
   </context>
   <context>
@@ -10966,7 +10966,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>Wyłącz</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -10974,7 +10974,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
+      <translation>Wymuś bezpieczne uwierzytelnianie</translation>
     </message>
     <message>
       <source>All users</source>

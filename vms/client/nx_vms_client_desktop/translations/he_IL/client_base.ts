@@ -1334,7 +1334,7 @@
     </message>
     <message>
       <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <translation>מזהה-חומרה</translation>
     </message>
     <message>
       <source>License Key</source>
@@ -1519,7 +1519,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Check</source>
-      <translation type="unfinished">Check</translation>
+      <translation>בדוק</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
@@ -5604,7 +5604,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>אינטגרציות</translation>
     </message>
   </context>
   <context>
@@ -7679,7 +7679,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>default</source>
-      <translation type="unfinished">default</translation>
+      <translation>ברירת מחדל</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -7801,7 +7801,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>סיום</translation>
     </message>
     <message>
       <source>Camera for Replacement</source>
@@ -8014,7 +8014,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>אינטגרציות</translation>
     </message>
   </context>
   <context>
@@ -10970,7 +10970,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>השבת</translation>
     </message>
     <message>
       <source>Delete</source>

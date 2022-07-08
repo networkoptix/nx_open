@@ -569,7 +569,7 @@
     </message>
     <message>
       <source>Camera Rules...</source>
-      <translation type="unfinished">Camera Rules...</translation>
+      <translation>Regras da câmera...</translation>
     </message>
     <message>
       <source>Cameras Rules...</source>
@@ -2698,7 +2698,7 @@ Chave de licença: %2</translation>
     <name>QnCameraListModel</name>
     <message>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>Gravação</translation>
     </message>
     <message>
       <source>Name</source>
@@ -3617,7 +3617,7 @@ a %1</translation>
     </message>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation type="unfinished">Creates a backup of System configuration that can be restored in case of failure.</translation>
+      <translation>Cria um ‘backup’ da configuração do sistema que pode ser restaurado em caso de falha.</translation>
     </message>
   </context>
   <context>
@@ -4954,7 +4954,7 @@ a %1</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation type="unfinished">Backup</translation>
+      <translation>Backup</translation>
     </message>
   </context>
   <context>
@@ -5221,7 +5221,7 @@ a %1</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation type="unfinished">Backup</translation>
+      <translation>Backup</translation>
     </message>
     <message>
       <source>Depending on the total size of the archive, reindexing can take up to several hours.</source>
@@ -6648,9 +6648,9 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     </message>
     <message numerus="yes">
       <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
-      <translation type="unfinished">
-        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
-        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
+      <translation>
+        <numerusform>Você está prestes a mover essas páginas da web para o servidor &quot;%1&quot;. Essas páginas da web atuam como proxy de todos os conteúdos solicitados e seu servidor proxy será alterado para o servidor &quot;%1&quot;.</numerusform>
+        <numerusform>Você está prestes a mover essas páginas da web para o servidor &quot;%1&quot;. Essas páginas da web atuam como proxy de todos os conteúdos solicitados e seu servidor proxy será alterado para o servidor &quot;%1&quot;.</numerusform>
       </translation>
     </message>
     <message>

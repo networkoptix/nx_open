@@ -1214,7 +1214,7 @@ to activate PTZ</translation>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>זיהוי ID לוגי</translation>
     </message>
   </context>
   <context>

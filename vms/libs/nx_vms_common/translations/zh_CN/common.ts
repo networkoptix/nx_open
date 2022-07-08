@@ -1060,23 +1060,23 @@
     <name>SystemSettings</name>
     <message>
       <source>SMTP host</source>
-      <translation type="unfinished">SMTP host</translation>
+      <translation>SMTP 服务器</translation>
     </message>
     <message>
       <source>Email from</source>
-      <translation type="unfinished">Email from</translation>
+      <translation>电子邮件发件人</translation>
     </message>
     <message>
       <source>SMTP user</source>
-      <translation type="unfinished">SMTP user</translation>
+      <translation>SMTP用户</translation>
     </message>
     <message>
       <source>SMTP password</source>
-      <translation type="unfinished">SMTP password</translation>
+      <translation>SMTP 密码</translation>
     </message>
     <message>
       <source>Email signature</source>
-      <translation type="unfinished">Email signature</translation>
+      <translation>电子邮件签名</translation>
     </message>
     <message>
       <source>Email support link</source>
@@ -1084,11 +1084,11 @@
     </message>
     <message>
       <source>SMTP connection type</source>
-      <translation type="unfinished">SMTP connection type</translation>
+      <translation>SMTP连接类型</translation>
     </message>
     <message>
       <source>SMTP port</source>
-      <translation type="unfinished">SMTP port</translation>
+      <translation>SMTP 端口</translation>
     </message>
     <message>
       <source>SMTP timeout (seconds)</source>
@@ -1104,7 +1104,7 @@
     </message>
     <message>
       <source>LDAP URI</source>
-      <translation type="unfinished">LDAP URI</translation>
+      <translation>LDAP URI</translation>
     </message>
     <message>
       <source>LDAP Admin DN</source>
@@ -1116,11 +1116,11 @@
     </message>
     <message>
       <source>LDAP search base</source>
-      <translation type="unfinished">LDAP search base</translation>
+      <translation>LDAP 搜索库</translation>
     </message>
     <message>
       <source>LDAP search filter</source>
-      <translation type="unfinished">LDAP search filter</translation>
+      <translation>LDAP 搜索过滤器</translation>
     </message>
     <message>
       <source>LDAP password expiration (milliseconds)</source>
@@ -1172,7 +1172,7 @@
     </message>
     <message>
       <source>Time synchronization enabled</source>
-      <translation type="unfinished">Time synchronization enabled</translation>
+      <translation>启用时间同步</translation>
     </message>
     <message>
       <source>Primary time synchronization Server ID</source>
@@ -1184,19 +1184,19 @@
     </message>
     <message>
       <source>OS time change check period</source>
-      <translation type="unfinished">OS time change check period</translation>
+      <translation>作业系统时间变更检查期</translation>
     </message>
     <message>
       <source>Sync time synchronization interval for network requests</source>
-      <translation type="unfinished">Sync time synchronization interval for network requests</translation>
+      <translation>发送网络校时请求的时间间隔</translation>
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
-      <translation type="unfinished">Sync time epsilon. New value is not applied if time delta less than epsilon</translation>
+      <translation>容许误差。如果时间最小误差容许值小于目前误差则不更新时间</translation>
     </message>
     <message>
       <source>Cloud owner account</source>
-      <translation type="unfinished">Cloud owner account</translation>
+      <translation>云所有者帐户</translation>
     </message>
     <message>
       <source>Cloud System ID</source>
@@ -1208,11 +1208,11 @@
     </message>
     <message>
       <source>System name</source>
-      <translation type="unfinished">System name</translation>
+      <translation>系统名称</translation>
     </message>
     <message>
       <source>Local System ID</source>
-      <translation type="unfinished">Local System ID</translation>
+      <translation>本地系统 ID</translation>
     </message>
     <message>
       <source>Last master System merge ID</source>
@@ -1241,19 +1241,19 @@
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
-      <translation type="unfinished">Max scene items (0 means default)</translation>
+      <translation>最大场景项目（0表示默认）</translation>
     </message>
     <message>
       <source>Send plain-text emails</source>
-      <translation type="unfinished">Send plain-text emails</translation>
+      <translation>发送纯文本电子邮件</translation>
     </message>
     <message>
       <source>Use Windows line feed in emails</source>
-      <translation type="unfinished">Use Windows line feed in emails</translation>
+      <translation>在电子邮件中使用Windows换行字元</translation>
     </message>
     <message>
       <source>Enable audit trail</source>
-      <translation type="unfinished">Enable audit trail</translation>
+      <translation>启用使用者行为记录</translation>
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
@@ -1261,7 +1261,7 @@
     </message>
     <message>
       <source>Event log period (days)</source>
-      <translation type="unfinished">Event log period (days)</translation>
+      <translation>事件日志周期（天）</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption)</source>
@@ -1333,7 +1333,7 @@
     </message>
     <message>
       <source>RTP timeout (milliseconds)</source>
-      <translation type="unfinished">RTP timeout (milliseconds)</translation>
+      <translation>RTP超时（毫秒）</translation>
     </message>
     <message>
       <source>Max RTSP connection duration (seconds)</source>
@@ -1385,7 +1385,7 @@
     </message>
     <message>
       <source>Watermark settings</source>
-      <translation type="unfinished">Watermark settings</translation>
+      <translation>浮水印设置</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (minutes)</source>
@@ -1409,7 +1409,7 @@
     </message>
     <message>
       <source>Default video codec</source>
-      <translation type="unfinished">Default video codec</translation>
+      <translation>回复视频编解码器为默认值</translation>
     </message>
     <message>
       <source>Default codec for export video</source>
@@ -1417,11 +1417,11 @@
     </message>
     <message>
       <source>Low quality screen video codec</source>
-      <translation type="unfinished">Low quality screen video codec</translation>
+      <translation>低质量的屏幕视频编解码器</translation>
     </message>
     <message>
       <source>License server</source>
-      <translation type="unfinished">License server</translation>
+      <translation>授权服务器</translation>
     </message>
     <message>
       <source>URI for resource_data.json automatic update</source>
@@ -1429,7 +1429,7 @@
     </message>
     <message>
       <source>Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation type="unfinished">Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
+      <translation>要保留最多笔在资料库中的事件日志记录。实际未删除记录的数量可能比指定值高出20％。</translation>
     </message>
     <message>
       <source>Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
@@ -1437,7 +1437,7 @@
     </message>
     <message>
       <source>Meta data storage change policy</source>
-      <translation type="unfinished">Meta data storage change policy</translation>
+      <translation>Meta数据存储更改策略</translation>
     </message>
     <message>
       <source>Persistent Servers for update storage</source>
@@ -2161,7 +2161,7 @@
     </message>
     <message>
       <source>Failed to backup file</source>
-      <translation type="unfinished">Failed to backup file</translation>
+      <translation>备份失败</translation>
     </message>
   </context>
   <context>

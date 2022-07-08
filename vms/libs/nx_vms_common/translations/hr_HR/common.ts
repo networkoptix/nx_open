@@ -1345,7 +1345,7 @@
     </message>
     <message>
       <source>Enable audit trail</source>
-      <translation type="unfinished">Enable audit trail</translation>
+      <translation>Enable audit trail</translation>
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>

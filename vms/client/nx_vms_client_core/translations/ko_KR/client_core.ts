@@ -245,11 +245,11 @@
     </message>
     <message>
       <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
-      <translation type="unfinished">You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</translation>
+      <translation>이 서버에 연결을 시도했지만 자동으로 확인할 수 없는 인증서를 제공했습니다.</translation>
     </message>
     <message>
       <source>Someone may be impersonating this Server to steal your personal information.</source>
-      <translation type="unfinished">Someone may be impersonating this Server to steal your personal information.</translation>
+      <translation>누군가 이 서버를 사칭하여 귀하의 개인 정보를 도용할 수 있습니다.</translation>
     </message>
     <message>
       <source>You attempted to connect to this Server but the Server&apos;s certificate has changed.</source>
@@ -257,11 +257,11 @@
     </message>
     <message>
       <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
-      <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
+      <translation>VMS 관리자가 지시하지 않는 한 이 서버에 연결하지 마십시오.</translation>
     </message>
     <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
-      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct Server.</translation>
+      <translation>인증서의 세부 정보를 검토하여 올바른 서버에 연결 중인지 확인한다.</translation>
     </message>
   </context>
 </TS>

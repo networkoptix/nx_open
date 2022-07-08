@@ -156,7 +156,7 @@
     </message>
     <message>
       <source>Camera %1 was disconnected</source>
-      <translation>A CÂmara %1 foi desligada</translation>
+      <translation>A сâmara %1 foi desligada</translation>
     </message>
     <message>
       <source>I/O Module %1 was disconnected</source>
@@ -179,7 +179,7 @@
     </message>
     <message>
       <source>MAC #%1: %2</source>
-      <translation>MAC #%1: %2  {1:?} {2?}</translation>
+      <translation>MAC #%1: %2 {1:?} {2?}</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
@@ -467,12 +467,12 @@
     <message>
       <source>Conflicting Server #%1: %2</source>
       <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>Servidor %1 em conflito : %2</translation>
+      <translation>Servidor %1 em conflito: %2</translation>
     </message>
     <message>
       <source>MAC #%1: %2</source>
       <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2  {1:?} {2?}</translation>
+      <translation>MAC #%1: %2 {1:?} {2?}</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Conflict</source>

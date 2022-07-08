@@ -1322,7 +1322,7 @@
     </message>
     <message>
       <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <translation>硬件ID:</translation>
     </message>
     <message>
       <source>License Key</source>
@@ -1486,7 +1486,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Check</source>
-      <translation type="unfinished">Check</translation>
+      <translation>检查</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
@@ -5399,7 +5399,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>整合</translation>
     </message>
   </context>
   <context>
@@ -6540,8 +6540,8 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
-      <translation type="unfinished">
-        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
+      <translation>
+        <numerusform>这些服务器代理转送的网页将被移动到服务器 &quot;%1&quot;，其代理服务器将更改为&quot;%1&quot;。</numerusform>
       </translation>
     </message>
     <message>
@@ -7325,7 +7325,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>default</source>
-      <translation type="unfinished">default</translation>
+      <translation>默认</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -7444,7 +7444,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>结束</translation>
     </message>
     <message>
       <source>Camera for Replacement</source>
@@ -7648,7 +7648,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>整合</translation>
     </message>
   </context>
   <context>
@@ -10508,7 +10508,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>停用</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -10516,7 +10516,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
+      <translation>强制安全认证</translation>
     </message>
     <message>
       <source>All users</source>
@@ -10539,7 +10539,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>LDAP</source>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
   </context>
   <context>

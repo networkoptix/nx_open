@@ -1198,23 +1198,23 @@
     <name>SystemSettings</name>
     <message>
       <source>SMTP host</source>
-      <translation type="unfinished">SMTP host</translation>
+      <translation>SMTP-хост</translation>
     </message>
     <message>
       <source>Email from</source>
-      <translation type="unfinished">Email from</translation>
+      <translation>Email від</translation>
     </message>
     <message>
       <source>SMTP user</source>
-      <translation type="unfinished">SMTP user</translation>
+      <translation>SMTP користувач</translation>
     </message>
     <message>
       <source>SMTP password</source>
-      <translation type="unfinished">SMTP password</translation>
+      <translation>Пароль до SMTP</translation>
     </message>
     <message>
       <source>Email signature</source>
-      <translation type="unfinished">Email signature</translation>
+      <translation>Підпис електронної пошти</translation>
     </message>
     <message>
       <source>Email support link</source>
@@ -1222,11 +1222,11 @@
     </message>
     <message>
       <source>SMTP connection type</source>
-      <translation type="unfinished">SMTP connection type</translation>
+      <translation>Тип підключення SMTP</translation>
     </message>
     <message>
       <source>SMTP port</source>
-      <translation type="unfinished">SMTP port</translation>
+      <translation>SMTP порт</translation>
     </message>
     <message>
       <source>SMTP timeout (seconds)</source>
@@ -1242,7 +1242,7 @@
     </message>
     <message>
       <source>LDAP URI</source>
-      <translation type="unfinished">LDAP URI</translation>
+      <translation>URI LDAP</translation>
     </message>
     <message>
       <source>LDAP Admin DN</source>
@@ -1254,11 +1254,11 @@
     </message>
     <message>
       <source>LDAP search base</source>
-      <translation type="unfinished">LDAP search base</translation>
+      <translation>База пошуку LDAP</translation>
     </message>
     <message>
       <source>LDAP search filter</source>
-      <translation type="unfinished">LDAP search filter</translation>
+      <translation>Фільтр пошуку LDAP</translation>
     </message>
     <message>
       <source>LDAP password expiration (milliseconds)</source>
@@ -1310,7 +1310,7 @@
     </message>
     <message>
       <source>Time synchronization enabled</source>
-      <translation type="unfinished">Time synchronization enabled</translation>
+      <translation>Синхронізація часу включена</translation>
     </message>
     <message>
       <source>Primary time synchronization Server ID</source>
@@ -1322,19 +1322,19 @@
     </message>
     <message>
       <source>OS time change check period</source>
-      <translation type="unfinished">OS time change check period</translation>
+      <translation>Час зміни часу ОС</translation>
     </message>
     <message>
       <source>Sync time synchronization interval for network requests</source>
-      <translation type="unfinished">Sync time synchronization interval for network requests</translation>
+      <translation>Інтервал синхронізації часу для мережевих запитів</translation>
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
-      <translation type="unfinished">Sync time epsilon. New value is not applied if time delta less than epsilon</translation>
+      <translation>Час синхронізації. Нове значення не застосовується при затримці часу менше аніж у epsilon</translation>
     </message>
     <message>
       <source>Cloud owner account</source>
-      <translation type="unfinished">Cloud owner account</translation>
+      <translation>Обліковий запис власника хмари</translation>
     </message>
     <message>
       <source>Cloud System ID</source>
@@ -1346,11 +1346,11 @@
     </message>
     <message>
       <source>System name</source>
-      <translation type="unfinished">System name</translation>
+      <translation>Ім'я системи</translation>
     </message>
     <message>
       <source>Local System ID</source>
-      <translation type="unfinished">Local System ID</translation>
+      <translation>Ідентифікатор локальної системи</translation>
     </message>
     <message>
       <source>Last master System merge ID</source>
@@ -1379,19 +1379,19 @@
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
-      <translation type="unfinished">Max scene items (0 means default)</translation>
+      <translation>Максимальна кількість сюжетів (0 - за замовчуванням)</translation>
     </message>
     <message>
       <source>Send plain-text emails</source>
-      <translation type="unfinished">Send plain-text emails</translation>
+      <translation>Відправка листів простим текстом</translation>
     </message>
     <message>
       <source>Use Windows line feed in emails</source>
-      <translation type="unfinished">Use Windows line feed in emails</translation>
+      <translation>Використовувати стрічку новин Windows у листах</translation>
     </message>
     <message>
       <source>Enable audit trail</source>
-      <translation type="unfinished">Enable audit trail</translation>
+      <translation>Увімкнути аудит</translation>
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
@@ -1399,7 +1399,7 @@
     </message>
     <message>
       <source>Event log period (days)</source>
-      <translation type="unfinished">Event log period (days)</translation>
+      <translation>Розмір журналу подій (дні)</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption)</source>
@@ -1471,7 +1471,7 @@
     </message>
     <message>
       <source>RTP timeout (milliseconds)</source>
-      <translation type="unfinished">RTP timeout (milliseconds)</translation>
+      <translation>Тайм-аут RTP (мілісекунди)</translation>
     </message>
     <message>
       <source>Max RTSP connection duration (seconds)</source>
@@ -1523,7 +1523,7 @@
     </message>
     <message>
       <source>Watermark settings</source>
-      <translation type="unfinished">Watermark settings</translation>
+      <translation>Налаштування водяного знака</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (minutes)</source>
@@ -1547,7 +1547,7 @@
     </message>
     <message>
       <source>Default video codec</source>
-      <translation type="unfinished">Default video codec</translation>
+      <translation>Відеокодек за замовчуванням</translation>
     </message>
     <message>
       <source>Default codec for export video</source>
@@ -1555,11 +1555,11 @@
     </message>
     <message>
       <source>Low quality screen video codec</source>
-      <translation type="unfinished">Low quality screen video codec</translation>
+      <translation>Низька якість відео кодеку</translation>
     </message>
     <message>
       <source>License server</source>
-      <translation type="unfinished">License server</translation>
+      <translation>Сервер ліцензії</translation>
     </message>
     <message>
       <source>URI for resource_data.json automatic update</source>
@@ -1567,7 +1567,7 @@
     </message>
     <message>
       <source>Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation type="unfinished">Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
+      <translation>Максимум запису журналу подій для зберігання в базі даних. Реальний обсяг відновлених записів може становити до 20% вище вказаного значення.</translation>
     </message>
     <message>
       <source>Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
@@ -1575,7 +1575,7 @@
     </message>
     <message>
       <source>Meta data storage change policy</source>
-      <translation type="unfinished">Meta data storage change policy</translation>
+      <translation>Політика зміни сховища даних</translation>
     </message>
     <message>
       <source>Persistent Servers for update storage</source>

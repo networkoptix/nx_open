@@ -1184,7 +1184,7 @@ to activate PTZ</translation>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>รหัสตรรกะ</translation>
     </message>
   </context>
   <context>

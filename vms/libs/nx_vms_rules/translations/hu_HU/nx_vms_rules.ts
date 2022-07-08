@@ -179,7 +179,7 @@
     </message>
     <message>
       <source>MAC #%1: %2</source>
-      <translation>MAC #%1: %2  {1:?} {2?}</translation>
+      <translation>MAC #%1: %2 {1:?} {2?}</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
@@ -432,7 +432,7 @@
     </message>
     <message>
       <source>to</source>
-      <translation>:</translation>
+      <translation type="unfinished">to</translation>
     </message>
     <message>
       <source>Interval of action</source>
@@ -472,7 +472,7 @@
     <message>
       <source>MAC #%1: %2</source>
       <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2  {1:?} {2?}</translation>
+      <translation>MAC #%1: %2 {1:?} {2?}</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Conflict</source>
