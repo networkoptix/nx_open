@@ -44,6 +44,11 @@ QString AnalyticsEngineEvent::uniqueName() const
     return makeName(DescribedEvent::uniqueName(), m_cameraId.toSimpleString());
 }
 
+QString AnalyticsEngineEvent::resourceKey() const
+{
+    return m_cameraId.toSimpleString();
+}
+
 QVariantMap AnalyticsEngineEvent::details(common::SystemContext* context) const
 {
     auto result = DescribedEvent::details(context);

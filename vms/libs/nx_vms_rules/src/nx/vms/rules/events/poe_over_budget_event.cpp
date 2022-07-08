@@ -42,6 +42,11 @@ QString PoeOverBudgetEvent::uniqueName() const
     return makeName(BasicEvent::uniqueName(), m_serverId.toSimpleString());
 }
 
+QString PoeOverBudgetEvent::resourceKey() const
+{
+    return m_serverId.toSimpleString();
+}
+
 QVariantMap PoeOverBudgetEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);

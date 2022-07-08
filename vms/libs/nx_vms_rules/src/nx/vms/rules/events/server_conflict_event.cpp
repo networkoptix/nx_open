@@ -25,6 +25,11 @@ QString ServerConflictEvent::uniqueName() const
     return makeName(BasicEvent::uniqueName(), m_source.toSimpleString());
 }
 
+QString ServerConflictEvent::resourceKey() const
+{
+    return m_source.toSimpleString();
+}
+
 QVariantMap ServerConflictEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);

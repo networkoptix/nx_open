@@ -17,6 +17,11 @@ ReasonedEvent::ReasonedEvent(
 {
 }
 
+QString ReasonedEvent::resourceKey() const
+{
+    return m_serverId.toSimpleString();
+}
+
 QString ReasonedEvent::uniqueName() const
 {
     switch (m_reasonCode)

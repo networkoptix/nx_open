@@ -22,6 +22,7 @@ public:
     ServerStartedEvent(std::chrono::microseconds timestamp, QnUuid serverId);
 
     virtual QString uniqueName() const override;
+    virtual QString resourceKey() const override;
     virtual QVariantMap details(common::SystemContext* context) const override;
 
 private:

@@ -24,6 +24,11 @@ QString CameraEvent::uniqueName() const
     return makeName(BasicEvent::uniqueName(), m_cameraId.toSimpleString());
 }
 
+QString CameraEvent::resourceKey() const
+{
+    return m_cameraId.toSimpleString();
+}
+
 QVariantMap CameraEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);

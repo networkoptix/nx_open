@@ -37,6 +37,11 @@ QString SoftTriggerEvent::uniqueName() const
     return QnUuid::createUuid().toString();
 }
 
+QString SoftTriggerEvent::resourceKey() const
+{
+    return m_cameraId.toSimpleString();
+}
+
 QVariantMap SoftTriggerEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);

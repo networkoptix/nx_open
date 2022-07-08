@@ -28,6 +28,7 @@ public:
         const QStringList& macAddrList);
 
     virtual QString uniqueName() const override;
+    virtual QString resourceKey() const override;
     virtual QVariantMap details(common::SystemContext* context) const override;
 
     static const ItemDescriptor& manifest();
