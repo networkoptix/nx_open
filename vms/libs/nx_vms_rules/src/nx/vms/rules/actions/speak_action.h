@@ -14,7 +14,7 @@ class NX_VMS_RULES_API SpeakAction: public nx::vms::rules::BasicAction
 
     FIELD(QnUuidSet, devices, setDevices)
     FIELD(nx::vms::rules::UuidSelection, users, setUsers)
-    FIELD(std::chrono::seconds, interval, setInterval)
+    FIELD(std::chrono::microseconds, interval, setInterval)
     FIELD(QString, text, setText)
     FIELD(float, volume, setVolume)
 

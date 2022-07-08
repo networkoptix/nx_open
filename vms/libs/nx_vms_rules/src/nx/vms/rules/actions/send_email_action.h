@@ -15,7 +15,7 @@ class NX_VMS_RULES_API SendEmailAction: public nx::vms::rules::BasicAction
     Q_CLASSINFO("type", "nx.actions.sendEmail")
 
     FIELD(nx::vms::rules::UuidSelection, users, setUsers)
-    FIELD(std::chrono::seconds, interval, setInterval)
+    FIELD(std::chrono::microseconds, interval, setInterval)
     FIELD(QString, emails, setEmails)
     FIELD(nx::email::Message, message, setMessage)
     FIELD(QVariantMap, details, setDetails)

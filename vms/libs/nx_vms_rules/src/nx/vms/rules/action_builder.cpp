@@ -126,7 +126,7 @@ void ActionBuilder::addField(const QString& name, std::unique_ptr<ActionField> f
     {
         auto optionalTimeField = dynamic_cast<OptionalTimeField*>(field.get());
         if (NX_ASSERT(optionalTimeField))
-            setAggregationInterval(seconds(optionalTimeField->value()));
+            setAggregationInterval(optionalTimeField->value());
     }
 
     m_fields[name] = std::move(field);
@@ -181,10 +181,10 @@ void ActionBuilder::processEvent(const EventPtr& event)
     }
 }
 
-void ActionBuilder::setAggregationInterval(seconds interval)
+void ActionBuilder::setAggregationInterval(microseconds interval)
 {
     m_interval = interval;
-    if (m_interval != seconds::zero())
+    if (m_interval != microseconds::zero())
     {
         // TODO: #mmalofeev move aggregation key function to the manifest or to some action
         // dependent strategy class when another aggregation logic will be required.
@@ -194,7 +194,7 @@ void ActionBuilder::setAggregationInterval(seconds interval)
     }
 }
 
-seconds ActionBuilder::aggregationInterval() const
+microseconds ActionBuilder::aggregationInterval() const
 {
     return m_interval;
 }

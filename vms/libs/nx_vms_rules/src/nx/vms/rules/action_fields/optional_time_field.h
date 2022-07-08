@@ -10,15 +10,15 @@ namespace nx::vms::rules {
 
 /**
  * Action field for storing optional time value. Typically displayed with a special editor widget.
- * Stores positive value in seconds if the editor checkbox is checked, zero otherwise.
+ * Stores positive value in microseconds if the editor checkbox is checked, zero otherwise.
  */
 class NX_VMS_RULES_API OptionalTimeField:
-    public SimpleTypeActionField<std::chrono::seconds, OptionalTimeField>
+    public SimpleTypeActionField<std::chrono::microseconds, OptionalTimeField>
 {
     Q_OBJECT
     Q_CLASSINFO("metatype", "nx.actions.fields.optionalTime")
 
-    Q_PROPERTY(std::chrono::seconds value READ value WRITE setValue NOTIFY valueChanged)
+    Q_PROPERTY(std::chrono::microseconds value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
     OptionalTimeField() = default;

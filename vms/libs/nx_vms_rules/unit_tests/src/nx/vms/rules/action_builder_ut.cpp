@@ -52,18 +52,19 @@ public:
             []{ return new TestAction; });
     }
 
-    QSharedPointer<TestActionBuilder> makeTestActionBuilder() const
+    QSharedPointer<TestActionBuilder> makeTestActionBuilder(
+        const std::function<BasicAction*()>& actionConstructor) const
     {
         return QSharedPointer<TestActionBuilder>::create(
             QnUuid::createUuid(),
             utils::type<TestActionWithTargetUsers>(),
-            []{ return new TestActionWithTargetUsers; });
+            actionConstructor);
     }
 
     QSharedPointer<TestActionBuilder> makeBuilderWithTargetUserField(
         const UuidSelection& selection) const
     {
-        auto builder = makeTestActionBuilder();
+        auto builder = makeTestActionBuilder([]{ return new TestActionWithTargetUsers; });
 
         auto targetUserField = std::make_unique<TargetUserField>(systemContext());
         targetUserField->setIds(selection.ids);
@@ -75,9 +76,9 @@ public:
     }
 
     QSharedPointer<TestActionBuilder> makeBuilderWithIntervalField(
-        std::chrono::seconds interval) const
+        std::chrono::microseconds interval) const
     {
-        auto builder = makeTestActionBuilder();
+        auto builder = makeTestActionBuilder([]{ return new TestAction; });
 
         auto intervalField = std::make_unique<OptionalTimeField>();
         intervalField->setValue(interval);
@@ -334,22 +335,28 @@ TEST_F(ActionBuilderTest, builderWithoutIntervalNotAggregatesEvents)
 
 TEST_F(ActionBuilderTest, builderWithIntervalAggregatesEvents)
 {
-    const std::chrono::seconds interval(1);
+    const std::chrono::milliseconds interval(100);
     auto builder = makeBuilderWithIntervalField(interval);
 
     MockActionBuilderEvents mock{builder.get()};
 
     EXPECT_CALL(mock, actionReceived()).Times(1);
 
-    builder->processEvent(makeSimpleEvent());
+    const auto initialEvent = makeSimpleEvent();
+    builder->processEvent(initialEvent);
+
     // The following 2 events are aggregated till the interval not elapsed.
     builder->processEvent(makeSimpleEvent());
     builder->processEvent(makeSimpleEvent());
+
+    // If this check fails, than interval must be increased.
+    ASSERT_TRUE(qnSyncTime->currentTimePoint() - initialEvent->timestamp() < interval);
+    builder->handleAggregatedEvents();
 }
 
 TEST_F(ActionBuilderTest, builderWithIntervalAggregatesAndEmitsThemWhenTimeElapsed)
 {
-    const std::chrono::seconds interval(1);
+    const std::chrono::milliseconds interval(100);
     auto builder = makeBuilderWithIntervalField(interval);
 
     MockActionBuilderEvents mock{builder.get()};
@@ -372,7 +379,7 @@ TEST_F(ActionBuilderTest, builderAggregatesDifferentTypesOfEventProperly)
     auto camera1 = addCamera();
     auto camera2 = addCamera();
 
-    const std::chrono::seconds interval(1);
+    const std::chrono::milliseconds interval(100);
     auto builder = makeBuilderWithIntervalField(interval);
 
     MockActionBuilderEvents mock{builder.get()};
