@@ -1198,95 +1198,95 @@
     <name>SystemSettings</name>
     <message>
       <source>SMTP host</source>
-      <translation type="unfinished">SMTP host</translation>
+      <translation>Host SMTP</translation>
     </message>
     <message>
       <source>Email from</source>
-      <translation type="unfinished">Email from</translation>
+      <translation>Nadawca e-mail</translation>
     </message>
     <message>
       <source>SMTP user</source>
-      <translation type="unfinished">SMTP user</translation>
+      <translation>Użytkownik SMTP</translation>
     </message>
     <message>
       <source>SMTP password</source>
-      <translation type="unfinished">SMTP password</translation>
+      <translation>Hasło SMTP</translation>
     </message>
     <message>
       <source>Email signature</source>
-      <translation type="unfinished">Email signature</translation>
+      <translation>Podpis e-mail</translation>
     </message>
     <message>
       <source>Email support link</source>
-      <translation type="unfinished">Email support link</translation>
+      <translation>Wsparcie e-mail</translation>
     </message>
     <message>
       <source>SMTP connection type</source>
-      <translation type="unfinished">SMTP connection type</translation>
+      <translation>Typ połączenia SMTP</translation>
     </message>
     <message>
       <source>SMTP port</source>
-      <translation type="unfinished">SMTP port</translation>
+      <translation>Port SMTP</translation>
     </message>
     <message>
       <source>SMTP timeout (seconds)</source>
-      <translation type="unfinished">SMTP timeout (seconds)</translation>
+      <translation>Limit czasu SMTP (sekundy)</translation>
     </message>
     <message>
       <source>SMTP use simple settings view in Client</source>
-      <translation type="unfinished">SMTP use simple settings view in Client</translation>
+      <translation>SMTP używa prostego widoku ustawień w kliencie</translation>
     </message>
     <message>
       <source>SMTP name</source>
-      <translation type="unfinished">SMTP name</translation>
+      <translation>Nazwa SMTP</translation>
     </message>
     <message>
       <source>LDAP URI</source>
-      <translation type="unfinished">LDAP URI</translation>
+      <translation>Adres URI LDAP</translation>
     </message>
     <message>
       <source>LDAP Admin DN</source>
-      <translation type="unfinished">LDAP Admin DN</translation>
+      <translation>LDAP Admin DN</translation>
     </message>
     <message>
       <source>LDAP Admin password</source>
-      <translation type="unfinished">LDAP Admin password</translation>
+      <translation>Hasło administratora LDAP</translation>
     </message>
     <message>
       <source>LDAP search base</source>
-      <translation type="unfinished">LDAP search base</translation>
+      <translation>Podstawa wyszukiwania LDAP</translation>
     </message>
     <message>
       <source>LDAP search filter</source>
-      <translation type="unfinished">LDAP search filter</translation>
+      <translation>Filtr wyszukiwania LDAP</translation>
     </message>
     <message>
       <source>LDAP password expiration (milliseconds)</source>
-      <translation type="unfinished">LDAP password expiration (milliseconds)</translation>
+      <translation>Wygaśnięcie hasła LDAP (milisekundy)</translation>
     </message>
     <message>
       <source>LDAP search timeout (seconds)</source>
-      <translation type="unfinished">LDAP search timeout (seconds)</translation>
+      <translation>Limit czasu wyszukiwania LDAP (sekundy)</translation>
     </message>
     <message>
       <source>Anonymous statistics report allowed</source>
-      <translation type="unfinished">Anonymous statistics report allowed</translation>
+      <translation>Dozwolony anonimowy raport statystyk</translation>
     </message>
     <message>
       <source>Anonymous statistics report last time</source>
-      <translation type="unfinished">Anonymous statistics report last time</translation>
+      <translation>Ostatni anonimowy raport statystyk</translation>
     </message>
     <message>
       <source>Anonymous statistics report last version</source>
-      <translation type="unfinished">Anonymous statistics report last version</translation>
+      <translation>Ostatnia wersja anonimowego raportu statystyk</translation>
     </message>
     <message>
       <source>Anonymous statistics report last number</source>
-      <translation type="unfinished">Anonymous statistics report last number</translation>
+      <translation>Ostatni numer anonimowego raportu statystyk</translation>
     </message>
     <message>
       <source>Anonymous statistics time cycle</source>
-      <translation type="unfinished">Anonymous statistics time cycle</translation>
+      <translation>Cykl czasowy statystyk anonimowych</translation>
     </message>
     <message>
       <source>Anonymous statistics report delay after update</source>
@@ -1310,7 +1310,7 @@
     </message>
     <message>
       <source>Time synchronization enabled</source>
-      <translation type="unfinished">Time synchronization enabled</translation>
+      <translation>Synchronizacja czasu włączona</translation>
     </message>
     <message>
       <source>Primary time synchronization Server ID</source>
@@ -1322,35 +1322,35 @@
     </message>
     <message>
       <source>OS time change check period</source>
-      <translation type="unfinished">OS time change check period</translation>
+      <translation>Okres sprawdzania zmiany czasu systemu</translation>
     </message>
     <message>
       <source>Sync time synchronization interval for network requests</source>
-      <translation type="unfinished">Sync time synchronization interval for network requests</translation>
+      <translation>Interwał synchronizacji czasu dla żądań sieciowych</translation>
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
-      <translation type="unfinished">Sync time epsilon. New value is not applied if time delta less than epsilon</translation>
+      <translation>Wartość synchronizacji czasu epsilon. Nowa wartość nie jest stosowana jeśli czas delta jest mniejszy niż czas epsilon</translation>
     </message>
     <message>
       <source>Cloud owner account</source>
-      <translation type="unfinished">Cloud owner account</translation>
+      <translation>Konto właściciela chmury</translation>
     </message>
     <message>
       <source>Cloud System ID</source>
-      <translation type="unfinished">Cloud System ID</translation>
+      <translation>ID systemu w chmurze</translation>
     </message>
     <message>
       <source>Cloud authorization key</source>
-      <translation type="unfinished">Cloud authorization key</translation>
+      <translation>Klucz autoryzacji w chmurze</translation>
     </message>
     <message>
       <source>System name</source>
-      <translation type="unfinished">System name</translation>
+      <translation>Nazwa systemu</translation>
     </message>
     <message>
       <source>Local System ID</source>
-      <translation type="unfinished">Local System ID</translation>
+      <translation>ID lokalnego systemu</translation>
     </message>
     <message>
       <source>Last master System merge ID</source>
@@ -1379,19 +1379,19 @@
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
-      <translation type="unfinished">Max scene items (0 means default)</translation>
+      <translation>Max liczba elementów sceny (0 oznacza domyślną)</translation>
     </message>
     <message>
       <source>Send plain-text emails</source>
-      <translation type="unfinished">Send plain-text emails</translation>
+      <translation>Wysyłaj e-maile czystym tekstem</translation>
     </message>
     <message>
       <source>Use Windows line feed in emails</source>
-      <translation type="unfinished">Use Windows line feed in emails</translation>
+      <translation>Używaj w e-mailach znaków końca linii zgodnych z Windows</translation>
     </message>
     <message>
       <source>Enable audit trail</source>
-      <translation type="unfinished">Enable audit trail</translation>
+      <translation>Zapisuj dziennik dostępu</translation>
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
@@ -1399,7 +1399,7 @@
     </message>
     <message>
       <source>Event log period (days)</source>
-      <translation type="unfinished">Event log period (days)</translation>
+      <translation>Okres dziennika zdarzeń (dni)</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption)</source>
@@ -1471,7 +1471,7 @@
     </message>
     <message>
       <source>RTP timeout (milliseconds)</source>
-      <translation type="unfinished">RTP timeout (milliseconds)</translation>
+      <translation>Limit czasu RTP (ms)</translation>
     </message>
     <message>
       <source>Max RTSP connection duration (seconds)</source>
@@ -1523,7 +1523,7 @@
     </message>
     <message>
       <source>Watermark settings</source>
-      <translation type="unfinished">Watermark settings</translation>
+      <translation>Ustawienia znaku wodnego</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (minutes)</source>
@@ -1547,7 +1547,7 @@
     </message>
     <message>
       <source>Default video codec</source>
-      <translation type="unfinished">Default video codec</translation>
+      <translation>Domyślny kodek wideo</translation>
     </message>
     <message>
       <source>Default codec for export video</source>
@@ -1555,11 +1555,11 @@
     </message>
     <message>
       <source>Low quality screen video codec</source>
-      <translation type="unfinished">Low quality screen video codec</translation>
+      <translation>Kodek ekranu wideo niskiej jakości</translation>
     </message>
     <message>
       <source>License server</source>
-      <translation type="unfinished">License server</translation>
+      <translation>Serwer licencji</translation>
     </message>
     <message>
       <source>URI for resource_data.json automatic update</source>
@@ -1567,7 +1567,7 @@
     </message>
     <message>
       <source>Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation type="unfinished">Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
+      <translation>Maksymalna liczba wpisów do dziennika zdarzeń przechowywanego w bazie danych. Rzeczywista ilość rekordów może być nawet o 20% wyższa niż podana wartość.</translation>
     </message>
     <message>
       <source>Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
@@ -1575,7 +1575,7 @@
     </message>
     <message>
       <source>Meta data storage change policy</source>
-      <translation type="unfinished">Meta data storage change policy</translation>
+      <translation>Polityka zmiany magazynu metadanych</translation>
     </message>
     <message>
       <source>Persistent Servers for update storage</source>
@@ -2335,7 +2335,7 @@
     </message>
     <message>
       <source>Failed to backup file</source>
-      <translation type="unfinished">Failed to backup file</translation>
+      <translation>Nie udało się zapisać pliku</translation>
     </message>
   </context>
   <context>

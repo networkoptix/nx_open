@@ -1106,23 +1106,23 @@
     <name>SystemSettings</name>
     <message>
       <source>SMTP host</source>
-      <translation type="unfinished">SMTP host</translation>
+      <translation>Host SMTP</translation>
     </message>
     <message>
       <source>Email from</source>
-      <translation type="unfinished">Email from</translation>
+      <translation>Email da</translation>
     </message>
     <message>
       <source>SMTP user</source>
-      <translation type="unfinished">SMTP user</translation>
+      <translation>Utente SMTP</translation>
     </message>
     <message>
       <source>SMTP password</source>
-      <translation type="unfinished">SMTP password</translation>
+      <translation>Password SMTP</translation>
     </message>
     <message>
       <source>Email signature</source>
-      <translation type="unfinished">Email signature</translation>
+      <translation>Firma e-mail</translation>
     </message>
     <message>
       <source>Email support link</source>
@@ -1130,11 +1130,11 @@
     </message>
     <message>
       <source>SMTP connection type</source>
-      <translation type="unfinished">SMTP connection type</translation>
+      <translation>Tipo di connessione SMTP</translation>
     </message>
     <message>
       <source>SMTP port</source>
-      <translation type="unfinished">SMTP port</translation>
+      <translation>Porta SMTP</translation>
     </message>
     <message>
       <source>SMTP timeout (seconds)</source>
@@ -1150,7 +1150,7 @@
     </message>
     <message>
       <source>LDAP URI</source>
-      <translation type="unfinished">LDAP URI</translation>
+      <translation>URI LDAP</translation>
     </message>
     <message>
       <source>LDAP Admin DN</source>
@@ -1162,11 +1162,11 @@
     </message>
     <message>
       <source>LDAP search base</source>
-      <translation type="unfinished">LDAP search base</translation>
+      <translation>Base di ricerca LDAP</translation>
     </message>
     <message>
       <source>LDAP search filter</source>
-      <translation type="unfinished">LDAP search filter</translation>
+      <translation>Filtro di ricerca LDAP</translation>
     </message>
     <message>
       <source>LDAP password expiration (milliseconds)</source>
@@ -1218,7 +1218,7 @@
     </message>
     <message>
       <source>Time synchronization enabled</source>
-      <translation type="unfinished">Time synchronization enabled</translation>
+      <translation>Sincronizzazione dell'ora abilitata</translation>
     </message>
     <message>
       <source>Primary time synchronization Server ID</source>
@@ -1230,19 +1230,19 @@
     </message>
     <message>
       <source>OS time change check period</source>
-      <translation type="unfinished">OS time change check period</translation>
+      <translation>Periodo di controllo della modifica dell'ora del sistema operativo</translation>
     </message>
     <message>
       <source>Sync time synchronization interval for network requests</source>
-      <translation type="unfinished">Sync time synchronization interval for network requests</translation>
+      <translation>Intervallo sincronizzazione orario per le richieste di rete</translation>
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
-      <translation type="unfinished">Sync time epsilon. New value is not applied if time delta less than epsilon</translation>
+      <translation>Tempo di sincronizzazione epsilon. Il nuovo valore non viene applicato se il tempo delta è inferiore a epsilon</translation>
     </message>
     <message>
       <source>Cloud owner account</source>
-      <translation type="unfinished">Cloud owner account</translation>
+      <translation>Account del proprietario del cloud</translation>
     </message>
     <message>
       <source>Cloud System ID</source>
@@ -1254,11 +1254,11 @@
     </message>
     <message>
       <source>System name</source>
-      <translation type="unfinished">System name</translation>
+      <translation>Nome del sistema</translation>
     </message>
     <message>
       <source>Local System ID</source>
-      <translation type="unfinished">Local System ID</translation>
+      <translation>ID del sistema locale</translation>
     </message>
     <message>
       <source>Last master System merge ID</source>
@@ -1287,19 +1287,19 @@
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
-      <translation type="unfinished">Max scene items (0 means default)</translation>
+      <translation>Numero massimo di elementi della scena (0 significa predefinito)</translation>
     </message>
     <message>
       <source>Send plain-text emails</source>
-      <translation type="unfinished">Send plain-text emails</translation>
+      <translation>Invia e-mail di testo</translation>
     </message>
     <message>
       <source>Use Windows line feed in emails</source>
-      <translation type="unfinished">Use Windows line feed in emails</translation>
+      <translation>Utilizza la riga di Windows nei messaggi di posta elettronica</translation>
     </message>
     <message>
       <source>Enable audit trail</source>
-      <translation type="unfinished">Enable audit trail</translation>
+      <translation>Abilita traccia di controllo</translation>
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
@@ -1307,7 +1307,7 @@
     </message>
     <message>
       <source>Event log period (days)</source>
-      <translation type="unfinished">Event log period (days)</translation>
+      <translation>Periodo del registro eventi (giorni)</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption)</source>
@@ -1379,7 +1379,7 @@
     </message>
     <message>
       <source>RTP timeout (milliseconds)</source>
-      <translation type="unfinished">RTP timeout (milliseconds)</translation>
+      <translation>Timeout RTP (millisecondi)</translation>
     </message>
     <message>
       <source>Max RTSP connection duration (seconds)</source>
@@ -1431,7 +1431,7 @@
     </message>
     <message>
       <source>Watermark settings</source>
-      <translation type="unfinished">Watermark settings</translation>
+      <translation>Impostazioni del watermark</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (minutes)</source>
@@ -1455,7 +1455,7 @@
     </message>
     <message>
       <source>Default video codec</source>
-      <translation type="unfinished">Default video codec</translation>
+      <translation>Codec video predefinito</translation>
     </message>
     <message>
       <source>Default codec for export video</source>
@@ -1463,11 +1463,11 @@
     </message>
     <message>
       <source>Low quality screen video codec</source>
-      <translation type="unfinished">Low quality screen video codec</translation>
+      <translation>Codec video di bassa qualità</translation>
     </message>
     <message>
       <source>License server</source>
-      <translation type="unfinished">License server</translation>
+      <translation>Server di licenza</translation>
     </message>
     <message>
       <source>URI for resource_data.json automatic update</source>
@@ -1475,7 +1475,7 @@
     </message>
     <message>
       <source>Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation type="unfinished">Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
+      <translation>Numero massimo di record del registro degli eventi da conservare nel database. La quantità reale di record non eliminati può essere maggiore del 20% rispetto al valore specificato.</translation>
     </message>
     <message>
       <source>Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
@@ -1483,7 +1483,7 @@
     </message>
     <message>
       <source>Meta data storage change policy</source>
-      <translation type="unfinished">Meta data storage change policy</translation>
+      <translation>Politica di modifica della memorizzazione dei metadati</translation>
     </message>
     <message>
       <source>Persistent Servers for update storage</source>

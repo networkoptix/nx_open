@@ -789,7 +789,7 @@
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Next</translation>
     </message>
   </context>
   <context>
@@ -1911,7 +1911,7 @@
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1919,7 +1919,7 @@
     </message>
     <message>
       <source>User</source>
-      <translation type="unfinished">User</translation>
+      <translation>User</translation>
     </message>
     <message>
       <source>Server Address</source>
@@ -1935,7 +1935,7 @@
     </message>
     <message>
       <source>Support Signature</source>
-      <translation type="unfinished">Support Signature</translation>
+      <translation>Support Signature</translation>
     </message>
     <message>
       <source>System Singnature</source>
@@ -3157,7 +3157,7 @@
     </message>
     <message>
       <source>Volume</source>
-      <translation type="unfinished">Volume</translation>
+      <translation>Volume</translation>
     </message>
     <message>
       <source>Test</source>

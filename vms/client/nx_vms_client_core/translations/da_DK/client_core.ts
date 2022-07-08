@@ -132,7 +132,7 @@
     </message>
     <message>
       <source>Invalid login or password</source>
-      <translation>Ugyldig brugernavn eller adgangskode.</translation>
+      <translation>Ugyldig brugernavn eller adgangskode</translation>
     </message>
     <message>
       <source>Incorrect username or password.</source>
@@ -245,11 +245,11 @@
     </message>
     <message>
       <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
-      <translation type="unfinished">You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</translation>
+      <translation>Du forsøgte at oprette forbindelse til denne server, men den præsenterede et certifikat, der ikke kan bekræftes automatisk.</translation>
     </message>
     <message>
       <source>Someone may be impersonating this Server to steal your personal information.</source>
-      <translation type="unfinished">Someone may be impersonating this Server to steal your personal information.</translation>
+      <translation>Nogen udgiver sig muligvis for at være denne server for at stjæle dine personlige oplysninger.</translation>
     </message>
     <message>
       <source>You attempted to connect to this Server but the Server&apos;s certificate has changed.</source>
@@ -257,11 +257,11 @@
     </message>
     <message>
       <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
-      <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
+      <translation>Opret ikke forbindelse til denne server, medmindre du er instrueret af din VMS-administrator.</translation>
     </message>
     <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
-      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct Server.</translation>
+      <translation>Gennemgå certifikatets&apos;s detaljer for at sikre, at du opretter forbindelse til den korrekte server.</translation>
     </message>
   </context>
 </TS>

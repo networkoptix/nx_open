@@ -245,11 +245,11 @@
     </message>
     <message>
       <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
-      <translation type="unfinished">You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</translation>
+      <translation>U heeft geprobeerd verbinding te maken met deze server, maar deze heeft een certificaat gepresenteerd dat niet automatisch kan worden geverifieerd.</translation>
     </message>
     <message>
       <source>Someone may be impersonating this Server to steal your personal information.</source>
-      <translation type="unfinished">Someone may be impersonating this Server to steal your personal information.</translation>
+      <translation>Iemand kan zich voordoen als deze server om uw persoonlijke gegevens te stelen.</translation>
     </message>
     <message>
       <source>You attempted to connect to this Server but the Server&apos;s certificate has changed.</source>
@@ -257,11 +257,11 @@
     </message>
     <message>
       <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
-      <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
+      <translation>Maak geen verbinding met deze server tenzij uw VMS-beheerder hierom heeft gevraagd.</translation>
     </message>
     <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
-      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct Server.</translation>
+      <translation>Bekijk de details van het certificaat&apos;s om er zeker van te zijn dat u verbinding maakt met de juiste server.</translation>
     </message>
   </context>
 </TS>

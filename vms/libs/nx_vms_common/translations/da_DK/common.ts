@@ -1106,15 +1106,15 @@
     <name>SystemSettings</name>
     <message>
       <source>SMTP host</source>
-      <translation type="unfinished">SMTP host</translation>
+      <translation>SMTP vært</translation>
     </message>
     <message>
       <source>Email from</source>
-      <translation type="unfinished">Email from</translation>
+      <translation>E-mail fra</translation>
     </message>
     <message>
       <source>SMTP user</source>
-      <translation type="unfinished">SMTP user</translation>
+      <translation>SMTP bruger</translation>
     </message>
     <message>
       <source>SMTP password</source>
@@ -1122,7 +1122,7 @@
     </message>
     <message>
       <source>Email signature</source>
-      <translation type="unfinished">Email signature</translation>
+      <translation>E-mail signatur</translation>
     </message>
     <message>
       <source>Email support link</source>
@@ -1130,11 +1130,11 @@
     </message>
     <message>
       <source>SMTP connection type</source>
-      <translation type="unfinished">SMTP connection type</translation>
+      <translation>SMTP-forbindelsestype</translation>
     </message>
     <message>
       <source>SMTP port</source>
-      <translation type="unfinished">SMTP port</translation>
+      <translation>SMTP port</translation>
     </message>
     <message>
       <source>SMTP timeout (seconds)</source>
@@ -1218,7 +1218,7 @@
     </message>
     <message>
       <source>Time synchronization enabled</source>
-      <translation type="unfinished">Time synchronization enabled</translation>
+      <translation>Tidssynkronisering aktiveret</translation>
     </message>
     <message>
       <source>Primary time synchronization Server ID</source>
@@ -1234,15 +1234,15 @@
     </message>
     <message>
       <source>Sync time synchronization interval for network requests</source>
-      <translation type="unfinished">Sync time synchronization interval for network requests</translation>
+      <translation>Synkroniser tidssynkroniseringsinterval for netværksanmodninger</translation>
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
-      <translation type="unfinished">Sync time epsilon. New value is not applied if time delta less than epsilon</translation>
+      <translation>Synkroniser tid epsilon. Ny værdi anvendes ikke, hvis tid delta mindre end epsilon</translation>
     </message>
     <message>
       <source>Cloud owner account</source>
-      <translation type="unfinished">Cloud owner account</translation>
+      <translation>Cloud ejer konto</translation>
     </message>
     <message>
       <source>Cloud System ID</source>
@@ -1254,7 +1254,7 @@
     </message>
     <message>
       <source>System name</source>
-      <translation type="unfinished">System name</translation>
+      <translation>Systemnavn</translation>
     </message>
     <message>
       <source>Local System ID</source>
@@ -1291,15 +1291,15 @@
     </message>
     <message>
       <source>Send plain-text emails</source>
-      <translation type="unfinished">Send plain-text emails</translation>
+      <translation>Send almindelig tekst e-mails</translation>
     </message>
     <message>
       <source>Use Windows line feed in emails</source>
-      <translation type="unfinished">Use Windows line feed in emails</translation>
+      <translation>Brug Windows line feed i e-mails</translation>
     </message>
     <message>
       <source>Enable audit trail</source>
-      <translation type="unfinished">Enable audit trail</translation>
+      <translation>Aktiver revisionsspor</translation>
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
@@ -1307,7 +1307,7 @@
     </message>
     <message>
       <source>Event log period (days)</source>
-      <translation type="unfinished">Event log period (days)</translation>
+      <translation>Hændelseslog periode (dage)</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption)</source>
@@ -1431,7 +1431,7 @@
     </message>
     <message>
       <source>Watermark settings</source>
-      <translation type="unfinished">Watermark settings</translation>
+      <translation>Indstillinger for vandmærke</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (minutes)</source>
@@ -1455,7 +1455,7 @@
     </message>
     <message>
       <source>Default video codec</source>
-      <translation type="unfinished">Default video codec</translation>
+      <translation>Standard video codec</translation>
     </message>
     <message>
       <source>Default codec for export video</source>
@@ -2219,7 +2219,7 @@
     </message>
     <message>
       <source>Failed to backup file</source>
-      <translation type="unfinished">Failed to backup file</translation>
+      <translation>Sikkerhedskopiering af fil mislykkedes</translation>
     </message>
   </context>
   <context>

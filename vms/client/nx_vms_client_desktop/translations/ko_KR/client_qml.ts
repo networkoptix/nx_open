@@ -274,7 +274,7 @@
     <name>CloudTile</name>
     <message>
       <source>Log in to</source>
-      <translation type="unfinished">Log in to</translation>
+      <translation>로그인</translation>
     </message>
   </context>
   <context>
@@ -1183,7 +1183,7 @@ to activate PTZ</source>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>논리적 ID</translation>
     </message>
   </context>
   <context>

@@ -21,7 +21,7 @@
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>Любой плагин</translation>
     </message>
     <message numerus="yes">
       <source>%1 with %n attributes</source>
@@ -1334,7 +1334,7 @@
     </message>
     <message>
       <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <translation>Аппаратный ID</translation>
     </message>
     <message>
       <source>License Key</source>
@@ -1519,7 +1519,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Check</source>
-      <translation type="unfinished">Check</translation>
+      <translation>Проверить</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
@@ -1886,11 +1886,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Рекомендованные</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation type="unfinished">Strict</translation>
+      <translation>Строгий</translation>
     </message>
     <message>
       <source>May lead to privacy issues</source>
@@ -2960,7 +2960,7 @@ to %1</source>
     </message>
     <message>
       <source>You will be logged out.</source>
-      <translation type="unfinished">You will be logged out.</translation>
+      <translation>Вы будете отключены от системы.</translation>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
@@ -5607,7 +5607,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Интеграции</translation>
     </message>
   </context>
   <context>
@@ -6855,11 +6855,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
-      <translation type="unfinished">
-        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
-        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
-        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
-        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
+      <translation>
+        <numerusform>Вы собираетесь переместить эти веб-страницы на сервер &quot;%1&quot;. Эти веб-страницы проксируют все запрошенное содержимое, и их прокси-сервер изменится на сервер &quot;%1&quot;.</numerusform>
+        <numerusform>Вы собираетесь переместить эти веб-страницы на сервер &quot;%1&quot;. Эти веб-страницы проксируют все запрошенное содержимое, и их прокси-сервер изменится на сервер &quot;%1&quot;.</numerusform>
+        <numerusform>Вы собираетесь переместить эти веб-страницы на сервер &quot;%1&quot;. Эти веб-страницы проксируют все запрошенное содержимое, и их прокси-сервер изменится на сервер &quot;%1&quot;.</numerusform>
+        <numerusform>Вы собираетесь переместить эти веб-страницы на сервер &quot;%1&quot;. Эти веб-страницы проксируют все запрошенное содержимое, и их прокси-сервер изменится на сервер &quot;%1&quot;.</numerusform>
       </translation>
     </message>
     <message>
@@ -7176,11 +7176,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
+      <translation>
+        <numerusform>%n выбранное устройство</numerusform>
+        <numerusform>%n выбранных устройства</numerusform>
+        <numerusform>%n выбранных устройств</numerusform>
+        <numerusform>%n выбранных устройств</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7584,7 +7584,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+      <translation>Выберите промежуток времени на временной шкале и щелкните правой кнопкой мыши выделенный раздел, чтобы создать закладку</translation>
     </message>
   </context>
   <context>
@@ -7682,7 +7682,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>default</source>
-      <translation type="unfinished">default</translation>
+      <translation>по-умолчанию</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -7804,7 +7804,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Завершить</translation>
     </message>
     <message>
       <source>Camera for Replacement</source>
@@ -8017,7 +8017,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Интеграции</translation>
     </message>
   </context>
   <context>
@@ -8130,7 +8130,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Выбрать</translation>
     </message>
   </context>
   <context>
@@ -8606,7 +8606,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+      <translation>Попробуйте изменить фильтры или создать правило события</translation>
     </message>
   </context>
   <context>
@@ -8810,7 +8810,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>No Failover</source>
-      <translation type="unfinished">No Failover</translation>
+      <translation>Без резервирования</translation>
     </message>
   </context>
   <context>
@@ -8888,7 +8888,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>Нажмите на иконку, чтобы прочитать больше</translation>
     </message>
   </context>
   <context>
@@ -9608,7 +9608,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
-      <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
+      <translation>Вы используете пользовательский клиент. Пожалуйста, свяжитесь с %1, чтобы получить инструкции по обновлению.</translation>
     </message>
     <message>
       <source>Uploading client packages to Servers...</source>
@@ -9939,7 +9939,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</translation>
+      <translation>Проксирование всего содержимого предоставляет доступ к любому сервису или устройству в сети сервера&apos;пользователям этой веб-страницы</translation>
     </message>
     <message>
       <source>The webpage is able to interact with the Desktop Client and request access to the user session</source>
@@ -10655,7 +10655,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>Попробуйте изменить фильтры или включить запись движения</translation>
     </message>
   </context>
   <context>
@@ -10973,7 +10973,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>Отключить</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -10981,7 +10981,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
+      <translation>Принудительная безопасная аутентификация</translation>
     </message>
     <message>
       <source>All users</source>
@@ -11004,7 +11004,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>LDAP</source>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
   </context>
   <context>

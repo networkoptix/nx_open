@@ -287,29 +287,29 @@
     </message>
     <message>
       <source>Limited to</source>
-      <translation type="unfinished">Limited to</translation>
+      <translation>Ограничено до</translation>
     </message>
     <message>
       <source>No backup</source>
-      <translation type="unfinished">No backup</translation>
+      <translation>Без резервирования</translation>
     </message>
   </context>
   <context>
     <name>BackupSettingsWidget</name>
     <message>
       <source>Server is offline. Backup settings are not available.</source>
-      <translation type="unfinished">Server is offline. Backup settings are not available.</translation>
+      <translation>Сервер отключен. Настройки резервного копирования недоступны.</translation>
     </message>
   </context>
   <context>
     <name>BackupStatusWidget</name>
     <message>
       <source>Backup is not configured yet.</source>
-      <translation type="unfinished">Backup is not configured yet.</translation>
+      <translation>Резервное копирование еще не настроено.</translation>
     </message>
     <message>
       <source>To start backup enable it for some cameras and apply settings.</source>
-      <translation type="unfinished">To start backup enable it for some cameras and apply settings.</translation>
+      <translation>Чтобы начать резервное копирование, включите его для некоторых камер и примените настройки.</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -317,19 +317,19 @@
     </message>
     <message>
       <source>Skip Current Queue</source>
-      <translation type="unfinished">Skip Current Queue</translation>
+      <translation>Пропустить текущую очередь</translation>
     </message>
     <message>
       <source>Maximum backup queue size</source>
-      <translation type="unfinished">Maximum backup queue size</translation>
+      <translation>Максимальный размер очереди резервного копирования</translation>
     </message>
     <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
-      <translation type="unfinished">All files are successfully backed up! New files will be backed up automatically</translation>
+      <translation>Все файлы успешно скопированы! Новые файлы будут копироваться автоматически</translation>
     </message>
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
-      <translation type="unfinished">Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</translation>
+      <translation>Резервное копирование остановлено из-за проблем с хранилищем. Резервное копирование возобновится автоматически после решения проблемы с хранилищем</translation>
     </message>
   </context>
   <context>
@@ -781,7 +781,7 @@
     </message>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>Назад</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -789,7 +789,7 @@
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Далее</translation>
     </message>
   </context>
   <context>
@@ -1911,7 +1911,7 @@
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1919,7 +1919,7 @@
     </message>
     <message>
       <source>User</source>
-      <translation type="unfinished">User</translation>
+      <translation>Пользователь</translation>
     </message>
     <message>
       <source>Server Address</source>
@@ -1935,7 +1935,7 @@
     </message>
     <message>
       <source>Support Signature</source>
-      <translation type="unfinished">Support Signature</translation>
+      <translation>Информация о технической поддержке</translation>
     </message>
     <message>
       <source>System Singnature</source>
@@ -2056,7 +2056,7 @@
     </message>
     <message>
       <source>Preset</source>
-      <translation type="unfinished">Preset</translation>
+      <translation>Предустановленное</translation>
     </message>
   </context>
   <context>
@@ -2810,7 +2810,7 @@
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Состояние</translation>
     </message>
   </context>
   <context>
@@ -3157,7 +3157,7 @@
     </message>
     <message>
       <source>Volume</source>
-      <translation type="unfinished">Volume</translation>
+      <translation>Громкость</translation>
     </message>
     <message>
       <source>Test</source>

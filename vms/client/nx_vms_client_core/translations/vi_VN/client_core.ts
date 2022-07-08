@@ -245,11 +245,11 @@
     </message>
     <message>
       <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
-      <translation type="unfinished">You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</translation>
+      <translation>Bạn đã cố gắng kết nối với Máy chủ này, nhưng xuất hiện một chứng chỉ không thể xác minh tự động.</translation>
     </message>
     <message>
       <source>Someone may be impersonating this Server to steal your personal information.</source>
-      <translation type="unfinished">Someone may be impersonating this Server to steal your personal information.</translation>
+      <translation>Ai đó có thể đang mạo danh Máy chủ này để lấy thông tin cá nhân của bạn.</translation>
     </message>
     <message>
       <source>You attempted to connect to this Server but the Server&apos;s certificate has changed.</source>
@@ -257,11 +257,11 @@
     </message>
     <message>
       <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
-      <translation type="unfinished">Do not connect to this Server unless instructed by your VMS administrator.</translation>
+      <translation>Không kết nối với Máy chủ này trừ khi được người quản trị VMS của bạn hướng dẫn.</translation>
     </message>
     <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
-      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct Server.</translation>
+      <translation>Xem lại các chi tiết của chứng chỉ để đảm bảo rằng bạn đang kết nối với đúng Máy chủ.</translation>
     </message>
   </context>
 </TS>

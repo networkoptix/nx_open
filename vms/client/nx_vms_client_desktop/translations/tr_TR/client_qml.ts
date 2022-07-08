@@ -1193,7 +1193,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>Mantıksal Kimlik</translation>
     </message>
   </context>
   <context>

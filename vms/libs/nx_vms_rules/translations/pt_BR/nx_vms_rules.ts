@@ -168,7 +168,7 @@
     </message>
     <message>
       <source>Device ID</source>
-      <translation type="unfinished">Device ID</translation>
+      <translation>ID de dispositivo</translation>
     </message>
   </context>
   <context>
@@ -179,7 +179,7 @@
     </message>
     <message>
       <source>MAC #%1: %2</source>
-      <translation>MAC #%1: %2  {1:?} {2?}</translation>
+      <translation>MAC #%1: %2 {1:?} {2?}</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
@@ -254,15 +254,15 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Intervalo de ação</translation>
     </message>
     <message>
       <source>HTTP Url</source>
-      <translation type="unfinished">HTTP Url</translation>
+      <translation>URL HTTP</translation>
     </message>
     <message>
       <source>HTTP Content</source>
-      <translation type="unfinished">HTTP Content</translation>
+      <translation>Conteúdo HTTP</translation>
     </message>
     <message>
       <source>Content type</source>
@@ -278,7 +278,7 @@
     </message>
     <message>
       <source>Request method</source>
-      <translation type="unfinished">Request method</translation>
+      <translation>Método de solicitação</translation>
     </message>
   </context>
   <context>
@@ -312,7 +312,7 @@
     </message>
     <message>
       <source>Motion Event</source>
-      <translation type="unfinished">Motion Event</translation>
+      <translation>Evento de movimento</translation>
     </message>
     <message>
       <source>State</source>
@@ -338,7 +338,7 @@
     <name>nx::vms::rules::NotificationAction</name>
     <message>
       <source>Show Notification</source>
-      <translation type="unfinished">Show Notification</translation>
+      <translation>Mostrar notificação</translation>
     </message>
     <message>
       <source>To</source>
@@ -346,11 +346,11 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Intervalo de ação</translation>
     </message>
     <message>
       <source>Force Acknowledgement</source>
-      <translation type="unfinished">Force Acknowledgement</translation>
+      <translation>Forçar reconhecimento</translation>
     </message>
     <message>
       <source>Caption</source>
@@ -362,7 +362,7 @@
     </message>
     <message>
       <source>Tooltip</source>
-      <translation type="unfinished">Tooltip</translation>
+      <translation>Dica de ferramenta</translation>
     </message>
   </context>
   <context>
@@ -373,7 +373,7 @@
     </message>
     <message>
       <source>%1 - %2</source>
-      <translation type="unfinished">%1 - %2</translation>
+      <translation>%1 - %2</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -436,15 +436,15 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Intervalo de ação</translation>
     </message>
     <message>
       <source>Additional recipients</source>
-      <translation type="unfinished">Additional recipients</translation>
+      <translation>Destinatários adicionais</translation>
     </message>
     <message>
       <source>Email Message</source>
-      <translation type="unfinished">Email Message</translation>
+      <translation>Mensagem de email</translation>
     </message>
   </context>
   <context>
@@ -467,12 +467,12 @@
     <message>
       <source>Conflicting Server #%1: %2</source>
       <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>Servidor %1 em conflito : %2</translation>
+      <translation>Servidor %1 em conflito: %2</translation>
     </message>
     <message>
       <source>MAC #%1: %2</source>
       <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2  {1:?} {2?}</translation>
+      <translation>MAC #%1: %2 {1:?} {2?}</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Conflict</source>
@@ -556,7 +556,7 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Intervalo de ação</translation>
     </message>
     <message>
       <source>Speak to users</source>

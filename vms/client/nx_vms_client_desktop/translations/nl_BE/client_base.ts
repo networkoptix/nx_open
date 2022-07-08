@@ -1326,7 +1326,7 @@
     </message>
     <message>
       <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <translation>Hardware ID</translation>
     </message>
     <message>
       <source>License Key</source>
@@ -1497,7 +1497,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Check</source>
-      <translation type="unfinished">Check</translation>
+      <translation>Controleer</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
@@ -5467,7 +5467,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Integraties</translation>
     </message>
   </context>
   <context>
@@ -6645,9 +6645,9 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     </message>
     <message numerus="yes">
       <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
-      <translation type="unfinished">
-        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
-        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
+      <translation>
+        <numerusform>Je bent bezig met het verplaatsen van deze webpagina's naar server &quot;%1&quot;. Deze webpagina's proxiteren alle gevraagde inhoud, en hun proxyserver verandert naar server &quot;%1&quot;.</numerusform>
+        <numerusform>Je bent bezig met het verplaatsen van deze webpagina's naar server &quot;%1&quot;. Deze webpagina's proxiteren alle gevraagde inhoud, en hun proxyserver verandert naar server &quot;%1&quot;.</numerusform>
       </translation>
     </message>
     <message>
@@ -7444,7 +7444,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     </message>
     <message>
       <source>default</source>
-      <translation type="unfinished">default</translation>
+      <translation>standaard</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -7564,7 +7564,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     </message>
     <message>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Voltooien</translation>
     </message>
     <message>
       <source>Camera for Replacement</source>
@@ -7771,7 +7771,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Integraties</translation>
     </message>
   </context>
   <context>
@@ -10664,7 +10664,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>Uitschakelen</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -10672,7 +10672,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
+      <translation>Beveiligde authenticatie forceren</translation>
     </message>
     <message>
       <source>All users</source>

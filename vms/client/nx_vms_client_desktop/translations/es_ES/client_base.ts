@@ -1032,7 +1032,7 @@
     </message>
     <message>
       <source>Account Security...</source>
-      <translation>Seguridad de la cuenta</translation>
+      <translation>Seguridad de la cuenta...</translation>
     </message>
     <message>
       <source>Replace Camera...</source>
@@ -1326,7 +1326,7 @@
     </message>
     <message>
       <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <translation>ID de hardware</translation>
     </message>
     <message>
       <source>License Key</source>
@@ -1497,7 +1497,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Check</source>
-      <translation type="unfinished">Check</translation>
+      <translation>Compruebe</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
@@ -2887,7 +2887,7 @@ a %1</translation>
     </message>
     <message>
       <source>You will be logged out.</source>
-      <translation>Se cerrará la sesión del usuario</translation>
+      <translation>Se cerrará la sesión del usuario.</translation>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
@@ -5469,7 +5469,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Integraciones</translation>
     </message>
   </context>
   <context>
@@ -6647,9 +6647,9 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
     <message numerus="yes">
       <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
-      <translation type="unfinished">
-        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
-        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
+      <translation>
+        <numerusform>Está a punto de mover estas páginas web al servidor &quot;%1&quot;. Estas páginas web proxy todo el contenido solicitado, y su servidor proxy cambiará al servidor &quot;%1&quot;.</numerusform>
+        <numerusform>Está a punto de mover estas páginas web al servidor &quot;%1&quot;. Estas páginas web proxy todo el contenido solicitado, y su servidor proxy cambiará al servidor &quot;%1&quot;.</numerusform>
       </translation>
     </message>
     <message>
@@ -7446,7 +7446,7 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
     <message>
       <source>default</source>
-      <translation type="unfinished">default</translation>
+      <translation>predeterminado</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -7566,7 +7566,7 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
     <message>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Terminar</translation>
     </message>
     <message>
       <source>Camera for Replacement</source>
@@ -7773,7 +7773,7 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Integraciones</translation>
     </message>
   </context>
   <context>
@@ -8796,7 +8796,7 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     <message numerus="yes">
       <source>%n minutes left</source>
       <translation type="unfinished">
-        <numerusform>%d minutos restantes</numerusform>
+        <numerusform>%n minutos restantes</numerusform>
         <numerusform>%n minutes left</numerusform>
       </translation>
     </message>
@@ -10666,7 +10666,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>Desactivar</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -10674,7 +10674,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
+      <translation>Forzar autenticación segura</translation>
     </message>
     <message>
       <source>All users</source>

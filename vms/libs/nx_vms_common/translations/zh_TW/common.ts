@@ -1060,23 +1060,23 @@
     <name>SystemSettings</name>
     <message>
       <source>SMTP host</source>
-      <translation type="unfinished">SMTP host</translation>
+      <translation>SMTP 主機地址</translation>
     </message>
     <message>
       <source>Email from</source>
-      <translation type="unfinished">Email from</translation>
+      <translation>Email寄件者</translation>
     </message>
     <message>
       <source>SMTP user</source>
-      <translation type="unfinished">SMTP user</translation>
+      <translation>SMTP 使用者名稱</translation>
     </message>
     <message>
       <source>SMTP password</source>
-      <translation type="unfinished">SMTP password</translation>
+      <translation>SMTP 密碼</translation>
     </message>
     <message>
       <source>Email signature</source>
-      <translation type="unfinished">Email signature</translation>
+      <translation>電子郵件簽名檔</translation>
     </message>
     <message>
       <source>Email support link</source>
@@ -1084,11 +1084,11 @@
     </message>
     <message>
       <source>SMTP connection type</source>
-      <translation type="unfinished">SMTP connection type</translation>
+      <translation>SMTP 連線類型</translation>
     </message>
     <message>
       <source>SMTP port</source>
-      <translation type="unfinished">SMTP port</translation>
+      <translation>SMTP 埠號</translation>
     </message>
     <message>
       <source>SMTP timeout (seconds)</source>
@@ -1104,7 +1104,7 @@
     </message>
     <message>
       <source>LDAP URI</source>
-      <translation type="unfinished">LDAP URI</translation>
+      <translation>LDAP URI</translation>
     </message>
     <message>
       <source>LDAP Admin DN</source>
@@ -1116,11 +1116,11 @@
     </message>
     <message>
       <source>LDAP search base</source>
-      <translation type="unfinished">LDAP search base</translation>
+      <translation>LDAP 搜尋庫</translation>
     </message>
     <message>
       <source>LDAP search filter</source>
-      <translation type="unfinished">LDAP search filter</translation>
+      <translation>LDAP 搜尋篩選</translation>
     </message>
     <message>
       <source>LDAP password expiration (milliseconds)</source>
@@ -1172,7 +1172,7 @@
     </message>
     <message>
       <source>Time synchronization enabled</source>
-      <translation type="unfinished">Time synchronization enabled</translation>
+      <translation>已啟用時間同步</translation>
     </message>
     <message>
       <source>Primary time synchronization Server ID</source>
@@ -1184,19 +1184,19 @@
     </message>
     <message>
       <source>OS time change check period</source>
-      <translation type="unfinished">OS time change check period</translation>
+      <translation>作業系統時間會變更檢查時段</translation>
     </message>
     <message>
       <source>Sync time synchronization interval for network requests</source>
-      <translation type="unfinished">Sync time synchronization interval for network requests</translation>
+      <translation>發送網路校時請求的時間間隔</translation>
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
-      <translation type="unfinished">Sync time epsilon. New value is not applied if time delta less than epsilon</translation>
+      <translation>容許誤差。如果時間最小誤差容許值小於目前誤差, 則不更新時間</translation>
     </message>
     <message>
       <source>Cloud owner account</source>
-      <translation type="unfinished">Cloud owner account</translation>
+      <translation>雲端所有者帳號</translation>
     </message>
     <message>
       <source>Cloud System ID</source>
@@ -1208,11 +1208,11 @@
     </message>
     <message>
       <source>System name</source>
-      <translation type="unfinished">System name</translation>
+      <translation>系統名稱</translation>
     </message>
     <message>
       <source>Local System ID</source>
-      <translation type="unfinished">Local System ID</translation>
+      <translation>本機系統 ID</translation>
     </message>
     <message>
       <source>Last master System merge ID</source>
@@ -1241,19 +1241,19 @@
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
-      <translation type="unfinished">Max scene items (0 means default)</translation>
+      <translation>最大場景項目 (預設為0)</translation>
     </message>
     <message>
       <source>Send plain-text emails</source>
-      <translation type="unfinished">Send plain-text emails</translation>
+      <translation>發送純文字電子郵件</translation>
     </message>
     <message>
       <source>Use Windows line feed in emails</source>
-      <translation type="unfinished">Use Windows line feed in emails</translation>
+      <translation>在電子郵件中使用Windows換行字元</translation>
     </message>
     <message>
       <source>Enable audit trail</source>
-      <translation type="unfinished">Enable audit trail</translation>
+      <translation>啟用使用者行為記錄</translation>
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
@@ -1261,7 +1261,7 @@
     </message>
     <message>
       <source>Event log period (days)</source>
-      <translation type="unfinished">Event log period (days)</translation>
+      <translation>事件日誌天數 (天)</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption)</source>
@@ -1333,7 +1333,7 @@
     </message>
     <message>
       <source>RTP timeout (milliseconds)</source>
-      <translation type="unfinished">RTP timeout (milliseconds)</translation>
+      <translation>RTP 超時時間 (毫秒)</translation>
     </message>
     <message>
       <source>Max RTSP connection duration (seconds)</source>
@@ -1385,7 +1385,7 @@
     </message>
     <message>
       <source>Watermark settings</source>
-      <translation type="unfinished">Watermark settings</translation>
+      <translation>浮水印設定</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (minutes)</source>
@@ -1409,7 +1409,7 @@
     </message>
     <message>
       <source>Default video codec</source>
-      <translation type="unfinished">Default video codec</translation>
+      <translation>將影片編碼器還原預設值</translation>
     </message>
     <message>
       <source>Default codec for export video</source>
@@ -1417,11 +1417,11 @@
     </message>
     <message>
       <source>Low quality screen video codec</source>
-      <translation type="unfinished">Low quality screen video codec</translation>
+      <translation>低質量的螢幕影片編碼器</translation>
     </message>
     <message>
       <source>License server</source>
-      <translation type="unfinished">License server</translation>
+      <translation>授權伺服器</translation>
     </message>
     <message>
       <source>URI for resource_data.json automatic update</source>
@@ -1429,7 +1429,7 @@
     </message>
     <message>
       <source>Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation type="unfinished">Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
+      <translation>要保留最多筆在資料庫中的事件日誌記錄。實際未刪除記錄的數量可能比預定高出20％。</translation>
     </message>
     <message>
       <source>Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
@@ -1437,7 +1437,7 @@
     </message>
     <message>
       <source>Meta data storage change policy</source>
-      <translation type="unfinished">Meta data storage change policy</translation>
+      <translation>Meta數據儲存更改政策</translation>
     </message>
     <message>
       <source>Persistent Servers for update storage</source>
@@ -2161,7 +2161,7 @@
     </message>
     <message>
       <source>Failed to backup file</source>
-      <translation type="unfinished">Failed to backup file</translation>
+      <translation>檔案備份失敗</translation>
     </message>
   </context>
   <context>

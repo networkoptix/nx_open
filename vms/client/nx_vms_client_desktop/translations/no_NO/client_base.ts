@@ -1326,7 +1326,7 @@
     </message>
     <message>
       <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <translation>Maskinvare ID</translation>
     </message>
     <message>
       <source>License Key</source>
@@ -1497,7 +1497,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Check</source>
-      <translation type="unfinished">Check</translation>
+      <translation>Velg</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
@@ -5471,7 +5471,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Integrasjoner</translation>
     </message>
   </context>
   <context>
@@ -6649,9 +6649,9 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message numerus="yes">
       <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
-      <translation type="unfinished">
-        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
-        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
+      <translation>
+        <numerusform>Du er i ferd med å flytte disse nettsidene til server &quot;%1&quot;. Disse nettsidene gir proxy for alt etterspurt innhold, og deres proxy-server vil endres til server &quot;%1&quot;.</numerusform>
+        <numerusform>Du er i ferd med å flytte disse nettsidene til server &quot;%1&quot;. Disse nettsidene gir proxy for alt etterspurt innhold, og deres proxy-server vil endres til server &quot;%1&quot;.</numerusform>
       </translation>
     </message>
     <message>
@@ -7448,7 +7448,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>default</source>
-      <translation type="unfinished">default</translation>
+      <translation>standard</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -7568,7 +7568,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Fullfør</translation>
     </message>
     <message>
       <source>Camera for Replacement</source>
@@ -7775,7 +7775,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Integrasjoner</translation>
     </message>
   </context>
   <context>
@@ -9334,7 +9334,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
-      <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
+      <translation>Du bruker en tilpasset klient. Ta kontakt med %1 for å få oppdateringsinstruksjonene.</translation>
     </message>
     <message>
       <source>Uploading client packages to Servers...</source>
@@ -10356,7 +10356,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>Prøv å endre filtrene eller aktiver bevegelsesopptak</translation>
     </message>
   </context>
   <context>
@@ -10666,7 +10666,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>Deaktiver</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -10674,7 +10674,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
+      <translation>Krev sikker autentisering</translation>
     </message>
     <message>
       <source>All users</source>
@@ -11878,7 +11878,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Automatic client updates</source>
-      <translation type="unfinished">Automatic client updates</translation>
+      <translation>Automatiske klientoppdateringer</translation>
     </message>
     <message>
       <source>New client-only updates will be installed automatically. You can change this in the settings.</source>

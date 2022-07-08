@@ -571,7 +571,7 @@
     </message>
     <message>
       <source>joystick</source>
-      <translation>Joystick</translation>
+      <translation>joystick</translation>
     </message>
     <message>
       <source>Basic Actions</source>

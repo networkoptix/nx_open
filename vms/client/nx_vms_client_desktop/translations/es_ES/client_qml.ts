@@ -278,7 +278,7 @@
     <name>CloudTile</name>
     <message>
       <source>Log in to</source>
-      <translation type="unfinished">Log in to</translation>
+      <translation>Inicie sesión en</translation>
     </message>
   </context>
   <context>
@@ -926,7 +926,7 @@ para activar PTZ</translation>
     </message>
     <message>
       <source>Try searching for something else</source>
-      <translation>Intente usar otros criterios de búsqueda:</translation>
+      <translation>Intente usar otros criterios de búsqueda</translation>
     </message>
   </context>
   <context>
@@ -1159,7 +1159,7 @@ para activar PTZ</translation>
     </message>
     <message>
       <source>Server unavailable</source>
-      <translation>Servidor no disponible.</translation>
+      <translation>Servidor no disponible</translation>
     </message>
     <message>
       <source>No access</source>
@@ -1194,7 +1194,7 @@ para activar PTZ</translation>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>ID Lógico</translation>
     </message>
   </context>
   <context>

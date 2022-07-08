@@ -278,7 +278,7 @@
     <name>CloudTile</name>
     <message>
       <source>Log in to</source>
-      <translation type="unfinished">Log in to</translation>
+      <translation>Logga in på</translation>
     </message>
   </context>
   <context>
@@ -1194,7 +1194,7 @@ att aktivera PTZ</translation>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>Logiskt ID</translation>
     </message>
   </context>
   <context>

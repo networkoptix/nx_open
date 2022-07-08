@@ -885,7 +885,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>to</source>
-      <translation>:</translation>
+      <translation type="unfinished">to</translation>
     </message>
   </context>
   <context>
@@ -1194,7 +1194,7 @@ to activate PTZ</translation>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>Logikai azonosító</translation>
     </message>
   </context>
   <context>

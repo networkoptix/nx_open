@@ -1326,7 +1326,7 @@
     </message>
     <message>
       <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <translation>ID Matériel</translation>
     </message>
     <message>
       <source>License Key</source>
@@ -1497,7 +1497,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Check</source>
-      <translation type="unfinished">Check</translation>
+      <translation>Vérifier</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
@@ -5471,7 +5471,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Intégrations</translation>
     </message>
   </context>
   <context>
@@ -6649,9 +6649,9 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message numerus="yes">
       <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
-      <translation type="unfinished">
-        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
-        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
+      <translation>
+        <numerusform>Vous êtes sur le point de déplacer ces pages Web vers le serveur &quot;%1&quot;. Ces pages Web proxy ainsi que tous les contenus demandés, et leur serveur proxy passera au serveur &quot;%1&quot;.</numerusform>
+        <numerusform>Vous êtes sur le point de déplacer ces pages Web vers le serveur &quot;%1&quot;. Ces pages Web proxy ainsi que tous les contenus demandés, et leur serveur proxy passera au serveur &quot;%1&quot;.</numerusform>
       </translation>
     </message>
     <message>
@@ -7448,7 +7448,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>default</source>
-      <translation type="unfinished">default</translation>
+      <translation>défaut</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -7568,7 +7568,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Fin</translation>
     </message>
     <message>
       <source>Camera for Replacement</source>
@@ -7775,7 +7775,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Intégrations</translation>
     </message>
   </context>
   <context>
@@ -10669,7 +10669,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>Désactiver</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -10677,7 +10677,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
+      <translation>Forcer l'authentification sécurisée</translation>
     </message>
     <message>
       <source>All users</source>

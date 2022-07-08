@@ -2888,7 +2888,7 @@ to %1</translation>
     </message>
     <message>
       <source>You will be logged out.</source>
-      <translation>Du er blevet logget ud</translation>
+      <translation>Du er blevet logget ud.</translation>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
@@ -4816,7 +4816,7 @@ to %1</translation>
     </message>
     <message>
       <source>All Servers</source>
-      <translation type="unfinished">All Servers</translation>
+      <translation>Alle servere</translation>
     </message>
     <message>
       <source>Select Servers...</source>
@@ -5471,7 +5471,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Integrationer</translation>
     </message>
   </context>
   <context>
@@ -6648,9 +6648,9 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message numerus="yes">
       <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
-      <translation type="unfinished">
-        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
-        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
+      <translation>
+        <numerusform>Du er ved at flytte disse websider til server &quot;%1&quot;. Disse websider proxyer alt forespurgt indhold, og deres proxy server vil skifte til server &quot;%1&quot;.</numerusform>
+        <numerusform>Du er ved at flytte disse websider til server &quot;%1&quot;. Disse websider proxyer alt forespurgt indhold, og deres proxy server vil skifte til server &quot;%1&quot;.</numerusform>
       </translation>
     </message>
     <message>
@@ -7774,7 +7774,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Integrationer</translation>
     </message>
   </context>
   <context>
@@ -10505,7 +10505,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>VMS tid</translation>
     </message>
   </context>
   <context>
@@ -10667,7 +10667,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>Deaktivér</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -10675,7 +10675,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
+      <translation>Gennemtving Sikker Godkendelse</translation>
     </message>
     <message>
       <source>All users</source>
@@ -10817,7 +10817,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Minimize</source>
-      <translation type="unfinished">Minimize</translation>
+      <translation>Minimér</translation>
     </message>
     <message>
       <source>Cannot write file</source>

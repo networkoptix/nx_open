@@ -781,7 +781,7 @@
     </message>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>뒤로</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -789,7 +789,7 @@
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>다음</translation>
     </message>
   </context>
   <context>
@@ -1911,7 +1911,7 @@
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>이메일</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1919,7 +1919,7 @@
     </message>
     <message>
       <source>User</source>
-      <translation type="unfinished">User</translation>
+      <translation>사용자:</translation>
     </message>
     <message>
       <source>Server Address</source>
@@ -1935,7 +1935,7 @@
     </message>
     <message>
       <source>Support Signature</source>
-      <translation type="unfinished">Support Signature</translation>
+      <translation>서명 지원</translation>
     </message>
     <message>
       <source>System Singnature</source>
@@ -2056,7 +2056,7 @@
     </message>
     <message>
       <source>Preset</source>
-      <translation type="unfinished">Preset</translation>
+      <translation>프리셋</translation>
     </message>
   </context>
   <context>
@@ -2810,7 +2810,7 @@
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>상태</translation>
     </message>
   </context>
   <context>
@@ -3157,7 +3157,7 @@
     </message>
     <message>
       <source>Volume</source>
-      <translation type="unfinished">Volume</translation>
+      <translation>음량</translation>
     </message>
     <message>
       <source>Test</source>

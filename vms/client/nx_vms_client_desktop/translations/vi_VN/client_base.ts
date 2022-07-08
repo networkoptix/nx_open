@@ -1322,7 +1322,7 @@
     </message>
     <message>
       <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <translation>ID phần cứng</translation>
     </message>
     <message>
       <source>License Key</source>
@@ -1486,7 +1486,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Check</source>
-      <translation type="unfinished">Check</translation>
+      <translation>kiểm tra</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
@@ -5398,7 +5398,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Tích hợp</translation>
     </message>
   </context>
   <context>
@@ -6541,8 +6541,8 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message numerus="yes">
       <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
-      <translation type="unfinished">
-        <numerusform>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</numerusform>
+      <translation>
+        <numerusform>Bạn sắp chuyển các trang web này sang máy chủ &quot;%1&quot;. Các trang web này ủy quyền tất cả các nội dung được yêu cầu và máy chủ ủy quyền sẽ thay đổi thành máy chủ &quot;%1&quot;.</numerusform>
       </translation>
     </message>
     <message>
@@ -7326,7 +7326,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>default</source>
-      <translation type="unfinished">default</translation>
+      <translation>mặc định</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -7445,7 +7445,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Kết thúc</translation>
     </message>
     <message>
       <source>Camera for Replacement</source>
@@ -7649,7 +7649,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Tích hợp</translation>
     </message>
   </context>
   <context>
@@ -10512,7 +10512,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>Vô hiệu hóa</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -10520,7 +10520,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
+      <translation>Bắt buộc xác thực an toàn</translation>
     </message>
     <message>
       <source>All users</source>

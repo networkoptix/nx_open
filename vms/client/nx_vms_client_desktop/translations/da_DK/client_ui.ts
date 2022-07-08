@@ -781,7 +781,7 @@
     </message>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>Tilbage</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -789,7 +789,7 @@
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Næste</translation>
     </message>
   </context>
   <context>
@@ -1911,7 +1911,7 @@
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>E-mail</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1919,7 +1919,7 @@
     </message>
     <message>
       <source>User</source>
-      <translation type="unfinished">User</translation>
+      <translation>Bruger</translation>
     </message>
     <message>
       <source>Server Address</source>
@@ -2810,7 +2810,7 @@
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Status</translation>
     </message>
   </context>
   <context>
@@ -2970,7 +2970,7 @@
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>VMS tid</translation>
     </message>
     <message>
       <source>Do not sync time among servers</source>
