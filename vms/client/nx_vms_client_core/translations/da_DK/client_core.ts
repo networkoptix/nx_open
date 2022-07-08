@@ -132,7 +132,7 @@
     </message>
     <message>
       <source>Invalid login or password</source>
-      <translation>Ugyldig brugernavn eller adgangskode.</translation>
+      <translation>Ugyldig brugernavn eller adgangskode</translation>
     </message>
     <message>
       <source>Incorrect username or password.</source>

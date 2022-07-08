@@ -862,7 +862,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>to</source>
-      <translation>:</translation>
+      <translation type="unfinished">to</translation>
     </message>
   </context>
   <context>
