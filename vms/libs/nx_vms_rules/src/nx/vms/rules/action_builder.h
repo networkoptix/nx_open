@@ -76,7 +76,7 @@ public:
      */
     void process(EventPtr event);
 
-    std::chrono::seconds aggregationInterval() const;
+    std::chrono::microseconds aggregationInterval() const;
 
     void connectSignals();
 
@@ -98,7 +98,7 @@ protected:
 private:
     void onTimeout();
     void updateState();
-    void setAggregationInterval(std::chrono::seconds interval);
+    void setAggregationInterval(std::chrono::microseconds interval);
     void buildAndEmitActionForTargetUsers(const AggregatedEventPtr& aggregatedEvent);
     ActionPtr buildAction(const AggregatedEventPtr& aggregatedEvent);
 
@@ -108,7 +108,7 @@ private:
     ActionConstructor m_constructor;
     std::map<QString, std::unique_ptr<ActionField>> m_fields;
     QList<ActionField*> m_targetFields;
-    std::chrono::seconds m_interval = std::chrono::seconds(0);
+    std::chrono::microseconds m_interval = std::chrono::microseconds::zero();
     QTimer m_timer;
     QSharedPointer<Aggregator> m_aggregator;
     bool m_updateInProgress = false;

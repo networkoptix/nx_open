@@ -18,7 +18,7 @@ class NX_VMS_RULES_API NotificationAction: public nx::vms::rules::BasicAction
     FIELD(QString, description, setDescription)
     FIELD(QString, tooltip, setTooltip)
     FIELD(nx::vms::rules::UuidSelection, users, setUsers)
-    FIELD(std::chrono::seconds, interval, setInterval)
+    FIELD(std::chrono::microseconds, interval, setInterval)
     FIELD(bool, acknowledge, setAcknowledge)
     FIELD(QnUuid, cameraId, setCameraId)
 
