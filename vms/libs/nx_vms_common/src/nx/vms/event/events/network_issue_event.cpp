@@ -19,11 +19,16 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(NetworkIssueEvent::MulticastAddressConflictPara
 
 NetworkIssueEvent::NetworkIssueEvent(
     const QnResourcePtr& resource,
-    qint64 timeStamp,
+    std::chrono::microseconds timestamp,
     EventReason reasonCode,
-    const QString& reasonParamsEncoded)
+    const nx::vms::rules::NetworkIssueInfo& info)
     :
-    base_type(EventType::networkIssueEvent, resource, timeStamp, reasonCode, reasonParamsEncoded)
+    base_type(
+        EventType::networkIssueEvent,
+        resource,
+        timestamp.count(),
+        reasonCode,
+        encodeInfo(reasonCode, info))
 {
 }
 
@@ -50,7 +55,7 @@ bool NetworkIssueEvent::decodePrimaryStream(const QString& encoded, const bool d
     return result;
 }
 
-QString NetworkIssueEvent::encodePrimaryStream(bool isPrimary) 
+QString NetworkIssueEvent::encodePrimaryStream(bool isPrimary)
 {
     return QString::number(isPrimary);
 }
@@ -67,9 +72,34 @@ bool NetworkIssueEvent::decodePrimaryStream(
     const auto delimiterPos = encoded.indexOf(kMessageSeparator);
     if (delimiterPos == -1)
         return decodePrimaryStream(encoded, defaultValue);
-    
+
     *outMessage = encoded.mid(delimiterPos + 1);
     return decodePrimaryStream(encoded.left(delimiterPos), defaultValue);
+}
+
+QString NetworkIssueEvent::encodeInfo(
+    EventReason reason,
+    const nx::vms::rules::NetworkIssueInfo& info)
+{
+    using namespace std::chrono;
+
+    switch (reason)
+    {
+        case EventReason::networkNoFrame:
+            return encodeTimeoutMsecs(duration_cast<milliseconds>(info.timeout).count());
+        case EventReason::networkRtpStreamError:
+        case EventReason::networkConnectionClosed:
+            return encodePrimaryStream(info.stream == nx::vms::api::StreamIndex::primary, info.message);
+        case EventReason::networkMulticastAddressConflict:
+            return QJson::serialized(MulticastAddressConflictParameters{
+                .address = info.address,
+                .deviceName = info.deviceName,
+                .stream = info.stream});
+        case EventReason::networkMulticastAddressIsInvalid:
+            return QJson::serialized(info.address);
+        default:
+            return QString();
+    };
 }
 
 } // namespace event

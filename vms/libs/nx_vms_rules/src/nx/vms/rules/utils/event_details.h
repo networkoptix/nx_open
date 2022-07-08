@@ -19,6 +19,7 @@ static constexpr auto kEmailTemplatePathDetailName = "extendedCaption";
 static constexpr auto kHasScreenshotDetailName = "hasTimestamp";
 static constexpr auto kNameDetailName = "name";
 static constexpr auto kPluginIdDetailName = "pluginId";
+static constexpr auto kReasonDetailName = "reason";
 static constexpr auto kScreenshotLifetimeDetailName = "screenshotLifetime";
 static constexpr auto kSourceIdDetailName = "sourceId";
 static constexpr auto kSourceStatusDetailName = "sourceStatus";
