@@ -52,7 +52,6 @@ void Metatypes::initialize()
     QnJsonSerializer::registerSerializer<QnUuidSet>();
 
     QnJsonSerializer::registerSerializer<std::chrono::microseconds>();
-    QnJsonSerializer::registerSerializer<std::chrono::seconds>();
 
     qRegisterMetaType<email::Message>();
 };
