@@ -55,7 +55,7 @@ Dialog
             onTextChanged:
             {
                 if (control.layoutModel)
-                    control.layoutModel.setFilterFixedString(text)
+                    control.layoutModel.setFilterRegularExpression(NxGlobals.escapeRegExp(text))
             }
         }
 
