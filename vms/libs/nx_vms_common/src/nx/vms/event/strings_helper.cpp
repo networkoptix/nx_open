@@ -591,22 +591,29 @@ QString StringsHelper::eventReason(const EventParameters& params) const
             bool isPrimaryStream = NetworkIssueEvent::decodePrimaryStream(
                 reasonParamsEncoded, true, &message);
             result = isPrimaryStream
-                ? tr("RTP error in primary stream (%1)").arg(message)
-                : tr("RTP error in secondary stream (%1)").arg(message);
+                ? tr("RTP error in primary stream (%1).").arg(message)
+                : tr("RTP error in secondary stream (%1).").arg(message);
             break;
         }
         case EventReason::networkConnectionClosed:
         {
-            bool isPrimaryStream = NetworkIssueEvent::decodePrimaryStream(reasonParamsEncoded, true);
+            const bool isPrimaryStream =
+                NetworkIssueEvent::decodePrimaryStream(reasonParamsEncoded, true);
+            const auto camera = eventSource(params).dynamicCast<QnVirtualCameraResource>();
 
-            QnVirtualCameraResourcePtr camera = eventSource(params).dynamicCast<QnVirtualCameraResource>();
-            if (camera && !camera->hasVideo(nullptr))
-                result = tr("Connection to device was unexpectedly closed.");
-            else if (isPrimaryStream)
-                result = tr("Connection to camera (primary stream) was unexpectedly closed.");
+            const auto deviceType =
+                QnDeviceDependentStrings::calculateDeviceType(resourcePool(), {camera});
+
+            if (deviceType == QnCameraDeviceType::Camera)
+            {
+                return isPrimaryStream
+                    ? tr("Connection to Camera (primary stream) was unexpectedly closed.")
+                    : tr("Connection to Camera (secondary stream) was unexpectedly closed.");
+            }
             else
-                result = tr("Connection to camera (secondary stream) was unexpectedly closed.");
-            break;
+            {
+                return tr("Connection to Device was unexpectedly closed.");
+            }
         }
         case EventReason::networkRtpPacketLoss:
         {
@@ -614,11 +621,12 @@ QString StringsHelper::eventReason(const EventParameters& params) const
         }
         case EventReason::networkBadCameraTime:
         {
-            return tr("Failed to force using camera time, it lags too much, system time will be used");
+            return tr("Failed to force using Camera time, it lags too much;"
+                " System time will be used.");
         }
         case EventReason::networkCameraTimeBackToNormal:
         {
-            return tr("Camera time is back to normal");
+            return tr("Camera time is back to normal.");
         }
         case EventReason::networkNoResponseFromDevice:
         {
@@ -630,18 +638,23 @@ QString StringsHelper::eventReason(const EventParameters& params) const
                 QJson::deserialized<NetworkIssueEvent::MulticastAddressConflictParameters>(
                     reasonParamsEncoded.toUtf8());
 
-            return tr("Multicast address conflict detected. "
-                "Address %1 is already in use by %2 on %3 stream")
-                    .arg(params.address.toString().c_str())
-                    .arg(params.deviceName)
-                    .arg(QString::fromStdString(nx::reflect::toString(params.stream)));
+            const auto addressLine = (params.stream == nx::vms::api::StreamIndex::primary)
+                ? tr("Address %1 is already in use by %2 on primary stream.",
+                    "%1 is the address, %2 is the device name")
+                : tr("Address %1 is already in use by %2 on secondary stream.",
+                    "%1 is the address, %2 is the device name");
+
+            return tr("Multicast address conflict detected.") + " "
+                + addressLine
+                    .arg(QString::fromStdString(params.address.toString()))
+                    .arg(params.deviceName);
         }
         case EventReason::networkMulticastAddressIsInvalid:
         {
             const auto params = QJson::deserialized<nx::network::SocketAddress>(
                 reasonParamsEncoded.toUtf8());
 
-            return tr("Network address %1 is not a multicast address")
+            return tr("Network address %1 is not a multicast address.")
                 .arg(params.toString().c_str());
         }
         case EventReason::serverTerminated:

@@ -9,6 +9,7 @@
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/rules/camera_conflict_list.h>
+#include <nx/vms/rules/network_issue_info.h>
 #include <utils/email/message.h>
 
 #include "basic_event.h"
@@ -47,6 +48,9 @@ void Metatypes::initialize()
     QnJsonSerializer::registerSerializer<nx::vms::rules::CameraConflictList>();
 
     qRegisterMetaType<nx::vms::rules::EventPtr>();
+
+    qRegisterMetaType<nx::vms::rules::NetworkIssueInfo>();
+    QnJsonSerializer::registerSerializer<nx::vms::rules::NetworkIssueInfo>();
 
     qRegisterMetaType<QnUuidSet>("QnUuidSet");
     QnJsonSerializer::registerSerializer<QnUuidSet>();
