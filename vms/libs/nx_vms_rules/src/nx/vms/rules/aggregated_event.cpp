@@ -18,7 +18,7 @@ AggregatedEvent::AggregatedEvent(const AggregationInfo& aggregationInfo)
     m_aggregationInfoList.push_back(aggregationInfo);
 }
 
-AggregatedEvent::AggregatedEvent(const std::list<AggregationInfo>& aggregationInfoList):
+AggregatedEvent::AggregatedEvent(const AggregationInfoList& aggregationInfoList):
     m_aggregationInfoList{aggregationInfoList}
 {
     NX_ASSERT(uniqueCount() != 0);
@@ -64,7 +64,7 @@ AggregatedEventPtr AggregatedEvent::filtered(const std::function<bool(const Even
     if(uniqueCount() == 0)
         return {};
 
-    std::list<AggregationInfo> filteredList;
+    AggregationInfoList filteredList;
     for (const auto& aggregationInfo: m_aggregationInfoList)
     {
         if (filter(aggregationInfo.event))

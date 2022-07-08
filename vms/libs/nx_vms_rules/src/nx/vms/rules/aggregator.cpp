@@ -53,11 +53,11 @@ bool Aggregator::aggregate(const EventPtr& event)
     }
 }
 
-std::list<AggregationInfo> Aggregator::popEvents()
+AggregationInfoList Aggregator::popEvents()
 {
     const auto now = qnSyncTime->currentTimePoint();
 
-    std::list<AggregationInfo> result;
+    AggregationInfoList result;
     for (auto it = m_aggregatedEvents.begin(); it != m_aggregatedEvents.end();)
     {
         auto& aggregationInfo = it->second;
@@ -86,7 +86,9 @@ std::list<AggregationInfo> Aggregator::popEvents()
         ++it;
     }
 
-    result.sort(
+    std::sort(
+        result.begin(),
+        result.end(),
         [](const AggregationInfo& l, const AggregationInfo& r)
         {
             return l.event->timestamp() < r.event->timestamp();

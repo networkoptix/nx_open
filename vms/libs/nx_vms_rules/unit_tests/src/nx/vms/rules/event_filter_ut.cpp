@@ -3,9 +3,11 @@
 #include <gtest/gtest.h>
 
 #include <nx/vms/rules/engine.h>
-#include <nx/vms/rules/events/generic_event.h>
 #include <nx/vms/rules/event_fields/keywords_field.h>
+#include <nx/vms/rules/event_fields/state_field.h>
 #include <nx/vms/rules/event_filter.h>
+#include <nx/vms/rules/events/generic_event.h>
+#include <nx/vms/rules/utils/field.h>
 
 namespace nx::vms::rules::test {
 
@@ -85,6 +87,49 @@ TEST_F(EventFilterTest, oneEventFieldMismatchToFilterFieldTest)
     descriptionField->setString("Description");
 
     ASSERT_FALSE(filter->match(genericEvent));
+}
+
+TEST(EventFilterProlongedEventTest, eventFilterHandlesStartedProlongedEventProperly)
+{
+    auto filter = std::make_unique<EventFilter>(QnUuid::createUuid(), "nx.events.test");
+    auto stateField = std::make_unique<StateField>();
+    stateField->setValue(State::started);
+    filter->addField(utils::kStateFieldName, std::move(stateField));
+
+    EventPtr event(new BasicEvent{{}, State::started});
+
+    // Only first started event match.
+    ASSERT_TRUE(filter->match(event));
+    ASSERT_FALSE(filter->match(event));
+
+    // Stopped event doesn't match, but filter stores that event stopped.
+    event->setState(State::stopped);
+    ASSERT_FALSE(filter->match(event));
+
+    // New started event match.
+    event->setState(State::started);
+    ASSERT_TRUE(filter->match(event));
+}
+
+TEST(EventFilterProlongedEventTest, eventFilterHandlesStoppedProlongedEventProperly)
+{
+    auto filter = std::make_unique<EventFilter>(QnUuid::createUuid(), "nx.events.test");
+    auto stateField = std::make_unique<StateField>();
+    stateField->setValue(State::stopped);
+    filter->addField(utils::kStateFieldName, std::move(stateField));
+
+    EventPtr event(new BasicEvent{{}, State::stopped});
+
+    // Event not match since there no started event before.
+    ASSERT_FALSE(filter->match(event));
+
+    // Started event doesn't match, but filter stores that event started.
+    event->setState(State::started);
+    ASSERT_FALSE(filter->match(event));
+
+    event->setState(State::stopped);
+    ASSERT_TRUE(filter->match(event));
+    ASSERT_FALSE(filter->match(event));
 }
 
 } // nx::vms::rules::test

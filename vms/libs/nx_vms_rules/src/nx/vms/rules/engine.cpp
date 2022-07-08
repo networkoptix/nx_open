@@ -701,6 +701,9 @@ void Engine::processEvent(const EventPtr& event)
     // TODO: #spanasenko Add filters-by-type maps?
     for (const auto& [id, rule]: m_rules)
     {
+        if (!rule->enabled())
+            continue;
+
         bool matched = false;
         for (const auto filter: rule->eventFilters())
         {

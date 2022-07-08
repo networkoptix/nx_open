@@ -30,6 +30,7 @@ public:
         const QString& reasonText);
 
     virtual QString uniqueName() const override;
+    virtual QString resourceKey() const override;
 
 protected:
     ~ReasonedEvent() = default; //< Intended for use as base class only.

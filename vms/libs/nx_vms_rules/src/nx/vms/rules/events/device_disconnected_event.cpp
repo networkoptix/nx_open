@@ -28,6 +28,11 @@ QString DeviceDisconnectedEvent::uniqueName() const
     return makeName(BasicEvent::uniqueName(), m_cameraId.toSimpleString());
 }
 
+QString DeviceDisconnectedEvent::resourceKey() const
+{
+    return m_cameraId.toSimpleString();
+}
+
 QVariantMap DeviceDisconnectedEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);

@@ -67,7 +67,12 @@ public:
 
     QString uniqueName() const override
     {
-        return makeName(m_cameraId.toString(), BasicEvent::uniqueName());
+        return makeName(m_cameraId.toSimpleString(), BasicEvent::uniqueName());
+    }
+
+    QString resourceKey() const override
+    {
+        return m_cameraId.toSimpleString();
     }
 
     QnUuid m_cameraId;
