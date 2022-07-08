@@ -21,7 +21,10 @@ bool FilteredResourceProxyModel::filterAcceptsRow(
     int sourceRow,
     const QModelIndex& sourceParent) const
 {
-    const auto filterString = filterRegularExpression().pattern();
+    // Make a filter string from escaped fixed string regexp pattern (eg "a\ b" -> "a b") so that
+    // the function search_helper::matches() can split the filter string into words.
+    static const QRegularExpression escapedRx("\\\\(.)");
+    const auto filterString = filterRegularExpression().pattern().replace(escapedRx, "\\1");
     if (filterString.trimmed().isEmpty())
         return true;
 
@@ -32,7 +35,7 @@ bool FilteredResourceProxyModel::filterAcceptsRow(
         const auto resource = resourceData.value<QnResourcePtr>();
         return resources::search_helper::matches(filterString, resource);
     }
-    return sourceIndex.data().toString().contains(filterString, filterCaseSensitivity());
+    return filterRegularExpression().match(sourceIndex.data().toString()).hasMatch();
 }
 
 } // namespace nx::vms::client::desktop
