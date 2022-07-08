@@ -269,7 +269,7 @@ void FilteredResourceViewWidget::setupFilter()
         [this](const QString& text)
         {
             const auto filterString = m_filterProxyModel->filterRegularExpression().pattern();
-            const auto newFilterString = text.trimmed();
+            const auto newFilterString = QRegularExpression::escape(text.trimmed());
             const auto caseSensitivity = m_filterProxyModel->filterCaseSensitivity();
 
             if (filterString.compare(newFilterString, caseSensitivity) == 0)

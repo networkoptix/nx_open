@@ -63,6 +63,9 @@ public:
      * functionality because it processes some special symbols (like slash) in a special way.
      */
     Q_INVOKABLE QString makeSearchRegExp(const QString& value) const;
+
+    /** Returns QRegularExpression::escape(value) */
+    Q_INVOKABLE QString escapeRegExp(const QString& value) const;
 };
 
 } // namespace nx::vms::client::core

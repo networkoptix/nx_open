@@ -211,4 +211,9 @@ QString NxGlobalsObject::makeSearchRegExp(const QString& value) const
     return QRegularExpression::anchoredPattern(result);
 }
 
+QString NxGlobalsObject::escapeRegExp(const QString& value) const
+{
+    return QRegularExpression::escape(value);
+}
+
 } // namespace nx::vms::client::core
