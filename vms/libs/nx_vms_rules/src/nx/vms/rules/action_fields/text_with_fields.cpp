@@ -90,6 +90,10 @@ QString eventTooltip(const AggregatedEventPtr& eventAggregator, common::SystemCo
         result << TextWithFields::tr("Plugin: %1").arg(pluginName);
     }
 
+    const auto reason = details.value(utils::kReasonDetailName).toString();
+    if (!reason.isEmpty())
+        result << TextWithFields::tr("Reason: %1").arg(reason);
+
     const auto count = details.value(utils::kCountDetailName);
     if (count.canConvert<size_t>())
         result << stringsHelper.timestamp(eventAggregator->timestamp(), count.value<size_t>());

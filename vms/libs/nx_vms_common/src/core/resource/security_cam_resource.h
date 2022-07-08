@@ -26,6 +26,8 @@
 
 class QnAbstractArchiveDelegate;
 
+namespace nx::vms::rules { struct NetworkIssueInfo; }
+
 class NX_VMS_COMMON_API QnSecurityCamResource:
     public QnNetworkResource,
     public QnMediaResource
@@ -591,7 +593,11 @@ signals:
     void backupPolicyChanged(const QnResourcePtr& resource);
     void mediaCapabilitiesChanged(const QnSecurityCamResourcePtr& camera);
 
-    void networkIssue(const QnResourcePtr&, qint64 timeStamp, nx::vms::api::EventReason reasonCode, const QString& reasonParamsEncoded);
+    void networkIssue(
+        const QnResourcePtr& resource,
+        std::chrono::microseconds timestamp,
+        nx::vms::api::EventReason reasonCode,
+        const nx::vms::rules::NetworkIssueInfo& info);
 
     void recordingActionChanged(const QnResourcePtr& resource);
 

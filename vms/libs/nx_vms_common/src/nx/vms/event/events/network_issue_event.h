@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <nx/vms/event/events/reasoned_event.h>
-
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/vms/event/events/reasoned_event.h>
+#include <nx/vms/rules/network_issue_info.h>
 
 namespace nx {
 namespace vms {
@@ -23,17 +23,23 @@ public:
     #define MulticastAddressConflictParameters_Fields (address)(deviceName)(stream)
 
 public:
-    explicit NetworkIssueEvent(const QnResourcePtr& resource, qint64 timeStamp,
-        EventReason reasonCode, const QString& reasonParamsEncoded);
+    NetworkIssueEvent(
+        const QnResourcePtr& resource,
+        std::chrono::microseconds timestamp,
+        EventReason reasonCode,
+        const nx::vms::rules::NetworkIssueInfo& info);
 
     static int decodeTimeoutMsecs(const QString& encoded, const int defaultValue);
     static QString encodeTimeoutMsecs(int msecs);
 
     static bool decodePrimaryStream(const QString& encoded, const bool defaultValue);
     static QString encodePrimaryStream(bool isPrimary);
-    
+
     static QString encodePrimaryStream(bool isPrimary, const QString& message);
     static bool decodePrimaryStream(const QString& encoded, const bool defaultValue, QString* outMessage);
+
+private:
+    static QString encodeInfo(EventReason reason, const nx::vms::rules::NetworkIssueInfo& info);
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(NetworkIssueEvent::MulticastAddressConflictParameters,
