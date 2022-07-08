@@ -36,7 +36,8 @@ private:
         if (auto targetedAction = action.dynamicCast<TestActionWithTargetUsers>())
         {
             targetedUsers(targetedAction->m_users);
-            targetedCameraId(targetedAction->m_cameraId);
+            if (!targetedAction->m_cameraId.isNull())
+                targetedCameraId(targetedAction->m_cameraId);
         }
     }
 };
