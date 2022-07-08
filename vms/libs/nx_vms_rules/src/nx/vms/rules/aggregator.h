@@ -3,8 +3,8 @@
 #pragma once
 
 #include <functional>
-#include <list>
 #include <unordered_map>
+#include <vector>
 
 #include "rules_fwd.h"
 
@@ -15,6 +15,8 @@ struct AggregationInfo
     EventPtr event;
     size_t count{};
 };
+
+using AggregationInfoList = std::vector<AggregationInfo>;
 
 /** Aggregates events by the aggregation key. */
 class NX_VMS_RULES_API Aggregator
@@ -33,7 +35,7 @@ public:
      * determined as elapsed if the difference between current time and first event occurrence time
      * is more than the interval parameter. Returned list is sorted by the event timestamp.
      */
-    std::list<AggregationInfo> popEvents();
+    AggregationInfoList popEvents();
 
     /** Returns whether the aggregator has aggregated events. */
     bool empty() const;

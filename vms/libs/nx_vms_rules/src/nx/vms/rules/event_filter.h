@@ -4,8 +4,10 @@
 
 #include <map>
 #include <memory>
+#include <set>
 
 #include <QtCore/QObject>
+#include <QtCore/QTimer>
 
 #include <nx/utils/uuid.h>
 
@@ -74,12 +76,17 @@ signals:
 
 private:
     void updateState();
+    void clearCache();
 
 private:
     QnUuid m_id;
     QString m_eventType;
     std::map<QString, std::unique_ptr<EventField>> m_fields;
     bool m_updateInProgress = false;
+
+    mutable std::set<QString> m_runningEvents;
+    mutable std::map<QString, std::chrono::microseconds> m_suppressedEvents;
+    mutable QTimer m_clearCacheTimer;
 };
 
 } // namespace nx::vms::rules

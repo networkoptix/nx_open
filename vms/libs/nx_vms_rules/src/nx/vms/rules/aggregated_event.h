@@ -17,7 +17,7 @@ class NX_VMS_RULES_API AggregatedEvent: public QObject
 public:
     explicit AggregatedEvent(const EventPtr& event);
     explicit AggregatedEvent(const AggregationInfo& aggregationInfo);
-    explicit AggregatedEvent(const std::list<AggregationInfo>& aggregationInfoList);
+    explicit AggregatedEvent(const AggregationInfoList& aggregationInfoList);
     ~AggregatedEvent() = default;
 
     /** Returns property with the given name of the initial event. */
@@ -42,7 +42,7 @@ public:
     size_t uniqueCount() const;
 
 private:
-    std::list<AggregationInfo> m_aggregationInfoList;
+    AggregationInfoList m_aggregationInfoList;
 
     AggregatedEvent() = default;
     EventPtr initialEvent() const;

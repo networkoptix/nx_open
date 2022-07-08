@@ -28,6 +28,7 @@ public:
     void setEngineId(QnUuid engineId);
 
     virtual QString uniqueName() const override;
+    virtual QString resourceKey() const override;
     virtual QVariantMap details(common::SystemContext* context) const override;
 
 private:

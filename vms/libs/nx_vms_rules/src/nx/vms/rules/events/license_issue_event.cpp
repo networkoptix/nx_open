@@ -29,6 +29,11 @@ QString LicenseIssueEvent::uniqueName() const
     return makeName(BasicEvent::uniqueName(), m_serverId.toSimpleString());
 }
 
+QString LicenseIssueEvent::resourceKey() const
+{
+    return m_serverId.toSimpleString();
+}
+
 QVariantMap LicenseIssueEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);

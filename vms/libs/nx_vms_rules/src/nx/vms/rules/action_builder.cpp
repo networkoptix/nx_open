@@ -190,7 +190,7 @@ void ActionBuilder::setAggregationInterval(seconds interval)
         // dependent strategy class when another aggregation logic will be required.
         m_aggregator = QSharedPointer<Aggregator>::create(
             m_interval,
-            [](const EventPtr& e) { return e->uniqueName(); });
+            [](const EventPtr& e) { return e->resourceKey(); });
     }
 }
 

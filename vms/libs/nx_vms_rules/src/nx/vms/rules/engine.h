@@ -7,6 +7,7 @@
 
 #include <QtCore/QList>
 #include <QtCore/QMap>
+#include <QtCore/QSet>
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
 
