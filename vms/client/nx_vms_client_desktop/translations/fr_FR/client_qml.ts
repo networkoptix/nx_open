@@ -154,19 +154,19 @@
     </message>
     <message>
       <source>This integration has no settings for this Camera.</source>
-      <translation type="unfinished">This integration has no settings for this Camera.</translation>
+      <translation>Cette intégration n'a pas de paramètres pour cette caméra.</translation>
     </message>
     <message>
       <source>Check System Administration Settings to configure this integration.</source>
-      <translation type="unfinished">Check System Administration Settings to configure this integration.</translation>
+      <translation>Vérifiez les paramètres d'administration du système pour configurer cette intégration.</translation>
     </message>
     <message>
       <source>This integration has no settings at System level.</source>
-      <translation type="unfinished">This integration has no settings at System level.</translation>
+      <translation>Cette intégration n'a pas de paramètres au niveau du système.</translation>
     </message>
     <message>
       <source>Check Camera Settings to configure this integration.</source>
-      <translation type="unfinished">Check Camera Settings to configure this integration.</translation>
+      <translation>Vérifiez les paramètres de la caméra pour configurer cette intégration.</translation>
     </message>
   </context>
   <context>

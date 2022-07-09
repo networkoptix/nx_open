@@ -1118,7 +1118,7 @@
     </message>
     <message>
       <source>SMTP password</source>
-      <translation type="unfinished">SMTP password</translation>
+      <translation>SMTP passord</translation>
     </message>
     <message>
       <source>Email signature</source>
@@ -1126,7 +1126,7 @@
     </message>
     <message>
       <source>Email support link</source>
-      <translation type="unfinished">Email support link</translation>
+      <translation>Link for e-poststøtte</translation>
     </message>
     <message>
       <source>SMTP connection type</source>
@@ -1138,15 +1138,15 @@
     </message>
     <message>
       <source>SMTP timeout (seconds)</source>
-      <translation type="unfinished">SMTP timeout (seconds)</translation>
+      <translation>SMTP-tidsavbrudd (sekunder)</translation>
     </message>
     <message>
       <source>SMTP use simple settings view in Client</source>
-      <translation type="unfinished">SMTP use simple settings view in Client</translation>
+      <translation>SMTP bruker enkel innstillingsvisning i klienten</translation>
     </message>
     <message>
       <source>SMTP name</source>
-      <translation type="unfinished">SMTP name</translation>
+      <translation>SMTP Navn</translation>
     </message>
     <message>
       <source>LDAP URI</source>
@@ -1154,11 +1154,11 @@
     </message>
     <message>
       <source>LDAP Admin DN</source>
-      <translation type="unfinished">LDAP Admin DN</translation>
+      <translation>LDAP Admin DN</translation>
     </message>
     <message>
       <source>LDAP Admin password</source>
-      <translation type="unfinished">LDAP Admin password</translation>
+      <translation>LDAP Admin passord</translation>
     </message>
     <message>
       <source>LDAP search base</source>
@@ -1170,23 +1170,23 @@
     </message>
     <message>
       <source>LDAP password expiration (milliseconds)</source>
-      <translation type="unfinished">LDAP password expiration (milliseconds)</translation>
+      <translation>Utløp av LDAP-passord (millisekunder)</translation>
     </message>
     <message>
       <source>LDAP search timeout (seconds)</source>
-      <translation type="unfinished">LDAP search timeout (seconds)</translation>
+      <translation>Tidsavbrudd for LDAP-søk (sekunder)</translation>
     </message>
     <message>
       <source>Anonymous statistics report allowed</source>
-      <translation type="unfinished">Anonymous statistics report allowed</translation>
+      <translation>Anonym statistikkrapport tillatt</translation>
     </message>
     <message>
       <source>Anonymous statistics report last time</source>
-      <translation type="unfinished">Anonymous statistics report last time</translation>
+      <translation>Anonym statistikkrapport forrige gang</translation>
     </message>
     <message>
       <source>Anonymous statistics report last version</source>
-      <translation type="unfinished">Anonymous statistics report last version</translation>
+      <translation>Anonym statistikk rapporterer siste versjon</translation>
     </message>
     <message>
       <source>Anonymous statistics report last number</source>
@@ -1194,15 +1194,15 @@
     </message>
     <message>
       <source>Anonymous statistics time cycle</source>
-      <translation type="unfinished">Anonymous statistics time cycle</translation>
+      <translation>Anonym statistikk tidssyklus</translation>
     </message>
     <message>
       <source>Anonymous statistics report delay after update</source>
-      <translation type="unfinished">Anonymous statistics report delay after update</translation>
+      <translation>Anonym statistikk rapporterer forsinkelse etter oppdatering</translation>
     </message>
     <message>
       <source>Anonymous Statistics Report Server URL</source>
-      <translation type="unfinished">Anonymous Statistics Report Server URL</translation>
+      <translation>Anonym Statistikk Rapport Server-URL</translation>
     </message>
     <message>
       <source>Anonymous statistics report Client settings</source>
@@ -1210,11 +1210,11 @@
     </message>
     <message>
       <source>System alive update interval (seconds, 1s-1h)</source>
-      <translation type="unfinished">System alive update interval (seconds, 1s-1h)</translation>
+      <translation>Oppdateringsintervall for systemet (sekunder, 1s-1t)</translation>
     </message>
     <message>
       <source>Proxy connection timeout (seconds, 1s-1h)</source>
-      <translation type="unfinished">Proxy connection timeout (seconds, 1s-1h)</translation>
+      <translation>Tidsavbrudd for proxy-tilkobling (sekunder, 1s-1t)</translation>
     </message>
     <message>
       <source>Time synchronization enabled</source>
@@ -1222,11 +1222,11 @@
     </message>
     <message>
       <source>Primary time synchronization Server ID</source>
-      <translation type="unfinished">Primary time synchronization Server ID</translation>
+      <translation>Primær tidssynkronisering Server ID</translation>
     </message>
     <message>
       <source>Max difference between local and source time (milliseconds)</source>
-      <translation type="unfinished">Max difference between local and source time (milliseconds)</translation>
+      <translation>Maks forskjell mellom lokal tid og kildetid (millisekunder)</translation>
     </message>
     <message>
       <source>OS time change check period</source>
@@ -1246,11 +1246,11 @@
     </message>
     <message>
       <source>Cloud System ID</source>
-      <translation type="unfinished">Cloud System ID</translation>
+      <translation>Cloud system ID</translation>
     </message>
     <message>
       <source>Cloud authorization key</source>
-      <translation type="unfinished">Cloud authorization key</translation>
+      <translation>Cloud autorisasjonsnøkkel</translation>
     </message>
     <message>
       <source>System name</source>
@@ -1274,16 +1274,16 @@
     </message>
     <message>
       <source>Optimize Camera settings</source>
-      <translation type="unfinished">Optimize Camera settings</translation>
+      <translation>Optimaliser kamerainnstillinger</translation>
     </message>
     <message>
       <source>Thumbnails auto-update</source>
-      <translation type="unfinished">Thumbnails auto-update</translation>
+      <translation>Automatisk oppdatering av miniatyrbilder</translation>
     </message>
     <message>
       <source>Use %1 service to send emails instead of SMTP client</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">Use %1 service to send emails instead of SMTP client</translation>
+      <translation>Bruk %1 -tjenesten for å sende e-poster i stedet for SMTP-klienten</translation>
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
@@ -1323,23 +1323,23 @@
     </message>
     <message>
       <source>Enable auto-update notifications</source>
-      <translation type="unfinished">Enable auto-update notifications</translation>
+      <translation>Aktiver auto-oppdateringsvarsler</translation>
     </message>
     <message>
       <source>Enable update notifications</source>
-      <translation type="unfinished">Enable update notifications</translation>
+      <translation>Aktiver oppdateringsvarsler</translation>
     </message>
     <message>
       <source>Enable UPNP port-mapping</source>
-      <translation type="unfinished">Enable UPNP port-mapping</translation>
+      <translation>Aktiver UPNP port-mapping</translation>
     </message>
     <message>
       <source>Backup settings</source>
-      <translation type="unfinished">Backup settings</translation>
+      <translation>Innstillinger for sikkerhetskopiering</translation>
     </message>
     <message>
       <source>Cloud host override</source>
-      <translation type="unfinished">Cloud host override</translation>
+      <translation>Overstyring av nettskyvert</translation>
     </message>
     <message>
       <source>Enable crossdomain policy</source>
@@ -1347,7 +1347,7 @@
     </message>
     <message>
       <source>Enable RTSP for Arecont</source>
-      <translation type="unfinished">Enable RTSP for Arecont</translation>
+      <translation>Aktiver RTSP for Arecont</translation>
     </message>
     <message>
       <source>Enable sequential Flir ONVIF searcher</source>
@@ -1367,7 +1367,7 @@
     </message>
     <message>
       <source>Max record queue size (elements, 250-4000)</source>
-      <translation type="unfinished">Max record queue size (elements, 250-4000)</translation>
+      <translation>Maks. postkø størrelse (elementer, 250-4000)</translation>
     </message>
     <message>
       <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value &gt;=2 to this parameter.</source>
@@ -1399,11 +1399,11 @@
     </message>
     <message>
       <source>Enable recording on EDGE</source>
-      <translation type="unfinished">Enable recording on EDGE</translation>
+      <translation>Aktiver opptak på EDGE</translation>
     </message>
     <message>
       <source>Enable WebSocket for p2p</source>
-      <translation type="unfinished">Enable WebSocket for p2p</translation>
+      <translation>Aktiver WebSocket for p2p</translation>
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32</source>
@@ -1415,7 +1415,7 @@
     </message>
     <message>
       <source>Installed update information</source>
-      <translation type="unfinished">Installed update information</translation>
+      <translation>Installert oppdateringsinformasjon</translation>
     </message>
     <message>
       <source>Downloader peers for files</source>
@@ -1423,7 +1423,7 @@
     </message>
     <message>
       <source>Client update settings</source>
-      <translation type="unfinished">Client update settings</translation>
+      <translation>Klientoppdateringsinnstillinger</translation>
     </message>
     <message>
       <source>Thread count limit for Camera archive synchronization</source>
