@@ -85,16 +85,19 @@ QnSmtpSimpleSettingsWidget::QnSmtpSimpleSettingsWidget(QWidget* parent /*= nullp
         ui->passwordInputField,
         ui->signatureInputField,
         ui->supportInputField};
+
     for (auto field: fields)
     {
-        connect(
-            field, &InputField::textChanged, this, &QnSmtpSimpleSettingsWidget::settingsChanged);
+        connect(field, &InputField::textChanged,
+            this, &QnSmtpSimpleSettingsWidget::settingsChanged);
+
         aligner->addWidget(field);
     }
 }
 
 QnSmtpSimpleSettingsWidget::~QnSmtpSimpleSettingsWidget()
-{}
+{
+}
 
 QnSimpleSmtpSettings QnSmtpSimpleSettingsWidget::settings() const
 {
@@ -129,4 +132,9 @@ void QnSmtpSimpleSettingsWidget::setReadOnly(bool readOnly)
     setReadOnly(ui->passwordInputField, readOnly);
     setReadOnly(ui->signatureInputField, readOnly);
     setReadOnly(ui->supportInputField, readOnly);
+}
+
+void QnSmtpSimpleSettingsWidget::setHasRemotePassword(bool value)
+{
+    ui->passwordInputField->setHasRemotePassword(value);
 }

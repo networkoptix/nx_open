@@ -86,17 +86,26 @@ QString QnSmtpTestConnectionWidget::errorString(
 
 bool QnSmtpTestConnectionWidget::testSettings(const QnEmailSettings& value)
 {
-    if (!NX_ASSERT(connection()))
-        return false;
-
-    QnEmailSettings settings = value;
-    settings.timeout = testSmtpTimeoutMSec / 1000;
-
-    if (!settings.isValid())
+    if (!value.isValid())
     {
         QnMessageBox::warning(this, tr("Invalid parameters"), tr("Cannot perform the test."));
         return false;
     }
+
+    return performTesting(value);
+}
+
+bool QnSmtpTestConnectionWidget::testRemoteSettings()
+{
+    return performTesting({});
+}
+
+bool QnSmtpTestConnectionWidget::performTesting(QnEmailSettings settings)
+{
+    if (!NX_ASSERT(connection()))
+        return false;
+
+    settings.timeout = testSmtpTimeoutMSec / 1000;
 
     std::optional<QnUuid> proxyToServer;
     if (auto server = commonModule()->currentServer();

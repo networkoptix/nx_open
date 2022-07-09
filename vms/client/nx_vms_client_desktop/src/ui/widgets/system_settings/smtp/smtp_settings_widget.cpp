@@ -66,18 +66,41 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent)
     connect(m_advancedSettingsWidget,   &QnSmtpAdvancedSettingsWidget::settingsChanged, this,   checkedChanged);
 
     connect(qnGlobalSettings,           &QnGlobalSettings::emailSettingsChanged,        this,   &QnSmtpSettingsWidget::loadDataToUi);
+
+    connect(this, &QnSmtpSettingsWidget::hasChangesChanged,
+        [this]()
+        {
+            m_passwordChanged = m_passwordChanged
+                || m_currentPassword != settings().password;
+
+            m_currentPassword = settings().password;
+
+            if (hasChanges())
+            {
+                m_simpleSettingsWidget->setHasRemotePassword(false);
+                m_advancedSettingsWidget->setHasRemotePassword(false);
+            }
+        });
 }
 
 QnSmtpSettingsWidget::~QnSmtpSettingsWidget()
 {
 }
 
-void QnSmtpSettingsWidget::loadDataToUi() {
+void QnSmtpSettingsWidget::loadDataToUi()
+{
     QScopedValueRollback<bool> guard(m_updating, true);
 
     finishTesting();
 
     QnEmailSettings settings = qnGlobalSettings->emailSettings();
+
+    const bool isEmpty = settings.isEmpty();
+    m_advancedSettingsWidget->setHasRemotePassword(!isEmpty);
+    m_simpleSettingsWidget->setHasRemotePassword(!isEmpty);
+
+    if (settings.equals(this->settings(), /*compareView*/ true, /*comparePassword*/ false))
+        return;
 
     m_simpleSettingsWidget->setSettings(QnSimpleSmtpSettings::fromSettings(settings));
     m_advancedSettingsWidget->setSettings(settings);
@@ -92,6 +115,9 @@ void QnSmtpSettingsWidget::applyChanges() {
     finishTesting();
     if (isReadOnly())
         return;
+
+    m_passwordChanged = false;
+    m_currentPassword.clear();
 
     qnGlobalSettings->setEmailSettings(settings());
     qnGlobalSettings->synchronizeNow();
@@ -144,22 +170,28 @@ void QnSmtpSettingsWidget::at_advancedCheckBox_toggled(bool toggled) {
         );
 }
 
-void QnSmtpSettingsWidget::at_testButton_clicked() {
-    if (m_testSettingsWidget->testSettings(settings())) {
+void QnSmtpSettingsWidget::at_testButton_clicked()
+{
+    const auto testResult = hasChanges() || !settings().isValid()
+        ? m_testSettingsWidget->testSettings(settings())
+        : m_testSettingsWidget->testRemoteSettings();
+
+    if (testResult)
+    {
         ui->controlsWidget->setEnabled(false);
         ui->stackedWidget->setCurrentIndex(TestingPage);
     }
 }
 
-
-bool QnSmtpSettingsWidget::hasChanges() const  {
-    QnEmailSettings local = settings();
-    QnEmailSettings remote = qnGlobalSettings->emailSettings();
+bool QnSmtpSettingsWidget::hasChanges() const
+{
+    const auto local = settings();
+    const auto remote = qnGlobalSettings->emailSettings();
 
     /* Do not notify about changes if no valid settings are provided. */
     if (!local.isValid() && !remote.isValid())
         return false;
 
-    return !local.equals(remote);
+    return m_passwordChanged
+        || !local.equals(remote, /*compareView*/ false, /*comparePassword*/ false);
 }
-

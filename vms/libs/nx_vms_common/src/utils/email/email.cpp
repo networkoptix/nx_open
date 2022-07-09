@@ -82,22 +82,37 @@ int QnEmailSettings::defaultPort(QnEmail::ConnectionType connectionType)
     }
 }
 
+bool QnEmailSettings::isEmpty() const
+{
+    return equals({});
+}
+
 bool QnEmailSettings::isValid() const
 {
     return !email.isEmpty() && !server.isEmpty();
 }
 
-bool QnEmailSettings::equals(const QnEmailSettings &other, bool compareView /* = false*/) const
+bool QnEmailSettings::equals(
+    const QnEmailSettings& other, bool compareView, bool comparePassword) const
 {
-    if (email != other.email)                   return false;
-    if (server != other.server)                 return false;
-    if (user != other.user)                     return false;
-    if (password != other.password)             return false;
-    if (signature != other.signature)           return false;
-    if (supportEmail != other.supportEmail)     return false;
-    if (connectionType != other.connectionType) return false;
-    if (port != other.port)                     return false;
-    if (timeout != other.timeout)               return false;
+    if (email != other.email)
+        return false;
+    if (server != other.server)
+        return false;
+    if (user != other.user)
+        return false;
+    if (comparePassword && password != other.password)
+        return false;
+    if (signature != other.signature)
+        return false;
+    if (supportEmail != other.supportEmail)
+        return false;
+    if (connectionType != other.connectionType)
+        return false;
+    if (port != other.port)
+        return false;
+    if (timeout != other.timeout)
+        return false;
 
     return !compareView || (simple == other.simple);
 }

@@ -29,15 +29,17 @@ class QnSmtpTestConnectionWidget:
     Q_OBJECT
 
 public:
-    QnSmtpTestConnectionWidget(QWidget* parent = nullptr);
-    ~QnSmtpTestConnectionWidget();
+    explicit QnSmtpTestConnectionWidget(QWidget* parent = nullptr);
+    virtual ~QnSmtpTestConnectionWidget() override;
 
-    bool testSettings(const QnEmailSettings &value);
+    bool testSettings(const QnEmailSettings& value);
+    bool testRemoteSettings();
 
 signals:
     void finished();
 
 private:
+    bool performTesting(QnEmailSettings settings);
     void stopTesting(const QString &result = QString());
 
     void at_timer_timeout();
@@ -45,11 +47,11 @@ private:
     QString errorString(const rest::RestResultWithData<QnTestEmailSettingsReply>& result) const;
 
 private slots:
-    void at_testEmailSettingsFinished(
-        bool success, int handle, const rest::RestResultWithData<QnTestEmailSettingsReply>& reply);
+    void at_testEmailSettingsFinished(bool success, int handle,
+        const rest::RestResultWithData<QnTestEmailSettingsReply>& reply);
 
 private:
     QScopedPointer<Ui::SmtpTestConnectionWidget> ui;
-    QTimer *m_timeoutTimer;
-    int m_testHandle;
+    QTimer* const m_timeoutTimer;
+    int m_testHandle = 0;
 };

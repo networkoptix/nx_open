@@ -23,6 +23,8 @@ public:
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
+    void setHasRemotePassword(bool value);
+
 signals:
     void settingsChanged();
 

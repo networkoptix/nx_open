@@ -88,11 +88,13 @@ QnSmtpAdvancedSettingsWidget::QnSmtpAdvancedSettingsWidget(QWidget* parent /*= n
 
     const QString autoPort = tr("Auto");
     ui->portComboBox->addItem(autoPort, 0);
-    for (QnEmail::ConnectionType type : connectionTypesAllowed())
+
+    for (QnEmail::ConnectionType type: connectionTypesAllowed())
     {
         int port = QnEmailSettings::defaultPort(type);
         ui->portComboBox->addItem(QString::number(port), port);
     }
+
     ui->portComboBox->setValidator(new QnPortNumberValidator(autoPort, this));
 
     Aligner* aligner = new Aligner(this);
@@ -105,37 +107,34 @@ QnSmtpAdvancedSettingsWidget::QnSmtpAdvancedSettingsWidget(QWidget* parent /*= n
         ui->passwordInputField,
         ui->signatureInputField,
         ui->supportInputField};
+
     for (auto field: fields)
     {
-        connect(
-            field, &InputField::textChanged, this, &QnSmtpAdvancedSettingsWidget::settingsChanged);
+        connect(field, &InputField::textChanged,
+            this, &QnSmtpAdvancedSettingsWidget::settingsChanged);
+
         aligner->addWidget(field);
     }
 
-    connect(ui->portComboBox,
-        QnComboboxCurrentIndexChanged,
-        this,
-        &QnSmtpAdvancedSettingsWidget::settingsChanged);
-    connect(ui->tlsRadioButton,
-        &QRadioButton::toggled,
-        this,
-        &QnSmtpAdvancedSettingsWidget::settingsChanged);
-    connect(ui->sslRadioButton,
-        &QRadioButton::toggled,
-        this,
-        &QnSmtpAdvancedSettingsWidget::settingsChanged);
-    connect(ui->unsecuredRadioButton,
-        &QRadioButton::toggled,
-        this,
-        &QnSmtpAdvancedSettingsWidget::settingsChanged);
-    connect(ui->portComboBox,
-        QnComboboxCurrentIndexChanged,
-        this,
-        &QnSmtpAdvancedSettingsWidget::at_portComboBox_currentIndexChanged);
+    connect(ui->portComboBox, QnComboboxCurrentIndexChanged,
+        this, &QnSmtpAdvancedSettingsWidget::settingsChanged);
+
+    connect(ui->tlsRadioButton, &QRadioButton::toggled,
+        this, &QnSmtpAdvancedSettingsWidget::settingsChanged);
+
+    connect(ui->sslRadioButton, &QRadioButton::toggled,
+        this, &QnSmtpAdvancedSettingsWidget::settingsChanged);
+
+    connect(ui->unsecuredRadioButton, &QRadioButton::toggled,
+        this, &QnSmtpAdvancedSettingsWidget::settingsChanged);
+
+    connect(ui->portComboBox, QnComboboxCurrentIndexChanged,
+        this, &QnSmtpAdvancedSettingsWidget::at_portComboBox_currentIndexChanged);
 }
 
 QnSmtpAdvancedSettingsWidget::~QnSmtpAdvancedSettingsWidget()
-{}
+{
+}
 
 QnEmailSettings QnSmtpAdvancedSettingsWidget::settings() const
 {
@@ -166,6 +165,11 @@ void QnSmtpAdvancedSettingsWidget::setSettings(const QnEmailSettings &value)
     ui->passwordInputField->setText(value.password);
     ui->signatureInputField->setText(value.signature);
     ui->supportInputField->setText(value.supportEmail);
+}
+
+void QnSmtpAdvancedSettingsWidget::setHasRemotePassword(bool value)
+{
+    ui->passwordInputField->setHasRemotePassword(value);
 }
 
 bool QnSmtpAdvancedSettingsWidget::isReadOnly() const

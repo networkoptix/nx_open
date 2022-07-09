@@ -46,5 +46,7 @@ private:
     QnSmtpAdvancedSettingsWidget* m_advancedSettingsWidget;
     QnSmtpTestConnectionWidget* m_testSettingsWidget;
 
+    QString m_currentPassword;
+    bool m_passwordChanged = false;
     bool m_updating;
 };
