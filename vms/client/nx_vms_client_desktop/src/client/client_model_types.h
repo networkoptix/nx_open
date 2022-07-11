@@ -46,13 +46,14 @@ public:
     struct UnsavedLayout
     {
         QnUuid id;
+        QnUuid parentId;
         QString name;
         qreal cellSpacing = 0.0;
         float cellAspectRatio = 0.0;
         QString backgroundImageFilename;
         qreal backgroundOpacity = 0.0;
         QSize backgroundSize;
-        QList<QnLayoutItemData> items;
+        QnLayoutItemDataList items;
     };
 
     QnWorkbenchState();
@@ -69,7 +70,7 @@ public:
 #define QnWorkbenchStateUnsavedLayoutItem_Fields (resource)(uuid)(flags)(combinedGeometry) \
     (zoomTargetUuid)(zoomRect)(rotation)(displayInfo)(controlPtz)(displayAnalyticsObjects) \
     (displayRoi)(contrastParams)(dewarpingParams)
-#define QnWorkbenchStateUnsavedLayout_Fields (id)(name)(cellSpacing)(cellAspectRatio) \
+#define QnWorkbenchStateUnsavedLayout_Fields (id)(parentId)(name)(cellSpacing)(cellAspectRatio) \
     (backgroundImageFilename)(backgroundOpacity)(backgroundSize)(items)
 #define QnWorkbenchState_Fields \
     (userId)(localSystemId)(currentLayoutId)(runningTourId)(layoutUuids)
