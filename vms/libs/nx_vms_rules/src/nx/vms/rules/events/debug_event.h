@@ -23,6 +23,7 @@ public:
         qint64 value,
         std::chrono::microseconds timestamp);
 
+    virtual QString resourceKey() const override;
     virtual QVariantMap details(common::SystemContext* context) const override;
 
     static const ItemDescriptor& manifest();

@@ -41,7 +41,7 @@ NX_REFLECTION_ENUM_CLASS(EventReason,
     // License Issue event
     licenseRemoved = 10,
 
-    // Backup Finished event
+    // Backup Finished event & Storage Failure event
     backupFailedSourceFileError = 13
 
     // Last number is 24, see networkRtpStreamError. Some numbers are 1000+.

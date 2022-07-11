@@ -90,12 +90,12 @@ public:
 
     EventPtr makeSimpleEvent() const
     {
-        return QSharedPointer<BasicEvent>::create(syncTime.currentTimePoint());
+        return TestEventPtr::create(syncTime.currentTimePoint());
     }
 
     EventPtr makeEventWithCameraId(const QnUuid& cameraId) const
     {
-        auto event = QSharedPointer<TestCameraEvent>::create(syncTime.currentTimePoint());
+        auto event = QSharedPointer<TestEvent>::create(syncTime.currentTimePoint());
         event->m_cameraId = cameraId;
         return event;
     }
