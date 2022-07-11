@@ -9,6 +9,8 @@
 #include <nx/vms/rules/events/generic_event.h>
 #include <nx/vms/rules/utils/field.h>
 
+#include "test_event.h"
+
 namespace nx::vms::rules::test {
 
 class EventFilterTest: public ::testing::Test
@@ -96,7 +98,7 @@ TEST(EventFilterProlongedEventTest, eventFilterHandlesStartedProlongedEventPrope
     stateField->setValue(State::started);
     filter->addField(utils::kStateFieldName, std::move(stateField));
 
-    EventPtr event(new BasicEvent{{}, State::started});
+    EventPtr event(new TestEvent{{}, State::started});
 
     // Only first started event match.
     ASSERT_TRUE(filter->match(event));
@@ -118,7 +120,7 @@ TEST(EventFilterProlongedEventTest, eventFilterHandlesStoppedProlongedEventPrope
     stateField->setValue(State::stopped);
     filter->addField(utils::kStateFieldName, std::move(stateField));
 
-    EventPtr event(new BasicEvent{{}, State::stopped});
+    EventPtr event(new TestEvent{{}, State::stopped});
 
     // Event not match since there no started event before.
     ASSERT_FALSE(filter->match(event));

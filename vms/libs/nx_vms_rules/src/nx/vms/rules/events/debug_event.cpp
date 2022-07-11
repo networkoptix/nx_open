@@ -15,6 +15,11 @@ DebugEvent::DebugEvent(const QString& action, qint64 value, std::chrono::microse
 {
 }
 
+QString DebugEvent::resourceKey() const
+{
+    return {};
+}
+
 QVariantMap DebugEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);

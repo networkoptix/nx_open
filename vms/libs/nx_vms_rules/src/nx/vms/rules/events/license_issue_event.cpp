@@ -24,11 +24,6 @@ LicenseIssueEvent::LicenseIssueEvent(
 {
 }
 
-QString LicenseIssueEvent::uniqueName() const
-{
-    return makeName(BasicEvent::uniqueName(), m_serverId.toSimpleString());
-}
-
 QString LicenseIssueEvent::resourceKey() const
 {
     return m_serverId.toSimpleString();
@@ -39,7 +34,7 @@ QVariantMap LicenseIssueEvent::details(common::SystemContext* context) const
     auto result = BasicEvent::details(context);
 
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
-    utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing(context));
+    utils::insertIfNotEmpty(result, utils::kReasonDetailName, reason(context));
     result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
 
     return result;
@@ -62,7 +57,7 @@ const ItemDescriptor& LicenseIssueEvent::manifest()
     return kDescriptor;
 }
 
-QString LicenseIssueEvent::detailing(nx::vms::common::SystemContext* context) const
+QString LicenseIssueEvent::reason(nx::vms::common::SystemContext* context) const
 {
     QnVirtualCameraResourceList disabledCameras =
         context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(cameras());

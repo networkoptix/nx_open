@@ -23,6 +23,11 @@ GenericEvent::GenericEvent(
     setState(state);
 }
 
+QString GenericEvent::resourceKey() const
+{
+    return {};
+}
+
 QVariantMap GenericEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);

@@ -22,7 +22,6 @@ public:
         QnUuid serverId,
         const QnUuidSet& disabledCameras);
 
-    virtual QString uniqueName() const override;
     virtual QString resourceKey() const override;
     virtual QVariantMap details(common::SystemContext* context) const override;
 
@@ -30,7 +29,7 @@ public:
 
 private:
     QString extendedCaption(common::SystemContext* context) const;
-    QString detailing(nx::vms::common::SystemContext* context) const;
+    QString reason(nx::vms::common::SystemContext* context) const;
 };
 
 } // namespace nx::vms::rules

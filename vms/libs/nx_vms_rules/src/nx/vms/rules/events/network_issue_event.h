@@ -29,6 +29,7 @@ public:
         nx::vms::api::EventReason reason,
         const NetworkIssueInfo& info);
 
+    virtual QString resourceKey() const override;
     virtual QString uniqueName() const override;
     virtual QVariantMap details(common::SystemContext* context) const override;
 
