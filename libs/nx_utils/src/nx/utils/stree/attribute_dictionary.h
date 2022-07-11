@@ -55,7 +55,21 @@ public:
     {
         if (auto str = getStr(name); str)
         {
-            if constexpr (std::is_integral_v<T>)
+            if constexpr (std::is_same_v<T, bool>)
+            {
+                return std::make_optional(nx::utils::stricmp(*str, "true") == 0 || *str == "1");
+            }
+            else if constexpr (std::is_same_v<T, std::string>)
+            {
+                return str;
+            }
+            else if constexpr (std::is_same_v<T, QnUuid>)
+            {
+                QnUuid val = QnUuid::fromStringSafe(*str);
+                if (!val.isNull())
+                    return val;
+            }
+            else if constexpr (std::is_integral_v<T>)
             {
                 std::size_t parsedChars = 0;
                 const T val = nx::utils::ston<T>(*str, &parsedChars, /*base*/ 10);
@@ -67,34 +81,6 @@ public:
                 auto value = nx::reflect::fromString<T>(str, &ok);
                 return ok ? std::make_optional(std::move(value)) : std::nullopt;
             }
-        }
-
-        return std::nullopt;
-    }
-
-    template<>
-    std::optional<std::string> get<std::string>(const AttrName& name) const
-    {
-        return getStr(name);
-    }
-
-    template<>
-    std::optional<bool> get<bool>(const AttrName& name) const
-    {
-        if (auto str = getStr(name); str)
-            return std::make_optional(nx::utils::stricmp(*str, "true") == 0 || *str == "1");
-
-        return std::nullopt;
-    }
-
-    template<>
-    std::optional<QnUuid> get<QnUuid>(const AttrName& name) const
-    {
-        if (auto str = getStr(name); str)
-        {
-            QnUuid val = QnUuid::fromStringSafe(*str);
-            if (!val.isNull())
-                return val;
         }
 
         return std::nullopt;
