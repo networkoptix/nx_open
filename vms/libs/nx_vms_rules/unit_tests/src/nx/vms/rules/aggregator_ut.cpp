@@ -8,6 +8,8 @@
 #include <nx/vms/rules/basic_event.h>
 #include <utils/common/synctime.h>
 
+#include "test_event.h"
+
 using namespace std::chrono;
 using namespace std::chrono_literals;
 
@@ -26,7 +28,7 @@ Aggregator makeAggregator(milliseconds aggregationInterval = kDefaultAggregation
 
 EventPtr makeEvent(const QString& name = QString())
 {
-    auto event = EventPtr::create(qnSyncTime->currentTimePoint());
+    auto event = TestEventPtr::create(qnSyncTime->currentTimePoint());
     event->setObjectName(name);
     return event;
 }

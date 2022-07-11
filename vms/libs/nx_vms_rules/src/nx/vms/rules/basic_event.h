@@ -49,11 +49,16 @@ public:
     /**
      * Returns the event unique name. Used for the event aggregation. At the basic level event
      * uniqueness is determined by the event name.
+     * Keep in sync with EventParameters::getParamsHash().
      */
     virtual QString uniqueName() const;
 
-    /** Returns string represent event uniqueness dependent on the resource produced the event. */
-    virtual QString resourceKey() const; //< TODO #mmalofeev consider to define as an abstract method.
+    /**
+     * Returns string represent event uniqueness dependent on the resource produced the event.
+     * Used for caching and matching prolonged events.
+     * Keep in sync with RuleProcessor::getResourceKey().
+     */
+    virtual QString resourceKey() const = 0;
 
     /** Returns the event details(such as caption, description, timestamp, source etc.). */
     virtual QVariantMap details(common::SystemContext* context) const;

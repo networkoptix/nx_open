@@ -29,7 +29,6 @@ QnUuid EventParameters::getParamsHash() const
                 || reasonCode == EventReason::metadataStorageFull
                 || reasonCode == EventReason::metadataStoragePermissionDenied
                 || reasonCode == EventReason::raidStorageError
-                || reasonCode == EventReason::raidStorageError
                 || reasonCode == EventReason::encryptionFailed)
             {
                 paramKey += '_' + description.toUtf8();

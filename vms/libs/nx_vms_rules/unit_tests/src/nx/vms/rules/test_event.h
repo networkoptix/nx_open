@@ -39,6 +39,16 @@ public:
         };
     }
 
+    virtual QString uniqueName() const override
+    {
+        return makeName(BasicEvent::uniqueName(), m_cameraId.toSimpleString());
+    }
+
+    virtual QString resourceKey() const override
+    {
+        return m_cameraId.toSimpleString();
+    }
+
     using BasicEvent::BasicEvent;
 
     QnUuid m_serverId;
@@ -55,28 +65,7 @@ public:
     nx::vms::rules::CameraConflictList conflicts;
 };
 
-class TestCameraEvent: public nx::vms::rules::BasicEvent
-{
-    Q_OBJECT
-    Q_CLASSINFO("type", "nx.events.camera")
-
-    Q_PROPERTY(QnUuid cameraId MEMBER m_cameraId)
-
-public:
-    using BasicEvent::BasicEvent;
-
-    QString uniqueName() const override
-    {
-        return makeName(m_cameraId.toSimpleString(), BasicEvent::uniqueName());
-    }
-
-    QString resourceKey() const override
-    {
-        return m_cameraId.toSimpleString();
-    }
-
-    QnUuid m_cameraId;
-};
+using TestEventPtr = QSharedPointer<TestEvent>;
 
 class TestTimestampDependentEvent: public nx::vms::rules::BasicEvent
 {

@@ -7,11 +7,28 @@
 
 namespace nx::vms::rules {
 
+ServerFailureEvent::ServerFailureEvent(
+    std::chrono::microseconds timestamp,
+    QnUuid serverId,
+    nx::vms::api::EventReason reason)
+    :
+    BasicEvent(timestamp),
+    m_serverId(serverId),
+    m_reason(reason)
+{
+}
+
+QString ServerFailureEvent::resourceKey() const
+{
+    return m_serverId.toSimpleString();
+}
+
 QVariantMap ServerFailureEvent::details(common::SystemContext* context) const
 {
-    auto result = ReasonedEvent::details(context);
+    auto result = BasicEvent::details(context);
 
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
+    utils::insertIfNotEmpty(result, utils::kReasonDetailName, reason(context));
     result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
 
     return result;
@@ -21,6 +38,31 @@ QString ServerFailureEvent::extendedCaption(common::SystemContext* context) cons
 {
     const auto resourceName = utils::StringHelper(context).resource(serverId(), Qn::RI_WithUrl);
     return tr("Server \"%1\" Failure").arg(resourceName);
+}
+
+QString ServerFailureEvent::uniqueName() const
+{
+    return makeName(
+        BasicEvent::uniqueName(),
+        QString::number(static_cast<int>(reason())));
+}
+
+QString ServerFailureEvent::reason(common::SystemContext* context) const
+{
+    using nx::vms::api::EventReason;
+
+    switch (reason())
+    {
+        case EventReason::serverTerminated:
+            return tr("Connection to server is lost.");
+
+        case EventReason::serverStarted:
+            return tr("Server stopped unexpectedly.");
+
+        default:
+            NX_ASSERT(0, "Unexpected reason");
+            return {};
+    }
 }
 
 const ItemDescriptor& ServerFailureEvent::manifest()
