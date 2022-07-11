@@ -15,6 +15,7 @@
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/style/skin.h>
@@ -59,7 +60,8 @@ public:
         m_state.currentLayoutId = QnUuid(state.value(kCurrentLayoutId).toString());
         m_state.runningTourId = QnUuid(state.value(kRunningTourId).toString());
         QJson::deserialize(state.value(kLayoutUuids), &m_state.layoutUuids);
-        QJson::deserialize(state.value(kUnsavedLayouts), &m_state.unsavedLayouts);
+        if (ini().enableMultiSystemTabBar)
+            QJson::deserialize(state.value(kUnsavedLayouts), &m_state.unsavedLayouts);
         return true;
     }
 
@@ -74,7 +76,8 @@ public:
             result[kCurrentLayoutId] = m_state.currentLayoutId.toString();
             result[kRunningTourId] = m_state.runningTourId.toString();
             QJson::serialize(m_state.layoutUuids, &result[kLayoutUuids]);
-            QJson::serialize(m_state.unsavedLayouts, &result[kUnsavedLayouts]);
+            if (ini().enableMultiSystemTabBar)
+                QJson::serialize(m_state.unsavedLayouts, &result[kUnsavedLayouts]);
             *state = result;
         }
     }
@@ -573,39 +576,49 @@ void QnWorkbench::update(const QnWorkbenchState& state)
         }
     }
 
-    for (const auto& stateLayout: state.unsavedLayouts)
+    if (ini().enableMultiSystemTabBar && context()->user())
     {
-        QnResourcePtr resource = resourcePool()->getResourceById(stateLayout.id);
-        QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
-
-        if (!layoutResource)
+        const auto userId = context()->user()->getId();
+        for (const auto& stateLayout: state.unsavedLayouts)
         {
-            layoutResource.reset(new QnLayoutResource());
-            layoutResource->setIdUnsafe(stateLayout.id);
-            resourcePool()->addResource(layoutResource);
-        }
+            if (stateLayout.parentId != userId)
+                continue;
 
-        layoutResource->setName(stateLayout.name);
-        layoutResource->setCellSpacing(stateLayout.cellSpacing);
-        layoutResource->setCellAspectRatio(stateLayout.cellAspectRatio);
-        layoutResource->setBackgroundImageFilename(stateLayout.backgroundImageFilename);
-        layoutResource->setBackgroundOpacity(stateLayout.backgroundOpacity);
-        layoutResource->setBackgroundSize(stateLayout.backgroundSize);
+            QnResourcePtr resource = resourcePool()->getResourceById(stateLayout.id);
+            QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
 
-        for (const auto& itemData: stateLayout.items)
-        {
-            layoutResource->removeItem(itemData.uuid);
-            layoutResource->addItem(itemData);
-        }
+            if (!layoutResource)
+            {
+                layoutResource.reset(new QnLayoutResource());
+                layoutResource->addFlags(Qn::local);
+                layoutResource->setParentId(stateLayout.parentId);
+                layoutResource->setIdUnsafe(stateLayout.id);
+                resourcePool()->addResource(layoutResource);
+            }
 
-        if (QnWorkbenchLayout* layout = findLayout(stateLayout.id))
-        {
-            layout->update(layoutResource);
-        }
-        else
-        {
-            layout = qnWorkbenchLayoutsFactory->create(layoutResource, this);
-            addLayout(layout);
+            layoutResource->setName(stateLayout.name);
+            layoutResource->setCellSpacing(stateLayout.cellSpacing);
+            layoutResource->setCellAspectRatio(stateLayout.cellAspectRatio);
+            layoutResource->setBackgroundImageFilename(stateLayout.backgroundImageFilename);
+            layoutResource->setBackgroundOpacity(stateLayout.backgroundOpacity);
+            layoutResource->setBackgroundSize(stateLayout.backgroundSize);
+
+            QnLayoutItemDataList items;
+            for (const auto& itemData: stateLayout.items)
+            {
+                items.append(itemData);
+            }
+            layoutResource->setItems(items);
+
+            if (QnWorkbenchLayout* layout = findLayout(stateLayout.id))
+            {
+                layout->update(layoutResource);
+            }
+            else
+            {
+                layout = qnWorkbenchLayoutsFactory->create(layoutResource, this);
+                addLayout(layout);
+            }
         }
     }
 
@@ -678,10 +691,12 @@ void QnWorkbench::submit(QnWorkbenchState& state)
             if (isLayoutSupported(resource))
                 state.layoutUuids.push_back(sourceId(resource));
 
-            if (resource->hasFlags(Qn::local) || snapshotManager()->isSaveable(resource))
+            if (ini().enableMultiSystemTabBar &&
+                (resource->hasFlags(Qn::local) || snapshotManager()->isSaveable(resource)))
             {
                 QnWorkbenchState::UnsavedLayout unsavedLayout;
                 unsavedLayout.id = resource->getId();
+                unsavedLayout.parentId = resource->getParentId();
                 unsavedLayout.name = layout->name();
                 unsavedLayout.cellSpacing = resource->cellSpacing();
                 unsavedLayout.cellAspectRatio = resource->cellAspectRatio();
