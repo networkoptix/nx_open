@@ -69,7 +69,9 @@ protected:
         EXPECT_TRUE(clientSocket.connect(addr, nx::network::kNoTimeout))
             << SystemError::getLastOSErrorText();
         if (conf.doServerDelay)
+        {
             EXPECT_TRUE(clientSocket.setSendTimeout(duration_cast<milliseconds>(kClientDelay).count()));
+        }
 
         std::vector<int> buffer(kBufferSize);
         for (int i = 0; i < kBufferSize; ++i)

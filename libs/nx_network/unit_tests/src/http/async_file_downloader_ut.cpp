@@ -289,7 +289,9 @@ protected:
             {
                 contextPtr->downloaded += buf.size();
                 if (percentage)
+                {
                     ASSERT_EQ(*percentage, (double)contextPtr->downloaded / contextPtr->contentLength);
+                }
                 contextPtr->calls++;
             });
         context->downloader->setOnDone(
