@@ -25,6 +25,11 @@ NetworkIssueEvent::NetworkIssueEvent(
 {
 }
 
+QString NetworkIssueEvent::resourceKey() const
+{
+    return m_cameraId.toSimpleString();
+}
+
 QString NetworkIssueEvent::uniqueName() const
 {
     return makeName(
