@@ -24,9 +24,12 @@ public:
 
     using SettingsValues = QMap<QString, QString>;
     static std::optional<SettingsValues> requestSettings(
-        const QJsonObject& settingsModel, QWidget* parent = nullptr);
+        const QJsonObject& settingsModel,
+        QWidget* parent = nullptr);
+
     static std::optional<QJsonObject> requestSettingsJson(
-        const QJsonObject& settingsModel, QWidget* parent = nullptr);
+        const QJsonObject& settingsModel,
+        QWidget* parent = nullptr);
 };
 
 } // namespace nx::vms::client::desktop

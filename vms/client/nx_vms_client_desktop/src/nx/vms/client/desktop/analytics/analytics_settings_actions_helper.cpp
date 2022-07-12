@@ -31,7 +31,8 @@ void AnalyticsSettingsActionsHelper::processResult(
 
 std::optional<AnalyticsSettingsActionsHelper::SettingsValues>
     AnalyticsSettingsActionsHelper::requestSettings(
-        const QJsonObject& settingsModel, QWidget* parent)
+        const QJsonObject& settingsModel,
+        QWidget* parent)
 {
     if (settingsModel.isEmpty())
         return SettingsValues{};

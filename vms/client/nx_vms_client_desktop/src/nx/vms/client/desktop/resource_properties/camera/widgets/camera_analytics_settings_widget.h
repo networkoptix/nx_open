@@ -13,6 +13,7 @@ class CameraSettingsDialogStore;
 
 class CameraAnalyticsSettingsWidget: public QQuickWidget
 {
+    Q_OBJECT
     using base_type = QQuickWidget;
 
 public:
@@ -20,6 +21,8 @@ public:
         CameraSettingsDialogStore* store,
         QQmlEngine* engine,
         QWidget* parent = nullptr);
+
+    Q_INVOKABLE QVariant requestParameters(const QJsonObject& model);
 };
 
 } // namespace nx::vms::client::desktop

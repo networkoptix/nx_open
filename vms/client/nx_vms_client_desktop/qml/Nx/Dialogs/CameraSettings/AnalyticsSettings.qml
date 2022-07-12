@@ -18,6 +18,7 @@ Item
     id: analyticsSettings
 
     property var store: null
+    property var backend: null
 
     property var analyticsEngines: []
     property var enabledAnalyticsEngines: []
@@ -173,11 +174,18 @@ Item
 
         onValuesEdited: function(activeItem)
         {
+            let parameters = activeItem && activeItem.parametersModel
+                ? backend.requestParameters(activeItem.parametersModel)
+                : {}
+
+            if (parameters == null)
+                return
+
             store.setDeviceAgentSettingsValues(
                 currentEngineId,
                 activeItem ? activeItem.name : "",
-                activeItem ? activeItem.parametersModel : "",
-                getValues())
+                getValues(),
+                parameters)
         }
 
         headerItem: InformationPanel

@@ -5,10 +5,13 @@
 #include <unordered_map>
 
 #include <QtCore/QObject>
+#include <QtWidgets/QWidget>
 
-#include <nx/vms/client/desktop/analytics/analytics_settings_types.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/analytics/analytics_settings_types.h>
+
+class QnWorkbenchContext;
 
 namespace nx::vms::client::desktop {
 
@@ -19,7 +22,11 @@ class DeviceAgentSettingsAdapter: public QObject
     using base_type = QObject;
 
 public:
-    DeviceAgentSettingsAdapter(CameraSettingsDialogStore* store, QObject* parent = nullptr);
+    DeviceAgentSettingsAdapter(
+        CameraSettingsDialogStore* store,
+        QnWorkbenchContext* context,
+        QWidget* parent = nullptr);
+
     virtual ~DeviceAgentSettingsAdapter() override;
 
     void setCamera(const QnVirtualCameraResourcePtr& camera);

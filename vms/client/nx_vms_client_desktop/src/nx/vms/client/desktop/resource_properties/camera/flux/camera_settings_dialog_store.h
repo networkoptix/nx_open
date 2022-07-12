@@ -199,14 +199,6 @@ public:
         const QnUuid& engineId, const DeviceAgentData& data, bool resetUser = true);
     Q_INVOKABLE QJsonObject deviceAgentSettingsErrors(const QnUuid& engineId) const;
 
-    using AnalyticsSettingsActionCallback = std::function<void(const AnalyticsActionResult&)>;
-    using RequestAnalyticsSettingsCallback =
-        std::function<std::optional<QJsonObject>(const QJsonObject& model)>;
-
-    void setAnalyticsSettingsActionCallbacks(
-        RequestAnalyticsSettingsCallback requestSettings,
-        AnalyticsSettingsActionCallback onAction);
-
     Q_INVOKABLE bool dualStreamingEnabled() const;
     Q_INVOKABLE bool recordingEnabled() const;
 

@@ -56,6 +56,9 @@ public:
         DeviceAgentData::Status status,
         const QJsonObject& settings);
 
+    void previewDataReceived(const DeviceAgentId& id, const DeviceAgentData& data);
+    void actionResultReceived(const DeviceAgentId& id, const AnalyticsActionResult& result);
+
     void loadResponseData(
         const DeviceAgentId& id,
         bool success,
@@ -246,6 +249,22 @@ void AnalyticsSettingsManager::Private::updateStatusAndSettings(
         emit listener->dataChanged(data);
 }
 
+void AnalyticsSettingsManager::Private::previewDataReceived(
+    const DeviceAgentId& id,
+    const DeviceAgentData& data)
+{
+    if (auto listener = dataByAgentId(id).listener.lock())
+        emit listener->previewDataReceived(data);
+}
+
+void AnalyticsSettingsManager::Private::actionResultReceived(
+    const DeviceAgentId& id,
+    const AnalyticsActionResult& result)
+{
+    if (auto listener = dataByAgentId(id).listener.lock())
+        emit listener->actionResultReceived(result);
+}
+
 void AnalyticsSettingsManager::Private::loadResponseData(
     const DeviceAgentId& id,
     bool success,
@@ -347,8 +366,7 @@ bool AnalyticsSettingsManager::activeSettingsChanged(
     const QString& activeElement,
     const QJsonObject& settingsModel,
     const QJsonObject& settingsValues,
-    const QJsonObject& paramValues,
-    DeviceAgentDataPreviewCallback previewSettings)
+    const QJsonObject& paramValues)
 {
     if (!NX_ASSERT(d->serverInterface))
         return false;
@@ -364,20 +382,26 @@ bool AnalyticsSettingsManager::activeSettingsChanged(
         settingsModel,
         settingsValues,
         paramValues,
-        [this, agentId, previewSettings](
+        [this, agentId](
             bool success,
             rest::Handle requestId,
             const DeviceAgentActiveSettingChangedResponse& result)
         {
-            previewSettings(
-                success,
+            if (!success)
+                return;
+
+            d->previewDataReceived(
+                agentId,
                 DeviceAgentData{
                     .model = result.settingsModel,
                     .values = result.settingsValues,
                     .errors = result.settingsErrors,
                     .modelId = result.settingsModelId,
                     .status = DeviceAgentData::Status::ok
-                },
+                });
+
+            d->actionResultReceived(
+                agentId,
                 AnalyticsActionResult{
                     .actionUrl = result.actionUrl,
                     .messageToUser = result.messageToUser
