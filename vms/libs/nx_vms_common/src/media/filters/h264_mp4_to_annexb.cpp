@@ -106,18 +106,25 @@ std::vector<uint8_t> readH265SeqHeaderFromExtraData(const uint8_t* extraData, in
 
 QnConstAbstractDataPacketPtr H2645Mp4ToAnnexB::processData(const QnConstAbstractDataPacketPtr& data)
 {
-    const QnCompressedVideoData* videoData =
-        dynamic_cast<const QnCompressedVideoData*>(data.get());
+    const QnConstCompressedVideoDataPtr videoData =
+        std::dynamic_pointer_cast<const QnCompressedVideoData>(data);
+
     if (!videoData)
         return data;
+    return processVideoData(videoData);
+}
+
+QnConstCompressedVideoDataPtr H2645Mp4ToAnnexB::processVideoData(
+    const QnConstCompressedVideoDataPtr& videoData)
+{
     auto codecId = videoData->compressionType;
     if (codecId != AV_CODEC_ID_H264 && codecId != AV_CODEC_ID_H265)
-        return data;
+        return videoData;
 
     if (!videoData->context)
     {
         NX_DEBUG(this, "Invalid video stream, failed to convert to AnnexB format, no extra data");
-        return data;
+        return videoData;
     }
 
     std::vector<uint8_t> header;
@@ -127,12 +134,13 @@ QnConstAbstractDataPacketPtr H2645Mp4ToAnnexB::processData(const QnConstAbstract
     if (extraData && extraDataSize)
     {
         if (nx::media::nal::isStartCode(extraData, extraDataSize))
-            return data;
+            return videoData;
     }
     else
     {
+        // Some sizes of NAL units can start from 001, so we try to check extradata first.
         if (nx::media::nal::isStartCode(videoData->data(), videoData->dataSize()))
-            return data;
+            return videoData;
     }
 
     if (videoData->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
@@ -146,7 +154,7 @@ QnConstAbstractDataPacketPtr H2645Mp4ToAnnexB::processData(const QnConstAbstract
         {
             NX_DEBUG(this,
                 "Invalid video stream, failed to convert to AnnexB format, invalid extra data");
-            return data;
+            return videoData;
         }
 
         auto context = std::make_shared<CodecParameters>(
@@ -157,7 +165,7 @@ QnConstAbstractDataPacketPtr H2645Mp4ToAnnexB::processData(const QnConstAbstract
     }
 
     QnWritableCompressedVideoDataPtr result(new QnWritableCompressedVideoData());
-    result->QnCompressedVideoData::assign(videoData);
+    result->QnCompressedVideoData::assign(videoData.get());
 
     const int resultDataSize = header.size() + videoData->dataSize();
     result->m_data.resize(resultDataSize);
