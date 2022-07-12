@@ -245,10 +245,6 @@ private:
     void releaseDecodedPicturePool( std::deque<UploadedPicture*>* const pool );
     //!Method is not thread-safe
     unsigned int nextPicSequenceValue();
-    void ensurePBOInitialized(
-        DecodedPictureToOpenGLUploader::UploadedPicture* const picBuf,
-        unsigned int pboIndex,
-        size_t sizeInBytes );
     void releasePictureBuffers();
     void releasePictureBuffersNonSafe();
     void savePicToFile( AVFrame* const pic, int pts );

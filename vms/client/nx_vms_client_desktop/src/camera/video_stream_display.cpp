@@ -31,6 +31,8 @@ extern "C" {
 #include <nx/media/quick_sync/quick_sync_video_decoder_old_player.h>
 #endif // __QSV_SUPPORTED__
 
+#include <nx/media/nvidia/nvidia_video_decoder_old_player.h>
+
 #include "buffered_frame_displayer.h"
 #include "gl_renderer.h"
 
@@ -386,6 +388,9 @@ QnAbstractVideoDecoder* QnVideoStreamDisplay::createVideoDecoder(
     QnCompressedVideoDataPtr data, bool mtDecoding) const
 {
     QnAbstractVideoDecoder* decoder;
+
+    decoder = new NvidiaVideoDecoderOldPlayer();
+    return decoder;
 
 #ifdef __QSV_SUPPORTED__
     if (qnSettings->isHardwareDecodingEnabled()

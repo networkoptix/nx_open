@@ -28,8 +28,10 @@ extern "C"
 
 #include <nx/media/quick_sync/qsv_supported.h>
 #ifdef __QSV_SUPPORTED__
-#include <nx/media/quick_sync/quick_sync_video_frame.h>
+//#include <nx/media/quick_sync/quick_sync_video_frame.h>
 #endif //__QSV_SUPPORTED__
+
+#include <nx/media/nvidia/nvidia_renderer.h>
 
 namespace
 {
@@ -1174,8 +1176,35 @@ bool DecodedPictureToOpenGLUploader::renderVideoMemory(
     DecodedPictureToOpenGLUploader::UploadedPicture* const emptyPictureBuf,
     const CLConstVideoDecoderOutputPtr& frame)
 {
-#ifdef __QSV_SUPPORTED__
     emptyPictureBuf->texturePack()->setPictureFormat((AVPixelFormat)frame->format);
+    emptyPictureBuf->setColorFormat(AV_PIX_FMT_RGBA);
+    QnGlRendererTexture* texture = emptyPictureBuf->texture(0);
+    QSize displaySize = emptyPictureBuf->displaySize();
+    QSize frameSize = frame->size();
+    if (!displaySize.isEmpty())
+        displaySize = displaySize.boundedTo(frameSize);
+    else
+        displaySize = frameSize;
+
+    bool isNewTexture = texture->ensureInitialized(
+        displaySize.width(), displaySize.height(), displaySize.width(), 1, GL_RGBA, 1, -1);
+
+    if (!renderToRgb(
+        frame->getVideoSurface(),
+        isNewTexture,
+        texture->m_id,
+        m_initializedContext,
+        frame->scaleFactor,
+        nullptr,
+        nullptr))
+    {
+        NX_ERROR(this, "Failed to render video memory to OpenGL texture");
+        return false;
+    }
+    return true;
+
+#ifdef __QSV_SUPPORTED__
+  /*  emptyPictureBuf->texturePack()->setPictureFormat((AVPixelFormat)frame->format);
     emptyPictureBuf->setColorFormat(AV_PIX_FMT_RGBA);
     QnGlRendererTexture* texture = emptyPictureBuf->texture(0);
     QSize displaySize = emptyPictureBuf->displaySize();
@@ -1190,6 +1219,7 @@ bool DecodedPictureToOpenGLUploader::renderVideoMemory(
 
     float cropWidth = 1;
     float cropHeight = 1;
+
     if (!renderToRgb(
         frame->getVideoSurface(),
         isNewTexture,
@@ -1203,7 +1233,7 @@ bool DecodedPictureToOpenGLUploader::renderVideoMemory(
         return false;
     }
     texture->m_texCoords = QVector2D(cropWidth, cropHeight);
-    return true;
+    return true;*/
 #else //__QSV_SUPPORTED__
     return false;
 #endif //__QSV_SUPPORTED__
@@ -1484,30 +1514,6 @@ unsigned int DecodedPictureToOpenGLUploader::nextPicSequenceValue()
     return seq;
 }
 
-void DecodedPictureToOpenGLUploader::ensurePBOInitialized(
-    DecodedPictureToOpenGLUploader::UploadedPicture* const picBuf,
-    unsigned int pboIndex,
-    size_t sizeInBytes )
-{
-    if( picBuf->m_pbo.size() <= pboIndex )
-        picBuf->m_pbo.resize( pboIndex+1 );
-
-    if( picBuf->m_pbo[pboIndex].id == std::numeric_limits<GLuint>::max() )
-    {
-        d->glGenBuffers( 1, &picBuf->m_pbo[pboIndex].id );
-        glCheckError("glGenBuffers");
-        picBuf->m_pbo[pboIndex].sizeBytes = 0;
-    }
-
-    if( picBuf->m_pbo[pboIndex].sizeBytes < sizeInBytes )
-    {
-        glCheckError("glBindBuffer");
-        glCheckError("glBufferData");
-        glCheckError("glBindBuffer");
-        picBuf->m_pbo[pboIndex].sizeBytes = sizeInBytes;
-    }
-}
-
 void DecodedPictureToOpenGLUploader::releasePictureBuffers()
 {
     NX_MUTEX_LOCKER lk( &m_mutex );
@@ -1521,62 +1527,4 @@ void DecodedPictureToOpenGLUploader::releasePictureBuffersNonSafe()
     releaseDecodedPicturePool( &m_renderedPictures );
     releaseDecodedPicturePool( &m_picturesWaitingRendering );
     releaseDecodedPicturePool( &m_picturesBeingRendered );
-}
-
-static void yv12aToRgba(
-    int width, int height,
-    quint8* yp, size_t y_stride,
-    quint8* up, size_t u_stride,
-    quint8* vp, size_t v_stride,
-    quint8* ap, size_t a_stride,
-    quint8* const rgbaBuf )
-{
-    static const int PIXEL_SIZE = 4;
-
-    for( int y = 0; y < height; ++y )
-    {
-        for( int x = 0; x < width; ++x )
-        {
-            const int Y = *((quint8*)yp + y*y_stride + x);
-            const int U = *((quint8*)up + (y>>1)*u_stride + (x>>1));
-            const int V = *((quint8*)vp + (y>>1)*v_stride + (x>>1));
-
-            int r = 1.164*(Y-16) + 1.596*(V-128);
-            int g = 1.164*(Y-16) - 0.813*(V-128) - 0.391*(U-128);
-            int b = 1.164*(Y-16)                 + 2.018*(U-128);
-
-            r = std::min<>( 255, std::max<>( r, 0 ) );
-            g = std::min<>( 255, std::max<>( g, 0 ) );
-            b = std::min<>( 255, std::max<>( b, 0 ) );
-
-            (rgbaBuf + (y*width + x)*PIXEL_SIZE)[0] = r;
-            (rgbaBuf + (y*width + x)*PIXEL_SIZE)[1] = g;
-            (rgbaBuf + (y*width + x)*PIXEL_SIZE)[2] = b;
-            (rgbaBuf + (y*width + x)*PIXEL_SIZE)[3] = ap ? *(ap+y*a_stride+x) : 0xff;
-        }
-    }
-}
-
-void DecodedPictureToOpenGLUploader::savePicToFile( AVFrame* const pic, int pts )
-{
-    if( !m_rgbaBuf )
-        m_rgbaBuf = new uint8_t[pic->width*pic->height*4];
-
-    yv12aToRgba(
-        pic->width, pic->height,
-        pic->data[0], pic->linesize[0],
-        pic->data[1], pic->linesize[1],
-        pic->data[2], pic->linesize[2],
-        pic->data[3], pic->linesize[3],
-        m_rgbaBuf );
-
-    QImage img(
-        m_rgbaBuf,
-        pic->width,
-        pic->height,
-        QImage::Format_ARGB32 ); //QImage::Format_ARGB4444_Premultiplied );
-    const QString& fileName = lit("C:\\temp\\%1_%2.png").arg(m_fileNumber++, 3, 10, QLatin1Char('0')).arg(pts);
-    img.save(fileName, "png");
-    /*if( !img.save( fileName, "bmp" ) )
-        int x = 0;*/
 }
