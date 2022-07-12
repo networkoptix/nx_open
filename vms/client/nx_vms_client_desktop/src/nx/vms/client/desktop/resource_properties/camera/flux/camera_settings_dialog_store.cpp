@@ -49,9 +49,6 @@ struct CameraSettingsDialogStore::Private:
     PrivateFluxStore<CameraSettingsDialogStore, State>
 {
     using PrivateFluxStore::PrivateFluxStore;
-
-    RequestAnalyticsSettingsCallback requestAnalyticsSettings;
-    AnalyticsSettingsActionCallback onAnalyticsSettingsAction;
 };
 
 CameraSettingsDialogStore::CameraSettingsDialogStore(QObject* parent):
@@ -743,34 +740,14 @@ QJsonObject CameraSettingsDialogStore::deviceAgentSettingsValues(const QnUuid& e
 void CameraSettingsDialogStore::setDeviceAgentSettingsValues(
     const QnUuid& engineId,
     const QString& activeElement,
-    const QJsonObject& paramsModel,
-    const QJsonObject& values)
+    const QJsonObject& values,
+    const QJsonObject& paramValues)
 {
-    auto previewSettings = utils::guarded(this,
-        [this, engineId](
-            bool success,
-            const DeviceAgentData& data,
-            const AnalyticsActionResult& actionResult)
-        {
-            resetDeviceAgentData(engineId, data, /*resetUser*/ false);
-            if (d->onAnalyticsSettingsAction)
-                d->onAnalyticsSettingsAction(actionResult);
-        });
-
     d->executeAction(
         [&](State state)
         {
-            if (!d->requestAnalyticsSettings)
-                return std::pair{false, std::move(state)};
-
-            QJsonObject paramValues;
-            if (auto values = d->requestAnalyticsSettings(paramsModel))
-                paramValues = *values;
-            else
-                return std::pair{false, std::move(state)};
-
             return Reducer::setDeviceAgentSettingsValues(
-                std::move(state), engineId, activeElement, values, paramValues, previewSettings);
+                std::move(state), engineId, activeElement, values, paramValues);
         });
 }
 
@@ -791,14 +768,6 @@ void CameraSettingsDialogStore::resetDeviceAgentData(
         {
             return Reducer::resetDeviceAgentData(std::move(state), engineId, data, resetUser);
         });
-}
-
-void CameraSettingsDialogStore::setAnalyticsSettingsActionCallbacks(
-    RequestAnalyticsSettingsCallback requestSettings,
-    AnalyticsSettingsActionCallback onAction)
-{
-    d->requestAnalyticsSettings = requestSettings;
-    d->onAnalyticsSettingsAction = onAction;
 }
 
 QJsonObject CameraSettingsDialogStore::deviceAgentSettingsErrors(const QnUuid& engineId) const

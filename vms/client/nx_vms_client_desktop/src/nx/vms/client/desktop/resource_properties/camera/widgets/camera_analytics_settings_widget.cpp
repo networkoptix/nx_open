@@ -4,6 +4,7 @@
 
 #include <QtQuick/QQuickItem>
 
+#include <nx/vms/client/desktop/analytics/analytics_settings_actions_helper.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
@@ -33,7 +34,14 @@ CameraAnalyticsSettingsWidget::CameraAnalyticsSettingsWidget(
         return;
 
     rootObject()->setProperty("store", QVariant::fromValue(store));
+    rootObject()->setProperty("backend", QVariant::fromValue(this));
     setHelpTopic(this, Qn::PluginsAndAnalytics_Help);
+}
+
+QVariant CameraAnalyticsSettingsWidget::requestParameters(const QJsonObject& model)
+{
+    auto result = AnalyticsSettingsActionsHelper::requestSettingsJson(model, this);
+    return result ? *result : QVariant{};
 }
 
 } // namespace nx::vms::client::desktop

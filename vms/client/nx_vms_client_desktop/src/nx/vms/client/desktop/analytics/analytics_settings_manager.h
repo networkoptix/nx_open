@@ -73,6 +73,8 @@ public:
 
 signals:
     void dataChanged(const DeviceAgentData& data);
+    void previewDataReceived(const DeviceAgentData& data);
+    void actionResultReceived(const AnalyticsActionResult& result);
 
 protected:
     AnalyticsSettingsListener(const DeviceAgentId& agentId, AnalyticsSettingsManager* manager);
@@ -127,8 +129,7 @@ public:
         const QString& activeElement,
         const QJsonObject& settingsModel,
         const QJsonObject& settingsValues,
-        const QJsonObject& paramValues,
-        DeviceAgentDataPreviewCallback previewSettings);
+        const QJsonObject& paramValues);
 
     AnalyticsSettingsListenerPtr getListener(const DeviceAgentId& agentId);
 
