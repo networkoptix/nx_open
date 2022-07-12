@@ -4,6 +4,7 @@
 
 #include <nx/reflect/generic_visitor.h>
 #include <nx/reflect/instrument.h>
+#include <nx/reflect/field_enumerator.h>
 #include <nx/reflect/json/serializer.h>
 #include <nx/reflect/json/deserializer.h>
 #include <nx/reflect/type_utils.h>
@@ -25,32 +26,11 @@ TEST(Reflection, is_instrumented)
 
 //-------------------------------------------------------------------------------------------------
 
-class FieldEnumerator:
-    public GenericVisitor<FieldEnumerator>
-{
-public:
-    template<typename WrappedField>
-    void visitField(const WrappedField& field)
-    {
-        m_fieldNames.push_back(field.name());
-    }
-
-    std::vector<std::string> finish()
-    {
-        return std::exchange(m_fieldNames, {});
-    }
-
-private:
-    std::vector<std::string> m_fieldNames;
-};
-
 TEST(Reflection, field_traverse)
 {
-    FieldEnumerator fieldEnumerator;
-    const auto fieldNames = nx::reflect::visitAllFields<A>(fieldEnumerator);
-    ASSERT_EQ(
-        std::vector<std::string>({"num", "str", "b", "bs", "c", "keyToValue"}),
-        fieldNames);
+    const auto fieldNames = nx::reflect::listFieldNames<A>();
+    const auto expected = std::array<std::string_view, 6>{"num", "str", "b", "bs", "c", "keyToValue"};
+    ASSERT_EQ(expected, fieldNames);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -82,12 +62,9 @@ NX_REFLECTION_INSTRUMENT_GSN(
 
 TEST(Reflection, struct_properties_represented_with_get_set_methods)
 {
-    FieldEnumerator fieldEnumerator;
-    const auto fieldNames = nx::reflect::visitAllFields<FooWithGetSetProperty>(fieldEnumerator);
-
-    ASSERT_EQ(
-        std::vector<std::string>({{"intVal"}, {"strVal"}}),
-        fieldNames);
+    const auto fieldNames = nx::reflect::listFieldNames<FooWithGetSetProperty>();
+    const auto expected = std::array<std::string_view, 2>{"intVal", "strVal"};
+    ASSERT_EQ(expected, fieldNames);
 }
 
 TEST(Reflection, struct_properties_represented_with_get_set_methods_json)
@@ -128,12 +105,9 @@ NX_REFLECTION_INSTRUMENT_GSN(
 
 TEST(Reflection, struct_properties_read_only)
 {
-    FieldEnumerator fieldEnumerator;
-    const auto fieldNames = nx::reflect::visitAllFields<FooWithReadOnlyProperty>(fieldEnumerator);
-
-    ASSERT_EQ(
-        std::vector<std::string>({{"strVal"}, {"ro"}}),
-        fieldNames);
+    const auto fieldNames = nx::reflect::listFieldNames<FooWithReadOnlyProperty>();
+    const auto expected = std::array<std::string_view, 2>{"strVal", "ro"};
+    ASSERT_EQ(expected, fieldNames);
 }
 
 TEST(Reflection, struct_properties_read_only_json)
@@ -169,12 +143,9 @@ NX_REFLECTION_INSTRUMENT_GSN(
 
 TEST(Reflection, struct_properties_write_only)
 {
-    FieldEnumerator fieldEnumerator;
-    const auto fieldNames = nx::reflect::visitAllFields<FooWithWriteOnlyProperty>(fieldEnumerator);
-
-    ASSERT_EQ(
-        std::vector<std::string>({{"strVal"}, {"wo"}}),
-        fieldNames);
+    const auto fieldNames = nx::reflect::listFieldNames<FooWithWriteOnlyProperty>();
+    const auto expected = std::array<std::string_view, 2>{"strVal", "wo"};
+    ASSERT_EQ(expected, fieldNames);
 }
 
 TEST(Reflection, struct_properties_write_only_json)
