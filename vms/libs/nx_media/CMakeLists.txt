@@ -5,6 +5,14 @@ set(additional_sources_include_dirs)
 
 set(artifacts_dir ${CMAKE_CURRENT_LIST_DIR}/../../../artifacts)
 
+#find_package(CUDA)
+#message("CUDA_CUDA_LIBRARY: ${CUDA_CUDA_LIBRARY}")
+#message("CUDA_TOOLKIT_ROOT_DIR: ${CUDA_TOOLKIT_ROOT_DIR}")
+
+list(APPEND additional_sources_include_dirs /home/lbusygin/develop/Video_Codec_SDK_11.1.5/Interface)
+
+list(APPEND additional_sources_include_dirs /home/lbusygin/tmp) #glew inlude dir
+
 # QuickSync: Add additional sources for the supported platforms (Windows x64 and Linux x64).
 if(NOT APPLE AND arch STREQUAL "x64")
     # Add allocators from artifacts/intel_media_sdk/.
@@ -53,6 +61,12 @@ nx_add_target(nx_media
         nx_vms_common
         nx_fusion
         nx_utils
+        /usr/lib/x86_64-linux-gnu/libnvcuvid.so
+        /usr/lib/x86_64-linux-gnu/libnvidia-encode.so
+        /usr/lib/x86_64-linux-gnu/libcuda.so
+        /usr/lib/x86_64-linux-gnu/libGLEW.so
+        /usr/local/cuda-11.7/targets/x86_64-linux/lib/libcudart.so
+        /home/lbusygin/tmp/1/color_space/libcolor_conversion.so
     ADDITIONAL_SOURCES
         ${additional_sources}
     FOLDER client/libs
@@ -62,6 +76,7 @@ target_include_directories(nx_media
     PRIVATE
         ${Qt5Multimedia_PRIVATE_INCLUDE_DIRS}
         ${additional_sources_include_dirs}
+        /usr/local/cuda/include
 )
 
 if(ANDROID OR IOS)
