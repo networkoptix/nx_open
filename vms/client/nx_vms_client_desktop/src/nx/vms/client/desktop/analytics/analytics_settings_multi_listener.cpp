@@ -125,6 +125,18 @@ void AnalyticsSettingsMultiListener::Private::addListener(const QnUuid& engineId
         {
             emit q->dataChanged(engineId, data);
         });
+
+    connect(listener.get(), &AnalyticsSettingsListener::previewDataReceived, this,
+        [this, engineId](const DeviceAgentData& data)
+        {
+            emit q->previewDataReceived(engineId, data);
+        });
+
+    connect(listener.get(), &AnalyticsSettingsListener::actionResultReceived, this,
+        [this, engineId](const AnalyticsActionResult& result)
+        {
+            emit q->actionResultReceived(engineId, result);
+        });
 }
 
 AnalyticsSettingsMultiListener::AnalyticsSettingsMultiListener(

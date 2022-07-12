@@ -162,8 +162,7 @@ public:
         const QnUuid& engineId,
         const QString& activeElement,
         const QJsonObject& values,
-        const QJsonObject& paramValues,
-        DeviceAgentDataPreviewCallback previewSettings = {});
+        const QJsonObject& paramValues);
 
     static State refreshDeviceAgentSettings(State state, const QnUuid& engineId);
 

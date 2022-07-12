@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include <QtCore/QObject>
 #include <QtCore/QJsonObject>
+#include <QtCore/QObject>
 
+#include <api/model/analytics_actions.h>
 #include <core/resource/resource_fwd.h>
 
 #include "analytics_settings_types.h"
@@ -38,6 +39,8 @@ public:
 signals:
     void enginesChanged();
     void dataChanged(const QnUuid& engineId, const DeviceAgentData& data);
+    void previewDataReceived(const QnUuid& engineId, const DeviceAgentData& data);
+    void actionResultReceived(const QnUuid& engineId, const AnalyticsActionResult& result);
 
 private:
     class Private;
