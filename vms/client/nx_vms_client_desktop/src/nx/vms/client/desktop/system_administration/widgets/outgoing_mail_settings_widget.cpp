@@ -58,7 +58,6 @@ public:
     Private(OutgoingMailSettingsWidget* owner);
 
     void setupDialogControls();
-    void setShowFullSmtpParams(bool show);
     void setReadOnly(bool readOnly);
 
     enum ConfigurationStatus
@@ -186,7 +185,7 @@ void OutgoingMailSettingsWidget::Private::setupDialogControls()
 
     // Setup placeholders.
 
-    ui->systemSingnatureInput->setPlaceholderText(tr("Enter a short System description here."));
+    ui->systemSignatureInput->setPlaceholderText(tr("Enter a short System description here."));
     ui->supportSignatureInput->setPlaceholderText(nx::branding::supportAddress());
 
     // Setup service type dropdown menu.
@@ -254,10 +253,7 @@ void OutgoingMailSettingsWidget::Private::setupDialogControls()
             const auto emailAddress = QnEmailAddress(ui->emailInput->text());
             const auto preset = emailAddress.smtpServer();
             if (preset.isNull())
-            {
-                setShowFullSmtpParams(true);
                 return;
-            }
 
             if (QnEmailSettings::defaultPort(preset.connectionType) != preset.port
                 && isValidPort(preset.port))
@@ -271,12 +267,11 @@ void OutgoingMailSettingsWidget::Private::setupDialogControls()
                 ui->serverAddressInput->setText(preset.server);
             }
 
-            ui->userInput->setText(emailAddress.user());
+            if (ui->userInput->text().isEmpty())
+                ui->userInput->setText(emailAddress.value());
 
             ui->protocolComboBox->setCurrentIndex(
             ui->protocolComboBox->findData(QVariant::fromValue(preset.connectionType)));
-
-            setShowFullSmtpParams(false);
         });
 
     q->connect(m_testSmtpConfigurationButton, &QPushButton::clicked, q,
@@ -284,18 +279,6 @@ void OutgoingMailSettingsWidget::Private::setupDialogControls()
 
     q->connect(q->systemSettings(), &nx::vms::common::SystemSettings::cloudSettingsChanged, q,
         [this] { ui->serviceTypeDropdown->setMenu(effectiveServiceTypeDropdownMenu()); });
-}
-
-void OutgoingMailSettingsWidget::Private::setShowFullSmtpParams(bool show)
-{
-    ui->userLabel->setHidden(!show);
-    ui->userInput->setHidden(!show);
-
-    ui->serverAddressLabel->setHidden(!show);
-    ui->serverAddressInput->setHidden(!show);
-
-    ui->protocolLabel->setHidden(!show);
-    ui->protocolComboBox->setHidden(!show);
 }
 
 void OutgoingMailSettingsWidget::Private::setReadOnly(bool readOnly)
@@ -481,15 +464,8 @@ void OutgoingMailSettingsWidget::Private::setSmtpSettingsToDialog(
         ui->serverAddressInput->setText(url.displayAddress());
     }
 
-    ui->systemSingnatureInput->setText(smtpSettings.signature);
+    ui->systemSignatureInput->setText(smtpSettings.signature);
     ui->supportSignatureInput->setText(smtpSettings.supportEmail);
-
-    bool showAdvancedControls = preset.isNull()
-        || preset.server != smtpSettings.server
-        || preset.port != smtpSettings.port
-        || preset.connectionType != smtpSettings.connectionType;
-
-    setShowFullSmtpParams(showAdvancedControls);
 }
 
 void OutgoingMailSettingsWidget::Private::setUseCloudServiceToDialog(bool useCloudService)
@@ -527,7 +503,7 @@ QnEmailSettings OutgoingMailSettingsWidget::Private::getSmtpSettingsFromDialog()
 
     result.user = ui->userInput->text();
     result.password = ui->passwordInput->text();
-    result.signature = ui->systemSingnatureInput->text();
+    result.signature = ui->systemSignatureInput->text();
     result.supportEmail = ui->supportSignatureInput->text();
     result.timeout = QnEmailSettings::defaultTimeoutSec();
 
