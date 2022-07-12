@@ -7,6 +7,7 @@
 #include <core/resource/camera_resource.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
+#include <nx/vms/client/desktop/analytics/analytics_settings_actions_helper.h>
 #include <nx/vms/client/desktop/analytics/analytics_settings_manager.h>
 #include <nx/vms/client/desktop/analytics/analytics_settings_multi_listener.h>
 #include <utils/common/delayed.h>
@@ -21,6 +22,8 @@ using namespace nx::vms::common;
 class DeviceAgentSettingsAdapter::Private: public nx::vms::client::core::CommonModuleAware
 {
 public:
+    QWidget* parent = nullptr;
+    QnWorkbenchContext* context = nullptr;
     CameraSettingsDialogStore* store = nullptr;
     QnVirtualCameraResourcePtr camera;
     AnalyticsSettingsManager* settingsManager = nullptr;
@@ -29,13 +32,15 @@ public:
 
 DeviceAgentSettingsAdapter::DeviceAgentSettingsAdapter(
     CameraSettingsDialogStore* store,
-    QObject* parent)
+    QnWorkbenchContext* context,
+    QWidget* parent)
     :
     base_type(parent),
     d(new Private())
 {
     d->store = store;
-
+    d->parent = parent;
+    d->context = context;
     d->settingsManager = qnClientModule->analyticsSettingsManager();
     NX_ASSERT(d->settingsManager);
 }
@@ -57,11 +62,31 @@ void DeviceAgentSettingsAdapter::setCamera(const QnVirtualCameraResourcePtr& cam
                 camera,
                 AnalyticsSettingsMultiListener::ListenPolicy::allEngines);
 
-            connect(d->settingsListener.get(), &AnalyticsSettingsMultiListener::dataChanged,
+            connect(
+                d->settingsListener.get(),
+                &AnalyticsSettingsMultiListener::dataChanged,
                 this,
                 [this](const QnUuid& engineId, const DeviceAgentData& data)
                 {
                     d->store->resetDeviceAgentData(engineId, data);
+                });
+
+            connect(
+                d->settingsListener.get(),
+                &AnalyticsSettingsMultiListener::previewDataReceived,
+                this,
+                [this](const QnUuid& engineId, const DeviceAgentData& data)
+                {
+                    d->store->resetDeviceAgentData(engineId, data, /*resetUser*/ false);
+                });
+
+            connect(
+                d->settingsListener.get(),
+                &AnalyticsSettingsMultiListener::actionResultReceived,
+                this,
+                [this](const QnUuid& engineId, const AnalyticsActionResult& result)
+                {
+                    AnalyticsSettingsActionsHelper::processResult(result, d->context, d->parent);
                 });
         }
         else

@@ -2,9 +2,6 @@
 
 #pragma once
 
-#include <functional>
-
-#include <api/model/analytics_actions.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/analytics/settings.h>
 
@@ -42,8 +39,5 @@ struct NX_VMS_CLIENT_DESKTOP_API DeviceAgentData
     QnUuid modelId;
     Status status = Status::initial;
 };
-
-using DeviceAgentDataPreviewCallback =
-    std::function<void(bool success, const DeviceAgentData&, const AnalyticsActionResult&)>;
 
 } // namespace nx::vms::client::desktop
