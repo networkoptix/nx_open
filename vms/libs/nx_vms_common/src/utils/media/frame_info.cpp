@@ -47,7 +47,8 @@ CLVideoDecoderOutput::~CLVideoDecoderOutput()
 
 bool CLVideoDecoderOutput::isEmpty() const
 {
-    return (m_memoryType == MemoryType::SystemMemory && !data[0]) || !width;
+    return (m_memoryType == MemoryType::SystemMemory && !data[0]) ||
+        !m_surface;
 }
 
 static bool convertImageFormat(
