@@ -345,7 +345,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         int(CameraSettingsTab::analytics),
         new CameraAnalyticsSettingsWidget(
             d->store, qnClientCoreModule->mainQmlEngine(), ui->tabWidget),
-        tr("Integrations"));
+        tr("Plugins"));
 
     addPage(
         int(CameraSettingsTab::expert),
