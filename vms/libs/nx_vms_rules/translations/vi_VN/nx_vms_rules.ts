@@ -98,7 +98,7 @@
     <name>nx::vms::rules::CameraInputEvent</name>
     <message>
       <source>Input Port: %1</source>
-      <translation>cổng đầu vào: %1</translation>
+      <translation>Cổng đầu vào: %1</translation>
     </message>
     <message>
       <source>Input on %1</source>
@@ -152,7 +152,7 @@
     </message>
     <message>
       <source>Device %1 was disconnected</source>
-      <translation>thiết bị %1 đã được ngắt kết nối</translation>
+      <translation>Thiết bị %1 đã được ngắt kết nối</translation>
     </message>
     <message>
       <source>Camera %1 was disconnected</source>
@@ -215,7 +215,7 @@
     <name>nx::vms::rules::GenericEvent</name>
     <message>
       <source>Generic Event</source>
-      <translation>sự kiện chung</translation>
+      <translation>Sự kiện chung</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
@@ -227,7 +227,7 @@
     </message>
     <message>
       <source>Generic</source>
-      <translation>chung</translation>
+      <translation>Chung</translation>
     </message>
     <message>
       <source>State</source>
@@ -250,7 +250,7 @@
     <name>nx::vms::rules::HttpAction</name>
     <message>
       <source>Do HTTP request</source>
-      <translation>gởi HTTP yêu cầu</translation>
+      <translation>Gởi HTTP yêu cầu</translation>
     </message>
     <message>
       <source>Interval of action</source>
@@ -289,7 +289,7 @@
     </message>
     <message>
       <source>License Issue</source>
-      <translation>vấn đề giấy phép</translation>
+      <translation>Vấn đề giấy phép</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following devices:</source>
@@ -331,7 +331,7 @@
     </message>
     <message>
       <source>Network Issue</source>
-      <translation>vấn đề về mạng</translation>
+      <translation>Vấn đề về mạng</translation>
     </message>
   </context>
   <context>
@@ -480,7 +480,7 @@
     </message>
     <message>
       <source>Server Conflict</source>
-      <translation>xung đột máy chủ</translation>
+      <translation>Xung đột máy chủ</translation>
     </message>
   </context>
   <context>
@@ -491,7 +491,7 @@
     </message>
     <message>
       <source>Server Failure</source>
-      <translation>máy chủ thất bại</translation>
+      <translation>Máy chủ thất bại</translation>
     </message>
   </context>
   <context>
@@ -502,7 +502,7 @@
     </message>
     <message>
       <source>Server Started</source>
-      <translation>máy chủ bắt đầu</translation>
+      <translation>Máy chủ bắt đầu</translation>
     </message>
   </context>
   <context>
@@ -548,7 +548,7 @@
     <name>nx::vms::rules::SpeakAction</name>
     <message>
       <source>Speak</source>
-      <translation>nói</translation>
+      <translation>Nói</translation>
     </message>
     <message>
       <source>Cameras</source>
@@ -609,11 +609,11 @@
     <name>nx::vms::rules::TextWithFields</name>
     <message>
       <source>Event: %1</source>
-      <translation>biến cố：%1</translation>
+      <translation>Biến cố：%1</translation>
     </message>
     <message>
       <source>Source: %1</source>
-      <translation>nguồn：%1</translation>
+      <translation>Nguồn：%1</translation>
     </message>
     <message>
       <source>Plugin: %1</source>
@@ -639,7 +639,7 @@
     <message>
       <source>Time: %1 on %2</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>thời gian：%1 trong %2</translation>
+      <translation>Thời gian：%1 trong %2</translation>
     </message>
   </context>
 </TS>
