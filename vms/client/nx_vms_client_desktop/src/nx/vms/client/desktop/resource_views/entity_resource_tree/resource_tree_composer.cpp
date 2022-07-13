@@ -92,7 +92,6 @@ void ResourceTreeComposer::rebuildEntity()
 {
     const auto currentUser = m_acccessController->user();
     const bool isAdmin = m_acccessController->hasGlobalPermission(GlobalPermission::admin);
-    const bool isOwner = !currentUser.isNull() && currentUser->isOwner();
 
     if (m_attachedModel)
         m_attachedModel->setRootEntity(nullptr);
@@ -114,11 +113,8 @@ void ResourceTreeComposer::rebuildEntity()
         if (isAdmin)
             composition->setSubEntity(usersGroup, m_entityBuilder->createUsersGroupEntity());
 
-        if (isOwner)
-        {
-            composition->setSubEntity(
-                otherSystemsGroup, m_entityBuilder->createOtherSystemsGroupEntity());
-        }
+        composition->setSubEntity(
+            otherSystemsGroup, m_entityBuilder->createOtherSystemsGroupEntity());
 
         composition->setSubEntity(
             localResourcesGroup, m_entityBuilder->createLocalFilesGroupEntity());
