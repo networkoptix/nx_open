@@ -138,6 +138,7 @@ TEST_F(ResourceTreeModelTest, topLevelNodesOrder)
     static constexpr auto kSystemName = "test_system";
     static constexpr auto kUserName = "test_owner";
     static constexpr auto kServerName = "test_server";
+    static constexpr auto kFakeServerName = "fake_server";
     static constexpr auto kVideowallName = "videowall";
 
     // Set up environment.
@@ -145,6 +146,7 @@ TEST_F(ResourceTreeModelTest, topLevelNodesOrder)
     const auto user = loginAsOwner(kUserName);
     const auto userId = user->getId();
     addServer(kServerName);
+    addFakeServer(kFakeServerName);
     addLayout("layout", userId);
     addVideoWall(kVideowallName);
     addLayoutTour("showreel", userId);
