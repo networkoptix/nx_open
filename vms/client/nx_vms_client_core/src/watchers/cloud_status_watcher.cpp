@@ -18,6 +18,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/fuzzy.h>
+#include <nx/utils/std/algorithm.h>
 #include <nx/utils/string.h>
 #include <nx/vms/api/data/cloud_system_data.h>
 #include <nx/vms/api/data/peer_data.h>
@@ -37,8 +38,9 @@ using namespace std::chrono;
 
 namespace {
 
-static constexpr auto kSystemUpdateInterval = 5s;
+static constexpr auto kSystemUpdateInterval = 10s;
 static constexpr auto kReconnectInterval = 5s;
+static constexpr int kUpdateSystemsTriesCount = 6;
 
 QnCloudSystemList getCloudSystemList(const api::SystemDataExList& systemsList)
 {
@@ -94,6 +96,7 @@ public:
     std::shared_ptr<api::Connection> cloudConnection;
     std::unique_ptr<api::Connection> resendActivationConnection;
 
+    bool hasUpdateSystemsRequest = false;
     QnCloudStatusWatcher::Status status = QnCloudStatusWatcher::LoggedOut;
     QnCloudStatusWatcher::ErrorCode errorCode = QnCloudStatusWatcher::NoError;
 
@@ -133,12 +136,14 @@ public:
 
 private:
     void updateSystems();
+    void updateSystemsInternal(int triesCount);
     void setCloudSystems(const QnCloudSystemList &newCloudSystems);
     void setRecentCloudSystems(const QnCloudSystemList &newRecentSystems);
     void updateCurrentCloudUserSecuritySettings();
     void updateStatusFromResultCode(api::ResultCode result);
     void setStatus(QnCloudStatusWatcher::Status newStatus, QnCloudStatusWatcher::ErrorCode error);
 
+    void resetCloudConnection();
     void updateConnection(bool initial);
     void issueAccessToken();
     void onAccessTokenIssued(api::ResultCode result, api::IssueTokenResponse response);
@@ -182,7 +187,7 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent):
                     break;
                 case QnCloudStatusWatcher::LoggedOut:
                     d->setRecentCloudSystems(QnCloudSystemList());
-                    d->cloudConnection.reset();
+                    d->resetCloudConnection();
                     break;
                 default:
                     break;
@@ -425,7 +430,7 @@ void QnCloudStatusWatcherPrivate::updateStatusFromResultCode(api::ResultCode res
     }
 }
 
-void QnCloudStatusWatcherPrivate::updateSystems()
+void QnCloudStatusWatcherPrivate::updateSystemsInternal(int triesCount)
 {
     if (!cloudConnection || m_authData.credentials.authToken.empty())
         return;
@@ -436,22 +441,63 @@ void QnCloudStatusWatcherPrivate::updateSystems()
     if (!checkSuppressed())
         return;
 
+    if (triesCount <= 0)
+        return;
+
     auto handler = nx::utils::AsyncHandlerExecutor(this).bind(
-        [this](api::ResultCode result, const api::SystemDataExList& systemsList)
+        [this, triesCount](api::ResultCode result, const api::SystemDataExList& systemsList)
         {
             if (!cloudConnection)
                 return;
 
             QnCloudSystemList cloudSystems;
-            if (result == api::ResultCode::ok)
+            if (result == api::ResultCode::badUsername && triesCount > 0)
             {
+                // In some situations after mobile client awakeness from the suspension we have
+                // expired cloud access token. It may take some time to update it, so we give a
+                // chance and do the several tries.
+                NX_DEBUG(this, "Access token is expired, waiting for the token refresh,\
+                    Try #%1", kUpdateSystemsTriesCount - triesCount + 1);
+                m_tokenUpdater->updateTokenIfNeeded();
+                const auto request =
+                    [this, tries = triesCount - 1]()
+                    {
+                        updateSystemsInternal(tries);
+                    };
+                executeDelayedParented(request, /*delay*/ 10s, this);
+                return;
+            }
+            else if (result == api::ResultCode::ok)
+            {
+                NX_DEBUG(this, "Successfully updated systems list");
                 cloudSystems = getCloudSystemList(systemsList);
                 setCloudSystems(cloudSystems);
             }
+            else
+            {
+                NX_ERROR(this, "Can't update systems list, error '%1'", result);
+            }
+
+            hasUpdateSystemsRequest = false;
             updateStatusFromResultCode(result);
         });
 
     cloudConnection->systemManager()->getSystemsFiltered(api::Filter(), std::move(handler));
+}
+
+void QnCloudStatusWatcherPrivate::updateSystems()
+{
+    if (hasUpdateSystemsRequest)
+        return;
+
+    hasUpdateSystemsRequest = true;
+    updateSystemsInternal(/*triesCount*/ kUpdateSystemsTriesCount);
+}
+
+void QnCloudStatusWatcherPrivate::resetCloudConnection()
+{
+    cloudConnection.reset();
+    hasUpdateSystemsRequest = false;
 }
 
 void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
@@ -460,7 +506,7 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
         ? QnCloudStatusWatcher::Offline
         : QnCloudStatusWatcher::LoggedOut);
     setStatus(status, QnCloudStatusWatcher::NoError);
-    cloudConnection.reset();
+    resetCloudConnection();
 
     const auto& credentials = m_authData.credentials;
     if (m_authData.empty())
