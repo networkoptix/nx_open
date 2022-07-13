@@ -136,7 +136,7 @@ int QnFfmpegTranscoder::setContainer(const QString& container)
         return -2;
     }
     if (container == QLatin1String("rtp"))
-        m_formatCtx->packet_size = MTU_SIZE;
+        m_formatCtx->packet_size = m_rtpMtu;
 
     return 0;
 }

@@ -61,6 +61,7 @@ public:
         uint32_t rtpTimestamp = 0;
     };
     PacketTimestamp getLastPacketTimestamp() { return m_lastPacketTimestamp; }
+    void setRtpMtu(int mtu) { m_rtpMtu = mtu; }
 
 protected:
     virtual int transcodePacketInternal(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result) override;
@@ -88,4 +89,5 @@ private:
     PacketTimestamp m_lastPacketTimestamp;
     bool m_inMiddleOfStream = false;
     qint64 m_startTimeOffset = 0;
+    int m_rtpMtu = MTU_SIZE;
 };
