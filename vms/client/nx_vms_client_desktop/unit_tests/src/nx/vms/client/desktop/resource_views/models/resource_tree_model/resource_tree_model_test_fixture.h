@@ -47,6 +47,7 @@ protected:
         nx::vms::api::UserType userType = nx::vms::api::UserType::local) const;
     QnMediaServerResourcePtr addServer(const QString& name) const;
     QnMediaServerResourcePtr addEdgeServer(const QString& name, const QString& address) const;
+    QnMediaServerResourcePtr addFakeServer(const QString& name) const;
     QnAviResourcePtr addLocalMedia(const QString& path) const;
     QnFileLayoutResourcePtr addFileLayout(const QString& path,
         bool isEncrypted = false) const;
