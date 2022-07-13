@@ -34,6 +34,8 @@ public:
         nx::cloud::db::api::ResultCode,
         nx::cloud::db::api::IssueTokenResponse)>;
 
+    void updateTokenIfNeeded();
+
     void issueToken(
         const nx::cloud::db::api::IssueTokenRequest& request,
         IssueTokenHandler handler,
@@ -46,13 +48,12 @@ signals:
     void sessionTokenExpiring();
 
 private:
-    void onTimer();
-
-private:
     std::unique_ptr<CloudConnectionFactory> m_cloudConnectionFactory;
     std::unique_ptr<nx::cloud::db::api::Connection> m_cloudConnection;
     QTimer* m_timer = nullptr;
-    std::chrono::microseconds m_expirationTime = std::chrono::microseconds::zero();
+    QDeadlineTimer m_expirationTimer; //< Countdoun timer to the token update request.
+    QDeadlineTimer m_requestInProgressTimer; //< Means "update request in progress" until expired.
+    bool m_wasSuspended = false;
 };
 
 } // namespace nx::vms::client::core
