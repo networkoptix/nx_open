@@ -1131,15 +1131,15 @@
     </message>
     <message>
       <source>Low</source>
-      <translation>thấp (L)</translation>
+      <translation>Thấp (L)</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation>trong (M)</translation>
+      <translation>Trong (M)</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>cao (H)</translation>
+      <translation>Cao (H)</translation>
     </message>
     <message>
       <source>Select some devices to setup failover priority</source>
@@ -2464,7 +2464,7 @@
     </message>
     <message>
       <source>General</source>
-      <translation>chung</translation>
+      <translation>Chung</translation>
     </message>
     <message>
       <source>Issued by</source>
@@ -2988,7 +2988,7 @@
     <name>WebpageDialog</name>
     <message>
       <source>General</source>
-      <translation>chung</translation>
+      <translation>Chung</translation>
     </message>
     <message>
       <source>Proxy this webpage via server</source>

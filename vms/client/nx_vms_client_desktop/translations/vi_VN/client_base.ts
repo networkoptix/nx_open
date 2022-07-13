@@ -9932,7 +9932,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Server:</source>
-      <translation>máy chủ:</translation>
+      <translation>Máy chủ:</translation>
     </message>
     <message>
       <source>Server ID:</source>
