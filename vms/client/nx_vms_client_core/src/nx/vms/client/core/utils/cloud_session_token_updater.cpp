@@ -3,6 +3,7 @@
 #include "cloud_session_token_updater.h"
 
 #include <QtCore/QTimer>
+#include <QtGui/QGuiApplication>
 
 #include <client_core/client_core_module.h>
 #include <nx/cloud/db/api/connection.h>
@@ -20,12 +21,7 @@ namespace {
 
 static constexpr auto kTokenUpdateInterval = 1min;
 static constexpr auto kTokenUpdateThreshold = 10min;
-
-bool isTokenExpiring(microseconds expirationTime)
-{
-    const auto timeLeft = expirationTime - qnSyncTime->currentTimePoint();
-    return timeLeft > microseconds::zero() && timeLeft <= kTokenUpdateThreshold;
-}
+static constexpr auto kMaxTokenUpdateRequestTime = 20s;
 
 } // namespace
 
@@ -34,37 +30,63 @@ CloudSessionTokenUpdater::CloudSessionTokenUpdater(QObject* parent):
     m_timer(new QTimer(this))
 {
     m_timer->setInterval(kTokenUpdateInterval);
-    m_timer->callOnTimeout([this]() { onTimer(); });
+    m_timer->callOnTimeout([this]() { updateTokenIfNeeded(); });
+
+    connect(qApp, &QGuiApplication::applicationStateChanged, this,
+        [this](Qt::ApplicationState state)
+        {
+            switch (state)
+            {
+                case Qt::ApplicationSuspended:
+                    NX_DEBUG(this, "Application is suspended. "
+                        "Will try to refresh token on awakeness");
+                    m_wasSuspended = true;
+                    break;
+                case Qt::ApplicationActive:
+                    if (m_wasSuspended)
+                    {
+                        NX_DEBUG(this, "Application is active, forcing token update try");
+                        updateTokenIfNeeded();
+                        m_wasSuspended = false;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        });
 }
 
 CloudSessionTokenUpdater::~CloudSessionTokenUpdater()
 {
 }
 
-void CloudSessionTokenUpdater::onTimer()
+void CloudSessionTokenUpdater::updateTokenIfNeeded()
 {
-    if (isTokenExpiring(m_expirationTime))
+    const bool expired = m_expirationTimer.hasExpired();
+    const bool requestInProgress = !m_requestInProgressTimer.hasExpired();
+    if (!expired || requestInProgress)
     {
-        NX_DEBUG(this, "Access token expiring, request for update");
-        emit sessionTokenExpiring();
+        NX_DEBUG(this, "Do not update token, expiring/expired: %1, request in progress: %2",
+           expired, requestInProgress);
+        return;
     }
+
+    NX_DEBUG(this, "Access token expiring or expired, requesting for the update");
+    emit sessionTokenExpiring();
 }
 
 void CloudSessionTokenUpdater::onTokenUpdated(microseconds expirationTime)
 {
-    m_expirationTime = expirationTime;
-    const bool isExpiring = isTokenExpiring(m_expirationTime);
-    NX_DEBUG(
-        this,
-        "Access token updated, expires at: %1, expiring: %2",
-        expirationTime,
-        isExpiring);
+    const auto duration = expirationTime - kTokenUpdateThreshold - qnSyncTime->currentTimePoint();
+    m_expirationTimer.setRemainingTime(duration > microseconds::zero()
+        ? duration
+        : microseconds::max());
 
-    // We need to stop trying to update already expiring token.
-    if (isExpiring || (expirationTime <= microseconds::zero()))
-        m_timer->stop();
-    else
-        m_timer->start();
+    // Reset timed "request in progress" flag.
+    m_requestInProgressTimer.setRemainingTime(microseconds::zero());
+
+    NX_DEBUG(this, "Access token updated, expires at: %1, expiring/expired: %2",
+        expirationTime, m_expirationTimer.hasExpired());
 }
 
 void CloudSessionTokenUpdater::issueToken(
@@ -77,6 +99,9 @@ void CloudSessionTokenUpdater::issueToken(
         m_cloudConnectionFactory = std::make_unique<CloudConnectionFactory>();
         m_cloudConnection = m_cloudConnectionFactory->createConnection();
     }
+
+    // Initialize timed "request in progress" flag.
+    m_requestInProgressTimer.setRemainingTime(kMaxTokenUpdateRequestTime);
 
     m_cloudConnection->oauthManager()->issueToken(request, executor.bind(handler));
 }
