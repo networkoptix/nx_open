@@ -2906,7 +2906,7 @@ to %1</source>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>ข้อผิดพลาดที่ไม่รู้จัก กรุณาติดต่อฝ่ายสนับสนุน.</translation>
+      <translation>ข้อผิดพลาดภายใน %1 โปรดติดต่อทีมสนับสนุน</translation>
     </message>
   </context>
   <context>

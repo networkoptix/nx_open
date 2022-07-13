@@ -1486,7 +1486,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Check</source>
-      <translation>kiểm tra</translation>
+      <translation>Kiểm tra</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
