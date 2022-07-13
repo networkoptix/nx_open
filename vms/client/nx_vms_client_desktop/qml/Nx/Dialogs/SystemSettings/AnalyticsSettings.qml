@@ -67,8 +67,8 @@ Item
 
         placeholderItem: SettingsPlaceholder
         {
-            header: qsTr("This integration has no settings at System level.")
-            description: qsTr("Check Camera Settings to configure this integration.")
+            header: qsTr("This plugin has no settings at System level.")
+            description: qsTr("Check Camera Settings to configure this plugin.")
         }
 
         onValuesEdited: function(activeItem)

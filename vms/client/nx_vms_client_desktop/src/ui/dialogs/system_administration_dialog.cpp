@@ -101,7 +101,7 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
             setPageVisible(Analytics, analyticsSettingsWidget->shouldBeVisible());
         };
 
-    addPage(Analytics, analyticsSettingsWidget, tr("Integrations"));
+    addPage(Analytics, analyticsSettingsWidget, tr("Plugins"));
     connect(analyticsSettingsWidget, &AnalyticsSettingsWidget::visibilityUpdateRequested, this,
         updateAnalyticsSettingsWidgetVisibility);
 
