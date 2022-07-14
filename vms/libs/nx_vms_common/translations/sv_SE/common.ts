@@ -1118,7 +1118,7 @@
     </message>
     <message>
       <source>SMTP password</source>
-      <translation type="unfinished">SMTP password</translation>
+      <translation>SMTP lösenord</translation>
     </message>
     <message>
       <source>Email signature</source>
@@ -1126,7 +1126,7 @@
     </message>
     <message>
       <source>Email support link</source>
-      <translation type="unfinished">Email support link</translation>
+      <translation>E-posta support</translation>
     </message>
     <message>
       <source>SMTP connection type</source>
@@ -1138,15 +1138,15 @@
     </message>
     <message>
       <source>SMTP timeout (seconds)</source>
-      <translation type="unfinished">SMTP timeout (seconds)</translation>
+      <translation>SMTP timeout (sekunder)</translation>
     </message>
     <message>
       <source>SMTP use simple settings view in Client</source>
-      <translation type="unfinished">SMTP use simple settings view in Client</translation>
+      <translation>SMTP använder enkel inställningsvy i klienten</translation>
     </message>
     <message>
       <source>SMTP name</source>
-      <translation type="unfinished">SMTP name</translation>
+      <translation>SMTP namn</translation>
     </message>
     <message>
       <source>LDAP URI</source>
@@ -1154,11 +1154,11 @@
     </message>
     <message>
       <source>LDAP Admin DN</source>
-      <translation type="unfinished">LDAP Admin DN</translation>
+      <translation>LDAP Admin DN</translation>
     </message>
     <message>
       <source>LDAP Admin password</source>
-      <translation type="unfinished">LDAP Admin password</translation>
+      <translation>LDAP Admin lösenord</translation>
     </message>
     <message>
       <source>LDAP search base</source>
@@ -1170,51 +1170,51 @@
     </message>
     <message>
       <source>LDAP password expiration (milliseconds)</source>
-      <translation type="unfinished">LDAP password expiration (milliseconds)</translation>
+      <translation>LDAP-lösenordsutgång (millisekunder)</translation>
     </message>
     <message>
       <source>LDAP search timeout (seconds)</source>
-      <translation type="unfinished">LDAP search timeout (seconds)</translation>
+      <translation>Timeout för LDAP-sökning (sekunder)</translation>
     </message>
     <message>
       <source>Anonymous statistics report allowed</source>
-      <translation type="unfinished">Anonymous statistics report allowed</translation>
+      <translation>Anonym statistikrapport tillåten</translation>
     </message>
     <message>
       <source>Anonymous statistics report last time</source>
-      <translation type="unfinished">Anonymous statistics report last time</translation>
+      <translation>Anonym statistik rapport senaste gången</translation>
     </message>
     <message>
       <source>Anonymous statistics report last version</source>
-      <translation type="unfinished">Anonymous statistics report last version</translation>
+      <translation>Anonym statistik rapport senaste versionen</translation>
     </message>
     <message>
       <source>Anonymous statistics report last number</source>
-      <translation type="unfinished">Anonymous statistics report last number</translation>
+      <translation>Anonym statistik rapport senaste numret</translation>
     </message>
     <message>
       <source>Anonymous statistics time cycle</source>
-      <translation type="unfinished">Anonymous statistics time cycle</translation>
+      <translation>Anonym statistik-tidscykel</translation>
     </message>
     <message>
       <source>Anonymous statistics report delay after update</source>
-      <translation type="unfinished">Anonymous statistics report delay after update</translation>
+      <translation>Anonym statistikrapport försenad efter uppdatering</translation>
     </message>
     <message>
       <source>Anonymous Statistics Report Server URL</source>
-      <translation type="unfinished">Anonymous Statistics Report Server URL</translation>
+      <translation>Anonym statistik rapportserver URL</translation>
     </message>
     <message>
       <source>Anonymous statistics report Client settings</source>
-      <translation type="unfinished">Anonymous statistics report Client settings</translation>
+      <translation>Anonym statistikrapport Klientinställningar</translation>
     </message>
     <message>
       <source>System alive update interval (seconds, 1s-1h)</source>
-      <translation type="unfinished">System alive update interval (seconds, 1s-1h)</translation>
+      <translation>Systemets uppdateringsintervall (sekunder, 1s-1h)</translation>
     </message>
     <message>
       <source>Proxy connection timeout (seconds, 1s-1h)</source>
-      <translation type="unfinished">Proxy connection timeout (seconds, 1s-1h)</translation>
+      <translation>Timeout för proxyanslutningen (sekunder, 1s-1h)</translation>
     </message>
     <message>
       <source>Time synchronization enabled</source>
@@ -1222,11 +1222,11 @@
     </message>
     <message>
       <source>Primary time synchronization Server ID</source>
-      <translation type="unfinished">Primary time synchronization Server ID</translation>
+      <translation>Primär tidssynkronisering Server-ID</translation>
     </message>
     <message>
       <source>Max difference between local and source time (milliseconds)</source>
-      <translation type="unfinished">Max difference between local and source time (milliseconds)</translation>
+      <translation>Max skillnad mellan lokal tid och källtid (millisekunder)</translation>
     </message>
     <message>
       <source>OS time change check period</source>
@@ -1246,11 +1246,11 @@
     </message>
     <message>
       <source>Cloud System ID</source>
-      <translation type="unfinished">Cloud System ID</translation>
+      <translation>Molnsystem-ID</translation>
     </message>
     <message>
       <source>Cloud authorization key</source>
-      <translation type="unfinished">Cloud authorization key</translation>
+      <translation>Cloud auktoriseringsnyckel</translation>
     </message>
     <message>
       <source>System name</source>
@@ -1262,28 +1262,28 @@
     </message>
     <message>
       <source>Last master System merge ID</source>
-      <translation type="unfinished">Last master System merge ID</translation>
+      <translation>Senaste huvudsystemets sammanslagnings-ID</translation>
     </message>
     <message>
       <source>Last slave System merge ID</source>
-      <translation type="unfinished">Last slave System merge ID</translation>
+      <translation>Sista slavsystems sammanslagnings-ID</translation>
     </message>
     <message>
       <source>Disable Device vendors</source>
-      <translation type="unfinished">Disable Device vendors</translation>
+      <translation>Inaktivera enhetsleverantörer</translation>
     </message>
     <message>
       <source>Optimize Camera settings</source>
-      <translation type="unfinished">Optimize Camera settings</translation>
+      <translation>Optimera kamerainställningar</translation>
     </message>
     <message>
       <source>Thumbnails auto-update</source>
-      <translation type="unfinished">Thumbnails auto-update</translation>
+      <translation>Miniatyrer automatisk uppdatering</translation>
     </message>
     <message>
       <source>Use %1 service to send emails instead of SMTP client</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">Use %1 service to send emails instead of SMTP client</translation>
+      <translation>Använd tjänsten %1 för att skicka e-post istället för SMTP-klient</translation>
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
@@ -1303,7 +1303,7 @@
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
-      <translation type="unfinished">Audit trail period (days, 14-730)</translation>
+      <translation>Revisionsspårperiod (dagar, 14-730)</translation>
     </message>
     <message>
       <source>Event log period (days)</source>
@@ -1311,71 +1311,71 @@
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption)</source>
-      <translation type="unfinished">Enforce HTTPS (data traffic encryption)</translation>
+      <translation>Framtvinga HTTPS (datatrafikkryptering)</translation>
     </message>
     <message>
       <source>Enforce RTSPS (video traffic encryption)</source>
-      <translation type="unfinished">Enforce RTSPS (video traffic encryption)</translation>
+      <translation>Framtvinga RTSPS (kryptering av videotrafik)</translation>
     </message>
     <message>
       <source>Enable auto-discovery</source>
-      <translation type="unfinished">Enable auto-discovery</translation>
+      <translation>Aktivera automatisk upptäckt</translation>
     </message>
     <message>
       <source>Enable auto-update notifications</source>
-      <translation type="unfinished">Enable auto-update notifications</translation>
+      <translation>Aktivera aviseringar om automatisk uppdatering</translation>
     </message>
     <message>
       <source>Enable update notifications</source>
-      <translation type="unfinished">Enable update notifications</translation>
+      <translation>Aktivera uppdateringsaviseringar</translation>
     </message>
     <message>
       <source>Enable UPNP port-mapping</source>
-      <translation type="unfinished">Enable UPNP port-mapping</translation>
+      <translation>Aktivera UPNP-port-mappning</translation>
     </message>
     <message>
       <source>Backup settings</source>
-      <translation type="unfinished">Backup settings</translation>
+      <translation>Backupinställningar</translation>
     </message>
     <message>
       <source>Cloud host override</source>
-      <translation type="unfinished">Cloud host override</translation>
+      <translation>Åsidosättande av molnvärd</translation>
     </message>
     <message>
       <source>Enable crossdomain policy</source>
-      <translation type="unfinished">Enable crossdomain policy</translation>
+      <translation>Aktivera crossdomain policy</translation>
     </message>
     <message>
       <source>Enable RTSP for Arecont</source>
-      <translation type="unfinished">Enable RTSP for Arecont</translation>
+      <translation>Aktivera RTSP för Arecont</translation>
     </message>
     <message>
       <source>Enable sequential Flir ONVIF searcher</source>
-      <translation type="unfinished">Enable sequential Flir ONVIF searcher</translation>
+      <translation>Aktivera sekventiell Flir ONVIF sökare</translation>
     </message>
     <message>
       <source>Max P2P queue size (bytes, 32-512MB)</source>
-      <translation type="unfinished">Max P2P queue size (bytes, 32-512MB)</translation>
+      <translation>Max storlek på P2P-kön (bytes, 32-512MB)</translation>
     </message>
     <message>
       <source>Max P2P all clients size (bytes, 32-512MB)</source>
-      <translation type="unfinished">Max P2P all clients size (bytes, 32-512MB)</translation>
+      <translation>Max P2P-storlek för alla klienter (byte, 32-512 Mb)</translation>
     </message>
     <message>
       <source>Max record queue size (bytes, 6-96MB)</source>
-      <translation type="unfinished">Max record queue size (bytes, 6-96MB)</translation>
+      <translation>Max inspelningsköstorlek (bytes, 6-96 Mb)</translation>
     </message>
     <message>
       <source>Max record queue size (elements, 250-4000)</source>
-      <translation type="unfinished">Max record queue size (elements, 250-4000)</translation>
+      <translation>Max inspelningsköstorlek (element 250-4000)</translation>
     </message>
     <message>
       <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value &gt;=2 to this parameter.</source>
-      <translation type="unfinished">Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value &gt;=2 to this parameter.</translation>
+      <translation>Max antal HTTP-anslutningar med omkodning för servern. Chrome öppnar 2 anslutningar samtidigt och stänger sedan den första. Så det rekommenderas att ställa in värdet &gt;=2 till denna parameter.</translation>
     </message>
     <message>
       <source>RTP retry count</source>
-      <translation type="unfinished">RTP retry count</translation>
+      <translation>Max antal RTP återförsök</translation>
     </message>
     <message>
       <source>RTP timeout (milliseconds)</source>
@@ -1383,51 +1383,51 @@
     </message>
     <message>
       <source>Max RTSP connection duration (seconds)</source>
-      <translation type="unfinished">Max RTSP connection duration (seconds)</translation>
+      <translation>Maximal RTSP-anslutningstid (sekunder)</translation>
     </message>
     <message>
       <source>Enable cloud-connect UDP hole-punching</source>
-      <translation type="unfinished">Enable cloud-connect UDP hole-punching</translation>
+      <translation>Aktivera UDP-hål för molnanslutning</translation>
     </message>
     <message>
       <source>Enable cloud-connect relays usage</source>
-      <translation type="unfinished">Enable cloud-connect relays usage</translation>
+      <translation>Aktivera användning av molnanslutningsreläer</translation>
     </message>
     <message>
       <source>Enforce SSL for cloud-connect relays</source>
-      <translation type="unfinished">Enforce SSL for cloud-connect relays</translation>
+      <translation>Tvinga SSL för cloud-connect relä</translation>
     </message>
     <message>
       <source>Enable recording on EDGE</source>
-      <translation type="unfinished">Enable recording on EDGE</translation>
+      <translation>Aktivera inspelning på EDGE</translation>
     </message>
     <message>
       <source>Enable WebSocket for p2p</source>
-      <translation type="unfinished">Enable WebSocket for p2p</translation>
+      <translation>Aktivera WebSocket för p2p</translation>
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32</source>
-      <translation type="unfinished">Max thread count for remote archive synchronization (&lt;=0 - auto, max 32</translation>
+      <translation>Max antal trådar för synkronisering av fjärrarkiv (&lt;=0 - auto, max 32</translation>
     </message>
     <message>
       <source>Target update information</source>
-      <translation type="unfinished">Target update information</translation>
+      <translation>Information om måluppdatering</translation>
     </message>
     <message>
       <source>Installed update information</source>
-      <translation type="unfinished">Installed update information</translation>
+      <translation>Installerad uppdateringsinformation</translation>
     </message>
     <message>
       <source>Downloader peers for files</source>
-      <translation type="unfinished">Downloader peers for files</translation>
+      <translation>Peers för nedladdningsfiler</translation>
     </message>
     <message>
       <source>Client update settings</source>
-      <translation type="unfinished">Client update settings</translation>
+      <translation>Inställningar för klientuppdatering</translation>
     </message>
     <message>
       <source>Thread count limit for Camera archive synchronization</source>
-      <translation type="unfinished">Thread count limit for Camera archive synchronization</translation>
+      <translation>Trådantalgräns för synkronisering av kameraarkiv</translation>
     </message>
     <message>
       <source>Watermark settings</source>
@@ -1435,23 +1435,23 @@
     </message>
     <message>
       <source>Authorization Session token lifetime (minutes)</source>
-      <translation type="unfinished">Authorization Session token lifetime (minutes)</translation>
+      <translation>Livstid för auktoriseringssessionstoken (minuter)</translation>
     </message>
     <message>
       <source>Session token count limit on a single Server</source>
-      <translation type="unfinished">Session token count limit on a single Server</translation>
+      <translation>Gräns för antalet sessionstoken på en enda server</translation>
     </message>
     <message>
       <source>Max session token count per user on single Server</source>
-      <translation type="unfinished">Max session token count per user on single Server</translation>
+      <translation>Max antal sessionstoken per användare på en enda server</translation>
     </message>
     <message>
       <source>Update interval for remote session token cache (other Servers and Cloud)</source>
-      <translation type="unfinished">Update interval for remote session token cache (other Servers and Cloud)</translation>
+      <translation>Uppdateringsintervall för fjärrsessionstokencache (andra servrar och moln)</translation>
     </message>
     <message>
       <source>Timeout for remote session token cache (other Servers and Cloud)</source>
-      <translation type="unfinished">Timeout for remote session token cache (other Servers and Cloud)</translation>
+      <translation>Uppdateringsintervall för fjärrsessionstokencache (andra servrar och moln)</translation>
     </message>
     <message>
       <source>Default video codec</source>
@@ -1459,7 +1459,7 @@
     </message>
     <message>
       <source>Default codec for export video</source>
-      <translation type="unfinished">Default codec for export video</translation>
+      <translation>Standard codec för export av video</translation>
     </message>
     <message>
       <source>Low quality screen video codec</source>
@@ -1471,7 +1471,7 @@
     </message>
     <message>
       <source>URI for resource_data.json automatic update</source>
-      <translation type="unfinished">URI for resource_data.json automatic update</translation>
+      <translation>URI för resource_data.json automatisk uppdatering</translation>
     </message>
     <message>
       <source>Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
@@ -1479,7 +1479,7 @@
     </message>
     <message>
       <source>Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
-      <translation type="unfinished">Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</translation>
+      <translation>Om några bilder ska cachelagras för den primära strömmen. Värden: &apos;ja&apos; - alltid aktiverat (kan använda mycket RAM-minne), &apos;nej&apos; - alltid inaktiverat utom när det krävs av uppspelningen (t.ex. HLS), &apos;auto&apos; - liknande &apos;nej&apos;, men aktiverat när förbättrar användarupplevelse (t.ex. när någon Analytics-plugin fungerar på kameran).</translation>
     </message>
     <message>
       <source>Meta data storage change policy</source>
@@ -1487,79 +1487,79 @@
     </message>
     <message>
       <source>Persistent Servers for update storage</source>
-      <translation type="unfinished">Persistent Servers for update storage</translation>
+      <translation>Beständiga servrar för uppdateringslagring</translation>
     </message>
     <message>
       <source>Persistent Servers where updates are stored</source>
-      <translation type="unfinished">Persistent Servers where updates are stored</translation>
+      <translation>Beständiga servrar där uppdateringar lagras</translation>
     </message>
     <message>
       <source>VMS Server version specific features</source>
-      <translation type="unfinished">VMS Server version specific features</translation>
+      <translation>VMS Server versionsspecifika funktioner</translation>
     </message>
     <message>
       <source>Language for mobile push notifications</source>
-      <translation type="unfinished">Language for mobile push notifications</translation>
+      <translation>Språk för mobila push-meddelanden</translation>
     </message>
     <message>
       <source>Additional local FS storage types for recording</source>
-      <translation type="unfinished">Additional local FS storage types for recording</translation>
+      <translation>Ytterligare lokala FS-lagringstyper för inspelning</translation>
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the Device</source>
-      <translation type="unfinished">Keep IO port state on when Server connects to the Device</translation>
+      <translation>Behåll IO-portstatus på när servern ansluter till enheten</translation>
     </message>
     <message>
       <source>Media buffer size (KB, 10KB-4Mb)</source>
-      <translation type="unfinished">Media buffer size (KB, 10KB-4Mb)</translation>
+      <translation>Mediebuffertstorlek (KB, 10KB-4Mb)</translation>
     </message>
     <message>
       <source>Media buffer size for audio only Devices (KB, 1Kb-1MB)</source>
-      <translation type="unfinished">Media buffer size for audio only Devices (KB, 1Kb-1MB)</translation>
+      <translation>Mediebuffertstorlek för enheter endast för ljud (KB, 1Kb-1MB)</translation>
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>
-      <translation type="unfinished">Force analytics DB storage mount point permissions in case of failure</translation>
+      <translation>Tvinga tillstånd för monteringspunkt för analytics DB-lagring vid fel</translation>
     </message>
     <message>
       <source>Check video stream period (milliseconds)</source>
-      <translation type="unfinished">Check video stream period (milliseconds)</translation>
+      <translation>Kontrollera videoströmningsperioden (millisekunder)</translation>
     </message>
     <message>
       <source>Storage encryption enabled</source>
-      <translation type="unfinished">Storage encryption enabled</translation>
+      <translation>Lagringskryptering aktiverad</translation>
     </message>
     <message>
       <source>Current storage encryption key</source>
-      <translation type="unfinished">Current storage encryption key</translation>
+      <translation>Aktuell lagringskrypteringsnyckel</translation>
     </message>
     <message>
       <source>Show Servers in tree for non-admins</source>
-      <translation type="unfinished">Show Servers in tree for non-admins</translation>
+      <translation>Visa servrar i trädet för icke-administratörer</translation>
     </message>
     <message>
       <source>HTTP header: Origin</source>
-      <translation type="unfinished">HTTP header: Origin</translation>
+      <translation>HTTP-huvud: Ursprung</translation>
     </message>
     <message>
       <source>HTTP header: X-Frame-Options</source>
-      <translation type="unfinished">HTTP header: X-Frame-Options</translation>
+      <translation>HTTP-huvud: X-Frame-Options</translation>
     </message>
     <message>
       <source>Use only HTTPS for Cameras</source>
-      <translation type="unfinished">Use only HTTPS for Cameras</translation>
+      <translation>Använd endast HTTPS för kameror</translation>
     </message>
     <message>
       <source>Enable insecure deprecated API</source>
-      <translation type="unfinished">Enable insecure deprecated API</translation>
+      <translation>Aktivera osäkra utfasade API</translation>
     </message>
     <message>
       <source>Enable insecure deprecated API functions curently in use by Nx products</source>
-      <translation type="unfinished">Enable insecure deprecated API functions curently in use by Nx products</translation>
+      <translation>Aktivera osäkra föråldrade API-funktioner som för närvarande används av Nx-produkter</translation>
     </message>
     <message>
       <source>Show mouse timeline preview</source>
-      <translation type="unfinished">Show mouse timeline preview</translation>
+      <translation>Visa förhandsgranskning med musen</translation>
     </message>
   </context>
   <context>
@@ -2215,7 +2215,7 @@
     </message>
     <message>
       <source>Intercom informer</source>
-      <translation type="unfinished">Intercom informer</translation>
+      <translation>Intercom informatör</translation>
     </message>
     <message>
       <source>Failed to backup file</source>

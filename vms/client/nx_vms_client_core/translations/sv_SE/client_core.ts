@@ -245,7 +245,7 @@
     </message>
     <message>
       <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
-      <translation>Du försökte ansluta till den här servern, men den visade ett certifikat som inte kan verifieras automatiskt.</translation>
+      <translation>Du försökte ansluta till men servern presenterade ett certifikat, som inte kan verifieras automatiskt.</translation>
     </message>
     <message>
       <source>Someone may be impersonating this Server to steal your personal information.</source>
@@ -253,7 +253,7 @@
     </message>
     <message>
       <source>You attempted to connect to this Server but the Server&apos;s certificate has changed.</source>
-      <translation type="unfinished">You attempted to connect to this Server but the Server&apos;s certificate has changed.</translation>
+      <translation>Du försökte ansluta till den här servern men Server&apos;:s certifikat har ändrats.</translation>
     </message>
     <message>
       <source>Do not connect to this Server unless instructed by your VMS administrator.</source>

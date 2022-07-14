@@ -80,18 +80,18 @@
     </message>
     <message>
       <source>Backup Finished</source>
-      <translation type="unfinished">Backup Finished</translation>
+      <translation>Säkerhetskopiering avslutad</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::BasicEvent</name>
     <message>
       <source>Unknown event</source>
-      <translation type="unfinished">Unknown event</translation>
+      <translation>Okänd händelse</translation>
     </message>
     <message>
       <source>%1 event has occurred</source>
-      <translation type="unfinished">%1 event has occurred</translation>
+      <translation>%1 händelse har inträffat</translation>
     </message>
   </context>
   <context>
@@ -106,7 +106,7 @@
     </message>
     <message>
       <source>Input Signal on Camera</source>
-      <translation type="unfinished">Input Signal on Camera</translation>
+      <translation>Ingångssignal på kameran</translation>
     </message>
     <message>
       <source>State</source>
@@ -125,7 +125,7 @@
     <name>nx::vms::rules::DebugEvent</name>
     <message>
       <source>Debug Event</source>
-      <translation type="unfinished">Debug Event</translation>
+      <translation>Felsökningshändelse</translation>
     </message>
     <message>
       <source>Action</source>
@@ -133,7 +133,7 @@
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Värde</translation>
     </message>
   </context>
   <context>
@@ -164,11 +164,11 @@
     </message>
     <message>
       <source>Device Disconnected</source>
-      <translation type="unfinished">Device Disconnected</translation>
+      <translation>Enheten är frånkopplad</translation>
     </message>
     <message>
       <source>Device ID</source>
-      <translation type="unfinished">Device ID</translation>
+      <translation>Enhets ID</translation>
     </message>
   </context>
   <context>
@@ -254,15 +254,15 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Åtgärdsintervall</translation>
     </message>
     <message>
       <source>HTTP Url</source>
-      <translation type="unfinished">HTTP Url</translation>
+      <translation>HTTP URL</translation>
     </message>
     <message>
       <source>HTTP Content</source>
-      <translation type="unfinished">HTTP Content</translation>
+      <translation>HTTP innehåll</translation>
     </message>
     <message>
       <source>Content type</source>
@@ -278,7 +278,7 @@
     </message>
     <message>
       <source>Request method</source>
-      <translation type="unfinished">Request method</translation>
+      <translation>Metod för begäran</translation>
     </message>
   </context>
   <context>
@@ -312,7 +312,7 @@
     </message>
     <message>
       <source>Motion Event</source>
-      <translation type="unfinished">Motion Event</translation>
+      <translation>Rörelsehändelse</translation>
     </message>
     <message>
       <source>State</source>
@@ -338,7 +338,7 @@
     <name>nx::vms::rules::NotificationAction</name>
     <message>
       <source>Show Notification</source>
-      <translation type="unfinished">Show Notification</translation>
+      <translation>Visa notifikation</translation>
     </message>
     <message>
       <source>To</source>
@@ -346,11 +346,11 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Intervall av åtgärder</translation>
     </message>
     <message>
       <source>Force Acknowledgement</source>
-      <translation type="unfinished">Force Acknowledgement</translation>
+      <translation>Tvinga bekräftelse</translation>
     </message>
     <message>
       <source>Caption</source>
@@ -362,7 +362,7 @@
     </message>
     <message>
       <source>Tooltip</source>
-      <translation type="unfinished">Tooltip</translation>
+      <translation>Verktygstips</translation>
     </message>
   </context>
   <context>
@@ -373,7 +373,7 @@
     </message>
     <message>
       <source>%1 - %2</source>
-      <translation type="unfinished">%1 - %2</translation>
+      <translation>%1 - %2</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -436,15 +436,15 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Åtgärdsintervall</translation>
     </message>
     <message>
       <source>Additional recipients</source>
-      <translation type="unfinished">Additional recipients</translation>
+      <translation>Ytterligare mottagare</translation>
     </message>
     <message>
       <source>Email Message</source>
-      <translation type="unfinished">Email Message</translation>
+      <translation>E-postmeddelande</translation>
     </message>
   </context>
   <context>
@@ -556,7 +556,7 @@
     </message>
     <message>
       <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <translation>Handlingsintervall</translation>
     </message>
     <message>
       <source>Speak to users</source>
