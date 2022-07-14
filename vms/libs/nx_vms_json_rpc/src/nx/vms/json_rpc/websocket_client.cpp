@@ -126,7 +126,13 @@ void WebSocketClient::sendAsync(api::JsonRpcRequest request, ResponseHandler han
                     }
 
                     api::JsonRpcResponse response;
-                    response.id = request.id.value_or(QJsonValue());
+                    if (request.id)
+                    {
+                        if (std::holds_alternative<int>(*request.id))
+                            response.id = std::get<int>(*request.id);
+                        else
+                            response.id = std::get<QString>(*request.id);
+                    }
                     response.error = api::JsonRpcError{
                         api::JsonRpcError::InternalError,
                         NX_FMT("Failed to establish connnection to %1 with error %2",

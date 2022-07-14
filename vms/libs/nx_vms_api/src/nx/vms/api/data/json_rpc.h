@@ -4,8 +4,11 @@
 
 #include <optional>
 #include <string>
+#include <variant>
 
+#include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
+#include <QtCore/QJsonObject>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
@@ -14,22 +17,14 @@ namespace nx::vms::api {
 
 struct NX_VMS_API JsonRpcRequest
 {
-    /*const*/ std::string jsonrpc = "2.0";
+    /**%apidoc
+     * %value "2.0"
+     */
+    std::string jsonrpc = "2.0";
+
     std::string method;
-
-    /*
-     * TODO: Replace with std::optional<std::variant<QJsonObject, QJsonArray>> when apidoctool will
-     * support this.
-     */
-    /**%apidoc:any */
-    std::optional<QJsonValue> params;
-
-    /*
-     * TODO: Replace with std::optional<std::variant<int, std::string>> when apidoctool will
-     * support std::variant.
-     */
-    /**%apidoc:any */
-    std::optional<QJsonValue> id;
+    std::optional<std::variant<QJsonObject, QJsonArray>> params;
+    std::optional<std::variant<int, QString>> id;
 };
 #define JsonRpcRequest_Fields (jsonrpc)(method)(params)(id)
 QN_FUSION_DECLARE_FUNCTIONS(JsonRpcRequest, (json), NX_VMS_API)
@@ -50,8 +45,6 @@ struct NX_VMS_API JsonRpcError
 
     int code = RequestError;
     std::string message;
-
-    /**%apidoc:any */
     std::optional<QJsonValue> data;
 };
 #define JsonRpcError_Fields (code)(message)(data)
@@ -60,16 +53,12 @@ NX_REFLECTION_INSTRUMENT(JsonRpcError, JsonRpcError_Fields);
 
 struct NX_VMS_API JsonRpcResponse
 {
-    /*const*/ std::string jsonrpc = "2.0";
-
-    /*
-     * TODO: Replace with std::variant<int, std::string, QJsonValue(QJsonValue::Null)> when
-     * apidoctool will support this.
+    /**%apidoc
+     * %value "2.0"
      */
-    /**%apidoc:any */
-    QJsonValue id;
+    std::string jsonrpc = "2.0";
 
-    /**%apidoc:any */
+    std::variant<int, QString, std::nullptr_t> id{std::nullptr_t()};
     std::optional<QJsonValue> result;
     std::optional<JsonRpcError> error;
 };
