@@ -16,27 +16,19 @@ static api::JsonRpcRequest deserialize(const QJsonValue& data)
     {
         QnJsonContext ctx;
         ctx.setStrictMode(true);
-        if (!QJson::deserialize(&ctx, data, &jsonRpcRequest))
-            throw QJson::InvalidParameterException(ctx.getFailedKeyValue());
-
-        if (jsonRpcRequest.id)
-        {
-            const auto type = jsonRpcRequest.id->type();
-            if (type != QJsonValue::Double
-                && type != QJsonValue::String
-                && type != QJsonValue::Null)
-            {
-                throw QJson::InvalidParameterException(
-                    {QString("id"), QString("Must be number, string or null")});
-            }
-        }
-
+        jsonRpcRequest = QJson::deserializeOrThrow<api::JsonRpcRequest>(&ctx, data);
         return jsonRpcRequest;
     }
     catch (const QJson::InvalidParameterException& e)
     {
         api::JsonRpcResponse jsonRpcResponse;
-        jsonRpcResponse.id = jsonRpcRequest.id.value_or(QJsonValue());
+        if (jsonRpcRequest.id)
+        {
+            if (std::holds_alternative<int>(*jsonRpcRequest.id))
+                jsonRpcResponse.id = std::get<int>(*jsonRpcRequest.id);
+            else
+                jsonRpcResponse.id = std::get<QString>(*jsonRpcRequest.id);
+        }
         jsonRpcResponse.error = api::JsonRpcError{Error::InvalidRequest, e.message().toStdString()};
         throw jsonRpcResponse;
     }
@@ -70,13 +62,19 @@ void IncomingProcessor::processRequest(
     try
     {
         auto jsonRpcRequest = deserialize(data);
-        auto id = jsonRpcRequest.id.value_or(QJsonValue());
+        auto id = jsonRpcRequest.id;
         if (!m_handler)
         {
             NX_DEBUG(this,
                 "Ignore request %1 with method %2", QJson::serialized(id), jsonRpcRequest.method);
             api::JsonRpcResponse jsonRpcResponse;
-            jsonRpcResponse.id = id;
+            if (jsonRpcRequest.id)
+            {
+                if (std::holds_alternative<int>(*jsonRpcRequest.id))
+                    jsonRpcResponse.id = std::get<int>(*jsonRpcRequest.id);
+                else
+                    jsonRpcResponse.id = std::get<QString>(*jsonRpcRequest.id);
+            }
             jsonRpcResponse.error = api::JsonRpcError{Error::MethodNotFound};
             return sendResponse(std::move(jsonRpcResponse), std::move(handler));
         }
@@ -114,7 +112,7 @@ void IncomingProcessor::processBatchRequest(
         try
         {
             auto jsonRpcRequest = deserialize(item);
-            auto id = jsonRpcRequest.id.value_or(QJsonValue());
+            auto id = jsonRpcRequest.id;
             if (m_handler)
             {
                 auto request = std::make_unique<Request>(std::move(jsonRpcRequest));
@@ -126,7 +124,13 @@ void IncomingProcessor::processBatchRequest(
                 NX_DEBUG(this, "Ignore request %1 with method %2",
                     QJson::serialized(id), jsonRpcRequest.method);
                 api::JsonRpcResponse jsonRpcResponse;
-                jsonRpcResponse.id = id;
+                if (jsonRpcRequest.id)
+                {
+                    if (std::holds_alternative<int>(*jsonRpcRequest.id))
+                        jsonRpcResponse.id = std::get<int>(*jsonRpcRequest.id);
+                    else
+                        jsonRpcResponse.id = std::get<QString>(*jsonRpcRequest.id);
+                }
                 jsonRpcResponse.error = api::JsonRpcError{Error::MethodNotFound};
                 responses.push_back(std::move(jsonRpcResponse));
             }
@@ -184,7 +188,7 @@ void IncomingProcessor::onBatchResponse(
         return;
     }
 
-    if (!response.id.isNull() || response.error)
+    if (!std::holds_alternative<std::nullptr_t>(response.id) || response.error)
         it->second->responses.push_back(std::move(response));
 
     NX_ASSERT(it->second->requests.erase(request),
@@ -209,7 +213,7 @@ void IncomingProcessor::sendResponse(nx::vms::api::JsonRpcResponse jsonRpcRespon
         ? "Send error response " + QJson::serialized(jsonRpcResponse)
         : "Send response " + QJson::serialized(jsonRpcResponse.id));
     QJsonValue serialized;
-    if (!jsonRpcResponse.id.isNull() || jsonRpcResponse.error)
+    if (!std::holds_alternative<std::nullptr_t>(jsonRpcResponse.id) || jsonRpcResponse.error)
         QJson::serialize(jsonRpcResponse, &serialized);
     else
         NX_DEBUG(this, "Ignored response %1", QJson::serialized(jsonRpcResponse));

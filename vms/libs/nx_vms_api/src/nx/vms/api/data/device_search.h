@@ -39,30 +39,14 @@ struct NX_VMS_API DeviceSearchStatus
 
 #define DeviceSearchStatus_Fields (state)(current)(total)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceSearchStatus, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(DeviceSearchStatus, DeviceSearchStatus_Fields)
 
-struct NX_VMS_API DeviceSearch
+struct NX_VMS_API DeviceSearchBase
 {
     /**%apidoc[readonly] Id of the search to get the status. */
     QnUuid id;
 
-    /**%apidoc
-     * IP address of the Device. Must be specified if startIp and endIp are not specified.
-     * NOTE: Some Device drivers may also accept URL in this field.
-     */
-    std::optional<QString> ip;
-
-    /**%apidoc
-     * Starting IP address of the IP address range to search Device(s) in. Must be specified if
-     * `ip` is not specified.
-     */
-    std::optional<QString> startIp;
-
-    /**%apidoc
-     * End IP of IP range to search Device(s) on. Must be specified if ip is not specified.
-     */
-    std::optional<QString> endIp;
-
-    /**%apidoc Port to search device(s) on. */
+    /**%apidoc Target port to search Device(s) on. */
     std::optional<int> port;
 
     /**%apidoc Device credentials if necessary. */
@@ -88,10 +72,68 @@ struct NX_VMS_API DeviceSearch
 
     QnUuid getId() const { return id; }
     void setId(QnUuid id) { this->id = std::move(id); }
-    static_assert(nx::vms::api::isCreateModelV<DeviceSearch>);
+    static_assert(nx::vms::api::isCreateModelV<DeviceSearchBase>);
 };
+#define DeviceSearchBase_Fields (id)(port)(credentials)(mode)(status)(devices)
 
-#define DeviceSearch_Fields (id)(ip)(startIp)(endIp)(port)(credentials)(mode)(status)(devices)
-QN_FUSION_DECLARE_FUNCTIONS(DeviceSearch, (json), NX_VMS_API)
+struct NX_VMS_API DeviceSearchIp
+{
+    /**%apidoc
+     * IP address of the Device. NOTE: Some Device drivers can also accept URL in this field.
+     */
+    QString ip;
+};
+#define DeviceSearchIp_Fields (ip)
+QN_FUSION_DECLARE_FUNCTIONS(DeviceSearchIp, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(DeviceSearchIp, DeviceSearchIp_Fields)
+
+struct NX_VMS_API DeviceSearchIpRange
+{
+    /**%apidoc Start IP address of the IP address range to search Device(s) in. */
+    QString startIp;
+
+    /**%apidoc End IP address of the IP address range to search Device(s) in. */
+    QString endIp;
+};
+#define DeviceSearchIpRange_Fields (startIp)(endIp)
+QN_FUSION_DECLARE_FUNCTIONS(DeviceSearchIpRange, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(DeviceSearchIpRange, DeviceSearchIpRange_Fields)
+
+struct NX_VMS_API DeviceSearchV2: DeviceSearchBase
+{
+    std::variant<DeviceSearchIp, DeviceSearchIpRange> target;
+};
+#define DeviceSearchV2_Fields DeviceSearchBase_Fields(target)
+QN_FUSION_DECLARE_FUNCTIONS(DeviceSearchV2, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(DeviceSearchV2, DeviceSearchV2_Fields)
+
+struct NX_VMS_API DeviceSearchV1: DeviceSearchBase
+{
+    /**%apidoc
+     * IP address of the Device. Must be specified if `startIp` and `endIp` are not specified.
+     * NOTE: Some Device drivers can also accept URL in this field.
+     */
+    std::optional<QString> ip;
+
+    /**%apidoc
+     * Start IP address of the IP address range to search Device(s) in. Must be specified if `ip`
+     * is not specified.
+     */
+    std::optional<QString> startIp;
+
+    /**%apidoc
+     * End IP address of the IP address range to search Device(s) in. Must be specified if `ip` is
+     * not specified.
+     */
+    std::optional<QString> endIp;
+
+    DeviceSearchV1() = default;
+    DeviceSearchV1(DeviceSearchV2&& origin);
+};
+#define DeviceSearchV1_Fields DeviceSearchBase_Fields(ip)(startIp)(endIp)
+QN_FUSION_DECLARE_FUNCTIONS(DeviceSearchV1, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(DeviceSearchV1, DeviceSearchV1_Fields)
+
+using DeviceSearch = DeviceSearchV2;
 
 } // namespace nx::vms::api
