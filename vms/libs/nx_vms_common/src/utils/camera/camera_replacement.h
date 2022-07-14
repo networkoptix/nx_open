@@ -21,7 +21,6 @@ namespace camera_replacement {
  *     - It's not a multisensor camera
  *     - It's not an I/O module
  *     - It's device that provides video output, e.g. not a speaker
- *     - It's doesn't have unauthorized status
  */
 bool NX_VMS_COMMON_API cameraSupportsReplacement(const QnResourcePtr& resource);
 
