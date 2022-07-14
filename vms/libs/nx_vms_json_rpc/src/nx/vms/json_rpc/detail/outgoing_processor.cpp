@@ -8,47 +8,28 @@ namespace std {
 
 static QString toString(const nx::vms::json_rpc::detail::OutgoingProcessor::Id& value)
 {
-    return std::holds_alternative<int64_t>(value)
-        ? nx::toString(std::get<int64_t>(value))
+    return std::holds_alternative<int>(value)
+        ? nx::toString(std::get<int>(value))
         : '"' + std::get<QString>(value) + '"';
 }
 
 } // std
 
-static nx::vms::json_rpc::detail::OutgoingProcessor::Id toId(const QJsonValue& value)
-{
-    nx::vms::json_rpc::detail::OutgoingProcessor::Id id;
-    if (value.isDouble())
-        id = (int64_t) value.toDouble();
-    else
-        id = value.toString();
-    return id;
-}
-
 namespace nx::vms::json_rpc::detail {
+
+static OutgoingProcessor::Id toId(const std::variant<int, QString, std::nullptr_t>& id)
+{
+    if (std::holds_alternative<int>(id))
+        return std::get<int>(id);
+    return std::get<QString>(id);
+}
 
 using Error = nx::vms::api::JsonRpcError::Code;
 
 void OutgoingProcessor::processRequest(
     nx::vms::api::JsonRpcRequest jsonRpcRequest, ResponseHandler handler)
 {
-    const auto idValue = jsonRpcRequest.id.value_or(QJsonValue());
-    const auto idType = idValue.type();
-    if (!NX_ASSERT(
-        idType == QJsonValue::Double || idType == QJsonValue::String || idType == QJsonValue::Null,
-        "Id %1 must be number, string or null", idValue))
-    {
-        if (!handler)
-            return;
-
-        nx::vms::api::JsonRpcResponse jsonRpcResponse;
-        jsonRpcResponse.id = idValue;
-        jsonRpcResponse.error = nx::vms::api::JsonRpcError{
-            Error::InvalidRequest, "Invalid parameter 'id': Must be number, string or null"};
-        return handler(std::move(jsonRpcResponse));
-    }
-
-    if (idType == QJsonValue::Null)
+    if (!jsonRpcRequest.id)
     {
         NX_DEBUG(this, "Send request with notification method %1", jsonRpcRequest.method);
         send(std::move(jsonRpcRequest));
@@ -57,7 +38,7 @@ void OutgoingProcessor::processRequest(
         return;
     }
 
-    auto id = toId(idValue);
+    auto id = *jsonRpcRequest.id;
     if (m_awaitingBatchResponses.contains(id) || m_awaitingResponses.contains(id))
     {
         NX_DEBUG(this, "Id %1 is already used", id);
@@ -65,7 +46,10 @@ void OutgoingProcessor::processRequest(
             return;
 
         nx::vms::api::JsonRpcResponse jsonRpcResponse;
-        jsonRpcResponse.id = idValue;
+        if (std::holds_alternative<int>(id))
+            jsonRpcResponse.id = std::get<int>(id);
+        else
+            jsonRpcResponse.id = std::get<QString>(id);
         jsonRpcResponse.error = nx::vms::api::JsonRpcError{
             Error::InvalidRequest, "Invalid parameter 'id': Already used"};
         return handler(std::move(jsonRpcResponse));
@@ -84,32 +68,21 @@ void OutgoingProcessor::processBatchRequest(
     std::unordered_set<Id> ids;
     for (auto& jsonRpcRequest: jsonRpcRequests)
     {
-        const auto idValue = jsonRpcRequest.id.value_or(QJsonValue());
-        const auto idType = idValue.type();
-        if (!NX_ASSERT(
-            idType == QJsonValue::Double || idType == QJsonValue::String || idType == QJsonValue::Null,
-            "Id %1 must be number, string or null", idValue))
-        {
-            nx::vms::api::JsonRpcResponse jsonRpcResponse;
-            jsonRpcResponse.id = idValue;
-            jsonRpcResponse.error = nx::vms::api::JsonRpcError{Error::InvalidRequest,
-                "Invalid parameter 'id': Must be number, string or null"};
-            awaitingResponse.errors.push_back(std::move(jsonRpcResponse));
-            continue;
-        }
-
-        if (idType == QJsonValue::Null)
+        if (!jsonRpcRequest.id)
         {
             goodRequests.push_back(std::move(jsonRpcRequest));
             continue;
         }
 
-        auto id = toId(idValue);
+        auto id = *jsonRpcRequest.id;
         if (m_awaitingBatchResponses.contains(id) || m_awaitingResponses.contains(id))
         {
             NX_DEBUG(this, "Id %1 is already used", id);
             nx::vms::api::JsonRpcResponse jsonRpcResponse;
-            jsonRpcResponse.id = idValue;
+            if (std::holds_alternative<int>(id))
+                jsonRpcResponse.id = std::get<int>(id);
+            else
+                jsonRpcResponse.id = std::get<QString>(id);
             jsonRpcResponse.error = nx::vms::api::JsonRpcError{
                 Error::InvalidRequest, "Invalid parameter 'id': Already used"};
             awaitingResponse.errors.push_back(std::move(jsonRpcResponse));
@@ -120,7 +93,10 @@ void OutgoingProcessor::processBatchRequest(
         {
             NX_DEBUG(this, "Id %1 is already used in this batch request", id);
             nx::vms::api::JsonRpcResponse jsonRpcResponse;
-            jsonRpcResponse.id = idValue;
+            if (std::holds_alternative<int>(id))
+                jsonRpcResponse.id = std::get<int>(id);
+            else
+                jsonRpcResponse.id = std::get<QString>(id);
             jsonRpcResponse.error = nx::vms::api::JsonRpcError{Error::InvalidRequest,
                 "Invalid parameter 'id': Already used in this batch request"};
             awaitingResponse.errors.push_back(std::move(jsonRpcResponse));
@@ -166,7 +142,7 @@ void OutgoingProcessor::processBatchRequest(
             std::vector<std::string_view> result;
             for (const auto& r: goodRequests)
             {
-                if (!r.id || r.id->isNull())
+                if (!r.id)
                     result.push_back(r.method);
             }
             return result;
@@ -209,15 +185,8 @@ void OutgoingProcessor::onResponse(const QJsonValue& data)
             Error::InvalidJson, "Failed to deserialize response", data};
     }
 
-    const auto idType = jsonRpcResponse.id.type();
-    if (idType != QJsonValue::Double && idType != QJsonValue::String)
+    if (std::holds_alternative<std::nullptr_t>(jsonRpcResponse.id))
     {
-        if (idType != QJsonValue::Null)
-        {
-            NX_DEBUG(this, "Ignore response with invalid type id: %1", data);
-            return;
-        }
-
         if (m_awaitingResponses.size() == 1)
         {
             NX_DEBUG(this, "Apply %1 response to any previously sent request", data);
@@ -265,16 +234,8 @@ void OutgoingProcessor::onResponse(const QJsonArray& list)
             continue;
         }
 
-        const auto idType = jsonRpcResponse.id.type();
-        if (idType != QJsonValue::Double && idType != QJsonValue::String)
+        if (std::holds_alternative<std::nullptr_t>(jsonRpcResponse.id))
         {
-            if (idType != QJsonValue::Null)
-            {
-                NX_DEBUG(this, "Invalid id type in response item %1: %2", i, list);
-                jsonRpcResponse.error = nx::vms::api::JsonRpcError{Error::InvalidParams,
-                    NX_FMT("Invalid id type in response item %1", i).toStdString(),
-                    list};
-            }
             nullResponses.push_back(std::move(jsonRpcResponse));
             continue;
         }
