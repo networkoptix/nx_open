@@ -645,12 +645,32 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createLayoutsGroupEntity() const
         resourceItemCreator(m_itemFactory.get(), userGlobalPermissions()),
         [this](const QnResourcePtr& resource) { return createLayoutItemListEntity(resource); },
         layoutsOrder());
-
     layoutsGroupList->installItemSource(m_itemKeySourcePool->layoutsSource(user()));
+
+    auto cloudLayoutItemCreator =
+        [this](const QnResourcePtr& resource)
+        {
+            auto layout = resource.dynamicCast<QnLayoutResource>();
+            NX_ASSERT(layout);
+            return m_itemFactory->createCloudLayoutItem(layout);
+        };
+
+    auto layoutsComposition = std::make_unique<CompositionEntity>();
+    layoutsComposition->addSubEntity(std::move(layoutsGroupList));
+
+    if (ini().crossSystemLayouts)
+    {
+        auto cloudLayoutsList = makeUniqueKeyGroupList<QnResourcePtr>(
+            cloudLayoutItemCreator,
+            [this](const QnResourcePtr& layout) { return createLayoutItemListEntity(layout); },
+            layoutsOrder());
+        cloudLayoutsList->installItemSource(m_itemKeySourcePool->cloudLayoutsSource());
+        layoutsComposition->addSubEntity(std::move(cloudLayoutsList));
+    }
 
     return makeFlatteningGroup(
         m_itemFactory->createLayoutsItem(),
-        std::move(layoutsGroupList),
+        std::move(layoutsComposition),
         FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy);
 }
 
@@ -663,7 +683,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createShowreelsGroupEntity() const
 
     return makeFlatteningGroup(
         m_itemFactory->createShowreelsItem(),
-        std::make_unique<ShowreeelsListEntity>(showreelItemCreator, layoutTourManager),
+        std::make_unique<ShowreelsListEntity>(showreelItemCreator, layoutTourManager),
         FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy);
 }
 

@@ -23,7 +23,6 @@ public:
     virtual QVector<QnResourcePtr> getResources() override;
 
 private:
-    const QnResourcePool* m_resourcePool;
     const std::function<bool(const QnResourcePtr&)> m_resourceFilter;
     const std::unique_ptr<AbstractResourceSource> m_baseResourceSource;
 };

@@ -5,18 +5,15 @@
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/unique_key_source.h>
 
-class QnCommonModule;
-
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
-class CloudSystemsSource: public nx::vms::client::desktop::entity_item_model::UniqueStringSource
+class CloudLayoutsSource: public entity_item_model::UniqueResourceSource
 {
 public:
-    CloudSystemsSource(const QnCommonModule* commonModule);
+    CloudLayoutsSource();
 
 private:
-    const QnCommonModule* m_commonModule;
     nx::utils::ScopedConnections m_connectionsGuard;
 };
 

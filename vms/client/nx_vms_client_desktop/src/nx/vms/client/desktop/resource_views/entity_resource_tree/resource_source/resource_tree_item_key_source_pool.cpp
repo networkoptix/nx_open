@@ -6,19 +6,23 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/camera_resource_index.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/layout_resource_index.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/webpage_resource_index.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
+#include <nx/vms/client/desktop/cross_system/resource_tree/cloud_layouts_source.h>
+#include <nx/vms/client/desktop/cross_system/resource_tree/cloud_system_cameras_source.h>
+#include <nx/vms/client/desktop/cross_system/resource_tree/cloud_systems_source.h>
+#include <nx/vms/client/desktop/system_context.h>
 
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/user_roles_provider.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/cloud_systems_source.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/abstract_resource_source.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/composite_resource_source.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/accessible_resource_proxy_source.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/cloud_system_cameras_source.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/filtered_resource_proxy_source.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/parent_servers_proxy_source.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/resource_sources/all_resource_key_sources.h>
+#include "../camera_resource_index.h"
+#include "../layout_resource_index.h"
+#include "../webpage_resource_index.h"
+#include "abstract_resource_source.h"
+#include "accessible_resource_proxy_source.h"
+#include "composite_resource_source.h"
+#include "filtered_resource_proxy_source.h"
+#include "parent_servers_proxy_source.h"
+#include "resource_sources/all_resource_key_sources.h"
+#include "user_roles_provider.h"
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
@@ -228,6 +232,11 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::fileLayoutsSource()
         std::make_unique<FileLayoutsSource>(resourcePool()));
 }
 
+UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::cloudLayoutsSource()
+{
+    return std::make_shared<CloudLayoutsSource>();
+}
+
 UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::localMediaSource()
 {
     return std::make_shared<ResourceSourceAdapter>(
@@ -242,7 +251,7 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::fakeServerResourcesSource
 
 UniqueStringSourcePtr ResourceTreeItemKeySourcePool::cloudSystemsSource()
 {
-    return std::make_shared<CloudSystemsSource>(m_commonModule);
+    return std::make_shared<CloudSystemsSource>();
 }
 
 UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::cloudSystemCamerasSource(

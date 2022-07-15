@@ -4,39 +4,34 @@
 
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QVariant>
-
 #include <QtGui/QContextMenuEvent>
-
 #include <QtWidgets/QLayout>
-#include <QtWidgets/QStyle>
 #include <QtWidgets/QMenu>
+#include <QtWidgets/QStyle>
 
-#include <common/common_module.h>
-
-#include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
-
+#include <client/client_settings.h>
+#include <common/common_module.h>
 #include <core/resource/layout_resource.h>
-#include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item_index.h>
+#include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
-
-#include <utils/common/checked_cast.h>
-
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <ui/workbench/workbench.h>
-#include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_layout_snapshot_manager.h>
-#include <ui/workaround/hidpi_workarounds.h>
-
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
-
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resources/layout_snapshot_manager.h>
+#include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
+#include <ui/workaround/hidpi_workarounds.h>
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_layout.h>
 
+using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
 namespace {
@@ -71,16 +66,27 @@ QnLayoutTabBar::QnLayoutTabBar(QWidget* parent):
         &QnLayoutTabBar::at_workbench_layoutsChanged);
     connect(workbench(), &QnWorkbench::currentLayoutChanged, this,
         &QnLayoutTabBar::at_workbench_currentLayoutChanged);
-    connect(snapshotManager(), &QnWorkbenchLayoutSnapshotManager::layoutFlagsChanged, this,
+
+    // Layouts can currently be stored only in the current and cloud layouts contexts.
+    connect(appContext()->currentSystemContext()->layoutSnapshotManager(),
+        &LayoutSnapshotManager::layoutFlagsChanged,
+        this,
         &QnLayoutTabBar::at_snapshotManager_flagsChanged);
+
+    if (nx::vms::client::desktop::ini().crossSystemLayouts)
+    {
+        connect(appContext()->cloudLayoutsSystemContext()->layoutSnapshotManager(),
+            &LayoutSnapshotManager::layoutFlagsChanged,
+            this,
+            &QnLayoutTabBar::at_snapshotManager_flagsChanged);
+    }
 
     m_submit = m_update = true;
 }
 
 QnLayoutTabBar::~QnLayoutTabBar()
 {
-    disconnect(workbench(), nullptr, this, nullptr);
-    disconnect(snapshotManager(), nullptr, this, nullptr);
+    workbench()->disconnect(this);
 
     m_submit = m_update = false;
     while (count() > 0)
@@ -159,7 +165,11 @@ QString QnLayoutTabBar::layoutText(QnWorkbenchLayout* layout) const
     }
 
     QnLayoutResourcePtr resource = layout->resource();
-    return snapshotManager()->isModified(resource)
+    auto systemContext = SystemContext::fromResource(resource);
+    if (!NX_ASSERT(systemContext))
+        return baseName;
+
+    return systemContext->layoutSnapshotManager()->isModified(resource)
         ? baseName + '*'
         : baseName;
 }
@@ -404,22 +414,27 @@ void QnLayoutTabBar::tabInserted(int index)
             name = tabText(index);
         }
 
-        QnWorkbenchLayout *layout = m_layouts[index];
-        connect(layout, &QnWorkbenchLayout::nameChanged, this, [this, layout]
-        {
-            updateTabText(layout);
-        });
-        connect(layout, &QnWorkbenchLayout::lockedChanged, this, [this, layout]
-        {
-            updateTabIcon(layout);
-        });
-        connect(layout, &QnWorkbenchLayout::titleChanged, this, [this, layout]
-        {
-            updateTabText(layout);
-            updateTabIcon(layout);
-        });
-        connect(layout, &QnWorkbenchLayout::iconChanged, this,
-            [this, layout](){ updateTabIcon(layout); });
+        QnWorkbenchLayout* layout = m_layouts[index];
+        connect(layout,
+            &QnWorkbenchLayout::nameChanged,
+            this,
+            [this, layout] { updateTabText(layout); });
+        connect(layout,
+            &QnWorkbenchLayout::lockedChanged,
+            this,
+            [this, layout] { updateTabIcon(layout); });
+        connect(layout,
+            &QnWorkbenchLayout::titleChanged,
+            this,
+            [this, layout]
+            {
+                updateTabText(layout);
+                updateTabIcon(layout);
+            });
+        connect(layout,
+            &QnWorkbenchLayout::iconChanged,
+            this,
+            [this, layout]() { updateTabIcon(layout); });
 
         if (!name.isNull())
             layout->setName(name); /* It is important to set the name after connecting so that the name change signal is delivered to us. */

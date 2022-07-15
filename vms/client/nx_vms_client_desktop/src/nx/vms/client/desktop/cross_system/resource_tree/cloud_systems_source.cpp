@@ -4,16 +4,22 @@
 
 #include <QtCore/QVector>
 
-#include <common/common_module.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
+
+#include "../cloud_cross_system_manager.h"
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
 namespace {
+
+QString connectedCloudSystemId()
+{
+    return appContext()->currentSystemContext()->globalSettings()->cloudSystemId();
+}
 
 QVector<QString> getOtherCloudSystemsIds(const QString& thisCloudSystemId)
 {
@@ -32,8 +38,7 @@ QVector<QString> getOtherCloudSystemsIds(const QString& thisCloudSystemId)
 
 } // namespace
 
-CloudSystemsSource::CloudSystemsSource(const QnCommonModule* commonModule):
-    m_commonModule(commonModule)
+CloudSystemsSource::CloudSystemsSource()
 {
     initializeRequest =
         [this]
@@ -47,7 +52,7 @@ CloudSystemsSource::CloudSystemsSource(const QnCommonModule* commonModule):
                 cloudSystemsManager, &CloudCrossSystemManager::systemFound,
                     [this](const QString& systemId)
                     {
-                        if (systemId != m_commonModule->globalSettings()->cloudSystemId())
+                        if (systemId != connectedCloudSystemId())
                         {
                             NX_VERBOSE(this, "New cloud system added: %1", systemId);
                             (*addKeyHandler)(systemId);
@@ -63,7 +68,7 @@ CloudSystemsSource::CloudSystemsSource(const QnCommonModule* commonModule):
                     }));
 
             setKeysHandler(
-                getOtherCloudSystemsIds(m_commonModule->globalSettings()->cloudSystemId()));
+                getOtherCloudSystemsIds(connectedCloudSystemId()));
         };
 }
 

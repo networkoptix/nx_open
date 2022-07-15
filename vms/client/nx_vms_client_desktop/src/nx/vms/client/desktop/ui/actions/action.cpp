@@ -6,26 +6,23 @@
 #include <QtGui/QShortcutEvent>
 #include <QtWidgets/QGraphicsWidget>
 
+#include <client/client_runtime_settings.h>
+#include <client/client_settings.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
-#include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-
-#include <nx/vms/client/desktop/ui/actions/action_conditions.h>
-#include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameter_types.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/workbench_layout_snapshot_manager.h>
-#include <ui/workbench/workbench_access_controller.h>
+#include <nx/vms/client/desktop/ui/actions/action_conditions.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/actions/action_parameter_types.h>
+#include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h> // TODO: this one does not belong here.
-
-#include <client/client_settings.h>
-#include <client/client_runtime_settings.h>
+#include <ui/workbench/workbench_layout.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {

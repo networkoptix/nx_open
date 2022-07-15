@@ -11,6 +11,7 @@
 #include <core/resource_management/resource_runtime_data.h>
 #include <nx/branding.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resources/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/desktop/statistics/statistics_sender.h>
 #include <nx/vms/client/desktop/utils/video_cache.h>
@@ -46,6 +47,7 @@ struct SystemContext::Private
     std::unique_ptr<StatisticsSender> statisticsSender;
     std::unique_ptr<VirtualCameraManager> virtualCameraManager;
     std::unique_ptr<VideoCache> videoCache;
+    std::unique_ptr<LayoutSnapshotManager> layoutSnapshotManager;
 
     void initLocalRuntimeInfo()
     {
@@ -89,6 +91,7 @@ SystemContext::SystemContext(
     d->statisticsSender = std::make_unique<StatisticsSender>(this);
     d->virtualCameraManager = std::make_unique<VirtualCameraManager>(this);
     d->videoCache = std::make_unique<VideoCache>(this);
+    d->layoutSnapshotManager = std::make_unique<LayoutSnapshotManager>(this);
 }
 
 SystemContext::~SystemContext()
@@ -143,6 +146,11 @@ VirtualCameraManager* SystemContext::virtualCameraManager() const
 VideoCache* SystemContext::videoCache() const
 {
     return d->videoCache.get();
+}
+
+LayoutSnapshotManager* SystemContext::layoutSnapshotManager() const
+{
+    return d->layoutSnapshotManager.get();
 }
 
 void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)

@@ -7,19 +7,13 @@
 #include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
 #include <camera/resource_display.h>
-#include <client_core/client_core_module.h>
 #include <client/client_module.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
+#include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_controller_pool.h>
-#include <core/resource_access/providers/resource_access_provider.h>
-#include <core/resource_access/resource_access_filter.h>
-#include <core/resource_access/resource_access_subject.h>
-#include <core/resource_management/layout_tour_manager.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/fake_media_server.h>
@@ -31,6 +25,12 @@
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
+#include <core/resource_access/providers/resource_access_provider.h>
+#include <core/resource_access/resource_access_filter.h>
+#include <core/resource_access/resource_access_subject.h>
+#include <core/resource_management/layout_tour_manager.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
 #include <network/router.h>
 #include <network/system_helpers.h>
@@ -41,12 +41,14 @@
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/condition/generic_condition.h>
+#include <nx/vms/client/desktop/cross_system/cross_system_layout_resource.h>
 #include <nx/vms/client/desktop/joystick/settings/manager.h>
 #include <nx/vms/client/desktop/network/cloud_url_validator.h>
 #include <nx/vms/client/desktop/radass/radass_support.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
+#include <nx/vms/client/desktop/resources/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resources/resource_descriptor.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
@@ -60,22 +62,22 @@
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/utils/platform/autorun.h>
 #include <plugins/resource/desktop_camera/desktop_resource_base.h>
-#include <recording/time_period_list.h>
 #include <recording/time_period.h>
+#include <recording/time_period_list.h>
 #include <ui/dialogs/ptz_manage_dialog.h>
 #include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/widgets/main_window.h>
+#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
-#include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
-#include <ui/workbench/workbench.h>
 #include <utils/camera/camera_replacement.h>
+#include <watchers/cloud_status_watcher.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {
@@ -732,7 +734,9 @@ SaveLayoutCondition::SaveLayoutCondition(bool isCurrent):
 {
 }
 
-ActionVisibility SaveLayoutCondition::check(const QnResourceList& resources, QnWorkbenchContext* context)
+ActionVisibility SaveLayoutCondition::check(
+    const QnResourceList& resources,
+    QnWorkbenchContext* context)
 {
     QnLayoutResourcePtr layout;
 
@@ -757,14 +761,13 @@ ActionVisibility SaveLayoutCondition::check(const QnResourceList& resources, QnW
     if (layout->data().contains(Qn::LayoutTourUuidRole))
         return InvisibleAction;
 
-    if (context->snapshotManager()->isSaveable(layout))
-    {
-        return EnabledAction;
-    }
-    else
-    {
+    auto systemContext = SystemContext::fromResource(layout);
+    if (!NX_ASSERT(systemContext))
         return DisabledAction;
-    }
+
+    return systemContext->layoutSnapshotManager()->isSaveable(layout)
+        ? EnabledAction
+        : DisabledAction;
 }
 
 SaveLayoutAsCondition::SaveLayoutAsCondition(bool isCurrent):
@@ -1400,7 +1403,9 @@ SaveVideowallReviewCondition::SaveVideowallReviewCondition(bool isCurrent):
 {
 }
 
-ActionVisibility SaveVideowallReviewCondition::check(const QnResourceList& resources, QnWorkbenchContext* context)
+ActionVisibility SaveVideowallReviewCondition::check(
+    const QnResourceList& resources,
+    QnWorkbenchContext* context)
 {
     QnLayoutResourceList layouts;
 
@@ -1415,7 +1420,7 @@ ActionVisibility SaveVideowallReviewCondition::check(const QnResourceList& resou
     }
     else
     {
-        foreach(const QnResourcePtr &resource, resources)
+        for (const QnResourcePtr& resource: resources)
         {
             if (!resource->hasFlags(Qn::videowall))
                 continue;
@@ -1427,6 +1432,7 @@ ActionVisibility SaveVideowallReviewCondition::check(const QnResourceList& resou
             QnWorkbenchLayout* layout = QnWorkbenchLayout::instance(videowall);
             if (!layout)
                 continue;
+
             layouts << layout->resource();
         }
     }
@@ -1434,9 +1440,15 @@ ActionVisibility SaveVideowallReviewCondition::check(const QnResourceList& resou
     if (layouts.isEmpty())
         return InvisibleAction;
 
-    foreach(const QnLayoutResourcePtr &layout, layouts)
-        if (context->snapshotManager()->isModified(layout))
+    for (const QnLayoutResourcePtr& layout: std::as_const(layouts))
+    {
+        auto systemContext = SystemContext::fromResource(layout);
+        if (NX_ASSERT(systemContext)
+            && systemContext->layoutSnapshotManager()->isModified(layout))
+        {
             return EnabledAction;
+        }
+    }
 
     return DisabledAction;
 }
@@ -1922,6 +1934,16 @@ ConditionWrapper isLoggedIn()
         });
 }
 
+ConditionWrapper isLoggedInToCloud()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& /*parameters*/, QnWorkbenchContext* /*context*/)
+        {
+            return appContext()->cloudStatusWatcher()->status()
+                == QnCloudStatusWatcher::Status::Online;
+        });
+}
+
 ConditionWrapper scoped(ActionScope scope, ConditionWrapper&& condition)
 {
     return new ScopedCondition(scope, std::move(condition));
@@ -2246,6 +2268,27 @@ ConditionWrapper showBetaUpgradeWarning()
             return !nx::branding::isDesktopClientCustomized()
                 && nx::branding::isDevCloudHost();
         });
+}
+
+ConditionWrapper isCloudLayout(bool useCurrentLayout)
+{
+    auto isCloud =
+        [](const QnResourcePtr& resource) -> bool
+        {
+            return resource.dynamicCast<CrossSystemLayoutResource>();
+        };
+
+    if (useCurrentLayout)
+    {
+        return new CustomBoolCondition(
+            [isCloud](const Parameters& /*parameters*/, QnWorkbenchContext* context)
+            {
+                return isCloud(context->workbench()->currentLayout()->resource());
+            }
+        );
+    }
+
+    return new ResourceCondition(isCloud, MatchMode::All);
 }
 
 } // namespace condition

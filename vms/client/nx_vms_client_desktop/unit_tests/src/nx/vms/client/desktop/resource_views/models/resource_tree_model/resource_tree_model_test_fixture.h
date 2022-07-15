@@ -15,12 +15,12 @@
 
 class QnWorkbenchAccessController;
 class QnResourceAccessManager;
-class QnWorkbenchLayoutSnapshotManager;
 class QnRuntimeInfoManager;
 
 namespace nx::vms::client::desktop {
 
 class SystemContext;
+class LayoutSnapshotManager;
 
 namespace entity_item_model { class EntityItemModel; }
 namespace entity_resource_tree { class ResourceTreeComposer; };
@@ -38,7 +38,7 @@ protected:
     QnResourcePool* resourcePool() const;
     QnWorkbenchAccessController* workbenchAccessController() const;
     QnResourceAccessManager* resourceAccessManager() const;
-    QnWorkbenchLayoutSnapshotManager* layoutSnapshotManager() const;
+    LayoutSnapshotManager* layoutSnapshotManager() const;
     QnRuntimeInfoManager* runtimeInfoManager() const;
 
     void setSystemName(const QString& name) const;
@@ -128,7 +128,6 @@ protected:
     std::vector<QString> transformToDisplayStrings(const QModelIndexList& indexes) const;
 
 protected:
-    QSharedPointer<QnWorkbenchLayoutSnapshotManager> m_layoutSnapshotManager;
     QSharedPointer<entity_item_model::EntityItemModel> m_newResourceTreeModel;
     QSharedPointer<entity_resource_tree::ResourceTreeComposer> m_resourceTreeComposer;
 };

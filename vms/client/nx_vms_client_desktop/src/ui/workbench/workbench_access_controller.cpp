@@ -15,9 +15,9 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
 #include <nx/streaming/abstract_archive_resource.h>
+#include <nx/vms/client/desktop/cross_system/cross_system_layout_resource.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <utils/common/checked_cast.h>
 
 using namespace nx::vms::client::desktop;
 
@@ -181,6 +181,15 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(
             | Qn::ExportPermission
             | Qn::WritePermission
             | Qn::WriteNamePermission;
+    }
+
+    // User can fully control his Cloud Layouts.
+    if (auto cloudLayout = resource.dynamicCast<CrossSystemLayoutResource>())
+    {
+        Qn::Permissions result = Qn::FullLayoutPermissions;
+        if (cloudLayout->locked())
+            result &= ~(Qn::AddRemoveItemsPermission | Qn::WriteNamePermission);
+        return result;
     }
 
     if (QnFileLayoutResourcePtr layout = resource.dynamicCast<QnFileLayoutResource>())

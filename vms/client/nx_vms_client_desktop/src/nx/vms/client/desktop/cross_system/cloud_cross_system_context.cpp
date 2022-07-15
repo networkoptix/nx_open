@@ -33,7 +33,7 @@ namespace {
 
 using namespace std::chrono;
 
-static constexpr auto kUpdateInterval = 30s;
+static constexpr auto kUpdateInterval = 10min;
 static const nx::vms::api::SoftwareVersion kRestApiSupportedVersion("5.0.0.0");
 
 } // namespace

@@ -35,6 +35,7 @@ public:
         ExportedLayout,
         ExportedEncryptedLayout,
         SharedLayout,
+        CloudLayout,
         Layouts,
         SharedLayouts,
         LayoutTour,
@@ -84,6 +85,7 @@ public:
         AlwaysSelected  = 0x20000
     };
     Q_DECLARE_FLAGS(Key, KeyPart)
+    Q_FLAG(Key)
 
     QnResourceIconCache(QObject* parent = nullptr);
 
