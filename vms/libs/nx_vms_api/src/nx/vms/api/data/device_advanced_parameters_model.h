@@ -26,11 +26,4 @@ struct NX_VMS_API DeviceAdvancedFilter
 #define DeviceAdvancedFilter_Fields (deviceId)(id)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceAdvancedFilter, (json), NX_VMS_API)
 
-struct NX_VMS_API AdvancedManifestFilter: IdData
-{
-    AdvancedManifestFilter() {}
-};
-#define AdvancedManifestFilter_Fields (id)
-QN_FUSION_DECLARE_FUNCTIONS(AdvancedManifestFilter, (json), NX_VMS_API)
-
 } // namespace nx::vms::api
