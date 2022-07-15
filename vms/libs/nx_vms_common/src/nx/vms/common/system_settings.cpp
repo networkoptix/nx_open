@@ -497,6 +497,11 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         "videoTrafficEncryptionForced", false, this,
         [] { return tr("Enforce RTSPS (video traffic encryption)"); });
 
+    m_exposeDeviceCredentialsAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        "exposeDeviceCredentials",
+        true,
+        this);
+
     m_autoDiscoveryEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "autoDiscoveryEnabled", true, this,
         [] { return tr("Enable auto-discovery"); });
@@ -1041,6 +1046,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << m_auditTrailPeriodDaysAdaptor
         << m_trafficEncryptionForcedAdaptor
         << m_videoTrafficEncryptionForcedAdaptor
+        << m_exposeDeviceCredentialsAdaptor
         << m_useHttpsOnlyCamerasAdaptor
         << m_insecureDeprecatedApiEnabledAdaptor
         << m_insecureDeprecatedApiInUseEnabledAdaptor
@@ -1226,6 +1232,16 @@ bool SystemSettings::isVideoTrafficEncryptionForced() const
 void SystemSettings::setVideoTrafficEncryptionForced(bool value)
 {
     m_videoTrafficEncryptionForcedAdaptor->setValue(value);
+}
+
+bool SystemSettings::exposeDeviceCredentials() const
+{
+    return m_exposeDeviceCredentialsAdaptor->value();
+}
+
+void SystemSettings::setExposeDeviceCredentials(bool value)
+{
+    m_exposeDeviceCredentialsAdaptor->setValue(value);
 }
 
 bool SystemSettings::isAutoDiscoveryEnabled() const
