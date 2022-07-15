@@ -62,7 +62,7 @@ public:
     const EventData kEventData = {
         {"type", TestEvent::manifest().id},
         {"intField", 123},
-        {"stringField", "hello"},
+        {"text", "hello"},
         {"boolField", true},
         {"floatField", 123.123},
     };
@@ -168,10 +168,10 @@ static const std::vector<FormatResult> kFormatResults
     // Test valid formatting
     {"int 123", "int {intField}"},
     {"int {} int", "int {} int"},
-    {"string hello", "string {stringField}"},
+    {"string hello", "string {text}"},
     {"bool true", "bool {boolField}"},
     {"float 123.123", "float {floatField}"},
-    {"123 hello true 123.123", "{intField} {stringField} {boolField} {floatField}"},
+    {"123 hello true 123.123", "{intField} {text} {boolField} {floatField}"},
 
     // Test placeholders.
     {"123 {absent}", "{intField} {absent}"},
