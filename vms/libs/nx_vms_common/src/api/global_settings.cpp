@@ -610,6 +610,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         false,
         this);
 
+    m_exposeDeviceCredentialsAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        "exposeDeviceCredentials",
+        true,
+        this);
+
     m_autoDiscoveryEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         kNameAutoDiscoveryEnabled,
         true,
@@ -1178,6 +1183,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_auditTrailPeriodDaysAdaptor
         << m_trafficEncryptionForcedAdaptor
         << m_videoTrafficEncryptionForcedAdaptor
+        << m_exposeDeviceCredentialsAdaptor
         << m_useHttpsOnlyCamerasAdaptor
         << m_insecureDeprecatedApiEnabledAdaptor
         << m_eventLogPeriodDaysAdaptor
@@ -1352,6 +1358,16 @@ bool QnGlobalSettings::isVideoTrafficEncryptionForced() const
 void QnGlobalSettings::setVideoTrafficEncryptionForced(bool value)
 {
     m_videoTrafficEncryptionForcedAdaptor->setValue(value);
+}
+
+bool QnGlobalSettings::exposeDeviceCredentials() const
+{
+    return m_exposeDeviceCredentialsAdaptor->value();
+}
+
+void QnGlobalSettings::setExposeDeviceCredentials(bool value)
+{
+    m_exposeDeviceCredentialsAdaptor->setValue(value);
 }
 
 bool QnGlobalSettings::isAutoDiscoveryEnabled() const
