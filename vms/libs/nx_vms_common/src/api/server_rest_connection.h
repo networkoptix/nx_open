@@ -355,6 +355,12 @@ public:
         Result<EventLogData>::type callback,
         QThread* targetThread = nullptr);
 
+    /* Get camera credentials. */
+    Handle getCameraCredentials(
+        const QnUuid& deviceId,
+        Result<QAuthenticator>::type callback,
+        QThread* targetThread = nullptr);
+
     /**
      * Change user's password on a camera. This method doesn't create new user.
      * Only cameras with capability Qn::SetUserPasswordCapability support it.

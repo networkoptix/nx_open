@@ -9,10 +9,13 @@
 #include <QtWebEngine/QQuickWebEngineProfile>
 #include <QtWidgets/QApplication>
 
+#include <api/server_rest_connection.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/web_widget.h>
 #include <nx/vms/client/desktop/resource_properties/camera/utils/camera_web_page_workarounds.h>
@@ -75,22 +78,46 @@ CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
     webWidget->controller()->setMenuSave(true);
 
     webWidget->controller()->setAuthCallback(
-        [this](const QUrl& url) -> std::optional<WebViewController::Credentials>
+        [this](const QUrl& url)
         {
             NX_ASSERT(currentlyOnUiThread());
 
             // Camera may redirect to another path and ask for credentials,
             // so check for host match.
             if (lastRequestUrl.host() != url.host())
-                return std::nullopt;
+            {
+                webWidget->controller()->auth(WebViewController::ShowDialog);
+                return;
+            }
 
             const auto camera = qnClientCoreModule->commonModule()->resourcePool()
                 ->getResourceById<QnVirtualCameraResource>(lastCamera.id);
             if (!camera || camera->getStatus() == nx::vms::api::ResourceStatus::unauthorized)
-                return std::nullopt;
+            {
+                webWidget->controller()->auth(WebViewController::ShowDialog);
+                return;
+            }
 
-            // Camera password on the client is masked, so just provide login for password dialog.
-            return WebViewController::Credentials{credentials.login()};
+            const auto resultCallback =
+                [this](bool success, rest::Handle /*handle*/, const QAuthenticator& result)
+                {
+                    if (success)
+                    {
+                        webWidget->controller()->auth(WebViewController::Accept, result);
+                        return;
+                    }
+
+                    // Just show user login in the dialog.
+                    QAuthenticator loginOnly;
+                    loginOnly.setUser(this->credentials.login());
+                    webWidget->controller()->auth(WebViewController::ShowDialog, loginOnly);
+                };
+
+            core::RemoteConnectionAware connectionAccessor;
+            connectionAccessor.connectedServerApi()->getCameraCredentials(
+                lastCamera.id,
+                nx::utils::guarded(webWidget->controller(), resultCallback),
+                QThread::currentThread());
         });
 
     // We don't have any info about cameras certificates right now.

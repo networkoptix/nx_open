@@ -1058,6 +1058,47 @@ Handle ServerConnection::getEvents(const QnEventLogMultiserverRequestData& reque
     return executeGet(lit("/ec2/getEvents"), request.toParams(), callback, targetThread);
 }
 
+Handle ServerConnection::getCameraCredentials(
+    const QnUuid& deviceId,
+    Result<QAuthenticator>::type callback,
+    QThread* targetThread)
+{
+    return executeGet(
+        nx::format("/rest/v1/devices/%1", deviceId),
+        nx::network::rest::Params{{"_with", "credentials"}},
+        Result<QByteArray>::type(
+            [callback = std::move(callback)](
+                bool success,
+                Handle requestId,
+                QByteArray result,
+                const nx::network::http::HttpHeaders& /*headers*/)
+            {
+                nx::vms::api::DeviceModel resultObject;
+
+                static const auto kMaskedPassword = QLatin1String("******");
+
+                if (success)
+                {
+                    success = QJson::deserialize(result, &resultObject)
+                        && resultObject.credentials.has_value()
+                        && resultObject.credentials->password != kMaskedPassword;
+                }
+
+                QAuthenticator credentials;
+                if (success)
+                {
+                    credentials.setUser(resultObject.credentials->user);
+                    credentials.setPassword(resultObject.credentials->password);
+                }
+
+                callback(
+                    success,
+                    requestId,
+                    credentials);
+            }),
+        targetThread);
+}
+
 Handle ServerConnection::changeCameraPassword(
     const QnVirtualCameraResourcePtr& camera,
     const QAuthenticator& auth,
