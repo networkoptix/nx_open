@@ -4791,27 +4791,27 @@ to %1</source>
     <message numerus="yes">
       <source>%n additional</source>
       <translation>
-        <numerusform>%n 追加</numerusform>
+        <numerusform>追加 %n 名</numerusform>
       </translation>
     </message>
     <message>
       <source>User %1 has invalid email address</source>
-      <translation>ユーザー %1 のメールアドレスが無効</translation>
+      <translation>ユーザー %1 のメールアドレスが無効です</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 users have invalid email address</source>
       <translation>
-        <numerusform>%1 ユーザーの %n は、無効なEmailアドレスです</numerusform>
+        <numerusform>%1 ユーザー中 %n 名のメールアドレスが無効です</numerusform>
       </translation>
     </message>
     <message>
       <source>Invalid email address %1</source>
-      <translation>無効なメール アドレス %1</translation>
+      <translation>無効なメールアドレス %1</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
       <translation>
-        <numerusform>%1 中の%n 追加Emailアドレスは有効ではありません</numerusform>
+        <numerusform>%1 件のうち %n 件の追加メールアドレスが無効です</numerusform>
       </translation>
     </message>
     <message>
