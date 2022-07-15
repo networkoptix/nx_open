@@ -128,6 +128,11 @@ public:
     UniqueResourceSourcePtr fileLayoutsSource();
 
     /**
+     * Provides all cloud layout resources.
+     */
+    UniqueResourceSourcePtr cloudLayoutsSource();
+
+    /**
      * Provides all local media resources stored in the resource pool.
      */
     UniqueResourceSourcePtr localMediaSource();

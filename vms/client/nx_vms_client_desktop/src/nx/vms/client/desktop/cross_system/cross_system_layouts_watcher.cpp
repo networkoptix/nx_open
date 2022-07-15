@@ -5,6 +5,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/resources/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resources/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
 
@@ -19,10 +20,13 @@ CrossSystemLayoutsWatcher::CrossSystemLayoutsWatcher(QObject* parent):
     auto processLayouts =
         [this](CloudCrossSystemContext* context, const QString& systemId)
         {
-            // TODO: #sivanov We need to process cloud layouts instead, so skip permissions check.
-            for (const auto& layout: appContext()->currentSystemContext()->resourcePool()
+            const auto snapshotManager = appContext()->cloudLayoutsSystemContext()
+                ->layoutSnapshotManager();
+
+            for (const auto& layout: appContext()->cloudLayoutsSystemContext()->resourcePool()
                 ->getResources<QnLayoutResource>())
             {
+                const bool wasModifiedByUser = snapshotManager->isModified(layout);
                 const auto items = layout->getItems(); //< Iterate over local copy.
                 for (const auto& item: items)
                 {
@@ -37,6 +41,8 @@ CrossSystemLayoutsWatcher::CrossSystemLayoutsWatcher(QObject* parent):
                         }
                     }
                 }
+                if (!wasModifiedByUser && snapshotManager->isModified(layout))
+                    snapshotManager->store(layout);
             }
         };
 
@@ -59,8 +65,6 @@ CrossSystemLayoutsWatcher::CrossSystemLayoutsWatcher(QObject* parent):
                         processLayouts(context, systemId);
                 });
         });
-
-
 }
 
 } // namespace nx::vms::client::desktop

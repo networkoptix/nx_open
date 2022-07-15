@@ -649,6 +649,9 @@ ConditionWrapper isTrue(bool value);
 /** Visible when user is logged in (or at least logging in). */
 ConditionWrapper isLoggedIn();
 
+/** Visible when user is logged in to Cloud. */
+ConditionWrapper isLoggedInToCloud();
+
 /** Check a condition only in the given scope */
 ConditionWrapper scoped(ActionScope scope, ConditionWrapper&& condition);
 
@@ -739,6 +742,9 @@ ConditionWrapper joystickConnected();
  * Used for showing warning for the customers.
  */
 ConditionWrapper showBetaUpgradeWarning();
+
+/** Checks if the provided Resource is a Cloud Layout. */
+ConditionWrapper isCloudLayout(bool useCurrentLayout);
 
 } // namespace condition
 

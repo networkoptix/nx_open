@@ -82,15 +82,18 @@ public:
     AbstractItemPtr createShowreelItem(const QnUuid& showreelUuid);
 
     // Resource Tree video wall screen item.
-    AbstractItemPtr createVideoWallScreenItem(const QnVideoWallResourcePtr& viedeoWall,
+    AbstractItemPtr createVideoWallScreenItem(const QnVideoWallResourcePtr& videoWall,
         const QnUuid& screenUuid);
 
     // Resource Tree video wall matrix item.
-    AbstractItemPtr createVideoWallMatrixItem(const QnVideoWallResourcePtr& viedeoWall,
+    AbstractItemPtr createVideoWallMatrixItem(const QnVideoWallResourcePtr& videoWall,
         const QnUuid& matrixUuid);
 
     // Resource Tree Cross-System Resources status preloader for the Cloud System.
     AbstractItemPtr createCloudSystemStatusItem(const QString& systemId);
+
+    // Resource Tree Cloud Layout item.
+    AbstractItemPtr createCloudLayoutItem(const QnLayoutResourcePtr& layout);
 
 private:
     QnResourcePool* resourcePool() const;

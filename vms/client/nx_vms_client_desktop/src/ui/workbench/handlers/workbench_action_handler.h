@@ -39,7 +39,6 @@ class QnResourcePool;
 class QnWorkbench;
 class QnWorkbenchContext;
 class QnWorkbenchSynchronizer;
-class QnWorkbenchLayoutSnapshotManager;
 class ActionHandler;
 class QnBusinessRulesDialog;
 class QnPopupCollectionWidget;

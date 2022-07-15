@@ -11,7 +11,7 @@ namespace entity_resource_tree {
 
 using namespace nx::vms::api;
 
-ShowreeelsListEntity::ShowreeelsListEntity(
+ShowreelsListEntity::ShowreelsListEntity(
     const ShowreelItemCreator& showreelItemCreator,
     const QnLayoutTourManager* layoutTourManager)
     :

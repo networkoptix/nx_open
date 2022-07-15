@@ -5,6 +5,9 @@
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
+#include <nx/vms/client/desktop/cross_system/cross_system_layout_resource.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop {
@@ -13,6 +16,9 @@ namespace {
 
 static const QString kCloudScheme = "cloud://";
 
+/** System Id placeholder for resources, not bound to any System (e.g. cloud layouts). */
+static const QString kGenericCloudSystemId = QnUuid().toSimpleString();
+
 QString resourcePath(const QnResourcePtr& resource)
 {
     if (resource->hasFlags(Qn::exported_layout))
@@ -20,6 +26,13 @@ QString resourcePath(const QnResourcePtr& resource)
 
     if (resource->hasFlags(Qn::local_video))
         return resource->getUrl();
+
+    if (resource.dynamicCast<CrossSystemLayoutResource>())
+    {
+        return nx::format(kCloudScheme + "%1.%2",
+            kGenericCloudSystemId,
+            resource->getId().toSimpleString());
+    }
 
     auto systemContext = SystemContext::fromResource(resource);
     if (NX_ASSERT(systemContext))
@@ -50,10 +63,14 @@ nx::vms::common::ResourceDescriptor descriptor(const QnResourcePtr& resource)
 QnResourcePtr getResourceByDescriptor(const nx::vms::common::ResourceDescriptor& descriptor)
 {
     SystemContext* systemContext = nullptr;
-    if (isCrossSystemResource(descriptor))
+    if (ini().crossSystemLayouts && isCrossSystemResource(descriptor))
     {
         const QString cloudSystemId = crossSystemResourceSystemId(descriptor);
-        systemContext = appContext()->systemContextByCloudSystemId(cloudSystemId);
+        // TODO: #sivanov Probably it worth improve systemContextByCloudSystemId instead.
+        if (cloudSystemId == kGenericCloudSystemId)
+            systemContext = appContext()->cloudLayoutsSystemContext();
+        else
+            systemContext = appContext()->systemContextByCloudSystemId(cloudSystemId);
     }
     if (!systemContext)
         systemContext = appContext()->currentSystemContext();

@@ -18,6 +18,7 @@ namespace nx::vms::client::desktop {
 
 class ClientStateHandler;
 class CloudCrossSystemManager;
+class CloudLayoutsManager;
 class ContextStatisticsModule;
 class LogsManagementWatcher;
 class ObjectDisplaySettings;
@@ -160,7 +161,20 @@ public:
 
     nx::vms::utils::TranslationManager* translationManager() const;
 
+    /**
+     * Monitors available Cloud Systems and manages corresponding cross-system Contexts.
+     */
     CloudCrossSystemManager* cloudCrossSystemManager() const;
+
+    /**
+     * Monitors available Cloud Layouts.
+     */
+    CloudLayoutsManager* cloudLayoutsManager() const;
+
+    /**
+     * System context, containing Cloud Layouts.
+     */
+    SystemContext* cloudLayoutsSystemContext() const;
 
     RadassController* radassController() const;
 

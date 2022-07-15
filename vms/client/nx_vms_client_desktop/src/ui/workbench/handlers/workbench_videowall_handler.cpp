@@ -2,12 +2,12 @@
 
 #include "workbench_videowall_handler.h"
 
+#include <boost/algorithm/cxx11/any_of.hpp>
+#include <boost/algorithm/cxx11/copy_if.hpp>
+
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QPushButton>
-
-#include <boost/algorithm/cxx11/any_of.hpp>
-#include <boost/algorithm/cxx11/copy_if.hpp>
 
 #include <api/runtime_info_manager.h>
 #include <client/client_installations_manager.h>
@@ -42,10 +42,12 @@
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/api/data/videowall_data.h>
 #include <nx/vms/api/types/connection_types.h>
-#include <nx/vms/client/desktop/license/videowall_license_validator.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/license/videowall_license_validator.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/desktop/resources/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/state/client_process_runner.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -80,7 +82,6 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/color_space/image_correction.h>
 #include <utils/common/checked_cast.h>
@@ -244,6 +245,11 @@ QSet<QnUuid> layoutResourceIds(const QnLayoutResourcePtr& layout)
     for (const auto& item: layout->getItems())
         result << item.resource.id;
     return result;
+}
+
+LayoutSnapshotManager* snapshotManager()
+{
+    return appContext()->currentSystemContext()->layoutSnapshotManager();
 }
 
 } // namespace
@@ -534,6 +540,10 @@ void QnWorkbenchVideoWallHandler::resetLayout(
     const QnLayoutResourcePtr& layout)
 {
     if (items.isEmpty())
+        return;
+
+    // Cloud layouts must be copied before placed on video wall.
+    if (!NX_ASSERT(layout->systemContext() == appContext()->currentSystemContext()))
         return;
 
     layout->setCellSpacing(0.0);

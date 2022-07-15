@@ -518,6 +518,19 @@ void initialize(Manager* manager, Action* root)
             && !condition::isLayoutTourReviewMode()
             && !condition::tourIsRunning());
 
+    factory(SaveCurrentLayoutAsCloudAction)
+        .mode(DesktopMode)
+        .flags(Scene | NoTarget)
+        .text(ContextMenu::tr("Save Current Layout As Cloud..."))
+        .autoRepeat(false)
+        .condition(condition::isLoggedIn()
+            && ConditionWrapper(new SaveLayoutAsCondition(/*useCurrentLayout*/ true))
+            && condition::isLoggedInToCloud()
+            && condition::isTrue(ini().crossSystemLayouts)
+            && !condition::isCloudLayout(/*useCurrentLayout*/ true)
+            && !condition::isLayoutTourReviewMode()
+            && !condition::tourIsRunning());
+
     factory(ShareLayoutAction)
         .mode(DesktopMode)
         .flags(SingleTarget | ResourceTarget)
@@ -1192,6 +1205,16 @@ void initialize(Manager* manager, Action* root)
         .condition(
             ConditionWrapper(new SaveLayoutAsCondition(false))
             && !condition::isLayoutTourReviewMode()
+        );
+
+    factory(SaveLayoutAsCloudAction)
+        .flags(TitleBar | Tree | SingleTarget | ResourceTarget)
+        .text(ContextMenu::tr("Save Layout As Cloud..."))
+        .condition(
+            ConditionWrapper(new SaveLayoutAsCondition(/*useCurrentLayout*/ false))
+            && condition::isLoggedInToCloud()
+            && condition::isTrue(ini().crossSystemLayouts)
+            && !condition::isCloudLayout(/*useCurrentLayout*/ false)
         );
 
     factory()

@@ -32,7 +32,6 @@
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_utility.h>
 #include <utils/common/delayed.h>
 
