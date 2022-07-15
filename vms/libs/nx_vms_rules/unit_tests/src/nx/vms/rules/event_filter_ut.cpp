@@ -2,9 +2,12 @@
 
 #include <gtest/gtest.h>
 
+#include <thread>
+
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_fields/keywords_field.h>
 #include <nx/vms/rules/event_fields/state_field.h>
+#include <nx/vms/rules/event_fields/text_field.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/events/generic_event.h>
 #include <nx/vms/rules/utils/field.h>
@@ -132,6 +135,51 @@ TEST(EventFilterProlongedEventTest, eventFilterHandlesStoppedProlongedEventPrope
     event->setState(State::stopped);
     ASSERT_TRUE(filter->match(event));
     ASSERT_FALSE(filter->match(event));
+}
+
+TEST(EventFilterCacheTest, cacheKey)
+{
+    auto filter = std::make_unique<EventFilter>(QnUuid::createUuid(), "nx.events.test");
+    filter->addField("text", std::make_unique<EventTextField>());
+
+    auto event = TestEventPtr::create();
+    event->m_text = "text";
+
+    // Empty cache key events are not cached.
+    EXPECT_TRUE(filter->match(event));
+    EXPECT_TRUE(filter->match(event));
+
+    // Same cache events are ignored.
+    event->setCacheKey("a");
+    EXPECT_TRUE(filter->match(event));
+    EXPECT_FALSE(filter->match(event));
+
+    // Different cache events are matched.
+    event->setCacheKey("b");
+    EXPECT_TRUE(filter->match(event));
+    EXPECT_FALSE(filter->match(event));
+}
+
+TEST(EventFilterCacheTest, cacheTimeout)
+{
+    using namespace std::chrono;
+
+    auto filter = std::make_unique<EventFilter>(QnUuid::createUuid(), "nx.events.test");
+    filter->addField("text", std::make_unique<EventTextField>());
+
+    auto event = TestEventPtr::create();
+    event->m_text = "text";
+
+    // Same cache events are ignored.
+    event->setCacheKey("a");
+    EXPECT_TRUE(filter->match(event));
+    EXPECT_FALSE(filter->match(event));
+
+    // Same cache events are matched after timeout.
+    std::this_thread::sleep_for(5ms);
+    filter->cleanupOldEventsFromCache(1ms, 1ms);
+    EXPECT_TRUE(filter->match(event));
+    EXPECT_FALSE(filter->match(event));
 }
 
 } // nx::vms::rules::test

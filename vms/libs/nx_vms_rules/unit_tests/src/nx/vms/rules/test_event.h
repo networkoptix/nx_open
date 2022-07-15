@@ -20,7 +20,7 @@ class TestEvent: public nx::vms::rules::BasicEvent
     Q_PROPERTY(QnUuid cameraId MEMBER m_cameraId)
 
     Q_PROPERTY(int intField MEMBER m_intField)
-    Q_PROPERTY(QString stringField MEMBER m_stringField)
+    Q_PROPERTY(QString text MEMBER m_text)
     Q_PROPERTY(bool boolField MEMBER m_boolField)
     Q_PROPERTY(double floatField MEMBER m_floatField)
 
@@ -49,13 +49,23 @@ public:
         return m_cameraId.toSimpleString();
     }
 
+    virtual QString cacheKey() const override
+    {
+        return m_cacheKey;
+    }
+
+    void setCacheKey(const QString& cacheKey)
+    {
+        m_cacheKey = cacheKey;
+    }
+
     using BasicEvent::BasicEvent;
 
     QnUuid m_serverId;
     QnUuid m_cameraId;
 
     int m_intField{};
-    QString m_stringField;
+    QString m_text;
     bool m_boolField{};
     double m_floatField{};
 
@@ -63,6 +73,8 @@ public:
     nx::vms::api::EventLevel level = {};
     nx::vms::api::EventReason reason = {};
     nx::vms::rules::CameraConflictList conflicts;
+
+    QString m_cacheKey;
 };
 
 using TestEventPtr = QSharedPointer<TestEvent>;

@@ -50,7 +50,7 @@ public:
         return std::chrono::duration_cast<Duration>(nx::utils::monotonicTime() - *m_start);
     }
 
-    bool hasExpired(std::chrono::milliseconds value) const
+    bool hasExpired(Duration value) const
     {
         if (!isValid())
             return true;
