@@ -7,6 +7,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
+#include <QtNetwork/QAuthenticator>
 #include <QtQuickWidgets/QQuickWidget>
 
 #include <nx/utils/impl_ptr.h>
@@ -28,13 +29,6 @@ class NX_VMS_CLIENT_DESKTOP_API WebViewController: public QObject
     using base_type = QObject;
 
 public:
-    /** Credentials for web page authentication. */
-    struct Credentials
-    {
-        QString username = {};
-        QString password = {};
-    };
-
     // Should be mapped to non-public QQuickWebEngineView::LoadStatus.
     enum WebEngineViewLoadStatus
     {
@@ -44,7 +38,14 @@ public:
         LoadFailedStatus
     };
 
-    using AuthCallback = std::function<std::optional<Credentials>(const QUrl&)>;
+    enum WebEngineViewAuthAction
+    {
+        Accept,
+        Reject,
+        ShowDialog
+    };
+
+    using AuthCallback = std::function<void(const QUrl&)>;
     using CertificateValidationFunc =
         std::function<bool(const QString& certificateChain, const QUrl& url)>;
 
@@ -119,9 +120,17 @@ public:
 
     /**
      * When the page requires authentication (like http auth), the callback is called with the page
-     * url passed as parameter. If the callback returns `std::nullopt` the standard dialog is shown.
+     * url passed as parameter. The function auth() should be called to provide auth credentials.
      */
     void setAuthCallback(AuthCallback callback);
+
+    /**
+     * After AuthCallback is called, exectute one of the following actions:
+     *   Accept - use credentials for authentication,
+     *   Reject - deny authentication,
+     *   ShowDialog - request credentials from the user, showing provided credentials if any.
+     */
+    void auth(WebEngineViewAuthAction action, const QAuthenticator& credentials = {});
 
     /** Execute JavaScript source code. */
     void runJavaScript(const QString& source);

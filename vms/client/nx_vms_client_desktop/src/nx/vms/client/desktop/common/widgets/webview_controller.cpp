@@ -50,6 +50,13 @@ using namespace std::chrono;
 
 namespace {
 
+// Should be mapped to non-public QQuickWebEngineAuthenticationDialogRequest::AuthenticationType.
+enum AuthenticationDialogRequestAuthenticationType
+{
+    AuthenticationTypeHTTP,
+    AuthenticationTypeProxy
+};
+
 QUrl urlFromResource(const QnResourcePtr& resource)
 {
     if (!resource)
@@ -186,6 +193,7 @@ struct WebViewController::Private {
 
     std::vector<Callback> delayedCalls;
 
+    QPointer<QObject> authRequest;
     AuthCallback authCallback;
 
     AttemptCounter dialodCounter;
@@ -889,60 +897,69 @@ void WebViewController::requestJavaScriptDialog(QObject* request)
     }
 }
 
+void WebViewController::auth(WebEngineViewAuthAction action, const QAuthenticator& credentials)
+{
+    if (!d->authRequest)
+        return;
+
+    if (action == ShowDialog)
+    {
+        QString text;
+        if (d->authRequest->property("type").toInt() == AuthenticationTypeProxy)
+        {
+            text = tr("The proxy %1 requires a username and password.")
+                .arg(d->authRequest->property("proxyHost").toString());
+        }
+        else
+        {
+            const auto url = d->authRequest->property("url").toUrl();
+            text = url.toString(QUrl::RemovePassword | QUrl::RemovePath);
+        }
+
+        PasswordDialog dialog(d->widget());
+        dialog.setText(text);
+        if (!credentials.isNull())
+            dialog.setUsername(credentials.user());
+
+        action = dialog.exec() == QDialog::Accepted ? Accept : Reject;
+    }
+
+    switch (action)
+    {
+        case Accept:
+            QMetaObject::invokeMethod(
+                d->authRequest,
+                "dialogAccept",
+                Q_ARG(QString, credentials.user()),
+                Q_ARG(QString, credentials.password()));
+            break;
+        case Reject:
+            QMetaObject::invokeMethod(d->authRequest, "dialogReject");
+            break;
+        default:
+            break;
+    }
+
+    d->authRequest = nullptr;
+}
+
 void WebViewController::requestAuthenticationDialog(QObject* request)
 {
     if (!d->acceptDialogRequest(request))
         return;
 
-    // Should be mapped to non-public QQuickWebEngineAuthenticationDialogRequest::AuthenticationType.
-    enum AuthenticationDialogRequestAuthenticationType
+    if (!NX_ASSERT(d->authRequest == nullptr))
     {
-        AuthenticationTypeHTTP,
-        AuthenticationTypeProxy
-    };
-
-    std::optional<Credentials> credentials;
-    bool requestUserInput = true;
-
-    QString text;
-    if (request->property("type").toInt() == AuthenticationTypeProxy)
-    {
-        text = tr("The proxy %1 requires a username and password.")
-            .arg(request->property("proxyHost").toString());
+        QMetaObject::invokeMethod(request, "dialogReject");
+        return;
     }
+
+    d->authRequest = request;
+
+    if (request->property("type").toInt() == AuthenticationTypeProxy || !d->authCallback)
+        auth(ShowDialog);
     else
-    {
-        const auto url = request->property("url").toUrl();
-        if (d->authCallback)
-            credentials = d->authCallback(url);
-
-        requestUserInput = !credentials || credentials->password.isNull();
-        if (requestUserInput)
-            text = url.toString(QUrl::RemovePassword | QUrl::RemovePath);
-    }
-
-    // We didn't get credentials from authorization callback, so just show a dialog to the user.
-    if (requestUserInput)
-    {
-        PasswordDialog dialog(d->widget());
-        dialog.setText(text);
-        if (credentials)
-            dialog.setUsername(credentials->username);
-
-        if (dialog.exec() != QDialog::Accepted)
-        {
-            QMetaObject::invokeMethod(request, "dialogReject");
-            return;
-        }
-
-        credentials = Credentials{dialog.username(), dialog.password()};
-    }
-
-    QMetaObject::invokeMethod(
-        request,
-        "dialogAccept",
-        Q_ARG(QString, credentials->username),
-        Q_ARG(QString, credentials->password));
+        d->authCallback(request->property("url").toUrl());
 }
 
 void WebViewController::requestFileDialog(QObject* request)
