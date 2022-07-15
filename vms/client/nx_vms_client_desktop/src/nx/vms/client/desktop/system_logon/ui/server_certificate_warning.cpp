@@ -12,11 +12,19 @@
 #include <nx/network/socket_common.h>
 #include <nx/network/ssl/certificate.h>
 #include <nx/vms/api/data/module_information.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/statistics/modules/certificate_statistics_module.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "server_certificate_viewer.h"
+
+namespace {
+
+const QString kCertificateLink = "#certificate";
+const QString kHelpLink = "#help";
+
+} // namespace
 
 namespace nx::vms::client::desktop {
 
@@ -30,56 +38,48 @@ ServerCertificateWarning::ServerCertificateWarning(
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    // Prepare target description text.
-    QStringList knownData;
-    const static QString kTemplate("<b>%1</b> %2");
-
-    if (!target.systemName.isEmpty())
-        knownData <<  kTemplate.arg(tr("System:"), helpers::getSystemName(target));
-
-    QString serverStr;
-    if (target.name.isEmpty())
-        serverStr = QString::fromStdString(primaryAddress.address.toString());
-    else if (primaryAddress.isNull())
-        serverStr = target.name;
-    else
-        serverStr = nx::format("%1 (%2)", target.name, primaryAddress.address);
-
-    if (!serverStr.isEmpty())
-        knownData << kTemplate.arg(tr("Server:"), serverStr);
-
-    knownData << kTemplate.arg(tr("Server ID:"), target.id.toSimpleString());
-
-    const auto targetInfo =
-        QString("<p style='margin-top: 8px; margin-bottom: 8px;'>%1</p>")
-            .arg(knownData.join(common::html::kLineBreak));
-
     // Prepare data.
-    QnMessageBox::Icon icon = QnMessageBox::Icon::NoIcon;
     QString header, details, advice;
+    bool dialogIsWarning = false;
+
     switch (reason)
     {
         case Reason::unknownServer:
         {
-            icon = QnMessageBox::Icon::Question;
-            header = tr("Trust this server?");
-            details = tr("You attempted to connect to this Server, but it presented a certificate "
-                "that cannot be verified automatically.");
+            dialogIsWarning = false;
 
-            advice = tr("Review the certificate's details to make sure you are connecting to the "
-                "correct Server.");
+            header = tr("Connecting to %1 for the first time?")
+                .arg(helpers::getSystemName(target));
+            details = tr(
+                "Review the %1 to ensure you trust the server you are connecting to.\n"
+                "Read this %2 to learn more about certificate validation.",
+                "%1 is <certificate details> link, "
+                "%2 is <help article> link")
+                .arg(
+                    common::html::localLink(tr("certificate details"), kCertificateLink),
+                    common::html::localLink(tr("help article"), kHelpLink));
+            advice = tr("This message may be shown multiple times when connecting to a multi-server system.");
+
             break;
         }
 
         case Reason::invalidCertificate:
         case Reason::serverCertificateChanged:
         {
-            icon = QnMessageBox::Icon::Warning;
+            dialogIsWarning = true;
+
             header = tr("Cannot verify the identity of %1").arg(target.name);
-            details = tr("Someone may be impersonating this Server to steal your personal "
-                "information.");
-            advice = tr("Do not connect to this Server unless instructed by your VMS "
-                "administrator.");
+            details = tr(
+                "This might be due to an expired server certificate or someone trying "
+                "to impersonate %1 to steal your personal information.\n"
+                "You can view %2 or read this %3 to learn more about the current problem.",
+                "%1 is the system name, "
+                "%2 is <the server's certificate> link, "
+                "%3 is <help article> link")
+                .arg(
+                    helpers::getSystemName(target),
+                    common::html::localLink(tr("the server's certificate"), kCertificateLink),
+                    common::html::localLink(tr("help article"), kHelpLink));
 
             break;
         }
@@ -90,14 +90,21 @@ ServerCertificateWarning::ServerCertificateWarning(
 
 
     // Load data into UI.
-    setIcon(icon);
+    setIcon(dialogIsWarning ? QnMessageBox::Icon::Warning : QnMessageBox::Icon::Question);
     setText(header);
-    setInformativeText(targetInfo + details);
+    setInformativeText(details);
 
-    // Add this text as a separate label to make a proper spacing.
-    auto additionalText = new QLabel(advice);
-    additionalText->setWordWrap(true);
-    addCustomWidget(additionalText);
+    if (!advice.isEmpty())
+    {
+        auto additionalText = new QLabel(advice);
+        additionalText->setWordWrap(true);
+
+        auto palette = additionalText->palette();
+        palette.setColor(QPalette::Foreground, colorTheme()->color("dark13"));
+        additionalText->setPalette(palette);
+
+        addCustomWidget(additionalText);
+    }
 
     auto layout = findChild<QVBoxLayout*>("verticalLayout");
     if (NX_ASSERT(layout))
@@ -119,31 +126,36 @@ ServerCertificateWarning::ServerCertificateWarning(
     auto statistics = context()->instance<QnCertificateStatisticsModule>();
     statistics->registerClick(statisticsName("open"));
 
-    // Init server certificate `link`
-    auto link = new QLabel(common::html::localLink(tr("View certificate")));
-    connect(link, &QLabel::linkActivated, this,
-        [=, this]
+    // Init links.
+    connect(this , &QnMessageBox::linkActivated, this,
+        [=, this](const QString& link)
         {
-            auto viewer = new ServerCertificateViewer(
-                target,
-                primaryAddress,
-                certificates,
-                ServerCertificateViewer::Mode::presented,
-                this);
+            if (link == kCertificateLink)
+            {
+                auto viewer = new ServerCertificateViewer(
+                    target,
+                    primaryAddress,
+                    certificates,
+                    ServerCertificateViewer::Mode::presented,
+                    this);
 
-            // Show modal.
-            viewer->open();
-            statistics->registerClick(statisticsName("view_cert"));
+                // Show modal.
+                viewer->open();
+                statistics->registerClick(statisticsName("view_cert"));
+            }
+            else if (link == kHelpLink)
+            {
+                //TODO: #spanasenko Open help page.
+            }
         });
-    addCustomWidget(link);
 
     // Create 'Connect' button.
     auto connectButton = addButton(
-        tr("Connect Anyway"),
+        dialogIsWarning ? tr("Connect Anyway") : tr("Continue"),
         QDialogButtonBox::AcceptRole,
-        Qn::ButtonAccent::Warning);
+        dialogIsWarning ? Qn::ButtonAccent::Warning : Qn::ButtonAccent::Standard);
 
-    if (reason == Reason::invalidCertificate || reason == Reason::serverCertificateChanged)
+    if (dialogIsWarning)
     {
         // Create mandatory checkbox for additional safety.
         auto checkbox = new QCheckBox(tr("I trust this server"));
@@ -163,13 +175,6 @@ ServerCertificateWarning::ServerCertificateWarning(
 
     // Create 'Cancel' button.
     setStandardButtons({QDialogButtonBox::Cancel});
-}
-
-void ServerCertificateWarning::showEvent(QShowEvent *event)
-{
-    // Set focus to 'Cancel' button for some additional safety.
-    button(QDialogButtonBox::Cancel)->setFocus();
-    base_type::showEvent(event);
 }
 
 } // namespace nx::vms::client::desktop
