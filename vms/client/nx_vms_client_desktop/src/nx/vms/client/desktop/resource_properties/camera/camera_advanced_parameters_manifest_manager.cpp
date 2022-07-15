@@ -51,9 +51,6 @@ void CameraAdvancedParametersManifestManager::loadManifestAsync(
     if (!NX_ASSERT(connection()))
         return;
 
-    nx::network::rest::Params params;
-    params.insert("cameraId", camera->getId());
-
     auto callback = nx::utils::guarded(this,
         [this, camera](bool success, int /*handle*/, nx::network::rest::JsonResult data)
         {
@@ -66,8 +63,8 @@ void CameraAdvancedParametersManifestManager::loadManifestAsync(
         });
 
     connectedServerApi()->getJsonResult(
-        "/api/getCameraParamManifest",
-        params,
+        NX_FMT("/rest/v2/devices/%1/advanced/*/manifest", camera->getId()),
+        /*params*/ {},
         callback,
         thread(),
         camera->getParentId());
