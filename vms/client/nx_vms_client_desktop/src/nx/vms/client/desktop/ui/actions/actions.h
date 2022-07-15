@@ -339,6 +339,11 @@ enum IDType
     SaveCurrentLayoutAsAction,
 
     /**
+     * Saves current layout as a cloud layout for the current user.
+     */
+    SaveCurrentLayoutAsCloudAction,
+
+    /**
      * Opens a file dialog and adds selected files to the current layout,
      * or opens the selected layouts.
      */
@@ -586,6 +591,11 @@ enum IDType
      * <tt>QString ResourceNameRole</tt> --- name for the new layout.
      */
     SaveLayoutAsAction,
+
+    /**
+     * Saves selected layout as a cloud layout for the current user.
+     */
+    SaveLayoutAsCloudAction,
 
     /**
     * Forgets password for encrypted layout.

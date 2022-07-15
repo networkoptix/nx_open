@@ -33,8 +33,10 @@ private:
     void at_saveLayoutAction_triggered();
     void at_saveCurrentLayoutAction_triggered();
     void at_saveLayoutAsAction_triggered();
+    void at_saveLayoutAsCloudAction_triggered();
     void at_saveLayoutForCurrentUserAsAction_triggered();
     void at_saveCurrentLayoutAsAction_triggered();
+    void at_saveCurrentLayoutAsCloudAction_triggered();
     void at_closeLayoutAction_triggered();
     void at_closeAllButThisLayoutAction_triggered();
     void at_removeFromServerAction_triggered();
@@ -47,10 +49,16 @@ private:
 private:
     bool closeAllLayouts(bool force = false);
 
-    /** Save target file, local or remote layout. */
-    void saveLayout(const QnLayoutResourcePtr &layout);
+    /**
+     * Save target file, local or remote layout.
+     * @param layout Layout to save.
+     * @param forceCloudConvert Forcibly convert existing layout to the Cloud one.
+     */
+    void saveLayout(const QnLayoutResourcePtr& layout, bool forceCloudConvert = false);
 
     void saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUserResourcePtr &user);
+
+    void saveLayoutAsCloud(const QnLayoutResourcePtr& layout);
 
     void removeLayoutItems(const QnLayoutItemIndexList& items, bool autoSave);
 

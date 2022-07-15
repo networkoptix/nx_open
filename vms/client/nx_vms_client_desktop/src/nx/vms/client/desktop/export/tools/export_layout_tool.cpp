@@ -29,7 +29,6 @@
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
 #include <nx_ec/data/api_conversion_functions.h>
-#include <ui/workbench/workbench_layout_snapshot_manager.h>
 
 #ifdef Q_OS_WIN
     #include <launcher/nov_launcher_win.h>

@@ -24,11 +24,27 @@ public:
     const CloudSystemStatusItem* q;
     const QString systemId;
     QPointer<CloudCrossSystemContext> systemContext;
-    nx::utils::ScopedConnections connections;
+    nx::utils::ScopedConnections managerConnections;
+    nx::utils::ScopedConnections contextConnections;
+
+    void connectToContext()
+    {
+        if (!NX_ASSERT(systemContext))
+            return;
+
+        NX_VERBOSE(this, "Connect to %1", *systemContext);
+        contextConnections << QObject::connect(systemContext.data(),
+            &CloudCrossSystemContext::statusChanged,
+            [this]()
+            {
+                NX_VERBOSE(this, "%1 status changed to %2", *systemContext, text());
+                q->notifyDataChanged({Qt::DisplayRole, Qn::DecorationPathRole, Qn::FlattenedRole});
+            });
+    }
 
     CloudCrossSystemContext::Status status() const
     {
-        return NX_ASSERT(systemContext)
+        return systemContext
             ? systemContext->status()
             : CloudCrossSystemContext::Status::uninitialized;
     }
@@ -38,7 +54,7 @@ public:
         switch (status())
         {
             case CloudCrossSystemContext::Status::uninitialized:
-                return "UNINITIALIZED"; //< Debug purposes.
+                return tr("Inaccessible");
             case CloudCrossSystemContext::Status::connecting:
                 return tr("Loading...");
             case CloudCrossSystemContext::Status::connectionFailure:
@@ -70,6 +86,8 @@ public:
     {
         switch (status())
         {
+            case CloudCrossSystemContext::Status::uninitialized:
+                return "events/alert_red.png";
             case CloudCrossSystemContext::Status::connecting:
                 return "legacy/loading.gif";
             case CloudCrossSystemContext::Status::connectionFailure:
@@ -78,6 +96,18 @@ public:
                 break;
         }
         return QString();
+    }
+
+    Qt::ItemFlags flags() const
+    {
+        switch (status())
+        {
+            case CloudCrossSystemContext::Status::uninitialized:
+                return {};
+            default:
+                break;
+        }
+        return {Qt::ItemIsEnabled};
     }
 };
 
@@ -89,18 +119,36 @@ CloudSystemStatusItem::CloudSystemStatusItem(const QString& systemId):
         .systemContext = appContext()->cloudCrossSystemManager()->systemContext(systemId)
     })
 {
-    if (!NX_ASSERT(d->systemContext))
-        return;
-
-    NX_VERBOSE(this, "Connect to %1", *d->systemContext);
-
-    d->connections << QObject::connect(d->systemContext.data(),
-        &CloudCrossSystemContext::statusChanged,
-        [this]()
+    auto manager = appContext()->cloudCrossSystemManager();
+    d->managerConnections << QObject::connect(
+        manager,
+        &CloudCrossSystemManager::systemFound,
+        [this, manager](const QString& systemId)
         {
-            NX_VERBOSE(this, "%1 status changed to %2", *d->systemContext, d->text());
-            notifyDataChanged({Qt::DisplayRole, Qn::DecorationPathRole, Qn::FlattenedRole});
+            if (systemId == d->systemId)
+            {
+                NX_ASSERT(!d->systemContext);
+                d->systemContext = manager->systemContext(systemId);
+                d->connectToContext();
+                notifyDataChanged({});
+            }
         });
+
+    d->managerConnections << QObject::connect(
+        manager,
+        &CloudCrossSystemManager::systemLost,
+        [this](const QString& systemId)
+        {
+            if (systemId == d->systemId)
+            {
+                d->systemContext.clear(); //< Actually it is already destroyed here.
+                d->contextConnections.reset();
+                notifyDataChanged({});
+            }
+        });
+
+    if (d->systemContext)
+        d->connectToContext();
 }
 
 CloudSystemStatusItem::~CloudSystemStatusItem()
@@ -134,7 +182,7 @@ QVariant CloudSystemStatusItem::data(int role) const
 
 Qt::ItemFlags CloudSystemStatusItem::flags() const
 {
-    return {Qt::ItemIsEnabled};
+    return d->flags();
 }
 
 } // namespace entity_resource_tree

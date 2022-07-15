@@ -2,15 +2,21 @@
 
 #include "workbench_layouts_handler.h"
 
-#include <QtWidgets/QAction>
-
 #include <boost/algorithm/cxx11/all_of.hpp>
 #include <boost/algorithm/cxx11/any_of.hpp>
+
+#include <QtWidgets/QAction>
 
 #include <client/client_globals.h>
 #include <client/client_message_processor.h>
 #include <client/client_settings.h>
 #include <common/common_module.h>
+#include <core/resource/file_layout_resource.h>
+#include <core/resource/layout_reader.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource/resource.h>
+#include <core/resource/user_resource.h>
+#include <core/resource/videowall_resource.h>
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_access/resource_access_manager.h>
@@ -18,19 +24,20 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/user_roles_manager.h>
-#include <core/resource/file_layout_resource.h>
-#include <core/resource/layout_reader.h>
-#include <core/resource/layout_resource.h>
-#include <core/resource/resource.h>
-#include <core/resource/user_resource.h>
-#include <core/resource/videowall_resource.h>
-#include <nx_ec/managers/abstract_layout_manager.h>
 #include <nx/utils/counter.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/metatypes.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
+#include <nx/vms/client/desktop/cross_system/cross_system_layout_resource.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
+#include <nx/vms/client/desktop/resources/layout_snapshot_manager.h>
+#include <nx/vms/client/desktop/resources/resource_descriptor.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameter_types.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
@@ -40,6 +47,7 @@
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/event/actions/abstract_action.h>
+#include <nx_ec/managers/abstract_layout_manager.h>
 #include <ui/dialogs/layout_name_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -47,16 +55,16 @@
 #include <ui/workbench/extensions/workbench_layout_change_validator.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/handlers/workbench_videowall_handler.h> //< TODO: #sivanov Dependencies.
+#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
-#include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_state_manager.h>
-#include <ui/workbench/workbench.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
+#include <watchers/cloud_status_watcher.h>
 
 using boost::algorithm::any_of;
 using boost::algorithm::all_of;
@@ -125,7 +133,8 @@ QnResourceList calculateResourcesToShare(const QnResourceList& resources,
     return resources.filtered(sharingRequired);
 }
 
-QSet<QnResourcePtr> localLayoutResources(QnResourcePool* resourcePool, const QnLayoutItemDataMap& items)
+QSet<QnResourcePtr> localLayoutResources(QnResourcePool* resourcePool,
+    const QnLayoutItemDataMap& items)
 {
     QSet<QnResourcePtr> result;
     for (const auto& item: items)
@@ -136,9 +145,41 @@ QSet<QnResourcePtr> localLayoutResources(QnResourcePool* resourcePool, const QnL
     return result;
 }
 
+QSet<QnResourcePtr> localLayoutResources(QnResourcePool* resourcePool,
+    const nx::vms::api::LayoutItemDataList& items)
+{
+    QSet<QnResourcePtr> result;
+    for (const auto& item: items)
+    {
+        const nx::vms::common::ResourceDescriptor descriptor{item.resourceId, item.resourcePath};
+        if (auto resource = resourcePool->getResourceByDescriptor(descriptor))
+            result.insert(resource);
+    }
+    return result;
+}
+
 QSet<QnResourcePtr> localLayoutResources(const QnLayoutResourcePtr& layout)
 {
     return localLayoutResources(layout->resourcePool(), layout->getItems());
+}
+
+bool isCloudLayout(const QnLayoutResourcePtr& layout)
+{
+    return !layout.dynamicCast<CrossSystemLayoutResource>().isNull();
+}
+
+bool hasCrossSystemItems(const QnLayoutResourcePtr& layout)
+{
+    const auto currentCloudSystemId = appContext()->currentSystemContext()->globalSettings()
+        ->cloudSystemId();
+
+    auto items = layout->getItems();
+    return std::any_of(items.cbegin(), items.cend(),
+        [currentCloudSystemId](const QnLayoutItemData& item)
+        {
+            return isCrossSystemResource(item.resource)
+                && crossSystemResourceSystemId(item.resource) != currentCloudSystemId;
+        });
 }
 
 } // namespace
@@ -147,17 +188,32 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
     QObject(parent),
     QnSessionAwareDelegate(parent)
 {
-    connect(action(action::NewUserLayoutAction),                 &QAction::triggered, this, &LayoutsHandler::at_newUserLayoutAction_triggered);
-    connect(action(action::SaveLayoutAction),                    &QAction::triggered, this, &LayoutsHandler::at_saveLayoutAction_triggered);
-    connect(action(action::SaveLayoutAsAction),                  &QAction::triggered, this, &LayoutsHandler::at_saveLayoutAsAction_triggered);
-    connect(action(action::SaveLayoutForCurrentUserAsAction),    &QAction::triggered, this, &LayoutsHandler::at_saveLayoutForCurrentUserAsAction_triggered);
-    connect(action(action::SaveCurrentLayoutAction),             &QAction::triggered, this, &LayoutsHandler::at_saveCurrentLayoutAction_triggered);
-    connect(action(action::SaveCurrentLayoutAsAction),           &QAction::triggered, this, &LayoutsHandler::at_saveCurrentLayoutAsAction_triggered);
-    connect(action(action::CloseLayoutAction),                   &QAction::triggered, this, &LayoutsHandler::at_closeLayoutAction_triggered);
-    connect(action(action::CloseAllButThisLayoutAction),         &QAction::triggered, this, &LayoutsHandler::at_closeAllButThisLayoutAction_triggered);
-    connect(action(action::RemoveFromServerAction),              &QAction::triggered, this, &LayoutsHandler::at_removeFromServerAction_triggered);
-    connect(action(action::OpenNewTabAction),                    &QAction::triggered, this, &LayoutsHandler::at_openNewTabAction_triggered);
-    connect(action(action::ForgetLayoutPasswordAction),          &QAction::triggered, this, &LayoutsHandler::at_forgetLayoutPasswordAction_triggered);
+    connect(action(action::NewUserLayoutAction), &QAction::triggered, this,
+        &LayoutsHandler::at_newUserLayoutAction_triggered);
+    connect(action(action::SaveLayoutAction), &QAction::triggered, this,
+        &LayoutsHandler::at_saveLayoutAction_triggered);
+    connect(action(action::SaveLayoutAsAction), &QAction::triggered, this,
+        &LayoutsHandler::at_saveLayoutAsAction_triggered);
+    connect(action(action::SaveLayoutAsCloudAction), &QAction::triggered, this,
+        &LayoutsHandler::at_saveLayoutAsCloudAction_triggered);
+    connect(action(action::SaveLayoutForCurrentUserAsAction), &QAction::triggered, this,
+        &LayoutsHandler::at_saveLayoutForCurrentUserAsAction_triggered);
+    connect(action(action::SaveCurrentLayoutAction), &QAction::triggered, this,
+        &LayoutsHandler::at_saveCurrentLayoutAction_triggered);
+    connect(action(action::SaveCurrentLayoutAsAction), &QAction::triggered, this,
+        &LayoutsHandler::at_saveCurrentLayoutAsAction_triggered);
+    connect(action(action::SaveCurrentLayoutAsCloudAction), &QAction::triggered, this,
+        &LayoutsHandler::at_saveCurrentLayoutAsCloudAction_triggered);
+    connect(action(action::CloseLayoutAction), &QAction::triggered, this,
+        &LayoutsHandler::at_closeLayoutAction_triggered);
+    connect(action(action::CloseAllButThisLayoutAction), &QAction::triggered, this,
+        &LayoutsHandler::at_closeAllButThisLayoutAction_triggered);
+    connect(action(action::RemoveFromServerAction), &QAction::triggered, this,
+        &LayoutsHandler::at_removeFromServerAction_triggered);
+    connect(action(action::OpenNewTabAction), &QAction::triggered, this,
+        &LayoutsHandler::at_openNewTabAction_triggered);
+    connect(action(action::ForgetLayoutPasswordAction), &QAction::triggered, this,
+        &LayoutsHandler::at_forgetLayoutPasswordAction_triggered);
 
     connect(action(action::RemoveLayoutItemAction), &QAction::triggered, this,
         &LayoutsHandler::at_removeLayoutItemAction_triggered);
@@ -299,13 +355,23 @@ void LayoutsHandler::at_forgetLayoutPasswordAction_triggered()
     layout::reloadFromFile(layout); //< Actually reload the file without a password.
 
     // Clear "modified" flag from layout.
-    snapshotManager()->store(layout);
+    auto systemContext = SystemContext::fromResource(layout);
+    if (NX_ASSERT(systemContext))
+        systemContext->layoutSnapshotManager()->store(layout);
 }
 
 void LayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, const QString &newName)
 {
-    QnLayoutResourceList existing = alreadyExistingLayouts(resourcePool(),
-        newName, layout->getParentId(), layout);
+    auto systemContext = SystemContext::fromResource(layout);
+    if (!NX_ASSERT(systemContext))
+        return;
+
+    QnLayoutResourceList existing = alreadyExistingLayouts(
+        systemContext->resourcePool(),
+        newName,
+        layout->getParentId(),
+        layout);
+
     if (!canRemoveLayouts(existing))
     {
         ui::messages::Resources::layoutAlreadyExists(mainWindowWidget());
@@ -316,23 +382,53 @@ void LayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, const QStri
     {
         if (!ui::messages::Resources::overrideLayout(mainWindowWidget()))
             return;
+
         removeLayouts(existing);
     }
 
-    bool changed = snapshotManager()->isChanged(layout);
+    bool changed = systemContext->layoutSnapshotManager()->isChanged(layout);
 
     layout->setName(newName);
 
     if (!changed)
-        snapshotManager()->save(layout);
+        systemContext->layoutSnapshotManager()->save(layout);
 }
 
-void LayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
+void LayoutsHandler::saveLayout(const QnLayoutResourcePtr& layout, bool forceCloudConvert)
 {
     if (!layout)
         return;
 
-    if (!snapshotManager()->isSaveable(layout))
+    if (ini().crossSystemLayouts
+        && !isCloudLayout(layout)
+        && (forceCloudConvert || hasCrossSystemItems(layout)))
+    {
+        // Convert common layout to cloud one.
+        appContext()->cloudLayoutsManager()->saveLayout(layout);
+
+        // Replace opened layout with the cloud one.
+        QnUuid id = layout->getId();
+        auto cloudLayout = appContext()->cloudLayoutsSystemContext()->resourcePool()
+            ->getResourceById<QnLayoutResource>(id);
+        if (NX_ASSERT(cloudLayout))
+        {
+            int index = workbench()->currentLayoutIndex();
+
+            workbench()->insertLayout(qnWorkbenchLayoutsFactory->create(cloudLayout, this), index);
+            workbench()->setCurrentLayoutIndex(index);
+            // workbench()->removeLayout(index + 1); //< TODO: #sivanov check this implementation.
+            closeLayouts({layout}, /*force*/ true);
+        }
+
+        return;
+    }
+
+    auto systemContext = SystemContext::fromResource(layout);
+    if (!NX_ASSERT(systemContext))
+        return;
+
+    auto snapshotManager = systemContext->layoutSnapshotManager();
+    if (!snapshotManager->isSaveable(layout))
         return;
 
     if (!accessController()->hasPermissions(layout, Qn::SavePermission))
@@ -342,21 +438,27 @@ void LayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
     {
         menu()->trigger(action::SaveLocalLayoutAction, layout);
     }
+    else if (ini().crossSystemLayouts && isCloudLayout(layout))
+    {
+        snapshotManager->save(layout);
+        return;
+    }
     else if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
     {
         // TODO: #sivanov Refactor common code to common place.
         NX_ASSERT(accessController()->hasPermissions(layout, Qn::SavePermission),
             "Saving unsaveable resource");
         if (context()->instance<QnWorkbenchVideoWallHandler>()->saveReviewLayout(layout,
-                [this, layout](int /*reqId*/, ec2::ErrorCode errorCode)
+                nx::utils::guarded(this,
+                    [this, layout, snapshotManager](int /*reqId*/, ec2::ErrorCode errorCode)
                 {
-                    snapshotManager()->markBeingSaved(layout->getId(), false);
+                    snapshotManager->markBeingSaved(layout->getId(), false);
                     if (errorCode != ec2::ErrorCode::ok)
                         return;
-                    snapshotManager()->markChanged(layout->getId(), false);
-                }))
+                    snapshotManager->markChanged(layout->getId(), false);
+                })))
         {
-            snapshotManager()->markBeingSaved(layout->getId(), true);
+            snapshotManager->markBeingSaved(layout->getId(), true);
         }
     }
     else
@@ -373,11 +475,11 @@ void LayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
             if (user)
                 grantMissingAccessRights(user, change);
 
-            snapshotManager()->save(layout);
+            snapshotManager->save(layout);
         }
         else
         {
-            snapshotManager()->restore(layout);
+            snapshotManager->restore(layout);
         }
     }
 }
@@ -500,6 +602,12 @@ void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUse
     bool shouldDelete = layout->hasFlags(Qn::local) &&
         (name == layout->getName() || isCurrent);
 
+    auto systemContext = SystemContext::fromResource(layout);
+    if (!NX_ASSERT(systemContext))
+        return;
+
+    auto snapshotManager = systemContext->layoutSnapshotManager();
+
     /* If it is current layout, close it and open the new one instead. */
     if (isCurrent &&
         user == layoutOwnerUser)   //making current only new layout of current user
@@ -515,11 +623,11 @@ void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUse
         {
             //(user == layoutOwnerUser) condition prevents clearing layout of another user (e.g., if copying layout from one user to another)
                 //user - is an owner of newLayout. It is not required to be owner of layout
-            snapshotManager()->restore(layout);
+            snapshotManager->restore(layout);
         }
     }
 
-    snapshotManager()->save(newLayout);
+    snapshotManager->save(newLayout);
 
     const auto radassManager = context()->instance<RadassResourceManager>();
     for (auto it = newUuidByOldUuid.begin(); it != newUuidByOldUuid.end(); ++it)
@@ -534,6 +642,61 @@ void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUse
 
     if (shouldDelete)
         removeLayouts(QnLayoutResourceList() << layout);
+}
+
+void LayoutsHandler::saveLayoutAsCloud(const QnLayoutResourcePtr& layout)
+{
+    if (!NX_ASSERT(layout) || !NX_ASSERT(ini().crossSystemLayouts))
+        return;
+
+    QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(
+        QDialogButtonBox::Save | QDialogButtonBox::Cancel,
+        mainWindowWidget()));
+    dialog->setWindowTitle(tr("Save Layout As Cloud"));
+    dialog->setText(tr("Enter Layout Name:"));
+
+    const QString proposedName = layout->getName();
+    dialog->setName(proposedName);
+
+    if (!dialog->exec() || dialog->clickedButton() != QDialogButtonBox::Save)
+        return;
+
+    const QString name = dialog->name();
+
+    // User press "Save As" and enters the same name as this layout already has.
+    if (name == proposedName && isCloudLayout(layout))
+    {
+        if (!ui::messages::Resources::overrideLayout(mainWindowWidget()))
+            return;
+
+        saveLayout(layout);
+        return;
+    }
+
+    auto cloudResourcesPool = appContext()->cloudLayoutsSystemContext()->resourcePool();
+
+    QnLayoutResourceList existing = cloudResourcesPool->getResources<QnLayoutResource>(
+        [suggestedName = name.toLower()](const QnLayoutResourcePtr& layout)
+        {
+            return suggestedName == layout->getName().toLower();
+        });
+
+    if (!existing.isEmpty())
+    {
+        if (!ui::messages::Resources::overrideLayout(mainWindowWidget()))
+            return;
+
+        removeLayouts(existing);
+    }
+
+    // TODO: #sivanov Fix double save workaround.
+    saveLayout(layout, /*forceCloudConvert*/ true);
+    auto createdLayout = cloudResourcesPool->getResourceById<QnLayoutResource>(layout->getId());
+    if (NX_ASSERT(createdLayout))
+    {
+        createdLayout->setName(name);
+        saveLayout(createdLayout);
+    }
 }
 
 void LayoutsHandler::removeLayoutItems(const QnLayoutItemIndexList& items, bool autoSave)
@@ -598,15 +761,19 @@ void LayoutsHandler::removeLayoutItems(const QnLayoutItemIndexList& items, bool 
 LayoutsHandler::LayoutChange LayoutsHandler::calculateLayoutChange(
     const QnLayoutResourcePtr& layout)
 {
+    auto systemContext = SystemContext::fromResource(layout);
+    if (!NX_ASSERT(systemContext))
+        return {};
+
     LayoutChange result;
     result.layout = layout;
 
     /* Share added resources. */
-    auto snapshot = snapshotManager()->snapshot(layout);
+    const auto& snapshot = systemContext->layoutSnapshotManager()->snapshot(layout);
 
     // Check only Resources from the same System Context as the Layout. Cross-system Resources
     // cannot be available through Shared Layouts.
-    auto oldResources = localLayoutResources(resourcePool(), snapshot.items);
+    auto oldResources = localLayoutResources(systemContext->resourcePool(), snapshot.items);
     auto newResources = localLayoutResources(layout);
 
     result.added = (newResources - oldResources).values();
@@ -727,7 +894,13 @@ bool LayoutsHandler::confirmDeleteLocalLayouts(const QnUserResourcePtr& user,
     QSet<QnResourcePtr> removedResources;
     for (const auto& layout: layouts)
     {
-        const auto snapshot = snapshotManager()->snapshot(layout);
+        NX_ASSERT(!isCloudLayout(layout));
+
+        auto systemContext = SystemContext::fromResource(layout);
+        if (!NX_ASSERT(systemContext))
+            continue;
+
+        const auto& snapshot = systemContext->layoutSnapshotManager()->snapshot(layout);
         removedResources.unite(localLayoutResources(resourcePool(), snapshot.items));
     }
 
@@ -789,13 +962,15 @@ void LayoutsHandler::removeLayouts(const QnLayoutResourceList &layouts)
         return;
 
     QnLayoutResourceList remoteResources;
-    for (const QnLayoutResourcePtr &layout : layouts)
+    for (const QnLayoutResourcePtr& layout: layouts)
     {
         NX_ASSERT(!layout->isFile());
         if (layout->isFile())
             continue;
 
-        if (layout->hasFlags(Qn::local))
+        if (isCloudLayout(layout))
+            appContext()->cloudLayoutsManager()->deleteLayout(layout);
+        else if (layout->hasFlags(Qn::local))
             resourcePool()->removeResource(layout); /*< This one can be simply deleted from resource pool. */
         else
             remoteResources << layout;
@@ -823,13 +998,17 @@ bool LayoutsHandler::closeLayouts(
     QnLayoutResourceList saveableResources, rollbackResources;
     if (!force)
     {
-        for (const QnLayoutResourcePtr &resource : resources)
+        for (const QnLayoutResourcePtr& layout: resources)
         {
-            bool changed = snapshotManager()->isChanged(resource);
+            auto systemContext = SystemContext::fromResource(layout);
+            if (!NX_ASSERT(systemContext))
+                continue;
+
+            bool changed = systemContext->layoutSnapshotManager()->isChanged(layout);
             if (!changed)
                 continue;
 
-            rollbackResources.push_back(resource);
+            rollbackResources.push_back(layout);
         }
     }
 
@@ -843,8 +1022,14 @@ void LayoutsHandler::closeLayoutsInternal(
     const QnLayoutResourceList& resources,
     const QnLayoutResourceList& rollbackResources)
 {
-    for (const QnLayoutResourcePtr &resource: rollbackResources)
-        snapshotManager()->restore(resource);
+    for (const QnLayoutResourcePtr& layout: rollbackResources)
+    {
+        auto systemContext = SystemContext::fromResource(layout);
+        if (!NX_ASSERT(systemContext))
+            continue;
+
+        systemContext->layoutSnapshotManager()->restore(layout);
+    }
 
     for (const QnLayoutResourcePtr &resource: resources)
     {
@@ -920,7 +1105,7 @@ void LayoutsHandler::at_newUserLayoutAction_triggered()
     layout->setParentId(user->getId());
     resourcePool()->addResource(layout);
 
-    snapshotManager()->save(layout);
+    appContext()->currentSystemContext()->layoutSnapshotManager()->save(layout);
 
     menu()->trigger(action::OpenInNewTabAction, layout);
 }
@@ -953,12 +1138,23 @@ void LayoutsHandler::at_saveLayoutAsAction_triggered()
     );
 }
 
+void LayoutsHandler::at_saveLayoutAsCloudAction_triggered()
+{
+    const auto parameters = menu()->currentParameters(sender());
+    saveLayoutAsCloud(parameters.resource().dynamicCast<QnLayoutResource>());
+}
+
 void LayoutsHandler::at_saveCurrentLayoutAsAction_triggered()
 {
     saveLayoutAs(
         workbench()->currentLayout()->resource(),
         context()->user()
     );
+}
+
+void LayoutsHandler::at_saveCurrentLayoutAsCloudAction_triggered()
+{
+    saveLayoutAsCloud(workbench()->currentLayout()->resource());
 }
 
 void LayoutsHandler::at_closeLayoutAction_triggered()
@@ -996,7 +1192,7 @@ void LayoutsHandler::at_removeFromServerAction_triggered()
             continue;
 
         auto owner = layout->getParentResource().dynamicCast<QnUserResource>();
-        if (layout->isServiceLayout() || layout->hasFlags(Qn::local))
+        if (isCloudLayout(layout) || layout->isServiceLayout() || layout->hasFlags(Qn::local))
             canAutoDelete << layout;
         else if (layout->isShared())
             shared << layout;

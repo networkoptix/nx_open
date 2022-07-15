@@ -650,32 +650,6 @@ void QnResourcesChangesManager::saveVideoWall(const QnVideoWallResourcePtr& vide
         apiVideowall, replyProcessor, this);
 }
 
-void QnResourcesChangesManager::saveLayout(const QnLayoutResourcePtr& layout,
-    LayoutChangesFunction applyChanges,
-    LayoutCallbackFunction callback)
-{
-    if (!applyChanges)
-        return;
-
-    NX_ASSERT(layout && !layout->isFile());
-    if (!layout || layout->isFile())
-        return;
-
-    auto connection = messageBusConnection();
-    if (!connection)
-        return;
-
-    auto replyProcessor = makeSaveResourceReplyProcessor<
-        QnLayoutResource,
-        nx::vms::api::LayoutData>(this, layout, callback);
-
-    applyChanges(layout);
-    nx::vms::api::LayoutData apiLayout;
-    ec2::fromResourceToApi(layout, apiLayout);
-
-    connection->getLayoutManager(Qn::kSystemAccess)->save(apiLayout, replyProcessor, this);
-}
-
 void QnResourcesChangesManager::saveWebPage(const QnWebPageResourcePtr& webPage,
     WebPageChangesFunction applyChanges,
     WebPageCallbackFunction callback)

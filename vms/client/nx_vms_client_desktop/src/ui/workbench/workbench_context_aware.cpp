@@ -146,11 +146,6 @@ QnWorkbench* QnWorkbenchContextAware::workbench() const
     return context()->workbench();
 }
 
-QnWorkbenchLayoutSnapshotManager* QnWorkbenchContextAware::snapshotManager() const
-{
-    return context()->snapshotManager();
-}
-
 QnWorkbenchAccessController* QnWorkbenchContextAware::accessController() const
 {
     return context()->accessController();

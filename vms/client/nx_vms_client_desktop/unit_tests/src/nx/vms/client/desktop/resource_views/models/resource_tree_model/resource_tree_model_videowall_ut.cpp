@@ -1,16 +1,16 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "resource_tree_model_test_fixture.h"
-
-#include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/videowall_resource.h>
-#include <core/resource/videowall_item.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <api/runtime_info_manager.h>
-#include <ui/help/help_topics.h>
-#include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <client/client_globals.h>
+#include <common/common_module.h>
+#include <core/resource/videowall_item.h>
+#include <core/resource/videowall_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/resources/layout_snapshot_manager.h>
+#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <ui/help/help_topics.h>
+
+#include "resource_tree_model_test_fixture.h"
 
 namespace nx::vms::client::desktop {
 namespace test {

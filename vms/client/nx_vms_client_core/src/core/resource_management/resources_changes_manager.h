@@ -98,11 +98,6 @@ public:
         VideoWallChangesFunction applyChanges = VideoWallChangesFunction(),
         VideoWallCallbackFunction callback = VideoWallCallbackFunction());
 
-    /** Apply changes to the given layout. */
-    void saveLayout(const QnLayoutResourcePtr& layout,
-        LayoutChangesFunction applyChanges,
-        LayoutCallbackFunction callback = LayoutCallbackFunction());
-
     /** Apply changes to the given web page. */
     void saveWebPage(const QnWebPageResourcePtr& webPage,
         WebPageChangesFunction applyChanges = WebPageChangesFunction(),

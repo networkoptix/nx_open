@@ -5,11 +5,13 @@
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
+#include <QtCore/QMetaEnum>
 #include <QtCore/QModelIndex>
 
 #include <client/client_globals.h>
 #include <core/resource/resource.h>
 #include <nx/vms/client/desktop/ui/scene/models/resource_tree_model_adapter.h>
+#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 
 namespace nx::vms::client::desktop {
 
@@ -27,7 +29,11 @@ QString ResourceTreeModelSquishFacade::jsonModel()
             jsonItem["name"] = index.data(Qt::DisplayRole).toString();
             jsonItem["node_type"] =
                 toString(index.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>());
-            jsonItem["icon"] = toString(index.data(Qn::ResourceIconKeyRole));
+
+            const auto resourceIconKeyValue = index.data(Qn::ResourceIconKeyRole).toInt();
+            jsonItem["icon"] = toString(
+                QMetaEnum::fromType<QnResourceIconCache::Key>().valueToKeys(resourceIconKeyValue));
+
             if (jsonItem["node_type"] == toString(ResourceTree::NodeType::resource))
             {
                 const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();

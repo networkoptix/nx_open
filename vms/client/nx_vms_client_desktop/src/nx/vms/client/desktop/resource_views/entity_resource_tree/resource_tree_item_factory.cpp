@@ -51,11 +51,11 @@ InvalidatorPtr systemNameInvalidator(const SystemSettings* globalSettings)
 }
 
 //-------------------------------------------------------------------------------------------------
-// Provider and invalidator pair factory functions for the header user name generic item.
+// Provider and invalidator pair factory functions for the header resource name generic item.
 //-------------------------------------------------------------------------------------------------
-GenericItem::DataProvider userNameProvider(const QnUserResourcePtr& user)
+GenericItem::DataProvider resourceNameProvider(const QnResourcePtr& resource)
 {
-    return [user] { return user->getName(); };
+    return [resource] { return resource->getName(); };
 }
 
 InvalidatorPtr resourceNameInvalidator(const QnResourcePtr& resource)
@@ -168,6 +168,57 @@ GenericItem::FlagsProvider cloudSystemFlagsProvider(const QnSystemDescriptionPtr
         };
 }
 
+//-------------------------------------------------------------------------------------------------
+// Icon data provider / invalidator and flags provider factory functions for the cloud layout item.
+//-------------------------------------------------------------------------------------------------
+GenericItem::DataProvider cloudLayoutIconProvider(const QnLayoutResourcePtr& layout)
+{
+    return
+        [layout]
+        {
+            return layout->locked()
+                ? static_cast<int>(QnResourceIconCache::CloudLayout | QnResourceIconCache::Locked)
+                : static_cast<int>(QnResourceIconCache::CloudLayout);
+        };
+}
+
+InvalidatorPtr cloudLayoutIconInvalidator(const QnLayoutResourcePtr& layout)
+{
+    auto result = std::make_shared<Invalidator>();
+
+    result->connections()->add(QObject::connect(
+        layout.get(),
+        &QnLayoutResource::lockedChanged,
+        [invalidator = result.get()]
+        {
+            invalidator->invalidate();
+        }));
+
+    return result;
+}
+
+GenericItem::FlagsProvider cloudLayoutFlagsProvider(const QnLayoutResourcePtr& layout)
+{
+    return
+        [weakCloudLayout = layout.toWeakRef()]() -> Qt::ItemFlags
+        {
+            if (auto cloudLayout = weakCloudLayout.lock())
+            {
+                if (!cloudLayout->locked()
+                    && cloudLayout->getStatus() == nx::vms::api::ResourceStatus::online)
+                {
+                    return Qt::ItemIsEnabled
+                        | Qt::ItemIsSelectable
+                        | Qt::ItemIsEditable
+                        | Qt::ItemIsDragEnabled
+                        | Qt::ItemIsDropEnabled;
+                }
+            }
+
+            return Qt::ItemIsSelectable;
+        };
+}
+
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -198,7 +249,7 @@ AbstractItemPtr ResourceTreeItemFactory::createCurrentSystemItem() const
 
 AbstractItemPtr ResourceTreeItemFactory::createCurrentUserItem(const QnUserResourcePtr& user) const
 {
-    const auto nameProvider = userNameProvider(user);
+    const auto nameProvider = resourceNameProvider(user);
     const auto nameInvalidator = resourceNameInvalidator(user);
 
     return GenericItemBuilder()
@@ -445,22 +496,38 @@ AbstractItemPtr ResourceTreeItemFactory::createShowreelItem(const QnUuid& showre
 }
 
 AbstractItemPtr ResourceTreeItemFactory::createVideoWallScreenItem(
-    const QnVideoWallResourcePtr& viedeoWall,
+    const QnVideoWallResourcePtr& videoWall,
     const QnUuid& screenUuid)
 {
-    return std::make_unique<VideoWallScreenItem>(viedeoWall, screenUuid);
+    return std::make_unique<VideoWallScreenItem>(videoWall, screenUuid);
 }
 
 AbstractItemPtr ResourceTreeItemFactory::createVideoWallMatrixItem(
-    const QnVideoWallResourcePtr& viedeoWall,
+    const QnVideoWallResourcePtr& videoWall,
     const QnUuid& matrixUuid)
 {
-    return std::make_unique<VideoWallMatrixItem>(viedeoWall, matrixUuid);
+    return std::make_unique<VideoWallMatrixItem>(videoWall, matrixUuid);
 }
 
 AbstractItemPtr ResourceTreeItemFactory::createCloudSystemStatusItem(const QString& systemId)
 {
     return std::make_unique<CloudSystemStatusItem>(systemId);
+}
+
+AbstractItemPtr ResourceTreeItemFactory::createCloudLayoutItem(const QnLayoutResourcePtr& layout)
+{
+    const auto nameProvider = resourceNameProvider(layout);
+    const auto nameInvalidator = resourceNameInvalidator(layout);
+    const auto iconProvider = cloudLayoutIconProvider(layout);
+    const auto iconInvalidator = cloudLayoutIconInvalidator(layout);
+    const auto flagsProvider = cloudLayoutFlagsProvider(layout);
+
+    return GenericItemBuilder()
+        .withRole(Qt::DisplayRole, nameProvider, nameInvalidator)
+        .withRole(Qn::ResourceRole, QVariant::fromValue(layout.staticCast<QnResource>()))
+        .withRole(Qn::ResourceIconKeyRole, iconProvider, iconInvalidator)
+        .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::resource))
+        .withFlags(flagsProvider);
 }
 
 QnResourcePool* ResourceTreeItemFactory::resourcePool() const
