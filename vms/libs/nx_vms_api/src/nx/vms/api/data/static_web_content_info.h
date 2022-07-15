@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <map>
 #include <optional>
 
 #include <QtCore/QString>
@@ -57,11 +58,14 @@ struct NX_VMS_API StaticWebContentInfo
     /**%apidoc[readonly]:integer The creation timestamp of the web content archive. */
     std::chrono::milliseconds timestampMs = std::chrono::milliseconds(0);
 
+    /**%apidoc[readonly] Detailed information about the contents. */
+    std::map<QString, QString> details;
+
     /**%apidoc Progress of the web content archive download/update. */
     std::optional<StaticWebContentUpdateInfo> update;
 };
 
-#define StaticWebContentInfo_Fields (source)(sha256)(timestampMs)(update)
+#define StaticWebContentInfo_Fields (source)(sha256)(timestampMs)(details)(update)
 QN_FUSION_DECLARE_FUNCTIONS(StaticWebContentInfo, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(StaticWebContentInfo, StaticWebContentInfo_Fields)
 
