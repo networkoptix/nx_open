@@ -34,6 +34,7 @@
 #include <nx/vms/client/desktop/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/desktop/analytics/object_display_settings.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_layouts_watcher.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
@@ -376,8 +377,16 @@ struct ApplicationContext::Private
             q->peerId());
         initializeServerCompatibilityValidator();
         q->core::ApplicationContext::initializeNetworkModules();
+    }
+
+    void initializeCrossSystemModules()
+    {
         cloudCrossSystemManager = std::make_unique<CloudCrossSystemManager>();
-        crossSystemLayoutsWatcher = std::make_unique<CrossSystemLayoutsWatcher>();
+        if (ini().crossSystemLayouts)
+        {
+            cloudLayoutsManager = std::make_unique<CloudLayoutsManager>();
+            crossSystemLayoutsWatcher = std::make_unique<CrossSystemLayoutsWatcher>();
+        }
     }
 
     void initializeTranslations()
@@ -527,6 +536,7 @@ struct ApplicationContext::Private
 
     // Network modules
     std::unique_ptr<CloudCrossSystemManager> cloudCrossSystemManager;
+    std::unique_ptr<CloudLayoutsManager> cloudLayoutsManager;
     std::unique_ptr<CrossSystemLayoutsWatcher> crossSystemLayoutsWatcher;
 };
 
@@ -583,6 +593,7 @@ ApplicationContext::ApplicationContext(
             d->statisticsModule = std::make_unique<ContextStatisticsModule>();
             d->initializeNetworkModules();
             d->initializeSystemContext();
+            d->initializeCrossSystemModules();
             d->unifiedResourcePool = std::make_unique<UnifiedResourcePool>();
             d->mainSystemContext->enableRouting(moduleDiscoveryManager());
             d->initializeClientCoreModule();
@@ -746,6 +757,19 @@ nx::vms::utils::TranslationManager* ApplicationContext::translationManager() con
 CloudCrossSystemManager* ApplicationContext::cloudCrossSystemManager() const
 {
     return d->cloudCrossSystemManager.get();
+}
+
+CloudLayoutsManager* ApplicationContext::cloudLayoutsManager() const
+{
+    return d->cloudLayoutsManager.get();
+}
+
+SystemContext* ApplicationContext::cloudLayoutsSystemContext() const
+{
+    if (NX_ASSERT(d->cloudLayoutsManager))
+        return d->cloudLayoutsManager->systemContext();
+
+    return {};
 }
 
 RadassController* ApplicationContext::radassController() const

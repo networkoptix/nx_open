@@ -26,12 +26,12 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/debug_helpers/model_transaction_checker.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
+#include <nx/vms/client/desktop/resources/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <utils/common/id.h>
 
 namespace nx::vms::client::desktop {
@@ -46,8 +46,6 @@ void ResourceTreeModelTest::SetUp()
 
     // Should be not null for correct Videowall Item node display.
     ASSERT_FALSE(systemContext()->peerId().isNull());
-
-    m_layoutSnapshotManager.reset(new QnWorkbenchLayoutSnapshotManager(commonModule()));
 
     m_newResourceTreeModel.reset(new entity_item_model::EntityItemModel());
     nx::utils::ModelTransactionChecker::install(m_newResourceTreeModel.get());
@@ -64,7 +62,6 @@ void ResourceTreeModelTest::TearDown()
     systemContext()->deleteMessageProcessor();
     m_resourceTreeComposer.clear();
     m_newResourceTreeModel.clear();
-    m_layoutSnapshotManager.clear();
 }
 
 QnResourcePool* ResourceTreeModelTest::resourcePool() const
@@ -82,9 +79,9 @@ QnResourceAccessManager* ResourceTreeModelTest::resourceAccessManager() const
     return systemContext()->resourceAccessManager();
 }
 
-QnWorkbenchLayoutSnapshotManager* ResourceTreeModelTest::layoutSnapshotManager() const
+LayoutSnapshotManager* ResourceTreeModelTest::layoutSnapshotManager() const
  {
-    return m_layoutSnapshotManager.get();
+    return systemContext()->layoutSnapshotManager();
 }
 
 QnRuntimeInfoManager* ResourceTreeModelTest::runtimeInfoManager() const

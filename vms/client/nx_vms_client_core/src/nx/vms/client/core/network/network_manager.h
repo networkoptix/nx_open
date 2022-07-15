@@ -85,6 +85,17 @@ public:
         RequestCallback callback,
         Qt::ConnectionType connectionType = Qt::AutoConnection);
 
+    /**
+     * Send DELETE request to the following url. Callback will be delivered using Qt signal-slot
+     * system to the request owner.
+     */
+    void doDelete(
+        std::unique_ptr<nx::network::http::AsyncClient> request,
+        nx::utils::Url url,
+        QObject* owner,
+        RequestCallback callback,
+        Qt::ConnectionType connectionType = Qt::AutoConnection);
+
     using ConnectCallback =
         std::function<void(std::shared_ptr<nx::network::http::AsyncClient> client)>;
 

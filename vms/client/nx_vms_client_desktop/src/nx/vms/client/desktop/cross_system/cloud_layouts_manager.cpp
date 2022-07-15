@@ -1,0 +1,321 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
+#include "cloud_layouts_manager.h"
+
+#include <QtCore/QTimer>
+
+#include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/fusion/serialization_format.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/http/buffer_source.h>
+#include <nx/network/http/http_async_client.h>
+#include <nx/network/http/http_types.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/url/url_builder.h>
+#include <nx/reflect/json.h>
+#include <nx/utils/guarded_callback.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/url.h>
+#include <nx/vms/api/data/layout_data.h>
+#include <nx/vms/client/core/network/network_manager.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <ui/workbench/workbench_access_controller.h>
+#include <watchers/cloud_status_watcher.h>
+
+#include "cross_system_layout_resource.h"
+
+using namespace std::chrono;
+using namespace nx::network::http;
+
+namespace nx::vms::client::desktop {
+
+namespace {
+
+constexpr auto kRequestInterval = 30s;
+constexpr auto kLayoutsPath = "/docdb/v1/docs/layouts";
+const auto kParticularLayoutPathTemplate = kLayoutsPath + QString("/%1.json");
+
+nx::utils::Url actualLayoutsEndpoint()
+{
+    const QString cloudLayoutsEndpointOverride(ini().cloudLayoutsEndpointOverride);
+    if (!cloudLayoutsEndpointOverride.isEmpty())
+    {
+        const auto endpoint = nx::utils::Url::fromUserInput(cloudLayoutsEndpointOverride);
+        if (NX_ASSERT(endpoint.isValid()))
+            return endpoint;
+    }
+
+    return nx::network::url::Builder()
+        .setScheme(kSecureUrlSchemeName)
+        .setHost(nx::network::SocketGlobals::cloud().cloudHost())
+        .toUrl();
+}
+
+} // namespace
+
+using Request = std::unique_ptr<AsyncClient>;
+using core::NetworkManager;
+
+struct CloudLayoutsManager::Private
+{
+    CloudLayoutsManager* const q;
+    QPointer<QnCloudStatusWatcher> cloudStatusWatcher = appContext()->cloudStatusWatcher();
+    bool online = false;
+    std::unique_ptr<SystemContext> systemContext = std::make_unique<SystemContext>(
+        appContext()->peerId(),
+        nx::core::access::Mode::direct);
+    const nx::utils::Url endpoint = actualLayoutsEndpoint();
+    std::unique_ptr<NetworkManager> networkManager = std::make_unique<NetworkManager>();
+    std::unique_ptr<QTimer> timer = std::make_unique<QTimer>();
+    QnUserResourcePtr user;
+
+    Private(CloudLayoutsManager* owner):
+        q(owner)
+    {
+        timer->setInterval(kRequestInterval);
+        timer->callOnTimeout([this](){ updateLayouts(); });
+    }
+
+    Request makeRequest()
+    {
+        Request request = std::make_unique<AsyncClient>(
+            nx::network::ssl::kDefaultCertificateCheck);
+        NetworkManager::setDefaultTimeouts(request.get());
+
+        if (NX_ASSERT(cloudStatusWatcher))
+            request->setCredentials(cloudStatusWatcher->credentials());
+
+        return request;
+    }
+
+    void addLayoutsToResourcePool(std::vector<nx::vms::api::LayoutData> layouts)
+    {
+        auto resourcePool = systemContext->resourcePool();
+        auto layoutsToRemove = resourcePool->getResources().filtered<CrossSystemLayoutResource>(
+            [](const CrossSystemLayoutResourcePtr& layout)
+            {
+                // Do not remove layouts which are still not saved.
+                return layout->hasFlags(Qn::remote);
+            }).toSet();
+
+        QnResourceList newlyCreatedLayouts;
+        for (const auto& layoutData: layouts)
+        {
+            if (auto existingLayout = resourcePool->getResourceById<CrossSystemLayoutResource>(
+                layoutData.id))
+            {
+                layoutsToRemove.remove(existingLayout);
+                existingLayout->update(layoutData);
+                existingLayout->removeFlags(Qn::local);
+                existingLayout->addFlags(Qn::remote);
+            }
+            else
+            {
+                auto layout = CrossSystemLayoutResourcePtr(
+                    new CrossSystemLayoutResource());
+                layout->setIdUnsafe(layoutData.id);
+                layout->addFlags(Qn::remote);
+                layout->update(layoutData);
+                newlyCreatedLayouts.push_back(layout);
+            }
+        }
+
+        if (!newlyCreatedLayouts.empty())
+            resourcePool->addResources(newlyCreatedLayouts);
+
+        if (!layoutsToRemove.empty())
+            resourcePool->removeResources(layoutsToRemove.toList());
+    }
+
+    void ensureUser()
+    {
+        NX_ASSERT(!user && cloudStatusWatcher);
+
+        user = QnUserResourcePtr(new QnUserResource(nx::vms::api::UserType::cloud));
+        user->setIdUnsafe(QnUuid::createUuid());
+        user->setName(cloudStatusWatcher->cloudLogin());
+        user->setOwner(true); //< Avoid resources access calculation.
+
+        auto resourcePool = systemContext->resourcePool();
+        resourcePool->addResource(user);
+        systemContext->accessController()->setUser(user);
+    }
+
+    void updateLayouts()
+    {
+        Request request = makeRequest();
+        auto url = endpoint;
+        url.setPath(kLayoutsPath);
+        url.setQuery("matchPrefix");
+        networkManager->doGet(
+            std::move(request),
+            std::move(url),
+            q,
+            nx::utils::guarded(q,
+                [this](NetworkManager::Response response)
+                {
+                    if (!online)
+                        return;
+
+                    if (!StatusCode::isSuccessCode(response.statusLine.statusCode))
+                    {
+                        NX_WARNING(this, "Layouts request failed with code %1",
+                            response.statusLine.statusCode);
+                        return;
+                    }
+
+                    std::vector<nx::vms::api::LayoutData> updatedLayouts;
+                    const bool parsed = nx::reflect::json::deserialize(response.messageBody,
+                        &updatedLayouts);
+                    if (NX_ASSERT(parsed))
+                        addLayoutsToResourcePool(std::move(updatedLayouts));
+                }));
+    }
+
+    void clearContext()
+    {
+        auto resourcePool = systemContext->resourcePool();
+        resourcePool->removeResources(resourcePool->getResources());
+        user.reset();
+        systemContext->accessController()->setUser({});
+    }
+
+    void sendSaveLayoutRequest(const nx::vms::api::LayoutData& layout, SaveCallback callback)
+    {
+        Request request = makeRequest();
+        auto url = endpoint;
+        url.setPath(nx::format(kParticularLayoutPathTemplate, layout.id.toSimpleString()));
+        auto messageBody = std::make_unique<BufferSource>(
+            Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+            std::move(nx::reflect::json::serialize(layout)));
+        request->setRequestBody(std::move(messageBody));
+        networkManager->doPost(
+            std::move(request),
+            std::move(url),
+            q,
+            nx::utils::guarded(q,
+                [this, callback](NetworkManager::Response response)
+                {
+                    const bool success = StatusCode::isSuccessCode(response.statusLine.statusCode);
+                    if (!success)
+                    {
+                        NX_WARNING(this, "Save request failed with code %1",
+                            response.statusLine.statusCode);
+                    }
+                    if (callback)
+                        callback(success);
+                }));
+    }
+
+    void sendDeleteLayoutRequest(const QnUuid& id)
+    {
+        Request request = makeRequest();
+        auto url = endpoint;
+        url.setPath(nx::format(kParticularLayoutPathTemplate, id.toSimpleString()));
+        networkManager->doDelete(
+            std::move(request),
+            std::move(url),
+            q,
+            nx::utils::guarded(q,
+                [this](NetworkManager::Response response)
+                {
+                    const bool success = StatusCode::isSuccessCode(response.statusLine.statusCode);
+                    if (!success)
+                    {
+                        NX_WARNING(this, "Delete request failed with code %1",
+                            response.statusLine.statusCode);
+                    }
+                }));
+    }
+
+    void saveLayout(const QnLayoutResourcePtr& layout, SaveCallback callback)
+    {
+        if (!NX_ASSERT(cloudStatusWatcher->status() == QnCloudStatusWatcher::Status::Online))
+            return;
+
+        nx::vms::api::LayoutData layoutData;
+        ec2::fromResourceToApi(layout, layoutData);
+
+        if (!layout.dynamicCast<CrossSystemLayoutResource>())
+        {
+            auto cloudLayout = CrossSystemLayoutResourcePtr(new CrossSystemLayoutResource());
+            cloudLayout->setIdUnsafe(layoutData.id);
+            cloudLayout->addFlags(Qn::local);
+            cloudLayout->update(layoutData);
+            systemContext->resourcePool()->addResource(cloudLayout);
+        }
+
+        sendSaveLayoutRequest(layoutData, callback);
+    }
+
+    void deleteLayout(const QnLayoutResourcePtr& layout)
+    {
+        if (!NX_ASSERT(cloudStatusWatcher->status() == QnCloudStatusWatcher::Status::Online))
+            return;
+
+        sendDeleteLayoutRequest(layout->getId());
+        systemContext->resourcePool()->removeResource(layout);
+    }
+
+    void setOnline(bool value)
+    {
+        if (value == online)
+            return;
+
+        online = value;
+        if (value)
+        {
+            timer->start();
+            ensureUser();
+            updateLayouts();
+        }
+        else
+        {
+            timer->stop();
+            clearContext();
+        }
+    }
+
+};
+
+CloudLayoutsManager::CloudLayoutsManager(QObject* parent):
+    QObject(parent),
+    d(new Private(this))
+{
+    NX_ASSERT(d->cloudStatusWatcher);
+    connect(d->cloudStatusWatcher.data(),
+        &QnCloudStatusWatcher::statusChanged,
+        this,
+        [this]()
+        {
+            d->setOnline(d->cloudStatusWatcher->status() == QnCloudStatusWatcher::Status::Online);
+        });
+
+     appContext()->addSystemContext(d->systemContext.get());
+}
+
+CloudLayoutsManager::~CloudLayoutsManager()
+{
+    d->networkManager->pleaseStopSync();
+}
+
+void CloudLayoutsManager::saveLayout(const QnLayoutResourcePtr& layout, SaveCallback callback)
+{
+    d->saveLayout(layout, callback);
+}
+
+void CloudLayoutsManager::deleteLayout(const QnLayoutResourcePtr& layout)
+{
+    d->deleteLayout(layout);
+}
+
+SystemContext* CloudLayoutsManager::systemContext() const
+{
+    return d->systemContext.get();
+}
+
+} // namespace nx::vms::client::desktop

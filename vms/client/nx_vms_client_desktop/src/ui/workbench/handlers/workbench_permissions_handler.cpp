@@ -15,10 +15,11 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/user_roles_manager.h>
+#include <nx/vms/client/desktop/resources/layout_snapshot_manager.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
-#include <ui/workbench/workbench_layout_snapshot_manager.h>
 
 namespace nx::vms::client::desktop {
 
@@ -71,10 +72,12 @@ void PermissionsHandler::shareLayoutWith(const QnLayoutResourcePtr& layout,
     // If layout is changed, it will automatically be saved here (and become shared if needed).
     // Also we do not grant direct access to cameras anyway as layout will become shared
     // and do not ask confirmation, so we do not use common saveLayout() method anyway.
-    if (!snapshotManager()->save(layout))
+    auto systemContext = SystemContext::fromResource(layout);
+    if (!NX_ASSERT(systemContext))
         return;
 
-    shareResourceWith(layout->getId(), subject);
+    if (systemContext->layoutSnapshotManager()->save(layout))
+        shareResourceWith(layout->getId(), subject);
 }
 
 void PermissionsHandler::shareCameraWith(const QnVirtualCameraResourcePtr& camera,

@@ -32,7 +32,9 @@
 #include <nx/vms/client/desktop/export/tools/export_media_validator.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
+#include <nx/vms/client/desktop/resources/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resources/resource_descriptor.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
@@ -52,10 +54,9 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/workbench_layout_snapshot_manager.h>
 
 #ifdef Q_OS_WIN
-#include <launcher/nov_launcher_win.h>
+    #include <launcher/nov_launcher_win.h>
 #endif
 
 namespace nx::vms::client::desktop {
@@ -346,7 +347,11 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
             const auto fileName = exportContext.fileName();
             const auto resource = d->ensureResourceIsInPool(fileName, resourcePool());
             if (const auto layout = resource.dynamicCast<QnLayoutResource>())
-                snapshotManager()->store(layout);
+            {
+                auto systemContext = SystemContext::fromResource(layout);
+                if (NX_ASSERT(systemContext))
+                    systemContext->layoutSnapshotManager()->store(layout);
+            }
             context()->menu()->trigger(ui::action::ExportFinishedEvent,
                 ui::action::Parameters().withArgument(
                     Qn::FileNameRole, fileName.completeFileName()));

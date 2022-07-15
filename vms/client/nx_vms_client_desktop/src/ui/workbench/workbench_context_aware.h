@@ -10,7 +10,6 @@
 
 class QnWorkbenchContext;
 class QnWorkbench;
-class QnWorkbenchLayoutSnapshotManager;
 class QnWorkbenchAccessController;
 class QnWorkbenchDisplay;
 class QnWorkbenchNavigator;
@@ -76,8 +75,6 @@ protected:
     nx::vms::client::desktop::ui::action::Manager* menu() const;
 
     QnWorkbench* workbench() const;
-
-    QnWorkbenchLayoutSnapshotManager* snapshotManager() const;
 
     QnWorkbenchAccessController* accessController() const;
 

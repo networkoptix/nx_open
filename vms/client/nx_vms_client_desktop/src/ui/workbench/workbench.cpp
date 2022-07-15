@@ -1,7 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "workbench.h"
-#include "workbench_layout_synchronizer.h"
 
 #include <common/common_module.h>
 #include <core/resource/file_layout_resource.h>
@@ -17,8 +16,10 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
+#include <nx/vms/client/desktop/resources/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_tab_bar/system_tab_bar_model.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/webengine_profile_manager.h>
@@ -32,10 +33,11 @@
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/util.h>
 #include <utils/web_downloader.h>
+
+#include "workbench_layout_synchronizer.h"
 
 using namespace nx::vms::client::desktop;
 using namespace ui;
@@ -203,7 +205,9 @@ void QnWorkbench::clear()
         if (layout->data(Qn::IsSpecialLayoutRole).isValid() && layout->data(Qn::IsSpecialLayoutRole).toBool())
             continue;
 
-        snapshotManager()->restore(layout->resource());
+        auto systemContext = SystemContext::fromResource(layout->resource());
+        if (NX_ASSERT(systemContext))
+            systemContext->layoutSnapshotManager()->restore(layout->resource());
     }
 
     setCurrentLayout(nullptr);
@@ -385,7 +389,10 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout)
             layout::reloadFromFile(resource, password);
             if (auto synchronizer = QnWorkbenchLayoutSynchronizer::instance(resource))
                 synchronizer->update();
-            snapshotManager()->store(resource);
+
+            auto systemContext = SystemContext::fromResource(resource);
+            if (NX_ASSERT(systemContext))
+                systemContext->layoutSnapshotManager()->store(resource);
         }
     }
 
@@ -691,8 +698,11 @@ void QnWorkbench::submit(QnWorkbenchState& state)
             if (isLayoutSupported(resource))
                 state.layoutUuids.push_back(sourceId(resource));
 
-            if (ini().enableMultiSystemTabBar &&
-                (resource->hasFlags(Qn::local) || snapshotManager()->isSaveable(resource)))
+            auto systemContext = SystemContext::fromResource(resource);
+            const bool isSaveable = NX_ASSERT(systemContext)
+                && systemContext->layoutSnapshotManager()->isSaveable(resource);
+
+            if (ini().enableMultiSystemTabBar && (resource->hasFlags(Qn::local) || isSaveable))
             {
                 QnWorkbenchState::UnsavedLayout unsavedLayout;
                 unsavedLayout.id = resource->getId();

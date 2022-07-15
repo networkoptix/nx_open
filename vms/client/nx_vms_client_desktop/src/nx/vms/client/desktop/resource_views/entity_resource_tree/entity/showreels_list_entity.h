@@ -16,12 +16,12 @@ using ShowreelItemCreator = std::function<entity_item_model::AbstractItemPtr(con
 /**
  * Entity which represents list of Showreels provided by layout tour manager.
  */
-class ShowreeelsListEntity: public entity_item_model::UniqueKeyListEntity<QnUuid>
+class ShowreelsListEntity: public entity_item_model::UniqueKeyListEntity<QnUuid>
 {
     using base_type = entity_item_model::UniqueKeyListEntity<QnUuid>;
 
 public:
-    ShowreeelsListEntity(
+    ShowreelsListEntity(
         const ShowreelItemCreator& showreelItemCreator,
         const QnLayoutTourManager* layoutTourManager);
 

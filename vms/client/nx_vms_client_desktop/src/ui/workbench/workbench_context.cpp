@@ -41,12 +41,11 @@
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_display.h>
-#include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_synchronizer.h>
 
 #if defined(Q_OS_LINUX)
-#include <ui/workaround/x11_launcher_workaround.h>
+    #include <ui/workaround/x11_launcher_workaround.h>
 #endif
 
 using namespace nx::vms::client::desktop::ui;
@@ -59,9 +58,9 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
     m_layoutWatcher(nullptr),
     m_closingDown(false)
 {
+    // FIXME: #sivanov Workaround interopration between those two.
     /* Layout watcher should be instantiated before snapshot manager because it can modify layout on adding. */
     m_layoutWatcher = instance<QnWorkbenchLayoutWatcher>();
-    m_snapshotManager.reset(new QnWorkbenchLayoutSnapshotManager(this));
 
     m_workbench.reset(new QnWorkbench(this));
 
@@ -143,7 +142,6 @@ QnWorkbenchContext::~QnWorkbenchContext() {
     m_navigator.reset();
     m_display.reset();
     m_menu.reset();
-    m_snapshotManager.reset();
     m_synchronizer.reset();
     m_workbench.reset();
 }
@@ -151,11 +149,6 @@ QnWorkbenchContext::~QnWorkbenchContext() {
 QnWorkbench* QnWorkbenchContext::workbench() const
 {
     return m_workbench.data();
-}
-
-QnWorkbenchLayoutSnapshotManager* QnWorkbenchContext::snapshotManager() const
-{
-    return m_snapshotManager.data();
 }
 
 nx::vms::client::desktop::ui::action::Manager* QnWorkbenchContext::menu() const

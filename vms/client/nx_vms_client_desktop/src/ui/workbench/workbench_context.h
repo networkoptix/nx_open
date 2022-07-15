@@ -20,7 +20,6 @@ struct QnStartupParameters;
 
 class QnWorkbench;
 class QnWorkbenchSynchronizer;
-class QnWorkbenchLayoutSnapshotManager;
 class QnWorkbenchAccessController;
 class QnWorkbenchDisplay;
 class QnWorkbenchNavigator;
@@ -56,7 +55,6 @@ public:
     virtual ~QnWorkbenchContext();
 
     QnWorkbench* workbench() const;
-    QnWorkbenchLayoutSnapshotManager* snapshotManager() const;
     nx::vms::client::desktop::ui::action::Manager* menu() const;
 
     QnWorkbenchAccessController* accessController() const;
@@ -118,7 +116,6 @@ private:
 
 private:
     QScopedPointer<QnWorkbench> m_workbench;
-    QScopedPointer<QnWorkbenchLayoutSnapshotManager> m_snapshotManager;
     QScopedPointer<nx::vms::client::desktop::ui::action::Manager> m_menu;
     QScopedPointer<QnWorkbenchDisplay> m_display;
     QScopedPointer<QnWorkbenchSynchronizer> m_synchronizer;
