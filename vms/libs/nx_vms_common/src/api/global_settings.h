@@ -224,6 +224,9 @@ public:
     bool isVideoTrafficEncryptionForced() const;
     void setVideoTrafficEncryptionForced(bool value);
 
+    bool exposeDeviceCredentials() const;
+    void setExposeDeviceCredentials(bool value);
+
     bool useHttpsOnlyCameras() const;
     void setUseHttpsOnlyCameras(bool value);
 
@@ -580,6 +583,7 @@ private:
     QnResourcePropertyAdaptor<int>* m_eventLogPeriodDaysAdaptor = nullptr;
     QnResourcePropertyAdaptor<QnOptionalBool>* m_trafficEncryptionForcedAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_videoTrafficEncryptionForcedAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_exposeDeviceCredentialsAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<QString>* m_disabledVendorsAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_autoDiscoveryEnabledAdaptor = nullptr;
