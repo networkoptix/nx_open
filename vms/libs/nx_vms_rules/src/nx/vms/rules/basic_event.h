@@ -60,6 +60,12 @@ public:
      */
     virtual QString resourceKey() const = 0;
 
+    /**
+     * Used for caching and limiting repeat of instant events.
+     * Keep in sync with uniqueKey in RuleProcessor::checkEventCondition().
+     */
+    virtual QString cacheKey() const;
+
     /** Returns the event details(such as caption, description, timestamp, source etc.). */
     virtual QVariantMap details(common::SystemContext* context) const;
 

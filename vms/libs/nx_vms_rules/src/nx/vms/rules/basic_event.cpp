@@ -59,6 +59,11 @@ QString BasicEvent::uniqueName() const
     return type();
 }
 
+QString BasicEvent::cacheKey() const
+{
+    return {};
+}
+
 QVariantMap BasicEvent::details(common::SystemContext*) const
 {
     QVariantMap result;
