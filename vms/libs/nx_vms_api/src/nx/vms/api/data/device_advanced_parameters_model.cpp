@@ -7,7 +7,6 @@
 namespace nx::vms::api {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceAdvancedFilter, (json), DeviceAdvancedFilter_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AdvancedManifestFilter, (json), AdvancedManifestFilter_Fields)
 
 QString DeviceAdvancedFilter::toString() const
 {

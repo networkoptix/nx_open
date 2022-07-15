@@ -258,7 +258,7 @@ struct NX_VMS_COMMON_API QnCameraAdvancedParams
 {
     QString name;
     QString version;
-    QString deviceId;
+    QString pluginUniqueId;
     // If packet_mode is set to true then the value of all parameters should be reloaded
     // on every parameter change. May be considered as a group `QnCameraAdvancedParam::resync`
     bool packet_mode = false;
@@ -278,10 +278,16 @@ struct NX_VMS_COMMON_API QnCameraAdvancedParams
 
     /** Check if at least one item is available when camera is offline. */
     bool hasItemsAvailableInOffline() const;
-
-    static DeprecatedFieldNames* getDeprecatedFieldNames();
 };
-#define QnCameraAdvancedParams_Fields (name)(version)(deviceId)(packet_mode)(groups)
+#define QnCameraAdvancedParams_Fields (name)(version)(pluginUniqueId)(packet_mode)(groups)
+
+struct QnCameraAdvancedParamsMap: std::map<QnUuid, QnCameraAdvancedParams>
+{
+    using base_type = std::map<QnUuid, QnCameraAdvancedParams>;
+    using base_type::base_type;
+    const QnCameraAdvancedParams& front() const { return begin()->second; }
+    QnUuid getId() const { return (size() == 1) ? begin()->first : QnUuid(); }
+};
 
 struct NX_VMS_COMMON_API QnCameraAdvancedParamsPostBody
 {
