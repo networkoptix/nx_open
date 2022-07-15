@@ -9,6 +9,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QTimer>
 
+#include <nx/utils/elapsed_timer.h>
 #include <nx/utils/uuid.h>
 
 #include "rules_fwd.h"
@@ -74,9 +75,16 @@ public:
 signals:
     void stateChanged();
 
+public: // For testing.
+    void cleanupOldEventsFromCache(
+        std::chrono::milliseconds eventTimeout,
+        std::chrono::milliseconds cleanupTimeout) const;
+
 private:
     void updateState();
-    void clearCache();
+
+    bool wasEventCached(const QString& cacheKey) const;
+    void cacheEvent(const QString& cacheKey) const;
 
 private:
     QnUuid m_id;
@@ -85,8 +93,9 @@ private:
     bool m_updateInProgress = false;
 
     mutable std::set<QString> m_runningEvents;
-    mutable std::map<QString, std::chrono::microseconds> m_suppressedEvents;
-    mutable QTimer m_clearCacheTimer;
+
+    mutable std::map<QString, nx::utils::ElapsedTimer> m_cachedEvents;
+    mutable nx::utils::ElapsedTimer m_cacheTimer;
 };
 
 } // namespace nx::vms::rules

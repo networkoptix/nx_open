@@ -21,9 +21,11 @@ namespace nx::vms::rules {
 
 namespace {
 
+using namespace std::chrono;
+
 // The following timeouts got from the event rule processor.
-constexpr std::chrono::seconds kObjectDetectedEventTimeout(30);
-constexpr std::chrono::seconds kCleanupTimeout(5);
+constexpr auto kEventTimeout = 30s;
+constexpr auto kCleanupTimeout = 5s;
 
 bool isProlonged(const EventPtr& event)
 {
@@ -39,9 +41,6 @@ EventFilter::EventFilter(const QnUuid& id, const QString& eventType):
 {
     NX_ASSERT(!id.isNull());
     NX_ASSERT(!m_eventType.isEmpty());
-
-    connect(&m_clearCacheTimer, &QTimer::timeout, this, &EventFilter::clearCache);
-    m_clearCacheTimer.setInterval(kCleanupTimeout);
 }
 
 EventFilter::~EventFilter()
@@ -125,9 +124,53 @@ const QHash<QString, EventField*> EventFilter::fields() const
     return result;
 }
 
+void EventFilter::cleanupOldEventsFromCache(
+    std::chrono::milliseconds eventTimeout,
+    std::chrono::milliseconds cleanupTimeout) const
+{
+    if (!m_cacheTimer.hasExpired(cleanupTimeout))
+        return;
+    m_cacheTimer.restart();
+
+    // TODO: can be changed to the std::remove_if after
+    // C++20 upgrade: https://en.cppreference.com/w/cpp/container/map/erase_if
+    auto itr = m_cachedEvents.begin();
+    while (itr != m_cachedEvents.end())
+    {
+        if (itr->second.hasExpired(eventTimeout))
+            itr = m_cachedEvents.erase(itr);
+        else
+            ++itr;
+    }
+}
+
+bool EventFilter::wasEventCached(const QString& cacheKey) const
+{
+    // TODO: #amalov Check for cached event expiration here.
+    return !cacheKey.isEmpty() && m_cachedEvents.contains(cacheKey);
+}
+
+void EventFilter::cacheEvent(const QString& eventKey) const
+{
+    using namespace nx::utils;
+
+    if (eventKey.isEmpty())
+        return;
+
+    cleanupOldEventsFromCache(kEventTimeout, kCleanupTimeout);
+    m_cachedEvents.emplace(eventKey, ElapsedTimer(ElapsedTimerState::started));
+}
+
 bool EventFilter::match(const EventPtr& event) const
 {
     NX_VERBOSE(this, "Matching filter id: %1", m_id);
+
+    const auto cacheKey = event->cacheKey();
+    if (wasEventCached(cacheKey))
+    {
+        NX_VERBOSE(this, "Skipping cached event with key: %1", cacheKey);
+        return false;
+    }
 
     // TODO: #mmalofeev Consider move this check to the engine.
     if (isProlonged(event))
@@ -181,39 +224,8 @@ bool EventFilter::match(const EventPtr& event) const
             return false;
     }
 
-    // At the moment only AnalyticsObjectEvent might be suppressed and processed not often than once
-    // per kObjectDetectedEventTimeout interval.
-    const bool isSuppressibleEvent = event->type() == utils::type<AnalyticsObjectEvent>();
-    // TODO: #mmalofeev Consider move this check to the engine.
-    if (isSuppressibleEvent)
-    {
-        const auto currentTimePoint = qnSyncTime->currentTimePoint();
-        const auto resourceKey = event->resourceKey();
-        if (auto it = m_suppressedEvents.find(event->uniqueName()); it != m_suppressedEvents.end())
-        {
-            if (currentTimePoint - it->second < kObjectDetectedEventTimeout)
-            {
-                NX_VERBOSE(
-                    this,
-                    "Event %1-%2 doesn't match since mightn't be processed often than once per %3 sec",
-                    event->type(),
-                    resourceKey,
-                    kObjectDetectedEventTimeout.count());
-                return false;
-            }
-            else
-            {
-                m_suppressedEvents.erase(it);
-            }
-        }
-        else
-        {
-            m_suppressedEvents.insert({resourceKey, currentTimePoint});
-
-            if (!m_clearCacheTimer.isActive())
-                m_clearCacheTimer.start();
-        }
-    }
+    // Cache and limit repeat of event with overloaded cacheKey().
+    cacheEvent(cacheKey);
 
     NX_VERBOSE(this, "Matched filter id: %1", m_id);
     return true;
@@ -237,21 +249,6 @@ void EventFilter::updateState()
 
     QScopedValueRollback<bool> guard(m_updateInProgress, true);
     emit stateChanged();
-}
-
-void EventFilter::clearCache()
-{
-    const auto now = qnSyncTime->currentTimePoint();
-    for (auto it = m_suppressedEvents.begin(); it != m_suppressedEvents.end();)
-    {
-        if (now - it->second >= kObjectDetectedEventTimeout)
-            it = m_suppressedEvents.erase(it);
-        else
-            ++it;
-    }
-
-    if (m_suppressedEvents.empty())
-        m_clearCacheTimer.stop();
 }
 
 } // namespace nx::vms::rules
