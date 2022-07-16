@@ -10397,26 +10397,26 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::VirtualCameraUploadWidget</name>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
-      <translation>別のユーザーが現在このカメラに映像をアップロードしています。</translation>
+      <translation>現在、別のユーザーがこのカメラに映像をアップロードしています。</translation>
     </message>
     <message>
       <source>User %1 is currently uploading footage to this camera.</source>
-      <translation>ユーザー %1 は現在このカメラに映像をアップロードしています。</translation>
+      <translation>現在、ユーザー %1 がこのカメラに映像をアップロードしています。</translation>
     </message>
     <message>
       <source>(%1 of %2)</source>
       <comment>Uploaded and total number of files will be substituted</comment>
-      <translation>(%2の%1)</translation>
+      <translation>(%1 / %2)</translation>
     </message>
     <message>
       <source>Finalizing %1...</source>
       <comment>Filename will be substituted</comment>
-      <translation>ファイナライズ %1...</translation>
+      <translation>%1 完了処理中...</translation>
     </message>
     <message>
       <source>Uploading %1...</source>
       <comment>Filename will be substituted</comment>
-      <translation>アップロード中 %1...</translation>
+      <translation>%1 アップロード中...</translation>
     </message>
   </context>
   <context>
