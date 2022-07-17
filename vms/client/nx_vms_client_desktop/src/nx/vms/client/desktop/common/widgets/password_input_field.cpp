@@ -31,10 +31,18 @@ struct PasswordInputField::Private
             passwordIndicator->setVisible(false);
     }
 
+    void updateDisplayedText()
+    {
+        q->base_type::setText(!storedPassword.isEmpty() || hasRemotePassword
+            ? kPasswordPlaceholder
+            : QString());
+    }
+
     PasswordInputField* const q;
     PasswordStrengthIndicator* passwordIndicator = nullptr;
     bool hidePasswordIndicatorWhenEmpty = true;
     bool passwordIsLocked = true;
+    bool hasRemotePassword = false;
     QString storedPassword;
 };
 
@@ -46,11 +54,10 @@ PasswordInputField::PasswordInputField(QWidget* parent):
 {
     const auto lineEdit = qobject_cast<QLineEdit*>(input());
     lineEdit->setObjectName("passwordLineEdit");
+
     connect(this, &QObject::objectNameChanged, this,
-        [lineEdit](const QString& name)
-        {
-            lineEdit->setObjectName(name + "_passwordLineEdit");
-        });
+        [lineEdit](const QString& name) { lineEdit->setObjectName(name + "_passwordLineEdit"); });
+
     lineEdit->setEchoMode(QLineEdit::Password);
     PasswordPreviewButton::createInline(lineEdit, [this]() { return !d->passwordIsLocked; });
 
@@ -76,11 +83,13 @@ PasswordInputField::PasswordInputField(QWidget* parent):
                 lineEdit->selectAll();
             }
         });
+
     lineEdit->installEventFilter(this);
 }
 
 PasswordInputField::~PasswordInputField()
 {
+    // Required here for forward-declared scoped pointer destruction.
 }
 
 bool PasswordInputField::eventFilter(QObject* watched, QEvent* event)
@@ -151,7 +160,21 @@ void PasswordInputField::setText(const QString& value)
 {
     d->storedPassword = value;
     d->passwordIsLocked = true;
-    base_type::setText(value.isEmpty() ? "" : kPasswordPlaceholder);
+    d->updateDisplayedText();
+}
+
+bool PasswordInputField::hasRemotePassword() const
+{
+    return d->hasRemotePassword;
+}
+
+void PasswordInputField::setHasRemotePassword(bool value)
+{
+    if (d->hasRemotePassword == value)
+        return;
+
+    d->hasRemotePassword = value;
+    d->updateDisplayedText();
 }
 
 } // namespace nx::vms::client::desktop
