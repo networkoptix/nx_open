@@ -4,6 +4,7 @@
 
 #include "input_field.h"
 
+#include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/common/utils/password_information.h>
 
 namespace nx::vms::client::desktop {
@@ -25,20 +26,26 @@ public:
     virtual ~PasswordInputField() override;
 
     virtual ValidationResult calculateValidationResult() const override;
+
     void setPasswordIndicatorEnabled(
         bool enabled,
         bool hideForEmptyInput = true,
         bool showImmediately = false,
         PasswordInformation::AnalyzeFunction analyzeFunction = nx::utils::passwordStrength);
+
     virtual QString text() const override;
     virtual void setText(const QString& value) override;
+
+    // Whether the password is stored on the server and isn't accessible on the client.
+    bool hasRemotePassword() const;
+    void setHasRemotePassword(bool value);
 
 protected:
     virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
 private:
     struct Private;
-    QScopedPointer<Private> d;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop

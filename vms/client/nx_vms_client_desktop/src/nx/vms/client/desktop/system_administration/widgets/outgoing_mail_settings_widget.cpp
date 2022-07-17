@@ -86,6 +86,10 @@ public:
 
     bool ignoreInputNotifications() const;
 
+    bool isPasswordChanged() const { return m_passwordChanged; }
+    void setCurrentPassword(const QString& value);
+    void clearCurrentPassword();
+
 private:
     OutgoingMailSettingsWidget* const q;
 
@@ -95,6 +99,9 @@ private:
 
     bool m_ignoreInputNotifications = false;
     bool m_useCloudServiceToSendEmail = false;
+
+    bool m_passwordChanged = false;
+    QString m_currentPassword;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -251,6 +258,9 @@ void OutgoingMailSettingsWidget::Private::setupDialogControls()
         [this]
         {
             const auto emailAddress = QnEmailAddress(ui->emailInput->text());
+            if (emailAddress.value() == q->systemSettings()->emailSettings().email)
+                return; //< Nothing actually changed.
+
             const auto preset = emailAddress.smtpServer();
             if (preset.isNull())
                 return;
@@ -271,7 +281,7 @@ void OutgoingMailSettingsWidget::Private::setupDialogControls()
                 ui->userInput->setText(emailAddress.value());
 
             ui->protocolComboBox->setCurrentIndex(
-            ui->protocolComboBox->findData(QVariant::fromValue(preset.connectionType)));
+                ui->protocolComboBox->findData(QVariant::fromValue(preset.connectionType)));
         });
 
     q->connect(m_testSmtpConfigurationButton, &QPushButton::clicked, q,
@@ -279,6 +289,19 @@ void OutgoingMailSettingsWidget::Private::setupDialogControls()
 
     q->connect(q->systemSettings(), &nx::vms::common::SystemSettings::cloudSettingsChanged, q,
         [this] { ui->serviceTypeDropdown->setMenu(effectiveServiceTypeDropdownMenu()); });
+
+    q->connect(q, &OutgoingMailSettingsWidget::hasChangesChanged,
+        [this]()
+        {
+            setCurrentPassword(getSmtpSettingsFromDialog().password);
+
+            if (q->hasChanges())
+            {
+                ui->passwordInput->setHasRemotePassword(false);
+                setConfigurationStatus(NotConfigured);
+                setConfigurationStatusHint({});
+            }
+        });
 }
 
 void OutgoingMailSettingsWidget::Private::setReadOnly(bool readOnly)
@@ -446,6 +469,18 @@ void OutgoingMailSettingsWidget::Private::setSmtpSettingsToDialog(
 {
     QnScopedValueRollback<bool> inputNotificationsGuard(&m_ignoreInputNotifications, true);
 
+    const bool isEmpty = smtpSettings.isEmpty();
+    ui->passwordInput->setHasRemotePassword(!isEmpty);
+
+    if (smtpSettings.equals(getSmtpSettingsFromDialog(),
+        /*compareView*/ false,
+        /*comparePassword*/ false))
+    {
+        return;
+    }
+
+    clearCurrentPassword();
+
     QnEmailAddress emailAddress(smtpSettings.email);
     const auto preset = emailAddress.smtpServer();
 
@@ -484,22 +519,12 @@ QnEmailSettings OutgoingMailSettingsWidget::Private::getSmtpSettingsFromDialog()
     QnEmailSettings result;
 
     const QnEmailAddress emailAddress(ui->emailInput->text());
-    const auto serverPreset = emailAddress.smtpServer();
 
     result.email = emailAddress.value();
-    if (!serverPreset.isNull())
-    {
-        result.server = serverPreset.server;
-        result.port = serverPreset.port;
-        result.connectionType = serverPreset.connectionType;
-    }
-    else
-    {
-        result.connectionType = ui->protocolComboBox->currentData().value<QnEmail::ConnectionType>();
-        const auto url = nx::utils::Url::fromUserInput(ui->serverAddressInput->text().trimmed());
-        result.port = url.port(QnEmailSettings::defaultPort(result.connectionType));
-        result.server = url.port() > 0 ? url.host() : ui->serverAddressInput->text().trimmed();
-    }
+    result.connectionType = ui->protocolComboBox->currentData().value<QnEmail::ConnectionType>();
+    const auto url = nx::utils::Url::fromUserInput(ui->serverAddressInput->text().trimmed());
+    result.port = url.port(QnEmailSettings::defaultPort(result.connectionType));
+    result.server = url.port() > 0 ? url.host() : ui->serverAddressInput->text().trimmed();
 
     result.user = ui->userInput->text();
     result.password = ui->passwordInput->text();
@@ -518,6 +543,23 @@ bool OutgoingMailSettingsWidget::Private::getUseCloudServiceFromDialog() const
 bool OutgoingMailSettingsWidget::Private::ignoreInputNotifications() const
 {
     return m_ignoreInputNotifications;
+}
+
+void OutgoingMailSettingsWidget::Private::setCurrentPassword(const QString& value)
+{
+    if (m_currentPassword == value)
+        return;
+
+    m_currentPassword = value;
+    m_passwordChanged = true;
+
+    emit q->hasChangesChanged();
+}
+
+void OutgoingMailSettingsWidget::Private::clearCurrentPassword()
+{
+    m_currentPassword = QString();
+    m_passwordChanged = false;
 }
 
 QMenu* OutgoingMailSettingsWidget::Private::effectiveServiceTypeDropdownMenu() const
@@ -606,8 +648,10 @@ void OutgoingMailSettingsWidget::applyChanges()
 
 bool OutgoingMailSettingsWidget::hasChanges() const
 {
-    return systemSettings()->useCloudServiceToSendEmail() != d->getUseCloudServiceFromDialog()
-        || !systemSettings()->emailSettings().equals(d->getSmtpSettingsFromDialog());
+    return d->isPasswordChanged()
+        || systemSettings()->useCloudServiceToSendEmail() != d->getUseCloudServiceFromDialog()
+        || !systemSettings()->emailSettings().equals(d->getSmtpSettingsFromDialog(),
+            /*compareView*/ false, /*comparePassword*/ false);
 }
 
 void OutgoingMailSettingsWidget::setReadOnlyInternal(bool readOnly)

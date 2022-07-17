@@ -82,23 +82,37 @@ int QnEmailSettings::defaultPort(QnEmail::ConnectionType connectionType)
     }
 }
 
-bool QnEmailSettings::isValid() const
+bool QnEmailSettings::isEmpty() const
 {
-    return nx::email::isValidAddress(email)
-        && nx::utils::Url::fromUserInput(server).isValid();
+    return equals({});
 }
 
-bool QnEmailSettings::equals(const QnEmailSettings &other, bool compareView /* = false*/) const
+bool QnEmailSettings::isValid() const
 {
-    if (email != other.email)                   return false;
-    if (server != other.server)                 return false;
-    if (user != other.user)                     return false;
-    if (password != other.password)             return false;
-    if (signature != other.signature)           return false;
-    if (supportEmail != other.supportEmail)     return false;
-    if (connectionType != other.connectionType) return false;
-    if (port != other.port)                     return false;
-    if (timeout != other.timeout)               return false;
+    return !email.isEmpty() && !server.isEmpty();
+}
+
+bool QnEmailSettings::equals(
+    const QnEmailSettings& other, bool compareView, bool comparePassword) const
+{
+    if (email != other.email)
+        return false;
+    if (server != other.server)
+        return false;
+    if (user != other.user)
+        return false;
+    if (comparePassword && password != other.password)
+        return false;
+    if (signature != other.signature)
+        return false;
+    if (supportEmail != other.supportEmail)
+        return false;
+    if (connectionType != other.connectionType)
+        return false;
+    if (port != other.port)
+        return false;
+    if (timeout != other.timeout)
+        return false;
 
     return !compareView || (simple == other.simple);
 }
@@ -130,8 +144,8 @@ QString QnEmailAddress::user() const
 {
     /* Support for tagged addressing: username+tag@domain.com */
 
-    const auto idx = m_email.indexOf('@');
-    const auto idxSuffix = m_email.indexOf('+');
+    int idx = m_email.indexOf(L'@');
+    int idxSuffix = m_email.indexOf(L'+');
     if (idx >= 0)
     {
         if (idxSuffix >= 0)
@@ -144,7 +158,7 @@ QString QnEmailAddress::user() const
 
 QString QnEmailAddress::domain() const
 {
-    const auto idx = m_email.indexOf('@');
+    int idx = m_email.indexOf(L'@');
     return m_email.mid(idx + 1);
 }
 
