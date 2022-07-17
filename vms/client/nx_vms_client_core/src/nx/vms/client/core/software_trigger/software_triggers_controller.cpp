@@ -124,13 +124,14 @@ bool SoftwareTriggersController::Private::setEventTriggerState(
             setActiveTrigger(ruleId, state, success);
         });
 
-    const auto triggerId = rule->eventParams().inputPortId;
+    const auto eventParams = rule->eventParams();
     nx::network::rest::Params params;
-    params.insert(lit("timestamp"), lit("%1").arg(qnSyncTime->currentMSecsSinceEpoch()));
+    params.insert("timestamp", QString::number(qnSyncTime->currentMSecsSinceEpoch()));
     params.insert("event_type",
         nx::reflect::toString(nx::vms::api::EventType::softwareTriggerEvent));
-    params.insert(lit("inputPortId"), triggerId);
-    params.insert(lit("eventResourceId"), resourceId.toString());
+    params.insert("inputPortId", eventParams.inputPortId);
+    params.insert("eventResourceId", resourceId.toString());
+    params.insert("caption", eventParams.getTriggerName());
 
     if (state != nx::vms::api::EventState::undefined)
         params.insert("state", nx::reflect::toString(state));
