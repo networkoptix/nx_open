@@ -104,9 +104,11 @@ struct NX_VMS_COMMON_API QnEmailSettings
 
     QString name;
 
+    bool isEmpty() const;
     bool isValid() const;
 
-    bool equals(const QnEmailSettings &other, bool compareView = false) const;
+    bool equals(const QnEmailSettings& other, bool compareView = false,
+        bool comparePassword = true) const;
 
     static int defaultPort(QnEmail::ConnectionType connectionType);
     static int defaultTimeoutSec();

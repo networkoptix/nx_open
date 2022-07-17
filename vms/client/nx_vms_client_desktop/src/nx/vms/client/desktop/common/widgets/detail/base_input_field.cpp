@@ -394,16 +394,16 @@ void BaseInputField::setCustomHint(const QString& hint)
 QString BaseInputField::text() const
 {
     Q_D(const BaseInputField);
-    return d->textAccessor->get(d->input).toString();
+    return d->getText();
 }
 
 void BaseInputField::setText(const QString& value)
 {
     Q_D(BaseInputField);
-    if (d->textAccessor->get(d->input) == value)
+    if (d->getText() == value)
         return;
 
-    d->textAccessor->set(d->input, value);
+    d->setText(value);
     validate();
 }
 
@@ -549,7 +549,7 @@ ValidationResult BaseInputField::calculateValidationResult() const
 {
     Q_D(const BaseInputField);
     return d->validator && !d->optionalTextIsNull
-        ? d->validator(d->getText())
+        ? d->validator(text())
         : ValidationResult(QValidator::Acceptable);
 }
 
