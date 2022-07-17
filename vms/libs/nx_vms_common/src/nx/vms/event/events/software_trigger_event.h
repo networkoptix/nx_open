@@ -15,13 +15,17 @@ class NX_VMS_COMMON_API SoftwareTriggerEvent: public ProlongedEvent
     using base_type = ProlongedEvent;
 
 public:
-    SoftwareTriggerEvent(const QnResourcePtr& resource,
-        const QString& triggerId, const QnUuid& userId, qint64 timeStampUs,
-        EventState toggleState = EventState::undefined);
+    SoftwareTriggerEvent(
+        const QnResourcePtr& resource,
+        const QString& triggerId,
+        const QnUuid& userId,
+        qint64 timeStampUs,
+        EventState toggleState,
+        const QString& triggerName);
 
     const QString& triggerId() const;
-
     const QnUuid& userId() const;
+    const QString& triggerName() const;
 
     virtual EventParameters getRuntimeParams() const override;
     virtual EventParameters getRuntimeParamsEx(
@@ -32,6 +36,7 @@ public:
 private:
     const QString m_triggerId;
     const QnUuid m_userId;
+    const QString m_triggerName;
 };
 
 } // namespace event
