@@ -13,11 +13,13 @@ SoftwareTriggerEvent::SoftwareTriggerEvent(
     const QString& triggerId,
     const QnUuid& userId,
     qint64 timeStampUs,
-    EventState toggleState)
+    EventState toggleState,
+    const QString& triggerName)
     :
     base_type(EventType::softwareTriggerEvent, resource, toggleState, timeStampUs),
     m_triggerId(triggerId),
-    m_userId(userId)
+    m_userId(userId),
+    m_triggerName(triggerName)
 {
 }
 
@@ -51,6 +53,11 @@ EventParameters SoftwareTriggerEvent::getRuntimeParamsEx(
 bool SoftwareTriggerEvent::checkEventParams(const EventParameters& params) const
 {
     return m_triggerId == params.inputPortId;
+}
+
+const QString& SoftwareTriggerEvent::triggerName() const
+{
+    return m_triggerName;
 }
 
 } // namespace event
