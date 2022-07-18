@@ -388,38 +388,33 @@ namespace QJsonDetail {
         }
     }
 
-    template<typename... Args, size_t... Indices>
-    inline bool deserializeFirstPossibleType(
+    template<typename T, typename... Args>
+    inline bool deserializeVariantType(
         QnJsonContext* ctx,
         const QJsonValue& value,
-        std::variant<Args...>* target,
-        std::index_sequence<Indices...>)
+        std::variant<Args...>* target)
     {
-        return (... ||
-            [&]()
+        // Note: Optional in variant is not supported. So we need temporary
+        // setSomeFieldsNotFound(false) to check that variant field is not found.
+        const bool areSomeFieldsNotFound = ctx->areSomeFieldsNotFound();
+        nx::utils::ScopeGuard guard(
+            [ctx, areSomeFieldsNotFound]()
             {
-                // Note: Optional in variant is not supported. So we need temporary
-                // setSomeFieldsNotFound(false) to check that variant field is not found.
-                const bool areSomeFieldsNotFound = ctx->areSomeFieldsNotFound();
-                nx::utils::ScopeGuard guard(
-                    [ctx, areSomeFieldsNotFound]()
-                    {
-                        if (areSomeFieldsNotFound)
-                            ctx->setSomeFieldsNotFound(true);
-                    });
                 if (areSomeFieldsNotFound)
-                    ctx->setSomeFieldsNotFound(false);
+                    ctx->setSomeFieldsNotFound(true);
+            });
+        if (areSomeFieldsNotFound)
+            ctx->setSomeFieldsNotFound(false);
 
-                std::decay_t<decltype(std::get<Indices>(*target))> typedTarget;
-                if (!deserialize(ctx, value, &typedTarget))
-                    return false;
+        T typedTarget;
+        if (!deserialize(ctx, value, &typedTarget))
+            return false;
 
-                if (ctx->areSomeFieldsNotFound())
-                    return false;
+        if (ctx->areSomeFieldsNotFound())
+            return false;
 
-                *target = std::move(typedTarget);
-                return true;
-            }());
+        *target = typedTarget;
+        return true;
     }
 
 } // namespace QJsonDetail
@@ -591,8 +586,7 @@ inline void serialize(QnJsonContext* ctx, const std::variant<Args...>& value, QJ
 template<typename... Args>
 inline bool deserialize(QnJsonContext* ctx, const QJsonValue& value, std::variant<Args...>* target)
 {
-    return QJsonDetail::deserializeFirstPossibleType(
-        ctx, value, target, std::make_index_sequence<sizeof...(Args)>{});
+    return (... || QJsonDetail::deserializeVariantType<Args>(ctx, value, target));
 }
 
 #define QN_DEFINE_INTEGER_JSON_SERIALIZATION_FUNCTIONS(TYPE)                    \
