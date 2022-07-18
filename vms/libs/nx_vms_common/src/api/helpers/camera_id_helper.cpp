@@ -65,7 +65,11 @@ QnVirtualCameraResourcePtr findCameraByFlexibleIds(
     }
 
     QString flexibleId = params.value(flexibleIdParamName);
-    NX_ASSERT(!flexibleId.isNull()); //< NOTE: Can be empty if specified empty in the request.
+    if (flexibleId.isNull())
+    {
+        NX_DEBUG(NX_SCOPE_TAG, "Bad request: %1 is null", flexibleIdParamName);
+        return QnVirtualCameraResourcePtr(nullptr);
+    }
 
     auto camera = findCameraByFlexibleId(resourcePool, flexibleId);
     if (!camera)

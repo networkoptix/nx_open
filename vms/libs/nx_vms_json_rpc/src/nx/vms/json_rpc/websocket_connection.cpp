@@ -75,6 +75,8 @@ void WebSocketConnection::stopWhileInAioThread()
     base_type::stopWhileInAioThread();
 
     m_socket->pleaseStopSync();
+    std::queue<QJsonValue> empty;
+    m_queuedRequests.swap(empty);
 }
 
 void WebSocketConnection::send(
@@ -108,6 +110,7 @@ void WebSocketConnection::readNextMessage()
             if (errorCode != SystemError::noError)
             {
                 NX_DEBUG(this, "Failed to read next message with error code %1", errorCode);
+                m_outgoingProcessor->clear(errorCode);
                 m_onDone(this);
                 return;
             }
@@ -172,6 +175,7 @@ void WebSocketConnection::send(QJsonValue data)
             if (errorCode != SystemError::noError)
             {
                 NX_DEBUG(this, "Failed to send message with error code %1", errorCode);
+                m_outgoingProcessor->clear(errorCode);
                 m_onDone(this);
             }
         });
