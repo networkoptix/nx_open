@@ -49,7 +49,13 @@ Pre-requisites per platform (the details are given in the further subsections):
     - NOTE: Microsoft Visual Studio 2019 can also be used to build the repository branch `vms_5.0`,
         but its support may be dropped in further branches like `vms_5.0_patch`.
 - **MacOS**:
-    - XCode 12.5.
+    - Xcode 12.5.
+    
+**MacOS**: for easy installation of further build prerequisites, install Homebrew:
+```
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" 
+brew update
+```
 
 ### CMake
 
@@ -66,10 +72,12 @@ version is recommended) and be available on `PATH` as `cmake`.
     to `CMakeSettings.json` (see the "Building and debugging in Visual Studio" section of this
     guide).
     - ATTENTION: If you use Cygwin, make sure the Cygwin's `cmake` is not on `PATH`.
+- **MacOS**: Download and install the latest stable CMake version from https://cmake.org/download/.
 
 ### Python
 
-Python 3.8+ should be installed and available on `PATH` either as `python` or `python3`.
+Python 3.8+ should be installed and available on `PATH` either as `python` or `python3`, and for
+**MacOS** - as `python3.<minor>`. In this guide we assume its main command is `python`.
 
 - **Windows**: a Windows-native (non-Cygwin) version of Python should be installed. A Cygwin
     version of Python may be installed as well, but must appear on `PATH` as a symlink (this makes
@@ -90,15 +98,15 @@ Python 3.8+ should be installed and available on `PATH` either as `python` or `p
         sudo rm /usr/bin/python3
         sudo ln -s /usr/bin/python3.8 /usr/bin/python3
         ```
+- **MacOS**:
+    ```
+    brew install python3.9
+    python3.9 -m ensurepip
+    ```    
 - Python module `pyaml` should be installed into Python:
-    - **Windows:**
-        ```
-        python -m pip install pyaml
-        ```
-    - **Linux:**
-        ```
-        python3 -m pip install pyaml
-        ```
+    ```
+    python -m pip install pyaml
+    ```
 
 ### Conan
 
@@ -125,7 +133,8 @@ directory `conan_cache/` next to the repository root and the build directories.
 
 ### Build tools
 
-- **Windows**: Install [Visual Studio, Community Edition](https://visualstudio.microsoft.com/downloads/)
+- **Windows**:
+    Install [Visual Studio, Community Edition](https://visualstudio.microsoft.com/downloads/)
     **The Workload** "Desktop development with C++" should be installed. Also make sure that in
     **Individual components**, "C++ CMake tools for Windows" is selected.
 
@@ -139,6 +148,10 @@ directory `conan_cache/` next to the repository root and the build directories.
         - **Ubuntu**: Install via apt:
             ```
             sudo apt install ninja-build
+            ```
+        - **MacOS**: Install via Homebrew:
+            ```
+            brew install ninja
             ```
     - Install the following build and runtime dependencies:
         - zlib: `zlib1g-dev`
@@ -157,7 +170,7 @@ directory `conan_cache/` next to the repository root and the build directories.
         - Autoconf: `autoconf`
         - X C Binding, xinerama extension: `libxcb-xinerama0`
 
-        A typical command to install all of the above:
+        A typical command to install all of the above via apt:
         ```
         sudo apt install zlib1g-dev libopenal-dev mesa-common-dev libgl1-mesa-dev \
             libglu1-mesa-dev libldap2-dev libxfixes-dev libxss-dev libgstreamer1.0-0 \
@@ -168,6 +181,27 @@ directory `conan_cache/` next to the repository root and the build directories.
         sudo apt install -y libtinfo5
         ```
 
+- **MacOS**:
+    - Install the latest Xcode from AppStore.
+    - Install the following build dependencies:
+        - zlib: `zlib1g-dev`
+        - OpenAL: `libopenal-dev`
+        - Mesa 3D: `mesa-common-dev`
+        - Mesa 3D GLX and DRI: `libgl1-mesa-dev`
+        - Mesa 3D GLU: `libglu1-mesa-dev`
+        - LDAP: `libldap2-dev`
+        - Xfixes: `libxfixes-dev` (used for cursors)
+        - X11 Screen Saver extension library: `libxss-dev`
+        - GStreamer: `libgstreamer1.0-0` (a runtime dependency)
+        - GStreamer plugins: `libgstreamer-plugins-base1.0-0` (a runtime dependency)
+        - XSLT library: `libxslt1.1` (a runtime dependency, required by Qt)
+        
+        A typicall command to install all of the above via Homebew:
+        ```
+            brew install zlib-ng openal-soft mesa mesa-glu mesalib-glw openldap libxfixes \
+                libxscrnsaver gstreamer gst-plugins-base libxslt pkgconf
+        ```
+    
 ---------------------------------------------------------------------------------------------------
 ## Using CMake
 
@@ -272,37 +306,49 @@ argument `-DtargetDevice=<value>`, where <value> is one of the following:
 ---------------------------------------------------------------------------------------------------
 ## Signing executable files
 
-On Windows platform there is an option of signing the built executables (including the
-distribution file itself) with the software publisher certificate. To perform it, a valid
-certificate file in the PKCS#12 format is needed.
+- **Windows**:
 
-Signing is performed by the `signtool.py` script which is a wrapper around native Windows
-`signtool.exe`. To enable signing, the following preparation steps must be done:
-- Save the publisher certificate file somewhere in your file system.
-- Create (preferably outside of the source tree) the configuration file. This file must contain the
-    following fields:
-    - `file`: the path to the publisher certificate file. It must be either an absolute path or a
-    path relative to the directory where the configuration file resides.
-    - `password`: the password protecting the publisher certificate file.
-    - `timestamp_servers` (optional): a list of the URLs of the trusted timestamping server. If
-        this field is present in the configuration file, the signed file will be time-stamped using
-        one of the listed servers. If this field is absent, the signed file will not be
-        time-stamped.
+    There is an option of signing the built executables (including the distribution file itself)
+    with the software publisher certificate. To perform it, a valid certificate file in the PKCS#12
+    format is needed.
 
-    The example of a configuration file can be found in
-    `open/build_utils/signtool/config/config.yaml`.
-- Add a CMake argument `-DsigntoolConfig=<configuration_file_path>` to the generation stage. If
-this argument is missing, no signing will be performed.
+    Signing is performed by the `signtool.py` script which is a wrapper around native Windows
+    `signtool.exe`. To enable signing, the following preparation steps must be done:
+    - Save the publisher certificate file somewhere in your file system.
+    - Create (preferably outside of the source tree) the configuration file. This file must contain
+        the following fields:
+        - `file`: the path to the publisher certificate file. It must be either an absolute path or
+            a path relative to the directory where the configuration file resides.
+        - `password`: the password protecting the publisher certificate file.
+        - `timestamp_servers` (optional): a list of the URLs of the trusted timestamping server. If
+            this field is present in the configuration file, the signed file will be time-stamped
+            using one of the listed servers. If this field is absent, the signed file will not be
+            time-stamped.
 
-Also you can sign any file manually by calling `signtool.py` directly:
-`python build_utils/signtool/signtool.py --config <configuration_file> --file <unsigned_file> --output <signed_file>`
+        The example of a configuration file can be found in
+        `open/build_utils/signtool/config/config.yaml`.
+    - Add a CMake argument `-DsigntoolConfig=<configuration_file_path>` to the generation stage. If
+    this argument is missing, no signing will be performed.
 
-To test the signing procedure, you can use a self-signed certificate. To generate such certificate,
-you can use the file `open/build_utils/signtool/genkey/genkey_signtool.bat`. When run, it creates
-the `certificate.p12` file and a couple of auxillary `*.pem` files in the same directory where it
-is run. We recommend to move these files outside of the source directory to maintain the
-out-of-source build concept.
+    Also you can sign any file manually by calling `signtool.py` directly:
+    `python build_utils/signtool/signtool.py --config <configuration_file> --file <unsigned_file> --output <signed_file>`
 
+    To test the signing procedure, you can use a self-signed certificate. To generate such
+    certificate, you can use the file `open/build_utils/signtool/genkey/genkey_signtool.bat`. When
+    run, it creates the `certificate.p12` file and a couple of auxillary `*.pem` files in the same
+    directory where it is run. We recommend to move these files outside of the source directory to
+    maintain the out-of-source build concept.
+
+- **Linux**:
+
+    Signing is not required; no tools or instructions are provided.
+    
+- **MacOS**:
+
+    A signing tool suitable for standalone use is being developed and will likely be provided in
+    the future. As for now, you can use your regular signing procedure that you involve for your
+    other MacOS developments.
+    
 ---------------------------------------------------------------------------------------------------
 ## Running VMS Desktop Client
 
@@ -348,6 +394,18 @@ the same customization package. If, however, for experimental purposes (not for 
 you need to connect to a Server with a different customization, the following option can be added
 to `desktop_client.ini`: `developerMode=true`. For the details, see the documentation for the
 IniConfig mechanism of the Nx Kit library located at `artifacts/nx_kit/`.
+
+### Automatic VMS updates
+
+The VMS product includes a comprehensive auto-update support, but this feature is turned off for
+the open-source Desktop Client, because it will simply re-write a custom-built Desktop Client with
+the new version of the Desktop Client built by Nx. Note that the VMS admin still can force such
+an automatic update, with the mentioned consequences.
+
+Technically it is possible to specify a custom Update server in the VMS Server settings, deploy a
+custom Update server, and prepare the update packages and meta-information according to the VMS
+standard, so that the automatic updates will work with a custom VMS built from open source. In the
+future, instructions and/or tools for this will likely be provided.
 
 ---------------------------------------------------------------------------------------------------
 ## Building and debugging in Visual Studio
