@@ -26,6 +26,48 @@ static OutgoingProcessor::Id toId(const std::variant<int, QString, std::nullptr_
 
 using Error = nx::vms::api::JsonRpcError::Code;
 
+void OutgoingProcessor::clear(SystemError::ErrorCode error)
+{
+    api::JsonRpcResponse response;
+    response.error = api::JsonRpcError{Error::InternalError,
+        NX_FMT("Connection closed with error %1: %2", error, SystemError::toString(error))
+            .toStdString()};
+    for (const auto& [id, handler]: m_awaitingResponses)
+    {
+        NX_DEBUG(this, "Terminating response with %1 id", id);
+        if (!handler)
+            continue;
+
+        if (std::holds_alternative<int>(id))
+            response.id = std::get<int>(id);
+        else
+            response.id = std::get<QString>(id);
+        handler(std::move(response));
+    }
+    m_awaitingResponses.clear();
+    for (auto& [key, batchResponse]: m_awaitingBatchResponseHolder)
+    {
+        NX_DEBUG(this, "Terminating batch response %1 with %2 ids", key, batchResponse.ids);
+        if (!batchResponse.handler)
+            continue;
+
+        std::vector<api::JsonRpcResponse> responses;
+        for (auto& id: batchResponse.ids)
+        {
+            if (std::holds_alternative<int>(id))
+                response.id = std::get<int>(id);
+            else
+                response.id = std::get<QString>(std::move(id));
+            responses.push_back(response);
+        }
+        responses.insert(responses.end(),
+            std::make_move_iterator(batchResponse.errors.begin()),
+            std::make_move_iterator(batchResponse.errors.end()));
+        batchResponse.handler(std::move(responses));
+    }
+    m_awaitingBatchResponseHolder.clear();
+}
+
 void OutgoingProcessor::processRequest(
     nx::vms::api::JsonRpcRequest jsonRpcRequest, ResponseHandler handler)
 {
@@ -288,7 +330,7 @@ void OutgoingProcessor::onResponse(const QJsonArray& list)
             continue;
         }
 
-        NX_DEBUG(this, "Received batch reponse %1 with %2 ids", batchResponseKey, it->second.ids);
+        NX_DEBUG(this, "Received batch response %1 with %2 ids", batchResponseKey, it->second.ids);
 
         auto handler = std::move(it->second.handler);
         std::vector<nx::vms::api::JsonRpcResponse> jsonRpcResponses;

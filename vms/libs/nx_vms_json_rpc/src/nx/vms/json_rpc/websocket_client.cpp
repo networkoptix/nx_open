@@ -65,6 +65,9 @@ void WebSocketClient::stopWhileInAioThread()
 
     m_connection.reset();
     m_handshakeClient->pleaseStopSync();
+    auto handlers = std::move(m_connectHandlers);
+    for (const auto& handler: handlers)
+        handler(SystemError::interrupted);
 }
 
 void WebSocketClient::onUpgrade()
