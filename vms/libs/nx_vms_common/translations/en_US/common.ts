@@ -1746,16 +1746,20 @@
         <translation></translation>
     </message>
     <message>
-        <source>Failed to backup file </source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Server Certificate Error</source>
         <translation></translation>
     </message>
     <message>
         <source>Server &quot;%1&quot; certificate error</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Intercom informer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to backup file</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
