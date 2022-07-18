@@ -10,6 +10,7 @@
 #include <QtCore/QJsonValue>
 
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/system_error.h>
 #include <nx/vms/api/data/json_rpc.h>
 
 namespace nx::vms::json_rpc::detail {
@@ -23,6 +24,9 @@ public:
     using Id = std::variant<int, QString>;
     using SendFunc = nx::utils::MoveOnlyFunc<void(QJsonValue)>;
     OutgoingProcessor(SendFunc sendFunc): m_sendFunc(std::move(sendFunc)) {}
+    ~OutgoingProcessor() { clear(SystemError::interrupted); }
+
+    void clear(SystemError::ErrorCode error);
 
     using ResponseHandler = nx::utils::MoveOnlyFunc<void(nx::vms::api::JsonRpcResponse)>;
     void processRequest(nx::vms::api::JsonRpcRequest jsonRpcRequest, ResponseHandler handler);
