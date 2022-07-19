@@ -534,7 +534,8 @@ NX_NETWORK_API HttpHeader cookieHeader(
     const std::string& name,
     const std::string& value,
     const std::string& path = "/",
-    bool secure = true);
+    bool secure = true,
+    bool httpOnly = true);
 
 inline bool operator==(const Response& left, const Response& right)
 {
