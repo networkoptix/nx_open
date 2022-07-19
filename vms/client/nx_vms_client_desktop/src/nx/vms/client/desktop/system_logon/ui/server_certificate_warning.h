@@ -25,8 +25,6 @@ public:
         const nx::network::ssl::CertificateChain& certificates,
         core::CertificateWarning::Reason reason,
         QWidget* parent = nullptr);
-
-    virtual void showEvent(QShowEvent *event) override;
 };
 
 } // namespace nx::vms::client::desktop
