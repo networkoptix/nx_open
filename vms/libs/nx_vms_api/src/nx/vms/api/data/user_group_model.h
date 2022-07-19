@@ -18,6 +18,10 @@ namespace nx::vms::api {
 struct NX_VMS_API UserGroupModel
 {
     QnUuid id;
+
+    /**%apidoc
+     * %example User Group 1
+     */
     QString name;
 
     /**%apidoc[opt] */

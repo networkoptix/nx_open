@@ -25,7 +25,10 @@ NX_REFLECTION_ENUM_CLASS(Status,
 
 struct NX_VMS_API StaticWebContentUpdateInfo
 {
-    /**%apidoc The origin of the web content archive. */
+    /**%apidoc The origin of the web content archive.
+     * %value "builtin"
+     * %value "manual"
+     */
     QString source;
 
     /**%apidoc SHA256 hash of the web content archive. */

@@ -15,7 +15,14 @@ namespace nx::vms::api {
 
 struct DevicePasswordRequest: IdData
 {
+    /**%apidoc
+     * %example admin
+     */
     QString user;
+
+    /**%apidoc
+     * %example password123
+     */
     QString password;
 
     bool operator==(const DevicePasswordRequest& other) const = default;
