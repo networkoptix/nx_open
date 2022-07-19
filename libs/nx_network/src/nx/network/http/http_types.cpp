@@ -8,6 +8,7 @@
 
 #include <QtCore/QLocale>
 
+#include <nx/network/http/custom_headers.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/switch.h>
@@ -825,13 +826,17 @@ HttpHeader deletedCookieHeader(const std::string& name, const std::string& path)
             + "; expires=Thu, 01 Jan 1970 00:00 : 00 GMT"};
 }
 
-HttpHeader cookieHeader(
-    const std::string& name, const std::string& value, const std::string& path, bool secure)
+HttpHeader cookieHeader(const std::string& name,
+    const std::string& value,
+    const std::string& path,
+    bool secure,
+    bool httpOnly)
 {
     // Using SameSite=None if cookie is secure to mimic old browser behavior, see:
     //     https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite
     return {kSetCookieHeaderName,
-        name + "=" + value + "; Path=" + path + (secure ? "; SameSite=None; Secure" : "")};
+        name + "=" + value + "; Path=" + path + (secure ? "; SameSite=None; Secure" : "")
+        + (httpOnly ? "; HttpOnly" : "")};
 }
 
 void Response::setCookie(
