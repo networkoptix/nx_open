@@ -152,6 +152,18 @@ inline QString optString(
     return optString(asObject(value, assertMessage), key, assertMessage);
 }
 
+inline bool optBool(
+    const QJsonObject& object, const QString& key, const QString& assertMessage = {})
+{
+    const auto it = object.find(key);
+    return it != object.end() ? asBool(it.value(), assertMessage) : false;
+}
+
+inline bool optBool(const QJsonValue& value, const QString& key, const QString& assertMessage = {})
+{
+    return optBool(asObject(value, assertMessage), key, assertMessage);
+}
+
 } // namespace json
 } // namespace utils
 } // namespace nx

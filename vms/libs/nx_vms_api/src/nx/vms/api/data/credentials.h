@@ -12,7 +12,14 @@ namespace nx::vms::api {
 
 struct NX_VMS_API Credentials
 {
+    /**%apidoc
+     * %example admin
+     */
     QString user;
+
+    /**%apidoc
+     * %example password123
+     */
     QString password;
 
 private:
