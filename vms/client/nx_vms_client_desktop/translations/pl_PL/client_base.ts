@@ -10352,10 +10352,6 @@ Nie przypinaj tego certyfikatu, jeśli &apos; nie zmodyfikowałeś %2 certyfikat
   <context>
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
     <message>
-      <source>View certificate</source>
-      <translation>Zobacz certyfikat</translation>
-    </message>
-    <message>
       <source>Connect Anyway</source>
       <translation>Połącz mimo to</translation>
     </message>
@@ -10364,40 +10360,46 @@ Nie przypinaj tego certyfikatu, jeśli &apos; nie zmodyfikowałeś %2 certyfikat
       <translation>Ufam temu serwerowi</translation>
     </message>
     <message>
-      <source>System:</source>
-      <translation>System:</translation>
-    </message>
-    <message>
-      <source>Server:</source>
-      <translation>Serwer:</translation>
-    </message>
-    <message>
-      <source>Server ID:</source>
-      <translation>ID serwera:</translation>
-    </message>
-    <message>
-      <source>Trust this server?</source>
-      <translation>Oznaczyć serwer jako zaufany?</translation>
-    </message>
-    <message>
       <source>Cannot verify the identity of %1</source>
       <translation>Nie można zweryfikować tożsamości %1</translation>
     </message>
     <message>
-      <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
-      <translation>Próbowałeś połączyć się z tym serwerem, ale przedstawił on certyfikat, którego nie można zweryfikować automatycznie.</translation>
+      <source>Connecting to %1 for the first time?</source>
+      <translation type="unfinished">Connecting to %1 for the first time?</translation>
     </message>
     <message>
-      <source>Someone may be impersonating this Server to steal your personal information.</source>
-      <translation>Ktoś może podszywać się pod ten Serwer, aby ukraść Twoje dane osobowe.</translation>
+      <source>Review the %1 to ensure you trust the server you are connecting to.
+Read this %2 to learn more about certificate validation.</source>
+      <comment>%1 is &lt;certificate details&gt; link, %2 is &lt;help article&gt; link</comment>
+      <translation type="unfinished">Review the %1 to ensure you trust the server you are connecting to.
+Read this %2 to learn more about certificate validation.</translation>
     </message>
     <message>
-      <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
-      <translation>Nie łącz się z tym serwerem bez instrukcji administratora VMS.</translation>
+      <source>certificate details</source>
+      <translation type="unfinished">certificate details</translation>
     </message>
     <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
-      <translation>Sprawdź szczegóły certyfikatu &apos;, aby upewnić się, że łączysz się z właściwym serwerem.</translation>
+      <source>help article</source>
+      <translation type="unfinished">help article</translation>
+    </message>
+    <message>
+      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
+      <translation type="unfinished">This message may be shown multiple times when connecting to a multi-server system.</translation>
+    </message>
+    <message>
+      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
+You can view %2 or read this %3 to learn more about the current problem.</source>
+      <comment>%1 is the system name, %2 is &lt;the server&apos;s certificate&gt; link, %3 is &lt;help article&gt; link</comment>
+      <translation type="unfinished">This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
+You can view %2 or read this %3 to learn more about the current problem.</translation>
+    </message>
+    <message>
+      <source>the server&apos;s certificate</source>
+      <translation type="unfinished">the server&apos;s certificate</translation>
+    </message>
+    <message>
+      <source>Continue</source>
+      <translation type="unfinished">Continue</translation>
     </message>
   </context>
   <context>

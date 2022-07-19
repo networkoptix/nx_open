@@ -9918,10 +9918,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
   <context>
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
     <message>
-      <source>View certificate</source>
-      <translation>証明書を表示</translation>
-    </message>
-    <message>
       <source>Connect Anyway</source>
       <translation>理解した上で接続</translation>
     </message>
@@ -9930,40 +9926,46 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation>このサーバーを信用する</translation>
     </message>
     <message>
-      <source>System:</source>
-      <translation>システム:</translation>
-    </message>
-    <message>
-      <source>Server:</source>
-      <translation>サーバー:</translation>
-    </message>
-    <message>
-      <source>Server ID:</source>
-      <translation>サーバーID:</translation>
-    </message>
-    <message>
-      <source>Trust this server?</source>
-      <translation>このサーバーを信用しますか？</translation>
-    </message>
-    <message>
       <source>Cannot verify the identity of %1</source>
       <translation>%1 の識別情報を確認できません</translation>
     </message>
     <message>
-      <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
-      <translation>このサーバーに接続しようとしましたが、自動的に検証できない証明書が表示されました。</translation>
+      <source>Connecting to %1 for the first time?</source>
+      <translation>%1 への接続は初めてですか?</translation>
     </message>
     <message>
-      <source>Someone may be impersonating this Server to steal your personal information.</source>
-      <translation>誰かがあなたの個人情報を盗むためにこのサーバーになりすましている可能性があります。</translation>
+      <source>Review the %1 to ensure you trust the server you are connecting to.
+Read this %2 to learn more about certificate validation.</source>
+      <comment>%1 is &lt;certificate details&gt; link, %2 is &lt;help article&gt; link</comment>
+      <translation>%1 を確認して、接続先サーバーが信頼できることを確認します。
+証明書の検証の詳細については、こちらの %2 をお読みください。</translation>
     </message>
     <message>
-      <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
-      <translation>VMS管理者の指示がない限り、このサーバーに接続しないでください。</translation>
+      <source>certificate details</source>
+      <translation>証明書の詳細</translation>
     </message>
     <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
-      <translation>証明書の詳細を確認して、正しいサーバーに接続していることを確認してください。</translation>
+      <source>help article</source>
+      <translation>ヘルプ記事</translation>
+    </message>
+    <message>
+      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
+      <translation>このメッセージは、マルチサーバーシステムに接続する際に複数回表示される場合があります。</translation>
+    </message>
+    <message>
+      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
+You can view %2 or read this %3 to learn more about the current problem.</source>
+      <comment>%1 is the system name, %2 is &lt;the server&apos;s certificate&gt; link, %3 is &lt;help article&gt; link</comment>
+      <translation>原因として、サーバー証明書の有効期限が切れているか、誰かが %1 になりすまして個人情報を盗もうとしていることが考えられます。
+%2 を表示するか、こちらの %3 を読むことで、現在の問題について詳しく知ることができます。</translation>
+    </message>
+    <message>
+      <source>the server&apos;s certificate</source>
+      <translation>サーバーの証明書</translation>
+    </message>
+    <message>
+      <source>Continue</source>
+      <translation>続行</translation>
     </message>
   </context>
   <context>
