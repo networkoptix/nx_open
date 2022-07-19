@@ -1204,14 +1204,14 @@ void SystemSettings::setAuditTrailEnabled(bool value)
     m_auditTrailEnabledAdaptor->setValue(value);
 }
 
-int SystemSettings::auditTrailPeriodDays() const
+std::chrono::days SystemSettings::auditTrailPeriodDays() const
 {
-    return m_auditTrailPeriodDaysAdaptor->value();
+    return std::chrono::days(m_auditTrailPeriodDaysAdaptor->value());
 }
 
-int SystemSettings::eventLogPeriodDays() const
+std::chrono::days SystemSettings::eventLogPeriodDays() const
 {
-    return m_eventLogPeriodDaysAdaptor->value();
+    return std::chrono::days(m_eventLogPeriodDaysAdaptor->value());
 }
 
 bool SystemSettings::isTrafficEncryptionForced() const
