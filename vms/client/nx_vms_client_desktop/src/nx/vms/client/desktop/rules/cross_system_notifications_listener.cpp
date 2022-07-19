@@ -147,12 +147,13 @@ private:
 
         p2pWebsocketTransport->start();
 
+        NX_VERBOSE(this, "Websocket upgrade success");
         readSomeAsync();
     }
 
     void scheduleReconnect()
     {
-        NX_DEBUG(this, "Next connection attempt in %2 seconds", kReconnectTimeout.count());
+        NX_DEBUG(this, "Next connection attempt in %1 seconds", kReconnectTimeout.count());
         reconnectTimer.start(kReconnectTimeout, [this]() { reconnectWebsocket(); });
         buffer.clear();
     }
@@ -161,6 +162,9 @@ private:
     {
         auto [cloudMessage, deserializationSucceeded] =
             nx::reflect::json::deserialize<CloudNotification>(buffer);
+
+        NX_VERBOSE(this, "Read message, deserialized: %1, type: %2",
+            deserializationSucceeded.success, cloudMessage.type);
 
         if (deserializationSucceeded && cloudMessage.type == kCloudNotificationType)
         {
