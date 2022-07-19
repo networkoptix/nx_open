@@ -191,26 +191,6 @@ constexpr qint64 kOneDayOffsetMs = 60 * 60 * 24 * 1000;
 
 constexpr qint64 kOneWeekOffsetMs = kOneDayOffsetMs * 7;
 
-// Check that all cameras in the list belong to the same group.
-bool areCamerasFromTheSameGroup(
-    const QnVirtualCameraResourceList& cameras,
-    const QString& groupId)
-{
-    using namespace nx::vms::client::desktop::entity_resource_tree::resource_grouping;
-
-    if (groupId.isEmpty())
-        return false;
-
-    const auto dimension = compositeIdDimension(groupId);
-
-    return std::all_of(cameras.cbegin(), cameras.cend(),
-        [&groupId, dimension](const auto& camera)
-        {
-            const auto cameraGroupId = resourceCustomGroupId(camera);
-            return trimCompositeId(cameraGroupId, dimension) == groupId;
-        });
-}
-
 } // namespace
 
 //!time that is given to process to exit. After that, applauncher (if present) will try to terminate it
@@ -1408,13 +1388,7 @@ void ActionHandler::moveResourcesToServer(
         // Operation is not performed if resource list contains USB or virtual cameras.
         if (!nonMovableCameras.empty())
         {
-            using namespace entity_resource_tree::resource_grouping;
-
-            const QString groupName = areCamerasFromTheSameGroup(camerasToMove, sourceGroupId)
-                ? getResourceTreeDisplayText(sourceGroupId)
-                : QString();
-
-            if (!groupName.isEmpty() && nonMovableCameras.size() < camerasToMove.size())
+            if (nonMovableCameras.size() < camerasToMove.size())
             {
                 // Some cameras from the group cannot be moved,
                 // ask the user if we should move the rest anyways.
@@ -1427,7 +1401,6 @@ void ActionHandler::moveResourcesToServer(
                     messages::Resources::moveCamerasToServer(
                         mainWindowWidget(),
                         nonMovableCameras,
-                        groupName,
                         targetServerName,
                         currentServerName,
                         hasVirtualCameras,
@@ -1457,7 +1430,6 @@ void ActionHandler::moveResourcesToServer(
 
                 messages::Resources::warnCamerasCannotBeMoved(
                     mainWindowWidget(),
-                    groupName,
                     hasVirtualCameras,
                     hasUsbCameras);
 
