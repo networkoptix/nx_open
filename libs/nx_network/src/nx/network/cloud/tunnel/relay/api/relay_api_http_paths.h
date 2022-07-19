@@ -39,6 +39,8 @@ static constexpr char kRelayStatisticsSpecificMetricPath[] = "/relay/statistics/
 static constexpr char kDbRelaysPath[] = "/relay/maintenance/db/relays/";
 static constexpr char kDbRelayPath[] = "/relay/maintenance/db/relays/{relayId}";
 
+static constexpr char kServerAliasPath[] = "/relay/server/{serverId}/alias";
+
 static constexpr char kApiPrefix[] = "/relay";
 
 static constexpr char kApiDocPrefix[] = "/relay/docs/api";
