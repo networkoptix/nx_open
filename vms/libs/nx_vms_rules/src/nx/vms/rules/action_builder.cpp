@@ -288,6 +288,7 @@ void ActionBuilder::buildAndEmitActionForTargetUsers(const AggregatedEventPtr& a
             .ids = {user->getId()},
             .all = false});
 
+        NX_VERBOSE(this, "Building action for user: %1", user->getName());
         emit action(buildAction(filteredAggregatedEvent));
     }
 
