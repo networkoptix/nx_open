@@ -94,7 +94,7 @@ void IndirectAccessDecoratorModel::setSubject(const QnResourceAccessSubject& sub
 
 QVariant IndirectAccessDecoratorModel::data(const QModelIndex& index, int role) const
 {
-    if (!index.isValid() || !m_resourceAccessProvider || !m_subject.isValid())
+    if (!index.isValid())
         return base_type::data(index, role);
 
     const auto sourceIndex = mapToSource(index);
@@ -113,6 +113,9 @@ QVariant IndirectAccessDecoratorModel::data(const QModelIndex& index, int role) 
         }
         return base_type::data(index, role);
     }
+
+    if (!m_resourceAccessProvider || !m_subject.isValid())
+        return base_type::data(index, role);
 
     if (const auto resource = sourceResourceIndex.data(Qn::ResourceRole).value<QnResourcePtr>())
     {
