@@ -1324,14 +1324,14 @@ void QnGlobalSettings::setAuditTrailEnabled(bool value)
     m_auditTrailEnabledAdaptor->setValue(value);
 }
 
-int QnGlobalSettings::auditTrailPeriodDays() const
+std::chrono::days QnGlobalSettings::auditTrailPeriodDays() const
 {
-    return m_auditTrailPeriodDaysAdaptor->value();
+    return std::chrono::days(m_auditTrailPeriodDaysAdaptor->value());
 }
 
-int QnGlobalSettings::eventLogPeriodDays() const
+std::chrono::days QnGlobalSettings::eventLogPeriodDays() const
 {
-    return m_eventLogPeriodDaysAdaptor->value();
+    return std::chrono::days(m_eventLogPeriodDaysAdaptor->value());
 }
 
 bool QnGlobalSettings::isTrafficEncryptionForced() const

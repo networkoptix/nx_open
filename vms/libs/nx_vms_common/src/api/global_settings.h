@@ -214,8 +214,8 @@ public:
 
     bool isAuditTrailEnabled() const;
     void setAuditTrailEnabled(bool value);
-    int auditTrailPeriodDays() const;
-    int eventLogPeriodDays() const;
+    std::chrono::days auditTrailPeriodDays() const;
+    std::chrono::days eventLogPeriodDays() const;
 
     bool isTrafficEncryptionForced() const;
     bool isTrafficEncryptionForcedExplicitlyDefined() const;
