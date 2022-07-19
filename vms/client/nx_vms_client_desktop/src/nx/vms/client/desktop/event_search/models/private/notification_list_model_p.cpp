@@ -164,6 +164,8 @@ NotificationListModel::Private::ExtraData NotificationListModel::Private::extraD
 void NotificationListModel::Private::onNotificationAction(
     const QSharedPointer<nx::vms::rules::NotificationAction>& action)
 {
+    NX_VERBOSE(this, "Received action: %1, id: %2", action->type(), action->id());
+
     EventData eventData;
     eventData.id = action->id();
     eventData.title = action->caption();
@@ -201,6 +203,8 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
 
     const auto& params = action->getRuntimeParams();
     const auto ruleId = action->getRuleId();
+
+    NX_VERBOSE(this, "Received action: %1, id: %2", action->actionType(), action->getParams().actionId);
 
     QnResourcePtr resource = resourcePool()->getResourceById(params.eventResourceId);
     auto camera = resource.dynamicCast<QnVirtualCameraResource>();
