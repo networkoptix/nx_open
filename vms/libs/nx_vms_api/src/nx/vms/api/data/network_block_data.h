@@ -113,10 +113,7 @@ NX_REFLECTION_INSTRUMENT(NetworkPortState, NetworkPortState_Fields)
  */
 struct NX_VMS_API NetworkBlockData
 {
-    /**%apidoc
-     * Array of current network port states with the following structure:
-     *     %struct NetworkPortState
-     */
+    /**%apidoc Current network port states. */
     std::vector<NetworkPortState> portStates;
 
     /**%apidoc

@@ -11,8 +11,9 @@ namespace nx::vms::api {
 struct NX_VMS_API DeviceAdvancedFilter
 {
     /**%apidoc:string
-     * Device id (can be obtained from "id", "physicalId" or "logicalId" field via
-     * `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
+     * Device id to get Advanced Parameters from (can be obtained from "id", "physicalId" or
+     * "logicalId" field via `GET /rest/v{1-}/devices`) or MAC address (not supported for certain
+     * cameras).
      */
     QnUuid deviceId;
 

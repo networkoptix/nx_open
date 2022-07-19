@@ -11,7 +11,9 @@ namespace nx::vms::api {
  * %param[proprietary] parentId
  * %param[readonly] id Web page unique id.
  * %param name Web page name.
+ *     %example Web page
  * %param url Web page URL.
+ *     %example https://example.com
  */
 struct NX_VMS_API WebPageData: ResourceData
 {

@@ -18,10 +18,10 @@ namespace nx::vms::api {
 
 struct NX_VMS_API LevelFilter
 {
-    /**%apidoc String or regex to match the tag of a log message. */
+    /**%apidoc[opt] String or regex to match the tag of a log message. */
     QString filter;
 
-    /**%apidoc The highest level of matched messages to allow into the log. */
+    /**%apidoc[opt] The highest level of matched messages to allow into the log. */
     nx::utils::log::Level level = nx::utils::log::kDefaultLevel;
 };
 #define LevelFilter_Fields (filter)(level)
@@ -36,7 +36,9 @@ struct NX_VMS_API LogSettings
     /**%apidoc[readonly] Pre-set filters, only messages with matching tags are allowed into the log. */
     std::vector<QString> predefinedFilters;
 
-    /**%apidoc The highest level of messages (that don't match any customFilters) to allow into the log. */
+    /**%apidoc[opt] The highest level of messages (that don't match any customFilters) to allow
+     * into the log.
+     */
     nx::utils::log::Level primaryLevel = nx::utils::log::kDefaultLevel;
 
     /**%apidoc Modifiable filters and levels for the log. */
@@ -57,22 +59,22 @@ struct NX_VMS_API ServerLogSettings
     /**%apidoc[readonly] Log directory on the filesystem. */
     QString directory;
 
-    /**%apidoc:integer Maximum size (in bytes) of all log files on the filesystem. */
+    /**%apidoc[opt]:integer Maximum size (in bytes) of all log files on the filesystem. */
     double maxVolumeSizeB = nx::utils::log::kDefaultMaxLogVolumeSizeB;
 
-    /**%apidoc:integer Maximum size (in bytes) of a single log file. */
+    /**%apidoc[opt]:integer Maximum size (in bytes) of a single log file. */
     double maxFileSizeB = nx::utils::log::kDefaultMaxLogFileSizeB;
 
-    /**%apidoc Maximum time duration of a single log file. */
+    /**%apidoc[opt] Maximum time duration of a single log file. */
     std::chrono::seconds maxFileTimePeriodS = nx::utils::log::kDefaultMaxLogFileTimePeriodS;
 
-    /**%apidoc MAIN log settings. */
+    /**%apidoc[opt] MAIN log settings. */
     LogSettings mainLog;
 
-    /**%apidoc HTTP log settings. */
+    /**%apidoc[opt] HTTP log settings. */
     LogSettings httpLog;
 
-    /**%apidoc HWID log settings. */
+    /**%apidoc[opt] HWID log settings. */
     LogSettings systemLog;
 
     QnUuid getId() const { return id; }

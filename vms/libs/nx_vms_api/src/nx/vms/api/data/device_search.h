@@ -80,6 +80,7 @@ struct NX_VMS_API DeviceSearchIp
 {
     /**%apidoc
      * IP address of the Device. NOTE: Some Device drivers can also accept URL in this field.
+     * %example 192.168.0.1
      */
     QString ip;
 };
@@ -89,10 +90,16 @@ NX_REFLECTION_INSTRUMENT(DeviceSearchIp, DeviceSearchIp_Fields)
 
 struct NX_VMS_API DeviceSearchIpRange
 {
-    /**%apidoc Start IP address of the IP address range to search Device(s) in. */
+    /**%apidoc
+     * Start IP address of the IP address range to search Device(s) in.
+     * %example 192.168.0.1
+     */
     QString startIp;
 
-    /**%apidoc End IP address of the IP address range to search Device(s) in. */
+    /**%apidoc
+     * End IP address of the IP address range to search Device(s) in.
+     * %example 192.168.0.255
+     */
     QString endIp;
 };
 #define DeviceSearchIpRange_Fields (startIp)(endIp)
