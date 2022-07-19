@@ -29,13 +29,21 @@ public:
         mobile
     };
 
-    static QString header(Reason reason, const QString& serverName);
+    static QString header(
+        Reason reason,
+        const nx::vms::api::ModuleInformation& target,
+        ClientType clientType = ClientType::desktop);
+
     static QString details(
         Reason reason,
         const nx::vms::api::ModuleInformation& target,
         const nx::network::SocketAddress& primaryAddress,
         ClientType clientType = ClientType::desktop);
-    static QString advice(Reason reason);
+
+    static QString advice(
+        Reason reason,
+        ClientType clientType = ClientType::desktop);
+
     static QString invalidCertificateError();
 
 private:
