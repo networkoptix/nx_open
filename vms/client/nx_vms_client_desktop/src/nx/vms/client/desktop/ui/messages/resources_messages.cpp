@@ -449,7 +449,6 @@ bool Resources::moveProxiedWebPages(QWidget* parent, const QnResourceList& resou
 bool Resources::moveCamerasToServer(
         QWidget* parent,
         const QnVirtualCameraResourceList& nonMovableCameras,
-        const QString& groupName,
         const QString& targetServerName,
         const QString& currentServerName,
         bool hasVirtualCameras,
@@ -461,8 +460,7 @@ bool Resources::moveCamerasToServer(
     QnSessionAwareMessageBox messageBox(parent);
 
     const QString text = nx::format(
-        tr("Some devices from %1 will not be moved to %2. Move anyways?"),
-        groupName,
+        tr("Only some of the selected devices can be moved to %1"),
         targetServerName);
 
     QString infoText;
@@ -486,7 +484,7 @@ bool Resources::moveCamerasToServer(
         QnMessageBox::Layout::Content);
 
     messageBox.addButton(
-        tr("Move Group without them"),
+        tr("Move Partially"),
         QDialogButtonBox::AcceptRole,
         Qn::ButtonAccent::Standard);
     messageBox.addButton(tr("Cancel"), QDialogButtonBox::RejectRole);
@@ -496,33 +494,17 @@ bool Resources::moveCamerasToServer(
 
 void Resources::warnCamerasCannotBeMoved(
     QWidget* parent,
-    const QString& groupName,
     bool hasVirtualCameras,
     bool hasUsbCameras)
 {
     QString warning;
 
     if (hasVirtualCameras && hasUsbCameras)
-    {
-        warning = groupName.isEmpty()
-            ? tr("Virtual cameras, USB or web cameras cannot be moved between servers")
-            : tr("%1 cannot be moved between servers as it contains "
-                "virtual cameras, USB or web cameras").arg(groupName);
-    }
+        warning = tr("Virtual cameras, USB or web cameras cannot be moved between servers");
     else if (hasVirtualCameras)
-    {
-        warning = groupName.isEmpty()
-            ? tr("Virtual cameras cannot be moved between servers")
-            : tr("%1 cannot be moved between servers as it contains "
-                "virtual cameras").arg(groupName);
-    }
+        warning = tr("Virtual cameras cannot be moved between servers");
     else
-    {
-        warning = groupName.isEmpty()
-            ? tr("USB or web cameras cannot be moved between servers")
-            : tr("%1 cannot be moved between servers as it contains "
-                "USB or web cameras").arg(groupName);
-    }
+        warning = tr("USB or web cameras cannot be moved between servers");
 
     QnMessageBox::warning(parent, warning);
 }

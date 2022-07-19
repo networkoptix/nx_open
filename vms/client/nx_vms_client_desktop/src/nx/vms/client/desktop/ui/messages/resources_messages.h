@@ -47,7 +47,6 @@ public:
     static bool moveCamerasToServer(
         QWidget* parent,
         const QnVirtualCameraResourceList& nonMovableCameras,
-        const QString& groupName,
         const QString& targetServerName,
         const QString& currentServerName,
         bool hasVirtualCameras,
@@ -55,7 +54,6 @@ public:
 
     static void warnCamerasCannotBeMoved(
         QWidget* parent,
-        const QString& groupName,
         bool hasVirtualCameras,
         bool hasUsbCameras);
 };
