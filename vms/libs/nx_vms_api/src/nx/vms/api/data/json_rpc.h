@@ -22,6 +22,9 @@ struct NX_VMS_API JsonRpcRequest
      */
     std::string jsonrpc = "2.0";
 
+    /**%apidoc
+     * %example rest.v2.system.info.get
+     */
     std::string method;
     std::optional<std::variant<QJsonObject, QJsonArray>> params;
     std::optional<std::variant<int, QString>> id;

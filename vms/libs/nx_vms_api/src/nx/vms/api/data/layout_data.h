@@ -22,16 +22,24 @@ struct NX_VMS_API LayoutItemData: IdData
     /**%apidoc [opt] Should have fixed value.*/
     qint32 flags = 0;
 
-    /**%apidoc Left coordinate of the layout item (floating-point).*/
+    /**%apidoc Left coordinate of the layout item (floating-point).
+     * %example 0
+     */
     float left = 0;
 
-    /**%apidoc Top coordinate of the layout item (floating-point).*/
+    /**%apidoc Top coordinate of the layout item (floating-point).
+     * %example 0
+     */
     float top = 0;
 
-    /**%apidoc Right coordinate of the layout item (floating-point).*/
+    /**%apidoc Right coordinate of the layout item (floating-point).
+     * %example 1
+     */
     float right = 0;
 
-    /**%apidoc Bottom coordinate of the layout item (floating-point).*/
+    /**%apidoc Bottom coordinate of the layout item (floating-point).
+     * %example 1
+     */
     float bottom = 0;
 
     /**%apidoc [opt] Degree of image tilt; a positive value rotates counter-clockwise
@@ -101,6 +109,7 @@ NX_REFLECTION_INSTRUMENT(LayoutItemData, LayoutItemData_Fields)
  * %param [readonly] id Layout unique id.
  * %param [opt] parentId Unique id of the user owning the layout.
  * %param name Layout name.
+ *     %example Layout
  * %param [unused] url
  * %param [unused] typeId
  */
@@ -126,9 +135,13 @@ struct NX_VMS_API LayoutData: ResourceData
     LayoutItemDataList items;
     /**%apidoc [opt] Whether the layout is locked.*/
     bool locked = false;
-    /**%apidoc Fixed width of the layout in cells (integer).*/
+    /**%apidoc Fixed width of the layout in cells (integer).
+     * %example 1
+     */
     qint32 fixedWidth = 0;
-    /**%apidoc Fixed height of the layout in cells (integer).*/
+    /**%apidoc Fixed height of the layout in cells (integer).
+     * %example 1
+     */
     qint32 fixedHeight = 0;
     /**%apidoc [opt] Logical id of the layout, set by user (integer).*/
     qint32 logicalId = 0;

@@ -53,7 +53,14 @@ NX_REFLECTION_INSTRUMENT(LoginUser, LoginUser_Fields);
 
 struct NX_VMS_API LoginSessionRequest
 {
+    /**%apidoc
+     * %example admin
+     */
     QString username;
+
+    /**%apidoc
+     * %example password123
+     */
     QString password;
 
     /**%apidoc[opt] Set HTTP cookie for automatic login by browser. */
@@ -65,7 +72,9 @@ NX_REFLECTION_INSTRUMENT(LoginSessionRequest, LoginSessionRequest_Fields);
 
 struct NX_VMS_API LoginSessionFilter
 {
-    /**%apidoc If the value "current" is used, the token is obtained from authorization. */
+    /**%apidoc If the value "current" is used, the token is obtained from authorization.
+     * %example current
+     */
     std::string token;
 
     /**%apidoc[opt] Set HTTP cookie for automatic login by browser. */
@@ -90,10 +99,12 @@ NX_REFLECTION_INSTRUMENT(LoginSession, LoginSession_Fields);
 
 struct NX_VMS_API CloudSignature
 {
-    /**%apidoc:string */
+    /**%apidoc
+     * %example MESSAGE
+     */
     std::string message;
 
-    /**%apidoc:string SIGNATURE = base64(hmacSha256(cloudSystemAuthKey, message)) */
+    /**%apidoc SIGNATURE = base64(hmacSha256(cloudSystemAuthKey, message)) */
     std::optional<std::string> signature;
 };
 #define CloudSignature_Fields (message)(signature)
