@@ -10061,7 +10061,7 @@ Dit certificaat niet vastpinnen als je het hebt gedaan&apos;t de %2 server SSL c
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
     <message>
       <source>View certificate</source>
-      <translation>Certificaat bekijken</translation>
+      <translation>Bekijk certificaat</translation>
     </message>
     <message>
       <source>Connect Anyway</source>

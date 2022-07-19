@@ -10066,7 +10066,7 @@ N'utilisez pas ce certificat si vous n'avez pas modifié le certificat SSL du se
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
     <message>
       <source>View certificate</source>
-      <translation>Voir le certificat</translation>
+      <translation>Afficher le certificat</translation>
     </message>
     <message>
       <source>Connect Anyway</source>

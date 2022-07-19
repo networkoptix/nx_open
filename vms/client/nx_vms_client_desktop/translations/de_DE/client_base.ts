@@ -10062,7 +10062,7 @@ Pinnen Sie dieses Zertifikat nicht an, wenn Sie das SSL-Zertifikat des %2-Server
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
     <message>
       <source>View certificate</source>
-      <translation>Zertifikat anzeigen</translation>
+      <translation>Zertifikat ansehen</translation>
     </message>
     <message>
       <source>Connect Anyway</source>
