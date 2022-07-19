@@ -167,4 +167,13 @@ QN_FUSION_DECLARE_FUNCTIONS(Relay, (json), NX_NETWORK_API)
 
 using Relays = std::map<std::string /*relay name*/, Relay>;
 
+//-------------------------------------------------------------------------------------------------
+
+struct GetServerAliasResponse
+{
+    std::string alias;
+};
+
+NX_REFLECTION_INSTRUMENT(GetServerAliasResponse, (alias))
+
 } // namespace nx::cloud::relay::api
