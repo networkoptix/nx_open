@@ -8,10 +8,38 @@
 #include <nx/vms/common/html/html.h>
 #include <nx/utils/log/log.h>
 
+namespace {
+
+const QString kCertificateLink = "#certificate";
+const QString kHelpLink = "#help";
+
+} // namespace
+
 namespace nx::vms::client::core {
 
-QString CertificateWarning::header(Reason reason, const QString& serverName)
+QString CertificateWarning::header(
+    Reason reason,
+    const nx::vms::api::ModuleInformation& target,
+    ClientType clientType)
 {
+    const auto& serverName = target.name;
+    const auto& systemName = helpers::getSystemName(target);
+
+    if (clientType == ClientType::desktop)
+    {
+        switch (reason)
+        {
+            case Reason::unknownServer:
+                return tr("Connecting to %1 for the first time?").arg(systemName);
+            case Reason::invalidCertificate:
+            case Reason::serverCertificateChanged:
+                return tr("Cannot verify the identity of %1").arg(serverName);
+            default:
+                NX_ASSERT(false, "Unreachable");
+                return {};
+        }
+    }
+
     switch (reason)
     {
         case Reason::unknownServer:
@@ -32,6 +60,40 @@ QString CertificateWarning::details(
     const nx::network::SocketAddress& primaryAddress,
     ClientType clientType)
 {
+    if (clientType == ClientType::desktop)
+    {
+        switch (reason)
+        {
+            case Reason::unknownServer:
+                return tr(
+                    "Review the %1 to ensure you trust the server you are connecting to.\n"
+                    "Read this %2 to learn more about certificate validation.",
+                    "%1 is <certificate details> link, "
+                    "%2 is <help article> link")
+                    .arg(
+                        common::html::localLink(tr("certificate details"), kCertificateLink),
+                        common::html::localLink(tr("help article"), kHelpLink));
+
+            case Reason::invalidCertificate:
+            case Reason::serverCertificateChanged:
+                return tr(
+                    "This might be due to an expired server certificate or someone trying "
+                    "to impersonate %1 to steal your personal information.\n"
+                    "You can view %2 or read this %3 to learn more about the current problem.",
+                    "%1 is the system name, "
+                    "%2 is <the server's certificate> link, "
+                    "%3 is <help article> link")
+                    .arg(
+                        helpers::getSystemName(target),
+                        common::html::localLink(tr("the server's certificate"), kCertificateLink),
+                        common::html::localLink(tr("help article"), kHelpLink));
+
+            default:
+                NX_ASSERT(false, "Unreachable");
+                return {};
+        }
+    }
+
     QString details;
     switch (reason)
     {
@@ -84,8 +146,24 @@ QString CertificateWarning::details(
     return targetInfo + details;
 }
 
-QString CertificateWarning::advice(Reason reason)
+QString CertificateWarning::advice(Reason reason, ClientType clientType)
 {
+    if (clientType == ClientType::desktop)
+    {
+        switch (reason)
+        {
+            case Reason::unknownServer:
+                return tr("This message may be shown multiple times when connecting to a multi-server "
+                    "system.");
+            case Reason::invalidCertificate:
+            case Reason::serverCertificateChanged:
+                return {};
+            default:
+                NX_ASSERT(false, "Unreachable");
+                return {};
+        }
+    }
+
     switch (reason)
     {
         case Reason::unknownServer:
