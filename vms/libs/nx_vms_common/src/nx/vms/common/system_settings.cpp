@@ -703,12 +703,12 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
     m_mediaBufferSizeKbAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "mediaBufferSizeKb", 256,
         [](auto v) { return v >= 10 && v <= 4 * 1024; }, this,
-        [] { return tr("Media buffer size (KB, 10KB-4Mb)"); });
+        [] { return tr("Media buffer size (KB, 10KB-4MB)"); });
 
     m_mediaBufferSizeKbForAudioOnlyDeviceAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "mediaBufferSizeForAudioOnlyDeviceKb", 16,
         [](auto v) { return v >= 1 && v <= 1024; }, this,
-        [] { return tr("Media buffer size for audio only Devices (KB, 1Kb-1MB)"); });
+        [] { return tr("Media buffer size for audio only Devices (KB, 1KB-1MB)"); });
 
     m_forceAnalyticsDbStoragePermissionsAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "forceAnalyticsDbStoragePermissions", true,  this,
@@ -740,11 +740,17 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
 
     m_insecureDeprecatedApiEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         Names::insecureDeprecatedApiEnabled, true, this,
-        [] { return tr("Enable insecure deprecated API"); });
+        [] { return tr("Enable insecure deprecated API functions"); });
 
     m_insecureDeprecatedApiInUseEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         Names::insecureDeprecatedApiInUseEnabled, true, this,
-        [] { return tr("Enable insecure deprecated API functions curently in use by Nx products"); });
+        []
+        {
+            return nx::format(tr(
+                "Enable insecure deprecated API functions curently used by %1 software",
+                "%1 is a company name"),
+                nx::branding::company());
+        });
 
     m_showMouseTimelinePreviewAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "showMouseTimelinePreview", true, this, [] { return tr("Show mouse timeline preview"); });
