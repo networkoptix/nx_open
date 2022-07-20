@@ -41,6 +41,11 @@ QString AnalyticsObjectEvent::resourceKey() const
     return makeName(AnalyticsEngineEvent::resourceKey(), m_objectTrackId.toSimpleString());
 }
 
+QString AnalyticsObjectEvent::aggregationKey() const
+{
+    return cameraId().toSimpleString();
+}
+
 QString AnalyticsObjectEvent::cacheKey() const
 {
     return m_objectTrackId.toSimpleString();
