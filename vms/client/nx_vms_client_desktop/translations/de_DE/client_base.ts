@@ -10078,41 +10078,41 @@ Pinnen Sie dieses Zertifikat nicht an, wenn Sie das SSL-Zertifikat des %2-Server
     </message>
     <message>
       <source>Connecting to %1 for the first time?</source>
-      <translation type="unfinished">Connecting to %1 for the first time?</translation>
+      <translation>Zum ersten Mal eine Verbindung zu %1 herstellen?</translation>
     </message>
     <message>
       <source>Review the %1 to ensure you trust the server you are connecting to.
 Read this %2 to learn more about certificate validation.</source>
       <comment>%1 is &lt;certificate details&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">Review the %1 to ensure you trust the server you are connecting to.
-Read this %2 to learn more about certificate validation.</translation>
+      <translation>Überprüfen Sie %1, um sicherzustellen, dass Sie dem Server, zu dem Sie eine Verbindung herstellen, vertrauen.
+Lesen Sie diesen Artikel %2, um mehr über die Zertifikatsüberprüfung zu erfahren.</translation>
     </message>
     <message>
       <source>certificate details</source>
-      <translation type="unfinished">certificate details</translation>
+      <translation>Zertifikatsdetails</translation>
     </message>
     <message>
       <source>help article</source>
-      <translation type="unfinished">help article</translation>
+      <translation>Hilfe-Artikel</translation>
     </message>
     <message>
       <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation type="unfinished">This message may be shown multiple times when connecting to a multi-server system.</translation>
+      <translation>Diese Meldung kann mehrfach angezeigt werden, wenn eine Verbindung zu einem System mit mehreren Servern besteht.</translation>
     </message>
     <message>
       <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
 You can view %2 or read this %3 to learn more about the current problem.</source>
       <comment>%1 is the system name, %2 is &lt;the server&apos;s certificate&gt; link, %3 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
-You can view %2 or read this %3 to learn more about the current problem.</translation>
+      <translation>Dies könnte auf ein abgelaufenes Serverzertifikat zurückzuführen sein oder darauf, dass jemand versucht, sich als %1 auszugeben, um Ihre persönlichen Daten zu stehlen.
+Sie können %2 anzeigen oder diesen Artikel %3 lesen, um mehr über das aktuelle Problem zu erfahren.</translation>
     </message>
     <message>
       <source>the server&apos;s certificate</source>
-      <translation type="unfinished">the server&apos;s certificate</translation>
+      <translation>das Server-Zertifikat</translation>
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>Fortfahren</translation>
     </message>
   </context>
   <context>
