@@ -635,23 +635,23 @@
     </message>
     <message>
       <source>ONVIF Settings</source>
-      <translation type="unfinished">ONVIF Settings</translation>
+      <translation>ONVIF inställningar</translation>
     </message>
     <message>
       <source>Secondary stream profile</source>
-      <translation type="unfinished">Secondary stream profile</translation>
+      <translation>Sekundär strömprofil</translation>
     </message>
     <message>
       <source>Primary stream profile</source>
-      <translation type="unfinished">Primary stream profile</translation>
+      <translation>Primär strömprofil</translation>
     </message>
     <message>
       <source>Export From SD Cards</source>
-      <translation type="unfinished">Export From SD Cards</translation>
+      <translation>Exportera från SD-kort</translation>
     </message>
     <message>
       <source>Do not export video automatically</source>
-      <translation type="unfinished">Do not export video automatically</translation>
+      <translation>Exportera inte video automatiskt</translation>
     </message>
   </context>
   <context>
@@ -769,11 +769,11 @@
     <name>CameraReplacementDialog</name>
     <message>
       <source>Camera Replacement</source>
-      <translation type="unfinished">Camera Replacement</translation>
+      <translation>Kamerabyte</translation>
     </message>
     <message>
       <source>New device</source>
-      <translation type="unfinished">New device</translation>
+      <translation>Ny enhet</translation>
     </message>
     <message>
       <source>Name</source>
@@ -900,11 +900,11 @@
     </message>
     <message>
       <source>This action can be set only for instant events</source>
-      <translation type="unfinished">This action can be set only for instant events</translation>
+      <translation>Denna åtgärd kan endast ställas in för omedelbara händelser</translation>
     </message>
     <message>
       <source>Select another event or action</source>
-      <translation type="unfinished">Select another event or action</translation>
+      <translation>Välj en annan händelse eller åtgärd</translation>
     </message>
   </context>
   <context>
@@ -1076,7 +1076,7 @@
     </message>
     <message>
       <source>Generic event</source>
-      <translation type="unfinished">Generic event</translation>
+      <translation>Generisk händelse</translation>
     </message>
   </context>
   <context>
@@ -1244,19 +1244,19 @@
     <name>FooterWidget</name>
     <message>
       <source>Add Comment</source>
-      <translation type="unfinished">Add Comment</translation>
+      <translation>Lägg till kommentar</translation>
     </message>
     <message>
       <source>Set Schedule</source>
-      <translation type="unfinished">Set Schedule</translation>
+      <translation>Ange schema</translation>
     </message>
     <message>
       <source>Test Action</source>
-      <translation type="unfinished">Test Action</translation>
+      <translation>Testa åtgärd</translation>
     </message>
     <message>
       <source>Add some comment</source>
-      <translation type="unfinished">Add some comment</translation>
+      <translation>Lägg till en kommentar</translation>
     </message>
   </context>
   <context>
@@ -1907,7 +1907,7 @@
     <name>OutgoingMailSettingsWidget</name>
     <message>
       <source>Connection Settings</source>
-      <translation type="unfinished">Connection Settings</translation>
+      <translation>Anslutningsinställningar</translation>
     </message>
     <message>
       <source>Email</source>
@@ -1923,15 +1923,15 @@
     </message>
     <message>
       <source>Server Address</source>
-      <translation type="unfinished">Server Address</translation>
+      <translation>Serveradress</translation>
     </message>
     <message>
       <source>Security Protocol</source>
-      <translation type="unfinished">Security Protocol</translation>
+      <translation>Säkerhetsprotokoll</translation>
     </message>
     <message>
       <source>Email Settings</source>
-      <translation type="unfinished">Email Settings</translation>
+      <translation>E-postinställningar</translation>
     </message>
     <message>
       <source>Support Signature</source>
@@ -1939,7 +1939,7 @@
     </message>
     <message>
       <source>System Singnature</source>
-      <translation type="unfinished">System Singnature</translation>
+      <translation>Systemsignatur</translation>
     </message>
   </context>
   <context>
@@ -2467,23 +2467,23 @@
     <name>RulesDialog</name>
     <message>
       <source>Alarm/Event Rules</source>
-      <translation type="unfinished">Alarm/Event Rules</translation>
+      <translation>Larm/händelseregler</translation>
     </message>
     <message>
       <source>New Rule</source>
-      <translation type="unfinished">New Rule</translation>
+      <translation>Ny regel</translation>
     </message>
     <message>
       <source>Delete Rule</source>
-      <translation type="unfinished">Delete Rule</translation>
+      <translation>Ta bort regel</translation>
     </message>
     <message>
       <source>Select some rule</source>
-      <translation type="unfinished">Select some rule</translation>
+      <translation>Välj en regel</translation>
     </message>
     <message>
       <source>Reset default rules</source>
-      <translation type="unfinished">Reset default rules</translation>
+      <translation>Återställ standardregler</translation>
     </message>
   </context>
   <context>
@@ -2795,11 +2795,11 @@
     </message>
     <message>
       <source>Sound</source>
-      <translation type="unfinished">Sound</translation>
+      <translation>Ljud</translation>
     </message>
     <message>
       <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
+      <translation>Hantera</translation>
     </message>
   </context>
   <context>
@@ -3004,11 +3004,11 @@
     </message>
     <message>
       <source>+ Add Group</source>
-      <translation type="unfinished">+ Add Group</translation>
+      <translation>+ Lägg till grupp</translation>
     </message>
     <message>
       <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <translation>Inga grupper hittades</translation>
     </message>
   </context>
   <context>
@@ -3019,11 +3019,11 @@
     </message>
     <message>
       <source>+ Add User</source>
-      <translation type="unfinished">+ Add User</translation>
+      <translation>+ Lägg till användare</translation>
     </message>
     <message>
       <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
+      <translation>Inga användare hittades</translation>
     </message>
   </context>
   <context>
