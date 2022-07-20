@@ -47,9 +47,10 @@ public:
     void setState(State state);
 
     /**
-     * Returns the event unique name. Used for the event aggregation. At the basic level event
-     * uniqueness is determined by the event name.
+     * Key for more detailed event aggregation. Used in SendMailAction.
+     * Returns event type by default.
      * Keep in sync with EventParameters::getParamsHash().
+     * Consider renaming to aggregationSubKey().
      */
     virtual QString uniqueName() const;
 
@@ -61,7 +62,15 @@ public:
     virtual QString resourceKey() const = 0;
 
     /**
+     * Key for basic event aggregation.
+     * Returns resourceKey() by default.
+     * Keep in sync with eventKey in RuleProcessor::processInstantAction().
+     */
+    virtual QString aggregationKey() const;
+
+    /**
      * Used for caching and limiting repeat of instant events.
+     * Returns empty string by default.
      * Keep in sync with uniqueKey in RuleProcessor::checkEventCondition().
      */
     virtual QString cacheKey() const;

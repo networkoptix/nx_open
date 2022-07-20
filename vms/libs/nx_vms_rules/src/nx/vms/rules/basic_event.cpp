@@ -59,6 +59,11 @@ QString BasicEvent::uniqueName() const
     return type();
 }
 
+QString BasicEvent::aggregationKey() const
+{
+    return resourceKey();
+}
+
 QString BasicEvent::cacheKey() const
 {
     return {};

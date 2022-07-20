@@ -14,7 +14,8 @@
 
 #include "basic_event.h"
 #include "event_field.h"
-#include "events/analytics_object_event.h"
+#include "event_fields/state_field.h"
+#include "utils/field.h"
 #include "utils/type.h"
 
 namespace nx::vms::rules {
@@ -172,6 +173,12 @@ bool EventFilter::match(const EventPtr& event) const
         return false;
     }
 
+    if (!matchFields(event))
+        return false;
+
+    // Cache and limit repeat of event with overloaded cacheKey().
+    cacheEvent(cacheKey);
+
     // TODO: #mmalofeev Consider move this check to the engine.
     if (isProlonged(event))
     {
@@ -212,8 +219,21 @@ bool EventFilter::match(const EventPtr& event) const
         }
     }
 
+    if (!matchState(event))
+        return false;
+
+    NX_VERBOSE(this, "Matched filter id: %1", m_id);
+    return true;
+}
+
+// Match all event fields excluding state.
+bool EventFilter::matchFields(const EventPtr& event) const
+{
     for (const auto& [name, field]: m_fields)
     {
+        if (name == utils::kStateFieldName)
+            continue;
+
         const auto& value = event->property(name.toUtf8().data());
         NX_VERBOSE(this, "Matching property: %1, null: %2", name, value.isNull());
 
@@ -224,10 +244,17 @@ bool EventFilter::match(const EventPtr& event) const
             return false;
     }
 
-    // Cache and limit repeat of event with overloaded cacheKey().
-    cacheEvent(cacheKey);
+    return true;
+}
 
-    NX_VERBOSE(this, "Matched filter id: %1", m_id);
+// Match state field only. Consider storing it as a separate member.
+bool EventFilter::matchState(const EventPtr& event) const
+{
+    NX_VERBOSE(this, "Matching event state: %1", event->state());
+
+    if (const auto stateField = fieldByName<StateField>(utils::kStateFieldName))
+        return stateField->match(QVariant::fromValue(event->state()));
+
     return true;
 }
 

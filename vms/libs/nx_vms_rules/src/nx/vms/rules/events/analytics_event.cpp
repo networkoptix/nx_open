@@ -48,6 +48,11 @@ QString AnalyticsEvent::resourceKey() const
         m_key);
 }
 
+QString AnalyticsEvent::aggregationKey() const
+{
+    return cameraId().toSimpleString();
+}
+
 QVariantMap AnalyticsEvent::details(common::SystemContext* context) const
 {
     auto result = AnalyticsEngineEvent::details(context);

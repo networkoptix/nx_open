@@ -42,6 +42,13 @@ QString SoftTriggerEvent::resourceKey() const
     return m_cameraId.toSimpleString();
 }
 
+QString SoftTriggerEvent::aggregationKey() const
+{
+    // Soft trigger are aggregated regardless to resource.
+    // See eventKey in RuleProcessor::processInstantAction.
+    return m_triggerId.toSimpleString();
+}
+
 QVariantMap SoftTriggerEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);
