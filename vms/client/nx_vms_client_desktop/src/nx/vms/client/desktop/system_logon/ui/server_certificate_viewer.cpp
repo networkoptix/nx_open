@@ -31,11 +31,6 @@ QString name(const nx::network::ssl::X509Name& subject, const QString& defaultVa
     return defaultValue;
 }
 
-QString formattedFingerprint(const std::vector<unsigned char>& hash)
-{
-    return QString(QByteArray::fromRawData((char *)hash.data(), hash.size()).toHex(' ')).toUpper();
-}
-
 QString highlightedText(const QString& text)
 {
     const auto color = nx::vms::client::desktop::colorTheme()->color("light10");
@@ -239,8 +234,8 @@ void ServerCertificateViewer::showSelectedCertificate()
     ui->expiresValueLabel->setText(
         QDateTime::fromSecsSinceEpoch(expiresAt.count()).toString());
 
-    ui->sha1->setText(formattedFingerprint(cert.sha1()));
-    ui->sha256->setText(formattedFingerprint(cert.sha256()));
+    ui->sha1->setText(nx::vms::client::core::formattedFingerprint(cert.sha1()));
+    ui->sha256->setText(nx::vms::client::core::formattedFingerprint(cert.sha256()));
 
     ui->certificateText->setText(QString::fromStdString(cert.printedText()));
 
