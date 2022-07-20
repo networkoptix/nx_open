@@ -5,6 +5,9 @@
 #include <vector>
 #include <string>
 
+#include <QByteArray>
+#include <QString>
+
 #include <nx/network/ssl/certificate.h>
 
 namespace nx::vms::client::core {
@@ -20,6 +23,11 @@ inline std::optional<std::string> certificateName(const nx::network::ssl::X509Na
         return it->second;
 
     return {};
+}
+
+inline QString formattedFingerprint(const std::vector<unsigned char>& hash)
+{
+    return QString(QByteArray::fromRawData((char *)hash.data(), hash.size()).toHex(' ')).toUpper();
 }
 
 } // namespace nx::vms::client::core
