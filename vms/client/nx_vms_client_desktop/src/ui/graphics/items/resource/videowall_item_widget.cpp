@@ -413,7 +413,8 @@ void QnVideowallItemWidget::updateLayout()
         // Right now this widget does not have any sort of proper size to calculate aspect ratio
         const QSize previewSize = kPreviewSize;
         m_layoutThumbnailProvider.reset(
-            new LayoutThumbnailLoader(m_layout, previewSize, nx::api::ImageRequest::kLatestThumbnail));
+            new LayoutThumbnailLoader(m_layout, previewSize,
+                nx::api::ImageRequest::kLatestThumbnail.count()));
 
         connect(m_layoutThumbnailProvider.get(), &ImageProvider::statusChanged,
             this, &QnVideowallItemWidget::at_updateThumbnailStatus);

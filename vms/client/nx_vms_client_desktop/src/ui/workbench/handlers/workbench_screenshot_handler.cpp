@@ -692,14 +692,14 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
             request.rotation = 0;
 
             // TODO: #vkutin Change to `raw` when it's supported.
-            request.imageFormat = nx::api::ImageRequest::ThumbnailFormat::png;
+            request.format = nx::api::ImageRequest::ThumbnailFormat::png;
 
             request.streamSelectionMode =
                 nx::api::CameraImageRequest::StreamSelectionMode::forcedPrimary;
 
-            request.usecSinceEpoch = localParameters.utcTimestampMsec == latestScreenshotTime
+            request.timestampUs = localParameters.utcTimestampMsec == latestScreenshotTime
                 ? nx::api::ImageRequest::kLatestThumbnail
-                : localParameters.utcTimestampMsec * 1000;
+                : microseconds(localParameters.utcTimestampMsec * 1000);
 
             imageProvider = new nx::vms::client::desktop::CameraThumbnailProvider(request);
         }

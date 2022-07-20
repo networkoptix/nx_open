@@ -410,11 +410,11 @@ void EventRibbon::Private::updateTilePreview(int index)
 
     nx::api::ResourceImageRequest request;
     request.resource = previewResource;
-    request.usecSinceEpoch =
-        previewTime.count() > 0 ? previewTime.count() : nx::api::ImageRequest::kLatestThumbnail;
+    request.timestampUs =
+        previewTime.count() > 0 ? previewTime : nx::api::ImageRequest::kLatestThumbnail;
     request.rotation = rotation;
     request.size = QSize(thumbnailWidth, 0);
-    request.imageFormat = nx::api::ImageRequest::ThumbnailFormat::jpg;
+    request.format = nx::api::ImageRequest::ThumbnailFormat::jpg;
     request.aspectRatio = nx::api::ImageRequest::AspectRatio::auto_;
     request.roundMethod = precisePreview
         ? nx::api::ImageRequest::RoundMethod::precise
@@ -439,7 +439,7 @@ void EventRibbon::Private::updateTilePreview(int index)
     else
     {
         const auto oldRequest = previewProvider->requestData();
-        forceUpdate = oldRequest.usecSinceEpoch != request.usecSinceEpoch
+        forceUpdate = oldRequest.timestampUs != request.timestampUs
             || oldRequest.streamSelectionMode != request.streamSelectionMode;
 
         previewProvider->setRequestData(request);
@@ -1603,7 +1603,7 @@ void EventRibbon::Private::loadNextPreview()
             if (tile->preview->tryLoad())
             {
                 NX_VERBOSE(this, "Loaded preview from videocache (timestamp=%1, objectTrackId=%2",
-                    tile->preview->requestData().usecSinceEpoch,
+                    tile->preview->requestData().timestampUs,
                     tile->preview->requestData().objectTrackId);
 
                 continue;
@@ -1613,7 +1613,7 @@ void EventRibbon::Private::loadNextPreview()
         if (isNextPreviewLoadAllowed(tile->preview.get()))
         {
             NX_VERBOSE(this, "Requesting preview from server (timestamp=%1, objectTrackId=%2",
-                tile->preview->requestData().usecSinceEpoch,
+                tile->preview->requestData().timestampUs,
                 tile->preview->requestData().objectTrackId);
 
             tile->preview->loadAsync();

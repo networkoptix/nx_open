@@ -110,9 +110,9 @@ void CameraHotspotItem::initTooltip(
 
     nx::api::CameraImageRequest request;
     request.camera = camera;
-    request.imageFormat = nx::api::ImageRequest::ThumbnailFormat::jpg;
+    request.format = nx::api::ImageRequest::ThumbnailFormat::jpg;
     request.aspectRatio = nx::api::ImageRequest::AspectRatio::auto_;
-    request.usecSinceEpoch = nx::api::ImageRequest::kLatestThumbnail;
+    request.timestampUs = nx::api::ImageRequest::kLatestThumbnail;
     request.roundMethod = nx::api::ImageRequest::RoundMethod::precise;
 
     d->thumbnailProvider = std::make_unique<CameraThumbnailProvider>(request);
