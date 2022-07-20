@@ -30,8 +30,7 @@ class NX_NETWORK_API ProxyWorker:
 
 public:
     using ProxyCompletionHander = nx::utils::MoveOnlyFunc<void(
-        RequestResult requestResult,
-        std::optional<Response> response)>;
+        RequestResult requestResult)>;
 
     ProxyWorker(
         network::SocketAddress targetHost,

@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include <nx/utils/stree/attribute_dictionary.h>
+#include <nx/network/http/server/request_processing_types.h>
 #include <nx/network/socket.h>
+#include <nx/utils/stree/attribute_dictionary.h>
 
 namespace nx::cloud::gateway {
 
@@ -11,12 +12,12 @@ class SocketResourceReader:
     public nx::utils::stree::AbstractAttributeReader
 {
 public:
-    SocketResourceReader(const network::AbstractCommunicatingSocket& sock);
+    SocketResourceReader(const nx::network::http::ConnectionAttrs& attrs);
 
     virtual std::optional<std::string> getStr(const nx::utils::stree::AttrName& name) const override;
 
 private:
-    const network::AbstractCommunicatingSocket& m_socket;
+    const nx::network::http::ConnectionAttrs& m_attrs;
 };
 
 } // namespace nx::cloud::gateway

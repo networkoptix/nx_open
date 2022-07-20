@@ -33,17 +33,19 @@ public:
 class NX_NETWORK_API BaseAuthenticationManager:
     public AbstractAuthenticationManager
 {
+    using base_type = AbstractAuthenticationManager;
+
 public:
     BaseAuthenticationManager(
+        AbstractRequestHandler* nextHandler,
         AbstractAuthenticationDataProvider* authenticationDataProvider,
         Role role = Role::resourceServer);
 
     virtual ~BaseAuthenticationManager() override;
 
-    virtual void authenticate(
-        const nx::network::http::HttpServerConnection& connection,
-        const nx::network::http::Request& request,
-        AuthenticationCompletionHandler completionHandler) override;
+    virtual void serve(
+        RequestContext requestContext,
+        nx::utils::MoveOnlyFunc<void(RequestResult)> completionHandler) override;
 
     std::string realm();
 
@@ -59,18 +61,20 @@ private:
         generateWwwAuthenticateHeader(bool isProxy);
 
     void lookupPassword(
-        const nx::network::http::Request& request,
+        RequestContext requestContext,
         AuthenticationCompletionHandler completionHandler,
         nx::network::http::header::DigestAuthorization authorizationHeader,
         bool isSsl);
 
     void validatePlainTextCredentials(
-        const http::Method& method,
+        RequestContext requestContext,
         const http::header::Authorization& authorizationHeader,
         const AuthToken& passwordLookupToken,
         AuthenticationCompletionHandler completionHandler);
 
-    void reportSuccess(AuthenticationCompletionHandler completionHandler);
+    void reportSuccess(
+        RequestContext requestContext,
+        AuthenticationCompletionHandler completionHandler);
 
     std::string generateNonce();
     bool validateNonce(const std::string& nonce);

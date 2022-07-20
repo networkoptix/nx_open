@@ -36,14 +36,11 @@ public:
 
     template<typename... Args>
     HttpStreamSocketServer(
-        nx::network::http::server::AbstractAuthenticationManager* const authenticationManager,
-        nx::network::http::AbstractMessageDispatcher* const httpMessageDispatcher,
+        AbstractRequestHandler* requestHandler,
         Args&&... args)
         :
         base_type(std::forward<Args>(args)...),
-        m_authenticationManager(authenticationManager),
-        m_httpMessageDispatcher(httpMessageDispatcher),
-        m_persistentConnectionEnabled(true)
+        m_requestHandler(requestHandler)
     {
     }
 
@@ -60,14 +57,15 @@ protected:
         std::unique_ptr<AbstractStreamSocket> _socket) override;
 
 private:
-    nx::network::http::server::AbstractAuthenticationManager* const m_authenticationManager;
-    nx::network::http::AbstractMessageDispatcher* const m_httpMessageDispatcher;
-    bool m_persistentConnectionEnabled;
+    nx::network::http::AbstractRequestHandler* m_requestHandler = nullptr;
+    bool m_persistentConnectionEnabled = true;
 
     mutable nx::Mutex m_mutex;
     nx::network::http::server::RequestStatisticsCalculator m_statsCalculator;
     std::optional<SocketAddress> m_addressToRedirect;
 };
+
+//-------------------------------------------------------------------------------------------------
 
 class NX_NETWORK_API StreamConnectionHolder:
     public nx::network::server::StreamConnectionHolder<

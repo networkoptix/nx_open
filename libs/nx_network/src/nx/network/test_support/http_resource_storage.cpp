@@ -81,7 +81,7 @@ void ResourceStorage::getResource(
         return handler(StatusCode::notFound);
 
     RequestResult result(StatusCode::ok);
-    result.dataSource = std::make_unique<BufferSource>("text/plain", std::move(*resource));
+    result.body = std::make_unique<BufferSource>("text/plain", std::move(*resource));
 
     handler(std::move(result));
 }

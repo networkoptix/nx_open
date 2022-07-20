@@ -111,6 +111,7 @@ int VmsGatewayProcess::serviceMain(
         nx::network::http::AuthMethodRestrictionList authRestrictionList;
 
         AuthenticationManager authenticationManager(
+            &httpMessageDispatcher,
             authRestrictionList,
             streeManager);
 
@@ -137,14 +138,11 @@ int VmsGatewayProcess::serviceMain(
         {
             httpServer = std::make_unique<HttpServer>(
                 &authenticationManager,
-                &httpMessageDispatcher,
                 nx::network::ssl::Context::instance());
         }
         else
         {
-            httpServer = std::make_unique<HttpServer>(
-                &authenticationManager,
-                &httpMessageDispatcher);
+            httpServer = std::make_unique<HttpServer>(&authenticationManager);
         }
 
         if (!httpServer->bind(httpAddrToListenList))

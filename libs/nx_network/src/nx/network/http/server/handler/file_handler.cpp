@@ -107,7 +107,7 @@ void FileDownloader::onOpenFileCompletion(SystemError::ErrorCode resultCode)
     body->setReadSize(m_fileReadSize);
 
     RequestResult result(StatusCode::ok);
-    result.dataSource = std::move(body);
+    result.body = std::move(body);
     m_completionHandler(std::move(result));
 }
 

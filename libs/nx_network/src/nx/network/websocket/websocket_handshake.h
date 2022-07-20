@@ -23,6 +23,11 @@ NX_NETWORK_API Error validateRequest(
     nx::network::http::Response* response,
     bool disableCompression = false);
 
+NX_NETWORK_API Error validateRequest(
+    const nx::network::http::Request& request,
+    nx::network::http::HttpHeaders* responseHeaders,
+    bool disableCompression = false);
+
 NX_NETWORK_API void addClientHeaders(
     nx::network::http::HttpHeaders* headers,
     const nx::Buffer& protocolName,

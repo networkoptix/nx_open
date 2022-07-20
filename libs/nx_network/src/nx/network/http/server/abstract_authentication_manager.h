@@ -8,11 +8,10 @@
 #include <nx/utils/stree/attribute_dictionary.h>
 #include <nx/utils/std/optional.h>
 
+#include "abstract_http_request_handler.h"
 #include "../abstract_msg_body_source.h"
 
-namespace nx {
-namespace network {
-namespace http {
+namespace nx::network::http {
 
 class HttpServerConnection;
 
@@ -24,50 +23,30 @@ enum class Role
     proxy,
 };
 
-struct AuthenticationResult
+struct SuccessfulAuthenticationResult: RequestResult
 {
-    StatusCode::Value statusCode = StatusCode::unauthorized;
-
-    /**
-     * Properties found during authentication can be stored here
-     * (e.g., some application-specific user ID) and will be later forwarded to a request handler.
-     */
-    nx::utils::stree::AttributeDictionary authInfo;
-
-    nx::network::http::HttpHeaders responseHeaders;
-    std::unique_ptr<nx::network::http::AbstractMsgBodySource> msgBody;
-
-    AuthenticationResult() = default;
-
-    AuthenticationResult(
-        StatusCode::Value statusCode,
-        nx::utils::stree::AttributeDictionary authInfo,
-        nx::network::http::HttpHeaders responseHeaders,
-        std::unique_ptr<nx::network::http::AbstractMsgBodySource> msgBody)
-        :
-        statusCode(statusCode),
-        authInfo(std::move(authInfo)),
-        responseHeaders(std::move(responseHeaders)),
-        msgBody(std::move(msgBody))
+    SuccessfulAuthenticationResult():
+        RequestResult(StatusCode::ok)
     {
-    }
-};
-
-struct SuccessfulAuthenticationResult:
-    AuthenticationResult
-{
-    SuccessfulAuthenticationResult()
-    {
-        statusCode = StatusCode::ok;
     }
 };
 
 using AuthenticationCompletionHandler =
-    nx::utils::MoveOnlyFunc<void(AuthenticationResult)>;
+    nx::utils::MoveOnlyFunc<void(RequestResult)>;
 
-class NX_NETWORK_API AbstractAuthenticationManager
+/**
+ * Puts the authentication result into the RequestResult::statusCode variable or the
+ * AbstractRequestHandler::serve output parameter.
+ * In the case of failed authentication may pass response headers and/or response body.
+ */
+class NX_NETWORK_API AbstractAuthenticationManager:
+    public IntermediaryHandler
 {
+    using base_type = IntermediaryHandler;
+
 public:
+    using base_type::base_type;
+
     virtual ~AbstractAuthenticationManager() = default;
 
     /**
@@ -77,13 +56,11 @@ public:
      * @param request The request is valid until invocation of completionHandler at least.
      * @param completionHandler Allowed to be called directly within this call.
      */
-    virtual void authenticate(
-        const nx::network::http::HttpServerConnection& connection,
-        const nx::network::http::Request& request,
-        AuthenticationCompletionHandler completionHandler) = 0;
+    //virtual void authenticate(
+    //    const nx::network::http::HttpServerConnection& connection,
+    //    const nx::network::http::Request& request,
+    //    AuthenticationCompletionHandler completionHandler) = 0;
 };
 
 } // namespace server
-} // namespace nx
-} // namespace network
-} // namespace http
+} // namespace nx::network::http

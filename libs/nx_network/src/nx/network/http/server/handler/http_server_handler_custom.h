@@ -8,7 +8,7 @@ namespace nx::network::http::server::handler {
 
 template<typename Func>
 class CustomRequestHandler:
-    public AbstractHttpRequestHandler
+    public RequestHandlerWithContext
 {
 public:
     CustomRequestHandler(Func func):

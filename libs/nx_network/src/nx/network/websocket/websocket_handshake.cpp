@@ -153,6 +153,17 @@ Error validateRequest(
     nx::network::http::Response* response,
     bool disableCompression)
 {
+    const auto res = validateRequest(request, response ? &response->headers : nullptr, disableCompression);
+    if (response && res == Error::noError)
+        response->statusLine.statusCode = nx::network::http::StatusCode::switchingProtocols;
+    return res;
+}
+
+Error validateRequest(
+    const nx::network::http::Request& request,
+    nx::network::http::HttpHeaders* responseHeaders,
+    bool disableCompression)
+{
     Error result = validateRequestLine(request.requestLine);
     if (result != Error::noError)
         return result;
@@ -161,20 +172,19 @@ Error validateRequest(
     if (result != Error::noError)
         return result;
 
-    if (!response)
+    if (!responseHeaders)
         return Error::noError;
 
-    response->statusLine.statusCode = nx::network::http::StatusCode::switchingProtocols;
-    response->headers.emplace(kConnection, kUpgrade);
-    response->headers.emplace(kUpgrade, kWebsocketProtocolName);
-    response->headers.emplace(kAccept, detail::makeAcceptKey(request.headers.find(kKey)->second));
+    responseHeaders->emplace(kConnection, kUpgrade);
+    responseHeaders->emplace(kUpgrade, kWebsocketProtocolName);
+    responseHeaders->emplace(kAccept, detail::makeAcceptKey(request.headers.find(kKey)->second));
 
     auto websocketProtocolIt = request.headers.find(kProtocol);
     if (websocketProtocolIt != request.headers.cend())
-        response->headers.emplace(kProtocol, websocketProtocolIt->second);
+        responseHeaders->emplace(kProtocol, websocketProtocolIt->second);
 
     if (compressionType(request.headers) != CompressionType::none && !disableCompression)
-        response->headers.emplace(kExtension, kCompressionAllowed);
+        responseHeaders->emplace(kExtension, kCompressionAllowed);
 
     return Error::noError;
 }

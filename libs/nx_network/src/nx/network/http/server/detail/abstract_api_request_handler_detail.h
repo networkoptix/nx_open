@@ -84,9 +84,9 @@ bool serializeToHeaders(nx::network::http::HttpHeaders* /*where*/, const T& /*wh
 
 template<typename Input, typename Descendant>
 class BaseApiRequestHandler:
-    public AbstractHttpRequestHandler
+    public RequestHandlerWithContext
 {
-    using base_type = AbstractHttpRequestHandler;
+    using base_type = RequestHandlerWithContext;
     using FormatBinder = NxReflectBinder;
 
 public:
@@ -112,6 +112,7 @@ protected:
 
     void requestCompleted(
         nx::network::http::StatusCode::Value statusCode,
+        nx::network::http::HttpHeaders responseHeaders,
         std::unique_ptr<nx::network::http::AbstractMsgBodySource> outputMsgBody);
 
     template<class T>
@@ -146,6 +147,7 @@ private:
     bool serializeOutputToResponse(
         const ApiRequestResult& result,
         const Output& output,
+        HttpHeaders* responseHeaders,
         std::unique_ptr<nx::network::http::AbstractMsgBodySource>* outputMsgBody);
 
     template <typename Output>
@@ -227,11 +229,19 @@ void BaseApiRequestHandler<Input, Descendant>::requestCompleted(
 {
     std::unique_ptr<nx::network::http::AbstractMsgBodySource> outputMsgBody;
 
+    HttpHeaders responseHeaders;
+    if constexpr (sizeof...(output) > 1)
+        responseHeaders = std::get<1>(std::forward_as_tuple(output...));
+
     if constexpr (sizeof...(output) > 0)
     {
         if (result.getErrorClass() == ApiRequestErrorClass::noError)
         {
-            if (!serializeOutputToResponse(result, output..., &outputMsgBody))
+            if (!serializeOutputToResponse(
+                    result,
+                    std::get<0>(std::forward_as_tuple(output...)),
+                    &responseHeaders,
+                    &outputMsgBody))
             {
                 result.setErrorClass(ApiRequestErrorClass::internalError);
                 result.setResultCode(nx::reflect::toString(ApiRequestErrorDetail::responseSerializationError));
@@ -259,20 +269,19 @@ void BaseApiRequestHandler<Input, Descendant>::requestCompleted(
             serializedResult);
     }
 
-    requestCompleted(
-        result.httpStatusCode(),
-        std::move(outputMsgBody));
+    requestCompleted(result.httpStatusCode(), std::move(responseHeaders), std::move(outputMsgBody));
 }
 
 template<typename Input, typename Descendant>
 void BaseApiRequestHandler<Input, Descendant>::requestCompleted(
     nx::network::http::StatusCode::Value statusCode,
+    nx::network::http::HttpHeaders responseHeaders,
     std::unique_ptr<nx::network::http::AbstractMsgBodySource> outputMsgBody)
 {
     auto completionHandler = std::move(m_completionHandler);
-    nx::network::http::RequestResult requestResult(
-        statusCode,
-        std::move(outputMsgBody));
+
+    nx::network::http::RequestResult requestResult(statusCode, std::move(outputMsgBody));
+    requestResult.headers.merge(std::move(responseHeaders));
     if (m_connectionEvents)
         requestResult.connectionEvents = std::move(*m_connectionEvents);
     completionHandler(std::move(requestResult));
@@ -410,16 +419,17 @@ template<typename Output>
 bool BaseApiRequestHandler<Input, Descendant>::serializeOutputToResponse(
     const ApiRequestResult& result,
     const Output& output,
+    HttpHeaders* responseHeaders,
     std::unique_ptr<nx::network::http::AbstractMsgBodySource>* outputMsgBody)
 {
     if (nx::network::http::Method::isMessageBodyAllowedInResponse(
-        m_requestMethod, result.httpStatusCode()))
+            m_requestMethod, result.httpStatusCode()))
     {
         return serializeOutputAsMessageBody(output, outputMsgBody);
     }
     else
     {
-        return serializeToHeaders(&response()->headers, output);
+        return serializeToHeaders(responseHeaders, output);
     }
 }
 

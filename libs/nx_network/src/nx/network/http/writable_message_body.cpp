@@ -8,32 +8,46 @@
 
 namespace nx::network::http {
 
-MessageBodyWriter::MessageBodyWriter(WritableMessageBody* body):
-    m_body(body),
-    m_mutex(nx::Mutex::Recursive)
+MessageBodyWriter::State::State(WritableMessageBody* body):
+    body(body),
+    mutex(nx::Mutex::Recursive)
 {
-    m_body->setOnBeforeDestructionHandler(
+}
+
+MessageBodyWriter::MessageBodyWriter(WritableMessageBody* body):
+    m_sharedState(std::make_shared<State>(body))
+{
+    m_sharedState->body->setOnBeforeDestructionHandler(
         [this]()
         {
-            NX_MUTEX_LOCKER lock(&m_mutex);
-            m_body = nullptr;
+            NX_MUTEX_LOCKER lock(&m_sharedState->mutex);
+            m_sharedState->body = nullptr;
         });
 }
 
 void MessageBodyWriter::writeBodyData(nx::Buffer data)
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_sharedState->mutex);
+    auto sharedState = m_sharedState;
 
-    if (m_body)
-        m_body->writeBodyData(std::move(data));
+    if (sharedState->body)
+        sharedState->body->writeBodyData(std::move(data));
+
+    lock.unlock();
 }
 
 void MessageBodyWriter::writeEof(SystemError::ErrorCode resultCode)
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
+    // Using sharedState since body->writeEof can cause body destruction
+    // which in turn can cause this destruction.
 
-    if (m_body)
-        m_body->writeEof(resultCode);
+    NX_MUTEX_LOCKER lock(&m_sharedState->mutex);
+    auto sharedState = m_sharedState;
+
+    if (sharedState->body)
+        sharedState->body->writeEof(resultCode);
+
+    lock.unlock();
 }
 
 //-------------------------------------------------------------------------------------------------

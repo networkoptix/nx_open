@@ -92,14 +92,14 @@ protected:
 
 private:
     void provideModuleInformation(
-        nx::network::http::RequestContext request,
+        nx::network::http::RequestContext /*request*/,
         nx::network::http::RequestProcessedHandler handler)
     {
         nx::network::rest::JsonResult apiResult;
         apiResult.setReply(m_moduleInformation);
 
         nx::network::http::RequestResult httpResult(nx::network::http::StatusCode::ok);
-        httpResult.dataSource = std::make_unique<nx::network::http::BufferSource>(
+        httpResult.body = std::make_unique<nx::network::http::BufferSource>(
             "application/json",
             QJson::serialized(apiResult));
         handler(std::move(httpResult));

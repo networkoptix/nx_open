@@ -98,7 +98,7 @@ void Server::serveGetLoggers(
     http::RequestProcessedHandler completionHandler)
 {
     http::RequestResult result(http::StatusCode::ok);
-    result.dataSource = std::make_unique<http::BufferSource>(
+    result.body = std::make_unique<http::BufferSource>(
         "application/json",
         nx::Buffer(QJson::serialized(mergeLoggers())));
 
@@ -164,7 +164,7 @@ void Server::servePostLogger(
         loggerId);
 
     http::RequestResult result(http::StatusCode::created);
-    result.dataSource = std::make_unique<http::BufferSource>(
+    result.body = std::make_unique<http::BufferSource>(
         "application/json",
         nx::Buffer(QJson::serialized(loggerInfo)));
 
@@ -223,7 +223,7 @@ void Server::serveGetStreamingLogger(
         });
 
     http::RequestResult result(http::StatusCode::ok);
-    result.dataSource = std::move(messageBody);
+    result.body = std::move(messageBody);
 
     completionHandler(std::move(result));
 }

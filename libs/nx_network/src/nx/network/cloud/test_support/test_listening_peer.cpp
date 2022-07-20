@@ -49,7 +49,7 @@ NX_REFLECTION_INSTRUMENT(VmsApiModuleInformation, (realm)(cloudHost)(id)(cloudSy
 using namespace nx::network;
 
 class ApiModuleInformationHandler:
-    public nx::network::http::AbstractHttpRequestHandler
+    public nx::network::http::RequestHandlerWithContext
 {
 public:
     ApiModuleInformationHandler(
@@ -108,7 +108,6 @@ TestListeningPeer::TestListeningPeer(
 :
     m_mediatorConnector(std::make_unique<hpm::api::MediatorConnector>("127.0.0.1")),
     m_httpServer(std::make_unique<nx::network::http::HttpStreamSocketServer>(
-        nullptr,
         &m_httpMessageDispatcher)),
     m_systemData(std::move(systemData)),
     m_serverId(

@@ -9,6 +9,7 @@
 #include <nx/network/http/server/proxy/proxy_handler.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/http/writable_message_body.h>
+#include <nx/network/test_support/message_body.h>
 #include <nx/network/test_support/synchronous_tcp_server.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/thread/barrier_handler.h>
@@ -36,7 +37,8 @@ public:
 
 protected:
     virtual void detectProxyTarget(
-        const HttpServerConnection& /*connection*/,
+        const ConnectionAttrs&,
+        const SocketAddress&,
         Request* const request,
         ProxyTargetDetectedHandler handler)
     {
@@ -87,7 +89,7 @@ protected:
             kFilePath,
             [](auto&&... args)
             {
-                handleRequest(
+                serve(
                     std::bind(&AsyncFileDownloader::sendFileResponse,
                         std::placeholders::_1, std::placeholders::_2),
                     std::forward<decltype(args)>(args)...);
@@ -96,7 +98,7 @@ protected:
             kInfiniteFilePath,
             [](auto&&... args)
             {
-                handleRequest(
+                serve(
                     std::bind(&AsyncFileDownloader::sendInfiniteFileResponse,
                         std::placeholders::_1, std::placeholders::_2),
                     std::forward<decltype(args)>(args)...);
@@ -105,7 +107,7 @@ protected:
             kPartialFilePath,
             [](auto&&... args)
             {
-                handleRequest(
+                serve(
                     std::bind(&AsyncFileDownloader::sendPartialFileResponse,
                         std::placeholders::_1, std::placeholders::_2),
                     std::forward<decltype(args)>(args)...);
@@ -114,7 +116,7 @@ protected:
             kEmptyFilePath,
             [](auto&&... args)
             {
-                handleRequest(
+                serve(
                     std::bind(&AsyncFileDownloader::sendEmptyFileResponse,
                         std::placeholders::_1, std::placeholders::_2),
                     std::forward<decltype(args)>(args)...);
@@ -157,8 +159,9 @@ protected:
             "application/octet-stream",
             kContentLength);
         auto writer = body->writer();
-        result.dataSource = std::move(body);
+        result.body = std::move(body);
         completionHandler(std::move(result));
+
         for (int i = 0; i < kContentLength/10 ; i++)
             writer->writeBodyData(kLine10Chars);
         writer->writeEof();
@@ -169,7 +172,7 @@ protected:
         nx::network::http::RequestProcessedHandler completionHandler)
     {
         http::RequestResult result(StatusCode::ok);
-        result.dataSource = std::make_unique<RepeatingBufferMsgBodySource>(
+        result.body = std::make_unique<RepeatingBufferMsgBodySource>(
             "application/octet-stream",
             kLine10Chars);
         completionHandler(std::move(result));
@@ -185,7 +188,7 @@ protected:
             kContentLength);
         auto writer = body->writer();
         writer->writeBodyData(kLine10Chars);
-        result.dataSource = std::move(body);
+        result.body = std::move(body);
         completionHandler(std::move(result));
     }
 
@@ -194,14 +197,14 @@ protected:
         nx::network::http::RequestProcessedHandler completionHandler)
     {
         http::RequestResult result(StatusCode::ok);
-        result.dataSource = std::make_unique<EmptyMessageBodySource>(
+        result.body = std::make_unique<EmptyMessageBodySource>(
             "application/octet-stream",
             kContentLength);
         completionHandler(std::move(result));
     }
 
     template<typename SendFunc>
-    static void handleRequest(
+    static void serve(
         SendFunc send,
         nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler)
@@ -231,17 +234,20 @@ protected:
         wwwAuthenticate.params.emplace("realm", "realm_of_possibility");
         wwwAuthenticate.params.emplace("algorithm", "MD5");
 
-        requestContext.response->headers.emplace(
+        RequestResult result(StatusCode::unauthorized);
+
+        result.headers.emplace(
             header::WWWAuthenticate::NAME,
             wwwAuthenticate.serialized());
 
-        requestContext.response->headers.emplace("Content-Type", "text/plain");
-        requestContext.response->headers.emplace("Content-Length", "0");
-        requestContext.response->headers.emplace("Connection", "close");
-        requestContext.response->messageBody =
-            "HTTP/1.1 401 Unauthorized\r\nContent-Length: 0\r\n\r\n";
+        result.headers.emplace("Connection", "close");
 
-        completionHandler(StatusCode::unauthorized);
+        result.body = std::make_unique<CustomLengthBody>(
+            "text/plain",
+            "HTTP/1.1 401 Unauthorized\r\nContent-Length: 0\r\n\r\n",
+            0);
+
+        completionHandler(std::move(result));
     }
 
     nx::utils::Url prepareUrl(const std::string& requestPath = std::string())

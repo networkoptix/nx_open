@@ -26,8 +26,23 @@ server::HttpStatistics HttpStreamSocketServer::httpStatistics() const
     httpStats.operator=(statistics());
     NX_MUTEX_LOCKER lock(&m_mutex);
     httpStats.operator=(m_statsCalculator.requestStatistics());
-    httpStats.notFound404 = m_httpMessageDispatcher->dispatchFailures();
-    httpStats.requests = m_httpMessageDispatcher->requestPathStatistics();
+
+    // TODO: #akolesnikov Refactor fetching statistics from the dispatcher.
+    for (AbstractRequestHandler* handler = m_requestHandler; handler != nullptr;)
+    {
+        if (auto dispatcher = dynamic_cast<AbstractMessageDispatcher*>(handler); dispatcher)
+        {
+            httpStats.notFound404 = dispatcher->dispatchFailures();
+            httpStats.requests = dispatcher->requestPathStatistics();
+            break;
+        }
+
+        if (auto intermediary = dynamic_cast<IntermediaryHandler*>(handler); intermediary)
+            handler = intermediary->nextHandler();
+        else
+            break;
+    }
+
     return httpStats;
 }
 
@@ -36,8 +51,7 @@ std::shared_ptr<HttpServerConnection> HttpStreamSocketServer::createConnection(
 {
     auto result = std::make_shared<HttpServerConnection>(
         std::move(_socket),
-        m_authenticationManager,
-        m_httpMessageDispatcher,
+        m_requestHandler,
         m_addressToRedirect);
     result->setPersistentConnectionEnabled(m_persistentConnectionEnabled);
     result->setOnResponseSent(

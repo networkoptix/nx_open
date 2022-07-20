@@ -4,36 +4,49 @@
 
 namespace nx::network::http::server {
 
+AuthenticationDispatcher::AuthenticationDispatcher(
+    AbstractRequestHandler* defaultHandler)
+    :
+    base_type(defaultHandler)
+{
+}
+
 void AuthenticationDispatcher::add(
     const std::regex& pathPattern,
-    AbstractAuthenticationManager* authenticator)
+    AbstractRequestHandler* authenticator)
 {
     m_authenticatorsByRegex.emplace_back(pathPattern, authenticator);
 }
 
-void AuthenticationDispatcher::authenticate(
-    const nx::network::http::HttpServerConnection& connection,
-    const nx::network::http::Request& request,
-    AuthenticationCompletionHandler completionHandler)
+void AuthenticationDispatcher::add(
+    const std::string& pathPattern,
+    AbstractRequestHandler* authenticator)
 {
-    AbstractAuthenticationManager* manager = nullptr;
-    std::string path = request.requestLine.url.path().toStdString();
+    add(std::regex(pathPattern), authenticator);
+}
 
+void AuthenticationDispatcher::serve(
+    RequestContext ctx,
+    nx::utils::MoveOnlyFunc<void(RequestResult)> completionHandler)
+{
+    AbstractRequestHandler* manager = nullptr;
+    std::string path = ctx.request.requestLine.url.path().toStdString();
+
+    for (const auto& element: m_authenticatorsByRegex)
     {
-        for (const auto& element: m_authenticatorsByRegex)
+        if (std::regex_match(path, element.first))
         {
-            if (std::regex_match(path, element.first))
-            {
-                manager = element.second;
-                break;
-            }
+            manager = element.second;
+            break;
         }
     }
 
     if (manager)
-        manager->authenticate(connection, request, std::move(completionHandler));
+        manager->serve(std::move(ctx), std::move(completionHandler));
+    else if (nextHandler())
+        nextHandler()->serve(std::move(ctx), std::move(completionHandler));
     else
-        completionHandler(SuccessfulAuthenticationResult());
+        completionHandler(RequestResult(StatusCode::forbidden));
 }
 
 } // namespace nx::network::http::server

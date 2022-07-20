@@ -47,13 +47,18 @@ const std::pair<const std::string, Value>* findByMaxPrefix(
  * Provides a pure virtual AbstractMessageDispatcher::getHandler method that must be implemented by
  * a descendant.
  */
-class NX_NETWORK_API AbstractMessageDispatcher
+class NX_NETWORK_API AbstractMessageDispatcher:
+    public AbstractRequestHandler
 {
 public:
-    using HandlerFactoryFunc = std::function<std::unique_ptr<AbstractHttpRequestHandler>()>;
+    using HandlerFactoryFunc = std::function<std::unique_ptr<RequestHandlerWithContext>()>;
 
     AbstractMessageDispatcher();
     virtual ~AbstractMessageDispatcher();
+
+    virtual void serve(
+        RequestContext requestContext,
+        nx::utils::MoveOnlyFunc<void(RequestResult)> completionHandler) override;
 
     /**
      * @return false if some handler is already registered for path.
@@ -126,14 +131,12 @@ public:
         const int seq = ++m_requestSeq;
         m_activeRequests.emplace(seq, requestContext.request.requestLine.toString());
 
-        handlerPtr->handleRequest(
+        handlerPtr->serve(
             std::move(requestContext),
             [this, handler = std::move(handlerContext->handler), seq,
                 completionFunc = std::move(completionFunc), counter = m_runningRequestCounter,
                 requestProcessStartTime, statisticsKey = std::move(statisticsKey)](
-                    nx::network::http::Message message,
-                    std::unique_ptr<nx::network::http::AbstractMsgBodySource> bodySource,
-                    ConnectionEvents connectionEvents) mutable
+                    RequestResult result) mutable
             {
                 using namespace std::chrono;
                 finishUpdatingRequestPathStatistics(
@@ -142,10 +145,7 @@ public:
 
                 m_activeRequests.erase(seq);
 
-                completionFunc(
-                    std::move(message),
-                    std::move(bodySource),
-                    std::move(connectionEvents));
+                completionFunc(std::move(result));
 
                 // Creating copy of counter since this lambda is destroyed by handler.reset().
                 auto localCounter = counter;
@@ -177,7 +177,7 @@ public:
 protected:
     struct HandlerContext
     {
-        std::unique_ptr<AbstractHttpRequestHandler> handler;
+        std::unique_ptr<RequestHandlerWithContext> handler;
         std::string pathTemplate;
     };
 
@@ -289,7 +289,7 @@ public:
     }
 
 private:
-    using FactoryFunc = std::function<std::unique_ptr<AbstractHttpRequestHandler>()>;
+    using FactoryFunc = std::function<std::unique_ptr<RequestHandlerWithContext>()>;
 
     struct HandlerFactory
     {

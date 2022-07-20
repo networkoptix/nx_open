@@ -23,13 +23,17 @@ static const std::vector<const char*> kTestPaths =
     "/test/unregisteredput"
 };
 
-class TestAuthenticator: public AbstractAuthenticationManager
+class TestAuthenticator:
+    public AbstractAuthenticationManager
 {
+    using base_type = AbstractAuthenticationManager;
+
 public:
-    void authenticate(
-        const nx::network::http::HttpServerConnection&,
-        const nx::network::http::Request&,
-        nx::network::http::server::AuthenticationCompletionHandler completionHandler) override
+    using base_type::base_type;
+
+    virtual void serve(
+        RequestContext /*requestContext*/,
+        nx::utils::MoveOnlyFunc<void(RequestResult)> completionHandler) override
     {
         m_authenticateCalled = true;
         completionHandler(nx::network::http::server::SuccessfulAuthenticationResult());
@@ -83,25 +87,50 @@ public:
 class AuthenticationDispatcher:
     public ::testing::Test
 {
+public:
+    AuthenticationDispatcher():
+        m_dispatcher(/*no default handler*/ nullptr)
+    {
+    }
+
 protected:
     void SetUp() override
     {
         initializeAndRegisterAuthenticators();
     }
 
-    void whenAuthenticateAllRegisteredAuthenticators()
+    void whenAuthenticateRegisteredPath()
     {
         // "/test/get"
         authenticateRegisteredPath(kTestPaths[0]);
-
-        // "/test/delete"
-        authenticateRegisteredPath(kTestPaths[1]);
+        m_lastInvokedPath = kTestPaths[0];
     }
 
-    void whenAuthenticateUnregisteredAuthenticator()
+    void whenAuthenticateUnregisteredPath()
     {
-        // "/test/unregisteredput"
-        authenticateUnregisteredPath(kTestPaths[2]);
+        invokeDispatcher("/foo/bar");
+    }
+
+    void thenCorrespondingAuthenticatorIsInvoked()
+    {
+        const auto& authenticator = m_authenticators[m_lastInvokedPath];
+        ASSERT_TRUE(authenticator->authenticateCalled());
+    }
+
+    void thenNoAuthenticatorIsInvoked()
+    {
+        for (const auto& [path, authenticator]: m_authenticators)
+        {
+            ASSERT_FALSE(authenticator->authenticateCalled());
+        }
+    }
+
+    void andRequestCompletedWith(StatusCode::Value expected)
+    {
+        for (const auto& status: m_requestCompletionStatuses)
+        {
+            ASSERT_EQ(expected, status);
+        }
     }
 
 private:
@@ -110,40 +139,31 @@ private:
         auto authenticator = m_authenticators[path].get();
         ASSERT_FALSE(authenticator->authenticateCalled());
 
-        auto serverConnection = createHttpServerConnection(authenticator);
-        auto httpRequest = createHttpRequest(path);
+        invokeDispatcher(path);
 
-        m_dispatcher.authenticate(
-            *serverConnection,
-            httpRequest,
-            [authenticator](AuthenticationResult /*result*/)
-            {
-                ASSERT_TRUE(authenticator->authenticateCalled());
-            });
+        ASSERT_TRUE(authenticator->authenticateCalled());
     }
 
-    void authenticateUnregisteredPath(const char* path)
+    void invokeDispatcher(const char* path)
     {
-        auto authenticator = m_authenticators[path].get();
-        ASSERT_FALSE(authenticator->authenticateCalled());
-
-        auto serverConnection = createHttpServerConnection(authenticator);
-        auto httpRequest = createHttpRequest(path);
-
-        m_dispatcher.authenticate(
-            *serverConnection,
-            httpRequest,
-            [authenticator](AuthenticationResult /*result*/)
+        RequestContext requestContext;
+        requestContext.request = createHttpRequest(path);
+        auto serverConnection = createHttpServerConnection();
+        requestContext.conn = serverConnection;
+        m_dispatcher.serve(
+            std::move(requestContext),
+            [this, serverConnection = std::move(serverConnection)](
+                RequestResult result)
             {
-                ASSERT_FALSE(authenticator->authenticateCalled());
+                m_requestCompletionStatuses.push_back(result.statusCode);
             });
     }
 
     void initializeAndRegisterAuthenticators()
     {
-        for (const auto& testPath : kTestPaths)
+        for (const auto& testPath: kTestPaths)
         {
-            auto authenticator = std::make_unique<TestAuthenticator>();
+            auto authenticator = std::make_unique<TestAuthenticator>(&m_dispatcher);
 
             // Skipping kTestPaths[2]: "/test/unregisteredput"
             if (std::string(testPath) != kTestPaths[2])
@@ -153,13 +173,11 @@ private:
         }
     }
 
-    std::unique_ptr<HttpServerConnection> createHttpServerConnection(
-        AbstractAuthenticationManager* authenticator)
+    std::shared_ptr<HttpServerConnection> createHttpServerConnection()
     {
-        return std::make_unique<HttpServerConnection>(
+        return std::make_shared<HttpServerConnection>(
             std::make_unique<TestSocket>(),
-            authenticator,
-            &m_messageDispatcher);
+            &m_dispatcher);
     }
 
     http::Request createHttpRequest(const std::string& path)
@@ -173,21 +191,24 @@ private:
     server::AuthenticationDispatcher m_dispatcher;
     std::map<std::string, std::unique_ptr<TestAuthenticator>> m_authenticators;
     MessageDispatcher m_messageDispatcher;
+    std::vector<StatusCode::Value> m_requestCompletionStatuses;
+    std::string m_lastInvokedPath;
 };
 
 TEST_F(AuthenticationDispatcher, dispatches_matched_requests_to_registered_authenticator)
 {
-    whenAuthenticateAllRegisteredAuthenticators();
+    whenAuthenticateRegisteredPath();
 
-    //thenRequestSucceeded();
+    thenCorrespondingAuthenticatorIsInvoked();
+    andRequestCompletedWith(StatusCode::ok);
 }
 
-TEST_F(AuthenticationDispatcher, authenticates_when_no_authenticator_is_matched)
+TEST_F(AuthenticationDispatcher, request_is_forbidden_when_no_authenticator_matched)
 {
-    whenAuthenticateUnregisteredAuthenticator();
+    whenAuthenticateUnregisteredPath();
 
-    //thenRequestSucceeded();
+    thenNoAuthenticatorIsInvoked();
+    andRequestCompletedWith(StatusCode::forbidden);
 }
-
 
 } // namespace nx::network::http::server::test

@@ -30,8 +30,7 @@ public:
      */
     static std::tuple<std::unique_ptr<MultiEndpointServer>, SystemError::ErrorCode> build(
         const Settings& settings,
-        AbstractAuthenticationManager* authenticator,
-        rest::MessageDispatcher* messageDispatcher);
+        AbstractRequestHandler* requestHandler);
 
     /**
      * Same as Builder::build, but throws on error.
@@ -39,19 +38,16 @@ public:
      */
     static std::unique_ptr<MultiEndpointServer> buildOrThrow(
         const Settings& settings,
-        AbstractAuthenticationManager* authenticator,
-        rest::MessageDispatcher* messageDispatcher);
+        AbstractRequestHandler* requestHandler);
 
 private:
     static std::tuple<std::unique_ptr<MultiEndpointServer>, SystemError::ErrorCode> buildHttpServer(
         const Settings& settings,
-        AbstractAuthenticationManager* authenticator,
-        rest::MessageDispatcher* httpMessageDispatcher);
+        AbstractRequestHandler* requestHandler);
 
     static std::tuple<std::unique_ptr<MultiEndpointServer>, SystemError::ErrorCode> buildHttpsServer(
         const Settings& settings,
-        AbstractAuthenticationManager* authenticator,
-        rest::MessageDispatcher* httpMessageDispatcher);
+        AbstractRequestHandler* requestHandler);
 
     static bool applySettings(
         const Settings& settings,

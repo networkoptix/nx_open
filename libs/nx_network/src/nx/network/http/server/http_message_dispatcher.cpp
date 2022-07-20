@@ -25,6 +25,23 @@ AbstractMessageDispatcher::~AbstractMessageDispatcher()
         NX_ASSERT(waitUntilAllRequestsCompleted(*m_linger));
 }
 
+void AbstractMessageDispatcher::serve(
+    RequestContext requestContext,
+    nx::utils::MoveOnlyFunc<void(RequestResult)> completionHandler)
+{
+    auto sharedHandler = std::make_shared<decltype(completionHandler)>(std::move(completionHandler));
+
+    const bool handlerFound = dispatchRequest(
+        std::move(requestContext),
+        [sharedHandler](RequestResult result)
+        {
+            (*sharedHandler)(std::move(result));
+        });
+
+    if (!handlerFound)
+        (*sharedHandler)(RequestResult(StatusCode::notFound));
+}
+
 bool AbstractMessageDispatcher::registerRedirect(
     const std::string& sourcePath,
     const std::string& destinationPath,

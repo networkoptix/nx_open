@@ -10,8 +10,7 @@ namespace nx::network::http::server {
 
 std::tuple<std::unique_ptr<MultiEndpointServer>, SystemError::ErrorCode> Builder::build(
     const Settings& settings,
-    AbstractAuthenticationManager* authenticator,
-    rest::MessageDispatcher* messageDispatcher)
+    AbstractRequestHandler* requestHandler)
 {
     if (settings.endpoints.empty() && settings.ssl.endpoints.empty())
         throw std::runtime_error("No HTTP endpoint to listen");
@@ -20,16 +19,14 @@ std::tuple<std::unique_ptr<MultiEndpointServer>, SystemError::ErrorCode> Builder
     if (!settings.endpoints.empty())
     {
         SystemError::ErrorCode err;
-        std::tie(server, err) = buildHttpServer(
-            settings, authenticator, messageDispatcher);
+        std::tie(server, err) = buildHttpServer(settings, requestHandler);
         if (!server)
             return std::make_tuple(nullptr, err);
     }
 
     if (!settings.ssl.endpoints.empty())
     {
-        auto [secureServer, err] = buildHttpsServer(
-            settings, authenticator, messageDispatcher);
+        auto [secureServer, err] = buildHttpsServer(settings, requestHandler);
         if (!secureServer)
             return std::make_tuple(nullptr, err);
 
@@ -63,12 +60,11 @@ std::tuple<std::unique_ptr<MultiEndpointServer>, SystemError::ErrorCode> Builder
 
 std::unique_ptr<MultiEndpointServer> Builder::buildOrThrow(
     const Settings& settings,
-    AbstractAuthenticationManager* authenticator,
-    rest::MessageDispatcher* messageDispatcher)
+    AbstractRequestHandler* requestHandler)
 {
     std::unique_ptr<MultiEndpointServer> server;
     SystemError::ErrorCode err = SystemError::noError;
-    std::tie(server, err) = build(settings, authenticator, messageDispatcher);
+    std::tie(server, err) = build(settings, requestHandler);
     if (!server)
         throw std::system_error(err, std::system_category());
 
@@ -77,12 +73,9 @@ std::unique_ptr<MultiEndpointServer> Builder::buildOrThrow(
 
 std::tuple<std::unique_ptr<MultiEndpointServer>, SystemError::ErrorCode> Builder::buildHttpServer(
     const Settings& settings,
-    AbstractAuthenticationManager* authenticator,
-    rest::MessageDispatcher* httpMessageDispatcher)
+    AbstractRequestHandler* requestHandler)
 {
-    auto server = std::make_unique<MultiEndpointServer>(
-        authenticator,
-        httpMessageDispatcher);
+    auto server = std::make_unique<MultiEndpointServer>(requestHandler);
 
     if (!applySettings(settings, settings.endpoints, server.get()))
         return {nullptr, SystemError::getLastOSErrorCode()};
@@ -93,16 +86,14 @@ std::tuple<std::unique_ptr<MultiEndpointServer>, SystemError::ErrorCode> Builder
 
 std::tuple<std::unique_ptr<MultiEndpointServer>, SystemError::ErrorCode> Builder::buildHttpsServer(
     const Settings& settings,
-    AbstractAuthenticationManager* authenticator,
-    rest::MessageDispatcher* httpMessageDispatcher)
+    AbstractRequestHandler* requestHandler)
 {
     std::unique_ptr<HttpsServerContext> httpsContext;
     if (!settings.ssl.certificatePath.empty())
         httpsContext = std::make_unique<HttpsServerContext>(settings);
 
     auto server = std::make_unique<MultiEndpointSslServer>(
-        authenticator,
-        httpMessageDispatcher,
+        requestHandler,
         std::move(httpsContext));
 
     if (!applySettings(settings, settings.ssl.endpoints, server.get()))

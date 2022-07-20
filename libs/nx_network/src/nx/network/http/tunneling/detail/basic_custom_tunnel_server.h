@@ -72,15 +72,22 @@ private:
     TunnelAuthorizer<ApplicationData...>* m_tunnelAuthorizer = nullptr;
     std::string m_path;
 
+    void authorizeTunnel(
+        const nx::network::http::HttpServerConnection& connection,
+        RequestContext requestContext,
+        nx::network::http::RequestProcessedHandler completionHandler);
+
     void onTunnelAutorizationCompleted(
         StatusCode::Value authorizationResult,
+        HttpHeaders responseHeaders,
         std::unique_ptr<RequestContext> requestContext,
         nx::network::http::RequestProcessedHandler completionHandler,
         ApplicationData... applicationData);
 
     void openTunnel(
-        std::unique_ptr<RequestContext> requestContext,
+        const RequestContext& requestContext,
         nx::network::http::RequestProcessedHandler completionHandler,
+        HttpHeaders responseHeaders,
         ApplicationData... applicationData);
 };
 
@@ -123,72 +130,39 @@ StatusCode::Value BasicCustomTunnelServer<ApplicationData...>::validateOpenTunne
 
 template<typename ...ApplicationData>
 void BasicCustomTunnelServer<ApplicationData...>::processTunnelInitiationRequest(
-    RequestContext requestContextOriginal,
+    RequestContext requestContext,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
-    NX_VERBOSE(this, "Open tunnel request %1", requestContextOriginal.request.requestLine.url);
+    NX_VERBOSE(this, "Open tunnel request %1", requestContext.request.requestLine.url);
 
-    const auto httpStatus = validateOpenTunnelRequest(requestContextOriginal);
+    const auto httpStatus = validateOpenTunnelRequest(requestContext);
     if (!StatusCode::isSuccessCode(httpStatus))
         return completionHandler(httpStatus);
 
-    auto requestContext = std::make_unique<RequestContext>(
-        std::move(requestContextOriginal));
+    auto connection = requestContext.conn.lock();
+    if (!connection) //< The connection was closed.
+        return completionHandler(StatusCode::internalServerError);
 
-    if (m_tunnelAuthorizer)
-    {
-        auto requestContextPtr = requestContext.get();
-
-        auto strongRef = requestContext->connection->shared_from_this();
-        std::weak_ptr<HttpServerConnection> weakConnectionRef = strongRef;
-
-        NX_VERBOSE(this, "Authorizing tunnel request %1",
-            requestContextOriginal.request.requestLine.url);
-
-        m_tunnelAuthorizer->authorize(
-            requestContextPtr,
-            [this, weakConnectionRef, requestContext = std::move(requestContext),
-                completionHandler = std::move(completionHandler)](
-                    StatusCode::Value result,
-                    ApplicationData... applicationData) mutable
+    connection->dispatch(
+        [this, connection, requestContext = std::move(requestContext),
+            completionHandler = std::move(completionHandler)]() mutable
+        {
+            if (m_tunnelAuthorizer)
             {
-                NX_VERBOSE(this, "Tunnel %1 authorization completed with %2",
-                    requestContext->request.requestLine.url, StatusCode::toString(result));
-
-                auto strongConnectionRef = weakConnectionRef.lock();
-                if (!strongConnectionRef)
-                    return nx::utils::swapAndCall(completionHandler, result);
-
-                auto args = std::make_tuple(
-                    result,
+                authorizeTunnel(
+                    *connection,
                     std::move(requestContext),
+                    std::move(completionHandler));
+            }
+            else
+            {
+                openTunnel(
+                    requestContext,
                     std::move(completionHandler),
-                    std::move(applicationData)...);
-
-                // NOTE: Connection should always be removed from its own thread.
-                // So, if our strongConnectionRef actually owns connection,
-                // it should not delete it here.
-                auto* connectionPtr = strongConnectionRef.get();
-                connectionPtr->getAioThread()->dispatch(
-                    nullptr,
-                    [this, args = std::move(args), strongConnectionRef = std::move(strongConnectionRef)]() mutable
-                    {
-                        std::apply(
-                            [this](auto&&... args)
-                            {
-                                onTunnelAutorizationCompleted(std::forward<decltype(args)>(args)...);
-                            },
-                            std::move(args));
-                    });
-            });
-    }
-    else
-    {
-        openTunnel(
-            std::move(requestContext),
-            std::move(completionHandler),
-            ApplicationData()...);
-    }
+                    {},
+                    ApplicationData()...);
+            }
+        });
 }
 
 template<typename ...ApplicationData>
@@ -202,30 +176,82 @@ void BasicCustomTunnelServer<ApplicationData...>::reportTunnel(
 }
 
 template<typename ...ApplicationData>
+void BasicCustomTunnelServer<ApplicationData...>::authorizeTunnel(
+    const nx::network::http::HttpServerConnection& connection,
+    RequestContext requestContextOriginal,
+    nx::network::http::RequestProcessedHandler completionHandler)
+{
+    NX_VERBOSE(this, "Authorizing tunnel request %1", requestContextOriginal.request.requestLine.url);
+
+    auto requestContext = std::make_unique<RequestContext>(
+        std::move(requestContextOriginal));
+
+    auto requestContextPtr = requestContext.get();
+
+    m_tunnelAuthorizer->authorize(
+        requestContextPtr,
+        [this, aioThread = connection.getAioThread(), requestContext = std::move(requestContext),
+            completionHandler = std::move(completionHandler)](
+                StatusCode::Value result,
+                HttpHeaders responseHeaders,
+                ApplicationData... applicationData) mutable
+        {
+            NX_VERBOSE(this, "Tunnel %1 authorization completed with %2",
+                requestContext->request.requestLine.url, StatusCode::toString(result));
+
+            auto args = std::make_tuple(
+                result,
+                std::move(responseHeaders),
+                std::move(requestContext),
+                std::move(completionHandler),
+                std::move(applicationData)...);
+
+            // Moving execution to the connection thread.
+            aioThread->dispatch(nullptr, [this, args = std::move(args)]() mutable
+            {
+                std::apply([this](auto&&... args)
+                {
+                    onTunnelAutorizationCompleted(std::forward<decltype(args)>(args)...);
+                },
+                std::move(args));
+            });
+        });
+}
+
+template<typename ...ApplicationData>
 void BasicCustomTunnelServer<ApplicationData...>::onTunnelAutorizationCompleted(
     StatusCode::Value authorizationResult,
+    HttpHeaders responseHeaders,
     std::unique_ptr<RequestContext> requestContext,
     nx::network::http::RequestProcessedHandler completionHandler,
     ApplicationData... applicationData)
 {
     if (!StatusCode::isSuccessCode(authorizationResult))
-        return nx::utils::swapAndCall(completionHandler, authorizationResult);
+    {
+        RequestResult result(authorizationResult);
+        result.headers = std::move(responseHeaders);
+        return nx::utils::swapAndCall(completionHandler, std::move(result));
+    }
 
     openTunnel(
-        std::move(requestContext),
+        *requestContext,
         std::move(completionHandler),
+        std::move(responseHeaders),
         std::move(applicationData)...);
 }
 
 template<typename ...ApplicationData>
 void BasicCustomTunnelServer<ApplicationData...>::openTunnel(
-    std::unique_ptr<RequestContext> requestContext,
+    const RequestContext& requestContext,
     nx::network::http::RequestProcessedHandler completionHandler,
+    HttpHeaders responseHeaders,
     ApplicationData... applicationData)
 {
     auto requestResult = this->processOpenTunnelRequest(
-        *requestContext,
+        requestContext,
         std::move(applicationData)...);
+
+    requestResult.headers.merge(std::move(responseHeaders));
 
     nx::utils::swapAndCall(completionHandler, std::move(requestResult));
 }

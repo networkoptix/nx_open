@@ -35,7 +35,7 @@ protected:
 };
 
 class DelayingRequestHandler:
-    public nx::network::http::AbstractHttpRequestHandler
+    public nx::network::http::RequestHandlerWithContext
 {
 public:
     static const std::string PATH;
@@ -128,7 +128,7 @@ TEST_F(HttpAsyncServerConnectionTest, multipleRequestsTest)
 namespace {
 
 class PipeliningTestHandler:
-    public nx::network::http::AbstractHttpRequestHandler
+    public nx::network::http::RequestHandlerWithContext
 {
 public:
     static const std::string PATH;
@@ -137,13 +137,15 @@ public:
         http::RequestContext requestContext,
         http::RequestProcessedHandler completionHandler)
     {
-        requestContext.response->headers.emplace(
+        http::RequestResult result(
+            http::StatusCode::ok,
+            std::make_unique<http::BufferSource>("text/plain", "bla-bla-bla"));
+
+        result.headers.emplace(
             "Seq",
             http::getHeaderValue(requestContext.request.headers, "Seq"));
 
-        completionHandler(http::RequestResult(
-            http::StatusCode::ok,
-            std::make_unique<http::BufferSource>("text/plain", "bla-bla-bla")));
+        completionHandler(std::move(result));
     }
 };
 

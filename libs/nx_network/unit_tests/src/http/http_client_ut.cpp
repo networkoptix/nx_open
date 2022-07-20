@@ -156,7 +156,7 @@ private:
             [](RequestContext requestContext, RequestProcessedHandler handler)
             {
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
-                requestContext.connection->closeConnection(SystemError::connectionReset);
+                requestContext.conn.lock()->closeConnection(SystemError::connectionReset);
                 handler(StatusCode::internalServerError);
             }));
 
@@ -165,23 +165,23 @@ private:
             [](RequestContext requestContext, RequestProcessedHandler handler)
             {
                 RequestResult result(StatusCode::ok);
-                result.dataSource = std::make_unique<TestBodySource>(
+                result.body = std::make_unique<TestBodySource>(
                     "text/plain",
                     "Reported Content-Length of this body is much larger",
                     10000);
-                requestContext.connection->setPersistentConnectionEnabled(false);
+                requestContext.conn.lock()->setPersistentConnectionEnabled(false);
                 handler(std::move(result));
             }));
 
         ASSERT_TRUE(testHttpServer()->registerRequestProcessorFunc(
             kCompressedFilePath,
-            [this](RequestContext requestContext, RequestProcessedHandler handler)
+            [this](RequestContext /*requestContext*/, RequestProcessedHandler handler)
             {
                 RequestResult result(StatusCode::ok);
-                result.dataSource = std::make_unique<BufferSource>(
+                result.body = std::make_unique<BufferSource>(
                     "application/octet-stream",
                     nx::utils::bstream::gzip::Compressor::compressData(m_fileBody));
-                requestContext.response->headers.emplace("Content-Encoding", "gzip");
+                result.headers.emplace("Content-Encoding", "gzip");
                 handler(std::move(result));
             }));
 
@@ -190,7 +190,7 @@ private:
             [this](RequestContext, RequestProcessedHandler handler)
             {
                 RequestResult result(StatusCode::ok);
-                result.dataSource = std::make_unique<TestBodySource>(
+                result.body = std::make_unique<TestBodySource>(
                     "application/octet-stream",
                     m_fileBody,
                     std::nullopt);

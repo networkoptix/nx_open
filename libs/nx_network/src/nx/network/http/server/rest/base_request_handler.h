@@ -42,19 +42,7 @@ public:
     type operator()(
         const network::http::RequestContext& requestContext) const
     {
-        return requestContext.authInfo;
-    }
-};
-
-class HttpResponseFetcher
-{
-public:
-    using type = network::http::Response*;
-
-    type operator()(
-        const network::http::RequestContext& requestContext) const
-    {
-        return requestContext.response;
+        return requestContext.attrs;
     }
 };
 
@@ -95,17 +83,17 @@ public:
     type operator()(
         const network::http::RequestContext& requestContext) const
     {
-        return (*this)(*requestContext.connection, requestContext.request);
+        return (*this)(requestContext.connectionAttrs, requestContext.request);
     }
 
     type operator()(
-        const nx::network::http::HttpServerConnection& connection,
+        const nx::network::http::ConnectionAttrs& connectionAttrs,
         const nx::network::http::Request& request) const
     {
         const auto xForwardedProtoValue = getHeaderValue(
             request.headers, header::XForwardedProto::NAME);
-        const bool isSslConnection = connection.isSsl()
-            || (connection.socket()->getForeignAddress().address.isLocalNetwork()
+        const bool isSslConnection = connectionAttrs.isSsl
+            || (connectionAttrs.sourceAddr.address.isLocalNetwork()
                 && xForwardedProtoValue == header::XForwardedProto::kHttps);
         return isSslConnection;
     }

@@ -7,13 +7,12 @@
 
 #include <nx/utils/log/assert.h>
 
-namespace nx {
-namespace network {
-namespace http {
-namespace rest {
+namespace nx::network::http::rest {
 
-namespace detail {
-
+/**
+ * Replaces the first occurance of "{<any_token>}" in the path with the given value
+ * @return true if replaced a token. false if nothing was found.
+ */
 template<typename ArgumentType>
 bool substituteNextParameter(
     std::string* path,
@@ -36,8 +35,6 @@ bool substituteNextParameter(
     return true;
 }
 
-} // namespace detail
-
 template<typename ArgumentType>
 bool substituteParameters(
     const std::string& pathTemplate,
@@ -47,7 +44,7 @@ bool substituteParameters(
     *resultPath = pathTemplate;
     for (const auto& argument: arguments)
     {
-        if (!detail::substituteNextParameter(resultPath, argument))
+        if (!substituteNextParameter(resultPath, argument))
             return false;
     }
     return true;
@@ -66,7 +63,4 @@ std::string substituteParameters(
     return resultPath;
 }
 
-} // namespace rest
-} // namespace nx
-} // namespace network
-} // namespace http
+} // namespace nx::network::http::rest

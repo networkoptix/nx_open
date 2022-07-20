@@ -30,7 +30,8 @@ public:
 
 protected:
     virtual void detectProxyTarget(
-        const nx::network::http::HttpServerConnection& connection,
+        const nx::network::http::ConnectionAttrs& connectionAttrs,
+        const nx::network::SocketAddress& requestSource,
         nx::network::http::Request* const request,
         ProxyTargetDetectedHandler handler) override;
 

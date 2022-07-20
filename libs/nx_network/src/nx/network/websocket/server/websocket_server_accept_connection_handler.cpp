@@ -28,10 +28,24 @@ void AcceptConnectionHandler::processRequest(
     http::RequestContext requestContext,
     http::RequestProcessedHandler completionHandler)
 {
-    if (validateRequest(requestContext.request, requestContext.response) != Error::noError)
+    http::HttpHeaders responseHeaders;
+    if (validateRequest(requestContext.request, &responseHeaders) != Error::noError)
         return completionHandler(http::StatusCode::badRequest);
 
-    base_type::processRequest(std::move(requestContext), std::move(completionHandler));
+    base_type::processRequest(
+        std::move(requestContext),
+        [completionHandler = std::move(completionHandler),
+            responseHeaders = std::move(responseHeaders)](
+                http::RequestResult result) mutable
+        {
+            for (auto& header: responseHeaders)
+            {
+                if (!result.headers.contains(header.first))
+                    result.headers.insert(std::move(header));
+            }
+
+            completionHandler(std::move(result));
+        });
 }
 
 } // namespace nx::network::websocket::server

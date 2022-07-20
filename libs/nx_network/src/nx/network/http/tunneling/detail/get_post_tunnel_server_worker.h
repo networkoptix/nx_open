@@ -76,7 +76,7 @@ private:
     Tunnels m_tunnels;
     nx::utils::AsyncOperationGuard m_guard;
     std::atomic<int> m_tunnelSequence{0};
-    std::map<HttpServerConnection*, int> m_connectionToTunnel;
+    std::map<std::uint64_t /*connectionId*/, int> m_connectionToTunnel;
 
     void closeConnection(
         int tunnelSeq,
@@ -96,7 +96,7 @@ private:
     void reportTunnelIfComplete(typename Tunnels::iterator it);
 
     std::unique_ptr<AbstractMsgBodySource> prepareCreateDownTunnelResponse(
-        network::http::Response* response);
+        network::http::HttpHeaders* responseHeaders);
 
     bool validateOpenUpChannelRequest(
         const TunnelContext& tunnelContext,
@@ -151,21 +151,28 @@ network::http::RequestResult
             requestContext.request.requestLine.url.path().toStdString(),
             std::make_tuple(std::move(requestData)...)));
 
-    if (!m_connectionToTunnel.emplace(requestContext.connection, tunnelSeq).second)
+    if (!m_connectionToTunnel.emplace(requestContext.connectionAttrs.id, tunnelSeq).second)
     {
         NX_DEBUG(this, "Received second GET for tunnel %1 (%2)",
             requestContext.request.requestLine.url.path(),
-            requestContext.connection->lastRequestSource());
-        return network::http::RequestResult(nx::network::http::StatusCode::badRequest);
+            requestContext.clientEndpoint);
+        return network::http::RequestResult(StatusCode::badRequest);
     }
 
-    requestContext.connection->registerCloseHandler(
-        [this, tunnelSeq, guard = m_guard.sharedGuard(), connection = requestContext.connection](
-            SystemError::ErrorCode reason, auto /*connectionDestroyed*/)
+    auto connection = requestContext.conn.lock();
+    if (!connection)
+        return network::http::RequestResult(StatusCode::internalServerError);
+
+    NX_ASSERT(connection->isInSelfAioThread());
+
+    connection->registerCloseHandler(
+        [this, tunnelSeq, guard = m_guard.sharedGuard(),
+            connectionId = requestContext.connectionAttrs.id](
+                SystemError::ErrorCode reason, auto /*connectionDestroyed*/)
         {
             if (auto lock = guard->lock())
             {
-                m_connectionToTunnel.erase(connection);
+                m_connectionToTunnel.erase(connectionId);
 
                 const auto it = m_tunnels.find(tunnelSeq);
                 if (it == m_tunnels.end())
@@ -181,7 +188,7 @@ network::http::RequestResult
         });
 
     network::http::RequestResult requestResult(nx::network::http::StatusCode::ok);
-    requestResult.dataSource = prepareCreateDownTunnelResponse(requestContext.response);
+    requestResult.body = prepareCreateDownTunnelResponse(&requestResult.headers);
     requestResult.connectionEvents.onResponseHasBeenSent =
         [this, tunnelSeq](auto connection) { openDownStream(tunnelSeq, connection); };
 
@@ -191,7 +198,7 @@ network::http::RequestResult
 template<typename ...ApplicationData>
 void GetPostTunnelServerWorker<ApplicationData...>::stopWhileInAioThread()
 {
-    for (auto& [seq, tunnelContext] : m_tunnels)
+    for (auto& [seq, tunnelContext]: m_tunnels)
     {
         if (tunnelContext.postCompletionHandler)
             std::exchange(tunnelContext.postCompletionHandler, nullptr)(StatusCode::ok);
@@ -213,7 +220,7 @@ void GetPostTunnelServerWorker<ApplicationData...>::openDownStream(
         return;
     }
 
-    m_connectionToTunnel.erase(connection);
+    m_connectionToTunnel.erase(connection->attrs().id);
 
     // Receiving the POST message here so that it does not require an authentication.
     it->second.connection = std::make_unique<AsyncMessagePipeline>(
@@ -250,11 +257,10 @@ void GetPostTunnelServerWorker<ApplicationData...>::processOpenUpStreamRequest(
     // It is possible that the client has sent this request early, before the GET response has been
     // sent.
 
-    auto it = m_connectionToTunnel.find(requestContext.connection);
+    auto it = m_connectionToTunnel.find(requestContext.connectionAttrs.id);
     if (it == m_connectionToTunnel.end())
     {
-        NX_DEBUG(this, "Received unexpected POST from %1",
-            requestContext.connection->lastRequestSource());
+        NX_DEBUG(this, "Received unexpected POST from %1", requestContext.clientEndpoint);
         return completionHandler(StatusCode::badRequest);
     }
 
@@ -354,12 +360,12 @@ void GetPostTunnelServerWorker<ApplicationData...>::reportTunnelIfComplete(
 template<typename ...ApplicationData>
 std::unique_ptr<AbstractMsgBodySource>
 GetPostTunnelServerWorker<ApplicationData...>::prepareCreateDownTunnelResponse(
-    network::http::Response* response)
+    network::http::HttpHeaders* responseHeaders)
 {
-    response->headers.emplace("Cache-Control", "no-store");
-    response->headers.emplace("Pragma", "no-cache");
-    response->headers.emplace("Content-Type", "application/octet-stream");
-    response->headers.emplace("Content-Length", "10000000000");
+    responseHeaders->emplace("Cache-Control", "no-store");
+    responseHeaders->emplace("Pragma", "no-cache");
+    responseHeaders->emplace("Content-Type", "application/octet-stream");
+    responseHeaders->emplace("Content-Length", "10000000000");
     return nullptr;
 }
 

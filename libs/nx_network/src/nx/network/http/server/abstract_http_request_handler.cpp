@@ -2,45 +2,19 @@
 
 #include "abstract_http_request_handler.h"
 
-#include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/utils/std/cpp14.h>
+
+#include "http_server_connection.h"
+#include "http_stream_socket_server.h"
 
 namespace nx::network::http {
 
 //-------------------------------------------------------------------------------------------------
-// RequestResult
+// RequestHandlerWithContext
 
-RequestResult::RequestResult(StatusCode::Value statusCode):
-    statusCode(statusCode)
-{
-}
-
-RequestResult::RequestResult(
-    nx::network::http::StatusCode::Value statusCode,
-    std::unique_ptr<nx::network::http::AbstractMsgBodySource> dataSource)
-    :
-    statusCode(statusCode),
-    dataSource(std::move(dataSource))
-{
-}
-
-RequestResult::RequestResult(
-    nx::network::http::StatusCode::Value statusCode,
-    std::unique_ptr<nx::network::http::AbstractMsgBodySource> dataSource,
-    ConnectionEvents connectionEvents)
-    :
-    statusCode(statusCode),
-    dataSource(std::move(dataSource)),
-    connectionEvents(std::move(connectionEvents))
-{
-}
-
-//-------------------------------------------------------------------------------------------------
-// AbstractHttpRequestHandler
-
-void AbstractHttpRequestHandler::handleRequest(
+void RequestHandlerWithContext::serve(
     RequestContext requestContext,
-    ResponseIsReadyHandler completionHandler)
+    RequestProcessedHandler completionHandler)
 {
     m_responseMsg = Message(MessageType::response);
     m_responseMsg.response->statusLine.version = requestContext.request.requestLine.version;
@@ -50,7 +24,6 @@ void AbstractHttpRequestHandler::handleRequest(
     m_completionHandler = std::move(completionHandler);
 
     m_requestContext = std::move(requestContext);
-    m_requestContext.response = m_responseMsg.response;
     m_requestContext.requestPathParams = std::exchange(m_requestPathParams, {});
 
     if (!m_requestBodySource ||
@@ -73,24 +46,24 @@ void AbstractHttpRequestHandler::handleRequest(
     readMessageBodyAsync();
 }
 
-void AbstractHttpRequestHandler::setRequestBodyDeliveryType(
+void RequestHandlerWithContext::setRequestBodyDeliveryType(
     MessageBodyDeliveryType value)
 {
     m_messageBodyDeliveryType = value;
 }
 
-void AbstractHttpRequestHandler::setRequestPathParams(
+void RequestHandlerWithContext::setRequestPathParams(
     RequestPathParams params)
 {
     m_requestPathParams = std::move(params);
 }
 
-nx::network::http::Response* AbstractHttpRequestHandler::response()
+nx::network::http::Response* RequestHandlerWithContext::response()
 {
     return m_responseMsg.response;
 }
 
-void AbstractHttpRequestHandler::readMessageBodyAsync()
+void RequestHandlerWithContext::readMessageBodyAsync()
 {
     m_requestBodySource->readAsync(
         [this](auto&&... args)
@@ -104,7 +77,7 @@ void AbstractHttpRequestHandler::readMessageBodyAsync()
         });
 }
 
-bool AbstractHttpRequestHandler::processMessageBodyBuffer(
+bool RequestHandlerWithContext::processMessageBodyBuffer(
     SystemError::ErrorCode resultCode, nx::Buffer buffer)
 {
     if (resultCode != SystemError::noError)
@@ -129,24 +102,19 @@ bool AbstractHttpRequestHandler::processMessageBodyBuffer(
     return false;
 }
 
-void AbstractHttpRequestHandler::propagateRequest()
+void RequestHandlerWithContext::propagateRequest()
 {
     processRequest(
         std::exchange(m_requestContext, {}),
         [this](auto&&... args) { sendResponse(std::forward<decltype(args)>(args)...); });
 }
 
-void AbstractHttpRequestHandler::sendResponse(RequestResult requestResult)
+void RequestHandlerWithContext::sendResponse(RequestResult result)
 {
-    m_responseMsg.response->statusLine.statusCode =
-        requestResult.statusCode;
-    m_responseMsg.response->statusLine.reasonPhrase =
-        StatusCode::toString(requestResult.statusCode);
+    if (m_responseMsg.response)
+        result.headers.merge(std::move(m_responseMsg.response->headers));
 
-    m_completionHandler(
-        std::exchange(m_responseMsg, {}),
-        std::exchange(requestResult.dataSource, nullptr),
-        std::move(requestResult.connectionEvents));
+    m_completionHandler(std::move(result));
 }
 
 } // namespace nx::network::http

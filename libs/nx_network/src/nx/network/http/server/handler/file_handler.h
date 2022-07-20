@@ -21,7 +21,7 @@ namespace nx::network::http::server::handler {
  * NOTE: Providing files from parent directory is forbidden.
  */
 class NX_NETWORK_API FileDownloader:
-    public AbstractHttpRequestHandler
+    public RequestHandlerWithContext
 {
 public:
     FileDownloader(

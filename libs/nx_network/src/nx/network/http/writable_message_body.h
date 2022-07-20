@@ -35,8 +35,15 @@ public:
     void writeEof(SystemError::ErrorCode resultCode = SystemError::noError);
 
 private:
-    WritableMessageBody* m_body = nullptr;
-    nx::Mutex m_mutex;
+    struct State
+    {
+        WritableMessageBody* body = nullptr;
+        nx::Mutex mutex;
+
+        State(WritableMessageBody* body);
+    };
+
+    std::shared_ptr<State> m_sharedState;
 };
 
 /**

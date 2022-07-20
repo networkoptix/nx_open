@@ -16,13 +16,12 @@ Redirect::Redirect(const nx::utils::Url& actualLocation):
 }
 
 void Redirect::processRequest(
-    RequestContext requestContext,
+    RequestContext /*requestContext*/,
     RequestProcessedHandler completionHandler)
 {
-    requestContext.response->headers.emplace(
-        "Location",
-        m_actualLocation.toStdString());
-    completionHandler(StatusCode::movedPermanently);
+    RequestResult result(StatusCode::movedPermanently);
+    result.headers.emplace("Location", m_actualLocation.toStdString());
+    completionHandler(std::move(result));
 }
 
 } // namespace nx::network::http::server::handler

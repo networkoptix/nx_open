@@ -49,56 +49,39 @@ protected:
         void thenOutputIsSerializedToMessageBody()
         {
             const auto result = m_requestResults.pop();
-            ASSERT_NE(nullptr, result.msgBody);
+            ASSERT_NE(nullptr, result.body);
         }
 
         void thenOutputIsSerializedToResponseHeaders()
         {
             const auto result = m_requestResults.pop();
-            ASSERT_EQ(nullptr, result.msgBody);
+            ASSERT_EQ(nullptr, result.body);
 
             test::Serializable output;
-            ASSERT_TRUE(test::deserializeFromHeaders(
-                result.responseMessage.response->headers, &output));
+            ASSERT_TRUE(test::deserializeFromHeaders(result.headers, &output));
         }
 
         void thenResponseStatusCodeIs(StatusCode::Value expected)
         {
             auto requestResult = m_requestResults.pop();
-            ASSERT_EQ(expected, requestResult.responseMessage.response->statusLine.statusCode);
+            ASSERT_EQ(expected, requestResult.statusCode);
         }
 
     private:
-        struct Result
-        {
-            nx::network::http::Message responseMessage;
-            std::unique_ptr<nx::network::http::AbstractMsgBodySource> msgBody;
-        };
-
-        nx::utils::SyncQueue<Result> m_requestResults;
+        nx::utils::SyncQueue<RequestResult> m_requestResults;
 
         void invokeProcessRequest(nx::network::http::StatusCode::Value statusCode)
         {
             m_handler.setHttpStatusCode(statusCode);
 
-            m_handler.handleRequest(
+            m_handler.serve(
                 RequestContext(
-                    nullptr,
+                    {},
+                    {},
                     SocketAddress(),
                     nx::utils::stree::AttributeDictionary(),
                     m_request),
-                [this](auto&&... args) { onRequestProcessed(std::forward<decltype(args)>(args)...); });
-        }
-
-        void onRequestProcessed(
-            nx::network::http::Message responseMessage,
-            std::unique_ptr<nx::network::http::AbstractMsgBodySource> msgBody,
-            ConnectionEvents /*connectionEvents*/)
-        {
-            Result result;
-            result.responseMessage = std::move(responseMessage);
-            result.msgBody = std::move(msgBody);
-            m_requestResults.push(std::move(result));
+                [this](auto result) { m_requestResults.push(std::move(result)); });
         }
     };
 
@@ -167,7 +150,6 @@ protected:
         public BaseContext<InOutHandler>
     {
     public:
-
         void preparePostRequestCommon()
         {
             this->m_request.requestLine.method = nx::network::http::Method::post;
@@ -190,7 +172,6 @@ protected:
             this->m_request.messageBody = nx::reflect::urlencoded::serialize(m_expectedInput);
             this->m_request.headers.emplace("Content-Type", "application/x-www-form-urlencoded");
         }
-
 
         void preparePostRequestWithUnsupportedFormat()
         {

@@ -190,6 +190,12 @@ public:
     std::string toString() const;
     bool empty() const;
 
+    /**
+     * Inserts elements of other with keys missing in *this.
+     */
+    void merge(AttributeDictionary&& other);
+    void merge(const AttributeDictionary& other);
+
 private:
     std::map<std::string, std::string, nx::utils::StringLessTransparentComp> m_attrs;
 };

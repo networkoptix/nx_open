@@ -27,7 +27,7 @@ void ConnectHandler::processRequest(
     nx::network::http::RequestProcessedHandler completionHandler)
 {
     const auto& request = requestContext.request;
-    auto connection = requestContext.connection;
+    auto connection = requestContext.conn.lock();
 
     // NOTE: this validation should be done somewhere in more general place
     if (!request.requestLine.url.isValid())
@@ -56,16 +56,16 @@ void ConnectHandler::processRequest(
     }
 
     m_request = std::move(request);
-    m_connection = connection;
-    connect(targetAddress, std::move(completionHandler));
+    connect(connection, targetAddress, std::move(completionHandler));
 }
 
 void ConnectHandler::connect(
+    std::shared_ptr<nx::network::http::HttpServerConnection> connection,
     const network::SocketAddress& address,
     network::http::RequestProcessedHandler completionHandler)
 {
     NX_DEBUG(this, "Connecting to '%1', socket[%2] -> socket[%3].",
-        address, m_connection->socket().get(), m_targetSocket.get());
+        address, connection->socket().get(), m_targetSocket.get());
 
     m_targetSocket->connectAsync(
         address,
