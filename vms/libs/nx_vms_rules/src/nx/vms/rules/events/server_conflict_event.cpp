@@ -15,19 +15,19 @@ ServerConflictEvent::ServerConflictEvent(
     const CameraConflictList& conflicts)
     :
     BasicEvent(timestamp),
-    m_source(serverId),
+    m_serverId(serverId),
     m_conflicts(conflicts)
 {
 }
 
 QString ServerConflictEvent::uniqueName() const
 {
-    return makeName(BasicEvent::uniqueName(), m_source.toSimpleString());
+    return makeName(BasicEvent::uniqueName(), m_serverId.toSimpleString());
 }
 
 QString ServerConflictEvent::resourceKey() const
 {
-    return m_source.toSimpleString();
+    return m_serverId.toSimpleString();
 }
 
 QVariantMap ServerConflictEvent::details(common::SystemContext* context) const

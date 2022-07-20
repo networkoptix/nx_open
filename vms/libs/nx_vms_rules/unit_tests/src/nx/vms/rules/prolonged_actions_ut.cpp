@@ -11,6 +11,7 @@
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/manifest.h>
 #include <nx/vms/rules/rule.h>
+#include <utils/common/synctime.h>
 
 #include "mock_engine_events.h"
 #include "test_plugin.h"
@@ -87,6 +88,9 @@ protected:
     std::unique_ptr<Plugin> plugin;
     TestEventConnector connector;
     TestActionExecutor executor;
+
+private:
+    QnSyncTime syncTime;
 };
 
 TEST_F(ProlongedActionsTest, sanity)

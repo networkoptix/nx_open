@@ -86,6 +86,9 @@ private:
     bool wasEventCached(const QString& cacheKey) const;
     void cacheEvent(const QString& cacheKey) const;
 
+    bool matchFields(const EventPtr& event) const;
+    bool matchState(const EventPtr& event) const;
+
 private:
     QnUuid m_id;
     QString m_eventType;
