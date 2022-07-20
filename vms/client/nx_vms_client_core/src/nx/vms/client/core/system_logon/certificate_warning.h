@@ -31,8 +31,7 @@ public:
 
     static QString header(
         Reason reason,
-        const nx::vms::api::ModuleInformation& target,
-        ClientType clientType = ClientType::desktop);
+        const nx::vms::api::ModuleInformation& target);
 
     static QString details(
         Reason reason,
