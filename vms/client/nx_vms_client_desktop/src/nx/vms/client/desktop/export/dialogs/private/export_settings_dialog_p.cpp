@@ -131,8 +131,8 @@ void ExportSettingsDialog::Private::refreshMediaPreview()
         // The only server-side applied transform is merging several channels into a single image.
         nx::api::ResourceImageRequest request;
         request.resource = m_mediaResource->toResourcePtr();
-        request.usecSinceEpoch = std::chrono::microseconds(std::chrono::milliseconds(
-            state().exportMediaSettings.period.startTimeMs)).count();
+        request.timestampUs = std::chrono::microseconds(std::chrono::milliseconds(
+            state().exportMediaSettings.period.startTimeMs));
         request.roundMethod = nx::api::ImageRequest::RoundMethod::iFrameAfter;
         request.rotation = 0;
         request.tolerant = true;

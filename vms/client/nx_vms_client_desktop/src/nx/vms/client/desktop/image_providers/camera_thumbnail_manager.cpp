@@ -330,7 +330,7 @@ rest::Handle CameraThumbnailManager::loadThumbnailForCamera(const QnVirtualCamer
             if (success && !isJsonError && !imageData.isEmpty())
             {
                 const auto imageFormat =
-                    QByteArray::fromStdString(nx::reflect::toString(request.imageFormat));
+                    QByteArray::fromStdString(nx::reflect::toString(request.format));
                 data.thumbnail.loadFromData(imageData, imageFormat);
                 if (!data.thumbnail.isNull())
                     data.status = Qn::ThumbnailStatus::Loaded;

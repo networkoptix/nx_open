@@ -113,7 +113,7 @@ CameraAsyncImageRequest::CameraAsyncImageRequest(
     connect(&d->imageWatcher, &QFutureWatcherBase::finished, this,
         [this]() { setImage(d->imageWatcher.future().result()); });
 
-    const auto imageFormat = nx::reflect::toString(requestParams.imageFormat);
+    const auto imageFormat = nx::reflect::toString(requestParams.format);
 
     const auto callback = nx::utils::guarded(this,
         [this, imageFormat](

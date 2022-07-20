@@ -60,7 +60,8 @@ void LayoutPreviewPainter::setLayout(const QnLayoutResourcePtr& layout)
     {
         const QSize previewSize = kPreviewSize;
         m_layoutThumbnailProvider.reset(
-            new LayoutThumbnailLoader(m_layout, previewSize, nx::api::ImageRequest::kLatestThumbnail));
+            new LayoutThumbnailLoader(m_layout, previewSize,
+                nx::api::ImageRequest::kLatestThumbnail.count()));
 
         connect(m_layoutThumbnailProvider.get(), &ImageProvider::statusChanged,
             this, &LayoutPreviewPainter::at_updateThumbnailStatus);

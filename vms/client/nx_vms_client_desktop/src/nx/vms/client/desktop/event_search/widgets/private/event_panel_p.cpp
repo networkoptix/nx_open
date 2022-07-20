@@ -635,11 +635,11 @@ std::unique_ptr<MultiImageProvider> EventPanel::Private::multiImageProvider(
 
     nx::api::CameraImageRequest request;
     request.size = QSize(kToolTipMaxThumbnailSize.width(), 0);
-    request.imageFormat = nx::api::ImageRequest::ThumbnailFormat::jpg;
+    request.format = nx::api::ImageRequest::ThumbnailFormat::jpg;
     request.aspectRatio = nx::api::ImageRequest::AspectRatio::auto_;
     request.streamSelectionMode = streamSelectionMode;
-    request.usecSinceEpoch =
-        previewTime.count() > 0 ? previewTime.count() : nx::api::ImageRequest::kLatestThumbnail;
+    request.timestampUs =
+        previewTime.count() > 0 ? previewTime : nx::api::ImageRequest::kLatestThumbnail;
     request.roundMethod = precisePreview
         ? nx::api::ImageRequest::RoundMethod::precise
         : nx::api::ImageRequest::RoundMethod::iFrameAfter;

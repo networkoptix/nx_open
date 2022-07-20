@@ -1355,11 +1355,11 @@ void RightPanelModelsAdapter::Private::updatePreviewProvider(int row)
 
     nx::api::ResourceImageRequest request;
     request.resource = previewResource->toSharedPointer();
-    request.usecSinceEpoch =
-        previewTime.count() > 0 ? previewTime.count() : nx::api::ImageRequest::kLatestThumbnail;
+    request.timestampUs =
+        previewTime.count() > 0 ? previewTime : nx::api::ImageRequest::kLatestThumbnail;
     request.rotation = rotation;
     request.size = QSize(kDefaultThumbnailWidth, 0);
-    request.imageFormat = nx::api::ImageRequest::ThumbnailFormat::jpg;
+    request.format = nx::api::ImageRequest::ThumbnailFormat::jpg;
     request.aspectRatio = nx::api::ImageRequest::AspectRatio::auto_;
     request.roundMethod = precisePreview
         ? nx::api::ImageRequest::RoundMethod::precise
@@ -1414,7 +1414,7 @@ void RightPanelModelsAdapter::Private::updatePreviewProvider(int row)
     else
     {
         const auto oldRequest = previewProvider->requestData();
-        const bool forceUpdate = oldRequest.usecSinceEpoch != request.usecSinceEpoch
+        const bool forceUpdate = oldRequest.timestampUs != request.timestampUs
             || oldRequest.streamSelectionMode != request.streamSelectionMode;
 
         previewProvider->setRequestData(request, forceUpdate);
@@ -1559,7 +1559,7 @@ void RightPanelModelsAdapter::Private::loadNextPreview()
             if (provider->tryLoad())
             {
                 NX_VERBOSE(q, "Loaded preview from videocache (timestamp=%1, objectTrackId=%2",
-                    provider->requestData().usecSinceEpoch,
+                    provider->requestData().timestampUs,
                     provider->requestData().objectTrackId);
 
                 ++loadedFromCache;
@@ -1571,7 +1571,7 @@ void RightPanelModelsAdapter::Private::loadNextPreview()
             continue;
 
         NX_VERBOSE(q, "Requesting preview from server (timestamp=%1, objectTrackId=%2",
-            provider->requestData().usecSinceEpoch,
+            provider->requestData().timestampUs,
             provider->requestData().objectTrackId);
 
         requestPreview(row);
