@@ -51,7 +51,7 @@ CameraThumbnailProvider::CameraThumbnailProvider(
                 NX_VERBOSE(this, "imageDataLoadedInternal(%1) - got response with data",
                     m_request.camera->getName());
                 const auto imageFormat =
-                    QByteArray::fromStdString(nx::reflect::toString(m_request.imageFormat));
+                    QByteArray::fromStdString(nx::reflect::toString(m_request.format));
                 m_image.loadFromData(data, imageFormat);
             }
             else if (nextStatus != Qn::ThumbnailStatus::NoData)
@@ -115,10 +115,10 @@ bool CameraThumbnailProvider::tryLoad()
 
     auto systemContext = SystemContext::fromResource(m_request.camera);
     auto cache = systemContext->videoCache();
-    if (!cache || nx::api::CameraImageRequest::isSpecialTimeValue(m_request.usecSinceEpoch))
+    if (!cache || nx::api::CameraImageRequest::isSpecialTimeValue(m_request.timestampUs))
         return false;
 
-    std::chrono::microseconds requiredTime(m_request.usecSinceEpoch);
+    std::chrono::microseconds requiredTime(m_request.timestampUs);
     std::chrono::microseconds actualTime{};
 
     const auto image = cache->image(m_request.camera->getId(), requiredTime, &actualTime);
@@ -156,7 +156,7 @@ void CameraThumbnailProvider::doLoadAsync()
     }
 
     const bool isLiveRequest =
-        nx::api::CameraImageRequest::isSpecialTimeValue(m_request.usecSinceEpoch);
+        nx::api::CameraImageRequest::isSpecialTimeValue(m_request.timestampUs);
 
     if (isLiveRequest && !m_request.camera->isOnline())
     {

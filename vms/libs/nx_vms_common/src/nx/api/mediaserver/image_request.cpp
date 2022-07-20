@@ -6,9 +6,9 @@
 
 namespace nx::api {
 
-bool CameraImageRequest::isSpecialTimeValue(qint64 value)
+bool CameraImageRequest::isSpecialTimeValue(std::chrono::microseconds value)
 {
-    return value < 0 || value == DATETIME_NOW;
+    return value.count() < 0 || value.count() == DATETIME_NOW;
 }
 
 } // namespace nx::api

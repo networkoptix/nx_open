@@ -650,11 +650,11 @@ void LayoutThumbnailLoader::doLoadAsync()
         // We will warp this image later.
         nx::api::ResourceImageRequest request;
         request.resource = thumbnailItem->resource;
-        request.usecSinceEpoch = microseconds(milliseconds(d->msecSinceEpoch)).count();
+        request.timestampUs = milliseconds(d->msecSinceEpoch);
         // Here we imitate old FfmpegImageProvider behavior where it ignored position
         // and always returned middle screenshot.
         if (thumbnailItem->resource.dynamicCast<QnAviResource>())
-            request.usecSinceEpoch = -1;
+            request.timestampUs = nx::api::ImageRequest::kLatestThumbnail;
 
         request.size = thumbnailSize;
         request.rotation = 0;
