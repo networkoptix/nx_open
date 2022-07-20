@@ -53,9 +53,9 @@ void QnThumbnailRequestData::loadFromParams(
     {
         QString timeValue = params.value(kTimeParam);
         if (timeValue.toLower() == kLatestTimeValue)
-            request.usecSinceEpoch = nx::api::ImageRequest::kLatestThumbnail;
+            request.timestampUs = nx::api::ImageRequest::kLatestThumbnail;
         else
-            request.usecSinceEpoch = nx::utils::parseDateTime(timeValue);
+            request.timestampUs = std::chrono::microseconds(nx::utils::parseDateTime(timeValue));
 
         if (params.contains(kIgnoreExternalArchiveParam))
             request.ignoreExternalArchive = true;
@@ -72,8 +72,8 @@ void QnThumbnailRequestData::loadFromParams(
         size.setWidth(QnLexical::deserialized(params.value(kWidthParam), size.width()));
     else
         size.setWidth(QnLexical::deserialized(params.value(kDeprecatedWidthParam), size.width()));
-    request.imageFormat = nx::reflect::fromString(
-        params.value(kImageFormatParam).toStdString(), /*defaultValue*/ request.imageFormat);
+    request.format = nx::reflect::fromString(
+        params.value(kImageFormatParam).toStdString(), /*defaultValue*/ request.format);
     request.roundMethod = nx::reflect::fromString(
         params.value(kRoundMethodParam).toStdString(), /*defaultValue*/ request.roundMethod);
     request.aspectRatio = nx::reflect::fromString(
@@ -93,9 +93,9 @@ nx::network::rest::Params QnThumbnailRequestData::toParams() const
 
     result.insert(kCameraIdParam, request.camera ? request.camera->getId().toString() : QString());
     result.insert(kTimeParam,
-        nx::api::CameraImageRequest::isSpecialTimeValue(request.usecSinceEpoch)
+        nx::api::CameraImageRequest::isSpecialTimeValue(request.timestampUs)
             ? kLatestTimeValue
-            : QString::number(request.usecSinceEpoch));
+            : QString::number(request.timestampUs.count()));
     if (request.ignoreExternalArchive)
         result.insert(kIgnoreExternalArchiveParam, "");
     if (request.tolerant)
@@ -105,7 +105,7 @@ nx::network::rest::Params QnThumbnailRequestData::toParams() const
         result.insert(kCropParam, QnLexical::serialized(request.crop));
     result.insert(kHeightParam, request.size.height());
     result.insert(kWidthParam, request.size.width());
-    result.insert(kImageFormatParam, nx::reflect::toString(request.imageFormat));
+    result.insert(kImageFormatParam, nx::reflect::toString(request.format));
     result.insert(kRoundMethodParam, nx::reflect::toString(request.roundMethod));
     result.insert(kAspectRatioParam, nx::reflect::toString(request.aspectRatio));
     result.insert(kStreamSelectionModeParam, nx::reflect::toString(request.streamSelectionMode));
@@ -119,14 +119,14 @@ std::optional<QString> QnThumbnailRequestData::getError() const
         return lit("No camera avaliable");
 
     // Check invalid time.
-    if (request.usecSinceEpoch < 0
-        && request.usecSinceEpoch != nx::api::ImageRequest::kLatestThumbnail)
+    if (request.timestampUs.count() < 0
+        && request.timestampUs != nx::api::ImageRequest::kLatestThumbnail)
     {
         return lit("Invalid time");
     }
     if (request.ignoreExternalArchive
-        && request.usecSinceEpoch != nx::api::ImageRequest::kLatestThumbnail
-        && request.usecSinceEpoch != DATETIME_NOW)
+        && request.timestampUs != nx::api::ImageRequest::kLatestThumbnail
+        && request.timestampUs.count() != DATETIME_NOW)
     {
         return QString("'%1' applies only for \"latest\" timestamp")
             .arg(kIgnoreExternalArchiveParam);
