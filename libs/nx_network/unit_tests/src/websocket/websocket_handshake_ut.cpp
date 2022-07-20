@@ -47,14 +47,15 @@ TEST(WebsocketHandshake, validateRequest_requestLine)
     givenCorrectRequestHeaders(&request);
     givenCorrectRequestLine(&request);
 
-    ASSERT_EQ(validateRequest(request, nullptr), Error::noError);
+    nx::network::http::Response response;
+    ASSERT_EQ(validateRequest(request, &response), Error::noError);
 
     request.requestLine.method = "POST";
-    ASSERT_EQ(validateRequest(request, nullptr), Error::handshakeError);
+    ASSERT_EQ(validateRequest(request, &response), Error::handshakeError);
 
     givenCorrectRequestLine(&request);
     request.requestLine.version = nx::network::http::http_1_0;
-    ASSERT_EQ(validateRequest(request, nullptr), Error::handshakeError);
+    ASSERT_EQ(validateRequest(request, &response), Error::handshakeError);
 }
 
 TEST(WebsocketHandshake, validateRequest_headers)
@@ -66,31 +67,31 @@ TEST(WebsocketHandshake, validateRequest_headers)
 
     givenCorrectRequestHeaders(&request);
     request.headers.erase("Origin");
-    ASSERT_EQ(validateRequest(request, nullptr), Error::noError);
+    ASSERT_EQ(validateRequest(request, (nx::network::http::Response*) nullptr), Error::noError);
 
     givenCorrectRequestHeaders(&request);
     request.headers.erase("Sec-WebSocket-Protocol");
-    ASSERT_EQ(validateRequest(request, nullptr), Error::noError);
+    ASSERT_EQ(validateRequest(request, (nx::network::http::Response*) nullptr), Error::noError);
 
     givenCorrectRequestHeaders(&request);
     insertOrReplaceHeader(&request.headers, HttpHeader("Connection", "upgrade"));
-    ASSERT_EQ(validateRequest(request, nullptr), Error::noError);
+    ASSERT_EQ(validateRequest(request, (nx::network::http::Response*) nullptr), Error::noError);
 
     givenCorrectRequestHeaders(&request);
     request.headers.erase("Host");
-    ASSERT_EQ(validateRequest(request, nullptr), Error::handshakeError);
+    ASSERT_EQ(validateRequest(request, (nx::network::http::Response*) nullptr), Error::handshakeError);
 
     givenCorrectRequestHeaders(&request);
     request.headers.erase("Sec-WebSocket-Key");
-    ASSERT_EQ(validateRequest(request, nullptr), Error::handshakeError);
+    ASSERT_EQ(validateRequest(request, (nx::network::http::Response*) nullptr), Error::handshakeError);
 
     givenCorrectRequestHeaders(&request);
     request.headers.erase("Sec-WebSocket-Version");
-    ASSERT_EQ(validateRequest(request, nullptr), Error::handshakeError);
+    ASSERT_EQ(validateRequest(request, (nx::network::http::Response*) nullptr), Error::handshakeError);
 
     givenCorrectRequestHeaders(&request);
     request.headers.find("Sec-WebSocket-Version")->second = "78";
-    ASSERT_EQ(validateRequest(request, nullptr), Error::handshakeError);
+    ASSERT_EQ(validateRequest(request, (nx::network::http::Response*) nullptr), Error::handshakeError);
 }
 
 TEST(WebsocketHandshake, validateRequest_response)
@@ -100,7 +101,7 @@ TEST(WebsocketHandshake, validateRequest_response)
     givenCorrectRequestHeaders(&request);
 
     nx::network::http::Response response;
-    ASSERT_EQ(validateRequest(request, &response), Error::noError);
+    ASSERT_EQ(validateRequest(request, &response.headers), Error::noError);
 
     ASSERT_EQ(response.headers.find("Sec-WebSocket-Protocol")->second, "test");
     ASSERT_EQ(response.headers.find("Sec-WebSocket-Accept")->second,
@@ -115,7 +116,7 @@ TEST(WebsocketHandshake, validateRequest_response_Compression)
     givenCorrectRequestLine(&request);
     givenCorrectRequestHeaders(&request, CompressionType::perMessageDeflate);
     nx::network::http::Response response;
-    ASSERT_EQ(validateRequest(request, &response), Error::noError);
+    ASSERT_EQ(validateRequest(request, &response.headers), Error::noError);
 
     ASSERT_EQ(response.headers.find("Sec-WebSocket-Protocol")->second, "test");
     ASSERT_EQ(response.headers.find("Sec-WebSocket-Accept")->second,
@@ -155,8 +156,10 @@ TEST(WebsocketHandshake, validateResponse)
     givenCorrectRequestLine(&request);
     givenCorrectRequestHeaders(&request);
 
-    ASSERT_EQ(validateRequest(request, &response), Error::noError);
-    ASSERT_EQ(validateResponse(request, response), Error::noError);
+    ASSERT_EQ(Error::noError, validateRequest(request, &response.headers));
+    response.statusLine.statusCode = nx::network::http::StatusCode::switchingProtocols;
+
+    ASSERT_EQ(Error::noError, validateResponse(request, response));
 }
 
 } // namespace test

@@ -351,7 +351,7 @@ private:
         RequestResult result(StatusCode::ok);
         result.connectionEvents.onResponseHasBeenSent =
             std::bind(&HttpServerConnection::onResponseSent, this, _1);
-        result.dataSource = std::make_unique<EmptyMessageBodySource>("text/plain", 0);
+        result.body = std::make_unique<EmptyMessageBodySource>("text/plain", 0);
         completionHandler(std::move(result));
     }
 
@@ -359,7 +359,7 @@ private:
         RequestContext requestContext,
         RequestProcessedHandler completionHandler)
     {
-        requestContext.connection->registerCloseHandler(
+        requestContext.conn.lock()->registerCloseHandler(
             [this](auto&&... args) { saveConnectionClosedEvent(std::forward<decltype(args)>(args)...); });
 
         completionHandler(StatusCode::ok);
@@ -375,23 +375,19 @@ private:
         RequestProcessedHandler completionHandler)
     {
         RequestResult result(StatusCode::ok);
-        result.dataSource = std::make_unique<BufferSource>(
-            "text/plain",
-            kResourceBody);
+        result.body = std::make_unique<BufferSource>("text/plain", kResourceBody);
         completionHandler(std::move(result));
     }
 
     void provideChunkedMessageBody(
-        RequestContext requestContext,
+        RequestContext /*requestContext*/,
         RequestProcessedHandler completionHandler)
     {
         RequestResult result(StatusCode::ok);
 
-        requestContext.response->headers.emplace("Transfer-Encoding", "chunked");
-        result.dataSource = std::make_unique<TestChunkedBodySource>(
-            std::make_unique<BufferSource>(
-                "text/plain",
-                kResourceBody));
+        result.headers.emplace("Transfer-Encoding", "chunked");
+        result.body = std::make_unique<TestChunkedBodySource>(
+            std::make_unique<BufferSource>("text/plain", kResourceBody));
         completionHandler(std::move(result));
     }
 
@@ -797,18 +793,22 @@ private:
         nx::network::http::RequestProcessedHandler completionHandler)
     {
         const auto requestSequence = requestContext.request.headers.find("Sequence")->second;
-        requestContext.response->headers.emplace(
-            "Sequence",
-            requestSequence);
 
         if (m_postponedRequestCompletionHandlers.empty())
         {
             m_postponedRequestCompletionHandlers.push_back(
-                std::move(completionHandler));
+                [requestSequence, completionHandler = std::move(completionHandler)](
+                    RequestResult result) mutable
+                {
+                    result.headers.emplace("Sequence", requestSequence);
+                    completionHandler(std::move(result));
+                });
         }
         else
         {
-            completionHandler(StatusCode::ok);
+            RequestResult result(StatusCode::ok);
+            result.headers.emplace("Sequence", requestSequence);
+            completionHandler(std::move(result));
 
             m_timer.start(
                 std::chrono::milliseconds(10),

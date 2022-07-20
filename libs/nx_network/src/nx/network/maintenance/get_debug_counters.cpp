@@ -19,7 +19,7 @@ void GetDebugCounters::processRequest(
     std::string json = counters.toJson();
 
     http::RequestResult result(http::StatusCode::ok);
-    result.dataSource = std::make_unique<http::BufferSource>("application/json", json);
+    result.body = std::make_unique<http::BufferSource>("application/json", json);
     completionHandler(std::move(result));
 }
 

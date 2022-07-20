@@ -101,7 +101,7 @@ private:
 };
 
 class TakingSocketRestHandler:
-    public nx::network::http::AbstractHttpRequestHandler
+    public nx::network::http::RequestHandlerWithContext
 {
 public:
     TakingSocketRestHandler(ThreadStorage* threadStorage):

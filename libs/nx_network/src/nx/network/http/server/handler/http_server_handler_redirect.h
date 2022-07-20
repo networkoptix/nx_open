@@ -7,7 +7,7 @@
 namespace nx::network::http::server::handler {
 
 class NX_NETWORK_API Redirect:
-    public AbstractHttpRequestHandler
+    public RequestHandlerWithContext
 {
 public:
     Redirect(const nx::utils::Url& actualLocation);

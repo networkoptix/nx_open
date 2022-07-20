@@ -41,7 +41,8 @@ std::unique_ptr<nx::network::aio::AbstractAsyncConnector>
 }
 
 void ProxyHandler::detectProxyTarget(
-    const nx::network::http::HttpServerConnection& connection,
+    const nx::network::http::ConnectionAttrs& connectionAttrs,
+    const nx::network::SocketAddress& requestSource,
     nx::network::http::Request* const request,
     ProxyTargetDetectedHandler handler)
 {
@@ -55,8 +56,8 @@ void ProxyHandler::detectProxyTarget(
 
     if (resultCode != nx::network::http::StatusCode::ok)
     {
-        NX_DEBUG(this, nx::format("Failed to find address string in request path %1 received from %2")
-            .arg(request->requestLine.url).arg(connection.socket()->getForeignAddress()));
+        NX_DEBUG(this, "Failed to find address string in request path %1 received from %2",
+            request->requestLine.url, requestSource);
 
         handler(resultCode, TargetHost());
         return;
@@ -86,13 +87,13 @@ void ProxyHandler::detectProxyTarget(
     if (targetHost.sslMode == SslMode::followIncomingConnection)
         targetHost.sslMode = m_settings.cloudConnect().preferedSslMode;
 
-    if (targetHost.sslMode == SslMode::followIncomingConnection && connection.isSsl())
+    if (targetHost.sslMode == SslMode::followIncomingConnection && connectionAttrs.isSsl)
         targetHost.sslMode = SslMode::enabled;
 
     if (targetHost.sslMode == SslMode::enabled && !m_settings.http().sslSupport)
     {
-        NX_DEBUG(this, nx::format("SSL requested but forbidden by settings. Originator endpoint: %1")
-            .arg(connection.socket()->getForeignAddress()));
+        NX_DEBUG(this, "SSL requested but forbidden by settings. Originator endpoint: %1",
+            requestSource);
 
         handler(nx::network::http::StatusCode::forbidden, TargetHost());
         return;

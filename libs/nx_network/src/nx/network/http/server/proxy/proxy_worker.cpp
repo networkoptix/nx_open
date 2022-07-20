@@ -102,10 +102,7 @@ void ProxyWorker::onConnectionClosed(SystemError::ErrorCode closeReason)
         m_targetHostPipeline->socket()->getForeignAddress().toString(),
         SystemError::toString(closeReason));
 
-    nx::utils::swapAndCall(
-        m_completionHandler,
-        StatusCode::serviceUnavailable,
-        std::nullopt);
+    nx::utils::swapAndCall(m_completionHandler, StatusCode::serviceUnavailable);
 }
 
 void ProxyWorker::stopWhileInAioThread()
@@ -136,10 +133,7 @@ void ProxyWorker::onMessageFromTargetHost(Message message)
             m_targetHostPipeline->socket()->getForeignAddress());
 
         // TODO: #akolesnikov Use better status code.
-        nx::utils::swapAndCall(
-            m_completionHandler,
-            StatusCode::serviceUnavailable,
-            std::nullopt);
+        nx::utils::swapAndCall(m_completionHandler, StatusCode::serviceUnavailable);
         return;
     }
 
@@ -166,9 +160,8 @@ void ProxyWorker::startMessageBodyStreaming(Message message)
 {
     std::unique_ptr<ResponseMsgBodySource> msgBody = prepareStreamingMessageBody(message);
     RequestResult requestResult(
-        static_cast<StatusCode::Value>(
-            message.response->statusLine.statusCode),
-                std::move(msgBody));
+        static_cast<StatusCode::Value>(message.response->statusLine.statusCode),
+        std::move(msgBody));
     if (!isConnectionShouldBeClosed(*message.response))
     {
         requestResult.connectionEvents.onResponseHasBeenSent =
@@ -190,10 +183,9 @@ void ProxyWorker::startMessageBodyStreaming(Message message)
                     std::move(socket));
             };
     }
-    nx::utils::swapAndCall(
-        m_completionHandler,
-        std::move(requestResult),
-        std::move(*message.response));
+    requestResult.headers = std::move(message.response->headers);
+
+    nx::utils::swapAndCall(m_completionHandler, std::move(requestResult));
 }
 
 std::unique_ptr<ProxyWorker::ResponseMsgBodySource>
@@ -262,15 +254,16 @@ void ProxyWorker::onMessageEnd()
         ConnectionCache::ConnectionInfo ci{m_targetHost, m_isSslConnectionRequired};
         auto socket = m_targetHostPipeline->takeSocket();
         if (socket->isConnected())
+        {
             SocketGlobals::httpGlobalContext().connectionCache.put(
                 std::move(ci),
                 std::move(socket));
+        }
     }
 
-    nx::utils::swapAndCall(
-        m_completionHandler,
-        std::move(requestResult),
-        std::move(*m_responseMessage.response));
+    requestResult.headers = std::exchange(m_responseMessage.response->headers, {});
+
+    nx::utils::swapAndCall(m_completionHandler, std::move(requestResult));
 }
 
 std::unique_ptr<AbstractMsgBodySource> ProxyWorker::prepareFixedMessageBody()

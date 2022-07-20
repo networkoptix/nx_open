@@ -7,7 +7,7 @@
 namespace nx::network::maintenance {
 
 class GetHealth:
-    public http::AbstractHttpRequestHandler
+    public http::RequestHandlerWithContext
 {
 protected:
     virtual void processRequest(

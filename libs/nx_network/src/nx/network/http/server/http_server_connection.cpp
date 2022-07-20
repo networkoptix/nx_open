@@ -15,16 +15,21 @@
 
 namespace nx::network::http {
 
+static std::atomic<std::uint64_t> sConnectionId{0};
+
 HttpServerConnection::HttpServerConnection(
     std::unique_ptr<AbstractStreamSocket> sock,
-    nx::network::http::server::AbstractAuthenticationManager* const authenticationManager,
-    nx::network::http::AbstractMessageDispatcher* const httpMessageDispatcher,
+    nx::network::http::AbstractRequestHandler* requestHandler,
     std::optional<SocketAddress> addressToRedirect)
     :
     base_type(std::move(sock)),
-    m_authenticationManager(authenticationManager),
-    m_httpMessageDispatcher(httpMessageDispatcher),
-    m_addressToRedirect(std::move(addressToRedirect))
+    m_requestHandler(requestHandler),
+    m_addressToRedirect(std::move(addressToRedirect)),
+    m_attrs{
+        .id = ++sConnectionId,
+        .isSsl = isSsl(),
+        .sourceAddr = socket()->getForeignAddress(),
+        .localAddr = socket()->getLocalAddress()}
 {
     SocketGlobals::instance().allocationAnalyzer().recordObjectCreation(this);
     ++SocketGlobals::instance().debugCounters().httpServerConnectionCount;
@@ -98,7 +103,7 @@ void HttpServerConnection::processMessage(
     auto requestContext = prepareRequestAuthContext(std::move(*requestMessage.request));
 
     NX_VERBOSE(this, "Processing request %1 received from %2",
-        requestContext->request.requestLine.url.toString(), getForeignAddress());
+        requestContext->request.requestLine.url, getForeignAddress());
 
     checkForConnectionPersistency(requestContext->request);
 
@@ -115,21 +120,13 @@ void HttpServerConnection::processMessage(
             std::make_unique<ResponseMessageContext>(
                 requestContext->request.requestLine,
                 std::move(response),
-                nx::network::http::server::SuccessfulAuthenticationResult().msgBody,
+                /*response body*/ nullptr,
                 ConnectionEvents(),
                 requestContext->requestReceivedTime));
         return;
     }
 
-    if (!m_authenticationManager)
-    {
-        onAuthenticationDone(
-            nx::network::http::server::SuccessfulAuthenticationResult(),
-            std::move(requestContext));
-        return;
-    }
-
-    authenticate(std::move(requestContext));
+    invokeRequestHandler(std::move(requestContext));
 }
 
 void HttpServerConnection::processSomeMessageBody(nx::Buffer buffer)
@@ -142,7 +139,11 @@ void HttpServerConnection::processMessageEnd()
 {
     if (m_currentRequestBodyWriter)
     {
+        nx::utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
         m_currentRequestBodyWriter->writeEof(SystemError::noError);
+        if (watcher.interrupted())
+            return; //< NOTE: EOF can destroy connection.
+
         m_currentRequestBodyWriter = nullptr;
         if (m_markedForClosure)
         {
@@ -196,69 +197,12 @@ void HttpServerConnection::extractClientEndpointFromForwardedHeader(
     }
 }
 
-void HttpServerConnection::authenticate(
-    std::unique_ptr<RequestAuthContext> requestContext)
-{
-    // TODO: #akolesnikov It makes sense to pass some context which has client endpoint to authenticate.
-    // Though, RequestContext does not make sense here since half of the fields are undefined
-    // at the moment or inappropriate for authenticate.
-
-    const nx::network::http::Request& request = requestContext->request;
-    auto strongRef = shared_from_this();
-    std::weak_ptr<HttpServerConnection> weakThis = strongRef;
-    m_authenticationManager->authenticate(
-        *this,
-        request,
-        [this, weakThis = std::move(weakThis), requestContext = std::move(requestContext)](
-            nx::network::http::server::AuthenticationResult authenticationResult) mutable
-        {
-            auto strongThis = weakThis.lock();
-            if (!strongThis)
-                return;
-
-            strongThis->post(
-                [this, strongThis, // connection has to be removed within its AIO thread
-                    authenticationResult = std::move(authenticationResult),
-                    requestContext = std::move(requestContext)]() mutable
-                {
-                    onAuthenticationDone(
-                        std::move(authenticationResult),
-                        std::move(requestContext));
-                });
-        });
-}
-
 void HttpServerConnection::stopWhileInAioThread()
 {
     base_type::stopWhileInAioThread();
 
     m_currentMsgBody.reset();
     m_bridge.reset();
-}
-
-void HttpServerConnection::onAuthenticationDone(
-    nx::network::http::server::AuthenticationResult authenticationResult,
-    std::unique_ptr<RequestAuthContext> requestContext)
-{
-    if (!socket())
-    {
-        // Connection has been removed while request authentication was in progress.
-        NX_VERBOSE(this, "Closing connection cause the socket is not available anymore");
-        closeConnection(SystemError::noError);
-        return;
-    }
-
-    if (!StatusCode::isSuccessCode(authenticationResult.statusCode))
-    {
-        sendUnauthorizedResponse(
-            std::move(requestContext),
-            std::move(authenticationResult));
-        return;
-    }
-
-    dispatchRequest(
-        std::move(requestContext),
-        std::move(authenticationResult));
 }
 
 std::unique_ptr<HttpServerConnection::RequestAuthContext>
@@ -292,44 +236,26 @@ std::unique_ptr<HttpServerConnection::RequestAuthContext>
     return requestContext;
 }
 
-void HttpServerConnection::sendUnauthorizedResponse(
-    std::unique_ptr<RequestAuthContext> requestContext,
-    nx::network::http::server::AuthenticationResult authenticationResult)
-{
-    nx::network::http::Message response(nx::network::http::MessageType::response);
-    std::move(
-        authenticationResult.responseHeaders.begin(),
-        authenticationResult.responseHeaders.end(),
-        std::inserter(response.response->headers, response.response->headers.end()));
-    response.response->statusLine.statusCode = authenticationResult.statusCode;
-
-    prepareAndSendResponse(
-        std::move(requestContext->descriptor),
-        std::make_unique<ResponseMessageContext>(
-            requestContext->request.requestLine,
-            std::move(response),
-            std::move(authenticationResult.msgBody),
-            ConnectionEvents(),
-            requestContext->requestReceivedTime));
-}
-
-void HttpServerConnection::dispatchRequest(
-    std::unique_ptr<RequestAuthContext> requestAuthContext,
-    server::AuthenticationResult authenticationResult)
+void HttpServerConnection::invokeRequestHandler(
+    std::unique_ptr<RequestAuthContext> requestAuthContext)
 {
     auto strongRef = shared_from_this();
     std::weak_ptr<HttpServerConnection> weakThis = strongRef;
 
     auto sendResponseFunc =
-        [this, weakThis, requestDescriptor = requestAuthContext->descriptor,
+        [this, weakThis, requestDescriptor = std::exchange(requestAuthContext->descriptor, {}),
             requestReceivedTime = requestAuthContext->requestReceivedTime](
-                nx::network::http::Message response,
-                std::unique_ptr<nx::network::http::AbstractMsgBodySource> responseMsgBody,
-                ConnectionEvents connectionEvents) mutable
+                RequestResult result) mutable
         {
             auto strongThis = weakThis.lock();
             if (!strongThis)
                 return;
+
+            Message response(http::MessageType::response);
+            response.response->statusLine.statusCode = result.statusCode;
+            response.response->statusLine.reasonPhrase = StatusCode::toString(result.statusCode);
+            response.response->statusLine.version = requestDescriptor.requestLine.version;
+            response.response->headers = std::move(result.headers);
 
             auto requestLine = requestDescriptor.requestLine;
             processResponse(
@@ -338,41 +264,27 @@ void HttpServerConnection::dispatchRequest(
                 std::make_unique<ResponseMessageContext>(
                     std::move(requestLine),
                     std::move(response),
-                    std::move(responseMsgBody),
-                    std::move(connectionEvents),
+                    std::move(result.body),
+                    std::move(result.connectionEvents),
                     requestReceivedTime));
         };
 
-    auto requestDescriptor = std::exchange(requestAuthContext->descriptor, {});
-    const auto requestReceivedTime = requestAuthContext->requestReceivedTime;
+    if (!m_requestHandler)
+        return sendResponseFunc(RequestResult(StatusCode::notFound));
 
-    if (!m_httpMessageDispatcher ||
-        !m_httpMessageDispatcher->dispatchRequest(
-            buildRequestContext(std::move(*requestAuthContext), std::move(authenticationResult)),
-            std::move(sendResponseFunc)))
-    {
-        nx::network::http::Message response(nx::network::http::MessageType::response);
-        response.response->statusLine.statusCode = nx::network::http::StatusCode::notFound;
-        auto requestLine = requestDescriptor.requestLine;
-        return prepareAndSendResponse(
-            std::move(requestDescriptor),
-            std::make_unique<ResponseMessageContext>(
-                std::move(requestLine),
-                std::move(response),
-                nullptr,
-                ConnectionEvents(),
-                requestReceivedTime));
-    }
+    m_requestHandler->serve(
+        buildRequestContext(std::move(*requestAuthContext)),
+        std::move(sendResponseFunc));
 }
 
 RequestContext HttpServerConnection::buildRequestContext(
-    RequestAuthContext requestAuthContext,
-    server::AuthenticationResult authenticationResult)
+    RequestAuthContext requestAuthContext)
 {
     return RequestContext(
-        this,
+        m_attrs,
+        shared_from_this(),
         std::move(requestAuthContext.clientEndpoint),
-        std::move(authenticationResult.authInfo),
+        {},
         std::move(requestAuthContext.request),
         std::move(requestAuthContext.body));
 }
@@ -708,6 +620,11 @@ std::size_t HttpServerConnection::pendingRequestCount() const
 std::size_t HttpServerConnection::pendingResponseCount() const
 {
     return m_responseQueue.size();
+}
+
+const ConnectionAttrs& HttpServerConnection::attrs() const
+{
+    return m_attrs;
 }
 
 void HttpServerConnection::checkForConnectionPersistency(

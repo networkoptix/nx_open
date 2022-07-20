@@ -39,7 +39,7 @@ enum class SslMode
  * connection. This is subject to change.
  */
 class NX_NETWORK_API AbstractProxyHandler:
-    public AbstractHttpRequestHandler
+    public RequestHandlerWithContext
 {
 public:
     AbstractProxyHandler();
@@ -62,6 +62,12 @@ protected:
         network::SocketAddress target;
         SslMode sslMode = SslMode::followIncomingConnection;
 
+        /**
+         * Filled in case a redirect is needed to reach the requested target.
+         * If filled then proxy request will complete with a redirect to the specified URL.
+         */
+        std::optional<nx::utils::Url> redirectLocation;
+
         TargetHost() = default;
         TargetHost(network::SocketAddress target);
     };
@@ -77,8 +83,9 @@ protected:
      * AbstractProxyHandler can be freed.
      */
     virtual void detectProxyTarget(
-        const HttpServerConnection& connection,
-        Request* const request,
+        const nx::network::http::ConnectionAttrs& connAttrs,
+        const nx::network::SocketAddress& requestSource,
+        nx::network::http::Request* const request,
         ProxyTargetDetectedHandler handler) = 0;
 
     /**
@@ -121,11 +128,9 @@ private:
 
     void proxyRequestToTarget(std::unique_ptr<AbstractStreamSocket> connection);
 
-    void sendTargetServerResponse(
-        RequestResult requestResult,
-        std::optional<Response> response);
+    void sendTargetServerResponse(RequestResult requestResult);
 
-    void removeKeepAliveConnectionHeaders(Response* response);
+    void removeKeepAliveConnectionHeaders(HttpHeaders* responseHeaders);
 
     void establishSecureConnectionToTheTarget(
         std::unique_ptr<AbstractStreamSocket> connection);
@@ -148,7 +153,8 @@ class NX_NETWORK_API ProxyHandler:
 {
 protected:
     virtual void detectProxyTarget(
-        const HttpServerConnection& connection,
+        const ConnectionAttrs& connAttrs,
+        const SocketAddress& requestSource,
         Request* const request,
         ProxyTargetDetectedHandler handler) override;
 };

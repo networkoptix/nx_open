@@ -18,8 +18,8 @@ using TunnelCreatedHandler =
 /**
  * Upgrades HTTP connection to the protocol specified.
  */
-class CreateTunnelHandler:
-    public AbstractHttpRequestHandler
+class NX_NETWORK_API CreateTunnelHandler:
+    public RequestHandlerWithContext
 {
 public:
     /**
@@ -28,38 +28,11 @@ public:
      */
     CreateTunnelHandler(
         const std::string& protocolToUpgradeTo,
-        TunnelCreatedHandler onTunnelCreated)
-        :
-        m_protocolToUpgradeTo(protocolToUpgradeTo),
-        m_onTunnelCreated(std::move(onTunnelCreated))
-    {
-    }
+        TunnelCreatedHandler onTunnelCreated);
 
     virtual void processRequest(
         RequestContext requestContext,
-        nx::network::http::RequestProcessedHandler completionHandler) override
-    {
-        const auto& request = requestContext.request;
-
-        auto upgradeIter = request.headers.find("Upgrade");
-        if (upgradeIter == request.headers.end() ||
-            upgradeIter->second != m_protocolToUpgradeTo)
-        {
-            return completionHandler(StatusCode::badRequest);
-        }
-
-        RequestResult requestResult(StatusCode::switchingProtocols);
-        requestResult.connectionEvents.onResponseHasBeenSent =
-            [onTunnelCreated = std::move(m_onTunnelCreated),
-                restParams = std::exchange(requestContext.requestPathParams, {})](
-                    HttpServerConnection* httpConnection)
-            {
-                onTunnelCreated(
-                    httpConnection->takeSocket(),
-                    std::move(restParams));
-            };
-        completionHandler(std::move(requestResult));
-    }
+        nx::network::http::RequestProcessedHandler completionHandler) override;
 
 private:
     const std::string m_protocolToUpgradeTo;

@@ -21,7 +21,7 @@ void GetMallocInfo::processRequest(
     }
 
     http::RequestResult result(http::StatusCode::ok);
-    result.dataSource = std::make_unique<http::BufferSource>(mimeType, data);
+    result.body = std::make_unique<http::BufferSource>(mimeType, data);
 
     completionHandler(std::move(result));
 }

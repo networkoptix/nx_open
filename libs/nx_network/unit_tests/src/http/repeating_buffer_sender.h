@@ -10,7 +10,7 @@ namespace nx::network::http {
  * Sends specified buffer forever.
  */
 class RepeatingBufferSender:
-    public nx::network::http::AbstractHttpRequestHandler
+    public nx::network::http::RequestHandlerWithContext
 {
 public:
     RepeatingBufferSender(const std::string& mimeType, nx::Buffer buffer);

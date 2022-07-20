@@ -24,7 +24,7 @@ void GetVersion::processRequest(
     http::RequestProcessedHandler completionHandler)
 {
     http::RequestResult result(http::StatusCode::ok);
-    result.dataSource = std::make_unique<http::BufferSource>(
+    result.body = std::make_unique<http::BufferSource>(
         http::header::ContentType::kJson.toString(),
         QJson::serialized(getVersion()));
 

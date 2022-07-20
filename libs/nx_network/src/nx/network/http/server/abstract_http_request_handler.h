@@ -10,30 +10,77 @@
 
 #include <nx/network/debug/object_instance_counter.h>
 
-#include "http_server_connection.h"
 #include "request_processing_types.h"
 #include "../abstract_msg_body_source.h"
 
 namespace nx::network::http {
 
 /**
+ * Interface of an HTTP request handler class.
+ * The implementation may choose to make the AbstractRequestHandler::serve re-enterable.
+ */
+class NX_NETWORK_API AbstractRequestHandler
+{
+public:
+    virtual ~AbstractRequestHandler() = default;
+
+    /**
+     * Processes request, generates response and reports it to the completionHandler callback.
+     * Note: requestContext.connection is guaranteed to be alive in this call only.
+     * It can be closed at any moment. So, it cannot be considered valid after executing any
+     * asynchronous operation.
+     */
+    virtual void serve(
+        network::http::RequestContext requestContext,
+        nx::utils::MoveOnlyFunc<void(network::http::RequestResult)> completionHandler) = 0;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Request handler that passes request to another handler after processing.
+ * It may choose to generate reply itself and avoid passing request further.
+ */
+class NX_NETWORK_API IntermediaryHandler:
+    public AbstractRequestHandler
+{
+public:
+    IntermediaryHandler(AbstractRequestHandler* nextHandler):
+        m_nextHandler(nextHandler)
+    {
+    }
+
+    void setNextHandler(AbstractRequestHandler* nextHandler)
+    {
+        m_nextHandler = nextHandler;
+    }
+
+    const AbstractRequestHandler* nextHandler() const { return m_nextHandler; }
+    AbstractRequestHandler* nextHandler() { return m_nextHandler; }
+
+private:
+    AbstractRequestHandler* m_nextHandler = nullptr;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+/**
  * Base class for all HTTP request processors.
  * NOTE: Class methods are not thread-safe.
  */
-class NX_NETWORK_API AbstractHttpRequestHandler
+class NX_NETWORK_API RequestHandlerWithContext:
+    public AbstractRequestHandler
 {
 public:
-    virtual ~AbstractHttpRequestHandler() = default;
-
     /**
      * The received request is passed here. It will be propagated to processRequest.
      * @param connection This object is valid only in this method.
      *     One cannot rely on its availability after return of this method.
      * @param completionHandler Functor to be invoked to send response.
      */
-    void handleRequest(
+    virtual void serve(
         RequestContext requestContext,
-        ResponseIsReadyHandler completionHandler);
+        RequestProcessedHandler completionHandler) override;
 
     /**
      * By default, it is MessageBodyDeliveryType::buffer.
@@ -52,16 +99,17 @@ protected:
         http::RequestContext requestContext,
         http::RequestProcessedHandler completionHandler) = 0;
 
+    // TODO: #akolesnikov Remove this method.
     http::Response* response();
 
 private:
     RequestContext m_requestContext;
     std::unique_ptr<AbstractMsgBodySourceWithCache> m_requestBodySource;
-    ResponseIsReadyHandler m_completionHandler;
+    RequestProcessedHandler m_completionHandler;
     http::Message m_responseMsg;
     MessageBodyDeliveryType m_messageBodyDeliveryType = MessageBodyDeliveryType::buffer;
     RequestPathParams m_requestPathParams;
-    debug::ObjectInstanceCounter<AbstractHttpRequestHandler> m_instanceCounter;
+    debug::ObjectInstanceCounter<RequestHandlerWithContext> m_instanceCounter;
     std::string m_pathTemplate;
 
     void readMessageBodyAsync();

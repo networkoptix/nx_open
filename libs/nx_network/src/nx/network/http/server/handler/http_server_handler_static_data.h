@@ -7,7 +7,7 @@
 namespace nx::network::http::server::handler {
 
 class NX_NETWORK_API StaticData:
-    public AbstractHttpRequestHandler
+    public RequestHandlerWithContext
 {
 public:
     StaticData(const std::string& mimeType, nx::Buffer response);

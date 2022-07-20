@@ -37,7 +37,7 @@ void Server::getStatisticsGeneral(
         duration_cast<milliseconds>(steady_clock::now() - m_processStartTime)};
 
     http::RequestResult result(http::StatusCode::ok);
-    result.dataSource = std::make_unique<http::BufferSource>(
+    result.body = std::make_unique<http::BufferSource>(
         http::header::ContentType::kJson,
         QJson::serialized(std::move(stats)));
 

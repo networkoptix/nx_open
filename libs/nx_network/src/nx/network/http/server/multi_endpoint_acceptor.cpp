@@ -7,11 +7,9 @@
 namespace nx::network::http::server {
 
 MultiEndpointAcceptor::MultiEndpointAcceptor(
-    server::AbstractAuthenticationManager* authenticationManager,
-    AbstractMessageDispatcher* httpMessageDispatcher)
+    AbstractRequestHandler* requestHandler)
     :
-    m_authenticationManager(authenticationManager),
-    m_httpMessageDispatcher(httpMessageDispatcher)
+    m_requestHandler(requestHandler)
 {
 }
 
@@ -118,11 +116,9 @@ std::unique_ptr<MultiEndpointAcceptor::MultiHttpServer>
         const std::vector<network::SocketAddress>& endpoints,
         Args&&... args)
 {
-    auto multiAddressHttpServer =
-        std::make_unique<MultiHttpServer>(
-            m_authenticationManager,
-            m_httpMessageDispatcher,
-            std::forward<Args>(args)...);
+    auto multiAddressHttpServer = std::make_unique<MultiHttpServer>(
+        m_requestHandler,
+        std::forward<Args>(args)...);
 
     if (!multiAddressHttpServer->bind(endpoints))
         return nullptr;
@@ -132,8 +128,6 @@ std::unique_ptr<MultiEndpointAcceptor::MultiHttpServer>
 
 void MultiEndpointAcceptor::initializeHttpStatisticsProvider()
 {
-    using namespace network::http::server;
-
     if (!m_multiAddressHttpServer)
         return;
 

@@ -64,7 +64,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 class SslAssertHandler:
-    public nx::network::http::AbstractHttpRequestHandler
+    public nx::network::http::RequestHandlerWithContext
 {
 public:
     SslAssertHandler(bool expectSsl):
@@ -76,7 +76,7 @@ public:
         http::RequestContext requestContext,
         http::RequestProcessedHandler completionHandler)
     {
-        EXPECT_EQ(m_expectSsl, requestContext.connection->isSsl());
+        EXPECT_EQ(m_expectSsl, requestContext.connectionAttrs.isSsl);
 
         completionHandler(http::RequestResult(
             http::StatusCode::ok,
@@ -693,7 +693,7 @@ TEST_F(HttpClientAsyncCustom, DISABLED_cameraThumbnail)
 
 namespace {
 class TestHandler:
-    public nx::network::http::AbstractHttpRequestHandler
+    public nx::network::http::RequestHandlerWithContext
 {
 public:
     TestHandler(bool closeConnectionOnReceivingRequest):
@@ -708,7 +708,7 @@ public:
         nx::network::http::RequestProcessedHandler completionHandler)
     {
         if (m_closeConnectionOnReceivingRequest)
-            requestContext.connection->takeSocket(); //< Closing connection by destroying socket.
+            requestContext.conn.lock()->takeSocket(); //< Closing connection by destroying socket.
 
         completionHandler(
             http::RequestResult(
@@ -1129,15 +1129,15 @@ private:
         HttpConnectionContext* connectionContext = nullptr;
         {
             NX_MUTEX_LOCKER lock(&m_mutex);
-            auto p = m_connectionToContext.emplace(requestContext.connection, nullptr);
+            auto p = m_connectionToContext.emplace(requestContext.conn.lock().get(), nullptr);
             if (p.second)
             {
                 p.first->second = std::make_unique<HttpConnectionContext>();
-                requestContext.connection->registerCloseHandler(
+                requestContext.conn.lock()->registerCloseHandler(
                     std::bind(
                         &HttpClientAsyncReusingConnection::onConnectionClosed,
                         this,
-                        requestContext.connection));
+                        requestContext.conn.lock().get()));
             }
             connectionContext = p.first->second.get();
         }
@@ -1145,7 +1145,8 @@ private:
         ++connectionContext->requestsReceived;
 
         requestResult.connectionEvents.onResponseHasBeenSent =
-            std::bind(&HttpClientAsyncReusingConnection::onResponseSent, this, requestContext.connection);
+            std::bind(&HttpClientAsyncReusingConnection::onResponseSent,
+                this, requestContext.conn.lock().get());
 
         completionHandler(std::move(requestResult));
     }
@@ -1183,7 +1184,7 @@ private:
         RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler)
     {
-        requestContext.connection->closeConnection(SystemError::connectionReset);
+        requestContext.conn.lock()->closeConnection(SystemError::connectionReset);
         completionHandler(http::StatusCode::internalServerError);
     }
 };

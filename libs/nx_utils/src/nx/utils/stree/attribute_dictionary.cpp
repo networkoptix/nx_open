@@ -112,6 +112,16 @@ bool AttributeDictionary::empty() const
     return m_attrs.empty();
 }
 
+void AttributeDictionary::merge(AttributeDictionary&& other)
+{
+    m_attrs.merge(std::move(other.m_attrs));
+}
+
+void AttributeDictionary::merge(const AttributeDictionary& other)
+{
+    std::copy(other.m_attrs.begin(), other.m_attrs.end(), std::inserter(m_attrs, m_attrs.end()));
+}
+
 //-------------------------------------------------------------------------------------------------
 // class SingleAttributeDictionary.
 

@@ -36,13 +36,13 @@ void UplinkSpeedTestServer::serve(
     if (it == request.request.headers.end()) //< Performing a ping test in this case.
         return completionHandler(nx::network::http::StatusCode::ok);
 
-    nx::network::http::insertOrReplaceHeader(&request.response->headers,
-        network::http::HttpHeader(it->first, it->second));
-
     if (m_bandwidthTestInProgressHandler)
         m_bandwidthTestInProgressHandler(nx::utils::stoi(it->second));
 
-    completionHandler(nx::network::http::StatusCode::ok);
+    network::http::RequestResult result(network::http::StatusCode::ok);
+    result.headers.emplace(it->first, it->second);
+
+    completionHandler(std::move(result));
 }
 
 } // namespace nx::network::cloud::speed_test::test

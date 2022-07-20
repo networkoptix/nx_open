@@ -19,6 +19,7 @@ public:
      */
     using CompletionHandler = nx::utils::MoveOnlyFunc<void(
         StatusCode::Value /*statusCode*/,
+        HttpHeaders /*responseHeaders*/,
         ApplicationData... /*applicationData*/)>;
 
     virtual ~TunnelAuthorizer() = default;

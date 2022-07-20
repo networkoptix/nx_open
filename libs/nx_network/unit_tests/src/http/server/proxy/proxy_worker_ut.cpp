@@ -42,13 +42,10 @@ protected:
 
     void thenEmptyResponseHasBeenDelivered()
     {
-        while (!m_proxiedResponse)
-            std::this_thread::yield();
+        const auto response = m_proxiedResponse.get_future().get();
 
-        ASSERT_EQ(nx::network::http::StatusCode::noContent, m_proxiedResponse->statusLine.statusCode);
-        ASSERT_TRUE(
-            m_proxiedResponse->headers.find("Content-Type") ==
-            m_proxiedResponse->headers.end());
+        ASSERT_EQ(nx::network::http::StatusCode::noContent, response.statusLine.statusCode);
+        ASSERT_FALSE(response.headers.contains("Content-Type"));
         ASSERT_EQ(nullptr, m_messageBodySource);
     }
 
@@ -58,7 +55,7 @@ private:
     nx::Buffer m_staticResource;
     nx::utils::promise<void> m_messageBodyEndReported;
     std::unique_ptr<nx::network::http::AbstractMsgBodySource> m_messageBodySource;
-    std::optional<nx::network::http::Response> m_proxiedResponse;
+    std::promise<nx::network::http::Response> m_proxiedResponse;
 
     virtual void SetUp() override
     {
@@ -77,15 +74,16 @@ private:
         ASSERT_TRUE(m_httpServer.bindAndListen());
     }
 
-    void proxyResponse(
-        nx::network::http::RequestResult requestResult,
-        std::optional<nx::network::http::Response> response)
+    void proxyResponse(nx::network::http::RequestResult requestResult)
     {
-        m_proxiedResponse = response;
+        http::Response resp;
+        resp.statusLine.statusCode = requestResult.statusCode;
+        resp.headers = requestResult.headers;
+        m_proxiedResponse.set_value(std::move(resp));
 
-        if (requestResult.dataSource)
+        if (requestResult.body)
         {
-            m_messageBodySource = std::move(requestResult.dataSource);
+            m_messageBodySource = std::move(requestResult.body);
             startReadingMessageBody();
         }
     }

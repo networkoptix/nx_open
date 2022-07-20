@@ -38,11 +38,11 @@ public:
 
     template<typename... Args>
     TestHttpServer(server::Role role, Args&&... args):
-        m_authenticationManager(&m_credentialsProvider, role)
+        m_authenticationManager(&m_httpMessageDispatcher, &m_credentialsProvider, role),
+        m_authDispatcher(&m_httpMessageDispatcher)
     {
         m_httpServer = std::make_unique<nx::network::http::HttpStreamSocketServer>(
             &m_authDispatcher,
-            &m_httpMessageDispatcher,
             std::forward<Args>(args)...);
     }
 

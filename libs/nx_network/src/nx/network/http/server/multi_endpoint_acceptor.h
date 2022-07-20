@@ -15,9 +15,7 @@ class NX_NETWORK_API MultiEndpointAcceptor:
     public network::http::server::AbstractHttpStatisticsProvider
 {
 public:
-    MultiEndpointAcceptor(
-        server::AbstractAuthenticationManager* authenticationManager,
-        AbstractMessageDispatcher* httpMessageDispatcher);
+    MultiEndpointAcceptor(AbstractRequestHandler* requestHandler);
 
     virtual network::server::Statistics statistics() const override;
     virtual HttpStatistics httpStatistics() const override;
@@ -43,8 +41,7 @@ private:
     using MultiHttpServer =
         network::server::MultiAddressServer<nx::network::http::HttpStreamSocketServer>;
 
-    server::AbstractAuthenticationManager* m_authenticationManager = nullptr;
-    AbstractMessageDispatcher* m_httpMessageDispatcher = nullptr;
+    AbstractRequestHandler* m_requestHandler = nullptr;
     std::vector<SocketAddress> m_endpoints;
     std::vector<SocketAddress> m_sslEndpoints;
     std::unique_ptr<MultiHttpServer> m_multiAddressHttpServer;

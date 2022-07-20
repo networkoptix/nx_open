@@ -29,15 +29,16 @@ void AbstractProxyHandler::processRequest(
     m_request = std::move(requestContext.request);
     m_requestBody = std::move(requestContext.body);
     m_requestCompletionHandler = std::move(completionHandler);
-    m_requestSourceEndpoint = requestContext.connection->socket()->getForeignAddress();
-    m_httpConnectionAioThread = requestContext.connection->getAioThread();
+    m_requestSourceEndpoint = requestContext.clientEndpoint;
+    m_httpConnectionAioThread = SocketGlobals::instance().aioService().getCurrentAioThread();
 
-    m_isIncomingConnectionEncrypted = requestContext.connection->isSsl();
+    m_isIncomingConnectionEncrypted = requestContext.connectionAttrs.isSsl;
 
     fixRequestHeaders();
 
     detectProxyTarget(
-        *requestContext.connection,
+        requestContext.connectionAttrs,
+        requestContext.clientEndpoint,
         &m_request,
         [this](auto&&... args) { startProxying(std::move(args)...); });
 }
@@ -89,7 +90,14 @@ void AbstractProxyHandler::startProxying(
     StatusCode::Value resultCode,
     TargetHost proxyTarget)
 {
-    using namespace std::placeholders;
+    if (proxyTarget.redirectLocation)
+    {
+        RequestResult result(network::http::StatusCode::temporaryRedirect);
+        if ((resultCode / 100) * 100 == 300)
+            result.statusCode = resultCode;
+        result.headers.emplace("Location", proxyTarget.redirectLocation->toStdString());
+        return nx::utils::swapAndCall(m_requestCompletionHandler, std::move(result));
+    }
 
     if (!StatusCode::isSuccessCode(resultCode))
     {
@@ -195,37 +203,32 @@ void AbstractProxyHandler::proxyRequestToTarget(
         m_requestProxyWorker->setTargetHostConnectionInactivityTimeout(
             *m_targetConnectionInactivityTimeout);
     }
-    m_requestProxyWorker->start(
-        [this](auto&&... args) { sendTargetServerResponse(std::move(args)...); });
+    m_requestProxyWorker->start([this](auto&&... args) {
+        sendTargetServerResponse(std::forward<decltype(args)>(args)...);
+    });
 }
 
-void AbstractProxyHandler::sendTargetServerResponse(
-    RequestResult requestResult,
-    std::optional<Response> responseMessage)
+void AbstractProxyHandler::sendTargetServerResponse(RequestResult requestResult)
 {
     NX_VERBOSE(this, "Proxying response from the target server %1",
         m_targetHost.target.toString());
 
-    if (responseMessage)
-    {
-        // Removing Keep-alive connection related headers to let
-        // local HTTP server to implement its own keep-alive policy.
-        removeKeepAliveConnectionHeaders(&*responseMessage);
-
-        *response() = std::move(*responseMessage);
-    }
+    // Removing Keep-alive connection related headers to let
+    // local HTTP server to implement its own keep-alive policy.
+    removeKeepAliveConnectionHeaders(&requestResult.headers);
 
     nx::utils::swapAndCall(m_requestCompletionHandler, std::move(requestResult));
 }
 
-void AbstractProxyHandler::removeKeepAliveConnectionHeaders(Response* response)
+void AbstractProxyHandler::removeKeepAliveConnectionHeaders(HttpHeaders* responseHeaders)
 {
-    response->headers.erase("Keep-Alive");
-    auto connectionHeaderIter = response->headers.find("Connection");
-    if (connectionHeaderIter != response->headers.end() &&
+    responseHeaders->erase("Keep-Alive");
+
+    auto connectionHeaderIter = responseHeaders->find("Connection");
+    if (connectionHeaderIter != responseHeaders->end() &&
         nx::utils::stricmp(connectionHeaderIter->second, "keep-alive") == 0)
     {
-        response->headers.erase(connectionHeaderIter);
+        responseHeaders->erase(connectionHeaderIter);
     }
 }
 
@@ -301,7 +304,8 @@ void AbstractProxyHandler::acceptAllCertificates(
 //-------------------------------------------------------------------------------------------------
 
 void ProxyHandler::detectProxyTarget(
-    const HttpServerConnection& /*connection*/,
+    const ConnectionAttrs& /*connAttrs*/,
+    const SocketAddress& /*requestSource*/,
     Request* const request,
     ProxyTargetDetectedHandler handler)
 {

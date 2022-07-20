@@ -24,7 +24,7 @@ using TunnelCreatedHandler =
     utils::MoveOnlyFunc<void(std::unique_ptr<network::aio::AsyncChannelBridge>)>;
 
 class ConnectHandler:
-    public nx::network::http::AbstractHttpRequestHandler
+    public nx::network::http::RequestHandlerWithContext
 {
 public:
     ConnectHandler(const conf::Settings& settings, TunnelCreatedHandler tunnelCreatedHandler);
@@ -34,12 +34,15 @@ public:
         nx::network::http::RequestProcessedHandler completionHandler) override;
 
 private:
-    void connect(const network::SocketAddress& address,
+    void connect(
+        std::shared_ptr<nx::network::http::HttpServerConnection> connection,
+        const network::SocketAddress& address,
         network::http::RequestProcessedHandler completionHandler);
+
+private:
     const conf::Settings& m_settings;
 
     nx::network::http::Request m_request;
-    nx::network::http::HttpServerConnection* m_connection;
     TunnelCreatedHandler m_tunnelCreatedHandler;
 
     std::unique_ptr<network::AbstractStreamSocket> m_targetSocket;

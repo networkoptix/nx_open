@@ -17,6 +17,7 @@
 #include <nx/network/ssl/context.h>
 #include <nx/network/ssl/ssl_stream_socket.h>
 #include <nx/network/system_socket.h>
+#include <nx/network/test_support/message_body.h>
 #include <nx/network/test_support/synchronous_tcp_server.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/network/aio/timer.h>
@@ -451,14 +452,14 @@ protected:
 
     void andTheSameTcpConnectionHasBeenUsed()
     {
-        std::optional<nx::network::http::HttpServerConnection*> connection;
+        std::optional<std::uint64_t> connectionId;
         while (!m_receivedRequests.empty())
         {
-            auto requestConnection = m_receivedRequests.pop().connection;
-            if (connection)
-                ASSERT_EQ(*connection, requestConnection);
+            auto requestConnectionId = m_receivedRequests.pop().connectionAttrs.id;
+            if (connectionId)
+                ASSERT_EQ(*connectionId, requestConnectionId);
             else
-                connection = requestConnection;
+                connectionId = requestConnectionId;
         }
     }
 
@@ -553,17 +554,19 @@ private:
         wwwAuthenticate.params.emplace("realm", "realm_of_possibility");
         wwwAuthenticate.params.emplace("algorithm", "MD5");
 
-        requestContext.response->headers.emplace(
+        http::RequestResult result(StatusCode::unauthorized);
+        result.headers.emplace(
             header::WWWAuthenticate::NAME,
             wwwAuthenticate.serialized());
 
-        requestContext.response->headers.emplace("Content-Type", "text/plain");
-        requestContext.response->headers.emplace("Content-Length", "0");
-        requestContext.response->headers.emplace("Connection", "close");
-        requestContext.response->messageBody =
-            "HTTP/1.1 401 Unauthorized\r\nContent-Length: 0\r\n\r\n";
+        result.headers.emplace("Connection", "close");
 
-        completionHandler(StatusCode::unauthorized);
+        result.body = std::make_unique<CustomLengthBody>(
+            "text/plain",
+            "HTTP/1.1 401 Unauthorized\r\nContent-Length: 0\r\n\r\n",
+            0);
+
+        completionHandler(std::move(result));
     }
 
     void handleInfiniteResourceRequest(
@@ -571,7 +574,7 @@ private:
         nx::network::http::RequestProcessedHandler completionHandler)
     {
         http::RequestResult result(StatusCode::ok);
-        result.dataSource = std::make_unique<RepeatingBufferMsgBodySource>(
+        result.body = std::make_unique<RepeatingBufferMsgBodySource>(
             "text/plain",
             "infinite resource. ");
         completionHandler(std::move(result));
@@ -586,7 +589,7 @@ private:
         body->writeEof();
 
         http::RequestResult result(StatusCode::ok);
-        result.dataSource = std::move(body);
+        result.body = std::move(body);
         completionHandler(std::move(result));
     }
 
@@ -595,7 +598,7 @@ private:
         nx::network::http::RequestProcessedHandler completionHandler)
     {
         http::RequestResult result(StatusCode::ok);
-        result.dataSource =
+        result.body =
             std::make_unique<EmptyMessageBodySource>("text/plain", std::nullopt);
         completionHandler(std::move(result));
     }
@@ -608,12 +611,12 @@ private:
             "GET /some HTTP/1.1\r\n"
             "\r\n");
 
-        requestContext.connection->socket()->sendAsync(
+        requestContext.conn.lock()->socket()->sendAsync(
             response.get(),
-            [response, connection = requestContext.connection,
+            [response, connection = requestContext.conn,
                 completionHandler = std::move(completionHandler)](auto&&...)
             {
-                connection->closeConnection(SystemError::interrupted);
+                connection.lock()->closeConnection(SystemError::interrupted);
                 completionHandler(nx::network::http::StatusCode::internalServerError);
             });
     }
@@ -626,7 +629,7 @@ private:
 
         auto body = std::make_unique<WritableMessageBody>("text/plain");
         body->writeBodyData(nx::Buffer(kResponseBody));
-        result.dataSource = std::move(body);
+        result.body = std::move(body);
 
         completionHandler(std::move(result));
     }
@@ -908,15 +911,17 @@ private:
         nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler)
     {
+        http::RequestResult result(nx::network::http::StatusCode::switchingProtocols);
+
         if (m_serverSendUpgradeHeaderInResponse)
-            requestContext.response->headers.emplace("Upgrade", kUpgradeTo);
+            result.headers.emplace("Upgrade", kUpgradeTo);
         else
-            requestContext.response->headers.emplace("Upgrade", std::string());
-        requestContext.response->headers.emplace("Connection", "Upgrade");
+            result.headers.emplace("Upgrade", std::string());
+        result.headers.emplace("Connection", "Upgrade");
 
         m_receivedRequests.push(std::move(requestContext));
 
-        completionHandler(nx::network::http::StatusCode::switchingProtocols);
+        completionHandler(std::move(result));
     }
 
     void onUpgradeDone()
@@ -1065,7 +1070,7 @@ private:
 
                 m_authorizationReceived.push(ClientAuthorization{
                     authorization,
-                    ctx.connection->connectionStatistics.messagesReceivedCount() - 1,
+                    ctx.conn.lock()->connectionStatistics.messagesReceivedCount() - 1,
                     nonceUseCount > 1});
                 return completionHandler(StatusCode::ok);
             }
@@ -1082,7 +1087,7 @@ private:
         wwwAuthenticate.params["realm"] = "nx";
         wwwAuthenticate.params["algorithm"] = "MD5";
         wwwAuthenticate.params["qop"] = "auth";
-        ctx.response->headers.emplace(wwwAuthenticate.NAME, wwwAuthenticate.serialized());
+        result.headers.emplace(wwwAuthenticate.NAME, wwwAuthenticate.serialized());
 
         completionHandler(std::move(result));
     }
@@ -1117,7 +1122,8 @@ public:
 
 protected:
     virtual void detectProxyTarget(
-        const HttpServerConnection& /*connection*/,
+        const ConnectionAttrs&,
+        const SocketAddress&,
         Request* const request,
         ProxyTargetDetectedHandler handler)
     {

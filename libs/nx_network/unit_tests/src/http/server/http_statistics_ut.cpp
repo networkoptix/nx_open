@@ -218,7 +218,7 @@ public:
     {
         http::server::Settings settings;
         settings.endpoints.emplace_back(SocketAddress::anyPrivateAddressV4);
-        m_httpServer = http::server::Builder::buildOrThrow(settings, nullptr, &m_httpDispatcher);
+        m_httpServer = http::server::Builder::buildOrThrow(settings, &m_httpDispatcher);
         ASSERT_TRUE(m_httpServer->listen());
     }
 
@@ -345,8 +345,9 @@ TEST_F(MultiEndpointServerHttpStatistics, RequestPathStatistics_present_if_reque
     ASSERT_EQ(1, stats.requests.find("GET /1")->second.requestsServedPerMinute);
 }
 
-TEST_F(MultiEndpointServerHttpStatistics,
-RequestPathStatistics_requestsServedPerMinute_matches_aggregate_requestsServerPerMinute_while_connections_are_open)
+TEST_F(
+    MultiEndpointServerHttpStatistics,
+    RequestPathStatistics_requestsServedPerMinute_matches_aggregate_requestsServerPerMinute_while_connections_are_open)
 {
     givenGetRequestPaths({"/0", "/1"});
 
@@ -371,7 +372,7 @@ RequestPathStatistics_requestsServedPerMinute_matches_aggregate_requestsServerPe
     ASSERT_EQ(200, stats.requestsServedPerMinute);
     ASSERT_EQ(stats.requestsServedPerMinute, requestPathStatsRequestsServedPerMinute);
 
-    // Sockets must be closed after statistics are taken, because the must report correct values
+    // Sockets must be closed after statistics are taken, because we must report correct values
     // while sockets are still alive.
     socket->pleaseStopSync();
     socket2->pleaseStopSync();

@@ -68,7 +68,7 @@ private:
         ApplicationData... requestData) override;
 
     std::unique_ptr<AbstractMsgBodySource> prepareCreateDownTunnelResponse(
-        network::http::Response* response);
+        network::http::HttpHeaders* responseHeaders);
 
     void saveDownChannel(
         network::http::HttpServerConnection* connection,
@@ -126,10 +126,8 @@ network::http::RequestResult
         const RequestContext& requestContext,
         ApplicationData... requestData)
 {
-    using namespace std::placeholders;
-
-    NX_VERBOSE(this, nx::format("Open experimental tunnel. Url %1")
-        .args(requestContext.request.requestLine.url.path()));
+    NX_VERBOSE(this, "Open experimental tunnel. Url %1",
+        requestContext.request.requestLine.url.path());
 
     if (requestContext.requestPathParams.empty())
         return RequestResult(StatusCode::badRequest);
@@ -138,8 +136,7 @@ network::http::RequestResult
 
     const std::string tunnelId = requestContext.requestPathParams.getByName(kTunnelIdName);
 
-    requestResult.dataSource =
-        prepareCreateDownTunnelResponse(requestContext.response);
+    requestResult.body = prepareCreateDownTunnelResponse(&requestResult.headers);
 
     requestResult.connectionEvents.onResponseHasBeenSent =
         [this, requestData = std::make_tuple(std::move(requestData)...), tunnelId](
@@ -178,10 +175,11 @@ void SeparateUpDownConnectionsTunnelServer<ApplicationData...>::closeAllTunnels(
 template<typename ...ApplicationData>
 std::unique_ptr<AbstractMsgBodySource>
     SeparateUpDownConnectionsTunnelServer<ApplicationData...>::prepareCreateDownTunnelResponse(
-        network::http::Response* response)
+        network::http::HttpHeaders* responseHeaders)
 {
-    response->headers.emplace("Cache-Control", "no-store");
-    response->headers.emplace("Pragma", "no-cache");
+    responseHeaders->emplace("Cache-Control", "no-store");
+    responseHeaders->emplace("Pragma", "no-cache");
+
     return std::make_unique<EmptyMessageBodySource>(
         "application/octet-stream",
         10000000000ULL);

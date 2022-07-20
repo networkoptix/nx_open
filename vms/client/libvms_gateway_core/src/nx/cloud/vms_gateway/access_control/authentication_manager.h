@@ -36,15 +36,17 @@ class StreeManager;
 class AuthenticationManager:
     public nx::network::http::server::AbstractAuthenticationManager
 {
+    using base_type = nx::network::http::server::AbstractAuthenticationManager;
+
 public:
     AuthenticationManager(
+        nx::network::http::AbstractRequestHandler* requestHandler,
         const nx::network::http::AuthMethodRestrictionList& authRestrictionList,
         const nx::utils::stree::StreeManager& stree);
 
-    virtual void authenticate(
-        const nx::network::http::HttpServerConnection& connection,
-        const nx::network::http::Request& request,
-        nx::network::http::server::AuthenticationCompletionHandler completionHandler) override;
+    virtual void serve(
+        nx::network::http::RequestContext requestContext,
+        nx::utils::MoveOnlyFunc<void(nx::network::http::RequestResult)> completionHandler) override;
 
     static std::string realm();
 

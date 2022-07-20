@@ -13,7 +13,7 @@
 #include <nx/network/http/writable_message_body.h>
 #include <nx/utils/interruption_flag.h>
 
-#include "abstract_authentication_manager.h"
+#include "abstract_http_request_handler.h"
 #include "request_processing_types.h"
 
 namespace nx::network::aio { class AsyncChannelBridge; }
@@ -22,8 +22,6 @@ namespace nx::utils::stree { class AttributeDictionary; }
 namespace nx::network::http {
 
 class WritableMessageBody;
-
-namespace server { class AbstractAuthenticationManager; }
 
 namespace deprecated {
 
@@ -44,12 +42,6 @@ nx::network::server::BaseStreamProtocolConnection<
 
 class NX_NETWORK_API HttpServerConnection;
 class AbstractMessageDispatcher;
-
-using ResponseIsReadyHandler =
-    nx::utils::MoveOnlyFunc<void(
-        nx::network::http::Message,
-        std::unique_ptr<nx::network::http::AbstractMsgBodySource>,
-        ConnectionEvents)>;
 
 template<typename ConnectionType> using BaseConnection =
     nx::network::server::BaseStreamProtocolConnection<
@@ -75,8 +67,7 @@ class NX_NETWORK_API HttpServerConnection:
 public:
     HttpServerConnection(
         std::unique_ptr<AbstractStreamSocket> sock,
-        nx::network::http::server::AbstractAuthenticationManager* const authenticationManager,
-        nx::network::http::AbstractMessageDispatcher* const httpMessageDispatcher,
+        nx::network::http::AbstractRequestHandler* requestHandler,
         std::optional<SocketAddress> addressToRedirect = std::nullopt);
     virtual ~HttpServerConnection();
 
@@ -129,6 +120,8 @@ public:
      */
     std::size_t pendingResponseCount() const;
 
+    const ConnectionAttrs& attrs() const;
+
 protected:
     virtual void processMessage(nx::network::http::Message request) override;
     virtual void processSomeMessageBody(nx::Buffer buffer) override;
@@ -180,9 +173,9 @@ private:
         }
     };
 
-    nx::network::http::server::AbstractAuthenticationManager* const m_authenticationManager = nullptr;
-    nx::network::http::AbstractMessageDispatcher* const m_httpMessageDispatcher = nullptr;
+    nx::network::http::AbstractRequestHandler* m_requestHandler = nullptr;
     std::optional<SocketAddress> m_addressToRedirect;
+    const ConnectionAttrs m_attrs;
     std::unique_ptr<nx::network::http::AbstractMsgBodySource> m_currentMsgBody;
     std::optional<ChunkedStreamParser> m_chunkedBodyParser;
     bool m_isPersistent = false;
@@ -204,22 +197,10 @@ private:
     void extractClientEndpointFromXForwardedHeader(const HttpHeaders& headers);
     void extractClientEndpointFromForwardedHeader(const HttpHeaders& headers);
 
-    void authenticate(std::unique_ptr<RequestAuthContext> requestContext);
-
-    void onAuthenticationDone(
-        nx::network::http::server::AuthenticationResult authenticationResult,
-        std::unique_ptr<RequestAuthContext> requestContext);
-
     std::unique_ptr<RequestAuthContext> prepareRequestAuthContext(
         nx::network::http::Request request);
 
-    void sendUnauthorizedResponse(
-        std::unique_ptr<RequestAuthContext> requestContext,
-        nx::network::http::server::AuthenticationResult authenticationResult);
-
-    void dispatchRequest(
-        std::unique_ptr<RequestAuthContext> requestContext,
-        nx::network::http::server::AuthenticationResult authenticationResult);
+    void invokeRequestHandler(std::unique_ptr<RequestAuthContext> requestContext);
 
     void processResponse(
         std::shared_ptr<HttpServerConnection> strongThis,
@@ -243,9 +224,7 @@ private:
         nx::network::http::Response* response,
         nx::network::http::AbstractMsgBodySource* responseMsgBody);
 
-    RequestContext buildRequestContext(
-        RequestAuthContext requestAuthContext,
-        server::AuthenticationResult authenticationResult);
+    RequestContext buildRequestContext(RequestAuthContext requestAuthContext);
 
     void sendNextResponse();
     void responseSent(const time_point& requestReceivedTime);

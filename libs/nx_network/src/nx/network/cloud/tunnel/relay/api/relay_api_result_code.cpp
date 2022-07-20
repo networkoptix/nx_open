@@ -19,6 +19,7 @@ hpm::api::NatTraversalResultCode toNatTraversalResultCode(
 
         case ResultCode::timedOut:
         case ResultCode::networkError:
+        case ResultCode::notAuthorized:
             return hpm::api::NatTraversalResultCode::errorConnectingToRelay;
 
         default:

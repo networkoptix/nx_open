@@ -171,6 +171,7 @@ using Relays = std::map<std::string /*relay name*/, Relay>;
 
 struct GetServerAliasResponse
 {
+    /**%apidoc Alias that can be used to refer the corresponding server. */
     std::string alias;
 };
 

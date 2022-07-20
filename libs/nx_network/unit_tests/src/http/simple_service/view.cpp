@@ -8,10 +8,12 @@
 
 namespace nx::network::http::server::test {
 
-View::View(const Settings& settings): m_settings(settings)
+View::View(const Settings& settings):
+    m_authenticationDispatcher(&m_httpMessageDispatcher),
+    m_settings(settings)
 {
     m_multiAddressHttpServer = nx::network::http::server::Builder::buildOrThrow(
-        m_settings.getHttpSettings(), &m_authenticationDispatcher, &m_httpMessageDispatcher);
+        m_settings.getHttpSettings(), &m_authenticationDispatcher);
 
     m_httpMessageDispatcher.registerRequestProcessorFunc(
         nx::network::http::Method::get, kHandlerPath, [this](auto&&... args) {

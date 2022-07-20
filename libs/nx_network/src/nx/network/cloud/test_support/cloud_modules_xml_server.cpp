@@ -80,8 +80,7 @@ void CloudModulesXmlServer::serve(
     network::http::RequestProcessedHandler handler)
 {
     network::http::RequestResult result(network::http::StatusCode::ok);
-    result.dataSource =
-        std::make_unique<network::http::BufferSource>("application/xml", xml());
+    result.body = std::make_unique<network::http::BufferSource>("application/xml", xml());
 
     handler(std::move(result));
 }

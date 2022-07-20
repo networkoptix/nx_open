@@ -30,7 +30,7 @@ public:
     void buildServer()
     {
         SystemError::ErrorCode err = SystemError::noError;
-        std::tie(m_server, err) = Builder::build(settings(), nullptr, nullptr);
+        std::tie(m_server, err) = Builder::build(settings(), /*request handler*/ nullptr);
         ASSERT_EQ(SystemError::noError, err) << SystemError::toString(err);
         ASSERT_NE(nullptr, m_server);
     }

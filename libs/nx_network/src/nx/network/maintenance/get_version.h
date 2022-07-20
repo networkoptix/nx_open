@@ -25,7 +25,7 @@ NX_NETWORK_API Version getVersion();
 // GetVersion
 
 class GetVersion:
-    public http::AbstractHttpRequestHandler
+    public http::RequestHandlerWithContext
 {
 protected:
     virtual void processRequest(

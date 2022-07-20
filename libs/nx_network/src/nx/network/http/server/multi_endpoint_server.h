@@ -30,13 +30,11 @@ class MultiEndpointServer:
 public:
     template<typename... Args>
     MultiEndpointServer(
-        AbstractAuthenticationManager* authenticator,
-        rest::MessageDispatcher* messageDispatcher,
+        AbstractRequestHandler* requestHandler,
         Args&&... args)
         :
         base_type(
-            authenticator,
-            messageDispatcher,
+            requestHandler,
             std::forward<Args>(args)...)
     {
     }
@@ -123,13 +121,11 @@ class MultiEndpointSslServer:
 
 public:
     MultiEndpointSslServer(
-        AbstractAuthenticationManager* authenticator,
-        rest::MessageDispatcher* messageDispatcher,
+        AbstractRequestHandler* requestHandler,
         std::unique_ptr<HttpsServerContext> httpsContext)
         :
         base_type(
-            authenticator,
-            messageDispatcher,
+            requestHandler,
             httpsContext ? &httpsContext->context() : ssl::Context::instance()),
         m_httpsContext(std::move(httpsContext))
     {

@@ -34,7 +34,7 @@ public:
 };
 
 class VmsGatewayProxyTestHandler:
-    public nx::network::http::AbstractHttpRequestHandler
+    public nx::network::http::RequestHandlerWithContext
 {
 public:
     VmsGatewayProxyTestHandler(std::optional<bool> securityExpectation):
@@ -50,7 +50,7 @@ public:
 
         if (m_securityExpectation)
         {
-            EXPECT_EQ(*m_securityExpectation, requestContext.connection->isSsl());
+            EXPECT_EQ(*m_securityExpectation, requestContext.connectionAttrs.isSsl);
         }
 
         QUrlQuery requestQuery(requestContext.request.requestLine.url.query());
@@ -58,24 +58,23 @@ public:
         if (requestContext.request.requestLine.url.path() == testPath &&
             requestQuery.hasQueryItem(testQuery))
         {
-            std::unique_ptr<http::AbstractMsgBodySource> bodySource;
+            http::RequestResult result(http::StatusCode::ok);
             if (requestQuery.hasQueryItem("chunked"))
             {
-                requestContext.response->headers.emplace("Transfer-Encoding", "chunked");
-                bodySource = std::make_unique<http::BufferSource>(testMsgContentType,
+                result.headers.emplace("Transfer-Encoding", "chunked");
+                result.body = std::make_unique<http::BufferSource>(testMsgContentType,
                     http::QnChunkedTransferEncoder::serializeSingleChunk(testMsgBody)+"0\r\n\r\n");
             }
             else if (requestQuery.hasQueryItem("undefinedContentLength"))
             {
-                bodySource = std::make_unique<UndefinedContentLengthBufferSource>();
+                result.body = std::make_unique<UndefinedContentLengthBufferSource>();
             }
             else
             {
-                bodySource = std::make_unique<http::BufferSource>(testMsgContentType, testMsgBody);
+                result.body = std::make_unique<http::BufferSource>(testMsgContentType, testMsgBody);
             }
 
-            completionHandler(http::RequestResult(
-                http::StatusCode::ok, std::move(bodySource)));
+            completionHandler(std::move(result));
         }
         else
         {

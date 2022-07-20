@@ -284,7 +284,7 @@ private:
         m_resourceStorage.setAuditFunc(
             [this](const RequestContext& requestContext)
             {
-                registerSocket(requestContext.connection->socket().get());
+                registerSocket(requestContext.conn.lock()->socket().get());
             });
 
         m_resourceStorage.registerHttpHandlers(
@@ -336,7 +336,7 @@ private:
 
         handler(StatusCode::ok);
 
-        registerSocket(requestContext.connection->socket().get());
+        registerSocket(requestContext.conn.lock()->socket().get());
     }
 
     void sendResourceWithoutContentLength(
@@ -349,13 +349,11 @@ private:
             return handler(StatusCode::notFound);
 
         RequestResult result(StatusCode::ok);
-        result.dataSource = std::make_unique<BodyWithoutContentLengthSource>(
-            "text/plain",
-            *resource);
+        result.body = std::make_unique<BodyWithoutContentLengthSource>("text/plain", *resource);
 
         handler(std::move(result));
 
-        registerSocket(requestContext.connection->socket().get());
+        registerSocket(requestContext.conn.lock()->socket().get());
     }
 
     void saveBody(std::unique_ptr<AbstractMsgBodySourceWithCache> body)

@@ -19,7 +19,7 @@ struct RequestContext
 };
 
 class DummyHandler:
-    public nx::network::http::AbstractHttpRequestHandler
+    public nx::network::http::RequestHandlerWithContext
 {
 public:
     DummyHandler(
@@ -125,7 +125,8 @@ protected:
         ASSERT_FALSE(
             m_messageDispatcher->dispatchRequest(
                 RequestContext(
-                    nullptr,
+                    {},
+                    {},
                     SocketAddress(),
                     nx::utils::stree::AttributeDictionary(),
                     prepareDummyRequest(method, path)),
@@ -146,7 +147,8 @@ protected:
         ASSERT_TRUE(
             m_messageDispatcher->dispatchRequest(
                 RequestContext(
-                    nullptr,
+                    ConnectionAttrs{},
+                    std::weak_ptr<http::HttpServerConnection>{},
                     SocketAddress(),
                     nx::utils::stree::AttributeDictionary(),
                     prepareDummyRequest(method, path)),

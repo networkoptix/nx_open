@@ -6,8 +6,8 @@
 
 namespace nx::cloud::gateway {
 
-SocketResourceReader::SocketResourceReader(const network::AbstractCommunicatingSocket& sock):
-    m_socket(sock)
+SocketResourceReader::SocketResourceReader(const nx::network::http::ConnectionAttrs& attrs):
+    m_attrs(attrs)
 {
 }
 
@@ -15,9 +15,9 @@ std::optional<std::string> SocketResourceReader::getStr(
     const nx::utils::stree::AttrName& name) const
 {
     if (name == attr::socketIntfIP)
-        return m_socket.getLocalAddress().address.toString();
+        return m_attrs.localAddr.address.toString();
     else if (name == attr::socketRemoteIP)
-        return m_socket.getForeignAddress().address.toString();
+        return m_attrs.sourceAddr.address.toString();
 
     return std::nullopt;
 }

@@ -30,28 +30,36 @@ namespace gateway {
 using namespace nx::network::http;
 
 AuthenticationManager::AuthenticationManager(
+    nx::network::http::AbstractRequestHandler* requestHandler,
     const nx::network::http::AuthMethodRestrictionList& authRestrictionList,
     const nx::utils::stree::StreeManager& stree)
 :
+    base_type(requestHandler),
     m_authRestrictionList(authRestrictionList),
     m_stree(stree),
     m_dist(0, std::numeric_limits<size_t>::max())
 {
 }
 
-void AuthenticationManager::authenticate(
-    const nx::network::http::HttpServerConnection& connection,
-    const nx::network::http::Request& request,
-    nx::network::http::server::AuthenticationCompletionHandler completionHandler)
+void AuthenticationManager::serve(
+    nx::network::http::RequestContext ctx,
+    nx::utils::MoveOnlyFunc<void(nx::network::http::RequestResult)> completionHandler)
 {
-    nx::network::http::server::AuthenticationResult authenticationResult;
+    nx::network::http::RequestResult authenticationResult(
+        nx::network::http::StatusCode::unauthorized);
     auto scopedGuard = nx::utils::makeScopeGuard(
-        [&authenticationResult, &completionHandler]() mutable
+        [this, &ctx, &authenticationResult, &completionHandler]() mutable
         {
+            if (authenticationResult.statusCode == nx::network::http::StatusCode::ok)
+            {
+                nextHandler()->serve(std::move(ctx), std::move(completionHandler));
+                return;
+            }
+
             completionHandler(std::move(authenticationResult));
         });
 
-    const auto allowedAuthMethods = m_authRestrictionList.getAllowedAuthMethods(request);
+    const auto allowedAuthMethods = m_authRestrictionList.getAllowedAuthMethods(ctx.request);
     if (allowedAuthMethods & AuthMethod::noAuth)
     {
         authenticationResult.statusCode = nx::network::http::StatusCode::ok;
@@ -63,11 +71,11 @@ void AuthenticationManager::authenticate(
         return;
     }
 
-    const auto authHeaderIter = request.headers.find(header::Authorization::NAME);
+    const auto authHeaderIter = ctx.request.headers.find(header::Authorization::NAME);
 
     //checking header
     std::optional<header::DigestAuthorization> authHeader;
-    if (authHeaderIter != request.headers.end())
+    if (authHeaderIter != ctx.request.headers.end())
     {
         authHeader.emplace(header::DigestAuthorization());
         if (!authHeader->parse(authHeaderIter->second))
@@ -79,8 +87,8 @@ void AuthenticationManager::authenticate(
     nx::utils::stree::AttributeDictionary inputRes;
     if (authHeader && !authHeader->userid().empty())
         inputRes.putStr(attr::userName, authHeader->userid());
-    SocketResourceReader socketResources(*connection.socket());
-    HttpRequestResourceReader httpRequestResources(request);
+    SocketResourceReader socketResources(ctx.connectionAttrs);
+    HttpRequestResourceReader httpRequestResources(ctx.request);
     const auto authSearchInputData = nx::utils::stree::makeMultiReader(
         socketResources,
         httpRequestResources,
@@ -100,7 +108,7 @@ void AuthenticationManager::authenticate(
         (authHeader->userid().empty()) ||
         !validateNonce(authHeader->digest->params["nonce"]))
     {
-        authenticationResult.responseHeaders.emplace(
+        authenticationResult.headers.emplace(
             nx::network::http::header::WWWAuthenticate::NAME,
             prepareWWWAuthenticateHeader().serialized());
         authenticationResult.statusCode = nx::network::http::StatusCode::unauthorized;
@@ -110,9 +118,9 @@ void AuthenticationManager::authenticate(
     const auto userID = authHeader->userid();
 
     auto validateHa1Func =
-        [&request, &userID, &authHeader](const nx::Buffer& buffer) -> bool
+        [&ctx, &userID, &authHeader](const nx::Buffer& buffer) -> bool
         {
-            return validateAuthorization(request.requestLine.method, userID, {}, buffer,
+            return validateAuthorization(ctx.request.requestLine.method, userID, {}, buffer,
                 std::move(*authHeader));
         };
 

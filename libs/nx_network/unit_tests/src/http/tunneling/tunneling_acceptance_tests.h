@@ -341,7 +341,7 @@ private:
             m_lastOpenTunnelRequestReceivedByServer = requestContext->request;
         }
 
-        completionHandler(StatusCode::ok);
+        completionHandler(StatusCode::ok, {});
     }
 
     void startHttpServer()

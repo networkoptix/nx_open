@@ -30,13 +30,15 @@ static constexpr char kDefaultPath[]{"/test"};
 
 } // namespace
 
-class BaseAuthenticationManager: public ::testing::Test
+class BaseAuthenticationManager:
+    public ::testing::Test
 {
 public:
-    BaseAuthenticationManager()
-        :
-        m_authManager(&m_credsProvider)
+    BaseAuthenticationManager():
+        m_authManager(nullptr, &m_credsProvider)
     {
+        m_authManager.setNextHandler(&m_httpServer.httpMessageDispatcher());
+
         m_credsProvider.addCredentials(kDefaultCredentials);
 
         m_httpServer.authDispatcher().add(

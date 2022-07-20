@@ -214,15 +214,15 @@ void UplinkSpeedReporter::onSpeedTestComplete(
 }
 
 void UplinkSpeedReporter::onFetchMediatorAddressComplete(
-        http::StatusCode::Value statusCode,
-        hpm::api::MediatorAddress mediatorAddress,
-        hpm::api::PeerConnectionSpeed peerConnectionSpeed)
+    http::StatusCode::Value statusCode,
+    hpm::api::MediatorAddress mediatorAddress,
+    hpm::api::PeerConnectionSpeed peerConnectionSpeed)
 {
     NX_VERBOSE(this,
         "Fetched Mediator adress, http status code = %1, mediator address = {%2}",
         http::StatusCode::toString(statusCode), mediatorAddress);
 
-    if(m_fetchMediatorAddressHandler)
+    if (m_fetchMediatorAddressHandler)
         m_fetchMediatorAddressHandler(statusCode, mediatorAddress);
 
     if (!http::StatusCode::isSuccessCode(statusCode))
@@ -233,9 +233,15 @@ void UplinkSpeedReporter::onFetchMediatorAddressComplete(
 
     if (!m_mediatorApiClient)
     {
-        m_mediatorApiClient = std::make_unique<hpm::api::Client>(
-            url::Builder(mediatorAddress.tcpUrl).setScheme(http::kUrlSchemeName),
-            ssl::kDefaultCertificateCheck);
+        auto url = url::Builder(mediatorAddress.tcpUrl).setScheme(http::kUrlSchemeName);
+        const auto systemCredentials = m_mediatorConnector->getSystemCredentials();
+        if (systemCredentials)
+        {
+            url.setUserName(systemCredentials->systemId);
+            url.setPassword(systemCredentials->key);
+        }
+
+        m_mediatorApiClient = std::make_unique<hpm::api::Client>(url, ssl::kDefaultCertificateCheck);
     }
 
     NX_VERBOSE(this, "Reporting PeerConnectionSpeed %1 to Mediator...", peerConnectionSpeed);
