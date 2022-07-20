@@ -16,6 +16,24 @@
 
 namespace nx::vms::rules::test {
 
+namespace {
+
+void addStateField(State state, EventFilter* filter)
+{
+    auto stateField = std::make_unique<StateField>();
+    stateField->setValue(state);
+    filter->addField(utils::kStateFieldName, std::move(stateField));
+}
+
+void addTextField(const QString& text, EventFilter* filter)
+{
+    auto field = std::make_unique<EventTextField>();
+    field->setValue(text);
+    filter->addField("text", std::move(field));
+}
+
+} // namespace
+
 class EventFilterTest: public ::testing::Test
 {
 protected:
@@ -97,9 +115,7 @@ TEST_F(EventFilterTest, oneEventFieldMismatchToFilterFieldTest)
 TEST(EventFilterProlongedEventTest, eventFilterHandlesStartedProlongedEventProperly)
 {
     auto filter = std::make_unique<EventFilter>(QnUuid::createUuid(), "nx.events.test");
-    auto stateField = std::make_unique<StateField>();
-    stateField->setValue(State::started);
-    filter->addField(utils::kStateFieldName, std::move(stateField));
+    addStateField(State::started, filter.get());
 
     EventPtr event(new TestEvent{{}, State::started});
 
@@ -119,9 +135,7 @@ TEST(EventFilterProlongedEventTest, eventFilterHandlesStartedProlongedEventPrope
 TEST(EventFilterProlongedEventTest, eventFilterHandlesStoppedProlongedEventProperly)
 {
     auto filter = std::make_unique<EventFilter>(QnUuid::createUuid(), "nx.events.test");
-    auto stateField = std::make_unique<StateField>();
-    stateField->setValue(State::stopped);
-    filter->addField(utils::kStateFieldName, std::move(stateField));
+    addStateField(State::stopped, filter.get());
 
     EventPtr event(new TestEvent{{}, State::stopped});
 
@@ -137,10 +151,32 @@ TEST(EventFilterProlongedEventTest, eventFilterHandlesStoppedProlongedEventPrope
     ASSERT_FALSE(filter->match(event));
 }
 
+TEST(EventFilterProlongedEventTest, filteredOutEventIsNotRunning)
+{
+    auto filter = std::make_unique<EventFilter>(QnUuid::createUuid(), "nx.events.test");
+    addStateField(State::started, filter.get());
+    addTextField("a", filter.get());
+
+    auto eventA = TestEventPtr::create(std::chrono::microseconds::zero(), State::started);
+    eventA->m_text = "a";
+
+    auto eventB = TestEventPtr::create(std::chrono::microseconds::zero(), State::started);
+    eventB->m_text = "b";
+
+    ASSERT_EQ(eventA->resourceKey(), eventB->resourceKey());
+
+    // Event doesn't match, and resource key is not stored.
+    ASSERT_FALSE(filter->match(eventB));
+
+    // Matched event is stored and double start is prevented.
+    ASSERT_TRUE(filter->match(eventA));
+    ASSERT_FALSE(filter->match(eventA));
+}
+
 TEST(EventFilterCacheTest, cacheKey)
 {
     auto filter = std::make_unique<EventFilter>(QnUuid::createUuid(), "nx.events.test");
-    filter->addField("text", std::make_unique<EventTextField>());
+    addTextField({}, filter.get());
 
     auto event = TestEventPtr::create();
     event->m_text = "text";
@@ -165,7 +201,7 @@ TEST(EventFilterCacheTest, cacheTimeout)
     using namespace std::chrono;
 
     auto filter = std::make_unique<EventFilter>(QnUuid::createUuid(), "nx.events.test");
-    filter->addField("text", std::make_unique<EventTextField>());
+    addTextField({}, filter.get());
 
     auto event = TestEventPtr::create();
     event->m_text = "text";

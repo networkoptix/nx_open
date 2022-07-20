@@ -32,6 +32,11 @@ QString CameraInputEvent::resourceKey() const
     return makeName(CameraEvent::resourceKey(), m_inputPortId);
 }
 
+QString CameraInputEvent::aggregationKey() const
+{
+    return CameraEvent::resourceKey();
+}
+
 QVariantMap CameraInputEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);

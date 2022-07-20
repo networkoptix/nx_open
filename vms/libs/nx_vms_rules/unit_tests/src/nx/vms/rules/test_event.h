@@ -39,6 +39,8 @@ public:
         };
     }
 
+    using BasicEvent::BasicEvent;
+
     virtual QString uniqueName() const override
     {
         return makeName(BasicEvent::uniqueName(), m_cameraId.toSimpleString());
@@ -58,8 +60,6 @@ public:
     {
         m_cacheKey = cacheKey;
     }
-
-    using BasicEvent::BasicEvent;
 
     QnUuid m_serverId;
     QnUuid m_cameraId;

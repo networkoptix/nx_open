@@ -31,6 +31,7 @@ public:
 
     virtual QString uniqueName() const override;
     virtual QString resourceKey() const override;
+    virtual QString aggregationKey() const override;
     virtual QString cacheKey() const override;
     virtual QVariantMap details(common::SystemContext* context) const override;
 

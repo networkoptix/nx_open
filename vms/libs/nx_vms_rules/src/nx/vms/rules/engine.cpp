@@ -9,6 +9,7 @@
 #include <nx/utils/qobject.h>
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/rules/ini.h>
+#include <utils/common/synctime.h>
 
 #include "action_builder.h"
 #include "action_executor.h"
@@ -757,6 +758,12 @@ void Engine::processAcceptedEvent(const QnUuid& ruleId, const EventData& eventDa
         return;
 
     const auto& rule = it->second;
+
+    if (!rule->timeInSchedule(qnSyncTime->currentDateTime()))
+    {
+        NX_VERBOSE(this, "Time is not in rule schedule, skipping the event.");
+        return;
+    }
 
     auto event = buildEvent(eventData);
     if (!NX_ASSERT(event))
