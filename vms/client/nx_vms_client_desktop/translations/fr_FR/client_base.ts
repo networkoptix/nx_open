@@ -10157,7 +10157,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
     <message>
       <source>View certificate</source>
-      <translation>Voir le certificat</translation>
+      <translation>Afficher le certificat</translation>
     </message>
     <message>
       <source>Connect Anyway</source>
