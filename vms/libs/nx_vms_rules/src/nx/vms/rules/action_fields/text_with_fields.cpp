@@ -99,8 +99,8 @@ QString eventTooltip(const AggregatedEventPtr& eventAggregator, common::SystemCo
         result << stringsHelper.timestamp(eventAggregator->timestamp(), count.value<size_t>());
 
     const auto detailing = details.value(utils::kDetailingDetailName);
-    if (detailing.canConvert<QString>())
-        result << detailing.toString();
+    if (detailing.canConvert<QStringList>())
+        result << detailing.toStringList();
 
     return result.join(common::html::kLineBreak);
 }
