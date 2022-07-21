@@ -21,9 +21,7 @@ struct NX_VMS_API StoragePurgeStatusData
 
     struct LastPurgeData
     {
-        /**%apidoc:integer */
         std::chrono::system_clock::time_point started{std::chrono::milliseconds{-1}};
-        /**%apidoc:integer */
         std::chrono::milliseconds elapsed{-1};
 
         bool isNull() const { return started.time_since_epoch() == std::chrono::milliseconds(-1); }

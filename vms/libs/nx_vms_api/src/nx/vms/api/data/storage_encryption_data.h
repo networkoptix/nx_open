@@ -37,7 +37,7 @@ struct NX_VMS_API AesKeyData
      */
     std::string ivVect;
 
-    /**%apidoc:integer Issue date. */
+    /**%apidoc Issue date. */
     std::chrono::microseconds issueDateUs{};
 
     /**%apidoc[opt] New archive will be recorded with this password if the value is true. */
