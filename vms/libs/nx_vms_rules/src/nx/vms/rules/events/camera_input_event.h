@@ -10,6 +10,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API CameraInputEvent: public CameraEvent
 {
     Q_OBJECT
+    using base_type = CameraEvent;
     Q_CLASSINFO("type", "nx.events.cameraInput")
 
     FIELD(QString, inputPortId, setInputPortId)

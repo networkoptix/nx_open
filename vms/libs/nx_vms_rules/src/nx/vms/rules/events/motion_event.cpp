@@ -19,7 +19,7 @@ MotionEvent::MotionEvent(std::chrono::microseconds timestamp, State state, QnUui
 
 QVariantMap MotionEvent::details(common::SystemContext* context) const
 {
-    auto result = BasicEvent::details(context);
+    auto result = base_type::details(context);
 
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
     result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
@@ -37,8 +37,7 @@ const ItemDescriptor& MotionEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = "nx.events.motion",
-        .displayName = tr("Motion Event"),
-        .description = "",
+        .displayName = tr("Motion on Camera"),
         .flags = ItemFlag::prolonged,
         .fields = {
             utils::makeStateFieldDescriptor(tr("State")),
