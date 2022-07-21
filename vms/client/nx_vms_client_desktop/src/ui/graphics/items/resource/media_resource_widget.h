@@ -50,6 +50,7 @@ class RoiFiguresOverlayWidget;
 class WatermarkPainter;
 class SoftwareTriggerButton;
 class EncryptedArchivePasswordDialog;
+class CameraHotspotsOverlayWidget;
 
 } // namespace nx::vms::client::desktop
 
@@ -442,6 +443,7 @@ private:
     void initAreaSelectOverlay();
     void initAnalyticsOverlays();
     void initStatusOverlayController();
+    void initCameraHotspotsOverlay();
 
     void createTrigger(const SoftwareTriggerInfo& info);
 
@@ -519,6 +521,8 @@ private:
     nx::vms::client::desktop::EncryptedArchivePasswordDialog*
         m_encryptedArchivePasswordDialog = nullptr;
     mutable QByteArray m_encryptedArchiveData;
+
+    nx::vms::client::desktop::CameraHotspotsOverlayWidget* m_cameraHotspotsOverlayWidget = nullptr;
 
     AreaType m_areaSelectionType{AreaType::none};
     QRectF m_analyticsFilterRect;

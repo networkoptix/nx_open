@@ -403,6 +403,16 @@ void CameraSettingsDialogStore::setAudioOutputDeviceId(const QnUuid& deviceId)
         [&](State state) { return Reducer::setAudioOutputDeviceId(std::move(state), deviceId); });
 }
 
+void CameraSettingsDialogStore::setCameraHotspotsData(
+    const nx::vms::common::CameraHotspotDataList & cameraHotspots)
+{
+    d->executeAction(
+        [&](State state)
+        {
+            return Reducer::setCameraHotspotsData(std::move(state), cameraHotspots);
+        });
+}
+
 void CameraSettingsDialogStore::setMotionDetectionEnabled(bool value)
 {
     d->executeAction(

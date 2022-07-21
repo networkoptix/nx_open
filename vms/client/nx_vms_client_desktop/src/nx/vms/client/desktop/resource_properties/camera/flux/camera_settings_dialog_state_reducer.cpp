@@ -8,13 +8,13 @@
 #include <QtCore/QUrlQuery>
 
 #include <camera/fps_calculator.h>
-#include <client_core/client_core_module.h>
 #include <client/client_module.h>
+#include <client_core/client_core_module.h>
 #include <common/common_module.h>
-#include <core/resource_management/resource_data_pool.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_display_info.h>
+#include <core/resource_management/resource_data_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/analytics/utils.h>
 #include <nx/network/http/http_types.h>
 #include <nx/reflect/json/serializer.h>
@@ -27,6 +27,7 @@
 #include <nx/vms/client/desktop/analytics/analytics_settings_manager.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx/vms/common/utils/camera_hotspots_support.h>
 #include <utils/camera/camera_bitrate_calculator.h>
 
 #include "../camera_advanced_parameters_manifest_manager.h"
@@ -835,6 +836,9 @@ State loadSingleCameraProperties(
         && state.singleCameraSettings.primaryStream().isEmpty()
         && state.singleCameraSettings.secondaryStream().isEmpty();
 
+    singleProperties.supportsCameraHotspots =
+        nx::vms::common::camera_hotspots::supportsCameraHotspots(singleCamera);
+
     state.recording.defaultStreamResolution = singleCamera->streamInfo().getResolution();
     state.recording.mediaStreamCapability = singleCamera->cameraMediaCapability().
         streamCapabilities.value(StreamIndex::primary);
@@ -904,6 +908,9 @@ State loadSingleCameraProperties(
 
     state.singleCameraSettings.audioInputDeviceId = singleCamera->audioInputDeviceId();
     state.singleCameraSettings.audioOutputDeviceId = singleCamera->audioOutputDeviceId();
+
+    if (state.singleCameraProperties.supportsCameraHotspots)
+        state.singleCameraSettings.cameraHotspots = singleCamera->getCameraHotspots();
 
     return state;
 }
@@ -2051,6 +2058,23 @@ State CameraSettingsDialogStateReducer::setAudioOutputDeviceId(State state, cons
         return state;
 
     state.singleCameraSettings.audioOutputDeviceId = deviceId;
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setCameraHotspotsData(
+    State state,
+    const nx::vms::common::CameraHotspotDataList& cameraHotspots)
+{
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, nx::reflect::json::serialize(cameraHotspots));
+
+    if (!state.isSingleCamera())
+        return state;
+
+    if (state.singleCameraSettings.cameraHotspots == cameraHotspots)
+        return state;
+
+    state.singleCameraSettings.cameraHotspots = cameraHotspots;
     state.hasChanges = true;
     return state;
 }

@@ -109,6 +109,8 @@ public:
     static State setAudioInputDeviceId(State state, const QnUuid& deviceId);
     static State setTwoWayAudioEnabled(State state, bool value);
     static State setAudioOutputDeviceId(State state, const QnUuid& deviceId);
+    static State setCameraHotspotsData(State state,
+        const nx::vms::common::CameraHotspotDataList& cameraHotspots);
 
     /** User clicked on "Motion detection" checkbox. */
     static State setMotionDetectionEnabled(State state, bool value);

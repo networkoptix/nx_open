@@ -8,12 +8,14 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/client_camera.h>
 #include <core/resource/resource_display_info.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/vms/api/types/motion_types.h>
 #include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/client/core/motion/motion_grid.h>
+#include <nx/vms/common/utils/camera_hotspots_support.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/widgets/views/resource_list_view.h>
 
@@ -454,6 +456,26 @@ void setAudioOutputDeviceId(const QnUuid& deviceId, const QnVirtualCameraResourc
         camera->setAudioOutputDeviceId(deviceId);
 }
 
+void setCameraHotspots(
+    const nx::vms::common::CameraHotspotDataList& cameraHotspots,
+    const QnVirtualCameraResourcePtr& camera)
+{
+    const auto resourcePool = camera->resourcePool();
+
+    nx::vms::common::CameraHotspotDataList validHotspots;
+    std::copy_if(cameraHotspots.begin(), cameraHotspots.end(), std::back_inserter(validHotspots),
+        [resourcePool](const nx::vms::common::CameraHotspotData& cameraHotspot)
+        {
+            if (!cameraHotspot.isValid())
+                return false;
+
+            const auto hotspotCamera = resourcePool->getResourceById(cameraHotspot.cameraId);
+            return nx::vms::common::camera_hotspots::hotspotCanReferToCamera(hotspotCamera);
+        });
+
+    camera->setCameraHotspots(validHotspots);
+}
+
 void setCredentials(const QnVirtualCameraResourcePtr& camera, const QAuthenticator& authenticator)
 {
     if ((camera->isMultiSensorCamera() || camera->isNvr()) && !camera->getGroupId().isEmpty())
@@ -577,6 +599,9 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
 
         setAudioInputDeviceId(state.singleCameraSettings.audioInputDeviceId, camera);
         setAudioOutputDeviceId(state.singleCameraSettings.audioOutputDeviceId, camera);
+
+        if (state.singleCameraProperties.supportsCameraHotspots)
+            setCameraHotspots(state.singleCameraSettings.cameraHotspots, camera);
     }
 
     if (state.devicesDescription.isVirtualCamera == CombinedValue::All)

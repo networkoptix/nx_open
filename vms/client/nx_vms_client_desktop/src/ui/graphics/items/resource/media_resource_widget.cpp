@@ -38,6 +38,7 @@
 #include <core/resource/client_camera.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/media_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
@@ -128,6 +129,7 @@
 #include <utils/common/synctime.h>
 #include <utils/math/color_transformations.h>
 #include <utils/media/sse_helper.h>
+#include <nx/vms/client/desktop/ui/graphics/items/overlays/camera_hotspots_overlay_widget.h>
 
 using namespace std::chrono;
 
@@ -393,6 +395,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(
     /* Set up buttons. */
     createButtons();
     initStatusOverlayController();
+
+    initCameraHotspotsOverlay();
 
     // TODO: #sivanov Get rid of resourceChanged.
     connect(base_type::resource().get(), &QnResource::resourceChanged, this,
@@ -728,6 +732,32 @@ void QnMediaResourceWidget::initStatusOverlayController()
                  ->instance<DefaultPasswordCamerasWatcher>();
              changeCameraPassword(passwordWatcher->camerasWithDefaultPassword().values(), true);
          });
+}
+
+void QnMediaResourceWidget::initCameraHotspotsOverlay()
+{
+    if (!ini().enableCameraHotspotsFeature)
+        return;
+
+    m_cameraHotspotsOverlayWidget = new CameraHotspotsOverlayWidget();
+
+    addOverlayWidget(m_cameraHotspotsOverlayWidget, {UserVisible, OverlayFlag::none, InfoLayer});
+    m_cameraHotspotsOverlayWidget->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+
+    if (const auto camera = resource().dynamicCast<QnVirtualCameraResource>())
+    {
+        const auto initHotspots =
+            [this, camera]
+            {
+                m_cameraHotspotsOverlayWidget->initHotspots(
+                    windowContext()->workbenchContext(),
+                    camera,
+                    camera->getCameraHotspots());
+            };
+
+        connect(camera.get(), &QnVirtualCameraResource::cameraHotspotsChanged, initHotspots);
+        initHotspots();
+    }
 }
 
 QnMediaResourceWidget::AreaType QnMediaResourceWidget::areaSelectionType() const

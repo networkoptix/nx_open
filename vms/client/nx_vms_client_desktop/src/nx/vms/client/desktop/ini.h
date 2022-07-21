@@ -262,6 +262,10 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, enableMultiSystemTabBar,
         "[Feature] Enable double layer tab bar.");
 
+    // VMS-34514
+    NX_INI_FLAG(false, enableCameraHotspotsFeature,
+        "[Feature] Makes Camera Hotspots feature available in the client.");
+
     // ---------------------------------------------------------------------------------------------
     // Support section.
     // Flags here can be removed when support engineers decide whether to discard the flag or move
