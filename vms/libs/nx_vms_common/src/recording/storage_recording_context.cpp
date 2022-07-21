@@ -106,7 +106,11 @@ void StorageRecordingContext::allocateFfmpegObjects(
             for (int i = 0; i < videoLayout->channelCount(); ++i)
             {
                 auto codecParams = getVideoCodecParameters(videoData);
+                if (!codecParams)
+                    throw ErrorEx(Error::Code::incompatibleCodec, "No video codec parameters");
                 auto avCodecParams = codecParams->getAvCodecParameters();
+                if (!avCodecParams)
+                    throw ErrorEx(Error::Code::invalidAudioCodec, "Invalid audio codec");
                 if (!nx::media::fillExtraData(
                     videoData.get(), &avCodecParams->extradata, &avCodecParams->extradata_size))
                 {
@@ -127,6 +131,8 @@ void StorageRecordingContext::allocateFfmpegObjects(
         for (const auto& track: audioLayout->tracks())
         {
             auto codecParameters = getAudioCodecParameters(track.codecParams, m_container);
+            if (!codecParameters)
+                throw ErrorEx(Error::Code::invalidAudioCodec, "Invalid audio codec");
             if (!helpers::addStream(codecParameters, context.formatCtx))
             {
                 throw ErrorEx(
