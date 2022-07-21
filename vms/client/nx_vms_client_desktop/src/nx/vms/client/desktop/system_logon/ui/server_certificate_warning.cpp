@@ -14,6 +14,7 @@
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/html/html.h>
+#include <ui/help/help_handler.h>
 #include <ui/statistics/modules/certificate_statistics_module.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -145,7 +146,7 @@ ServerCertificateWarning::ServerCertificateWarning(
             }
             else if (link == kHelpLink)
             {
-                //TODO: #spanasenko Open help page.
+                QnHelpHandler::openHelpTopic(Qn::CertificateValidation_Help);
             }
         });
 
