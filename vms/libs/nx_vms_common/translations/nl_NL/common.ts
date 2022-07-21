@@ -1746,16 +1746,20 @@
       <translation>Gegevens zijn geback-upte naar %1</translation>
     </message>
     <message>
-      <source>Failed to backup file </source>
-      <translation>Back-up bestand mislukt </translation>
-    </message>
-    <message>
       <source>Server Certificate Error</source>
       <translation>Server Certificaat Fout</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
       <translation>Server &quot;%1&quot; certificaatfout</translation>
+    </message>
+    <message>
+      <source>Intercom informer</source>
+      <translation type="unfinished">Intercom informer</translation>
+    </message>
+    <message>
+      <source>Failed to backup file</source>
+      <translation>Back-up bestand mislukt</translation>
     </message>
   </context>
   <context>

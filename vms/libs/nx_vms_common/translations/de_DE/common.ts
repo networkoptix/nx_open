@@ -1746,16 +1746,20 @@
       <translation>Daten werden auf %1 gesichert</translation>
     </message>
     <message>
-      <source>Failed to backup file </source>
-      <translation>Fehler beim Sichern der Datei </translation>
-    </message>
-    <message>
       <source>Server Certificate Error</source>
       <translation>Server-Zertifikatsfehler</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
       <translation>Server &quot;%1&quot; Zertifikatsfehler</translation>
+    </message>
+    <message>
+      <source>Intercom informer</source>
+      <translation>Intercom-Informant</translation>
+    </message>
+    <message>
+      <source>Failed to backup file</source>
+      <translation>Fehler beim Sichern der Datei</translation>
     </message>
   </context>
   <context>

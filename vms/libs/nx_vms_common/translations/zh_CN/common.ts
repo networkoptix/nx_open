@@ -1688,16 +1688,20 @@
       <translation>数据备份到 %1</translation>
     </message>
     <message>
-      <source>Failed to backup file </source>
-      <translation>备份失败 </translation>
-    </message>
-    <message>
       <source>Server Certificate Error</source>
       <translation>服务器认证错误</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
       <translation>服务器 &quot;%1&quot; 认证错误</translation>
+    </message>
+    <message>
+      <source>Intercom informer</source>
+      <translation type="unfinished">Intercom informer</translation>
+    </message>
+    <message>
+      <source>Failed to backup file</source>
+      <translation>备份失败</translation>
     </message>
   </context>
   <context>

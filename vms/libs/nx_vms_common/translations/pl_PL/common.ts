@@ -1862,16 +1862,20 @@
       <translation>Dane są kopiowane do %1</translation>
     </message>
     <message>
-      <source>Failed to backup file </source>
-      <translation>Nie udało się zapisać pliku </translation>
-    </message>
-    <message>
       <source>Server Certificate Error</source>
       <translation>Błąd certyfikatu serwera</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
       <translation>Błąd certyfikatu serwera &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Intercom informer</source>
+      <translation type="unfinished">Intercom informer</translation>
+    </message>
+    <message>
+      <source>Failed to backup file</source>
+      <translation>Nie udało się zapisać pliku</translation>
     </message>
   </context>
   <context>

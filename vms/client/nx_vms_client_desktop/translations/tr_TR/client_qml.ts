@@ -261,8 +261,8 @@
   <context>
     <name>CloudTile</name>
     <message>
-      <source>Log in to </source>
-      <translation type="unfinished">Log in to </translation>
+      <source>Log in to</source>
+      <translation type="unfinished">Log in to</translation>
     </message>
   </context>
   <context>
@@ -1165,8 +1165,8 @@ herhangi bir bölümü üzerine sürükleyin</translation>
   <context>
     <name>StyledRadioButton</name>
     <message>
-      <source>Logical ID </source>
-      <translation>Mantıksal Kimlik </translation>
+      <source>Logical ID</source>
+      <translation>Mantıksal Kimlik</translation>
     </message>
   </context>
   <context>

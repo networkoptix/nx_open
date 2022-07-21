@@ -94,6 +94,10 @@
       <source>Verifying update package</source>
       <translation>Verifierar uppdateringspaketet</translation>
     </message>
+    <message>
+      <source>Cannot connect to the System</source>
+      <translation>Kan inte ansluta till systemet</translation>
+    </message>
   </context>
   <context>
     <name>ContextMenu</name>
@@ -5517,10 +5521,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Ett fel inträffade när e-post skickades</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been started</source>
-      <translation>Synkronisering av fjärrarkiv har startats</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been finished</source>
       <translation>Synkronisering av fjärrarkiv har startats</translation>
     </message>
@@ -5529,16 +5529,8 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Synkronisering av fjärrarkiv pågår</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been started for the following device:</source>
-      <translation>Synkronisering av fjärrarkiv har startats för följande enhet:</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been finished for the following device:</source>
       <translation>Synkronisering av fjärrarkiv har slutförts för följande enhet:</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization</source>
-      <translation>Synkronisering av fjärrarkiv</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
@@ -5581,6 +5573,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Camera recording schedule is invalid</source>
       <translation>Kamerainspelningsschemat är ogiltigt</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization available</source>
+      <translation>Synkronisering av fjärrarkiv</translation>
     </message>
   </context>
   <context>
@@ -7461,6 +7457,10 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>Server will not push time settings to the camera.</source>
       <translation>Servern skickar inte tidsinställningar till kameran.</translation>
+    </message>
+    <message>
+      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</source>
+      <translation>Video inspelad på den interna kameran&apos;s lagring kommer inte att laddas upp till huvudarkivet.</translation>
     </message>
   </context>
   <context>
@@ -10051,22 +10051,18 @@ Varning: Det här lösenordet kan inte återställas. Om du tappar det blir arki
       <translation>Fäst detta certifikat till %1?</translation>
     </message>
     <message>
-      <source>Someone may be impersonating %1 to steel your personal information.
+      <source>Pin</source>
+      <translation>Fäst</translation>
+    </message>
+    <message>
+      <source>Someone may be impersonating %1 to steal your personal information.
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
       <translation>Någon kan efterlikna %1 för att stjäla dina personuppgifter.
 Fäst inte detta certifikat om du gjorde&apos;t ändra %2 server SSL-certifikat.</translation>
     </message>
-    <message>
-      <source>Pin</source>
-      <translation>Fäst</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
-    <message>
-      <source>View certificate</source>
-      <translation>Visa certifikat</translation>
-    </message>
     <message>
       <source>Connect Anyway</source>
       <translation>Anslut ändå</translation>
@@ -10076,40 +10072,46 @@ Fäst inte detta certifikat om du gjorde&apos;t ändra %2 server SSL-certifikat.
       <translation>Jag litar på den här servern</translation>
     </message>
     <message>
-      <source>System:</source>
-      <translation>Systemet:</translation>
-    </message>
-    <message>
-      <source>Server:</source>
-      <translation>Server:</translation>
-    </message>
-    <message>
-      <source>Server ID:</source>
-      <translation>Server-ID:</translation>
-    </message>
-    <message>
-      <source>Trust this server?</source>
-      <translation>Lita på den här servern?</translation>
-    </message>
-    <message>
       <source>Cannot verify the identity of %1</source>
       <translation>Kan inte verifiera identiteten på %1</translation>
     </message>
     <message>
-      <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
-      <translation>Du försökte ansluta till den här servern, men den visade ett certifikat som inte kan verifieras automatiskt.</translation>
+      <source>Connecting to %1 for the first time?</source>
+      <translation>Ansluter du till %1 för första gången?</translation>
     </message>
     <message>
-      <source>Someone may be impersonating this Server to steal your personal information.</source>
-      <translation>Någon kanske utger sig för att vara den här servern för att stjäla din personliga information.</translation>
+      <source>Review the %1 to ensure you trust the server you are connecting to.
+Read this %2 to learn more about certificate validation.</source>
+      <comment>%1 is &lt;certificate details&gt; link, %2 is &lt;help article&gt; link</comment>
+      <translation>Granska %1 för att säkerställa att du litar på servern du ansluter till.
+Läs detta %2 för att lära dig mer om certifikatvalidering.</translation>
     </message>
     <message>
-      <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
-      <translation>Anslut inte till den här servern om inte din VMS administratör har fått instruktioner.</translation>
+      <source>certificate details</source>
+      <translation>certifikatdetaljer</translation>
     </message>
     <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
-      <translation>Granska certifikatets&apos;s detaljer för att se till att du ansluter till rätt server.</translation>
+      <source>help article</source>
+      <translation>hjälpartikel</translation>
+    </message>
+    <message>
+      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
+      <translation>Detta meddelande kan visas flera gånger när du ansluter till ett multiserversystem.</translation>
+    </message>
+    <message>
+      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
+You can view %2 or read this %3 to learn more about the current problem.</source>
+      <comment>%1 is the system name, %2 is &lt;the server&apos;s certificate&gt; link, %3 is &lt;help article&gt; link</comment>
+      <translation>Detta kan bero på ett utgånget servercertifikat eller att någon försöker utge sig för att vara %1 för att stjäla din personliga information.
+Du kan se %2 eller läsa den här %3 för att lära dig mer om det aktuella problemet.</translation>
+    </message>
+    <message>
+      <source>the server&apos;s certificate</source>
+      <translation>serverns&apos;s certifikat</translation>
+    </message>
+    <message>
+      <source>Continue</source>
+      <translation>Fortsätt</translation>
     </message>
   </context>
   <context>
@@ -10336,6 +10338,38 @@ Fäst inte detta certifikat om du gjorde&apos;t ändra %2 server SSL-certifikat.
     <message>
       <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
       <translation>Inspelningsschemat på vissa kameror innehåller inspelningslägen som inte stöds.</translation>
+    </message>
+    <message>
+      <source>SD archive found</source>
+      <translation>SD-arkiv hittat</translation>
+    </message>
+    <message>
+      <source>Export in progress...</source>
+      <translation>Export pågår...</translation>
+    </message>
+    <message>
+      <source>Export archive from %1 completed</source>
+      <translation>Exportarkiv från %1 slutfört</translation>
+    </message>
+    <message>
+      <source>Export archive from %1 failed</source>
+      <translation>Det gick inte att exportera arkiv från %1</translation>
+    </message>
+    <message>
+      <source>Not exported archive found on Device %1</source>
+      <translation>Ej exporterat arkiv hittades på enhet %1</translation>
+    </message>
+    <message>
+      <source>Not exported archive found on Camera %1</source>
+      <translation>Ej exporterat arkiv hittades på kamera %1</translation>
+    </message>
+    <message>
+      <source>Export archive from %1</source>
+      <translation>Exportera arkiv från %1</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>Exportera</translation>
     </message>
   </context>
   <context>

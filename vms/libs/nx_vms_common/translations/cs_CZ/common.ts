@@ -1862,16 +1862,20 @@
       <translation type="unfinished">Data is backed up to %1</translation>
     </message>
     <message>
-      <source>Failed to backup file </source>
-      <translation type="unfinished">Failed to backup file </translation>
-    </message>
-    <message>
       <source>Server Certificate Error</source>
       <translation type="unfinished">Server Certificate Error</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
       <translation type="unfinished">Server &quot;%1&quot; certificate error</translation>
+    </message>
+    <message>
+      <source>Intercom informer</source>
+      <translation type="unfinished">Intercom informer</translation>
+    </message>
+    <message>
+      <source>Failed to backup file</source>
+      <translation type="unfinished">Failed to backup file</translation>
     </message>
   </context>
   <context>

@@ -1688,16 +1688,20 @@
       <translation>데이터가 %1로 백업됨</translation>
     </message>
     <message>
-      <source>Failed to backup file </source>
-      <translation>파일을 백업하지 못했습니다.</translation>
-    </message>
-    <message>
       <source>Server Certificate Error</source>
       <translation>서버 인증서 오류</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
       <translation>서버 &quot;%1&quot; 인증서 오류</translation>
+    </message>
+    <message>
+      <source>Intercom informer</source>
+      <translation type="unfinished">Intercom informer</translation>
+    </message>
+    <message>
+      <source>Failed to backup file</source>
+      <translation type="unfinished">Failed to backup file</translation>
     </message>
   </context>
   <context>

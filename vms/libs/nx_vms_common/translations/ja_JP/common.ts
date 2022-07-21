@@ -1688,16 +1688,20 @@
       <translation>データを %1 にバックアップしました</translation>
     </message>
     <message>
-      <source>Failed to backup file </source>
-      <translation>ファイルのバックアップに失敗しました </translation>
-    </message>
-    <message>
       <source>Server Certificate Error</source>
       <translation>サーバー証明書エラー</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
       <translation>サーバー &quot;%1&quot; 証明書エラー</translation>
+    </message>
+    <message>
+      <source>Intercom informer</source>
+      <translation>インターホン通知者</translation>
+    </message>
+    <message>
+      <source>Failed to backup file</source>
+      <translation>ファイルのバックアップに失敗しました</translation>
     </message>
   </context>
   <context>

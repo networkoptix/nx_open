@@ -257,8 +257,8 @@
   <context>
     <name>CloudTile</name>
     <message>
-      <source>Log in to </source>
-      <translation>登录到 </translation>
+      <source>Log in to</source>
+      <translation>登录到</translation>
     </message>
   </context>
   <context>
@@ -1156,8 +1156,8 @@ to activate PTZ</source>
   <context>
     <name>StyledRadioButton</name>
     <message>
-      <source>Logical ID </source>
-      <translation>逻辑 ID </translation>
+      <source>Logical ID</source>
+      <translation>逻辑 ID</translation>
     </message>
   </context>
   <context>

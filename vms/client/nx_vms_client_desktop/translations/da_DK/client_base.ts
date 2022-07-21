@@ -94,6 +94,10 @@
       <source>Verifying update package</source>
       <translation>Bekræfter opdateringspakken</translation>
     </message>
+    <message>
+      <source>Cannot connect to the System</source>
+      <translation>Kan ikke oprette forbindelse til systemet</translation>
+    </message>
   </context>
   <context>
     <name>ContextMenu</name>
@@ -5517,10 +5521,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Error while sending email</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been started</source>
-      <translation type="unfinished">Remote archive synchronization has been started</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been finished</source>
       <translation type="unfinished">Remote archive synchronization has been finished</translation>
     </message>
@@ -5529,16 +5529,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Remote archive synchronization is in progress</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been started for the following device:</source>
-      <translation type="unfinished">Remote archive synchronization has been started for the following device:</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been finished for the following device:</source>
       <translation type="unfinished">Remote archive synchronization has been finished for the following device:</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization</source>
-      <translation type="unfinished">Remote archive synchronization</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
@@ -5581,6 +5573,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Camera recording schedule is invalid</source>
       <translation>Kameraets optagelsesplan er ugyldig</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization available</source>
+      <translation type="unfinished">Remote archive synchronization available</translation>
     </message>
   </context>
   <context>
@@ -7460,6 +7456,10 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <message>
       <source>Server will not push time settings to the camera.</source>
       <translation>Serveren sender ikke tidsindstillinger til kameraet.</translation>
+    </message>
+    <message>
+      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</source>
+      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</translation>
     </message>
   </context>
   <context>
@@ -10050,22 +10050,18 @@ Forsigtig: Denne adgangskode kan ikke nulstilles. Hvis du mister det, vil arkive
       <translation>Fastgør dette certifikat til %1?</translation>
     </message>
     <message>
-      <source>Someone may be impersonating %1 to steel your personal information.
-Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
-      <translation>Nogen udgiver sig muligvis som %1 for at stjæle dine personlige oplysninger.
-Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-certifikat.</translation>
-    </message>
-    <message>
       <source>Pin</source>
       <translation>Fastgør</translation>
+    </message>
+    <message>
+      <source>Someone may be impersonating %1 to steal your personal information.
+Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
+      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
+Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
-    <message>
-      <source>View certificate</source>
-      <translation>Vis certifikat</translation>
-    </message>
     <message>
       <source>Connect Anyway</source>
       <translation>Tilslut alligevel</translation>
@@ -10075,40 +10071,46 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
       <translation>Jeg tillid til denne server</translation>
     </message>
     <message>
-      <source>System:</source>
-      <translation>System:</translation>
-    </message>
-    <message>
-      <source>Server:</source>
-      <translation>Server:</translation>
-    </message>
-    <message>
-      <source>Server ID:</source>
-      <translation>Server ID:</translation>
-    </message>
-    <message>
-      <source>Trust this server?</source>
-      <translation>Hav tillid til denne server?</translation>
-    </message>
-    <message>
       <source>Cannot verify the identity of %1</source>
       <translation>Kan ikke bekræfte identiteten af %1</translation>
     </message>
     <message>
-      <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
-      <translation>Du forsøgte at oprette forbindelse til denne server, men den præsenterede et certifikat, der ikke kan bekræftes automatisk.</translation>
+      <source>Connecting to %1 for the first time?</source>
+      <translation type="unfinished">Connecting to %1 for the first time?</translation>
     </message>
     <message>
-      <source>Someone may be impersonating this Server to steal your personal information.</source>
-      <translation>Nogen udgiver sig muligvis for at være denne server for at stjæle dine personlige oplysninger.</translation>
+      <source>Review the %1 to ensure you trust the server you are connecting to.
+Read this %2 to learn more about certificate validation.</source>
+      <comment>%1 is &lt;certificate details&gt; link, %2 is &lt;help article&gt; link</comment>
+      <translation type="unfinished">Review the %1 to ensure you trust the server you are connecting to.
+Read this %2 to learn more about certificate validation.</translation>
     </message>
     <message>
-      <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
-      <translation>Opret ikke forbindelse til denne server, medmindre du er instrueret af din VMS-administrator.</translation>
+      <source>certificate details</source>
+      <translation type="unfinished">certificate details</translation>
     </message>
     <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
-      <translation>Gennemgå certifikatets&apos;s detaljer for at sikre, at du opretter forbindelse til den korrekte server.</translation>
+      <source>help article</source>
+      <translation type="unfinished">help article</translation>
+    </message>
+    <message>
+      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
+      <translation type="unfinished">This message may be shown multiple times when connecting to a multi-server system.</translation>
+    </message>
+    <message>
+      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
+You can view %2 or read this %3 to learn more about the current problem.</source>
+      <comment>%1 is the system name, %2 is &lt;the server&apos;s certificate&gt; link, %3 is &lt;help article&gt; link</comment>
+      <translation type="unfinished">This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
+You can view %2 or read this %3 to learn more about the current problem.</translation>
+    </message>
+    <message>
+      <source>the server&apos;s certificate</source>
+      <translation type="unfinished">the server&apos;s certificate</translation>
+    </message>
+    <message>
+      <source>Continue</source>
+      <translation type="unfinished">Continue</translation>
     </message>
   </context>
   <context>
@@ -10335,6 +10337,38 @@ Fastgør ikke dette certifikat, hvis du ikke har ændret&apos; %2 serverens SSL-
     <message>
       <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
       <translation>Optagelsesplan på nogle kameraer indeholder optagetilstande, der ikke understøttes.</translation>
+    </message>
+    <message>
+      <source>SD archive found</source>
+      <translation type="unfinished">SD archive found</translation>
+    </message>
+    <message>
+      <source>Export in progress...</source>
+      <translation type="unfinished">Export in progress...</translation>
+    </message>
+    <message>
+      <source>Export archive from %1 completed</source>
+      <translation type="unfinished">Export archive from %1 completed</translation>
+    </message>
+    <message>
+      <source>Export archive from %1 failed</source>
+      <translation type="unfinished">Export archive from %1 failed</translation>
+    </message>
+    <message>
+      <source>Not exported archive found on Device %1</source>
+      <translation type="unfinished">Not exported archive found on Device %1</translation>
+    </message>
+    <message>
+      <source>Not exported archive found on Camera %1</source>
+      <translation type="unfinished">Not exported archive found on Camera %1</translation>
+    </message>
+    <message>
+      <source>Export archive from %1</source>
+      <translation type="unfinished">Export archive from %1</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation type="unfinished">Export</translation>
     </message>
   </context>
   <context>

@@ -93,6 +93,10 @@
       <source>Verifying update package</source>
       <translation>업데이트 패키지 확인 중</translation>
     </message>
+    <message>
+      <source>Cannot connect to the System</source>
+      <translation>시스템에 연결할 수 없습니다</translation>
+    </message>
   </context>
   <context>
     <name>ContextMenu</name>
@@ -5445,10 +5449,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>이메일 발송 중 오류 발생</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been started</source>
-      <translation>원격 아카이브 동기화가 시작되었습니다.</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been finished</source>
       <translation>원격 아카이브 동기화가 완료되었습니다.</translation>
     </message>
@@ -5457,16 +5457,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>원격 아카이브 동기화가 진행 중입니다.</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been started for the following device:</source>
-      <translation>다음 장치에 대한 원격 아카이브 동기화가 시작 되었습니다.</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been finished for the following device:</source>
       <translation>다음 장치에 대한 원격 아카이브 동기화가 완료되었습니다.</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization</source>
-      <translation>원격 아카이브 동기화</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
@@ -5509,6 +5501,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Camera recording schedule is invalid</source>
       <translation>카메라 녹화 일정이 잘못되었습니다.</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization available</source>
+      <translation type="unfinished">Remote archive synchronization available</translation>
     </message>
   </context>
   <context>
@@ -7341,6 +7337,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Server will not push time settings to the camera.</source>
       <translation>서버는 카메라에 시간 설정을 푸시하지 않습니다.</translation>
+    </message>
+    <message>
+      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</source>
+      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</translation>
     </message>
   </context>
   <context>
@@ -9904,22 +9904,18 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <translation>이 인증서를 %1에 고정하시겠습니까?</translation>
     </message>
     <message>
-      <source>Someone may be impersonating %1 to steel your personal information.
-Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
-      <translation>누군가가 개인 정보를 강화하기 위해 %1을 사칭하고 있을 수 있다.
-%2 서버 SSL 인증서를 수정하지 않은 경우 이 인증서를 고정하지 마십시오.</translation>
-    </message>
-    <message>
       <source>Pin</source>
       <translation>고정</translation>
+    </message>
+    <message>
+      <source>Someone may be impersonating %1 to steal your personal information.
+Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
+      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
+Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
-    <message>
-      <source>View certificate</source>
-      <translation>인증서 보기</translation>
-    </message>
     <message>
       <source>Connect Anyway</source>
       <translation>그래도 연결</translation>
@@ -9929,40 +9925,46 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation>나는 이 서버를 신뢰한다</translation>
     </message>
     <message>
-      <source>System:</source>
-      <translation>시스템:</translation>
-    </message>
-    <message>
-      <source>Server:</source>
-      <translation>서버:</translation>
-    </message>
-    <message>
-      <source>Server ID:</source>
-      <translation>서버 ID:</translation>
-    </message>
-    <message>
-      <source>Trust this server?</source>
-      <translation>이 서버를 신뢰하시겠습니까?</translation>
-    </message>
-    <message>
       <source>Cannot verify the identity of %1</source>
       <translation>%1의 신원을 확인할 수 없습니다</translation>
     </message>
     <message>
-      <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
-      <translation>이 서버에 연결을 시도했지만 자동으로 확인할 수 없는 인증서를 제공했습니다.</translation>
+      <source>Connecting to %1 for the first time?</source>
+      <translation type="unfinished">Connecting to %1 for the first time?</translation>
     </message>
     <message>
-      <source>Someone may be impersonating this Server to steal your personal information.</source>
-      <translation>누군가 이 서버를 사칭하여 귀하의 개인 정보를 도용할 수 있습니다.</translation>
+      <source>Review the %1 to ensure you trust the server you are connecting to.
+Read this %2 to learn more about certificate validation.</source>
+      <comment>%1 is &lt;certificate details&gt; link, %2 is &lt;help article&gt; link</comment>
+      <translation type="unfinished">Review the %1 to ensure you trust the server you are connecting to.
+Read this %2 to learn more about certificate validation.</translation>
     </message>
     <message>
-      <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
-      <translation>VMS 관리자가 지시하지 않는 한 이 서버에 연결하지 마십시오.</translation>
+      <source>certificate details</source>
+      <translation type="unfinished">certificate details</translation>
     </message>
     <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
-      <translation>인증서의 세부 정보를 검토하여 올바른 서버에 연결 중인지 확인한다.</translation>
+      <source>help article</source>
+      <translation type="unfinished">help article</translation>
+    </message>
+    <message>
+      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
+      <translation type="unfinished">This message may be shown multiple times when connecting to a multi-server system.</translation>
+    </message>
+    <message>
+      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
+You can view %2 or read this %3 to learn more about the current problem.</source>
+      <comment>%1 is the system name, %2 is &lt;the server&apos;s certificate&gt; link, %3 is &lt;help article&gt; link</comment>
+      <translation type="unfinished">This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
+You can view %2 or read this %3 to learn more about the current problem.</translation>
+    </message>
+    <message>
+      <source>the server&apos;s certificate</source>
+      <translation type="unfinished">the server&apos;s certificate</translation>
+    </message>
+    <message>
+      <source>Continue</source>
+      <translation type="unfinished">Continue</translation>
     </message>
   </context>
   <context>
@@ -10185,6 +10187,38 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <message>
       <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
       <translation>일부 카메라의 녹화 일정에는 지원되지 않는 녹화 모드가 포함되어 있습니다.</translation>
+    </message>
+    <message>
+      <source>SD archive found</source>
+      <translation type="unfinished">SD archive found</translation>
+    </message>
+    <message>
+      <source>Export in progress...</source>
+      <translation type="unfinished">Export in progress...</translation>
+    </message>
+    <message>
+      <source>Export archive from %1 completed</source>
+      <translation type="unfinished">Export archive from %1 completed</translation>
+    </message>
+    <message>
+      <source>Export archive from %1 failed</source>
+      <translation type="unfinished">Export archive from %1 failed</translation>
+    </message>
+    <message>
+      <source>Not exported archive found on Device %1</source>
+      <translation type="unfinished">Not exported archive found on Device %1</translation>
+    </message>
+    <message>
+      <source>Not exported archive found on Camera %1</source>
+      <translation type="unfinished">Not exported archive found on Camera %1</translation>
+    </message>
+    <message>
+      <source>Export archive from %1</source>
+      <translation type="unfinished">Export archive from %1</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>내보내기</translation>
     </message>
   </context>
   <context>

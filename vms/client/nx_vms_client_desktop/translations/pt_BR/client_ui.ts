@@ -630,6 +630,14 @@
       <source>Keep camera time settings</source>
       <translation>Manter as configurações de horário da câmera</translation>
     </message>
+    <message>
+      <source>Export From SD Cards</source>
+      <translation>Exportar de cartões SD</translation>
+    </message>
+    <message>
+      <source>Do not export video automatically</source>
+      <translation>Não exporte vídeo automaticamente</translation>
+    </message>
   </context>
   <context>
     <name>CameraInfoWidget</name>

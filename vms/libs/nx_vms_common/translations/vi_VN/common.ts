@@ -1688,16 +1688,20 @@
       <translation>Dữ liệu được sao lưu lên đến %1</translation>
     </message>
     <message>
-      <source>Failed to backup file </source>
-      <translation>Không thể sao lưu tệp </translation>
-    </message>
-    <message>
       <source>Server Certificate Error</source>
       <translation>Lỗi chứng chỉ máy chủ</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
       <translation>Máy chủ &quot;%1&quot; lỗi chứng chỉ</translation>
+    </message>
+    <message>
+      <source>Intercom informer</source>
+      <translation type="unfinished">Intercom informer</translation>
+    </message>
+    <message>
+      <source>Failed to backup file</source>
+      <translation>Không thể sao lưu tệp</translation>
     </message>
   </context>
   <context>

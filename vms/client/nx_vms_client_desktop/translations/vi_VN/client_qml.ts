@@ -257,8 +257,8 @@
   <context>
     <name>CloudTile</name>
     <message>
-      <source>Log in to </source>
-      <translation>Đăng nhập vào </translation>
+      <source>Log in to</source>
+      <translation>Đăng nhập vào</translation>
     </message>
   </context>
   <context>
@@ -1156,8 +1156,8 @@ to activate PTZ</source>
   <context>
     <name>StyledRadioButton</name>
     <message>
-      <source>Logical ID </source>
-      <translation>ID hợp lý </translation>
+      <source>Logical ID</source>
+      <translation>ID logic</translation>
     </message>
   </context>
   <context>

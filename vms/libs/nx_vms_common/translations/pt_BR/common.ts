@@ -1746,16 +1746,20 @@
       <translation>Os dados são copiados para %1</translation>
     </message>
     <message>
-      <source>Failed to backup file </source>
-      <translation>Falha ao fazer backup do arquivo </translation>
-    </message>
-    <message>
       <source>Server Certificate Error</source>
       <translation>Erro de certificado do servidor</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
       <translation>Erro de certificado do servidor &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Intercom informer</source>
+      <translation>Informante de intercomunicação</translation>
+    </message>
+    <message>
+      <source>Failed to backup file</source>
+      <translation>Falha ao fazer backup do arquivo</translation>
     </message>
   </context>
   <context>

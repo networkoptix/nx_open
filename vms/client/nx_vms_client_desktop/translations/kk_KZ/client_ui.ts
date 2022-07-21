@@ -630,6 +630,14 @@
       <source>Keep camera time settings</source>
       <translation type="unfinished">Keep camera time settings</translation>
     </message>
+    <message>
+      <source>Export From SD Cards</source>
+      <translation type="unfinished">Export From SD Cards</translation>
+    </message>
+    <message>
+      <source>Do not export video automatically</source>
+      <translation type="unfinished">Do not export video automatically</translation>
+    </message>
   </context>
   <context>
     <name>CameraInfoWidget</name>

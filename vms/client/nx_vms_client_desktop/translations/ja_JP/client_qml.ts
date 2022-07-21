@@ -257,8 +257,8 @@
   <context>
     <name>CloudTile</name>
     <message>
-      <source>Log in to </source>
-      <translation>ログイン - </translation>
+      <source>Log in to</source>
+      <translation>ログイン:</translation>
     </message>
   </context>
   <context>
@@ -1154,8 +1154,8 @@ PTZを行います</translation>
   <context>
     <name>StyledRadioButton</name>
     <message>
-      <source>Logical ID </source>
-      <translation>自定義ID </translation>
+      <source>Logical ID</source>
+      <translation>自定義ID</translation>
     </message>
   </context>
   <context>

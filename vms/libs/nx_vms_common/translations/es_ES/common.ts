@@ -1746,16 +1746,20 @@
       <translation>Los datos están respaldados a %1</translation>
     </message>
     <message>
-      <source>Failed to backup file </source>
-      <translation>No se pudo realizar la copia de seguridad del archivo </translation>
-    </message>
-    <message>
       <source>Server Certificate Error</source>
       <translation>Error de certificado del servidor</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
       <translation>Error de certificado del servidor &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Intercom informer</source>
+      <translation type="unfinished">Intercom informer</translation>
+    </message>
+    <message>
+      <source>Failed to backup file</source>
+      <translation>No se pudo realizar la copia de seguridad del archivo</translation>
     </message>
   </context>
   <context>

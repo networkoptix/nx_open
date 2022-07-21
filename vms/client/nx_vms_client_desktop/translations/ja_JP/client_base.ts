@@ -93,6 +93,10 @@
       <source>Verifying update package</source>
       <translation>アップデートパッケージを確認中</translation>
     </message>
+    <message>
+      <source>Cannot connect to the System</source>
+      <translation>システム に接続できません</translation>
+    </message>
   </context>
   <context>
     <name>ContextMenu</name>
@@ -5444,10 +5448,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Email送信中のエラー</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been started</source>
-      <translation>カメラストレージとの同期が開始されました</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been finished</source>
       <translation>カメラストレージとの同期が完了しました</translation>
     </message>
@@ -5456,16 +5456,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>カメラストレージとの同期が進行中です</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been started for the following device:</source>
-      <translation>次のデバイスのカメラストレージとの同期が開始されました：</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been finished for the following device:</source>
       <translation>次のデバイスのカメラストレージとの同期が完了しました：</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization</source>
-      <translation>カメラストレージとの同期</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
@@ -5508,6 +5500,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Camera recording schedule is invalid</source>
       <translation>カメラの録画スケジュールが無効です</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization available</source>
+      <translation>リモートアーカイブの同期が利用可能です</translation>
     </message>
   </context>
   <context>
@@ -7339,6 +7335,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Server will not push time settings to the camera.</source>
       <translation>サーバーは時刻設定をカメラに通知しません。</translation>
+    </message>
+    <message>
+      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</source>
+      <translation>カメラの内部ストレージに保存された映像はメインアーカイブにアップロードされません。</translation>
     </message>
   </context>
   <context>
@@ -9901,22 +9901,18 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <translation>この証明書を %1 にピン留めしますか？</translation>
     </message>
     <message>
-      <source>Someone may be impersonating %1 to steel your personal information.
+      <source>Pin</source>
+      <translation>ピン留めする</translation>
+    </message>
+    <message>
+      <source>Someone may be impersonating %1 to steal your personal information.
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
       <translation>誰かがあなたの個人情報を盗むために %1 になりすましている可能性があります。
 %2 サーバーのSSL証明書を変更していない場合は、この証明書を固定しないでください。</translation>
     </message>
-    <message>
-      <source>Pin</source>
-      <translation>ピン留めする</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
-    <message>
-      <source>View certificate</source>
-      <translation>証明書を表示</translation>
-    </message>
     <message>
       <source>Connect Anyway</source>
       <translation>理解した上で接続</translation>
@@ -9926,40 +9922,46 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation>このサーバーを信用する</translation>
     </message>
     <message>
-      <source>System:</source>
-      <translation>システム:</translation>
-    </message>
-    <message>
-      <source>Server:</source>
-      <translation>サーバー:</translation>
-    </message>
-    <message>
-      <source>Server ID:</source>
-      <translation>サーバーID:</translation>
-    </message>
-    <message>
-      <source>Trust this server?</source>
-      <translation>このサーバーを信用しますか？</translation>
-    </message>
-    <message>
       <source>Cannot verify the identity of %1</source>
       <translation>%1 の識別情報を確認できません</translation>
     </message>
     <message>
-      <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
-      <translation>このサーバーに接続しようとしましたが、自動的に検証できない証明書が表示されました。</translation>
+      <source>Connecting to %1 for the first time?</source>
+      <translation>%1 への接続は初めてですか?</translation>
     </message>
     <message>
-      <source>Someone may be impersonating this Server to steal your personal information.</source>
-      <translation>誰かがあなたの個人情報を盗むためにこのサーバーになりすましている可能性があります。</translation>
+      <source>Review the %1 to ensure you trust the server you are connecting to.
+Read this %2 to learn more about certificate validation.</source>
+      <comment>%1 is &lt;certificate details&gt; link, %2 is &lt;help article&gt; link</comment>
+      <translation>%1 を確認して、接続先サーバーが信頼できることを確認します。
+証明書の検証の詳細については、こちらの %2 をお読みください。</translation>
     </message>
     <message>
-      <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
-      <translation>VMS管理者の指示がない限り、このサーバーに接続しないでください。</translation>
+      <source>certificate details</source>
+      <translation>証明書の詳細</translation>
     </message>
     <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
-      <translation>証明書の詳細を確認して、正しいサーバーに接続していることを確認してください。</translation>
+      <source>help article</source>
+      <translation>ヘルプ記事</translation>
+    </message>
+    <message>
+      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
+      <translation>このメッセージは、マルチサーバーシステムに接続する際に複数回表示される場合があります。</translation>
+    </message>
+    <message>
+      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
+You can view %2 or read this %3 to learn more about the current problem.</source>
+      <comment>%1 is the system name, %2 is &lt;the server&apos;s certificate&gt; link, %3 is &lt;help article&gt; link</comment>
+      <translation>原因として、サーバー証明書の有効期限が切れているか、誰かが %1 になりすまして個人情報を盗もうとしていることが考えられます。
+%2 を表示するか、こちらの %3 を読むことで、現在の問題について詳しく知ることができます。</translation>
+    </message>
+    <message>
+      <source>the server&apos;s certificate</source>
+      <translation>サーバーの証明書</translation>
+    </message>
+    <message>
+      <source>Continue</source>
+      <translation>続行</translation>
     </message>
   </context>
   <context>
@@ -10182,6 +10184,38 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <message>
       <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
       <translation>一部のカメラの録画スケジュールには、サポートされていない録画モードが含まれています。</translation>
+    </message>
+    <message>
+      <source>SD archive found</source>
+      <translation>SD アーカイブが見つかりました</translation>
+    </message>
+    <message>
+      <source>Export in progress...</source>
+      <translation>エクスポート中...</translation>
+    </message>
+    <message>
+      <source>Export archive from %1 completed</source>
+      <translation>%1 からのアーカイブのエクスポートが完了しました</translation>
+    </message>
+    <message>
+      <source>Export archive from %1 failed</source>
+      <translation>%1 からのアーカイブのエクスポートに失敗しました</translation>
+    </message>
+    <message>
+      <source>Not exported archive found on Device %1</source>
+      <translation>デバイス %1 にエクスポートされていないアーカイブが見つかりました</translation>
+    </message>
+    <message>
+      <source>Not exported archive found on Camera %1</source>
+      <translation>カメラ %1 にエクスポートされていないアーカイブが見つかりました</translation>
+    </message>
+    <message>
+      <source>Export archive from %1</source>
+      <translation>%1 からアーカイブをエクスポート</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>エクスポート</translation>
     </message>
   </context>
   <context>

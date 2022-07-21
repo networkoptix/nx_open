@@ -1688,16 +1688,20 @@
       <translation>資料將備份至%1</translation>
     </message>
     <message>
-      <source>Failed to backup file </source>
-      <translation>檔案備份失敗 </translation>
-    </message>
-    <message>
       <source>Server Certificate Error</source>
       <translation>伺服器憑證錯誤</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
       <translation>伺服器&quot;%1&quot; 憑證錯誤</translation>
+    </message>
+    <message>
+      <source>Intercom informer</source>
+      <translation type="unfinished">Intercom informer</translation>
+    </message>
+    <message>
+      <source>Failed to backup file</source>
+      <translation>檔案備份失敗</translation>
     </message>
   </context>
   <context>

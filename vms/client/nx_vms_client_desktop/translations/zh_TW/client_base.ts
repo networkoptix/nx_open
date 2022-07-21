@@ -93,6 +93,10 @@
       <source>Verifying update package</source>
       <translation>正在驗證更新套件</translation>
     </message>
+    <message>
+      <source>Cannot connect to the System</source>
+      <translation>無法連接至系統</translation>
+    </message>
   </context>
   <context>
     <name>ContextMenu</name>
@@ -5448,10 +5452,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>傳送郵件時發生錯誤</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been started</source>
-      <translation>已啟動遠端錄影備份</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been finished</source>
       <translation>遠端錄影備份已結束</translation>
     </message>
@@ -5460,16 +5460,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>遠端錄影備份進行中</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been started for the following device:</source>
-      <translation>下列設備已開始遠端錄影備份</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been finished for the following device:</source>
       <translation>下列設備已完成遠端錄影備份</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization</source>
-      <translation>Remote archive synchronization</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
@@ -5512,6 +5504,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Camera recording schedule is invalid</source>
       <translation>無效的錄影排程</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization available</source>
+      <translation type="unfinished">Remote archive synchronization available</translation>
     </message>
   </context>
   <context>
@@ -7342,6 +7338,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Server will not push time settings to the camera.</source>
       <translation>服務器將不會推送時間設置至攝影機。</translation>
+    </message>
+    <message>
+      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</source>
+      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</translation>
     </message>
   </context>
   <context>
@@ -9902,22 +9902,18 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <translation>是否將此憑證綁定至 %1?</translation>
     </message>
     <message>
-      <source>Someone may be impersonating %1 to steel your personal information.
-Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
-      <translation>將可能有冒充 %1 來竊取您隱私資料的風險。
-若您沒有修改%2伺服器的憑證，請不要綁定此憑證。</translation>
-    </message>
-    <message>
       <source>Pin</source>
       <translation>鎖定</translation>
+    </message>
+    <message>
+      <source>Someone may be impersonating %1 to steal your personal information.
+Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
+      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
+Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
-    <message>
-      <source>View certificate</source>
-      <translation>檢視憑證</translation>
-    </message>
     <message>
       <source>Connect Anyway</source>
       <translation>仍進行連線</translation>
@@ -9927,40 +9923,46 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation>信任此伺服器</translation>
     </message>
     <message>
-      <source>System:</source>
-      <translation>系統:</translation>
-    </message>
-    <message>
-      <source>Server:</source>
-      <translation>伺服器:</translation>
-    </message>
-    <message>
-      <source>Server ID:</source>
-      <translation>伺服器ID:</translation>
-    </message>
-    <message>
-      <source>Trust this server?</source>
-      <translation>是否信任此伺服器？</translation>
-    </message>
-    <message>
       <source>Cannot verify the identity of %1</source>
       <translation>無法驗證 %1的身份</translation>
     </message>
     <message>
-      <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
-      <translation>您嘗試連接的伺服器提供了無法被自動校驗的憑證。</translation>
+      <source>Connecting to %1 for the first time?</source>
+      <translation>是否第一次連線至%1?</translation>
     </message>
     <message>
-      <source>Someone may be impersonating this Server to steal your personal information.</source>
-      <translation>將可能有冒充此伺服器來竊取您隱私資料的風險。</translation>
+      <source>Review the %1 to ensure you trust the server you are connecting to.
+Read this %2 to learn more about certificate validation.</source>
+      <comment>%1 is &lt;certificate details&gt; link, %2 is &lt;help article&gt; link</comment>
+      <translation>請檢視憑證 %1 內容，確認此伺服器為可信任伺服器。
+若需了解更多Nx憑證驗證資訊，請詳閱 %2 文件。</translation>
     </message>
     <message>
-      <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
-      <translation>連接到此服務器之前，請先向您的管理員確認。</translation>
+      <source>certificate details</source>
+      <translation>憑證詳情</translation>
     </message>
     <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
-      <translation>請檢查憑證詳細內容以確保您連接到正確的伺服器。</translation>
+      <source>help article</source>
+      <translation>幫助文件</translation>
+    </message>
+    <message>
+      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
+      <translation>若連線至多伺服器合併的系統，則此訊息可能會重複出現。</translation>
+    </message>
+    <message>
+      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
+You can view %2 or read this %3 to learn more about the current problem.</source>
+      <comment>%1 is the system name, %2 is &lt;the server&apos;s certificate&gt; link, %3 is &lt;help article&gt; link</comment>
+      <translation>這可能是由於伺服器憑證過期或有人試圖冒充 %1 來竊取您的私人訊息。
+請確認伺服器憑證 %2資訊，或查看 %3 文件來了解更多資訊。</translation>
+    </message>
+    <message>
+      <source>the server&apos;s certificate</source>
+      <translation>伺服器的憑證</translation>
+    </message>
+    <message>
+      <source>Continue</source>
+      <translation>繼續</translation>
     </message>
   </context>
   <context>
@@ -10183,6 +10185,38 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <message>
       <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
       <translation>部分攝影機的錄影排程包含不支援的錄影模式</translation>
+    </message>
+    <message>
+      <source>SD archive found</source>
+      <translation type="unfinished">SD archive found</translation>
+    </message>
+    <message>
+      <source>Export in progress...</source>
+      <translation type="unfinished">Export in progress...</translation>
+    </message>
+    <message>
+      <source>Export archive from %1 completed</source>
+      <translation type="unfinished">Export archive from %1 completed</translation>
+    </message>
+    <message>
+      <source>Export archive from %1 failed</source>
+      <translation type="unfinished">Export archive from %1 failed</translation>
+    </message>
+    <message>
+      <source>Not exported archive found on Device %1</source>
+      <translation type="unfinished">Not exported archive found on Device %1</translation>
+    </message>
+    <message>
+      <source>Not exported archive found on Camera %1</source>
+      <translation type="unfinished">Not exported archive found on Camera %1</translation>
+    </message>
+    <message>
+      <source>Export archive from %1</source>
+      <translation type="unfinished">Export archive from %1</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>匯出</translation>
     </message>
   </context>
   <context>

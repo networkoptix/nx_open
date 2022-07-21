@@ -94,6 +94,10 @@
       <source>Verifying update package</source>
       <translation>Verificando pacote de atualização</translation>
     </message>
+    <message>
+      <source>Cannot connect to the System</source>
+      <translation>Não é possível conectar ao sistema</translation>
+    </message>
   </context>
   <context>
     <name>ContextMenu</name>
@@ -5517,10 +5521,6 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
       <translation>Erro ao enviar e-mail</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been started</source>
-      <translation>A sincronização do arquivo remoto foi iniciada</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been finished</source>
       <translation>A sincronização do arquivo remoto foi concluída</translation>
     </message>
@@ -5529,16 +5529,8 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
       <translation>Sincronização de arquivos remotos em andamento</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been started for the following device:</source>
-      <translation>A sincronização de arquivos remoto foi iniciada para o seguinte dispositivo:</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been finished for the following device:</source>
       <translation>A sincronização do arquivo remoto foi concluída para o seguinte dispositivo:</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization</source>
-      <translation>Sincronização de arquivo remoto</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
@@ -5581,6 +5573,10 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     <message>
       <source>Camera recording schedule is invalid</source>
       <translation>A programação de gravação da câmera é inválida</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization available</source>
+      <translation>Sincronização remota de arquivos disponível</translation>
     </message>
   </context>
   <context>
@@ -7460,6 +7456,10 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     <message>
       <source>Server will not push time settings to the camera.</source>
       <translation>O servidor não enviará as configurações de tempo para a câmera.</translation>
+    </message>
+    <message>
+      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</source>
+      <translation>O vídeo gravado no armazenamento interno da câmera&apos;s não será carregado no arquivo principal.</translation>
     </message>
   </context>
   <context>
@@ -10051,22 +10051,18 @@ Cuidado: Esta senha não pode ser redefinida. Se você perdê-lo, o arquivo ser�
       <translation>Fixar este certificado em %1?</translation>
     </message>
     <message>
-      <source>Someone may be impersonating %1 to steel your personal information.
+      <source>Pin</source>
+      <translation>Fixar</translation>
+    </message>
+    <message>
+      <source>Someone may be impersonating %1 to steal your personal information.
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
       <translation>Alguém pode estar se passando por %1 para roubar suas informações pessoais.
 Não fixe este certificado se você&apos;t modificou o certificado SSL %2 servidores.</translation>
     </message>
-    <message>
-      <source>Pin</source>
-      <translation>Fixar</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
-    <message>
-      <source>View certificate</source>
-      <translation>Ver certificado</translation>
-    </message>
     <message>
       <source>Connect Anyway</source>
       <translation>Conecte mesmo assim</translation>
@@ -10076,40 +10072,46 @@ Não fixe este certificado se você&apos;t modificou o certificado SSL %2 servid
       <translation>Eu confio neste servidor</translation>
     </message>
     <message>
-      <source>System:</source>
-      <translation>Sistema:</translation>
-    </message>
-    <message>
-      <source>Server:</source>
-      <translation>Servidor:</translation>
-    </message>
-    <message>
-      <source>Server ID:</source>
-      <translation>ID do servidor:</translation>
-    </message>
-    <message>
-      <source>Trust this server?</source>
-      <translation>Deseja confiar neste servidor?</translation>
-    </message>
-    <message>
       <source>Cannot verify the identity of %1</source>
       <translation>Não é possível verificar a identidade de %1</translation>
     </message>
     <message>
-      <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
-      <translation>Você tentou se conectar a este servidor, mas apresentou um certificado que não pode ser verificado automaticamente.</translation>
+      <source>Connecting to %1 for the first time?</source>
+      <translation type="unfinished">Connecting to %1 for the first time?</translation>
     </message>
     <message>
-      <source>Someone may be impersonating this Server to steal your personal information.</source>
-      <translation>Alguém pode estar se passando por este Servidor para roubar suas informações pessoais.</translation>
+      <source>Review the %1 to ensure you trust the server you are connecting to.
+Read this %2 to learn more about certificate validation.</source>
+      <comment>%1 is &lt;certificate details&gt; link, %2 is &lt;help article&gt; link</comment>
+      <translation type="unfinished">Review the %1 to ensure you trust the server you are connecting to.
+Read this %2 to learn more about certificate validation.</translation>
     </message>
     <message>
-      <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
-      <translation>Não se conecte a este servidor a menos que instruído pelo administrador do VMS.</translation>
+      <source>certificate details</source>
+      <translation type="unfinished">certificate details</translation>
     </message>
     <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
-      <translation>Revise os detalhes do certificado&apos;s para certificar-se de que você está se conectando ao servidor correto.</translation>
+      <source>help article</source>
+      <translation type="unfinished">help article</translation>
+    </message>
+    <message>
+      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
+      <translation type="unfinished">This message may be shown multiple times when connecting to a multi-server system.</translation>
+    </message>
+    <message>
+      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
+You can view %2 or read this %3 to learn more about the current problem.</source>
+      <comment>%1 is the system name, %2 is &lt;the server&apos;s certificate&gt; link, %3 is &lt;help article&gt; link</comment>
+      <translation type="unfinished">This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
+You can view %2 or read this %3 to learn more about the current problem.</translation>
+    </message>
+    <message>
+      <source>the server&apos;s certificate</source>
+      <translation type="unfinished">the server&apos;s certificate</translation>
+    </message>
+    <message>
+      <source>Continue</source>
+      <translation type="unfinished">Continue</translation>
     </message>
   </context>
   <context>
@@ -10336,6 +10338,38 @@ Não fixe este certificado se você&apos;t modificou o certificado SSL %2 servid
     <message>
       <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
       <translation>A programação de gravação em algumas câmeras contém modos de gravação que não são suportados.</translation>
+    </message>
+    <message>
+      <source>SD archive found</source>
+      <translation type="unfinished">SD archive found</translation>
+    </message>
+    <message>
+      <source>Export in progress...</source>
+      <translation>Exportação em andamento...</translation>
+    </message>
+    <message>
+      <source>Export archive from %1 completed</source>
+      <translation type="unfinished">Export archive from %1 completed</translation>
+    </message>
+    <message>
+      <source>Export archive from %1 failed</source>
+      <translation type="unfinished">Export archive from %1 failed</translation>
+    </message>
+    <message>
+      <source>Not exported archive found on Device %1</source>
+      <translation type="unfinished">Not exported archive found on Device %1</translation>
+    </message>
+    <message>
+      <source>Not exported archive found on Camera %1</source>
+      <translation type="unfinished">Not exported archive found on Camera %1</translation>
+    </message>
+    <message>
+      <source>Export archive from %1</source>
+      <translation type="unfinished">Export archive from %1</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>Exportar</translation>
     </message>
   </context>
   <context>

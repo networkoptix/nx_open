@@ -1746,16 +1746,20 @@
       <translation>Les données sont sauvegardées dans %1</translation>
     </message>
     <message>
-      <source>Failed to backup file </source>
-      <translation>Échec de la sauvegarde du fichier </translation>
-    </message>
-    <message>
       <source>Server Certificate Error</source>
       <translation>Erreur de certificat de serveur</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
       <translation>Erreur serveur &quot;%1&quot; certificat</translation>
+    </message>
+    <message>
+      <source>Intercom informer</source>
+      <translation>Informeur Interphone</translation>
+    </message>
+    <message>
+      <source>Failed to backup file</source>
+      <translation>Échec de la sauvegarde du fichier</translation>
     </message>
   </context>
   <context>

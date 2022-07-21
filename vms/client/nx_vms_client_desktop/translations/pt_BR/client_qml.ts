@@ -261,8 +261,8 @@
   <context>
     <name>CloudTile</name>
     <message>
-      <source>Log in to </source>
-      <translation>Logar em </translation>
+      <source>Log in to</source>
+      <translation>Iniciar sessão em</translation>
     </message>
   </context>
   <context>
@@ -1166,8 +1166,8 @@ para ativar PTZ</translation>
   <context>
     <name>StyledRadioButton</name>
     <message>
-      <source>Logical ID </source>
-      <translation>ID lógico </translation>
+      <source>Logical ID</source>
+      <translation>ID lógico</translation>
     </message>
   </context>
   <context>

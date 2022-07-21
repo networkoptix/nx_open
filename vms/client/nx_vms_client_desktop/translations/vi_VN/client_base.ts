@@ -93,6 +93,10 @@
       <source>Verifying update package</source>
       <translation>Đang xác minh gói cập nhật</translation>
     </message>
+    <message>
+      <source>Cannot connect to the System</source>
+      <translation>Không thể kết nối với Hệ thống</translation>
+    </message>
   </context>
   <context>
     <name>ContextMenu</name>
@@ -5443,10 +5447,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Lỗi khi gửi email</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been started</source>
-      <translation>Đồng bộ hoá lưu trữ từ xa đã bắt đầu</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been finished</source>
       <translation>Đồng bộ hoá lưu trữ từ xa đã hoàn tất</translation>
     </message>
@@ -5455,16 +5455,8 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Đồng bộ hoá lưu trữ từ xa đang được tiến hành</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been started for the following device:</source>
-      <translation>Đồng bộ hoá lưu trữ từ xa đã được bắt đầu cho thiết bị sau:</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been finished for the following device:</source>
       <translation>Đồng bộ hoá lưu trữ từ xa đã được hoàn tất cho thiết bị sau:</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization</source>
-      <translation>Remote archive synchronization</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
@@ -5507,6 +5499,10 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Camera recording schedule is invalid</source>
       <translation>Lịch biểu ghi camera không hợp lệ</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization available</source>
+      <translation type="unfinished">Remote archive synchronization available</translation>
     </message>
   </context>
   <context>
@@ -7339,6 +7335,10 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>Server will not push time settings to the camera.</source>
       <translation>Máy chủ sẽ không đẩy cài đặt thời gian vào camera.</translation>
+    </message>
+    <message>
+      <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</source>
+      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</translation>
     </message>
   </context>
   <context>
@@ -9902,22 +9902,18 @@ Chú ý: Không thể đặt lại mật khẩu này. Nếu bạn làm mất nó
       <translation>Ghim chứng chỉ này vào %1?</translation>
     </message>
     <message>
-      <source>Someone may be impersonating %1 to steel your personal information.
-Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
-      <translation>Ai đó có thể đang mạo danh %1 để lấy thông tin cá nhân của bạn.
-Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL máy chủ %2.</translation>
-    </message>
-    <message>
       <source>Pin</source>
       <translation>Ghim</translation>
+    </message>
+    <message>
+      <source>Someone may be impersonating %1 to steal your personal information.
+Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
+      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
+Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
-    <message>
-      <source>View certificate</source>
-      <translation>Xem chứng chỉ</translation>
-    </message>
     <message>
       <source>Connect Anyway</source>
       <translation>Vẫn kết nối</translation>
@@ -9927,40 +9923,46 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <translation>Tôi tin tưởng máy chủ này</translation>
     </message>
     <message>
-      <source>System:</source>
-      <translation>Hệ thống:</translation>
-    </message>
-    <message>
-      <source>Server:</source>
-      <translation>Máy chủ:</translation>
-    </message>
-    <message>
-      <source>Server ID:</source>
-      <translation>ID máy chủ:</translation>
-    </message>
-    <message>
-      <source>Trust this server?</source>
-      <translation>Tin cậy máy chủ này?</translation>
-    </message>
-    <message>
       <source>Cannot verify the identity of %1</source>
       <translation>Không thể xác minh danh tính của %1</translation>
     </message>
     <message>
-      <source>You attempted to connect to this Server, but it presented a certificate that cannot be verified automatically.</source>
-      <translation>Bạn đã cố gắng kết nối với Máy chủ này, nhưng xuất hiện một chứng chỉ không thể xác minh tự động.</translation>
+      <source>Connecting to %1 for the first time?</source>
+      <translation type="unfinished">Connecting to %1 for the first time?</translation>
     </message>
     <message>
-      <source>Someone may be impersonating this Server to steal your personal information.</source>
-      <translation>Ai đó có thể đang mạo danh Máy chủ này để lấy thông tin cá nhân của bạn.</translation>
+      <source>Review the %1 to ensure you trust the server you are connecting to.
+Read this %2 to learn more about certificate validation.</source>
+      <comment>%1 is &lt;certificate details&gt; link, %2 is &lt;help article&gt; link</comment>
+      <translation type="unfinished">Review the %1 to ensure you trust the server you are connecting to.
+Read this %2 to learn more about certificate validation.</translation>
     </message>
     <message>
-      <source>Do not connect to this Server unless instructed by your VMS administrator.</source>
-      <translation>Không kết nối với Máy chủ này trừ khi được người quản trị VMS của bạn hướng dẫn.</translation>
+      <source>certificate details</source>
+      <translation type="unfinished">certificate details</translation>
     </message>
     <message>
-      <source>Review the certificate&apos;s details to make sure you are connecting to the correct Server.</source>
-      <translation>Xem lại các chi tiết của chứng chỉ để đảm bảo rằng bạn đang kết nối với đúng Máy chủ.</translation>
+      <source>help article</source>
+      <translation type="unfinished">help article</translation>
+    </message>
+    <message>
+      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
+      <translation type="unfinished">This message may be shown multiple times when connecting to a multi-server system.</translation>
+    </message>
+    <message>
+      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
+You can view %2 or read this %3 to learn more about the current problem.</source>
+      <comment>%1 is the system name, %2 is &lt;the server&apos;s certificate&gt; link, %3 is &lt;help article&gt; link</comment>
+      <translation type="unfinished">This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
+You can view %2 or read this %3 to learn more about the current problem.</translation>
+    </message>
+    <message>
+      <source>the server&apos;s certificate</source>
+      <translation type="unfinished">the server&apos;s certificate</translation>
+    </message>
+    <message>
+      <source>Continue</source>
+      <translation type="unfinished">Continue</translation>
     </message>
   </context>
   <context>
@@ -10183,6 +10185,38 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <message>
       <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
       <translation>Lịch ghi trên một số camera có các chế độ ghi không được hỗ trợ.</translation>
+    </message>
+    <message>
+      <source>SD archive found</source>
+      <translation type="unfinished">SD archive found</translation>
+    </message>
+    <message>
+      <source>Export in progress...</source>
+      <translation type="unfinished">Export in progress...</translation>
+    </message>
+    <message>
+      <source>Export archive from %1 completed</source>
+      <translation type="unfinished">Export archive from %1 completed</translation>
+    </message>
+    <message>
+      <source>Export archive from %1 failed</source>
+      <translation type="unfinished">Export archive from %1 failed</translation>
+    </message>
+    <message>
+      <source>Not exported archive found on Device %1</source>
+      <translation type="unfinished">Not exported archive found on Device %1</translation>
+    </message>
+    <message>
+      <source>Not exported archive found on Camera %1</source>
+      <translation type="unfinished">Not exported archive found on Camera %1</translation>
+    </message>
+    <message>
+      <source>Export archive from %1</source>
+      <translation type="unfinished">Export archive from %1</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>Xuất</translation>
     </message>
   </context>
   <context>

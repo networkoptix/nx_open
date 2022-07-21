@@ -630,6 +630,14 @@
       <source>Keep camera time settings</source>
       <translation>カメラの時刻設定を保持する</translation>
     </message>
+    <message>
+      <source>Export From SD Cards</source>
+      <translation>SDカードからエクスポート</translation>
+    </message>
+    <message>
+      <source>Do not export video automatically</source>
+      <translation>ビデオを自動的にエクスポートしない</translation>
+    </message>
   </context>
   <context>
     <name>CameraInfoWidget</name>
@@ -2484,7 +2492,7 @@
     </message>
     <message>
       <source>Fingerprints</source>
-      <translation>指紋</translation>
+      <translation>フィンガープリント</translation>
     </message>
     <message>
       <source>Details</source>

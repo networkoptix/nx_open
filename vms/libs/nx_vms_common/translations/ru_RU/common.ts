@@ -1862,16 +1862,20 @@
       <translation>Резервная кокия сохранена в %1</translation>
     </message>
     <message>
-      <source>Failed to backup file </source>
-      <translation>Не удалось создать резервную копию файла </translation>
-    </message>
-    <message>
       <source>Server Certificate Error</source>
       <translation>Ошибка сертификата сервера</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
       <translation>Ошибка сертификата на сервере &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Intercom informer</source>
+      <translation type="unfinished">Intercom informer</translation>
+    </message>
+    <message>
+      <source>Failed to backup file</source>
+      <translation>Не удалось создать резервную копию файла</translation>
     </message>
   </context>
   <context>

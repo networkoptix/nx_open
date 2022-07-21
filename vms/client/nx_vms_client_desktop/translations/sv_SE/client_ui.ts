@@ -630,6 +630,14 @@
       <source>Keep camera time settings</source>
       <translation>Behåll kamerans tidsinställningar</translation>
     </message>
+    <message>
+      <source>Export From SD Cards</source>
+      <translation>Exportera från SD-kort</translation>
+    </message>
+    <message>
+      <source>Do not export video automatically</source>
+      <translation>Exportera inte video automatiskt</translation>
+    </message>
   </context>
   <context>
     <name>CameraInfoWidget</name>

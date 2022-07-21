@@ -1746,16 +1746,20 @@
       <translation>Data sikkerhedskopieres til %1</translation>
     </message>
     <message>
-      <source>Failed to backup file </source>
-      <translation>Sikkerhedskopiering af fil mislykkedes </translation>
-    </message>
-    <message>
       <source>Server Certificate Error</source>
       <translation>Servercertifikat fejl</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
       <translation>Server &quot;%1&quot; certifikatfejl</translation>
+    </message>
+    <message>
+      <source>Intercom informer</source>
+      <translation type="unfinished">Intercom informer</translation>
+    </message>
+    <message>
+      <source>Failed to backup file</source>
+      <translation>Sikkerhedskopiering af fil mislykkedes</translation>
     </message>
   </context>
   <context>
