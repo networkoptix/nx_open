@@ -17,7 +17,7 @@ CameraInputEvent::CameraInputEvent(
     QnUuid cameraId,
     const QString& inputPortId)
     :
-    CameraEvent(timestamp, state, cameraId),
+    base_type(timestamp, state, cameraId),
     m_inputPortId(inputPortId)
 {
 }
@@ -39,7 +39,7 @@ QString CameraInputEvent::aggregationKey() const
 
 QVariantMap CameraInputEvent::details(common::SystemContext* context) const
 {
-    auto result = BasicEvent::details(context);
+    auto result = base_type::details(context);
 
     utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing());
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
