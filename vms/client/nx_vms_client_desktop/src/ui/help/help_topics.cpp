@@ -64,6 +64,8 @@ QString relativeUrlForTopic(Qn::HelpTopic topic)
             return "setting_camera_orientation.html";
         case Qn::HelpTopic::CameraSettings_SecondStream_Help:
             return "dual_streaming.html";
+        case Qn::HelpTopic::CertificateValidation_Help:
+            return "certificate-validation.html";
         case Qn::HelpTopic::ConnectToCamerasOverOnlyHttps_Help:
             return "to-connect-to-cameras-over-onl.html";
         case Qn::HelpTopic::EnableArchiveEncryption_Help:
