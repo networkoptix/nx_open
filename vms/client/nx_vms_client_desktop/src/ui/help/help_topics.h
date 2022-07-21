@@ -36,6 +36,7 @@ enum HelpTopic
     CameraSettings_Recording_Export_Help,
     CameraSettings_Rotation_Help,
     CameraSettings_SecondStream_Help,
+    CertificateValidation_Help,
     ConnectToCamerasOverOnlyHttps_Help,
     EnableArchiveEncryption_Help,
     EnableEncryptedVideoTraffic_Help,

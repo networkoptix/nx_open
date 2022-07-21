@@ -13,6 +13,7 @@
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/common/html/html.h>
+#include <ui/help/help_handler.h>
 #include <ui/statistics/modules/certificate_statistics_module.h>
 
 #include "server_certificate_viewer.h"
@@ -114,7 +115,7 @@ ServerCertificateWarning::ServerCertificateWarning(
             }
             else if (link == kHelpLink)
             {
-                //TODO: #spanasenko Open help page.
+                QnHelpHandler::openHelpTopic(Qn::CertificateValidation_Help);
             }
         });
 
