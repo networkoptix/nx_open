@@ -55,7 +55,7 @@ struct NX_VMS_API StaticWebContentInfo
     /**%apidoc[readonly] SHA256 hash of the web content archive. */
     std::optional<QByteArray> sha256;
 
-    /**%apidoc[readonly]:integer The creation timestamp of the web content archive. */
+    /**%apidoc[readonly] The creation timestamp of the web content archive. */
     std::chrono::milliseconds timestampMs = std::chrono::milliseconds(0);
 
     /**%apidoc[readonly] Detailed information about the contents. */
