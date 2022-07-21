@@ -2484,7 +2484,7 @@
     </message>
     <message>
       <source>Fingerprints</source>
-      <translation>指紋</translation>
+      <translation>フィンガープリント</translation>
     </message>
     <message>
       <source>Details</source>
