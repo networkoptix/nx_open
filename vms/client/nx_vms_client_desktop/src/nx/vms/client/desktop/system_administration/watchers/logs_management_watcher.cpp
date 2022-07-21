@@ -680,10 +680,14 @@ struct LogsManagementWatcher::Private
                     //TODO: #spanasenko Report an error.
                 });
 
+            QByteArray serializedSettings;
+            QnJsonContext ctx;
+            ctx.setChronoSerializedAsDouble(true);
+            QJson::serialize(&ctx, newSettings, &serializedSettings);
             q->connection()->serverApi()->putEmptyResult(
                 QString("/rest/v2/servers/%1/logSettings").arg(server->id().toString()),
                 {},
-                nx::String(nx::reflect::json::serialize(newSettings)),
+                serializedSettings,
                 callback,
                 q->thread()
             );
