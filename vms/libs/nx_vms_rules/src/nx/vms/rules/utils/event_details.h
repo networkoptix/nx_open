@@ -29,7 +29,8 @@ static constexpr auto kUserIdDetailName = "userId";
 
 static constexpr std::chrono::microseconds kScreenshotLifetime(5'000'000);
 
-inline void insertIfNotEmpty(QVariantMap& map, const QString& key, const QString& value)
+template <class T>
+void insertIfNotEmpty(QVariantMap& map, const QString& key, const T& value)
 {
     if (!value.isEmpty())
         map.insert(key, value);

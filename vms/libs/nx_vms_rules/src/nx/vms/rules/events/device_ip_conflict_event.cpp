@@ -48,7 +48,7 @@ QVariantMap DeviceIpConflictEvent::details(common::SystemContext* context) const
     return result;
 }
 
-QString DeviceIpConflictEvent::detailing() const
+QStringList DeviceIpConflictEvent::detailing() const
 {
     QStringList result;
 
@@ -57,7 +57,7 @@ QString DeviceIpConflictEvent::detailing() const
     for (const auto& macAddress: m_macAddresses)
         result << tr("MAC #%1: %2").arg(++n).arg(macAddress);
 
-    return result.join(common::html::kLineBreak);
+    return result;
 }
 
 QString DeviceIpConflictEvent::extendedCaption(common::SystemContext* context) const

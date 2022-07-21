@@ -32,7 +32,7 @@ public:
     static const ItemDescriptor& manifest();
 
 private:
-    QString detailing() const;
+    QStringList detailing() const;
     QString extendedCaption(common::SystemContext* context) const;
 };
 

@@ -34,12 +34,6 @@ QVariantMap ServerConflictEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);
 
-    if (!m_conflicts.sourceServer.isEmpty())
-    {
-        result[utils::kCaptionDetailName] =
-            tr("Conflicting Server: %1").arg(m_conflicts.sourceServer);
-    }
-
     utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing());
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
     result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
@@ -47,12 +41,8 @@ QVariantMap ServerConflictEvent::details(common::SystemContext* context) const
     return result;
 }
 
-QString ServerConflictEvent::detailing() const
+QStringList ServerConflictEvent::detailing() const
 {
-    // See original formatting in StringsHelper::eventDetails()
-    if (m_conflicts.camerasByServer.isEmpty())
-        return {};
-
     QStringList result;
 
     int n = 0;
@@ -66,8 +56,10 @@ QString ServerConflictEvent::detailing() const
             result << tr("MAC #%1: %2").arg(++m).arg(camera);
     }
 
-    //TODO: #mmalofeev Choose type for tooltip/detailing field.
-    return result.join("\n");
+    if (result.empty())
+        result << tr("Conflicting Server: %1").arg(m_conflicts.sourceServer);
+
+    return result;
 }
 
 QString ServerConflictEvent::extendedCaption(common::SystemContext* context) const
