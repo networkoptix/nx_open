@@ -333,6 +333,30 @@ struct WebViewController::Private {
 
         root->setProperty(kResourceIdProperty, isProxied ? resource->getId().toString() : "");
     }
+
+    void acceptAuth(const QString& username, const QString& password)
+    {
+        if (!NX_ASSERT(authRequest))
+            return;
+
+        QMetaObject::invokeMethod(
+            authRequest,
+            "dialogAccept",
+            Q_ARG(QString, username),
+            Q_ARG(QString, password));
+
+        authRequest = nullptr;
+    }
+
+    void rejectAuth()
+    {
+        if (!NX_ASSERT(authRequest))
+            return;
+
+        QMetaObject::invokeMethod(authRequest, "dialogReject");
+
+        authRequest = nullptr;
+    }
 };
 
 WebViewController::WebViewController(QObject* parent): base_type(parent), d(new Private(this))
@@ -902,45 +926,43 @@ void WebViewController::auth(WebEngineViewAuthAction action, const QAuthenticato
     if (!d->authRequest)
         return;
 
-    if (action == ShowDialog)
-    {
-        QString text;
-        if (d->authRequest->property("type").toInt() == AuthenticationTypeProxy)
-        {
-            text = tr("The proxy %1 requires a username and password.")
-                .arg(d->authRequest->property("proxyHost").toString());
-        }
-        else
-        {
-            const auto url = d->authRequest->property("url").toUrl();
-            text = url.toString(QUrl::RemovePassword | QUrl::RemovePath);
-        }
-
-        PasswordDialog dialog(d->widget());
-        dialog.setText(text);
-        if (!credentials.isNull())
-            dialog.setUsername(credentials.user());
-
-        action = dialog.exec() == QDialog::Accepted ? Accept : Reject;
-    }
-
     switch (action)
     {
         case Accept:
-            QMetaObject::invokeMethod(
-                d->authRequest,
-                "dialogAccept",
-                Q_ARG(QString, credentials.user()),
-                Q_ARG(QString, credentials.password()));
+            d->acceptAuth(credentials.user(), credentials.password());
             break;
         case Reject:
-            QMetaObject::invokeMethod(d->authRequest, "dialogReject");
+            d->rejectAuth();
             break;
+        case ShowDialog:
+        {
+            QString text;
+            if (d->authRequest->property("type").toInt() == AuthenticationTypeProxy)
+            {
+                text = tr("The proxy %1 requires a username and password.")
+                    .arg(d->authRequest->property("proxyHost").toString());
+            }
+            else
+            {
+                const auto url = d->authRequest->property("url").toUrl();
+                text = url.toString(QUrl::RemovePassword | QUrl::RemovePath);
+            }
+
+            PasswordDialog dialog(d->widget());
+            dialog.setText(text);
+            if (!credentials.isNull())
+                dialog.setUsername(credentials.user());
+
+            if (dialog.exec() == QDialog::Accepted)
+                d->acceptAuth(dialog.username(), dialog.password());
+            else
+                d->rejectAuth();
+
+            break;
+        }
         default:
             break;
     }
-
-    d->authRequest = nullptr;
 }
 
 void WebViewController::requestAuthenticationDialog(QObject* request)
