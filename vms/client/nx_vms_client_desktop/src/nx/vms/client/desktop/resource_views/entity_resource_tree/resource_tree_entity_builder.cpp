@@ -850,11 +850,13 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createOtherSystemsGroupEntity() con
 {
     auto otherSystemsComposition = std::make_unique<CompositionEntity>();
     otherSystemsComposition->addSubEntity(createCloudOtherSystemsEntity());
-    otherSystemsComposition->addSubEntity(createLocalOtherSystemsEntity());
+    if (user() && user()->isOwner())
+        otherSystemsComposition->addSubEntity(createLocalOtherSystemsEntity());
 
     return makeFlatteningGroup(
         m_itemFactory->createOtherSystemsItem(),
-        std::move(otherSystemsComposition));
+        std::move(otherSystemsComposition),
+        FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy);
 }
 
 AbstractEntityPtr ResourceTreeEntityBuilder::createSubjectResourcesEntity(

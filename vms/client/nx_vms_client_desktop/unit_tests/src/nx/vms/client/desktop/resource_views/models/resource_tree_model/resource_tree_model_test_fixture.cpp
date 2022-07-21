@@ -143,6 +143,16 @@ QnMediaServerResourcePtr ResourceTreeModelTest::addEdgeServer(const QString& nam
     return server;
 }
 
+QnMediaServerResourcePtr ResourceTreeModelTest::addFakeServer(const QString& name) const
+{
+    QnMediaServerResourcePtr server(new QnMediaServerResource(commonModule()));
+    server->setIdUnsafe(QnUuid::createUuid());
+    server->setName(name);
+    server->setFlags(Qn::ResourceFlag::fake_server);
+    resourcePool()->addResource(server);
+    return server;
+}
+
 QnAviResourcePtr ResourceTreeModelTest::addLocalMedia(const QString& path) const
 {
     QnAviResourcePtr localMedia(new QnAviResource(path, commonModule()));
