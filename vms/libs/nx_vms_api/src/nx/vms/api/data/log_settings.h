@@ -63,7 +63,7 @@ struct NX_VMS_API ServerLogSettings
     /**%apidoc:integer Maximum size (in bytes) of a single log file. */
     double maxFileSizeB = nx::utils::log::kDefaultMaxLogFileSizeB;
 
-    /**%apidoc:integer Maximum time duration of a single log file. */
+    /**%apidoc Maximum time duration of a single log file. */
     std::chrono::seconds maxFileTimePeriodS = nx::utils::log::kDefaultMaxLogFileTimePeriodS;
 
     /**%apidoc MAIN log settings. */
