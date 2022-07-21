@@ -17,13 +17,12 @@ class NX_VMS_RULES_API CameraEvent: public BasicEvent
 
 public:
     virtual QString uniqueName() const override;
+    virtual QString resourceKey() const override;
     virtual QVariantMap details(common::SystemContext* context) const override;
 
 protected:
     CameraEvent() = default;
     CameraEvent(std::chrono::microseconds timestamp, State state, QnUuid id);
-
-    virtual QString resourceKey() const override;
 
 private:
     nx::vms::api::ResourceStatus sourceStatus(common::SystemContext* context) const;
