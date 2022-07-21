@@ -87,6 +87,7 @@ private:
         SystemError::ErrorCode error,
         network::IoCompletionHandler userHandler,
         utils::MoveOnlyFunc<void(SystemError::ErrorCode, network::IoCompletionHandler)> completionHandler);
+
     void onReadFromSendSocket(SystemError::ErrorCode error, size_t transferred);
 
     static void addDateHeader(network::http::HttpHeaders* headers);

@@ -237,19 +237,7 @@ void P2PHttpServerTransport::onBytesRead(
     {
         NX_VERBOSE(this, "onBytesRead: Connection seems to have been closed by a remote peer.");
         m_readSocket.reset();
-
-        NX_ASSERT(m_userReadHandlerPair == nullptr);
-        if (m_userReadHandlerPair != nullptr)
-        {
-            handler(SystemError::notSupported, 0);
-            return;
-        }
-
-        m_userReadHandlerPair = UserReadHandlerPair(
-            new std::pair<nx::Buffer* const, network::IoCompletionHandler>(
-                buffer,
-                std::move(handler)));
-
+        handler(SystemError::connectionAbort, 0);
         return;
     }
 
@@ -260,44 +248,52 @@ void P2PHttpServerTransport::onBytesRead(
                 m_readContext.buffer = nx::utils::fromBase64(*buffer);
             else
                 m_readContext.buffer = *buffer;
-            *buffer = m_readContext.buffer;
 
+            *buffer = m_readContext.buffer;
             utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
             handler(error, m_readContext.bytesParsed);
             if (watcher.interrupted())
                 return;
 
             m_readContext.reset();
+
+            if (error != SystemError::noError)
+                m_readSocket.reset();
         };
 
-    size_t totalBytesProcessed = 0;
-
-    while (totalBytesProcessed != transferred)
+    auto lastBufferSize = m_readContext.buffer.size();
+    while (true)
     {
         size_t bytesProcessed = 0;
         const auto parserState = m_readContext.parser.parse(m_readContext.buffer, &bytesProcessed);
         m_readContext.bytesParsed += bytesProcessed;
-        totalBytesProcessed += bytesProcessed;
-
-        switch(parserState)
+        switch (parserState)
         {
-        case network::server::ParserState::done:
-            buffer->append(m_readContext.parser.fetchMessageBody());
-            sendPostResponse(SystemError::noError, std::move(handler), std::move(completionHandler));
-            return;
-        case network::server::ParserState::failed:
-            sendPostResponse(SystemError::invalidData, std::move(handler), std::move(completionHandler));
-            return;
-        case network::server::ParserState::readingBody:
-        case network::server::ParserState::readingMessage:
-            buffer->append(m_readContext.parser.fetchMessageBody());
-            m_readContext.buffer.erase(0, bytesProcessed);
-            break;
-        case network::server::ParserState::init:
-            NX_ASSERT(false, "Should never get here");
-            sendPostResponse(SystemError::invalidData, std::move(handler), std::move(completionHandler));
-            return;
+            case network::server::ParserState::done:
+                buffer->append(m_readContext.parser.fetchMessageBody());
+                sendPostResponse(
+                    SystemError::noError, std::move(handler), std::move(completionHandler));
+                return;
+            case network::server::ParserState::failed:
+                sendPostResponse(
+                    SystemError::invalidData, std::move(handler), std::move(completionHandler));
+                return;
+            case network::server::ParserState::readingBody:
+            case network::server::ParserState::readingMessage:
+                buffer->append(m_readContext.parser.fetchMessageBody());
+                m_readContext.buffer.erase(0, bytesProcessed);
+                break;
+            case network::server::ParserState::init:
+                NX_ASSERT(false, "Should never get here");
+                sendPostResponse(
+                    SystemError::invalidData, std::move(handler), std::move(completionHandler));
+                return;
         }
+
+        if (m_readContext.buffer.empty() || lastBufferSize == m_readContext.buffer.size())
+            break;
+
+        lastBufferSize = m_readContext.buffer.size();
     }
 
     readFromSocket(buffer, std::move(handler));
