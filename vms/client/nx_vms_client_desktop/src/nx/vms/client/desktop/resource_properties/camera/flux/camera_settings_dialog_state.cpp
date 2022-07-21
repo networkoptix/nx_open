@@ -2,6 +2,8 @@
 
 #include "camera_settings_dialog_state.h"
 
+#include <nx/vms/client/desktop/ini.h>
+
 namespace nx::vms::client::desktop {
 
 bool CameraSettingsDialogState::isSingleCamera() const
@@ -160,6 +162,11 @@ bool CameraSettingsDialogState::isPageVisible(CameraSettingsTab page) const
 
         case CameraSettingsTab::dewarping:
             return isSingleCamera() && singleCameraProperties.hasVideo;
+
+        case CameraSettingsTab::hotspots:
+            return isSingleCamera()
+                && singleCameraProperties.supportsCameraHotspots
+                && ini().enableCameraHotspotsFeature;
 
         case CameraSettingsTab::advanced:
             return canShowAdvancedPage();

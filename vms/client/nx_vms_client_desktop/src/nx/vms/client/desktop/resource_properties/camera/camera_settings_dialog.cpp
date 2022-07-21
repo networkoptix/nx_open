@@ -58,6 +58,7 @@
 #include "widgets/camera_analytics_settings_widget.h"
 #include "widgets/camera_dewarping_settings_widget.h"
 #include "widgets/camera_expert_settings_widget.h"
+#include "widgets/camera_hotspots_settings_widget.h"
 #include "widgets/camera_motion_settings_widget.h"
 #include "widgets/camera_schedule_widget.h"
 #include "widgets/camera_settings_general_tab_widget.h"
@@ -259,8 +260,14 @@ struct CameraSettingsDialog::Private: public QObject
 
     void updatePreviewIfNeeded()
     {
-        if (q->isVisible() && q->currentPage() == int(CameraSettingsTab::dewarping))
-            cameraPreview->update();
+        if (q->isVisible())
+        {
+            if (q->currentPage() == int(CameraSettingsTab::dewarping) ||
+                q->currentPage() == int(CameraSettingsTab::hotspots))
+            {
+                cameraPreview->update();
+            }
+        }
     }
 };
 
@@ -327,6 +334,11 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         new CameraDewarpingSettingsWidget(
             d->store, d->cameraPreview, qnClientCoreModule->mainQmlEngine(), ui->tabWidget),
         tr("Dewarping"));
+
+    addPage(
+        int(CameraSettingsTab::hotspots),
+        new CameraHotspotsSettingsWidget(d->store, d->cameraPreview),
+        tr("Hotspots"));
 
     d->initializeAdvancedSettingsWidget();
     addPage(

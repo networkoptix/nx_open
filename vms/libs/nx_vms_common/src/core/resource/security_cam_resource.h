@@ -21,6 +21,7 @@
 #include <nx/vms/api/data/device_model.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/events/events_fwd.h>
+#include <nx/vms/common/resource/camera_hotspots_data.h>
 
 #include "resource_data.h"
 
@@ -324,6 +325,17 @@ public:
     /** Get backup qualities, substantiating default value. */
     nx::vms::api::CameraBackupQuality getActualBackupQualities() const;
 
+    /**
+     * @return List of camera hotspots description data structures.
+     */
+    nx::vms::common::CameraHotspotDataList getCameraHotspots();
+
+    /**
+     * Sets camera hotspots descriptions to the resource as is. Data validity is the responsibility
+     * of the caller.
+     */
+    void setCameraHotspots(const nx::vms::common::CameraHotspotDataList& cameraHotspots);
+
     QString getModel() const;
     void setModel(const QString &model);
 
@@ -592,6 +604,7 @@ signals:
     void backupContentTypeChanged(const QnResourcePtr& resource);
     void backupPolicyChanged(const QnResourcePtr& resource);
     void mediaCapabilitiesChanged(const QnSecurityCamResourcePtr& camera);
+    void cameraHotspotsChanged(const QnSecurityCamResourcePtr& camera);
 
     void networkIssue(
         const QnResourcePtr& resource,

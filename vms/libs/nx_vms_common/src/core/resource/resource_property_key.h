@@ -105,6 +105,7 @@ static const QString kForcedLicenseType("forcedLicenseType");
 static const QString kTwoWayAudioEnabled("twoWayAudioEnabled");
 static const QString kAudioInputDeviceId("audioInputDeviceId");
 static const QString kAudioOutputDeviceId("audioOutputDeviceId");
+static const QString kCameraHotspotsData("cameraHotspotsData");
 
 /**
  * Whether primary stream should be recorded on a camera. Empty if recording is allowed, any

@@ -236,6 +236,10 @@ QnSecurityCamResource::QnSecurityCamResource():
                 m_cachedCameraMediaCapabilities.reset();
                 emit mediaCapabilitiesChanged(toSharedPointer(this));
             }
+            else if (key == ResourcePropertyKey::kCameraHotspotsData)
+            {
+                emit cameraHotspotsChanged(toSharedPointer(this));
+            }
         });
 
     QnMediaResource::initMediaResource();
@@ -1409,6 +1413,38 @@ nx::vms::api::CameraBackupQuality QnSecurityCamResource::getActualBackupQualitie
 
     /* If backup is not configured on this camera, use 'Backup newly added cameras' value */
     return systemContext()->globalSettings()->backupSettings().quality;
+}
+
+nx::vms::common::CameraHotspotDataList QnSecurityCamResource::getCameraHotspots()
+{
+    const auto hotspotsPropertyValue = getProperty(ResourcePropertyKey::kCameraHotspotsData);
+    if (hotspotsPropertyValue.isEmpty())
+        return {};
+
+    const auto [hotspotsData, result] =
+        nx::reflect::json::deserialize<nx::vms::common::CameraHotspotDataList>(
+            hotspotsPropertyValue.toStdString());
+
+    if (!NX_ASSERT(result, "Failed to deserialize camera hotspots: %1", result.errorDescription))
+        return {};
+
+    return hotspotsData;
+}
+
+void QnSecurityCamResource::setCameraHotspots(
+    const nx::vms::common::CameraHotspotDataList& hotspots)
+{
+    nx::vms::common::CameraHotspotDataList savedHotspots;
+
+    std::copy_if(hotspots.cbegin(), hotspots.cend(), std::back_inserter(savedHotspots),
+        [](const auto& hotspot) { return hotspot.isValid(); });
+
+    for (auto& hotspot: savedHotspots)
+        hotspot.fixupData();
+
+    setProperty(ResourcePropertyKey::kCameraHotspotsData, !savedHotspots.empty()
+        ? QString::fromStdString(nx::reflect::json::serialize(savedHotspots))
+        : QString());
 }
 
 bool QnSecurityCamResource::isDualStreamingDisabled() const

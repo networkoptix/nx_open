@@ -25,6 +25,7 @@
 #include <nx/vms/client/desktop/common/flux/abstract_flux_state.h>
 #include <nx/vms/client/desktop/common/flux/flux_types.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/common/resource/camera_hotspots_data.h>
 #include <nx/vms/client/desktop/resource_properties/schedule/record_schedule_cell_data.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_state.h>
 #include <utils/common/aspect_ratio.h>
@@ -57,6 +58,7 @@ struct SingleCameraProperties
     bool editableStreamUrls = false;
     bool networkLink = false;
     bool usbDevice = false;
+    bool supportsCameraHotspots = false;
 
     int maxFpsWithoutMotion = 0;
 
@@ -72,7 +74,7 @@ struct SingleCameraProperties
 NX_REFLECTION_INSTRUMENT(SingleCameraProperties,
     (id)(name)(firmware)(model)(vendor)(macAddress)(ipAddress)(webPageLabelText)(settingsUrl)
     (overrideXmlHttpRequestTimeout)(overrideHttpUserAgent)(isOnline)(fixupRequestUrls)(hasVideo)
-    (editableStreamUrls)(networkLink)(usbDevice)(maxFpsWithoutMotion)
+    (editableStreamUrls)(networkLink)(usbDevice)(supportsCameraHotspots)(maxFpsWithoutMotion)
     (primaryStreamResolution)(secondaryStreamResolution))
 
 struct CombinedProperties
@@ -242,11 +244,11 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
         QnUuid audioInputDeviceId;
         QnUuid audioOutputDeviceId;
 
+        nx::vms::common::CameraHotspotDataList cameraHotspots;
+
         QStringList sameLogicalIdCameraNames; //< Read-only informational value.
     };
     SingleCameraSettings singleCameraSettings;
-
-
 
     camera_settings_detail::Motion motion;
 

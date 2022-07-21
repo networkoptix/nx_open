@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CameraHotspotsSettingsWidget</class>
+ <widget class="QWidget" name="CameraHotspotsSettingsWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>629</width>
+    <height>384</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="widgetLayout">
+   <property name="spacing">
+    <number>16</number>
+   </property>
+   <item>
+    <layout class="QVBoxLayout" name="hotspotsEditorLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <property name="sizeConstraint">
+      <enum>QLayout::SetMinimumSize</enum>
+     </property>
+     <item>
+      <widget class="nx::vms::client::desktop::CameraHotspotsEditorWidget" name="hotspotsEditorWidget" native="true"/>
+     </item>
+     <item>
+      <widget class="QWidget" name="hotspotEditControlsPanel" native="true">
+       <layout class="QHBoxLayout" name="hotspotEditControlsLayout">
+        <item>
+         <widget class="QPushButton" name="selectCameraButton">
+          <property name="text">
+           <string>Select Camera</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="hotspotEditControlsHorizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="deleteHotspotButton">
+          <property name="text">
+           <string>Delete Hotspot</string>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="Line" name="hotspotsEditorBottomLine">
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="addHotspotButtonHorizontalLayout">
+     <item>
+      <widget class="QPushButton" name="addHotspotButton">
+       <property name="text">
+        <string>Add Hotspot</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="addHotspotButtonHorizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="widgetVerticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>nx::vms::client::desktop::CameraHotspotsEditorWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/camera_hotspots_editor_widget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

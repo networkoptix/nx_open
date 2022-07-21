@@ -119,6 +119,7 @@ public:
     void setAudioInputDeviceId(const QnUuid& deviceId);
     void setTwoWayAudioEnabled(bool value);
     void setAudioOutputDeviceId(const QnUuid& deviceId);
+    void setCameraHotspotsData(const nx::vms::common::CameraHotspotDataList& cameraHotspots);
 
     /** User clicked on "Motion detection" checkbox. */
     void setMotionDetectionEnabled(bool value);
