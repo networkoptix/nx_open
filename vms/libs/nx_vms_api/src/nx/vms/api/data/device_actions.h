@@ -27,11 +27,8 @@ NX_REFLECTION_INSTRUMENT(DevicePasswordRequest, DevicePasswordRequest_Fields)
 
 struct DeviceFootageRequest: IdData
 {
-    /**%apidoc:integer */
     std::chrono::milliseconds startTimeMs{0};
-    /**%apidoc:integer */
     std::chrono::milliseconds endTimeMs{std::numeric_limits<qint64>::max()};
-    /**%apidoc:integer */
     std::chrono::milliseconds detailLevelMs{1};
     bool keepSmallChunks{false};
     bool preciseBounds{false};
