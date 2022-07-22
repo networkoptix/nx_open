@@ -38,6 +38,9 @@ public:
     linux::Renderer& getRenderer();
     void resetDecoder();
 
+    void pushContext();
+    void popContext();
+
 private:
     bool initialize(const QnConstCompressedVideoDataPtr& frame);
 

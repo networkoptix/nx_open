@@ -4,18 +4,11 @@
 
 #include <nx/media/nvidia/nvidia_video_frame.h>
 
-bool renderToRgb(
-    AbstractVideoSurface* frame,
-    bool isNewTexture,
-    GLuint textureId,
-    QOpenGLContext* /*context*/,
-    int scaleFactor,
-    float* cropWidth,
-    float* cropHeight)
+bool renderToRgb(AbstractVideoSurface* frame, GLuint textureId, int textureWidth, int textureHeight)
 {
     NvidiaVideoFrame* nvFrame = dynamic_cast<NvidiaVideoFrame*>(frame);
     if (!nvFrame)
         return false;
 
-    return nvFrame->renderToRgb(isNewTexture, textureId, scaleFactor, cropWidth, cropHeight);
+    return nvFrame->renderToRgb(textureId, textureWidth, textureHeight);
 }

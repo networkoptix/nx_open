@@ -17,16 +17,8 @@ class Renderer
 public:
     Renderer();
     ~Renderer();
-    bool initialize(int width, int height);
-    bool convertToRgb(
-        uint8_t* frameData, cudaVideoSurfaceFormat format, int bitDepth, int matrix);
-    bool render(
-        bool isNewTexture,
-        GLuint textureId,
-        uint8_t* frameData,
-        cudaVideoSurfaceFormat format,
-        int bitDepth,
-        int matrix);
+    bool initialize(int width, int height, int pitch);
+    bool render(GLuint textureId, uint8_t* frameData, cudaVideoSurfaceFormat format, int bitDepth, int matrix, int textureWidth, int textureHeight);
 
 private:
     std::unique_ptr<RendererImpl> m_impl;

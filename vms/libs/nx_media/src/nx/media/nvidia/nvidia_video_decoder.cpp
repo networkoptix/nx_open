@@ -48,7 +48,7 @@ struct NvidiaVideoDecoderImpl
 };
 
 bool NvidiaVideoDecoder::isCompatible(
-    const QnConstCompressedVideoDataPtr& frame, AVCodecID codec, int width, int height)
+    const QnConstCompressedVideoDataPtr& /*frame*/, AVCodecID /*codec*/, int /*width*/, int /*height*/)
 {
     return true;
 }
@@ -87,14 +87,14 @@ bool NvidiaVideoDecoder::initialize(const QnConstCompressedVideoDataPtr& frame)
     }
 
     m_impl->decoder =
-        std::make_unique<NvDecoder>(m_impl->context, true, FFmpeg2NvCodecId(frame->compressionType));
+        std::make_unique<NvDecoder>(m_impl->context, true, FFmpeg2NvCodecId(frame->compressionType), /*bLowLatency*/false, /*bDeviceFramePitched*/true);
 
     return true;
 }
 
 int NvidiaVideoDecoder::decode(const QnConstCompressedVideoDataPtr& packet, nx::QVideoFramePtr* result)
 {
-    NX_DEBUG(this, "decode");
+    NX_DEBUG(this, "decode: %1", packet->timestamp);
     if (!m_impl->decoder && !initialize(packet))
     {
         NX_ERROR(this, "Failed to initialize nvidia decoder");
@@ -104,9 +104,8 @@ int NvidiaVideoDecoder::decode(const QnConstCompressedVideoDataPtr& packet, nx::
     auto packetAnnexB = m_impl->filterAnnexB.processVideoData(packet);
 
     m_impl->framesReady = m_impl->decoder->Decode(
-        (const uint8_t*)packetAnnexB->data(), packetAnnexB->dataSize());
+        (const uint8_t*)packetAnnexB->data(), packetAnnexB->dataSize(), 0, packetAnnexB->timestamp);
     NX_DEBUG(this, "framesReady: %1", m_impl->framesReady);
-    //TODO crash here getFrame();
     return 1;
 }
 
@@ -115,30 +114,28 @@ std::unique_ptr<NvidiaVideoFrame> NvidiaVideoDecoder::getFrame()
     if (!m_impl->framesReady)
         return nullptr;
 
+    auto& nvDecoder = m_impl->decoder;
     if (!m_impl->renderer)
     {
         m_impl->renderer = std::make_unique<linux::Renderer>();
-        if (!m_impl->renderer->initialize(m_impl->decoder->GetWidth(), m_impl->decoder->GetHeight()))
+        if (!m_impl->renderer->initialize(nvDecoder->GetWidth(), nvDecoder->GetHeight(), nvDecoder->GetDeviceFramePitch()))
         {
             NX_WARNING(this, "Failed to initialize renderer");
             return nullptr;
         }
     }
 
+
     auto frame = std::make_unique<NvidiaVideoFrame>();
     frame->decoder = weak_from_this();
-    frame->height = m_impl->decoder->GetHeight();
-    frame->width = m_impl->decoder->GetWidth();
-    frame->frameData = m_impl->decoder->GetFrame(nullptr);
-    frame->format = m_impl->decoder->GetOutputFormat();
-    frame->bitDepth = m_impl->decoder->GetBitDepth();
-    frame->matrix = m_impl->decoder->GetVideoFormatInfo().video_signal_description.matrix_coefficients;
-    m_impl->renderer->convertToRgb(frame->frameData, (cudaVideoSurfaceFormat)frame->format, frame->bitDepth, frame->matrix);
+    frame->height = nvDecoder->GetHeight();
+    frame->width = nvDecoder->GetWidth();
+    frame->frameData = nvDecoder->GetFrame(&frame->timestamp);
+    frame->bitDepth = nvDecoder->GetBitDepth();
+    frame->format = nvDecoder->GetOutputFormat();
+    frame->matrix = nvDecoder->GetVideoFormatInfo().video_signal_description.matrix_coefficients;
     return frame;
 }
-
-//bool NvidiaVideoDecoderImpl::scaleFrame(
-//      mfxFrameSurface1* inputSurface, mfxFrameSurface1** outSurface, const QSize& targetSize);
 
 void NvidiaVideoDecoder::resetDecoder()
 {
@@ -148,6 +145,16 @@ void NvidiaVideoDecoder::resetDecoder()
 linux::Renderer& NvidiaVideoDecoder::getRenderer()
 {
     return *m_impl->renderer;
+}
+
+void NvidiaVideoDecoder::pushContext()
+{
+    cuCtxPushCurrent(m_impl->context);
+}
+
+void NvidiaVideoDecoder::popContext()
+{
+    cuCtxPopCurrent(nullptr);
 }
 
 } // namespace nx::media::nvidia
