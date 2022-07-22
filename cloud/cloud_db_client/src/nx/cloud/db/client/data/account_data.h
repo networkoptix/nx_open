@@ -57,6 +57,11 @@ NX_REFLECTION_INSTRUMENT(AccountRegistrationData, AccountRegistrationData_Fields
 
 NX_REFLECTION_INSTRUMENT(AccountData, AccountData_Fields)
 
+#define AccountStatusData_Fields (statusCode)
+
+NX_REFLECTION_INSTRUMENT(AccountStatusData, AccountStatusData_Fields)
+QN_FUSION_DECLARE_FUNCTIONS(AccountStatusData, (json))
+
 //-------------------------------------------------------------------------------------------------
 // class AccountConfirmationCode
 

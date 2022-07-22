@@ -61,6 +61,7 @@ void serializeToUrlQuery(const AccountRegistrationData& data, QUrlQuery* const u
         QString::fromStdString(data.customization));
 }
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AccountStatusData, (json), AccountStatusData_Fields)
 
 //-------------------------------------------------------------------------------------------------
 // class AccountConfirmationCode

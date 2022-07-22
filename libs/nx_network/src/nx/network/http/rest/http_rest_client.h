@@ -4,6 +4,7 @@
 
 #include <initializer_list>
 #include <string>
+#include <string_view>
 
 #include <nx/utils/log/assert.h>
 
@@ -64,6 +65,18 @@ std::string substituteParameters(
         NX_ASSERT(false);
     }
     return resultPath;
+}
+
+/**
+ * Replaces all REST parameters (e.g., "{foo}") with the token.
+ * @return Result of the replacement.
+ */
+inline std::string replaceAllParameters(
+    const std::string_view& pathTemplate, const std::string_view& token)
+{
+    std::string result(pathTemplate);
+    while (detail::substituteNextParameter(&result, token)) {}
+    return result;
 }
 
 } // namespace rest

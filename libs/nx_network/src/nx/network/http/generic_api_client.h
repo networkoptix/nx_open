@@ -37,6 +37,8 @@ struct DefaultApiResultCodeDescriptor
  *         const network::http::ApiRequestResult& fusionRequestResult,
  *         const Output&... output);
  * </code></pre>
+ *
+ * Note: Supports concurrent requests.
  */
 template<typename ApiResultCodeDescriptor = DefaultApiResultCodeDescriptor>
 // requires { typename ApiResultCodeDescriptor::ResultCode; }
@@ -53,12 +55,11 @@ public:
 
     void setRequestTimeout(std::optional<std::chrono::milliseconds> timeout);
     void setRetryPolicy(unsigned numOfRetries, ResultType res);
+
     void setRetryPolicy(
         unsigned numOfRetries, nx::utils::MoveOnlyFunc<bool(ResultType)> requestSuccessed);
 
 protected:
-    virtual void stopWhileInAioThread() override;
-
     /**
      * @param args The last argument of this pack MUST be the completion handler which will be
      * invoked as completionHandler(ResultCode, OutputData).
@@ -106,6 +107,9 @@ protected:
     template<typename Output, typename... InputArgs>
     auto makeSyncCall(InputArgs&&... inputArgs);
 
+protected:
+    virtual void stopWhileInAioThread() override;
+
     const utils::Url& baseApiUrl() const;
 
 private:
@@ -147,6 +151,25 @@ private:
 
     template<typename Output, typename ResultTuple, typename... InputArgs>
     auto makeSyncCallInternal(InputArgs&&... inputArgs);
+};
+
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Introduced as a work around a weird link error on mswin.
+ * TODO: akolesnikov Review it again. It has something to do with GenericApiClient inheriting
+ * exported class aio::BasicPollable.
+ */
+class NX_NETWORK_API DefaultGenericApiClient:
+    public GenericApiClient<>
+{
+    using base_type = GenericApiClient<>;
+
+public:
+    using base_type::base_type;
+
+    using base_type::makeAsyncCall;
+    using base_type::makeSyncCall;
 };
 
 //-------------------------------------------------------------------------------------------------

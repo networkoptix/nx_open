@@ -27,4 +27,13 @@ TEST(HttpRest_substituteParameters, bad_input)
         "/account/{accId}/systems/sys1", &resultPath, {"ak", "sys1"}));
 }
 
+TEST(HttpRest_client, replaceAllParameters)
+{
+    ASSERT_EQ(
+        "/users/.*/docs/.*",
+        replaceAllParameters("/users/{userId}/docs/{docId}", ".*"));
+
+    ASSERT_EQ("/foo/bar", replaceAllParameters("/foo/bar", ".*"));
+}
+
 } // namespace nx::network::http::rest::test
