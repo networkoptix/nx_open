@@ -5,6 +5,7 @@
 #include "utils/common/threadsafe_item_storage.h"
 #include <common/common_module_aware.h>
 #include <nx/vms/api/data/resource_data.h>
+#include <nx/utils/move_only_func.h>
 #include <nx_ec/ec_api_fwd.h>
 
 class NX_VMS_COMMON_API QnResourcePropertyDictionary:
@@ -36,7 +37,9 @@ public:
     /**
      * Mark all params for resource as unsaved
      **/
-    void markAllParamsDirty(const QnUuid& resourceId);
+    void markAllParamsDirty(
+        const QnUuid& resourceId,
+        nx::utils::MoveOnlyFunc<bool(const QString& paramName, const QString& paramValue)> filter = nullptr);
 
     QHash<QnUuid, QSet<QString> > allPropertyNamesByResource() const;
 

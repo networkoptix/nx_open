@@ -1495,14 +1495,15 @@ void QnGlobalSettings::synchronizeNow()
     resourcePropertyDictionary()->saveParamsAsync(m_admin->getId());
 }
 
-bool QnGlobalSettings::resynchronizeNowSync()
+bool QnGlobalSettings::resynchronizeNowSync(nx::utils::MoveOnlyFunc<
+    bool(const QString& paramName, const QString& paramValue)> filter)
 {
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
         NX_ASSERT(m_admin, "Invalid sync state");
         if (!m_admin)
             return false;
-        resourcePropertyDictionary()->markAllParamsDirty(m_admin->getId());
+        resourcePropertyDictionary()->markAllParamsDirty(m_admin->getId(), std::move(filter));
     }
     return synchronizeNowSync();
 }
