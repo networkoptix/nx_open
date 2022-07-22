@@ -42,7 +42,8 @@ private:
     static ResultCode getResultCodeFromResponse(const network::http::Response& response);
 };
 
-class NX_NETWORK_API Client: public nx::network::http::GenericApiClient<ApiResultCodeDescriptor>
+class NX_NETWORK_API Client:
+    public nx::network::http::GenericApiClient<ApiResultCodeDescriptor>
 {
     using base_type = nx::network::http::GenericApiClient<ApiResultCodeDescriptor>;
 

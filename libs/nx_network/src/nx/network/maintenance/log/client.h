@@ -9,9 +9,9 @@
 namespace nx::network::maintenance::log {
 
 class NX_NETWORK_API Client:
-    public nx::network::http::GenericApiClient<>
+    public nx::network::http::DefaultGenericApiClient
 {
-    using base_type = nx::network::http::GenericApiClient<>;
+    using base_type = nx::network::http::DefaultGenericApiClient;
 
 public:
     using ResultCode = nx::network::http::StatusCode::Value;
