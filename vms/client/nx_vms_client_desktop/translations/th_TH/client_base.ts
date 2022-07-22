@@ -9933,7 +9933,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Connecting to %1 for the first time?</source>
-      <translation type="unfinished">Connecting to %1 for the first time?</translation>
+      <translation>กำลังเชื่อมต่อกับ %1 เป็นครั้งแรก?</translation>
     </message>
     <message>
       <source>Review the %1 to ensure you trust the server you are connecting to.
@@ -9944,11 +9944,11 @@ Read this %2 to learn more about certificate validation.</translation>
     </message>
     <message>
       <source>certificate details</source>
-      <translation type="unfinished">certificate details</translation>
+      <translation>รายละเอียดใบรับรอง</translation>
     </message>
     <message>
       <source>help article</source>
-      <translation type="unfinished">help article</translation>
+      <translation>บทความช่วยเหลือ</translation>
     </message>
     <message>
       <source>This message may be shown multiple times when connecting to a multi-server system.</source>
@@ -9967,7 +9967,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>ดำเนิน​การ</translation>
     </message>
   </context>
   <context>

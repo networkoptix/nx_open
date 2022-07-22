@@ -10369,7 +10369,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Connecting to %1 for the first time?</source>
-      <translation type="unfinished">Connecting to %1 for the first time?</translation>
+      <translation>מתחבר ל %1 בפעם הראשונה?</translation>
     </message>
     <message>
       <source>Review the %1 to ensure you trust the server you are connecting to.
@@ -10380,15 +10380,15 @@ Read this %2 to learn more about certificate validation.</translation>
     </message>
     <message>
       <source>certificate details</source>
-      <translation type="unfinished">certificate details</translation>
+      <translation>פרטי תעודה</translation>
     </message>
     <message>
       <source>help article</source>
-      <translation type="unfinished">help article</translation>
+      <translation>מאמר עזרה</translation>
     </message>
     <message>
       <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation type="unfinished">This message may be shown multiple times when connecting to a multi-server system.</translation>
+      <translation>הודעה זו עשויה להופיע מספר פעמים בעת חיבור למערכת מרובת שרתים.</translation>
     </message>
     <message>
       <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
@@ -10399,11 +10399,11 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>the server&apos;s certificate</source>
-      <translation type="unfinished">the server&apos;s certificate</translation>
+      <translation>אישור השרת</translation>
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>המשך</translation>
     </message>
   </context>
   <context>
