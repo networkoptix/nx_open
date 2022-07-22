@@ -90,21 +90,21 @@
     </message>
     <message>
       <source>Invalid certificate</source>
-      <translation type="unfinished">Invalid certificate</translation>
+      <translation>Неверный сертификат</translation>
     </message>
     <message>
       <source>The server&amp;apos;s certificate was rejected.</source>
-      <translation type="unfinished">The server&amp;apos;s certificate was rejected.</translation>
+      <translation>Сертификат сервера был отклонен.</translation>
     </message>
     <message>
       <source>Restore the connection to %1 and try again</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Restore the connection to %1 and try again</translation>
+      <translation>Восстановите соединение с %1 и повторите попытку</translation>
     </message>
     <message>
       <source>%1 user login is temporarily unavailable</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user login is temporarily unavailable</translation>
+      <translation>Логин пользователя %1 временно недоступен</translation>
     </message>
     <message>
       <source>Connection timed out</source>
@@ -112,7 +112,7 @@
     </message>
     <message>
       <source>The server is incompatible.</source>
-      <translation type="unfinished">The server is incompatible.</translation>
+      <translation>Сервер несовместим.</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
@@ -128,7 +128,7 @@
     </message>
     <message>
       <source>Session expired. Re-enter your password.</source>
-      <translation type="unfinished">Session expired. Re-enter your password.</translation>
+      <translation>Истек срок действия сессии. Введите пароль еще раз.</translation>
     </message>
     <message>
       <source>Invalid login or password</source>
@@ -152,25 +152,25 @@
     </message>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation type="unfinished">Internal error. Please try again later.</translation>
+      <translation>Внутренняя ошибка. Повторите попытку позже.</translation>
     </message>
     <message>
       <source>If this error persists, please contact your system administrator.</source>
-      <translation type="unfinished">If this error persists, please contact your system administrator.</translation>
+      <translation>Если ошибка остаётся, обратитесь к администратору системы.</translation>
     </message>
     <message>
       <source>Connection to %1 is not ready yet. Check your internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check your internet connection or try again later.</translation>
+      <translation>Подключение к %1 еще не установлено. Проверьте подключение к Интернету или повторите попытку позже.</translation>
     </message>
     <message>
       <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</translation>
+      <translation>Подключение к %1 еще не готово. Проверьте интернет-соединение сервера или повторите попытку позже.</translation>
     </message>
     <message>
       <source>Connection to the server could not be established. Try again later.</source>
-      <translation type="unfinished">Connection to the server could not be established. Try again later.</translation>
+      <translation>Невозвожно подключиться к серверу. Попробуйте позже.</translation>
     </message>
     <message>
       <source>Your session has expired</source>
@@ -179,16 +179,16 @@
     <message>
       <source>Please log in to %1 again.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Please log in to %1 again.</translation>
+      <translation>Пожалуйста, войдите в %1 снова.</translation>
     </message>
     <message>
       <source>Log in to %1 to log in to this system with %2 user</source>
       <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in to %1 to log in to this system with %2 user</translation>
+      <translation>Войдите в %1 для входа в систему с %2 пользователем</translation>
     </message>
     <message>
       <source>Session duration limit can be changed by a system administrator.</source>
-      <translation type="unfinished">Session duration limit can be changed by a system administrator.</translation>
+      <translation>Ограничение продолжительности сессии может быть изменено системным администраторам.</translation>
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
@@ -196,21 +196,21 @@
     </message>
     <message>
       <source>Too many login attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many login attempts. Try again in a minute.</translation>
+      <translation>Слишком много попыток входа. Повторите попытку позже.</translation>
     </message>
     <message>
       <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</translation>
+      <translation>Чтобы войти в систему, отключите «Запрашивать код подтверждения при каждом входе с вашей учётной записью %1» в вашем %2.</translation>
     </message>
     <message>
       <source>Two-factor authentication is required.</source>
-      <translation type="unfinished">Two-factor authentication is required.</translation>
+      <translation>Требуется двухфакторная аутентификация.</translation>
     </message>
     <message>
       <source>You can enable two-factor authentication in your %1.</source>
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">You can enable two-factor authentication in your %1.</translation>
+      <translation>Вы можете включить двухфакторную аутентификацию в вашем %1.</translation>
     </message>
   </context>
   <context>

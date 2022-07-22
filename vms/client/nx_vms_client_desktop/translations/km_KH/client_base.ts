@@ -1486,7 +1486,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Check</source>
-      <translation type="unfinished">Check</translation>
+      <translation>Check</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
@@ -7450,7 +7450,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Finish</translation>
     </message>
     <message>
       <source>Camera for Replacement</source>
@@ -10517,7 +10517,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>Disable</translation>
     </message>
     <message>
       <source>Delete</source>

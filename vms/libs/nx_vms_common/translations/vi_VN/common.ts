@@ -1176,11 +1176,11 @@
     </message>
     <message>
       <source>Primary time synchronization Server ID</source>
-      <translation type="unfinished">Primary time synchronization Server ID</translation>
+      <translation>ID máy chủ đồng bộ hóa thời gian chính</translation>
     </message>
     <message>
       <source>Max difference between local and source time (milliseconds)</source>
-      <translation type="unfinished">Max difference between local and source time (milliseconds)</translation>
+      <translation>Chênh lệch tối đa giữa thời gian cục bộ và thời gian nguồn (mili giây)</translation>
     </message>
     <message>
       <source>OS time change check period</source>
@@ -1200,11 +1200,11 @@
     </message>
     <message>
       <source>Cloud System ID</source>
-      <translation type="unfinished">Cloud System ID</translation>
+      <translation>ID hệ thống đám mây</translation>
     </message>
     <message>
       <source>Cloud authorization key</source>
-      <translation type="unfinished">Cloud authorization key</translation>
+      <translation>Khóa ủy quyền đám mây</translation>
     </message>
     <message>
       <source>System name</source>
@@ -1216,28 +1216,28 @@
     </message>
     <message>
       <source>Last master System merge ID</source>
-      <translation type="unfinished">Last master System merge ID</translation>
+      <translation>ID hợp nhất hệ thống chính gần đây nhất</translation>
     </message>
     <message>
       <source>Last slave System merge ID</source>
-      <translation type="unfinished">Last slave System merge ID</translation>
+      <translation>ID hợp nhất hệ thống phụ gần đây nhất</translation>
     </message>
     <message>
       <source>Disable Device vendors</source>
-      <translation type="unfinished">Disable Device vendors</translation>
+      <translation>Vô hiệu hóa nhà cung cấp Thiết bị</translation>
     </message>
     <message>
       <source>Optimize Camera settings</source>
-      <translation type="unfinished">Optimize Camera settings</translation>
+      <translation>Tối ưu hóa Cài đặt Camera</translation>
     </message>
     <message>
       <source>Thumbnails auto-update</source>
-      <translation type="unfinished">Thumbnails auto-update</translation>
+      <translation>Tự động cập nhật hình thu nhỏ</translation>
     </message>
     <message>
       <source>Use %1 service to send emails instead of SMTP client</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">Use %1 service to send emails instead of SMTP client</translation>
+      <translation>Sử dụng dịch vụ %1 để gửi email thay vì ứng dụng khách SMTP</translation>
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
@@ -1257,7 +1257,7 @@
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
-      <translation type="unfinished">Audit trail period (days, 14-730)</translation>
+      <translation>Khoảng thời gian báo cáo hành vi người dùng (ngày, 14-730)</translation>
     </message>
     <message>
       <source>Event log period (days)</source>
@@ -1265,71 +1265,71 @@
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption)</source>
-      <translation type="unfinished">Enforce HTTPS (data traffic encryption)</translation>
+      <translation>Thực thi HTTPS (mã hóa lưu lượng dữ liệu)</translation>
     </message>
     <message>
       <source>Enforce RTSPS (video traffic encryption)</source>
-      <translation type="unfinished">Enforce RTSPS (video traffic encryption)</translation>
+      <translation>Thực thi RTSPS (mã hóa lưu lượng video)</translation>
     </message>
     <message>
       <source>Enable auto-discovery</source>
-      <translation type="unfinished">Enable auto-discovery</translation>
+      <translation>Cho phép tự động phát hiện thiết bị</translation>
     </message>
     <message>
       <source>Enable auto-update notifications</source>
-      <translation type="unfinished">Enable auto-update notifications</translation>
+      <translation>Bật thông báo tự động cập nhật</translation>
     </message>
     <message>
       <source>Enable update notifications</source>
-      <translation type="unfinished">Enable update notifications</translation>
+      <translation>Bật thông báo cập nhật</translation>
     </message>
     <message>
       <source>Enable UPNP port-mapping</source>
-      <translation type="unfinished">Enable UPNP port-mapping</translation>
+      <translation>Bật port-mapping UPNP</translation>
     </message>
     <message>
       <source>Backup settings</source>
-      <translation type="unfinished">Backup settings</translation>
+      <translation>Cài đặt sao lưu</translation>
     </message>
     <message>
       <source>Cloud host override</source>
-      <translation type="unfinished">Cloud host override</translation>
+      <translation>Ghi đè máy chủ đám mây</translation>
     </message>
     <message>
       <source>Enable crossdomain policy</source>
-      <translation type="unfinished">Enable crossdomain policy</translation>
+      <translation>Bật chính sách tên miền chéo</translation>
     </message>
     <message>
       <source>Enable RTSP for Arecont</source>
-      <translation type="unfinished">Enable RTSP for Arecont</translation>
+      <translation>Bật RTSP cho Arecont</translation>
     </message>
     <message>
       <source>Enable sequential Flir ONVIF searcher</source>
-      <translation type="unfinished">Enable sequential Flir ONVIF searcher</translation>
+      <translation>Bật trình tìm kiếm Flir ONVIF tuần tự</translation>
     </message>
     <message>
       <source>Max P2P queue size (bytes, 32-512MB)</source>
-      <translation type="unfinished">Max P2P queue size (bytes, 32-512MB)</translation>
+      <translation>Kích thước hàng đợi P2P tối đa (byte, 32-512MB)</translation>
     </message>
     <message>
       <source>Max P2P all clients size (bytes, 32-512MB)</source>
-      <translation type="unfinished">Max P2P all clients size (bytes, 32-512MB)</translation>
+      <translation>Kích thước tối đa cho tất cả máy khách P2P (byte, 32-512MB)</translation>
     </message>
     <message>
       <source>Max record queue size (bytes, 6-96MB)</source>
-      <translation type="unfinished">Max record queue size (bytes, 6-96MB)</translation>
+      <translation>Kích thước hàng đợi ghi tối đa (byte, 6-96MB)</translation>
     </message>
     <message>
       <source>Max record queue size (elements, 250-4000)</source>
-      <translation type="unfinished">Max record queue size (elements, 250-4000)</translation>
+      <translation>Kích thước hàng đợi ghi tối đa (phần tử, 250-4000)</translation>
     </message>
     <message>
       <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value &gt;=2 to this parameter.</source>
-      <translation type="unfinished">Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value &gt;=2 to this parameter.</translation>
+      <translation>Số lượng kết nối HTTP tối đa sử dụng chuyển mã cho Máy chủ. Chrome mở 2 kết nối cùng một lúc, sau đó đóng kết nối đầu tiên. Vì vậy, bạn nên đặt giá trị &gt;= 2 cho tham số này.</translation>
     </message>
     <message>
       <source>RTP retry count</source>
-      <translation type="unfinished">RTP retry count</translation>
+      <translation>Số lần thử lại RTP</translation>
     </message>
     <message>
       <source>RTP timeout (milliseconds)</source>
@@ -1337,51 +1337,51 @@
     </message>
     <message>
       <source>Max RTSP connection duration (seconds)</source>
-      <translation type="unfinished">Max RTSP connection duration (seconds)</translation>
+      <translation>Thời lượng kết nối RTSP tối đa (giây)</translation>
     </message>
     <message>
       <source>Enable cloud-connect UDP hole-punching</source>
-      <translation type="unfinished">Enable cloud-connect UDP hole-punching</translation>
+      <translation>Bật kết nối đám mây UDP hole-punching</translation>
     </message>
     <message>
       <source>Enable cloud-connect relays usage</source>
-      <translation type="unfinished">Enable cloud-connect relays usage</translation>
+      <translation>Bật sử dụng relay kết nối đám mây</translation>
     </message>
     <message>
       <source>Enforce SSL for cloud-connect relays</source>
-      <translation type="unfinished">Enforce SSL for cloud-connect relays</translation>
+      <translation>Thực thi SSL cho các relay kết nối đám mây</translation>
     </message>
     <message>
       <source>Enable recording on EDGE</source>
-      <translation type="unfinished">Enable recording on EDGE</translation>
+      <translation>Bật ghi tại biên</translation>
     </message>
     <message>
       <source>Enable WebSocket for p2p</source>
-      <translation type="unfinished">Enable WebSocket for p2p</translation>
+      <translation>Bật WebSocket cho p2p</translation>
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32</source>
-      <translation type="unfinished">Max thread count for remote archive synchronization (&lt;=0 - auto, max 32</translation>
+      <translation>Số luồng tối đa để đồng bộ hóa lưu trữ từ xa (&lt;= 0 - tự động, tối đa 32</translation>
     </message>
     <message>
       <source>Target update information</source>
-      <translation type="unfinished">Target update information</translation>
+      <translation>Thông tin cập nhật mục tiêu</translation>
     </message>
     <message>
       <source>Installed update information</source>
-      <translation type="unfinished">Installed update information</translation>
+      <translation>Thông tin cập nhật đã cài đặt</translation>
     </message>
     <message>
       <source>Downloader peers for files</source>
-      <translation type="unfinished">Downloader peers for files</translation>
+      <translation>Trình tải xuống ngang hàng cho các tệp</translation>
     </message>
     <message>
       <source>Client update settings</source>
-      <translation type="unfinished">Client update settings</translation>
+      <translation>Cài đặt cập nhật ứng dụng khách</translation>
     </message>
     <message>
       <source>Thread count limit for Camera archive synchronization</source>
-      <translation type="unfinished">Thread count limit for Camera archive synchronization</translation>
+      <translation>Giới hạn số luồng đối với đồng bộ hóa lưu trữ camera</translation>
     </message>
     <message>
       <source>Watermark settings</source>
@@ -1389,23 +1389,23 @@
     </message>
     <message>
       <source>Authorization Session token lifetime (minutes)</source>
-      <translation type="unfinished">Authorization Session token lifetime (minutes)</translation>
+      <translation>Thời gian khả dụng của mã token Phiên Xác thực (phút)</translation>
     </message>
     <message>
       <source>Session token count limit on a single Server</source>
-      <translation type="unfinished">Session token count limit on a single Server</translation>
+      <translation>Giới hạn số lượng mã token theo phiên trên một Máy chủ</translation>
     </message>
     <message>
       <source>Max session token count per user on single Server</source>
-      <translation type="unfinished">Max session token count per user on single Server</translation>
+      <translation>Số lượng mã token theo phiên tối đa cho mỗi người dùng trên một Máy chủ</translation>
     </message>
     <message>
       <source>Update interval for remote session token cache (other Servers and Cloud)</source>
-      <translation type="unfinished">Update interval for remote session token cache (other Servers and Cloud)</translation>
+      <translation>Khoảng thời gian cập nhật cho bộ đệm mã token theo phiên từ xa (Các máy chủ khác và Đám mây)</translation>
     </message>
     <message>
       <source>Timeout for remote session token cache (other Servers and Cloud)</source>
-      <translation type="unfinished">Timeout for remote session token cache (other Servers and Cloud)</translation>
+      <translation>Hết thời gian chờ cho bộ đệm ẩn mã token theo phiên từ xa (Máy chủ khác và Đám mây)</translation>
     </message>
     <message>
       <source>Default video codec</source>
@@ -1413,7 +1413,7 @@
     </message>
     <message>
       <source>Default codec for export video</source>
-      <translation type="unfinished">Default codec for export video</translation>
+      <translation>Codec mặc định cho xuất video</translation>
     </message>
     <message>
       <source>Low quality screen video codec</source>
@@ -1425,7 +1425,7 @@
     </message>
     <message>
       <source>URI for resource_data.json automatic update</source>
-      <translation type="unfinished">URI for resource_data.json automatic update</translation>
+      <translation>URI cho cập nhật tự động resource_data.json</translation>
     </message>
     <message>
       <source>Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
@@ -1433,7 +1433,7 @@
     </message>
     <message>
       <source>Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
-      <translation type="unfinished">Whether to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improves the user experience (e.g. when some Analytics plugin is working on the Camera).</translation>
+      <translation>Có lưu vào bộ nhớ cache một số khung cho luồng chính hay không. Giá trị: &apos;có&apos; - luôn được bật (có thể sử dụng nhiều RAM), &apos;không&apos; - luôn bị tắt ngoại trừ khi yêu cầu phát lại (ví dụ: HLS), &apos;tự động&apos; - tương tự như &apos;không&apos;, nhưng được bật khi cải thiện trải nghiệm người dùng (ví dụ: khi một số plugin Analytics đang hoạt động trên Camera).</translation>
     </message>
     <message>
       <source>Meta data storage change policy</source>
@@ -1441,79 +1441,79 @@
     </message>
     <message>
       <source>Persistent Servers for update storage</source>
-      <translation type="unfinished">Persistent Servers for update storage</translation>
+      <translation>Máy chủ cố định để lưu trữ cập nhật</translation>
     </message>
     <message>
       <source>Persistent Servers where updates are stored</source>
-      <translation type="unfinished">Persistent Servers where updates are stored</translation>
+      <translation>Máy chủ cố định nơi lưu trữ cập nhật</translation>
     </message>
     <message>
       <source>VMS Server version specific features</source>
-      <translation type="unfinished">VMS Server version specific features</translation>
+      <translation>Các tính năng cụ thể của phiên bản máy chủ VMS</translation>
     </message>
     <message>
       <source>Language for mobile push notifications</source>
-      <translation type="unfinished">Language for mobile push notifications</translation>
+      <translation>Ngôn ngữ cho thông báo trên thiết bị di động</translation>
     </message>
     <message>
       <source>Additional local FS storage types for recording</source>
-      <translation type="unfinished">Additional local FS storage types for recording</translation>
+      <translation>Các loại lưu trữ FS cục bộ bổ sung dành cho việc ghi</translation>
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the Device</source>
-      <translation type="unfinished">Keep IO port state on when Server connects to the Device</translation>
+      <translation>Luôn bật trạng thái cổng IO khi Máy chủ kết nối với Thiết bị</translation>
     </message>
     <message>
       <source>Media buffer size (KB, 10KB-4Mb)</source>
-      <translation type="unfinished">Media buffer size (KB, 10KB-4Mb)</translation>
+      <translation>Kích thước bộ đệm đa phương tiện (KB, 10KB-4Mb)</translation>
     </message>
     <message>
       <source>Media buffer size for audio only Devices (KB, 1Kb-1MB)</source>
-      <translation type="unfinished">Media buffer size for audio only Devices (KB, 1Kb-1MB)</translation>
+      <translation>Kích thước bộ đệm đa phương tiện chỉ dành cho thiết bị âm thanh (KB, 1Kb-1MB)</translation>
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>
-      <translation type="unfinished">Force analytics DB storage mount point permissions in case of failure</translation>
+      <translation>Trao quyền đối với điểm gắn kết lưu trữ của Cơ sở dữ liệu phân tích đề phòng trường hợp bị lỗi</translation>
     </message>
     <message>
       <source>Check video stream period (milliseconds)</source>
-      <translation type="unfinished">Check video stream period (milliseconds)</translation>
+      <translation>Kiểm tra khoảng thời gian luồng video (mili giây)</translation>
     </message>
     <message>
       <source>Storage encryption enabled</source>
-      <translation type="unfinished">Storage encryption enabled</translation>
+      <translation>Mã hóa bộ nhớ đã được bật</translation>
     </message>
     <message>
       <source>Current storage encryption key</source>
-      <translation type="unfinished">Current storage encryption key</translation>
+      <translation>Khóa mã hóa bộ nhớ hiện tại</translation>
     </message>
     <message>
       <source>Show Servers in tree for non-admins</source>
-      <translation type="unfinished">Show Servers in tree for non-admins</translation>
+      <translation>Hiển thị Máy chủ trong cây cho người dùng không phải quản trị viên</translation>
     </message>
     <message>
       <source>HTTP header: Origin</source>
-      <translation type="unfinished">HTTP header: Origin</translation>
+      <translation>Tiêu đề HTTP: Nguồn gốc</translation>
     </message>
     <message>
       <source>HTTP header: X-Frame-Options</source>
-      <translation type="unfinished">HTTP header: X-Frame-Options</translation>
+      <translation>Tiêu đề HTTP: X-Frame-Options</translation>
     </message>
     <message>
       <source>Use only HTTPS for Cameras</source>
-      <translation type="unfinished">Use only HTTPS for Cameras</translation>
+      <translation>Chỉ sử dụng HTTPS cho camera</translation>
     </message>
     <message>
       <source>Enable insecure deprecated API</source>
-      <translation type="unfinished">Enable insecure deprecated API</translation>
+      <translation>Bật API deprecated không an toàn</translation>
     </message>
     <message>
       <source>Enable insecure deprecated API functions curently in use by Nx products</source>
-      <translation type="unfinished">Enable insecure deprecated API functions curently in use by Nx products</translation>
+      <translation>Bật các hàm API deprecated không an toàn đang được sử dụng</translation>
     </message>
     <message>
       <source>Show mouse timeline preview</source>
-      <translation type="unfinished">Show mouse timeline preview</translation>
+      <translation>Hiển thị bản xem trước dòng thời gian từ chuột</translation>
     </message>
   </context>
   <context>
@@ -2157,7 +2157,7 @@
     </message>
     <message>
       <source>Intercom informer</source>
-      <translation type="unfinished">Intercom informer</translation>
+      <translation>Trình thông báo intercom</translation>
     </message>
     <message>
       <source>Failed to backup file</source>

@@ -152,19 +152,19 @@
     </message>
     <message>
       <source>This integration has no settings for this Camera.</source>
-      <translation type="unfinished">This integration has no settings for this Camera.</translation>
+      <translation>Tích hợp này không có cài đặt cho camera này.</translation>
     </message>
     <message>
       <source>Check System Administration Settings to configure this integration.</source>
-      <translation type="unfinished">Check System Administration Settings to configure this integration.</translation>
+      <translation>Kiểm tra Cài đặt quản trị hệ thống để định cấu hình tích hợp này.</translation>
     </message>
     <message>
       <source>This integration has no settings at System level.</source>
-      <translation type="unfinished">This integration has no settings at System level.</translation>
+      <translation>Tích hợp này không có cài đặt nào ở cấp Hệ thống.</translation>
     </message>
     <message>
       <source>Check Camera Settings to configure this integration.</source>
-      <translation type="unfinished">Check Camera Settings to configure this integration.</translation>
+      <translation>Kiểm tra Cài đặt Camera để định cấu hình tích hợp này.</translation>
     </message>
   </context>
   <context>

@@ -432,7 +432,7 @@
     </message>
     <message>
       <source>to</source>
-      <translation type="unfinished">to</translation>
+      <translation>:</translation>
     </message>
     <message>
       <source>Interval of action</source>
