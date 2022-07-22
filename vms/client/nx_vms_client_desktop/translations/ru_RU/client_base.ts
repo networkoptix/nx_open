@@ -25,16 +25,16 @@
     </message>
     <message numerus="yes">
       <source>%1 with %n attributes</source>
-      <translation type="unfinished">
-        <numerusform>%1 with %n attributes</numerusform>
-        <numerusform>%1 with %n attributes</numerusform>
-        <numerusform>%1 with %n attributes</numerusform>
-        <numerusform>%1 with %n attributes</numerusform>
+      <translation>
+        <numerusform>%1 с %n атрибутом</numerusform>
+        <numerusform>%1 с %n атрибутами</numerusform>
+        <numerusform>%1 с %n атрибутами</numerusform>
+        <numerusform>%1 с %n атрибутами</numerusform>
       </translation>
     </message>
     <message>
       <source>Any subtype</source>
-      <translation type="unfinished">Any subtype</translation>
+      <translation>Любой подтип</translation>
     </message>
   </context>
   <context>
@@ -52,7 +52,7 @@
     </message>
     <message>
       <source>Issuer</source>
-      <translation type="unfinished">Issuer</translation>
+      <translation>Эмитент</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -7193,11 +7193,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
+      <translation>
+        <numerusform>%n выбранная камера</numerusform>
+        <numerusform>%n выбранные камеры</numerusform>
+        <numerusform>%n выбранных камер</numerusform>
+        <numerusform>%n выбранных камер</numerusform>
       </translation>
     </message>
     <message>
@@ -10335,11 +10335,11 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>This is a custom certificate installed on %1</source>
-      <translation type="unfinished">This is a custom certificate installed on %1</translation>
+      <translation>Это пользовательский сертификат, установленный на %1</translation>
     </message>
     <message>
       <source>Pin this certificate to %1?</source>
-      <translation type="unfinished">Pin this certificate to %1?</translation>
+      <translation>Прикрепить этот сертификат к %1?</translation>
     </message>
     <message>
       <source>Pin</source>
@@ -10356,11 +10356,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
     <message>
       <source>Connect Anyway</source>
-      <translation type="unfinished">Connect Anyway</translation>
+      <translation>Подключиться в любом случае</translation>
     </message>
     <message>
       <source>I trust this server</source>
-      <translation type="unfinished">I trust this server</translation>
+      <translation>Я доверяю этому серверу</translation>
     </message>
     <message>
       <source>Cannot verify the identity of %1</source>
@@ -10368,7 +10368,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Connecting to %1 for the first time?</source>
-      <translation type="unfinished">Connecting to %1 for the first time?</translation>
+      <translation>Подключаетесь к %1 в первый раз?</translation>
     </message>
     <message>
       <source>Review the %1 to ensure you trust the server you are connecting to.
@@ -10379,30 +10379,30 @@ Read this %2 to learn more about certificate validation.</translation>
     </message>
     <message>
       <source>certificate details</source>
-      <translation type="unfinished">certificate details</translation>
+      <translation>сведения о сертификате</translation>
     </message>
     <message>
       <source>help article</source>
-      <translation type="unfinished">help article</translation>
+      <translation>справочная статья</translation>
     </message>
     <message>
       <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation type="unfinished">This message may be shown multiple times when connecting to a multi-server system.</translation>
+      <translation>Это сообщение может отображаться несколько раз при подключении к многосерверной системе.</translation>
     </message>
     <message>
       <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
 You can view %2 or read this %3 to learn more about the current problem.</source>
       <comment>%1 is the system name, %2 is &lt;the server&apos;s certificate&gt; link, %3 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
-You can view %2 or read this %3 to learn more about the current problem.</translation>
+      <translation>Это может произойти из-за просроченного сертификата сервера или из-за того, что кто-то пытается выдать себя за %1 чтобы украсть вашу личную информацию.
+Вы можете просмотреть %2 или прочитать %3, чтобы узнать больше об этой проблеме.</translation>
     </message>
     <message>
       <source>the server&apos;s certificate</source>
-      <translation type="unfinished">the server&apos;s certificate</translation>
+      <translation>сертификат сервера</translation>
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>Продолжить</translation>
     </message>
   </context>
   <context>
@@ -10418,7 +10418,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>There are no suitable servers</source>
-      <translation type="unfinished">There are no suitable servers</translation>
+      <translation>Нет подходящих серверов</translation>
     </message>
   </context>
   <context>
@@ -10489,7 +10489,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>unknown status</source>
-      <translation type="unfinished">unknown status</translation>
+      <translation>неизвестный статус</translation>
     </message>
   </context>
   <context>
@@ -10627,16 +10627,16 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message numerus="yes">
       <source>Recording schedule is invalid for %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
+      <translation>
+        <numerusform>Недопустимый график записи для %n камеры</numerusform>
+        <numerusform>Недопустимый график записи для %n камер</numerusform>
+        <numerusform>Недопустимый график записи для %n камер</numerusform>
+        <numerusform>Недопустимый график записи для %n камер</numerusform>
       </translation>
     </message>
     <message>
       <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
-      <translation type="unfinished">Recording schedule on some cameras contains recording modes that are not supported.</translation>
+      <translation>Расписание записи на некоторых камерах содержит неподдерживаемые режимы записи.</translation>
     </message>
     <message>
       <source>SD archive found</source>
@@ -10852,7 +10852,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     <name>nx::vms::client::desktop::VersionSelectionDialog</name>
     <message>
       <source>Select Version</source>
-      <translation type="unfinished">Select Version</translation>
+      <translation>Выбрать версию</translation>
     </message>
     <message>
       <source>Version</source>
@@ -10860,7 +10860,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>Invalid version.</source>
-      <translation type="unfinished">Invalid version.</translation>
+      <translation>Недопустимая версия.</translation>
     </message>
     <message>
       <source>Password</source>
@@ -10930,11 +10930,11 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     <name>nx::vms::client::desktop::WelcomeScreen</name>
     <message>
       <source>Are you sure you want to hide this tile?</source>
-      <translation type="unfinished">Are you sure you want to hide this tile?</translation>
+      <translation>Вы уверены, что хотите скрыть эту плитку?</translation>
     </message>
     <message>
       <source>You will be able to access the %1 login menu at any time by clicking the cloud icon on the navigation panel.</source>
-      <translation type="unfinished">You will be able to access the %1 login menu at any time by clicking the cloud icon on the navigation panel.</translation>
+      <translation>Вы сможете в любое время получить доступ в меню входа %1, нажав на значок облака на панели навигации.</translation>
     </message>
     <message>
       <source>Hide</source>
@@ -10942,7 +10942,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>Unable to connect to the system because it has become offline</source>
-      <translation type="unfinished">Unable to connect to the system because it has become offline</translation>
+      <translation>Невозможно подключиться к системе, поскольку она не в сети</translation>
     </message>
   </context>
   <context>
@@ -11057,7 +11057,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     <name>nx::vms::client::desktop::backup_settings_view::BackupSettingsViewStrings</name>
     <message>
       <source>All archive</source>
-      <translation type="unfinished">All archive</translation>
+      <translation>Весь архив</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -11073,7 +11073,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>High-Res</source>
-      <translation type="unfinished">High-Res</translation>
+      <translation>Выс</translation>
     </message>
     <message>
       <source>Low-Res</source>
@@ -11153,11 +11153,11 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     <name>nx::vms::client::desktop::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
     <message>
       <source>New Group</source>
-      <translation type="unfinished">New Group</translation>
+      <translation>Новая группа</translation>
     </message>
     <message>
       <source>New Group %1</source>
-      <translation type="unfinished">New Group %1</translation>
+      <translation>Новая группа %1</translation>
     </message>
   </context>
   <context>
@@ -11962,7 +11962,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Automatic client updates</source>
-      <translation type="unfinished">Automatic client updates</translation>
+      <translation>Автоматические обновления клиента</translation>
     </message>
     <message>
       <source>New client-only updates will be installed automatically. You can change this in the settings.</source>

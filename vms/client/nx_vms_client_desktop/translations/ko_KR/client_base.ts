@@ -9930,7 +9930,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Connecting to %1 for the first time?</source>
-      <translation type="unfinished">Connecting to %1 for the first time?</translation>
+      <translation>처음으로 %1 에 연결하시겠습니까?</translation>
     </message>
     <message>
       <source>Review the %1 to ensure you trust the server you are connecting to.
@@ -9941,15 +9941,15 @@ Read this %2 to learn more about certificate validation.</translation>
     </message>
     <message>
       <source>certificate details</source>
-      <translation type="unfinished">certificate details</translation>
+      <translation>인증서 정보</translation>
     </message>
     <message>
       <source>help article</source>
-      <translation type="unfinished">help article</translation>
+      <translation>도움말</translation>
     </message>
     <message>
       <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation type="unfinished">This message may be shown multiple times when connecting to a multi-server system.</translation>
+      <translation>이 메시지는 다중 서버 시스템에 연결할 때 여러 번 표시될 수 있습니다.</translation>
     </message>
     <message>
       <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
@@ -9960,11 +9960,11 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>the server&apos;s certificate</source>
-      <translation type="unfinished">the server&apos;s certificate</translation>
+      <translation>서버 인증서</translation>
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>계속</translation>
     </message>
   </context>
   <context>

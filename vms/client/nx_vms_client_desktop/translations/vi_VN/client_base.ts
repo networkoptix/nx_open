@@ -5502,7 +5502,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Remote archive synchronization available</source>
-      <translation type="unfinished">Remote archive synchronization available</translation>
+      <translation>Đồng bộ hóa lưu trữ từ xa khả dụng</translation>
     </message>
   </context>
   <context>
@@ -7338,7 +7338,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</translation>
+      <translation>Video được quay trên bộ nhớ nội bộ của camera sẽ không được tải lên kho lưu trữ chính.</translation>
     </message>
   </context>
   <context>
@@ -9908,8 +9908,8 @@ Chú ý: Không thể đặt lại mật khẩu này. Nếu bạn làm mất nó
     <message>
       <source>Someone may be impersonating %1 to steal your personal information.
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
-Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
+      <translation>Ai đó có thể đang mạo danh %1 để lấy cắp thông tin cá nhân của bạn.
+Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL máy chủ %2.</translation>
     </message>
   </context>
   <context>
@@ -9928,41 +9928,41 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Connecting to %1 for the first time?</source>
-      <translation type="unfinished">Connecting to %1 for the first time?</translation>
+      <translation>Kết nối với %1 lần đầu tiên?</translation>
     </message>
     <message>
       <source>Review the %1 to ensure you trust the server you are connecting to.
 Read this %2 to learn more about certificate validation.</source>
       <comment>%1 is &lt;certificate details&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">Review the %1 to ensure you trust the server you are connecting to.
-Read this %2 to learn more about certificate validation.</translation>
+      <translation>Xem lại %1 để đảm bảo bạn tin tưởng vào máy chủ mà bạn đang kết nối.
+Đọc %2 này để tìm hiểu thêm về việc xác thực chứng chỉ.</translation>
     </message>
     <message>
       <source>certificate details</source>
-      <translation type="unfinished">certificate details</translation>
+      <translation>chi tiết chứng chỉ</translation>
     </message>
     <message>
       <source>help article</source>
-      <translation type="unfinished">help article</translation>
+      <translation>bài báo trợ giúp</translation>
     </message>
     <message>
       <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation type="unfinished">This message may be shown multiple times when connecting to a multi-server system.</translation>
+      <translation>Thông báo này có thể hiển thị nhiều lần khi kết nối với hệ thống nhiều máy chủ.</translation>
     </message>
     <message>
       <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
 You can view %2 or read this %3 to learn more about the current problem.</source>
       <comment>%1 is the system name, %2 is &lt;the server&apos;s certificate&gt; link, %3 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
-You can view %2 or read this %3 to learn more about the current problem.</translation>
+      <translation>Điều này có thể do chứng chỉ máy chủ đã hết hạn hoặc ai đó đang cố mạo danh %1 để lấy cắp thông tin cá nhân của bạn.
+Bạn có thể xem %2 hoặc đọc %3 này để tìm hiểu thêm về vấn đề hiện tại.</translation>
     </message>
     <message>
       <source>the server&apos;s certificate</source>
-      <translation type="unfinished">the server&apos;s certificate</translation>
+      <translation>chứng chỉ của máy chủ</translation>
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>Tiếp tục</translation>
     </message>
   </context>
   <context>
@@ -10188,31 +10188,31 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>SD archive found</source>
-      <translation type="unfinished">SD archive found</translation>
+      <translation>Tìm thấy kho lưu trữ SD</translation>
     </message>
     <message>
       <source>Export in progress...</source>
-      <translation type="unfinished">Export in progress...</translation>
+      <translation>Đang xuất...</translation>
     </message>
     <message>
       <source>Export archive from %1 completed</source>
-      <translation type="unfinished">Export archive from %1 completed</translation>
+      <translation>Đã hoàn thành xuất kho lưu trữ từ %1</translation>
     </message>
     <message>
       <source>Export archive from %1 failed</source>
-      <translation type="unfinished">Export archive from %1 failed</translation>
+      <translation>Xuất kho lưu trữ từ %1 không thành công</translation>
     </message>
     <message>
       <source>Not exported archive found on Device %1</source>
-      <translation type="unfinished">Not exported archive found on Device %1</translation>
+      <translation>Không tìm thấy bản lưu trữ đã xuất trên Thiết bị %1</translation>
     </message>
     <message>
       <source>Not exported archive found on Camera %1</source>
-      <translation type="unfinished">Not exported archive found on Camera %1</translation>
+      <translation>Không tìm thấy kho lưu trữ đã xuất trên camera %1</translation>
     </message>
     <message>
       <source>Export archive from %1</source>
-      <translation type="unfinished">Export archive from %1</translation>
+      <translation>Xuất kho lưu trữ từ %1</translation>
     </message>
     <message>
       <source>Export</source>

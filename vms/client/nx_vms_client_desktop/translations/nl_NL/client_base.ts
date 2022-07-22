@@ -10108,7 +10108,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>Doorgaan</translation>
     </message>
   </context>
   <context>

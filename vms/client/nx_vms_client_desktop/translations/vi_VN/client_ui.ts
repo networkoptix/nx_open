@@ -632,11 +632,11 @@
     </message>
     <message>
       <source>Export From SD Cards</source>
-      <translation type="unfinished">Export From SD Cards</translation>
+      <translation>Xuất từ thẻ SD</translation>
     </message>
     <message>
       <source>Do not export video automatically</source>
-      <translation type="unfinished">Do not export video automatically</translation>
+      <translation>Không tự động xuất video</translation>
     </message>
   </context>
   <context>

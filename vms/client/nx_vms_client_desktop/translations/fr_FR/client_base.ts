@@ -10342,7 +10342,7 @@ Vous pouvez consulter %2 ou lire ce %3 pour en savoir plus sur le problème actu
     </message>
     <message>
       <source>SD archive found</source>
-      <translation type="unfinished">SD archive found</translation>
+      <translation>Archive SD trouvée</translation>
     </message>
     <message>
       <source>Export in progress...</source>
@@ -10350,23 +10350,23 @@ Vous pouvez consulter %2 ou lire ce %3 pour en savoir plus sur le problème actu
     </message>
     <message>
       <source>Export archive from %1 completed</source>
-      <translation type="unfinished">Export archive from %1 completed</translation>
+      <translation>Export des archives de %1 terminé</translation>
     </message>
     <message>
       <source>Export archive from %1 failed</source>
-      <translation type="unfinished">Export archive from %1 failed</translation>
+      <translation>L'exportation de l'archive de %1 a échoué</translation>
     </message>
     <message>
       <source>Not exported archive found on Device %1</source>
-      <translation type="unfinished">Not exported archive found on Device %1</translation>
+      <translation>Archive non exportée trouvée sur l'appareil %1</translation>
     </message>
     <message>
       <source>Not exported archive found on Camera %1</source>
-      <translation type="unfinished">Not exported archive found on Camera %1</translation>
+      <translation>Archive non exportée trouvée sur la caméra %1</translation>
     </message>
     <message>
       <source>Export archive from %1</source>
-      <translation type="unfinished">Export archive from %1</translation>
+      <translation>Exporter l'archive depuis %1</translation>
     </message>
     <message>
       <source>Export</source>

@@ -10076,41 +10076,41 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Connecting to %1 for the first time?</source>
-      <translation type="unfinished">Connecting to %1 for the first time?</translation>
+      <translation>Opretter forbindelse til %1 for første gang?</translation>
     </message>
     <message>
       <source>Review the %1 to ensure you trust the server you are connecting to.
 Read this %2 to learn more about certificate validation.</source>
       <comment>%1 is &lt;certificate details&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">Review the %1 to ensure you trust the server you are connecting to.
-Read this %2 to learn more about certificate validation.</translation>
+      <translation>Gennemgå %1 for at sikre, at du har tillid til den server, du opretter forbindelse til.
+Læs dette %2 for mere information om certifikatvalidering.</translation>
     </message>
     <message>
       <source>certificate details</source>
-      <translation type="unfinished">certificate details</translation>
+      <translation>Certifikatdetaljer</translation>
     </message>
     <message>
       <source>help article</source>
-      <translation type="unfinished">help article</translation>
+      <translation>hjælpeartikel</translation>
     </message>
     <message>
       <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation type="unfinished">This message may be shown multiple times when connecting to a multi-server system.</translation>
+      <translation>Denne meddelelse vises muligvis flere gange, når der oprettes forbindelse til et multi-serversystem.</translation>
     </message>
     <message>
       <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
 You can view %2 or read this %3 to learn more about the current problem.</source>
       <comment>%1 is the system name, %2 is &lt;the server&apos;s certificate&gt; link, %3 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
-You can view %2 or read this %3 to learn more about the current problem.</translation>
+      <translation>Dette kan skyldes et udløbet servercertifikat eller en person, der forsøger at efterligne %1 for at stjæle dine personlige oplysninger.
+Du kan se %2 eller læse denne %3 for at lære mere om det aktuelle problem.</translation>
     </message>
     <message>
       <source>the server&apos;s certificate</source>
-      <translation type="unfinished">the server&apos;s certificate</translation>
+      <translation>serverens&apos;s certifikat</translation>
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>Fortsæt</translation>
     </message>
   </context>
   <context>
@@ -10340,7 +10340,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>SD archive found</source>
-      <translation type="unfinished">SD archive found</translation>
+      <translation>SD arkiv fundet</translation>
     </message>
     <message>
       <source>Export in progress...</source>
@@ -10348,23 +10348,23 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>Export archive from %1 completed</source>
-      <translation type="unfinished">Export archive from %1 completed</translation>
+      <translation>Eksport af arkiv fra %1 afsluttet</translation>
     </message>
     <message>
       <source>Export archive from %1 failed</source>
-      <translation type="unfinished">Export archive from %1 failed</translation>
+      <translation>Eksport af arkiv fra %1 mislykkedes</translation>
     </message>
     <message>
       <source>Not exported archive found on Device %1</source>
-      <translation type="unfinished">Not exported archive found on Device %1</translation>
+      <translation>Ikke eksporteret arkiv fundet på enheden %1</translation>
     </message>
     <message>
       <source>Not exported archive found on Camera %1</source>
-      <translation type="unfinished">Not exported archive found on Camera %1</translation>
+      <translation>Ikke eksporteret arkiv fundet på Kamera %1</translation>
     </message>
     <message>
       <source>Export archive from %1</source>
-      <translation type="unfinished">Export archive from %1</translation>
+      <translation>Eksporter arkiv fra %1</translation>
     </message>
     <message>
       <source>Export</source>

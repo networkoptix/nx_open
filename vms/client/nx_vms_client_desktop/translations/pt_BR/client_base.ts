@@ -10077,41 +10077,41 @@ Não fixe este certificado se você&apos;t modificou o certificado SSL %2 servid
     </message>
     <message>
       <source>Connecting to %1 for the first time?</source>
-      <translation type="unfinished">Connecting to %1 for the first time?</translation>
+      <translation>Conectando a %1 pela primeira vez?</translation>
     </message>
     <message>
       <source>Review the %1 to ensure you trust the server you are connecting to.
 Read this %2 to learn more about certificate validation.</source>
       <comment>%1 is &lt;certificate details&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">Review the %1 to ensure you trust the server you are connecting to.
-Read this %2 to learn more about certificate validation.</translation>
+      <translation>Revise o %1 para garantir que você confia no servidor ao qual está se conectando.
+Leia isto %2 para saber mais sobre validação de certificado.</translation>
     </message>
     <message>
       <source>certificate details</source>
-      <translation type="unfinished">certificate details</translation>
+      <translation>detalhes do certificado</translation>
     </message>
     <message>
       <source>help article</source>
-      <translation type="unfinished">help article</translation>
+      <translation>artigo de ajuda</translation>
     </message>
     <message>
       <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation type="unfinished">This message may be shown multiple times when connecting to a multi-server system.</translation>
+      <translation>Esta mensagem pode ser mostrada várias vezes ao se conectar a um sistema multi-servidores.</translation>
     </message>
     <message>
       <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
 You can view %2 or read this %3 to learn more about the current problem.</source>
       <comment>%1 is the system name, %2 is &lt;the server&apos;s certificate&gt; link, %3 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
-You can view %2 or read this %3 to learn more about the current problem.</translation>
+      <translation>Isso pode ser devido a um certificado de servidor expirado ou alguém tentando se passar por %1 para roubar suas informações pessoais.
+Você pode ver %2 ou ler este %3 para saber mais sobre o problema atual.</translation>
     </message>
     <message>
       <source>the server&apos;s certificate</source>
-      <translation type="unfinished">the server&apos;s certificate</translation>
+      <translation>o certificado do servidor</translation>
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>Continuar</translation>
     </message>
   </context>
   <context>
@@ -10341,7 +10341,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>SD archive found</source>
-      <translation type="unfinished">SD archive found</translation>
+      <translation>Arquivo SD encontrado</translation>
     </message>
     <message>
       <source>Export in progress...</source>
@@ -10349,23 +10349,23 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>Export archive from %1 completed</source>
-      <translation type="unfinished">Export archive from %1 completed</translation>
+      <translation>Exportação de arquivos de %1 concluída</translation>
     </message>
     <message>
       <source>Export archive from %1 failed</source>
-      <translation type="unfinished">Export archive from %1 failed</translation>
+      <translation>A exportação do arquivo de %1 falhou</translation>
     </message>
     <message>
       <source>Not exported archive found on Device %1</source>
-      <translation type="unfinished">Not exported archive found on Device %1</translation>
+      <translation>Arquivo não exportado encontrado no dispositivo %1</translation>
     </message>
     <message>
       <source>Not exported archive found on Camera %1</source>
-      <translation type="unfinished">Not exported archive found on Camera %1</translation>
+      <translation>Arquivo não exportado encontrado na Câmera %1</translation>
     </message>
     <message>
       <source>Export archive from %1</source>
-      <translation type="unfinished">Export archive from %1</translation>
+      <translation>Exportar arquivo de %1</translation>
     </message>
     <message>
       <source>Export</source>
