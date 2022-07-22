@@ -168,7 +168,9 @@ void QnResourcePropertyDictionary::clear(const QVector<QnUuid>& idList)
         });
 }
 
-void QnResourcePropertyDictionary::markAllParamsDirty(const QnUuid& resourceId)
+void QnResourcePropertyDictionary::markAllParamsDirty(
+    const QnUuid& resourceId,
+    nx::utils::MoveOnlyFunc<bool(const QString& paramName, const QString& paramValue)> filter)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     auto itr = m_items.find(resourceId);
@@ -179,7 +181,11 @@ void QnResourcePropertyDictionary::markAllParamsDirty(const QnUuid& resourceId)
     for (auto itrProperty = properties.begin(); itrProperty != properties.end(); ++itrProperty)
     {
         if (!modifiedProperties.contains(itrProperty.key()))
+        {
+            if (filter && !filter(itrProperty.key(), itrProperty.value()))
+                continue;
             modifiedProperties[itrProperty.key()] = itrProperty.value();
+        }
     }
 }
 
