@@ -240,14 +240,7 @@ CodecParametersPtr QnFfmpegHelper::createVideoCodecParameters(
     if (!nx::media::fillExtraData(data, &avCodecParams->extradata, &avCodecParams->extradata_size))
     {
         if (!externalExtradata || externalExtradata->empty())
-        {
-            QnResourcePtr resource;
-            if (data && data->dataProvider)
-                resource = data->dataProvider->getResource();
-            NX_WARNING(NX_SCOPE_TAG, "Can't build data for codec %1. Malformed video stream. Resource %2", 
-                avCodecParams->codec_id, resource);
             return nullptr;
-        }
 
         codecParams->setExtradata(externalExtradata->data(), externalExtradata->size());
     }
