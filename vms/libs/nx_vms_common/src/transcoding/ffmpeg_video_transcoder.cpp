@@ -8,7 +8,8 @@
 #include "decoders/video/ffmpeg_video_decoder.h"
 #include "filters/abstract_image_filter.h"
 #include "filters/crop_image_filter.h"
-#include "utils/common/util.h"
+#include <utils/common/util.h>
+#include <utils/math/math.h>
 #include <utils/media/av_options.h>
 #include <nx/streaming/av_codec_media_context.h>
 #include <nx/streaming/config.h>
@@ -146,7 +147,7 @@ bool QnFfmpegVideoTranscoder::prepareFilters(
                 m_sourceResolution, m_outputResolutionLimit);
             return false;
         }
-        m_outputResolutionLimit = nx::transcoding::alignSize(m_outputResolutionLimit, 16, 4);
+        m_outputResolutionLimit = alignSize(m_outputResolutionLimit, 16, 4);
 
         // Use user resolution if it less as a source before filters.
         if (m_outputResolutionLimit.height() < m_sourceResolution.height())
