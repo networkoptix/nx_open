@@ -2,16 +2,8 @@
 
 #pragma once
 
-#include <QtGui/QOpenGLContext>
-#include <QtMultimedia/QVideoFrame>
+#include <GL/gl.h>
 
 class AbstractVideoSurface;
 
-bool renderToRgb(
-    AbstractVideoSurface* frame,
-    bool isNewTexture,
-    GLuint textureId,
-    QOpenGLContext* /*context*/,
-    int scaleFactor,
-    float* cropWidth,
-    float* cropHeight);
+bool renderToRgb(AbstractVideoSurface* frame, GLuint textureId, int textureWidth, int textureHeight);
