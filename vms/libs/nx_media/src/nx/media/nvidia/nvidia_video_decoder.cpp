@@ -116,20 +116,13 @@ std::unique_ptr<NvidiaVideoFrame> NvidiaVideoDecoder::getFrame()
 
     auto& nvDecoder = m_impl->decoder;
     if (!m_impl->renderer)
-    {
         m_impl->renderer = std::make_unique<linux::Renderer>();
-        if (!m_impl->renderer->initialize(nvDecoder->GetWidth(), nvDecoder->GetHeight(), nvDecoder->GetDeviceFramePitch()))
-        {
-            NX_WARNING(this, "Failed to initialize renderer");
-            return nullptr;
-        }
-    }
-
 
     auto frame = std::make_unique<NvidiaVideoFrame>();
     frame->decoder = weak_from_this();
     frame->height = nvDecoder->GetHeight();
     frame->width = nvDecoder->GetWidth();
+    frame->pitch = nvDecoder->GetDeviceFramePitch();
     frame->frameData = nvDecoder->GetFrame(&frame->timestamp);
     frame->bitDepth = nvDecoder->GetBitDepth();
     frame->format = nvDecoder->GetOutputFormat();

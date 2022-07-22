@@ -33,7 +33,6 @@ enum class Error
 
 NX_VMS_COMMON_API AVCodecID findEncoderCodecId(const QString& codecName);
 
-QSize alignSize(QSize source, int widthAlign, int heightAlign);
 QSize maxResolution(AVCodecID codec);
 NX_VMS_COMMON_API QSize normalizeResolution(const QSize& target, const QSize& source);
 NX_VMS_COMMON_API QSize adjustCodecRestrictions(AVCodecID codec, const QSize& source);
