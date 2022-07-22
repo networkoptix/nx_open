@@ -10,12 +10,7 @@
 #include <nx/media/nvidia/linux/renderer.h>
 #include <nx/media/nvidia/nvidia_video_decoder.h>
 
-bool NvidiaVideoFrame::renderToRgb(
-    bool isNewTexture,
-    GLuint textureId,
-    [[maybe_unused]] int scaleFactor,
-    float* cropWidth,
-    float* cropHeight)
+bool NvidiaVideoFrame::renderToRgb(GLuint textureId, int textureWidth, int textureHeight)
 {
     auto decoderLock = decoder.lock();
     if (!decoderLock)
@@ -23,13 +18,10 @@ bool NvidiaVideoFrame::renderToRgb(
         NX_DEBUG(this, "Skip frame rendering, decoder has destroyed already");
         return false;
     }
-
-    if (cropWidth)
-        *cropWidth = 0;
-    if (cropHeight)
-        *cropHeight = 0;
-   return decoderLock->getRenderer().render(
-       isNewTexture, textureId, frameData, (cudaVideoSurfaceFormat)format, bitDepth, matrix);
+    decoderLock->pushContext();
+    bool result = decoderLock->getRenderer().render(textureId, frameData, (cudaVideoSurfaceFormat)format, bitDepth, matrix, textureWidth, textureHeight);
+    decoderLock->popContext();
+    return result;
 }
 
 AVFrame NvidiaVideoFrame::lockFrame()
@@ -41,4 +33,3 @@ AVFrame NvidiaVideoFrame::lockFrame()
 void NvidiaVideoFrame::unlockFrame()
 {
 }
-
