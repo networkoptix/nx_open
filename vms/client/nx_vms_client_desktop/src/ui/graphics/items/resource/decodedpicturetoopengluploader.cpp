@@ -22,6 +22,7 @@ extern "C"
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include "opengl_renderer.h"
+#include <transcoding/transcoding_utils.h>
 
 #include <nx/streaming/config.h>
 #include <nx/vms/client/core/graphics/shader_helper.h>
@@ -700,9 +701,6 @@ private:
 //TODO/IMPL minimize blocking in \a DecodedPictureToOpenGLUploader::uploadDataToGl method:
     //before calling this method we can check that it would not block and take another task if it would
 
-//we need second frame in case of using async upload to ensure renderer always gets something to draw
-static const size_t MIN_GL_PIC_BUF_COUNT = 2;
-
 DecodedPictureToOpenGLUploader::DecodedPictureToOpenGLUploader(
     QOpenGLWidget* glWidget,
     unsigned int /*asyncDepth*/ )
@@ -1186,12 +1184,13 @@ bool DecodedPictureToOpenGLUploader::renderVideoMemory(
     else
         displaySize = frameSize;
 
-    displaySize = QSize((displaySize.width() / 8 + 1) * 8, (displaySize.height() / 8 + 1) * 8);
+    displaySize = alignSize(displaySize, 8, 8);
+    //displaySize = QSize((displaySize.width() / 8 + 1) * 8, (displaySize.height() / 8 + 1) * 8);
 
     texture->ensureInitialized(
         displaySize.width(), displaySize.height(), displaySize.width(), 1, GL_RGBA, 1, -1);
 
-    if (!renderToRgb(frame->getVideoSurface(), texture->m_id, displaySize.width(), displaySize.height()))
+    if (!nx::media::nvidia::renderToRgb(frame->getVideoSurface(), texture->m_id, displaySize))
     {
         NX_ERROR(this, "Failed to render video memory to OpenGL texture");
         return false;

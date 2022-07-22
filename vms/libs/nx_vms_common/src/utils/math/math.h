@@ -126,6 +126,14 @@ inline int qPower2Round(int value, int step)
     return qPower2Floor(value + step / 2, step);
 }
 
+inline QSize alignSize(QSize source, int widthAlign, int heightAlign)
+{
+    int width = qPower2Round(source.width(), widthAlign);
+    int height = qPower2Round(source.height(), heightAlign);
+
+    return QSize(width, height);
+}
+
 /**
  * Modulo function that never returns negative values.
  *

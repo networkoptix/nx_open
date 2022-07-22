@@ -3,7 +3,12 @@
 #pragma once
 
 #include <GL/gl.h>
+#include <QtCore/QSize>
 
 class AbstractVideoSurface;
 
-bool renderToRgb(AbstractVideoSurface* frame, GLuint textureId, int textureWidth, int textureHeight);
+namespace nx::media::nvidia {
+
+bool renderToRgb(AbstractVideoSurface* frame, GLuint textureId, const QSize& textureSize);
+
+} // namespace nx::media::nvidia

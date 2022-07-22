@@ -52,14 +52,6 @@ AVCodecID findEncoderCodecId(const QString& codecName)
     return AV_CODEC_ID_NONE;
 }
 
-QSize alignSize(QSize source, int widthAlign, int heightAlign)
-{
-    int width = qPower2Round(source.width(), widthAlign);
-    int height = qPower2Round(source.height(), heightAlign);
-
-    return QSize(width, height);
-}
-
 QSize downscaleByHeight(const QSize& source, int newHeight)
 {
     float ar = source.width() / (float)source.height();
