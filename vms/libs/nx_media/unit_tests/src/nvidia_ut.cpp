@@ -35,7 +35,5 @@ TEST(NvidiaVideoDecoderTest, SampleDecode)
         NX_ERROR(this, "Decode packet");
         decoder->decode(videoPacket, &result);
         auto frame = decoder->getFrame();
-        if (frame)
-            frame->renderToRgb(false, 1, 1, nullptr, nullptr);
     }
 }

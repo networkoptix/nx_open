@@ -91,15 +91,14 @@ bool NvidiaVideoDecoderOldPlayer::decode(
 
     outFrame->format = AV_PIX_FMT_NV12;
     outFrame->flags = m_lastFlags | QnAbstractMediaData::MediaFlags_HWDecodingUsed;
-    static int64_t pts = 0;
-    outFrame->pkt_dts = pts; pts += 30000;
     auto frame = m_impl->getFrame();
     if (!frame)
         return false;
+    outFrame->pkt_dts = frame->timestamp;
     outFrame->width = frame->width;
     outFrame->height = frame->height;
+    NX_INFO(this, "QQQ decoded new frame: %1", frame->timestamp);
     outFrame->attachVideoSurface(std::move(frame));
-    NX_INFO(this, "QQQ decoded new frame");
     return true;
 }
 

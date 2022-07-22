@@ -145,8 +145,15 @@ void QnBufferedFrameDisplayer::run()
             m_lastDisplayedTime = frame->pkt_dts;
             {
                 NX_MUTEX_LOCKER lock( &m_renderMtx );
+                int maxW = 0, maxH = 0;
+                for (const auto& render: m_renderList)
+                {
+                    QSize sz = render->sizeOnScreen(0);
+                    maxW = qMax(sz.width(), maxW);
+                    maxH = qMax(sz.height(), maxH);
+                }
                 foreach(QnResourceWidgetRenderer* render, m_renderList)
-                    render->draw(frame, QSize());
+                    render->draw(frame, QSize(maxW, maxH));
             }
         }
         else {

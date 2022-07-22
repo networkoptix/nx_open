@@ -14,23 +14,18 @@ class NvidiaVideoDecoder;
 class NvidiaVideoFrame: public AbstractVideoSurface
 {
 public:
-    bool renderToRgb(
-        bool isNewTexture,
-        GLuint textureId,
-        int scaleFactor,
-        float* cropWidth,
-        float* cropHeight);
+    bool renderToRgb(GLuint textureId, int textureWidth, int textureHeight);
     virtual AVFrame lockFrame() override;
     virtual void unlockFrame() override;
 
 public:
-    uint8_t* frameData;
-    int format;
-    int bitDepth = 0;
-    int matrix = 0;
     int width = 0;
     int height = 0;
+    int64_t timestamp = 0;
     std::weak_ptr<nx::media::nvidia::NvidiaVideoDecoder> decoder;
+
+    uint8_t* frameData = nullptr;
+    int format;
+    int bitDepth;
+    int matrix;
 };
-
-
