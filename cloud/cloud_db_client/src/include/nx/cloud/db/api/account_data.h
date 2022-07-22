@@ -102,6 +102,12 @@ struct AccountData
     std::optional<std::chrono::seconds> authSessionLifetime;
 };
 
+struct AccountStatusData
+{
+    /**%apidoc[readonly] Account status. */
+    AccountStatus statusCode = AccountStatus::invalid;
+};
+
 struct AccountConfirmationCode
 {
     /**%apidoc Account confirmation code. */
