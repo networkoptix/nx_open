@@ -60,7 +60,7 @@
     </message>
     <message>
       <source>User interaction required</source>
-      <translation type="unfinished">User interaction required</translation>
+      <translation>Yêu cầu sự tương tác của người dùng</translation>
     </message>
   </context>
   <context>
@@ -1014,7 +1014,7 @@
     </message>
     <message>
       <source>Archive filter...</source>
-      <translation type="unfinished">Archive filter...</translation>
+      <translation>Bộ lọc lưu trữ...</translation>
     </message>
     <message>
       <source>Copy Bookmark Text</source>
@@ -1034,7 +1034,7 @@
     </message>
     <message>
       <source>Replace Camera...</source>
-      <translation type="unfinished">Replace Camera...</translation>
+      <translation>Thay thế camera...</translation>
     </message>
   </context>
   <context>
@@ -1314,11 +1314,11 @@
     </message>
     <message>
       <source>If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to %1.</source>
-      <translation type="unfinished">If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to %1.</translation>
+      <translation>Nếu hệ thống không có quyền truy cập internet, để nhận được tệp kích hoạt, vui lòng gửi Khóa giấy phép và ID phần cứng tới %1.</translation>
     </message>
     <message>
       <source>If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to your Regional / License support:</source>
-      <translation type="unfinished">If system doesn&apos;t have access to the internet, to get activation file please send the provided License Key and Hardware ID to your Regional / License support:</translation>
+      <translation>Nếu hệ thống không có quyền truy cập internet, để nhận tệp kích hoạt, vui lòng gửi Khóa giấy phép đã cung cấp và ID phần cứng đến bộ phận hỗ trợ Khu vực / Giấy phép của bạn:</translation>
     </message>
     <message>
       <source>Hardware ID</source>
@@ -1330,11 +1330,11 @@
     </message>
     <message>
       <source>Failed to activate free license</source>
-      <translation type="unfinished">Failed to activate free license</translation>
+      <translation>Không kích hoạt được giấy phép miễn phí</translation>
     </message>
     <message>
       <source>Copy parameters</source>
-      <translation type="unfinished">Copy parameters</translation>
+      <translation>Sao chép thông số</translation>
     </message>
     <message>
       <source>Copied</source>
@@ -1343,8 +1343,8 @@
     <message>
       <source>Hardware ID: %1
 License Key: %2</source>
-      <translation type="unfinished">Hardware ID: %1
-License Key: %2</translation>
+      <translation>ID phần cứng: %1
+Khóa giấy phép: %2</translation>
     </message>
   </context>
   <context>
@@ -1482,7 +1482,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Unsecure</source>
-      <translation type="unfinished">Unsecure</translation>
+      <translation>Không an toàn</translation>
     </message>
     <message>
       <source>Check</source>
@@ -1494,7 +1494,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>URL is not valid.</source>
-      <translation type="unfinished">URL is not valid.</translation>
+      <translation>URL không hợp lệ.</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
@@ -1502,11 +1502,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Active</source>
-      <translation type="unfinished">Active</translation>
+      <translation>Hoạt động</translation>
     </message>
     <message>
       <source>Not configured</source>
-      <translation type="unfinished">Not configured</translation>
+      <translation>Chưa được cấu hình</translation>
     </message>
     <message>
       <source>Error</source>
@@ -1514,35 +1514,35 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Set your email address or SMTP server</source>
-      <translation type="unfinished">Set your email address or SMTP server</translation>
+      <translation>Đặt địa chỉ email hoặc máy chủ SMTP của bạn</translation>
     </message>
     <message>
       <source>Unable to test email settings due to no internetconnection on any of the active servers</source>
-      <translation type="unfinished">Unable to test email settings due to no internetconnection on any of the active servers</translation>
+      <translation>Không thể kiểm tra cài đặt email do không có kết nối internet trên bất kỳ máy chủ nào đang hoạt động</translation>
     </message>
     <message>
       <source>%1 users are receiving emails</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users are receiving emails</translation>
+      <translation>Người dùng %1 đang nhận email</translation>
     </message>
     <message>
       <source>%1 users will start receiving emails right after you apply settings</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users will start receiving emails right after you apply settings</translation>
+      <translation>Người dùng %1 sẽ bắt đầu nhận được email ngay sau khi bạn áp dụng cài đặt</translation>
     </message>
     <message>
       <source>%1 is not available</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 is not available</translation>
+      <translation>%1 không khả dụng</translation>
     </message>
     <message>
       <source>Route via %1</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">Route via %1</translation>
+      <translation>Định tuyến qua %1</translation>
     </message>
     <message>
       <source>Route via SMTP server</source>
-      <translation type="unfinished">Route via SMTP server</translation>
+      <translation>Định tuyến qua máy chủ SMTP</translation>
     </message>
     <message>
       <source>Success</source>
@@ -5394,7 +5394,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>User Management</source>
-      <translation type="unfinished">User Management</translation>
+      <translation>Quản lý người dùng</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -5551,7 +5551,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Remote archive synchronization available</source>
-      <translation type="unfinished">Remote archive synchronization available</translation>
+      <translation>Đồng bộ hóa lưu trữ từ xa khả dụng</translation>
     </message>
   </context>
   <context>
@@ -6603,7 +6603,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Move Group without them</source>
-      <translation type="unfinished">Move Group without them</translation>
+      <translation>Di chuyển nhóm mà không bao gồm chúng</translation>
     </message>
   </context>
   <context>
@@ -7339,7 +7339,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will not be uploaded to the main archive.</translation>
+      <translation>Video được quay trên bộ nhớ nội bộ của camera sẽ không được tải lên kho lưu trữ chính.</translation>
     </message>
   </context>
   <context>
@@ -7425,19 +7425,19 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <name>nx::vms::client::desktop::CameraReplacementDialog</name>
     <message>
       <source>Failed to replace camera</source>
-      <translation type="unfinished">Failed to replace camera</translation>
+      <translation>Không thể thay thế camera</translation>
     </message>
     <message>
       <source>Abort camera replacement?</source>
-      <translation type="unfinished">Abort camera replacement?</translation>
+      <translation>Hủy thay thế camera?</translation>
     </message>
     <message>
       <source>Will be transferred partially:</source>
-      <translation type="unfinished">Will be transferred partially:</translation>
+      <translation>Sẽ được chuyển một phần:</translation>
     </message>
     <message>
       <source>Will not be transferred:</source>
-      <translation type="unfinished">Will not be transferred:</translation>
+      <translation>Sẽ không được chuyển:</translation>
     </message>
     <message>
       <source>Next</source>
@@ -7449,28 +7449,28 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Camera for Replacement</source>
-      <translation type="unfinished">Camera for Replacement</translation>
+      <translation>Camera để thay thế</translation>
     </message>
     <message>
       <source>%1 will be replaced by selected camera and removed from the system</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation type="unfinished">%1 will be replaced by selected camera and removed from the system</translation>
+      <translation>%1 sẽ được thay thế bằng camera đã chọn và bị xóa khỏi hệ thống</translation>
     </message>
     <message>
       <source>Data for Transfer</source>
-      <translation type="unfinished">Data for Transfer</translation>
+      <translation>Dữ liệu để chuyển</translation>
     </message>
     <message>
       <source>Checking if the data from the camera can be transferred to the new one.</source>
-      <translation type="unfinished">Checking if the data from the camera can be transferred to the new one.</translation>
+      <translation>Kiểm tra xem dữ liệu từ camera này có thể được chuyển sang camera mới hay không.</translation>
     </message>
     <message>
       <source>Some data and settings may not supported for new Camera</source>
-      <translation type="unfinished">Some data and settings may not supported for new Camera</translation>
+      <translation>Một số dữ liệu và cài đặt có thể không được hỗ trợ cho camera mới</translation>
     </message>
     <message>
       <source>Camera replaced!</source>
-      <translation type="unfinished">Camera replaced!</translation>
+      <translation>Đã thay thế camera!</translation>
     </message>
   </context>
   <context>
@@ -7751,31 +7751,31 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <name>nx::vms::client::desktop::ChunksFilterActionFactory</name>
     <message>
       <source>No filter</source>
-      <translation type="unfinished">No filter</translation>
+      <translation>Không lọc</translation>
     </message>
     <message>
       <source>Main storage only</source>
-      <translation type="unfinished">Main storage only</translation>
+      <translation>Chỉ bộ nhớ chính</translation>
     </message>
     <message>
       <source>Backup storage only</source>
-      <translation type="unfinished">Backup storage only</translation>
+      <translation>Chỉ bộ nhớ sao lưu</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ClientApiAuthDialog</name>
     <message>
       <source>This webpage is requesting access to your account for authorization</source>
-      <translation type="unfinished">This webpage is requesting access to your account for authorization</translation>
+      <translation>Trang web này đang yêu cầu quyền truy cập vào tài khoản của bạn để được ủy quyền</translation>
     </message>
     <message>
       <source>Your confirmation is required to provide a token to</source>
       <comment>... a web page (below there is a web page name with an icon)</comment>
-      <translation type="unfinished">Your confirmation is required to provide a token to</translation>
+      <translation>Xác nhận của bạn là bắt buộc để cung cấp mã token cho</translation>
     </message>
     <message>
       <source>Allow</source>
-      <translation type="unfinished">Allow</translation>
+      <translation>Cho phép</translation>
     </message>
   </context>
   <context>
@@ -9196,7 +9196,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>Uploading client packages to Servers...</source>
-      <translation type="unfinished">Uploading client packages to Servers...</translation>
+      <translation>Đang tải các gói ứng dụng khách lên Máy chủ...</translation>
     </message>
     <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
@@ -9521,7 +9521,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>The webpage is able to interact with the Desktop Client and request access to the user session</source>
-      <translation type="unfinished">The webpage is able to interact with the Desktop Client and request access to the user session</translation>
+      <translation>Trang web có thể tương tác với Máy khách trên máy tính để bàn và yêu cầu quyền truy cập vào phiên người dùng</translation>
     </message>
   </context>
   <context>
@@ -9998,8 +9998,8 @@ Chú ý: Không thể đặt lại mật khẩu này. Nếu bạn làm mất nó
     <message>
       <source>Someone may be impersonating %1 to steal your personal information.
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
-Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
+      <translation>Ai đó có thể đang mạo danh %1 để lấy cắp thông tin cá nhân của bạn.
+Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL máy chủ %2.</translation>
     </message>
   </context>
   <context>
@@ -10240,23 +10240,23 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Replaced camera discovered</source>
-      <translation type="unfinished">Replaced camera discovered</translation>
+      <translation>Đã phát hiện camera được thay thế</translation>
     </message>
     <message>
       <source>Export in progress...</source>
-      <translation type="unfinished">Export in progress...</translation>
+      <translation>Đang xuất...</translation>
     </message>
     <message>
       <source>Camera %1 has been replaced by %2.</source>
-      <translation type="unfinished">Camera %1 has been replaced by %2.</translation>
+      <translation>Camera %1 đã được thay thế bằng %2.</translation>
     </message>
     <message>
       <source>Click on the &quot;Undo Replace&quot; button to continue using two devices.</source>
-      <translation type="unfinished">Click on the &quot;Undo Replace&quot; button to continue using two devices.</translation>
+      <translation>Nhấp vào nút &quot;Hoàn tác Thay thế&quot; để tiếp tục sử dụng hai thiết bị.</translation>
     </message>
     <message>
       <source>Undo Replace</source>
-      <translation type="unfinished">Undo Replace</translation>
+      <translation>Hoàn tác thay thế</translation>
     </message>
   </context>
   <context>
@@ -10434,15 +10434,15 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::UserGroupListModel</name>
     <message>
       <source>LDAP group</source>
-      <translation type="unfinished">LDAP group</translation>
+      <translation>Nhóm LDAP</translation>
     </message>
     <message>
       <source>Built-in group</source>
-      <translation type="unfinished">Built-in group</translation>
+      <translation>Nhóm cài sẵn</translation>
     </message>
     <message>
       <source>Custom group</source>
-      <translation type="unfinished">Custom group</translation>
+      <translation>Nhóm tùy chỉnh</translation>
     </message>
     <message>
       <source>Name</source>
@@ -10454,7 +10454,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Member of</source>
-      <translation type="unfinished">Member of</translation>
+      <translation>Thành viên của</translation>
     </message>
     <message>
       <source>Permissions</source>
@@ -10497,7 +10497,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Các nhóm</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -10539,11 +10539,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Các nhóm</translation>
     </message>
     <message>
       <source>LDAP</source>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
   </context>
   <context>
@@ -11006,7 +11006,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::rules::ModificationMarkItemDelegate</name>
     <message>
       <source>Not saved</source>
-      <translation type="unfinished">Not saved</translation>
+      <translation>Chưa lưu</translation>
     </message>
   </context>
   <context>
@@ -11017,7 +11017,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Apply changes failed.</source>
-      <translation type="unfinished">Apply changes failed.</translation>
+      <translation>Không áp dụng được các thay đổi.</translation>
     </message>
     <message>
       <source>Restore all rules to default?</source>
@@ -11029,7 +11029,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Restore rules failed.</source>
-      <translation type="unfinished">Restore rules failed.</translation>
+      <translation>Không khôi phục được quy tắc.</translation>
     </message>
   </context>
   <context>
@@ -11047,7 +11047,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::rules::SourcePickerWidget</name>
     <message>
       <source>Select at least one User</source>
-      <translation type="unfinished">Select at least one User</translation>
+      <translation>Chọn ít nhất một người dùng</translation>
     </message>
   </context>
   <context>
@@ -11482,15 +11482,15 @@ Bạn có thể chọn một vị trí lưu trữ khác trong tab &quot;Quản l
     </message>
     <message>
       <source>There are no suitable cameras for replacement on the %1</source>
-      <translation type="unfinished">There are no suitable cameras for replacement on the %1</translation>
+      <translation>Không có camera thích hợp để thay thế trên %1</translation>
     </message>
     <message>
       <source>Undo replacement completed successfully!</source>
-      <translation type="unfinished">Undo replacement completed successfully!</translation>
+      <translation>Hoàn tác thay thế đã hoàn tất thành công!</translation>
     </message>
     <message>
       <source>Some settings may not be transferred from the replaced camera due to compatibility issues.</source>
-      <translation type="unfinished">Some settings may not be transferred from the replaced camera due to compatibility issues.</translation>
+      <translation>Một số cài đặt có thể không được chuyển từ camera được thay thế do các vấn đề tương thích.</translation>
     </message>
   </context>
   <context>

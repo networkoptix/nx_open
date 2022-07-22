@@ -253,7 +253,7 @@
     </message>
     <message>
       <source>You attempted to connect to this Server but the Server&apos;s certificate has changed.</source>
-      <translation type="unfinished">You attempted to connect to this Server but the Server&apos;s certificate has changed.</translation>
+      <translation>Bạn đã cố gắng kết nối với Máy chủ này nhưng chứng chỉ của Máy chủ đã thay đổi.</translation>
     </message>
     <message>
       <source>Do not connect to this Server unless instructed by your VMS administrator.</source>

@@ -1418,7 +1418,7 @@
     </message>
     <message>
       <source>Sync time synchronization interval for network requests</source>
-      <translation type="unfinished">Sync time synchronization interval for network requests</translation>
+      <translation>مزامنة الفاصل الزمني لمزامنة الوقت لطلبات الشبكة</translation>
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
@@ -1483,7 +1483,7 @@
     </message>
     <message>
       <source>Enable audit trail</source>
-      <translation type="unfinished">Enable audit trail</translation>
+      <translation>Enable audit trail</translation>
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>

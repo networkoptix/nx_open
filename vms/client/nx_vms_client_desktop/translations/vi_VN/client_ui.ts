@@ -635,23 +635,23 @@
     </message>
     <message>
       <source>ONVIF Settings</source>
-      <translation type="unfinished">ONVIF Settings</translation>
+      <translation>Cài đặt ONVIF</translation>
     </message>
     <message>
       <source>Secondary stream profile</source>
-      <translation type="unfinished">Secondary stream profile</translation>
+      <translation>Profile luồng phụ</translation>
     </message>
     <message>
       <source>Primary stream profile</source>
-      <translation type="unfinished">Primary stream profile</translation>
+      <translation>Profile luồng chính</translation>
     </message>
     <message>
       <source>Export From SD Cards</source>
-      <translation type="unfinished">Export From SD Cards</translation>
+      <translation>Xuất từ thẻ SD</translation>
     </message>
     <message>
       <source>Do not export video automatically</source>
-      <translation type="unfinished">Do not export video automatically</translation>
+      <translation>Không tự động xuất video</translation>
     </message>
   </context>
   <context>
@@ -769,11 +769,11 @@
     <name>CameraReplacementDialog</name>
     <message>
       <source>Camera Replacement</source>
-      <translation type="unfinished">Camera Replacement</translation>
+      <translation>Thay thế camera</translation>
     </message>
     <message>
       <source>New device</source>
-      <translation type="unfinished">New device</translation>
+      <translation>Thiết bị mới</translation>
     </message>
     <message>
       <source>Name</source>
@@ -900,11 +900,11 @@
     </message>
     <message>
       <source>This action can be set only for instant events</source>
-      <translation type="unfinished">This action can be set only for instant events</translation>
+      <translation>Hành động này chỉ có thể được đặt cho các sự kiện tức thì</translation>
     </message>
     <message>
       <source>Select another event or action</source>
-      <translation type="unfinished">Select another event or action</translation>
+      <translation>Chọn một sự kiện hoặc hành động khác</translation>
     </message>
   </context>
   <context>
@@ -1076,7 +1076,7 @@
     </message>
     <message>
       <source>Generic event</source>
-      <translation type="unfinished">Generic event</translation>
+      <translation>Sự kiện chung</translation>
     </message>
   </context>
   <context>
@@ -1244,19 +1244,19 @@
     <name>FooterWidget</name>
     <message>
       <source>Add Comment</source>
-      <translation type="unfinished">Add Comment</translation>
+      <translation>Thêm bình luận</translation>
     </message>
     <message>
       <source>Set Schedule</source>
-      <translation type="unfinished">Set Schedule</translation>
+      <translation>Đặt lịch</translation>
     </message>
     <message>
       <source>Test Action</source>
-      <translation type="unfinished">Test Action</translation>
+      <translation>Hành động thử nghiệm</translation>
     </message>
     <message>
       <source>Add some comment</source>
-      <translation type="unfinished">Add some comment</translation>
+      <translation>Thêm một số bình luận</translation>
     </message>
   </context>
   <context>
@@ -1907,7 +1907,7 @@
     <name>OutgoingMailSettingsWidget</name>
     <message>
       <source>Connection Settings</source>
-      <translation type="unfinished">Connection Settings</translation>
+      <translation>Cài đặt kết nối</translation>
     </message>
     <message>
       <source>Email</source>
@@ -1923,15 +1923,15 @@
     </message>
     <message>
       <source>Server Address</source>
-      <translation type="unfinished">Server Address</translation>
+      <translation>Địa chỉ máy chủ</translation>
     </message>
     <message>
       <source>Security Protocol</source>
-      <translation type="unfinished">Security Protocol</translation>
+      <translation>Giao thức bảo mật</translation>
     </message>
     <message>
       <source>Email Settings</source>
-      <translation type="unfinished">Email Settings</translation>
+      <translation>Cài đặt email</translation>
     </message>
     <message>
       <source>Support Signature</source>
@@ -1939,7 +1939,7 @@
     </message>
     <message>
       <source>System Singnature</source>
-      <translation type="unfinished">System Singnature</translation>
+      <translation>Chữ ký hệ thống</translation>
     </message>
   </context>
   <context>
@@ -2467,23 +2467,23 @@
     <name>RulesDialog</name>
     <message>
       <source>Alarm/Event Rules</source>
-      <translation type="unfinished">Alarm/Event Rules</translation>
+      <translation>Quy tắc cảnh báo/sự kiện</translation>
     </message>
     <message>
       <source>New Rule</source>
-      <translation type="unfinished">New Rule</translation>
+      <translation>Quy tắc mới</translation>
     </message>
     <message>
       <source>Delete Rule</source>
-      <translation type="unfinished">Delete Rule</translation>
+      <translation>Xoá quy tắc</translation>
     </message>
     <message>
       <source>Select some rule</source>
-      <translation type="unfinished">Select some rule</translation>
+      <translation>Chọn một số quy tắc</translation>
     </message>
     <message>
       <source>Reset default rules</source>
-      <translation type="unfinished">Reset default rules</translation>
+      <translation>Khôi phục quy tắc mặc định</translation>
     </message>
   </context>
   <context>
@@ -2795,11 +2795,11 @@
     </message>
     <message>
       <source>Sound</source>
-      <translation type="unfinished">Sound</translation>
+      <translation>Âm thanh</translation>
     </message>
     <message>
       <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
+      <translation>Quản lý</translation>
     </message>
   </context>
   <context>
@@ -3004,11 +3004,11 @@
     </message>
     <message>
       <source>+ Add Group</source>
-      <translation type="unfinished">+ Add Group</translation>
+      <translation>+ Thêm nhóm</translation>
     </message>
     <message>
       <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <translation>Không tìm thấy nhóm nào</translation>
     </message>
   </context>
   <context>
@@ -3019,11 +3019,11 @@
     </message>
     <message>
       <source>+ Add User</source>
-      <translation type="unfinished">+ Add User</translation>
+      <translation>+ Thêm người dùng</translation>
     </message>
     <message>
       <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
+      <translation>Không tìm thấy người dùng</translation>
     </message>
   </context>
   <context>
