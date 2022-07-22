@@ -11,6 +11,7 @@
 
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/utils/move_only_func.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/url.h>
@@ -139,7 +140,8 @@ public:
     /**
      * Save all settings to database
      */
-    bool resynchronizeNowSync();
+    bool resynchronizeNowSync(nx::utils::MoveOnlyFunc<
+        bool(const QString& paramName, const QString& paramValue)> filter = nullptr);
 
     /**
     * Save modified settings to database
