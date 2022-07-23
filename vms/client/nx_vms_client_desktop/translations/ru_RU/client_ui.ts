@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Open source libraries</source>
-      <translation type="unfinished">Open source libraries</translation>
+      <translation>Библиотеки с открытым исходным кодом</translation>
     </message>
   </context>
   <context>
@@ -114,7 +114,7 @@
     </message>
     <message>
       <source>Server certificate validation</source>
-      <translation type="unfinished">Server certificate validation</translation>
+      <translation>Проверка сертификата сервера</translation>
     </message>
   </context>
   <context>
@@ -159,7 +159,7 @@
     <name>AnalyticsSdkObjectDetectedWidget</name>
     <message>
       <source>Attributes:</source>
-      <translation type="unfinished">Attributes:</translation>
+      <translation>Атрибуты:</translation>
     </message>
     <message>
       <source>Object Type:</source>
