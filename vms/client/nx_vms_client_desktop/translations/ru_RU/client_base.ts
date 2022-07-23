@@ -11323,7 +11323,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
     <message>
       <source>Intercom Alarm Layout</source>
-      <translation type="unfinished">Intercom Alarm Layout</translation>
+      <translation>Тревожная раскладка с домофона</translation>
     </message>
     <message>
       <source>Intercom Open Door</source>
@@ -12211,23 +12211,23 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>New client-only updates will be installed automatically. You can change this in the settings.</source>
-      <translation type="unfinished">New client-only updates will be installed automatically. You can change this in the settings.</translation>
+      <translation>Новые обновления клиента будут установлены автоматически. Вы можете изменить это в настройках.</translation>
     </message>
     <message>
       <source>Cannot check for update.</source>
-      <translation type="unfinished">Cannot check for update.</translation>
+      <translation>Не удается проверить наличие обновлений.</translation>
     </message>
     <message>
       <source>Client update package is broken.</source>
-      <translation type="unfinished">Client update package is broken.</translation>
+      <translation>Пакет обновления клиента поврежден.</translation>
     </message>
     <message>
       <source>Client update package is missing for current platform.</source>
-      <translation type="unfinished">Client update package is missing for current platform.</translation>
+      <translation>Для текущей платформы отсутствует пакет обновления клиента.</translation>
     </message>
     <message>
       <source>Can&apos;t check client update availability. Check your internet connection and try again.</source>
-      <translation type="unfinished">Can&apos;t check client update availability. Check your internet connection and try again.</translation>
+      <translation>Не удалось проверить наличие обновлений клиента. Проверьте подключение к Интернету и повторите попытку.</translation>
     </message>
   </context>
 </TS>
