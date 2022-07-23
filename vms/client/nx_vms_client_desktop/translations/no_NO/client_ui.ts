@@ -2476,7 +2476,7 @@
     </message>
     <message>
       <source>Issued by</source>
-      <translation type="unfinished">Issued by</translation>
+      <translation>Utstedt av </translation>
     </message>
     <message>
       <source>Self-signed root certificate</source>
@@ -2492,7 +2492,7 @@
     </message>
     <message>
       <source>Fingerprints</source>
-      <translation type="unfinished">Fingerprints</translation>
+      <translation>Fingeravtrykk</translation>
     </message>
     <message>
       <source>Details</source>
