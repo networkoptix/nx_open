@@ -105,7 +105,7 @@
     </message>
     <message>
       <source>Cannot connect to the System</source>
-      <translation type="unfinished">Cannot connect to the System</translation>
+      <translation>Не удаётся подключиться к системе</translation>
     </message>
   </context>
   <context>
@@ -911,7 +911,7 @@
     </message>
     <message>
       <source>Search Cameras &amp; Resources</source>
-      <translation type="unfinished">Search Cameras &amp; Resources</translation>
+      <translation>Поиск камер и ресурсов</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
@@ -923,7 +923,7 @@
     </message>
     <message>
       <source>Welcome Screen</source>
-      <translation type="unfinished">Welcome Screen</translation>
+      <translation>Cтартовый экран</translation>
     </message>
     <message>
       <source>Add Web Page...</source>
@@ -1016,7 +1016,7 @@
     </message>
     <message>
       <source>Advanced...</source>
-      <translation type="unfinished">Advanced...</translation>
+      <translation>Дополнительно...</translation>
     </message>
     <message>
       <source>Archive filter...</source>
@@ -1024,19 +1024,19 @@
     </message>
     <message>
       <source>Copy Bookmark Text</source>
-      <translation type="unfinished">Copy Bookmark Text</translation>
+      <translation>Копировать текст закладки</translation>
     </message>
     <message>
       <source>Copy Bookmarks Text</source>
-      <translation type="unfinished">Copy Bookmarks Text</translation>
+      <translation>Копировать текст закладок</translation>
     </message>
     <message>
       <source>Web Page Settings...</source>
-      <translation type="unfinished">Web Page Settings...</translation>
+      <translation>Настройки веб-страницы...</translation>
     </message>
     <message>
       <source>Account Security...</source>
-      <translation type="unfinished">Account Security...</translation>
+      <translation>Безопасность учетной записи...</translation>
     </message>
     <message>
       <source>Replace Camera...</source>
@@ -1195,7 +1195,7 @@
     </message>
     <message>
       <source>Executable %1 Media File</source>
-      <translation type="unfinished">Executable %1 Media File</translation>
+      <translation>Исполняемый медиа-файл %1</translation>
     </message>
   </context>
   <context>
@@ -1894,7 +1894,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>May lead to privacy issues</source>
-      <translation type="unfinished">May lead to privacy issues</translation>
+      <translation>Может привести к проблемам конфиденциальности</translation>
     </message>
     <message>
       <source>Connect only servers with public certificate</source>
@@ -1902,15 +1902,15 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Certificate storage will be cleared.</source>
-      <translation type="unfinished">Certificate storage will be cleared.</translation>
+      <translation>Хранилище сертификатов будет очищено.</translation>
     </message>
     <message>
       <source>Current client instance will be disconnected.</source>
-      <translation type="unfinished">Current client instance will be disconnected.</translation>
+      <translation>Текущий клиент будет отключен.</translation>
     </message>
     <message>
       <source>All other client windows will be closed.</source>
-      <translation type="unfinished">All other client windows will be closed.</translation>
+      <translation>Все остальные окна клиента будут закрыты.</translation>
     </message>
     <message>
       <source>Security settings changed</source>
