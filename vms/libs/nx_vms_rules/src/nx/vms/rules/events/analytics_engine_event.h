@@ -31,6 +31,9 @@ public:
     virtual QString resourceKey() const override;
     virtual QVariantMap details(common::SystemContext* context) const override;
 
+protected:
+    QString detailing() const;
+
 private:
     QnUuid m_cameraId;
     QnUuid m_engineId;

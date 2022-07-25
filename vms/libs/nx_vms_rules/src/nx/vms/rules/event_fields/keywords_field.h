@@ -6,6 +6,11 @@
 
 namespace nx::vms::rules {
 
+/**
+* Field matches event string with filter keywords separated by space.
+* Any keyword match is enough. Empty keywords are always match.
+* Keep in sync with checkForKeywords() in event_parameters.h.
+*/
 class NX_VMS_RULES_API KeywordsField: public EventField
 {
     Q_OBJECT
