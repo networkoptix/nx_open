@@ -17,7 +17,7 @@ GenericEvent::GenericEvent(
     const QString& description,
     const QString& source)
     :
-    DescribedEvent(timestamp, caption, description),
+    base_type(timestamp, caption, description),
     m_source(source)
 {
     setState(state);
@@ -30,9 +30,11 @@ QString GenericEvent::resourceKey() const
 
 QVariantMap GenericEvent::details(common::SystemContext* context) const
 {
-    auto result = BasicEvent::details(context);
+    auto result = base_type::details(context);
 
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption());
+    utils::insertIfNotEmpty(result, utils::kDetailingDetailName, description());
+    utils::insertIfNotEmpty(result, utils::kSourceNameDetailName, source());
     result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
 
     return result;
@@ -50,7 +52,7 @@ const ItemDescriptor& GenericEvent::manifest()
     static const QString kKeywordFieldDescription = tr("Keywords separated by space");
     static const auto kDescriptor = ItemDescriptor{
         .id = "nx.events.generic",
-        .displayName = tr("Generic"),
+        .displayName = tr("Generic Event"),
         .flags = {ItemFlag::instant, ItemFlag::prolonged},
         .fields = {
             makeFieldDescriptor<StateField>(utils::kStateFieldName, tr("State"), {}),
