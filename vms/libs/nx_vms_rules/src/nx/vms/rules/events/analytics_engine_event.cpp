@@ -54,8 +54,19 @@ QVariantMap AnalyticsEngineEvent::details(common::SystemContext* context) const
     auto result = DescribedEvent::details(context);
 
     utils::insertIfValid(result, utils::kPluginIdDetailName, QVariant::fromValue(m_engineId));
+    utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing());
 
     return result;
+}
+
+QString AnalyticsEngineEvent::detailing() const
+{
+    QString eventDetailing = caption();
+
+    if (!description().isEmpty())
+        eventDetailing += eventDetailing.isEmpty() ? description() : ": " + description();
+
+    return eventDetailing;
 }
 
 } // namespace nx::vms::rules

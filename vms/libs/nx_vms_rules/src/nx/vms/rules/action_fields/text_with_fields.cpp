@@ -76,18 +76,29 @@ QString eventTooltip(const AggregatedEventPtr& eventAggregator, common::SystemCo
     if (name.canConvert<QString>())
         result << TextWithFields::tr("Event: %1").arg(name.toString());
 
-    const auto sourceId = details.value(utils::kSourceIdDetailName);
-    if (sourceId.canConvert<QnUuid>())
+    QString sourceName;
+    if (const auto sourceId = details.value(utils::kSourceIdDetailName);
+        sourceId.canConvert<QnUuid>())
     {
-        const auto sourceName = stringsHelper.resource(sourceId.value<QnUuid>());
-        result << TextWithFields::tr("Source: %1").arg(sourceName);
+        sourceName = stringsHelper.resource(sourceId.value<QnUuid>());
     }
+
+    if (sourceName.isEmpty())
+        sourceName = details.value(utils::kSourceNameDetailName).toString();
+    if (!sourceName.isEmpty())
+        result << TextWithFields::tr("Source: %1").arg(sourceName);
 
     const auto pluginId = details.value(utils::kPluginIdDetailName);
     if (pluginId.canConvert<QnUuid>())
     {
         const auto pluginName = stringsHelper.plugin(pluginId.value<QnUuid>());
         result << TextWithFields::tr("Plugin: %1").arg(pluginName);
+    }
+
+    if (const auto caption = details.value(utils::kCaptionDetailName).toString();
+        !caption.isEmpty())
+    {
+        result << TextWithFields::tr("Caption: %1").arg(caption);
     }
 
     const auto reason = details.value(utils::kReasonDetailName).toString();
