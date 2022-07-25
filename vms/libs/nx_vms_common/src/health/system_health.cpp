@@ -14,6 +14,7 @@ bool isMessageVisible(MessageType message)
         case /* NoPrimaryTimeServer */ 5:
         case /* SystemIsReadOnly */ 6:
         case /* StoragesAreFull */ 9:
+        case /* RemoteArchiveSyncStarted */ 14:
         case ArchiveFastScanFinished:
             return false;
 
@@ -32,6 +33,7 @@ bool isMessageVisibleInSettings(MessageType message)
     {
         case CloudPromo:
         case DefaultCameraPasswords:
+        case RemoteArchiveSyncAvailable:
 
         // TODO: remove these in VMS-7724
         case RemoteArchiveSyncFinished:
