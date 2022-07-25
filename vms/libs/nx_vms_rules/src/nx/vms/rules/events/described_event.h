@@ -12,7 +12,7 @@ class NX_VMS_RULES_API DescribedEvent: public BasicEvent
     Q_OBJECT
 
     Q_PROPERTY(QString caption READ caption WRITE setCaption)
-    Q_PROPERTY(QString description READ caption WRITE setDescription)
+    Q_PROPERTY(QString description READ description WRITE setDescription)
 
 public:
     QString caption() const;
@@ -32,8 +32,6 @@ protected:
 private:
     QString m_caption;
     QString m_description;
-
-    QString detailing() const;
 };
 
 } // namespace nx::vms::rules

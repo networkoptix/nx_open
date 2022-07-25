@@ -22,6 +22,7 @@ static constexpr auto kPluginIdDetailName = "pluginId";
 static constexpr auto kReasonDetailName = "reason";
 static constexpr auto kScreenshotLifetimeDetailName = "screenshotLifetime";
 static constexpr auto kSourceIdDetailName = "sourceId";
+static constexpr auto kSourceNameDetailName = "sourceName";
 static constexpr auto kSourceStatusDetailName = "sourceStatus";
 static constexpr auto kTypeDetailName = "type";
 static constexpr auto kTriggerNameDetailName = "triggerName";

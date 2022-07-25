@@ -43,22 +43,8 @@ QVariantMap DescribedEvent::details(common::SystemContext* context) const
 
     utils::insertIfNotEmpty(result, utils::kCaptionDetailName, m_caption);
     utils::insertIfNotEmpty(result, utils::kDescriptionDetailName, m_description);
-    utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing());
 
     return result;
-}
-
-QString DescribedEvent::detailing() const
-{
-    QString eventDetailing;
-
-    if (!m_caption.isEmpty())
-        eventDetailing = m_caption;
-
-    if (!m_description.isEmpty())
-        eventDetailing += eventDetailing.isEmpty() ? m_description : ": " + m_description;
-
-    return eventDetailing;
 }
 
 } // namespace nx::vms::rules
