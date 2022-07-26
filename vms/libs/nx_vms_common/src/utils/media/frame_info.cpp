@@ -300,7 +300,9 @@ void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat
     }
 }
 
-#if 0
+/**
+ * Intended for debug purposes.
+ */
 void CLVideoDecoderOutput::saveToFile(const char* filename)
 {
 
@@ -342,7 +344,6 @@ void CLVideoDecoderOutput::saveToFile(const char* filename)
     }
 
 }
-#endif
 
 bool CLVideoDecoderOutput::isPixelFormatSupported(AVPixelFormat format)
 {
