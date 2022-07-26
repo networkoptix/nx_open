@@ -115,7 +115,7 @@ SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
     ui->limitSessionAlertLabel->setText(tr("Unlimited user session lifetime threatens overall"
         " System security and may lead to degradation in System performance"));
     ui->limitSessionLengthAlertLabel->setText(tr(
-        "It is recommended to have user session lifetime not greater than %1",
+        "The recommended maximum user session lifetime is %1",
         "%1 is the time span with time units")
             .arg(HumanReadable::timeSpan(kSessionLengthAlertLimit, HumanReadable::Days)));
 
