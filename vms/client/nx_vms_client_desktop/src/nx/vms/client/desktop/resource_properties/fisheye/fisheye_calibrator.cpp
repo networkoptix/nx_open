@@ -456,58 +456,6 @@ int FisheyeCalibrator::Private::calculateLuminanceThreshold(QImage frame) const
     const int result = borders[borders.size() / 2];
 
     return qBound(kMinLuminanceThreshold, result, kMaxLuminanceThreshold);
-
-#if 0
-    // Use adaptive binarisation to find optimal LuminanceThreshold value
-
-    // 1. build hystogram
-
-    int hystogram[256];
-    memset(hystogram, 0, sizeof(hystogram));
-    for (int y = 0; y < frame.height(); ++y)
-    {
-        quint32* curPtr = (quint32*) (frame.bits() + y * frame.bytesPerLine());
-        for (int x = 0; x < frame.width() / 4; ++x)
-        {
-            quint32 value = *curPtr++;
-
-            hystogram[(quint8) value]++;
-            value >>= 8;
-
-            hystogram[(quint8) value]++;
-            value >>= 8;
-
-            hystogram[(quint8) value]++;
-            value >>= 8;
-
-            hystogram[(quint8) value]++;
-        }
-    }
-
-    // 2.1 calculate initial range
-    int left = 0;
-    int right = 255;
-    while (hystogram[left] == 0 && left < 256)
-        left++;
-    while (hystogram[right] == 0 && right > 0)
-        right--;
-
-    int midPoint = 0;
-    qint64 sum = 0;
-    qint64 halfSquare = frame.width() * frame.height() / 2;
-    int midPos = left;
-    for (; midPos <= right; ++midPos)
-    {
-        sum += hystogram[midPos];
-        if (sum >= halfSquare)
-            break;
-    }
-    int result = midPos / 2 + left;
-    if (result < 16)
-        return -1;
-    else
-        return qBound(28, result, 64);
-#endif
 }
 
 } // namespace nx::vms::client::desktop
