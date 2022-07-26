@@ -33,7 +33,6 @@ namespace ffmpeg {
 
 void logCallback(void* ptr, int level, const char* fmt, va_list vl)
 {
-    av_log_default_callback(ptr, level, fmt, vl);
     if (!fmt)
         return;
 
@@ -42,6 +41,8 @@ void logCallback(void* ptr, int level, const char* fmt, va_list vl)
     {
         case AV_LOG_WARNING:
         case AV_LOG_ERROR:
+        case AV_LOG_FATAL:
+        case AV_LOG_PANIC:
             if (vsnprintf(message, sizeof(message), fmt, vl) < 0)
                 return;
 
