@@ -8,7 +8,6 @@
 #include "ffmpeg_video_decoder.h"
 #include "ffmpeg_audio_decoder.h"
 
-#include "proxy_video_decoder/proxy_video_decoder.h"
 #include "android_video_decoder.h"
 #include "android_audio_decoder.h"
 #include "ios_video_decoder.h"

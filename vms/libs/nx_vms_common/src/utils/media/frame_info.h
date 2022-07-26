@@ -65,7 +65,7 @@ public:
     void copyDataOnlyFrom(const AVFrame* src);
     static bool isPixelFormatSupported(AVPixelFormat format);
 
-    void saveToFile(const char* filename);
+    void saveToFile(const char* filename); //< Is used for debugging.
     void clean();
     void setUseExternalData(bool value);
     bool isExternalData() const { return m_useExternalData; }

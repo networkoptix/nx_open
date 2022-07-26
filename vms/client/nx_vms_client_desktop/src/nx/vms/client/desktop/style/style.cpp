@@ -1268,19 +1268,7 @@ void Style::drawPrimitive(PrimitiveElement element,
                 painter->setPen(option->palette.color(QPalette::Mid));
                 painter->drawLine(adjustedRect.bottomLeft(), adjustedRect.bottomRight());
             }
-#if 0
-            /*
-            TODO: #vkutin Make entire tab bar displaying focus.
-            We need to send whole area updates when a tab loses focus.
-            */
-            if (option->state.testFlag(State_HasFocus))
-            {
-                QStyleOptionFocusRect focusOption;
-                focusOption.QStyleOption::operator=(*option);
-                focusOption.rect = rect.adjusted(1, 1, -1, -1);
-                proxy()->drawPrimitive(PE_FrameFocusRect, &focusOption, painter, widget);
-            }
-#endif
+
             return;
         }
 

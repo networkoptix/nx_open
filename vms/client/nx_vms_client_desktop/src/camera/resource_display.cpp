@@ -120,14 +120,6 @@ QnClientVideoCamera* QnResourceDisplay::camera() const
 void QnResourceDisplay::cleanUp(QnLongRunnable *runnable) const {
     if(runnable == nullptr)
         return;
-
-#if 0
-    if(m_started) {
-        runnable->pleaseStop();
-    } else {
-        runnable->deleteLater();
-    }
-#endif
     runnable->pleaseStop();
 }
 
