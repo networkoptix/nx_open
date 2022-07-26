@@ -104,7 +104,7 @@
     <message>
       <source>%1 user login is temporarily unavailable</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>Логин пользователя %1 временно недоступен</translation>
+      <translation>Вход в систему с использованием %1 временно недоступен</translation>
     </message>
     <message>
       <source>Connection timed out</source>

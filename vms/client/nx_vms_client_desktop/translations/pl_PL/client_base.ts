@@ -10633,7 +10633,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>SD archive found</source>
-      <translation type="unfinished">SD archive found</translation>
+      <translation>Znaleziono archiwum SD</translation>
     </message>
     <message>
       <source>Export in progress...</source>
@@ -10641,23 +10641,23 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>Export archive from %1 completed</source>
-      <translation type="unfinished">Export archive from %1 completed</translation>
+      <translation>Eksport archiwum z %1 ukończono</translation>
     </message>
     <message>
       <source>Export archive from %1 failed</source>
-      <translation type="unfinished">Export archive from %1 failed</translation>
+      <translation>Eksportowanie archiwum z %1 nie powiodło się</translation>
     </message>
     <message>
       <source>Not exported archive found on Device %1</source>
-      <translation type="unfinished">Not exported archive found on Device %1</translation>
+      <translation>Na urządzeniu %1 znaleziono nie wyeksportowane archiwum</translation>
     </message>
     <message>
       <source>Not exported archive found on Camera %1</source>
-      <translation type="unfinished">Not exported archive found on Camera %1</translation>
+      <translation>Znaleziono nie wyeksportowane archiwum dla kamery %1</translation>
     </message>
     <message>
       <source>Export archive from %1</source>
-      <translation type="unfinished">Export archive from %1</translation>
+      <translation>Eksportuj archiwum z %1</translation>
     </message>
     <message>
       <source>Export</source>

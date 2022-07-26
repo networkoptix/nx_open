@@ -10212,7 +10212,7 @@ You can view %2 or read this %3 to learn more about the current problem.</source
     </message>
     <message>
       <source>Export archive from %1</source>
-      <translation type="unfinished">Export archive from %1</translation>
+      <translation>從%1 匯出錄影資料</translation>
     </message>
     <message>
       <source>Export</source>
