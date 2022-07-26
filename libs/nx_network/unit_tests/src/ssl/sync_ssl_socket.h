@@ -75,25 +75,4 @@ public:
     AcceptedSyncSslSocket(std::unique_ptr<AbstractStreamSocket> wrappedSocket);
 };
 
-//-------------------------------------------------------------------------------------------------
-// QnMixedSSLSocket
-
-#if 0
-
-class QnMixedSSLSocket:
-    public SyncSslSocket
-{
-public:
-    QnMixedSSLSocket(std::unique_ptr<AbstractStreamSocket> wrappedSocket);
-
-    virtual int recv(void* buffer, unsigned int bufferLen, int flags) override;
-    virtual int send(const void* buffer, unsigned int bufferLen) override;
-
-private:
-    bool m_initState;
-    bool m_useSSL;
-};
-
-#endif
-
 } // namespace nx::network::ssl::test
