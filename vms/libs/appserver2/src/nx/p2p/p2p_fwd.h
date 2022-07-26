@@ -77,22 +77,6 @@ struct PeerNumberResponseRecord: vms::api::PersistentIdData
 
 struct BidirectionRoutingInfo;
 
-#if 0
-struct UnicastTransactionRecord
-{
-    UnicastTransactionRecord() {}
-    UnicastTransactionRecord(const QnUuid& dstPeer, int ttl):
-        dstPeer(dstPeer),
-        ttl(ttl)
-    {
-    }
-    static const int kRecordSize = 16 + 1;
-    QnUuid dstPeer;
-    quint8 ttl = 0;
-};
-using UnicastTransactionRecords = std::vector<UnicastTransactionRecord>;
-#endif
-
 struct TransportHeader
 {
     std::set<QnUuid> via;
