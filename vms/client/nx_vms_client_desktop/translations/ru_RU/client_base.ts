@@ -7254,11 +7254,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::AudioRedirectPickerWidget</name>
     <message>
       <source>Select Device...</source>
-      <translation type="unfinished">Select Device...</translation>
+      <translation>Выбрать устройство...</translation>
     </message>
     <message>
       <source>Use audio stream from</source>
-      <translation type="unfinished">Use audio stream from</translation>
+      <translation>Использовать аудиопоток из</translation>
     </message>
     <message>
       <source>Transmit audio stream to</source>
@@ -10218,12 +10218,11 @@ You can still change quality and FPS directly on the camera.</translation>
     <message>
       <source>Motion
  + Low-Res</source>
-      <translation type="unfinished">Motion
- + Low-Res</translation>
+      <translation>Дд + Низ</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected devices</translation>
+      <translation>Обнаружение движения отключено для некоторых выбранных устройств</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this camera</source>
@@ -10368,7 +10367,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message>
       <source>It is recommended to have user session lifetime not greater than %1</source>
       <comment>%1 is the time span with time units</comment>
-      <translation type="unfinished">It is recommended to have user session lifetime not greater than %1</translation>
+      <translation>Рекомендуется настроить время сеанса пользователя не более %1</translation>
     </message>
     <message>
       <source>Learn more.</source>
@@ -10377,11 +10376,11 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message numerus="yes">
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
       <comment>%n is digest user count, %1 is total user count</comment>
-      <translation type="unfinished">
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
+      <translation>
+        <numerusform>%n из %1 пользователей может использовать дайджест-аутентификацию (небезопасно).</numerusform>
+        <numerusform>%n из %1 пользователей могут использовать дайджест-аутентификацию (небезопасно).</numerusform>
+        <numerusform>%n из %1 пользователей могут использовать дайджест-аутентификацию (небезопасно).</numerusform>
+        <numerusform>%n из %1 пользователей могут использовать дайджест-аутентификацию (небезопасно).</numerusform>
       </translation>
     </message>
   </context>
@@ -10400,31 +10399,31 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
     <message>
       <source>The certificate is pinned to %1</source>
-      <translation type="unfinished">The certificate is pinned to %1</translation>
+      <translation>Сертификат прикреплен к %1</translation>
     </message>
     <message>
       <source>The certificate was presented by %1</source>
-      <translation type="unfinished">The certificate was presented by %1</translation>
+      <translation>Сертификат был представлен %1</translation>
     </message>
     <message>
       <source>Server Id: %1</source>
-      <translation type="unfinished">Server Id: %1</translation>
+      <translation>Id сервера: %1</translation>
     </message>
     <message>
       <source>This certificate does not match the certificate %1 is pinned to.</source>
-      <translation type="unfinished">This certificate does not match the certificate %1 is pinned to.</translation>
+      <translation>Этот сертификат не соответствует сертификату, к которому привязан %1.</translation>
     </message>
     <message>
       <source>Custom certificate</source>
-      <translation type="unfinished">Custom certificate</translation>
+      <translation>Пользовательский сертификат</translation>
     </message>
     <message>
       <source>Pinned certificate</source>
-      <translation type="unfinished">Pinned certificate</translation>
+      <translation>Прикрепленный сертификат</translation>
     </message>
     <message>
       <source>Unknown certificate</source>
-      <translation type="unfinished">Unknown certificate</translation>
+      <translation>Неизвестный сертификат</translation>
     </message>
     <message>
       <source>This is a custom certificate installed on %1</source>
