@@ -174,15 +174,15 @@
     </message>
     <message>
       <source>Keep Archive For...</source>
-      <translation type="unfinished">Keep Archive For...</translation>
+      <translation>Хранить архив в течение...</translation>
     </message>
     <message>
       <source>Max</source>
-      <translation type="unfinished">Max</translation>
+      <translation>Макс</translation>
     </message>
     <message>
       <source>Min</source>
-      <translation type="unfinished">Min</translation>
+      <translation>Мин</translation>
     </message>
   </context>
   <context>
@@ -263,19 +263,19 @@
     <name>BackupBandwidthSettingsWidget</name>
     <message>
       <source>No Limit</source>
-      <translation type="unfinished">No Limit</translation>
+      <translation>Без ограничений</translation>
     </message>
     <message>
       <source>Fixed</source>
-      <translation type="unfinished">Fixed</translation>
+      <translation>Фиксированный</translation>
     </message>
     <message>
       <source>Scheduled</source>
-      <translation type="unfinished">Scheduled</translation>
+      <translation>Запланировано</translation>
     </message>
     <message>
       <source>Fix bandwidth to</source>
-      <translation type="unfinished">Fix bandwidth to</translation>
+      <translation>Ограничить пропускную способность</translation>
     </message>
     <message>
       <source>Mbit/s</source>
@@ -283,7 +283,7 @@
     </message>
     <message>
       <source>Unlimited</source>
-      <translation type="unfinished">Unlimited</translation>
+      <translation>Неограничено</translation>
     </message>
     <message>
       <source>Limited to</source>
@@ -591,7 +591,7 @@
     </message>
     <message>
       <source>Stream Settings</source>
-      <translation type="unfinished">Stream Settings</translation>
+      <translation>Настройки потока</translation>
     </message>
     <message>
       <source>Use Media2 to fetch profiles</source>
@@ -599,7 +599,7 @@
     </message>
     <message>
       <source>Use different values for pan and tilt</source>
-      <translation type="unfinished">Use different values for pan and tilt</translation>
+      <translation>Используйте разные значения для панорамы и наклона</translation>
     </message>
     <message>
       <source>Tilt</source>
