@@ -10081,8 +10081,8 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <source>Review the %1 to ensure you trust the server you are connecting to.
 Read this %2 to learn more about certificate validation.</source>
       <comment>%1 is &lt;certificate details&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">Review the %1 to ensure you trust the server you are connecting to.
-Read this %2 to learn more about certificate validation.</translation>
+      <translation>Se gjennom %1 -en for å sikre at du stoler på serveren du kobler til.
+Les denne %2 for å lære mer om sertifikatvalidering.</translation>
     </message>
     <message>
       <source>certificate details</source>
@@ -10100,8 +10100,8 @@ Read this %2 to learn more about certificate validation.</translation>
       <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
 You can view %2 or read this %3 to learn more about the current problem.</source>
       <comment>%1 is the system name, %2 is &lt;the server&apos;s certificate&gt; link, %3 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
-You can view %2 or read this %3 to learn more about the current problem.</translation>
+      <translation>Dette kan skyldes et utløpt serversertifikat eller at noen prøver å etterligne %1 for å stjele din personlige informasjon.
+Du kan se %2 eller lese denne %3 for å lære mer om det nåværende problemet.</translation>
     </message>
     <message>
       <source>the server&apos;s certificate</source>

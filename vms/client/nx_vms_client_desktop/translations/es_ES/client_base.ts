@@ -10339,7 +10339,7 @@ Puede ver %2 o leer este %3 para obtener más información sobre el problema act
     </message>
     <message>
       <source>SD archive found</source>
-      <translation type="unfinished">SD archive found</translation>
+      <translation>Archivo SD encontrado</translation>
     </message>
     <message>
       <source>Export in progress...</source>
@@ -10347,23 +10347,23 @@ Puede ver %2 o leer este %3 para obtener más información sobre el problema act
     </message>
     <message>
       <source>Export archive from %1 completed</source>
-      <translation type="unfinished">Export archive from %1 completed</translation>
+      <translation>Exportar archivo desde %1 completado</translation>
     </message>
     <message>
       <source>Export archive from %1 failed</source>
-      <translation type="unfinished">Export archive from %1 failed</translation>
+      <translation>Error al exportar archivo de %1</translation>
     </message>
     <message>
       <source>Not exported archive found on Device %1</source>
-      <translation type="unfinished">Not exported archive found on Device %1</translation>
+      <translation>Archivo exportado no  encontrado en el dispositivo %1</translation>
     </message>
     <message>
       <source>Not exported archive found on Camera %1</source>
-      <translation type="unfinished">Not exported archive found on Camera %1</translation>
+      <translation>Archivo no exportado encontrado en el dispositivo %1</translation>
     </message>
     <message>
       <source>Export archive from %1</source>
-      <translation type="unfinished">Export archive from %1</translation>
+      <translation>Exportar archivo desde %1</translation>
     </message>
     <message>
       <source>Export</source>
