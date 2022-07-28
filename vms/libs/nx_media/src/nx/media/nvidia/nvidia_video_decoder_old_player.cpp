@@ -77,8 +77,7 @@ bool NvidiaVideoDecoderOldPlayer::decode(
     }
 
     CLVideoDecoderOutputPtr outFrame = *outFramePtr;
-    nx::QVideoFramePtr result;
-    if (m_impl->decode(data, &result) < 0)
+    if (m_impl->decode(data) < 0)
     {
         NX_WARNING(this, "Failed to decode frame");
         m_impl.reset();

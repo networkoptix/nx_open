@@ -5,12 +5,13 @@
 #include <utils/media/frame_info.h>
 
 namespace nx::media::nvidia {
+
 class NvidiaVideoDecoder;
-}
 
 class NvidiaVideoFrame: public AbstractVideoSurface
 {
 public:
+    ~NvidiaVideoFrame();
     virtual AVFrame lockFrame() override;
     virtual void unlockFrame() override;
 
@@ -25,3 +26,5 @@ public:
     uint8_t* frameData = nullptr;
     std::weak_ptr<nx::media::nvidia::NvidiaVideoDecoder> decoder;
 };
+
+} // namespace nx::media::nvidia

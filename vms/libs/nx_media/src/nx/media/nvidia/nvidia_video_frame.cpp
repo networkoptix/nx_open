@@ -2,6 +2,10 @@
 
 #include "nvidia_video_frame.h"
 
+#include <nx/media/nvidia/nvidia_video_decoder.h>
+
+namespace nx::media::nvidia {
+
 AVFrame NvidiaVideoFrame::lockFrame()
 {
     AVFrame result;
@@ -11,3 +15,12 @@ AVFrame NvidiaVideoFrame::lockFrame()
 void NvidiaVideoFrame::unlockFrame()
 {
 }
+
+NvidiaVideoFrame::~NvidiaVideoFrame()
+{
+    auto decoderLock = decoder.lock();
+    if (decoderLock)
+        decoderLock->releaseFrame(frameData);
+}
+
+} // namespace nx::media::nvidia

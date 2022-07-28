@@ -31,9 +31,8 @@ TEST(NvidiaVideoDecoderTest, SampleDecode)
         if (!videoPacket)
             continue;
 
-        nx::QVideoFramePtr result;
         NX_ERROR(this, "Decode packet");
-        decoder->decode(videoPacket, &result);
+        decoder->decode(videoPacket);
         auto frame = decoder->getFrame();
     }
 }

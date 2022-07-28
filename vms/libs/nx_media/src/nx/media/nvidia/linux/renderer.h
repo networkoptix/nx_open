@@ -10,7 +10,11 @@
 #include <GL/gl.h>
 #include <cuda.h>
 
+namespace nx::media::nvidia {
+
 class NvidiaVideoFrame;
+
+}
 
 namespace nx::media::nvidia::linux {
 

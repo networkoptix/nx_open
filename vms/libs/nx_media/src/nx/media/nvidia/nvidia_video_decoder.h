@@ -10,14 +10,13 @@
 #include <nx/media/abstract_video_decoder.h>
 
 
-class NvidiaVideoFrame;
-
 namespace nx::media::nvidia {
 
 namespace linux{
     class Renderer;
 }
 
+class NvidiaVideoFrame;
 struct NvidiaVideoDecoderImpl;
 
 class NvidiaVideoDecoder: public std::enable_shared_from_this<NvidiaVideoDecoder>
@@ -25,9 +24,10 @@ class NvidiaVideoDecoder: public std::enable_shared_from_this<NvidiaVideoDecoder
 public:
     NvidiaVideoDecoder();
     ~NvidiaVideoDecoder();
-    int decode(const QnConstCompressedVideoDataPtr& frame, nx::QVideoFramePtr* result = nullptr);
+    int decode(const QnConstCompressedVideoDataPtr& frame);
 
     std::unique_ptr<NvidiaVideoFrame> getFrame();
+    void releaseFrame(uint8_t* frame);
 
     static bool isCompatible(
         const QnConstCompressedVideoDataPtr& frame, AVCodecID codec, int width, int height);
