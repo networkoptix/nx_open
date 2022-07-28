@@ -40,6 +40,14 @@ constexpr auto operator<=>(
     return ct(lhs).count() <=> ct(rhs).count();
 }
 
+template<typename Clock, typename Duration>
+constexpr auto operator<=>(
+    const std::chrono::time_point<Clock, Duration>& lhs,
+    const std::chrono::time_point<Clock, Duration>& rhs)
+{
+    return lhs.time_since_epoch() <=> rhs.time_since_epoch();
+}
+
 template<class I1, class I2, class Cmp>
 constexpr auto lexicographical_compare_three_way(I1 f1, I1 l1, I2 f2, I2 l2, Cmp comp)
     -> decltype(comp(*f1, *f2))

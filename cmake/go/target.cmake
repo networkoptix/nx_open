@@ -32,6 +32,9 @@ function(nx_go_add_target target)
         set_target_properties(${target} PROPERTIES FOLDER ${GO_TARGET_FOLDER})
     endif()
 
+    file(GLOB_RECURSE GO_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR} *.go)
+    set(GO_TARGET_DEPENDS ${GO_TARGET_DEPENDS} ${GO_SRC_FILES})
+
     list_subdirectories(${CMAKE_CURRENT_SOURCE_DIR}/cmd executables)
     list(REMOVE_ITEM executables internal)
 
