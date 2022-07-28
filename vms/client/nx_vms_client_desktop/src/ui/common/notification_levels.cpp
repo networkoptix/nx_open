@@ -5,20 +5,21 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 
-using namespace nx;
 using namespace nx::vms::client::desktop;
 
-using nx::vms::api::EventType;
-using nx::vms::api::ActionType;
+QnNotificationLevel::Value QnNotificationLevel::convert(nx::vms::event::Level level)
+{
+    return static_cast<QnNotificationLevel::Value>(level);
+}
 
 QnNotificationLevel::Value QnNotificationLevel::valueOf(const nx::vms::event::AbstractActionPtr& action)
 {
-    return static_cast<QnNotificationLevel::Value>(nx::vms::event::levelOf(action));
+    return convert(nx::vms::event::levelOf(action));
 };
 
 QnNotificationLevel::Value QnNotificationLevel::valueOf(const nx::vms::event::EventParameters& params)
 {
-    return static_cast<QnNotificationLevel::Value>(nx::vms::event::levelOf(params));
+    return convert(nx::vms::event::levelOf(params));
 }
 
 QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageType messageType)

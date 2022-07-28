@@ -53,7 +53,7 @@ Level levelOf(const EventParameters& params)
 
         case EventType::backupFinishedEvent:
             NX_ASSERT(false, "This event is deprecated");
-            return Level::no;
+            return Level::none;
 
         case EventType::pluginDiagnosticEvent:
         {
@@ -73,7 +73,7 @@ Level levelOf(const EventParameters& params)
 
         default:
             NX_ASSERT(false, "All enum values must be handled");
-            return Level::no;
+            return Level::none;
     }
 }
 

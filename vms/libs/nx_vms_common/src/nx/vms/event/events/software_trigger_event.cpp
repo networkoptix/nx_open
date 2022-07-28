@@ -14,12 +14,14 @@ SoftwareTriggerEvent::SoftwareTriggerEvent(
     const QnUuid& userId,
     qint64 timeStampUs,
     EventState toggleState,
-    const QString& triggerName)
+    const QString& triggerName,
+    const QString& triggerIcon)
     :
     base_type(EventType::softwareTriggerEvent, resource, toggleState, timeStampUs),
     m_triggerId(triggerId),
     m_userId(userId),
-    m_triggerName(triggerName)
+    m_triggerName(triggerName),
+    m_triggerIcon(triggerIcon)
 {
 }
 
@@ -58,6 +60,11 @@ bool SoftwareTriggerEvent::checkEventParams(const EventParameters& params) const
 const QString& SoftwareTriggerEvent::triggerName() const
 {
     return m_triggerName;
+}
+
+const QString& SoftwareTriggerEvent::triggerIcon() const
+{
+    return m_triggerIcon;
 }
 
 } // namespace event

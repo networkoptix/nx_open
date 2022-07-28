@@ -6,6 +6,7 @@
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/rules/basic_event.h>
 #include <nx/vms/rules/camera_conflict_list.h>
+#include <nx/vms/rules/utils/event_details.h>
 #include <nx/vms/rules/utils/type.h>
 
 namespace nx::vms::rules::test {
@@ -13,6 +14,7 @@ namespace nx::vms::rules::test {
 /** May be used for serialization test, should include all event prop types. */
 class TestEvent: public nx::vms::rules::BasicEvent
 {
+    using base_type = BasicEvent;
     Q_OBJECT
     Q_CLASSINFO("type", "nx.events.test")
 
@@ -59,6 +61,15 @@ public:
     void setCacheKey(const QString& cacheKey)
     {
         m_cacheKey = cacheKey;
+    }
+
+    virtual QVariantMap details(common::SystemContext* context) const override
+    {
+        auto result = base_type::details(context);
+        nx::vms::rules::utils::insertLevel(result, nx::vms::event::Level::none);
+        nx::vms::rules::utils::insertIcon(result, nx::vms::rules::Icon::calculated);
+        result[nx::vms::rules::utils::kCustomIconDetailName] = "test";
+        return result;
     }
 
     QnUuid m_serverId;

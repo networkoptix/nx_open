@@ -2,8 +2,6 @@
 
 #include "resource_filter_field.h"
 
-#include "../field_types.h"
-
 namespace nx::vms::rules {
 
 bool ResourceFilterEventField::match(const QVariant& value) const

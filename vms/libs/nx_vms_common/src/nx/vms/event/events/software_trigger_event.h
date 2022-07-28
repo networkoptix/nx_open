@@ -21,11 +21,13 @@ public:
         const QnUuid& userId,
         qint64 timeStampUs,
         EventState toggleState,
-        const QString& triggerName);
+        const QString& triggerName,
+        const QString& triggerIcon);
 
     const QString& triggerId() const;
     const QnUuid& userId() const;
     const QString& triggerName() const;
+    const QString& triggerIcon() const;
 
     virtual EventParameters getRuntimeParams() const override;
     virtual EventParameters getRuntimeParamsEx(
@@ -37,6 +39,7 @@ private:
     const QString m_triggerId;
     const QnUuid m_userId;
     const QString m_triggerName;
+    const QString m_triggerIcon;
 };
 
 } // namespace event
