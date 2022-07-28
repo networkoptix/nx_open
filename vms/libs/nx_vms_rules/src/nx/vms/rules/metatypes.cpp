@@ -8,7 +8,9 @@
 #include <nx/utils/metatypes.h>
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/api/types/event_rule_types.h>
+#include <nx/vms/event/level.h>
 #include <nx/vms/rules/camera_conflict_list.h>
+#include <nx/vms/rules/icon.h>
 #include <nx/vms/rules/network_issue_info.h>
 #include <utils/email/message.h>
 
@@ -44,10 +46,16 @@ void Metatypes::initialize()
     qRegisterMetaType<nx::vms::api::rules::State>();
     QnJsonSerializer::registerSerializer<State>();
 
+    qRegisterMetaType<nx::vms::event::Level>();
+    QnJsonSerializer::registerSerializer<nx::vms::event::Level>();
+
     qRegisterMetaType<nx::vms::rules::CameraConflictList>();
     QnJsonSerializer::registerSerializer<nx::vms::rules::CameraConflictList>();
 
     qRegisterMetaType<nx::vms::rules::EventPtr>();
+
+    qRegisterMetaType<nx::vms::rules::Icon>();
+    QnJsonSerializer::registerSerializer<nx::vms::rules::Icon>();
 
     qRegisterMetaType<nx::vms::rules::NetworkIssueInfo>();
     QnJsonSerializer::registerSerializer<nx::vms::rules::NetworkIssueInfo>();

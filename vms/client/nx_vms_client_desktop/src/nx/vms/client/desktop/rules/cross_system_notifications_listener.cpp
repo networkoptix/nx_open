@@ -3,6 +3,7 @@
 #include "cross_system_notifications_listener.h"
 
 #include <helpers/cloud_url_helper.h>
+#include <nx/fusion/serialization/json.h>
 #include <nx/network/abstract_socket.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/http/auth_tools.h>
@@ -18,6 +19,7 @@
 #include <nx/utils/url.h>
 #include <nx/vms/api/data/cloud_notification.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
+#include <nx/vms/rules/utils/serialization.h>
 #include <watchers/cloud_status_watcher.h>
 
 namespace nx::vms::client::desktop {
@@ -160,26 +162,21 @@ private:
 
     void onReadSomeAsync()
     {
-        auto [cloudMessage, deserializationSucceeded] =
-            nx::reflect::json::deserialize<CloudNotification>(buffer);
+        CloudNotification cloudMessage;
+        auto deserializationSucceeded = QJson::deserialize(buffer, &cloudMessage);
 
         NX_VERBOSE(this, "Read message, deserialized: %1, type: %2",
-            deserializationSucceeded.success, cloudMessage.type);
+            deserializationSucceeded, cloudMessage.type);
 
         if (deserializationSucceeded && cloudMessage.type == kCloudNotificationType)
         {
             QSharedPointer<nx::vms::rules::NotificationAction> notificationAction(
                 new nx::vms::rules::NotificationAction);
 
-            const Notification& notification = cloudMessage.notification;
-            notificationAction->setId(notification.id);
-            notificationAction->setAcknowledge(notification.acknowledge);
-            notificationAction->setCameraId(notification.cameraId);
-            notificationAction->setCaption(notification.caption);
-            notificationAction->setDescription(notification.description);
-            notificationAction->setTooltip(notification.tooltip);
-            notificationAction->setRuleId(notification.ruleId);
-            notificationAction->setTimestamp(notification.timestampUs);
+            nx::vms::rules::deserializeProperties(
+                cloudMessage.notification,
+                notificationAction.get());
+
             emit q->notificationActionReceived(notificationAction);
         }
 

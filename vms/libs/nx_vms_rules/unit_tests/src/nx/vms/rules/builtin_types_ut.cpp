@@ -11,6 +11,7 @@
 #include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_fields/builtin_fields.h>
+#include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/events/builtin_events.h>
 #include <nx/vms/rules/plugin.h>
 #include <nx/vms/rules/utils/serialization.h>
@@ -44,7 +45,8 @@ public:
         // Check all manifest fields correspond to properties with the same name.
         for (const auto& field: manifest.fields)
         {
-            SCOPED_TRACE(field.id.toStdString());
+            SCOPED_TRACE(
+                nx::format("Field name: %1, type %2", field.fieldName, field.id).toStdString());
             fieldNames.insert(field.fieldName);
 
             EXPECT_FALSE(field.id.isEmpty());
@@ -100,11 +102,15 @@ public:
     template<class T>
     void testEventRegistration()
     {
-        SCOPED_TRACE(T::manifest().id.toStdString());
+        const auto& manifest = T::manifest();
+        SCOPED_TRACE(nx::format("Event id: %1", manifest.id).toStdString());
 
         testManifestValidity<T>();
 
-        EXPECT_TRUE(registerEvent<T>());
+        ASSERT_TRUE(registerEvent<T>());
+
+        const auto filter = engine->buildEventFilter(manifest.id);
+        EXPECT_TRUE(filter);
 
         // Check for serialization assertions.
         const auto event = QSharedPointer<T>::create();
@@ -118,7 +124,7 @@ public:
     void testActionRegistration()
     {
         const auto& manifest = T::manifest();
-        SCOPED_TRACE(manifest.id.toStdString());
+        SCOPED_TRACE(nx::format("Action id: %1", manifest.id).toStdString());
 
         testManifestValidity<T>();
         ASSERT_TRUE(registerAction<T>());
@@ -194,6 +200,7 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionFieldRegistration<ContentTypeField>();
     testActionFieldRegistration<EmailMessageField>(systemContext());
     testActionFieldRegistration<EventIdField>();
+    testActionFieldRegistration<ExtractDetailField>(systemContext());
     testActionFieldRegistration<FlagField>();
     testActionFieldRegistration<HttpMethodField>();
     testActionFieldRegistration<OptionalTimeField>();
