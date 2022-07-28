@@ -23,8 +23,10 @@ public:
     explicit LivePreview(QnTimeSlider* slider, QObject* parent = nullptr);
     virtual ~LivePreview() override;
 
-    void showAt(const TimeContent& timeContent, int pointerX, int bottomY,
-        int minX = 0, int maxX = 0);
+    void showAt(
+        const QPoint& globalCursorPos,
+        const QRectF& globalTimeSliderRect,
+        const TimeContent& timeContent);
 
     void setThumbnailLoadingManager(ThumbnailLoadingManager* value);
 

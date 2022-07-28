@@ -1963,22 +1963,24 @@ void QnTimeSlider::updateLivePreview()
         return;
 
     const QPoint globalCursorPos = QCursor::pos();
-    const QPointF cursorPos = WidgetUtils::mapFromGlobal(this, globalCursorPos);
+    const QPointF localCursorPos = WidgetUtils::mapFromGlobal(this, globalCursorPos);
+
     if (m_livePreviewAllowed
         && isVisible()
         && m_view->underMouse()
-        && rect().contains(cursorPos)
+        && rect().contains(localCursorPos)
         && navigator()->currentResource()
         && m_bookmarksViewer->getDisplayedBookmarks().isEmpty()
         && !m_tooltip->widget()->underMouse())
     {
-        const QPoint positionAtTopLine = mapItemToGlobal(this, {0.0, 0.0});
-        const QRect horizontalBounds(
+        QRectF globalRect = QRectF(
             mapItemToGlobal(this, rect().topLeft()),
             mapItemToGlobal(this, rect().bottomRight()));
 
-        m_livePreview->showAt(tooltipTimeContent(timeFromPosition(cursorPos)), globalCursorPos.x(),
-            positionAtTopLine.y(), horizontalBounds.left(), horizontalBounds.right());
+        m_livePreview->showAt(
+            globalCursorPos,
+            globalRect,
+            tooltipTimeContent(timeFromPosition(localCursorPos)));
 
         m_livePreview->widget()->raise();
     }
