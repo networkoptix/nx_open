@@ -19,6 +19,7 @@ namespace nx::network::http {
 
 struct DefaultApiResultCodeDescriptor
 {
+    // TODO: #akolesnikov Rename to type.
     using ResultCode = nx::network::http::StatusCode::Value;
 };
 
@@ -53,7 +54,7 @@ template<
 class GenericApiClient:
     public Base
 {
-    using base_type = network::aio::BasicPollable;
+    using base_type = Base;
     using ResultType = typename ApiResultCodeDescriptor::ResultCode;
 
 public:
@@ -66,7 +67,10 @@ public:
     void setRetryPolicy(unsigned numOfRetries, ResultType res);
 
     void setRetryPolicy(
-        unsigned numOfRetries, nx::utils::MoveOnlyFunc<bool(ResultType)> requestSuccessed);
+        unsigned numOfRetries,
+        nx::utils::MoveOnlyFunc<bool(ResultType)> requestSuccessed);
+
+    void setHttpCredentials(Credentials credentials);
 
 protected:
     /**
@@ -132,7 +136,8 @@ private:
     std::map<network::aio::BasicPollable*, Context> m_activeRequests;
     nx::Mutex m_mutex;
     std::optional<std::chrono::milliseconds> m_requestTimeout;
-    unsigned m_numRetries;
+    std::optional<Credentials> m_credentials;
+    unsigned int m_numRetries = 1;
     std::optional<nx::utils::MoveOnlyFunc<bool(ResultType)>> m_isRequestSucceeded;
 
     template<typename Output, typename... Args>
@@ -185,15 +190,18 @@ public:
 
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
 GenericApiClient<ApiResultCodeDescriptor, Base>::GenericApiClient(
-    const utils::Url& baseApiUrl, ssl::AdapterFunc adapterFunc):
-    m_baseApiUrl(baseApiUrl), m_adapterFunc(std::move(adapterFunc)), m_numRetries(1)
+    const utils::Url& baseApiUrl,
+    ssl::AdapterFunc adapterFunc)
+    :
+    m_baseApiUrl(baseApiUrl),
+    m_adapterFunc(std::move(adapterFunc))
 {
 }
 
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
 GenericApiClient<ApiResultCodeDescriptor, Base>::~GenericApiClient()
 {
-    Base::pleaseStopSync();
+    this->pleaseStopSync();
 }
 
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
@@ -229,6 +237,12 @@ void GenericApiClient<ResultCode, Base>::setRetryPolicy(
     m_isRequstSucceded = std::move(m_isRequstSucceded);
 }
 
+template<HasResultCodeT ResultCode, typename Base>
+void GenericApiClient<ResultCode, Base>::setHttpCredentials(Credentials credentials)
+{
+    m_credentials = std::move(credentials);
+}
+
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
 void GenericApiClient<ApiResultCodeDescriptor, Base>::stopWhileInAioThread()
 {
@@ -249,7 +263,7 @@ inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCall(
         method,
         requestPath,
         urlQuery,
-        network::http::Credentials(),
+        m_credentials ? *m_credentials : network::http::Credentials(),
         std::forward<InputArgsAndCompletionHandler>(args)...);
 }
 
@@ -329,7 +343,7 @@ inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCallWithRe
         method,
         [this, request, handlerWrapper = std::move(handlerWrapper)](auto&&... args) mutable
         {
-            this->processResponse(request, std::move(handlerWrapper), std::move(args)...);
+            this->processResponse(request, std::move(handlerWrapper), std::forward<decltype(args)>(args)...);
         });
 }
 
@@ -344,7 +358,7 @@ inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCall(
         method,
         requestPath,
         nx::utils::UrlQuery(),
-        network::http::Credentials(),
+        m_credentials ? *m_credentials : network::http::Credentials(),
         std::forward<InputArgsAndCompletionHandler>(args)...);
 }
 
@@ -380,7 +394,7 @@ auto GenericApiClient<ApiResultCodeDescriptor, Base>::createHttpClient(
     auto httpClient =
         std::make_unique<network::http::FusionDataHttpClient<InputParamType, Output>>(
             url, std::move(credentials), m_adapterFunc, std::forward<Args>(args)...);
-    httpClient->bindToAioThread(Base::getAioThread());
+    httpClient->bindToAioThread(this->getAioThread());
 
     if (m_requestTimeout)
         httpClient->setRequestTimeout(*m_requestTimeout);
@@ -455,7 +469,7 @@ auto GenericApiClient<ApiResultCodeDescriptor, Base>::makeSyncCallInternal(Input
     makeAsyncCall<Output>(std::forward<InputArgs>(inputArgs)..., [this, &done](auto&&... args) {
         auto result = std::make_tuple(std::move(args)...);
         // Doing post to make sure all network operations are completed before returning.
-        Base::post([&done, result = std::move(result)]() { done.set_value(std::move(result)); });
+        this->post([&done, result = std::move(result)]() { done.set_value(std::move(result)); });
     });
 
     auto result = done.get_future().get();

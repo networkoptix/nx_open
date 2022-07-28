@@ -42,21 +42,6 @@ class NX_NETWORK_API AbstractProxyHandler:
     public RequestHandlerWithContext
 {
 public:
-    AbstractProxyHandler();
-
-    virtual void processRequest(
-        RequestContext requestContext,
-        RequestProcessedHandler completionHandler) override;
-
-    void setTargetHostConnectionInactivityTimeout(
-        std::optional<std::chrono::milliseconds> timeout);
-
-    void setSslHandshakeTimeout(
-        std::optional<std::chrono::milliseconds> timeout);
-
-    void setCertificateChainVerificationCallback(ssl::VerifyCertificateAsyncFunc cb);
-
-protected:
     struct NX_NETWORK_API TargetHost
     {
         network::SocketAddress target;
@@ -72,6 +57,22 @@ protected:
         TargetHost(network::SocketAddress target);
     };
 
+public:
+    AbstractProxyHandler();
+
+    virtual void processRequest(
+        RequestContext requestContext,
+        RequestProcessedHandler completionHandler) override;
+
+    void setTargetHostConnectionInactivityTimeout(
+        std::optional<std::chrono::milliseconds> timeout);
+
+    void setSslHandshakeTimeout(
+        std::optional<std::chrono::milliseconds> timeout);
+
+    void setCertificateChainVerificationCallback(ssl::VerifyCertificateAsyncFunc cb);
+
+protected:
     using ProxyTargetDetectedHandler = nx::utils::MoveOnlyFunc<void(
         StatusCode::Value resultCode,
         TargetHost proxyTarget)>;

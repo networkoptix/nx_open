@@ -39,8 +39,8 @@ public:
         matchContext.mapped = std::move(mapped);
 
         if (std::any_of(
-                m_restPathToMatchContext.begin(), m_restPathToMatchContext.end(),
-                [&pathTemplate](const auto& elem) { return elem.first == pathTemplate; }))
+            m_restPathToMatchContext.begin(), m_restPathToMatchContext.end(),
+            [&pathTemplate](const auto& elem) { return elem.first == pathTemplate; }))
         {
             // Duplicate entry.
             return false;
@@ -61,7 +61,7 @@ public:
         RequestPathParams* pathParams,
         std::string* pathTemplate) const
     {
-        for (const auto& [pathTemplateStr, matchContext]: m_restPathToMatchContext)
+        for (const auto& [pathTemplateStr, matchContext] : m_restPathToMatchContext)
         {
             std::match_results<std::string_view::const_iterator> matchResult;
             if (std::regex_search(path.begin(), path.end(), matchResult, matchContext.regex))
@@ -76,7 +76,7 @@ public:
                         break;
                     }
                     params.nameToValue.emplace(
-                        matchContext.paramNames[i-1], matchResult[i]);
+                        matchContext.paramNames[i - 1], matchResult[i]);
                 }
                 if (!matched)
                     continue;

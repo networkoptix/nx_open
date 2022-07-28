@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <compare>
 #include <iterator>
 #include <optional>
 #include <cstring>
@@ -65,6 +66,8 @@ public:
     BasicBuffer& operator=(const QByteArray& other);
     BasicBuffer& operator=(QByteArray&& other);
     BasicBuffer& operator=(const std::basic_string_view<value_type>& other);
+
+    std::strong_ordering operator<=>(const BasicBuffer&) const;
 
     value_type& at(size_type pos);
     const value_type& at(size_type pos) const;
@@ -469,6 +472,14 @@ BasicBuffer<CharType>& BasicBuffer<CharType>::operator=(const std::basic_string_
 {
     assign(other);
     return *this;
+}
+
+template<typename CharType>
+std::strong_ordering BasicBuffer<CharType>::operator<=>(const BasicBuffer& right) const
+{
+    const int cmp = compare(right);
+    return cmp == 0 ? std::strong_ordering::equal
+        : (cmp < 0 ? std::strong_ordering::less : std::strong_ordering::greater);
 }
 
 //-------------------------------------------------------------------------------------------------
