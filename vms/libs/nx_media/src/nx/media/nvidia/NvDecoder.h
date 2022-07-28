@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include <mutex>
 #include <vector>
+#include <queue>
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -22,6 +23,8 @@
 
 #include <nvcuvid.h>
 #include <map>
+
+#include <nx/media/nvidia/nvidia_frame_queue.h>
 
 /**
 * @brief Exception class for error reporting from the decode API.
@@ -91,7 +94,7 @@ public:
     *  starting to decode any frames.
     */
     NvDecoder(CUcontext cuContext, bool bUseDeviceFrame, cudaVideoCodec eCodec, bool bLowLatency = false,
-              bool bDeviceFramePitched = false, const Rect *pCropRect = NULL, const Dim *pResizeDim = NULL,
+              const Rect *pCropRect = NULL, const Dim *pResizeDim = NULL,
               int maxWidth = 0, int maxHeight = 0, unsigned int clkRate = 1000, bool force_zero_latency = false);
     ~NvDecoder();
 
@@ -145,7 +148,7 @@ public:
     /**
     *  @brief  This function is used to get the pitch of the device buffer holding the decoded frame.
     */
-    int GetDeviceFramePitch() { assert(m_nWidth); return m_nDeviceFramePitch ? (int)m_nDeviceFramePitch : GetWidth() * m_nBPP; }
+    int GetDeviceFramePitch() { assert(m_nWidth); return m_frameQueue.getPitch(); }
 
     /**
     *   @brief  This function is used to get the bit depth associated with the pixel format.
@@ -168,24 +171,18 @@ public:
     CUVIDEOFORMAT GetVideoFormatInfo() { assert(m_nWidth); return m_videoFormat; }
 
     /**
-    *   @brief  This function is used to get codec string from codec id
-    */
-    const char *GetCodecString(cudaVideoCodec eCodec);
-
-    /**
     *   @brief  This function is used to print information about the video stream
     */
     std::string GetVideoInfo() const { return m_videoInfo.str(); }
 
     /**
-    *   @brief  This function decodes a frame and returns the number of frames that are available for
-    *   display. All frames that are available for display should be read before making a subsequent decode call.
+    *   @brief  This function decodes a frame
     *   @param  pData - pointer to the data buffer that is to be decoded
     *   @param  nSize - size of the data buffer in bytes
     *   @param  nFlags - CUvideopacketflags for setting decode options
     *   @param  nTimestamp - presentation timestamp
     */
-    int Decode(const uint8_t *pData, int nSize, int nFlags = 0, int64_t nTimestamp = 0);
+    void Decode(const uint8_t *pData, int nSize, int nFlags = 0, int64_t nTimestamp = 0);
 
     /**
     *   @brief  This function returns a decoded frame and timestamp. This function should be called in a loop for
@@ -193,29 +190,7 @@ public:
     */
     uint8_t* GetFrame(int64_t* pTimestamp = nullptr);
 
-
-    /**
-    *   @brief  This function decodes a frame and returns the locked frame buffers
-    *   This makes the buffers available for use by the application without the buffers
-    *   getting overwritten, even if subsequent decode calls are made. The frame buffers
-    *   remain locked, until UnlockFrame() is called
-    */
-    uint8_t* GetLockedFrame(int64_t* pTimestamp = nullptr);
-
-    /**
-    *   @brief  This function unlocks the frame buffer and makes the frame buffers available for write again
-    *   @param  ppFrame - pointer to array of frames that are to be unlocked
-    *   @param  nFrame - number of frames to be unlocked
-    */
-    void UnlockFrame(uint8_t **pFrame);
-
-    /**
-    *   @brief  This function allows app to set decoder reconfig params
-    *   @param  pCropRect - cropping rectangle coordinates
-    *   @param  pResizeDim - width and height of resized output
-    */
-    int setReconfigParams(const Rect * pCropRect, const Dim * pResizeDim);
-
+    void releaseFrame(uint8_t* frame);
     /**
     *   @brief  This function allows app to set operating point for AV1 SVC clips
     *   @param  opPoint - operating point of an AV1 scalable bitstream
@@ -231,6 +206,7 @@ public:
     static int64_t getDecoderSessionOverHead(int sessionID) { return sessionOverHead[sessionID]; }
 
 private:
+
     int decoderSessionID; // Decoder session identifier. Used to gather session level stats.
     static std::map<int, int64_t> sessionOverHead; // Records session overhead of initialization+deinitialization time. Format is (thread id, duration)
 
@@ -300,18 +276,12 @@ private:
     int m_nBPP = 1;
     CUVIDEOFORMAT m_videoFormat = {};
     Rect m_displayRect = {};
-    // stock of frames
-    std::vector<uint8_t *> m_vpFrame;
+    nx::media::nvidia::FrameQueue m_frameQueue;
     // timestamps of decoded frames
-    std::vector<int64_t> m_vTimestamp;
-    int m_nDecodedFrame = 0, m_nDecodedFrameReturned = 0;
+    std::deque<int64_t> m_timestamps;
     int m_nDecodePicCnt = 0, m_nPicNumInDecodeOrder[32];
     bool m_bEndDecodeDone = false;
-    std::mutex m_mtxVPFrame;
-    int m_nFrameAlloc = 0;
     CUstream m_cuvidStream = 0;
-    bool m_bDeviceFramePitched = false;
-    size_t m_nDeviceFramePitch = 0;
     Rect m_cropRect = {};
     Dim m_resizeDim = {};
 

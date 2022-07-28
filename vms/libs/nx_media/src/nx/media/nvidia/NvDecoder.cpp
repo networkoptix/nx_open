@@ -15,6 +15,7 @@
 #include <cmath>
 
 #include "NvDecoder.h"
+#include <nx/utils/log/log.h>
 
 #define START_TIMER auto start = std::chrono::high_resolution_clock::now();
 
@@ -129,14 +130,6 @@ static int GetChromaPlaneCount(cudaVideoSurfaceFormat eSurfaceFormat)
 }
 
 std::map<int, int64_t> NvDecoder::sessionOverHead = { {0,0}, {1,0} };
-
-/**
-*   @brief  This function is used to get codec string from codec id
-*/
-const char *NvDecoder::GetCodecString(cudaVideoCodec eCodec)
-{
-    return GetVideoCodecString(eCodec);
-}
 
 /* Called when the parser encounters sequence header for AV1 SVC content
 *  return value interpretation:
@@ -341,6 +334,8 @@ int NvDecoder::HandleVideoSequence(CUVIDEOFORMAT *pVideoFormat)
     ;
     m_videoInfo << std::endl;
 
+    m_frameQueue.configure(GetWidth() * m_nBPP, m_nLumaHeight + m_nChromaHeight * m_nNumChromaPlanes);
+
     CUDA_DRVAPI_CALL(cuCtxPushCurrent(m_cuContext));
     NVDEC_API_CALL(cuvidCreateDecoder(&m_hDecoder, &videoDecodeCreateInfo));
     CUDA_DRVAPI_CALL(cuCtxPopCurrent(NULL));
@@ -460,49 +455,6 @@ int NvDecoder::ReconfigureDecoder(CUVIDEOFORMAT *pVideoFormat)
     return nDecodeSurface;
 }
 
-int NvDecoder::setReconfigParams(const Rect *pCropRect, const Dim *pResizeDim)
-{
-    m_bReconfigExternal = true;
-    m_bReconfigExtPPChange = false;
-    if (pCropRect)
-    {
-        if (!((pCropRect->t == m_cropRect.t) && (pCropRect->l == m_cropRect.l) &&
-            (pCropRect->b == m_cropRect.b) && (pCropRect->r == m_cropRect.r)))
-        {
-            m_bReconfigExtPPChange = true;
-            m_cropRect = *pCropRect;
-        }
-    }
-    if (pResizeDim)
-    {
-        if (!((pResizeDim->w == m_resizeDim.w) && (pResizeDim->h == m_resizeDim.h)))
-        {
-            m_bReconfigExtPPChange = true;
-            m_resizeDim = *pResizeDim;
-        }
-    }
-
-    // Clear existing output buffers of different size
-    uint8_t *pFrame = NULL;
-    while (!m_vpFrame.empty())
-    {
-        pFrame = m_vpFrame.back();
-        m_vpFrame.pop_back();
-        if (m_bUseDeviceFrame)
-        {
-            CUDA_DRVAPI_CALL(cuCtxPushCurrent(m_cuContext));
-            CUDA_DRVAPI_CALL(cuMemFree((CUdeviceptr)pFrame));
-            CUDA_DRVAPI_CALL(cuCtxPopCurrent(NULL));
-        }
-        else
-        {
-            delete pFrame;
-        }
-    }
-
-    return 1;
-}
-
 /* Return value from HandlePictureDecode() are interpreted as:
 *  0: fail, >=1: succeeded
 */
@@ -553,32 +505,11 @@ int NvDecoder::HandlePictureDisplay(CUVIDPARSERDISPINFO *pDispInfo) {
         printf("Decode Error occurred for picture %d\n", m_nPicNumInDecodeOrder[pDispInfo->picture_index]);
     }
 
-    uint8_t *pDecodedFrame = nullptr;
+    uint8_t *pDecodedFrame = m_frameQueue.getFreeFrame();
+    if (pDecodedFrame == nullptr)
     {
-        std::lock_guard<std::mutex> lock(m_mtxVPFrame);
-        if ((unsigned)++m_nDecodedFrame > m_vpFrame.size())
-        {
-            // Not enough frames in stock
-            m_nFrameAlloc++;
-            uint8_t *pFrame = NULL;
-            if (m_bUseDeviceFrame)
-            {
-                if (m_bDeviceFramePitched)
-                {
-                    CUDA_DRVAPI_CALL(cuMemAllocPitch((CUdeviceptr *)&pFrame, &m_nDeviceFramePitch, GetWidth() * m_nBPP, m_nLumaHeight + (m_nChromaHeight * m_nNumChromaPlanes), 16));
-                }
-                else
-                {
-                    CUDA_DRVAPI_CALL(cuMemAlloc((CUdeviceptr *)&pFrame, GetFrameSize()));
-                }
-            }
-            else
-            {
-                pFrame = new uint8_t[GetFrameSize()];
-            }
-            m_vpFrame.push_back(pFrame);
-        }
-        pDecodedFrame = m_vpFrame[m_nDecodedFrame - 1];
+        NX_WARNING(this, "Not enought frame buffers!");
+        return 1;
     }
 
     // Copy luma plane
@@ -588,7 +519,7 @@ int NvDecoder::HandlePictureDisplay(CUVIDPARSERDISPINFO *pDispInfo) {
     m.srcPitch = nSrcPitch;
     m.dstMemoryType = m_bUseDeviceFrame ? CU_MEMORYTYPE_DEVICE : CU_MEMORYTYPE_HOST;
     m.dstDevice = (CUdeviceptr)(m.dstHost = pDecodedFrame);
-    m.dstPitch = m_nDeviceFramePitch ? m_nDeviceFramePitch : GetWidth() * m_nBPP;
+    m.dstPitch = GetDeviceFramePitch();
     m.WidthInBytes = GetWidth() * m_nBPP;
     m.Height = m_nLumaHeight;
     CUDA_DRVAPI_CALL(cuMemcpy2DAsync(&m, m_cuvidStream));
@@ -610,19 +541,15 @@ int NvDecoder::HandlePictureDisplay(CUVIDPARSERDISPINFO *pDispInfo) {
     CUDA_DRVAPI_CALL(cuStreamSynchronize(m_cuvidStream));
     CUDA_DRVAPI_CALL(cuCtxPopCurrent(NULL));
 
-    if ((int)m_vTimestamp.size() < m_nDecodedFrame) {
-        m_vTimestamp.resize(m_vpFrame.size());
-    }
-    m_vTimestamp[m_nDecodedFrame - 1] = pDispInfo->timestamp;
-
+    m_timestamps.push_back(pDispInfo->timestamp);
     NVDEC_API_CALL(cuvidUnmapVideoFrame(m_hDecoder, dpSrcFrame));
     return 1;
 }
 
 NvDecoder::NvDecoder(CUcontext cuContext, bool bUseDeviceFrame, cudaVideoCodec eCodec, bool bLowLatency,
-    bool bDeviceFramePitched, const Rect *pCropRect, const Dim *pResizeDim, int maxWidth, int maxHeight, unsigned int clkRate,
+    const Rect *pCropRect, const Dim *pResizeDim, int maxWidth, int maxHeight, unsigned int clkRate,
     bool force_zero_latency) :
-    m_cuContext(cuContext), m_bUseDeviceFrame(bUseDeviceFrame), m_eCodec(eCodec), m_bDeviceFramePitched(bDeviceFramePitched),
+    m_cuContext(cuContext), m_bUseDeviceFrame(bUseDeviceFrame), m_eCodec(eCodec),
     m_nMaxWidth (maxWidth), m_nMaxHeight(maxHeight), m_bForce_zero_latency(force_zero_latency)
 {
     if (pCropRect) m_cropRect = *pCropRect;
@@ -657,21 +584,8 @@ NvDecoder::~NvDecoder() {
         cuvidDestroyDecoder(m_hDecoder);
     }
 
-    std::lock_guard<std::mutex> lock(m_mtxVPFrame);
-
-    for (uint8_t *pFrame : m_vpFrame)
-    {
-        if (m_bUseDeviceFrame)
-        {
-            cuMemFree((CUdeviceptr)pFrame);
-        }
-        else
-        {
-            delete[] pFrame;
-        }
-    }
+    m_frameQueue.clear();
     cuCtxPopCurrent(NULL);
-
     cuvidCtxLockDestroy(m_ctxLock);
 
     STOP_TIMER("Session Deinitialization Time: ");
@@ -679,10 +593,8 @@ NvDecoder::~NvDecoder() {
     NvDecoder::addDecoderSessionOverHead(getDecoderSessionID(), elapsedTime);
 }
 
-int NvDecoder::Decode(const uint8_t *pData, int nSize, int nFlags, int64_t nTimestamp)
+void  NvDecoder::Decode(const uint8_t *pData, int nSize, int nFlags, int64_t nTimestamp)
 {
-    m_nDecodedFrame = 0;
-    m_nDecodedFrameReturned = 0;
     CUVIDSOURCEDATAPACKET packet = { 0 };
     packet.payload = pData;
     packet.payload_size = nSize;
@@ -693,52 +605,22 @@ int NvDecoder::Decode(const uint8_t *pData, int nSize, int nFlags, int64_t nTime
     }
     NVDEC_API_CALL(cuvidParseVideoData(m_hParser, &packet));
     m_cuvidStream = 0;
-
-    return m_nDecodedFrame;
+    NX_DEBUG(this, "framesReady: %1", m_timestamps.size());
 }
 
 uint8_t* NvDecoder::GetFrame(int64_t* pTimestamp)
 {
-    if (m_nDecodedFrame > 0)
+    auto frame = m_frameQueue.getNextFrame();
+    if (frame && pTimestamp)
     {
-        std::lock_guard<std::mutex> lock(m_mtxVPFrame);
-        m_nDecodedFrame--;
-        if (pTimestamp)
-            *pTimestamp = m_vTimestamp[m_nDecodedFrameReturned];
-        return m_vpFrame[m_nDecodedFrameReturned++];
+        *pTimestamp = m_timestamps.front();
+        m_timestamps.pop_front();
     }
 
-    return NULL;
+    return frame;
 }
 
-uint8_t* NvDecoder::GetLockedFrame(int64_t* pTimestamp)
+void NvDecoder::releaseFrame(uint8_t* frame)
 {
-    uint8_t *pFrame;
-    uint64_t timestamp;
-    if (m_nDecodedFrame > 0) {
-        std::lock_guard<std::mutex> lock(m_mtxVPFrame);
-        m_nDecodedFrame--;
-        pFrame = m_vpFrame[0];
-        m_vpFrame.erase(m_vpFrame.begin(), m_vpFrame.begin() + 1);
-
-        timestamp = m_vTimestamp[0];
-        m_vTimestamp.erase(m_vTimestamp.begin(), m_vTimestamp.begin() + 1);
-
-        if (pTimestamp)
-            *pTimestamp = timestamp;
-
-        return pFrame;
-    }
-
-    return NULL;
-}
-
-void NvDecoder::UnlockFrame(uint8_t **pFrame)
-{
-    std::lock_guard<std::mutex> lock(m_mtxVPFrame);
-    m_vpFrame.insert(m_vpFrame.end(), &pFrame[0], &pFrame[1]);
-
-    // add a dummy entry for timestamp
-    uint64_t timestamp[2] = {0};
-    m_vTimestamp.insert(m_vTimestamp.end(), &timestamp[0], &timestamp[1]);
+    m_frameQueue.releaseFrame(frame);
 }
