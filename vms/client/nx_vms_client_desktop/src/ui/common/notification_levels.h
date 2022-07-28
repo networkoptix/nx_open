@@ -12,7 +12,7 @@ namespace QnNotificationLevel {
 
 enum class Value
 {
-    NoNotification = (int) nx::vms::event::Level::no,
+    NoNotification = (int) nx::vms::event::Level::none,
     CommonNotification = (int) nx::vms::event::Level::common,
     OtherNotification = (int) nx::vms::event::Level::other,
     SuccessNotification = (int) nx::vms::event::Level::success,
@@ -20,6 +20,8 @@ enum class Value
     CriticalNotification = (int) nx::vms::event::Level::critical,
     LevelCount = (int) nx::vms::event::Level::count
 };
+
+Value convert(nx::vms::event::Level level);
 
 Value valueOf(const nx::vms::event::AbstractActionPtr& action);
 Value valueOf(const nx::vms::event::EventParameters& params);

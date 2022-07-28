@@ -13,6 +13,45 @@
 
 namespace nx::vms::rules {
 
+namespace {
+
+nx::vms::event::Level calculateLevel(nx::vms::api::EventLevel eventLevel)
+{
+    using nx::vms::api::EventLevel;
+    using nx::vms::event::Level;
+
+    switch (eventLevel)
+    {
+        case EventLevel::ErrorEventLevel:
+            return Level::critical;
+
+        case EventLevel::WarningEventLevel:
+            return Level::important;
+
+        default:
+            return Level::common;
+    }
+}
+
+Icon calculateIcon(nx::vms::api::EventLevel eventLevel)
+{
+    using nx::vms::api::EventLevel;
+
+    switch (eventLevel)
+    {
+        case EventLevel::ErrorEventLevel:
+            return Icon::critical;
+
+        case EventLevel::WarningEventLevel:
+            return Icon::important;
+
+        default:
+            return Icon::alert;
+    }
+}
+
+} // namespace
+
 PluginDiagnosticEvent::PluginDiagnosticEvent(
     std::chrono::microseconds timestamp,
     const QString& caption,
@@ -34,6 +73,8 @@ QVariantMap PluginDiagnosticEvent::details(common::SystemContext* context) const
         result.insert(utils::kCaptionDetailName, eventCaption());
 
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
+    utils::insertLevel(result, calculateLevel(level()));
+    utils::insertIcon(result, calculateIcon(level()));
 
     return result;
 }

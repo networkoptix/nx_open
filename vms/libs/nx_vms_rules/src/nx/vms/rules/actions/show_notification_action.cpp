@@ -3,10 +3,12 @@
 #include "show_notification_action.h"
 
 #include "../action_fields/event_id_field.h"
+#include "../action_fields/extract_detail_field.h"
 #include "../action_fields/flag_field.h"
 #include "../action_fields/optional_time_field.h"
 #include "../action_fields/target_user_field.h"
 #include "../action_fields/text_with_fields.h"
+#include "../utils/event_details.h"
 #include "../utils/field.h"
 #include "../utils/type.h"
 
@@ -34,7 +36,20 @@ const ItemDescriptor& NotificationAction::manifest()
             makeFieldDescriptor<TextWithFields>("tooltip", tr("Tooltip"), QString(),
                 {
                     { "text", "{@EventTooltip}" }
-                })
+                }),
+            makeFieldDescriptor<ExtractDetailField>("level", tr("Level"), {},
+                {
+                    { "detailName", utils::kLevelDetailName }
+                }),
+            makeFieldDescriptor<ExtractDetailField>("icon", tr("Icon"), {},
+                {
+                    { "detailName", utils::kIconDetailName }
+                }),
+            makeFieldDescriptor<ExtractDetailField>("customIcon", tr("Icon"), {},
+                {
+                    { "detailName", utils::kCustomIconDetailName }
+                }),
+
         }
     };
     return kDescriptor;

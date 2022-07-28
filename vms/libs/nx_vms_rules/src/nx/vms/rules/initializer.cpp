@@ -83,6 +83,9 @@ void Initializer::registerFields() const
     m_engine->registerActionField(
         fieldMetatype<EmailMessageField>(),
         [this] { return new EmailMessageField(this->m_context); });
+    m_engine->registerActionField(
+        fieldMetatype<ExtractDetailField>(),
+        [this] { return new ExtractDetailField(this->m_context); });
     registerActionField<EventIdField>();
     registerActionField<HttpMethodField>();
     registerActionField<OptionalTimeField>();

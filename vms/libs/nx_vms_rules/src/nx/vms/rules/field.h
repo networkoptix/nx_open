@@ -5,7 +5,8 @@
 #include <QtCore/QMetaClassInfo>
 #include <QtCore/QObject>
 
-#include "field_types.h"
+#include <nx/utils/uuid.h>
+
 #include "rules_fwd.h"
 
 namespace nx::vms::rules {

@@ -6,17 +6,23 @@
 
 #include <QtCore/QVariantMap>
 
+#include <nx/vms/event/level.h>
+#include <nx/vms/rules/icon.h>
+
 namespace nx::vms::rules::utils {
 
 static constexpr auto kAnalyticsEventTypeDetailName = "analyticsEventType";
 static constexpr auto kAnalyticsObjectTypeDetailName = "analyticsObjectType";
 static constexpr auto kCaptionDetailName = "caption";
 static constexpr auto kCountDetailName = "count";
+static constexpr auto kCustomIconDetailName = "customIcon";
 static constexpr auto kDescriptionDetailName = "description";
 static constexpr auto kDetailingDetailName = "detailing";
 static constexpr auto kExtendedCaptionDetailName = "extendedCaption";
 static constexpr auto kEmailTemplatePathDetailName = "extendedCaption";
 static constexpr auto kHasScreenshotDetailName = "hasTimestamp";
+static constexpr auto kIconDetailName = "icon";
+static constexpr auto kLevelDetailName = "level";
 static constexpr auto kNameDetailName = "name";
 static constexpr auto kPluginIdDetailName = "pluginId";
 static constexpr auto kReasonDetailName = "reason";
@@ -41,6 +47,16 @@ inline void insertIfValid(QVariantMap& map, const QString& key, const QVariant& 
 {
     if (value.isValid())
         map.insert(key, value);
+}
+
+inline void insertLevel(QVariantMap& map, nx::vms::event::Level level)
+{
+    map.insert(kLevelDetailName, QVariant::fromValue(level));
+}
+
+inline void insertIcon(QVariantMap& map, nx::vms::rules::Icon icon)
+{
+    map.insert(kIconDetailName, QVariant::fromValue(icon));
 }
 
 } // namespace nx::vms::rules::utils

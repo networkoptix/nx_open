@@ -61,6 +61,10 @@ QVariantMap SoftTriggerEvent::details(common::SystemContext* context) const
     utils::insertIfValid(result, utils::kUserIdDetailName, QVariant::fromValue(m_userId));
     result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
 
+    utils::insertLevel(result, nx::vms::event::Level::common);
+    utils::insertIcon(result, nx::vms::rules::Icon::custom);
+    utils::insertIfNotEmpty(result, utils::kCustomIconDetailName, triggerIcon());
+
     return result;
 }
 

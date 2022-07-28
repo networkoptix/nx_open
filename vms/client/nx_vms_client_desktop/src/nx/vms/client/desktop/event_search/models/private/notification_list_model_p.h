@@ -48,8 +48,12 @@ private:
 
     QString getPoeOverBudgetDescription(const nx::vms::event::EventParameters& parameters) const;
 
-    QPixmap pixmapForAction(const vms::event::AbstractActionPtr& action,
-        const QColor& color = QColor()) const;
+    QPixmap pixmapForAction(
+        const vms::event::AbstractActionPtr& action,
+        const QColor& color) const;
+    QPixmap pixmapForAction(
+        const nx::vms::rules::NotificationAction* action,
+        const QColor& color) const;
 
     void truncateToMaximumCount();
 

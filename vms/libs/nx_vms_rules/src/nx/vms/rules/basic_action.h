@@ -7,17 +7,10 @@
 #include <QtCore/QObject>
 #include <QtCore/QSharedPointer>
 
+#include "field_types.h"
 #include "manifest.h"
 
 namespace nx::vms::rules {
-
-enum class ActionType
-{
-    instant = 0,
-    actAtStart = 1 << 0,
-    actAtEnd = 1 << 1,
-    prolonged = actAtStart | actAtEnd
-};
 
 /**
  * Base class for storing data of output actions produced by action builders.

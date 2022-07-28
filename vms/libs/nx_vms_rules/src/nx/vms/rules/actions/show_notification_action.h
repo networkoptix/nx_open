@@ -2,9 +2,12 @@
 
 #pragma once
 
-#include <nx/vms/rules/basic_action.h>
+#include <nx/vms/event/level.h>
+#include <nx/vms/rules/icon.h>
 
+#include "../basic_action.h"
 #include "../data_macros.h"
+#include "../field_types.h"
 
 namespace nx::vms::rules {
 
@@ -21,6 +24,10 @@ class NX_VMS_RULES_API NotificationAction: public nx::vms::rules::BasicAction
     FIELD(std::chrono::microseconds, interval, setInterval)
     FIELD(bool, acknowledge, setAcknowledge)
     FIELD(QnUuid, cameraId, setCameraId)
+
+    FIELD(nx::vms::event::Level, level, setLevel)
+    FIELD(nx::vms::rules::Icon, icon, setIcon)
+    FIELD(QString, customIcon, setCustomIcon)
 
 public:
     NotificationAction() = default;
