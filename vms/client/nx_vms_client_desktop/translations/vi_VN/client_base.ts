@@ -190,11 +190,11 @@
     </message>
     <message>
       <source>New Layout...</source>
-      <translation>Việc bố trí mới...</translation>
+      <translation>Bố cục mới...</translation>
     </message>
     <message>
       <source>Open Layout...</source>
-      <translation>Mở bố trí...</translation>
+      <translation>Mở bố cục...</translation>
     </message>
     <message>
       <source>Folder...</source>
@@ -210,11 +210,11 @@
     </message>
     <message>
       <source>Save Current Layout</source>
-      <translation>Lưu lại giao diện hiện tại</translation>
+      <translation>Lưu bố cục hiện tại</translation>
     </message>
     <message>
       <source>Save Current Layout As...</source>
-      <translation>Lưu lại giao diện hiện tại...</translation>
+      <translation>Lưu bố cục hiện tại thành...</translation>
     </message>
     <message>
       <source>Save Video Wall View</source>
@@ -373,7 +373,7 @@
     </message>
     <message>
       <source>Open in Alarm Layout</source>
-      <translation>Mở trong diện báo động</translation>
+      <translation>Mở trong Bố cục cảnh báo</translation>
     </message>
     <message>
       <source>Open in New Window</source>
@@ -429,11 +429,11 @@
     </message>
     <message>
       <source>Save Layout</source>
-      <translation>Cách bài trí cửa</translation>
+      <translation>Lưu bố cục</translation>
     </message>
     <message>
       <source>Save Layout As...</source>
-      <translation>Lưu bố trí...</translation>
+      <translation>Lưu bố cục thành...</translation>
     </message>
     <message>
       <source>Maximize Item</source>
@@ -497,11 +497,11 @@
     </message>
     <message>
       <source>Remove from Layout</source>
-      <translation>Gỡ bỏ khỏi bố trí</translation>
+      <translation>Xóa khỏi bố cục</translation>
     </message>
     <message>
       <source>Stop Sharing Layout</source>
-      <translation>Dừng Chia sẻ Layout</translation>
+      <translation>Dừng chia sẻ Bố cục</translation>
     </message>
     <message>
       <source>Rename</source>
@@ -513,7 +513,7 @@
     </message>
     <message>
       <source>Set as Layout Background</source>
-      <translation>Hãy bố trí nền (đồ điện tử)</translation>
+      <translation>Đặt làm nền bố cục</translation>
     </message>
     <message>
       <source>User Settings...</source>
@@ -605,7 +605,7 @@
     </message>
     <message>
       <source>Layout Settings...</source>
-      <translation>Giao diện thiết lập...</translation>
+      <translation>Cài đặt bố cục...</translation>
     </message>
     <message>
       <source>Video Wall Settings...</source>
@@ -1132,7 +1132,7 @@
     <message numerus="yes">
       <source>%n layouts</source>
       <translation>
-        <numerusform>%n bố cục</numerusform>
+        <numerusform>Bố cục %n</numerusform>
       </translation>
     </message>
   </context>
@@ -1195,7 +1195,7 @@
     <message numerus="yes">
       <source>%n layouts</source>
       <translation>
-        <numerusform>%n bố cục</numerusform>
+        <numerusform>Bố cục %n</numerusform>
       </translation>
     </message>
     <message>
@@ -1499,7 +1499,7 @@
     </message>
     <message>
       <source>Shared Layouts</source>
-      <translation>Chia sẻ nhiều Layout</translation>
+      <translation>Bố cục được chia sẻ</translation>
     </message>
     <message>
       <source>Permissions</source>
@@ -1653,7 +1653,7 @@
     <name>QnAccessibleLayoutsWidget</name>
     <message>
       <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
-      <translation>Cho phép truy cập vào một số layout mà cho phép tất cả các camera trụy nhậptrên đó. Ngoài ra người dùng sẽ có quyền truy cập vào tất cả các camera mới trên layout này.</translation>
+      <translation>Khi cấp quyền truy cập vào một số bố cục, bạn cấp quyền truy cập vào tất cả các camera trên bố cục đó. Ngoài ra, người dùng sẽ có quyền truy cập vào tất cả các camera mới trên các bố cục này.</translation>
     </message>
   </context>
   <context>
@@ -3241,11 +3241,11 @@ to %1</source>
     <name>QnFullscreenCameraActionWidget</name>
     <message>
       <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation>Camera này hiện không có trên bố cục đã chọn. Hành động sẽ hoạt động nếu camera được thêm vào trước khi kích hoạt.</translation>
+      <translation>Camera này hiện không có trên bố cục đã chọn. Hành động sẽ được thực hiện nếu camera được thêm vào trước khi kích hoạt.</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation>Camera này hiện không có trên một số bố trí đã chọn. Hành động sẽ được thực hiện nếu camera được thêm vào trước khi kích hoạt.</translation>
+      <translation>Camera này hiện không có trên một số bố cục đã chọn. Hành động sẽ được thực hiện nếu camera được thêm vào trước khi kích hoạt.</translation>
     </message>
   </context>
   <context>
@@ -3830,7 +3830,7 @@ to %1</source>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
-      <translation>Khoảng thời gian mỗi camera trên bố trí sẽ được hiển thị nếu bạn bắt đầu Tour.</translation>
+      <translation>Khoảng thời gian mỗi camera trên bố cục sẽ được hiển thị nếu bạn bắt đầu Tour.</translation>
     </message>
   </context>
   <context>
@@ -4410,7 +4410,7 @@ to %1</source>
     </message>
     <message>
       <source>Layouts</source>
-      <translation>Layouts</translation>
+      <translation>Bố cục</translation>
     </message>
     <message>
       <source>Showreels</source>
@@ -5758,7 +5758,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Layouts</source>
-      <translation>Layouts</translation>
+      <translation>Bố cục</translation>
     </message>
     <message>
       <source>New Role</source>
@@ -5785,7 +5785,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Layouts</source>
-      <translation>Layouts</translation>
+      <translation>Bố cục</translation>
     </message>
     <message>
       <source>New User...</source>
@@ -6402,7 +6402,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <name>Resources</name>
     <message>
       <source>There is another layout with the same name</source>
-      <translation>Có một layout khác có cùng tên</translation>
+      <translation>Có một bố cục khác có cùng tên</translation>
     </message>
     <message>
       <source>You do not have permission to overwrite it.</source>
@@ -6410,11 +6410,11 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Overwrite existing layout?</source>
-      <translation>Ghi đè layout hiện tại?</translation>
+      <translation>Ghi đè bố cục hiện có?</translation>
     </message>
     <message>
       <source>There is another layout with the same name.</source>
-      <translation>Có một layout khác có cùng tên.</translation>
+      <translation>Có một bố cục khác có cùng tên.</translation>
     </message>
     <message numerus="yes">
       <source>User will still have access to %n removed resources:</source>
@@ -6448,7 +6448,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>This layout is shared with other users, so you change it for them too.</source>
-      <translation>Layout này được chia sẻ với người dùng khác, vì vậy bạn thay đổi chúng.</translation>
+      <translation>Bố cục này được chia sẻ với những người dùng khác, vì vậy bạn cũng thay đổi nó cho họ.</translation>
     </message>
     <message numerus="yes">
       <source>User will lose access to %n resources:</source>
@@ -6465,19 +6465,19 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message numerus="yes">
       <source>Delete %n shared layouts?</source>
       <translation>
-        <numerusform>Xóa %n Layout được chia sẻ?</numerusform>
+        <numerusform>Xóa bố cục được chia sẻ %n?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These %n layouts are shared with other users, so you delete it for them too.</source>
       <translation>
-        <numerusform>Những layout %n này được chia sẻ với người dùng khác, vì vậy bạn cũng xóa nó cho họ.</numerusform>
+        <numerusform>Những bố cục %n này được chia sẻ với những người dùng khác, vì vậy bạn cũng xóa nó cho họ.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
       <translation>
-        <numerusform>Xóa %n mục khỏi layout?</numerusform>
+        <numerusform>Xóa mục %n khỏi bố cục?</numerusform>
       </translation>
     </message>
     <message>
@@ -6835,7 +6835,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Devices on layout</source>
-      <translation>Các thiết trên bố cục</translation>
+      <translation>Thiết bị trên bố cục</translation>
     </message>
     <message>
       <source>Cameras on layout</source>
@@ -8476,11 +8476,11 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Error while loading picture</source>
-      <translation>Lỗi trong khi tải lên hình ảnh</translation>
+      <translation>Lỗi trong khi tải hình ảnh</translation>
     </message>
     <message>
       <source>Error while uploading picture</source>
-      <translation>Lỗi trong khi tải lên hình ảnh</translation>
+      <translation>Lỗi trong khi tải hình ảnh lên</translation>
     </message>
     <message>
       <source>Select file...</source>
@@ -9110,7 +9110,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
     <message>
       <source>You do not have any layouts</source>
-      <translation>Bạn không có bất kỳ bố trí</translation>
+      <translation>Bạn không có bất kỳ bố cục nào</translation>
     </message>
   </context>
   <context>
@@ -9154,7 +9154,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
-      <translation>Không người dùng nào được chọn có quyền truy cập vào bố cục đã chọn. Hành động sẽ không hoạt động.</translation>
+      <translation>Không người dùng được chọn nào có quyền truy cập vào bố cục đã chọn. Hành động sẽ không thực hiện được.</translation>
     </message>
     <message>
       <source>Select layout...</source>
@@ -9174,7 +9174,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
-      <translation>Một số người dùng không có quyền truy cập vào bố trí đã chọn. Hành động sẽ không làm việc cho họ.</translation>
+      <translation>Một số người dùng không có quyền truy cập vào bố cục đã chọn. Hành động sẽ không thực hiện được.</translation>
     </message>
   </context>
   <context>
@@ -10530,7 +10530,7 @@ Bạn có thể xem %2 hoặc đọc %3 này để tìm hiểu thêm về vấn 
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
-      <translation>Một số dấu trang chỉ có thể được xuất dưới dạng bố cục.</translation>
+      <translation>Chỉ có thể xuất một số dấu trang dưới dạng bố cục.</translation>
     </message>
     <message>
       <source>Local files not allowed for Multi-Video export</source>
@@ -10546,7 +10546,7 @@ Bạn có thể xem %2 hoặc đọc %3 này để tìm hiểu thêm về vấn 
     </message>
     <message>
       <source>Saving layout</source>
-      <translation>Lưu bố cục</translation>
+      <translation>Đang lưu bố cục</translation>
     </message>
     <message>
       <source>Stop Saving</source>
@@ -10649,7 +10649,7 @@ Bạn có thể xem %2 hoặc đọc %3 này để tìm hiểu thêm về vấn 
     </message>
     <message>
       <source>Layouts</source>
-      <translation>Layouts</translation>
+      <translation>Bố cục</translation>
     </message>
     <message>
       <source>Showreels</source>
@@ -10677,7 +10677,7 @@ Bạn có thể xem %2 hoặc đọc %3 này để tìm hiểu thêm về vấn 
     </message>
     <message>
       <source>All Shared Layouts</source>
-      <translation>Chia sẻ tất cả Layout</translation>
+      <translation>Tất cả các bố cục được chia sẻ</translation>
     </message>
     <message>
       <source>Cameras &amp; Resources</source>
@@ -10685,7 +10685,7 @@ Bạn có thể xem %2 hoặc đọc %3 này để tìm hiểu thêm về vấn 
     </message>
     <message>
       <source>Shared Layouts</source>
-      <translation>Chia sẻ nhiều Layout</translation>
+      <translation>Bố cục được chia sẻ</translation>
     </message>
   </context>
   <context>
@@ -10866,7 +10866,7 @@ Bạn có thể xem %2 hoặc đọc %3 này để tìm hiểu thêm về vấn 
     <name>nx::vms::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
       <source>Drag layout or camera here to add it to the showreel</source>
-      <translation>Kéo layout hoặc camera ở đây để thêm nó vào showreel</translation>
+      <translation>Kéo Bố cục hoặc camera vào đây để thêm vào showreel</translation>
     </message>
   </context>
   <context>
@@ -11039,7 +11039,7 @@ Bạn có thể xem %2 hoặc đọc %3 này để tìm hiểu thêm về vấn 
     <name>nx::vms::client::desktop::ui::workbench::ActionHandler</name>
     <message>
       <source>Layout is full</source>
-      <translation>Bố cục đầy đủ</translation>
+      <translation>Bố cục đã bị đầy</translation>
     </message>
     <message>
       <source>Failed to change password</source>
@@ -11255,7 +11255,7 @@ Bạn có thể chọn một vị trí lưu trữ khác trong tab &quot;Quản l
     <name>nx::vms::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
       <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
-      <translation>Sử dụng mũi tên trên bàn phím để chuyển giữu các layout. Để thoát khỏi showreel ấn Esc.</translation>
+      <translation>Sử dụng mũi tên trên bàn phím để chuyển giữu các bố cục. Để thoát khỏi showreel ấn Esc.</translation>
     </message>
     <message>
       <source>Press Esc to stop the tour.</source>
@@ -11299,23 +11299,23 @@ Bạn có thể chọn một vị trí lưu trữ khác trong tab &quot;Quản l
     <name>nx::vms::client::desktop::ui::workbench::LayoutsHandler</name>
     <message>
       <source>Save Layout As</source>
-      <translation>Lưu bố trí</translation>
+      <translation>Lưu bố cục thành</translation>
     </message>
     <message>
       <source>Enter Layout Name:</source>
-      <translation>Nhập tên bố trí:</translation>
+      <translation>Nhập tên bố cục:</translation>
     </message>
     <message>
       <source>New Layout</source>
-      <translation>Việc bố trí mới</translation>
+      <translation>Bố cục mới</translation>
     </message>
     <message>
       <source>Enter the name of the layout to create:</source>
-      <translation>Nhập tên mà bạn muốn xây dựng bố cục:</translation>
+      <translation>Nhập tên của bố cục để tạo:</translation>
     </message>
     <message>
       <source>New Layout %1</source>
-      <translation>Việc bố trí mới %1</translation>
+      <translation>Bố cục mới %1</translation>
     </message>
   </context>
   <context>
