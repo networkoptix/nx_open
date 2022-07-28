@@ -132,7 +132,27 @@ void ThumbnailLoadingManager::refresh(
     if (m_slider->isThumbnailsVisible())
         m_panelLoader->setTimeStep(timeStep);
 
-    m_livePreviewLoader->setTimeStep(m_slider->msecsPerPixel() * LivePreview::kStepPixels);
+    static constexpr auto kLivePreviewTimeStepUpdateThresholdRatio = 1.1;
+    static constexpr auto kMinimumLivePreviewTimeStep = 40ms;
+
+    const auto livePreviewTimeStep = m_livePreviewLoader->timeStep();
+    const auto newLivePreviewTimeStep = std::max(
+        kMinimumLivePreviewTimeStep,
+        m_slider->msecsPerPixel() * LivePreview::kStepPixels);
+
+    if (livePreviewTimeStep != 0ms && newLivePreviewTimeStep != 0ms)
+    {
+        const auto livePreviewTimeStepChangeRatio =
+            std::max<double>(livePreviewTimeStep.count(), newLivePreviewTimeStep.count())
+            / std::min<double>(livePreviewTimeStep.count(), newLivePreviewTimeStep.count());
+
+        if (livePreviewTimeStepChangeRatio > kLivePreviewTimeStepUpdateThresholdRatio)
+            m_livePreviewLoader->setTimeStep(newLivePreviewTimeStep);
+    }
+    else
+    {
+        m_livePreviewLoader->setTimeStep(newLivePreviewTimeStep);
+    }
 
     applyPanelWindowPeriod();
 }
