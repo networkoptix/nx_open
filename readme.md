@@ -17,6 +17,11 @@ Most of the source code and other files are licensed under the terms of Mozilla 
 (unless specified otherwise in the files) which can be found in the `license_mpl2.md` file in the
 `licenses/` directory in the root directory of the repository.
 
+### Contribution policy
+
+At this moment, Network Optix is not able to process any pull/merge requests to this repository. It
+is likely that a policy for contributions will be developed and offered in the future.
+
 ---------------------------------------------------------------------------------------------------
 ## Build environment
 
@@ -243,9 +248,9 @@ To build the Client, besides cloning this repository, you must obtain a Customiz
 it is a collection of texts and graphics used in the GUI; it defines the branding of the VMS. The
 Customization Package comes as a zip file.
 
-If you want to build an Nx-Meta-branded VMS Client, download the Nx Meta customization package from
-https://meta.nxvms.com/. Otherwise, download a different Powered-by-Nx customization package using
-the corresponding Developer account.
+If you want to build an Nx-Meta-branded VMS Client, create a Custom Client on the Nx Meta Developer
+Portal and download its customization package at https://meta.nxvms.com/developers/custom-clients/.
+Otherwise, request a different Powered-by-Nx customization package.
 
 All the commands necessary to perform the CMake Configuration and Build stages are written in the
 scripts `build.sh` (for Linux and MacOS) and `build.bat` (for Windows) located in the repository
@@ -376,7 +381,7 @@ set(CONAN_QT_ROOT ...)
 The Desktop Client built from the open-source repository can only connect to a compatible VMS
 Server. Because the VMS Server sources are not publicly available, such Server can only be obtained
 from any public VMS release, including the official VMS releases, and the regular preview
-releases called MetaVMS.
+releases called Nx Meta VMS.
 
 For any given public VMS release, the compatibility is guaranteed only for the Client built from
 the same commit as the Server. The particular commit can be identified in the repository by its git
@@ -386,8 +391,8 @@ Clients built from further commits in the same branch may retain compatibility w
 released Server for a while, but at some point may lose the compatibility because of some changes
 introduced synchronously into the Client and the Server parts of the source code. Thus, it is
 recommended to base the Client modification branches from tagged commits corresponding to the
-public releases, including MetaVMS releases, and rebase them as soon as next public release from
-this branch is available.
+public releases, including Nx Meta VMS releases, and rebase them as soon as next public release
+from this branch is available.
 
 Besides having the compatible code, to be able to work together, the Client and Server have to use
 the same customization package. If, however, for experimental purposes (not for the production use)
