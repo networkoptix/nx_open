@@ -40,11 +40,10 @@ public:
 
     // TODO: #sivanov Pass credentials to constructor or using separate setter.
     void setCamera(const QnSecurityCamResourcePtr& camera);
-    void setFixedServer(const QnMediaServerResourcePtr& server);
     void updateCredentials(const nx::network::http::Credentials& credentials);
 
     virtual bool open(
-        const QnResourcePtr &resource,
+        const QnResourcePtr& resource,
         AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher) override;
     virtual void close() override;
     virtual qint64 startTime() const override;
@@ -73,7 +72,7 @@ public:
      * @return Simply an echo of time argument. Some using classes assume that return value
      *     depends on real actions performed somehow; that is mistake in fact.
      */
-    virtual qint64 seek (qint64 time, bool findIFrame) override;
+    virtual qint64 seek(qint64 time, bool findIFrame) override;
 
     qint64 seek(qint64 startTime, qint64 endTime);
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() override;
@@ -95,7 +94,10 @@ public:
     // Chunks filter
     virtual void setStorageLocationFilter(nx::vms::api::StorageLocation filter) override;
 
-    virtual bool setQuality(MediaQuality quality, bool fastSwitch, const QSize& resolution) override;
+    virtual bool setQuality(
+        MediaQuality quality,
+        bool fastSwitch,
+        const QSize& resolution) override;
 
     virtual void beforeSeek(qint64 time) override;
     virtual void beforeChangeSpeed(double speed) override;
@@ -103,8 +105,6 @@ public:
     void setAdditionalAttribute(const QByteArray& name, const QByteArray& value);
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) override;
     virtual bool hasVideo() const override;
-
-    void setMultiserverAllowed(bool value);
 
     void setPlayNowModeAllowed(bool value);
 
@@ -125,56 +125,70 @@ public:
     virtual bool reopen() override;
 signals:
     void dataDropped(QnArchiveStreamReader* reader);
+
 private:
-    std::pair<QnAbstractDataPacketPtr, bool> processFFmpegRtpPayload(quint8* data, int dataSize, int channelNum, qint64* parserPosition);
+    std::pair<QnAbstractDataPacketPtr, bool> processFFmpegRtpPayload(
+        quint8* data,
+        int dataSize,
+        int channelNum,
+        qint64* parserPosition);
     void processMetadata(const quint8* data, int dataSize);
     bool openInternal();
 
     // determine camera's video server on specified time
     QnMediaServerResourcePtr getServerOnTime(qint64 time);
-    QnMediaServerResourcePtr getNextMediaServerFromTime(const QnSecurityCamResourcePtr &camera, qint64 time);
+    QnMediaServerResourcePtr getNextMediaServerFromTime(
+        const QnSecurityCamResourcePtr& camera, qint64 time);
     QnAbstractMediaDataPtr getNextDataInternal();
-    void checkGlobalTimeAsync(const QnSecurityCamResourcePtr &camera, const QnMediaServerResourcePtr &server, qint64* result);
-    void checkMinTimeFromOtherServer(const QnSecurityCamResourcePtr &camera);
-    void setupRtspSession(const QnSecurityCamResourcePtr &camera, const QnMediaServerResourcePtr &server, QnRtspClient* session) const;
+    void checkGlobalTimeAsync(
+        const QnSecurityCamResourcePtr& camera,
+        const QnMediaServerResourcePtr& server,
+        qint64* result);
+    void checkMinTimeFromOtherServer(const QnSecurityCamResourcePtr& camera);
+    void setupRtspSession(
+        const QnSecurityCamResourcePtr& camera,
+        const QnMediaServerResourcePtr& server,
+        QnRtspClient* session) const;
     void parseAudioSDP(const QStringList& audioSDP);
     void setCustomVideoLayout(const QnCustomResourceVideoLayoutPtr& value);
     bool isConnectionExpired() const;
+
 private:
     nx::Mutex m_mutex;
     std::unique_ptr<QnRtspClient> m_rtspSession;
     std::unique_ptr<QnRtspIoDevice> m_rtspDevice;
-    QnRtspIoDevice* m_rtpData;
+    QnRtspIoDevice* m_rtpData = nullptr;
     quint8* m_rtpDataBuffer;
-    bool m_tcpMode;
+    bool m_tcpMode = true;
     QMap<quint32, quint16> m_prevTimestamp;
-    qint64 m_position;
+    qint64 m_position = DATETIME_NOW;
     QnSecurityCamResourcePtr m_camera;
     QnMediaServerResourcePtr m_server;
-    QnMediaServerResourcePtr m_fixedServer;
-    //bool m_waitBOF;
-    int m_lastMediaFlags;
-    bool m_closing;
-    bool m_singleShotMode;
-    quint8 m_sendedCSec;
-    qint64 m_lastSeekTime;
-    qint64 m_lastReceivedTime;
-    std::atomic<bool> m_blockReopening;
-    MediaQuality m_quality;
-    bool m_qualityFastSwitch;
+    int m_lastMediaFlags = -1;
+    bool m_closing = false;
+    bool m_singleShotMode = false;
+    quint8 m_sendedCSec = 0;
+    qint64 m_lastSeekTime = DATETIME_INVALID;
+    qint64 m_lastReceivedTime = DATETIME_INVALID;
+    std::atomic<bool> m_blockReopening = false;
+    MediaQuality m_quality = MediaQuality::MEDIA_Quality_High;
+    bool m_qualityFastSwitch = true;
     QSize m_resolution;
-    qint64 m_lastMinTimeTime;
+    qint64 m_lastMinTimeTime = 0;
     int m_channelCount = 0;
 
     QnTimePeriod m_serverTimePeriod;
-    std::atomic<qint64> m_globalMinArchiveTime; // min archive time between all servers
 
-    qint64 m_forcedEndTime;
-    bool m_isMultiserverAllowed;
+    /** Minimal archive time between all servers. */
+    std::atomic<qint64> m_globalMinArchiveTime = DATETIME_INVALID;
+
+    qint64 m_forcedEndTime = DATETIME_INVALID;
     AudioLayoutPtr m_audioLayout;
-    bool m_playNowModeAllowed; // fast open mode without DESCRIBE
+
+    /** Fast open mode without DESCRIBE. */
+    bool m_playNowModeAllowed = true;
     QPointer<QnArchiveStreamReader> m_reader;
-    int m_frameCnt;
+    int m_frameCnt = 0;
     QnCustomResourceVideoLayoutPtr m_customVideoLayout;
 
     QMap<int, QSharedPointer<nx::streaming::rtp::QnNxRtpParser>> m_parsers;
@@ -185,11 +199,11 @@ private:
     std::atomic_flag m_currentServerUpToDate;
     QElapsedTimer m_reopenTimer;
     QElapsedTimer m_sessionTimeout;
-    std::chrono::milliseconds m_maxSessionDurationMs;
-    nx::vms::api::StreamDataFilters m_streamDataFilter{ nx::vms::api::StreamDataFilter::media};
+    std::chrono::milliseconds m_maxSessionDurationMs{std::numeric_limits<qint64>::max()};
+    nx::vms::api::StreamDataFilters m_streamDataFilter{nx::vms::api::StreamDataFilter::media};
     nx::vms::api::StorageLocation m_storageLocationFilter{};
     QString m_rtpLogTag;
-    CameraDiagnostics::Result m_lastError;
+    CameraDiagnostics::Result m_lastError = CameraDiagnostics::NoErrorResult();
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;
