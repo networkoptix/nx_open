@@ -44,7 +44,6 @@ struct NvidiaVideoDecoderImpl
     std::unique_ptr<NvDecoder> decoder;
     std::unique_ptr<linux::Renderer> renderer;
     H2645Mp4ToAnnexB filterAnnexB;
-    int framesReady = 0;
 };
 
 bool NvidiaVideoDecoder::isCompatible(
@@ -87,12 +86,12 @@ bool NvidiaVideoDecoder::initialize(const QnConstCompressedVideoDataPtr& frame)
     }
 
     m_impl->decoder =
-        std::make_unique<NvDecoder>(m_impl->context, true, FFmpeg2NvCodecId(frame->compressionType), /*bLowLatency*/false, /*bDeviceFramePitched*/true);
+        std::make_unique<NvDecoder>(m_impl->context, true, FFmpeg2NvCodecId(frame->compressionType), /*bLowLatency*/false);
 
     return true;
 }
 
-int NvidiaVideoDecoder::decode(const QnConstCompressedVideoDataPtr& packet, nx::QVideoFramePtr* result)
+int NvidiaVideoDecoder::decode(const QnConstCompressedVideoDataPtr& packet)
 {
     NX_DEBUG(this, "decode: %1", packet->timestamp);
     if (!m_impl->decoder && !initialize(packet))
@@ -103,18 +102,19 @@ int NvidiaVideoDecoder::decode(const QnConstCompressedVideoDataPtr& packet, nx::
 
     auto packetAnnexB = m_impl->filterAnnexB.processVideoData(packet);
 
-    m_impl->framesReady = m_impl->decoder->Decode(
+    m_impl->decoder->Decode(
         (const uint8_t*)packetAnnexB->data(), packetAnnexB->dataSize(), 0, packetAnnexB->timestamp);
-    NX_DEBUG(this, "framesReady: %1", m_impl->framesReady);
     return 1;
 }
 
 std::unique_ptr<NvidiaVideoFrame> NvidiaVideoDecoder::getFrame()
 {
-    if (!m_impl->framesReady)
+    auto& nvDecoder = m_impl->decoder;
+    int64_t timestamp = 0;
+    auto frameData = nvDecoder->GetFrame(&timestamp);
+    if (!frameData)
         return nullptr;
 
-    auto& nvDecoder = m_impl->decoder;
     if (!m_impl->renderer)
         m_impl->renderer = std::make_unique<linux::Renderer>();
 
@@ -123,11 +123,17 @@ std::unique_ptr<NvidiaVideoFrame> NvidiaVideoDecoder::getFrame()
     frame->height = nvDecoder->GetHeight();
     frame->width = nvDecoder->GetWidth();
     frame->pitch = nvDecoder->GetDeviceFramePitch();
-    frame->frameData = nvDecoder->GetFrame(&frame->timestamp);
+    frame->frameData = frameData;
+    frame->timestamp = timestamp;
     frame->bitDepth = nvDecoder->GetBitDepth();
     frame->format = nvDecoder->GetOutputFormat();
     frame->matrix = nvDecoder->GetVideoFormatInfo().video_signal_description.matrix_coefficients;
     return frame;
+}
+
+void NvidiaVideoDecoder::releaseFrame(uint8_t* frame)
+{
+    m_impl->decoder->releaseFrame(frame);
 }
 
 void NvidiaVideoDecoder::resetDecoder()
