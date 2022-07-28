@@ -132,6 +132,7 @@ bool SoftwareTriggersController::Private::setEventTriggerState(
     params.insert("inputPortId", eventParams.inputPortId);
     params.insert("eventResourceId", resourceId.toString());
     params.insert("caption", eventParams.getTriggerName());
+    params.insert("description", eventParams.getTriggerIcon());
 
     if (state != nx::vms::api::EventState::undefined)
         params.insert("state", nx::reflect::toString(state));

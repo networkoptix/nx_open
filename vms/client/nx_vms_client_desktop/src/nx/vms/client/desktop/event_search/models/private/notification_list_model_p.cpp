@@ -174,6 +174,9 @@ void NotificationListModel::Private::onNotificationAction(
     eventData.lifetime = kDisplayTimeout;
     eventData.removable = true;
     eventData.timestamp = action->timestamp();
+    eventData.level = QnNotificationLevel::convert(action->level());
+    eventData.titleColor = QnNotificationLevel::notificationTextColor(eventData.level);
+    eventData.icon = pixmapForAction(action.get(), eventData.titleColor);
 
     if (!action->cameraId().isNull())
     {
@@ -632,6 +635,65 @@ QPixmap NotificationListModel::Private::pixmapForAction(
             return QPixmap();
     }
 }
+
+QPixmap NotificationListModel::Private::pixmapForAction(
+    const nx::vms::rules::NotificationAction* action,
+    const QColor& color) const
+{
+    using nx::vms::event::Level;
+    using nx::vms::rules::Icon;
+
+    static const auto iconFromLevel = QMap<Level, Icon>{
+        {Level::critical, Icon::critical},
+        {Level::important, Icon::important}
+    };
+
+    auto icon = action->icon();
+    if (icon == Icon::calculated)
+        icon = iconFromLevel.value(action->level(), Icon::none);
+
+    switch (icon)
+    {
+        case Icon::none:
+            return {};
+
+        case Icon::alert:
+            return qnSkin->pixmap("events/alert.png");
+
+        case Icon::important:
+            return qnSkin->pixmap("events/alert_yellow.png");
+
+        case Icon::critical:
+            return qnSkin->pixmap("events/alert_red.png");
+
+        case Icon::server:
+            return qnSkin->pixmap("events/server.png");
+
+        case Icon::camera:
+            return qnSkin->pixmap("events/camera.png");
+
+        case Icon::motion:
+            return qnSkin->pixmap("events/motion.svg");
+
+        case Icon::resource:
+        {
+            const auto resource = resourcePool()->getResourceById(action->cameraId());
+            return toPixmap(resource
+                ? qnResIconCache->icon(resource)
+                : qnResIconCache->icon(QnResourceIconCache::Camera));
+        }
+
+        case Icon::custom:
+            return SoftwareTriggerPixmaps::colorizedPixmap(
+                action->customIcon(),
+                color.isValid() ? color : QPalette().light().color());
+
+        default:
+            NX_ASSERT(false, "Unhandled icon");
+            return {};
+    }
+}
+
 
 int NotificationListModel::Private::maximumCount() const
 {

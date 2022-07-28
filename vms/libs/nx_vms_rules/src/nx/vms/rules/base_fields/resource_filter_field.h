@@ -6,6 +6,7 @@
 
 #include "../action_field.h"
 #include "../event_field.h"
+#include "../field_types.h"
 
 namespace nx::vms::rules {
 
