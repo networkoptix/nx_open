@@ -118,10 +118,19 @@ Item
 
                 anchors.fill: imageHolder
                 source: image
-                radius: 32
+                radius: imageHolder.blurRequired ? 32 : 0
                 z: 1
 
                 visible: imageHolder.blurRequired
+
+                Behavior on radius
+                {
+                    NumberAnimation
+                    {
+                        duration: 250
+                        easing.type: Easing.InCubic
+                    }
+                }
             }
 
             Image
