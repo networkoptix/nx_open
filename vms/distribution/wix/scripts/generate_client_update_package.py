@@ -2,10 +2,8 @@
 
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import argparse
 import os
 import zipfile
-import yaml
 
 import distribution_tools as tools
 
@@ -141,15 +139,8 @@ def create_client_update_file(config, output_file):
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--config', help="Config file", required=True)
-    parser.add_argument('--output_file', help="Output file", required=True)
-    args = parser.parse_args()
-
-    with open(args.config, 'r') as f:
-        config = yaml.load(f, Loader=yaml.SafeLoader)
-
-    create_client_update_file(config, args.output_file)
+    args = tools.parse_generation_scripts_arguments()
+    create_client_update_file(args.config, args.output_file)
 
 
 if __name__ == '__main__':
