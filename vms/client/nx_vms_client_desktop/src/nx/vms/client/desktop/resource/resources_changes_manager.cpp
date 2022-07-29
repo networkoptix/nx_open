@@ -483,6 +483,14 @@ void ResourcesChangesManager::saveUser(const QnUserResourcePtr& user,
     if (!user)
         return;
 
+    if (const auto mock = mockImplementation())
+    {
+        applyChanges(user);
+        const bool success = mock->saveUser(user);
+        safeCallback(success, user);
+        return;
+    }
+
     auto connection = messageBusConnection();
     if (!connection)
     {
@@ -625,6 +633,15 @@ void ResourcesChangesManager::saveAccessRights(
 void ResourcesChangesManager::saveUserRole(const nx::vms::api::UserRoleData& role,
     RoleCallbackFunction callback)
 {
+    if (const auto mock = mockImplementation())
+    {
+        const bool success = mock->saveGroup(role);
+        if (success)
+            userRolesManager()->addOrUpdateUserRole(role);
+        callback(success, role);
+        return;
+    }
+
     auto connection = messageBusConnection();
     if (!connection)
         return;
