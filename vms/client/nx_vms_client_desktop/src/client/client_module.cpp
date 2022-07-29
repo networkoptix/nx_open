@@ -66,7 +66,6 @@
 #include <utils/common/command_line_parser.h>
 #include <utils/math/color_transformations.h>
 #include <watchers/cloud_status_watcher.h>
-#include <watchers/server_interface_watcher.h>
 
 #if defined(Q_OS_WIN)
     #include <plugins/resource/desktop_win/desktop_resource.h>
@@ -251,9 +250,6 @@ void QnClientModule::initNetwork()
 
     commonModule->store(new QnForgottenSystemsManager());
     commonModule->store(new nx::vms::client::core::SystemsVisibilityManager());
-
-    // Depends on qnSystemsFinder
-    commonModule->instance<QnServerInterfaceWatcher>();
 }
 
 void QnClientModule::initSkin()

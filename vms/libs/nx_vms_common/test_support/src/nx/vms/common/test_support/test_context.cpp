@@ -20,6 +20,7 @@ Context::Context(nx::core::access::Mode resourceAccessMode):
     d(new Private())
 {
     d->systemContext = std::make_unique<SystemContext>(
+        SystemContext::Mode::unitTests,
         /*peerId*/ QnUuid::createUuid(),
         /*sessionId*/ QnUuid::createUuid(),
         resourceAccessMode);

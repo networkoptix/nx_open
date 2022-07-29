@@ -6,7 +6,6 @@
 
 #include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>
-#include <client/desktop_client_message_processor.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <common/static_common_module.h>
@@ -42,8 +41,6 @@ using namespace index_condition;
 
 void ResourceTreeModelTest::SetUp()
 {
-    systemContext()->createMessageProcessor<QnDesktopClientMessageProcessor>();
-
     // Should be not null for correct Videowall Item node display.
     ASSERT_FALSE(systemContext()->peerId().isNull());
 
@@ -59,7 +56,6 @@ void ResourceTreeModelTest::SetUp()
 
 void ResourceTreeModelTest::TearDown()
 {
-    systemContext()->deleteMessageProcessor();
     m_resourceTreeComposer.clear();
     m_newResourceTreeModel.clear();
 }

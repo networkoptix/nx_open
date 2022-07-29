@@ -9,9 +9,11 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <finders/systems_finder.h>
+#include <helpers/system_helpers.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/camera_data_ex.h>
+#include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/user_model.h>
 #include <nx/vms/client/core/network/cloud_system_endpoint.h>
 #include <nx/vms/client/core/network/network_module.h>
@@ -165,11 +167,13 @@ struct CloudCrossSystemContext::Private
         }
 
         systemContext = std::make_unique<SystemContext>(
+            SystemContext::Mode::crossSystem,
             appContext()->peerId(),
             nx::core::access::Mode::direct);
         systemContext->setConnection(connection);
 
         server = CrossSystemServerResourcePtr(new CrossSystemServerResource(connection));
+        server->setIdUnsafe(connection->moduleInformation().id);
 
         systemContext->resourcePool()->addResource(server);
         server->setStatus(nx::vms::api::ResourceStatus::online);
@@ -195,6 +199,38 @@ struct CloudCrossSystemContext::Private
         appContext()->addSystemContext(systemContext.get());
     }
 
+    void addServersToResourcePool(std::vector<nx::vms::api::MediaServerData> servers)
+    {
+        if (!NX_ASSERT(systemContext))
+            return;
+
+        const QString cloudSystemId = systemContext->moduleInformation().cloudSystemId;
+
+        QnResourceList newServers;
+        for (const auto& server: servers)
+        {
+            if (server.id == this->server->getId())
+                continue;
+
+            const QString cloudAddress = core::helpers::serverCloudHost(cloudSystemId, server.id);
+
+            CrossSystemServerResourcePtr newServer(new CrossSystemServerResource(
+                server.id,
+                cloudAddress.toStdString(),
+                systemContext->connection()));
+
+            newServers.push_back(newServer);
+        }
+
+        const auto resourcePool = systemContext->resourcePool();
+        if (!newServers.empty())
+            resourcePool->addResources(newServers);
+
+        // We do not update servers periodically, so count them all as online.
+        for (const auto& serverResource: newServers)
+            serverResource->setStatus(nx::vms::api::ResourceStatus::online);
+    }
+
     void addCamerasToResourcePool(std::vector<nx::vms::api::CameraDataEx> cameras)
     {
         if (!NX_ASSERT(systemContext))
@@ -215,7 +251,6 @@ struct CloudCrossSystemContext::Private
             {
                 auto camera = CrossSystemCameraResourcePtr(
                     new CrossSystemCameraResource(cameraData));
-                camera->setParentId(server->getId());
                 newlyCreatedCameras.push_back(camera);
             }
         }
@@ -302,7 +337,7 @@ struct CloudCrossSystemContext::Private
                     return;
                 }
                 addUserToResourcePool(std::move(result));
-                updateCameras();
+                updateServers();
             });
 
         const QString encodedUsername =
@@ -315,6 +350,50 @@ struct CloudCrossSystemContext::Private
             q->thread());
 
         return false;
+    }
+
+    void updateServers()
+    {
+        if (!ensureConnection() || !ensureUser())
+            return;
+
+        if (!systemDescription->isReachable())
+        {
+            NX_VERBOSE(this, "System is unreachable");
+            return;
+        }
+
+        NX_VERBOSE(this, "Updating servers");
+        auto callback = nx::utils::guarded(q,
+            [this](
+                bool success,
+                ::rest::Handle requestId,
+                QByteArray data,
+                nx::network::http::HttpHeaders /*headers*/)
+            {
+                if (!success)
+                {
+                     NX_WARNING(this, "Servers request failed");
+                     return;
+                }
+
+                std::vector<nx::vms::api::MediaServerData> result;
+                if (!QJson::deserialize(data, &result))
+                {
+                    NX_WARNING(this, "Cameras list cannot be deserialized");
+                    return;
+                }
+
+                NX_VERBOSE(this, "Received %1 servers", result.size());
+                addServersToResourcePool(std::move(result));
+                updateCameras();
+            });
+
+        systemContext->connectedServerApi()->getRawResult(
+            "/ec2/getMediaServers",
+            {},
+            callback,
+            q->thread());
     }
 
     void updateCameras()

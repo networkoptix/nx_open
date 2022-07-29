@@ -38,6 +38,7 @@ using namespace nx::analytics;
 
 struct SystemContext::Private
 {
+    const Mode mode;
     const QnUuid peerId;
     /*const*/ QnUuid sessionId; //< FIXME: #sivanov Make separate sessions with own ids.
     QnCommonMessageProcessor* messageProcessor = nullptr;
@@ -67,13 +68,18 @@ struct SystemContext::Private
 };
 
 SystemContext::SystemContext(
+    Mode mode,
     QnUuid peerId,
     QnUuid sessionId,
     nx::core::access::Mode resourceAccessMode,
     QObject* parent)
     :
     QObject(parent),
-    d(new Private{.peerId = std::move(peerId), .sessionId=std::move(sessionId)})
+    d(new Private{
+        .mode = mode,
+        .peerId = std::move(peerId),
+        .sessionId=std::move(sessionId)
+    })
 {
     d->licensePool = std::make_unique<QnLicensePool>(this);
     d->resourcePool = std::make_unique<QnResourcePool>(this);
@@ -296,6 +302,11 @@ std::shared_ptr<taxonomy::AbstractState> SystemContext::analyticsTaxonomyState()
         return d->analyticsTaxonomyStateWatcher->state();
 
     return nullptr;
+}
+
+SystemContext::Mode SystemContext::mode() const
+{
+    return d->mode;
 }
 
 void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)

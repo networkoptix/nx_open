@@ -40,6 +40,7 @@ NX_VMS_CLIENT_CORE_API std::optional<QnUuid> preferredCloudServer(const QString&
 NX_VMS_CLIENT_CORE_API void savePreferredCloudServer(
     const QString& systemId, const QnUuid& serverId);
 
+/** Server address to access it using cloud sockets. */
 NX_VMS_CLIENT_CORE_API QString serverCloudHost(const QString& systemId, const QnUuid& serverId);
 NX_VMS_CLIENT_CORE_API bool isCloudUrl(const nx::utils::Url& url);
 

@@ -11,6 +11,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/client/core/network/server_primary_interface_watcher.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/core/watchers/watermark_watcher.h>
@@ -59,6 +60,7 @@ struct SystemContext::Private
     std::unique_ptr<UserWatcher> userWatcher;
     std::unique_ptr<WatermarkWatcher> watermarkWatcher;
     std::unique_ptr<ServerTimeWatcher> serverTimeWatcher;
+    std::unique_ptr<ServerPrimaryInterfaceWatcher> serverPrimaryInterfaceWatcher;
     std::unique_ptr<nx::vms::rules::EngineHolder> vmsRulesEngineHolder;
 
     mutable nx::Mutex sessionMutex;
@@ -71,25 +73,43 @@ struct SystemContext::Private
 };
 
 SystemContext::SystemContext(
+    Mode mode,
     QnUuid peerId,
     nx::core::access::Mode resourceAccessMode,
     QObject* parent)
     :
     base_type(
+        mode,
         std::move(peerId),
         /*sessionId*/ QnUuid::createUuid(),
         resourceAccessMode,
         parent),
     d(new Private())
 {
-    d->ptzControllerPool = std::make_unique<QnClientPtzControllerPool>(this);
-    d->userWatcher = std::make_unique<UserWatcher>(this);
-    d->watermarkWatcher = std::make_unique<WatermarkWatcher>(this);
     d->serverTimeWatcher = std::make_unique<ServerTimeWatcher>(this);
 
-    d->vmsRulesEngineHolder = std::make_unique<nx::vms::rules::EngineHolder>(
-        this,
-        std::make_unique<nx::vms::rules::Initializer>(this));
+    switch (mode)
+    {
+        case Mode::default_:
+            d->ptzControllerPool = std::make_unique<QnClientPtzControllerPool>(this);
+            d->userWatcher = std::make_unique<UserWatcher>(this);
+            d->watermarkWatcher = std::make_unique<WatermarkWatcher>(this);
+            d->serverPrimaryInterfaceWatcher = std::make_unique<ServerPrimaryInterfaceWatcher>(
+                this);
+            d->vmsRulesEngineHolder = std::make_unique<nx::vms::rules::EngineHolder>(
+                this,
+                std::make_unique<nx::vms::rules::Initializer>(this));
+            break;
+
+        case Mode::crossSystem:
+            d->ptzControllerPool = std::make_unique<QnClientPtzControllerPool>(this);
+            d->userWatcher = std::make_unique<UserWatcher>(this);
+            d->watermarkWatcher = std::make_unique<WatermarkWatcher>(this);
+            d->serverPrimaryInterfaceWatcher = std::make_unique<ServerPrimaryInterfaceWatcher>(
+                this);
+            break;
+    }
+
 }
 
 SystemContext::~SystemContext()
