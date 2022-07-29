@@ -167,6 +167,11 @@ void TextMatcher::matchAttributeValues(
         const auto& condition = m_conditions[i];
         if (condition.type == ConditionType::textMatch)
         {
+            if (condition.text.length() < 3)
+            {
+                // Match the text in the same way as the SQL trigram matcher. It can match >= 3 symbols only.
+                continue;
+            }
             m_conditionsMatched[i] =
             m_conditionsMatched[i] || wordMatchAnyOfAttributes(condition.text, attributes);
         }
