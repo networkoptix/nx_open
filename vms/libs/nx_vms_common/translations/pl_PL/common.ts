@@ -1314,11 +1314,11 @@
     </message>
     <message>
       <source>Primary time synchronization Server ID</source>
-      <translation type="unfinished">Primary time synchronization Server ID</translation>
+      <translation>Podstawowy serwer synchronizacji czasu</translation>
     </message>
     <message>
       <source>Max difference between local and source time (milliseconds)</source>
-      <translation type="unfinished">Max difference between local and source time (milliseconds)</translation>
+      <translation>Max różnica między czasem zsynchronizowanym a lokalnym (ms)</translation>
     </message>
     <message>
       <source>OS time change check period</source>
@@ -1366,7 +1366,7 @@
     </message>
     <message>
       <source>Optimize Camera settings</source>
-      <translation type="unfinished">Optimize Camera settings</translation>
+      <translation>Optymalizuj ustawienia kamery</translation>
     </message>
     <message>
       <source>Thumbnails auto-update</source>
@@ -1411,7 +1411,7 @@
     </message>
     <message>
       <source>Enable auto-discovery</source>
-      <translation type="unfinished">Enable auto-discovery</translation>
+      <translation>Włącz automatyczne wykrywanie urządzeń</translation>
     </message>
     <message>
       <source>Enable auto-update notifications</source>
@@ -1427,7 +1427,7 @@
     </message>
     <message>
       <source>Backup settings</source>
-      <translation type="unfinished">Backup settings</translation>
+      <translation>Ustawienia kopii zapasowej</translation>
     </message>
     <message>
       <source>Cloud host override</source>
@@ -1551,7 +1551,7 @@
     </message>
     <message>
       <source>Default codec for export video</source>
-      <translation type="unfinished">Default codec for export video</translation>
+      <translation>Domyślny kodek do eksportu wideo</translation>
     </message>
     <message>
       <source>Low quality screen video codec</source>
