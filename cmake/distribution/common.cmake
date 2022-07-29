@@ -41,16 +41,19 @@ function(nx_create_distribution_package)
     set(oneValueArgs
         PACKAGE_GENERATION_SCRIPT_NAME
         OUTPUT_FILE
-        CONFIG_FILE
         WORKING_DIRECTORY
         PACKAGE_TARGET
         PACKAGE_NAME)
-    set(multiValueArgs DEPENDENCIES)
+    set(multiValueArgs
+        CONFIG_FILES
+        DEPENDENCIES)
     cmake_parse_arguments(DISTRIBUTION "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    list(JOIN DISTRIBUTION_CONFIG_FILES "\;" DISTRIBUTION_CONFIG_FILES_ARG)
 
     set(package_generation_command
         ${PYTHON_EXECUTABLE} ${DISTRIBUTION_PACKAGE_GENERATION_SCRIPT_NAME}
-        "--config" ${DISTRIBUTION_CONFIG_FILE}
+        "--config" "\"${DISTRIBUTION_CONFIG_FILES_ARG}\""
         "--output_file" ${DISTRIBUTION_OUTPUT_FILE})
     add_custom_command(
         COMMENT "Preparing ${DISTRIBUTION_PACKAGE_NAME} package..."

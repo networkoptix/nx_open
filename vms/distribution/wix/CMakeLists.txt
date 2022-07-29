@@ -55,7 +55,7 @@ if(withDesktopClient)
         PACKAGE_TARGET client_update
         PACKAGE_GENERATION_SCRIPT_NAME generate_client_update_package.py
         OUTPUT_FILE ${client_update_file}
-        CONFIG_FILE ${distribution_config_file}
+        CONFIG_FILES ${distribution_config_file}
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/scripts"
         DEPENDENCIES applauncher minilauncher desktop_client)
     if(NOT openSourceBuild)

@@ -24,8 +24,5 @@ client_binary_name: '${client.binary.name}'
 minilauncher_binary_name: '${minilauncher.binary.name}'
 launcher_version_file: '${launcher.version.file}'
 
-# Distrib names
-server_distribution_name: '${server_distribution_name}'
-
 # ASan required library
 asan_library_name: '${asan_library_name}'
