@@ -10,7 +10,10 @@ import os
 import zipfile
 import platform
 import sys
+import argparse
+import yaml
 from pathlib import Path
+from collections import namedtuple
 
 
 def is_windows():
@@ -39,15 +42,15 @@ def dynamic_library_filename(name, extension=None, version=None):
         return f'{name}{extension or ".dll"}'
     elif is_linux():
         return (
-            f'lib{name}'
-            + (extension or '.so')
-            + (f'.{version}' if version else '')
+                f'lib{name}'
+                + (extension or '.so')
+                + (f'.{version}' if version else '')
         )
     elif is_macos():
         return (
-            f'lib{name}'
-            + (f'.{version}' if version else '')
-            + (extension or '.dylib')
+                f'lib{name}'
+                + (f'.{version}' if version else '')
+                + (extension or '.dylib')
         )
 
 
@@ -100,12 +103,12 @@ def ffmpeg_files(source_dir):
     templates = (
         (
             f'{template}*{_dynamic_library_extension()}' if is_windows()
-                else f'{dynamic_library_filename(template, None, "*")}'
+            else f'{dynamic_library_filename(template, None, "*")}'
         ) for template in (
-            'av*',
-            'swscale',
-            'swresample'
-        )
+        'av*',
+        'swscale',
+        'swresample'
+    )
     )
 
     for template in templates:
@@ -120,12 +123,15 @@ def openssl_files(source_dir):
         templates = ['crypto*', 'ssl*']
 
     for template in templates:
-        for file in find_files_by_template(source_dir, dynamic_library_filename(template, None, '*')):
+        files = find_files_by_template(source_dir, dynamic_library_filename(template, None, '*'))
+        for file in files:
             yield file
+
 
 def hidapi_files(source_dir):
     template = 'hidapi-hidraw' if is_linux() else 'hidapi'
     yield os.path.join(source_dir, dynamic_library_filename(template))
+
 
 def openal_files(source_dir):
     yield os.path.join(source_dir, f'OpenAL32{_dynamic_library_extension()}')
@@ -139,18 +145,18 @@ def icu_files(icu_lib_directory):
     if is_windows():
         templates = (
             dynamic_library_filename(template) for template in (
-                'icudt70',
-                'icuin70',
-                'icuuc70'
-            )
+            'icudt70',
+            'icuin70',
+            'icuuc70'
+        )
         )
     else:
         templates = (
             f'{dynamic_library_filename(template, version="55")}' for template in (
-                'icudata',
-                'icui18n',
-                'icuuc'
-            )
+            'icudata',
+            'icui18n',
+            'icuuc'
+        )
         )
 
     for template in templates:
@@ -161,8 +167,8 @@ def icu_files(icu_lib_directory):
 def qt_libraries(dir, libs, extension=None):
     for lib in libs:
         for file in find_files_by_template(
-            dir,
-            dynamic_library_filename(f'Qt5{lib}', extension=extension) + '*'
+                dir,
+                dynamic_library_filename(f'Qt5{lib}', extension=extension) + '*'
         ):
             yield file
 
@@ -201,3 +207,22 @@ def zip_files_to(zip, files, rel_path, target_path='.'):
 def zip_rdep_package_to(zip, package_directory):
     bin_directory = os.path.join(package_directory, 'bin')
     zip_files_to(zip, find_all_files(bin_directory), bin_directory)
+
+
+def parse_generation_scripts_arguments():
+    Arguments = namedtuple('Arguments', ['config', 'output_file'])
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--config', help="Config files via semicolon", required=True)
+    parser.add_argument('--output_file', help="Output file", required=True)
+    args = parser.parse_args()
+
+    config = {}
+    config_files = args.config.split(';')
+
+    for config_file in config_files:
+        with open(config_file, 'r') as f:
+            config_part = yaml.load(f, Loader=yaml.SafeLoader)
+            config.update(config_part)
+
+    return Arguments(config=config, output_file=args.output_file)
