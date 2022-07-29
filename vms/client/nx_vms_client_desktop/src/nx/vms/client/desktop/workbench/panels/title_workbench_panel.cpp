@@ -189,6 +189,16 @@ void TitleWorkbenchPanel::setGeometry(const QRect& geometry)
     m_widget->setGeometry(geometry);
 }
 
+QSize TitleWorkbenchPanel::sizeHint() const
+{
+    return m_widget->sizeHint();
+}
+
+void TitleWorkbenchPanel::activatePreviousSystemTab()
+{
+    m_widget->activatePreviousTab();
+}
+
 void TitleWorkbenchPanel::updateControlsGeometry()
 {
     auto parentWidgetRect = m_parentWidget->rect();

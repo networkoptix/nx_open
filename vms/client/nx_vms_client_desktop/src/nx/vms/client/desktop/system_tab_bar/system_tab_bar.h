@@ -23,6 +23,8 @@ public:
     SystemTabBar(QWidget* parent = nullptr);
     void setModel(SystemTabBarModel* model);
     void rebuildTabs();
+    void activateHomeTab();
+    void activatePreviousTab();
 
 protected:
     virtual QSize tabSizeHint(int index) const override;

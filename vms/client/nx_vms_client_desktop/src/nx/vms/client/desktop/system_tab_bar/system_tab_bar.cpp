@@ -22,7 +22,8 @@
 
 namespace {
 static const int kFixedTabSizeHeight = 32;
-static const int kFixedHomeIconWidth = 32;
+static const int kFixedHomeIconWidth = 30;
+static const int kFixedWideHomeIconWidth = 52;
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -53,7 +54,7 @@ SystemTabBar::SystemTabBar(QWidget *parent):
         [this]()
         {
             if (currentIndex() != m_lastTabIndex)
-                setCurrentIndex(m_lastTabIndex);
+                activatePreviousTab();
         });
     updateHomeTab();
 
@@ -93,6 +94,16 @@ void SystemTabBar::rebuildTabs()
     }
 }
 
+void SystemTabBar::activateHomeTab()
+{
+    setCurrentIndex(homeTabIndex());
+}
+
+void SystemTabBar::activatePreviousTab()
+{
+    setCurrentIndex(m_lastTabIndex);
+}
+
 QSize SystemTabBar::tabSizeHint(int index) const
 {
     auto result = base_type::tabSizeHint(index);
@@ -101,7 +112,7 @@ QSize SystemTabBar::tabSizeHint(int index) const
         if (count() == 1 || !isHomeTab(currentIndex()))
             result.setWidth(kFixedHomeIconWidth);
         else
-            result.setWidth(kFixedHomeIconWidth * 2);
+            result.setWidth(kFixedWideHomeIconWidth);
     }
     else if (result.width() < kFixedHomeIconWidth)
     {
@@ -215,7 +226,8 @@ void SystemTabBar::updateHomeTab()
         closeButton->setVisible(false);
         setTabIcon(index, qnSkin->icon("titlebar/add.svg"));
     }
-    update();
+    resizeEvent({});
+    updateGeometry();
 }
 
 } // namespace nx::vms::client::desktop
