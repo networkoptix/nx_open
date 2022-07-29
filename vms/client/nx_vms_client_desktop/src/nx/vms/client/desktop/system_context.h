@@ -42,6 +42,7 @@ public:
      *     emit signals. Cross-system contexts also use direct mode.
      */
     SystemContext(
+        Mode mode,
         QnUuid peerId,
         nx::core::access::Mode resourceAccessMode = nx::core::access::Mode::cached,
         QObject* parent = nullptr);

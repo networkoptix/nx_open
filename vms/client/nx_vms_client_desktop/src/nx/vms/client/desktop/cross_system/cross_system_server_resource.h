@@ -10,15 +10,16 @@ namespace nx::vms::client::desktop {
 class CrossSystemServerResource: public QnMediaServerResource
 {
 public:
+    /** Main server which was used for connection establishing. */
     CrossSystemServerResource(core::RemoteConnectionPtr connection);
 
-    virtual nx::vms::api::ModuleInformation getModuleInformation() const override;
+    /** Server for video direct access if possible. */
+    CrossSystemServerResource(
+        const QnUuid& id,
+        nx::network::SocketAddress endpoint,
+        core::RemoteConnectionPtr connection);
 
     virtual QString rtspUrl() const override;
-
-private:
-    nx::network::SocketAddress m_endpoint;
-    const nx::vms::api::ModuleInformation m_moduleInformation;
 };
 
 using CrossSystemServerResourcePtr = QnSharedResourcePointer<CrossSystemServerResource>;

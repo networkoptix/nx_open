@@ -259,17 +259,21 @@ ResourceTreeEntityBuilder::ResourceTreeEntityBuilder(const QnCommonModule* commo
     m_itemKeySourcePool(new ResourceTreeItemKeySourcePool(
         commonModule, m_cameraResourceIndex.get(), m_layoutResourceIndex.get()))
 {
-    auto userWatcher = new core::SessionResourcesSignalListener<QnUserResource>(
-        m_commonModule->resourcePool(),
-        m_commonModule->messageProcessor(),
-        this);
-    userWatcher->setOnRemovedHandler(
-        [this](const QnUserResourceList& users)
-        {
-            if (m_user && users.contains(m_user))
-                m_user.reset();
-        });
-    userWatcher->start();
+    // Message processor does not exist in unit tests.
+    if (auto messageProcessor = m_commonModule->messageProcessor())
+    {
+        auto userWatcher = new core::SessionResourcesSignalListener<QnUserResource>(
+            m_commonModule->resourcePool(),
+            messageProcessor,
+            this);
+        userWatcher->setOnRemovedHandler(
+            [this](const QnUserResourceList& users)
+            {
+                if (m_user && users.contains(m_user))
+                    m_user.reset();
+            });
+        userWatcher->start();
+    }
 }
 
 ResourceTreeEntityBuilder::~ResourceTreeEntityBuilder()

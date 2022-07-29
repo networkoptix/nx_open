@@ -405,7 +405,11 @@ struct ApplicationContext::Private
             : q->peerId();
         NX_ASSERT(!peerId.isNull());
 
-        mainSystemContext = std::make_unique<SystemContext>(peerId);
+        mainSystemContext = std::make_unique<SystemContext>(
+            mode == Mode::unitTests
+                ? SystemContext::Mode::unitTests
+                : SystemContext::Mode::default_,
+            peerId);
         systemContexts.push_back(mainSystemContext.get());
 
         if (mode == Mode::desktopClient)
@@ -571,6 +575,7 @@ ApplicationContext::ApplicationContext(
         case Mode::unitTests:
         {
             d->initializeSystemContext();
+            d->initializeCrossSystemModules(); //< For the resources tree tests.
             d->initializeClientCoreModule();
             break;
         }

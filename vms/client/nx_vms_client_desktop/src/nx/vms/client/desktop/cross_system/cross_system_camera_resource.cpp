@@ -17,6 +17,7 @@ CrossSystemCameraResource::CrossSystemCameraResource(nx::vms::api::CameraDataEx 
     setVendor(m_source.vendor);
     setPhysicalId(m_source.physicalId);
     setMAC(nx::utils::MacAddress(m_source.mac));
+    setParentId(m_source.parentId);
 
     QnResource::setName(m_source.name); //< Set resource name, but not camera name.
     setUrl(m_source.url);
@@ -35,6 +36,17 @@ void CrossSystemCameraResource::update(nx::vms::api::CameraDataEx data)
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
         m_source = std::move(data);
+
+        if (m_parentId != m_source.parentId)
+        {
+            const auto oldParentId = m_parentId;
+            m_parentId = m_source.parentId;
+            notifiers <<
+                [r = toSharedPointer(this), oldParentId]
+                {
+                    emit r->parentIdChanged(r, oldParentId);
+                };
+        }
 
         if (m_url != m_source.url)
         {

@@ -65,38 +65,46 @@ QnCameraDataManager::QnCameraDataManager(SystemContext* systemContext, QObject* 
                 loader->discardCachedData();
         });
 
-    connect(systemContext->serverStorageManager(),
-        &QnServerStorageManager::serverRebuildArchiveFinished,
-        this,
-        &QnCameraDataManager::clearCache);
+    // Cross-system contexts do not have Server Storage Manager.
+    if (auto serverStorageManager = systemContext->serverStorageManager())
+    {
+        connect(serverStorageManager,
+            &QnServerStorageManager::serverRebuildArchiveFinished,
+            this,
+            &QnCameraDataManager::clearCache);
 
-    connect(systemContext->serverStorageManager(),
-        &QnServerStorageManager::activeMetadataStorageChanged,
-        this,
-        [this](const QnMediaServerResourcePtr& server)
-        {
-            const auto serverFootageCameras =
-                cameraHistoryPool()->getServerFootageCameras(server);
-            for (const auto& camera: serverFootageCameras)
+        connect(serverStorageManager,
+            &QnServerStorageManager::activeMetadataStorageChanged,
+            this,
+            [this](const QnMediaServerResourcePtr& server)
             {
-                if (const auto loader = this->loader(camera, /*createIfNotExists*/ false))
-                    loader->discardCachedDataType(Qn::AnalyticsContent);
-            }
-        });
+                const auto serverFootageCameras =
+                    cameraHistoryPool()->getServerFootageCameras(server);
+                for (const auto& camera: serverFootageCameras)
+                {
+                    if (const auto loader = this->loader(camera, /*createIfNotExists*/ false))
+                        loader->discardCachedDataType(Qn::AnalyticsContent);
+                }
+            });
+    }
 
-    connect(systemContext->serverRuntimeEventConnector(),
-        &ServerRuntimeEventConnector::deviceFootageChanged,
-        this,
-        [this](const std::vector<QnUuid>& deviceIds)
-        {
-            const auto devices =
-                resourcePool()->getResourcesByIds<QnVirtualCameraResource>(deviceIds);
-            for (const auto& device: devices)
+    // Cross-system contexts do not support runtime events.
+    if (auto serverRuntimeEventConnector = systemContext->serverRuntimeEventConnector())
+    {
+        connect(serverRuntimeEventConnector,
+            &ServerRuntimeEventConnector::deviceFootageChanged,
+            this,
+            [this](const std::vector<QnUuid>& deviceIds)
             {
-                if (const auto loader = this->loader(device, /*createIfNotExists*/ false))
-                    loader->discardCachedData();
-            }
-        });
+                const auto devices =
+                    resourcePool()->getResourcesByIds<QnVirtualCameraResource>(deviceIds);
+                for (const auto& device: devices)
+                {
+                    if (const auto loader = this->loader(device, /*createIfNotExists*/ false))
+                        loader->discardCachedData();
+                }
+            });
+    }
 
     // TODO: #sivanov Temporary fix. Correct change would be: expand getTimePeriods query with
     // Region data, then truncate cached chunks by this region and synchronize the cache.
