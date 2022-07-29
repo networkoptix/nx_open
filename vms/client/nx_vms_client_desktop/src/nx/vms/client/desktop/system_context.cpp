@@ -65,33 +65,50 @@ struct SystemContext::Private
 };
 
 SystemContext::SystemContext(
+    Mode mode,
     QnUuid peerId,
     nx::core::access::Mode resourceAccessMode,
     QObject* parent)
     :
-    base_type(std::move(peerId), resourceAccessMode, parent),
+    base_type(mode, std::move(peerId), resourceAccessMode, parent),
     d(new Private{.q = this})
 {
-    d->initLocalRuntimeInfo();
-
     d->accessController = std::make_unique<QnWorkbenchAccessController>(this);
-    d->videoWallOnlineScreensWatcher = std::make_unique<VideoWallOnlineScreensWatcher>(
-        this);
-    d->incompatibleServerWatcher = std::make_unique<QnIncompatibleServerWatcher>(this);
-    d->serverRuntimeEventConnector = std::make_unique<ServerRuntimeEventConnector>();
-
-    // Depends on ServerRuntimeEventConnector.
-    d->serverStorageManager = std::make_unique<QnServerStorageManager>(this);
-
-    d->cameraBookmarksManager = std::make_unique<QnCameraBookmarksManager>(this);
-    d->cameraDataManager = std::make_unique<QnCameraDataManager>(this);
-
     d->resourceRuntimeDataManager = std::make_unique<QnResourceRuntimeDataManager>(this);
 
-    d->statisticsSender = std::make_unique<StatisticsSender>(this);
-    d->virtualCameraManager = std::make_unique<VirtualCameraManager>(this);
-    d->videoCache = std::make_unique<VideoCache>(this);
-    d->layoutSnapshotManager = std::make_unique<LayoutSnapshotManager>(this);
+    switch (mode)
+    {
+        case Mode::default_:
+            d->initLocalRuntimeInfo();
+            d->videoWallOnlineScreensWatcher = std::make_unique<VideoWallOnlineScreensWatcher>(
+                this);
+            d->incompatibleServerWatcher = std::make_unique<QnIncompatibleServerWatcher>(this);
+            d->serverRuntimeEventConnector = std::make_unique<ServerRuntimeEventConnector>();
+            // Depends on ServerRuntimeEventConnector.
+            d->serverStorageManager = std::make_unique<QnServerStorageManager>(this);
+            d->cameraBookmarksManager = std::make_unique<QnCameraBookmarksManager>(this);
+            d->cameraDataManager = std::make_unique<QnCameraDataManager>(this);
+            d->resourceRuntimeDataManager = std::make_unique<QnResourceRuntimeDataManager>(this);
+            d->statisticsSender = std::make_unique<StatisticsSender>(this);
+            d->virtualCameraManager = std::make_unique<VirtualCameraManager>(this);
+            d->videoCache = std::make_unique<VideoCache>(this);
+            d->layoutSnapshotManager = std::make_unique<LayoutSnapshotManager>(this);
+            break;
+
+        case Mode::crossSystem:
+            d->cameraBookmarksManager = std::make_unique<QnCameraBookmarksManager>(this);
+            d->cameraDataManager = std::make_unique<QnCameraDataManager>(this);
+            d->videoCache = std::make_unique<VideoCache>(this);
+            break;
+
+        case Mode::cloudLayouts:
+            d->layoutSnapshotManager = std::make_unique<LayoutSnapshotManager>(this);
+            break;
+
+        case Mode::unitTests:
+            break;
+    }
+
 }
 
 SystemContext::~SystemContext()

@@ -66,6 +66,7 @@ struct CloudLayoutsManager::Private
     QPointer<QnCloudStatusWatcher> cloudStatusWatcher = appContext()->cloudStatusWatcher();
     bool online = false;
     std::unique_ptr<SystemContext> systemContext = std::make_unique<SystemContext>(
+        SystemContext::Mode::cloudLayouts,
         appContext()->peerId(),
         nx::core::access::Mode::direct);
     const nx::utils::Url endpoint = actualLayoutsEndpoint();

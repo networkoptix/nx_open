@@ -50,6 +50,24 @@ class NX_VMS_COMMON_API SystemContext: public QObject
     Q_OBJECT
 
 public:
+    /** Various types of system contexts. Some of them require shortened initialization. */
+    enum class Mode
+    {
+        /** Generic System Context. */
+        default_,
+
+        /** System Context for the cross-system connection. */
+        crossSystem,
+
+        /** System Context for the cloud layouts storage. */
+        cloudLayouts,
+
+        /** System Context for the unit tests. */
+        unitTests,
+
+        // There will be separate type for the local files context in the future.
+    };
+
     /**
      * @param peerId Id of the current peer in the Message Bus. It is persistent and is not changed
      *     between the application runs. See ::peerId() for the details.
@@ -61,6 +79,7 @@ public:
      *     emit signals. Cross-system contexts also use direct mode.
      */
     SystemContext(
+        Mode mode,
         QnUuid peerId,
         QnUuid sessionId,
         nx::core::access::Mode resourceAccessMode,
@@ -221,6 +240,8 @@ public:
     std::shared_ptr<nx::analytics::taxonomy::AbstractState> analyticsTaxonomyState() const;
 
 protected:
+    Mode mode() const;
+
     virtual void setMessageProcessor(QnCommonMessageProcessor* messageProcessor);
 
 private:

@@ -65,23 +65,27 @@ AccessibleResourceProxySource::AccessibleResourceProxySource(
             }
         });
 
-    auto cachesCleaner = new core::SessionResourcesSignalListener<QnResource>(
-        commonModule->resourcePool(),
-        commonModule->messageProcessor(),
-        this);
-    cachesCleaner->setOnRemovedHandler(
-        [this](const QnResourceList& resources)
-        {
-            for (const auto& resource: resources)
+    // Message processor does not exist in unit tests.
+    if (auto messageProcessor = commonModule->messageProcessor())
+    {
+        auto cachesCleaner = new core::SessionResourcesSignalListener<QnResource>(
+            commonModule->resourcePool(),
+            messageProcessor,
+            this);
+        cachesCleaner->setOnRemovedHandler(
+            [this](const QnResourceList& resources)
             {
-                if (m_accessSubject.user() == resource)
-                    m_accessSubject = {};
+                for (const auto& resource: resources)
+                {
+                    if (m_accessSubject.user() == resource)
+                        m_accessSubject = {};
 
-                m_acceptedResources.remove(resource);
-                m_deniedResources.remove(resource);
-            }
-        });
-    cachesCleaner->start();
+                    m_acceptedResources.remove(resource);
+                    m_deniedResources.remove(resource);
+                }
+            });
+        cachesCleaner->start();
+    }
 }
 
 AccessibleResourceProxySource::~AccessibleResourceProxySource()

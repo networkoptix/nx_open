@@ -1446,11 +1446,14 @@ bool QnWorkbenchNavigator::isCurrentWidgetSynced() const
 
 void QnWorkbenchNavigator::connectToContext(SystemContext* systemContext)
 {
-    auto cameraDataManager = systemContext->cameraDataManager();
-    connect(cameraDataManager,
-        &QnCameraDataManager::periodsChanged,
-        this,
-        &QnWorkbenchNavigator::updatePeriods);
+    // Cloud layouts context does not have camera data.
+    if (auto cameraDataManager = systemContext->cameraDataManager())
+    {
+        connect(cameraDataManager,
+            &QnCameraDataManager::periodsChanged,
+            this,
+            &QnWorkbenchNavigator::updatePeriods);
+    }
 }
 
 void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
