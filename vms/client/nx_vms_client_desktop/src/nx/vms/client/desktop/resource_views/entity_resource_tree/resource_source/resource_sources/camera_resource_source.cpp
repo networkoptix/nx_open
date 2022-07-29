@@ -45,17 +45,21 @@ CameraResourceSource::CameraResourceSource(
             });
 
         NX_CRITICAL(m_server->systemContext());
-        auto serverWatcher = new core::SessionResourcesSignalListener<QnMediaServerResource>(
-            m_server->systemContext()->resourcePool(),
-            m_server->systemContext()->messageProcessor(),
-            this);
-        serverWatcher->setOnRemovedHandler(
-            [this](const QnMediaServerResourceList& servers)
-            {
-                if (m_server && servers.contains(m_server))
-                    m_server.reset();
-            });
-        serverWatcher->start();
+        // Message processor does not exist in unit tests.
+        if (auto messageProcessor = m_server->systemContext()->messageProcessor())
+        {
+            auto serverWatcher = new core::SessionResourcesSignalListener<QnMediaServerResource>(
+                m_server->systemContext()->resourcePool(),
+                messageProcessor,
+                this);
+            serverWatcher->setOnRemovedHandler(
+                [this](const QnMediaServerResourceList& servers)
+                {
+                    if (m_server && servers.contains(m_server))
+                        m_server.reset();
+                });
+            serverWatcher->start();
+        }
     }
 }
 

@@ -110,6 +110,8 @@ ApplicationContext::ApplicationContext(
     switch (mode)
     {
         case Mode::unitTests:
+            // For the resources tree tests.
+            d->cloudStatusWatcher = std::make_unique<QnCloudStatusWatcher>();
             break;
 
         case Mode::desktopClient:
