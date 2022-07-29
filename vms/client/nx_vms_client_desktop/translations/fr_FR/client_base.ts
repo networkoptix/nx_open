@@ -5015,7 +5015,7 @@ to %1</source>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take Cameras from offline Servers with the same Location ID.</source>
-      <translation>Les serveurs avec failover activés prendront automatiquement les caméras des serveurs hors ligne avec le même ID d'emplacement.</translation>
+      <translation>Les serveurs avec basculement activé prendront automatiquement les caméras des serveurs hors ligne avec le même ID d'emplacement.</translation>
     </message>
   </context>
   <context>
