@@ -5,9 +5,9 @@
 #include <QtGui/QDesktopServices>
 
 #include <core/resource/camera_resource.h>
-#include <ui/workbench/workbench_access_controller.h>
-
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <ui/workbench/workbench_access_controller.h>
 
 namespace nx::vms::client::desktop {
 
@@ -110,14 +110,15 @@ const EventListModel::EventData& EventListModel::Private::getEvent(int index) co
 
 QnVirtualCameraResourcePtr EventListModel::Private::previewCamera(const EventData& event) const
 {
-    if (event.previewCamera.isNull()
-        || !q->accessController()->hasGlobalPermission(GlobalPermission::viewArchive)
-        || !q->accessController()->hasPermissions(event.previewCamera, Qn::ViewContentPermission))
-    {
-        return QnVirtualCameraResourcePtr();
-    }
+    if (!event.previewCamera)
+        return {};
 
-    return event.previewCamera;
+    auto systemContext = SystemContext::fromResource(event.previewCamera);
+    auto accessController = systemContext->accessController();
+    const bool hasAccess =
+        accessController->hasPermissions(event.previewCamera, Qn::ViewContentPermission)
+        && accessController->hasGlobalPermission(GlobalPermission::viewArchive);
+    return hasAccess ? event.previewCamera : QnVirtualCameraResourcePtr();
 }
 
 QnVirtualCameraResourceList EventListModel::Private::accessibleCameras(const EventData& event) const

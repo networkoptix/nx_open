@@ -130,6 +130,10 @@ struct Ini: nx::kit::IniConfig
     NX_INI_STRING("", cloudLayoutsEndpointOverride,
         "[Dev] Override url to cloud layouts endpoint (e.g. \"localhost::8000\").");
 
+    NX_INI_FLAG(false,
+        allowOwnCloudNotifications,
+        "[Dev] Allow receiving cloud notifications from the current cloud system");
+
     // ---------------------------------------------------------------------------------------------
     // Design section
     // Flags here can be removed when designers approve the resulting approach.

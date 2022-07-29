@@ -45,7 +45,8 @@ signals:
     void notificationAdded(const nx::vms::event::AbstractActionPtr& action);
     void notificationRemoved(const nx::vms::event::AbstractActionPtr& action);
     void notificationActionReceived(
-        const QSharedPointer<nx::vms::rules::NotificationAction>& notificationAction);
+        const QSharedPointer<nx::vms::rules::NotificationAction>& notificationAction,
+        const QString& cloudSystemId);
 
     void cleared();
 
