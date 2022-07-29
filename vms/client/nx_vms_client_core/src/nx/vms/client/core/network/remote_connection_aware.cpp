@@ -79,9 +79,15 @@ rest::ServerConnectionPtr RemoteConnectionAware::connectedServerApi() const
     return {};
 }
 
-void RemoteConnectionAware::mockImplementation(RemoteConnectionAwareMock implementation)
+void RemoteConnectionAware::setMockImplementation(
+    std::unique_ptr<RemoteConnectionAwareMock> implementation)
 {
-    m_mockImplementation = implementation;
+    m_mockImplementation = std::move(implementation);
+}
+
+RemoteConnectionAwareMock* RemoteConnectionAware::mockImplementation() const
+{
+    return m_mockImplementation.get();
 }
 
 QnUuid RemoteConnectionAware::serverId() const

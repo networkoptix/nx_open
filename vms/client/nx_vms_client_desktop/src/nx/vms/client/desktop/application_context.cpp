@@ -601,6 +601,8 @@ ApplicationContext::ApplicationContext(
             d->initializeSystemContext();
             d->initializeCrossSystemModules(); //< For the resources tree tests.
             d->initializeClientCoreModule();
+            d->initializeQml();
+            d->resourcesChangesManager = std::make_unique<ResourcesChangesManager>();
             break;
         }
 

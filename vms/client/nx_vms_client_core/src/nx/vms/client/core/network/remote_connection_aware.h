@@ -24,9 +24,21 @@ using ServerConnectionPtr = std::shared_ptr<ServerConnection>;
 
 } // namespace rest
 
+namespace nx::vms::api {
+
+struct UserRoleData;
+
+} // namespace nx::vms::api
+
 namespace nx::vms::client::core {
 
-using RemoteConnectionAwareMock = ConnectionInfo;
+class NX_VMS_CLIENT_CORE_API RemoteConnectionAwareMock: public ConnectionInfo
+{
+public:
+    virtual ~RemoteConnectionAwareMock() {}
+    virtual bool saveUser(const QnUserResourcePtr&) { return true; }
+    virtual bool saveGroup(const nx::vms::api::UserRoleData&) { return true; }
+};
 
 class NX_VMS_CLIENT_CORE_API RemoteConnectionAware
 {
@@ -47,13 +59,16 @@ public:
     rest::ServerConnectionPtr connectedServerApi() const;
 
     /** Sets the mock implementation. */
-    void mockImplementation(RemoteConnectionAwareMock implementation);
+    void setMockImplementation(std::unique_ptr<RemoteConnectionAwareMock> implementation);
+
+    /** Returns mock implementation currently set. */
+    RemoteConnectionAwareMock* mockImplementation() const;
 
     QnUuid serverId() const;
     QnMediaServerResourcePtr currentServer() const;
 
 private:
-    std::optional<RemoteConnectionAwareMock> m_mockImplementation;
+    std::unique_ptr<RemoteConnectionAwareMock> m_mockImplementation;
 };
 
 } // namespace nx::vms::client::core
