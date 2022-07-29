@@ -10,6 +10,10 @@ namespace nx::vms::client::desktop {
 /** Create resource descriptor for storing in layout item or passing to another client instance. */
 nx::vms::common::ResourceDescriptor descriptor(const QnResourcePtr& resource);
 
+/** Create resource descriptor for cloud resource. Works only for cloud resources.*/
+nx::vms::common::ResourceDescriptor descriptor(
+    const QnUuid& resourceId, const QString& cloudSystemId);
+
 /** Find Resource in a corresponding System Context. */
 QnResourcePtr getResourceByDescriptor(const nx::vms::common::ResourceDescriptor& descriptor);
 

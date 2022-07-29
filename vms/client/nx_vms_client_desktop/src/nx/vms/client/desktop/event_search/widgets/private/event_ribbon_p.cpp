@@ -349,12 +349,13 @@ void EventRibbon::Private::updateTile(int index)
     setHelpTopic(widget, modelIndex.data(Qn::HelpTopicIdRole).toInt());
 
     const auto resourceList = modelIndex.data(Qn::DisplayedResourceListRole);
+    const auto cloudSystemId = modelIndex.data(Qn::CloudSystemIdRole).toString();
     if (resourceList.isValid())
     {
         if (resourceList.canConvert<QnResourceList>())
-            widget->setResourceList(resourceList.value<QnResourceList>());
+            widget->setResourceList(resourceList.value<QnResourceList>(), cloudSystemId);
         else if (resourceList.canConvert<QStringList>())
-            widget->setResourceList(resourceList.value<QStringList>());
+            widget->setResourceList(resourceList.value<QStringList>(), cloudSystemId);
     }
 
     updateTilePreview(index);

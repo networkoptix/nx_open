@@ -11,16 +11,22 @@
 
 #include <client/client_globals.h>
 #include <core/resource/resource.h>
+#include <finders/systems_finder.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/close_button.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/image_providers/resource_thumbnail_provider.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/system_settings.h>
 #include <ui/common/palette.h>
 #include <ui/widgets/common/elided_label.h>
 #include <utils/common/delayed.h>
@@ -58,8 +64,8 @@ static constexpr int kSeparatorHeight = 6;
 
 static constexpr int kMaximumResourceListSize = 3; //< Before "...and n more"
 
-static constexpr int kMaximumPreviewHeightWithHeader = 120;
-static constexpr int kMaximumPreviewHeightWithoutHeader = 136;
+static constexpr int kMaximumPreviewHeightWithHeader = 135;
+static constexpr int kMaximumPreviewHeightWithoutHeader = 151;
 
 static constexpr QMargins kMarginsWithHeader(8, 8, 8, 8);
 static constexpr QMargins kMarginsWithoutHeader(8, 4, 8, 8);
@@ -82,6 +88,20 @@ void setWidgetHolder(QWidget* widget, QWidget* newHolder)
     widget->setParent(newHolder);
     newHolder->layout()->addWidget(widget);
     widget->setHidden(wasHidden);
+}
+
+// For cloud notifications the system name must be displayed. The function returns the name of
+// a system different from the current one in the form required for display.
+QString getFormattedSystemNameIfNeeded(const QString& systemId)
+{
+    if (systemId.isEmpty())
+        return QString();
+
+    auto systemDescription = qnSystemsFinder->getSystem(systemId);
+    if (!NX_ASSERT(systemDescription))
+        return QString();
+
+    return systemDescription->name() + " / ";
 }
 
 } // namespace
@@ -476,23 +496,26 @@ void EventTile::setDescription(const QString& value)
     ui->progressDescriptionLabel->setHidden(value.isEmpty());
 }
 
-void EventTile::setResourceList(const QnResourceList& list)
+void EventTile::setResourceList(const QnResourceList& list, const QString& cloudSystemId)
 {
     QStringList items;
+    auto systemName = getFormattedSystemNameIfNeeded(cloudSystemId);
     for (int i = 0; i < std::min(list.size(), kMaximumResourceListSize); ++i)
     {
         NX_ASSERT(list[i]); //< Null resource pointer is an abnormal situation.
-        items.push_back(list[i] ? common::html::bold(list[i]->getName()) : "?");
+        items.push_back(
+            list[i] ? common::html::bold(systemName + list[i]->getName()) : systemName + "?");
     }
 
     d->setResourceList(items, qMax(list.size() - kMaximumResourceListSize, 0));
 }
 
-void EventTile::setResourceList(const QStringList& list)
+void EventTile::setResourceList(const QStringList& list, const QString& cloudSystemId)
 {
+    auto systemName = getFormattedSystemNameIfNeeded(cloudSystemId);
     QStringList items = list.mid(0, kMaximumResourceListSize);
     for (auto& item: items)
-        item = common::html::toHtml(item);
+        item = common::html::toHtml(systemName + item);
 
     d->setResourceList(items, qMax(list.size() - kMaximumResourceListSize, 0));
 }
@@ -943,7 +966,7 @@ void EventTile::clear()
     setProgressValue(0.0);
     setProgressTitle({});
     setProgressFormat(QString());
-    setResourceList(QStringList());
+    setResourceList(QStringList(), QString());
     setToolTip({});
     setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
 }

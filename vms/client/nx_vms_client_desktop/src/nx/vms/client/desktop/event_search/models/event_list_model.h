@@ -36,6 +36,7 @@ public:
         QPixmap icon;
         QColor titleColor;
         bool removable = false;
+        QString cloudSystemId; //< The field is filled in only for events received from cloud.
         std::chrono::milliseconds lifetime{0};
         int helpId = -1;
         QnNotificationLevel::Value level = QnNotificationLevel::Value::NoNotification;

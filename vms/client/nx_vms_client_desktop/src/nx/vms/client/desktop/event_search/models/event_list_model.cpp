@@ -95,6 +95,9 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
         case Qn::GroupedAttributesRole:
             return QVariant::fromValue(event.attributes);
 
+        case Qn::CloudSystemIdRole:
+            return QVariant::fromValue(event.cloudSystemId);
+
         default:
             return base_type::data(index, role);
     }

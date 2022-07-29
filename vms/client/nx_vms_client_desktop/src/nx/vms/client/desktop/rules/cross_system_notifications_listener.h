@@ -21,7 +21,8 @@ public:
 
 signals:
     void notificationActionReceived(
-        const QSharedPointer<nx::vms::rules::NotificationAction>& notificationAction);
+        const QSharedPointer<nx::vms::rules::NotificationAction>& notificationAction,
+        const QString& cloudSystemId);
 
 private:
     class Private;
