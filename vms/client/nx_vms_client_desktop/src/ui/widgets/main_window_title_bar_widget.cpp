@@ -272,6 +272,20 @@ void QnMainWindowTitleBarWidget::setTabBarStuffVisible(bool visible)
     action(action::OpenNewTabAction)->setEnabled(visible);
 }
 
+void QnMainWindowTitleBarWidget::activateHomeTab()
+{
+    Q_D(const QnMainWindowTitleBarWidget);
+    if (d->systemBar)
+        d->systemBar->activateHomeTab();
+}
+
+void QnMainWindowTitleBarWidget::activatePreviousTab()
+{
+    Q_D(const QnMainWindowTitleBarWidget);
+    if (d->systemBar)
+        d->systemBar->activatePreviousTab();
+}
+
 void QnMainWindowTitleBarWidget::mouseDoubleClickEvent(QMouseEvent* event)
 {
     Q_D(QnMainWindowTitleBarWidget);

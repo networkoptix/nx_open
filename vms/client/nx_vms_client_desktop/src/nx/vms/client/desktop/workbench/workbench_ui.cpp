@@ -991,7 +991,7 @@ void WorkbenchUi::at_controlsWidget_geometryChanged()
             0,
             m_title->geometry().y(),
             rect.width(),
-            m_title->geometry().height()));
+            m_title->sizeHint().height()));
     }
 
     if (m_notifications)
@@ -1204,6 +1204,12 @@ void WorkbenchUi::setTitleUsed(bool used)
     m_titleIsUsed = used;
 
     updateControlsVisibility(false);
+}
+
+void WorkbenchUi::activatePreviousSystemTab()
+{
+    if (m_title)
+        m_title->activatePreviousSystemTab();
 }
 
 void WorkbenchUi::setTitleOpened(bool opened, bool animate)

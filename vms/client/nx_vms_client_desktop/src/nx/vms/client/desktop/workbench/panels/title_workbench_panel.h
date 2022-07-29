@@ -46,6 +46,9 @@ public:
     void setGeometry(const QRect& geometry);
     virtual QRectF geometry() const override;
 
+    QSize sizeHint() const;
+    void activatePreviousSystemTab();
+
 private:
     void updateControlsGeometry();
 
