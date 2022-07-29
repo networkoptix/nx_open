@@ -106,8 +106,9 @@ public:
     bool headerEnabled() const;
     void setHeaderEnabled(bool value);
 
-    void setResourceList(const QnResourceList& list); //< Doesn't store it, only generates text.
-    void setResourceList(const QStringList& list);
+    // Resources are not stored, function only generates text.
+    void setResourceList(const QnResourceList& list, const QString& cloudSystemId);
+    void setResourceList(const QStringList& list, const QString& cloudSystemId);
 
     enum class Mode
     {

@@ -19,6 +19,14 @@ static const QString kCloudScheme = "cloud://";
 /** System Id placeholder for resources, not bound to any System (e.g. cloud layouts). */
 static const QString kGenericCloudSystemId = QnUuid().toSimpleString();
 
+QString resourcePath(const QnUuid& resourceId, const QString& cloudSystemId)
+{
+    if (NX_ASSERT(!cloudSystemId.isEmpty()))
+        return nx::format(kCloudScheme + "%1.%2", cloudSystemId, resourceId.toSimpleString());
+
+    return {};
+}
+
 QString resourcePath(const QnResourcePtr& resource)
 {
     if (resource->hasFlags(Qn::exported_layout))
@@ -28,11 +36,7 @@ QString resourcePath(const QnResourcePtr& resource)
         return resource->getUrl();
 
     if (resource.dynamicCast<CrossSystemLayoutResource>())
-    {
-        return nx::format(kCloudScheme + "%1.%2",
-            kGenericCloudSystemId,
-            resource->getId().toSimpleString());
-    }
+        return resourcePath(resource->getId(), kGenericCloudSystemId);
 
     auto systemContext = SystemContext::fromResource(resource);
     if (NX_ASSERT(systemContext))
@@ -40,9 +44,7 @@ QString resourcePath(const QnResourcePtr& resource)
         if (auto cloudSystemId = systemContext->moduleInformation().cloudSystemId;
             !cloudSystemId.isEmpty())
         {
-            return nx::format(kCloudScheme + "%1.%2",
-                cloudSystemId,
-                resource->getId().toSimpleString());
+            return resourcePath(resource->getId(), cloudSystemId);
         }
     }
     return {};
@@ -57,6 +59,13 @@ nx::vms::common::ResourceDescriptor descriptor(const QnResourcePtr& resource)
         return {};
 
     return {resource->getId(), resourcePath(resource)};
+}
+
+/** Create resource descriptor for cloud resource. Works only for cloud resources.*/
+nx::vms::common::ResourceDescriptor descriptor(
+    const QnUuid& resourceId, const QString& cloudSystemId)
+{
+    return {resourceId, resourcePath(resourceId, cloudSystemId)};
 }
 
 /** Find Resource in a corresponding System Context. */

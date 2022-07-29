@@ -13,6 +13,7 @@
 #include <nx/utils/metatypes.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
+#include <nx/vms/client/desktop/resources/resource_descriptor.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
@@ -144,7 +145,9 @@ NotificationListModel::Private::Private(NotificationListModel* q):
 
     connect(context()->instance<QnWorkbenchNotificationsExecutor>(),
         &QnWorkbenchNotificationsExecutor::notificationActionReceived,
-        this, &NotificationListModel::Private::onNotificationAction);
+        this,
+        [this](const QSharedPointer<nx::vms::rules::NotificationAction>& notificationAction)
+        { onNotificationAction(notificationAction); });
     connect(context()->instance<QnWorkbenchNotificationsHandler>(),
         &QnWorkbenchNotificationsHandler::notificationActionReceived,
         this, &NotificationListModel::Private::onNotificationAction);
@@ -162,7 +165,7 @@ NotificationListModel::Private::ExtraData NotificationListModel::Private::extraD
 }
 
 void NotificationListModel::Private::onNotificationAction(
-    const QSharedPointer<nx::vms::rules::NotificationAction>& action)
+    const QSharedPointer<nx::vms::rules::NotificationAction>& action, QString cloudSystemId)
 {
     NX_VERBOSE(this, "Received action: %1, id: %2", action->type(), action->id());
 
@@ -180,7 +183,17 @@ void NotificationListModel::Private::onNotificationAction(
 
     if (!action->cameraId().isNull())
     {
-        eventData.source = resourcePool()->getResourceById(action->cameraId());
+        if (cloudSystemId.isEmpty())
+        {
+            auto resourceDescriptor = descriptor(action->cameraId(), cloudSystemId);
+            eventData.source = getResourceByDescriptor(resourceDescriptor);
+            eventData.cloudSystemId = cloudSystemId;
+        }
+        else
+        {
+            eventData.source = resourcePool()->getResourceById(action->cameraId());
+        }
+
         if (eventData.source)
         {
             if (auto camera = eventData.source.dynamicCast<QnVirtualCameraResource>())
