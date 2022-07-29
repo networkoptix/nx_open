@@ -575,6 +575,17 @@ void MainWindow::setWelcomeScreenVisible(bool visible)
         return;
 
     m_welcomeScreenVisible = visible;
+    // m_titleBar is visible while windowed mode or Welcome Screen is active.
+    // m_ui is visible in full-screen mode but not on Welcome Screen.
+    // If we switch system tab bar to Home Tab in full-screen mode, we click on m_ui which 
+    // disappears right after that and unswitched m_titleBar appears instead. To synchronize home 
+    // tabs we should call activateHomeTab().
+    // If we switch back to system tab, we should call activatePreviousSystemTab() on m_ui to
+    // synchronize its tabs with m_titleBar.
+    if (visible)
+        m_titleBar->activateHomeTab();
+    else
+        m_ui->activatePreviousSystemTab();
 
     updateWidgetsVisibility();
 }

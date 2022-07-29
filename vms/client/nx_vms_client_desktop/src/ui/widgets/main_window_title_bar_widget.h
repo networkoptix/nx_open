@@ -34,6 +34,8 @@ public:
     * Sets tab bar and "add"/"tabs list menu" buttons visible (or not)
     */
     void setTabBarStuffVisible(bool visible);
+    void activateHomeTab();
+    void activatePreviousTab();
 
 signals:
     void yChanged(int newY);
