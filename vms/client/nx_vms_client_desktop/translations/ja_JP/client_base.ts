@@ -9240,7 +9240,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Update files cannot be extracted.</source>
-      <translation>更新ファイルは解凍できません。</translation>
+      <translation>更新ファイルを解凍できません。</translation>
     </message>
     <message>
       <source>Internal downloader error.</source>

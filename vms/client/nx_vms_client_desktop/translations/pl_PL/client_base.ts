@@ -10641,7 +10641,7 @@ You can view %2 or read this %3 to learn more about the current problem.</transl
     </message>
     <message>
       <source>Export archive from %1 completed</source>
-      <translation>Eksport archiwum z %1 ukończono</translation>
+      <translation>Ukończono eksport archiwum z %1</translation>
     </message>
     <message>
       <source>Export archive from %1 failed</source>

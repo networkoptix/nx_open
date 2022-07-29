@@ -999,7 +999,7 @@
     </message>
     <message>
       <source>Joystick Settings...</source>
-      <translation type="unfinished">Joystick Settings...</translation>
+      <translation>搖桿設定...</translation>
     </message>
     <message>
       <source>Advanced...</source>
