@@ -2389,7 +2389,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
-      <translation>カメラ識別子が汎用イベントURLで使用されている場合、確認要求は汎用イベントに対してのみ機能します</translation>
+      <translation>確認要求は、汎用イベントURLでカメラ識別子が使用されている場合にのみ汎用イベントに対して機能します</translation>
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
@@ -9251,27 +9251,27 @@ You can force it, but it may significantly increase CPU load.</source>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
-      <translation>選択したユーザーは選択したレイアウトにアクセスできません。アクションは機能しません。</translation>
+      <translation>選択したいずれのユーザーも指定されたレイアウトにアクセスできません。アクションは機能しません。</translation>
     </message>
     <message>
       <source>Select layout...</source>
-      <translation>少なくとも一つのレイアウトを選択してください</translation>
+      <translation>レイアウトを選択...</translation>
     </message>
     <message>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>このリストにローカル レイアウトを表示する単一のユーザーを選択します</translation>
+      <translation>&quot;表示先&quot; 行でユーザー1名を選択すると、そのユーザーのローカルレイアウトがリストに表示されます</translation>
     </message>
     <message>
       <source>Local layouts can only be shown to their owners.</source>
-      <translation>ローカルレイアウトは所有者にのみ表示できます。</translation>
+      <translation>ローカルレイアウトはその所有者にのみ表示できます。</translation>
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
-      <translation>選択されたユーザーロールにユーザーが含まれていません。アクションは動作しません。</translation>
+      <translation>選択されたユーザーロールにはユーザーが含まれていません。アクションは機能しません。</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
-      <translation>一部のユーザーは選択されたレイアウトにアクセスできません。アクションは動作しません。</translation>
+      <translation>一部のユーザーは選択されたレイアウトにアクセスできません。当該ユーザーに対してアクションは機能しません。</translation>
     </message>
   </context>
   <context>
