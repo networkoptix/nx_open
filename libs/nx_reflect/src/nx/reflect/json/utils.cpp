@@ -5,6 +5,33 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
+namespace nx::reflect::json {
+
+std::tuple<std::string, DeserializationResult> compactJson(const std::string_view json)
+{
+    using namespace rapidjson;
+
+    Document document;
+    document.Parse(json.data(), json.size());
+    if (document.HasParseError())
+    {
+        return std::make_tuple(
+            std::string(),
+            DeserializationResult(false, json_detail::parseErrorToString(document), std::string(json)));
+    }
+
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    document.Accept(writer);
+    return std::make_tuple(
+        std::string(buffer.GetString(), buffer.GetSize()),
+        DeserializationResult(true));
+}
+
+} // namespace nx::reflect::json
+
+//--------------------------------------------------------------------------------------------------
+
 namespace nx::reflect::json_detail {
 
 static const char* toString(const rapidjson::ParseErrorCode& val)
