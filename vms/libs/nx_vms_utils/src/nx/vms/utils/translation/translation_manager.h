@@ -111,6 +111,14 @@ public:
 
     void setLoadTranslationsEnabled(bool value);
 
+    /**
+     * When assert on failure is enabled, TranslationManager will report an error (assert) if
+     * installScopedLocale() call was not executed within the given timelimit. Such behaviour could
+     * be helpful to detect unwanted locks of the main app thread. By default, assert is disabled
+     * since some integration tests could lock the main thread until the testing action is done.
+     */
+    void setAssertOnOverlayInstallationFailure(bool assert = true);
+
 private:
     /**
      * Find a translation by its locale code and install it on a thread level. If empty locale is
