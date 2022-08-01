@@ -17,7 +17,7 @@ namespace utils {
 namespace log {
 
 static constexpr int kMaxLogRotation = 999;
-static constexpr qint64 kDefaultMaxLogVolumeSizeB = 500 * 1024 * 1024;
+static constexpr qint64 kDefaultMaxLogVolumeSizeB = 250 * 1024 * 1024;
 static constexpr qint64 kDefaultMaxLogFileSizeB = 10 * 1024 * 1024;
 static constexpr std::chrono::seconds kDefaultMaxLogFileTimePeriodS = std::chrono::seconds::zero();
 
