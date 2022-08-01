@@ -72,7 +72,7 @@ struct NX_VMS_API PeerData: PersistentIdData
     QnUuid instanceId;
 
     /** Type of the peer. */
-    PeerType peerType;
+    PeerType peerType{PeerType::notDefined};
 
     /** Preferred client data serialization format */
     Qn::SerializationFormat dataFormat = Qn::UbjsonFormat;
