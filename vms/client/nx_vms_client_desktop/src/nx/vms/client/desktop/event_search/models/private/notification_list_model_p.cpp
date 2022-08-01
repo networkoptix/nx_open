@@ -183,7 +183,7 @@ void NotificationListModel::Private::onNotificationAction(
 
     if (!action->cameraId().isNull())
     {
-        if (cloudSystemId.isEmpty())
+        if (!cloudSystemId.isEmpty())
         {
             auto resourceDescriptor = descriptor(action->cameraId(), cloudSystemId);
             eventData.source = getResourceByDescriptor(resourceDescriptor);
