@@ -49,6 +49,11 @@ function(nx_create_distribution_package)
         DEPENDENCIES)
     cmake_parse_arguments(DISTRIBUTION "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
+    if("${DISTRIBUTION_CONFIG_FILES}" STREQUAL "")
+        message(FATAL_ERROR "No config files passed to nx_create_distribution_package."
+            "Arguments passed: ${ARGV}")
+    endif()
+
     list(JOIN DISTRIBUTION_CONFIG_FILES "\;" DISTRIBUTION_CONFIG_FILES_ARG)
 
     set(package_generation_command
