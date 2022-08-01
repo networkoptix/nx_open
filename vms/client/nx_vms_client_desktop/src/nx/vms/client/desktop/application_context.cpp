@@ -396,6 +396,8 @@ struct ApplicationContext::Private
         if (!loaded)
             loaded = translationManager->installTranslation(nx::branding::defaultLocale());
         NX_ASSERT(loaded, "Translations could not be initialized");
+
+        translationManager->setAssertOnOverlayInstallationFailure();
     }
 
     void initializeSystemContext()
