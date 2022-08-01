@@ -19,6 +19,8 @@ TranslationOverlay::TranslationOverlay(Translation&& translation, QObject* paren
     for (const QString& file: translation.filePaths)
     {
         auto translator = std::make_unique<TranslationOverlayItem>();
+        translator->moveToThread(qApp->thread());
+
         if (translator->load(file))
             m_translators.push_back(std::move(translator));
     }
@@ -30,16 +32,16 @@ TranslationOverlay::~TranslationOverlay()
     if (m_installed)
     {
         // The only sane scenario: app is shutting down.
-        // Release translators to avoid possible crashes.
         NX_DEBUG(
             this,
             "Translation overlay for locale %1 is still being used on destruction (ref count: %2)",
             m_translation.localeCode,
             m_refCount);
+
         for (auto& translator: m_translators)
         {
-            translator->moveToThread(qApp->thread());
-            translator->setParent(qApp);
+            // Release translators to avoid possible crashes. Translator is parented by qApp in
+            // handleTranslatorsUnderMutex(), therefore it will be deleted later.
             translator.release();
         }
         m_translators.clear();
@@ -104,6 +106,14 @@ void TranslationOverlay::handleTranslatorsUnderMutex()
     // As result, it is impossible to install translators from any other thread.
     if (QThread::currentThread() == qApp->thread())
     {
+        for (auto& translator: m_translators)
+        {
+            // Set parent to avoid memory leaks in the case of out-of-order destruction. Parent
+            // should be set in qApp's thread because some signals are sent internally.
+            if (!translator->parent())
+                translator->setParent(qApp);
+        }
+
         if (m_refCount > 0 && !m_installed)
         {
             for (auto& translator: m_translators)

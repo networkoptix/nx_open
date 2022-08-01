@@ -7,11 +7,10 @@
 #include <QtCore/QThread>
 #include <QtCore/QTranslator>
 
-#include <nx/vms/utils/external_resources.h>
-
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/vms/utils/external_resources.h>
 
 #include "translation_overlay.h"
 #include "scoped_locale.h"
@@ -32,6 +31,7 @@ struct TranslationManager::Private
     mutable nx::Mutex mutex;
     QHash<Qt::HANDLE, QString> threadLocales;
     QHash<QString, QSharedPointer<TranslationOverlay>> overlays;
+    std::atomic<bool> assertOnOverlayInstallationFailure = false;
     std::atomic<bool> isLoadTranslationsEnabled = true;
 
     std::optional<Translation> findTranslation(const QString& localeCode)
@@ -207,6 +207,11 @@ void TranslationManager::setLoadTranslationsEnabled(bool value)
     d->isLoadTranslationsEnabled = value;
 }
 
+void TranslationManager::setAssertOnOverlayInstallationFailure(bool assert)
+{
+    d->assertOnOverlayInstallationFailure = assert;
+}
+
 bool TranslationManager::setCurrentThreadTranslationLocale(
     const QString& locale,
     std::chrono::milliseconds maxWaitTime)
@@ -233,9 +238,17 @@ bool TranslationManager::setCurrentThreadTranslationLocale(
             if (maxWaitTime.count() > 0)
                 overlay->waitForInstallation(maxWaitTime);
 
-            // Perhaps we should use warning instead of assert when maxWaitTime is zero?
-            if (NX_ASSERT(overlay->isInstalled(),
-                "Translation is not installed for locale '%1' within %2", locale, maxWaitTime))
+            const bool overlayIsInstalled = overlay->isInstalled();
+            // Some "unit" tests are actually integration tests that sleep in the main thread
+            // waiting until some activity (e.g. interaction with a cloud) is completed. Since
+            // the main thread is locked, translation overlay can't be installed in such test
+            // cases, therefore installation failure could be expected here.
+            if (d->assertOnOverlayInstallationFailure)
+            {
+                NX_ASSERT(overlayIsInstalled,
+                    "Translation is not installed for locale '%1' within %2", locale, maxWaitTime);
+            }
+            if (overlayIsInstalled)
             {
                 // Enable translation overlay for the given thread.
                 overlay->addThreadContext(id);
