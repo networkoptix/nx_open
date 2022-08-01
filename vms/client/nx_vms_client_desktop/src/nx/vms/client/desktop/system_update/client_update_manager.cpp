@@ -18,6 +18,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/vms/api/protocol_version.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -233,7 +234,7 @@ void ClientUpdateManager::Private::checkForUpdate()
                 system_update::getUpdateContents(connectedServerApi(),
                     nx::vms::common::update::updateFeedUrl(),
                     update::LatestDesktopClientVersionParams{
-                        nx::utils::SoftwareVersion(nx::build_info::vmsVersion()),
+                        nx::utils::SoftwareVersion(appContext()->version()),
                         nx::build_info::publicationType(),
                         api::protocolVersion()},
                     false);
