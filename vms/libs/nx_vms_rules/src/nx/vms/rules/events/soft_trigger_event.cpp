@@ -64,6 +64,7 @@ QVariantMap SoftTriggerEvent::details(common::SystemContext* context) const
     utils::insertLevel(result, nx::vms::event::Level::common);
     utils::insertIcon(result, nx::vms::rules::Icon::custom);
     utils::insertIfNotEmpty(result, utils::kCustomIconDetailName, triggerIcon());
+    utils::insertClientAction(result, nx::vms::rules::ClientAction::previewCameraOnTime);
 
     return result;
 }

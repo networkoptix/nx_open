@@ -37,19 +37,12 @@ const ItemDescriptor& NotificationAction::manifest()
                 {
                     { "text", "{@EventTooltip}" }
                 }),
-            makeFieldDescriptor<ExtractDetailField>("level", tr("Level"), {},
-                {
-                    { "detailName", utils::kLevelDetailName }
-                }),
-            makeFieldDescriptor<ExtractDetailField>("icon", tr("Icon"), {},
-                {
-                    { "detailName", utils::kIconDetailName }
-                }),
-            makeFieldDescriptor<ExtractDetailField>("customIcon", tr("Icon"), {},
-                {
-                    { "detailName", utils::kCustomIconDetailName }
-                }),
 
+            utils::makeExtractDetailFieldDescriptor("level", utils::kLevelDetailName),
+            utils::makeExtractDetailFieldDescriptor("icon", utils::kIconDetailName),
+            utils::makeExtractDetailFieldDescriptor("customIcon", utils::kCustomIconDetailName),
+            utils::makeExtractDetailFieldDescriptor("clientAction", utils::kClientActionDetailName),
+            utils::makeExtractDetailFieldDescriptor("url", utils::kUrlDetailName),
         }
     };
     return kDescriptor;

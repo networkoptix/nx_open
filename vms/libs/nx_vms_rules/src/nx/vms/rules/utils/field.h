@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "../action_fields/extract_detail_field.h"
 #include "../action_fields/optional_time_field.h"
 #include "../event_fields/state_field.h"
 #include "../manifest.h"
@@ -36,6 +37,17 @@ inline FieldDescriptor makeStateFieldDescriptor(
         displayName,
         description,
         {});
+}
+
+inline FieldDescriptor makeExtractDetailFieldDescriptor(
+    const QString& fieldName,
+    const QString& detailName)
+{
+    return makeFieldDescriptor<ExtractDetailField>(
+        fieldName,
+        fieldName,
+        {},
+        {{ "detailName", detailName }});
 }
 
 } // namespace nx::vms::rules::utils

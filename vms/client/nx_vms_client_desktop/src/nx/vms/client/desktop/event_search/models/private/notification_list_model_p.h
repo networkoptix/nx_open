@@ -54,7 +54,14 @@ private:
         const QColor& color) const;
     QPixmap pixmapForAction(
         const nx::vms::rules::NotificationAction* action,
+        const QString& cloudSystemId,
         const QColor& color) const;
+
+    void setupClientAction(
+        const nx::vms::rules::NotificationAction* action,
+        EventData& eventData) const;
+
+    QnResourcePtr getResource(QnUuid resouceId, const QString& cloudSystemId) const;
 
     void truncateToMaximumCount();
 

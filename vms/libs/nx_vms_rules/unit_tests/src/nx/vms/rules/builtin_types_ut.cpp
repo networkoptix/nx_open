@@ -139,7 +139,7 @@ public:
         // Test property type compatibility.
         for(const auto [name, field]: nx::utils::constKeyValueRange(fields))
         {
-            SCOPED_TRACE(name.toStdString());
+            SCOPED_TRACE(nx::format("Field name: %1", name).toStdString());
             const auto value = field->build(testEvent);
             EXPECT_TRUE(value.isValid());
 
