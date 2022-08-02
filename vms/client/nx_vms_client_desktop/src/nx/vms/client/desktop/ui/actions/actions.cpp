@@ -141,7 +141,11 @@ void initialize(Manager* manager, Action* root)
     factory(CameraDiagnosticsAction)
         .mode(DesktopMode)
         .flags(ResourceTarget | SingleTarget)
-        .condition(condition::hasFlags(Qn::live_cam, MatchMode::Any)
+        .condition(
+            condition::hasFlags(
+                /*require*/ Qn::live_cam,
+                /*exclude*/ Qn::cross_system,
+                MatchMode::Any)
             && !condition::tourIsRunning());
 
     factory(OpenBusinessLogAction)
@@ -1516,13 +1520,16 @@ void initialize(Manager* manager, Action* root)
         .autoRepeat(false)
         .condition(ConditionWrapper(new SetAsBackgroundCondition())
             && ConditionWrapper(new LightModeCondition(Qn::LightModeNoLayoutBackground))
-            && !condition::tourIsRunning());
+            && !condition::tourIsRunning()
+            && condition::applyToCurrentLayout(
+                condition::hasFlags(/*require*/ {}, /*exclude*/ Qn::cross_system, MatchMode::All)
+            ));
 
     factory(UserSettingsAction)
         .flags(Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("User Settings..."))
         .requiredTargetPermissions(Qn::ReadPermission)
-        .condition(condition::hasFlags(Qn::user, /*exclude*/ Qn::removed, MatchMode::Any));
+        .condition(condition::hasFlags(Qn::user, MatchMode::Any));
 
     factory(UserRolesAction)
         .flags(Tree | NoTarget)
@@ -1582,8 +1589,11 @@ void initialize(Manager* manager, Action* root)
                 ContextMenu::tr("Check I/O Module Issues..."), ContextMenu::tr("Check I/O Modules Issues...")
             ), manager))
         .requiredGlobalPermission(GlobalPermission::viewLogs)
-        .condition(condition::hasFlags(Qn::live_cam, MatchMode::Any)
-            && !condition::hasFlags(Qn::virtual_camera, MatchMode::All)
+        .condition(
+            condition::hasFlags(
+                /*require*/ Qn::live_cam,
+                /*exclude*/ Qn::cross_system | Qn::virtual_camera,
+                MatchMode::All)
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope,
                 !condition::isLayoutTourReviewMode()
@@ -1591,16 +1601,19 @@ void initialize(Manager* manager, Action* root)
 
     factory(CameraBusinessRulesAction)
         .mode(DesktopMode)
-        .flags(Scene | Tree | Table | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget)
+        .flags(Scene | Tree | Table | SingleTarget | ResourceTarget | LayoutItemTarget)
         .dynamicText(new DevicesNameTextFactory(
             QnCameraDeviceStringSet(
-                ContextMenu::tr("Device Rules..."), ContextMenu::tr("Devices Rules..."),
-                ContextMenu::tr("Camera Rules..."), ContextMenu::tr("Cameras Rules..."),
-                ContextMenu::tr("I/O Module Rules..."), ContextMenu::tr("I/O Modules Rules...")
+                ContextMenu::tr("Device Rules..."),
+                ContextMenu::tr("Camera Rules..."),
+                ContextMenu::tr("I/O Module Rules...")
             ), manager))
         .requiredGlobalPermission(GlobalPermission::admin)
-        .condition(condition::hasFlags(Qn::live_cam, MatchMode::ExactlyOne)
-            && !condition::hasFlags(Qn::virtual_camera, MatchMode::All)
+        .condition(
+            condition::hasFlags(
+                /*require*/ Qn::live_cam,
+                /*exclude*/ Qn::cross_system | Qn::virtual_camera,
+                MatchMode::Any)
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope,
                 !condition::isLayoutTourReviewMode()
@@ -1616,7 +1629,10 @@ void initialize(Manager* manager, Action* root)
                 ContextMenu::tr("I/O Module Settings..."), ContextMenu::tr("I/O Modules Settings...")
             ), manager))
         .requiredGlobalPermission(GlobalPermission::editCameras)
-        .condition(condition::hasFlags(Qn::live_cam, /*exclude*/ Qn::removed, MatchMode::Any)
+        .condition(condition::hasFlags(
+                /*require*/ Qn::live_cam,
+                /*exclude*/ Qn::cross_system,
+                MatchMode::All)
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope,
                 !condition::isLayoutTourReviewMode()
@@ -1643,7 +1659,6 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Layout Settings..."))
         .requiredTargetPermissions(Qn::EditLayoutSettingsPermission)
         .condition(ConditionWrapper(new LightModeCondition(Qn::LightModeNoLayoutBackground))
-            && !condition::hasFlags(Qn::removed, MatchMode::All)
             && !condition::tourIsRunning());
 
     factory(VideowallSettingsAction)
@@ -1728,7 +1743,10 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Server Settings..."))
         .requiredGlobalPermission(GlobalPermission::admin)
         .condition(
-            condition::hasFlags(Qn::remote_server, /*exclude*/ Qn::removed, MatchMode::ExactlyOne)
+            condition::hasFlags(
+                /*require*/ Qn::remote_server,
+                /*exclude*/ Qn::cross_system,
+                MatchMode::ExactlyOne)
             && !ConditionWrapper(new FakeServerCondition(true))
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
@@ -1930,12 +1948,22 @@ void initialize(Manager* manager, Action* root)
         .condition(new LayoutCountCondition(2));
 
     factory(DebugCalibratePtzAction)
-        .flags(Scene | SingleTarget | DevMode)
-        .text("Calibrate PTZ"); //< DevMode, so untranslatable
+        .flags(Scene | SingleTarget)
+        .text("[Dev] Calibrate PTZ") //< Developer-only option, leave untranslatable.
+        .condition(condition::hasFlags(
+            /*require*/ Qn::live_cam,
+            /*exclude*/ Qn::cross_system,
+            MatchMode::Any)
+        && condition::isTrue(ini().calibratePtzActions));
 
     factory(DebugGetPtzPositionAction)
-        .flags(Scene | SingleTarget | DevMode)
-        .text("Get PTZ Position"); //< DevMode, so untranslatable
+        .flags(Scene | SingleTarget)
+        .text("[Dev] Get PTZ Position") //< Developer-only option, leave untranslatable.
+        .condition(condition::hasFlags(
+            /*require*/ Qn::live_cam,
+            /*exclude*/ Qn::cross_system,
+            MatchMode::Any)
+        && condition::isTrue(ini().calibratePtzActions));
 
     factory(PlayPauseAction)
         .flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget)

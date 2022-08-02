@@ -61,8 +61,13 @@ PermissionsHandler::~PermissionsHandler()
 void PermissionsHandler::shareLayoutWith(const QnLayoutResourcePtr& layout,
     const QnResourceAccessSubject& subject)
 {
-    if (!NX_ASSERT(layout && subject.isValid() && !layout->isFile()))
+    if (!NX_ASSERT(layout
+        && subject.isValid()
+        && !layout->isFile()
+        && !layout->hasFlags(Qn::cross_system)))
+    {
         return;
+    }
 
     if (!layout->isShared())
         layout->setParentId(QnUuid());

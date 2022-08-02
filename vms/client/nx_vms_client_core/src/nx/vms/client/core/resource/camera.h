@@ -4,7 +4,7 @@
 
 #include <core/resource/camera_resource.h>
 
-#include "client_core_resource_fwd.h"
+#include "resource_fwd.h"
 
 namespace nx::vms::client::core {
 

@@ -2,7 +2,14 @@
 
 #pragma once
 
-#include <core/resource/client_core_resource_fwd.h>
+#include <nx/vms/client/core/resource/resource_fwd.h>
+
+class QnClientStorageResource;
+typedef QnSharedResourcePointer<QnClientStorageResource> QnClientStorageResourcePtr;
+typedef QnSharedResourcePointerList<QnClientStorageResource> QnClientStorageResourceList;
+
+class QnFakeMediaServerResource;
+using QnFakeMediaServerResourcePtr = QnSharedResourcePointer<QnFakeMediaServerResource>;
 
 class QnClientCameraResource;
 using QnClientCameraResourcePtr = QnSharedResourcePointer<QnClientCameraResource>;

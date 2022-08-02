@@ -9,11 +9,13 @@ namespace nx::vms::client::desktop {
 
 CrossSystemLayoutResource::CrossSystemLayoutResource()
 {
+    addFlags(Qn::cross_system);
 }
 
 void CrossSystemLayoutResource::update(const nx::vms::api::LayoutData& layoutData)
 {
     QnLayoutResourcePtr copy(new QnLayoutResource());
+    copy->setFlags(flags()); //< Do not update current resource flags.
     ec2::fromApiToResource(layoutData, copy);
     QnResource::update(copy);
 }

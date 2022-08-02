@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include <core/resource/client_core_resource_fwd.h>
 #include <network/tcp_connection_processor.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/thread/long_runnable.h>
+#include <nx/vms/client/core/resource/resource_fwd.h>
 
 namespace nx::network::http {
 

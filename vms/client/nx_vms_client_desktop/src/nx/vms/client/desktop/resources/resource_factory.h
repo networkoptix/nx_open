@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include <core/resource/resource_factory.h>
+#include <nx/vms/client/core/resource/resource_factory.h>
 
 namespace nx::vms::client::desktop {
 
-class ResourceFactory: public QnResourceFactory
+class ResourceFactory: public core::ResourceFactory
 {
 public:
     virtual QnResourcePtr createResource(

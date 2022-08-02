@@ -312,7 +312,10 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
         }
 
         const auto layoutsToShare = data.resources().filtered<QnLayoutResource>(
-            [](const QnLayoutResourcePtr& layout) { return !layout->isFile(); });
+            [](const QnLayoutResourcePtr& layout)
+            {
+                return !layout->hasFlags(Qn::cross_system) && !layout->isFile();
+            });
         for (const auto& layout: layoutsToShare)
         {
             actionManager()->trigger(ShareLayoutAction,
