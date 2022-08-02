@@ -5,9 +5,9 @@
 #include <core/ptz/caching_ptz_controller.h>
 #include <core/ptz/remote_ptz_controller.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/client_core_camera.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/resource/camera.h>
 #include <utils/common/delete_later.h>
 
 QnClientPtzControllerPool::QnClientPtzControllerPool(

@@ -11,6 +11,7 @@ CrossSystemCameraResource::CrossSystemCameraResource(nx::vms::api::CameraDataEx 
     QnClientCameraResource(source.typeId),
     m_source(std::move(source))
 {
+    addFlags(Qn::cross_system);
     setIdUnsafe(m_source.id);
     setTypeId(m_source.typeId);
     setModel(m_source.model);

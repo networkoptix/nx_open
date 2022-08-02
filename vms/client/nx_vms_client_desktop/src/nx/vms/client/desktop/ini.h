@@ -46,6 +46,9 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, debugThumbnailProviders,
         "[Dev] Enables debug mode for the thumbnail providers.");
 
+    NX_INI_FLAG(false, calibratePtzActions,
+        "[Dev] Enables calibrate PTZ actions in the camera context menu on scene.");
+
     NX_INI_STRING("", displayAnalyticsObjectsDebugInfo,
         "[Dev] Whether to add a debug info label to Analytics Object description.\n"
         "Allows to see the Analytics Objects details in the Desktop Client. Use \"all\" to\n"

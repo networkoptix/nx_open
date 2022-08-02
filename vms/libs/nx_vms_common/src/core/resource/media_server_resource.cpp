@@ -683,19 +683,6 @@ void QnMediaServerResource::setStatus(
     }
 
     QnResource::setStatus(newStatus, reason);
-    if (auto pool = resourcePool())
-    {
-        QnResourceList childList = pool->getResourcesByParentId(getId());
-        for (const QnResourcePtr& res: childList)
-        {
-            if (res->hasFlags(Qn::depend_on_parent_status))
-            {
-                NX_VERBOSE(this, "%1 Emit statusChanged signal for resource %2, %3, %4",
-                    __func__, res->getId(), res->getName(), res->getUrl());
-                emit res->statusChanged(res, Qn::StatusChangeReason::Local);
-            }
-        }
-    }
 }
 
 qint64 QnMediaServerResource::currentStatusTime() const

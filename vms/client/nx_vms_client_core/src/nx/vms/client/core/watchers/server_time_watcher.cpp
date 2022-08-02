@@ -7,7 +7,6 @@
 #include <client_core/client_core_module.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/fake_media_server.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
@@ -166,11 +165,8 @@ qint64 ServerTimeWatcher::localOffset(
 
 void ServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr& server)
 {
-    if (server->getStatus() != nx::vms::api::ResourceStatus::online
-        || server.dynamicCast<QnFakeMediaServerResource>())
-    {
+    if (server->getStatus() != nx::vms::api::ResourceStatus::online || server->hasFlags(Qn::fake))
         return;
-    }
 
     auto connection = this->connection();
     if (!connection)
@@ -202,7 +198,7 @@ void ServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr& server)
 void ServerTimeWatcher::handleResourceAdded(const QnResourcePtr& resource)
 {
     const auto server = resource.dynamicCast<QnMediaServerResource>();
-    if (!server || server.dynamicCast<QnFakeMediaServerResource>())
+    if (!server || server->hasFlags(Qn::fake))
         return;
 
     const auto updateServer = [this, server]{ sendRequest(server); };

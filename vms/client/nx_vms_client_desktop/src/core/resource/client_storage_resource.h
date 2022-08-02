@@ -2,16 +2,16 @@
 
 #pragma once
 
-#include <core/resource/client_core_resource_fwd.h>
-
 #include <core/resource/storage_resource.h>
+
+#include "client_resource_fwd.h"
 
 /*
 *   This class used only for manipulating storage as User Interface entity.
 *   Additional info like total space is loaded with a separate API request
 *   and is set from outside.
 */
-class NX_VMS_CLIENT_CORE_API QnClientStorageResource: public QnStorageResource
+class NX_VMS_CLIENT_DESKTOP_API QnClientStorageResource: public QnStorageResource
 {
     Q_OBJECT
 
