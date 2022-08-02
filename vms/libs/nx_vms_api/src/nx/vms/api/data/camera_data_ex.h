@@ -27,6 +27,11 @@ struct NX_VMS_API CameraDataEx:
 
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(CameraDataEx)
 
+NX_VMS_API void serialize(
+    QnJsonContext* ctx, const CameraDataEx& value, QJsonValue* target);
+NX_VMS_API bool deserialize(
+    QnJsonContext* ctx, const QJsonValue& value, CameraDataEx* target);
+
 } // namespace api
 } // namespace vms
 } // namespace nx

@@ -129,24 +129,24 @@ bool QnCameraUserAttributePool::setLogicalId(const QnUuid& cameraId, const QStri
     return setValue(cameraId, &QnCameraUserAttributes::logicalId, value);
 }
 
-int QnCameraUserAttributePool::minDays(const QnUuid& cameraId)
+std::chrono::seconds QnCameraUserAttributePool::minPeriod(const QnUuid& cameraId)
 {
-    return getValue(cameraId, &QnCameraUserAttributes::minDays);
+    return getValue(cameraId, &QnCameraUserAttributes::minPeriodS);
 }
 
-bool QnCameraUserAttributePool::setMinDays(const QnUuid& cameraId, int value)
+bool QnCameraUserAttributePool::setMinPeriod(const QnUuid& cameraId, std::chrono::seconds value)
 {
-    return setValue(cameraId, &QnCameraUserAttributes::minDays, value);
+    return setValue(cameraId, &QnCameraUserAttributes::minPeriodS, value);
 }
 
-int QnCameraUserAttributePool::maxDays(const QnUuid& cameraId)
+std::chrono::seconds QnCameraUserAttributePool::maxPeriod(const QnUuid& cameraId)
 {
-    return getValue(cameraId, &QnCameraUserAttributes::maxDays);
+    return getValue(cameraId, &QnCameraUserAttributes::maxPeriodS);
 }
 
-bool QnCameraUserAttributePool::setMaxDays(const QnUuid& cameraId, int value)
+bool QnCameraUserAttributePool::setMaxPeriod(const QnUuid& cameraId, std::chrono::seconds value)
 {
-    return setValue(cameraId, &QnCameraUserAttributes::maxDays, value);
+    return setValue(cameraId, &QnCameraUserAttributes::maxPeriodS, value);
 }
 
 int QnCameraUserAttributePool::recordBeforeMotionSec(const QnUuid& cameraId)

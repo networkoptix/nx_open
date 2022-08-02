@@ -297,8 +297,8 @@ void QnWorkbenchResourcesSettingsHandler::at_copyRecordingScheduleAction_trigger
 
             if (copyArchiveLength)
             {
-                camera->setMinDays(settings.recording.minDays.rawValue());
-                camera->setMaxDays(settings.recording.maxDays.rawValue());
+                camera->setMinPeriod(settings.recording.minDays.rawValue());
+                camera->setMaxPeriod(settings.recording.maxDays.rawValue());
             }
         };
 

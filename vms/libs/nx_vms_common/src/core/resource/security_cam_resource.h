@@ -394,11 +394,11 @@ public:
 
     virtual bool needCheckIpConflicts() const;
 
-    void setMaxDays(int value);
-    int maxDays() const;
+    void setMaxPeriod(std::chrono::seconds value);
+    std::chrono::seconds maxPeriod() const;
 
-    void setMinDays(int value);
-    int minDays() const;
+    void setMinPeriod(std::chrono::seconds value);
+    std::chrono::seconds minPeriod() const;
 
     int recordBeforeMotionSec() const;
     void setRecordBeforeMotionSec(int value);

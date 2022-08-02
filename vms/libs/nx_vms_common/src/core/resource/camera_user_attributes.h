@@ -29,11 +29,11 @@ public:
     QnScheduleTaskList scheduleTasks;
     bool disableDualStreaming = false; //< TODO: #sivanov Double negation.
 
-    /** Minimum days to keep camera footage. Any negative value means 'auto'. */
-    int minDays = -nx::vms::api::kDefaultMinArchiveDays;
+    /**%apidoc Minimum seconds to keep camera footage. Any negative value means 'auto'. */
+    std::chrono::seconds minPeriodS = -nx::vms::api::kDefaultMinArchivePeriod;
 
-    /** Maximum days to keep camera footage. Any negative value means 'auto'. */
-    int maxDays = -nx::vms::api::kDefaultMaxArchiveDays;
+    /**%apidoc Maximum seconds to keep camera footage. Any negative value means 'auto'. */
+    std::chrono::seconds maxPeriodS = -nx::vms::api::kDefaultMaxArchivePeriod;
 
     QnUuid preferredServerId;
 

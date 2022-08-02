@@ -1047,16 +1047,16 @@ void QnSecurityCamResource::setLogicalId(int value)
         emit logicalIdChanged(::toSharedPointer(this));
 }
 
-void QnSecurityCamResource::setMaxDays(int value)
+void QnSecurityCamResource::setMaxPeriod(std::chrono::seconds value)
 {
     NX_ASSERT(!getIdForUserAttributes().isNull());
-    userAttributesPool()->setMaxDays(getIdForUserAttributes(), value);
+    userAttributesPool()->setMaxPeriod(getIdForUserAttributes(), value);
 }
 
-int QnSecurityCamResource::maxDays() const
+std::chrono::seconds QnSecurityCamResource::maxPeriod() const
 {
     NX_ASSERT(!getIdForUserAttributes().isNull());
-    return userAttributesPool()->maxDays(getIdForUserAttributes());
+    return userAttributesPool()->maxPeriod(getIdForUserAttributes());
 }
 
 void QnSecurityCamResource::setPreferredServerId(const QnUuid& value)
@@ -1101,16 +1101,16 @@ void QnSecurityCamResource::updatePreferredServerId()
         setPreferredServerId(getParentId());
 }
 
-void QnSecurityCamResource::setMinDays(int value)
+void QnSecurityCamResource::setMinPeriod(std::chrono::seconds value)
 {
     NX_ASSERT(!getIdForUserAttributes().isNull());
-    userAttributesPool()->setMinDays(getIdForUserAttributes(), value);
+    userAttributesPool()->setMinPeriod(getIdForUserAttributes(), value);
 }
 
-int QnSecurityCamResource::minDays() const
+std::chrono::seconds QnSecurityCamResource::minPeriod() const
 {
     NX_ASSERT(!getIdForUserAttributes().isNull());
-    return userAttributesPool()->minDays(getIdForUserAttributes());
+    return userAttributesPool()->minPeriod(getIdForUserAttributes());
 }
 
 int QnSecurityCamResource::recordBeforeMotionSec() const

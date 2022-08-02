@@ -9,8 +9,41 @@ namespace vms {
 namespace api {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    CameraDataEx, (ubjson)(xml)(json)(csv_record)(sql_record), CameraDataEx_Fields)
+    CameraDataEx, (ubjson)(xml)(csv_record)(sql_record), CameraDataEx_Fields)
 
+namespace detail {
+
+QN_FUSION_DEFINE_FUNCTIONS(CameraDataEx, (json))
+
+} // namespace detail
+
+struct CameraDataExBackwardCompatibility: public CameraDataEx
+{
+    int maxArchiveDays = 0;
+    int minArchiveDays = 0;
+};
+
+#define CameraDataExBackwardCompatibility_Fields CameraDataEx_Fields (maxArchiveDays)(minArchiveDays)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(CameraDataExBackwardCompatibility,
+    (json), CameraDataExBackwardCompatibility_Fields)
+
+void serialize(
+    QnJsonContext* ctx, const CameraDataEx& value, QJsonValue* target)
+{
+    CameraDataExBackwardCompatibility compatibilityValue;
+    static_cast<CameraDataEx&>(compatibilityValue) = value;
+    using namespace std::chrono;
+    compatibilityValue.maxArchiveDays = duration_cast<days>(value.maxArchivePeriodS).count();
+    compatibilityValue.minArchiveDays = duration_cast<days>(value.minArchivePeriodS).count();
+    ctx->setChronoSerializedAsDouble(true);
+    serialize(ctx, compatibilityValue, target);
+}
+
+bool deserialize(QnJsonContext* ctx, const QJsonValue& value, CameraDataEx* target)
+{
+    return detail::deserialize(ctx, value, target);
+}
 
 } // namespace api
 } // namespace vms

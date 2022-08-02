@@ -88,10 +88,17 @@ DeviceModel::DbUpdateTypes DeviceModel::toDbTypes() &&
 
     attributes.scheduleEnabled = schedule.isEnabled;
     attributes.scheduleTasks = schedule.tasks;
-    if (schedule.minArchiveDays)
-        attributes.minArchiveDays = *schedule.minArchiveDays;
-    if (schedule.maxArchiveDays)
-        attributes.maxArchiveDays = *schedule.maxArchiveDays;
+
+    using namespace std::chrono;
+    if (schedule.minArchivePeriodS)
+        attributes.minArchivePeriodS = seconds(*schedule.minArchivePeriodS);
+    else if (schedule.minArchiveDays)
+        attributes.minArchivePeriodS = days(*schedule.minArchiveDays);
+
+    if (schedule.maxArchivePeriodS)
+        attributes.maxArchivePeriodS = seconds(*schedule.maxArchivePeriodS);
+    else if (schedule.maxArchiveDays)
+        attributes.maxArchivePeriodS = days(*schedule.maxArchiveDays);
 
     attributes.motionType = motion.type;
     attributes.motionMask = motion.mask.toLatin1();;
@@ -156,10 +163,12 @@ std::vector<DeviceModel> DeviceModel::fromDbTypes(DbListTypes all)
 
                 model.schedule.isEnabled = attributes->scheduleEnabled;
                 model.schedule.tasks = attributes->scheduleTasks;
-                if (attributes->minArchiveDays > 0)
-                    model.schedule.minArchiveDays = attributes->minArchiveDays;
-                if (attributes->maxArchiveDays > 0)
-                    model.schedule.maxArchiveDays = attributes->maxArchiveDays;
+
+                using namespace std::chrono;
+                model.schedule.minArchivePeriodS = duration_cast<seconds>(attributes->minArchivePeriodS).count();
+                model.schedule.minArchiveDays = duration_cast<days>(attributes->minArchivePeriodS).count();
+                model.schedule.maxArchivePeriodS = duration_cast<seconds>(attributes->maxArchivePeriodS).count();
+                model.schedule.maxArchiveDays = duration_cast<days>(attributes->maxArchivePeriodS).count();
 
                 model.motion.type = attributes->motionType;
                 model.motion.mask = attributes->motionMask;

@@ -276,8 +276,8 @@ void fromApiToResource(const CameraAttributesData& src, const QnCameraUserAttrib
     dst->cameraControlDisabled = !src.controlEnabled;
     dst->dewarpingParams = QJson::deserialized<nx::vms::api::dewarping::MediaData>(
         src.dewarpingParams);
-    dst->minDays = src.minArchiveDays;
-    dst->maxDays = src.maxArchiveDays;
+    dst->minPeriodS = src.minArchivePeriodS;
+    dst->maxPeriodS = src.maxArchivePeriodS;
     dst->preferredServerId = src.preferredServerId;
     dst->failoverPriority = src.failoverPriority;
     dst->backupQuality = src.backupQuality;
@@ -310,8 +310,8 @@ void fromResourceToApi(const QnCameraUserAttributesPtr& src, CameraAttributesDat
     dst.disableDualStreaming = src->disableDualStreaming;
     dst.controlEnabled = !src->cameraControlDisabled;
     dst.dewarpingParams = QJson::serialized(src->dewarpingParams);
-    dst.minArchiveDays = src->minDays;
-    dst.maxArchiveDays = src->maxDays;
+    dst.minArchivePeriodS = src->minPeriodS;
+    dst.maxArchivePeriodS = src->maxPeriodS;
     dst.preferredServerId = src->preferredServerId;
     dst.failoverPriority = src->failoverPriority;
     dst.backupQuality = src->backupQuality;

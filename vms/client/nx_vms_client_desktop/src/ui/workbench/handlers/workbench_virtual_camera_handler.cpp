@@ -300,7 +300,7 @@ bool QnWorkbenchVirtualCameraHandler::fixFileUpload(
 
         QString title = tr("Selected files are too old", "", count);
 
-        int days = camera->maxDays();
+        const int days = duration_cast<std::chrono::days>(camera->maxPeriod()).count();
         QString extra;
         if (count == 1)
         {

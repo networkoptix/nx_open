@@ -69,8 +69,8 @@ NX_REFLECTION_INSTRUMENT(ScheduleTaskData, ScheduleTaskData_Fields)
 
 //-------------------------------------------------------------------------------------------------
 
-static constexpr int kDefaultMinArchiveDays = 1;
-static constexpr int kDefaultMaxArchiveDays = 30;
+static constexpr std::chrono::days kDefaultMinArchivePeriod(1);
+static constexpr std::chrono::days kDefaultMaxArchivePeriod(30);
 static constexpr int kDefaultRecordBeforeMotionSec = 5;
 static constexpr int kDefaultRecordAfterMotionSec = 5;
 
@@ -143,15 +143,15 @@ struct NX_VMS_API CameraAttributesData
      */
     QnLatin1Array dewarpingParams;
 
-    /**%apidoc[opt] Minimum number of days to keep the archive for. If the value is less than or
+    /**%apidoc[opt] Minimum number of seconds to keep the archive for. If the value is less than or
      * equal to zero, it is not used.
      */
-    int minArchiveDays = -kDefaultMinArchiveDays; //< Negative means 'auto'.
+    std::chrono::seconds minArchivePeriodS = -kDefaultMinArchivePeriod; //< Negative means 'auto'.
 
-    /**%apidoc[opt] Maximum number of days to keep the archive for. If the value is less than or
+    /**%apidoc[opt] Maximum number of seconds to keep the archive for. If the value is less than or
      * equal zero, it is not used.
      */
-    int maxArchiveDays = -kDefaultMaxArchiveDays; //< Negative means 'auto'.
+    std::chrono::seconds maxArchivePeriodS = -kDefaultMaxArchivePeriod; //< Negative means 'auto'.
 
     /**%apidoc[opt] Unique id of a server which has the highest priority of hosting the device for
      * failover (if the current server fails).
@@ -190,8 +190,8 @@ struct NX_VMS_API CameraAttributesData
     (disableDualStreaming)\
     (controlEnabled) \
     (dewarpingParams) \
-    (minArchiveDays) \
-    (maxArchiveDays) \
+    (minArchivePeriodS) \
+    (maxArchivePeriodS) \
     (preferredServerId) \
     (failoverPriority) \
     (backupQuality) \
@@ -205,6 +205,11 @@ struct NX_VMS_API CameraAttributesData
 
 NX_VMS_API_DECLARE_STRUCT(ScheduleTaskData)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(CameraAttributesData)
+
+NX_VMS_API void serialize(
+    QnJsonContext* ctx, const CameraAttributesData& value, QJsonValue* target);
+NX_VMS_API bool deserialize(
+    QnJsonContext* ctx, const QJsonValue& value, CameraAttributesData* target);
 
 } // namespace api
 } // namespace vms

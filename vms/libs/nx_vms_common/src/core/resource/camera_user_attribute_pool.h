@@ -55,11 +55,11 @@ public:
     QString logicalId(const QnUuid& cameraId);
     bool setLogicalId(const QnUuid& cameraId, const QString& value);
 
-    int minDays(const QnUuid& cameraId);
-    bool setMinDays(const QnUuid& cameraId, int value);
+    std::chrono::seconds minPeriod(const QnUuid& cameraId);
+    bool setMinPeriod(const QnUuid& cameraId, std::chrono::seconds value);
 
-    int maxDays(const QnUuid& cameraId);
-    bool setMaxDays(const QnUuid& cameraId, int value);
+    std::chrono::seconds maxPeriod(const QnUuid& cameraId);
+    bool setMaxPeriod(const QnUuid& cameraId, std::chrono::seconds value);
 
     int recordBeforeMotionSec(const QnUuid& cameraId);
     bool setRecordBeforeMotionSec(const QnUuid& cameraId, int value);
