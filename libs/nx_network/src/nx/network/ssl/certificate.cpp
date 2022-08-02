@@ -915,6 +915,58 @@ PKeyPtr generateKey(int length /*= kRsaLength*/)
     return pkey;
 }
 
+bool generateKeyFiles(
+    const std::string& privateKeyFileName,
+    const std::string& publicKeyFileName,
+    int rsaKeyLength /*= kRsaLength*/)
+{
+    auto key = generateKey(rsaKeyLength);
+
+    FILE* f = fopen(publicKeyFileName.c_str(), "wt");
+    if (!f)
+    {
+        NX_WARNING(typeid(Certificate), "Cannot open file: %1", publicKeyFileName);
+        return false;
+    }
+    if (PEM_write_PUBKEY(f, key.get()) != 1)
+    {
+        fclose(f);
+        NX_WARNING(typeid(Certificate), "PEM_write_PUBKEY() failed: %1", publicKeyFileName);
+        return false;
+    }
+    if (fclose(f) != 0)
+    {
+        NX_WARNING(typeid(Certificate), "fclose() failed: %1", publicKeyFileName);
+        return false;
+    }
+
+    f = fopen(privateKeyFileName.c_str(), "wt");
+    if (!f)
+    {
+        NX_WARNING(typeid(Certificate), "Cannot open file: %1", privateKeyFileName);
+        return false;
+    }
+    if (PEM_write_PrivateKey(
+        f,
+        key.get(),
+        /* default cipher for encrypting the key on disk */ nullptr,
+        /* passphrase required for decrypting the key on disk */ nullptr,
+        /* length of the passphrase string */ 0,
+        /* callback for requesting a password */ nullptr,
+        /* data to pass to the callback */ nullptr) != 1)
+    {
+        fclose(f);
+        NX_WARNING(typeid(Certificate), "PEM_write_PrivateKey() failed: %1", privateKeyFileName);
+        return false;
+    }
+    if (fclose(f) != 0)
+    {
+        NX_WARNING(typeid(Certificate), "fclose() failed: %1", privateKeyFileName);
+        return false;
+    }
+    return true;
+}
+
 std::string makeCertificateAndKey(
     const X509Name& issuerAndSubject,
     const std::string& dnsName,
