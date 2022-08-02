@@ -7,6 +7,7 @@
 #include <QtCore/QVariantMap>
 
 #include <nx/vms/event/level.h>
+#include <nx/vms/rules/client_action.h>
 #include <nx/vms/rules/icon.h>
 
 namespace nx::vms::rules::utils {
@@ -14,12 +15,13 @@ namespace nx::vms::rules::utils {
 static constexpr auto kAnalyticsEventTypeDetailName = "analyticsEventType";
 static constexpr auto kAnalyticsObjectTypeDetailName = "analyticsObjectType";
 static constexpr auto kCaptionDetailName = "caption";
+static constexpr auto kClientActionDetailName = "clientAction";
 static constexpr auto kCountDetailName = "count";
 static constexpr auto kCustomIconDetailName = "customIcon";
 static constexpr auto kDescriptionDetailName = "description";
 static constexpr auto kDetailingDetailName = "detailing";
 static constexpr auto kExtendedCaptionDetailName = "extendedCaption";
-static constexpr auto kEmailTemplatePathDetailName = "extendedCaption";
+static constexpr auto kEmailTemplatePathDetailName = "emailTemplate";
 static constexpr auto kHasScreenshotDetailName = "hasTimestamp";
 static constexpr auto kIconDetailName = "icon";
 static constexpr auto kLevelDetailName = "level";
@@ -32,6 +34,7 @@ static constexpr auto kSourceNameDetailName = "sourceName";
 static constexpr auto kSourceStatusDetailName = "sourceStatus";
 static constexpr auto kTypeDetailName = "type";
 static constexpr auto kTriggerNameDetailName = "triggerName";
+static constexpr auto kUrlDetailName = "url";
 static constexpr auto kUserIdDetailName = "userId";
 
 static constexpr std::chrono::microseconds kScreenshotLifetime(5'000'000);
@@ -57,6 +60,11 @@ inline void insertLevel(QVariantMap& map, nx::vms::event::Level level)
 inline void insertIcon(QVariantMap& map, nx::vms::rules::Icon icon)
 {
     map.insert(kIconDetailName, QVariant::fromValue(icon));
+}
+
+inline void insertClientAction(QVariantMap& map, nx::vms::rules::ClientAction action)
+{
+    map.insert(kClientActionDetailName, QVariant::fromValue(action));
 }
 
 } // namespace nx::vms::rules::utils

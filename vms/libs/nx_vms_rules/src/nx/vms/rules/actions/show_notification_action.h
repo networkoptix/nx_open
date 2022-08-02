@@ -3,6 +3,7 @@
 #pragma once
 
 #include <nx/vms/event/level.h>
+#include <nx/vms/rules/client_action.h>
 #include <nx/vms/rules/icon.h>
 
 #include "../basic_action.h"
@@ -23,11 +24,14 @@ class NX_VMS_RULES_API NotificationAction: public nx::vms::rules::BasicAction
     FIELD(nx::vms::rules::UuidSelection, users, setUsers)
     FIELD(std::chrono::microseconds, interval, setInterval)
     FIELD(bool, acknowledge, setAcknowledge)
+    FIELD(QnUuid, serverId, setServerId)
     FIELD(QnUuid, cameraId, setCameraId)
 
     FIELD(nx::vms::event::Level, level, setLevel)
     FIELD(nx::vms::rules::Icon, icon, setIcon)
     FIELD(QString, customIcon, setCustomIcon)
+    FIELD(nx::vms::rules::ClientAction, clientAction, setClientAction)
+    FIELD(QString, url, setUrl)
 
 public:
     NotificationAction() = default;

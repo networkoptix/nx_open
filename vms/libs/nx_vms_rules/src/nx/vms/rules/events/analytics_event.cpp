@@ -66,6 +66,7 @@ QVariantMap AnalyticsEvent::details(common::SystemContext* context) const
     result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
     utils::insertLevel(result, nx::vms::event::Level::common);
     utils::insertIcon(result, nx::vms::rules::Icon::resource);
+    utils::insertClientAction(result, nx::vms::rules::ClientAction::previewCameraOnTime);
 
     return result;
 }
@@ -105,7 +106,8 @@ const ItemDescriptor& AnalyticsEvent::manifest()
             makeFieldDescriptor<AnalyticsEventTypeField>("eventTypeId", tr("Event Type")),
             makeFieldDescriptor<KeywordsField>("caption", tr("Caption")),
             makeFieldDescriptor<KeywordsField>("description", tr("Description")),
-            makeFieldDescriptor<AnalyticsObjectAttributesField>("attributes", tr("Attributes")),
+            // TODO: #amalov Consider adding following fields in 5.1+.
+            // makeFieldDescriptor<AnalyticsObjectAttributesField>("attributes", tr("Attributes")),
         },
         .emailTemplatePath = ":/email_templates/analytics_event.mustache"
     };

@@ -69,6 +69,9 @@ public:
         nx::vms::rules::utils::insertLevel(result, nx::vms::event::Level::none);
         nx::vms::rules::utils::insertIcon(result, nx::vms::rules::Icon::calculated);
         result[nx::vms::rules::utils::kCustomIconDetailName] = "test";
+        nx::vms::rules::utils::insertClientAction(result, nx::vms::rules::ClientAction::none);
+        result[nx::vms::rules::utils::kUrlDetailName] = "http://localhost";
+
         return result;
     }
 

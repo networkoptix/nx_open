@@ -56,6 +56,7 @@ QVariantMap PoeOverBudgetEvent::details(common::SystemContext* context) const
     utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing());
     result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
     utils::insertLevel(result, nx::vms::event::Level::critical);
+    utils::insertClientAction(result, nx::vms::rules::ClientAction::poeSettings);
 
     return result;
 }
