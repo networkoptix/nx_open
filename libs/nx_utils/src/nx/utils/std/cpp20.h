@@ -223,6 +223,19 @@ constexpr detail::synth3way_t<pair<const Key, Tp>> operator<=>(
         detail::synth3way);
 }
 
+template<typename Tp, typename Alloc>
+inline detail::synth3way_t<Tp> operator<=>(
+    const vector<Tp, Alloc>& x,
+    const vector<Tp, Alloc>& y)
+{
+    return std::lexicographical_compare_three_way(
+        x.begin(),
+        x.end(),
+        y.begin(),
+        y.end(),
+        detail::synth3way);
+}
+
 } // namespace std
 
 #endif // defined(__clang__) && defined(_LIBCPP_COMPILER_CLANG_BASED)
