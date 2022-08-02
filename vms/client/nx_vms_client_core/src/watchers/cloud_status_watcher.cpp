@@ -18,6 +18,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/fuzzy.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/string.h>
 #include <nx/vms/api/data/cloud_system_data.h>
@@ -432,6 +433,12 @@ void QnCloudStatusWatcherPrivate::updateStatusFromResultCode(api::ResultCode res
 
 void QnCloudStatusWatcherPrivate::updateSystemsInternal(int triesCount)
 {
+    if (!hasUpdateSystemsRequest)
+        return;
+
+    auto hasUpdateRequestRollback = nx::utils::makeScopeGuard(
+        [this](){ hasUpdateSystemsRequest = false; }); //< Reset in case of return.
+
     if (!cloudConnection || m_authData.credentials.authToken.empty())
         return;
 
@@ -443,6 +450,8 @@ void QnCloudStatusWatcherPrivate::updateSystemsInternal(int triesCount)
 
     if (triesCount <= 0)
         return;
+
+    hasUpdateRequestRollback.disarm(); //< Request is still actual.
 
     auto handler = nx::utils::AsyncHandlerExecutor(this).bind(
         [this, triesCount](api::ResultCode result, const api::SystemDataExList& systemsList)
@@ -482,11 +491,14 @@ void QnCloudStatusWatcherPrivate::updateSystemsInternal(int triesCount)
             updateStatusFromResultCode(result);
         });
 
+    NX_DEBUG(this, "Updating systems list");
     cloudConnection->systemManager()->getSystemsFiltered(api::Filter(), std::move(handler));
 }
 
 void QnCloudStatusWatcherPrivate::updateSystems()
 {
+    NX_DEBUG(this, "Try update systems list: has request is %1 ", hasUpdateSystemsRequest);
+
     if (hasUpdateSystemsRequest)
         return;
 
