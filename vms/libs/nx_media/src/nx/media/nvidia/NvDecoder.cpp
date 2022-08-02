@@ -68,7 +68,7 @@ static const char * GetVideoCodecString(cudaVideoCodec eCodec) {
     if (eCodec >= 0 && eCodec <= cudaVideoCodec_NumCodecs) {
         return aCodecName[eCodec].name;
     }
-    for (int i = cudaVideoCodec_NumCodecs + 1; i < sizeof(aCodecName) / sizeof(aCodecName[0]); i++) {
+    for (int i = cudaVideoCodec_NumCodecs + 1; i < (int)sizeof(aCodecName) / sizeof(aCodecName[0]); i++) {
         if (eCodec == aCodecName[i].eCodec) {
             return aCodecName[eCodec].name;
         }
@@ -87,7 +87,7 @@ static const char * GetVideoChromaFormatString(cudaVideoChromaFormat eChromaForm
         { cudaVideoChromaFormat_444,        "YUV 444"              },
     };
 
-    if (eChromaFormat >= 0 && eChromaFormat < sizeof(aChromaFormatName) / sizeof(aChromaFormatName[0])) {
+    if (eChromaFormat >= 0 && eChromaFormat < (int)sizeof(aChromaFormatName) / sizeof(aChromaFormatName[0])) {
         return aChromaFormatName[eChromaFormat].name;
     }
     return "Unknown";
@@ -494,6 +494,14 @@ int NvDecoder::HandlePictureDisplay(CUVIDPARSERDISPINFO *pDispInfo) {
     CUdeviceptr dpSrcFrame = 0;
     unsigned int nSrcPitch = 0;
     CUDA_DRVAPI_CALL(cuCtxPushCurrent(m_cuContext));
+
+    uint8_t *pDecodedFrame = m_frameQueue.getFreeFrame();
+    if (pDecodedFrame == nullptr)
+    {
+        NX_WARNING(this, "Not enought frame buffers!");
+        return 1;
+    }
+
     NVDEC_API_CALL(cuvidMapVideoFrame(m_hDecoder, pDispInfo->picture_index, &dpSrcFrame,
         &nSrcPitch, &videoProcessingParameters));
 
@@ -505,12 +513,6 @@ int NvDecoder::HandlePictureDisplay(CUVIDPARSERDISPINFO *pDispInfo) {
         printf("Decode Error occurred for picture %d\n", m_nPicNumInDecodeOrder[pDispInfo->picture_index]);
     }
 
-    uint8_t *pDecodedFrame = m_frameQueue.getFreeFrame();
-    if (pDecodedFrame == nullptr)
-    {
-        NX_WARNING(this, "Not enought frame buffers!");
-        return 1;
-    }
 
     // Copy luma plane
     CUDA_MEMCPY2D m = { 0 };

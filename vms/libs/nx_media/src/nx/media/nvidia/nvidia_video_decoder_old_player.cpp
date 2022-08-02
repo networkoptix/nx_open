@@ -96,7 +96,7 @@ bool NvidiaVideoDecoderOldPlayer::decode(
     outFrame->pkt_dts = frame->timestamp;
     outFrame->width = frame->width;
     outFrame->height = frame->height;
-    NX_INFO(this, "QQQ decoded new frame: %1", frame->timestamp);
+    NX_DEBUG(this, "QQQ decoded new frame: %1", frame->timestamp);
     outFrame->attachVideoSurface(std::move(frame));
     return true;
 }
