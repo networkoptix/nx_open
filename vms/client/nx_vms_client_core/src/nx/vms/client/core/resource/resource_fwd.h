@@ -22,12 +22,5 @@ using CameraPtr = QnSharedResourcePointer<Camera>;
 
 } // namespace nx::vms::client::core
 
-class QnClientStorageResource;
-typedef QnSharedResourcePointer<QnClientStorageResource> QnClientStorageResourcePtr;
-typedef QnSharedResourcePointerList<QnClientStorageResource> QnClientStorageResourceList;
-
-class QnFakeMediaServerResource;
-using QnFakeMediaServerResourcePtr = QnSharedResourcePointer<QnFakeMediaServerResource>;
-
 class QnDesktopResource;
 using QnDesktopResourcePtr = QnSharedResourcePointer<QnDesktopResource>;

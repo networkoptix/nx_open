@@ -60,57 +60,60 @@ namespace Qn {
     // TODO: #sivanov Split to server-only and client-only flags as they are always local.
     enum ResourceFlag
     {
-        network                     = 0x1,          /**< Has ip and mac. */
-        url                         = 0x2,          /**< Has url, e.g. file name. */
-        streamprovider              = 0x4,
-        media                       = 0x8,
+        network = 1 << 0, /**< Has ip and mac. */
+        url = 1 << 1, /**< Has url, e.g. file name. */
+        media = 1 << 2,
+        playback = 1 << 3, /**< Something playable (not real time and not a single shot). */
+        video = 1 << 4,
+        audio = 1 << 5,
+        live = 1 << 6,
 
-        playback                    = 0x10,         /**< Something playable (not real time and not a single shot). */
-        video                       = 0x20,
-        audio                       = 0x40,
-        live                        = 0x80,
+        still_image = 1 << 7, /**< Still image device. */
+        local = 1 << 8, /**< Local client resource. */
+        server = 1 << 9, /**< Server resource. */
+        remote = 1 << 10, /**< Remote (on-server) resource. */
 
-        still_image                 = 0x100,        /**< Still image device. */
-        local                       = 0x200,        /**< Local client resource. */
-        server                      = 0x400,        /**< Server resource. */
-        remote                      = 0x800,        /**< Remote (on-server) resource. */
+        layout = 1 << 11, /**< Layout resource. */
+        user = 1 << 12, /**< User resource. */
+        utc = 1 << 13, /**< Uses UTC-based timing. */
+        periods = 1 << 14, /**< Has recorded periods. */
+        motion = 1 << 15, /**< Has motion */
+        sync = 1 << 16, /**< Can be used in sync playback mode. */
 
-        layout                      = 0x1000,       /**< Layout resource. */
-        user                        = 0x2000,       /**< User resource. */
-        utc                         = 0x4000,       /**< Resource uses UTC-based timing. */
-        periods                     = 0x8000,       /**< Resource has recorded periods. */
+        // Server-only flag.
+        foreigner = 1 << 17, /**< Belongs to other entity, e.g., camera on another server */
 
-        motion                      = 0x10000,      /**< Resource has motion */
-        sync                        = 0x20000,      /**< Resource can be used in sync playback mode. */
+        // Client-only flag.
+        fake = 1 << 18, /**< Fake server (belonging to other system). */
 
-        /* Server-only flag. */
-        foreigner                   = 0x40000,      /**< Resource belongs to other entity. E.g., camera on another server */
+        videowall = 1 << 19, /**< Videowall resource */
+        desktop_camera = 1 << 20, /**< Desktop Camera resource */
 
-        /* Client-only flag */
-        fake                        = 0x100000,     /**< Fake server (belonging to other system). */
+        // Server-only flag.
+        parent_change = 1 << 21, /**< Camera discovery internal purpose. Server-only flag. */
 
-        videowall                   = 0x200000,     /**< Videowall resource */
-        desktop_camera              = 0x400000,     /**< Desktop Camera resource */
+        // Server-only flag.
+        search_upd_only = 1 << 22, /**< Disable to insert new resource during discovery process,
+                                        allow update only */
 
-        /* Server-only flag. */
-        parent_change               = 0x800000,     /**< Camera discovery internal purpose. Server-only flag. */
+        io_module = 1 << 23, /**< I/O module device (camera subtype) */
+        read_only = 1 << 24, /**< Resource is read-only by design. */
 
-        /* Client-only flag. */
-        depend_on_parent_status     = 0x1000000,    /**< Resource status depend on parent resource status. */
+        // Server-only flag.
+        storage_fastscan = 1 << 25, /**< Fast scan for storage in progress */
 
-        /* Server-only flag. */
-        search_upd_only             = 0x2000000,    /**< Disable to insert new resource during discovery process, allow update only */
+        // Client-only flag.
+        exported = 1 << 26, /**< Exported media file. */
 
-        io_module                   = 0x4000000,    /**< It's I/O module camera (camera subtype) */
-        read_only                   = 0x8000000,    /**< Resource is read-only by design. */
+        removed = 1 << 27, /**< Resource is already removed from the resource pool. */
 
-        storage_fastscan            = 0x10000000,   /**< Fast scan for storage in progress */
+        virtual_camera = 1 << 28, /**< Virtual camera resource. */
 
-        /* Client-only flag. */
-        exported                    = 0x20000000,   /**< Exported media file. */
-        removed                     = 0x40000000,   /**< resource removed from pool. */
-
-        virtual_camera             = 0x80000000,   /**< Virtual camera resource. */
+        /**
+         * Cross-system Resource, e.g. Camera from another System or it's parent Server. Cloud
+         * Layouts are also considered as cross-system Resources.
+         */
+        cross_system = 1 << 29,
 
         local_media = local | media | url,
         exported_media = local_media | exported,
@@ -121,14 +124,14 @@ namespace Qn {
         local_server = local | server,
         remote_server = remote | server,
 
-        live_cam = utc | sync | live | media | video | streamprovider, // don't set w/o `local` or `remote` flag
+        live_cam = utc | sync | live | media | video, // don't set w/o `local` or `remote` flag
         local_live_cam = live_cam | local | network,
-        server_live_cam = live_cam | remote,// | network,
-        server_archive = remote | media | video | audio | streamprovider,
-        local_video = local_media | video | audio | streamprovider,     /**< Local media file. */
-        local_image = local_media | still_image | streamprovider,    /**< Local still image file. */
+        server_live_cam = live_cam | remote, // | network,
+        server_archive = remote | media | video | audio,
+        local_video = local_media | video | audio, /**< Local media file. */
+        local_image = local_media | still_image, /**< Local still image file. */
 
-        web_page = url | remote,   /**< Web-page resource */
+        web_page = url | remote, /**< Web-page resource */
         fake_server = remote_server | fake
     };
     Q_DECLARE_FLAGS(ResourceFlags, ResourceFlag)

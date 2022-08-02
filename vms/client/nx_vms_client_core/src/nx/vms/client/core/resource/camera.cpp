@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "client_core_camera.h"
+#include "camera.h"
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/status_dictionary.h>
@@ -12,7 +12,7 @@ Camera::Camera(const QnUuid& resourceTypeId):
     base_type()
 {
     setTypeId(resourceTypeId);
-    addFlags(Qn::server_live_cam | Qn::depend_on_parent_status);
+    addFlags(Qn::server_live_cam);
 }
 
 QString Camera::getName() const

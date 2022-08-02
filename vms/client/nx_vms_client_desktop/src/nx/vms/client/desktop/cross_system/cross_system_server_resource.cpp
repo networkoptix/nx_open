@@ -12,6 +12,7 @@ namespace nx::vms::client::desktop {
 
 CrossSystemServerResource::CrossSystemServerResource(core::RemoteConnectionPtr connection)
 {
+    addFlags(Qn::cross_system);
     setPrimaryAddress(connection->address());
     m_restConnection = connection->serverApi();
 }
@@ -21,6 +22,7 @@ CrossSystemServerResource::CrossSystemServerResource(
     nx::network::SocketAddress endpoint,
     core::RemoteConnectionPtr connection)
 {
+    addFlags(Qn::cross_system);
     setIdUnsafe(id);
     setPrimaryAddress(std::move(endpoint));
     m_restConnection = rest::ServerConnectionPtr(new rest::ServerConnection(

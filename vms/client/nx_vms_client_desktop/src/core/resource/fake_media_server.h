@@ -5,15 +5,15 @@
 #include <QtNetwork/QAuthenticator>
 
 #include <core/resource/media_server_resource.h>
-#include <core/resource/client_core_resource_fwd.h>
-
 #include <nx/vms/api/data/discovery_data.h>
 #include <nx/vms/api/data/module_information.h>
+
+#include "client_resource_fwd.h"
 
 /**
  * Used for DesktopClient purpose to put incompatible media servers to the resource tree.
  */
-class NX_VMS_CLIENT_CORE_API QnFakeMediaServerResource: public QnMediaServerResource
+class NX_VMS_CLIENT_DESKTOP_API QnFakeMediaServerResource: public QnMediaServerResource
 {
     Q_OBJECT
     using base_type = QnMediaServerResource;
