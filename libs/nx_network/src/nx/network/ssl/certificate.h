@@ -307,6 +307,11 @@ NX_NETWORK_API bool makeCertificateAndKeyFile(
 
 NX_NETWORK_API PKeyPtr generateKey(int length = kRsaLength);
 
+NX_NETWORK_API bool generateKeyFiles(
+    const std::string& privateKeyFileName,
+    const std::string& publicKeyFileName,
+    int rsaKeyLength = kRsaLength);
+
 NX_NETWORK_API std::string makeCertificate(
     const PKeyPtr& privateKey,
     const X509Name& issuerAndSubject,
