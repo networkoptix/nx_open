@@ -20,9 +20,9 @@
 #include <iostream>
 #include <sstream>
 #include <string.h>
+#include <map>
 
 #include <nvcuvid.h>
-#include <map>
 
 #include <nx/media/nvidia/nvidia_frame_queue.h>
 
@@ -133,7 +133,7 @@ public:
     /**
     *   @brief  This function is used to get the current frame size based on pixel format.
     */
-    int GetFrameSize() { assert(m_nWidth); return GetWidth() * (m_nLumaHeight + (m_nChromaHeight * m_nNumChromaPlanes)) * m_nBPP; }
+    int GetFrameSize() { return GetDeviceFramePitch() * (m_nLumaHeight + m_nChromaHeight * m_nNumChromaPlanes); }
 
     /**
     *   @brief  This function is used to get the current frame Luma plane size.
@@ -148,7 +148,7 @@ public:
     /**
     *  @brief  This function is used to get the pitch of the device buffer holding the decoded frame.
     */
-    int GetDeviceFramePitch() { assert(m_nWidth); return m_frameQueue.getPitch(); }
+    int GetDeviceFramePitch() { return m_frameQueue.getPitch(); }
 
     /**
     *   @brief  This function is used to get the bit depth associated with the pixel format.
@@ -280,7 +280,6 @@ private:
     // timestamps of decoded frames
     std::deque<int64_t> m_timestamps;
     int m_nDecodePicCnt = 0, m_nPicNumInDecodeOrder[32];
-    bool m_bEndDecodeDone = false;
     CUstream m_cuvidStream = 0;
     Rect m_cropRect = {};
     Dim m_resizeDim = {};

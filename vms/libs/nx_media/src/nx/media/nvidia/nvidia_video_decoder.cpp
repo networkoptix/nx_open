@@ -128,6 +128,7 @@ std::unique_ptr<NvidiaVideoFrame> NvidiaVideoDecoder::getFrame()
     frame->bitDepth = nvDecoder->GetBitDepth();
     frame->format = nvDecoder->GetOutputFormat();
     frame->matrix = nvDecoder->GetVideoFormatInfo().video_signal_description.matrix_coefficients;
+    frame->bufferSize = nvDecoder->GetFrameSize();
     return frame;
 }
 
