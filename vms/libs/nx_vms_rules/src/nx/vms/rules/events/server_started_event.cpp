@@ -32,6 +32,7 @@ QVariantMap ServerStartedEvent::details(common::SystemContext* context) const
     result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
     utils::insertLevel(result, nx::vms::event::Level::common);
     utils::insertIcon(result, nx::vms::rules::Icon::server);
+    utils::insertClientAction(result, nx::vms::rules::ClientAction::serverSettings);
 
     return result;
 }
