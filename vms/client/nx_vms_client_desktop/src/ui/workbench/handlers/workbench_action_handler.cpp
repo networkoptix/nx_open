@@ -2595,16 +2595,16 @@ void ActionHandler::doCloseApplication(bool force, AppClosingMode mode)
     const bool storeSystemSpecificParameters =
         context()->user() && mode != AppClosingMode::External;
 
+    // Store system-specific parameters.
+    if (storeSystemSpecificParameters)
+        appContext()->clientStateHandler()->clientDisconnected();
+
     // Try close, if force - exit anyway.
     // The tryClose() method may return false (when a user rejects closing). So any disconnecting
     // and closing actions that affect the current client state must be performed after this
     // statement (i.e. closing is confirmed).
     if (!context()->instance<QnWorkbenchStateManager>()->tryClose(force) && !force)
         return;
-
-    // Store system-specific parameters.
-    if (storeSystemSpecificParameters)
-        appContext()->clientStateHandler()->clientDisconnected();
 
     // Store system-independent parameters
     if (mode != AppClosingMode::External)
