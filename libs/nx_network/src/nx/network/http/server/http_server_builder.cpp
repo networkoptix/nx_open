@@ -150,6 +150,8 @@ void Builder::configureServerUrls(
                 url.setHost(endpoint.address.toString());
                 if (endpoint.port > 0)
                     url.setPort(endpoint.port);
+                if (endpoint.port == 443)
+                    url.setScheme("https");
             });
     }
 
