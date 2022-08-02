@@ -57,7 +57,7 @@ AVFrame QuickSyncVideoFrame::lockFrame()
     auto decoderLock = surfaceInfo.decoder.lock();
     if (!decoderLock)
     {
-        NX_VERBOSE(this, "Quick sync decoder already deleted, failed to lock frame");
+        NX_DEBUG(this, "Quick sync decoder already deleted, failed to lock frame");
         return result;
     }
 

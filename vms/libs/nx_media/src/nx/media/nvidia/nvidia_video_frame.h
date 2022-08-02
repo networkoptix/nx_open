@@ -24,7 +24,11 @@ public:
     int matrix = 0;
     int64_t timestamp = 0;
     uint8_t* frameData = nullptr;
+    int bufferSize = 0;
     std::weak_ptr<nx::media::nvidia::NvidiaVideoDecoder> decoder;
+
+private:
+    std::vector<uint8_t> systemMemory;
 };
 
 } // namespace nx::media::nvidia
