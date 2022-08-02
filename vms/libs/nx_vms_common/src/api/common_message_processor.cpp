@@ -1193,17 +1193,17 @@ void QnCommonMessageProcessor::updateResource(const CameraData& camera, ec2::Not
 }
 
 void QnCommonMessageProcessor::updateResource(
-    const MediaServerData& server, ec2::NotificationSource source)
+    const MediaServerData& serverData, ec2::NotificationSource source)
 {
-    QnMediaServerResourcePtr qnServer(new QnMediaServerResource());
-    ec2::fromApiToResource(server, qnServer);
-    auto iter = m_serverUserAttributesCache.find(server.id);
+    QnMediaServerResourcePtr server = getResourceFactory()->createServer();
+    ec2::fromApiToResource(serverData, server);
+    auto iter = m_serverUserAttributesCache.find(serverData.id);
     if (iter != m_serverUserAttributesCache.cend())
     {
-        qnServer->setUserAttributes(iter->second);
+        server->setUserAttributes(iter->second);
         m_serverUserAttributesCache.erase(iter);
     }
-    updateResource(qnServer, source);
+    updateResource(server, source);
 }
 
 void QnCommonMessageProcessor::updateResource(

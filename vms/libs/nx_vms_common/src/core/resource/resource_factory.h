@@ -23,10 +23,12 @@ struct QnResourceParams
     QString vendor;
 };
 
-class QnResourceFactory
+class NX_VMS_COMMON_API QnResourceFactory
 {
 public:
     virtual ~QnResourceFactory() = default;
+
+    virtual QnMediaServerResourcePtr createServer() const;
 
     virtual QnResourcePtr createResource(
         const QnUuid &resourceTypeId, const QnResourceParams &params) = 0;

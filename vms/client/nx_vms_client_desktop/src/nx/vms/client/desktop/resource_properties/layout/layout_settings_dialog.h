@@ -19,6 +19,12 @@ class LayoutSettingsDialog:
     Q_OBJECT
     using base_type = GenericTabbedDialog;
 
+    enum class Tab
+    {
+        general,
+        background,
+    };
+
 public:
     explicit LayoutSettingsDialog(QWidget* parent = nullptr);
     virtual ~LayoutSettingsDialog() override;

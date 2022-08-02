@@ -655,6 +655,9 @@ ConditionWrapper isLoggedInToCloud();
 /** Check a condition only in the given scope */
 ConditionWrapper scoped(ActionScope scope, ConditionWrapper&& condition);
 
+/** Check if current layout fits the provided condition. */
+ConditionWrapper applyToCurrentLayout(ConditionWrapper&& condition);
+
 /** Check if current user has certain global permission. */
 ConditionWrapper hasGlobalPermission(GlobalPermission permission);
 

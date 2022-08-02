@@ -43,12 +43,15 @@ struct LayoutSettingsDialog::Private
         layout->setFixedSize(state.fixedSizeEnabled ? state.fixedSize : QSize());
 
         const auto& background = state.background;
-        layout->setBackgroundImageFilename(background.filename);
-        // Do not save size change if no image was set.
-        if (!background.filename.isEmpty())
+        if (background.supported)
         {
-            layout->setBackgroundSize({background.width.value, background.height.value});
-            layout->setBackgroundOpacity(0.01 * background.opacityPercent);
+            layout->setBackgroundImageFilename(background.filename);
+            // Do not save size change if no image was set.
+            if (!background.filename.isEmpty())
+            {
+                layout->setBackgroundSize({background.width.value, background.height.value});
+                layout->setBackgroundOpacity(0.01 * background.opacityPercent);
+            }
         }
     }
 };
@@ -82,12 +85,12 @@ LayoutSettingsDialog::LayoutSettingsDialog(QWidget* parent):
         });
 
     addPage(
-        0,
+        (int) Tab::general,
         generalTab,
         tr("General"));
 
     addPage(
-        1,
+        (int) Tab::background,
         d->backgroundTab,
         tr("Background"));
 }
@@ -107,6 +110,12 @@ bool LayoutSettingsDialog::setLayout(const QnLayoutResourcePtr& layout)
 void LayoutSettingsDialog::accept()
 {
     const auto& background = d->store->state().background;
+    if (!background.supported)
+    {
+        d->applyChanges();
+        base_type::accept();
+        return;
+    }
 
     switch (background.status)
     {
@@ -144,7 +153,8 @@ void LayoutSettingsDialog::accept()
 
 void LayoutSettingsDialog::loadState(const LayoutSettingsDialogState& state)
 {
-    const bool isLoading = state.background.loadingInProgress();
+    setPageVisible((int) Tab::background, state.background.supported);
+    const bool isLoading = state.background.supported && state.background.loadingInProgress();
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!isLoading);
 }
 

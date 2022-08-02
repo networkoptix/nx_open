@@ -4,9 +4,9 @@
 
 #include <memory>
 
-#include <core/resource/client_core_resource_fwd.h>
 #include <core/resource/resource.h>
 #include <nx/streaming/abstract_archive_resource.h>
+#include <nx/vms/client/core/resource/resource_fwd.h>
 
 class QnDesktopCameraConnection;
 
