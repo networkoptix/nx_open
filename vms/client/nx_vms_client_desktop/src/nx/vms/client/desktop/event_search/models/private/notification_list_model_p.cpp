@@ -179,38 +179,26 @@ void NotificationListModel::Private::onNotificationAction(
     eventData.timestamp = action->timestamp();
     eventData.level = QnNotificationLevel::convert(action->level());
     eventData.titleColor = QnNotificationLevel::notificationTextColor(eventData.level);
-    eventData.icon = pixmapForAction(action.get(), eventData.titleColor);
+    eventData.icon = pixmapForAction(action.get(), cloudSystemId, eventData.titleColor);
+    eventData.cloudSystemId = cloudSystemId;
 
-    if (!action->cameraId().isNull())
-    {
-        if (!cloudSystemId.isEmpty())
-        {
-            auto resourceDescriptor = descriptor(action->cameraId(), cloudSystemId);
-            eventData.source = getResourceByDescriptor(resourceDescriptor);
-            eventData.cloudSystemId = cloudSystemId;
-        }
-        else
-        {
-            eventData.source = resourcePool()->getResourceById(action->cameraId());
-        }
-
-        if (eventData.source)
-        {
-            if (auto camera = eventData.source.dynamicCast<QnVirtualCameraResource>())
-            {
-                eventData.previewCamera = camera;
-                eventData.cameras = {camera};
-            }
-        }
-    }
-
-    eventData.extraData =
-        QVariant::fromValue(ExtraData(action->ruleId(), eventData.source));
+    setupClientAction(action.get(), eventData);
 
     if (!this->q->addEvent(eventData))
         return;
 
     truncateToMaximumCount();
+}
+
+QnResourcePtr NotificationListModel::Private::getResource(
+    QnUuid resourceId,
+    const QString& cloudSystemId) const
+{
+    const auto resourceDescriptor = cloudSystemId.isEmpty()
+        ? nx::vms::common::ResourceDescriptor{.id = resourceId}
+        : descriptor(resourceId, cloudSystemId);
+
+    return getResourceByDescriptor(resourceDescriptor);
 }
 
 void NotificationListModel::Private::addNotification(const vms::event::AbstractActionPtr& action)
@@ -407,6 +395,69 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
         m_uuidHashes[action->getRuleId()][resource].insert(eventData.id);
 
     truncateToMaximumCount();
+}
+
+void NotificationListModel::Private::setupClientAction(
+    const nx::vms::rules::NotificationAction* action,
+    EventData& eventData) const
+{
+    using nx::vms::rules::ClientAction;
+
+    const auto camera = getResource(action->cameraId(), eventData.cloudSystemId)
+        .dynamicCast<QnVirtualCameraResource>();
+    const auto server = getResource(action->serverId(), eventData.cloudSystemId)
+        .dynamicCast<QnMediaServerResource>();
+
+    eventData.source = camera ? camera.staticCast<QnResource>() : server.staticCast<QnResource>();
+    eventData.extraData = QVariant::fromValue(ExtraData(action->ruleId(), eventData.source));
+
+    switch (action->clientAction())
+    {
+        case ClientAction::none:
+            break;
+
+        case ClientAction::poeSettings:
+            eventData.actionId = action::ServerSettingsAction;
+            eventData.actionParameters = action::Parameters(server);
+            eventData.actionParameters
+                .setArgument(Qn::FocusTabRole, QnServerSettingsDialog::PoePage);
+            break;
+
+        case ClientAction::cameraSettings:
+            eventData.actionId = action::CameraSettingsAction;
+            eventData.actionParameters = camera;
+            eventData.previewCamera = camera;
+            break;
+
+        case ClientAction::serverSettings:
+            eventData.actionId = action::ServerSettingsAction;
+            eventData.actionParameters = server;
+            break;
+
+        case ClientAction::licensesSettings:
+            eventData.actionId = action::PreferencesLicensesTabAction;
+            break;
+
+        case ClientAction::previewCamera:
+            eventData.cameras = {camera};
+            eventData.previewCamera = camera;
+            break;
+
+        case ClientAction::previewCameraOnTime:
+            eventData.cameras = {camera};
+            eventData.previewCamera = camera;
+            eventData.previewTime = action->timestamp();
+            break;
+
+        case ClientAction::browseUrl:
+            eventData.actionId = action::BrowseUrlAction;
+            eventData.actionParameters = {Qn::UrlRole, action->url()};
+            break;
+
+        default:
+            NX_ASSERT(false, "Unsupported client action");
+            break;
+    }
 }
 
 void NotificationListModel::Private::removeNotification(const vms::event::AbstractActionPtr& action)
@@ -651,6 +702,7 @@ QPixmap NotificationListModel::Private::pixmapForAction(
 
 QPixmap NotificationListModel::Private::pixmapForAction(
     const nx::vms::rules::NotificationAction* action,
+    const QString& cloudSystemId,
     const QColor& color) const
 {
     using nx::vms::event::Level;
@@ -690,7 +742,7 @@ QPixmap NotificationListModel::Private::pixmapForAction(
 
         case Icon::resource:
         {
-            const auto resource = resourcePool()->getResourceById(action->cameraId());
+            const auto resource = getResource(action->cameraId(), cloudSystemId);
             return toPixmap(resource
                 ? qnResIconCache->icon(resource)
                 : qnResIconCache->icon(QnResourceIconCache::Camera));
@@ -706,7 +758,6 @@ QPixmap NotificationListModel::Private::pixmapForAction(
             return {};
     }
 }
-
 
 int NotificationListModel::Private::maximumCount() const
 {
