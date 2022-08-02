@@ -10188,7 +10188,7 @@ You can view %2 or read this %3 to learn more about the current problem.</source
     </message>
     <message>
       <source>SD archive found</source>
-      <translation type="unfinished">SD archive found</translation>
+      <translation>發現儲存於終端裝置上的錄影檔案</translation>
     </message>
     <message>
       <source>Export in progress...</source>
@@ -10196,23 +10196,23 @@ You can view %2 or read this %3 to learn more about the current problem.</source
     </message>
     <message>
       <source>Export archive from %1 completed</source>
-      <translation type="unfinished">Export archive from %1 completed</translation>
+      <translation>從 %1 匯入錄影已完成</translation>
     </message>
     <message>
       <source>Export archive from %1 failed</source>
-      <translation type="unfinished">Export archive from %1 failed</translation>
+      <translation>從 %1 匯入錄影失敗</translation>
     </message>
     <message>
       <source>Not exported archive found on Device %1</source>
-      <translation type="unfinished">Not exported archive found on Device %1</translation>
+      <translation>在設備%1上發現尚未匯入的錄影檔案</translation>
     </message>
     <message>
       <source>Not exported archive found on Camera %1</source>
-      <translation type="unfinished">Not exported archive found on Camera %1</translation>
+      <translation>在攝影機%1上發現尚未匯入的錄影檔案</translation>
     </message>
     <message>
       <source>Export archive from %1</source>
-      <translation>從%1 匯出錄影資料</translation>
+      <translation>從%1 匯入錄影資料</translation>
     </message>
     <message>
       <source>Export</source>
