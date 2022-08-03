@@ -1532,7 +1532,7 @@
     </message>
     <message>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>&quot;表示先&quot; 行でユーザーを選択すると、そのユーザーのローカルレイアウトがリストに表示されます</translation>
+      <translation>&quot;表示先&quot; 行でユーザー1名を選択すると、そのユーザーのローカルレイアウトがリストに表示されます</translation>
     </message>
   </context>
   <context>
