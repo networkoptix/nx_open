@@ -137,7 +137,9 @@ public:
 
 private:
     void updateSystems();
-    void updateSystemsInternal(int triesCount);
+
+    /** @return Whether request was actually sent. */
+    bool updateSystemsInternal(int triesCount);
     void setCloudSystems(const QnCloudSystemList &newCloudSystems);
     void setRecentCloudSystems(const QnCloudSystemList &newRecentSystems);
     void updateCurrentCloudUserSecuritySettings();
@@ -431,27 +433,19 @@ void QnCloudStatusWatcherPrivate::updateStatusFromResultCode(api::ResultCode res
     }
 }
 
-void QnCloudStatusWatcherPrivate::updateSystemsInternal(int triesCount)
+bool QnCloudStatusWatcherPrivate::updateSystemsInternal(int triesCount)
 {
-    if (!hasUpdateSystemsRequest)
-        return;
-
-    auto hasUpdateRequestRollback = nx::utils::makeScopeGuard(
-        [this](){ hasUpdateSystemsRequest = false; }); //< Reset in case of return.
-
     if (!cloudConnection || m_authData.credentials.authToken.empty())
-        return;
+        return false;
 
     if (status == QnCloudStatusWatcher::LoggedOut)
-        return;
+        return false;
 
     if (!checkSuppressed())
-        return;
+        return false;
 
     if (triesCount <= 0)
-        return;
-
-    hasUpdateRequestRollback.disarm(); //< Request is still actual.
+        return false;
 
     auto handler = nx::utils::AsyncHandlerExecutor(this).bind(
         [this, triesCount](api::ResultCode result, const api::SystemDataExList& systemsList)
@@ -493,6 +487,7 @@ void QnCloudStatusWatcherPrivate::updateSystemsInternal(int triesCount)
 
     NX_DEBUG(this, "Updating systems list");
     cloudConnection->systemManager()->getSystemsFiltered(api::Filter(), std::move(handler));
+    return true;
 }
 
 void QnCloudStatusWatcherPrivate::updateSystems()
@@ -502,8 +497,7 @@ void QnCloudStatusWatcherPrivate::updateSystems()
     if (hasUpdateSystemsRequest)
         return;
 
-    hasUpdateSystemsRequest = true;
-    updateSystemsInternal(/*triesCount*/ kUpdateSystemsTriesCount);
+    hasUpdateSystemsRequest = updateSystemsInternal(kUpdateSystemsTriesCount);
 }
 
 void QnCloudStatusWatcherPrivate::resetCloudConnection()
