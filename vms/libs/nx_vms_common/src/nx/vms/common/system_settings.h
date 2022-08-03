@@ -39,6 +39,7 @@ struct SystemSettingNames
     DECLARE_SETTING_NAME(cloudAccountName);
     DECLARE_SETTING_NAME(cloudAuthKey);
     DECLARE_SETTING_NAME(cloudHost);
+    DECLARE_SETTING_NAME(cloudNotificationsLanguage);
     DECLARE_SETTING_NAME(cloudSystemID); //< TODO: rename it to cloudSystemId
     DECLARE_SETTING_NAME(disabledVendors);
     DECLARE_SETTING_NAME(insecureDeprecatedApiEnabled);
@@ -437,8 +438,8 @@ public:
 
     nx::utils::Url resourceFileUri() const;
 
-    QString pushNotificationsLanguage() const;
-    void setPushNotificationsLanguage(const QString& value);
+    QString cloudNotificationsLanguage() const;
+    void setCloudNotificationsLanguage(const QString& value);
 
     QString additionalLocalFsTypes() const;
 
@@ -518,7 +519,7 @@ signals:
     void remoteSessionUpdateChanged();
     void useStorageEncryptionChanged();
     void currentStorageEncryptionKeyChanged();
-    void pushNotificationsLanguageChanged();
+    void cloudNotificationsLanguageChanged();
     void showServersInTreeForNonAdminsChanged();
     void backupSettingsChanged();
     void showMouseTimelinePreviewChanged();
@@ -665,7 +666,7 @@ private:
     QnResourcePropertyAdaptor<std::map<QString, int>>* m_specificFeaturesAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_licenseServerUrlAdaptor = nullptr;
     QnResourcePropertyAdaptor<nx::utils::Url>* m_resourceFileUriAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_pushNotificationsLanguageAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_cloudNotificationsLanguageAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_additionalLocalFsTypesAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_keepIoPortStateIntactOnInitializationAdaptor= nullptr;
     QnResourcePropertyAdaptor<int>* m_mediaBufferSizeKbAdaptor = nullptr;

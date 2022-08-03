@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <nx/vms/utils/translation/scoped_locale.h>
+
 #include "rules_fwd.h"
 
 namespace nx::vms::rules {
@@ -21,6 +23,10 @@ public:
         QObject(parent)
     {}
 
+    virtual nx::vms::utils::ScopedLocalePtr translateAction(const QString& actionType)
+    {
+        return nullptr;
+    };
     virtual void initialize(Engine* engine) {};
     virtual void execute(const ActionPtr& action) = 0;
 };
