@@ -688,9 +688,9 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Names::specificFeatures, std::map<QString, int>{}, this,
         [] { return tr("VMS Server version specific features"); });
 
-    m_pushNotificationsLanguageAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        "pushNotificationsLanguage", "", this,
-        [] { return tr("Language for mobile push notifications"); });
+    m_cloudNotificationsLanguageAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
+        Names::cloudNotificationsLanguage, "", this,
+        [] { return tr("Language for Cloud notifications"); });
 
     m_additionalLocalFsTypesAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         "additionalLocalFsTypes", "", this,
@@ -1015,10 +1015,10 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Qt::QueuedConnection);
 
     connect(
-        m_pushNotificationsLanguageAdaptor,
+        m_cloudNotificationsLanguageAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
-        &SystemSettings::pushNotificationsLanguageChanged,
+        &SystemSettings::cloudNotificationsLanguageChanged,
         Qt::QueuedConnection);
 
     connect(
@@ -1102,7 +1102,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << m_targetPersistentUpdateStorageAdaptor
         << m_installedPersistentUpdateStorageAdaptor
         << m_specificFeaturesAdaptor
-        << m_pushNotificationsLanguageAdaptor
+        << m_cloudNotificationsLanguageAdaptor
         << m_additionalLocalFsTypesAdaptor
         << m_keepIoPortStateIntactOnInitializationAdaptor
         << m_mediaBufferSizeKbAdaptor
@@ -2019,14 +2019,14 @@ nx::utils::Url SystemSettings::resourceFileUri() const
     return m_resourceFileUriAdaptor->value();
 }
 
-QString SystemSettings::pushNotificationsLanguage() const
+QString SystemSettings::cloudNotificationsLanguage() const
 {
-    return m_pushNotificationsLanguageAdaptor->value();
+    return m_cloudNotificationsLanguageAdaptor->value();
 }
 
-void SystemSettings::setPushNotificationsLanguage(const QString& value)
+void SystemSettings::setCloudNotificationsLanguage(const QString& value)
 {
-    m_pushNotificationsLanguageAdaptor->setValue(value);
+    m_cloudNotificationsLanguageAdaptor->setValue(value);
 }
 
 bool SystemSettings::keepIoPortStateIntactOnInitialization() const
