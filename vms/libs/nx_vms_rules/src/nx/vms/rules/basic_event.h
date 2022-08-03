@@ -92,6 +92,12 @@ protected:
 
     QString extendedCaption() const;
 
+    /**
+    * Returns event source to display in notification tile and tooltip.
+    * Keep in sync with AbstractEvent.getResource().
+    */
+    QnUuid sourceId() const;
+
 private:
     QString m_type;
     std::chrono::microseconds m_timestamp;

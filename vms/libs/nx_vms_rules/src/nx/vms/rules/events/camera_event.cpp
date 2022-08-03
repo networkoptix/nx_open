@@ -33,7 +33,6 @@ QVariantMap CameraEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);
 
-    utils::insertIfValid(result, utils::kSourceIdDetailName, QVariant::fromValue(cameraId()));
     result.insert(utils::kHasScreenshotDetailName, true);
     result.insert(utils::kScreenshotLifetimeDetailName, QVariant::fromValue(utils::kScreenshotLifetime));
     result.insert(utils::kSourceStatusDetailName, QVariant::fromValue(sourceStatus(context)));

@@ -4,11 +4,11 @@
 
 #include <QtCore/QMetaProperty>
 
-#include <nx/vms/time/formatter.h>
 #include <nx/utils/metatypes.h>
 
 #include "engine.h"
 #include "utils/event_details.h"
+#include "utils/field.h"
 #include "utils/type.h"
 
 namespace nx::vms::rules {
@@ -77,6 +77,9 @@ QVariantMap BasicEvent::details(common::SystemContext*) const
     utils::insertIfNotEmpty(result, utils::kNameDetailName, name());
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption());
 
+    if (const auto source = sourceId(); !source.isNull())
+        result[utils::kSourceIdDetailName] = QVariant::fromValue(source);
+
     return result;
 }
 
@@ -89,6 +92,19 @@ QString BasicEvent::name() const
 QString BasicEvent::extendedCaption() const
 {
     return tr("%1 event has occurred").arg(name());
+}
+
+QnUuid BasicEvent::sourceId() const
+{
+    const auto getId = [this](const char* propName){ return property(propName).value<QnUuid>(); };
+
+    if (const auto cameraId = getId(utils::kCameraIdFieldName); !cameraId.isNull())
+        return cameraId;
+
+    if (const auto serverId = getId(utils::kServerIdFieldName); !serverId.isNull())
+        return serverId;
+
+    return {};
 }
 
 } // namespace nx::vms::rules
