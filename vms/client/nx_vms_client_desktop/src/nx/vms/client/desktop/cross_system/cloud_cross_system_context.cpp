@@ -210,7 +210,10 @@ struct CloudCrossSystemContext::Private
         for (const auto& server: servers)
         {
             if (server.id == this->server->getId())
+            {
+                this->server->setName(server.name);
                 continue;
+            }
 
             const QString cloudAddress = core::helpers::serverCloudHost(cloudSystemId, server.id);
 
@@ -218,6 +221,7 @@ struct CloudCrossSystemContext::Private
                 server.id,
                 cloudAddress.toStdString(),
                 systemContext->connection()));
+            newServer->setName(server.name);
 
             newServers.push_back(newServer);
         }

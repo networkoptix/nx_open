@@ -39,7 +39,6 @@ QVariantMap DeviceDisconnectedEvent::details(common::SystemContext* context) con
 
     utils::insertIfNotEmpty(result, utils::kCaptionDetailName, caption(context));
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
-    utils::insertIfValid(result, utils::kSourceIdDetailName, QVariant::fromValue(m_cameraId));
     result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
     utils::insertLevel(result, nx::vms::event::Level::critical);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::cameraSettings);

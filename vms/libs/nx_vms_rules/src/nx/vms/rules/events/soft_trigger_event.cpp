@@ -54,7 +54,6 @@ QVariantMap SoftTriggerEvent::details(common::SystemContext* context) const
     auto result = BasicEvent::details(context);
 
     utils::insertIfNotEmpty(result, utils::kCaptionDetailName, caption());
-    utils::insertIfValid(result, utils::kSourceIdDetailName, QVariant::fromValue(cameraId()));
     utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing());
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
     utils::insertIfNotEmpty(result, utils::kTriggerNameDetailName, trigger());
