@@ -102,7 +102,7 @@ void QnSystemSettingsWidget::loadDataToUi()
     ui->statisticsReportCheckBox->setChecked(globalSettings()->isStatisticsAllowed());
 
     const bool connectedToCloud = !globalSettings()->cloudSystemId().isNull();
-    const bool hasCustomLanguage = !globalSettings()->pushNotificationsLanguage().isEmpty();
+    const bool hasCustomLanguage = !globalSettings()->cloudNotificationsLanguage().isEmpty();
 
     ui->customNotificationLanguageCheckBox->setVisible(connectedToCloud);
     ui->customNotificationLanguageCheckBox->setChecked(hasCustomLanguage);
@@ -110,7 +110,7 @@ void QnSystemSettingsWidget::loadDataToUi()
 
     int defaultLanguageIndex = -1;
     int currentLanguage = -1;
-    QString locale = globalSettings()->pushNotificationsLanguage();
+    QString locale = globalSettings()->cloudNotificationsLanguage();
     for (int i = 0; i < ui->languageComboBox->count(); i++)
     {
         const auto& translation = ui->languageComboBox->itemData(
@@ -148,7 +148,7 @@ void QnSystemSettingsWidget::applyChanges()
             QnTranslationListModel::TranslationRole)
             .value<TranslationInfo>().localeCode;
 
-        globalSettings()->setPushNotificationsLanguage(
+        globalSettings()->setCloudNotificationsLanguage(
             ui->customNotificationLanguageCheckBox->isChecked() ? locale : QString());
     }
 
@@ -175,7 +175,7 @@ bool QnSystemSettingsWidget::hasChanges() const
 
     if (!globalSettings()->cloudSystemId().isNull())
     {
-        const auto& currentLocale = globalSettings()->pushNotificationsLanguage();
+        const auto& currentLocale = globalSettings()->cloudNotificationsLanguage();
 
         if (ui->customNotificationLanguageCheckBox->isChecked() != !currentLocale.isEmpty())
             return true;

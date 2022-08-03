@@ -268,7 +268,7 @@ void SimplifiedRule::watchOn(QObject* object) const
     if(!NX_ASSERT(updateMetaMethod.isValid()))
         return;
 
-    const auto propertyNames = utils::propertyNames(object);
+    const auto propertyNames = nx::utils::propertyNames(object);
     const auto metaObject = object->metaObject();
     for (const auto propertyName: propertyNames)
     {
