@@ -566,6 +566,7 @@ void QnWorkbench::submit(QnWorkbenchState& state)
             // Ignore other service layouts, e.g. videowall control layouts.
             if (layout->hasFlags(Qn::local) || layout->isServiceLayout())
                 return false;
+
             return true;
         };
 
