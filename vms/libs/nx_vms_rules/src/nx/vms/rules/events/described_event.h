@@ -29,6 +29,8 @@ protected:
         const QString& caption,
         const QString& description);
 
+    QString extraCaption() const;
+
 private:
     QString m_caption;
     QString m_description;
