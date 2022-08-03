@@ -10,7 +10,6 @@
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/rules/ini.h>
 #include <nx/vms/utils/translation/scoped_locale.h>
-#include <nx/vms/utils/translation/translation_manager.h>
 #include <utils/common/synctime.h>
 
 #include "action_builder.h"
