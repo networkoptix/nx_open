@@ -126,7 +126,9 @@ QnVirtualCameraResourceList EventListModel::Private::accessibleCameras(const Eve
     return event.cameras.filtered(
         [this](const QnVirtualCameraResourcePtr& camera) -> bool
         {
-            return q->accessController()->hasPermissions(camera, Qn::ViewContentPermission);
+            auto systemContext = SystemContext::fromResource(camera);
+            auto accessController = systemContext->accessController();
+            return accessController->hasPermissions(camera, Qn::ViewContentPermission);
         });
 }
 
