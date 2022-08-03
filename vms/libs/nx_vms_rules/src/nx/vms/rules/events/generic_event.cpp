@@ -32,6 +32,7 @@ QVariantMap GenericEvent::details(common::SystemContext* context) const
 {
     auto result = base_type::details(context);
 
+    utils::insertIfNotEmpty(result, utils::kExtraCaptionDetailName, extraCaption());
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption());
     utils::insertIfNotEmpty(result, utils::kDetailingDetailName, description());
     utils::insertIfNotEmpty(result, utils::kSourceNameDetailName, source());
