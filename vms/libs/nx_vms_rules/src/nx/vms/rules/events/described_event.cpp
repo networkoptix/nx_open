@@ -47,4 +47,9 @@ QVariantMap DescribedEvent::details(common::SystemContext* context) const
     return result;
 }
 
+QString DescribedEvent::extraCaption() const
+{
+    return (!m_caption.isEmpty() && !m_description.startsWith(m_caption)) ? m_caption : QString();
+}
+
 } // namespace nx::vms::rules

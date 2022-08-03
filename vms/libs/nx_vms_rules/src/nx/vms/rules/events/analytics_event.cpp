@@ -60,6 +60,7 @@ QVariantMap AnalyticsEvent::details(common::SystemContext* context) const
     if (!result.contains(utils::kCaptionDetailName))
         utils::insertIfNotEmpty(result, utils::kCaptionDetailName, analyticsEventCaption(context));
 
+    utils::insertIfNotEmpty(result, utils::kExtraCaptionDetailName, extraCaption());
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
     result.insert(utils::kHasScreenshotDetailName, true);
     utils::insertIfNotEmpty(result, utils::kAnalyticsEventTypeDetailName, analyticsEventCaption(context));
