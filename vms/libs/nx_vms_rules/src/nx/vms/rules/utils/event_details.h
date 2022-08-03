@@ -20,8 +20,11 @@ static constexpr auto kCountDetailName = "count";
 static constexpr auto kCustomIconDetailName = "customIcon";
 static constexpr auto kDescriptionDetailName = "description";
 static constexpr auto kDetailingDetailName = "detailing";
-static constexpr auto kExtendedCaptionDetailName = "extendedCaption";
 static constexpr auto kEmailTemplatePathDetailName = "emailTemplate";
+// Verbose event caption with resource name. Used as email subject.
+static constexpr auto kExtendedCaptionDetailName = "extendedCaption";
+// Separate 'Caption' line in notification tooltip.
+static constexpr auto kExtraCaptionDetailName = "extraCaption";
 static constexpr auto kHasScreenshotDetailName = "hasTimestamp";
 static constexpr auto kIconDetailName = "icon";
 static constexpr auto kLevelDetailName = "level";

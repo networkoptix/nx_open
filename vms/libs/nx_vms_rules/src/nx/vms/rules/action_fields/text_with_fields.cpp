@@ -95,7 +95,7 @@ QString eventTooltip(const AggregatedEventPtr& eventAggregator, common::SystemCo
         result << TextWithFields::tr("Plugin: %1").arg(pluginName);
     }
 
-    if (const auto caption = details.value(utils::kCaptionDetailName).toString();
+    if (const auto caption = details.value(utils::kExtraCaptionDetailName).toString();
         !caption.isEmpty())
     {
         result << TextWithFields::tr("Caption: %1").arg(caption);
