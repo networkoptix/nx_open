@@ -63,6 +63,8 @@ public:
     virtual QVariant minValue() const = 0;
 
     virtual QVariant maxValue() const = 0;
+
+    Q_INVOKABLE virtual bool isSupported(QnUuid engineId, QnUuid deviceId) const = 0;
 };
 
 } // namespace nx::analytics::taxonomy

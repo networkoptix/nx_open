@@ -4,8 +4,9 @@
 
 #include "abstract_event_type.h"
 #include "abstract_group.h"
+#include "abstract_object_type.h"
 #include "abstract_scope.h"
-#include "proxy_object_type_attribute.h"
+#include "proxy_attribute.h"
 
 namespace nx::analytics::taxonomy {
 
@@ -43,43 +44,90 @@ AttributeType toDescriptorAttributeType(AbstractAttribute::Type attributeType)
     }
 }
 
-void pathsFromTree(
-    std::set<QString>* inOutPaths,
-    const AttributeTree& attributeTree,
-    const QString& prefix)
+std::map<QnUuid, std::set<QnUuid>> propagateOwnSupport(
+    AttributeSupportInfoTree* inOutAttributeSupportInfoTree)
 {
-    for (const auto& [attributeName, subTree]: attributeTree.children)
+    if (inOutAttributeSupportInfoTree->nestedAttributeSupportInfo.empty())
+        return inOutAttributeSupportInfoTree->ownSupportInfo;
+
+    for (auto& [nestedAttributeName, nestedAttributeSupportInfoTree]:
+        inOutAttributeSupportInfoTree->nestedAttributeSupportInfo)
     {
-        if (subTree.children.empty())
-            inOutPaths->insert(prefix + attributeName);
-        else
-            pathsFromTree(inOutPaths, subTree, prefix + attributeName + ".");
+        for (auto& [engineId, deviceIds]:
+            propagateOwnSupport(&nestedAttributeSupportInfoTree))
+        {
+            inOutAttributeSupportInfoTree->ownSupportInfo[engineId]
+                .insert(deviceIds.begin(), deviceIds.end());
+        }
     }
+
+    return inOutAttributeSupportInfoTree->ownSupportInfo;
+}
+
+std::map<QString, AttributeSupportInfoTree> buildAttributeSupportInfoTree(
+    const std::vector<AbstractAttribute*>& attributes,
+    std::map<QString, std::map<QnUuid, std::set<QnUuid>>> supportInfo)
+{
+    std::map<QString, AttributeSupportInfoTree> result;
+
+    std::vector<AbstractAttribute*> objectTypeAttributes;
+    for (AbstractAttribute* attribute: attributes)
+    {
+        const QString& attributeName = attribute->name();
+        if (auto it = supportInfo.find(attributeName); it != supportInfo.cend())
+        {
+            result[attributeName].ownSupportInfo = std::move(it->second);
+            supportInfo.erase(it);
+        }
+
+        if (attribute->type() == AbstractAttribute::Type::object)
+        {
+            objectTypeAttributes.push_back(attribute);
+        }
+    }
+
+    for (const AbstractAttribute* objectTypeAttribute: objectTypeAttributes)
+    {
+        const AbstractObjectType* objectType = objectTypeAttribute->objectType();
+        if (!NX_ASSERT(objectType))
+            continue;
+
+        const QString prefix = objectTypeAttribute->name() + ".";
+        auto lowerBoundIt = supportInfo.lower_bound(prefix);
+
+        std::map<QString, std::map<QnUuid, std::set<QnUuid>>> nestedSupportInfo;
+        while (lowerBoundIt != supportInfo.cend() && lowerBoundIt->first.startsWith(prefix))
+        {
+            nestedSupportInfo[lowerBoundIt->first.mid(prefix.length())] =
+                supportInfo[lowerBoundIt->first];
+            ++lowerBoundIt;
+        }
+
+        if (nestedSupportInfo.empty())
+            continue;
+
+        result[objectTypeAttribute->name()].nestedAttributeSupportInfo =
+            buildAttributeSupportInfoTree(objectType->attributes(), nestedSupportInfo);
+    }
+
+    for (auto& [_, attributeSupportInfoTree]: result)
+        propagateOwnSupport(&attributeSupportInfoTree);
+
+    return result;
 }
 
 std::vector<AbstractAttribute*> makeSupportedAttributes(
-    const std::vector<AbstractAttribute*>& allAttributes,
-    const AttributeTree& supportedAttributeTree)
+    const std::vector<AbstractAttribute*>& attributes,
+    std::map<QString, std::map<QnUuid, std::set<QnUuid>>> supportInfo)
 {
+    std::map<QString, AttributeSupportInfoTree> supportInfoTree =
+        buildAttributeSupportInfoTree(attributes, std::move(supportInfo));
+
     std::vector<AbstractAttribute*> result;
-
-    for (AbstractAttribute* attribute: allAttributes)
+    for (AbstractAttribute* attribute: attributes)
     {
-        const QString attributeName = attribute->name();
-        if (!contains(supportedAttributeTree.children, attributeName))
-            continue;
-
-        if (attribute->type() != AbstractAttribute::Type::object)
-        {
-            result.push_back(attribute);
-        }
-        else
-        {
-            result.push_back(
-                new ProxyObjectTypeAttribute(
-                    attribute,
-                    supportedAttributeTree.children.at(attributeName)));
-        }
+        result.push_back(new ProxyAttribute(
+            attribute, std::move(supportInfoTree[attribute->name()])));
     }
 
     return result;

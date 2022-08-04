@@ -2,19 +2,25 @@
 
 #pragma once
 
-#include <set>
-
 #include <nx/analytics/taxonomy/abstract_attribute.h>
 #include <nx/analytics/taxonomy/utils.h>
 
 namespace nx::analytics::taxonomy {
 
-class ProxyObjectTypeAttribute: public AbstractAttribute
+/**
+ * Attributes sometimes need to be wrapped to Proxy Attributes because under different
+ * circumstances they can have different lists of Device Agents that support them. For example,
+ * some Object Type will likely have different support lists for its different roles: as a
+ * standalone Analytics Object, or as an Attribute of some other Object.
+ */
+class ProxyAttribute: public AbstractAttribute
 {
 public:
-    ProxyObjectTypeAttribute(
-        AbstractAttribute* proxiedAttribute,
-        AttributeTree supportedAttributeTree);
+    ProxyAttribute(
+        AbstractAttribute* attribute,
+        AttributeSupportInfoTree attributeSupportInfoTree);
+
+    virtual ~ProxyAttribute() override;
 
     virtual QString name() const override;
 
@@ -34,11 +40,12 @@ public:
 
     virtual QVariant maxValue() const override;
 
+    virtual bool isSupported(QnUuid engineId, QnUuid deviceId) const override;
+
 private:
     AbstractAttribute* m_proxiedAttribute = nullptr;
-    AttributeTree m_supportedAttributeTree;
-
-    mutable AbstractObjectType* m_proxyObjectType = nullptr;
+    AbstractObjectType* m_proxyObjectType = nullptr;
+    std::map<QnUuid, std::set<QnUuid>> m_ownSupportInfo;
 };
 
 } // namespace nx::analytics::taxonomy

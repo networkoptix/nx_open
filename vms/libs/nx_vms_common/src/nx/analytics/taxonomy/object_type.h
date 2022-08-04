@@ -60,10 +60,9 @@ public:
 
     void resolve(InternalState* inOutInternalState, ErrorHandler* errorHandler);
 
-    AttributeTree getSupportedAttributeTree(
-        std::set<QString> allowedAttributePaths, InternalState* internalState) const;
-
     void resolveSupportedAttributes(InternalState* inOutInternalState, ErrorHandler* errorHandler);
+
+    void resolvePrivateness();
 
 private:
     void resolveScopes(InternalState* inOutInternalState, ErrorHandler* errorHandler);

@@ -17,25 +17,25 @@ bool contains(const Container& container, const Item& item)
     return container.find(item) != container.cend();
 }
 
+struct AttributeSupportInfoTree
+{
+    std::map<QnUuid, std::set<QnUuid>> ownSupportInfo;
+    std::map<QString, AttributeSupportInfoTree> nestedAttributeSupportInfo;
+};
+
+std::map<QString, AttributeSupportInfoTree> buildAttributeSupportInfoTree(
+    const std::vector<AbstractAttribute*>& attributes,
+    std::map<QString, std::map<QnUuid, std::set<QnUuid>>> supportInfo);
+
+std::vector<AbstractAttribute*> makeSupportedAttributes(
+    const std::vector<AbstractAttribute*>& attributes,
+    std::map<QString, std::map<QnUuid, std::set<QnUuid>>> supportInfo);
+
 AbstractAttribute::Type fromDescriptorAttributeType(
     nx::vms::api::analytics::AttributeType attributeType);
 
 nx::vms::api::analytics::AttributeType toDescriptorAttributeType(
     AbstractAttribute::Type attributeType);
-
-struct AttributeTree
-{
-    std::map<QString, AttributeTree> children;
-};
-
-void pathsFromTree(
-    std::set<QString>* inOutPaths,
-    const AttributeTree& attributeTree,
-    const QString& prefix = QString());
-
-std::vector<AbstractAttribute*> makeSupportedAttributes(
-    const std::vector<AbstractAttribute*>& allAttributes,
-    const AttributeTree& supportedAttributeTree);
 
 NX_VMS_COMMON_API bool eventBelongsToGroup(
     const AbstractEventType* eventType,

@@ -47,6 +47,14 @@ private:
         nx::vms::api::analytics::AttributeDescription* inOutAttributeDescription,
         const AbstractAttribute* baseAttribute);
 
+    Attribute* resolveBooleanAttribute(
+        nx::vms::api::analytics::AttributeDescription* inOutAttributeDescription,
+        const AbstractAttribute* baseAttribute);
+
+    Attribute* resolveStringAttribute(
+        nx::vms::api::analytics::AttributeDescription* inOutAttributeDescription,
+        const AbstractAttribute* baseAttribute);
+
     Attribute* resolveNumberAttribute(
         nx::vms::api::analytics::AttributeDescription* inOutAttributeDescription,
         const AbstractAttribute* baseAttribute);

@@ -71,7 +71,10 @@ NX_REFLECTION_INSTRUMENT(ExpectedData, ExpectedData_Fields);
 
 struct InputData
 {
-    using AttributeSupportInfo = std::map<QString, std::set<QnUuid>>;
+    using AttributeSupportInfo = std::map<
+        QString /*attributeName*/,
+        std::map<QnUuid /*engineId*/, std::set<QnUuid /*deviceId*/>>
+    >;
 
     std::vector<QString> objectTypes;
     std::map<QString, AttributeSupportInfo> attributeSupportInfo;
