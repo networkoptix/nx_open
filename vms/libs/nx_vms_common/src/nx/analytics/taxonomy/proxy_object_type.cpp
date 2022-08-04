@@ -4,15 +4,17 @@
 
 #include <nx/analytics/taxonomy/utils.h>
 
+#include "proxy_attribute.h"
+
 namespace nx::analytics::taxonomy {
 
 ProxyObjectType::ProxyObjectType(
     AbstractObjectType* proxiedObjectType,
-    AttributeTree supportedAttributeTree)
+    std::map<QString, AttributeSupportInfoTree> attributeSupportInfoTree)
     :
     AbstractObjectType(proxiedObjectType),
     m_proxiedObjectType(proxiedObjectType),
-    m_supportedAttributeTree(std::move(supportedAttributeTree))
+    m_attributeSupportInfoTree(std::move(attributeSupportInfoTree))
 {
 }
 
@@ -56,7 +58,18 @@ std::vector<AbstractAttribute*> ProxyObjectType::supportedAttributes() const
     if (m_supportedAttributes)
         return *m_supportedAttributes;
 
-    m_supportedAttributes = makeSupportedAttributes(this->attributes(), m_supportedAttributeTree);
+    m_supportedAttributes = std::vector<AbstractAttribute*>();
+    for (AbstractAttribute* attribute: this->attributes())
+    {
+        if (m_attributeSupportInfoTree.contains(attribute->name()))
+        {
+            auto proxyAttribute = new ProxyAttribute(
+                attribute,
+                m_attributeSupportInfoTree[attribute->name()]);
+
+            m_supportedAttributes->push_back(proxyAttribute);
+        }
+    }
 
     return *m_supportedAttributes;
 }
@@ -66,8 +79,18 @@ std::vector<AbstractAttribute*> ProxyObjectType::supportedOwnAttributes() const
     if (m_supportedOwnAttributes)
         return *m_supportedOwnAttributes;
 
-    m_supportedAttributes = makeSupportedAttributes(
-        this->ownAttributes(), m_supportedAttributeTree);
+    m_supportedOwnAttributes = std::vector<AbstractAttribute*>();
+    for (AbstractAttribute* attribute: this->ownAttributes())
+    {
+        if (m_attributeSupportInfoTree.contains(attribute->name()))
+        {
+            auto proxyAttribute = new ProxyAttribute(
+                attribute,
+                m_attributeSupportInfoTree[attribute->name()]);
+
+            m_supportedOwnAttributes->push_back(proxyAttribute);
+        }
+    }
 
     return *m_supportedOwnAttributes;
 }

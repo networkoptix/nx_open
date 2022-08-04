@@ -3,6 +3,7 @@
 #include "attribute.h"
 
 #include <nx/analytics/taxonomy/common.h>
+#include <nx/analytics/taxonomy/proxy_object_type.h>
 #include <nx/analytics/taxonomy/utils.h>
 
 namespace nx::analytics::taxonomy {
@@ -16,6 +17,44 @@ Attribute::Attribute(
     AbstractAttribute(parent),
     m_attributeDescription(std::move(attributeDescription))
 {
+    NX_ASSERT(m_attributeDescription.type == nx::vms::api::analytics::AttributeType::boolean
+        || m_attributeDescription.type == nx::vms::api::analytics::AttributeType::string
+        || m_attributeDescription.type == nx::vms::api::analytics::AttributeType::number);
+}
+
+Attribute::Attribute(
+    nx::vms::api::analytics::AttributeDescription attributeDescription,
+    AbstractObjectType* objectType,
+    QObject* parent)
+    :
+    AbstractAttribute(parent),
+    m_attributeDescription(std::move(attributeDescription)),
+    m_objectType(objectType)
+{
+}
+
+Attribute::Attribute(
+    nx::vms::api::analytics::AttributeDescription attributeDescription,
+    AbstractEnumType* enumType,
+    QObject* parent)
+    :
+    AbstractAttribute(parent),
+    m_attributeDescription(std::move(attributeDescription)),
+    m_enumType(enumType)
+{
+    NX_ASSERT(m_attributeDescription.type == nx::vms::api::analytics::AttributeType::enumeration);
+}
+
+Attribute::Attribute(
+    nx::vms::api::analytics::AttributeDescription attributeDescription,
+    AbstractColorType* colorType,
+    QObject* parent)
+    :
+    AbstractAttribute(parent),
+    m_attributeDescription(std::move(attributeDescription)),
+    m_colorType(colorType)
+{
+    NX_ASSERT(m_attributeDescription.type == nx::vms::api::analytics::AttributeType::color);
 }
 
 QString Attribute::name() const
@@ -115,22 +154,9 @@ QVariant Attribute::maxValue() const
     return QVariant();
 }
 
-void Attribute::setEnumType(AbstractEnumType* enumType)
+bool Attribute::isSupported(QnUuid engineId, QnUuid deviceId) const
 {
-    NX_ASSERT(fromDescriptorAttributeType(m_attributeDescription.type) == Type::enumeration);
-    m_enumType = enumType;
-}
-
-void Attribute::setObjectType(AbstractObjectType* objectType)
-{
-    NX_ASSERT(fromDescriptorAttributeType(m_attributeDescription.type) == Type::object);
-    m_objectType = objectType;
-}
-
-void Attribute::setColorType(AbstractColorType* colorType)
-{
-    NX_ASSERT(fromDescriptorAttributeType(m_attributeDescription.type) == Type::color);
-    m_colorType = colorType;
+    return false;
 }
 
 void Attribute::setBaseAttribute(AbstractAttribute* attribute)

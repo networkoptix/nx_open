@@ -27,7 +27,10 @@
                 }
             ],
             "scopes": [
-                { "engineId": "9fee3a77-8200-4e55-97fb-04fae8a78da6" }
+                {
+                    "engineId": "9fee3a77-8200-4e55-97fb-04fae8a78da6",
+                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                }
             ]
         },
         "base.object.type.2": {
@@ -41,7 +44,10 @@
                 }
             ],
             "scopes": [
-                { "engineId": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73" }
+                {
+                    "engineId": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73",
+                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                }
             ]
         },
         "base.object.type.3": {
@@ -55,7 +61,10 @@
                 }
             ],
             "scopes": [
-                { "engineId": "0a89f20b-9827-434d-b75c-c18866d6b993" }
+                {
+                    "engineId": "0a89f20b-9827-434d-b75c-c18866d6b993",
+                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                }
             ]
         },
         "base.object.type.4": {
@@ -69,8 +78,14 @@
                 }
             ],
             "scopes": [
-                { "engineId": "9fee3a77-8200-4e55-97fb-04fae8a78da6" },
-                { "engineId": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73" }
+                {
+                    "engineId": "9fee3a77-8200-4e55-97fb-04fae8a78da6",
+                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                },
+                {
+                    "engineId": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73",
+                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                }
             ]
         },
         "derived.object.type.1": {
@@ -85,7 +100,10 @@
                 }
             ],
             "scopes": [
-                { "engineId": "9fee3a77-8200-4e55-97fb-04fae8a78da6" }
+                {
+                    "engineId": "9fee3a77-8200-4e55-97fb-04fae8a78da6",
+                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                }
             ]
         },
         "derived.object.type.2": {
@@ -100,7 +118,10 @@
                 }
             ],
             "scopes": [
-                { "engineId": "0a89f20b-9827-434d-b75c-c18866d6b993" }
+                {
+                    "engineId": "0a89f20b-9827-434d-b75c-c18866d6b993",
+                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                }
             ]
 
         },
@@ -116,7 +137,10 @@
                 }
             ],
             "scopes": [
-                { "engineId": "0a89f20b-9827-434d-b75c-c18866d6b993" }
+                {
+                    "engineId": "0a89f20b-9827-434d-b75c-c18866d6b993",
+                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                }
             ]
         },
         "derived.object.type.4": {
@@ -131,7 +155,10 @@
                 }
             ],
             "scopes": [
-                { "engineId": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73" }
+                {
+                    "engineId": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73",
+                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                }
             ]
         },
         "derived.object.type.5": {
@@ -146,7 +173,10 @@
                 }
             ],
             "scopes": [
-                { "engineId": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73" }
+                {
+                    "engineId": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73",
+                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                }
             ]
         },
         "derived.object.type.6": {
@@ -161,7 +191,10 @@
                 }
             ],
             "scopes": [
-                { "engineId": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73" }
+                {
+                    "engineId": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73",
+                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                }
             ]
         },
         "hidden.derived.object.type.1": {
@@ -176,7 +209,10 @@
                 }
             ],
             "scopes": [
-                { "engineId": "9fee3a77-8200-4e55-97fb-04fae8a78da6" }
+                {
+                    "engineId": "9fee3a77-8200-4e55-97fb-04fae8a78da6",
+                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                }
             ]
         },
         "hidden.derived.object.type.2": {
@@ -191,7 +227,10 @@
                 }
             ],
             "scopes": [
-                { "engineId": "0a89f20b-9827-434d-b75c-c18866d6b993" }
+                {
+                    "engineId": "0a89f20b-9827-434d-b75c-c18866d6b993",
+                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                }
             ]
         },
         "hidden.derived.object.type.3": {
@@ -206,7 +245,10 @@
                 }
             ],
             "scopes": [
-                { "engineId": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73" }
+                {
+                    "engineId": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73",
+                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                }
             ]
         },
         "hidden.derived.object.type.4": {
@@ -221,7 +263,10 @@
                 }
             ],
             "scopes": [
-                { "engineId": "0a89f20b-9827-434d-b75c-c18866d6b993" }
+                {
+                    "engineId": "0a89f20b-9827-434d-b75c-c18866d6b993",
+                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                }
             ]
         },
         "hidden.derived.object.type.5": {
@@ -236,7 +281,10 @@
                 }
             ],
             "scopes": [
-                { "engineId": "0a89f20b-9827-434d-b75c-c18866d6b993" }
+                {
+                    "engineId": "0a89f20b-9827-434d-b75c-c18866d6b993",
+                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                }
             ]
         },
         "hidden.derived.object.type.6": {
@@ -251,7 +299,10 @@
                 }
             ],
             "scopes": [
-                { "engineId": "9fee3a77-8200-4e55-97fb-04fae8a78da6" }
+                {
+                    "engineId": "9fee3a77-8200-4e55-97fb-04fae8a78da6",
+                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                }
             ]
         },
         "hidden.derived.object.type.7": {
@@ -266,8 +317,14 @@
                 }
             ],
             "scopes": [
-                { "engineId": "9fee3a77-8200-4e55-97fb-04fae8a78da6" },
-                { "engineId": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73" }
+                {
+                    "engineId": "9fee3a77-8200-4e55-97fb-04fae8a78da6",
+                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                },
+                {
+                    "engineId": "5ec1b2ee-6a89-41a1-8e82-22861c11ab73",
+                    "deviceIds": ["a3711179-2f9e-4a06-b764-6e0a64dcc343"]
+                }
             ]
         }
     }
@@ -289,40 +346,80 @@
             ],
             "attributeSupportInfo": {
                 "base.object.type.1": {
-                    "Base Object Type 1, Attribute 1": ["9fee3a77-8200-4e55-97fb-04fae8a78da6"]
+                    "Base Object Type 1, Attribute 1": {
+                        "9fee3a77-8200-4e55-97fb-04fae8a78da6": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ]
+                    }
                 },
                 "base.object.type.2": {
-                    "Base Object Type 2, Attribute 1": ["5ec1b2ee-6a89-41a1-8e82-22861c11ab73"]
+                    "Base Object Type 2, Attribute 1": {
+                        "5ec1b2ee-6a89-41a1-8e82-22861c11ab73": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ]
+                    }
                 },
                 "base.object.type.3": {
-                    "Base Object Type 3, Attribute 1": ["0a89f20b-9827-434d-b75c-c18866d6b993"]
+                    "Base Object Type 3, Attribute 1": {
+                        "0a89f20b-9827-434d-b75c-c18866d6b993": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ]
+                    }
                 },
                 "base.object.type.4": {
-                    "Base Object Type 4, Attribute 1": [
-                        "9fee3a77-8200-4e55-97fb-04fae8a78da6",
-                        "5ec1b2ee-6a89-41a1-8e82-22861c11ab73"
-                    ]
+                    "Base Object Type 4, Attribute 1": {
+                        "9fee3a77-8200-4e55-97fb-04fae8a78da6": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ],
+                        "5ec1b2ee-6a89-41a1-8e82-22861c11ab73": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ]
+                    }
                 },
                 "derived.object.type.1": {
-                    "Derived Object Type 1, Attribute 1": ["9fee3a77-8200-4e55-97fb-04fae8a78da6"]
+                    "Derived Object Type 1, Attribute 1": {
+                        "9fee3a77-8200-4e55-97fb-04fae8a78da6": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ]
+                    }
                 },
                 "derived.object.type.2": {
-                    "Derived Object Type 2, Attribute 1": ["0a89f20b-9827-434d-b75c-c18866d6b993"]
+                    "Derived Object Type 2, Attribute 1": {
+                        "0a89f20b-9827-434d-b75c-c18866d6b993": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ]
+                    }
                 },
                 "derived.object.type.3": {
-                    "Derived Object Type 3, Attribute 1": ["0a89f20b-9827-434d-b75c-c18866d6b993"]
+                    "Derived Object Type 3, Attribute 1": {
+                        "0a89f20b-9827-434d-b75c-c18866d6b993": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ]
+                    }
                 },
                 "derived.object.type.4": {
-                    "Derived Object Type 4, Attribute 1": ["5ec1b2ee-6a89-41a1-8e82-22861c11ab73"]
+                    "Derived Object Type 4, Attribute 1": {
+                        "5ec1b2ee-6a89-41a1-8e82-22861c11ab73": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ]
+                    }
                 },
                 "derived.object.type.5": {
-                    "Derived Object Type 5, Attribute 1": ["5ec1b2ee-6a89-41a1-8e82-22861c11ab73"]
+                    "Derived Object Type 5, Attribute 1": {
+                        "5ec1b2ee-6a89-41a1-8e82-22861c11ab73": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ]
+                    }
                 },
                 "derived.object.type.6": {
-                    "Derived Object Type 6, Attribute 1": [
-                        "9fee3a77-8200-4e55-97fb-04fae8a78da6",
-                        "5ec1b2ee-6a89-41a1-8e82-22861c11ab73"
-                    ]
+                    "Derived Object Type 6, Attribute 1": {
+                        "9fee3a77-8200-4e55-97fb-04fae8a78da6": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ],
+                        "5ec1b2ee-6a89-41a1-8e82-22861c11ab73": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ]
+                    }
                 }
             }
         },
@@ -707,76 +804,132 @@
             ],
             "attributeSupportInfo": {
                 "base.object.type.1": {
-                    "Base Object Type 1, Attribute 1": ["9fee3a77-8200-4e55-97fb-04fae8a78da6"]
+                    "Base Object Type 1, Attribute 1": {
+                        "9fee3a77-8200-4e55-97fb-04fae8a78da6": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ]
+                    }
                 },
                 "base.object.type.2": {
-                    "Base Object Type 2, Attribute 1": ["5ec1b2ee-6a89-41a1-8e82-22861c11ab73"]
+                    "Base Object Type 2, Attribute 1": {
+                        "5ec1b2ee-6a89-41a1-8e82-22861c11ab73": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ]
+                    }
                 },
                 "base.object.type.3": {
-                    "Base Object Type 3, Attribute 1": ["0a89f20b-9827-434d-b75c-c18866d6b993"]
+                    "Base Object Type 3, Attribute 1": {
+                        "0a89f20b-9827-434d-b75c-c18866d6b993": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ]
+                    }
                 },
                 "base.object.type.4": {
-                    "Base Object Type 4, Attribute 1": [
-                        "9fee3a77-8200-4e55-97fb-04fae8a78da6",
-                        "5ec1b2ee-6a89-41a1-8e82-22861c11ab73"
-                    ]
+                    "Base Object Type 4, Attribute 1": {
+                        "9fee3a77-8200-4e55-97fb-04fae8a78da6": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ],
+                        "5ec1b2ee-6a89-41a1-8e82-22861c11ab73": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ]
+                    }
                 },
                 "derived.object.type.1": {
-                    "Derived Object Type 1, Attribute 1": ["9fee3a77-8200-4e55-97fb-04fae8a78da6"]
+                    "Derived Object Type 1, Attribute 1": {
+                        "9fee3a77-8200-4e55-97fb-04fae8a78da6": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ]
+                    }
                 },
                 "derived.object.type.2": {
-                    "Derived Object Type 2, Attribute 1": ["0a89f20b-9827-434d-b75c-c18866d6b993"]
+                    "Derived Object Type 2, Attribute 1": {
+                        "0a89f20b-9827-434d-b75c-c18866d6b993": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ]
+                    }
                 },
                 "derived.object.type.3": {
-                    "Derived Object Type 3, Attribute 1": ["0a89f20b-9827-434d-b75c-c18866d6b993"]
+                    "Derived Object Type 3, Attribute 1": {
+                        "0a89f20b-9827-434d-b75c-c18866d6b993": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ]
+                    }
                 },
                 "derived.object.type.4": {
-                    "Derived Object Type 4, Attribute 1": ["5ec1b2ee-6a89-41a1-8e82-22861c11ab73"]
+                    "Derived Object Type 4, Attribute 1": {
+                        "5ec1b2ee-6a89-41a1-8e82-22861c11ab73": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ]
+                    }
                 },
                 "derived.object.type.5": {
-                    "Derived Object Type 5, Attribute 1": ["5ec1b2ee-6a89-41a1-8e82-22861c11ab73"]
+                    "Derived Object Type 5, Attribute 1": {
+                        "5ec1b2ee-6a89-41a1-8e82-22861c11ab73": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ]
+                    }
                 },
                 "derived.object.type.6": {
-                    "Derived Object Type 6, Attribute 1": [
-                        "9fee3a77-8200-4e55-97fb-04fae8a78da6",
-                        "5ec1b2ee-6a89-41a1-8e82-22861c11ab73"
-                    ]
+                    "Derived Object Type 6, Attribute 1": {
+                        "9fee3a77-8200-4e55-97fb-04fae8a78da6": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ],
+                        "5ec1b2ee-6a89-41a1-8e82-22861c11ab73": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ]
+                    }
                 },
                 "hidden.derived.object.type.1": {
-                    "Hidden Derived Object Type 1, Attribute 1": [
-                        "9fee3a77-8200-4e55-97fb-04fae8a78da6"
-                    ]
+                    "Hidden Derived Object Type 1, Attribute 1": {
+                        "9fee3a77-8200-4e55-97fb-04fae8a78da6": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ]
+                    }
                 },
                 "hidden.derived.object.type.2": {
-                    "Hidden Derived Object Type 2, Attribute 1": [
-                        "0a89f20b-9827-434d-b75c-c18866d6b993"
-                    ]
+                    "Hidden Derived Object Type 2, Attribute 1": {
+                        "0a89f20b-9827-434d-b75c-c18866d6b993": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ]
+                    }
                 },
                 "hidden.derived.object.type.3": {
-                    "Hidden Derived Object Type 3, Attribute 1": [
-                        "5ec1b2ee-6a89-41a1-8e82-22861c11ab73"
-                    ]
+                    "Hidden Derived Object Type 3, Attribute 1": {
+                        "5ec1b2ee-6a89-41a1-8e82-22861c11ab73": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ]
+                    }
                 },
                 "hidden.derived.object.type.4": {
-                    "Hidden Derived Object Type 4, Attribute 1": [
-                        "0a89f20b-9827-434d-b75c-c18866d6b993"
-                    ]
+                    "Hidden Derived Object Type 4, Attribute 1": {
+                        "0a89f20b-9827-434d-b75c-c18866d6b993": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ]
+                    }
                 },
                 "hidden.derived.object.type.5": {
-                    "Hidden Derived Object Type 5, Attribute 1": [
-                        "0a89f20b-9827-434d-b75c-c18866d6b993"
-                    ]
+                    "Hidden Derived Object Type 5, Attribute 1": {
+                        "0a89f20b-9827-434d-b75c-c18866d6b993": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ]
+                    }
                 },
                 "hidden.derived.object.type.6": {
-                    "Hidden Derived Object Type 6, Attribute 1": [
-                        "9fee3a77-8200-4e55-97fb-04fae8a78da6"
-                    ]
+                    "Hidden Derived Object Type 6, Attribute 1": {
+                        "9fee3a77-8200-4e55-97fb-04fae8a78da6": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ]
+                    }
                 },
                 "hidden.derived.object.type.7": {
-                    "Hidden Derived Object Type 7, Attribute 1": [
-                        "9fee3a77-8200-4e55-97fb-04fae8a78da6",
-                        "5ec1b2ee-6a89-41a1-8e82-22861c11ab73"
-                    ]
+                    "Hidden Derived Object Type 7, Attribute 1": {
+                        "9fee3a77-8200-4e55-97fb-04fae8a78da6": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ],
+                        "5ec1b2ee-6a89-41a1-8e82-22861c11ab73": [
+                            "a3711179-2f9e-4a06-b764-6e0a64dcc343"
+                        ]
+                    }
                 }
             }
         },

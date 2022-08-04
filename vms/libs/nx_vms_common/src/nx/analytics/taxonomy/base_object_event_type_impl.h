@@ -3,7 +3,6 @@
 #pragma once
 
 #include <nx/analytics/taxonomy/attribute.h>
-#include <nx/analytics/taxonomy/proxy_object_type_attribute.h>
 #include <nx/analytics/taxonomy/enum_type.h>
 #include <nx/analytics/taxonomy/color_type.h>
 #include <nx/analytics/taxonomy/scope.h>
@@ -66,14 +65,26 @@ public:
         if (!m_base)
             return {};
 
+        if (m_areSupportedAttributesResolved)
+        {
+            std::vector<AbstractAttribute*> result;
+            for (const AttributeContext& context: m_attributes)
+            {
+                if (!context.isOwn)
+                    result.push_back(context.attribute);
+            }
+
+            return result;
+        }
+
+        // This code is executed only when compiling the State.
         std::vector<AbstractAttribute*> baseAttributes = m_base->attributes();
 
         const std::set<QString> omittedBaseAttributeIds{
             m_descriptor.omittedBaseAttributes.cbegin(),
-            m_descriptor.omittedBaseAttributes.cend() };
+            m_descriptor.omittedBaseAttributes.cend()};
 
         std::vector<AbstractAttribute*> result;
-
         for (auto& attribute: baseAttributes)
         {
             if (omittedBaseAttributeIds.find(attribute->name()) == omittedBaseAttributeIds.cend())
@@ -85,13 +96,35 @@ public:
 
     std::vector<AbstractAttribute*> ownAttributes() const
     {
-        return m_internalOwnAttributes;
+        if (m_areSupportedAttributesResolved)
+        {
+            std::vector<AbstractAttribute*> result;
+            for (const AttributeContext& context: m_attributes)
+            {
+                if (context.isOwn)
+                    result.push_back(context.attribute);
+            }
+
+            return result;
+        }
+
+        return m_ownAttributes;
     }
 
     std::vector<AbstractAttribute*> attributes() const
     {
+        if (m_areSupportedAttributesResolved)
+        {
+            std::vector<AbstractAttribute*> result;
+            for (const AttributeContext& context: m_attributes)
+                result.push_back(context.attribute);
+
+            return result;
+        }
+
+        // This code is executed only when compiling the State.
         std::map<QString, AbstractAttribute*> ownAttributes;
-        for (AbstractAttribute* ownAttribute: m_internalOwnAttributes)
+        for (AbstractAttribute* ownAttribute: m_ownAttributes)
             ownAttributes[ownAttribute->name()] = ownAttribute;
 
         std::vector<AbstractAttribute*> result;
@@ -109,7 +142,7 @@ public:
             }
         }
 
-        for (AbstractAttribute* ownAttribute: m_internalOwnAttributes)
+        for (AbstractAttribute* ownAttribute: m_ownAttributes)
         {
             if (ownAttributes.find(ownAttribute->name()) != ownAttributes.cend())
                 result.push_back(ownAttribute);
@@ -120,12 +153,29 @@ public:
 
     std::vector<AbstractAttribute*> supportedAttributes() const
     {
-        return m_internalSupportedAttributes;
+        std::vector<AbstractAttribute*> result;
+        for (const AttributeContext& context: m_attributes)
+        {
+            if (context.attribute->isSupported(/*any Engine*/ QnUuid(), /*any Device*/ QnUuid()))
+                result.push_back(context.attribute);
+        }
+
+        return result;
     }
 
     std::vector<AbstractAttribute*> supportedOwnAttributes() const
     {
-        return m_internalSupportedOwnAttributes;
+        std::vector<AbstractAttribute*> result;
+        for (const AttributeContext& context: m_attributes)
+        {
+            if (context.isOwn && context.attribute->isSupported(
+                /*any Engine*/ QnUuid(), /*any Device*/ QnUuid()))
+            {
+                result.push_back(context.attribute);
+            }
+        }
+
+        return result;
     }
 
     bool hasEverBeenSupported() const
@@ -161,6 +211,12 @@ public:
     bool isLeaf() const
     {
         return m_derivedTypes.empty();
+    }
+
+    void resolvePrivateness()
+    {
+        if (isLeaf())
+            resolvePrivateness(/*hasPublicDescendants*/ false);
     }
 
     void resolvePrivateness(bool hasPublicDescendants)
@@ -225,6 +281,8 @@ public:
             }
 
             taxonomyScope->setProvider(scope.provider);
+            taxonomyScope->setDeviceIds(
+                std::vector<QnUuid>{scope.deviceIds.begin(), scope.deviceIds.end()});
 
             if (!taxonomyScope->isEmpty())
             {
@@ -238,7 +296,7 @@ public:
 
     void resolve(InternalState* inOutInternalState, ErrorHandler* errorHandler)
     {
-        if (m_resolved)
+        if (m_isResolved)
             return;
 
         if (m_descriptor.base && !m_descriptor.base->isEmpty())
@@ -261,9 +319,9 @@ public:
         context.ownAttributes = &m_descriptor.attributes;
         context.omittedBaseAttributeNames = &m_descriptor.omittedBaseAttributes;
         if (m_base)
-            context.baseAttributes = m_base->baseAttributes();
+            context.baseAttributes = m_base->attributes();
 
-        context.resolvedOwnAttributes = &m_internalOwnAttributes;
+        context.resolvedOwnAttributes = &m_ownAttributes;
         context.owner = m_owner;
 
         AttributeResolver resolver(context, errorHandler);
@@ -272,88 +330,49 @@ public:
         if (m_base)
             m_base->addDerivedType(m_owner);
 
-        m_resolved = true;
+        m_isResolved = true;
     }
 
     void resolveSupportedAttributes(InternalState* inOutInternalState, ErrorHandler* errorHandler)
     {
-        // TODO: handle errors.
-        // TODO: Either rename this method or resolve privateness in another place.
+        // At this point all attributes of all types are resolved but support info is not set yet.
+        std::map<QString, AbstractAttribute*> ownAttributes;
+        for (AbstractAttribute* ownAttribute: m_ownAttributes)
+            ownAttributes[ownAttribute->name()] = ownAttribute;
 
-        if (isLeaf())
-            resolvePrivateness(/*hasPublicDescendants*/ false);
-
-        std::set<QString> attributePaths;
-        for (const auto& [attributePath, _]: m_descriptor.attributeSupportInfo)
-            attributePaths.insert(attributePath);
-
-        const AttributeTree attributeTree = getSupportedAttributeTree(
-            attributePaths, inOutInternalState);
-
-        m_internalSupportedAttributes = makeSupportedAttributes(this->attributes(), attributeTree);
-        m_internalSupportedOwnAttributes = makeSupportedAttributes(
-            this->ownAttributes(), attributeTree);
-    }
-
-    AttributeTree getSupportedAttributeTree(
-        std::set<QString> attributePaths, InternalState* internalState) const
-    {
-        AttributeTree result;
-        std::vector<const AbstractAttribute*> nestedAttributes;
-
-        for (const AbstractAttribute* attribute: this->attributes())
+        for (AbstractAttribute* baseAttribute: this->baseAttributes())
         {
-            if (attributePaths.empty())
-                return result;
-
-            if (attribute->type() == AbstractAttribute::Type::object)
-                nestedAttributes.push_back(attribute);
-
-            const QString attributeName = attribute->name();
-            if (contains(attributePaths, attributeName))
+            const auto ownAttributeIt = ownAttributes.find(baseAttribute->name());
+            if (ownAttributeIt == ownAttributes.cend())
             {
-                result.children.emplace(attributeName, AttributeTree());
-                attributePaths.erase(attributeName);
+                m_attributes.push_back({baseAttribute, /*isOwn*/ false});
+            }
+            else
+            {
+                m_attributes.push_back({ownAttributeIt->second, /*isOwn*/ true});
+                ownAttributes.erase(ownAttributeIt);
             }
         }
 
-        for (const AbstractAttribute* attribute: nestedAttributes)
+        for (AbstractAttribute* ownAttribute: m_ownAttributes)
         {
-            if (attributePaths.empty())
-                return result;
-
-            const ObjectType* objectType =
-                internalState->getTypeById<ObjectType>(attribute->subtype());
-
-            if (!NX_ASSERT(objectType))
-                continue;
-
-            const QString attributeName = attribute->name();
-            const QString prefix = attributeName + ".";
-
-            std::set<QString> nestedAttributePaths;
-            for (auto itr = attributePaths.lower_bound(prefix);
-                itr != attributePaths.cend() && itr->startsWith(prefix);
-                ++itr)
-            {
-                QString attributeSuffix = itr->mid(prefix.length());
-                if (!attributeSuffix.isEmpty())
-                    nestedAttributePaths.insert(std::move(attributeSuffix));
-            }
-
-            if (nestedAttributePaths.empty())
-                continue;
-
-            result.children[attributeName] =
-                objectType->getSupportedAttributeTree(nestedAttributePaths, internalState);
-
-            nestedAttributePaths.clear();
-            pathsFromTree(&nestedAttributePaths, result.children[attributeName], prefix);
-            for (const QString& path: nestedAttributePaths)
-                attributePaths.erase(path);
+            if (ownAttributes.find(ownAttribute->name()) != ownAttributes.cend())
+                m_attributes.push_back({ownAttribute, /*isOwn*/ true});
         }
 
-        return result;
+        std::vector<AbstractAttribute*> attributes;
+        for (AttributeContext& context: m_attributes)
+            attributes.push_back(context.attribute);
+
+        attributes = makeSupportedAttributes(attributes, m_descriptor.attributeSupportInfo);
+        NX_ASSERT(attributes.size() == m_attributes.size(),
+            "The resolved Attribute list size does not equal the Attribute list size, %1: %2",
+            m_typeName, m_descriptor.name);
+
+        for (int i = 0; i < attributes.size(); ++i)
+            m_attributes[i].attribute = attributes[i];
+
+        m_areSupportedAttributesResolved = true;
     }
 
 private:
@@ -362,15 +381,21 @@ private:
     ResolvedType* m_base = nullptr;
     ResolvedType* m_owner = nullptr;
     std::vector<AbstractResolvedType*> m_derivedTypes;
-    std::vector<AbstractAttribute*> m_internalOwnAttributes;
-    std::vector<AbstractAttribute*> m_internalSupportedAttributes;
-    std::vector<AbstractAttribute*> m_internalSupportedOwnAttributes;
 
+    struct AttributeContext
+    {
+        AbstractAttribute* attribute;
+        bool isOwn = false;
+    };
+
+    std::vector<AttributeContext> m_attributes;
+    std::vector<AbstractAttribute*> m_ownAttributes;
     std::vector<AbstractScope*> m_scopes;
 
     QString m_typeName;
     bool m_isPrivate = true;
-    bool m_resolved = false;
+    bool m_isResolved = false;
+    bool m_areSupportedAttributesResolved = false;
 };
 
 } // namespace nx::analytics::taxonomy
