@@ -167,7 +167,7 @@ TEST_F(BuiltinTypesTest, BuiltinEvents)
     testEventFieldRegistration<KeywordsField>();
     testEventFieldRegistration<SourceCameraField>();
     testEventFieldRegistration<SourceServerField>();
-    testEventFieldRegistration<SourceUserField>();
+    testEventFieldRegistration<SourceUserField>(systemContext());
     testEventFieldRegistration<UniqueIdField>();
 
     // TODO: #amalov Uncomment all types after manifest definition.

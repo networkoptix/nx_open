@@ -3,6 +3,8 @@
 #include <gtest/gtest.h>
 
 #include <nx/utils/log/format.h>
+#include <nx/vms/api/data/user_role_data.h>
+#include <nx/vms/common/test_support/test_context.h>
 #include <nx/vms/rules/event_fields/builtin_fields.h>
 
 namespace nx::vms::rules::test {
@@ -41,6 +43,39 @@ void testSimpleTypeField(
 }
 
 } // namespace
+
+class EventFieldContextTest: public nx::vms::common::test::ContextBasedTest
+{
+};
+
+TEST_F(EventFieldContextTest, SourceUserField)
+{
+    const auto permission = nx::vms::api::GlobalPermission::userInput;
+    const auto user = addUser(permission);
+    const auto userIdValue = QVariant::fromValue(user->getId());
+    const auto role = createRole(permission);
+
+    user->setSingleUserRole(role.id);
+
+    auto field = SourceUserField(systemContext());
+
+    // Default field do not match anything.
+    EXPECT_FALSE(field.match(userIdValue));
+
+    // Accept all match any user.
+    field.setAcceptAll(true);
+    EXPECT_TRUE(field.match(userIdValue));
+    EXPECT_TRUE(field.match({}));
+    field.setAcceptAll(false);
+
+    // User id is matched.
+    field.setIds({user->getId()});
+    EXPECT_TRUE(field.match(userIdValue));
+
+    // User role is matched.
+    field.setIds({role.id});
+    EXPECT_TRUE(field.match(userIdValue));
+}
 
 TEST(EventFieldTest, SimpleTypes)
 {
