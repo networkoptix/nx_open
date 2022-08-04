@@ -9,6 +9,7 @@
 
 #include <openssl/ssl.h>
 
+#include <nx/network/nx_network_ini.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/algorithm.h>
@@ -37,11 +38,17 @@ public:
 
 } // namespace
 
+static int defaultDisabledServerVersions()
+{
+    int value = SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | SSL_OP_NO_TLSv1;
+    if (ini().disableTls13ByDefault)
+        value |= SSL_OP_NO_TLSv1_3;
+    return value;
+}
+
 Context::Context():
-    // NOTE: #akolesnikov TLSv1.3 is temporarily disabled since some network test fail when using it.
-    // Will be fixed in NXLIB-55.
-    m_disabledServerVersions(
-        SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | SSL_OP_NO_TLSv1 | SSL_OP_NO_TLSv1_3),
+
+    m_disabledServerVersions(defaultDisabledServerVersions()),
     m_allowedServerCiphers("HIGH:!RC4:!3DES")
 {
     static OpenSslInitializer openSslInitializer;
@@ -201,7 +208,6 @@ bool Context::setAllowedServerVersions(const std::string& versionsStr)
     nx::utils::split(
         versionsStr, '|',
         [&versions](const auto& token) { versions.push_back(std::string(token)); });
-    NX_INFO(this, "Set server SSL versions: %1", containerString(versions));
 
     for (auto& version: versions)
     {
@@ -228,6 +234,10 @@ bool Context::setAllowedServerVersions(const std::string& versionsStr)
         {
             disabledVersions ^= SSL_OP_NO_TLSv1_2;
         }
+        else if (s == "tls1_3" || s == "tlsv1_3" || s == "tls1.3" || s == "tlsv1.3")
+        {
+            disabledVersions ^= SSL_OP_NO_TLSv1_3;
+        }
         else
         {
             NX_ASSERT(false, "Unknown SSL version: %1", s);
@@ -241,6 +251,7 @@ bool Context::setAllowedServerVersions(const std::string& versionsStr)
         return false;
     }
 
+    NX_INFO(this, "Set server SSL versions: %1", containerString(versions));
     m_disabledServerVersions = disabledVersions;
     return true;
 }
