@@ -134,45 +134,45 @@ TEST_F(CameraSettingsDialogStateReducerTest, recordingDaysApplicableChecks)
     const QnVirtualCameraResourceList cameras = {createCamera(), createCamera()};
 
     // Same days value, same "manual" mode.
-    cameras[0]->setMinDays(1);
-    cameras[1]->setMinDays(1);
+    cameras[0]->setMinPeriod(std::chrono::days(1));
+    cameras[1]->setMinPeriod(std::chrono::days(1));
     State state = Reducer::loadCameras({}, cameras);
     ASSERT_TRUE(state.recording.minDays.isApplicable());
 
     // Same days value, different "auto" mode.
-    cameras[0]->setMinDays(1);
-    cameras[1]->setMinDays(-1);
+    cameras[0]->setMinPeriod(std::chrono::days(1));
+    cameras[1]->setMinPeriod(std::chrono::days(-1));
     state = Reducer::loadCameras({}, cameras);
     ASSERT_FALSE(state.recording.minDays.isApplicable());
 
 
     // Same days value, same "auto" mode.
-    cameras[0]->setMinDays(-1);
-    cameras[1]->setMinDays(-1);
+    cameras[0]->setMinPeriod(std::chrono::days(-1));
+    cameras[1]->setMinPeriod(std::chrono::days(-1));
     state = Reducer::loadCameras({}, cameras);
     ASSERT_TRUE(state.recording.minDays.isApplicable());
 
     // Different days value, same "auto" mode.
-    cameras[0]->setMinDays(-1);
-    cameras[1]->setMinDays(-2);
+    cameras[0]->setMinPeriod(std::chrono::days(-1));
+    cameras[1]->setMinPeriod(std::chrono::days(-2));
     state = Reducer::loadCameras({}, cameras);
     ASSERT_TRUE(state.recording.minDays.isApplicable());
 
     // Different days value, same "manual" mode.
-    cameras[0]->setMinDays(1);
-    cameras[1]->setMinDays(2);
+    cameras[0]->setMinPeriod(std::chrono::days(1));
+    cameras[1]->setMinPeriod(std::chrono::days(2));
     state = Reducer::loadCameras({}, cameras);
     ASSERT_FALSE(state.recording.minDays.isApplicable());
 }
 
 TEST_F(CameraSettingsDialogStateReducerTest, fixedArchiveLengthValidation)
 {
-    static constexpr int kTestDaysBig = nx::vms::api::kDefaultMaxArchiveDays + 1;
+    static constexpr int kTestDaysBig = nx::vms::api::kDefaultMaxArchivePeriod.count() + 1;
 
     // Unchecking automatic max days when no fixed value is set: sets fixed value to default.
     State s;
     s = Reducer::setMaxRecordingDaysAutomatic(std::move(s), false);
-    ASSERT_EQ(s.recording.maxDays.displayValue(), nx::vms::api::kDefaultMaxArchiveDays);
+    ASSERT_EQ(s.recording.maxDays.displayValue(), nx::vms::api::kDefaultMaxArchivePeriod.count());
 
     // Unchecking automatic max days when fixed value is set: keeps fixed value.
     s = {};
@@ -198,7 +198,7 @@ TEST_F(CameraSettingsDialogStateReducerTest, fixedArchiveLengthValidation)
     // Unchecking automatic min days when no fixed value is set: sets fixed value to default.
     s = {};
     s = Reducer::setMinRecordingDaysAutomatic(std::move(s), false);
-    ASSERT_EQ(s.recording.minDays.displayValue(), nx::vms::api::kDefaultMinArchiveDays);
+    ASSERT_EQ(s.recording.minDays.displayValue(), nx::vms::api::kDefaultMinArchivePeriod.count());
 
     // Unchecking automatic min days when fixed value is set: keeps fixed value.
     // Checks that min days value stays lesser or equal than fixed max days value.
@@ -226,13 +226,13 @@ TEST_F(CameraSettingsDialogStateReducerTest, fixedArchiveLengthValidation)
 // Setup fixed value of recording min days, leaving max days as auto.
 TEST_F(CameraSettingsDialogStateReducerTest, setFixedRecordingMinDays)
 {
-    static constexpr int kDefaultDays = -nx::vms::api::kDefaultMaxArchiveDays;
-    static constexpr int kTestDaysBig = nx::vms::api::kDefaultMaxArchiveDays + 1;
+    static constexpr int kDefaultDays = -nx::vms::api::kDefaultMaxArchivePeriod.count();
+    static constexpr int kTestDaysBig = nx::vms::api::kDefaultMaxArchivePeriod.count() + 1;
 
     const auto camera = createCamera();
 
     // Unchecking 'auto' must keep previously saved (as negative) value.
-    camera->setMinDays(-kTestDaysBig);
+    camera->setMinPeriod(std::chrono::days(-kTestDaysBig));
 
     State initial = Reducer::loadCameras({}, {camera});
     ASSERT_TRUE(initial.recording.minDays.autoCheckState() == Qt::Checked);
