@@ -206,7 +206,6 @@ bool QnResourceSearchProxyModel::isRejectedNodeType(
     switch (nodeType)
     {
         case NodeType::separator:
-        case NodeType::otherSystems:
         case NodeType::currentSystem:
         case NodeType::currentUser:
         case NodeType::allCamerasAccess:
