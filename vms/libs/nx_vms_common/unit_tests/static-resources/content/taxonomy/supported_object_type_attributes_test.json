@@ -38,21 +38,37 @@
                     "name": "object.attribute.ofObjectType1",
                     "type": "String"
                 }
-                
+
             ],
-            
+
             "attributeSupportInfo": {
-                "attribute": [],
-                "attribute with spaces": [],
-                "attribute.withDot": [],
-                "attribute with spaces dot at the end.": [],
-                "object.attribute.ofObjectType2": [],
-                "object.attribute.ofObjectType3": [],
-                "object.attribute": [],
-                "object": []
+                "attribute": {
+                    "697c7b65-1f6d-4c03-934d-92e3aee2cb8f": []
+                },
+                "attribute with spaces": {
+                    "697c7b65-1f6d-4c03-934d-92e3aee2cb8f": []
+                },
+                "attribute.withDot": {
+                    "697c7b65-1f6d-4c03-934d-92e3aee2cb8f": []
+                },
+                "attribute with spaces dot at the end.": {
+                    "697c7b65-1f6d-4c03-934d-92e3aee2cb8f": []
+                },
+                "object.attribute.ofObjectType2": {
+                    "697c7b65-1f6d-4c03-934d-92e3aee2cb8f": []
+                },
+                "object.attribute.ofObjectType3": {
+                    "697c7b65-1f6d-4c03-934d-92e3aee2cb8f": []
+                },
+                "object.attribute": {
+                    "697c7b65-1f6d-4c03-934d-92e3aee2cb8f": []
+                },
+                "object": {
+                    "697c7b65-1f6d-4c03-934d-92e3aee2cb8f": []
+                }
             }
         },
-        
+
         "test.objectType2": {
             "id": "test.objectType2",
             "name": "Test Object Type 2",
@@ -67,7 +83,7 @@
                 }
             ]
         },
-        
+
         "test.objectType3": {
             "id": "test.objectType3",
             "name": "Test Object Type 3",

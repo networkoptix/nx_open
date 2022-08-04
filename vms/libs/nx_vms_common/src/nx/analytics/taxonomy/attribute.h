@@ -11,8 +11,24 @@ namespace nx::analytics::taxonomy {
 class Attribute: public AbstractAttribute
 {
 public:
+    /** Boolean, string and number attribute constructor. */
     Attribute(
         nx::vms::api::analytics::AttributeDescription attributeDescription,
+        QObject* parent = nullptr);
+
+    Attribute(
+        nx::vms::api::analytics::AttributeDescription attributeDescription,
+        AbstractObjectType* objectType,
+        QObject* parent = nullptr);
+
+    Attribute(
+        nx::vms::api::analytics::AttributeDescription attributeDescription,
+        AbstractEnumType* enumType,
+        QObject* parent = nullptr);
+
+    Attribute(
+        nx::vms::api::analytics::AttributeDescription attributeDescription,
+        AbstractColorType* colorType,
         QObject* parent = nullptr);
 
     virtual QString name() const override;
@@ -33,11 +49,7 @@ public:
 
     virtual QVariant maxValue() const override;
 
-    void setEnumType(AbstractEnumType* enumType);
-
-    void setObjectType(AbstractObjectType* objectType);
-
-    void setColorType(AbstractColorType* colorType);
+    virtual bool isSupported(QnUuid engineId, QnUuid deviceId) const override;
 
     void setBaseAttribute(AbstractAttribute* attribute);
 

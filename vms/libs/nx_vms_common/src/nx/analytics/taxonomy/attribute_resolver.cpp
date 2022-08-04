@@ -139,11 +139,11 @@ Attribute* AttributeResolver::resolveOwnAttribute(
     switch (inOutAttributeDescription->type)
     {
         case AttributeType::boolean:
-            return new Attribute(*inOutAttributeDescription);
+            return resolveBooleanAttribute(inOutAttributeDescription, baseAttribute);
         case AttributeType::number:
             return resolveNumberAttribute(inOutAttributeDescription, baseAttribute);
         case AttributeType::string:
-            return new Attribute(*inOutAttributeDescription);
+            return resolveStringAttribute(inOutAttributeDescription, baseAttribute);
         case AttributeType::enumeration:
             return resolveEnumerationAttribute(inOutAttributeDescription, baseAttribute);
         case AttributeType::color:
@@ -169,6 +169,20 @@ Attribute* AttributeResolver::resolveOwnAttribute(
             return nullptr;
         }
     }
+}
+
+Attribute* AttributeResolver::resolveBooleanAttribute(
+    nx::vms::api::analytics::AttributeDescription* inOutAttributeDescription,
+    const AbstractAttribute* /*baseAttribute*/)
+{
+    return new Attribute(*inOutAttributeDescription);
+}
+
+Attribute* AttributeResolver::resolveStringAttribute(
+    nx::vms::api::analytics::AttributeDescription* inOutAttributeDescription,
+    const AbstractAttribute* /*baseAttribute*/)
+{
+    return new Attribute(*inOutAttributeDescription);
 }
 
 Attribute* AttributeResolver::resolveNumberAttribute(
@@ -321,10 +335,7 @@ Attribute* AttributeResolver::resolveEnumerationAttribute(
         return nullptr;
     }
 
-    auto attribute = new Attribute(*inOutAttributeDescription);
-    attribute->setEnumType(enumType);
-
-    return attribute;
+    return new Attribute(*inOutAttributeDescription, enumType);
 }
 
 Attribute* AttributeResolver::resolveColorAttribute(
@@ -343,10 +354,7 @@ Attribute* AttributeResolver::resolveColorAttribute(
         return nullptr;
     }
 
-    auto attribute = new Attribute(*inOutAttributeDescription);
-    attribute->setColorType(colorType);
-
-    return attribute;
+    return new Attribute(*inOutAttributeDescription, colorType);
 }
 
 Attribute* AttributeResolver::resolveObjectAttribute(
@@ -365,11 +373,7 @@ Attribute* AttributeResolver::resolveObjectAttribute(
         return nullptr;
     }
 
-
-    auto attribute = new Attribute(*inOutAttributeDescription);
-    attribute->setObjectType(objectType);
-
-    return attribute;
+    return new Attribute(*inOutAttributeDescription, objectType);
 }
 
 } // namespace nx::analytics::taxonomy

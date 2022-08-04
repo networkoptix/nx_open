@@ -13,7 +13,7 @@ class ProxyObjectType: public AbstractObjectType
 public:
     ProxyObjectType(
         AbstractObjectType* proxiedObjectType,
-        AttributeTree supportedAttributeTree);
+        std::map<QString, AttributeSupportInfoTree> attributeSupportInfoTree);
 
     virtual QString id() const override;
 
@@ -49,7 +49,7 @@ public:
 
 private:
     AbstractObjectType* m_proxiedObjectType = nullptr;
-    mutable AttributeTree m_supportedAttributeTree;
+    mutable std::map<QString, AttributeSupportInfoTree> m_attributeSupportInfoTree;
     mutable std::optional<std::vector<AbstractAttribute*>> m_supportedAttributes;
     mutable std::optional<std::vector<AbstractAttribute*>> m_supportedOwnAttributes;
 
