@@ -202,10 +202,11 @@ void VirtualCameraPreparer::checkLocally(VirtualCameraPayload& payload)
     QnTimePeriod localPeriod = QnTimePeriod(startTimeMs, durationMs);
     payload.local.period = localPeriod;
 
-    if (d->camera->maxDays() > 0)
+    if (d->camera->maxPeriod().count() > 0)
     {
-        qint64 minTime = qnSyncTime->currentMSecsSinceEpoch() - kOneDayMSecs * d->camera->maxDays();
-        if (startTimeMs < minTime)
+        const auto minTime = qnSyncTime->currentTimePoint() - d->camera->maxPeriod();
+        const qint64 minTimeMs = duration_cast<std::chrono::milliseconds>(minTime).count();
+        if (startTimeMs < minTimeMs)
         {
             payload.status = VirtualCameraPayload::FootagePastMaxDays;
             return;

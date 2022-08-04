@@ -76,34 +76,48 @@ RecordingDays::RecordingDays(
 
 RecordingDays RecordingDays::minDays(int daysCount)
 {
-    return RecordingDays(nx::vms::api::kDefaultMinArchiveDays, DaysStorage::fromValue(daysCount));
+    return RecordingDays(
+        duration_cast<std::chrono::days>(nx::vms::api::kDefaultMinArchivePeriod).count(),
+        DaysStorage::fromValue(daysCount));
 }
 
 RecordingDays RecordingDays::minDays(
     const QnVirtualCameraResourceList& cameras)
 {
+    static const auto defaultMinDays =
+        duration_cast<std::chrono::days>(nx::vms::api::kDefaultMinArchivePeriod).count();
     const auto value = extractValue(
-        nx::vms::api::kDefaultMinArchiveDays,
-        cameras,
-        [](const QnVirtualCameraResourcePtr& camera) { return camera->minDays(); });
+        defaultMinDays, cameras,
+        [](const QnVirtualCameraResourcePtr& camera) 
+        { 
+            return duration_cast<std::chrono::days>(camera->minPeriod()).count();
+        });
 
-    return RecordingDays(nx::vms::api::kDefaultMinArchiveDays, value);
+    return RecordingDays(defaultMinDays, value);
 }
 
 RecordingDays RecordingDays::maxDays(int daysCount)
 {
-    return RecordingDays(nx::vms::api::kDefaultMaxArchiveDays, DaysStorage::fromValue(daysCount));
+    return RecordingDays(
+        duration_cast<std::chrono::days>(nx::vms::api::kDefaultMaxArchivePeriod).count(),
+        DaysStorage::fromValue(daysCount));
 }
 
 RecordingDays RecordingDays::maxDays(
     const QnVirtualCameraResourceList& cameras)
 {
-    const auto value = extractValue(
-        nx::vms::api::kDefaultMaxArchiveDays,
-        cameras,
-        [](const QnVirtualCameraResourcePtr& camera) { return camera->maxDays(); });
+    static const auto defaultMaxDays =
+        duration_cast<std::chrono::days>(nx::vms::api::kDefaultMaxArchivePeriod).count();
 
-    return RecordingDays(nx::vms::api::kDefaultMaxArchiveDays, value);
+    const auto value = extractValue(
+        defaultMaxDays,
+        cameras,
+        [](const QnVirtualCameraResourcePtr& camera) 
+        { 
+            return duration_cast<std::chrono::days>(camera->maxPeriod()).count();
+        });
+
+    return RecordingDays(defaultMaxDays, value);
 }
 
 Qt::CheckState RecordingDays::autoCheckState() const
@@ -142,11 +156,9 @@ int RecordingDays::displayValue() const
         : m_emptyDaysValue;
 }
 
-int RecordingDays::rawValue() const
+std::chrono::seconds RecordingDays::rawValue() const
 {
-    return m_value.hasValue()
-        ? m_value.get()
-        : m_emptyDaysValue;
+    return std::chrono::days(m_value.valueOr(m_emptyDaysValue));
 }
 
 void RecordingDays::setAutoMode()

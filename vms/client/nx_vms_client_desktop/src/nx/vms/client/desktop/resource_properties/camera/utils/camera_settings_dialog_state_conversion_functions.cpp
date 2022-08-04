@@ -42,18 +42,18 @@ void tryStoreRecordingDaysChanges(
     const QnVirtualCameraResourceList& cameras,
     DaysType type)
 {
-    using getterType = std::function<int(const QnVirtualCameraResourcePtr&)>;
-    using setterType = std::function<void(const QnVirtualCameraResourcePtr&, int)>;
+    using getterType = std::function<std::chrono::seconds(const QnVirtualCameraResourcePtr&)>;
+    using setterType = std::function<void(const QnVirtualCameraResourcePtr&, std::chrono::seconds)>;
 
     static const getterType minGetter =
-        [](const QnVirtualCameraResourcePtr& camera) { return camera->minDays(); };
+        [](const QnVirtualCameraResourcePtr& camera) { return camera->minPeriod(); };
     static const setterType minSetter =
-        [](const QnVirtualCameraResourcePtr& camera, int value) { return camera->setMinDays(value); };
+        [](const QnVirtualCameraResourcePtr& camera, std::chrono::seconds value) { return camera->setMinPeriod(value); };
 
     static const getterType maxGetter =
-        [](const QnVirtualCameraResourcePtr& camera) { return camera->maxDays(); };
+        [](const QnVirtualCameraResourcePtr& camera) { return camera->maxPeriod(); };
     static const setterType maxSetter =
-        [](const QnVirtualCameraResourcePtr& camera, int value) { return camera->setMaxDays(value); };
+        [](const QnVirtualCameraResourcePtr& camera, std::chrono::seconds value) { return camera->setMaxPeriod(value); };
 
     const setterType& setter = type == DaysType::minDays ? minSetter : maxSetter;
 
@@ -75,7 +75,7 @@ void tryStoreRecordingDaysChanges(
     for (const auto& camera: cameras)
     {
         const auto value = getter(camera);
-        const bool currentManualMode = value >= 0;
+        const bool currentManualMode = value.count() >= 0;
         if (currentManualMode != data.isManualMode())
             setter(camera, -value);
     }
