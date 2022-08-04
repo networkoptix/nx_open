@@ -28,16 +28,14 @@ using ManifestItemId = QString;
 struct DescriptorScope
 {
     QnUuid engineId;
-    QString groupId;
-    QString provider;
+    mutable QString groupId;
+    mutable QString provider;
+    mutable std::set<DeviceId> deviceIds;
 
     bool operator==(const DescriptorScope& other) const = default;
 
     bool operator<(const DescriptorScope& other) const
     {
-        // Two paths with the same pluginId and different groupId are not allowed because
-        // only single Engine per Plugin is supported. In the future, when we support multiple
-        // Engines per Plugin, this have to change.
         return engineId < other.engineId;
     }
 
@@ -46,7 +44,7 @@ struct DescriptorScope
         return engineId.isNull() && groupId.isEmpty() && provider.isEmpty();
     }
 };
-#define nx_vms_api_analytics_DescriptorScope_Fields (engineId)(groupId)(provider)
+#define nx_vms_api_analytics_DescriptorScope_Fields (engineId)(groupId)(provider)(deviceIds)
 NX_REFLECTION_INSTRUMENT(DescriptorScope, nx_vms_api_analytics_DescriptorScope_Fields);
 
 
@@ -61,6 +59,12 @@ struct hasProvider: std::false_type {};
 
 template<typename T>
 struct hasProvider<T, std::void_t<decltype(std::declval<T>().provider)>>: std::true_type {};
+
+template<typename T, typename = void>
+struct hasScopes: std::false_type {};
+
+template<typename T>
+struct hasScopes<T, std::void_t<decltype(std::declval<T>().scopes)>>: std::true_type {};
 
 template<typename T>
 DescriptorScope scopeFromItem(QnUuid engineId, T item)
@@ -203,7 +207,7 @@ struct ExtendedScopedDescriptor: public BaseScopedDescriptor
     std::optional<QString> base;
     std::vector<QString> omittedBaseAttributes;
     std::vector<AttributeDescription> attributes;
-    std::map<QString, std::set<EngineId>> attributeSupportInfo;
+    std::map<QString, std::map<EngineId, std::set<DeviceId>>> attributeSupportInfo;
 };
 #define nx_vms_api_analytics_ExtendedScopedDescriptor_Fields \
     nx_vms_api_analytics_BaseScopedDescriptor_Fields \

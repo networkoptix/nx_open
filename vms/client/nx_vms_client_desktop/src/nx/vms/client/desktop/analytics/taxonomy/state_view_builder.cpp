@@ -18,6 +18,10 @@ static void engineFiltersFromObjectType(
 
     for (const nx::analytics::taxonomy::AbstractScope* scope: objectType->scopes())
     {
+        // Skip the Type which is in the Engine scope but has never been supported by any Device Agent.
+        if (scope->deviceIds().empty())
+            continue;
+
         nx::analytics::taxonomy::AbstractEngine* taxonomyEngine = scope->engine();
         if (!taxonomyEngine)
             continue;
