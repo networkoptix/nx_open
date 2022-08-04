@@ -30,6 +30,10 @@ struct NX_NETWORK_API Ini: nx::kit::IniConfig
 
     NX_INI_FLAG(false, traceIoObjectsLifetime,
         "Enables reporting creation stack traces of dangling HTTP clients during server shutdown");
+
+    // NOTE: #akolesnikov TLSv1.3 is temporarily disabled since some network test fail when using it.
+    // Will be fixed in NXLIB-55.
+    NX_INI_FLAG(true, disableTls13ByDefault, "Disable TLS v1.3 by default");
 };
 
 NX_NETWORK_API Ini& ini();
