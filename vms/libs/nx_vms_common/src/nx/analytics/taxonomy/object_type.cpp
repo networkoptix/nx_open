@@ -106,6 +106,11 @@ void ObjectType::addDerivedType(AbstractObjectType* derivedType)
     m_impl->addDerivedType(derivedType);
 }
 
+void ObjectType::resolvePrivateness()
+{
+    m_impl->resolvePrivateness();
+}
+
 void ObjectType::resolvePrivateness(bool hasPublicDescendants)
 {
     m_impl->resolvePrivateness(hasPublicDescendants);
@@ -119,12 +124,6 @@ void ObjectType::resolveScopes(InternalState* inOutInternalState, ErrorHandler* 
 void ObjectType::resolve(InternalState* inOutInternalState, ErrorHandler* errorHandler)
 {
     m_impl->resolve(inOutInternalState, errorHandler);
-}
-
-AttributeTree ObjectType::getSupportedAttributeTree(
-    std::set<QString> allowedAttributePaths, InternalState* internalState) const
-{
-    return m_impl->getSupportedAttributeTree(allowedAttributePaths, internalState);
 }
 
 void ObjectType::resolveSupportedAttributes(

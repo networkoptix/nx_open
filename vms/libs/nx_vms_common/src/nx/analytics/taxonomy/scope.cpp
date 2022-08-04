@@ -22,6 +22,16 @@ AbstractGroup* Scope::group() const
     return m_group;
 }
 
+QString Scope::provider() const
+{
+    return m_provider;
+}
+
+std::vector<QnUuid> Scope::deviceIds() const
+{
+    return m_deviceIds;
+}
+
 bool Scope::isEmpty() const
 {
     return m_engine == nullptr && m_group == nullptr;
@@ -35,6 +45,16 @@ void Scope::setEngine(Engine* engine)
 void Scope::setGroup(Group* group)
 {
     m_group = group;
+}
+
+void Scope::setProvider(const QString& provider)
+{
+    m_provider = provider;
+}
+
+void Scope::setDeviceIds(std::vector<QnUuid> deviceIds)
+{
+    m_deviceIds = std::move(deviceIds);
 }
 
 } // namespace nx::analytics::taxonomy

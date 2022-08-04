@@ -98,6 +98,11 @@ void EventType::resolvePrivateness(bool hasPublicDescendants)
     m_impl->resolvePrivateness(hasPublicDescendants);
 }
 
+void EventType::resolvePrivateness()
+{
+    m_impl->resolvePrivateness();
+}
+
 void EventType::resolveScopes(InternalState* inOutInternalState, ErrorHandler* errorHandler)
 {
     m_impl->resolveScopes(inOutInternalState, errorHandler);
@@ -106,12 +111,6 @@ void EventType::resolveScopes(InternalState* inOutInternalState, ErrorHandler* e
 void EventType::resolve(InternalState* inOutInternalState, ErrorHandler* errorHandler)
 {
     m_impl->resolve(inOutInternalState, errorHandler);
-}
-
-AttributeTree EventType::getSupportedAttributeTree(
-    std::set<QString> allowedAttributePaths, InternalState* internalState) const
-{
-    return m_impl->getSupportedAttributeTree(allowedAttributePaths, internalState);
 }
 
 void EventType::resolveSupportedAttributes(

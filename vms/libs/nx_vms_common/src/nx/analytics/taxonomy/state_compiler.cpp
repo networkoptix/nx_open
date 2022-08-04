@@ -35,6 +35,13 @@ void resolveSupportedAttributes(
         item->resolveSupportedAttributes(internalState, errorHandler);
 }
 
+template<typename Map>
+void resolvePrivateness(Map* inOutMap)
+{
+    for (auto& [_, item]: *inOutMap)
+        item->resolvePrivateness();
+}
+
 static InternalState makeInitialInternalState(Descriptors descriptors)
 {
     InternalState internalState;
@@ -79,6 +86,8 @@ StateCompiler::Result StateCompiler::compile(Descriptors descriptors)
 
     resolveSupportedAttributes(&internalState.objectTypeById, &internalState, &errorHandler);
     resolveSupportedAttributes(&internalState.eventTypeById, &internalState, &errorHandler);
+    resolvePrivateness(&internalState.objectTypeById);
+    resolvePrivateness(&internalState.eventTypeById);
 
     StateCompiler::Result result;
     result.state = std::make_shared<State>(std::move(internalState));

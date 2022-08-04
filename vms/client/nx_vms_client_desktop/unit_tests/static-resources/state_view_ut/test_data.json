@@ -723,35 +723,53 @@
             ],
             "attributeSupportInfo": {
                 "base.object.type.1": {
-                    "Base Type String Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Boolean Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Numeric Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Numeric Attribute 2": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Numeric Attribute 3": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Numeric Attribute 4": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Enumeration Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Color Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Object Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"]
+                    "Base Type String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Boolean Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Numeric Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Numeric Attribute 2": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Numeric Attribute 3": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Numeric Attribute 4": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Enumeration Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Color Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Object Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "hidden.derived.object.type.1": {
-                    "Hidden Derived Type 1, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Hidden Derived Type 1, Boolean Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Hidden Derived Type 1, Numeric Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Hidden Derived Type 1, Enumeration Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Hidden Derived Type 1, Color Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Hidden Derived Type 1, Object Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Hidden Derived Type 1, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 1, Boolean Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 1, Numeric Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 1, Enumeration Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 1, Color Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 1, Object Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 }
             }
         },
@@ -873,19 +891,35 @@
             "objectTypes": ["base.object.type.1", "hidden.derived.object.type.4"],
             "attributeSupportInfo": {
                 "base.object.type.1": {
-                    "Base Type Numeric Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Numeric Attribute 2": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Numeric Attribute 3": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Numeric Attribute 4": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"]
+                    "Base Type Numeric Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Numeric Attribute 2": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Numeric Attribute 3": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Numeric Attribute 4": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "hidden.derived.object.type.4": {
-                    "Base Type Numeric Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Numeric Attribute 2": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Numeric Attribute 3": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Numeric Attribute 4": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Hidden Derived Type 4, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Base Type Numeric Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Numeric Attribute 2": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Numeric Attribute 3": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Numeric Attribute 4": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 4, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 }
             }
         },
@@ -924,6 +958,9 @@
                         {
                             "name": "Base Type Numeric Attribute 4",
                             "type": "number",
+                            "minValue": 2,
+                            "maxValue": 20,
+                            "unit": "unit",
                             "subtype": "integer"
                         },
                         {
@@ -940,13 +977,17 @@
             "objectTypes": ["base.object.type.1", "hidden.derived.object.type.5"],
             "attributeSupportInfo": {
                 "base.object.type.1": {
-                    "Base Type Enumeration Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"]
+                    "Base Type Enumeration Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "hidden.derived.object.type.5": {
-                    "Base Type Enumeration Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Hidden Derived Type 5, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Base Type Enumeration Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 5, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 }
             }
         },
@@ -990,13 +1031,17 @@
             "objectTypes": ["base.object.type.1", "hidden.derived.object.type.6"],
             "attributeSupportInfo": {
                 "base.object.type.1": {
-                    "Base Type Color Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"]
+                    "Base Type Color Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "hidden.derived.object.type.6": {
-                    "Base Type Color Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Hidden Derived Type 6, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Base Type Color Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 6, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 }
             }
         },
@@ -1045,43 +1090,47 @@
             ],
             "attributeSupportInfo": {
                 "base.object.type.1": {
-                    "Base Type Object Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Object Attribute 1.Nested Type 1, Nested String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Base Type Object Attribute 1.Nested Type 1, Nested Boolean Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Base Type Object Attribute 1.Nested Type 1, Nested Numeric Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Base Type Object Attribute 1.Nested Type 1, Nested Enumeration Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Base Type Object Attribute 1.Nested Type 1, Nested Color Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Base Type Object Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Object Attribute 1.Nested Type 1, Nested String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Boolean Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Numeric Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Enumeration Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Color Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "hidden.derived.object.type.7": {
-                    "Base Type Object Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Object Attribute 1.Nested Type 1, Nested String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Base Type Object Attribute 1.Nested Type 1, Nested Boolean Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Base Type Object Attribute 1.Nested Type 1, Nested Numeric Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Base Type Object Attribute 1.Nested Type 1, Nested Enumeration Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Base Type Object Attribute 1.Nested Type 1, Nested Color Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Hidden Derived Type 7, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Base Type Object Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Object Attribute 1.Nested Type 1, Nested String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Boolean Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Numeric Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Enumeration Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Color Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 7, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 }
             }
         },
@@ -1156,13 +1205,17 @@
             "objectTypes": ["base.object.type.1", "hidden.derived.object.type.2"],
             "attributeSupportInfo": {
                 "base.object.type.1": {
-                    "Base Type String Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"]
+                    "Base Type String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "hidden.derived.object.type.2": {
-                    "Base Type String Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Hidden Derived Type 2, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Base Type String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 2, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 }
             }
         },
@@ -1198,13 +1251,17 @@
             "objectTypes": ["base.object.type.1", "hidden.derived.object.type.3"],
             "attributeSupportInfo": {
                 "base.object.type.1": {
-                    "Base Type Boolean Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"]
+                    "Base Type Boolean Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "hidden.derived.object.type.3": {
-                    "Base Type Boolean Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Hidden Derived Type 3, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Base Type Boolean Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 3, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 }
             }
         },
@@ -1246,55 +1303,73 @@
             ],
             "attributeSupportInfo": {
                 "base.object.type.1": {
-                    "Base Type String Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Boolean Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Numeric Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Numeric Attribute 2": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Numeric Attribute 3": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Numeric Attribute 4": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Enumeration Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Color Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Object Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"]
+                    "Base Type String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Boolean Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Numeric Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Numeric Attribute 2": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Numeric Attribute 3": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Numeric Attribute 4": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Enumeration Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Color Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Object Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "hidden.derived.object.type.1": {
-                    "Hidden Derived Type 1, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Hidden Derived Type 1, Boolean Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Hidden Derived Type 1, Numeric Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Hidden Derived Type 1, Enumeration Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Hidden Derived Type 1, Color Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Hidden Derived Type 1, Object Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Hidden Derived Type 1, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 1, Boolean Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 1, Numeric Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 1, Enumeration Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 1, Color Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 1, Object Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "hidden.derived.object.type.1.1": {
-                    "Hidden Derived Type 1.1, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Hidden Derived Type 1.1, Boolean Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Hidden Derived Type 1.1, Numeric Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Hidden Derived Type 1.1, Enumeration Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Hidden Derived Type 1.1, Color Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Hidden Derived Type 1.1, Object Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Hidden Derived Type 1.1, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 1.1, Boolean Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 1.1, Numeric Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 1.1, Enumeration Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 1.1, Color Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 1.1, Object Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 }
             }
         },
@@ -1458,28 +1533,52 @@
             ],
             "attributeSupportInfo": {
                 "base.object.type.1": {
-                    "Base Type Numeric Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Numeric Attribute 2": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Numeric Attribute 3": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Numeric Attribute 4": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"]
+                    "Base Type Numeric Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Numeric Attribute 2": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Numeric Attribute 3": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Numeric Attribute 4": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "hidden.derived.object.type.4": {
-                    "Base Type Numeric Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Numeric Attribute 2": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Numeric Attribute 3": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Numeric Attribute 4": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Hidden Derived Type 4, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Base Type Numeric Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Numeric Attribute 2": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Numeric Attribute 3": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Numeric Attribute 4": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 4, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "hidden.derived.object.type.4.1": {
-                    "Base Type Numeric Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Numeric Attribute 2": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Numeric Attribute 3": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Numeric Attribute 4": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Hidden Derived Type 4.1, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Base Type Numeric Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Numeric Attribute 2": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Numeric Attribute 3": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Numeric Attribute 4": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 4.1, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 }
             }
         },
@@ -1507,7 +1606,10 @@
                         {
                             "name": "Base Type Numeric Attribute 2",
                             "type": "number",
-                            "subtype": "float"
+                            "subtype": "float",
+                            "minValue": 1.0,
+                            "maxValue": 10.0,
+                            "unit": "kg"
                         },
                         {
                             "name": "Base Type Numeric Attribute 3",
@@ -1517,7 +1619,10 @@
                         {
                             "name": "Base Type Numeric Attribute 4",
                             "type": "number",
-                            "subtype": "integer"
+                            "subtype": "integer",
+                            "minValue": 2,
+                            "maxValue": 20,
+                            "unit": "unit"
                         },
                         {
                             "name": "Hidden Derived Type 4, String Attribute 1",
@@ -1541,19 +1646,25 @@
             ],
             "attributeSupportInfo": {
                 "base.object.type.1": {
-                    "Base Type Enumeration Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"]
+                    "Base Type Enumeration Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "hidden.derived.object.type.5": {
-                    "Base Type Enumeration Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Hidden Derived Type 5, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Base Type Enumeration Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 5, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "hidden.derived.object.type.5.1": {
-                    "Base Type Enumeration Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Hidden Derived Type 5.1, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Base Type Enumeration Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 5.1, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 }
             }
         },
@@ -1610,19 +1721,25 @@
             ],
             "attributeSupportInfo": {
                 "base.object.type.1": {
-                    "Base Type Color Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"]
+                    "Base Type Color Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "hidden.derived.object.type.6": {
-                    "Base Type Color Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Hidden Derived Type 6, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Base Type Color Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 6, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "hidden.derived.object.type.6.1": {
-                    "Base Type Color Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Hidden Derived Type 6.1, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Base Type Color Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 6.1, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 }
             }
         },
@@ -1682,67 +1799,73 @@
             ],
             "attributeSupportInfo": {
                 "base.object.type.1": {
-                    "Base Type Object Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Object Attribute 1.Nested Type 1, Nested String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Base Type Object Attribute 1.Nested Type 1, Nested Boolean Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Base Type Object Attribute 1.Nested Type 1, Nested Numeric Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Base Type Object Attribute 1.Nested Type 1, Nested Enumeration Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Base Type Object Attribute 1.Nested Type 1, Nested Color Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Hidden Derived Type 5, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Base Type Object Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Object Attribute 1.Nested Type 1, Nested String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Boolean Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Numeric Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Enumeration Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Color Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 5, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "hidden.derived.object.type.7": {
-                    "Base Type Object Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Object Attribute 1.Nested Type 1, Nested String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Base Type Object Attribute 1.Nested Type 1, Nested Boolean Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Base Type Object Attribute 1.Nested Type 1, Nested Numeric Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Base Type Object Attribute 1.Nested Type 1, Nested Enumeration Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Base Type Object Attribute 1.Nested Type 1, Nested Color Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Hidden Derived Type 7, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Base Type Object Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Object Attribute 1.Nested Type 1, Nested String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Boolean Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Numeric Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Enumeration Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Color Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 7, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "hidden.derived.object.type.7.1": {
-                    "Base Type Object Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Base Type Object Attribute 1.Nested Type 1, Nested String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Base Type Object Attribute 1.Nested Type 1, Nested Boolean Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Base Type Object Attribute 1.Nested Type 1, Nested Numeric Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Base Type Object Attribute 1.Nested Type 1, Nested Enumeration Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Base Type Object Attribute 1.Nested Type 1, Nested Color Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ],
-                    "Hidden Derived Type 7.1, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Base Type Object Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Object Attribute 1.Nested Type 1, Nested String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Boolean Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Numeric Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Enumeration Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Base Type Object Attribute 1.Nested Type 1, Nested Color Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 7.1, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 }
             }
         },
@@ -1833,19 +1956,25 @@
             ],
             "attributeSupportInfo": {
                 "base.object.type.1": {
-                    "Base Type String Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"]
+                    "Base Type String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "hidden.derived.object.type.2": {
-                    "Base Type String Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Hidden Derived Type 2, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Base Type String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 2, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "hidden.derived.object.type.2.1": {
-                    "Base Type String Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Hidden Derived Type 2.1, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Base Type String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 2.1, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 }
             }
         },
@@ -1891,19 +2020,25 @@
             ],
             "attributeSupportInfo": {
                 "base.object.type.1": {
-                    "Base Type Boolean Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"]
+                    "Base Type Boolean Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "hidden.derived.object.type.3": {
-                    "Base Type Boolean Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Hidden Derived Type 3, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Base Type Boolean Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 3, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "hidden.derived.object.type.3.1": {
-                    "Base Type Boolean Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Hidden Derived Type 3.1, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Base Type Boolean Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 3.1, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 }
             }
         },
@@ -1951,24 +2086,24 @@
             ],
             "attributeSupportInfo": {
                 "base.object.type.1": {
-                    "Base Type String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Base Type String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "derived.object.type.1": {
-                    "Derived Object Type 1, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Derived Object Type 1, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "derived.object.type.2": {
-                    "Derived Object Type 2, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Derived Object Type 2, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "derived.object.type.3": {
-                    "Derived Object Type 3, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Derived Object Type 3, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 }
             }
         },
@@ -2052,45 +2187,47 @@
             ],
             "attributeSupportInfo": {
                 "base.object.type.1": {
-                    "Base Type String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Base Type String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "derived.object.type.1": {
-                    "Derived Object Type 1, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Derived Object Type 1, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "derived.object.type.2": {
-                    "Derived Object Type 2, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Derived Object Type 2, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "derived.object.type.3": {
-                    "Derived Object Type 3, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Derived Object Type 3, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "hidden.derived.object.type.2": {
-                    "Base Type String Attribute 1": ["2a6397b7-9645-4f9a-b6c3-78320c6a0633"],
-                    "Hidden Derived Type 2, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Base Type String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    },
+                    "Hidden Derived Type 2, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "hidden.derived.object.type.8": {
-                    "Hidden Derived Type 8, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Hidden Derived Type 8, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "hidden.derived.object.type.9": {
-                    "Hidden Derived Type 9, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Hidden Derived Type 9, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "hidden.derived.object.type.10": {
-                    "Hidden Derived Type 10, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Hidden Derived Type 10, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 }
             }
         },
@@ -2213,24 +2350,24 @@
             ],
             "attributeSupportInfo": {
                 "hidden.derived.object.type.2": {
-                    "Hidden Derived Type 2, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Hidden Derived Type 2, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "hidden.derived.object.type.8": {
-                    "Hidden Derived Type 8, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Hidden Derived Type 8, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "hidden.derived.object.type.9": {
-                    "Hidden Derived Type 9, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Hidden Derived Type 9, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 },
                 "hidden.derived.object.type.10": {
-                    "Hidden Derived Type 10, String Attribute 1": [
-                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633"
-                    ]
+                    "Hidden Derived Type 10, String Attribute 1": {
+                        "2a6397b7-9645-4f9a-b6c3-78320c6a0633": []
+                    }
                 }
             }
 

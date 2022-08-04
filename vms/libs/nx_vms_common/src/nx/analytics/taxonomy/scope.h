@@ -18,15 +18,26 @@ public:
 
     virtual AbstractGroup* group() const override;
 
+    virtual QString provider() const override;
+
+    virtual std::vector<QnUuid> deviceIds() const override;
+
     virtual bool isEmpty() const override;
 
     void setEngine(Engine* engine);
 
     void setGroup(Group* group);
 
+    void setProvider(const QString& provider);
+
+    void setDeviceIds(std::vector<QnUuid> deviceIds);
+
 private:
     Engine* m_engine = nullptr;
     Group* m_group = nullptr;
+    QString m_provider;
+    std::vector<QnUuid> m_deviceIds;
+
 };
 
 } // namespace nx::analytics::taxonomy
