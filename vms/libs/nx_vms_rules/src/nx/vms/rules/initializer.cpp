@@ -73,7 +73,9 @@ void Initializer::registerFields() const
     registerEventField<KeywordsField>();
     registerEventField<SourceCameraField>();
     registerEventField<SourceServerField>();
-    registerEventField<SourceUserField>();
+    m_engine->registerEventField(
+        fieldMetatype<SourceUserField>(),
+        [this] { return new SourceUserField(systemContext()); });
     registerEventField<StateField>();
     registerEventField<UniqueIdField>();
 
