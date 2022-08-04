@@ -313,7 +313,7 @@ bool QnWorkbenchVirtualCameraHandler::fixFileUpload(
 
         QLocale locale = QLocale::system();
 
-        int days = camera->maxDays();
+        const int days = duration_cast<std::chrono::days>(camera->maxPeriod()).count();
         QString extra;
         if (count == 1)
         {

@@ -30,8 +30,12 @@ ArchiveLengthWidget::ArchiveLengthWidget(QWidget* parent):
     check_box_utils::autoClearTristate(ui->checkBoxMinArchive);
     check_box_utils::autoClearTristate(ui->checkBoxMaxArchive);
 
-    spin_box_utils::autoClearSpecialValue(ui->spinBoxMinDays, nx::vms::api::kDefaultMinArchiveDays);
-    spin_box_utils::autoClearSpecialValue(ui->spinBoxMaxDays, nx::vms::api::kDefaultMaxArchiveDays);
+    spin_box_utils::autoClearSpecialValue(
+        ui->spinBoxMinDays, 
+        duration_cast<std::chrono::days>(nx::vms::api::kDefaultMinArchivePeriod).count());
+    spin_box_utils::autoClearSpecialValue(
+        ui->spinBoxMaxDays,
+        duration_cast<std::chrono::days>(nx::vms::api::kDefaultMaxArchivePeriod).count());
 
     m_aligner->addWidgets({
         ui->labelMinDays,
