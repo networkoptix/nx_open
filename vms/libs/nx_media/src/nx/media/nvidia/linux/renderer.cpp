@@ -3,14 +3,8 @@
 
 #include <nx/utils/log/log.h>
 
-#include <GL/glew.h>
-
 #include "renderer.h"
 
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <GL/gl.h>
-#include <GL/glx.h>
 #include <cuda.h>
 #include <cudaGL.h>
 
@@ -104,12 +98,7 @@ bool Renderer::initializePbo(int width, int height)
     NX_DEBUG(this, "Render init: %1x%2", width, height);
     freePbo();
 
-    GLenum err = glewInit();
-    if (GLEW_OK != err)
-    {
-        NX_WARNING(this, "glewInit failed: %1", glewGetErrorString(err));
-        return false;
-    }
+    QOpenGLFunctions::initializeOpenGLFunctions();
 
     glGenBuffers(1, &m_pbo);
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_pbo);
