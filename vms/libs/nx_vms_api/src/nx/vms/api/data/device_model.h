@@ -121,10 +121,30 @@ struct DeviceScheduleSettings
 {
     bool isEnabled = false;
     std::vector<ScheduleTaskData> tasks;
+
+    /**%apidoc Minimum number of days to keep the archive for.
+     * %deprecated This fields is deprecated and used for backward compatibility only. Use 
+     *     'minArchivePeriodS' instead.
+     */
     std::optional<int> minArchiveDays;
+
+    /**%apidoc[opt] Maximum number of days to keep the archive for.
+     * %deprecated This fields is deprecated and used for backward compatibility only. Use 
+     *     'maxArchivePeriodS' instead.
+     */
     std::optional<int> maxArchiveDays;
+
+    /**%apidoc[opt] Minimum number of seconds to keep the archive for. If the value is less than or
+     * equal to zero, it is not used.
+     */
+    std::optional<int> minArchivePeriodS;
+
+    /**%apidoc[opt] Maximum number of seconds to keep the archive for. If the value is less than or
+     * equal zero, it is not used.
+     */
+    std::optional<int> maxArchivePeriodS;
 };
-#define DeviceScheduleSettings_Fields (isEnabled)(tasks)(minArchiveDays)(maxArchiveDays)
+#define DeviceScheduleSettings_Fields (isEnabled)(tasks)(minArchiveDays)(maxArchiveDays)(minArchivePeriodS)(maxArchivePeriodS)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceScheduleSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(DeviceScheduleSettings, DeviceScheduleSettings_Fields);
 

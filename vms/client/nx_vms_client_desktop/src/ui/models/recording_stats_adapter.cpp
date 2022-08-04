@@ -142,8 +142,11 @@ QnCameraStatsData QnRecordingStats::forecastFromStatsToModel(const QnRecordingSt
         {
             CameraRecordingSettings camera;
             camera.physicalId = cameraStats.physicalId;
-            camera.minDays = qMax(0, cameraResource->minDays());
-            camera.maxDays = qMax(0, cameraResource->maxDays());
+            using namespace std::chrono;
+            camera.minDays = qMax(std::chrono::days::zero().count(),
+                duration_cast<days>(cameraResource->minPeriod()).count());
+            camera.maxDays = qMax(std::chrono::days::zero().count(), 
+                duration_cast<days>(cameraResource->maxPeriod()).count());
             camera.averageDensity = qMax(0ll, cameraStats.averageDensity);
 
             cameras.push_back(std::move(camera)); //< Add camera for forecast.

@@ -1095,16 +1095,16 @@ void QnSecurityCamResource::setLogicalId(int value)
     emit logicalIdChanged(::toSharedPointer(this));
 }
 
-void QnSecurityCamResource::setMaxDays(int value)
+void QnSecurityCamResource::setMaxPeriod(std::chrono::seconds value)
 {
     NX_MUTEX_LOCKER lock(&m_attributesMutex);
-    m_userAttributes.maxArchiveDays = value;
+    m_userAttributes.maxArchivePeriodS = value;
 }
 
-int QnSecurityCamResource::maxDays() const
+std::chrono::seconds QnSecurityCamResource::maxPeriod() const
 {
     NX_MUTEX_LOCKER lock(&m_attributesMutex);
-    return m_userAttributes.maxArchiveDays;
+    return m_userAttributes.maxArchivePeriodS;
 }
 
 void QnSecurityCamResource::setPreferredServerId(const QnUuid& value)
@@ -1149,16 +1149,16 @@ void QnSecurityCamResource::updatePreferredServerId()
         setPreferredServerId(getParentId());
 }
 
-void QnSecurityCamResource::setMinDays(int value)
+void QnSecurityCamResource::setMinPeriod(std::chrono::seconds value)
 {
     NX_MUTEX_LOCKER lock(&m_attributesMutex);
-    m_userAttributes.minArchiveDays = value;
+    m_userAttributes.minArchivePeriodS = value;
 }
 
-int QnSecurityCamResource::minDays() const
+std::chrono::seconds QnSecurityCamResource::minPeriod() const
 {
     NX_MUTEX_LOCKER lock(&m_attributesMutex);
-    return m_userAttributes.minArchiveDays;
+    return m_userAttributes.minArchivePeriodS;
 }
 
 int QnSecurityCamResource::recordBeforeMotionSec() const

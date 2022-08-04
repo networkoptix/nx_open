@@ -21,9 +21,11 @@ QN_FUSION_DEFINE_FUNCTIONS(CameraDataEx, (json))
 struct CameraDataExBackwardCompatibility: public CameraDataEx
 {
     bool licenseUsed = false;
+    int maxArchiveDays = 0;
+    int minArchiveDays = 0;
 };
 
-#define CameraDataExBackwardCompatibility_Fields CameraDataEx_Fields (licenseUsed)
+#define CameraDataExBackwardCompatibility_Fields CameraDataEx_Fields (licenseUsed)(maxArchiveDays)(minArchiveDays)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(CameraDataExBackwardCompatibility,
     (json), CameraDataExBackwardCompatibility_Fields)
@@ -33,6 +35,10 @@ void serialize(QnJsonContext* ctx, const CameraDataEx& value, QJsonValue* target
     CameraDataExBackwardCompatibility compatibilityValue;
     static_cast<CameraDataEx&>(compatibilityValue) = value;
     compatibilityValue.licenseUsed = value.scheduleEnabled;
+    using namespace std::chrono;
+    compatibilityValue.maxArchiveDays = duration_cast<days>(value.maxArchivePeriodS).count();
+    compatibilityValue.minArchiveDays = duration_cast<days>(value.minArchivePeriodS).count();
+    ctx->setChronoSerializedAsDouble(true);
     serialize(ctx, compatibilityValue, target);
 }
 

@@ -37,7 +37,7 @@ public:
      * Raw value, used to store value in database. Positive if days limit is enabled, negative
      * otherwise (absolute value is used to keep value when it is enabled / disabled).
      */
-    int rawValue() const;
+    std::chrono::seconds rawValue() const;
 
     void setAutoMode();
     void setManualMode();
