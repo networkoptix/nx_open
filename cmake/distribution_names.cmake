@@ -27,6 +27,7 @@ function(set_distribution_names)
     set(android_aab_suffix "android${distribution_name_suffix}${notification_provider_suffix}")
     set(vmsBenchmarkSuffix "${targetDevice}${publication_type_suffix}")
     set(sdkSuffix "universal${publication_type_suffix}")
+    set(webadminSuffix "universal${publication_type_suffix}")
     if(targetDevice STREQUAL "linux_arm32")
         set(suffix_rpi "rpi${distribution_name_suffix}")
         set(suffix_bananapi "bananapi${distribution_name_suffix}")
@@ -77,6 +78,8 @@ function(set_distribution_names)
         "${prefix}-client-${mobileClientVersion.full}-${suffix}" PARENT_SCOPE)
     set(mobile_client_aab_distribution_name
         "${prefix}-client-${mobileClientVersion.full}-${android_aab_suffix}" PARENT_SCOPE)
+    set(webadmin_distribution_name
+        "${prefix}-webadmin-${releaseVersion.full}-${webadminSuffix}" PARENT_SCOPE)
     set(metadata_sdk_distribution_name
         "${prefix}-metadata_sdk-${releaseVersion.full}-${sdkSuffix}" PARENT_SCOPE)
     set(video_source_sdk_distribution_name
