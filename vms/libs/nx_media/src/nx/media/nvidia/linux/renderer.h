@@ -5,9 +5,9 @@
 #ifdef __linux__
 
 #include <QtCore/QSize>
+#include <QtGui/QOpenGLFunctions>
 
 #include <memory>
-#include <GL/gl.h>
 #include <cuda.h>
 
 namespace nx::media::nvidia {
@@ -18,7 +18,7 @@ class NvidiaVideoFrame;
 
 namespace nx::media::nvidia::linux {
 
-class Renderer
+class Renderer : public QOpenGLFunctions
 {
 public:
     ~Renderer();
