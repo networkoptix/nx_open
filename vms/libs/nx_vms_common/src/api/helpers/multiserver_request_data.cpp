@@ -37,7 +37,7 @@ void QnMultiserverRequestData::loadFromParams(QnResourcePool* /*resourcePool*/,
     QnBaseMultiserverRequestData::loadFromParams(params);
 }
 
-nx::network::rest::Params QnMultiserverRequestData::toParams() const
+nx::network::rest::Params QnBaseMultiserverRequestData::toParams() const
 {
     nx::network::rest::Params result;
     if (isLocal)
