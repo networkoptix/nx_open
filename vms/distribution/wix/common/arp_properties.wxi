@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Include>
+    <?ifndef arpPropertiesIncludeGuard?>
+        <?define arpPropertiesIncludeGuard = "arp_properies.wxi"?>
+        <!-- Set up ARPINSTALLLOCATION property -->
+        <CustomAction Id="SetARPINSTALLLOCATION" Property="ARPINSTALLLOCATION" Value="[INSTALLDIR]" />
+
+        <!-- Sequences -->
+        <InstallExecuteSequence>
+            <Custom Action="SetARPINSTALLLOCATION" After="InstallValidate"></Custom>
+        </InstallExecuteSequence>
+     <?endif?>
+</Include>
