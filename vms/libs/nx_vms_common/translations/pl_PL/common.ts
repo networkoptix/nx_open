@@ -1370,7 +1370,7 @@
     </message>
     <message>
       <source>Thumbnails auto-update</source>
-      <translation type="unfinished">Thumbnails auto-update</translation>
+      <translation>Automatyczna aktualizacja miniatur</translation>
     </message>
     <message>
       <source>Use %1 service to send emails instead of SMTP client</source>
