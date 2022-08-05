@@ -56,8 +56,8 @@ __VA_ARGS__ uint qHash(const TYPE &value, uint seed) {                          
 namespace Qn {
 
 template<typename OutputData>
-std::optional<QByteArray> trySerialize(const OutputData& outputData,
-    Qn::SerializationFormat format, bool extraFormatting)
+std::optional<QByteArray> trySerialize(
+    const OutputData& outputData, Qn::SerializationFormat format)
 {
     switch (format)
     {
@@ -66,12 +66,7 @@ std::optional<QByteArray> trySerialize(const OutputData& outputData,
 
         case Qn::JsonFormat:
         case Qn::UnsupportedFormat:
-        {
-            QByteArray result = QJson::serialized(outputData);
-            if (extraFormatting)
-                result = nx::utils::formatJsonString(result);
-            return result;
-        }
+            return QJson::serialized(outputData);
 
         case Qn::CsvFormat:
             return QnCsv::serialized(outputData);
@@ -87,10 +82,9 @@ std::optional<QByteArray> trySerialize(const OutputData& outputData,
 }
 
 template<typename OutputData>
-QByteArray serialized(
-    const OutputData& outputData, Qn::SerializationFormat format, bool extraFormatting)
+QByteArray serialized(const OutputData& outputData, Qn::SerializationFormat format)
 {
-    auto serializedData = trySerialize(outputData, format, extraFormatting);
+    auto serializedData = trySerialize(outputData, format);
     NX_ASSERT(serializedData.has_value());
     return serializedData.has_value() ? *serializedData : QByteArray();
 }
