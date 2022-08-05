@@ -19,7 +19,8 @@
             InstallPrivileges="elevated"
             InstallScope="perMachine"/>
 
-        <?include ${CMAKE_CURRENT_SOURCE_DIR}/installer_states.wxi ?>
+        <?include ${common_wix_sources_path}/installer_states.wxi ?>
+        <?include ${common_wix_sources_path}/arp_properties.wxi ?>
 
         <!-- This property is used in custom actions to cleanup autorun registry key. -->
         <Property Id="CLIENT_NAME" Value="${desktopClientInternalName}"/>
