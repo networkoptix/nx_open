@@ -42,6 +42,7 @@ private:
     void initClientApiSupport();
     void setupOverlays();
     void setupWidget();
+    void updateInterfaceVisibility();
     bool verifyCertificate(const QString& pemString, const QUrl& url);
     bool askUserToAcceptCertificate(
         const nx::network::ssl::CertificateChain& chain, const nx::utils::Url& url);
