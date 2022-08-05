@@ -1,0 +1,34 @@
+# IDE and misc software files.
+*.xcworkspace
+.idea
+.vs
+.vscode
+*~*.TMP
+*.kdev4
+.DS_Store
+._.DS_Store
+*.swp
+*.orig
+*.rej
+*.autosave
+CMakeLists.txt.user
+CMakeSettings.json
+CMakeUserPresets.json
+.vim*
+.ccls*
+compile_commands.json
+.clangd
+.cache
+_ReSharper.Caches
+env
+venv
+
+# Precompiled files.
+__pycache__
+*.pyc
+*.qmlc
+
+# Build folders in the repository root.
+/build/
+/build-*/
+/*-build/
