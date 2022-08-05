@@ -28,8 +28,8 @@ private:
         const QnSecurityCamResourcePtr& camera,
         nx::vms::client::desktop::VirtualCameraUpload *upload);
     bool fixFolderUpload(
-        const QString& path, 
-        const QnSecurityCamResourcePtr& camera, 
+        const QString& path,
+        const QnSecurityCamResourcePtr& camera,
         nx::vms::client::desktop::VirtualCameraUpload* upload);
     bool fixStorageCleanupUpload(nx::vms::client::desktop::VirtualCameraUpload* upload);
     void uploadValidFiles(
