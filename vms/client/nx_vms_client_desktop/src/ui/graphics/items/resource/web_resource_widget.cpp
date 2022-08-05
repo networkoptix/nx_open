@@ -5,6 +5,7 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
 
+#include <core/resource/layout_resource.h>
 #include <core/resource/webpage_resource.h>
 #include <nx/network/ssl/certificate.h>
 #include <nx/utils/string.h>
@@ -95,6 +96,9 @@ QnWebResourceWidget::QnWebResourceWidget(
                 m_pageLoaded = true;
         });
 
+    connect(layoutResource().get(), &QnLayoutResource::lockedChanged,
+        this, &QnWebResourceWidget::updateInterfaceVisibility);
+
     setupOverlays();
     updateButtonsVisibility();
 
@@ -166,6 +170,13 @@ void QnWebResourceWidget::setupWidget()
     addOverlayWidget(m_webEngineView.get(), webParams);
 }
 
+void QnWebResourceWidget::updateInterfaceVisibility()
+{
+    const bool hasButtons = calculateButtonsVisibility() != 0;
+    titleBar()->setVisible(hasButtons || !m_isMinimalTitleBar);
+    setOption(AlwaysShowName, !m_isMinimalTitleBar);
+}
+
 Qn::ResourceStatusOverlay QnWebResourceWidget::calculateStatusOverlay() const
 {
     switch (m_webEngineView->status())
@@ -214,9 +225,10 @@ bool QnWebResourceWidget::eventFilter(QObject* object, QEvent* event)
 
 int QnWebResourceWidget::calculateButtonsVisibility() const
 {
+    const int defaultButtonsVisibility = base_type::calculateButtonsVisibility();
     return m_isMinimalTitleBar
-        ? Qn::CloseButton
-        : (base_type::calculateButtonsVisibility()
+        ? defaultButtonsVisibility & Qn::CloseButton
+        : (defaultButtonsVisibility
             | Qn::FullscreenButton | Qn::BackButton | Qn::ReloadPageButton);
 }
 
@@ -257,7 +269,7 @@ nx::vms::client::desktop::GraphicsWebEngineView* QnWebResourceWidget::webView() 
 void QnWebResourceWidget::setMinimalTitleBarMode(bool value)
 {
     m_isMinimalTitleBar = value;
-    setOption(AlwaysShowName, !m_isMinimalTitleBar);
+    updateInterfaceVisibility();
     setupWidget();
     updateButtonsVisibility();
     updateTitleText();
