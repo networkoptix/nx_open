@@ -10367,8 +10367,8 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <source>Review the %1 to ensure you trust the server you are connecting to.
 Read this %2 to learn more about certificate validation.</source>
       <comment>%1 is &lt;certificate details&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">Review the %1 to ensure you trust the server you are connecting to.
-Read this %2 to learn more about certificate validation.</translation>
+      <translation>Sprawdź %1, aby upewnić się, że ufasz serwerowi, z którym się łączysz.
+Przeczytaj to %2, aby dowiedzieć się więcej o walidacji certyfikatu.</translation>
     </message>
     <message>
       <source>certificate details</source>
@@ -10386,8 +10386,8 @@ Read this %2 to learn more about certificate validation.</translation>
       <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
 You can view %2 or read this %3 to learn more about the current problem.</source>
       <comment>%1 is the system name, %2 is &lt;the server&apos;s certificate&gt; link, %3 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.
-You can view %2 or read this %3 to learn more about the current problem.</translation>
+      <translation>Może to być spowodowane wygaśnięciem certyfikatu serwera lub próbą podszywania się pod %1, aby ukraść Twoje dane osobowe.
+Możesz wyświetlić %2 lub przeczytać %3, aby dowiedzieć się więcej o bieżącym problemie.</translation>
     </message>
     <message>
       <source>the server&apos;s certificate</source>
