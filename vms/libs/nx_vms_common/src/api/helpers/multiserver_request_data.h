@@ -16,13 +16,16 @@ struct NX_VMS_COMMON_API QnBaseMultiserverRequestData
 
     bool isLocal = false; //< If set, the request should not be redirected to another server.
     Qn::SerializationFormat format = kDefaultFormat;
-    bool extraFormatting = false;
 
     QnBaseMultiserverRequestData() = default;
     QnBaseMultiserverRequestData(const nx::network::rest::Params& params);
+    virtual nx::network::rest::Params toParams() const;
 
 protected:
     void loadFromParams(const nx::network::rest::Params& params);
+
+private:
+    bool extraFormatting = false;
 };
 
 struct NX_VMS_COMMON_API QnMultiserverRequestData: QnBaseMultiserverRequestData
@@ -38,7 +41,6 @@ struct NX_VMS_COMMON_API QnMultiserverRequestData: QnBaseMultiserverRequestData
     }
 
     virtual void loadFromParams(QnResourcePool* resourcePool, const nx::network::rest::Params& params);
-    virtual nx::network::rest::Params toParams() const;
     virtual QUrlQuery toUrlQuery() const;
     virtual bool isValid() const;
 
