@@ -663,45 +663,56 @@ struct SaveUserAccess
     Result operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData,
         const nx::vms::api::UserData& param)
     {
-        if (!hasSystemAccess(accessData))
+        if (hasSystemAccess(accessData))
+            return ModifyResourceAccess()(commonModule, accessData, param);
+
+        const bool hasUserWithSameName = commonModule->resourcePool()->contains<QnUserResource>(
+            [name = param.name.toLower(), id = param.id](const auto& u)
+            {
+                return u->getName().toLower() == name && u->getId() != id;
+            });
+        if (hasUserWithSameName)
         {
-            auto allUsers = commonModule->systemContext()->resourcePool()->getResources<QnUserResource>();
-            auto hasUserWithSameName = std::any_of(allUsers.cbegin(), allUsers.cend(),
-                [&param](const auto& resPtr)
-                { return resPtr->getName() == param.name && resPtr->getId() != param.id; });
-
-            if (hasUserWithSameName)
-            {
-                QString errorMessage =
-                    NX_FMT("Won't save user '%1' because of the name duplication", param.name);
-                return Result(ErrorCode::forbidden, std::move(errorMessage));
-            }
-
-            // Won't allow to change the user name without providing the password because it's not
-            // possible to recalculate hashes.
-            const auto existingUser =
-                commonModule->systemContext()->resourcePool()->getResourceById<QnUserResource>(param.id);
-
-            if (existingUser
-                && param.digest != nx::vms::api::UserData::kHttpIsDisabledStub
-                && (param.isCloud || existingUser->getDigest() == param.digest)
-                && existingUser->getName() != param.name)
-            {
-                QString errorMessage = NX_FMT(
-                    "Won't save existing user '%1' because names differ: '%1' vs '%2' and %3.",
-                    existingUser->getName(), param.name,
-                    param.isCloud
-                        ? "changing name is forbidden for cloud users"
-                        : "password has not been provided");
-
-                return Result(ErrorCode::forbidden, std::move(errorMessage));
-            }
-
-            if (!existingUser && param.name.isEmpty())
-                return Result(ErrorCode::badRequest, "Won't save new user with empty name.");
+            QString errorMessage =
+                NX_FMT("Won't save user '%1' because of the name duplication", param.name);
+            return Result(ErrorCode::forbidden, std::move(errorMessage));
         }
 
-        return ModifyResourceAccess()(commonModule, accessData, param);
+        const auto existingUser =
+            commonModule->resourcePool()->getResourceById<QnUserResource>(param.id);
+
+        // Won't allow to change the user name without providing the password because it's not
+        // possible to recalculate hashes.
+        if (existingUser
+            && param.digest != nx::vms::api::UserData::kHttpIsDisabledStub
+            && (param.isCloud || existingUser->getDigest() == param.digest)
+            && existingUser->getName() != param.name)
+        {
+            QString errorMessage = NX_FMT(
+                "Won't save existing user '%1' because names differ: '%1' vs '%2' and %3.",
+                existingUser->getName(), param.name,
+                param.isCloud
+                    ? "changing name is forbidden for cloud users"
+                    : "password has not been provided");
+
+            return Result(ErrorCode::forbidden, std::move(errorMessage));
+        }
+
+        if (!existingUser && param.name.isEmpty())
+            return Result(ErrorCode::badRequest, "Won't save new user with empty name.");
+
+        auto r = ModifyResourceAccess()(commonModule, accessData, param);
+        if (r)
+            return r;
+
+        // Correct error message if this is a cloud full name save attempt.
+        if (param.isCloud
+            && ((existingUser && param.fullName != existingUser->fullName())
+                || (!existingUser && !param.fullName.isEmpty())))
+        {
+            r.message = "Cloud user full name is controlled by the Cloud";
+        }
+        return r;
     }
 };
 
