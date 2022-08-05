@@ -183,6 +183,11 @@ void NotificationListModel::Private::onNotificationAction(
     eventData.icon = pixmapForAction(action.get(), cloudSystemId, eventData.titleColor);
     eventData.cloudSystemId = cloudSystemId;
 
+    eventData.objectTrackId = action->objectTrackId();
+    eventData.attributes = qnClientModule->analyticsAttributeHelper()->preprocessAttributes(
+        action->objectTypeId(),
+        action->attributes());
+
     setupClientAction(action.get(), eventData);
 
     if (!this->q->addEvent(eventData))
