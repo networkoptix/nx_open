@@ -96,7 +96,7 @@ protected:
     void pushPluginDiagnosticEvent(
         IPluginDiagnosticEvent::Level level,
         std::string caption,
-        std::string description);
+        std::string description) const;
 
     /**
      * Called when the settings are received from the server (even if the values are not changed).

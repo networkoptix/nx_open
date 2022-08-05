@@ -4,6 +4,8 @@
 
 #include "plugin.h"
 
+#include "stream_parser.h"
+
 #include <nx/sdk/analytics/helpers/engine.h>
 
 namespace nx {
@@ -25,6 +27,9 @@ protected:
     virtual void doObtainDeviceAgent(
         nx::sdk::Result<nx::sdk::analytics::IDeviceAgent*>* outResult,
         const nx::sdk::IDeviceInfo* deviceInfo) override;
+
+private:
+    void reportIssues(const Issues& issues) const;
 
 private:
     Plugin* m_plugin = nullptr;
