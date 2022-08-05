@@ -67,7 +67,7 @@ Result<IAction::Result> Engine::executeAction(
 void Engine::pushPluginDiagnosticEvent(
     IPluginDiagnosticEvent::Level level,
     std::string caption,
-    std::string description)
+    std::string description) const
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (!m_handler)
