@@ -4,6 +4,7 @@ include(wix_utils)
 
 add_subdirectory(modules)
 
+set(common_wix_sources_path ${CMAKE_CURRENT_SOURCE_DIR}/../common)
 set(backgrounds_directory "${vms_distribution_common_dir}/desktop_client/backgrounds")
 set(client_registry_path "Software\\${customization.companyName}\\${desktopClientInternalName}")
 set(unsigned_msi_filename ${CMAKE_CURRENT_BINARY_DIR}/client-unsigned.msi)
