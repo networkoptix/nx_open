@@ -89,7 +89,7 @@ protected:
     void pushPluginDiagnosticEvent(
         IPluginDiagnosticEvent::Level level,
         std::string caption,
-        std::string description);
+        std::string description) const;
 
     IHandler* handler() const { return m_handler.get(); }
 

@@ -2,7 +2,13 @@
 
 #include "engine.h"
 
+#include "constants.h"
 #include "device_agent.h"
+#include "utils.h"
+
+#include <nx/kit/json.h>
+
+using nx::kit::Json;
 
 namespace nx {
 namespace vms_server_plugins {
@@ -30,12 +36,47 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
 
 std::string Engine::manifestString() const
 {
+    const std::string pluginHomeDir = m_plugin->utilityProvider()->homeDir();
+
+    Issues issues;
+    const StreamInfo streamInfo = parseObjectStreamFile(
+        defaultStreamFilePath(pluginHomeDir),
+        &issues);
+
+    reportIssues(issues);
+
+    const std::string settingsModel = makeSettingsModel(
+        defaultManifestFilePath(pluginHomeDir),
+        defaultStreamFilePath(pluginHomeDir),
+        pluginHomeDir,
+        streamInfo.objectTypeIds);
+
     return /*suppress newline*/ 1 + (const char*)
 R"json(
 {
-    "streamTypeFilter": "compressedVideo"
+    "streamTypeFilter": "compressedVideo",
+    "deviceAgentSettingsModel": )json" + settingsModel + R"json(
 }
 )json";
+}
+
+void Engine::reportIssues(const Issues& issues) const
+{
+    if (!issues.errors.empty())
+    {
+        pushPluginDiagnosticEvent(
+            IPluginDiagnosticEvent::Level::error,
+            "Serious issues in the Object stream",
+            makePluginDiagnosticEventDescription(issues.errors));
+    }
+
+    if (!issues.warnings.empty())
+    {
+        pushPluginDiagnosticEvent(
+            IPluginDiagnosticEvent::Level::warning,
+            "Issues in the Object stream",
+            makePluginDiagnosticEventDescription(issues.warnings));
+    }
 }
 
 } // namespace object_streamer
