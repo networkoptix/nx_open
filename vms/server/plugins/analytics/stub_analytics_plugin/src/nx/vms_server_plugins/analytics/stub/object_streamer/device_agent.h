@@ -4,6 +4,8 @@
 
 #include <set>
 
+#include "stream_parser.h"
+
 #include <nx/sdk/analytics/helpers/consuming_device_agent.h>
 #include <nx/sdk/analytics/i_object_metadata_packet.h>
 
@@ -34,76 +36,6 @@ protected:
     virtual nx::sdk::Result<const nx::sdk::ISettingsResponse*> settingsReceived() override;
 
 private:
-    struct Object
-    {
-        std::string typeId;
-        nx::sdk::Uuid trackId;
-        nx::sdk::analytics::Rect boundingBox;
-        std::map<std::string, std::string> attributes;
-        int frameNumberToGenerateObject = 0;
-        int64_t timestampUs = -1;
-    };
-
-    enum class Issue
-    {
-        objectStreamIsNotAValidJson,
-        objectStreamIsNotAJsonArray,
-        objectItemIsNotAJsonObject,
-        trackIdIsNotAString,
-        trackIdIsNotAUuid,
-        typeIdIsNotAString,
-        frameNumberIsNotANumber,
-        boundingBoxIsNotAJsonObject,
-        topLeftXIsNotANumber,
-        topLeftYIsNotANumber,
-        widthIsNotANumber,
-        heightIsNotANumber,
-        objectIsOutOfBounds,
-        attributesFieldIsNotAJsonObject,
-        attributeValueIsNotAString,
-        timestampIsNotANumber,
-    };
-
-    struct Issues
-    {
-        std::set<Issue> errors;
-        std::set<Issue> warnings;
-    };
-
-    struct StreamInfo
-    {
-        std::map<int, std::vector<Object>> objectsByFrameNumber;
-        std::set<std::string> objectTypeIds;
-    };
-
-private:
-    static StreamInfo parseObjectStreamFile(const std::string& filePath, Issues* outIssues);
-
-    static bool parseCommonFields(
-        const nx::kit::Json& objectDescription,
-        Object* outObject,
-        Issues* outIssues);
-
-    static bool parseBoundingBox(
-        const nx::kit::Json& objectDescription,
-        nx::sdk::analytics::Rect* outBoundingBox,
-        Issues* outIssues);
-
-    static bool parseAttributes(
-        const nx::kit::Json& objectDescription,
-        std::map<std::string, std::string>* outAttributes,
-        Issues* outIssues);
-
-    static bool parseTimestamp(
-        const nx::kit::Json& objectDescription,
-        int64_t* outTimestamp,
-        Issues* outIssues);
-
-    static std::string issueToString(Issue issue);
-
-    static std::string makePluginDiagnosticEventDescription(const std::set<Issue>& issues);
-
-private:
     std::vector<nx::sdk::Ptr<nx::sdk::analytics::IObjectMetadataPacket>> generateObjects(
         int frameNumber,
         int64_t frameTimestampUs,
@@ -113,7 +45,7 @@ private:
         const std::string& manifestFilePath,
         const std::string& streamFilePath) const;
 
-    void reportIssues(const Issues& issues);
+    void reportIssues(const Issues& issues) const;
 
 private:
     StreamInfo m_streamInfo;
