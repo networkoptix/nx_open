@@ -16,6 +16,7 @@
 #include <nx/reflect/json.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/string.h>
 #include <nx/utils/url.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/client/core/network/network_manager.h>
@@ -233,22 +234,42 @@ struct CloudLayoutsManager::Private
                 }));
     }
 
+    QnLayoutResourcePtr convertLocalLayout(const QnLayoutResourcePtr& layout)
+    {
+        auto existingLayouts = systemContext->resourcePool()->getResources<QnLayoutResource>();
+        QStringList usedNames;
+        std::transform(
+            existingLayouts.cbegin(), existingLayouts.cend(),
+            std::back_inserter(usedNames), [](const auto& layout) { return layout->getName(); });
+
+        NX_ASSERT(!layout->hasFlags(Qn::cross_system));
+
+        auto cloudLayout = CrossSystemLayoutResourcePtr(new CrossSystemLayoutResource());
+        layout->cloneTo(cloudLayout);
+        cloudLayout->setParentId(QnUuid());
+        cloudLayout->addFlags(Qn::local);
+        cloudLayout->setName(nx::utils::generateUniqueString(
+            usedNames,
+            tr("%1 (Copy)", "Original name will be substituted")
+                .arg(cloudLayout->getName()),
+            tr("%1 (Copy %2)", "Original name will be substituted as %1, counter as %2")
+                .arg(cloudLayout->getName())));
+
+        systemContext->resourcePool()->addResource(cloudLayout);
+
+        return cloudLayout;
+    }
+
     void saveLayout(const QnLayoutResourcePtr& layout, SaveCallback callback)
     {
         if (!NX_ASSERT(cloudStatusWatcher->status() == QnCloudStatusWatcher::Status::Online))
             return;
 
+        if (!NX_ASSERT(layout->hasFlags(Qn::cross_system)))
+            return;
+
         nx::vms::api::LayoutData layoutData;
         ec2::fromResourceToApi(layout, layoutData);
-
-        if (!layout.dynamicCast<CrossSystemLayoutResource>())
-        {
-            auto cloudLayout = CrossSystemLayoutResourcePtr(new CrossSystemLayoutResource());
-            cloudLayout->setIdUnsafe(layoutData.id);
-            cloudLayout->addFlags(Qn::local);
-            cloudLayout->update(layoutData);
-            systemContext->resourcePool()->addResource(cloudLayout);
-        }
 
         sendSaveLayoutRequest(layoutData, callback);
     }
@@ -302,6 +323,11 @@ CloudLayoutsManager::CloudLayoutsManager(QObject* parent):
 CloudLayoutsManager::~CloudLayoutsManager()
 {
     d->networkManager->pleaseStopSync();
+}
+
+QnLayoutResourcePtr CloudLayoutsManager::convertLocalLayout(const QnLayoutResourcePtr& layout)
+{
+    return d->convertLocalLayout(layout);
 }
 
 void CloudLayoutsManager::saveLayout(const QnLayoutResourcePtr& layout, SaveCallback callback)

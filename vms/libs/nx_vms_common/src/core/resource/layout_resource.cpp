@@ -34,10 +34,10 @@ void QnLayoutResource::setStatus(nx::vms::api::ResourceStatus newStatus,
     NX_ASSERT(false, "Not implemented");
 }
 
-void QnLayoutResource::cloneItems(QnLayoutResourcePtr target, QHash<QnUuid, QnUuid>* remapHash) const
+void QnLayoutResource::cloneItems(QnLayoutResourcePtr target, ItemsRemapHash* remapHash) const
 {
     QnLayoutItemDataList items = m_items->getItems().values();
-    QHash<QnUuid, QnUuid> newUuidByOldUuid;
+    ItemsRemapHash newUuidByOldUuid;
     for (int i = 0; i < items.size(); i++)
     {
         QnUuid newUuid = QnUuid::createUuid();
@@ -52,25 +52,28 @@ void QnLayoutResource::cloneItems(QnLayoutResourcePtr target, QHash<QnUuid, QnUu
     target->setItems(items);
 }
 
-QnLayoutResourcePtr QnLayoutResource::clone(QHash<QnUuid, QnUuid>* remapHash) const
+void QnLayoutResource::cloneTo(QnLayoutResourcePtr target, ItemsRemapHash* remapHash) const
 {
-    QnLayoutResourcePtr result(new QnLayoutResource());
-
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
-        result->setIdUnsafe(QnUuid::createUuid());
-        result->setUrl(m_url);
-        result->setName(m_name);
-        result->setParentId(m_parentId);
-        result->setCellSpacing(m_cellSpacing);
-        result->setCellAspectRatio(m_cellAspectRatio);
-        result->setBackgroundImageFilename(m_backgroundImageFilename);
-        result->setBackgroundOpacity(m_backgroundOpacity);
-        result->setBackgroundSize(m_backgroundSize);
+        target->setIdUnsafe(QnUuid::createUuid());
+        target->setUrl(m_url);
+        target->setName(m_name);
+        target->setParentId(m_parentId);
+        target->setCellSpacing(m_cellSpacing);
+        target->setCellAspectRatio(m_cellAspectRatio);
+        target->setBackgroundImageFilename(m_backgroundImageFilename);
+        target->setBackgroundOpacity(m_backgroundOpacity);
+        target->setBackgroundSize(m_backgroundSize);
     }
 
-    cloneItems(result, remapHash);
+    cloneItems(target, remapHash);
+}
 
+QnLayoutResourcePtr QnLayoutResource::clone(ItemsRemapHash* remapHash) const
+{
+    QnLayoutResourcePtr result(new QnLayoutResource());
+    cloneTo(result, remapHash);
     return result;
 }
 

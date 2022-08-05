@@ -423,6 +423,9 @@ private:
     /** Check that item belongs to the current layout. */
     bool own(QnWorkbenchItem* item) const;
 
+    /** Calculate what icon should be used for the layout. */
+    QIcon calculateIcon(const QnLayoutResourcePtr& layout) const;
+
 private:
     /** Name of this layout. */
     QString m_name;

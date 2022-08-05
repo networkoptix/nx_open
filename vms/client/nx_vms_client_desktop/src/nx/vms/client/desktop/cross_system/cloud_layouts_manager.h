@@ -24,6 +24,9 @@ public:
     CloudLayoutsManager(QObject* parent = nullptr);
     virtual ~CloudLayoutsManager() override;
 
+    /** Convert layout to the cloud one. */
+    QnLayoutResourcePtr convertLocalLayout(const QnLayoutResourcePtr& layout);
+
     using SaveCallback = std::function<void(bool)>;
     void saveLayout(const QnLayoutResourcePtr& layout, SaveCallback callback = {});
 

@@ -194,4 +194,70 @@ TEST(String, truncateToNul)
     ASSERT_EQ(testQString1, QString("abcdef"));
 }
 
+//-------------------------------------------------------------------------------------------------
+
+struct GenerateUniqueStringInput
+{
+    QStringList usedStrings;
+    QString defaultString;
+    QString templateString;
+    QString expectedString;
+};
+
+class GenerateUniqueString:
+    public ::testing::Test,
+    public ::testing::WithParamInterface<GenerateUniqueStringInput>
+{
+};
+
+TEST_P(GenerateUniqueString, validateExpectedString)
+{
+    const GenerateUniqueStringInput input = GetParam();
+    EXPECT_EQ(
+        generateUniqueString(input.usedStrings, input.defaultString, input.templateString),
+        input.expectedString);
+}
+
+static std::vector<GenerateUniqueStringInput> kGenerateUniqueStringInput {
+    {
+        {},
+        "New Layout",
+        "New Layout %1",
+        "New Layout"
+    },
+    {
+        {{"New Layout"}},
+        "New Layout",
+        "New Layout %1",
+        "New Layout 2"
+    },
+    {
+        {{"New Layout 20"}},
+        "New Layout",
+        "New Layout %1",
+        "New Layout 21"
+    },
+    {
+        {},
+        "New Layout (copy)",
+        "New Layout (copy %2)",
+        "New Layout (copy)"
+    },
+    {
+        {{"New Layout (copy)"}},
+        "New Layout (copy)",
+        "New Layout (copy %2)",
+        "New Layout (copy 2)"
+    },
+    {
+        {{"New Layout (copy 20)"}},
+        "New Layout (copy)",
+        "New Layout (copy %2)",
+        "New Layout (copy 21)"
+    },
+};
+
+INSTANTIATE_TEST_SUITE_P(String, GenerateUniqueString,
+    ::testing::ValuesIn(kGenerateUniqueStringInput));
+
 } // namespace nx::utils::test
