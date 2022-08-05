@@ -42,9 +42,29 @@ public:
     virtual void setStatus(nx::vms::api::ResourceStatus newStatus,
         Qn::StatusChangeReason reason = Qn::StatusChangeReason::Local) override;
 
-    void cloneItems(QnLayoutResourcePtr target, QHash<QnUuid, QnUuid>* remapHash = nullptr) const;
+    using ItemsRemapHash = QHash<QnUuid, QnUuid>;
 
-    QnLayoutResourcePtr clone(QHash<QnUuid, QnUuid>* remapHash = nullptr) const;
+    /**
+     * Clone items of the current layout to the target layout. Ids of the layout items will be
+     *     re-generated, zoom links correspondingly fixed.
+     * @param target Target layout. Existing items will be removed (if any).
+     * @param remapHash If passed, filled with map of new items ids by old items ids.
+     */
+    void cloneItems(QnLayoutResourcePtr target, ItemsRemapHash* remapHash = nullptr) const;
+
+    /**
+     * Clone current layout to the target one.
+     * @param target Target layout. Existing items will be removed (if any).
+     * @param remapHash If passed, filled with map of new items ids by old items ids.
+     */
+    void cloneTo(QnLayoutResourcePtr target, ItemsRemapHash* remapHash = nullptr) const;
+
+    /**
+     * Clone current layout to the new layout.
+     * @param remapHash If passed, filled with map of new items ids by old items ids.
+     * @return New layout (not added to any system context).
+     */
+    QnLayoutResourcePtr clone(ItemsRemapHash* remapHash = nullptr) const;
 
     void setItems(const QnLayoutItemDataList &items);
 

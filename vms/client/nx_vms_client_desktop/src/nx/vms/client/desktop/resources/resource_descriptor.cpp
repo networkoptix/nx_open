@@ -39,7 +39,7 @@ QString resourcePath(const QnResourcePtr& resource)
         return resourcePath(resource->getId(), kGenericCloudSystemId);
 
     auto systemContext = SystemContext::fromResource(resource);
-    if (NX_ASSERT(systemContext))
+    if (NX_ASSERT(systemContext) && systemContext != appContext()->currentSystemContext())
     {
         if (auto cloudSystemId = systemContext->moduleInformation().cloudSystemId;
             !cloudSystemId.isEmpty())
@@ -92,12 +92,16 @@ QnResourcePtr getResourceByDescriptor(const nx::vms::common::ResourceDescriptor&
 
 bool isCrossSystemResource(const nx::vms::common::ResourceDescriptor& descriptor)
 {
-    return descriptor.path.startsWith(kCloudScheme);
+    const QString systemId = crossSystemResourceSystemId(descriptor);
+    return !systemId.isEmpty()
+        && systemId != appContext()->currentSystemContext()->moduleInformation().cloudSystemId;
 }
 
 QString crossSystemResourceSystemId(const nx::vms::common::ResourceDescriptor& descriptor)
 {
-    NX_ASSERT(isCrossSystemResource(descriptor));
+    if (!descriptor.path.startsWith(kCloudScheme))
+        return {};
+
     return descriptor.path.mid(
         kCloudScheme.length(),
         descriptor.path.indexOf('.') - kCloudScheme.length());

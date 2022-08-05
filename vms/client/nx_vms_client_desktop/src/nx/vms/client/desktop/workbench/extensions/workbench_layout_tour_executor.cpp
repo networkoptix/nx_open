@@ -204,7 +204,7 @@ void LayoutTourExecutor::resetTourItems(const nx::vms::api::LayoutTourItemDataLi
 
         const auto existingLayout = existing.dynamicCast<QnLayoutResource>();
 
-        QHash<QnUuid, QnUuid> remapHash;
+        QnLayoutResource::ItemsRemapHash remapHash;
 
         QnLayoutResourcePtr layout = existingLayout
             ? existingLayout->clone(&remapHash)

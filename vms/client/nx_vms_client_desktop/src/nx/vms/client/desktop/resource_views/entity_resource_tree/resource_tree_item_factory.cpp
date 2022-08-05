@@ -215,7 +215,7 @@ GenericItem::FlagsProvider cloudLayoutFlagsProvider(const QnLayoutResourcePtr& l
                 }
             }
 
-            return Qt::ItemIsSelectable;
+            return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
         };
 }
 

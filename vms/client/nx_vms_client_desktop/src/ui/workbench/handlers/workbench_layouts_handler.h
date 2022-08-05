@@ -52,9 +52,8 @@ private:
     /**
      * Save target file, local or remote layout.
      * @param layout Layout to save.
-     * @param forceCloudConvert Forcibly convert existing layout to the Cloud one.
      */
-    void saveLayout(const QnLayoutResourcePtr& layout, bool forceCloudConvert = false);
+    void saveLayout(const QnLayoutResourcePtr& layout);
 
     void saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUserResourcePtr &user);
 

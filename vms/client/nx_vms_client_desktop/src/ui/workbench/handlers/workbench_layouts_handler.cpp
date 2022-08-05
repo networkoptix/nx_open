@@ -165,7 +165,7 @@ QSet<QnResourcePtr> localLayoutResources(const QnLayoutResourcePtr& layout)
 
 bool isCloudLayout(const QnLayoutResourcePtr& layout)
 {
-    return !layout.dynamicCast<CrossSystemLayoutResource>().isNull();
+    return layout->hasFlags(Qn::cross_system);
 }
 
 bool hasCrossSystemItems(const QnLayoutResourcePtr& layout)
@@ -394,32 +394,18 @@ void LayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, const QStri
         systemContext->layoutSnapshotManager()->save(layout);
 }
 
-void LayoutsHandler::saveLayout(const QnLayoutResourcePtr& layout, bool forceCloudConvert)
+void LayoutsHandler::saveLayout(const QnLayoutResourcePtr& layout)
 {
     if (!layout)
         return;
 
+    // This scenario is not very actual as it can be caused only if user places cross-system
+    // cameras on a local layout using api.
     if (ini().crossSystemLayouts
         && !isCloudLayout(layout)
-        && (forceCloudConvert || hasCrossSystemItems(layout)))
+        && hasCrossSystemItems(layout))
     {
-        // Convert common layout to cloud one.
-        appContext()->cloudLayoutsManager()->saveLayout(layout);
-
-        // Replace opened layout with the cloud one.
-        QnUuid id = layout->getId();
-        auto cloudLayout = appContext()->cloudLayoutsSystemContext()->resourcePool()
-            ->getResourceById<QnLayoutResource>(id);
-        if (NX_ASSERT(cloudLayout))
-        {
-            int index = workbench()->currentLayoutIndex();
-
-            workbench()->insertLayout(qnWorkbenchLayoutsFactory->create(cloudLayout, this), index);
-            workbench()->setCurrentLayoutIndex(index);
-            // workbench()->removeLayout(index + 1); //< TODO: #sivanov check this implementation.
-            closeLayouts({layout}, /*force*/ true);
-        }
-
+        saveLayoutAsCloud(layout);
         return;
     }
 
@@ -573,30 +559,11 @@ void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUse
         }
     }
 
-    QnLayoutResourcePtr newLayout;
-
-    newLayout = QnLayoutResourcePtr(new QnLayoutResource());
-    newLayout->setIdUnsafe(QnUuid::createUuid());
+    QnLayoutResource::ItemsRemapHash newUuidByOldUuid;
+    QnLayoutResourcePtr newLayout = layout->clone(&newUuidByOldUuid);
     newLayout->setName(name);
     newLayout->setParentId(user->getId());
-    newLayout->setCellSpacing(layout->cellSpacing());
-    newLayout->setCellAspectRatio(layout->cellAspectRatio());
-    newLayout->setBackgroundImageFilename(layout->backgroundImageFilename());
-    newLayout->setBackgroundOpacity(layout->backgroundOpacity());
-    newLayout->setBackgroundSize(layout->backgroundSize());
     resourcePool()->addResource(newLayout);
-
-    QnLayoutItemDataList items = layout->getItems().values();
-    QHash<QnUuid, QnUuid> newUuidByOldUuid;
-    for (int i = 0; i < items.size(); i++)
-    {
-        QnUuid newUuid = QnUuid::createUuid();
-        newUuidByOldUuid[items[i].uuid] = newUuid;
-        items[i].uuid = newUuid;
-    }
-    for (int i = 0; i < items.size(); i++)
-        items[i].zoomTargetUuid = newUuidByOldUuid.value(items[i].zoomTargetUuid, QnUuid());
-    newLayout->setItems(items);
 
     const bool isCurrent = (layout == workbench()->currentLayout()->resource());
     bool shouldDelete = layout->hasFlags(Qn::local) &&
@@ -649,6 +616,8 @@ void LayoutsHandler::saveLayoutAsCloud(const QnLayoutResourcePtr& layout)
     if (!NX_ASSERT(layout) || !NX_ASSERT(ini().crossSystemLayouts))
         return;
 
+    NX_ASSERT(!isCloudLayout(layout));
+
     QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(
         QDialogButtonBox::Save | QDialogButtonBox::Cancel,
         mainWindowWidget()));
@@ -689,14 +658,16 @@ void LayoutsHandler::saveLayoutAsCloud(const QnLayoutResourcePtr& layout)
         removeLayouts(existing);
     }
 
-    // TODO: #sivanov Fix double save workaround.
-    saveLayout(layout, /*forceCloudConvert*/ true);
-    auto createdLayout = cloudResourcesPool->getResourceById<QnLayoutResource>(layout->getId());
-    if (NX_ASSERT(createdLayout))
-    {
-        createdLayout->setName(name);
-        saveLayout(createdLayout);
-    }
+    // Convert common layout to cloud one.
+    auto cloudLayout = appContext()->cloudLayoutsManager()->convertLocalLayout(layout);
+    saveLayout(cloudLayout);
+
+    // Replace opened layout with the cloud one.
+    int index = workbench()->currentLayoutIndex();
+
+    workbench()->insertLayout(qnWorkbenchLayoutsFactory->create(cloudLayout, this), index);
+    workbench()->setCurrentLayoutIndex(index);
+    workbench()->removeLayout(index + 1);
 }
 
 void LayoutsHandler::removeLayoutItems(const QnLayoutItemIndexList& items, bool autoSave)
@@ -1031,7 +1002,7 @@ void LayoutsHandler::closeLayoutsInternal(
         systemContext->layoutSnapshotManager()->restore(layout);
     }
 
-    for (const QnLayoutResourcePtr &resource: resources)
+    for (const QnLayoutResourcePtr& resource: resources)
     {
         if (QnWorkbenchLayout *layout = QnWorkbenchLayout::instance(resource))
         {
@@ -1039,8 +1010,12 @@ void LayoutsHandler::closeLayoutsInternal(
             delete layout;
         }
 
+        auto systemContext = SystemContext::fromResource(resource);
+        if (!NX_ASSERT(systemContext))
+            continue;
+
         if (resource->hasFlags(Qn::local) && !resource->isFile())
-            resourcePool()->removeResource(resource);
+            systemContext->resourcePool()->removeResource(resource);
     }
 
     if (workbench()->layouts().empty())
