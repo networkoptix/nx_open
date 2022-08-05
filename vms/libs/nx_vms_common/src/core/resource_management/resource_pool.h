@@ -184,6 +184,22 @@ public:
         return result;
     }
 
+    template<class Resource>
+    bool contains(ResourceClassFilter<Resource> filter) const
+    {
+        NX_READ_LOCKER locker(&m_resourcesMutex);
+        QnSharedResourcePointerList<Resource> result;
+        for (const QnResourcePtr& resource: m_resources)
+        {
+            if (auto derived = resource.template dynamicCast<Resource>())
+            {
+                if (filter(derived))
+                    return true;
+            }
+        }
+        return false;
+    }
+
     QnNetworkResourceList getAllNetResourceByHostAddress(const nx::String& hostAddress) const;
 
     QnVirtualCameraResourceList getAllCameras(
