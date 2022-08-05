@@ -76,6 +76,8 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/delegates/customizable_item_delegate.h>
 #include <nx/vms/client/desktop/common/dialogs/progress_dialog.h>
+#include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
+#include <nx/vms/client/desktop/cross_system/dialogs/cloud_layouts_intro_dialog.h>
 #include <nx/vms/client/desktop/event_search/widgets/advanced_search_dialog.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
@@ -181,7 +183,10 @@ using namespace nx::vms::common;
 namespace {
 
 /* Asking for update all outdated servers to the last version. */
-static const QString kVersionMismatchShowOnceKey(lit("VersionMismatch"));
+static const QString kVersionMismatchShowOnceKey("VersionMismatch");
+
+/** Promo dialog for Cloud Layouts. */
+static const QString kCloudLayoutsPromoShowOnceKey("CloudLayoutsPromo");
 
 const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
 
@@ -832,9 +837,58 @@ void ActionHandler::at_openInLayoutAction_triggered()
     const auto parameters = menu()->currentParameters(sender());
 
     QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole);
-    NX_ASSERT(layout, "No layout provided.");
-    if (!layout)
+    if (!NX_ASSERT(layout))
         return;
+
+    QnResourceList resources = parameters.resources();
+    if (!layout->hasFlags(Qn::cross_system)
+        && std::any_of(resources.cbegin(), resources.cend(),
+            [](const QnResourcePtr& resource) { return resource->hasFlags(Qn::cross_system); }))
+    {
+        if (!ini().crossSystemLayouts)
+            return;
+
+        NX_ASSERT(parameters.widgets().empty());
+
+        auto convertLayout =
+            [this, layout, parameters]()
+            {
+                // Convert common layout to cloud one.
+                auto cloudLayout = appContext()->cloudLayoutsManager()->convertLocalLayout(layout);
+
+                // Replace opened layout with the cloud one.
+                int index = workbench()->currentLayoutIndex();
+                workbench()->insertLayout(
+                    qnWorkbenchLayoutsFactory->create(cloudLayout, this),
+                    index);
+                workbench()->setCurrentLayoutIndex(index);
+                menu()->trigger(ui::action::OpenInCurrentLayoutAction, parameters);
+                workbench()->removeLayout(index + 1);
+            };
+
+        if (qnClientShowOnce->testFlag(kCloudLayoutsPromoShowOnceKey))
+        {
+            convertLayout();
+            return;
+        }
+
+        // Displaying message delayed to avoid waiting cursor (see drop_instrument.cpp:245).
+        executeDelayedParented(
+            [this, convertLayout]()
+            {
+                CloudLayoutsIntroDialog introDialog;
+                const auto result = introDialog.exec();
+
+                if (result == QDialog::Accepted)
+                {
+                    convertLayout();
+                    if (introDialog.doNotShowAgainChecked())
+                        qnClientShowOnce->setFlag(kCloudLayoutsPromoShowOnceKey);
+                }
+            },
+            this);
+        return;
+    }
 
     auto layoutContext = SystemContext::fromResource(layout);
     auto resourceRuntimeDataManager = layoutContext->resourceRuntimeDataManager();
@@ -900,50 +954,46 @@ void ActionHandler::at_openInLayoutAction_triggered()
                 resourceRuntimeDataManager->setLayoutItemData(data.uuid, it.key(), it.value());
         }
     }
-    else
+    else if (!resources.isEmpty())
     {
-        QnResourceList resources = parameters.resources();
-        if (!resources.isEmpty())
+        AddToLayoutParams addParams;
+        addParams.usePosition = !position.isNull();
+        addParams.position = position;
+        addParams.timelineWindow =
+            parameters.argument<QnTimePeriod>(Qn::ItemSliderWindowRole);
+        addParams.timelineSelection =
+            parameters.argument<QnTimePeriod>(Qn::ItemSliderSelectionRole);
+        addParams.motionSelection =
+            parameters.argument<MotionSelection>(Qn::ItemMotionSelectionRole);
+        addParams.analyticsSelection =
+            parameters.argument<QRectF>(Qn::ItemAnalyticsSelectionRole);
+
+        addParams.time = std::chrono::milliseconds(DATETIME_NOW);
+        addParams.paused = false;
+        addParams.speed = 1.0;
+
+        // Live viewers must not open items on archive position
+        if (accessController()->hasGlobalPermission(GlobalPermission::viewArchive))
         {
-            AddToLayoutParams addParams;
-            addParams.usePosition = !position.isNull();
-            addParams.position = position;
-            addParams.timelineWindow =
-                parameters.argument<QnTimePeriod>(Qn::ItemSliderWindowRole);
-            addParams.timelineSelection =
-                parameters.argument<QnTimePeriod>(Qn::ItemSliderSelectionRole);
-            addParams.motionSelection =
-                parameters.argument<MotionSelection>(Qn::ItemMotionSelectionRole);
-            addParams.analyticsSelection =
-                parameters.argument<QRectF>(Qn::ItemAnalyticsSelectionRole);
+            using namespace std::chrono;
 
-            addParams.time = std::chrono::milliseconds(DATETIME_NOW);
-            addParams.paused = false;
-            addParams.speed = 1.0;
-
-            // Live viewers must not open items on archive position
-            if (accessController()->hasGlobalPermission(GlobalPermission::viewArchive))
+            if (parameters.hasArgument(Qn::ItemTimeRole))
             {
-                using namespace std::chrono;
-
-                if (parameters.hasArgument(Qn::ItemTimeRole))
-                {
-                    addParams.time = milliseconds(parameters.argument<qint64>(Qn::ItemTimeRole));
-                    addParams.paused = parameters.argument<bool>(Qn::ItemPausedRole, false);
-                    addParams.speed = parameters.argument<qreal>(Qn::ItemSpeedRole, 1.0);
-                }
-                else if (parameters.hasArgument(Qn::LayoutSyncStateRole))
-                {
-                    const auto state =
-                        parameters.argument<QnStreamSynchronizationState>(Qn::LayoutSyncStateRole);
-                    addParams.time = milliseconds(
-                        state.timeUs == DATETIME_NOW ? DATETIME_NOW : state.timeUs / 1000);
-                    addParams.paused = qFuzzyIsNull(state.speed);
-                    addParams.speed = state.speed;
-                }
+                addParams.time = milliseconds(parameters.argument<qint64>(Qn::ItemTimeRole));
+                addParams.paused = parameters.argument<bool>(Qn::ItemPausedRole, false);
+                addParams.speed = parameters.argument<qreal>(Qn::ItemSpeedRole, 1.0);
             }
-            addToLayout(layout, resources, addParams);
+            else if (parameters.hasArgument(Qn::LayoutSyncStateRole))
+            {
+                const auto state =
+                    parameters.argument<QnStreamSynchronizationState>(Qn::LayoutSyncStateRole);
+                addParams.time = milliseconds(
+                    state.timeUs == DATETIME_NOW ? DATETIME_NOW : state.timeUs / 1000);
+                addParams.paused = qFuzzyIsNull(state.speed);
+                addParams.speed = state.speed;
+            }
         }
+        addToLayout(layout, resources, addParams);
     }
 
     auto workbenchLayout = workbench()->currentLayout();

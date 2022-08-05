@@ -148,14 +148,19 @@ QString extractFileExtension(const QString &string)
 }
 
 
-QString generateUniqueString(const QStringList &usedStrings, const QString &defaultString, const QString &templateString)
+QString generateUniqueString(
+    const QStringList& usedStrings,
+    const QString& defaultString,
+    const QString& templateString)
 {
     QStringList lowerStrings;
     for (const QString &string : usedStrings)
         lowerStrings << string.toLower();
 
-    auto pattern = QRegularExpression(QRegularExpression::anchoredPattern(
-        templateString.arg(QLatin1String("?([0-9]+)?")).toLower()));
+    const QString escapedTemplate = replaceStrings(templateString,
+        {{"(", "\\("}, {")", "\\)"}});
+    const QString stringPattern = escapedTemplate.arg("?([0-9]+)?").toLower();
+    auto pattern = QRegularExpression(QRegularExpression::anchoredPattern(stringPattern));
 
     /* Prepare new name. */
     int number = 0;

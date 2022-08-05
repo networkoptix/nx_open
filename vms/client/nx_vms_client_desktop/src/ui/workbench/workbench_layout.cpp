@@ -4,9 +4,9 @@
 
 #include <limits>
 
-#include <QtWidgets/QGraphicsWidget>
-
 #include <boost/algorithm/cxx11/all_of.hpp>
+
+#include <QtWidgets/QGraphicsWidget>
 
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
@@ -21,6 +21,7 @@
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resources/resource_descriptor.h>
+#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <utils/common/util.h>
@@ -63,7 +64,8 @@ QnWorkbenchLayout::QnWorkbenchLayout(const QnLayoutResourcePtr& resource, QObjec
     if (resource->data().contains(Qn::LayoutFlagsRole))
         setFlags(flags() | resource->data(Qn::LayoutFlagsRole).value<QnLayoutFlags>());
 
-    m_icon = resource->data(Qn::LayoutIconRole).value<QIcon>();
+    m_icon = calculateIcon(resource);
+
     auto synchronizer = new QnWorkbenchLayoutSynchronizer(this, resource, this);
     synchronizer->setAutoDeleting(true);
     synchronizer->update();
@@ -883,7 +885,11 @@ void QnWorkbenchLayout::setLocked(bool value)
 {
     if (m_locked == value)
         return;
+
     m_locked = value;
+
+    if (auto layout = resource())
+        m_icon = calculateIcon(layout);
 
     emit lockedChanged();
 }
@@ -898,6 +904,18 @@ bool QnWorkbenchLayout::own(QnWorkbenchItem* item) const
     NX_ASSERT(item);
     NX_ASSERT(item->layout() == this, "Item must belong to this layout.");
     return item && item->layout() == this;
+}
+
+QIcon QnWorkbenchLayout::calculateIcon(const QnLayoutResourcePtr& layout) const
+{
+    if (layout->hasFlags(Qn::cross_system))
+    {
+        return layout->locked()
+            ? qnResIconCache->icon(QnResourceIconCache::CloudLayout | QnResourceIconCache::Locked)
+            : qnResIconCache->icon(QnResourceIconCache::CloudLayout);
+    }
+
+    return layout->data(Qn::LayoutIconRole).value<QIcon>();
 }
 
 QVariant QnWorkbenchLayout::data(int role) const

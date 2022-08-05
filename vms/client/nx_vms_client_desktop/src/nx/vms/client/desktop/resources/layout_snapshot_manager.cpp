@@ -190,6 +190,9 @@ void LayoutSnapshotManager::restore(const QnLayoutResourcePtr &resource)
         QnLayoutResourcePtr restored(new QnLayoutResource());
         ec2::fromApiToResource(snapshot, restored);
 
+        // Overwrite flags as they are runtime data and not stored in the snapshot.
+        restored->setFlags(resource->flags());
+
         // Cleanup from snapshot resources which are already deleted from the resource pool.
         QnLayoutItemDataMap existingItems;
         for (const auto& item: restored->getItems())
