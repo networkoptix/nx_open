@@ -15,7 +15,7 @@ const std::map<std::string, std::map<std::string, std::string>> kObjectAttribute
             {"Gender", "Woman"},
             {"Age", "Adult"},
             {"Hair Color", "Red"},
-            {"Hat.Type", "Hitjab"},
+            {"Hat.Type", "Hijab"},
             {"Name", "Jane Doe"},
             {"Bag.Color", "Yellow"},
             {"Weapon", "false"},
