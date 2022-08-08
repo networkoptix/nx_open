@@ -468,6 +468,13 @@ void TileInteractionHandler::copyBookmarkToClipboard(const QModelIndex &index)
 void TileInteractionHandler::openSource(
     const QModelIndex& index, bool inNewTab, bool fromDoubleClick)
 {
+    if (fromDoubleClick && !index.data(Qn::CloudSystemIdRole).toString().isEmpty()
+        && index.data(Qn::ActionIdRole).value<ui::action::IDType>() != ui::action::NoAction)
+    {
+        showMessage(tr("This action is not supported for notifications from other Systems"));
+        return;
+    }
+
     auto resourceList = index.data(Qn::ResourceListRole).value<QnResourceList>()
         .filtered(&QnResourceAccessFilter::isOpenableInLayout);
 
