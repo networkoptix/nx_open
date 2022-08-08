@@ -15,6 +15,8 @@
 #include <network/system_helpers.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/desktop/cross_system/cross_system_camera_resource.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -128,6 +130,9 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(Camera | Unauthorized, loadIcon("tree/camera_unauthorized.svg"));
     m_cache.insert(Camera | Incompatible, loadIcon("tree/camera_alert.svg"));
     m_cache.insert(VirtualCamera, loadIcon("tree/virtual_camera.png"));
+    m_cache.insert(CrossSystemStatus | Unauthorized, loadIcon("events/alert_yellow.png"));
+    m_cache.insert(CrossSystemStatus | Control, loadIcon("legacy/loading.gif")); //< The Control uses to describe loading state.
+    m_cache.insert(CrossSystemStatus | Offline, loadIcon("cloud/cloud_20_disabled.png"));
     m_cache.insert(IOModule, loadIcon("tree/io.png"));
     m_cache.insert(IOModule | Offline, loadIcon("tree/io_offline.png"));
     m_cache.insert(IOModule | Unauthorized, loadIcon("tree/io_unauthorized.png"));
@@ -308,8 +313,23 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
 
     Key status = calculateStatus(key, resource);
 
+    if (flags.testFlag(Qn::cross_system) && flags.testFlag(Qn::fake))
+    {
+        key = CrossSystemStatus;
+        const auto crossSystemCamera = resource.dynamicCast<nx::vms::client::desktop::CrossSystemCameraResource>();
+        const auto systemStatus = NX_ASSERT(crossSystemCamera)
+            ? crossSystemCamera->crossSystemContext()->status()
+            : CloudCrossSystemContext::Status::uninitialized;
+
+        if (systemStatus == CloudCrossSystemContext::Status::uninitialized)
+            status = QnResourceIconCache::Offline;
+        else if (systemStatus == CloudCrossSystemContext::Status::connecting)
+            status = QnResourceIconCache::Control;
+        else if (systemStatus == CloudCrossSystemContext::Status::connectionFailure)
+            status = QnResourceIconCache::Unauthorized;
+    }
     // Fake servers
-    if (flags.testFlag(Qn::fake))
+    else if (flags.testFlag(Qn::fake_server))
     {
         auto server = resource.dynamicCast<QnMediaServerResource>();
         NX_ASSERT(server);

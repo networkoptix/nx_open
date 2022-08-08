@@ -134,15 +134,7 @@ LayoutItemCreator layoutItemCreator(
 
             const auto itemResource = getResourceByDescriptor(itemData.resource);
             if (!itemResource)
-            {
-                if (isCrossSystemResource(itemData.resource))
-                {
-                    const QString systemId = crossSystemResourceSystemId(itemData.resource);
-                    return factory->createCloudSystemStatusItem(systemId);
-                }
-
-                return AbstractItemPtr();
-            }
+                return {};
 
             return std::make_unique<MainTreeResourceItemDecorator>(
                 factory->createResourceItem(itemResource),
