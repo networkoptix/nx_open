@@ -545,13 +545,10 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
             if (activationType != ResourceTree::ActivationType::doubleClick)
                 return;
 
-            const QString systemId = index.data(Qn::CloudSystemIdRole).toString();
-            auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
-            if (!NX_ASSERT(context))
-                return;
-
-            if (context->status() == CloudCrossSystemContext::Status::connectionFailure)
-                context->initializeConnectionWithUserInteraction();
+            const auto systemId = index.data(Qn::CloudSystemIdRole).toString();
+            d->context->menu()->trigger(
+                ui::action::ConnectToCloudSystemWithUserInteractionAction,
+                {Qn::CloudSystemIdRole, systemId});
 
             break;
         }

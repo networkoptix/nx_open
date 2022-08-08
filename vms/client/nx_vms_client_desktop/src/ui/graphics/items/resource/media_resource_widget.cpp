@@ -21,11 +21,11 @@
 #include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h> //< TODO: #sivanov Remove this dependency.
 #include <camera/resource_display.h>
-#include <client_core/client_core_module.h>
 #include <client/client_globals.h>
 #include <client/client_module.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
+#include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/ptz/activity_ptz_controller.h>
 #include <core/ptz/fallback_ptz_controller.h>
@@ -34,10 +34,6 @@
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/tour_ptz_controller.h>
 #include <core/ptz/viewport_ptz_controller.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_runtime_data.h>
-#include <core/resource_management/resources_changes_manager.h>
-#include <core/resource_management/user_roles_manager.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/client_camera.h>
@@ -47,6 +43,10 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_runtime_data.h>
+#include <core/resource_management/resources_changes_manager.h>
+#include <core/resource_management/user_roles_manager.h>
 #include <nx/analytics/metadata_log_parser.h>
 #include <nx/network/cloud/protocol_type.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
@@ -59,11 +59,13 @@
 #include <nx/vms/client/core/software_trigger/software_triggers_watcher.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
+#include <nx/vms/client/desktop/resources/resource_descriptor.h>
 #include <nx/vms/client/desktop/scene/resource_widget/dialogs/encrypted_archive_password_dialog.h>
 #include <nx/vms/client/desktop/scene/resource_widget/private/camera_button_controller.h>
 #include <nx/vms/client/desktop/scene/resource_widget/private/media_resource_widget_p.h>
@@ -88,8 +90,8 @@
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/crypt/crypt.h>
 #include <nx/vms/event/actions/abstract_action.h>
-#include <nx/vms/event/rule_manager.h>
 #include <nx/vms/event/rule.h>
+#include <nx/vms/event/rule_manager.h>
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/license/usage_helper.h>
 #include <nx/vms/time/formatter.h>

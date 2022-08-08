@@ -39,7 +39,13 @@ public:
         unsupported,
         connected,
     };
+    Q_ENUM(Status);
+
     Status status() const;
+
+    bool isConnected() const;
+
+    QString systemId() const;
 
     SystemContext* systemContext() const;
 
@@ -60,6 +66,14 @@ public:
      */
     void initializeConnectionWithUserInteraction();
 
+    enum class UpdateReason
+    {
+        new_,
+        found,
+        lost
+    };
+    void update(UpdateReason reason);
+
 signals:
     void statusChanged();
     void camerasAdded(const QnVirtualCameraResourceList& cameras);
@@ -69,5 +83,7 @@ private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
 };
+
+QString toString(CloudCrossSystemContext::Status status);
 
 } // namespace nx::vms::client::desktop

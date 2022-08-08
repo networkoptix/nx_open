@@ -53,6 +53,8 @@
 #include <nx/vms/client/core/network/remote_session_timeout_watcher.h>
 #include <nx/vms/client/core/utils/reconnect_helper.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
@@ -271,6 +273,11 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
 
     connect(action(ui::action::ConnectToCloudSystemAction), &QAction::triggered, this,
         &ConnectActionsHandler::at_connectToCloudSystemAction_triggered);
+    connect(
+        action(ui::action::ConnectToCloudSystemWithUserInteractionAction),
+        &QAction::triggered,
+        this,
+        &ConnectActionsHandler::onConnectToCloudSystemWithUserInteractionTriggered);
     connect(action(ui::action::ReconnectAction), &QAction::triggered, this,
         &ConnectActionsHandler::at_reconnectAction_triggered);
 
@@ -1015,6 +1022,17 @@ void ConnectActionsHandler::at_connectToCloudSystemAction_triggered()
     auto remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
 
     d->currentConnectionProcess = remoteConnectionFactory->connect(*connectionInfo, callback);
+}
+
+void ConnectActionsHandler::onConnectToCloudSystemWithUserInteractionTriggered()
+{
+    const auto parameters = menu()->currentParameters(sender());
+    const auto systemId = parameters.argument(Qn::CloudSystemIdRole).toString();
+    auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
+    if (!NX_ASSERT(context && context->status() == CloudCrossSystemContext::Status::connectionFailure))
+        return;
+
+    context->initializeConnectionWithUserInteraction();
 }
 
 void ConnectActionsHandler::at_reconnectAction_triggered()

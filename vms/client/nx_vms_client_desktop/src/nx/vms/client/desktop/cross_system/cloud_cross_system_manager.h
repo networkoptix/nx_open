@@ -18,7 +18,7 @@ class CloudCrossSystemManager: public QObject
     Q_OBJECT
 
 public:
-    CloudCrossSystemManager(QObject* parent = nullptr);
+    explicit CloudCrossSystemManager(QObject* parent = nullptr);
     virtual ~CloudCrossSystemManager() override;
 
     QStringList cloudSystems() const;

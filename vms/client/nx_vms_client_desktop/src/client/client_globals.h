@@ -118,8 +118,8 @@ namespace Qn
         ItemSpeedRole,                              /**< Role for item's playback speed. Value of type qreal. */
         ItemSliderWindowRole,                       /**< Role for slider window that is displayed when the item is active. Value of type QnTimePeriod. */
         ItemSliderSelectionRole,                    /**< Role for slider selection that is displayed when the items is active. Value of type QnTimePeriod. */
-        ItemCheckedButtonsRole,                     /**< Role for buttons that are checked in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
-        ItemDisabledButtonsRole,                    /**< Role for buttons that are not to be displayed in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
+        ItemCheckedButtonsRole,                     /**< Role for buttons that are checked in item's titlebar. Value of type int (Qn::WidgetButtons). */
+        ItemDisabledButtonsRole,                    /**< Role for buttons that are not to be displayed in item's titlebar. Value of type int (Qn::WidgetButtons). */
         ItemHealthMonitoringButtonsRole,            /**< Role for buttons that are checked on each line of Health Monitoring widget. Value of type QnServerResourceWidget::HealthMonitoringButtons. */
         ItemMotionSelectionRole,                    /**< Role for motion region selection. Value of type MotionSelection. */
         ItemAnalyticsSelectionRole,                 /**< Role for analytics region selection. Value of type QRectF. */
@@ -391,6 +391,7 @@ namespace Qn
         OldFirmwareOverlay,
         CannotDecryptMediaOverlay,
         MismatchedCertificateOverlay,
+        InformationRequiredOverlay,
 
         OverlayCount
     };
@@ -404,6 +405,9 @@ namespace Qn
         Settings,
         SetPassword,
         UnlockEncryptedArchive,
+
+        /** Provides information about required actions. */
+        RequestInformation
     };
 
     /**
