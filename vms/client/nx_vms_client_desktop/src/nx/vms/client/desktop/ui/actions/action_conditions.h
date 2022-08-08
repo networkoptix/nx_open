@@ -749,6 +749,9 @@ ConditionWrapper showBetaUpgradeWarning();
 /** Checks if the provided Resource is a Cloud Layout. */
 ConditionWrapper isCloudLayout(bool useCurrentLayout);
 
+/** Checks whether the provided id belongs to a cloud system which requires user interaction. */
+ConditionWrapper isCloudSystemConnectionUserInteractionRequired();
+
 } // namespace condition
 
 } // namespace action

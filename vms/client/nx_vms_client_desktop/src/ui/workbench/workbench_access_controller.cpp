@@ -15,8 +15,13 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
 #include <nx/streaming/abstract_archive_resource.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/desktop/cross_system/cross_system_camera_resource.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_layout_resource.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
+#include <nx/vms/client/desktop/resources/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
 
 using namespace nx::vms::client::desktop;
@@ -190,6 +195,19 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(
         if (cloudLayout->locked())
             result &= ~(Qn::AddRemoveItemsPermission | Qn::WriteNamePermission);
         return result;
+    }
+
+    // If a system the resource belongs is not connected yet, user must be able to view thumbs
+    // with the appropriate informations.
+    if (auto crossSystemCameraResource = resource.dynamicCast<CrossSystemCameraResource>())
+    {
+        const auto descriptor = crossSystemCameraResource->descriptor();
+        const auto systemId = nx::vms::client::desktop::crossSystemResourceSystemId(descriptor);
+        if (const auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
+            context && !context->isConnected())
+        {
+            return Qn::ViewContentPermission;
+        }
     }
 
     if (QnFileLayoutResourcePtr layout = resource.dynamicCast<QnFileLayoutResource>())

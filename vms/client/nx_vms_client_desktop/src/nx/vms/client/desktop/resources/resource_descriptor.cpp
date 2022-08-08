@@ -6,6 +6,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
+#include <nx/vms/client/desktop/cross_system/cross_system_camera_resource.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_layout_resource.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -38,6 +39,9 @@ QString resourcePath(const QnResourcePtr& resource)
     if (resource.dynamicCast<CrossSystemLayoutResource>())
         return resourcePath(resource->getId(), kGenericCloudSystemId);
 
+    if (const auto camera = resource.dynamicCast<CrossSystemCameraResource>())
+        return camera->descriptor().path;
+
     auto systemContext = SystemContext::fromResource(resource);
     if (NX_ASSERT(systemContext) && systemContext != appContext()->currentSystemContext())
     {
@@ -47,6 +51,7 @@ QString resourcePath(const QnResourcePtr& resource)
             return resourcePath(resource->getId(), cloudSystemId);
         }
     }
+
     return {};
 }
 
@@ -81,6 +86,7 @@ QnResourcePtr getResourceByDescriptor(const nx::vms::common::ResourceDescriptor&
         else
             systemContext = appContext()->systemContextByCloudSystemId(cloudSystemId);
     }
+
     if (!systemContext)
         systemContext = appContext()->currentSystemContext();
 

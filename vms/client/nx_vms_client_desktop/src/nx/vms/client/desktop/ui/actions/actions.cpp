@@ -112,6 +112,12 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Connect to System"))
         .condition(condition::treeNodeType(ResourceTree::NodeType::cloudSystem));
 
+    factory(ConnectToCloudSystemWithUserInteractionAction)
+        .mode(DesktopMode)
+        .flags(NoTarget)
+        .condition(condition::isLoggedInToCloud()
+            && condition::isCloudSystemConnectionUserInteractionRequired());
+
     factory(ReconnectAction)
         .flags(NoTarget);
 

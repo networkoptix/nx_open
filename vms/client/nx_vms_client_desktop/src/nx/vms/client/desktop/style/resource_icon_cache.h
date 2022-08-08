@@ -43,6 +43,7 @@ public:
 
         Camera,
         VirtualCamera,
+        CrossSystemStatus,
         Cameras,
 
         Recorder,

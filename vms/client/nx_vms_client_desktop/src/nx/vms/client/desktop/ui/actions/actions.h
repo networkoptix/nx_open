@@ -37,9 +37,14 @@ enum IDType
     SetupFactoryServerAction,
 
     /**
-    * Connects to cloud system.
-    */
+     * Connects to cloud system.
+     */
     ConnectToCloudSystemAction,
+
+    /**
+     * Initiates connect to a cloud system with user interaction.
+     */
+    ConnectToCloudSystemWithUserInteractionAction,
 
     /**
      * Disconnects from the current Server (universal internal action).

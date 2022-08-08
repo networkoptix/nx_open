@@ -11,6 +11,7 @@
 
 #include "cloud_cross_system_context.h"
 #include "cloud_cross_system_manager.h"
+#include "cross_system_layout_resource.h"
 
 namespace nx::vms::client::desktop {
 
@@ -18,7 +19,7 @@ CrossSystemLayoutsWatcher::CrossSystemLayoutsWatcher(QObject* parent):
     QObject(parent)
 {
     auto processLayouts =
-        [this](CloudCrossSystemContext* context, const QString& systemId)
+        [](CloudCrossSystemContext* context, const QString& systemId)
         {
             const auto snapshotManager = appContext()->cloudLayoutsSystemContext()
                 ->layoutSnapshotManager();
@@ -58,10 +59,10 @@ CrossSystemLayoutsWatcher::CrossSystemLayoutsWatcher(QObject* parent):
             connect(context,
                 &CloudCrossSystemContext::statusChanged,
                 this,
-                [this, context, systemId, processLayouts]()
+                [context, systemId, processLayouts]()
                 {
                     // Handle system went online and loaded all it's cameras.
-                    if (context->status() == CloudCrossSystemContext::Status::connected)
+                    if (context->isConnected())
                         processLayouts(context, systemId);
                 });
         });

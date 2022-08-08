@@ -20,12 +20,15 @@
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resources/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <watchers/cloud_status_watcher.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <watchers/cloud_status_watcher.h>
 
 #include "cross_system_camera_resource.h"
+#include "cross_system_layout_resource.h"
 #include "cross_system_server_resource.h"
+#include "cloud_layouts_manager.h"
 
 namespace nx::vms::client::desktop {
 
@@ -48,27 +51,89 @@ struct CloudCrossSystemContext::Private
     {
         NX_VERBOSE(this, "Initialized");
 
+        systemContext = std::make_unique<SystemContext>(
+            SystemContext::Mode::crossSystem,
+            appContext()->peerId(),
+            nx::core::access::Mode::direct);
+        appContext()->addSystemContext(systemContext.get());
+
+        connect(systemContext->resourcePool(),
+            &QnResourcePool::resourcesAdded,
+            q,
+            [this](const QnResourceList& resources)
+            {
+                auto cameras = resources.filtered<QnVirtualCameraResource>();
+                if (!cameras.empty())
+                    emit q->camerasAdded(cameras);
+            });
+
+        connect(systemContext->resourcePool(),
+            &QnResourcePool::resourcesRemoved,
+            q,
+            [this](const QnResourceList& resources)
+            {
+                auto cameras = resources.filtered<QnVirtualCameraResource>();
+                if (!cameras.empty())
+                    emit q->camerasRemoved(cameras);
+            });
+
+        connect(
+            appContext()->cloudLayoutsManager()->systemContext()->resourcePool(),
+            &QnResourcePool::resourcesAdded,
+            q,
+            [this](const QnResourceList& resources)
+            {
+                if (status != Status::connected)
+                    createThumbCameraResources(resources.filtered<CrossSystemLayoutResource>());
+            });
+
         auto timer = new QTimer(q);
         timer->setInterval(kUpdateInterval);
         timer->callOnTimeout([this]() { updateCameras(); });
         timer->start();
 
-        auto updateConnectionStatus =
-            [this](const QString& logMessage)
-            {
-                return [this, logMessage] { NX_VERBOSE(this, logMessage); ensureConnection(); };
-            };
-
         connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged, q,
-            updateConnectionStatus("Cloud watcher status changed"));
+            [this]
+            {
+                NX_VERBOSE(this, "Cloud status became %1", qnCloudStatusWatcher->status());
+                ensureConnection();
+            });
         connect(systemDescription.get(), &QnBaseSystemDescription::reachableStateChanged, q,
-            updateConnectionStatus("System reachable state changed"));
+            [this]
+            {
+                NX_VERBOSE(
+                    this,
+                    "System became %1",
+                    this->systemDescription->isReachable() ? "reachable" : "unreachable");
+                ensureConnection();
+            });
         connect(systemDescription.get(), &QnBaseSystemDescription::onlineStateChanged, q,
-            updateConnectionStatus("System online state changed"));
+            [this]
+            {
+                NX_VERBOSE(
+                    this,
+                    "System became %1",
+                    this->systemDescription->isOnline() ? "online" : "offline");
+                ensureConnection();
+            });
         connect(systemDescription.get(), &QnBaseSystemDescription::system2faEnabledChanged, q,
-            updateConnectionStatus("System 2fa support changed"));
+            [this]
+            {
+                NX_VERBOSE(
+                    this,
+                    "System 2fa support became %1",
+                    this->systemDescription->is2FaEnabled() ? "enabled" : "disabled");
+                ensureConnection();
+            });
         connect(systemDescription.get(), &QnBaseSystemDescription::oauthSupportedChanged, q,
-            updateConnectionStatus("System OAuth support changed"));
+            [this]
+            {
+                NX_VERBOSE(
+                    this,
+                    "System OAuth became %1",
+                    this->systemDescription->isOauthSupported() ? "supported" : "unsupported");
+                ensureConnection();
+            });
 
         ensureConnection();
     }
@@ -109,7 +174,7 @@ struct CloudCrossSystemContext::Private
         if (status == Status::unsupported)
             return false;
 
-        if (systemContext)
+        if (systemContext->connection())
             return true;
 
         if (qnCloudStatusWatcher->status() != QnCloudStatusWatcher::Online)
@@ -136,11 +201,11 @@ struct CloudCrossSystemContext::Private
                     connectionProcess.reset();
                 };
 
-            updateStatus(Status::connecting);
-
             auto endpoint = core::cloudSystemEndpoint(systemDescription);
             if (!endpoint)
                 return false;
+
+            updateStatus(Status::connecting);
 
             NX_VERBOSE(this, "Initialize new connection");
             connectionProcess = qnClientCoreModule->networkModule()->connectionFactory()->connect(
@@ -166,10 +231,6 @@ struct CloudCrossSystemContext::Private
             return;
         }
 
-        systemContext = std::make_unique<SystemContext>(
-            SystemContext::Mode::crossSystem,
-            appContext()->peerId(),
-            nx::core::access::Mode::direct);
         systemContext->setConnection(connection);
 
         server = CrossSystemServerResourcePtr(new CrossSystemServerResource(connection));
@@ -177,26 +238,6 @@ struct CloudCrossSystemContext::Private
 
         systemContext->resourcePool()->addResource(server);
         server->setStatus(nx::vms::api::ResourceStatus::online);
-
-        connect(systemContext->resourcePool(),
-            &QnResourcePool::resourcesAdded,
-            q,
-            [this](const QnResourceList& resources)
-            {
-                auto cameras = resources.filtered<QnVirtualCameraResource>();
-                if (!cameras.empty())
-                    emit q->camerasAdded(cameras);
-            });
-        connect(systemContext->resourcePool(),
-            &QnResourcePool::resourcesRemoved,
-            q,
-            [this](const QnResourceList& resources)
-            {
-                auto cameras = resources.filtered<QnVirtualCameraResource>();
-                if (!cameras.empty())
-                    emit q->camerasRemoved(cameras);
-            });
-        appContext()->addSystemContext(systemContext.get());
     }
 
     void addServersToResourcePool(std::vector<nx::vms::api::MediaServerData> servers)
@@ -254,7 +295,7 @@ struct CloudCrossSystemContext::Private
             else
             {
                 auto camera = CrossSystemCameraResourcePtr(
-                    new CrossSystemCameraResource(cameraData));
+                    new CrossSystemCameraResource(q, cameraData));
                 newlyCreatedCameras.push_back(camera);
             }
         }
@@ -443,6 +484,29 @@ struct CloudCrossSystemContext::Private
             callback,
             q->thread());
     }
+
+    void createThumbCameraResources(const CrossSystemLayoutResourceList& crossSystemLayoutsList)
+    {
+        // Required to find all the cloud resource descriptors inside the cross system layouts
+        // that still not have an actual Resource. It might be happen by the various
+        // reasons(system not found at the time or system found, but user action required or
+        // system is loading). Than create a thumb resource in the resource pool until the real
+        // resource is appeared. When the real resource is appeared, the thumb resources must be
+        // updated.
+        for (const auto& layout: crossSystemLayoutsList)
+        {
+            for (const auto& item: layout->getItems())
+            {
+                if (crossSystemResourceSystemId(item.resource) != systemDescription->id())
+                    continue;
+
+                const auto camera = CrossSystemCameraResourcePtr(
+                    new CrossSystemCameraResource(q, item.resource));
+
+                systemContext->resourcePool()->addResource(camera);
+            }
+        }
+    }
 };
 
 CloudCrossSystemContext::CloudCrossSystemContext(
@@ -454,13 +518,21 @@ CloudCrossSystemContext::CloudCrossSystemContext(
 {
 }
 
-CloudCrossSystemContext::~CloudCrossSystemContext()
-{
-}
+CloudCrossSystemContext::~CloudCrossSystemContext() = default;
 
 CloudCrossSystemContext::Status CloudCrossSystemContext::status() const
 {
     return d->status;
+}
+
+bool CloudCrossSystemContext::isConnected() const
+{
+    return d->status == Status::connected;
+}
+
+QString CloudCrossSystemContext::systemId() const
+{
+    return d->systemDescription->id();
 }
 
 SystemContext* CloudCrossSystemContext::systemContext() const
@@ -491,6 +563,53 @@ void CloudCrossSystemContext::initializeConnectionWithUserInteraction()
     d->connectionProcess.reset();
     d->updateStatus(Status::connecting);
     d->ensureConnection(/*allowUserInteraction*/ true);
+}
+
+void CloudCrossSystemContext::update(UpdateReason reason)
+{
+    switch (reason)
+    {
+        case UpdateReason::new_:
+        {
+            d->createThumbCameraResources(appContext()->cloudLayoutsManager()->systemContext()
+                ->resourcePool()->getResources<CrossSystemLayoutResource>());
+
+            break;
+        }
+        case UpdateReason::found:
+        {
+            if (d->ensureConnection())
+                d->updateCameras();
+
+            break;
+        }
+        case UpdateReason::lost:
+        {
+            if (d->status != Status::unsupported)
+                d->updateStatus(Status::uninitialized);
+
+            break;
+        }
+    }
+}
+
+QString toString(CloudCrossSystemContext::Status status)
+{
+    switch (status)
+    {
+        case CloudCrossSystemContext::Status::uninitialized:
+            return CloudCrossSystemContext::tr("Inaccessible");
+        case CloudCrossSystemContext::Status::connecting:
+            return CloudCrossSystemContext::tr("Loading...");
+        case CloudCrossSystemContext::Status::connectionFailure:
+            return CloudCrossSystemContext::tr("Information required");
+        case CloudCrossSystemContext::Status::unsupported:
+            return "UNSUPPORTED"; //< Debug purposes.
+        case CloudCrossSystemContext::Status::connected:
+            return "CONNECTED"; //< Debug purposes.
+        default:
+            return {};
+    }
 }
 
 } // namespace nx::vms::client::desktop
