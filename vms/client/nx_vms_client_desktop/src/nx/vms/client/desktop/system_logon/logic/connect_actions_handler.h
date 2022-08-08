@@ -110,6 +110,7 @@ private:
 
     void at_connectAction_triggered();
     void at_connectToCloudSystemAction_triggered();
+    void onConnectToCloudSystemWithUserInteractionTriggered();
     void at_reconnectAction_triggered();
     void at_disconnectAction_triggered();
     void at_selectCurrentServerAction_triggered();

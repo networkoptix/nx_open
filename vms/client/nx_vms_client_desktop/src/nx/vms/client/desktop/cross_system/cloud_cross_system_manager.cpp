@@ -35,19 +35,24 @@ CloudCrossSystemManager::CloudCrossSystemManager(QObject* parent):
             if (systemDescription && systemDescription->isCloudSystem())
             {
                 if (existing != d->cloudSystems.end())
-                    return;
+                {
+                    NX_VERBOSE(this, "System %1 became online again", systemDescription->name());
+                    existing->second->update(CloudCrossSystemContext::UpdateReason::found);
+                }
+                else
+                {
+                    NX_VERBOSE(this, "Found new cloud system %1", systemDescription->name());
+                    d->cloudSystems[systemId] =
+                        std::make_unique<CloudCrossSystemContext>(systemDescription);
+                    d->cloudSystems[systemId]->update(CloudCrossSystemContext::UpdateReason::new_);
+                }
 
-                NX_VERBOSE(this, "Found new cloud system %1", systemDescription->name());
-                d->cloudSystems[systemId] =
-                    std::make_unique<CloudCrossSystemContext>(systemDescription);
                 emit systemFound(systemId);
             }
             else if (existing != d->cloudSystems.end()) //< System is lost or not cloud anymore.
             {
                 NX_VERBOSE(this, "Cloud system %1 lost", existing->second.get());
-                if (auto systemContext = existing->second->systemContext())
-                    appContext()->removeSystemContext(systemContext);
-                d->cloudSystems.erase(existing);
+                d->cloudSystems[systemId]->update(CloudCrossSystemContext::UpdateReason::lost);
                 emit systemLost(systemId);
             }
         };
@@ -81,15 +86,14 @@ CloudCrossSystemManager::CloudCrossSystemManager(QObject* parent):
         handleSystemAdded(systemDescription);
 }
 
-CloudCrossSystemManager::~CloudCrossSystemManager()
-{
-}
+CloudCrossSystemManager::~CloudCrossSystemManager() = default;
 
 QStringList CloudCrossSystemManager::cloudSystems() const
 {
     QStringList result;
     for (const auto& [id, _]: d->cloudSystems)
         result.push_back(id);
+
     return result;
 }
 

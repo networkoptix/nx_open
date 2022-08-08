@@ -41,6 +41,8 @@
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/condition/generic_condition.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_layout_resource.h>
 #include <nx/vms/client/desktop/joystick/settings/manager.h>
 #include <nx/vms/client/desktop/network/cloud_url_validator.h>
@@ -2322,6 +2324,21 @@ ConditionWrapper isCloudLayout(bool useCurrentLayout)
     }
 
     return new ResourceCondition(isCloud, MatchMode::All);
+}
+
+ConditionWrapper isCloudSystemConnectionUserInteractionRequired()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& parameters, QnWorkbenchContext*)
+        {
+            const auto systemId = parameters.argument(Qn::CloudSystemIdRole).toString();
+            const auto cloudContext =
+                appContext()->cloudCrossSystemManager()->systemContext(systemId);
+
+            return cloudContext && cloudContext->status()
+                == CloudCrossSystemContext::Status::connectionFailure;
+        }
+    );
 }
 
 } // namespace condition

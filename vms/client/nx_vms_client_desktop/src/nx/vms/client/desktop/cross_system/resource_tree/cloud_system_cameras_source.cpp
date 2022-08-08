@@ -40,6 +40,9 @@ struct CloudSystemCamerasSource::Private
             {
                 NX_VERBOSE(this, "%1 cameras added to %2", cameras.size(), *systemContext);
 
+                if (!systemContext->isConnected())
+                    return;
+
                 auto handler = q->addKeyHandler;
                 for (auto& camera: cameras)
                     (*handler)(camera);
@@ -51,14 +54,35 @@ struct CloudSystemCamerasSource::Private
             {
                 NX_VERBOSE(this, "%1 cameras removed from %2", cameras.size(), *systemContext);
 
+                if (!systemContext->isConnected())
+                    return;
+
                 auto handler = q->removeKeyHandler;
                 for (auto& camera: cameras)
                     (*handler)(camera);
             });
 
+        connections << QObject::connect(systemContext,
+            &CloudCrossSystemContext::statusChanged,
+            [this]
+            {
+                if (systemContext->isConnected())
+                {
+                    auto cameras = systemContext->cameras();
+                    q->setKeysHandler(QVector<QnResourcePtr>(cameras.cbegin(), cameras.cend()));
+                }
+                else
+                {
+                    q->setKeysHandler({});
+                }
+            });
+
         auto cameras = systemContext->cameras();
-        NX_VERBOSE(this, "%1 cameras already exist in the %2", cameras.size(), *systemContext);
-        q->setKeysHandler(QVector<QnResourcePtr>(cameras.cbegin(), cameras.cend()));
+        if (systemContext->isConnected())
+        {
+            NX_VERBOSE(this, "%1 cameras already exist in the %2", cameras.size(), *systemContext);
+            q->setKeysHandler(QVector<QnResourcePtr>(cameras.cbegin(), cameras.cend()));
+        }
     };
 };
 

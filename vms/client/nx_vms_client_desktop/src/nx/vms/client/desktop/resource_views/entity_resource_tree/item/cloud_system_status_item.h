@@ -21,7 +21,7 @@ class CloudSystemStatusItem: public entity_item_model::AbstractItem
     using base_type = entity_item_model::AbstractItem;
 
 public:
-    CloudSystemStatusItem(const QString& systemId);
+    explicit CloudSystemStatusItem(const QString& systemId);
     virtual ~CloudSystemStatusItem() override;
 
     virtual QVariant data(int role) const override;

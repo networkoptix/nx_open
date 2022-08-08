@@ -268,6 +268,7 @@ QString QnStatusOverlayController::captionText(Qn::ResourceStatusOverlay overlay
         { Qn::NoLiveStreamOverlay, tr("NO LIVE STREAM") },
         { Qn::OldFirmwareOverlay, tr("UNSUPPORTED FIRMWARE VERSION") },
         { Qn::CannotDecryptMediaOverlay, tr("ARCHIVE ENCRYPTED") },
+        { Qn::InformationRequiredOverlay, tr("INFORMATION REQUIRED") },
     };
     return extractValue(overlay, kCaptions);
 }
@@ -311,6 +312,7 @@ QString QnStatusOverlayController::statusIconPath(Qn::ResourceStatusOverlay over
         { Qn::PausedOverlay, lit("item_placeholders/pause.png") },
         { Qn::PasswordRequiredOverlay, lit("item_placeholders/alert.png") },
         { Qn::CannotDecryptMediaOverlay, lit("item_placeholders/encrypted.svg") },
+        { Qn::InformationRequiredOverlay, lit("item_placeholders/alert.png") },
     };
 
     return extractValue(overlay, kIconPaths);
@@ -341,6 +343,7 @@ QnStatusOverlayController::getButtonCaptions(const QnResourcePtr& resource)
     result.insert(toInt(Qn::ResourceOverlayButton::MoreLicenses), tr("Activate License"));
     result.insert(toInt(Qn::ResourceOverlayButton::SetPassword), tr("Set for this Camera"));
     result.insert(toInt(Qn::ResourceOverlayButton::UnlockEncryptedArchive), tr("Unlock"));
+    result.insert(toInt(Qn::ResourceOverlayButton::RequestInformation), tr("Provide"));
 
     if (resource)
     {

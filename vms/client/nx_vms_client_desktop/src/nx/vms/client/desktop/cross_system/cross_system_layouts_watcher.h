@@ -19,7 +19,7 @@ class CrossSystemLayoutsWatcher: public QObject
     Q_OBJECT
 
 public:
-    CrossSystemLayoutsWatcher(QObject* parent = nullptr);
+    explicit CrossSystemLayoutsWatcher(QObject* parent = nullptr);
 };
 
 } // namespace nx::vms::client::desktop
