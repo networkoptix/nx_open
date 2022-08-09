@@ -6,6 +6,8 @@
 #include <QtWidgets/QPushButton>
 
 #include <client_core/client_core_module.h>
+#include <nx/branding.h>
+#include <nx/build_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/nx_network_ini.h>
 #include <nx/network/socket_global.h>
@@ -71,6 +73,24 @@ Qn::HelpTopic helpTopicId(RemoteConnectionErrorCode errorCode)
         default:
             return Qn::Login_Help;
     }
+}
+
+/** In some cases error message is misleading, though it can be shown to developers only. */
+bool alwaysShowDeveloperError(
+    RemoteConnectionErrorCode errorCode,
+    const nx::vms::api::ModuleInformation& targetSystem)
+{
+    if (errorCode != RemoteConnectionErrorCode::binaryProtocolVersionDiffers
+        && errorCode != RemoteConnectionErrorCode::cloudHostDiffers)
+    {
+        return false; // Other error codes are self-explanatory for developers.
+    }
+
+    if (nx::build_info::publicationType() == nx::build_info::PublicationType::local)
+        return true;
+
+    return nx::vms::api::SoftwareVersion(nx::build_info::vmsVersion()) == targetSystem.version
+        && nx::branding::customization() == targetSystem.customization;
 }
 
 } // namespace
@@ -292,15 +312,18 @@ void ConnectionTestingDialog::updateUi()
             d->ui->descriptionLabel->setVisible(true);
             if (d->connectionProcess)
             {
+                auto targetModuleInformation = d->connectionProcess->context->moduleInformation;
+
                 const auto error = d->result.error;
                 QString description = error->externalDescription
                     ? *error->externalDescription
                     : errorDescription(
                         error->code,
-                        d->connectionProcess->context->moduleInformation,
+                        targetModuleInformation,
                         d->engineVersion).longText;
 
-                if (ini().developerMode)
+                if (ini().developerMode
+                    || alwaysShowDeveloperError(error->code, targetModuleInformation))
                 {
                     description += common::html::kLineBreak
                         + QnConnectionDiagnosticsHelper::developerModeText(
