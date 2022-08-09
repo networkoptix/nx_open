@@ -77,15 +77,18 @@ struct CloudCrossSystemContext::Private
                     emit q->camerasRemoved(cameras);
             });
 
-        connect(
-            appContext()->cloudLayoutsManager()->systemContext()->resourcePool(),
-            &QnResourcePool::resourcesAdded,
-            q,
-            [this](const QnResourceList& resources)
-            {
-                if (status != Status::connected)
-                    createThumbCameraResources(resources.filtered<CrossSystemLayoutResource>());
-            });
+        if (ini().crossSystemLayouts)
+        {
+            connect(
+                appContext()->cloudLayoutsSystemContext()->resourcePool(),
+                &QnResourcePool::resourcesAdded,
+                q,
+                [this](const QnResourceList& resources)
+                {
+                    if (status != Status::connected)
+                        createThumbCameraResources(resources.filtered<CrossSystemLayoutResource>());
+                });
+        }
 
         auto timer = new QTimer(q);
         timer->setInterval(kUpdateInterval);
@@ -571,9 +574,11 @@ void CloudCrossSystemContext::update(UpdateReason reason)
     {
         case UpdateReason::new_:
         {
-            d->createThumbCameraResources(appContext()->cloudLayoutsManager()->systemContext()
-                ->resourcePool()->getResources<CrossSystemLayoutResource>());
-
+            if (ini().crossSystemLayouts)
+            {
+                d->createThumbCameraResources(appContext()->cloudLayoutsSystemContext()
+                    ->resourcePool()->getResources<CrossSystemLayoutResource>());
+            }
             break;
         }
         case UpdateReason::found:
