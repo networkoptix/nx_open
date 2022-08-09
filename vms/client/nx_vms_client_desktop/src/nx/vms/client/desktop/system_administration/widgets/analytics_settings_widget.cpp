@@ -380,7 +380,9 @@ void AnalyticsSettingsWidget::Private::activeElementChanged(
     if (!NX_ASSERT(engine))
         return;
 
-    auto paramValues = AnalyticsSettingsActionsHelper::requestSettingsJson(paramsModel);
+    const auto paramValues =
+        AnalyticsSettingsActionsHelper::requestSettingsJson(paramsModel, /*parent*/ q);
+
     if (!paramValues)
         return;
 
