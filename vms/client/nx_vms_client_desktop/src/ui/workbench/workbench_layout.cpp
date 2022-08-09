@@ -21,7 +21,7 @@
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resources/resource_descriptor.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <utils/common/util.h>
@@ -909,11 +909,7 @@ bool QnWorkbenchLayout::own(QnWorkbenchItem* item) const
 QIcon QnWorkbenchLayout::calculateIcon(const QnLayoutResourcePtr& layout) const
 {
     if (layout->hasFlags(Qn::cross_system))
-    {
-        return layout->locked()
-            ? qnResIconCache->icon(QnResourceIconCache::CloudLayout | QnResourceIconCache::Locked)
-            : qnResIconCache->icon(QnResourceIconCache::CloudLayout);
-    }
+        return qnSkin->icon("layouts/cloud_layout.svg");
 
     return layout->data(Qn::LayoutIconRole).value<QIcon>();
 }
