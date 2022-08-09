@@ -54,9 +54,8 @@ static const std::string kParametersModel = /*suppress newline*/ 1 + (const char
     [
         {
             "type": "TextField",
-            "name": "url",
-            "caption": "Url",
-            "defaultValue": "https://example.com/"
+            "name": "parameter",
+            "caption": "Parameter"
         }
     ]
 }
@@ -511,15 +510,15 @@ static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R
                 {
                     "type": "Button",
                     "name": ")json" + kShowMessageButtonId + R"json(",
-                    "caption": "Show a message",
-                    "isActive": true
+                    "caption": "Show Message...",
+                    "isActive": true,
+                    "parametersModel": )json" + kParametersModel + R"json(
                 },
                 {
                     "type": "Button",
                     "name": ")json" + kShowUrlButtonId + R"json(",
-                    "caption": "Show a web-page",
-                    "isActive": true,
-                    "parametersModel": )json" + kParametersModel + R"json(
+                    "caption": "Show Webpage...",
+                    "isActive": true
                 }
             ]
         }

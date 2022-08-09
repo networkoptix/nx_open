@@ -4,6 +4,7 @@
 
 #include <algorithm>
 
+#include "actions.h"
 #include "active_settings_rules.h"
 #include "device_agent.h"
 #include "settings_model.h"
@@ -11,9 +12,8 @@
 
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
 #include <nx/kit/debug.h>
-
-#include <nx/sdk/helpers/error.h>
 #include <nx/sdk/helpers/active_setting_changed_response.h>
+#include <nx/sdk/helpers/error.h>
 #include <nx/vms_server_plugins/analytics/stub/utils.h>
 
 namespace nx {
@@ -142,22 +142,12 @@ void Engine::doGetSettingsOnActiveSettingChange(
     settingsResponse->setValues(makePtr<StringMap>(values));
     settingsResponse->setModel(makePtr<String>(Json(model).dump()));
 
+    const nx::sdk::Ptr<nx::sdk::ActionResponse> actionResponse =
+        generateActionResponse(settingId, activeSettingChangeAction->params());
+
     auto response = makePtr<ActiveSettingChangedResponse>();
     response->setSettingsResponse(settingsResponse);
-
-    if (settingId == kShowMessageButtonId)
-    {
-        const auto actionResponse = makePtr<ActionResponse>();
-        actionResponse->setMessageToUser("Message Example");
-        response->setActionResponse(actionResponse);
-    }
-    if (settingId == kShowUrlButtonId)
-    {
-        const auto actionResponse = makePtr<ActionResponse>();
-        const auto url = activeSettingChangeAction->params()->value("url");
-        actionResponse->setActionUrl(url);
-        response->setActionResponse(actionResponse);
-    }
+    response->setActionResponse(actionResponse);
 
     *outResult = response.releasePtr();
 }
