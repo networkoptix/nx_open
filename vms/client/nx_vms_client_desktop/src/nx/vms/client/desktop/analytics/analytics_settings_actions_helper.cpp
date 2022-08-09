@@ -2,17 +2,11 @@
 
 #include "analytics_settings_actions_helper.h"
 
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonDocument>
-#include <QtCore/QMetaObject>
-#include <QtQuick/QQuickItem>
-#include <QtQuickWidgets/QQuickWidget>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QScrollArea>
-
-#include <client_core/client_core_module.h>
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
+#include <nx/vms/client/desktop/ui/dialogs/analytics_action_settings_dialog.h>
 #include <ui/dialogs/common/message_box.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
@@ -23,81 +17,46 @@ void AnalyticsSettingsActionsHelper::processResult(
     QWidget* parent)
 {
     if (!result.messageToUser.isEmpty())
-        QnMessageBox::success(parent, result.messageToUser);
+    {
+        QnMessageBox message(
+            QnMessageBox::Icon::Success,
+            result.messageToUser,
+            /*extras*/ "",
+            QDialogButtonBox::Ok,
+            QDialogButtonBox::NoButton,
+            parent);
+
+        setHelpTopic(&message, Qn::Forced_Empty_Help);
+        message.exec();
+    }
 
     if (!result.actionUrl.isEmpty())
         WebViewDialog::showUrl(QUrl(result.actionUrl), /*enableClientApi*/ true, context, parent);
 }
 
-std::optional<AnalyticsSettingsActionsHelper::SettingsValues>
-    AnalyticsSettingsActionsHelper::requestSettings(
+std::optional<AnalyticsSettingsActionsHelper::SettingsValuesMap>
+    AnalyticsSettingsActionsHelper::requestSettingsMap(
         const QJsonObject& settingsModel,
         QWidget* parent)
 {
-    if (settingsModel.isEmpty())
-        return SettingsValues{};
+    const auto values = requestSettingsJson(settingsModel, parent);
+    if (!values)
+        return std::nullopt;
 
-    QnMessageBox parametersDialog(parent);
-    parametersDialog.addButton(QDialogButtonBox::Ok);
-    parametersDialog.addButton(QDialogButtonBox::Cancel);
-    parametersDialog.setText(tr("Enter parameters"));
-    parametersDialog.setInformativeText(tr("Action requires some parameters to be filled."));
-    parametersDialog.setIcon(QnMessageBoxIcon::Information);
+    SettingsValuesMap result;
+    for (const auto& key: values->keys())
+        result[key] = values->value(key).toString();
 
-    const auto view = new QQuickWidget(qnClientCoreModule->mainQmlEngine(), &parametersDialog);
-    view->setClearColor(parametersDialog.palette().window().color());
-    view->setResizeMode(QQuickWidget::SizeRootObjectToView);
-    view->setSource(QUrl("Nx/InteractiveSettings/SettingsView.qml"));
-
-    const auto root = view->rootObject();
-    if (!NX_ASSERT(root))
-        return {};
-
-    QMetaObject::invokeMethod(
-        root,
-        "loadModel",
-        Qt::DirectConnection,
-        Q_ARG(QVariant, settingsModel.toVariantMap()),
-        /*initialValues*/ Q_ARG(QVariant, {}),
-        /*restoreScrollPosition*/ Q_ARG(QVariant, false));
-
-    const auto panel = new QScrollArea(&parametersDialog);
-    panel->setFixedHeight(400);
-    const auto layout = new QHBoxLayout(panel);
-    layout->addWidget(view);
-
-    parametersDialog.addCustomWidget(panel, QnMessageBox::Layout::Main);
-    if (parametersDialog.exec() != QDialogButtonBox::Ok)
-        return {};
-
-    QVariant result;
-    QMetaObject::invokeMethod(
-        root,
-        "getValues",
-        Qt::DirectConnection,
-        Q_RETURN_ARG(QVariant, result));
-
-    SettingsValues settingsValues;
-    const auto resultMap = result.value<QVariantMap>();
-    for (auto iter = resultMap.cbegin(); iter != resultMap.cend(); ++iter)
-        settingsValues.insert(iter.key(), iter.value().toString());
-
-    return settingsValues;
+    return result;
 }
 
 std::optional<QJsonObject> AnalyticsSettingsActionsHelper::requestSettingsJson(
     const QJsonObject& settingsModel,
     QWidget* parent)
 {
-    const auto settings = requestSettings(settingsModel, parent);
-    if (!settings)
-        return std::nullopt;
-
-    QJsonObject result;
-    for (const auto& key: settings->keys())
-        result[key] = settings->value(key);
-
-    return result;
+    return settingsModel.isEmpty()
+        ? QJsonObject{}
+        : AnalyticsActionSettingsDialog::request(settingsModel, parent);
 }
 
 } // namespace nx::vms::client::desktop

@@ -314,7 +314,7 @@ void TileInteractionHandler::executePluginAction(
     if (!actionDescriptor->parametersModel.isEmpty())
     {
         // Show dialog to enter required parameters.
-        auto params = AnalyticsSettingsActionsHelper::requestSettings(
+        const auto params = AnalyticsSettingsActionsHelper::requestSettingsMap(
             actionDescriptor->parametersModel, mainWindowWidget());
 
         if (!params)
