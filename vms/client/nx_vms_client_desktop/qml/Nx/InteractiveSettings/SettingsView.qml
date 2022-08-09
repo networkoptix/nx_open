@@ -25,6 +25,9 @@ Item
     property var resourceId: NxGlobals.uuid("")
     property var engineId: NxGlobals.uuid("")
 
+    implicitWidth: contentItem ? contentItem.implicitWidth : 0
+    implicitHeight: contentItem ? contentItem.implicitHeight : 0
+
     QtObject
     {
         id: impl

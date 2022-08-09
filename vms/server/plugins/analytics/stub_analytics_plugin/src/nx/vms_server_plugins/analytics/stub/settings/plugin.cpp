@@ -152,15 +152,15 @@ std::string Plugin::manifestString() const
                     {
                         "type": "Button",
                         "name": ")json" + kShowMessageButtonId + R"json(",
-                        "caption": "Show a message",
-                        "isActive": true
+                        "caption": "Show Message...",
+                        "isActive": true,
+                        "parametersModel": )json" + kParametersModel + R"json(
                     },
                     {
                         "type": "Button",
                         "name": ")json" + kShowUrlButtonId + R"json(",
-                        "caption": "Show a web-page",
-                        "isActive": true,
-                        "parametersModel": )json" + kParametersModel + R"json(
+                        "caption": "Show Webpage...",
+                        "isActive": true
                     }
                 ]
             }

@@ -4,7 +4,7 @@
 
 #include <optional>
 
-#include <QtCore/QCoreApplication>
+#include <QtCore/QJsonObject>
 
 #include <api/model/analytics_actions.h>
 
@@ -15,15 +15,14 @@ namespace nx::vms::client::desktop {
 
 class AnalyticsSettingsActionsHelper
 {
-    Q_DECLARE_TR_FUNCTIONS(AnalyticsSettingsActionsHelper)
 public:
     static void processResult(
         const AnalyticsActionResult& result,
         QnWorkbenchContext* context = nullptr,
         QWidget* parent = nullptr);
 
-    using SettingsValues = QMap<QString, QString>;
-    static std::optional<SettingsValues> requestSettings(
+    using SettingsValuesMap = QMap<QString, QString>;
+    static std::optional<SettingsValuesMap> requestSettingsMap(
         const QJsonObject& settingsModel,
         QWidget* parent = nullptr);
 

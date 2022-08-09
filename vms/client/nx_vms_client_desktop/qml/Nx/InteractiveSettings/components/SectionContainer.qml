@@ -30,6 +30,9 @@ StackLayout
     readonly property bool hasItems: childrenItem.children.length
     readonly property bool isEmpty: !hasOtherSections && !hasItems
 
+    implicitWidth: view.contentItem.implicitWidth
+    implicitHeight: view.contentItem.implicitHeight
+
     Scrollable
     {
         id: view
