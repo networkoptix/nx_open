@@ -178,7 +178,7 @@ struct NX_VMS_API ServerInformation: ModuleInformationWithAddresses
     (timeZoneOffsetMs) \
     (timeZoneId)
 
-NX_VMS_API_DECLARE_STRUCT_EX(ServerInformation, (json))
+NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(ServerInformation, (json))
 NX_REFLECTION_INSTRUMENT(ServerInformation, ServerInformation_Fields);
 
 } // namespace nx::vms::api
