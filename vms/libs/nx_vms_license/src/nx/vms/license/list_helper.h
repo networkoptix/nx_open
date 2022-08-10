@@ -29,4 +29,7 @@ private:
     QnLicenseDict m_licenseDict;
 };
 
+// Should only be used for UTs.
+void fakeLicenseCount(int value = 0);
+
 } // namespace nx::vms::license

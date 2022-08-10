@@ -8,6 +8,8 @@
 
 namespace nx::vms::license {
 
+static std::atomic<int> g_fakeLicenseCount = 0;
+
 ListHelper::ListHelper(const QnLicenseList& licenseList)
 {
     update(licenseList);
@@ -37,7 +39,7 @@ int ListHelper::totalLicenseByType(Qn::LicenseType licenseType,
     if (licenseType == Qn::LC_Free)
         return std::numeric_limits<int>::max();
 
-    int result = 0;
+    int result = g_fakeLicenseCount.load();
 
     for (const QnLicensePtr& license: m_licenseDict.values())
     {
@@ -57,6 +59,11 @@ void ListHelper::update(const QnLicenseList& licenseList)
     m_licenseDict.clear();
     for (const auto& license: licenseList)
         m_licenseDict[license->key()] = license;
+}
+
+void fakeLicenseCount(int value)
+{
+    g_fakeLicenseCount = value;
 }
 
 } // namespace nx::vms::license
