@@ -539,8 +539,14 @@ bool QnLayoutResource::isServiceLayout() const
     if (const auto module = commonModule())
     {
         const auto parent = module->resourcePool()->getResourceById(parentId);
-        if (parent && parent->hasFlags(Qn::user))
-            return false;
+        if (parent)
+        {
+            if (parent->hasFlags(Qn::user) //< General user's layout.
+                || parent->hasFlags(Qn::media)) //< Intercom layout.
+            {
+                return false;
+            }
+        }
     }
 
     return true;

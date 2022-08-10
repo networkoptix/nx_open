@@ -6,6 +6,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <client/client_globals.h>
+#include <nx/vms/common/intercom/utils.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
@@ -70,7 +71,10 @@ void LayoutResourceSource::onResourceRemoved(const QnResourcePtr& resource)
         m_localLayouts.remove(resource);
 
     if (resource->hasFlags(Qn::layout))
-        emit resourceRemoved(resource);
+    {
+        if (!nx::vms::common::isIntercomLayout(resource))
+            emit resourceRemoved(resource);
+    }
 }
 
 void LayoutResourceSource::onLayoutParentIdChanged(
@@ -99,7 +103,7 @@ void LayoutResourceSource::processResource(
     if (layout->isServiceLayout() || layout->data().contains(Qn::LayoutSearchStateRole))
         return;
 
-    if (layout->hasFlags(Qn::local))
+    if (layout->hasFlags(Qn::local) && !layout->hasFlags(Qn::local_intercom_layout))
     {
         holdLocalLayout(resource);
         return;
@@ -107,6 +111,9 @@ void LayoutResourceSource::processResource(
 
     connect(resource.get(), &QnResource::parentIdChanged,
         this, &LayoutResourceSource::onLayoutParentIdChanged);
+
+    if (nx::vms::common::isIntercomLayout(layout))
+        return;
 
     if (!m_parentUser
         || (layout->getParentResource() == m_parentUser)

@@ -16,6 +16,7 @@
 #include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/resource_access_subjects_cache.h>
+#include <core/resource_access/providers/intercom_layout_access_provider.h>
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_access/providers/permissions_resource_access_provider.h>
 #include <core/resource_access/providers/shared_resource_access_provider.h>
@@ -153,6 +154,8 @@ QnCommonModule::QnCommonModule(bool clientMode,
         new core::access::SharedLayoutItemAccessProvider(resourceAccessMode, this));
     m_resourceAccessProvider->addBaseProvider(
         new core::access::VideoWallItemAccessProvider(resourceAccessMode, this));
+    m_resourceAccessProvider->addBaseProvider(
+        new core::access::IntercomLayoutAccessProvider(resourceAccessMode, this));
 
     // Depends on access provider.
     m_resourceAccessManager = new QnResourceAccessManager(resourceAccessMode, this);

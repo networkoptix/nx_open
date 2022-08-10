@@ -19,7 +19,7 @@ namespace nx::core::access {
 BaseResourceAccessProvider::BaseResourceAccessProvider(Mode mode, QObject* parent):
     base_type(mode, parent),
     QnCommonModuleAware(parent),
-    m_mutex(nx::Mutex::NonRecursive),
+    m_mutex(nx::Mutex::Recursive),
     m_accessibleResources()
 {
     if (mode == Mode::cached)

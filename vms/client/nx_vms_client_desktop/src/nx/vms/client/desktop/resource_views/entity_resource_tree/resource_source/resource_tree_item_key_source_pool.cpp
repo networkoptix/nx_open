@@ -9,7 +9,6 @@
 #include <core/resource/resource_fwd.h>
 
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/camera_resource_index.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/layout_resource_index.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/webpage_resource_index.h>
 
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/user_roles_provider.h>
@@ -30,11 +29,11 @@ using namespace nx::vms::client::desktop::entity_item_model;
 ResourceTreeItemKeySourcePool::ResourceTreeItemKeySourcePool(
     const QnCommonModule* commonModule,
     const CameraResourceIndex* cameraResourceIndex,
-    const LayoutResourceIndex* layoutResourceIndex)
+    const UserLayoutResourceIndex* sharedLayoutResourceIndex)
     :
     m_commonModule(commonModule),
     m_cameraResourceIndex(cameraResourceIndex),
-    m_layoutResourceIndex(layoutResourceIndex),
+    m_userLayoutResourceIndex(sharedLayoutResourceIndex),
     m_userRolesProvider(new UserRolesProvider(commonModule->userRolesManager())),
     m_webPageResourceIndex(new WebPageResourceIndex(resourcePool()))
 {
@@ -136,6 +135,38 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::devicesAndProxiedWebPages
 UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::layoutsSource(
     const QnUserResourcePtr& user)
 {
+    auto layouts = std::make_unique<AccessibleResourceProxySource>(
+        m_commonModule,
+        accessProvider(),
+        user,
+        std::make_unique<LayoutResourceSource>(resourcePool(), user, true));
+
+    auto intercomLayouts = std::make_unique<AccessibleResourceProxySource>(
+        m_commonModule,
+        accessProvider(),
+        user,
+        std::make_unique<IntercomLayoutResourceSource>(resourcePool()));
+
+    return std::make_shared<ResourceSourceAdapter>(
+        std::make_unique<CompositeResourceSource>(
+            std::move(layouts),
+            std::move(intercomLayouts)
+        ));
+}
+
+UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::allLayoutsSource(
+    const QnUserResourcePtr& user)
+{
+    return std::make_shared<ResourceSourceAdapter>(std::make_unique<AccessibleResourceProxySource>(
+        m_commonModule,
+        accessProvider(),
+        user,
+        std::make_unique<LayoutResourceSource>(resourcePool(), QnUserResourcePtr(), true)));
+}
+
+UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::shareableLayoutsSource(
+    const QnUserResourcePtr& user)
+{
     return std::make_shared<ResourceSourceAdapter>(
         std::make_unique<AccessibleResourceProxySource>(
             m_commonModule,
@@ -144,22 +175,11 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::layoutsSource(
             std::make_unique<LayoutResourceSource>(resourcePool(), user, true)));
 }
 
-UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::allLayoutsSource(
-    const QnUserResourcePtr& user)
-{
-    return std::make_shared<ResourceSourceAdapter>(
-        std::make_unique<AccessibleResourceProxySource>(
-            m_commonModule,
-            accessProvider(),
-            user,
-            std::make_unique<LayoutResourceSource>(resourcePool(), QnUserResourcePtr(), true)));
-}
-
 UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::userLayoutsSource(
     const QnUserResourcePtr& user)
 {
     return std::make_shared<ResourceSourceAdapter>(
-        std::make_unique<UserLayoutsSource>(m_layoutResourceIndex, user));
+        std::make_unique<UserLayoutsSource>(m_userLayoutResourceIndex, user));
 }
 
 UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::usersSource(
@@ -182,13 +202,31 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::userAccessibleDevicesSour
         resourcePool(), globalPermissionsManager(), accessProvider(), subject));
 }
 
-UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::directlySharedAndOwnLayoutsSource(
-    const QnUserResourcePtr& user)
+UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::sharedAndOwnLayoutsSource(
+    const QnResourceAccessSubject& subject)
 {
-    return std::make_shared<ResourceSourceAdapter>(std::make_unique<CompositeResourceSource>(
-        std::make_unique<UserLayoutsSource>(m_layoutResourceIndex, user),
-        std::make_unique<DirectlySharedLayoutsSource>(resourcePool(),globalPermissionsManager(),
-            sharedResourcesManager(), user)));
+    auto userLayouts = std::make_unique<UserLayoutsSource>(
+        m_userLayoutResourceIndex,
+        subject.user());
+
+    auto intercomLayouts = std::make_unique<AccessibleResourceProxySource>(
+        m_commonModule,
+        accessProvider(),
+        subject,
+        std::make_unique<IntercomLayoutResourceSource>(resourcePool()));
+
+    auto directlySharedLayouts = std::make_unique<DirectlySharedLayoutsSource>(
+        resourcePool(),
+        globalPermissionsManager(),
+        sharedResourcesManager(),
+        subject.user());
+
+    return std::make_shared<ResourceSourceAdapter>(
+        std::make_unique<CompositeResourceSource>(
+            std::move(userLayouts),
+            std::make_unique<CompositeResourceSource>(
+                std::move(intercomLayouts),
+                std::move(directlySharedLayouts))));
 }
 
 UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::directlySharedLayoutsSource(

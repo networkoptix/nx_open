@@ -32,6 +32,7 @@ namespace nx::vms::client::desktop {
 class ContextCurrentUserWatcher;
 class MainWindow;
 class ResourceTreeSettings;
+class IntercomManager;
 
 namespace joystick { class Manager; }
 
@@ -128,6 +129,9 @@ private:
     QScopedPointer<QnControlsStatisticsModule> m_statisticsModule;
     QScopedPointer<nx::vms::client::desktop::ResourceTreeSettings> m_resourceTreeSettings;
     std::unique_ptr<nx::vms::client::desktop::joystick::Manager> m_joystickManager;
+
+    // Have to be moved in nx::vms::client::desktop::SystemContext when it will be possible.
+    std::unique_ptr<nx::vms::client::desktop::IntercomManager> m_intercomManager;
 
     QPointer<nx::vms::client::desktop::MainWindow> m_mainWindow;
 

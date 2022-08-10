@@ -29,7 +29,7 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
-
+#include <nx/vms/common/intercom/utils.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
 
 #include <nx/vms/client/desktop/ui/actions/actions.h>
@@ -342,11 +342,11 @@ void LayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
         // done in one place.
 
         const auto change = calculateLayoutChange(layout);
-        const auto layoutOwner = layout->getParentResource();
+        const auto layoutParent = layout->getParentResource();
 
-        if (confirmLayoutChange(change, layoutOwner))
+        const auto user = layoutParent.dynamicCast<QnUserResource>();
+        if (confirmLayoutChange(change, user))
         {
-            const auto user = layoutOwner.dynamicCast<QnUserResource>();
             if (user)
                 grantMissingAccessRights(user, change);
 
@@ -589,8 +589,9 @@ LayoutsHandler::LayoutChange LayoutsHandler::calculateLayoutChange(
     return result;
 }
 
-bool LayoutsHandler::confirmLayoutChange(const LayoutChange& change,
-    const QnResourcePtr& layoutOwner)
+bool LayoutsHandler::confirmLayoutChange(
+    const LayoutChange& change,
+    const QnUserResourcePtr& layoutOwner)
 {
     NX_ASSERT(context()->user(), "Should never ask for layout saving when offline");
     if (!context()->user())
@@ -612,7 +613,11 @@ bool LayoutsHandler::confirmLayoutChange(const LayoutChange& change,
     if (change.layout->isShared())
         return confirmChangeSharedLayout(change);
 
-    return confirmChangeLocalLayout(layoutOwner.dynamicCast<QnUserResource>(), change);
+    /* Never ask for intercom layouts. */
+    if (nx::vms::common::isIntercomLayout(change.layout))
+        return true;
+
+    return confirmChangeLocalLayout(layoutOwner, change);
 }
 
 bool LayoutsHandler::confirmChangeSharedLayout(const LayoutChange& change)
@@ -820,8 +825,12 @@ void LayoutsHandler::closeLayoutsInternal(
             delete layout;
         }
 
-        if (resource->hasFlags(Qn::local) && !resource->isFile())
+        if (resource->hasFlags(Qn::local)
+            && !resource->isFile()
+            && !resource->hasFlags(Qn::local_intercom_layout))
+        {
             resourcePool()->removeResource(resource);
+        }
     }
 
     if (workbench()->layouts().empty())

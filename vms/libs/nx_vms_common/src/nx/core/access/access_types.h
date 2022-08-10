@@ -16,6 +16,7 @@ enum class Source
     shared,         //< Accessible by direct sharing.
     layout,         //< Accessible by placing on shared layout.
     videowall,      //< Accessible by placing on videowall.
+    intercom //< Accessible as an intercom child.
 };
 
 inline uint qHash(Source value, uint seed)

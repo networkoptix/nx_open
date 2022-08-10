@@ -15,6 +15,7 @@
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/director/director.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/intercom/intercom_manager.h>
 #include <nx/vms/client/desktop/joystick/settings/manager.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>
 #include <nx/vms/client/desktop/system_health/system_health_state.h>
@@ -92,6 +93,7 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
     m_joystickManager.reset(joystick::Manager::create(this));
     m_display.reset(new QnWorkbenchDisplay(this));
     m_navigator.reset(new QnWorkbenchNavigator(this));
+    m_intercomManager.reset(new IntercomManager(this));
 
     // Adds statistics modules
 

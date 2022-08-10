@@ -87,7 +87,7 @@ namespace Qn {
         foreigner                   = 0x40000,      /**< Resource belongs to other entity. E.g., camera on another server */
 
         /* Client-only flag */
-        fake                        = 0x100000,     /**< Fake server (belonging to other system). */
+        fake                        = 0x100000,     /**< Fake server (belonging to other system). / Intercom layout, while it is local / User */
 
         videowall                   = 0x200000,     /**< Videowall resource */
         desktop_camera              = 0x400000,     /**< Desktop Camera resource */
@@ -117,6 +117,7 @@ namespace Qn {
 
         local_layout = local | layout,
         exported_layout = local_layout | url | exported,
+        local_intercom_layout = Qn::layout | Qn::local | Qn::fake,
 
         local_server = local | server,
         remote_server = remote | server,

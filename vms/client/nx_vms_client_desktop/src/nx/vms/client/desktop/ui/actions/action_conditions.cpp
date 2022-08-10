@@ -48,6 +48,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_manager.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_state.h>
+#include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/discovery/manager.h>
 #include <nx/vms/utils/platform/autorun.h>
@@ -579,6 +580,10 @@ ActionVisibility ResourceRemovalCondition::check(const Parameters& parameters, Q
 
         if (resource->hasFlags(Qn::layout) && !resource->hasFlags(Qn::local))
         {
+
+            if (nx::vms::common::isIntercomLayout(resource))
+                return false;
+
             if (ownResources)
                 return true;
 
@@ -708,9 +713,36 @@ ActionVisibility RenameResourceCondition::check(const Parameters& parameters, Qn
 
 ActionVisibility LayoutItemRemovalCondition::check(const QnLayoutItemIndexList& layoutItems, QnWorkbenchContext* context)
 {
-    foreach(const QnLayoutItemIndex &item, layoutItems)
+    for (const QnLayoutItemIndex& item: layoutItems)
+    {
         if (!context->accessController()->hasPermissions(item.layout(), Qn::WritePermission | Qn::AddRemoveItemsPermission))
             return InvisibleAction;
+
+        const auto resourceId = item.layout()->getItem(item.uuid()).resource.id;
+        const auto resource = context->resourcePool()->getResourceById<QnResource>(resourceId);
+
+        if (nx::vms::common::isIntercomOnIntercomLayout(resource, item.layout()))
+        {
+            const QnUuid intercomToDeleteId = resource->getId();
+
+            QSet<QnUuid> intercomLayoutItemIds; // Other intercom item copies on the layout.
+
+            const auto intercomLayoutItems = item.layout()->getItems();
+            for (const QnLayoutItemData& intercomLayoutItem: intercomLayoutItems)
+            {
+                const auto itemResourceId = intercomLayoutItem.resource.id;
+                if (itemResourceId == intercomToDeleteId && intercomLayoutItem.uuid != item.uuid())
+                    intercomLayoutItemIds.insert(intercomLayoutItem.uuid);
+            }
+
+            for (const QnLayoutItemIndex& item: layoutItems)
+                intercomLayoutItemIds.remove(item.uuid());
+
+            // If all intercom copies on the layout is selected - removal is forbidden.
+            if (intercomLayoutItemIds.isEmpty())
+                return InvisibleAction;
+        }
+    }
 
     return EnabledAction;
 }
