@@ -30,6 +30,8 @@ set(CMAKE_BUILD_TYPE ${default_cmake_build_type} CACHE STRING
     "One of [Debug Release RelWithDebInfo MinSizeRel].")
 
 include(cmake/open_source/vms_parts.cmake)
+include(cmake/distribution/flavors.cmake)
+nx_init_distribution_flavor_list()
 
 # This variable is used in utils.cmake and ninja_tool.cmake.
 set(open_source_root "${CMAKE_SOURCE_DIR}")
