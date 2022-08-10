@@ -7,6 +7,7 @@
 #include <nx/utils/latin1_array.h>
 
 #include "data_macros.h"
+#include "map.h"
 
 namespace nx {
 namespace vms {
@@ -138,6 +139,8 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(DetailedLicenseData)
 
 #define LicenseSummaryData_Fields (total)(available)(inUse)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(LicenseSummaryData)
+
+using LicenseSummaryValues = Map<QString /*type*/, LicenseSummaryData /*summary*/>;
 
 } // namespace api
 } // namespace vms
