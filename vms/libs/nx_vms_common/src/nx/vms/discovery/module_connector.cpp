@@ -61,8 +61,6 @@ static void validateEndpoints(std::set<nx::network::SocketAddress>* endpoints)
     const auto& resolver = nx::network::SocketGlobals::addressResolver();
     for (auto it = endpoints->begin(); it != endpoints->end(); )
     {
-        NX_ASSERT(resolver.isValidForConnect(*it), "Invalid endpoint: %1", *it);
-
         if (resolver.isValidForConnect(*it))
             ++it;
         else
