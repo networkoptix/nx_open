@@ -50,17 +50,23 @@ void serialize(QnJsonContext* ctx, const CameraAttributesData& value, QJsonValue
 
 bool deserialize(QnJsonContext* ctx, const QJsonValue& value, CameraAttributesData* target)
 {
-    CameraAttributesDataBackwardCompatibility compatibilityValue;
-    bool result = deserialize(ctx, value, &compatibilityValue);
+    CameraAttributesDataBackwardCompatibility cValue;
+    bool result = deserialize(ctx, value, &cValue);
     if (!result)
         return false;
 
-    *target = compatibilityValue;
+    *target = cValue;
     using namespace std::chrono;
-    if (compatibilityValue.minArchiveDays.has_value())
-        target->minArchivePeriodS = duration_cast<seconds>(days(*compatibilityValue.minArchiveDays));
-    if (compatibilityValue.maxArchiveDays.has_value())
-        target->maxArchivePeriodS = duration_cast<seconds>(days(*compatibilityValue.maxArchiveDays));
+    if (cValue.minArchiveDays.has_value()
+        && duration_cast<days>(cValue.minArchivePeriodS) != days(*cValue.minArchiveDays))
+    {
+        target->minArchivePeriodS = duration_cast<seconds>(days(*cValue.minArchiveDays));
+    }
+    if (cValue.maxArchiveDays.has_value()
+        && duration_cast<days>(cValue.maxArchivePeriodS) != days(*cValue.maxArchiveDays))
+    {
+        target->maxArchivePeriodS = duration_cast<seconds>(days(*cValue.maxArchiveDays));
+    }
 
     return result;
 }
