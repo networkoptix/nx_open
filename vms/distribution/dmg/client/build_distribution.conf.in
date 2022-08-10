@@ -1,4 +1,5 @@
 CURRENT_SOURCE_DIR="@CMAKE_CURRENT_SOURCE_DIR@"
+OPEN_SOURCE_DIR="@open_source_root@"
 UPDATE_ZIP="@update_file@"
 COMPATIBILITY_UPDATE_ZIP="@compatibility_update_file@"
 DISTRIBUTION_DMG="@dmg_file@"
@@ -25,5 +26,6 @@ NOTARIZATION_PASSWORD="@notarizationPassword@"
 KEYCHAIN_NOTARIZATION_USER="noptixbiz@gmail.com"
 ROBOTO_FONTS_DIRECTORY=@CONAN_ROBOTO-FONTS_ROOT@
 QUICK_START_GUIDE_FILE="@quick_start_guide_directory@/@quick_start_guide_file_name@"
+PYTHON="@PYTHON_EXECUTABLE@"
 
 ZIP_COMPRESSION_LEVEL=@zip_compression_level@
