@@ -73,7 +73,7 @@ private:
     /** Ask user if layout should be saved. Actual when admin modifies shared layout
      *  or layout belonging to user with custom access rights.
      */
-    bool confirmLayoutChange(const LayoutChange& change, const QnResourcePtr& layoutOwner);
+    bool confirmLayoutChange(const LayoutChange& change, const QnUserResourcePtr& layoutOwner);
 
     bool confirmChangeSharedLayout(const LayoutChange& change);
     bool confirmDeleteSharedLayouts(const QnLayoutResourceList& layouts);

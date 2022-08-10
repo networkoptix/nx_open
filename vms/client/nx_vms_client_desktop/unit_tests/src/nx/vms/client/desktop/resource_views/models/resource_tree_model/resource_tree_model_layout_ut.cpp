@@ -3,12 +3,15 @@
 #include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/user_resource.h>
+#include <core/resource/videowall_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_matrix.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/resources/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/common/intercom/utils.h>
 #include <ui/help/help_topics.h>
 
 #include "resource_tree_model_test_fixture.h"
@@ -337,6 +340,128 @@ TEST_F(ResourceTreeModelTest, dontShowServiceLayoutsWhileInLayoutSearchMode)
 
     // Then there are still no resources anywhere in the resource tree.
     ASSERT_TRUE(noneMatches(nodeTypeDataMatch(NodeType::resource)));
+}
+
+TEST_F(ResourceTreeModelTest, intercomLayoutNodeVisibleUnderAdmin)
+{
+    // String constants
+    static constexpr auto kUniqueUserName = "unique_user_name";
+    static constexpr auto kIntercomCameraName = "intercom_camera_name";
+
+    // When user is logged in.
+    const auto admin = loginAsAdmin("admin");
+
+    // When intercom camera is added to the resource pool.
+    const auto intercom = addIntercomCamera(kIntercomCameraName, admin->getId());
+
+    // When intercom layout is added to the resource pool.
+    const auto layout = addIntercomLayout(kUniqueLayoutName, intercom->getId());
+
+    // When non-admin user is added to the resource pool.
+    const auto otherUser = addUser(kUniqueUserName, GlobalPermission::userInput);
+
+    // When intercom is accessible for non-admin user.
+    setupAccessToResourceForUser(otherUser, intercom, true);
+
+    // Then two copies of intercom layout appeard in the resource tree.
+    ASSERT_EQ(allMatchingIndexes(kUniqueLayoutNameCondition).size(), 2);
+
+    // When intercom is not accessible for non-admin user.
+    setupAccessToResourceForUser(otherUser, intercom, false);
+
+    // Then only single copy of intercom layout appeard in the resource tree.
+    ASSERT_EQ(allMatchingIndexes(kUniqueLayoutNameCondition).size(), 1);
+}
+
+TEST_F(ResourceTreeModelTest, intercomLayoutNodeVisibleUnderUser)
+{
+    // String constants
+    static constexpr auto kUniqueUserName = "unique_user_name";
+    static constexpr auto kIntercomCameraName = "intercom_camera_name";
+
+    // When user with unique name and administrator permissions is added to the resource pool.
+    const auto admin = addUser("admin", GlobalPermission::adminPermissions);
+
+    // When intercom camera is added to the resource pool.
+    const auto intercom = addIntercomCamera(kIntercomCameraName, admin->getId());
+
+    // When intercom layout is added to the resource pool.
+    const auto layout = addIntercomLayout(kUniqueLayoutName, intercom->getId());
+
+    // When non-admin user is logged in.
+    const auto otherUser = loginAsCustomUser(kUniqueUserName);
+
+    // When intercom is accessible for non-admin user.
+    setupAccessToResourceForUser(otherUser, intercom, true);
+
+    // Then exactly one node with corresponding layout display text appears in the resource tree.
+    ASSERT_TRUE(uniqueMatchingIndex(kUniqueLayoutNameCondition).isValid());
+}
+
+TEST_F(ResourceTreeModelTest, intercomLayoutNodeNotVisibleUnderUser)
+{
+    // String constants
+    static constexpr auto kUniqueUserName = "unique_user_name";
+    static constexpr auto kIntercomCameraName = "intercom_camera_name";
+
+    // When user with unique name and administrator permissions is added to the resource pool.
+    const auto admin = addUser("admin", GlobalPermission::adminPermissions);
+
+    // When intercom camera is added to the resource pool.
+    const auto intercom = addIntercomCamera(kIntercomCameraName, admin->getId());
+
+    // When intercom layout is added to the resource pool.
+    const auto layout = addIntercomLayout(kUniqueLayoutName, intercom->getId());
+
+    // When non-admin user is logged in.
+    const auto otherUser = loginAsCustomUser(kUniqueUserName);
+
+    // And intercom node doesn't appear in the resource tree.
+    ASSERT_TRUE(noneMatches(displayFullMatch(kIntercomCameraName)));
+
+    // Then layout node doesn't appear in the resource tree.
+    ASSERT_TRUE(noneMatches(kUniqueLayoutNameCondition));
+}
+
+TEST_F(ResourceTreeModelTest, intercomLayoutLayoutTypeCheck)
+{
+    // String constants
+    static constexpr auto kUserName = "user_name";
+    static constexpr auto kVideowallName = "videowall_name";
+    static constexpr auto kIntercomCameraName = "intercom_camera_name";
+
+    // When user is logged in.
+    const auto admin = loginAsAdmin("admin");
+
+    // When layout is created.
+    const auto layout = addIntercomLayout(kUniqueLayoutName);
+
+    // When user is added to the resource pool.
+    auto user = addUser(kUserName, nx::vms::api::GlobalPermission::adminPermissions);
+
+    // When user is the layout parent.
+    layout->setParentId(user->getId());
+
+    // Layout is not an intercom layout.
+    ASSERT_TRUE(!nx::vms::common::isIntercomLayout(layout));
+
+    // When videowall is added to the resource pool.
+    auto videowall = addVideoWall(kVideowallName);
+
+    // When videowall is the layout parent.
+    layout->setParentId(videowall->getId());
+
+    // Layout is not an intercom layout.
+    ASSERT_TRUE(!nx::vms::common::isIntercomLayout(layout));
+
+    // When intercom camera is added to the resource pool.
+    const auto intercom = addIntercomCamera(kIntercomCameraName, admin->getId());
+
+    // When intercom is the layout parent.
+    layout->setParentId(intercom->getId());
+
+    // Layout is an intercom layout.
+    ASSERT_TRUE(nx::vms::common::isIntercomLayout(layout));
 }
 
 } // namespace test

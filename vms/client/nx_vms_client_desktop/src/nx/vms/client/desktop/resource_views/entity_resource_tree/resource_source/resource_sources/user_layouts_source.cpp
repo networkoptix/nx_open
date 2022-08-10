@@ -6,32 +6,32 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <client/client_globals.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/layout_resource_index.h>
+#include <nx/vms/client/desktop/resource_views/entity_resource_tree/user_layout_resource_index.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
 UserLayoutsSource::UserLayoutsSource(
-    const LayoutResourceIndex* layoutResourceIndex,
+    const UserLayoutResourceIndex* sharedLayoutResourceIndex,
     const QnUserResourcePtr& parentUser)
     :
     base_type(),
-    m_layoutResourceIndex(layoutResourceIndex),
+    m_userLayoutResourceIndex(sharedLayoutResourceIndex),
     m_parentUser(parentUser)
 {
     NX_ASSERT(!m_parentUser.isNull());
 
-    connect(m_layoutResourceIndex, &LayoutResourceIndex::layoutAdded,
+    connect(m_userLayoutResourceIndex, &UserLayoutResourceIndex::layoutAdded,
         this, &UserLayoutsSource::onLayoutAdded);
 
-    connect(m_layoutResourceIndex, &LayoutResourceIndex::layoutRemoved,
+    connect(m_userLayoutResourceIndex, &UserLayoutResourceIndex::layoutRemoved,
         this, &UserLayoutsSource::onLayoutRemoved);
 }
 
 QVector<QnResourcePtr> UserLayoutsSource::getResources()
 {
     const QnUuid parentId = m_parentUser->getId();
-    const auto layouts = m_layoutResourceIndex->layoutsWithParentId(parentId);
+    const auto layouts = m_userLayoutResourceIndex->layoutsWithParentUserId(parentId);
 
     QVector<QnResourcePtr> result;
     for (const auto& layout: layouts)
@@ -82,7 +82,7 @@ void UserLayoutsSource::processLayout(
     if (layout->data().contains(Qn::LayoutSearchStateRole))
         return;
 
-    if (layout->hasFlags(Qn::local))
+    if (layout->hasFlags(Qn::local) && !layout->hasFlags(Qn::local_intercom_layout))
     {
         holdLocalLayout(layoutResource);
         return;

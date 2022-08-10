@@ -9,7 +9,7 @@ class QnResourcePool;
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
-class LayoutResourceIndex;
+class UserLayoutResourceIndex;
 
 class UserLayoutsSource: public AbstractResourceSource
 {
@@ -18,7 +18,7 @@ class UserLayoutsSource: public AbstractResourceSource
 
 public:
     UserLayoutsSource(
-        const LayoutResourceIndex* layoutResourceIndex,
+        const UserLayoutResourceIndex* sharedLayoutResourceIndex,
         const QnUserResourcePtr& parentUser);
 
     virtual QVector<QnResourcePtr> getResources() override;
@@ -30,7 +30,7 @@ private:
     void processLayout(const QnResourcePtr& layout, std::function<void()> successHandler);
 
 private:
-    const LayoutResourceIndex* m_layoutResourceIndex;
+    const UserLayoutResourceIndex* m_userLayoutResourceIndex;
     QSet<QnResourcePtr> m_localLayouts;
     QnUserResourcePtr m_parentUser;
 };

@@ -15,6 +15,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/director/director.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/intercom/intercom_manager.h>
 #include <nx/vms/client/desktop/joystick/settings/manager.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
@@ -90,6 +91,8 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
     m_joystickManager.reset(joystick::Manager::create(this));
     m_display.reset(new QnWorkbenchDisplay(this));
     m_navigator.reset(new QnWorkbenchNavigator(this));
+    m_intercomManager = std::make_unique<IntercomManager>(
+        dynamic_cast<nx::vms::client::desktop::SystemContext*>(systemContext()));
 
     // Adds statistics modules
 

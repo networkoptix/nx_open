@@ -15,7 +15,7 @@ namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
 class CameraResourceIndex;
-class LayoutResourceIndex;
+class UserLayoutResourceIndex;
 class UserRolesProvider;
 class WebPageResourceIndex;
 
@@ -29,7 +29,7 @@ public:
     ResourceTreeItemKeySourcePool(
         const QnCommonModule* commonModule,
         const CameraResourceIndex* cameraResourceIndex,
-        const LayoutResourceIndex* layoutResourceIndex);
+        const UserLayoutResourceIndex* sharedLayoutResourceIndex);
 
     ~ResourceTreeItemKeySourcePool();
 
@@ -77,6 +77,11 @@ public:
     UniqueResourceSourcePtr allLayoutsSource(const QnUserResourcePtr& user);
 
     /**
+     * @todo Remove.
+     */
+    UniqueResourceSourcePtr shareableLayoutsSource(const QnUserResourcePtr& user);
+
+    /**
      * Provides layout resources stored in the resource pool which owned by the given user.
      */
     UniqueResourceSourcePtr userLayoutsSource(const QnUserResourcePtr& user);
@@ -102,7 +107,8 @@ public:
     /**
      * @todo Re-implement.
      */
-    UniqueResourceSourcePtr directlySharedAndOwnLayoutsSource(const QnUserResourcePtr& user);
+    UniqueResourceSourcePtr sharedAndOwnLayoutsSource(
+        const QnResourceAccessSubject& subject);
 
     /**
      * Provides layouts accessible to the subject with given ID. Makes sense only for custom
@@ -166,7 +172,7 @@ private:
 private:
     const QnCommonModule* m_commonModule;
     const CameraResourceIndex* m_cameraResourceIndex;
-    const LayoutResourceIndex* m_layoutResourceIndex;
+    const UserLayoutResourceIndex* m_userLayoutResourceIndex;
     QScopedPointer<UserRolesProvider> m_userRolesProvider;
     QScopedPointer<WebPageResourceIndex> m_webPageResourceIndex;
 };

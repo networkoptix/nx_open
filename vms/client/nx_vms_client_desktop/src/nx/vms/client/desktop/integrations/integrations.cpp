@@ -7,7 +7,6 @@
 #include <nx/vms/client/desktop/ini.h>
 
 #include "config.h"
-#include "intercom/intercom.h"
 #include "interfaces.h"
 #include "nvr/overlapped_id.h"
 
@@ -47,7 +46,6 @@ void initialize(QObject* storageParent)
 {
     NX_ASSERT(!Storage::instance());
     auto storage = new Storage(storageParent);
-    storage->addIntegration(new IntercomIntegration(storage));
     storage->addIntegration(new OverlappedIdIntegration(storage));
 }
 

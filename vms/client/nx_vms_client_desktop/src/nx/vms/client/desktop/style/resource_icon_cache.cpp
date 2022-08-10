@@ -20,6 +20,7 @@
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx_ec/abstract_ec_connection.h>
@@ -115,6 +116,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(ExportedLayout, loadIcon("tree/layout_exported.svg"));
     m_cache.insert(ExportedLayout | Locked, loadIcon("tree/layout_exported_locked.svg"));
     m_cache.insert(ExportedEncryptedLayout, loadIcon("tree/layout_exported_encrypted.svg"));
+    m_cache.insert(IntercomLayout, loadIcon("tree/layouts_intercom.svg"));
     m_cache.insert(SharedLayout, loadIcon("tree/layout_shared.svg"));
     m_cache.insert(SharedLayout | Locked, loadIcon("tree/layout_shared_locked.svg"));
     m_cache.insert(CloudLayout, loadIcon("tree/layout_cloud.svg"));
@@ -344,6 +346,8 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
 
         if (videowall)
             key = VideoWall;
+        else if (nx::vms::common::isIntercomLayout(layout))
+            key = IntercomLayout;
         else if (layout->isShared())
             key = SharedLayout;
         else if (layout::isEncrypted(layout))
