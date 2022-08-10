@@ -322,7 +322,7 @@ QString ServerCertificateViewer::calculateDialogTitle(Mode mode)
         case Mode::custom:
             return tr("Custom certificate");
         case Mode::pinned:
-            return tr("Pinned certificate");
+            return tr("Auto-generated certificate");
         default:
             return tr("Unknown certificate");
     }
@@ -341,7 +341,7 @@ QString ServerCertificateViewer::calculateServerInfo(
         case Mode::custom:
             return tr("This is a custom certificate installed on %1").arg(serverInfo);
         case Mode::pinned:
-            return tr("The certificate is pinned to %1").arg(serverInfo);
+            return tr("The certificate is auto-generated and pinned to %1").arg(serverInfo);
         default:
             return tr("The certificate was presented by %1").arg(serverInfo);
     }
