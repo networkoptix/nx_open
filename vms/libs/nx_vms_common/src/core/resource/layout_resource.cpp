@@ -495,8 +495,15 @@ bool QnLayoutResource::isServiceLayout() const
         return false;
 
     // Service layout can belong to a Server or to a VideoWall.
-    if (const auto parent = getParentResource(); parent && parent->hasFlags(Qn::user))
-        return false;
+    const auto parent = getParentResource();
+    if (parent)
+    {
+        if (parent->hasFlags(Qn::user) //< General user's layout.
+            || parent->hasFlags(Qn::media)) //< Intercom layout.
+        {
+            return false;
+        }
+    }
 
     return true;
 }

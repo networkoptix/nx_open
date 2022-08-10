@@ -52,8 +52,6 @@ qint64 QnCommonModule::systemIdentityTime() const
     return m_systemIdentityTime;
 }
 
-
-
 nx::metrics::Storage* QnCommonModule::metrics() const
 {
     return m_metrics.get();

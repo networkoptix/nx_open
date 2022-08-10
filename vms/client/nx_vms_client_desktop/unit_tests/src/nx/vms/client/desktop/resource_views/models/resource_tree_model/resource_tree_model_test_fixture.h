@@ -88,6 +88,14 @@ protected:
         const QString& groupId, const QnUuid& parentId = QnUuid()) const;
     QnVirtualCameraResourcePtr addMultisensorSubCamera(const QString& name,
         const QString& groupId, const QnUuid& parentId = QnUuid()) const;
+    QnVirtualCameraResourcePtr addIntercomCamera(
+        const QString& name,
+        const QnUuid& parentId = QnUuid(),
+        const QString& hostAddress = QString()) const;
+    QnLayoutResourcePtr addIntercomLayout(
+        const QString& name,
+        const QnUuid& parentId = QnUuid()) const;
+    void removeCamera(const QnVirtualCameraResourcePtr& camera) const;
 
     void addToLayout(const QnLayoutResourcePtr& layout, const QnResourceList& resources) const;
     void setVideoWallScreenRuntimeStatus(

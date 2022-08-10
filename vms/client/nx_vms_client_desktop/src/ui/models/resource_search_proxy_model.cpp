@@ -184,7 +184,9 @@ bool QnResourceSearchProxyModel::isAcceptedIndex(
         case NodeType::servers:
             return resourceFlags.testFlag(Qn::server) && !resourceFlags.testFlag(Qn::fake);
         case NodeType::layouts:
-            return resourceFlags.testFlag(Qn::layout) && !resourceFlags.testFlag(Qn::local);
+            return resourceFlags.testFlag(Qn::layout)
+                && (!resourceFlags.testFlag(Qn::local)
+                    || resourceFlags.testFlag(Qn::local_intercom_layout));
         case NodeType::layoutTours:
             return true;
         case NodeType::videoWalls:

@@ -54,6 +54,11 @@ QnResourceAccessManager* SystemContextAware::resourceAccessManager() const
     return systemContext()->resourceAccessManager();
 }
 
+nx::core::access::ResourceAccessProvider* SystemContextAware::resourceAccessProvider() const
+{
+    return systemContext()->resourceAccessProvider();
+}
+
 QnResourcePool* SystemContextAware::resourcePool() const
 {
     return systemContext()->resourcePool();

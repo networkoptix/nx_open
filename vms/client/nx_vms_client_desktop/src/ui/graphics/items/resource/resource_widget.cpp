@@ -1006,9 +1006,14 @@ int QnResourceWidget::calculateButtonsVisibility() const
     if (!m_options.testFlag(WindowRotationForbidden) && permissions.testFlag(Qn::WritePermission))
         result |= Qn::RotateButton;
 
-    Qn::Permissions closeButtonPermissions = Qn::WritePermission | Qn::AddRemoveItemsPermission;
-    if ((permissions & closeButtonPermissions) == closeButtonPermissions && !fullscreenMode)
-        result |= Qn::CloseButton;
+    const bool hasCloseButtonPermissions =
+        permissions.testFlag(Qn::WritePermission)
+        && permissions.testFlag(Qn::AddRemoveItemsPermission);
+
+    if (hasCloseButtonPermissions && !fullscreenMode)
+    {
+         result |= Qn::CloseButton;
+    }
 
     if (fullscreenMode)
         result |= Qn::FullscreenButton;
