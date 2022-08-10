@@ -11,7 +11,11 @@
 
 namespace nx::vms::client::desktop {
 
-CloudLayoutsIntroDialog::CloudLayoutsIntroDialog(QWidget* parent, Qt::WindowFlags windowFlags):
+CloudLayoutsIntroDialog::CloudLayoutsIntroDialog(
+    Mode mode,
+    QWidget* parent,
+    Qt::WindowFlags windowFlags)
+    :
     base_type(parent, windowFlags),
     ui(new Ui::CloudLayoutsIntroDialog())
 {
@@ -25,8 +29,16 @@ CloudLayoutsIntroDialog::CloudLayoutsIntroDialog(QWidget* parent, Qt::WindowFlag
         "%1 is the short cloud name (like Cloud)")
             .arg(nx::branding::shortCloudName()));
 
-    auto acceptButton = ui->buttonBox->addButton(tr("Create"), QDialogButtonBox::AcceptRole);
-    setAccentStyle(acceptButton);
+    if (mode == Mode::confirmation)
+    {
+        auto acceptButton = ui->buttonBox->addButton(tr("Create"), QDialogButtonBox::AcceptRole);
+        setAccentStyle(acceptButton);
+    }
+    else
+    {
+        ui->doNotShowAgainCheckBox->setVisible(false);
+        ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok);
+    }
 }
 
 CloudLayoutsIntroDialog::~CloudLayoutsIntroDialog()
