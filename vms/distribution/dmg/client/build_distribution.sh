@@ -92,7 +92,7 @@ buildDistribution()
 
     copyMacOsSpecificApplauncherStuff
 
-    python3 macdeployqt.py \
+    "$PYTHON" macdeployqt.py \
         "$CURRENT_BUILD_DIR" "$APP_DIR" "$BUILD_DIR/bin" "$BUILD_DIR/lib" "$CLIENT_HELP_PATH" "$QT_DIR" \
         "$QT_VERSION"
 
@@ -101,7 +101,7 @@ buildDistribution()
     copyTranslations
     copyQuickStartGuide
 
-    if [[ $CODE_SIGNING = true ]]
+    if [ $CODE_SIGNING = true ]
     then
         local KEYCHAIN_ARGS=""
 
@@ -110,25 +110,12 @@ buildDistribution()
             KEYCHAIN_ARGS="--keychain $KEYCHAIN"
         fi
 
-        # codesign tool does not sign libraries and executables in 'Resources' folder when using
-        # --deep option (known codesign issue). But if we move 'qml' folder to the appropriate
-        # folder (like 'MacOS' or 'Frameworks') we need to create simlinks for all folders
-        # containing dots in their path. It causes crash of desktop client when signed.
-        # To avoid this situation we move 'qml' folder to 'Resources' and sign each library
-        # one by one.
-
-        find "$APP_RESOURCES_DIR/qml" -regex '.*\.dylib' -exec \
-            codesign -f -v \
-                --options runtime \
-                $KEYCHAIN_ARGS \
-                --entitlements "$CURRENT_SOURCE_DIR/entitlements.plist" \
-                -s "$MAC_SIGN_IDENTITY" '{}' \;
-
-        codesign -f -v \
-            --options runtime \
-            --deep $KEYCHAIN_ARGS \
+        "$PYTHON" "$OPEN_SOURCE_DIR/build_utils/macos/signtool.py" \
+            sign \
+            --identity "$MAC_SIGN_IDENTITY" \
             --entitlements "$CURRENT_SOURCE_DIR/entitlements.plist" \
-            -s "$MAC_SIGN_IDENTITY" "$APP_DIR"
+            $KEYCHAIN_ARGS \
+            "$APP_DIR"
     fi
 
     test -f $DISTRIBUTION_DMG && rm $DISTRIBUTION_DMG
@@ -153,7 +140,7 @@ buildDistribution()
         # It can be usefull for development purposes.
         FINAL_USER="${NOTARIZATION_USER:-$KEYCHAIN_NOTARIZATION_USER}"
 
-        python3 notarize.py notarize \
+        "$PYTHON" notarize.py notarize \
             --user "$FINAL_USER" \
             --password "$FINAL_PASSWORD" \
             --team-id "$APPLE_TEAM_ID" \
