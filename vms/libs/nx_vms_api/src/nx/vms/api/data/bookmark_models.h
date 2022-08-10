@@ -13,6 +13,8 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/json/value_or_array.h>
 
+#include "map.h"
+
 namespace nx::vms::api {
 
 NX_REFLECTION_ENUM_CLASS(BookmarkSortField,
@@ -135,11 +137,6 @@ struct NX_VMS_API BookmarkTagFilter
 #define BookmarkTagFilter_Fields (limit)
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkTagFilter, (json), NX_VMS_API)
 
-class BookmarkTagCounts: public std::map<QString, int>
-{
-public:
-    int front() const { return begin()->second; }
-    QString getId() const { return (size() == 1) ? begin()->first : QString(); }
-};
+using BookmarkTagCounts = Map<QString /*tag*/, int /*count*/>;
 
 } // namespace nx::vms::api
