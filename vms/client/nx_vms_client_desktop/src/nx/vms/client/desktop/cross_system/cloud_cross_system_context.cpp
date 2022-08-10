@@ -243,7 +243,7 @@ struct CloudCrossSystemContext::Private
         server->setStatus(nx::vms::api::ResourceStatus::online);
     }
 
-    void addServersToResourcePool(std::vector<nx::vms::api::MediaServerData> servers)
+    void addServersToResourcePool(nx::vms::api::ServerInformationList servers)
     {
         if (!NX_ASSERT(systemContext))
             return;
@@ -416,32 +416,22 @@ struct CloudCrossSystemContext::Private
             [this](
                 bool success,
                 ::rest::Handle requestId,
-                QByteArray data,
-                nx::network::http::HttpHeaders /*headers*/)
+                ::rest::RestResultOrData<nx::vms::api::ServerInformationList> response)
             {
-                if (!success)
+                if (const auto result = std::get_if<nx::network::rest::Result>(&response))
                 {
-                     NX_WARNING(this, "Servers request failed");
-                     return;
-                }
-
-                std::vector<nx::vms::api::MediaServerData> result;
-                if (!QJson::deserialize(data, &result))
-                {
-                    NX_WARNING(this, "Cameras list cannot be deserialized");
+                    NX_WARNING(this, "Servers request failed: %1", QJson::serialized(*result));
                     return;
                 }
 
-                NX_VERBOSE(this, "Received %1 servers", result.size());
-                addServersToResourcePool(std::move(result));
+                auto servers = std::get_if<nx::vms::api::ServerInformationList>(&response);
+                NX_VERBOSE(this, "Received %1 servers", servers->size());
+
+                addServersToResourcePool(std::move(*servers));
                 updateCameras();
             });
 
-        systemContext->connectedServerApi()->getRawResult(
-            "/ec2/getMediaServers",
-            {},
-            callback,
-            q->thread());
+        systemContext->connectedServerApi()->getServersInfo(std::move(callback), q->thread());
     }
 
     void updateCameras()
