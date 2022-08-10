@@ -107,13 +107,12 @@ nx_add_targets_to_strengthened(
 )
 
 if(NOT openSourceBuild)
+    if(codeSigning)
+        prepare_mac_keychain(distribution_dmg_client)
+    endif()
+
     nx_create_openssl_signature(distribution_dmg_client ${update_file})
     if(compatibility_update_file)
         nx_create_openssl_signature(distribution_dmg_client ${compatibility_update_file})
     endif()
 endif()
-
-if(codeSigning)
-    prepare_mac_keychain(distribution_dmg_client)
-endif()
-
