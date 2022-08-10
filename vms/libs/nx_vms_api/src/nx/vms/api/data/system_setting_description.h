@@ -7,6 +7,8 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
 
+#include "map.h"
+
 namespace nx::vms::api {
 
 struct NX_VMS_API SystemSettingDescription
@@ -36,5 +38,7 @@ struct SystemSettingDescriptions: std::map<QString, SystemSettingDescription>
     const SystemSettingDescription& front() const { return begin()->second; }
     QString getId() const { return (size() == 1) ? begin()->first : QString(); }
 };
+
+using SystemSettingsValues = Map<QString /*key*/, QJsonValue /*value*/>;
 
 } // namespace nx::vms::api

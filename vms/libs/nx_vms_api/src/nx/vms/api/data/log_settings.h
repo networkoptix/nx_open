@@ -14,6 +14,8 @@
 #include <nx/utils/log/log_writers.h>
 #include <nx/utils/uuid.h>
 
+#include "map.h"
+
 namespace nx::vms::api {
 
 struct NX_VMS_API LevelFilter
@@ -98,5 +100,7 @@ struct NX_VMS_API ServerLogSettings
     (id)(maxFileSizeB)(maxVolumeSizeB)(maxFileTimePeriodS)(directory)(mainLog)(httpLog)(systemLog)
 QN_FUSION_DECLARE_FUNCTIONS(ServerLogSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(ServerLogSettings, ServerLogSettings_Fields)
+
+using ServerLogSettingsMap = Map<QnUuid, nx::vms::api::ServerLogSettings>;
 
 } // namespace nx::vms::api
