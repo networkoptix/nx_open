@@ -31,6 +31,7 @@
 #include <nx/utils/buffer.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
+#include <nx/utils/serialization/qt_containers_reflect_json.h>
 #include <nx/vms/api/analytics/device_agent_active_setting_changed_request.h>
 #include <nx/vms/api/analytics/device_agent_settings_request.h>
 #include <nx/vms/api/data/device_actions.h>
@@ -462,6 +463,13 @@ Handle ServerConnection::getMediaServers(
 {
     nx::network::rest::Params params;
     return executeGet("/ec2/getMediaServers", params, callback, targetThread);
+}
+
+Handle ServerConnection::getServersInfo(
+    Result<RestResultOrData<nx::vms::api::ServerInformationList>>::type&& callback,
+    QThread* targetThread)
+{
+    return executeGet("/rest/v1/servers/*/info", {}, std::move(callback), targetThread);
 }
 
 Handle ServerConnection::bindSystemToCloud(
