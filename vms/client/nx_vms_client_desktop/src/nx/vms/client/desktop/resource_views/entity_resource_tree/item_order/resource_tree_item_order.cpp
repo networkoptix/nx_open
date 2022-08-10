@@ -47,10 +47,16 @@ ItemOrder layoutsOrder()
             const bool lhsIsSharedLayout = lhsIconKey == QnResourceIconCache::SharedLayout;
             const bool rhsIsSharedLayout = rhsIconKey == QnResourceIconCache::SharedLayout;
 
-            if (lhsIsSharedLayout == rhsIsSharedLayout)
-                return mainOrder.comp(lhs, rhs);
+            if (lhsIsSharedLayout != rhsIsSharedLayout)
+                return lhsIsSharedLayout;
 
-            return lhsIsSharedLayout;
+            const bool lhsIsIntercomLayout = lhsIconKey == QnResourceIconCache::IntercomLayout;
+            const bool rhsIsIntercomLayout = rhsIconKey == QnResourceIconCache::IntercomLayout;
+
+            if (lhsIsIntercomLayout != rhsIsIntercomLayout)
+                return lhsIsSharedLayout;
+
+            return mainOrder.comp(lhs, rhs);
         },
         {Qt::DisplayRole, Qn::ResourceIconKeyRole}
     };

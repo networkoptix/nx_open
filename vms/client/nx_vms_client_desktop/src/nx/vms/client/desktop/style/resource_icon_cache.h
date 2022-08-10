@@ -36,6 +36,7 @@ public:
         ExportedEncryptedLayout,
         SharedLayout,
         CloudLayout,
+        IntercomLayout,
         Layouts,
         SharedLayouts,
         LayoutTour,

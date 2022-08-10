@@ -18,7 +18,6 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/fake_media_server.h>
 #include <core/resource/file_layout_resource.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
@@ -48,6 +47,7 @@
 #include <nx/vms/client/desktop/network/cloud_url_validator.h>
 #include <nx/vms/client/desktop/radass/radass_support.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
@@ -58,6 +58,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_manager.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_state.h>
+#include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/discovery/manager.h>
@@ -616,6 +617,9 @@ ActionVisibility ResourceRemovalCondition::check(const Parameters& parameters, Q
             if (!resource || !resource->resourcePool())
                 return false;
 
+            if (nx::vms::common::isIntercomLayout(resource))
+                return false;
+
             if (resource->hasFlags(Qn::layout) && !resource->hasFlags(Qn::local))
             {
                 if (ownResources)
@@ -758,6 +762,31 @@ ActionVisibility LayoutItemRemovalCondition::check(const LayoutItemIndexList& la
             Qn::WritePermission | Qn::AddRemoveItemsPermission))
         {
             return InvisibleAction;
+        }
+
+        const auto resourceId = item.layout()->getItem(item.uuid()).resource.id;
+        const auto resource = context->resourcePool()->getResourceById<QnResource>(resourceId);
+
+        if (nx::vms::common::isIntercomOnIntercomLayout(resource, item.layout()))
+        {
+            const QnUuid intercomToDeleteId = resource->getId();
+
+            QSet<QnUuid> intercomLayoutItemIds; // Other intercom item copies on the layout.
+
+            const auto intercomLayoutItems = item.layout()->getItems();
+            for (const QnLayoutItemData& intercomLayoutItem: intercomLayoutItems)
+            {
+                const auto itemResourceId = intercomLayoutItem.resource.id;
+                if (itemResourceId == intercomToDeleteId && intercomLayoutItem.uuid != item.uuid())
+                    intercomLayoutItemIds.insert(intercomLayoutItem.uuid);
+            }
+
+            for (const LayoutItemIndex& item: layoutItems)
+                intercomLayoutItemIds.remove(item.uuid());
+
+            // If all intercom copies on the layout is selected - removal is forbidden.
+            if (intercomLayoutItemIds.isEmpty())
+                return InvisibleAction;
         }
     }
 

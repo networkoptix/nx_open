@@ -22,7 +22,7 @@ BaseResourceAccessProvider::BaseResourceAccessProvider(
     :
     base_type(mode, parent),
     nx::vms::common::SystemContextAware(context),
-    m_mutex(nx::Mutex::NonRecursive)
+    m_mutex(nx::Mutex::Recursive)
 {
     if (mode == Mode::cached)
     {
