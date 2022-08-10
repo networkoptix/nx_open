@@ -2,21 +2,25 @@
 
 #include "directly_shared_layouts_source.h"
 
-#include <core/resource_management/resource_pool.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/shared_resources_manager.h>
+#include <core/resource_management/resource_pool.h>
 
 namespace {
+
+bool isSharedLayout(const QnResourcePtr& resource)
+{
+    const auto layout = resource.dynamicCast<QnLayoutResource>();
+    return layout && layout->isShared();
+}
 
 bool filter(const QnResourcePtr& resource)
 {
     if (!resource->hasFlags(Qn::layout))
         return false;
 
-    if (resource->getParentId().isNull() && !resource->hasFlags(Qn::exported))
-        return true;
-
-    return false;
+    return isSharedLayout(resource);
 }
 
 } // namespace
@@ -67,7 +71,10 @@ DirectlySharedLayoutsSource::DirectlySharedLayoutsSource(
     connect(resourcePool, &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
         {
-            if (resource->hasFlags(Qn::layout) && resource->getParentId().isNull())
+            if (!resource->hasFlags(Qn::layout))
+                return;
+
+            if (isSharedLayout(resource))
                 emit resourceRemoved(resource);
         });
 }

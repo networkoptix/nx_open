@@ -28,6 +28,7 @@
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
@@ -343,6 +344,47 @@ QnVirtualCameraResourcePtr ResourceTreeModelTest::addMultisensorSubCamera(
     camera->setGroupId(groupId);
     resourcePool()->addResource(camera);
     return camera;
+}
+
+QnVirtualCameraResourcePtr ResourceTreeModelTest::addIntercomCamera(
+    const QString& name,
+    const QnUuid& parentId,
+    const QString& hostAddress) const
+{
+    QnVirtualCameraResourcePtr camera(new CameraResourceStub());
+    camera->setName(name);
+    camera->setIdUnsafe(QnUuid::createUuid());
+    camera->setParentId(parentId);
+    if (!hostAddress.isEmpty())
+        camera->setHostAddress(hostAddress);
+
+    static const QString kOpenDoorPortName =
+        QString::fromStdString(nx::reflect::toString(nx::vms::api::ExtendedCameraOutput::powerRelay));
+
+    QnIOPortData intercomFeaturePort;
+    intercomFeaturePort.outputName = kOpenDoorPortName;
+
+    camera->setIoPortDescriptions({intercomFeaturePort}, false);
+
+    resourcePool()->addResource(camera);
+    return camera;
+}
+
+LayoutResourcePtr ResourceTreeModelTest::addIntercomLayout(
+    const QString& name,
+    const QnUuid& parentId) const
+{
+    LayoutResourcePtr layout(new LayoutResource());
+    layout->setName(name);
+    layout->setIdUnsafe(nx::vms::common::calculateIntercomLayoutId(parentId));
+    layout->setParentId(parentId);
+    resourcePool()->addResource(layout);
+    return layout;
+}
+
+void ResourceTreeModelTest::removeCamera(const QnVirtualCameraResourcePtr& camera) const
+{
+    resourcePool()->removeResource(camera);
 }
 
 void ResourceTreeModelTest::addToLayout(

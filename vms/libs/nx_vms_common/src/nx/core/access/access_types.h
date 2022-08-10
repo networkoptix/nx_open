@@ -16,7 +16,8 @@ NX_REFLECTION_ENUM_CLASS(Source,
     permissions, //< Accessible by permissions.
     shared, //< Accessible by direct sharing.
     layout, //< Accessible by placing on shared layout.
-    videowall //< Accessible by placing on videowall.
+    videowall, //< Accessible by placing on videowall.
+    intercom //< Accessible as an intercom child.
 )
 
 inline uint qHash(Source value, uint seed)

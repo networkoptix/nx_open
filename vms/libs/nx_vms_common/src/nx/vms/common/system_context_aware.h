@@ -11,6 +11,8 @@ class QnCommonMessageProcessor;
 class QnResourceAccessManager;
 class QnResourcePool;
 
+namespace nx::core::access { class ResourceAccessProvider; }
+
 namespace nx::vms::common {
 
 class SystemContext;
@@ -43,6 +45,11 @@ protected:
      * Manages which permissions User has on each of its accessible Resources.
      */
     QnResourceAccessManager* resourceAccessManager() const;
+
+    /**
+     * Grants information about resource access status.
+     */
+    nx::core::access::ResourceAccessProvider* resourceAccessProvider() const;
 
     /**
      * List of all Resources in the System. Some data is stored in the external dictionaries.

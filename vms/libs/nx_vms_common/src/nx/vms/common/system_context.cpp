@@ -7,7 +7,9 @@
 
 #include <api/common_message_processor.h>
 #include <api/runtime_info_manager.h>
+#include <core/resource/camera_history.h>
 #include <core/resource_access/global_permissions_manager.h>
+#include <core/resource_access/providers/intercom_layout_access_provider.h>
 #include <core/resource_access/providers/permissions_resource_access_provider.h>
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_access/providers/shared_layout_item_access_provider.h>
@@ -23,7 +25,6 @@
 #include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource_management/status_dictionary.h>
 #include <core/resource_management/user_roles_manager.h>
-#include <core/resource/camera_history.h>
 #include <licensing/license.h>
 #include <nx/analytics/taxonomy/descriptor_container.h>
 #include <nx/analytics/taxonomy/state_watcher.h>
@@ -116,6 +117,8 @@ SystemContext::SystemContext(
         new nx::core::access::SharedLayoutItemAccessProvider(resourceAccessMode, this));
     d->resourceAccessProvider->addBaseProvider(
         new nx::core::access::VideoWallItemAccessProvider(resourceAccessMode, this));
+    d->resourceAccessProvider->addBaseProvider(
+        new core::access::IntercomLayoutAccessProvider(resourceAccessMode, this));
 
     // Depends on access provider.
     d->resourceAccessManager = std::make_unique<QnResourceAccessManager>(resourceAccessMode, this);

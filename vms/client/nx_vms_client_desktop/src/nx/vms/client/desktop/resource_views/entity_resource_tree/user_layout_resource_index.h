@@ -12,16 +12,15 @@ class QnResourcePool;
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
-class LayoutResourceIndex: public QObject
+class UserLayoutResourceIndex: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
 
 public:
-    LayoutResourceIndex(const QnResourcePool* resourcePool);
+    UserLayoutResourceIndex(const QnResourcePool* resourcePool);
 
-    QVector<QnResourcePtr> allLayouts() const;
-    QVector<QnResourcePtr> layoutsWithParentId(const QnUuid& parentId) const;
+    QVector<QnResourcePtr> layoutsWithParentUserId(const QnUuid& parentId) const;
 
 signals:
     void layoutAdded(const QnResourcePtr& layout, const QnUuid& parentId);
@@ -38,7 +37,7 @@ private:
 
 private:
     const QnResourcePool* m_resourcePool;
-    QHash<QnUuid, QSet<QnResourcePtr>> m_layoutsByParentId;
+    QHash<QnUuid, QSet<QnResourcePtr>> m_layoutsByParentUserId;
 };
 
 } // namespace entity_resource_tree

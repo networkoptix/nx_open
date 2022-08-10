@@ -31,6 +31,7 @@
 #include <nx/vms/api/data/user_data.h>
 #include <nx/vms/api/data/videowall_data.h>
 #include <nx/vms/api/data/webpage_data.h>
+#include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/system_context.h>
@@ -827,6 +828,16 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
                     : Qn::NoPermissions;
             }
 
+            /* Access to intercom layouts. */
+            const auto camera = resourcePool()->getResourceById<QnResource>(ownerId);
+            if (nx::vms::common::isIntercom(camera))
+            {
+                if (globalPermissions.testFlag(GlobalPermission::userInput))
+                    return Qn::FullLayoutPermissions;
+
+                return Qn::ReadPermission;
+            }
+
             /* Checking other user's layout. Only users can have access to them. */
             if (auto user = subject.user())
             {
@@ -979,7 +990,13 @@ bool QnResourceAccessManager::canCreateLayout(
 
     const auto owner = ownerResource.dynamicCast<QnUserResource>();
     if (!owner)
+    {
+        const auto parentCamera = ownerResource.dynamicCast<QnVirtualCameraResource>();
+        if (parentCamera) //< Intercom layout case.
+            return hasGlobalPermission(subject, GlobalPermission::userInput);
+
         return false;
+    }
 
     // We can create layout for user if we can modify this user.
     return hasPermission(subject, owner, Qn::SavePermission);

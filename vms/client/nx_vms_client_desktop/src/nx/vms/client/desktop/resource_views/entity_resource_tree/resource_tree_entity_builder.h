@@ -18,7 +18,7 @@ namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
 class CameraResourceIndex;
-class LayoutResourceIndex;
+class UserLayoutResourceIndex;
 class RecorderItemDataHelper;
 class ResourceTreeItemFactory;
 class ResourceTreeItemKeySourcePool;
@@ -89,7 +89,7 @@ public:
 private:
     const QnCommonModule* m_commonModule;
     QScopedPointer<CameraResourceIndex> m_cameraResourceIndex;
-    QScopedPointer<LayoutResourceIndex> m_layoutResourceIndex;
+    QScopedPointer<UserLayoutResourceIndex> m_userLayoutResourceIndex;
     QSharedPointer<RecorderItemDataHelper> m_recorderItemDataHelper;
     QScopedPointer<ResourceTreeItemFactory> m_itemFactory;
     QScopedPointer<ResourceTreeItemKeySourcePool> m_itemKeySourcePool;

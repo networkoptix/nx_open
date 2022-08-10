@@ -42,6 +42,7 @@
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
+#include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/event/actions/abstract_action.h>
@@ -467,11 +468,11 @@ void LayoutsHandler::saveLayout(const LayoutResourcePtr& layout)
         // done in one place.
 
         const auto change = calculateLayoutChange(layout);
-        const auto layoutOwner = layout->getParentResource();
+        const auto layoutParent = layout->getParentResource();
 
-        if (confirmLayoutChange(change, layoutOwner))
+        const auto user = layoutParent.dynamicCast<QnUserResource>();
+        if (confirmLayoutChange(change, user))
         {
-            const auto user = layoutOwner.dynamicCast<QnUserResource>();
             if (user)
                 grantMissingAccessRights(user, change);
 
@@ -814,8 +815,9 @@ LayoutsHandler::LayoutChange LayoutsHandler::calculateLayoutChange(
     return result;
 }
 
-bool LayoutsHandler::confirmLayoutChange(const LayoutChange& change,
-    const QnResourcePtr& layoutOwner)
+bool LayoutsHandler::confirmLayoutChange(
+    const LayoutChange& change,
+    const QnUserResourcePtr& layoutOwner)
 {
     NX_ASSERT(context()->user(), "Should never ask for layout saving when offline");
     if (!context()->user())
@@ -837,7 +839,11 @@ bool LayoutsHandler::confirmLayoutChange(const LayoutChange& change,
     if (change.layout->isShared())
         return confirmChangeSharedLayout(change);
 
-    return confirmChangeLocalLayout(layoutOwner.dynamicCast<QnUserResource>(), change);
+    /* Never ask for intercom layouts. */
+    if (nx::vms::common::isIntercomLayout(change.layout))
+        return true;
+
+    return confirmChangeLocalLayout(layoutOwner, change);
 }
 
 bool LayoutsHandler::confirmChangeSharedLayout(const LayoutChange& change)
@@ -1077,8 +1083,12 @@ void LayoutsHandler::closeLayoutsInternal(
         if (!systemContext)
             continue;
 
-        if (resource->hasFlags(Qn::local) && !resource->isFile())
+        if (resource->hasFlags(Qn::local)
+            && !resource->isFile()
+            && !resource->hasFlags(Qn::local_intercom_layout))
+        {
             systemContext->resourcePool()->removeResource(resource);
+        }
     }
 
     if (workbench()->layouts().empty())

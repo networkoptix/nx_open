@@ -1,15 +1,16 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "layout_resource_index.h"
+#include "user_layout_resource_index.h"
 
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/user_resource.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
 
-LayoutResourceIndex::LayoutResourceIndex(const QnResourcePool* resourcePool):
+UserLayoutResourceIndex::UserLayoutResourceIndex(const QnResourcePool* resourcePool):
     base_type(),
     m_resourcePool(resourcePool)
 {
@@ -18,27 +19,19 @@ LayoutResourceIndex::LayoutResourceIndex(const QnResourcePool* resourcePool):
     blockSignals(false);
 
     connect(m_resourcePool, &QnResourcePool::resourceAdded,
-        this, &LayoutResourceIndex::onResourceAdded);
+        this, &UserLayoutResourceIndex::onResourceAdded);
 
     connect(m_resourcePool, &QnResourcePool::resourceRemoved,
-        this, &LayoutResourceIndex::onResourceRemoved);
+        this, &UserLayoutResourceIndex::onResourceRemoved);
 }
 
-QVector<QnResourcePtr> LayoutResourceIndex::allLayouts() const
+QVector<QnResourcePtr> UserLayoutResourceIndex::layoutsWithParentUserId(const QnUuid& parentId) const
 {
-    QVector<QnResourcePtr> result;
-    for (const auto& layoutsSet: m_layoutsByParentId)
-        std::copy(layoutsSet.cbegin(), layoutsSet.cend(), std::back_inserter(result));
-    return result;
-}
-
-QVector<QnResourcePtr> LayoutResourceIndex::layoutsWithParentId(const QnUuid& parentId) const
-{
-    const auto layoutSet = m_layoutsByParentId.value(parentId);
+    const auto layoutSet = m_layoutsByParentUserId.value(parentId);
     return QVector<QnResourcePtr>(layoutSet.cbegin(), layoutSet.cend());
 }
 
-void LayoutResourceIndex::indexAllLayouts()
+void UserLayoutResourceIndex::indexAllLayouts()
 {
     const QnResourceList layouts = m_resourcePool->getResourcesWithFlag(Qn::layout);
     for (const auto& layout: layouts)
@@ -49,7 +42,7 @@ void LayoutResourceIndex::indexAllLayouts()
     }
 }
 
-void LayoutResourceIndex::onResourceAdded(const QnResourcePtr& resource)
+void UserLayoutResourceIndex::onResourceAdded(const QnResourcePtr& resource)
 {
     if (!resource->hasFlags(Qn::layout))
         return;
@@ -60,38 +53,44 @@ void LayoutResourceIndex::onResourceAdded(const QnResourcePtr& resource)
     indexLayout(resource);
 }
 
-void LayoutResourceIndex::onResourceRemoved(const QnResourcePtr& resource)
+void UserLayoutResourceIndex::onResourceRemoved(const QnResourcePtr& resource)
 {
     if (!resource->hasFlags(Qn::layout) || resource->hasFlags(Qn::exported))
         return;
 
     const QnUuid parentId = resource->getParentId();
-    m_layoutsByParentId[parentId].remove(resource);
+    m_layoutsByParentUserId[parentId].remove(resource);
     emit layoutRemoved(resource, parentId);
 }
 
-void LayoutResourceIndex::onLayoutParentIdChanged(
+void UserLayoutResourceIndex::onLayoutParentIdChanged(
     const QnResourcePtr& layout,
     const QnUuid& previousParentId)
 {
-    m_layoutsByParentId[previousParentId].remove(layout);
+    m_layoutsByParentUserId[previousParentId].remove(layout);
     emit layoutRemoved(layout, previousParentId);
 
     const auto parentId = layout->getParentId();
-    m_layoutsByParentId[parentId].insert(layout);
+    m_layoutsByParentUserId[parentId].insert(layout);
     emit layoutAdded(layout, parentId);
 }
 
-void LayoutResourceIndex::indexLayout(const QnResourcePtr& layout)
+void UserLayoutResourceIndex::indexLayout(const QnResourcePtr& layout)
 {
-    const QnUuid parentId = layout->getParentId();
+    QnLayoutResourcePtr layoutResource = layout.dynamicCast<QnLayoutResource>();
 
-    m_layoutsByParentId[parentId].insert(layout);
+    if (!layoutResource
+        || layoutResource->getParentResource().dynamicCast<QnUserResource>().isNull())
+    {
+        return;
+    }
 
     connect(layout.get(), &QnResource::parentIdChanged,
-        this, &LayoutResourceIndex::onLayoutParentIdChanged);
+        this, &UserLayoutResourceIndex::onLayoutParentIdChanged);
 
-    emit layoutAdded(layout, layout->getParentId());
+    const QnUuid parentId = layout->getParentId();
+    m_layoutsByParentUserId[parentId].insert(layout);
+    emit layoutAdded(layout, parentId);
 }
 
 } // namespace entity_resource_tree

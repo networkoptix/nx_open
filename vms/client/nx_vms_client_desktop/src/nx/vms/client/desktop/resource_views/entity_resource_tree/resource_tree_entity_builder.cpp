@@ -36,7 +36,7 @@
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/health_monitor_resource_item_decorator.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/main_tree_resource_item_decorator.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item_order/resource_tree_item_order.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/layout_resource_index.h>
+#include <nx/vms/client/desktop/resource_views/entity_resource_tree/user_layout_resource_index.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/recorder_item_data_helper.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/resource_tree_item_key_source_pool.h>
@@ -245,11 +245,11 @@ ResourceTreeEntityBuilder::ResourceTreeEntityBuilder(const QnCommonModule* commo
     base_type(),
     m_commonModule(commonModule),
     m_cameraResourceIndex(new CameraResourceIndex(commonModule->resourcePool())),
-    m_layoutResourceIndex(new LayoutResourceIndex(commonModule->resourcePool())),
+    m_userLayoutResourceIndex(new UserLayoutResourceIndex(commonModule->resourcePool())),
     m_recorderItemDataHelper(new RecorderItemDataHelper(m_cameraResourceIndex.get())),
     m_itemFactory(new ResourceTreeItemFactory(commonModule)),
     m_itemKeySourcePool(new ResourceTreeItemKeySourcePool(
-        commonModule, m_cameraResourceIndex.get(), m_layoutResourceIndex.get()))
+        commonModule, m_cameraResourceIndex.get(), m_userLayoutResourceIndex.get()))
 {
     // Message processor does not exist in unit tests.
     if (auto messageProcessor = m_commonModule->messageProcessor())
@@ -504,7 +504,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogShareableLayoutsEntity(
     auto allLayoutsList = makeKeyList<QnResourcePtr>(
         simpleResourceItemCreator(m_itemFactory.get()), layoutsOrder());
 
-    allLayoutsList->installItemSource(m_itemKeySourcePool->layoutsSource(user()));
+    allLayoutsList->installItemSource(m_itemKeySourcePool->shareableLayoutsSource(user()));
 
     return allLayoutsList;
 }
@@ -994,7 +994,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createSubjectLayoutsEntity(
     if (subject.user()->userRole() == Qn::UserRole::customPermissions)
     {
         layoutsList->installItemSource(
-            m_itemKeySourcePool->directlySharedAndOwnLayoutsSource(subject.user()));
+            m_itemKeySourcePool->sharedAndOwnLayoutsSource(subject));
 
         return makeFlatteningGroup(
             m_itemFactory->createSharedLayoutsItem(/*useRegularAppearance*/ true),
@@ -1015,7 +1015,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createSubjectLayoutsEntity(
     }
 
     layoutsList->installItemSource(
-        m_itemKeySourcePool->directlySharedAndOwnLayoutsSource(subject.user()));
+        m_itemKeySourcePool->sharedAndOwnLayoutsSource(subject));
 
     return layoutsList;
 }
