@@ -547,6 +547,10 @@ public:
         Result<nx::vms::api::MediaServerDataList>::type callback,
         QThread* targetThread = nullptr);
 
+    Handle getServersInfo(
+        Result<RestResultOrData<nx::vms::api::ServerInformationList>>::type&& callback,
+        QThread* targetThread);
+
     Handle getEngineAnalyticsSettings(
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
         Result<nx::vms::api::analytics::EngineSettingsResponse>::type&& callback,
