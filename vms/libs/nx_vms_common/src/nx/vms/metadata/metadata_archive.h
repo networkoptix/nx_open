@@ -122,7 +122,7 @@ protected:
     QString getFilePrefix(const QDate& datetime) const;
     void dateBounds(qint64 datetimeMs, qint64& minDate, qint64& maxDate) const;
     void fillFileNames(qint64 datetimeMs, QFile* motionFile, QFile* indexFile) const;
-    bool saveToArchiveInternal(const QnAbstractCompressedMetadataPtr& data);
+    bool saveToArchiveInternal(const QnConstAbstractCompressedMetadataPtr& data);
     QString getChannelPrefix() const;
 
     void loadRecordedRange();

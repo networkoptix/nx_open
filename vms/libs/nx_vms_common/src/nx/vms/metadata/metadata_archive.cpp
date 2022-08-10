@@ -254,7 +254,7 @@ bool MetadataArchive::openFiles(qint64 timestampMs)
     return true;
 }
 
-bool MetadataArchive::saveToArchiveInternal(const QnAbstractCompressedMetadataPtr& data)
+bool MetadataArchive::saveToArchiveInternal(const QnConstAbstractCompressedMetadataPtr& data)
 {
     NX_MUTEX_LOCKER lock(&m_writeMutex);
 
