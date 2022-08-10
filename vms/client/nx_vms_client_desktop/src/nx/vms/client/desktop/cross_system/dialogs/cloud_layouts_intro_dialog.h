@@ -15,7 +15,14 @@ class CloudLayoutsIntroDialog: public QnButtonBoxDialog
     using base_type = QnButtonBoxDialog;
 
 public:
+    enum class Mode
+    {
+        confirmation,
+        info
+    };
+
     explicit CloudLayoutsIntroDialog(
+        Mode mode = Mode::confirmation,
         QWidget* parent = nullptr,
         Qt::WindowFlags windowFlags = {Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint});
 
