@@ -4,6 +4,7 @@
     "cloudHost" : "@cloud_host@",
     "platform": "@platform@",
     "variants": [@variants@],
+    "flavor": "@flavor@",
     "installScript": "@install_script@",
     "freeSpaceRequired": @freeSpaceRequired@
 }
