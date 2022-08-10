@@ -24,6 +24,11 @@ public:
 
     virtual bool event(QEvent* event) override;
 
+    /** Functor should return whether given tab should be displayed as enabled or not. */
+    using CustomTabEnabledFunction = std::function<bool(int)>;
+
+    void setCustomTabEnabledFunction(const CustomTabEnabledFunction& customTabEnabledFunction);
+
 signals:
     void tabHoverChanged(int hoveredTabIndex); //< -1 if no tab is hovered.
 
