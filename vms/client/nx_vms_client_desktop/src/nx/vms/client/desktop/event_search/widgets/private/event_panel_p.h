@@ -27,6 +27,7 @@ class EventSearchWidget;
 class AnalyticsSearchWidget;
 class MultiImageProvider;
 class AbstractSearchSynchronizer;
+class OverlappableSearchWidget;
 
 class EventPanel::Private:
     public QObject,
@@ -63,9 +64,9 @@ private:
     NotificationCounterLabel* m_counterLabel = nullptr;
 
     SimpleMotionSearchWidget* m_motionTab = nullptr;
-    BookmarkSearchWidget* m_bookmarksTab = nullptr;
-    EventSearchWidget* m_eventsTab = nullptr;
-    AnalyticsSearchWidget* m_analyticsTab = nullptr;
+    OverlappableSearchWidget* m_bookmarksTab = nullptr;
+    OverlappableSearchWidget* m_eventsTab = nullptr;
+    OverlappableSearchWidget* m_analyticsTab = nullptr;
 
     QHash<AbstractSearchWidget*, AbstractSearchSynchronizer*> m_synchronizers;
     QHash<QWidget*, Tab> m_tabIds;

@@ -14,6 +14,7 @@
 #include <QtWidgets/QVBoxLayout>
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
 #include <nx/api/mediaserver/image_request.h>
 #include <nx/utils/metatypes.h>
 #include <nx/utils/range_adapters.h>
@@ -30,6 +31,7 @@
 #include <nx/vms/client/desktop/event_search/widgets/event_search_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/notification_counter_label.h>
 #include <nx/vms/client/desktop/event_search/widgets/notification_list_widget.h>
+#include <nx/vms/client/desktop/event_search/widgets/overlappable_search_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/simple_motion_search_widget.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/desktop/image_providers/multi_image_provider.h>
@@ -47,7 +49,9 @@
 #include <ui/common/notification_levels.h>
 #include <ui/processors/hover_processor.h>
 #include <ui/workaround/hidpi_workarounds.h>
+#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/event_processors.h>
 
@@ -81,6 +85,12 @@ QRect globalGeometry(QWidget* widget)
         : QRect();
 }
 
+bool isCrossSystemLayout(const QnWorkbenchLayout* workbenchLayout)
+{
+    const auto layoutResource = workbenchLayout->resource();
+    return layoutResource && layoutResource->hasFlags(Qn::cross_system);
+}
+
 } // namespace
 
 class EventPanel::Private::StateDelegate: public ClientStateDelegate
@@ -101,23 +111,34 @@ public:
             return false;
         }
 
-        m_panel->m_bookmarksTab->setPreviewToggled(state.value(kBookmarksPreviewKey).toBool(true));
-        m_panel->m_eventsTab->setPreviewToggled(state.value(kEventsPreviewKey).toBool(true));
+        m_panel->m_bookmarksTab->searchWidget()->setPreviewToggled(
+            state.value(kBookmarksPreviewKey).toBool(true));
+        m_panel->m_eventsTab->searchWidget()->setPreviewToggled(
+            state.value(kEventsPreviewKey).toBool(true));
         m_panel->m_motionTab->setPreviewToggled(state.value(kMotionPreviewKey).toBool(true));
-        m_panel->m_analyticsTab->setPreviewToggled(state.value(kObjectsPreviewKey).toBool(true));
-        m_panel->m_analyticsTab->setFooterToggled(state.value(kObjectsInformation).toBool(true));
+        m_panel->m_analyticsTab->searchWidget()->setPreviewToggled(
+            state.value(kObjectsPreviewKey).toBool(true));
+        m_panel->m_analyticsTab->searchWidget()->setFooterToggled(
+            state.value(kObjectsInformation).toBool(true));
         const auto tab = static_cast<Tab>(state.value(kTabIndexKey).toInt(0));
         m_panel->setCurrentTab(tab);
 
         reportStatistics("right_panel_active_tab", tab);
-        reportStatistics("right_panel_event_thumbnails", m_panel->m_eventsTab->previewToggled());
-        reportStatistics("right_panel_motion_thumbnails", m_panel->m_motionTab->previewToggled());
         reportStatistics(
-            "right_panel_bookmark_thumbnails", m_panel->m_bookmarksTab->previewToggled());
+            "right_panel_event_thumbnails",
+            m_panel->m_eventsTab->searchWidget()->previewToggled());
         reportStatistics(
-            "right_panel_analytics_thumbnails", m_panel->m_analyticsTab->previewToggled());
+            "right_panel_motion_thumbnails",
+            m_panel->m_motionTab->previewToggled());
         reportStatistics(
-            "right_panel_analytics_information", m_panel->m_analyticsTab->footerToggled());
+            "right_panel_bookmark_thumbnails",
+            m_panel->m_bookmarksTab->searchWidget()->previewToggled());
+        reportStatistics(
+            "right_panel_analytics_thumbnails",
+            m_panel->m_analyticsTab->searchWidget()->previewToggled());
+        reportStatistics(
+            "right_panel_analytics_information",
+            m_panel->m_analyticsTab->searchWidget()->footerToggled());
 
         return true;
     }
@@ -129,11 +150,14 @@ public:
             DelegateState result;
             if (!ini().newPanelsLayout)
             {
-                result[kBookmarksPreviewKey] = m_panel->m_bookmarksTab->previewToggled();
-                result[kEventsPreviewKey] = m_panel->m_eventsTab->previewToggled();
+                result[kBookmarksPreviewKey] =
+                    m_panel->m_bookmarksTab->searchWidget()->previewToggled();
+                result[kEventsPreviewKey] = m_panel->m_eventsTab->searchWidget()->previewToggled();
                 result[kMotionPreviewKey] = m_panel->m_motionTab->previewToggled();
-                result[kObjectsPreviewKey] = m_panel->m_analyticsTab->previewToggled();
-                result[kObjectsInformation] = m_panel->m_analyticsTab->footerToggled();
+                result[kObjectsPreviewKey] =
+                    m_panel->m_analyticsTab->searchWidget()->previewToggled();
+                result[kObjectsInformation] =
+                    m_panel->m_analyticsTab->searchWidget()->footerToggled();
                 result[kTabIndexKey] = static_cast<int>(m_panel->currentTab());
             }
             *state = result;
@@ -159,23 +183,44 @@ EventPanel::Private::Private(EventPanel* q):
     }
     else
     {
-        m_tabs = new AnimatedTabWidget(new CompactTabBar(), q);
+        auto compactTabBar = new CompactTabBar();
+        compactTabBar->setCustomTabEnabledFunction(
+            [this](int index)
+            {
+                const bool isCurrentLayoutCrossSystem =
+                    isCrossSystemLayout(workbench()->currentLayout());
+
+                if (isCurrentLayoutCrossSystem
+                    && (index == static_cast<int>(Tab::analytics)
+                        || index == static_cast<int>(Tab::bookmarks)
+                        || index == static_cast<int>(Tab::events)))
+                {
+                    return false;
+                }
+
+                return m_tabs->isTabEnabled(index);
+            });
+
+        m_tabs = new AnimatedTabWidget(compactTabBar, q);
         m_tabs->setStyleSheet("QTabWidget::tab-bar { left: -1px; } ");
 
         m_notificationsTab = new NotificationListWidget(m_tabs);
         m_counterLabel = new NotificationCounterLabel(m_tabs->tabBar());
         m_motionTab = new SimpleMotionSearchWidget(context(), m_tabs);
-        m_bookmarksTab = new BookmarkSearchWidget(context(), m_tabs);
-        m_eventsTab = new EventSearchWidget(context(), m_tabs);
-        m_analyticsTab = new AnalyticsSearchWidget(context(), m_tabs);
+        m_bookmarksTab = new OverlappableSearchWidget(new BookmarkSearchWidget(context()), m_tabs);
+        m_eventsTab = new OverlappableSearchWidget(new EventSearchWidget(context()), m_tabs);
+        m_analyticsTab = new OverlappableSearchWidget(new AnalyticsSearchWidget(context()), m_tabs);
 
         m_synchronizers = {
             {m_motionTab, new MotionSearchSynchronizer(
                 context(), m_motionTab->commonSetup(), m_motionTab->motionModel(), this)},
-            {m_bookmarksTab, new BookmarkSearchSynchronizer(
-                context(), m_bookmarksTab->commonSetup(), this)},
-            {m_analyticsTab, new AnalyticsSearchSynchronizer(
-                context(), m_analyticsTab->commonSetup(), m_analyticsTab->analyticsSetup(), this)}};
+            {m_bookmarksTab->searchWidget(), new BookmarkSearchSynchronizer(
+                context(), m_bookmarksTab->searchWidget()->commonSetup(), this)},
+            {m_analyticsTab->searchWidget(), new AnalyticsSearchSynchronizer(
+                context(),
+                m_analyticsTab->searchWidget()->commonSetup(),
+                static_cast<AnalyticsSearchWidget*>(m_analyticsTab->searchWidget())->analyticsSetup(),
+                this)}};
 
         m_tabIds = {
             {m_notificationsTab, Tab::notifications},
@@ -285,7 +330,11 @@ EventPanel::Private::Private(EventPanel* q):
             });
 
         using Tabs = std::initializer_list<AbstractSearchWidget*>;
-        for (auto tab: Tabs{m_eventsTab, m_motionTab, m_bookmarksTab, m_analyticsTab})
+        for (const auto tab: Tabs{
+            m_eventsTab->searchWidget(),
+            m_motionTab,
+            m_bookmarksTab->searchWidget(),
+            m_analyticsTab->searchWidget()})
         {
             m_connections << connect(tab, &AbstractSearchWidget::tileHovered,
                 this, &EventPanel::Private::at_eventTileHovered);
@@ -309,6 +358,24 @@ EventPanel::Private::Private(EventPanel* q):
 
     appContext()->clientStateHandler()->registerDelegate(
         kEventPanelStorageKey, std::make_unique<StateDelegate>(this));
+
+    connect(
+        workbench(),
+        &QnWorkbench::currentLayoutChanged,
+        this,
+        [this]
+        {
+            const bool isCurrentLayoutCrossSystem = isCrossSystemLayout(workbench()->currentLayout());
+
+            // Bookmarks, analytics and events are not supported for the cross systems at the moment.
+            const auto appearance = isCurrentLayoutCrossSystem
+                ? OverlappableSearchWidget::Appearance::overlay
+                : OverlappableSearchWidget::Appearance::searchWidget;
+
+            m_bookmarksTab->setAppearance(appearance);
+            m_eventsTab->setAppearance(appearance);
+            m_analyticsTab->setAppearance(appearance);
+        });
 }
 
 EventPanel::Private::~Private()
@@ -414,17 +481,17 @@ void EventPanel::Private::rebuildTabs()
         tr("Motion", "Motion tab title"));
 
     updateTab(m_bookmarksTab,
-        m_bookmarksTab->isAllowed(),
+        m_bookmarksTab->searchWidget()->isAllowed(),
         qnSkin->icon(lit("events/tabs/bookmarks.svg")),
         tr("Bookmarks", "Bookmarks tab title"));
 
     updateTab(m_eventsTab,
-        m_eventsTab->isAllowed(),
+        m_eventsTab->searchWidget()->isAllowed(),
         qnSkin->icon(lit("events/tabs/events.svg")),
         tr("Events", "Events tab title"));
 
     updateTab(m_analyticsTab,
-        m_analyticsTab->isAllowed(),
+        m_analyticsTab->searchWidget()->isAllowed(),
         qnSkin->icon(lit("events/tabs/analytics.svg")),
         tr("Objects", "Analytics tab title"));
 

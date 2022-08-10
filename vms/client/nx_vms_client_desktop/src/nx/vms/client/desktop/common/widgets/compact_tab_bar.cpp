@@ -53,6 +53,7 @@ public:
 
     void handleCurrentChanged();
 
+    void setCustomTabEnabledFunction(const CustomTabEnabledFunction& tabEnabledFunction);
 private:
     void paintTab(int index, QPainter* painter);
     void updateAnimation(int index);
@@ -63,6 +64,7 @@ private:
 private:
     int m_hoveredTab = -1;
     QList<QVariantAnimation*> m_animations; //< Animations are owned by q.
+    CustomTabEnabledFunction m_customTabEnabledFunction;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -168,10 +170,18 @@ void CompactTabBar::Private::handleCurrentChanged()
         updateAnimation(index);
 }
 
+void CompactTabBar::Private::setCustomTabEnabledFunction(
+    const CustomTabEnabledFunction& tabEnabledFunction)
+{
+    m_customTabEnabledFunction = tabEnabledFunction;
+}
+
 void CompactTabBar::Private::paintTab(int index, QPainter* painter)
 {
     // Get state.
-    const auto enabled = q->isTabEnabled(index);
+    const auto enabled = m_customTabEnabledFunction
+        ? m_customTabEnabledFunction(index)
+        : q->isTabEnabled(index);
     const auto current = q->currentIndex() == index;
     const auto hovered = enabled && m_hoveredTab == index;
 
@@ -373,6 +383,12 @@ bool CompactTabBar::event(QEvent* event)
     }
 
     return base_type::event(event);
+}
+
+void CompactTabBar::setCustomTabEnabledFunction(
+    const CustomTabEnabledFunction& customTabEnabledFunction)
+{
+    d->setCustomTabEnabledFunction(customTabEnabledFunction);
 }
 
 void CompactTabBar::tabInserted(int index)
