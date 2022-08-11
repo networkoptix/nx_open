@@ -98,12 +98,21 @@ struct NX_VMS_API CloudSystemAuth
 NX_VMS_API_DECLARE_STRUCT_EX(CloudSystemAuth, (json))
 NX_REFLECTION_INSTRUMENT(CloudSystemAuth, CloudSystemAuth_Fields)
 
+NX_REFLECTION_ENUM_CLASS(SystemSettingsPreset,
+    compatibility,
+    recommended,
+    security
+)
+
 struct NX_VMS_API SetupSystemData
 {
     /**%apidoc New System name.
      * %example System 1
      */
     QString name;
+
+    /**%apidoc[opt] System settings preset. */
+    SystemSettingsPreset settingsPreset = SystemSettingsPreset::recommended;
 
     /**%apidoc System settings to set when System is configured. */
     std::map<QString, QJsonValue> settings;
@@ -114,7 +123,7 @@ struct NX_VMS_API SetupSystemData
     /**%apidoc For cloud System only. */
     std::optional<CloudSystemAuth> cloud;
 };
-#define SetupSystemData_Fields (name)(settings)(local)(cloud)
+#define SetupSystemData_Fields (name)(settingsPreset)(settings)(local)(cloud)
 NX_VMS_API_DECLARE_STRUCT_EX(SetupSystemData, (json))
 
 } // namespace nx::vms::api
