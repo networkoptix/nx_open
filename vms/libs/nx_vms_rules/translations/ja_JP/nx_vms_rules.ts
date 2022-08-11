@@ -223,7 +223,7 @@
     </message>
     <message>
       <source>Keywords separated by space</source>
-      <translation>キーワードをスペースで区切る</translation>
+      <translation>キーワード (スペース区切り)</translation>
     </message>
     <message>
       <source>Generic</source>
