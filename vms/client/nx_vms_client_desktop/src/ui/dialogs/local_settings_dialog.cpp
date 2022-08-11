@@ -8,26 +8,22 @@
 #include <QtWidgets/QPushButton>
 
 #include <client/client_settings.h>
-
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/branding.h>
+#include <nx/vms/client/desktop/resource/screen_recording/video_recorder_settings.h>
+#include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-
-#include <ui/screen_recording/video_recorder_settings.h>
-#include <nx/vms/client/desktop/style/custom_style.h>
-
+#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <ui/dialogs/common/message_box.h>
+#include <ui/widgets/local_settings/advanced_settings_widget.h>
 #include <ui/widgets/local_settings/general_preferences_widget.h>
 #include <ui/widgets/local_settings/look_and_feel_preferences_widget.h>
-#include <ui/widgets/local_settings/recording_settings_widget.h>
 #include <ui/widgets/local_settings/popup_settings_widget.h>
-#include <ui/widgets/local_settings/advanced_settings_widget.h>
-#include <ui/dialogs/common/message_box.h>
-
-#include <ui/workbench/workbench_context.h>
+#include <ui/widgets/local_settings/recording_settings_widget.h>
 #include <ui/workbench/watchers/workbench_desktop_camera_watcher.h>
+#include <ui/workbench/workbench_context.h>
 
-#include <nx/branding.h>
-
+using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
 namespace
@@ -66,7 +62,7 @@ QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
     m_restartLabel(nullptr)
 {
     ui->setupUi(this);
-    auto recorderSettings = new QnVideoRecorderSettings(this);
+    auto recorderSettings = new VideoRecorderSettings(this);
     auto updateRecorderSettings =
         [this]
         {

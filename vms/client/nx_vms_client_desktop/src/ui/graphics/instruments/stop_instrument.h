@@ -6,7 +6,7 @@
 #include "instrument.h"
 
 /**
- * This instrument stops event processing. 
+ * This instrument stops event processing.
  */
 class StopInstrument: public Instrument {
     Q_OBJECT;
@@ -20,9 +20,9 @@ public:
     {}
 
 private:
-    virtual bool event(QGraphicsScene *, QEvent *) override { return true; }
-    virtual bool event(QGraphicsView *, QEvent *) override { return true; }
-    virtual bool event(QWidget *, QEvent *) override { return true; }
+    virtual bool anyEvent(QGraphicsScene *, QEvent *) override { return true; }
+    virtual bool anyEvent(QGraphicsView *, QEvent *) override { return true; }
+    virtual bool anyEvent(QWidget *, QEvent *) override { return true; }
     virtual bool sceneEvent(QGraphicsItem *, QEvent *) override { return true; }
 };
 

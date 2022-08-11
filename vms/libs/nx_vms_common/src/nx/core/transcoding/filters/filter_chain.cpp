@@ -231,7 +231,7 @@ void FilterChain::prepareRotationFilter()
 
 void FilterChain::prepareOverlaysFilters()
 {
-    for (const auto overlaySettings: m_settings.overlays)
+    for (const auto& overlaySettings: m_settings.overlays)
     {
         if (const auto imageFilterSetting = dynamic_cast<ImageOverlaySettings*>(
             overlaySettings.data()))
@@ -250,7 +250,7 @@ void FilterChain::prepareOverlaysFilters()
         }
     }
 
-    for (const auto legacyFilter: m_legacyFilters)
+    for (const auto& legacyFilter: m_legacyFilters)
         push_back(legacyFilter);
 }
 

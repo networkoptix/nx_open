@@ -175,7 +175,9 @@ signals:
 protected:
     virtual Qn::Notifier storedItemAdded(const QnLayoutItemData& item) override;
     virtual Qn::Notifier storedItemRemoved(const QnLayoutItemData& item) override;
-    virtual Qn::Notifier storedItemChanged(const QnLayoutItemData& item) override;
+    virtual Qn::Notifier storedItemChanged(
+        const QnLayoutItemData& item,
+        const QnLayoutItemData& oldItem) override;
 
     virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;
 

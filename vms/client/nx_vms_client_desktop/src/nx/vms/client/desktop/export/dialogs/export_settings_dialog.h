@@ -70,11 +70,10 @@ public:
     // Making this methods private causes pointless code bloat
     void disableTab(Mode mode, const QString& reason);
     void setLayout(const QnLayoutResourcePtr& layout);
-    void setMediaParams(const QnMediaResourcePtr& mediaResource, const QnLayoutItemData& itemData,
-        QnWorkbenchContext* context);
+    void setMediaParams(const QnMediaResourcePtr& mediaResource, const QnLayoutItemData& itemData);
     void setBookmarks(const QnCameraBookmarkList& bookmarks);
 
-    bool applySettings(const QVariant &settings);
+    virtual int exec() override;
 
 private:
     SelectableTextButton* buttonForOverlayType(ExportOverlayType type);

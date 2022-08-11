@@ -8,24 +8,24 @@
 #include <QtMultimedia/QAudioDeviceInfo>
 
 #include <client/client_settings.h>
-
 #include <common/common_module.h>
-
+#include <nx/vms/client/desktop/resource/screen_recording/video_recorder_settings.h>
+#include <nx/vms/utils/platform/autorun.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/screen_recording/video_recorder_settings.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
-#include <nx/vms/utils/platform/autorun.h>
+using namespace nx::vms::client;
+using namespace nx::vms::client::desktop;
 
 namespace {
 const int kMsecsPerMinute = 60 * 1000;
 }
 
 QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(
-    QnVideoRecorderSettings* settings,
+    VideoRecorderSettings* settings,
     QWidget* parent)
     :
     base_type(parent),
@@ -258,14 +258,14 @@ void QnGeneralPreferencesWidget::initAudioDevices()
     if (defaultPrimaryDeviceName.isEmpty())
         defaultPrimaryDeviceName = tr("None");
     ui->primaryAudioDeviceComboBox->addItem(tr("Auto (%1)").arg(defaultPrimaryDeviceName));
-    ui->primaryAudioDeviceComboBox->addItem(tr("None"), QnAudioRecorderSettings::kNoDevice);
+    ui->primaryAudioDeviceComboBox->addItem(tr("None"), core::AudioRecorderSettings::kNoDevice);
 
     QString defaultSecondaryDeviceName =
         m_recorderSettings->defaultSecondaryAudioDevice().fullName();
     if (defaultSecondaryDeviceName.isEmpty())
         defaultSecondaryDeviceName = tr("None");
     ui->secondaryAudioDeviceComboBox->addItem(tr("Auto (%1)").arg(defaultSecondaryDeviceName));
-    ui->secondaryAudioDeviceComboBox->addItem(tr("None"), QnAudioRecorderSettings::kNoDevice);
+    ui->secondaryAudioDeviceComboBox->addItem(tr("None"), core::AudioRecorderSettings::kNoDevice);
 
     for (const auto& deviceName: m_recorderSettings->availableDevices())
     {

@@ -12,6 +12,8 @@
 #include <nx/utils/file_system.h>
 #include <nx/vms/common/html/html.h>
 
+using nx::core::transcoding::TimestampFormat;
+
 namespace {
 
 static const qint64 kMsInSec = 1000;
@@ -64,7 +66,7 @@ QSize textMargins(const QFontMetrics& fontMetrics)
     return QSize(fontMetrics.averageCharWidth() / 2, 1);
 }
 
-QString calculateLongestStringViewDateTime(const Qt::DateFormat& format)
+QString calculateLongestStringViewDateTime(TimestampFormat format)
 {
     int maxLength{0};
     static const QTime kLongestTime(20, 20, 28, 888);
@@ -79,7 +81,7 @@ QString calculateLongestStringViewDateTime(const Qt::DateFormat& format)
     return QString(maxLength, QChar('8'));
 }
 
-int calculateMaximumFontSize(const Qt::DateFormat& format, const QFont& font, int maxWidth)
+int calculateMaximumFontSize(TimestampFormat format, const QFont& font, int maxWidth)
 {
     auto longestStringViewDateTime = calculateLongestStringViewDateTime(format);
     auto currentFont = font;
@@ -521,195 +523,6 @@ State ExportSettingsDialogStateReducer::disableTab(State state, ExportSettingsDi
     return state;
 }
 
-namespace {
-
-typedef std::function<State(State, const QVariant&)> ParseStateFunc;
-
-State parseMap(State state, const QVariant& v, const QMap<QString, ParseStateFunc>& rules)
-{
-    const QVariantMap m = v.toMap();
-
-    if (v.isNull())
-        return state;
-
-    QMapIterator<QString, ParseStateFunc> i(rules);
-
-    // Call ParseStateFunc for each property found in the rules.
-    while (i.hasNext())
-    {
-        i.next();
-        const auto valueIt = m.find(i.key());
-        if (valueIt == m.end())
-            continue;
-        state = i.value()(std::move(state), *valueIt);
-    }
-
-    return state;
-}
-
-State parseList(State state, const QVariant& v, const QString& typeProperty, const QMap<QString, ParseStateFunc>& rules)
-{
-    const QVariantList l = v.toList();
-
-    // Call ParseStateFunc for the object if its typeProperty field is in the rules.
-    foreach(const QVariant &o, l)
-    {
-        const auto item = o.toMap();
-        const auto valueIt = rules.find(item.value(typeProperty).toString());
-        if (valueIt == rules.end())
-            continue;
-        state = valueIt.value()(std::move(state), item);
-    }
-
-    return state;
-}
-
-State selectOverlayWithCoords(State state, const QVariant& v, ExportOverlayType overlayType)
-{
-    int left = 0;
-    int top = 0;
-
-    state = parseMap(std::move(state), v, {
-        { "left", [&](State state, const QVariant& v){ left = v.toInt(); return state; } },
-        { "top", [&](State state, const QVariant& v){ top = v.toInt(); return state; } }
-    });
-
-    state = Reducer::setOverlayOffset(std::move(state), overlayType, left, top).second;
-    return Reducer::selectOverlay(std::move(state), overlayType);
-}
-
-State parseImageOverlay(State state, const QVariant& v)
-{
-    ExportImageOverlayPersistentSettings imageSettings = state.exportMediaPersistentSettings.imageOverlay;
-
-    state.setCacheDirLocation(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
-
-    state = parseMap(std::move(state), v, {
-        { "opacity", [&](State state, const QVariant& v){ imageSettings.opacity = v.toFloat(); return state; } },
-        { "size", [&](State state, const QVariant& v){ imageSettings.overlayWidth = v.toInt(); return state; } },
-        { "path", [&](State state, const QVariant& v){
-            QFileInfo fileInfo(v.toString());
-            imageSettings.image.load(fileInfo.absoluteFilePath());
-            imageSettings.name = fileInfo.fileName();
-            return state;
-        } },
-        { "cacheDirLocation", [&](State state, const QVariant& v){
-            state.setCacheDirLocation(v.toString());
-            return state;
-        } }
-    });
-
-    state = Reducer::setImageOverlaySettings(std::move(state), imageSettings);
-
-    return selectOverlayWithCoords(std::move(state), v, ExportOverlayType::image);
-}
-
-State parseTextOverlay(State state, const QVariant& v)
-{
-    ExportTextOverlayPersistentSettings textSettings = state.exportMediaPersistentSettings.textOverlay;
-
-    state = parseMap(std::move(state), v, {
-        { "fontSize", [&](State state, const QVariant& v){ textSettings.fontSize = v.toInt(); return state; } },
-        { "areaWidth", [&](State state, const QVariant& v){ textSettings.overlayWidth = v.toInt(); return state; } },
-        { "text", [&](State state, const QVariant& v){ textSettings.text = v.toString(); return state; } }
-    });
-
-    state = Reducer::setTextOverlaySettings(std::move(state), textSettings);
-
-    return selectOverlayWithCoords(std::move(state), v, ExportOverlayType::text);
-}
-
-State parseBookmarkOverlay(State state, const QVariant& v)
-{
-    ExportBookmarkOverlayPersistentSettings bookmarkSettings = state.exportMediaPersistentSettings.bookmarkOverlay;
-
-    state = parseMap(std::move(state), v, {
-        { "includeDescription", [&](State state, const QVariant& v){ bookmarkSettings.includeDescription = v.toBool(); return state; } },
-        { "areaWidth", [&](State state, const QVariant& v){ bookmarkSettings.overlayWidth = v.toInt(); return state; } },
-        { "fontSize", [&](State state, const QVariant& v){ bookmarkSettings.fontSize = v.toInt(); return state; } }
-    });
-
-    state = Reducer::setBookmarkOverlaySettings(std::move(state), bookmarkSettings);
-
-    return selectOverlayWithCoords(std::move(state), v, ExportOverlayType::bookmark);
-}
-
-State parseTimestampOverlay(State state, const QVariant& v)
-{
-    ExportTimestampOverlayPersistentSettings timestampSettings = state.exportMediaPersistentSettings.timestampOverlay;
-
-    state = parseMap(std::move(state), v, {
-        { "format", [&](State state, const QVariant& v){
-            static const QMap<QString, Qt::DateFormat> textToformat
-            {
-                {"Long", Qt::DefaultLocaleLongDate},
-                {"Short", Qt::DefaultLocaleShortDate},
-                {"ISO 8601", Qt::ISODate},
-                {"RFC 2822", Qt::RFC2822Date}
-            };
-            timestampSettings.format = textToformat.value(v.toString(), Qt::DefaultLocaleLongDate);
-            return state;
-        } },
-        { "fontSize", [&](State state, const QVariant& v){ timestampSettings.fontSize = v.toInt(); return state; } }
-    });
-
-    state = Reducer::setTimestampOverlaySettings(std::move(state), timestampSettings);
-
-    return selectOverlayWithCoords(std::move(state), v, ExportOverlayType::timestamp);
-}
-
-} // namespace
-
-std::pair<bool, State> ExportSettingsDialogStateReducer::applySettings(State state, QVariant settings)
-{
-    if (settings.isNull())
-        return {false, std::move(state)};
-
-    auto parseMedia = [&](State state, const QVariant& v){
-        state = setMode(std::move(state), ExportSettingsDialog::Mode::Media).second;
-        state = parseMap(std::move(state), v, {
-            { "applyFilters", [](State state, const QVariant& v){ return setApplyFilters(std::move(state), v.toBool()).second; } },
-            { "rapidReview", [](State state, const QVariant& v){
-                return parseMap(std::move(state), v, {
-                    { "speed", [](State state, const QVariant& v){
-                        state = selectRapidReview(std::move(state));
-                        return setSpeed(std::move(state), v.toInt()); }}
-                });
-            } },
-            { "overlays", [&](State state, const QVariant& v){
-                return parseList(std::move(state), v, "type", {
-                    { "image", parseImageOverlay },
-                    { "timestamp", parseTimestampOverlay },
-                    { "text", parseTextOverlay },
-                    { "bookmark", parseBookmarkOverlay }
-                });
-            } }
-        });
-        return state;
-    };
-
-    auto parseLayout = [](State state, const QVariant& v){
-        state = setMode(std::move(state), ExportSettingsDialog::Mode::Layout).second;
-        return parseMap(std::move(state), v, {
-            { "readOnly", [](State state, const QVariant& v){ return setLayoutReadOnly(std::move(state), v.toBool()); } },
-            { "password", [](State state, const QVariant& v){ return setLayoutEncryption(std::move(state), true, v.toString()); } }
-        });
-    };
-
-    state = parseMap(std::move(state), settings,
-    {
-        { "media", parseMedia },
-        { "layout", parseLayout },
-        { "fileName", [](State state, const QVariant& v){
-            auto filename = Filename::parse(v.toString());
-            state = setMediaFilename(std::move(state), filename);
-            return setLayoutFilename(std::move(state), filename);
-        } }
-    });
-
-    return {true, std::move(state)};
-}
-
 State ExportSettingsDialogStateReducer::setTimestampFont(State state, const QFont& font)
 {
     state.exportMediaPersistentSettings.timestampOverlay.font = font;
@@ -727,7 +540,8 @@ State ExportSettingsDialogStateReducer::updateMaximumFontSizeTimestamp(State sta
 }
 
 State ExportSettingsDialogStateReducer::setFormatTimestampOverlay(
-    State state, Qt::DateFormat format)
+    State state,
+    TimestampFormat format)
 {
     state.exportMediaPersistentSettings.timestampOverlay.format = format;
     return updateMaximumFontSizeTimestamp(std::move(state));

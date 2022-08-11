@@ -5,7 +5,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
-#include <ui/screen_recording/video_recorder_settings.h> //< TODO: #sivanov Move out enums.
+#include <nx/vms/client/desktop/resource/screen_recording/video_recorder_settings.h> //< TODO: #sivanov Move out enums.
 #include <ui/widgets/common/abstract_preferences_widget.h>
 
 namespace Ui {
@@ -13,7 +13,7 @@ class RecordingSettings;
 }
 
 class QnDwm;
-class QnVideoRecorderSettings;
+namespace nx::vms::client::desktop { class VideoRecorderSettings; }
 
 class QnRecordingSettingsWidget : public QnAbstractPreferencesWidget
 {
@@ -21,7 +21,9 @@ class QnRecordingSettingsWidget : public QnAbstractPreferencesWidget
     typedef QnAbstractPreferencesWidget base_type;
 
 public:
-    explicit QnRecordingSettingsWidget(QnVideoRecorderSettings* recorderSettings, QWidget *parent = nullptr);
+    explicit QnRecordingSettingsWidget(
+        nx::vms::client::desktop::VideoRecorderSettings* recorderSettings,
+        QWidget* parent = nullptr);
     virtual ~QnRecordingSettingsWidget();
 
     virtual void applyChanges() override;
@@ -59,6 +61,6 @@ private:
 
 private:
     QScopedPointer<Ui::RecordingSettings> ui;
-    QnVideoRecorderSettings *m_settings;
+    nx::vms::client::desktop::VideoRecorderSettings* m_settings;
     QnDwm* m_dwm;
 };

@@ -42,12 +42,13 @@
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/api/data/videowall_data.h>
 #include <nx/vms/api/types/connection_types.h>
+#include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
-#include <nx/vms/client/desktop/resources/layout_snapshot_manager.h>
+#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/state/client_process_runner.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -65,7 +66,6 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_videowall_manager.h>
 #include <platform/platform_abstraction.h>
-#include <plugins/resource/desktop_camera/desktop_resource_base.h>
 #include <recording/time_period.h>
 #include <ui/dialogs/attach_to_videowall_dialog.h>
 #include <ui/dialogs/layout_name_dialog.h> //< TODO: #sivanov Invalid reuse.
@@ -94,7 +94,7 @@ using nx::vms::client::desktop::utils::UnityLauncherWorkaround;
 using nx::vms::client::core::MotionSelection;
 
 using namespace std::chrono;
-using namespace nx;
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
@@ -361,7 +361,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoAdded, this,
         [this](const QnPeerRuntimeInfo &info)
         {
-            if (info.data.peer.peerType == vms::api::PeerType::videowallClient)
+            if (info.data.peer.peerType == nx::vms::api::PeerType::videowallClient)
             {
                 /* Master node, will run other clients and exit. */
                 if (info.data.videoWallInstanceGuid.isNull())
@@ -378,7 +378,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoRemoved, this,
         [this](const QnPeerRuntimeInfo &info)
         {
-            if (info.data.peer.peerType == vms::api::PeerType::videowallClient)
+            if (info.data.peer.peerType == nx::vms::api::PeerType::videowallClient)
             {
                 /* Master node, will run other clients and exit. */
                 if (info.data.videoWallInstanceGuid.isNull())
@@ -425,7 +425,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
 
     for (const auto& info: runtimeInfoManager()->items()->getItems())
     {
-        if (info.data.peer.peerType != vms::api::PeerType::videowallClient)
+        if (info.data.peer.peerType != nx::vms::api::PeerType::videowallClient)
             continue;
 
         /* Master node, will run other clients and exit. */
@@ -2118,7 +2118,7 @@ void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered()
     if (!user)
         return;
 
-    const auto desktopCameraId = QnDesktopResource::calculateUniqueId(
+    const auto desktopCameraId = core::DesktopResource::calculateUniqueId(
         commonModule()->peerId(), user->getId());
 
     const auto desktopCamera = resourcePool()->getResourceByPhysicalId<QnVirtualCameraResource>(

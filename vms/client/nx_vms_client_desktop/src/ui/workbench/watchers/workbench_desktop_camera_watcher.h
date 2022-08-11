@@ -42,5 +42,5 @@ private:
 
 private:
     QnMediaServerResourcePtr m_server;
-    QnDesktopResourcePtr m_desktop;
+    nx::vms::client::core::DesktopResourcePtr m_desktop;
 };

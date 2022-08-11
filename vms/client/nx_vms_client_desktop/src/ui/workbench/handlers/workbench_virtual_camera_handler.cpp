@@ -8,7 +8,6 @@
 #include <api/model/virtual_camera_reply.h>
 #include <api/server_rest_connection.h>
 #include <camera/camera_data_manager.h>
-#include <camera/loaders/caching_camera_data_loader.h>
 #include <client/client_module.h>
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
@@ -16,6 +15,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -32,6 +32,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_state_manager.h>
 
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 using namespace nx::utils;
@@ -538,7 +539,7 @@ void QnWorkbenchVirtualCameraHandler::at_virtualCameraManager_stateChanged(const
         if (!NX_ASSERT(systemContext))
             return;
 
-        QnCachingCameraDataLoaderPtr loader =
+        core::CachingCameraDataLoaderPtr loader =
             systemContext->cameraDataManager()->loader(camera, /*create=*/true);
         loader->invalidateCachedData();
         loader->load(/*forced=*/true);

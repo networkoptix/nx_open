@@ -49,7 +49,7 @@ void ActivityListenerInstrument::aboutToBeDisabledNotify()
     setAutoStopping(false);
 }
 
-bool ActivityListenerInstrument::event(QGraphicsView* view, QEvent* event)
+bool ActivityListenerInstrument::anyEvent(QGraphicsView* view, QEvent* event)
 {
     Q_UNUSED(view);
 
@@ -67,7 +67,7 @@ bool ActivityListenerInstrument::event(QGraphicsView* view, QEvent* event)
     return false;
 }
 
-bool ActivityListenerInstrument::event(QWidget* widget, QEvent* event)
+bool ActivityListenerInstrument::anyEvent(QWidget* widget, QEvent* event)
 {
     Q_UNUSED(widget);
 

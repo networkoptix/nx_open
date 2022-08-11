@@ -5,7 +5,6 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QPushButton>
 
-#include <camera/loaders/caching_camera_data_loader.h>
 #include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
@@ -22,6 +21,7 @@
 #include <nx/build_info.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/streaming/archive_stream_reader.h>
+#include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/core/utils/grid_walker.h>
 #include <nx/vms/client/desktop/common/dialogs/progress_dialog.h>
 #include <nx/vms/client/desktop/export/data/export_media_settings.h>
@@ -31,9 +31,9 @@
 #include <nx/vms/client/desktop/export/tools/export_media_tool.h>
 #include <nx/vms/client/desktop/export/tools/export_media_validator.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
-#include <nx/vms/client/desktop/resources/layout_password_management.h>
-#include <nx/vms/client/desktop/resources/layout_snapshot_manager.h>
-#include <nx/vms/client/desktop/resources/resource_descriptor.h>
+#include <nx/vms/client/desktop/resource/layout_password_management.h>
+#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
+#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
@@ -254,7 +254,7 @@ struct WorkbenchExportHandler::Private
                 QnAviResourcePtr file(new QnAviResource(completeFilename));
                 file->setStatus(nx::vms::api::ResourceStatus::online);
                 resourcePool->addResource(file);
-                return file;
+                return std::move(file);
             }
 
             case FileExtension::nov:
@@ -428,7 +428,7 @@ void WorkbenchExportHandler::handleExportVideoAction(const ui::action::Parameter
     {
         const QnLayoutItemData itemData = widget->item()->data();
         // Exporting from the scene and timeline
-        dialog.setMediaParams(centralResource, itemData, context());
+        dialog.setMediaParams(centralResource, itemData);
 
         // Why symmetry with the next block is broken?
         const auto periods = parameters.argument<QnTimePeriodList>(Qn::MergedTimePeriodsRole);
@@ -438,10 +438,10 @@ void WorkbenchExportHandler::handleExportVideoAction(const ui::action::Parameter
     }
     else
     {
-        dialog.setMediaParams(centralResource, QnLayoutItemData(), context());
+        dialog.setMediaParams(centralResource, QnLayoutItemData());
     }
 
-    if (!dialog.applySettings(parameters.argument(Qn::ExportSettingsRole)))
+    if (dialog.exec() != QDialog::Accepted)
         return;
 
     auto exportToolInstance = prepareExportTool(dialog);
@@ -474,9 +474,9 @@ void WorkbenchExportHandler::handleExportBookmarkAction(const ui::action::Parame
         mainWindowWidget());
 
     const QnLayoutItemData itemData = widget ? widget->item()->data() : QnLayoutItemData();
-    dialog.setMediaParams(camera, itemData, context());
+    dialog.setMediaParams(camera, itemData);
 
-    if (!dialog.applySettings(parameters.argument(Qn::ExportSettingsRole)))
+    if (dialog.exec() != QDialog::Accepted)
         return;
 
     auto exportToolInstance = prepareExportTool(dialog);
@@ -505,7 +505,7 @@ void WorkbenchExportHandler::handleExportBookmarksAction()
     dialog.setLayout(layoutFromBookmarks(bookmarks, resourcePool()));
     dialog.setBookmarks(bookmarks);
 
-    if (!dialog.applySettings(parameters.argument(Qn::ExportSettingsRole)))
+    if (dialog.exec() != QDialog::Accepted)
         return;
 
     auto exportToolInstance = prepareExportTool(dialog);

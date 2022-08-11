@@ -3,7 +3,7 @@
 #include "cross_system_camera_resource_widget.h"
 
 #include <nx/vms/client/desktop/cross_system/cross_system_camera_resource.h>
-#include <nx/vms/client/desktop/resources/resource_descriptor.h>
+#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <ui/graphics/items/overlays/status_overlay_controller.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 

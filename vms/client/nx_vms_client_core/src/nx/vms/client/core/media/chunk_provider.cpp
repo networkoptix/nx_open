@@ -3,11 +3,10 @@
 #include "chunk_provider.h"
 
 #include <common/common_module.h>
-
-#include <camera/loaders/flat_camera_data_loader.h>
+#include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/camera_history.h>
+#include <nx/vms/client/core/resource/data_loaders/flat_camera_data_loader.h>
 
 namespace nx::vms::client::core {
 
@@ -41,7 +40,7 @@ private:
 private:
     ChunkProvider* const q;
     const Qn::TimePeriodContent m_contentType;
-    QScopedPointer<QnFlatCameraDataLoader> m_loader;
+    QScopedPointer<FlatCameraDataLoader> m_loader;
     QString m_filter;
     bool m_loading = false;
     int updateTriesCount = 0;
@@ -85,15 +84,15 @@ void ChunkProvider::ChunkProviderInternal::setResourceId(const QnUuid& id)
         return;
 
     setLoading(true);
-    m_loader.reset(new QnFlatCameraDataLoader(camera, m_contentType));
+    m_loader.reset(new FlatCameraDataLoader(camera, m_contentType));
 
-    connect(m_loader.get(), &QnFlatCameraDataLoader::ready, this,
+    connect(m_loader.get(), &FlatCameraDataLoader::ready, this,
         [this](qint64 /*startTimeMs*/)
         {
             notifyAboutTimePeriodsChange();
             setLoading(false);
         });
-    connect(m_loader.get(), &QnFlatCameraDataLoader::failed, this,
+    connect(m_loader.get(), &FlatCameraDataLoader::failed, this,
         [this]()
         {
             if (--updateTriesCount > 0)

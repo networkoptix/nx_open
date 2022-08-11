@@ -10,10 +10,8 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/api/types/storage_location.h>
+#include <nx/vms/client/core/resource/data_loaders/camera_data_loader_fwd.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
-
-class QnCachingCameraDataLoader;
-using QnCachingCameraDataLoaderPtr = QSharedPointer<QnCachingCameraDataLoader>;
 
 class QnCameraDataManager: public QObject, public nx::vms::client::desktop::SystemContextAware
 {
@@ -24,7 +22,7 @@ public:
         QObject* parent = nullptr);
     virtual ~QnCameraDataManager();
 
-    QnCachingCameraDataLoaderPtr loader(
+    nx::vms::client::core::CachingCameraDataLoaderPtr loader(
         const QnMediaResourcePtr& resource,
         bool createIfNotExists = true);
 

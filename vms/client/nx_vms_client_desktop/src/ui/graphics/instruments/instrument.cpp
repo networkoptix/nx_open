@@ -317,19 +317,19 @@ void Instrument::sendInstalledNotifications(bool installed) {
     }
 }
 
-bool Instrument::event(QGraphicsScene* watched, QEvent* event)
+bool Instrument::anyEvent(QGraphicsScene* watched, QEvent* event)
 {
     QnHiDpiWorkarounds::fixupGraphicsSceneEvent(event);
     return dispatchEvent(watched, event);
 }
 
-bool Instrument::event(QGraphicsView* watched, QEvent* event)
+bool Instrument::anyEvent(QGraphicsView* watched, QEvent* event)
 {
     std::unique_ptr<QEvent> eventCopyBuffer;
     return dispatchEvent(watched, QnHiDpiWorkarounds::fixupEvent(watched, event, eventCopyBuffer));
 }
 
-bool Instrument::event(QWidget* watched, QEvent* event)
+bool Instrument::anyEvent(QWidget* watched, QEvent* event)
 {
     std::unique_ptr<QEvent> eventCopyBuffer;
     return dispatchEvent(watched, QnHiDpiWorkarounds::fixupEvent(watched, event, eventCopyBuffer));

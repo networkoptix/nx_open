@@ -38,8 +38,8 @@
 #include <nx/vms/client/desktop/cross_system/cross_system_layouts_watcher.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
-#include <nx/vms/client/desktop/resources/resource_factory.h>
-#include <nx/vms/client/desktop/resources/unified_resource_pool.h>
+#include <nx/vms/client/desktop/resource/resource_factory.h>
+#include <nx/vms/client/desktop/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/session_manager/default_process_interface.h>
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
 #include <nx/vms/client/desktop/settings/ipc_settings_synchronizer.h>

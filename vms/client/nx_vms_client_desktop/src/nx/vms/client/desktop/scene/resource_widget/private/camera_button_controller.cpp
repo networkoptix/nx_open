@@ -7,11 +7,11 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/types/event_rule_types.h>
+#include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <plugins/resource/desktop_camera/desktop_resource_base.h>
 #include <ui/graphics/items/overlays/scrollable_text_items_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/software_trigger_button.h>
@@ -107,7 +107,7 @@ void CameraButtonController::createTwoAudioButton()
     if (!m_twoWayAudioWidget)
     {
         auto systemContext = SystemContext::fromResource(m_camera);
-        const QString desktopResourceUniqueId = QnDesktopResource::calculateUniqueId(
+        const QString desktopResourceUniqueId = core::DesktopResource::calculateUniqueId(
             systemContext->peerId(),
             workbench()->context()->user()->getId());
         m_twoWayAudioWidget =

@@ -10,10 +10,9 @@
 #include <QtGui/QRegion>
 
 #include <camera/camera_data_manager.h>
-#include <recording/time_period_list.h>
-
 #include <nx/vms/client/core/common/data/motion_selection.h>
 #include <nx/vms/client/desktop/event_search/models/abstract_search_list_model.h>
+#include <recording/time_period_list.h>
 
 class QMenu;
 
@@ -63,7 +62,7 @@ private:
     QSharedPointer<QMenu> contextMenu(const QnTimePeriod& chunk) const;
 
 private:
-    QnCachingCameraDataLoaderPtr m_loader;
+    core::CachingCameraDataLoaderPtr m_loader;
     MotionSelection m_filterRegions;
     std::deque<QnTimePeriod> m_data; //< From newer to older.
     bool m_fetchInProgress = false;

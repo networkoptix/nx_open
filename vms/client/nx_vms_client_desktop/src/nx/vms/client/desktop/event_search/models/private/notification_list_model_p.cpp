@@ -13,7 +13,7 @@
 #include <nx/utils/metatypes.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
-#include <nx/vms/client/desktop/resources/resource_descriptor.h>
+#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>

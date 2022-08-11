@@ -20,8 +20,8 @@
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_camera_resource.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_layout_resource.h>
-#include <nx/vms/client/desktop/resources/layout_password_management.h>
-#include <nx/vms/client/desktop/resources/resource_descriptor.h>
+#include <nx/vms/client/desktop/resource/layout_password_management.h>
+#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
 
 using namespace nx::vms::client::desktop;

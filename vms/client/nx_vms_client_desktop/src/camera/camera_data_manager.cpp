@@ -6,13 +6,13 @@
 
 #include <QtCore/QTimer>
 
-#include <camera/loaders/caching_camera_data_loader.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
@@ -20,6 +20,7 @@
 #include <server/server_storage_manager.h>
 
 using namespace std::chrono;
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 
 using StorageLocation = nx::vms::api::StorageLocation;
@@ -32,7 +33,7 @@ constexpr auto kDiscardCacheInterval = 1h;
 
 struct QnCameraDataManager::Private
 {
-    QHash<QnMediaResourcePtr, QnCachingCameraDataLoaderPtr> loaderByResource;
+    QHash<QnMediaResourcePtr, core::CachingCameraDataLoaderPtr> loaderByResource;
     StorageLocation storageLocation = StorageLocation::both;
 };
 
@@ -117,7 +118,7 @@ QnCameraDataManager::QnCameraDataManager(SystemContext* systemContext, QObject* 
 
 QnCameraDataManager::~QnCameraDataManager() {}
 
-QnCachingCameraDataLoaderPtr QnCameraDataManager::loader(
+core::CachingCameraDataLoaderPtr QnCameraDataManager::loader(
     const QnMediaResourcePtr& resource,
     bool createIfNotExists)
 {
@@ -131,15 +132,15 @@ QnCachingCameraDataLoaderPtr QnCameraDataManager::loader(
     if (!createIfNotExists)
         return {};
 
-    if (!QnCachingCameraDataLoader::supportedResource(resource))
+    if (!core::CachingCameraDataLoader::supportedResource(resource))
         return {};
 
     NX_ASSERT(resource->toResourcePtr()->systemContext() == systemContext(),
         "Resource belongs to another System Context");
 
-    QnCachingCameraDataLoaderPtr loader(new QnCachingCameraDataLoader(resource));
+    core::CachingCameraDataLoaderPtr loader(new core::CachingCameraDataLoader(resource));
 
-    connect(loader.data(), &QnCachingCameraDataLoader::periodsChanged, this,
+    connect(loader.data(), &core::CachingCameraDataLoader::periodsChanged, this,
         [this, resource](Qn::TimePeriodContent type, qint64 startTimeMs)
         {
             emit periodsChanged(resource, type, startTimeMs);

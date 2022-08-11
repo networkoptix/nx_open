@@ -27,17 +27,17 @@ signals:
     void activated(QGraphicsItem *item, QEvent *event);
 
 protected:
-    virtual bool event(QGraphicsScene *scene, QEvent *event) override {
+    virtual bool anyEvent(QGraphicsScene *scene, QEvent *event) override {
         emit activated(scene, event);
         return false;
     }
 
-    virtual bool event(QGraphicsView *view, QEvent *event) override {
+    virtual bool anyEvent(QGraphicsView *view, QEvent *event) override {
         emit activated(view, event);
         return false;
     }
 
-    virtual bool event(QWidget *viewport, QEvent *event) override {
+    virtual bool anyEvent(QWidget *viewport, QEvent *event) override {
         emit activated(viewport, event);
         return false;
     }

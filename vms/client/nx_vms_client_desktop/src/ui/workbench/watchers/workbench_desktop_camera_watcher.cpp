@@ -11,8 +11,10 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_session.h>
-#include <plugins/resource/desktop_camera/desktop_resource_base.h>
+#include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <ui/workbench/workbench_context.h>
+
+using namespace nx::vms::client;
 
 QnWorkbenchDesktopCameraWatcher::QnWorkbenchDesktopCameraWatcher(QObject *parent):
     QObject(parent),
@@ -59,8 +61,8 @@ void QnWorkbenchDesktopCameraWatcher::initialize()
 {
     if (!m_desktop)
     {
-        m_desktop = resourcePool()->getResourceById<QnDesktopResource>(
-            QnDesktopResource::getDesktopResourceUuid());
+        m_desktop = resourcePool()->getResourceById<core::DesktopResource>(
+            core::DesktopResource::getDesktopResourceUuid());
     }
 
     setServer(currentServer());
@@ -75,7 +77,7 @@ void QnWorkbenchDesktopCameraWatcher::deinitialize()
 
 void QnWorkbenchDesktopCameraWatcher::at_resourcePool_resourceAdded(const QnResourcePtr& resource)
 {
-    if (resource->getId() == QnDesktopResource::getDesktopResourceUuid())
+    if (resource->getId() == core::DesktopResource::getDesktopResourceUuid())
         initialize();
 }
 

@@ -38,19 +38,19 @@ namespace {
 
 } // anonymous namespace
 
-bool ForwardingInstrument::event(QGraphicsScene *scene, QEvent *event) {
+bool ForwardingInstrument::anyEvent(QGraphicsScene *scene, QEvent *event) {
     open(scene)->processEvent(event);
 
     return false;
 }
 
-bool ForwardingInstrument::event(QGraphicsView *view, QEvent *event) {
+bool ForwardingInstrument::anyEvent(QGraphicsView *view, QEvent *event) {
     open(view)->processEvent(event);
 
     return false;
 }
 
-bool ForwardingInstrument::event(QWidget *viewport, QEvent *event) {
+bool ForwardingInstrument::anyEvent(QWidget *viewport, QEvent *event) {
     // Some of the viewport's events are handled by the view via event filters. As we employ the
     // same mechanism, these events won't get delivered unless we forward them here.
     bool filtered = false;

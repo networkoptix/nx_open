@@ -8,7 +8,7 @@
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/client/desktop/resources/resource_descriptor.h>
+#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 
 using namespace nx::vms::client::desktop;
 

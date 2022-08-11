@@ -17,7 +17,7 @@
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_camera_resource.h>
-#include <nx/vms/client/desktop/resources/layout_password_management.h>
+#include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/intercom/utils.h>

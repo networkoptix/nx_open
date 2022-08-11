@@ -2,22 +2,22 @@
 
 #pragma once
 
-#include "../abstract_http_request_handler.h"
-
 #include <optional>
 #include <type_traits>
 
 #include <QtCore/QUrlQuery>
 
 #include <nx/fusion/fusion/fusion_adaptors.h>
-#include <nx/fusion/serialization_format.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/utils/std/cpp14.h>
+#include <nx/fusion/serialization_format.h>
 #include <nx/reflect/json.h>
 #include <nx/reflect/urlencoded.h>
+#include <nx/utils/serialization/qt_geometry_reflect_json.h>
+#include <nx/utils/std/cpp14.h>
 
-#include "../api_request_result.h"
 #include "../../buffer_source.h"
+#include "../abstract_http_request_handler.h"
+#include "../api_request_result.h"
 
 namespace nx::network::http::detail {
 

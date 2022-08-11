@@ -232,27 +232,17 @@ ExportSettingsDialog::ExportSettingsDialog(
     d->subscribe([this](const State&){ renderState(); });
 }
 
-bool ExportSettingsDialog::applySettings(const QVariant &settings)
+int ExportSettingsDialog::exec()
 {
-    if (settings.isNull())
-    {
-        d->dispatch(Reducer::loadSettings,
-            qnSettings,
-            QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
+    d->dispatch(Reducer::loadSettings,
+        qnSettings,
+        QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
 
-        // Updates media resource related settings like camera name.
-        const auto infoData = d->state().exportMediaPersistentSettings.infoOverlay;
-        d->dispatch(Reducer::setInfoOverlaySettings, d->getInfoTextData(infoData));
+    // Updates media resource related settings like camera name.
+    const auto infoData = d->state().exportMediaPersistentSettings.infoOverlay;
+    d->dispatch(Reducer::setInfoOverlaySettings, d->getInfoTextData(infoData));
 
-        if (this->exec() != QDialog::Accepted)
-            return false;
-    }
-    else
-    {
-        d->dispatch(Reducer::applySettings, settings);
-    }
-
-    return true;
+    return base_type::exec();
 }
 
 void ExportSettingsDialog::setupSettingsButtons()
@@ -432,7 +422,7 @@ ExportSettingsDialog::~ExportSettingsDialog()
     d->disconnect(this);
 }
 
-bool ExportSettingsDialog::tryClose(bool force)
+bool ExportSettingsDialog::tryClose(bool /*force*/)
 {
     return close();
 }
@@ -645,8 +635,7 @@ void ExportSettingsDialog::updateWidgetsState()
 
 void ExportSettingsDialog::setMediaParams(
     const QnMediaResourcePtr& mediaResource,
-    const QnLayoutItemData& itemData,
-    QnWorkbenchContext* context)
+    const QnLayoutItemData& itemData)
 {
     d->dispatch(Reducer::enableTab, Mode::Media);
 

@@ -71,7 +71,9 @@ signals:
 private:
     virtual Qn::Notifier storedItemAdded(const QnPeerRuntimeInfo& item) override;
     virtual Qn::Notifier storedItemRemoved(const QnPeerRuntimeInfo& item) override;
-    virtual Qn::Notifier storedItemChanged(const QnPeerRuntimeInfo& item) override;
+    virtual Qn::Notifier storedItemChanged(
+        const QnPeerRuntimeInfo& item,
+        const QnPeerRuntimeInfo& oldItem) override;
 
     void updateItem(const QnPeerRuntimeInfo& value);
 
@@ -83,4 +85,3 @@ private:
     QScopedPointer<QnThreadsafeItemStorage<QnPeerRuntimeInfo>> m_items;
     QnCommonMessageProcessor* m_messageProcessor = nullptr;
 };
-

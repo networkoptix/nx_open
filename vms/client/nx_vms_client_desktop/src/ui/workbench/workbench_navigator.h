@@ -5,32 +5,26 @@
 #include <array>
 #include <chrono>
 
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QObject>
 #include <QtCore/QSet>
-#include <QtCore/QElapsedTimer>
-
-#include <nx/utils/uuid.h>
 
 #include <analytics/db/analytics_db_types.h>
-
-#include <common/common_globals.h>
-#include <core/resource/resource_fwd.h>
-#include <core/resource/camera_bookmark_fwd.h>
 #include <camera/camera_bookmarks_manager_fwd.h>
-
 #include <client/client_globals.h>
-
-#include <recording/time_period.h>
-
+#include <common/common_globals.h>
+#include <core/resource/camera_bookmark_fwd.h>
+#include <core/resource/resource_fwd.h>
+#include <nx/utils/scoped_connections.h>
+#include <nx/utils/thread/long_runnable.h>
+#include <nx/utils/uuid.h>
+#include <nx/vms/client/core/resource/data_loaders/camera_data_loader_fwd.h>
 #include <nx/vms/client/desktop/camera/camera_fwd.h>
 #include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
+#include <recording/time_period.h>
 #include <ui/common/speed_range.h>
 #include <ui/workbench/workbench_context_aware.h>
-
-#include <nx/utils/thread/long_runnable.h>
 #include <utils/threaded_chunks_merge_tool.h>
-
-#include <nx/utils/scoped_connections.h>
 
 class QAction;
 class QCompleter;
@@ -42,8 +36,6 @@ class QnTimeScrollBar;
 class QnResourceWidget;
 class QnMediaResourceWidget;
 class QnAbstractArchiveStreamReader;
-class QnCachingCameraDataLoader;
-typedef QSharedPointer<QnCachingCameraDataLoader> QnCachingCameraDataLoaderPtr;
 class QnCalendarWidget;
 class QnDayTimeWidget;
 class QnSearchQueryStrategy;
@@ -285,7 +277,9 @@ private:
 
     void updateSliderFromReader(UpdateSliderMode mode = UpdateSliderMode::KeepInWindow);
 
-    QnCachingCameraDataLoaderPtr loaderByWidget(const QnMediaResourceWidget* widget, bool createIfNotExists = true);
+    nx::vms::client::core::CachingCameraDataLoaderPtr loaderByWidget(
+        const QnMediaResourceWidget* widget,
+        bool createIfNotExists = true);
 
     bool hasArchiveForCamera(const QnSecurityCamResourcePtr& camera) const;
     bool hasWidgetWithCamera(const QnSecurityCamResourcePtr& camera) const;

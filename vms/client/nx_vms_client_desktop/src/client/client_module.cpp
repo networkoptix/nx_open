@@ -33,6 +33,8 @@
 #include <nx/network/http/http_mod_manager.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/crash_dump/systemexcept.h>
+#include <nx/vms/client/core/resource/screen_recording/audio_only/desktop_audio_only_resource.h>
+#include <nx/vms/client/core/resource/screen_recording/desktop_resource_searcher.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/settings/systems_visibility_manager.h>
 #include <nx/vms/client/core/watchers/known_server_connections.h>
@@ -60,18 +62,16 @@
 #include <nx/vms/discovery/manager.h>
 #include <nx/vms/license/usage_helper.h>
 #include <nx/vms/time/formatter.h>
-#include <plugins/resource/desktop_audio_only/desktop_audio_only_resource.h>
-#include <plugins/resource/desktop_camera/desktop_resource_searcher.h>
 #include <ui/workaround/qtbug_workaround.h>
 #include <utils/common/command_line_parser.h>
 #include <utils/math/color_transformations.h>
 #include <watchers/cloud_status_watcher.h>
 
 #if defined(Q_OS_WIN)
-    #include <plugins/resource/desktop_win/desktop_resource.h>
-    #include <plugins/resource/desktop_win/desktop_resource_searcher_impl.h>
+    #include <nx/vms/client/desktop/resource/screen_recording/audio_video_win/windows_desktop_resource.h>
+    #include <nx/vms/client/desktop/resource/screen_recording/audio_video_win/windows_desktop_resource_searcher_impl.h>
 #else
-    #include <plugins/resource/desktop_audio_only/desktop_audio_only_resource_searcher_impl.h>
+    #include <nx/vms/client/core/resource/screen_recording/audio_only/desktop_audio_only_resource_searcher_impl.h>
 #endif
 #if defined(Q_OS_MAC)
     #include <ui/workaround/mac_utils.h>
@@ -80,7 +80,7 @@
 #include <nx/vms/client/desktop/state/running_instances_manager.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 
-using namespace nx;
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 
 namespace {
@@ -209,11 +209,11 @@ void QnClientModule::initDesktopCamera([[maybe_unused]] QOpenGLWidget* window)
     /* Initialize desktop camera searcher. */
     auto commonModule = clientCoreModule()->commonModule();
 #if defined(Q_OS_WIN)
-    auto impl = new QnDesktopResourceSearcherImpl(window);
+    auto impl = new WindowsDesktopResourceSearcherImpl(window);
 #else
-    auto impl = new QnDesktopAudioOnlyResourceSearcherImpl();
+    auto impl = new core::DesktopAudioOnlyResourceSearcherImpl();
 #endif
-    auto desktopSearcher = commonModule->store(new QnDesktopResourceSearcher(impl));
+    auto desktopSearcher = commonModule->store(new core::DesktopResourceSearcher(impl));
     desktopSearcher->setLocal(true);
     appContext()->resourceDiscoveryManager()->addDeviceSearcher(desktopSearcher);
 }
@@ -374,6 +374,6 @@ void QnClientModule::registerResourceDataProviders()
     factory->registerResourceType<QnAviResource>();
     factory->registerResourceType<QnClientCameraResource>();
     #if defined(Q_OS_WIN)
-        factory->registerResourceType<QnWinDesktopResource>();
+        factory->registerResourceType<WindowsDesktopResource>();
     #endif
 }

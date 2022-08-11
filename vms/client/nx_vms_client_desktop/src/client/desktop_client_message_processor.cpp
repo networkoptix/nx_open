@@ -3,7 +3,7 @@
 #include "desktop_client_message_processor.h"
 
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/resources/resource_factory.h>
+#include <nx/vms/client/desktop/resource/resource_factory.h>
 
 using namespace nx::vms::client::desktop;
 

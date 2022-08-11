@@ -9,11 +9,11 @@
 #include <QtGui/QImage>
 
 #include <nx/core/watermark/watermark.h>
-
-#include <utils/common/aspect_ratio.h>
-
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/api/data/image_correction_data.h>
+#include <utils/common/aspect_ratio.h>
+
+#include "../timestamp_format.h"
 
 namespace nx {
 namespace core {
@@ -71,7 +71,7 @@ struct ImageOverlaySettings: OverlaySettings
 
 struct TimestampOverlaySettings: OverlaySettings
 {
-    Qt::DateFormat format = Qt::DefaultLocaleLongDate;
+    TimestampFormat format = TimestampFormat::longDate;
     int fontSize = 18;
     QColor foreground = Qt::white;
     QColor outline = Qt::black;

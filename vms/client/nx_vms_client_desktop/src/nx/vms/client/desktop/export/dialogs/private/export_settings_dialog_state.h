@@ -2,15 +2,16 @@
 
 #pragma once
 
-#include "../export_settings_dialog.h"
-
+#include <QtCore/QDir>
 #include <QtCore/QSize>
 #include <QtCore/QString>
-#include <QtCore/QDir>
 
+#include <nx/core/transcoding/timestamp_format.h>
 #include <nx/vms/client/desktop/common/flux/abstract_flux_state.h>
 #include <nx/vms/client/desktop/export/settings/export_layout_persistent_settings.h>
 #include <nx/vms/client/desktop/export/settings/export_media_persistent_settings.h>
+
+#include "../export_settings_dialog.h"
 
 class QnClientSettings;
 
@@ -155,13 +156,13 @@ public:
 
     static State setSpeed(State state, int speed);
 
-    static std::pair<bool, State> applySettings(State state, QVariant settings);
-
     static State setTimestampFont(State state, const QFont& font);
 
     static State updateMaximumFontSizeTimestamp(State state);
 
-    static State setFormatTimestampOverlay(State state, Qt::DateFormat format);
+    static State setFormatTimestampOverlay(
+        State state,
+        nx::core::transcoding::TimestampFormat format);
 };
 
 } // namespace nx::vms::client::desktop

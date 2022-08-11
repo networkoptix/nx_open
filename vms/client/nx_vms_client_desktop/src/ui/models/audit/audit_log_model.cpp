@@ -18,7 +18,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/resources/search_helper.h>
+#include <nx/vms/client/desktop/resource/search_helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_context.h>

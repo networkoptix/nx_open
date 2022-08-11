@@ -40,7 +40,7 @@
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/resource_tree_item_key_source_pool.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_item_factory.h>
-#include <nx/vms/client/desktop/resources/resource_descriptor.h>
+#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 
 using namespace nx::vms::client::desktop;
 

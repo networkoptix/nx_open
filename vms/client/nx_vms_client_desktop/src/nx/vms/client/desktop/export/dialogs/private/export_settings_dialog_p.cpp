@@ -465,13 +465,13 @@ void ExportSettingsDialog::Private::updateOverlayImage(
 ExportOverlayWidget* ExportSettingsDialog::Private::overlay(ExportOverlayType type)
 {
     const auto index = int(type);
-    return index < m_overlays.size() ? m_overlays[index] : nullptr;
+    return index < (int) m_overlays.size() ? m_overlays[index] : nullptr;
 }
 
 const ExportOverlayWidget* ExportSettingsDialog::Private::overlay(ExportOverlayType type) const
 {
     const auto index = int(type);
-    return index < m_overlays.size() ? m_overlays[index] : nullptr;
+    return index < (int) m_overlays.size() ? m_overlays[index] : nullptr;
 }
 
 void ExportSettingsDialog::Private::setMediaPreviewWidget(nx::vms::client::desktop::AsyncImageWidget* widget)

@@ -15,22 +15,24 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/resource/screen_recording/desktop_data_provider_base.h>
+#include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <nx/vms/client/desktop/export/tools/export_storage_stream_recorder.h>
+#include <nx/vms/client/desktop/resource/screen_recording/desktop_data_provider_wrapper.h>
+#include <nx/vms/client/desktop/resource/screen_recording/video_recorder_settings.h>
 #include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
 #include <nx/vms/time/formatter.h>
-#include <plugins/resource/desktop_camera/desktop_data_provider_base.h>
-#include <plugins/resource/desktop_win/desktop_resource.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_messages.h>
 #include <ui/dialogs/common/message_box.h>
-#include <ui/screen_recording/video_recorder_settings.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <utils/common/delayed.h>
 
 using namespace std::chrono;
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 
 namespace {
@@ -130,8 +132,8 @@ void QnWorkbenchScreenRecordingHandler::startRecordingCountdown()
     if (!screenRecordingAction)
         return;
 
-    const auto desktop = resourcePool()->getResourceById<QnDesktopResource>(
-        QnDesktopResource::getDesktopResourceUuid());
+    const auto desktop = resourcePool()->getResourceById<core::DesktopResource>(
+        core::DesktopResource::getDesktopResourceUuid());
 
     if (!desktop)
     {
@@ -200,24 +202,24 @@ void QnWorkbenchScreenRecordingHandler::startRecordingInternal()
     if (!NX_ASSERT(screenRecordingAction))
         return;
 
-    QnVideoRecorderSettings recorderSettings;
+    VideoRecorderSettings recorderSettings;
 
     QDateTime dt = QDateTime::currentDateTime();
     QString filePath = recorderSettings.recordingFolder() + QString(lit("/")) +
         nx::utils::replaceNonFileNameCharacters(
             QString(lit("video_recording_%1.avi"))
                 .arg(nx::vms::time::toString(dt, nx::vms::time::Format::filename_date)), QLatin1Char('_'));
-    QnAudioDeviceInfo audioDevice = recorderSettings.primaryAudioDevice();
-    QnAudioDeviceInfo secondAudioDevice;
+    core::AudioDeviceInfo audioDevice = recorderSettings.primaryAudioDevice();
+    core::AudioDeviceInfo secondAudioDevice;
     if (recorderSettings.secondaryAudioDevice().fullName() != audioDevice.fullName())
         secondAudioDevice = recorderSettings.secondaryAudioDevice();
-    if (QnAudioDeviceInfo::availableDevices(QAudio::AudioInput).isEmpty()) {
-        audioDevice = QnAudioDeviceInfo(); // no audio devices
-        secondAudioDevice = QnAudioDeviceInfo();
+    if (core::AudioDeviceInfo::availableDevices(QAudio::AudioInput).isEmpty()) {
+        audioDevice = core::AudioDeviceInfo(); // no audio devices
+        secondAudioDevice = core::AudioDeviceInfo();
     }
 
-    const QnDesktopResourcePtr res =
-        resourcePool()->getResourceById<QnDesktopResource>(QnDesktopResource::getDesktopResourceUuid());
+    const auto res = resourcePool()->getResourceById<core::DesktopResource>(
+        core::DesktopResource::getDesktopResourceUuid());
 
     if (!res)
     {
@@ -225,7 +227,7 @@ void QnWorkbenchScreenRecordingHandler::startRecordingInternal()
         return;
     }
 
-    m_dataProvider.reset(dynamic_cast<QnDesktopDataProviderWrapper*>(
+    m_dataProvider.reset(dynamic_cast<DesktopDataProviderWrapper*>(
         qnClientCoreModule->dataProviderFactory()->createDataProvider(res)));
     m_recorder.reset(new nx::vms::client::desktop::ExportStorageStreamRecorder(res->toResourcePtr(), m_dataProvider.get()));
     m_dataProvider->addDataProcessor(m_recorder.data());

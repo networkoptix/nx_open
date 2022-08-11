@@ -15,7 +15,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/user_roles_manager.h>
-#include <nx/vms/client/desktop/resources/layout_snapshot_manager.h>
+#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
