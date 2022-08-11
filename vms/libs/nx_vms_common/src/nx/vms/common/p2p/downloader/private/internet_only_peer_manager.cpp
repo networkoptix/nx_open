@@ -71,7 +71,8 @@ AbstractPeerManager::RequestContextPtr<nx::Buffer> InternetOnlyPeerManager::down
     const QString& /*fileName*/,
     const utils::Url& url,
     int chunkIndex,
-    int chunkSize)
+    int chunkSize,
+    qint64 fileSize)
 {
     constexpr milliseconds kDownloadRequestTimeout = 1min;
 
@@ -87,7 +88,7 @@ AbstractPeerManager::RequestContextPtr<nx::Buffer> InternetOnlyPeerManager::down
 
     const qint64 pos = chunkIndex * chunkSize;
     httpClient->addAdditionalHeader("Range",
-        nx::format("bytes=%1-%2").arg(pos).arg(pos + chunkSize - 1).toStdString());
+        nx::format("bytes=%1-%2", pos, std::min(pos + chunkSize, fileSize) - 1).toStdString());
 
     auto promise = std::make_shared<std::promise<std::optional<nx::Buffer>>>();
 

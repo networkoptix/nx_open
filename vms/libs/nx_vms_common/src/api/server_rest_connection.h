@@ -315,7 +315,7 @@ public:
     Handle downloadFileChunk(
         const QnUuid& serverId,
         const QString& fileName,
-        int index,
+        int chunkIndex,
         Result<QByteArray>::type callback,
         QThread* targetThread = nullptr);
 
@@ -325,6 +325,7 @@ public:
         const nx::utils::Url &url,
         int chunkIndex,
         int chunkSize,
+        qint64 fileSize,
         Result<QByteArray>::type callback,
         QThread* targetThread = nullptr);
 

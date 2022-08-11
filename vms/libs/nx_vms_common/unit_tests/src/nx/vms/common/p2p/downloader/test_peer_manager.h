@@ -103,7 +103,8 @@ public:
         const QString& fileName,
         const nx::utils::Url& url,
         int chunkIndex,
-        int chunkSize) override;
+        int chunkSize,
+        qint64 fileSize) override;
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle);
 
@@ -190,7 +191,8 @@ public:
         const QString& fileName,
         const nx::utils::Url& url,
         int chunkIndex,
-        int chunkSize) override;
+        int chunkSize,
+        qint64 fileSize) override;
 
 private:
     TestPeerManager* m_peerManager;
