@@ -489,18 +489,17 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
     m_eventLogPeriodDaysAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "eventLogPeriodDays", 30, this, [] { return tr("Event log period (days)"); });
 
-    m_trafficEncryptionForcedAdaptor = new QnLexicalResourcePropertyAdaptor<QnOptionalBool>(
-        Names::trafficEncryptionForced, QnOptionalBool(), this,
+    m_trafficEncryptionForcedAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        Names::trafficEncryptionForced, true, this,
         [] { return tr("Enforce HTTPS (data traffic encryption)"); });
 
     m_videoTrafficEncryptionForcedAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        "videoTrafficEncryptionForced", false, this,
+        Names::videoTrafficEncryptionForced, false, this,
         [] { return tr("Enforce RTSPS (video traffic encryption)"); });
 
     m_exposeDeviceCredentialsAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        "exposeDeviceCredentials",
-        true,
-        this);
+        Names::exposeDeviceCredentials, true, this,
+        [] { return tr("Expose Device passwords storred in VMS for administrators (for web-pages)"); });
 
     m_autoDiscoveryEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "autoDiscoveryEnabled", true, this,
@@ -739,7 +738,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         "useHttpsOnlyForCameras", false, this, [] { return tr("Use only HTTPS for Cameras"); });
 
     m_insecureDeprecatedApiEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        Names::insecureDeprecatedApiEnabled, true, this,
+        Names::insecureDeprecatedApiEnabled, false, this,
         [] { return tr("Enable insecure deprecated API functions"); });
 
     m_insecureDeprecatedApiInUseEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
@@ -1216,18 +1215,12 @@ std::chrono::days SystemSettings::eventLogPeriodDays() const
 
 bool SystemSettings::isTrafficEncryptionForced() const
 {
-    const auto setting = m_trafficEncryptionForcedAdaptor->value();
-    return setting.isDefined() && setting.value();
-}
-
-bool SystemSettings::isTrafficEncryptionForcedExplicitlyDefined() const
-{
-    return m_trafficEncryptionForcedAdaptor->value().isDefined();
+    return m_trafficEncryptionForcedAdaptor->value();
 }
 
 void SystemSettings::setTrafficEncryptionForced(bool value)
 {
-    m_trafficEncryptionForcedAdaptor->setValue(QnOptionalBool(value));
+    m_trafficEncryptionForcedAdaptor->setValue(value);
 }
 
 bool SystemSettings::isVideoTrafficEncryptionForced() const
