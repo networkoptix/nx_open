@@ -58,7 +58,7 @@ void initialize(Manager* manager, Action* root)
     factory(MoveCameraAction)
         .flags(ResourceTarget | SingleTarget | MultiTarget)
         .requiredTargetPermissions(Qn::RemovePermission)
-        .condition(condition::hasFlags(Qn::network, MatchMode::Any));
+        .condition(condition::hasFlags(Qn::network, MatchMode::any));
 
     factory(NextLayoutAction)
         .flags(GlobalHotkey)
@@ -151,7 +151,7 @@ void initialize(Manager* manager, Action* root)
             condition::hasFlags(
                 /*require*/ Qn::live_cam,
                 /*exclude*/ Qn::cross_system,
-                MatchMode::Any)
+                MatchMode::any)
             && !condition::tourIsRunning());
 
     factory(OpenBusinessLogAction)
@@ -177,7 +177,7 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .flags(NoTarget | SingleTarget | ResourceTarget)
         .requiredGlobalPermission(GlobalPermission::manageBookmarks)
-        .condition(condition::hasFlags(Qn::live_cam, MatchMode::All));
+        .condition(condition::hasFlags(Qn::live_cam, MatchMode::all));
 
     factory(StartVideoWallControlAction)
         .flags(Tree | VideoWallReviewScene | SingleTarget | MultiTarget | VideoWallItemTarget)
@@ -520,11 +520,12 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .flags(Scene | NoTarget | GlobalHotkey)
         .text(ContextMenu::tr("Save Current Layout As..."))
-        .shortcut(lit("Ctrl+Shift+S"))
-        .shortcut(lit("Ctrl+Alt+S"), Builder::Windows, false)
+        .shortcut("Ctrl+Shift+S")
+        .shortcut(QKeySequence("Ctrl+Alt+S"), Builder::Windows, false)
         .autoRepeat(false)
-        .condition(condition::isLoggedIn()
-            && ConditionWrapper(new SaveLayoutAsCondition(true))
+        .condition(
+            condition::isLoggedIn()
+            && condition::applyToCurrentLayout(condition::canSaveLayoutAs())
             && !condition::isLayoutTourReviewMode()
             && !condition::tourIsRunning());
 
@@ -533,11 +534,13 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | NoTarget)
         .text(ContextMenu::tr("Save Current Layout As Cloud..."))
         .autoRepeat(false)
-        .condition(condition::isLoggedIn()
-            && ConditionWrapper(new SaveLayoutAsCondition(/*useCurrentLayout*/ true))
+        .condition(
+            condition::isLoggedIn()
             && condition::isLoggedInToCloud()
             && condition::isTrue(ini().crossSystemLayouts)
-            && !condition::isCloudLayout(/*useCurrentLayout*/ true)
+            && condition::applyToCurrentLayout(
+                condition::canSaveLayoutAs()
+                && condition::hasFlags(Qn::cross_system, MatchMode::none))
             && !condition::isLayoutTourReviewMode()
             && !condition::tourIsRunning());
 
@@ -1052,7 +1055,7 @@ void initialize(Manager* manager, Action* root)
         .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission)
         .text(ContextMenu::tr("Open"))
         .conditionalText(ContextMenu::tr("Monitor"),
-            condition::hasFlags(Qn::server, MatchMode::All))
+            condition::hasFlags(Qn::server, MatchMode::all))
         .condition(
             ConditionWrapper(new OpenInCurrentLayoutCondition())
             && !condition::isLayoutTourReviewMode());
@@ -1062,7 +1065,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | Table | Scene | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget | WidgetTarget)
         .text(ContextMenu::tr("Open in New Tab"))
         .conditionalText(ContextMenu::tr("Monitor in New Tab"),
-            condition::hasFlags(Qn::server, MatchMode::All))
+            condition::hasFlags(Qn::server, MatchMode::all))
         .condition(new OpenInNewEntityCondition());
 
     factory(OpenInAlarmLayoutAction)
@@ -1075,7 +1078,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | Table | Scene | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget | WidgetTarget)
         .text(ContextMenu::tr("Open in New Window"))
         .conditionalText(ContextMenu::tr("Monitor in New Window"),
-            condition::hasFlags(Qn::server, MatchMode::All))
+            condition::hasFlags(Qn::server, MatchMode::all))
         .condition(
             ConditionWrapper(new OpenInNewEntityCondition())
             && ConditionWrapper(new LightModeCondition(Qn::LightModeNoNewWindow))
@@ -1088,7 +1091,7 @@ void initialize(Manager* manager, Action* root)
     factory(OpenVideoWallReviewAction)
         .flags(Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Open Video Wall"))
-        .condition(condition::hasFlags(Qn::videowall, MatchMode::Any));
+        .condition(condition::hasFlags(Qn::videowall, MatchMode::any));
 
     factory(OpenInFolderAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
@@ -1111,7 +1114,7 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Attach to Video Wall..."))
         .autoRepeat(false)
         .condition(
-            condition::hasFlags(Qn::videowall, MatchMode::Any)
+            condition::hasFlags(Qn::videowall, MatchMode::any)
         );
 
     factory(StartVideoWallAction)
@@ -1199,21 +1202,14 @@ void initialize(Manager* manager, Action* root)
     factory(SaveLocalLayoutAction)
         .flags(SingleTarget | ResourceTarget)
         .requiredTargetPermissions(Qn::SavePermission)
-        .condition(condition::hasFlags(Qn::layout, MatchMode::All));
-
-    factory(SaveLayoutAsAction) // TODO: #sivanov Check canCreateResource permission.
-        .flags(SingleTarget | ResourceTarget)
-        .requiredTargetPermissions(Qn::UserResourceRole, Qn::SavePermission)
-        .condition(
-            ConditionWrapper(new SaveLayoutAsCondition(false))
-            && !condition::isLayoutTourReviewMode()
-        );
+        .condition(condition::hasFlags(Qn::layout, MatchMode::all));
 
     factory(SaveLayoutForCurrentUserAsAction) // TODO: #sivanov Check canCreateResource permission.
         .flags(TitleBar | Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Save Layout As..."))
         .condition(
-            ConditionWrapper(new SaveLayoutAsCondition(false))
+            condition::isLoggedIn()
+            && condition::canSaveLayoutAs()
             && !condition::isLayoutTourReviewMode()
         );
 
@@ -1221,10 +1217,10 @@ void initialize(Manager* manager, Action* root)
         .flags(TitleBar | Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Save Layout As Cloud..."))
         .condition(
-            ConditionWrapper(new SaveLayoutAsCondition(/*useCurrentLayout*/ false))
+            condition::canSaveLayoutAs()
             && condition::isLoggedInToCloud()
             && condition::isTrue(ini().crossSystemLayouts)
-            && !condition::isCloudLayout(/*useCurrentLayout*/ false)
+            && condition::hasFlags(Qn::cross_system, MatchMode::none)
         );
 
     factory()
@@ -1346,7 +1342,7 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Check File Watermark"))
         .shortcut(lit("Alt+C"))
         .autoRepeat(false)
-        .condition(condition::hasFlags(Qn::local_video, MatchMode::Any)
+        .condition(condition::hasFlags(Qn::local_video, MatchMode::any)
             && !condition::tourIsRunning()
             && !condition::isLayoutTourReviewMode());
 
@@ -1483,7 +1479,7 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Page..."))
         .childFactory(new WebPageFactory(manager))
         .autoRepeat(false)
-        .condition(condition::hasFlags(Qn::web_page, MatchMode::ExactlyOne));
+        .condition(condition::hasFlags(Qn::web_page, MatchMode::exactlyOne));
 
     factory(RenameResourceAction)
         .flags(Tree | SingleTarget | MultiTarget | ResourceTarget | IntentionallyAmbiguous)
@@ -1509,14 +1505,14 @@ void initialize(Manager* manager, Action* root)
         .requiredGlobalPermission(GlobalPermission::admin)
         .text(ContextMenu::tr("Web Page Settings..."))
         .autoRepeat(false)
-        .condition(condition::hasFlags(Qn::web_page, MatchMode::ExactlyOne)
+        .condition(condition::hasFlags(Qn::web_page, MatchMode::exactlyOne)
             && !condition::tourIsRunning());
 
     factory(DeleteFromDiskAction)
         .flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget)
         .text(ContextMenu::tr("Delete from Disk"))
         .autoRepeat(false)
-        .condition(condition::hasFlags(Qn::local_media, MatchMode::All)
+        .condition(condition::hasFlags(Qn::local_media, MatchMode::all)
             && condition::isTrue(ini().allowDeleteLocalFiles));
 
     factory(SetAsBackgroundAction)
@@ -1528,14 +1524,14 @@ void initialize(Manager* manager, Action* root)
             && ConditionWrapper(new LightModeCondition(Qn::LightModeNoLayoutBackground))
             && !condition::tourIsRunning()
             && condition::applyToCurrentLayout(
-                condition::hasFlags(/*require*/ {}, /*exclude*/ Qn::cross_system, MatchMode::All)
+                condition::hasFlags(Qn::cross_system, MatchMode::none)
             ));
 
     factory(UserSettingsAction)
         .flags(Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("User Settings..."))
         .requiredTargetPermissions(Qn::ReadPermission)
-        .condition(condition::hasFlags(Qn::user, MatchMode::Any));
+        .condition(condition::hasFlags(Qn::user, MatchMode::any));
 
     factory(UserRolesAction)
         .flags(Tree | NoTarget)
@@ -1599,7 +1595,7 @@ void initialize(Manager* manager, Action* root)
             condition::hasFlags(
                 /*require*/ Qn::live_cam,
                 /*exclude*/ Qn::cross_system | Qn::virtual_camera,
-                MatchMode::All)
+                MatchMode::all)
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope,
                 !condition::isLayoutTourReviewMode()
@@ -1619,7 +1615,7 @@ void initialize(Manager* manager, Action* root)
             condition::hasFlags(
                 /*require*/ Qn::live_cam,
                 /*exclude*/ Qn::cross_system | Qn::virtual_camera,
-                MatchMode::Any)
+                MatchMode::any)
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope,
                 !condition::isLayoutTourReviewMode()
@@ -1638,7 +1634,7 @@ void initialize(Manager* manager, Action* root)
         .condition(condition::hasFlags(
                 /*require*/ Qn::live_cam,
                 /*exclude*/ Qn::cross_system,
-                MatchMode::All)
+                MatchMode::all)
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope,
                 !condition::isLayoutTourReviewMode()
@@ -1653,7 +1649,7 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
         .text(ContextMenu::tr("File Settings..."))
-        .condition(condition::hasFlags(Qn::local_media, MatchMode::Any)
+        .condition(condition::hasFlags(Qn::local_media, MatchMode::any)
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope,
                 !condition::isLayoutTourReviewMode()
@@ -1670,7 +1666,7 @@ void initialize(Manager* manager, Action* root)
     factory(VideowallSettingsAction)
         .flags(Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Video Wall Settings..."))
-        .condition(condition::hasFlags(Qn::videowall, MatchMode::ExactlyOne)
+        .condition(condition::hasFlags(Qn::videowall, MatchMode::exactlyOne)
             && ConditionWrapper(new AutoStartAllowedCondition())
         );
 
@@ -1683,7 +1679,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
         .text(ContextMenu::tr("Add Device..."))   //intentionally hardcode devices here
         .requiredGlobalPermission(GlobalPermission::admin)
-        .condition(condition::hasFlags(Qn::remote_server, MatchMode::ExactlyOne)
+        .condition(condition::hasFlags(Qn::remote_server, MatchMode::exactlyOne)
             && ConditionWrapper(new EdgeServerCondition(false))
             && !ConditionWrapper(new FakeServerCondition(true))
             && !condition::tourIsRunning()
@@ -1693,7 +1689,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
         .text(ContextMenu::tr("Add Proxied Web Page..."))
         .requiredGlobalPermission(GlobalPermission::admin)
-        .condition(condition::hasFlags(Qn::remote_server, MatchMode::ExactlyOne)
+        .condition(condition::hasFlags(Qn::remote_server, MatchMode::exactlyOne)
             && ConditionWrapper(new EdgeServerCondition(false))
             && !ConditionWrapper(new FakeServerCondition(true))
             && !condition::tourIsRunning()
@@ -1707,7 +1703,7 @@ void initialize(Manager* manager, Action* root)
             ContextMenu::tr("Cameras List by Server...")
         ))
         .requiredGlobalPermission(GlobalPermission::admin)
-        .condition(condition::hasFlags(Qn::remote_server, MatchMode::ExactlyOne)
+        .condition(condition::hasFlags(Qn::remote_server, MatchMode::exactlyOne)
             && ConditionWrapper(new EdgeServerCondition(false))
             && !ConditionWrapper(new FakeServerCondition(true))
             && !condition::tourIsRunning()
@@ -1720,7 +1716,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
         .text(ContextMenu::tr("Server Logs..."))
         .requiredGlobalPermission(GlobalPermission::admin)
-        .condition(condition::hasFlags(Qn::remote_server, MatchMode::ExactlyOne)
+        .condition(condition::hasFlags(Qn::remote_server, MatchMode::exactlyOne)
             && !ConditionWrapper(new FakeServerCondition(true))
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
@@ -1729,7 +1725,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
         .text(ContextMenu::tr("Server Diagnostics..."))
         .requiredGlobalPermission(GlobalPermission::viewLogs)
-        .condition(condition::hasFlags(Qn::remote_server, MatchMode::ExactlyOne)
+        .condition(condition::hasFlags(Qn::remote_server, MatchMode::exactlyOne)
             && !ConditionWrapper(new FakeServerCondition(true))
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
@@ -1738,9 +1734,9 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget)
         .text(ContextMenu::tr("Server Web Page..."))
         .requiredGlobalPermission(GlobalPermission::admin)
-        .condition(condition::hasFlags(Qn::remote_server, MatchMode::ExactlyOne)
+        .condition(condition::hasFlags(Qn::remote_server, MatchMode::exactlyOne)
             && !ConditionWrapper(new FakeServerCondition(true))
-            && !ConditionWrapper(new CloudServerCondition(MatchMode::Any))
+            && !ConditionWrapper(new CloudServerCondition(MatchMode::any))
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
 
@@ -1752,7 +1748,7 @@ void initialize(Manager* manager, Action* root)
             condition::hasFlags(
                 /*require*/ Qn::remote_server,
                 /*exclude*/ Qn::cross_system,
-                MatchMode::ExactlyOne)
+                MatchMode::exactlyOne)
             && !ConditionWrapper(new FakeServerCondition(true))
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
@@ -1959,7 +1955,7 @@ void initialize(Manager* manager, Action* root)
         .condition(condition::hasFlags(
             /*require*/ Qn::live_cam,
             /*exclude*/ Qn::cross_system,
-            MatchMode::Any)
+            MatchMode::any)
         && condition::isTrue(ini().calibratePtzActions));
 
     factory(DebugGetPtzPositionAction)
@@ -1968,7 +1964,7 @@ void initialize(Manager* manager, Action* root)
         .condition(condition::hasFlags(
             /*require*/ Qn::live_cam,
             /*exclude*/ Qn::cross_system,
-            MatchMode::Any)
+            MatchMode::any)
         && condition::isTrue(ini().calibratePtzActions));
 
     factory(PlayPauseAction)
