@@ -9963,11 +9963,6 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
         <translation></translation>
     </message>
     <message>
-        <source>It is recommended to have user session lifetime not greater than %1</source>
-        <comment>%1 is the time span with time units</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>Learn more.</source>
         <translation></translation>
     </message>
@@ -9978,6 +9973,11 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
             <numerusform>%n out of %1 users is allowed to use digest authentication (not secure).</numerusform>
             <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>The recommended maximum user session lifetime is %1</source>
+        <comment>%1 is the time span with time units</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9998,10 +9998,6 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
 <context>
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
     <message>
-        <source>The certificate is pinned to %1</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>The certificate was presented by %1</source>
         <translation></translation>
     </message>
@@ -10015,10 +10011,6 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
         <source>Custom certificate</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Pinned certificate</source>
         <translation></translation>
     </message>
     <message>
@@ -10040,6 +10032,14 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message>
         <source>Someone may be impersonating %1 to steal your personal information.
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-generated certificate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The certificate is auto-generated and pinned to %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -1758,7 +1758,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to backup file</source>
+        <source>Failed to backup file %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
