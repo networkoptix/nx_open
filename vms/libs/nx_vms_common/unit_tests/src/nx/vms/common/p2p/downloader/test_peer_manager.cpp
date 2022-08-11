@@ -205,7 +205,8 @@ AbstractPeerManager::RequestContextPtr<nx::Buffer> TestPeerManager::downloadChun
     const QString& fileName,
     const utils::Url &url,
     int chunkIndex,
-    int chunkSize)
+    int chunkSize,
+    qint64 /*fileSize*/)
 {
     m_requestCounter.incrementCounters(peerId, RequestCounter::DownloadChunkRequest);
 
@@ -501,10 +502,11 @@ AbstractPeerManager::RequestContextPtr<nx::Buffer> ProxyTestPeerManager::downloa
     const QString& fileName,
     const utils::Url &url,
     int chunkIndex,
-    int chunkSize)
+    int chunkSize,
+    qint64 fileSize)
 {
     m_requestCounter.incrementCounters(peerId, RequestCounter::DownloadChunkRequest);
-    return m_peerManager->downloadChunk(peerId, fileName, url, chunkIndex, chunkSize);
+    return m_peerManager->downloadChunk(peerId, fileName, url, chunkIndex, chunkSize, fileSize);
 }
 
 TestPeerManager::FileInformation::FileInformation(const downloader::FileInformation& fileInfo):

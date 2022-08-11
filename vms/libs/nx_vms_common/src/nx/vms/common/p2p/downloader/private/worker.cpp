@@ -656,7 +656,7 @@ void Worker::downloadChunks()
                 peer, chunk, peerInfo.rank, peerInfo.averageChunkDownloadTime);
 
             auto context = peer.manager->downloadChunk(
-                peer.id, m_fileName, fileInfo.url, chunk, (int) fileInfo.chunkSize);
+                peer.id, m_fileName, fileInfo.url, chunk, (int) fileInfo.chunkSize, fileInfo.size);
             if (context && context->isValid())
             {
                 chunkRequested = true;
