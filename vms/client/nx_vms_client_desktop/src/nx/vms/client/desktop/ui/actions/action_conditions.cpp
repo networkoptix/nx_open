@@ -831,45 +831,6 @@ ActionVisibility SaveLayoutCondition::check(
         : DisabledAction;
 }
 
-SaveLayoutAsCondition::SaveLayoutAsCondition(bool isCurrent):
-    m_current(isCurrent)
-{
-}
-
-ActionVisibility SaveLayoutAsCondition::check(const QnResourceList& resources, QnWorkbenchContext* context)
-{
-    if (!context->user())
-        return InvisibleAction;
-
-    QnLayoutResourcePtr layout;
-    if (m_current)
-    {
-        layout = context->workbench()->currentLayout()->resource();
-    }
-    else
-    {
-        if (resources.size() != 1)
-            return InvisibleAction;
-
-        layout = resources[0].dynamicCast<QnLayoutResource>();
-    }
-
-    if (!layout)
-        return InvisibleAction;
-
-    if (layout->isServiceLayout())
-        return InvisibleAction;
-
-    if (layout->data().contains(Qn::VideoWallResourceRole))
-        return InvisibleAction;
-
-    /* Save as.. for exported layouts works very strange, disabling it for now. */
-    if (layout->isFile())
-        return InvisibleAction;
-
-    return EnabledAction;
-}
-
 LayoutCountCondition::LayoutCountCondition(int minimalRequiredCount):
     m_minimalRequiredCount(minimalRequiredCount)
 {
@@ -1379,7 +1340,7 @@ ActionVisibility ChangeResolutionCondition::check(const Parameters& parameters,
     if (cameras.empty())
         return InvisibleAction;
 
-    const bool supported = isRadassSupported(cameras, MatchMode::Any);
+    const bool supported = isRadassSupported(cameras, MatchMode::any);
     return supported ? EnabledAction : DisabledAction;
 }
 
@@ -2258,7 +2219,7 @@ ConditionWrapper canMakeShowreel()
         {
             const auto layout = resource.dynamicCast<QnLayoutResource>();
             return layout && !layout::isEncrypted(layout) && !layout->hasFlags(Qn::cross_system);
-        }, MatchMode::All);
+        }, MatchMode::all);
 }
 
 ConditionWrapper isWorkbenchVisible()
@@ -2336,27 +2297,6 @@ ConditionWrapper showBetaUpgradeWarning()
         });
 }
 
-ConditionWrapper isCloudLayout(bool useCurrentLayout)
-{
-    auto isCloud =
-        [](const QnResourcePtr& resource) -> bool
-        {
-            return resource.dynamicCast<CrossSystemLayoutResource>();
-        };
-
-    if (useCurrentLayout)
-    {
-        return new CustomBoolCondition(
-            [isCloud](const Parameters& /*parameters*/, QnWorkbenchContext* context)
-            {
-                return isCloud(context->workbench()->currentLayout()->resource());
-            }
-        );
-    }
-
-    return new ResourceCondition(isCloud, MatchMode::All);
-}
-
 ConditionWrapper isCloudSystemConnectionUserInteractionRequired()
 {
     return new CustomBoolCondition(
@@ -2372,8 +2312,36 @@ ConditionWrapper isCloudSystemConnectionUserInteractionRequired()
     );
 }
 
-} // namespace condition
+ConditionWrapper canSaveLayoutAs()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& parameters, QnWorkbenchContext* /*context*/)
+        {
+            auto resources = parameters.resources();
+            if (resources.size() != 1)
+                return false;
 
+            auto layout = resources[0].dynamicCast<QnLayoutResource>();
+
+            if (!layout)
+                return false;
+
+            if (layout->isServiceLayout())
+                return false;
+
+            if (layout->data().contains(Qn::VideoWallResourceRole))
+                return false;
+
+            /* Save as.. for exported layouts works very strange, disabling it for now. */
+            if (layout->isFile())
+                return false;
+
+            return true;
+        }
+    );
+}
+
+} // namespace condition
 } // namespace action
 } // namespace ui
 } // namespace nx::vms::client::desktop

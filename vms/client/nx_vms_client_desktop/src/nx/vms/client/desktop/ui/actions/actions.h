@@ -589,15 +589,6 @@ enum IDType
     SaveLocalLayoutAction,
 
     /**
-     * Saves selected layout under another name.
-     *
-     * Parameters:
-     * <tt>QnUserResourcePtr UserResourceRole</tt> --- user to assign layout to.
-     * <tt>QString ResourceNameRole</tt> --- name for the new layout.
-     */
-    SaveLayoutAsAction,
-
-    /**
      * Saves selected layout as a cloud layout for the current user.
      */
     SaveLayoutAsCloudAction,
@@ -625,9 +616,6 @@ enum IDType
 
     /**
      * Saves selected layout under another name in current user's layouts list.
-     *
-     * Parameters:
-     * <tt>QString ResourceNameRole</tt> --- name for the new layout.
      */
     SaveLayoutForCurrentUserAsAction,
 

@@ -6,9 +6,17 @@ namespace nx::vms::client::desktop {
 
 enum class MatchMode
 {
-    Any,            //< Match if at least one element satisfies the condition.
-    All,            //< Match only if all elements satisfy the condition.
-    ExactlyOne      //< Match only if exactly one element satisfies condition.
+    /** Match if at least one element satisfies the condition. */
+    any,
+
+    /** Matches if all elements satisfy the condition. */
+    all,
+
+    /* Matches if exactly one element satisfies condition. */
+    exactlyOne,
+
+    /** Matches if no elements satisfy the condition. */
+    none,
 };
 
 enum class ConditionResult

@@ -240,19 +240,6 @@ private:
 };
 
 /**
- * Condition for saving of a layout with a new name.
- */
-class SaveLayoutAsCondition: public Condition
-{
-public:
-    SaveLayoutAsCondition(bool isCurrent);
-    virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
-
-private:
-    bool m_current;
-};
-
-/**
  * Condition based on the count of layouts that are currently open.
  */
 class LayoutCountCondition: public Condition
@@ -746,11 +733,11 @@ ConditionWrapper joystickConnected();
  */
 ConditionWrapper showBetaUpgradeWarning();
 
-/** Checks if the provided Resource is a Cloud Layout. */
-ConditionWrapper isCloudLayout(bool useCurrentLayout);
-
 /** Checks whether the provided id belongs to a cloud system which requires user interaction. */
 ConditionWrapper isCloudSystemConnectionUserInteractionRequired();
+
+/** Checks if "Save Layout As..." action is applicable. */
+ConditionWrapper canSaveLayoutAs();
 
 } // namespace condition
 

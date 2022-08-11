@@ -32,7 +32,6 @@ private:
     void at_newUserLayoutAction_triggered();
     void at_saveLayoutAction_triggered();
     void at_saveCurrentLayoutAction_triggered();
-    void at_saveLayoutAsAction_triggered();
     void at_saveLayoutAsCloudAction_triggered();
     void at_saveLayoutForCurrentUserAsAction_triggered();
     void at_saveCurrentLayoutAsAction_triggered();
@@ -55,9 +54,14 @@ private:
      */
     void saveLayout(const QnLayoutResourcePtr& layout);
 
-    void saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUserResourcePtr &user);
+    /** Save a copy of remote layout for the current user. */
+    void saveRemoteLayoutAs(const QnLayoutResourcePtr& layout);
 
+    /** Save common remote layout as a cloud one. */
     void saveLayoutAsCloud(const QnLayoutResourcePtr& layout);
+
+    /** Save existing cloud layout under another name. */
+    void saveCloudLayoutAs(const QnLayoutResourcePtr& layout);
 
     void removeLayoutItems(const QnLayoutItemIndexList& items, bool autoSave);
 
