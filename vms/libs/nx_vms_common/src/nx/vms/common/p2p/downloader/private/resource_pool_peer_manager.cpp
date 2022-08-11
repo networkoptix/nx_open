@@ -255,7 +255,8 @@ AbstractPeerManager::RequestContextPtr<nx::Buffer> ResourcePoolPeerManager::down
     const QString& fileName,
     const nx::utils::Url& url,
     int chunkIndex,
-    int chunkSize)
+    int chunkSize,
+    qint64 fileSize)
 {
     const auto& connection = getConnection(peerId);
     if (!connection)
@@ -280,7 +281,7 @@ AbstractPeerManager::RequestContextPtr<nx::Buffer> ResourcePoolPeerManager::down
     if (d->allowIndirectInternetRequests)
     {
         handle = connection->downloadFileChunkFromInternet(
-            peerId, fileName, url, chunkIndex, chunkSize, handleReply);
+            peerId, fileName, url, chunkIndex, chunkSize, fileSize, handleReply);
     }
     else
     {
