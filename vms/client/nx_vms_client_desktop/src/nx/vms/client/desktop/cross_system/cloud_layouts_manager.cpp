@@ -25,6 +25,7 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <utils/common/delayed.h>
 #include <watchers/cloud_status_watcher.h>
 
 #include "cross_system_layout_resource.h"
@@ -107,6 +108,9 @@ struct CloudLayoutsManager::Private
         QnResourceList newlyCreatedLayouts;
         for (const auto& layoutData: layouts)
         {
+            if (layoutData.id.isNull())
+                continue;
+
             if (auto existingLayout = resourcePool->getResourceById<CrossSystemLayoutResource>(
                 layoutData.id))
             {
@@ -152,7 +156,7 @@ struct CloudLayoutsManager::Private
         Request request = makeRequest();
         auto url = endpoint;
         url.setPath(kLayoutsPath);
-        url.setQuery("matchPrefix");
+        url.setQuery("matchPrefix&responseType=dataOnly");
         networkManager->doGet(
             std::move(request),
             std::move(url),
@@ -188,6 +192,13 @@ struct CloudLayoutsManager::Private
 
     void sendSaveLayoutRequest(const nx::vms::api::LayoutData& layout, SaveCallback callback)
     {
+        if (!NX_ASSERT(!layout.id.isNull(), "Saving layout with null id"))
+        {
+            if (callback)
+                executeDelayedParented([callback] { callback(/*success*/ false); }, q);
+            return;
+        }
+
         Request request = makeRequest();
         auto url = endpoint;
         url.setPath(nx::format(kParticularLayoutPathTemplate, layout.id.toSimpleString()));
@@ -246,6 +257,7 @@ struct CloudLayoutsManager::Private
 
         auto cloudLayout = CrossSystemLayoutResourcePtr(new CrossSystemLayoutResource());
         layout->cloneTo(cloudLayout);
+        cloudLayout->setIdUnsafe(QnUuid::createUuid());
         cloudLayout->setParentId(QnUuid());
         cloudLayout->addFlags(Qn::local);
         cloudLayout->setName(nx::utils::generateUniqueString(

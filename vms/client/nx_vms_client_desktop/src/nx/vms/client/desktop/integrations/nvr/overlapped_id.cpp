@@ -39,7 +39,7 @@ void OverlappedIdIntegration::registerActions(ui::action::MenuFactory* factory)
         .flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget)
         .text(tr("Overlapped ID..."))
         .requiredGlobalPermission(GlobalPermission::viewArchive)
-        .condition(condition::hasFlags(Qn::live_cam, /*exclude*/ Qn::removed, MatchMode::Any)
+        .condition(condition::hasFlags(Qn::live_cam, /*exclude*/ Qn::removed, MatchMode::any)
             && condition::scoped(
                 SceneScope,
                 !condition::isLayoutTourReviewMode()
@@ -52,7 +52,7 @@ void OverlappedIdIntegration::registerActions(ui::action::MenuFactory* factory)
                         const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
                         return camera->isNvr();
                     },
-                    MatchMode::All))
+                    MatchMode::all))
         )
         .action();
 
