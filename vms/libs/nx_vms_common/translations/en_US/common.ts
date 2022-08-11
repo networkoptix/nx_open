@@ -1498,23 +1498,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Language for mobile push notifications</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Additional local FS storage types for recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Keep IO port state on when Server connects to the Device</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Media buffer size (KB, 10KB-4Mb)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Media buffer size for audio only Devices (KB, 1Kb-1MB)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1550,15 +1538,28 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable insecure deprecated API</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable insecure deprecated API functions curently in use by Nx products</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Show mouse timeline preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Language for Cloud notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media buffer size (KB, 10KB-4MB)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media buffer size for audio only Devices (KB, 1KB-1MB)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable insecure deprecated API functions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable insecure deprecated API functions curently used by %1 software</source>
+        <comment>%1 is a company name</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1913,18 +1914,6 @@
         </translation>
     </message>
     <message>
-        <source>Connection to device was unexpectedly closed.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>RTP packet loss detected.</source>
         <translation></translation>
     </message>
@@ -2068,23 +2057,7 @@
         <translation></translation>
     </message>
     <message>
-        <source>Failed to force using camera time, it lags too much, system time will be used</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Camera time is back to normal</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Multiple %1 events have occurred</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Network address %1 is not a multicast address</source>
         <translation></translation>
     </message>
     <message>
@@ -2161,14 +2134,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>RTP error in primary stream (%1)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>RTP error in secondary stream (%1)</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Analytics Object Detected</source>
         <translation></translation>
     </message>
@@ -2218,7 +2183,53 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to backup file</source>
+        <source>RTP error in primary stream (%1).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RTP error in secondary stream (%1).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to Camera (primary stream) was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to Camera (secondary stream) was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to Device was unexpectedly closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to force using Camera time, it lags too much; System time will be used.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera time is back to normal.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Address %1 is already in use by %2 on primary stream.</source>
+        <comment>%1 is the address, %2 is the device name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Address %1 is already in use by %2 on secondary stream.</source>
+        <comment>%1 is the address, %2 is the device name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Multicast address conflict detected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network address %1 is not a multicast address.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to backup file %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

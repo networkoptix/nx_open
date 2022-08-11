@@ -153,19 +153,19 @@
         <translation></translation>
     </message>
     <message>
-        <source>This integration has no settings for this Camera.</source>
+        <source>This plugin has no settings for this Camera.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Check System Administration Settings to configure this integration.</source>
+        <source>Check System Administration Settings to configure this plugin.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This integration has no settings at System level.</source>
+        <source>This plugin has no settings at System level.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Check Camera Settings to configure this integration.</source>
+        <source>Check Camera Settings to configure this plugin.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1065,6 +1065,17 @@ to activate PTZ</source>
     <message>
         <source>Sensitivity</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>SettingsDialog</name>
+    <message>
+        <source>Enter parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This action requires some parameters to be filled.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

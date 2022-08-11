@@ -875,6 +875,21 @@
     </message>
 </context>
 <context>
+    <name>CloudLayoutsIntroDialog</name>
+    <message>
+        <source>BETA</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create the Layout?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not show again</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ConnectingToServerDialog</name>
     <message>
         <source>Connecting...</source>
@@ -1347,10 +1362,6 @@
         <source>System Settings</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Backup and Restore</source>
-        <translation></translation>
-    </message>
 </context>
 <context>
     <name>ImageControlWidget</name>
@@ -1705,6 +1716,29 @@
     </message>
 </context>
 <context>
+    <name>LogSettingsDialog</name>
+    <message>
+        <source>Logging level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Limit Max volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Split file by time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Split file by size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LoginDialog</name>
     <message>
         <source>Host</source>
@@ -1725,6 +1759,41 @@
     <message>
         <source>Test</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>LogsManagementWidget</name>
+    <message>
+        <source>Download</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset to Default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download is finished!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open files folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Retry failed</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1938,7 +2007,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>System Singnature</source>
+        <source>System Signature</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2935,8 +3004,8 @@
         <translation></translation>
     </message>
     <message>
-        <source>Custom language for mobile notifications</source>
-        <translation></translation>
+        <source>Custom language for Cloud notifications</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

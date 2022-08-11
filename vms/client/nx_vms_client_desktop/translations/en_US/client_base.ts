@@ -54,17 +54,6 @@
     </message>
 </context>
 <context>
-    <name>CloudSystemStatusItem::Private</name>
-    <message>
-        <source>Loading...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>User interaction required</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>ComboBoxUtils</name>
     <message>
         <source>multiple values</source>
@@ -564,23 +553,11 @@
         <translation></translation>
     </message>
     <message>
-        <source>Devices Rules...</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Camera Rules...</source>
         <translation></translation>
     </message>
     <message>
-        <source>Cameras Rules...</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>I/O Module Rules...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>I/O Modules Rules...</source>
         <translation></translation>
     </message>
     <message>
@@ -1036,6 +1013,14 @@
     </message>
     <message>
         <source>Replace Camera...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Current Layout As Cloud...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Layout As Cloud...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3606,14 +3591,6 @@ to %1</source>
         <source>Open Camera List</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-        <translation></translation>
-    </message>
 </context>
 <context>
     <name>QnHistogramWidget</name>
@@ -5150,6 +5127,14 @@ to %1</source>
         <source>Unlock</source>
         <translation></translation>
     </message>
+    <message>
+        <source>INFORMATION REQUIRED</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Provide</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnStorageAnalyticsWidget</name>
@@ -5443,14 +5428,6 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Routing Management</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Time Synchronization</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Users</source>
         <translation></translation>
     </message>
@@ -5463,7 +5440,19 @@ If you intended to move analytics data to another storage location, please conta
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Integrations</source>
+        <source>Time Sync</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Routing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plugins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5550,10 +5539,6 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Remote archive synchronization has been started</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Remote archive synchronization has been finished</source>
         <translation></translation>
     </message>
@@ -5562,15 +5547,7 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Remote archive synchronization has been started for the following device:</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Remote archive synchronization has been finished for the following device:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Remote archive synchronization</source>
         <translation></translation>
     </message>
     <message>
@@ -6661,10 +6638,6 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation></translation>
     </message>
     <message>
-        <source>Some devices from %1 will not be moved to %2. Move anyways?</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
         <translation></translation>
     </message>
@@ -6681,15 +6654,7 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation></translation>
     </message>
     <message>
-        <source>%1 cannot be moved between servers as it contains virtual cameras, USB or web cameras</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Virtual cameras cannot be moved between servers</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%1 cannot be moved between servers as it contains virtual cameras</source>
         <translation></translation>
     </message>
     <message>
@@ -6697,11 +6662,11 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation></translation>
     </message>
     <message>
-        <source>%1 cannot be moved between servers as it contains USB or web cameras</source>
-        <translation></translation>
+        <source>Only some of the selected devices can be moved to %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Move Group without them</source>
+        <source>Move Partially</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6984,6 +6949,17 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
         <source>All Cameras &amp; Resources</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::AdvancedSystemSettingsWidget</name>
+    <message>
+        <source>Backup and Restore</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Logs Management</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7764,7 +7740,7 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation></translation>
     </message>
     <message>
-        <source>Integrations</source>
+        <source>Plugins</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7984,6 +7960,51 @@ We recommend you not to open this web page. If you understand the risks, you can
         <source>Login to %1</source>
         <comment>%1 is the cloud name (like Nx Cloud)</comment>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::CloudCrossSystemContext</name>
+    <message>
+        <source>Inaccessible</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Information required</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::CloudLayoutsIntroDialog</name>
+    <message>
+        <source>Introducing %1 Layouts</source>
+        <comment>%1 is the short cloud name (like Cloud)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adding a Camera from another System transforms the Layout to a %1 Layout</source>
+        <comment>%1 is the short cloud name (like Cloud)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::CloudLayoutsManager</name>
+    <message>
+        <source>%1 (Copy)</source>
+        <comment>Original name will be substituted</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 (Copy %2)</source>
+        <comment>Original name will be substituted as %1, counter as %2</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8794,6 +8815,23 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
 </context>
 <context>
+    <name>nx::vms::client::desktop::LogSettingsDialog</name>
+    <message>
+        <source>Notice: Not enough information could be collected on the current Logging level.
+The Logging level &quot;%1&quot; will provide more granular information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notice: The selected Logging level may degrade the performance of the system.
+Do not forget to return the Logging level to its default setting after you have collected enough logs.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset to Default</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::client::desktop::LoginDialog</name>
     <message>
         <source>Connect to Server...</source>
@@ -8802,6 +8840,96 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
         <source>Version %1</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::LogsManagementModel</name>
+    <message>
+        <source>Unit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Client</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>none</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>warning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>debug</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>verbose</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::LogsManagementWatcher</name>
+    <message numerus="yes">
+        <source>... and %n more</source>
+        <translation type="unfinished">
+            <numerusform>... and %n more</numerusform>
+            <numerusform>... and %n more</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Debug Logging is enabled on Client</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Debug Logging is enabled on %n Servers</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Downloading file...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pending download...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n Servers</source>
+        <translation type="unfinished">
+            <numerusform>%n Server</numerusform>
+            <numerusform>%n Servers</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Logs downloaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Logs downloading failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::LogsManagementWidget</name>
+    <message>
+        <source>Select folder...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9401,6 +9529,21 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
         <source>Some users do not have access to the selected layout. Action will not work for them.</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::OverlappableSearchWidget</name>
+    <message>
+        <source>Not supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This tab will be available in future versions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Learn more</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10057,11 +10200,6 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
         <translation></translation>
     </message>
     <message>
-        <source>It is recommended to have user session lifetime not greater than %1</source>
-        <comment>%1 is the time span with time units</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>Learn more.</source>
         <translation></translation>
     </message>
@@ -10072,6 +10210,11 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
             <numerusform>%n out of %1 users is allowed to use digest authentication (not secure).</numerusform>
             <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>The recommended maximum user session lifetime is %1</source>
+        <comment>%1 is the time span with time units</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10088,10 +10231,6 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
 <context>
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
     <message>
-        <source>The certificate is pinned to %1</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>The certificate was presented by %1</source>
         <translation></translation>
     </message>
@@ -10105,10 +10244,6 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
         <source>Custom certificate</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Pinned certificate</source>
         <translation></translation>
     </message>
     <message>
@@ -10132,13 +10267,17 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Auto-generated certificate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The certificate is auto-generated and pinned to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
-    <message>
-        <source>View certificate</source>
-        <translation></translation>
-    </message>
     <message>
         <source>Connect Anyway</source>
         <translation></translation>
@@ -10146,6 +10285,10 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <message>
         <source>I trust this server</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10393,6 +10536,34 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
         <source>Undo Replace</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>SD archive found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export archive from %1 completed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export archive from %1 failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not exported archive found on Device %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not exported archive found on Camera %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export archive from %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::TileInteractionHandler</name>
@@ -10451,20 +10622,16 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
         <translation></translation>
     </message>
     <message>
-        <source>Enter parameters</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Action requires some parameters to be filled.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Open</source>
         <translation></translation>
     </message>
     <message>
         <source>Open in New Tab</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>This action is not supported for notifications from other Systems</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -11637,6 +11804,10 @@ You can select another storage location in the &quot;Storage Management&quot; ta
         <source>Some settings may not be transferred from the replaced camera due to compatibility issues.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Confirm undo replacement?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::ui::workbench::LayoutTourExecutor</name>
@@ -11703,6 +11874,10 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <message>
         <source>New Layout %1</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Save Layout As Cloud</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
