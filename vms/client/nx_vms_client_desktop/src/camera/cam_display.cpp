@@ -26,7 +26,7 @@
     #include <CoreServices/CoreServices.h>
 #elif defined(Q_OS_WIN)
     #include <qt_windows.h>
-    #include <plugins/resource/desktop_win/desktop_resource.h>
+    #include <nx/vms/client/desktop/resource/screen_recording/audio_video_win/windows_desktop_resource.h>
 #endif
 
 using namespace nx::vms::client::desktop;
@@ -164,7 +164,7 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     }
 
 #ifdef Q_OS_WIN
-    QnDesktopResourcePtr desktopResource = resource.dynamicCast<QnDesktopResource>();
+    auto desktopResource = resource.dynamicCast<WindowsDesktopResource>();
     if (desktopResource && desktopResource->isRendererSlow())
         m_forceMtDecoding = true; // not enough speed for desktop camera with aero in single thread mode because of slow rendering
 #endif

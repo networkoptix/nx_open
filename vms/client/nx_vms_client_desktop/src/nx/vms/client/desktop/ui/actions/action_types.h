@@ -118,7 +118,7 @@ enum ActionFlag
     Main = MainScope | NoTarget,
 
     /** Action can appear in scene context menu. */
-    Scene = SceneScope | WidgetTarget,
+    Scene = SceneScope | (int) WidgetTarget,
 
     /**
      * Action can appear in scene context menu in videowall review mode (target elements are
@@ -133,12 +133,12 @@ enum ActionFlag
     Table = TableScope,
 
     /** Action can appear in slider context menu. */
-    Slider = TimelineScope | WidgetTarget,
+    Slider = TimelineScope | (int) WidgetTarget,
 
     /** Action can appear in title bar context menu. */
-    TitleBar = TitleBarScope | LayoutTarget,
+    TitleBar = TitleBarScope | (int) LayoutTarget,
 
-    Notifications = NotificationsScope | WidgetTarget
+    Notifications = NotificationsScope | (int) WidgetTarget
 };
 Q_DECLARE_FLAGS(ActionFlags, ActionFlag)
 

@@ -14,7 +14,7 @@
 #include <nx/core/watermark/watermark.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
-#include <nx/vms/client/desktop/resources/layout_password_management.h>
+#include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <nx/vms/common/system_context.h>
 

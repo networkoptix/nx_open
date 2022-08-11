@@ -19,7 +19,6 @@
 #include <api/server_rest_connection.h>
 #include <camera/cam_display.h>
 #include <camera/camera_data_manager.h>
-#include <camera/loaders/caching_camera_data_loader.h> //< TODO: #sivanov Remove this dependency.
 #include <camera/resource_display.h>
 #include <client/client_globals.h>
 #include <client/client_module.h>
@@ -55,6 +54,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/media/consuming_motion_metadata_provider.h>
 #include <nx/vms/client/core/motion/motion_grid.h>
+#include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h> //< TODO: #sivanov Remove this dependency.
+#include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <nx/vms/client/core/software_trigger/software_triggers_controller.h>
 #include <nx/vms/client/core/software_trigger/software_triggers_watcher.h>
 #include <nx/vms/client/core/utils/geometry.h>
@@ -65,7 +66,7 @@
 #include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
-#include <nx/vms/client/desktop/resources/resource_descriptor.h>
+#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/scene/resource_widget/dialogs/encrypted_archive_password_dialog.h>
 #include <nx/vms/client/desktop/scene/resource_widget/private/camera_button_controller.h>
 #include <nx/vms/client/desktop/scene/resource_widget/private/media_resource_widget_p.h>
@@ -95,7 +96,6 @@
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/license/usage_helper.h>
 #include <nx/vms/time/formatter.h>
-#include <plugins/resource/desktop_camera/desktop_resource_base.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/controls/html_text_item.h>

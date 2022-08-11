@@ -5,6 +5,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
+#include <nx/core/transcoding/timestamp_format.h>
 #include <nx/vms/client/desktop/export/settings/export_media_persistent_settings.h>
 
 namespace Ui { class TimestampOverlaySettingsWidget; }
@@ -28,7 +29,7 @@ public:
 
 signals:
     void dataChanged(const ExportTimestampOverlayPersistentSettings& data);
-    void formatChanged(Qt::DateFormat format);
+    void formatChanged(nx::core::transcoding::TimestampFormat format);
     void deleteClicked();
 
 private:

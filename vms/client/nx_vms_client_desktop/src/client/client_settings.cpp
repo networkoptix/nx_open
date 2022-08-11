@@ -184,17 +184,21 @@ QVariant QnClientSettings::readValueFromSettings(QSettings* settings, int id,
         case EXPORT_BOOKMARK_SETTINGS:
         {
             const auto asJson = base_type::readValueFromSettings(settings, id, QVariant())
-                .value<QString>().toUtf8();
-            return QVariant::fromValue(QJson::deserialized<ExportMediaSettings>(asJson,
-                defaultValue.value<ExportMediaSettings>()));
+                .value<QString>().toStdString();
+            auto [settings, error] = nx::reflect::json::deserialize<ExportMediaSettings>(asJson);
+            return QVariant::fromValue(error.success
+                ? settings
+                : ExportMediaSettings());
         }
 
         case EXPORT_LAYOUT_SETTINGS:
         {
             const auto asJson = base_type::readValueFromSettings(settings, id, QVariant())
-                .value<QString>().toUtf8();
-            return QVariant::fromValue(QJson::deserialized<ExportLayoutSettings>(asJson,
-                defaultValue.value<ExportLayoutSettings>()));
+                .value<QString>().toStdString();
+            auto [settings, error] = nx::reflect::json::deserialize<ExportLayoutSettings>(asJson);
+            return QVariant::fromValue(error.success
+                ? settings
+                : ExportLayoutSettings());
         }
 
         case BACKGROUND_IMAGE:
@@ -303,14 +307,16 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
         case EXPORT_MEDIA_SETTINGS:
         case EXPORT_BOOKMARK_SETTINGS:
         {
-            const auto asJson = QString::fromUtf8(QJson::serialized(value.value<ExportMediaSettings>()));
+            const auto asJson = QString::fromStdString(
+                nx::reflect::json::serialize(value.value<ExportMediaSettings>()));
             base_type::writeValueToSettings(settings, id, asJson);
             break;
         }
 
         case EXPORT_LAYOUT_SETTINGS:
         {
-            const auto asJson = QString::fromUtf8(QJson::serialized(value.value<ExportLayoutSettings>()));
+            const auto asJson = QString::fromStdString(
+                nx::reflect::json::serialize(value.value<ExportLayoutSettings>()));
             base_type::writeValueToSettings(settings, id, asJson);
             break;
         }

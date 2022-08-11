@@ -5,7 +5,6 @@
 #include <QtWidgets/QAction>
 
 #include <camera/camera_data_manager.h>
-#include <camera/loaders/caching_camera_data_loader.h>
 #include <camera/resource_display.h>
 #include <client/client_module.h>
 #include <client/client_runtime_settings.h>
@@ -39,6 +38,8 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
+#include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/condition/generic_condition.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
@@ -49,9 +50,9 @@
 #include <nx/vms/client/desktop/radass/radass_support.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
-#include <nx/vms/client/desktop/resources/layout_password_management.h>
-#include <nx/vms/client/desktop/resources/layout_snapshot_manager.h>
-#include <nx/vms/client/desktop/resources/resource_descriptor.h>
+#include <nx/vms/client/desktop/resource/layout_password_management.h>
+#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
+#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -64,7 +65,6 @@
 #include <nx/vms/discovery/manager.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/utils/platform/autorun.h>
-#include <plugins/resource/desktop_camera/desktop_resource_base.h>
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
 #include <ui/dialogs/ptz_manage_dialog.h>
@@ -1706,7 +1706,7 @@ ActionVisibility DesktopCameraCondition::check(const Parameters& /*parameters*/,
         if (!user)
             return InvisibleAction;
 
-        const auto desktopCameraId = QnDesktopResource::calculateUniqueId(
+        const auto desktopCameraId =core::DesktopResource::calculateUniqueId(
             context->commonModule()->peerId(), user->getId());
 
         /* Do not check real pointer type to speed up check. */

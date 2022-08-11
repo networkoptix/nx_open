@@ -6,7 +6,7 @@
 #include "instrument.h"
 
 /**
- * This instrument forwards the events to the target object. 
+ * This instrument forwards the events to the target object.
  */
 class ForwardingInstrument: public Instrument {
     Q_OBJECT;
@@ -20,9 +20,9 @@ public:
     {}
 
 protected:
-    virtual bool event(QGraphicsScene *, QEvent *) override;
-    virtual bool event(QGraphicsView *, QEvent *) override;
-    virtual bool event(QWidget *, QEvent *) override;
+    virtual bool anyEvent(QGraphicsScene *, QEvent *) override;
+    virtual bool anyEvent(QGraphicsView *, QEvent *) override;
+    virtual bool anyEvent(QWidget *, QEvent *) override;
     virtual bool sceneEvent(QGraphicsItem *, QEvent *) override;
 };
 

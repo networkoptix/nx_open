@@ -114,7 +114,7 @@ QSize TimestampFilter::updatedResolution(const QSize& sourceSize)
 QString TimestampFilter::timestampTextUtc(
     qint64 sinceEpochMs,
     int displayOffsetMs,
-    Qt::DateFormat format)
+    TimestampFormat format)
 {
     // TODO: Here was this code, which was not consistent with other places.
     // However, sometime nx::vms::time::toString should be expanded to accept different zones.
@@ -127,13 +127,14 @@ QString TimestampFilter::timestampTextUtc(
 
     switch (format)
     {
-        case Qt::DefaultLocaleLongDate:
+        case TimestampFormat::longDate:
             return nx::vms::time::toString(dateTime, nx::vms::time::dddd_d_MMMM_yyyy_hh_mm_ss);
-        case Qt::DefaultLocaleShortDate:
+        case TimestampFormat::shortDate:
             return nx::vms::time::toString(dateTime);
-        case Qt::ISODate:
-        case Qt::RFC2822Date:
-            return dateTime.toString(format);
+        case TimestampFormat::ISODate:
+            return dateTime.toString(Qt::ISODate);
+        case TimestampFormat::RFC2822Date:
+            return dateTime.toString(Qt::RFC2822Date);
         default:
             NX_ASSERT(false, "Invalid DateTime Format");
             return QString();

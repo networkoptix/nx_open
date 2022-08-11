@@ -4,7 +4,7 @@
 
 #include <client/client_globals.h>
 #include <core/resource/resource.h>
-#include <nx/vms/client/desktop/resources/search_helper.h>
+#include <nx/vms/client/desktop/resource/search_helper.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 
 namespace nx::vms::client::desktop {

@@ -29,14 +29,7 @@ protected:
 protected:
     virtual Qn::Notifier storedItemAdded(const T &item) = 0;
     virtual Qn::Notifier storedItemRemoved(const T &item) = 0;
-    virtual Qn::Notifier storedItemChanged(const T& /*item*/)
-    {
-        return Qn::Notifier();
-    };
-    virtual Qn::Notifier storedItemChanged(const T& /*item*/, const T& /*oldItem*/)
-    {
-        return Qn::Notifier();
-    };
+    virtual Qn::Notifier storedItemChanged(const T& /*item*/, const T& /*oldItem*/) = 0;
 
 private:
     friend class QnThreadsafeItemStorage<T>;
@@ -206,14 +199,7 @@ private:
         *pos = item;
 
         if (m_notifier)
-        {
-            auto simple = m_notifier->storedItemChanged(item);
-            if (simple)
-                notifiers << simple;
-            auto advanced = m_notifier->storedItemChanged(item, oldItem);
-            if (advanced)
-                notifiers << advanced;
-        }
+            notifiers << m_notifier->storedItemChanged(item, oldItem);
     }
 
     void removeItemUnderLock(const QnUuid &uuid, Qn::NotifierList& notifiers)

@@ -6,7 +6,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/client/desktop/resources/resource_descriptor.h>
+#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 
 namespace nx::vms::client::desktop {
 

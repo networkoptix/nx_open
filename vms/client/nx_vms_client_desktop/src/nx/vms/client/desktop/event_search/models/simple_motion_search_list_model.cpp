@@ -6,12 +6,12 @@
 // It might be refactored later to avoid using QtWidgets at all.
 #include <QtWidgets/QMenu>
 
-#include <camera/loaders/caching_camera_data_loader.h>
 #include <core/resource/camera_resource.h>
 #include <nx/api/mediaserver/image_request.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/metatypes.h>
+#include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/skin.h>
@@ -206,7 +206,7 @@ void SimpleMotionSearchListModel::clearData()
                 updateMotionPeriods(startTimeMs);
         };
 
-    connect(m_loader.data(), &QnCachingCameraDataLoader::periodsChanged,
+    connect(m_loader.data(), &core::CachingCameraDataLoader::periodsChanged,
         this, updatePeriods, Qt::DirectConnection);
 }
 

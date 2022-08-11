@@ -165,7 +165,9 @@ Qn::Notifier QnVideoWallResource::storedItemRemoved(const QnVideoWallPcData &ite
     return [r = toSharedPointer(this), item]{ emit r->pcRemoved(r, item); };
 }
 
-Qn::Notifier QnVideoWallResource::storedItemChanged(const QnVideoWallPcData& item)
+Qn::Notifier QnVideoWallResource::storedItemChanged(
+    const QnVideoWallPcData& item,
+    const QnVideoWallPcData& /*oldItem*/)
 {
     return [r = toSharedPointer(this), item]{ emit r->pcChanged(r, item); };
 }
@@ -180,7 +182,9 @@ Qn::Notifier QnVideoWallResource::storedItemRemoved(const QnVideoWallMatrix &ite
     return [r = toSharedPointer(this), item]{ emit r->matrixRemoved(r, item); };
 }
 
-Qn::Notifier QnVideoWallResource::storedItemChanged(const QnVideoWallMatrix& item)
+Qn::Notifier QnVideoWallResource::storedItemChanged(
+    const QnVideoWallMatrix& item,
+    const QnVideoWallMatrix& /*oldItem*/)
 {
     return [r = toSharedPointer(this), item]{ emit r->matrixChanged(r, item); };
 }
@@ -197,4 +201,3 @@ QList<QnUuid> QnVideoWallResource::onlineItems() const
     }
     return result;
 }
-

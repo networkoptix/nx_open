@@ -95,7 +95,7 @@ private:
 
     template<class Y>
     bool dispatch(Instrument *instrument, Y *target, QEvent *event) const {
-        return instrument->event(target, event);
+        return instrument->anyEvent(target, event);
     }
 
     bool dispatch(Instrument *instrument, QGraphicsItem *target, QEvent *event) const {

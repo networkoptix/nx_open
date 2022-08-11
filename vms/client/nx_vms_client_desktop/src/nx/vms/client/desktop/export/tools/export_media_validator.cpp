@@ -3,18 +3,18 @@
 #include "export_media_validator.h"
 
 #include <camera/camera_data_manager.h>
-#include <camera/loaders/caching_camera_data_loader.h>
 #include <client_core/client_core_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/core/transcoding/filters/filter_chain.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/desktop/common/utils/filesystem.h>
 #include <nx/vms/client/desktop/export/data/export_layout_settings.h>
 #include <nx/vms/client/desktop/export/data/export_media_settings.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
-#include <nx/vms/client/desktop/resources/resource_descriptor.h>
+#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>

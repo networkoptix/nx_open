@@ -266,8 +266,6 @@ namespace Qn
 
         ExtraInfoRole,                              /**< Role for extra resource information in the tree (QString). */
 
-        ExportSettingsRole,                         /**< Role for export settings that replace the export dialog (QVariantMap). */
-
         AutoExpandRole,                             /**< Role for automatic expanding of tree nodes on first show (bool). */
 
         RawResourceRole,                            /**< As ResourceRole, but with QnResource* for QML. */

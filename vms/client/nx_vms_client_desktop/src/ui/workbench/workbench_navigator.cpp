@@ -23,7 +23,6 @@ extern "C" {
 #include <camera/camera_bookmarks_query.h>
 #include <camera/camera_data_manager.h>
 #include <camera/client_video_camera.h>
-#include <camera/loaders/caching_camera_data_loader.h>
 #include <camera/resource_display.h>
 #include <client/client_module.h>
 #include <client/client_runtime_settings.h>
@@ -45,6 +44,7 @@ extern "C" {
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -80,12 +80,10 @@ extern "C" {
 #include "workbench_item.h"
 #include "workbench_layout.h"
 
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
-using namespace std::literals::chrono_literals;
-
-using std::chrono::milliseconds;
-using std::chrono::microseconds;
+using namespace std::chrono;
 
 namespace {
 
@@ -785,7 +783,7 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget)
 
     if (auto loader = systemContext->cameraDataManager()->loader(syncedResource))
     {
-        QnCachingCameraDataLoader::AllowedContent content =
+        core::CachingCameraDataLoader::AllowedContent content =
             {Qn::RecordingContent, Qn::MotionContent};
 
         if (selectedExtraContent() == Qn::AnalyticsContent
@@ -1811,7 +1809,7 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodContent timePeriodT
         return;
 
     /* We don't want duplicate providers. */
-    QSet<QnCachingCameraDataLoaderPtr> loaders;
+    QSet<core::CachingCameraDataLoaderPtr> loaders;
     for (const auto widget: m_syncedWidgets)
     {
         if (timePeriodType == Qn::MotionContent && !widget->options().testFlag(QnResourceWidget::DisplayMotion))
@@ -2326,7 +2324,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     }
 }
 
-QnCachingCameraDataLoaderPtr QnWorkbenchNavigator::loaderByWidget(
+core::CachingCameraDataLoaderPtr QnWorkbenchNavigator::loaderByWidget(
     const QnMediaResourceWidget* widget,
     bool createIfNotExists)
 {

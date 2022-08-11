@@ -67,7 +67,9 @@ Qn::Notifier QnRuntimeInfoManager::storedItemRemoved(const QnPeerRuntimeInfo& it
     return [this, item](){ emit runtimeInfoRemoved(item); };
 }
 
-Qn::Notifier QnRuntimeInfoManager::storedItemChanged(const QnPeerRuntimeInfo& item)
+Qn::Notifier QnRuntimeInfoManager::storedItemChanged(
+    const QnPeerRuntimeInfo& item,
+    const QnPeerRuntimeInfo& /*oldItem*/)
 {
     NX_VERBOSE(this, "Runtime info changed: %1 [%2]",  item.data.peer.peerType, item.uuid);
     return [this, item]{ emit runtimeInfoChanged(item); };

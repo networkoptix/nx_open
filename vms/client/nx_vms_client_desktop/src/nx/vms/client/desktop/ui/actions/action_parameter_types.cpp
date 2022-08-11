@@ -11,7 +11,7 @@
 #include <core/resource/videowall_matrix_index.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/flat_map.h>
-#include <nx/vms/client/desktop/resources/resource_descriptor.h>
+#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>

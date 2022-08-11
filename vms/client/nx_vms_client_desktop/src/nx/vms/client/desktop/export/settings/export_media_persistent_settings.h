@@ -4,11 +4,13 @@
 
 #include <QtGui/QFont>
 
-#include <nx/fusion/model_functions_fwd.h>
+#include <nx/core/transcoding/timestamp_format.h>
 #include <nx/reflect/enum_instrument.h>
+#include <nx/reflect/instrument.h>
+#include <nx/utils/serialization/qt_core_types.h>
 #include <nx/vms/client/desktop/common/utils/filesystem.h>
 #include <nx/vms/client/desktop/export/data/export_media_settings.h>
-#include <nx/utils/serialization/qt_core_types.h>
+#include <nx/utils/serialization/qt_geometry_reflect_json.h>
 
 class QTextDocument;
 
@@ -41,6 +43,7 @@ struct NX_VMS_CLIENT_DESKTOP_API ExportOverlayPersistentSettings
     virtual void rescale(qreal factor);
 };
 #define ExportOverlayPersistentSettings_Fields (offset)(alignment)
+NX_REFLECTION_INSTRUMENT(ExportOverlayPersistentSettings, ExportOverlayPersistentSettings_Fields)
 
 struct NX_VMS_CLIENT_DESKTOP_API ExportImageOverlayPersistentSettings: public ExportOverlayPersistentSettings
 {
@@ -56,6 +59,8 @@ struct NX_VMS_CLIENT_DESKTOP_API ExportImageOverlayPersistentSettings: public Ex
 #define ExportImageOverlayPersistentSettings_Fields \
     ExportOverlayPersistentSettings_Fields \
     (name)(overlayWidth)(opacity)
+NX_REFLECTION_INSTRUMENT(ExportImageOverlayPersistentSettings,
+    ExportImageOverlayPersistentSettings_Fields)
 
 struct NX_VMS_CLIENT_DESKTOP_API ExportTextOverlayPersistentSettingsBase: public ExportOverlayPersistentSettings
 {
@@ -75,12 +80,16 @@ struct NX_VMS_CLIENT_DESKTOP_API ExportTextOverlayPersistentSettingsBase: public
 #define ExportTextOverlayPersistentSettingsBase_Fields \
     ExportOverlayPersistentSettings_Fields \
     (fontSize)(overlayWidth)(indent)
+NX_REFLECTION_INSTRUMENT(ExportTextOverlayPersistentSettingsBase,
+    ExportTextOverlayPersistentSettingsBase_Fields)
 
 struct NX_VMS_CLIENT_DESKTOP_API ExportTextOverlayPersistentSettings: public ExportTextOverlayPersistentSettingsBase
 {
 };
 #define ExportTextOverlayPersistentSettings_Fields \
     ExportTextOverlayPersistentSettingsBase_Fields (text)
+NX_REFLECTION_INSTRUMENT(ExportTextOverlayPersistentSettings,
+    ExportTextOverlayPersistentSettings_Fields)
 
 struct NX_VMS_CLIENT_DESKTOP_API ExportBookmarkOverlayPersistentSettings: public ExportTextOverlayPersistentSettingsBase
 {
@@ -90,10 +99,14 @@ struct NX_VMS_CLIENT_DESKTOP_API ExportBookmarkOverlayPersistentSettings: public
 };
 #define ExportBookmarkOverlayPersistentSettings_Fields \
     ExportTextOverlayPersistentSettingsBase_Fields (includeDescription)
+NX_REFLECTION_INSTRUMENT(ExportBookmarkOverlayPersistentSettings,
+    ExportBookmarkOverlayPersistentSettings_Fields)
 
 struct NX_VMS_CLIENT_DESKTOP_API ExportTimestampOverlayPersistentSettings: public ExportOverlayPersistentSettings
 {
-    Qt::DateFormat format = Qt::DefaultLocaleLongDate;
+    using TimestampFormat = nx::core::transcoding::TimestampFormat;
+
+    TimestampFormat format = TimestampFormat::longDate;
     int fontSize = 18;
     int maximumFontSize = 400;
     qint64 serverTimeDisplayOffsetMs = 0;
@@ -109,10 +122,14 @@ struct NX_VMS_CLIENT_DESKTOP_API ExportTimestampOverlayPersistentSettings: publi
 #define ExportTimestampOverlayPersistentSettings_Fields \
     ExportOverlayPersistentSettings_Fields \
     (format)(fontSize)
+NX_REFLECTION_INSTRUMENT(ExportTimestampOverlayPersistentSettings,
+    ExportTimestampOverlayPersistentSettings_Fields)
 
 struct NX_VMS_CLIENT_DESKTOP_API ExportInfoOverlayPersistentSettings: public ExportTextOverlayPersistentSettingsBase
 {
-    Qt::DateFormat format = Qt::DefaultLocaleShortDate;
+    using TimestampFormat = nx::core::transcoding::TimestampFormat;
+
+    TimestampFormat format = TimestampFormat::shortDate;
     int maxOverlayWidth = 320;
     int maxOverlayHeight = 240;
     bool exportCameraName = true;
@@ -131,6 +148,8 @@ private:
 };
 #define ExportInfoOverlayPersistentSettings_Fields \
     ExportTextOverlayPersistentSettingsBase_Fields (maxOverlayWidth)(maxOverlayHeight)(exportCameraName)(exportDate)
+NX_REFLECTION_INSTRUMENT(ExportInfoOverlayPersistentSettings,
+    ExportInfoOverlayPersistentSettings_Fields)
 
 struct ExportRapidReviewPersistentSettings
 {
@@ -141,6 +160,8 @@ struct ExportRapidReviewPersistentSettings
     ExportRapidReviewPersistentSettings(bool enabled, int speed);
 };
 #define ExportRapidReviewPersistentSettings_Fields (enabled)(speed)
+NX_REFLECTION_INSTRUMENT(ExportRapidReviewPersistentSettings,
+    ExportRapidReviewPersistentSettings_Fields)
 
 struct NX_VMS_CLIENT_DESKTOP_API ExportMediaPersistentSettings
 {
@@ -190,14 +211,7 @@ struct NX_VMS_CLIENT_DESKTOP_API ExportMediaPersistentSettings
 
 #define ExportMediaPersistentSettings_Fields (applyFilters)(fileFormat)(dimension)(rapidReview)\
     (usedOverlays)(imageOverlay)(timestampOverlay)(textOverlay)(bookmarkOverlay)(infoOverlay)
-
-QN_FUSION_DECLARE_FUNCTIONS(ExportTimestampOverlayPersistentSettings, (json))
-QN_FUSION_DECLARE_FUNCTIONS(ExportImageOverlayPersistentSettings, (json))
-QN_FUSION_DECLARE_FUNCTIONS(ExportTextOverlayPersistentSettings, (json))
-QN_FUSION_DECLARE_FUNCTIONS(ExportBookmarkOverlayPersistentSettings, (json))
-QN_FUSION_DECLARE_FUNCTIONS(ExportInfoOverlayPersistentSettings, (json))
-QN_FUSION_DECLARE_FUNCTIONS(ExportRapidReviewPersistentSettings, (json))
-QN_FUSION_DECLARE_FUNCTIONS(ExportMediaPersistentSettings, (json))
+NX_REFLECTION_INSTRUMENT(ExportMediaPersistentSettings, ExportMediaPersistentSettings_Fields)
 
 } // namespace nx::vms::client::desktop
 

@@ -634,7 +634,7 @@ protected:
     virtual void unregisteredNotify(QGraphicsItem *item) { Q_UNUSED(item); }
 
     /* Graphics view's viewport event filtering functions. */
-    virtual bool event(QWidget *, QEvent *);
+    virtual bool anyEvent(QWidget *, QEvent *);
     virtual bool mouseMoveEvent(QWidget *, QMouseEvent *) { return false; }
     virtual bool mousePressEvent(QWidget *, QMouseEvent *) { return false; }
     virtual bool mouseReleaseEvent(QWidget *, QMouseEvent *) { return false; }
@@ -683,7 +683,7 @@ protected:
     virtual bool animationEvent(AnimationEvent *) { return false; }
 
     /* Graphics view event filtering functions. */
-    virtual bool event(QGraphicsView *, QEvent *);
+    virtual bool anyEvent(QGraphicsView *, QEvent *);
     virtual bool mouseMoveEvent(QGraphicsView *, QMouseEvent *) { return false; }
     virtual bool mousePressEvent(QGraphicsView *, QMouseEvent *) { return false; }
     virtual bool mouseReleaseEvent(QGraphicsView *, QMouseEvent *) { return false; }
@@ -729,7 +729,7 @@ protected:
     virtual bool helpEvent(QGraphicsView *, QGraphicsSceneHelpEvent *) { return false; }
 
     /* Graphics scene event filtering functions. */
-    virtual bool event(QGraphicsScene *, QEvent *);
+    virtual bool anyEvent(QGraphicsScene *, QEvent *);
     virtual bool mouseMoveEvent(QGraphicsScene *, QMouseEvent *) { return false; }
     virtual bool mousePressEvent(QGraphicsScene *, QMouseEvent *) { return false; }
     virtual bool mouseReleaseEvent(QGraphicsScene *, QMouseEvent *) { return false; }

@@ -62,16 +62,21 @@ protected:
 
     virtual Qn::Notifier storedItemAdded(const QnVideoWallItem& item) override;
     virtual Qn::Notifier storedItemRemoved(const QnVideoWallItem& item) override;
-    virtual Qn::Notifier storedItemChanged(const QnVideoWallItem& item,
+    virtual Qn::Notifier storedItemChanged(
+        const QnVideoWallItem& item,
         const QnVideoWallItem& oldItem) override;
 
     virtual Qn::Notifier storedItemAdded(const QnVideoWallPcData& item) override;
     virtual Qn::Notifier storedItemRemoved(const QnVideoWallPcData& item) override;
-    virtual Qn::Notifier storedItemChanged(const QnVideoWallPcData& item) override;
+    virtual Qn::Notifier storedItemChanged(
+        const QnVideoWallPcData& item,
+        const QnVideoWallPcData& oldItem) override;
 
     virtual Qn::Notifier storedItemAdded(const QnVideoWallMatrix& item) override;
     virtual Qn::Notifier storedItemRemoved(const QnVideoWallMatrix& item) override;
-    virtual Qn::Notifier storedItemChanged(const QnVideoWallMatrix& item) override;
+    virtual Qn::Notifier storedItemChanged(
+        const QnVideoWallMatrix& item,
+        const QnVideoWallMatrix& oldItem) override;
 
 private:
     bool m_autorun = false;

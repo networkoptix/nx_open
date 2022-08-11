@@ -19,7 +19,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/vms/client/core/utils/grid_walker.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/resources/layout_password_management.h>
+#include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>

@@ -5,6 +5,7 @@
 #include <QtCore/qnamespace.h>
 
 #include <nx/reflect/enum_instrument.h>
+#include <nx/reflect/instrument.h>
 
 #include "flags.h"
 

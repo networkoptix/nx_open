@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/instrument.h>
 #include <nx/vms/client/desktop/common/utils/filesystem.h>
 #include <nx/vms/client/desktop/export/data/export_layout_settings.h>
 
@@ -16,8 +16,7 @@ struct ExportLayoutPersistentSettings
     void updateRuntimeSettings(ExportLayoutSettings& runtimeSettings) const;
 };
 #define ExportLayoutPersistentSettings_Fields (readOnly)(fileFormat)
-
-QN_FUSION_DECLARE_FUNCTIONS(ExportLayoutPersistentSettings, (json))
+NX_REFLECTION_INSTRUMENT(ExportLayoutPersistentSettings, ExportLayoutPersistentSettings_Fields)
 
 } // namespace nx::vms::client::desktop
 

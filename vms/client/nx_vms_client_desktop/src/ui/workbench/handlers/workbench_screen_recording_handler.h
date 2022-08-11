@@ -10,11 +10,13 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnCountdownTimer;
-class QnDesktopDataProviderWrapper;
 
 namespace nx::vms::client::desktop {
+
+class DesktopDataProviderWrapper;
 class ExportStorageStreamRecorder;
 class SceneBanner;
+
 } // namespace nx::vms::client::desktop
 
 class QnWorkbenchScreenRecordingHandler: public QObject, public QnWorkbenchContextAware
@@ -78,7 +80,7 @@ private:
     QString m_recordedFileName;
     int m_timerId;
 
-    QScopedPointer<QnDesktopDataProviderWrapper> m_dataProvider;
+    QScopedPointer<nx::vms::client::desktop::DesktopDataProviderWrapper> m_dataProvider;
     QScopedPointer<nx::vms::client::desktop::ExportStorageStreamRecorder> m_recorder;
     QElapsedTimer m_countdown;
     QPointer<nx::vms::client::desktop::SceneBanner> m_messageBox;

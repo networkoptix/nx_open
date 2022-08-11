@@ -15,7 +15,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/resources/unified_resource_pool.h>
+#include <nx/vms/client/desktop/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/resource/resource_widget.h>

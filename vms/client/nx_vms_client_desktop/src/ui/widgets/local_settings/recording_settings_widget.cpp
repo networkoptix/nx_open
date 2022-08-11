@@ -14,7 +14,12 @@
 #include <ui/widgets/dwm.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
-QnRecordingSettingsWidget::QnRecordingSettingsWidget(QnVideoRecorderSettings* settings, QWidget *parent):
+using namespace nx::vms::client::desktop;
+
+QnRecordingSettingsWidget::QnRecordingSettingsWidget(
+    VideoRecorderSettings* settings,
+    QWidget *parent)
+    :
     base_type(parent),
     ui(new Ui::RecordingSettings),
     m_settings(settings),

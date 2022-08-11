@@ -32,8 +32,8 @@ protected:
     virtual void enabledNotify() override;
     virtual void aboutToBeDisabledNotify() override;
 
-    virtual bool event(QGraphicsView *view, QEvent *event) override;
-    virtual bool event(QWidget *viewport, QEvent *event) override;
+    virtual bool anyEvent(QGraphicsView *view, QEvent *event) override;
+    virtual bool anyEvent(QWidget *viewport, QEvent *event) override;
     virtual void timerEvent(QTimerEvent *event) override;
 
     void activityDetected();

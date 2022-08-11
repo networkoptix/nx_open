@@ -14,8 +14,8 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/common/utils/ordered_requests_helper.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <nx/vms/client/core/two_way_audio/two_way_audio_availability_watcher.h>
-#include <plugins/resource/desktop_camera/desktop_resource_base.h>
 
 namespace nx::vms::client::core {
 
@@ -152,4 +152,3 @@ bool TwoWayAudioController::available() const
 }
 
 } // namespace nx::vms::client::core
-

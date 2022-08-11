@@ -9,25 +9,25 @@ void RedirectingInstrument::init(Instrument *target) {
     m_target = target;
 }
 
-bool RedirectingInstrument::event(QGraphicsScene *scene, QEvent *event) {
+bool RedirectingInstrument::anyEvent(QGraphicsScene *scene, QEvent *event) {
     if(m_target != nullptr) {
-        return m_target->event(scene, event);
+        return m_target->anyEvent(scene, event);
     } else {
         return false;
     }
 }
 
-bool RedirectingInstrument::event(QGraphicsView *view, QEvent *event) {
+bool RedirectingInstrument::anyEvent(QGraphicsView *view, QEvent *event) {
     if(m_target != nullptr) {
-        return m_target->event(view, event);
+        return m_target->anyEvent(view, event);
     } else {
         return false;
     }
 }
 
-bool RedirectingInstrument::event(QWidget *viewport, QEvent *event) {
+bool RedirectingInstrument::anyEvent(QWidget *viewport, QEvent *event) {
     if(m_target != nullptr) {
-        return m_target->event(viewport, event);
+        return m_target->anyEvent(viewport, event);
     } else {
         return false;
     }
@@ -40,4 +40,3 @@ bool RedirectingInstrument::sceneEvent(QGraphicsItem *item, QEvent *event) {
         return false;
     }
 }
-

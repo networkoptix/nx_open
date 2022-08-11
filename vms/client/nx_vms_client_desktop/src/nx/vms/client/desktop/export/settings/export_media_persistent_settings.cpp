@@ -10,7 +10,6 @@
 #include <QtGui/QTextDocument>
 
 #include <client/client_meta_types.h>
-#include <nx/fusion/model_functions.h>
 #include <nx/utils/string.h>
 #include <nx/vms/common/html/html.h>
 #include <utils/math/math.h>
@@ -389,20 +388,5 @@ ExportRapidReviewPersistentSettings::ExportRapidReviewPersistentSettings(bool en
     speed(speed)
 {
 }
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ExportTimestampOverlayPersistentSettings, (json),
-    ExportTimestampOverlayPersistentSettings_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    ExportImageOverlayPersistentSettings, (json), ExportImageOverlayPersistentSettings_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    ExportTextOverlayPersistentSettings, (json), ExportTextOverlayPersistentSettings_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ExportBookmarkOverlayPersistentSettings, (json),
-    ExportBookmarkOverlayPersistentSettings_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    ExportRapidReviewPersistentSettings, (json), ExportRapidReviewPersistentSettings_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    ExportMediaPersistentSettings, (json), ExportMediaPersistentSettings_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    ExportInfoOverlayPersistentSettings, (json), ExportInfoOverlayPersistentSettings_Fields)
 
 } // namespace nx::vms::client::desktop

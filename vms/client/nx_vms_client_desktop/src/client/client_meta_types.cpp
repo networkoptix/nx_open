@@ -39,7 +39,7 @@
 #include <nx/vms/client/desktop/resource_properties/server/widgets/details/backup_queue_size.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/item_view_drag_and_drop_scroll_assist.h>
-#include <nx/vms/client/desktop/resources/resource_status_helper.h>
+#include <nx/vms/client/desktop/resource/resource_status_helper.h>
 #include <nx/vms/client/desktop/system_logon/data/connect_tiles_proxy_model.h>
 #include <nx/vms/client/desktop/system_logon/data/systems_visibility_sort_filter_model.h>
 #include <nx/vms/client/desktop/system_update/update_contents.h>

@@ -6,7 +6,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/client/desktop/resources/resource_descriptor.h>
+#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/scoped_value_rollback.h>

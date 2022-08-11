@@ -7,6 +7,8 @@
 #include <nx/vms/client/desktop/style/skin.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
+using nx::core::transcoding::TimestampFormat;
+
 namespace nx::vms::client::desktop {
 
 namespace {
@@ -24,10 +26,14 @@ TimestampOverlaySettingsWidget::TimestampOverlaySettingsWidget(QWidget* parent):
     auto aligner = new Aligner(this);
     aligner->addWidgets({ui->fontSizeLabel, ui->formatLabel});
 
-    ui->formatComboBox->addItem(tr("Long"), Qt::DefaultLocaleLongDate);
-    ui->formatComboBox->addItem(tr("Short"), Qt::DefaultLocaleShortDate);
-    ui->formatComboBox->addItem(lit("ISO 8601"), Qt::ISODate);
-    ui->formatComboBox->addItem(lit("RFC 2822"), Qt::RFC2822Date);
+    ui->formatComboBox->addItem(tr("Long"),
+        QVariant::fromValue(TimestampFormat::longDate));
+    ui->formatComboBox->addItem(tr("Short"),
+        QVariant::fromValue(TimestampFormat::shortDate));
+    ui->formatComboBox->addItem("ISO 8601",
+        QVariant::fromValue(TimestampFormat::ISODate));
+    ui->formatComboBox->addItem("RFC 2822",
+        QVariant::fromValue(TimestampFormat::RFC2822Date));
 
     ui->fontSizeSpinBox->setRange(ExportTimestampOverlayPersistentSettings::minimumFontSize(),
         kMaximumFontSize);
@@ -43,7 +49,8 @@ TimestampOverlaySettingsWidget::TimestampOverlaySettingsWidget(QWidget* parent):
     connect(ui->formatComboBox, QnComboboxCurrentIndexChanged,
         [this](int index)
         {
-            auto format = static_cast<Qt::DateFormat>(ui->formatComboBox->itemData(index).toInt());
+            auto format = static_cast<TimestampFormat>(
+                ui->formatComboBox->itemData(index).toInt());
             emit formatChanged(format);
         });
 
@@ -61,7 +68,8 @@ void TimestampOverlaySettingsWidget::updateControls()
 {
     ui->fontSizeSpinBox->setValue(m_data.fontSize);
     ui->fontSizeSpinBox->setMaximum(m_data.maximumFontSize);
-    ui->formatComboBox->setCurrentIndex(ui->formatComboBox->findData(m_data.format));
+    ui->formatComboBox->setCurrentIndex(ui->formatComboBox->findData(
+        QVariant::fromValue(m_data.format)));
 }
 
 const ExportTimestampOverlayPersistentSettings& TimestampOverlaySettingsWidget::data() const

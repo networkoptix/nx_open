@@ -4,8 +4,8 @@
 
 #include <QtCore/QRect>
 
-#include <nx/fusion/fusion/fusion_adaptors.h>
 #include <nx/reflect/instrument.h>
+#include <nx/utils/serialization/qt_geometry_reflect_json.h>
 
 namespace nx::vms::client::desktop {
 
