@@ -32,7 +32,8 @@ public:
         const QString& fileName,
         const nx::utils::Url &url,
         int chunkIndex,
-        int chunkSize) override;
+        int chunkSize,
+        qint64 fileSize) override;
 
 private:
     nx::network::aio::Timer m_aioTimer;

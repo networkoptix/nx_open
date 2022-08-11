@@ -39,7 +39,8 @@ public:
         const QString& fileName,
         const nx::utils::Url &url,
         int chunkIndex,
-        int chunkSize) override;
+        int chunkSize,
+        qint64 fileSize) override;
 
     void setServerDirectConnection(const QnUuid& id, const rest::ServerConnectionPtr& connection);
     void clearServerDirectConnections();

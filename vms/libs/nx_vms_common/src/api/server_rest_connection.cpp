@@ -827,12 +827,12 @@ Handle ServerConnection::fileChunkChecksums(
 Handle ServerConnection::downloadFileChunk(
     const QnUuid& serverId,
     const QString& fileName,
-    int index,
+    int chunkIndex,
     Result<QByteArray>::type callback,
     QThread* targetThread)
 {
     return executeGet(
-        lit("/api/downloads/%1/chunks/%2").arg(fileName).arg(index),
+        nx::format("/api/downloads/%1/chunks/%2", fileName, chunkIndex),
         nx::network::rest::Params(),
         callback,
         targetThread,
@@ -845,15 +845,17 @@ Handle ServerConnection::downloadFileChunkFromInternet(
     const nx::utils::Url& url,
     int chunkIndex,
     int chunkSize,
+    qint64 fileSize,
     Result<QByteArray>::type callback,
     QThread* targetThread)
 {
     return executeGet(
-        lit("/api/downloads/%1/chunks/%2").arg(fileName).arg(chunkIndex),
+        nx::format("/api/downloads/%1/chunks/%2", fileName, chunkIndex),
         nx::network::rest::Params{
-            {lit("url"), url.toString()},
-            {lit("chunkSize"), QString::number(chunkSize)},
-            {lit("fromInternet"), lit("true")}},
+            {"url", url.toString()},
+            {"chunkSize", QString::number(chunkSize)},
+            {"fileSize", QString::number(fileSize)},
+            {"fromInternet", "true"}},
         callback,
         targetThread,
         serverId);

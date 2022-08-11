@@ -121,7 +121,8 @@ public:
         const QString& fileName,
         const nx::utils::Url& url,
         int chunkIndex,
-        int chunkSize) = 0;
+        int chunkSize,
+        qint64 fileSize) = 0;
 
     const Capabilities capabilities;
 };

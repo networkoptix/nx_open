@@ -92,7 +92,8 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, invalidChunk)
     fileInformation.chunkSize = 1024;
     peerManager->setFileInformation(peer, fileInformation);
 
-    auto request = peerManager->downloadChunk(peer, fileInformation.name, nx::utils::Url(), 2, 0);
+    auto request = peerManager->downloadChunk(
+        peer, fileInformation.name, nx::utils::Url(), 2, 0, fileInformation.size);
     ASSERT_FALSE(request->future.get().has_value());
 }
 
@@ -124,7 +125,8 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, usingStorage)
     ASSERT_EQ(fileInfo->size, originalFileInfo.size);
     ASSERT_EQ(fileInfo->md5, originalFileInfo.md5);
 
-    auto chunkRequest = peerManager->downloadChunk(peer, fileName, nx::utils::Url(), 0, 0);
+    auto chunkRequest = peerManager->downloadChunk(
+        peer, fileName, nx::utils::Url(), 0, 0, originalFileInfo.size);
     auto chunk = chunkRequest->future.get();
 
     ASSERT_TRUE(chunk.has_value());
@@ -151,7 +153,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, internetFile)
     peerManager->setHasInternetConnection(peerId);
     peerManager->setIndirectInternetRequestsAllowed(true);
 
-    auto request = peerManager->downloadChunk(peerId, fileName, url, 0, 1);
+    auto request = peerManager->downloadChunk(peerId, fileName, url, 0, 1, 1);
     auto chunk = request->future.get();
 
     ASSERT_TRUE(chunk.has_value());
