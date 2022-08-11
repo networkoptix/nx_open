@@ -42,6 +42,7 @@ struct SystemSettingNames
     DECLARE_SETTING_NAME(cloudNotificationsLanguage);
     DECLARE_SETTING_NAME(cloudSystemID); //< TODO: rename it to cloudSystemId
     DECLARE_SETTING_NAME(disabledVendors);
+    DECLARE_SETTING_NAME(exposeDeviceCredentials);
     DECLARE_SETTING_NAME(insecureDeprecatedApiEnabled);
     DECLARE_SETTING_NAME(insecureDeprecatedApiInUseEnabled);
     DECLARE_SETTING_NAME(lastMergeMasterId);
@@ -74,6 +75,7 @@ struct SystemSettingNames
     DECLARE_SETTING_NAME(statisticsReportLastVersion);
     DECLARE_SETTING_NAME(systemName);
     DECLARE_SETTING_NAME(trafficEncryptionForced);
+    DECLARE_SETTING_NAME(videoTrafficEncryptionForced);
     DECLARE_SETTING_NAME(webSocketEnabled);
 
     static const inline std::set<QString> kReadOnlyNames = {
@@ -196,7 +198,6 @@ public:
     std::chrono::days eventLogPeriodDays() const;
 
     bool isTrafficEncryptionForced() const;
-    bool isTrafficEncryptionForcedExplicitlyDefined() const;
     void setTrafficEncryptionForced(bool value);
 
     bool isVideoTrafficEncryptionForced() const;
@@ -553,7 +554,7 @@ private:
     QnResourcePropertyAdaptor<bool>* m_auditTrailEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_auditTrailPeriodDaysAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_eventLogPeriodDaysAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QnOptionalBool>* m_trafficEncryptionForcedAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_trafficEncryptionForcedAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_videoTrafficEncryptionForcedAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_exposeDeviceCredentialsAdaptor = nullptr;
 
