@@ -16,8 +16,9 @@ void nx::core::storage_forecast::doForecast(const CameraRecordingSettingsSet& ca
     QMap<qint64, qint64> bitrateScale;
     for (const auto& camera: cameras)
     {
+        const auto cameraMinDays = std::chrono::duration_cast<std::chrono::days>(camera.minPeriod);
         bitrateScale[0] += camera.averageDensity;
-        bitrateScale[camera.minDays] -= camera.averageDensity;
+        bitrateScale[cameraMinDays.count()] -= camera.averageDensity;
     }
     const qint64 maxMinDays = bitrateScale.keys().back();
 
@@ -25,10 +26,17 @@ void nx::core::storage_forecast::doForecast(const CameraRecordingSettingsSet& ca
     for (const auto& camera: cameras)
     {
         bitrateScale[maxMinDays] += camera.averageDensity;
-        if(camera.maxDays > 0) //< We consider camera.maxDays == 0 => camera should record forever.
+        if (camera.maxPeriod.count() > 0) //< We consider camera.maxDays == 0s => camera should record forever.
         {
-            NX_ASSERT(camera.maxDays >= camera.minDays);
-            bitrateScale[camera.maxDays - camera.minDays + maxMinDays] -= camera.averageDensity;
+            const auto cameraMinDays =
+                std::chrono::duration_cast<std::chrono::days>(camera.minPeriod);
+
+            const auto cameraMaxDays =
+                std::chrono::duration_cast<std::chrono::days>(camera.maxPeriod);
+
+            NX_ASSERT(camera.maxPeriod >= camera.minPeriod);
+            bitrateScale[cameraMaxDays.count() - cameraMinDays.count() + maxMinDays]
+                -= camera.averageDensity;
         }
     }
 
@@ -77,15 +85,30 @@ void nx::core::storage_forecast::doForecast(const CameraRecordingSettingsSet& ca
         }
         else
         {
-            if (camera->averageDensity == 0) //< We have no data to make forecast on this camera.
-                cameraStat.archiveDurationSecs = 0;
-            else if (days < maxMinDays)
-                cameraStat.archiveDurationSecs = (qint64) (kSecsInDay * qMin((qreal)camera->minDays, days));
-            else
-                cameraStat.archiveDurationSecs = (qint64) (kSecsInDay * (camera->minDays + (days - maxMinDays)));
+            using DaysF = std::chrono::duration<qreal, std::chrono::days::period>;
+            const auto cameraMinPeriodDaysF = std::chrono::duration_cast<DaysF>(camera->minPeriod);
 
-            if (camera->maxDays > 0)
-                cameraStat.archiveDurationSecs = qMin(cameraStat.archiveDurationSecs, camera->maxDays * kSecsInDay);
+            if (camera->averageDensity == 0) //< We have no data to make forecast on this camera.
+            {
+                cameraStat.archiveDurationSecs = 0;
+            }
+            else if (days < maxMinDays)
+            {
+                cameraStat.archiveDurationSecs =
+                    qRound64(kSecsInDay * qMin(cameraMinPeriodDaysF.count(), days));
+            }
+            else
+            {
+                cameraStat.archiveDurationSecs =
+                    qRound64(kSecsInDay * (cameraMinPeriodDaysF.count() + (days - maxMinDays)));
+            }
+
+            if (camera->maxPeriod.count() > 0)
+            {
+                cameraStat.archiveDurationSecs = std::min(
+                    cameraStat.archiveDurationSecs,
+                    static_cast<qint64>(camera->maxPeriod.count()));
+            }
         }
 
         cameraStat.recordedBytes = cameraStat.archiveDurationSecs * camera->averageDensity;
