@@ -3199,7 +3199,7 @@ a %1</translation>
     </message>
     <message>
       <source>System configuration will be restored from backup, Server application will be restarted.</source>
-      <translation>A configuração do sistema será restaurada a partir do backup, o aplicativo do servidor será reiniciado.</translation>
+      <translation>A configuração do sistema será restaurada a partir do ‘backup’, o aplicativo do servidor será reiniciado.</translation>
     </message>
   </context>
   <context>
@@ -4954,7 +4954,7 @@ a %1</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation>Backup</translation>
+      <translation>‘Backup’ / Redundância de Gravações</translation>
     </message>
   </context>
   <context>

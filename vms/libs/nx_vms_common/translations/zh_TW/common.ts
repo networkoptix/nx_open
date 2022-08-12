@@ -174,7 +174,7 @@
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-      <translation>從伺服器 %1: &quot;%2&quot; 接收到錯誤回應.</translation>
+      <translation>從伺服器 %1接收到錯誤回應:&quot;%2&quot;</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
@@ -186,7 +186,7 @@
     </message>
     <message>
       <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
-      <translation>最後, 試著更新分位. 若問題持續發生, 請連繫技術支援部門.</translation>
+      <translation>請嘗試更新韌體(分位)。 若問題持續或沒有解決， 請連繫技術支援部門.</translation>
     </message>
     <message>
       <source>Failed to configure parameter %1.</source>
@@ -194,11 +194,11 @@
     </message>
     <message>
       <source>Please contact support.</source>
-      <translation>請連繫技術支援部門.</translation>
+      <translation>請聯繫技術支援部門.</translation>
     </message>
     <message>
       <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-      <translation>I/O發生錯誤. 錯誤訊息為: &quot;%1&quot;.</translation>
+      <translation>作業系統發生I/O錯誤，錯誤訊息為: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Parameters:</source>
@@ -206,59 +206,59 @@
     </message>
     <message>
       <source>Please try to reboot the device, then restore factory defaults on the web-page.</source>
-      <translation>請嘗試重啟裝置, 接著在裝置網頁上還原預設值.</translation>
+      <translation>請嘗試重啟裝置，然後在裝置網頁上還原至出廠預設值。</translation>
     </message>
     <message>
       <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-      <translation>請嘗試重啟攝影機, 接著在攝影機網頁上還原預設值.</translation>
+      <translation>請嘗試重啟攝影機，接著在攝影機網頁上還原至出廠預設值。</translation>
     </message>
     <message>
       <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
-      <translation>請確認裝置已接入至網路. 請嘗試重啟此裝置.</translation>
+      <translation>請確認裝置已接至正確的網路，並請嘗試重啟此裝置。</translation>
     </message>
     <message>
       <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-      <translation>請確認攝影機已接入至網路. 請嘗試重啟此攝影機.</translation>
+      <translation>請確認攝影機已接至正確的網路，並請嘗試重啟此裝置。</translation>
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>設備請求&quot;%1&quot; 失敗, 錯誤訊息 &quot;%2&quot;.</translation>
+      <translation>設備請求&quot;%1&quot; 失敗，錯誤訊息 &quot;%2&quot;。</translation>
     </message>
     <message>
       <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>攝影機請求&quot;%1&quot; 失敗, 錯誤訊息 &quot;%2&quot;.</translation>
+      <translation>攝影機請求&quot;%1&quot; 失敗，錯誤訊息 &quot;%2&quot;。</translation>
     </message>
     <message>
       <source>Unknown device issue.</source>
-      <translation>未知的裝置錯誤.</translation>
+      <translation>未知的裝置錯誤</translation>
     </message>
     <message>
       <source>Unknown camera issue.</source>
-      <translation>未知的攝影機錯誤.</translation>
+      <translation>未知的攝影機錯誤</translation>
     </message>
     <message>
       <source>Invalid data was received from the device %1.</source>
-      <translation>從裝置 %1 接收到無效的資料.</translation>
+      <translation>從裝置 %1 接收到無效的資料</translation>
     </message>
     <message>
       <source>Invalid data was received from the camera %1.</source>
-      <translation>從攝影機 %1 接收到無效的資料.</translation>
+      <translation>從攝影機 %1 接收到無效的資料</translation>
     </message>
     <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
-      <translation>過多的媒體錯誤. 請開啟裝置問題表以取得更多資訊.</translation>
+      <translation>串流發生太多錯誤，請開啟事件列表確認裝置問題內容。</translation>
     </message>
     <message>
       <source>Too many media errors. Please open camera issues dialog for more details.</source>
-      <translation>過多的媒體錯誤. 請開啟攝影機問題表以取得更多資訊.</translation>
+      <translation>串流發生太多錯誤，請開啟事件列表確認攝影機問題內容</translation>
     </message>
     <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
-      <translation>請試著重啟 I/O 模組, 接著至網頁界面上還原預設值.</translation>
+      <translation>請試著重啟 I/O 模組，並嘗試在網頁介面上還原至出廠預設值</translation>
     </message>
     <message>
       <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
-      <translation>請確認 I/O 裝置已連接至網路. 試著重啟 I/O 模組.</translation>
+      <translation>請確認 I/O 裝置已連接至正確的網路，然後嘗試重啟 I/O 模組。</translation>
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -266,79 +266,79 @@
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
-      <translation>未知的 I/O 模組問題.</translation>
+      <translation>未知的 I/O 模組問題</translation>
     </message>
     <message>
       <source>Invalid data was received from the I/O module %1.</source>
-      <translation>從 I/O 模組 %1 接收到無效資料.</translation>
+      <translation>從 I/O 模組 %1 接收到無效資料</translation>
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-      <translation>過多媒體錯誤. 請開啟 I/O 模組問題列表以取得更多資訊.</translation>
+      <translation>I/O模組發生太多錯誤，請開啟事件列表確認I/O模組問題內容</translation>
     </message>
     <message>
       <source>Device initialization process is in progress.</source>
-      <translation>裝置初始程序進行中.</translation>
+      <translation>裝置初始程序正在進行中</translation>
     </message>
     <message>
       <source>Camera initialization process is in progress.</source>
-      <translation>攝影機初始程序進行中.</translation>
+      <translation>攝影機初始程序正在進行中</translation>
     </message>
     <message>
       <source>I/O Module initialization process is in progress.</source>
-      <translation>I/O 模組初始程序進行中.</translation>
+      <translation>I/O 模組初始程序正在進行中</translation>
     </message>
     <message>
       <source>Make sure port %1 is accessible (e.g. forwarded).</source>
-      <translation>請確認 %1 埠可被連結 (譬如已開啟轉發埠).</translation>
+      <translation>請確認 %1 埠已允許連線 (例如：已建立通訊埠轉發規則)</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
-      <translation>若無幫助, 請在設備 Web 頁面上還原預設值.</translation>
+      <translation>若問題仍存在，請嘗試在設備網頁介面上還原出廠預設值</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the camera web-page.</source>
-      <translation>若無幫助, 請在攝影機 Web 頁面上還原預設值.</translation>
+      <translation>若問題仍存在，請嘗試在攝影機網頁介面上還原出廠預設值</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
-      <translation>若無幫助, 請在 I/O 模組 Web 頁面上還原預設值.</translation>
+      <translation>若問題仍存在，請嘗試在I/O模組網頁介面上還原出廠預設值</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
-      <translation>無法開啟媒體 URL %1. 連接到通訊埠 %2 失敗.</translation>
+      <translation>無法開啟媒體 URL %1，無法連接到通訊埠 %2</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
-      <translation>無法開啟媒體 URL %1. 與通訊埠 %2 的連線無預警關閉.</translation>
+      <translation>無法開啟媒體 URL %1，與通訊埠 %2 的連線無預警關閉。</translation>
     </message>
     <message>
       <source>Could not parse device response. URL %1, request name %2.</source>
-      <translation>無法分析設備回應. URL %1, 請求名稱 %2.</translation>
+      <translation>無法解析設備回應。請求URL：%1，請求名稱： %2.</translation>
     </message>
     <message>
       <source>Could not parse camera response. URL %1, request name %2.</source>
-      <translation>無法分析攝影機回應. URL %1, 請求名稱 %2.</translation>
+      <translation>無法解析攝影機回應。請求URL：%1，請求名稱： %2.</translation>
     </message>
     <message>
       <source>Could not parse I/O module response. URL %1, request name %2.</source>
-      <translation>無法分析 I/O 模組回應. URL %1, 請求名稱 %2.</translation>
+      <translation>無法解析I/O模組回應。請求URL：%1，請求名稱： %2.</translation>
     </message>
     <message>
       <source>No supported media tracks at URL %1.</source>
-      <translation>不支援的媒體軌於 URL %1.</translation>
+      <translation>不支援從URL：%1獲取的媒體內容。</translation>
     </message>
     <message>
       <source>Not authorized. URL %1.</source>
-      <translation>未認証. URL %1.</translation>
+      <translation>認証未通過。URL：%1</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
-      <translation>無法打開媒體 URL %1. 不支援的媒體協議 %2.</translation>
+      <translation>無法開啟媒體 URL：%1。不支援的協定：%2.</translation>
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
-      <translation>攝影機是從錄影資料中找回的. 刪除相機並重加一遍以瀏覽即時影像.</translation>
+      <translation>此攝影機來自離線錄影資料回復，若要瀏覽即時影像，請刪除相機並重新添加。</translation>
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>

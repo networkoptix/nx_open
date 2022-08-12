@@ -1052,7 +1052,7 @@ om PTZ te activeren</translation>
     <name>SelectOverlappedIdDialog</name>
     <message>
       <source>Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</source>
-      <translation>Tijdlijn-ID, die wordt gemaakt wanneer de tijd achteruit wordt gewijzigd op een externe NVR. De nieuwe tijdlijn kan de bestaande overlappen.</translation>
+      <translation>Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</translation>
     </message>
     <message>
       <source>Select</source>
