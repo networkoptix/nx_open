@@ -31,16 +31,16 @@ using Rotation = core::Rotation;
 using StreamIndex = nx::vms::api::StreamIndex;
 using MotionStreamIndex = QnSecurityCamResource::MotionStreamIndex;
 
-enum class DaysType
+enum class PeriodType
 {
-    minDays,
-    maxDays
+    minPeriod,
+    maxPeriod
 };
 
-void tryStoreRecordingDaysChanges(
-    const RecordingDays& data,
+void tryStoreRecordingPeriodChanges(
+    const RecordingPeriod& data,
     const QnVirtualCameraResourceList& cameras,
-    DaysType type)
+    PeriodType type)
 {
     using getterType = std::function<std::chrono::seconds(const QnVirtualCameraResourcePtr&)>;
     using setterType = std::function<void(const QnVirtualCameraResourcePtr&, std::chrono::seconds)>;
@@ -48,19 +48,25 @@ void tryStoreRecordingDaysChanges(
     static const getterType minGetter =
         [](const QnVirtualCameraResourcePtr& camera) { return camera->minPeriod(); };
     static const setterType minSetter =
-        [](const QnVirtualCameraResourcePtr& camera, std::chrono::seconds value) { return camera->setMinPeriod(value); };
+        [](const QnVirtualCameraResourcePtr& camera, std::chrono::seconds value)
+        {
+            return camera->setMinPeriod(value);
+        };
 
     static const getterType maxGetter =
         [](const QnVirtualCameraResourcePtr& camera) { return camera->maxPeriod(); };
     static const setterType maxSetter =
-        [](const QnVirtualCameraResourcePtr& camera, std::chrono::seconds value) { return camera->setMaxPeriod(value); };
+        [](const QnVirtualCameraResourcePtr& camera, std::chrono::seconds value)
+        {
+            return camera->setMaxPeriod(value);
+        };
 
-    const setterType& setter = type == DaysType::minDays ? minSetter : maxSetter;
+    const setterType& setter = type == PeriodType::minPeriod ? minSetter : maxSetter;
 
     if (!data.isApplicable())
         return;
 
-    if (data.hasManualDaysValue())
+    if (data.hasManualPeriodValue())
     {
         // Sets direct values.
         for (const auto& camera: cameras)
@@ -71,7 +77,7 @@ void tryStoreRecordingDaysChanges(
 
     // Preserves days value if there are different ones.
 
-    const getterType& getter = type == DaysType::minDays ? minGetter : maxGetter;
+    const getterType& getter = type == PeriodType::minPeriod ? minGetter : maxGetter;
     for (const auto& camera: cameras)
     {
         const auto value = getter(camera);
@@ -593,8 +599,8 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
         setCredentials(state.credentials, cameras);
     }
 
-    tryStoreRecordingDaysChanges(state.recording.minDays, cameras, DaysType::minDays);
-    tryStoreRecordingDaysChanges(state.recording.maxDays, cameras, DaysType::maxDays);
+    tryStoreRecordingPeriodChanges(state.recording.minPeriod, cameras, PeriodType::minPeriod);
+    tryStoreRecordingPeriodChanges(state.recording.maxPeriod, cameras, PeriodType::maxPeriod);
 
     if (state.imageControl.aspectRatio.hasValue())
         setCustomAspectRatio(state.imageControl.aspectRatio(), cameras);

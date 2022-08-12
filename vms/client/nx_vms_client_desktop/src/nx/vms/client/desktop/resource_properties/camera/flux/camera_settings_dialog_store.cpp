@@ -313,34 +313,34 @@ void CameraSettingsDialogStore::setRecordingBitrateNormalized(float value)
         });
 }
 
-void CameraSettingsDialogStore::setMinRecordingDaysAutomatic(bool value)
+void CameraSettingsDialogStore::setMinRecordingPeriodAutomatic(bool value)
 {
     d->executeAction(
         [&](State state)
         {
-            return Reducer::setMinRecordingDaysAutomatic(std::move(state), value);
+            return Reducer::setMinRecordingPeriodAutomatic(std::move(state), value);
         });
 }
 
-void CameraSettingsDialogStore::setMinRecordingDaysValue(int value)
+void CameraSettingsDialogStore::setMinRecordingPeriodValue(std::chrono::seconds value)
 {
     d->executeAction(
-        [&](State state) { return Reducer::setMinRecordingDaysValue(std::move(state), value); });
+        [&](State state) { return Reducer::setMinRecordingPeriodValue(std::move(state), value); });
 }
 
-void CameraSettingsDialogStore::setMaxRecordingDaysAutomatic(bool value)
+void CameraSettingsDialogStore::setMaxRecordingPeriodAutomatic(bool value)
 {
     d->executeAction(
         [&](State state)
         {
-            return Reducer::setMaxRecordingDaysAutomatic(std::move(state), value);
+            return Reducer::setMaxRecordingPeriodAutomatic(std::move(state), value);
         });
 }
 
-void CameraSettingsDialogStore::setMaxRecordingDaysValue(int value)
+void CameraSettingsDialogStore::setMaxRecordingPeriodValue(std::chrono::seconds value)
 {
     d->executeAction(
-        [&](State state) { return Reducer::setMaxRecordingDaysValue(std::move(state), value); });
+        [&](State state) { return Reducer::setMaxRecordingPeriodValue(std::move(state), value); });
 }
 
 void CameraSettingsDialogStore::setRecordingBeforeThresholdSec(int value)
