@@ -63,36 +63,30 @@ function(nx_go_build_test target working_dir package_path)
     set(multi_value_args DEPENDS)
     cmake_parse_arguments(GO_BUILD_TEST "" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
-    nx_find_files(go_sources ${package_path} "go")
-    add_custom_target(${target} ALL SOURCES ${go_sources})
+    nx_go_fix_target_exe(${target} target_exe)
+    set(target_path ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${target_exe})
 
+    set(compile_command ${NX_GO_COMPILER} test -c ${package_path} -o ${target_exe})
+    if(WIN32)
+        list(PREPEND compile_command ${CMAKE_COMMAND} -E env PATH="${CONAN_MINGW-W64_ROOT}/bin")
+    endif()
+
+    add_custom_command(
+        OUTPUT ${target_path}
+        WORKING_DIRECTORY ${working_dir}
+        DEPENDS ${GO_BUILD_TEST_DEPENDS}
+        COMMAND ${compile_command}
+        COMMAND ${CMAKE_COMMAND} -E copy ${target_exe} ${target_path}
+        COMMAND ${CMAKE_COMMAND} -E remove -f ${target_exe}
+    )
+
+    nx_find_files(go_sources ${package_path} "go")
+    add_custom_target(${target} ALL SOURCES ${go_sources} DEPENDS ${target_path})
     if(GO_BUILD_TEST_FOLDER)
         set_target_properties(${target} PROPERTIES FOLDER ${GO_BUILD_TEST_FOLDER})
     endif()
 
-    nx_go_fix_target_exe(${target} target_exe)
-
-    if (WIN32)
-        add_custom_command(
-            TARGET ${target}
-            WORKING_DIRECTORY ${working_dir}
-            DEPENDS ${GO_BUILD_TEST_DEPENDS}
-            COMMAND COMMAND ${CMAKE_COMMAND} -E env PATH="${CONAN_MINGW-W64_ROOT}/bin" ${NX_GO_COMPILER} test -c ${package_path} -o ${target_exe}
-            COMMAND ${CMAKE_COMMAND} -E copy ${target_exe} ${CMAKE_BINARY_DIR}/bin
-            COMMAND ${CMAKE_COMMAND} -E remove -f ${target_exe}
-        )    
-    else() 
-        add_custom_command(
-            TARGET ${target}
-            WORKING_DIRECTORY ${working_dir}
-            DEPENDS ${GO_BUILD_TEST_DEPENDS}
-            COMMAND ${NX_GO_COMPILER} test -c ${package_path} -o ${target_exe}
-            COMMAND ${CMAKE_COMMAND} -E copy ${target_exe} ${CMAKE_BINARY_DIR}/bin
-            COMMAND ${CMAKE_COMMAND} -E remove -f ${target_exe}
-        )
-    endif()
-	
-    add_test(NAME ${target} COMMAND ${CMAKE_BINARY_DIR}/bin/${target_exe})
+    add_test(NAME ${target} COMMAND ${target_path})
 
     # NOTE: unit_tests is a custom target set in open/cmake/test_utils.cmake
     add_dependencies(unit_tests ${target})
