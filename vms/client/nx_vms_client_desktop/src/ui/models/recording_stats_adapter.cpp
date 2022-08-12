@@ -129,11 +129,13 @@ QnCameraStatsData QnRecordingStats::forecastFromStatsToModel(const QnRecordingSt
     QnResourcePool* resourcePool)
 {
     using namespace nx::core::storage_forecast;
+    using namespace std::chrono;
+
     QnRecordingStatsReply filteredStats;
     CameraRecordingSettingsSet cameras;
 
     // Filter "hidden" cameras.
-    for (const auto& cameraStats : stats)
+    for (const auto& cameraStats: stats)
     {
         const auto& cameraResource =
             resourcePool->getResourceByPhysicalId<QnSecurityCamResource>(cameraStats.physicalId);
@@ -142,12 +144,9 @@ QnCameraStatsData QnRecordingStats::forecastFromStatsToModel(const QnRecordingSt
         {
             CameraRecordingSettings camera;
             camera.physicalId = cameraStats.physicalId;
-            using namespace std::chrono;
-            camera.minDays = qMax(std::chrono::days::zero().count(),
-                duration_cast<days>(cameraResource->minPeriod()).count());
-            camera.maxDays = qMax(std::chrono::days::zero().count(), 
-                duration_cast<days>(cameraResource->maxPeriod()).count());
-            camera.averageDensity = qMax(0ll, cameraStats.averageDensity);
+            camera.minPeriod = std::max(0s, cameraResource->minPeriod());
+            camera.maxPeriod = std::max(0s, cameraResource->maxPeriod());
+            camera.averageDensity = std::max(0ll, cameraStats.averageDensity);
 
             cameras.push_back(std::move(camera)); //< Add camera for forecast.
             filteredStats << cameraStats; //< Add camera to model.
