@@ -1758,8 +1758,8 @@
       <translation>Informante de intercomunicação</translation>
     </message>
     <message>
-      <source>Failed to backup file</source>
-      <translation>Falha ao fazer backup do arquivo</translation>
+      <source>Failed to backup file %1</source>
+      <translation type="unfinished">Failed to backup file %1</translation>
     </message>
   </context>
   <context>

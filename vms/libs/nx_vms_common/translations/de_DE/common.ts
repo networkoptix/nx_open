@@ -1758,8 +1758,8 @@
       <translation>Intercom-Informant</translation>
     </message>
     <message>
-      <source>Failed to backup file</source>
-      <translation>Fehler beim Sichern der Datei</translation>
+      <source>Failed to backup file %1</source>
+      <translation>Sicherung der Datei %1 fehlgeschlagen</translation>
     </message>
   </context>
   <context>

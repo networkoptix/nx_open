@@ -9,15 +9,15 @@
     </message>
     <message>
       <source>Select area</source>
-      <translation>選取範圍</translation>
+      <translation>選擇區域</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation>選擇影片上的某區域。</translation>
+      <translation>請在影像上圈選欲搜尋的區域</translation>
     </message>
     <message>
       <source>In selected area</source>
-      <translation>在選定區域</translation>
+      <translation>在已圈選區域內</translation>
     </message>
     <message>
       <source>Any plugin</source>
@@ -38,7 +38,7 @@
     <name>CameraDiagnostics::DiagnoseTool</name>
     <message>
       <source>No connection to Server %1.</source>
-      <translation>無法連線到伺服器 %1.</translation>
+      <translation>設備無法連線到伺服器 %1.</translation>
     </message>
   </context>
   <context>
@@ -53,7 +53,7 @@
     </message>
     <message>
       <source>Expires</source>
-      <translation>到期日</translation>
+      <translation>有效期到</translation>
     </message>
   </context>
   <context>
@@ -67,11 +67,11 @@
     <name>CompatibilityVersionInstallationDialog</name>
     <message>
       <source>Installing version %1</source>
-      <translation>安裝版本 %1</translation>
+      <translation>正在安裝版本 %1</translation>
     </message>
     <message>
       <source>Installation failed</source>
-      <translation>安裝失敗</translation>
+      <translation>安裝未完成，請聯絡系統管理員。</translation>
     </message>
     <message>
       <source>Installation completed</source>
@@ -79,11 +79,11 @@
     </message>
     <message>
       <source>Getting update information from the server</source>
-      <translation>從伺服器獲取更新信息</translation>
+      <translation>正在從伺服器取得相關資訊</translation>
     </message>
     <message>
       <source>Downloading update package</source>
-      <translation>正在下載更新套件</translation>
+      <translation>正在下載更新或相容版本套件</translation>
     </message>
     <message>
       <source>Installing</source>
@@ -91,7 +91,7 @@
     </message>
     <message>
       <source>Verifying update package</source>
-      <translation>正在驗證更新套件</translation>
+      <translation>正在驗證更新或相容套件</translation>
     </message>
     <message>
       <source>Cannot connect to the System</source>
@@ -102,7 +102,7 @@
     <name>ContextMenu</name>
     <message>
       <source>Filter...</source>
-      <translation>篩選器...</translation>
+      <translation>篩選...</translation>
     </message>
     <message>
       <source>Connect to System</source>
@@ -122,7 +122,7 @@
     </message>
     <message>
       <source>Push my screen</source>
-      <translation>同步我的桌面</translation>
+      <translation>推送桌面</translation>
     </message>
     <message>
       <source>Select Time Server</source>
@@ -138,11 +138,11 @@
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation>連線至伺服器...</translation>
+      <translation>連線到伺服器...</translation>
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation>中斷連線</translation>
+      <translation>結束連線</translation>
     </message>
     <message>
       <source>Browse Local Files</source>
@@ -210,11 +210,11 @@
     </message>
     <message>
       <source>Save Current Layout</source>
-      <translation>儲存目前佈局</translation>
+      <translation>儲存佈局</translation>
     </message>
     <message>
       <source>Save Current Layout As...</source>
-      <translation>另存目前佈局為…</translation>
+      <translation>另存佈局…</translation>
     </message>
     <message>
       <source>Save Video Wall View</source>
@@ -226,7 +226,7 @@
     </message>
     <message>
       <source>Stop Screen Recording</source>
-      <translation>停止螢幕錄影</translation>
+      <translation>結束螢幕錄影</translation>
     </message>
     <message>
       <source>Stop current action</source>
@@ -250,7 +250,7 @@
     </message>
     <message>
       <source>Restore Down</source>
-      <translation>恢復視窗化</translation>
+      <translation>回復視窗顯示</translation>
     </message>
     <message>
       <source>Open in Browser...</source>
@@ -289,7 +289,7 @@
     <message>
       <source>Open %1 Portal...</source>
       <comment>Open Nx Cloud Portal</comment>
-      <translation>打開 %1 入口...</translation>
+      <translation>開啟 %1 介面...</translation>
     </message>
     <message>
       <source>Account Settings...</source>
@@ -333,11 +333,11 @@
     </message>
     <message>
       <source>Clear Selection</source>
-      <translation>清除選擇的區塊</translation>
+      <translation>清除標記</translation>
     </message>
     <message>
       <source>Zoom to Selection</source>
-      <translation>拉伸至選擇區域</translation>
+      <translation>跳轉至已標記範圍</translation>
     </message>
     <message>
       <source>Add Bookmark...</source>
@@ -361,7 +361,7 @@
     </message>
     <message>
       <source>Monitor</source>
-      <translation>顯示器</translation>
+      <translation>伺服器效能監視器</translation>
     </message>
     <message>
       <source>Open in New Tab</source>
@@ -369,7 +369,7 @@
     </message>
     <message>
       <source>Monitor in New Tab</source>
-      <translation>於新頁籤中檢視</translation>
+      <translation>在新頁籤中開啟伺服器效能監視器</translation>
     </message>
     <message>
       <source>Open in Alarm Layout</source>
@@ -389,7 +389,7 @@
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation>開啟檔案所在目錄</translation>
+      <translation>開啟檔案所在資料夾</translation>
     </message>
     <message>
       <source>Identify</source>
@@ -9832,11 +9832,6 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <translation>未限制使用者連線時間將可能影響系統效能，並有潛在的安全性問題</translation>
     </message>
     <message>
-      <source>It is recommended to have user session lifetime not greater than %1</source>
-      <comment>%1 is the time span with time units</comment>
-      <translation>建議使用者連線時間限制低於 %1</translation>
-    </message>
-    <message>
       <source>Learn more.</source>
       <translation>了解更多.</translation>
     </message>
@@ -9846,6 +9841,11 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <translation>
         <numerusform>%1個使用者中有%n個使用者允許使用Digest驗證(較不安全)。</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>The recommended maximum user session lifetime is %1</source>
+      <comment>%1 is the time span with time units</comment>
+      <translation type="unfinished">The recommended maximum user session lifetime is %1</translation>
     </message>
   </context>
   <context>
@@ -9866,10 +9866,6 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
   <context>
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
     <message>
-      <source>The certificate is pinned to %1</source>
-      <translation>此憑證已綁定至 %1</translation>
-    </message>
-    <message>
       <source>The certificate was presented by %1</source>
       <translation>此憑證由 %1提供</translation>
     </message>
@@ -9884,10 +9880,6 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message>
       <source>Custom certificate</source>
       <translation>自定義憑證</translation>
-    </message>
-    <message>
-      <source>Pinned certificate</source>
-      <translation>綁定的憑證</translation>
     </message>
     <message>
       <source>Unknown certificate</source>
@@ -9910,6 +9902,14 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
       <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
+    </message>
+    <message>
+      <source>Auto-generated certificate</source>
+      <translation type="unfinished">Auto-generated certificate</translation>
+    </message>
+    <message>
+      <source>The certificate is auto-generated and pinned to %1</source>
+      <translation type="unfinished">The certificate is auto-generated and pinned to %1</translation>
     </message>
   </context>
   <context>

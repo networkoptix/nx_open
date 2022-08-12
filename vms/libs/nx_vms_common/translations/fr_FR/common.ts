@@ -1758,8 +1758,8 @@
       <translation>Informeur Interphone</translation>
     </message>
     <message>
-      <source>Failed to backup file</source>
-      <translation>Échec de la sauvegarde du fichier</translation>
+      <source>Failed to backup file %1</source>
+      <translation type="unfinished">Failed to backup file %1</translation>
     </message>
   </context>
   <context>

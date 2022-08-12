@@ -9979,11 +9979,6 @@ Forsigtig: Denne adgangskode kan ikke nulstilles. Hvis du mister det, vil arkive
       <translation>Ubegrænset levetid for brugersessioner truer den overordnede systemsikkerhed og kan føre til forringelse af systemets ydeevne</translation>
     </message>
     <message>
-      <source>It is recommended to have user session lifetime not greater than %1</source>
-      <comment>%1 is the time span with time units</comment>
-      <translation>Det anbefales at have en levetid for brugersessioner, der ikke er længere end %1</translation>
-    </message>
-    <message>
       <source>Learn more.</source>
       <translation>Læs mere.</translation>
     </message>
@@ -9994,6 +9989,11 @@ Forsigtig: Denne adgangskode kan ikke nulstilles. Hvis du mister det, vil arkive
         <numerusform>%n ud af %1 brugere har tilladelse til at bruge digest-godkendelse (ikke sikker).</numerusform>
         <numerusform>%n ud af %1 brugere har tilladelse til at bruge digest-godkendelse (ikke sikker).</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>The recommended maximum user session lifetime is %1</source>
+      <comment>%1 is the time span with time units</comment>
+      <translation type="unfinished">The recommended maximum user session lifetime is %1</translation>
     </message>
   </context>
   <context>
@@ -10014,10 +10014,6 @@ Forsigtig: Denne adgangskode kan ikke nulstilles. Hvis du mister det, vil arkive
   <context>
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
     <message>
-      <source>The certificate is pinned to %1</source>
-      <translation>Certifikatet er fastgjort til %1</translation>
-    </message>
-    <message>
       <source>The certificate was presented by %1</source>
       <translation>Certifikatet blev præsenteret af %1</translation>
     </message>
@@ -10032,10 +10028,6 @@ Forsigtig: Denne adgangskode kan ikke nulstilles. Hvis du mister det, vil arkive
     <message>
       <source>Custom certificate</source>
       <translation>Brugerdefineret certifikat</translation>
-    </message>
-    <message>
-      <source>Pinned certificate</source>
-      <translation>Fastgjort certifikat</translation>
     </message>
     <message>
       <source>Unknown certificate</source>
@@ -10058,6 +10050,14 @@ Forsigtig: Denne adgangskode kan ikke nulstilles. Hvis du mister det, vil arkive
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
       <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
+    </message>
+    <message>
+      <source>Auto-generated certificate</source>
+      <translation type="unfinished">Auto-generated certificate</translation>
+    </message>
+    <message>
+      <source>The certificate is auto-generated and pinned to %1</source>
+      <translation type="unfinished">The certificate is auto-generated and pinned to %1</translation>
     </message>
   </context>
   <context>

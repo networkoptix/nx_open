@@ -10268,11 +10268,6 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <translation type="unfinished">Unlimited user session lifetime threatens overall System security and may lead to degradation in System performance</translation>
     </message>
     <message>
-      <source>It is recommended to have user session lifetime not greater than %1</source>
-      <comment>%1 is the time span with time units</comment>
-      <translation>Рекомендуется настроить время сеанса пользователя не более %1</translation>
-    </message>
-    <message>
       <source>Learn more.</source>
       <translation>Подробнее.</translation>
     </message>
@@ -10285,6 +10280,11 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
         <numerusform>%n из %1 пользователей могут использовать дайджест-аутентификацию (небезопасно).</numerusform>
         <numerusform>%n из %1 пользователей могут использовать дайджест-аутентификацию (небезопасно).</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>The recommended maximum user session lifetime is %1</source>
+      <comment>%1 is the time span with time units</comment>
+      <translation type="unfinished">The recommended maximum user session lifetime is %1</translation>
     </message>
   </context>
   <context>
@@ -10305,10 +10305,6 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
   <context>
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
     <message>
-      <source>The certificate is pinned to %1</source>
-      <translation>Сертификат прикреплен к %1</translation>
-    </message>
-    <message>
       <source>The certificate was presented by %1</source>
       <translation>Сертификат был представлен %1</translation>
     </message>
@@ -10323,10 +10319,6 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message>
       <source>Custom certificate</source>
       <translation>Пользовательский сертификат</translation>
-    </message>
-    <message>
-      <source>Pinned certificate</source>
-      <translation>Прикрепленный сертификат</translation>
     </message>
     <message>
       <source>Unknown certificate</source>
@@ -10349,6 +10341,14 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
       <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
+    </message>
+    <message>
+      <source>Auto-generated certificate</source>
+      <translation type="unfinished">Auto-generated certificate</translation>
+    </message>
+    <message>
+      <source>The certificate is auto-generated and pinned to %1</source>
+      <translation type="unfinished">The certificate is auto-generated and pinned to %1</translation>
     </message>
   </context>
   <context>

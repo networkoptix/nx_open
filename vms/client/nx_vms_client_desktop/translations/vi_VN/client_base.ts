@@ -9832,11 +9832,6 @@ Chú ý: Không thể đặt lại mật khẩu này. Nếu bạn làm mất nó
       <translation>Thời lượng không giới hạn của phiên người dùng đe dọa đến tính bảo mật chung của Hệ thống và có thể dẫn đến sự suy giảm hiệu suất của Hệ thống</translation>
     </message>
     <message>
-      <source>It is recommended to have user session lifetime not greater than %1</source>
-      <comment>%1 is the time span with time units</comment>
-      <translation>Thời lượng của phiên người dùng được khuyến nghị không dài hơn %1</translation>
-    </message>
-    <message>
       <source>Learn more.</source>
       <translation>Tìm hiểu thêm.</translation>
     </message>
@@ -9846,6 +9841,11 @@ Chú ý: Không thể đặt lại mật khẩu này. Nếu bạn làm mất nó
       <translation>
         <numerusform>%n trong số %1 người dùng được phép sử dụng xác thực thông báo (không an toàn).</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>The recommended maximum user session lifetime is %1</source>
+      <comment>%1 is the time span with time units</comment>
+      <translation>Thời lượng phiên người dùng tối đa được đề xuất là %1</translation>
     </message>
   </context>
   <context>
@@ -9866,10 +9866,6 @@ Chú ý: Không thể đặt lại mật khẩu này. Nếu bạn làm mất nó
   <context>
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
     <message>
-      <source>The certificate is pinned to %1</source>
-      <translation>Chứng chỉ này được ghim cho %1</translation>
-    </message>
-    <message>
       <source>The certificate was presented by %1</source>
       <translation>Chứng chỉ này đã được xuất trình bởi %1</translation>
     </message>
@@ -9884,10 +9880,6 @@ Chú ý: Không thể đặt lại mật khẩu này. Nếu bạn làm mất nó
     <message>
       <source>Custom certificate</source>
       <translation>Tùy chỉnh chứng nhận</translation>
-    </message>
-    <message>
-      <source>Pinned certificate</source>
-      <translation>Chứng chỉ được ghim</translation>
     </message>
     <message>
       <source>Unknown certificate</source>
@@ -9910,6 +9902,14 @@ Chú ý: Không thể đặt lại mật khẩu này. Nếu bạn làm mất nó
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
       <translation>Ai đó có thể đang mạo danh %1 để lấy cắp thông tin cá nhân của bạn.
 Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL máy chủ %2.</translation>
+    </message>
+    <message>
+      <source>Auto-generated certificate</source>
+      <translation>Chứng chỉ được tạo tự động</translation>
+    </message>
+    <message>
+      <source>The certificate is auto-generated and pinned to %1</source>
+      <translation>Chứng chỉ được tạo tự động và được ghim thành %1</translation>
     </message>
   </context>
   <context>

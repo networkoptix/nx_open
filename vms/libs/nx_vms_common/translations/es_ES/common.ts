@@ -1758,8 +1758,8 @@
       <translation type="unfinished">Intercom informer</translation>
     </message>
     <message>
-      <source>Failed to backup file</source>
-      <translation>No se pudo realizar la copia de seguridad del archivo</translation>
+      <source>Failed to backup file %1</source>
+      <translation>No se pudo hacer la copia de seguridad del archivo %1</translation>
     </message>
   </context>
   <context>

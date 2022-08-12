@@ -1700,8 +1700,8 @@
       <translation type="unfinished">Intercom informer</translation>
     </message>
     <message>
-      <source>Failed to backup file</source>
-      <translation>备份失败</translation>
+      <source>Failed to backup file %1</source>
+      <translation type="unfinished">Failed to backup file %1</translation>
     </message>
   </context>
   <context>

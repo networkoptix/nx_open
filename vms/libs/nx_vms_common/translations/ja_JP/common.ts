@@ -1700,8 +1700,8 @@
       <translation>インターホン通知者</translation>
     </message>
     <message>
-      <source>Failed to backup file</source>
-      <translation>ファイルのバックアップに失敗しました</translation>
+      <source>Failed to backup file %1</source>
+      <translation>ファイル %1 のバックアップに失敗しました</translation>
     </message>
   </context>
   <context>

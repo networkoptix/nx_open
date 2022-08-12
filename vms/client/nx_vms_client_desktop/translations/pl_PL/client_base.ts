@@ -10262,11 +10262,6 @@ Uwaga: To hasło nie może zostać zresetowane. Jeśli je zgubisz, archiwum nie 
       <translation>Nieograniczony czas trwania sesji użytkownika zagraża ogólnemu bezpieczeństwu systemu i może prowadzić do obniżenia wydajności systemu</translation>
     </message>
     <message>
-      <source>It is recommended to have user session lifetime not greater than %1</source>
-      <comment>%1 is the time span with time units</comment>
-      <translation>Zaleca się, aby czas trwania sesji użytkownika nie był większy niż %1</translation>
-    </message>
-    <message>
       <source>Learn more.</source>
       <translation>Więcej informacji.</translation>
     </message>
@@ -10279,6 +10274,11 @@ Uwaga: To hasło nie może zostać zresetowane. Jeśli je zgubisz, archiwum nie 
         <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
         <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>The recommended maximum user session lifetime is %1</source>
+      <comment>%1 is the time span with time units</comment>
+      <translation type="unfinished">The recommended maximum user session lifetime is %1</translation>
     </message>
   </context>
   <context>
@@ -10299,10 +10299,6 @@ Uwaga: To hasło nie może zostać zresetowane. Jeśli je zgubisz, archiwum nie 
   <context>
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
     <message>
-      <source>The certificate is pinned to %1</source>
-      <translation>Certyfikat jest przypięty do %1</translation>
-    </message>
-    <message>
       <source>The certificate was presented by %1</source>
       <translation>Certyfikat został przedstawiony przez %1</translation>
     </message>
@@ -10317,10 +10313,6 @@ Uwaga: To hasło nie może zostać zresetowane. Jeśli je zgubisz, archiwum nie 
     <message>
       <source>Custom certificate</source>
       <translation>Własny certyfikat</translation>
-    </message>
-    <message>
-      <source>Pinned certificate</source>
-      <translation>Przypięty certyfikat</translation>
     </message>
     <message>
       <source>Unknown certificate</source>
@@ -10343,6 +10335,14 @@ Uwaga: To hasło nie może zostać zresetowane. Jeśli je zgubisz, archiwum nie 
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
       <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
+    </message>
+    <message>
+      <source>Auto-generated certificate</source>
+      <translation type="unfinished">Auto-generated certificate</translation>
+    </message>
+    <message>
+      <source>The certificate is auto-generated and pinned to %1</source>
+      <translation type="unfinished">The certificate is auto-generated and pinned to %1</translation>
     </message>
   </context>
   <context>

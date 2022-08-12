@@ -9977,11 +9977,6 @@ Achtung: Dieses Passwort kann nicht zurückgesetzt werden. Wenn Sie es verlieren
       <translation>Unbegrenzte Lebensdauer von Benutzersitzungen gefährdet die Sicherheit des gesamten Systems und kann zu einer Verschlechterung der Systemleistung führen</translation>
     </message>
     <message>
-      <source>It is recommended to have user session lifetime not greater than %1</source>
-      <comment>%1 is the time span with time units</comment>
-      <translation>Es wird empfohlen, dass die Lebensdauer einer Benutzersitzung nicht größer als %1 ist</translation>
-    </message>
-    <message>
       <source>Learn more.</source>
       <translation>Mehr erfahren.</translation>
     </message>
@@ -9992,6 +9987,11 @@ Achtung: Dieses Passwort kann nicht zurückgesetzt werden. Wenn Sie es verlieren
         <numerusform>%n von %1 Benutzern darf die Digest-Authentifizierung verwenden (nicht sicher).</numerusform>
         <numerusform>%n von %1 Benutzern dürfen die Digest-Authentifizierung verwenden (nicht sicher).</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>The recommended maximum user session lifetime is %1</source>
+      <comment>%1 is the time span with time units</comment>
+      <translation>Die empfohlene maximale Lebensdauer einer Benutzersitzung beträgt %1</translation>
     </message>
   </context>
   <context>
@@ -10012,10 +10012,6 @@ Achtung: Dieses Passwort kann nicht zurückgesetzt werden. Wenn Sie es verlieren
   <context>
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
     <message>
-      <source>The certificate is pinned to %1</source>
-      <translation>Das Zertifikat ist auf %1 angepinnt</translation>
-    </message>
-    <message>
       <source>The certificate was presented by %1</source>
       <translation>Das Zertifikat wurde überreicht von %1</translation>
     </message>
@@ -10030,10 +10026,6 @@ Achtung: Dieses Passwort kann nicht zurückgesetzt werden. Wenn Sie es verlieren
     <message>
       <source>Custom certificate</source>
       <translation>Benutzerdefiniertes Zertifikat</translation>
-    </message>
-    <message>
-      <source>Pinned certificate</source>
-      <translation>Abgeheftetes Zertifikat</translation>
     </message>
     <message>
       <source>Unknown certificate</source>
@@ -10056,6 +10048,14 @@ Achtung: Dieses Passwort kann nicht zurückgesetzt werden. Wenn Sie es verlieren
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
       <translation>Jemand könnte sich als %1 ausgeben, um Ihre persönlichen Daten zu stehlen.
 Pinnen Sie dieses Zertifikat nicht, wenn Sie das SSL-Zertifikat des %2-Servers nicht geändert haben.</translation>
+    </message>
+    <message>
+      <source>Auto-generated certificate</source>
+      <translation>Automatisch generiertes Zertifikat</translation>
+    </message>
+    <message>
+      <source>The certificate is auto-generated and pinned to %1</source>
+      <translation>Das Zertifikat wird automatisch generiert und an %1 angeheftet</translation>
     </message>
   </context>
   <context>

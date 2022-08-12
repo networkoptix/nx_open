@@ -9980,11 +9980,6 @@ Varning: Det här lösenordet kan inte återställas. Om du tappar det blir arki
       <translation>Obegränsad livstid för användarsessioner hotar den övergripande systemsäkerheten och kan leda till försämring av systemprestandan</translation>
     </message>
     <message>
-      <source>It is recommended to have user session lifetime not greater than %1</source>
-      <comment>%1 is the time span with time units</comment>
-      <translation>Det rekommenderas att användarens sessionslivslängd inte är större än %1</translation>
-    </message>
-    <message>
       <source>Learn more.</source>
       <translation>Läs mer.</translation>
     </message>
@@ -9995,6 +9990,11 @@ Varning: Det här lösenordet kan inte återställas. Om du tappar det blir arki
         <numerusform>%n av %1 användare får använda digest-autentisering (inte säker).</numerusform>
         <numerusform>%n av %1 användare får använda digest-autentisering (inte säker).</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>The recommended maximum user session lifetime is %1</source>
+      <comment>%1 is the time span with time units</comment>
+      <translation>Den rekommenderade maximala användarsessionens livslängd är %1</translation>
     </message>
   </context>
   <context>
@@ -10015,10 +10015,6 @@ Varning: Det här lösenordet kan inte återställas. Om du tappar det blir arki
   <context>
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
     <message>
-      <source>The certificate is pinned to %1</source>
-      <translation>Certifikatet är fäst till %1</translation>
-    </message>
-    <message>
       <source>The certificate was presented by %1</source>
       <translation>Certifikatet presenterades av %1</translation>
     </message>
@@ -10033,10 +10029,6 @@ Varning: Det här lösenordet kan inte återställas. Om du tappar det blir arki
     <message>
       <source>Custom certificate</source>
       <translation>Anpassat certifikat</translation>
-    </message>
-    <message>
-      <source>Pinned certificate</source>
-      <translation>Fäst certifikat</translation>
     </message>
     <message>
       <source>Unknown certificate</source>
@@ -10059,6 +10051,14 @@ Varning: Det här lösenordet kan inte återställas. Om du tappar det blir arki
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
       <translation>Någon kan efterlikna %1 för att stjäla dina personuppgifter.
 Fäst inte detta certifikat om du gjorde&apos;t ändra %2 server SSL-certifikat.</translation>
+    </message>
+    <message>
+      <source>Auto-generated certificate</source>
+      <translation>Auto-genererat certifikat</translation>
+    </message>
+    <message>
+      <source>The certificate is auto-generated and pinned to %1</source>
+      <translation>Certifikatet är automatiskt genererat och fäst till %1</translation>
     </message>
   </context>
   <context>

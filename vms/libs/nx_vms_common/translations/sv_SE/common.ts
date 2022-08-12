@@ -1758,8 +1758,8 @@
       <translation>Intercom informatör</translation>
     </message>
     <message>
-      <source>Failed to backup file</source>
-      <translation>Det gick inte att säkerhetskopiera filen</translation>
+      <source>Failed to backup file %1</source>
+      <translation>Det gick inte att säkerhetskopiera fil %1</translation>
     </message>
   </context>
   <context>

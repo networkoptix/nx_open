@@ -1758,8 +1758,8 @@
       <translation type="unfinished">Intercom informer</translation>
     </message>
     <message>
-      <source>Failed to backup file</source>
-      <translation>Back-up bestand mislukt</translation>
+      <source>Failed to backup file %1</source>
+      <translation type="unfinished">Failed to backup file %1</translation>
     </message>
   </context>
   <context>

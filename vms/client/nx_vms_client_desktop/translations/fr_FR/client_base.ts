@@ -9981,11 +9981,6 @@ Attention : Ce mot de passe ne peut pas être réinitialisé. Si vous le perdez,
       <translation>La durée de vie illimitée de la session utilisateur menace la sécurité globale du système et peut entraîner une dégradation des performances du système</translation>
     </message>
     <message>
-      <source>It is recommended to have user session lifetime not greater than %1</source>
-      <comment>%1 is the time span with time units</comment>
-      <translation>Il est recommandé d'avoir une durée de vie de session utilisateur pas supérieure à %1</translation>
-    </message>
-    <message>
       <source>Learn more.</source>
       <translation>En savoir plus.</translation>
     </message>
@@ -9996,6 +9991,11 @@ Attention : Ce mot de passe ne peut pas être réinitialisé. Si vous le perdez,
         <numerusform>%n utilisateurs sur %1 est autorisé à utiliser l'authentification "digest" (non sécurisé).</numerusform>
         <numerusform>%n utilisateurs sur %1 sont autorisés à utiliser l'authentification "digest" (non sécurisé).</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>The recommended maximum user session lifetime is %1</source>
+      <comment>%1 is the time span with time units</comment>
+      <translation type="unfinished">The recommended maximum user session lifetime is %1</translation>
     </message>
   </context>
   <context>
@@ -10016,10 +10016,6 @@ Attention : Ce mot de passe ne peut pas être réinitialisé. Si vous le perdez,
   <context>
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
     <message>
-      <source>The certificate is pinned to %1</source>
-      <translation>Le certificat est épinglé à %1</translation>
-    </message>
-    <message>
       <source>The certificate was presented by %1</source>
       <translation>Le certificat a été présenté par %1</translation>
     </message>
@@ -10034,10 +10030,6 @@ Attention : Ce mot de passe ne peut pas être réinitialisé. Si vous le perdez,
     <message>
       <source>Custom certificate</source>
       <translation>Certificat personnalisé</translation>
-    </message>
-    <message>
-      <source>Pinned certificate</source>
-      <translation>Certificat épinglé</translation>
     </message>
     <message>
       <source>Unknown certificate</source>
@@ -10060,6 +10052,14 @@ Attention : Ce mot de passe ne peut pas être réinitialisé. Si vous le perdez,
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
       <translation>Quelqu'un peut se faire passer pour %1 afin de voler vos informations personnelles.
 N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du serveur %2.</translation>
+    </message>
+    <message>
+      <source>Auto-generated certificate</source>
+      <translation type="unfinished">Auto-generated certificate</translation>
+    </message>
+    <message>
+      <source>The certificate is auto-generated and pinned to %1</source>
+      <translation type="unfinished">The certificate is auto-generated and pinned to %1</translation>
     </message>
   </context>
   <context>

@@ -9834,11 +9834,6 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <translation>무제한 사용자 세션 수명은 전체 시스템 보안을 위협하고 시스템 성능 저하로 이어질 수 있습니다.</translation>
     </message>
     <message>
-      <source>It is recommended to have user session lifetime not greater than %1</source>
-      <comment>%1 is the time span with time units</comment>
-      <translation>사용자 세션 수명은 %1보다 크지 않는 것이 좋습니다.</translation>
-    </message>
-    <message>
       <source>Learn more.</source>
       <translation>자세히 알아보기.</translation>
     </message>
@@ -9848,6 +9843,11 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <translation>
         <numerusform>%1 사용자 중 %n 은 다이제스트 인증을 사용할 수 있다(보안되지 않음).</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>The recommended maximum user session lifetime is %1</source>
+      <comment>%1 is the time span with time units</comment>
+      <translation type="unfinished">The recommended maximum user session lifetime is %1</translation>
     </message>
   </context>
   <context>
@@ -9868,10 +9868,6 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
   <context>
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
     <message>
-      <source>The certificate is pinned to %1</source>
-      <translation>인증서가 %1에 고정됨</translation>
-    </message>
-    <message>
       <source>The certificate was presented by %1</source>
       <translation>%1이(가) 인증서를 제시했습니다.</translation>
     </message>
@@ -9886,10 +9882,6 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message>
       <source>Custom certificate</source>
       <translation>사용자 지정 인증서</translation>
-    </message>
-    <message>
-      <source>Pinned certificate</source>
-      <translation>고정 인증서</translation>
     </message>
     <message>
       <source>Unknown certificate</source>
@@ -9912,6 +9904,14 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
       <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
+    </message>
+    <message>
+      <source>Auto-generated certificate</source>
+      <translation type="unfinished">Auto-generated certificate</translation>
+    </message>
+    <message>
+      <source>The certificate is auto-generated and pinned to %1</source>
+      <translation type="unfinished">The certificate is auto-generated and pinned to %1</translation>
     </message>
   </context>
   <context>

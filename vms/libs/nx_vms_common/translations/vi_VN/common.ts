@@ -1700,8 +1700,8 @@
       <translation>Trình thông báo intercom</translation>
     </message>
     <message>
-      <source>Failed to backup file</source>
-      <translation>Không thể sao lưu tệp</translation>
+      <source>Failed to backup file %1</source>
+      <translation>Không thể sao lưu tệp %1</translation>
     </message>
   </context>
   <context>

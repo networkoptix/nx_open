@@ -9978,11 +9978,6 @@ Atención: Esta contraseña no se puede resetear. Si la pierde, el archivo será
       <translation>Duración ilimitada de la sesión de usuario amenaza la seguridad general del sistema y puede llevar a la degradación en el rendimiento del sistema</translation>
     </message>
     <message>
-      <source>It is recommended to have user session lifetime not greater than %1</source>
-      <comment>%1 is the time span with time units</comment>
-      <translation>Se recomienda tener el tiempo de la sesión del usuario no superior a %1</translation>
-    </message>
-    <message>
       <source>Learn more.</source>
       <translation>Aprenda más.</translation>
     </message>
@@ -9993,6 +9988,11 @@ Atención: Esta contraseña no se puede resetear. Si la pierde, el archivo será
         <numerusform>%n de %1 usuarios tienen permitido usar autenticación digest (no seguro).</numerusform>
         <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>The recommended maximum user session lifetime is %1</source>
+      <comment>%1 is the time span with time units</comment>
+      <translation>La duración máxima recomendada de la sesión de usuario es %1</translation>
     </message>
   </context>
   <context>
@@ -10013,10 +10013,6 @@ Atención: Esta contraseña no se puede resetear. Si la pierde, el archivo será
   <context>
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
     <message>
-      <source>The certificate is pinned to %1</source>
-      <translation>El certificado está anclado a %1</translation>
-    </message>
-    <message>
       <source>The certificate was presented by %1</source>
       <translation>El certificado fue presentado por %1</translation>
     </message>
@@ -10031,10 +10027,6 @@ Atención: Esta contraseña no se puede resetear. Si la pierde, el archivo será
     <message>
       <source>Custom certificate</source>
       <translation>Certificado personalizado</translation>
-    </message>
-    <message>
-      <source>Pinned certificate</source>
-      <translation>Certificado anclado</translation>
     </message>
     <message>
       <source>Unknown certificate</source>
@@ -10057,6 +10049,14 @@ Atención: Esta contraseña no se puede resetear. Si la pierde, el archivo será
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
       <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
+    </message>
+    <message>
+      <source>Auto-generated certificate</source>
+      <translation>Certificado generado automáticamente</translation>
+    </message>
+    <message>
+      <source>The certificate is auto-generated and pinned to %1</source>
+      <translation>El certificado se genera automáticamente y se ancla a %1</translation>
     </message>
   </context>
   <context>

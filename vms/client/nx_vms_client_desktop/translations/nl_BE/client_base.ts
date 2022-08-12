@@ -9976,11 +9976,6 @@ Waarschuwing: Dit wachtwoord kan niet worden gereset. Als je het verliest, is he
       <translation>Onbeperkte levensduur van de gebruikerssessie bedreigt de algehele systeembeveiliging en kan leiden tot degradatie in de systeemprestaties</translation>
     </message>
     <message>
-      <source>It is recommended to have user session lifetime not greater than %1</source>
-      <comment>%1 is the time span with time units</comment>
-      <translation>Het wordt aanbevolen om de levensduur van de gebruikerssessie niet te overschrijden met %1</translation>
-    </message>
-    <message>
       <source>Learn more.</source>
       <translation>Meer informatie.</translation>
     </message>
@@ -9991,6 +9986,11 @@ Waarschuwing: Dit wachtwoord kan niet worden gereset. Als je het verliest, is he
         <numerusform>%n van de %1 gebruikers mogen digest authenticatie gebruiken (niet beveiligd).</numerusform>
         <numerusform>%n van de %1 gebruikers mogen digest authenticatie gebruiken (niet beveiligd).</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>The recommended maximum user session lifetime is %1</source>
+      <comment>%1 is the time span with time units</comment>
+      <translation type="unfinished">The recommended maximum user session lifetime is %1</translation>
     </message>
   </context>
   <context>
@@ -10011,10 +10011,6 @@ Waarschuwing: Dit wachtwoord kan niet worden gereset. Als je het verliest, is he
   <context>
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
     <message>
-      <source>The certificate is pinned to %1</source>
-      <translation>Het certificaat is vastgezet aan %1</translation>
-    </message>
-    <message>
       <source>The certificate was presented by %1</source>
       <translation>Het certificaat is gepresenteerd door %1</translation>
     </message>
@@ -10029,10 +10025,6 @@ Waarschuwing: Dit wachtwoord kan niet worden gereset. Als je het verliest, is he
     <message>
       <source>Custom certificate</source>
       <translation>Aangepast certificaat</translation>
-    </message>
-    <message>
-      <source>Pinned certificate</source>
-      <translation>Vastgezette certificaat</translation>
     </message>
     <message>
       <source>Unknown certificate</source>
@@ -10055,6 +10047,14 @@ Waarschuwing: Dit wachtwoord kan niet worden gereset. Als je het verliest, is he
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
       <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
+    </message>
+    <message>
+      <source>Auto-generated certificate</source>
+      <translation type="unfinished">Auto-generated certificate</translation>
+    </message>
+    <message>
+      <source>The certificate is auto-generated and pinned to %1</source>
+      <translation type="unfinished">The certificate is auto-generated and pinned to %1</translation>
     </message>
   </context>
   <context>

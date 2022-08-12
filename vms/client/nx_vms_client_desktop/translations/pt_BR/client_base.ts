@@ -3066,7 +3066,7 @@ a %1</translation>
     </message>
     <message>
       <source>System configuration will be restored from backup, Server application will be restarted.</source>
-      <translation>A configuração do sistema será restaurada a partir do backup, o aplicativo do servidor será reiniciado.</translation>
+      <translation>A configuração do sistema será restaurada a partir do ‘backup’, o aplicativo do servidor será reiniciado.</translation>
     </message>
   </context>
   <context>
@@ -4797,7 +4797,7 @@ a %1</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation>Backup</translation>
+      <translation>‘Backup’ / Redundância de Gravações</translation>
     </message>
   </context>
   <context>
@@ -9980,11 +9980,6 @@ Cuidado: Esta senha não pode ser redefinida. Se você perdê-lo, o arquivo ser�
       <translation>A vida útil ilimitada da sessão do usuário ameaça a segurança geral do sistema e pode levar à degradação do desempenho do sistema</translation>
     </message>
     <message>
-      <source>It is recommended to have user session lifetime not greater than %1</source>
-      <comment>%1 is the time span with time units</comment>
-      <translation>Recomenda-se que o tempo de vida da sessão do usuário não seja maior que %1</translation>
-    </message>
-    <message>
       <source>Learn more.</source>
       <translation>Saiba mais.</translation>
     </message>
@@ -9995,6 +9990,11 @@ Cuidado: Esta senha não pode ser redefinida. Se você perdê-lo, o arquivo ser�
         <numerusform>%n em cada %1 usuários têm permissão para usar autenticação digest (não segura).</numerusform>
         <numerusform>%n em cada %1 usuários têm permissão para usar autenticação digest (não segura).</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>The recommended maximum user session lifetime is %1</source>
+      <comment>%1 is the time span with time units</comment>
+      <translation type="unfinished">The recommended maximum user session lifetime is %1</translation>
     </message>
   </context>
   <context>
@@ -10015,10 +10015,6 @@ Cuidado: Esta senha não pode ser redefinida. Se você perdê-lo, o arquivo ser�
   <context>
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
     <message>
-      <source>The certificate is pinned to %1</source>
-      <translation>O certificado está fixado em %1</translation>
-    </message>
-    <message>
       <source>The certificate was presented by %1</source>
       <translation>O certificado foi apresentado por %1</translation>
     </message>
@@ -10033,10 +10029,6 @@ Cuidado: Esta senha não pode ser redefinida. Se você perdê-lo, o arquivo ser�
     <message>
       <source>Custom certificate</source>
       <translation>Certificado personalizado</translation>
-    </message>
-    <message>
-      <source>Pinned certificate</source>
-      <translation>Certificado fixado</translation>
     </message>
     <message>
       <source>Unknown certificate</source>
@@ -10059,6 +10051,14 @@ Cuidado: Esta senha não pode ser redefinida. Se você perdê-lo, o arquivo ser�
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
       <translation>Alguém pode estar se passando por %1 para roubar suas informações pessoais.
 Não fixe este certificado se você&apos;t modificou o certificado SSL %2 servidores.</translation>
+    </message>
+    <message>
+      <source>Auto-generated certificate</source>
+      <translation type="unfinished">Auto-generated certificate</translation>
+    </message>
+    <message>
+      <source>The certificate is auto-generated and pinned to %1</source>
+      <translation type="unfinished">The certificate is auto-generated and pinned to %1</translation>
     </message>
   </context>
   <context>
