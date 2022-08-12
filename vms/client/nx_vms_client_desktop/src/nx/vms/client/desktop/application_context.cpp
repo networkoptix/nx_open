@@ -121,7 +121,7 @@ void initDeveloperOptions(const QnStartupParameters& startupParameters)
             win32_exception::setCreateFullCrashDump(true);
     #endif
 
-    nx::utils::OsInfo::override(
+    nx::utils::OsInfo::overrideVariant(
         ini().currentOsVariantOverride,
         ini().currentOsVariantVersionOverride);
 

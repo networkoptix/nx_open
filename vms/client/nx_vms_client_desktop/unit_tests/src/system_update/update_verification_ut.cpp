@@ -526,6 +526,67 @@ TEST_F(UpdateVerificationTest, preferVersionedVariant)
     ASSERT_EQ(std::get<update::Package>(result).file, "ubuntu_16.04.zip");
 }
 
+TEST_F(UpdateVerificationTest, flavorSelection)
+{
+    auto info = QJson::deserialized<common::update::Information>(
+        R"({
+            "packages": [
+                {
+                    "component": "server",
+                    "platform": "linux_arm32",
+                    "flavor": "default",
+                    "variants": [{ "name": "debian" }],
+                    "file": "debian.zip"
+                },
+                {
+                    "component": "server",
+                    "platform": "linux_arm32",
+                    "flavor": "nx1",
+                    "file": "debian_nx1.zip"
+                }
+            ]
+        })");
+
+    FindPackageResult result = info.findPackage(update::Component::server,
+        nx::utils::OsInfo("linux_arm32", "", "", "nx1"));
+    ASSERT_TRUE(std::holds_alternative<update::Package>(result));
+    ASSERT_EQ(std::get<update::Package>(result).file, "debian_nx1.zip");
+
+    auto package = info.packages.takeFirst();
+    result = info.findPackage(update::Component::server,
+        nx::utils::OsInfo("linux_arm32"));
+    ASSERT_TRUE(std::holds_alternative<update::FindPackageError>(result));
+    ASSERT_EQ(std::get<update::FindPackageError>(result), update::FindPackageError::notFound);
+
+    info.packages = {package};
+    result = info.findPackage(update::Component::server,
+        nx::utils::OsInfo("linux_arm32", "", "", "nx1"));
+    ASSERT_TRUE(std::holds_alternative<update::FindPackageError>(result));
+    ASSERT_EQ(std::get<update::FindPackageError>(result), update::FindPackageError::notFound);
+}
+
+TEST_F(UpdateVerificationTest, defaultFlavorSelection)
+{
+    ASSERT_EQ(nx::utils::OsInfo().flavor, "default");
+
+    auto info = QJson::deserialized<common::update::Information>(
+        R"({
+            "packages": [
+                {
+                    "component": "server",
+                    "platform": "linux_x64",
+                    "variants": [{ "name": "ubuntu" }],
+                    "file": "ubuntu.zip"
+                }
+            ]
+        })");
+
+    const FindPackageResult result = info.findPackage(
+        update::Component::server,
+        nx::utils::OsInfo("linux_x64", "ubuntu", "", "default"));
+    ASSERT_TRUE(std::holds_alternative<update::Package>(result));
+}
+
 TEST_F(UpdateVerificationTest, aSyntheticTest)
 {
     const auto info = QJson::deserialized<common::update::Information>(

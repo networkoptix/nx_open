@@ -18,15 +18,19 @@ bool PackageInfo::isValid() const
 
 bool PackageInfo::isCompatibleTo(const utils::OsInfo& osInfo, bool ignoreVersion) const
 {
-    return isPackageCompatibleTo(platform, variants, osInfo, ignoreVersion);
+    return isPackageCompatibleTo(platform, flavor, variants, osInfo, ignoreVersion);
 }
 
 bool isPackageCompatibleTo(
     const QString& packagePlatform,
+    const QString& packageFlavor,
     const PlatformVariantList& packageVariants,
     const nx::utils::OsInfo& osInfo,
     bool ignoreVersion)
 {
+    if (packageFlavor != osInfo.flavor)
+        return false;
+
     if (packagePlatform != osInfo.platform)
     {
         if (packagePlatform == "macos" && osInfo.platform == "macos_x64")

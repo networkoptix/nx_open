@@ -17,7 +17,7 @@ bool Package::isValid() const
 
 bool Package::isCompatibleTo(const utils::OsInfo& osInfo, bool ignoreVersion) const
 {
-    return isPackageCompatibleTo(platform, variants, osInfo, ignoreVersion);
+    return isPackageCompatibleTo(platform, flavor, variants, osInfo, ignoreVersion);
 }
 
 bool Package::isNewerThan(const QString& variant, const Package& other) const
@@ -29,6 +29,7 @@ bool Package::isSameTarget(const Package& other) const
 {
     return component == other.component
         && platform == other.platform
+        && flavor == other.flavor
         && variants == other.variants;
 }
 
