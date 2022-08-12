@@ -9,6 +9,32 @@
 
 namespace nx::vms::client::desktop {
 
+namespace {
+
+QTransform filteredTransform(const QTransform& transform)
+{
+    // When paint events calculate transformation for QPainter they obviously have some rounding
+    // errors, and may produce slightly varying values in the transformation matrix. Practically
+    // there are values very close to zero (smaller than 1e-14). Despite this fact, those values
+    // do affect the resulting coordinates which may be 1 screen pixel more or less, what causes
+    // annoying jitter of the displaying picture. To fix that, we round translation values of the
+    // transformation matrix, which are considered very close to their rounded value.
+
+    const auto filter =
+        [](qreal x)
+        {
+            const qreal rounded = std::round(x);
+            return qFuzzyEquals(x, rounded) ? rounded : x;
+        };
+
+    return QTransform(
+        transform.m11(), transform.m12(), transform.m13(),
+        transform.m21(), transform.m22(), transform.m23(),
+        filter(transform.m31()), filter(transform.m32()), transform.m33());
+}
+
+} // namespace
+
 PainterTransformScaleStripper::PainterTransformScaleStripper(QPainter* painter):
     m_painter(painter),
     m_originalTransform(painter->transform()),
@@ -19,7 +45,7 @@ PainterTransformScaleStripper::PainterTransformScaleStripper(QPainter* painter):
         && m_originalTransform.m11() > 0
         && m_originalTransform.m22() > 0)
     {
-        m_transform = m_originalTransform;
+        m_transform = filteredTransform(m_originalTransform);
         painter->setTransform(QTransform());
         m_alignable = true;
         return;
@@ -51,7 +77,7 @@ PainterTransformScaleStripper::PainterTransformScaleStripper(QPainter* painter):
                 * rotation.transposed(); //< For rotation matrix transposition === inversion.
 
             painter->setTransform(rotation);
-            m_transform = QTransform::fromScale(sx, sy) * translation;
+            m_transform = filteredTransform(QTransform::fromScale(sx, sy) * translation);
             return;
         }
     }
@@ -73,7 +99,7 @@ QTransform::TransformationType PainterTransformScaleStripper::type() const
 QRectF PainterTransformScaleStripper::mapRect(const QRectF& rect) const
 {
     const auto mapped = m_transform.mapRect(rect);
-    return m_alignable ? mapped.toAlignedRect() : mapped;
+    return m_alignable ? mapped.toRect() : mapped;
 }
 
 QPointF PainterTransformScaleStripper::mapPoint(const QPointF& point) const
