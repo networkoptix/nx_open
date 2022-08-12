@@ -253,7 +253,7 @@ FetchPublicationInfoResult fetchLegacyPublicationInfo(
                     package.url.setPath(publicationUrlPath + package.file);
                     // Old update.json doesn't contain variant version.
                     if (!osInfo.variant.isEmpty())
-                        package.variants.append(PlatformVariant(osInfo.variant));
+                        package.variants.append(PlatformVariant{.name = osInfo.variant});
 
                     result.append(package);
                 }

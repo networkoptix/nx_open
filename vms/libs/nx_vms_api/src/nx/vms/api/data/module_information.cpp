@@ -73,7 +73,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ServerInformation, (json), ServerInformation_Fi
 namespace nx::utils {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(OsInfo,
-     (ubjson)(json)(xml)(csv_record),
-     (platform)(variant)(variantVersion))
+    (ubjson)(json)(xml)(csv_record),
+    (platform)(flavor)(variant)(variantVersion))
 
 } // namespace nx::utils
