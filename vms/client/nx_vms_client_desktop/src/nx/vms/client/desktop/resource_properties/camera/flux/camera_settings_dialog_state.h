@@ -29,7 +29,7 @@
 #include <nx/vms/client/desktop/utils/virtual_camera_state.h>
 #include <utils/common/aspect_ratio.h>
 
-#include "../data/recording_days.h"
+#include "../data/recording_period.h"
 #include "../data/analytics_engine_info.h"
 #include "../camera_settings_tab.h"
 
@@ -335,8 +335,8 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
         bool showQuality = true;
         bool showFps = true;
 
-        RecordingDays minDays = RecordingDays::minDays();
-        RecordingDays maxDays = RecordingDays::maxDays();
+        RecordingPeriod minPeriod = RecordingPeriod::minPeriod();
+        RecordingPeriod maxPeriod = RecordingPeriod::maxPeriod();
 
         float normalizedCustomBitrateMbps() const
         {

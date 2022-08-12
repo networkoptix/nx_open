@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <chrono>
+
 #include <QtCore/QVector>
 
 #include <api/model/recording_stats_reply.h>
@@ -15,8 +17,8 @@ struct CameraRecordingSettings
     qint64 averageDensity = 0; //< Average density (= bytes / requested period in seconds).
 
     // These are taken from ResourcePool
-    int minDays = 0; //< Cached camera 'minDays' value.
-    int maxDays = 0; //< Cached camera 'maxDays' value. maxDays == 0 => record forever.
+    std::chrono::seconds minPeriod{0}; //< Cached camera 'minPeriod' value.
+    std::chrono::seconds maxPeriod{0}; //< Cached camera 'maxPeriod' value. maxPeriod == 0s => record forever.
 };
 
 using CameraRecordingSettingsSet = QVector<CameraRecordingSettings>;

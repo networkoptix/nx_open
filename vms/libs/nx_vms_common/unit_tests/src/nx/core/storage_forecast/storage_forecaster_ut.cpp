@@ -11,11 +11,11 @@ TEST(storage_forecast, Basic)
 {
     // Create test camera data.
     CameraRecordingSettingsSet allCameras = {
-        {"Camera 1", 1000, 0, 1},
-        {"Camera 2", 2000, 0, 3},
-        {"Camera 3", 3000, 1, 2},
-        {"Camera 4", 4000, 2, 3},
-        {"Camera 5", 5000, 4, 7}
+        {"Camera 1", 1000, std::chrono::days(0), std::chrono::days(1)},
+        {"Camera 2", 2000, std::chrono::days(0), std::chrono::days(3)},
+        {"Camera 3", 3000, std::chrono::days(1), std::chrono::days(2)},
+        {"Camera 4", 4000, std::chrono::days(2), std::chrono::days(3)},
+        {"Camera 5", 5000, std::chrono::days(4), std::chrono::days(7)}
     };
 
 
@@ -28,7 +28,7 @@ TEST(storage_forecast, Basic)
     }
 
     // Do forecast 1.
-    // 2 secs forcams 3,4,5:
+    // 2 secs for cams 3,4,5:
     doForecast(allCameras, 2 * (3000 + 4000 + 5000), recordingStats);
     QVector<qint64> forecast = {0, 0, 2, 2, 2};
     for (int i = 0; i < 5; i++)
@@ -62,7 +62,7 @@ TEST(storage_forecast, Basic)
 
     // Forecast 2.
     // Now add extra cam that records forever.
-    allCameras.push_back({"Camera 6", 6000, 0, 0});
+    allCameras.push_back({"Camera 6", 6000, std::chrono::days(0), std::chrono::days(0)});
     QnCamRecordingStatsData cameraStats;
     cameraStats.uniqueId = allCameras[5].uniqueId;
     recordingStats.push_back(std::move(cameraStats));

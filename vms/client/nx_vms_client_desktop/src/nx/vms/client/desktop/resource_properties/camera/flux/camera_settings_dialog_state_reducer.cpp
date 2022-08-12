@@ -61,7 +61,7 @@ static constexpr int kMinFps = 1;
 static constexpr auto kMinQuality = Qn::StreamQuality::low;
 static constexpr auto kMaxQuality = Qn::StreamQuality::highest;
 
-static constexpr int kMinArchiveDaysAlertThreshold = 5;
+static constexpr auto kMinArchiveDurationAlertThreshold = std::chrono::days(5);
 static constexpr auto kPreRecordingAlertThreshold = 30s;
 
 QnIOPortDataList sortedPorts(QnIOPortDataList ports)
@@ -630,8 +630,8 @@ State::ScheduleAlerts calculateScheduleAlerts(const State& state)
 
 std::optional<State::RecordingAlert> updateArchiveLengthAlert(const State& state)
 {
-    const bool warning = state.recording.minDays.hasManualDaysValue()
-        && state.recording.minDays.displayValue() > kMinArchiveDaysAlertThreshold;
+    const bool warning = state.recording.minPeriod.hasManualPeriodValue()
+        && state.recording.minPeriod.displayValue() > kMinArchiveDurationAlertThreshold;
 
     if (warning)
         return State::RecordingAlert::highArchiveLength;
@@ -1334,8 +1334,8 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state = loadMinMaxCustomBitrate(std::move(state));
     state = fillBitrateFromFixedQuality(std::move(state));
 
-    state.recording.minDays = RecordingDays::minDays(cameras);
-    state.recording.maxDays = RecordingDays::maxDays(cameras);
+    state.recording.minPeriod = RecordingPeriod::minPeriod(cameras);
+    state.recording.maxPeriod = RecordingPeriod::maxPeriod(cameras);
 
     if (!state.isPageVisible(state.selectedTab))
         state.selectedTab = CameraSettingsTab::general;
@@ -1787,83 +1787,98 @@ State CameraSettingsDialogStateReducer::setRecordingBitrateNormalized(
     return setRecordingBitrateMbps(std::move(state), mbps);
 }
 
-State CameraSettingsDialogStateReducer::setMinRecordingDaysAutomatic(State state, bool value)
+State CameraSettingsDialogStateReducer::setMinRecordingPeriodAutomatic(State state, bool value)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
 
-    auto& minDays = state.recording.minDays;
+    auto& minPeriod = state.recording.minPeriod;
     state.hasChanges = true;
 
     if (value)
     {
-        minDays.setAutoMode();
+        minPeriod.setAutoMode();
     }
     else
     {
-        const auto& maxDays = state.recording.maxDays;
-        if (maxDays.hasManualDaysValue())
-            minDays.setManualModeWithDays(qMin(minDays.displayValue(), maxDays.displayValue()));
+        const auto& maxPeriod = state.recording.maxPeriod;
+        if (maxPeriod.hasManualPeriodValue())
+        {
+            minPeriod.setManualModeWithPeriod(
+                std::min(minPeriod.displayValue(), maxPeriod.displayValue()));
+        }
         else
-            minDays.setManualMode();
+        {
+            minPeriod.setManualMode();
+        }
     }
     state.recordingAlert = updateArchiveLengthAlert(state);
     return state;
 }
 
-State CameraSettingsDialogStateReducer::setMinRecordingDaysValue(State state, int value)
+State CameraSettingsDialogStateReducer::setMinRecordingPeriodValue(
+    State state,
+    std::chrono::seconds value)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
 
-    auto& minDays = state.recording.minDays;
-    NX_ASSERT(minDays.isManualMode());
+    auto& minPeriod = state.recording.minPeriod;
+    NX_ASSERT(minPeriod.isManualMode());
 
     state.hasChanges = true;
-    minDays.setManualModeWithDays(value);
+    minPeriod.setManualModeWithPeriod(value);
     state.recordingAlert = updateArchiveLengthAlert(state);
 
-    auto& maxDays = state.recording.maxDays;
-    if (maxDays.hasManualDaysValue() && maxDays.displayValue() < value)
-        maxDays.setManualModeWithDays(value);
+    auto& maxPeriod = state.recording.maxPeriod;
+    if (maxPeriod.hasManualPeriodValue() && maxPeriod.displayValue() < value)
+        maxPeriod.setManualModeWithPeriod(value);
 
     return state;
 }
 
-State CameraSettingsDialogStateReducer::setMaxRecordingDaysAutomatic(State state, bool value)
+State CameraSettingsDialogStateReducer::setMaxRecordingPeriodAutomatic(State state, bool value)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
 
-    auto& maxDays = state.recording.maxDays;
+    auto& maxPeriod = state.recording.maxPeriod;
     state.hasChanges = true;
 
     if (value)
     {
-        maxDays.setAutoMode();
+        maxPeriod.setAutoMode();
     }
     else
     {
-        const auto& minDays = state.recording.minDays;
-        if (minDays.hasManualDaysValue())
-            maxDays.setManualModeWithDays(qMax(minDays.displayValue(), maxDays.displayValue()));
+        const auto& minPeriod = state.recording.minPeriod;
+        if (minPeriod.hasManualPeriodValue())
+        {
+            maxPeriod.setManualModeWithPeriod(
+                std::max(minPeriod.displayValue(), maxPeriod.displayValue()));
+        }
         else
-            maxDays.setManualMode();
+        {
+            maxPeriod.setManualMode();
+        }
     }
-
     return state;
 }
 
-State CameraSettingsDialogStateReducer::setMaxRecordingDaysValue(State state, int value)
+State CameraSettingsDialogStateReducer::setMaxRecordingPeriodValue(
+    State state,
+    std::chrono::seconds value)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
 
-    auto& maxDays = state.recording.maxDays;
-    NX_ASSERT(maxDays.isManualMode());
+    auto& maxPeriod = state.recording.maxPeriod;
+    NX_ASSERT(maxPeriod.isManualMode());
 
     state.hasChanges = true;
-    maxDays.setManualModeWithDays(value);
+    maxPeriod.setManualModeWithPeriod(value);
 
-    auto& minDays = state.recording.minDays;
-    if (minDays.hasManualDaysValue() && minDays.displayValue() > value)
-        minDays.setManualModeWithDays(value);
+    auto& minPeriod = state.recording.minPeriod;
+    if (minPeriod.hasManualPeriodValue() && minPeriod.displayValue() > value)
+        minPeriod.setManualModeWithPeriod(value);
+
+    state.recordingAlert = updateArchiveLengthAlert(state);
 
     return state;
 }

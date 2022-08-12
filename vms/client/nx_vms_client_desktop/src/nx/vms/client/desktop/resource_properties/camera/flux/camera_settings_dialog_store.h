@@ -106,10 +106,10 @@ public:
     void toggleCustomBitrateVisible();
     void setRecordingBitrateMbps(float mbps);
     void setRecordingBitrateNormalized(float value);
-    void setMinRecordingDaysAutomatic(bool value);
-    void setMinRecordingDaysValue(int value);
-    void setMaxRecordingDaysAutomatic(bool value);
-    void setMaxRecordingDaysValue(int value);
+    void setMinRecordingPeriodAutomatic(bool value);
+    void setMinRecordingPeriodValue(std::chrono::seconds value);
+    void setMaxRecordingPeriodAutomatic(bool value);
+    void setMaxRecordingPeriodValue(std::chrono::seconds value);
     void setRecordingBeforeThresholdSec(int value);
     void setRecordingAfterThresholdSec(int value);
     void setCustomAspectRatio(const QnAspectRatio& value);

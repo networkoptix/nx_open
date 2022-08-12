@@ -129,142 +129,143 @@ private:
     std::unique_ptr<QnClientCoreModule> m_clientCoreModule;
 };
 
-TEST_F(CameraSettingsDialogStateReducerTest, recordingDaysBasicChecks)
+TEST_F(CameraSettingsDialogStateReducerTest, recordingPeriodsBasicChecks)
 {
     State s;
 
     // Checks basic conditions for initial (auto) state.
-    ASSERT_FALSE(s.recording.maxDays.isManualMode());
-    ASSERT_FALSE(s.recording.maxDays.hasManualDaysValue());
-    ASSERT_TRUE(s.recording.maxDays.isApplicable());
-    ASSERT_EQ(s.recording.maxDays.autoCheckState(), Qt::Checked);
+    ASSERT_FALSE(s.recording.maxPeriod.isManualMode());
+    ASSERT_FALSE(s.recording.maxPeriod.hasManualPeriodValue());
+    ASSERT_TRUE(s.recording.maxPeriod.isApplicable());
+    ASSERT_EQ(s.recording.maxPeriod.autoCheckState(), Qt::Checked);
 
     // Checks basic conditions for manual mode.
-    s = Reducer::setMaxRecordingDaysAutomatic(std::move(s), false);
-    ASSERT_TRUE(s.recording.maxDays.isManualMode());
-    ASSERT_TRUE(s.recording.maxDays.hasManualDaysValue());
-    ASSERT_TRUE(s.recording.maxDays.isApplicable());
-    ASSERT_EQ(s.recording.maxDays.autoCheckState(), Qt::Unchecked);
+    s = Reducer::setMaxRecordingPeriodAutomatic(std::move(s), false);
+    ASSERT_TRUE(s.recording.maxPeriod.isManualMode());
+    ASSERT_TRUE(s.recording.maxPeriod.hasManualPeriodValue());
+    ASSERT_TRUE(s.recording.maxPeriod.isApplicable());
+    ASSERT_EQ(s.recording.maxPeriod.autoCheckState(), Qt::Unchecked);
 }
 
-TEST_F(CameraSettingsDialogStateReducerTest, recordingDaysApplicableChecks)
+TEST_F(CameraSettingsDialogStateReducerTest, recordingPeriodsApplicableChecks)
 {
     const QnVirtualCameraResourceList cameras = {createCamera(), createCamera()};
 
-    // Same days value, same "manual" mode.
+    // Same recording periods values, same "manual" mode.
     cameras[0]->setMinPeriod(std::chrono::days(1));
     cameras[1]->setMinPeriod(std::chrono::days(1));
     State state = Reducer::loadCameras({}, cameras);
-    ASSERT_TRUE(state.recording.minDays.isApplicable());
+    ASSERT_TRUE(state.recording.minPeriod.isApplicable());
 
-    // Same days value, different "auto" mode.
+    // Same recording periods values, different "auto" mode.
     cameras[0]->setMinPeriod(std::chrono::days(1));
     cameras[1]->setMinPeriod(std::chrono::days(-1));
     state = Reducer::loadCameras({}, cameras);
-    ASSERT_FALSE(state.recording.minDays.isApplicable());
+    ASSERT_FALSE(state.recording.minPeriod.isApplicable());
 
 
-    // Same days value, same "auto" mode.
+    // Same recording periods values, same "auto" mode.
     cameras[0]->setMinPeriod(std::chrono::days(-1));
     cameras[1]->setMinPeriod(std::chrono::days(-1));
     state = Reducer::loadCameras({}, cameras);
-    ASSERT_TRUE(state.recording.minDays.isApplicable());
+    ASSERT_TRUE(state.recording.minPeriod.isApplicable());
 
-    // Different days value, same "auto" mode.
+    // Different recording periods values, same "auto" mode.
     cameras[0]->setMinPeriod(std::chrono::days(-1));
     cameras[1]->setMinPeriod(std::chrono::days(-2));
     state = Reducer::loadCameras({}, cameras);
-    ASSERT_TRUE(state.recording.minDays.isApplicable());
+    ASSERT_TRUE(state.recording.minPeriod.isApplicable());
 
-    // Different days value, same "manual" mode.
+    // Different recording periods values, same "manual" mode.
     cameras[0]->setMinPeriod(std::chrono::days(1));
     cameras[1]->setMinPeriod(std::chrono::days(2));
     state = Reducer::loadCameras({}, cameras);
-    ASSERT_FALSE(state.recording.minDays.isApplicable());
+    ASSERT_FALSE(state.recording.minPeriod.isApplicable());
 }
 
 TEST_F(CameraSettingsDialogStateReducerTest, fixedArchiveLengthValidation)
 {
-    static constexpr int kTestDaysBig = nx::vms::api::kDefaultMaxArchivePeriod.count() + 1;
+    static constexpr auto kTestBigPeriod =
+        nx::vms::api::kDefaultMaxArchivePeriod + std::chrono::days(1);
 
-    // Unchecking automatic max days when no fixed value is set: sets fixed value to default.
+    // Unchecking automatic max period when no fixed value is set: sets fixed value to default.
     State s;
-    s = Reducer::setMaxRecordingDaysAutomatic(std::move(s), false);
-    ASSERT_EQ(s.recording.maxDays.displayValue(), nx::vms::api::kDefaultMaxArchivePeriod.count());
+    s = Reducer::setMaxRecordingPeriodAutomatic(std::move(s), false);
+    ASSERT_EQ(s.recording.maxPeriod.displayValue(), nx::vms::api::kDefaultMaxArchivePeriod);
 
-    // Unchecking automatic max days when fixed value is set: keeps fixed value.
+    // Unchecking automatic max period when fixed value is set: keeps fixed value.
     s = {};
-    s.recording.maxDays = RecordingDays::maxDays(-kTestDaysBig);
-    s = Reducer::setMaxRecordingDaysAutomatic(std::move(s), false);
-    ASSERT_EQ(s.recording.maxDays.displayValue(), kTestDaysBig);
+    s.recording.maxPeriod = RecordingPeriod::maxPeriod(-kTestBigPeriod);
+    s = Reducer::setMaxRecordingPeriodAutomatic(std::move(s), false);
+    ASSERT_EQ(s.recording.maxPeriod.displayValue(), kTestBigPeriod);
 
-    // Unchecking automatic max days when no fixed value is set: sets fixed value to default.
-    // Checks that max days value stays greater or equal than fixed min days value.
+    // Unchecking automatic max period when no fixed value is set: sets fixed value to default.
+    // Checks that max period value stays greater or equal than fixed min period value.
     s = {};
-    s.recording.minDays = RecordingDays::minDays(kTestDaysBig);
-    s = Reducer::setMaxRecordingDaysAutomatic(std::move(s), false);
-    ASSERT_GE(s.recording.maxDays.displayValue(), s.recording.minDays.displayValue());
+    s.recording.minPeriod = RecordingPeriod::minPeriod(kTestBigPeriod);
+    s = Reducer::setMaxRecordingPeriodAutomatic(std::move(s), false);
+    ASSERT_GE(s.recording.maxPeriod.displayValue(), s.recording.minPeriod.displayValue());
 
-    // Unchecking automatic max days when fixed value is set: keeps fixed value.
-    // Checks that max days value stays greater or equal than fixed min days value.
+    // Unchecking automatic max period when fixed value is set: keeps fixed value.
+    // Checks that max period value stays greater or equal than fixed min period value.
     s = {};
-    s.recording.maxDays = RecordingDays::maxDays(-kTestDaysBig);
-    s.recording.minDays = RecordingDays::minDays(kTestDaysBig + 1);
-    s = Reducer::setMaxRecordingDaysAutomatic(std::move(s), false);
-    ASSERT_GE(s.recording.maxDays.displayValue(), s.recording.minDays.displayValue());
+    s.recording.maxPeriod = RecordingPeriod::maxPeriod(-kTestBigPeriod);
+    s.recording.minPeriod = RecordingPeriod::minPeriod(kTestBigPeriod + std::chrono::days(1));
+    s = Reducer::setMaxRecordingPeriodAutomatic(std::move(s), false);
+    ASSERT_GE(s.recording.maxPeriod.displayValue(), s.recording.minPeriod.displayValue());
 
-    // Unchecking automatic min days when no fixed value is set: sets fixed value to default.
+    // Unchecking automatic min period when no fixed value is set: sets fixed value to default.
     s = {};
-    s = Reducer::setMinRecordingDaysAutomatic(std::move(s), false);
-    ASSERT_EQ(s.recording.minDays.displayValue(), nx::vms::api::kDefaultMinArchivePeriod.count());
+    s = Reducer::setMinRecordingPeriodAutomatic(std::move(s), false);
+    ASSERT_EQ(s.recording.minPeriod.displayValue(), nx::vms::api::kDefaultMinArchivePeriod);
 
-    // Unchecking automatic min days when fixed value is set: keeps fixed value.
-    // Checks that min days value stays lesser or equal than fixed max days value.
+    // Unchecking automatic min period when fixed value is set: keeps fixed value.
+    // Checks that min period value stays lesser or equal than fixed max period value.
     s = {};
-    s.recording.minDays = RecordingDays::minDays(-kTestDaysBig);
-    s.recording.maxDays = RecordingDays::maxDays(kTestDaysBig - 1);
-    s = Reducer::setMinRecordingDaysAutomatic(std::move(s), false);
-    ASSERT_LE(s.recording.minDays.displayValue(), s.recording.maxDays.displayValue());
+    s.recording.minPeriod = RecordingPeriod::minPeriod(-kTestBigPeriod);
+    s.recording.maxPeriod = RecordingPeriod::maxPeriod(kTestBigPeriod - std::chrono::days(1));
+    s = Reducer::setMinRecordingPeriodAutomatic(std::move(s), false);
+    ASSERT_LE(s.recording.minPeriod.displayValue(), s.recording.maxPeriod.displayValue());
 
-    // Checking automatic min days when has fixed non-default value: keep fixed value.
+    // Checking automatic min period when has fixed non-default value: keep fixed value.
     s = {};
-    s.recording.minDays = RecordingDays::minDays(kTestDaysBig);
-    s = Reducer::setMinRecordingDaysAutomatic(std::move(s), true);
-    ASSERT_EQ(s.recording.minDays.displayValue(), kTestDaysBig);
+    s.recording.minPeriod = RecordingPeriod::minPeriod(kTestBigPeriod);
+    s = Reducer::setMinRecordingPeriodAutomatic(std::move(s), true);
+    ASSERT_EQ(s.recording.minPeriod.displayValue(), kTestBigPeriod);
 
-    // Setting fixed min days greater than fixed max days pushes max days up.
+    // Setting fixed min period greater than fixed max period pushes max period up.
     s = {};
-    s.recording.minDays.setManualMode();
-    s.recording.maxDays = RecordingDays::maxDays(kTestDaysBig - 1);
-    s = Reducer::setMinRecordingDaysValue(std::move(s), kTestDaysBig);
-    ASSERT_EQ(s.recording.minDays.displayValue(), kTestDaysBig);
-    ASSERT_LE(s.recording.minDays.displayValue(), s.recording.maxDays.displayValue());
+    s.recording.minPeriod.setManualMode();
+    s.recording.maxPeriod = RecordingPeriod::maxPeriod(kTestBigPeriod - std::chrono::days(1));
+    s = Reducer::setMinRecordingPeriodValue(std::move(s), kTestBigPeriod);
+    ASSERT_EQ(s.recording.minPeriod.displayValue(), kTestBigPeriod);
+    ASSERT_LE(s.recording.minPeriod.displayValue(), s.recording.maxPeriod.displayValue());
 }
 
-// Setup fixed value of recording min days, leaving max days as auto.
-TEST_F(CameraSettingsDialogStateReducerTest, setFixedRecordingMinDays)
+// Setup fixed value of recording min period, leaving max period as auto.
+TEST_F(CameraSettingsDialogStateReducerTest, setFixedRecordingMinPeriod)
 {
-    static constexpr int kDefaultDays = -nx::vms::api::kDefaultMaxArchivePeriod.count();
-    static constexpr int kTestDaysBig = nx::vms::api::kDefaultMaxArchivePeriod.count() + 1;
+    static constexpr auto kTestBigPeriod =
+        nx::vms::api::kDefaultMaxArchivePeriod + std::chrono::days(1);
 
     const auto camera = createCamera();
 
     // Unchecking 'auto' must keep previously saved (as negative) value.
-    camera->setMinPeriod(std::chrono::days(-kTestDaysBig));
+    camera->setMinPeriod(std::chrono::days(-kTestBigPeriod));
 
     State initial = Reducer::loadCameras({}, {camera});
-    ASSERT_TRUE(initial.recording.minDays.autoCheckState() == Qt::Checked);
-    ASSERT_FALSE(initial.recording.minDays.isManualMode());
-    ASSERT_FALSE(initial.recording.minDays.hasManualDaysValue());
+    ASSERT_TRUE(initial.recording.minPeriod.autoCheckState() == Qt::Checked);
+    ASSERT_FALSE(initial.recording.minPeriod.isManualMode());
+    ASSERT_FALSE(initial.recording.minPeriod.hasManualPeriodValue());
 
-    State unchecked = Reducer::setMinRecordingDaysAutomatic(std::move(initial), false);
-    ASSERT_FALSE(initial.recording.minDays.isManualMode());
-    ASSERT_FALSE(initial.recording.minDays.hasManualDaysValue());
-    ASSERT_EQ(unchecked.recording.minDays.displayValue(), kTestDaysBig);
+    State unchecked = Reducer::setMinRecordingPeriodAutomatic(std::move(initial), false);
+    ASSERT_FALSE(initial.recording.minPeriod.isManualMode());
+    ASSERT_FALSE(initial.recording.minPeriod.hasManualPeriodValue());
+    ASSERT_EQ(unchecked.recording.minPeriod.displayValue(), kTestBigPeriod);
 
     CameraSettingsDialogStateConversionFunctions::applyStateToCameras(unchecked, {camera});
     State reloaded = Reducer::loadCameras(std::move(unchecked), {camera});
-    ASSERT_EQ(reloaded.recording.minDays.displayValue(), kTestDaysBig);
+    ASSERT_EQ(reloaded.recording.minPeriod.displayValue(), kTestBigPeriod);
 }
 
 // Schedule brush should be correctly initialized after loadCameras.

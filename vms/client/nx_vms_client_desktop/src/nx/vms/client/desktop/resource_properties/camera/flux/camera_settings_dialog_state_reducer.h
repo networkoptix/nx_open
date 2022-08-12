@@ -95,10 +95,10 @@ public:
     static State toggleCustomBitrateVisible(State state);
     static State setRecordingBitrateMbps(State state, float mbps);
     static State setRecordingBitrateNormalized(State state, float value);
-    static State setMinRecordingDaysAutomatic(State state, bool value);
-    static State setMinRecordingDaysValue(State state, int value);
-    static State setMaxRecordingDaysAutomatic(State state, bool value);
-    static State setMaxRecordingDaysValue(State state, int value);
+    static State setMinRecordingPeriodAutomatic(State state, bool value);
+    static State setMinRecordingPeriodValue(State state, std::chrono::seconds value);
+    static State setMaxRecordingPeriodAutomatic(State state, bool value);
+    static State setMaxRecordingPeriodValue(State state, std::chrono::seconds value);
     static State setRecordingBeforeThresholdSec(State state, int value);
     static State setRecordingAfterThresholdSec(State state, int value);
     static State setCustomAspectRatio(State state, const QnAspectRatio& value);
