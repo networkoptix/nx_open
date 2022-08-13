@@ -57,7 +57,7 @@
     </message>
     <message>
       <source>Analytics Object Detected</source>
-      <translation>解析オブジェクトの検出</translation>
+      <translation>分析オブジェクト検出</translation>
     </message>
     <message>
       <source>Camera</source>
