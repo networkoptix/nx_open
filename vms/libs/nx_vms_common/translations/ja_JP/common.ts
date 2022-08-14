@@ -1652,7 +1652,7 @@
     </message>
     <message>
       <source>Analytics Object Detected</source>
-      <translation>解析オブジェクトの検出</translation>
+      <translation>分析オブジェクト検出</translation>
     </message>
     <message>
       <source>%1 at camera &apos;%2&apos;</source>
@@ -1665,7 +1665,7 @@
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
-      <translation>解析ストレージ &quot;%1&quot; DB エラー: マウントポイントに権限がありません。</translation>
+      <translation>分析ストレージ &quot;%1&quot; DB エラー: マウントポイントの権限が不足しています。</translation>
     </message>
     <message>
       <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>

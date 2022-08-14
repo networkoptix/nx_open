@@ -986,7 +986,7 @@ PTZを行います</translation>
     </message>
     <message>
       <source>Analytics</source>
-      <translation>解析</translation>
+      <translation>分析</translation>
     </message>
   </context>
   <context>

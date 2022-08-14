@@ -4691,7 +4691,7 @@ to %1</source>
     </message>
     <message>
       <source>Storage Analytics</source>
-      <translation>ストレージ解析</translation>
+      <translation>ストレージ分析</translation>
     </message>
     <message>
       <source>Server Settings - %1 (readonly)</source>
@@ -4815,7 +4815,7 @@ to %1</source>
     <name>QnSignInfo</name>
     <message>
       <source>Analyzing: %1%</source>
-      <translation>解析: %1%</translation>
+      <translation>分析中: %1%</translation>
     </message>
     <message>
       <source>Invalid watermark</source>
