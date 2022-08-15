@@ -97,7 +97,10 @@ QString QnInterfaceAndAddr::toString() const
     return NX_FMT("%1: %2 %3", name, address, netMask);
 }
 
-QnInterfaceAndAddrList getAllIPv4Interfaces(InterfaceListPolicy policy, bool ignoreLoopback)
+QnInterfaceAndAddrList getAllIPv4Interfaces(
+    bool ignoreUsb0NetworkInterfaceIfOthersExist,
+    InterfaceListPolicy interfaceListPolicy,
+    bool ignoreLoopback)
 {
     struct LocalCache
     {
@@ -108,7 +111,7 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(InterfaceListPolicy policy, bool ign
 
     static LocalCache caches[(int)InterfaceListPolicy::count];
 
-    LocalCache &cache = caches[(int)policy];
+    LocalCache &cache = caches[(int) interfaceListPolicy];
     {
         // speed optimization
         NX_MUTEX_LOCKER lock(&cache.guard);
@@ -125,12 +128,14 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(InterfaceListPolicy policy, bool ign
         if (ignoreLoopback && iface.flags().testFlag(QNetworkInterface::IsLoopBack))
             continue;
 
-        #if defined(Q_OS_LINUX) && defined(__arm__)
+        if (ignoreUsb0NetworkInterfaceIfOthersExist)
+        {
             if (iface.name() == "usb0" && interfaces.size() > 1)
                 continue;
-        #endif
+        }
 
-        bool addInterfaceAnyway = policy == InterfaceListPolicy::allowInterfacesWithoutAddress;
+        bool addInterfaceAnyway =
+            interfaceListPolicy == InterfaceListPolicy::allowInterfacesWithoutAddress;
         QList<QNetworkAddressEntry> addresses = iface.addressEntries();
         for (const QNetworkAddressEntry& address : addresses)
         {
@@ -144,7 +149,7 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(InterfaceListPolicy policy, bool ign
                 result.append(QnInterfaceAndAddr(
                     iface.name(), address.ip(), address.netmask(), iface));
                 addInterfaceAnyway = false;
-                if (policy != InterfaceListPolicy::keepAllAddressesPerInterface)
+                if (interfaceListPolicy != InterfaceListPolicy::keepAllAddressesPerInterface)
                     break;
             }
         }

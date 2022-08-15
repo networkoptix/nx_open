@@ -68,6 +68,7 @@ public:
     explicit DeviceSearcher(
         nx::utils::TimerManager* timerManager,
         std::unique_ptr<AbstractDeviceSearcherSettings> settings,
+        bool ignoreUsb0NetworkInterfaceIfOthersExist = false,
         std::function<bool()> isHttpsForced = nullptr,
         unsigned int discoverTryTimeoutMS = kDefaultDiscoverTryTimeoutMs);
 
@@ -130,6 +131,7 @@ private:
     };
 
     std::unique_ptr<AbstractDeviceSearcherSettings> m_settings;
+    bool m_ignoreUsb0NetworkInterfaceIfOthersExist;
     std::function<bool()> m_isHttpsForced;
     const unsigned int m_discoverTryTimeoutMS;
     mutable nx::Mutex m_mutex;
