@@ -68,7 +68,8 @@ using QnInterfaceAndAddrList = QList<QnInterfaceAndAddr>;
  * @return List of network interfaces.
  */
 NX_NETWORK_API QList<QnInterfaceAndAddr> getAllIPv4Interfaces(
-    InterfaceListPolicy policy = InterfaceListPolicy::oneAddressPerInterface,
+    bool ignoreUsb0NetworkInterfaceIfOthersExist = false,
+    InterfaceListPolicy interfaceListPolicy = InterfaceListPolicy::oneAddressPerInterface,
     bool ignoreLoopback = true);
 
 /** Filter mask for allLocalAddresses()*/
