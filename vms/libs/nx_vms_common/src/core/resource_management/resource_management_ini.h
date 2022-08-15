@@ -8,8 +8,10 @@ struct ResourceManagementIni: public nx::kit::IniConfig
 {
     ResourceManagementIni(): IniConfig("resource_management.ini") { reload(); }
 
-    NX_INI_FLAG(0, allowDefaultStorageFactory, "Allows default storage factory using for external storage creation");
-    NX_INI_INT(15'000, cameraDiscoveryIntervalMs, "Wait at least this many milliseconds between camera discovery attempts");
+    NX_INI_FLAG(false, allowDefaultStorageFactory,
+        "Allows using the default storage factory for external storage creation.");
+    NX_INI_INT(15'000, cameraDiscoveryIntervalMs,
+        "Wait at least this many milliseconds between the camera discovery attempts.");
 };
 
 NX_VMS_COMMON_API ResourceManagementIni& resourceManagementIni();

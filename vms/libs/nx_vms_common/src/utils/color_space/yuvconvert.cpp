@@ -13,7 +13,6 @@
 
 #include "utils/math/math.h"
 
-
 const __m128i  sse_00ffw_intrs = _mm_setr_epi32(0x00ff00ff, 0x00ff00ff, 0x00ff00ff, 0x00ff00ff);
 const __m128i  sse_0010_intrs  = _mm_setr_epi32(0x00100010, 0x00100010, 0x00100010, 0x00100010);
 const __m128i  sse_0080_intrs  = _mm_setr_epi32(0x00800080, 0x00800080, 0x00800080, 0x00800080);
@@ -424,7 +423,7 @@ void bgra_yuv420(quint8* rgba, quint8* yptr, quint8* uptr, quint8* vptr, int wid
     }
 }
 
-#elif __arm__ && __ARM_NEON__
+#elif defined(__arm__) && defined(__ARM_NEON__)
 
 void yuv444_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
                             const unsigned char * pu, const unsigned char * pv,
@@ -432,7 +431,7 @@ void yuv444_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
                             const unsigned int dst_stride, const unsigned int y_stride,
                             const unsigned int uv_stride, quint8 alpha)
 {
-    //TODO/ARM
+    //TODO: ARM.
 }
 
 void yuv422_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
@@ -441,7 +440,7 @@ void yuv422_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
                             const unsigned int dst_stride, const unsigned int y_stride,
                             const unsigned int uv_stride, quint8 alpha)
 {
-    //TODO/ARM
+    //TODO: ARM.
 }
 
 void yuv420_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
@@ -450,12 +449,12 @@ void yuv420_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
                             const unsigned int dst_stride, const unsigned int y_stride,
                             const unsigned int uv_stride, quint8 alpha)
 {
-    //TODO/ARM
+    //TODO: ARM.
 }
 
 void bgra_yuv420(quint8* rgba, quint8* yptr, quint8* uptr, quint8* vptr, int width, int height, bool flip)
 {
-    //TODO/ARM
+    //TODO: ARM.
 }
 
 /*!
@@ -465,7 +464,7 @@ void bgra_yuv420(quint8* rgba, quint8* yptr, quint8* uptr, quint8* vptr, int wid
 */
 void bgra_to_yv12_simd_intr(const quint8* rgba, int xStride, quint8* y, quint8* u, quint8* v, int yStride, int uvStride, int width, int height, bool flip)
 {
-    //TODO/ARM
+    //TODO: ARM.
 }
 
 //!Converts bgra to yuv420 with alpha plane, total 20 bits per pixel (Y - 8bit, A - 8bit, UV)
@@ -476,17 +475,18 @@ void bgra_to_yv12_simd_intr(const quint8* rgba, int xStride, quint8* y, quint8* 
 */
 void bgra_to_yva12_simd_intr(const quint8* rgba, int xStride, quint8* y, quint8* u, quint8* v, quint8* a, int yStride, int uvStride, int aStride, int width, int height, bool flip)
 {
-    //TODO/ARM
+    //TODO: ARM.
 }
 
 #else
+    
 void yuv444_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
                             const unsigned char * pu, const unsigned char * pv,
                             const unsigned int width, const unsigned int height,
                             const unsigned int dst_stride, const unsigned int y_stride,
                             const unsigned int uv_stride, quint8 alpha)
 {
-    // TODO: C fallback routine
+    // TODO: C fallback routine.
 }
 
 void yuv422_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
@@ -495,7 +495,7 @@ void yuv422_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
                             const unsigned int dst_stride, const unsigned int y_stride,
                             const unsigned int uv_stride, quint8 alpha)
 {
-    // TODO: C fallback routine
+    // TODO: C fallback routine.
 }
 
 void yuv420_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
@@ -504,12 +504,12 @@ void yuv420_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
                             const unsigned int dst_stride, const unsigned int y_stride,
                             const unsigned int uv_stride, quint8 alpha)
 {
-    // TODO: C fallback routine
+    // TODO: C fallback routine.
 }
 
 void bgra_yuv420(quint8* rgba, quint8* yptr, quint8* uptr, quint8* vptr, int width, int height, bool flip)
 {
-    // TODO: C fallback routine
+    // TODO: C fallback routine.
 }
 
 /*!
@@ -530,6 +530,7 @@ void bgra_to_yv12_simd_intr(const quint8* rgba, int xStride, quint8* y, quint8* 
 */
 void bgra_to_yva12_simd_intr(const quint8* rgba, int xStride, quint8* y, quint8* u, quint8* v, quint8* a, int yStride, int uvStride, int aStride, int width, int height, bool flip)
 {
-    // TODO: C fallback routine
+    // TODO: C fallback routine.
 }
+
 #endif

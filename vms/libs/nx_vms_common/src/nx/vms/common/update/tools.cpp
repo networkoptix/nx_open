@@ -5,7 +5,7 @@
 #include <nx/branding.h>
 #include <nx/build_info.h>
 
-#include <nx/vms/common/update/ini.h>
+#include <nx/vms/common/update/nx_system_updates_ini.h>
 
 namespace nx::vms::common::update {
 

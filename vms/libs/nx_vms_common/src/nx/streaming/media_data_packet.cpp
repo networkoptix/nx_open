@@ -189,17 +189,17 @@ bool QnMetaDataV1::matchImage(const quint64* data, const simd128i* mask, int mas
     if (uintptr_t (data) % 16)
         return mathImage_cpu(data, mask, maskStart, maskEnd);
 
-#if defined(NX_SSE2_SUPPORTED)
-    if (useSSE41())
-        return mathImage_sse41((const simd128i*) data, mask, maskStart, maskEnd);
-    else
-        return mathImage_sse2((const simd128i*) data, mask, maskStart, maskEnd);
-#elif __arm__ && __ARM_NEON__
-    //TODO/ARM
-    return mathImage_cpu(data, mask, maskStart, maskEnd);
-#else
-    return mathImage_cpu(data, mask, maskStart, maskEnd);
-#endif
+    #if defined(NX_SSE2_SUPPORTED)
+        if (useSSE41())
+            return mathImage_sse41((const simd128i*) data, mask, maskStart, maskEnd);
+        else
+            return mathImage_sse2((const simd128i*) data, mask, maskStart, maskEnd);
+    #elif defined(__arm__) && defined(__ARM_NEON__)
+        // TODO: ARM.
+        return mathImage_cpu(data, mask, maskStart, maskEnd);
+    #else
+        return mathImage_cpu(data, mask, maskStart, maskEnd);
+    #endif
 }
 
 void QnMetaDataV1::assign(const QnMetaDataV1* other)
@@ -313,16 +313,17 @@ void QnMetaDataV1Light::doMarshalling()
 
 bool QnMetaDataV1::isEmpty() const
 {
-#if defined(NX_SSE2_SUPPORTED)
-    if (useSSE41())
-        return metadataIsEmpty_sse41((__m128i*) m_data.data());
-    else
-        return metadataIsEmpty_sse2((__m128i*) m_data.data());
-#elif __arm__ && __ARM_NEON__
-    return metadataIsEmpty_cpu(m_data.data());
-#else
-    return metadataIsEmpty_cpu(m_data.data());
-#endif
+    #if defined(NX_SSE2_SUPPORTED)
+        if (useSSE41())
+            return metadataIsEmpty_sse41((__m128i*) m_data.data());
+        else
+            return metadataIsEmpty_sse2((__m128i*) m_data.data());
+    #elif defined(__arm__) && defined(__ARM_NEON__)
+        // TODO: ARM.
+        return metadataIsEmpty_cpu(m_data.data());
+    #else
+        return metadataIsEmpty_cpu(m_data.data());
+    #endif
 }
 
 void QnMetaDataV1::assign( const void* data, qint64 timestamp, qint64 duration )

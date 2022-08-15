@@ -33,7 +33,7 @@
 #include <nx/vms/common/system_settings.h>
 #include <utils/common/util.h>
 
-#ifdef __arm__
+#if defined(__arm__)
     static const int kThreadCount = 8;
 #else
     static const int kThreadCount = 32;
