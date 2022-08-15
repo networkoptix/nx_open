@@ -1860,6 +1860,8 @@ Handle ServerConnection::executeRequest(
 {
     if (callback)
     {
+        if constexpr (std::is_base_of_v<nx::network::rest::Result, ResultType>)
+            NX_ASSERT(!request.url.path().startsWith("/rest/"));
         const QString serverId = d->serverId.toString();
         return sendRequest(request,
             [this, callback = std::move(callback), serverId](ContextPtr context)
