@@ -70,7 +70,7 @@ ServerCertificateWarning::ServerCertificateWarning(
         additionalText->setWordWrap(true);
 
         auto palette = additionalText->palette();
-        palette.setColor(QPalette::Foreground, colorTheme()->color("dark13"));
+        palette.setColor(QPalette::WindowText, colorTheme()->color("dark13"));
         additionalText->setPalette(palette);
 
         addCustomWidget(additionalText);
