@@ -1,7 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick 2.15
-import QtGraphicalEffects 1.15
+import Qt5Compat.GraphicalEffects
 
 import Nx 1.0
 import Nx.Controls 1.0
@@ -116,8 +116,8 @@ Item
             {
                 id: imageBlur
 
-                anchors.fill: imageHolder
-                source: image
+                anchors.fill: blurContainer
+                source: blurContainer
                 radius: imageHolder.blurRequired ? 32 : 0
                 z: 1
 
@@ -133,18 +133,26 @@ Item
                 }
             }
 
-            Image
+            // Blur the blurContainer instead of the image to avoid a crash in Qt6.
+            Item
             {
-                id: image
+                id: blurContainer
 
                 anchors.fill: imageHolder
-                fillMode: Image.Stretch
-                source: (preview.source && preview.source.url) || ""
-                cache: false
 
-                visible: !!source.toString()
-                    && !imageHolder.blurRequired
-                    && content.status !== AbstractResourceThumbnail.Status.unavailable
+                Image
+                {
+                    id: image
+
+                    anchors.fill: parent
+                    fillMode: Image.Stretch
+                    source: (preview.source && preview.source.url) || ""
+                    cache: false
+
+                    visible: !!source.toString()
+                        && !imageHolder.blurRequired
+                        && content.status !== AbstractResourceThumbnail.Status.unavailable
+                }
             }
         }
 
