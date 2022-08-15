@@ -5,6 +5,7 @@
 #include <QtCore/QAtomicInt>
 #include <QtCore/QThreadPool>
 
+#include <core/ptz/ptz_ini.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -85,12 +86,7 @@ QnPtzControllerPool::QnPtzControllerPool(SystemContext* systemContext, QObject* 
     d->executorThread->start();
 
     d->commandThreadPool = new QThreadPool(this);
-    #if defined(__arm__)
-        const int maxThreads = 8;
-    #else
-        const int maxThreads = 32;
-    #endif
-    d->commandThreadPool->setMaxThreadCount(maxThreads);
+    d->commandThreadPool->setMaxThreadCount(ptzIni().maxPtzControllerPoolThreadCount);
 }
 
 QnPtzControllerPool::~QnPtzControllerPool()
