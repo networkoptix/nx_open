@@ -73,9 +73,9 @@ bool ObjectType::hasEverBeenSupported() const
     return m_impl->hasEverBeenSupported();
 }
 
-bool ObjectType::isPrivate() const
+bool ObjectType::isReachable() const
 {
-    return m_impl->isPrivate();
+    return m_impl->isReachable();
 }
 
 bool ObjectType::isNonIndexable() const
@@ -106,14 +106,14 @@ void ObjectType::addDerivedType(AbstractObjectType* derivedType)
     m_impl->addDerivedType(derivedType);
 }
 
-void ObjectType::resolvePrivateness()
+void ObjectType::resolveReachability()
 {
-    m_impl->resolvePrivateness();
+    m_impl->resolveReachability();
 }
 
-void ObjectType::resolvePrivateness(bool hasPublicDescendants)
+void ObjectType::resolveReachability(bool hasPublicDescendants)
 {
-    m_impl->resolvePrivateness(hasPublicDescendants);
+    m_impl->resolveReachability(hasPublicDescendants);
 }
 
 void ObjectType::resolveScopes(InternalState* inOutInternalState, ErrorHandler* errorHandler)

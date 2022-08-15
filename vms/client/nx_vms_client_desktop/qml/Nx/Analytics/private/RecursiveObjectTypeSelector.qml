@@ -28,7 +28,7 @@ Column
         return Array.prototype.filter.call(objectTypes,
             function (objectType)
             {
-                return !objectType.isPrivate && !objectType.isLiveOnly && !objectType.isNonIndexable
+                return objectType.isReachable && !objectType.isLiveOnly && !objectType.isNonIndexable
                     && Analytics.TaxonomyManager.isRelevantForEngine(objectType, engine)
             })
     }
