@@ -41,10 +41,12 @@ const QString DeviceSearcher::kDefaultDeviceType =
 DeviceSearcher::DeviceSearcher(
     nx::utils::TimerManager* timerManager,
     std::unique_ptr<AbstractDeviceSearcherSettings> settings,
+    bool ignoreUsb0NetworkInterfaceIfOthersExist,
     std::function<bool()> isHttpsForced,
     unsigned int discoverTryTimeoutMS)
     :
     m_settings(std::move(settings)),
+    m_ignoreUsb0NetworkInterfaceIfOthersExist(ignoreUsb0NetworkInterfaceIfOthersExist),
     m_isHttpsForced(isHttpsForced),
     m_discoverTryTimeoutMS(
         discoverTryTimeoutMS == 0 ? kDefaultDiscoverTryTimeoutMs : discoverTryTimeoutMS),
@@ -315,7 +317,7 @@ void DeviceSearcher::dispatchDiscoverPackets()
 
 bool DeviceSearcher::needToUpdateReceiveSocket() const
 {
-    const auto interfacesList = getAllIPv4Interfaces();
+    const auto interfacesList = getAllIPv4Interfaces(m_ignoreUsb0NetworkInterfaceIfOthersExist);
     const QSet interfaces(interfacesList.begin(), interfacesList.end());
 
     bool changed = interfaces != m_interfacesCache;
