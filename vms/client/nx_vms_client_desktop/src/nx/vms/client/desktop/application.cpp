@@ -263,9 +263,13 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
     // Window handle must exist before events processing. This is required to initialize the scene.
     volatile auto winId = mainWindow->winId();
 
-    auto geometryManager = std::make_unique<WindowGeometryManager>(
-        std::make_unique<WindowController>(mainWindow.get()));
-    client.clientStateHandler()->registerDelegate(kWindowGeometryData, std::move(geometryManager));
+    if (qnRuntime->isDesktopMode())
+    {
+        auto geometryManager = std::make_unique<WindowGeometryManager>(
+            std::make_unique<WindowController>(mainWindow.get()));
+        client.clientStateHandler()->registerDelegate(kWindowGeometryData, std::move(geometryManager));
+    }
+
     client.clientStateHandler()->setStatisticsModules(
         context->commonModule()->instance<QnStatisticsManager>(),
         context->instance<QnSessionRestoreStatisticsModule>());
@@ -307,22 +311,7 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
     #endif
 
     mainWindow->show();
-
-    const bool instantlyMaximize = false
-        && !startupParams.fullScreenDisabled
-//        && !customWindowGeometry
-        && qnRuntime->isDesktopMode();
-
-    if (instantlyMaximize)
-    {
-        // We must handle 'move' event _before_ we activate fullscreen.
-        qApp->processEvents();
-        context->menu()->trigger(ui::action::EffectiveMaximizeAction);
-    }
-    else
-    {
-        mainWindow->updateDecorationsState();
-    }
+    mainWindow->updateDecorationsState();
 
     client.initDesktopCamera(qobject_cast<QOpenGLWidget*>(mainWindow->viewport()));
     client.startLocalSearchers();
