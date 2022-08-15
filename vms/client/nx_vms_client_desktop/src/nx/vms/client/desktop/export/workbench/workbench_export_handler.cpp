@@ -67,12 +67,27 @@ QnMediaResourceWidget* extractMediaWidget(QnWorkbenchDisplay* display,
     const ui::action::Parameters& parameters)
 {
     if (parameters.size() == 1)
-        return dynamic_cast<QnMediaResourceWidget *>(parameters.widget());
+    {
+        if (parameters.hasArgument(Qn::CameraBookmarkRole))
+        {
+            if (const auto bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
+                bookmark.isValid())
+            {
+                if (const auto activeWidget = display->activeWidget())
+                {
+                    if (activeWidget->resource()->getId() == bookmark.cameraId)
+                        return dynamic_cast<QnMediaResourceWidget*>(activeWidget);
+                }
+            }
+        }
+
+        return dynamic_cast<QnMediaResourceWidget*>(parameters.widget());
+    }
 
     if ((parameters.size() == 0) && display->widgets().size() == 1)
-        return dynamic_cast<QnMediaResourceWidget *>(display->widgets().front());
+        return dynamic_cast<QnMediaResourceWidget*>(display->widgets().front());
 
-    return dynamic_cast<QnMediaResourceWidget *>(display->activeWidget());
+    return dynamic_cast<QnMediaResourceWidget*>(display->activeWidget());
 }
 
 QnLayoutResourcePtr layoutFromBookmarks(const QnCameraBookmarkList& bookmarks, QnResourcePool* pool)
