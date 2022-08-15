@@ -85,11 +85,11 @@ QnPtzControllerPool::QnPtzControllerPool(SystemContext* systemContext, QObject* 
     d->executorThread->start();
 
     d->commandThreadPool = new QThreadPool(this);
-#ifdef __arm__
-    const int maxThreads = 8;
-#else
-    const int maxThreads = 32;
-#endif
+    #if defined(__arm__)
+        const int maxThreads = 8;
+    #else
+        const int maxThreads = 32;
+    #endif
     d->commandThreadPool->setMaxThreadCount(maxThreads);
 }
 
