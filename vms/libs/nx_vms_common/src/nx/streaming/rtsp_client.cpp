@@ -1543,7 +1543,7 @@ QString QnRtspClient::getVideoLayout() const
     return m_videoLayout;
 }
 
-#ifdef __arm__
+#if defined(__arm__)
 void sleepIfEmptySocket(nx::network::AbstractStreamSocket* socket)
 {
     static const size_t ADDITIONAL_READ_BUFFER_CAPACITY = 64 * 1024;
@@ -1571,9 +1571,10 @@ void sleepIfEmptySocket(nx::network::AbstractStreamSocket* socket)
 
 int QnRtspClient::readSocketWithBuffering(quint8* buf, size_t bufSize, bool readSome)
 {
-#ifdef __arm__
-    sleepIfEmptySocket(m_tcpSock.get());
-#endif
+    #if defined(__arm__)
+        sleepIfEmptySocket(m_tcpSock.get());
+    #endif
+    
     int bytesRead = m_tcpSock->recv(buf, (unsigned int) bufSize, readSome ? 0 : MSG_WAITALL);
     if (bytesRead > 0)
         m_lastReceivedDataTimer.restart();

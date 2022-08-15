@@ -13,9 +13,9 @@ namespace nx::network::rest { class UbjsonResult; }
 
 namespace rest {
 
-#ifdef __arm__
+#if defined(__arm__)
     // Some devices lack kernel support for atomic int64.
-    typedef int Handle;
+    typedef qint32 Handle;
 #else
     typedef qint64 Handle;
 #endif

@@ -119,4 +119,4 @@ QString getCPUString()
     bool useSSSE3() { return qCpuHasFeature(SSSE3); }
     bool useSSE41() { return qCpuHasFeature(SSE4_1); }
     bool useSSE42() { return qCpuHasFeature(SSE4_2); }
-#endif // defined(__arm__)
+#endif

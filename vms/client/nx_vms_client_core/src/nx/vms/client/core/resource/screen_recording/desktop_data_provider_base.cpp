@@ -20,17 +20,16 @@ QString DesktopDataProviderBase::lastErrorStr() const
     return m_lastErrorStr;
 }
 
-// mux audio 1 and audio 2 to audio1 buffer
-// I have used intrisicts for SSE. It is portable for MSVC, GCC (mac, linux), Intel compiler
-#if !defined(__arm__) && !defined(__aarch64__)
+/** Mux audio 1 and audio 2 to audio1 buffer. */
 void DesktopDataProviderBase::stereoAudioMux(qint16 *a1, qint16 *a2, int lenInShort)
+#if !defined(__arm__) && !defined(__aarch64__)
 {
     __m128i* audio1 = (__m128i*) a1;
     __m128i* audio2 = (__m128i*) a2;
     for (int i = 0; i < lenInShort/8; ++i)
     {
         //*audio1 = _mm_avg_epu16(*audio1, *audio2);
-        *audio1 = _mm_add_epi16(*audio1, *audio2); /* SSE2. */
+        *audio1 = _mm_add_epi16(*audio1, *audio2); //< SSE2.
         audio1++;
         audio2++;
     }
@@ -49,7 +48,6 @@ void DesktopDataProviderBase::stereoAudioMux(qint16 *a1, qint16 *a2, int lenInSh
     }
 }
 #else
-void DesktopDataProviderBase::stereoAudioMux(qint16 *a1, qint16 *a2, int lenInShort)
 {
     for ( int i = 0; i < lenInShort; ++i)
     {

@@ -174,7 +174,7 @@ void downscalePlate_factor8_sse41_intr(
     }
 }
 
-#else // !defined(__arm__)
+#else // !defined(__arm__) && !defined(__aarch64__)
 
 void downscalePlate_factor2_sse2_intr(
     unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
@@ -197,7 +197,7 @@ void downscalePlate_factor8_sse41_intr(
     NX_CRITICAL(false);
 }
 
-#endif // !defined(__arm__)
+#endif // !defined(__arm__) && !defined(__aarch64__)
 
 template <auto scalerFunc>
 void downscalePlanes(
