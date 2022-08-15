@@ -7,7 +7,7 @@ dynamic libraries, either taken from the OS (Windows or Linux), or coming with t
 dedicated directory.
 
 NOTE: The issues described below do not take place if the Plugin manually loads a dynamic library
-via LoadLibrary() on Windows, or dlopen() on Linux.
+via `LoadLibrary()` on Windows, or `dlopen()` on Linux.
 
 The consequences of not following the recommendations below can vary from Plugin loading failures
 to VMS Server crashes. And even if the Plugin works well with the particular VMS version on a
@@ -21,7 +21,7 @@ including minor updates like monthly patches. So, if the Plugin is dynamically l
 libraries which come with the VMS installation, it may malfunction with any VMS version which has
 any changes in those libraries. Such changes are expected to appear frequently. This issue may
 happen regardless of whether the library referenced by the Plugin is an integral part of the VMS
-code, or is a third-party library which VMS depends on.
+code, or is a third-party library which the VMS depends on.
 
 SOLUTION: The Plugin should never depend on any dynamic library bundled with the VMS installation.
 
@@ -43,7 +43,7 @@ also contains such symbol.
 
 EXAMPLE: The Plugin depends on `libxxx.so` located in the OS, and works great with the VMS version
 A. But in the VMS version B it has been decided to bundle VMS with `libxxx.so`, possibly having
-some internal differences to the Plugin's libxxx.so. So, after the VMS upgrade from A to B, this
+some internal differences to the Plugin's `libxxx.so`. So, after the VMS upgrade from A to B, this
 Plugin will automatically start working with VMS'es `libxxx.so` instead of the OS'es one, and this
 cannot be changed. Note that this happens in both cases: `libxxx.so` is the Linux system library,
 or it comes bundled with the Plugin in its directory.

@@ -20,11 +20,12 @@ bool QnContrastImageFilter::isFormatSupported(CLVideoDecoderOutput* frame) const
 }
 
 #if defined(NX_SSE2_SUPPORTED)
-static const __m128i  sse_0000_intrs  = _mm_setr_epi32(0x00000000, 0x00000000, 0x00000000, 0x00000000);
-#elif __arm__ && __ARM_NEON__
-    //TODO/ARM
+    static const __m128i sse_0000_intrs =
+        _mm_setr_epi32(0x00000000, 0x00000000, 0x00000000, 0x00000000);
+#elif defined(__arm__) && defined(__ARM_NEON__)
+    // TODO: ARM.
 #else
-    // TODO: C fallback routine
+    // TODO: C fallback routine.
 #endif
 
 CLVideoDecoderOutputPtr QnContrastImageFilter::updateImage(const CLVideoDecoderOutputPtr& srcFrame)
@@ -55,81 +56,82 @@ CLVideoDecoderOutputPtr QnContrastImageFilter::updateImage(const CLVideoDecoderO
 
     int xSteps = (right - left) / 16;
 
-#if defined(NX_SSE2_SUPPORTED)
-    quint16 aCoeff = quint16(m_gamma.aCoeff * 256.0f + 0.5);
-    __m128i  aFactorIntr  = _mm_setr_epi16(aCoeff, aCoeff, aCoeff, aCoeff, aCoeff, aCoeff, aCoeff, aCoeff);
+    #if defined(NX_SSE2_SUPPORTED)
+        quint16 aCoeff = quint16(m_gamma.aCoeff * 256.0f + 0.5);
+        __m128i  aFactorIntr  = _mm_setr_epi16(aCoeff, aCoeff, aCoeff, aCoeff, aCoeff, aCoeff, aCoeff, aCoeff);
 
-    quint8 bCoeff = quint8(qAbs(m_gamma.bCoeff) * 256.0 + 0.5);
-    __m128i  bFactorIntr  = _mm_setr_epi8(bCoeff, bCoeff, bCoeff, bCoeff, bCoeff, bCoeff, bCoeff, bCoeff,
-                                          bCoeff, bCoeff, bCoeff, bCoeff, bCoeff, bCoeff, bCoeff, bCoeff);
+        quint8 bCoeff = quint8(qAbs(m_gamma.bCoeff) * 256.0 + 0.5);
+        __m128i  bFactorIntr  = _mm_setr_epi8(bCoeff, bCoeff, bCoeff, bCoeff, bCoeff, bCoeff, bCoeff, bCoeff,
+                                              bCoeff, bCoeff, bCoeff, bCoeff, bCoeff, bCoeff, bCoeff, bCoeff);
 
-    __m128i *srcY =    (__m128i*)  (frame->data[0] + top * frame->linesize[0] + left);
-    __m128i *srcYEnd = (__m128i*)  (frame->data[0] + bottom * frame->linesize[0] + left);
-    int strideCoeff = frame->linesize[0]/16 - xSteps;
-    if (m_gamma.gamma != 1.0)
-    {
-        while (srcY < srcYEnd)
+        __m128i *srcY =    (__m128i*)  (frame->data[0] + top * frame->linesize[0] + left);
+        __m128i *srcYEnd = (__m128i*)  (frame->data[0] + bottom * frame->linesize[0] + left);
+        int strideCoeff = frame->linesize[0]/16 - xSteps;
+        if (m_gamma.gamma != 1.0)
         {
-            for (int x = xSteps; x > 0; --x)
+            while (srcY < srcYEnd)
             {
-                __m128i y = _mm_subs_epu8(*srcY, bFactorIntr);
-                __m128i y0 = _mm_unpacklo_epi8(sse_0000_intrs, y);
-                __m128i y1 = _mm_unpackhi_epi8(sse_0000_intrs, y);
-
-                typedef union
+                for (int x = xSteps; x > 0; --x)
                 {
-                    __m128i v;
-                    uint32_t a[4];
-                    uint8_t b[16];
-                } U32;
-                U32 tmp;
+                    __m128i y = _mm_subs_epu8(*srcY, bFactorIntr);
+                    __m128i y0 = _mm_unpacklo_epi8(sse_0000_intrs, y);
+                    __m128i y1 = _mm_unpackhi_epi8(sse_0000_intrs, y);
 
-                tmp.v = _mm_packus_epi16(_mm_mulhi_epu16(y0, aFactorIntr), _mm_mulhi_epu16(y1, aFactorIntr));
+                    typedef union
+                    {
+                        __m128i v;
+                        uint32_t a[4];
+                        uint8_t b[16];
+                    } U32;
+                    U32 tmp;
 
-                tmp.a[0] = m_gammaCorrection[(quint8)tmp.a[0]] +
-                                 (m_gammaCorrection[(quint8)(tmp.a[0]>>8)] << 8)+
-                                 (m_gammaCorrection[(quint8)(tmp.a[0]>>16)] << 16)+
-                                 (m_gammaCorrection[(quint8)(tmp.a[0]>>24)] << 24);
+                    tmp.v = _mm_packus_epi16(_mm_mulhi_epu16(y0, aFactorIntr), _mm_mulhi_epu16(y1, aFactorIntr));
 
-                tmp.a[1] = (quint32) m_gammaCorrection[tmp.b[4]] +
-                    (m_gammaCorrection[tmp.b[5]] << 8) +
-                    (m_gammaCorrection[tmp.b[6]] << 16) +
-                    (m_gammaCorrection[tmp.b[7]] << 24);
+                    tmp.a[0] = m_gammaCorrection[(quint8)tmp.a[0]] +
+                                     (m_gammaCorrection[(quint8)(tmp.a[0]>>8)] << 8)+
+                                     (m_gammaCorrection[(quint8)(tmp.a[0]>>16)] << 16)+
+                                     (m_gammaCorrection[(quint8)(tmp.a[0]>>24)] << 24);
 
-                tmp.a[2] = (quint32) m_gammaCorrection[tmp.b[8]] +
-                    (m_gammaCorrection[tmp.b[9]] << 8) +
-                    (m_gammaCorrection[tmp.b[10]] << 16) +
-                    (m_gammaCorrection[tmp.b[11]] << 24);
+                    tmp.a[1] = (quint32) m_gammaCorrection[tmp.b[4]] +
+                        (m_gammaCorrection[tmp.b[5]] << 8) +
+                        (m_gammaCorrection[tmp.b[6]] << 16) +
+                        (m_gammaCorrection[tmp.b[7]] << 24);
 
-                tmp.a[3] = (quint32) m_gammaCorrection[tmp.b[12]] +
-                    (m_gammaCorrection[tmp.b[13]] << 8) +
-                    (m_gammaCorrection[tmp.b[14]] << 16) +
-                    (m_gammaCorrection[tmp.b[15]] << 24);
+                    tmp.a[2] = (quint32) m_gammaCorrection[tmp.b[8]] +
+                        (m_gammaCorrection[tmp.b[9]] << 8) +
+                        (m_gammaCorrection[tmp.b[10]] << 16) +
+                        (m_gammaCorrection[tmp.b[11]] << 24);
+
+                    tmp.a[3] = (quint32) m_gammaCorrection[tmp.b[12]] +
+                        (m_gammaCorrection[tmp.b[13]] << 8) +
+                        (m_gammaCorrection[tmp.b[14]] << 16) +
+                        (m_gammaCorrection[tmp.b[15]] << 24);
 
 
-                *srcY++ = tmp.v;
+                    *srcY++ = tmp.v;
+                }
+                srcY += strideCoeff;
             }
-            srcY += strideCoeff;
         }
-    }
-    else {
-        while (srcY < srcYEnd)
-        {
-            for (int x = xSteps; x > 0; --x)
+        else {
+            while (srcY < srcYEnd)
             {
-                __m128i y = _mm_subs_epu8(*srcY, bFactorIntr);
-                __m128i y0 = _mm_unpacklo_epi8(sse_0000_intrs, y);
-                __m128i y1 = _mm_unpackhi_epi8(sse_0000_intrs, y);
+                for (int x = xSteps; x > 0; --x)
+                {
+                    __m128i y = _mm_subs_epu8(*srcY, bFactorIntr);
+                    __m128i y0 = _mm_unpacklo_epi8(sse_0000_intrs, y);
+                    __m128i y1 = _mm_unpackhi_epi8(sse_0000_intrs, y);
 
-                *srcY++ = _mm_packus_epi16(_mm_mulhi_epu16(y0, aFactorIntr), _mm_mulhi_epu16(y1, aFactorIntr));
+                    *srcY++ = _mm_packus_epi16(_mm_mulhi_epu16(y0, aFactorIntr), _mm_mulhi_epu16(y1, aFactorIntr));
+                }
+                srcY += strideCoeff;
             }
-            srcY += strideCoeff;
         }
-    }
-#elif __arm__ && __ARM_NEON__
-    //TODO/ARM
-#else
-    // TODO: C fallback routine
-#endif
+    #elif defined(__arm__) && defined(__ARM_NEON__)
+        // TODO: ARM.
+    #else
+        // TODO: C fallback routine.
+    #endif
+
     return frame;
 }

@@ -1,6 +1,5 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-
 #include <iostream>
 #include <sstream>
 #include <memory>
@@ -142,7 +141,8 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(InterfaceListPolicy policy, bool ign
 
             if (allowedAddresses.isEmpty() || allowedAddresses.contains(address.ip()))
             {
-                result.append(QnInterfaceAndAddr(iface.name(), address.ip(), address.netmask(), iface));
+                result.append(QnInterfaceAndAddr(
+                    iface.name(), address.ip(), address.netmask(), iface));
                 addInterfaceAnyway = false;
                 if (policy != InterfaceListPolicy::keepAllAddressesPerInterface)
                     break;

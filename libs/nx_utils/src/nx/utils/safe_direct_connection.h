@@ -27,7 +27,7 @@ class NX_UTILS_API EnableSafeDirectConnection
 {
 public:
     #if defined(__arm__) //< Some 32-bit ARM devices lack the kernel support for the atomic int64.
-        typedef unsigned int ID;
+        typedef quint32 ID;
     #else
         typedef quint64 ID;
     #endif

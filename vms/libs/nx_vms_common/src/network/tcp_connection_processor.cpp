@@ -29,11 +29,11 @@
 #include <nx/metrics/metrics_storage.h>
 
 
-// we need enough size for updates
-#ifdef __arm__
-    const int QnTCPConnectionProcessor::kMaxRequestSize = 1024*1024*16;
+// We need enough size for updates.
+#if defined(__arm__)
+    const int QnTCPConnectionProcessor::kMaxRequestSize = 1024 * 1024 * 16;
 #else
-    const int QnTCPConnectionProcessor::kMaxRequestSize = 1024*1024*512;
+    const int QnTCPConnectionProcessor::kMaxRequestSize = 1024 * 1024 * 512;
 #endif
 
 namespace {

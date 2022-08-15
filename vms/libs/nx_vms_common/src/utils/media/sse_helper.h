@@ -9,12 +9,11 @@
 #endif
 
 #if defined(NX_SSE2_SUPPORTED)
-#include <xmmintrin.h>
-#include <emmintrin.h>
+    #include <xmmintrin.h>
+    #include <emmintrin.h>
 
-typedef __m128i simd128i;
-typedef __m128 simd128;
-
+    typedef __m128i simd128i;
+    typedef __m128 simd128;
 #elif (defined(__arm__) || defined(__aarch64__)) && defined(__ARM_NEON__)
     #include <sse2neon.h>
     #define NX_SSE2_SUPPORTED
@@ -23,24 +22,23 @@ typedef __m128 simd128;
     typedef __m128i simd128i;
     typedef __m128 simd128;
 #else
-//#ifndef SIMD_WARNING_ISSUED
-//#define SIMD_WARNING_ISSUED
-//#warning "Target CPU has no SIMD extension or it is not supported - using C fallback routines"
-//#endif
+    //#if !defined(SIMD_WARNING_ISSUED)
+    //    #define SIMD_WARNING_ISSUED
+    //    #warning "Target CPU has no SIMD extension or it is not supported - using C fallback routines"
+    //#endif
 
-typedef struct
-{
-    int64_t one;
-    uint64_t two;
-} simd128i;
+    typedef struct
+    {
+        int64_t one;
+        uint64_t two;
+    } simd128i;
 
-typedef struct
-{
-    uint64_t one;
-    uint64_t two;
-} simd128;
+    typedef struct
+    {
+        uint64_t one;
+        uint64_t two;
+    } simd128;
 #endif
-
 
 #if defined(NX_SSE2_SUPPORTED)
     #if defined(Q_CC_GNU) && !defined(Q_OS_MAC) && !defined(NX_SSE2_SUPPORTED_SSE2NEON)
@@ -55,7 +53,7 @@ typedef struct
          */
 
         #undef __STATIC_INLINE
-        #ifdef __GNUC_STDC_INLINE__
+        #if defined(__GNUC_STDC_INLINE__)
             #define __STATIC_INLINE __inline
         #else
             #define __STATIC_INLINE static __inline

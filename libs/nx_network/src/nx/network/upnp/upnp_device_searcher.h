@@ -70,6 +70,7 @@ public:
         std::unique_ptr<AbstractDeviceSearcherSettings> settings,
         std::function<bool()> isHttpsForced = nullptr,
         unsigned int discoverTryTimeoutMS = kDefaultDiscoverTryTimeoutMs);
+
     virtual ~DeviceSearcher();
 
     virtual void pleaseStop() override;

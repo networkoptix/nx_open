@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "ini.h"
+#include "nx_system_updates_ini.h"
 
 namespace nx::vms::common::update {
 
