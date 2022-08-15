@@ -70,7 +70,7 @@ private:
 
     void switchToVideoWallMode(const QnVideoWallResourcePtr& videoWall);
 
-    void openNewWindow(QnUuid videoWallId, QnUuid videoWallInstanceId);
+    void openNewWindow(QnUuid videoWallId, const QnVideoWallItem& item);
     void openVideoWallItem(const QnVideoWallResourcePtr& videoWall);
     void closeInstanceDelayed();
 
