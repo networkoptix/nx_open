@@ -42,13 +42,6 @@ NX_REFLECTION_INSTRUMENT_ENUM(AlignmentFlag,
 NX_REFLECTION_INSTRUMENT_ENUM(DateFormat,
     TextDate,
     ISODate,
-    SystemLocaleDate,
-    LocalDate,
-    LocaleDate,
-    SystemLocaleShortDate,
-    SystemLocaleLongDate,
-    DefaultLocaleShortDate,
-    DefaultLocaleLongDate,
     RFC2822Date,
     ISODateWithMs
 )
