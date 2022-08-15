@@ -122,6 +122,11 @@ public:
         m_zoomWidget = zoomWidget;
     }
 
+    void setTargetWidget(QnMediaResourceWidget* targetWidget)
+    {
+        m_targetWidget = targetWidget;
+    }
+
     QColor frameColor() const
     {
         return m_frameColor;
@@ -196,8 +201,15 @@ protected:
         const QStyleOptionGraphicsItem* /*option*/,
         QWidget* /*widget*/) override
     {
-        Style::paintCosmeticFrame(painter, rect(), m_frameColor,
-            m_frameWidth, m_frameWidth / 2);
+        if (!NX_ASSERT(m_zoomWidget) || !NX_ASSERT(m_targetWidget))
+           return;
+
+        if (m_zoomWidget->isOverlayVisible() || m_zoomWidget->isInfoVisible() ||
+            m_targetWidget->isOverlayVisible() || m_targetWidget->isInfoVisible())
+        {
+            Style::paintCosmeticFrame(painter, rect(), m_frameColor, m_frameWidth,
+                m_frameWidth / 2);
+        }
     }
 
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF& region) const override
@@ -227,6 +239,7 @@ private:
     bool m_interactive;
     QPointer<ZoomOverlayWidget> m_overlay;
     QPointer<QnMediaResourceWidget> m_zoomWidget;
+    QPointer<QnMediaResourceWidget> m_targetWidget;
     QColor m_frameColor;
     int m_frameWidth;
 };
@@ -607,6 +620,7 @@ void ZoomWindowInstrument::registerLink(QnMediaResourceWidget* widget,
         windowWidget = new ZoomWindowWidget();
     }
     windowWidget->setZoomWidget(widget);
+    windowWidget->setTargetWidget(zoomTargetWidget);
     windowWidget->setFrameWidth(kZoomLineWidth);
     overlayWidget->addWidget(windowWidget);
     data.windowWidget = windowWidget;
@@ -633,6 +647,7 @@ void ZoomWindowInstrument::unregisterLink(QnMediaResourceWidget* widget, bool de
         if (auto overlay = data.windowWidget->overlay())
             overlay->removeWidget(data.windowWidget);
         data.windowWidget->setZoomWidget(nullptr);
+        data.windowWidget->setTargetWidget(nullptr);
         data.windowWidget->disconnect(this);
     }
     data.windowWidget = nullptr;
@@ -1048,6 +1063,7 @@ void ZoomWindowInstrument::at_resizing(
     auto oldTargetWidget = windowTarget()->overlay()->target();
 
     /* Preserve zoom window widget. */
+    newTargetWidget->setOverlayVisible(true, false);
     windowTarget()->hide();
     unregisterLink(widget, false);
 
