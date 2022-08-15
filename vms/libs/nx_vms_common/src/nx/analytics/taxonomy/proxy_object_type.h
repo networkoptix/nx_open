@@ -37,7 +37,7 @@ public:
 
     virtual bool hasEverBeenSupported() const override;
 
-    virtual bool isPrivate() const override;
+    virtual bool isReachable() const override;
 
     virtual bool isLiveOnly() const override;
 
