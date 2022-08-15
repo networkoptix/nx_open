@@ -7,6 +7,7 @@
 
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QInputDialog>
 #include <QtWidgets/QPushButton>
 
 #include <api/runtime_info_manager.h>
@@ -43,6 +44,7 @@
 #include <nx/vms/api/types/connection_types.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
@@ -712,11 +714,11 @@ void QnWorkbenchVideoWallHandler::switchToVideoWallMode(const QnVideoWallResourc
 
     for (const auto& item: items)
     {
-        openNewWindow(videoWall->getId(), item.uuid);
+        openNewWindow(videoWall->getId(), item);
     }
 }
 
-void QnWorkbenchVideoWallHandler::openNewWindow(QnUuid videoWallId, QnUuid videoWallInstanceId)
+void QnWorkbenchVideoWallHandler::openNewWindow(QnUuid videoWallId, const QnVideoWallItem& item)
 {
     if (!NX_ASSERT(connection(), "Client must be connected while we are running the video wall"))
         return;
@@ -725,12 +727,16 @@ void QnWorkbenchVideoWallHandler::openNewWindow(QnUuid videoWallId, QnUuid video
     logonData.address = connectionAddress();
     // Connection credentials will be constructed by callee from videowall IDs.
 
+    const int leftmostScreen = item.screenSnaps.left().screenIndex;
+
     QStringList arguments;
     arguments
         << "--videowall"
         << videoWallId.toString()
         << "--videowall-instance"
-        << videoWallInstanceId.toString()
+        << item.uuid.toString()
+        << "--screen"
+        << QString::number(leftmostScreen)
         << "--auth"
         << QnStartupParameters::createAuthenticationString(logonData);
 
@@ -747,7 +753,7 @@ void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr
     }
 
     QnVideoWallItem item = videoWall->items()->getItem(m_videoWallMode.instanceGuid);
-    updateMainWindowGeometry(item.screenSnaps); // TODO: #sivanov Check if it is needed at all.
+    executeDelayedParented([this, item] { updateMainWindowGeometry(item.screenSnaps); }, this);
 
     QnLayoutResourcePtr layout = resourcePool()->getResourceById<QnLayoutResource>(item.layout);
 
@@ -1334,7 +1340,7 @@ void QnWorkbenchVideoWallHandler::submitDelayedItemOpen()
             if (item.pcUuid != pcUuid || item.runtimeStatus.online)
                 continue;
 
-            openNewWindow(m_videoWallMode.guid, item.uuid);
+            openNewWindow(m_videoWallMode.guid, item);
         }
         closeInstanceDelayed();
     }
@@ -3162,7 +3168,49 @@ void QnWorkbenchVideoWallHandler::updateMainWindowGeometry(const QnScreenSnaps& 
     if (!m_geometrySetter)
         m_geometrySetter.reset(new GeometrySetter(mainWindowWidget()));
 
-    m_geometrySetter->changeGeometry(targetGeometry);
+    QRect actualGeometry = targetGeometry;
+    if (ini().videoWallHiDpiMode == 1)
+    {
+        if (qApp->devicePixelRatio() > 1.0)
+        {
+            actualGeometry = QRect(
+                targetGeometry.x() / 2,
+                targetGeometry.y() / 2,
+                targetGeometry.width() / 2,
+                targetGeometry.height() / 2);
+        }
+    }
+    else if (ini().videoWallHiDpiMode == 2)
+    {
+        static constexpr int kErrorValue = std::numeric_limits<int>::min();
+        auto askCoord =
+            [this](QString question, int value) -> int
+            {
+                bool ok = true;
+                auto result = QInputDialog::getInt(
+                    mainWindowWidget(), question, question, value, -10000, 10000, 1, &ok);
+                if (!ok)
+                    return kErrorValue;
+                return result;
+            };
+
+        int x = askCoord("X", targetGeometry.x());
+        if (x == kErrorValue)
+            return;
+        int y = askCoord("Y", targetGeometry.y());
+        if (y == kErrorValue)
+            return;
+        int w = askCoord("Width", targetGeometry.width());
+        if (w == kErrorValue)
+            return;
+        int h = askCoord("Height", targetGeometry.height());
+        if (h == kErrorValue)
+            return;
+
+        actualGeometry = QRect(x, y, w, h);
+    }
+
+    m_geometrySetter->changeGeometry(actualGeometry);
 }
 
 void QnWorkbenchVideoWallHandler::updateControlLayout(
