@@ -33,7 +33,7 @@ class NX_VMS_COMMON_API AbstractEventType: public QObject
     Q_PROPERTY(bool isHidden READ isHidden CONSTANT)
     Q_PROPERTY(bool useTrackBestShotAsPreview READ useTrackBestShotAsPreview CONSTANT)
     Q_PROPERTY(bool hasEverBeenSupported READ hasEverBeenSupported CONSTANT)
-    Q_PROPERTY(bool isPrivate READ isPrivate CONSTANT)
+    Q_PROPERTY(bool isReachable READ isReachable CONSTANT)
     Q_PROPERTY(std::vector<AbstractScope*> scopes READ scopes CONSTANT)
 
 public:
@@ -54,12 +54,23 @@ public:
 
     virtual std::vector<AbstractEventType*> derivedTypes() const = 0;
 
+    /**
+     * @return A list of Attributes that have been inherited from the base Type.
+     */
     virtual std::vector<AbstractAttribute*> baseAttributes() const = 0;
 
+    /**
+     * @return A list of Attributes that are declared by the Type directly, including overriden
+     *     base Attributes.
+     */
     virtual std::vector<AbstractAttribute*> ownAttributes() const = 0;
 
     virtual std::vector<AbstractAttribute*> attributes() const = 0;
 
+    /**
+     * @return A list of Attributes that have been declared as supported for the Type by any
+     *     Device Agent.
+     */
     virtual std::vector<AbstractAttribute*> supportedAttributes() const = 0;
 
     virtual std::vector<AbstractAttribute*> supportedOwnAttributes() const = 0;
@@ -72,9 +83,16 @@ public:
 
     virtual bool useTrackBestShotAsPreview() const = 0;
 
+    /**
+     * @return Whether the Type has ever been declared as supported by any Device Agent.
+     */
     virtual bool hasEverBeenSupported() const = 0;
 
-    virtual bool isPrivate() const = 0;
+    /**
+     * @return Whether the Type has ever been supported by any Device Agent or is a direct or
+     *     indirect base for any supported Type.
+     */
+    virtual bool isReachable() const = 0;
 
     virtual std::vector<AbstractScope*> scopes() const = 0;
 

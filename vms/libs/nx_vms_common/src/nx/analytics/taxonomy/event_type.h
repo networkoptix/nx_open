@@ -52,7 +52,7 @@ public:
 
     virtual bool hasEverBeenSupported() const override;
 
-    virtual bool isPrivate() const override;
+    virtual bool isReachable() const override;
 
     virtual std::vector<AbstractScope*> scopes() const override;
 
@@ -60,13 +60,13 @@ public:
 
     void addDerivedType(AbstractEventType* derivedObjectType);
 
-    void resolvePrivateness(bool hasPublicDescendants);
-
     void resolve(InternalState* inOutInternalState, ErrorHandler* errorHandler);
 
     void resolveSupportedAttributes(InternalState* inOutInternalState, ErrorHandler* errorHandler);
 
-    void resolvePrivateness();
+    void resolveReachability(bool hasPublicDescendants);
+
+    void resolveReachability();
 
 private:
     void resolveScopes(InternalState* inOutInternalState, ErrorHandler* errorHandler);

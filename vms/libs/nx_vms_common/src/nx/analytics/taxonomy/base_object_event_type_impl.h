@@ -183,9 +183,9 @@ public:
         return m_descriptor.hasEverBeenSupported;
     }
 
-    bool isPrivate() const
+    bool isReachable() const
     {
-        return m_isPrivate;
+        return m_isReachable;
     }
 
     std::vector<AbstractScope*> scopes() const
@@ -213,26 +213,26 @@ public:
         return m_derivedTypes.empty();
     }
 
-    void resolvePrivateness()
+    void resolveReachability()
     {
         if (isLeaf())
-            resolvePrivateness(/*hasPublicDescendants*/ false);
+            resolveReachability(/*hasPublicDescendants*/ false);
     }
 
-    void resolvePrivateness(bool hasPublicDescendants)
+    void resolveReachability(bool hasPublicDescendants)
     {
-        if (!m_isPrivate)
+        if (m_isReachable)
             return;
 
         if ((hasPublicDescendants || m_descriptor.hasEverBeenSupported) && !m_descriptor.isHidden())
-            m_isPrivate = false;
+            m_isReachable = true;
 
-        hasPublicDescendants |= !m_isPrivate;
+        hasPublicDescendants |= m_isReachable;
         if (m_descriptor.isHidden() && m_descriptor.hasEverBeenSupported)
             hasPublicDescendants = true;
 
         if (m_base)
-            m_base->resolvePrivateness(hasPublicDescendants);
+            m_base->resolveReachability(hasPublicDescendants);
     }
 
     void resolveScopes(InternalState* inOutInternalState, ErrorHandler* errorHandler)
@@ -393,7 +393,7 @@ private:
     std::vector<AbstractScope*> m_scopes;
 
     QString m_typeName;
-    bool m_isPrivate = true;
+    bool m_isReachable = false;
     bool m_isResolved = false;
     bool m_areSupportedAttributesResolved = false;
 };

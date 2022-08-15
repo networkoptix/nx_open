@@ -105,9 +105,9 @@ bool ProxyObjectType::hasEverBeenSupported() const
     return m_proxiedObjectType->hasEverBeenSupported();
 }
 
-bool ProxyObjectType::isPrivate() const
+bool ProxyObjectType::isReachable() const
 {
-    return m_proxiedObjectType->isPrivate();
+    return m_proxiedObjectType->isReachable();
 }
 
 bool ProxyObjectType::isLiveOnly() const
