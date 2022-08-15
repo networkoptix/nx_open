@@ -12,6 +12,9 @@ struct ResourceManagementIni: public nx::kit::IniConfig
         "Allows using the default storage factory for external storage creation.");
     NX_INI_INT(15'000, cameraDiscoveryIntervalMs,
         "Wait at least this many milliseconds between the camera discovery attempts.");
+    NX_INI_INT(32, maxResourceDiscoveryThreadCount,
+        "The maximum number of threads for the thread pool of the Resource Discovery Manager.\n"
+        "Up to 5.0, for ARM32 devices it used to be 8.");
 };
 
 NX_VMS_COMMON_API ResourceManagementIni& resourceManagementIni();
