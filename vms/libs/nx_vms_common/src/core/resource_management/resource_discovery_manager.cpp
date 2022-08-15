@@ -33,12 +33,6 @@
 #include <nx/vms/common/system_settings.h>
 #include <utils/common/util.h>
 
-#if defined(__arm__)
-    static const int kThreadCount = 8;
-#else
-    static const int kThreadCount = 32;
-#endif
-
 using namespace nx::vms::common;
 
 // ------------------------------------ QnManualCameraInfo -----------------------------
@@ -77,7 +71,7 @@ QnResourceDiscoveryManager::QnResourceDiscoveryManager(
     m_serverOfflineTimeout(QnMediaServerResource::kMinFailoverTimeoutMs),
     m_manualCameraListChanged(false)
 {
-    m_threadPool.setMaxThreadCount(kThreadCount);
+    m_threadPool.setMaxThreadCount(resourceManagementIni().maxResourceDiscoveryThreadCount);
 }
 
 QnResourceDiscoveryManager::~QnResourceDiscoveryManager()
