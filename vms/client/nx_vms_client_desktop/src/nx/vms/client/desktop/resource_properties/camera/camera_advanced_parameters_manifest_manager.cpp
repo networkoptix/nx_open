@@ -52,22 +52,22 @@ void CameraAdvancedParametersManifestManager::loadManifestAsync(
         return;
 
     auto callback = nx::utils::guarded(this,
-        [this, camera](bool success, int /*handle*/, nx::network::rest::JsonResult data)
+        [this, camera](bool success, auto /*handle*/, auto result, auto /*headers*/)
         {
             if (!success)
                 return;
 
-            const auto manifest = data.deserialized<QnCameraAdvancedParams>();
+            QnCameraAdvancedParams manifest;
+            QJson::deserialize(result, &manifest);
             d->manifestsByCameraId[camera->getId()] = manifest;
             emit manifestLoaded(camera, manifest);
         });
 
-    connectedServerApi()->getJsonResult(
+    connectedServerApi()->getRawResult(
         NX_FMT("/rest/v2/devices/%1/advanced/*/manifest", camera->getId()),
         /*params*/ {},
         callback,
-        thread(),
-        camera->getParentId());
+        thread());
 }
 
 } // namespace nx::vms::client::desktop
