@@ -36,10 +36,10 @@ void resolveSupportedAttributes(
 }
 
 template<typename Map>
-void resolvePrivateness(Map* inOutMap)
+void resolveReachability(Map* inOutMap)
 {
     for (auto& [_, item]: *inOutMap)
-        item->resolvePrivateness();
+        item->resolveReachability();
 }
 
 static InternalState makeInitialInternalState(Descriptors descriptors)
@@ -86,8 +86,8 @@ StateCompiler::Result StateCompiler::compile(Descriptors descriptors)
 
     resolveSupportedAttributes(&internalState.objectTypeById, &internalState, &errorHandler);
     resolveSupportedAttributes(&internalState.eventTypeById, &internalState, &errorHandler);
-    resolvePrivateness(&internalState.objectTypeById);
-    resolvePrivateness(&internalState.eventTypeById);
+    resolveReachability(&internalState.objectTypeById);
+    resolveReachability(&internalState.eventTypeById);
 
     StateCompiler::Result result;
     result.state = std::make_shared<State>(std::move(internalState));

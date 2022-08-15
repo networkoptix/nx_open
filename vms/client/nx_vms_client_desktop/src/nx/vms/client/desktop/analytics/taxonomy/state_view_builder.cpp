@@ -38,7 +38,7 @@ static void engineFiltersFromObjectType(
 
 static bool isHidden(const nx::analytics::taxonomy::AbstractObjectType* objectType)
 {
-    return objectType->isPrivate() && objectType->hasEverBeenSupported();
+    return !objectType->isReachable() && objectType->hasEverBeenSupported();
 }
 
 static AbstractNode* makeFilteredNode(
@@ -47,7 +47,7 @@ static AbstractNode* makeFilteredNode(
     QObject* parent,
     std::map<QString, AbstractStateViewFilter*>* outEngineFilters = nullptr)
 {
-    if (objectType->isPrivate())
+    if (!objectType->isReachable())
         return nullptr;
 
     std::vector<const nx::analytics::taxonomy::AbstractObjectType*> nodeObjectTypes;
@@ -63,7 +63,7 @@ static AbstractNode* makeFilteredNode(
             if (outEngineFilters)
                 engineFiltersFromObjectType(derivedObjectType, outEngineFilters, parent);
         }
-        else if (!derivedObjectType->isPrivate())
+        else if (derivedObjectType->isReachable())
         {
             if (AbstractNode* node = makeFilteredNode(derivedObjectType, filter, parent))
                 derivedNodes.push_back(node);

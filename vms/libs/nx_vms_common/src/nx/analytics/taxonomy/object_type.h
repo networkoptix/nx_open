@@ -44,7 +44,7 @@ public:
 
     virtual bool hasEverBeenSupported() const override;
 
-    virtual bool isPrivate() const override;
+    virtual bool isReachable() const override;
 
     virtual bool isNonIndexable() const override;
 
@@ -56,13 +56,13 @@ public:
 
     void addDerivedType(AbstractObjectType* derivedObjectType);
 
-    void resolvePrivateness(bool hasPublicDescendants);
-
     void resolve(InternalState* inOutInternalState, ErrorHandler* errorHandler);
 
     void resolveSupportedAttributes(InternalState* inOutInternalState, ErrorHandler* errorHandler);
 
-    void resolvePrivateness();
+    void resolveReachability(bool hasPublicDescendants);
+
+    void resolveReachability();
 
 private:
     void resolveScopes(InternalState* inOutInternalState, ErrorHandler* errorHandler);

@@ -85,7 +85,7 @@ private:
 
         for (const auto& child: children)
         {
-            if (child->isPrivate()
+            if (!child->isReachable()
                 || (liveTypesExcluded && (child->isLiveOnly() || child->isNonIndexable()))
                 || (engine && !manager->isRelevantForEngine(child, engine)))
             {

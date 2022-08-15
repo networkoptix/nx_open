@@ -41,5 +41,10 @@
             }
         }
     },
-    "privateTypes": ["object.derived2", "object.derived3", "object.derived4", "object.derived1.derived2"]
+    "nonReachableTypes": [
+        "object.derived2",
+        "object.derived3",
+        "object.derived4",
+        "object.derived1.derived2"
+    ]
 }
