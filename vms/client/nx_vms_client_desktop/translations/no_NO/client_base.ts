@@ -9992,7 +9992,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message>
       <source>The recommended maximum user session lifetime is %1</source>
       <comment>%1 is the time span with time units</comment>
-      <translation type="unfinished">The recommended maximum user session lifetime is %1</translation>
+      <translation>Anbefalt maksimal levetid for brukerøkter er %1</translation>
     </message>
   </context>
   <context>
@@ -10052,11 +10052,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Auto-generated certificate</source>
-      <translation type="unfinished">Auto-generated certificate</translation>
+      <translation>Autogenerert sertifikat</translation>
     </message>
     <message>
       <source>The certificate is auto-generated and pinned to %1</source>
-      <translation type="unfinished">The certificate is auto-generated and pinned to %1</translation>
+      <translation>Sertifikatet er automatisk generert og festet til %1</translation>
     </message>
   </context>
   <context>
