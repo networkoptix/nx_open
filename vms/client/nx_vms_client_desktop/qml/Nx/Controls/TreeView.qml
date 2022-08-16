@@ -158,7 +158,7 @@ FocusScope
         return rowItem && rowItem.delegateItem
     }
 
-    signal activated(var modelIndex, var selection, var activationType)
+    signal activated(var modelIndex, var selection, var activationType, var modifiers)
     signal contextMenuRequested(point globalPos, var modelIndex, var selection)
     signal selectionChanged()
 
@@ -503,7 +503,9 @@ FocusScope
                         }
                         else
                         {
-                            activated(listItem.sourceIndex, selection(), ResourceTree.ActivationType.doubleClick)
+                            activated(listItem.sourceIndex, selection(),
+                                ResourceTree.ActivationType.doubleClick,
+                                Qt.NoModifier)
                         }
                     }
 
@@ -533,7 +535,10 @@ FocusScope
 
                             if (mouse.button == Qt.MiddleButton)
                             {
-                                activated(modelIndex, selection(), ResourceTree.ActivationType.middleClick);
+                                activated(modelIndex,
+                                    selection(),
+                                    ResourceTree.ActivationType.middleClick,
+                                    Qt.NoModifier);
                             }
                             else
                             {
@@ -796,7 +801,10 @@ FocusScope
             case Qt.Key_Enter:
             case Qt.Key_Return:
                 if (treeView.currentIndex.valid)
-                    activated(treeView.currentIndex, selection(), ResourceTree.ActivationType.enterKey)
+                    activated(treeView.currentIndex,
+                        selection(),
+                        ResourceTree.ActivationType.enterKey,
+                        event.modifiers)
                 break
 
             case Qt.Key_Space:

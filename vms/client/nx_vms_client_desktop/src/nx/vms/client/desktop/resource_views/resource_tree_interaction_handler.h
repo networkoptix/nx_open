@@ -55,7 +55,8 @@ public:
      */
     void activateItem(const QModelIndex& index,
         const QModelIndexList& selection,
-        const ResourceTree::ActivationType activationType);
+        const ResourceTree::ActivationType activationType,
+        const Qt::KeyboardModifiers modifiers = Qt::NoModifier);
 
     /**
      * Handler which is called when user presses Enter key from resource search input field.
