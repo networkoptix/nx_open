@@ -70,12 +70,66 @@ void AttributeResolver::resolveOmittedBaseAttributes()
     *m_context.omittedBaseAttributeNames = omittedBaseAttributeNames;
 }
 
+void AttributeResolver::fillAttributeCandidateList(
+    const std::vector<AttributeDescription>& attributes,
+    const std::map<QString, std::vector<AttributeDescription>>& attributeLists,
+    std::vector<AttributeDescription>* outAttributeCandidateList,
+    const std::set<QString>& uniqueAttributeListIds)
+{
+    for (const AttributeDescription& attribute: attributes)
+    {
+        if (attribute.attributeList.isEmpty())
+        {
+            outAttributeCandidateList->push_back(attribute);
+        }
+        else
+        {
+            if (!attributeLists.contains(attribute.attributeList))
+            {
+                m_errorHandler->handleError(
+                    ProcessingError{NX_FMT(
+                        "%1 %2: Attribute List %3 doesn't exist.",
+                        m_context.typeName, m_context.typeId, attribute.attributeList)});
+                continue;
+            }
+
+            if (uniqueAttributeListIds.contains(attribute.attributeList))
+            {
+                m_errorHandler->handleError(
+                    ProcessingError{NX_FMT(
+                        "%1 %2: Cyclic Attribute Lists detected: %3.",
+                        m_context.typeName, m_context.typeId,
+                        nx::containerString(uniqueAttributeListIds))});
+                continue;
+            }
+
+            const std::vector<AttributeDescription> attributeList =
+                attributeLists.at(attribute.attributeList);
+
+            std::set<QString> currentUniqueAttributeListIds = uniqueAttributeListIds;
+            currentUniqueAttributeListIds.insert(attribute.attributeList);
+            fillAttributeCandidateList(
+                attributeList,
+                attributeLists,
+                outAttributeCandidateList,
+                currentUniqueAttributeListIds);
+        }
+    }
+}
+
 void AttributeResolver::resolveOwnAttributes()
 {
     std::set<QString> uniqueAttributeNames;
     std::vector<AttributeDescription> ownAttributes;
 
-    for (AttributeDescription& attribute: *m_context.ownAttributes)
+    std::vector<AttributeDescription> attributeCandidates;
+    fillAttributeCandidateList(
+        *m_context.ownAttributes,
+        m_context.internalState->attributeListById,
+        &attributeCandidates,
+        std::set<QString>());
+
+    for (AttributeDescription& attribute: attributeCandidates)
     {
         if (attribute.name.isEmpty())
         {

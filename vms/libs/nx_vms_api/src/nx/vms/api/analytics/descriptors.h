@@ -24,6 +24,7 @@ using EnumTypeId = QString;
 using ColorTypeId = QString;
 using DeviceId = QnUuid;
 using ManifestItemId = QString;
+using AttributeListId = QString;
 
 struct DescriptorScope
 {
@@ -363,6 +364,8 @@ using ObjectTypeDescriptorMap = std::map<ObjectTypeId, ObjectTypeDescriptor>;
 using EnumTypeDescriptorMap = std::map<EnumTypeId, EnumTypeDescriptor>;
 using ColorTypeDescriptorMap = std::map<ColorTypeId, ColorTypeDescriptor>;
 
+using AttributeListMap = std::map<AttributeListId, AttributeList>;
+
 using ScopedEventTypeIds = std::map<EngineId, std::map<GroupId, std::set<EventTypeId>>>;
 using ScopedObjectTypeIds = std::map<EngineId, std::map<GroupId, std::set<ObjectTypeId>>>;
 using ScopedEntityTypeIds = std::map<EngineId, std::map<GroupId, std::set<QString>>>;
@@ -378,6 +381,7 @@ struct NX_VMS_API Descriptors
     ObjectTypeDescriptorMap objectTypeDescriptors;
     EnumTypeDescriptorMap enumTypeDescriptors;
     ColorTypeDescriptorMap colorTypeDescriptors;
+    AttributeListMap attributeListDescriptors;
 
     void merge(Descriptors descriptors);
 
@@ -392,7 +396,8 @@ struct NX_VMS_API Descriptors
     (eventTypeDescriptors) \
     (objectTypeDescriptors) \
     (enumTypeDescriptors) \
-    (colorTypeDescriptors)
+    (colorTypeDescriptors) \
+    (attributeListDescriptors)
 NX_REFLECTION_INSTRUMENT(Descriptors, nx_vms_api_analytics_Descriptors_Fields);
 
 QN_FUSION_DECLARE_FUNCTIONS(Descriptors, (json), NX_VMS_API)

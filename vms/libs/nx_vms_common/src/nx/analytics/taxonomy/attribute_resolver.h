@@ -83,6 +83,14 @@ private:
         nx::vms::api::analytics::AttributeDescription* inOutAttributeDescription,
         const AbstractAttribute* baseAttribute);
 
+    void fillAttributeCandidateList(
+        const std::vector<nx::vms::api::analytics::AttributeDescription>& attributes,
+        const std::map<
+            QString /*attributeListId*/,
+            std::vector<nx::vms::api::analytics::AttributeDescription>>& attributeLists,
+        std::vector<nx::vms::api::analytics::AttributeDescription>* outAttributeCandidateList,
+        const std::set<QString>& uniqueAttributeListIds);
+
 private:
     Context m_context;
     ErrorHandler* m_errorHandler = nullptr;

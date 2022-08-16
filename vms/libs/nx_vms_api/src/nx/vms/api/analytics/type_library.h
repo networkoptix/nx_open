@@ -15,6 +15,9 @@ struct NX_VMS_API TypeLibrary
     QList<Group> groups;
     QList<EnumType> enumTypes;
     QList<ColorType> colorTypes;
+    QList<HiddenExtendedType> extendedObjectTypes;
+    QList<HiddenExtendedType> extendedEventTypes;
+    QList<AttributeList> attributeLists;
 };
 
 #define TypeLibrary_Fields \
@@ -22,7 +25,10 @@ struct NX_VMS_API TypeLibrary
     (objectTypes) \
     (enumTypes) \
     (colorTypes) \
-    (groups)
+    (groups) \
+    (extendedObjectTypes) \
+    (extendedEventTypes) \
+    (attributeLists)
 
 QN_FUSION_DECLARE_FUNCTIONS(TypeLibrary, (json), NX_VMS_API)
 

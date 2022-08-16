@@ -342,6 +342,38 @@ Ptr<ObjectMetadata> generateInstanceOfNonIndexableObjectType()
     return objectMetadata;
 }
 
+Ptr<ObjectMetadata> generateInstanceOfExtendedObjectType()
+{
+    auto objectMetadata = makePtr<ObjectMetadata>();
+    objectMetadata->setTypeId("nx.stub.taxonomy_features$nx.base.Vehicle");
+    objectMetadata->addAttributes({
+        makePtr<Attribute>(
+            "Extended Vehicle attribute",
+            "Some value"),
+        });
+
+    return objectMetadata;
+}
+
+Ptr<ObjectMetadata> generateInstanceOfObjectTypeWithAttributeList()
+{
+    auto objectMetadata = makePtr<ObjectMetadata>();
+    objectMetadata->setTypeId("nx.stub.objectTypeWithAttributeList");
+    objectMetadata->addAttributes({
+        makePtr<Attribute>(
+            "Attribute List attribute 1",
+            "Some value 1"),
+        makePtr<Attribute>(
+            "Attribute List attribute 2",
+            "Some value 2"),
+        makePtr<Attribute>(
+            "Regular attribute",
+            "Some value 3")
+        });
+
+    return objectMetadata;
+}
+
 } // namespace taxonomy_features
 } // namespace stub
 } // namespace analytics

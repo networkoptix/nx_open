@@ -168,12 +168,65 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
             [
                 "Non-indexable Object Type attribute"
             ]
+        },
+        {
+            "objectTypeId": "nx.base.Vehicle",
+            "attributes": [
+                "Extended Vehicle attribute"
+            ]
+        },
+        {
+            "objectTypeId": "nx.stub.objectTypeWithAttributeList",
+            "attributes": [
+                "Attribute List attribute 1",
+                "Attribute List attribute 2",
+                "Regular attribute"
+            ]
         }
     ],)json" + /* Workaround for long strings. */ std::string() + R"json(
     "typeLibrary":
     {
+        "attributeLists": [
+            {
+                "id": "nx.stub.attributeList",
+                "attributes": [
+                    {
+                        "type": "String",
+                        "name": "Attribute List attribute 1"
+                    },
+                    {
+                        "type": "String",
+                        "name": "Attribute List attribute 2"
+                    }
+                ]
+            }
+        ],
+        "extendedObjectTypes": [
+            {
+                "id": "nx.base.Vehicle",
+                "attributes": [
+                    {
+                        "name": "Extended Vehicle attribute",
+                        "type": "String"
+                    }
+                ]
+            }
+        ],
         "objectTypes":
         [
+            {
+                "id": "nx.stub.objectTypeWithAttributeList",
+                "name": "Stub: Object Type with Attribute List",
+                "attributes": [
+                    {
+                        "attributeList": "nx.stub.attributeList"
+                    },
+                    {
+                        "name": "Regular attribute",
+                        "type": "String"
+                    }
+                ]
+            },
             {
                 "_comment": "Base Object Type containing Attributes of all types. All Attributes are declared as supported in the \"supportedTypes\" list.",
                 "id": "nx.stub.baseObjectType1",

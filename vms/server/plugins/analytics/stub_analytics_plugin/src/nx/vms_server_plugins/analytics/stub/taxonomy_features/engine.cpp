@@ -209,6 +209,18 @@ std::string Engine::manifestString() const
                 "caption": "Non-indexable Object Type",
                 "name": "generateInstanceOfNonIndexableObjectType",
                 "defaultValue": true
+            },
+            {
+                "type": "CheckBox",
+                "caption": "Extended Object Type",
+                "name": "generateInstanceOfExtendedObjectType",
+                "defaultValue": true
+            },
+            {
+                "type": "CheckBox",
+                "caption": "Object Type with Attribute List",
+                "name": "generateInstanceOfObjectTypeWithAttributeList",
+                "defaultValue": true
             }
         ]
     }

@@ -84,10 +84,20 @@ struct AttributeDescription
     QString unit; //< Only for Number. Can be empty.
     std::optional<double> minValue; //< Only for Number.
     std::optional<double> maxValue; //< Only for Number.
+    QString attributeList; //< If not empty, all other fields are ignored.
 
     bool operator==(const AttributeDescription& other) const = default;
 };
-#define AttributeDescription_Fields (name)(type)(subtype)(items)(unit)(minValue)(maxValue)
+#define AttributeDescription_Fields \
+    (name)\
+    (type)\
+    (subtype)\
+    (items)\
+    (unit)\
+    (minValue)\
+    (maxValue)\
+    (attributeList)
+
 NX_REFLECTION_INSTRUMENT(AttributeDescription, AttributeDescription_Fields);
 
 struct ExtendedType: public NamedItem
@@ -171,6 +181,24 @@ struct ObjectType: public ExtendedType
 #define ObjectType_Fields ExtendedType_Fields (provider)(flags)
 NX_REFLECTION_INSTRUMENT(ObjectType, ObjectType_Fields);
 
+struct HiddenExtendedType
+{
+    QString id;
+    std::vector<AttributeDescription> attributes;
+};
+#define HiddenExtendedType_Fields (id)(attributes)
+NX_REFLECTION_INSTRUMENT(HiddenExtendedType, HiddenExtendedType_Fields);
+
+struct AttributeList
+{
+    QString id;
+    std::vector<AttributeDescription> attributes;
+
+    bool operator==(const AttributeList& other) const = default;
+};
+#define AttributeList_Fields (id)(attributes)
+NX_REFLECTION_INSTRUMENT(AttributeList, AttributeList_Fields)
+
 /**
  * Named group which is referenced from a "groupId" attribute of other types to group them.
  */
@@ -207,6 +235,8 @@ QN_FUSION_DECLARE_FUNCTIONS(AttributeDescription, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(ExtendedType, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(EventType, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(ObjectType, (json), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(HiddenExtendedType, (json), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(AttributeList, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(Group, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(TypeSupportInfo, (json), NX_VMS_API)
 

@@ -142,6 +142,9 @@ void Descriptors::merge(Descriptors descriptors)
     for (auto& [id, descriptor]: descriptors.colorTypeDescriptors)
         this->colorTypeDescriptors[id] = std::move(descriptor);
 
+    for (auto& [id, descriptor]: descriptors.attributeListDescriptors)
+        this->attributeListDescriptors[id] = std::move(descriptor);
+
     for (auto& [id, descriptor]: descriptors.groupDescriptors)
         mergeDescriptors(&this->groupDescriptors[id], &descriptor);
 
@@ -160,7 +163,8 @@ bool Descriptors::isEmpty() const
         && eventTypeDescriptors.empty()
         && objectTypeDescriptors.empty()
         && colorTypeDescriptors.empty()
-        && enumTypeDescriptors.empty();
+        && enumTypeDescriptors.empty()
+        && attributeListDescriptors.empty();
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(

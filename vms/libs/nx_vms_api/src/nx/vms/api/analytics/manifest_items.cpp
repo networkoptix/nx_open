@@ -24,6 +24,8 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ExtendedType, (json), ExtendedType_Fields, (brief, true))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EventType, (json), EventType_Fields, (brief, true))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ObjectType, (json), ObjectType_Fields, (brief, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(HiddenExtendedType, (json), HiddenExtendedType_Fields, (brief, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AttributeList, (json), AttributeList_Fields, (brief, true))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Group, (json), Group_Fields, (brief, true))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TypeSupportInfo, (json), TypeSupportInfo_Fields, (brief, true))
 
