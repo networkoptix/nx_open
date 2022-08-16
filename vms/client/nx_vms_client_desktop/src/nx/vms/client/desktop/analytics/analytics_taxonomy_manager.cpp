@@ -62,7 +62,7 @@ struct TaxonomyManager::Private
         QSet<AbstractObjectType*> publicRootTypes;
         for (const auto objectType: (*currentTaxonomy)->rootObjectTypes())
         {
-            if (!objectType->isPrivate())
+            if (objectType->isReachable())
                 publicRootTypes.insert(objectType);
         }
 

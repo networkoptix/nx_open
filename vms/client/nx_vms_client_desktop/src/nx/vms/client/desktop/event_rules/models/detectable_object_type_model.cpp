@@ -76,7 +76,7 @@ private:
 
         for (const auto& child: children)
         {
-            if (child->isPrivate())
+            if (!child->isReachable())
                 continue;
 
             const int indexInParent = data.derivedTypeIds.size();

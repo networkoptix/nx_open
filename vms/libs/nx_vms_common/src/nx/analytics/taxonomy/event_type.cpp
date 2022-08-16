@@ -73,9 +73,9 @@ bool EventType::hasEverBeenSupported() const
     return m_impl->hasEverBeenSupported();
 }
 
-bool EventType::isPrivate() const
+bool EventType::isReachable() const
 {
-    return m_impl->isPrivate();
+    return m_impl->isReachable();
 }
 
 std::vector<AbstractScope*> EventType::scopes() const
@@ -93,14 +93,14 @@ void EventType::addDerivedType(AbstractEventType* derivedEventType)
     m_impl->addDerivedType(derivedEventType);
 }
 
-void EventType::resolvePrivateness(bool hasPublicDescendants)
+void EventType::resolveReachability(bool hasPublicDescendants)
 {
-    m_impl->resolvePrivateness(hasPublicDescendants);
+    m_impl->resolveReachability(hasPublicDescendants);
 }
 
-void EventType::resolvePrivateness()
+void EventType::resolveReachability()
 {
-    m_impl->resolvePrivateness();
+    m_impl->resolveReachability();
 }
 
 void EventType::resolveScopes(InternalState* inOutInternalState, ErrorHandler* errorHandler)

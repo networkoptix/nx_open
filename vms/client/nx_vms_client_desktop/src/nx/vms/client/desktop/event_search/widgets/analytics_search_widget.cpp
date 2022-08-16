@@ -392,7 +392,7 @@ void AnalyticsSearchWidget::Private::updateObjectTypes()
             QVector<AbstractObjectType*> relevantTypes;
             for (const auto type: derivedTypes)
             {
-                if (!type->isPrivate() && !type->isLiveOnly() && !type->isNonIndexable()
+                if (type->isReachable() && !type->isLiveOnly() && !type->isNonIndexable()
                     && taxonomyManager->isRelevantForEngine(type, engine))
                 {
                     relevantTypes.push_back(type);

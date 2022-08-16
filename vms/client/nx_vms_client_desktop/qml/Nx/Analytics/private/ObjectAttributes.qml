@@ -76,7 +76,7 @@ Column
             // Add attributes of private derived types.
             for (const derivedType of objectAttributes.objectType.derivedTypes)
             {
-                if (!derivedType.isPrivate)
+                if (derivedType.isReachable)
                     continue
 
                 for (const attribute of derivedType.supportedAttributes)

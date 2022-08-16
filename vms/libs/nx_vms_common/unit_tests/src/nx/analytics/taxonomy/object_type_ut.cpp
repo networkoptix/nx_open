@@ -118,11 +118,11 @@ protected:
             verifySupportedAttributesAreCorrect(objectType, supportedAttributesByTypeId);
     }
 
-    void makeSurePrivateTypesAreCorrect()
+    void makeSureReachableTypesAreCorrect()
     {
         std::set<QString> expectedResult;
-        ASSERT_TRUE(QJson::deserialize(m_testData.fullData["privateTypes"], &expectedResult));
-        ASSERT_EQ(privateTypeIds(m_result.state), expectedResult);
+        ASSERT_TRUE(QJson::deserialize(m_testData.fullData["nonReachableTypes"], &expectedResult));
+        ASSERT_EQ(nonReachableTypeIds(m_result.state), expectedResult);
     }
 
     void makeSureInheritanceIsCorrect()
@@ -270,12 +270,12 @@ private:
         return result;
     }
 
-    std::set<QString> privateTypeIds(const std::shared_ptr<AbstractState>& state)
+    std::set<QString> nonReachableTypeIds(const std::shared_ptr<AbstractState>& state)
     {
         std::set<QString> result;
         for (const AbstractObjectType* objectType : state->objectTypes())
         {
-            if (objectType->isPrivate())
+            if (!objectType->isReachable())
                 result.insert(objectType->id());
         }
 
@@ -294,11 +294,11 @@ TEST_F(ObjectTypeTest, supportedAttributes)
     makeSureSupportedAttributesAreCorrect();
 }
 
-TEST_F(ObjectTypeTest, privateness)
+TEST_F(ObjectTypeTest, reachability)
 {
-    givenDescriptors(":/content/taxonomy/object_type_privateness_test.json");
+    givenDescriptors(":/content/taxonomy/object_type_reachability_test.json");
     afterDescriptorsCompilation();
-    makeSurePrivateTypesAreCorrect();
+    makeSureReachableTypesAreCorrect();
 }
 
 TEST_F(ObjectTypeTest, inheritance)
