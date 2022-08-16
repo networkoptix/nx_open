@@ -67,7 +67,7 @@ TreeView
         resourceTreeModel.showContextMenu(globalPos, modelIndex, selection)
 
     onActivated:
-        resourceTreeModel.activateItem(modelIndex, selection, activationType)
+        resourceTreeModel.activateItem(modelIndex, selection, activationType, modifiers)
 
     model: ResourceTreeModel
     {
