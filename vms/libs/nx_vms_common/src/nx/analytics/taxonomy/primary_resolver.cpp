@@ -33,7 +33,9 @@ std::optional<ProcessingError> validateId(const Descriptor& descriptor, const QS
         return ProcessingError{nx::format("%1: id can't be an empty string", typeName)};
     }
 
-    QRegularExpression idRegExp("^[A-Za-z_][\\}\\{\\-A-Za-z0-9_\\.]+$");
+    QRegularExpression idRegExp(
+        "^([A-Za-z_][\\}\\{\\-A-Za-z0-9_\\.]+\\$)?[A-Za-z_][\\}\\{\\-A-Za-z0-9_\\.]+$");
+
     if (const auto match = idRegExp.match(descriptor.id); !match.hasMatch())
     {
         return ProcessingError{nx::format(

@@ -78,7 +78,8 @@ A Type Library is a JSON object which contain the following lists of entities (i
     "colorTypes": [ ... ],
     "objectTypes": [ ... ],
     "eventTypes": [ ... ],
-    "eventGroups": [ ... ]
+    "groups": [ ... ],
+    "extendedObjectTypes": [ ... ]
 }
 ```
 
@@ -128,12 +129,12 @@ following fields:
     List of color values. Each item is a JSON object with the following fields:
 
     - `"name"`: Name (String)
-        
+
         Full name of the color value, in English. Will be shown to the user. May look like
         `"dark"`.
 
     - `"rgb"`: RGB in HEX format (String)
-    
+
         The associated RGB value used for this color representation in the UI, for example, when
         the user is presented a palette to choose from when searching. This RGB value is not
         intended to have any direct connection to the color or a real-life object detected on the
@@ -196,7 +197,7 @@ This JSON object describes an Object type. It has the following fields:
     NOTE: This concept of color has no relation to the one used as an Attribute type.
 
 - `"base"`: String
-  
+
     Optional name of an Object Type to inherit the Attributes from.
 
 - `"flags"`: Flag set (String)
@@ -225,7 +226,7 @@ This JSON object describes an Object type. It has the following fields:
 
     Optional list of Attributes from the base type, listing the Attributes which this type is not
     expected to contain.
-    
+
 - `"attributes"`: Array<Object>
 
    The definitions of Attributes for this Object Type, in addition to those which are inherited
@@ -276,7 +277,7 @@ This JSON object describes an Event type. It has the following fields:
 
     Similar to the same-name fields of an Object type.
 
-### Event groups
+### Groups
 
 This JSON object describes a Group for Event types. The particular Group is referenced from an
 Event Type via its `"groupId"` field. The Group definition has the following fields:
@@ -296,9 +297,41 @@ Event Type via its `"groupId"` field. The Group definition has the following fie
 
     Mandatory.
 
+### Extended Object Types
+
+This section provides an alternative simplified syntax of defining "hidden" derived Object Types.
+Each entity in the `"extendedObjectTypes"` array is technically a definition of a "hidden" derived
+Object Type with an auto-generated id using the template `"<pluginId>$<baseObjectTypeId>"`. The `"id"`
+field of an Extended Object Type is an id of the base Object Type. The name of the derived Type must
+be empty. The Extended Object Type definition has the following fields:
+
+- `"id"`: Id (String)
+
+    Identifier of the base Object Type that is being extended.
+
+- `"attributes"`: Array<Object>
+
+    List of Attributes of the newly defined "hidden" descendant.
+
+### Attribute Lists
+
+Describes a list of Type Attributes, which can be used in the Type definition. Each List must have
+an id, and a list of Attributes which uses that same syntax as used in specifying Attributes in
+Object and Event Types. Semantically an Attribute List is like a macro - it can be used instead of
+an Attribute definition in any Object Type or Event Type definition; its contents simply substitute
+the invocation. The Attribute List definition has the following fields:
+
+- `"id"`: Id (String)
+
+    Identifier of the Attribute List.
+
+- `"attributes"`: Array<Object>
+
+    List of Attributes.
+
 ---------------------------------------------------------------------------------------------------
-## Attributes 
-   
+## Attributes
+
 Objects and Events can have a list of Attributes, each Attribute being defined with a JSON object
 containing the following fields:
 
@@ -309,6 +342,9 @@ containing the following fields:
 - `"type"`: String
 
     Must have one of the values listed below in the "Attribute types" section.
+
+- `"attributeList"`: String
+    Id of an Attribute List. If present, all other fields are ignored.
 
 Other fields depend on the particular attribute type.
 
@@ -337,14 +373,14 @@ Attributes that are inherited from the base type can be "re-defined" as follows:
     - Can hold both integer and floating-point values, as in JSON.
     - Hints: `"minValue"`, `"maxValue"`, `"unit"` (for GUI only).
     - `"subtype"` is treated like a hint: can be `"integer"` or `"float"` (default).
-    
+
 - `"Boolean"`:
     - Can be either True, False, or omitted (which is a distinct case).
     - Case-insensitive `"true"`, `"false"` is accepted by the Server from a Plugin, as well as
         `"0"` and `"1"`.
 
 - `"String"`:
-    - An empty string is equivalent to the omitted attribute. 
+    - An empty string is equivalent to the omitted attribute.
     - Cannot be restricted to be non-empty.
     - May contain any Unicode chars, including '\n', '\0' and other control chars.
 
@@ -359,8 +395,8 @@ Attributes that are inherited from the base type can be "re-defined" as follows:
         representation in the UI.
     - The color Name is what appears as the Attbiture value.
     - Like Enums, Colors can be inherited and extended via `"base"` and `"baseItems"` fields.
-    
+
 - `"Object"`:
     - A nested (aggregated) Object of the specified `"subtype"` Object type, or of any type (if
-        `"subtype"` is omitted). 
+        `"subtype"` is omitted).
     - Can be null, which is equivalent to the omitted attribute.

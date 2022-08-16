@@ -57,6 +57,8 @@ private:
         std::atomic<bool> generateInstanceOfObjectTypeDeclaredInEngineManifest{true};
         std::atomic<bool> generateInstanceOfLiveOnlyObjectType{true};
         std::atomic<bool> generateInstanceOfNonIndexableObjectType{true};
+        std::atomic<bool> generateInstanceOfExtendedObjectType{true};
+        std::atomic<bool> generateInstanceOfObjectTypeWithAttributeList{true};
     };
 
     Engine* const m_engine;

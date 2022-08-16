@@ -75,14 +75,18 @@ Ptr<IMetadataPacket> DeviceAgent::generateObjectMetadataPacket(int64_t frameTime
         objects.push_back(generateInstanceOfObjectTypeUsingBaseTypeLibraryColorType());
     if (m_settings.generateInstanceOfObjectTypeUsingBaseTypeLibraryObjectType)
         objects.push_back(generateInstanceOfObjectTypeUsingBaseTypeLibraryObjectType());
-    if (m_settings. generateInstanceOfOfBaseTypeLibraryObjectType)
+    if (m_settings.generateInstanceOfOfBaseTypeLibraryObjectType)
         objects.push_back(generateInstanceOfOfBaseTypeLibraryObjectType());
-    if (m_settings. generateInstanceOfObjectTypeDeclaredInEngineManifest)
+    if (m_settings.generateInstanceOfObjectTypeDeclaredInEngineManifest)
         objects.push_back(generateInstanceOfObjectTypeDeclaredInEngineManifest());
     if (m_settings.generateInstanceOfLiveOnlyObjectType)
         objects.push_back(generateInstanceOfLiveOnlyObjectType());
-    if (m_settings. generateInstanceOfNonIndexableObjectType)
+    if (m_settings.generateInstanceOfNonIndexableObjectType)
         objects.push_back(generateInstanceOfNonIndexableObjectType());
+    if (m_settings.generateInstanceOfExtendedObjectType)
+        objects.push_back(generateInstanceOfExtendedObjectType());
+    if (m_settings.generateInstanceOfObjectTypeWithAttributeList)
+        objects.push_back(generateInstanceOfObjectTypeWithAttributeList());
 
     for (int i = 0; i < (int) objects.size(); ++i)
     {
@@ -166,6 +170,10 @@ Result<const nx::sdk::ISettingsResponse*> DeviceAgent::settingsReceived()
         toBool(settingValue("generateInstanceOfLiveOnlyObjectType"));
     m_settings.generateInstanceOfNonIndexableObjectType =
         toBool(settingValue("generateInstanceOfNonIndexableObjectType"));
+    m_settings.generateInstanceOfExtendedObjectType =
+        toBool(settingValue("generateInstanceOfExtendedObjectType"));
+    m_settings.generateInstanceOfObjectTypeWithAttributeList =
+        toBool(settingValue("generateInstanceOfObjectTypeWithAttributeList"));
 
     return nullptr;
 }

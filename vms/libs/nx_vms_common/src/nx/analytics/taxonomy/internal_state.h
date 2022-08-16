@@ -38,6 +38,9 @@ struct InternalState
     std::map<QString, ColorType*> colorTypeById;
     std::map<QString, ObjectType*> objectTypeById;
     std::map<QString, EventType*> eventTypeById;
+    std::map<
+        QString,
+        std::vector<nx::vms::api::analytics::AttributeDescription>> attributeListById;
 
     template<typename Type>
     Type* getTypeById(const QString& id) const

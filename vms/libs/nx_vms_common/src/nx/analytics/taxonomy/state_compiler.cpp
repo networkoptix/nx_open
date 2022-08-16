@@ -67,6 +67,12 @@ static InternalState makeInitialInternalState(Descriptors descriptors)
     for (auto& [id, descriptor]: descriptors.objectTypeDescriptors)
         internalState.objectTypeById[id] = new ObjectType(std::move(descriptor));
 
+    for (auto& [id, descriptor]: descriptors.attributeListDescriptors)
+    {
+        for (AttributeDescription& attributeDescription: descriptor.attributes)
+            internalState.attributeListById[id].push_back(std::move(attributeDescription));
+    }
+
     return internalState;
 }
 
