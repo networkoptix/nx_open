@@ -104,16 +104,20 @@ struct ArchiveTimeCheckInfo
 QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(
     QnArchiveStreamReader* reader,
     nx::network::http::Credentials credentials,
-    const QString& rtpLogTag)
+    const QString& rtpLogTag,
+    bool sleepIfEmptySocket)
     :
     QnAbstractArchiveDelegate(),
-    m_rtspSession(new QnRtspClient(QnRtspClient::Config{
-        /*shouldGuessAuthDigest*/ true,
-        /*backChannelAudioOnly*/ false,
-        /*disableKeepAlive*/ true})),
+    m_rtspSession(new QnRtspClient(
+        QnRtspClient::Config{
+            .shouldGuessAuthDigest = true,
+            .backChannelAudioOnly = false,
+            .disableKeepAlive = true,
+            .sleepIfEmptySocket = sleepIfEmptySocket})),
     m_reader(reader),
     m_credentials(std::move(credentials)),
-    m_rtpLogTag(rtpLogTag)
+    m_rtpLogTag(rtpLogTag),
+    m_sleepIfEmptySocket(sleepIfEmptySocket)
 {
     m_rtspSession->setPlayNowModeAllowed(true); //< Default value.
     m_footageUpToDate.test_and_set();
@@ -224,7 +228,10 @@ void QnRtspClientArchiveDelegate::checkGlobalTimeAsync(
     const QnSecurityCamResourcePtr& camera, const QnMediaServerResourcePtr& server, qint64* result)
 {
     QnRtspClient client(
-        QnRtspClient::Config{/*shouldGuessAuthDigest*/ true, /*backChannelAudioOnly*/ false});
+        QnRtspClient::Config{
+            .shouldGuessAuthDigest = true,
+            .backChannelAudioOnly = false,
+            .sleepIfEmptySocket = m_sleepIfEmptySocket});
     QnRtspClientArchiveDelegate::setupRtspSession(camera, server, &client);
     const auto url = getUrl(camera, server);
     const auto error = client.open(url).errorCode;

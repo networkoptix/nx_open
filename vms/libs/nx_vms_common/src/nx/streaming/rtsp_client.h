@@ -117,6 +117,7 @@ public:
         bool shouldGuessAuthDigest = false;
         bool backChannelAudioOnly = false;
         bool disableKeepAlive = false;
+        bool sleepIfEmptySocket = false;
     };
 
     static const QByteArray kPlayCommand;
