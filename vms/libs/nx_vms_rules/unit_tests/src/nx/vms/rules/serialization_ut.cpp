@@ -115,12 +115,6 @@ TEST(VmsRulesSerialization, VariantConversion)
         EXPECT_TRUE(v.toString().isNull());
     }
     {
-        // Variant constructed from null string is null.
-        QVariant v = QString();
-        EXPECT_TRUE(v.isNull());
-        EXPECT_TRUE(v.isValid());
-    }
-    {
         // Variant constructed from not null string is not null.
         QVariant v = QString("");
         EXPECT_FALSE(v.isNull());
