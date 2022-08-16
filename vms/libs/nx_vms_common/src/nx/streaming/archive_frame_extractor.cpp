@@ -347,7 +347,8 @@ struct ArchiveFrameExtractor::Private
 ArchiveFrameExtractor::ArchiveFrameExtractor(
     const QnMediaResourcePtr& mediaResource,
     nx::network::http::Credentials credentials,
-    VideoQuality videQuality)
+    VideoQuality videQuality,
+    bool sleepIfEmptySocket)
     :
     base_type(),
     d(new Private{this})
@@ -361,7 +362,10 @@ ArchiveFrameExtractor::ArchiveFrameExtractor(
     if (const auto cameraResource = mediaResource.dynamicCast<QnVirtualCameraResource>())
     {
         auto rtspDelegate = std::make_unique<QnRtspClientArchiveDelegate>(
-            /*archiveStreamReader*/ nullptr, std::move(credentials));
+            /*archiveStreamReader*/ nullptr,
+            std::move(credentials),
+            /*rtpLogTag*/ QString(),
+            sleepIfEmptySocket);
         rtspDelegate->setCamera(cameraResource);
         rtspDelegate->setMediaRole(PlaybackMode::Archive);
         d->streamWorker.archiveDelegate = std::move(rtspDelegate);

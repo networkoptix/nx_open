@@ -56,7 +56,7 @@ struct Ini: public nx::kit::IniConfig
 
     NX_INI_FLAG(false, ignoreUsb0NetworkInterfaceIfOthersExist,
         "Influence enumerating local network interfaces when listening to discovery messages.\n"
-        "The option is similar to the same-name option in the Server settings.\n"
+        "The option works the same way as the option in the Server settings with the same name.\n"
         "If set, when enumerating network interfaces, the Server will skip the \"usb0\"\n"
         "interface in case it is not the only interface. Can be useful for some ARM devices.");
 };

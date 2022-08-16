@@ -1,6 +1,8 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#if defined(__arm__)
+#include <QtCore/QtGlobal>
+
+#if defined(Q_OS_LINUX)
     #include <sys/ioctl.h>
 #endif
 
@@ -1543,7 +1545,7 @@ QString QnRtspClient::getVideoLayout() const
     return m_videoLayout;
 }
 
-#if defined(__arm__)
+#if defined(Q_OS_LINUX)
 void sleepIfEmptySocket(nx::network::AbstractStreamSocket* socket)
 {
     static const size_t ADDITIONAL_READ_BUFFER_CAPACITY = 64 * 1024;
@@ -1567,14 +1569,15 @@ void sleepIfEmptySocket(nx::network::AbstractStreamSocket* socket)
         QThread::msleep(MS_PER_SEC / (MAX_BITRATE_BYTES_PER_SECOND / ADDITIONAL_READ_BUFFER_CAPACITY));
     }
 }
-#endif
+#endif // defined(Q_OS_LINUX)
 
 int QnRtspClient::readSocketWithBuffering(quint8* buf, size_t bufSize, bool readSome)
 {
-    #if defined(__arm__)
-        sleepIfEmptySocket(m_tcpSock.get());
+    #if defined(Q_OS_LINUX)
+        if (m_config.sleepIfEmptySocket)
+            sleepIfEmptySocket(m_tcpSock.get());
     #endif
-    
+
     int bytesRead = m_tcpSock->recv(buf, (unsigned int) bufSize, readSome ? 0 : MSG_WAITALL);
     if (bytesRead > 0)
         m_lastReceivedDataTimer.restart();
