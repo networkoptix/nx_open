@@ -35,7 +35,8 @@ public:
     QnRtspClientArchiveDelegate(
         QnArchiveStreamReader* reader,
         nx::network::http::Credentials credentials,
-        const QString& rtpLogTag = QString());
+        const QString& rtpLogTag = QString(),
+        bool sleepIfEmptySocket = false);
     virtual ~QnRtspClientArchiveDelegate();
 
     // TODO: #sivanov Pass credentials to constructor or using separate setter.
@@ -189,6 +190,7 @@ private:
     nx::vms::api::StreamDataFilters m_streamDataFilter{ nx::vms::api::StreamDataFilter::media};
     nx::vms::api::StorageLocation m_storageLocationFilter{};
     QString m_rtpLogTag;
+    const bool m_sleepIfEmptySocket;
     CameraDiagnostics::Result m_lastError;
 };
 

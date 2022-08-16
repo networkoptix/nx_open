@@ -62,7 +62,8 @@ public:
     ArchiveFrameExtractor(
         const QnMediaResourcePtr& mediaResource,
         nx::network::http::Credentials credentials,
-        VideoQuality videoQuality);
+        VideoQuality videoQuality,
+        bool sleepIfEmptySocket = false);
 
     virtual ~ArchiveFrameExtractor() override;
 
