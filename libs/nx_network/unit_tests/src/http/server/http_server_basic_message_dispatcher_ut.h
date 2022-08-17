@@ -128,7 +128,7 @@ protected:
                     {},
                     {},
                     SocketAddress(),
-                    nx::utils::stree::AttributeDictionary(),
+                    {},
                     prepareDummyRequest(method, path)),
                 [](auto&&...) {}));
     }
@@ -150,7 +150,7 @@ protected:
                     ConnectionAttrs{},
                     std::weak_ptr<http::HttpServerConnection>{},
                     SocketAddress(),
-                    nx::utils::stree::AttributeDictionary(),
+                    {},
                     prepareDummyRequest(method, path)),
                 [](auto&&...) {}));
     }

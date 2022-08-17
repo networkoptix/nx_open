@@ -3,9 +3,11 @@
 #pragma once
 
 #include <memory>
+#include <unordered_map>
 
 #include <nx/network/http/http_types.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/string.h>
 #include <nx/utils/stree/attribute_dictionary.h>
 
 #include "../abstract_msg_body_source.h"
@@ -29,6 +31,8 @@ struct ConnectionAttrs
 
 struct RequestContext
 {
+    using Attrs = nx::utils::stree::StringAttrDict;
+
     ConnectionAttrs connectionAttrs;
     std::weak_ptr<http::HttpServerConnection> conn;
 
@@ -42,7 +46,7 @@ struct RequestContext
     /**
      * Attributes added by chained request handlers while processing the request.
      */
-    nx::utils::stree::AttributeDictionary attrs;
+    Attrs attrs;
 
     http::Request request;
 
@@ -65,7 +69,7 @@ struct RequestContext
         ConnectionAttrs connectionAttrs,
         std::weak_ptr<http::HttpServerConnection> connection,
         const SocketAddress& clientEndpoint,
-        nx::utils::stree::AttributeDictionary attrs,
+        Attrs attrs,
         http::Request request,
         std::unique_ptr<AbstractMsgBodySourceWithCache> body = nullptr)
         :

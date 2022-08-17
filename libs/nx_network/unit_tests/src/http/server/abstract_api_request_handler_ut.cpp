@@ -79,7 +79,7 @@ protected:
                     {},
                     {},
                     SocketAddress(),
-                    nx::utils::stree::AttributeDictionary(),
+                    {},
                     m_request),
                 [this](auto result) { m_requestResults.push(std::move(result)); });
         }
