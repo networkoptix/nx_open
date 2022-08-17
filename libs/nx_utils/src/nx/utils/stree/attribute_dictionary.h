@@ -8,6 +8,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/uuid.h>
@@ -18,7 +19,7 @@ namespace nx::utils::stree {
 using AttrName = std::string_view;
 
 /**
- * Implement this interface to allow reading attribute values from object.
+ * Implement this interface to allow reading attributes.
  */
 class NX_UTILS_API AbstractAttributeReader
 {
@@ -97,7 +98,7 @@ public:
 //-------------------------------------------------------------------------------------------------
 
 /**
- * Implement this interface to allow writing attribute values to object.
+ * Implement this interface to allow adding attributes.
  */
 class NX_UTILS_API AbstractAttributeWriter
 {
@@ -119,6 +120,9 @@ public:
 
 //-------------------------------------------------------------------------------------------------
 
+/**
+ * Iterating over attributes.
+ */
 class NX_UTILS_API AbstractConstIterator
 {
 public:
@@ -147,10 +151,10 @@ public:
 //-------------------------------------------------------------------------------------------------
 
 /**
- * Implement this interface to allow walk through container data.
+ * Interface of an attribites dictionary that allows iterating.
  * Usage sample:
  * AbstractIteratableContainer* cont = ...;
- * for( auto it = cont->begin(); !it->atEnd(); it->next() )
+ * for (auto it = cont->begin(); !it->atEnd(); it->next())
  * {
  *   //accessing data through iterator
  * }
@@ -170,55 +174,196 @@ NX_UTILS_API void copy(const AbstractIteratableContainer& from, AbstractAttribut
 
 //-------------------------------------------------------------------------------------------------
 
+namespace detail {
+
+template<typename AttributesMap>
+class AttributeDictionaryConstIterator:
+    public AbstractConstIterator
+{
+public:
+    AttributeDictionaryConstIterator(const AttributesMap& attrs):
+        m_attrs(attrs),
+        m_curIter(m_attrs.begin())
+    {
+    }
+
+    virtual bool next() override
+    {
+        if (m_curIter == m_attrs.end())
+            return false;
+        ++m_curIter;
+        return m_curIter != m_attrs.end();
+    }
+
+    virtual bool atEnd() const override { return m_curIter == m_attrs.end(); }
+    virtual AttrName name() const override { return m_curIter->first; }
+    virtual const std::string& value() const override { return m_curIter->second; }
+
+private:
+    const AttributesMap& m_attrs;
+    typename AttributesMap::const_iterator m_curIter;
+};
+
+template<typename C, typename Key, typename = void>
+struct FindDefined: public std::false_type {};
+
+template<typename C, typename Key>
+struct FindDefined<C, Key, std::void_t<decltype(C().find(Key()))>>:
+    public std::true_type {};
+
+template<typename... Args> inline constexpr bool FindDefinedV = FindDefined<Args...>::value;
+
+} // namespace detail
+
+//-------------------------------------------------------------------------------------------------
+
 /**
- * Allows to add/get attributes. Represents associative container.
+ * Adapter for using an STL associative container as AbstractAttributeReader.
  */
-class NX_UTILS_API AttributeDictionary:
-    public AbstractAttributeReader,
+template<typename AttributesMap>
+class AttributeReaderAdapter:
+    public AbstractAttributeReader
+{
+public:
+    AttributeReaderAdapter(const AttributesMap& attrs): m_attrs(&attrs) {}
+    AttributeReaderAdapter(const AttributesMap* attrs): m_attrs(attrs) {}
+
+    virtual std::optional<std::string> getStr(const AttrName& name) const override
+    {
+        typename AttributesMap::const_iterator it;
+        if constexpr (detail::FindDefinedV<AttributesMap, AttrName>)
+            it = m_attrs->find(name);
+        else
+            it = m_attrs->find(std::string(name));
+
+        return it != m_attrs->end() ? std::make_optional(it->second) : std::nullopt;
+    }
+
+private:
+    const AttributesMap* m_attrs = nullptr;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Adapts an STL associative container as an attributes container.
+ */
+template<typename AttributesMap>
+class AttributeDictionaryAdapter:
+    public AttributeReaderAdapter<AttributesMap>,
     public AbstractAttributeWriter,
     public AbstractIteratableContainer
 {
 public:
-    AttributeDictionary() = default;
-    AttributeDictionary(std::initializer_list<std::pair<const std::string, std::string>> l);
+    AttributeDictionaryAdapter(AttributesMap* attrs):
+        AttributeReaderAdapter<AttributesMap>(attrs),
+        m_attrs(attrs)
+    {
+    }
 
-    virtual std::optional<std::string> getStr(const AttrName& name) const override;
-    virtual void putStr(const AttrName& name, std::string value) override;
+    virtual void putStr(const AttrName& name, std::string value) override
+    {
+        typename AttributesMap::iterator it;
+        if constexpr (detail::FindDefinedV<AttributesMap, AttrName>)
+            it = m_attrs->find(name);
+        else
+            it = m_attrs->find(std::string(name));
 
-    virtual std::unique_ptr<nx::utils::stree::AbstractConstIterator> begin() const override;
+        if (it == m_attrs->end())
+            (*m_attrs)[std::string(name)] = std::move(value);
+        else
+            it->second = std::move(value);
+    }
 
-    std::string toString() const;
-    bool empty() const;
+    virtual std::unique_ptr<nx::utils::stree::AbstractConstIterator> begin() const override
+    {
+        return std::make_unique<detail::AttributeDictionaryConstIterator<AttributesMap>>(*m_attrs);
+    }
+
+    std::string toString() const
+    {
+        return nx::utils::join(
+            m_attrs->begin(), m_attrs->end(), ", ",
+            [](std::string* out, const auto& item)
+            {
+                return buildString(out, item.first, ':', item.second);
+            });
+    }
+
+    bool empty() const
+    {
+        return m_attrs->empty();
+    }
 
     /**
      * Inserts elements of other with keys missing in *this.
      */
-    void merge(AttributeDictionary&& other);
-    void merge(const AttributeDictionary& other);
+    void merge(AttributeDictionaryAdapter&& other)
+    {
+        m_attrs->merge(std::move(*other.m_attrs));
+    }
+
+    void merge(const AttributeDictionaryAdapter& other)
+    {
+        std::copy(other.m_attrs->begin(), other.m_attrs->end(), std::inserter(*m_attrs, m_attrs->end()));
+    }
 
 private:
-    std::map<std::string, std::string, nx::utils::StringLessTransparentComp> m_attrs;
+    AttributesMap* m_attrs = nullptr;
 };
 
 //-------------------------------------------------------------------------------------------------
 
-class NX_UTILS_API SingleReader:
-    public AbstractAttributeReader
+using StringAttrDict = std::unordered_map<std::string, std::string,
+    nx::utils::StringHashTransparent, std::equal_to<>>;
+
+/**
+ * Attributes container. Implements reading and saving attributes.
+ * Attributes are stored in a unique-key dictionary internally.
+ */
+class NX_UTILS_API AttributeDictionary:
+    public AttributeDictionaryAdapter<StringAttrDict>
 {
 public:
-    SingleReader(const AttrName& name, std::string value);
-
-    virtual std::optional<std::string> getStr(const AttrName& name) const override;
+    using Container = StringAttrDict;
 
 private:
-    const std::string m_name;
-    std::string m_value;
+    using base_type = AttributeDictionaryAdapter<Container>;
+
+public:
+    AttributeDictionary();
+    AttributeDictionary(std::initializer_list<std::pair<std::string_view, std::string>> l);
+
+    AttributeDictionary(Container attrs):
+        base_type(&m_attrs),
+        m_attrs(std::move(attrs))
+    {
+    }
+
+    template<typename Iter>
+    AttributeDictionary(Iter begin, Iter end):
+        base_type(&m_attrs),
+        m_attrs(begin, end)
+    {
+    }
+
+    AttributeDictionary(const AttributeDictionary&);
+    AttributeDictionary(AttributeDictionary&&);
+
+    AttributeDictionary& operator=(const AttributeDictionary&);
+    AttributeDictionary& operator=(AttributeDictionary&&);
+
+    const Container& data() const { return m_attrs; }
+    Container takeData() { return std::exchange(m_attrs, {}); }
+
+private:
+    Container m_attrs;
 };
 
 //-------------------------------------------------------------------------------------------------
 
 /**
- * Reads from mutiple AbstractAttributeReader.
+ * Reads from mutiple AbstractAttributeReader instances.
  */
 template<std::size_t kSize>
 class MultiReader:

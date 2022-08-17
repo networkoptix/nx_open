@@ -1793,6 +1793,21 @@ struct StringLessTransparentComp
 //-------------------------------------------------------------------------------------------------
 
 /**
+ * Hash for std::unordered_*<std::string, ...> containers that enables find(const std::string_view&).
+ */
+struct StringHashTransparent
+{
+    using hash_type = std::hash<std::string_view>;
+    using is_transparent = void;
+
+    size_t operator()(const char* str) const { return hash_type{}(str); }
+    size_t operator()(std::string_view str) const { return hash_type{}(str); }
+    size_t operator()(std::string const& str) const { return hash_type{}(str); }
+};
+
+//-------------------------------------------------------------------------------------------------
+
+/**
  * Comparator for case-insensitive comparison in STL associative containers.
  * Supports both std::string and std::string_view. Allows specifying std::string_view to find()
  * when dictionary uses std::string as a key type.

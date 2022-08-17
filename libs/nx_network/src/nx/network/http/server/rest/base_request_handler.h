@@ -34,12 +34,12 @@ public:
     }
 };
 
-class AuthInfoFetcher
+class AttrsFetcher
 {
 public:
-    using type = nx::utils::stree::AttributeDictionary;
+    using type = decltype(network::http::RequestContext::attrs);
 
-    type operator()(
+    const type& operator()(
         const network::http::RequestContext& requestContext) const
     {
         return requestContext.attrs;
