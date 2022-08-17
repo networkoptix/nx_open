@@ -372,7 +372,10 @@ CommandActionPtr SystemHealthListModel::Private::commandAction(int index) const
                 {
                     auto camera = resource.dynamicCast<QnSecurityCamResource>();
                     if (NX_ASSERT(camera))
+                    {
                         camera->synchronizeRemoteArchiveOnce();
+                        camera->savePropertiesAsync();
+                    }
                 });
 
             return action;
