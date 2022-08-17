@@ -1124,7 +1124,6 @@ void QnSecurityCamResource::synchronizeRemoteArchiveOnce()
     QString value;
     QnLexical::serialize(true, &value);
     setProperty(ResourcePropertyKey::kRemoteArchiveSynchronizationEnabledOnce, value);
-    saveProperties();
 }
 
 void QnSecurityCamResource::setRemoteArchiveSynchronizationDisabled(bool disabled)
@@ -1132,7 +1131,6 @@ void QnSecurityCamResource::setRemoteArchiveSynchronizationDisabled(bool disable
     QString value;
     QnLexical::serialize(disabled, &value);
     setProperty(ResourcePropertyKey::kRemoteArchiveSynchronizationDisabled, value);
-    saveProperties();
 }
 
 bool QnSecurityCamResource::remoteArchiveSynchronizationDisabled() const
