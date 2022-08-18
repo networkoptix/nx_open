@@ -62,6 +62,11 @@ enum MethodType
 {
     // STUN RFC 5389.
     bindingMethod = 1,
+    // TURN RFC 8656
+    allocateMethod = 3,
+    sendMethod = 6,
+    dataMethod = 7,
+    createPermissionMethod = 8,
 
     // Starting value for custom NX methods in the middle of unasigned range 0x00D-0x0FF:
     // https://www.iana.org/assignments/stun-parameters/stun-parameters.txt
