@@ -143,7 +143,6 @@ private:
     void parseInternal(const nx::ConstBufferRefType& buf, size_t* bytesProcessed);
 
     // Attribute value parsing
-    attrs::Attribute* parseXORMappedAddress();
     attrs::Attribute* parseErrorCode();
     attrs::Attribute* parseFingerprint();
     attrs::Attribute* parseMessageIntegrity();

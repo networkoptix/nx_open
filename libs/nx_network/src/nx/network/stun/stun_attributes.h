@@ -44,8 +44,12 @@ enum Type
     messageIntegrity = 0x0008,
     errorCode = 0x0009,
     unknown = 0x000A,
+    xorPeerAddress = 0x0012,
+    data = 0x0013,
     realm = 0x0014,
     nonce = 0x0015,
+    xorRelayedAddress = 0x0016,
+    requestedTransport = 0x0019,
     xorMappedAddress = 0x0020,
     priority = 0x0024,
     useCandidate = 0x0025,
@@ -170,6 +174,25 @@ struct NX_NETWORK_API XorMappedAddress: Attribute
         Ipv6 ipv6;
     } address;  //!< address in host byte order
 };
+
+struct NX_NETWORK_API XorPeerAddress: XorMappedAddress
+{
+    static constexpr int TYPE = xorPeerAddress;
+
+    using XorMappedAddress::XorMappedAddress;
+
+    virtual int getType() const override { return TYPE; }
+};
+
+struct NX_NETWORK_API XorRelayedAddress: XorMappedAddress
+{
+    static constexpr int TYPE = xorRelayedAddress;
+
+    using XorMappedAddress::XorMappedAddress;
+
+    virtual int getType() const override { return TYPE; }
+};
+
 
 struct NX_NETWORK_API BufferedValue
 {
@@ -296,6 +319,27 @@ struct NX_NETWORK_API Realm: Unknown
     virtual int getType() const override { return TYPE; }
 };
 
+struct NX_NETWORK_API Data: Unknown
+{
+    static const int TYPE = data;
+
+    Data(nx::Buffer value_ = nx::Buffer()): Unknown(TYPE, value_) {}
+    virtual int getType() const override { return TYPE; }
+};
+
+struct NX_NETWORK_API RequestedTransport: Unknown
+{
+    static const int TYPE = requestedTransport;
+    /* UDP (0x11) is the only possible value for this attribute. */
+    enum class Transport: char
+    {
+        udp = 0x11,
+        tcp = 0x6
+    };
+
+    RequestedTransport(Transport transport = Transport::udp);
+    virtual int getType() const override { return TYPE; }
+};
 
 } // namespace attrs
 
