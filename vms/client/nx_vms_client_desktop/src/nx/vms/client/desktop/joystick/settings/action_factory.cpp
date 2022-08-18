@@ -353,8 +353,8 @@ struct ActionFactory::Private
         {
             case 0: //< No actions assigned to the button.
                 return nullptr;
-            case 1: //< Single action assigned, modifier state does not matter.
-                return v[0].get();
+            case 1: //< Single action assigned.
+                return modifier ? nullptr : v[0].get();
             default: //< Multiple actions.
                 return modifier ? v[1].get() : v[0].get();
         }
