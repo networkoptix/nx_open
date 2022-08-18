@@ -255,6 +255,9 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(
     if (camera.isNull())
         return StartResult::failed;
 
+    if (!m_context->ec2Connection()) //< Reconnecting to the server after idle.
+        return StartResult::failed;
+
     if (isCameraHistoryValid(camera))
         return StartResult::ommited;
 
