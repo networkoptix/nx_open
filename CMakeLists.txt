@@ -72,6 +72,7 @@ find_package(OpenSSL REQUIRED)
 
 include(qt_utils)
 include(cpp_utils)
+include(process_target_debug_symbols)
 include(find_sources)
 include(compiler_options)
 include(linker_options)
