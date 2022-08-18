@@ -30,11 +30,12 @@ if(NOT EXISTS ${installer_icon})
     set(installer_icon ${app_icon})
 endif()
 
+set(distribution_config_file "${CMAKE_CURRENT_BINARY_DIR}/build_distribution.conf")
 nx_configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/build_distribution.conf.in
-    ${CMAKE_CURRENT_BINARY_DIR}/build_distribution.conf
+    ${distribution_config_file}
     @ONLY)
-list(APPEND configured_files ${CMAKE_CURRENT_BINARY_DIR}/build_distribution.conf)
+list(APPEND configured_files ${distribution_config_file})
 
 nx_configure_directory(
     ${CMAKE_CURRENT_SOURCE_DIR}/resources
@@ -115,6 +116,80 @@ add_custom_command(
 add_custom_target(distribution_dmg_client ALL
     DEPENDS ${dmg_file} ${update_file} ${compatibility_update_file}
 )
+
+if(CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo")
+    set(client_debug_file "${distribution_output_dir}/${client_debug_distribution_name}.zip")
+    nx_create_distribution_package(
+        PACKAGE_NAME "client debug"
+        PACKAGE_TARGET client_debug
+        PACKAGE_GENERATION_SCRIPT_NAME generate_client_debug_package.py
+        OUTPUT_FILE ${client_debug_file}
+        CONFIG_FILES ${distribution_config_file}
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+        DEPENDENCIES ${dmg_file})
+
+    if(withDesktopClient OR withMediaServer OR withTestCamera)
+        set(libs_debug_dependencies
+            nx_network
+            nx_utils
+            nx_fusion
+            nx_reflect
+            nx_zip
+            nx_vms_api
+            nx_vms_common
+            nx_vms_rules
+            nx_vms_update
+            nx_vms_utils
+            nx_branding
+            nx_build_info
+            nx_monitoring
+            nx_kit
+            udt
+        )
+
+        if(TARGET vms_gateway_core)
+            list(APPEND libs_debug_dependencies vms_gateway_core)
+        endif()
+        if(TARGET nx_vms_applauncher_api)
+            list(APPEND libs_debug_dependencies nx_vms_applauncher_api)
+        endif()
+        if(TARGET qtkeychain)
+            list(APPEND libs_debug_dependencies qtkeychain)
+        endif()
+
+        set(libs_debug_file "${distribution_output_dir}/${libs_debug_distribution_name}.zip")
+        nx_create_distribution_package(
+            PACKAGE_NAME "libs debug"
+            PACKAGE_TARGET libs_debug
+            PACKAGE_GENERATION_SCRIPT_NAME generate_libs_debug_package.py
+            OUTPUT_FILE ${libs_debug_file}
+            CONFIG_FILES ${distribution_config_file}
+            WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+            DEPENDENCIES ${libs_debug_dependencies}
+        )
+    endif()
+
+    set(misc_debug_dependencies)
+    if(TARGET applauncher)
+        list(APPEND misc_debug_dependencies applauncher)
+    endif()
+
+    if(TARGET testcamera)
+        list(APPEND misc_debug_dependencies testcamera)
+    endif()
+
+    set(misc_debug_file "${distribution_output_dir}/${misc_debug_distribution_name}.zip")
+    nx_create_distribution_package(
+        PACKAGE_NAME "misc debug"
+        PACKAGE_TARGET misc_debug
+        PACKAGE_GENERATION_SCRIPT_NAME generate_misc_debug_package.py
+        OUTPUT_FILE ${misc_debug_file}
+        CONFIG_FILES ${distribution_config_file}
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+        DEPENDENCIES ${misc_debug_dependencies}
+    )
+endif()
+
 nx_add_targets_to_strengthened(
     ${dmg_file} ${update_file} ${compatibility_update_file}
 )
