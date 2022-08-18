@@ -284,10 +284,13 @@ struct ResourceTreeInteractionHandler::Private
 
             case NodeType::cloudSystem:
             {
-                ui::action::Parameters result{Qn::CloudSystemIdRole,
-                    index.data(Qn::CloudSystemIdRole).toString()};
+                const auto systemId = index.data(Qn::CloudSystemIdRole).toString();
+                CloudSystemConnectData connectData{systemId, ConnectScenario::connectFromTree};
+                const auto parameters = ui::action::Parameters()
+                    .withArgument(Qn::CloudSystemIdRole, systemId)
+                    .withArgument(Qn::CloudSystemConnectDataRole, connectData);
 
-                return withNodeType(result);
+                return withNodeType(parameters);
             }
 
             default:
