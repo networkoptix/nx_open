@@ -408,7 +408,11 @@ if(${colorOutput})
     endif()
 endif()
 
-if(${CMAKE_BUILD_TYPE} STREQUAL "Release" AND NOT ${arch} STREQUAL "arm64"
+if(CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo")
+    set(_stripBinaries ON)
+elseif(${CMAKE_BUILD_TYPE} STREQUAL "Release"
+    AND ${CMAKE_SYSTEM_NAME} STREQUAL "Linux"
+    AND NOT ${arch} STREQUAL "arm64"
     AND NOT ${targetDevice} STREQUAL "linux_arm32")
     set(_stripBinaries ON)
 else()
