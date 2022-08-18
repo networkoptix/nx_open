@@ -128,6 +128,8 @@ server::SerializerState MessageSerializer::serializeAttributeValue(
             return serializeAttributeValue_ErrorCode(buffer, *static_cast<const ErrorCode*>(attribute), bytesWritten);
 
         case attrs::xorMappedAddress:
+        case attrs::xorPeerAddress:
+        case attrs::xorRelayedAddress:
             return serializeAttributeValue_XORMappedAddress(buffer, *static_cast<const XorMappedAddress*>(attribute), bytesWritten);
 
         case attrs::messageIntegrity:

@@ -330,6 +330,17 @@ Priority::Priority(int value):
 {
 }
 
+//-------------------------------------------------------------------------------------------------
+// RequestedTransport
+
+RequestedTransport::RequestedTransport(Transport transport):
+    Unknown(TYPE)
+{
+    constexpr int kRequestedTransportValueSize = 4;
+    char value[] = {(char)transport, 0, 0, 0};
+    setBuffer({value, kRequestedTransportValueSize});
+}
+
 } // namespace attrs
 } // namespace stun
 } // namespace network

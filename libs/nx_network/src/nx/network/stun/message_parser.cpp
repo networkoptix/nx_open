@@ -103,15 +103,16 @@ void MessageParser::setFingerprintRequired(bool val)
 }
 
 // Parsing for each specific type
-Attribute* MessageParser::parseXORMappedAddress()
+template <typename XorAddressType>
+Attribute* parseXorAddress(const nx::Buffer& transactionId, const nx::Buffer& stunAttribute)
 {
-    if (m_attribute.value.size() < 8 || m_attribute.value.front() != 0)
+    if (stunAttribute.size() < 8 || stunAttribute.front() != 0)
         return NULL;
-    MessageParserBuffer buffer(m_attribute.value);
+    MessageParserBuffer buffer(stunAttribute);
     bool ok;
 
     // Parsing the family
-    std::unique_ptr<XorMappedAddress> attribute(new XorMappedAddress());
+    std::unique_ptr<XorAddressType> attribute(new XorAddressType());
     std::uint16_t family = buffer.NextUint16(&ok);
     NX_ASSERT(ok);
     // We only need the lower part of the word.
@@ -134,8 +135,9 @@ Attribute* MessageParser::parseXORMappedAddress()
     }
     else
     {
+        constexpr int kXorAddressValueSize = 20;
         // ensure the buffer
-        if (m_attribute.value.size() != 20)
+        if (stunAttribute.size() != kXorAddressValueSize)
             return NULL;
 
         // The RFC doesn't indicate how to concatenate, I just assume it with the natural byte order
@@ -155,7 +157,7 @@ Attribute* MessageParser::parseXORMappedAddress()
             NX_ASSERT(ok);
             attribute->address.ipv6.words[i + 2] =
                 xor_comp ^ *reinterpret_cast< const std::uint16_t* >(
-                    m_header.transactionId.data() + i * 2);
+                    transactionId.data() + i * 2);
         }
     }
 
@@ -244,7 +246,13 @@ Attribute* MessageParser::parseValue()
     switch (m_attribute.type)
     {
         case attrs::xorMappedAddress:
-            return parseXORMappedAddress();
+            return parseXorAddress<XorMappedAddress>(m_header.transactionId, m_attribute.value);
+
+        case attrs::xorRelayedAddress:
+            return parseXorAddress<XorRelayedAddress>(m_header.transactionId, m_attribute.value);
+
+        case attrs::xorPeerAddress:
+            return parseXorAddress<XorPeerAddress>(m_header.transactionId, m_attribute.value);
 
         case attrs::errorCode:
             return parseErrorCode();
