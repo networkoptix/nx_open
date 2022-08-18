@@ -43,5 +43,22 @@ function(nx_process_target_debug_symbols target)
             COMMAND ${CMAKE_STRIP} ${strip_flags} $<TARGET_FILE:${target}>
             ${add_debuglink_command}
             COMMENT "Stripping ${target}")
+
+    elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+        if(NOT CMAKE_STRIP)
+            message(FATAL_ERROR "strip is not found.")
+        endif()
+
+        if(STRIP_COPY_DEBUG_INFO)
+            set(copy_debug_info_command COMMAND
+                dsymutil $<TARGET_FILE:${target}> -o $<TARGET_FILE:${target}>.dSYM)
+        else()
+            set(copy_debug_info_command)
+        endif()
+
+        add_custom_command(TARGET ${target} POST_BUILD
+            ${copy_debug_info_command}
+            COMMAND ${CMAKE_STRIP} -S $<TARGET_FILE:${target}>
+            COMMENT "Stripping ${target}")
     endif()
 endfunction()
