@@ -408,4 +408,11 @@ if(${colorOutput})
     endif()
 endif()
 
-option(stripBinaries "Strip the resulting binaries" OFF)
+if(${CMAKE_BUILD_TYPE} STREQUAL "Release" AND NOT ${arch} STREQUAL "arm64"
+    AND NOT ${targetDevice} STREQUAL "linux_arm32")
+    set(_stripBinaries ON)
+else()
+    set(_stripBinaries OFF)
+endif()
+
+nx_option(stripBinaries "Strip the resulting binaries" ${_stripBinaries})

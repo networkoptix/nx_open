@@ -160,7 +160,7 @@ function(nx_add_target name type)
     endif()
 
     if(stripBinaries)
-        nx_strip_target(${name} COPY_DEBUG_INFO)
+        nx_process_target_debug_symbols(${name} COPY_DEBUG_INFO)
     endif()
 
     if(NOT NX_NO_WERROR AND (nx_enable_werror OR NX_WERROR OR NOT "${NX_WERROR_IF}" STREQUAL ""))
