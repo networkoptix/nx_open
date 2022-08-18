@@ -12,6 +12,7 @@ import platform
 import sys
 import argparse
 import yaml
+import shlex
 from pathlib import Path
 from collections import namedtuple
 
@@ -209,6 +210,36 @@ def zip_rdep_package_to(zip, package_directory):
     zip_files_to(zip, find_all_files(bin_directory), bin_directory)
 
 
+def shell_like_parse(infile):
+    result = {}
+
+    for kv in [line.strip().split('=', 2) for line in infile]:
+        if len(kv) != 2:
+            continue
+
+        key, value = kv[0], kv[1]
+
+        # Parse the value, shlex.split() should take care of comments and whitespaces.
+
+        if value.startswith('('): # Array.
+            parsed_elements = shlex.split(value[1:], comments=True)
+
+            # Last parsed element should be either '<arg...>)' or just ')'.
+            if parsed_elements[-1] == ')':
+                value = parsed_elements[:-1]
+            elif parsed_elements[-1].endswith(')'):
+                value[-1] = parsed_elements[-1][:-1]
+
+        else: # Value.
+            value = shlex.split(value, comments=True)
+            # shlex.split() always returns a list, but we need a single value here.
+            if value:
+                value = value[0]
+
+        result[key] = value
+
+    return result
+
 def parse_generation_scripts_arguments():
     Arguments = namedtuple('Arguments', ['config', 'output_file'])
 
@@ -222,7 +253,10 @@ def parse_generation_scripts_arguments():
 
     for config_file in config_files:
         with open(config_file, 'r') as f:
-            config_part = yaml.load(f, Loader=yaml.SafeLoader)
+            if config_file.endswith('.conf'):
+                config_part = shell_like_parse(f)
+            else:
+                config_part = yaml.load(f, Loader=yaml.SafeLoader)
             config.update(config_part)
 
     return Arguments(config=config, output_file=args.output_file)
