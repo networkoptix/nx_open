@@ -7,6 +7,7 @@
 #include <api/server_rest_connection.h>
 
 #include <nx/utils/guarded_callback.h>
+#include <utils/common/delayed.h>
 
 namespace nx::vms::client::core {
 
@@ -33,7 +34,7 @@ void OrderedRequestsHelper::Private::addRequest(const Request& request)
 
 void OrderedRequestsHelper::Private::tryExecuteNextRequest()
 {
-    if (currentHandle == -1 && !requests.isEmpty())
+    while (currentHandle == -1 && !requests.isEmpty())
         currentHandle = requests.dequeue()();
 }
 
@@ -49,13 +50,16 @@ OrderedRequestsHelper::~OrderedRequestsHelper()
 {
 }
 
-void OrderedRequestsHelper::postJsonResult(
+bool OrderedRequestsHelper::postJsonResult(
     const rest::ServerConnectionPtr& connection,
     const QString& action,
     const nx::network::rest::Params& params,
     rest::JsonResultCallback&& callback,
-    QThread* targetThread)
+    QThread* thread)
 {
+    if (!connection)
+        return false;
+
     const auto internalCallback = nx::utils::guarded(this,
         [this, callback](
             bool success, rest::Handle handle, const nx::network::rest::JsonResult& result)
@@ -74,12 +78,19 @@ void OrderedRequestsHelper::postJsonResult(
         });
 
     const auto request =
-        [connection, action, params, internalCallback, targetThread]()
+        [connection, action, params, callback, internalCallback, thread]() -> rest::Handle
         {
-            return connection->postJsonResult(action, params, {}, internalCallback, targetThread);
+            if (connection)
+                return connection->postJsonResult(action, params, {}, internalCallback, thread);
+
+            executeInThread(thread,
+                [callback]() { callback(/*success*/ false, /*handle*/ -1, /*result*/ {}); });
+
+            return -1;
         };
 
     d->addRequest(request);
+    return true;
 }
 
 } // namespace nx::vms::client::core
