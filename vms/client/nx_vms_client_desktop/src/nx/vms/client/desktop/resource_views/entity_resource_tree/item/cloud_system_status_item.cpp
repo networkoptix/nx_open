@@ -8,6 +8,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/utils/scoped_connections.h>
@@ -27,11 +28,17 @@ public:
 
     QString text() const
     {
+        if (!crossSystemContext)
+            return {};
+
         return toString(crossSystemContext->status());
     }
 
     bool isVisible() const
     {
+        if (!crossSystemContext)
+            return false;
+
         switch (crossSystemContext->status())
         {
             case CloudCrossSystemContext::Status::connecting:
@@ -40,11 +47,14 @@ public:
             default:
                 break;
         }
-        return false;
+        return ini().crossSystemLayoutsExtendedDebug;
     }
 
     QString customIcon() const
     {
+        if (!crossSystemContext)
+            return {};
+
         switch (crossSystemContext->status())
         {
             case CloudCrossSystemContext::Status::uninitialized:
@@ -61,6 +71,9 @@ public:
 
     Qt::ItemFlags flags() const
     {
+        if (!crossSystemContext)
+            return {};
+
         switch (crossSystemContext->status())
         {
             case CloudCrossSystemContext::Status::uninitialized:

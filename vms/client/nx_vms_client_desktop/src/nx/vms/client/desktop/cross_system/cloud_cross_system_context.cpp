@@ -6,6 +6,7 @@
 
 #include <api/server_rest_connection.h>
 #include <client_core/client_core_module.h>
+#include <core/resource/camera_history.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <finders/systems_finder.h>
@@ -25,10 +26,11 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <watchers/cloud_status_watcher.h>
 
+#include "cloud_cross_system_context_data_loader.h"
+#include "cloud_layouts_manager.h"
 #include "cross_system_camera_resource.h"
 #include "cross_system_layout_resource.h"
 #include "cross_system_server_resource.h"
-#include "cloud_layouts_manager.h"
 
 namespace nx::vms::client::desktop {
 
@@ -38,7 +40,7 @@ namespace {
 
 using namespace std::chrono;
 
-static constexpr auto kUpdateInterval = 10min;
+static constexpr auto kUpdateConnectionInterval = 30s;
 static const nx::vms::api::SoftwareVersion kRestApiSupportedVersion("5.0.0.0");
 
 } // namespace
@@ -91,8 +93,8 @@ struct CloudCrossSystemContext::Private
         }
 
         auto timer = new QTimer(q);
-        timer->setInterval(kUpdateInterval);
-        timer->callOnTimeout([this]() { updateCameras(); });
+        timer->setInterval(kUpdateConnectionInterval);
+        timer->callOnTimeout([this]() { ensureConnection(); });
         timer->start();
 
         connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged, q,
@@ -142,6 +144,7 @@ struct CloudCrossSystemContext::Private
     }
 
     CloudCrossSystemContext* const q;
+    std::unique_ptr<CloudCrossSystemContextDataLoader> dataLoader;
     QnSystemDescriptionPtr const systemDescription;
     Status status = Status::uninitialized;
     core::RemoteConnectionFactory::ProcessPtr connectionProcess;
@@ -169,22 +172,29 @@ struct CloudCrossSystemContext::Private
         emit q->statusChanged();
     }
 
-    bool ensureConnection(bool allowUserInteraction = false)
+    void ensureConnection(bool allowUserInteraction = false)
     {
         if (!ini().crossSystemLayouts)
-            return false;
+            return;
 
         if (status == Status::unsupported)
-            return false;
+            return;
 
         if (systemContext->connection())
-            return true;
-
-        if (qnCloudStatusWatcher->status() != QnCloudStatusWatcher::Online)
-            return false;
+            return;
 
         NX_VERBOSE(this, "Ensure connection exists");
-        if (!connectionProcess)
+        if (qnCloudStatusWatcher->status() != QnCloudStatusWatcher::Online)
+        {
+            NX_VERBOSE(this, "Cloud status failure: %1", qnCloudStatusWatcher->status());
+            return;
+        }
+
+        if (connectionProcess)
+        {
+            NX_VERBOSE(this, "Connection is already in progress");
+        }
+        else
         {
             auto handleConnection =
                 [this](core::RemoteConnectionFactory::ConnectionOrError result)
@@ -193,7 +203,6 @@ struct CloudCrossSystemContext::Private
                     {
                         NX_VERBOSE(this, "Connection successfully established");
                         initializeContext(*connection);
-                        ensureUser();
                     }
                     else if (const auto error = std::get_if<core::RemoteConnectionError>(&result))
                     {
@@ -206,7 +215,10 @@ struct CloudCrossSystemContext::Private
 
             auto endpoint = core::cloudSystemEndpoint(systemDescription);
             if (!endpoint)
-                return false;
+            {
+                NX_VERBOSE(this, "Endpoint was not found");
+                return;
+            }
 
             updateStatus(Status::connecting);
 
@@ -221,8 +233,6 @@ struct CloudCrossSystemContext::Private
                 },
                 handleConnection);
         }
-
-        return false;
     }
 
     void initializeContext(core::RemoteConnectionPtr connection)
@@ -241,6 +251,32 @@ struct CloudCrossSystemContext::Private
 
         systemContext->resourcePool()->addResource(server);
         server->setStatus(nx::vms::api::ResourceStatus::online);
+
+        dataLoader = std::make_unique<CloudCrossSystemContextDataLoader>(
+            connection->serverApi(),
+            QString::fromStdString(connection->credentials().username));
+        QObject::connect(dataLoader.get(),
+            &CloudCrossSystemContextDataLoader::ready,
+            q,
+            [this]()
+            {
+                addUserToResourcePool(dataLoader->user());
+                addServersToResourcePool(dataLoader->servers());
+                if (NX_ASSERT(systemContext))
+                {
+                    systemContext->cameraHistoryPool()->resetServerFootageData(
+                        dataLoader->serverFootageData());
+                }
+                addCamerasToResourcePool(dataLoader->cameras());
+                updateStatus(Status::connected);
+            });
+        QObject::connect(dataLoader.get(),
+            &CloudCrossSystemContextDataLoader::camerasUpdated,
+            q,
+            [this]()
+            {
+                addCamerasToResourcePool(dataLoader->cameras());
+            });
     }
 
     void addServersToResourcePool(nx::vms::api::ServerInformationList servers)
@@ -347,137 +383,6 @@ struct CloudCrossSystemContext::Private
         systemContext->accessController()->setUser(user);
     }
 
-    bool ensureUser()
-    {
-        if (user)
-            return true;
-
-        if (!NX_ASSERT(systemContext))
-            return false;
-
-        if (!NX_ASSERT(isRestApiSupported))
-            return false;
-
-        if (!systemDescription->isReachable())
-        {
-            NX_VERBOSE(this, "System is unreachable");
-            return false;
-        }
-
-        NX_VERBOSE(this, "Requesting user");
-        auto callback = nx::utils::guarded(q,
-            [this](
-                bool success,
-                ::rest::Handle requestId,
-                QByteArray data,
-                nx::network::http::HttpHeaders /*headers*/)
-            {
-                if (!success)
-                {
-                     NX_WARNING(this, "User request failed");
-                     return;
-                }
-
-                nx::vms::api::UserModel result;
-                if (!QJson::deserialize(data, &result))
-                {
-                    NX_WARNING(this, "User reply cannot be deserialized");
-                    return;
-                }
-                addUserToResourcePool(std::move(result));
-                updateServers();
-            });
-
-        const QString encodedUsername =
-            QUrl::toPercentEncoding(
-                QString::fromStdString(systemContext->connection()->credentials().username));
-        systemContext->connectedServerApi()->getRawResult(
-            QString("/rest/v1/users/") + encodedUsername,
-            {},
-            callback,
-            q->thread());
-
-        return false;
-    }
-
-    void updateServers()
-    {
-        if (!ensureConnection() || !ensureUser())
-            return;
-
-        if (!systemDescription->isReachable())
-        {
-            NX_VERBOSE(this, "System is unreachable");
-            return;
-        }
-
-        NX_VERBOSE(this, "Updating servers");
-        auto callback = nx::utils::guarded(q,
-            [this](
-                bool success,
-                ::rest::Handle requestId,
-                ::rest::RestResultOrData<nx::vms::api::ServerInformationList> response)
-            {
-                if (const auto result = std::get_if<nx::network::rest::Result>(&response))
-                {
-                    NX_WARNING(this, "Servers request failed: %1", QJson::serialized(*result));
-                    return;
-                }
-
-                auto servers = std::get_if<nx::vms::api::ServerInformationList>(&response);
-                NX_VERBOSE(this, "Received %1 servers", servers->size());
-
-                addServersToResourcePool(std::move(*servers));
-                updateCameras();
-            });
-
-        systemContext->connectedServerApi()->getServersInfo(std::move(callback), q->thread());
-    }
-
-    void updateCameras()
-    {
-        if (!ensureConnection() || !ensureUser())
-            return;
-
-        if (!systemDescription->isReachable())
-        {
-            NX_VERBOSE(this, "System is unreachable");
-            return;
-        }
-
-        NX_VERBOSE(this, "Updating cameras");
-        auto callback = nx::utils::guarded(q,
-            [this](
-                bool success,
-                ::rest::Handle requestId,
-                QByteArray data,
-                nx::network::http::HttpHeaders /*headers*/)
-            {
-                if (!success)
-                {
-                     NX_WARNING(this, "Cameras request failed");
-                     return;
-                }
-
-                std::vector<nx::vms::api::CameraDataEx> result;
-                if (!QJson::deserialize(data, &result))
-                {
-                    NX_WARNING(this, "Cameras list cannot be deserialized");
-                    return;
-                }
-
-                NX_VERBOSE(this, "Received %1 cameras", result.size());
-                addCamerasToResourcePool(std::move(result));
-                updateStatus(Status::connected);
-            });
-
-        systemContext->connectedServerApi()->getRawResult(
-            "/ec2/getCamerasEx",
-            {},
-            callback,
-            q->thread());
-    }
-
     void createThumbCameraResources(const CrossSystemLayoutResourceList& crossSystemLayoutsList)
     {
         // Required to find all the cloud resource descriptors inside the cross system layouts
@@ -573,9 +478,7 @@ void CloudCrossSystemContext::update(UpdateReason reason)
         }
         case UpdateReason::found:
         {
-            if (d->ensureConnection())
-                d->updateCameras();
-
+            d->ensureConnection();
             break;
         }
         case UpdateReason::lost:

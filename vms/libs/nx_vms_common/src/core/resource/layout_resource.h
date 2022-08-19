@@ -108,8 +108,6 @@ public:
 
     QHash<int, QVariant> data() const;
 
-    void requestStore() { emit storeRequested(::toSharedPointer(this)); }
-
     QnTimePeriod getLocalRange() const;
     void setLocalRange(const QnTimePeriod& value);
 
@@ -162,8 +160,6 @@ signals:
 
     void cellAspectRatioChanged(const QnLayoutResourcePtr &resource);
     void cellSpacingChanged(const QnLayoutResourcePtr &resource);
-    void storeRequested(const QnLayoutResourcePtr &resource);
-
     void fixedSizeChanged(const QnLayoutResourcePtr& resource);
     void backgroundSizeChanged(const QnLayoutResourcePtr &resource);
     void backgroundImageChanged(const QnLayoutResourcePtr &resource);
