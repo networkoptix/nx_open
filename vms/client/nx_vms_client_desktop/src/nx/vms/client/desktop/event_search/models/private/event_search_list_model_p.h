@@ -82,7 +82,7 @@ private:
     EventType m_selectedEventType = EventType::undefinedEvent;
     QString m_selectedSubType;
 
-    std::vector<EventType> m_defaultEventTypes{{EventType::anyEvent}};
+    std::vector<EventType> m_defaultEventTypes{EventType::anyEvent};
 
     ActionDataList m_prefetch;
     std::deque<ActionData> m_data;

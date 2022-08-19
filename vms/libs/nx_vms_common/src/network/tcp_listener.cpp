@@ -97,7 +97,6 @@ QnTcpListener::QnTcpListener(
 
 QnTcpListener::~QnTcpListener()
 {
-    Q_D(QnTcpListener);
     stop();
     destroyServerSocket();
     delete d_ptr;

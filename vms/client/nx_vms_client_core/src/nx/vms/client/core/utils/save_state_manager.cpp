@@ -1,21 +1,23 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "abstract_save_state_manager.h"
+#include "save_state_manager.h"
 
-QnAbstractSaveStateManager::QnAbstractSaveStateManager(QObject* parent):
+namespace nx::vms::client::core {
+
+SaveStateManager::SaveStateManager(QObject* parent):
     base_type(parent),
     m_mutex(nx::Mutex::NonRecursive)
 {
 
 }
 
-QnAbstractSaveStateManager::SaveStateFlags QnAbstractSaveStateManager::flags(const QnUuid& id) const
+SaveStateManager::SaveStateFlags SaveStateManager::flags(const QnUuid& id) const
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
     return m_flags.value(id);
 }
 
-void QnAbstractSaveStateManager::setFlags(const QnUuid& id, SaveStateFlags flags)
+void SaveStateManager::setFlags(const QnUuid& id, SaveStateFlags flags)
 {
     {
         NX_MUTEX_LOCKER lk(&m_mutex);
@@ -27,29 +29,29 @@ void QnAbstractSaveStateManager::setFlags(const QnUuid& id, SaveStateFlags flags
     emit flagsChanged(id, flags);
 }
 
-void QnAbstractSaveStateManager::clean(const QnUuid& id)
+void SaveStateManager::clean(const QnUuid& id)
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
     m_flags.remove(id);
     m_saveRequests.remove(id);
 }
 
-bool QnAbstractSaveStateManager::isBeingSaved(const QnUuid& id) const
+bool SaveStateManager::isBeingSaved(const QnUuid& id) const
 {
     return flags(id).testFlag(IsBeingSaved);
 }
 
-bool QnAbstractSaveStateManager::isChanged(const QnUuid& id) const
+bool SaveStateManager::isChanged(const QnUuid& id) const
 {
     return flags(id).testFlag(IsChanged);
 }
 
-bool QnAbstractSaveStateManager::isSaveable(const QnUuid& id) const
+bool SaveStateManager::isSaveable(const QnUuid& id) const
 {
     return (flags(id) & (IsChanged | IsBeingSaved)) == IsChanged;
 }
 
-void QnAbstractSaveStateManager::markBeingSaved(const QnUuid& id, bool saved)
+void SaveStateManager::markBeingSaved(const QnUuid& id, bool saved)
 {
     if (saved)
         setFlags(id, flags(id) | IsBeingSaved);
@@ -57,7 +59,7 @@ void QnAbstractSaveStateManager::markBeingSaved(const QnUuid& id, bool saved)
         setFlags(id, flags(id) & ~IsBeingSaved);
 }
 
-void QnAbstractSaveStateManager::markChanged(const QnUuid& id, bool changed)
+void SaveStateManager::markChanged(const QnUuid& id, bool changed)
 {
     if (changed)
         setFlags(id, flags(id) | IsChanged);
@@ -65,25 +67,28 @@ void QnAbstractSaveStateManager::markChanged(const QnUuid& id, bool changed)
         setFlags(id, flags(id) & ~IsChanged);
 }
 
-bool QnAbstractSaveStateManager::hasSaveRequests(const QnUuid& id) const
+bool SaveStateManager::hasSaveRequests(const QnUuid& id) const
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
     return !m_saveRequests.value(id).empty();
 }
 
-void QnAbstractSaveStateManager::addSaveRequest(const QnUuid& id, int reqId)
+void SaveStateManager::addSaveRequest(const QnUuid& id, int reqId)
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
     m_saveRequests[id].insert(reqId);
 }
 
-void QnAbstractSaveStateManager::removeSaveRequest(const QnUuid& id, int reqId)
+void SaveStateManager::removeSaveRequest(const QnUuid& id, int reqId)
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
     if (!m_saveRequests.contains(id))
         return;
+
     auto& ids = m_saveRequests[id];
     ids.remove(reqId);
     if (ids.empty())
         m_saveRequests.remove(id);
 }
+
+} // namespace nx::vms::client::core

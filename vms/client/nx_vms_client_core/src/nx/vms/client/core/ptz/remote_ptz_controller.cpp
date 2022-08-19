@@ -11,9 +11,10 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/system_context.h>
 
-using namespace nx::core;
 using namespace nx::vms::common::ptz;
-using namespace nx::vms::client::core;
+
+namespace nx::vms::client::core {
+namespace ptz {
 
 namespace {
 
@@ -21,7 +22,7 @@ static constexpr Options kDefaultOptions = {Type::operational};
 
 } // namespace
 
-QnRemotePtzController::QnRemotePtzController(const QnVirtualCameraResourcePtr& camera):
+RemotePtzController::RemotePtzController(const QnVirtualCameraResourcePtr& camera):
     base_type(camera),
     m_camera(camera),
     m_sequenceId(QnUuid::createUuid()),
@@ -29,11 +30,11 @@ QnRemotePtzController::QnRemotePtzController(const QnVirtualCameraResourcePtr& c
 {
 }
 
-QnRemotePtzController::~QnRemotePtzController()
+RemotePtzController::~RemotePtzController()
 {
 }
 
-Ptz::Capabilities QnRemotePtzController::getCapabilities(
+Ptz::Capabilities RemotePtzController::getCapabilities(
     const Options& options) const
 {
     Ptz::Capabilities result = m_camera->getPtzCapabilities(options.type);
@@ -48,7 +49,7 @@ Ptz::Capabilities QnRemotePtzController::getCapabilities(
     return result;
 }
 
-bool QnRemotePtzController::isPointless(
+bool RemotePtzController::isPointless(
     Command command,
     const Options& options) const
 {
@@ -66,7 +67,7 @@ bool QnRemotePtzController::isPointless(
     return !base_type::supports(command, options);
 }
 
-int QnRemotePtzController::nextSequenceNumber()
+int RemotePtzController::nextSequenceNumber()
 {
     return m_sequenceNumber.fetchAndAddOrdered(1);
 }
@@ -74,7 +75,7 @@ int QnRemotePtzController::nextSequenceNumber()
 // Current PTZ API returns a pair of {Command command, QVariant data} for each request.
 // This function helps to generate a proper "QVariant data" value.
 template<class T>
-QnRemotePtzController::PtzDeserializationHelper makeDeserializationHelper()
+RemotePtzController::PtzDeserializationHelper makeDeserializationHelper()
 {
     return [](const nx::network::rest::JsonResult& data) -> QVariant
         {
@@ -86,7 +87,7 @@ QnRemotePtzController::PtzDeserializationHelper makeDeserializationHelper()
 // Some PTZ functions embed request arguments to a response. This function helps to store this
 // input argument and return it instead of server response.
 template<class T>
-QnRemotePtzController::PtzDeserializationHelper makeInputHelper(const T& data)
+RemotePtzController::PtzDeserializationHelper makeInputHelper(const T& data)
 {
     auto response = QVariant::fromValue<T>(data);
     return [response](const nx::network::rest::JsonResult& /*data*/) -> QVariant
@@ -103,7 +104,7 @@ nx::network::http::HttpHeaders makeDefaultHeaders()
     return headers;
 }
 
-bool QnRemotePtzController::sendRequest(
+bool RemotePtzController::sendRequest(
     Command command,
     const nx::network::rest::Params& baseParams,
     const QByteArray& body,
@@ -145,7 +146,7 @@ bool QnRemotePtzController::sendRequest(
             bool /*success*/, rest::Handle /*handle*/, const nx::network::rest::JsonResult& data)
         {
             QVariant value = deserializer(data);
-            auto notConstThis = const_cast<QnRemotePtzController*>(this);
+            auto notConstThis = const_cast<RemotePtzController*>(this);
             emit notConstThis->finished(command, value);
         });
 
@@ -161,7 +162,7 @@ bool QnRemotePtzController::sendRequest(
     return true;
 }
 
-bool QnRemotePtzController::continuousMove(
+bool RemotePtzController::continuousMove(
     const Vector& speed,
     const Options& options)
 {
@@ -176,7 +177,7 @@ bool QnRemotePtzController::continuousMove(
     return sendRequest(Command::continuousMove, params, QByteArray(), options);
 }
 
-bool QnRemotePtzController::continuousFocus(
+bool RemotePtzController::continuousFocus(
     qreal speed,
     const Options& options)
 {
@@ -186,7 +187,7 @@ bool QnRemotePtzController::continuousFocus(
     return sendRequest(Command::continuousFocus, params, QByteArray(), options);
 }
 
-bool QnRemotePtzController::absoluteMove(
+bool RemotePtzController::absoluteMove(
     CoordinateSpace space,
     const Vector& position,
     qreal speed,
@@ -205,7 +206,7 @@ bool QnRemotePtzController::absoluteMove(
         QByteArray(), options);
 }
 
-bool QnRemotePtzController::viewportMove(
+bool RemotePtzController::viewportMove(
     qreal aspectRatio,
     const QRectF& viewport,
     qreal speed,
@@ -224,7 +225,7 @@ bool QnRemotePtzController::viewportMove(
     return sendRequest(Command::viewportMove, params, QByteArray(), options);
 }
 
-bool QnRemotePtzController::relativeMove(
+bool RemotePtzController::relativeMove(
     const Vector& direction,
     const Options& options)
 {
@@ -239,7 +240,7 @@ bool QnRemotePtzController::relativeMove(
     return sendRequest(Command::relativeMove, params, QByteArray(), options);
 }
 
-bool QnRemotePtzController::relativeFocus(qreal direction, const Options& options)
+bool RemotePtzController::relativeFocus(qreal direction, const Options& options)
 {
     nx::network::rest::Params params;
     params.insert("focus", QnLexical::serialized(direction));
@@ -247,7 +248,7 @@ bool QnRemotePtzController::relativeFocus(qreal direction, const Options& option
     return sendRequest(Command::relativeFocus, params, QByteArray(), options);
 }
 
-bool QnRemotePtzController::getPosition(
+bool RemotePtzController::getPosition(
     Vector* /*position*/,
     CoordinateSpace space,
     const Options& options) const
@@ -260,7 +261,7 @@ bool QnRemotePtzController::getPosition(
     return sendRequest(command, params, QByteArray(), options, helper);
 }
 
-bool QnRemotePtzController::getLimits(
+bool RemotePtzController::getLimits(
     QnPtzLimits* /*limits*/,
     CoordinateSpace,
     const Options& /*options*/) const
@@ -268,14 +269,14 @@ bool QnRemotePtzController::getLimits(
     return false;
 }
 
-bool QnRemotePtzController::getFlip(
+bool RemotePtzController::getFlip(
     Qt::Orientations* /*flip*/,
     const Options& /*options*/) const
 {
     return false;
 }
 
-bool QnRemotePtzController::createPreset(const QnPtzPreset& preset)
+bool RemotePtzController::createPreset(const QnPtzPreset& preset)
 {
     nx::network::rest::Params params;
     params.insert("presetName", preset.name);
@@ -284,7 +285,7 @@ bool QnRemotePtzController::createPreset(const QnPtzPreset& preset)
     return sendRequest(Command::createPreset, params, QByteArray(), kDefaultOptions, helper);
 }
 
-bool QnRemotePtzController::updatePreset(const QnPtzPreset& preset)
+bool RemotePtzController::updatePreset(const QnPtzPreset& preset)
 {
     nx::network::rest::Params params;
     params.insert("presetName", preset.name);
@@ -293,7 +294,7 @@ bool QnRemotePtzController::updatePreset(const QnPtzPreset& preset)
     return sendRequest(Command::updatePreset, params, QByteArray(), kDefaultOptions, helper);
 }
 
-bool QnRemotePtzController::removePreset(const QString& presetId)
+bool RemotePtzController::removePreset(const QString& presetId)
 {
     nx::network::rest::Params params;
     params.insert("presetId", presetId);
@@ -301,7 +302,7 @@ bool QnRemotePtzController::removePreset(const QString& presetId)
     return sendRequest(Command::removePreset, params, QByteArray(), kDefaultOptions, helper);
 }
 
-bool QnRemotePtzController::activatePreset(const QString& presetId, qreal speed)
+bool RemotePtzController::activatePreset(const QString& presetId, qreal speed)
 {
     nx::network::rest::Params params;
     params.insert("presetId", presetId);
@@ -311,14 +312,14 @@ bool QnRemotePtzController::activatePreset(const QString& presetId, qreal speed)
         helper);
 }
 
-bool QnRemotePtzController::getPresets(QnPtzPresetList* /*presets*/) const
+bool RemotePtzController::getPresets(QnPtzPresetList* /*presets*/) const
 {
     nx::network::rest::Params params;
     auto helper = makeDeserializationHelper<QnPtzPresetList>();
     return sendRequest(Command::getPresets, params, QByteArray(), kDefaultOptions, helper);
 }
 
-bool QnRemotePtzController::createTour(
+bool RemotePtzController::createTour(
     const QnPtzTour& tour)
 {
     nx::network::rest::Params params;
@@ -327,7 +328,7 @@ bool QnRemotePtzController::createTour(
         helper);
 }
 
-bool QnRemotePtzController::removeTour(const QString& tourId)
+bool RemotePtzController::removeTour(const QString& tourId)
 {
     nx::network::rest::Params params;
     params.insert("tourId", tourId);
@@ -335,7 +336,7 @@ bool QnRemotePtzController::removeTour(const QString& tourId)
     return sendRequest(Command::removeTour, params, QByteArray(), kDefaultOptions, helper);
 }
 
-bool QnRemotePtzController::activateTour(const QString& tourId)
+bool RemotePtzController::activateTour(const QString& tourId)
 {
     nx::network::rest::Params params;
     params.insert("tourId", tourId);
@@ -343,14 +344,14 @@ bool QnRemotePtzController::activateTour(const QString& tourId)
     return sendRequest(Command::activateTour, params, QByteArray(), kDefaultOptions, helper);
 }
 
-bool QnRemotePtzController::getTours(QnPtzTourList* /*tours*/) const
+bool RemotePtzController::getTours(QnPtzTourList* /*tours*/) const
 {
     nx::network::rest::Params params;
     auto helper = makeDeserializationHelper<QnPtzTourList>();
     return sendRequest(Command::getTours, params, QByteArray(), kDefaultOptions, helper);
 }
 
-bool QnRemotePtzController::getActiveObject(QnPtzObject* /*object*/) const
+bool RemotePtzController::getActiveObject(QnPtzObject* /*object*/) const
 {
     nx::network::rest::Params params;
     auto helper = makeDeserializationHelper<QnPtzObject>();
@@ -358,7 +359,7 @@ bool QnRemotePtzController::getActiveObject(QnPtzObject* /*object*/) const
         helper);
 }
 
-bool QnRemotePtzController::updateHomeObject(const QnPtzObject& homePosition)
+bool RemotePtzController::updateHomeObject(const QnPtzObject& homePosition)
 {
     nx::network::rest::Params params;
     params.insert("objectType", homePosition.type);
@@ -368,7 +369,7 @@ bool QnRemotePtzController::updateHomeObject(const QnPtzObject& homePosition)
         helper);
 }
 
-bool QnRemotePtzController::getHomeObject(QnPtzObject* /*object*/) const
+bool RemotePtzController::getHomeObject(QnPtzObject* /*object*/) const
 {
     nx::network::rest::Params params;
     auto helper = makeDeserializationHelper<QnPtzObject>();
@@ -376,7 +377,7 @@ bool QnRemotePtzController::getHomeObject(QnPtzObject* /*object*/) const
         helper);
 }
 
-bool QnRemotePtzController::getAuxiliaryTraits(
+bool RemotePtzController::getAuxiliaryTraits(
     QnPtzAuxiliaryTraitList* /*auxiliaryTraits*/,
     const Options& options) const
 {
@@ -386,7 +387,7 @@ bool QnRemotePtzController::getAuxiliaryTraits(
     return sendRequest(Command::getAuxiliaryTraits, params, QByteArray(), options, helper);
 }
 
-bool QnRemotePtzController::runAuxiliaryCommand(
+bool RemotePtzController::runAuxiliaryCommand(
     const QnPtzAuxiliaryTrait& trait,
     const QString& data,
     const Options& options)
@@ -399,7 +400,7 @@ bool QnRemotePtzController::runAuxiliaryCommand(
     return sendRequest(Command::runAuxiliaryCommand, params, QByteArray(), options, helper);
 }
 
-bool QnRemotePtzController::getData(
+bool RemotePtzController::getData(
     QnPtzData* /*data*/,
     DataFields query,
     const Options& options) const
@@ -410,3 +411,6 @@ bool QnRemotePtzController::getData(
     auto helper = makeDeserializationHelper<QnPtzData>();
     return sendRequest(Command::getData, params, QByteArray(), options, helper);
 }
+
+} // namespace ptz
+} // namespace nx::vms::client::core

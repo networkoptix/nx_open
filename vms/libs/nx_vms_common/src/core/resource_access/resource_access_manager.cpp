@@ -846,7 +846,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
                     const auto owner = resourcePool()->getResourceById<QnUserResource>(ownerId);
                     if (!owner)
                     {
-                        const auto tour = m_context->layoutTourManager()->tour(ownerId);
+                        const auto tour = m_context->showreelManager()->tour(ownerId);
                         if (tour.isValid())
                         {
                             return tour.parentId == user->getId()
@@ -982,7 +982,7 @@ bool QnResourceAccessManager::canCreateLayout(
         return hasGlobalPermission(subject, GlobalPermission::controlVideowall);
 
     // Tour owner can create layouts in it.
-    const auto tour = m_context->layoutTourManager()->tour(data.parentId);
+    const auto tour = m_context->showreelManager()->tour(data.parentId);
     if (tour.isValid())
         return tour.parentId == subject.id();
 

@@ -8,15 +8,19 @@
 #include <core/resource/resource_processor.h>
 #include <nx/vms/common/system_context_aware.h>
 
-class NX_VMS_CLIENT_CORE_API QnClientResourceProcessor:
+namespace nx::vms::client::core {
+
+class NX_VMS_CLIENT_CORE_API ResourceProcessor:
     public QObject,
     public QnResourceProcessor,
-    public nx::vms::common::SystemContextAware
+    public common::SystemContextAware
 {
     Q_OBJECT
 
 public:
-    QnClientResourceProcessor(nx::vms::common::SystemContext* systemContext);
+    ResourceProcessor(common::SystemContext* systemContext);
 
     virtual void processResources(const QnResourceList& resources) override;
 };
+
+} // namespace nx::vms::client::core

@@ -482,17 +482,17 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         &QnCommonMessageProcessor::discoveredServerChanged,
         connectionType);
 
-    const auto layoutTourManager = connection->layoutTourNotificationManager();
+    const auto showreelNotificationManager = connection->layoutTourNotificationManager().get();
     connect(
-        layoutTourManager.get(),
+        showreelNotificationManager,
         &ec2::AbstractLayoutTourNotificationManager::addedOrUpdated,
         this,
         &QnCommonMessageProcessor::handleTourAddedOrUpdated,
         connectionType);
     connect(
-        layoutTourManager.get(),
+        showreelNotificationManager,
         &ec2::AbstractLayoutTourNotificationManager::removed,
-        m_context->layoutTourManager(),
+        m_context->showreelManager(),
         &QnLayoutTourManager::removeTour,
         connectionType);
 
@@ -539,7 +539,7 @@ void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
     connection->miscNotificationManager()->disconnect(this);
     connection->layoutTourNotificationManager()->disconnect(this);
 
-    m_context->layoutTourManager()->resetTours();
+    m_context->showreelManager()->resetTours();
 }
 
 void QnCommonMessageProcessor::on_gotInitialNotification(const FullInfoData& fullData)
@@ -856,7 +856,7 @@ void QnCommonMessageProcessor::on_broadcastBusinessAction(const vms::event::Abst
 
 void QnCommonMessageProcessor::handleTourAddedOrUpdated(const nx::vms::api::LayoutTourData& tour)
 {
-    m_context->layoutTourManager()->addOrUpdateTour(tour);
+    m_context->showreelManager()->addOrUpdateTour(tour);
 }
 
 void QnCommonMessageProcessor::resetResourceTypes(const ResourceTypeDataList& resTypes)
@@ -1061,7 +1061,7 @@ void QnCommonMessageProcessor::onGotInitialNotification(const FullInfoData& full
     resetAccessRights(fullData.accessRights);
     resetUserRoles(fullData.userRoles);
     resetLicenses(fullData.licenses);
-    m_context->layoutTourManager()->resetTours(fullData.layoutTours);
+    m_context->showreelManager()->resetTours(fullData.layoutTours);
 
     m_context->resourceAccessProvider()->endUpdate();
     m_context->resourceAccessManager()->endUpdate();

@@ -18,7 +18,6 @@ class QnUserRolesManager;
 class QnCameraHistoryPool;
 class QnResourcePropertyDictionary;
 class QnResourceStatusDictionary;
-class QnLayoutTourManager;
 class QnAuditManager;
 class QnResourceDataPool;
 class QnCommonMessageProcessor;
@@ -64,7 +63,6 @@ public:
     QnResourcePropertyDictionary* resourcePropertyDictionary() const;
     QnResourceStatusDictionary* statusDictionary() const;
     nx::vms::common::SystemSettings* globalSettings() const;
-    QnLayoutTourManager* layoutTourManager() const;
     nx::vms::event::RuleManager* eventRuleManager() const;
     QnAuditManager* auditManager() const;
     QnResourceDataPool* dataPool() const;

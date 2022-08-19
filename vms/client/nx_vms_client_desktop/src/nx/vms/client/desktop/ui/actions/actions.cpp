@@ -1163,7 +1163,7 @@ void initialize(Manager* manager, Action* root)
         .requiredGlobalPermission(GlobalPermission::controlVideowall)
         .text(ContextMenu::tr("Stop Video Wall"))
         .autoRepeat(false)
-        .condition(new RunningVideowallCondition());
+        .condition(condition::videowallIsRunning());
 
     factory(ClearVideoWallScreen)
         .flags(Tree | VideoWallReviewScene | SingleTarget | MultiTarget | VideoWallItemTarget)

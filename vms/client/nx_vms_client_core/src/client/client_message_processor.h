@@ -28,8 +28,6 @@ protected:
 
     virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr& connection) override;
 
-    virtual void handleTourAddedOrUpdated(const nx::vms::api::LayoutTourData& tour) override;
-
     virtual void onResourceStatusChanged(
         const QnResourcePtr &resource,
         nx::vms::api::ResourceStatus status,

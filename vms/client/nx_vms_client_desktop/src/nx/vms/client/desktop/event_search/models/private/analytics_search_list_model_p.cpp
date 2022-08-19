@@ -67,7 +67,6 @@ using StreamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode;
 
 static constexpr milliseconds kMetadataTimerInterval = 1000ms;
 static constexpr milliseconds kDataChangedInterval = 500ms;
-static constexpr milliseconds kUpdateWorkbenchFilterDelay = 100ms;
 
 milliseconds startTime(const ObjectTrack& track)
 {
@@ -429,8 +428,8 @@ void AnalyticsSearchListModel::Private::updateRelevantObjectTypes()
         const auto watcher = q->commonModule()->systemContext()->analyticsTaxonomyStateWatcher();
         if (NX_ASSERT(watcher))
         {
-            relevantObjectTypes = std::move(nx::analytics::taxonomy::getAllDerivedTypeIds(
-                watcher->state().get(), m_selectedObjectType));
+            relevantObjectTypes = nx::analytics::taxonomy::getAllDerivedTypeIds(
+                watcher->state().get(), m_selectedObjectType);
         }
 
         relevantObjectTypes.insert(m_selectedObjectType);

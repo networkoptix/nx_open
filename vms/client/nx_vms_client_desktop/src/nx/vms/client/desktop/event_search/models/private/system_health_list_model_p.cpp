@@ -19,6 +19,7 @@
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
 #include <nx/vms/client/desktop/common/utils/progress_state.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_health/system_health_state.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -82,7 +83,7 @@ SystemHealthListModel::Private::Private(SystemHealthListModel* q) :
     base_type(),
     QnWorkbenchContextAware(q),
     q(q),
-    m_helper(new vms::event::StringsHelper(systemContext())),
+    m_helper(new nx::vms::event::StringsHelper(systemContext())),
     m_popupSystemHealthFilter(qnSettings->popupSystemHealth())
 {
     // Handle system health state.
@@ -335,18 +336,16 @@ QString SystemHealthListModel::Private::description(int index) const
     switch (item.message)
     {
         case QnSystemHealth::RemoteArchiveSyncAvailable:
-        {
             return QnDeviceDependentStrings::getNameFromSet(
                 resourcePool(),
                 QnCameraDeviceStringSet(
                     tr("Not exported archive found on Device %1").arg(resourceName),
                     tr("Not exported archive found on Camera %1").arg(resourceName)),
                 camera);
-        }
         case QnSystemHealth::RemoteArchiveSyncProgress:
-        {
             return tr("Export archive from %1").arg(resourceName);
-        }
+        default:
+            break;
     }
     return {};
 }
@@ -357,10 +356,10 @@ QVariant SystemHealthListModel::Private::progress(int index) const
     switch (item.message)
     {
         case QnSystemHealth::RemoteArchiveSyncProgress:
-        {
             return QVariant::fromValue(
                 ProgressState(item.serverData->getRuntimeParams().progress));
-        }
+        default:
+            break;
     }
     return {};
 }
@@ -372,10 +371,10 @@ QVariant SystemHealthListModel::Private::timestamp(int index) const
     {
         case QnSystemHealth::RemoteArchiveSyncFinished:
         case QnSystemHealth::RemoteArchiveSyncError:
-        {
             return QVariant::fromValue(std::chrono::microseconds(
                 item.serverData->getRuntimeParams().eventTimestampUsec));
-        }
+        default:
+            break;
     }
     return {};
 }
@@ -412,7 +411,6 @@ CommandActionPtr SystemHealthListModel::Private::commandAction(int index) const
             connect(action.data(), &QAction::triggered, this,
                 [this]
                 {
-                    const auto state = context()->instance<SystemHealthState>();
                     const auto parameters = action::Parameters(m_camerasWithDefaultPassword)
                         .withArgument(Qn::ForceShowCamerasList, true);
 
@@ -440,7 +438,7 @@ CommandActionPtr SystemHealthListModel::Private::commandAction(int index) const
         {
             const auto action = CommandActionPtr(new CommandAction(tr("Export")));
             connect(action.data(), &QAction::triggered, this,
-                [this, resource = item.resource]
+                [resource = item.resource]
                 {
                     auto camera = resource.dynamicCast<QnSecurityCamResource>();
                     if (NX_ASSERT(camera))

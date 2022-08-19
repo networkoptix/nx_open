@@ -291,8 +291,12 @@ void QnAbstractResourcePropertyAdaptor::enqueueSaveRequest()
     emit saveRequestQueued();
 }
 
-void QnAbstractResourcePropertyAdaptor::at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key, const QString& prevValue, const QString& newValue)
+void QnAbstractResourcePropertyAdaptor::at_resource_propertyChanged(
+    const QnResourcePtr& resource,
+    const QString& key,
+    const QString& /*prevValue*/,
+    const QString& /*newValue*/)
 {
-    if(key == m_key)
+    if (key == m_key)
         loadValue(resource->getProperty(key));
 }

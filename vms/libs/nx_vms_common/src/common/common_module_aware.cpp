@@ -160,12 +160,6 @@ SystemSettings* QnCommonModuleAware::globalSettings() const
     return m_commonModule ? m_commonModule->systemContext()->globalSettings() : nullptr;
 }
 
-QnLayoutTourManager* QnCommonModuleAware::layoutTourManager() const
-{
-    NX_ASSERT(m_initialized);
-    return m_commonModule ? m_commonModule->systemContext()->layoutTourManager() : nullptr;
-}
-
 nx::vms::event::RuleManager* QnCommonModuleAware::eventRuleManager() const
 {
     NX_ASSERT(m_initialized);

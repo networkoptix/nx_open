@@ -320,7 +320,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createCamerasAndDevicesGroupEntity(
 {
     Qt::ItemFlags camerasAndDevicesitemFlags = {Qt::ItemIsEnabled, Qt::ItemIsSelectable};
     if (userGlobalPermissions().testFlag(GlobalPermission::admin))
-        camerasAndDevicesitemFlags |= {Qt::ItemIsDropEnabled};
+        camerasAndDevicesitemFlags |= Qt::ItemIsDropEnabled;
 
     return makeFlatteningGroup(
         m_itemFactory->createCamerasAndDevicesItem(camerasAndDevicesitemFlags),
@@ -675,11 +675,11 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createShowreelsGroupEntity() const
     const auto showreelItemCreator =
         [this](const QnUuid& id) { return m_itemFactory->createShowreelItem(id); };
 
-    const auto layoutTourManager = m_commonModule->layoutTourManager();
+    const auto showreelManager = m_commonModule->systemContext()->showreelManager();
 
     return makeFlatteningGroup(
         m_itemFactory->createShowreelsItem(),
-        std::make_unique<ShowreelsListEntity>(showreelItemCreator, layoutTourManager),
+        std::make_unique<ShowreelsListEntity>(showreelItemCreator, showreelManager),
         FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy);
 }
 

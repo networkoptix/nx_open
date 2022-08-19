@@ -433,7 +433,7 @@ public:
     virtual ActionVisibility check(const QnResourceWidgetList& widgets, QnWorkbenchContext* context) override;
 
 private:
-    bool check(const QnPtzControllerPtr &controller);
+    bool checkInternal(const QnPtzControllerPtr& controller);
 
 private:
     Ptz::Capabilities m_capabilities;
@@ -441,12 +441,6 @@ private:
 };
 
 class NonEmptyVideowallCondition: public Condition
-{
-public:
-    virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
-};
-
-class RunningVideowallCondition: public Condition
 {
 public:
     virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
@@ -467,7 +461,7 @@ public:
     virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
 };
 
-class IdentifyVideoWallCondition: public RunningVideowallCondition
+class IdentifyVideoWallCondition: public Condition
 {
 public:
     virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
@@ -735,6 +729,8 @@ ConditionWrapper showBetaUpgradeWarning();
 
 /** Checks whether the provided id belongs to a cloud system which requires user interaction. */
 ConditionWrapper isCloudSystemConnectionUserInteractionRequired();
+
+ConditionWrapper videowallIsRunning();
 
 /** Checks if "Save Layout As..." action is applicable. */
 ConditionWrapper canSaveLayoutAs();

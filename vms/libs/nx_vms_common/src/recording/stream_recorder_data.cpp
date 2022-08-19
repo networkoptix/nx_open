@@ -17,6 +17,7 @@ QString Error::toString() const
     switch (code)
     {
         case Code::unknown:
+        case Code::resourceNotFound: //< Exists in cloud part only.
             NX_ASSERT(false, "Unexpected error code");
             return tr("Internal error");
         case Code::containerNotFound:
@@ -41,6 +42,10 @@ QString Error::toString() const
             return tr("Invalid resource type for data export.");
         case Code::dataNotFound:
             return tr("No data exported.");
+        case Code::encryptedArchive:
+            return tr("Archive is encrypted.");
+        case Code::temporaryUnavailable:
+            return tr("Archive is unavailable now. Please try again later.");
     }
 
     return QString();

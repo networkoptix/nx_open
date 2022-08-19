@@ -875,7 +875,9 @@ void ActionHandler::at_openInLayoutAction_triggered()
         executeDelayedParented(
             [this, convertLayout]()
             {
-                CloudLayoutsIntroDialog introDialog;
+                CloudLayoutsIntroDialog introDialog(
+                    CloudLayoutsIntroDialog::Mode::confirmation,
+                    mainWindowWidget());
                 const auto result = introDialog.exec();
 
                 if (result == QDialog::Accepted)
@@ -1249,7 +1251,6 @@ void ActionHandler::at_openNewScene_triggered()
 
 void ActionHandler::moveResourcesToServer(
     const QnResourceList& resources,
-    const QString& sourceGroupId,
     const QnMediaServerResourcePtr& server,
     MoveResourcesResultFunc resultCallback)
 {
@@ -1451,7 +1452,6 @@ void ActionHandler::at_moveCameraAction_triggered() {
 
     moveResourcesToServer(
         resources,
-        /*sourceGroupId*/ {},
         server,
         [](QnSharedResourcePointerList<QnResource> /*moved*/){});
 }
@@ -2196,7 +2196,7 @@ void ActionHandler::undoReplaceCameraActionTriggered()
         return;
 
     const auto callback = nx::utils::guarded(this,
-        [this] (bool success, Handle requestId, ServerConnection::EmptyResponseType requestResult)
+        [this](bool success, auto /*requestId*/, auto /*requestResult*/)
         {
             if (success)
             {

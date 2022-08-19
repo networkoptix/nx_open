@@ -3,7 +3,7 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
-#include <core/resource_management/abstract_save_state_manager.h>
+#include <nx/vms/client/core/utils/save_state_manager.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 
 class QnWorkbenchLayout;
@@ -21,11 +21,11 @@ class LayoutSnapshotStorage;
  * It also provides some functions for layout and snapshot manipulation.
  */
 class NX_VMS_CLIENT_DESKTOP_API LayoutSnapshotManager:
-    public QnAbstractSaveStateManager,
+    public core::SaveStateManager,
     public SystemContextAware
 {
     Q_OBJECT
-    using base_type = QnAbstractSaveStateManager;
+    using base_type = core::SaveStateManager;
 
 public:
     LayoutSnapshotManager(SystemContext* systemContext, QObject* parent = nullptr);

@@ -133,7 +133,6 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
             context->moduleInformation,
             connectionInfo,
             context->sessionTokenExpirationTime,
-            certificateVerifier,
             context->certificateCache,
             serializationFormat,
             /*auditId*/ sessionId());

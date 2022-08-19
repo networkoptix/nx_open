@@ -14,12 +14,12 @@ namespace entity_resource_tree {
 
 using namespace nx::vms::api;
 
-ShowreelItem::ShowreelItem(const QnLayoutTourManager* layoutTourManager, const QnUuid& id):
+ShowreelItem::ShowreelItem(const QnLayoutTourManager* showreelManager, const QnUuid& id):
     base_type()
 {
-    m_tourData = layoutTourManager->tour(id);
+    m_tourData = showreelManager->tour(id);
     m_connectionsGuard.add(
-        layoutTourManager->connect(layoutTourManager, &QnLayoutTourManager::tourChanged,
+        QObject::connect(showreelManager, &QnLayoutTourManager::tourChanged,
         [this](const LayoutTourData& tour) { onLayoutTourChanged(tour); }));
 }
 

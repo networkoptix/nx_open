@@ -8,7 +8,6 @@
 #include <nx/vms/client/core/utils/geometry.h>
 
 namespace nx::vms::client::core {
-namespace ui {
 namespace positioners {
 
 GridAttached::GridAttached(QObject* parent):
@@ -191,5 +190,4 @@ void Grid::updateBounds()
 }
 
 } // namespace positioners
-} // namespace ui
 } // namespace nx::vms::client::core

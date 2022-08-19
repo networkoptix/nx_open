@@ -22,6 +22,7 @@
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/recorder_item_data_helper.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/help/help_topics.h>
 
@@ -492,7 +493,7 @@ AbstractItemPtr ResourceTreeItemFactory::createUserRoleItem(const QnUuid& roleUu
 
 AbstractItemPtr ResourceTreeItemFactory::createShowreelItem(const QnUuid& showreelId)
 {
-    return std::make_unique<ShowreelItem>(layoutTourManager(), showreelId);
+    return std::make_unique<ShowreelItem>(showreelManager(), showreelId);
 }
 
 AbstractItemPtr ResourceTreeItemFactory::createVideoWallScreenItem(
@@ -540,9 +541,9 @@ SystemSettings* ResourceTreeItemFactory::globalSettings() const
     return m_commonModule->globalSettings();
 }
 
-QnLayoutTourManager* ResourceTreeItemFactory::layoutTourManager() const
+QnLayoutTourManager* ResourceTreeItemFactory::showreelManager() const
 {
-    return m_commonModule->layoutTourManager();
+    return m_commonModule->systemContext()->showreelManager();
 }
 
 } // namespace entity_resource_tree

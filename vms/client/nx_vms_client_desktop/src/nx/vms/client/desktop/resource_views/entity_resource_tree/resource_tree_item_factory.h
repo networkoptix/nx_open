@@ -98,7 +98,7 @@ public:
 private:
     QnResourcePool* resourcePool() const;
     nx::vms::common::SystemSettings* globalSettings() const;
-    QnLayoutTourManager* layoutTourManager() const;
+    QnLayoutTourManager* showreelManager() const;
 
 private:
     const QnCommonModule* m_commonModule;

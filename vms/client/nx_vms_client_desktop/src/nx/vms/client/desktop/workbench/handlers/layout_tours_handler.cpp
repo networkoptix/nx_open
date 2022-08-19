@@ -4,31 +4,27 @@
 
 #include <QtWidgets/QAction>
 
-#include <common/common_module.h>
-
 #include <client_core/client_core_module.h>
-
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/layout_tour_manager.h>
-#include <core/resource_management/layout_tour_state_manager.h>
+#include <common/common_module.h>
 #include <core/resource/user_resource.h>
-
-#include <nx_ec/abstract_ec_connection.h>
-#include <nx_ec/managers/abstract_layout_tour_manager.h>
-
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <ui/dialogs/common/message_box.h>
-#include <ui/dialogs/common/session_aware_dialog.h>
-#include <nx/vms/client/desktop/ui/messages/resources_messages.h>
+#include <core/resource_management/layout_tour_manager.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/utils/string.h>
+#include <nx/vms/client/desktop/layout_tour/showreel_state_manager.h>
 #include <nx/vms/client/desktop/style/skin.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench.h>
-#include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/workbench_state_manager.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <nx/vms/client/desktop/workbench/extensions/workbench_layout_tour_executor.h>
 #include <nx/vms/client/desktop/workbench/extensions/workbench_layout_tour_review_controller.h>
-
-#include <nx/utils/string.h>
+#include <nx_ec/abstract_ec_connection.h>
+#include <nx_ec/managers/abstract_layout_tour_manager.h>
+#include <ui/dialogs/common/message_box.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_state_manager.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {
@@ -40,10 +36,10 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
     m_tourExecutor(new LayoutTourExecutor(this)),
     m_reviewController(new LayoutTourReviewController(this))
 {
-    connect(layoutTourManager(), &QnLayoutTourManager::tourChanged, m_tourExecutor,
+    connect(systemContext()->showreelManager(), &QnLayoutTourManager::tourChanged, m_tourExecutor,
         &LayoutTourExecutor::updateTour);
 
-    connect(layoutTourManager(), &QnLayoutTourManager::tourRemoved, m_tourExecutor,
+    connect(systemContext()->showreelManager(), &QnLayoutTourManager::tourRemoved, m_tourExecutor,
         &LayoutTourExecutor::stopTour);
 
     connect(action(action::NewLayoutTourAction), &QAction::triggered, this,
@@ -54,7 +50,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
                 return;
 
             QStringList usedNames;
-            for (const auto& tour: layoutTourManager()->tours())
+            for (const auto& tour: systemContext()->showreelManager()->tours())
                 usedNames << tour.name;
 
             nx::vms::api::LayoutTourData tour;
@@ -62,7 +58,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             tour.parentId = context()->user()->getId();
             tour.name = nx::utils::generateUniqueString(
                 usedNames, tr("Showreel"), tr("Showreel %1"));
-            layoutTourManager()->addOrUpdateTour(tour);
+            systemContext()->showreelManager()->addOrUpdateTour(tour);
             saveTourToServer(tour);
             menu()->trigger(action::SelectNewItemAction, {Qn::UuidRole, tour.id});
             menu()->trigger(action::ReviewLayoutTourAction, {Qn::UuidRole, tour.id});
@@ -83,7 +79,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
         {
             const auto parameters = menu()->currentParameters(sender());
             auto id = parameters.argument<QnUuid>(Qn::UuidRole);
-            auto tour = layoutTourManager()->tour(id);
+            auto tour = systemContext()->showreelManager()->tour(id);
             if (!tour.isValid())
                 return;
 
@@ -92,7 +88,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             const QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
 
             // Ask to override tour with the same name (if any). Create local copy to avoid crash.
-            const auto tours = layoutTourManager()->tours();
+            const auto tours = systemContext()->showreelManager()->tours();
             for (const auto& other: tours)
             {
                 if (other.id == id)
@@ -106,13 +102,13 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
                     if (!ui::messages::Resources::overrideLayoutTour(mainWindowWidget()))
                         return;
 
-                    layoutTourManager()->removeTour(other.id);
+                    systemContext()->showreelManager()->removeTour(other.id);
                     removeTourFromServer(other.id);
                 }
             }
 
             tour.name = name;
-            layoutTourManager()->addOrUpdateTour(tour);
+            systemContext()->showreelManager()->addOrUpdateTour(tour);
             saveTourToServer(tour);
         });
 
@@ -123,7 +119,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             auto id = parameters.argument<QnUuid>(Qn::UuidRole);
             NX_ASSERT(!id.isNull());
 
-            const auto tour = layoutTourManager()->tour(id);
+            const auto tour = systemContext()->showreelManager()->tour(id);
             if (!tour.name.isEmpty())
             {
                 QnSessionAwareMessageBox messageBox(mainWindowWidget());
@@ -136,7 +132,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
                     return;
             }
 
-            layoutTourManager()->removeTour(id);
+            systemContext()->showreelManager()->removeTour(id);
             removeTourFromServer(id);
         });
 
@@ -170,7 +166,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             else
             {
                 NX_ASSERT(toggled);
-                m_tourExecutor->startTour(layoutTourManager()->tour(id));
+                m_tourExecutor->startTour(systemContext()->showreelManager()->tour(id));
                 //TODO: #spanasenko Is it necessary here?
                 //context()->instance<QnWorkbenchStateManager>()->saveState();
             }
@@ -196,7 +192,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
         {
             const auto parameters = menu()->currentParameters(sender());
             auto id = parameters.argument<QnUuid>(Qn::UuidRole);
-            auto tour = layoutTourManager()->tour(id);
+            auto tour = systemContext()->showreelManager()->tour(id);
             if (!tour.isValid())
                 return;
             saveTourToServer(tour);
@@ -248,8 +244,8 @@ QnUuid LayoutToursHandler::runningTour() const
 
 void LayoutToursHandler::saveTourToServer(const nx::vms::api::LayoutTourData& tour)
 {
-    NX_ASSERT(layoutTourManager()->tour(tour.id).isValid());
-    auto stateManager = qnClientCoreModule->layoutTourStateManager();
+    NX_ASSERT(systemContext()->showreelManager()->tour(tour.id).isValid());
+    auto stateManager = systemContext()->showreelStateManager();
 
     if (const auto connection = messageBusConnection())
     {

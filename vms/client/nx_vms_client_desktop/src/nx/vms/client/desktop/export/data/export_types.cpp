@@ -14,11 +14,16 @@ ExportProcessError convertError(const std::optional<nx::recording::Error>& value
 
     switch (value->code)
     {
+        case Error::Code::unknown:
+        case Error::Code::resourceNotFound: //< Exists in cloud part only.
+            return ExportProcessError::internalError;
+
         case Error::Code::containerNotFound:
             return ExportProcessError::unsupportedFormat;
 
         case Error::Code::videoStreamAllocation:
         case Error::Code::audioStreamAllocation:
+        case Error::Code::metadataStreamAllocation:
             return ExportProcessError::ffmpegError;
 
         case Error::Code::incompatibleCodec:
@@ -43,12 +48,9 @@ ExportProcessError convertError(const std::optional<nx::recording::Error>& value
 
         case Error::Code::temporaryUnavailable:
             return ExportProcessError::temporaryUnavailable;
-
-        default:
-            break;
     }
 
-    return ExportProcessError::noError;
+    return ExportProcessError::internalError;
 }
 
 } // namespace nx::vms::client::desktop

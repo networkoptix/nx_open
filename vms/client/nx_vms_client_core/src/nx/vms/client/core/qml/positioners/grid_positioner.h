@@ -5,7 +5,6 @@
 #include <QtQuick/QQuickItem>
 
 namespace nx::vms::client::core {
-namespace ui {
 namespace positioners {
 
 class Grid;
@@ -75,7 +74,6 @@ private:
 };
 
 } // namespace positioners
-} // namespace ui
 } // namespace nx::vms::client::core
 
-QML_DECLARE_TYPEINFO(nx::vms::client::core::ui::positioners::Grid, QML_HAS_ATTACHED_PROPERTIES)
+QML_DECLARE_TYPEINFO(nx::vms::client::core::positioners::Grid, QML_HAS_ATTACHED_PROPERTIES)

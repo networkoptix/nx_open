@@ -84,7 +84,7 @@ void DeviceAgentSettingsAdapter::setCamera(const QnVirtualCameraResourcePtr& cam
                 d->settingsListener.get(),
                 &AnalyticsSettingsMultiListener::actionResultReceived,
                 this,
-                [this](const QnUuid& engineId, const AnalyticsActionResult& result)
+                [this](const QnUuid& /*engineId*/, const AnalyticsActionResult& result)
                 {
                     AnalyticsSettingsActionsHelper::processResult(result, d->context, d->parent);
                 });

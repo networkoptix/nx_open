@@ -26,10 +26,6 @@
 
 namespace {
 
-using namespace std::chrono;
-
-constexpr milliseconds kCheckInterval = minutes(2);
-
 template<typename T>
 bool trimConnectionsList(QList<T>& list)
 {

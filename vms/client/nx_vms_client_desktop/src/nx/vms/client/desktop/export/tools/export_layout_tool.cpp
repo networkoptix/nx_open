@@ -290,7 +290,7 @@ bool ExportLayoutTool::exportMetadata(const ItemInfoList &items)
     /* Additional flags. */
     {
         quint32 flags = d->settings.readOnly ? QnLayoutFileStorageResource::ReadOnly : 0;
-        for (const QnMediaResourcePtr resource : d->resources)
+        for (const QnMediaResourcePtr& resource : d->resources)
         {
             if (resource->toResource()->hasFlags(Qn::utc))
             {
@@ -470,7 +470,7 @@ bool ExportLayoutTool::exportNextCamera()
     return exportMediaResource(d->resources.dequeue());
 }
 
-void ExportLayoutTool::finishExport(bool success)
+void ExportLayoutTool::finishExport(bool /*success*/)
 {
     d->finishExport();
 }

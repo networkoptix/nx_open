@@ -39,7 +39,6 @@ using namespace std::chrono;
 namespace {
 
 static constexpr auto kReconnectDelay = 3s;
-static constexpr auto kTerminateServerSessionTimeout = 3s;
 static constexpr auto kTokenExpirationUpdateInterval = 1min;
 
 } // namespace
@@ -82,7 +81,7 @@ void RemoteSession::Private::updateTokenExpirationTime()
         nx::utils::guarded(connection.get(),
             [connection = connection.get()](
                 bool success,
-                rest::Handle requestId,
+                rest::Handle /*requestId*/,
                 QByteArray data,
                 nx::network::http::HttpHeaders)
             {
@@ -236,7 +235,7 @@ void RemoteSession::setAutoTerminate(bool value)
     d->autoTerminate = value;
 }
 
-bool RemoteSession::keepCurrentServerOnError(RemoteConnectionErrorCode error)
+bool RemoteSession::keepCurrentServerOnError(RemoteConnectionErrorCode /*error*/)
 {
     return false;
 }

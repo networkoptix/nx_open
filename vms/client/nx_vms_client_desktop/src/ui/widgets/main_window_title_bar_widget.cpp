@@ -23,6 +23,7 @@
 #include <nx/vms/client/desktop/common/widgets/tool_button.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_tab_bar/system_tab_bar.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
@@ -47,7 +48,6 @@ namespace {
 const int kTitleBarHeight = 24;
 const QSize kControlButtonSize(36, kTitleBarHeight);
 const auto kTabBarButtonSize = QSize(kTitleBarHeight, kTitleBarHeight);
-const auto kSystemBarButtonSize = QSize(41, 32);
 
 QFrame* newVLine()
 {
@@ -338,7 +338,7 @@ void QnMainWindowTitleBarWidget::dropEvent(QDropEvent* event)
     if (d->mimeData->isEmpty())
         return;
 
-    const auto layoutTours = layoutTourManager()->tours(d->mimeData->entities());
+    const auto layoutTours = systemContext()->showreelManager()->tours(d->mimeData->entities());
     for (const auto& tour: layoutTours)
         menu()->trigger(action::ReviewLayoutTourAction, {Qn::UuidRole, tour.id});
 

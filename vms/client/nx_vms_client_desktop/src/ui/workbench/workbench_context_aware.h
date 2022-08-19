@@ -15,7 +15,11 @@ class QnWorkbenchDisplay;
 class QnWorkbenchNavigator;
 class QnWorkbenchCustomizer;
 
-namespace nx::vms::client::desktop { class MainWindow; }
+namespace nx::vms::client::desktop {
+class MainWindow;
+class SystemContext;
+} // namespace nx::vms::client::desktop
+
 /**
  * This class simplifies access to workbench context.
  *
@@ -69,6 +73,8 @@ public:
     /** Initialize context manually. */
     void initializeContext();
 
+    nx::vms::client::desktop::SystemContext* systemContext() const;
+
 protected:
     QAction* action(const nx::vms::client::desktop::ui::action::IDType id) const;
 
@@ -102,4 +108,3 @@ private:
     InitializationMode m_initializationMode = InitializationMode::instant;
     QnWorkbenchContext* m_context = nullptr;
 };
-

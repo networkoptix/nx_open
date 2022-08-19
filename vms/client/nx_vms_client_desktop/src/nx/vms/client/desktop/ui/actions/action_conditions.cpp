@@ -220,7 +220,9 @@ public:
     {
     }
 
-    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override
+    virtual ActionVisibility check(
+        const Parameters& parameters,
+        QnWorkbenchContext* context) override
     {
         return m_delegate(parameters, context)
             ? EnabledAction
@@ -242,7 +244,9 @@ public:
     {
     }
 
-    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override
+    virtual ActionVisibility check(
+        const Parameters& parameters,
+        QnWorkbenchContext* context) override
     {
         return m_delegate(parameters, context);
     }
@@ -475,7 +479,7 @@ ConditionWrapper PreventWhenFullscreenTransition::condition()
 }
 
 ActionVisibility PreventWhenFullscreenTransition::check(
-    const Parameters& parameters,
+    const Parameters& /*parameters*/,
     QnWorkbenchContext* context)
 {
     return !nx::build_info::isMacOsX() || context->mainWindow()->updatesEnabled()
@@ -533,7 +537,9 @@ SmartSearchCondition::SmartSearchCondition():
 {
 }
 
-ActionVisibility SmartSearchCondition::check(const QnResourceWidgetList& widgets, QnWorkbenchContext* /*context*/)
+ActionVisibility SmartSearchCondition::check(
+    const QnResourceWidgetList& widgets,
+    QnWorkbenchContext* /*context*/)
 {
     for (auto widget: widgets)
     {
@@ -571,7 +577,9 @@ ActionVisibility DisplayInfoCondition::check(
     return enabled ? EnabledAction : InvisibleAction;
 }
 
-ActionVisibility ClearMotionSelectionCondition::check(const QnResourceWidgetList& widgets, QnWorkbenchContext* /*context*/)
+ActionVisibility ClearMotionSelectionCondition::check(
+    const QnResourceWidgetList& widgets,
+    QnWorkbenchContext* /*context*/)
 {
     bool hasDisplayedGrid = false;
 
@@ -585,9 +593,13 @@ ActionVisibility ClearMotionSelectionCondition::check(const QnResourceWidgetList
             hasDisplayedGrid = true;
 
             if (auto mediaWidget = dynamic_cast<const QnMediaResourceWidget*>(widget))
-                foreach(const QRegion &region, mediaWidget->motionSelection())
-                if (!region.isEmpty())
-                    return EnabledAction;
+            {
+                for (const QRegion& region: mediaWidget->motionSelection())
+                {
+                    if (!region.isEmpty())
+                        return EnabledAction;
+                }
+            }
         }
     }
 
@@ -1009,7 +1021,7 @@ ActionVisibility StartCurrentLayoutTourCondition::check(const Parameters& /*para
 {
     const auto tourId = context->workbench()->currentLayout()->data()
         .value(Qn::LayoutTourUuidRole).value<QnUuid>();
-    const auto tour = context->layoutTourManager()->tour(tourId);
+    const auto tour = context->systemContext()->showreelManager()->tour(tourId);
     if (tour.isValid() && tour.items.size() > 0)
         return EnabledAction;
     return DisabledAction;
@@ -1247,9 +1259,11 @@ ActionVisibility OpenInNewEntityCondition::check(
         : InvisibleAction;
 }
 
-ActionVisibility OpenInNewEntityCondition::check(const QnLayoutItemIndexList& layoutItems, QnWorkbenchContext* context)
+ActionVisibility OpenInNewEntityCondition::check(
+    const QnLayoutItemIndexList& layoutItems,
+    QnWorkbenchContext* context)
 {
-    foreach(const QnLayoutItemIndex &index, layoutItems)
+    for (const QnLayoutItemIndex& index: layoutItems)
     {
         QnLayoutItemData itemData = index.layout()->getItem(index.uuid());
         if (itemData.zoomRect.isNull())
@@ -1259,13 +1273,17 @@ ActionVisibility OpenInNewEntityCondition::check(const QnLayoutItemIndexList& la
     return InvisibleAction;
 }
 
-ActionVisibility OpenInNewEntityCondition::check(const Parameters& parameters, QnWorkbenchContext* context)
+ActionVisibility OpenInNewEntityCondition::check(
+    const Parameters& parameters,
+    QnWorkbenchContext* context)
 {
     /* Make sure we will get to specialized implementation */
     return Condition::check(parameters, context);
 }
 
-ActionVisibility SetAsBackgroundCondition::check(const QnResourceList& resources, QnWorkbenchContext* context)
+ActionVisibility SetAsBackgroundCondition::check(
+    const QnResourceList& resources,
+    QnWorkbenchContext* context)
 {
     if (resources.size() != 1)
         return InvisibleAction;
@@ -1282,7 +1300,9 @@ ActionVisibility SetAsBackgroundCondition::check(const QnResourceList& resources
     return EnabledAction;
 }
 
-ActionVisibility SetAsBackgroundCondition::check(const QnLayoutItemIndexList& layoutItems, QnWorkbenchContext* context)
+ActionVisibility SetAsBackgroundCondition::check(
+    const QnLayoutItemIndexList& layoutItems,
+    QnWorkbenchContext* context)
 {
     foreach(const QnLayoutItemIndex &index, layoutItems)
     {
@@ -1294,9 +1314,11 @@ ActionVisibility SetAsBackgroundCondition::check(const QnLayoutItemIndexList& la
     return InvisibleAction;
 }
 
-ActionVisibility BrowseLocalFilesCondition::check(const Parameters& /*parameters*/, QnWorkbenchContext* context)
+ActionVisibility BrowseLocalFilesCondition::check(
+    const Parameters& /*parameters*/,
+    QnWorkbenchContext* /*context*/)
 {
-    return (qnClientCoreModule->networkModule()->isConnected() ? InvisibleAction : EnabledAction);
+    return qnClientCoreModule->networkModule()->isConnected() ? InvisibleAction : EnabledAction;
 }
 
 ActionVisibility ChangeResolutionCondition::check(const Parameters& parameters,
@@ -1309,7 +1331,7 @@ ActionVisibility ChangeResolutionCondition::check(const Parameters& parameters,
     std::vector<QnLayoutItemData> items;
     if (!parameters.layoutItems().empty())
     {
-        for (const auto idx: parameters.layoutItems())
+        for (const auto& idx: parameters.layoutItems())
             items.push_back(idx.layout()->getItem(idx.uuid()));
     }
     else // Use all items from the current layout.
@@ -1360,50 +1382,58 @@ ActionVisibility PtzCondition::check(const Parameters& parameters, QnWorkbenchCo
     return Condition::check(parameters, context);
 }
 
-ActionVisibility PtzCondition::check(const QnResourceList& resources, QnWorkbenchContext* /*context*/)
+ActionVisibility PtzCondition::check(
+    const QnResourceList& resources,
+    QnWorkbenchContext* /*context*/)
 {
-    foreach(const QnResourcePtr &resource, resources)
+    for (const QnResourcePtr& resource: resources)
     {
         auto ptzPool = qnClientCoreModule->commonModule()->findInstance<QnPtzControllerPool>();
-        if (!check(ptzPool->controller(resource)))
+        if (!checkInternal(ptzPool->controller(resource)))
             return InvisibleAction;
     }
 
-    if (m_disableIfPtzDialogVisible && QnPtzManageDialog::instance() && QnPtzManageDialog::instance()->isVisible())
+    const auto ptzManagementDialog = QnPtzManageDialog::instance();
+    if (m_disableIfPtzDialogVisible && ptzManagementDialog && ptzManagementDialog->isVisible())
         return DisabledAction;
 
     return EnabledAction;
 }
 
-ActionVisibility PtzCondition::check(const QnResourceWidgetList& widgets, QnWorkbenchContext* /*context*/)
+ActionVisibility PtzCondition::check(
+    const QnResourceWidgetList& widgets,
+    QnWorkbenchContext* /*context*/)
 {
-    for (auto widget: widgets)
+    for (const auto& widget: widgets)
     {
         auto mediaWidget = dynamic_cast<const QnMediaResourceWidget*>(widget);
         if (!mediaWidget)
             return InvisibleAction;
 
-        if (!check(mediaWidget->ptzController()))
+        if (!checkInternal(mediaWidget->ptzController()))
             return InvisibleAction;
 
         if (mediaWidget->isZoomWindow())
             return InvisibleAction;
     }
 
-    if (m_disableIfPtzDialogVisible && QnPtzManageDialog::instance() && QnPtzManageDialog::instance()->isVisible())
+    const auto ptzManagementDialog = QnPtzManageDialog::instance();
+    if (m_disableIfPtzDialogVisible && ptzManagementDialog && ptzManagementDialog->isVisible())
         return DisabledAction;
 
     return EnabledAction;
 }
 
-bool PtzCondition::check(const QnPtzControllerPtr &controller)
+bool PtzCondition::checkInternal(const QnPtzControllerPtr& controller)
 {
     return controller && controller->hasCapabilities(m_capabilities);
 }
 
-ActionVisibility NonEmptyVideowallCondition::check(const QnResourceList& resources, QnWorkbenchContext* /*context*/)
+ActionVisibility NonEmptyVideowallCondition::check(
+    const QnResourceList& resources,
+    QnWorkbenchContext* /*context*/)
 {
-    foreach(const QnResourcePtr &resource, resources)
+    for (const QnResourcePtr& resource: resources)
     {
         if (!resource->hasFlags(Qn::videowall))
             continue;
@@ -1475,41 +1505,16 @@ ActionVisibility SaveVideowallReviewCondition::check(
     return DisabledAction;
 }
 
-ActionVisibility RunningVideowallCondition::check(const QnResourceList& resources, QnWorkbenchContext* /*context*/)
-{
-    bool hasNonEmptyVideowall = false;
-    foreach(const QnResourcePtr &resource, resources)
-    {
-        if (!resource->hasFlags(Qn::videowall))
-            continue;
-
-        QnVideoWallResourcePtr videowall = resource.dynamicCast<QnVideoWallResource>();
-        if (!videowall)
-            continue;
-
-        if (videowall->items()->getItems().isEmpty())
-            continue;
-
-        hasNonEmptyVideowall = true;
-        if (videowall->onlineItems().isEmpty())
-            continue;
-
-        return EnabledAction;
-    }
-
-    return hasNonEmptyVideowall
-        ? DisabledAction
-        : InvisibleAction;
-}
-
-ActionVisibility StartVideowallCondition::check(const QnResourceList& resources, QnWorkbenchContext* /*context*/)
+ActionVisibility StartVideowallCondition::check(
+    const QnResourceList& resources,
+    QnWorkbenchContext* /*context*/)
 {
     QnUuid pcUuid = qnSettings->pcUuid();
     if (pcUuid.isNull())
         return InvisibleAction;
 
     bool hasAttachedItems = false;
-    foreach(const QnResourcePtr &resource, resources)
+    for (const QnResourcePtr& resource: resources)
     {
         if (!resource->hasFlags(Qn::videowall))
             continue;
@@ -1521,7 +1526,7 @@ ActionVisibility StartVideowallCondition::check(const QnResourceList& resources,
         if (!videowall->pcs()->hasItem(pcUuid))
             continue;
 
-        foreach(const QnVideoWallItem &item, videowall->items()->getItems())
+        for (const QnVideoWallItem& item: videowall->items()->getItems())
         {
             if (item.pcUuid != pcUuid)
                 continue;
@@ -1538,15 +1543,18 @@ ActionVisibility StartVideowallCondition::check(const QnResourceList& resources,
         : InvisibleAction;
 }
 
-ActionVisibility IdentifyVideoWallCondition::check(const Parameters& parameters, QnWorkbenchContext* context)
+ActionVisibility IdentifyVideoWallCondition::check(
+    const Parameters& parameters,
+    QnWorkbenchContext* context)
 {
     if (parameters.videoWallItems().size() > 0)
     {
         // allow action if there is at least one online item
-        foreach(const QnVideoWallItemIndex &index, parameters.videoWallItems())
+        for (const QnVideoWallItemIndex& index: parameters.videoWallItems())
         {
             if (!index.isValid())
                 continue;
+
             if (index.item().runtimeStatus.online)
                 return EnabledAction;
         }
@@ -1554,9 +1562,10 @@ ActionVisibility IdentifyVideoWallCondition::check(const Parameters& parameters,
     }
 
     /* 'Identify' action should not be displayed as disabled anyway. */
-    ActionVisibility baseResult = Condition::check(parameters, context);
+    ActionVisibility baseResult = condition::videowallIsRunning()->check(parameters, context);
     if (baseResult != EnabledAction)
         return InvisibleAction;
+
     return EnabledAction;
 }
 
@@ -1779,7 +1788,7 @@ ActionVisibility CloudServerCondition::check(const QnResourceList& resources, Qn
 }
 
 ActionVisibility ReachableServerCondition::check(
-    const Parameters& parameters, QnWorkbenchContext* context)
+    const Parameters& parameters, QnWorkbenchContext* /*context*/)
 {
     const auto server = parameters.resource().dynamicCast<QnMediaServerResource>();
     if (!server || server->hasFlags(Qn::fake))
@@ -1845,7 +1854,7 @@ ActionVisibility ReplaceCameraCondition::check(const Parameters& parameters, QnW
 
 ActionVisibility CreateNewResourceTreeGroupCondition::check(
     const Parameters& parameters,
-    QnWorkbenchContext* context)
+    QnWorkbenchContext* /*context*/)
 {
     using namespace entity_resource_tree::resource_grouping;
 
@@ -1896,22 +1905,22 @@ ActionVisibility CreateNewResourceTreeGroupCondition::check(
 }
 
 ActionVisibility AssignResourceTreeGroupIdCondition::check(
-    const QnResourceList& resources,
-    QnWorkbenchContext* context)
+    const QnResourceList& /*resources*/,
+    QnWorkbenchContext* /*context*/)
 {
     return EnabledAction;
 }
 
 ActionVisibility MoveResourceTreeGroupIdCondition::check(
-    const QnResourceList& resources,
-    QnWorkbenchContext* context)
+    const QnResourceList& /*resources*/,
+    QnWorkbenchContext* /*context*/)
 {
     return EnabledAction;
 }
 
 ActionVisibility RenameResourceTreeGroupCondition::check(
     const Parameters& parameters,
-    QnWorkbenchContext* context)
+    QnWorkbenchContext* /*context*/)
 {
     return parameters.argument(Qn::SelectedGroupIdsRole).toStringList().count() == 1
         ? EnabledAction
@@ -1920,7 +1929,7 @@ ActionVisibility RenameResourceTreeGroupCondition::check(
 
 ActionVisibility RemoveResourceTreeGroupCondition::check(
     const Parameters& parameters,
-    QnWorkbenchContext* context)
+    QnWorkbenchContext* /*context*/)
 {
     return parameters.argument(Qn::SelectedGroupFullyMatchesFilter).toBool()
         ? EnabledAction
@@ -1950,7 +1959,7 @@ ConditionWrapper isTrue(bool value)
 ConditionWrapper isLoggedIn()
 {
     return new CustomBoolCondition(
-        [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
+        [](const Parameters& /*parameters*/, QnWorkbenchContext* /*context*/)
         {
             return qnClientCoreModule->networkModule()->isConnected();
         });
@@ -2205,7 +2214,7 @@ ConditionWrapper currentLayoutIsVideowallScreen()
 ConditionWrapper canForgetPassword()
 {
     return new CustomBoolCondition(
-        [](const Parameters& parameters, QnWorkbenchContext* context)
+        [](const Parameters& parameters, QnWorkbenchContext* /*context*/)
         {
             const auto layout = parameters.resource().dynamicCast<QnFileLayoutResource>();
             return layout && layout->isEncrypted() && !layout->requiresPassword();
@@ -2225,7 +2234,7 @@ ConditionWrapper canMakeShowreel()
 ConditionWrapper isWorkbenchVisible()
 {
     return new CustomBoolCondition(
-        [](const Parameters& parameters, QnWorkbenchContext* context)
+        [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
         {
             return context->isWorkbenchVisible();
         });
@@ -2234,7 +2243,7 @@ ConditionWrapper isWorkbenchVisible()
 ConditionWrapper hasSavedWindowsState()
 {
     return new CustomBoolCondition(
-        [](const Parameters& parameters, QnWorkbenchContext* context)
+        [](const Parameters& /*parameters*/, QnWorkbenchContext* /*context*/)
         {
             return appContext()->clientStateHandler()->hasSavedConfiguration();
         });
@@ -2243,7 +2252,7 @@ ConditionWrapper hasSavedWindowsState()
 ConditionWrapper hasOtherWindowsInSession()
 {
     return new CustomBoolCondition(
-        [](const Parameters& parameters, QnWorkbenchContext* context)
+        [](const Parameters& /*parameters*/, QnWorkbenchContext* /*context*/)
         {
             return !appContext()->sharedMemoryManager()->isLastInstanceInCurrentSession();
         });
@@ -2252,7 +2261,7 @@ ConditionWrapper hasOtherWindowsInSession()
 ConditionWrapper hasOtherWindows()
 {
     return new CustomBoolCondition(
-        [](const Parameters& parameters, QnWorkbenchContext* context)
+        [](const Parameters& /*parameters*/, QnWorkbenchContext* /*context*/)
         {
             return appContext()->sharedMemoryManager()->runningInstancesIndices().size() > 1;
         });
@@ -2261,7 +2270,7 @@ ConditionWrapper hasOtherWindows()
 ConditionWrapper hasNewEventRulesEngine()
 {
     return new CustomBoolCondition(
-        [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
+        [](const Parameters& /*parameters*/, QnWorkbenchContext* /*context*/)
         {
             auto engine = appContext()->currentSystemContext()->vmsRulesEngine();
             return engine && engine->isEnabled();
@@ -2312,6 +2321,25 @@ ConditionWrapper isCloudSystemConnectionUserInteractionRequired()
     );
 }
 
+ConditionWrapper videowallIsRunning()
+{
+    return new ResourceCondition(
+        [](const QnResourcePtr& resource)
+        {
+            const auto videowall = resource.dynamicCast<QnVideoWallResource>();
+            if (!videowall)
+                return InvisibleAction;
+
+            if (videowall->items()->getItems().isEmpty())
+                return InvisibleAction;
+
+            if (videowall->onlineItems().isEmpty())
+                return DisabledAction;
+
+            return EnabledAction;
+        }, MatchMode::any);
+}
+
 ConditionWrapper canSaveLayoutAs()
 {
     return new CustomBoolCondition(
@@ -2340,6 +2368,7 @@ ConditionWrapper canSaveLayoutAs()
         }
     );
 }
+
 
 } // namespace condition
 } // namespace action

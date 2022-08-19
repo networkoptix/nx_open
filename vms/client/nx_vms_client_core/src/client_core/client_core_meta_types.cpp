@@ -15,7 +15,6 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
-#include <helpers/nx_globals_object.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/api/data/software_version.h>
 #include <nx/vms/api/types/dewarping_types.h>
@@ -37,6 +36,9 @@
 #include <nx/vms/client/core/motion/items/motion_mask_item.h>
 #include <nx/vms/client/core/network/oauth_client.h>
 #include <nx/vms/client/core/network/server_certificate_validation_level.h>
+#include <nx/vms/client/core/qml/nx_globals_object.h>
+#include <nx/vms/client/core/qml/positioners/grid_positioner.h>
+#include <nx/vms/client/core/qml/qml_test_helper.h>
 #include <nx/vms/client/core/resource/media_dewarping_params.h>
 #include <nx/vms/client/core/resource/media_resource_helper.h>
 #include <nx/vms/client/core/resource/resource_helper.h>
@@ -51,12 +53,10 @@
 #include <nx/vms/client/core/utils/persistent_index_watcher.h>
 #include <nx/vms/client/core/utils/quick_item_mouse_tracker.h>
 #include <nx/vms/rules/metatypes.h>
-#include <test/qml_test_helper.h>
 #include <ui/models/authentication_data_model.h>
 #include <ui/models/model_data_accessor.h>
 #include <ui/models/ordered_systems_model.h>
 #include <ui/models/system_hosts_model.h>
-#include <ui/positioners/grid_positioner.h>
 
 namespace nx::vms::client::core {
 
@@ -64,7 +64,7 @@ namespace {
 
 static QObject* createNxGlobals(QQmlEngine*, QJSEngine*)
 {
-    return new nx::vms::client::core::NxGlobalsObject();
+    return new NxGlobalsObject();
 }
 
 } // namespace
@@ -91,7 +91,7 @@ void initializeMetaTypes()
     qmlRegisterUncreatableType<QAbstractItemModel>("Nx", 1, 0, "AbstractItemModel",
         "Cannot create instance of AbstractItemModel.");
 
-    qmlRegisterType<QnQmlTestHelper>("Nx.Test", 1, 0, "QmlTestHelper");
+    qmlRegisterType<QmlTestHelper>("Nx.Test", 1, 0, "QmlTestHelper");
     qmlRegisterType<ScenePositionListener>("nx.vms.client.core", 1, 0, "ScenePositionListener");
     qmlRegisterType<ResourceHelper>("Nx.Core", 1, 0, "ResourceHelper");
     qmlRegisterType<MediaResourceHelper>("Nx.Core", 1, 0, "MediaResourceHelper");
@@ -101,7 +101,7 @@ void initializeMetaTypes()
     qmlRegisterType<QnOrderedSystemsModel>("Nx.Models", 1, 0, "OrderedSystemsModel");
     qmlRegisterType<nx::client::ModelDataAccessor>("Nx.Models", 1, 0, "ModelDataAccessor");
 
-    qmlRegisterType<ui::positioners::Grid>("Nx.Positioners", 1, 0, "Grid");
+    qmlRegisterType<positioners::Grid>("Nx.Positioners", 1, 0, "Grid");
 
     animation::KineticAnimation::registerQmlType();
 

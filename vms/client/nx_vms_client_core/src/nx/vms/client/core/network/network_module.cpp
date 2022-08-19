@@ -69,7 +69,6 @@ NetworkModule::NetworkModule(
         serializationFormat);
 
     d->serverCertificateWatcher = std::make_unique<ServerCertificateWatcher>(
-        commonModule,
         d->certificateVerifier.get());
 
     d->sessionTimeoutWatcher = std::make_unique<RemoteSessionTimeoutWatcher>(

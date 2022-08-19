@@ -35,7 +35,6 @@ using namespace nx::vms::client::desktop;
 
 static constexpr int kDialogFixedWidth = 640;
 static constexpr int kHeaderCaptionTextPixelSize = 24;
-static constexpr auto kHeaderCaptionTextWeight = QFont::ExtraLight;
 static constexpr auto kEmDashChar = QChar(0x2014);
 
 bool showServersInTree(const QnWorkbenchContext* context)
@@ -225,12 +224,10 @@ CameraReplacementDialog::CameraReplacementDialog(
     :
     base_type(parent),
     ui(new Ui::CameraReplacementDialog),
-    d(new Private{this})
+    d(new Private{.q=this, .cameraToBeReplaced=cameraToBeReplaced})
 {
     ui->setupUi(this);
     setFixedWidth(kDialogFixedWidth);
-
-    d->cameraToBeReplaced = cameraToBeReplaced;
 
     d->resourceSelectionWidget =
         new ResourceSelectionWidget(this, resource_selection_view::ColumnCount);

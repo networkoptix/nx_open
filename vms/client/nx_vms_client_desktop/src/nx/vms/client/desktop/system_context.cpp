@@ -11,6 +11,7 @@
 #include <core/resource_management/resource_runtime_data.h>
 #include <nx/branding.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/layout_tour/showreel_state_manager.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/desktop/statistics/statistics_sender.h>
@@ -48,6 +49,7 @@ struct SystemContext::Private
     std::unique_ptr<VirtualCameraManager> virtualCameraManager;
     std::unique_ptr<VideoCache> videoCache;
     std::unique_ptr<LayoutSnapshotManager> layoutSnapshotManager;
+    std::unique_ptr<ShowreelStateManager> showreelStateManager;
 
     void initLocalRuntimeInfo()
     {
@@ -93,6 +95,7 @@ SystemContext::SystemContext(
             d->virtualCameraManager = std::make_unique<VirtualCameraManager>(this);
             d->videoCache = std::make_unique<VideoCache>(this);
             d->layoutSnapshotManager = std::make_unique<LayoutSnapshotManager>(this);
+            d->showreelStateManager = std::make_unique<ShowreelStateManager>(this);
             break;
 
         case Mode::crossSystem:
@@ -168,6 +171,11 @@ VideoCache* SystemContext::videoCache() const
 LayoutSnapshotManager* SystemContext::layoutSnapshotManager() const
 {
     return d->layoutSnapshotManager.get();
+}
+
+ShowreelStateManager* SystemContext::showreelStateManager() const
+{
+    return d->showreelStateManager.get();
 }
 
 void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)

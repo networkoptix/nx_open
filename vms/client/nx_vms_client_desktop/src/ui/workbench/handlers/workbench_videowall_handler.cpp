@@ -3423,7 +3423,7 @@ void QnWorkbenchVideoWallHandler::saveVideowallAndReviewLayout(
     if (const auto reviewLayout = workbenchLayout->resource())
     {
         auto callback =
-            [this, id = reviewLayout->getId()](int /*reqId*/, ec2::ErrorCode errorCode)
+            [id = reviewLayout->getId()](int /*reqId*/, ec2::ErrorCode errorCode)
             {
                 snapshotManager()->markBeingSaved(id, false);
                 if (errorCode != ec2::ErrorCode::ok)

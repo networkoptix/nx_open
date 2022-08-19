@@ -44,10 +44,10 @@ void OverlappedIdIntegration::registerActions(ui::action::MenuFactory* factory)
                 SceneScope,
                 !condition::isLayoutTourReviewMode()
                 && !condition::isPreviewSearchMode())
-            && condition::treeNodeType({ResourceTree::NodeType::recorder})
+            && condition::treeNodeType(ResourceTree::NodeType::recorder)
             && ConditionWrapper(
                 new ResourceCondition(
-                    [this](const QnResourcePtr& resource)
+                    [](const QnResourcePtr& resource)
                     {
                         const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
                         return camera->isNvr();

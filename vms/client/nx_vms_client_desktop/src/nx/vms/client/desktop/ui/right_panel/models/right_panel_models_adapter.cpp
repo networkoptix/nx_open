@@ -118,11 +118,6 @@ milliseconds previewReloadDelay()
     return seconds(ini().rightPanelPreviewReloadDelay);
 }
 
-int maximumThumbnailWidth()
-{
-    return ini().rightPanelMaxThumbnailWidth;
-}
-
 int maxSimultaneousPreviewLoads(const QnMediaServerResourcePtr& server)
 {
     if (QnMediaServerResource::isArmServer(server))
@@ -1316,7 +1311,7 @@ void RightPanelModelsAdapter::Private::closeExpired()
 
 void RightPanelModelsAdapter::Private::createPreviews(int first, int count)
 {
-    if (!NX_ASSERT(first >= 0 && first <= m_previews.size()))
+    if (!NX_ASSERT(first >= 0 && first <= (int) m_previews.size()))
         return;
 
     std::vector<PreviewData> inserted(count);
@@ -1329,8 +1324,12 @@ void RightPanelModelsAdapter::Private::createPreviews(int first, int count)
 
 void RightPanelModelsAdapter::Private::updatePreviewProvider(int row)
 {
-    if (!NX_ASSERT(row >= 0 && row < m_previews.size() && m_previews.size() == q->rowCount()))
+    if (!NX_ASSERT(row >= 0
+        && row < (int) m_previews.size()
+        && (int) m_previews.size() == q->rowCount()))
+    {
         return;
+    }
 
     const auto index = q->index(row, 0);
     const auto previewResource = index.data(Qn::ResourceRole).value<QnResource*>();
@@ -1578,8 +1577,11 @@ void RightPanelModelsAdapter::Private::loadNextPreview()
         m_sinceLastPreviewRequest.restart();
     }
 
-    if (awaitingReload || ((rowsToLoad.size() > loadedFromCache) && m_loadingByProvider.empty()))
+    if (awaitingReload
+        || (((int) rowsToLoad.size() > loadedFromCache) && m_loadingByProvider.empty()))
+    {
         m_previewLoadOperation.requestOperation();
+    }
 }
 
 bool RightPanelModelsAdapter::Private::isNextPreviewLoadAllowed(
@@ -1749,7 +1751,7 @@ void RightPanelModelsAdapter::Private::ensureAnalyticsRowVisible(int row)
 // ------------------------------------------------------------------------------------------------
 
 QImage RightPanelImageProvider::requestImage(
-    const QString& id, QSize* size, const QSize& /*requestedSize*/)
+    const QString& id, QSize* /*size*/, const QSize& /*requestedSize*/)
 {
     const auto provider = previewsById().value(id.toLongLong());
     return provider ? provider->image() : QImage();

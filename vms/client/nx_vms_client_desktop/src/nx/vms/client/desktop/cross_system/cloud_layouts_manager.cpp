@@ -137,7 +137,7 @@ struct CloudLayoutsManager::Private
             resourcePool->addResources(newlyCreatedLayouts);
 
         if (!layoutsToRemove.empty())
-            resourcePool->removeResources(layoutsToRemove.toList());
+            resourcePool->removeResources(layoutsToRemove.values());
     }
 
     void ensureUser()
@@ -207,7 +207,7 @@ struct CloudLayoutsManager::Private
         url.setPath(nx::format(kParticularLayoutPathTemplate, layout.id.toSimpleString()));
         auto messageBody = std::make_unique<BufferSource>(
             Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
-            std::move(nx::reflect::json::serialize(layout)));
+            nx::reflect::json::serialize(layout));
         request->setRequestBody(std::move(messageBody));
         networkManager->doPost(
             std::move(request),
@@ -272,7 +272,7 @@ struct CloudLayoutsManager::Private
 
         systemContext->resourcePool()->addResource(cloudLayout);
 
-        return cloudLayout;
+        return std::move(cloudLayout);
     }
 
     void saveLayout(const QnLayoutResourcePtr& layout, SaveCallback callback)

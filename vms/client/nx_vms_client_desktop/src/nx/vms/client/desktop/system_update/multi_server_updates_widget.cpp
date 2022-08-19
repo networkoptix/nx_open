@@ -16,7 +16,6 @@
 
 #include <client/client_message_processor.h>
 #include <client/client_settings.h>
-#include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
@@ -29,6 +28,7 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/style.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_update/client_update_manager.h>
 #include <nx/vms/client/desktop/system_update/version_selection_dialog.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -436,7 +436,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
                 .credentials = connection->credentials(),
                 .expectedServerId = moduleInformation.id,
             },
-            commonModule()->certificateVerifier());
+            systemContext()->certificateVerifier());
         //m_clientUpdateTool->requestRemoteUpdateInfo();
     }
     // Force update when we open dialog.

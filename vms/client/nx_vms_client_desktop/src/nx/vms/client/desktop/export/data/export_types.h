@@ -27,6 +27,7 @@ enum class ExportProcessStatus
 enum class ExportProcessError
 {
     noError,
+    internalError,
     unsupportedMedia,
     unsupportedFormat,
     ffmpegError,

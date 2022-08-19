@@ -39,7 +39,7 @@ struct NX_VMS_CLIENT_CORE_API LogonData
      * Id of the Server we expect to connect. Reqired to avoid passing stored credentials to another
      * Server on the same endpoint.
      */
-    std::optional<QnUuid> expectedServerId;
+    std::optional<QnUuid> expectedServerId = std::nullopt;
 
     /**
      * Allow user interaction in the UI thread (like displaying dialog about certifcate mismatch).

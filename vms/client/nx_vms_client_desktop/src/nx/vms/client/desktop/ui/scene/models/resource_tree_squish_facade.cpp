@@ -23,7 +23,7 @@ ResourceTreeModelSquishFacade::ResourceTreeModelSquishFacade(ResourceTreeModelAd
 QString ResourceTreeModelSquishFacade::jsonModel()
 {
     const auto itemDataToJson =
-        [this](const QModelIndex& index)
+        [](const QModelIndex& index)
         {
             QJsonObject jsonItem;
             jsonItem["name"] = index.data(Qt::DisplayRole).toString();

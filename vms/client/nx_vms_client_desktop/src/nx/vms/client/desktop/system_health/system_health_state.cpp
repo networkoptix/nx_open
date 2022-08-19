@@ -278,7 +278,7 @@ void SystemHealthState::Private::updateServersWithoutStorages()
 
             QSet<QnUuid> servers;
             const auto items = runtimeInfoManager->items()->getItems();
-            for (const auto item: items)
+            for (const auto& item: items)
             {
                 if (item.data.flags.testFlag(flag))
                     servers.insert(item.uuid);

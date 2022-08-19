@@ -44,7 +44,7 @@ ObjectTrackingInstrument::ObjectTrackingInstrument(QObject* parent):
         this,
         qOverload<QGraphicsView*, QGraphicsItem*, const ClickInfo&>(&ClickInstrument::clicked),
         this,
-        [this](QGraphicsView* view, QGraphicsItem* item, const ClickInfo& info)
+        [this](QGraphicsView* /*view*/, QGraphicsItem* item, const ClickInfo& info)
         {
             if (info.modifiers() != Qt::AltModifier)
                 return;
@@ -93,7 +93,9 @@ ObjectTrackingInstrument::ObjectTrackingInstrument(QObject* parent):
             actionData.params = QJson::serialized(actionParameters);
 
             auto callback = nx::utils::guarded(this,
-                [this](bool success, rest::Handle requestId, nx::network::rest::JsonResult result)
+                [this](bool success,
+                    rest::Handle /*requestId*/,
+                    nx::network::rest::JsonResult /*result*/)
                 {
                     if (!success)
                         NX_WARNING(this, "Start object tracking request was not successful.");

@@ -264,8 +264,6 @@ void setPtzSensitivities(const State::PtzSensitivity& value, const Cameras& came
     if (!value.separate.hasValue())
         return;
 
-    constexpr qreal kPtzSameTiltSensitivityAsPan = 0.0;
-
     const std::optional<qreal> pan = value.pan;
     const std::optional<qreal> tilt = value.separate() ? value.tilt : std::optional<qreal>(0.0);
 

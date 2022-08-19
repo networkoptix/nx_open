@@ -1,14 +1,15 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "resource_tree_model_test_fixture.h"
-
+#include <client/client_globals.h>
 #include <common/common_module.h>
 #include <core/resource_management/layout_tour_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/data/layout_tour_data.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <ui/help/help_topics.h>
-#include <client/client_globals.h>
+
+#include "resource_tree_model_test_fixture.h"
 
 namespace nx::vms::client::desktop {
 namespace test {
@@ -45,7 +46,7 @@ TEST_F(ResourceTreeModelTest, showreelRemoves)
     ASSERT_TRUE(onlyOneMatches(displayFullMatch(kUniqueShowreelName)));
 
     // When previously added showreel is removed.
-    commonModule()->layoutTourManager()->removeTour(showreel.id);
+    systemContext()->showreelManager()->removeTour(showreel.id);
 
     // Then no more nodes with corresponding display text found in the resource tree.
     ASSERT_TRUE(noneMatches(displayFullMatch(kUniqueShowreelName)));

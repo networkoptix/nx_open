@@ -4,39 +4,34 @@
 
 #include <limits>
 
-#include <QtCore/QMimeData>
 #include <QtCore/QFile>
-
+#include <QtCore/QMimeData>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QGraphicsSceneDragDropEvent>
 #include <QtWidgets/QGraphicsItem>
+#include <QtWidgets/QGraphicsSceneDragDropEvent>
 
 #include <common/common_globals.h>
-
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/layout_tour_manager.h>
+#include <core/resource/file_processor.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/layout_resource.h>
-#include <core/resource/videowall_resource.h>
-#include <core/resource/webpage_resource.h>
-#include <core/resource/file_processor.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>
-
+#include <core/resource/videowall_resource.h>
+#include <core/resource/webpage_resource.h>
+#include <core/resource_management/layout_tour_manager.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/utils/scope_guard.h>
-
+#include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/utils/mime_data.h>
+#include <ui/workaround/mac_utils.h>
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_grid_mapper.h>
 #include <utils/common/delayed.h>
 
-#include <ui/workbench/workbench.h>
-#include <ui/workbench/workbench_grid_mapper.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workaround/mac_utils.h>
-
 #include "destruction_guard_item.h"
-
-#include <nx/vms/client/desktop/utils/mime_data.h>
-#include <nx/vms/client/core/utils/geometry.h>
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
@@ -183,7 +178,8 @@ bool DropInstrument::dropEvent(QGraphicsItem* /*item*/, QGraphicsSceneDragDropEv
 
     event->acceptProposedAction();
 
-    const auto layoutTours = layoutTourManager()->tours(localMimeData->entities());
+    const auto layoutTours =
+        systemContext()->showreelManager()->tours(localMimeData->entities());
     if (!layoutTours.empty())
     {
         for (const auto& tour : layoutTours)

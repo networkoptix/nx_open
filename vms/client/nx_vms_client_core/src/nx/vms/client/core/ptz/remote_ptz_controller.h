@@ -12,15 +12,18 @@
 namespace nx::network::rest { struct JsonResult; }
 namespace nx::network::rest { class Params; }
 
-class NX_VMS_CLIENT_CORE_API QnRemotePtzController:
+namespace nx::vms::client::core {
+namespace ptz {
+
+class NX_VMS_CLIENT_CORE_API RemotePtzController:
     public QnAbstractPtzController
 {
     Q_OBJECT
     typedef QnAbstractPtzController base_type;
 
 public:
-    QnRemotePtzController(const QnVirtualCameraResourcePtr& camera);
-    virtual ~QnRemotePtzController();
+    RemotePtzController(const QnVirtualCameraResourcePtr& camera);
+    virtual ~RemotePtzController();
 
     virtual Ptz::Capabilities getCapabilities(const Options& options) const override;
 
@@ -140,3 +143,5 @@ private:
     mutable nx::Mutex m_mutex;
 };
 
+} // namespace ptz
+} // namespace nx::vms::client::core

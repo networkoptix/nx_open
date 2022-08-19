@@ -226,7 +226,7 @@ public:
     /**
      * Manages Showreels.
      */
-    QnLayoutTourManager* layoutTourManager() const;
+    QnLayoutTourManager* showreelManager() const;
 
     /**
      * Manages old event rules.

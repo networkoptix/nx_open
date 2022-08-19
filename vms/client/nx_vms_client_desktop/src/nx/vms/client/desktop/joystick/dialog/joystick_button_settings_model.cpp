@@ -772,17 +772,17 @@ QModelIndex JoystickButtonSettingsModel::index(
     return createIndex(row, column);
 }
 
-QModelIndex JoystickButtonSettingsModel::parent(const QModelIndex& index) const
+QModelIndex JoystickButtonSettingsModel::parent(const QModelIndex& /*index*/) const
 {
     return QModelIndex();
 }
 
-int JoystickButtonSettingsModel::rowCount(const QModelIndex& parent) const
+int JoystickButtonSettingsModel::rowCount(const QModelIndex& /*parent*/) const
 {
     return d->description.buttons.size();
 }
 
-int JoystickButtonSettingsModel::columnCount(const QModelIndex& parent) const
+int JoystickButtonSettingsModel::columnCount(const QModelIndex& /*parent*/) const
 {
     return LastColumn + 1;
 }

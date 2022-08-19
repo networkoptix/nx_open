@@ -4,9 +4,9 @@
 #include "ui_camera_advanced_params_widget.h"
 
 #include <api/server_rest_connection.h>
-#include <core/ptz/remote_ptz_controller.h>
 #include <nx/network/rest/params.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/core/ptz/remote_ptz_controller.h>
 #include <ui/common/read_only.h>
 
 #include "camera_advanced_param_widgets_manager.h"
@@ -71,7 +71,7 @@ struct CameraAdvancedParamsWidget::Private
 {
     QPointer<CameraSettingsDialogStore> store;
     QnUuid selectedServer;
-    std::unique_ptr<QnRemotePtzController> ptzController;
+    std::unique_ptr<core::ptz::RemotePtzController> ptzController;
     QnCameraAdvancedParams manifest;
     QnUuid cameraId;
 
@@ -179,7 +179,8 @@ void CameraAdvancedParamsWidget::setSelectedServer(const QnUuid& serverId)
     d->selectedServer = serverId;
 }
 
-void CameraAdvancedParamsWidget::setPtzInterface(std::unique_ptr<QnRemotePtzController> controller)
+void CameraAdvancedParamsWidget::setPtzInterface(
+    std::unique_ptr<core::ptz::RemotePtzController> controller)
 {
     d->ptzController = std::move(controller);
 }

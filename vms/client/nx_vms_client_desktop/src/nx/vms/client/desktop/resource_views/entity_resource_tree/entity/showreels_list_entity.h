@@ -23,7 +23,7 @@ class ShowreelsListEntity: public entity_item_model::UniqueKeyListEntity<QnUuid>
 public:
     ShowreelsListEntity(
         const ShowreelItemCreator& showreelItemCreator,
-        const QnLayoutTourManager* layoutTourManager);
+        const QnLayoutTourManager* showreelManager);
 
 private:
     nx::utils::ScopedConnections m_connectionsGuard;

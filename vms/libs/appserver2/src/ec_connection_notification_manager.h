@@ -39,7 +39,7 @@ public:
         QnBusinessEventNotificationManager* businessEventManager,
         VmsRulesNotificationManager* vmsRulesManager,
         QnLayoutNotificationManager* layoutManager,
-        QnLayoutTourNotificationManager* layoutTourManager,
+        QnLayoutTourNotificationManager* showreelManager,
         QnVideowallNotificationManager* videowallManager,
         QnWebPageNotificationManager* webPageManager,
         QnStoredFileNotificationManager* storedFileManager,
@@ -61,7 +61,7 @@ public:
             m_businessEventManager,
             m_vmsRulesManager,
             m_layoutManager,
-            m_layoutTourManager,
+            m_showreelManager,
             m_videowallManager,
             m_webPageManager,
             m_storedFileManager,
@@ -90,7 +90,7 @@ private:
     QnBusinessEventNotificationManager* m_businessEventManager;
     VmsRulesNotificationManager* m_vmsRulesManager;
     QnLayoutNotificationManager* m_layoutManager;
-    QnLayoutTourNotificationManager* m_layoutTourManager;
+    QnLayoutTourNotificationManager* m_showreelManager;
     QnVideowallNotificationManager* m_videowallManager;
     QnWebPageNotificationManager* m_webPageManager;
     QnStoredFileNotificationManager* m_storedFileManager;

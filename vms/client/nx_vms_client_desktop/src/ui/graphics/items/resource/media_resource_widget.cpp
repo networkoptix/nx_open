@@ -153,8 +153,6 @@ static constexpr int kMicroInMilliSeconds = 1000;
 // Now it is returned when there is no archive data and archive is played backwards.
 static constexpr int kNoTimeValue = 0;
 
-static constexpr qreal kMotionRegionAlpha = 0.4;
-
 static constexpr qreal kMaxForwardSpeed = 16.0;
 static constexpr qreal kMaxBackwardSpeed = 16.0;
 
@@ -3160,7 +3158,7 @@ void QnMediaResourceWidget::createTrigger(const SoftwareTriggerInfo& info)
     const auto button = new SoftwareTriggerButton(this);
     configureTriggerButton(button, info);
 
-    const auto overlayItemId = m_triggersContainer->insertItem(index, button, info.ruleId);
+    m_triggersContainer->insertItem(index, button, info.ruleId);
     m_triggers.insert(index, info);
 }
 

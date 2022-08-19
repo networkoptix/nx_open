@@ -168,7 +168,7 @@ void FilteredResourceViewWidget::setHeaderWidget(QWidget* widget)
 
 bool FilteredResourceViewWidget::headerWidgetVisible() const
 {
-    if (!NX_ASSERT(m_headerWidget, "Header widget hasn't been set"));
+    if (!NX_ASSERT(m_headerWidget, "Header widget hasn't been set"))
         return false;
 
     return ui->headerContainer->isVisible();
@@ -208,7 +208,7 @@ void FilteredResourceViewWidget::setFooterWidget(QWidget* widget)
 
 bool FilteredResourceViewWidget::footerWidgetVisible() const
 {
-    if (!NX_ASSERT(m_footerWidget, "Footer widget hasn't been set"));
+    if (!NX_ASSERT(m_footerWidget, "Footer widget hasn't been set"))
         return false;
 
     return ui->footerContainer->isVisible();

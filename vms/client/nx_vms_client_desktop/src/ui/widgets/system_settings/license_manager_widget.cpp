@@ -18,7 +18,6 @@
 #include <api/runtime_info_manager.h>
 #include <client/client_runtime_settings.h>
 #include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <licensing/license.h>
@@ -35,6 +34,7 @@
 #include <nx/vms/client/desktop/licensing/license_management_dialogs.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/dialogs/license_deactivation_reason.h>
 #include <nx/vms/client/desktop/utils/layout_widget_hider.h>
@@ -85,7 +85,7 @@ QString licenseReplyLogString(
             "Body:\n%5\n");
 
     QStringList headers;
-    for (const auto header: reply->rawHeaderPairs())
+    for (const auto& header: reply->rawHeaderPairs())
     {
         headers.push_back(lit("%1: %2").arg(
             QString::fromLatin1(header.first),
@@ -286,7 +286,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
         updateLicensesIfNeeded);
     connect(videowallUsageWatcher, &UsageWatcher::licenseUsageChanged, this,
         updateLicensesIfNeeded);
-    connect(commonModule()->licensePool(), &QnLicensePool::licensesChanged, this,
+    connect(systemContext()->licensePool(), &QnLicensePool::licensesChanged, this,
         updateLicensesIfNeeded);
 
     connect(qnClientCoreModule->networkModule(),

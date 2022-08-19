@@ -22,7 +22,6 @@ class ServerCertificateWatcher: public QObject
 
 public:
     ServerCertificateWatcher(
-        QnCommonModule* commonModule,
         CertificateVerifier* certificateVerifier,
         QObject* parent = nullptr);
 };

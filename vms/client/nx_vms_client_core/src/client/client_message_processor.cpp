@@ -3,7 +3,6 @@
 #include "client_message_processor.h"
 
 #include <client_core/client_core_module.h>
-#include <core/resource_management/layout_tour_state_manager.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
@@ -99,14 +98,6 @@ void QnClientMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
     m_holdConnection = false;
     base_type::disconnectFromConnection(connection);
     connection->miscNotificationManager()->disconnect(this);
-}
-
-void QnClientMessageProcessor::handleTourAddedOrUpdated(const nx::vms::api::LayoutTourData& tour)
-{
-    if (qnClientCoreModule->layoutTourStateManager()->isChanged(tour.id))
-        return;
-
-    base_type::handleTourAddedOrUpdated(tour);
 }
 
 void QnClientMessageProcessor::onResourceStatusChanged(

@@ -38,7 +38,7 @@ LayoutSnapshotManager::LayoutSnapshotManager(SystemContext* systemContext, QObje
 
     onResourcesAdded(resourcePool()->getResources<QnLayoutResource>());
 
-    connect(this, &QnAbstractSaveStateManager::flagsChanged, this,
+    connect(this, &core::SaveStateManager::flagsChanged, this,
         [this](const QnUuid& id, SaveStateFlags /*flags*/)
         {
             if (const auto layout = resourcePool()->getResourceById<QnLayoutResource>(id))
@@ -50,7 +50,7 @@ LayoutSnapshotManager::~LayoutSnapshotManager()
 {
 }
 
-QnAbstractSaveStateManager::SaveStateFlags LayoutSnapshotManager::flags(
+core::SaveStateManager::SaveStateFlags LayoutSnapshotManager::flags(
     const QnLayoutResourcePtr& layout) const
 {
     NX_ASSERT(layout);
@@ -59,7 +59,7 @@ QnAbstractSaveStateManager::SaveStateFlags LayoutSnapshotManager::flags(
     return base_type::flags(layout->getId());
 }
 
-QnAbstractSaveStateManager::SaveStateFlags LayoutSnapshotManager::flags(
+core::SaveStateManager::SaveStateFlags LayoutSnapshotManager::flags(
     QnWorkbenchLayout* layout) const
 {
     NX_ASSERT(layout); //< Layout resource can be null.
@@ -143,7 +143,7 @@ bool LayoutSnapshotManager::save(
 
     int reqID = connection->getLayoutManager(Qn::kSystemAccess)->save(
         apiLayout,
-        [this, internalCallback](int /*reqID*/, ec2::ErrorCode errorCode)
+        [internalCallback](int /*reqID*/, ec2::ErrorCode errorCode)
         {
             const bool success = errorCode == ec2::ErrorCode::ok;
             internalCallback(success);

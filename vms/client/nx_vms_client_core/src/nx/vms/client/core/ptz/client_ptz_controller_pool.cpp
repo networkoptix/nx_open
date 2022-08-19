@@ -2,27 +2,28 @@
 
 #include "client_ptz_controller_pool.h"
 
-#include <core/ptz/caching_ptz_controller.h>
-#include <core/ptz/remote_ptz_controller.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/resource/camera.h>
 #include <utils/common/delete_later.h>
 
-QnClientPtzControllerPool::QnClientPtzControllerPool(
-    nx::vms::common::SystemContext* systemContext,
-    QObject* parent)
-    :
+#include "caching_ptz_controller.h"
+#include "remote_ptz_controller.h"
+
+namespace nx::vms::client::core {
+namespace ptz {
+
+ControllerPool::ControllerPool(common::SystemContext* systemContext, QObject* parent):
     base_type(systemContext, parent)
 {
     // Controller may potentially be created with delay.
     connect(this, &QnPtzControllerPool::controllerChanged,
-        this, &QnClientPtzControllerPool::cacheCameraPresets);
+        this, &ControllerPool::cacheCameraPresets);
     init();
 }
 
-void QnClientPtzControllerPool::registerResource(const QnResourcePtr &resource)
+void ControllerPool::registerResource(const QnResourcePtr &resource)
 {
     base_type::registerResource(resource);
 
@@ -62,27 +63,27 @@ void QnClientPtzControllerPool::registerResource(const QnResourcePtr &resource)
         });
 
     connect(camera.get(), &QnResource::statusChanged,
-        this, &QnClientPtzControllerPool::cacheCameraPresets);
+        this, &ControllerPool::cacheCameraPresets);
 
     cacheCameraPresets(camera);
 }
 
-void QnClientPtzControllerPool::unregisterResource(const QnResourcePtr &resource) {
+void ControllerPool::unregisterResource(const QnResourcePtr &resource) {
     base_type::unregisterResource(resource);
 }
 
-QnPtzControllerPtr QnClientPtzControllerPool::createController(const QnResourcePtr &resource) const
+QnPtzControllerPtr ControllerPool::createController(const QnResourcePtr &resource) const
 {
     const auto camera = resource.dynamicCast<nx::vms::client::core::Camera>();
     if (!camera || !camera->isPtzSupported())
         return {};
 
-    QnPtzControllerPtr baseController(new QnRemotePtzController(camera));
-    QnPtzControllerPtr result(new QnCachingPtzController(baseController), &qnDeleteLater);
+    QnPtzControllerPtr baseController(new RemotePtzController(camera));
+    QnPtzControllerPtr result(new CachingPtzController(baseController), &qnDeleteLater);
     return result;
 }
 
-void QnClientPtzControllerPool::cacheCameraPresets(const QnResourcePtr &resource)
+void ControllerPool::cacheCameraPresets(const QnResourcePtr &resource)
 {
     const auto camera = resource.dynamicCast<nx::vms::client::core::Camera>();
     if (!camera || !camera->isPtzSupported() || !camera->isOnline())
@@ -94,7 +95,7 @@ void QnClientPtzControllerPool::cacheCameraPresets(const QnResourcePtr &resource
     if (!controller)
         return;
 
-    // Cache presets and tours in the QnCachingPtzController instance.
+    // Cache presets and tours in the CachingPtzController instance.
     QnPtzPresetList presets;
     controller->getPresets(&presets);
 
@@ -102,7 +103,7 @@ void QnClientPtzControllerPool::cacheCameraPresets(const QnResourcePtr &resource
     controller->getTours(&tours);
 }
 
-void QnClientPtzControllerPool::reinitServerCameras(const QnMediaServerResourcePtr& server)
+void ControllerPool::reinitServerCameras(const QnMediaServerResourcePtr& server)
 {
     for (auto camera: server->resourcePool()->getAllCameras(server, /*ignoreDesktopCameras*/ true))
     {
@@ -110,3 +111,6 @@ void QnClientPtzControllerPool::reinitServerCameras(const QnMediaServerResourceP
             updateController(camera);
     }
 }
+
+} // namespace ptz
+} // namespace nx::vms::client::core

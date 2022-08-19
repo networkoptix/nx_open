@@ -2,45 +2,40 @@
 
 #include "action_factories.h"
 
+#include <QtQuick/QQuickItem>
+#include <QtWebEngineWidgets/QWebEnginePage>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QWidget>
-#include <QtWebEngineWidgets/QWebEnginePage>
-#include <QtQuick/QQuickItem>
-
-#include <nx/utils/string.h>
-#include <utils/resource_property_adaptors.h>
 
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_preset.h>
 #include <core/ptz/ptz_tour.h>
-
+#include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
+#include <core/resource/videowall_resource.h>
 #include <core/resource_management/layout_tour_manager.h>
 #include <core/resource_management/resource_pool.h>
-
-#include <core/resource/user_resource.h>
-#include <core/resource/layout_resource.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/videowall_resource.h>
-
-#include <nx/vms/client/desktop/radass/radass_types.h>
-#include <nx/vms/client/desktop/radass/radass_resource_manager.h>
-#include <nx/vms/client/desktop/ini.h>
-
+#include <nx/utils/string.h>
 #include <nx/vms/client/core/ptz/helpers.h>
 #include <nx/vms/client/core/ptz/hotkey_resource_property_adaptor.h>
 #include <nx/vms/client/desktop/common/widgets/webview_controller.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/radass/radass_resource_manager.h>
+#include <nx/vms/client/desktop/radass/radass_types.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/web_resource_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
+#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/workbench.h>
+#include <utils/resource_property_adaptors.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {
@@ -268,7 +263,6 @@ LayoutTourSettingsFactory::LayoutTourSettingsFactory(QObject* parent):
 {
 }
 
-
 Factory::ActionList LayoutTourSettingsFactory::newActions(const Parameters& parameters,
     QObject* parent)
 {
@@ -282,7 +276,8 @@ Factory::ActionList LayoutTourSettingsFactory::newActions(const Parameters& para
     if (isCurrentTour)
         id = workbench()->currentLayout()->data(Qn::LayoutTourUuidRole).value<QnUuid>();
 
-    const auto tour = layoutTourManager()->tour(id);
+    auto showreelManager = systemContext()->showreelManager();
+    const auto tour = showreelManager->tour(id);
     NX_ASSERT(tour.isValid());
     if (!tour.isValid())
         return actionGroup->actions();
@@ -297,15 +292,15 @@ Factory::ActionList LayoutTourSettingsFactory::newActions(const Parameters& para
         action->setCheckable(true);
         action->setChecked(manual == isManual);
         connect(action, &QAction::triggered, this,
-            [this, id, manual]
+            [this, showreelManager, id, manual]
             {
-                auto tour = layoutTourManager()->tour(id);
+                auto tour = showreelManager->tour(id);
                 NX_ASSERT(tour.isValid());
                 if (!tour.isValid())
                     return;
 
                 tour.settings.manual = manual;
-                layoutTourManager()->addOrUpdateTour(tour);
+                showreelManager->addOrUpdateTour(tour);
                 menu()->trigger(action::SaveLayoutTourAction, {Qn::UuidRole, id});
             });
         actionGroup->addAction(action);

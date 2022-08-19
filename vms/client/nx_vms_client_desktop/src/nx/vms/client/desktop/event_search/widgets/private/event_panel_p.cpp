@@ -71,10 +71,6 @@ const QString kObjectsInformation = "objectsInformation";
 const QString kTabIndexKey = "tabIndex";
 
 static const QSize kToolTipMaxThumbnailSize{240, 180};
-static const QSize kToolTipMaxMultiThumbnailSize{240, 540};
-static constexpr int kToolTipAnimationDurationMs = 200;
-static constexpr int kToolTipShowDelayMs = 250;
-static constexpr int kToolTipHideDelayMs = 250;
 static constexpr int kMaxMultiThumbnailCount = 5;
 static constexpr int kMultiThumbnailSpacing = 1;
 

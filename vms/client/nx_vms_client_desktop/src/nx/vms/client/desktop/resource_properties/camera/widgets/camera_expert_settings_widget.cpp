@@ -88,8 +88,8 @@ void fillProfiles(
     {
         using namespace nx::vms::api;
         comboBox->addItem(QString::fromStdString(p.name), QString::fromStdString(p.token));
-        if (p.state == DeviceProfile::State::primaryDefault && isPrimary
-            || p.state == DeviceProfile::State::secondaryDefault && !isPrimary)
+        if ((p.state == DeviceProfile::State::primaryDefault && isPrimary)
+            || (p.state == DeviceProfile::State::secondaryDefault && !isPrimary))
         {
             comboBox->setItemHint(comboBox->count() - 1, kDefaultProfileHint);
         }

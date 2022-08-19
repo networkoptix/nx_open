@@ -15,7 +15,6 @@
 namespace nx::vms::client::core {
 
 ServerCertificateWatcher::ServerCertificateWatcher(
-    QnCommonModule* commonModule,
     CertificateVerifier* certificateVerifier,
     QObject* parent)
     :
@@ -23,7 +22,6 @@ ServerCertificateWatcher::ServerCertificateWatcher(
 {
     auto pinCertificates =
         [this,
-            commonModule,
             certificateVerifier = QPointer<CertificateVerifier>(certificateVerifier)](
                 const QnMediaServerResourcePtr& server)
         {
@@ -37,7 +35,7 @@ ServerCertificateWatcher::ServerCertificateWatcher(
             using namespace nx::network::ssl;
 
             auto updateKey =
-                [commonModule, certificateVerifier, serverId = server->getId()](
+                [certificateVerifier, serverId = server->getId()](
                     const std::string& pem,
                     CertificateVerifier::CertificateType certType)
                 {
@@ -62,7 +60,7 @@ ServerCertificateWatcher::ServerCertificateWatcher(
         };
 
     auto removeCertificatesFromCache =
-        [this, certificateVerifier = QPointer<CertificateVerifier>(certificateVerifier)](
+        [certificateVerifier = QPointer<CertificateVerifier>(certificateVerifier)](
             const QnMediaServerResourcePtr& server)
         {
             if (!NX_ASSERT(certificateVerifier))
@@ -74,7 +72,7 @@ ServerCertificateWatcher::ServerCertificateWatcher(
     auto serverListener = new SessionResourcesSignalListener<QnMediaServerResource>(this);
 
     serverListener->setOnAddedHandler(
-        [this, pinCertificates](const QnMediaServerResourceList& servers)
+        [pinCertificates](const QnMediaServerResourceList& servers)
         {
             for (const auto& server: servers)
                 pinCertificates(server);
@@ -85,7 +83,7 @@ ServerCertificateWatcher::ServerCertificateWatcher(
         pinCertificates);
 
     serverListener->setOnRemovedHandler(
-        [this, removeCertificatesFromCache](const QnMediaServerResourceList& servers)
+        [removeCertificatesFromCache](const QnMediaServerResourceList& servers)
         {
             for (const auto& server: servers)
                 removeCertificatesFromCache(server);

@@ -124,7 +124,7 @@ CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
     // We don't have any info about cameras certificates right now.
     // Assume that we can trust them as long as they are a part of our system already.
     webWidget->controller()->setCertificateValidator(
-        [](const QString& certificateChain, const QUrl&){ return true; });
+        [](const QString& /*certificateChain*/, const QUrl&){ return true; });
 }
 
 CameraWebPageWidget::CameraWebPageWidget(CameraSettingsDialogStore* store, QWidget* parent):
