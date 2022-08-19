@@ -180,6 +180,9 @@ void TileInteractionHandler::handleClick(
     if (!NX_ASSERT(index.isValid()))
         return;
 
+    if (!checkActionSupport(index))
+        return;
+
     if (button == Qt::LeftButton && !modifiers.testFlag(Qt::ControlModifier))
     {
         const auto model = const_cast<QAbstractItemModel*>(index.model());
@@ -465,15 +468,23 @@ void TileInteractionHandler::copyBookmarkToClipboard(const QModelIndex &index)
     }
 }
 
-void TileInteractionHandler::openSource(
-    const QModelIndex& index, bool inNewTab, bool fromDoubleClick)
+bool TileInteractionHandler::checkActionSupport(const QModelIndex& index)
 {
-    if (fromDoubleClick && !index.data(Qn::CloudSystemIdRole).toString().isEmpty()
+    if (!index.data(Qn::CloudSystemIdRole).toString().isEmpty()
         && index.data(Qn::ActionIdRole).value<ui::action::IDType>() != ui::action::NoAction)
     {
         showMessage(tr("This action is not supported for notifications from other Systems"));
-        return;
+        return false;
     }
+
+    return true;
+}
+
+void TileInteractionHandler::openSource(
+    const QModelIndex& index, bool inNewTab, bool fromDoubleClick)
+{
+    if (fromDoubleClick && !checkActionSupport(index))
+        return;
 
     auto resourceList = index.data(Qn::ResourceListRole).value<QnResourceList>()
         .filtered(&QnResourceAccessFilter::isOpenableInLayout);
