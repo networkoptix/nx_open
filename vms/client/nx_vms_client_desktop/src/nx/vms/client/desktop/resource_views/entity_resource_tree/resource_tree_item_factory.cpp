@@ -143,7 +143,7 @@ InvalidatorPtr cloudSystemIconInvalidator(const QnSystemDescriptionPtr& systemDe
 {
     auto result = std::make_shared<Invalidator>();
 
-    result->connections()->add(systemDescription->connect(
+    result->connections()->add(QObject::connect(
         systemDescription.get(),
         &QnBaseSystemDescription::onlineStateChanged,
         [invalidator = result.get()]

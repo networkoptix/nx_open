@@ -151,7 +151,6 @@ protected slots:
     void at_openInLayoutAction_triggered();
 
     void at_openInCurrentLayoutAction_triggered();
-    void at_openInNewTabAction_triggered();
     void at_openInNewWindowAction_triggered();
 
     void at_openCurrentLayoutInNewWindowAction_triggered();

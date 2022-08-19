@@ -117,48 +117,25 @@ void QnClientMessageProcessor::onResourceStatusChanged(
     resource->setStatus(status);
 }
 
-void QnClientMessageProcessor::updateResource(const QnResourcePtr& resource, ec2::NotificationSource source)
+void QnClientMessageProcessor::updateResource(
+    const QnResourcePtr& resource,
+    ec2::NotificationSource source)
 {
-    NX_ASSERT(resource);
-    /*
-     * In rare cases we can receive updateResource call when the client is
-     * in the reconnect process (it starts an event loop inside the main
-     * thread). Populating the resource pool or changing resources is highly
-     * inappropriate at that time.
-     * */
-    if (!m_connection || !resource)
-        return;
-
-    auto isFile = [](const QnResourcePtr &resource)
-    {
-        QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
-        return layout && layout->isFile();
-    };
-
-    QnResourcePtr ownResource = resourcePool()->getResourceById(resource->getId());
-
-    /* Security check. Local layouts must not be overridden by server's.
-    * Really that means GUID conflict, caused by saving of local layouts to server. */
-    if (isFile(resource) || isFile(ownResource))
+    // In some rare cases we can receive updateResource call when the client is in the reconnect
+    // process (it starts an event loop inside the main thread). Populating the resource pool or
+    // changing resources is highly inappropriate at that time.
+    if (!m_connection || !NX_ASSERT(resource))
         return;
 
     resource->addFlags(Qn::remote);
     resource->removeFlags(Qn::local);
 
-    QnCommonMessageProcessor::updateResource(resource, source);
-    if (!ownResource)
-    {
-        resourcePool()->addResource(resource);
-    }
-    else
-    {
-        // TODO: #sivanov Don't update layout if we're re-reading resources,
-        // this leads to unsaved layouts spontaneously rolling back to last saved state.
-        // Solution is to move 'saved/modified' flags to Qn::ResourceFlags. VMS-3180
+    base_type::updateResource(resource, source);
+
+    if (QnResourcePtr ownResource = resourcePool()->getResourceById(resource->getId()))
         ownResource->update(resource);
-        if (QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
-            layout->requestStore();
-    }
+    else
+        resourcePool()->addResource(resource);
 }
 
 void QnClientMessageProcessor::handleRemotePeerFound(QnUuid peer, nx::vms::api::PeerType peerType)

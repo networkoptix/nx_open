@@ -12,6 +12,7 @@
 
 class QnWorkbenchLayout;
 typedef QList<QnWorkbenchLayout *> QnWorkbenchLayoutList;
+struct QnStreamSynchronizationState;
 
 namespace nx::vms::client::desktop {
 namespace ui {
@@ -30,12 +31,6 @@ public:
 
 private:
     void at_newUserLayoutAction_triggered();
-    void at_saveLayoutAction_triggered();
-    void at_saveCurrentLayoutAction_triggered();
-    void at_saveLayoutAsCloudAction_triggered();
-    void at_saveLayoutForCurrentUserAsAction_triggered();
-    void at_saveCurrentLayoutAsAction_triggered();
-    void at_saveCurrentLayoutAsCloudAction_triggered();
     void at_closeLayoutAction_triggered();
     void at_closeAllButThisLayoutAction_triggered();
     void at_removeFromServerAction_triggered();
@@ -44,6 +39,7 @@ private:
     void at_removeLayoutItemFromSceneAction_triggered();
     void at_openLayoutAction_triggered(const vms::event::AbstractActionPtr& businessAction);
     void at_forgetLayoutPasswordAction_triggered();
+    void at_openInNewTabAction_triggered();
 
 private:
     bool closeAllLayouts(bool force = false);
@@ -53,6 +49,11 @@ private:
      * @param layout Layout to save.
      */
     void saveLayout(const QnLayoutResourcePtr& layout);
+
+    /**
+     * Save provided layout under another name. Remote layout will be copied for the current user.
+     */
+    void saveLayoutAs(const QnLayoutResourcePtr& layout);
 
     /** Save a copy of remote layout for the current user. */
     void saveRemoteLayoutAs(const QnLayoutResourcePtr& layout);
@@ -97,6 +98,14 @@ private:
         const QnLayoutResourceList& rollbackResources);
     bool closeLayouts(const QnLayoutResourceList& resources, bool force = false);
     bool closeLayouts(const QnWorkbenchLayoutList& layouts, bool force = false);
+
+    /**
+     * Open provided layouts in new tabs.
+     * @param state Playback synchronization state for the layout if it is not opened yet.
+     */
+    void openLayouts(
+        const QnLayoutResourceList& layouts,
+        const QnStreamSynchronizationState& playbackState);
 };
 
 } // namespace workbench

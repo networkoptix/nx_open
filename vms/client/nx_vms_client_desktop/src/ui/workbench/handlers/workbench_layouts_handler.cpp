@@ -2,15 +2,13 @@
 
 #include "workbench_layouts_handler.h"
 
-#include <boost/algorithm/cxx11/all_of.hpp>
-#include <boost/algorithm/cxx11/any_of.hpp>
-
 #include <QtWidgets/QAction>
 
 #include <client/client_globals.h>
 #include <client/client_message_processor.h>
 #include <client/client_settings.h>
 #include <common/common_module.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/layout_reader.h>
 #include <core/resource/layout_resource.h>
@@ -43,12 +41,14 @@
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
 #include <ui/dialogs/layout_name_dialog.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/widgets/views/resource_list_view.h>
@@ -60,14 +60,12 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_state_manager.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
 #include <watchers/cloud_status_watcher.h>
-
-using boost::algorithm::any_of;
-using boost::algorithm::all_of;
 
 namespace nx::vms::client::desktop {
 namespace ui {
@@ -188,20 +186,35 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
     QObject(parent),
     QnSessionAwareDelegate(parent)
 {
+    auto getCurrentLayout =
+        [this]() { return workbench()->currentLayout()->resource(); };
+    auto getLayoutFromParameters =
+        [this]()
+        {
+            return menu()->currentParameters(sender()).resource().dynamicCast<QnLayoutResource>();
+        };
+
     connect(action(action::NewUserLayoutAction), &QAction::triggered, this,
         &LayoutsHandler::at_newUserLayoutAction_triggered);
+
     connect(action(action::SaveLayoutAction), &QAction::triggered, this,
-        &LayoutsHandler::at_saveLayoutAction_triggered);
-    connect(action(action::SaveLayoutAsCloudAction), &QAction::triggered, this,
-        &LayoutsHandler::at_saveLayoutAsCloudAction_triggered);
-    connect(action(action::SaveLayoutForCurrentUserAsAction), &QAction::triggered, this,
-        &LayoutsHandler::at_saveLayoutForCurrentUserAsAction_triggered);
+        [=]() { saveLayout(getLayoutFromParameters()); });
+
     connect(action(action::SaveCurrentLayoutAction), &QAction::triggered, this,
-        &LayoutsHandler::at_saveCurrentLayoutAction_triggered);
-    connect(action(action::SaveCurrentLayoutAsAction), &QAction::triggered, this,
-        &LayoutsHandler::at_saveCurrentLayoutAsAction_triggered);
+        [=]() { saveLayout(getCurrentLayout()); });
+
+    connect(action(action::SaveLayoutAsCloudAction), &QAction::triggered, this,
+        [=]() { saveLayoutAsCloud(getLayoutFromParameters()); });
+
     connect(action(action::SaveCurrentLayoutAsCloudAction), &QAction::triggered, this,
-        &LayoutsHandler::at_saveCurrentLayoutAsCloudAction_triggered);
+        [=]() { saveLayoutAsCloud(getCurrentLayout());});
+
+    connect(action(action::SaveLayoutAsAction), &QAction::triggered, this,
+        [=]() { saveLayoutAs(getLayoutFromParameters()); });
+
+    connect(action(action::SaveCurrentLayoutAsAction), &QAction::triggered, this,
+        [=]() { saveLayoutAs(getCurrentLayout()); });
+
     connect(action(action::CloseLayoutAction), &QAction::triggered, this,
         &LayoutsHandler::at_closeLayoutAction_triggered);
     connect(action(action::CloseAllButThisLayoutAction), &QAction::triggered, this,
@@ -217,6 +230,9 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
         &LayoutsHandler::at_removeLayoutItemAction_triggered);
     connect(action(action::RemoveLayoutItemFromSceneAction), &QAction::triggered, this,
         &LayoutsHandler::at_removeLayoutItemFromSceneAction_triggered);
+
+    connect(action(action::OpenInNewTabAction), &QAction::triggered, this,
+        &LayoutsHandler::at_openInNewTabAction_triggered);
 
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
@@ -468,6 +484,17 @@ void LayoutsHandler::saveLayout(const QnLayoutResourcePtr& layout)
     }
 }
 
+void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr& layout)
+{
+    if (!NX_ASSERT(layout))
+        return;
+
+    if (isCloudLayout(layout))
+        saveCloudLayoutAs(layout);
+    else
+        saveRemoteLayoutAs(layout);
+}
+
 void LayoutsHandler::saveRemoteLayoutAs(const QnLayoutResourcePtr& layout)
 {
     QnUserResourcePtr user = context()->user();
@@ -647,7 +674,7 @@ void LayoutsHandler::saveLayoutAsCloud(const QnLayoutResourcePtr& layout)
 
 void LayoutsHandler::saveCloudLayoutAs(const QnLayoutResourcePtr& layout)
 {
-    if (!NX_ASSERT(layout->hasFlags(Qn::cross_system)))
+    if (!NX_ASSERT(isCloudLayout(layout)))
         return;
 
     QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(
@@ -819,8 +846,8 @@ bool LayoutsHandler::confirmChangeSharedLayout(const LayoutChange& change)
 {
     /* Checking if custom users have access to this shared layout. */
     auto allUsers = resourcePool()->getResources<QnUserResource>();
-    auto accessibleToCustomUsers = any_of(
-        allUsers,
+    auto accessibleToCustomUsers = std::any_of(
+        allUsers.cbegin(), allUsers.cend(),
         [this, layout = change.layout](const QnUserResourcePtr& user)
         {
             return resourceAccessProvider()->accessibleVia(user, layout) ==
@@ -838,10 +865,10 @@ bool LayoutsHandler::confirmDeleteSharedLayouts(const QnLayoutResourceList& layo
 {
     /* Checking if custom users have access to this shared layout. */
     auto allUsers = resourcePool()->getResources<QnUserResource>();
-    auto accessibleToCustomUsers = any_of(allUsers,
+    auto accessibleToCustomUsers = std::any_of(allUsers.cbegin(), allUsers.cend(),
         [this, layouts](const QnUserResourcePtr& user)
         {
-            return any_of(layouts,
+            return std::any_of(layouts.cbegin(), layouts.cend(),
                 [this, user](const QnLayoutResourcePtr& layout)
                 {
                     return resourceAccessProvider()->accessibleVia(user, layout) ==
@@ -953,7 +980,7 @@ void LayoutsHandler::grantMissingAccessRights(const QnUserResourcePtr& user,
 
 bool LayoutsHandler::canRemoveLayouts(const QnLayoutResourceList &layouts)
 {
-    return all_of(layouts,
+    return std::all_of(layouts.cbegin(), layouts.cend(),
         [this](const QnLayoutResourcePtr& layout)
         {
             return accessController()->hasPermissions(layout, Qn::RemovePermission);
@@ -1063,6 +1090,59 @@ bool LayoutsHandler::closeAllLayouts(bool force)
     return closeLayouts(resourcePool()->getResources<QnLayoutResource>(), force);
 }
 
+void LayoutsHandler::openLayouts(
+    const QnLayoutResourceList& layouts,
+    const QnStreamSynchronizationState& playbackState)
+{
+    if (!NX_ASSERT(!layouts.empty()))
+        return;
+
+    static const QnStreamSynchronizationState kExportedLayoutDefaultState(
+        /*isLive*/ false,
+        /*position*/ 0,
+        /*speed*/ 1.0);
+
+    QnWorkbenchLayout* lastLayout = nullptr;
+    for (const auto& layout: layouts)
+    {
+        auto wbLayout = QnWorkbenchLayout::instance(layout);
+        if (!wbLayout)
+        {
+            wbLayout = qnWorkbenchLayoutsFactory->create(layout, workbench());
+
+            workbench()->addLayout(wbLayout);
+
+            if (!wbLayout->isSearchLayout())
+            {
+                // Use zero position for nov files.
+                const auto state = layout->isFile()
+                    ? kExportedLayoutDefaultState
+                    : playbackState;
+
+                // Force playback state.
+                wbLayout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue(state));
+
+                for (auto item: wbLayout->items())
+                {
+                    // Do not set item's playback parameters if they are already set.
+                    if (!item->data(Qn::ItemTimeRole).isValid())
+                    {
+                        item->setData(Qn::ItemTimeRole,
+                            state.timeUs == DATETIME_NOW ? DATETIME_NOW : state.timeUs / 1000);
+                        item->setData(Qn::ItemPausedRole, state.speed == 0);
+                        item->setData(Qn::ItemSpeedRole, state.speed);
+                    }
+                }
+            }
+        }
+        // Explicitly set that we do not control videowall through this layout.
+        wbLayout->setData(Qn::VideoWallItemGuidRole, QVariant::fromValue(QnUuid()));
+
+        lastLayout = wbLayout;
+    }
+    workbench()->setCurrentLayout(lastLayout);
+}
+
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
@@ -1098,7 +1178,7 @@ void LayoutsHandler::at_newUserLayoutAction_triggered()
 
     if (!existing.isEmpty())
     {
-        bool allAreLocal = boost::algorithm::all_of(existing,
+        bool allAreLocal = std::all_of(existing.cbegin(), existing.cend(),
             [](const QnLayoutResourcePtr& layout)
             {
                 return layout->hasFlags(Qn::local);
@@ -1119,45 +1199,6 @@ void LayoutsHandler::at_newUserLayoutAction_triggered()
     appContext()->currentSystemContext()->layoutSnapshotManager()->save(layout);
 
     menu()->trigger(action::OpenInNewTabAction, layout);
-}
-
-void LayoutsHandler::at_saveLayoutAction_triggered()
-{
-    saveLayout(menu()->currentParameters(sender()).resource().dynamicCast<QnLayoutResource>());
-}
-
-void LayoutsHandler::at_saveCurrentLayoutAction_triggered()
-{
-    saveLayout(workbench()->currentLayout()->resource());
-}
-
-void LayoutsHandler::at_saveLayoutForCurrentUserAsAction_triggered()
-{
-    saveRemoteLayoutAs(
-        menu()->currentParameters(sender()).resource().dynamicCast<QnLayoutResource>());
-}
-
-void LayoutsHandler::at_saveLayoutAsCloudAction_triggered()
-{
-    const auto parameters = menu()->currentParameters(sender());
-    saveLayoutAsCloud(parameters.resource().dynamicCast<QnLayoutResource>());
-}
-
-void LayoutsHandler::at_saveCurrentLayoutAsAction_triggered()
-{
-    auto layout = workbench()->currentLayout()->resource();
-    if (!NX_ASSERT(layout))
-        return;
-
-    if (layout->hasFlags(Qn::cross_system))
-        saveCloudLayoutAs(layout);
-    else
-        saveRemoteLayoutAs(layout);
-}
-
-void LayoutsHandler::at_saveCurrentLayoutAsCloudAction_triggered()
-{
-    saveLayoutAsCloud(workbench()->currentLayout()->resource());
 }
 
 void LayoutsHandler::at_closeLayoutAction_triggered()
@@ -1253,6 +1294,101 @@ void LayoutsHandler::at_removeLayoutItemFromSceneAction_triggered()
 {
     const auto layoutItems = menu()->currentParameters(sender()).layoutItems();
     removeLayoutItems(layoutItems, false);
+}
+
+void LayoutsHandler::at_openInNewTabAction_triggered()
+{
+    // Stop layout tour if it is running.
+    if (action(action::ToggleLayoutTourModeAction)->isChecked())
+        menu()->trigger(action::ToggleLayoutTourModeAction);
+
+    const auto isCameraWithFootage =
+        [this](const QnResourceWidget* widget)
+        {
+            const auto camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
+            return camera && accessController()->hasPermissions(camera, Qn::ViewFootagePermission);
+        };
+
+    const auto currentWidget = navigator()->currentWidget();
+    const auto streamSynchronizer = workbench()->windowContext()->streamSynchronizer();
+    auto currentState = streamSynchronizer->state();
+    if (!currentState.isSyncOn
+        || currentState.timeUs == DATETIME_NOW
+        || !currentWidget
+        || !isCameraWithFootage(currentWidget))
+    {
+        // Get default value.
+        currentState = QnStreamSynchronizationState::live();
+    }
+
+    auto parameters = menu()->currentParameters(sender());
+    const auto layouts = parameters.resources().filtered<QnLayoutResource>();
+    if (!layouts.empty())
+    {
+        NX_ASSERT(parameters.widgets().empty(), "Layouts can not be passed with widgets");
+        NX_ASSERT(parameters.resources().size() == layouts.size(),
+            "Mixed resources set is not expected here");
+        openLayouts(layouts, currentState);
+        // Do not return in case mixed resource set is passed somehow.
+    }
+
+    const auto openable = parameters.resources()
+        .filtered(QnResourceAccessFilter::isOpenableInLayout);
+    const bool hasCrossSystemResources = std::any_of(
+        openable.cbegin(), openable.cend(),
+        [](const QnResourcePtr& resource) { return resource->hasFlags(Qn::cross_system); });
+
+    auto layout = hasCrossSystemResources
+        ? QnLayoutResourcePtr(new CrossSystemLayoutResource())
+        : QnLayoutResourcePtr(new QnLayoutResource());
+    layout->setIdUnsafe(QnUuid::createUuid());
+    layout->addFlags(Qn::local);
+
+    if (hasCrossSystemResources)
+    {
+        appContext()->cloudLayoutsSystemContext()->resourcePool()->addResource(layout);
+        layout->setName(generateUniqueLayoutName(
+            layout->resourcePool(),
+            /*user*/ {},
+            tr("New Layout"),
+            tr("New Layout %1")));
+    }
+    else
+    {
+        if (context()->user())
+            layout->setParentId(context()->user()->getId());
+        resourcePool()->addResource(layout);
+        layout->setName(generateUniqueLayoutName(
+            resourcePool(),
+            context()->user(),
+            tr("New Layout"),
+            tr("New Layout %1")));
+    }
+
+    const auto widgets = parameters.widgets();
+
+    // Check if action is called from the Resources Tree.
+    if (widgets.isEmpty())
+    {
+        if (openable.empty())
+            return;
+
+        parameters.setResources(openable);
+        parameters.setArgument(Qn::LayoutSyncStateRole, currentState);
+        openLayouts({layout}, currentState);
+    }
+    else // Action is called for widgets from the current layout context menu.
+    {
+        const bool hasViewFootagePermission = std::any_of(widgets.cbegin(), widgets.cend(),
+            isCameraWithFootage);
+        const auto state = hasViewFootagePermission
+            ? streamSynchronizer->state()
+            : QnStreamSynchronizationState::live();
+
+        openLayouts({layout}, state);
+    }
+
+    menu()->trigger(action::DropResourcesAction, parameters);
 }
 
 bool LayoutsHandler::tryClose(bool force)

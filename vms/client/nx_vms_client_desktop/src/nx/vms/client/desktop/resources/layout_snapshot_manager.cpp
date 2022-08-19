@@ -123,19 +123,20 @@ bool LayoutSnapshotManager::save(
                 callback(success, layout);
         });
 
+    /* Submit all changes from workbench to resource. */
+    if (auto synchronizer = QnWorkbenchLayoutSynchronizer::instance(layout))
+        synchronizer->submit();
+
     if (layout.dynamicCast<CrossSystemLayoutResource>())
     {
         appContext()->cloudLayoutsManager()->saveLayout(layout, internalCallback);
+        markBeingSaved(layout->getId(), true);
         return true;
     }
 
     auto connection = this->connection()->messageBusConnection();
     if (!NX_ASSERT(connection))
         return false;
-
-    /* Submit all changes from workbench to resource. */
-    if (QnWorkbenchLayoutSynchronizer *synchronizer = QnWorkbenchLayoutSynchronizer::instance(layout))
-        synchronizer->submit();
 
     nx::vms::api::LayoutData apiLayout;
     ec2::fromResourceToApi(layout, apiLayout);
@@ -245,9 +246,6 @@ void LayoutSnapshotManager::connectTo(const QnLayoutResourcePtr &resource)
     // layout is not opened right now.
     connect(resource.get(), &QnLayoutResource::itemChanged, this,
         &LayoutSnapshotManager::at_layout_changed);
-
-    connect(resource.get(), &QnLayoutResource::storeRequested, this,
-        &LayoutSnapshotManager::store);
 }
 
 void LayoutSnapshotManager::disconnectFrom(const QnLayoutResourcePtr &resource)

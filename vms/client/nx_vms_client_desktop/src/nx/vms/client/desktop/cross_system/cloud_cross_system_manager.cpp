@@ -52,7 +52,8 @@ CloudCrossSystemManager::CloudCrossSystemManager(QObject* parent):
             else if (existing != d->cloudSystems.end()) //< System is lost or not cloud anymore.
             {
                 NX_VERBOSE(this, "Cloud system %1 lost", existing->second.get());
-                d->cloudSystems[systemId]->update(CloudCrossSystemContext::UpdateReason::lost);
+                //d->cloudSystems[systemId]->update(CloudCrossSystemContext::UpdateReason::lost);
+                d->cloudSystems.erase(existing);
                 emit systemLost(systemId);
             }
         };

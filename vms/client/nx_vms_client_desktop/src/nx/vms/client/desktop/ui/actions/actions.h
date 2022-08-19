@@ -615,9 +615,9 @@ enum IDType
     StopSharingLayoutAction,
 
     /**
-     * Saves selected layout under another name in current user's layouts list.
+     * Saves provided layout under another name.
      */
-    SaveLayoutForCurrentUserAsAction,
+    SaveLayoutAsAction,
 
     /**
      * Shares selected camera with another user.
