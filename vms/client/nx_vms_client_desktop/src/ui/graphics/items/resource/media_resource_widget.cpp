@@ -2298,7 +2298,11 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
         const auto taxonomy = d->taxonomyManager->currentTaxonomy();
         for (const auto engineId: d->camera->compatibleAnalyticsEngines())
         {
-            if (d->taxonomyManager->isEngineRelevant(taxonomy->engineById(engineId.toString())))
+            auto engine = taxonomy->engineById(engineId.toString());
+            if (!engine) //< Can be absent for cross-system Cameras.
+                continue;
+
+            if (d->taxonomyManager->isEngineRelevant(engine))
             {
                 result |= Qn::ObjectSearchButton;
                 break;

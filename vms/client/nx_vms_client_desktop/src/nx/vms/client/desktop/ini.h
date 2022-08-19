@@ -133,6 +133,8 @@ struct Ini: nx::kit::IniConfig
     NX_INI_STRING("", cloudLayoutsEndpointOverride,
         "[Dev] Override url to cloud layouts endpoint (e.g. \"localhost::8000\").");
 
+    NX_INI_FLAG(false, crossSystemLayoutsExtendedDebug, "[Dev] Cross-system layouts debug info.");
+
     NX_INI_FLAG(false,
         allowOwnCloudNotifications,
         "[Dev] Allow receiving cloud notifications from the current cloud system");
@@ -234,7 +236,7 @@ struct Ini: nx::kit::IniConfig
         " * \"low\" - all new layouts are opened with forced low resolution");
 
     // VMS-30447
-    NX_INI_FLAG(false, crossSystemLayouts, "[Feature] Enables cross-system layouts.");
+    NX_INI_FLAG(true, crossSystemLayouts, "[Feature] Enables cross-system layouts.");
 
     // VMS-30455 Enabled by default in 5.1.
     NX_INI_FLAG(true, crossSystemNotifications, "[Feature] Enables cross-system notifications");

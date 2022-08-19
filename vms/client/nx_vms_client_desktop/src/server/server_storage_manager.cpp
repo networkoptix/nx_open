@@ -219,7 +219,7 @@ void QnServerStorageManager::handleResourceAdded(const QnResourcePtr& resource)
     }
 
     const auto server = resource.objectCast<QnMediaServerResource>();
-    if (!server || server.objectCast<QnFakeMediaServerResource>())
+    if (!server || server->hasFlags(Qn::fake) || server->hasFlags(Qn::cross_system))
         return;
 
     m_serverInfo.insert(server, ServerInfo());

@@ -19,14 +19,14 @@ const QnUuid kThumbCameraTypeId("{72d232d7-0c67-4d8e-b5a8-a0d5075ff3a4}");
 struct CrossSystemCameraResource::Private
 {
     CrossSystemCameraResource* const q;
-    nx::vms::api::CameraDataEx source;
+    std::optional<nx::vms::api::CameraDataEx> source;
     QPointer<CloudCrossSystemContext> crossSystemContext;
     CloudCrossSystemContext::Status cachedStatus = CloudCrossSystemContext::Status::uninitialized;
 
     QString calculateName() const
     {
         return crossSystemContext->isConnected()
-            ? source.name
+            ? NX_ASSERT(source) ? source->name : toString(cachedStatus)
             : toString(cachedStatus);
     }
 
@@ -62,22 +62,22 @@ CrossSystemCameraResource::CrossSystemCameraResource(
     })
 {
     addFlags(Qn::cross_system);
-    setIdUnsafe(d->source.id);
-    setTypeId(d->source.typeId);
-    setModel(d->source.model);
-    setVendor(d->source.vendor);
-    setPhysicalId(d->source.physicalId);
-    setMAC(nx::utils::MacAddress(d->source.mac));
+    setIdUnsafe(source.id);
+    setTypeId(source.typeId);
+    setModel(source.model);
+    setVendor(source.vendor);
+    setPhysicalId(source.physicalId);
+    setMAC(nx::utils::MacAddress(source.mac));
 
-    m_name = d->source.name; //< Set resource name, but not camera name.
-    m_url = d->source.url;
-    m_parentId = d->source.parentId;
+    m_name = source.name; //< Set resource name, but not camera name.
+    m_url = source.url;
+    m_parentId = source.parentId;
 
     // Test if the camera is a desktop or virtual camera.
-    if (d->source.typeId == nx::vms::api::CameraData::kDesktopCameraTypeId)
+    if (source.typeId == nx::vms::api::CameraData::kDesktopCameraTypeId)
         addFlags(Qn::desktop_camera);
 
-    if (d->source.typeId == nx::vms::api::CameraData::kVirtualCameraTypeId)
+    if (source.typeId == nx::vms::api::CameraData::kVirtualCameraTypeId)
         addFlags(Qn::virtual_camera);
 
     watchOnCrossSystemContext();
@@ -106,20 +106,20 @@ CrossSystemCameraResource::~CrossSystemCameraResource() = default;
 
 void CrossSystemCameraResource::update(nx::vms::api::CameraDataEx data)
 {
-    if (data.typeId != d->source.typeId)
+    if (!d->source)
     {
         // Test if the camera is a desktop or virtual camera.
-        if (d->source.typeId == nx::vms::api::CameraData::kDesktopCameraTypeId)
+        if (data.typeId == nx::vms::api::CameraData::kDesktopCameraTypeId)
             addFlags(Qn::desktop_camera);
 
-        if (d->source.typeId == nx::vms::api::CameraData::kVirtualCameraTypeId)
+        if (data.typeId == nx::vms::api::CameraData::kVirtualCameraTypeId)
             addFlags(Qn::virtual_camera);
 
         setTypeId(data.typeId);
-        setModel(d->source.model);
-        setVendor(d->source.vendor);
-        setPhysicalId(d->source.physicalId);
-        setMAC(nx::utils::MacAddress(d->source.mac));
+        setModel(data.model);
+        setVendor(data.vendor);
+        setPhysicalId(data.physicalId);
+        setMAC(nx::utils::MacAddress(data.mac));
     }
 
     NotifierList notifiers;
@@ -128,10 +128,10 @@ void CrossSystemCameraResource::update(nx::vms::api::CameraDataEx data)
 
         d->source = std::move(data);
 
-        if (m_parentId != d->source.parentId)
+        if (m_parentId != d->source->parentId)
         {
             const auto oldParentId = m_parentId;
-            m_parentId = d->source.parentId;
+            m_parentId = d->source->parentId;
             notifiers <<
                 [r = toSharedPointer(this), oldParentId]
                 {
@@ -139,15 +139,15 @@ void CrossSystemCameraResource::update(nx::vms::api::CameraDataEx data)
                 };
         }
 
-        if (m_url != d->source.url)
+        if (m_url != d->source->url)
         {
-            m_url = d->source.url;
+            m_url = d->source->url;
             notifiers << [r = toSharedPointer(this)] { emit r->urlChanged(r); };
         }
 
-        if (m_name != d->source.name)
+        if (m_name != d->source->name)
         {
-            m_name = d->source.name;
+            m_name = d->source->name;
             notifiers << [r = toSharedPointer(this)] { emit r->nameChanged(r); };
         }
 
