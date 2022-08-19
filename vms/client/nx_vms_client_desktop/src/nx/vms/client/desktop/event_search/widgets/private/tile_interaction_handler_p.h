@@ -69,6 +69,7 @@ private:
         const QnVirtualCameraResourcePtr& camera) const;
 
     void copyBookmarkToClipboard(const QModelIndex& index);
+    bool checkActionSupport(const QModelIndex& index);
 
 signals:
     void highlightedTimestampChanged(std::chrono::microseconds value);
