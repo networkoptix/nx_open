@@ -2346,12 +2346,12 @@ bool QnWorkbenchNavigator::hasArchiveForCamera(const QnSecurityCamResourcePtr& c
     if (!camera)
         return false;
 
-    auto footageServers = cameraHistoryPool()->getCameraFootageData(camera, true);
-    if (footageServers.empty())
-        return false;
-
     auto systemContext = SystemContext::fromResource(camera);
     if (!NX_ASSERT(systemContext))
+        return false;
+
+    auto footageServers = systemContext->cameraHistoryPool()->getCameraFootageData(camera, true);
+    if (footageServers.empty())
         return false;
 
     if (const auto loader = systemContext->cameraDataManager()->loader(

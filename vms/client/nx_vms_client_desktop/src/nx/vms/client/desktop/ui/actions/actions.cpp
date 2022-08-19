@@ -1202,7 +1202,7 @@ void initialize(Manager* manager, Action* root)
         .requiredTargetPermissions(Qn::SavePermission)
         .condition(condition::hasFlags(Qn::layout, MatchMode::all));
 
-    factory(SaveLayoutForCurrentUserAsAction) // TODO: #sivanov Check canCreateResource permission.
+    factory(SaveLayoutAsAction)
         .flags(TitleBar | Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Save Layout As..."))
         .condition(

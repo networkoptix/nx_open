@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>573</width>
-    <height>497</height>
+    <width>515</width>
+    <height>471</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="leftMargin">
@@ -29,6 +35,9 @@
       <widget class="QLabel" name="imageLabel">
        <property name="text">
         <string notr="true">&lt;image placeholder&gt;</string>
+       </property>
+       <property name="scaledContents">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

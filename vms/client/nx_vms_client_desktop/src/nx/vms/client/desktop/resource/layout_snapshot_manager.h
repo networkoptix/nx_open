@@ -46,6 +46,9 @@ public:
 
     bool isChanged(const QnLayoutResourcePtr& layout) const;
     bool isSaveable(const QnLayoutResourcePtr& layout) const;
+
+    // TODO: #sivanov Naming is not the best.
+    /** Whether layout is changed and not is being saved. */
     bool isModified(const QnLayoutResourcePtr& layout) const;
 
 signals:

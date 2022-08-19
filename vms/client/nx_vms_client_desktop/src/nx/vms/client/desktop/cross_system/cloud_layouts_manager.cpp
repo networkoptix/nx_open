@@ -22,6 +22,7 @@
 #include <nx/vms/client/core/network/network_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -115,9 +116,11 @@ struct CloudLayoutsManager::Private
                 layoutData.id))
             {
                 layoutsToRemove.remove(existingLayout);
-                existingLayout->update(layoutData);
-                existingLayout->removeFlags(Qn::local);
-                existingLayout->addFlags(Qn::remote);
+                if (!systemContext->layoutSnapshotManager()->isChanged(existingLayout))
+                {
+                    existingLayout->update(layoutData);
+                    systemContext->layoutSnapshotManager()->store(existingLayout);
+                }
             }
             else
             {
@@ -280,10 +283,21 @@ struct CloudLayoutsManager::Private
         if (!NX_ASSERT(layout->hasFlags(Qn::cross_system)))
             return;
 
+        auto internalCallback =
+            [this, layout, callback](bool success)
+            {
+                if (success)
+                {
+                    layout->removeFlags(Qn::local);
+                    layout->addFlags(Qn::remote);
+                }
+                callback(success);
+            };
+
         nx::vms::api::LayoutData layoutData;
         ec2::fromResourceToApi(layout, layoutData);
 
-        sendSaveLayoutRequest(layoutData, callback);
+        sendSaveLayoutRequest(layoutData, internalCallback);
     }
 
     void deleteLayout(const QnLayoutResourcePtr& layout)
