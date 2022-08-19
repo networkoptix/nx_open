@@ -575,7 +575,7 @@ void QnWorkbench::update(const QnWorkbenchState& state)
             continue;
         }
 
-        const auto tour = layoutTourManager()->tour(id);
+        const auto tour = systemContext()->showreelManager()->tour(id);
         if (tour.isValid())
         {
             menu()->trigger(action::ReviewLayoutTourAction, {Qn::UuidRole, id});

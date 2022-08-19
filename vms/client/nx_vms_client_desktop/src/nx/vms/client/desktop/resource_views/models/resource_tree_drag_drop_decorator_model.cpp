@@ -282,7 +282,7 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
         // Setting empty parent ID for web pages forces them not to be proxied.
         const auto webPages = data.resources().filtered<QnWebPageResource>();
 
-        m_actionHandler->moveResourcesToServer(webPages, /*sourceGroupId*/ {}, /*server*/ {},
+        m_actionHandler->moveResourcesToServer(webPages, /*server*/ {},
             [this](QnResourceList moved)
             {
                 // Group ID is discarded for web pages being moved back to the 'Web Pages' parent
@@ -398,7 +398,6 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
         {
             m_actionHandler->moveResourcesToServer(
                 sourceResources,
-                dragGroupId,
                 dropParentServer,
                 moveResourcesToGroup);
         }
@@ -465,7 +464,6 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
         {
             m_actionHandler->moveResourcesToServer(
                 sourceResources,
-                dragGroupId,
                 server,
                 moveResourcesToGroup);
         }

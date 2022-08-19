@@ -17,6 +17,8 @@ protected:
     virtual void updateResource(
         const QnResourcePtr& resource,
         ec2::NotificationSource source) override;
+
+    virtual void handleTourAddedOrUpdated(const nx::vms::api::LayoutTourData& tour) override;
 };
 
 #define qnDesktopClientMessageProcessor \

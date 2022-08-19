@@ -105,7 +105,7 @@ TileInteractionHandler* TileInteractionHandler::doInstall(
     const auto handler = new TileInteractionHandler(context, tileInteractionSource);
 
     connect(tileInteractionSource, &T::linkActivated, handler,
-        [tileInteractionSource](const QModelIndex& index, const QString& link)
+        [](const QModelIndex& index, const QString& link)
         {
             if (!NX_ASSERT(index.isValid()))
                 return;
@@ -118,7 +118,7 @@ TileInteractionHandler* TileInteractionHandler::doInstall(
         handler, &TileInteractionHandler::handleClick);
 
     connect(tileInteractionSource, &T::doubleClicked, handler,
-        [handler, context](const QModelIndex& index)
+        [handler](const QModelIndex& index)
         {
             handler->openSource(index, /*inNewTab*/ false, /*fromDoubleClick*/ true);
         });
@@ -348,7 +348,7 @@ void TileInteractionHandler::executePluginAction(
 void TileInteractionHandler::copyBookmarkToClipboard(const QModelIndex &index)
 {
     auto displayTime =
-        [this](qint64 msecsSinceEpoch)
+        [](qint64 msecsSinceEpoch)
         {
             // TODO: #sivanov Actualize used system context.
             const auto timeWatcher = appContext()->currentSystemContext()->serverTimeWatcher();

@@ -4,14 +4,17 @@
 
 #include <core/ptz/ptz_controller_pool.h>
 
-class QnClientPtzControllerPool: public QnPtzControllerPool
+namespace nx::vms::client::core {
+namespace ptz {
+
+class ControllerPool: public QnPtzControllerPool
 {
     Q_OBJECT
     typedef QnPtzControllerPool base_type;
 
 public:
-    QnClientPtzControllerPool(
-        nx::vms::common::SystemContext* systemContext,
+    ControllerPool(
+        common::SystemContext* systemContext,
         QObject* parent = nullptr);
 
 protected:
@@ -23,3 +26,6 @@ private:
     void cacheCameraPresets(const QnResourcePtr& resource);
     void reinitServerCameras(const QnMediaServerResourcePtr& server);
 };
+
+} // namespace ptz
+} // namespace nx::vms::client::core

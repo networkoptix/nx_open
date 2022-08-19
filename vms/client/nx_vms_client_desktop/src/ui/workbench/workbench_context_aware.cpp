@@ -3,13 +3,15 @@
 #include "workbench_context_aware.h"
 
 #include <QtCore/QObject>
-#include <QtWidgets/QGraphicsItem>
 #include <QtQml/QtQml>
+#include <QtWidgets/QGraphicsItem>
 
+#include <nx/vms/client/desktop/system_context.h>
 #include <ui/widgets/main_window.h>
 
 #include "workbench_context.h"
 
+using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
 QString QnWorkbenchContextAware::kQmlWorkbenchContextPropertyName("workbenchContext");
@@ -59,6 +61,11 @@ void QnWorkbenchContextAware::initializeContext()
     NX_ASSERT(!m_context, "Double initialization.");
     NX_ASSERT(m_parent);
     init(m_parent);
+}
+
+SystemContext* QnWorkbenchContextAware::systemContext() const
+{
+    return dynamic_cast<SystemContext*>(context()->systemContext());
 }
 
 void QnWorkbenchContextAware::init(QObject* parent)

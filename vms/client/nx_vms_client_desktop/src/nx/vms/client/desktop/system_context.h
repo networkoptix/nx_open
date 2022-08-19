@@ -18,6 +18,7 @@ class QnServerStorageManager;
 namespace nx::vms::client::desktop {
 
 class LayoutSnapshotManager;
+class ShowreelStateManager;
 class ServerRuntimeEventConnector;
 class VideoCache;
 class VideoWallOnlineScreensWatcher;
@@ -60,6 +61,7 @@ public:
     VirtualCameraManager* virtualCameraManager() const;
     VideoCache* videoCache() const;
     LayoutSnapshotManager* layoutSnapshotManager() const;
+    ShowreelStateManager* showreelStateManager() const;
 
 protected:
     virtual void setMessageProcessor(QnCommonMessageProcessor* messageProcessor) override;

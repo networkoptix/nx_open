@@ -16,7 +16,7 @@ class ShowreelItem: public entity_item_model::AbstractItem
     using base_type = entity_item_model::AbstractItem;
 
 public:
-    ShowreelItem(const QnLayoutTourManager* layoutTourManager, const QnUuid& id);
+    ShowreelItem(const QnLayoutTourManager* showreelManager, const QnUuid& id);
 
     /**
      * Implements AbstractItem::data().

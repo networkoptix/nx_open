@@ -47,6 +47,9 @@ struct IntercomManager::Private: public QObject
                 if (!camera)
                     return;
 
+                if (!subject.isUser() || subject.user() != currentUser)
+                    return;
+
                 if (q->systemContext()->resourceAccessProvider()->hasAccess(currentUser, resource))
                     tryCreateLayouts({camera});
                 else

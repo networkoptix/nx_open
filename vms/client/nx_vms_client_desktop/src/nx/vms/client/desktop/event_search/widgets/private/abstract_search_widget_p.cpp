@@ -60,7 +60,6 @@ static constexpr int kTextSearchTopMargin = 12;
 static constexpr int kHeaderSideMargin = 8;
 
 static constexpr milliseconds kQueuedFetchDataDelay = 50ms;
-static constexpr milliseconds kTimeSelectionDelay = 250ms;
 static constexpr milliseconds kTextFilterDelay = 250ms;
 
 static constexpr milliseconds kPlaceholderFadeDuration = 150ms;

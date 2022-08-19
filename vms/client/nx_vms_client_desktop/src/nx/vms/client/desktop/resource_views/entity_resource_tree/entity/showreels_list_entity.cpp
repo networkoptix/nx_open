@@ -13,11 +13,11 @@ using namespace nx::vms::api;
 
 ShowreelsListEntity::ShowreelsListEntity(
     const ShowreelItemCreator& showreelItemCreator,
-    const QnLayoutTourManager* layoutTourManager)
+    const QnLayoutTourManager* showreelManager)
     :
     base_type(showreelItemCreator, entity_item_model::numericOrder())
 {
-    const auto showreels = layoutTourManager->tours();
+    const auto showreels = showreelManager->tours();
 
     QVector<QnUuid> tourIds;
     std::transform(std::cbegin(showreels), std::cend(showreels), std::back_inserter(tourIds),
@@ -26,11 +26,11 @@ ShowreelsListEntity::ShowreelsListEntity(
     setItems(tourIds);
 
     m_connectionsGuard.add(
-        layoutTourManager->connect(layoutTourManager, &QnLayoutTourManager::tourAdded,
+        showreelManager->connect(showreelManager, &QnLayoutTourManager::tourAdded,
         [this](const LayoutTourData& tour) { addItem(tour.id); }));
 
     m_connectionsGuard.add(
-        layoutTourManager->connect(layoutTourManager, &QnLayoutTourManager::tourRemoved,
+        showreelManager->connect(showreelManager, &QnLayoutTourManager::tourRemoved,
         [this](const QnUuid& tourId) { removeItem(tourId); }));
 }
 

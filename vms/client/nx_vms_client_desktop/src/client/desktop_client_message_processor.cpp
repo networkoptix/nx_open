@@ -5,6 +5,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/layout_tour/showreel_state_manager.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/resource_factory.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -48,4 +49,15 @@ void QnDesktopClientMessageProcessor::updateResource(
     base_type::updateResource(resource, source);
     if (layout && NX_ASSERT(systemContext))
         systemContext->layoutSnapshotManager()->store(layout);
+}
+
+void QnDesktopClientMessageProcessor::handleTourAddedOrUpdated(
+    const nx::vms::api::LayoutTourData& tour)
+{
+    auto systemContext = dynamic_cast<SystemContext*>(this->systemContext());
+
+    if (NX_ASSERT(systemContext) && systemContext->showreelStateManager()->isChanged(tour.id))
+        return;
+
+    base_type::handleTourAddedOrUpdated(tour);
 }

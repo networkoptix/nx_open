@@ -258,7 +258,7 @@ LayoutTourData ResourceTreeModelTest::addLayoutTour(
     tourData.id = QnUuid::createUuid();
     tourData.parentId = parentId;
     tourData.name = name;
-    commonModule()->layoutTourManager()->addOrUpdateTour(tourData);
+    systemContext()->showreelManager()->addOrUpdateTour(tourData);
     return tourData;
 }
 

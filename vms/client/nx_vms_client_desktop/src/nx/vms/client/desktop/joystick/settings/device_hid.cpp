@@ -68,15 +68,15 @@ Device::State DeviceHid::getNewState()
 
     StickPosition newStickPosition;
     newStickPosition.fill(0);
-    for (int i = 0; i < m_axisLocations.size() && i < newStickPosition.max_size(); ++i)
+    for (size_t i = 0; i < m_axisLocations.size() && i < newStickPosition.max_size(); ++i)
     {
         const auto state = parseData(m_reportData, m_axisLocations[i]);
 
         int rawValue = 0;
-        for (int i = 0; i < state.size(); ++i)
+        for (int j = 0; j < state.size(); ++j)
         {
-            if (state.at(i))
-                rawValue |= 1 << i;
+            if (state.at(j))
+                rawValue |= 1 << j;
         }
 
         newStickPosition[i] = mapAxisState(rawValue, m_axisLimits[i]);

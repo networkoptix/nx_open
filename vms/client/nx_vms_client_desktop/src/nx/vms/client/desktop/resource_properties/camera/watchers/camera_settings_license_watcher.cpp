@@ -4,11 +4,11 @@
 
 #include <QtCore/QPointer>
 
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/resource_properties/camera/utils/license_usage_provider.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/license/usage_helper.h>
 #include <ui/workbench/workbench_access_controller.h>

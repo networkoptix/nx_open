@@ -6,9 +6,9 @@
 #include <chrono>
 
 #include <QtCore/QCollator>
+#include <QtCore/QHash>
 #include <QtCore/QPointer>
 #include <QtCore/QVector>
-#include <QtCore/QHash>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMenu>
 
@@ -18,21 +18,20 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <ui/workbench/workbench_access_controller.h>
-
+#include <nx/utils/std/algorithm.h>
+#include <nx/utils/string.h>
 #include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/vms/client/desktop/event_search/models/event_search_list_model.h>
 #include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
-#include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/vms/client/desktop/rules/nvr_events_actions_access.h>
+#include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/strings_helper.h>
-
-#include <nx/utils/string.h>
-#include <nx/utils/std/algorithm.h>
+#include <ui/workbench/workbench_access_controller.h>
 
 using namespace std::chrono;
 

@@ -96,32 +96,6 @@ QnResourceList selectedResources(const QModelIndexList& selection)
     return result;
 }
 
-QnResourceList childCameras(const QModelIndex& index)
-{
-    if (!index.isValid())
-    {
-        NX_ASSERT(false, "Invalid parameter");
-        return {};
-    }
-
-    const auto model = index.model();
-    QnResourceList result;
-
-    for (int row = 0; row < model->rowCount(index); ++row)
-    {
-        const auto childIndex = model->index(row, 0, index);
-        const auto childIndexResource = childIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
-
-        if (childIndexResource.dynamicCast<QnVirtualCameraResource>()
-            || childIndexResource->hasFlags(Qn::web_page))
-        {
-            result.append(childIndexResource);
-        }
-    }
-
-    return result;
-}
-
 QnResourceList childCamerasRecursive(const QModelIndex& index)
 {
     if (!index.isValid())

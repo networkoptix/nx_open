@@ -11,7 +11,6 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/layout_tour_manager.h>
-#include <core/resource_management/layout_tour_state_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
 #include <nx/utils/log/log.h>
@@ -19,6 +18,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/vms/client/core/utils/grid_walker.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/layout_tour/showreel_state_manager.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -92,10 +92,10 @@ LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
     m_updateItemsLayoutOperation =
         new nx::utils::PendingOperation(updateItemsLayout, kUpdateItemsLayoutIntervalMs, this);
 
-    connect(layoutTourManager(), &QnLayoutTourManager::tourChanged, this,
+    connect(systemContext()->showreelManager(), &QnLayoutTourManager::tourChanged, this,
         &LayoutTourReviewController::handleTourChanged);
 
-    connect(layoutTourManager(), &QnLayoutTourManager::tourRemoved, this,
+    connect(systemContext()->showreelManager(), &QnLayoutTourManager::tourRemoved, this,
         &LayoutTourReviewController::handleTourRemoved);
 
     connect(action(action::ReviewLayoutTourAction), &QAction::triggered, this,
@@ -369,7 +369,7 @@ void LayoutTourReviewController::updateItemsLayout()
 
     const auto wbLayout = workbench()->currentLayout();
     const auto tourId = currentTourId();
-    const auto tour = layoutTourManager()->tour(currentTourId());
+    const auto tour = systemContext()->showreelManager()->tour(currentTourId());
     const auto reviewLayout = wbLayout->resource();
     NX_ASSERT(reviewLayout == m_reviewLayouts.value(tourId));
     auto resourceRuntimeDataManager =
@@ -564,7 +564,7 @@ void LayoutTourReviewController::at_reviewLayoutTourAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
     auto id = parameters.argument<QnUuid>(Qn::UuidRole);
-    reviewLayoutTour(layoutTourManager()->tour(id));
+    reviewLayoutTour(systemContext()->showreelManager()->tour(id));
 }
 
 void LayoutTourReviewController::at_dropResourcesAction_triggered()
@@ -576,14 +576,14 @@ void LayoutTourReviewController::at_dropResourcesAction_triggered()
     const auto parameters = menu()->currentParameters(sender());
     QPointF position = parameters.argument<QPointF>(Qn::ItemPositionRole);
     addResourcesToReviewLayout(reviewLayout, parameters.resources(), position);
-    const auto tour = layoutTourManager()->tour(currentTourId());
+    const auto tour = systemContext()->showreelManager()->tour(currentTourId());
     menu()->trigger(action::SaveCurrentLayoutTourAction);
 }
 
 void LayoutTourReviewController::at_startCurrentLayoutTourAction_triggered()
 {
     NX_ASSERT_HEAVY_CONDITION(isLayoutTourReviewMode());
-    const auto tour = layoutTourManager()->tour(currentTourId());
+    const auto tour = systemContext()->showreelManager()->tour(currentTourId());
     NX_ASSERT(tour.isValid());
     const auto startTourAction = action(action::ToggleLayoutTourModeAction);
     NX_ASSERT(!startTourAction->isChecked());
@@ -599,7 +599,7 @@ void LayoutTourReviewController::at_saveCurrentLayoutTourAction_triggered()
 
     NX_ASSERT_HEAVY_CONDITION(isLayoutTourReviewMode());
     const auto id = currentTourId();
-    auto tour = layoutTourManager()->tour(id);
+    auto tour = systemContext()->showreelManager()->tour(id);
     NX_ASSERT(tour.isValid());
 
     const auto reviewLayout = m_reviewLayouts.value(id);
@@ -608,8 +608,8 @@ void LayoutTourReviewController::at_saveCurrentLayoutTourAction_triggered()
     tour.items.clear();
     fillTourItems(&tour.items);
     tour.settings.manual = workbench()->currentLayout()->data(Qn::LayoutTourIsManualRole).toBool();
-    layoutTourManager()->addOrUpdateTour(tour);
-    qnClientCoreModule->layoutTourStateManager()->markChanged(tour.id, true);
+    systemContext()->showreelManager()->addOrUpdateTour(tour);
+    systemContext()->showreelStateManager()->markChanged(tour.id, true);
 
     m_saveToursQueue.insert(tour.id);
     m_saveToursOperation->requestOperation();

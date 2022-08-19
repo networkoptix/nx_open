@@ -754,7 +754,7 @@ void applyColumnFilter(
         data.authKey.clear();
 }
 
-void applyColumnFilter(QnCommonModule* commonModule,
+void applyColumnFilter(QnCommonModule* /*commonModule*/,
     const Qn::UserAccessData& accessData,
     api::MediaServerDataEx& data)
 {
@@ -1445,7 +1445,7 @@ struct LayoutTourAccessById
         const Qn::UserAccessData& accessData,
         const nx::vms::api::IdData& tourId)
     {
-        const auto tour = commonModule->systemContext()->layoutTourManager()->tour(tourId.id);
+        const auto tour = commonModule->systemContext()->showreelManager()->tour(tourId.id);
         if (!tour.isValid())
             return Result(); //< Allow everyone to work with tours which are already deleted.
         return LayoutTourAccess()(commonModule, accessData, tour);

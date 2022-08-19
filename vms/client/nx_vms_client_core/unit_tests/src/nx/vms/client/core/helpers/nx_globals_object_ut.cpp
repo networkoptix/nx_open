@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include <helpers/nx_globals_object.h>
+#include <nx/vms/client/core/qml/nx_globals_object.h>
 
 namespace nx::vms::client::core::test {
 

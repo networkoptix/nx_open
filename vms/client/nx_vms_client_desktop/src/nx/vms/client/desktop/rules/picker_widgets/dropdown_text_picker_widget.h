@@ -262,7 +262,7 @@ void InputPortPicker::connectLinkedFields()
 }
 
 template<>
-void InputPortPicker::onCurrentTextChanged(const QString& text)
+void InputPortPicker::onCurrentTextChanged(const QString& /*text*/)
 {
     field->setValue(comboBox->currentData().toString());
 }

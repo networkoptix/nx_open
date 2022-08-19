@@ -3,32 +3,32 @@
 #include "caching_ptz_controller.h"
 
 #include <common/common_meta_types.h>
-
 #include <core/resource/resource.h>
-
-#include <utils/common/delayed.h>
-
 #include <nx/utils/algorithm/index_of.h>
+#include <utils/common/delayed.h>
 
 using namespace nx::vms::common::ptz;
 
-QnCachingPtzController::QnCachingPtzController(const QnPtzControllerPtr& baseController):
+namespace nx::vms::client::core {
+namespace ptz {
+
+CachingPtzController::CachingPtzController(const QnPtzControllerPtr& baseController):
     base_type(baseController),
     m_initialized(false)
 {
 }
 
-QnCachingPtzController::~QnCachingPtzController()
+CachingPtzController::~CachingPtzController()
 {
 }
 
-bool QnCachingPtzController::extends(Ptz::Capabilities capabilities)
+bool CachingPtzController::extends(Ptz::Capabilities capabilities)
 {
     return capabilities.testFlag(Ptz::AsynchronousPtzCapability)
         && !capabilities.testFlag(Ptz::SynchronizedPtzCapability);
 }
 
-Ptz::Capabilities QnCachingPtzController::getCapabilities(
+Ptz::Capabilities CachingPtzController::getCapabilities(
     const Options& options) const
 {
     const Ptz::Capabilities capabilities = base_type::getCapabilities(options);
@@ -37,7 +37,7 @@ Ptz::Capabilities QnCachingPtzController::getCapabilities(
         : capabilities;
 }
 
-bool QnCachingPtzController::getLimits(
+bool CachingPtzController::getLimits(
     QnPtzLimits* limits,
     CoordinateSpace space,
     const Options& options) const
@@ -70,7 +70,7 @@ bool QnCachingPtzController::getLimits(
     return false;
 }
 
-bool QnCachingPtzController::getFlip(
+bool CachingPtzController::getFlip(
     Qt::Orientations* flip,
     const Options& options) const
 {
@@ -85,7 +85,7 @@ bool QnCachingPtzController::getFlip(
     return true;
 }
 
-bool QnCachingPtzController::getPresets(QnPtzPresetList* presets) const
+bool CachingPtzController::getPresets(QnPtzPresetList* presets) const
 {
     if (!base_type::getPresets(presets))
         return false;
@@ -98,7 +98,7 @@ bool QnCachingPtzController::getPresets(QnPtzPresetList* presets) const
     return true;
 }
 
-bool QnCachingPtzController::getTours(QnPtzTourList* tours) const
+bool CachingPtzController::getTours(QnPtzTourList* tours) const
 {
     if (!base_type::getTours(tours))
         return false;
@@ -111,7 +111,7 @@ bool QnCachingPtzController::getTours(QnPtzTourList* tours) const
     return true;
 }
 
-bool QnCachingPtzController::getActiveObject(QnPtzObject* activeObject) const
+bool CachingPtzController::getActiveObject(QnPtzObject* activeObject) const
 {
     if (!base_type::getActiveObject(activeObject))
         return false;
@@ -124,7 +124,7 @@ bool QnCachingPtzController::getActiveObject(QnPtzObject* activeObject) const
     return true;
 }
 
-bool QnCachingPtzController::getHomeObject(QnPtzObject* homeObject) const
+bool CachingPtzController::getHomeObject(QnPtzObject* homeObject) const
 {
     if (!base_type::getHomeObject(homeObject))
         return false;
@@ -137,7 +137,7 @@ bool QnCachingPtzController::getHomeObject(QnPtzObject* homeObject) const
     return true;
 }
 
-bool QnCachingPtzController::getAuxiliaryTraits(
+bool CachingPtzController::getAuxiliaryTraits(
     QnPtzAuxiliaryTraitList* auxiliaryTraits,
     const Options& options) const
 {
@@ -152,7 +152,7 @@ bool QnCachingPtzController::getAuxiliaryTraits(
     return true;
 }
 
-bool QnCachingPtzController::getData(
+bool CachingPtzController::getData(
     QnPtzData* data,
     DataFields query,
     const Options& options) const
@@ -170,7 +170,7 @@ bool QnCachingPtzController::getData(
     return true;
 }
 
-void QnCachingPtzController::baseFinished(Command command, const QVariant& data)
+void CachingPtzController::baseFinished(Command command, const QVariant& data)
 {
     DataFields changedFields = DataField::none;
 
@@ -298,7 +298,7 @@ void QnCachingPtzController::baseFinished(Command command, const QVariant& data)
         emit changed(changedFields);
 }
 
-bool QnCachingPtzController::initializeInternal()
+bool CachingPtzController::initializeInternal()
 {
     /* Note that this field is accessed from this object's thread only,
      * so there is no need to lock. */
@@ -309,7 +309,7 @@ bool QnCachingPtzController::initializeInternal()
     return getData(&data, DataField::all, {Type::operational});
 }
 
-void QnCachingPtzController::initialize()
+void CachingPtzController::initialize()
 {
     const auto guard = toSharedPointer();
 
@@ -330,7 +330,7 @@ void QnCachingPtzController::initialize()
 }
 
 template<class T>
-DataFields QnCachingPtzController::updateCacheLocked(
+DataFields CachingPtzController::updateCacheLocked(
     DataField field, T QnPtzData::*member, const T& value)
 {
     if (!m_data.fields.testFlag(field) || m_data.*member != value)
@@ -346,13 +346,13 @@ DataFields QnCachingPtzController::updateCacheLocked(
 }
 
 template<class T>
-DataFields QnCachingPtzController::updateCacheLocked(
+DataFields CachingPtzController::updateCacheLocked(
     DataField field, T QnPtzData::*member, const QVariant& value)
 {
     return updateCacheLocked(field, member, value.value<T>());
 }
 
-DataFields QnCachingPtzController::updateCacheLocked(const QnPtzData& data)
+DataFields CachingPtzController::updateCacheLocked(const QnPtzData& data)
 {
     using DataFields = nx::vms::common::ptz::DataFields;
     if (data.query == DataFields(DataField::all))
@@ -414,3 +414,6 @@ DataFields QnCachingPtzController::updateCacheLocked(const QnPtzData& data)
 
     return changedFields;
 }
+
+} // namespace ptz
+} // namespace nx::vms::client::core

@@ -281,18 +281,20 @@ JoystickSettingsDialog::JoystickSettingsDialog(Manager* manager, QWidget* parent
             d->layoutsEntity = std::move(layoutsEntity);
         });
 
-    auto handleApply = [this, manager]
+    auto handleApply =
+        [this, manager]
         {
             manager->updateDeviceDescription(d->buttonSettingsModel->getDescriptionState());
             manager->saveConfig(d->buttonSettingsModel->getDescriptionState().id);
             QmlProperty<bool>(rootObjectHolder(), "applyButtonEnabled") = false;
         };
 
-    auto handleReset = [this, manager]
-    {
-        d->initModel(true);
-        QmlProperty<bool>(rootObjectHolder(), "applyButtonEnabled") = true;
-    };
+    auto handleReset =
+        [this]
+        {
+            d->initModel(true);
+            QmlProperty<bool>(rootObjectHolder(), "applyButtonEnabled") = true;
+        };
 
     connect(this, &JoystickSettingsDialog::accepted, handleApply);
     connect(this, &JoystickSettingsDialog::applied, handleApply);

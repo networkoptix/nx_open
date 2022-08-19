@@ -2,22 +2,23 @@
 
 #pragma once
 
-#include <nx/utils/thread/mutex.h>
-
 #include <core/ptz/proxy_ptz_controller.h>
-
+#include <nx/utils/thread/mutex.h>
 #include <utils/common/from_this_to_shared.h>
 
-class QnCachingPtzController:
+namespace nx::vms::client::core {
+namespace ptz {
+
+class CachingPtzController:
     public QnProxyPtzController,
-    public QnFromThisToShared<QnCachingPtzController>
+    public QnFromThisToShared<CachingPtzController>
 {
     Q_OBJECT
     using base_type = QnProxyPtzController;
 
 public:
-    QnCachingPtzController(const QnPtzControllerPtr& baseController);
-    virtual ~QnCachingPtzController();
+    CachingPtzController(const QnPtzControllerPtr& baseController);
+    virtual ~CachingPtzController();
 
     virtual void initialize() override;
 
@@ -76,3 +77,6 @@ private:
     mutable nx::Mutex m_mutex;
     QnPtzData m_data;
 };
+
+} // namespace ptz
+} // namespace nx::vms::client::core

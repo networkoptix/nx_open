@@ -184,13 +184,6 @@ SystemSettings* QnCommonModule::globalSettings() const
         : nullptr;
 }
 
-QnLayoutTourManager* QnCommonModule::layoutTourManager() const
-{
-    return NX_ASSERT(d->systemContext)
-        ? d->systemContext->layoutTourManager()
-        : nullptr;
-}
-
 nx::vms::event::RuleManager* QnCommonModule::eventRuleManager() const
 {
     return NX_ASSERT(d->systemContext)

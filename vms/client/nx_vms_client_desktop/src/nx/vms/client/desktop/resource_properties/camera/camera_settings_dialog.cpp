@@ -12,13 +12,13 @@
 #include <client/client_module.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
-#include <core/ptz/remote_ptz_controller.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <nx/utils/qset.h>
+#include <nx/vms/client/core/ptz/remote_ptz_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -462,7 +462,7 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
     const bool askConfirmation =
         !force
         && isVisible()
-        && !(d->cameras == cameras)
+        && d->cameras != cameras
         && d->hasChanges();
 
     if (askConfirmation)
@@ -498,7 +498,7 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
         if (const auto server = singleCamera->getParentServer())
             d->advancedSettingsWidget->setSelectedServer(server->getId());
         d->advancedSettingsWidget->setPtzInterface(
-            std::make_unique<QnRemotePtzController>(singleCamera));
+            std::make_unique<core::ptz::RemotePtzController>(singleCamera));
     }
 
     d->resetChanges();

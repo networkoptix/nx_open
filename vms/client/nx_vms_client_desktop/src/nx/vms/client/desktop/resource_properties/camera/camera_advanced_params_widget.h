@@ -13,7 +13,7 @@
 
 namespace Ui { class CameraAdvancedParamsWidget; }
 
-class QnRemotePtzController;
+namespace nx::vms::client::core::ptz {class RemotePtzController; }
 
 namespace nx::vms::client::desktop {
 
@@ -34,7 +34,7 @@ public:
     void loadState(const CameraSettingsDialogState& state);
 
     void setSelectedServer(const QnUuid& serverId);
-    void setPtzInterface(std::unique_ptr<QnRemotePtzController> controller);
+    void setPtzInterface(std::unique_ptr<core::ptz::RemotePtzController> controller);
 
     void saveValues();
 

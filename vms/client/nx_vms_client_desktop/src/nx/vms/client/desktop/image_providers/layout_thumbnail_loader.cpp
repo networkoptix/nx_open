@@ -144,7 +144,7 @@ struct LayoutThumbnailLoader::Private
         return item;
     }
 
-    void notifyLoaderIsComplete(ItemPtr item)
+    void notifyLoaderIsComplete()
     {
         if (numLoading > 0)
         {
@@ -164,8 +164,6 @@ struct LayoutThumbnailLoader::Private
     {
         qreal rotation = qMod(item->rotation, 180.0);
         QRectF cellRect = item->outCellRect;
-
-        QSizeF dataSize = item->provider->sizeHint();
 
         // Aspect ratio is invalid when there is no image. No need to rotate in this case.
         if (qFuzzyIsNull(rotation) || !aspectRatio.isValid())
@@ -243,7 +241,7 @@ struct LayoutThumbnailLoader::Private
         }
 
         if (loaderIsComplete)
-            notifyLoaderIsComplete(item);
+            notifyLoaderIsComplete();
     }
 
     void finalizeOutputImage()
@@ -617,7 +615,7 @@ void LayoutThumbnailLoader::doLoadAsync()
                 if (status == Qn::ThumbnailStatus::Loaded)
                 {
                     d->drawBackground(item, item->provider->image());
-                    d->notifyLoaderIsComplete(item);
+                    d->notifyLoaderIsComplete();
                 }
             });
 

@@ -64,18 +64,10 @@ static void updateActivity()
 // a lot of small audio packets in bluray HD audio codecs. So, previous size 7 is not enought
 static const int CL_MAX_DISPLAY_QUEUE_SIZE = 20;
 static const int CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE = 30;
-
 static const int DEFAULT_AUDIO_BUFF_SIZE = 1000 * 4;
-
 static const int REALTIME_AUDIO_BUFFER_SIZE = 750; // at ms, max buffer
-
 static const qint64 MIN_VIDEO_DETECT_JUMP_INTERVAL = 300 * 1000; // 300ms
-//static const qint64 MIN_AUDIO_DETECT_JUMP_INTERVAL = MIN_VIDEO_DETECT_JUMP_INTERVAL + AUDIO_BUFF_SIZE*1000;
-//static const int MAX_VALID_SLEEP_TIME = 1000*1000*5;
-static const int MAX_VALID_SLEEP_LIVE_TIME = 1000 * 500; // 5 seconds as most long sleep time
-static const int SLOW_COUNTER_THRESHOLD = 24;
 static const double FPS_EPS = 0.0001;
-
 static const int DEFAULT_DELAY_OVERDRAFT = 5000 * 1000;
 
 QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* reader):
@@ -1359,13 +1351,13 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
         NX_MUTEX_LOCKER lock(&m_timeMutex);
         if (vd->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
         {
-            if (m_gotKeyDataInfo.size() <= vd->channelNumber)
+            if (m_gotKeyDataInfo.size() <= (int) vd->channelNumber)
                 m_gotKeyDataInfo.resize(vd->channelNumber + 1);
             m_gotKeyDataInfo[vd->channelNumber] = true;
         }
         else
         {
-            if (m_gotKeyDataInfo.size() <= vd->channelNumber ||
+            if (m_gotKeyDataInfo.size() <= (int) vd->channelNumber ||
                 !m_gotKeyDataInfo[vd->channelNumber])
             {
                 NX_DEBUG(this, "Ignore video data with timestamp %1. Waiting for I-frame", vd->timestamp);

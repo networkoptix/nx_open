@@ -46,7 +46,6 @@ public:
         const nx::vms::api::ModuleInformation& moduleInformation,
         ConnectionInfo connectionInfo,
         std::optional<std::chrono::microseconds> sessionTokenExpirationTime,
-        CertificateVerifier* certificateVerifier,
         std::shared_ptr<CertificateCache> certificateCache,
         Qn::SerializationFormat serializationFormat,
         QnUuid sessionId,

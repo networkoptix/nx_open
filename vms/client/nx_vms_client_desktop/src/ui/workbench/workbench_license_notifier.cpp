@@ -5,9 +5,9 @@
 #include <api/runtime_info_manager.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
-#include <common/common_module.h>
 #include <core/resource/user_resource.h>
 #include <licensing/license.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/license/validator.h>
 #include <ui/dialogs/license_notification_dialog.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -27,8 +27,6 @@ const qint64 kWarningTimes[] = {
     kMsPerDay,
     0
 };
-
-static const int kMessagesDelayMs = 5000;
 
 } // anonymous namespace
 

@@ -32,7 +32,7 @@ public:
     virtual bool loadState(
         const DelegateState& state,
         SubstateFlags flags,
-        const StartupParameters& params) override
+        const StartupParameters& /*params*/) override
     {
         if (!NX_ASSERT(!m_resourceTreeSettings.isNull()))
             return false;
@@ -68,7 +68,7 @@ public:
     virtual void createInheritedState(
         DelegateState* state,
         SubstateFlags flags,
-        const QStringList& resources) override
+        const QStringList& /*resources*/) override
     {
         if (!NX_ASSERT(!m_resourceTreeSettings.isNull()))
             return;

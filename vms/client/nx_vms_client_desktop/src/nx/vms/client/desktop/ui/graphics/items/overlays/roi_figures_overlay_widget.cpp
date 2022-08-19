@@ -60,16 +60,12 @@ struct RoiFiguresOverlayWidget::Private: public QObject
 
     void paintFigureLabels(
         QPainter* painter,
-        const QStyleOptionGraphicsItem* option,
-        QWidget* widget,
         const QSizeF& widgetSize);
 
     void paintLabel(
         QPainter* painter,
-        const QStyleOptionGraphicsItem* option,
         FigurePtr figure,
         const QString& labelText,
-        QWidget* widget,
         const QSizeF& widgetSize);
 };
 
@@ -182,8 +178,6 @@ void RoiFiguresOverlayWidget::Private::updateFigures()
 
 void RoiFiguresOverlayWidget::Private::paintFigureLabels(
     QPainter* painter,
-    const QStyleOptionGraphicsItem* option,
-    QWidget* widget,
     const QSizeF& widgetSize)
 {
     const auto figuresHolder = watcher.figures();
@@ -202,24 +196,20 @@ void RoiFiguresOverlayWidget::Private::paintFigureLabels(
                 figure->setSceneRect(zoomRect);
             }
 
-            paintLabel(painter, option, figure, labelText, widget, widgetSize);
+            paintLabel(painter, figure, labelText, widgetSize);
         }
     }
 }
 
 void RoiFiguresOverlayWidget::Private::paintLabel(
     QPainter* painter,
-    const QStyleOptionGraphicsItem* option,
     FigurePtr figure,
     const QString& labelText,
-    QWidget* widget,
     const QSizeF& widgetSize)
 {
     static constexpr qreal kTopMargin = 3;
     static constexpr qreal kBottomMargin = 4;
     static const QFont kFigureLabelFont("Roboto", 12, QFont::Medium);
-
-    const auto glWidget = qobject_cast<QOpenGLWidget*>(widget);
 
     QTextDocument doc(labelText.toUpper());
     doc.setDocumentMargin(0);
@@ -293,10 +283,10 @@ void RoiFiguresOverlayWidget::setZoomRect(const QRectF& value)
 
 void RoiFiguresOverlayWidget::paint(
     QPainter* painter,
-    const QStyleOptionGraphicsItem* option,
-    QWidget* widget)
+    const QStyleOptionGraphicsItem* /*option*/,
+    QWidget* /*widget*/)
 {
-    d->paintFigureLabels(painter, option, widget, size());
+    d->paintFigureLabels(painter, size());
 }
 
 } // namespace nx::vms::client::desktop

@@ -8,7 +8,6 @@
 #include <api/common_message_processor.h>
 #include <common/common_module.h>
 #include <core/dataprovider/data_provider_factory.h>
-#include <core/resource_management/layout_tour_state_manager.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <nx/core/access/access_types.h>
 #include <nx/utils/app_info.h>
@@ -50,12 +49,9 @@ QnClientCoreModule::QnClientCoreModule(
     d->commonModule = std::make_unique<QnCommonModule>(systemContext);
 
     d->commonModule->instance<QnResourcesChangesManager>();
-    d->commonModule->instance<QnLayoutTourStateManager>();
-
     d->commonModule->store(new nx::vms::client::core::LocalNetworkInterfacesManager());
     d->commonModule->store(new watchers::KnownServerConnections(d->commonModule.get()));
     d->commonModule->store(new OperationManager());
-
 
     systemContext->storeToQmlContext(appContext()->qmlEngine()->rootContext());
 
@@ -103,11 +99,6 @@ QnResourcePool* QnClientCoreModule::resourcePool() const
 QnCommonModule* QnClientCoreModule::commonModule() const
 {
     return d->commonModule.get();
-}
-
-QnLayoutTourStateManager* QnClientCoreModule::layoutTourStateManager() const
-{
-    return d->commonModule->instance<QnLayoutTourStateManager>();
 }
 
 QnDataProviderFactory* QnClientCoreModule::dataProviderFactory() const

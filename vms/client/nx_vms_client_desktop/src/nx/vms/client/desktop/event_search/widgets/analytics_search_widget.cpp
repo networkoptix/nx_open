@@ -113,7 +113,6 @@ private:
     DetectableObjectTypeModel* const m_objectTypeModel;
     QMenu* const m_engineMenu;
     ItemModelMenu* const m_objectTypeMenu;
-    bool m_areaSelectionEnabled = false;
     QCollator m_collator;
 
     std::optional<std::pair<milliseconds, QnUuid>> m_ensureVisibleRequest;

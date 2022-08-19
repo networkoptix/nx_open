@@ -18,7 +18,6 @@ class QQmlEngine;
 class QnCloudStatusWatcher;
 class QnCommonModule;
 class QnDataProviderFactory;
-class QnLayoutTourStateManager;
 class QnPtzControllerPool;
 class QnResourcePool;
 
@@ -56,7 +55,6 @@ public:
      */
     QnResourcePool* resourcePool() const;
     QnCommonModule* commonModule() const;
-    QnLayoutTourStateManager* layoutTourStateManager() const;
     QnDataProviderFactory* dataProviderFactory() const;
     nx::vms::client::core::SessionTokenTerminator* sessionTokenTerminator() const;
 

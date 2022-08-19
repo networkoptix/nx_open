@@ -59,7 +59,7 @@ struct SystemContext::Private
     std::unique_ptr<QnResourceAccessSubjectsCache> resourceAccessSubjectCache;
     std::unique_ptr<nx::core::access::ResourceAccessProvider> resourceAccessProvider;
     std::unique_ptr<QnResourceAccessManager> resourceAccessManager;
-    std::unique_ptr<QnLayoutTourManager> layoutTourManager;
+    std::unique_ptr<QnLayoutTourManager> showreelManager;
     std::unique_ptr<nx::vms::event::RuleManager> eventRuleManager;
     std::unique_ptr<taxonomy::DescriptorContainer> analyticsDescriptorContainer;
     std::unique_ptr<taxonomy::AbstractStateWatcher> analyticsTaxonomyStateWatcher;
@@ -123,7 +123,7 @@ SystemContext::SystemContext(
     // Depends on access provider.
     d->resourceAccessManager = std::make_unique<QnResourceAccessManager>(resourceAccessMode, this);
 
-    d->layoutTourManager = std::make_unique<QnLayoutTourManager>();
+    d->showreelManager = std::make_unique<QnLayoutTourManager>();
     d->eventRuleManager = std::make_unique<nx::vms::event::RuleManager>();
     d->analyticsDescriptorContainer = std::make_unique<taxonomy::DescriptorContainer>(this);
     d->analyticsTaxonomyStateWatcher = std::make_unique<taxonomy::StateWatcher>(
@@ -279,9 +279,9 @@ nx::core::access::ResourceAccessProvider* SystemContext::resourceAccessProvider(
     return d->resourceAccessProvider.get();
 }
 
-QnLayoutTourManager* SystemContext::layoutTourManager() const
+QnLayoutTourManager* SystemContext::showreelManager() const
 {
-    return d->layoutTourManager.get();
+    return d->showreelManager.get();
 }
 
 nx::vms::event::RuleManager* SystemContext::eventRuleManager() const

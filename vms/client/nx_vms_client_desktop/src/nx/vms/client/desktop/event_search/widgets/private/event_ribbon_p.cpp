@@ -1618,7 +1618,7 @@ void EventRibbon::Private::loadNextPreview()
 
 void EventRibbon::Private::ensureVisible(int row)
 {
-    if (!NX_ASSERT(row >= 0 && row <= m_tiles.size()) || !m_scrollBarRelevant)
+    if (!NX_ASSERT(row >= 0 && row <= (int) m_tiles.size()) || !m_scrollBarRelevant)
         return;
 
     const auto& tile = m_tiles[row];

@@ -99,13 +99,13 @@ public:
     }
 
     virtual bool resyncTransactionLog(
-        const std::set<QnUuid>& filter = std::set<QnUuid>()) override
+        const std::set<QnUuid>& /*filter*/) override
     {
         NX_ASSERT(false, "Not implemented");
         return false;
     }
 
-    virtual void setTransactionLogTime(nx::vms::api::Timestamp value) override
+    virtual void setTransactionLogTime(nx::vms::api::Timestamp /*value*/) override
     {
         NX_ASSERT(false, "Not implemented");
     }
@@ -168,7 +168,6 @@ struct RemoteConnection::Private
         const nx::vms::api::ModuleInformation& moduleInformation,
         ConnectionInfo connectionInfo,
         std::optional<std::chrono::microseconds> sessionTokenExpirationTime,
-        CertificateVerifier* certificateVerifier,
         std::shared_ptr<CertificateCache> certificateCache,
         Qn::SerializationFormat serializationFormat,
         QnUuid sessionId)
@@ -201,7 +200,6 @@ RemoteConnection::RemoteConnection(
     const nx::vms::api::ModuleInformation& moduleInformation,
     ConnectionInfo connectionInfo,
     std::optional<std::chrono::microseconds> sessionTokenExpirationTime,
-    CertificateVerifier* certificateVerifier,
     std::shared_ptr<CertificateCache> certificateCache,
     Qn::SerializationFormat serializationFormat,
     QnUuid sessionId,
@@ -213,7 +211,6 @@ RemoteConnection::RemoteConnection(
         moduleInformation,
         std::move(connectionInfo),
         sessionTokenExpirationTime,
-        certificateVerifier,
         certificateCache,
         serializationFormat,
         sessionId))

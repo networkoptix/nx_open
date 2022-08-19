@@ -34,6 +34,7 @@
 #include <nx/vms/client/desktop/debug_utils/utils/performance_monitor.h>
 #include <nx/vms/client/desktop/director/director.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
 #include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
 #include <nx/vms/client/desktop/testkit/testkit.h>
@@ -244,7 +245,7 @@ void StartupActionsHandler::submitDelayedDrops()
 
     const MimeData mimeData(d->delayedDrops.raw);
 
-    for (const auto& tour: layoutTourManager()->tours(mimeData.entities()))
+    for (const auto& tour: systemContext()->showreelManager()->tours(mimeData.entities()))
         tours.push_back(tour);
 
     resources.append(mimeData.resources());

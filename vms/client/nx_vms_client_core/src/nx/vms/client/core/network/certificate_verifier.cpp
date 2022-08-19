@@ -226,7 +226,7 @@ nx::network::ssl::AdapterFunc CertificateVerifier::makeAdapterFunc(const QnUuid&
     return NX_ASSERT(cache)
         ? cache->makeAdapterFunc(serverId)
         : nx::network::ssl::makeAdapterFunc(
-            [](const nx::network::ssl::CertificateChainView& chain){ return false; });
+            [](const nx::network::ssl::CertificateChainView& /*chain*/){ return false; });
 }
 
 CertificateVerifier::Status CertificateVerifier::verifyCertificate(

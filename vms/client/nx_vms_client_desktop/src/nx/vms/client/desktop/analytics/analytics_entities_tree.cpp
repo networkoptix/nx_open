@@ -156,7 +156,7 @@ NodePtr buildObjectTypesTree(const std::vector<EngineScope<AbstractObjectType>>&
 // Cleanup empty groups from the given node.
 NodePtr removeEmptyGroupsRecursive(NodePtr node)
 {
-    for (const auto child: node->children)
+    for (const auto& child: node->children)
         removeEmptyGroupsRecursive(child);
 
     // Cleanup empty subgroups.

@@ -16,8 +16,15 @@
 #include <client/client_show_once_settings.h>
 #include <client/client_startup_parameters.h>
 #include <client/desktop_client_message_processor.h>
+#include <client/system_weights_manager.h>
 #include <client_core/client_core_module.h>
+#include <core/resource/local_resource_status_watcher.h>
 #include <core/resource/resource.h>
+#include <core/resource/resource_directory_browser.h>
+#include <core/resource/storage_plugin_factory.h>
+#include <core/resource_management/resource_discovery_manager.h>
+#include <core/storage/file_storage/layout_storage_resource.h>
+#include <core/storage/file_storage/qtfile_storage_resource.h>
 #include <nx/branding.h>
 #include <nx/build_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
@@ -28,6 +35,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/vms/api/protocol_version.h>
+#include <nx/vms/client/core/resource/resource_processor.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/utils/font_loader.h>
 #include <nx/vms/client/desktop/analytics/analytics_icon_manager.h>
@@ -56,18 +64,9 @@
 #include <nx/vms/client/desktop/utils/applauncher_guard.h>
 #include <nx/vms/client/desktop/utils/upload_manager.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/utils/external_resources.h>
 #include <nx/vms/utils/translation/translation_manager.h>
 #include <platform/platform_abstraction.h>
-#include <core/resource_management/resource_discovery_manager.h>
-#include <core/storage/file_storage/layout_storage_resource.h>
-#include <core/storage/file_storage/qtfile_storage_resource.h>
-#include <core/resource/storage_plugin_factory.h>
-#include <client/client_resource_processor.h>
-#include <client/system_weights_manager.h>
-#include <core/resource/local_resource_status_watcher.h>
-#include <core/resource/resource_directory_browser.h>
 
 #if defined(Q_OS_MACOS)
     #include <ui/workaround/mac_utils.h>
@@ -485,9 +484,9 @@ struct ApplicationContext::Private
         auto localContext = mainSystemContext.get();
 
         resourceDiscoveryManager = std::make_unique<QnResourceDiscoveryManager>(localContext);
-        clientResourceProcessor = std::make_unique<QnClientResourceProcessor>(localContext);
-        clientResourceProcessor->moveToThread(resourceDiscoveryManager.get());
-        resourceDiscoveryManager->setResourceProcessor(clientResourceProcessor.get());
+        resourceProcessor = std::make_unique<core::ResourceProcessor>(localContext);
+        resourceProcessor->moveToThread(resourceDiscoveryManager.get());
+        resourceDiscoveryManager->setResourceProcessor(resourceProcessor.get());
         resourceDiscoveryManager->setReady(true);
 
         localResourceStatusWatcher =
@@ -522,7 +521,7 @@ struct ApplicationContext::Private
 
     // Local resources search modules.
     std::unique_ptr<QnResourceDiscoveryManager> resourceDiscoveryManager;
-    std::unique_ptr<QnClientResourceProcessor> clientResourceProcessor;
+    std::unique_ptr<core::ResourceProcessor> resourceProcessor;
     std::unique_ptr<QnLocalResourceStatusWatcher> localResourceStatusWatcher;
     std::unique_ptr<ResourceDirectoryBrowser> resourceDirectoryBrowser;
 

@@ -87,7 +87,6 @@ public:
 
     void moveResourcesToServer(
         const QnResourceList& resources,
-        const QString& sourceGroupId,
         const QnMediaServerResourcePtr& server,
         MoveResourcesResultFunc resultCallback);
 

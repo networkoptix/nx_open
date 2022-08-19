@@ -5,7 +5,6 @@
 
 #include <QtWidgets/QPushButton>
 
-#include <common/common_module.h>
 #include <nx/branding.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -17,6 +16,7 @@
 #include <nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.h>
 #include <nx/vms/client/desktop/system_administration/widgets/user_list_widget.h>
 #include <nx/vms/client/desktop/system_administration/widgets/user_management_tab_widget.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_update/multi_server_updates_widget.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -35,9 +35,6 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
 {
     ui->setupUi(this);
     setHelpTopic(this, Qn::Administration_Help);
-
-    auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
-    auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
 
     auto generalWidget = new QnGeneralSystemAdministrationWidget(this);
     addPage(GeneralPage, generalWidget, tr("General"));

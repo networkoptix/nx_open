@@ -68,7 +68,20 @@ public:
     }
 
     template<class OtherResource>
+    bool operator==(const QnSharedResourcePointerList<OtherResource>& other) const
+    {
+        return this->size() == other.size()
+            && std::equal(this->begin(), this->end(), other.begin());
+    }
+
+    template<class OtherResource>
     bool operator!=(const QList<QnSharedResourcePointer<OtherResource>>& other) const
+    {
+        return !(*this == other);
+    }
+
+    template<class OtherResource>
+    bool operator!=(const QnSharedResourcePointerList<OtherResource>& other) const
     {
         return !(*this == other);
     }

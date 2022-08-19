@@ -7,58 +7,49 @@
 
 #include <QtCore/QMimeData>
 #include <QtGui/QClipboard>
-#include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
+#include <QtWidgets/QMenu>
 
 #include <api/helpers/event_log_request_data.h>
 #include <api/server_rest_connection.h>
-
-#include <common/common_module.h>
-
-#include <client_core/client_core_module.h>
-
+#include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
-
-#include <core/resource/device_dependent_strings.h>
+#include <client/client_settings.h>
+#include <client_core/client_core_module.h>
+#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-
-#include <nx/vms/event/events/abstract_event.h>
-#include <nx/vms/event/strings_helper.h>
-
-#include <client/client_globals.h>
-#include <client/client_settings.h>
-
-#include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
-#include <nx/vms/client/desktop/rules/nvr_events_actions_access.h>
-
-#include <ui/utils/table_export_helper.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
-#include <ui/dialogs/common/custom_file_dialog.h>
-#include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
-#include <ui/models/event_log_model.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/common/widgets/item_view_auto_hider.h>
-#include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
-
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_access_controller.h>
-#include <ui/workaround/widgets_signals_workaround.h>
-#include <ui/workaround/hidpi_workarounds.h>
-#include <utils/common/event_processors.h>
-#include <utils/common/delayed.h>
-
 #include <nx/utils/log/log.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
+#include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
+#include <nx/vms/client/desktop/common/widgets/item_view_auto_hider.h>
+#include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/desktop/rules/nvr_events_actions_access.h>
+#include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/event/events/abstract_event.h>
+#include <nx/vms/event/strings_helper.h>
+#include <ui/dialogs/common/custom_file_dialog.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+#include <ui/models/event_log_model.h>
+#include <ui/utils/table_export_helper.h>
+#include <ui/workaround/hidpi_workarounds.h>
+#include <ui/workaround/widgets_signals_workaround.h>
+#include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_context.h>
+#include <utils/common/delayed.h>
+#include <utils/common/event_processors.h>
 
 using namespace nx;
 using namespace nx::vms::event;

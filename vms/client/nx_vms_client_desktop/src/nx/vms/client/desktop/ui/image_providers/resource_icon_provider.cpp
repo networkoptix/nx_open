@@ -34,7 +34,7 @@ QIcon::Mode iconMode(ResourceTree::ItemState itemState)
 } // namespace
 
 QPixmap ResourceIconProvider::requestPixmap(
-    const QString& id, QSize* size, const QSize& requestedSize)
+    const QString& id, QSize* /*size*/, const QSize& /*requestedSize*/)
 {
     auto path = id.split("/", Qt::SkipEmptyParts);
     const int key = path.empty() ? 0 : path.takeFirst().toInt();

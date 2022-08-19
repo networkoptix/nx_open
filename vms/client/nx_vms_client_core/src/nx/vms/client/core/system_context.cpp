@@ -5,13 +5,13 @@
 #include <QtQml/QtQml>
 
 #include <client/client_message_processor.h>
-#include <core/ptz/client_ptz_controller_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/network/server_primary_interface_watcher.h>
+#include <nx/vms/client/core/ptz/client_ptz_controller_pool.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/core/watchers/watermark_watcher.h>
@@ -56,7 +56,7 @@ private:
 
 struct SystemContext::Private
 {
-    std::unique_ptr<QnClientPtzControllerPool> ptzControllerPool;
+    std::unique_ptr<ptz::ControllerPool> ptzControllerPool;
     std::unique_ptr<UserWatcher> userWatcher;
     std::unique_ptr<WatermarkWatcher> watermarkWatcher;
     std::unique_ptr<ServerTimeWatcher> serverTimeWatcher;
@@ -91,7 +91,7 @@ SystemContext::SystemContext(
     switch (mode)
     {
         case Mode::default_:
-            d->ptzControllerPool = std::make_unique<QnClientPtzControllerPool>(this);
+            d->ptzControllerPool = std::make_unique<ptz::ControllerPool>(this);
             d->userWatcher = std::make_unique<UserWatcher>(this);
             d->watermarkWatcher = std::make_unique<WatermarkWatcher>(this);
             d->serverPrimaryInterfaceWatcher = std::make_unique<ServerPrimaryInterfaceWatcher>(
@@ -102,11 +102,15 @@ SystemContext::SystemContext(
             break;
 
         case Mode::crossSystem:
-            d->ptzControllerPool = std::make_unique<QnClientPtzControllerPool>(this);
+            d->ptzControllerPool = std::make_unique<ptz::ControllerPool>(this);
             d->userWatcher = std::make_unique<UserWatcher>(this);
             d->watermarkWatcher = std::make_unique<WatermarkWatcher>(this);
             d->serverPrimaryInterfaceWatcher = std::make_unique<ServerPrimaryInterfaceWatcher>(
                 this);
+            break;
+
+        case Mode::cloudLayouts:
+        case Mode::unitTests:
             break;
     }
 

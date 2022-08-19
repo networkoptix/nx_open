@@ -6,21 +6,16 @@
 #include <QtCore/QScopedValueRollback>
 
 #include <client/client_settings.h>
-
-#include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_properties.h>
-
+#include <health/system_health_strings_helper.h>
+#include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
-
-#include <health/system_health_strings_helper.h>
-
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <ui/workbench/workbench_context.h>
-
 #include <utils/resource_property_adaptors.h>
 
 using namespace nx::vms::client::desktop;

@@ -27,6 +27,7 @@
 #include <nx/vms/client/desktop/rules/helpers/exit_fullscreen_action_helper.h>
 #include <nx/vms/client/desktop/rules/helpers/fullscreen_action_helper.h>
 #include <nx/vms/client/desktop/rules/nvr_events_actions_access.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>

@@ -1143,7 +1143,7 @@ void ConnectActionsHandler::at_selectCurrentServerAction_triggered()
 
     auto callback = d->makeSingleConnectionCallback(
         nx::utils::guarded(d->switchServerDialog.data(),
-            [this, serverId, dialog = d->switchServerDialog, connectScenario]
+            [this, dialog = d->switchServerDialog, connectScenario]
                 (RemoteConnectionFactory::ConnectionOrError result)
         {
             if (NX_ASSERT(dialog))
@@ -1183,7 +1183,7 @@ void ConnectActionsHandler::at_selectCurrentServerAction_triggered()
     d->currentConnectionProcess = remoteConnectionFactory->connect(logonData, callback);
 
     const auto showModalDialog =
-        [this, dialog = d->switchServerDialog]()
+        [dialog = d->switchServerDialog]()
         {
             if (dialog)
                 dialog->open();
