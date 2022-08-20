@@ -7,6 +7,8 @@
 #include <nx/vms/client/core/time/display_time_helper.h>
 #include <nx/vms/client/core/time/time_common_properties_test.h>
 
+using namespace std::chrono;
+
 namespace nx::vms::client::core {
 namespace test {
 namespace {
@@ -18,17 +20,17 @@ INSTANTIATE_TYPED_TEST_SUITE_P(DisplayTimeHelperTest, CommonTimePropertiesTest, 
 
 static const QString kNoNoonMark;
 
-enum DisplayOffset
+namespace display_offset
 {
-    utc = 0,
-    ninetySeconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::seconds(90)).count(),
-    oneHourForward = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::hours(1)).count(),
-    threeHoursBack = -std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::hours(3)).count(),
-};
+    constexpr milliseconds kUtc = 0ms;
+    constexpr milliseconds kNinetySeconds = 90s;
+    constexpr milliseconds kOneHourForward = 1h;
+    constexpr milliseconds kThreeHoursBack = -3h;
+}
 
 struct When
 {
-    DisplayOffset displayOffset = DisplayOffset::utc;
+    milliseconds displayOffset = display_offset::kUtc;
 };
 
 struct Hour
@@ -37,18 +39,13 @@ struct Hour
     QString noonMark;
 };
 
-using HoursIn12Format = Hour;
-using HoursIn24Format = Hour;
-using Minutes = QString;
-using Seconds = QString;
-using FullDate = QString;
-
 struct Expect
 {
-    std::array<Hour, 2> hours;
-    Minutes minutes;
-    Seconds seconds;
-    FullDate fullDate;
+    Hour hoursIn12hFormat;
+    Hour hoursIn24hFormat;
+    QString minutes;
+    QString seconds;
+    QString fullDate;
 };
 
 struct HelperTestParams
@@ -67,12 +64,13 @@ struct HelperTestFixture: public testing::TestWithParam<HelperTestParams>
 void HelperTestFixture::SetUp()
 {
     static const QLocale kTestLocale(QLocale::English, QLocale::UnitedStates);
-    static constexpr qint64 kTestPosition = 1567296549000; //< 0:09:09, 1 September 2019 UTC
+    static const qint64 kTestPosition =
+        QDateTime(QDate(2019, 9, 1), QTime(0, 9, 9)).toMSecsSinceEpoch();
 
     const auto params = GetParam();
     helper.setLocale(kTestLocale);
     helper.setPosition(kTestPosition);
-    helper.setDisplayOffset(params.when.displayOffset);
+    helper.setDisplayOffset(params.when.displayOffset.count());
 }
 
 TEST_P(HelperTestFixture, TestVisualValues)
@@ -84,7 +82,9 @@ TEST_P(HelperTestFixture, TestVisualValues)
     {
         helper.set24HoursTimeFormat(is24HoursTimeFormat);
 
-        const auto hours = params.expected.hours[is24HoursTimeFormat];
+        const auto hours = is24HoursTimeFormat
+            ? params.expected.hoursIn24hFormat
+            : params.expected.hoursIn12hFormat;
         ASSERT_EQ(helper.hours(), hours.value);
         ASSERT_EQ(helper.noonMark(), hours.noonMark);
         ASSERT_EQ(helper.minutes(), params.expected.minutes);
@@ -97,46 +97,50 @@ TEST_P(HelperTestFixture, TestVisualValues)
 static const std::vector<HelperTestParams> kTestData =
 {
     {
-        When{DisplayOffset::utc},
+        When{display_offset::kUtc},
         Expect
         {
-            {HoursIn12Format{"12", "AM"}, HoursIn24Format{"00", kNoNoonMark}},
-            Minutes{"09"},
-            Seconds{"09"},
-            FullDate{"1 September 2019"}
+            .hoursIn12hFormat{"12", "AM"},
+            .hoursIn24hFormat{"00", kNoNoonMark},
+            .minutes{"09"},
+            .seconds{"09"},
+            .fullDate{"1 September 2019"}
         }
     },
 
     {
-        When{DisplayOffset::ninetySeconds},
+        When{display_offset::kNinetySeconds},
         Expect
         {
-            {HoursIn12Format{"12", "AM"}, HoursIn24Format{"00", kNoNoonMark}},
-            Minutes{"10"},
-            Seconds{"39"},
-            FullDate{"1 September 2019"}
+            .hoursIn12hFormat{"12", "AM"},
+            .hoursIn24hFormat{"00", kNoNoonMark},
+            .minutes{"10"},
+            .seconds{"39"},
+            .fullDate{"1 September 2019"}
         }
     },
 
     {
-        When{DisplayOffset::oneHourForward},
+        When{display_offset::kOneHourForward},
         Expect
         {
-            {HoursIn12Format{"1", "AM"}, HoursIn24Format{"01", kNoNoonMark}},
-            Minutes{"09"},
-            Seconds{"09"},
-            FullDate{"1 September 2019"}
+            .hoursIn12hFormat{"1", "AM"},
+            .hoursIn24hFormat{"01", kNoNoonMark},
+            .minutes{"09"},
+            .seconds{"09"},
+            .fullDate{"1 September 2019"}
         }
     },
 
     {
-        When{DisplayOffset::threeHoursBack},
+        When{display_offset::kThreeHoursBack},
         Expect
         {
-            {HoursIn12Format{"9", "PM"}, HoursIn24Format{"21", kNoNoonMark}},
-            Minutes{"09"},
-            Seconds{"09"},
-            FullDate{"31 August 2019"}
+            .hoursIn12hFormat{"9", "PM"},
+            .hoursIn24hFormat{"21", kNoNoonMark},
+            .minutes{"09"},
+            .seconds{"09"},
+            .fullDate{"31 August 2019"}
         }
     }
 };

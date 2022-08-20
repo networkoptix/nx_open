@@ -11,10 +11,10 @@
 #include <QtCore/QScopedPointer>
 
 #include <core/resource/camera_bookmark_fwd.h>
+#include <nx/vms/client/core/media/time_period_storage.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail.h>
 #include <nx/vms/client/desktop/workbench/timeline/time_marker.h>
 #include <qt_graphics_items/graphics_slider.h>
-#include <recording/time_period_storage.h>
 #include <ui/processors/kinetic_process_handler.h>
 #include <ui/processors/drag_process_handler.h>
 #include <ui/animation/animation_timer_listener.h>
@@ -394,13 +394,12 @@ private:
 
     struct LineData
     {
-        LineData(): visible(true), stretch(1.0) {}
-
-        QnTimePeriodStorage timeStorage;
+        std::shared_ptr<nx::vms::client::core::TimePeriodStorage> periodStorage{
+            new nx::vms::client::core::TimePeriodStorage()};
         QString comment;
         QPixmap commentPixmap;
-        bool visible;
-        qreal stretch;
+        bool visible = true;
+        qreal stretch = 1.0;
     };
 
     struct ThumbnailData

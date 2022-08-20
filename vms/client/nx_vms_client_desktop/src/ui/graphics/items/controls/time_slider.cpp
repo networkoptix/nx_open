@@ -961,15 +961,16 @@ QnTimePeriodList QnTimeSlider::timePeriods(int line, Qn::TimePeriodContent type)
     if (!checkLinePeriod(line, type))
         return QnTimePeriodList();
 
-    return m_lineData[line].timeStorage.periods(type);
+    return m_lineData[line].periodStorage->periods(type);
 }
 
-void QnTimeSlider::setTimePeriods(int line, Qn::TimePeriodContent type, const QnTimePeriodList& timePeriods)
+void QnTimeSlider::setTimePeriods(
+    int line, Qn::TimePeriodContent type, const QnTimePeriodList& timePeriods)
 {
     if (!checkLinePeriod(line, type))
         return;
 
-    m_lineData[line].timeStorage.setPeriods(type, timePeriods);
+    m_lineData[line].periodStorage->setPeriods(type, timePeriods);
 }
 
 QnTimeSlider::Options QnTimeSlider::options() const
@@ -2267,12 +2268,12 @@ void QnTimeSlider::updateAggregationValue()
     qreal aggregationMSecs = qMax(m_msecsPerPixel / 16.0, 1.0);
 
     /* Calculate only once presuming current value is the same on all lines. */
-    qreal oldAggregationMSecs = m_lineData[0].timeStorage.aggregationMSecs();
+    qreal oldAggregationMSecs = m_lineData[0].periodStorage->aggregationMSecs();
     if (oldAggregationMSecs / 2.0 < aggregationMSecs && aggregationMSecs < oldAggregationMSecs * 2.0)
         return;
 
     for (int line = 0; line < m_lineCount; line++)
-        m_lineData[line].timeStorage.setAggregationMSecs(aggregationMSecs);
+        m_lineData[line].periodStorage->setAggregationMSecs(aggregationMSecs);
 }
 
 void QnTimeSlider::updateTotalLineStretch()
@@ -2448,11 +2449,11 @@ void QnTimeSlider::paint(QPainter* painter, const QStyleOptionGraphicsItem* , QW
             switch (m_selectedExtraContent)
             {
                 case Qn::MotionContent:
-                    extraContent = m_lineData[line].timeStorage.aggregated(Qn::MotionContent);
+                    extraContent = m_lineData[line].periodStorage->aggregated(Qn::MotionContent);
                     break;
 
                 case Qn::AnalyticsContent:
-                    extraContent = m_lineData[line].timeStorage.aggregated(Qn::AnalyticsContent);
+                    extraContent = m_lineData[line].periodStorage->aggregated(Qn::AnalyticsContent);
                     break;
 
                 default:
@@ -2461,7 +2462,7 @@ void QnTimeSlider::paint(QPainter* painter, const QStyleOptionGraphicsItem* , QW
 
             drawPeriodsBar(
                 painter,
-                m_lineData[line].timeStorage.aggregated(Qn::RecordingContent),
+                m_lineData[line].periodStorage->aggregated(Qn::RecordingContent),
                 extraContent,
                 lineRect);
 

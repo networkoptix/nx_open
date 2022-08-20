@@ -7,7 +7,8 @@
 #include <nx/vms/client/core/time/calendar_utils.h>
 #include <nx/vms/client/core/time/calendar_model.h>
 #include <nx/vms/client/core/time/time_common_properties_test.h>
-#include <nx/vms/client/core/media/time_periods_store.h>
+#include <nx/vms/client/core/media/abstract_time_period_storage.h>
+#include <recording/time_period_list.h>
 
 namespace nx::vms::client::core {
 namespace test {
@@ -16,8 +17,8 @@ namespace {
 static const QLocale kTestLocale(QLocale::Russian, QLocale::RussianFederation);
 static constexpr int kTestYear = 2019;
 static constexpr int kTestMonth = 9;
-static constexpr qint64 kTestMonthStartUtc = 1567296000000;
-static constexpr qint64 kTestMonthEndUtc = 1569887999999;
+static const auto kTestMonthStart = QDateTime(QDate(kTestYear, kTestMonth, 1), QTime());
+static const auto kTestMonthEnd = kTestMonthStart.addMonths(1).addMSecs(-1);
 static const QString kExpectedNoItem("no item");
 static const QString kExpectedFirstDayOfMonth("1");
 static const QString kExpectedLastDayOfMonth("30");
@@ -186,6 +187,10 @@ QString HighlightTestFixture::findHighlightedRow(int role) const
     for (int row = 0; row != model.rowCount(); ++row)
     {
         const auto index = model.index(row);
+
+        if (model.data(index, CalendarModel::DateRole).toDateTime() > kTestMonthEnd)
+            break;
+
         if (model.data(index, role).toBool())
             return model.data(index, Qt::DisplayRole).toString();
     }
@@ -194,60 +199,23 @@ QString HighlightTestFixture::findHighlightedRow(int role) const
 
 qint64 HighlightTestFixture::firstDayStartTimestamp() const
 {
-    return kTestMonthStartUtc - model.displayOffset();
+    return kTestMonthStart.toMSecsSinceEpoch() - model.displayOffset();
 }
 
 qint64 HighlightTestFixture::lastDayEndTimestamp() const
 {
-    return kTestMonthEndUtc - model.displayOffset();
+    return kTestMonthEnd.toMSecsSinceEpoch() - model.displayOffset();
 }
 
 qint64 HighlightTestFixture::beforeFirstDayStartTimestamp()
 {
-    return kTestMonthStartUtc - model.displayOffset() - 1;
+    return kTestMonthStart.toMSecsSinceEpoch() - model.displayOffset() - 1;
 }
 
 qint64 HighlightTestFixture::afterLastDayStartTimestamp()
 {
-    return kTestMonthEndUtc - model.displayOffset() + 1;
+    return kTestMonthEnd.toMSecsSinceEpoch() - model.displayOffset() + 1;
 }
-
-//--------------------------------------------------------------------------------------------------
-
-using PositionHighlightTestFixture = HighlightTestFixture;
-
-TEST_P(PositionHighlightTestFixture, MonthStartPositionHitTest)
-{
-    // If current position points to the start of the month -
-    // we expect the first day in highlighted state.
-    model.setPosition(firstDayStartTimestamp());
-    ASSERT_EQ(findHighlightedRow(CalendarModel::IsCurrentRole), kExpectedFirstDayOfMonth);
-}
-
-TEST_P(PositionHighlightTestFixture, MonthEndPositionHitTest)
-{
-    // If current position points to the end of the month -
-    // we expect the last day in highlighted state.
-    model.setPosition(lastDayEndTimestamp());
-    ASSERT_EQ(findHighlightedRow(CalendarModel::IsCurrentRole), kExpectedLastDayOfMonth);
-}
-
-TEST_P(PositionHighlightTestFixture, MonthStartPositionMissTest)
-{
-    // If current position is before the start of the month - we expect nothing highlighted.
-    model.setPosition(beforeFirstDayStartTimestamp());
-    ASSERT_EQ(findHighlightedRow(CalendarModel::IsCurrentRole), kExpectedNoItem);
-}
-
-TEST_P(PositionHighlightTestFixture, MonthEndPositionMissTest)
-{
-    // If current position is after the end of the month - we expect nothing highlighted.
-    model.setPosition(afterLastDayStartTimestamp());
-    ASSERT_EQ(findHighlightedRow(CalendarModel::IsCurrentRole), kExpectedNoItem);
-}
-
-INSTANTIATE_TEST_SUITE_P(CalendarModel, PositionHighlightTestFixture,
-    testing::ValuesIn(DisplayOffsetParams::standardDisplayOffsets));
 
 //--------------------------------------------------------------------------------------------------
 
@@ -257,7 +225,7 @@ enum ChunkDuration
     milliseconds = 2
 };
 
-class TimePeriodsStoreMock: public TimePeriodsStore
+class TimePeriodStorageMock: public AbstractTimePeriodStorage
 {
 public:
     virtual const QnTimePeriodList& periods(Qn::TimePeriodContent type) const override
@@ -281,18 +249,18 @@ struct ChunkHighlightTestFixture: public HighlightTestFixture
 
     virtual void SetUp() override;
     void setSingleRecordingPeriod(qint64 position, qint64 duration);
-    TimePeriodsStoreMock periodsStore;
+    TimePeriodStorageMock periodStorage;
 };
 
 void ChunkHighlightTestFixture::SetUp()
 {
     base_type::SetUp();
-    model.setPeriodsStore(&periodsStore);
+    model.setPeriodStorage(&periodStorage);
 }
 
 void ChunkHighlightTestFixture::setSingleRecordingPeriod(qint64 position, qint64 duration)
 {
-    periodsStore.setPeriods(Qn::RecordingContent, {QnTimePeriod(position, duration)});
+    periodStorage.setPeriods(Qn::RecordingContent, {QnTimePeriod(position, duration)});
 }
 
 TEST_P(ChunkHighlightTestFixture, ChunkStartsInsideFirstDayTest)

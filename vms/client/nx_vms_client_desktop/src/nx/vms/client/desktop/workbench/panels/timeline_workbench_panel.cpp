@@ -11,6 +11,7 @@
 #include <client/client_runtime_settings.h>
 
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/scene/widgets/timeline_calendar_widget.h>
 #include <nx/vms/client/desktop/workbench/timeline/navigation_widget.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail_loading_manager.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail_panel.h>
@@ -310,12 +311,8 @@ void TimelineWorkbenchPanel::setCalendarPanel(CalendarWorkbenchPanel* calendar)
     if (m_calendar)
     {
         m_calendar->disconnect(this);
-
-        for (auto widget : m_calendar->activeWidgets())
-        {
-            m_opacityProcessor->removeTargetWidget(widget);
-            m_hidingProcessor->removeTargetWidget(widget);
-        }
+        m_opacityProcessor->removeTargetWidget(m_calendar->widget());
+        m_hidingProcessor->removeTargetWidget(m_calendar->widget());
     }
 
     m_calendar = calendar;
@@ -342,11 +339,8 @@ void TimelineWorkbenchPanel::setCalendarPanel(CalendarWorkbenchPanel* calendar)
     connect(m_calendar.data(), &AbstractWorkbenchPanel::visibleChanged, this, updateAutoHideHeight);
     connect(m_calendar.data(), &AbstractWorkbenchPanel::geometryChanged, this, updateAutoHideHeight);
 
-    for (auto widget : m_calendar->activeWidgets())
-    {
-        m_opacityProcessor->addTargetWidget(widget);
-        m_hidingProcessor->addTargetWidget(widget);
-    }
+    m_opacityProcessor->addTargetWidget(m_calendar->widget());
+    m_hidingProcessor->addTargetWidget(m_calendar->widget());
 }
 
 bool TimelineWorkbenchPanel::isPinned() const

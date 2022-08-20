@@ -46,7 +46,7 @@ struct TriggerInfo
 
 } // namespace
 
-struct SoftwareTriggersController::Private : public SystemContextAware
+struct SoftwareTriggersController::Private
 {
     Private(SoftwareTriggersController* q);
 
@@ -65,7 +65,6 @@ struct SoftwareTriggersController::Private : public SystemContextAware
 };
 
 SoftwareTriggersController::Private::Private(SoftwareTriggersController* q):
-    SystemContextAware(q->systemContext()),
     q(q)
 {
 }
@@ -81,9 +80,9 @@ bool SoftwareTriggersController::Private::setTriggerState(
         return false;
     }
 
-    const auto resource = resourcePool()->getResourceById(resourceId);
-    const auto currentUser = systemContext()->userWatcher()->user();
-    if (!resourceAccessManager()->hasPermission(
+    const auto resource = q->resourcePool()->getResourceById(resourceId);
+    const auto currentUser = q->systemContext()->userWatcher()->user();
+    if (!q->resourceAccessManager()->hasPermission(
         currentUser,
         resource,
         Qn::Permission::SoftTriggerPermission))
@@ -109,7 +108,7 @@ bool SoftwareTriggersController::Private::setEventTriggerState(
     const TriggerInfo& trigger,
     vms::event::EventState state)
 {
-    const auto rule = systemContext()->eventRuleManager()->rule(trigger.ruleId);
+    const auto rule = q->systemContext()->eventRuleManager()->rule(trigger.ruleId);
     if (!rule)
     {
         NX_ASSERT(rule, "Trigger does not exist");
@@ -137,7 +136,7 @@ bool SoftwareTriggersController::Private::setEventTriggerState(
     if (state != nx::vms::api::EventState::undefined)
         params.insert("state", nx::reflect::toString(state));
 
-    orderedRequestsHelper.postJsonResult(connectedServerApi(),
+    orderedRequestsHelper.postJsonResult(q->connectedServerApi(),
         "/api/createEvent", params, callback, QThread::currentThread());
     return true;
 }
@@ -146,7 +145,7 @@ bool SoftwareTriggersController::Private::setVmsTriggerState(
     const TriggerInfo& trigger,
     vms::event::EventState state)
 {
-    const auto rule = systemContext()->vmsRulesEngine()->rule(trigger.ruleId);
+    const auto rule = q->systemContext()->vmsRulesEngine()->rule(trigger.ruleId);
     if (!NX_ASSERT(rule, "Trigger does not exist"))
         return false;
 
@@ -164,11 +163,11 @@ bool SoftwareTriggersController::Private::setVmsTriggerState(
         nx::vms::rules::convertEventState(state),
         idField->id(),
         resourceId,
-        systemContext()->userWatcher()->user()->getId(),
+        q->systemContext()->userWatcher()->user()->getId(),
         nx::vms::event::StringsHelper::getSoftwareTriggerName(nameField->value()),
         iconField->value());
 
-    systemContext()->vmsRulesEngine()->processEvent(triggerEvent);
+    q->systemContext()->vmsRulesEngine()->processEvent(triggerEvent);
 
     executeLater(
         [this, trigger, state]() {setActiveTrigger(trigger.ruleId, state, /*success*/ true); },
@@ -190,17 +189,17 @@ void SoftwareTriggersController::Private::setActiveTrigger(
 
 TriggerInfo SoftwareTriggersController::Private::triggerInfo(QnUuid ruleId) const
 {
-    if (const auto rule = systemContext()->eventRuleManager()->rule(ruleId))
+    if (const auto rule = q->systemContext()->eventRuleManager()->rule(ruleId))
         return TriggerInfo{/*version*/ 0, ruleId, rule->isActionProlonged()};
 
-    if (const auto rule = systemContext()->vmsRulesEngine()->rule(ruleId))
+    if (const auto rule = q->systemContext()->vmsRulesEngine()->rule(ruleId))
     {
         const auto firstActionBuilder = rule->actionBuilders()[0];
 
         return TriggerInfo{
             /*version*/ 1,
             ruleId,
-            nx::vms::rules::isProlonged(systemContext()->vmsRulesEngine(), firstActionBuilder)};
+            nx::vms::rules::isProlonged(q->systemContext()->vmsRulesEngine(), firstActionBuilder)};
     }
 
     return {};

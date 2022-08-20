@@ -30,7 +30,9 @@
 #include <nx/vms/client/core/common/utils/velocity_meter.h>
 #include <nx/vms/client/core/graphics/shader_helper.h>
 #include <nx/vms/client/core/items/grid_viewport.h>
+#include <nx/vms/client/core/media/chunk_provider.h>
 #include <nx/vms/client/core/media/media_player.h>
+#include <nx/vms/client/core/media/abstract_time_period_storage.h>
 #include <nx/vms/client/core/motion/helpers/camera_motion_helper.h>
 #include <nx/vms/client/core/motion/helpers/media_player_motion_provider.h>
 #include <nx/vms/client/core/motion/items/motion_mask_item.h>
@@ -44,6 +46,9 @@
 #include <nx/vms/client/core/resource/resource_helper.h>
 #include <nx/vms/client/core/settings/welcome_screen_info.h>
 #include <nx/vms/client/core/thumbnails/abstract_resource_thumbnail.h>
+#include <nx/vms/client/core/time/calendar_model.h>
+#include <nx/vms/client/core/time/date_range.h>
+#include <nx/vms/client/core/time/day_hours_model.h>
 #include <nx/vms/client/core/time/display_time_helper.h>
 #include <nx/vms/client/core/two_way_audio/two_way_audio_controller.h>
 #include <nx/vms/client/core/ui/frame_section.h>
@@ -110,11 +115,14 @@ void initializeMetaTypes()
 
     qmlRegisterSingletonType<NxGlobalsObject>("Nx", 1, 0, "NxGlobals", &createNxGlobals);
     qmlRegisterUncreatableType<QnUuid>(
-        "Nx.Utils", 1, 0, "Uuid", QLatin1String("Cannot create an instance of Uuid."));
+        "Nx.Utils", 1, 0, "Uuid", "Cannot create an instance of Uuid.");
     qmlRegisterUncreatableType<utils::Url>(
-        "Nx.Utils", 1, 0, "Url", QLatin1String("Cannot create an instance of Url."));
+        "Nx.Utils", 1, 0, "Url", "Cannot create an instance of Url.");
     qmlRegisterUncreatableType<nx::vms::api::SoftwareVersion>(
-        "Nx", 1, 0, "SoftwareVersion", QLatin1String("Cannot create an instance of SoftwareVersion."));
+        "Nx", 1, 0, "SoftwareVersion", "Cannot create an instance of SoftwareVersion.");
+    qRegisterMetaType<DateRange>();
+    qmlRegisterUncreatableType<DateRange>(
+        "nx.vms.client.core", 1, 0, "DateRange", "Cannot create an instance of DateRange.");
 
     FrameSection::registedQmlType();
     Geometry::registerQmlType();
@@ -136,6 +144,10 @@ void initializeMetaTypes()
     FileIO::registerQmlType();
     DisplayTimeHelper::registerQmlType();
     OauthClient::registerQmlType();
+    CalendarModel::registerQmlType();
+    DayHoursModel::registerQmlType();
+    AbstractTimePeriodStorage::registerQmlType();
+    ChunkProvider::registerQmlType();
 
     MediaPlayer::registerQmlTypes();
 

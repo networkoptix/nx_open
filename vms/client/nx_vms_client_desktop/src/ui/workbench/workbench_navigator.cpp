@@ -51,6 +51,7 @@ extern "C" {
 #include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/scene/widgets/timeline_calendar_widget.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail_loading_manager.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
@@ -63,8 +64,6 @@ extern "C" {
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
-#include <ui/widgets/calendar_widget.h>
-#include <ui/widgets/day_time_widget.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -190,9 +189,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
                 if (m_timeSlider)
                     m_timeSlider->setTimePeriods(SyncedLine, timePeriodType, result);
                 if (m_calendar)
-                    m_calendar->setSyncedTimePeriods(timePeriodType, result);
-                if (m_dayTimeWidget)
-                    m_dayTimeWidget->setSecondaryTimePeriods(timePeriodType, result);
+                    m_calendar->setAllCamerasTimePeriods(timePeriodType, result);
             });
 
         chunksMergeTool->start();
@@ -296,12 +293,12 @@ void QnWorkbenchNavigator::setTimeScrollBar(QnTimeScrollBar *scrollBar)
     }
 }
 
-QnCalendarWidget *QnWorkbenchNavigator::calendar() const
+nx::vms::client::desktop::TimelineCalendarWidget *QnWorkbenchNavigator::calendar() const
 {
     return m_calendar;
 }
 
-void QnWorkbenchNavigator::setCalendar(QnCalendarWidget *calendar)
+void QnWorkbenchNavigator::setCalendar(TimelineCalendarWidget* calendar)
 {
     if (m_calendar == calendar)
         return;
@@ -319,35 +316,6 @@ void QnWorkbenchNavigator::setCalendar(QnCalendarWidget *calendar)
     if (m_calendar)
     {
         connect(m_calendar, &QObject::destroyed, this, [this]() { setCalendar(nullptr); });
-
-        if (isValid())
-            initialize();
-    }
-}
-
-QnDayTimeWidget *QnWorkbenchNavigator::dayTimeWidget() const
-{
-    return m_dayTimeWidget;
-}
-
-void QnWorkbenchNavigator::setDayTimeWidget(QnDayTimeWidget *dayTimeWidget)
-{
-    if (m_dayTimeWidget == dayTimeWidget)
-        return;
-
-    if (m_dayTimeWidget)
-    {
-        m_dayTimeWidget->disconnect(this);
-
-        if (isValid())
-            deinitialize();
-    }
-
-    m_dayTimeWidget = dayTimeWidget;
-
-    if (m_dayTimeWidget)
-    {
-        connect(m_dayTimeWidget, &QObject::destroyed, this, [this]() { setDayTimeWidget(nullptr); });
 
         if (isValid())
             initialize();
@@ -444,9 +412,8 @@ void QnWorkbenchNavigator::initialize()
     connect(m_timeScrollBar, SIGNAL(sliderReleased()), this, SLOT(at_timeScrollBar_sliderReleased()));
     m_timeScrollBar->installEventFilter(this);
 
-    connect(m_calendar, SIGNAL(dateClicked(const QDate &)), this, SLOT(at_calendar_dateClicked(const QDate &)));
-
-    connect(m_dayTimeWidget, SIGNAL(timeClicked(const QTime &)), this, SLOT(at_dayTimeWidget_timeClicked(const QTime &)));
+    m_calendar->selection.connectNotifySignal(
+        this, [this]() { updateTimeSliderWindowFromCalendar(); });
 
     // TODO: #sivanov Actualize used system context.
     const auto timeWatcher = appContext()->currentSystemContext()->serverTimeWatcher();
@@ -1299,9 +1266,7 @@ void QnWorkbenchNavigator::updateLocalOffset()
     if (m_timeSlider)
         m_timeSlider->setLocalOffset(milliseconds(localOffset));
     if (m_calendar)
-        m_calendar->setLocalOffset(localOffset);
-    if (m_dayTimeWidget)
-        m_dayTimeWidget->setLocalOffset(localOffset);
+        m_calendar->displayOffset = localOffset;
 }
 
 QnWorkbenchNavigator::WidgetFlags QnWorkbenchNavigator::calculateResourceWidgetFlags(const QnResourcePtr& resource) const
@@ -1595,11 +1560,11 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
     m_timeSlider->setTimeRange(milliseconds(startTimeMSec), milliseconds(endTimeMSec));
 
     if (m_calendar)
-        m_calendar->setDateRange(
-            QDateTime::fromMSecsSinceEpoch(startTimeMSec + m_calendar->localOffset()).date(),
-            QDateTime::fromMSecsSinceEpoch(endTimeMSec + m_calendar->localOffset()).date());
-    if (m_dayTimeWidget)
-        m_dayTimeWidget->setEnabledWindow(startTimeMSec, endTimeMSec);
+    {
+        m_calendar->range = {
+            QDateTime::fromMSecsSinceEpoch(startTimeMSec + m_calendar->displayOffset),
+            QDateTime::fromMSecsSinceEpoch(endTimeMSec + m_calendar->displayOffset)};
+    }
 
     if (!m_currentWidgetLoaded && widgetLoaded && !isSearch
         && display()->widgets().size() == 1
@@ -1795,9 +1760,7 @@ void QnWorkbenchNavigator::updateCurrentPeriods(Qn::TimePeriodContent type)
     if (m_timeSlider)
         m_timeSlider->setTimePeriods(CurrentLine, type, periods);
     if (m_calendar)
-        m_calendar->setCurrentTimePeriods(type, periods);
-    if (m_dayTimeWidget)
-        m_dayTimeWidget->setPrimaryTimePeriods(type, periods);
+        m_calendar->setTimePeriods(type, periods);
 }
 
 void QnWorkbenchNavigator::resetSyncedPeriods()
@@ -1808,9 +1771,7 @@ void QnWorkbenchNavigator::resetSyncedPeriods()
         if (m_timeSlider)
             m_timeSlider->setTimePeriods(SyncedLine, periodsType, QnTimePeriodList());
         if (m_calendar)
-            m_calendar->setSyncedTimePeriods(periodsType, QnTimePeriodList());
-        if (m_dayTimeWidget)
-            m_dayTimeWidget->setSecondaryTimePeriods(periodsType, QnTimePeriodList());
+            m_calendar->setAllCamerasTimePeriods(periodsType, QnTimePeriodList());
     }
 }
 
@@ -1914,12 +1875,8 @@ void QnWorkbenchNavigator::updateLines()
 
 void QnWorkbenchNavigator::updateCalendar()
 {
-    if (!m_calendar)
-        return;
-    if (m_currentWidgetFlags & WidgetSupportsPeriods)
-        m_calendar->setCurrentTimePeriodsVisible(true);
-    else
-        m_calendar->setCurrentTimePeriodsVisible(false);
+    if (m_calendar)
+        m_calendar->periodsVisible = m_currentWidgetFlags.testFlag(WidgetSupportsPeriods);
 }
 
 void QnWorkbenchNavigator::updateSliderFromScrollBar()
@@ -1968,10 +1925,30 @@ void QnWorkbenchNavigator::updateCalendarFromSlider()
     if (!isValid())
         return;
 
-    m_calendar->setSelectedWindow(m_timeSlider->windowStart().count(),
-        m_timeSlider->windowEnd().count());
-    m_dayTimeWidget->setSelectedWindow(m_timeSlider->windowStart().count(),
-        m_timeSlider->windowEnd().count());
+    m_calendar->selection = {
+        QDateTime::fromMSecsSinceEpoch(
+            m_timeSlider->windowStart().count() + m_calendar->displayOffset),
+        QDateTime::fromMSecsSinceEpoch(
+            m_timeSlider->windowEnd().count() + m_calendar->displayOffset)};
+}
+
+void QnWorkbenchNavigator::updateTimeSliderWindowFromCalendar()
+{
+    if (!isValid())
+        return;
+
+    m_timeSlider->finishAnimations();
+
+    const bool animate = true;
+    const bool forceResize = true;
+
+    m_timeSlider->setWindow(
+        milliseconds(
+            m_calendar->selection().start.toMSecsSinceEpoch() - m_calendar->displayOffset),
+        milliseconds(m_calendar->selection().end.toMSecsSinceEpoch() - m_calendar->displayOffset),
+        animate,
+        forceResize
+    );
 }
 
 void QnWorkbenchNavigator::updateLive()
@@ -2732,49 +2709,6 @@ void QnWorkbenchNavigator::at_timeScrollBar_sliderReleased()
     // Double-click on slider handle must always unzoom.
     m_ignoreScrollBarDblClick = false;
     m_timeSlider->setOption(QnTimeSlider::AdjustWindowToPosition, m_lastAdjustTimelineToPosition);
-}
-
-void QnWorkbenchNavigator::at_calendar_dateClicked(const QDate &date)
-{
-    if (!m_timeSlider)
-        return;
-
-    const QDateTime dateTime = date.startOfDay();
-    const auto startMSec = milliseconds(dateTime.toMSecsSinceEpoch() - m_calendar->localOffset());
-    const auto endMSec = milliseconds(dateTime.addDays(1).toMSecsSinceEpoch() - m_calendar->localOffset());
-    const bool extend = QApplication::keyboardModifiers() == Qt::ControlModifier;
-    setTimeSliderWindowFromCalendar(startMSec, endMSec, extend);
-}
-
-void QnWorkbenchNavigator::at_dayTimeWidget_timeClicked(const QTime &time)
-{
-    if (!m_timeSlider || !m_calendar)
-        return;
-
-    const QDate date = m_calendar->selectedDate();
-    if (!date.isValid())
-        return;
-
-    const QDateTime dateTime = QDateTime(date, time);
-    const auto startMSec = milliseconds(dateTime.toMSecsSinceEpoch() - m_dayTimeWidget->localOffset());
-    const auto endMSec = milliseconds(dateTime.addSecs(60 * 60).toMSecsSinceEpoch() - m_dayTimeWidget->localOffset());
-    const bool extend = QApplication::keyboardModifiers() == Qt::ControlModifier;
-    setTimeSliderWindowFromCalendar(startMSec, endMSec, extend);
-}
-
-void QnWorkbenchNavigator::setTimeSliderWindowFromCalendar(milliseconds startMSec, milliseconds endMSec, bool extend)
-{
-    m_timeSlider->finishAnimations();
-
-    const bool animate = true;
-    const bool forceResize = true;
-
-    m_timeSlider->setWindow(
-        extend ? qMin(startMSec, m_timeSlider->windowStart()) : startMSec,
-        extend ? qMax(endMSec, m_timeSlider->windowEnd()) : endMSec,
-        animate,
-        forceResize
-    );
 }
 
 bool QnWorkbenchNavigator::hasWidgetWithCamera(const QnSecurityCamResourcePtr& camera) const

@@ -37,6 +37,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameter_types.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
+#include <nx/vms/client/desktop/ui/scene/widgets/timeline_calendar_widget.h>
 #include <ui/animation/animator_group.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/viewport_animator.h>
@@ -54,8 +55,6 @@
 #include <ui/graphics/items/generic/gui_elements_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
-#include <ui/widgets/calendar_widget.h>
-#include <ui/widgets/day_time_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -441,7 +440,7 @@ void WorkbenchUi::storeSettings()
     navigation.state = makePaneState(isTimelineOpened(), true);
 
     QnPaneSettings& calendar = m_settings[Qn::WorkbenchPane::Calendar];
-    calendar.state = makePaneState(isCalendarOpened(), isCalendarPinned());
+    calendar.state = makePaneState(isCalendarOpened());
 
     QnPaneSettings& thumbnails = m_settings[Qn::WorkbenchPane::Thumbnails];
     thumbnails.state = makePaneState(m_timeline->isThumbnailsVisible());
@@ -1434,11 +1433,6 @@ void WorkbenchUi::createNotificationsWidget(const QnPaneSettings& settings)
 
 #pragma region CalendarWidget
 
-bool WorkbenchUi::isCalendarPinned() const
-{
-    return m_calendar && m_calendar->isPinned();
-}
-
 bool WorkbenchUi::isCalendarOpened() const
 {
     return m_calendar && m_calendar->isOpened();
@@ -1481,10 +1475,13 @@ void WorkbenchUi::updateCalendarVisibility(bool animate)
 
 void WorkbenchUi::updateCalendarGeometry()
 {
+    const QPoint kCalendarMargins{8, 12};
+
     QRectF geometry = m_calendar->geometry();
     geometry.moveRight(m_controlsWidgetRect.right());
     geometry.moveBottom(m_timeline->effectiveGeometry().top());
-    m_calendar->setOrigin(geometry.topLeft().toPoint());
+    geometry.translate(-kCalendarMargins);
+    m_calendar->setPosition(geometry.topLeft().toPoint());
 }
 
 void WorkbenchUi::createCalendarWidget(const QnPaneSettings& settings)
@@ -1492,7 +1489,7 @@ void WorkbenchUi::createCalendarWidget(const QnPaneSettings& settings)
     m_calendar = new CalendarWorkbenchPanel(settings, display()->view(), m_controlsWidget, this);
 
     // TODO: #sivanov Refactor indirect dependency.
-    m_connections << connect(navigator()->calendar(), &QnCalendarWidget::emptyChanged, this,
+    m_connections << connect(navigator()->calendar(), &TimelineCalendarWidget::emptyChanged, this,
         &WorkbenchUi::updateCalendarVisibilityAnimated);
 
     m_connections << connect(m_calendar, &AbstractWorkbenchPanel::hoverEntered, this,

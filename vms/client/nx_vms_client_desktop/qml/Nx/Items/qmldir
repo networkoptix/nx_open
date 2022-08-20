@@ -11,6 +11,7 @@ ResourceBrowser 1.0 ResourceBrowser.qml
 ResourcePreview 1.0 ResourcePreview.qml
 SelectionMouseArea 1.0 SelectionMouseArea.qml
 Timeline 1.0 Timeline.qml
+TimelineCalendar 1.0 TimelineCalendar.qml
 InteractiveGrid 1.0 InteractiveGrid.qml
 IntervalPreview 1.0 IntervalPreview.qml
 IntervalPreviewControls 1.0 IntervalPreviewControls.qml

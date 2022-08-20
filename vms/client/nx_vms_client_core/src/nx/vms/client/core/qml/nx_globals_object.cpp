@@ -159,6 +159,11 @@ QnUuid NxGlobalsObject::generateUuid() const
     return QnUuid::createUuid();
 }
 
+DateRange NxGlobalsObject::dateRange(const QDateTime& start, const QDateTime& end) const
+{
+    return DateRange{start, end};
+}
+
 bool NxGlobalsObject::fileExists(const QString& path) const
 {
     return QFile::exists(path);

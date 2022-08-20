@@ -1250,16 +1250,6 @@ enum IDType
     ToggleLeftPanelAction = ToggleTreeAction,
 
     /**
-     * Pins/unpins calendar and day/time view
-     */
-    PinCalendarAction,
-
-    /**
-     * Minimizes day/time view
-     */
-    MinimizeDayTimeViewAction,
-
-    /**
      * Shows/hides timeline.
      */
     ToggleTimelineAction,

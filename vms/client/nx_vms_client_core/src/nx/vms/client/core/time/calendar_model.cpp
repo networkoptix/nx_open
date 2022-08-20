@@ -8,11 +8,31 @@
 
 #include <functional>
 
+#include <nx/reflect/enum_instrument.h>
+#include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/time/calendar_utils.h>
-#include <nx/vms/client/core/media/chunk_provider.h>
-#include <nx/vms/client/core/media/time_periods_store.h>
+#include <nx/vms/client/core/media/abstract_time_period_storage.h>
+#include <recording/time_period_list.h>
+
+namespace nx::vms::client::core {
 
 namespace {
+
+NX_REFLECTION_ENUM_CLASS(PeriodStorageType, currentCamera, allCameras, count)
+
+int roleForPeriodStorageType(PeriodStorageType type)
+{
+    switch (type)
+    {
+        case PeriodStorageType::currentCamera:
+            return CalendarModel::HasArchiveRole;
+        case PeriodStorageType::allCameras:
+            return CalendarModel::AnyCameraHasArchiveRole;
+        default:
+            NX_ASSERT(false, "Invalid period store type requested %1", type);
+            return -1;
+    }
+}
 
 struct Day
 {
@@ -20,18 +40,18 @@ struct Day
     Day(const QDate& date, qint64 displayOffset);
 
     qint64 endTime() const;
-    bool containsTime(qint64 value) const;
 
+    QDate date;
     qint64 startTime = 0;
-    bool hasArchive = false;
-    int dayNumber = 1;
+
+    bool hasArchive[(int) PeriodStorageType::count]{false, false};
 };
 
 Day::Day() {}
 
 Day::Day(const QDate& date, qint64 displayOffset):
-    startTime(QDateTime(date, QTime(), Qt::UTC).toMSecsSinceEpoch() - displayOffset),
-    dayNumber(date.day())
+    date(date),
+    startTime(QDateTime(date, QTime()).toMSecsSinceEpoch() - displayOffset)
 {
 }
 
@@ -41,12 +61,7 @@ qint64 Day::endTime() const
     return startTime + kMillisecondsInDay - 1;
 }
 
-bool Day::containsTime(qint64 value) const
-{
-    return startTime <= value && value <= endTime();
-}
-
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 struct Month
 {
@@ -54,7 +69,6 @@ struct Month
 
     void recalculateData(qint64 displayOffset);
     bool containsDay(const Day& day) const;
-    bool containsPosition(qint64 position) const;
 
     int year;
     int month;
@@ -80,34 +94,26 @@ bool Month::containsDay(const Day& day) const
     return day.startTime <= endDay.endTime() && day.endTime() >= startDay.startTime;
 }
 
-bool Month::containsPosition(qint64 position) const
-{
-    return startDay.startTime <= position && position <= endDay.endTime();
-}
-
 } // namespace
 
-//--------------------------------------------------------------------------------------------------
-
-namespace nx::vms::client::core {
+//-------------------------------------------------------------------------------------------------
 
 struct CalendarModel::Private
 {
     Private(CalendarModel* owner);
     void resetDaysModelData();
-    void updateArchiveInfo();
-    void handleCurrentPositionChanged();
-    void clearArchiveMarks(int dayIndex = 0);
+    void updateArchiveInfo(PeriodStorageType type);
+    void clearArchiveMarks(PeriodStorageType type, int dayIndex = 0);
+    void setPeriodStorage(AbstractTimePeriodStorage* store, PeriodStorageType type);
 
     CalendarModel* const q;
 
-    qint64 currentPosition = 0;
     qint64 displayOffset = 0;
     Month currentMonth;
     QList<Day> days;
     QLocale locale;
 
-    TimePeriodsStore* periodsStore = nullptr;
+    AbstractTimePeriodStorage* periodStorage[(int) PeriodStorageType::count]{nullptr, nullptr};
     bool populated = false;
 };
 
@@ -126,35 +132,34 @@ void CalendarModel::Private::resetDaysModelData()
     if (!date.isValid())
         return;
 
-    // First row will contain the first day of this month.
-    static constexpr int kDaysInWeek = 7;
-    for (int i = 0; i < kDaysInWeek; ++i)
+    constexpr int kDaysInWeek = 7;
+    constexpr int kDisplayWeeks = 6;
+
+    for (int week = 0; week < kDisplayWeeks; ++week)
     {
-        days.append(Day(date, displayOffset));
-        date = date.addDays(1);
+        for (int day = 0; day < kDaysInWeek; ++day)
+        {
+            days.append(Day(date, displayOffset));
+            date = date.addDays(1);
+        }
     }
 
-    // Add weeks till month ended.
-    while (date.month() == currentMonth.month)
-    {
-        days.append(Day(date, displayOffset));
-        date = date.addDays(1);
-    }
-
-    updateArchiveInfo();
+    updateArchiveInfo(PeriodStorageType::currentCamera);
+    updateArchiveInfo(PeriodStorageType::allCameras);
     q->endResetModel();
     currentMonth.recalculateData(displayOffset);
 }
 
-void CalendarModel::Private::updateArchiveInfo()
+void CalendarModel::Private::updateArchiveInfo(PeriodStorageType type)
 {
-    if (!periodsStore)
+    const auto store = periodStorage[(int) type];
+    if (!store)
     {
-        clearArchiveMarks();
+        clearArchiveMarks(type);
         return;
     }
 
-    const auto timePeriods = periodsStore->periods(Qn::RecordingContent);
+    const QnTimePeriodList timePeriods = store->periods(Qn::RecordingContent);
 
     const int firstMonthDayPosition =
         [this]() -> int
@@ -164,13 +169,13 @@ void CalendarModel::Private::updateArchiveInfo()
             return it == days.end() ? -1 : it - days.begin();
         }();
 
-    for (int i = firstMonthDayPosition; i != days.size();)
+    for (int i = firstMonthDayPosition; i < days.size();)
     {
         const auto it = timePeriods.findNearestPeriod(days[i].startTime, true);
         if (it == timePeriods.cend())
         {
-            // No chinks at the right of the first day of month.
-            clearArchiveMarks(i);
+            // No chunks at the right of the first day of month.
+            clearArchiveMarks(type, i);
             break;
         }
 
@@ -180,35 +185,68 @@ void CalendarModel::Private::updateArchiveInfo()
             : it->endTimeMs();
 
         while (i < days.size() && days[i].endTime() < chunkStartTime)
-            days[i++].hasArchive = false;
+            days[i++].hasArchive[(int) type] = false;
 
         while (i < days.size() && days[i].startTime <= chunkEndTime)
-            days[i++].hasArchive = true;
+            days[i++].hasArchive[(int) type] = true;
 
         if (it->isInfinite())
         {
-            clearArchiveMarks(i);
+            clearArchiveMarks(type, i);
             break;
         }
     }
 }
 
-void CalendarModel::Private::handleCurrentPositionChanged()
-{
-    emit q->dataChanged(q->index(0), q->index(q->rowCount() - 1), {CalendarModel::IsCurrentRole});
-}
-
-void CalendarModel::Private::clearArchiveMarks(int dayIndex)
+void CalendarModel::Private::clearArchiveMarks(PeriodStorageType type, int dayIndex)
 {
     for (int i = dayIndex; i != days.size(); ++i)
-        days[i].hasArchive = false;
+        days[i].hasArchive[(int) type] = false;
 }
 
-//--------------------------------------------------------------------------------------------------
+void CalendarModel::Private::setPeriodStorage(
+    AbstractTimePeriodStorage* store, PeriodStorageType type)
+{
+    const auto currentStore = periodStorage[(int) type];
+
+    if (currentStore == store)
+        return;
+
+    if (currentStore)
+        currentStore->disconnect(q);
+
+    periodStorage[(int) type] = store;
+
+    const auto updateArchiveInfoInternal =
+        [this, type](Qn::TimePeriodContent contentType)
+        {
+            if (contentType != Qn::RecordingContent)
+                return;
+
+            updateArchiveInfo(type);
+            emit q->dataChanged(
+                q->index(0), q->index(q->rowCount() - 1), {roleForPeriodStorageType(type)});
+        };
+
+    if (store)
+    {
+        QObject::connect(
+            store, &AbstractTimePeriodStorage::periodsUpdated, q, updateArchiveInfoInternal);
+    }
+
+    updateArchiveInfoInternal(Qn::RecordingContent);
+
+    if (type == PeriodStorageType::allCameras)
+        emit q->allCamerasPeriodStorageChanged();
+    else
+        emit q->periodStorageChanged();
+}
+
+//-------------------------------------------------------------------------------------------------
 
 void CalendarModel::registerQmlType()
 {
-    qmlRegisterType<nx::vms::client::core::CalendarModel>("Nx.Core", 1, 0, "CalendarModel");
+    qmlRegisterType<CalendarModel>("nx.vms.client.core", 1, 0, "CalendarModel");
 }
 
 CalendarModel::CalendarModel(QObject* parent):
@@ -236,14 +274,13 @@ QVariant CalendarModel::data(const QModelIndex& index, int role) const
     switch (role)
     {
         case Qt::DisplayRole:
-            return d->currentMonth.containsDay(day) ? QString::number(day.dayNumber) : QString();
-        case DayStartTimeRole:
-            return day.startTime;
-        case IsCurrentRole:
-            return d->currentMonth.containsPosition(d->currentPosition)
-                && day.containsTime(d->currentPosition);
+            return d->currentMonth.containsDay(day) ? QString::number(day.date.day()) : QString();
+        case DateRole:
+            return QDateTime(day.date, QTime());
         case HasArchiveRole:
-            return day.hasArchive;
+            return day.hasArchive[(int) PeriodStorageType::currentCamera];
+        case AnyCameraHasArchiveRole:
+            return day.hasArchive[(int) PeriodStorageType::allCameras];
     }
 
     return QVariant();
@@ -251,10 +288,16 @@ QVariant CalendarModel::data(const QModelIndex& index, int role) const
 
 QHash<int, QByteArray> CalendarModel::roleNames() const
 {
-    QHash<int, QByteArray> roleNames = QAbstractListModel::roleNames();
-    roleNames[DayStartTimeRole] = "dayStartTime";
-    roleNames[IsCurrentRole] = "isCurrent";
-    roleNames[HasArchiveRole] = "hasArchive";
+    static QHash<int, QByteArray> roleNames;
+    if (roleNames.isEmpty())
+    {
+        roleNames = QAbstractListModel::roleNames();
+        roleNames.insert({
+            {DateRole, "date"},
+            {HasArchiveRole, "hasArchive"},
+            {AnyCameraHasArchiveRole, "anyCameraHasArchive"},
+        });
+    }
     return roleNames;
 }
 
@@ -269,7 +312,7 @@ void CalendarModel::setYear(int year)
     if (year == d->currentMonth.year)
         return;
 
-    d->currentMonth.year = year;
+    d->currentMonth = Month(year, d->currentMonth.month, d->displayOffset);
     emit yearChanged();
 
     d->resetDaysModelData();
@@ -286,62 +329,31 @@ void CalendarModel::setMonth(int month)
     if (month == d->currentMonth.month)
         return;
 
-    d->currentMonth.month = month;
+    d->currentMonth = Month(d->currentMonth.year, month, d->displayOffset);
     emit yearChanged();
 
     d->resetDaysModelData();
 }
 
 
-TimePeriodsStore* CalendarModel::periodsStore() const
+AbstractTimePeriodStorage* CalendarModel::periodStorage() const
 {
-    return d->periodsStore;
+    return d->periodStorage[(int) PeriodStorageType::currentCamera];
 }
 
-void CalendarModel::setPeriodsStore(TimePeriodsStore* store)
+void CalendarModel::setPeriodStorage(AbstractTimePeriodStorage* store)
 {
-    if (d->periodsStore == store)
-        return;
-
-    if (d->periodsStore)
-        disconnect(d->periodsStore, nullptr, this, nullptr);
-
-    d->periodsStore = store;
-
-    const auto updateArchiveInfoInternal =
-        [this](Qn::TimePeriodContent type)
-        {
-            if (type != Qn::RecordingContent)
-                return;
-            d->updateArchiveInfo();
-            emit dataChanged(index(0), index(rowCount() - 1), {HasArchiveRole});
-        };
-
-    if (d->periodsStore)
-    {
-        connect(d->periodsStore, &TimePeriodsStore::periodsUpdated,
-            this, updateArchiveInfoInternal);
-    }
-
-    updateArchiveInfoInternal(Qn::RecordingContent);
-    emit periodsStoreChanged();
+    d->setPeriodStorage(store, PeriodStorageType::currentCamera);
 }
 
-qint64 CalendarModel::position() const
+AbstractTimePeriodStorage* CalendarModel::allCamerasPeriodStorage() const
 {
-    return d->currentPosition;
+    return d->periodStorage[(int) PeriodStorageType::allCameras];
 }
 
-void CalendarModel::setPosition(qint64 value)
+void CalendarModel::setAllCamerasPeriodStorage(AbstractTimePeriodStorage* store)
 {
-    value = std::clamp<qint64>(value, 0, std::numeric_limits<qint64>().max());
-    if (d->currentPosition == value)
-        return;
-
-    d->currentPosition = value;
-    emit positionChanged();
-
-    d->handleCurrentPositionChanged();
+    d->setPeriodStorage(store, PeriodStorageType::allCameras);
 }
 
 qint64 CalendarModel::displayOffset() const

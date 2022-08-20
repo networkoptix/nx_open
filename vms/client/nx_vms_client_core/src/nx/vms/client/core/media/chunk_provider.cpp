@@ -2,11 +2,14 @@
 
 #include "chunk_provider.h"
 
+#include <QtQml/QtQml>
+
 #include <common/common_module.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/resource/data_loaders/flat_camera_data_loader.h>
+#include <nx/vms/client/core/system_context.h>
 
 namespace nx::vms::client::core {
 
@@ -179,6 +182,7 @@ QnVirtualCameraResourcePtr ChunkProvider::ChunkProviderInternal::getCamera(const
 
 ChunkProvider::ChunkProvider(QObject* parent):
     base_type(parent),
+    SystemContextAware(SystemContext::fromQmlContext(this)),
     m_providers(
         [this]()
         {
@@ -200,6 +204,11 @@ bool ChunkProvider::hasChunks() const
 bool ChunkProvider::hasMotionChunks() const
 {
     return hasPeriods(Qn::MotionContent);
+}
+
+void ChunkProvider::registerQmlType()
+{
+    qmlRegisterType<ChunkProvider>("nx.vms.client.core", 1, 0, "ChunkProvider");
 }
 
 QnUuid ChunkProvider::resourceId() const

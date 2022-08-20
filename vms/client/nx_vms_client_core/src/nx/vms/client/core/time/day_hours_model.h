@@ -12,14 +12,13 @@ namespace nx::vms::client::core {
 
 class AbstractTimePeriodStorage;
 
-class NX_VMS_CLIENT_CORE_API CalendarModel: public QAbstractListModel
+/* The model represents 24 day hours and the archive presence on that hours. */
+class NX_VMS_CLIENT_CORE_API DayHoursModel: public QAbstractListModel
 {
     Q_OBJECT
-    using base_type = QAbstractListModel;
 
-    Q_PROPERTY(int year READ year WRITE setYear NOTIFY yearChanged)
-    Q_PROPERTY(int month READ month WRITE setMonth NOTIFY monthChanged)
-    Q_PROPERTY(QLocale locale READ locale WRITE setLocale NOTIFY localeChanged)
+    Q_PROPERTY(bool amPmTime READ amPmTime WRITE setAmPmTime NOTIFY amPmTimeChanged)
+    Q_PROPERTY(QDate date READ date WRITE setDate NOTIFY dateChanged)
     Q_PROPERTY(nx::vms::client::core::AbstractTimePeriodStorage* periodStorage
         READ periodStorage
         WRITE setPeriodStorage
@@ -35,25 +34,19 @@ public:
     enum Role
     {
         DateRole = Qt::UserRole + 1,
-        DayStartTimeRole,
+        HourRole,
         HasArchiveRole,
         AnyCameraHasArchiveRole,
     };
 
-    static void registerQmlType();
+    DayHoursModel(QObject* parent = nullptr);
+    virtual ~DayHoursModel() override;
 
-    CalendarModel(QObject* parent = nullptr);
-    virtual ~CalendarModel() override;
+    bool amPmTime() const;
+    void setAmPmTime(bool amPmTime);
 
-public: // Properties and invokables.
-    int year() const;
-    void setYear(int year);
-
-    int month() const;
-    void setMonth(int month);
-
-    QLocale locale() const;
-    void setLocale(const QLocale& locale);
+    QDate date() const;
+    void setDate(const QDate& date);
 
     AbstractTimePeriodStorage* periodStorage() const;
     void setPeriodStorage(AbstractTimePeriodStorage* store);
@@ -64,18 +57,19 @@ public: // Properties and invokables.
     qint64 displayOffset() const;
     void setDisplayOffset(qint64 value);
 
-public: // Overrides section.
+    static void registerQmlType();
+
+public:
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual QVariant data(const QModelIndex& index, int role) const override;
 
     virtual QHash<int, QByteArray> roleNames() const override;
 
 signals:
-    void yearChanged();
-    void monthChanged();
+    void amPmTimeChanged();
+    void dateChanged();
     void periodStorageChanged();
     void allCamerasPeriodStorageChanged();
-    void localeChanged();
     void displayOffsetChanged();
 
 private:
