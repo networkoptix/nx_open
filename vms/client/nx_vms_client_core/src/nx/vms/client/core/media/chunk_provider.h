@@ -5,18 +5,18 @@
 #include <QtCore/QObject>
 
 #include <common/common_globals.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <nx/vms/client/core/media/time_periods_store.h>
+#include <nx/vms/client/core/media/abstract_time_period_storage.h>
+#include <nx/vms/client/core/system_context_aware.h>
 #include <recording/time_period_list.h>
 
 namespace nx::vms::client::core {
 
 class NX_VMS_CLIENT_CORE_API ChunkProvider:
-    public TimePeriodsStore,
-    public nx::vms::client::core::CommonModuleAware
+    public AbstractTimePeriodStorage,
+    public SystemContextAware
 {
     Q_OBJECT
-    using base_type = TimePeriodsStore;
+    using base_type = AbstractTimePeriodStorage;
 
     Q_PROPERTY(QnUuid resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
     Q_PROPERTY(qint64 bottomBound READ bottomBound NOTIFY bottomBoundChanged)
@@ -43,6 +43,8 @@ public:
     Q_INVOKABLE void update();
     Q_INVOKABLE bool hasChunks() const;
     Q_INVOKABLE bool hasMotionChunks() const;
+
+    static void registerQmlType();
 
 signals:
     void resourceIdChanged();

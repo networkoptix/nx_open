@@ -13,6 +13,7 @@
 #include <nx/utils/url.h>
 #include <nx/vms/api/data/software_version.h>
 #include <nx/vms/client/core/enums.h>
+#include <nx/vms/client/core/time/date_range.h>
 
 namespace nx::vms::client::core {
 
@@ -43,6 +44,9 @@ public:
 
     Q_INVOKABLE QnUuid uuid(const QString& uuid) const;
     Q_INVOKABLE QnUuid generateUuid() const;
+
+    Q_INVOKABLE nx::vms::client::core::DateRange dateRange(
+        const QDateTime& start, const QDateTime& end) const;
 
     Q_INVOKABLE QLocale numericInputLocale(const QString& basedOn = "") const;
 

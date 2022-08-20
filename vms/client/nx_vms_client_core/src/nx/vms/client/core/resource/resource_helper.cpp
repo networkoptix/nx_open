@@ -182,12 +182,10 @@ bool ResourceHelper::hasVideo() const
 
 qint64 ResourceHelper::displayOffset() const
 {
-    const auto timeWatcher = serverTimeWatcher();
     const auto mediaResource = m_resource.dynamicCast<QnMediaResource>();
-
-    return !mediaResource || timeWatcher->timeMode() == ServerTimeWatcher::clientTimeMode
-        ? nx::vms::time::systemDisplayOffset()
-        : timeWatcher->utcOffset(mediaResource);
+    return mediaResource
+        ? serverTimeWatcher()->displayOffset(m_resource.dynamicCast<QnMediaResource>())
+        : 0;
 }
 
 } // namespace nx::vms::client::core

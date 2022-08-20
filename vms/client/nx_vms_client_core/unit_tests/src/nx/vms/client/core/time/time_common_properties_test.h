@@ -35,25 +35,8 @@ TYPED_TEST_P(CommonTimePropertiesTest, DisplayOffsetPropertyCheck)
     ASSERT_EQ(TimeConstants::kMaxDisplayOffset, object.displayOffset());
 }
 
-TYPED_TEST_P(CommonTimePropertiesTest, PositionPropertyCheck)
-{
-    TypeParam& object = this->object;
-
-    // Checks if current position setter/getter works correctly.
-    static const int kSomePosition = 1000;
-    object.setPosition(kSomePosition);
-    ASSERT_EQ(kSomePosition, object.position());
-
-    // Checks if minimum position value is constrained.
-    object.setPosition(-1);
-    ASSERT_EQ(object.position(), 0);
-}
-
 GTEST_ALLOW_UNINSTANTIATED_PARAMETERIZED_TEST(CommonTimePropertiesTest);
-REGISTER_TYPED_TEST_SUITE_P(CommonTimePropertiesTest,
-    DisplayOffsetPropertyCheck,
-    PositionPropertyCheck);
+REGISTER_TYPED_TEST_SUITE_P(CommonTimePropertiesTest, DisplayOffsetPropertyCheck);
 
 } // namespace test
 } // namespace nx::vms::client::core
-

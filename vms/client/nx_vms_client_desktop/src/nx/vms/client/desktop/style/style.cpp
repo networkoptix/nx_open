@@ -63,7 +63,6 @@
 #include <ui/common/indents.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/dialog.h>
-#include <ui/widgets/calendar_widget.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <utils/common/delayed.h>
@@ -4216,8 +4215,7 @@ void Style::polish(QWidget* widget)
                     widget->setFont(font);
                 }
 
-                if (!ObjectCompanionManager::companion(calendar, kCalendarDelegateCompanion)
-                    && !qobject_cast<QnCalendarWidget*>(calendar))
+                if (!ObjectCompanionManager::companion(calendar, kCalendarDelegateCompanion))
                 {
                     ObjectCompanionManager::attach(calendar,
                         new CalendarDelegateReplacement(view, calendar),

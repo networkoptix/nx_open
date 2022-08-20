@@ -7,7 +7,8 @@
 #include <QtWidgets/QStyledItemDelegate>
 
 struct QnTimePeriod;
-class QnTimePeriodStorage;
+
+namespace nx::vms::client::core { class TimePeriodStorage; }
 
 class QnCalendarItemDelegate: public QStyledItemDelegate
 {
@@ -22,8 +23,8 @@ public:
     void paintCell(QPainter* painter,
         const QRect& rect,
         const QnTimePeriod& localPeriod,
-        const QnTimePeriodStorage& primaryPeriods,
-        const QnTimePeriodStorage& secondaryPeriods,
+        const nx::vms::client::core::TimePeriodStorage& primaryPeriods,
+        const nx::vms::client::core::TimePeriodStorage& secondaryPeriods,
         bool isSelected) const;
 
     void paintCellText(QPainter* painter,

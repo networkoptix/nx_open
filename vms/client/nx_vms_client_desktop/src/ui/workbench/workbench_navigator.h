@@ -36,14 +36,17 @@ class QnTimeScrollBar;
 class QnResourceWidget;
 class QnMediaResourceWidget;
 class QnAbstractArchiveStreamReader;
-class QnCalendarWidget;
-class QnDayTimeWidget;
 class QnSearchQueryStrategy;
 class VariantAnimator;
 
 namespace nx { namespace utils { class PendingOperation; }}
 
-namespace nx::vms::client::desktop { class SystemContext; }
+namespace nx::vms::client::desktop {
+
+class SystemContext;
+class TimelineCalendarWidget;
+
+} // namespace nx::vms::client::desktop
 
 class QnWorkbenchNavigator:
     public QObject,
@@ -78,11 +81,8 @@ public:
     QnTimeScrollBar *timeScrollBar() const;
     void setTimeScrollBar(QnTimeScrollBar *scrollBar);
 
-    QnCalendarWidget *calendar() const;
-    void setCalendar(QnCalendarWidget *calendar);
-
-    QnDayTimeWidget *dayTimeWidget() const;
-    void setDayTimeWidget(QnDayTimeWidget *dayTimeWidget);
+    nx::vms::client::desktop::TimelineCalendarWidget* calendar() const;
+    void setCalendar(nx::vms::client::desktop::TimelineCalendarWidget* calendar);
 
     bool bookmarksModeEnabled() const;
     void setBookmarksModeEnabled(bool bookmarksModeEnabled);
@@ -262,10 +262,6 @@ protected slots:
     void at_timeScrollBar_sliderPressed();
     void at_timeScrollBar_sliderReleased();
 
-    void at_calendar_dateClicked(const QDate &date);
-
-    void at_dayTimeWidget_timeClicked(const QTime &time);
-
 private:
     void connectToContext(nx::vms::client::desktop::SystemContext* systemContext);
 
@@ -305,14 +301,13 @@ private:
 
     void syncIfOutOfSyncWithLive(QnResourceWidget *widget);
 
-    void setTimeSliderWindowFromCalendar(milliseconds startMSec, milliseconds endMSec, bool extend);
+    void updateTimeSliderWindowFromCalendar();
 
 private:
     QElapsedTimer m_updateSliderTimer;
     QPointer<QnTimeSlider> m_timeSlider;
     QPointer<QnTimeScrollBar> m_timeScrollBar;
-    QPointer<QnCalendarWidget> m_calendar;
-    QPointer<QnDayTimeWidget> m_dayTimeWidget;
+    QPointer<nx::vms::client::desktop::TimelineCalendarWidget> m_calendar;
 
     QSet<QnMediaResourceWidget *> m_syncedWidgets;
     QHash<QnMediaResourcePtr, int> m_syncedResources;

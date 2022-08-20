@@ -6,11 +6,13 @@
 #include <utils/math/color_transformations.h>
 
 #include <recording/time_period.h>
-#include <recording/time_period_storage.h>
 
+#include <nx/vms/client/core/media/time_period_storage.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 
 using namespace nx::vms::client::desktop;
+
+using nx::vms::client::core::TimePeriodStorage;
 
 namespace {
 
@@ -50,7 +52,7 @@ static const QPoint kRightOffset = QPoint(1, 0);
 static const QPoint kBottomOffset = QPoint(0, 1);
 static const QPoint kBottomRightOffset = kRightOffset + kBottomOffset;
 
-int fillType(const QnTimePeriod &period, const QnTimePeriodStorage &periodStorage)
+int fillType(const QnTimePeriod &period, const TimePeriodStorage &periodStorage)
 {
     return ((periodStorage.periods(Qn::MotionContent).intersects(period) ? kMotionFill : kNoFill)
         | (periodStorage.periods(Qn::RecordingContent).intersects(period) ? kRecordingFill : kNoFill));
@@ -91,8 +93,8 @@ void QnCalendarItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem
 void QnCalendarItemDelegate::paintCell(QPainter* painter,
     const QRect& rect,
     const QnTimePeriod& localPeriod,
-    const QnTimePeriodStorage& primaryPeriods,
-    const QnTimePeriodStorage& secondaryPeriods,
+    const TimePeriodStorage& primaryPeriods,
+    const TimePeriodStorage& secondaryPeriods,
     bool isSelected) const
 {
     static const QBrush kPrimaryMotionBrush(

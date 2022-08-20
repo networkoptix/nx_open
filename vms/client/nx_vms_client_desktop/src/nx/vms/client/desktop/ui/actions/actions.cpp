@@ -2101,16 +2101,6 @@ void initialize(Manager* manager, Action* root)
         .toggledText(ContextMenu::tr("Hide Title Bar"))
         .condition(new ToggleTitleBarCondition());
 
-    factory(PinCalendarAction)
-        .flags(NoTarget)
-        .text(ContextMenu::tr("Pin Calendar")) //< To be displayed on the button tooltip
-        .toggledText(ContextMenu::tr("Unpin Calendar"))
-        .checkable();
-
-    factory(MinimizeDayTimeViewAction)
-        .text(ContextMenu::tr("Minimize")) //< To be displayed on button tooltip
-        .icon(qnSkin->icon("titlebar/dropdown.png"));
-
     if (ini().newPanelsLayout)
     {
         factory(ToggleLeftPanelAction)

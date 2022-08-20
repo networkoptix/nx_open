@@ -33,7 +33,7 @@ DisplayTimeHelper::Private::Private(DisplayTimeHelper* owner):
 
 QDateTime DisplayTimeHelper::Private::getDateTime() const
 {
-    return QDateTime::fromMSecsSinceEpoch(position + displayOffset, Qt::UTC);
+    return QDateTime::fromMSecsSinceEpoch(position + displayOffset);
 }
 
 void DisplayTimeHelper::Private::handleChanges()

@@ -2,22 +2,24 @@
 
 #pragma once
 
+#include <common/common_globals.h>
+#include <nx/vms/client/core/media/abstract_time_period_storage.h>
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
 
-#include <common/common_globals.h>
+namespace nx::vms::client::core {
 
 /**
  * Class for collecting, aggregating and providing time period lists.
  */
-class NX_VMS_COMMON_API QnTimePeriodStorage
+class NX_VMS_CLIENT_CORE_API TimePeriodStorage: public AbstractTimePeriodStorage
 {
 public:
-    QnTimePeriodStorage(): m_aggregationMSecs(0) {}
+    TimePeriodStorage(QObject* parent = nullptr);
 
-    QnTimePeriodList periods(Qn::TimePeriodContent type) const;
+    virtual const QnTimePeriodList& periods(Qn::TimePeriodContent type) const override;
     QnTimePeriodList aggregated(Qn::TimePeriodContent type) const;
-    void setPeriods(Qn::TimePeriodContent type, const QnTimePeriodList &timePeriods);
+    void setPeriods(Qn::TimePeriodContent type, const QnTimePeriodList& timePeriods);
 
     int aggregationMSecs() const;
     void setAggregationMSecs(int value);
@@ -28,5 +30,7 @@ protected:
 private:
     QnTimePeriodList m_normalPeriods[Qn::TimePeriodContentCount];
     QnTimePeriodList m_aggregatedPeriods[Qn::TimePeriodContentCount];
-    int m_aggregationMSecs;
+    int m_aggregationMSecs = 0;
 };
+
+} // namespace nx::vms::client::core
