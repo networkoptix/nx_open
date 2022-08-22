@@ -47,7 +47,7 @@ desktop: {
 
     # Installer.
     installer_icon.icns: 'icons/macosx/installer_icon.icns',
-    installer_background.png: 'client-dmg/dmg-folder/.background/dmgBackground.png', # 600x400.
+    installer_background.png: 'desktop/macos/installer_background.png',
     installer_config: 'client-dmg/dmg-folder/DS_Store'
   }
 }

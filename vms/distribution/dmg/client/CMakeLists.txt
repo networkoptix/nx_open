@@ -44,10 +44,17 @@ nx_configure_directory(
 )
 
 nx_configure_directory(
+    ${customization_dir}/common-dmg
+    ${configured_files_dir}
+    COPYONLY
+    OUTPUT_FILES_VARIABLE customization_common_files
+)
+
+nx_configure_directory(
     ${customization_dir}/client-dmg
     ${configured_files_dir}
     COPYONLY
-    OUTPUT_FILES_VARIABLE customization_files
+    OUTPUT_FILES_VARIABLE customization_client_files
 )
 
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${launcher.version.file} "${releaseVersion.full}")
@@ -57,9 +64,15 @@ nx_store_known_file(${CMAKE_CURRENT_BINARY_DIR}/${launcher.version.file})
 nx_copy(${CMAKE_CURRENT_SOURCE_DIR}/qt.conf DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 add_custom_command(
-    DEPENDS desktop_client applauncher
-        ${configured_files} ${copied_files} ${customization_files}
-        ${app_icon} ${installer_icon}
+    DEPENDS
+        desktop_client
+        applauncher
+        ${configured_files}
+        ${copied_files}
+        ${customization_common_files}
+        ${customization_client_files}
+        ${app_icon}
+        ${installer_icon}
     COMMENT "Creating ${dmg_file}"
     OUTPUT ${dmg_file} ${update_file} ${compatibility_update_file}
 

@@ -15,9 +15,10 @@ LOG_FILE="$LOGS_DIR/build_distribution.log"
 # TODO: Create the "stage" in $WORK_DIR.
 SRC=./dmg-folder
 VOLUME_NAME="$DISPLAY_PRODUCT_NAME $RELEASE_VERSION"
-BACKGROUND_PATH="$SRC/.background/dmgBackground.png"
 PACKAGE_ICON_PATH="$SRC/.VolumeIcon.icns"
 DMG_SETTINGS="settings.py"
+
+BACKGROUND_PATH="$CUSTOMIZATION_DIR/desktop/macos/installer_background.png"
 
 APP_BUNDLE="$DISPLAY_PRODUCT_NAME.app"
 APP_DIR="$SRC/$APP_BUNDLE"
@@ -93,9 +94,9 @@ buildDistribution()
 
     copyMacOsSpecificApplauncherStuff
 
-    "$PYTHON" macdeployqt.py \
-        "$CURRENT_BUILD_DIR" "$APP_DIR" "$BUILD_DIR/bin" "$BUILD_DIR/lib" "$CLIENT_HELP_PATH" "$QT_DIR" \
-        "$QT_VERSION"
+    PYTHONPATH="${VMS_DISTRIBUTION_COMMON_DIR}/scripts" "${PYTHON}" macdeployqt.py \
+        "$CURRENT_BUILD_DIR" "$APP_DIR" "$BUILD_DIR/bin" "$BUILD_DIR/lib" "$CLIENT_HELP_PATH" \
+        "$QT_DIR" "$QT_VERSION"
 
     copyWebEngineFiles
     copyResources
