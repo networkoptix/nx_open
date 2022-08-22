@@ -19,8 +19,6 @@
 #include <recording/time_period_list.h>
 #include <utils/common/sleep.h>
 
-#include "resource_consumer.h"
-
 namespace {
 
 static const QString kMediaPortParamName = "mediaPort";

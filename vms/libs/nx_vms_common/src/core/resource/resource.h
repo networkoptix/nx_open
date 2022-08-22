@@ -14,7 +14,6 @@
 #include "resource_type.h"
 #include "shared_resource_pointer.h"
 
-class QnResourceConsumer;
 class QnResourcePool;
 
 namespace nx::vms::common { class SystemContext; }
@@ -408,19 +407,6 @@ protected:
 private:
     bool useLocalProperties() const;
 
-private:
-    // The following consumer-related API is private as it is supposed to be used from
-    // QnResourceConsumer instances only. Using it from other places may break invariants.
-    // This is a legacy api which was created before Resources were used as shared pointers.
-    // TODO: #sivanov Remove this class at all. Keep the shared pointer and listen to the Resource
-    // Pool for the Resource removal instead.
-    friend class QnResourceConsumer;
-
-    void addConsumer(QnResourceConsumer* consumer);
-    void removeConsumer(QnResourceConsumer* consumer);
-    bool hasConsumer(QnResourceConsumer* consumer) const;
-    void disconnectAllConsumers();
-
 protected:
     /** Recursive mutex that is used when accessing Resource fields. */
     mutable nx::Mutex m_mutex;
@@ -438,9 +424,6 @@ protected:
 
     /** Mutex that is to be used when accessing a set of all consumers. */
     mutable nx::Mutex m_consumersMtx;
-
-    /** Set of consumers for this Resource. */
-    QSet<QnResourceConsumer*> m_consumers;
 
 private:
     /** Identifier of this Resource. */
