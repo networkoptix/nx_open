@@ -397,7 +397,8 @@ bool SystemHealthListModel::Private::locked(int index) const
 
 bool SystemHealthListModel::Private::isCloseable(int index) const
 {
-    return m_items[index].message != QnSystemHealth::DefaultCameraPasswords;
+    return m_items[index].message != QnSystemHealth::DefaultCameraPasswords
+        && m_items[index].message != QnSystemHealth::RemoteArchiveSyncProgress;
 }
 
 CommandActionPtr SystemHealthListModel::Private::commandAction(int index) const
@@ -614,6 +615,19 @@ void SystemHealthListModel::Private::doAddItem(
         }
     }
 
+    if (message == QnSystemHealth::MessageType::RemoteArchiveSyncFinished
+        || message == QnSystemHealth::MessageType::RemoteArchiveSyncError)
+    {
+        removeItem(QnSystemHealth::MessageType::RemoteArchiveSyncProgress, params);
+    }
+
+    if (message == QnSystemHealth::MessageType::RemoteArchiveSyncProgress
+        || message == QnSystemHealth::MessageType::RemoteArchiveSyncFinished
+        || message == QnSystemHealth::MessageType::RemoteArchiveSyncError)
+    {
+        removeItem(QnSystemHealth::MessageType::RemoteArchiveSyncAvailable, params);
+    }
+
     Item item(message, resource);
     item.serverData = action;
 
@@ -640,12 +654,6 @@ void SystemHealthListModel::Private::doAddItem(
         // New item.
         ScopedInsertRows insertRows(q, index, index, !initial);
         m_items.insert(position, item);
-    }
-
-    if (message == QnSystemHealth::MessageType::RemoteArchiveSyncFinished
-        || message == QnSystemHealth::MessageType::RemoteArchiveSyncError)
-    {
-        removeItem(QnSystemHealth::MessageType::RemoteArchiveSyncProgress, params);
     }
 }
 
