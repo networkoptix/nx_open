@@ -114,7 +114,7 @@
           </property>
           <item>
            <widget class="QWidget" name="leftWidget" native="true">
-            <layout class="QVBoxLayout" name="verticalLayout_9" stretch="0,0,0,0,0,1">
+            <layout class="QVBoxLayout" name="verticalLayout_9" stretch="0,0,0,0,0,0,1">
              <property name="spacing">
               <number>16</number>
              </property>
