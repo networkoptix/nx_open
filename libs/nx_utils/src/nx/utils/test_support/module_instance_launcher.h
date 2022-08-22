@@ -4,8 +4,6 @@
 
 #include <vector>
 
-#include <boost/algorithm/string.hpp>
-
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
@@ -13,9 +11,7 @@
 #include <nx/utils/std/thread.h>
 #include <nx/utils/uuid.h>
 
-namespace nx {
-namespace utils {
-namespace test {
+namespace nx::utils::test {
 
 /**
  * Added to help create functional tests when each test wants to start process from scratch.
@@ -57,8 +53,8 @@ public:
                 m_moduleInstance->setOnStartedEventHandler(
                     [this](bool isStarted)
                     {
-                        m_moduleStartedPromise->set_value(isStarted);
                         afterModuleStart();
+                        m_moduleStartedPromise->set_value(isStarted);
                     });
                 moduleInstantiatedCreatedPromise.set_value();
                 auto result = m_moduleInstance->exec();
@@ -157,7 +153,7 @@ public:
                 if (i < argCount() && m_argTypes[i] == ArgumentType::value)
                     removeArgAt(i);
             }
-            else if (boost::starts_with(m_args[i], longName))
+            else if (std::string_view(m_args[i]).starts_with(longName))
             {
                 removeArgAt(i);
             }
@@ -226,6 +222,4 @@ private:
     mutable std::mutex m_mutex;
 };
 
-} // namespace test
-} // namespace utils
-} // namespace nx
+} // namespace nx::utils::test
