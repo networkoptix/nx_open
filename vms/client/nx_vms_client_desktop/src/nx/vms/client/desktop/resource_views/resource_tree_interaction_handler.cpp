@@ -491,7 +491,8 @@ ui::action::Parameters ResourceTreeInteractionHandler::actionParameters(
 
 void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
     const QModelIndexList& selection,
-    const ResourceTree::ActivationType activationType)
+    const ResourceTree::ActivationType activationType,
+    const Qt::KeyboardModifiers modifiers)
 {
     if (!NX_ASSERT(d->context))
         return;
@@ -592,7 +593,7 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
             const bool isLayoutTourReviewMode =
                 d->context->workbench()->currentLayout()->isLayoutTourReview();
 
-            const auto actionId = isLayoutTourReviewMode
+            const auto actionId = isLayoutTourReviewMode || modifiers == Qt::ControlModifier
                 ? ui::action::OpenInNewTabAction
                 : ui::action::DropResourcesAction;
 

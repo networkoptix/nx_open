@@ -61,16 +61,23 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget* parent):
     connect(ui->resourcesTreeView,
         &TreeView::enterPressed,
         this,
-        [this](const QModelIndex& index)
+        [this](const QModelIndex& index, const Qt::KeyboardModifiers modifiers)
         {
-            emit activated(
-                index, selectionModel()->selectedRows(), ResourceTree::ActivationType::enterKey);
+            emit activated(index,
+                selectionModel()->selectedRows(),
+                ResourceTree::ActivationType::enterKey,
+                modifiers);
         });
     connect(ui->resourcesTreeView,
         &TreeView::doubleClicked,
         this,
         [this](const QModelIndex& index)
-        { emit activated(index, {}, ResourceTree::ActivationType::doubleClick); });
+        {
+            emit activated(index,
+                {},
+                ResourceTree::ActivationType::doubleClick,
+                Qt::NoModifier);
+        });
 
     ui->resourcesTreeView->installEventFilter(this);
 }

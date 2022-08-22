@@ -51,7 +51,8 @@ public:
 
     Q_INVOKABLE void activateItem(const QModelIndex& index,
         const QModelIndexList& selection,
-        const nx::vms::client::desktop::ResourceTree::ActivationType activationType);
+        const nx::vms::client::desktop::ResourceTree::ActivationType activationType,
+        const Qt::KeyboardModifiers modifiers);
 
     Q_INVOKABLE void showContextMenu(
         const QPoint& globalPos, const QModelIndex& index, const QModelIndexList& selection);

@@ -54,7 +54,7 @@ void TreeView::keyPressEvent(QKeyEvent* event)
             event->ignore();
             if (hasFocus())
                 emit activated(currentIndex());
-            emit enterPressed(currentIndex());
+            emit enterPressed(currentIndex(), event->modifiers());
             return; //< Don't call base implementation which triggers edit on macOS.
 
         case Qt::Key_Space:

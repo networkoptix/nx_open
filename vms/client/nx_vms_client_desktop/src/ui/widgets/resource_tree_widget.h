@@ -59,7 +59,8 @@ protected:
 signals:
     void activated(const QModelIndex& index,
         const QModelIndexList& selection,
-        nx::vms::client::desktop::ResourceTree::ActivationType activationType);
+        nx::vms::client::desktop::ResourceTree::ActivationType activationType,
+        const Qt::KeyboardModifiers modifiers);
 
 private:
     void at_resourceProxyModel_rowsInserted(const QModelIndex& parent, int start, int end);

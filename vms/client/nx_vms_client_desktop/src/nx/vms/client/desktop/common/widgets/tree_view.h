@@ -83,7 +83,7 @@ signals:
      * Emitted when user presses enter key while tree view has non null current index.
      * @param index Tree view current index, guaranteed to be valid.
      */
-    void enterPressed(const QModelIndex& index);
+    void enterPressed(const QModelIndex& index, const Qt::KeyboardModifiers modifiers);
 
     /**
      * Emitted when user presses space key while tree view has non null current index.
