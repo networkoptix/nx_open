@@ -6,7 +6,6 @@
 #include <common/common_module.h>
 #include <core/resource/avi/avi_archive_delegate.h>
 #include <core/resource/media_resource.h>
-#include <core/resource/resource_consumer.h>
 #include <core/resource/resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <nx/fusion/model_functions.h>
@@ -28,8 +27,8 @@ static const int STORE_QUEUE_SIZE = 50;
 QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev)
 :
     QnAbstractDataConsumer(STORE_QUEUE_SIZE),
-    QnResourceConsumer(dev),
-    m_mediaDevice(m_resource.dynamicCast<QnMediaResource>())
+    m_resource(dev),
+    m_mediaDevice(dev.dynamicCast<QnMediaResource>())
 {
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
     memset(m_motionFileList, 0, sizeof(m_motionFileList));
@@ -485,12 +484,6 @@ void QnStreamRecorder::setNeedReopen()
 bool QnStreamRecorder::isAudioPresent() const
 {
     return m_isAudioPresent;
-}
-
-void QnStreamRecorder::disconnectFromResource()
-{
-    stop();
-    QnResourceConsumer::disconnectFromResource();
 }
 
 int64_t QnStreamRecorder::startTimeUs() const

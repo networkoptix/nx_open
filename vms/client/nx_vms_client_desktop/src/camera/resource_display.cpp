@@ -22,7 +22,7 @@
 
 QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *parent):
     base_type(parent),
-    QnResourceConsumer(resource),
+    m_resource(resource),
     m_started(false)
 {
     NX_ASSERT(resource);
@@ -81,7 +81,6 @@ QnResourceDisplay::~QnResourceDisplay()
         m_camera->deleteLater();
     }
 
-    beforeDisconnectFromResource();
     disconnectFromResource();
 }
 
@@ -89,11 +88,13 @@ void QnResourceDisplay::beforeDestroy()
 {
 }
 
-const QnResourcePtr &QnResourceDisplay::resource() const {
-    return getResource();
+const QnResourcePtr& QnResourceDisplay::resource() const 
+{
+    return m_resource;
 }
 
-const QnMediaResourcePtr &QnResourceDisplay::mediaResource() const {
+const QnMediaResourcePtr& QnResourceDisplay::mediaResource() const 
+{
     return m_mediaResource;
 }
 
@@ -130,14 +131,8 @@ QnCamDisplay *QnResourceDisplay::camDisplay() const {
     return m_camera->getCamDisplay();
 }
 
-void QnResourceDisplay::beforeDisconnectFromResource() {
-    if (!m_dataProvider)
-        return;
-
-    static_cast<QnResourceConsumer *>(m_dataProvider.data())->beforeDisconnectFromResource();
-}
-
-void QnResourceDisplay::disconnectFromResource() {
+void QnResourceDisplay::disconnectFromResource() 
+{
     if (!m_dataProvider)
         return;
 
@@ -153,8 +148,6 @@ void QnResourceDisplay::disconnectFromResource() {
     m_mediaProvider.clear();
     m_archiveReader.clear();
     m_camera.clear();
-
-    QnResourceConsumer::disconnectFromResource();
 }
 
 QnConstResourceVideoLayoutPtr QnResourceDisplay::videoLayout() const {

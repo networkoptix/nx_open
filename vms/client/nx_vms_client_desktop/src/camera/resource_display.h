@@ -5,7 +5,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
 
-#include <core/resource/resource_consumer.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
 #include <nx/media/abstract_metadata_consumer.h>
@@ -30,7 +29,8 @@ class CounterWithSignal;
  * Proxy class to route video data and metadata through it.
  * Also allows media distribution between several receivers.
  */
-class QnResourceDisplay: public QObject, protected QnResourceConsumer {
+class QnResourceDisplay: public QObject
+{
     Q_OBJECT
 
     typedef QObject base_type;
@@ -127,9 +127,7 @@ public:
     void removeMetadataConsumer(const nx::media::AbstractMetadataConsumerPtr& metadataConsumer);
 
 protected:
-    virtual void beforeDisconnectFromResource() override;
-
-    virtual void disconnectFromResource() override;
+    void disconnectFromResource();
 
 private:
     void cleanUp(QnLongRunnable *runnable) const;
@@ -149,6 +147,8 @@ private:
 
     /** Video camera. */
     QPointer<QnClientVideoCamera> m_camera; // TODO: #sivanov Compatibility layer. Remove.
+
+    QnResourcePtr m_resource;
 
     /** Whether this display was started. */
     bool m_started;

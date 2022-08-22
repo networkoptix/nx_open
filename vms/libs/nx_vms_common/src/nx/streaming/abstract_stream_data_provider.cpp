@@ -7,7 +7,7 @@
 #include <nx/utils/log/log.h>
 
 QnAbstractStreamDataProvider::QnAbstractStreamDataProvider(const QnResourcePtr& resource):
-    QnResourceConsumer(resource),
+    m_resource(resource),
     m_role(Qn::CR_Default)
 {
     NX_DEBUG(this, "New");
@@ -87,18 +87,6 @@ void QnAbstractStreamDataProvider::putData(const QnAbstractDataPacketPtr& data)
         p->putData(data);
 }
 
-void QnAbstractStreamDataProvider::disconnectFromResource()
-{
-    stop();
-
-    QnResourceConsumer::disconnectFromResource();
-}
-
-void QnAbstractStreamDataProvider::beforeDisconnectFromResource()
-{
-    pleaseStop();
-}
-
 void QnAbstractStreamDataProvider::setRole(Qn::ConnectionRole role)
 {
     NX_ASSERT(!isRunning());
@@ -108,4 +96,9 @@ void QnAbstractStreamDataProvider::setRole(Qn::ConnectionRole role)
 Qn::ConnectionRole QnAbstractStreamDataProvider::getRole() const
 {
     return m_role;
+}
+
+const QnResourcePtr& QnAbstractStreamDataProvider::getResource() const
+{
+    return m_resource;
 }

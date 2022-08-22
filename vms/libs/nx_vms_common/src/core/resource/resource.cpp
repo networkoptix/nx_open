@@ -18,8 +18,6 @@
 #include <nx/vms/common/system_settings.h>
 #include <utils/common/util.h>
 
-#include "resource_consumer.h"
-
 using namespace nx::vms::common;
 
 namespace {
@@ -54,7 +52,6 @@ QnResource::QnResource():
 
 QnResource::~QnResource()
 {
-    disconnectAllConsumers();
 }
 
 QnResourcePool* QnResource::resourcePool() const
@@ -352,46 +349,6 @@ int QnResource::logicalId() const
 void QnResource::setLogicalId(int /*value*/)
 {
     // Base implementation does not keep logical Id.
-}
-
-void QnResource::addConsumer(QnResourceConsumer* consumer)
-{
-    NX_MUTEX_LOCKER locker(&m_consumersMtx);
-
-    if (m_consumers.contains(consumer))
-    {
-        NX_ASSERT(false,
-            "Given resource consumer '%1' is already associated with this resource.",
-            typeid(*consumer).name());
-        return;
-    }
-
-    m_consumers.insert(consumer);
-}
-
-void QnResource::removeConsumer(QnResourceConsumer* consumer)
-{
-    NX_MUTEX_LOCKER locker(&m_consumersMtx);
-    m_consumers.remove(consumer);
-}
-
-bool QnResource::hasConsumer(QnResourceConsumer* consumer) const
-{
-    NX_MUTEX_LOCKER locker(&m_consumersMtx);
-    return m_consumers.contains(consumer);
-}
-
-void QnResource::disconnectAllConsumers()
-{
-    NX_MUTEX_LOCKER locker(&m_consumersMtx);
-
-    for (QnResourceConsumer* consumer: m_consumers)
-        consumer->beforeDisconnectFromResource();
-
-    for (QnResourceConsumer* consumer: m_consumers)
-        consumer->disconnectFromResource();
-
-    m_consumers.clear();
 }
 
 QString QnResource::getProperty(const QString& key) const

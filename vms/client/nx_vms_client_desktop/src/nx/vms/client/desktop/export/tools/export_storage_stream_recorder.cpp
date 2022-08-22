@@ -171,7 +171,7 @@ void ExportStorageStreamRecorder::updateSignatureAttr(StorageContext* context)
     QByteArray placeholder = QnSignHelper::addSignatureFiller(QnSignHelper::getSignMagic());
     QByteArray signature =
         QnSignHelper::addSignatureFiller(m_signer.buildSignature(
-            getResource()->systemContext()->licensePool(), serverId()));
+            m_resource->systemContext()->licensePool(), serverId()));
 
     //New metadata is stored as json, so signature is written base64 - encoded.
     const bool metadataUpdated = updateInFile(file.data(),
@@ -216,7 +216,7 @@ CodecParametersConstPtr ExportStorageStreamRecorder::getVideoCodecParameters(
         if (m_dstVideoCodec == AV_CODEC_ID_NONE)
         {
             m_dstVideoCodec = findVideoEncoder(
-                getResource()->systemContext()->globalSettings()->defaultExportVideoCodec());
+                m_resource->systemContext()->globalSettings()->defaultExportVideoCodec());
         }
 
         m_videoTranscoder = std::make_unique<QnFfmpegVideoTranscoder>(

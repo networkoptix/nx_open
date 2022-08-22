@@ -25,7 +25,6 @@ extern "C"
 #include <core/resource/resource_media_layout.h>
 
 #include <utils/color_space/image_correction.h>
-#include <core/resource/resource_consumer.h>
 
 #include <recording/stream_recorder_data.h>
 
@@ -38,7 +37,6 @@ extern "C"
 
 class NX_VMS_COMMON_API QnStreamRecorder:
     public QnAbstractDataConsumer,
-    public QnResourceConsumer,
     // Public, because private breaks clang build.
     public virtual /*mix-in*/ nx::AbstractRecordingContext, //< Uses.
     public virtual nx::AbstractRecordingContextCallback //< Implements.
@@ -57,7 +55,6 @@ public:
     void close();
     qint64 duration() const  { return m_endDateTimeUs - m_startDateTimeUs; }
     void setProgressBounds(qint64 bof, qint64 eof);
-    virtual void disconnectFromResource() override;
     void setNeedReopen();
     bool isAudioPresent() const;
 
@@ -119,6 +116,7 @@ protected:
     bool m_firstTime = true;
     bool m_gotKeyFrame[CL_MAX_CHANNELS];
     bool m_isAudioPresent = false;
+    QnResourcePtr m_resource;
     const QnMediaResourcePtr m_mediaDevice;
     bool m_fileOpened = false;
     bool m_finishReported = false;
