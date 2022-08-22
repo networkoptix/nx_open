@@ -37,8 +37,10 @@ void QnDesktopClientMessageProcessor::updateResource(
     auto layout = ownResource.dynamicCast<QnLayoutResource>();
     auto systemContext = dynamic_cast<SystemContext*>(this->systemContext());
 
-    // Ignore layout update if user has unsaved data.
+    // Ignore remote layout update if user has unsaved data.
     if (layout
+        && layout->hasFlags(Qn::remote)
+        && NX_ASSERT(!layout->hasFlags(Qn::local))
         && NX_ASSERT(systemContext)
         && systemContext->layoutSnapshotManager()->isChanged(layout))
     {
