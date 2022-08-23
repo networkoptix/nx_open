@@ -102,8 +102,10 @@ function(nx_go_build target working_dir package_path)
             set(target_lib "${target}.lib")
             set(target_dll "${target}.dll")
             set(full_lib_path "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${target_lib}")
+            set(full_dll_path "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${target_dll}")
+            set(deps "${full_lib_path}" "${full_dll_path}")
             add_custom_command(
-                OUTPUT "${full_lib_path}" "${GO_BUILD_C_GO_INCLUDE_DIRECTORY}/${target}.h"
+                OUTPUT "${full_lib_path}" "${full_dll_path}" "${GO_BUILD_C_GO_INCLUDE_DIRECTORY}/${target}.h"
                 WORKING_DIRECTORY ${working_dir}
                 DEPENDS ${all_go_files} ${GO_BUILD_DEPENDS}
                 COMMAND ${CMAKE_COMMAND} -E make_directory "${GO_BUILD_C_GO_INCLUDE_DIRECTORY}"
@@ -119,6 +121,7 @@ function(nx_go_build target working_dir package_path)
         else()
             set(target_lib "lib${target}.so")
             set(full_lib_path "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${target_lib}")
+            set(deps "${full_lib_path}")
             add_custom_command(
                 OUTPUT "${full_lib_path}" "${GO_BUILD_C_GO_INCLUDE_DIRECTORY}/${target}.h"
                 WORKING_DIRECTORY ${working_dir}
@@ -132,11 +135,16 @@ function(nx_go_build target working_dir package_path)
             )
         endif()
         set_source_files_properties("${GO_BUILD_C_GO_INCLUDE_DIRECTORY}/${target}.h" PROPERTIES GENERATED TRUE)
+        add_custom_target(${target}_lib_build ALL DEPENDS ${deps})
+        if(GO_BUILD_FOLDER)
+            set_target_properties(${target}_lib_build PROPERTIES FOLDER ${GO_BUILD_FOLDER})
+        endif()
 
-        add_library(${target}_lib INTERFACE "${full_lib_path}")
+        add_library(${target}_lib INTERFACE)
         if(GO_BUILD_FOLDER)
             set_target_properties(${target}_lib PROPERTIES FOLDER ${GO_BUILD_FOLDER})
         endif()
+        add_dependencies(${target}_lib ${target}_lib_build)
         target_link_libraries(${target}_lib INTERFACE "${full_lib_path}")
         add_dependencies(${target} ${target}_lib)
     endif()
