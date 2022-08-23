@@ -62,12 +62,13 @@ class BasicCloudModuleUrlFetcher:
 
 public:
     BasicCloudModuleUrlFetcher():
-        m_requestIsRunning(false)
-    {
         // Preparing compatibility data.
-        m_moduleToDefaultUrlScheme.emplace(kCloudDbModuleName, nx::network::http::kUrlSchemeName);
-        m_moduleToDefaultUrlScheme.emplace(kConnectionMediatorModuleName, nx::network::stun::kUrlSchemeName);
-        m_moduleToDefaultUrlScheme.emplace(kNotificationModuleName, nx::network::http::kUrlSchemeName);
+        m_moduleToDefaultUrlScheme({
+            {kCloudDbModuleName, nx::network::http::kUrlSchemeName},
+            {kConnectionMediatorModuleName, nx::network::stun::kUrlSchemeName},
+            {kNotificationModuleName, nx::network::http::kUrlSchemeName}
+        })
+    {
     }
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
@@ -99,8 +100,6 @@ public:
     }
 
 protected:
-    mutable nx::Mutex m_mutex;
-
     virtual bool analyzeXmlSearchResult(
         const nx::utils::stree::AttributeDictionary& searchResult) = 0;
 
@@ -116,47 +115,38 @@ protected:
         using namespace std::chrono;
         using namespace std::placeholders;
 
-        if (!m_modulesXmlUrl)
+        post([this, auth, proxyAdapterFunc = std::move(proxyAdapterFunc),
+            handler = std::move(handler)]() mutable
         {
-            post([this, handler = std::move(handler)]() {
-                invokeHandler(handler, http::StatusCode::badRequest);
-            });
-            return;
-        }
+            if (!m_modulesXmlUrl)
+                return invokeHandler(handler, http::StatusCode::badRequest);
 
-        // If async resolve is already started, should wait for its completion.
-        m_resolveHandlers.emplace_back(std::move(handler));
+            // If async resolve is already started, should wait for its completion.
+            m_resolveHandlers.emplace_back(std::move(handler));
 
-        if (m_requestIsRunning)
-            return;
+            if (m_httpClient)
+                return; //< Request is already in-progress.
 
-        NX_ASSERT(!m_httpClient);
-        // If requested url is unknown, fetching description xml.
-        m_httpClient = nx::network::http::AsyncHttpClient::create(ssl::kDefaultCertificateCheck);
-        m_httpClient->setCredentials(auth.credentials);
-        if (!auth.proxyEndpoint.isNull())
-        {
-            m_httpClient->setProxyCredentials(auth.proxyCredentials);
-            m_httpClient->setProxyVia(
-                auth.proxyEndpoint, auth.isProxySecure, std::move(proxyAdapterFunc));
-        }
-        m_httpClient->bindToAioThread(getAioThread());
+            // If requested url is unknown, fetching description xml.
+            m_httpClient = std::make_unique<nx::network::http::AsyncClient>(ssl::kDefaultCertificateCheck);
+            m_httpClient->setCredentials(auth.credentials);
+            if (!auth.proxyEndpoint.isNull())
+            {
+                m_httpClient->setProxyCredentials(auth.proxyCredentials);
+                m_httpClient->setProxyVia(
+                    auth.proxyEndpoint, auth.isProxySecure, std::move(proxyAdapterFunc));
+            }
+            m_httpClient->bindToAioThread(getAioThread());
 
-        for (const auto& header: m_additionalHttpHeadersForGetRequest)
-            m_httpClient->addAdditionalHeader(header.first, header.second);
+            for (const auto& header: m_additionalHttpHeadersForGetRequest)
+                m_httpClient->addAdditionalHeader(header.first, header.second);
 
-        m_httpClient->setSendTimeoutMs(
-            duration_cast<milliseconds>(kHttpRequestTimeout).count());
-        m_httpClient->setResponseReadTimeoutMs(
-            duration_cast<milliseconds>(kHttpRequestTimeout).count());
-        m_httpClient->setMessageBodyReadTimeoutMs(
-            duration_cast<milliseconds>(kHttpRequestTimeout).count());
+            m_httpClient->setSendTimeout(kHttpRequestTimeout);
+            m_httpClient->setResponseReadTimeout(kHttpRequestTimeout);
+            m_httpClient->setMessageBodyReadTimeout(kHttpRequestTimeout);
 
-        m_requestIsRunning = true;
-
-        m_httpClient->doGet(
-            *m_modulesXmlUrl,
-            [this](auto&&... args) { onHttpClientDone(std::forward<decltype(args)>(args)...); });
+            m_httpClient->doGet(*m_modulesXmlUrl, [this]() { onHttpClientDone(); });
+        });
     }
 
     nx::utils::Url buildUrl(const std::string& str, const std::string& moduleAttrName)
@@ -193,13 +183,12 @@ protected:
 
 private:
     std::optional<nx::utils::Url> m_modulesXmlUrl;
-    nx::network::http::AsyncHttpClientPtr m_httpClient;
+    std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
     std::vector<Handler> m_resolveHandlers;
-    bool m_requestIsRunning;
     std::list<std::pair<std::string, std::string>> m_additionalHttpHeadersForGetRequest;
-    std::map<std::string, std::string> m_moduleToDefaultUrlScheme;
+    const std::map<std::string, std::string> m_moduleToDefaultUrlScheme;
 
-    void onHttpClientDone(nx::network::http::AsyncHttpClientPtr client)
+    void onHttpClientDone()
     {
         NX_ASSERT(isInSelfAioThread());
 
@@ -209,10 +198,7 @@ private:
         auto scope = nx::utils::makeScopeGuard(
             [this, &resultCode]() { signalWaitingHandlers(resultCode); });
 
-        NX_MUTEX_LOCKER lk(&m_mutex);
-
-        m_httpClient.reset();
-
+        auto client = std::exchange(m_httpClient, nullptr);
         if (!client->response())
         {
             resultCode = nx::network::http::StatusCode::serviceUnavailable;
@@ -226,7 +212,7 @@ private:
             return;
         }
 
-        QByteArray xmlData = toByteArray(client->fetchMessageBodyBuffer());
+        auto xmlData = client->fetchMessageBodyBuffer();
         std::unique_ptr<nx::utils::stree::AbstractNode> stree =
             nx::utils::stree::StreeManager::loadStree(xmlData);
         if (!stree)
@@ -280,7 +266,6 @@ private:
     {
         decltype(m_resolveHandlers) handlers;
         m_resolveHandlers.swap(handlers);
-        m_requestIsRunning = false;
         for (auto& handler: handlers)
             invokeHandler(handler, statusCode);
     }

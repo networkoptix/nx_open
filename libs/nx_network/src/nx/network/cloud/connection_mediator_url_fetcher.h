@@ -35,7 +35,7 @@ public:
 protected:
     virtual bool analyzeXmlSearchResult(
         const nx::utils::stree::AttributeDictionary& searchResult) override;
-    
+
     virtual void invokeHandler(
         const Handler& handler,
         nx::network::http::StatusCode::Value statusCode) override;
@@ -48,6 +48,7 @@ private:
     };
 
     std::optional<MediatorHostDescriptor> m_mediatorHostDescriptor;
+    mutable nx::Mutex m_mutex;
 };
 
 } // namespace nx::network::cloud

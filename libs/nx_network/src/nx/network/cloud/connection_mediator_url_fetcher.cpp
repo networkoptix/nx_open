@@ -34,6 +34,8 @@ void ConnectionMediatorUrlFetcher::get(
 bool ConnectionMediatorUrlFetcher::analyzeXmlSearchResult(
     const nx::utils::stree::AttributeDictionary& searchResult)
 {
+    NX_MUTEX_LOCKER lk(&m_mutex);
+
     auto foundTcpUrlStr = searchResult.get<std::string>(CloudInstanceSelectionAttributeNameset::hpmTcpUrl);
     auto foundUdpUrlStr = searchResult.get<std::string>(CloudInstanceSelectionAttributeNameset::hpmUdpUrl);
     if (foundTcpUrlStr && foundUdpUrlStr)

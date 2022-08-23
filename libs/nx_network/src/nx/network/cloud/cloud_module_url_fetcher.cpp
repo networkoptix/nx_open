@@ -53,6 +53,8 @@ bool CloudModuleUrlFetcher::analyzeXmlSearchResult(
     if (!foundEndpointStr)
         return false;
 
+    NX_MUTEX_LOCKER lk(&m_mutex);
+
     m_url = buildUrl(*foundEndpointStr, m_moduleAttrName);
     return true;
 }

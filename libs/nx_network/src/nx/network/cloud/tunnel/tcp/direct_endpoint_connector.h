@@ -46,12 +46,6 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    struct ConnectionContext
-    {
-        SocketAddress endpoint;
-        nx::network::http::AsyncHttpClientPtr httpClient;
-    };
-
     using Verificators = std::list<std::unique_ptr<AbstractEndpointVerificator>>;
 
     const AddressEntry m_targetHostAddress;
