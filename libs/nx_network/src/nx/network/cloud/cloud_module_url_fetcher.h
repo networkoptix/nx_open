@@ -72,11 +72,13 @@ public:
 protected:
     virtual bool analyzeXmlSearchResult(
         const nx::utils::stree::AttributeDictionary& searchResult) override;
+
     virtual void invokeHandler(
         const Handler& handler,
         nx::network::http::StatusCode::Value statusCode) override;
 
 private:
+    mutable nx::Mutex m_mutex;
     const std::string m_moduleAttrName;
     std::optional<nx::utils::Url> m_url;
 };
