@@ -60,6 +60,10 @@ bool isMessageLocked(MessageType message)
         case StoragesNotConfigured:
         case NoInternetForTimeSync:
         case cameraRecordingScheduleIsInvalid:
+        case RemoteArchiveSyncAvailable:
+        case RemoteArchiveSyncProgress:
+        case RemoteArchiveSyncFinished:
+        case RemoteArchiveSyncError:
             return true;
         default:
             return false;
