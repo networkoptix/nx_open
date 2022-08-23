@@ -44,7 +44,6 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
-#include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/analytics/metadata_log_parser.h>
 #include <nx/network/cloud/protocol_type.h>
@@ -65,8 +64,9 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
-#include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
+#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
+#include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
 #include <nx/vms/client/desktop/scene/resource_widget/dialogs/encrypted_archive_password_dialog.h>
 #include <nx/vms/client/desktop/scene/resource_widget/private/camera_button_controller.h>
 #include <nx/vms/client/desktop/scene/resource_widget/private/media_resource_widget_p.h>

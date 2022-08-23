@@ -1,7 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "backup_bandwidth_settings_widget.h"
-
 #include "ui_backup_bandwidth_settings_widget.h"
 
 #include <cstdint>
@@ -11,10 +10,11 @@
 #include <QtWidgets/QGroupBox>
 
 #include <core/resource/media_server_resource.h>
-#include <core/resource_management/resources_changes_manager.h>
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/types/day_of_week.h>
 #include <nx/vms/api/types/resource_types.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_properties/schedule/backup_bandwidth_schedule_cell_painter.h>
 #include <utils/common/event_processors.h>
 

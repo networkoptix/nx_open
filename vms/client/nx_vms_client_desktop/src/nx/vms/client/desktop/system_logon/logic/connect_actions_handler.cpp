@@ -27,8 +27,6 @@
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/status_dictionary.h>
 #include <finders/systems_finder.h>
-#include <helpers/system_helpers.h>
-#include <helpers/system_weight_helper.h>
 #include <licensing/license.h>
 #include <network/router.h>
 #include <network/system_helpers.h>
@@ -46,11 +44,14 @@
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/os_information.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/cloud_system_endpoint.h>
+#include <nx/vms/client/core/network/credentials_manager.h>
 #include <nx/vms/client/core/network/logon_data_helpers.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session_timeout_watcher.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/utils/reconnect_helper.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
@@ -90,7 +91,6 @@
 #include <utils/applauncher_utils.h>
 #include <utils/common/delayed.h>
 #include <utils/connection_diagnostics_helper.h>
-#include <watchers/cloud_status_watcher.h>
 
 #include "../ui/login_dialog.h"
 #include "../ui/welcome_screen.h"
@@ -662,7 +662,10 @@ void ConnectActionsHandler::storeConnectionRecord(
     const auto localId = ::helpers::getLocalSystemId(info);
 
     if (options.testFlag(UpdateSystemWeight))
-        nx::vms::client::core::helpers::updateWeightData(localId);
+    {
+        qnClientCoreSettings->updateWeightData(localId);
+        qnClientCoreSettings->save();
+    }
 
     const nx::network::http::Credentials& credentials = connectionInfo.credentials;
 
@@ -671,13 +674,13 @@ void ConnectActionsHandler::storeConnectionRecord(
     // Stores local credentials after successful connection.
     if (!cloudConnection && options.testFlag(StoreSession))
     {
-        NX_DEBUG(nx::vms::client::core::helpers::kCredentialsLogTag,
+        NX_DEBUG(this,
             "Store connection record of %1 to the system %2",
             credentials.username,
             localId);
 
         NX_ASSERT(!credentials.authToken.value.empty());
-        NX_DEBUG(nx::vms::client::core::helpers::kCredentialsLogTag, storePassword
+        NX_DEBUG(this, storePassword
             ? "Password is set"
             : "Password must be cleared");
 
@@ -694,7 +697,7 @@ void ConnectActionsHandler::storeConnectionRecord(
         // AutoLogin may be enabled while we are connected to the system,
         // so we have to always save the last used connection info.
         NX_ASSERT(!credentials.authToken.value.empty());
-        NX_DEBUG(nx::vms::client::core::helpers::kCredentialsLogTag,
+        NX_DEBUG(this,
             "Saving last used connection of %1 to the system %2",
             credentials.username,
             connectionInfo.address);
@@ -718,7 +721,7 @@ void ConnectActionsHandler::storeConnectionRecord(
     qnSettings->save();
 
     if (options.testFlag(StorePreferredCloudServer) && cloudConnection)
-        nx::vms::client::core::helpers::savePreferredCloudServer(info.cloudSystemId, info.id);
+        core::settings()->setPreferredCloudServer(info.cloudSystemId, info.id);
 
     if (cloudConnection)
     {
@@ -733,7 +736,7 @@ void ConnectActionsHandler::storeConnectionRecord(
         builder.setEndpoint(connectionInfo.address);
 
         // Stores connection if it is local.
-        nx::vms::client::core::helpers::storeConnection(localId, info.systemName, builder.toUrl());
+        qnClientCoreSettings->storeRecentConnection(localId, info.systemName, builder.toUrl());
         qnClientCoreSettings->save();
     }
 }
@@ -1126,8 +1129,7 @@ void ConnectActionsHandler::at_selectCurrentServerAction_triggered()
 
     if (isConnectionToCloud(logonData) && server->hasInternetAccess())
     {
-        logonData.address.address = nx::vms::client::core::helpers::serverCloudHost(
-            systemId, serverId);
+        logonData.address.address = helpers::serverCloudHost(systemId, serverId);
     }
 
     auto remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();

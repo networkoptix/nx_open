@@ -8,7 +8,6 @@
 #include <api/common_message_processor.h>
 #include <common/common_module.h>
 #include <core/dataprovider/data_provider_factory.h>
-#include <core/resource_management/resources_changes_manager.h>
 #include <nx/core/access/access_types.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/assert.h>
@@ -48,7 +47,6 @@ QnClientCoreModule::QnClientCoreModule(
 {
     d->commonModule = std::make_unique<QnCommonModule>(systemContext);
 
-    d->commonModule->instance<QnResourcesChangesManager>();
     d->commonModule->store(new nx::vms::client::core::LocalNetworkInterfacesManager());
     d->commonModule->store(new watchers::KnownServerConnections(d->commonModule.get()));
     d->commonModule->store(new OperationManager());

@@ -3,14 +3,15 @@
 #include "workbench_resources_changes_watcher.h"
 
 #include <common/common_module.h>
-
 #include <core/resource/resource.h>
-#include <core/resource_management/resources_changes_manager.h>
-
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/help/help_topics.h>
 #include <ui/widgets/views/resource_list_view.h>
-#include <ui/dialogs/common/message_box.h>
 #include <ui/workbench/workbench_context.h>
+
+using namespace nx::vms::client::desktop;
 
 namespace {
 
@@ -26,9 +27,9 @@ QnWorkbenchResourcesChangesWatcher::QnWorkbenchResourcesChangesWatcher(QObject* 
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(qnResourcesChangesManager, &QnResourcesChangesManager::saveChangesFailed, this,
+    connect(qnResourcesChangesManager, &ResourcesChangesManager::saveChangesFailed, this,
         &QnWorkbenchResourcesChangesWatcher::showWarningDialog);
-    connect(qnResourcesChangesManager, &QnResourcesChangesManager::resourceDeletingFailed, this,
+    connect(qnResourcesChangesManager, &ResourcesChangesManager::resourceDeletingFailed, this,
         &QnWorkbenchResourcesChangesWatcher::showDeleteErrorDialog);
 }
 

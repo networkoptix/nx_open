@@ -35,6 +35,7 @@
 #include <network/system_helpers.h>
 #include <nx/build_info.h>
 #include <nx/vms/api/data/layout_data.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
@@ -48,11 +49,11 @@
 #include <nx/vms/client/desktop/joystick/settings/manager.h>
 #include <nx/vms/client/desktop/network/cloud_url_validator.h>
 #include <nx/vms/client/desktop/radass/radass_support.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -80,7 +81,6 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/camera/camera_replacement.h>
-#include <watchers/cloud_status_watcher.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {
@@ -1971,7 +1971,7 @@ ConditionWrapper isLoggedInToCloud()
         [](const Parameters& /*parameters*/, QnWorkbenchContext* /*context*/)
         {
             return appContext()->cloudStatusWatcher()->status()
-                == QnCloudStatusWatcher::Status::Online;
+                == core::CloudStatusWatcher::Status::Online;
         });
 }
 

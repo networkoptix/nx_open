@@ -11,7 +11,6 @@
 #include <client/self_updater.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
-#include <helpers/system_helpers.h>
 #include <nx/branding.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/http_types.h>
@@ -20,6 +19,7 @@
 #include <nx/vms/api/data/software_version.h>
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/client/core/network/remote_connection_error_strings.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_update/compatibility_version_installation_dialog.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -29,6 +29,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <utils/applauncher_utils.h>
 
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::common;
 
@@ -209,6 +210,17 @@ bool agreeToTryAgain(
     return dialog.exec() != QDialogButtonBox::Cancel;
 }
 
+/** Try to load password cloud credentials from older versions, 4.2 and below.*/
+nx::network::http::Credentials loadCloudPasswordCredentials()
+{
+    const nx::network::http::Credentials credentials = core::settings()->cloudPasswordCredentials();
+    const bool isValid = (!credentials.username.empty() && !credentials.authToken.empty()
+        && credentials.authToken.isPassword());
+
+    NX_DEBUG(NX_SCOPE_TAG, "Load password cloud credentials: %1", isValid);
+    return isValid ? credentials : nx::network::http::Credentials();
+}
+
 } // namespace
 
 bool QnConnectionDiagnosticsHelper::downloadAndRunCompatibleVersion(
@@ -301,8 +313,7 @@ void QnConnectionDiagnosticsHelper::fixLogonData(
         && moduleInformation.version < kCloudTokenVersion
         && (authToken.empty() || !authToken.isPassword()))
     {
-        logonData->credentials =
-            nx::vms::client::core::helpers::loadCloudPasswordCredentials();
+        logonData->credentials = loadCloudPasswordCredentials();
     }
 }
 

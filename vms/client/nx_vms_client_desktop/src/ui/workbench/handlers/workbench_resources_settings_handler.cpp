@@ -16,10 +16,11 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resources_changes_manager.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_dialogs/copy_schedule_camera_selection_dialog.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_dialog.h>
 #include <nx/vms/client/desktop/resource_properties/camera/flux/camera_settings_dialog_state.h>

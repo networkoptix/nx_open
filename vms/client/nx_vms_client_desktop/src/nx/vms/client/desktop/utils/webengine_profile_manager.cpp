@@ -3,16 +3,15 @@
 #include "webengine_profile_manager.h"
 
 #include <QtCore/QHash>
+#include <QtNetwork/QNetworkProxy>
 #include <QtQml/QtQml>
 #include <QtWebEngine/private/qquickwebenginedownloaditem_p.h>
-#include <QtNetwork/QNetworkProxy>
 
-#include <core/resource_management/resources_changes_manager.h>
-#include <core/resource_management/resource_pool.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_properties/camera/utils/camera_web_page_workarounds.h>
-
 #include <nx/vms/client/desktop/utils/local_proxy_server.h>
 
 namespace nx::vms::client::desktop::utils {

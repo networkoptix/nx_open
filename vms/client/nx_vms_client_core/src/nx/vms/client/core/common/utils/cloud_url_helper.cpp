@@ -13,9 +13,11 @@
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/utils/system_uri.h>
 
-using namespace nx::vms::utils;
+namespace nx::vms::client::core {
 
-QnCloudUrlHelper::QnCloudUrlHelper(
+using nx::vms::utils::SystemUri;
+
+CloudUrlHelper::CloudUrlHelper(
     SystemUri::ReferralSource source,
     SystemUri::ReferralContext context,
     QObject* parent)
@@ -26,42 +28,42 @@ QnCloudUrlHelper::QnCloudUrlHelper(
 {
 }
 
-QUrl QnCloudUrlHelper::mainUrl() const
+QUrl CloudUrlHelper::mainUrl() const
 {
     return makeUrl();
 }
 
-QUrl QnCloudUrlHelper::aboutUrl() const
+QUrl CloudUrlHelper::aboutUrl() const
 {
     return makeUrl("/content/about");
 }
 
-QUrl QnCloudUrlHelper::accountManagementUrl() const
+QUrl CloudUrlHelper::accountManagementUrl() const
 {
     return makeUrl("/account");
 }
 
-QUrl QnCloudUrlHelper::accountSecurityUrl() const
+QUrl CloudUrlHelper::accountSecurityUrl() const
 {
     return makeUrl("/account/security");
 }
 
-QUrl QnCloudUrlHelper::createAccountUrl() const
+QUrl CloudUrlHelper::createAccountUrl() const
 {
     return makeUrl("/register");
 }
 
-QUrl QnCloudUrlHelper::restorePasswordUrl() const
+QUrl CloudUrlHelper::restorePasswordUrl() const
 {
     return makeUrl("/restore_password");
 }
 
-QUrl QnCloudUrlHelper::faqUrl() const
+QUrl CloudUrlHelper::faqUrl() const
 {
     return makeUrl("/content/faq");
 }
 
-QUrl QnCloudUrlHelper::viewSystemUrl() const
+QUrl CloudUrlHelper::viewSystemUrl() const
 {
     const auto systemId = qnClientCoreModule->commonModule()
         ->systemContext()->globalSettings()->cloudSystemId();
@@ -71,7 +73,7 @@ QUrl QnCloudUrlHelper::viewSystemUrl() const
     return makeUrl(QString("/systems/%1/view").arg(systemId));
 }
 
-QUrl QnCloudUrlHelper::cloudLinkUrl(bool withReferral) const
+QUrl CloudUrlHelper::cloudLinkUrl(bool withReferral) const
 {
     const QString url = nx::branding::customOpenSourceLibrariesUrl();
     if (!url.isEmpty())
@@ -80,7 +82,7 @@ QUrl QnCloudUrlHelper::cloudLinkUrl(bool withReferral) const
     return makeUrl("/content/libraries", withReferral);
 }
 
-QUrl QnCloudUrlHelper::makeUrl(const QString& path, bool withReferral) const
+QUrl CloudUrlHelper::makeUrl(const QString& path, bool withReferral) const
 {
     SystemUri uri(nx::network::AppInfo::defaultCloudPortalUrl(
         nx::network::SocketGlobals::cloud().cloudHost()));
@@ -93,3 +95,5 @@ QUrl QnCloudUrlHelper::makeUrl(const QString& path, bool withReferral) const
     NX_DEBUG(this, result.toString());
     return result;
 }
+
+} // namespace nx::vms::client::core

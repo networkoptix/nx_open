@@ -18,7 +18,6 @@
 #include <core/resource/client_storage_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resources_changes_manager.h>
 #include <nx/analytics/utils.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/pending_operation.h>
@@ -26,6 +25,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
+#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>

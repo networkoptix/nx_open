@@ -1,15 +1,13 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "failover_priority_dialog.h"
-
 #include "ui_failover_priority_dialog.h"
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resources_changes_manager.h>
-
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_dialogs/failover_priority_view_widget.h>
-
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 

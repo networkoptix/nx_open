@@ -14,9 +14,10 @@
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_property_key.h>
-#include <core/resource_management/resources_changes_manager.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
+#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/system_context.h>

@@ -47,6 +47,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 #include <nx/vms/client/desktop/resource/resource_factory.h>
+#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/session_manager/default_process_interface.h>
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
@@ -537,7 +538,8 @@ struct ApplicationContext::Private
     std::unique_ptr<ResourceFactory> resourceFactory;
     std::unique_ptr<UploadManager> uploadManager;
     std::unique_ptr<QnSystemsWeightsManager> systemsWeightsManager;
-    std::unique_ptr<LogsManagementWatcher> logaManagementWatcher;
+    std::unique_ptr<LogsManagementWatcher> logsManagementWatcher;
+    std::unique_ptr<ResourcesChangesManager> resourcesChangesManager;
 
     // Network modules
     std::unique_ptr<CloudCrossSystemManager> cloudCrossSystemManager;
@@ -611,7 +613,8 @@ ApplicationContext::ApplicationContext(
             d->resourceFactory = std::make_unique<ResourceFactory>();
             d->uploadManager = std::make_unique<UploadManager>();
             d->systemsWeightsManager = std::make_unique<QnSystemsWeightsManager>();
-            d->logaManagementWatcher = std::make_unique<LogsManagementWatcher>(currentSystemContext());
+            d->logsManagementWatcher = std::make_unique<LogsManagementWatcher>(currentSystemContext());
+            d->resourcesChangesManager = std::make_unique<ResourcesChangesManager>();
             break;
         }
     }
@@ -797,7 +800,12 @@ QnResourceDiscoveryManager* ApplicationContext::resourceDiscoveryManager() const
 
 LogsManagementWatcher* ApplicationContext::logsManagementWatcher() const
 {
-    return d->logaManagementWatcher.get();
+    return d->logsManagementWatcher.get();
+}
+
+ResourcesChangesManager* ApplicationContext::resourcesChangesManager() const
+{
+    return d->resourcesChangesManager.get();
 }
 
 } // namespace nx::vms::client::desktop

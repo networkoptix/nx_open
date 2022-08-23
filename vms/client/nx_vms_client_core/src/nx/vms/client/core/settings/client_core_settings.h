@@ -12,6 +12,7 @@
 #include <nx/utils/property_storage/storage.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <nx/vms/client/core/network/server_certificate_validation_level.h>
 #include <nx/vms/client/core/system_logon/connection_data.h>
 
@@ -60,8 +61,20 @@ public:
 
     Property<bool> enableHardwareDecoding{this, "EnableHadrwareDecoding", true};
 
+    /** Adapter for the cloudCredentials property. */
+    CloudAuthData cloudAuthData() const;
+
+    /** Adapter for the cloudCredentials property. */
+    void setCloudAuthData(const CloudAuthData& value);
+
+    /** Adapter for the preferredCloudServers property. */
+    std::optional<QnUuid> preferredCloudServer(const QString& systemId);
+
+    /** Adapter for the preferredCloudServers property. */
+    void setPreferredCloudServer(const QString& systemId, const QnUuid& serverId);
+
 private:
-    // Migration from 4.2 to 4.3.
+    // Migration from 4.2 to 5.0.
     void migrateSystemAuthenticationData();
 
 private:

@@ -22,7 +22,6 @@
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/layout_tour_manager.h>
 #include <core/resource_management/resource_pool.h>
-#include <helpers/system_helpers.h> //< Saved credentials helpers.
 #include <nx/build_info.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
@@ -30,6 +29,9 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/trace/trace.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/core/network/credentials_manager.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/utils/performance_monitor.h>
 #include <nx/vms/client/desktop/director/director.h>
@@ -51,7 +53,6 @@
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_state_manager.h>
 #include <utils/common/synctime.h>
-#include <watchers/cloud_status_watcher.h>
 
 namespace {
 
@@ -116,12 +117,12 @@ struct StartupActionsHandler::Private
     {
     }
 
-    void onCloudStatusChanged(QnCloudStatusWatcher::Status status)
+    void onCloudStatusChanged(core::CloudStatusWatcher::Status status)
     {
         if (!delayedLogonParameters)
             return;
 
-        if (status == QnCloudStatusWatcher::Status::Online)
+        if (status == core::CloudStatusWatcher::Status::Online)
         {
             context->menu()->trigger(
                 ConnectAction,
@@ -176,9 +177,9 @@ StartupActionsHandler::StartupActionsHandler(QObject* parent):
 
     connect(
         qnCloudStatusWatcher,
-        &QnCloudStatusWatcher::statusChanged,
+        &core::CloudStatusWatcher::statusChanged,
         this,
-        [this](QnCloudStatusWatcher::Status status) { d->onCloudStatusChanged(status); });
+        [this](core::CloudStatusWatcher::Status status) { d->onCloudStatusChanged(status); });
 }
 
 StartupActionsHandler::~StartupActionsHandler()
@@ -576,7 +577,7 @@ bool StartupActionsHandler::connectToSystemIfNeeded(
                 Parameters().withArgument(Qn::LogonDataRole, logonData));
             return true;
         }
-        else if (qnCloudStatusWatcher->status() != QnCloudStatusWatcher::LoggedOut)
+        else if (qnCloudStatusWatcher->status() != core::CloudStatusWatcher::LoggedOut)
         {
             CloudSystemConnectData connectData =
                 {systemId.toSimpleString(), ConnectScenario::autoConnect};
@@ -593,7 +594,7 @@ bool StartupActionsHandler::connectToSystemIfNeeded(
 
 bool StartupActionsHandler::connectToCloudIfNeeded(const QnStartupParameters& startupParameters)
 {
-    nx::vms::client::core::CloudAuthData authData;
+    core::CloudAuthData authData;
 
     const auto& uri = startupParameters.customUri;
     if (uri.isValid()
@@ -607,7 +608,7 @@ bool StartupActionsHandler::connectToCloudIfNeeded(const QnStartupParameters& st
 
     if (authData.empty())
     {
-        authData = nx::vms::client::core::helpers::loadCloudCredentials();
+        authData = core::settings()->cloudAuthData();
         NX_DEBUG(
             this, "Loaded auth data, refresh token length: %1", authData.refreshToken.length());
     }

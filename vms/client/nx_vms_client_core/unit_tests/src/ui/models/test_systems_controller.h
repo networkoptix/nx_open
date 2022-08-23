@@ -4,6 +4,9 @@
 
 #include <ui/models/abstract_systems_controller.h>
 
+namespace nx::vms::client::core {
+namespace test {
+
 class TestSystemsController: public AbstractSystemsController
 {
     struct ScopeInfo
@@ -18,7 +21,7 @@ public:
     virtual ~TestSystemsController() override;
 
 public:
-    virtual QnCloudStatusWatcher::Status cloudStatus() const override;
+    virtual CloudStatusWatcher::Status cloudStatus() const override;
     virtual QString cloudLogin() const override;
     virtual QnAbstractSystemsFinder::SystemDescriptionList systemsList() const override;
     virtual nx::vms::client::core::welcome_screen::TileVisibilityScope visibilityScope(
@@ -38,3 +41,6 @@ private:
     QnAbstractSystemsFinder::SystemDescriptionList m_systems;
     QHash<QnUuid, ScopeInfo> m_scopeInfoHash;
 };
+
+} // namespace test
+} // namespace nx::vms::client::core

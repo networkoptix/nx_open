@@ -11,12 +11,12 @@
 #include <finders/systems_finder.h>
 #include <nx/branding_proxy.h>
 #include <nx/build_info_proxy.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_image_provider.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <nx/vms/discovery/manager.h>
 #include <utils/media/voice_spectrum_analyzer.h>
-#include <watchers/cloud_status_watcher.h>
 
 // Resources initialization must be located outside of the namespace.
 static void initializeResources()
@@ -74,7 +74,7 @@ struct ApplicationContext::Private
             nx::vms::common::ServerCompatibilityValidator::initialize(
                 q->localPeerType());
         }
-        cloudStatusWatcher = std::make_unique<QnCloudStatusWatcher>();
+        cloudStatusWatcher = std::make_unique<CloudStatusWatcher>();
         moduleDiscoveryManager = std::make_unique<nx::vms::discovery::Manager>();
         systemsFinder = std::make_unique<QnSystemsFinder>();
     }
@@ -83,7 +83,7 @@ struct ApplicationContext::Private
     QQmlEngine* qmlEngine = nullptr;
     std::unique_ptr<QnClientCoreSettings> deprecatedSettings;
     std::unique_ptr<Settings> settings;
-    std::unique_ptr<QnCloudStatusWatcher> cloudStatusWatcher;
+    std::unique_ptr<CloudStatusWatcher> cloudStatusWatcher;
     std::unique_ptr<QnSystemsFinder> systemsFinder;
     std::unique_ptr<nx::vms::discovery::Manager> moduleDiscoveryManager;
     std::unique_ptr<QnVoiceSpectrumAnalyzer> voiceSpectrumAnalyzer;
@@ -111,7 +111,7 @@ ApplicationContext::ApplicationContext(
     {
         case Mode::unitTests:
             // For the resources tree tests.
-            d->cloudStatusWatcher = std::make_unique<QnCloudStatusWatcher>();
+            d->cloudStatusWatcher = std::make_unique<CloudStatusWatcher>();
             break;
 
         case Mode::desktopClient:
@@ -143,7 +143,7 @@ QQmlEngine* ApplicationContext::qmlEngine() const
     return d->qmlEngine;
 }
 
-QnCloudStatusWatcher* ApplicationContext::cloudStatusWatcher() const
+CloudStatusWatcher* ApplicationContext::cloudStatusWatcher() const
 {
     return d->cloudStatusWatcher.get();
 }

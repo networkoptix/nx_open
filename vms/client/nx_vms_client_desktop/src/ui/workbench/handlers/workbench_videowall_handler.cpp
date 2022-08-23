@@ -32,7 +32,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/resource_runtime_data.h>
-#include <core/resource_management/resources_changes_manager.h>
 #include <nx/build_info.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/url/url_builder.h>
@@ -47,8 +46,9 @@
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
+#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/state/client_process_runner.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -1552,7 +1552,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
     videoWall->setAutorun(true);
 
     // No need to backup newly created videowall.
-    auto applyChangesFunction = QnResourcesChangesManager::VideoWallChangesFunction();
+    auto applyChangesFunction = ResourcesChangesManager::VideoWallChangesFunction();
     auto callbackFunction =
         [this](bool success, const QnVideoWallResourcePtr& videoWall)
         {

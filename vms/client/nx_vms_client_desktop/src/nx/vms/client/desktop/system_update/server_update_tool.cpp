@@ -1,5 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include "server_update_tool.h"
+
 #include <future>
 
 #include <QtCore/QFileInfo>
@@ -8,15 +10,14 @@
 #include <QtCore/QStorageInfo>
 #include <QtCore/QThread>
 
-#include <client_core/client_core_module.h>
 #include <client/client_module.h>
 #include <client/client_settings.h>
+#include <client_core/client_core_module.h>
 #include <common/common_module.h>
-#include <core/resource_management/incompatible_server_watcher.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/fake_media_server.h>
 #include <core/resource/media_server_resource.h>
-#include <nx_ec/abstract_ec_connection.h>
+#include <core/resource_management/incompatible_server_watcher.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/branding.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
@@ -25,6 +26,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/qset.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -34,10 +36,9 @@
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/update/tools.h>
 #include <nx/vms/update/update_check.h>
+#include <nx_ec/abstract_ec_connection.h>
 #include <utils/common/synctime.h>
-#include <watchers/cloud_status_watcher.h>
 
-#include "server_update_tool.h"
 #include "server_updates_model.h"
 #include "update_verification.h"
 

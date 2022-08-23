@@ -11,18 +11,18 @@
 #include <nx/cloud/db/api/account_data.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/impl_ptr.h>
-#include <nx/utils/singleton.h>
 #include <nx/utils/uuid.h>
 
 class QSettings;
 class QnSystemDescription;
-class QnCloudStatusWatcherPrivate;
+class CloudStatusWatcherPrivate;
 
-namespace nx::vms::client::core { struct CloudAuthData; }
+namespace nx::vms::client::core {
 
-class NX_VMS_CLIENT_CORE_API QnCloudStatusWatcher:
-    public QObject,
-    public Singleton<QnCloudStatusWatcher>
+struct CloudAuthData;
+
+class NX_VMS_CLIENT_CORE_API CloudStatusWatcher:
+    public QObject
 {
     using Credentials = nx::network::http::Credentials;
     using base_type = QObject;
@@ -55,8 +55,8 @@ public:
     };
     Q_ENUM(Status)
 
-    explicit QnCloudStatusWatcher(QObject* parent = nullptr);
-    virtual ~QnCloudStatusWatcher() override;
+    explicit CloudStatusWatcher(QObject* parent = nullptr);
+    virtual ~CloudStatusWatcher() override;
 
     // Username and access token with global scope.
     Credentials credentials() const;
@@ -113,8 +113,10 @@ signals:
     void recentCloudSystemsChanged();
 
 private:
-    nx::utils::ImplPtr<QnCloudStatusWatcherPrivate> d_ptr;
-    Q_DECLARE_PRIVATE(QnCloudStatusWatcher)
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
-#define qnCloudStatusWatcher QnCloudStatusWatcher::instance()
+} // namespace nx::vms::client::core
+
+#define qnCloudStatusWatcher appContext()->cloudStatusWatcher()

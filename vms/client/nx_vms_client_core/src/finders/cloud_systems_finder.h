@@ -4,7 +4,7 @@
 
 #include <network/cloud_system_description.h>
 #include <nx/utils/thread/mutex.h>
-#include <watchers/cloud_status_watcher.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
 
 #include "abstract_systems_finder.h"
 
@@ -26,7 +26,7 @@ public: // overrides
     QnSystemDescriptionPtr getSystem(const QString& id) const override;
 
 private:
-    void onCloudStatusChanged(QnCloudStatusWatcher::Status status);
+    void onCloudStatusChanged(nx::vms::client::core::CloudStatusWatcher::Status status);
     void setCloudSystems(const QnCloudSystemList& systems);
     void pingCloudSystem(const QString& cloudSystemId);
     void updateSystems();

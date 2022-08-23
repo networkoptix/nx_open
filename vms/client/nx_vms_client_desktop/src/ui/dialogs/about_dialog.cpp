@@ -14,15 +14,15 @@
 #include <QtWidgets/QPushButton>
 
 #include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource/resource_type.h>
-#include <helpers/cloud_url_helper.h>
+#include <core/resource_management/resource_pool.h>
 #include <licensing/license.h>
 #include <nx/audio/audiodevice.h>
 #include <nx/branding.h>
 #include <nx/build_info.h>
+#include <nx/vms/client/core/common/utils/cloud_url_helper.h>
 #include <nx/vms/client/desktop/common/delegates/customizable_item_delegate.h>
 #include <nx/vms/client/desktop/common/widgets/clipboard_button.h>
 #include <nx/vms/client/desktop/licensing/customer_support.h>
@@ -39,6 +39,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::common;
 
@@ -156,15 +157,14 @@ void QnAboutDialog::retranslateUi()
     const QString brandName = html::bold(nx::branding::company());
     ui->developerNameLabel->setText(brandName);
 
-    QnCloudUrlHelper* cloudUrlHelper(new QnCloudUrlHelper(
+    core::CloudUrlHelper cloudUrlHelper(
         nx::vms::utils::SystemUri::ReferralSource::DesktopClient,
-        nx::vms::utils::SystemUri::ReferralContext::AboutDialog,
-        this));
+        nx::vms::utils::SystemUri::ReferralContext::AboutDialog);
 
     const auto cloudLinkHtml =
         nx::format("<a href=\"%1\">%2</a>").args(
-            cloudUrlHelper->cloudLinkUrl(/*withReferral*/ true),
-            cloudUrlHelper->cloudLinkUrl(/*withReferral*/ false));
+            cloudUrlHelper.cloudLinkUrl(/*withReferral*/ true),
+            cloudUrlHelper.cloudLinkUrl(/*withReferral*/ false));
 
     ui->openSourceLibrariesLabel->setText(cloudLinkHtml);
 

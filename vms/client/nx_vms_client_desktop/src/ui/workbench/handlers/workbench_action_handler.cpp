@@ -52,7 +52,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/resource_runtime_data.h>
-#include <core/resource_management/resources_changes_manager.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
 #include <network/authutil.h>
 #include <nx/analytics/utils.h>
@@ -82,6 +81,8 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/network/cloud_url_validator.h>
+#include <nx/vms/client/desktop/resource/layout_password_management.h>
+#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_replacement_dialog.h>
 #include <nx/vms/client/desktop/resource_dialogs/failover_priority_dialog.h>
 #include <nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.h>
@@ -91,7 +92,6 @@
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/resource_views/functional_delegate_utilities.h>
-#include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/rules/rules_dialog.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/state/screen_manager.h>

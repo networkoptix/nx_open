@@ -2,23 +2,20 @@
 
 #include "client_core_settings.h"
 
-#include <QtCore/QLatin1String>
 #include <QtCore/QSettings>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/reflect/json.h>
-
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
+#include <nx/utils/system_utils.h>
 #include <nx/utils/url.h>
 
 using KnownServerConnection = nx::vms::client::core::watchers::KnownServerConnections::Connection;
 
 namespace {
 
-const QString kEncodeXorKey = lit("ItIsAGoodDayToDie");
-
-const auto kCoreSettingsGroup = lit("client_core");
+static const QString kCoreSettingsGroup = "client_core";
 
 // Cleanup invalid or corrupted stored connections.
 QList<KnownServerConnection> validKnownConnections(QList<KnownServerConnection> source)
@@ -160,4 +157,55 @@ void QnClientCoreSettings::save()
 {
     submitToSettings(m_settings);
     m_settings->sync();
+}
+
+void QnClientCoreSettings::storeRecentConnection(
+    const QnUuid& localSystemId,
+    const QString& systemName,
+    const nx::utils::Url& url)
+{
+    const auto cleanUrl = url.cleanUrl();
+
+    auto connections = recentLocalConnections();
+
+    auto& data = connections[localSystemId];
+    data.systemName = systemName;
+    data.urls.removeOne(cleanUrl);
+    data.urls.prepend(cleanUrl);
+
+    setRecentLocalConnections(connections);
+}
+
+void QnClientCoreSettings::removeRecentConnection(const QnUuid& localSystemId)
+{
+    auto connections = qnClientCoreSettings->recentLocalConnections();
+    connections.remove(localSystemId);
+    qnClientCoreSettings->setRecentLocalConnections(connections);
+}
+
+void QnClientCoreSettings::updateWeightData(const QnUuid& localId)
+{
+    using namespace std::chrono;
+    using nx::vms::client::core::WeightData;
+
+    auto weightData = localSystemWeightsData();
+    const auto itWeightData = std::find_if(weightData.begin(), weightData.end(),
+        [localId](const WeightData& data) { return data.localId == localId; });
+
+    auto currentWeightData = (itWeightData == weightData.end()
+        ? WeightData{localId, 0, QDateTime::currentMSecsSinceEpoch(), true}
+        : *itWeightData);
+
+    currentWeightData.weight = nx::utils::calculateSystemUsageFrequency(
+        time_point<system_clock>(milliseconds(currentWeightData.lastConnectedUtcMs)),
+        currentWeightData.weight) + 1;
+    currentWeightData.lastConnectedUtcMs = QDateTime::currentMSecsSinceEpoch();
+    currentWeightData.realConnection = true;
+
+    if (itWeightData == weightData.end())
+        weightData.append(currentWeightData);
+    else
+        *itWeightData = currentWeightData;
+
+    setLocalSystemWeightsData(weightData);
 }

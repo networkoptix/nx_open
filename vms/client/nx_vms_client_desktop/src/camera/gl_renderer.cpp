@@ -2,39 +2,31 @@
 
 #include "gl_renderer.h"
 
-#include <QtGui/qopengl.h>
-
 #include <cassert>
+#include <opengl_renderer.h>
 
 #include <QtCore/QCoreApplication> /* For Q_DECLARE_TR_FUNCTIONS. */
 #include <QtCore/QScopedPointer>
-#include <nx/utils/thread/mutex.h>
-
+#include <QtGui/qopengl.h>
 #include <QtWidgets/QErrorMessage>
 
-#include <nx/utils/log/log.h>
-#include <nx/vms/client/core/utils/geometry.h>
-#include <utils/common/util.h>
-#include <utils/media/sse_helper.h>
-#include <opengl_renderer.h>
-#include <utils/color_space/yuvconvert.h>
-
-#include <ui/graphics/opengl/gl_shortcuts.h>
-#include <ui/graphics/opengl/gl_context_data.h>
-#include <ui/graphics/opengl/gl_buffer_stream.h>
-#include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
-#include <ui/graphics/shaders/texture_color_shader_program.h>
-#include <ui/graphics/shaders/blur_shader_program.h>
-#include "ui/fisheye/fisheye_ptz_controller.h"
-
 #include <camera/client_video_camera.h>
-
+#include <nx/utils/log/log.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/shaders/media_output_shader_manager.h>
 #include <nx/vms/client/desktop/shaders/media_output_shader_program.h>
+#include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
+#include <ui/graphics/opengl/gl_buffer_stream.h>
+#include <ui/graphics/opengl/gl_context_data.h>
+#include <ui/graphics/opengl/gl_shortcuts.h>
+#include <ui/graphics/shaders/blur_shader_program.h>
+#include <ui/graphics/shaders/texture_color_shader_program.h>
+#include <utils/color_space/yuvconvert.h>
+#include <utils/common/util.h>
+#include <utils/media/sse_helper.h>
 
-#ifdef QN_GL_RENDERER_DEBUG_PERFORMANCE
-#   include <utils/common/performance.h>
-#endif
+#include "ui/fisheye/fisheye_ptz_controller.h"
 #include "utils/color_space/image_correction.h"
 
 using nx::vms::client::core::Geometry;

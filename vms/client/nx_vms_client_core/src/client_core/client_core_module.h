@@ -15,7 +15,6 @@
 
 class QQmlEngine;
 
-class QnCloudStatusWatcher;
 class QnCommonModule;
 class QnDataProviderFactory;
 class QnPtzControllerPool;

@@ -4,25 +4,25 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource_access/resource_access_subject.h>
-#include <nx/utils/singleton.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
+
+namespace nx::vms::client::desktop {
 
 /**
  * Utility class for saving resources user attributes.
  * Supports changes rollback in case they cannot be saved on server.
  */
-class NX_VMS_CLIENT_CORE_API QnResourcesChangesManager: public QObject,
-    public Singleton<QnResourcesChangesManager>,
-    public nx::vms::client::core::CommonModuleAware,
-    public nx::vms::client::core::RemoteConnectionAware
+class ResourcesChangesManager: public QObject,
+    public core::CommonModuleAware,
+    public core::RemoteConnectionAware
 {
     Q_OBJECT
     typedef QObject base_type;
 
 public:
-    QnResourcesChangesManager(QObject* parent = nullptr);
-    ~QnResourcesChangesManager();
+    ResourcesChangesManager(QObject* parent = nullptr);
+    ~ResourcesChangesManager();
 
     using CameraChangesFunction = std::function<void(const QnVirtualCameraResourcePtr&)>;
     using ServerChangesFunction = std::function<void(const QnMediaServerResourcePtr&)>;
@@ -111,4 +111,6 @@ signals:
     void resourceDeletingFailed(const QnResourceList &resources);
 };
 
-#define qnResourcesChangesManager QnResourcesChangesManager::instance()
+} // namespace nx::vms::client::desktop
+
+#define qnResourcesChangesManager appContext()->resourcesChangesManager()

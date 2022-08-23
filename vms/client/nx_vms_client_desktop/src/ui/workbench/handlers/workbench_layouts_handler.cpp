@@ -20,13 +20,13 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/utils/counter.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/metatypes.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_layout_resource.h>
@@ -35,6 +35,7 @@
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
+#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameter_types.h>
@@ -66,7 +67,6 @@
 #include <utils/common/delete_later.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
-#include <watchers/cloud_status_watcher.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {

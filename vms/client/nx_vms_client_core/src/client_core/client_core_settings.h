@@ -2,16 +2,16 @@
 
 #pragma once
 
-#include <utils/common/property_storage.h>
+#include <client_core/client_core_meta_types.h>
+#include <client_core/local_connection_data.h>
+#include <network/cloud_system_data.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/url.h>
-#include <client_core/local_connection_data.h>
-#include <client/forgotten_systems_manager.h>
-#include <watchers/cloud_status_watcher.h>
-#include <nx/vms/client/core/watchers/known_server_connections.h>
-#include <nx/vms/client/core/settings/welcome_screen_info.h>
-#include <nx/vms/client/core/settings/system_visibility_scope_info.h>
 #include <nx/vms/client/core/settings/search_addresses_info.h>
+#include <nx/vms/client/core/settings/system_visibility_scope_info.h>
+#include <nx/vms/client/core/settings/welcome_screen_info.h>
+#include <nx/vms/client/core/watchers/known_server_connections.h>
+#include <utils/common/property_storage.h>
 
 class QSettings;
 
@@ -62,6 +62,16 @@ public:
             const QVariant& defaultValue) const override;
 
     void save();
+
+    void storeRecentConnection(
+        const QnUuid& localSystemId,
+        const QString& systemName,
+        const nx::utils::Url& url);
+
+    void removeRecentConnection(const QnUuid& localSystemId);
+
+    /** Update weight data as if client just logged in to the system. */
+    void updateWeightData(const QnUuid& localId);
 
 private:
     QN_BEGIN_PROPERTY_STORAGE(PropertiesCount)

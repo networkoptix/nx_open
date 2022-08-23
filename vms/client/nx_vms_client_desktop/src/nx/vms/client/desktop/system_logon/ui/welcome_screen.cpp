@@ -20,7 +20,6 @@
 #include <core/resource/file_processor.h>
 #include <core/resource/resource.h>
 #include <finders/systems_finder.h>
-#include <helpers/system_helpers.h>
 #include <network/system_helpers.h>
 #include <nx/branding.h>
 #include <nx/network/deprecated/asynchttpclient.h>
@@ -30,6 +29,8 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/core/network/credentials_manager.h>
 #include <nx/vms/client/core/network/remote_connection_error.h>
 #include <nx/vms/client/core/network/remote_connection_error_strings.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
@@ -55,7 +56,6 @@
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
 #include <utils/common/util.h>
-#include <watchers/cloud_status_watcher.h>
 
 #include "../data/connect_tiles_proxy_model.h"
 #include "../data/systems_visibility_sort_filter_model.h"
@@ -81,6 +81,8 @@ QnResourceList extractResources(const QList<QUrl>& urls, QnResourcePool* resourc
 
 namespace nx::vms::client::desktop {
 
+using core::CloudStatusWatcher;
+
 WelcomeScreen::WelcomeScreen(QWidget* parent):
     base_type(qnClientCoreModule->mainQmlEngine(), parent),
     QnWorkbenchContextAware(parent)
@@ -102,22 +104,22 @@ WelcomeScreen::WelcomeScreen(QWidget* parent):
     }
 
     NX_CRITICAL(qnCloudStatusWatcher, "Cloud watcher does not exist");
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::cloudLoginChanged,
+    connect(qnCloudStatusWatcher, &CloudStatusWatcher::cloudLoginChanged,
         this, &WelcomeScreen::cloudUserNameChanged);
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged, this,
+    connect(qnCloudStatusWatcher, &CloudStatusWatcher::statusChanged, this,
         [this]()
         {
             if (m_systemModel)
             {
                 m_systemModel->setLoggedToCloud(
-                    qnCloudStatusWatcher->status() != QnCloudStatusWatcher::LoggedOut);
+                    qnCloudStatusWatcher->status() != CloudStatusWatcher::LoggedOut);
             }
             emit hasCloudConnectionIssueChanged();
         });
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::isCloudEnabledChanged,
+    connect(qnCloudStatusWatcher, &CloudStatusWatcher::isCloudEnabledChanged,
         this, &WelcomeScreen::isCloudEnabledChanged);
 
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::is2FaEnabledForUserChanged,
+    connect(qnCloudStatusWatcher, &CloudStatusWatcher::is2FaEnabledForUserChanged,
         this, &WelcomeScreen::is2FaEnabledForUserChanged);
 
     setHelpTopic(this, Qn::Login_Help);
@@ -185,7 +187,7 @@ void WelcomeScreen::changeEvent(QEvent* event)
 
 bool WelcomeScreen::hasCloudConnectionIssue() const
 {
-    return qnCloudStatusWatcher->status() == QnCloudStatusWatcher::Status::Offline;
+    return qnCloudStatusWatcher->status() == CloudStatusWatcher::Status::Offline;
 }
 
 QString WelcomeScreen::cloudUserName() const
@@ -456,7 +458,7 @@ void WelcomeScreen::forceActiveFocus()
 
 bool WelcomeScreen::isLoggedInToCloud() const
 {
-    return (qnCloudStatusWatcher->status() != QnCloudStatusWatcher::LoggedOut);
+    return (qnCloudStatusWatcher->status() != CloudStatusWatcher::LoggedOut);
 }
 
 static SystemsVisibilitySortFilterModel* createVisibilityModel(QObject* parent)
@@ -522,7 +524,7 @@ void WelcomeScreen::createSystemModel()
     m_systemModel->setSourceModel(createVisibilityModel(m_systemModel));
 
     m_systemModel->setLoggedToCloud(
-        qnCloudStatusWatcher->status() != QnCloudStatusWatcher::LoggedOut);
+        qnCloudStatusWatcher->status() != CloudStatusWatcher::LoggedOut);
 
     emit systemModelChanged();
 }
@@ -776,8 +778,7 @@ void WelcomeScreen::deleteSystem(const QString& systemId, const QString& localSy
     qnForgottenSystemsManager->forgetSystem(localSystemId);
 
     CredentialsManager::removeCredentials(localSystemUuid);
-    nx::vms::client::core::helpers::removeConnection(localSystemUuid);
-
+    qnClientCoreSettings->removeRecentConnection(localSystemUuid);
     qnSystemsVisibilityManager->removeSystemData(localSystemUuid);
 
     if (const auto system = qnSystemsFinder->getSystem(systemId))

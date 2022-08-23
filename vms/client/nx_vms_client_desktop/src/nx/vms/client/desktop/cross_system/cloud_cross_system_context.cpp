@@ -10,12 +10,13 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <finders/systems_finder.h>
-#include <helpers/system_helpers.h>
+#include <network/system_helpers.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/camera_data_ex.h>
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/user_model.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/cloud_system_endpoint.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
@@ -24,7 +25,6 @@
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <watchers/cloud_status_watcher.h>
 
 #include "cloud_cross_system_context_data_loader.h"
 #include "cloud_layouts_manager.h"
@@ -97,7 +97,7 @@ struct CloudCrossSystemContext::Private
         timer->callOnTimeout([this]() { ensureConnection(); });
         timer->start();
 
-        connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged, q,
+        connect(qnCloudStatusWatcher, &core::CloudStatusWatcher::statusChanged, q,
             [this]
             {
                 NX_VERBOSE(this, "Cloud status became %1", qnCloudStatusWatcher->status());
@@ -184,7 +184,7 @@ struct CloudCrossSystemContext::Private
             return;
 
         NX_VERBOSE(this, "Ensure connection exists");
-        if (qnCloudStatusWatcher->status() != QnCloudStatusWatcher::Online)
+        if (qnCloudStatusWatcher->status() != core::CloudStatusWatcher::Online)
         {
             NX_VERBOSE(this, "Cloud status failure: %1", qnCloudStatusWatcher->status());
             return;
@@ -295,7 +295,7 @@ struct CloudCrossSystemContext::Private
                 continue;
             }
 
-            const QString cloudAddress = core::helpers::serverCloudHost(cloudSystemId, server.id);
+            const QString cloudAddress = helpers::serverCloudHost(cloudSystemId, server.id);
 
             CrossSystemServerResourcePtr newServer(new CrossSystemServerResource(
                 server.id,

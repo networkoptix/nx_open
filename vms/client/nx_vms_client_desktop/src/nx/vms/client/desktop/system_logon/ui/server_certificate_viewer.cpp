@@ -8,13 +8,14 @@
 #include <QtWidgets/QTreeWidgetItem>
 
 #include <core/resource/media_server_resource.h>
-#include <core/resource_management/resources_changes_manager.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/ssl/helpers.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/client/core/network/helpers.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/delegates/customizable_item_delegate.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
+#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>

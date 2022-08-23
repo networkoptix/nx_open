@@ -6,17 +6,17 @@
 #include <QtWidgets/QAction>
 
 #include <client/client_globals.h>
-#include <helpers/cloud_url_helper.h>
-#include <helpers/system_helpers.h>
 #include <nx/branding.h>
 #include <nx/vms/api/data/module_information.h>
+#include <nx/vms/client/core/common/utils/cloud_url_helper.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/connection_diagnostics_helper.h>
-#include <watchers/cloud_status_watcher.h>
 
 #include "../ui/oauth_login_dialog.h"
 
@@ -37,7 +37,7 @@ CloudActionsHandler::CloudActionsHandler(QObject* parent):
             return [url](){ QDesktopServices::openUrl(url); };
         };
 
-    QnCloudUrlHelper urlHelper(
+    core::CloudUrlHelper urlHelper(
         nx::vms::utils::SystemUri::ReferralSource::DesktopClient,
         nx::vms::utils::SystemUri::ReferralContext::CloudMenu);
 
@@ -59,7 +59,7 @@ CloudActionsHandler::CloudActionsHandler(QObject* parent):
     // Forcing logging out if found 'logged out' status.
     // Seems like it can cause double disconnect.
     auto watcher = qnCloudStatusWatcher;
-    connect(watcher, &QnCloudStatusWatcher::forcedLogout,
+    connect(watcher, &core::CloudStatusWatcher::forcedLogout,
         this, &CloudActionsHandler::at_forcedLogout);
 
     connect(
@@ -83,7 +83,7 @@ CloudActionsHandler::~CloudActionsHandler()
 void CloudActionsHandler::logoutFromCloud()
 {
     qnCloudStatusWatcher->resetAuthData();
-    nx::vms::client::core::helpers::forgetSavedCloudPassword();
+    core::settings()->cloudPasswordCredentials = nx::network::http::Credentials();
 }
 
 void CloudActionsHandler::at_loginToCloudAction_triggered()

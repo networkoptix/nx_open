@@ -2,14 +2,18 @@
 
 #include "system_health_strings_helper.h"
 
-#include <helpers/cloud_url_helper.h>
 #include <nx/branding.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/common/utils/cloud_url_helper.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/event/actions/abstract_action.h>
-#include <watchers/cloud_status_watcher.h>
+
+using namespace nx::vms::client;
+using namespace nx::vms::client::desktop;
 
 QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType messageType)
 {
@@ -48,9 +52,9 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
 
 
 QString QnSystemHealthStringsHelper::messageText(QnSystemHealth::MessageType messageType,
-    const QString& resourceName)
+   const QString& resourceName)
 {
-    using namespace nx::vms::common;
+    namespace html = nx::vms::common::html;
 
     // TODO: #sivanov Elide on the widget level.
     static const int kMaxNameLength = 30;
@@ -64,7 +68,7 @@ QString QnSystemHealthStringsHelper::messageText(QnSystemHealth::MessageType mes
         case QnSystemHealth::CloudPromo:
         {
             const bool isLoggedIntoCloud =
-                qnCloudStatusWatcher->status() != QnCloudStatusWatcher::LoggedOut;
+                qnCloudStatusWatcher->status() != core::CloudStatusWatcher::LoggedOut;
 
             const QString kCloudNameText = html::bold(nx::branding::cloudName());
             const QString kMessage = isLoggedIntoCloud
@@ -74,7 +78,7 @@ QString QnSystemHealthStringsHelper::messageText(QnSystemHealth::MessageType mes
                     "%1 is the cloud name (like Nx Cloud)").arg(kCloudNameText);
 
             using nx::vms::utils::SystemUri;
-            QnCloudUrlHelper urlHelper(
+            core::CloudUrlHelper urlHelper(
                 SystemUri::ReferralSource::DesktopClient,
                 SystemUri::ReferralContext::None);
 

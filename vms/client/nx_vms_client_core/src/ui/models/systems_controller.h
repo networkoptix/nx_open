@@ -13,7 +13,7 @@ public:
     virtual ~SystemsController() override;
 
 public:
-    virtual QnCloudStatusWatcher::Status cloudStatus() const override;
+    virtual nx::vms::client::core::CloudStatusWatcher::Status cloudStatus() const override;
     virtual QString cloudLogin() const override;
     virtual QnAbstractSystemsFinder::SystemDescriptionList systemsList() const override;
     virtual nx::vms::client::core::welcome_screen::TileVisibilityScope visibilityScope(
