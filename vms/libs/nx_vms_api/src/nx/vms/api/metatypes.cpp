@@ -10,54 +10,53 @@
 #include <nx/fusion/serialization/json_functions.h>
 
 #include "data/access_rights_data.h"
-#include "data/camera_data.h"
+#include "data/analytics_data.h"
 #include "data/camera_attributes_data.h"
+#include "data/camera_data.h"
 #include "data/camera_history_data.h"
 #include "data/cleanup_db_data.h"
 #include "data/cloud_system_data.h"
 #include "data/credentials.h"
 #include "data/database_dump_data.h"
 #include "data/database_dump_to_file_data.h"
+#include "data/dewarping_data.h"
 #include "data/discovery_data.h"
 #include "data/event_rule_data.h"
 #include "data/full_info_data.h"
-#include "data/dewarping_data.h"
 #include "data/image_correction_data.h"
 #include "data/layout_data.h"
 #include "data/layout_tour_data.h"
+#include "data/ldap.h"
 #include "data/license_data.h"
 #include "data/license_overflow_data.h"
-#include "data/videowall_license_overflow_data.h"
 #include "data/lock_data.h"
 #include "data/media_server_data.h"
 #include "data/misc_data.h"
 #include "data/module_information.h"
+#include "data/os_information.h"
 #include "data/p2p_statistics_data.h"
-#include "data/peer_data.h"
 #include "data/peer_alive_data.h"
+#include "data/peer_data.h"
 #include "data/peer_sync_time_data.h"
 #include "data/resource_data.h"
 #include "data/resource_type_data.h"
 #include "data/reverse_connection_data.h"
 #include "data/runtime_data.h"
+#include "data/server_runtime_event_data.h"
 #include "data/software_version.h"
 #include "data/system_id_data.h"
 #include "data/system_merge_history_record.h"
-#include "data/os_information.h"
-#include "data/tran_state_data.h"
 #include "data/timestamp.h"
+#include "data/tran_state_data.h"
 #include "data/update_data.h"
 #include "data/user_data.h"
+#include "data/user_data_ex.h"
 #include "data/user_role_data.h"
 #include "data/videowall_data.h"
+#include "data/videowall_license_overflow_data.h"
 #include "data/webpage_data.h"
-#include "data/user_data_ex.h"
-#include "data/analytics_data.h"
-#include "data/server_runtime_event_data.h"
-
 #include "rules/event_info.h"
 #include "rules/rule.h"
-
 #include "types/access_rights_types.h"
 #include "types/motion_types.h"
 #include "types/rtp_types.h"
@@ -115,6 +114,8 @@ void Metatypes::initialize()
     qRegisterMetaType<LicenseData>();
     qRegisterMetaType<LicenseOverflowData>();
     qRegisterMetaType<LockData>();
+    qRegisterMetaType<LdapUser>();
+    qRegisterMetaType<LdapUserList>();
     qRegisterMetaType<MediaServerData>();
     qRegisterMetaType<MediaServerDataList>();
     qRegisterMetaType<MediaServerDataEx>();

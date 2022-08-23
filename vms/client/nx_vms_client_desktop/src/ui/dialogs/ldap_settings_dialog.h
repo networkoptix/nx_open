@@ -4,7 +4,7 @@
 
 #include <ui/dialogs/common/session_aware_dialog.h>
 
-#include <utils/common/ldap.h>
+#include <nx/vms/api/data/ldap.h>
 
 namespace Ui {
     class LdapSettingsDialog;
@@ -24,8 +24,10 @@ public:
 
 private:
     void at_testLdapSettingsFinished(
-        bool success, int handle, const QnLdapUsers &users,
-        const QString &errorString);
+        bool success,
+        int handle,
+        const nx::vms::api::LdapUserList& users,
+        const QString& errorString);
 
 private:
     QScopedPointer<Ui::LdapSettingsDialog> ui;

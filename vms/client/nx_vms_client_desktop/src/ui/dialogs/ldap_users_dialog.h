@@ -4,7 +4,7 @@
 
 #include <ui/dialogs/common/session_aware_dialog.h>
 
-#include <utils/common/ldap.h>
+#include <nx/vms/api/data/ldap.h>
 
 namespace Ui {
     class LdapUsersDialog;
@@ -26,23 +26,25 @@ private:
     void stopTesting(const QString &text = QString());
 
     /** Update details for already existing users, e.g. email. */
-    void updateExistingUsers(const QnLdapUsers &users);
+    void updateExistingUsers(const nx::vms::api::LdapUserList& users);
 
     /** Import new ldap users. */
-    void importUsers(const QnLdapUsers &users);
+    void importUsers(const nx::vms::api::LdapUserList& users);
 
     /** Hide users that are already imported (or default users with same name exist). */
-    QnLdapUsers filterExistingUsers(const QnLdapUsers &users) const;
+    nx::vms::api::LdapUserList filterExistingUsers(const nx::vms::api::LdapUserList& users) const;
 
-    QnLdapUsers visibleUsers() const;
-    QnLdapUsers selectedUsers(bool onlyVisible = false) const;
+    nx::vms::api::LdapUserList visibleUsers() const;
+    nx::vms::api::LdapUserList selectedUsers(bool onlyVisible = false) const;
 
-    void setupUsersTable(const QnLdapUsers& filteredUsers);
+    void setupUsersTable(const nx::vms::api::LdapUserList& filteredUsers);
 
 private:
     void at_testLdapSettingsFinished(
-        bool success, int handle, const QnLdapUsers &users,
-        const QString &errorString);
+        bool success,
+        int handle,
+        const nx::vms::api::LdapUserList& users,
+        const QString& errorString);
 
 private:
     QScopedPointer<Ui::LdapUsersDialog> ui;

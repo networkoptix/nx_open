@@ -87,35 +87,33 @@ UserModelBase UserModelBase::fromDbTypesBase(
     return model;
 }
 
-QN_FUSION_ADAPT_STRUCT(UserModelV1, UserModelV1_Fields)
-QN_FUSION_DEFINE_FUNCTIONS(UserModelV1, (csv_record)(json)(ubjson)(xml))
+QN_FUSION_ADAPT_STRUCT(UserModelV3, UserModelV3_Fields)
+QN_FUSION_DEFINE_FUNCTIONS(UserModelV3, (csv_record)(json)(ubjson)(xml))
 
-UserModelV1::DbUpdateTypes UserModelV1::toDbTypes() &&
+UserModelV3::DbUpdateTypes UserModelV3::toDbTypes() &&
 {
     auto result = std::move(*this).toDbTypesBase();
     auto& user = std::get<UserDataEx>(result);
     if (!userRoleId.isNull())
         user.userRoleIds.push_back(std::move(userRoleId));
+    user.externalId = std::move(externalId);
     return result;
 }
 
-std::vector<UserModelV1> UserModelV1::fromDbTypes(DbListTypes data)
+std::vector<UserModelV3> UserModelV3::fromDbTypes(DbListTypes data)
 {
     auto& baseList = std::get<std::vector<UserData>>(data);
     auto& accessRights = std::get<AccessRightsDataList>(data);
 
-    std::vector<UserModelV1> result;
+    std::vector<UserModelV3> result;
     result.reserve(baseList.size());
     for (auto& baseData: baseList)
     {
-        UserModelV1 model;
+        UserModelV3 model;
         static_cast<UserModelBase&>(model) =
             fromDbTypesBase(std::move(baseData), std::move(accessRights));
-
-        model.userRoleId = baseData.userRoleIds.empty()
-            ? QUuid()
-            : baseData.userRoleIds.front();
-
+        model.userRoleId = baseData.userRoleIds.empty() ? QUuid() : baseData.userRoleIds.front();
+        model.externalId = std::move(baseData.externalId);
         result.push_back(std::move(model));
     }
     return result;
@@ -124,11 +122,12 @@ std::vector<UserModelV1> UserModelV1::fromDbTypes(DbListTypes data)
 QN_FUSION_ADAPT_STRUCT(UserModelVX, UserModelVX_Fields)
 QN_FUSION_DEFINE_FUNCTIONS(UserModelVX, (csv_record)(json)(ubjson)(xml))
 
-UserModelV1::DbUpdateTypes UserModelVX::toDbTypes() &&
+UserModelV3::DbUpdateTypes UserModelVX::toDbTypes() &&
 {
     auto result = std::move(*this).toDbTypesBase();
     auto& user = std::get<UserDataEx>(result);
     user.userRoleIds = std::move(userGroupIds);
+    user.externalId = std::move(externalId);
     return result;
 }
 
@@ -146,6 +145,7 @@ std::vector<UserModelVX> UserModelVX::fromDbTypes(DbListTypes data)
             fromDbTypesBase(std::move(baseData), std::move(accessRights));
 
         model.userGroupIds = std::move(baseData.userRoleIds);
+        model.externalId = std::move(baseData.externalId);
         result.push_back(std::move(model));
     }
     return result;

@@ -56,7 +56,7 @@ struct NX_VMS_API UserData: ResourceData
     QnUuid userRoleId;
 
     /**%apidoc[opt] List of roles to inherit permissions. */
-    std::vector<QnUuid> userRoleIds; //< TODO: Rename to userGroupIds on gneral renaming.
+    std::vector<QnUuid> userRoleIds; //< TODO: Rename to userGroupIds on general renaming.
 
     /**%apidoc[opt] User's email.*/
     QString email;
@@ -95,6 +95,11 @@ struct NX_VMS_API UserData: ResourceData
     /**%apidoc[opt] Full name of the user.*/
     QString fullName;
 
+    /**%apidoc[readonly]
+     * An external id, for example, a Distinguished Name (DN) if this User is imported from LDAP.
+     */
+    QString externalId;
+
     // TODO: Remove when /ec2/getUsers and /ec2/saveUser compatibility below 5.1 can be dropped.
     bool adaptFromDeprecatedApi();
     void cleanOnDeprecatedApiMerge(const QJsonValue& overrideValue);
@@ -114,7 +119,8 @@ struct NX_VMS_API UserData: ResourceData
     (userRoleId)  \
     (isCloud)  \
     (fullName) \
-    (userRoleIds)
+    (userRoleIds) \
+    (externalId)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(UserData)
 NX_REFLECTION_INSTRUMENT(UserData, UserData_Fields)
 

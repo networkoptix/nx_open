@@ -34,6 +34,7 @@
 #include <nx/vms/api/data/database_dump_data.h>
 #include <nx/vms/api/data/device_replacement.h>
 #include <nx/vms/api/data/event_rule_data.h>
+#include <nx/vms/api/data/ldap.h>
 #include <nx/vms/api/data/login.h>
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/module_information.h>
@@ -42,7 +43,6 @@
 #include <nx/vms/event/event_fwd.h>
 #include <recording/time_period_list.h>
 #include <utils/camera/camera_diagnostics.h>
-#include <utils/common/ldap_fwd.h>
 
 #include "server_rest_connection_fwd.h"
 
@@ -660,10 +660,14 @@ public:
         Result<RestResultWithData<QnCameraDiagnosticsReply>>::type&& callback,
         QThread* targetThread = nullptr);
 
-    using LdapSettingsCallback = std::function<void (
-        bool success, Handle requestId, const QnLdapUsers& result, const QString& message)>;
+    using LdapSettingsCallback = std::function<void(
+        bool success,
+        Handle requestId,
+        const nx::vms::api::LdapUserList& result,
+        const QString& message)>;
 
-    Handle testLdapSettingsAsync(const QnLdapSettings& settings,
+    Handle testLdapSettingsAsync(
+        const nx::vms::api::LdapSettings& settings,
         LdapSettingsCallback&& callback,
         QThread* targetThread = nullptr);
 

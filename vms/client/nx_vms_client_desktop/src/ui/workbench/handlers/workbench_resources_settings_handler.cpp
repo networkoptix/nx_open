@@ -131,7 +131,8 @@ void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
 
 void QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered()
 {
-    QnUserResourcePtr user(new QnUserResource(nx::vms::api::UserType::local));
+    QnUserResourcePtr user(
+        new QnUserResource(nx::vms::api::UserType::local, /*externalId*/ {}));
     user->setRawPermissions(GlobalPermission::liveViewerPermissions);
 
     // Shows New User dialog as modal because we can't pick anothr user from resources tree anyway.

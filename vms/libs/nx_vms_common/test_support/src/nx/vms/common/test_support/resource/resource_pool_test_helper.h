@@ -23,12 +23,14 @@ public:
     QnUserResourcePtr createUser(
         GlobalPermissions globalPermissions,
         const QString& name = kTestUserName,
-        nx::vms::api::UserType userType = nx::vms::api::UserType::local);
+        nx::vms::api::UserType userType = nx::vms::api::UserType::local,
+        const QString& ldapDn = "");
 
     QnUserResourcePtr addUser(
         GlobalPermissions globalPermissions,
         const QString& name = kTestUserName,
-        nx::vms::api::UserType userType = nx::vms::api::UserType::local);
+        nx::vms::api::UserType userType = nx::vms::api::UserType::local,
+        const QString& ldapDn = "");
 
     QnLayoutResourcePtr createLayout();
     QnLayoutResourcePtr addLayout();

@@ -66,12 +66,10 @@ protected:
         m_currentUser = user;
     }
 
-    void loginAs(
-        GlobalPermissions globalPermissions,
-        nx::vms::api::UserType userType = nx::vms::api::UserType::local)
+    void loginAs(GlobalPermissions globalPermissions)
     {
         logout();
-        auto user = addUser(globalPermissions, QnResourcePoolTestHelper::kTestUserName, userType);
+        auto user = addUser(globalPermissions, QnResourcePoolTestHelper::kTestUserName);
         ASSERT_FALSE(user->isOwner());
         m_currentUser = user;
     }
@@ -700,7 +698,7 @@ TEST_P(ResourceAccessManagerTest, checkEditDisabledAdmin)
 TEST_P(ResourceAccessManagerTest, checkEditDisabledOwner)
 {
     const auto localOwner = createUser(
-    GlobalPermission::none, "admin", nx::vms::api::UserType::local);
+        GlobalPermission::none, "admin", nx::vms::api::UserType::local);
     localOwner->setOwner(true);
     localOwner->setEnabled(false);
     resourcePool()->addResource(localOwner);
@@ -787,7 +785,7 @@ TEST_P(ResourceAccessManagerTest, checkCanModifyUserDigestAuthorizationEnabled)
         addUser(GlobalPermission::none, "cloud owner", nx::vms::api::UserType::cloud);
     cloudOwner->setOwner(true);
     auto admin = addUser(GlobalPermission::admin, "admin");
-    auto ldap = addUser(GlobalPermission::none, "ldap", nx::vms::api::UserType::ldap);
+    auto ldap = addUser(GlobalPermission::none, "ldap", nx::vms::api::UserType::ldap, "cn=ldap");
     auto other = addUser(GlobalPermission::none, "other");
 
     QnUserResourceList users = {owner, cloudOwner, admin, cloud, ldap, other};
@@ -823,7 +821,7 @@ TEST_P(ResourceAccessManagerTest, checkCanGrantUserAdminPermissions)
         addUser(GlobalPermission::none, "cloud owner", nx::vms::api::UserType::cloud);
     cloudOwner->setOwner(true);
     auto admin = addUser(GlobalPermission::admin, "admin");
-    auto ldap = addUser(GlobalPermission::none, "ldap", nx::vms::api::UserType::ldap);
+    auto ldap = addUser(GlobalPermission::none, "ldap", nx::vms::api::UserType::ldap, "cn=ldap");
     auto other = addUser(GlobalPermission::none, "other");
 
     QnUserResourceList users = { owner, cloudOwner, admin, cloud, ldap, other };

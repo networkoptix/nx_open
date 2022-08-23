@@ -15,7 +15,6 @@
 #include <core/resource/webpage_resource.h>
 #include <core/misc/screen_snap.h>
 #include <utils/email/email.h>
-#include <utils/common/ldap.h>
 #include <licensing/license.h>
 
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
@@ -581,7 +580,7 @@ void fromApiToResourceList(const ResourceTypeDataList& src, QnResourceTypeList& 
 
 QnUserResourcePtr fromApiToResource(const UserData& src)
 {
-    QnUserResourcePtr dst(new QnUserResource(nx::vms::api::type(src)));
+    QnUserResourcePtr dst(new QnUserResource(nx::vms::api::type(src), src.externalId));
     fromApiToResource(src, dst);
     return dst;
 }
@@ -616,6 +615,7 @@ void fromResourceToApi(const QnUserResourcePtr& src, UserData& dst)
     dst.realm = src->getRealm();
     dst.userRoleIds = src->userRoleIds();
     dst.fullName = src->fullName();
+    dst.externalId = src->externalId();
     nx::vms::api::setType(&dst, src->userType());
 }
 

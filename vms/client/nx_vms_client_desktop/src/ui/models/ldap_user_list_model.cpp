@@ -2,10 +2,8 @@
 
 #include "ldap_user_list_model.h"
 
-#include <nx/vms/client/desktop/style/skin.h>
-
 #include <nx/utils/string.h>
-#include <utils/common/ldap.h>
+#include <nx/vms/client/desktop/style/skin.h>
 
 QnLdapUserListModel::QnLdapUserListModel(QObject *parent)
     : base_type(parent)
@@ -29,7 +27,7 @@ QVariant QnLdapUserListModel::data(const QModelIndex &index, int role) const {
     if (!hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
 
-    QnLdapUser user = m_userList[index.row()];
+    auto user = m_userList[index.row()];
 
     switch (role) {
     case Qt::DisplayRole:
@@ -54,7 +52,7 @@ QVariant QnLdapUserListModel::data(const QModelIndex &index, int role) const {
     case LoginRole:
         return user.login;
     case LdapUserRole:
-        return QVariant::fromValue<QnLdapUser>(user);
+        return QVariant::fromValue(user);
     default:
         break;
     } // switch (role)
@@ -92,7 +90,7 @@ Qt::ItemFlags QnLdapUserListModel::flags(const QModelIndex &index) const {
     if (!hasIndex(index.row(), index.column(), index.parent()))
         return flags;
 
-    QnLdapUser user = m_userList[index.row()];
+    auto user = m_userList[index.row()];
     if (user.login.isEmpty())
         return flags;
 
@@ -105,9 +103,8 @@ Qt::ItemFlags QnLdapUserListModel::flags(const QModelIndex &index) const {
 }
 
 int QnLdapUserListModel::userIndex(const QString &login) const {
-    auto it = std::find_if(m_userList.begin(), m_userList.end(), [&login](const QnLdapUser &user) {
-        return user.login == login;
-    });
+    auto it = std::find_if(
+        m_userList.begin(), m_userList.end(), [&login](auto user) { return user.login == login; });
 
     if (it == m_userList.end())
         return -1;
@@ -135,7 +132,7 @@ void QnLdapUserListModel::setCheckState(Qt::CheckState state, const QString& log
         m_checkedUserLogins.clear();
         if (state == Qt::Checked)
         {
-            for (const QnLdapUser &user: m_userList)
+            for (const auto& user: m_userList)
                 m_checkedUserLogins.insert(user.login);
         }
     }
@@ -190,12 +187,13 @@ void QnLdapUserListModel::setCheckState(Qt::CheckState state, const QSet<QString
         {Qt::CheckStateRole});
 }
 
-QnLdapUsers QnLdapUserListModel::users() const
+nx::vms::api::LdapUserList QnLdapUserListModel::users() const
 {
     return m_userList;
 }
 
-void QnLdapUserListModel::setUsers(const QnLdapUsers &users) {
+void QnLdapUserListModel::setUsers(const nx::vms::api::LdapUserList& users)
+{
     beginResetModel();
     m_userList = users;
     endResetModel();

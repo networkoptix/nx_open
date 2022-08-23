@@ -358,14 +358,14 @@ struct CloudCrossSystemContext::Private
         }
     }
 
-    void addUserToResourcePool(nx::vms::api::UserModel model)
+    void addUserToResourcePool(nx::vms::api::UserModelV3 model)
     {
         NX_ASSERT(model.type == nx::vms::api::UserType::cloud);
 
         if (user)
             return;
 
-        user = QnUserResourcePtr(new QnUserResource(model.type));
+        user = QnUserResourcePtr(new QnUserResource(model.type, model.externalId));
         user->setIdUnsafe(model.id);
         user->setName(model.name);
         user->setOwner(model.isOwner);

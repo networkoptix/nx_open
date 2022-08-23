@@ -33,6 +33,11 @@ struct NX_VMS_API UserRoleData: IdData
     /**%apidoc[opt] */
     QString description;
 
+    /**%apidoc[readonly]
+     * An external id, for example, a Distinguished Name (DN) if this Role is imported from LDAP.
+     */
+    QString externalId;
+
     UserRoleData() = default;
     UserRoleData(
         const QnUuid& id, const QString& name,
@@ -51,7 +56,8 @@ struct NX_VMS_API UserRoleData: IdData
     (parentRoleIds) \
     (isLdap) \
     (description) \
-    (isPredefined)
+    (isPredefined) \
+    (externalId)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(UserRoleData)
 
 } // namespace nx::vms::api

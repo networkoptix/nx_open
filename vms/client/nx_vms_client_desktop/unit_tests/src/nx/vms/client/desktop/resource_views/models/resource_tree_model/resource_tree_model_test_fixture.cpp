@@ -92,11 +92,9 @@ void ResourceTreeModelTest::setSystemName(const QString& name) const
 }
 
 QnUserResourcePtr ResourceTreeModelTest::addUser(
-    const QString& name,
-    GlobalPermissions globalPermissions,
-    nx::vms::api::UserType userType) const
+    const QString& name, GlobalPermissions globalPermissions) const
 {
-    QnUserResourcePtr user(new QnUserResource(userType));
+    QnUserResourcePtr user(new QnUserResource(nx::vms::api::UserType::local, /*externalId*/ {}));
     user->setIdUnsafe(QnUuid::createUuid());
     user->setName(name);
     user->setRawPermissions(globalPermissions);

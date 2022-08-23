@@ -24,7 +24,6 @@
 #include <ui/help/help_topics.h>
 #include <ui/models/ldap_user_list_model.h>
 #include <ui/models/user_roles_model.h>
-#include <utils/common/ldap.h>
 
 using namespace nx;
 using namespace nx::vms::client::desktop;
@@ -49,7 +48,7 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
     ui->userRoleComboBox->setModel(m_rolesModel);
     ui->userRoleComboBox->setCurrentIndex(m_rolesModel->rowForRole(Qn::UserRole::liveViewer)); // sensible default
 
-    const QnLdapSettings &settings = globalSettings()->ldapSettings();
+    const auto settings = globalSettings()->ldapSettings();
 
     if (!settings.isValid(/*checkPassword*/ false))
     {
@@ -71,18 +70,20 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
     m_importButton->setVisible(false);
 
     ui->buttonBox->showProgress();
-    m_timeoutTimer->setInterval(settings.searchTimeoutS * 1000);
+    m_timeoutTimer->setInterval(settings.searchTimeoutS);
     connect(m_timeoutTimer, &QTimer::timeout, this, [this]{
         stopTesting(tr("Timed Out"));
     });
     m_timeoutTimer->start();
 
-    connectedServerApi()->testLdapSettingsAsync(settings,
+    connectedServerApi()->testLdapSettingsAsync(
+        settings,
         nx::utils::guarded(this,
-        [this](bool success, int handle, const QnLdapUsers &users, const QString &errorString)
-        {
-            at_testLdapSettingsFinished(success, handle, users, errorString);
-        }), thread());
+            [this](bool success, int handle, auto users, auto errorString)
+            {
+                at_testLdapSettingsFinished(success, handle, users, errorString);
+            }),
+        thread());
 
     setHelpTopic(this, Qn::Ldap_Help);
 }
@@ -90,8 +91,10 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
 QnLdapUsersDialog::~QnLdapUsersDialog() {}
 
 void QnLdapUsersDialog::at_testLdapSettingsFinished(
-    bool success, [[maybe_unused]]int handle,
-    const QnLdapUsers &users, const QString &errorString)
+    bool success,
+    int /*handle*/,
+    const nx::vms::api::LdapUserList& users,
+    const QString& errorString)
 {
     if (!m_loading)
         return;
@@ -108,8 +111,8 @@ void QnLdapUsersDialog::at_testLdapSettingsFinished(
 
     updateExistingUsers(users);
 
-    QnLdapUsers filteredUsers = filterExistingUsers(users);
-    if (filteredUsers.isEmpty())
+    auto filteredUsers = filterExistingUsers(users);
+    if (filteredUsers.empty())
     {
         stopTesting(tr("No new users found."));
         return;
@@ -144,7 +147,7 @@ void QnLdapUsersDialog::stopTesting(const QString &text /* = QString()*/) {
     ui->errorLabel->setVisible(true);
 }
 
-void QnLdapUsersDialog::updateExistingUsers(const QnLdapUsers &users)
+void QnLdapUsersDialog::updateExistingUsers(const nx::vms::api::LdapUserList& users)
 {
     auto connection = messageBusConnection();
     if (!connection)
@@ -180,7 +183,7 @@ void QnLdapUsersDialog::updateExistingUsers(const QnLdapUsers &users)
     qnResourcesChangesManager->saveUsers(modifiedUsers);
 }
 
-void QnLdapUsersDialog::importUsers(const QnLdapUsers &users)
+void QnLdapUsersDialog::importUsers(const nx::vms::api::LdapUserList& users)
 {
     auto connection = messageBusConnection();
     if (!connection)
@@ -199,7 +202,7 @@ void QnLdapUsersDialog::importUsers(const QnLdapUsers &users)
     QnUserResourceList addedUsers;
     for (const auto& ldapUser: filteredUsers)
     {
-        QnUserResourcePtr user(new QnUserResource(nx::vms::api::UserType::ldap));
+        QnUserResourcePtr user(new QnUserResource(nx::vms::api::UserType::ldap, ldapUser.dn));
         user->setName(ldapUser.login);
         user->setEmail(ldapUser.email);
         user->setFullName(ldapUser.fullName);
@@ -216,42 +219,43 @@ void QnLdapUsersDialog::importUsers(const QnLdapUsers &users)
     qnResourcesChangesManager->saveUsers(addedUsers, digestSupport);
 }
 
-QnLdapUsers QnLdapUsersDialog::filterExistingUsers(const QnLdapUsers &users) const
+nx::vms::api::LdapUserList QnLdapUsersDialog::filterExistingUsers(
+    const nx::vms::api::LdapUserList& users) const
 {
     QSet<QString> logins;
     for (const auto& user: resourcePool()->getResources<QnUserResource>())
         logins.insert(user->getName().toLower());
 
-    QnLdapUsers result;
-    for (const auto& user: users)
+    nx::vms::api::LdapUserList result;
+    for (auto& user: users)
     {
         if (logins.contains(user.login.toLower()))
             continue;
-        result << user;
+        result.push_back(std::move(user));
     }
 
     return result;
 }
 
-QnLdapUsers QnLdapUsersDialog::visibleUsers() const
+nx::vms::api::LdapUserList QnLdapUsersDialog::visibleUsers() const
 {
-    QnLdapUsers result;
+    nx::vms::api::LdapUserList result;
     auto model = ui->usersTable->model();
 
     for (int row = 0; row < model->rowCount(); ++row)
     {
         QModelIndex index = model->index(row, QnLdapUserListModel::CheckBoxColumn);
 
-        auto user = index.data(QnLdapUserListModel::LdapUserRole).value<QnLdapUser>();
+        auto user = index.data(QnLdapUserListModel::LdapUserRole).value<nx::vms::api::LdapUser>();
         if (!user.login.isEmpty())
-            result << user;
+            result.push_back(std::move(user));
     }
     return result;
 }
 
-QnLdapUsers QnLdapUsersDialog::selectedUsers(bool onlyVisible) const
+nx::vms::api::LdapUserList QnLdapUsersDialog::selectedUsers(bool onlyVisible) const
 {
-    QnLdapUsers result;
+    nx::vms::api::LdapUserList result;
     const auto model = onlyVisible
         ? static_cast<QAbstractItemModel*>(m_sortModel.get())
         : static_cast<QAbstractItemModel*>(m_usersModel.get());
@@ -262,14 +266,14 @@ QnLdapUsers QnLdapUsersDialog::selectedUsers(bool onlyVisible) const
         bool checked = index.data(Qt::CheckStateRole).toInt() == Qt::Checked;
         if (!checked)
             continue;
-        auto user = index.data(QnLdapUserListModel::LdapUserRole).value<QnLdapUser>();
+        auto user = index.data(QnLdapUserListModel::LdapUserRole).value<nx::vms::api::LdapUser>();
         if (!user.login.isEmpty())
-            result << user;
+            result.push_back(std::move(user));
     }
     return result;
 }
 
-void QnLdapUsersDialog::setupUsersTable(const QnLdapUsers& filteredUsers)
+void QnLdapUsersDialog::setupUsersTable(const nx::vms::api::LdapUserList& filteredUsers)
 {
     auto scrollBar = new SnappedScrollBar(this);
     ui->usersTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
@@ -307,7 +311,7 @@ void QnLdapUsersDialog::setupUsersTable(const QnLdapUsers& filteredUsers)
             auto users = selectedUsers(/*onlyVisible*/ true);
             Qt::CheckState selectionState = Qt::Unchecked;
 
-            if (!users.isEmpty())
+            if (!users.empty())
             {
 
                 if (users.size() == m_sortModel->rowCount())
@@ -338,11 +342,7 @@ void QnLdapUsersDialog::setupUsersTable(const QnLdapUsers& filteredUsers)
 
         });
 
-    auto updateButton =
-        [this, header]
-        {
-            m_importButton->setEnabled(!selectedUsers().isEmpty());
-        };
+    auto updateButton = [this] { m_importButton->setEnabled(!selectedUsers().empty()); };
 
     // TODO: #sivanov Model should notify about its check state changes.
     connect(header, &CheckableHeaderView::checkStateChanged, this, updateButton);

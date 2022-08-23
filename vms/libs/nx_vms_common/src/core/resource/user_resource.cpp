@@ -18,7 +18,6 @@
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <utils/common/id.h>
-#include <utils/common/ldap.h>
 #include <utils/common/synctime.h>
 #include <utils/crypt/symmetrical.h>
 
@@ -197,9 +196,10 @@ QnUserHash QnUserHash::scryptPassword(const QString& password, nx::scrypt::Optio
     return result;
 }
 
-QnUserResource::QnUserResource(nx::vms::api::UserType userType):
+QnUserResource::QnUserResource(nx::vms::api::UserType userType, QString externalId):
     m_userType(userType),
-    m_realm(nx::network::AppInfo::realm().c_str())
+    m_realm(nx::network::AppInfo::realm().c_str()),
+    m_externalId(externalId)
 {
     addFlags(Qn::user | Qn::remote);
     setTypeId(nx::vms::api::UserData::kResourceTypeId);
@@ -506,6 +506,12 @@ void QnUserResource::setFullName(const QString& value)
     emit fullNameChanged(::toSharedPointer(this));
 }
 
+QString QnUserResource::externalId() const
+{
+    NX_MUTEX_LOCKER locker(&m_mutex);
+    return m_externalId;
+}
+
 void QnUserResource::updateInternal(const QnResourcePtr& source, NotifierList& notifiers)
 {
     base_type::updateInternal(source, notifiers);
@@ -513,7 +519,10 @@ void QnUserResource::updateInternal(const QnResourcePtr& source, NotifierList& n
     QnUserResourcePtr localOther = source.dynamicCast<QnUserResource>();
     if (localOther)
     {
-        NX_ASSERT(m_userType == localOther->m_userType, "%1: User type was designed to be read-only", this);
+        NX_ASSERT(m_userType == localOther->m_userType,
+            "%1: User type was designed to be read-only", this);
+        NX_ASSERT(m_externalId.isEmpty() || m_externalId == localOther->m_externalId,
+            "%1: User external id was designed to be read-only", this);
 
         bool isEmptyOtherPasswordAcceptable = false;
         if (m_hash != localOther->m_hash)

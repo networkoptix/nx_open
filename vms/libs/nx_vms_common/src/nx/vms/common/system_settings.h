@@ -18,7 +18,6 @@
 #include <nx/vms/common/api/client_update_settings.h>
 #include <nx/vms/common/system_context_aware.h>
 #include <nx/vms/common/update/persistent_update_storage.h>
-#include <utils/common/ldap_fwd.h>
 #include <utils/common/optional.h>
 #include <utils/email/email_fwd.h>
 
@@ -28,6 +27,7 @@ class QSettings;
 struct QnWatermarkSettings;
 namespace nx::vms::api { struct ResourceParamWithRefData; }
 namespace nx::vms::api { struct BackupSettings; }
+namespace nx::vms::api { struct LdapSettings; }
 
 namespace nx::vms::common {
 
@@ -48,10 +48,14 @@ struct SystemSettingNames
     DECLARE_SETTING_NAME(lastMergeSlaveId);
     DECLARE_SETTING_NAME(ldapAdminDn);
     DECLARE_SETTING_NAME(ldapAdminPassword);
+    DECLARE_SETTING_NAME(ldapGroupObjectClass);
+    DECLARE_SETTING_NAME(ldapLoginAttribute);
+    DECLARE_SETTING_NAME(ldapMemberAttribute);
     DECLARE_SETTING_NAME(ldapPasswordExpirationPeriodMs);
     DECLARE_SETTING_NAME(ldapSearchBase);
     DECLARE_SETTING_NAME(ldapSearchFilter);
     DECLARE_SETTING_NAME(ldapSearchTimeoutS);
+    DECLARE_SETTING_NAME(ldapSearchPageSize);
     DECLARE_SETTING_NAME(ldapUri);
     DECLARE_SETTING_NAME(licenseServer);
     DECLARE_SETTING_NAME(localSystemId);
@@ -102,6 +106,7 @@ struct SystemSettingNames
         ldapSearchBase,
         ldapSearchFilter,
         ldapSearchTimeoutS,
+        ldapSearchPageSize,
         ldapUri,
         licenseServer,
         maxHttpTranscodingSessions,
@@ -218,8 +223,8 @@ public:
     QnEmailSettings emailSettings() const;
     void setEmailSettings(const QnEmailSettings& settings);
 
-    QnLdapSettings ldapSettings() const;
-    void setLdapSettings(const QnLdapSettings& settings);
+    nx::vms::api::LdapSettings ldapSettings() const;
+    void setLdapSettings(const nx::vms::api::LdapSettings& settings);
 
     bool isUpdateNotificationsEnabled() const;
     void setUpdateNotificationsEnabled(bool updateNotificationsEnabled);
@@ -600,8 +605,12 @@ private:
     QnResourcePropertyAdaptor<QString>* m_ldapAdminPasswordAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_ldapSearchBaseAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_ldapSearchFilterAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_ldapLoginAttributeAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_ldapGroupObjectClassAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_ldapMemberAttributeAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_ldapPasswordExpirationPeriodAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_ldapSearchTimeoutSAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* m_ldapSearchPageSizeAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<int>* m_ec2AliveUpdateIntervalAdaptor = nullptr;
     /** seconds */

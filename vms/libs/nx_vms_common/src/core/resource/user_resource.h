@@ -82,7 +82,7 @@ class NX_VMS_COMMON_API QnUserResource: public QnResource
 public:
     static const QnUuid kAdminGuid;
 
-    QnUserResource(nx::vms::api::UserType userType);
+    QnUserResource(nx::vms::api::UserType userType, QString externalId);
     virtual ~QnUserResource();
 
     nx::vms::api::UserType userType() const;
@@ -154,6 +154,8 @@ public:
     QString fullName() const;
     void setFullName(const QString& value);
 
+    QString externalId() const;
+
     virtual nx::vms::api::ResourceStatus getStatus() const override;
 
     /*
@@ -194,6 +196,7 @@ private:
     std::atomic<bool> m_isEnabled{true};
     QString m_email;
     QString m_fullName;
+    QString m_externalId;
 };
 
 Q_DECLARE_METATYPE(QnUserResourcePtr)
