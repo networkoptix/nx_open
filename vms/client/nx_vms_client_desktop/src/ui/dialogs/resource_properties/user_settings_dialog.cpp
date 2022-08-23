@@ -330,9 +330,9 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget* parent):
         [this](bool isCloud)
         {
             // We have to recreate user resource to change user type.
-            QnUserResourcePtr newUser(new QnUserResource(isCloud
-                ? nx::vms::api::UserType::cloud
-                : nx::vms::api::UserType::local));
+            QnUserResourcePtr newUser(new QnUserResource(
+                isCloud ? nx::vms::api::UserType::cloud : nx::vms::api::UserType::local,
+                /*externalId*/ {}));
             newUser->setFlags(m_user->flags());
             newUser->setIdUnsafe(m_user->getId());
             newUser->setRawPermissions(m_user->getRawPermissions());

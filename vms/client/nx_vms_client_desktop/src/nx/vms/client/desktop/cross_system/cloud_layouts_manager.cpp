@@ -144,7 +144,7 @@ struct CloudLayoutsManager::Private
     {
         NX_ASSERT(!user && cloudStatusWatcher);
 
-        user = QnUserResourcePtr(new QnUserResource(nx::vms::api::UserType::cloud));
+        user = QnUserResourcePtr(new QnUserResource(api::UserType::cloud, /*externalId*/ {}));
         user->setIdUnsafe(QnUuid::createUuid());
         user->setName(cloudStatusWatcher->cloudLogin());
         user->setOwner(true); //< Avoid resources access calculation.

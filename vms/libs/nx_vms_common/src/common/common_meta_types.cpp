@@ -85,7 +85,6 @@
 #include <recording/stream_recorder_data.h>
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
-#include <utils/common/ldap.h>
 #include <utils/common/optional.h>
 #include <utils/math/space_mapper.h>
 
@@ -235,9 +234,6 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<QnConfigureReply>();
     qRegisterMetaType<QnUpdateFreeSpaceReply>();
     qRegisterMetaType<QnCloudHostCheckReply>();
-
-    qRegisterMetaType<QnLdapUser>();
-    qRegisterMetaType<QnLdapUsers>();
 
     qRegisterMetaType<ec2::ErrorCode>("ErrorCode");
     qRegisterMetaType<ec2::NotificationSource>();

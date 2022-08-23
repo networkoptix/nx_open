@@ -40,7 +40,6 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
-#include <utils/common/ldap.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
 

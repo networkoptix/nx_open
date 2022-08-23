@@ -10,6 +10,6 @@
 # ATTENTION: You must change the comment below to make sure it will generate a merge conflict if
 # somebody concurrently updates the Protocol version. Prefer to use the Jira Issue id and title as
 # a comment.
-set(_vmsInVersionProtocolNumber 00) #< VMS-34719: Bump VMS version to 5.2
+set(_vmsInVersionProtocolNumber 01) #< VMS-31378: Rework LDAP manager to support user groups and async data fetching
 set(vmsProtocolVersion "${PROJECT_VERSION_MAJOR}${PROJECT_VERSION_MINOR}${_vmsInVersionProtocolNumber}")
 unset(_vmsInVersionProtocolNumber)

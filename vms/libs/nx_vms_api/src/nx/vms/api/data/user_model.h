@@ -88,22 +88,26 @@ QN_FUSION_DECLARE_FUNCTIONS(UserModelBase, (csv_record)(json)(ubjson)(xml), NX_V
 
 // -------------------------------------------------------------------------------------------------
 
-struct NX_VMS_API UserModelV1: public UserModelBase
+struct NX_VMS_API UserModelV3: public UserModelBase
 {
     /**%apidoc[opt] User role id, can be obtained from `GET /rest/v{1-}/userRoles`. */
     QnUuid userRoleId;
 
-    bool operator==(const UserModelV1& other) const = default;
+    /**%apidoc[readonly]
+     * An external id, for example, a Distinguished Name (DN) if this User is imported from LDAP.
+     */
+    QString externalId;
+
+    bool operator==(const UserModelV3& other) const = default;
 
     DbUpdateTypes toDbTypes() &&;
-    static std::vector<UserModelV1> fromDbTypes(DbListTypes data);
+    static std::vector<UserModelV3> fromDbTypes(DbListTypes data);
 
-    static_assert(isCreateModelV<UserModelV1>);
-    static_assert(isUpdateModelV<UserModelV1>);
+    static_assert(isCreateModelV<UserModelV3>);
+    static_assert(isUpdateModelV<UserModelV3>);
 };
-#define UserModelV1_Fields UserModelBase_Fields(userRoleId)
-
-QN_FUSION_DECLARE_FUNCTIONS(UserModelV1, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
+#define UserModelV3_Fields UserModelBase_Fields(userRoleId)(externalId)
+QN_FUSION_DECLARE_FUNCTIONS(UserModelV3, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
 
 // -------------------------------------------------------------------------------------------------
 
@@ -116,6 +120,11 @@ struct NX_VMS_API UserModelVX: public UserModelBase
     /**%apidoc[opt] User group id, can be obtained from `GET /rest/v{3-}/exp_userGroups`. */
     std::vector<QnUuid> userGroupIds;
 
+    /**%apidoc[readonly]
+     * An external id, for example, a Distinguished Name (DN) if this User is imported from LDAP.
+     */
+    QString externalId;
+
     bool operator==(const UserModelVX& other) const = default;
 
     DbUpdateTypes toDbTypes() &&;
@@ -124,10 +133,10 @@ struct NX_VMS_API UserModelVX: public UserModelBase
     static_assert(isCreateModelV<UserModelVX>);
     static_assert(isUpdateModelV<UserModelVX>);
 };
-#define UserModelVX_Fields UserModelBase_Fields(userGroupIds)
+#define UserModelVX_Fields UserModelBase_Fields(userGroupIds)(externalId)
 
 QN_FUSION_DECLARE_FUNCTIONS(UserModelVX, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
 
-using UserModel = UserModelV1;
+using UserModel = UserModelV3;
 
 } // namespace nx::vms::api

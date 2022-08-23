@@ -19,7 +19,6 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
-#include <utils/common/ldap.h>
 
 using namespace nx;
 using namespace nx::vms::common;
@@ -51,7 +50,7 @@ public:
     void testSettings();
     void showTestResult(const QString &text);
     void stopTesting(const QString &text = QString());
-    QnLdapSettings settings() const;
+    nx::vms::api::LdapSettings settings() const;
     void updateFromSettings();
 
     void at_timeoutTimer_timeout();
@@ -75,7 +74,7 @@ void QnLdapSettingsDialogPrivate::testSettings()
     // Make sure stopTesting() will work well.
     testHandle = kTestPrepareHandle;
 
-    QnLdapSettings settings = this->settings();
+    auto settings = this->settings();
 
     if (!settings.isValid())
     {
@@ -101,15 +100,18 @@ void QnLdapSettingsDialogPrivate::testSettings()
     q->ui->testStackWidget->setCurrentWidget(q->ui->testProgressPage);
     q->ui->testStackWidget->show();
 
-    timeoutTimer->setInterval(settings.searchTimeoutS * 1000 / q->ui->testProgressBar->maximum());
+    timeoutTimer->setInterval(
+        settings.searchTimeoutS.count() * 1000 / q->ui->testProgressBar->maximum());
     timeoutTimer->start();
 
-    testHandle = connectedServerApi()->testLdapSettingsAsync(settings,
+    testHandle = connectedServerApi()->testLdapSettingsAsync(
+        settings,
         nx::utils::guarded(this,
-        [q](bool success, int handle, const QnLdapUsers &users, const QString &errorString)
-        {
-            q->at_testLdapSettingsFinished(success, handle, users, errorString);
-        }), thread());
+            [q](bool success, int handle, auto users, auto errorString)
+            {
+                q->at_testLdapSettingsFinished(success, handle, users, errorString);
+            }),
+        thread());
 }
 
 void QnLdapSettingsDialogPrivate::showTestResult(const QString &text) {
@@ -137,15 +139,17 @@ void QnLdapSettingsDialogPrivate::stopTesting(const QString &text) {
     showTestResult(text);
 }
 
-QnLdapSettings QnLdapSettingsDialogPrivate::settings() const {
+nx::vms::api::LdapSettings QnLdapSettingsDialogPrivate::settings() const
+{
     Q_Q(const QnLdapSettingsDialog);
 
-    QnLdapSettings result;
+    nx::vms::api::LdapSettings result;
 
     QUrl url = QUrl::fromUserInput(q->ui->serverLineEdit->text().trimmed());
-    if (url.isValid()) {
+    if (url.isValid())
+    {
         if (url.port() == -1)
-            url.setPort(QnLdapSettings::defaultPort(url.scheme() == lit("ldaps")));
+            url.setPort(nx::vms::api::LdapSettings::defaultPort(url.scheme() == "ldaps"));
         result.uri = url;
     }
 
@@ -153,7 +157,8 @@ QnLdapSettings QnLdapSettingsDialogPrivate::settings() const {
     result.adminPassword = q->ui->passwordLineEdit->text().trimmed();
     result.searchBase = q->ui->searchBaseLineEdit->text().trimmed();
     result.searchFilter = q->ui->searchFilterLineEdit->text().trimmed();
-    result.searchTimeoutS = q->ui->searchTimeoutSSpinBox->value();
+    result.searchTimeoutS = std::chrono::seconds(q->ui->searchTimeoutSSpinBox->value());
+    // TODO: Support searchPageSize.
     return result;
 }
 
@@ -162,10 +167,10 @@ void QnLdapSettingsDialogPrivate::updateFromSettings() {
 
     stopTesting();
 
-    const QnLdapSettings &settings = globalSettings()->ldapSettings();
+    const auto& settings = globalSettings()->ldapSettings();
 
     QUrl url = settings.uri;
-    if (url.port() == QnLdapSettings::defaultPort(url.scheme() == lit("ldaps")))
+    if (url.port() == nx::vms::api::LdapSettings::defaultPort(url.scheme() == "ldaps"))
         url.setPort(-1);
 
     q->ui->serverLineEdit->setText(url.toString());
@@ -173,7 +178,7 @@ void QnLdapSettingsDialogPrivate::updateFromSettings() {
     q->ui->passwordLineEdit->setText(settings.adminPassword.trimmed());
     q->ui->searchBaseLineEdit->setText(settings.searchBase.trimmed());
     q->ui->searchFilterLineEdit->setText(settings.searchFilter.trimmed());
-    q->ui->searchTimeoutSSpinBox->setValue(settings.searchTimeoutS);
+    q->ui->searchTimeoutSSpinBox->setValue(settings.searchTimeoutS.count());
     q->ui->testStackWidget->setCurrentWidget(q->ui->testResultPage);
     q->ui->testResultLabel->setText(QString());
     q->ui->testStackWidget->hide();
@@ -220,14 +225,16 @@ QnLdapSettingsDialog::QnLdapSettingsDialog(QWidget *parent)
     d->testButton = ui->buttonBox->addButton(tr("Test"), QDialogButtonBox::HelpRole);
     connect(d->testButton, &QPushButton::clicked, d, &QnLdapSettingsDialogPrivate::testSettings);
 
-    auto updateTestButton = [this] {
-        Q_D(QnLdapSettingsDialog);
-        /* Check if testing in progress. */
-        if (d->testHandle >= kTestPrepareHandle)
-            return;
-        QnLdapSettings settings = d->settings();
-        d->testButton->setEnabled(settings.isValid());
-    };
+    auto updateTestButton =
+        [this]()
+        {
+            Q_D(QnLdapSettingsDialog);
+            /* Check if testing in progress. */
+            if (d->testHandle >= kTestPrepareHandle)
+                return;
+
+            d->testButton->setEnabled(d->settings().isValid());
+        };
 
     /* Mark some fields as mandatory, so field label will turn red if the field is empty. */
     auto declareMandatoryField = [this, updateTestButton](QLabel* label, QLineEdit* lineEdit) {
@@ -264,8 +271,7 @@ QnLdapSettingsDialog::QnLdapSettingsDialog(QWidget *parent)
 QnLdapSettingsDialog::~QnLdapSettingsDialog() {}
 
 void QnLdapSettingsDialog::at_testLdapSettingsFinished(
-    bool success, int handle, const QnLdapUsers &users,
-    const QString &errorString)
+    bool success, int handle, const nx::vms::api::LdapUserList& users, const QString& errorString)
 {
     Q_D(QnLdapSettingsDialog);
 
@@ -296,8 +302,7 @@ void QnLdapSettingsDialog::accept() {
 
     d->stopTesting();
 
-    QnLdapSettings settings = d->settings();
-    globalSettings()->setLdapSettings(settings);
+    globalSettings()->setLdapSettings(d->settings());
     globalSettings()->synchronizeNow();
 
     base_type::accept();

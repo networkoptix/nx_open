@@ -43,8 +43,7 @@ protected:
 
     void setSystemName(const QString& name) const;
 
-    QnUserResourcePtr addUser(const QString& name, GlobalPermissions globalPermissions,
-        nx::vms::api::UserType userType = nx::vms::api::UserType::local) const;
+    QnUserResourcePtr addUser(const QString& name, GlobalPermissions globalPermissions) const;
     QnMediaServerResourcePtr addServer(const QString& name) const;
     QnMediaServerResourcePtr addEdgeServer(const QString& name, const QString& address) const;
     QnMediaServerResourcePtr addFakeServer(const QString& name) const;

@@ -37,11 +37,10 @@ protected:
 
     QnResourcePool* resourcePool() const { return systemContext()->resourcePool(); }
 
-    QnUserResourcePtr addUser(
-        const QString &name, GlobalPermissions globalPermissions,
-        nx::vms::api::UserType userType = nx::vms::api::UserType::local)
+    QnUserResourcePtr addUser(const QString& name, GlobalPermissions globalPermissions)
     {
-        QnUserResourcePtr user(new QnUserResource(userType));
+        QnUserResourcePtr user(
+            new QnUserResource(nx::vms::api::UserType::local, /*externalId*/ {}));
         user->setIdUnsafe(QnUuid::createUuid());
         user->setName(name);
         user->setRawPermissions(globalPermissions);
@@ -86,12 +85,10 @@ protected:
         systemContext()->accessController()->setUser(m_currentUser);
     }
 
-    void loginAs(
-        GlobalPermissions globalPermissions,
-        nx::vms::api::UserType userType = nx::vms::api::UserType::local)
+    void loginAs(GlobalPermissions globalPermissions)
     {
         logout();
-        auto user = addUser(userName1, globalPermissions, userType);
+        auto user = addUser(userName1, globalPermissions);
         ASSERT_FALSE(user->isOwner());
         m_currentUser = user;
         systemContext()->accessController()->setUser(m_currentUser);
@@ -251,7 +248,8 @@ TEST_F(WorkbenchAccessControllerTest, checkPermissionForNewCloudUser)
 {
     loginAs(GlobalPermission::adminPermissions);
 
-    QnUserResourcePtr newCloudUser(new QnUserResource(nx::vms::api::UserType::cloud));
+    QnUserResourcePtr newCloudUser(
+        new QnUserResource(nx::vms::api::UserType::cloud, /*externalId*/ {}));
     newCloudUser->setIdUnsafe(QnUuid::createUuid());
 
     checkForbiddenPermissions(newCloudUser, Qn::WriteDigestPermission);

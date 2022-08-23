@@ -25,9 +25,10 @@ QnResourcePoolTestHelper::~QnResourcePoolTestHelper()
 
 QnUserResourcePtr QnResourcePoolTestHelper::createUser(GlobalPermissions globalPermissions,
     const QString& name,
-    nx::vms::api::UserType userType)
+    nx::vms::api::UserType userType,
+    const QString& ldapDn)
 {
-    QnUserResourcePtr user(new QnUserResource(userType));
+    QnUserResourcePtr user(new QnUserResource(userType, ldapDn));
     user->setIdUnsafe(QnUuid::createUuid());
     user->setName(name);
     user->setPasswordAndGenerateHash(name);
@@ -41,9 +42,10 @@ QnUserResourcePtr QnResourcePoolTestHelper::createUser(GlobalPermissions globalP
 
 QnUserResourcePtr QnResourcePoolTestHelper::addUser(GlobalPermissions globalPermissions,
     const QString& name,
-    nx::vms::api::UserType userType)
+    nx::vms::api::UserType userType,
+    const QString& ldapDn)
 {
-    auto user = createUser(globalPermissions, name, userType);
+    auto user = createUser(globalPermissions, name, userType, ldapDn);
     resourcePool()->addResource(user);
     return user;
 }

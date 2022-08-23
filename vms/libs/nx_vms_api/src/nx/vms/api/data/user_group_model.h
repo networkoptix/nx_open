@@ -30,6 +30,11 @@ struct NX_VMS_API UserGroupModel
     /**%apidoc[opt] Only local User Groups are supposed to be created by the API. */
     UserType type = UserType::local;
 
+    /**%apidoc[opt]
+     * An external id, for example, a Distinguished Name (DN) if this Group is imported from LDAP.
+     */
+    QString externalId;
+
     /**%apidoc[opt] */
     GlobalPermissions permissions;
 
@@ -59,8 +64,15 @@ struct NX_VMS_API UserGroupModel
 };
 
 #define UserGroupModel_Fields \
-    (id)(name)(description)(type)(permissions)(parentGroupIds)(accessibleResources)(isPredefined)
-
+    (id) \
+    (name) \
+    (description) \
+    (type) \
+    (permissions) \
+    (parentGroupIds) \
+    (accessibleResources) \
+    (isPredefined) \
+    (externalId)
 QN_FUSION_DECLARE_FUNCTIONS(UserGroupModel, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
 
 } // namespace nx::vms::api

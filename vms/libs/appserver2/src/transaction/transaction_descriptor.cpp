@@ -681,25 +681,33 @@ struct SaveUserAccess
         const auto existingUser =
             commonModule->resourcePool()->getResourceById<QnUserResource>(param.id);
 
-        // Won't allow to change the user name without providing the password because it's not
-        // possible to recalculate hashes.
-        if (existingUser
-            && param.digest != nx::vms::api::UserData::kHttpIsDisabledStub
-            && (param.isCloud || existingUser->getDigest() == param.digest)
-            && existingUser->getName() != param.name)
-        {
-            QString errorMessage = NX_FMT(
-                "Won't save existing user '%1' because names differ: '%1' vs '%2' and %3.",
-                existingUser->getName(), param.name,
-                param.isCloud
-                    ? "changing name is forbidden for cloud users"
-                    : "password has not been provided");
-
-            return Result(ErrorCode::forbidden, std::move(errorMessage));
-        }
-
         if (!existingUser && param.name.isEmpty())
             return Result(ErrorCode::badRequest, "Won't save new user with empty name.");
+
+        if (existingUser)
+        {
+            if (!param.externalId.isEmpty())
+            {
+                const auto existingExternalId = existingUser->externalId();
+                if (!existingExternalId.isEmpty() && existingExternalId != param.externalId)
+                    return Result(ErrorCode::forbidden, "Change of externalId is forbidden");
+            }
+
+            if (param.digest != nx::vms::api::UserData::kHttpIsDisabledStub
+                && (param.isCloud || existingUser->getDigest() == param.digest)
+                && existingUser->getName() != param.name)
+            {
+                QString errorMessage = NX_FMT(
+                    "Won't save existing user '%1' because names differ: '%1' vs '%2' and %3.",
+                    existingUser->getName(),
+                    param.name,
+                    param.isCloud
+                        ? "changing name is forbidden for cloud users"
+                        : "password has not been provided");
+
+                return Result(ErrorCode::forbidden, std::move(errorMessage));
+            }
+        }
 
         auto r = ModifyResourceAccess()(commonModule, accessData, param);
         if (r)
@@ -1288,13 +1296,24 @@ struct SaveUserRoleAccess
             return r;
         }
 
-        const auto parentRoles = commonModule->userRolesManager()->userRoles(param.parentRoleIds);
+        auto userRoleManager = commonModule->userRolesManager();
+        const auto parentRoles = userRoleManager->userRoles(param.parentRoleIds);
         if (const auto cycledRole =
             nx::utils::find_if(parentRoles, [&](const auto& role) { return role.id == param.id; }))
         {
             return Result(ErrorCode::forbidden, NX_FMT(
                 "Parent role cycle is forbidden: This role is already inherided by: %1",
                 cycledRole->name));
+        }
+
+        if (!hasSystemAccess(accessData))
+        {
+            if (!param.externalId.isEmpty())
+            {
+                const auto userRole = userRoleManager->userRole(param.id);
+                if (!userRole.externalId.isEmpty() && userRole.externalId != param.externalId)
+                    return Result(ErrorCode::forbidden, "Change of externalId is forbidden");
+            }
         }
 
         return Result();

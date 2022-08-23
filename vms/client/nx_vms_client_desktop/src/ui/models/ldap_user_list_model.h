@@ -5,7 +5,7 @@
 #include <QtCore/QSortFilterProxyModel>
 #include <QtCore/QSet>
 
-#include <utils/common/ldap_fwd.h>
+#include <nx/vms/api/data/ldap.h>
 
 class QnLdapUserListModel : public QAbstractListModel {
     Q_OBJECT
@@ -40,12 +40,12 @@ public:
     void setCheckState(Qt::CheckState state, const QString &login = QString());
     void setCheckState(Qt::CheckState state, const QSet<QString>& logins);
 
-    QnLdapUsers users() const;
-    void setUsers(const QnLdapUsers &users);
+    nx::vms::api::LdapUserList users() const;
+    void setUsers(const nx::vms::api::LdapUserList& users);
 
 private:
     int userIndex(const QString &login) const;
 
-    QnLdapUsers m_userList;
+    nx::vms::api::LdapUserList m_userList;
     QSet<QString> m_checkedUserLogins;
 };

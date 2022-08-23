@@ -9,7 +9,6 @@
 #include <nx/vms/event/event_fwd.h>
 #include <nx_ec/ec_api_fwd.h>
 #include <utils/email/email_fwd.h>
-#include <utils/common/ldap_fwd.h>
 
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/api/data/camera_data.h>

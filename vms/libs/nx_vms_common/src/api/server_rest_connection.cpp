@@ -49,7 +49,6 @@
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <utils/common/delayed.h>
-#include <utils/common/ldap.h>
 
 using namespace nx;
 
@@ -1556,7 +1555,8 @@ std::function<void(ServerConnection::ContextPtr context)> makeCallbackWithErrorM
         };
 }
 
-Handle ServerConnection::testLdapSettingsAsync(const QnLdapSettings& settings,
+Handle ServerConnection::testLdapSettingsAsync(
+    const nx::vms::api::LdapSettings& settings,
     LdapSettingsCallback&& callback,
     QThread* targetThread)
 {
@@ -1564,13 +1564,13 @@ Handle ServerConnection::testLdapSettingsAsync(const QnLdapSettings& settings,
     params.insert(nx::network::http::header::kContentType, "application/json");
 
     Timeouts timeouts = d->httpClientPool.defaultTimeouts();
-    timeouts.responseReadTimeout = std::chrono::seconds(settings.searchTimeoutS);
-    timeouts.messageBodyReadTimeout = std::chrono::seconds(settings.searchTimeoutS);
+    timeouts.responseReadTimeout = settings.searchTimeoutS;
+    timeouts.messageBodyReadTimeout = settings.searchTimeoutS;
 
     auto callback_wrapper =
         [callback](bool success, int handle, nx::network::rest::JsonResult data)
         {
-            auto response = data.deserialized<QnLdapUsers>(&success);
+            auto response = data.deserialized<nx::vms::api::LdapUserList>(&success);
             callback(success, handle, response, data.errorString);
         };
 
