@@ -9,13 +9,14 @@
 
 class QQmlEngine;
 
-class QnCloudStatusWatcher;
 class QnSystemsFinder;
 class QnVoiceSpectrumAnalyzer;
 
 namespace nx::vms::discovery { class Manager; }
 
 namespace nx::vms::client::core {
+
+class CloudStatusWatcher;
 
 /**
  * Main context of the desktop client application. Exists through all application lifetime and is
@@ -52,7 +53,7 @@ public:
 
     QQmlEngine* qmlEngine() const;
 
-    QnCloudStatusWatcher* cloudStatusWatcher() const;
+    CloudStatusWatcher* cloudStatusWatcher() const;
 
     nx::vms::discovery::Manager* moduleDiscoveryManager() const;
 

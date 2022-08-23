@@ -5,15 +5,14 @@
 #include <variant>
 
 #include <QtCore/QHash>
-#include <QtCore/QMap>
 #include <QtCore/QList>
-#include <QtCore/QVariantMap>
+#include <QtCore/QMap>
 #include <QtCore/QSharedPointer>
+#include <QtCore/QVariantMap>
 #include <QtGui/QColor>
 
-#include <utils/common/evaluator.h>
-
 #include "color_substitutions.h"
+#include "private/evaluator.h"
 
 class QJsonObject;
 
@@ -22,7 +21,7 @@ namespace nx::vms::client::desktop {
 class ColorTree;
 
 /**
- * Json's colors parser.
+ * Json colors parser.
  */
 class ColorThemeReader: public Qee::Resolver
 {

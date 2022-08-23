@@ -4,8 +4,8 @@
 
 #include <finders/abstract_systems_finder.h>
 #include <network/base_system_description.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/settings/welcome_screen_info.h>
-#include <watchers/cloud_status_watcher.h>
 
 class NX_VMS_CLIENT_CORE_API AbstractSystemsController: public QObject
 {
@@ -16,7 +16,7 @@ public:
     virtual ~AbstractSystemsController() override;
 
 public:
-    virtual QnCloudStatusWatcher::Status cloudStatus() const = 0;
+    virtual nx::vms::client::core::CloudStatusWatcher::Status cloudStatus() const = 0;
     virtual QString cloudLogin() const = 0;
     virtual QnAbstractSystemsFinder::SystemDescriptionList systemsList() const = 0;
     virtual nx::vms::client::core::welcome_screen::TileVisibilityScope visibilityScope(

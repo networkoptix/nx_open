@@ -10,7 +10,6 @@
 #include <QtCore/QTimer>
 
 #include <client_core/client_core_settings.h>
-#include <helpers/system_helpers.h>
 #include <network/cloud_system_data.h>
 #include <nx/branding.h>
 #include <nx/cloud/db/client/oauth_manager.h>
@@ -33,9 +32,10 @@
 #include <utils/common/id.h>
 #include <utils/common/synctime.h>
 
-using namespace nx::cloud::db;
-using namespace nx::vms::client::core;
+using namespace nx::cloud::db::api;
 using namespace std::chrono;
+
+namespace nx::vms::client::core {
 
 namespace {
 
@@ -43,15 +43,15 @@ static constexpr auto kSystemUpdateInterval = 10s;
 static constexpr auto kReconnectInterval = 5s;
 static constexpr int kUpdateSystemsTriesCount = 6;
 
-QnCloudSystemList getCloudSystemList(const api::SystemDataExList& systemsList)
+QnCloudSystemList getCloudSystemList(const SystemDataExList& systemsList)
 {
     using namespace nx::vms::common;
 
     QnCloudSystemList result;
 
-    for (const nx::cloud::db::api::SystemDataEx &systemData : systemsList.systems)
+    for (const SystemDataEx &systemData : systemsList.systems)
     {
-        if (systemData.status != nx::cloud::db::api::SystemStatus::activated)
+        if (systemData.status != SystemStatus::activated)
             continue;
 
         const bool compatibleCustomization =
@@ -70,7 +70,7 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList& systemsList)
             : guidFromArbitraryData(system.cloudId); //< Safety check, local id should be present.
 
         system.newestServerVersion = systemData.version;
-        system.online = (systemData.stateOfHealth == nx::cloud::db::api::SystemHealth::online);
+        system.online = (systemData.stateOfHealth == SystemHealth::online);
         system.system2faEnabled = systemData.system2faEnabled;
         system.name = QString::fromStdString(systemData.name);
         system.ownerAccountEmail = QString::fromStdString(systemData.ownerAccountEmail);
@@ -85,33 +85,29 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList& systemsList)
     return result;
 }
 
-}
+} // namespace
 
-class QnCloudStatusWatcherPrivate : public QObject
+struct CloudStatusWatcher::Private: public QObject
 {
-    QnCloudStatusWatcher* q_ptr;
-    Q_DECLARE_PUBLIC(QnCloudStatusWatcher)
-
-public:
+    CloudStatusWatcher* const q;
     std::unique_ptr<CloudConnectionFactory> cloudConnectionFactory;
-    std::shared_ptr<api::Connection> cloudConnection;
-    std::unique_ptr<api::Connection> resendActivationConnection;
+    std::shared_ptr<Connection> cloudConnection;
+    std::unique_ptr<Connection> resendActivationConnection;
 
     bool hasUpdateSystemsRequest = false;
-    QnCloudStatusWatcher::Status status = QnCloudStatusWatcher::LoggedOut;
-    QnCloudStatusWatcher::ErrorCode errorCode = QnCloudStatusWatcher::NoError;
+    CloudStatusWatcher::Status status = CloudStatusWatcher::LoggedOut;
+    CloudStatusWatcher::ErrorCode errorCode = CloudStatusWatcher::NoError;
 
     QnCloudSystemList cloudSystems;
     QnCloudSystemList recentCloudSystems;
 
-public:
-    QnCloudStatusWatcherPrivate(QnCloudStatusWatcher* parent);
+    Private(CloudStatusWatcher* parent);
 
     void setCloudEnabled(bool enabled);
     bool cloudIsEnabled() const;
     bool is2FaEnabledForUser() const;
 
-    using TimePoint = QnCloudStatusWatcher::TimePoint;
+    using TimePoint = CloudStatusWatcher::TimePoint;
     /**
      * @brief Stops watcher from interacting with cloud from background
      * Background interaction with the cloud breaks user lockout feature in
@@ -120,7 +116,7 @@ public:
      * Mirrored from the parent class.
      * @param timeout: interaction will be automatically resumed after it expires.
      */
-    void suppressCloudInteraction(QnCloudStatusWatcher::TimePoint::duration timeout);
+    void suppressCloudInteraction(CloudStatusWatcher::TimePoint::duration timeout);
 
     /**
      * @brief Resumes background interaction with the cloud.
@@ -135,7 +131,6 @@ public:
 
     void saveCredentials() const;
 
-private:
     void updateSystems();
 
     /** @return Whether request was actually sent. */
@@ -143,13 +138,13 @@ private:
     void setCloudSystems(const QnCloudSystemList &newCloudSystems);
     void setRecentCloudSystems(const QnCloudSystemList &newRecentSystems);
     void updateCurrentCloudUserSecuritySettings();
-    void updateStatusFromResultCode(api::ResultCode result);
-    void setStatus(QnCloudStatusWatcher::Status newStatus, QnCloudStatusWatcher::ErrorCode error);
+    void updateStatusFromResultCode(ResultCode result);
+    void setStatus(CloudStatusWatcher::Status newStatus, CloudStatusWatcher::ErrorCode error);
 
     void resetCloudConnection();
     void updateConnection(bool initial);
     void issueAccessToken();
-    void onAccessTokenIssued(api::ResultCode result, api::IssueTokenResponse response);
+    void onAccessTokenIssued(ResultCode result, IssueTokenResponse response);
     void validateAccessToken();
     void scheduleConnectionRetryIfNeeded();
 
@@ -169,26 +164,24 @@ private:
     TimePoint m_suppressUntil;
 
     CloudAuthData m_authData;
-    api::AccountSecuritySettings m_accountSecuritySettings;
+    AccountSecuritySettings m_accountSecuritySettings;
     std::unique_ptr<CloudSessionTokenUpdater> m_tokenUpdater;
     CloudTokenRemover m_tokenRemover;
 };
 
-template<> QnCloudStatusWatcher* Singleton<QnCloudStatusWatcher>::s_instance = nullptr;
-
-QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent):
+CloudStatusWatcher::CloudStatusWatcher(QObject* parent):
     base_type(parent),
-    d_ptr(new QnCloudStatusWatcherPrivate(this))
+    d(new Private(this))
 {
-    const auto correctOfflineState = [this]()
+    const auto correctOfflineState =
+        [this]()
         {
-            Q_D(QnCloudStatusWatcher);
             switch (d->status)
             {
-                case QnCloudStatusWatcher::Online:
+                case CloudStatusWatcher::Online:
                     d->setRecentCloudSystems(cloudSystems());
                     break;
-                case QnCloudStatusWatcher::LoggedOut:
+                case CloudStatusWatcher::LoggedOut:
                     d->setRecentCloudSystems(QnCloudSystemList());
                     d->resetCloudConnection();
                     break;
@@ -197,13 +190,11 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent):
             }
         };
 
-    connect(this, &QnCloudStatusWatcher::statusChanged, this, correctOfflineState);
+    connect(this, &CloudStatusWatcher::statusChanged, this, correctOfflineState);
 
-    Q_D(QnCloudStatusWatcher);
-
-    connect(this, &QnCloudStatusWatcher::cloudSystemsChanged,
-        d, &QnCloudStatusWatcherPrivate::setRecentCloudSystems);
-    connect(this, &QnCloudStatusWatcher::recentCloudSystemsChanged, this,
+    connect(this, &CloudStatusWatcher::cloudSystemsChanged,
+        d.get(), &CloudStatusWatcher::Private::setRecentCloudSystems);
+    connect(this, &CloudStatusWatcher::recentCloudSystemsChanged, this,
         [this]()
         {
             qnClientCoreSettings->setRecentCloudSystems(recentCloudSystems());
@@ -211,114 +202,96 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent):
         });
 }
 
-QnCloudStatusWatcher::~QnCloudStatusWatcher()
+CloudStatusWatcher::~CloudStatusWatcher()
 {
-    Q_D(const QnCloudStatusWatcher);
     d->saveCredentials();
 }
 
-nx::network::http::Credentials QnCloudStatusWatcher::credentials() const
+nx::network::http::Credentials CloudStatusWatcher::credentials() const
 {
-    Q_D(const QnCloudStatusWatcher);
     return d->authData().credentials;
 }
 
-nx::network::http::Credentials QnCloudStatusWatcher::remoteConnectionCredentials() const
+nx::network::http::Credentials CloudStatusWatcher::remoteConnectionCredentials() const
 {
-    Q_D(const QnCloudStatusWatcher);
     auto result = credentials();
     result.authToken = nx::network::http::BearerAuthToken(d->authData().refreshToken);
     return result;
 }
 
-QString QnCloudStatusWatcher::cloudLogin() const
+QString CloudStatusWatcher::cloudLogin() const
 {
     return QString::fromStdString(credentials().username);
 }
 
-bool QnCloudStatusWatcher::is2FaEnabledForUser() const
+bool CloudStatusWatcher::is2FaEnabledForUser() const
 {
-    Q_D(const QnCloudStatusWatcher);
-
     return d->is2FaEnabledForUser();
 }
 
-void QnCloudStatusWatcher::logSession(const QString& cloudSystemId)
+void CloudStatusWatcher::logSession(const QString& cloudSystemId)
 {
-    Q_D(QnCloudStatusWatcher);
-
     if (!d->cloudConnection)
         return;
 
     d->cloudConnection->systemManager()->recordUserSessionStart(cloudSystemId.toStdString(),
-        [cloudSystemId](api::ResultCode result)
+        [this, cloudSystemId](ResultCode result)
         {
-            if (result == api::ResultCode::ok)
+            if (result == ResultCode::ok)
                 return;
 
-            NX_INFO(typeid(QnCloudStatusWatcher), lit("Error logging session %1: %2")
-                .arg(cloudSystemId)
-                .arg(QString::fromStdString(api::toString(result))));
+            NX_INFO(this, "Error logging session %1: %2", cloudSystemId, result);
         });
 }
 
-void QnCloudStatusWatcher::resetAuthData()
+void CloudStatusWatcher::resetAuthData()
 {
     setAuthData(CloudAuthData());
-    nx::vms::client::core::helpers::saveCloudCredentials(CloudAuthData());
+    settings()->setCloudAuthData(CloudAuthData());
 }
 
-bool QnCloudStatusWatcher::setAuthData(const CloudAuthData& authData)
+bool CloudStatusWatcher::setAuthData(const CloudAuthData& authData)
 {
-    Q_D(QnCloudStatusWatcher);
     return d->setAuthData(authData, /*initial*/ false);
 }
 
-bool QnCloudStatusWatcher::setInitialAuthData(const CloudAuthData& authData)
+bool CloudStatusWatcher::setInitialAuthData(const CloudAuthData& authData)
 {
-    Q_D(QnCloudStatusWatcher);
     return d->setAuthData(authData, /*initial*/ true);
 }
 
-QnCloudStatusWatcher::ErrorCode QnCloudStatusWatcher::error() const
+CloudStatusWatcher::ErrorCode CloudStatusWatcher::error() const
 {
-    Q_D(const QnCloudStatusWatcher);
     return d->errorCode;
 }
 
-QnCloudStatusWatcher::Status QnCloudStatusWatcher::status() const
+CloudStatusWatcher::Status CloudStatusWatcher::status() const
 {
-    Q_D(const QnCloudStatusWatcher);
     return d->status;
 }
 
-bool QnCloudStatusWatcher::isCloudEnabled() const
+bool CloudStatusWatcher::isCloudEnabled() const
 {
-    Q_D(const QnCloudStatusWatcher);
     return d->cloudIsEnabled();
 }
 
-void QnCloudStatusWatcher::suppressCloudInteraction(TimePoint::duration timeout)
+void CloudStatusWatcher::suppressCloudInteraction(TimePoint::duration timeout)
 {
-    Q_D(QnCloudStatusWatcher);
     d->suppressCloudInteraction(timeout);
 }
 
-void QnCloudStatusWatcher::resumeCloudInteraction()
+void CloudStatusWatcher::resumeCloudInteraction()
 {
-    Q_D(QnCloudStatusWatcher);
     d->resumeCloudInteraction();
 }
 
-void QnCloudStatusWatcher::updateSystems()
+void CloudStatusWatcher::updateSystems()
 {
-    Q_D(QnCloudStatusWatcher);
     d->updateSystems();
 }
 
-void QnCloudStatusWatcher::resendActivationEmail(const QString& email)
+void CloudStatusWatcher::resendActivationEmail(const QString& email)
 {
-    Q_D(QnCloudStatusWatcher);
     if (!d->cloudConnectionFactory)
         d->cloudConnectionFactory = std::make_unique<CloudConnectionFactory>();
 
@@ -326,42 +299,38 @@ void QnCloudStatusWatcher::resendActivationEmail(const QString& email)
         d->resendActivationConnection = d->cloudConnectionFactory->createConnection();
 
     const auto callback =
-        [this](api::ResultCode result, api::AccountConfirmationCode /*code*/)
+        [this](ResultCode result, AccountConfirmationCode /*code*/)
         {
             const bool success =
-                result == api::ResultCode::ok || result == api::ResultCode::partialContent;
+                result == ResultCode::ok || result == ResultCode::partialContent;
 
             emit activationEmailResent(success);
         };
 
-    const api::AccountEmail account{email.toStdString()};
+    const AccountEmail account{email.toStdString()};
     const auto accountManager = d->resendActivationConnection->accountManager();
     accountManager->reactivateAccount(account, nx::utils::guarded(this, callback));
 }
 
-QnCloudSystemList QnCloudStatusWatcher::cloudSystems() const
+QnCloudSystemList CloudStatusWatcher::cloudSystems() const
 {
-    Q_D(const QnCloudStatusWatcher);
     return d->cloudSystems;
 }
 
-QnCloudSystemList QnCloudStatusWatcher::recentCloudSystems() const
+QnCloudSystemList CloudStatusWatcher::recentCloudSystems() const
 {
-    Q_D(const QnCloudStatusWatcher);
     return d->recentCloudSystems;
 }
 
-QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *parent):
+CloudStatusWatcher::Private::Private(CloudStatusWatcher *parent):
     QObject(parent),
-    q_ptr(parent),
+    q(parent),
     recentCloudSystems(qnClientCoreSettings->recentCloudSystems())
 {
-    Q_Q(QnCloudStatusWatcher);
-
     QTimer* systemUpdateTimer = new QTimer(this);
     systemUpdateTimer->setInterval(kSystemUpdateInterval);
     systemUpdateTimer->callOnTimeout(
-        [this, q]()
+        [this]()
         {
              if (checkSuppressed())
                  q->updateSystems();
@@ -376,24 +345,22 @@ QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *p
         m_tokenUpdater.get(),
         &CloudSessionTokenUpdater::sessionTokenExpiring,
         this,
-        &QnCloudStatusWatcherPrivate::issueAccessToken);
+        &CloudStatusWatcher::Private::issueAccessToken);
 }
 
-bool QnCloudStatusWatcherPrivate::cloudIsEnabled() const
+bool CloudStatusWatcher::Private::cloudIsEnabled() const
 {
     return m_cloudIsEnabled;
 }
 
-bool QnCloudStatusWatcherPrivate::is2FaEnabledForUser() const
+bool CloudStatusWatcher::Private::is2FaEnabledForUser() const
 {
     // totpExistsForAccount field shows whether 2fa is enabled for cloud account.
     return m_accountSecuritySettings.totpExistsForAccount.value_or(false);
 }
 
-void QnCloudStatusWatcherPrivate::setCloudEnabled(bool enabled)
+void CloudStatusWatcher::Private::setCloudEnabled(bool enabled)
 {
-    Q_Q(QnCloudStatusWatcher);
-
     if (m_cloudIsEnabled == enabled)
         return;
 
@@ -401,44 +368,44 @@ void QnCloudStatusWatcherPrivate::setCloudEnabled(bool enabled)
     emit q->isCloudEnabledChanged();
 }
 
-void QnCloudStatusWatcherPrivate::updateStatusFromResultCode(api::ResultCode result)
+void CloudStatusWatcher::Private::updateStatusFromResultCode(ResultCode result)
 {
-    setCloudEnabled(result != api::ResultCode::networkError
-        && result != api::ResultCode::serviceUnavailable
-        && result != api::ResultCode::accountBlocked);
+    setCloudEnabled(result != ResultCode::networkError
+        && result != ResultCode::serviceUnavailable
+        && result != ResultCode::accountBlocked);
 
     switch (result)
     {
-        case api::ResultCode::ok:
-            setStatus(QnCloudStatusWatcher::Online, QnCloudStatusWatcher::NoError);
+        case ResultCode::ok:
+            setStatus(CloudStatusWatcher::Online, CloudStatusWatcher::NoError);
             break;
-        case api::ResultCode::badUsername:
-            setStatus(QnCloudStatusWatcher::LoggedOut, QnCloudStatusWatcher::InvalidEmail);
+        case ResultCode::badUsername:
+            setStatus(CloudStatusWatcher::LoggedOut, CloudStatusWatcher::InvalidEmail);
             break;
-        case api::ResultCode::notAuthorized:
-        case api::ResultCode::forbidden:
-            setStatus(QnCloudStatusWatcher::LoggedOut, QnCloudStatusWatcher::InvalidPassword);
+        case ResultCode::notAuthorized:
+        case ResultCode::forbidden:
+            setStatus(CloudStatusWatcher::LoggedOut, CloudStatusWatcher::InvalidPassword);
             break;
-        case api::ResultCode::accountNotActivated:
-            setStatus(QnCloudStatusWatcher::LoggedOut, QnCloudStatusWatcher::AccountNotActivated);
+        case ResultCode::accountNotActivated:
+            setStatus(CloudStatusWatcher::LoggedOut, CloudStatusWatcher::AccountNotActivated);
             break;
-        case api::ResultCode::accountBlocked:
+        case ResultCode::accountBlocked:
             setStatus(
-                QnCloudStatusWatcher::LoggedOut,
-                QnCloudStatusWatcher::UserTemporaryLockedOut);
+                CloudStatusWatcher::LoggedOut,
+                CloudStatusWatcher::UserTemporaryLockedOut);
             break;
         default:
-            setStatus(QnCloudStatusWatcher::Offline, QnCloudStatusWatcher::UnknownError);
+            setStatus(CloudStatusWatcher::Offline, CloudStatusWatcher::UnknownError);
             break;
     }
 }
 
-bool QnCloudStatusWatcherPrivate::updateSystemsInternal(int triesCount)
+bool CloudStatusWatcher::Private::updateSystemsInternal(int triesCount)
 {
     if (!cloudConnection || m_authData.credentials.authToken.empty())
         return false;
 
-    if (status == QnCloudStatusWatcher::LoggedOut)
+    if (status == CloudStatusWatcher::LoggedOut)
         return false;
 
     if (!checkSuppressed())
@@ -448,13 +415,13 @@ bool QnCloudStatusWatcherPrivate::updateSystemsInternal(int triesCount)
         return false;
 
     auto handler = nx::utils::AsyncHandlerExecutor(this).bind(
-        [this, triesCount](api::ResultCode result, const api::SystemDataExList& systemsList)
+        [this, triesCount](ResultCode result, const SystemDataExList& systemsList)
         {
             if (!cloudConnection)
                 return;
 
             QnCloudSystemList cloudSystems;
-            if (result == api::ResultCode::badUsername && triesCount > 0)
+            if (result == ResultCode::badUsername && triesCount > 0)
             {
                 // In some situations after mobile client awakeness from the suspension we have
                 // expired cloud access token. It may take some time to update it, so we give a
@@ -470,7 +437,7 @@ bool QnCloudStatusWatcherPrivate::updateSystemsInternal(int triesCount)
                 executeDelayedParented(request, /*delay*/ 10s, this);
                 return;
             }
-            else if (result == api::ResultCode::ok)
+            else if (result == ResultCode::ok)
             {
                 NX_DEBUG(this, "Successfully updated systems list");
                 cloudSystems = getCloudSystemList(systemsList);
@@ -486,11 +453,11 @@ bool QnCloudStatusWatcherPrivate::updateSystemsInternal(int triesCount)
         });
 
     NX_DEBUG(this, "Updating systems list");
-    cloudConnection->systemManager()->getSystemsFiltered(api::Filter(), std::move(handler));
+    cloudConnection->systemManager()->getSystemsFiltered(Filter(), std::move(handler));
     return true;
 }
 
-void QnCloudStatusWatcherPrivate::updateSystems()
+void CloudStatusWatcher::Private::updateSystems()
 {
     NX_DEBUG(this, "Try update systems list: has request is %1 ", hasUpdateSystemsRequest);
 
@@ -500,27 +467,27 @@ void QnCloudStatusWatcherPrivate::updateSystems()
     hasUpdateSystemsRequest = updateSystemsInternal(kUpdateSystemsTriesCount);
 }
 
-void QnCloudStatusWatcherPrivate::resetCloudConnection()
+void CloudStatusWatcher::Private::resetCloudConnection()
 {
     cloudConnection.reset();
     hasUpdateSystemsRequest = false;
 }
 
-void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
+void CloudStatusWatcher::Private::updateConnection(bool initial)
 {
     const auto status = (initial
-        ? QnCloudStatusWatcher::Offline
-        : QnCloudStatusWatcher::LoggedOut);
-    setStatus(status, QnCloudStatusWatcher::NoError);
+        ? CloudStatusWatcher::Offline
+        : CloudStatusWatcher::LoggedOut);
+    setStatus(status, CloudStatusWatcher::NoError);
     resetCloudConnection();
 
     const auto& credentials = m_authData.credentials;
     if (m_authData.empty())
     {
         const auto error = (initial || credentials.username.empty())
-            ? QnCloudStatusWatcher::NoError
-            : QnCloudStatusWatcher::InvalidPassword;
-        setStatus(QnCloudStatusWatcher::LoggedOut, error);
+            ? CloudStatusWatcher::NoError
+            : CloudStatusWatcher::InvalidPassword;
+        setStatus(CloudStatusWatcher::LoggedOut, error);
         setCloudSystems(QnCloudSystemList());
         return;
     }
@@ -541,8 +508,9 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
     }
 }
 
-void QnCloudStatusWatcherPrivate::onAccessTokenIssued(
-    api::ResultCode result, api::IssueTokenResponse response)
+void CloudStatusWatcher::Private::onAccessTokenIssued(
+    ResultCode result,
+    IssueTokenResponse response)
 {
     NX_DEBUG(
         this,
@@ -553,7 +521,7 @@ void QnCloudStatusWatcherPrivate::onAccessTokenIssued(
     if (!cloudConnection)
         return;
 
-    if (result != api::ResultCode::ok)
+    if (result != ResultCode::ok)
     {
         updateStatusFromResultCode(result);
         scheduleConnectionRetryIfNeeded();
@@ -562,14 +530,14 @@ void QnCloudStatusWatcherPrivate::onAccessTokenIssued(
 
     if (response.error)
     {
-        if (*response.error == api::OauthManager::k2faRequiredError)
+        if (*response.error == OauthManager::k2faRequiredError)
         {
-            updateStatusFromResultCode(api::ResultCode::notAuthorized);
+            updateStatusFromResultCode(ResultCode::notAuthorized);
             return;
         }
         else
         {
-            updateStatusFromResultCode(api::ResultCode::unknownError);
+            updateStatusFromResultCode(ResultCode::unknownError);
             return;
         }
     }
@@ -583,16 +551,15 @@ void QnCloudStatusWatcherPrivate::onAccessTokenIssued(
     cloudConnection->setCredentials(m_authData.credentials);
     m_tokenUpdater->onTokenUpdated(m_authData.expiresAt);
 
-    Q_Q(QnCloudStatusWatcher);
     emit q->credentialsChanged();
 
     validateAccessToken();
 };
 
-void QnCloudStatusWatcherPrivate::issueAccessToken()
+void CloudStatusWatcher::Private::issueAccessToken()
 {
     auto callback =
-        [this](api::ResultCode result, api::IssueTokenResponse response)
+        [this](ResultCode result, IssueTokenResponse response)
         {
             onAccessTokenIssued(result, std::move(response));
         };
@@ -600,15 +567,15 @@ void QnCloudStatusWatcherPrivate::issueAccessToken()
     if (!NX_ASSERT(cloudConnection))
         return;
 
-    api::IssueTokenRequest request;
+    IssueTokenRequest request;
     if (!m_authData.refreshToken.empty())
     {
-        request.grant_type = api::GrantType::refreshToken;
+        request.grant_type = GrantType::refreshToken;
         request.refresh_token = m_authData.refreshToken;
     }
     else if (!m_authData.authorizationCode.empty())
     {
-        request.grant_type = api::GrantType::authorizationCode;
+        request.grant_type = GrantType::authorizationCode;
         request.code = m_authData.authorizationCode;
     }
     else
@@ -619,16 +586,16 @@ void QnCloudStatusWatcherPrivate::issueAccessToken()
     m_tokenUpdater->issueToken(request, std::move(callback), this);
 }
 
-void QnCloudStatusWatcherPrivate::validateAccessToken()
+void CloudStatusWatcher::Private::validateAccessToken()
 {
     auto callback = nx::utils::AsyncHandlerExecutor(this).bind(
-        [this](api::ResultCode result, api::ValidateTokenResponse response)
+        [this](ResultCode result, ValidateTokenResponse response)
         {
             NX_DEBUG(this, "Validate token result: %1", result);
             if (!cloudConnection)
                 return;
 
-            if (result != api::ResultCode::ok)
+            if (result != ResultCode::ok)
             {
                 updateStatusFromResultCode(result);
                 return;
@@ -637,13 +604,12 @@ void QnCloudStatusWatcherPrivate::validateAccessToken()
             const bool loginChanged = (m_authData.credentials.username != response.username);
             m_authData.credentials.username = std::move(response.username);
 
-            Q_Q(QnCloudStatusWatcher);
             NX_DEBUG(this, "Access token valid, username: %1", q->cloudLogin());
 
             updateStatusFromResultCode(result);
             saveCredentials();
 
-            if (result == api::ResultCode::ok)
+            if (result == ResultCode::ok)
                 q->updateSystems();
             if (loginChanged)
                 emit q->cloudLoginChanged();
@@ -653,9 +619,9 @@ void QnCloudStatusWatcherPrivate::validateAccessToken()
         m_authData.credentials.authToken.value, std::move(callback));
 }
 
-void QnCloudStatusWatcherPrivate::scheduleConnectionRetryIfNeeded()
+void CloudStatusWatcher::Private::scheduleConnectionRetryIfNeeded()
 {
-    if (!cloudConnection || status != QnCloudStatusWatcher::Offline)
+    if (!cloudConnection || status != CloudStatusWatcher::Offline)
         return;
 
     QTimer::singleShot(
@@ -663,7 +629,7 @@ void QnCloudStatusWatcherPrivate::scheduleConnectionRetryIfNeeded()
         this,
         [this]()
         {
-            if (!cloudConnection || status != QnCloudStatusWatcher::Offline)
+            if (!cloudConnection || status != CloudStatusWatcher::Offline)
                 return;
 
             NX_DEBUG(this, "Retrying connection");
@@ -671,8 +637,8 @@ void QnCloudStatusWatcherPrivate::scheduleConnectionRetryIfNeeded()
         });
 }
 
-void QnCloudStatusWatcherPrivate::setStatus(
-    QnCloudStatusWatcher::Status newStatus, QnCloudStatusWatcher::ErrorCode newErrorCode)
+void CloudStatusWatcher::Private::setStatus(
+    CloudStatusWatcher::Status newStatus, CloudStatusWatcher::ErrorCode newErrorCode)
 {
     const bool isNewStatus = (status != newStatus);
     const bool isNewErrorCode = (errorCode != newErrorCode);
@@ -685,12 +651,11 @@ void QnCloudStatusWatcherPrivate::setStatus(
     errorCode = newErrorCode;
     NX_DEBUG(this, "Updating cloud status: %1, error: %2", status, errorCode);
 
-    Q_Q(QnCloudStatusWatcher);
     // This should catch the case when user changes cloud password from browser.
     if (isNewStatus
-        && status == QnCloudStatusWatcher::LoggedOut
-        && (errorCode == QnCloudStatusWatcher::InvalidPassword
-            || errorCode == QnCloudStatusWatcher::InvalidEmail))
+        && status == CloudStatusWatcher::LoggedOut
+        && (errorCode == CloudStatusWatcher::InvalidPassword
+            || errorCode == CloudStatusWatcher::InvalidEmail))
     {
         NX_WARNING(this, "Forcing logout. Session expired or password was changed.");
         m_accountSecuritySettings = {};
@@ -701,40 +666,37 @@ void QnCloudStatusWatcherPrivate::setStatus(
     if (isNewStatus)
         emit q->statusChanged(status);
 
-    if (isNewErrorCode && (errorCode != QnCloudStatusWatcher::NoError))
+    if (isNewErrorCode && (errorCode != CloudStatusWatcher::NoError))
         emit q->errorChanged(errorCode);
 }
 
-void QnCloudStatusWatcherPrivate::setCloudSystems(const QnCloudSystemList &newCloudSystems)
+void CloudStatusWatcher::Private::setCloudSystems(const QnCloudSystemList &newCloudSystems)
 {
     if (cloudSystems == newCloudSystems)
         return;
-
-    Q_Q(QnCloudStatusWatcher);
 
     cloudSystems = newCloudSystems;
 
     emit q->cloudSystemsChanged(cloudSystems);
 }
 
-void QnCloudStatusWatcherPrivate::setRecentCloudSystems(const QnCloudSystemList &newRecentCloudSystems)
+void CloudStatusWatcher::Private::setRecentCloudSystems(const QnCloudSystemList &newRecentCloudSystems)
 {
     if (recentCloudSystems == newRecentCloudSystems)
         return;
 
     recentCloudSystems = newRecentCloudSystems;
 
-    Q_Q(QnCloudStatusWatcher);
     emit q->recentCloudSystemsChanged();
 }
 
-void QnCloudStatusWatcherPrivate::updateCurrentCloudUserSecuritySettings()
+void CloudStatusWatcher::Private::updateCurrentCloudUserSecuritySettings()
 {
     if (!cloudConnection)
         return;
 
     auto callback = nx::utils::AsyncHandlerExecutor(this).bind(
-        [this](api::ResultCode result, api::AccountSecuritySettings settings)
+        [this](ResultCode result, AccountSecuritySettings settings)
         {
             NX_VERBOSE(
                 this, "Updated current security settings of the cloud user, status: %1.", result);
@@ -746,7 +708,6 @@ void QnCloudStatusWatcherPrivate::updateCurrentCloudUserSecuritySettings()
 
             if (has2FaChanged)
             {
-                Q_Q(QnCloudStatusWatcher);
                 emit q->is2FaEnabledForUserChanged();
             }
         });
@@ -754,7 +715,7 @@ void QnCloudStatusWatcherPrivate::updateCurrentCloudUserSecuritySettings()
     cloudConnection->accountManager()->getSecuritySettings(std::move(callback));
 }
 
-void QnCloudStatusWatcherPrivate::suppressCloudInteraction(
+void CloudStatusWatcher::Private::suppressCloudInteraction(
         TimePoint::duration timeout)
 {
     if (timeout > std::chrono::milliseconds(0))
@@ -772,12 +733,12 @@ void QnCloudStatusWatcherPrivate::suppressCloudInteraction(
     }
 }
 
-void QnCloudStatusWatcherPrivate::resumeCloudInteraction()
+void CloudStatusWatcher::Private::resumeCloudInteraction()
 {
     m_suppression = SuppressionMode::Resumed;
 }
 
-bool QnCloudStatusWatcherPrivate::checkSuppressed()
+bool CloudStatusWatcher::Private::checkSuppressed()
 {
     if (m_suppression == SuppressionMode::Suppressed)
         return false;
@@ -793,9 +754,8 @@ bool QnCloudStatusWatcherPrivate::checkSuppressed()
     return true;
 }
 
-bool QnCloudStatusWatcherPrivate::setAuthData(const CloudAuthData& authData, bool initial)
+bool CloudStatusWatcher::Private::setAuthData(const CloudAuthData& authData, bool initial)
 {
-    Q_Q(QnCloudStatusWatcher);
     NX_ASSERT(!authData.credentials.authToken.isPassword());
 
     const bool userChanged = (m_authData.credentials.username != authData.credentials.username);
@@ -815,15 +775,17 @@ bool QnCloudStatusWatcherPrivate::setAuthData(const CloudAuthData& authData, boo
     return true;
 }
 
-void QnCloudStatusWatcherPrivate::saveCredentials() const
+void CloudStatusWatcher::Private::saveCredentials() const
 {
-    if (status == QnCloudStatusWatcher::LoggedOut)
+    if (status == CloudStatusWatcher::LoggedOut)
         return;
 
-    nx::vms::client::core::helpers::saveCloudCredentials(m_authData);
+    settings()->setCloudAuthData(m_authData);
 }
 
-const CloudAuthData& QnCloudStatusWatcherPrivate::authData() const
+const CloudAuthData& CloudStatusWatcher::Private::authData() const
 {
     return m_authData;
 }
+
+} // namespace nx::vms::client::core

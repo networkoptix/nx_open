@@ -4,18 +4,16 @@
 
 #include <client/system_weights_manager.h>
 #include <finders/test_systems_finder.h>
-#include <helpers/system_weight_helper.h>
 #include <network/local_system_description.h>
-#include <utils/common/delayed.h>
-
-#include <nx/vms/api/protocol_version.h>
+#include <nx/build_info.h>
 #include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/scope_guard.h>
-
-#include <nx/build_info.h>
+#include <nx/utils/system_utils.h>
+#include <nx/vms/api/protocol_version.h>
+#include <utils/common/delayed.h>
 
 namespace {
 
@@ -97,11 +95,13 @@ QnSystemDescriptionPtr createSystem(
 
 qreal getSystemMaxWeight()
 {
+    using namespace std::chrono;
     qreal result = 0;
     for(const auto& weightData: qnSystemWeightsManager->weights())
     {
-        const auto weight = nx::vms::client::core::helpers::calculateSystemWeight(
-            weightData.weight, weightData.lastConnectedUtcMs);
+        const auto weight = nx::utils::calculateSystemUsageFrequency(
+            time_point<system_clock>(milliseconds(weightData.lastConnectedUtcMs)),
+            weightData.weight);
 
         if (result < weight)
             result = weight;

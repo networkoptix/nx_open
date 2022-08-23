@@ -2,16 +2,19 @@
 
 #include "system_weights_manager.h"
 
-#include <QtCore/QTimer>
 #include <QtCore/QDateTime>
+#include <QtCore/QTimer>
 
-#include <finders/systems_finder.h>
-#include <watchers/cloud_status_watcher.h>
 #include <client_core/client_core_settings.h>
+#include <finders/systems_finder.h>
 #include <network/cloud_system_data.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/math/fuzzy.h>
-#include <helpers/system_weight_helper.h>
+#include <nx/utils/system_utils.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
+
+using namespace nx::vms::client::core;
 
 namespace {
 
@@ -57,9 +60,13 @@ QnWeightsDataHash fromCloudSystemData(const QnCloudSystemList& data)
 
 QnWeightsDataHash recalculatedWeights(QnWeightsDataHash source)
 {
-    using namespace nx::vms::client::core;
+    using namespace std::chrono;
     for (auto& data: source)
-        data.weight = helpers::calculateSystemWeight(data.weight, data.lastConnectedUtcMs);
+    {
+        data.weight = nx::utils::calculateSystemUsageFrequency(
+            time_point<system_clock>(milliseconds(data.lastConnectedUtcMs)),
+            data.weight);
+    }
 
     return source;
 }
@@ -79,7 +86,7 @@ QnSystemsWeightsManager::QnSystemsWeightsManager():
     NX_ASSERT(qnClientCoreSettings, "Client client settings are not ready");
     NX_ASSERT(qnCloudStatusWatcher, "Cloud status watcher is not ready");
 
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::cloudSystemsChanged,
+    connect(qnCloudStatusWatcher, &CloudStatusWatcher::cloudSystemsChanged,
         this, &QnSystemsWeightsManager::handleSourceWeightsChanged);
 
     connect(qnClientCoreSettings, &QnClientCoreSettings::valueChanged, this,

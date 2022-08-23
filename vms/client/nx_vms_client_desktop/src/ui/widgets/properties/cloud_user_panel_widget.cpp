@@ -3,15 +3,17 @@
 #include "cloud_user_panel_widget.h"
 #include "ui_cloud_user_panel_widget.h"
 
-#include <helpers/cloud_url_helper.h>
+#include <nx/vms/client/core/common/utils/cloud_url_helper.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/accessor.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <watchers/cloud_status_watcher.h>
 
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 
 namespace {
@@ -43,7 +45,7 @@ QnCloudUserPanelWidget::QnCloudUserPanelWidget(QWidget* parent /*= 0*/):
         + kSpacingByContentsMargin);
 
     updateManageAccountLink();
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged, this,
+    connect(qnCloudStatusWatcher, &core::CloudStatusWatcher::statusChanged, this,
         &QnCloudUserPanelWidget::updateManageAccountLink);
 }
 
@@ -105,14 +107,14 @@ AbstractAccessor* QnCloudUserPanelWidget::createIconWidthAccessor()
 
 void QnCloudUserPanelWidget::updateManageAccountLink()
 {
-    if (qnCloudStatusWatcher->status() == QnCloudStatusWatcher::Status::LoggedOut)
+    if (qnCloudStatusWatcher->status() == core::CloudStatusWatcher::Status::LoggedOut)
     {
         ui->manageAccountLabel->setText(tr("Account Settings"));
         return;
     }
 
     using nx::vms::utils::SystemUri;
-    QnCloudUrlHelper urlHelper(
+    core::CloudUrlHelper urlHelper(
         SystemUri::ReferralSource::DesktopClient,
         SystemUri::ReferralContext::SettingsDialog);
     ui->manageAccountLabel->setText(nx::vms::common::html::link(

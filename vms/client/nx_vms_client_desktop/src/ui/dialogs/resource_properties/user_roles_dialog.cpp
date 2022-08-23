@@ -8,12 +8,13 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>

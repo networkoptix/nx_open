@@ -6,13 +6,14 @@
 #include <set>
 #include <utility>
 
-#include <client_core/client_core_module.h>
 #include <client/client_globals.h>
+#include <client_core/client_core_module.h>
 #include <common/common_module.h>
-#include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/camera_resource.h>
 #include <nx/analytics/utils.h>
 #include <nx/vms/api/data/backup_settings.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_dialogs/backup_settings_view_common.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
 #include <nx/vms/client/desktop/resource_views/data/camera_extra_status.h>

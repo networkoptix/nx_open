@@ -7,13 +7,13 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resources_changes_manager.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/common/utils/background_flasher.h>
 #include <nx/vms/client/desktop/common/utils/check_box_utils.h>
 #include <nx/vms/client/desktop/common/utils/provided_text_display.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_properties/schedule/record_schedule_cell_painter.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>

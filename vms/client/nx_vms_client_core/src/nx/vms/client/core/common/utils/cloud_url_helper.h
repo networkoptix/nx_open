@@ -8,14 +8,16 @@
 #include <nx/vms/utils/system_uri.h>
 #include <nx/utils/url.h>
 
-class NX_VMS_CLIENT_CORE_API QnCloudUrlHelper: public QObject
+namespace nx::vms::client::core {
+
+class NX_VMS_CLIENT_CORE_API CloudUrlHelper: public QObject
 {
     Q_OBJECT
 
 public:
-    QnCloudUrlHelper(
-        nx::vms::utils::SystemUri::ReferralSource source,
-        nx::vms::utils::SystemUri::ReferralContext context,
+    CloudUrlHelper(
+        utils::SystemUri::ReferralSource source,
+        utils::SystemUri::ReferralContext context,
         QObject* parent = nullptr);
 
     Q_INVOKABLE QUrl mainUrl() const;
@@ -32,6 +34,8 @@ private:
     QUrl makeUrl(const QString& path = QString(), bool withReferral = true) const;
 
 public:
-    nx::vms::utils::SystemUri::ReferralSource m_source;
-    nx::vms::utils::SystemUri::ReferralContext m_context;
+    utils::SystemUri::ReferralSource m_source;
+    utils::SystemUri::ReferralContext m_context;
 };
+
+} // namespace nx::vms::client::core

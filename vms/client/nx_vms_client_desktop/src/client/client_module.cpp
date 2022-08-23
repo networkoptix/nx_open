@@ -65,7 +65,6 @@
 #include <ui/workaround/qtbug_workaround.h>
 #include <utils/common/command_line_parser.h>
 #include <utils/math/color_transformations.h>
-#include <watchers/cloud_status_watcher.h>
 
 #if defined(Q_OS_WIN)
     #include <nx/vms/client/desktop/resource/screen_recording/audio_video_win/windows_desktop_resource.h>

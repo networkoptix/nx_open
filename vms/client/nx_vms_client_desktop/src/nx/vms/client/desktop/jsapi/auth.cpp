@@ -2,8 +2,9 @@
 
 #include "auth.h"
 
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/remote_connection.h>
-#include <watchers/cloud_status_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
 
 namespace nx::vms::client::desktop::jsapi {
 

@@ -8,9 +8,9 @@
 #include <api/server_rest_connection.h>
 #include <common/common_module.h>
 #include <core/resource/user_resource.h>
-#include <helpers/cloud_url_helper.h>
 #include <nx/branding.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/core/common/utils/cloud_url_helper.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
@@ -25,6 +25,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::common;
 
@@ -32,16 +33,20 @@ namespace {
 
 const int kAccountFontPixelSize = 24;
 
+core::CloudUrlHelper urlHelper()
+{
+    using nx::vms::utils::SystemUri;
+    return core::CloudUrlHelper(
+        SystemUri::ReferralSource::DesktopClient,
+        SystemUri::ReferralContext::SettingsDialog);
+}
+
 } // namespace
 
 QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::CloudManagementWidget),
-    m_cloudUrlHelper(new QnCloudUrlHelper(
-        nx::vms::utils::SystemUri::ReferralSource::DesktopClient,
-        nx::vms::utils::SystemUri::ReferralContext::SettingsDialog,
-        this))
+    ui(new Ui::CloudManagementWidget)
 {
     ui->setupUi(this);
 
@@ -75,21 +80,16 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
         "%1 is the cloud name (like Nx Cloud)").arg(nx::branding::cloudName()));
     ui->promo3TextLabel->setText(tr("Connect to your Systems\nfrom anywhere with any\ndevices"));
 
-    using nx::vms::utils::SystemUri;
-    QnCloudUrlHelper urlHelper(
-        SystemUri::ReferralSource::DesktopClient,
-        SystemUri::ReferralContext::SettingsDialog);
-
     ui->learnMoreLabel->setText(
         nx::vms::common::html::link(
             tr("Learn more about %1", "%1 is the cloud name (like Nx Cloud)").arg(
                 nx::branding::cloudName()),
-            urlHelper.aboutUrl()));
+            urlHelper().aboutUrl()));
 
     connect(ui->goToCloudButton, &QPushButton::clicked, this,
         [this]
         {
-            QDesktopServices::openUrl(m_cloudUrlHelper->mainUrl());
+            QDesktopServices::openUrl(urlHelper().mainUrl());
         });
 
     connect(

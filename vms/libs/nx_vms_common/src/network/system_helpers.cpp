@@ -115,4 +115,9 @@ bool currentSystemIsNew(const nx::vms::common::SystemContext* context)
     return settings->localSystemId().isNull();
 }
 
+QString serverCloudHost(const QString& systemId, const QnUuid& serverId)
+{
+    return QString("%1.%2").arg(serverId.toSimpleString(), systemId);
+}
+
 } // namespace helpers

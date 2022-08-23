@@ -91,6 +91,58 @@ Settings::Settings(bool useKeyChain):
     migrateSystemAuthenticationData();
 }
 
+CloudAuthData Settings::cloudAuthData() const
+{
+    nx::network::http::Credentials credentials = cloudCredentials();
+
+    CloudAuthData authData;
+    authData.credentials.authToken.type = nx::network::http::AuthTokenType::bearer;
+    authData.credentials.username = std::move(credentials.username);
+    authData.refreshToken = std::move(credentials.authToken.value);
+    return authData;
+}
+
+void Settings::setCloudAuthData(const CloudAuthData& authData)
+{
+    cloudCredentials = nx::network::http::Credentials(
+        authData.credentials.username,
+        nx::network::http::BearerAuthToken(authData.refreshToken));
+}
+
+std::optional<QnUuid> Settings::preferredCloudServer(const QString& systemId)
+{
+    const auto preferredServers = preferredCloudServers();
+    const auto iter = std::find_if(preferredServers.cbegin(), preferredServers.cend(),
+        [&systemId](const auto& item) { return item.systemId == systemId; });
+
+    if (iter == preferredServers.cend())
+        return std::nullopt;
+
+    return iter->serverId;
+}
+
+void Settings::setPreferredCloudServer(const QString& systemId, const QnUuid& serverId)
+{
+    static constexpr int kMaxStoredPreferredCloudServers = 100;
+
+    auto preferredServers = preferredCloudServers();
+    const auto iter = std::find_if(preferredServers.begin(), preferredServers.end(),
+        [&systemId](const auto& item) { return item.systemId == systemId; });
+
+    if (iter != preferredServers.end())
+        preferredServers.erase(iter);
+
+    NX_DEBUG(this, "Setting server %1 as preferred for the cloud system %2",
+        serverId.toSimpleString(), systemId);
+
+    preferredServers.push_back({systemId, serverId});
+
+    while (preferredServers.size() > kMaxStoredPreferredCloudServers)
+        preferredServers.pop_front();
+
+    preferredCloudServers = preferredServers;
+}
+
 void Settings::migrateSystemAuthenticationData()
 {
     // Check if data is already migrated.

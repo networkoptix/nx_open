@@ -4,6 +4,9 @@
 
 #include <finders/systems_finder.h>
 #include <nx/vms/client/core/settings/systems_visibility_manager.h>
+#include <nx/vms/client/core/application_context.h>
+
+using namespace nx::vms::client::core;
 
 SystemsController::SystemsController(QObject* parent): AbstractSystemsController(parent)
 {
@@ -17,17 +20,17 @@ SystemsController::SystemsController(QObject* parent): AbstractSystemsController
     connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemLost,
         this, &AbstractSystemsController::systemLost);
 
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged,
+    connect(qnCloudStatusWatcher, &CloudStatusWatcher::statusChanged,
         this, &AbstractSystemsController::cloudStatusChanged);
 
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::cloudLoginChanged,
+    connect(qnCloudStatusWatcher, &CloudStatusWatcher::cloudLoginChanged,
         this, &AbstractSystemsController::cloudLoginChanged);
 }
 
 SystemsController::~SystemsController()
 {}
 
-QnCloudStatusWatcher::Status SystemsController::cloudStatus() const
+CloudStatusWatcher::Status SystemsController::cloudStatus() const
 {
     return qnCloudStatusWatcher->status();
 }

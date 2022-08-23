@@ -3,17 +3,18 @@
 #include "cloud_system_endpoint.h"
 
 #include <finders/systems_finder.h>
-#include <helpers/system_helpers.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
+#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/ini.h>
-#include <watchers/cloud_status_watcher.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 
 namespace nx::vms::client::core {
 
 std::optional<CloudSystemEndpoint> cloudSystemEndpoint(const QString& systemId)
 {
-    if (!NX_ASSERT(qnCloudStatusWatcher->status() != QnCloudStatusWatcher::LoggedOut))
+    if (!NX_ASSERT(qnCloudStatusWatcher->status() != CloudStatusWatcher::LoggedOut))
         return std::nullopt;
 
     NX_DEBUG(NX_SCOPE_TAG, "Connecting to the cloud system %1", systemId);
@@ -41,8 +42,7 @@ std::optional<CloudSystemEndpoint> cloudSystemEndpoint(const QnSystemDescription
 
     if (!ini().ignoreSavedPreferredCloudServers)
     {
-        result.serverId =
-            nx::vms::client::core::helpers::preferredCloudServer(system->id()).value_or(QnUuid());
+        result.serverId = settings()->preferredCloudServer(system->id()).value_or(QnUuid());
         if (!result.serverId.isNull())
         {
             if (system->isReachableServer(result.serverId))

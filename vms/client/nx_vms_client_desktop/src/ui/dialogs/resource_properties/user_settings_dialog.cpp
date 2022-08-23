@@ -11,12 +11,13 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/branding.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/core/ini.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
@@ -662,7 +663,7 @@ void QnUserSettingsDialog::applyChanges()
     CustomUserAccessibleResourcesPtr customUserResources =
         std::make_shared<CustomUserAccessibleResources>(std::nullopt);
 
-    QnResourcesChangesManager::UserChangesFunction applyChangesFunction =
+    ResourcesChangesManager::UserChangesFunction applyChangesFunction =
         [this, customUserResources](const QnUserResourcePtr& /*user*/)
         {
             // Here accessible resources will also be filled to model.
@@ -676,7 +677,7 @@ void QnUserSettingsDialog::applyChanges()
 
     // Handle new user creating.
     const auto actionManager = QPointer<action::Manager>(menu());
-    QnResourcesChangesManager::UserCallbackFunction callbackFunction =
+    ResourcesChangesManager::UserCallbackFunction callbackFunction =
         [actionManager, mode, customUserResources](bool success, const QnUserResourcePtr& user)
         {
             if (!success || !actionManager)

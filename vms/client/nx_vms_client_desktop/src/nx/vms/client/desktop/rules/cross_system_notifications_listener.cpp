@@ -2,7 +2,6 @@
 
 #include "cross_system_notifications_listener.h"
 
-#include <helpers/cloud_url_helper.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/network/abstract_socket.h>
 #include <nx/network/aio/timer.h>
@@ -18,13 +17,14 @@
 #include <nx/utils/system_error.h>
 #include <nx/utils/url.h>
 #include <nx/vms/api/data/cloud_notification.h>
+#include <nx/vms/client/core/common/utils/cloud_url_helper.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx/vms/rules/utils/serialization.h>
-#include <watchers/cloud_status_watcher.h>
 
 namespace nx::vms::client::desktop {
 
@@ -70,7 +70,7 @@ public:
             {
                 stopSync();
 
-                QnCloudUrlHelper cloudUrlHelper(
+                core::CloudUrlHelper cloudUrlHelper(
                     nx::vms::utils::SystemUri::ReferralSource::DesktopClient,
                     nx::vms::utils::SystemUri::ReferralContext::None);
 

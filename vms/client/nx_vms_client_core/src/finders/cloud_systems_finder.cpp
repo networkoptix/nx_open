@@ -11,12 +11,15 @@
 #include <nx/network/rest/result.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/scope_guard.h>
 #include <nx/utils/qset.h>
+#include <nx/utils/scope_guard.h>
+#include <nx/vms/client/core/application_context.h>
 #include <utils/common/delayed.h>
 
 static const std::chrono::milliseconds kCloudSystemsRefreshPeriod = std::chrono::seconds(15);
 static const std::chrono::milliseconds kSystemConnectTimeout = std::chrono::seconds(12);
+
+using namespace nx::vms::client::core;
 
 namespace {
 
@@ -41,11 +44,11 @@ QnCloudSystemsFinder::QnCloudSystemsFinder(QObject* parent):
     NX_ASSERT(qnCloudStatusWatcher, "Cloud watcher is not ready");
 
     connect(qnCloudStatusWatcher,
-        &QnCloudStatusWatcher::statusChanged,
+        &CloudStatusWatcher::statusChanged,
         this,
         &QnCloudSystemsFinder::onCloudStatusChanged);
     connect(qnCloudStatusWatcher,
-        &QnCloudStatusWatcher::cloudSystemsChanged,
+        &CloudStatusWatcher::cloudSystemsChanged,
         this,
         &QnCloudSystemsFinder::setCloudSystems);
 
@@ -93,9 +96,9 @@ QnSystemDescriptionPtr QnCloudSystemsFinder::getSystem(const QString &id) const
 }
 
 
-void QnCloudSystemsFinder::onCloudStatusChanged(QnCloudStatusWatcher::Status status)
+void QnCloudSystemsFinder::onCloudStatusChanged(CloudStatusWatcher::Status status)
 {
-    setCloudSystems(status == QnCloudStatusWatcher::Online
+    setCloudSystems(status == CloudStatusWatcher::Online
         ? qnCloudStatusWatcher->cloudSystems()
         : QnCloudSystemList());
 }

@@ -4,18 +4,15 @@
 
 #include <QtWidgets/QAction>
 
-#include <common/common_module.h>
-
 #include <client/client_globals.h>
 #include <client/client_message_processor.h>
-
-#include <core/resource/webpage_resource.h>
+#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource_management/resources_changes_manager.h>
+#include <core/resource/webpage_resource.h>
 #include <core/resource_management/resource_pool.h>
-
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-
 #include <ui/dialogs/webpage_dialog.h>
 
 using namespace nx::vms::client::desktop;

@@ -9,9 +9,9 @@
 #include <nx/cloud/db/api/connection.h>
 #include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/network/cloud_connection_factory.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <utils/common/synctime.h>
-#include <watchers/cloud_status_watcher.h>
 
 namespace nx::vms::client::core {
 

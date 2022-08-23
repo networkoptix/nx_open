@@ -3,19 +3,20 @@
 #include "logon_data_helpers.h"
 
 #include <finders/systems_finder.h>
-#include <helpers/system_helpers.h>
 #include <network/system_helpers.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
-#include <watchers/cloud_status_watcher.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 
 namespace nx::vms::client::core {
 
 std::optional<LogonData> cloudLogonData(const QString& systemId)
 {
     static const auto kLogTag = nx::utils::log::Tag(typeid(LogonData));
-    if (!NX_ASSERT(qnCloudStatusWatcher->status() != QnCloudStatusWatcher::LoggedOut))
+    if (!NX_ASSERT(qnCloudStatusWatcher->status() != CloudStatusWatcher::LoggedOut))
         return std::nullopt;
 
     const auto system = qnSystemsFinder->getSystem(systemId);
@@ -28,7 +29,7 @@ std::optional<LogonData> cloudLogonData(const QString& systemId)
     LogonData result;
     nx::utils::Url url;
 
-    result.expectedServerId = helpers::preferredCloudServer(systemId);
+    result.expectedServerId = settings()->preferredCloudServer(systemId);
     if (result.expectedServerId)
     {
         if (system->isReachableServer(result.expectedServerId.value()))

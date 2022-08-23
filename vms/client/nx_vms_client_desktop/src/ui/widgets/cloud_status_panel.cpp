@@ -6,6 +6,8 @@
 #include <QtWidgets/QMenu>
 
 #include <nx/branding.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/skin.h>
@@ -17,13 +19,13 @@
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
-#include <watchers/cloud_status_watcher.h>
 
 // TODO: #dklychkov Uncomment when cloud login is implemented
 //#define DIRECT_CLOUD_CONNECT
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
+using nx::vms::client::core::CloudStatusWatcher;
 
 namespace {
 
@@ -75,12 +77,12 @@ QnCloudStatusPanel::QnCloudStatusPanel(QWidget* parent):
     setHelpTopic(this, Qn::MainWindow_TitleBar_Cloud_Help);
 
     connect(this, &QnCloudStatusPanel::justPressed, qnCloudStatusWatcher,
-        &QnCloudStatusWatcher::updateSystems);
+        &CloudStatusWatcher::updateSystems);
 
     connect(this, &QnCloudStatusPanel::clicked, this,
         [this, d]
         {
-            if (qnCloudStatusWatcher->status() == QnCloudStatusWatcher::LoggedOut)
+            if (qnCloudStatusWatcher->status() == CloudStatusWatcher::LoggedOut)
             {
                 context()->menu()->trigger(action::LoginToCloud);
                 return;
@@ -91,9 +93,9 @@ QnCloudStatusPanel::QnCloudStatusPanel(QWidget* parent):
                 {
                     switch (qnCloudStatusWatcher->status())
                     {
-                        case QnCloudStatusWatcher::Online:
+                        case CloudStatusWatcher::Online:
                             return d->loggedInMenu;
-                        case QnCloudStatusWatcher::Offline:
+                        case CloudStatusWatcher::Offline:
                             return d->offlineMenu;
                         default:
                             return nullptr;
@@ -159,14 +161,14 @@ QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel* parent)
     offlineMenu->addSeparator();
     offlineMenu->addAction(q->action(action::LogoutFromCloud));
 
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged, this,
+    connect(qnCloudStatusWatcher, &CloudStatusWatcher::statusChanged, this,
         &QnCloudStatusPanelPrivate::updateUi);
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::cloudLoginChanged, this,
+    connect(qnCloudStatusWatcher, &CloudStatusWatcher::cloudLoginChanged, this,
         &QnCloudStatusPanelPrivate::updateUi);
 
 #ifdef DIRECT_CLOUD_CONNECT
     systemsMenu = loggedInMenu->addMenu(QnCloudStatusPanel::tr("Connect to Server"));
-    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::cloudSystemsChanged, this, &QnCloudStatusPanelPrivate::updateSystems);
+    connect(qnCloudStatusWatcher, &CloudStatusWatcher::cloudSystemsChanged, this, &QnCloudStatusPanelPrivate::updateSystems);
     updateSystems();
 #endif
 }
@@ -181,17 +183,17 @@ void QnCloudStatusPanelPrivate::updateUi()
 
     switch (qnCloudStatusWatcher->status())
     {
-        case QnCloudStatusWatcher::LoggedOut:
+        case CloudStatusWatcher::LoggedOut:
             q->setText(QString());
             q->setIcon(loggedOutIcon);
             q->setToolButtonStyle(Qt::ToolButtonIconOnly);
             break;
-        case QnCloudStatusWatcher::Online:
+        case CloudStatusWatcher::Online:
             q->setText(effectiveUserName);
             q->setIcon(loggedInIcon);
             q->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
             break;
-        case QnCloudStatusWatcher::Offline:
+        case CloudStatusWatcher::Offline:
             q->setText(effectiveUserName);
             q->setIcon(offlineIcon);
             q->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);

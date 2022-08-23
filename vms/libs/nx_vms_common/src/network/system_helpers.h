@@ -44,4 +44,7 @@ NX_VMS_COMMON_API bool serverBelongsToCurrentSystem(
 
 NX_VMS_COMMON_API bool serverBelongsToCurrentSystem(const QnMediaServerResourcePtr& server);
 
+/** Server address to access it using cloud sockets. */
+NX_VMS_COMMON_API QString serverCloudHost(const QString& systemId, const QnUuid& serverId);
+
 } // helpers

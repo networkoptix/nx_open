@@ -19,6 +19,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/url.h>
 #include <nx/vms/api/data/layout_data.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/network_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -27,7 +28,6 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <utils/common/delayed.h>
-#include <watchers/cloud_status_watcher.h>
 
 #include "cross_system_layout_resource.h"
 
@@ -66,7 +66,7 @@ using core::NetworkManager;
 struct CloudLayoutsManager::Private
 {
     CloudLayoutsManager* const q;
-    QPointer<QnCloudStatusWatcher> cloudStatusWatcher = appContext()->cloudStatusWatcher();
+    QPointer<core::CloudStatusWatcher> cloudStatusWatcher = appContext()->cloudStatusWatcher();
     bool online = false;
     std::unique_ptr<SystemContext> systemContext = std::make_unique<SystemContext>(
         SystemContext::Mode::cloudLayouts,
@@ -277,7 +277,7 @@ struct CloudLayoutsManager::Private
 
     void saveLayout(const QnLayoutResourcePtr& layout, SaveCallback callback)
     {
-        if (!NX_ASSERT(cloudStatusWatcher->status() == QnCloudStatusWatcher::Status::Online))
+        if (!NX_ASSERT(cloudStatusWatcher->status() == core::CloudStatusWatcher::Status::Online))
             return;
 
         if (!NX_ASSERT(layout->hasFlags(Qn::cross_system)))
@@ -302,7 +302,7 @@ struct CloudLayoutsManager::Private
 
     void deleteLayout(const QnLayoutResourcePtr& layout)
     {
-        if (!NX_ASSERT(cloudStatusWatcher->status() == QnCloudStatusWatcher::Status::Online))
+        if (!NX_ASSERT(cloudStatusWatcher->status() == core::CloudStatusWatcher::Status::Online))
             return;
 
         sendDeleteLayoutRequest(layout->getId());
@@ -336,11 +336,12 @@ CloudLayoutsManager::CloudLayoutsManager(QObject* parent):
 {
     NX_ASSERT(d->cloudStatusWatcher);
     connect(d->cloudStatusWatcher.data(),
-        &QnCloudStatusWatcher::statusChanged,
+        &core::CloudStatusWatcher::statusChanged,
         this,
         [this]()
         {
-            d->setOnline(d->cloudStatusWatcher->status() == QnCloudStatusWatcher::Status::Online);
+            d->setOnline(
+                d->cloudStatusWatcher->status() == core::CloudStatusWatcher::Status::Online);
         });
 
      appContext()->addSystemContext(d->systemContext.get());

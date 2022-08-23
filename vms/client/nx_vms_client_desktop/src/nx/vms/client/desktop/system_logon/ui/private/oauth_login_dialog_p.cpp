@@ -12,11 +12,11 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/async_handler_executor.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/oauth_client.h>
 #include <nx/vms/client/desktop/common/widgets/webview_widget.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
-#include <watchers/cloud_status_watcher.h>
 
 #include "../oauth_login_dialog.h"
 #include "../oauth_login_placeholder.h"

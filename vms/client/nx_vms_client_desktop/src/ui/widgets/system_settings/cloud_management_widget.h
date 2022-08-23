@@ -5,12 +5,7 @@
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-namespace Ui
-{
-    class CloudManagementWidget;
-}
-
-class QnCloudUrlHelper;
+namespace Ui { class CloudManagementWidget; }
 
 namespace nx::vms::client::desktop{ class ConnectToCloudTool; }
 
@@ -37,6 +32,5 @@ private:
 
 private:
     QScopedPointer<Ui::CloudManagementWidget> ui;
-    QnCloudUrlHelper* m_cloudUrlHelper;
     QPointer<nx::vms::client::desktop::ConnectToCloudTool> m_connectTool;
 };

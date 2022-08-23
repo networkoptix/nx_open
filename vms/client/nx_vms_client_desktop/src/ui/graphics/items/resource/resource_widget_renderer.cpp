@@ -3,11 +3,8 @@
 #include "resource_widget_renderer.h"
 
 #include <camera/gl_renderer.h>
-#include <utils/common/performance.h>
-
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
-
 #include <nx/streaming/config.h>
 
 #include "decodedpicturetoopengluploader.h"

@@ -12,16 +12,17 @@
 
 #include <client/client_settings.h>
 #include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/range_adapters.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/common/widgets/checkable_header_view.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -45,7 +46,6 @@
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
-using namespace nx::vms::common;
 
 namespace {
 
@@ -359,7 +359,7 @@ QnDeprecatedUserManagementWidget::Private::Private(QnDeprecatedUserManagementWid
     connect(sortModel, &QAbstractItemModel::rowsRemoved, this, &Private::modelUpdated);
     connect(sortModel, &QAbstractItemModel::dataChanged, this, &Private::modelUpdated);
 
-    connect(q->globalSettings(), &SystemSettings::ldapSettingsChanged,
+    connect(q->globalSettings(), &nx::vms::common::SystemSettings::ldapSettingsChanged,
         this, &Private::updateLdapState);
 }
 

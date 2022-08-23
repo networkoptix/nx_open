@@ -24,6 +24,7 @@ class LogsManagementWatcher;
 class ObjectDisplaySettings;
 class RadassController;
 class ResourceFactory;
+class ResourcesChangesManager;
 class RunningInstancesManager;
 class SharedMemoryManager;
 class SystemContext;
@@ -183,6 +184,8 @@ public:
     UploadManager* uploadManager() const;
 
     QnResourceDiscoveryManager* resourceDiscoveryManager() const;
+
+    ResourcesChangesManager* resourcesChangesManager() const;
 
 signals:
     void systemContextAdded(SystemContext* systemContext);

@@ -10,9 +10,10 @@
 #include <nx/reflect/instrument.h>
 #include <nx/reflect/json.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/webview_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
-#include <watchers/cloud_status_watcher.h>
 
 #include "../setup_wizard_dialog.h"
 

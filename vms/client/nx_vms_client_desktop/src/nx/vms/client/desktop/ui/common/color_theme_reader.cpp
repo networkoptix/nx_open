@@ -5,7 +5,6 @@
 #include <QtCore/QRegularExpression>
 
 #include <nx/fusion/serialization/json_functions.h>
-#include <utils/common/evaluator.h>
 #include <utils/common/hash.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/range_adapters.h>

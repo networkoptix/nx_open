@@ -1,7 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "remote_connection_factory.h"
-#include "private/remote_connection_factory_requests.h"
 
 #include <memory>
 
@@ -11,23 +10,25 @@
 #include <common/common_module_aware.h>
 #include <network/system_helpers.h>
 #include <nx/network/address_resolver.h>
+#include <nx/network/http/auth_tools.h>
 #include <nx/network/nx_network_ini.h>
 #include <nx/network/socket_global.h>
-#include <nx/network/http/auth_tools.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/thread/thread_util.h>
 #include <nx/vms/client/core/ini.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <nx_ec/ec_api_fwd.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
 #include <utils/email/email.h>
-#include <watchers/cloud_status_watcher.h>
 
 #include "certificate_verifier.h"
 #include "cloud_connection_factory.h"
 #include "network_manager.h"
+#include "private/remote_connection_factory_requests.h"
 #include "remote_connection.h"
 #include "remote_connection_user_interaction_delegate.h"
 

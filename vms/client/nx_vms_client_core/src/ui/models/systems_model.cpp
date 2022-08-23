@@ -227,7 +227,7 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
                 return QString(); // No owner for local system
 
             const bool isLoggedIn =
-                (d->controller->cloudStatus() != QnCloudStatusWatcher::LoggedOut);
+                (d->controller->cloudStatus() != CloudStatusWatcher::LoggedOut);
             if (isLoggedIn && (d->controller->cloudLogin() == system->ownerAccountEmail()))
             {
                 return tr("Your System");

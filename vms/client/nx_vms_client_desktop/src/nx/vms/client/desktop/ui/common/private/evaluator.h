@@ -134,7 +134,7 @@ namespace Qee {
     typedef QVector<Instruction> Program;
 
 
-    class NX_VMS_CLIENT_CORE_API Parser {
+    class Parser {
         Q_DECLARE_TR_FUNCTIONS(Qee::Parser)
     public:
         Parser(Lexer *lexer): m_lexer(lexer) {};
@@ -220,8 +220,7 @@ namespace Qee {
         virtual QVariant resolveConstant(const QString &name) const = 0;
     };
 
-
-    class NX_VMS_CLIENT_CORE_API Evaluator {
+    class Evaluator {
         Q_DECLARE_TR_FUNCTIONS(Qee::Evaluator)
     public:
         Evaluator();

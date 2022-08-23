@@ -31,8 +31,7 @@
 #include <nx_ec/managers/abstract_webpage_manager.h>
 #include <utils/common/delayed.h>
 
-using namespace nx;
-using namespace nx::vms::client::core;
+namespace nx::vms::client::desktop {
 
 namespace {
 
@@ -54,10 +53,10 @@ using ReplyProcessorFunction = std::function<void(int reqId, ec2::ErrorCode erro
  * Create handler that will be called in the callee thread and only if we have not changed the
  * actual connection session.
  */
-ReplyProcessorFunction makeReplyProcessor(QnResourcesChangesManager* manager,
+ReplyProcessorFunction makeReplyProcessor(ResourcesChangesManager* manager,
     ReplyProcessorFunction handler)
 {
-    QPointer<QnResourcesChangesManager> guard(manager);
+    QPointer<ResourcesChangesManager> guard(manager);
     const auto sessionGuid = manager->sessionId();
     QPointer<QThread> thread(QThread::currentThread());
     return
@@ -89,7 +88,7 @@ using ResourceCallbackFunction = std::function<void(bool, const QnSharedResource
 * actual connection session.
 */
 template<typename ResourceType, typename BackupType>
-ReplyProcessorFunction makeSaveResourceReplyProcessor(QnResourcesChangesManager* manager,
+ReplyProcessorFunction makeSaveResourceReplyProcessor(ResourcesChangesManager* manager,
     QnSharedResourcePointer<ResourceType> resource,
     ResourceCallbackFunction<ResourceType> callback = ResourceCallbackFunction<ResourceType>())
 {
@@ -194,20 +193,18 @@ QList<QnUuid> idListFromResList(const QList<ResourcePtrType>& resList)
 
 } // namespace
 
-template<> QnResourcesChangesManager* Singleton<QnResourcesChangesManager>::s_instance = nullptr;
-
-QnResourcesChangesManager::QnResourcesChangesManager(QObject* parent):
+ResourcesChangesManager::ResourcesChangesManager(QObject* parent):
     base_type(parent)
 {}
 
-QnResourcesChangesManager::~QnResourcesChangesManager()
+ResourcesChangesManager::~ResourcesChangesManager()
 {}
 
 /************************************************************************/
 /* Generic block                                                        */
 /************************************************************************/
 
-void QnResourcesChangesManager::deleteResources(
+void ResourcesChangesManager::deleteResources(
     const QnResourceList& resources,
     const GenericCallbackFunction& callback)
 {
@@ -271,13 +268,13 @@ void QnResourcesChangesManager::deleteResources(
 /* Cameras block                                                        */
 /************************************************************************/
 
-void QnResourcesChangesManager::saveCamera(const QnVirtualCameraResourcePtr& camera,
+void ResourcesChangesManager::saveCamera(const QnVirtualCameraResourcePtr& camera,
     CameraChangesFunction applyChanges)
 {
     saveCameras(QnVirtualCameraResourceList() << camera, applyChanges);
 }
 
-void QnResourcesChangesManager::saveCameras(const QnVirtualCameraResourceList& cameras,
+void ResourcesChangesManager::saveCameras(const QnVirtualCameraResourceList& cameras,
     CameraChangesFunction applyChanges)
 {
     if (!applyChanges)
@@ -292,7 +289,7 @@ void QnResourcesChangesManager::saveCameras(const QnVirtualCameraResourceList& c
      saveCamerasBatch(cameras, batchFunction);
 }
 
-void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceList& cameras,
+void ResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceList& cameras,
     GenericChangesFunction applyChanges,
     GenericCallbackFunction callback)
 {
@@ -341,7 +338,7 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
     resourcePropertyDictionary()->saveParamsAsync(idList);
 }
 
-void QnResourcesChangesManager::saveCamerasCore(const QnVirtualCameraResourceList& cameras,
+void ResourcesChangesManager::saveCamerasCore(const QnVirtualCameraResourceList& cameras,
     CameraChangesFunction applyChanges)
 {
     NX_ASSERT(applyChanges); //< ::saveCamerasCore is to be removed someday.
@@ -388,13 +385,13 @@ void QnResourcesChangesManager::saveCamerasCore(const QnVirtualCameraResourceLis
 /* Servers block                                                        */
 /************************************************************************/
 
-void QnResourcesChangesManager::saveServer(const QnMediaServerResourcePtr &server,
+void ResourcesChangesManager::saveServer(const QnMediaServerResourcePtr &server,
     ServerChangesFunction applyChanges)
 {
     saveServers(QnMediaServerResourceList() << server, applyChanges);
 }
 
-void QnResourcesChangesManager::saveServers(const QnMediaServerResourceList &servers,
+void ResourcesChangesManager::saveServers(const QnMediaServerResourceList &servers,
     ServerChangesFunction applyChanges)
 {
     if (!applyChanges)
@@ -409,7 +406,7 @@ void QnResourcesChangesManager::saveServers(const QnMediaServerResourceList &ser
     saveServersBatch(servers, batchFunction);
 }
 
-void QnResourcesChangesManager::saveServersBatch(
+void ResourcesChangesManager::saveServersBatch(
     const QnMediaServerResourceList &servers,
     GenericChangesFunction applyChanges)
 {
@@ -467,7 +464,7 @@ void QnResourcesChangesManager::saveServersBatch(
 /* Users block                                                          */
 /************************************************************************/
 
-void QnResourcesChangesManager::saveUser(const QnUserResourcePtr& user,
+void ResourcesChangesManager::saveUser(const QnUserResourcePtr& user,
     QnUserResource::DigestSupport digestSupport,
     UserChangesFunction applyChanges,
     UserCallbackFunction callback)
@@ -505,7 +502,7 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr& user,
     connection->getUserManager(Qn::kSystemAccess)->save(apiUser, replyProcessor, this);
 }
 
-void QnResourcesChangesManager::saveUsers(
+void ResourcesChangesManager::saveUsers(
     const QnUserResourceList& users, QnUserResource::DigestSupport digestSupport)
 {
     if (users.empty())
@@ -544,7 +541,7 @@ void QnResourcesChangesManager::saveUsers(
     connection->getUserManager(Qn::kSystemAccess)->save(apiUsers, replyProcessor, this);
 }
 
-void QnResourcesChangesManager::saveAccessibleResources(const QnResourceAccessSubject& subject,
+void ResourcesChangesManager::saveAccessibleResources(const QnResourceAccessSubject& subject,
     const QSet<QnUuid>& accessibleResources)
 {
     auto connection = messageBusConnection();
@@ -573,7 +570,7 @@ void QnResourcesChangesManager::saveAccessibleResources(const QnResourceAccessSu
         accessRights, makeReplyProcessor(this, handler), this);
 }
 
-void QnResourcesChangesManager::saveUserRole(const nx::vms::api::UserRoleData& role,
+void ResourcesChangesManager::saveUserRole(const nx::vms::api::UserRoleData& role,
     RoleCallbackFunction callback)
 {
     auto connection = messageBusConnection();
@@ -602,7 +599,7 @@ void QnResourcesChangesManager::saveUserRole(const nx::vms::api::UserRoleData& r
         role, makeReplyProcessor(this, handler), this);
 }
 
-void QnResourcesChangesManager::removeUserRole(const QnUuid& id)
+void ResourcesChangesManager::removeUserRole(const QnUuid& id)
 {
     auto connection = messageBusConnection();
     if (!connection)
@@ -625,7 +622,7 @@ void QnResourcesChangesManager::removeUserRole(const QnUuid& id)
         id, makeReplyProcessor(this, handler), this);
 }
 
-void QnResourcesChangesManager::saveVideoWall(const QnVideoWallResourcePtr& videoWall,
+void ResourcesChangesManager::saveVideoWall(const QnVideoWallResourcePtr& videoWall,
     VideoWallChangesFunction applyChanges,
     VideoWallCallbackFunction callback)
 {
@@ -650,7 +647,7 @@ void QnResourcesChangesManager::saveVideoWall(const QnVideoWallResourcePtr& vide
         apiVideowall, replyProcessor, this);
 }
 
-void QnResourcesChangesManager::saveWebPage(const QnWebPageResourcePtr& webPage,
+void ResourcesChangesManager::saveWebPage(const QnWebPageResourcePtr& webPage,
     WebPageChangesFunction applyChanges,
     WebPageCallbackFunction callback)
 {
@@ -676,3 +673,5 @@ void QnResourcesChangesManager::saveWebPage(const QnWebPageResourcePtr& webPage,
     // TODO: #sivanov Properties are not rolled back in case of failure.
     resourcePropertyDictionary()->saveParamsAsync({webPage->getId()});
 }
+
+} // namespace nx::vms::client::desktop

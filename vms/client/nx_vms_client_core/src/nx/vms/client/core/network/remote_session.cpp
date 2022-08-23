@@ -19,7 +19,9 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/client/core/ini.h>
+#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/credentials_manager.h>
 #include <nx/vms/client/core/utils/cloud_session_token_updater.h>
 #include <nx/vms/client/core/utils/reconnect_helper.h>
@@ -27,7 +29,6 @@
 #include <transaction/message_bus_adapter.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
-#include <watchers/cloud_status_watcher.h>
 
 #include "network_module.h"
 #include "remote_connection.h"

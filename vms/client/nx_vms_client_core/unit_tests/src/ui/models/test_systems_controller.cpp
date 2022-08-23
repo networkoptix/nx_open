@@ -4,7 +4,12 @@
 
 #include <algorithm>
 
-using TileVisibilityScope = nx::vms::client::core::welcome_screen::TileVisibilityScope;
+#include <nx/vms/client/core/application_context.h>
+
+namespace nx::vms::client::core {
+namespace test {
+
+using TileVisibilityScope = welcome_screen::TileVisibilityScope;
 
 TestSystemsController::TestSystemsController(QObject* parent): AbstractSystemsController(parent)
 {
@@ -14,7 +19,7 @@ TestSystemsController::~TestSystemsController()
 {
 }
 
-QnCloudStatusWatcher::Status TestSystemsController::cloudStatus() const
+CloudStatusWatcher::Status TestSystemsController::cloudStatus() const
 {
     return qnCloudStatusWatcher->status();
 }
@@ -83,3 +88,5 @@ void TestSystemsController::emitSystemLost(const QString& systemId)
     emit systemLost(systemId);
 }
 
+} // namespace test
+} // namespace nx::vms::client::core

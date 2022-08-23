@@ -8,11 +8,12 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/providers/resource_access_provider.h>
-#include <core/resource_management/resources_changes_manager.h>
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
