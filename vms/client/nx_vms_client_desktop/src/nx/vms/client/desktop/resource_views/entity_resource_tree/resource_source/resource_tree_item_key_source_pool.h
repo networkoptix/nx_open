@@ -143,7 +143,7 @@ public:
     UniqueResourceSourcePtr fakeServerResourcesSource();
 
     /**
-     * Provides ids of cloud systems retrieved from the QnCloudSystemsFinder instance.
+     * Provides ids of cloud systems retrieved from the CloudSystemsFinder instance.
      */
     UniqueStringSourcePtr cloudSystemsSource();
 

@@ -5,302 +5,330 @@
 #include <QtCore/QPointer>
 #include <QtCore/QTimer>
 
+#include <api/http_client_pool.h>
 #include <network/system_helpers.h>
-#include <nx/network/deprecated/asynchttpclient.h>
-#include <nx/network/http/async_http_client_reply.h>
 #include <nx/network/rest/result.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/url/url_builder.h>
+#include <nx/utils/async_handler_executor.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/scope_guard.h>
 #include <nx/utils/qset.h>
-#include <utils/common/delayed.h>
+#include <watchers/cloud_status_watcher.h>
 
-static const std::chrono::milliseconds kCloudSystemsRefreshPeriod = std::chrono::seconds(15);
-static const std::chrono::milliseconds kSystemConnectTimeout = std::chrono::seconds(12);
+using namespace std::chrono;
+using nx::network::http::ClientPool;
+
+namespace nx::vms::client::core {
 
 namespace {
 
+static constexpr milliseconds kCloudSystemsRefreshPeriod = 1min;
+
+// First connection to a system (cloud and not cloud) may take a long time because it may require
+// hole punching.
+static constexpr nx::network::http::AsyncClient::Timeouts kDefaultTimeouts{
+    .sendTimeout = 1min,
+    .responseReadTimeout = 1min,
+    .messageBodyReadTimeout = 1min
+};
+
 nx::utils::Url makeCloudModuleInformationUrl(const QString& cloudSystemId)
 {
-    nx::utils::Url url;
-    url.setScheme(nx::network::http::kSecureUrlSchemeName);
-    url.setHost(cloudSystemId);
-    url.setPort(0);
-    url.setPath("/api/moduleInformation");
-    return url;
+    return nx::network::url::Builder()
+        .setScheme(nx::network::http::kSecureUrlSchemeName)
+        .setHost(cloudSystemId)
+        .setPort(0)
+        .setPath("/api/moduleInformation")
+        .toUrl();
 }
 
 } // namespace
 
-QnCloudSystemsFinder::QnCloudSystemsFinder(QObject* parent):
+struct CloudSystemsFinder::Private
+{
+    CloudSystemsFinder* const q;
+    mutable nx::Mutex mutex{nx::Mutex::Recursive};
+    std::unique_ptr<ClientPool> clientPool = std::make_unique<ClientPool>();
+    using SystemsHash = QHash<QString, QnCloudSystemDescriptionPtr>;
+    SystemsHash systems;
+
+    void pingAllSystems()
+    {
+        NX_MUTEX_LOCKER lock(&mutex);
+        for (auto it = systems.begin(); it != systems.end(); ++it)
+            pingSystem(it.key());
+    }
+
+    void pingSystem(const QString& cloudSystemId)
+    {
+        static const QnUuid kAdapterFuncId = QnUuid::createUuid();
+        NX_DEBUG(this, "Cloud system <%1>: send moduleInformation request", cloudSystemId);
+
+        ClientPool::Request request;
+        request.method = nx::network::http::Method::get;
+        request.url = makeCloudModuleInformationUrl(cloudSystemId);
+
+        ClientPool::ContextPtr context(new ClientPool::Context(
+            kAdapterFuncId,
+            nx::network::ssl::kAcceptAnyCertificate));
+        context->request = request;
+        context->completionFunc = nx::utils::AsyncHandlerExecutor(q).bind(
+            [this, cloudSystemId](ClientPool::ContextPtr context)
+            {
+                onRequestComplete(cloudSystemId, context);
+            });
+        context->setTargetThread(q->thread());
+        clientPool->sendRequest(context);
+    }
+
+    bool tryRemoveAlienServerUnderLock(const nx::vms::api::ModuleInformation& serverInfo)
+    {
+        const auto serverId = serverInfo.id;
+        for (auto it = systems.begin(); it != systems.end(); ++it)
+        {
+            const auto cloudSystemId = it.key();
+            const bool remove = (cloudSystemId != serverInfo.cloudSystemId);
+            const auto system = it.value();
+            if (remove && system->containsServer(serverId))
+                system->removeServer(serverId);
+        }
+        return true;
+    }
+
+    void clearServersUnderLock(QnCloudSystemDescriptionPtr systemDescription)
+    {
+        const auto currentServers = systemDescription->servers();
+        NX_ASSERT(currentServers.size() <= 1, "There should be one or zero servers");
+        for (const auto& current: currentServers)
+            systemDescription->removeServer(current.id);
+    }
+
+    bool parseModuleInformation(
+        const QByteArray& messageBody,
+        nx::vms::api::ModuleInformationWithAddresses* moduleInformation)
+    {
+        nx::network::rest::JsonResult jsonReply;
+        if (!NX_ASSERT(QJson::deserialize(messageBody, &jsonReply)))
+        {
+            NX_DEBUG(this, "Failed to deserialize json reply:\n%1", messageBody);
+            return false;
+        }
+
+        if (!NX_ASSERT(QJson::deserialize(jsonReply.reply, moduleInformation)))
+        {
+            NX_DEBUG(this, "Failed to deserialize module information:\n%1", messageBody);
+            return false;
+        }
+
+        return true;
+    }
+
+    void onRequestComplete(const QString& cloudSystemId, ClientPool::ContextPtr context)
+    {
+        const bool success = context->hasSuccessfulResponse();
+        if (success)
+        {
+             NX_VERBOSE(this, "Cloud system <%1>: ping successful", cloudSystemId);
+        }
+        else
+        {
+            NX_VERBOSE(this,
+                "Cloud system <%1>: ping failure: status %2 error %3",
+                cloudSystemId,
+                context->getStatusCode(),
+                context->systemError);
+        }
+
+        const NX_MUTEX_LOCKER lock(&mutex);
+        const auto it = systems.find(cloudSystemId);
+        if (it == systems.end())
+            return;
+
+        const auto systemDescription = it.value();
+        nx::vms::api::ModuleInformationWithAddresses moduleInformation;
+
+        if (!success
+            || !parseModuleInformation(context->response.messageBody, &moduleInformation)
+                // Prevent hanging of fake online cloud servers.
+            || !tryRemoveAlienServerUnderLock(moduleInformation)
+            || (cloudSystemId != moduleInformation.cloudSystemId)
+            )
+        {
+            clearServersUnderLock(systemDescription);
+            return;
+        }
+
+        const auto serverId = moduleInformation.id;
+        if (systemDescription->containsServer(serverId))
+        {
+            systemDescription->updateServer(moduleInformation);
+        }
+        else
+        {
+            clearServersUnderLock(systemDescription);
+            systemDescription->addServer(moduleInformation, /*priority*/ 0);
+        }
+
+        nx::utils::Url url;
+        url.setHost(moduleInformation.cloudId());
+        url.setScheme(nx::network::http::kSecureUrlSchemeName);
+        systemDescription->setServerHost(serverId, url);
+        NX_DEBUG(this,
+            "Cloud system <%1>: set server <%2> url to %3",
+            cloudSystemId,
+            serverId.toString(),
+            url.toString(QUrl::RemovePassword));
+    }
+
+    void updateStateUnderLock(const QnCloudSystemList& targetSystems)
+    {
+        for (const auto system: targetSystems)
+        {
+            const auto itCurrent = systems.find(system.cloudId);
+            if (itCurrent == systems.end())
+                continue;
+
+            const auto systemDescription = itCurrent.value();
+            NX_DEBUG(this, "Set online state for the system \"%1\" <%2> to [%3]",
+                systemDescription->name(), systemDescription->id(), system.online);
+            systemDescription->setOnline(system.online);
+
+            NX_DEBUG(this, "Update last known system version for the system \"%1\" <%2> to [%3]",
+                systemDescription->name(), systemDescription->id(), system.newestServerVersion);
+            const auto version = nx::utils::SoftwareVersion(system.newestServerVersion);
+            systemDescription->updateLastKnownVersion(version);
+
+            NX_DEBUG(this, "Set 2fa state for the system \"%1\" <%2> to [%3]",
+                systemDescription->name(), systemDescription->id(), system.system2faEnabled);
+            systemDescription->set2faEnabled(system.system2faEnabled);
+        }
+    }
+
+    void onCloudStatusChanged(QnCloudStatusWatcher::Status status)
+    {
+        setCloudSystems(status == QnCloudStatusWatcher::Online
+            ? qnCloudStatusWatcher->cloudSystems()
+            : QnCloudSystemList());
+    }
+
+    void setCloudSystems(const QnCloudSystemList& value)
+    {
+        Private::SystemsHash updatedSystems;
+        for (const auto& system: value)
+        {
+            NX_ASSERT(!helpers::isNewSystem(system), "Cloud system can't be NEW system");
+
+            const auto targetId = helpers::getTargetSystemId(system);
+            const auto systemDescription = QnCloudSystemDescription::create(
+                targetId,
+                system.localId,
+                system.name,
+                system.ownerAccountEmail,
+                system.ownerFullName,
+                system.online,
+                system.system2faEnabled);
+            updatedSystems.insert(system.cloudId, systemDescription);
+        }
+
+        typedef QSet<QString> IdsSet;
+
+        const auto newIds = nx::utils::toQSet(updatedSystems.keys());
+
+        QHash<QString, QnUuid> removedTargetIds;
+
+        {
+            NX_MUTEX_LOCKER lock(&mutex);
+
+            const auto oldIds = nx::utils::toQSet(systems.keys());
+            const auto addedCloudIds = IdsSet(newIds).subtract(oldIds);
+
+            const auto removedCloudIds = IdsSet(oldIds).subtract(newIds);
+            for (const auto addedCloudId : addedCloudIds)
+            {
+                const auto system = updatedSystems[addedCloudId];
+                emit q->systemDiscovered(system);
+
+                systems.insert(addedCloudId, system);
+                pingSystem(addedCloudId);
+            }
+
+            for (const auto removedCloudId : removedCloudIds)
+            {
+                const auto system = systems[removedCloudId];
+                removedTargetIds.insert(system->id(), system->localId());
+                systems.remove(removedCloudId);
+            }
+
+            updateStateUnderLock(value);
+        }
+
+        for (const auto id: removedTargetIds.keys())
+        {
+            const auto localId = removedTargetIds[id];
+            emit q->systemLostInternal(id, localId);
+            emit q->systemLost(id);
+        }
+    }
+};
+
+CloudSystemsFinder::CloudSystemsFinder(QObject* parent):
     base_type(parent),
-    m_updateSystemsTimer(new QTimer(this)),
-    m_mutex(nx::Mutex::Recursive),
-    m_systems()
+    d(new Private{.q=this})
 {
     NX_ASSERT(qnCloudStatusWatcher, "Cloud watcher is not ready");
 
     connect(qnCloudStatusWatcher,
         &QnCloudStatusWatcher::statusChanged,
         this,
-        &QnCloudSystemsFinder::onCloudStatusChanged);
+        [this](auto status) { d->onCloudStatusChanged(status); });
     connect(qnCloudStatusWatcher,
         &QnCloudStatusWatcher::cloudSystemsChanged,
         this,
-        &QnCloudSystemsFinder::setCloudSystems);
+        [this](const auto& value) { d->setCloudSystems(value); });
 
-    connect(m_updateSystemsTimer.get(), &QTimer::timeout, this, &QnCloudSystemsFinder::updateSystems);
-    m_updateSystemsTimer->setInterval(kCloudSystemsRefreshPeriod.count());
-    m_updateSystemsTimer->start();
+    d->clientPool->setDefaultTimeouts(kDefaultTimeouts);
 
-    onCloudStatusChanged(qnCloudStatusWatcher->status());
+    auto updateSystemsTimer = new QTimer(this);
+    updateSystemsTimer->callOnTimeout(
+        [this] { d->pingAllSystems(); });
+    updateSystemsTimer->setInterval(kCloudSystemsRefreshPeriod);
+    updateSystemsTimer->start();
+
+    d->onCloudStatusChanged(qnCloudStatusWatcher->status());
 }
 
-QnCloudSystemsFinder::~QnCloudSystemsFinder()
+CloudSystemsFinder::~CloudSystemsFinder()
 {
-    const NX_MUTEX_LOCKER lock(&m_mutex);
-    for (auto request: m_runningRequests)
-        request->pleaseStopSync();
-    m_runningRequests.clear();
+    d->clientPool->stop(/*invokeCallbacks*/ false);
 }
 
-QnAbstractSystemsFinder::SystemDescriptionList QnCloudSystemsFinder::systems() const
+QnAbstractSystemsFinder::SystemDescriptionList CloudSystemsFinder::systems() const
 {
     SystemDescriptionList result;
 
-    const NX_MUTEX_LOCKER lock(&m_mutex);
-    for (const auto& system : m_systems)
+    const NX_MUTEX_LOCKER lock(&d->mutex);
+    for (const auto& system: d->systems)
         result.append(system.dynamicCast<QnBaseSystemDescription>());
 
     return result;
 }
 
-QnSystemDescriptionPtr QnCloudSystemsFinder::getSystem(const QString &id) const
+QnSystemDescriptionPtr CloudSystemsFinder::getSystem(const QString &id) const
 {
-    const NX_MUTEX_LOCKER lock(&m_mutex);
+    const NX_MUTEX_LOCKER lock(&d->mutex);
 
-    const auto systemDescriptions = m_systems.values();
-    const auto predicate = [id](const QnSystemDescriptionPtr &desc)
-    {
-        return (desc->id() == id);
-    };
-
-    const auto it = std::find_if(systemDescriptions.begin()
-        , systemDescriptions.end(), predicate);
-
-    return (it == systemDescriptions.end()
-        ? QnSystemDescriptionPtr() : (*it).dynamicCast<QnBaseSystemDescription>());
-}
-
-
-void QnCloudSystemsFinder::onCloudStatusChanged(QnCloudStatusWatcher::Status status)
-{
-    setCloudSystems(status == QnCloudStatusWatcher::Online
-        ? qnCloudStatusWatcher->cloudSystems()
-        : QnCloudSystemList());
-}
-
-void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
-{
-    SystemsHash updatedSystems;
-    for (const auto& system: systems)
-    {
-        NX_ASSERT(!helpers::isNewSystem(system), "Cloud system can't be NEW system");
-
-        const auto targetId = helpers::getTargetSystemId(system);
-        const auto systemDescription = QnCloudSystemDescription::create(
-            targetId, system.localId, system.name, system.ownerAccountEmail,
-            system.ownerFullName, system.online, system.system2faEnabled);
-        updatedSystems.insert(system.cloudId, systemDescription);
-    }
-
-    typedef QSet<QString> IdsSet;
-
-    const auto newIds = nx::utils::toQSet(updatedSystems.keys());
-
-    QHash<QString, QnUuid> removedTargetIds;
-
-    {
-        const NX_MUTEX_LOCKER lock(&m_mutex);
-
-        const auto oldIds = nx::utils::toQSet(m_systems.keys());
-        const auto addedCloudIds = IdsSet(newIds).subtract(oldIds);
-
-        const auto removedCloudIds = IdsSet(oldIds).subtract(newIds);
-        for (const auto addedCloudId : addedCloudIds)
+    const auto systemDescriptions = d->systems.values();
+    const auto predicate =
+        [id](const QnSystemDescriptionPtr &desc)
         {
-            const auto system = updatedSystems[addedCloudId];
-            emit systemDiscovered(system);
-
-            m_systems.insert(addedCloudId, system);
-            pingCloudSystem(addedCloudId);
-        }
-
-        for (const auto removedCloudId : removedCloudIds)
-        {
-            const auto system = m_systems[removedCloudId];
-            removedTargetIds.insert(system->id(), system->localId());
-            m_systems.remove(removedCloudId);
-        }
-
-        updateStateUnsafe(systems);
-    }
-
-    for (const auto id: removedTargetIds.keys())
-    {
-        const auto localId = removedTargetIds[id];
-        emit systemLostInternal(id, localId);
-        emit systemLost(id);
-    }
-}
-
-void QnCloudSystemsFinder::updateStateUnsafe(const QnCloudSystemList& targetSystems)
-{
-    for (const auto system: targetSystems)
-    {
-        const auto itCurrent = m_systems.find(system.cloudId);
-        if (itCurrent == m_systems.end())
-            continue;
-
-        const auto systemDescription = itCurrent.value();
-        NX_DEBUG(this, "Set online state for the system \"%1\" <%2> to [%3]",
-            systemDescription->name(), systemDescription->id(), system.online);
-        systemDescription->setOnline(system.online);
-
-        NX_DEBUG(this, "Update last known system version for the system \"%1\" <%2> to [%3]",
-            systemDescription->name(), systemDescription->id(), system.newestServerVersion);
-        const auto version = nx::utils::SoftwareVersion(system.newestServerVersion);
-        systemDescription->updateLastKnownVersion(version);
-
-        NX_DEBUG(this, "Set 2fa state for the system \"%1\" <%2> to [%3]",
-            systemDescription->name(), systemDescription->id(), system.system2faEnabled);
-        systemDescription->set2faEnabled(system.system2faEnabled);
-    }
-}
-
-void QnCloudSystemsFinder::tryRemoveAlienServer(const nx::vms::api::ModuleInformation& serverInfo)
-{
-    const auto serverId = serverInfo.id;
-    for (auto it = m_systems.begin(); it != m_systems.end(); ++it)
-    {
-        const auto cloudSystemId = it.key();
-        const bool remove = (cloudSystemId != serverInfo.cloudSystemId);
-        const auto system = it.value();
-        if (remove && system->containsServer(serverId))
-            system->removeServer(serverId);
-    }
-}
-
-void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
-{
-    auto client = nx::network::http::AsyncHttpClient::create(nx::network::ssl::kAcceptAnyCertificate);
-    client->setAuthType(nx::network::http::AuthType::authBasicAndDigest);
-    // First connection to a system (cloud and not cloud) may take a long time
-    // because it may require hole punching.
-    client->setSendTimeoutMs(kSystemConnectTimeout.count());
-    client->setResponseReadTimeoutMs(kSystemConnectTimeout.count());
-
-    QPointer<QObject> guard(this);
-
-    const auto handleReply =
-        [this, guard, cloudSystemId](nx::network::http::AsyncHttpClientPtr reply)
-        {
-            const bool failed = reply->failed();
-            const auto data = failed ? nx::Buffer() : reply->fetchMessageBodyBuffer();
-
-            NX_ASSERT(guard, "If we are already in the handler, destructor must wait on stopSync.");
-
-            executeInThread(guard->thread(),
-                [this, guard, cloudSystemId, failed, data, reply]
-                {
-                    if (!guard)
-                        return;
-
-                    NX_VERBOSE(
-                        this,
-                        "Cloud system <%1>: ping request reply:\nSuccess: %2\n%3\n%4",
-                        cloudSystemId,
-                        !failed,
-                        reply->response() ? reply->response()->toString() : "none",
-                        data);
-
-                    const NX_MUTEX_LOCKER lock(&m_mutex);
-                    m_runningRequests.removeOne(reply);
-
-                    const auto it = m_systems.find(cloudSystemId);
-                    if (it == m_systems.end())
-                        return;
-
-                    const auto systemDescription = it.value();
-                    const auto clearServers =
-                        [systemDescription]()
-                        {
-                            const auto currentServers = systemDescription->servers();
-                            NX_ASSERT(currentServers.size() <= 1,
-                                "There should be one or zero servers");
-                            for (const auto& current : currentServers)
-                                systemDescription->removeServer(current.id);
-                        };
-
-                    auto clearServersTask = nx::utils::makeScopeGuard(clearServers);
-                    if (failed)
-                        return;
-
-                    nx::network::rest::JsonResult jsonReply;
-                    if (!QJson::deserialize(data, &jsonReply))
-                    {
-                        NX_DEBUG(this, nx::format("Cloud system <%1>: failed to deserialize json reply:\n%2"),
-                            cloudSystemId, data);
-                        return;
-                    }
-
-                    nx::vms::api::ModuleInformationWithAddresses moduleInformation;
-                    if (!QJson::deserialize(jsonReply.reply, &moduleInformation))
-                    {
-                        NX_DEBUG(this, nx::format("Cloud system <%1>: failed to deserialize module information:\n%2"),
-                            cloudSystemId, data);
-                        return;
-                    }
-
-                    // Prevent hanging of fake online cloud servers.
-                    tryRemoveAlienServer(moduleInformation);
-                    if (cloudSystemId != moduleInformation.cloudSystemId)
-                        return;
-
-                    clearServersTask.disarm();
-
-                    const auto serverId = moduleInformation.id;
-                    if (systemDescription->containsServer(serverId))
-                    {
-                        systemDescription->updateServer(moduleInformation);
-                    }
-                    else
-                    {
-                        clearServers();
-                        systemDescription->addServer(moduleInformation, 0);
-                    }
-
-                    nx::utils::Url url;
-                    url.setHost(moduleInformation.cloudId());
-                    url.setScheme(nx::network::http::kSecureUrlSchemeName);
-                    systemDescription->setServerHost(serverId, url);
-                    NX_DEBUG(this, nx::format("Cloud system <%1>: set server <%2> url to %3"),
-                        cloudSystemId, serverId.toString(), url.toString(QUrl::RemovePassword));
-                }); //< executeInThread
-            reply->pleaseStopSync();
-
+            return (desc->id() == id);
         };
 
-    NX_DEBUG(this, nx::format("Cloud system <%1>: send moduleInformation request"), cloudSystemId);
-    client->doGet(makeCloudModuleInformationUrl(cloudSystemId), handleReply);
+    const auto it = std::find_if(systemDescriptions.begin(), systemDescriptions.end(), predicate);
 
-    // This method is always called under mutex.
-    m_runningRequests.push_back(client);
+    return (it == systemDescriptions.end()
+        ? QnSystemDescriptionPtr()
+        : (*it).dynamicCast<QnBaseSystemDescription>());
 }
 
-void QnCloudSystemsFinder::updateSystems()
-{
-    const NX_MUTEX_LOCKER lock(&m_mutex);
-    for (auto it = m_systems.begin(); it != m_systems.end(); ++it)
-        pingCloudSystem(it.key());
-}
+} // namespace nx::vms::client::core
