@@ -1370,7 +1370,7 @@ QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) con
 
     QList<int> result;
 
-    const auto transcodingCoded = d->archiveReader
+    const auto transcodingCodec = d->archiveReader
         ? d->archiveReader->getTranscodingCodec()
         : QnArchiveStreamReader(d->resource).getTranscodingCodec();
 
@@ -1383,7 +1383,7 @@ QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) con
         : std::vector<AbstractVideoDecoder*>();
     const auto getQuality =
         [input = media_player_quality_chooser::Params{
-            transcodingCoded,
+            transcodingCodec,
             d->liveMode,
             d->positionMs,
             camera,
