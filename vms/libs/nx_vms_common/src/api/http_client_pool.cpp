@@ -78,6 +78,14 @@ bool ClientPool::Context::isCanceled() const
     return state == State::canceled;
 }
 
+bool ClientPool::Context::hasSuccessfulResponse() const
+{
+    const auto statusCode = getStatusCode();
+    return hasResponse()
+        && systemError == SystemError::noError
+        && nx::network::http::StatusCode::isSuccessCode(response.statusLine.statusCode);
+}
+
 void ClientPool::Context::setCanceled()
 {
     NX_MUTEX_LOCKER lock(&mutex);

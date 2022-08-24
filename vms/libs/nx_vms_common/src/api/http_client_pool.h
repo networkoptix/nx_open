@@ -4,20 +4,17 @@
 
 #include <optional>
 
-#include <QtCore/QSharedPointer>
 #include <QtCore/QPointer>
+#include <QtCore/QSharedPointer>
 
 #include <nx/network/http/http_async_client.h>
-
 #include <nx/string.h>
 #include <nx/utils/impl_ptr.h>
 
 namespace nx::network::http {
 
 /**
- * A pool of http connections.
- * rest::ServerConnection sends requests through this pool using ClientPool::sendRequest(...)
- * and catching responses from event ClientPool::void done(...)
+ * A pool of http connections, effectively limiting number of simultaneous requests.
  */
 class NX_VMS_COMMON_API ClientPool: public QObject
 {
@@ -153,6 +150,9 @@ public:
          * It happens only when client calls ClientPool::terminate(...) for this request.
          */
         bool isCanceled() const;
+
+        /** Whether request completed successfully. */
+        bool hasSuccessfulResponse() const;
 
         /**
          * Get total time for request.
