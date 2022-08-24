@@ -41,7 +41,7 @@ QnSystemsFinder::QnSystemsFinder(QObject* parent):
         kScopeFinder,
     };
 
-    auto cloudSystemsFinder = new QnCloudSystemsFinder(this);
+    auto cloudSystemsFinder = new CloudSystemsFinder(this);
     addSystemsFinder(cloudSystemsFinder, kCloudPriority);
 
     SearchAddressManager* searchUrlManager = new SearchAddressManager(this);

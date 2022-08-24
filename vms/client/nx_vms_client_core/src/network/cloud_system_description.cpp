@@ -4,7 +4,7 @@
 
 #include <nx/utils/software_version.h>
 
-QnCloudSystemDescription::PointerType QnCloudSystemDescription::create(
+QnCloudSystemDescriptionPtr QnCloudSystemDescription::create(
     const QString& systemId,
     const QnUuid& localSystemId,
     const QString& systemName,
@@ -13,7 +13,7 @@ QnCloudSystemDescription::PointerType QnCloudSystemDescription::create(
     bool online,
     bool system2faEnabled)
 {
-    return PointerType(new QnCloudSystemDescription(
+    return QnCloudSystemDescriptionPtr(new QnCloudSystemDescription(
         systemId, localSystemId, systemName, ownerEmail, ownerFullName, online, system2faEnabled));
 }
 
