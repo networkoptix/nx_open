@@ -12,9 +12,7 @@ class QnCloudSystemDescription: public QnSystemDescription
     using base_type = QnSystemDescription;
 
 public:
-    typedef QSharedPointer<QnCloudSystemDescription> PointerType;
-
-    static PointerType create(
+    static QSharedPointer<QnCloudSystemDescription> create(
         const QString& systemId,
         const QnUuid& localSystemId,
         const QString& systemName,
@@ -64,3 +62,5 @@ private:
     bool m_online;
     bool m_system2faEnabled = false;
 };
+
+using QnCloudSystemDescriptionPtr = QSharedPointer<QnCloudSystemDescription>;

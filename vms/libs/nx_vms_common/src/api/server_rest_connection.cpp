@@ -1930,11 +1930,9 @@ Handle ServerConnection::executeRequest(
                     "<%1> Got %2 byte(s) reply of content type %3. OS error: %4, HTTP status: %5",
                     id, context->response.messageBody.size(), QString::fromLatin1(context->response.contentType), osErrorCode, statusCode);
 
-                bool success = (osErrorCode == SystemError::noError
-                    && statusCode >= nx::network::http::StatusCode::ok
-                    && statusCode <= nx::network::http::StatusCode::partialContent);
-
-                auto internal_callback = [callback, success, id, context]()
+                const bool success = context->hasSuccessfulResponse();
+                auto internal_callback =
+                    [callback, success, id, context]()
                     {
                         callback(success, id, context->response.messageBody, context->response.headers);
                     };
