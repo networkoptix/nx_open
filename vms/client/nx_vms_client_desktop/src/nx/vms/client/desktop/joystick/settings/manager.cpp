@@ -182,32 +182,32 @@ QList<DevicePtr> Manager::devices() const
     return m_devices.values();
 }
 
-JoystickDescriptor Manager::getDefaultDeviceDescription(const QString& id) const
+JoystickDescriptor Manager::getDefaultDeviceDescription(const QString& modelName) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    return d->defaultDeviceConfigs[id];
+    return d->defaultDeviceConfigs[modelName];
 }
 
-JoystickDescriptor Manager::getDeviceDescription(const QString& id) const
+JoystickDescriptor Manager::getDeviceDescription(const QString& modelName) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    return m_deviceConfigs[id];
+    return m_deviceConfigs[modelName];
 }
 
 void Manager::updateDeviceDescription(const JoystickDescriptor& config)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    m_deviceConfigs[config.id] = config;
+    m_deviceConfigs[config.model] = config;
     for (auto& actionFactory: d->actionFactories)
     {
-        if (actionFactory->id() == config.id)
+        if (actionFactory->modelName() == config.model)
             actionFactory->updateConfig(config);
     }
 
     const auto device = std::find_if(m_devices.begin(), m_devices.end(),
         [config] (const DevicePtr& device)
         {
-            return device->id() == config.id;
+            return device->modelName() == config.model;
         });
 
     if (device != m_devices.end())
@@ -235,14 +235,14 @@ void Manager::loadConfig()
         d->deviceConfigRelativePath);
 }
 
-void Manager::saveConfig(const QString& id)
+void Manager::saveConfig(const QString& model)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
 
-    const auto configPathIter = d->deviceConfigRelativePath.find(id);
+    const auto configPathIter = d->deviceConfigRelativePath.find(model);
     if (configPathIter == d->deviceConfigRelativePath.end())
     {
-        NX_ASSERT(false, "Invalid joystick device id.");
+        NX_ASSERT(false, "Invalid joystick device model.");
         return;
     }
 
@@ -265,10 +265,10 @@ void Manager::saveConfig(const QString& id)
         return;
     }
 
-    const auto configIter = m_deviceConfigs.find(id);
+    const auto configIter = m_deviceConfigs.find(model);
     if (configIter == m_deviceConfigs.end())
     {
-        NX_ASSERT(false, "Invalid joystick device id.");
+        NX_ASSERT(false, "Invalid joystick device model.");
         return;
     }
 
@@ -294,11 +294,11 @@ void Manager::loadConfig(
             continue;
         }
 
-        destConfigs[config.id] = config;
+        destConfigs[config.model] = config;
 
         const QString tempAbsPath = QFileInfo(file).absoluteFilePath();
         const int startPos = tempAbsPath.indexOf(kSettingsDirName);
-        destIdToRelativePath[config.id] = tempAbsPath.mid(startPos);
+        destIdToRelativePath[config.model] = tempAbsPath.mid(startPos);
     }
 }
 

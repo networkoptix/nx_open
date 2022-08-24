@@ -53,7 +53,18 @@ void ManagerHid::enumerateDevices()
             {
                 const QString modelName =
                     QString::fromWCharArray(currentDevice->product_string);
-                NX_VERBOSE(this, "A new Joystick has been found: %1 (%2)", modelName, path);
+
+                const QString manufacturerName =
+                    QString::fromWCharArray(currentDevice->manufacturer_string);
+
+                const auto id =
+                    QString::number(currentDevice->vendor_id, 16).rightJustified(4, '0') + "_"
+                    + QString::number(currentDevice->product_id, 16).rightJustified(4, '0');
+
+                NX_VERBOSE(this,
+                    "A new Joystick has been found. "
+                    "Manufacturer: %1, model: %2, id: %3, path: %4",
+                    manufacturerName, modelName, id, path);
 
                 const auto iter = std::find_if(m_deviceConfigs.begin(), m_deviceConfigs.end(),
                     [modelName](const JoystickDescriptor& description)
@@ -71,12 +82,10 @@ void ManagerHid::enumerateDevices()
                 }
                 else
                 {
-                    const auto id =
-                        QString::number(currentDevice->vendor_id, 16).rightJustified(4, '0') + "_"
-                        + QString::number(currentDevice->product_id, 16).rightJustified(4, '0');
-
-                    NX_VERBOSE(this, "An unsupported Joystick has been found: %1, %2 (%3)",
-                        modelName, id, path);
+                    NX_VERBOSE(this,
+                        "An unsupported Joystick has been found. "
+                        "Manufacturer: %1, model: %2, id: %3, path: %4",
+                        manufacturerName, modelName, id, path);
                 }
             }
         }
