@@ -4,6 +4,7 @@
 
 #include <iostream>
 
+#include <QtCore/QCoreApplication>
 #include <QtCore/QCryptographicHash>
 
 #include <common/common_module.h>
@@ -21,6 +22,7 @@
 #include <core/resource/user_resource.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/data/api_fwd.h>
+#include <nx/branding.h>
 #include <nx/cloud/db/client/data/auth_data.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/common/system_context.h>
@@ -59,6 +61,15 @@ ErrorCode canModifyStorage(const CanModifyStorageData& data)
 } // namespace transaction_descriptor
 
 namespace detail {
+
+namespace {
+
+struct ServerApiErrors
+{
+    Q_DECLARE_TR_FUNCTIONS(ServerApiErrors);
+};
+
+} // namespace
 
 struct InvalidGetHashHelper
 {
@@ -427,9 +438,9 @@ struct InvalidAccess
     template<typename Param>
     Result operator()(QnCommonModule*, const Qn::UserAccessData&, const Param&)
     {
-        static const QString kErrorMessage = NX_FMT("Invalid access check for %1", typeid(Param));
-        NX_ASSERT(false, kErrorMessage);
-        return Result(ErrorCode::forbidden, QString(kErrorMessage));
+        NX_ASSERT(false, "Invalid access check for %1", typeid(Param));
+        return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+            "Invalid access check for %1.", /*comment*/ "%1 is a C++ type name"), typeid(Param)));
     }
 };
 
@@ -439,8 +450,8 @@ struct InvalidAccessOut
     RemotePeerAccess operator()(QnCommonModule* commonModule,
         const Qn::UserAccessData&, const Param&)
     {
-        NX_ASSERT(false, "Invalid outgoing transaction access check (%1). We shouldn't be here.",
-            typeid(Param).name());
+        NX_ASSERT(false,
+            "Invalid outgoing transaction access check (%1).", typeid(Param));
         return RemotePeerAccess::Forbidden;
     }
 };
@@ -510,13 +521,12 @@ static Result checkExistingResourceAccess(
         return Result();
     }
 
-    const QString errorMessage = NX_FMT(
-        "User %1 with %2 permissions is asking for %3 resource with %4 permissions and fails",
+    return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+        "Request of User %1 with %2 permissions for %3 Resource with %4 permissions is forbidden."),
         userResource ? userResource->getName() : accessData.userId.toString(),
         accessData.access,
         resourceId,
-        permissions);
-    return Result(ErrorCode::forbidden, errorMessage);
+        permissions));
 }
 
 static Result checkReadResourceAccess(
@@ -574,18 +584,18 @@ struct ModifyResourceAccess
 
         if (!result)
         {
-            QString errorMessage = NX_FMT(
-                "User %1 is not permitted to modify %2",
-                userResource ? userResource->getId().toSimpleString() : QString(),
-                target ? target->getId().toSimpleString() : QString());
-            return Result(ErrorCode::forbidden, std::move(errorMessage));
+            return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+                "User '%1' is not permitted to modify %2."),
+                userResource ? userResource->getName() : QString(),
+                target ? target->getId().toSimpleString() : QString()));
         }
 
         auto typeDescriptor = qnResTypePool->getResourceType(param.typeId);
         if (!typeDescriptor)
         {
-            QString errorMessage = NX_FMT("Invalid resource type %1", param.typeId);
-            return Result(ErrorCode::badRequest, std::move(errorMessage));
+            return Result(ErrorCode::badRequest, nx::format(ServerApiErrors::tr(
+                "Invalid Resource type %1."),
+                param.typeId));
         }
 
         return Result();
@@ -602,7 +612,8 @@ struct ModifyStorageAccess
         if (param.url.isEmpty())
         {
             NX_DEBUG(this, "Declining save storage request because provided url is empty");
-            return Result(ErrorCode::badRequest, "Empty url is not allowed");
+            return Result(ErrorCode::badRequest, ServerApiErrors::tr(
+                "Empty Storage URL is not allowed."));
         }
 
         transaction_descriptor::CanModifyStorageData data;
@@ -647,11 +658,10 @@ struct RemoveResourceAccess
         if (!commonModule->systemContext()->resourceAccessManager()->hasPermission(
             userResource, target, Qn::RemovePermission))
         {
-            QString errorMessage = NX_FMT(
-                "User %1 is not permitted to remove %2",
-                userResource ? userResource->getId().toSimpleString() : QString(),
-                target ? target->getId().toSimpleString() : QString());
-            return Result(ErrorCode::forbidden, std::move(errorMessage));
+            return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+                "User '%1' is not permitted to remove %2."),
+                userResource ? userResource->getName() : QString(),
+                target ? target->getId().toSimpleString() : QString()));
         }
 
         return Result();
@@ -673,39 +683,47 @@ struct SaveUserAccess
             });
         if (hasUserWithSameName)
         {
-            QString errorMessage =
-                NX_FMT("Won't save user '%1' because of the name duplication", param.name);
-            return Result(ErrorCode::forbidden, std::move(errorMessage));
+            return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+                "User '%1' will not be saved because of the name duplication."), param.name));
         }
 
         const auto existingUser =
             commonModule->resourcePool()->getResourceById<QnUserResource>(param.id);
-
-        if (!existingUser && param.name.isEmpty())
-            return Result(ErrorCode::badRequest, "Won't save new user with empty name.");
-
         if (existingUser)
         {
             if (!param.externalId.isEmpty())
             {
                 const auto existingExternalId = existingUser->externalId();
                 if (!existingExternalId.isEmpty() && existingExternalId != param.externalId)
-                    return Result(ErrorCode::forbidden, "Change of externalId is forbidden");
+                {
+                    return Result(ErrorCode::forbidden, ServerApiErrors::tr(
+                        "Change of `externalId` is forbidden."));
+                }
             }
 
             if (param.digest != nx::vms::api::UserData::kHttpIsDisabledStub
                 && (param.isCloud || existingUser->getDigest() == param.digest)
                 && existingUser->getName() != param.name)
             {
-                QString errorMessage = NX_FMT(
-                    "Won't save existing user '%1' because names differ: '%1' vs '%2' and %3.",
-                    existingUser->getName(),
-                    param.name,
+                return Result(ErrorCode::forbidden,
                     param.isCloud
-                        ? "changing name is forbidden for cloud users"
-                        : "password has not been provided");
-
-                return Result(ErrorCode::forbidden, std::move(errorMessage));
+                        ? nx::format(ServerApiErrors::tr(
+                            "User '%1' will not be saved because names differ: "
+                            "'%1' vs '%2' and changing name is forbidden for %3 users.",
+                            /*comment*/ "%3 is the short Cloud name"),
+                            existingUser->getName(), param.name, nx::branding::shortCloudName())
+                        : nx::format(ServerApiErrors::tr(
+                            "User '%1' will not be saved because names differ: "
+                            "'%1' vs '%2' and `password` has not been provided."),
+                            existingUser->getName(), param.name));
+            }
+        }
+        else
+        {
+            if (param.name.isEmpty())
+            {
+                return Result(ErrorCode::badRequest, ServerApiErrors::tr(
+                    "User with empty name is not allowed."));
             }
         }
 
@@ -718,7 +736,9 @@ struct SaveUserAccess
             && ((existingUser && param.fullName != existingUser->fullName())
                 || (!existingUser && !param.fullName.isEmpty())))
         {
-            r.message = "Cloud user full name is controlled by the Cloud";
+            r.message = nx::format(ServerApiErrors::tr(
+                "User full name is controlled by the %1.", /*comment*/ "%1 is the short Cloud name"),
+                nx::branding::shortCloudName());
         }
         return r;
     }
@@ -738,10 +758,9 @@ struct ModifyCameraDataAccess
                 const auto expectedId = nx::vms::api::CameraData::physicalIdToId(param.physicalId);
                 if (expectedId != param.id)
                 {
-                    QString errorMessage = NX_FMT(
-                        "Expected camera id %1 != actual %2 (physicalId %3)",
-                        expectedId, param.id, param.physicalId);
-                    return Result(ErrorCode::badRequest, std::move(errorMessage));
+                    return Result(ErrorCode::badRequest, nx::format(ServerApiErrors::tr(
+                        "Expected Device id %1 is not equal to actual id %2 (`physicalId` %3)."),
+                        expectedId, param.id, param.physicalId));
                 }
             }
         }
@@ -839,12 +858,9 @@ struct ReadResourceParamAccess
             return Result();
         }
 
-        QString errorMessage = NX_FMT(
-            "User %1 with %2 permissions is asking for reading resource parameter %3 and fails",
-            accessData.userId,
-            accessData.access,
-            param.name);
-        return Result(ErrorCode::forbidden, std::move(errorMessage));
+        return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+            "Request of User %1 with %2 permissions to read Resource parameter `%3` is forbidden."),
+            accessData.userId, accessData.access, param.name));
     }
 };
 
@@ -914,8 +930,8 @@ struct ModifyResourceParamAccess
 
         if (kSystemAccessOnlyProperties.find(param.name) != kSystemAccessOnlyProperties.cend())
         {
-            return Result(ErrorCode::forbidden, NX_FMT(
-                "User '%1' with %2 permissions can not modify resource parameter '%3'",
+            return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+                "User '%1' with %2 permissions is not allowed to modify Resource parameter '%3'."),
                 userNameOrId(accessData, commonModule), accessData.access, param.name));
         }
 
@@ -946,16 +962,16 @@ struct ModifyResourceParamAccess
         {
             if (param.resourceId != commonModule->peerId())
             {
-                return Result(ErrorCode::forbidden,
-                    NX_FMT("Setting analytics storage for different server is forbidden"));
+                return Result(ErrorCode::forbidden, ServerApiErrors::tr(
+                    "Setting analytics Storage for a different Server is forbidden."));
             }
 
             const auto metadataStorageId = QnUuid::fromStringSafe(param.value);
             const auto ownServer = resPool->getResourceById<QnMediaServerResource>(param.resourceId);
             if (!NX_ASSERT(ownServer))
             {
-                return Result(ErrorCode::serverError,
-                    NX_FMT("Own server %1 does not exist", param.resourceId));
+                return Result(ErrorCode::serverError, nx::format(ServerApiErrors::tr(
+                    "Own Server %1 does not exist."), param.resourceId));
             }
 
             const auto ownStorages = ownServer->getStorages();
@@ -964,14 +980,14 @@ struct ModifyResourceParamAccess
 
             if (!storage)
             {
-                return Result(ErrorCode::badRequest,
-                    NX_FMT("Storage %1 does not belong to the server", param.value));
+                return Result(ErrorCode::badRequest, nx::format(ServerApiErrors::tr(
+                    "Storage %1 does not belong to this Server."), param.value));
             }
 
             if (!(*storage)->canStoreAnalytics())
             {
-                return Result(ErrorCode::forbidden,
-                    NX_FMT("Storage %1 can not store analytics", param.value));
+                return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+                    "Storage %1 can not store analytics."), param.value));
             }
         }
 
@@ -987,8 +1003,8 @@ struct ModifyResourceParamAccess
 
         return accessManager->hasPermission(userResource, target, permissions)
             ? Result()
-            : Result(ErrorCode::forbidden, NX_FMT(
-                "User '%1' with %2 permissions can not modify resource parameter of %3",
+            : Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+                "User '%1' with %2 permissions is not allowed to modify Resource parameter of %3."),
                 userNameOrId(userResource, accessData), accessData.access, param.resourceId));
     }
 
@@ -1083,8 +1099,8 @@ struct ModifyCameraAttributesAccess
         {
             if (param.scheduleEnabled)
             {
-                return Result(
-                    ErrorCode::forbidden, "Device creation with scheduleEnabled is forbidden.");
+                return Result(ErrorCode::forbidden, ServerApiErrors::tr(
+                    "`scheduleEnabled` set to true is not allowed for Device creation."));
             }
 
             if (param.checkResourceExists != nx::vms::api::CheckResourceExists::yes)
@@ -1097,12 +1113,9 @@ struct ModifyCameraAttributesAccess
         auto user = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
         if (!accessManager->hasPermission(user, camera, Qn::SavePermission))
         {
-            return Result(ErrorCode::forbidden,
-                "Saving Device attributes is forbidden: no saving permission.");
+            return Result(ErrorCode::forbidden, ServerApiErrors::tr(
+                "Saving Device attributes is forbidden: no saving permission."));
         }
-
-        using namespace nx::vms::license;
-        CamLicenseUsageHelper licenseUsageHelper(commonModule->systemContext());
 
         // Check the license if and only if recording goes from 'off' to 'on' state
         if (param.scheduleEnabled && !camera->isScheduleEnabled())
@@ -1114,10 +1127,9 @@ struct ModifyCameraAttributesAccess
             licenseUsageHelper.propose(camera, param.scheduleEnabled);
             if (licenseUsageHelper.isOverflowForCamera(camera))
             {
-                QString errorMessage = NX_FMT(
-                    "Saving CameraAttributesData %1 is forbidden: no license to enable recording.",
-                    param.cameraId);
-                return Result(ErrorCode::forbidden, std::move(errorMessage));
+                return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+                    "Set %1 `scheduleEnabled` to true is forbidden: no license to enable recording."),
+                    param.cameraId));
             }
         }
 
@@ -1224,8 +1236,8 @@ struct ModifyServerAttributesAccess
         auto user = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
         return accessManager->hasPermission(user, server, Qn::SavePermission)
             ? Result()
-            : Result(ErrorCode::forbidden,
-                "Saving Server attributes is forbidden: no saving permission.");
+            : Result(ErrorCode::forbidden, ServerApiErrors::tr(
+                "Saving Server attributes is forbidden: no saving permission."));
     }
 };
 
@@ -1240,12 +1252,11 @@ static Result userAccessHelper(
     auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
     if (!commonModule->systemContext()->resourceAccessManager()->hasGlobalPermission(userResource, permissions))
     {
-        QString errorMessage = NX_FMT(
-            "User %1 with %2 permissions is asking for %3 permissions and fails",
+        return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+            "User %1 with %2 permissions has no %3 permissions."),
             userResource ? userResource->getName() : accessData.userId.toString(),
             accessData.access,
-            permissions);
-        return Result(ErrorCode::forbidden, std::move(errorMessage));
+            permissions));
     }
 
     return Result();
@@ -1292,7 +1303,8 @@ struct SaveUserRoleAccess
     {
         if (auto r = AdminOnlyAccess()(commonModule, accessData, param); !r)
         {
-            r.message = NX_FMT("Saving user role is forbidden because the user has no admin access");
+            r.message = ServerApiErrors::tr(
+                "Saving Role is forbidden because the user has no admin access.");
             return r;
         }
 
@@ -1301,8 +1313,8 @@ struct SaveUserRoleAccess
         if (const auto cycledRole =
             nx::utils::find_if(parentRoles, [&](const auto& role) { return role.id == param.id; }))
         {
-            return Result(ErrorCode::forbidden, NX_FMT(
-                "Parent role cycle is forbidden: This role is already inherided by: %1",
+            return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+                "Parent Role cycle is forbidden. This Role is already inherided by '%1'."),
                 cycledRole->name));
         }
 
@@ -1312,7 +1324,10 @@ struct SaveUserRoleAccess
             {
                 const auto userRole = userRoleManager->userRole(param.id);
                 if (!userRole.externalId.isEmpty() && userRole.externalId != param.externalId)
-                    return Result(ErrorCode::forbidden, "Change of externalId is forbidden");
+                {
+                    return Result(ErrorCode::forbidden, ServerApiErrors::tr(
+                        "Change of `externalId` is forbidden."));
+                }
             }
         }
 
@@ -1329,7 +1344,8 @@ struct RemoveUserRoleAccess
     {
         if (auto r = AdminOnlyAccess()(commonModule, accessData, param); !r)
         {
-            r.message = NX_FMT("Removing user role is forbidden because the user has no admin access");
+            r.message = ServerApiErrors::tr(
+                "Removing Role is forbidden because the user has no admin access.");
             return r;
         }
 
@@ -1337,10 +1353,9 @@ struct RemoveUserRoleAccess
         {
             if (nx::utils::find_if(user->userRoleIds(), [&](const auto& id) { return id == param.id; }))
             {
-                QString errorMessage = NX_FMT(
-                    "Removing user role is forbidden because the role is still used by the user: %1",
-                    user->getName());
-                return Result(ErrorCode::forbidden, std::move(errorMessage));
+                return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+                    "Removing Role is forbidden because it is still used by '%1'."),
+                    user->getName()));
             }
         }
 
@@ -1348,10 +1363,9 @@ struct RemoveUserRoleAccess
         {
             if (nx::utils::find_if(role.parentRoleIds, [&](const auto& id) { return id == param.id; }))
             {
-                QString errorMessage = NX_FMT(
-                    "Removing user role is forbidden because the role is still inherited by the role: %1",
-                    role.name);
-                return Result(ErrorCode::forbidden, std::move(errorMessage));
+                return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+                    "Removing Role is forbidden because it is still inherited by '%1'."),
+                    role.name));
             }
         }
 
@@ -1376,8 +1390,8 @@ struct ModifyAccessRightsChecker
                 || ((param.checkResourceExists == nx::vms::api::CheckResourceExists::yes) && user
                     && (user->userRole() == Qn::UserRole::customUserRole)))
             {
-                return Result(ErrorCode::forbidden,
-                    "User with a custom user role is not allowed to change shared Resources.");
+                return Result(ErrorCode::forbidden, ServerApiErrors::tr(
+                    "User with a custom User Role is not allowed to change shared Resources."));
             }
         }
 
@@ -1398,8 +1412,9 @@ struct ModifyAccessRightsChecker
                 if (!param.resourceIds.empty()
                     && (param.checkResourceExists == nx::vms::api::CheckResourceExists::yes))
                 {
-                    return Result(ErrorCode::badRequest, NX_FMT(
-                        "To set shared Resources, %1 must be a valid User or Role", param.userId));
+                    return Result(ErrorCode::badRequest, nx::format(ServerApiErrors::tr(
+                        "To set shared Resources, %1 must be a valid User or Role."),
+                        param.userId));
                 }
             }
             else
@@ -1412,7 +1427,7 @@ struct ModifyAccessRightsChecker
 
         return accessManager->hasGlobalPermission(accessData, GlobalPermission::admin)
             ? Result()
-            : Result(ErrorCode::forbidden, "Admin permissions required.");
+            : Result(ErrorCode::forbidden, ServerApiErrors::tr("Admin permissions required."));
     }
 };
 
@@ -1427,8 +1442,8 @@ struct VideoWallControlAccess
             ;
             !r)
         {
-            r.message = NX_FMT(
-                "Access check for ApiVideoWallControlMessageData failed for user %1",
+            r.message = nx::format(ServerApiErrors::tr(
+                "Access check for ApiVideoWallControlMessageData failed for the user %1."),
                 accessData.userId);
             return r;
         }
@@ -1449,11 +1464,10 @@ struct LayoutTourAccess
         {
             return Result();
         }
-        QString errorMessage = NX_FMT(
-            "User %1 is not allowed to modify layout tour with parentId %2",
+        return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+            "User %1 is not allowed to modify the Layout Tour with parentId %2."),
             accessData.userId,
-            tour.parentId);
-        return Result(ErrorCode::forbidden, std::move(errorMessage));
+            tour.parentId));
     }
 };
 
@@ -1476,7 +1490,8 @@ struct InvalidFilterFunc
     template<typename ParamType>
     void operator()(QnCommonModule*, const Qn::UserAccessData&, ParamType&)
     {
-        NX_ASSERT(0, lit("This transaction (%1) param type doesn't support filtering").arg(typeid(ParamType).name()));
+        NX_ASSERT(false,
+            "This transaction (%1) param type doesn't support filtering", typeid(ParamType));
     }
 };
 
@@ -1584,12 +1599,11 @@ struct ModifyListAccess
         FilterListByAccess<SingleAccess>()(commonModule, accessData, tmpContainer);
         if (paramContainer.size() != tmpContainer.size())
         {
-            QString errorMessage = NX_FMT(
-                "Modiying of %1 entries out of %2 is not allowed for %3",
+            return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+                "Modiying of %1 entries out of %2 is not allowed for %3.", /*comment*/ "%3 is a C++ type name"),
                 paramContainer.size() - tmpContainer.size(),
                 paramContainer.size(),
-                typeid(ParamContainer));
-            return Result(ErrorCode::forbidden, std::move(errorMessage));
+                typeid(ParamContainer)));
         }
         return Result();
     }
