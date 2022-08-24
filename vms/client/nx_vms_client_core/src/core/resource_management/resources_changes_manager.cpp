@@ -551,7 +551,7 @@ void QnResourcesChangesManager::saveAccessibleResources(const QnResourceAccessSu
     if (!connection)
         return;
 
-    auto backup = sharedResourcesManager()->sharedResources(subject);
+    auto backup = sharedResourcesManager()->sharedResourcesInternal(subject);
     if (backup == accessibleResources)
         return;
 
@@ -561,8 +561,9 @@ void QnResourcesChangesManager::saveAccessibleResources(const QnResourceAccessSu
         [this, subject, backup](int /*reqID*/, ec2::ErrorCode errorCode)
         {
             const bool success = errorCode == ec2::ErrorCode::ok;
+            // Ignore setSharedResources() constraints here since we are just reverting the change.
             if (!success)
-                sharedResourcesManager()->setSharedResources(subject, backup);
+                sharedResourcesManager()->setSharedResourcesInternal(subject, backup);
         };
 
     vms::api::AccessRightsData accessRights;
