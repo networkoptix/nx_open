@@ -434,10 +434,15 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     executeLater(
         [this]()
         {
-            handleItemDataChanged(
-                m_itemId,
-                Qn::ItemPausedRole,
-                qnResourceRuntimeDataManager->layoutItemData(m_itemId, Qn::ItemPausedRole));
+            const QVariant isPaused = qnResourceRuntimeDataManager->layoutItemData(
+                m_itemId, Qn::ItemPausedRole);
+            if (isPaused.isValid())
+            {
+                handleItemDataChanged(
+                    m_itemId,
+                    Qn::ItemPausedRole,
+                    isPaused);
+            }
         }, this);
 
     const bool canRotate = accessController()->hasPermissions(item->layout()->resource(),
