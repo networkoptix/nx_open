@@ -26,7 +26,6 @@ namespace nx::vms::api::analytics {
  *
  * See the description of the fields in manifests.md.
  */
-
 struct NX_VMS_API EngineManifest
 {
     struct ObjectAction

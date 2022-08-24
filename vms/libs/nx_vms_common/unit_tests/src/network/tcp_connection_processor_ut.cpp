@@ -29,8 +29,8 @@ public:
     TestConnectionProcessor(
         std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         QnTcpListener* owner)
-    :
         QnTCPConnectionProcessor(std::move(socket), owner)
+        :
     {
     }
     virtual ~TestConnectionProcessor() override
