@@ -70,7 +70,7 @@ void QnAttachToVideowallDialog::updateLicencesUsage()
     int used = pcUuid.isNull() || m_videowall.isNull()
         ? 0
         : boost::count_if(
-            m_videowall->items()->getItems(),
+            m_videowall->items()->getItems().values(),
             [pcUuid](const QnVideoWallItem& item) { return item.pcUuid == pcUuid; });
     int localScreensChange = ui->manageWidget->proposedItemsCount() - used;
 

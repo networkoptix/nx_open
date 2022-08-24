@@ -29,6 +29,7 @@ auto licenseSortPriority =
             case nx::vms::license::QnLicenseErrorCode::NoError:
                 return 2; /* Active licenses at the end. */
             case nx::vms::license::QnLicenseErrorCode::Expired:
+            case nx::vms::license::QnLicenseErrorCode::TemporaryExpired:
                 return 1; /* Expired licenses in the middle. */
             default:
                 return 0; /* Erroneous licenses at the beginning. */

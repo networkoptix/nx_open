@@ -111,6 +111,7 @@ static std::array<LicenseTypeInfo, Qn::LC_Count> licenseTypeInfo = {
     LicenseTypeInfo{Qn::LC_Free, "free", /*allowedToShareChannel*/ true},
     LicenseTypeInfo{Qn::LC_Bridge, "bridge", false},
     LicenseTypeInfo{Qn::LC_Nvr, "nvr", /*allowedToShareChannel*/ true},
+    LicenseTypeInfo{Qn::LC_Cloud, "cloud", /*allowedToShareChannel*/ true},
     LicenseTypeInfo{Qn::LC_Invalid, "", false},
 };
 
@@ -201,12 +202,12 @@ QnLicense::RegionalSupport QnLicense::regionalSupport() const
     return m_regionalSupport;
 }
 
-void QnLicense::loadLicenseBlock( const QByteArray& licenseBlock )
+void QnLicense::loadLicenseBlock(const QByteArray& licenseBlock)
 {
-    QByteArray v1LicenseBlock, v2LicenseBlock;
-    parseLicenseBlock( licenseBlock, &v1LicenseBlock, &v2LicenseBlock );
-    verify( v1LicenseBlock, v2LicenseBlock );
     this->m_rawLicense = licenseBlock;
+    QByteArray v1LicenseBlock, v2LicenseBlock;
+    parseLicenseBlock(licenseBlock, &v1LicenseBlock, &v2LicenseBlock);
+    verify(v1LicenseBlock, v2LicenseBlock);
 }
 
 QnLicensePtr QnLicense::readFromStream(QTextStream& stream)
@@ -270,6 +271,8 @@ QString QnLicense::displayName(Qn::LicenseType licenseType)
             return tr("Bridge");
         case Qn::LC_Nvr:
             return tr("NVR");
+        case Qn::LC_Cloud:
+            return nx::branding::shortCloudName();
         case Qn::LC_Invalid:
             return tr("Invalid");
         default:
@@ -310,6 +313,9 @@ QString QnLicense::longDisplayName(Qn::LicenseType licenseType)
             return tr("Bridge Licenses");
         case Qn::LC_Nvr:
             return tr("NVR Licenses");
+        case Qn::LC_Cloud:
+            return tr("%1 Licenses", "%1 is the short cloud name (like Cloud)")
+                .arg(nx::branding::shortCloudName());
         case Qn::LC_Invalid:
             return tr("Invalid Licenses");
         default:
@@ -345,6 +351,10 @@ QString QnLicense::displayText(Qn::LicenseType licenseType, int count)
             return tr("%n Bridge Licenses", "", count);
         case Qn::LC_Nvr:
             return tr("%n NVR Licenses", "", count);
+        case Qn::LC_Cloud:
+            return tr("%n %1 Licenses",
+                "%1 is the short cloud name (like Cloud)", count)
+                .arg(nx::branding::shortCloudName());
         case Qn::LC_Invalid:
             return tr("%n Invalid Licenses", "", count);
         default:
@@ -392,6 +402,11 @@ QString QnLicense::displayText(Qn::LicenseType licenseType, int count, int total
         case Qn::LC_Nvr:
             return tr("%n/%1 NVR Licenses",
                 "%n will be replaced by the total count", count).arg(total);
+        case Qn::LC_Cloud:
+            return tr("%n/%1 %2 Licenses",
+                "%n will be replaced by the total count,"
+                "%2 is the short cloud name (like Cloud)", count).arg(total)
+                .arg(nx::branding::shortCloudName());
         case Qn::LC_Invalid:
             return tr("%n/%1 Invalid Licenses",
                 "%n will be replaced by the total count", count).arg(total);
@@ -500,6 +515,8 @@ Qn::LicenseType QnLicense::type() const
 
     if (xclass().toLower().toUtf8() == ::licenseTypeInfo[Qn::LC_VideoWall].className)
         return Qn::LC_VideoWall;
+    if (xclass().toLower().toUtf8() == ::licenseTypeInfo[Qn::LC_Cloud].className)
+        return Qn::LC_Cloud;
 
     // Saas licenses are supported.
     // Expiring non-saas licenses are demo licenses, which support provides by request.
@@ -516,6 +533,20 @@ Qn::LicenseType QnLicense::type() const
     return Qn::LC_Invalid;
 }
 
+
+void QnLicense::fillCompatibleFields()
+{
+    m_class = m_name = ::licenseTypeInfo[Qn::LC_Cloud].className;
+    m_key = m_cloudData.params.orderParams.licenseKey.toUtf8();
+    auto value = m_cloudData.params.services["localRecording"]["totalChannelNumber"];
+    m_cameraCount = value.toInt();
+    m_version = m_cloudData.version.toString();
+    m_brand = m_cloudData.params.orderParams.brand;
+    m_expiration = m_cloudData.state.expirationDate;
+    m_deactivationsCount = m_cloudData.state.deactivationsRemaining;
+    m_signature = m_cloudData.signature.toUtf8();
+}
+
 void QnLicense::parseLicenseBlock(
     const QByteArray& licenseBlock,
     QByteArray* const v1LicenseBlock,
@@ -523,6 +554,16 @@ void QnLicense::parseLicenseBlock(
 {
     int n = 0;
     m_orderType.clear();
+
+    if (licenseBlock.startsWith("{"))
+    {
+        // Cloud license.
+        nx::reflect::json::deserialize(
+            std::string_view(licenseBlock.data(), licenseBlock.size()),
+            &m_cloudData);
+        fillCompatibleFields();
+        return;
+    }
 
     for (QByteArray line: licenseBlock.split('\n'))
     {
@@ -582,7 +623,14 @@ void QnLicense::parseLicenseBlock(
 
 void QnLicense::verify(const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock)
 {
-    if (isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), nxRSAPublicKey3)
+    if (type() == Qn::LC_Cloud)
+    {
+        auto rawData = m_rawLicense;
+        rawData.replace(m_cloudData.signature, "");
+        m_isValid1 = isSignatureMatch(rawData.data(),
+            QByteArray::fromBase64(m_signature), nxRSAPublicKey3);
+    }
+    else if (isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), nxRSAPublicKey3)
         || isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), nxRSAPublicKey2)
         || isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), nxRSAPublicKey))
     {
@@ -616,6 +664,11 @@ QString QnLicense::orderType() const
 bool QnLicense::isSaas() const
 {
     return orderType() == "saas";
+}
+
+const nx::vms::api::CloudLicenseData& QnLicense::cloudData() const
+{
+    return m_cloudData;
 }
 
 //-------------------------------------------------------------------------------------------------
