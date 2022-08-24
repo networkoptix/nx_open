@@ -13,6 +13,7 @@
 #include <nx/network/http/http_types.h>
 #include <nx/reflect/instrument.h>
 #include <nx/utils/serialization/qt_core_types.h>
+#include <nx/utils/serialization/qt_geometry_reflect_json.h>
 #include <nx/utils/url_query.h>
 
 #include <analytics/common/object_metadata.h>

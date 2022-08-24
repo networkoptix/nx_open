@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/instrument.h>
 #include <nx/utils/log/log_level.h>
 
 namespace nx::network::maintenance::log {
@@ -22,6 +23,7 @@ struct Filter
 #define Filter_Fields (level)(tags)
 
 QN_FUSION_DECLARE_FUNCTIONS(Filter, (json), NX_NETWORK_API)
+NX_REFLECTION_INSTRUMENT(Filter, Filter_Fields)
 
 //-------------------------------------------------------------------------------------------------
 
@@ -36,6 +38,7 @@ struct Logger
 #define Logger_Fields (id)(path)(filters)(defaultLevel)
 
 QN_FUSION_DECLARE_FUNCTIONS(Logger, (json), NX_NETWORK_API)
+NX_REFLECTION_INSTRUMENT(Logger, Logger_Fields)
 
 //-------------------------------------------------------------------------------------------------
 
@@ -51,5 +54,6 @@ struct Loggers
 #define Loggers_Fields (loggers)
 
 QN_FUSION_DECLARE_FUNCTIONS(Loggers, (json), NX_NETWORK_API)
+NX_REFLECTION_INSTRUMENT(Loggers, Loggers_Fields)
 
 } // namespace nx::network::maintenance::log

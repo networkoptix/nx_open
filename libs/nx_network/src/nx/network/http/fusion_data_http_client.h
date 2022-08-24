@@ -172,6 +172,20 @@ protected:
     nx::utils::MoveOnlyFunc<HandlerFunc> m_handler;
     ApiRequestResult m_lastFusionRequestResult;
 
+    template<typename T, typename = void>
+    struct IsDeserializableWithNxReflect: std::false_type {};
+
+    template<typename T>
+    struct IsDeserializableWithNxReflect<
+        T, std::enable_if_t<nx::reflect::IsInstrumentedV<T>>
+    >: std::true_type {};
+
+    template<typename T>
+    struct IsDeserializableWithNxReflect<
+        T, std::enable_if_t<nx::reflect::IsContainerV<T> &&
+            nx::reflect::IsInstrumentedV<typename T::value_type>>
+    >: std::true_type {};
+
     virtual void requestDone(nx::network::http::AsyncClient* client) = 0;
 
     void deserializeFusionRequestResult(
@@ -220,7 +234,7 @@ protected:
         if (!msgBody.empty())
         {
             bool success = false;
-            if constexpr (nx::reflect::IsInstrumentedV<OutputData>)
+            if constexpr (IsDeserializableWithNxReflect<OutputData>::value)
             {
                 nx::reflect::DeserializationResult res;
                 std::tie(outputData, res) = nx::reflect::json::deserialize<OutputData>(msgBody);
