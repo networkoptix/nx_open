@@ -79,6 +79,17 @@ QSet<QnUuid> QnSharedResourcesManager::sharedResources(
     return result;
 }
 
+QSet<QnUuid> QnSharedResourcesManager::sharedResourcesInternal(
+    const QnResourceAccessSubject& subject) const
+{
+    NX_ASSERT(subject.isValid());
+    if (!subject.isValid())
+        return QSet<QnUuid>();
+
+    NX_MUTEX_LOCKER lk(&m_mutex);
+    return m_sharedResources[subject.id()];
+}
+
 bool QnSharedResourcesManager::hasSharedResource(
     const QnResourceAccessSubject& subject, const QnUuid& resourceId) const
 {
@@ -112,6 +123,10 @@ void QnSharedResourcesManager::setSharedResourcesById(const QnUuid& subjectId,
 void QnSharedResourcesManager::setSharedResourcesInternal(const QnResourceAccessSubject& subject,
     const QSet<QnUuid>& resources)
 {
+    NX_ASSERT(subject.isValid());
+    if (!subject.isValid())
+        return;
+
     QSet<QnUuid> oldValue;
     {
         NX_MUTEX_LOCKER lk(&m_mutex);
