@@ -53,15 +53,15 @@ public:
      */
     QList<DevicePtr> devices() const;
 
-    JoystickDescriptor getDefaultDeviceDescription(const QString& id) const;
-    JoystickDescriptor getDeviceDescription(const QString& id) const;
+    JoystickDescriptor getDefaultDeviceDescription(const QString& model) const;
+    JoystickDescriptor getDeviceDescription(const QString& model) const;
     void updateDeviceDescription(const JoystickDescriptor& config);
 
     /** Load config files. */
     void loadConfig();
 
     /** Save config files. */
-    void saveConfig(const QString& id);
+    void saveConfig(const QString& model);
 
     /**
      * If disabled, any device events will not be transmitted to
