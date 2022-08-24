@@ -120,7 +120,7 @@ uint8_t* FrameQueue::allocFrame()
 {
     uint8_t* frame = nullptr;
 
-    auto status = cuMemAllocPitch(
+    auto status = NvidiaDriverApiProxy::instance().cuMemAllocPitch(
         (CUdeviceptr*)&frame, &m_pitch, m_widthInBytes, m_bufferHeight, 16);
     if (status != CUDA_SUCCESS)
     {
@@ -132,7 +132,7 @@ uint8_t* FrameQueue::allocFrame()
 
 void FrameQueue::freeFrame(uint8_t* frame)
 {
-    auto status = cuMemFree((CUdeviceptr)frame);
+    auto status = NvidiaDriverApiProxy::instance().cuMemFree((CUdeviceptr)frame);
     if (status != CUDA_SUCCESS)
         NX_WARNING(this, "Failed to free frame buffer: %1", toString(status));
 }

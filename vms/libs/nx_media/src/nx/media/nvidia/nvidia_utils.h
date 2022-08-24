@@ -4,12 +4,14 @@
 
 #include <nvcuvid.h>
 
+#include <nx/media/nvidia/nvidia_driver_proxy.h>
+
 namespace nx::media::nvidia {
 
 inline std::string toString(CUresult error)
 {
     const char *szErrName = NULL;
-    cuGetErrorName(error, &szErrName);
+    NvidiaDriverApiProxy::instance().cuGetErrorName(error, &szErrName);
     return std::string(szErrName);
 }
 
