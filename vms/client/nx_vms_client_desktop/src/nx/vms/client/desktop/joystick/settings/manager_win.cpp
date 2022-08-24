@@ -96,7 +96,10 @@ void ManagerWindows::enumerateDevices()
             const QString modelName(deviceInfo.model);
             const QString path = deviceInfo.guid;
 
-            NX_VERBOSE(this, "A new Joystick has been found: %1 (%2)", modelName, path);
+            NX_VERBOSE(this,
+                "A new Joystick has been found. "
+                "Model: %1, path: %2",
+                modelName, path);
 
             foundDevicePaths << path;
 
@@ -123,7 +126,9 @@ void ManagerWindows::enumerateDevices()
                 else
                 {
                     NX_VERBOSE(this,
-                        "An unsupported Joystick has been found: %1 (%2)", modelName, path);
+                        "An unsupported Joystick has been found. "
+                        "Model: %1, path: %2",
+                        modelName, path);
                 }
             }
         }

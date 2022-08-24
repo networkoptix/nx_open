@@ -180,8 +180,8 @@ bool JoystickSettingsDialog::Private::initModel(bool initWithDefaults)
 
     const auto& device = devices.first();
     JoystickDescriptor description = initWithDefaults
-        ? manager->getDefaultDeviceDescription(device->id())
-        : manager->getDeviceDescription(device->id());
+        ? manager->getDefaultDeviceDescription(device->modelName())
+        : manager->getDeviceDescription(device->modelName());
     buttonSettingsModel->init(description, device);
 
     const auto stickPosition = device->currentStickPosition();
@@ -282,7 +282,7 @@ JoystickSettingsDialog::JoystickSettingsDialog(Manager* manager, QWidget* parent
     auto handleApply = [this, manager]
         {
             manager->updateDeviceDescription(d->buttonSettingsModel->getDescriptionState());
-            manager->saveConfig(d->buttonSettingsModel->getDescriptionState().id);
+            manager->saveConfig(d->buttonSettingsModel->getDescriptionState().model);
             QmlProperty<bool>(rootObjectHolder(), "applyButtonEnabled") = false;
         };
 

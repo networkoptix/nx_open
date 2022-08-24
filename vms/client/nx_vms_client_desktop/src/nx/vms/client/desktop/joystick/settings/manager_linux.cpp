@@ -52,7 +52,10 @@ void ManagerLinux::enumerateDevices()
         close(fd);
 
         const QString modelName(name);
-        NX_VERBOSE(this, "A new Joystick has been found: %1 (%2)", modelName, path);
+        NX_VERBOSE(this,
+            "A new Joystick has been found. "
+            "Model: %1, path: %2",
+            modelName, path);
 
         const auto iter = std::find_if(m_deviceConfigs.begin(), m_deviceConfigs.end(),
             [modelName](const JoystickDescriptor& description)
@@ -69,7 +72,12 @@ void ManagerLinux::enumerateDevices()
                 initializeDevice(device, config, path);
         }
         else
-            NX_VERBOSE(this, "An unsupported Joystick has been found: %1 (%2)", modelName, path);
+        {
+            NX_VERBOSE(this,
+                "An unsupported Joystick has been found. "
+                "Model: %1, path: %2",
+                modelName, path);
+        }
     }
 
     removeUnpluggedJoysticks(foundDevices);
