@@ -181,7 +181,10 @@ void TileInteractionHandler::handleClick(
         return;
 
     if (!checkActionSupport(index))
+    {
+        showMessage(tr("This action is not supported for notifications from other Systems"));
         return;
+    }
 
     if (button == Qt::LeftButton && !modifiers.testFlag(Qt::ControlModifier))
     {
@@ -473,7 +476,6 @@ bool TileInteractionHandler::checkActionSupport(const QModelIndex& index)
     if (!index.data(Qn::CloudSystemIdRole).toString().isEmpty()
         && index.data(Qn::ActionIdRole).value<ui::action::IDType>() != ui::action::NoAction)
     {
-        showMessage(tr("This action is not supported for notifications from other Systems"));
         return false;
     }
 
