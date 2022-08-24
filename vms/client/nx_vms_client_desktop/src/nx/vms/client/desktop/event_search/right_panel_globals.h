@@ -49,6 +49,13 @@ enum class CameraSelection
 };
 Q_ENUM_NS(CameraSelection)
 
+enum class SystemSelection
+{
+    all,
+    current,
+};
+Q_ENUM_NS(SystemSelection)
+
 enum class TimeSelection
 {
     anytime,
@@ -101,6 +108,11 @@ inline uint qHash(RightPanel::TimeSelection source)
 }
 
 inline uint qHash(RightPanel::CameraSelection source)
+{
+    return uint(source);
+}
+
+inline uint qHash(RightPanel::SystemSelection source)
 {
     return uint(source);
 }
