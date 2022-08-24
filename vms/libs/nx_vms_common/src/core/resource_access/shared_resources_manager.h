@@ -36,10 +36,11 @@ public:
      */
     void setSharedResourcesById(const QnUuid& subjectId, const QSet<QnUuid>& resources);
 
-private:
     void setSharedResourcesInternal(const QnResourceAccessSubject& subject,
         const QSet<QnUuid>& resources);
+    QSet<QnUuid> sharedResourcesInternal(const QnResourceAccessSubject& subject) const;
 
+private:
     void handleResourceAdded(const QnResourcePtr& resource);
     void handleResourceRemoved(const QnResourcePtr& resource);
 
