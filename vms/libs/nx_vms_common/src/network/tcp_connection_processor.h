@@ -38,7 +38,11 @@ public:
      */
     static bool doesPathEndWithCameraId() { return false; }
 
-    QnTCPConnectionProcessor(std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
+    QnTCPConnectionProcessor(
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
+        QnTcpListener* owner,
+        int maxTcpRequestSize);
+
     virtual ~QnTCPConnectionProcessor();
 
     virtual void stop() override;
@@ -112,7 +116,6 @@ public:
 
     QnTcpListener* owner() const;
 
-    static const int kMaxRequestSize;
 protected:
     QnAuthSession authSession(const Qn::UserAccessData& accessRights) const;
     QString extractPath() const;
@@ -146,13 +149,17 @@ protected:
     QnTCPConnectionProcessor(
         QnTCPConnectionProcessorPrivate* d_ptr,
         std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-        QnTcpListener* owner);
+        QnTcpListener* owner,
+        int maxTcpRequestSize);
 
     /** For inherited classes without a TCP server socket only. */
     QnTCPConnectionProcessor(
         QnTCPConnectionProcessorPrivate* dptr,
         std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-        QnCommonModule* commonModule);
+        QnCommonModule* commonModule,
+        int maxTcpRequestSize);
+
+    int maxTcpRequestSize() const { return m_maxTcpRequestSize; }
 
     void sendErrorResponse(
         nx::network::http::StatusCode::Value httpResult, const nx::String& errorDetails = {});
@@ -178,4 +185,7 @@ protected:
 private:
     bool sendBufferThreadSafe(
         const char* data, int size, std::optional<int64_t> timestampForLogging);
+
+private:
+    int m_maxTcpRequestSize;
 };

@@ -54,6 +54,9 @@ struct Ini: public nx::kit::IniConfig
         "Whether testcamera must declare itself as capable of receiving the audio from Client.\n"
         "ATTENTION: Must be set in the .ini file of the Server, not the one of the testcamera.");
 
+    NX_INI_INT(16 * 1024 * 1024, maxTcpRequestSize,
+        "The maximum size of the request body for the HTTP API, in bytes.");
+
     NX_INI_FLAG(false, ignoreUsb0NetworkInterfaceIfOthersExist,
         "Influence enumerating local network interfaces when listening to discovery messages.\n"
         "The option works the same way as the option in the Server settings with the same name.\n"
