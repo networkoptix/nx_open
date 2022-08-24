@@ -489,14 +489,15 @@ FocusScope
                         editingTimer.stop()
                         reselectOnRelease = false
 
-                        const toggle = model && model.hasChildren
-                            && !button.contains(mapToItem(button, mouse.x, mouse.y))
+                        const toggleable = model && model.hasChildren
+                        if (toggleable && button.contains(mapToItem(button, mouse.x, mouse.y)))
+                            return
 
-                        const mayExpand = (typeof treeView.expandsOnDoubleClick === "function")
-                            ? treeView.expandsOnDoubleClick(listItem.sourceIndex)
-                            : !!treeView.expandsOnDoubleClick
-
-                        if (toggle && mayExpand)
+                        const toggle = toggleable
+                            && ((typeof treeView.expandsOnDoubleClick === "function")
+                                    ? treeView.expandsOnDoubleClick(listItem.sourceIndex)
+                                    : !!treeView.expandsOnDoubleClick)
+                        if (toggle)
                         {
                             linearizationListModel.setExpanded(modelIndex, !model.expanded,
                                 /*recursively*/ mouse.modifiers & Qt.AltModifier)
