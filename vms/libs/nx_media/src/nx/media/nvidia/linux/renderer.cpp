@@ -11,6 +11,7 @@
 #include <nx/media/nvidia/nvidia_utils.h>
 #include <nx/media/nvidia/NvCodecUtils.h>
 #include <nx/media/nvidia/ColorSpace.h>
+#include <nx/media/nvidia/nvidia_driver_proxy.h>
 #include <nx/media/nvidia/nvidia_video_frame.h>
 
 static QString glErrorString(GLenum err)
@@ -60,14 +61,14 @@ Renderer::~Renderer()
 void Renderer::freeScaledFrame()
 {
     if (m_scaledFrame)
-        cuMemFree(m_scaledFrame);
+        NvidiaDriverApiProxy::instance().cuMemFree(m_scaledFrame);
 }
 
 void Renderer::freePbo()
 {
     if (m_pbo)
     {
-        cuGraphicsUnregisterResource(m_cuResource);
+        NvidiaDriverApiProxy::instance().cuGraphicsUnregisterResource(m_cuResource);
         glDeleteBuffers(1, &m_pbo);
         m_pbo = 0;
     }
@@ -78,13 +79,13 @@ bool Renderer::initializeScaledFrame(int width, int height)
     freeScaledFrame();
 
     int size = width * (height + height / 2);
-    auto status = cuMemAlloc(&m_scaledFrame, size);
+    auto status = NvidiaDriverApiProxy::instance().cuMemAlloc(&m_scaledFrame, size);
     if (status != CUDA_SUCCESS)
     {
         NX_WARNING(this, "Failed to alloc buffer: %1", toString(status));
         return false;
     }
-    status = cuMemsetD8(m_scaledFrame, 0, size);
+    status = NvidiaDriverApiProxy::instance().cuMemsetD8(m_scaledFrame, 0, size);
     if (status != CUDA_SUCCESS)
     {
         NX_WARNING(this, "Failed to memset buffer: %1", toString(status));
@@ -106,7 +107,7 @@ bool Renderer::initializePbo(int width, int height)
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
     // Attach pbo to the cuda graphics resource
-    auto status = cuGraphicsGLRegisterBuffer(
+    auto status = NvidiaDriverApiProxy::instance().cuGraphicsGLRegisterBuffer(
         &m_cuResource, m_pbo, CU_GRAPHICS_REGISTER_FLAGS_WRITE_DISCARD);
     if (status != CUDA_SUCCESS)
     {
@@ -132,7 +133,7 @@ bool Renderer::convertToRgb(
     int width = size.width();
     int height = size.height();
     int dstPitch = size.width() * 4;
-    auto status = cuGraphicsMapResources(1, &m_cuResource, 0);
+    auto status = NvidiaDriverApiProxy::instance().cuGraphicsMapResources(1, &m_cuResource, 0);
     if (status != CUDA_SUCCESS)
     {
         NX_WARNING(this, "Failed to map resource: %1", toString(status));
@@ -141,7 +142,7 @@ bool Renderer::convertToRgb(
 
     size_t bufferSize = 0;
     CUdeviceptr deviceBuffer;
-    status = cuGraphicsResourceGetMappedPointer(&deviceBuffer, &bufferSize, m_cuResource);
+    status = NvidiaDriverApiProxy::instance().cuGraphicsResourceGetMappedPointer(&deviceBuffer, &bufferSize, m_cuResource);
     if (status != CUDA_SUCCESS)
     {
         NX_WARNING(this, "Failed to get mapped pointer: %1", toString(status));
@@ -165,7 +166,7 @@ bool Renderer::convertToRgb(
             P016ToColor32<BGRA32>(frameData, 2 * pitch, (uint8_t*)deviceBuffer, dstPitch, width, height, matrix);
     }
 
-    status = cuGraphicsUnmapResources(1, &m_cuResource, 0);
+    status = NvidiaDriverApiProxy::instance().cuGraphicsUnmapResources(1, &m_cuResource, 0);
     if (status != CUDA_SUCCESS)
     {
         NX_WARNING(this, "Failed to unmap resource: %1", toString(status));

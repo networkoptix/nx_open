@@ -9,6 +9,8 @@
 #include <nx/media/nvidia/nvidia_utils.h>
 #include <nx/media/nvidia/nvidia_video_frame.h>
 
+#include <nx/media/nvidia/nvidia_driver_proxy.h>
+
 namespace {
 
 inline cudaVideoCodec FFmpeg2NvCodecId(AVCodecID id) {
@@ -38,7 +40,7 @@ struct NvidiaVideoDecoderImpl
     {
         decoder.reset();
         if (context)
-            cuCtxDestroy(context);
+            NvidiaDriverApiProxy::instance().cuCtxDestroy(context);
     }
     CUcontext context = nullptr;
     std::unique_ptr<NvDecoder> decoder;
@@ -63,7 +65,10 @@ NvidiaVideoDecoder::~NvidiaVideoDecoder()
 
 bool NvidiaVideoDecoder::initialize(const QnConstCompressedVideoDataPtr& frame)
 {
-    CUresult status = cuInit(0);
+    if (!NvidiaDriverApiProxy::instance().load())
+        return false;
+
+    CUresult status = NvidiaDriverApiProxy::instance().cuInit(0);
     if (status != CUDA_SUCCESS)
     {
         NX_WARNING(this, "Failed to init nvidia decoder: %1", toString(status));
@@ -71,14 +76,14 @@ bool NvidiaVideoDecoder::initialize(const QnConstCompressedVideoDataPtr& frame)
     }
 
     CUdevice device = 0;
-    status = cuDeviceGet(&device, 0/*gpu*/);
+    status = NvidiaDriverApiProxy::instance().cuDeviceGet(&device, 0/*gpu*/);
     if (status != CUDA_SUCCESS)
     {
         NX_WARNING(this, "Failed to get device: %1", toString(status));
         return false;
     }
 
-    status = cuCtxCreate(&m_impl->context, CU_CTX_SCHED_BLOCKING_SYNC, device);
+    status = NvidiaDriverApiProxy::instance().cuCtxCreate(&m_impl->context, CU_CTX_SCHED_BLOCKING_SYNC, device);
     if (status != CUDA_SUCCESS)
     {
         NX_WARNING(this, "Failed to create context: %1", toString(status));
@@ -149,12 +154,12 @@ linux::Renderer& NvidiaVideoDecoder::getRenderer()
 
 void NvidiaVideoDecoder::pushContext()
 {
-    cuCtxPushCurrent(m_impl->context);
+    NvidiaDriverApiProxy::instance().cuCtxPushCurrent(m_impl->context);
 }
 
 void NvidiaVideoDecoder::popContext()
 {
-    cuCtxPopCurrent(nullptr);
+    NvidiaDriverApiProxy::instance().cuCtxPopCurrent(nullptr);
 }
 
 } // namespace nx::media::nvidia
