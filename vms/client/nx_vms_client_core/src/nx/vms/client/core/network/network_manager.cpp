@@ -249,6 +249,16 @@ void NetworkManager::doPost(
     doRequest(Method::post, std::move(request), std::move(url), owner, callback, connectionType);
 }
 
+void NetworkManager::doPut(
+    std::unique_ptr<nx::network::http::AsyncClient> request,
+    nx::utils::Url url,
+    QObject* owner,
+    RequestCallback callback,
+    Qt::ConnectionType connectionType)
+{
+    doRequest(Method::put, std::move(request), std::move(url), owner, callback, connectionType);
+}
+
 void NetworkManager::doDelete(
     std::unique_ptr<nx::network::http::AsyncClient> request,
     nx::utils::Url url,

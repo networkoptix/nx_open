@@ -86,6 +86,17 @@ public:
         Qt::ConnectionType connectionType = Qt::AutoConnection);
 
     /**
+     * Send PUT request to the following url. Callback will be delivered using Qt signal-slot
+     * system to the request owner.
+     */
+    void doPut(
+        std::unique_ptr<nx::network::http::AsyncClient> request,
+        nx::utils::Url url,
+        QObject* owner,
+        RequestCallback callback,
+        Qt::ConnectionType connectionType = Qt::AutoConnection);
+
+    /**
      * Send DELETE request to the following url. Callback will be delivered using Qt signal-slot
      * system to the request owner.
      */
