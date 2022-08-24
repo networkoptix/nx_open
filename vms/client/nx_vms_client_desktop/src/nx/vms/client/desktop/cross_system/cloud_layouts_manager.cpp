@@ -193,7 +193,10 @@ struct CloudLayoutsManager::Private
         systemContext->accessController()->setUser({});
     }
 
-    void sendSaveLayoutRequest(const nx::vms::api::LayoutData& layout, SaveCallback callback)
+    void sendSaveLayoutRequest(
+        const nx::vms::api::LayoutData& layout,
+        SaveCallback callback,
+        bool isNewLayout)
     {
         if (!NX_ASSERT(!layout.id.isNull(), "Saving layout with null id"))
         {
@@ -202,6 +205,10 @@ struct CloudLayoutsManager::Private
             return;
         }
 
+        nx::network::http::Method method = isNewLayout
+            ? nx::network::http::Method::post
+            : nx::network::http::Method::put;
+
         Request request = makeRequest();
         auto url = endpoint;
         url.setPath(nx::format(kParticularLayoutPathTemplate, layout.id.toSimpleString()));
@@ -209,7 +216,8 @@ struct CloudLayoutsManager::Private
             Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
             std::move(nx::reflect::json::serialize(layout)));
         request->setRequestBody(std::move(messageBody));
-        networkManager->doPost(
+        networkManager->doRequest(
+            method,
             std::move(request),
             std::move(url),
             q,
@@ -297,7 +305,10 @@ struct CloudLayoutsManager::Private
         nx::vms::api::LayoutData layoutData;
         ec2::fromResourceToApi(layout, layoutData);
 
-        sendSaveLayoutRequest(layoutData, internalCallback);
+        sendSaveLayoutRequest(
+            layoutData,
+            internalCallback,
+            /*isNewLayout*/ layout->hasFlags(Qn::local));
     }
 
     void deleteLayout(const QnLayoutResourcePtr& layout)
