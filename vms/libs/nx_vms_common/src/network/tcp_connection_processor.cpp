@@ -29,13 +29,6 @@
 #include <nx/metrics/metrics_storage.h>
 
 
-// We need enough size for updates.
-#if defined(__arm__)
-    const int QnTCPConnectionProcessor::kMaxRequestSize = 1024 * 1024 * 16;
-#else
-    const int QnTCPConnectionProcessor::kMaxRequestSize = 1024 * 1024 * 512;
-#endif
-
 namespace {
 
 void copyAndReplaceHeader(
@@ -54,10 +47,12 @@ void copyAndReplaceHeader(
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-    QnTcpListener* owner)
+    QnTcpListener* owner,
+    int maxTcpRequestSize)
     :
     QnCommonModuleAware(owner->commonModule()),
-    d_ptr(new QnTCPConnectionProcessorPrivate)
+    d_ptr(new QnTCPConnectionProcessorPrivate),
+    m_maxTcpRequestSize(maxTcpRequestSize)
 {
     Q_D(QnTCPConnectionProcessor);
     d->socket = std::move(socket);
@@ -67,10 +62,12 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     QnTCPConnectionProcessorPrivate* dptr,
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-    QnTcpListener* owner)
+    QnTcpListener* owner,
+    int maxTcpRequestSize)
     :
     QnCommonModuleAware(owner->commonModule()),
-    d_ptr(dptr)
+    d_ptr(dptr),
+    m_maxTcpRequestSize(maxTcpRequestSize)
 {
     Q_D(QnTCPConnectionProcessor);
     d->socket = std::move(socket);
@@ -80,10 +77,12 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     QnTCPConnectionProcessorPrivate* dptr,
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-    QnCommonModule* commonModule)
+    QnCommonModule* commonModule,
+    int maxTcpRequestSize)
     :
     QnCommonModuleAware(commonModule),
-    d_ptr(dptr)
+    d_ptr(dptr),
+    m_maxTcpRequestSize(maxTcpRequestSize)
 {
     Q_D(QnTCPConnectionProcessor);
     d->socket = std::move(socket);
@@ -550,10 +549,10 @@ QnTCPConnectionProcessor::ReadResult QnTCPConnectionProcessor::readRequest()
             {
                 return ReadResult::ok;
             }
-            else if (d->clientRequest.size() > kMaxRequestSize)
+            else if (d->clientRequest.size() > m_maxTcpRequestSize)
             {
                 NX_WARNING(this, "Too large HTTP client request (%1 bytes, %2 allowed). Ignoring...",
-                    d->clientRequest.size(), kMaxRequestSize);
+                    d->clientRequest.size(), m_maxTcpRequestSize);
                 return ReadResult::error;
             }
             if (fullHttpMessageSize)
@@ -625,10 +624,10 @@ bool QnTCPConnectionProcessor::readSingleRequest()
         d->currentRequestSize += bytesParsed;
         d->interleavedMessageDataPos += bytesParsed;
 
-        if( d->currentRequestSize > kMaxRequestSize )
+        if (d->currentRequestSize > m_maxTcpRequestSize)
         {
             qWarning() << "Too large HTTP client request (" << d->currentRequestSize << " bytes"
-                ", "<<kMaxRequestSize<<" allowed). Ignoring...";
+                ", " << m_maxTcpRequestSize << " allowed). Ignoring...";
             return false;
         }
 

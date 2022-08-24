@@ -77,13 +77,15 @@ void QnTcpListener::setAuth(const QByteArray& userName, const QByteArray& passwo
 
 QnTcpListener::QnTcpListener(
     QnCommonModule* commonModule,
+    int maxTcpRequestSize,
     const QHostAddress& address,
     int port,
     int maxConnections,
     bool useSSL)
     :
     QnCommonModuleAware(commonModule),
-    d_ptr(new QnTcpListenerPrivate())
+    d_ptr(new QnTcpListenerPrivate()),
+    m_maxTcpRequestSize(maxTcpRequestSize)
 {
     Q_D(QnTcpListener);
     d->serverAddress = address;
@@ -419,8 +421,8 @@ void QnTcpListener::processNewConnection(std::unique_ptr<nx::network::AbstractSt
 
     socket->setRecvTimeout(kDefaultSocketTimeout);
     socket->setSendTimeout(kDefaultSocketTimeout);
-    QnTCPConnectionProcessor* processor = createRequestProcessor(std::move(socket));
-
+    QnTCPConnectionProcessor* processor =
+        createRequestProcessor(std::move(socket), m_maxTcpRequestSize);
 
     NX_MUTEX_LOCKER lock(&d->connectionMtx);
     d->connections << processor;

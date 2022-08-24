@@ -21,6 +21,9 @@ namespace {
     static const int kDataTransferTimeout = 1000;
     static const int kTotalTestBytes = 1024 * 1024 * 20;
     static const int kTcpServerStartTimeoutMs = 1000;
+
+    /** Corresponds to the same-name Server setting. */
+    static const int kMaxTcpRequestSize = 16 * 1024 * 1024;
 }
 
 class TestConnectionProcessor: public QnTCPConnectionProcessor
@@ -28,9 +31,10 @@ class TestConnectionProcessor: public QnTCPConnectionProcessor
 public:
     TestConnectionProcessor(
         std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-        QnTcpListener* owner)
-        QnTCPConnectionProcessor(std::move(socket), owner)
+        QnTcpListener* owner,
+        int maxTcpRequestSize)
         :
+        QnTCPConnectionProcessor(std::move(socket), owner, maxTcpRequestSize)
     {
     }
     virtual ~TestConnectionProcessor() override
@@ -56,8 +60,19 @@ protected:
 class TestTcpListener: public QnTcpListener
 {
 public:
-    TestTcpListener(QnCommonModule* commonModule, const QHostAddress& address, int port):
-        QnTcpListener(commonModule, address, port, DEFAULT_MAX_CONNECTIONS, /*useSSL*/ false)
+    TestTcpListener(
+        QnCommonModule* commonModule,
+        int maxTcpRequestSize,
+        const QHostAddress& address,
+        int port)
+        :
+        QnTcpListener(
+            commonModule,
+            maxTcpRequestSize,
+            address,
+            port,
+            DEFAULT_MAX_CONNECTIONS,
+            /*useSSL*/ false)
     {
     }
 
@@ -68,9 +83,10 @@ public:
 
 protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(
-        std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket) override
+        std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket,
+        int maxTcpRequestSize) override
     {
-        return new TestConnectionProcessor(std::move(clientSocket), this);
+        return new TestConnectionProcessor(std::move(clientSocket), this, maxTcpRequestSize);
     }
 };
 
@@ -79,8 +95,9 @@ TEST( TcpConnectionProcessor, sendAsyncData )
 {
     nx::vms::common::test::Context context;
 
-    // TcpListener uses commonModule()->moduleGuid().
-    TestTcpListener tcpListener(context.commonModule(), QHostAddress::Any, 0);
+    // QnTcpListener uses commonModule()->moduleGuid().
+    TestTcpListener tcpListener(
+        context.commonModule(), kMaxTcpRequestSize, QHostAddress::Any, /*port*/ 0);
     tcpListener.start();
 
     QElapsedTimer timer;
