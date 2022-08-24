@@ -15,12 +15,14 @@
 
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
-#include <licensing/license_fwd.h>
 #include <nx/utils/latin1_array.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/vms/api/data/cloud_license_data.h>
 #include <nx/vms/api/data/license_data.h>
 #include <nx/vms/common/system_context_aware.h>
 #include <utils/common/id.h>
+
+#include "license_fwd.h"
 
 #ifdef __APPLE__
 #undef verify
@@ -58,6 +60,7 @@ public:
     QnLicense() = default;
     QnLicense(const QByteArray& licenseBlock);
     QnLicense(const nx::vms::api::DetailedLicenseData& value);
+
     virtual ~QnLicense() = default;
 
     void loadLicenseBlock(const QByteArray& licenseBlock);
@@ -135,6 +138,7 @@ public:
     static LicenseTypeInfo licenseTypeInfo(Qn::LicenseType licenseType);
     LicenseTypeInfo licenseTypeInfo() const;
 
+    const nx::vms::api::CloudLicenseData& cloudData() const;
 protected:
     void setClass(const QString& xclass);
 
@@ -146,8 +150,12 @@ private:
 
     void verify(const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock);
 
+    /** Fill license v1 fields from license v2 fields */
+    void fillCompatibleFields();
+
 private:
     QByteArray m_rawLicense;
+    nx::vms::api::CloudLicenseData m_cloudData;
 
     QString m_name;
     QByteArray m_key;

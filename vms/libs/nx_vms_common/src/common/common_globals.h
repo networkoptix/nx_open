@@ -332,6 +332,11 @@ namespace Qn {
         LC_Nvr,
 
         /**
+         * Cloud license. Can be used instead of any previous license type
+         */
+        LC_Cloud,
+
+        /**
          * Invalid license. Required when the correct license type is not known in current version.
          */
         LC_Invalid,

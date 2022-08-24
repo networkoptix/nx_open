@@ -4,9 +4,10 @@
 
 #include <api/runtime_info_manager.h>
 #include <licensing/license.h>
-#include <nx_ec/abstract_ec_connection.h>
+#include <nx/branding.h>
 #include <nx/vms/api/types/connection_types.h>
 #include <nx/vms/common/system_context.h>
+#include <nx_ec/abstract_ec_connection.h>
 #include <utils/common/synctime.h>
 
 namespace nx::vms::license {
@@ -48,13 +49,27 @@ QnLicenseErrorCode Validator::validate(const QnLicensePtr& license, ValidationMo
         currentServerId = connection->moduleInformation().id;
 
     const auto& manager = m_context->runtimeInfoManager();
-    QnPeerRuntimeInfo info =
-        manager->items()->getItem(mode == VM_Regular ? serverId(license) : currentServerId);
+    QnPeerRuntimeInfo info;
 
-    // #TODO: #ynikitenkov It does not make sense in case of VM_JustAdded. #refactor
-    // peer where license was activated not found
-    if (info.uuid.isNull() && !overrideMissingRuntimeInfo(license, info))
-        return QnLicenseErrorCode::InvalidHardwareID;
+    if (license->type() == Qn::LC_Cloud)
+    {
+        // Check cloud license expiration time using tmpExpirationDate.
+        const auto data = license->cloudData();
+        const auto expirationTime = data.toDateTime(data.security.tmpExpirationDate);
+        if (!expirationTime.isNull() && qnSyncTime->currentDateTime() > expirationTime)
+            return QnLicenseErrorCode::TemporaryExpired;
+        info = manager->items()->getItem(currentServerId);
+    }
+    else
+    {
+        // Check local license by hardwareId.
+        info = manager->items()->getItem(mode == VM_Regular ? serverId(license) : currentServerId);
+
+        // #TODO: #ynikitenkov It does not make sense in case of VM_JustAdded.
+        // Peer where license was activated was not found.
+        if (info.uuid.isNull() && !overrideMissingRuntimeInfo(license, info))
+            return QnLicenseErrorCode::InvalidHardwareID;
+    }
 
     if (!license->brand().isEmpty() && license->brand() != info.data.brand)
         return QnLicenseErrorCode::InvalidBrand;
@@ -95,6 +110,10 @@ QString Validator::errorMessage(QnLicenseErrorCode errCode, Qn::LicenseType lice
             return tr("Invalid customization");
         case QnLicenseErrorCode::Expired:
             return tr("License is expired"); // license is out of date
+        case QnLicenseErrorCode::TemporaryExpired:
+            // License is out of date temporary.
+            return tr("License is not validated by %1", "%1 is the short cloud name (like Cloud)")
+                .arg(nx::branding::shortCloudName());
         case QnLicenseErrorCode::InvalidType:
             return tr("Invalid type");
         case QnLicenseErrorCode::TooManyLicensesPerSystem:

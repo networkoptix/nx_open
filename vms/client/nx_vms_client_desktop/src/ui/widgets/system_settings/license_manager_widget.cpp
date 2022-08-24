@@ -891,11 +891,18 @@ void QnLicenseManagerWidget::processReply(
                 Validator::VM_JustCreated);
 
             if (errCode == QnLicenseErrorCode::NoError)
+            {
                 licenses.append(license);
-            else if (errCode == QnLicenseErrorCode::Expired)
+            }
+            else if (errCode == QnLicenseErrorCode::Expired
+                || errCode == QnLicenseErrorCode::TemporaryExpired)
+            {
                 licenses.append(license); // ignore expired error code
+            }
             else if (errCode == QnLicenseErrorCode::FutureLicense)
+            {
                 licenses.append(license); // add future licenses
+            }
         }
     }
 
@@ -930,6 +937,7 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged()
         {
             case QnLicenseErrorCode::NoError:
             case QnLicenseErrorCode::Expired:
+            case QnLicenseErrorCode::TemporaryExpired:
                 ui->licenseWidget->clearManualActivationUserInput();
                 validateLicenses(license->key(), QList<QnLicensePtr>() << license);
                 break;

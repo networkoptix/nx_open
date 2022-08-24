@@ -77,6 +77,26 @@ const nx::utils::Url LicenseServer::validateUrl(common::SystemContext* context)
     return baseUrl(context) + "/api/v1/validate/";
 }
 
+const nx::utils::Url LicenseServer::reportUrl(common::SystemContext* context)
+{
+    return baseUrl(context) + "/api/v2/license/cloud/usage_report";
+}
+
+const nx::utils::Url LicenseServer::cloudLicensesUrl(common::SystemContext* context)
+{
+    return baseUrl(context) + "/api/v2/license/cloud/licenses";
+}
+
+const nx::utils::Url LicenseServer::inspectUrl(common::SystemContext* context)
+{
+    return baseUrl(context) + "/api/v2/license/inspect/";
+}
+
+const nx::utils::Url LicenseServer::activateV2Url(common::SystemContext* context)
+{
+    return baseUrl(context) + "/api/v2/license/cloud/activate";
+}
+
 //#define QN_NO_LICENSE_CHECK
 
 /**
@@ -132,6 +152,15 @@ static std::vector<LicenseCompatibility> compatibleLicenseType =
     {Qn::LC_Trial, Qn::LC_IO},
     {Qn::LC_Trial, Qn::LC_AnalogEncoder},
     {Qn::LC_Trial, Qn::LC_Bridge},
+
+    {Qn::LC_Cloud, Qn::LC_Edge},
+    {Qn::LC_Cloud, Qn::LC_Professional},
+    {Qn::LC_Cloud, Qn::LC_Analog},
+    {Qn::LC_Cloud, Qn::LC_VMAX},
+    {Qn::LC_Cloud, Qn::LC_IO},
+    {Qn::LC_Cloud, Qn::LC_AnalogEncoder},
+    {Qn::LC_Cloud, Qn::LC_Bridge},
+
 };
 
 /************************************************************************/
@@ -166,10 +195,17 @@ UsageWatcher::UsageWatcher(common::SystemContext* context, QObject* parent):
 
 UsageHelper::Cache::Cache()
 {
-    boost::fill(used, 0);
+    reset();
+}
+
+void UsageHelper::Cache::reset()
+{
     boost::fill(proposed, 0);
-    boost::fill(overflow, 0);
     boost::fill(total, 0);
+    for (auto& value: used)
+        value.clear();
+    for (auto& value: overflow)
+        value.clear();
 }
 
 UsageHelper::UsageHelper(common::SystemContext* context, QObject* parent):
@@ -186,20 +222,25 @@ UsageHelper::~UsageHelper()
 {
 }
 
-int UsageHelper::borrowLicenses(const LicenseCompatibility &compat, licensesArray &licenses) const
+LicenseUsageByDevice UsageHelper::borrowLicenses(const LicenseCompatibility& compat, LicensesArrayEx& licenses) const
 {
     auto borrowLicenseFromClass =
-        [](int& srcUsed, int srcTotal, int& dstUsed, int dstTotal)
+        [](LicenseUsageByDevice& srcUsed, int srcTotal, LicenseUsageByDevice& dstUsed, int dstTotal)
         {
-            int borrowed = 0;
-            if (dstUsed > dstTotal)
+            LicenseUsageByDevice borrowed;
+            int borrowedCount = 0;
+            if (dstUsed.size() > dstTotal)
             {
-                int donatorRest = srcTotal - srcUsed;
+                int donatorRest = srcTotal - srcUsed.size();
                 if (donatorRest > 0)
                 {
-                    borrowed = qMin(donatorRest, dstUsed - dstTotal);
-                    srcUsed += borrowed;
-                    dstUsed -= borrowed;
+                    borrowedCount = qMin(donatorRest, (int) dstUsed.size() - dstTotal);
+                    for (int i = 0; i < borrowedCount; ++i)
+                    {
+                        srcUsed.push_back(dstUsed[i]);
+                        borrowed.push_back(dstUsed[i]);
+                    }
+                    dstUsed.erase(dstUsed.begin(), dstUsed.begin() + borrowedCount);
                 }
             }
             return borrowed;
@@ -260,25 +301,32 @@ void UsageHelper::setCustomValidator(std::unique_ptr<Validator> validator)
     m_validator = std::move(validator);
 }
 
+LicensesArray toLicenseArray(const LicensesArrayEx& data)
+{
+    LicensesArray result;
+    for (int i = 0; i < data.size(); ++i)
+        result[i] = data[i].size();
+    return result;
+}
+
 void UsageHelper::updateCache() const
 {
     if (!m_dirty)
         return;
     /* Need to set flag right here as virtual methods may call various cache-dependent getters. */
     m_dirty = false;
+    m_cache.reset();
 
     m_cache.licenses.update(m_context->licensePool()->getLicenses());
 
     /* How many licenses of each type are borrowed. */
-    licensesArray borrowedLicenses;
-    boost::fill(borrowedLicenses, 0);
+    LicensesArrayEx borrowedLicenses;
 
     /* Used licenses without proposed cameras. */
-    licensesArray basicUsedLicenses;
+    LicensesArrayEx basicUsedLicenses;
 
     /* Borrowed licenses count without proposed cameras. */
-    licensesArray basicBorrowedLicenses;
-    boost::fill(basicBorrowedLicenses, 0);
+    LicensesArrayEx basicBorrowedLicenses;
 
     /* Calculate total licenses. */
     for (Qn::LicenseType lt : licenseTypes())
@@ -297,14 +345,10 @@ void UsageHelper::updateCache() const
     /* Finally calculating proposed and lacking (overflow) licenses. */
     for (Qn::LicenseType lt : licenseTypes())
     {
-        m_cache.overflow[lt] = calculateOverflowLicenses(lt, borrowedLicenses[lt]);
-        m_cache.proposed[lt] = m_cache.used[lt] - basicUsedLicenses[lt];
+        for (int index = m_cache.total[lt]; index < m_cache.used[lt].size(); ++index)
+            m_cache.overflow[lt].push_back(m_cache.used[lt][index]);
+        m_cache.proposed[lt] = m_cache.used[lt].size() - basicUsedLicenses[lt].size();
     }
-}
-
-int UsageHelper::calculateOverflowLicenses(Qn::LicenseType licenseType, int /*borrowedLicenses*/) const
-{
-    return qMax(0, m_cache.used[licenseType] - m_cache.total[licenseType]);
 }
 
 bool UsageHelper::isValid() const
@@ -319,7 +363,7 @@ bool UsageHelper::isValid(Qn::LicenseType licenseType) const
 #endif
 
     updateCache();
-    return m_cache.overflow[licenseType] == 0;
+    return m_cache.overflow[licenseType].empty();
 }
 
 int UsageHelper::totalLicenses(Qn::LicenseType licenseType) const
@@ -331,14 +375,32 @@ int UsageHelper::totalLicenses(Qn::LicenseType licenseType) const
 int UsageHelper::usedLicenses(Qn::LicenseType licenseType) const
 {
 #ifdef QN_NO_LICENSE_CHECK
-    return true;
+    return 0;
 #endif
 
     updateCache();
     /* In all cases but analog encoder licenses m_cache.used contains already valid number. */
-    if (m_cache.overflow[licenseType] == 0)
-        return m_cache.used[licenseType];
-    return m_cache.total[licenseType] + m_cache.overflow[licenseType];
+    if (m_cache.overflow[licenseType].empty())
+        return m_cache.used[licenseType].size();
+    return m_cache.total[licenseType] + m_cache.overflow[licenseType].size();
+}
+
+std::set<QnUuid> UsageHelper::usedDevices(Qn::LicenseType licenseType) const
+{
+    #ifdef QN_NO_LICENSE_CHECK
+        return std::set<QnUuid>();
+    #endif
+
+    updateCache();
+    /* In all cases but analog encoder licenses m_cache.used contains already valid number. */
+    NX_ASSERT(licenseType != Qn::LC_AnalogEncoder);
+    std::set<QnUuid> result;
+    
+    for (const auto& id: m_cache.used[licenseType])
+        result.insert(id);
+    for (const auto& id: m_cache.overflow[licenseType])
+        result.insert(id);
+    return result;
 }
 
 int UsageHelper::requiredLicenses(Qn::LicenseType licenseType) const
@@ -348,7 +410,7 @@ int UsageHelper::requiredLicenses(Qn::LicenseType licenseType) const
 #endif
 
     updateCache();
-    return m_cache.overflow[licenseType];
+    return m_cache.overflow[licenseType].size();
 }
 
 int UsageHelper::proposedLicenses(Qn::LicenseType licenseType) const
@@ -564,16 +626,14 @@ QList<Qn::LicenseType> CamLicenseUsageHelper::calculateLicenseTypes() const
         << Qn::LC_IO
         << Qn::LC_Start
         << Qn::LC_Nvr
+        << Qn::LC_Cloud
         ;
 }
 
 void CamLicenseUsageHelper::calculateUsedLicenses(
-    licensesArray& basicUsedLicenses,
-    licensesArray& proposedToUse) const
+    LicensesArrayEx& basicUsedLicenses,
+    LicensesArrayEx& proposedToUse) const
 {
-    boost::fill(basicUsedLicenses, 0);
-    boost::fill(proposedToUse, 0);
-
     auto groupId = [](const QnSecurityCamResourcePtr& camera)
     {
         return camera->isSharingLicenseInGroup()
@@ -589,7 +649,10 @@ void CamLicenseUsageHelper::calculateUsedLicenses(
     }
 
     for (const auto& data : oldCameras)
-        basicUsedLicenses[(*data.begin())->licenseType()]++;
+    {
+        const auto& c = *data.begin();
+        basicUsedLicenses[c->licenseType()].push_back(c->getId());
+    }
 
     auto newCameras = oldCameras;
     for (const auto& camera: m_proposedToEnable)
@@ -600,7 +663,10 @@ void CamLicenseUsageHelper::calculateUsedLicenses(
     for (const auto& data: newCameras)
     {
         if (!data.isEmpty())
-            proposedToUse[(*data.begin())->licenseType()]++;
+        {
+            const auto& c = *data.begin();
+            proposedToUse[c->licenseType()].push_back(c->getId());
+        }
     }
 
 }
@@ -713,21 +779,32 @@ QList<Qn::LicenseType> VideoWallLicenseUsageHelper::calculateLicenseTypes() cons
     return QList<Qn::LicenseType>() << Qn::LC_VideoWall;
 }
 
-void VideoWallLicenseUsageHelper::calculateUsedLicenses(licensesArray& basicUsedLicenses,
-    licensesArray& proposedToUse) const
+void VideoWallLicenseUsageHelper::calculateUsedLicenses(
+    LicensesArrayEx& basicUsedLicenses,
+    LicensesArrayEx& proposedToUse) const
 {
-    boost::fill(basicUsedLicenses, 0);
-    boost::fill(proposedToUse, 0);
-
-    int usedScreens = 0;
+    std::set<QnUuid> usedScreens;
 
     // Calculating total screens.
     for (const auto& videowall: resourcePool()->getResources<QnVideoWallResource>())
-        usedScreens += videowall->items()->getItems().size();
+    {
+        for (const auto& item: videowall->items()->getItems())
+            usedScreens.insert(item.uuid);
+    }
 
-    basicUsedLicenses[Qn::LC_VideoWall] =
-        VideoWallLicenseUsageHelper::licensesForScreens(usedScreens);
-    proposedToUse[Qn::LC_VideoWall] = basicUsedLicenses[Qn::LC_VideoWall] + m_proposed;
+    int count = VideoWallLicenseUsageHelper::licensesForScreens(usedScreens.size());
+    NX_ASSERT(count + m_proposed <= usedScreens.size());
+    int counter = 0;
+    for (const auto& key: usedScreens)
+    {
+        if (counter < count)
+            basicUsedLicenses[Qn::LC_VideoWall].push_back(key);
+        if (counter < count + m_proposed)
+            proposedToUse[Qn::LC_VideoWall].push_back(key);
+        else
+            break;
+        ++counter;
+    }
 }
 
 void VideoWallLicenseUsageHelper::propose(int count)

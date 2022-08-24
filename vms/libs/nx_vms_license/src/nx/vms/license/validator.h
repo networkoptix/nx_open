@@ -22,7 +22,8 @@ enum class QnLicenseErrorCode
     Expired,                    /**< Expired */
     InvalidType,                /**< Such license type isn't allowed for that device. */
     TooManyLicensesPerSystem,   /**< Too many licenses of this type per system. */
-    FutureLicense               /**< License type is unknown, may be license from future version. */
+    FutureLicense,              /**< License type is unknown, may be license from future version. */
+    TemporaryExpired            /**< License is not validated in time. Temporary expiration date passed. */
 };
 
 // TODO: #sivanov Store Context pointer in the License itself and use it.

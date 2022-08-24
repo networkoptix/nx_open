@@ -76,7 +76,8 @@ void QnWorkbenchLicenseNotifier::checkLicenses() const
 
         if (someLicenseWillBeBlocked
             && errorCode != nx::vms::license::QnLicenseErrorCode::NoError
-            && errorCode != nx::vms::license::QnLicenseErrorCode::Expired)
+            && errorCode != nx::vms::license::QnLicenseErrorCode::Expired
+            && errorCode != nx::vms::license::QnLicenseErrorCode::TemporaryExpired)
         {
             licenses.push_back(license);
             licenseWarningStates[license->key()].lastWarningTime = currentTime;

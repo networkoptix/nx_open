@@ -131,13 +131,21 @@ QVariant QnLicenseListModel::textData(const QModelIndex& index, bool fullText) c
             if (fullStatus)
                 return Validator::errorMessage(code, license->type());
 
-            return code == QnLicenseErrorCode::Expired
-                ? tr("Expired")
-                : tr("Error");
+            switch (code)
+            {
+                case QnLicenseErrorCode::Expired:
+                    return tr("Expired");
+                case QnLicenseErrorCode::TemporaryExpired:
+                    return tr("Not verified");
+                default:
+                    return tr("Error");
+            }
         }
 
         case ServerColumn:
         {
+            if (license->type() == Qn::LC_Cloud)
+                return nx::branding::cloudHost();
             auto server = serverByLicense(license);
             if (!server)
                 return tr("Server not found");

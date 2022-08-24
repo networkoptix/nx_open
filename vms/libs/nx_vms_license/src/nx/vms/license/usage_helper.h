@@ -19,8 +19,12 @@ struct LicenseServer
 {
     static const nx::utils::Url indexUrl(common::SystemContext* context);
     static const nx::utils::Url activateUrl(common::SystemContext* context);
+    static const nx::utils::Url activateV2Url(common::SystemContext* context);
     static const nx::utils::Url deactivateUrl(common::SystemContext* context);
     static const nx::utils::Url validateUrl(common::SystemContext* context);
+    static const nx::utils::Url reportUrl(common::SystemContext* context);
+    static const nx::utils::Url cloudLicensesUrl(common::SystemContext* context);
+    static const nx::utils::Url inspectUrl(common::SystemContext* context);
 private:
     static const QString baseUrl(common::SystemContext* context);
 };
@@ -48,7 +52,10 @@ signals:
     void licenseUsageChanged();
 };
 
-typedef std::array<int, Qn::LC_Count> licensesArray;
+typedef std::array<int, Qn::LC_Count> LicensesArray;
+
+using LicenseUsageByDevice = QVector<QnUuid>;
+using LicensesArrayEx =  std::array<LicenseUsageByDevice, Qn::LC_Count>;
 
 class UsageHelper:
     public QObject,
@@ -101,6 +108,9 @@ public:
     /** Number of licenses of the selected type currently in use (including proposed). */
     int usedLicenses(Qn::LicenseType licenseType) const;
 
+    /** @return the list of Devices that spend requested license type. */
+    std::set<QnUuid> usedDevices(Qn::LicenseType licenseType) const;
+
     /**
      *  Number of licenses of the selected type lacking for system to work.
      *  Always equals to 0 of the helper is valid.
@@ -122,14 +132,13 @@ public:
     void setCustomValidator(std::unique_ptr<Validator> validator);
 
 protected:
-    virtual void calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const = 0;
-    virtual int calculateOverflowLicenses(Qn::LicenseType licenseType, int borrowedLicenses) const;
+    virtual void calculateUsedLicenses(LicensesArrayEx& basicUsedLicenses, LicensesArrayEx& proposedToUse) const = 0;
 
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const = 0;
 
     void updateCache() const;
 private:
-    int borrowLicenses(const LicenseCompatibility &compat, licensesArray &licenses) const;
+    LicenseUsageByDevice borrowLicenses(const LicenseCompatibility& compat, LicensesArrayEx& licenses) const;
 
 private:
     mutable bool m_dirty;
@@ -139,11 +148,13 @@ private:
     {
         Cache();
 
+        void reset();
+
         ListHelper licenses;
-        licensesArray total;
-        licensesArray used;
-        licensesArray proposed;
-        licensesArray overflow;
+        LicensesArray total;
+        LicensesArrayEx used;
+        LicensesArray proposed;
+        LicensesArrayEx overflow;
     };
 
     mutable Cache m_cache;
@@ -200,7 +211,7 @@ signals:
 
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
-    virtual void calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const override;
+    virtual void calculateUsedLicenses(LicensesArrayEx& basicUsedLicenses, LicensesArrayEx& proposedToUse) const override;
 
 private:
     CamLicenseUsageWatcher* m_watcher{nullptr};
@@ -253,8 +264,8 @@ public:
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
     virtual void calculateUsedLicenses(
-        licensesArray& basicUsedLicenses,
-        licensesArray& proposedToUse) const override;
+        LicensesArrayEx& basicUsedLicenses,
+        LicensesArrayEx& proposedToUse) const override;
 
 private:
     int m_proposed = 0;
