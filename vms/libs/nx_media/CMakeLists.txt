@@ -59,8 +59,6 @@ nx_add_target(nx_media
         nx_vms_common
         nx_fusion
         nx_utils
-        /usr/lib/x86_64-linux-gnu/libnvcuvid.so
-        /usr/lib/x86_64-linux-gnu/libcuda.so
         /usr/local/cuda-11.7/targets/x86_64-linux/lib/libcudart.so
         /home/lbusygin/tmp/1/color_space/libcolor_conversion.so
     ADDITIONAL_SOURCES
