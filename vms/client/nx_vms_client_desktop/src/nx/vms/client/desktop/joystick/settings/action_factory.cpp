@@ -40,7 +40,7 @@ struct ActionFactory::Private
 {
     ActionFactory* q;
 
-    QString id;
+    QString modelName;
 
     // TODO: Make sure there is no race condition for editable lists.
     std::vector<std::vector<std::unique_ptr<ParsedAction>>> assignedActions;
@@ -72,7 +72,7 @@ struct ActionFactory::Private
 
     void updateConfig(const JoystickDescriptor& config)
     {
-        id = config.id;
+        modelName = config.model;
 
         updataButtonActionsConfig(config);
 
@@ -376,9 +376,9 @@ ActionFactory::~ActionFactory()
     d->stopContinuousActions();
 }
 
-QString ActionFactory::id() const
+QString ActionFactory::modelName() const
 {
-    return d->id;
+    return d->modelName;
 }
 
 void ActionFactory::updateConfig(const JoystickDescriptor& config)

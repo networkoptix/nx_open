@@ -41,7 +41,7 @@ public:
 
     virtual ~ActionFactory();
 
-    QString id() const;
+    QString modelName() const;
 
     void updateConfig(const JoystickDescriptor& config);
 
