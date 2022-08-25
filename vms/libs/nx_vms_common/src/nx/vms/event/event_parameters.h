@@ -160,12 +160,6 @@ struct NX_VMS_COMMON_API EventParameters
 
     /** Hash for events aggregation. */
     QnUuid getParamsHash() const;
-
-    /**
-     * Unique id of event, used for action deduplication, e.g. notification.
-     * Should be equal to EventIdField in new engine.
-     */
-    QnUuid getUniqueId() const;
 };
 
 #define EventParameters_Fields \
