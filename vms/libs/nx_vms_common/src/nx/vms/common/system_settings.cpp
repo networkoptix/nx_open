@@ -523,7 +523,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Names::cloudHost, QString(), this, [] { return tr("Cloud host override"); });
 
     m_crossdomainEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        "crossdomainEnabled", false, this, [] { return tr("Enable crossdomain policy"); });
+        "crossdomainEnabled", false, this, [] { return tr("Enable cross-domain policy"); });
 
     m_arecontRtspEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "arecontRtspEnabled", false, this, [] { return tr("Enable RTSP for Arecont"); });
@@ -585,7 +585,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         "enableEdgeRecording", true, this, [] { return tr("Enable recording on EDGE"); });
 
     m_webSocketEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        Names::webSocketEnabled, true, this, [] { return tr("Enable WebSocket for p2p"); });
+        Names::webSocketEnabled, true, this, [] { return tr("Enable WebSocket for P2P"); });
 
     m_maxRemoteArchiveSynchronizationThreads = new QnLexicalResourcePropertyAdaptor<int>(
         "maxRemoteArchiveSynchronizationThreads", -1,
@@ -727,7 +727,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
 
     m_showServersInTreeForNonAdminsAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "showServersInTreeForNonAdmins", true, this,
-        [] { return tr("Show Servers in tree for non-admins"); });
+        [] { return tr("Show Servers in the Resource Tree for non-admins"); });
 
     m_supportedOriginsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         "supportedOrigins", "*", this, [] { return tr("HTTP header: Origin"); });
@@ -736,18 +736,18 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         "frameOptionsHeader", "SAMEORIGIN", this, [] { return tr("HTTP header: X-Frame-Options"); });
 
     m_useHttpsOnlyCamerasAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        "useHttpsOnlyForCameras", false, this, [] { return tr("Use only HTTPS for Cameras"); });
+        "useHttpsOnlyForCameras", false, this, [] { return tr("Use only HTTPS for cameras"); });
 
     m_insecureDeprecatedApiEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         Names::insecureDeprecatedApiEnabled, false, this,
-        [] { return tr("Enable insecure deprecated API functions"); });
+        [] { return tr("Enable deprecated API functions (unsecure)"); });
 
     m_insecureDeprecatedApiInUseEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         Names::insecureDeprecatedApiInUseEnabled, true, this,
         []
         {
             return nx::format(tr(
-                "Enable insecure deprecated API functions curently used by %1 software",
+                "Enable deprecated API functions curently used by %1 software (unsecure)",
                 "%1 is a company name"),
                 nx::branding::company());
         });
