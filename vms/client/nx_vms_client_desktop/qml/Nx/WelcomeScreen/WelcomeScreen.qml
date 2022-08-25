@@ -155,7 +155,7 @@ Rectangle
 
             visible: context.hasCloudConnectionIssue
 
-            text: qsTr("You don't have access to the %1. Please check your internet connection.")
+            text: qsTr("You do not have access to the %1. Please check your internet connection.")
                 .arg(Branding.cloudName())
         }
 

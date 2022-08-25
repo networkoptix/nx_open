@@ -65,7 +65,7 @@ Error cantFindItemResult()
 {
     return Error::invalidArguments(QCoreApplication::translate(
         "nx::vms::client::desktop::jsapi::detail::TabApiBackend",
-        "Cannot find an item with the specified id"));
+        "Cannot find an item with the specified ID"));
 }
 
 } // namespace
@@ -685,7 +685,7 @@ ItemResult TabApiBackend::addItem(
     if (!resource)
     {
         return d->itemOperationResult(
-            Error::invalidArguments(tr("Cannot find a resource with the specified id.")));
+            Error::invalidArguments(tr("Cannot find a resource with the specified ID.")));
     }
 
     if (params.media && !hasMediaStream(resourceType(resource)))
