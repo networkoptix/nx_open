@@ -177,7 +177,7 @@ void ServerCertificateViewer::setCertificateData(
     // Update text labels with server description.
     ui->serverInfoLabel->setText(calculateServerInfo(mode, target, primaryAddress));
     ui->serverIdLabel->setText(
-        tr("Server Id: %1").arg(highlightedText(target.id.toSimpleString())));
+        tr("Server ID: %1").arg(highlightedText(target.id.toSimpleString())));
 
     // Update warning message (even if it would not be shown).
     ui->warningLabel->setText(
@@ -259,7 +259,7 @@ void ServerCertificateViewer::pinCertificate()
     message.setText(tr("Pin this certificate to %1?").arg(name));
     message.setInformativeText(
         tr("Someone may be impersonating %1 to steal your personal information.\n"
-            "Do not pin this certificate if you didn't modify %2 server SSL certificate.")
+            "Do not pin this certificate if you did not modify %2 server SSL certificate.")
             .arg(name, name));
     message.addButton(
         tr("Pin"),

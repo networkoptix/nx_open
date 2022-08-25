@@ -470,7 +470,7 @@ void QnServerSettingsWidget::updateCertificatesInfo()
 
 void QnServerSettingsWidget::showCertificateMismatchBanner(bool dataLoaded)
 {
-    const auto kBase = tr("Certificate received from the server doesn't match"
+    const auto kBase = tr("Certificate received from the server does not match"
         " the certificate this server is pinned to.");
 
     ui->alertBar->setText(dataLoaded

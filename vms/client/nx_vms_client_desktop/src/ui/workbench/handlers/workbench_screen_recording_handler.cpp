@@ -234,7 +234,8 @@ void QnWorkbenchScreenRecordingHandler::startRecordingInternal()
 
     if (!m_recorder->addRecordingContext(filePath))
     {
-        onError(tr("Could not open file '%1'. Please check if the folder is accessible").arg(filePath));
+        onError(tr("Could not open file \"%1\". Please check if the folder is accessible.")
+            .arg(filePath));
         return;
     }
 
