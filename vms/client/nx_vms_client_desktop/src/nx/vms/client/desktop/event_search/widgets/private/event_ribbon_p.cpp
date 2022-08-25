@@ -357,6 +357,10 @@ void EventRibbon::Private::updateTile(int index)
         else if (resourceList.canConvert<QStringList>())
             widget->setResourceList(resourceList.value<QStringList>(), cloudSystemId);
     }
+    else
+    {
+        widget->setResourceList(QnResourceList(), cloudSystemId);
+    }
 
     updateTilePreview(index);
 }
