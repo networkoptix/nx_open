@@ -29,6 +29,9 @@ public:
     /** Returns initial event timestamp. */
     std::chrono::microseconds timestamp() const;
 
+    /** Event id, may be used for action deduplication.*/
+    QnUuid id() const;
+
     /** Returns initial event details plus aggregated details. */
     QVariantMap details(common::SystemContext* context) const;
 
@@ -42,6 +45,7 @@ public:
     size_t uniqueCount() const;
 
 private:
+    QnUuid m_id = QnUuid::createUuid(); //< TODO: #amalov Get from initial event if needed.
     AggregationInfoList m_aggregationInfoList;
 
     AggregatedEvent() = default;

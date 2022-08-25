@@ -214,4 +214,18 @@ TEST_F(ActionFieldTest, TargetUserField)
     EXPECT_EQ(selection, result.value<UuidSelection>());
 }
 
+TEST_F(ActionFieldTest, EventIdField)
+{
+    const auto event = QSharedPointer<TestEvent>::create();
+    const auto aggEvent = AggregatedEventPtr::create(event);
+
+    const auto field = QSharedPointer<EventIdField>::create();
+    const auto value = field->build(aggEvent);
+
+    ASSERT_FALSE(aggEvent->id().isNull());
+    ASSERT_TRUE(value.isValid());
+    ASSERT_FALSE(value.isNull());
+    ASSERT_EQ(value.value<QnUuid>(), aggEvent->id());
+}
+
 } // namespace nx::vms::rules::test

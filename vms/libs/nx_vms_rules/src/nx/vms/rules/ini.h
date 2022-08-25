@@ -16,11 +16,6 @@ struct NX_VMS_RULES_API Ini: public nx::kit::IniConfig
     // TODO: #amalov Temporary solution for 5.1. Should be removed in the future.
     NX_INI_FLAG(false, fullSupport,
         "Process cloud notification only when set to false.");
-
-    // TODO: #mmalofeev Temporary solution for the test purposes. Should be removed in the future.
-    NX_INI_FLAG(false, amendEventIds,
-        "[Testing] If true, new event ids is different from the old ones,\n"
-        "so both cloud and local notifications may be displayed simultaneously.");
 };
 
 NX_VMS_RULES_API Ini& ini();
