@@ -1643,7 +1643,7 @@ QUrl generateUpdatePackageUrl(
 
     if (changeset == "latest" && targetVersion.isNull())
     {
-        // We are here if we have failed to check update in the internet.
+        // We are here if we have failed to check update in the Internet.
         // Changeset will contain requested build number in this case, or 'latest'.
         query.addQueryItem("version", changeset);
         query.addQueryItem("current", getCurrentVersion(engineVersion, resourcePool).toString());

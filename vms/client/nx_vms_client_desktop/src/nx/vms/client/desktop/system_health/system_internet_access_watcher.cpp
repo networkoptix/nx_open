@@ -38,7 +38,7 @@ SystemInternetAccessWatcher::SystemInternetAccessWatcher(
         {
             if (!m_hasInternetAccess && server->hasInternetAccess())
                 setHasInternetAccess(true);
-            // Recalculate everything if this was the only server which provided the internet.
+            // Recalculate everything if this was the only server which provided the Internet.
             else if (m_hasInternetAccess)
                 recalculateAll();
         };

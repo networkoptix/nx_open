@@ -380,7 +380,7 @@ void RulesDialog::applyChanges()
     const auto errorHandler =
         [this](const QString& error)
         {
-            QnMessageBox::critical(this, tr("Apply changes failed."), error);
+            QnMessageBox::critical(this, tr("Failed to apply changes."), error);
         };
 
     rulesTableModel->applyChanges(errorHandler);
@@ -415,7 +415,7 @@ void RulesDialog::resetToDefaults()
     const auto errorHandler =
         [this](const QString& error)
         {
-            QnMessageBox::critical(this, tr("Restore rules failed."), error);
+            QnMessageBox::critical(this, tr("Failed to restore rules."), error);
         };
 
     rulesTableModel->resetToDefaults(errorHandler);

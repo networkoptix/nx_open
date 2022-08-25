@@ -220,7 +220,7 @@
              </font>
             </property>
             <property name="text">
-             <string>Select some rule</string>
+             <string>Select a rule</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>

@@ -224,7 +224,7 @@ Item
         {
             header: qsTr("This plugin has no settings for this Camera.")
             description:
-                qsTr("Check System Administration Settings to configure this plugin.")
+                qsTr("Check System Administration settings to configure this plugin.")
         }
     }
 
