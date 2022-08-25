@@ -2,10 +2,12 @@
 
 #include "ffmpeg_sdk_support.h"
 
-#include <utils/media/ffmpeg_helper.h>
+#include <nx/sdk/cloud_storage/helpers/algorithm.h>
+#include <nx/sdk/cloud_storage/helpers/media_data_packet.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/scope_guard.h>
 #include <recording/helpers/recording_context_helpers.h>
+#include <utils/media/ffmpeg_helper.h>
 
 namespace nx::utils::media::sdk_support {
 
@@ -300,9 +302,9 @@ nxcip::SampleFormat toNxSampleFormat(AVSampleFormat sampleFormat)
     return nxcip::AV_SAMPLE_FMT_NONE;
 }
 
-void avCodecParametersFromCodecInfo(const CodecInfo& info, AVCodecParameters* codecParams)
+void avCodecParametersFromCodecInfo(
+    const nx::sdk::cloud_storage::CodecInfoData& info, AVCodecParameters* codecParams)
 {
-
 #define SET_IF_DEFINED_INT(dst, src) \
         do \
         { \
@@ -327,22 +329,20 @@ void avCodecParametersFromCodecInfo(const CodecInfo& info, AVCodecParameters* co
     SET_IF_DEFINED_INT(codecParams->bits_per_coded_sample, info.bitsPerCodedSample);
     SET_IF_DEFINED_INT(codecParams->channel_layout, info.channelLayout);
 
+    const auto extradata = nx::sdk::cloud_storage::fromBase64(info.extradataBase64);
     QnFfmpegHelper::copyAvCodecContextField(
-        (void**) &codecParams->extradata, info.extradata, info.extradataSize);
-    codecParams->extradata_size = info.extradataSize;
+        (void**) &codecParams->extradata, extradata.data(), extradata.size());
+
+    codecParams->extradata_size = extradata.size();
 
 #undef SET_IF_DEFINED_INT
 #undef SET_IF_DEFINED_RATIONAL
 }
 
-CodecInfo::CodecInfo()
+nx::sdk::cloud_storage::CodecInfoData codecInfoFromAvCodecParameters(
+    const AVCodecParameters* codecParams)
 {
-    memset(extradata, 0, sizeof(extradata));
-}
-
-CodecInfo codecInfoFromAvCodecParameters(const AVCodecParameters* codecParams)
-{
-    CodecInfo result;
+    nx::sdk::cloud_storage::CodecInfoData result;
     result.mediaType = toNxMediaType(codecParams->codec_type);
     result.codecTag = codecParams->codec_tag;
     result.compressionType = toNxCompressionType(codecParams->codec_id);
@@ -361,10 +361,8 @@ CodecInfo codecInfoFromAvCodecParameters(const AVCodecParameters* codecParams)
     result.channels = codecParams->channels;
     result.channelLayout = codecParams->channel_layout;
     result.blockAlign = codecParams->block_align;
-
-    NX_ASSERT(codecParams->extradata_size <= (int) sizeof(result.extradata));
-    result.extradataSize = std::min<int>(codecParams->extradata_size, sizeof(result.extradata));
-    memcpy(result.extradata, codecParams->extradata, result.extradataSize);
+    result.extradataBase64 = nx::sdk::cloud_storage::toBase64(
+        codecParams->extradata, codecParams->extradata_size);
 
     return result;
 }
@@ -384,107 +382,46 @@ void setupIoContext(
         throw std::runtime_error("Failed to initialize ffmpeg: avio_alloc_context");
 }
 
-
-ThirdPartyMediaDataPacket::ThirdPartyMediaDataPacket(
+nx::sdk::Ptr<nx::sdk::cloud_storage::IMediaDataPacket> mediaPacketFromFrame(
     const QnConstAbstractMediaDataPtr& mediaData,
-    std::optional<int> streamIndex)
-    :
-    m_refManager(this),
-    m_mediaData(mediaData),
-    m_streamIndex(streamIndex)
+    int streamIndex)
 {
+    nx::sdk::cloud_storage::MediaPacketData data;
+    data.channelNumber = mediaData->channelNumber;
+    data.compressionType = toNxCompressionType(mediaData->compressionType);
     if (auto metadata = std::dynamic_pointer_cast<const QnAbstractCompressedMetadata>(mediaData))
-        m_serializedMetadata = nx::recording::helpers::serializeMetadataPacket(metadata);
-}
-
-nxcip::UsecUTCTimestamp ThirdPartyMediaDataPacket::timestamp() const
-{
-    return (nxcip::UsecUTCTimestamp) m_mediaData->timestamp;
-}
-
-nxcip::DataPacketType ThirdPartyMediaDataPacket::type() const
-{
-    return toSdkDataPacketType(m_mediaData->dataType);
-}
-
-const void* ThirdPartyMediaDataPacket::data() const
-{
-    return m_serializedMetadata.isEmpty() ? m_mediaData->data() : m_serializedMetadata.constData();
-}
-
-unsigned int ThirdPartyMediaDataPacket::dataSize() const
-{
-    return m_serializedMetadata.isEmpty()
-        ? (unsigned int) m_mediaData->dataSize()
-        : (unsigned int) m_serializedMetadata.size();
-}
-
-unsigned int ThirdPartyMediaDataPacket::channelNumber() const
-{
-    return m_streamIndex ? *m_streamIndex : m_mediaData->channelNumber;
-}
-
-nxcip::CompressionType ThirdPartyMediaDataPacket::codecType() const
-{
-    return toNxCompressionType(m_mediaData->compressionType);
-}
-
-unsigned int ThirdPartyMediaDataPacket::flags() const
-{
-    unsigned int result = 0;
-    if ((m_mediaData->flags & QnAbstractMediaData::MediaFlags_AVKey)
-        && m_mediaData->dataType != QnAbstractMediaData::GENERIC_METADATA)
     {
-        result |= nxcip::MediaDataPacket::fKeyPacket;
+        const auto serializedMetadata = nx::recording::helpers::serializeMetadataPacket(metadata);
+        data.data.assign(
+            serializedMetadata.constData(), serializedMetadata.constData() + serializedMetadata.size());
+        data.dataSize = serializedMetadata.size()   ;
+    }
+    else
+    {
+        data.data.assign(mediaData->data(), mediaData->data() + mediaData->dataSize());
+        data.dataSize = mediaData->dataSize();
     }
 
-    return result;
-}
-
-unsigned int ThirdPartyMediaDataPacket::cSeq() const
-{
-    return 0;
-}
-
-int ThirdPartyMediaDataPacket::addRef() const { return m_refManager.addRef(); }
-
-int ThirdPartyMediaDataPacket::releaseRef() const { return m_refManager.releaseRef(); }
-
-void* ThirdPartyMediaDataPacket::queryInterface(const nxpl::NX_GUID& interfaceID)
-{
-    if (memcmp(interfaceID.bytes, nxcip::IID_MediaDataPacket.bytes, sizeof(interfaceID.bytes)) == 0)
+    data.encryptionData = mediaData->encryptionData;
+    data.isKeyFrame = mediaData->flags & QnAbstractMediaData::MediaFlags_AVKey;
+    data.timestampUs = mediaData->timestamp;
+    switch (mediaData->dataType)
     {
-        addRef();
-        return dynamic_cast<nxcip::MediaDataPacket*>(this);
+        case QnAbstractMediaData::DataType::AUDIO:
+            data.type = nx::sdk::cloud_storage::IMediaDataPacket::Type::audio;
+            break;
+        case QnAbstractMediaData::DataType::VIDEO:
+            data.type = nx::sdk::cloud_storage::IMediaDataPacket::Type::video;
+            break;
+        case QnAbstractMediaData::DataType::GENERIC_METADATA:
+            data.type = nx::sdk::cloud_storage::IMediaDataPacket::Type::metadata;
+            break;
+        default:
+            data.type = nx::sdk::cloud_storage::IMediaDataPacket::Type::unknown;
+            break;
     }
 
-    if (memcmp(interfaceID.bytes, nxcip::IID_Encryptable.bytes, sizeof(interfaceID.bytes)) == 0)
-    {
-        addRef();
-        return dynamic_cast<nxcip::Encryptable*>(this);
-    }
-
-    return nullptr;
-}
-
-const uint8_t* ThirdPartyMediaDataPacket::encryptionData() const
-{
-    return m_mediaData->encryptionData.data();
-}
-
-int ThirdPartyMediaDataPacket::encryptionDataSize() const
-{
-    return m_mediaData->encryptionData.size();
-}
-
-nx::sdk::Ptr<nxcip::MediaDataPacket> mediaPacketFromFrame(
-    const QnConstAbstractMediaDataPtr& mediaData,
-    std::optional<int> streamIndex)
-{
-    nx::sdk::Ptr<nxcip::MediaDataPacket> result = nx::sdk::toPtr(
-        new ThirdPartyMediaDataPacket(mediaData, streamIndex));
-
-    return result;
+    return nx::sdk::toPtr(new nx::sdk::cloud_storage::MediaDataPacket(data));
 }
 
 QnAbstractMediaData::DataType toMediaDataType(nxcip::DataPacketType type)
@@ -526,120 +463,6 @@ nxcip::DataPacketType toSdkDataPacketType(QnAbstractMediaData::DataType type)
 
     NX_ASSERT(false);
     return nxcip::dptUnknown;
-}
-
-SdkCodecInfo::SdkCodecInfo(const CodecInfo& codecInfo) : m_codecInfo(codecInfo)
-{
-}
-
-nxcip::CompressionType SdkCodecInfo::compressionType() const
-{
-    return m_codecInfo.compressionType;
-}
-
-nxcip::PixelFormat SdkCodecInfo::pixelFormat() const
-{
-    return m_codecInfo.pixelFormat;
-}
-
-nxcip::MediaType SdkCodecInfo::mediaType() const
-{
-    return m_codecInfo.mediaType;
-}
-
-int SdkCodecInfo::width() const
-{
-    return m_codecInfo.width;
-}
-
-int SdkCodecInfo::height() const
-{
-    return m_codecInfo.height;
-}
-
-int64_t SdkCodecInfo::codecTag() const
-{
-    return m_codecInfo.codecTag;
-}
-
-int64_t SdkCodecInfo::bitRate() const
-{
-    return m_codecInfo.bitRate;
-}
-
-int SdkCodecInfo::channels() const
-{
-    return m_codecInfo.channels;
-}
-
-int SdkCodecInfo::frameSize() const
-{
-    return m_codecInfo.frameSize;
-}
-
-int SdkCodecInfo::blockAlign() const
-{
-    return m_codecInfo.blockAlign;
-}
-
-int SdkCodecInfo::sampleRate() const
-{
-    return m_codecInfo.sampleRate;
-}
-
-nxcip::SampleFormat SdkCodecInfo::sampleFormat() const
-{
-    return m_codecInfo.sampleFormat;
-}
-
-int SdkCodecInfo::bitsPerCodedSample() const
-{
-    return m_codecInfo.bitsPerCodedSample;
-}
-
-int64_t SdkCodecInfo::channelLayout() const
-{
-    return m_codecInfo.channelLayout;
-}
-
-int SdkCodecInfo::extradataSize() const
-{
-    return m_codecInfo.extradataSize;
-}
-
-const uint8_t* SdkCodecInfo::extradata() const
-{
-    return m_codecInfo.extradata;
-}
-
-int SdkCodecInfo::channelNumber() const
-{
-    return m_codecInfo.channelNumber;
-}
-
-CodecInfo codecInfo(const nx::sdk::archive::ICodecInfo* info)
-{
-    sdk_support::CodecInfo result;
-
-    result.compressionType = info->compressionType();
-    result.pixelFormat = info->pixelFormat();
-    result.mediaType = info->mediaType();
-    result.width = info->width();
-    result.height = info->height();
-    result.codecTag = info->codecTag();
-    result.bitRate = info->bitRate();
-    result.channels = info->channels();
-    result.frameSize = info->frameSize();
-    result.blockAlign = info->blockAlign();
-    result.sampleRate = info->sampleRate();
-    result.sampleFormat = info->sampleFormat();
-    result.bitsPerCodedSample = info->bitsPerCodedSample();
-    result.channelLayout = info->channelLayout();
-    result.extradataSize = info->extradataSize();
-    if (result.extradataSize > 0)
-        memcpy(result.extradata, info->extradata(), result.extradataSize);
-    result.channelNumber = info->channelNumber();
-    return result;
 }
 
 } // nx::utils::media::sdk_support

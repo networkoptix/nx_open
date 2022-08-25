@@ -17,6 +17,8 @@ enum class ErrorCode: int
     invalidParams = -1001, //< Method arguments are invalid.
     notImplemented = -21,
     otherError = -100,
+    ioError = -31,
+    noData = -101, //< Call succeeded, but no valid data can be returned (EoF for example)
 };
 
 class Error

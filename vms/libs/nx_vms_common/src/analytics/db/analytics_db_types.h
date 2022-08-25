@@ -170,7 +170,6 @@ struct NX_VMS_COMMON_API Filter
 
     /** Coordinates in range [0;1]. */
     std::optional<QRectF> boundingBox;
-    std::vector<common::metadata::Attribute> requiredAttributes;
     /**
      * Set of words separated by spaces, commas, etc. The search is done across all attribute
      * values, using wildcards.
