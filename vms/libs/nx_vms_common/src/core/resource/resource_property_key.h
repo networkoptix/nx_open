@@ -292,6 +292,11 @@ static const QString kOnvifRemoteArchiveStartSkipDuration("onvifRemoteArchiveSta
 
 static const QString kDisableRtspMetadataStream("disableRtspMetadataStream");
 
+// Do not attemp donloading remote archive faster than real-time. This is necessary since some
+// cameras cannot cope with that.
+static const QString kOnvifRemoteArchiveDisableFastDownload(
+    "onvifRemoteArchiveDisableFastDownload");
+
 } // namespace ResourceDataKey
 
 //-------------------------------------------------------------------------------------------------
