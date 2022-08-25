@@ -69,7 +69,16 @@ private:
         const QnVirtualCameraResourcePtr& camera) const;
 
     void copyBookmarkToClipboard(const QModelIndex& index);
-    bool checkActionSupport(const QModelIndex& index);
+
+    enum class ActionSupport
+    {
+        supported,
+        unsupported,
+
+        /** Generally supported, but not for the Cross-System tiles. */
+        cross_system,
+    };
+    ActionSupport checkActionSupport(const QModelIndex& index);
 
 signals:
     void highlightedTimestampChanged(std::chrono::microseconds value);

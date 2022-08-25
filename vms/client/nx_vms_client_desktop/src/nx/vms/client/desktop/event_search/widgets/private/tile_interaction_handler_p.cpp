@@ -180,9 +180,11 @@ void TileInteractionHandler::handleClick(
     if (!NX_ASSERT(index.isValid()))
         return;
 
-    if (!checkActionSupport(index))
+    if (auto actionSupported = checkActionSupport(index);
+        actionSupported != ActionSupport::supported)
     {
-        showMessage(tr("This action is not supported for notifications from other Systems"));
+        if (actionSupported == ActionSupport::unsupported)
+            showMessage(tr("This action is not supported for notifications from other Systems"));
         return;
     }
 
@@ -471,21 +473,26 @@ void TileInteractionHandler::copyBookmarkToClipboard(const QModelIndex &index)
     }
 }
 
-bool TileInteractionHandler::checkActionSupport(const QModelIndex& index)
+TileInteractionHandler::ActionSupport TileInteractionHandler::checkActionSupport(
+    const QModelIndex& index)
 {
-    if (!index.data(Qn::CloudSystemIdRole).toString().isEmpty()
-        && index.data(Qn::ActionIdRole).value<ui::action::IDType>() != ui::action::NoAction)
-    {
-        return false;
-    }
+    if (index.data(Qn::CloudSystemIdRole).toString().isEmpty())
+        return ActionSupport::supported;
 
-    return true;
+    auto actionType = index.data(Qn::ActionIdRole).value<ui::action::IDType>();
+    if (actionType  == ui::action::BrowseUrlAction)
+        return ActionSupport::cross_system;
+
+    if (actionType != ui::action::NoAction)
+        return ActionSupport::unsupported;
+
+    return ActionSupport::supported;
 }
 
 void TileInteractionHandler::openSource(
     const QModelIndex& index, bool inNewTab, bool fromDoubleClick)
 {
-    if (fromDoubleClick && !checkActionSupport(index))
+    if (fromDoubleClick && checkActionSupport(index) != ActionSupport::supported)
         return;
 
     auto resourceList = index.data(Qn::ResourceListRole).value<QnResourceList>()
