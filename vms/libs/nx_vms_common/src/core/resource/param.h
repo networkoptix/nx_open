@@ -274,6 +274,12 @@ namespace ResourceDataKey
 
     // Skip this many seconds at the start of remote archive when when downloading it.
     static const QString kOnvifRemoteArchiveStartSkipDuration("onvifRemoteArchiveStartSkipDuration");
+
+    // Do not attemp donloading remote archive faster than real-time. This is necessary since some
+    // cameras cannot cope with that.
+    static const QString kOnvifRemoteArchiveDisableFastDownload(
+        "onvifRemoteArchiveDisableFastDownload");
+
 } // namespace ResourceDataKey
 
 //-------------------------------------------------------------------------------------------------
