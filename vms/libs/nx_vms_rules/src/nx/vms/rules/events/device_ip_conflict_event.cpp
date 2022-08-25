@@ -41,6 +41,7 @@ QVariantMap DeviceIpConflictEvent::details(common::SystemContext* context) const
 {
     auto result = BasicEvent::details(context);
 
+    utils::insertIfNotEmpty(result, utils::kCaptionDetailName, caption(context));
     utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing());
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
     result.insert(utils::kEmailTemplatePathDetailName, manifest().emailTemplatePath);
@@ -49,6 +50,14 @@ QVariantMap DeviceIpConflictEvent::details(common::SystemContext* context) const
     utils::insertIfNotEmpty(result, utils::kUrlDetailName, m_ipAddress);
 
     return result;
+}
+
+QString DeviceIpConflictEvent::caption(common::SystemContext* context) const
+{
+    // TODO: #amalov The number of devices in translation should be corrected in 5.1+
+    return QnDeviceDependentStrings::getDefaultNameFromSet(context->resourcePool(),
+        tr("Device IP Conflict", "", 1),
+        tr("Camera IP Conflict", "", 1));
 }
 
 QStringList DeviceIpConflictEvent::detailing() const
