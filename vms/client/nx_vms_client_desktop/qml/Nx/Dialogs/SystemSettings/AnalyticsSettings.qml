@@ -68,7 +68,7 @@ Item
 
         placeholderItem: SettingsPlaceholder
         {
-            header: qsTr("This plugin has no settings at System level.")
+            header: qsTr("This plugin has no settings at the System level.")
             description: qsTr("Check Camera Settings to configure this plugin.")
         }
 

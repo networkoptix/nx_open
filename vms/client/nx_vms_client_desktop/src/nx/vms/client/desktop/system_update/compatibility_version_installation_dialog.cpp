@@ -41,7 +41,7 @@ struct CompatibilityVersionInstallationDialog::Private
 
     // Update info from mediaservers.
     std::future<UpdateContents> updateInfoMediaserver;
-    // Update info from the internet.
+    // Update info from the Internet.
     std::future<UpdateContents> updateInfoInternet;
     // Information about servers in the system.
     std::future<ClientUpdateTool::SystemServersInfo> systemServersInfo;
@@ -319,7 +319,7 @@ void CompatibilityVersionInstallationDialog::startUpdate()
     const QString updateUrl = nx::vms::common::update::updateFeedUrl();
 
     m_private->checkingUpdates = true;
-    // Starting check for update manifest from the internet.
+    // Starting check for update manifest from the Internet.
     m_private->updateInfoInternet = m_private->clientUpdateTool->requestInternetUpdateInfo(
         updateUrl, nx::vms::update::CertainVersionParams{m_versionToInstall, m_engineVersion});
     if (m_private->updateInfoInternet.valid())

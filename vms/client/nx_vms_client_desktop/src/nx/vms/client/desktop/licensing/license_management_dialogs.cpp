@@ -347,10 +347,10 @@ void LicenseActivationDialogs::freeLicenseNetworkError(QWidget* parent, const QS
 {
     const QString supportContactString = Private::customerSupportMessage(
         parent,
-        tr("If system doesn't have access to the internet, to get activation file please send "
-           "the provided License Key and Hardware ID to %1."),
-        tr("If system doesn't have access to the internet, to get activation file please send "
-           "the provided License Key and Hardware ID to your Regional / License support:")) +
+        tr("If your System does not have access to the Internet please send the provided License "
+           "Key and Hardware ID to %1 to get activation file."),
+        tr("If your System does not have access to the Internet please send the provided License "
+           "Key and Hardware ID to your Regional / License support to get activation file:")) +
         QString(html::kLineBreak);
 
     QString licenseInfoString;

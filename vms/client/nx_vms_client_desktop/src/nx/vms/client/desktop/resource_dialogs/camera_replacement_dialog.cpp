@@ -570,7 +570,7 @@ void CameraReplacementDialog::updateHeader()
 
             //: %1 will be substituted with the camera's name.
             ui->headerDetailsLabel->setText(
-                tr("%1 will be replaced by selected camera and removed from the system")
+                tr("%1 will be replaced by the selected Camera and removed from the System")
                     .arg(makeCameraNameRichText(d->cameraToBeReplaced->getName())));
 
             ui->headerDetailsLabel->setHidden(false);
@@ -580,8 +580,8 @@ void CameraReplacementDialog::updateHeader()
         case ReplacementApproval:
             ui->headerCaptionLabel->setText(tr("Data for Transfer"));
             ui->headerDetailsLabel->setText(QStringList({
-                tr("Checking if the data from the camera can be transferred to the new one."),
-                tr("Some data and settings may not supported for new Camera")})
+                tr("Checking if the old Camera's data can be transferred to the new Camera."),
+                tr("Some data and settings may not be compatible with the new Camera")})
                     .join(QChar::LineFeed));
 
             ui->headerDetailsLabel->setHidden(false);
