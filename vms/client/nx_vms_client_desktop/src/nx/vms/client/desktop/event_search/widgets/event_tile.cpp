@@ -90,9 +90,7 @@ void setWidgetHolder(QWidget* widget, QWidget* newHolder)
     widget->setHidden(wasHidden);
 }
 
-// For cloud notifications the system name must be displayed. The function returns the name of
-// a system different from the current one in the form required for display.
-QString getFormattedSystemNameIfNeeded(const QString& systemId)
+QString getSystemName(const QString& systemId)
 {
     if (systemId.isEmpty())
         return QString();
@@ -101,7 +99,17 @@ QString getFormattedSystemNameIfNeeded(const QString& systemId)
     if (!NX_ASSERT(systemDescription))
         return QString();
 
-    return systemDescription->name() + " / ";
+    return systemDescription->name();
+}
+
+// For cloud notifications the system name must be displayed. The function returns the name of
+// a system different from the current one in the form required for display.
+QString getFormattedSystemNameIfNeeded(const QString& systemId)
+{
+    if (auto systemName = getSystemName(systemId); !systemName.isEmpty())
+        return systemName + " / ";
+
+    return QString();
 }
 
 } // namespace
@@ -507,6 +515,9 @@ void EventTile::setResourceList(const QnResourceList& list, const QString& cloud
             list[i] ? common::html::bold(systemName + list[i]->getName()) : systemName + "?");
     }
 
+    if (items.isEmpty() && !cloudSystemId.isEmpty())
+        items.push_back(common::html::bold(getSystemName(cloudSystemId)));
+
     d->setResourceList(items, qMax(list.size() - kMaximumResourceListSize, 0));
 }
 
@@ -516,6 +527,9 @@ void EventTile::setResourceList(const QStringList& list, const QString& cloudSys
     QStringList items = list.mid(0, kMaximumResourceListSize);
     for (auto& item: items)
         item = common::html::toHtml(systemName + item);
+
+    if (items.isEmpty() && !cloudSystemId.isEmpty())
+        items.push_back(common::html::bold(getSystemName(cloudSystemId)));
 
     d->setResourceList(items, qMax(list.size() - kMaximumResourceListSize, 0));
 }
