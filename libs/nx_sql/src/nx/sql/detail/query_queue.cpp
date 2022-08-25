@@ -11,8 +11,6 @@
 
 namespace nx::sql::detail {
 
-const int QueryQueue::kDefaultPriority;
-
 QueryQueue::QueryQueue():
     m_currentModificationCount(0)
 {
@@ -28,13 +26,11 @@ void QueryQueue::push(value_type value)
         NX_MUTEX_LOCKER lock(&m_mutex);
 
         const auto priority = getPriority(*value);
-        auto elementIter = m_elementsByPriority.emplace(
-            priority, ElementContext{std::move(value), std::nullopt});
+        m_priorityToQueue[priority].push_back(ElementContext{
+            .value = std::move(value), .enqueueTime = nx::utils::monotonicTime()});
 
-        queueSize = m_elementsByPriority.size();
-
-        if (m_itemStayTimeout)
-            addElementExpirationTimer(elementIter);
+        for (const auto& [p, q]: m_priorityToQueue)
+            queueSize += q.size();
     }
 
     m_cond.wakeAll();
@@ -42,11 +38,26 @@ void QueryQueue::push(value_type value)
     NX_TRACE(this, "QueryQueue::push done in %1, queue size %2", t.elapsed(), queueSize);
 }
 
-std::size_t QueryQueue::size() const
+Stats QueryQueue::stats() const
 {
+    using namespace std::chrono;
+
     NX_MUTEX_LOCKER lock(&m_mutex);
 
-    return m_elementsByPriority.size();
+    std::size_t queueSize = 0;
+    milliseconds oldestQueryAge = milliseconds::zero();
+
+    const auto now = steady_clock::now();
+    for (const auto& [p, q]: m_priorityToQueue)
+    {
+        if (!q.empty())
+            oldestQueryAge = std::max(oldestQueryAge, floor<milliseconds>(now - q.front().enqueueTime));
+        queueSize += q.size();
+    }
+
+    return Stats{
+        .pendingQueryCount = (int) queueSize,
+        .oldestQueryAge = oldestQueryAge};
 }
 
 std::optional<QueryQueue::value_type> QueryQueue::pop(
@@ -139,31 +150,31 @@ std::optional<QueryQueue::FoundQueryContext> QueryQueue::getNextSuitableQuery(
     QuerySelectionContext* querySelectionContext,
     bool consumeLimits)
 {
-    for (auto it = m_elementsByPriority.begin(); it != m_elementsByPriority.end(); ++it)
-    {
-        auto& query = it->second.value;
-
-        if (nx::utils::contains(querySelectionContext->forbiddenQueryTypes, query->queryType()))
-            continue;
-
-        if (!consumeLimits || checkAndUpdateQueryLimits(query))
-            return FoundQueryContext{query, it};
-
-        if (consumeLimits)
+    for (auto& [priority, queue]: m_priorityToQueue)
+        for (auto it = queue.begin(); it != queue.end(); ++it)
         {
-            // Limits check didn't pass. Making sure we are not selecting a query of the same type
-            // on this iteration since it will lead to query reordering.
-            querySelectionContext->forbiddenQueryTypes.push_back(query->queryType());
+            auto& query = it->value;
+
+            if (nx::utils::contains(querySelectionContext->forbiddenQueryTypes, query->queryType()))
+                continue;
+
+            if (!consumeLimits || checkAndUpdateQueryLimits(query))
+                return FoundQueryContext{.value = query, .priority = priority, .it = it};
+
+            if (consumeLimits)
+            {
+                // Limits check didn't pass. Making sure we are not selecting a query of the same type
+                // on this iteration since it will lead to query reordering.
+                querySelectionContext->forbiddenQueryTypes.push_back(query->queryType());
+            }
         }
-    }
 
     return std::nullopt;
 }
 
 void QueryQueue::pop(const FoundQueryContext& queryContext)
 {
-    removeExpirationTimer(queryContext.it->second);
-    m_elementsByPriority.erase(queryContext.it);
+    m_priorityToQueue[queryContext.priority].erase(queryContext.it);
 }
 
 bool QueryQueue::checkAndUpdateQueryLimits(
@@ -232,39 +243,22 @@ void QueryQueue::decreaseLimitCounters(AbstractExecutor* finishedQuery)
     }
 }
 
-void QueryQueue::addElementExpirationTimer(
-    typename ElementsByPriority::iterator elementIter)
-{
-    auto timerIter = m_elementExpirationTimers.emplace(
-        nx::utils::monotonicTime() + *m_itemStayTimeout,
-        ElementExpirationContext{elementIter});
-    elementIter->second.timerIter = timerIter;
-}
-
-void QueryQueue::removeExpirationTimer(const ElementContext& elementContext)
-{
-    if (elementContext.timerIter)
-        m_elementExpirationTimers.erase(*elementContext.timerIter);
-}
-
 void QueryQueue::removeExpiredElements(nx::Locker<nx::Mutex>* lock)
 {
-    const auto now = nx::utils::monotonicTime();
-    while (!m_elementExpirationTimers.empty() &&
-        m_elementExpirationTimers.begin()->first <= now)
+    if (!m_itemStayTimeout)
+        return;
+
+    const auto minEnqueueTime = nx::utils::monotonicTime() - *m_itemStayTimeout;
+    for (auto& [priority, queue]: m_priorityToQueue)
     {
-        auto expirationContext = std::move(m_elementExpirationTimers.begin()->second);
-        m_elementExpirationTimers.erase(m_elementExpirationTimers.begin());
-
-        value_type value;
-        if (expirationContext.elementsByPriorityIter)
+        while (!queue.empty() && queue.front().enqueueTime <= minEnqueueTime)
         {
-            value = std::move((*expirationContext.elementsByPriorityIter)->second.value);
-            m_elementsByPriority.erase(*expirationContext.elementsByPriorityIter);
-        }
+            auto value = std::exchange(queue.front().value, {});
+            queue.pop_front();
 
-        nx::Unlocker<nx::Mutex> unlocker(lock);
-        m_itemStayTimeoutHandler(std::move(value));
+            nx::Unlocker<nx::Mutex> unlocker(lock);
+            m_itemStayTimeoutHandler(std::move(value));
+        }
     }
 }
 

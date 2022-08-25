@@ -5,6 +5,7 @@
 #include <chrono>
 #include <vector>
 
+#include <nx/reflect/instrument.h>
 #include <nx/network/socket_common.h>
 
 class QnSettings;
@@ -71,5 +72,11 @@ private:
 
     void loadSsl(const QnSettings& settings);
 };
+
+NX_REFLECTION_INSTRUMENT(Settings::Ssl,
+    (endpoints)(certificatePath)(certificateMonitorTimeout)(allowedSslVersions))
+
+NX_REFLECTION_INSTRUMENT(Settings,
+    (tcpBacklogSize)(connectionInactivityPeriod)(endpoints)(serverName)(redirectHttpToHttps)(ssl))
 
 } // namespace nx::network::http::server

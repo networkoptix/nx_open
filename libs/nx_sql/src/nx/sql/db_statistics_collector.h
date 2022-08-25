@@ -5,7 +5,6 @@
 #include <chrono>
 #include <deque>
 
-#include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
 #include <nx/utils/std/optional.h>
 #include <nx/utils/thread/mutex.h>
@@ -29,7 +28,6 @@ struct NX_SQL_API DurationStatistics
 };
 
 #define DurationStatistics_sql_Fields (min)(max)(average)
-QN_FUSION_DECLARE_FUNCTIONS(DurationStatistics, (json), NX_SQL_API)
 
 NX_REFLECTION_INSTRUMENT(DurationStatistics, DurationStatistics_sql_Fields)
 
@@ -45,7 +43,6 @@ struct NX_SQL_API QueryStatistics
 
 #define QueryStatistics_sql_Fields (statisticalPeriod)(requestsSucceeded)(requestsFailed) \
     (requestsCancelled)(requestExecutionTimes)(waitingForExecutionTimes)
-QN_FUSION_DECLARE_FUNCTIONS(QueryStatistics, (json), NX_SQL_API)
 
 NX_REFLECTION_INSTRUMENT(QueryStatistics, QueryStatistics_sql_Fields)
 

@@ -78,5 +78,52 @@ private:
     const std::chrono::milliseconds m_expirationTime;
 };
 
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Caches a value and updates its value periodically from a given function.
+ * Locks internal mutex when value update is needed only.
+ * So, this class is suitable for multithreaded environment with a lot of concurrent value access.
+ * Value type must be suitable for std::atomic<Value>.
+ */
+template<typename Value>
+class AtomicValueCache
+{
+public:
+    AtomicValueCache(
+        nx::utils::MoveOnlyFunc<Value()> generator,
+        std::chrono::milliseconds valueUpdatePeriod)
+        :
+        m_generator(std::move(generator)),
+        m_valueUpdatePeriod(valueUpdatePeriod)
+    {
+    }
+
+    Value get()
+    {
+        const auto now = std::chrono::steady_clock::now();
+        if (now - m_lastUpdateTime.load() > m_valueUpdatePeriod)
+            generateValue();
+
+        return m_value.load();
+    }
+
+private:
+    void generateValue()
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        auto newValue = m_generator();
+        m_value.store(std::move(newValue));
+        m_lastUpdateTime.store(std::chrono::steady_clock::now());
+    }
+
+private:
+    nx::utils::MoveOnlyFunc<Value()> m_generator;
+    const std::chrono::milliseconds m_valueUpdatePeriod;
+    std::atomic<std::chrono::steady_clock::time_point> m_lastUpdateTime;
+    std::atomic<Value> m_value;
+    nx::Mutex m_mutex;
+};
+
 } // namespace nx::utils
 

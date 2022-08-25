@@ -4,9 +4,9 @@
 
 #include <atomic>
 #include <chrono>
-#include <memory>
+#include <deque>
 #include <map>
-#include <list>
+#include <memory>
 #include <limits>
 
 #include <nx/utils/move_only_func.h>
@@ -23,13 +23,13 @@ public:
     using value_type = std::unique_ptr<AbstractExecutor>;
     using ItemStayTimeoutHandler = nx::utils::MoveOnlyFunc<void(value_type)>;
 
-    static const int kDefaultPriority = 0;
+    static constexpr int kDefaultPriority = 0;
 
     QueryQueue();
 
     void push(value_type query);
 
-    std::size_t size() const;
+    Stats stats() const;
 
     std::optional<value_type> pop(
         std::optional<std::chrono::milliseconds> timeout = std::nullopt);
@@ -45,6 +45,7 @@ public:
     int concurrentModificationCount() const;
 
     /**
+     * Queries with bigger priority are executed first.
      * By default, every query has priority of 0.
      */
     void setQueryPriority(QueryType queryType, int newPriority);
@@ -57,31 +58,19 @@ public:
     int aggregationLimit() const;
 
 private:
-    struct ElementContext;
-
-    using ElementsByPriority = std::multimap<int, ElementContext, std::greater<int>>;
-
-    /**
-     * Element can be in either m_elementsByPriority or m_postponedElements.
-     */
-    struct ElementExpirationContext
-    {
-        std::optional<typename ElementsByPriority::iterator> elementsByPriorityIter;
-    };
-
-    using ElementExpirationTimers =
-        std::multimap<std::chrono::steady_clock::time_point, ElementExpirationContext>;
-
     struct ElementContext
     {
         value_type value;
-        std::optional<typename ElementExpirationTimers::iterator> timerIter;
+        std::chrono::steady_clock::time_point enqueueTime;
     };
+
+    using Queries = std::deque<ElementContext>;
 
     struct FoundQueryContext
     {
         value_type& value;
-        ElementsByPriority::iterator it;
+        int priority = 0;
+        Queries::iterator it;
     };
 
     struct QuerySelectionContext
@@ -96,8 +85,7 @@ private:
     std::atomic<int> m_currentModificationCount;
     int m_concurrentModificationQueryLimit = 0;
     int m_aggregationLimit = -1;
-    ElementsByPriority m_elementsByPriority;
-    ElementExpirationTimers m_elementExpirationTimers;
+    std::map<int, Queries, std::greater<int>> m_priorityToQueue;
 
     std::optional<std::chrono::milliseconds> m_itemStayTimeout;
     ItemStayTimeoutHandler m_itemStayTimeoutHandler;
@@ -118,11 +106,6 @@ private:
 
     bool checkAndUpdateQueryLimits(
         const std::unique_ptr<AbstractExecutor>& queryExecutor);
-
-    void addElementExpirationTimer(
-        typename ElementsByPriority::iterator elementIter);
-
-    void removeExpirationTimer(const ElementContext& elementContext);
 
     void removeExpiredElements(nx::Locker<nx::Mutex>* lock);
 
