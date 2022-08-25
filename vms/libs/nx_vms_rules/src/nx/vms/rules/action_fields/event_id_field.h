@@ -7,8 +7,7 @@
 namespace nx::vms::rules {
 
 /**
- * Unique id of event, used for action discretion, e.g. notification.
- * Should be equal to EventParameters.uniqueId in old engine.
+ * Unique id of event, used for action deduplication, e.g. notification.
  */
 class NX_VMS_RULES_API EventIdField: public ActionField
 {

@@ -12,24 +12,9 @@ namespace nx::vms::rules {
 
 QVariant EventIdField::build(const AggregatedEventPtr& event) const
 {
-    auto eventResourceId = event->property(utils::kCameraIdFieldName).value<QnUuid>();
-    if (eventResourceId.isNull())
-        eventResourceId = event->property(utils::kServerIdFieldName).value<QnUuid>();
+    NX_ASSERT(!event->id().isNull());
 
-    QByteArray data;
-    QDataStream stream(&data, QIODevice::WriteOnly);
-    stream << (qint64) event->timestamp().count() << eventResourceId;
-
-    if (ini().amendEventIds)
-    {
-        // Temporary solution, must be removed in future. Allows catch event duplications for both
-        // engines in parallel(it is handy, for example, to show notification from the both engines
-        // simultaneously).
-        constexpr auto kIdPostfix = "#";
-        stream << kIdPostfix;
-    }
-
-    return QVariant::fromValue(QnUuid::fromArbitraryData(data));
+    return QVariant::fromValue(event->id());
 }
 
 } // namespace nx::vms::rules
