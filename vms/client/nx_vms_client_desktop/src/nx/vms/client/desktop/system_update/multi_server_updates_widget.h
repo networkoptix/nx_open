@@ -306,7 +306,7 @@ private:
         /** We have no information about remote state right now. */
         initial,
         /**
-         * We have obtained update info from the internet, but we need to
+         * We have obtained update info from the Internet, but we need to
          * GET /ec2/updateInformation from the servers, to decide which state we should move to.
          */
         initialCheck,

@@ -174,7 +174,7 @@
           <number>140</number>
          </property>
          <property name="placeholderText">
-          <string>Add some comment</string>
+          <string>Add a comment</string>
          </property>
         </widget>
        </item>

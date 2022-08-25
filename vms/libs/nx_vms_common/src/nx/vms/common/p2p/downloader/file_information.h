@@ -61,7 +61,7 @@ public:
     /**%apidoc MD5 checksum of the entire file. */
     QByteArray md5;
 
-    /**%apidoc URL via which the file could be downloaded from the internet. */
+    /**%apidoc URL via which the file could be downloaded from the Internet. */
     nx::utils::Url url;
 
     /**%apidoc Size of a chunk, in bytes. */

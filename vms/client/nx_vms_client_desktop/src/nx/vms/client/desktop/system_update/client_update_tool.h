@@ -148,7 +148,7 @@ public:
         nx::vms::common::AbstractCertificateVerifier* certificateVerifier);
 
     /**
-     * Requests update information from the internet. It can proxy request through mediaserver if
+     * Requests update information from the Internet. It can proxy request through mediaserver if
      * client has no internet.
      */
     std::future<UpdateContents> requestInternetUpdateInfo(

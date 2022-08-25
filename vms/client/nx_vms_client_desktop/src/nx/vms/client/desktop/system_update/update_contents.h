@@ -35,9 +35,9 @@ QN_FUSION_DECLARE_FUNCTIONS(UpdateDeliveryInfo, (json))
  */
 enum class UpdateSourceType
 {
-    /** Got update info from the internet. */
+    /** Got update info from the Internet. */
     internet,
-    /** Got update info from the internet for specific build. */
+    /** Got update info from the Internet for specific build. */
     internetSpecific,
     /** Got update info from offline update package. */
     file,

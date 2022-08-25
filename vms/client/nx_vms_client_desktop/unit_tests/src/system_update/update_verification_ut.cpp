@@ -281,7 +281,7 @@ TEST_F(UpdateVerificationTest, testFailedUpdateChechk)
     EXPECT_FALSE(report.hasLatestVersion);
     EXPECT_TRUE(report.versionMode == VersionReport::VersionMode::build);
 
-    // "Unable to check updates on the internet"
+    // "Unable to check updates on the Internet"
     contents.sourceType = UpdateSourceType::internet;
     report = MultiServerUpdatesWidget::calculateUpdateVersionReport(
         contents, clientData.clientId);
