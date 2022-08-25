@@ -34,6 +34,7 @@ public:
     static const ItemDescriptor& manifest();
 
 private:
+    QString caption(common::SystemContext* context) const;
     QStringList detailing() const;
     QString extendedCaption(common::SystemContext* context) const;
 };
