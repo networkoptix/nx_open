@@ -100,4 +100,9 @@ EventPtr AggregatedEvent::initialEvent() const
     return m_aggregationInfoList.size() > 0 ? m_aggregationInfoList.front().event : EventPtr{};
 }
 
+QnUuid AggregatedEvent::id() const
+{
+    return m_id;
+}
+
 } // namespace nx::vms::rules
