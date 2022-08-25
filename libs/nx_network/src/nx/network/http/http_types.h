@@ -1118,3 +1118,12 @@ NX_NETWORK_API std::string formatDateTime(const QDateTime& value);
 NX_NETWORK_API QDateTime parseDate(const std::string_view& str);
 
 } // namespace nx::network::http
+
+template<>
+struct std::hash<nx::network::http::Method>
+{
+    std::size_t operator()(const nx::network::http::Method& method) const noexcept
+    {
+        return std::hash<std::string>{}(method.toString());
+    }
+};

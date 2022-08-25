@@ -26,21 +26,17 @@ protected:
         RequestPathParams expectedParams,
         const std::string& expectedPathTemplate)
     {
-        RequestPathParams params;
-        std::string pathTemplate;
-        const auto result = m_dictionary.match(path, &params, &pathTemplate);
+        const auto result = m_dictionary.match(path);
 
         ASSERT_TRUE(static_cast<bool>(result));
-        ASSERT_EQ(expectedValue, *result);
-        ASSERT_EQ(expectedParams, params);
-        ASSERT_EQ(pathTemplate, expectedPathTemplate);
+        ASSERT_EQ(expectedValue, result->value);
+        ASSERT_EQ(expectedParams, result->pathParams);
+        ASSERT_EQ(expectedPathTemplate, result->pathTemplate);
     }
 
     void assertPathNotMatched(const std::string& path)
     {
-        RequestPathParams params;
-        std::string pathTemplate;
-        ASSERT_FALSE(m_dictionary.match(path, &params, &pathTemplate));
+        ASSERT_FALSE(m_dictionary.match(path));
     }
 
 private:

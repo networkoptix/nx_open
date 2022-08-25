@@ -2,15 +2,9 @@
 
 #include "db_statistics_collector.h"
 
-#include <nx/fusion/model_functions.h>
 #include <nx/utils/time.h>
 
 namespace nx::sql {
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DurationStatistics, (json), DurationStatistics_sql_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QueryStatistics, (json), QueryStatistics_sql_Fields)
-
-//-------------------------------------------------------------------------------------------------
 
 StatisticsCollector::DurationStatisticsCalculationContext::DurationStatisticsCalculationContext(
     DurationStatistics* result)

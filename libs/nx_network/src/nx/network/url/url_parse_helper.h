@@ -13,8 +13,8 @@ namespace nx::network::url {
 namespace detail {
 
 NX_NETWORK_API std::string joinPath(
-    const std::string& left,
-    const std::string& right);
+    const std::string_view& left,
+    const std::string_view& right);
 
 } // namespace detail
 
@@ -34,8 +34,8 @@ NX_NETWORK_API QString normalizedPath(
 
 template<typename... Path>
 std::string joinPath(
-    const std::string& first,
-    const std::string& second,
+    const std::string_view& first,
+    const std::string_view& second,
     const Path&... other)
 {
     if constexpr (sizeof...(other) == 0)

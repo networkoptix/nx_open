@@ -116,4 +116,14 @@ private:
     DBResult m_dbResult;
 };
 
+//-------------------------------------------------------------------------------------------------
+
+struct Stats
+{
+    int pendingQueryCount = 0;
+    std::chrono::milliseconds oldestQueryAge = std::chrono::milliseconds::zero();
+};
+
+NX_REFLECTION_INSTRUMENT(Stats, (pendingQueryCount)(oldestQueryAge))
+
 } // namespace nx::sql

@@ -25,6 +25,8 @@ struct UserLockerSettings
     std::chrono::milliseconds lockPeriod = std::chrono::minutes(1);
 };
 
+NX_REFLECTION_INSTRUMENT(UserLockerSettings, (checkPeriod)(authFailureCount)(maxLockerCount)(lockPeriod))
+
 /**
  * If there were not less than authFailureCount login failures during last checkPeriod,
  * then username is locked for another lockPeriod.

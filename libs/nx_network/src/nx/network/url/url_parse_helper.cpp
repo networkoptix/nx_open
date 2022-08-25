@@ -80,9 +80,9 @@ QString normalizedPath(const QString& path, const QString& pathIgnorePrefix)
 
 namespace detail {
 
-std::string joinPath(const std::string& left, const std::string& right)
+std::string joinPath(const std::string_view& left, const std::string_view& right)
 {
-    return normalizePath(left + "/" + right);
+    return normalizePath(nx::utils::buildString(left, "/", right));
 }
 
 } // namespace detail

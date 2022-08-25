@@ -7,6 +7,7 @@
 #include <map>
 #include <vector>
 
+#include "request_matcher.h"
 #include "../http_types.h"
 
 namespace nx {
@@ -17,21 +18,24 @@ template<typename Mapped>
 class ExactPathMatcher
 {
 public:
+    using MatchResult = RequestMatchResult<Mapped>;
+
     bool add(const std::string_view& path, Mapped mapped)
     {
         return m_pathToMapped.emplace(std::string(path), std::move(mapped)).second;
     }
 
-    std::optional<std::reference_wrapper<const Mapped>> match(
-        const std::string_view& path,
-        RequestPathParams* /*pathParams*/,
-        std::string* /*pathTemplate*/) const
+    std::optional<MatchResult> match(const std::string_view& path) const
     {
-        auto it = m_pathToMapped.find(path);
-        if (it == m_pathToMapped.end())
-            return std::nullopt;
+        if (auto it = m_pathToMapped.find(path); it != m_pathToMapped.end())
+        {
+            return MatchResult{
+                .value = it->second,
+                .pathTemplate = (std::string_view) it->first,
+                .pathParams = {}};
+        }
 
-        return std::cref(it->second);
+        return std::nullopt;
     }
 
 private:
@@ -50,6 +54,6 @@ private:
     std::map<std::string, Mapped, Comparator> m_pathToMapped;
 };
 
-} // namespace nx
-} // namespace network
 } // namespace http
+} // namespace network
+} // namespace nx

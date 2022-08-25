@@ -355,10 +355,11 @@ private:
         RequestPathParams pathParams;
         std::string pathTemplate;
 
-        std::optional<std::reference_wrapper<const HandlerFactory>> handlerFactory =
-            pathMatchContext.pathToFactory.match(path, &pathParams, &pathTemplate);
-        if (handlerFactory)
-            return handlerFactory->get().instantiate(std::move(pathParams), std::move(pathTemplate));
+        std::optional<typename PathMatcherType<HandlerFactory>::MatchResult> result =
+            pathMatchContext.pathToFactory.match(path);
+
+        if (result)
+            return result->value.instantiate(std::move(result->pathParams), std::string(result->pathTemplate));
 
         if (pathMatchContext.defaultHandlerFactory)
         {

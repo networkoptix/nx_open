@@ -7,6 +7,7 @@
 #include <regex>
 #include <string>
 
+#include "../request_matcher.h"
 #include "../../http_types.h"
 
 namespace nx::network::http::server::rest {
@@ -24,6 +25,8 @@ template<typename Mapped>
 class PathMatcher
 {
 public:
+    using MatchResult = RequestMatchResult<Mapped>;
+
     /**
      * Registers path that may contain REST parameters. Each parameter is a string token
      * enclosed into {}. E.g., {name}. A path template may contain zero or more REST parameters.
@@ -56,12 +59,9 @@ public:
      * Matches registered paths. Path templates are tested in the order
      * they were registered using PathMatcher::add.
      */
-    std::optional<std::reference_wrapper<const Mapped>> match(
-        const std::string_view& path,
-        RequestPathParams* pathParams,
-        std::string* pathTemplate) const
+    std::optional<MatchResult> match(const std::string_view& path) const
     {
-        for (const auto& [pathTemplateStr, matchContext] : m_restPathToMatchContext)
+        for (const auto& [pathTemplateStr, matchContext]: m_restPathToMatchContext)
         {
             std::match_results<std::string_view::const_iterator> matchResult;
             if (std::regex_search(path.begin(), path.end(), matchResult, matchContext.regex))
@@ -78,11 +78,14 @@ public:
                     params.nameToValue.emplace(
                         matchContext.paramNames[i - 1], matchResult[i]);
                 }
+
                 if (!matched)
                     continue;
-                *pathParams = std::move(params);
-                *pathTemplate = pathTemplateStr;
-                return std::cref(matchContext.mapped);
+
+                return MatchResult{
+                    .value = matchContext.mapped,
+                    .pathTemplate = (std::string_view) pathTemplateStr,
+                    .pathParams = std::move(params)};
             }
         }
 

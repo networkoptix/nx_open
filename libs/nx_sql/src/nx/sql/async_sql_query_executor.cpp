@@ -164,13 +164,14 @@ const StatisticsCollector& AsyncSqlQueryExecutor::statisticsCollector() const
 void AsyncSqlQueryExecutor::reserveConnections(int count)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
+
     for (int i = 0; i < count; ++i)
         openNewConnection(lock);
 }
 
-int AsyncSqlQueryExecutor::pendingQueryCount() const
+Stats AsyncSqlQueryExecutor::stats() const
 {
-    return (int) m_queryQueue.size();
+    return m_queryQueue.stats();
 }
 
 void AsyncSqlQueryExecutor::createCursorImpl(
@@ -241,7 +242,7 @@ bool AsyncSqlQueryExecutor::isNewConnectionNeeded(
     // TODO: #akolesnikov Check for non-busy threads.
 
     const auto effectiveDBConnectionCount = m_dbThreadList.size();
-    const auto queueSize = static_cast< size_t >(m_queryQueue.size());
+    const auto queueSize = static_cast< size_t >(m_queryQueue.stats().pendingQueryCount);
     const auto maxDesiredQueueSize =
         effectiveDBConnectionCount * kDesiredMaxQueuedQueriesPerConnection;
     if (queueSize < maxDesiredQueueSize)
