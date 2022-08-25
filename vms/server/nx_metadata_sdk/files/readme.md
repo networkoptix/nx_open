@@ -30,7 +30,7 @@ dedicated interface) `class nx::sdk::analytics::IPlugin` (`src/nx/sdk/analytics/
 derived from `class nx::sdk::IPlugin` (`src/nx/sdk/i_plugin.h`). This base interface also defines
 the name and the prototype of the entry point function.
 
-ATTENTION: If you consider linking your Plugin to any dynamic libraries, including the ones from
+ATTENTION: If you consider linking your plugin to any dynamic libraries, including the ones from
 the OS, consult [src/nx/sdk/dynamic_libraries.md](@ref md_src_nx_sdk_dynamic_libraries) to avoid
 potential issues.
 

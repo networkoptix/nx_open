@@ -2,24 +2,20 @@
 
 #pragma once
 
+#include <camera/camera_plugin_types.h>
 #include <nx/sdk/interface.h>
 #include <nx/sdk/result.h>
-#include <camera/camera_plugin.h>
 
-namespace nx {
-namespace sdk {
-namespace archive {
+namespace nx::sdk::cloud_storage {
 
-struct Rational
-{
-    int num;
-    int den;
-};
-
+/**
+ * Abstract representaion of parameters corresponding to the substream of
+ * media data.
+ */
 class ICodecInfo: public Interface<ICodecInfo>
 {
 public:
-    static auto interfaceId() { return makeId("nx::sdk::archive::ICodecInfo"); }
+    static auto interfaceId() { return makeId("nx::sdk::cloud_storage::ICodecInfo"); }
 
     virtual nxcip::CompressionType compressionType() const = 0;
     virtual nxcip::PixelFormat pixelFormat() const = 0;
@@ -42,6 +38,4 @@ public:
     virtual int channelNumber() const = 0;
 };
 
-} // namespace archive
-} // namespace sdk
-} // namespace nx
+} // namespace nx::sdk::cloud_storage

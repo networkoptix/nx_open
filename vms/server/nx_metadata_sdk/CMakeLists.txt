@@ -39,7 +39,7 @@ set(copied_nx_sdk_src_nx_sdk_origin ${open_source_root}/vms/libs/nx_sdk/src/nx/s
 file(GLOB_RECURSE copied_nx_sdk_src_nx_sdk_files
     CONFIGURE_DEPENDS ${copied_nx_sdk_src_nx_sdk_origin}/*)
 list(FILTER copied_nx_sdk_src_nx_sdk_files
-    EXCLUDE REGEX "^${copied_nx_sdk_src_nx_sdk_origin}/archive/.*$")
+    EXCLUDE REGEX "^${copied_nx_sdk_src_nx_sdk_origin}/cloud_storage/.*$")
 set(copied_nx_sdk_unit_tests_origin ${open_source_root}/vms/libs/nx_sdk/unit_tests)
 file(GLOB_RECURSE copied_nx_sdk_unit_tests_files CONFIGURE_DEPENDS
     ${copied_nx_sdk_unit_tests_origin}/*)

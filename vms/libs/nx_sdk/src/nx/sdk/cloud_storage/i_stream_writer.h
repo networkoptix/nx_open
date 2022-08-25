@@ -7,13 +7,21 @@
 #include <nx/sdk/result.h>
 #include <camera/camera_plugin.h>
 
+#include "i_media_data_packet.h"
+
 namespace nx {
 namespace sdk {
-namespace archive {
+namespace cloud_storage {
 
 /**
+ * Stream writer abstraction. Stream is a sequence of media data packets, which more or
+ * less represent continuous chunk of media and metadata for the given period of time.
  * When Mediaserver is finished with the current stream ~IStreamWriter() will be called.
  * Implementation might do some finalization at this point.
+ * Server will create a StreamWriter object for each chunk of media data. So the media stream,
+ * being continuos is still cut on the small chunks of data each of which has its timestamp
+ * and duration. Each of those chunks are recorded using Stream Writer and subsequently
+ * requested back using a corresponding StreamReader object.
  */
 class IStreamWriter: public Interface<IStreamWriter>
 {
@@ -34,15 +42,15 @@ public:
      * If packet->type() == dptData && packet->channelNumber() == 0, then CodecInfo with
      * mediaType == AVMEDIA_TYPE_DATA && channelNumber == 0 can be used to process this packet.
      */
-    virtual ErrorCode putData(const nxcip::MediaDataPacket* packet) = 0;
+    virtual ErrorCode putData(const IMediaDataPacket* packet) = 0;
 
     /**
-     * This function should be called just before destruction of the StreamWriter object and no
-     * other calls should follow.
+     * This function will be called just before destruction of the StreamWriter object and no
+     * other calls (except destructor) will follow.
      */
     virtual void close(int64_t durationMs) = 0;
 };
 
-} // namespace archive
+} // namespace cloud_storage
 } // namespace sdk
 } // namespace nx

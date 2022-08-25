@@ -33,7 +33,6 @@ function(set_distribution_names)
         set(suffix_bananapi "bananapi${distribution_name_suffix}")
     endif()
 
-
     set(client_distribution_name
         "${prefix}-client-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(server_distribution_name
@@ -86,6 +85,8 @@ function(set_distribution_names)
         "${prefix}-video_source_sdk-${releaseVersion.full}-${sdkSuffix}" PARENT_SCOPE)
     set(storage_sdk_distribution_name
         "${prefix}-storage_sdk-${releaseVersion.full}-${sdkSuffix}" PARENT_SCOPE)
+    set(cloud_storage_sdk_distribution_name
+        "${prefix}-cloud_storage_sdk-${releaseVersion.full}-${sdkSuffix}" PARENT_SCOPE)
     set(vms_benchmark_distribution_name
         "${prefix}-vms_benchmark-${releaseVersion.full}-${vmsBenchmarkSuffix}" PARENT_SCOPE)
     set(ssc_analytics_plugin_distribution_name
