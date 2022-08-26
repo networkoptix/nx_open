@@ -265,6 +265,8 @@ public:
     virtual int64_t vmsSystemTimeSinceEpochMs() const override { return 0; }
     virtual const nx::sdk::IString* getHomeDir() const override { return new nx::sdk::String(); }
     virtual const char* serverId() const override { return ""; }
+    virtual IString* cloudSystemId() const { return new nx::sdk::String(); }
+    virtual IString* cloudAuthKey() const { return new nx::sdk::String(); }
 
     virtual const nx::sdk::IString* getServerSdkVersion() const override
     {
