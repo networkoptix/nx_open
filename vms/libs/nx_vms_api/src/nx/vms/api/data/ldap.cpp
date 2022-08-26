@@ -6,7 +6,6 @@
 
 namespace nx::vms::api {
 
-const QString kDefaultLdapSearchFilter = QStringLiteral("objectClass=inetOrgPerson");
 const QString kDefaultLdapLoginAttribute = QStringLiteral("uid");
 const QString kDefaultLdapGroupObjectClass = QStringLiteral("groupOfNames");
 const QString kDefaultLdapMemberAttribute = QStringLiteral("member");

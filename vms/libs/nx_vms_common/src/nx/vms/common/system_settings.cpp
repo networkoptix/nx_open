@@ -202,7 +202,7 @@ SystemSettings::AdaptorList SystemSettings::initLdapAdaptors()
         Names::ldapSearchBase, QString(), this, [] { return tr("LDAP search base"); });
 
     m_ldapSearchFilterAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        Names::ldapSearchFilter, nx::vms::api::kDefaultLdapSearchFilter, this,
+        Names::ldapSearchFilter, QString(), this,
         []
         {
             return tr(
