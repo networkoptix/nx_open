@@ -1,5 +1,7 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+customization_mobile_client_enabled: '${customization.mobile.enabled}'
+
 qt_directory: '${qt.dir}'
 icu_directory: '${icu_directory}'
 
@@ -16,6 +18,8 @@ help_directory: '${help_directory}'
 fonts_directory: '${CONAN_ROBOTO-FONTS_ROOT}'
 client_update_files_directory: '${client_update_files_directory}'
 server_update_files_directory: '${server_update_files_directory}'
+mobile_help_source_file_path: '${mobile_help_directory}/${mobile_help_file_name}'
+mobile_help_destination_file_name: '${mobile_help_file_name}'
 quick_start_guide_source_file_path: '${quick_start_guide_directory}/${quick_start_guide_file_name}'
 quick_start_guide_destination_file_name: '${quick_start_guide_file_name}'
 

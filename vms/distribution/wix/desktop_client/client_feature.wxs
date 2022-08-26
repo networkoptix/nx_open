@@ -141,6 +141,28 @@
                         </File>
                     </Component>
 
+                    <?if ${customization.mobile.enabled} = true ?>
+                        <Component Id="MobileHelp">
+                            <File
+                                Id="mobilehelp"
+                                Name="${mobile_help_file_name}"
+                                Source="${mobile_help_directory}/${mobile_help_file_name}"
+                                KeyPath="yes">
+
+                                <Shortcut
+                                    Id="DesktopMobileHelpShortcut"
+                                    Directory="DesktopFolder"
+                                    Name="${mobile_help_shortcut_name}"
+                                    WorkingDirectory='InstallDirRoot'/>
+                                <Shortcut
+                                    Id="StartMenuMobileHelpShortcut"
+                                    Directory="ProgramMenuDir"
+                                    Name="${mobile_help_shortcut_name}"
+                                    WorkingDirectory='InstallDirRoot'/>
+                            </File>
+                        </Component>
+                    <?endif?>
+
                 </Directory>
             </Directory>
         </DirectoryRef>
@@ -207,6 +229,9 @@
             <ComponentRef Id="NovFileAssociation"/>
 
             <ComponentRef Id="MiniLauncherExecutable" />
+            <?if ${customization.mobile.enabled} = true ?>
+                <ComponentRef Id="MobileHelp" />
+            <?endif?>
             <ComponentRef Id="QuickStartGuide" />
             <ComponentRef Id="AppLauncherExecutable" />
             <ComponentRef Id="ClientExecutable" />
