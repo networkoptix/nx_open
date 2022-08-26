@@ -58,14 +58,23 @@ public:
     public: std::string serverSdkVersion() const { return toPtr(getServerSdkVersion())->str(); }
 };
 
-class IUtilityProvider: public Interface<IUtilityProvider, IUtilityProvider1>
+class IUtilityProvider2: public Interface<IUtilityProvider2, IUtilityProvider1>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider2"); }
 
     virtual const char* serverId() const = 0;
 };
-using IUtilityProvider2 = IUtilityProvider;
+
+class IUtilityProvider: public Interface<IUtilityProvider, IUtilityProvider2>
+{
+public:
+    static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider3"); }
+
+    virtual IString* cloudSystemId() const = 0;
+    virtual IString* cloudAuthKey() const = 0;
+};
+using IUtilityProvider3 = IUtilityProvider;
 
 } // namespace sdk
 } // namespace nx
