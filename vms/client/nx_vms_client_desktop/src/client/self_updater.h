@@ -38,24 +38,24 @@ public:
     static bool runNewClient(const QStringList& args);
 
 private:
-    enum class Operation
-    {
-        registerUriHandler,
-        updateApplauncher,
-        updateMinilauncher,
-        updateQuickStartGuide
-    };
-
     struct UriHandlerUpdateResult
     {
         bool success = false;
         bool upgrade = false;
     };
 
+    struct HelpFileDescription
+    {
+        QString fileName;
+        QString shortcutName;
+        QString helpName;
+        QString componentDataDirName;
+    };
+
     UriHandlerUpdateResult registerUriHandler();
     void updateApplauncher();
     bool updateMinilauncherOnWindows(bool hasAdminRights);
-    bool updateQuickStartGuide();
+    bool updateHelpFile(const HelpFileDescription& helpDescription);
 
     nx::utils::SoftwareVersion getVersionFromFile(const QString& filename) const;
     bool saveVersionToFile(const QString& filename, const nx::utils::SoftwareVersion& version) const;

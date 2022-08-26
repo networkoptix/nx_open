@@ -105,6 +105,18 @@ NX_BRANDING_API QString desktopClientInternalName();
 /** Real application name, visible to the user. */
 NX_BRANDING_API QString desktopClientDisplayName();
 
+/** Shortcut to Mobile Help name. */
+NX_BRANDING_API QString mobileHelpShortcutName();
+
+/** Mobile Help document name. */
+NX_BRANDING_API QString mobileHelpDocumentName();
+
+/** Mobile Help file name. */
+NX_BRANDING_API QString mobileHelpFileName();
+
+/** Quick Start Guide document name. */
+NX_BRANDING_API QString quickStartGuideDocumentName();
+
 /** Shortcut to Quick Start Guide name. */
 NX_BRANDING_API QString quickStartGuideShortcutName();
 
@@ -137,6 +149,9 @@ NX_BRANDING_API QString installerName();
 
 /** Custom desktop client, created using open source. */
 NX_BRANDING_API bool isDesktopClientCustomized();
+
+/** Mobile Client is enabled in customization. */
+NX_BRANDING_API bool isMobileClientEnabledInCustomization();
 
 /** Whether Client auto-update should be enabled by default. */
 NX_BRANDING_API bool clientAutoUpdateEnabledByDefault();

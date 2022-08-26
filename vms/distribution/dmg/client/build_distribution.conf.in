@@ -4,6 +4,7 @@ UPDATE_ZIP="@update_file@"
 COMPATIBILITY_UPDATE_ZIP="@compatibility_update_file@"
 DISTRIBUTION_DMG="@dmg_file@"
 MAC_SIGN_IDENTITY="@customization.desktop.macos.signIdentity@"
+CUSTOMIZATION_MOBILE_CLIENT_ENABLED="@customization.mobile.enabled@"
 CODE_SIGNING="@codeSigning@"
 PACKAGES_DIR="@PACKAGES_DIR@"
 QT_DIR="@QT_DIR@"
@@ -27,5 +28,7 @@ KEYCHAIN_NOTARIZATION_USER="noptixbiz@gmail.com"
 ROBOTO_FONTS_DIRECTORY=@CONAN_ROBOTO-FONTS_ROOT@
 QUICK_START_GUIDE_FILE="@quick_start_guide_directory@/@quick_start_guide_file_name@"
 PYTHON="@PYTHON_EXECUTABLE@"
+VMS_DISTRIBUTION_COMMON_DIR="@vms_distribution_common_dir@"
+MOBILE_HELP_FILE="@mobile_help_directory@/@mobile_help_file_name@"
 
 ZIP_COMPRESSION_LEVEL=@zip_compression_level@

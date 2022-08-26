@@ -4,6 +4,7 @@ CUSTOMIZATION="@customization.companyId@"
 CUSTOMIZATION_DIR="@customization_dir@"
 CUSTOMIZATION_NAME="@customization@" #< E.g. for "networkoptix", the value is "default".
 CUSTOMIZATION_VMS_NAME="@customization.vmsName@"
+CUSTOMIZATION_MOBILE_CLIENT_ENABLED="@customization.mobile.enabled@"
 VERSION="@releaseVersion@.@buildNumber@"
 RELEASE_VERSION="@releaseVersion@"
 
@@ -32,6 +33,7 @@ DISTRIBUTION_NAME="@client_distribution_name@"
 UPDATE_ZIP="@client_update_distribution_name@.zip"
 
 QUICK_START_GUIDE_FILE="@quick_start_guide_directory@/@quick_start_guide_file_name@"
+MOBILE_HELP_FILE="@mobile_help_directory@/@mobile_help_file_name@"
 
 DEB_COMPRESSION_LEVEL=@deb_compression_level@
 ZIP_COMPRESSION_LEVEL=@zip_compression_level@
