@@ -2,21 +2,38 @@
 
 #include "stun_over_http_server.h"
 
-namespace nx {
-namespace network {
-namespace stun {
+namespace nx::network::stun {
 
-const char* const StunOverHttpServer::kStunProtocolName = "STUN/rfc5389";
+namespace detail {
+
+class TunnelAuthorizer:
+    public nx::network::http::tunneling::TunnelAuthorizer<nx::utils::stree::StringAttrDict>
+{
+public:
+    virtual void authorize(
+        const nx::network::http::RequestContext* requestContext,
+        CompletionHandler completionHandler) override
+    {
+        completionHandler(nx::network::http::StatusCode::ok, {}, requestContext->attrs);
+    }
+};
+
+} // namespace detail
+
+//-------------------------------------------------------------------------------------------------
 
 StunOverHttpServer::StunOverHttpServer(
-    nx::network::stun::MessageDispatcher* stunMessageDispatcher)
+    nx::network::stun::AbstractMessageHandler* messageHandler)
     :
-    m_dispatcher(stunMessageDispatcher),
+    m_messageHandler(messageHandler),
+    m_tunnelAuthorizer(std::make_unique<detail::TunnelAuthorizer>()),
     m_httpTunnelingServer(
-        [this](auto connection) { createStunConnection(std::move(connection)); },
-        nullptr)
+        [this](auto&&... args) { createStunConnection(std::forward<decltype(args)>(args)...); },
+        m_tunnelAuthorizer.get())
 {
 }
+
+StunOverHttpServer::~StunOverHttpServer() = default;
 
 StunOverHttpServer::StunConnectionPool& StunOverHttpServer::stunConnectionPool()
 {
@@ -35,15 +52,22 @@ void StunOverHttpServer::setInactivityTimeout(
 }
 
 void StunOverHttpServer::createStunConnection(
-    std::unique_ptr<AbstractStreamSocket> connection)
+    std::unique_ptr<AbstractStreamSocket> connection,
+    nx::utils::stree::StringAttrDict attrs)
 {
     auto stunConnection = std::make_shared<nx::network::stun::ServerConnection>(
         std::move(connection),
-        *m_dispatcher);
+        m_messageHandler,
+        std::move(attrs));
     m_stunConnectionPool.saveConnection(stunConnection);
     stunConnection->startReadingConnection(m_inactivityTimeout);
 }
 
-} // namespace stun
-} // namespace network
-} // namespace nx
+void StunOverHttpServer::createStunConnection(
+    std::unique_ptr<AbstractStreamSocket> connection,
+    nx::network::http::RequestContext ctx)
+{
+    createStunConnection(std::move(connection), std::move(ctx.attrs));
+}
+
+} // namespace nx::network::stun

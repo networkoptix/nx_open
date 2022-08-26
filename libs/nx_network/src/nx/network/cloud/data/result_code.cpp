@@ -47,4 +47,11 @@ void PrintTo(ResultCode val, ::std::ostream* os)
     *os << nx::reflect::toString(val);
 }
 
+//-------------------------------------------------------------------------------------------------
+
+std::string Result::toString() const
+{
+    return nx::utils::buildString("code: ", nx::reflect::toString(code), ", text: ", text);
+}
+
 } // namespace nx::hpm::api

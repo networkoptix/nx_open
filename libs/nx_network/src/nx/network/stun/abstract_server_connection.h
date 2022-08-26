@@ -9,7 +9,9 @@
 #include <nx/network/abstract_socket.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/stree/attribute_dictionary.h>
 #include <nx/utils/system_error.h>
+#include <nx/utils/string.h>
 
 #include "message.h"
 

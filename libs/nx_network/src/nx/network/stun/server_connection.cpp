@@ -4,19 +4,19 @@
 
 #include <nx/network/socket_global.h>
 
-#include "message_dispatcher.h"
+#include "abstract_message_handler.h"
 
-namespace nx {
-namespace network {
-namespace stun {
+namespace nx::network::stun {
 
 ServerConnection::ServerConnection(
     std::unique_ptr<AbstractStreamSocket> sock,
-    const MessageDispatcher& dispatcher)
-:
+    AbstractMessageHandler* messageHandler,
+    nx::utils::stree::StringAttrDict attrs)
+    :
     base_type(std::move(sock)),
     m_peerAddress(base_type::getForeignAddress()),
-    m_dispatcher(dispatcher)
+    m_messageHandler(messageHandler),
+    m_attrs(std::move(attrs))
 {
     SocketGlobals::instance().allocationAnalyzer().recordObjectCreation(this);
     ++SocketGlobals::instance().debugCounters().stunServerConnectionCount;
@@ -38,9 +38,7 @@ void ServerConnection::sendMessage(
     nx::network::stun::Message message,
     std::function<void(SystemError::ErrorCode)> handler)
 {
-    base_type::sendMessage(
-        std::move(message),
-        std::move(handler));
+    base_type::sendMessage(std::move(message), std::move(handler));
 }
 
 nx::network::TransportProtocol ServerConnection::transportProtocol() const
@@ -94,25 +92,20 @@ void ServerConnection::setDestructHandler(std::function<void()> handler)
     m_destructHandler = std::move(handler);
 }
 
-void ServerConnection::processMessage( Message message )
+void ServerConnection::processMessage(Message message)
 {
-    switch( message.header.messageClass )
+    switch (message.header.messageClass)
     {
         case MessageClass::request:
-            switch( message.header.method )
-            {
-                case bindingMethod:
-                    processBindingRequest( std::move( message ) );
-                    break;
-
-                default:
-                    processCustomRequest( std::move( message ) );
-                    break;
-            }
+            if (message.header.method == bindingMethod)
+                processBindingRequest(std::move(message));
+            else
+                m_messageHandler->serve(MessageContext{
+                    shared_from_this(), std::move(message), m_attrs});
             break;
 
         default:
-            NX_ASSERT( false );  //not supported yet
+            NX_ASSERT(false);  //not supported yet
     }
 
     // Message handler has closed connection.
@@ -120,7 +113,7 @@ void ServerConnection::processMessage( Message message )
         closeConnection(SystemError::noError);
 }
 
-void ServerConnection::processBindingRequest( Message message )
+void ServerConnection::processBindingRequest(Message message)
 {
     Message response(stun::Header(
         MessageClass::successResponse,
@@ -132,25 +125,4 @@ void ServerConnection::processBindingRequest( Message message )
     sendMessage(std::move(response), nullptr);
 }
 
-void ServerConnection::processCustomRequest( Message message )
-{
-    const auto messageHeader = message.header;
-
-    if (m_dispatcher.dispatchRequest(shared_from_this(), std::move(message)))
-        return;
-
-    stun::Message response(stun::Header(
-        stun::MessageClass::errorResponse,
-        messageHeader.method,
-        std::move(messageHeader.transactionId)));
-
-    // TODO: verify with RFC
-    response.newAttribute< stun::attrs::ErrorCode >(
-        stun::error::notFound, "Method is not supported");
-
-    sendMessage(std::move(response), nullptr);
-}
-
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun

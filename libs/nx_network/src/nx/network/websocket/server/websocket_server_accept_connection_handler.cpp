@@ -13,13 +13,13 @@ AcceptConnectionHandler::AcceptConnectionHandler(
         nx::network::websocket::kWebsocketProtocolName,
         [onConnectionCreated = std::move(onConnectionCreated)](
             std::unique_ptr<AbstractStreamSocket> connection,
-            http::RequestPathParams restParams)
+            http::RequestContext ctx)
         {
             auto webSocket = std::make_unique<WebSocket>(
                 std::move(connection), SendMode::singleMessage, ReceiveMode::message,
                 Role::server, FrameType::binary, CompressionType::perMessageDeflate);
             webSocket->start();
-            onConnectionCreated(std::move(webSocket), std::move(restParams));
+            onConnectionCreated(std::move(webSocket), std::move(ctx.requestPathParams));
         })
 {
 }

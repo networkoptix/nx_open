@@ -7,16 +7,16 @@
 #include <nx/utils/log/log.h>
 
 #include "abstract_server_connection.h"
-#include "message_dispatcher.h"
+#include "abstract_message_handler.h"
 #include "udp_message_response_sender.h"
 
 namespace nx {
 namespace network {
 namespace stun {
 
-UdpServer::UdpServer(const MessageDispatcher* dispatcher):
+UdpServer::UdpServer(AbstractMessageHandler* messageHandler):
     m_messagePipeline(this),
-    m_dispatcher(dispatcher),
+    m_messageHandler(messageHandler),
     m_activeRequestCounter(std::make_shared<nx::utils::Counter>())
 {
     bindToAioThread(getAioThread());
@@ -109,12 +109,13 @@ void UdpServer::stopWhileInAioThread()
     m_messagePipeline.pleaseStopSync();
 }
 
-void UdpServer::messageReceived(SocketAddress sourceAddress, Message mesage)
+void UdpServer::messageReceived(SocketAddress sourceAddress, Message message)
 {
-    m_dispatcher->dispatchRequest(
+    m_messageHandler->serve(MessageContext{
         std::make_shared<UDPMessageResponseSender>(
             this, m_activeRequestCounter, std::move(sourceAddress)),
-        std::move(mesage));
+        std::move(message),
+        {} /*empty attributes*/});
 }
 
 void UdpServer::ioFailure(SystemError::ErrorCode)

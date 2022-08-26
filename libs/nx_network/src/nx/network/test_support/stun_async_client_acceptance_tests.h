@@ -448,7 +448,7 @@ private:
 
         m_server->dispatcher().registerRequestProcessor(
             m_testMethodNumber,
-            std::bind(&StunAsyncClientAcceptanceTest::sendResponse, this, _1, _2));
+            [this](auto&&... args) { sendResponse(std::forward<decltype(args)>(args)...); });
 
         ASSERT_TRUE(m_server->bind(m_serverEndpoint));
         m_serverEndpoint = nx::network::url::getEndpoint(m_server->url());
@@ -497,18 +497,15 @@ private:
             this);
     }
 
-    void sendResponse(
-        std::shared_ptr<stun::AbstractServerConnection> connection,
-        nx::network::stun::Message request)
+    void sendResponse(nx::network::stun::MessageContext ctx)
     {
         NX_MUTEX_LOCKER lock(&m_serverSendResponseLock);
 
-        nx::network::stun::Message response(
-            stun::Header(
-                stun::MessageClass::successResponse,
-                request.header.method,
-                request.header.transactionId));
-        connection->sendMessage(std::move(response));
+        nx::network::stun::Message response(stun::Header(
+            stun::MessageClass::successResponse,
+            ctx.message.header.method,
+            ctx.message.header.transactionId));
+        ctx.connection->sendMessage(std::move(response));
     }
 
     void storeRequestResult(

@@ -13,7 +13,7 @@ namespace nx::network::http::server::handler {
 using TunnelCreatedHandler =
     nx::utils::MoveOnlyFunc<void(
         std::unique_ptr<AbstractStreamSocket>,
-        RequestPathParams /*REST request parameters values*/)>;
+        RequestContext /*openTunnelRequestContext*/)>;
 
 /**
  * Upgrades HTTP connection to the protocol specified.

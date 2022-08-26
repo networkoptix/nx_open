@@ -16,10 +16,10 @@ CreateTunnelHandler::CreateTunnelHandler(
 }
 
 void CreateTunnelHandler::processRequest(
-    RequestContext requestContext,
+    RequestContext ctx,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
-    const auto& request = requestContext.request;
+    const auto& request = ctx.request;
 
     auto upgradeIter = request.headers.find("Upgrade");
     if (upgradeIter == request.headers.end() ||
@@ -30,13 +30,10 @@ void CreateTunnelHandler::processRequest(
 
     RequestResult requestResult(StatusCode::switchingProtocols);
     requestResult.connectionEvents.onResponseHasBeenSent =
-        [onTunnelCreated = std::move(m_onTunnelCreated),
-            restParams = std::exchange(requestContext.requestPathParams, {})](
-                HttpServerConnection* httpConnection)
+        [onTunnelCreated = std::move(m_onTunnelCreated), ctx = std::move(ctx)](
+            HttpServerConnection* httpConnection) mutable
         {
-            onTunnelCreated(
-                httpConnection->takeSocket(),
-                std::move(restParams));
+            onTunnelCreated(httpConnection->takeSocket(), std::move(ctx));
         };
     completionHandler(std::move(requestResult));
 }

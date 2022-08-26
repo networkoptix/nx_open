@@ -16,7 +16,7 @@ namespace nx {
 namespace network {
 namespace stun {
 
-class MessageDispatcher;
+class AbstractMessageHandler;
 
 /**
  * Receives STUN message over udp, forwards them to dispatcher, sends response message.
@@ -33,7 +33,7 @@ class NX_NETWORK_API UdpServer:
         MessageSerializer> PipelineType;
 
 public:
-    UdpServer(const MessageDispatcher* dispatcher);
+    UdpServer(AbstractMessageHandler* messageHandler);
     virtual ~UdpServer() override;
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
@@ -73,7 +73,7 @@ public:
 private:
     PipelineType m_messagePipeline;
     bool m_boundToLocalAddress = false;
-    const MessageDispatcher* m_dispatcher = nullptr;
+    AbstractMessageHandler* m_messageHandler = nullptr;
     bool m_fingerprintRequired = false;
 
     /**

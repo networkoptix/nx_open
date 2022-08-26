@@ -14,11 +14,9 @@
 
 #include "abstract_server_connection.h"
 
-namespace nx {
-namespace network {
-namespace stun {
+namespace nx::network::stun {
 
-class MessageDispatcher;
+class AbstractMessageHandler;
 
 class NX_NETWORK_API ServerConnection:
     public nx::network::server::BaseStreamProtocolConnection<
@@ -36,9 +34,14 @@ public:
         MessageParser,
         MessageSerializer>;
 
+    /**
+     * @param attrs These will be passed along with every message.
+     */
     ServerConnection(
         std::unique_ptr<AbstractStreamSocket> sock,
-        const MessageDispatcher& dispatcher);
+        AbstractMessageHandler* messageHandler,
+        nx::utils::stree::StringAttrDict attrs = {});
+
     ~ServerConnection();
 
     ServerConnection(const ServerConnection&) = delete;
@@ -65,16 +68,14 @@ protected:
 
 private:
     void processBindingRequest(Message message);
-    void processCustomRequest(Message message);
 
 private:
     const SocketAddress m_peerAddress;
 
     nx::Mutex m_mutex;
     std::function< void() > m_destructHandler;
-    const MessageDispatcher& m_dispatcher;
+    AbstractMessageHandler* m_messageHandler = nullptr;
+    const nx::utils::stree::StringAttrDict m_attrs;
 };
 
-} // namespace stun
-} // namespace network
-} // namespace nx
+} // namespace nx::network::stun
